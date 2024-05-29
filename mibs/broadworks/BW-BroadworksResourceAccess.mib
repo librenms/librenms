@@ -1,0 +1,92 @@
+--===============================================================
+-- File Name : BW-BroadworksDeviceMgmtSystem.mib
+-- Date      : 03/01/2008
+-- Author    : BroadSoft Inc.
+--===============================================================
+
+BW-BroadworksResourceAccess	DEFINITIONS ::= BEGIN
+	IMPORTS
+		MODULE-COMPLIANCE, OBJECT-GROUP          
+			FROM SNMPv2-CONF
+		enterprises, MODULE-IDENTITY, OBJECT-TYPE, Counter32
+			FROM SNMPv2-SMI;
+
+
+	
+	broadsoft	MODULE-IDENTITY
+		LAST-UPDATED	"200803011000Z"
+		ORGANIZATION	"Broadsoft, Inc"
+		CONTACT-INFO	"Broadsoft, Inc
+220 Perry Parkway
+Gaithersburg, MD  20877
+301-977-9440"
+		DESCRIPTION		
+				"The BW-BroadworksResourceAccess.mib is introduces to capture the performance measurements for the BroadWorks Resource Access."
+				 
+		::=  {  enterprises  6431  }
+
+	broadworks	OBJECT IDENTIFIER
+		::=  {  broadsoft  1  }
+
+	resourceAccess	OBJECT IDENTIFIER
+		::=  {  broadworks  13  }
+
+	operations	OBJECT IDENTIFIER
+		::=  {  resourceAccess  1  }
+
+	bwResourceAccessMibConformance	OBJECT IDENTIFIER
+		::=  {  resourceAccess  1000  }
+
+-- cpeDevicesModule modules  ...........................................
+
+	bwFileGets		OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This counter reflects the number of times the application gets a file from the file repository."
+		::=  {  operations  1  }
+
+	bwFileDeletes		OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This counter reflects the number of times the application deletes a file from the file repository."
+		::=  {  operations  2  }
+		
+	bwFilePuts		OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This counter reflects the number of times the application saves a file in the file repository."
+		::=  {  operations  3  }
+		
+		
+-- BroadWorks Resource Access MIB Conformance Definition  ...........................................
+
+bwResourceAccessMibGroups		OBJECT IDENTIFIER ::= { bwResourceAccessMibConformance 1 }
+bwResourceAccessMibCompliancy		OBJECT IDENTIFIER ::= { bwResourceAccessMibConformance 2 }
+
+-- units of conformance
+
+bwResourceAccessOperationsGroup    OBJECT-GROUP
+    OBJECTS { bwFileGets, bwFileDeletes, bwFilePuts }
+    STATUS  current
+    DESCRIPTION
+       "This group defines the operations statistics for the Resource Access component."
+    ::= { bwResourceAccessMibGroups 1 }
+
+-- 
+bwResourceAccessBasicCompliance MODULE-COMPLIANCE
+	STATUS current
+     	DESCRIPTION
+		"BroadWorks Resource Access MIB compliance"
+	MODULE -- this module
+		MANDATORY-GROUPS { bwResourceAccessOperationsGroup }
+	::= { bwResourceAccessMibCompliancy 1 }
+
+-- End of MIB file - Do not put anything behind this line ...........................................
+
+END

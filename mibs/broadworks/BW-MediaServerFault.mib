@@ -1,0 +1,213 @@
+
+-- File Name : BW-MediaServerFault.mib
+BW-MediaServerFault DEFINITIONS ::= BEGIN
+  IMPORTS
+    MODULE-IDENTITY, NOTIFICATION-TYPE
+      FROM SNMPv2-SMI
+    common, faultFields, identifier, timeStamp, alarmName, systemName, severity, alarmState, component, subcomponent, problemText, recommendedActionsText
+      FROM BroadworksFault;
+
+  systemFaults MODULE-IDENTITY
+    LAST-UPDATED  "200201220000Z"
+    ORGANIZATION  "Broadsoft, Inc"
+    CONTACT-INFO  "Broadsoft, Inc.
+220 Perry Parkway
+Gaithersburg, MD  20877
+301-977-9440"
+    DESCRIPTION
+        "The defines the fault "
+    REVISION    "200009191431Z"
+    DESCRIPTION
+        ""
+    ::=  {  common  1  }
+
+  bwPMMediaServerLaunched  NOTIFICATION-TYPE
+    OBJECTS     { identifier ,timeStamp ,alarmName ,systemName ,severity ,component ,subcomponent ,problemText ,recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "For the actual description, refer the BroadWorks FaultManagementGuide as it may contain variable data."
+    ::=  {  systemFaults 1501  }
+
+  bwPMMediaServerShutDown  NOTIFICATION-TYPE
+    OBJECTS     { identifier ,timeStamp ,alarmName ,systemName ,severity ,component ,subcomponent ,problemText ,recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "For the actual description, refer the BroadWorks FaultManagementGuide as it may contain variable data."
+    ::=  {  systemFaults 1502  }
+
+  bwPMMediaServerRestarted  NOTIFICATION-TYPE
+    OBJECTS     { identifier ,timeStamp ,alarmName ,systemName ,severity ,component ,subcomponent ,problemText ,recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "For the actual description, refer the BroadWorks FaultManagementGuide as it may contain variable data."
+    ::=  {  systemFaults 1503  }
+
+  bwPMMediaServerDeath  NOTIFICATION-TYPE
+    OBJECTS     { identifier ,timeStamp ,alarmName ,systemName ,severity ,component ,subcomponent ,problemText ,recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "For the actual description, refer the BroadWorks FaultManagementGuide as it may contain variable data."
+    ::=  {  systemFaults 1504  }
+
+  msSoftwareError  NOTIFICATION-TYPE
+    OBJECTS     { identifier ,timeStamp ,alarmName ,systemName ,severity ,component ,subcomponent ,problemText ,recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "For the actual description, refer the BroadWorks FaultManagementGuide as it may contain variable data."
+    ::=  {  systemFaults 1505  }
+
+  msMemAllocFailure  NOTIFICATION-TYPE
+    OBJECTS     { identifier ,timeStamp ,alarmName ,systemName ,severity ,component ,subcomponent ,problemText ,recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "For the actual description, refer the BroadWorks FaultManagementGuide as it may contain variable data."
+    ::=  {  systemFaults 1506  }
+
+  msStaleSession  NOTIFICATION-TYPE
+    OBJECTS     { identifier ,timeStamp ,alarmName ,systemName ,severity ,component ,subcomponent ,problemText ,recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "For the actual description, refer the BroadWorks FaultManagementGuide as it may contain variable data."
+    ::=  {  systemFaults 1507  }
+
+  msInvalidAudioFile  NOTIFICATION-TYPE
+    OBJECTS     { identifier ,timeStamp ,alarmName ,systemName ,severity ,component ,subcomponent ,problemText ,recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "For the actual description, refer the BroadWorks FaultManagementGuide as it may contain variable data."
+    ::=  {  systemFaults 1509  }
+
+  msShutDown  NOTIFICATION-TYPE
+    OBJECTS     { identifier ,timeStamp ,alarmName ,systemName ,severity ,component ,subcomponent ,problemText ,recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "For the actual description, refer the BroadWorks FaultManagementGuide as it may contain variable data."
+    ::=  {  systemFaults 1510  }
+
+  msSmtpFailure  NOTIFICATION-TYPE
+    OBJECTS     { identifier ,timeStamp ,alarmName ,systemName ,severity ,component ,subcomponent ,problemText ,recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "For the actual description, refer the BroadWorks FaultManagementGuide as it may contain variable data."
+    ::=  {  systemFaults 1511  }
+
+  msLicenseHWViolation  NOTIFICATION-TYPE
+    OBJECTS     { identifier ,timeStamp ,alarmName ,systemName ,severity ,component ,subcomponent ,problemText ,recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "For the actual description, refer the BroadWorks FaultManagementGuide as it may contain variable data."
+    ::=  {  systemFaults 1512  }
+
+  msHTTPConnectionFailure  NOTIFICATION-TYPE
+    OBJECTS     { identifier ,timeStamp ,alarmName ,systemName ,severity ,component ,subcomponent ,problemText ,recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "For the actual description, refer the BroadWorks FaultManagementGuide as it may contain variable data."
+    ::=  {  systemFaults 1513  }
+
+  msHTTPFileNotFound  NOTIFICATION-TYPE
+    OBJECTS     { identifier ,timeStamp ,alarmName ,systemName ,severity ,component ,subcomponent ,problemText ,recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "For the actual description, refer the BroadWorks FaultManagementGuide as it may contain variable data."
+    ::=  {  systemFaults 1515  }
+
+  msHTTPReceiveFailure  NOTIFICATION-TYPE
+    OBJECTS     { identifier ,timeStamp ,alarmName ,systemName ,severity ,component ,subcomponent ,problemText ,recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "For the actual description, refer the BroadWorks FaultManagementGuide as it may contain variable data."
+    ::=  {  systemFaults 1516  }
+
+  msRTPInterfaceFailure  NOTIFICATION-TYPE
+    OBJECTS     { identifier ,timeStamp ,alarmName ,systemName ,severity ,component ,subcomponent ,problemText ,recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "For the actual description, refer the BroadWorks FaultManagementGuide as it may contain variable data."
+    ::=  {  systemFaults 1517  }
+
+  msRTPInterfaceNotFound  NOTIFICATION-TYPE
+    OBJECTS     { identifier ,timeStamp ,alarmName ,systemName ,severity ,component ,subcomponent ,problemText ,recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "For the actual description, refer the BroadWorks FaultManagementGuide as it may contain variable data."
+    ::=  {  systemFaults 1518  }
+
+  msnddExecutionFailure  NOTIFICATION-TYPE
+    OBJECTS     { identifier ,timeStamp ,alarmName ,systemName ,severity ,component ,subcomponent ,problemText ,recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "For the actual description, refer the BroadWorks FaultManagementGuide as it may contain variable data."
+    ::=  {  systemFaults 1519  }
+
+  msLiveAudioHWFailure  NOTIFICATION-TYPE
+    OBJECTS     { identifier ,timeStamp ,alarmName ,systemName ,severity ,component ,subcomponent ,problemText ,recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "For the actual description, refer the BroadWorks FaultManagementGuide as it may contain variable data."
+    ::=  {  systemFaults 1520  }
+
+  msLiveAudioLicenseViolation  NOTIFICATION-TYPE
+    OBJECTS     { identifier ,timeStamp ,alarmName ,systemName ,severity ,component ,subcomponent ,problemText ,recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "For the actual description, refer the BroadWorks FaultManagementGuide as it may contain variable data."
+    ::=  {  systemFaults 1521  }
+
+  msNoPortsAvailable  NOTIFICATION-TYPE
+    OBJECTS     { identifier ,timeStamp ,alarmName ,systemName ,severity ,component ,subcomponent ,problemText ,recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "For the actual description, refer the BroadWorks FaultManagementGuide as it may contain variable data."
+    ::=  {  systemFaults 1522  }
+
+  msVXMLAppServerUnreachable  NOTIFICATION-TYPE
+    OBJECTS     { identifier ,timeStamp ,alarmName ,systemName ,severity ,component ,subcomponent ,problemText ,recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "For the actual description, refer the BroadWorks FaultManagementGuide as it may contain variable data."
+    ::=  {  systemFaults 1523  }
+
+  msVxmlScriptError  NOTIFICATION-TYPE
+    OBJECTS     { identifier ,timeStamp ,alarmName ,systemName ,severity ,component ,subcomponent ,problemText ,recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "For the actual description, refer the BroadWorks FaultManagementGuide as it may contain variable data."
+    ::=  {  systemFaults 1524  }
+
+  msVXMLSecurityThresholdExceeded  NOTIFICATION-TYPE
+    OBJECTS     { identifier ,timeStamp ,alarmName ,systemName ,severity ,component ,subcomponent ,problemText ,recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "For the actual description, refer the BroadWorks FaultManagementGuide as it may contain variable data."
+    ::=  {  systemFaults 1525  }
+
+  msMrcpConnectionFailure  NOTIFICATION-TYPE
+    OBJECTS     { identifier ,timeStamp ,alarmName ,systemName ,severity ,component ,subcomponent ,problemText ,recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "For the actual description, refer the BroadWorks FaultManagementGuide as it may contain variable data."
+    ::=  {  systemFaults 1526  }
+
+  msMrcpKeepAliveFailure  NOTIFICATION-TYPE
+    OBJECTS     { identifier ,timeStamp ,alarmName ,systemName ,severity ,component ,subcomponent ,problemText ,recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "For the actual description, refer the BroadWorks FaultManagementGuide as it may contain variable data."
+    ::=  {  systemFaults 1527  }
+
+  msRouteAdvance  NOTIFICATION-TYPE
+    OBJECTS     { identifier ,timeStamp ,alarmName ,systemName ,severity ,component ,subcomponent ,problemText ,recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "For the actual description, refer the BroadWorks FaultManagementGuide as it may contain variable data."
+    ::=  {  systemFaults 1528  }
+
+  msMrcpError  NOTIFICATION-TYPE
+    OBJECTS     { identifier ,timeStamp ,alarmName ,systemName ,severity ,component ,subcomponent ,problemText ,recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "For the actual description, refer the BroadWorks FaultManagementGuide as it may contain variable data."
+    ::=  {  systemFaults 1529  }
+
+END

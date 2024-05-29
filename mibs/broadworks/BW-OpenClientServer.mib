@@ -1,0 +1,1086 @@
+--===============================================================
+-- File Name : BW-OpenClientServer.mib
+-- Date      : 06/02/2004
+-- Author    : BroadSoft Inc.
+--===============================================================
+
+BW-OpenClientServer	DEFINITIONS ::= BEGIN
+	IMPORTS
+		DisplayString
+			FROM SNMPv2-TC
+		MODULE-COMPLIANCE, OBJECT-GROUP          
+			FROM SNMPv2-CONF
+		enterprises, MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-TYPE, Gauge32, Counter32, Integer32, Unsigned32
+			FROM SNMPv2-SMI;
+
+
+	
+	broadsoft	MODULE-IDENTITY
+		LAST-UPDATED	"200508161000Z"
+		ORGANIZATION	"Broadsoft, Inc"
+		CONTACT-INFO	"Broadsoft, Inc
+220 Perry Parkway
+Gaithersburg, MD  20877
+301-977-9440"
+		DESCRIPTION		
+				"This MIB contains the performance measurements related to the BroadWorks
+				 Open Client Server."
+		REVISION		"200508161000Z"
+		DESCRIPTION		
+				"Added MIB conformance section."
+		REVISION		"200009191431Z"
+		DESCRIPTION		
+				""
+		::=  {  enterprises  6431  }
+
+	broadworks	OBJECT IDENTIFIER
+		::=  {  broadsoft  1  }
+
+	openClientServer	OBJECT IDENTIFIER
+		::=  {  broadworks  8  }
+
+	protocols	OBJECT IDENTIFIER
+		::=  {  openClientServer  1  }
+
+	concurrent	OBJECT IDENTIFIER
+		::=  {  openClientServer  2  }
+
+	ocsReserved	OBJECT IDENTIFIER
+		::=  {  openClientServer  999  }
+
+	bwOcsMibConformance	OBJECT IDENTIFIER
+		::=  {  openClientServer  1000  }
+
+	cap	OBJECT IDENTIFIER
+		::=  {  protocols  1  }
+
+	oss	OBJECT IDENTIFIER
+		::=  {  protocols  2  }
+
+	nsoss	OBJECT IDENTIFIER
+		::=  {  protocols  3  }
+		
+	commonComm	OBJECT IDENTIFIER
+		::=  {  protocols  4  }
+
+	extAuth	OBJECT IDENTIFIER
+		::=  {  protocols  5  }
+        
+	oci	OBJECT IDENTIFIER
+		::=  {  protocols  6  }
+
+	tcp	OBJECT IDENTIFIER
+		::=  {  protocols  7  }
+
+-- cap modules  ...........................................
+
+	bwOCSCAPRegisterAuthentications	OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"The number of registerAuthentication CAP messages received."
+		::=  {  cap  1  }
+
+	bwOCSCAPResponseAuthentications	OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			obsolete
+		DESCRIPTION		
+				"The number of responseAuthentication CAP messages received."
+		::=  {  cap  2  }
+
+	bwOCSCAPRegisterRequests	OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			obsolete
+		DESCRIPTION		
+				"The number of registerRequest CAP messages received."
+		::=  {  cap  3  }
+
+	bwOCSCAPRegisterResponses	OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			obsolete
+		DESCRIPTION		
+				"This counter was replaced with bwOCSCAPRegisterRequestIns and bwOCSCAPRegisterRequestOuts"
+		::=  {  cap  4  }
+
+	bwOCSCAPUnsuccessfulRegisterResponses	OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"The number of failed registerResponse CAP messages received."
+		::=  {  cap  5  }
+
+	bwOCSCAPAcknowledgements	OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"The number of acknowledgement CAP messages received."
+		::=  {  cap  6  }
+
+	bwOCSCAPUnregisterIns	OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"The number of unregister CAP messages received."
+		::=  {  cap  7  }
+
+	bwOCSCAPUnregisterOuts	OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"The number of unregister CAP messages sent."
+		::=  {  cap  8  }
+
+	bwOCSCAPSessionUpdates	OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"The number of sessionUpdate CAP messages received."
+		::=  {  cap  9  }
+
+	bwOCSCAPProfileUpdates	OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"The number of profileUpdate CAP messages received."
+		::=  {  cap  10  }
+
+	bwOCSCAPCallUpdates	OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"The number of callUpdate CAP messages received."
+		::=  {  cap  11  }
+
+	bwOCSCAPCallActions	OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"The number of callAction CAP messages received."
+		::=  {  cap  12  }
+
+	bwOCSCAPCallControlInfos	OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"The number of callControlInfo CAP messages received."
+		::=  {  cap  13  }
+
+	bwOCSCAPInfoRequests	OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"The number of infoRequest CAP messages received."
+		::=  {  cap  14  }
+
+	bwOCSCAPInfoResponses	OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"The number of infoResponse CAP messages received."
+		::=  {  cap  15  }
+
+	bwOCSCAPServerStatusRequests	OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"The number of serverStatusRequest CAP messages received."
+		::=  {  cap  16  }
+
+	bwOCSCAPExternalNotifies	OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"The number of externalNotify CAP messages received."
+		::=  {  cap  17  }
+
+
+	bwOCSCAPMonitoringUsersRequests	OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"The number of monitoringUsersRequest CAP messages received."
+		::=  {  cap  18  }
+
+	bwOCSCAPMonitoringUsersResponses	OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"The number of monitoringUsersResponse CAP messages sent."
+		::=  {  cap  19  }
+
+	bwOCSCAPStatsQueueUpdatesOut	OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This counter reflects the number of CAP queueUpdate messages that have been sent out by the system."
+		::=  {  cap  20  }
+
+	bwOCSCAPStatsQueueActionsIn	OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This counter reflects the number of CAP queueAction messages that have been received by the system."
+		::=  {  cap  21  }
+
+	bwOCSCAPStatsDatagramsIn	OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This counter reflects the number of CAP datagram  commands  that have been received by the system."
+		::=  {  cap  22  }
+
+	bwOCSCAPStatsDatagramsOut	OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This counter reflects the number of CAP datagram  commands  that have been sent by the system."
+		::=  {  cap  23  }
+
+	bwOCSCAPRegisterRequestIns	OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This counter is incremented when the OCS receives a CAP registerRequest."
+		::=  {  cap  24  }
+
+	bwOCSCAPRegisterRequestOuts	OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This counter is incremented when the OCS sends a CAP registerRequest."
+		::=  {  cap  25  }
+
+	bwOCSCAPResponseAuthenticationIns	OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This counter is incremented when the OCS receives a CAP responseAuthentication."
+		::=  {  cap  26  }
+
+	bwOCSCAPResponseAuthenticationOuts	OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This counter is incremented when the OCS sends a CAP responseAuthentication."
+		::=  {  cap  27  }
+
+-- oss modules  ...........................................
+
+	bwOCSOSSRequestAuthentications	OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			obsolete
+		DESCRIPTION		
+				"The number of requestAuthentication OSS messages received."
+		::=  {  oss  1  }
+
+	bwOCSOSSResponseAuthentications	OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			obsolete
+		DESCRIPTION		
+				"The number of requestAuthentication response OSS messages received."
+		::=  {  oss  2  }
+
+
+	bwOCSOSSRequestLogins	OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			obsolete
+		DESCRIPTION		
+				"The number of requestLogin OSS messages received."
+		::=  {  oss  3  }
+
+	bwOCSOSSResponseLogins	OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			obsolete
+		DESCRIPTION		
+				"The number of requestLogin response OSS messages received."
+		::=  {  oss  4  }
+
+	bwOCSOSSUnsuccessfulResponseLogins	OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			obsolete
+		DESCRIPTION		
+				"The number of unsuccessful requestLogin response OSS messages received."
+		::=  {  oss  5  }
+
+	bwOCSOSSRequestLogoutIns	OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			obsolete
+		DESCRIPTION		
+				"The number of requestLogout OSS messages received."
+		::=  {  oss  6  }
+
+	bwOCSOSSRequestLogoutOuts	OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			obsolete
+		DESCRIPTION		
+				"The number of requestLogout OSS messages sent."
+		::=  {  oss  7  }
+
+	bwOCSOSSRequests	OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			obsolete
+		DESCRIPTION		
+				"The number of OSS request messages received."
+		::=  {  oss  8  }
+
+	bwOCSOSSResponses	OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			obsolete
+		DESCRIPTION		
+				"The number of request response OSS messages received."
+		::=  {  oss  9  }
+
+	bwOCSOSSResponseAuthenticationOuts	OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			obsolete
+		DESCRIPTION		
+				"The number of requestAuthentication response OSS messages sent from OCS."
+		::=  {  oss  10  }
+	bwOCSOSSResponseAuthenticationIns	OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			obsolete
+		DESCRIPTION		
+				"The number of requestAuthentication response OSS messages received."
+		::=  {  oss  11  }
+
+-- NS oss modules  ...........................................
+
+	bwOCSNSOSSRequestAuthentications	OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"The number of requestAuthentication NS OSS messages received."
+		::=  {  nsoss  1  }
+
+	bwOCSNSOSSResponseAuthentications	OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			obsolete
+		DESCRIPTION		
+				"The number of requestAuthentication response NS OSS messages received."
+		::=  {  nsoss  2  }
+
+	bwOCSNSOSSRequestLogins	OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"The number of requestLogin NS OSS messages received."
+		::=  {  nsoss  3  }
+
+	bwOCSNSOSSResponseLogins	OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"The number of requestLogin response NS OSS messages received."
+		::=  {  nsoss  4  }
+
+	bwOCSNSOSSUnsuccessfulResponseLogins	OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"The number of unsuccessful requestLogin response NS OSS messages received."
+		::=  {  nsoss  5  }
+
+	bwOCSNSOSSRequestLogoutIns	OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"The number of requestLogout NS OSS messages received."
+		::=  {  nsoss  6  }
+
+	bwOCSNSOSSRequestLogoutOuts	OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"The number of requestLogout NS OSS messages sent."
+		::=  {  nsoss  7  }
+
+	bwOCSNSOSSRequests	OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"The number of NS OSS request messages received."
+		::=  {  nsoss  8  }
+
+	bwOCSNSOSSResponses	OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"The number of request response NS OSS messages received."
+		::=  {  nsoss  9  }
+
+	bwOCSNSOSSResponseAuthenticationOuts	OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"The number of requestAuthentication response NS OSS messages sent from OCS."
+		::=  {  nsoss  10  }
+		
+	bwOCSNSOSSResponseAuthenticationIns	OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"The number of requestAuthentication response NS OSS messages received."
+		::=  {  nsoss  11  }
+
+-- OCS - BroadWorks Common Communication Protocol ........................
+
+	bwOCSCommonCommStatsTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  BwOCSCommonCommStatsEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"This table contains counters for BCCT for the OCS process."
+		::=  { commonComm  1 }
+
+	bwOCSCommonCommStatsEntry	OBJECT-TYPE
+		SYNTAX		BwOCSCommonCommStatsEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"Definition of the entries for bwOCSCommonCommStatsTable."
+		INDEX		{  bwOCSCommonCommStatsIndex  }
+		::=  { bwOCSCommonCommStatsTable 1 }
+
+	BwOCSCommonCommStatsEntry  ::=  SEQUENCE {
+		bwOCSCommonCommStatsIndex  Unsigned32,
+		bwOCSCommonCommHost  DisplayString,
+		bwOCSCommonCommInterface  DisplayString,
+		bwOCSCommonCommProtocol  DisplayString,
+		bwOCSCommonCommAcceptedOutboundConnections  Counter32,
+		bwOCSCommonCommAcceptedInboundConnections  Counter32,
+		bwOCSCommonCommRejectedOutboundConnections  Counter32,
+		bwOCSCommonCommRejectedInboundConnections  Counter32,
+		bwOCSCommonCommOutputMessagesProcessed  Counter32,
+		bwOCSCommonCommInputMessagesProcessed  Counter32,
+		bwOCSCommonCommOutputCommunicationErrors  Counter32,
+		bwOCSCommonCommInputCommunicationErrors  Counter32
+		}
+
+	bwOCSCommonCommStatsIndex	OBJECT-TYPE
+		SYNTAX			Unsigned32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"This integer represents an index in table bwCommonCommPSStatsTable. The index represents a connection for a specific Host-Interfacece-Protocol combination."
+		::=  {  bwOCSCommonCommStatsEntry  1  }
+
+	bwOCSCommonCommHost	OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"The address of a host connected to the BroadWorks Common Communication Protocol."
+		::=  {  bwOCSCommonCommStatsEntry  2  }
+
+	bwOCSCommonCommInterface	OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"The IP address of a local interface that a protocol is bound to."
+		::=  {  bwOCSCommonCommStatsEntry  3  }
+
+	bwOCSCommonCommProtocol	OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"The name of a BroadWorks Common Communication Protocol client protocol, e.g. OCI or SyncApi."
+		::=  {  bwOCSCommonCommStatsEntry  4  }
+
+	bwOCSCommonCommAcceptedOutboundConnections	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter is incremented whenever a client in this process connects to the framework to a remote host, using the interface and protocol."
+		::=  {  bwOCSCommonCommStatsEntry  5  }
+
+	bwOCSCommonCommAcceptedInboundConnections	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter is incremented whenever a client in this process connects to the framework from a remote host, using the interface and protocol."
+		::=  {  bwOCSCommonCommStatsEntry  6  }
+
+	bwOCSCommonCommRejectedOutboundConnections	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter is incremented whenever a client connection request going from this process to a remote host and going through this interface has been rejected for a particular protocol."
+		::=  {  bwOCSCommonCommStatsEntry  7  }
+
+	bwOCSCommonCommRejectedInboundConnections	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter is incremented whenever a client connection request coming to this host and going through this interface has been rejected by the framework for a particular protocol."
+		::=  {  bwOCSCommonCommStatsEntry  8  }
+
+	bwOCSCommonCommOutputMessagesProcessed	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter is incremented whenever a message has been sent and processed for this host, interface and protocol."
+		::=  {  bwOCSCommonCommStatsEntry  9  }
+
+	bwOCSCommonCommInputMessagesProcessed	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter is incremented whenever a message has been received and processed for this host, interface and protocol."
+		::=  {  bwOCSCommonCommStatsEntry  10  }
+
+	bwOCSCommonCommOutputCommunicationErrors	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter is incremented whenever a message could not be read because the TCP stack returned an error."
+		::=  {  bwOCSCommonCommStatsEntry  11  }
+
+	bwOCSCommonCommInputCommunicationErrors	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter is incremented whenever a message has been sent and processed for this host, interface and protocol."
+		::=  {  bwOCSCommonCommStatsEntry  12  }
+
+-- extAuth modules  ...........................................
+
+	bwOCSWASAuthenticationAttempts	OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This counter is incremented when the OCS sends an authentication message to the WAS."
+		::=  {  extAuth  1  }
+
+	bwOCSWASLoginAttempts	OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This counter is incremented when the OCS sends a login message to the WAS."
+		::=  {  extAuth  2  }
+
+	bwOCSWASCommunicationErrors	OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This counter is incremented every time the OCS cannot connect to the WAS."
+		::=  {  extAuth  3  }
+
+	bwOCSWASProcessingErrors	OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This counter is incremented every time the OCS cannot connect to the WAS."
+		::=  {  extAuth  4  }
+
+-- oci modules  ...........................................
+   
+	bwOCSOCIAuthenticationRequests	OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"The number of requestAuthentication OCI messages received."
+		::=  {  oci  1  }
+
+	bwOCSOCILoginRequestIns	OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"The number of requestLogin OCI messages received."
+		::=  {  oci  2  }
+
+	bwOCSOCILoginRequestOuts	OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"The number of requestLogin OCI messages received."
+		::=  {  oci  3  }
+
+	bwOCSOCILoginResponses	OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"The number of requestLogin response OCI messages received."
+		::=  {  oci  4  }
+
+	bwOCSOCIUnsuccessfulLoginResponses	OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"The number of unsuccessful requestLogin response OCI messages received."
+		::=  {  oci  5  }
+
+	bwOCSOCILogoutRequestIns	OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"The number of requestLogout OCI messages received."
+		::=  {  oci  6  }
+
+	bwOCSOCILogoutRequestOuts	OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"The number of requestLogout OCI messages sent."
+		::=  {  oci  7  }
+
+	bwOCSOCIRequests	OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"The number of OCI request messages received."
+		::=  {  oci  8  }
+
+	bwOCSOCIResponses	OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"The number of request response OCI messages received."
+		::=  {  oci  10  }
+
+	bwOCSOCIAuthenticationResponseOuts	OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"The number of requestAuthentication response OCI messages sent from OCS."
+		::=  {  oci  11  }
+
+	bwOCSOCIAuthenticationResponseIns	OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"The number of requestAuthentication response OCI messages received."
+		::=  {  oci  12  }
+
+	bwOCSOCIUserIdLoginLevelNotAllowed	OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"The number of times the Open Client Server force logged out a user whose login level is not in the list of OCI login levels allowed by the Open Client Server."
+		::=  {  oci  13  }
+
+	bwOCSOCIErrorResponse	OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"The number of invalid or unknown OCI response message treated within the scope of an established OCI session."
+		::=  {  oci  14  }
+
+-- OCS - Concurrent Framework ........................
+
+	bwOCSMonitoringExecutorTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  BwOCSMonitoringExecutorEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"This table contains counters for the concurrent framework."
+		::=  { concurrent  1 }
+
+	bwOCSMonitoringExecutorEntry	OBJECT-TYPE
+		SYNTAX		BwOCSMonitoringExecutorEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"Definition of the entries for bwOCSMonitoringExecutorTable."
+		INDEX		{  bwOCSMonitoringExecutorIndex  }
+		::=  { bwOCSMonitoringExecutorTable 1 }
+
+	BwOCSMonitoringExecutorEntry  ::=  SEQUENCE {
+		bwOCSMonitoringExecutorIndex  Unsigned32,
+		bwOCSMonitoringExecutorName   DisplayString,
+		bwOCSMonitoringExecutorCurrentPoolSize  Gauge32,
+		bwOCSMonitoringExecutorMaxPoolSize      Gauge32,
+		bwOCSMonitoringExecutorAvgActiveThreads Gauge32,
+		bwOCSMonitoringExecutorTaskQueueSize     Gauge32,
+		bwOCSMonitoringExecutorNbTasksRun       Counter32,
+		bwOCSMonitoringExecutorNbWarnings       Counter32,
+		bwOCSMonitoringExecutorNbErrors         Counter32,
+		bwOCSMonitoringExecutorLongestTaskMs    Gauge32,
+		bwOCSMonitoringExecutorLongestTaskName  DisplayString
+		}
+
+	bwOCSMonitoringExecutorIndex	OBJECT-TYPE
+		SYNTAX			Unsigned32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"This integer represents an index in table bwOCSMonitoringExecutorTable. This is the index to a specific Monitoring Executor name."
+		::=  {  bwOCSMonitoringExecutorEntry  1  }
+
+	bwOCSMonitoringExecutorName	OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"The name of the Monitoring Executor - Names are internally defined at the application level."
+		::=  {  bwOCSMonitoringExecutorEntry  2  }
+
+	bwOCSMonitoringExecutorCurrentPoolSize	OBJECT-TYPE
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"The current thread pool size"
+		::=  {  bwOCSMonitoringExecutorEntry  3  }
+
+	bwOCSMonitoringExecutorMaxPoolSize	OBJECT-TYPE
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"The maximum thread pool size"
+		::=  {  bwOCSMonitoringExecutorEntry  4  }
+
+	bwOCSMonitoringExecutorAvgActiveThreads	OBJECT-TYPE
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"The average number of active threads, rounded up"
+		::=  {  bwOCSMonitoringExecutorEntry  5  }
+
+	bwOCSMonitoringExecutorTaskQueueSize	OBJECT-TYPE
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"Number of tasks in the queue (includes scheduled and recurring tasks)"
+		::=  {  bwOCSMonitoringExecutorEntry  6  }
+
+	bwOCSMonitoringExecutorNbTasksRun	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"Number of tasks run"
+		::=  {  bwOCSMonitoringExecutorEntry  7  }
+
+	bwOCSMonitoringExecutorNbWarnings	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"Number of warnings that occured"
+		::=  {  bwOCSMonitoringExecutorEntry  8  }
+
+	bwOCSMonitoringExecutorNbErrors	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"Number of errors that occured"
+		::=  {  bwOCSMonitoringExecutorEntry  9  }
+
+	bwOCSMonitoringExecutorLongestTaskMs	OBJECT-TYPE
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"Longest completed task execution time in milliseconds"
+		::=  {  bwOCSMonitoringExecutorEntry  10  }
+
+	bwOCSMonitoringExecutorLongestTaskName	OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"Longest completed task name"
+		::=  {  bwOCSMonitoringExecutorEntry  11  }
+
+-- OCS - TCP Framework ........................
+
+	bwOCSTcpServersStatsTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  BwOCSTcpServersStatsEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"This table contains counters for TCP underlying framework for the OCS process."
+		::=  { tcp  1 }
+
+	bwOCSTcpServersStatsEntry	OBJECT-TYPE
+		SYNTAX		BwOCSTcpServersStatsEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"Definition of the entries for bwOCSTcpServersStatsTable."
+		INDEX		{  bwOCSTcpServersStatsIndex  }
+		::=  { bwOCSTcpServersStatsTable 1 }
+
+	BwOCSTcpServersStatsEntry  ::=  SEQUENCE {
+		bwOCSTcpServersStatsIndex  Unsigned32,
+		bwOCSTcpServersName  DisplayString,
+		bwOCSTcpServersNbConnectionsAccepted  Counter32,
+		bwOCSTcpServersNbConnectionsRefused  Counter32,
+		bwOCSTcpServersNbConnectionsInitiated  Counter32,
+		bwOCSTcpServersNbConnectionsClosed  Counter32,
+		bwOCSTcpServersNbBytesSent        Gauge32,
+		bwOCSTcpServersNbBytesReceived    Gauge32,
+		bwOCSTcpServersOutgoingQueueSize  Gauge32,
+		bwOCSTcpServersIncomingQueueSize  Gauge32,
+    bwOCSTcpServersNbBytesSentSecure Gauge32,
+    bwOCSTcpServersNbBytesReceivedSecure Gauge32
+		}
+
+	bwOCSTcpServersStatsIndex	OBJECT-TYPE
+		SYNTAX			Unsigned32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"This integer represents an index in table bwOCSTcpServersStatsTable. This is the index to a specific TCP server name."
+		::=  {  bwOCSTcpServersStatsEntry  1  }
+
+	bwOCSTcpServersName	OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"The name of TCP server - Names are internally defined at at the application level."
+		::=  {  bwOCSTcpServersStatsEntry  2  }
+
+	bwOCSTcpServersNbConnectionsAccepted	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter represents the number of connections accepted by the TCP server."
+		::=  {  bwOCSTcpServersStatsEntry  3  }
+
+	bwOCSTcpServersNbConnectionsRefused	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter represents the number of connections refused by the TCP server."
+		::=  {  bwOCSTcpServersStatsEntry  4  }
+
+	bwOCSTcpServersNbConnectionsInitiated	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter represents the number of connections initiated by the TCP server."
+		::=  {  bwOCSTcpServersStatsEntry  5  }
+
+	bwOCSTcpServersNbConnectionsClosed	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter represents the number of connections closed by the TCP server or remote hosts."
+		::=  {  bwOCSTcpServersStatsEntry  6  }
+
+	bwOCSTcpServersNbBytesSent	OBJECT-TYPE
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter represents the number of bytes sent by the TCP server."
+		::=  {  bwOCSTcpServersStatsEntry  7  }
+
+	bwOCSTcpServersNbBytesReceived	OBJECT-TYPE
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter represents the number of bytes received by the TCP server."
+		::=  {  bwOCSTcpServersStatsEntry  8  }
+
+	bwOCSTcpServersOutgoingQueueSize	OBJECT-TYPE
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"This counter represents the number of bytes in the outgoing queue."
+		::=  {  bwOCSTcpServersStatsEntry  9  }
+
+	bwOCSTcpServersIncomingQueueSize	OBJECT-TYPE
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"This counter represents the number of bytes in the incoming queue."
+		::=  {  bwOCSTcpServersStatsEntry  10  }
+
+  bwOCSTcpServersNbBytesSentSecure	OBJECT-TYPE
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter represents the number of bytes sent by the TCP server over secure connections."
+		::=  {  bwOCSTcpServersStatsEntry  11  }
+
+  bwOCSTcpServersNbBytesReceivedSecure	OBJECT-TYPE
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter represents the number of bytes received by the TCP server over secure connections."
+		::=  {  bwOCSTcpServersStatsEntry  12  }
+
+-- OCS reserved module  ...........................................
+
+	bwOCSReserved	OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS		read-only
+		STATUS			obsolete
+		DESCRIPTION		
+				"This is a reserved counter not used to report any particular value."
+		::=  {  ocsReserved  1  }
+
+-- BroadWorks Open Client Server MIB Conformance Definition  ...........................................
+
+bwOcsMibGroups		OBJECT IDENTIFIER ::= { bwOcsMibConformance 1 }
+bwOcsMibCompliancy	OBJECT IDENTIFIER ::= { bwOcsMibConformance 2 }
+
+-- units of conformance
+
+bwOcsCapGroup    OBJECT-GROUP
+    OBJECTS { bwOCSCAPRegisterAuthentications, bwOCSCAPResponseAuthentications, bwOCSCAPRegisterRequests, bwOCSCAPUnsuccessfulRegisterResponses, bwOCSCAPAcknowledgements, bwOCSCAPUnregisterIns, bwOCSCAPUnregisterOuts, bwOCSCAPSessionUpdates, bwOCSCAPProfileUpdates, bwOCSCAPCallUpdates, bwOCSCAPCallActions, bwOCSCAPCallControlInfos, bwOCSCAPInfoRequests, bwOCSCAPInfoResponses, bwOCSCAPServerStatusRequests, bwOCSCAPExternalNotifies, bwOCSCAPMonitoringUsersRequests, bwOCSCAPMonitoringUsersResponses, bwOCSCAPStatsQueueUpdatesOut, bwOCSCAPStatsQueueActionsIn, bwOCSCAPStatsDatagramsIn, bwOCSCAPStatsDatagramsOut, bwOCSCAPRegisterRequestIns, bwOCSCAPRegisterRequestOuts, bwOCSCAPResponseAuthenticationIns, bwOCSCAPResponseAuthenticationOuts }
+    STATUS  current
+    DESCRIPTION
+       "This group defines the OCS statistics for the CAP protocol to the BroadWorks Application Server."
+    ::= { bwOcsMibGroups 1 }
+
+bwOcsAsOSSGroup    OBJECT-GROUP
+    OBJECTS { bwOCSOSSRequestAuthentications, bwOCSOSSResponseAuthentications, bwOCSOSSRequestLogins, bwOCSOSSResponseLogins, bwOCSOSSUnsuccessfulResponseLogins, bwOCSOSSRequestLogoutIns, bwOCSOSSRequestLogoutOuts, bwOCSOSSRequests, bwOCSOSSResponses, bwOCSOSSResponseAuthenticationOuts, bwOCSOSSResponseAuthenticationIns }
+    STATUS  obsolete
+    DESCRIPTION
+       "This group defines the OCS statistics for the OSS protocol to the BroadWorks Application Server."
+    ::= { bwOcsMibGroups 2 }
+
+bwOcsNsOSSGroup    OBJECT-GROUP
+    OBJECTS { bwOCSNSOSSRequestAuthentications, bwOCSNSOSSResponseAuthentications, bwOCSNSOSSRequestLogins, bwOCSNSOSSResponseLogins, bwOCSNSOSSUnsuccessfulResponseLogins, bwOCSNSOSSRequestLogoutIns, bwOCSNSOSSRequestLogoutOuts, bwOCSNSOSSRequests, bwOCSNSOSSResponses, bwOCSNSOSSResponseAuthenticationOuts, bwOCSNSOSSResponseAuthenticationIns }
+    STATUS  current
+    DESCRIPTION
+       "This group defines the OCS statistics for the OSS protocol to the BroadWorks Network Server."
+    ::= { bwOcsMibGroups 3 }
+
+bwOcsBcctGroup    OBJECT-GROUP
+    OBJECTS { bwOCSCommonCommStatsTable, bwOCSCommonCommStatsIndex, bwOCSCommonCommHost, bwOCSCommonCommInterface, bwOCSCommonCommProtocol, bwOCSCommonCommAcceptedOutboundConnections, bwOCSCommonCommAcceptedInboundConnections, bwOCSCommonCommRejectedOutboundConnections, bwOCSCommonCommRejectedInboundConnections, bwOCSCommonCommOutputMessagesProcessed, bwOCSCommonCommInputMessagesProcessed, bwOCSCommonCommOutputCommunicationErrors, bwOCSCommonCommInputCommunicationErrors }
+    STATUS  current
+    DESCRIPTION
+       "This group defines the OCS statistics for the BCCT protocol to the BroadWorks Application and Network Servers."
+    ::= { bwOcsMibGroups 4 }
+
+bwOcsReserveGroup    OBJECT-GROUP
+    OBJECTS { bwOCSReserved }
+    STATUS  current
+    DESCRIPTION
+       "MIB reserved section."
+    ::= { bwOcsMibGroups 5 }
+
+bwOcsExtAuthGroup    OBJECT-GROUP
+    OBJECTS { bwOCSWASAuthenticationAttempts, bwOCSWASLoginAttempts, bwOCSWASCommunicationErrors, bwOCSWASProcessingErrors }
+    STATUS  current
+    DESCRIPTION
+       "This group defines the OCS statistics for the External Authentication protocol to the Web Base Authentication server."
+    ::= { bwOcsMibGroups 6 }
+
+bwOcsOciAuthGroup    OBJECT-GROUP
+    OBJECTS { bwOCSOCIAuthenticationRequests, bwOCSOCILoginRequestIns, bwOCSOCILoginRequestOuts, bwOCSOCILoginResponses, bwOCSOCIUnsuccessfulLoginResponses, bwOCSOCILogoutRequestIns, bwOCSOCILogoutRequestOuts, bwOCSOCIRequests, bwOCSOCIResponses, bwOCSOCIAuthenticationResponseOuts, bwOCSOCIAuthenticationResponseIns, bwOCSOCIUserIdLoginLevelNotAllowed, bwOCSOCIErrorResponse }
+    STATUS  current
+    DESCRIPTION
+       "This group defines the OCS statistics for the OCI protocol to the BroadWorks Application."
+    ::= { bwOcsMibGroups 7 }
+
+bwOcsTcpStatsGroup    OBJECT-GROUP
+    OBJECTS { bwOCSTcpServersStatsTable, bwOCSTcpServersStatsIndex, bwOCSTcpServersName, bwOCSTcpServersNbConnectionsAccepted, bwOCSTcpServersNbConnectionsClosed, bwOCSTcpServersOutgoingQueueSize, bwOCSTcpServersIncomingQueueSize }
+    STATUS  current
+    DESCRIPTION
+       "This group defines the statistics for the Automatic Hold And Retrieve Service."
+    ::= { bwOcsMibGroups 8 }
+
+bwOCSConcurrentFrameworkStatsGroup    OBJECT-GROUP
+    OBJECTS { bwOCSMonitoringExecutorTable, bwOCSMonitoringExecutorIndex, bwOCSMonitoringExecutorName, bwOCSMonitoringExecutorCurrentPoolSize, bwOCSMonitoringExecutorMaxPoolSize, bwOCSMonitoringExecutorAvgActiveThreads, bwOCSMonitoringExecutorTaskQueueSize, bwOCSMonitoringExecutorNbTasksRun, bwOCSMonitoringExecutorNbWarnings, bwOCSMonitoringExecutorNbErrors, bwOCSMonitoringExecutorLongestTaskMs, bwOCSMonitoringExecutorLongestTaskName }
+    STATUS  current
+    DESCRIPTION
+       "This group defines the statistics for the Automatic Hold And Retrieve Service."
+    ::= { bwOcsMibGroups 9 }
+    
+-- 
+bwOcsBasicCompliance MODULE-COMPLIANCE
+	STATUS current
+     	DESCRIPTION
+		"BroadWorks Open Client Server MIB compliance"
+	MODULE -- this module
+		MANDATORY-GROUPS { bwOcsCapGroup, bwOcsAsOSSGroup, bwOcsNsOSSGroup, bwOcsBcctGroup, bwOcsReserveGroup, bwOcsExtAuthGroup, bwOcsTcpStatsGroup }
+	::= { bwOcsMibCompliancy 1 }
+
+-- End of MIB file - Do not put anything behind this line ...........................................
+
+END

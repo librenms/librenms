@@ -1,0 +1,254 @@
+--===============================================================
+-- File Name : BW-BroadworksDiameterFrontNode.mib
+-- Date      : 05/23/2007
+-- Author    : BroadSoft Inc.
+--===============================================================
+
+BW-BroadworksDiameterServer	DEFINITIONS ::= BEGIN
+	IMPORTS
+		DisplayString
+			FROM SNMPv2-TC
+		MODULE-COMPLIANCE, OBJECT-GROUP          
+			FROM SNMPv2-CONF
+		enterprises, MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-TYPE, Gauge32, Counter32
+			FROM SNMPv2-SMI;
+
+	broadsoft	MODULE-IDENTITY
+		LAST-UPDATED	"200705230000Z"
+		ORGANIZATION	"BroadSoft, Inc"
+		CONTACT-INFO	"BroadSoft, Inc
+220 Perry Parkway
+Gaithersburg, MD  20877
+301-977-9440"
+		DESCRIPTION		
+				"This MIB contains the performance measurements related to the BroadWorks
+				 Diameter Server interconnect process."
+		REVISION		"200601260001Z"
+		DESCRIPTION		
+				""
+		::=  {  enterprises  6431  }
+
+	broadworks OBJECT IDENTIFIER
+		::=  {  broadsoft  1  }
+
+	diameterFrontNode OBJECT IDENTIFIER
+		::=  {  broadworks  10  }
+
+-- Modules Definitions  .........................................
+
+	protocolsModule	OBJECT IDENTIFIER
+		::=  {  diameterFrontNode  1  }
+	
+	managementModule	OBJECT IDENTIFIER
+		::=  {  diameterFrontNode  2  }
+		
+-- Protocols Stats  .............................................
+
+	dsBaseProtocolStats	OBJECT IDENTIFIER
+		::=  {  protocolsModule  1  }
+
+-- Diameter Server Base Protocol Stats ..........................
+
+	bwDiameterFrontNodeRequestsOut	OBJECT-TYPE
+		SYNTAX      Counter32
+		MAX-ACCESS	read-only
+		STATUS      current
+		DESCRIPTION
+				"Number of Diameter requests transmitted. This counter is incremented whenever a Diameter request is transmitted."
+		::=  {  dsBaseProtocolStats  1  }
+
+	bwDiameterFrontNodeRequestsIn  OBJECT-TYPE
+		SYNTAX      Counter32
+		MAX-ACCESS	read-only
+		STATUS      current
+		DESCRIPTION
+				"Number of Diameter requests received.This counter is incremented whenever a Diameter request is received."
+		::=  {  dsBaseProtocolStats  2  }
+
+	bwDiameterFrontNodeResponsesOut  OBJECT-TYPE
+		SYNTAX      Counter32
+		MAX-ACCESS	read-only
+		STATUS      current
+		DESCRIPTION
+				"Number of Diameter answers transmitted. This counter is incremented whenever a Diameter answer is transmitted."
+		::=  {  dsBaseProtocolStats  3  }
+
+  bwDiameterFrontNodeResponsesIn	OBJECT-TYPE
+		SYNTAX      Counter32
+		MAX-ACCESS	read-only
+		STATUS      current
+		DESCRIPTION
+				"Number of Diameter answers received. This counter is incremented whenever a Diameter answer is received."
+		::=  {  dsBaseProtocolStats  4  }
+
+  bwDiameterFrontNodeDWRsOut  OBJECT-TYPE
+		SYNTAX      Counter32
+		MAX-ACCESS	read-only
+		STATUS      current
+		DESCRIPTION
+				"Number of Device-Watchdog-Requests transmitted. This counter is incremented whenever a Device-Watchdog-Request is transmitted."
+		::=  {  dsBaseProtocolStats  5  }
+
+  bwDiameterFrontNodeDWRsIn  OBJECT-TYPE
+		SYNTAX      Counter32
+		MAX-ACCESS	read-only
+		STATUS      current
+		DESCRIPTION
+				"Number of Device-Watchdog-Requests received. This counter is incremented whenever a Device-Watchdog-Request is received."
+		::=  {  dsBaseProtocolStats  6  }
+
+  bwDiameterFrontNodeDWAsOut  OBJECT-TYPE
+		SYNTAX      Counter32
+		MAX-ACCESS	read-only
+		STATUS      current
+		DESCRIPTION
+				"Number of Device-Watchdog-Answers transmitted. This counter is incremented whenever a Device-Watchdog-Answer is transmitted."
+		::=  {  dsBaseProtocolStats 7  }
+
+  bwDiameterFrontNodeDWAsIn  OBJECT-TYPE
+		SYNTAX      Counter32
+		MAX-ACCESS	read-only
+		STATUS      current
+		DESCRIPTION
+				"Number of Device-Watchdog-Answers received. This counter is incremented whenever a Device-Watchdog-Answer is received."
+		::=  {  dsBaseProtocolStats 8  }
+
+  bwDiameterFrontNodeCERsOut  OBJECT-TYPE
+		SYNTAX      Counter32
+		MAX-ACCESS	read-only
+		STATUS      current
+		DESCRIPTION
+				"Number of Capabilities-Exchange-Requests transmitted. This counter is incremented whenever a Capabilities-Exchange-Request is transmitted."
+		::=  {  dsBaseProtocolStats 9  }
+
+  bwDiameterFrontNodeCERsIn  OBJECT-TYPE
+		SYNTAX      Counter32
+		MAX-ACCESS	read-only
+		STATUS      current
+		DESCRIPTION
+				"Number of Capabilities-Exchange-Requests received. This counter is incremented whenever a Capabilities-Exchange-Request is received."
+		::=  {  dsBaseProtocolStats 10  }
+
+  bwDiameterFrontNodeCEAsOut  OBJECT-TYPE
+		SYNTAX      Counter32
+		MAX-ACCESS	read-only
+		STATUS      current
+		DESCRIPTION
+				"Number of Capabilities-Exchange-Answers transmitted. This counter is incremented whenever a Capabilities-Exchange-Answer is transmitted."
+		::=  {  dsBaseProtocolStats 11  }
+
+  bwDiameterFrontNodeCEAsIn  OBJECT-TYPE
+		SYNTAX      Counter32
+		MAX-ACCESS	read-only
+		STATUS      current
+		DESCRIPTION
+				"Number of Capabilities-Exchange-Answers received. This counter is incremented whenever a Capabilities-Exchange-Answers is received."
+		::=  {  dsBaseProtocolStats 12  }
+
+  bwDiameterFrontNodeDPRsOut  OBJECT-TYPE
+		SYNTAX      Counter32
+		MAX-ACCESS	read-only
+		STATUS      current
+		DESCRIPTION
+				"Number of Disconnect-Peer-Requests transmitted. This counter is incremented whenever a Disconnect-Peer-Request is transmitted."
+		::=  {  dsBaseProtocolStats 13  }
+
+  bwDiameterFrontNodeDPRsIn  OBJECT-TYPE
+		SYNTAX      Counter32
+		MAX-ACCESS	read-only
+		STATUS      current
+		DESCRIPTION
+				"Number of Disconnect-Peer-Requests received. This counter is incremented whenever a Disconnect-Peer-Request is received."
+		::=  {  dsBaseProtocolStats 14  }
+
+  bwDiameterFrontNodeDPAsOut  OBJECT-TYPE
+		SYNTAX      Counter32
+		MAX-ACCESS	read-only
+		STATUS      current
+		DESCRIPTION
+				"Number of Disconnect-Peer-Answers transmitted. This counter is incremented whenever a Disconnect-Peer-Answer is transmitted."
+		::=  {  dsBaseProtocolStats 15  }
+
+  bwDiameterFrontNodeDPAsIn  OBJECT-TYPE
+		SYNTAX      Counter32
+		MAX-ACCESS	read-only
+		STATUS      current
+		DESCRIPTION
+				"Number of Disconnect-Peer-Answers received. This counter is incremented whenever a Disconnect-Peer-Answer is received."
+		::=  {  dsBaseProtocolStats 16  }
+
+  bwDiameterFrontNodeSTRsOut  OBJECT-TYPE
+		SYNTAX      Counter32
+		MAX-ACCESS	read-only
+		STATUS      current
+		DESCRIPTION
+				"Number of Session-Termination-Requests transmitted. This counter is incremented whenever a Session-Termination-Requests is transmitted."
+		::=  {  dsBaseProtocolStats 17  }
+
+  bwDiameterFrontNodeSTRsIn  OBJECT-TYPE
+		SYNTAX      Counter32
+		MAX-ACCESS	read-only
+		STATUS      current
+		DESCRIPTION
+				"Number of Session-Termination-Requests received. This counter is incremented whenever a Session-Termination-Requests is received."
+		::=  {  dsBaseProtocolStats 18  }
+
+  bwDiameterFrontNodeSTAsOut  OBJECT-TYPE
+		SYNTAX      Counter32
+		MAX-ACCESS	read-only
+		STATUS      current
+		DESCRIPTION
+				"Number of Session-Termination-Answers transmitted. This counter is incremented whenever a Session-Termination-Answers is transmitted."
+		::=  {  dsBaseProtocolStats 19  }
+
+  bwDiameterFrontNodeSTAsIn  OBJECT-TYPE
+		SYNTAX      Counter32
+		MAX-ACCESS	read-only
+		STATUS      current
+		DESCRIPTION
+				"Number of Session-Termination-Answers received. This counter is incremented whenever a Session-Termination-Answers is received."
+		::=  {  dsBaseProtocolStats 20  }
+
+  bwDiameterFrontNodeASRsOut  OBJECT-TYPE
+		SYNTAX      Counter32
+		MAX-ACCESS	read-only
+		STATUS      current
+		DESCRIPTION
+				"Number of Abort-Session-Requests transmitted. This counter is incremented whenever a Abort-Session-Requests is transmitted."
+		::=  {  dsBaseProtocolStats 21  }
+
+  bwDiameterFrontNodeASRsIn  OBJECT-TYPE
+		SYNTAX      Counter32
+		MAX-ACCESS	read-only
+		STATUS      current
+		DESCRIPTION
+				"Number of Abort-Session-Requests received. This counter is incremented whenever a Abort-Session-Requests is received."
+		::=  {  dsBaseProtocolStats 22  }
+
+  bwDiameterFrontNodeASAsOut  OBJECT-TYPE
+		SYNTAX      Counter32
+		MAX-ACCESS	read-only
+		STATUS      current
+		DESCRIPTION
+				"Number of Abort-Session-Answers transmitted. This counter is incremented whenever a Abort-Session-Answers is transmitted."
+		::=  {  dsBaseProtocolStats 23  }
+
+  bwDiameterFrontNodeASAsIn  OBJECT-TYPE
+		SYNTAX      Counter32
+		MAX-ACCESS	read-only
+		STATUS      current
+		DESCRIPTION
+				"Number of Abort-Session-Answers received. This counter is incremented whenever a Abort-Session-Answers is received."
+		::=  {  dsBaseProtocolStats 24  }
+
+  bwDiameterFrontNodeResetAllCounters  OBJECT-TYPE
+		SYNTAX      Counter32
+		MAX-ACCESS	read-write
+		STATUS      current
+		DESCRIPTION
+				"When set to a value other than 0, all counters in the Diameter Front Node are reset to 0."
+		::=  {  managementModule 1  }
+
+-- End of MIB file - Do not put anything behind this line ...........................................
+
+END

@@ -1,0 +1,73 @@
+
+-- File Name : BW-CallDetailServerFault.mib 
+BW-CallDetailServerFault DEFINITIONS ::= BEGIN
+  IMPORTS
+    MODULE-IDENTITY, NOTIFICATION-TYPE
+      FROM SNMPv2-SMI
+    common, faultFields, identifier, timeStamp, alarmName, systemName, severity, alarmState, component, subcomponent, problemText, recommendedActionsText
+      FROM BroadworksFault;
+
+  systemFaults MODULE-IDENTITY
+    LAST-UPDATED  "200201220000Z"
+    ORGANIZATION  "Broadsoft, Inc"
+    CONTACT-INFO  "Broadsoft, Inc.
+220 Perry Parkway
+Gaithersburg, MD  20877
+301-977-9440"
+    DESCRIPTION
+        "The defines the fault "
+    REVISION    "200009191431Z"
+    DESCRIPTION
+        ""
+    ::=  {  common  1  }
+
+  bwPMCallDetailServerLaunched  NOTIFICATION-TYPE
+    OBJECTS     { identifier ,timeStamp ,alarmName ,systemName ,severity ,component ,subcomponent ,problemText ,recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "For the actual description, refer the BroadWorks FaultManagementGuide as it may contain variable data."
+    ::=  {  systemFaults 2001  }
+
+  bwPMCallDetailServerShutDown  NOTIFICATION-TYPE
+    OBJECTS     { identifier ,timeStamp ,alarmName ,systemName ,severity ,component ,subcomponent ,problemText ,recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "For the actual description, refer the BroadWorks FaultManagementGuide as it may contain variable data."
+    ::=  {  systemFaults 2002  }
+
+  bwPMCallDetailServerRestarted  NOTIFICATION-TYPE
+    OBJECTS     { identifier ,timeStamp ,alarmName ,systemName ,severity ,component ,subcomponent ,problemText ,recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "For the actual description, refer the BroadWorks FaultManagementGuide as it may contain variable data."
+    ::=  {  systemFaults 2003  }
+
+  bwPMCallDetailServerDeath  NOTIFICATION-TYPE
+    OBJECTS     { identifier ,timeStamp ,alarmName ,systemName ,severity ,component ,subcomponent ,problemText ,recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "For the actual description, refer the BroadWorks FaultManagementGuide as it may contain variable data."
+    ::=  {  systemFaults 2004  }
+
+  bwNetworkServerRequestError NOTIFICATION-TYPE
+    OBJECTS     { identifier ,timeStamp ,alarmName ,systemName ,severity ,component ,subcomponent ,problemText ,recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "For the actual description, refer the BroadWorks FaultManagementGuide as it may contain variable data."
+    ::= { systemFaults 2005 }
+
+  bwCAPSCallCenterLinkDown NOTIFICATION-TYPE
+    OBJECTS     { identifier ,timeStamp ,alarmName ,systemName ,severity ,component ,subcomponent ,problemText ,recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "For the actual description, refer the BroadWorks FaultManagementGuide as it may contain variable data."
+    ::= { systemFaults 2006 }
+
+  bwOCIReportingLinkDown NOTIFICATION-TYPE
+    OBJECTS     { identifier ,timeStamp ,alarmName ,systemName ,severity ,component ,subcomponent ,problemText ,recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "For the actual description, refer the BroadWorks FaultManagementGuide as it may contain variable data."
+    ::= { systemFaults 2007 }
+
+END

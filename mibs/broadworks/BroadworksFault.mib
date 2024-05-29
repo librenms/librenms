@@ -1,0 +1,669 @@
+-- File Name : BroadworksFault.mib
+-- Date      : Fri Jun 22 19:15:11 EDT 2001
+-- Author    : AdventNet Agent Toolkit - MibEditor 4.1
+-- File Name : Broadworks.mib
+-- Date      : Wed Oct 18 17:33:37 EDT 2000
+-- Author    : AdventNet Agent Toolkit - MibEditor 4.0
+BroadworksFault DEFINITIONS ::= BEGIN
+  IMPORTS
+    enterprises, MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-TYPE, Counter32
+      FROM SNMPv2-SMI
+    DateAndTime, DisplayString
+      FROM SNMPv2-TC;
+
+  broadsoft MODULE-IDENTITY
+    LAST-UPDATED  "200802220000Z"
+    ORGANIZATION  "Broadsoft, Inc"
+    CONTACT-INFO  "Broadsoft, Inc.
+220 Perry Parkway
+Gaithersburg, MD  20877
+301-977-9440"
+    DESCRIPTION
+        "This document contains the management information that is
+        common to all elements in a Broadworks system."
+    REVISION    "200009191431Z"
+    DESCRIPTION
+        ""
+    ::=  {  enterprises  6431  }
+
+  broadworks  OBJECT IDENTIFIER
+    ::=  {  broadsoft  1  }
+
+  common  OBJECT IDENTIFIER
+    ::=  {  broadworks  1  }
+
+  systemFaults  OBJECT IDENTIFIER
+    ::=  {  common  1  }
+
+  faultFields OBJECT IDENTIFIER
+    ::=  {  systemFaults 1  }
+
+
+  identifier  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS    not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A sequentially generated number, which can be used to uniquely identify the fault."
+    ::=  {  faultFields  1  }
+
+  timeStamp OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS    not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The date and time at which the fault was generated"
+    ::=  {  faultFields  2  }
+
+  alarmName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS    not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The name of the alarm that occurred.  This name is also
+        referenced in an alarm guide."
+    ::=  {  faultFields  3  }
+
+  systemName  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS    not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The hostname of the system"
+    ::=  {  faultFields  4  }
+
+  severity  OBJECT-TYPE
+    SYNTAX      INTEGER  {
+          informational ( 0 ) ,
+          low ( 1 ) ,
+          medium ( 2 ) ,
+          high ( 3 ) ,
+          critical ( 4 ) }
+    MAX-ACCESS    read-only
+    STATUS      current
+    DESCRIPTION
+        "An indicator of the severity of the fault.
+        informational:  Not service affecting
+        low: Losing redundant connectivity, but not service or capacity affecting.
+        medium: ability to provide connectivity, but service level affecting.
+        high: Inability to provide connectivity over a particular interface.
+        critical: No basic calls can be processed without operator intervention."
+    ::=  {  faultFields  5  }
+
+  alarmState  OBJECT-TYPE
+    SYNTAX      INTEGER  { off ( 0 ) , on ( 1 ) }
+    MAX-ACCESS    not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Flag that describes the state of the alarm
+        OFF: alarm is off
+        ON: alarm is on"
+    ::=  {  faultFields  6  }
+
+  component OBJECT-TYPE
+    SYNTAX      INTEGER  {
+          applicationserver ( 0 ) ,
+          mediaserver ( 1 ) ,
+          networkserver ( 2 ),
+          relayserver ( 3 ),
+          servicecontrolproxy ( 4 ),
+          elementmanagementsystem ( 5 ),
+          webserver ( 6 ),
+          calldetailserver ( 7 ),
+          clientmanagementprofileserver (8),
+          clientmanagementaccessserver (9),
+          xtendedservicesplatform (10),
+          profileserver (11)
+          }
+    MAX-ACCESS    read-only
+    STATUS      current
+    DESCRIPTION
+        "Broadworks server that is reporting the fault.
+        applicationserver:  Application server component
+        mediaserver: Media server component
+        networkserver:  Network server component
+        servicecontrolproxy: Service control proxy component
+        elementmanagementsystem: Element management system component
+        clientmanagementprofileserver: Client Management Profile server component
+        xtendedservicesplatform: Xtended Services Platform
+        profileserver: Profile Server"
+    ::=  {  faultFields  7  }
+
+  subcomponent  OBJECT-TYPE
+    SYNTAX      INTEGER  {
+          unspecified ( 0 ) ,
+          processmonitor ( 1 ) ,
+          webserver ( 2 ) ,
+          database ( 3 ) ,
+          sip ( 4 ) ,
+          ccp ( 5 ) ,
+          mgcp ( 6 ) ,
+          mcp ( 7 ) ,
+          smtp ( 8 ) ,
+          pop3 ( 9 ) ,
+          rtcp ( 10 ) ,
+          conferencing ( 11 ) ,
+          rtp ( 12 ) ,
+          ivr ( 13 ) ,
+          filesystem ( 14 ) ,
+          callp ( 15 ) ,
+          nssynch ( 16 ) ,
+          mss ( 17 ) ,
+          transevent ( 18 ) ,
+          emergency ( 19 ),
+          smap ( 20 ),
+          loggingserver ( 21 ),
+          nslocation ( 22 ),
+          ims ( 23 ),
+          nrs ( 24 ),
+          oss ( 25 ),
+          accounting ( 26 ),
+          licensing ( 27 ),
+          ldap ( 28 ),
+          pmReporting ( 29 ),
+          smdi ( 30 ),
+          cpeDeviceManagement ( 31 ),
+          networkDeviceManagement ( 32 ),
+          externalAuthentication ( 33 ),
+          liveAudio ( 34 ),
+          servicePackMigration ( 35 ),
+          cap ( 36 ),
+          openClientServer ( 37 ),
+          voicePortal ( 38 ),
+          callLogs ( 39 ),
+          ociReporting ( 40 ),
+          bcct ( 41 ),
+          diameterServer ( 42 ),
+          cms ( 43 ),
+          taskMonitor ( 44 ),
+          tcp ( 45 ),
+          logging ( 46 ),
+          soap ( 47 ),
+          smpp ( 48 ),
+          mm ( 49 ),
+          dns (50 ),
+          diameterFrontNode ( 51 ),
+          sh ( 52 ),
+          snmpAgent( 53 ),
+          xsp ( 54),
+          surveillance(55),
+          subscriberCache(56),
+          trunking(57)
+          }
+    MAX-ACCESS    not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The subcomponent field identifies the subcomponent within
+        the component that has triggered the alarm.
+        unspecified: originated from an unspecified location
+        processmonitor: originated from the process monitor
+        The process monitor starts processes, monitors
+        them for process deaths, and restarts them upon death.
+        webserver: originated from the web server
+        database: originated from the database
+        sip: originated from the Session Initiation Protocol io subcomponent
+        ccp: originated from the Call Client Protocol IO subcomponent.
+        The Call Client Protocol provides a means for bi-directional
+        communication between a BroadWorks Feature Server and a call
+        control client.
+        mgcp: originated from the Media Gateway Control Protocol
+        io subcomponent
+        mcp: originated from the Media Control Protocol
+        io subcomponent.  The MCP protocol is the means of
+        communication between the application server and
+        the media server.
+        smtp: originated from the Simple Mail Transfer Protocol
+        IO subcomponent
+        pop3: originated from the POP3 IO subcomponent
+        rtcp: originated from the Realtime Transport Control Protocol
+        IO subcomponent
+        conferencing:  originated from the Conferencing subcomponent
+        rtp: originated from the Realtime Transport Protocol
+        IO subcomponent
+        ivr: originated from the Interactive Voice Response subcomponent
+        filesystem: originated from the filesystem subcomponent
+        callp: originated from the Call Processing subcomponent
+        nssynch: originated from the Network Server Synchronization
+        subcomponent
+        mss: originated from the Media Server Selection subcomponent
+        accounting: originated from the Accounting (billing) subcomponent
+        licensing: originated from the license management subcomponent
+        ldap: originated from the ldap configuration interface subcomponent
+        pmReporting: originated from the PM reporting subcomponent
+        smdi: originated from the SMDI io sub component
+        ccpeDeviceManagement: originated from the CPE device management subcomponent
+        networkDeviceManagement: originated from the network device address
+        mangement component
+        externalAuthentication: originated by the external web server
+        liveAudio: originated by the live audio subcomponent
+        servicePackMigration: originated by the service pack migration subcomponent
+        cap: originated by the call processing application protocol io subcomponent
+        openClientServer: originated by the open client server process
+        voicePortal: originated by the voice portal subcomponent
+        callLogs: originated by the enhanced call logs subcomponent
+        diameterServer: originated by the diameter server process (obsolete)
+        cms: originated by the Client Management System (CMS) subcomponent
+        taskMonitor: Originated by the task monitor sub system
+        tcp: Originated by the TCP sub system
+        soap: Originated by the SOAP subcomponent
+        smpp: Originated by the SMPP subcomponent
+        mm: Originated by the Mobility Manager subcomponent
+        diameterFrontNode: originated by the Diameter Front Node process
+        "
+    ::=  {  faultFields  8  }
+
+  problemText OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS    not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Text describing the nature of the problem.  The text consists
+        of constant and variable portions."
+    ::=  {  faultFields  9  }
+
+  recommendedActionsText  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS    not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Text describing recommended actions to take in order to isolate
+        the problem."
+    ::=  {  faultFields  10  }
+
+broadsoftNotifications  OBJECT IDENTIFIER
+    ::=  {  systemFaults 0  }
+
+
+  notification  NOTIFICATION-TYPE
+    OBJECTS     { identifier ,timeStamp ,alarmName ,systemName ,severity ,component ,subcomponent ,problemText ,recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "A notification indicates detection of an abnormal
+        condition in the system."
+    ::=  {  systemFaults 2  }
+
+  statefulAlarm NOTIFICATION-TYPE
+    OBJECTS     { identifier ,timeStamp ,alarmName ,systemName ,severity ,component ,subcomponent ,problemText ,recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "A stateful alarm alerts to the onset and cleanup of an abnormal
+        condition associated with a resource."
+    ::=  {  systemFaults 3 }
+
+  softwareError NOTIFICATION-TYPE
+    OBJECTS     { identifier ,timeStamp ,alarmName ,systemName ,severity ,component ,subcomponent ,problemText ,recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "Internal error detected by software."
+    ::=  {  systemFaults 4  }
+
+  bwGeneralSoftwareError NOTIFICATION-TYPE
+    OBJECTS     { identifier ,timeStamp ,alarmName ,systemName ,severity ,component ,subcomponent ,problemText ,recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "Internal error detected by software."
+    ::=  {  systemFaults 5  }
+
+  bwPMtomcatLaunched  NOTIFICATION-TYPE
+    OBJECTS     { identifier ,timeStamp ,alarmName ,systemName ,severity ,component ,subcomponent ,problemText ,recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "A notification indicates detection of an abnormal
+        condition in the system."
+    ::=  {  systemFaults 6  }
+
+  bwPMtomcatShutDown  NOTIFICATION-TYPE
+    OBJECTS     { identifier ,timeStamp ,alarmName ,systemName ,severity ,component ,subcomponent ,problemText ,recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "A notification indicates detection of an abnormal
+        condition in the system."
+    ::=  {  systemFaults 7  }
+
+  bwPMtomcatRestarted  NOTIFICATION-TYPE
+    OBJECTS     { identifier ,timeStamp ,alarmName ,systemName ,severity ,component ,subcomponent ,problemText ,recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "A notification indicates detection of an abnormal
+        condition in the system."
+    ::=  {  systemFaults 8  }
+
+  bwPMtomcatDeath  NOTIFICATION-TYPE
+    OBJECTS     { identifier ,timeStamp ,alarmName ,systemName ,severity ,component ,subcomponent ,problemText ,recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "A notification indicates detection of an abnormal
+        condition in the system."
+    ::=  {  systemFaults 9  }
+
+  bwSystemHealthReport  NOTIFICATION-TYPE
+    OBJECTS     { identifier ,timeStamp ,alarmName ,systemName ,severity ,component ,subcomponent ,problemText ,recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "A notification indicates detection of an abnormal
+        condition in the system."
+    ::=  {  systemFaults 10  }
+
+  bwDatabaseSyncReport  NOTIFICATION-TYPE
+    OBJECTS     { identifier ,timeStamp ,alarmName ,systemName ,severity ,component ,subcomponent ,problemText ,recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "A notification indicates detection of an abnormal
+        condition in the system."
+    ::=  {  systemFaults 11  }
+
+  bwServerStateTransition  NOTIFICATION-TYPE
+    OBJECTS     { identifier ,timeStamp ,alarmName ,systemName ,severity ,component ,subcomponent ,problemText ,recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "A notification indicates detection of an abnormal
+        condition in the system."
+    ::=  {  systemFaults 12  }
+
+  bwCounterThreshold  NOTIFICATION-TYPE
+    OBJECTS     { identifier ,timeStamp ,alarmName ,systemName ,severity ,component ,subcomponent ,problemText ,recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "A notification indicates detection of an abnormal
+        condition in the system."
+    ::=  {  systemFaults 13  }
+
+  bwGaugeLowLimitThreshold  NOTIFICATION-TYPE
+    OBJECTS     { identifier ,timeStamp ,alarmName ,systemName ,severity ,component ,subcomponent ,problemText ,recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "A notification indicates detection of an abnormal
+        condition in the system."
+    ::=  {  systemFaults 14  }
+
+  bwGaugeHighLimitThreshold  NOTIFICATION-TYPE
+    OBJECTS     { identifier ,timeStamp ,alarmName ,systemName ,severity ,component ,subcomponent ,problemText ,recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "A notification indicates detection of an abnormal
+        condition in the system."
+    ::=  {  systemFaults 15  }
+
+  bwPMReportingFTPConnectionError  NOTIFICATION-TYPE
+    OBJECTS     { identifier ,timeStamp ,alarmName ,systemName ,severity ,component ,subcomponent ,problemText ,recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "A notification indicates detection of an abnormal
+        condition in the system."
+    ::=  {  systemFaults 16  }
+
+  bwCPUIdleTimeLimitReached  NOTIFICATION-TYPE
+    OBJECTS     { identifier ,timeStamp ,alarmName ,systemName ,severity ,component ,subcomponent ,problemText ,recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "A notification indicates detection of an abnormal
+        condition in the system."
+    ::=  {  systemFaults 17  }
+
+  bwMemoryLimitReached  NOTIFICATION-TYPE
+    OBJECTS     { identifier ,timeStamp ,alarmName ,systemName ,severity ,component ,subcomponent ,problemText ,recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "A notification indicates detection of an abnormal
+        condition in the system."
+    ::=  {  systemFaults 18  }
+
+  bwNetworkDeviceIsFailed  NOTIFICATION-TYPE
+    OBJECTS     { identifier ,timeStamp ,alarmName ,systemName ,severity ,component ,subcomponent ,problemText ,recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "A notification indicates detection of an abnormal
+        condition in the system."
+    ::=  {  systemFaults 19  }
+
+  bwNetworkDeviceIsOnline  NOTIFICATION-TYPE
+    OBJECTS     { identifier ,timeStamp ,alarmName ,systemName ,severity ,component ,subcomponent ,problemText ,recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "A notification indicates detection of an abnormal
+        condition in the system."
+    ::=  {  systemFaults 20  }
+
+  bwPMremotexlaLaunched   NOTIFICATION-TYPE
+    OBJECTS     { identifier ,timeStamp ,alarmName ,systemName ,severity ,component ,subcomponent ,problemText ,recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "A notification indicates detection of an abnormal
+        condition in the system."
+    ::=  {  systemFaults 21  }
+
+  bwPMremotexlaShutDown  NOTIFICATION-TYPE
+    OBJECTS     { identifier ,timeStamp ,alarmName ,systemName ,severity ,component ,subcomponent ,problemText ,recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "A notification indicates detection of an abnormal
+        condition in the system."
+    ::=  {  systemFaults 22  }
+
+  bwPMremotexlaRestarted   NOTIFICATION-TYPE
+    OBJECTS     { identifier ,timeStamp ,alarmName ,systemName ,severity ,component ,subcomponent ,problemText ,recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "A notification indicates detection of an abnormal
+        condition in the system."
+    ::=  {  systemFaults 23  }
+
+  bwPMremotexlaDeath   NOTIFICATION-TYPE
+    OBJECTS     { identifier ,timeStamp ,alarmName ,systemName ,severity ,component ,subcomponent ,problemText ,recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "A notification indicates detection of an abnormal
+        condition in the system."
+    ::=  {  systemFaults 24  }
+
+  bwLicenseFileNotFound  NOTIFICATION-TYPE
+    OBJECTS     { identifier ,timeStamp ,alarmName ,systemName ,severity ,component ,subcomponent ,problemText ,recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "For the actual description, refer the BroadWorks FaultManagementGuide as it may contain variable data."
+    ::=  {  systemFaults 25  }
+
+  bwSMAPConnectionFailure  NOTIFICATION-TYPE
+    OBJECTS     { identifier ,timeStamp ,alarmName ,systemName ,severity ,component ,subcomponent ,problemText ,recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "For the actual description, refer the BroadWorks FaultManagementGuide as it may contain variable data."
+    ::=  {  systemFaults 26  }
+
+  bwMaximumFailedLoginAttempts  NOTIFICATION-TYPE
+    OBJECTS     { identifier ,timeStamp ,alarmName ,systemName ,severity ,component ,subcomponent ,problemText ,recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "For the actual description, refer the BroadWorks FaultManagementGuide as it may contain variable data."
+    ::=  {  systemFaults 27  }
+
+  bwCommProtocolInitError  NOTIFICATION-TYPE
+    OBJECTS     { identifier ,timeStamp ,alarmName ,systemName ,severity ,component ,subcomponent ,problemText ,recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "For the actual description, refer the BroadWorks FaultManagementGuide as it may contain variable data."
+    ::=  {  systemFaults 28  }
+
+  bwCommProtocolHostNotAllowed  NOTIFICATION-TYPE
+    OBJECTS     { identifier ,timeStamp ,alarmName ,systemName ,severity ,component ,subcomponent ,problemText ,recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "For the actual description, refer the BroadWorks FaultManagementGuide as it may contain variable data."
+    ::=  {  systemFaults 29  }
+
+  bwCommProtocolInterfaceNotAllowed  NOTIFICATION-TYPE
+    OBJECTS     { identifier ,timeStamp ,alarmName ,systemName ,severity ,component ,subcomponent ,problemText ,recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "For the actual description, refer the BroadWorks FaultManagementGuide as it may contain variable data."
+    ::=  {  systemFaults 30  }
+
+  bwSipTcpExceededMax  NOTIFICATION-TYPE
+    OBJECTS     { identifier ,timeStamp ,alarmName ,systemName ,severity ,component ,subcomponent ,problemText ,recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "For the actual description, refer the BroadWorks FaultManagementGuide as it may contain variable data."
+    ::=  {  systemFaults 31  }
+
+  bwSipTcpExceededMaxPerPeer  NOTIFICATION-TYPE
+    OBJECTS     { identifier ,timeStamp ,alarmName ,systemName ,severity ,component ,subcomponent ,problemText ,recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "For the actual description, refer the BroadWorks FaultManagementGuide as it may contain variable data."
+    ::=  {  systemFaults 32  }
+
+  bwSipTcpSocketError  NOTIFICATION-TYPE
+    OBJECTS     { identifier ,timeStamp ,alarmName ,systemName ,severity ,component ,subcomponent ,problemText ,recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "For the actual description, refer the BroadWorks FaultManagementGuide as it may contain variable data."
+    ::=  {  systemFaults 33  }
+
+  bwTaskMonitorWarning  NOTIFICATION-TYPE
+    OBJECTS     { identifier ,timeStamp ,alarmName ,systemName ,severity ,component ,subcomponent ,problemText ,recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "For the actual description, refer the BroadWorks FaultManagementGuide as it may contain variable data."
+    ::=  {  systemFaults 34  }
+
+  bwTaskMonitorHungTask  NOTIFICATION-TYPE
+    OBJECTS     { identifier ,timeStamp ,alarmName ,systemName ,severity ,component ,subcomponent ,problemText ,recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "For the actual description, refer the BroadWorks FaultManagementGuide as it may contain variable data."
+    ::=  {  systemFaults 35  }
+
+  bwTcpSubsystemFatalError  NOTIFICATION-TYPE
+    OBJECTS     { identifier ,timeStamp ,alarmName ,systemName ,severity ,component ,subcomponent ,problemText ,recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "For the actual description, refer the BroadWorks FaultManagementGuide as it may contain variable data."
+    ::=  {  systemFaults 36  }
+
+  bwFileServerClusterUnreachable NOTIFICATION-TYPE
+    OBJECTS     { identifier ,timeStamp ,alarmName ,systemName ,severity ,component ,subcomponent ,problemText ,recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "For the actual description, refer the BroadWorks FaultManagementGuide as it may contain variable data."
+    ::=  {  systemFaults 37  }
+
+  bwFileServerNodeUnreachable NOTIFICATION-TYPE
+    OBJECTS     { identifier ,timeStamp ,alarmName ,systemName ,severity ,component ,subcomponent ,problemText ,recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "For the actual description, refer the BroadWorks FaultManagementGuide as it may contain variable data."
+    ::=  {  systemFaults 38   }
+    
+  bwFileServerClusterUnreachableClear NOTIFICATION-TYPE
+    OBJECTS     { identifier ,timeStamp ,alarmName ,systemName ,severity ,component ,subcomponent ,problemText ,recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "For the actual description, refer the BroadWorks FaultManagementGuide as it may contain variable data."
+    ::=  {  systemFaults 39  }
+
+  bwFileServerNodeUnreachableClear NOTIFICATION-TYPE
+    OBJECTS     { identifier ,timeStamp ,alarmName ,systemName ,severity ,component ,subcomponent ,problemText ,recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "For the actual description, refer the BroadWorks FaultManagementGuide as it may contain variable data."
+    ::=  {  systemFaults 40   }    
+
+  bwAlarmsDiscarded  NOTIFICATION-TYPE
+    OBJECTS     { identifier ,timeStamp ,alarmName ,systemName ,severity ,component ,subcomponent ,problemText ,recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "For the actual description, refer the BroadWorks FaultManagementGuide as it may contain variable data."
+    ::=  {  systemFaults 41  }
+
+  bwLogQueueSizeLimitReached  NOTIFICATION-TYPE
+    OBJECTS     { identifier ,timeStamp ,alarmName ,systemName ,severity ,component ,subcomponent ,problemText ,recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "For the actual description, refer the BroadWorks FaultManagementGuide as it may contain variable data."
+    ::=  {  systemFaults 42  }
+
+  bwLogQueueSizeLimitReachedClear  NOTIFICATION-TYPE
+    OBJECTS     { identifier ,timeStamp ,alarmName ,systemName ,severity ,component ,subcomponent ,problemText ,recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "For the actual description, refer the BroadWorks FaultManagementGuide as it may contain variable data."
+    ::=  {  systemFaults 43  }
+
+  bwLicenseFileExpiring  NOTIFICATION-TYPE
+    OBJECTS     { identifier ,timeStamp ,alarmName ,systemName ,severity ,component ,subcomponent ,problemText ,recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "For the actual description, refer the BroadWorks FaultManagementGuide as it may contain variable date."
+    ::= {  systemFaults 44   }
+
+  bwLicenseFileExpired  NOTIFICATION-TYPE
+    OBJECTS     { identifier ,timeStamp ,alarmName ,systemName ,severity ,component ,subcomponent ,problemText ,recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "For the actual description, refer the BroadWorks FaultManagementGuide as it may contain variable date."
+    ::= {  systemFaults 45   }
+
+  bwCallOverloadZoneTransition NOTIFICATION-TYPE
+    OBJECTS     { identifier ,timeStamp ,alarmName ,systemName ,severity ,component ,subcomponent ,problemText ,recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "For the actual description, refer the BroadWorks FaultManagementGuide as it may contain variable data."
+    ::=  {  systemFaults 3618  }
+
+  bwNonCallOverloadZoneTransition NOTIFICATION-TYPE
+    OBJECTS     { identifier ,timeStamp ,alarmName ,systemName ,severity ,component ,subcomponent ,problemText ,recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "For the actual description, refer the BroadWorks FaultManagementGuide as it may contain variable data."
+    ::=  {  systemFaults 3619  }
+
+  bwCongestionManagementNeighborsInhibited NOTIFICATION-TYPE
+    OBJECTS     { identifier ,timeStamp ,alarmName ,systemName ,severity ,component ,subcomponent ,problemText ,recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "For the actual description, refer the BroadWorks FaultManagementGuide as it may contain variable data."
+    ::= { systemFaults 46 }
+
+  bwPMhttpdLaunched  NOTIFICATION-TYPE
+    OBJECTS     { identifier ,timeStamp ,alarmName ,systemName ,severity ,component ,subcomponent ,problemText ,recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "A notification indicates detection of an abnormal
+        condition in the system."
+    ::=  {  systemFaults 48  }
+
+  bwPMhttpdShutDown  NOTIFICATION-TYPE
+    OBJECTS     { identifier ,timeStamp ,alarmName ,systemName ,severity ,component ,subcomponent ,problemText ,recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "A notification indicates detection of an abnormal
+        condition in the system."
+    ::=  {  systemFaults 49  }
+
+  bwPMhttpdRestarted  NOTIFICATION-TYPE
+    OBJECTS     { identifier ,timeStamp ,alarmName ,systemName ,severity ,component ,subcomponent ,problemText ,recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "A notification indicates detection of an abnormal
+        condition in the system."
+    ::=  {  systemFaults 50  }
+
+  bwPMhttpdDeath  NOTIFICATION-TYPE
+    OBJECTS     { identifier ,timeStamp ,alarmName ,systemName ,severity ,component ,subcomponent ,problemText ,recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "A notification indicates detection of an abnormal
+        condition in the system."
+    ::=  {  systemFaults 51  }
+
+  -- ===============================================================
+  -- Moved from the BW-ApplicationServerFault MIB.
+  -- ===============================================================
+  bwLicenseHWViolation  NOTIFICATION-TYPE
+    OBJECTS     { identifier, timeStamp, alarmName, systemName, severity, component, subcomponent, problemText, recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "For the actual description, refer the BroadWorks FaultManagementGuide as it may contain variable data."
+    ::=  {  systemFaults 3543  }
+END
+

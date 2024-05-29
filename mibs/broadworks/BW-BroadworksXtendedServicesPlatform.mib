@@ -1,0 +1,373 @@
+--===============================================================
+-- File Name : BW-BroadworksXtendedServicesPlatform.mib
+-- Date      : 01/28/2008
+-- Author    : BroadSoft Inc.
+--===============================================================
+
+BW-BroadworksXtendedServicesPlatform	DEFINITIONS ::= BEGIN
+	IMPORTS
+		DisplayString
+			FROM SNMPv2-TC
+		MODULE-COMPLIANCE, OBJECT-GROUP          
+			FROM SNMPv2-CONF
+		enterprises, MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-TYPE, Gauge32, Counter32, Integer32, Unsigned32
+			FROM SNMPv2-SMI;
+
+
+	
+	broadsoft	MODULE-IDENTITY
+		LAST-UPDATED	"200810281054Z"
+		ORGANIZATION	"Broadsoft, Inc"
+		CONTACT-INFO	"Broadsoft, Inc
+220 Perry Parkway
+Gaithersburg, MD  20877
+301-977-9440"
+		DESCRIPTION		
+				"The BW-BroadworksXtendedServicesPlatform.mib is introduces to capture the performance measurements for the BroadWorks Xtended Services Platform."
+    REVISION    "200810281054Z"
+      DESCRIPTION
+        "Added new counters for XSI-Events feature"
+    REVISION    "200807181000Z"
+      DESCRIPTION
+        "MIB Compliancy."
+				 
+		::=  {  enterprises  6431  }
+
+	broadworks	OBJECT IDENTIFIER
+		::=  {  broadsoft  1  }
+
+	bwXtendedServicesPlatform	OBJECT IDENTIFIER
+		::=  {  broadworks  12  }
+
+	protocols	OBJECT IDENTIFIER
+		::=  {  bwXtendedServicesPlatform  1  }
+
+	bwXspMibConformance	OBJECT IDENTIFIER
+		::=  {  bwXtendedServicesPlatform  1000  }
+
+	bcct	OBJECT IDENTIFIER
+		::=  {  protocols  1  }
+
+	auth	OBJECT IDENTIFIER
+		::=  {  protocols  2  }
+        
+	oci	OBJECT IDENTIFIER
+		::=  {  protocols  3  }
+
+	nsLocationAPI	OBJECT IDENTIFIER
+		::=  {  protocols  4  }
+
+	nsPortalAPI	OBJECT IDENTIFIER
+		::=  {  protocols  5  }
+
+-- XSP - BroadWorks Common Communication Protocol ........................
+
+	bwXspCommonCommStatsTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  BwXspCommonCommStatsEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"This table contains counters for BCCT for the XSP process."
+		::=  { bcct  1 }
+
+	bwXspCommonCommStatsEntry	OBJECT-TYPE
+		SYNTAX		BwXspCommonCommStatsEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"Definition of the entries for bwOCSCommonCommStatsTable."
+		INDEX		{  bwXspCommonCommStatsIndex  }
+		::=  { bwXspCommonCommStatsTable 1 }
+
+	BwXspCommonCommStatsEntry  ::=  SEQUENCE {
+		bwXspCommonCommStatsIndex  Unsigned32,
+		bwXspCommonCommHost  DisplayString,
+		bwXspCommonCommInterface  DisplayString,
+		bwXspCommonCommProtocol  DisplayString,
+		bwXspCommonCommAcceptedOutboundConnections  Counter32,
+		bwXspCommonCommAcceptedInboundConnections  Counter32,
+		bwXspCommonCommRejectedOutboundConnections  Counter32,
+		bwXspCommonCommRejectedInboundConnections  Counter32,
+		bwXspCommonCommOutputMessagesProcessed  Counter32,
+		bwXspCommonCommInputMessagesProcessed  Counter32,
+		bwXspCommonCommOutputCommunicationErrors  Counter32,
+		bwXspCommonCommInputCommunicationErrors  Counter32
+		}
+
+	bwXspCommonCommStatsIndex	OBJECT-TYPE
+		SYNTAX			Unsigned32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"This integer represents an index in table bwXspCommonCommStatsTable. The index represents a connection for a specific Host-Interfacece-Protocol combination."
+		::=  {  bwXspCommonCommStatsEntry  1  }
+
+	bwXspCommonCommHost	OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"The address of a host connected to the BroadWorks Common Communication Protocol."
+		::=  {  bwXspCommonCommStatsEntry  2  }
+
+	bwXspCommonCommInterface	OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"The IP address of a local interface that a protocol is bound to."
+		::=  {  bwXspCommonCommStatsEntry  3  }
+
+	bwXspCommonCommProtocol	OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"The name of a BroadWorks Common Communication Protocol client protocol, e.g. OCI."
+		::=  {  bwXspCommonCommStatsEntry  4  }
+
+	bwXspCommonCommAcceptedOutboundConnections	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter is incremented whenever a client in this process connects to the framework to a remote host, using the interface and protocol."
+		::=  {  bwXspCommonCommStatsEntry  5  }
+
+	bwXspCommonCommAcceptedInboundConnections	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter is incremented whenever a client in this process connects to the framework from a remote host, using the interface and protocol."
+		::=  {  bwXspCommonCommStatsEntry  6  }
+
+	bwXspCommonCommRejectedOutboundConnections	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter is incremented whenever a client connection request going from this process to a remote host and going through this interface has been rejected for a particular protocol."
+		::=  {  bwXspCommonCommStatsEntry  7  }
+
+	bwXspCommonCommRejectedInboundConnections	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter is incremented whenever a client connection request coming to this host and going through this interface has been rejected by the framework for a particular protocol."
+		::=  {  bwXspCommonCommStatsEntry  8  }
+
+	bwXspCommonCommOutputMessagesProcessed	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter is incremented whenever a message has been sent and processed for this host, interface and protocol."
+		::=  {  bwXspCommonCommStatsEntry  9  }
+
+	bwXspCommonCommInputMessagesProcessed	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter is incremented whenever a message has been received and processed for this host, interface and protocol."
+		::=  {  bwXspCommonCommStatsEntry  10  }
+
+	bwXspCommonCommOutputCommunicationErrors	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter is incremented whenever a message could not be read because the TCP stack returned an error."
+		::=  {  bwXspCommonCommStatsEntry  11  }
+
+	bwXspCommonCommInputCommunicationErrors	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter is incremented whenever a message has been sent and processed for this host, interface and protocol."
+		::=  {  bwXspCommonCommStatsEntry  12  }
+
+-- auth modules  ...........................................
+
+	bwXspAuthenticationAttempts	OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This counter is incremented when the XSP sends an authentication message to the Authentication Server, e.g. BroadWorks PS."
+		::=  {  auth  1  }
+
+	bwXspAuthenticationFailed	OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This counter is incremented when the XSP receives an authentication failure response from the Authentication Server, e.g. BroadWorks PS."
+		::=  {  auth  2  }
+		
+-- oci modules  ...........................................
+   
+	bwXspOCIRequests	OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"The number of OCI request messages sent to the BroadWorks PS."
+		::=  {  oci  1  }
+
+	bwXspOCIResponses	OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"The number of request response to OCI messages received from the BroadWorks PS."
+		::=  {  oci  2  }
+
+	bwXspOCIUnauthorizedMessage	OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"The number of error response due to unauthorized session received from the BroadWorks PS."
+		::=  {  oci  3  }
+
+	bwXspOCICRequests	OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"The number of OCI-C request messages sent to the BroadWorks XS."
+		::=  {  oci  4  }
+
+	bwXspOCICResponses	OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"The number of request response to OCI-C messages received from the BroadWorks XS."
+		::=  {  oci  5  }
+
+  bwXspOCICMessagesReceived OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS	read-write
+		STATUS			current
+		DESCRIPTION		
+				"This counter is incremented when a message from an XS is received."
+		::=  {  oci  6  }
+
+  bwXspOCICMessagesRejected OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS	read-write
+		STATUS			current
+		DESCRIPTION		
+				"This counter is incremented when a message from an XS is rejected before it reaches the web application."
+		::=  {  oci  7  }
+
+  bwXspOCICMessagesDelivered OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS	read-write
+		STATUS			current
+		DESCRIPTION		
+				"This counter is incremented when a message from an XS is delivered to the web application."
+		::=  {  oci  8  }
+
+  bwXspOCICMessagesReplied OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS	read-write
+		STATUS			current
+		DESCRIPTION		
+				"This counter is incremented when a reply from an web application is delivered to the XS."
+		::=  {  oci  9  }
+
+-- nsLocationAPI modules  ...........................................
+
+	bwXspNsLocAPIAttempts	OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This counter is incremented when the XSP sends a location API request to a Network Server."
+		::=  {  nsLocationAPI  1  }
+
+	bwXspNsLocAPIResponseFailed	OBJECT-TYPE	
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This counter is incremented when the XSP receives a failed location API response from the Network Server."
+		::=  {  nsLocationAPI  2  }
+
+-- nsPortalAPI counters ...........................................
+  bwXspNsASDiscoveryAttempts OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+      "This counter is incremented when the Xsp sends a PortalAPI request to a Network Server."
+    ::= { nsPortalAPI	1 }
+
+  bwXspNsASDiscoveryAttemptsFailed OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+      "This counter is incremented when the Xsp is unable to receive a successful PortalAPI request from the Network Server."
+    ::= { nsPortalAPI	2 }
+
+
+-- BroadWorks Open Client Server MIB Conformance Definition  ...........................................
+
+bwXspMibGroups		OBJECT IDENTIFIER ::= { bwXspMibConformance 1 }
+bwXspMibCompliancy	OBJECT IDENTIFIER ::= { bwXspMibConformance 2 }
+
+-- units of conformance
+
+bwXspBcctGroup    OBJECT-GROUP
+    OBJECTS { bwXspCommonCommStatsIndex, bwXspCommonCommHost, bwXspCommonCommInterface, bwXspCommonCommProtocol, bwXspCommonCommAcceptedOutboundConnections, bwXspCommonCommAcceptedInboundConnections, bwXspCommonCommRejectedOutboundConnections, bwXspCommonCommRejectedInboundConnections, bwXspCommonCommOutputMessagesProcessed, bwXspCommonCommInputMessagesProcessed, bwXspCommonCommOutputCommunicationErrors, bwXspCommonCommInputCommunicationErrors }
+    STATUS  current
+    DESCRIPTION
+       "This group defines the Xsp statistics for the BCCT protocol to the BroadWorks Application."
+    ::= { bwXspMibGroups 1 }
+
+bwXspAuthGroup    OBJECT-GROUP
+    OBJECTS { bwXspAuthenticationAttempts, bwXspAuthenticationFailed }
+    STATUS  current
+    DESCRIPTION
+       "This group defines the XSP statistics for the auth component."
+    ::= { bwXspMibGroups 2 }
+
+bwXspOciGroup    OBJECT-GROUP
+    OBJECTS { bwXspOCIRequests, bwXspOCIResponses, bwXspOCIUnauthorizedMessage, bwXspOCICRequests, bwXspOCICResponses, bwXspOCICMessagesReceived, bwXspOCICMessagesRejected, bwXspOCICMessagesDelivered, bwXspOCICMessagesReplied }
+    STATUS  current
+    DESCRIPTION
+       "This group defines the Xsp statistics for the OCI protocol to the BroadWorks Application."
+    ::= { bwXspMibGroups 3 }
+    
+bwXspNsLocAPIGroup    OBJECT-GROUP
+    OBJECTS { bwXspNsLocAPIAttempts, bwXspNsLocAPIResponseFailed }
+    STATUS  current
+    DESCRIPTION
+       "This group defines the Xsp statistics for the NS Location API protocol to the BroadWorks Network Server."
+    ::= { bwXspMibGroups 4 }
+
+bwXspNsPortalAPIGroup    OBJECT-GROUP
+    OBJECTS { bwXspNsASDiscoveryAttempts, bwXspNsASDiscoveryAttemptsFailed }
+    STATUS  current
+    DESCRIPTION
+       "This group defines the Xsp statistics for the NS Portal API protocol to the BroadWorks Network Server."
+    ::= { bwXspMibGroups 5 }
+-- 
+bwXspBasicCompliance MODULE-COMPLIANCE
+	STATUS current
+     	DESCRIPTION
+		"BroadWorks Xtended Services Platform MIB compliance"
+	MODULE -- this module
+		MANDATORY-GROUPS { bwXspBcctGroup, bwXspAuthGroup, bwXspOciGroup, bwXspNsLocAPIGroup, bwXspNsPortalAPIGroup }
+	::= { bwXspMibCompliancy 1 }
+
+-- End of MIB file - Do not put anything behind this line ...........................................
+
+END

@@ -1,0 +1,4038 @@
+
+-- File Name : BW-BroadworksEMS-MIB.mib
+-- Date      : Thu Jun 28 17:58:13 GMT+05:30 2001
+-- Author    : AdventNet Agent Toolkit (Java Edition) - MibEditor 4.2
+
+BW-BroadworksEMS-MIB	DEFINITIONS ::= BEGIN
+	IMPORTS                                                                 
+		Unsigned32, Integer32, enterprises, OBJECT-TYPE, IpAddress, TimeTicks, Gauge32, NOTIFICATION-TYPE
+			FROM SNMPv2-SMI
+		DisplayString, DateAndTime, TruthValue
+			FROM SNMPv2-TC
+		enterprises
+			FROM RFC1155-SMI
+		DisplayString
+			FROM RFC1213-MIB;
+			
+	RowStatus ::= INTEGER 
+		{ active ( 1 ) , 
+		  notInService ( 2 ) , 
+		  notReady ( 3 ) , 
+		  createAndGo ( 4 ) , 
+		  createAndWait ( 5 ) , 
+		  destroy ( 6 ) }
+
+	org	OBJECT IDENTIFIER
+		::=  {  iso  3  }
+
+	dod	OBJECT IDENTIFIER
+		::=  {  org  6  }
+
+	internet	OBJECT IDENTIFIER
+		::=  {  dod  1  }
+
+	private	OBJECT IDENTIFIER
+		::=  {  internet  4  }
+
+	enterprises	OBJECT IDENTIFIER
+		::=  {  private  1  }
+
+	adventnet	OBJECT IDENTIFIER
+		::=  {  enterprises  2162  }
+
+	webNMS	OBJECT IDENTIFIER
+		::=  {  adventnet  4  }
+
+	webNMSSystem	OBJECT IDENTIFIER
+		::=  {  webNMS  1  }
+
+	webNMSTopoMib	OBJECT IDENTIFIER
+		::=  {  webNMS  2  }
+
+	webNMSFaultMib	OBJECT IDENTIFIER
+		::=  {  webNMS  3  }
+
+	webNMSPerformanceMib	OBJECT IDENTIFIER
+		::=  {  webNMS  4  }
+
+	persistentTrapsMib	OBJECT IDENTIFIER
+		::=  {  webNMS  5  }
+
+	tftpMib	OBJECT IDENTIFIER
+		::=  {  webNMS  6  }
+
+	proxyService	OBJECT IDENTIFIER
+		::=  {  webNMS  7  }
+
+	subagents	OBJECT IDENTIFIER
+		::=  {  webNMS  8  }
+
+      trapForwardingModule	OBJECT IDENTIFIER
+		::=  {  webNMS  9  }
+
+	nmsConfiguration	OBJECT IDENTIFIER
+		::=  {  webNMS  10  }
+
+    agentConfiguration	OBJECT IDENTIFIER
+		::=  {  webNMS  11  }
+
+	webNMSVersion	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"The version number of the AdventNet WebNMS System."
+		::=  {  webNMSSystem  1  }
+
+	webNMSHost	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"The hostname of the system in which
+				the AdventNet WebNMS system is executed on."
+		::=  {  webNMSSystem  2  }
+
+	webNMSIpAddress	OBJECT-TYPE	
+		SYNTAX			IpAddress
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"The ipaddress of the system in which
+				the AdventNet WebNMS system is executed on."
+		::=  {  webNMSSystem  3  }
+
+	webNMSTotalMemory	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"The Total memory of the device in which the WebNMS is running"
+		::=  {  webNMSSystem  4  }
+
+	webNMSFreeMemory	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"The Free memory available in the device in which the WebNMS is running"
+		::=  {  webNMSSystem  5  }
+
+	webNMSStartTime	OBJECT-TYPE	
+		SYNTAX			DateAndTime
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the time at which the NMS Server started"
+		::=  {  webNMSSystem  6  }
+
+	webNMSUpTime	OBJECT-TYPE	
+		SYNTAX			TimeTicks
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the duration for which the NMS Server has been running"
+		::=  {  webNMSSystem  7  }
+
+	webNMSShutdown	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) ) 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This variable  is used to shutdown the NMS from the manager.
+				The user needs to give the login name and the password.Once,the user gives the
+				loginname and the password,the NMS Server shuts down.
+				SYNTAX:
+				loginName,password"
+		::=  {  webNMSSystem  8  }
+
+	webNMSPorts	OBJECT IDENTIFIER
+		::=  {  webNMSSystem  9  }
+
+	webNMSSchedulerTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  WebNMSSchedulerEntry
+		MAX-ACCESS	not-accessible
+		STATUS		optional
+		DESCRIPTION	
+			"A table of WebNMS scheduler instances"
+		::=  { webNMSSystem  10 }
+
+	webNMSSchedulerEntry	OBJECT-TYPE
+		SYNTAX		WebNMSSchedulerEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	
+			"A collection of objects specific to
+			the WebNMS system Scheduler"
+		INDEX		{  webNMSSchedulerIndex  }
+		::=  { webNMSSchedulerTable 1 }
+
+	WebNMSSchedulerEntry  ::=  SEQUENCE {
+		webNMSSchedulerIndex  Integer32,
+		webNMSSchedulerDesc  DisplayString,
+		webNMSSchedulerNumTasks  Integer32,
+		webNMSSchedulerNumThreads  Integer32,
+		webNMSSchedulerActiveThreads  Integer32,
+		webNMSSchedulerIdleThreads  Integer32
+		}
+
+
+	webNMSSchedulerIndex	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"The index for the WebNMS Scheduler instance"
+		::=  {  webNMSSchedulerEntry  1  }
+
+
+	webNMSSchedulerDesc	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"A description of the WebNMS Scheduler instance"
+		::=  {  webNMSSchedulerEntry  2  }
+
+
+	webNMSSchedulerNumTasks	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"The number of tasks scheduled in this WebNMS
+				Scheduler instance"
+		::=  {  webNMSSchedulerEntry  3  }
+
+
+	webNMSSchedulerNumThreads	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"Total number of Worker threads available"
+		::=  {  webNMSSchedulerEntry  4  }
+
+
+	webNMSSchedulerActiveThreads	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"The number of active Worker threads"
+		::=  {  webNMSSchedulerEntry  5  }
+
+
+	webNMSSchedulerIdleThreads	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"The number of idle Worker threads"
+		::=  {  webNMSSchedulerEntry  6  }
+
+	webNMSNumObjects	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"The number of objects being managed
+				by the AdventNet WebNMS system."
+		::=  {  webNMSTopoMib  1  }
+
+	webNMSNumNetworks	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"The number of networks being managed
+				by the AdventNet WebNMS system."
+		::=  {  webNMSTopoMib  2  }
+
+	webNMSNumNodes	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"The number of nodes being managed
+				by the AdventNet WebNMS system."
+		::=  {  webNMSTopoMib  3  }
+
+	webNMSNumInterfaces	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"The number of interfaces being managed
+				by the AdventNet WebNMS system."
+		::=  {  webNMSTopoMib  4  }
+
+	moUserPropNames	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) ) 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This variable indicates to the agent what all user property
+				values the user would like to see in the moUserProp variable of the MoTable.
+				This also provides for the facility of viewing all the user property-values by
+				specifying the word 'all' .
+				If the user needs to see only a few specific user property values ,then he needs
+				to specify them explicitly
+				SYNTAX1
+				all
+				SYNTAX2
+				userPropName1,userPropName2,...
+				The values for the properties will be in the following format:
+				userPropName1=value1,userPopName2=value2.."
+		::=  {  webNMSTopoMib  5  }
+
+	moTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  MoEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	
+			"This describes the details of Managed Objects"
+		::=  { webNMSTopoMib  6 }
+
+	moEntry	OBJECT-TYPE
+		SYNTAX		MoEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	
+			"An entry of the Mo Table"
+		INDEX		{  moNameIndex, moOwnerName  }
+		::=  { moTable 1 }
+
+	MoEntry  ::=  SEQUENCE {
+		moNameIndex  DisplayString,
+		moOwnerName  DisplayString,
+		moType  DisplayString,
+		moFailureCount  Integer32,
+		moFailureThreshold  Integer32,
+		moManaged  TruthValue,
+		moStatus  Integer32,
+		moStatusChangeTime  Gauge32,
+		moStatusUpdateTime  Gauge32,
+		moPollInterval  TimeTicks,
+		moUserProperties  DisplayString,
+		moDerivedProperties  DisplayString,
+		inheritingOid1  OBJECT IDENTIFIER,
+		inheritingTableName1  DisplayString
+		}
+
+
+	moNameIndex	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable represents the name of the Network Element.
+				This name should uniquely represent the MO in the network
+				domain across all MO types.This entry corresponds to the Name field of the
+				ManagedObject table in the database"
+		::=  {  moEntry  1  }
+
+
+	moOwnerName	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable represents the Ownername of the Network Element.
+				This name also uniquely represents the MO in the network
+				domain across all MO types. This entry corresponds to the OwnerName field of the
+				ManagedObject table in the database"
+		::=  {  moEntry  2  }
+
+
+	moType	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable represents the type of the Network Element
+				whose attributes are presented in this specific row of the MO table.This entry
+				corresponds to the Type field of the ManagedObject table in the database"
+		::=  {  moEntry  3  }
+
+
+	moFailureCount	OBJECT-TYPE	
+		SYNTAX			Integer32  ( -2147483648 .. 2147483647  ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable represents the number of failures occuring in the network element.
+				This entry corresponds to the FailureCount field of the ManagedObject table in the database"
+		::=  {  moEntry  4  }
+
+
+	moFailureThreshold	OBJECT-TYPE	
+		SYNTAX			Integer32  ( -2147483648 .. 2147483647  ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable represents the minimum value for failures which acts
+				as the threshold.This entry corresponds to the FailureThreshold field of the
+				ManagedObject table in the database"
+		::=  {  moEntry  5  }
+
+
+	moManaged	OBJECT-TYPE	
+		SYNTAX			TruthValue
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable states whether the mo is managed or not.This entry corresponds
+				to the Managed field of the ManagedObject table in the database"
+		::=  {  moEntry  6  }
+
+
+	moStatus	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This value gives the current status of the MO.This entry corresponds to the Status
+				field of the ManagedObject table in the database"
+		::=  {  moEntry  7  }
+
+
+	moStatusChangeTime	OBJECT-TYPE	
+		SYNTAX			Gauge32  ( 0 .. 4294967295  ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable represents the time at which the status of
+				the mo was formally acknowledged to have changed.This entry corresponds to the
+				StatusChangeTime field of the ManagedObject table in the database"
+		::=  {  moEntry  8  }
+
+
+	moStatusUpdateTime	OBJECT-TYPE	
+		SYNTAX			Gauge32  ( 0 .. 4294967295  ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable represents the time at which the status of the
+				mo was formally acknowledged to have been updated.This entry corresponds to the
+				StatusUpdateTime field of the ManagedObject table in the database"
+		::=  {  moEntry  9  }
+
+
+	moPollInterval	OBJECT-TYPE	
+		SYNTAX			TimeTicks
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the polling interval of the mo.This entry corresponds to the
+				PollInterval field of the ManagedObject table in the database"
+		::=  {  moEntry  10  }
+
+
+	moUserProperties	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"The values for the user properties which the user
+				specifies in the moUserPropNames variable are displayed
+				The values will be displayed in the folloing formate
+				propName1=value1,porpName2=vaule2,...."
+		::=  {  moEntry  11  }
+
+
+	moDerivedProperties	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable displays the values of the user defined objects ' properties
+				which the user 	specifies in the derivedPropNames variable in the
+				moDerivedPropNamesTable.
+				The values will be displayed in the following formate
+				propName1=value1,propName2=value2,...."
+		::=  {  moEntry  12  }
+
+
+	inheritingOid1	OBJECT-TYPE	
+		SYNTAX			OBJECT IDENTIFIER
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the oid of the table.
+				For example,if the discovered object is
+				derived from TopoObject, then, the oid of the TopoObjectTable in
+				this MIB will be filled here.If the oid is .0.0 then it implies
+				that there is no further inheritance."
+		::=  {  moEntry  13  }
+
+
+	inheritingTableName1	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the name of the table.
+				For example,if the discovered object is
+				derived from TopoObject, then, the table name TopoObjectTable 
+                                will be filled here.If the tablename is empty then it implies
+				that there is no further inheritance."
+		::=  {  moEntry  14  }
+		
+	topoObjTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  TopoObjEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	
+			"This table contains the various topo Objects"
+		::=  { webNMSTopoMib  7 }
+
+	topoObjEntry	OBJECT-TYPE
+		SYNTAX		TopoObjEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	
+			"An entry  of the topoObject Table"
+		INDEX		{  moNameIndex, moOwnerName  }
+		::=  { topoObjTable 1 }
+
+	TopoObjEntry  ::=  SEQUENCE {
+		ipAddress  IpAddress,
+		netmask  IpAddress,
+		moCommunity  DisplayString,
+		moWriteCommunity  DisplayString,
+		snmpPort  Integer32,
+		isDHCP  DisplayString,
+		baseMibs  DisplayString,
+		version  DisplayString,
+		userName  DisplayString,
+		contextName  DisplayString,
+		inheritingOid2  OBJECT IDENTIFIER,
+		inheritingTableName2  DisplayString
+		}
+
+
+	ipAddress	OBJECT-TYPE	
+		SYNTAX			IpAddress
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the ipAddress of the Object.This entry corresponds to the
+				IpAddress field of the TopoObject table in the database"
+		::=  {  topoObjEntry  1  }
+
+
+	netmask	OBJECT-TYPE	
+		SYNTAX			IpAddress
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the net mask of the object.This entry corresponds to the
+				NetMask field of the TopoObject table in the database"
+		::=  {  topoObjEntry  2  }
+
+
+	moCommunity	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the read community String used by the
+				Snmp Agent in the Network Element. This field is valid only
+				if the Network Element is also an SnmpNode.This entry corresponds to the
+				Community field of the TopoObject table in the database"
+		::=  {  topoObjEntry  3  }
+
+
+	moWriteCommunity	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the write community String used by the
+				Snmp Agent in the Network Element. This field is valid only
+				if the Network Element is also an SnmpNode.This entry corresponds to the
+				WriteCommunity field of the TopoObject table in the database"
+		::=  {  topoObjEntry  4  }
+
+
+	snmpPort	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the Snmp port used by the Snmp Agent in the
+				Network Element. This field is valid only if the Network Element
+				is also an Snmp Node.This entry corresponds to the
+				SnmpPort field of the TopoObject table in the database"
+		::=  {  topoObjEntry  5  }
+
+
+	isDHCP	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable states whether the network element supports DHCP
+				(i.e is the ipaddress for the network element assigned by DHCP protocol).
+				This entry corresponds to the IsDHCP field of the TopoObject table in the database"
+		::=  {  topoObjEntry  6  }
+
+
+	baseMibs	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the Mibs implemented by the Snmp Agent in the
+				Network Element. This field is valid only if the Network Element is
+				also an Snmp Node.This entry corresponds to the BaseMibs field of the
+				TopoObject table in the database"
+		::=  {  topoObjEntry  7  }
+
+
+	version	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the version used by the Snmp Agent in the Network Element.
+				This entry corresponds to the Version field of the TopoObject table in the database."
+		::=  {  topoObjEntry  8  }
+
+
+	userName	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the userName used by the SNMPv3 Agent in the Network Element.
+				This entry corresponds to the UserName field of the TopoObject table in the database."
+		::=  {  topoObjEntry  9  }
+
+
+	contextName	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the contextName used by the SNMPv3 Agent in the Network Element.
+				This entry corresponds to the ContextName field of the TopoObject table in the database."
+		::=  {  topoObjEntry  10  }
+
+
+	inheritingOid2	OBJECT-TYPE	
+		SYNTAX			OBJECT IDENTIFIER
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the oid of the table.
+				For example,if the discovered object's type is either
+				Node or any of its child, then, the oid of the NodeTable in
+				this MIB will be filled here.If the oid is .0.0 then it implies
+				that there is no further inheritance."
+		::=  {  topoObjEntry  11  }
+
+
+	inheritingTableName2	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the name of the table.
+				For example,if the discovered object's type is either
+				Node or any of its child, then, the table name NodeTable 
+				will be filled here.If the table name is empty then it implies
+				that there is no further inheritance."
+		::=  {  topoObjEntry  12  }
+
+	networkTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  NetworkEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	
+			"This table contains information about the various networks supported by the NMS"
+		::=  { webNMSTopoMib  8 }
+
+	networkEntry	OBJECT-TYPE
+		SYNTAX		NetworkEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	
+			"An entry of the Network table"
+		INDEX		{  moNameIndex, moOwnerName  }
+		::=  { networkTable 1 }
+
+	NetworkEntry  ::=  SEQUENCE {
+		discover  DisplayString,
+		discoverStatus  Integer32,
+		inheritingOid3  OBJECT IDENTIFIER,
+		inheritingTableName3  DisplayString
+		}
+
+
+	discover	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable states whether disocvery is being done on this network or not.
+				This entry corresponds to the Discover field of the Network table in the database"
+		::=  {  networkEntry  1  }
+
+
+	discoverStatus	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the discovery status for the network. This entry
+				corresponds to the DiscoveryStatus field of the Network table in the database"
+		::=  {  networkEntry  2  }
+
+
+	inheritingOid3	OBJECT-TYPE	
+		SYNTAX			OBJECT IDENTIFIER
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the oid of the table.
+				For example,if the discovered object is any direct
+				child( e.g. MyNetworkChild) of Network (or any child of
+				MyNetworkChild),then, the oid of the direct child's table
+				(e.g. MyNetworkChildTable) in this MIB will be filled here,
+				If the oid is .0.0 then it implies
+				that there is no further inheritance."
+		::=  {  networkEntry  3  }
+
+
+	inheritingTableName3	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the name of the table.
+				For example,if the discovered object is any direct
+				child( e.g. MyNetworkChild) of Network (or any child of
+				MyNetworkChild),then, the tablename of the direct child's table
+				(e.g. MyNetworkChildTable) in this MIB will be filled here,
+				If the table name is empty then it implies
+				that there is no further inheritance."
+		::=  {  networkEntry  4  }
+
+	nodeTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  NodeEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	
+			"This table describes the nodes in the NMS"
+		::=  { webNMSTopoMib  9 }
+
+	nodeEntry	OBJECT-TYPE
+		SYNTAX		NodeEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	
+			"An entry of the Node table"
+		INDEX		{  moNameIndex, moOwnerName  }
+		::=  { nodeTable 1 }
+
+	NodeEntry  ::=  SEQUENCE {
+		isRouter  DisplayString,
+		inheritingOid4  OBJECT IDENTIFIER,
+		inheritingTableName4  DisplayString
+		}
+
+
+	isRouter	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable states whether the node is a router or not. This entry
+				corresponds to the isRouter field of the Node table in the database"
+		::=  {  nodeEntry  1  }
+
+
+	inheritingOid4	OBJECT-TYPE	
+		SYNTAX			OBJECT IDENTIFIER
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the oid of the table.
+				For example,if the discovered object's type is either
+				SnmpNode or any of its child, then, the oid of the SnmpNodeTable in
+				this MIB will be filled here. If the oid is .0.0 then it implies
+				that there is no further inheritance."
+		::=  {  nodeEntry  2  }
+
+
+	inheritingTableName4	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the name of the table.
+				For example,if the discovered object's type is either
+				SnmpNode or any of its child, then, the tabel name SnmpNodeTable
+				will be filled here. If the table name is empty then it implies
+				that there is no further inheritance."
+		::=  {  nodeEntry  3  }
+
+	ipAddressTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  IpAddressEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	
+			"This table describes the ipAddress objects"
+		::=  { webNMSTopoMib  10 }
+
+	ipAddressEntry	OBJECT-TYPE
+		SYNTAX		IpAddressEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	
+			"An entry of the ipAddress table"
+		INDEX		{  moNameIndex, moOwnerName  }
+		::=  { ipAddressTable 1 }
+
+	IpAddressEntry  ::=  SEQUENCE {
+		parentNode  DisplayString,
+		parentNet  IpAddress,
+		inheritingOid5  OBJECT IDENTIFIER,
+		inheritingTableName5  DisplayString
+		}
+
+
+	parentNode	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the parent Node of this Interface.This entry
+				corresponds to the ParentNode field of the IpAddress table in the database."
+		::=  {  ipAddressEntry  1  }
+
+
+	parentNet	OBJECT-TYPE	
+		SYNTAX			IpAddress
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the name of the parent network to which this Interface belongs.
+				This entry corresponds to the ParentNode field of the IpAddress table in the database."
+		::=  {  ipAddressEntry  2  }
+
+
+	inheritingOid5	OBJECT-TYPE	
+		SYNTAX			OBJECT IDENTIFIER
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the oid of the table.
+				For example,if the discovered object's type is either
+				SnmpInterface  or any of its child.Then,the oid of the SnmpInterfaceTable in
+				this MIB will be filled here. If the oid is .0.0 then it implies
+				that there is no further inheritance."
+		::=  {  ipAddressEntry  3  }
+
+
+	inheritingTableName5	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the name of the table.
+				For example,if the discovered object's type is either
+				SnmpInterface  or any of its child.Then,the tabelname SnmpInterfaceTable
+				will be filled here. If the table name is empty then it implies
+				that there is no further inheritance."
+		::=  {  ipAddressEntry  4  }
+
+	snmpNodeTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  SnmpNodeEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	
+			"This table describes the SNMP nodes in the WebNMS"
+		::=  { webNMSTopoMib  11 }
+
+	snmpNodeEntry	OBJECT-TYPE
+		SYNTAX		SnmpNodeEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	
+			"An entry of the snmpNode table"
+		INDEX		{  moNameIndex, moOwnerName  }
+		::=  { snmpNodeTable 1 }
+
+	SnmpNodeEntry  ::=  SEQUENCE {
+		hostNetMask  IpAddress,
+		sysDesc  DisplayString,
+		sysName  DisplayString,
+		sysOid  OBJECT IDENTIFIER,
+		inheritingOid6  OBJECT IDENTIFIER,
+		inheritingTableName6  DisplayString
+		}
+
+
+	hostNetMask	OBJECT-TYPE	
+		SYNTAX			IpAddress
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the netmask of the primary interface reported by the snmp agent.
+				This entry corresponds to the HostNetMask field of the SnmpNode table in the database"
+		::=  {  snmpNodeEntry  1  }
+
+
+	sysDesc	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the System Descriptor of this node as reported by the snmp agent.
+				This entry corresponds to the SysDescr field of the SnmpNode table in the database"
+		::=  {  snmpNodeEntry  2  }
+
+
+	sysName	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the System Name of this node as reported by the snmp agent.
+				This entry corresponds to the SysName field of the SnmpNode table in the database"
+		::=  {  snmpNodeEntry  3  }
+
+
+	sysOid	OBJECT-TYPE	
+		SYNTAX			OBJECT IDENTIFIER
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the System Object Identifier of this node as reported by the
+				snmp agent. This entry corresponds to the SysOid field of the SnmpNode table in
+				the database"
+		::=  {  snmpNodeEntry  4  }
+
+
+	inheritingOid6	OBJECT-TYPE	
+		SYNTAX			OBJECT IDENTIFIER
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the oid of the table.
+				For example,if the discovered  object is any direct child
+				( e.g. MySnmpNodeChild) of SnmpNode (or any child of MySnmpNodeChild),then,
+				the oid of the direct child's table(e.g. MySnmpNodeChildTable) in
+				this MIB will be filled here. If the oid is .0.0 then it implies
+				that there is no further inheritance."
+		::=  {  snmpNodeEntry  5  }
+
+
+	inheritingTableName6	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the name of the table.
+				For example,if the discovered  object is any direct child
+				( e.g. MySnmpNodeChild) of SnmpNode (or any child of MySnmpNodeChild),then,
+				the table name of the direct child's table(e.g. MySnmpNodeChildTable) in
+				this MIB will be filled here. If the table name is empty then it implies
+				that there is no further inheritance."
+		::=  {  snmpNodeEntry  6  }
+
+	snmpInterfaceTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  SnmpInterfaceEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	
+			"This table describes the properties of the snmp interfaces attached to a Snmp node disocvered by
+			the WebNMS system."
+		::=  { webNMSTopoMib  12 }
+
+	snmpInterfaceEntry	OBJECT-TYPE
+		SYNTAX		SnmpInterfaceEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	
+			"An entry of the snmpInterfaceTable"
+		INDEX		{  moNameIndex, moOwnerName  }
+		::=  { snmpInterfaceTable 1 }
+
+	SnmpInterfaceEntry  ::=  SEQUENCE {
+		hostnetMask  IpAddress,
+		ifIndex  Integer32,
+		physMedia  DisplayString,
+		physAddress  DisplayString,
+		ifSpeed  Integer32,
+		ifDesc  DisplayString,
+		sysOID  OBJECT IDENTIFIER,
+		inheritingOid7  OBJECT IDENTIFIER,
+		inheritingTableName7  DisplayString
+		}
+
+
+	hostnetMask	OBJECT-TYPE	
+		SYNTAX			IpAddress
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the netmask of this interface reported by the snmp
+				agent in the node to which this interface object is attahced. This entry
+				corresponds to the HostNetMask field of the SnmpInterface table in the database"
+		::=  {  snmpInterfaceEntry  1  }
+
+
+	ifIndex	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the interface index reported by the snmp agent in the
+				node to which this interface object is attached. This entry corresponds to
+				the IfIndex field of the SnmpInterface table in the database"
+		::=  {  snmpInterfaceEntry  2  }
+
+
+	physMedia	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the physical media of this inetrface as reported by the snmp agent.
+				This entry corresponds to the PhysMedia field of the SnmpInterface table in the database"
+		::=  {  snmpInterfaceEntry  3  }
+
+
+	physAddress	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the Physical address of the interface as reported by the snmp agent.
+				This entry corresponds to the PhysAddr field of the SnmpInterface table in the database"
+		::=  {  snmpInterfaceEntry  4  }
+
+
+	ifSpeed	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the speed of this interface as reported by the snmp agent.This
+				entry corresponds to the IfSpeed field of the SnmpInterface table in the database"
+		::=  {  snmpInterfaceEntry  5  }
+
+
+	ifDesc	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the descriptor of this inetrface as reported by the snmp agent.
+				This entry corresponds to the IfDescr field of the SnmpInterface table in the database"
+		::=  {  snmpInterfaceEntry  6  }
+
+
+	sysOID	OBJECT-TYPE	
+		SYNTAX			OBJECT IDENTIFIER
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the System Object Identifier of this node as
+				reported by the snmp agent.This entry corresponds to the SysOid field of the
+				SnmpInterface table in the database"
+		::=  {  snmpInterfaceEntry  7  }
+
+
+	inheritingOid7	OBJECT-TYPE	
+		SYNTAX			OBJECT IDENTIFIER
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the oid of the table.
+				For example,if the discovered  object is
+				any direct child( e.g. MySnmpInterfaceChild) of SnmpInterface
+				(or any child of MySnmpInterfaceChild),then,
+				the oid of the direct child's table(e.g. MySnmpInterfaceChildTable) in
+				this MIB will be filled here. If the oid is .0.0 then it implies
+				that there is no further inheritance."
+		::=  {  snmpInterfaceEntry  8  }
+
+
+	inheritingTableName7	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the name of the table.
+				For example,if the discovered  object is
+				any direct child( e.g. MySnmpInterfaceChild) of SnmpInterface
+				(or any child of MySnmpInterfaceChild),then,
+				the table name of the direct child's table(e.g. MySnmpInterfaceChildTable) in
+				this MIB will be filled here. If the table name is empty then it implies
+				that there is no further inheritance."
+		::=  {  snmpInterfaceEntry  9  }
+
+	moDerivedPropNameTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  MoDerivedPropNameEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	
+			"This table contains the type of the user-defined objects and
+			the properties of the user defined objects.
+			The user can specify what all user-object's properties he wants to
+			be displayed in the moDerivedProperties in MO table."
+		::=  { webNMSTopoMib  13 }
+
+	moDerivedPropNameEntry	OBJECT-TYPE
+		SYNTAX		MoDerivedPropNameEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	
+			"An entry of the User Object Table."
+		INDEX		{  indexNum  }
+		::=  { moDerivedPropNameTable 1 }
+
+	MoDerivedPropNameEntry  ::=  SEQUENCE {
+		indexNum  Integer32,
+		objClassName  DisplayString,
+		derivedPropNames  DisplayString,
+		tableOid  OBJECT IDENTIFIER,
+		tableName  DisplayString
+		}
+
+
+	indexNum	OBJECT-TYPE	
+		SYNTAX			Integer32  ( -2147483648 .. 2147483647  ) 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This variable is an incremental integer which uniquely identifies
+				each entry of the table."
+		::=  {  moDerivedPropNameEntry  1  }
+
+
+	objClassName	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) ) 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This variable indicates the class name of the user defined objects
+				and identifies them uniquely.The user needs to specify the
+				full package name of the object
+				For example : com.adventnet.nms.topodb.Node"
+		::=  {  moDerivedPropNameEntry  2  }
+
+
+	derivedPropNames	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) ) 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This variable indicates the names of the derived properties of
+				user defined objects which will be displayed in the moDerivedProperties
+				variable in the MoTable.
+				The user must specify the names of derived properties in the following format
+				.SYNTAX:
+				propName1,propName2,..."
+		::=  {  moDerivedPropNameEntry  3  }
+
+
+	tableOid	OBJECT-TYPE	
+		SYNTAX			OBJECT IDENTIFIER
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the oid of the table for the  particular mo-type"
+		::=  {  moDerivedPropNameEntry  4  }
+
+
+	tableName	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) ) 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This variable describes the table name"
+		::=  {  moDerivedPropNameEntry  5  }
+
+	moNotificationMib	OBJECT IDENTIFIER
+		::=  {  webNMSTopoMib  14  }
+
+	webNMSNumEvents	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"The total Number of Events
+				in the AdventNet WebNMS system"
+		::=  {  webNMSFaultMib  1  }
+
+	webNMSNumAlerts	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"The total Number of Alerts
+				in the AdventNet WebNMS system"
+		::=  {  webNMSFaultMib  2  }
+
+	webNMSEventsInBuffer	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"The Size of the Event Queue in the
+				AdventNet WebNMS system"
+		::=  {  webNMSFaultMib  3  }
+
+	webNMSAlertsInBuffer	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"The Size of the Alert Queue in the
+				AdventNet WebNMS system"
+		::=  {  webNMSFaultMib  4  }
+
+	alertUserPropNames	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) ) 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This variable indicates to the agent what all user property
+				values the user would like to see in the alertUserProperties variable of the AlertTable
+				This also provides for the facility of viewing all the user property-values by
+				specifying the word 'all' .
+				If the user needs to see only a few specific user property values ,then he needs
+				to specify them explicitly
+				SYNTAX1
+				all
+				SYNTAX2
+				userPropName1,userPropName2,...
+				The values for the properties will be in the following format:
+				userPropName1=value1,userPropName2=value2.."
+		::=  {  webNMSFaultMib  5  }
+
+	eventUserPropNames	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) ) 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This variable indicates to the agent what all user properties
+				value the user would like to see in the eventUserProperties variable in the EventTable
+				This also provides for the facility of viewing all the user property-values by
+				specifying the word 'all' .
+				If the user needs to see only a few specific user property values ,then he needs
+				to specify them explicitly
+				SYNTAX1
+				all
+				SYNTAX2
+				userPropName1,userPropName2,...
+				The values for the properties will be in the following format:
+				userPropName1=value1,userPropName2=value2.."
+		::=  {  webNMSFaultMib  6  }
+
+-- This table has been deprecated and replaced by AlarmTable 
+-- AlarmTable is present in end of this WebNMSFaultMib module with the OID .1.3.6.1.4.1.2162.4.3.11
+
+	alertTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  AlertEntry
+		MAX-ACCESS	not-accessible
+		STATUS	        deprecated
+		DESCRIPTION	
+			"This table describes all the elements of the alert.
+			 This table has been deprecated since the AlertSource column
+			 is not an index column. This table has been replaced by AlarmTable."
+		::=  { webNMSFaultMib  7 }
+
+	alertEntry	OBJECT-TYPE
+		SYNTAX		AlertEntry
+		MAX-ACCESS	not-accessible
+		STATUS		deprecated
+		DESCRIPTION	
+			"An entry of the alert table"
+		INDEX		{  alertEntity, alertOwnerName  }
+		::=  { alertTable 1 }
+
+	AlertEntry  ::=  SEQUENCE {
+		alertEntity  DisplayString,
+		alertOwnerName  DisplayString,
+		alertCreateTime  Gauge32,
+		alertSource  DisplayString,
+		alertModTime  Gauge32,
+		alertSeverity  Integer32,
+		alertPreviousSeverity  Integer32,
+		alertCategory  DisplayString,
+		alertUserProperties  DisplayString
+		}
+
+
+	alertEntity	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) ) 
+		MAX-ACCESS		read-only
+		STATUS			deprecated
+		DESCRIPTION		
+				"This variable states the unique source of the alert which uniquely identifies
+				any alert in the table.This corresponds to the Entity entry in the Alert
+				Table in the database"
+		::=  {  alertEntry  1  }
+
+
+	alertOwnerName	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) ) 
+		MAX-ACCESS		read-only
+		STATUS			deprecated
+		DESCRIPTION		
+				"This variable states the name of the owner of the alert.This corresponds to the
+				OwnerName entry in the Alert Table in the database"
+		::=  {  alertEntry  2  }
+
+
+	alertCreateTime	OBJECT-TYPE	
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			deprecated
+		DESCRIPTION		
+				"This variable states the time of creation of the alert.This corresponds to the
+				CreateTime entry in the Alert Table in the database"
+		::=  {  alertEntry  3  }
+
+
+	alertSource	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) ) 
+		MAX-ACCESS		read-only
+		STATUS			deprecated
+		DESCRIPTION		
+				"This variable indicates the source of the alert i.e., from where
+				the alert generated.This corresponds to the Source entry in the Alert
+				Table in the database"
+		::=  {  alertEntry  4  }
+
+
+	alertModTime	OBJECT-TYPE	
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			deprecated
+		DESCRIPTION		
+				"This variable states the latest time at which the alert status
+				was modified.This corresponds to the ModTime entry in the Alert
+				Table in the database"
+		::=  {  alertEntry  5  }
+
+
+	alertSeverity	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			deprecated
+		DESCRIPTION		
+				"This variable describes the severity of the alert in integer
+				format.This corresponds to the Severity entry in the Alert
+				Table in the database"
+		::=  {  alertEntry  6  }
+
+
+	alertPreviousSeverity	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			deprecated
+		DESCRIPTION		
+				"This variable states the previous severity of the alert.This corresponds to the
+				PreviousSeverity entry in the Alert Table in the database"
+		::=  {  alertEntry  7  }
+
+
+	alertCategory	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) ) 
+		MAX-ACCESS		read-only
+		STATUS			deprecated
+		DESCRIPTION		
+				"This variable describes the category to which the alert belongs
+				to, in a string form.This corresponds to the Category entry in the Alert
+				Table in the database"
+		::=  {  alertEntry  8  }
+
+
+	alertUserProperties	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) ) 
+		MAX-ACCESS		read-only
+		STATUS			deprecated
+		DESCRIPTION		
+				"This variable describes the values ot the user properties which
+				the user specifies in the alertUserPropNames variable in the WebNMSFaultMib module.
+				The values will be displayed in the following format:
+				userPropName1=value1,userPropName2=value2,..."
+		::=  {  alertEntry  9  }
+
+	alertNotificationMib	OBJECT IDENTIFIER
+		::=  {  webNMSFaultMib  8  }
+
+
+	eventTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  EventEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	
+			"This table describes the events in the event database"
+		::=  { webNMSFaultMib  9 }
+
+	eventEntry	OBJECT-TYPE
+		SYNTAX		EventEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	
+			"An entry of the event Table"
+		INDEX		{  evtID  }
+		::=  { eventTable 1 }
+
+	EventEntry  ::=  SEQUENCE {
+		evtID  Integer32,
+		evtSource  DisplayString,
+		evtEntity  DisplayString,
+		evtSeverity  Integer32,
+		evtCategory  DisplayString,
+		evtTime  Gauge32,
+		evtText  DisplayString,
+		eventUserProperties  DisplayString
+		}
+
+
+	evtID	OBJECT-TYPE	
+		SYNTAX			Integer32  ( -2147483648 .. 2147483647  ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable is the unique id (primary key) of this event object.This corresponds to
+				the Id entry in the Event Table in the database"
+		::=  {  eventEntry  1  }
+
+
+	evtSource	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable is the source of the event.This corresponds to
+				the Source entry in the Event Table in the database"
+		::=  {  eventEntry  2  }
+
+
+	evtEntity	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable is the Entity (also known as Failure Object) of the Event.This corresponds to
+				the Entity entry in the Event Table in the database"
+		::=  {  eventEntry  3  }
+
+
+	evtSeverity	OBJECT-TYPE	
+		SYNTAX			Integer32  ( -2147483648 .. 2147483647  ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable  is the Severity of the Event object.This corresponds to
+				the Severity entry in the Event Table in the database"
+		::=  {  eventEntry  4  }
+
+
+	evtCategory	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable gives the category of the event, like Topology events or Threshold event etc.
+				This corresponds to the Category entry in the Event Table in the database"
+		::=  {  eventEntry  5  }
+
+
+	evtTime	OBJECT-TYPE	
+		SYNTAX			Gauge32  ( 0 .. 4294967295  ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable is the time of occurrence (creation), in milliseconds, of this Event object.
+				This corresponds to the Ttime entry in the Event Table in the database"
+		::=  {  eventEntry  6  }
+
+
+	evtText	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable gives the descriptive text message of the event.This corresponds to
+				the Text entry in the Event Table in the database"
+		::=  {  eventEntry  7  }
+
+
+	eventUserProperties	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable describes the values ot the user properties which
+				the user specifies in the eventUserPropNames variable
+				The values will be displayed in the following format:
+				userPropName1=value1,userPropName2=value2,..."
+		::=  {  eventEntry  8  }
+
+	webNMSSeverityTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  WebNMSSeverityEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	
+			"This table shows the number of alarms of a  particular severity."
+		::=  { webNMSFaultMib  10 }
+
+	webNMSSeverityEntry	OBJECT-TYPE
+		SYNTAX		WebNMSSeverityEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	
+			"An entry of the table"
+		INDEX		{  severityName  }
+		::=  { webNMSSeverityTable 1 }
+
+	WebNMSSeverityEntry  ::=  SEQUENCE {
+		severityName  DisplayString,
+		numberOfAlarms  Integer32
+		}
+
+
+	severityName	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable displays the name of severity like critical,major,minor etc."
+		::=  {  webNMSSeverityEntry  1  }
+
+
+	numberOfAlarms	OBJECT-TYPE	
+		SYNTAX			Integer32  ( -2147483648 .. 2147483647  ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable displays the number of alarms of a particular severity."
+		::=  {  webNMSSeverityEntry  2  }
+
+
+-- The new table - alarmTable is the replacement for alertTable
+
+	alarmTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  AlarmEntry
+		MAX-ACCESS	not-accessible
+		STATUS	        current
+		DESCRIPTION	
+			"This table describes various attributes of the NMS alarms.
+			This is the replacement table for alertTable.This table
+			has the following features other than those found in alertTable: 
+			1. AlarmSource added as the first index along with
+			   AlarmOwnerName and AlarmEntity.
+			2. AlarmAssignedTo - a new column to describe the owner to
+			   whom the alarm assigned."
+		::=  { webNMSFaultMib  11 }
+
+	alarmEntry	OBJECT-TYPE
+		SYNTAX		AlarmEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	
+			"An entry of the alarmTable"
+		INDEX		{ alarmSource, alarmOwnerName, alarmEntity  }
+		::=  { alarmTable 1 }
+
+	AlarmEntry  ::=  SEQUENCE {
+		alarmSource  DisplayString,
+		alarmOwnerName DisplayString,
+		alarmEntity  DisplayString,
+		alarmSeverity  Integer32,
+		alarmPreviousSeverity  Integer32,
+		alarmCreateTime  Gauge32,
+		alarmModTime  Gauge32,
+		alarmCategory  DisplayString,
+		alarmAssignedTo DisplayString,
+		alarmUserProperties  DisplayString
+		}
+
+
+	alarmSource	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable indicates the source of the alarm i.e.,from where
+				the alarm generated. This corresponds to the Source entry in the Alert
+				Table in the database"
+		::=  {  alarmEntry  1  }
+
+
+	alarmOwnerName	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the OwnerName for the alarm.This corresponds to the
+				OwnerName entry in the Alert Table in the database"
+		::=  {  alarmEntry  2  }
+
+
+	alarmEntity	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the unique name of each alarm which is used to
+			         identifies any alarm. This corresponds to the Entity field in the Alert
+				 Table in the database"
+		::=  {  alarmEntry  3  }
+
+
+	alarmSeverity	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable describes the severity of the alarm in integer
+				format. This corresponds to the Severity entry in the Alert
+				Table in the database"
+		::=  {  alarmEntry  4  }
+
+
+	alarmPreviousSeverity	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the previous severity of the alarm.
+				 This corresponds to the PreviousSeverity entry in the 
+				 Alert Table in the database"
+		::=  {  alarmEntry  5  }
+
+
+	alarmCreateTime	OBJECT-TYPE	
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the time at which the alarm has been created. 
+				 This corresponds to the CreateTime entry in the Alert Table in the database"
+		::=  {  alarmEntry  6  }
+
+
+	alarmModTime	OBJECT-TYPE	
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the latest time at which the alarm status
+				was modified. This corresponds to the ModTime entry in the Alert
+				Table in the database"
+		::=  {  alarmEntry  7  }
+
+
+	alarmCategory	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable describes the category to which the alarm belongs
+				 to, in a string form. This corresponds to the Category entry in the Alert
+				 Table in the database"
+		::=  {  alarmEntry  8  }
+
+
+	alarmAssignedTo	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable describes the owner to whom the alarm has assigned.
+				 This corresponds to the Who entry in the Alert
+				 Table in the database"
+		::=  {  alarmEntry  9  }
+
+
+	alarmUserProperties	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable describes the values of the user properties which
+				the user specifies in the alertUserPropNames variable in the WebNMSFaultMib module.
+				The values will be displayed in the following format:
+				userPropName1=value1,userPropName2=value2,..."
+		::=  {  alarmEntry  10  }
+
+	numPollObjects	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable displays the total number of PolledData objects
+				currently present in the Polling engine."
+		::=  {  webNMSPerformanceMib  1  }
+
+	numActivePollers	OBJECT-TYPE	
+		SYNTAX			Integer32  ( -2147483648 .. 2147483647  ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable displays the total number of active pollers at that time."
+		::=  {  webNMSPerformanceMib  2  }
+
+	numThresholdObjects	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable displays the total number of threshold objects available"
+		::=  {  webNMSPerformanceMib  3  }
+
+	pollTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  PollEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	
+			"The table describes the polleddatas in the database"
+		::=  { webNMSPerformanceMib  4 }
+
+	pollEntry	OBJECT-TYPE
+		SYNTAX		PollEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	
+			"It describes the various entries of the performance table"
+		INDEX		{  pollid  }
+		::=  { pollTable 1 }
+
+	PollEntry  ::=  SEQUENCE {
+		pollid  Gauge32,
+		polldataName  DisplayString,
+		oid  DisplayString,
+		pollingInterval  Gauge32,
+		failureCount  Integer32,
+		failureThreshold  Integer32,
+		timeToPoll  Gauge32,
+		polledTime  Gauge32,
+        agentName DisplayString
+		}
+
+
+	pollid	OBJECT-TYPE	
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable represents the id of the PolledData.
+				It is assigned by the poll engine when the PolledData
+				is created and it is a unique value for every PolledData.This corresponds to
+				the Id entry in the PolledDataTable in the database"
+		::=  {  pollEntry  1  }
+
+
+	polldataName	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable represents the name of the PolledData,
+				which is a user assigned name for identification purposes.This corresponds to
+				the Name entry in the PolledData Table in the database"
+		::=  {  pollEntry  2  }
+
+
+	oid	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable represents the OID that is being polled
+				for on the agent.This corresponds to the oid entry in the PolledData Table in the database"
+		::=  {  pollEntry  3  }
+
+
+	pollingInterval	OBJECT-TYPE	
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable represents the polling interval of this PolledData.This corresponds to
+				the Period entry in the PolledData Table in the database"
+		::=  {  pollEntry  4  }
+
+
+	failureCount	OBJECT-TYPE	
+		SYNTAX			Integer32  ( -2147483648 .. 2147483647  ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable represents the failureCount for this PolledData.This corresponds to
+				the FailureCount entry in the PolledData Table in the database"
+		::=  {  pollEntry  5  }
+
+
+	failureThreshold	OBJECT-TYPE	
+		SYNTAX			Integer32  ( -2147483648 .. 2147483647  ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable represents the failureThreshold for this PolledData.This corresponds to
+				the FailureThreshold entry in the PolledData Table in the database"
+		::=  {  pollEntry  6  }
+
+
+	timeToPoll	OBJECT-TYPE	
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the time at which polling has to be done again.This corresponds to
+				the TimeVal entry in the PolledData Table in the database"
+		::=  {  pollEntry  7  }
+
+
+	polledTime	OBJECT-TYPE	
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the time at which the polling was done.This corresponds to
+				the LastTimeValue entry in the PolledData Table in the database"
+		::=  {  pollEntry  8  }
+
+    agentName	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable represents the Agent Name"
+		::=  {  pollEntry  9  }
+
+	thresholdTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  ThresholdEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	
+			"A table showing all data related to threshold objects"
+		::=  { webNMSPerformanceMib  5 }
+
+	thresholdEntry	OBJECT-TYPE
+		SYNTAX		ThresholdEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	
+			"All the entries of the threshold table"
+		INDEX		{  thresholdObjectName  }
+		::=  { thresholdTable 1 }
+
+	ThresholdEntry  ::=  SEQUENCE {
+		thresholdObjectName  DisplayString,
+		thresholdKind  DisplayString,
+		thresholdMessage  DisplayString,
+		thresholdClearMessage  DisplayString,
+		thresholdSeverity  Integer32,
+		thresholdCategory  DisplayString
+		}
+
+
+	thresholdObjectName	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the name of the threshold object."
+		::=  {  thresholdEntry  1  }
+
+
+	thresholdKind	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable states whether the threshold is of type long,string or percentage."
+		::=  {  thresholdEntry  2  }
+
+
+	thresholdMessage	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable displays the message generated when the threshold occurs."
+		::=  {  thresholdEntry  3  }
+
+
+	thresholdClearMessage	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable displays the message to be generated on clearing of the threshold ."
+		::=  {  thresholdEntry  4  }
+
+
+	thresholdSeverity	OBJECT-TYPE	
+		SYNTAX			Integer32  ( -2147483648 .. 2147483647  ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"The severity of the event generated."
+		::=  {  thresholdEntry  5  }
+
+
+	thresholdCategory	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable displays  the category of this ThresholdObject.
+				Category of the ThresholdObject represents the category in which
+				the events will be generated in case of thresholds."
+		::=  {  thresholdEntry  6  }
+
+	statsdata	OBJECT IDENTIFIER
+		::=  {  webNMSPerformanceMib  6  }
+
+	perfNotificationMib	OBJECT IDENTIFIER
+		::=  {  webNMSPerformanceMib  7  }
+	
+	maxRows	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the maximum number of rows that can be stored in the
+				notilog table of the database.Once it exceeds the limit, the oldest row
+				will be deleted from the database and the new row will be added.We can retrieve
+				only that many number of rows from the notilog table as specified."
+		::=  {  persistentTrapsMib  1  }
+
+	sequenceNum	OBJECT-TYPE	
+		SYNTAX			Integer32  ( -2147483648 .. 2147483647  ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable represents the index number of the last transmitted notification and
+				is incremented by 1 whenever a notification is emitted from the agent.
+				This would be included as a varbind for all notification."
+		::=  {  persistentTrapsMib  2  }
+
+	notiLogTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  NotiLogEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	
+			"This table contains the general information about
+			the logged notifications."
+		::=  { persistentTrapsMib  3 }
+
+	notiLogEntry	OBJECT-TYPE
+		SYNTAX		NotiLogEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	
+			"An entry in the notiLog table."
+		INDEX		{  notiLogIndex  }
+		::=  { notiLogTable 1 }
+
+	NotiLogEntry  ::=  SEQUENCE {
+		notiLogIndex  Integer32,
+		notiLogTime  Gauge32,
+		notiLogNumVarBinds  Integer32,
+		notiLogOid  OBJECT IDENTIFIER
+		}
+
+
+	notiLogIndex	OBJECT-TYPE	
+		SYNTAX			Integer32  ( -2147483648 .. 2147483647  ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable's purpose
+				is to index the entries / distinguish the rows within this table.
+				The value of this variable is the same as that of the
+				sequenceNum defined in the mib. This table backs up all the
+				transmitted notifications and facilitates selective
+				recovery of lost notifications via their sequence numbers."
+		::=  {  notiLogEntry  1  }
+
+
+	notiLogTime	OBJECT-TYPE	
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable represents the value of sysUpTime when the
+				entry occurred"
+		::=  {  notiLogEntry  2  }
+
+
+	notiLogNumVarBinds	OBJECT-TYPE	
+		SYNTAX			Integer32  ( -2147483648 .. 2147483647  ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This column indicates the number of variable bindings
+				in the  logged notification."
+		::=  {  notiLogEntry  3  }
+
+
+	notiLogOid	OBJECT-TYPE	
+		SYNTAX			OBJECT IDENTIFIER
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This column indicates the OID of the Notification definition."
+		::=  {  notiLogEntry  4  }
+
+	varbindLogTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  VarbindLogEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	
+			"This table contains the information of the  varbinds
+			sent during sending a notification. All the varbinds to the notifications
+			are logged in this table except for the sequence
+			number of the notification which serves as an index for
+			this table."
+		::=  { persistentTrapsMib  4 }
+
+	varbindLogEntry	OBJECT-TYPE
+		SYNTAX		VarbindLogEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	
+			"An entry in the  Notification Log variable table."
+		INDEX		{  notiLogIndex, varbindIndex  }
+		::=  { varbindLogTable 1 }
+
+	VarbindLogEntry  ::=  SEQUENCE {
+		varbindIndex  Integer32,
+		varbindType  INTEGER,
+		varbindValue  DisplayString
+		}
+
+
+	varbindIndex	OBJECT-TYPE	
+		SYNTAX			Integer32  ( -2147483648 .. 2147483647  ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable's purpose is to provide the
+				second level index to distinguish the entries / rows within
+				this table. This value always starts at 1 and goes upto the
+				maximum number of varbinds for a notification as indicated by
+				in the notification log table."
+		::=  {  varbindLogEntry  1  }
+
+
+	varbindType	OBJECT-TYPE	
+		SYNTAX			INTEGER  { displayString ( 1 ) , gauge32 ( 2 ) , timeTicks ( 3 ) , integer32 ( 4 ) , ipAddress ( 5 ) , objectId ( 6 ) } 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This specifies the type of the varbind that was
+				sent as part of a  Notification."
+		::=  {  varbindLogEntry  2  }
+
+
+	varbindValue	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable provides the value of the corresponding varbind"
+		::=  {  varbindLogEntry  3  }
+
+	serverName	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) ) 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This variable describes the name of the TFTP-server to or from
+				which  a  file has to be sent or obtained"
+		::=  {  tftpMib  1  }
+
+	portNum	OBJECT-TYPE	
+		SYNTAX			Integer32  ( -2147483648 .. 2147483647  ) 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the port at which the file has to sent or obtained
+				to or from the server respectively."
+		::=  {  tftpMib  2  }
+
+	sourceFile	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) ) 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the name of the file to be obtained from the server [GET(1)] or
+				sent  to the server [PUT(2)]."
+		::=  {  tftpMib  3  }
+
+	destinationFile	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) ) 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the name of the file to be sent to the device [GET(1)] or
+				obtained from the device [PUT(2)]."
+		::=  {  tftpMib  4  }
+
+	tftpMode	OBJECT-TYPE	
+		SYNTAX			INTEGER  { netascii ( 1 ) , octet ( 2 ) } 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This variable states  the mode of file-transfer"
+		::=  {  tftpMib  5  }
+
+	request	OBJECT-TYPE	
+		SYNTAX			INTEGER  { get ( 1 ) , put ( 2 ) } 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This variable states  the operation to be performed  .The operations that can
+				be performed are:
+				sending the file to a tftp server or getting a file from a tftp server.
+				This variable takes two values indicating the type of operation performed.
+				The value that this variable takes are :-
+				(1)   getting a file from a tftp server
+				(2)  sending a file to a tftp server"
+		::=  {  tftpMib  6  }
+
+	proxyTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  ProxyEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	
+			"This table is used to obtain the current value of an oid from a device .The values that
+			the user needs to set are :
+			IpAddress, Port,Community, OID and service.
+			When the last value is set,the value for the oid is obtained"
+		::=  { proxyService  1 }
+
+	proxyEntry	OBJECT-TYPE
+		SYNTAX		ProxyEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	
+			"An entry of the table"
+		INDEX		{  serialNumber  }
+		::=  { proxyTable 1 }
+
+	ProxyEntry  ::=  SEQUENCE {
+		serialNumber  Integer32,
+		hostName  DisplayString,
+		devicePort  Integer32,
+		requestOid  OBJECT IDENTIFIER,
+		community  DisplayString,
+		service  INTEGER,
+		result  DisplayString
+		}
+
+
+	serialNumber	OBJECT-TYPE	
+		SYNTAX			Integer32  ( -2147483648 .. 2147483647  ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"An incremental integer for the purpose of identifying the row"
+		::=  {  proxyEntry  1  }
+
+
+	hostName	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This states the DNS name or IpAddress of the device from which the
+				value needs to be obtained"
+		::=  {  proxyEntry  2  }
+
+
+	devicePort	OBJECT-TYPE	
+		SYNTAX			Integer32  ( -2147483648 .. 2147483647  ) 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"The port of the device from which the value
+				needs to be obtained"
+		::=  {  proxyEntry  3  }
+
+
+	requestOid	OBJECT-TYPE	
+		SYNTAX			OBJECT IDENTIFIER
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This states the oid in the device  whose value is needs to be obtained."
+		::=  {  proxyEntry  4  }
+
+
+	community	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) ) 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"The community which may be specified.It is an optional
+				field.If the community value is not  specified,the default community
+				'public' will be taken"
+		::=  {  proxyEntry  5  }
+
+
+	service	OBJECT-TYPE	
+		SYNTAX			INTEGER  { wait ( 0 ) , get ( 1 ) , getNext ( 2 ) } 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This variable takes two values ,1 and 2,which  when set carry out SNMP operations:
+				1 for  snmpGet
+				2 for  snmpGetNext"
+		::=  {  proxyEntry  6  }
+
+
+	result	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable displays the result of the service :snmpGet/snmpGetNext
+				of the specified oid in the specified device.If any of the specified data
+				is not correct or if the host is not functioning properly then an
+				exception  Error in Data  will be filled"
+		::=  {  proxyEntry  7  }
+
+
+	subAgentTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  SubAgentEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	
+			"The table having the details of sub-agents"
+		::=  { subagents  1 }
+
+	subAgentEntry	OBJECT-TYPE
+		SYNTAX		SubAgentEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	
+			"An entry in the table"
+		INDEX		{  subAgentoid  }
+		::=  { subAgentTable 1 }
+
+	SubAgentEntry  ::=  SEQUENCE {
+		subAgentoid  OBJECT IDENTIFIER,
+		subAgent  DisplayString,
+    	subAgentPort  Unsigned32,
+        subAgentVersion  Integer32,
+        subAgentCommunity  DisplayString,
+		timeout  Unsigned32,
+        subAgentRetries  Unsigned32,
+        rowStatus  RowStatus
+		}
+
+
+	subAgentoid	OBJECT-TYPE	
+		SYNTAX			OBJECT IDENTIFIER
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This states the  oid of the sub-agent whose value is
+				to be obtained from the sub-agent"
+		::=  {  subAgentEntry  1  }
+
+
+	subAgent	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) ) 
+		MAX-ACCESS		read-create
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the sub-agent name  to whom the request is sent."
+		::=  {  subAgentEntry  2  }
+
+
+	subAgentPort	OBJECT-TYPE	
+		SYNTAX			Unsigned32 
+		MAX-ACCESS		read-create
+		STATUS			current
+		DESCRIPTION		
+				"This states the sub- Agent's Port number at which the value has to be got."
+		::=  {  subAgentEntry  3  }
+
+    subAgentVersion	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-create
+		STATUS			current
+		DESCRIPTION		"Description"
+		::=  {  subAgentEntry  4  }
+
+    subAgentCommunity	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) ) 
+		MAX-ACCESS		read-create
+		STATUS			current
+		DESCRIPTION		
+				"This specifies the sub- Agent community to which  the request is sent."
+		::=  {  subAgentEntry  5  }
+
+	timeout	OBJECT-TYPE	
+		SYNTAX			Unsigned32 
+		MAX-ACCESS		read-create
+		STATUS			current
+		DESCRIPTION		
+				"This specifies the time period one has to wait for,to
+				get a response from the sub agent."
+		::=  {  subAgentEntry  6  }
+
+	subAgentRetries	OBJECT-TYPE	
+		SYNTAX			Unsigned32
+		MAX-ACCESS		read-create
+		STATUS			current
+		DESCRIPTION		"Description"
+		::=  {  subAgentEntry  7  }
+
+	rowStatus	OBJECT-TYPE	
+		SYNTAX			RowStatus
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This specifies  the process by which the data have to be entered.
+				This is the first value which needs to be set..
+				the value of 1 specifies 'active'
+				the value of 2 specifies 'notInService'
+				the value of 3 specifies 'notReady'
+				the value of 4 specifies 'createAndGo'.
+				the value of 5 specifies 'createAndWait'
+				the value of 6 specifies 'destroy'"
+		::=  {  subAgentEntry  8  }
+       
+    
+    v1v2TrapForwardingTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  V1v2TrapForwardingEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"This table maintains the SNMP v1 and v2c managers information
+		 like manager IP address, port number,community, time out,
+		 retires, etc which are used in trap generation.  Timeout and
+		 retires are used in the case of SNMPv2c INFORM."
+		::=  { trapForwardingModule  1 }
+
+	v1v2TrapForwardingEntry	OBJECT-TYPE
+		SYNTAX		V1v2TrapForwardingEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"Each entry in this table refers one manager information who
+		 is registered to receive traps	fromt the agent."
+		INDEX		{  v1v2ManagerHost, v1v2ManagerPort  }
+		::=  { v1v2TrapForwardingTable 1 }
+
+	V1v2TrapForwardingEntry  ::=  SEQUENCE {
+		v1v2ManagerHost  IpAddress,
+		v1v2ManagerPort  Integer32,
+		v1v2ManagerVersion  Integer32,
+		v1v2ManagerCommunity  DisplayString,
+		v1v2ManagerTimeOut  Unsigned32,
+		v1v2ManagerRetries  Unsigned32,
+		v1v2ManagerStatus  RowStatus
+		}
+
+
+	v1v2ManagerHost	OBJECT-TYPE	
+		SYNTAX			IpAddress
+		MAX-ACCESS		not-accessible
+		STATUS			current
+		DESCRIPTION		"IP address where the manager is listening to receive traps
+		 from the agent."
+		DEFVAL			{ '7F000001'h }
+		::=  {  v1v2TrapForwardingEntry  1  }
+
+
+	v1v2ManagerPort	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		not-accessible
+		STATUS			current
+		DESCRIPTION		"The port at which manager is listening for the traps from the
+		 agent."
+		DEFVAL			{ 162 }
+		::=  {  v1v2TrapForwardingEntry  2  }
+
+
+	v1v2ManagerVersion	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-create
+		STATUS			current
+		DESCRIPTION		"Description"
+		::=  {  v1v2TrapForwardingEntry  3  }
+
+
+	v1v2ManagerCommunity	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-create
+		STATUS			current
+		DESCRIPTION		"The community used by the agent to send trap or inform to this
+		 manager."
+		DEFVAL			{ "public" }
+		::=  {  v1v2TrapForwardingEntry  4  }
+
+
+	v1v2ManagerTimeOut	OBJECT-TYPE	
+		SYNTAX			Unsigned32
+		MAX-ACCESS		read-create
+		STATUS			current
+		DESCRIPTION		"The  time out value in seconds for SNMPv2c INFORM."
+		DEFVAL			{ 5 }
+		::=  {  v1v2TrapForwardingEntry  5  }
+
+
+	v1v2ManagerRetries	OBJECT-TYPE	
+		SYNTAX			Unsigned32
+		MAX-ACCESS		read-create
+		STATUS			current
+		DESCRIPTION		"The number of retries in the case of SNMPV2c INFORM."
+		DEFVAL			{ 0 }
+		::=  {  v1v2TrapForwardingEntry  6  }
+
+
+	v1v2ManagerStatus	OBJECT-TYPE	
+		SYNTAX			RowStatus
+		MAX-ACCESS		read-create
+		STATUS			current
+		DESCRIPTION		"The status of this conceptual row.Until instances of all
+		 corresponding columns are appropriately configured, the value
+		 of the corresponding instance of the usmUserStatus column is
+		 'notReady'"
+		::=  {  v1v2TrapForwardingEntry  7  }
+
+v3TrapForwardingTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  V3TrapForwardingEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"This table maintains the SNMP v3 managers information like
+		 manager IP address, port number, user name,security model,
+		 context name, community, time out,retires, etc which are
+		 used in trap generation.
+ 		 Timeout and retires are used in the case of INFORM."
+		::=  { trapForwardingModule  2 }
+
+	v3TrapForwardingEntry	OBJECT-TYPE
+		SYNTAX		V3TrapForwardingEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"Each entry in this table refers one SNMPv3 manager who will
+		 listen for TRAP or INFORM."
+		INDEX		{  v3ManagerHost, v3ManagerPort  }
+		::=  { v3TrapForwardingTable 1 }
+
+	V3TrapForwardingEntry  ::=  SEQUENCE {
+		v3ManagerHost  IpAddress,
+		v3ManagerPort  Integer32,
+		v3ManagerVersion  Integer32,
+		v3ManagerCommunity  DisplayString,
+		v3ManagerUserName  DisplayString,
+		v3ManagerUserSecModel  Unsigned32,
+		v3ManagerUserSecLevel  Integer32,
+		v3ManagerUserContextName  DisplayString,
+		v3ManagerTimeOut  Unsigned32,
+		v3ManagerRetries  Unsigned32,
+		v3ManagerStatus  RowStatus
+		}
+
+
+	v3ManagerHost	OBJECT-TYPE	
+		SYNTAX			IpAddress
+		MAX-ACCESS		not-accessible
+		STATUS			current
+		DESCRIPTION		"The IP address where the manager is  listening for TRAPS or
+		 INFORMS."
+		DEFVAL			{ '7F000001'h }
+		::=  {  v3TrapForwardingEntry  1  }
+
+
+	v3ManagerPort	OBJECT-TYPE	
+		SYNTAX			Integer32  ( 0 .. 4294967295  ) 
+		MAX-ACCESS		not-accessible
+		STATUS			current
+		DESCRIPTION		"The UDP port at which manager is listening for TRAPS or
+		 INFORMS."
+		DEFVAL			{ 162 }
+		::=  {  v3TrapForwardingEntry  2  }
+
+
+	v3ManagerVersion	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-create
+		STATUS			current
+		DESCRIPTION		"Description"
+		::=  {  v3TrapForwardingEntry  3  }
+
+
+	v3ManagerCommunity	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-create
+		STATUS			current
+		DESCRIPTION		"The community string used by the agent when sending SNMP v1/v2c
+		 TRAPS or INFORMS to the manager.It used to support backward
+		 compatability,i.e. without any change in the table,user can
+		 send both SNMPv1 and v2c TARPS and INFORMS."
+		DEFVAL			{ "public" }
+		::=  {  v3TrapForwardingEntry  4  }
+
+
+	v3ManagerUserName	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-create
+		STATUS			current
+		DESCRIPTION		"This user name is same  as in USM MIB RFC 2574."
+		REFERENCE		"RFC 2574 USM table ."
+		::=  {  v3TrapForwardingEntry  5  }
+
+
+	v3ManagerUserSecModel	OBJECT-TYPE	
+		SYNTAX			Unsigned32
+		MAX-ACCESS		read-create
+		STATUS			current
+		DESCRIPTION		"This security model value is same as in USM table of USM MIB
+		 RFC2574."
+		REFERENCE		"RFC 2574 USM table"
+		DEFVAL			{ 3 }
+		::=  {  v3TrapForwardingEntry  6  }
+
+
+	v3ManagerUserSecLevel	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-create
+		STATUS			current
+		DESCRIPTION		"Description"
+		::=  {  v3TrapForwardingEntry  7  }
+
+
+	v3ManagerUserContextName	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-create
+		STATUS			current
+		DESCRIPTION		"This context name is  same as in VacmAccessTable of VACM
+		MIB RFC2575."
+		REFERENCE		"RFC 2575"
+		::=  {  v3TrapForwardingEntry  8  }
+
+
+	v3ManagerTimeOut	OBJECT-TYPE	
+		SYNTAX			Unsigned32
+		MAX-ACCESS		read-create
+		STATUS			current
+		DESCRIPTION		"The  time out value in seconds for INFORM request."
+		DEFVAL			{ 5 }
+		::=  {  v3TrapForwardingEntry  9  }
+
+
+	v3ManagerRetries	OBJECT-TYPE	
+		SYNTAX			Unsigned32
+		MAX-ACCESS		read-create
+		STATUS			current
+		DESCRIPTION		"The number of retries  for a failed INFORM reqeust."
+		DEFVAL			{ 0 }
+		::=  {  v3TrapForwardingEntry  10  }
+
+
+	v3ManagerStatus	OBJECT-TYPE	
+		SYNTAX			RowStatus
+		MAX-ACCESS		read-create
+		STATUS			current
+		DESCRIPTION		"The status of this conceptual row.Until instances of all
+		 corresponding columns are appropriately configured, the
+		 value of the corresponding instance of the usmUserStatus
+		 column is 'notReady'"
+		::=  {  v3TrapForwardingEntry  11  }
+
+
+	topologyConfiguration	OBJECT IDENTIFIER
+		::=  {  nmsConfiguration  1  }
+
+	faultConfIguration	OBJECT IDENTIFIER
+		::=  {  nmsConfiguration  2  }
+
+	performanceConfiguration	OBJECT IDENTIFIER
+		::=  {  nmsConfiguration  3  }
+
+	logConfiguration	OBJECT IDENTIFIER
+		::=  {  nmsConfiguration  4  }
+
+    v1v2AuthenticationTables	OBJECT IDENTIFIER
+	::=  {  agentConfiguration  1  }
+
+	httpPort	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This describes the http port.This port can be used to open an html client
+				connection to the WebNMS Server"
+		::=  {  webNMSPorts  1  }
+
+	nmsSocketPort	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This describes the NMS-Socket port"
+		::=  {  webNMSPorts  2  }
+
+	rmiRegistryPort	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This describes the RMI-Registry port.This port can be used to open a
+				RMI client connection to the WebNMS Server"
+		::=  {  webNMSPorts  3  }
+
+	trapPortTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  TrapPortEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	
+			"This table describes the ports at which the traps are being received by the WebNMS"
+		::=  { webNMSPorts  4 }
+
+	trapPortEntry	OBJECT-TYPE
+		SYNTAX		TrapPortEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	
+			"It describes an entry in the trap-port table"
+		INDEX		{  seqNum  }
+		::=  { trapPortTable 1 }
+
+	TrapPortEntry  ::=  SEQUENCE {
+		seqNum  Integer32,
+		port  Integer32
+		}
+
+
+	seqNum	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"An incremental  integer number"
+		::=  {  trapPortEntry  1  }
+
+
+	port	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This describes the port number"
+		::=  {  trapPortEntry  2  }
+
+	moExtraPropNames	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) ) 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"The extra properties which the user wants to be sent with the
+				pre-defined notificaiton varbinds.
+				It should be in the following format.
+				SYNTAX:
+				propName1,propName2,...
+				The values for the properties will be in the following format:
+				propName1=value1,propName2=value2..."
+		::=  {  moNotificationMib  1  }
+
+	moNotiPrefix	OBJECT IDENTIFIER
+		::=  {  moNotificationMib  2  }
+
+	moNotiVarbinds	OBJECT IDENTIFIER
+		::=  {  moNotificationMib  3  }
+
+	alertExtraPropNames	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) ) 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"The extra properties which the user wants to be sent with the
+				pre-defined notificaiton varbinds.
+				It should be in the following format.
+				SYNTAX:
+				propName1,propName2,...
+				The values for the properties will be in the following format:
+				propName1=value1,propName2=value2.."
+		::=  {  alertNotificationMib  1  }
+
+	alertNotiPrefix	OBJECT IDENTIFIER
+		::=  {  alertNotificationMib  2  }
+
+	alertNotiVarbinds	OBJECT IDENTIFIER
+		::=  {  alertNotificationMib  3  }
+	
+	perfNotiConfigPrefix	OBJECT IDENTIFIER
+		::=  {  perfNotificationMib  1  }
+
+	perfNotiVarbinds	OBJECT IDENTIFIER
+		::=  {  perfNotificationMib  2  }
+	
+	statsdataTableName	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the name of the table of the statsdata table,
+				the  details of which,the user wants to view.The user needs to enter values in the
+				form of statsdata% or statsdataMM-DD-YY.If the user gives statsdata%,then the current
+				day is taken."
+		::=  {  statsdata  1  }
+
+	statsDataTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  StatsDataEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	
+			"This table exposes the statsdata table of the database for the day"
+		::=  { statsdata  2 }
+
+	statsDataEntry	OBJECT-TYPE
+		SYNTAX		StatsDataEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	
+			"Each entry contains the data like time,oidindex and value for a particular pollid"
+		INDEX		{  pollID, oidindex, time  }
+		::=  { statsDataTable 1 }
+
+	StatsDataEntry  ::=  SEQUENCE {
+		pollID  Gauge32,
+		time  DisplayString,
+		oidindex  DisplayString,
+		value  DisplayString
+		}
+
+
+	pollID	OBJECT-TYPE	
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the id value of the polldata"
+		::=  {  statsDataEntry  1  }
+
+
+	time	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the time at which the data was collected"
+		::=  {  statsDataEntry  2  }
+
+
+	oidindex	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the instance of the collected data"
+		::=  {  statsDataEntry  3  }
+
+
+	value	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the value of the collected data"
+		::=  {  statsDataEntry  4  }
+
+	autoDiscover	OBJECT-TYPE	
+		SYNTAX			TruthValue
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This variable takes integer values like 1 for true and 2 for false.This variable
+				states whether the auto discovery process should start or not"
+		::=  {  topologyConfiguration  1  }
+
+	discoverLocalNet	OBJECT-TYPE	
+		SYNTAX			TruthValue
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This variable states whether the local network should be discovered or not"
+		::=  {  topologyConfiguration  2  }
+
+	discoverInterval	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"The time interval in which the discovery process should occur"
+		::=  {  topologyConfiguration  3  }
+
+	enablelog	OBJECT-TYPE	
+		SYNTAX			TruthValue
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This variable states whether the logging should be enabled or not"
+		::=  {  topologyConfiguration  4  }
+
+	rediscoveryConfiguration	OBJECT IDENTIFIER
+		::=  {  topologyConfiguration  5  }
+
+	snmpPingConfiguration	OBJECT IDENTIFIER
+		::=  {  topologyConfiguration  6  }
+
+	icmpPingConfiguration	OBJECT IDENTIFIER
+		::=  {  topologyConfiguration  7  }
+
+	nativePingConfiguration	OBJECT IDENTIFIER
+		::=  {  topologyConfiguration  8  }
+
+	networkDiscoveryTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  NetworkDiscoveryEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	
+			"This table stores the criteria for the discovery of networks in the NMS"
+		::=  { topologyConfiguration  9 }
+
+	networkDiscoveryEntry	OBJECT-TYPE
+		SYNTAX		NetworkDiscoveryEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	
+			"Each entry states the discovery criteria  for a network"
+		INDEX		{  networkDiscoveryIndex  }
+		::=  { networkDiscoveryTable 1 }
+
+	NetworkDiscoveryEntry  ::=  SEQUENCE {
+		networkDiscoveryIndex Integer32,
+		netIPAddress  IpAddress,
+		netMask  IpAddress,
+		startIPAddress  DisplayString,
+		endIPAddress  DisplayString,
+		doDiscovery  TruthValue,
+		dhcp  TruthValue
+		}
+
+
+	networkDiscoveryIndex	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the index of the network discovery table"
+		::=  {  networkDiscoveryEntry  1  }
+
+	netIPAddress	OBJECT-TYPE	
+		SYNTAX			IpAddress
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the ipaddress of the network which has to be discovered"
+		::=  {  networkDiscoveryEntry  2  }
+
+
+	netMask	OBJECT-TYPE	
+		SYNTAX			IpAddress
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This provides for the net-mask of the network to be discovered"
+		::=  {  networkDiscoveryEntry  3  }
+
+
+	startIPAddress	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the ipaddress from which the discovery process should
+				start for the network"
+		::=  {  networkDiscoveryEntry  4  }
+
+
+	endIPAddress	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the ipaddress till which the discovery process should
+				proceed for the network"
+		::=  {  networkDiscoveryEntry  5  }
+
+
+	doDiscovery	OBJECT-TYPE	
+		SYNTAX			TruthValue
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This variable states whether a particular network should be discovered or not"
+		::=  {  networkDiscoveryEntry  6  }
+
+
+	dhcp	OBJECT-TYPE	
+		SYNTAX			TruthValue
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This variable states whether the network supports DHCP or not"
+		::=  {  networkDiscoveryEntry  7  }
+
+	nodeDiscoveryTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  NodeDiscoveryEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	
+			"This table contains the node discovery criteria"
+		::=  { topologyConfiguration  10 }
+
+	nodeDiscoveryEntry	OBJECT-TYPE
+		SYNTAX		NodeDiscoveryEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	
+			"`This contains the entry of  NodeDiscTable which has the criteria for discovery of a node"
+		INDEX		{  nodeIP  }
+		::=  { nodeDiscoveryTable 1 }
+
+	NodeDiscoveryEntry  ::=  SEQUENCE {
+		nodeIP  IpAddress,
+		nodeNetMask  IpAddress,
+		nodeDiscoverEnable  TruthValue,
+		snmpAgentPort  Integer32,
+		nodeCommunity  DisplayString,
+		snmpVersion  INTEGER,
+		v3UserName  DisplayString,
+		v3ContextName  DisplayString
+		}
+
+
+	nodeIP	OBJECT-TYPE	
+		SYNTAX			IpAddress
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the ipaddress of the node to be discovered"
+		::=  {  nodeDiscoveryEntry  1  }
+
+
+	nodeNetMask	OBJECT-TYPE	
+		SYNTAX			IpAddress
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the net mask for the discovery of the node"
+		::=  {  nodeDiscoveryEntry  2  }
+
+
+	nodeDiscoverEnable	OBJECT-TYPE	
+		SYNTAX			TruthValue
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This variable states whether a particular node should be discovered or not"
+		::=  {  nodeDiscoveryEntry  3  }
+
+
+	snmpAgentPort	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the port at which the snmp agent is listening"
+		::=  {  nodeDiscoveryEntry  4  }
+
+
+	nodeCommunity	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the community of the node to be discovered"
+		::=  {  nodeDiscoveryEntry  5  }
+
+
+	snmpVersion	OBJECT-TYPE	
+		SYNTAX			INTEGER  { snmpV1 ( 1 ) , snmpV2c ( 2 ) , snmpV3 ( 3 ) } 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the version of snmp"
+		::=  {  nodeDiscoveryEntry  6  }
+
+
+	v3UserName	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the v3userName. If the snmp version is v3 then
+				the user name has to be given to access the node"
+		::=  {  nodeDiscoveryEntry  7  }
+
+
+	v3ContextName	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the v3contextName. If the snmp version is v3 then
+				the context name has to be given to access the node"
+		::=  {  nodeDiscoveryEntry  8  }
+
+	moCriteriaTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  MoCriteriaEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	
+			"This table contains the various criteria for discovery in order to  further refine the search"
+		::=  { topologyConfiguration  11 }
+
+	moCriteriaEntry	OBJECT-TYPE
+		SYNTAX		MoCriteriaEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	
+			"Each entry of this table contains some criteria for making the discovery process further refined"
+		INDEX		{  criteriaIndex  }
+		::=  { moCriteriaTable 1 }
+
+	MoCriteriaEntry  ::=  SEQUENCE {
+		criteriaIndex  Integer32,
+		propertyName   INTEGER,
+		propertyValue  DisplayString,
+		allow  TruthValue
+		}
+
+
+	criteriaIndex	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable uniquely identifies each entry of the table"
+		::=  {  moCriteriaEntry  1  }
+
+
+	propertyName	OBJECT-TYPE	
+		SYNTAX			INTEGER  { name ( 1 ) , type ( 2 ) , ipAddress ( 3 ) , sysOID ( 4 ) , isSNMP ( 5 ) } 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the property name on which basis the discovery should be done"
+		REFERENCE		"name ( 1 )"
+		::=  {  moCriteriaEntry  2  }
+
+
+	propertyValue	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the value for a property,on which basis discovery should be done"
+		::=  {  moCriteriaEntry  3  }
+
+
+	allow	OBJECT-TYPE	
+		SYNTAX			TruthValue
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This variable states whether the criteria for discovery should be considered or not"
+		::=  {  moCriteriaEntry  4  }
+
+	discoveryFilterTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  DiscoveryFilterEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	
+			"This table has the discovery filter class names"
+		::=  { topologyConfiguration  12 }
+
+	discoveryFilterEntry	OBJECT-TYPE
+		SYNTAX		DiscoveryFilterEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	
+			"Each entry of this table has the discovery filter class name"
+		INDEX		{  discFilterIndex  }
+		::=  { discoveryFilterTable 1 }
+
+	DiscoveryFilterEntry  ::=  SEQUENCE {
+		discFilterIndex  Integer32,
+		discFilterClassName  DisplayString
+		}
+
+
+	discFilterIndex	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"An incremental integer for uniquely identifying each element of the table"
+		::=  {  discoveryFilterEntry  1  }
+
+
+	discFilterClassName	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the class Name of the discovery filter file"
+		::=  {  discoveryFilterEntry  2  }
+
+	trapFilterTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  TrapFilterEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	
+			"This table states the class names of the various trap filters"
+		::=  { faultConfIguration  1 }
+
+	trapFilterEntry	OBJECT-TYPE
+		SYNTAX		TrapFilterEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	
+			"Each entry of the table contains the name of the class of a trap filter"
+		INDEX		{  trapFilterIndex  }
+		::=  { trapFilterTable 1 }
+
+	TrapFilterEntry  ::=  SEQUENCE {
+		trapFilterIndex  Integer32,
+		alertFilterClassName  DisplayString,
+		trapFilterName  DisplayString,
+		trapFilterEnable  TruthValue,
+		genericType  DisplayString,
+		specificType  DisplayString,
+		enterpriseOID  DisplayString,
+		trapOID  DisplayString,
+		setFilter  TruthValue
+		}
+
+
+	trapFilterIndex	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"The user defined name for the trap filter"
+		::=  {  trapFilterEntry  1  }
+
+
+	alertFilterClassName	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"The class name of the trap filter"
+		::=  {  trapFilterEntry  2  }
+
+
+	trapFilterName	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the name of the trap filter"
+		::=  {  trapFilterEntry  3  }
+
+
+	trapFilterEnable	OBJECT-TYPE	
+		SYNTAX			TruthValue
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This variable states if the trap filter should be enabled or not"
+		::=  {  trapFilterEntry  4  }
+
+
+	genericType	OBJECT-TYPE	
+		SYNTAX		        DisplayString	
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"A property of snmp"
+		::=  {  trapFilterEntry  6  }
+
+
+	specificType	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"A property of snmp"
+		::=  {  trapFilterEntry  7  }
+
+
+	enterpriseOID	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"When the snmp version is v3,this variable needs to be stated"
+		::=  {  trapFilterEntry  8  }
+
+
+	trapOID	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the oid of the trap to be sent"
+		::=  {  trapFilterEntry  9  }
+
+
+	setFilter	OBJECT-TYPE	
+		SYNTAX			TruthValue
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"0: Do nothing
+				1: To set  trap filter"
+		::=  {  trapFilterEntry  10  }
+
+	pollingFiltersTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  PollingFiltersEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	
+			"This table contains various poll-filters"
+		::=  { performanceConfiguration  1 }
+
+	pollingFiltersEntry	OBJECT-TYPE
+		SYNTAX		PollingFiltersEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	
+			"Each entry of the table contains a poll-filter"
+		INDEX		{  pollingFilterIndex  }
+		::=  { pollingFiltersTable 1 }
+
+	PollingFiltersEntry  ::=  SEQUENCE {
+		pollingFilterIndex  Integer32,
+		pollingFilterClassName  DisplayString
+		}
+
+
+	pollingFilterIndex	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"An incremental integer to uniquely identify each entry of the table"
+		::=  {  pollingFiltersEntry  1  }
+
+
+	pollingFilterClassName	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) ) 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the class names of the polling filters used"
+		::=  {  pollingFiltersEntry  2  }
+
+	stdout	OBJECT IDENTIFIER
+		::=  {  logConfiguration  1  }
+
+	stderr	OBJECT IDENTIFIER
+		::=  {  logConfiguration  2  }
+
+	logTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  LogEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	
+			"This table contains data regarding the logging of values"
+		::=  { logConfiguration  3 }
+
+	logEntry	OBJECT-TYPE
+		SYNTAX		LogEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	
+			"Each entry of this table states the log name and the data regarding its storage"
+		INDEX		{  logIndex  }
+		::=  { logTable 1 }
+
+	LogEntry  ::=  SEQUENCE {
+		logIndex  Integer32,
+		logFileName  DisplayString,
+		logDirName  DisplayString,
+		maxLines  Integer32,
+		maxFiles  Integer32,
+		linesCached  Integer32,
+		timeStamp  TruthValue
+		}
+
+
+	logIndex	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This is an incremental integer which uniquely identifies each entry of the table"
+		::=  {  logEntry  1  }
+
+
+	logFileName	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the file name of the log file"
+		::=  {  logEntry  2  }
+
+
+	logDirName	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the directory name of the log file"
+		::=  {  logEntry  3  }
+
+
+	maxLines	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the number of lines that can be stored in a single file"
+		::=  {  logEntry  4  }
+
+
+	maxFiles	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the number of files of the same type can be formed"
+		::=  {  logEntry  5  }
+
+
+	linesCached	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the number of lines that can be cached"
+		::=  {  logEntry  6  }
+
+
+	timeStamp	OBJECT-TYPE	
+		SYNTAX			TruthValue
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This variable states whether time-stamping need be done or not"
+		::=  {  logEntry  7  }
+
+	logUserTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  LogUserEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	
+			"This table states the name of the log users"
+		::=  { logConfiguration  4 }
+
+	logUserEntry	OBJECT-TYPE
+		SYNTAX		LogUserEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	
+			"Each entry of the table states the user name and the display name of the file"
+		INDEX		{  logIndex, logUserIndex  }
+		::=  { logUserTable 1 }
+
+	LogUserEntry  ::=  SEQUENCE {
+		logUserIndex  Integer32,
+		logUserName  DisplayString,
+		displayName  DisplayString,
+		logLevel  Integer32,
+		enableLog  TruthValue
+		}
+
+
+	logUserIndex	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"An incremental integer which uniquely identifies each entry of the table"
+		::=  {  logUserEntry  1  }
+
+
+	logUserName	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the name of the log user"
+		::=  {  logUserEntry  2  }
+
+
+	displayName	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the name which is displayed for each log user"
+		::=  {  logUserEntry  3  }
+
+
+	logLevel	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the level at which the logging needs to be done"
+		::=  {  logUserEntry  4  }
+
+
+	enableLog	OBJECT-TYPE	
+		SYNTAX			TruthValue
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This variable states whether logging should be enabled or not"
+		::=  {  logUserEntry  5  }
+
+	moName	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable indicates the name of the MO."
+		::=  {  moNotiVarbinds  1  }
+
+	moownerName	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable represents the Ownername of the Network Element.
+				This name also uniquely represents the MO in the network
+				domain across all MO types."
+		::=  {  moNotiVarbinds  2  }
+
+	moNodeType	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable describes the type of the MO ie whether it is node,
+				motwork,interface,etc."
+		::=  {  moNotiVarbinds  3  }
+
+	moEnrolTime	OBJECT-TYPE	
+		SYNTAX			Gauge32  ( 0 .. 4294967295  ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable represents the time at which the MO was formally
+				enrolled in the management domain"
+		::=  {  moNotiVarbinds  4  }
+
+	moDeEnrolTime	OBJECT-TYPE	
+		SYNTAX			Gauge32  ( 0 .. 4294967295  ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable represents the time at which the MO was formally
+				deenrolled in the management domain"
+		::=  {  moNotiVarbinds  5  }
+
+	moDataChangeTime	OBJECT-TYPE	
+		SYNTAX			Gauge32  ( 0 .. 4294967295  ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable indicates when a particular value's time of change
+				is formally acknowleged by the NMS."
+		::=  {  moNotiVarbinds  6  }
+
+	moExtraProperties	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"The values for the user properties which the user
+				specifies in the moExtraPropNames variable are sent as part of the notifications
+				The values will be displayed in the folloing formate
+				propName1=value1,porpName2=vaule2,...."
+		::=  {  moNotiVarbinds  7  }
+
+	moEnrolNotification	NOTIFICATION-TYPE
+		OBJECTS			{ sequenceNum ,moName ,moownerName ,moType ,moEnrolTime ,moExtraProperties  }
+		STATUS			current
+		DESCRIPTION		
+				"The NMS-Agent sends a moEnrolNotification to the manager when an MO has been
+				enrolled/added into management domain."
+		::=  {  moNotiPrefix  1  }
+
+	moDeenrolNotification	NOTIFICATION-TYPE
+		OBJECTS			{ sequenceNum ,moName ,moownerName ,moType ,moDeEnrolTime ,moExtraProperties  }
+		STATUS			current
+		DESCRIPTION		
+				"The NMSAgent sends a moDeenrolNotification to the manager when an MO has been
+				deenrolled/deleted from the management domain"
+		::=  {  moNotiPrefix  2  }
+
+	moAttrChangeNotification	NOTIFICATION-TYPE
+		OBJECTS			{ sequenceNum ,moName ,moownerName ,moType ,moDataChangeTime ,moExtraProperties  }
+		STATUS			current
+		DESCRIPTION		
+				"The NMSAgent sends a moAttrChangeNotification to the manager 
+				 when any discoverd MO's one or more attributes are changed."
+		::=  {  moNotiPrefix  3  }
+
+	alertentity	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the unique source of the alert which uniquely identifies  any
+				alert in the table"
+		::=  {  alertNotiVarbinds  1  }
+
+	alertownerName	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the name of the owner of the alert"
+		::=  {  alertNotiVarbinds  2  }
+
+	alertDescription	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable describes the alert"
+		::=  {  alertNotiVarbinds  3  }
+
+	alertTimeStamp	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable indicates the  time at which the alert was last modified"
+		::=  {  alertNotiVarbinds  4  }
+
+	alertNotificationId	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable indicates the id of the  generated alert"
+		::=  {  alertNotiVarbinds  5  }
+
+	alertcategory	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable provides a string representation of the category
+				of the alert"
+		::=  {  alertNotiVarbinds  6  }
+		
+	alertClearNotification	NOTIFICATION-TYPE
+		OBJECTS			{ sequenceNum ,alertentity ,alertownerName ,alertDescription ,alertTimeStamp ,alertcategory ,alertNotificationId ,alertExtraProperties  }
+		STATUS			current
+		DESCRIPTION		
+				"The NMS-Agent sends an alertClearNotification to the manager indicating that one
+				or more previously reported alerts have been cleared"
+		::=  {  alertNotiPrefix  1  }
+
+	alertWarningNotification	NOTIFICATION-TYPE
+		OBJECTS			{ alertcategory ,alertentity ,alertownerName ,alertDescription ,sequenceNum ,alertTimeStamp ,alertNotificationId ,alertExtraProperties  }
+		STATUS			current
+		DESCRIPTION		
+				"The NMS-Agent sends an alertWarningNotification to the manager indicating that an
+				alert of 'Warning' severity has been raised on a MO"
+		::=  {  alertNotiPrefix  2  }
+
+	alertMinorNotification	NOTIFICATION-TYPE
+		OBJECTS			{ sequenceNum ,alertcategory ,alertentity ,alertownerName ,alertDescription ,alertTimeStamp ,alertNotificationId ,alertExtraProperties  }
+		STATUS			current
+		DESCRIPTION		
+				"The NMS-Agent sends an alertMinorNotification to the manager indicating that a an alert
+				of 'Minor' severity has been raised on a MO"
+		::=  {  alertNotiPrefix  3  }
+
+	alertMajorNotification	NOTIFICATION-TYPE
+		OBJECTS			{ sequenceNum ,alertcategory ,alertentity ,alertownerName ,alertDescription ,alertNotificationId ,alertTimeStamp ,alertExtraProperties  }
+		STATUS			current
+		DESCRIPTION		
+				"The NMS-Agent sends an alertMajorNotification to the manager indicating that an
+				alert of 'Major' severity has been raised on a MO"
+		::=  {  alertNotiPrefix  4  }
+
+	alertCriticalNotification	NOTIFICATION-TYPE
+		OBJECTS			{ sequenceNum ,alertentity ,alertownerName ,alertcategory ,alertDescription ,alertTimeStamp ,alertNotificationId ,alertExtraProperties  }
+		STATUS			current
+		DESCRIPTION		
+				"The NMS-Agent sends an alertCriticalNotification to the manager indicating that an
+				alert of 'Critical' severity 	has been raised on a MO"
+		::=  {  alertNotiPrefix  5  }
+
+	thresholdNotification	NOTIFICATION-TYPE
+		OBJECTS			{ thresholdObjectName ,thresholdKind ,thresholdMessage ,thresholdSeverity }
+		STATUS			current
+		DESCRIPTION		
+				"This notification is generated for the threshold objects
+				which return a string value, when they exceed or fall below
+				a particular threshold value."
+		::=  {  perfNotiConfigPrefix  1  }
+
+	eventid	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable is the unique id (primary key) of this event object."
+		::=  {  perfNotiVarbinds  1  }
+
+	eventsource	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable is the source of the event"
+		::=  {  perfNotiVarbinds  2  }
+
+	eventEntity	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable is the Entity (also known as Failure Object) of the Event."
+		::=  {  perfNotiVarbinds  3  }
+
+	eventGenTime	OBJECT-TYPE	
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable is the time of occurrence (creation), in milliseconds, of this Event object."
+		::=  {  perfNotiVarbinds  4  }
+
+	eventSeverity	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This variable  is the Severity of the Event object."
+		::=  {  perfNotiVarbinds  5  }
+
+	alertExtraProperties	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"The values for the user properties which the user
+				specifies in the alertExtraPropNames variable are sent as part of the notifications
+				The values will be displayed in the folloing format:
+				propName1=value1,porpName2=vaule2,...."
+		::=  {  alertNotiVarbinds  7  }
+
+	reDiscover	OBJECT-TYPE	
+		SYNTAX			TruthValue
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This variable states whether the node which is already discovered should be
+				discovered again or not"
+		::=  {  rediscoveryConfiguration  1  }
+
+	reDiscoverInterval	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"The time interval in which the rediscovery takes place"
+		::=  {  rediscoveryConfiguration  2  }
+
+	hour	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the time in hours at whicgh the discovery should be done again"
+		::=  {  rediscoveryConfiguration  3  }
+
+	dayOfWeek	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the time in terms of the days of the week when the rediscovery is scheduled to be done"
+		::=  {  rediscoveryConfiguration  4  }
+
+	dayOfMonth	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the time in terms of the days of the month when the rediscovery is scheduled to be done"
+		::=  {  rediscoveryConfiguration  5  }
+
+	enableSnmpPing	OBJECT-TYPE	
+		SYNTAX			TruthValue
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This variable states if the snmp ping should be enabled or not"
+		::=  {  snmpPingConfiguration  1  }
+
+	snmpPingRetries	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"The number of retries for snmp-ping while discovery"
+		::=  {  snmpPingConfiguration  2  }
+
+	snmpPingTimeout	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"The maximum time taken to wait for  a response"
+		::=  {  snmpPingConfiguration  3  }
+
+	snmpport	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the snmp port"
+		::=  {  snmpPingConfiguration  4  }
+
+	readCommunity	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the read community"
+		::=  {  snmpPingConfiguration  5  }
+
+	writeCommunity	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the writed community"
+		::=  {  snmpPingConfiguration  6  }
+
+	snmpV3Configuration	OBJECT IDENTIFIER
+		::=  {  snmpPingConfiguration  7  }
+
+	enableIcmp	OBJECT-TYPE	
+		SYNTAX			TruthValue
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This variable states whether icmp ping be enabled or not"
+		::=  {  icmpPingConfiguration  1  }
+
+	icmpPingRetries	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"The number of retries for icmp-ping while discovery"
+		::=  {  icmpPingConfiguration  2  }
+
+	nativePingRetries	OBJECT-TYPE	
+		SYNTAX			Integer32  ( -2147483648 .. 2147483647  ) 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"The number of time native-ping must be done while discovery"
+		::=  {  nativePingConfiguration  1  }
+
+	nativePingTimeOut	OBJECT-TYPE	
+		SYNTAX			Integer32  ( -2147483648 .. 2147483647  ) 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the max time that need be waited for to get a response back"
+		::=  {  nativePingConfiguration  2  }
+
+	debugLevel	OBJECT-TYPE	
+		SYNTAX			Integer32  ( -2147483648 .. 2147483647  ) 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the debug level"
+		::=  {  nativePingConfiguration  3  }
+
+	enableSweep	OBJECT-TYPE	
+		SYNTAX			TruthValue
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This variable states whether sweep be enabled or not"
+		::=  {  nativePingConfiguration  4  }
+
+	sweepPkts	OBJECT-TYPE	
+		SYNTAX			Integer32  ( -2147483648 .. 2147483647  ) 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the number of sweep packets"
+		::=  {  nativePingConfiguration  5  }
+
+	sweepSleepInterval	OBJECT-TYPE	
+		SYNTAX			Integer32  ( -2147483648 .. 2147483647  ) 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the interval at which sweep must be done"
+		::=  {  nativePingConfiguration  6  }
+
+	name	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This states the name of the file"
+		::=  {  stdout  1  }
+
+	directory	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This states the directory in which the file will be present"
+		::=  {  stdout  2  }
+
+	numFiles	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This states the number of files of the same type may exist"
+		::=  {  stdout  3  }
+
+	numLines	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This states the number of lines that will be prresent in the file"
+		::=  {  stdout  4  }
+
+	logging	OBJECT-TYPE	
+		SYNTAX			TruthValue
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This variable takes in a truth value where 1(True) implies that the file be
+				logged and 2(False) which implies that the file may not be logged"
+		::=  {  stdout  5  }
+
+	timestamp	OBJECT-TYPE	
+		SYNTAX			TruthValue
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This variable also takes in a truth value where 1(True) implies that the
+				time be noted during logging and 2(False) which denotes that the time not be noted"
+		::=  {  stdout  6  }
+
+	filename	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This states the name of the file in which the logging has to be done"
+		::=  {  stderr  1  }
+
+	logDirectory	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This states the directory in which the file will be present"
+		::=  {  stderr  2  }
+
+	filenum	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This variable describes the number of files that may exist"
+		::=  {  stderr  3  }
+
+	linenum	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This variable states the number of lines that will be present in each file"
+		::=  {  stderr  4  }
+
+	log	OBJECT-TYPE	
+		SYNTAX			TruthValue
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This variable takes in a truth value where 1(True) implies that the file be
+				logged and 2(False) which implies that the file may not be logged"
+		::=  {  stderr  5  }
+
+	logTime	OBJECT-TYPE	
+		SYNTAX			TruthValue
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This variable also takes in a truth value where 1(True) implies that the
+				time be noted during logging and 2(False) which denotes that the time not be noted"
+		::=  {  stderr  6  }
+
+	enableV3	OBJECT-TYPE	
+		SYNTAX			TruthValue
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This variable states whether v3 be enabled or not"
+		::=  {  snmpV3Configuration  1  }
+
+	v3Username	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"Whenever v3 is enabled, the user needs to give the user name"
+		::=  {  snmpV3Configuration  2  }
+
+	v3Contextname	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"Whenever v3 is enabled, the user needs to give the context name"
+		::=  {  snmpV3Configuration  3  }
+
+    aclTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  AclEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"The table maintains  a set of authentication parameters like
+		 community and its maximum access. It also has facility	for
+		 specifying the manager list for access control. This table
+		 will be referred by the v1/v2c agent for authentication of
+		 any incoming request."
+		::=  { v1v2AuthenticationTables  1 }
+
+	aclEntry	OBJECT-TYPE
+		SYNTAX		AclEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"Each entry in this table describes one valid authentication
+		 property."
+		INDEX		{  aclCommunity  }
+		::=  { aclTable 1 }
+
+	AclEntry  ::=  SEQUENCE {
+		aclCommunity  DisplayString,
+		aclAccess  Integer32,
+		aclManagers  DisplayString,
+		aclStatus  RowStatus
+		}
+
+
+	aclCommunity	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) ) 
+		MAX-ACCESS		not-accessible
+		STATUS			current
+		DESCRIPTION		"Community string used by the manager to communicate with the
+		 agent."
+		DEFVAL			{ "public" }
+		::=  {  aclEntry  1  }
+
+
+	aclAccess	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-create
+		STATUS			current
+		DESCRIPTION		"The maximum access allowed for the corresponding
+			 community."
+		DEFVAL			{ 3 }
+		::=  {  aclEntry  2  }
+
+
+	aclManagers	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-create
+		STATUS			current
+		DESCRIPTION		"This variable has the managers list allowed for specified
+		access with specified community. The format of the string
+		is 'managerName1;managerName2.....' with a  list of manager
+		IpAddress/name corresponding to each additional information
+		separated via ';' as the delimiter between any two managers.
+		The default value is '0:0:0:0' which states access for all
+		managers for the corresponding community."
+		::=  {  aclEntry  3  }
+
+
+	aclStatus	OBJECT-TYPE	
+		SYNTAX		RowStatus
+		MAX-ACCESS	read-create
+		STATUS			current
+		DESCRIPTION  	"The status of this conceptual row in the aclTable." 
+		::=  {  aclEntry  4  }
+
+	vaclTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  VaclEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"This table furnishes the View Based Access Control
+			 Entries for the SNMP Version 1 and Version 2 Agents
+			 (V1/V2C Agents)."
+		::=  { v1v2AuthenticationTables  2 }
+
+	vaclEntry	OBJECT-TYPE
+		SYNTAX		VaclEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"Each Entry is based upon the Community and its allowed
+			 views for the View Based Access Control."
+		INDEX		{  aclCommunity  }
+		::=  { vaclTable 1 }
+
+	VaclEntry  ::=  SEQUENCE {
+		vaclmibViews  DisplayString,
+		vaclviewStatus  RowStatus
+		}
+
+
+	vaclmibViews	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-create
+		STATUS			current
+		DESCRIPTION		"This column represents the Mib View or Views furnished for
+		the corresponding communities. More Mib Views can be set by
+		giving a ';' as a separator."
+		::=  {  vaclEntry  1  }
+
+
+	vaclviewStatus	OBJECT-TYPE	
+		SYNTAX			RowStatus
+		MAX-ACCESS		read-create
+		STATUS			current
+		DESCRIPTION		"The Status of the View Set."
+		::=  {  vaclEntry  2  }
+
+END

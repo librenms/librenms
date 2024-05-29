@@ -1,0 +1,58 @@
+-- File Name : BW-BroadworksDiameterFrontNodeFault.mib
+BW-BroadworksDiameterFrontNodeFault DEFINITIONS ::= BEGIN
+  IMPORTS
+    MODULE-IDENTITY, NOTIFICATION-TYPE
+      FROM SNMPv2-SMI
+    common, faultFields, identifier, timeStamp, alarmName, systemName, severity, alarmState, component, subcomponent, problemText, recommendedActionsText
+      FROM BroadworksFault;
+
+  systemFaults MODULE-IDENTITY
+    LAST-UPDATED  "200601260000Z"
+    ORGANIZATION  "Broadsoft, Inc"
+    CONTACT-INFO  "Broadsoft, Inc.
+220 Perry Parkway
+Gaithersburg, MD  20877
+301-977-9440"
+    DESCRIPTION
+        "The defines the fault for the BroadWorks Diameter Server interconnect process."
+    REVISION    "200601260001Z"
+    DESCRIPTION
+        ""
+    ::=  {  common  1  }
+
+  bwPMDiameterFrontNodeLaunched  NOTIFICATION-TYPE
+    OBJECTS     { identifier, timeStamp, alarmName, systemName, severity, component, subcomponent, problemText, recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "Indicates that the Diameter Front Node has been started. For a complete description, refer the BroadWorks FaultManagementGuide as it may contain variable data."
+    ::=  {  systemFaults 5101  }
+
+  bwPMDiameterFrontNodeShutDown  NOTIFICATION-TYPE
+    OBJECTS     { identifier, timeStamp, alarmName, systemName, severity, component, subcomponent, problemText, recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "Indicates that the Diameter Front Node has been manually shut down. For a complete description, refer the BroadWorks FaultManagementGuide as it may contain variable data."
+    ::=  {  systemFaults 5102  }
+
+  bwPMDiameterFrontNodeRestarted  NOTIFICATION-TYPE
+    OBJECTS     { identifier, timeStamp, alarmName, systemName, severity, component, subcomponent, problemText, recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "Indicates that the Diameter Front Node has been restarted. For a complete description, refer the BroadWorks FaultManagementGuide as it may contain variable data."
+    ::=  {  systemFaults 5103  }
+
+  bwPMDiameterFrontNodeDeath  NOTIFICATION-TYPE
+    OBJECTS     { identifier, timeStamp, alarmName, systemName, severity, component, subcomponent, problemText, recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "Indicates that the Diameter Front Node has terminated. For a complete description, refer the BroadWorks FaultManagementGuide as it may contain variable data."
+    ::=  {  systemFaults 5104  }
+
+  bwDiameterFrontNodeSyncFailure  NOTIFICATION-TYPE
+    OBJECTS     { identifier, timeStamp, alarmName, systemName, severity, component, subcomponent, problemText, recommendedActionsText }
+    STATUS      current
+    DESCRIPTION
+        "Indicates that the Execution Server encountered a failure messaging with the Diameter Front Node when synchronizing Diameter Front Node configuration data with the database. For a complete description, refer the BroadWorks FaultManagementGuide as it may contain variable data."
+    ::=  {  systemFaults 5105  }
+
+END
