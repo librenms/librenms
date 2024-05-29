@@ -157,7 +157,8 @@
                                     },
                                     "value": {"$ref": "#/definitions/oid"},
                                     "type": {
-                                        "type": "string"
+                                        "type": "string",
+                                        "maxLength": 16
                                     },
                                     "skip_values": {
                                         "$ref": "#/definitions/skip_values"
