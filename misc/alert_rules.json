@@ -799,5 +799,10 @@
     "rule": "applications.app_type = \"cape\" AND application_metrics.metric = \"critical\" AND application_metrics.value > 0",
     "name": "CAPE Criticals > 0",
     "severity": "critical"
+  },
+  {
+    "rule": "applications.app_type = \"cape\" AND application_metrics.metric = \"error\" AND application_metrics.value > 0",
+    "name": "CAPE Errors > 0",
+    "severity": "critical"
   }
 ]
