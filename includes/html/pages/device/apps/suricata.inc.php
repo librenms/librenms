@@ -1,5 +1,7 @@
 <?php
 
+$name = 'suricata';
+
 $link_array = [
     'page' => 'device',
     'device' => $device['device_id'],
@@ -481,154 +483,180 @@ if ($app_data['version'] == 1) {
         $graphs['suricata_v2_app_layer__flow__tftp'] = 'TFTP, flows/second';
         $graphs['suricata_v2_app_layer__flow__tls'] = 'TLS, flows/second';
     } elseif (strcmp($vars['suricata_graph_set'], 'errors_alloc') == 0) {
-        $graphs = [
-            // app_layer__error__*__alloc
-            'suricata_v2_app_layer__error__bittorrent-dht__alloc' => 'Bittorrent-DHT, alloc errors/second',
-            'suricata_v2_app_layer__error__dcerpc_tcp__alloc' => 'DCE RPC TCP, alloc errors/second',
-            'suricata_v2_app_layer__error__dcerpc_udp__alloc' => 'DCE RPC UDP, alloc errors/second',
-            'suricata_v2_app_layer__error__dhcp__alloc' => 'DHCP, alloc errors/second',
-            'suricata_v2_app_layer__error__dnp3__alloc' => 'DNP3, alloc errors/second',
-            'suricata_v2_app_layer__error__dns_tcp__alloc' => 'DNS TCP, alloc errors/second',
-            'suricata_v2_app_layer__error__dns_udp__alloc' => 'DNS UDP, alloc errors/second',
-            'suricata_v2_app_layer__error__enip_tcp__alloc' => 'ENIP TCP, alloc errors/second',
-            'suricata_v2_app_layer__error__enip_udp__alloc' => 'ENIP UDP, alloc errors/second',
-            'suricata_v2_app_layer__error__ftp__alloc' => 'FTP, alloc errors/second',
-            'suricata_v2_app_layer__error__ftp-data__alloc' => 'FTP-DATA, alloc errors/second',
-            'suricata_v2_app_layer__error__http__alloc' => 'HTTP, alloc errors/second',
-            'suricata_v2_app_layer__error__http2__alloc' => 'HTTP2, alloc errors/second',
-            'suricata_v2_app_layer__error__ike__alloc' => 'IKE, alloc errors/second',
-            'suricata_v2_app_layer__error__imap__alloc' => 'IMAP, alloc errors/second',
-            'suricata_v2_app_layer__error__krb5_tcp__alloc' => 'KRB5 TCP, alloc errors/second',
-            'suricata_v2_app_layer__error__krb5_udp__alloc' => 'KRB5 UDP, alloc errors/second',
-            'suricata_v2_app_layer__error__modbus__alloc' => 'ModBus, alloc errors/second',
-            'suricata_v2_app_layer__error__mqtt__alloc' => 'MQTT, alloc errors/second',
-            'suricata_v2_app_layer__error__nfs_tcp__alloc' => 'NFS TCP, alloc errors/second',
-            'suricata_v2_app_layer__error__nfs_udp__alloc' => 'NFS UDP, alloc errors/second',
-            'suricata_v2_app_layer__error__ntp__alloc' => 'NTP, alloc errors/second',
-            'suricata_v2_app_layer__error__pgsql__alloc' => 'Pgsql, alloc errors/second',
-            'suricata_v2_app_layer__error__quic__alloc' => 'QUIC, alloc errors/second',
-            'suricata_v2_app_layer__error__rdp__alloc' => 'RDP, alloc errors/second',
-            'suricata_v2_app_layer__error__rfb__alloc' => 'RFB, alloc errors/second',
-            'suricata_v2_app_layer__error__sip__alloc' => 'SIP, alloc errors/second',
-            'suricata_v2_app_layer__error__smb__alloc' => 'SMB, alloc errors/second',
-            'suricata_v2_app_layer__error__smtp__alloc' => 'SMTP, alloc errors/second',
-            'suricata_v2_app_layer__error__snmp__alloc' => 'SNMP, alloc errors/second',
-            'suricata_v2_app_layer__error__ssh__alloc' => 'SSH, alloc errors/second',
-            'suricata_v2_app_layer__error__telnet__alloc' => 'Telnet, alloc errors/second',
-            'suricata_v2_app_layer__error__tftp__alloc' => 'TFTP, alloc errors/second',
-            'suricata_v2_app_layer__error__tls__alloc' => 'TLS, alloc errors/second',
-        ];
+        $graphs = [];
+        // app_layer__error__*__alloc
+        $graphs['suricata_v2_app_layer__error__bittorrent-dht__alloc'] = 'Bittorrent-DHT, alloc errors/second';
+        $graphs['suricata_v2_app_layer__error__dcerpc_tcp__alloc'] = 'DCE RPC TCP, alloc errors/second';
+        $graphs['suricata_v2_app_layer__error__dcerpc_udp__alloc'] = 'DCE RPC UDP, alloc errors/second';
+        $graphs['suricata_v2_app_layer__error__dhcp__alloc'] = 'DHCP, alloc errors/second';
+        if (Rrd::checkRrdExists(Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__dnp3__alloc']))) {
+            $graphs['suricata_v2_app_layer__error__dnp3__alloc'] = 'DNP3, alloc errors/second';
+        }
+        $graphs['suricata_v2_app_layer__error__dns_tcp__alloc'] = 'DNS TCP, alloc errors/second';
+        $graphs['suricata_v2_app_layer__error__dns_udp__alloc'] = 'DNS UDP, alloc errors/second';
+        if (Rrd::checkRrdExists(Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__enip_tcp__alloc']))) {
+            $graphs['suricata_v2_app_layer__error__enip_tcp__alloc'] = 'ENIP TCP, alloc errors/second';
+        }
+        if (Rrd::checkRrdExists(Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__enip_udp__alloc']))) {
+            $graphs['suricata_v2_app_layer__error__enip_udp__alloc'] = 'ENIP UDP, alloc errors/second';
+        }
+        $graphs['suricata_v2_app_layer__error__ftp__alloc'] = 'FTP, alloc errors/second';
+        $graphs['suricata_v2_app_layer__error__ftp-data__alloc'] = 'FTP-DATA, alloc errors/second';
+        $graphs['suricata_v2_app_layer__error__http__alloc'] = 'HTTP, alloc errors/second';
+        $graphs['suricata_v2_app_layer__error__http2__alloc'] = 'HTTP2, alloc errors/second';
+        $graphs['suricata_v2_app_layer__error__ike__alloc'] = 'IKE, alloc errors/second';
+        $graphs['suricata_v2_app_layer__error__imap__alloc'] = 'IMAP, alloc errors/second';
+        $graphs['suricata_v2_app_layer__error__krb5_tcp__alloc'] = 'KRB5 TCP, alloc errors/second';
+        $graphs['suricata_v2_app_layer__error__krb5_udp__alloc'] = 'KRB5 UDP, alloc errors/second';
+        if (Rrd::checkRrdExists(Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__modbus__alloc']))) {
+            $graphs['suricata_v2_app_layer__error__modbus__alloc'] = 'ModBus, alloc errors/second';
+        }
+        $graphs['suricata_v2_app_layer__error__mqtt__alloc'] = 'MQTT, alloc errors/second';
+        $graphs['suricata_v2_app_layer__error__nfs_tcp__alloc'] = 'NFS TCP, alloc errors/second';
+        $graphs['suricata_v2_app_layer__error__nfs_udp__alloc'] = 'NFS UDP, alloc errors/second';
+        $graphs['suricata_v2_app_layer__error__ntp__alloc'] = 'NTP, alloc errors/second';
+        $graphs['suricata_v2_app_layer__error__pgsql__alloc'] = 'Pgsql, alloc errors/second';
+        $graphs['suricata_v2_app_layer__error__quic__alloc'] = 'QUIC, alloc errors/second';
+        $graphs['suricata_v2_app_layer__error__rdp__alloc'] = 'RDP, alloc errors/second';
+        $graphs['suricata_v2_app_layer__error__rfb__alloc'] = 'RFB, alloc errors/second';
+        $graphs['suricata_v2_app_layer__error__sip__alloc'] = 'SIP, alloc errors/second';
+        $graphs['suricata_v2_app_layer__error__smb__alloc'] = 'SMB, alloc errors/second';
+        $graphs['suricata_v2_app_layer__error__smtp__alloc'] = 'SMTP, alloc errors/second';
+        $graphs['suricata_v2_app_layer__error__snmp__alloc'] = 'SNMP, alloc errors/second';
+        $graphs['suricata_v2_app_layer__error__ssh__alloc'] = 'SSH, alloc errors/second';
+        $graphs['suricata_v2_app_layer__error__telnet__alloc'] = 'Telnet, alloc errors/second';
+        $graphs['suricata_v2_app_layer__error__tftp__alloc'] = 'TFTP, alloc errors/second';
+        $graphs['suricata_v2_app_layer__error__tls__alloc'] = 'TLS, alloc errors/second';
     } elseif (strcmp($vars['suricata_graph_set'], 'errors_gap') == 0) {
-        $graphs = [
-            // app_layer__error__*__gap
-            'suricata_v2_app_layer__error__bittorrent-dht__gap' => 'Bittorrent-DHT, gap errors/second',
-            'suricata_v2_app_layer__error__dcerpc_tcp__gap' => 'DCE RPC TCP, gap errors/second',
-            'suricata_v2_app_layer__error__dhcp__gap' => 'DHCP, gap errors/second',
-            'suricata_v2_app_layer__error__dnp3__gap' => 'DNP3, gap errors/second',
-            'suricata_v2_app_layer__error__dns_tcp__gap' => 'DNS TCP, gap errors/second',
-            'suricata_v2_app_layer__error__enip_tcp__gap' => 'ENIP TCP, gap errors/second',
-            'suricata_v2_app_layer__error__ftp__gap' => 'FTP, gap errors/second',
-            'suricata_v2_app_layer__error__ftp-data__gap' => 'FTP-DATA, gap errors/second',
-            'suricata_v2_app_layer__error__http__gap' => 'HTTP, gap errors/second',
-            'suricata_v2_app_layer__error__http2__gap' => 'HTTP2, gap errors/second',
-            'suricata_v2_app_layer__error__ike__gap' => 'IKE, gap errors/second',
-            'suricata_v2_app_layer__error__imap__gap' => 'IMAP, gap errors/second',
-            'suricata_v2_app_layer__error__krb5_tcp__gap' => 'KRB5 TCP, gap errors/second',
-            'suricata_v2_app_layer__error__modbus__gap' => 'ModBus, gap errors/second',
-            'suricata_v2_app_layer__error__mqtt__gap' => 'MQTT, gap errors/second',
-            'suricata_v2_app_layer__error__nfs_tcp__gap' => 'NFS TCP, gap errors/second',
-            'suricata_v2_app_layer__error__ntp__gap' => 'NTP, gap errors/second',
-            'suricata_v2_app_layer__error__pgsql__gap' => 'Pgsql, gap errors/second',
-            'suricata_v2_app_layer__error__quic__gap' => 'QUIC, gap errors/second',
-            'suricata_v2_app_layer__error__rdp__gap' => 'RDP, gap errors/second',
-            'suricata_v2_app_layer__error__rfb__gap' => 'RFB, gap errors/second',
-            'suricata_v2_app_layer__error__sip__gap' => 'SIP, gap errors/second',
-            'suricata_v2_app_layer__error__smb__gap' => 'SMB, gap errors/second',
-            'suricata_v2_app_layer__error__smtp__gap' => 'SMTP, gap errors/second',
-            'suricata_v2_app_layer__error__snmp__gap' => 'SNMP, gap errors/second',
-            'suricata_v2_app_layer__error__ssh__gap' => 'SSH, gap errors/second',
-            'suricata_v2_app_layer__error__telnet__gap' => 'Telnet, gap errors/second',
-            'suricata_v2_app_layer__error__tftp__gap' => 'TFTP, gap errors/second',
-            'suricata_v2_app_layer__error__tls__gap' => 'TLS, gap errors/second',
-            // tcp__reassembly_gap
-            'suricata_v2_tcp__reassembly_gap' => 'TCP Reassembly, gap errors/second',
-        ];
+        $graphs = [];
+        // app_layer__error__*__gap
+        $graphs['suricata_v2_app_layer__error__bittorrent-dht__gap'] = 'Bittorrent-DHT, gap errors/second';
+        $graphs['suricata_v2_app_layer__error__dcerpc_tcp__gap'] = 'DCE RPC TCP, gap errors/second';
+        $graphs['suricata_v2_app_layer__error__dhcp__gap'] = 'DHCP, gap errors/second';
+        if (Rrd::checkRrdExists(Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__dnp3__gap']))) {
+            $graphs['suricata_v2_app_layer__error__dnp3__gap'] = 'DNP3, gap errors/second';
+        }
+        $graphs['suricata_v2_app_layer__error__dns_tcp__gap'] = 'DNS TCP, gap errors/second';
+        if (Rrd::checkRrdExists(Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__enip_tcp__gap']))) {
+            $graphs['suricata_v2_app_layer__error__enip_tcp__gap'] = 'ENIP TCP, gap errors/second';
+        }
+        $graphs['suricata_v2_app_layer__error__ftp__gap'] = 'FTP, gap errors/second';
+        $graphs['suricata_v2_app_layer__error__ftp-data__gap'] = 'FTP-DATA, gap errors/second';
+        $graphs['suricata_v2_app_layer__error__http__gap'] = 'HTTP, gap errors/second';
+        $graphs['suricata_v2_app_layer__error__http2__gap'] = 'HTTP2, gap errors/second';
+        $graphs['suricata_v2_app_layer__error__ike__gap'] = 'IKE, gap errors/second';
+        $graphs['suricata_v2_app_layer__error__imap__gap'] = 'IMAP, gap errors/second';
+        $graphs['suricata_v2_app_layer__error__krb5_tcp__gap'] = 'KRB5 TCP, gap errors/second';
+        if (Rrd::checkRrdExists(Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__modbus__gap']))) {
+            $graphs['suricata_v2_app_layer__error__modbus__gap'] = 'ModBus, gap errors/second';
+        }
+        $graphs['suricata_v2_app_layer__error__mqtt__gap'] = 'MQTT, gap errors/second';
+        $graphs['suricata_v2_app_layer__error__nfs_tcp__gap'] = 'NFS TCP, gap errors/second';
+        $graphs['suricata_v2_app_layer__error__ntp__gap'] = 'NTP, gap errors/second';
+        $graphs['suricata_v2_app_layer__error__pgsql__gap'] = 'Pgsql, gap errors/second';
+        $graphs['suricata_v2_app_layer__error__quic__gap'] = 'QUIC, gap errors/second';
+        $graphs['suricata_v2_app_layer__error__rdp__gap'] = 'RDP, gap errors/second';
+        $graphs['suricata_v2_app_layer__error__rfb__gap'] = 'RFB, gap errors/second';
+        $graphs['suricata_v2_app_layer__error__sip__gap'] = 'SIP, gap errors/second';
+        $graphs['suricata_v2_app_layer__error__smb__gap'] = 'SMB, gap errors/second';
+        $graphs['suricata_v2_app_layer__error__smtp__gap'] = 'SMTP, gap errors/second';
+        $graphs['suricata_v2_app_layer__error__snmp__gap'] = 'SNMP, gap errors/second';
+        $graphs['suricata_v2_app_layer__error__ssh__gap'] = 'SSH, gap errors/second';
+        $graphs['suricata_v2_app_layer__error__telnet__gap'] = 'Telnet, gap errors/second';
+        $graphs['suricata_v2_app_layer__error__tftp__gap'] = 'TFTP, gap errors/second';
+        $graphs['suricata_v2_app_layer__error__tls__gap'] = 'TLS, gap errors/second';
+        // tcp__reassembly_gap
+        $graphs['suricata_v2_tcp__reassembly_gap'] = 'TCP Reassembly, gap errors/second';
     } elseif (strcmp($vars['suricata_graph_set'], 'errors_internal') == 0) {
-        $graphs = [
-            // app_layer__error__*__alloc
-            'suricata_v2_app_layer__error__bittorrent-dht__internal' => 'Bittorrent-DHT, internal errors/second',
-            'suricata_v2_app_layer__error__dcerpc_tcp__internal' => 'DCE RPC TCP, internal errors/second',
-            'suricata_v2_app_layer__error__dcerpc_udp__internal' => 'DCE RPC UDP, internal errors/second',
-            'suricata_v2_app_layer__error__dhcp__internal' => 'DHCP, internal errors/second',
-            'suricata_v2_app_layer__error__dnp3__internal' => 'DNP3, internal errors/second',
-            'suricata_v2_app_layer__error__dns_tcp__internal' => 'DNS TCP, internal errors/second',
-            'suricata_v2_app_layer__error__dns_udp__internal' => 'DNS UDP, internal errors/second',
-            'suricata_v2_app_layer__error__enip_tcp__internal' => 'ENIP TCP, internal errors/second',
-            'suricata_v2_app_layer__error__enip_udp__internal' => 'ENIP UDP, internal errors/second',
-            'suricata_v2_app_layer__error__ftp__internal' => 'FTP, internal errors/second',
-            'suricata_v2_app_layer__error__ftp-data__internal' => 'FTP-DATA, internal errors/second',
-            'suricata_v2_app_layer__error__http__internal' => 'HTTP, internal errors/second',
-            'suricata_v2_app_layer__error__http2__internal' => 'HTTP2, internal errors/second',
-            'suricata_v2_app_layer__error__ike__internal' => 'IKE, internal errors/second',
-            'suricata_v2_app_layer__error__imap__internal' => 'IMAP, internal errors/second',
-            'suricata_v2_app_layer__error__krb5_tcp__internal' => 'KRB5 TCP, internal errors/second',
-            'suricata_v2_app_layer__error__krb5_udp__internal' => 'KRB5 UDP, internal errors/second',
-            'suricata_v2_app_layer__error__modbus__internal' => 'ModBus, internal errors/second',
-            'suricata_v2_app_layer__error__mqtt__internal' => 'MQTT, internal errors/second',
-            'suricata_v2_app_layer__error__nfs_tcp__internal' => 'NFS TCP, internal errors/second',
-            'suricata_v2_app_layer__error__nfs_udp__internal' => 'NFS UDP, internal errors/second',
-            'suricata_v2_app_layer__error__ntp__internal' => 'NTP, internal errors/second',
-            'suricata_v2_app_layer__error__pgsql__internal' => 'Pgsql, internal errors/second',
-            'suricata_v2_app_layer__error__quic__internal' => 'QUIC, internal errors/second',
-            'suricata_v2_app_layer__error__rdp__internal' => 'RDP, internal errors/second',
-            'suricata_v2_app_layer__error__rfb__internal' => 'RFB, internal errors/second',
-            'suricata_v2_app_layer__error__sip__internal' => 'SIP, internal errors/second',
-            'suricata_v2_app_layer__error__smb__internal' => 'SMB, internal errors/second',
-            'suricata_v2_app_layer__error__smtp__internal' => 'SMTP, internal errors/second',
-            'suricata_v2_app_layer__error__snmp__internal' => 'SNMP, internal errors/second',
-            'suricata_v2_app_layer__error__ssh__internal' => 'SSH, internal errors/second',
-            'suricata_v2_app_layer__error__telnet__internal' => 'Telnet, internal errors/second',
-            'suricata_v2_app_layer__error__tftp__internal' => 'TFTP, internal errors/second',
-            'suricata_v2_app_layer__error__tls__internal' => 'TLS, internal errors/second',
-        ];
+        $graphs = [];
+        // app_layer__error__*__alloc
+        $graphs['suricata_v2_app_layer__error__bittorrent-dht__internal'] = 'Bittorrent-DHT, internal errors/second';
+        $graphs['suricata_v2_app_layer__error__dcerpc_tcp__internal'] = 'DCE RPC TCP, internal errors/second';
+        $graphs['suricata_v2_app_layer__error__dcerpc_udp__internal'] = 'DCE RPC UDP, internal errors/second';
+        $graphs['suricata_v2_app_layer__error__dhcp__internal'] = 'DHCP, internal errors/second';
+        if (Rrd::checkRrdExists(Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__dnp3__internal']))) {
+            $graphs['suricata_v2_app_layer__error__dnp3__internal'] = 'DNP3, internal errors/second';
+        }
+        $graphs['suricata_v2_app_layer__error__dns_tcp__internal'] = 'DNS TCP, internal errors/second';
+        $graphs['suricata_v2_app_layer__error__dns_udp__internal'] = 'DNS UDP, internal errors/second';
+        if (Rrd::checkRrdExists(Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__enip_tcp__internal']))) {
+            $graphs['suricata_v2_app_layer__error__enip_tcp__internal'] = 'ENIP TCP, internal errors/second';
+        }
+        if (Rrd::checkRrdExists(Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__enip_udp__internal']))) {
+            $graphs['suricata_v2_app_layer__error__enip_udp__internal'] = 'ENIP UDP, internal errors/second';
+        }
+        $graphs['suricata_v2_app_layer__error__ftp__internal'] = 'FTP, internal errors/second';
+        $graphs['suricata_v2_app_layer__error__ftp-data__internal'] = 'FTP-DATA, internal errors/second';
+        $graphs['suricata_v2_app_layer__error__http__internal'] = 'HTTP, internal errors/second';
+        $graphs['suricata_v2_app_layer__error__http2__internal'] = 'HTTP2, internal errors/second';
+        $graphs['suricata_v2_app_layer__error__ike__internal'] = 'IKE, internal errors/second';
+        $graphs['suricata_v2_app_layer__error__imap__internal'] = 'IMAP, internal errors/second';
+        $graphs['suricata_v2_app_layer__error__krb5_tcp__internal'] = 'KRB5 TCP, internal errors/second';
+        $graphs['suricata_v2_app_layer__error__krb5_udp__internal'] = 'KRB5 UDP, internal errors/second';
+        if (Rrd::checkRrdExists(Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__modbus__internal']))) {
+            $graphs['suricata_v2_app_layer__error__modbus__internal'] = 'ModBus, internal errors/second';
+        }
+        $graphs['suricata_v2_app_layer__error__mqtt__internal'] = 'MQTT, internal errors/second';
+        $graphs['suricata_v2_app_layer__error__nfs_tcp__internal'] = 'NFS TCP, internal errors/second';
+        $graphs['suricata_v2_app_layer__error__nfs_udp__internal'] = 'NFS UDP, internal errors/second';
+        $graphs['suricata_v2_app_layer__error__ntp__internal'] = 'NTP, internal errors/second';
+        $graphs['suricata_v2_app_layer__error__pgsql__internal'] = 'Pgsql, internal errors/second';
+        $graphs['suricata_v2_app_layer__error__quic__internal'] = 'QUIC, internal errors/second';
+        $graphs['suricata_v2_app_layer__error__rdp__internal'] = 'RDP, internal errors/second';
+        $graphs['suricata_v2_app_layer__error__rfb__internal'] = 'RFB, internal errors/second';
+        $graphs['suricata_v2_app_layer__error__sip__internal'] = 'SIP, internal errors/second';
+        $graphs['suricata_v2_app_layer__error__smb__internal'] = 'SMB, internal errors/second';
+        $graphs['suricata_v2_app_layer__error__smtp__internal'] = 'SMTP, internal errors/second';
+        $graphs['suricata_v2_app_layer__error__snmp__internal'] = 'SNMP, internal errors/second';
+        $graphs['suricata_v2_app_layer__error__ssh__internal'] = 'SSH, internal errors/second';
+        $graphs['suricata_v2_app_layer__error__telnet__internal'] = 'Telnet, internal errors/second';
+        $graphs['suricata_v2_app_layer__error__tftp__internal' ] = 'TFTP, internal errors/second';
+        $graphs['suricata_v2_app_layer__error__tls__internal'] = 'TLS, internal errors/second';
     } elseif (strcmp($vars['suricata_graph_set'], 'errors_parser') == 0) {
-        $graphs = [
-            // app_layer__error__*__parser
-            'suricata_v2_app_layer__error__bittorrent-dht__parser' => 'Bittorrent-DHT, parser errors/second',
-            'suricata_v2_app_layer__error__dcerpc_tcp__parser' => 'DCE RPC TCP, parser errors/second',
-            'suricata_v2_app_layer__error__dcerpc_udp__parser' => 'DCE RPC UDP, parser errors/second',
-            'suricata_v2_app_layer__error__dhcp__parser' => 'DHCP, parser errors/second',
-            'suricata_v2_app_layer__error__dnp3__parser' => 'DNP3, parser errors/second',
-            'suricata_v2_app_layer__error__dns_tcp__parser' => 'DNS TCP, parser errors/second',
-            'suricata_v2_app_layer__error__dns_udp__parser' => 'DNS UDP, parser errors/second',
-            'suricata_v2_app_layer__error__enip_tcp__parser' => 'ENIP TCP, parser errors/second',
-            'suricata_v2_app_layer__error__enip_udp__parser' => 'ENIP UDP, parser errors/second',
-            'suricata_v2_app_layer__error__ftp__parser' => 'FTP, parser errors/second',
-            'suricata_v2_app_layer__error__ftp-data__parser' => 'FTP-DATA, parser errors/second',
-            'suricata_v2_app_layer__error__http__parser' => 'HTTP, parser errors/second',
-            'suricata_v2_app_layer__error__http2__parser' => 'HTTP2, parser errors/second',
-            'suricata_v2_app_layer__error__ike__parser' => 'IKE, parser errors/second',
-            'suricata_v2_app_layer__error__imap__parser' => 'IMAP, parser errors/second',
-            'suricata_v2_app_layer__error__krb5_tcp__parser' => 'KRB5 TCP, parser errors/second',
-            'suricata_v2_app_layer__error__krb5_udp__parser' => 'KRB5 UDP, parser errors/second',
-            'suricata_v2_app_layer__error__modbus__parser' => 'ModBus, parser errors/second',
-            'suricata_v2_app_layer__error__mqtt__parser' => 'MQTT, parser errors/second',
-            'suricata_v2_app_layer__error__nfs_tcp__parser' => 'NFS TCP, parser errors/second',
-            'suricata_v2_app_layer__error__nfs_udp__parser' => 'NFS UDP, parser errors/second',
-            'suricata_v2_app_layer__error__ntp__parser' => 'NTP, parser errors/second',
-            'suricata_v2_app_layer__error__pgsql__parser' => 'Pgsql, parser errors/second',
-            'suricata_v2_app_layer__error__quic__parser' => 'QUIC, parser errors/second',
-            'suricata_v2_app_layer__error__rdp__parser' => 'RDP, parser errors/second',
-            'suricata_v2_app_layer__error__rfb__parser' => 'RFB, parser errors/second',
-            'suricata_v2_app_layer__error__sip__parser' => 'SIP, parser errors/second',
-            'suricata_v2_app_layer__error__smb__parser' => 'SMB, parser errors/second',
-            'suricata_v2_app_layer__error__smtp__parser' => 'SMTP, parser errors/second',
-            'suricata_v2_app_layer__error__snmp__parser' => 'SNMP, parser errors/second',
-            'suricata_v2_app_layer__error__ssh__parser' => 'SSH, parser errors/second',
-            'suricata_v2_app_layer__error__telnet__parser' => 'Telnet, parser errors/second',
-            'suricata_v2_app_layer__error__tftp__parser' => 'TFTP, parser errors/second',
-            'suricata_v2_app_layer__error__tls__parser' => 'TLS, parser errors/second',
-        ];
+        $graphs = [];
+        // app_layer__error__*__parser
+        $graphs['suricata_v2_app_layer__error__bittorrent-dht__parser'] = 'Bittorrent-DHT, parser errors/second';
+        $graphs['suricata_v2_app_layer__error__dcerpc_tcp__parser'] = 'DCE RPC TCP, parser errors/second';
+        $graphs['suricata_v2_app_layer__error__dcerpc_udp__parser'] = 'DCE RPC UDP, parser errors/second';
+        $graphs['suricata_v2_app_layer__error__dhcp__parser'] = 'DHCP, parser errors/second';
+        if (Rrd::checkRrdExists(Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__dnp3__parser']))) {
+            $graphs['suricata_v2_app_layer__error__dnp3__parser'] = 'DNP3, parser errors/second';
+        }
+        $graphs['suricata_v2_app_layer__error__dns_tcp__parser'] = 'DNS TCP, parser errors/second';
+        $graphs['suricata_v2_app_layer__error__dns_udp__parser'] = 'DNS UDP, parser errors/second';
+        if (Rrd::checkRrdExists(Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__enip_tcp__parser']))) {
+            $graphs['suricata_v2_app_layer__error__enip_tcp__parser'] = 'ENIP TCP, parser errors/second';
+        }
+        if (Rrd::checkRrdExists(Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__enip_udp__parser']))) {
+            $graphs['suricata_v2_app_layer__error__enip_udp__parser'] = 'ENIP UDP, parser errors/second';
+        }
+        $graphs['suricata_v2_app_layer__error__ftp__parser'] = 'FTP, parser errors/second';
+        $graphs['suricata_v2_app_layer__error__ftp-data__parser'] = 'FTP-DATA, parser errors/second';
+        $graphs['suricata_v2_app_layer__error__http__parser'] = 'HTTP, parser errors/second';
+        $graphs['suricata_v2_app_layer__error__http2__parser'] = 'HTTP2, parser errors/second';
+        $graphs['suricata_v2_app_layer__error__ike__parser'] = 'IKE, parser errors/second';
+        $graphs['suricata_v2_app_layer__error__imap__parser'] = 'IMAP, parser errors/second';
+        $graphs['suricata_v2_app_layer__error__krb5_tcp__parser'] = 'KRB5 TCP, parser errors/second';
+        $graphs['suricata_v2_app_layer__error__krb5_udp__parser'] = 'KRB5 UDP, parser errors/second';
+        if (Rrd::checkRrdExists(Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__modbus__parser']))) {
+            $graphs['suricata_v2_app_layer__error__modbus__parser'] = 'ModBus, parser errors/second';
+        }
+        $graphs['suricata_v2_app_layer__error__mqtt__parser'] = 'MQTT, parser errors/second';
+        $graphs['suricata_v2_app_layer__error__nfs_tcp__parser'] = 'NFS TCP, parser errors/second';
+        $graphs['suricata_v2_app_layer__error__nfs_udp__parser'] = 'NFS UDP, parser errors/second';
+        $graphs['suricata_v2_app_layer__error__ntp__parser'] = 'NTP, parser errors/second';
+        $graphs['suricata_v2_app_layer__error__pgsql__parser'] = 'Pgsql, parser errors/second';
+        $graphs['suricata_v2_app_layer__error__quic__parser'] = 'QUIC, parser errors/second';
+        $graphs['suricata_v2_app_layer__error__rdp__parser'] = 'RDP, parser errors/second';
+        $graphs['suricata_v2_app_layer__error__rfb__parser'] = 'RFB, parser errors/second';
+        $graphs['suricata_v2_app_layer__error__sip__parser'] = 'SIP, parser errors/second';
+        $graphs['suricata_v2_app_layer__error__smb__parser'] = 'SMB, parser errors/second';
+        $graphs['suricata_v2_app_layer__error__smtp__parser'] = 'SMTP, parser errors/second';
+        $graphs['suricata_v2_app_layer__error__snmp__parser'] = 'SNMP, parser errors/second';
+        $graphs['suricata_v2_app_layer__error__ssh__parser'] = 'SSH, parser errors/second';
+        $graphs['suricata_v2_app_layer__error__telnet__parser'] = 'Telnet, parser errors/second';
+        $graphs['suricata_v2_app_layer__error__tftp__parser'] = 'TFTP, parser errors/second';
+        $graphs['suricata_v2_app_layer__error__tls__parser'] = 'TLS, parser errors/second';
     } elseif (strcmp($vars['suricata_graph_set'], 'decoder_erspan') == 0) {
         $graphs = [
             'suricata_v2_decoder__event__erspan__header_too_small' => 'ERSPAN Header Too Small, packets/second',
