@@ -1,28 +1,19 @@
 <?php
 
+$munge = true;
 $name = 'suricata';
 $unit_text = 'Packets';
-$colours = 'psychedelic';
-$dostack = 0;
-$printtotal = 1;
-$addarea = 0;
-$transparency = 15;
+$descr = 'Drop Prct';
+$ds = 'data';
 
 if (isset($vars['sinstance'])) {
-    $drop_percent_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___drop_percent']);
+    $filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___drop_percent']);
 } else {
-    $drop_percent_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___drop_percent']);
+    $filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___drop_percent']);
 }
 
-$rrd_list = [];
-if (Rrd::checkRrdExists($drop_percent_rrd_filename)) {
-    $rrd_list[] = [
-        'filename' => $drop_percent_rrd_filename,
-        'descr' => 'Drop Prct',
-        'ds' => 'data',
-    ];
-} else {
-    d_echo('RRD "' . $drop_percent_rrd_filename . '" not found');
+if (Rrd::checkRrdExists($filename)) {
+    d_echo('RRD "' . $filename . '" not found');
 }
 
-require 'includes/html/graphs/generic_multi_line.inc.php';
+require 'includes/html/graphs/generic_stats.inc.php';
