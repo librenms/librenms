@@ -1,6 +1,6 @@
 <?php
 
-$munge = true;
+
 $name = 'suricata';
 $unit_text = 'MPLS pkts/s';
 $descr = 'Pkt Too Small';

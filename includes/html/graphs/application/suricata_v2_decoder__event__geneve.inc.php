@@ -1,6 +1,6 @@
 <?php
 
-$munge = true;
+
 $name = 'suricata';
 $unit_text = 'Geneve packets/s';
 $descr = 'Unknown Payload';

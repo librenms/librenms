@@ -1,6 +1,6 @@
 <?php
 
-$munge = true;
+
 $name = 'suricata';
 $unit_text = 'GRE pkts/s';
 $descr = 'Ver0 Mal SRE HDR';

@@ -1,6 +1,6 @@
 <?php
 
-$munge = true;
+
 $name = 'suricata';
 $unit_text = 'ERSPAN pkts/s';
 $descr = 'Too Many VLAN Layers';

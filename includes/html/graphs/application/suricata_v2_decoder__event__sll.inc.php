@@ -1,6 +1,6 @@
 <?php
 
-$munge = true;
+
 $name = 'suricata';
 $unit_text = 'SLL packets/s';
 $descr = 'Pkt Too Small';

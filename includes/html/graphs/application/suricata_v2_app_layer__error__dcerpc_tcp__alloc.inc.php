@@ -1,6 +1,6 @@
 <?php
 
-$munge = true;
+
 $name = 'suricata';
 $unit_text = 'errors/s';
 $descr = 'DCE RPC TCP';

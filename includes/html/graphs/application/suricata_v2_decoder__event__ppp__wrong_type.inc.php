@@ -1,6 +1,6 @@
 <?php
 
-$munge = true;
+
 $name = 'suricata';
 $unit_text = 'PPP pkts/s';
 $descr = 'Wrong Type';

@@ -1,6 +1,6 @@
 <?php
 
-$munge = true;
+
 $name = 'suricata';
 $unit_text = 'LT Null pkts/s';
 $descr = 'Unsupported Type';

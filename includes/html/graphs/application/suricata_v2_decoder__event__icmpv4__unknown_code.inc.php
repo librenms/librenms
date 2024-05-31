@@ -1,6 +1,6 @@
 <?php
 
-$munge = true;
+
 $name = 'suricata';
 $unit_text = 'ICMPv4 pkts/s';
 $descr = 'Unknown Code';

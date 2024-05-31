@@ -1,6 +1,6 @@
 <?php
 
-$munge = true;
+
 $name = 'suricata';
 $unit_text = 'NSH pkts/s';
 $descr = 'Unknown Payload';

@@ -1,6 +1,6 @@
 <?php
 
-$munge = true;
+
 $name = 'suricata';
 $unit_text = 'VNTag pkts/s';
 $descr = 'Hdr Too Small';

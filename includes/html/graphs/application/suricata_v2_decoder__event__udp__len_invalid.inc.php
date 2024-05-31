@@ -1,6 +1,6 @@
 <?php
 
-$munge = true;
+
 $name = 'suricata';
 $unit_text = 'UDP pkts/s';
 $descr = 'Len Invalid';

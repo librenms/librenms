@@ -1,6 +1,6 @@
 <?php
 
-$munge = true;
+
 $name = 'suricata';
 $unit_text = 'Ethernet pkts/s';
 $descr = 'Pkt To Small';

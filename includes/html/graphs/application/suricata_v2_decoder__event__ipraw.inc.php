@@ -1,6 +1,6 @@
 <?php
 
-$munge = true;
+
 $name = 'suricata';
 $unit_text = 'IP Raw packets/s';
 $descr = 'Inv IP Ver';
