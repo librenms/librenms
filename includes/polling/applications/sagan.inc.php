@@ -80,7 +80,7 @@ foreach ($sagan['data'] as $instance => $stats) {
 }
 
 $old_instances = $app->app['instances'] ?? [];
-$new_data['instances'] = $instances;
+$new_data = ['instances' => $instances];
 
 //check for added instances
 $added_instances = array_values(array_diff($instances, $old_instances));
