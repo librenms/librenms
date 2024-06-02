@@ -1,6 +1,5 @@
 <?php
 
-//$munge = true;
 $name = 'suricata';
 $unit_text = 'Packets';
 $descr = 'Drop Prct';

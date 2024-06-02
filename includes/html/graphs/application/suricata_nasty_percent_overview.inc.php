@@ -7,7 +7,6 @@ $drop_percent_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app-
 
 $rrd_list = [];
 if (Rrd::checkRrdExists($drop_percent_rrd_filename)) {
-    $munge = true;
     $unit_text = 'Packets';
     $descr = 'Drop Prct';
     $ds = 'data';
