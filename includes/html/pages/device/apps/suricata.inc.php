@@ -610,7 +610,7 @@ if ($app_data['version'] == 1) {
         $graphs['suricata_v2_app_layer__error__snmp__internal'] = 'SNMP, internal errors/second';
         $graphs['suricata_v2_app_layer__error__ssh__internal'] = 'SSH, internal errors/second';
         $graphs['suricata_v2_app_layer__error__telnet__internal'] = 'Telnet, internal errors/second';
-        $graphs['suricata_v2_app_layer__error__tftp__internal' ] = 'TFTP, internal errors/second';
+        $graphs['suricata_v2_app_layer__error__tftp__internal'] = 'TFTP, internal errors/second';
         $graphs['suricata_v2_app_layer__error__tls__internal'] = 'TLS, internal errors/second';
     } elseif (strcmp($vars['suricata_graph_set'], 'errors_parser') == 0) {
         $graphs = [];
