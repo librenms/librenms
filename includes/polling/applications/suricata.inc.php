@@ -218,7 +218,7 @@ if ($suricata['version'] == 1) {
                 $rrd_name = ['app', $name, $app->app_id, 'instance_' . $instance . '___' . $stat];
                 $fields = ['data' => $value];
 
-                $metrics['instance_' . $instance . '_' . $stat] = $value;
+                $metrics['instances_' . $instance . '_' . $stat] = $value;
 
                 // Check if it is a gauge or counter
                 if (isset($suricata_stat_gauges[$stat])) {
