@@ -1,6 +1,5 @@
 <?php
 
-
 $name = 'suricata';
 $unit_text = 'PPPoE pkts/s';
 $descr = 'Packet Too Small';

@@ -1,6 +1,5 @@
 <?php
 
-
 $name = 'suricata';
 $unit_text = 'IPv6 pkts/s';
 $descr = 'IP6 in IP6 Wrong Ver';

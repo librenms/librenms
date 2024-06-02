@@ -1,6 +1,5 @@
 <?php
 
-
 $name = 'suricata';
 $unit_text = 'IPv4 pkts/s';
 $descr = 'Opt Invalid Len';

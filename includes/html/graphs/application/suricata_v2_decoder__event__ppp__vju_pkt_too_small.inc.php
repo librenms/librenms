@@ -1,6 +1,5 @@
 <?php
 
-
 $name = 'suricata';
 $unit_text = 'PPP pkts/s';
 $descr = 'Vju Pkt Too Small';

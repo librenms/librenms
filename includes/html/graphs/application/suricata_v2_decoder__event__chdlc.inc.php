@@ -1,6 +1,5 @@
 <?php
 
-
 $name = 'suricata';
 $unit_text = 'packets/s';
 $descr = 'CHDLC Pkg Too Small';

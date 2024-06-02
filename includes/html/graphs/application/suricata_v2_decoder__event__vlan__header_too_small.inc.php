@@ -1,6 +1,5 @@
 <?php
 
-
 $name = 'suricata';
 $unit_text = 'VLAN pkts/s';
 $descr = 'Hdr Too Small';

@@ -1,6 +1,5 @@
 <?php
 
-
 $name = 'suricata';
 $unit_text = 'MPLS pkts/s';
 $descr = 'Bad Label Rtr Alt';

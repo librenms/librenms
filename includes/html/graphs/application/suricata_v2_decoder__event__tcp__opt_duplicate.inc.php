@@ -1,6 +1,5 @@
 <?php
 
-
 $name = 'suricata';
 $unit_text = 'TCP pkts/s';
 $descr = 'Opt Duplicate';

@@ -1,6 +1,5 @@
 <?php
 
-
 $name = 'suricata';
 $unit_text = 'NSH pkts/s';
 $descr = 'Bad Hdr Len';

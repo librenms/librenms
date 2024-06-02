@@ -1,6 +1,5 @@
 <?php
 
-
 $name = 'suricata';
 $unit_text = 'errors/s';
 $descr = 'NFS UDP';

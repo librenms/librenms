@@ -1,6 +1,5 @@
 <?php
 
-
 $name = 'suricata';
 $unit_text = 'SCTP packets/s';
 $descr = 'Pkt Too Small';

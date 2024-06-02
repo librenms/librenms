@@ -1,6 +1,5 @@
 <?php
 
-
 $name = 'suricata';
 $unit_text = 'ESP packets/s';
 $descr = 'Pkgs To Small';

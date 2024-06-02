@@ -1,6 +1,5 @@
 <?php
 
-
 $name = 'suricata';
 $unit_text = 'pkt/s';
 $descr = 'KRB5 TCP';

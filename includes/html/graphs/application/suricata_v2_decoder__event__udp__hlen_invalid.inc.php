@@ -1,6 +1,5 @@
 <?php
 
-
 $name = 'suricata';
 $unit_text = 'UDP pkts/s';
 $descr = 'Hlen Invalid';

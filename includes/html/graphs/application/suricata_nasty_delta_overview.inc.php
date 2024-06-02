@@ -33,7 +33,7 @@ if (Rrd::checkRrdExists($error_delta_rrd_filename)) {
         'filename' => $error_delta_rrd_filename,
         'descr' => 'Errors',
         'ds' => 'data',
-        ];
+    ];
 }
 if (! isset($rrd_list[0]) && Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [

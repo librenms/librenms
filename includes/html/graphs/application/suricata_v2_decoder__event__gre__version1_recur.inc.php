@@ -1,6 +1,5 @@
 <?php
 
-
 $name = 'suricata';
 $unit_text = 'GRE pkts/s';
 $descr = 'Ver1 Recur';

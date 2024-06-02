@@ -1,6 +1,5 @@
 <?php
 
-
 $name = 'suricata';
 $unit_text = '802.1ah pkts/s';
 $descr = 'Header To Small';

@@ -1,6 +1,5 @@
 <?php
 
-
 $name = 'suricata';
 $unit_text = 'ERSPAN pkts/s';
 $descr = 'Header Too Small';

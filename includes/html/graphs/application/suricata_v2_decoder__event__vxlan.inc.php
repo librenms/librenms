@@ -1,6 +1,5 @@
 <?php
 
-
 $name = 'suricata';
 $unit_text = 'VXLAN packets/s';
 $descr = 'Unknown Payload Type';

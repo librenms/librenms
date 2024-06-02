@@ -1,6 +1,5 @@
 <?php
 
-
 $name = 'suricata';
 $unit_text = 'flows/s';
 $descr = 'NFS TCP';

@@ -1,6 +1,5 @@
 <?php
 
-
 $name = 'suricata';
 $unit_text = 'DCE packets/s';
 $descr = 'Pkt To Small';

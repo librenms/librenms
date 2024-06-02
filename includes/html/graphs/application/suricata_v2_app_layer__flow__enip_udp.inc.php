@@ -1,6 +1,5 @@
 <?php
 
-
 $name = 'suricata';
 $unit_text = 'flows/s';
 $descr = 'ENIP UDP';
