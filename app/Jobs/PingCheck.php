@@ -32,6 +32,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 use LibreNMS\Alert\AlertRules;
 use LibreNMS\Data\Source\Fping;
 use LibreNMS\Data\Source\FpingResponse;
@@ -64,6 +65,11 @@ class PingCheck implements ShouldQueue
         if (is_array($groups)) {
             $this->groups = $groups;
         }
+
+        // working collections
+        $this->deferred = new Collection;
+        $this->waiting_on = new Collection;
+        $this->processed = new Collection;
     }
 
     /**
@@ -75,7 +81,7 @@ class PingCheck implements ShouldQueue
     {
         $ping_start = microtime(true);
 
-        $ordered_hostname_list = $this->fetchOrderedHostnames();
+        $ordered_hostname_list = $this->orderHostnames($this->fetchDevices());
 
         if (Debug::isVerbose()) {
             echo 'Processing hosts in this order : ' . implode(', ', $ordered_hostname_list) . PHP_EOL;
@@ -101,61 +107,29 @@ class PingCheck implements ShouldQueue
     /**
      * Get an ordered list of hostnames that we need to ping starting from devices with no parents
      */
-    private function fetchOrderedHostnames(): array
+    private function orderHostnames(Collection $devices): array
     {
-        $ret = [];
-        $current_hostnames = [];
-        $deferred_device_ids = new Collection();
 
-        $device_list = $this->fetchDevices();
+        $ordered_device_list = new Collection;
 
-        foreach ($device_list as $hostname => $device) {
-            if ($device->parents->count() === 0) {
-                $current_hostnames[] = $hostname;
-            } else {
-                $deferred_device_ids->put($device->device_id, $hostname);
-            }
+        // start with root nodes (no parents)
+        [$current_tier_devices, $pending_children] = $devices->keyBy('device_id')->partition(fn(Device $d) => $d->parents_count === 0);
+
+        // recurse down until no children are found
+        while ($current_tier_devices->isNotEmpty()) {
+            // add current tier to the list
+            $ordered_device_list = $ordered_device_list->merge($current_tier_devices);
+            // fetch the next tier of devices
+            $current_tier_devices = $current_tier_devices
+                ->pluck('children.*.device_id')->flatten() // get all direct child ids
+                ->map(fn($child_id) => $pending_children->pull($child_id)) // fetch and remove the device from pending if it exists
+                ->filter(); // filter out children that are already in the list
         }
 
-        while (count($current_hostnames) > 0) {
-            if (Debug::isVerbose()) {
-                echo 'Adding hosts to ordered list : ' . implode(', ', $current_hostnames) . PHP_EOL;
-            }
+        // just add any left over
+        $ordered_device_list = $ordered_device_list->merge($pending_children);
 
-            $ret = array_merge($ret, $current_hostnames);
-
-            $current_hostnames = $this->getUnprocessedChildren($current_hostnames, $deferred_device_ids);
-        }
-
-        if (count($deferred_device_ids) > 0) {
-            if (Debug::isVerbose()) {
-                echo 'Adding unprocessed deferred hosts to ordered list : ' . $deferred_device_ids->values()->implode(', ') . PHP_EOL;
-            }
-
-            $ret = array_merge($ret, $deferred_device_ids->values()->toArray());
-        }
-
-        return $ret;
-    }
-
-    /**
-     * For each hostname given, get the device and return any unprocessed child hostnames, removing from the unprocessed list
-     */
-    private function getUnprocessedChildren(array $hostnames, Collection &$unprocessed): array
-    {
-        $ret = [];
-
-        foreach ($hostnames as $hostname) {
-            $device = $this->devices->get($hostname);
-            foreach ($device->children as $child) {
-                if ($unprocessed->has($child->device_id)) {
-                    $child_id = $unprocessed->pull($child->device_id);
-                    $ret[] = $child_id;
-                }
-            }
-        }
-
-        return $ret;
+        return $ordered_device_list->map(fn(Device $device) => $device->overwrite_ip ?: $device->hostname)->all();
     }
 
     /**
