@@ -36,7 +36,6 @@ use Illuminate\Support\Facades\Log;
 use LibreNMS\Alert\AlertRules;
 use LibreNMS\Data\Source\Fping;
 use LibreNMS\Data\Source\FpingResponse;
-use LibreNMS\Util\Debug;
 
 class PingCheck implements ShouldQueue
 {
@@ -79,9 +78,7 @@ class PingCheck implements ShouldQueue
 
         $ordered_hostname_list = $this->orderHostnames($this->fetchDevices());
 
-        if (Debug::isVerbose()) {
-            Log::info('Processing hosts in this order : ' . implode(', ', $ordered_hostname_list));
-        }
+        Log::info('Processing hosts in this order : ' . implode(', ', $ordered_hostname_list));
 
         // bulk ping and send FpingResponse's to recordData as they come in
         app()->make(Fping::class)->bulkPing($ordered_hostname_list, [$this, 'handleResponse']);
@@ -105,7 +102,6 @@ class PingCheck implements ShouldQueue
      */
     private function orderHostnames(Collection $devices): array
     {
-
         $ordered_device_list = new Collection;
 
         // start with root nodes (no parents)
