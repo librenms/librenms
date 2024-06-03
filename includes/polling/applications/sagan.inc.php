@@ -95,8 +95,6 @@ if (sizeof($added_instances) > 0 or sizeof($removed_instances) > 0) {
     log_event($log_message, $device, 'application');
 }
 
-$app->data = $new_data;
-
 //
 // all done so update the app metrics
 //
