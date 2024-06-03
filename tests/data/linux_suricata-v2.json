@@ -22,24 +22,12 @@
                     "discovered": 1,
                     "app_state_prev": "UNKNOWN",
                     "app_status": "",
+                    "app_instance": "",
                     "data": "{\"version\":2,\"instances\":[\"ids\"]}",
-                    "data": null,
                     "deleted_at": null
                 }
             ],
             "application_metrics": [
-                {
-                    "metric": "alert",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "suricata"
-                },
-                {
-                    "metric": "alertString",
-                    "value": "",
-                    "value_prev": null,
-                    "app_type": "suricata"
-                },
                 {
                     "metric": "instances_ids_app_layer__error__bittorrent-dht__alloc",
                     "value": 0,
