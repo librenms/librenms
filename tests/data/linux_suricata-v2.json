@@ -21,7 +21,7 @@
                     "discovered": "1",
                     "app_state_prev": "UNKNOWN",
                     "app_status": "",
-                    "data": "'{\"version\":2,\"instances\":[\"ids\"]}'",
+                    "data": "{\"version\":2,\"instances\":[\"ids\"]}",
                     "data": null
                 }
             ],
