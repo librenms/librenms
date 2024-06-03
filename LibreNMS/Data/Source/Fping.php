@@ -127,9 +127,7 @@ class Fping
                             $partial = '';
                         } catch (FpingUnparsableLine $e) {
                             // handle possible partial line (only save it if it is the last line of output)
-                            if ($index === array_key_last($lines)) {
-                                $partial = $e->unparsedLine;
-                            }
+                            $partial = $index === array_key_last($lines) ? $e->unparsedLine : '';
                         }
                     }
                 }
