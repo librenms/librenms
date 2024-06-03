@@ -210,6 +210,7 @@ $suricata_stat_keys = [
     'app_layer__tx__telnet' => 1,
     'app_layer__tx__tftp' => 1,
     'app_layer__tx__tls' => 1,
+    'capture__kernel_drops_any' => 1,
     'capture__kernel_drops' => 1,
     'capture__kernel_ifdrops' => 1,
     'capture__kernel_packets' => 1,
