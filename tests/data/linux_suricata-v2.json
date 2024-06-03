@@ -1499,7 +1499,7 @@
                     "app_type": "suricata"
                 },
                 {
-                    "metric": "instances_ids_decoder__event__icmpv6__mld_message_with_invalid_hl",
+                    "metric": "instances_ids_decoder__event__icmpv6__mld_message_with_invalid_h",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "suricata"
@@ -3077,30 +3077,6 @@
                     "app_type": "suricata"
                 },
                 {
-                    "metric": "totals_app_layer__error__ftp-data__alloc",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "suricata"
-                },
-                {
-                    "metric": "totals_app_layer__error__ftp-data__gap",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "suricata"
-                },
-                {
-                    "metric": "totals_app_layer__error__ftp-data__internal",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "suricata"
-                },
-                {
-                    "metric": "totals_app_layer__error__ftp-data__parser",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "suricata"
-                },
-                {
                     "metric": "totals_app_layer__error__ftp__alloc",
                     "value": 0,
                     "value_prev": null,
@@ -3125,25 +3101,25 @@
                     "app_type": "suricata"
                 },
                 {
-                    "metric": "totals_app_layer__error__http2__alloc",
+                    "metric": "totals_app_layer__error__ftp-data__alloc",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "suricata"
                 },
                 {
-                    "metric": "totals_app_layer__error__http2__gap",
+                    "metric": "totals_app_layer__error__ftp-data__gap",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "suricata"
                 },
                 {
-                    "metric": "totals_app_layer__error__http2__internal",
+                    "metric": "totals_app_layer__error__ftp-data__internal",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "suricata"
                 },
                 {
-                    "metric": "totals_app_layer__error__http2__parser",
+                    "metric": "totals_app_layer__error__ftp-data__parser",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "suricata"
@@ -3169,6 +3145,30 @@
                 {
                     "metric": "totals_app_layer__error__http__parser",
                     "value": 72,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "totals_app_layer__error__http2__alloc",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "totals_app_layer__error__http2__gap",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "totals_app_layer__error__http2__internal",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "totals_app_layer__error__http2__parser",
+                    "value": 0,
                     "value_prev": null,
                     "app_type": "suricata"
                 },
