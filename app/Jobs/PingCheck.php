@@ -62,11 +62,7 @@ class PingCheck implements ShouldQueue
      */
     public function __construct(array $groups = [])
     {
-        if (is_array($groups)) {
-            $this->groups = $groups;
-        }
-
-        // working collections
+        $this->groups = $groups;
         $this->deferred = new Collection;
         $this->waiting_on = new Collection;
         $this->processed = new Collection;
@@ -84,7 +80,7 @@ class PingCheck implements ShouldQueue
         $ordered_hostname_list = $this->orderHostnames($this->fetchDevices());
 
         if (Debug::isVerbose()) {
-            echo 'Processing hosts in this order : ' . implode(', ', $ordered_hostname_list) . PHP_EOL;
+            Log::info('Processing hosts in this order : ' . implode(', ', $ordered_hostname_list));
         }
 
         // bulk ping and send FpingResponse's to recordData as they come in
@@ -92,11 +88,11 @@ class PingCheck implements ShouldQueue
 
         // check for any left over devices
         if ($this->deferred->isNotEmpty()) {
-            d_echo("Leftover deferred devices, this shouldn't happen: " . $this->deferred->keys()->implode(', ') . PHP_EOL);
+            Log::debug("Leftover deferred devices, this shouldn't happen: " . $this->deferred->keys()->implode(', '));
         }
 
         if ($this->waiting_on->isNotEmpty()) {
-            d_echo("Leftover waiting on devices, this shouldn't happen: " . $this->waiting_on->keys()->implode(', ') . PHP_EOL);
+            Log::debug("Leftover waiting on devices, this shouldn't happen: " . $this->waiting_on->keys()->implode(', '));
         }
 
         if (\App::runningInConsole()) {
@@ -169,14 +165,17 @@ class PingCheck implements ShouldQueue
      */
     public function handleResponse(FpingResponse $response): void
     {
-        if (Debug::isVerbose()) {
-            echo "Attempting to record data for $response->host... \n";
-        }
+        Log::debug("Attempting to record data for $response->host");
 
         $device = $this->devices->get($response->host);
 
+        if ($device === null) {
+            Log::error("Ping host from response not found $response->host");
+            return;
+        }
+
         $waiting_on = [];
-        foreach ($device->parents as $parent) {
+        foreach ($device->parents ?? [] as $parent) {
             if (! $this->processed->has($parent->device_id)) {
                 $waiting_on[] = $parent->device_id;
             }
@@ -195,28 +194,19 @@ class PingCheck implements ShouldQueue
 
         // mark as processed
         $this->processed->put($device->device_id, true);
-        d_echo("Recorded data for $device->hostname\n");
+        Log::debug("Recorded data for $device->hostname");
 
         if (isset($type)) { // only run alert rules if status changed
-            if (Debug::isEnabled()) {
-                echo "Device $device->hostname changed status to $type, running alerts\n";
-            }
-            if (count($waiting_on) === 0) {
-                if (Debug::isVerbose()) {
-                    echo "Success\n";
-                }
+            Log::debug("Device $device->hostname changed status to $type, running alerts");
 
+            if (count($waiting_on) === 0) {
                 $this->runAlerts($device->device_id);
             } else {
-                if (Debug::isVerbose()) {
-                    echo "Deferred\n";
-                }
+                Log::debug("Alerts Deferred");
 
                 $this->deferred->put($device->device_id, $device->parents);
                 foreach ($waiting_on as $parent_id) {
-                    if (Debug::isVerbose()) {
-                        echo "Adding $device->device_id to list waiting for $parent_id\n";
-                    }
+                    Log::debug("Adding $device->device_id to list waiting for $parent_id");
 
                     if ($this->waiting_on->has($parent_id)) {
                         $child_list = $this->waiting_on->get($parent_id);
@@ -250,18 +240,14 @@ class PingCheck implements ShouldQueue
 
                     foreach ($parents as $parent) {
                         if (! $this->processed->has($parent->device_id)) {
-                            if (Debug::isVerbose()) {
-                                echo "Deferring device $child_id triggered by $device_id still waiting for $parent->device_id\n";
-                            }
+                            Log::debug("Deferring device $child_id triggered by $device_id still waiting for $parent->device_id");
 
                             $alert_child = false;
                         }
                     }
 
                     if ($alert_child) {
-                        if (Debug::isVerbose()) {
-                            echo "Deferred device $child_id triggered by $device_id\n";
-                        }
+                        Log::debug("Deferred device $child_id triggered by $device_id");
 
                         $this->runAlerts($child_id);
                         $this->deferred->pull($child_id);
