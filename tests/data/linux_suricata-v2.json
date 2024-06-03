@@ -29,6 +29,12 @@
             ],
             "application_metrics": [
                 {
+                    "metric": "alert",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
                     "metric": "instances_ids_app_layer__error__bittorrent-dht__alloc",
                     "value": 0,
                     "value_prev": null,
