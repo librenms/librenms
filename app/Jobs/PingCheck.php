@@ -41,25 +41,25 @@ class PingCheck implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    /** @var \Illuminate\Database\Eloquent\Collection<string, Device>|null List of devices keyed by hostname */
-    private $devices;
+    /** @var Collection<string, Device> List of devices keyed by hostname */
+    private Collection $devices;
     /** @var array List of device group ids to check */
-    private $groups = [];
+    private array $groups = [];
 
     // working data for loop
     /** @var Collection */
-    private $deferred;
-    /** @var Collection */
-    private $waiting_on;
-    /** @var Collection */
-    private $processed;
+    private Collection $deferred;
+    /** @var Collection<int, Collection<Device>> device id, parent devices */
+    private Collection $waiting_on;
+    /** @var Collection<int, bool> */
+    private Collection $processed;
 
     /**
      * Create a new job instance.
      *
      * @param  array  $groups  List of distributed poller groups to check
      */
-    public function __construct($groups = [])
+    public function __construct(array $groups = [])
     {
         if (is_array($groups)) {
             $this->groups = $groups;
@@ -161,7 +161,7 @@ class PingCheck implements ShouldQueue
     /**
      * Fetch and cache all devices that we need to process
      */
-    private function fetchDevices()
+    private function fetchDevices(): Collection
     {
         if (isset($this->devices)) {
             return $this->devices;
@@ -186,11 +186,6 @@ class PingCheck implements ShouldQueue
         $this->devices = $query->get()->keyBy(function ($device) {
             return $device->overwrite_ip ?: $device->hostname;
         });
-
-        // working collections
-        $this->deferred = new Collection();
-        $this->waiting_on = new Collection();
-        $this->processed = new Collection();
 
         return $this->devices;
     }
@@ -266,7 +261,7 @@ class PingCheck implements ShouldQueue
     /**
      * Run any deferred alerts
      */
-    private function runDeferredAlerts(int $device_id)
+    private function runDeferredAlerts(int $device_id): void
     {
         // check for any devices waiting on this device
         if ($this->waiting_on->has($device_id)) {
@@ -307,7 +302,7 @@ class PingCheck implements ShouldQueue
     /**
      * run alerts for a device
      */
-    private function runAlerts(int $device_id)
+    private function runAlerts(int $device_id): void
     {
         $rules = new AlertRules;
         $rules->runRules($device_id);
