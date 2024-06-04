@@ -25,6 +25,7 @@
 
 namespace LibreNMS\Validations\Poller;
 
+use App\Models\Device;
 use App\Models\Poller;
 use App\Models\PollerCluster;
 use LibreNMS\ValidationResult;
