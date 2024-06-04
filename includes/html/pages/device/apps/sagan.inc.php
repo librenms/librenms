@@ -9,7 +9,7 @@ $link_array = [
 
 print_optionbar_start();
 
-echo generate_link('Totals', $link_array) . ' | Instances: ';
+echo generate_link('Totals', $link_array);
 
 $sagan_instances = $app->data['instances'] ?? [];
 sort($sagan_instances);
