@@ -118,7 +118,7 @@ if (! function_exists('preg_match_any')) {
 
 if (! function_exists('toast')) {
     /**
-     * send a toastr popup or return FlashInterface
+     * send a toastr popup or return ToastInterface
      */
     function toast(?string $title = null, ?string $message = null, string $level = 'info', ?array $options = null)
     {
