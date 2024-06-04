@@ -78,7 +78,7 @@ if (! empty($vlans)) {
                 $ifIndex = $portsIndexes[$pdIndex]['hwL2IfPortIfIndex'];
                 foreach (['Low', 'High'] as $hilo) {
                     foreach (['TrunkAllowPass', 'HybridTagged'] as $pType) {
-                        $oid ='hwL2If' . $pType . 'VlanList' . $hilo;
+                        $oid = 'hwL2If' . $pType . 'VlanList' . $hilo;
                         if (! empty($vlanData[$oid])) {
                             $vlansOnPort = q_bridge_bits2indices($vlanData[$oid]);
                             foreach ($vlansOnPort as $vlanIdOnPort) {
