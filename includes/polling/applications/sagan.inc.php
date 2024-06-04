@@ -80,7 +80,6 @@ foreach ($sagan['data'] as $instance => $stats) {
 }
 
 $old_instances = $app->app['instances'] ?? [];
-$new_data = ['instances' => $instances];
 
 //check for added instances
 $added_instances = array_values(array_diff($instances, $old_instances));
@@ -96,7 +95,7 @@ if (sizeof($added_instances) > 0 or sizeof($removed_instances) > 0) {
     log_event($log_message, $device, 'application');
 }
 
-$app->data = $new_data;
+$app->data = ['instances' => $instances];
 
 //
 // all done so update the app metrics
