@@ -45,7 +45,7 @@ class ServiceController extends Controller
         );
         $service->save();
 
-        $toast->sucess(__('Service :name created', ['name' => $service->service_name]));
+        $toast->success(__('Service :name created', ['name' => $service->service_name]));
 
         return redirect()->route('services.templates.index');
     }
