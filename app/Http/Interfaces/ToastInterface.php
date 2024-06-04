@@ -31,8 +31,7 @@ class ToastInterface
 {
     public function __construct(
         private SessionManager $session
-    )
-    {
+    ) {
     }
 
     public function info(string $title, ?string $message = null, ?array $options = null): static

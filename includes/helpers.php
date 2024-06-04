@@ -117,7 +117,6 @@ if (! function_exists('preg_match_any')) {
 }
 
 if (! function_exists('toast')) {
-
     /**
      * send a toastr popup or return FlashInterface
      */
