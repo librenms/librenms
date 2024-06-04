@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Interfaces\ToastInterface;
 use App\Models\PortGroup;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -38,7 +39,7 @@ class PortGroupController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function store(Request $request, FlashInterface $toast)
+    public function store(Request $request, ToastInterface $toast)
     {
         $this->validate($request, [
             'name' => 'required|string|unique:port_groups',
@@ -72,7 +73,7 @@ class PortGroupController extends Controller
      * @param  \App\Models\PortGroup  $portGroup
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function update(Request $request, PortGroup $portGroup, FlashInterface $toast)
+    public function update(Request $request, PortGroup $portGroup, ToastInterface $toast)
     {
         $this->validate($request, [
             'name' => [
