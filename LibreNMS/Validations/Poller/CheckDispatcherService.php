@@ -48,7 +48,7 @@ class CheckDispatcherService implements \LibreNMS\Interfaces\Validation
      */
     public function enabled(): bool
     {
-        return true;
+        return Device::exists();
     }
 
     private function checkDispatchService(): ValidationResult
