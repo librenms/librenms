@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Interfaces\ToastInterface;
 use App\Models\Service;
 use Illuminate\Http\Request;
 
@@ -13,7 +14,7 @@ class ServiceController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\View\View
      */
-    public function store(Request $request)
+    public function store(Request $request, ToastInterface $toast)
     {
         $request = [
             'service_name' => 'required|string|unique:service',
@@ -44,7 +45,7 @@ class ServiceController extends Controller
         );
         $service->save();
 
-        flash()->addSuccess(__('Service :name created', ['name' => $service->service_name]));
+        $toast->success(__('Service :name created', ['name' => $service->service_name]));
 
         return redirect()->route('services.templates.index');
     }
