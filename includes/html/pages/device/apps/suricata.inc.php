@@ -101,7 +101,7 @@ if ($app_data['version'] == 1) {
         $vars['suricata_graph_set'] = 'general';
     }
 
-    if (strcmp($vars['suricata_graph_set'], 'general') == 0) {
+    if ($vars['suricata_graph_set'] == 'general') {
         if (! isset($vars['sinstance'])) {
             // v2 computes drop_percent for total only currently
             $graphs = [
@@ -167,7 +167,7 @@ if ($app_data['version'] == 1) {
                 'suricata_v2_uptime' => 'Uptime',
             ];
         }
-    } elseif (strcmp($vars['suricata_graph_set'], 'bypassed') == 0) {
+    } elseif ($vars['suricata_graph_set'] == 'bypassed') {
         $graphs = [
             // flow_bypassed__closed
             'suricata_v2_flow_bypassed__closed' => 'Flow Bypassed Closed',
@@ -184,7 +184,7 @@ if ($app_data['version'] == 1) {
             // flow__end__state__local_bypassed
             'suricata_v2_flow__end__state__local_bypassed' => 'Flow End State Local Bypassed',
         ];
-    } elseif (strcmp($vars['suricata_graph_set'], 'errors') == 0) {
+    } elseif ($vars['suricata_graph_set'] == 'errors') {
         $graphs = [
             // drop_percent
             'suricata_v2_drop_percent' => 'Drop Percent',
@@ -203,7 +203,7 @@ if ($app_data['version'] == 1) {
             // file_store__fs_errors
             'suricata_v2_file_store__fs_errors' => 'File Store FS Errors',
         ];
-    } elseif (strcmp($vars['suricata_graph_set'], 'memuse') == 0) {
+    } elseif ($vars['suricata_graph_set'] == 'memuse') {
         $graphs = [
             // flow__memuse
             // ftp__memuse
@@ -230,7 +230,7 @@ if ($app_data['version'] == 1) {
             // memcap_pressure_max
             'suricata_v2_memcap_pressure' => 'Memcap Pressure',
         ];
-    } elseif (strcmp($vars['suricata_graph_set'], 'memuse_details') == 0) {
+    } elseif ($vars['suricata_graph_set'] == 'memuse_details') {
         $graphs = [
             // ftp__memuse
             // http__memuse
@@ -254,7 +254,7 @@ if ($app_data['version'] == 1) {
             // memcap_pressure_max
             'suricata_v2_memcap_pressure_det' => 'Memcap Pressure',
         ];
-    } elseif (strcmp($vars['suricata_graph_set'], 'detect') == 0) {
+    } elseif ($vars['suricata_graph_set'] == 'detect') {
         $graphs = [
             // detect__alert
             // detect__alerts_suppressed
@@ -266,7 +266,7 @@ if ($app_data['version'] == 1) {
             // detect__alerts_suppressed
             'suricata_v2_detect__alerts_suppressed' => 'Detect Alerts Suppressed',
         ];
-    } elseif (strcmp($vars['suricata_graph_set'], 'filestore') == 0) {
+    } elseif ($vars['suricata_graph_set'] == 'filestore') {
         $graphs = [
             // file_store__fs_errors
             'suricata_v2_file_store__fs_errors' => 'File Store FS Errors',
@@ -275,7 +275,7 @@ if ($app_data['version'] == 1) {
             // file_store__open_files_max_hit
             'suricata_v2_file_store__open_files_max_hit' => 'File Store Open Files, Max Hit',
         ];
-    } elseif (strcmp($vars['suricata_graph_set'], 'tcp') == 0) {
+    } elseif ($vars['suricata_graph_set'] == 'tcp') {
         $graphs = [
             // tcp__ack_unseen_data
             'suricata_v2_tcp__ack_unseen_data' => 'TCP Ack Unseen Data',
@@ -330,7 +330,7 @@ if ($app_data['version'] == 1) {
             // flow__end__tcp__*
             'suricata_v2_flow__end__end' => 'TCP Flow Ends',
         ];
-    } elseif (strcmp($vars['suricata_graph_set'], 'decoder') == 0) {
+    } elseif ($vars['suricata_graph_set'] =='decoder') {
         $graphs = [
             // decoder_* protocol items
             'suricata_v2_dec_proto' => 'Decoder Protocol Packets',
@@ -385,14 +385,14 @@ if ($app_data['version'] == 1) {
             // decoder__event__vxlan_*
             'suricata_v2_decoder__event__vxlan' => 'Decoder Events, VXLAN',
         ];
-    } elseif (strcmp($vars['suricata_graph_set'], 'applayer') == 0) {
+    } elseif ($vars['suricata_graph_set'] == 'applayer') {
         $graphs = [
             // app_layer__flow__*
             'suricata_v2_app_layer__flows' => 'Application Layer Flows',
             // app_layer__tx__*
             'suricata_v2_app_layer__tx' => 'Application Layer Packets',
         ];
-    } elseif (strcmp($vars['suricata_graph_set'], 'applayer_tx') == 0) {
+    } elseif ($vars['suricata_graph_set'] == 'applayer_tx') {
         $graphs = [];
         // app_layer__tx__*
         $graphs['suricata_v2_app_layer__tx__bittorrent-dht'] = 'Bittorrent-DHT, packets/second';
@@ -437,7 +437,7 @@ if ($app_data['version'] == 1) {
         $graphs['suricata_v2_app_layer__tx__telnet'] = 'Telnet, packets/second';
         $graphs['suricata_v2_app_layer__tx__tftp'] = 'TFTP, packets/second';
         $graphs['suricata_v2_app_layer__tx__tls'] = 'TLS, packets/second';
-    } elseif (strcmp($vars['suricata_graph_set'], 'applayer_flows') == 0) {
+    } elseif ($vars['suricata_graph_set'] == 'applayer_flows') {
         $graphs = [];
         // app_layer__flows__*
         $graphs['suricata_v2_app_layer__flow__bittorrent-dht'] = 'Bittorrent-DHT, flows/second';
@@ -527,7 +527,7 @@ if ($app_data['version'] == 1) {
         $graphs['suricata_v2_app_layer__error__telnet__alloc'] = 'Telnet, alloc errors/second';
         $graphs['suricata_v2_app_layer__error__tftp__alloc'] = 'TFTP, alloc errors/second';
         $graphs['suricata_v2_app_layer__error__tls__alloc'] = 'TLS, alloc errors/second';
-    } elseif (strcmp($vars['suricata_graph_set'], 'errors_gap') == 0) {
+    } elseif ($vars['suricata_graph_set'] == 'errors_gap') {
         $graphs = [];
         // app_layer__error__*__gap
         $graphs['suricata_v2_app_layer__error__bittorrent-dht__gap'] = 'Bittorrent-DHT, gap errors/second';
@@ -567,7 +567,7 @@ if ($app_data['version'] == 1) {
         $graphs['suricata_v2_app_layer__error__tls__gap'] = 'TLS, gap errors/second';
         // tcp__reassembly_gap
         $graphs['suricata_v2_tcp__reassembly_gap'] = 'TCP Reassembly, gap errors/second';
-    } elseif (strcmp($vars['suricata_graph_set'], 'errors_internal') == 0) {
+    } elseif ($vars['suricata_graph_set'] == 'errors_internal') {
         $graphs = [];
         // app_layer__error__*__alloc
         $graphs['suricata_v2_app_layer__error__bittorrent-dht__internal'] = 'Bittorrent-DHT, internal errors/second';
@@ -612,7 +612,7 @@ if ($app_data['version'] == 1) {
         $graphs['suricata_v2_app_layer__error__telnet__internal'] = 'Telnet, internal errors/second';
         $graphs['suricata_v2_app_layer__error__tftp__internal'] = 'TFTP, internal errors/second';
         $graphs['suricata_v2_app_layer__error__tls__internal'] = 'TLS, internal errors/second';
-    } elseif (strcmp($vars['suricata_graph_set'], 'errors_parser') == 0) {
+    } elseif ($vars['suricata_graph_set'] == 'errors_parser') {
         $graphs = [];
         // app_layer__error__*__parser
         $graphs['suricata_v2_app_layer__error__bittorrent-dht__parser'] = 'Bittorrent-DHT, parser errors/second';
@@ -657,13 +657,13 @@ if ($app_data['version'] == 1) {
         $graphs['suricata_v2_app_layer__error__telnet__parser'] = 'Telnet, parser errors/second';
         $graphs['suricata_v2_app_layer__error__tftp__parser'] = 'TFTP, parser errors/second';
         $graphs['suricata_v2_app_layer__error__tls__parser'] = 'TLS, parser errors/second';
-    } elseif (strcmp($vars['suricata_graph_set'], 'decoder_erspan') == 0) {
+    } elseif ($vars['suricata_graph_set'] == 'decoder_erspan') {
         $graphs = [
             'suricata_v2_decoder__event__erspan__header_too_small' => 'ERSPAN Header Too Small, packets/second',
             'suricata_v2_decoder__event__erspan__too_many_vlan_layers' => 'ERSPAN Too Many VLAN Layers, packets/second',
             'suricata_v2_decoder__event__erspan__unsupported_version' => 'ERSPAN Unsupported Version, packets/second',
         ];
-    } elseif (strcmp($vars['suricata_graph_set'], 'decoder_gre') == 0) {
+    } elseif ($vars['suricata_graph_set'] == 'decoder_gre') {
         $graphs = [
             'suricata_v2_decoder__event__gre__pkt_too_small' => 'GRE Packet Too Small, packets/second',
             'suricata_v2_decoder__event__gre__version0_flags' => 'GRE Version0 Flags, packets/second',
@@ -681,7 +681,7 @@ if ($app_data['version'] == 1) {
             'suricata_v2_decoder__event__gre__version1_wrong_protocol' => 'GRE Version1 Wrong Protocol, packets/second',
             'suricata_v2_decoder__event__gre__wrong_version' => 'GRE Wrong Version, packets/second',
         ];
-    } elseif (strcmp($vars['suricata_graph_set'], 'decoder_icmpv4') == 0) {
+    } elseif ($vars['suricata_graph_set'] == 'decoder_icmpv4') {
         $graphs = [
             'suricata_v2_decoder__event__icmpv4__ipv4_trunc_pkt' => 'ICMPv4 Truncated Packet, packets/second',
             'suricata_v2_decoder__event__icmpv4__ipv4_unknown_ver' => 'ICMPv4 Unknown Version, packets/second',
@@ -689,7 +689,7 @@ if ($app_data['version'] == 1) {
             'suricata_v2_decoder__event__icmpv4__unknown_code' => 'ICMPv4 Packet Too Small, packets/second',
             'suricata_v2_decoder__event__icmpv4__unknown_type' => 'ICMPv4 Unknown Type, packets/second',
         ];
-    } elseif (strcmp($vars['suricata_graph_set'], 'decoder_icmpv6') == 0) {
+    } elseif ($vars['suricata_graph_set'] == 'decoder_icmpv6') {
         $graphs = [
             'suricata_v2_decoder__event__icmpv6__experimentation_type' => 'ICMPv6 Experimentation Type, packets/second',
             'suricata_v2_decoder__event__icmpv6__ipv6_trunc_pkt' => 'ICMPv6 Truncated Packet, packets/second',
@@ -700,7 +700,7 @@ if ($app_data['version'] == 1) {
             'suricata_v2_decoder__event__icmpv6__unknown_code' => 'ICMPv6 Unknown Code, packets/second',
             'suricata_v2_decoder__event__icmpv6__unknown_type' => 'ICMPv6 Unknown Type, packets/second',
         ];
-    } elseif (strcmp($vars['suricata_graph_set'], 'decoder_ipv4') == 0) {
+    } elseif ($vars['suricata_graph_set'] == 'decoder_ipv4') {
         $graphs = [
             'suricata_v2_decoder__event__ipv4__frag_ignored' => 'IPv4 Frag Ignored, packets/second',
             'suricata_v2_decoder__event__ipv4__frag_overlap' => 'IPv4 Frag Overlap, packets/second',
@@ -719,7 +719,7 @@ if ($app_data['version'] == 1) {
             'suricata_v2_decoder__event__ipv4__trunc_pkt' => 'IPv4 Truncated Packet, packets/second',
             'suricata_v2_decoder__event__ipv4__wrong_ip_version' => 'IPv4 Wrong IP, packets/second',
         ];
-    } elseif (strcmp($vars['suricata_graph_set'], 'decoder_ipv6') == 0) {
+    } elseif ($vars['suricata_graph_set'] == 'decoder_ipv6') {
         $graphs = [
             'suricata_v2_decoder__event__ipv6__data_after_none_header' => 'IPv6 After None Header, packets/second',
             'suricata_v2_decoder__event__ipv6__dstopts_only_padding' => 'IPv6 Destination Only Padding, packets/second',
@@ -753,12 +753,12 @@ if ($app_data['version'] == 1) {
             'suricata_v2_decoder__event__ipv6__wrong_ip_version' => 'IPv6 Wrong IP Version, packets/second',
             'suricata_v2_decoder__event__ipv6__zero_len_padn' => 'IPv6 Zero Length Padn, packets/second',
         ];
-    } elseif (strcmp($vars['suricata_graph_set'], 'decoder_ltnull') == 0) {
+    } elseif ($vars['suricata_graph_set'] == 'decoder_ltnull') {
         $graphs = [
             'suricata_v2_decoder__event__ltnull__pkt_too_small' => 'LT Null Packet Too Small, packets/second',
             'suricata_v2_decoder__event__ltnull__unsupported_type' => 'LT Null Unsupported Type, packets/second',
         ];
-    } elseif (strcmp($vars['suricata_graph_set'], 'decoder_mpls') == 0) {
+    } elseif ($vars['suricata_graph_set'] == 'decoder_mpls') {
         $graphs = [
             'suricata_v2_decoder__event__mpls__bad_label_implicit_null' => 'MPLS Bad Label Implicit Null, packets/second',
             'suricata_v2_decoder__event__mpls__bad_label_reserved' => 'MPLS Bad Label Reserved, packets/second',
@@ -767,7 +767,7 @@ if ($app_data['version'] == 1) {
             'suricata_v2_decoder__event__mpls__pkt_too_small' => 'MPLS Packet Too Small, packets/second',
             'suricata_v2_decoder__event__mpls__unknown_payload_type' => 'MPLS Unknown Payload, packets/second',
         ];
-    } elseif (strcmp($vars['suricata_graph_set'], 'decoder_nsh') == 0) {
+    } elseif ($vars['suricata_graph_set'] == 'decoder_nsh') {
         $graphs = [
             'suricata_v2_decoder__event__nsh__bad_header_length' => 'NSH Bad Header Length, packets/second',
             'suricata_v2_decoder__event__nsh__header_too_small' => 'NSH Header Too Small, packets/second',
@@ -776,7 +776,7 @@ if ($app_data['version'] == 1) {
             'suricata_v2_decoder__event__nsh__unsupported_type' => 'NSH Unsupported Type, packets/second',
             'suricata_v2_decoder__event__nsh__unsupported_version' => 'NSH Unsupported Version, packets/second',
         ];
-    } elseif (strcmp($vars['suricata_graph_set'], 'decoder_ppp') == 0) {
+    } elseif ($vars['suricata_graph_set'] == 'decoder_ppp') {
         $graphs = [
             'suricata_v2_decoder__event__ppp__ip4_pkt_too_small' => 'PPP IPv4 Packet Too Small, packets/second',
             'suricata_v2_decoder__event__ppp__ip6_pkt_too_small' => 'PPP IPv6 Packet Too Small, packets/second',
@@ -785,13 +785,13 @@ if ($app_data['version'] == 1) {
             'suricata_v2_decoder__event__ppp__vju_pkt_too_small' => 'PPP Vju Packet Too Small, packets/second',
             'suricata_v2_decoder__event__ppp__wrong_type' => 'PPP Wrong Type, packets/second',
         ];
-    } elseif (strcmp($vars['suricata_graph_set'], 'decoder_pppoe') == 0) {
+    } elseif ($vars['suricata_graph_set'] == 'decoder_pppoe') {
         $graphs = [
             'suricata_v2_decoder__event__pppoe__malformed_tags' => 'PPPoE Malformed Tags, packets/second',
             'suricata_v2_decoder__event__pppoe__pkt_too_small' => 'PPPoE Packet Too Small, packets/second',
             'suricata_v2_decoder__event__pppoe__wrong_code' => 'PPPoE Wrong Code, packets/second',
         ];
-    } elseif (strcmp($vars['suricata_graph_set'], 'decoder_tcp') == 0) {
+    } elseif ($vars['suricata_graph_set'] == 'decoder_tcp') {
         $graphs = [
             'suricata_v2_decoder__event__tcp__hlen_too_small' => 'TCP Hlen Too Small, packets/second',
             'suricata_v2_decoder__event__tcp__invalid_optlen' => 'TCP Invalid Opt Len, packets/second',
@@ -799,20 +799,20 @@ if ($app_data['version'] == 1) {
             'suricata_v2_decoder__event__tcp__opt_invalid_len' => 'TCP Opt Invalid Len, packets/second',
             'suricata_v2_decoder__event__tcp__pkt_too_small' => 'TCP Packet Too Small, packets/second',
         ];
-    } elseif (strcmp($vars['suricata_graph_set'], 'decoder_udp') == 0) {
+    } elseif ($vars['suricata_graph_set'] == 'decoder_udp') {
         $graphs = [
             'suricata_v2_decoder__event__udp__hlen_invalid' => 'UDP Hlen Invalid, packets/second',
             'suricata_v2_decoder__event__udp__hlen_too_small' => 'UDP Hlen Too Small, packets/second',
             'suricata_v2_decoder__event__udp__len_invalid' => 'UDP Length Invalid, packets/second',
             'suricata_v2_decoder__event__udp__pkt_too_small' => 'UDP Packet Too Small, packets/second',
         ];
-    } elseif (strcmp($vars['suricata_graph_set'], 'decoder_vlan') == 0) {
+    } elseif ($vars['suricata_graph_set'] == 'decoder_vlan') {
         $graphs = [
             'suricata_v2_decoder__event__vlan__header_too_small' => 'VLAN Header Too Small, packets/second',
             'suricata_v2_decoder__event__vlan__too_many_layers' => 'VLAN Too Many Layers, packets/second',
             'suricata_v2_decoder__event__vlan__unknown_type' => 'VLAN Unknown Type, packets/second',
         ];
-    } elseif (strcmp($vars['suricata_graph_set'], 'decoder_vntag') == 0) {
+    } elseif ($vars['suricata_graph_set'] == 'decoder_vntag') {
         $graphs = [
             'suricata_v2_decoder__event__vntag__header_too_small' => 'VNTag Header Too Small, packets/second',
             'suricata_v2_decoder__event__vntag__unknown_type' => 'VNTag Unknown Type, packets/second',
