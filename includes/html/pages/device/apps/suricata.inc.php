@@ -330,7 +330,7 @@ if ($app_data['version'] == 1) {
             // flow__end__tcp__*
             'suricata_v2_flow__end__end' => 'TCP Flow Ends',
         ];
-    } elseif ($vars['suricata_graph_set'] =='decoder') {
+    } elseif ($vars['suricata_graph_set'] == 'decoder') {
         $graphs = [
             // decoder_* protocol items
             'suricata_v2_dec_proto' => 'Decoder Protocol Packets',
