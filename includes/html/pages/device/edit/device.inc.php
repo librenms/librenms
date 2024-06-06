@@ -48,7 +48,7 @@ if (! empty($_POST['editing'])) {
 
         if ($device_model->isDirty()) {
             if ($device_model->save()) {
-                toast()->sucess(__('Device record updated'));
+                toast()->success(__('Device record updated'));
             } else {
                 toast()->error(__('Device record update error'));
             }
