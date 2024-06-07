@@ -2728,12 +2728,19 @@ dnf install smartmontools perl-JSON perl-MIME-Base64
 chmod +x /etc/snmp/smart
 ```
 
-4. Edit your snmpd.conf file and add:
+4. Setup a cronjob to run it. This ensures slow to poll disks won't
+   result in errors.
+
 ```
-extend smart /etc/snmp/smart
+ */5 * * * * /etc/snmp/smart -u -Z
 ```
 
-5. You will also need to create the config file, which defaults to the same path as the script,
+5. Edit your snmpd.conf file and add:
+```
+extend smart /bin/cat /var/cache/smart
+```
+
+6. You will also need to create the config file, which defaults to the same path as the script,
 but with .config appended. So if the script is located at /etc/snmp/smart, the config file
 will be `/etc/snmp/smart.config`. Alternatively you can also specific a config via `-c`.
 
@@ -2773,32 +2780,11 @@ it should be.
 
 6. Restart snmpd on your host
 
-If you have a large number of more than one or two disks on a system,
-you should consider adding this to cron. Also make sure the cache file
-is some place it can be written to.
-
-```
- */5 * * * * /etc/snmp/smart -u
-```
-
-7. If your snmp agent runs as user "snmp", edit your sudo users
-   (usually `visudo`) and add at the bottom:
-```
-snmp ALL=(ALL) NOPASSWD: /etc/snmp/smart, /usr/bin/env smartctl
-```
-
-and modify your snmpd.conf file accordingly, sudo can be excluded if
-running it via cron:
-
-```
-extend smart /usr/bin/sudo /etc/snmp/smart
-```
-
 The application should be auto-discovered as described at the top of
 the page. If it is not, please follow the steps set out under `SNMP
 Extend` heading top of page.
 
-8. Optionally setup nightly self tests for the disks. The exend will
+7. Optionally setup nightly self tests for the disks. The exend will
    run the specified test on all configured disks if called with the
    -t flag and the name of the SMART test to run.
 

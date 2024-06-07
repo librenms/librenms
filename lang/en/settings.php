@@ -757,6 +757,7 @@ return [
                     'openstreetmap' => 'OpenStreetMap',
                     'mapquest' => 'MapQuest',
                     'bing' => 'Bing Maps',
+                    'esri' => 'ESRI ArcGIS',
                 ],
             ],
             'latlng' => [
@@ -765,7 +766,12 @@ return [
             ],
             'layer' => [
                 'description' => 'Initial Map Layer',
-                'help' => 'Initial map layer to display when showing various Geo Maps',
+                'help' => 'Initial map layer to display. *Not all layers are available for all mapping engines.',
+                'options' => [
+                    'Streets' => 'Streets',
+                    'Sattelite' => 'Sattelite',
+                    'Topography' => 'Topography',
+                ],
             ],
         ],
         'graphite' => [
@@ -1037,6 +1043,10 @@ return [
         ],
         'nfsen_lasts' => [
             'description' => 'Default Last Options',
+        ],
+        'nfsen_base' => [
+            'description' => 'NFSen Base Directory',
+            'help' => 'Used to locate device specific graphs',
         ],
         'nfsen_split_char' => [
             'description' => 'Split Char',
