@@ -1,5 +1,5 @@
-os: C1300
-text: 'Catalyst 1300 Series Managed Switch'
+os: cisco-access
+text: 'Catalyst 1200-1300 Series Managed Switch'
 type: network
 icon: cisco
 group: cisco
