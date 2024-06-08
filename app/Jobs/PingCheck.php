@@ -167,6 +167,7 @@ class PingCheck implements ShouldQueue
 
         if ($device === null) {
             Log::error("Ping host from response not found $response->host");
+
             return;
         }
 
