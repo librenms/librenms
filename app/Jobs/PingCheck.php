@@ -49,7 +49,7 @@ class PingCheck implements ShouldQueue
     // working data for loop
     /** @var Collection */
     private Collection $deferred;
-    /** @var Collection<int, Collection<Device>> device id, parent devices */
+    /** @var Collection<int, Collection<int, bool>> device id, parent devices */
     private Collection $waiting_on;
     /** @var Collection<int, bool> */
     private Collection $processed;
