@@ -105,7 +105,7 @@ class PingCheck implements ShouldQueue
         $ordered_device_list = new Collection;
 
         // start with root nodes (no parents)
-        [$current_tier_devices, $pending_children] = $devices->keyBy('device_id')->partition(fn(Device $d) => $d->parents_count === 0);
+        [$current_tier_devices, $pending_children] = $devices->keyBy('device_id')->partition(fn (Device $d) => $d->parents_count === 0);
 
         // recurse down until no children are found
         while ($current_tier_devices->isNotEmpty()) {
@@ -114,14 +114,14 @@ class PingCheck implements ShouldQueue
             // fetch the next tier of devices
             $current_tier_devices = $current_tier_devices
                 ->pluck('children.*.device_id')->flatten() // get all direct child ids
-                ->map(fn($child_id) => $pending_children->pull($child_id)) // fetch and remove the device from pending if it exists
+                ->map(fn ($child_id) => $pending_children->pull($child_id)) // fetch and remove the device from pending if it exists
                 ->filter(); // filter out children that are already in the list
         }
 
         // just add any left over
         $ordered_device_list = $ordered_device_list->merge($pending_children);
 
-        return $ordered_device_list->map(fn(Device $device) => $device->overwrite_ip ?: $device->hostname)->all();
+        return $ordered_device_list->map(fn (Device $device) => $device->overwrite_ip ?: $device->hostname)->all();
     }
 
     /**
@@ -198,7 +198,7 @@ class PingCheck implements ShouldQueue
             if (count($waiting_on) === 0) {
                 $this->runAlerts($device->device_id);
             } else {
-                Log::debug("Alerts Deferred");
+                Log::debug('Alerts Deferred');
 
                 $this->deferred->put($device->device_id, $device->parents);
                 foreach ($waiting_on as $parent_id) {
