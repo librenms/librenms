@@ -24,8 +24,9 @@
 
 // Discovery module using ROS ability to start script execution through SNMP.
 // This way, script called "LNMS_vlans" could start and send data about vlans on device
-// data format is: type,vlanId,ifName <cr>
-// i.e: T,254,ether1 is translated to: tagged vlan 254 on ether1
+// data format is: type,vlanId,ifName,vlanName <cr>
+// i.e: T,254,ether1,vlan-254-home is translated to: tagged vlan 254 on ether1 named vlan-254-home
+// To maintain compatibility with the old script, vlanName is optional
 
 use App\Models\Vlan;
 use LibreNMS\Enum\Severity;
@@ -41,8 +42,11 @@ if (isset($sIndex)) {
     $oldId = 0;
 
     foreach (preg_split("/((\r?\n)|(\r\n?))/", $data) as $line) {
-        [$vType, $vId, $vIf] = array_map('trim', explode(',', $line));
-        $vName = 'Vlan_' . $vId;
+        $fields = array_map('trim', explode(',', $line));
+        $vType = $fields[0];
+        $vId = $fields[1];
+        $vIf = $fields[2];
+        $vName = isset($fields[3]) ? $fields[3] : 'Vlan_' . $vId;
 
         if ($oldId != $vId) {
             $oldId = $vId;
@@ -59,7 +63,8 @@ if (isset($sIndex)) {
                 'vlan_name' => $vName,
             ]);
 
-            if ($vlan->isDirty('vlan_name')) {
+            if ($vlan->vlan_name != $vName) {
+                $vlan->vlan_name = $vName;
                 \App\Models\Eventlog::log("Vlan id: $vId changed name to: $vName from " . $vlan->getOriginal('vlan_name'), $device['device_id'], 'vlan', Severity::Warning);
             }
 
