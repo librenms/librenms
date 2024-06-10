@@ -4,7 +4,10 @@ modules:
         features: MIKROTIK-MIB::mtxrLicLevel.0
         features_template: 'Level {{ MIKROTIK-MIB::mtxrLicLevel.0 }}'
         serial: MIKROTIK-MIB::mtxrSerialNumber.0
-        version: MIKROTIK-MIB::mtxrLicVersion.0
+        version:
+            - MIKROTIK-MIB::mtxrLicVersion.0
+            - MIKROTIK-MIB::mtxrFirmwareVersion.0
+        version_template: '{{ MIKROTIK-MIB::mtxrLicVersion.0 }}, Firmware {{ MIKROTIK-MIB::mtxrFirmwareVersion.0 }}'
     sensors:
         pre-cache:
             data:
