@@ -15,7 +15,7 @@ $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id]);
 
 $rrd_list = [];
 
-foreach (\App\Models\Application::query()->where('app_type', 'suricata')->lazy() as $app) {
+foreach (\App\Models\Application::query()->where('app_type', 'sagan')->lazy() as $app) {
     $device=\App\Models\Device::query()->where('device_id', $app->device_id)->first();
 
     $rrd_filename = Rrd::name($device->hostname, ['app', $name, $app->app_id]);
