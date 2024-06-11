@@ -1,8 +1,5 @@
 <?php
 
-use App\Models\Application;
-use App\Models\Device;
-
 $name = 'sagan';
 $unit_text = 'Bytes';
 $colours = 'rainbow';
