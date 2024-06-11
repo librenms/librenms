@@ -20,7 +20,7 @@
  * Cisco LDP Session Up.
  *
  * @link       https://www.librenms.org
- * 
+ *
  * @author     Olivier MORFIN - <morfin.olivier@gmail.com>
  */
 
@@ -48,9 +48,9 @@ class CiscoLdpSesUp implements SnmptrapHandler
         $port = $device->ports()->where('ifIndex', $ifIndex)->first();
 
         if (! $port) {
-		Log::warning("Snmptrap CiscoLdpSesUp: Could not find port at ifIndex $ifIndex for device: " . $device->hostname);
+            Log::warning("Snmptrap CiscoLdpSesUp: Could not find port at ifIndex $ifIndex for device: " . $device->hostname);
 
-		return;
+            return;
         }
 
         $trap->log("LDP session UP on interface $port->ifDescr", Severity::Ok);
