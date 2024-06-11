@@ -20,9 +20,10 @@
  * Cisco LDP Session Down.
  *
  * @link       https://www.librenms.org
+ * 
  * @author     Olivier MORFIN - <morfin.olivier@gmail.com>
  */
- 
+
 namespace LibreNMS\Snmptrap\Handlers;
 
 use App\Models\Device;
@@ -48,8 +49,8 @@ class CiscoLdpSesDown implements SnmptrapHandler
 
         if (! $port) {
             Log::warning("Snmptrap ciscoLdpSesDown: Could not find port at ifIndex $ifIndex for device: " . $device->hostname);
- 
-	    return;
+
+            return;
         }
 
         $trap->log("LDP session DOWN on interface $port->ifDescr", Severity::Warning);
