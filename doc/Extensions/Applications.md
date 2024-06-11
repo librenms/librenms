@@ -2973,6 +2973,14 @@ the instances. So if you want the total eps, the metric would be
 `.total_eps`. Also worth noting that the alert value is the highest
 one found among all the instances.
 
+The Following graphs are available for usage for displaying global
+overall stats on the dashboard.
+
+- application_sagan_global_bytes
+- application_sagan_global_bytes_stacked
+- application_sagan_global_eps
+- application_sagan_global_eps_stacked
+
 ### SNMP Extend
 
 1. Install the extend.
