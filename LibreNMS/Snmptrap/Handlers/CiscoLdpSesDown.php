@@ -1,27 +1,27 @@
 <?php
 /**
-* CiscoLdpSesDown.php
-*
-* -Description-
-*
-* This program is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*
-* Cisco LDP Session Down.
-*
-* @link       https://www.librenms.org
-* @author     Olivier MORFIN - <morfin.olivier@gmail.com>
-*/
+ * CiscoLdpSesDown.php
+ *
+ * -Description-
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Cisco LDP Session Down.
+ *
+ * @link       https://www.librenms.org
+ * @author     Olivier MORFIN - <morfin.olivier@gmail.com>
+ */
  
 namespace LibreNMS\Snmptrap\Handlers;
 
@@ -48,11 +48,10 @@ class CiscoLdpSesDown implements SnmptrapHandler
 
         if (! $port) {
             Log::warning("Snmptrap ciscoLdpSesDown: Could not find port at ifIndex $ifIndex for device: " . $device->hostname);
-            return;
+ 
+	    return;
         }
 
         $trap->log("LDP session DOWN on interface $port->ifDescr", Severity::Warning);
     }
 }
-
-
