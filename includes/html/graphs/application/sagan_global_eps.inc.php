@@ -7,7 +7,7 @@ $name = 'sagan';
 $unit_text = 'Events Per Second';
 $colours = 'rainbow';
 $dostack = 0;
-$printtotal = 1;
+$printtotal = 0;
 $addarea = 0;
 $transparency = 15;
 
