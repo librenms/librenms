@@ -9,7 +9,7 @@ class BaicellsOd04 extends OS
     /**
      * convert hh:mm:ss to minutes (for yaml user_func)
      */
-    public function hhmmss_to_minutes($duration)
+    public static function hhmmss_to_minutes($duration)
     {
         [$h, $m, $s] = explode(':', $duration);
 
