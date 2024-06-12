@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Facades\DeviceCache;
-use App\Http\Controllers\Device\Tabs\EmptyTab;
 use App\Models\Device;
 use App\Models\Vminfo;
 use Carbon\Carbon;

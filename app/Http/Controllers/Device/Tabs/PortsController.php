@@ -63,7 +63,7 @@ class PortsController implements DeviceTab
     {
         $tab = $request->segment(4);
         $this->detail = empty($tab) || $tab == 'detail';
-        $data = match($tab) {
+        $data = match ($tab) {
             'links' => $this->linksData($device),
             'xdsl' => $this->xdslData($device),
             default => $this->portData($device, $request),
@@ -73,6 +73,7 @@ class PortsController implements DeviceTab
         $ignore = $request->input('ignore');
         $admin = $request->input('admin') == 'any';
         $status = $request->input('status') == 'up';
+
         return array_merge([
             'tab' => $tab,
             'details' => empty($tab) || $tab == 'detail',
@@ -127,7 +128,7 @@ class PortsController implements DeviceTab
         ]);
         $perPage = $request->input('perPage', 15);
         $sort = $request->input('sort', 'port');
-        $orderBy = match($sort) {
+        $orderBy = match ($sort) {
             'traffic' => \DB::raw('ports.ifInOctets_rate + ports.ifOutOctets_rate'),
             'speed' => 'ifSpeed',
             'media' => 'ifType',
@@ -146,10 +147,10 @@ class PortsController implements DeviceTab
 
         $ports = $device->ports()
             ->isNotDeleted()
-            ->when(! $request->input('disabled'), fn(Builder $q, $disabled) => $q->where('disabled', 0))
-            ->when(! $request->input('ignore'), fn(Builder $q, $disabled) => $q->where('ignore', 0))
-            ->when($request->input('admin') != 'any', fn(Builder $q, $admin) => $q->where('ifAdminStatus', $request->input('admin', 'up')))
-            ->when($request->input('status', 'any') != 'any', fn(Builder $q, $admin) => $q->where('ifOperStatus', $request->input('status')))
+            ->when(! $request->input('disabled'), fn (Builder $q, $disabled) => $q->where('disabled', 0))
+            ->when(! $request->input('ignore'), fn (Builder $q, $disabled) => $q->where('ignore', 0))
+            ->when($request->input('admin') != 'any', fn (Builder $q, $admin) => $q->where('ifAdminStatus', $request->input('admin', 'up')))
+            ->when($request->input('status', 'any') != 'any', fn (Builder $q, $admin) => $q->where('ifOperStatus', $request->input('status')))
             ->orderBy($orderBy, $order)
             ->hasAccess(Auth::user())->with($relationships)
             ->paginate($perPage);
@@ -166,11 +167,11 @@ class PortsController implements DeviceTab
             ],
         ];
 
-        $data['neighbors'] = $ports->keyBy('port_id')->map(fn($port) => $this->findPortNeighbors($port));
+        $data['neighbors'] = $ports->keyBy('port_id')->map(fn ($port) => $this->findPortNeighbors($port));
         if ($this->detail) {
             $data['neighbor_ports'] = Port::with('device')
                 ->hasAccess(Auth::user())
-                ->whereIn('port_id', $data['neighbors']->map(fn($a) => array_keys($a))->flatten())
+                ->whereIn('port_id', $data['neighbors']->map(fn ($a) => array_keys($a))->flatten())
                 ->get()->keyBy('port_id');
         }
 
@@ -204,7 +205,7 @@ class PortsController implements DeviceTab
             // IPv4 + IPv6 subnet if detailed
             // fa-arrow-right green portlink on devicelink
             if ($port->ipv4Networks->isNotEmpty()) {
-                $ids = $port->ipv4Networks->map(fn($net) => $net->ipv4->pluck('port_id'))->flatten();
+                $ids = $port->ipv4Networks->map(fn ($net) => $net->ipv4->pluck('port_id'))->flatten();
                 foreach ($ids as $port_id) {
                     if ($port_id !== $port->port_id) {
                         $this->addPortNeighbor($neighbors, 'ipv4_network', $port_id);
@@ -213,7 +214,7 @@ class PortsController implements DeviceTab
             }
 
             if ($port->ipv6Networks->isNotEmpty()) {
-                $ids = $port->ipv6Networks->map(fn($net) => $net->ipv6->pluck('port_id'))->flatten();
+                $ids = $port->ipv6Networks->map(fn ($net) => $net->ipv6->pluck('port_id'))->flatten();
                 foreach ($ids as $port_id) {
                     if ($port_id !== $port->port_id) {
                         $this->addPortNeighbor($neighbors, 'ipv6_network', $port_id);
@@ -237,7 +238,7 @@ class PortsController implements DeviceTab
         // fa-expand portlink: local is low port
         // fa-compress portlink: local is high portPort
         $stacks = \DB::table('ports_stack')->where('device_id', $port->device_id)
-            ->where(fn($q) => $q->where('port_id_high', $port->port_id)->orWhere('port_id_low', $port->port_id))->get();
+            ->where(fn ($q) => $q->where('port_id_high', $port->port_id)->orWhere('port_id_low', $port->port_id))->get();
         foreach ($stacks as $stack) {
             if ($stack->port_id_low) {
                 $this->addPortNeighbor($neighbors, 'stack_low', $stack->port_id_low);
@@ -257,7 +258,6 @@ class PortsController implements DeviceTab
                 $this->addPortNeighbor($neighbors, 'pagp', $port->pagpParent->port_id);
             }
         }
-
 
         return $neighbors;
     }
@@ -290,7 +290,6 @@ class PortsController implements DeviceTab
 
         return ['links' => $device->links];
     }
-
 
     private function getTabs(Device $device): array
     {

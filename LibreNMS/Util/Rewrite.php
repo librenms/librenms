@@ -212,7 +212,7 @@ class Rewrite
 
     public static function dslLineType(string $lineType): string
     {
-        return match($lineType) {
+        return match ($lineType) {
             'noChannel' => 'No Channel',
             'fastOnly' => 'Fastpath',
             'interleavedOnly' => 'Interleaved',

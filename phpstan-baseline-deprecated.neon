@@ -4074,14 +4074,6 @@ parameters:
 
 		-
 			message: """
-				#^Call to deprecated function dbFetchRows\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 2
-			path: includes/html/print-interface-adsl.inc.php
-
-		-
-			message: """
 				#^Call to deprecated function dbFetchCell\\(\\)\\:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
 			"""
