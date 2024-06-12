@@ -311,7 +311,7 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
                     foreach ($value as $lldpV2RemIndex => $lldpv2_array_entries) {
                         foreach ($lldpv2_array_entries as $key => $value) {
                             $newKey = $mapV2toV1[$key] ?? $key;
-                            $lldp_array[$lldpV2RemTimeMark][$lldpV2RemLocalIfIndex][$lldpV2RemIndex][$newKey] = $value ;
+                            $lldp_array[$lldpV2RemTimeMark][$lldpV2RemLocalIfIndex][$lldpV2RemIndex][$newKey] = $value;
                         }
                         $lldp_array[$lldpV2RemTimeMark][$lldpV2RemLocalIfIndex][$lldpV2RemIndex]['lldpRemLocalDestMACAddress'] = $lldpV2RemLocalDestMACAddress;
                     }
