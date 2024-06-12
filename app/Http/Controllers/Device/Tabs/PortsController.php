@@ -78,36 +78,36 @@ class PortsController implements DeviceTab
             'details' => empty($tab) || $tab == 'detail',
             'submenu' => [
                 $this->getTabs($device),
-                'Graphs' => [
-                    ['name' => 'Bits', 'url' => 'bits'],
-                    ['name' => 'Unicast Packets', 'url' => 'upkts'],
-                    ['name' => 'Non-Unicast Packets', 'url' => 'nupkts'],
-                    ['name' => 'Errors', 'url' => 'errors'],
+                __('Graphs') => [
+                    ['name' => __('port.graphs.bits'), 'url' => 'bits'],
+                    ['name' => __('port.graphs.upkts'), 'url' => 'upkts'],
+                    ['name' => __('port.graphs.nupkts'), 'url' => 'nupkts'],
+                    ['name' => __('port.graphs.errors'), 'url' => 'errors'],
                 ],
             ],
             'page_links' => [
                 [
                     'icon' => $status ? 'fa-regular fa-square-check' : 'fa-regular fa-square',
                     'url' => $status ? $request->fullUrlWithoutQuery('status') : $request->fullUrlWithQuery(['status' => 'up']),
-                    'title' => __('Only Show Up'),
+                    'title' => __('port.filters.status_up'),
                     'external' => false,
                 ],
                 [
                     'icon' => $admin ? 'fa-regular fa-square-check' : 'fa-regular fa-square',
                     'url' => $admin ? $request->fullUrlWithoutQuery('admin') : $request->fullUrlWithQuery(['admin' => 'any']),
-                    'title' => __('Show Admin Down'),
+                    'title' => __('port.filters.admin_down'),
                     'external' => false,
                 ],
                 [
                     'icon' => $disabled ? 'fa-regular fa-square-check' : 'fa-regular fa-square',
                     'url' => $disabled ? $request->fullUrlWithoutQuery('disabled') : $request->fullUrlWithQuery(['disabled' => 1]),
-                    'title' => __('Show Disabled'),
+                    'title' => __('port.filters.disabled'),
                     'external' => false,
                 ],
                 [
                     'icon' => $ignore ? 'fa-regular fa-square-check' : 'fa-regular fa-square',
                     'url' => $ignore ? $request->fullUrlWithoutQuery('ignore') : $request->fullUrlWithQuery(['ignore' => 1]),
-                    'title' => __('Show Ignored'),
+                    'title' => __('port.filters.disabled'),
                     'external' => false,
                 ],
             ],
@@ -295,24 +295,24 @@ class PortsController implements DeviceTab
     private function getTabs(Device $device): array
     {
         $tabs = [
-            ['name' => 'Basic', 'url' => 'basic'],
-            ['name' => 'Detail', 'url' => ''],
+            ['name' => __('Basic'), 'url' => 'basic'],
+            ['name' => __('Detail'), 'url' => ''],
         ];
 
         if ($device->macs()->exists()) {
-            $tabs[] = ['name' => 'ARP Table', 'url' => 'arp'];
+            $tabs[] = ['name' => __('port.tabs.arp'), 'url' => 'arp'];
         }
 
         if ($device->portsFdb()->exists()) {
-            $tabs[] = ['name' => 'FDB Table', 'url' => 'fdb'];
+            $tabs[] = ['name' => __('port.tabs.fdb'), 'url' => 'fdb'];
         }
 
         if ($device->links()->exists()) {
-            $tabs[] = ['name' => 'Neighbors', 'url' => 'links'];
+            $tabs[] = ['name' => __('port.tabs.links'), 'url' => 'links'];
         }
 
         if ($device->portsAdsl()->exists() || $device->portsVdsl()->exists()) {
-            $tabs[] = ['name' => 'xDSL', 'url' => 'xdsl'];
+            $tabs[] = ['name' => __('port.tabs.xdsl'), 'url' => 'xdsl'];
         }
 
         return $tabs;

@@ -2,13 +2,13 @@
     <table id="ports-fdb" class="table table-condensed table-hover table-striped tw-mt-1 !tw-mb-0">
         <thead>
         <tr>
-            <th width="350"><a href="{{ $request->fullUrlWithQuery(['sort' => 'port', 'order' => $data['sort'] == 'port' ? $data['next_order'] : 'asc']) }} ">Port</a></th>
-            <th width="100">Port Groups</th>
+            <th width="350"><a href="{{ $request->fullUrlWithQuery(['sort' => 'port', 'order' => $data['sort'] == 'port' ? $data['next_order'] : 'asc']) }} ">{{ __('Port') }}</a></th>
+            <th width="100">{{ __('Port Groups') }}</th>
             <th width="100"></th>
-            <th width="120"><a href="{{ $request->fullUrlWithQuery(['sort' => 'traffic', 'order' => $data['sort'] == 'traffic' ? $data['next_order'] : 'desc']) }} ">Traffic</a></th>
-            <th width="75"><a href="{{ $request->fullUrlWithQuery(['sort' => 'speed', 'order' => $data['sort'] == 'speed' ? $data['next_order'] : 'desc']) }} ">Speed</a></th>
-            <th width="100"><a href="{{ $request->fullUrlWithQuery(['sort' => 'media', 'order' => $data['sort'] == 'media' ? $data['next_order'] : 'asc']) }} ">Media</a></th>
-            <th width="100"><a href="{{ $request->fullUrlWithQuery(['sort' => 'mac', 'order' => $data['sort'] == 'mac' ? $data['next_order'] : 'asc']) }} ">Mac Address</a></th>
+            <th width="120"><a href="{{ $request->fullUrlWithQuery(['sort' => 'traffic', 'order' => $data['sort'] == 'traffic' ? $data['next_order'] : 'desc']) }} ">{{ __('Traffic') }}</a></th>
+            <th width="75"><a href="{{ $request->fullUrlWithQuery(['sort' => 'speed', 'order' => $data['sort'] == 'speed' ? $data['next_order'] : 'desc']) }} ">{{ __('Speed') }}</a></th>
+            <th width="100"><a href="{{ $request->fullUrlWithQuery(['sort' => 'media', 'order' => $data['sort'] == 'media' ? $data['next_order'] : 'asc']) }} ">{{ __('Media') }}</a></th>
+            <th width="100"><a href="{{ $request->fullUrlWithQuery(['sort' => 'mac', 'order' => $data['sort'] == 'mac' ? $data['next_order'] : 'asc']) }} ">{{ __('MAC Address') }}</a></th>
             <th width="375"></th>
         </tr>
         </thead>
@@ -39,7 +39,7 @@
                     @forelse($port->groups as $group)
                         <div>{{ $group->name }}</div>
                     @empty
-                        <div>Default</div>
+                        <div>{{ __('Default') }}</div>
                     @endforelse
                 </td>
                 <td>
@@ -82,9 +82,9 @@
                         <div class="tw-text-blue-800">
                             <a href="{{ \LibreNMS\Util\Url::deviceUrl($device->device_id, ['tab' => 'vlans']) }}">
                                 @if($port->vlans->count() > 1)
-                                    <span title="{{ $port->vlans->pluck('vlan')->implode(',') }}">VLANs: {{ $port->vlans->count() }}</span>
+                                    <span title="{{ $port->vlans->pluck('vlan')->implode(',') }}">{{ __('port.vlan_count', ['count' => $port->vlans->count()]) }}</span>
                                 @elseif($port->vlans->count() == 1 || $port->ifVlan)
-                                    VLAN: {{ $port->vlans->first()->vlan ?: $port->ifVlan }}
+                                    {{ __('port.vlan_label', ['label' => $port->vlans->first()->vlan ?: $port->ifVlan]) }}
                                 @elseif($port->ifVrf)
                                     {{ Vrf::where('vrf_id', $port->ifVrf)->value('vrf_name') }}
                                 @endif
@@ -95,13 +95,13 @@
                 <td>
                     @if($port->adsl)
                         <div>{{ $port->adsl->adslLineCoding }}/{{ \LibreNMS\Util\Rewrite::dslLineType($port->adsl->adslLineType) }}</div>
-                        <div>Sync: {{ \LibreNMS\Util\Number::formatSi($port->adsl->adslAtucChanCurrTxRate, 2, 3, 'bps') }}/{{ \LibreNMS\Util\Number::formatSi($port->adsl->adslAturChanCurrTxRate, 2, 3, 'bps') }}</div>
-                        <div>Max: {{ \LibreNMS\Util\Number::formatSi($port->adsl->adslAturCurrAttainableRate, 2, 3, 'bps') }}/{{ \LibreNMS\Util\Number::formatSi($port->adsl->adslAtucCurrAttainableRate, 2, 3, 'bps') }}</div>
-                        <div>Atten: {{ $port->adsl->adslAturCurrAtn }}dB/{{ $port->adsl->adslAtucCurrAtn }}dB</div>
-                        <div>SNR: {{ $port->adsl->adslAturCurrSnrMgn }}dB/{{ $port->adsl->adslAtucCurrSnrMgn }}dB</div>
+                        <div>{{ __('port.xdsl.sync_stat', ['down' => \LibreNMS\Util\Number::formatSi($port->adsl->adslAtucChanCurrTxRate, 2, 3, 'bps'), 'up' => \LibreNMS\Util\Number::formatSi($port->adsl->adslAturChanCurrTxRate, 2, 3, 'bps')]) }}</div>
+                        <div>{{ __('port.xdsl.attainable_stat', ['down' => \LibreNMS\Util\Number::formatSi($port->adsl->adslAtucCurrAttainableRate, 2, 3, 'bps'), 'up' => \LibreNMS\Util\Number::formatSi($port->adsl->adslAturCurrAttainableRate, 2, 3, 'bps')]) }}</div>
+                        <div>{{ __('port.xdsl.attenuation_stat', ['down' => $port->adsl->adslAtucCurrAtn . 'dB', 'up' => $port->adsl->adslAturCurrAtn . 'dB']) }}</div>
+                        <div>{{ __('port.xdsl.snr_stat', ['down' => $port->adsl->adslAtucCurrSnrMgn . 'dB','up' => $port->adsl->adslAturCurrSnrMgn . 'dB']) }}</div>
                     @elseif($port->vdsl)
-                        <div>Sync: {{ \LibreNMS\Util\Number::formatSi($port->vdsl->xdsl2ChStatusActDataRateXtur, 2, 3, 'bps') }}/{{ \LibreNMS\Util\Number::formatSi($port->vdsl->xdsl2ChStatusActDataRateXtuc, 2, 3, 'bps') }}</div>
-                        <div>Max: {{ \LibreNMS\Util\Number::formatSi($port->vdsl->xdsl2LineStatusAttainableRateDs, 2, 3, 'bps') }}/{{ \LibreNMS\Util\Number::formatSi($port->vdsl->xdsl2LineStatusAttainableRateUs, 2, 3, 'bps') }}</div>
+                        <div>{{ __('port.xdsl.sync_stat', ['down' => \LibreNMS\Util\Number::formatSi($port->vdsl->xdsl2ChStatusActDataRateXtuc, 2, 3, 'bps'), 'up' => \LibreNMS\Util\Number::formatSi($port->vdsl->xdsl2ChStatusActDataRateXtur, 2, 3, 'bps')]) }}</div>
+                        <div>{{ __('port.xdsl.attainable_stat', ['down' => \LibreNMS\Util\Number::formatSi($port->vdsl->xdsl2LineStatusAttainableRateDs, 2, 3, 'bps'), 'up' => \LibreNMS\Util\Number::formatSi($port->vdsl->xdsl2LineStatusAttainableRateUs, 2, 3, 'bps')]) }}</div>
                     @else
                     <div>{{ \LibreNMS\Util\Rewrite::normalizeIfType($port->ifType) }}</div>
                     @endif
@@ -109,7 +109,7 @@
                 </td>
                 <td>
                     <div class="tw-text-base">{{ $port->ifPhysAddress }}</div>
-                    <div class="tw-text-base">MTU {{ $port->ifMtu }}</div>
+                    <div class="tw-text-base">{{ __('port.mtu_label', ['mtu' => $port->ifMtu]) }}</div>
                 </td>
                 <td>
                     <x-expandable height="4em">
@@ -163,7 +163,7 @@
                       " x-data="{}"
                       :selected="$data['perPage']"
                       name="perPage"
-                      label="Per Page"
+                      label="{{ __('Per Page') }}"
                       class="tw-mx-4"></x-select>
         @endisset
     </div>
