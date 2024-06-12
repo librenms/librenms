@@ -17,6 +17,7 @@ use App\Models\Availability;
 use App\Models\Device;
 use App\Models\DeviceGroup;
 use App\Models\DeviceOutage;
+use App\Models\Ipv4Mac;
 use App\Models\Location;
 use App\Models\MplsSap;
 use App\Models\MplsService;
@@ -2809,23 +2810,21 @@ function list_arp(Illuminate\Http\Request $request)
     }
 
     if ($query === 'all') {
-        $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
-        $arp = dbFetchRows('SELECT `ipv4_mac`.* FROM `ipv4_mac` LEFT JOIN `ports` ON `ipv4_mac`.`port_id` = `ports`.`port_id` WHERE `ports`.`device_id` = ?', [$device_id]);
+        $arp = $request->has('device')
+            ? \DeviceCache::get($hostname)->macs
+            : Ipv4Mac::all();
     } elseif ($cidr) {
         try {
             $ip = new IPv4("$query/$cidr");
-            $arp = dbFetchRows(
-                'SELECT * FROM `ipv4_mac` WHERE (inet_aton(`ipv4_address`) & ?) = ?',
-                [ip2long($ip->getNetmask()), ip2long($ip->getNetworkAddress())]
-            );
+            $arp = Ipv4Mac::whereRaw('(inet_aton(`ipv4_address`) & ?) = ?', [ip2long($ip->getNetmask()), ip2long($ip->getNetworkAddress())])->get();
         } catch (InvalidIpException $e) {
             return api_error(400, 'Invalid Network Address');
         }
     } elseif (filter_var($query, FILTER_VALIDATE_MAC)) {
         $mac = Mac::parse($query)->hex();
-        $arp = dbFetchRows('SELECT * FROM `ipv4_mac` WHERE `mac_address`=?', [$mac]);
+        $arp = Ipv4Mac::where('mac_address', $mac);
     } else {
-        $arp = dbFetchRows('SELECT * FROM `ipv4_mac` WHERE `ipv4_address`=?', [$query]);
+        $arp = Ipv4Mac::where('ipv4_address', $query);
     }
 
     return api_success($arp, 'arp');
