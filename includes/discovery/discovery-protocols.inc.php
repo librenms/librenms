@@ -277,13 +277,12 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
             $dot1d_array = snmpwalk_group($device, 'dot1dBasePortIfIndex', 'BRIDGE-MIB');
             $lldp_ports = snmpwalk_group($device, 'lldpLocPortId', 'LLDP-MIB');
         }
-
     } else {
         echo ' LLDP-V2-MIB: ';
         $lldpv2_array = SnmpQuery::hideMib()->walk('LLDP-V2-MIB::lldpV2RemTable')->table(4);
     }
 
-    $mapV2toV1= [
+    $mapV2toV1 = [
         'lldpV2RemChassisIdSubtype' => 'lldpRemChassisIdSubtype',
         'lldpV2RemChassisId' => 'lldpRemChassisId',
         'lldpV2RemPortIdSubtype' => 'lldpRemPortIdSubtype',
