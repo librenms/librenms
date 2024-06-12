@@ -151,7 +151,7 @@ return [
         'VEEAM-MIB::onSobrOffloadFinished' => \LibreNMS\Snmptrap\Handlers\VeeamSobrOffloadFinished::class,
         'VEEAM-MIB::onCdpRpoReport' => \LibreNMS\Snmptrap\Handlers\VeeamCdpRpoReport::class,
         'HP-ICF-FAULT-FINDER-MIB::hpicfFaultFinderTrap' => \LibreNMS\Snmptrap\Handlers\HpFault::class,
-        'SNMPv2-SMI::enterprises.9.10.65.2.0.4' => \LibreNMS\Snmptrap\Handlers\CiscoLdpSesDown::class,
-        'SNMPv2-SMI::enterprises.9.10.65.2.0.3' => \LibreNMS\Snmptrap\Handlers\CiscoLdpSesUp::class,
+        'MPLS-LDP-MIB::mplsLdpSessionDown' => \LibreNMS\Snmptrap\Handlers\CiscoLdpSesDown::class,
+        'MPLS-LDP-MIB::mplsLdpSessionUp' => \LibreNMS\Snmptrap\Handlers\CiscoLdpSesUp::class,
     ],
 ];
