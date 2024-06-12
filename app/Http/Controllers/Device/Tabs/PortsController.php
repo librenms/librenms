@@ -29,6 +29,7 @@ use App\Models\Device;
 use App\Models\Link;
 use App\Models\Port;
 use App\Models\Pseudowire;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -68,6 +69,10 @@ class PortsController implements DeviceTab
             default => $this->portData($device, $request),
         };
 
+        $disabled = $request->input('disabled');
+        $ignore = $request->input('ignore');
+        $admin = $request->input('admin') == 'any';
+        $status = $request->input('status') == 'up';
         return array_merge([
             'tab' => $tab,
             'details' => empty($tab) || $tab == 'detail',
@@ -80,6 +85,32 @@ class PortsController implements DeviceTab
                     ['name' => 'Errors', 'url' => 'errors'],
                 ],
             ],
+            'page_links' => [
+                [
+                    'icon' => $status ? 'fa-regular fa-square-check' : 'fa-regular fa-square',
+                    'url' => $status ? $request->fullUrlWithoutQuery('status') : $request->fullUrlWithQuery(['status' => 'up']),
+                    'title' => __('Only Show Up'),
+                    'external' => false,
+                ],
+                [
+                    'icon' => $admin ? 'fa-regular fa-square-check' : 'fa-regular fa-square',
+                    'url' => $admin ? $request->fullUrlWithoutQuery('admin') : $request->fullUrlWithQuery(['admin' => 'any']),
+                    'title' => __('Show Admin Down'),
+                    'external' => false,
+                ],
+                [
+                    'icon' => $disabled ? 'fa-regular fa-square-check' : 'fa-regular fa-square',
+                    'url' => $disabled ? $request->fullUrlWithoutQuery('disabled') : $request->fullUrlWithQuery(['disabled' => 1]),
+                    'title' => __('Show Disabled'),
+                    'external' => false,
+                ],
+                [
+                    'icon' => $ignore ? 'fa-regular fa-square-check' : 'fa-regular fa-square',
+                    'url' => $ignore ? $request->fullUrlWithoutQuery('ignore') : $request->fullUrlWithQuery(['ignore' => 1]),
+                    'title' => __('Show Ignored'),
+                    'external' => false,
+                ],
+            ],
         ], $data);
     }
 
@@ -89,6 +120,10 @@ class PortsController implements DeviceTab
             'perPage' => 'int',
             'sort' => 'in:media,mac,port,traffic,speed',
             'order' => 'in:asc,desc',
+            'disabled' => 'in:0,1',
+            'ignore' => 'in:0,1',
+            'admin' => 'in:up,down,testing,any',
+            'status' => 'in:up,down,testing,unknown,dormant,notPresent,lowerLayerDown,any',
         ]);
         $perPage = $request->input('perPage', 15);
         $sort = $request->input('sort', 'port');
@@ -109,7 +144,12 @@ class PortsController implements DeviceTab
             $relationships[] = 'ipv6Networks.ipv6';
         }
 
-        $ports = $device->ports()->isUp()
+        $ports = $device->ports()
+            ->isNotDeleted()
+            ->when(! $request->input('disabled'), fn(Builder $q, $disabled) => $q->where('disabled', 0))
+            ->when(! $request->input('ignore'), fn(Builder $q, $disabled) => $q->where('ignore', 0))
+            ->when($request->input('admin') != 'any', fn(Builder $q, $admin) => $q->where('ifAdminStatus', $request->input('admin', 'up')))
+            ->when($request->input('status', 'any') != 'any', fn(Builder $q, $admin) => $q->where('ifOperStatus', $request->input('status')))
             ->orderBy($orderBy, $order)
             ->hasAccess(Auth::user())->with($relationships)
             ->paginate($perPage);
