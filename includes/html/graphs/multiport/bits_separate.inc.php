@@ -9,8 +9,13 @@ foreach (explode(',', $vars['id']) as $ifid) {
         $port = cleanPort($port);
         $rrd_list[$i]['filename'] = $rrd_file;
         $rrd_list[$i]['descr'] = format_hostname($port) . ' ' . $port['ifDescr'];
-        $rrd_list[$i]['descr_in'] = format_hostname($port);
-        $rrd_list[$i]['descr_out'] = makeshortif($port['label']);
+        if (isset($port['ifAlias'])) {
+            $rrd_list[$i]['descr_in'] = $port['ifAlias'];
+            $rrd_list[$i]['descr_out'] = $port['ifAlias'];
+        } else {
+            $rrd_list[$i]['descr_in'] = format_hostname($port);
+            $rrd_list[$i]['descr_out'] = makeshortif($port['label']);
+        }
         $i++;
     }
 }
