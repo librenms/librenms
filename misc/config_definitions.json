@@ -3955,7 +3955,7 @@
                 "/on: \\/packages/",
                 "/on: \\/dev/",
                 "/on: \\/proc/",
-                "/on: \\/junos^/",
+                "/on: \\/junos$/",
                 "/on: \\/junos\\/dev/",
                 "/on: \\/jail\\/dev/",
                 "/^(dev|proc)fs/",
