@@ -87,11 +87,6 @@ class PortsController implements DeviceTab
             default => $this->portData($device, $request),
         };
 
-        $disabled = $request->input('disabled');
-        $ignore = $request->input('ignore');
-        $admin = $request->input('admin') == 'any';
-        $status = $request->input('status') == 'up';
-
         return array_merge([
             'tab' => $tab,
             'details' => $this->detail,
@@ -99,32 +94,7 @@ class PortsController implements DeviceTab
                 $this->getTabs($device),
                 __('Graphs') => $this->getGraphLinks(),
             ],
-            'page_links' => [
-                [
-                    'icon' => $status ? 'fa-regular fa-square-check' : 'fa-regular fa-square',
-                    'url' => $status ? $request->fullUrlWithoutQuery('status') : $request->fullUrlWithQuery(['status' => 'up']),
-                    'title' => __('port.filters.status_up'),
-                    'external' => false,
-                ],
-                [
-                    'icon' => $admin ? 'fa-regular fa-square-check' : 'fa-regular fa-square',
-                    'url' => $admin ? $request->fullUrlWithoutQuery('admin') : $request->fullUrlWithQuery(['admin' => 'any']),
-                    'title' => __('port.filters.admin_down'),
-                    'external' => false,
-                ],
-                [
-                    'icon' => $disabled ? 'fa-regular fa-square-check' : 'fa-regular fa-square',
-                    'url' => $disabled ? $request->fullUrlWithoutQuery('disabled') : $request->fullUrlWithQuery(['disabled' => 1]),
-                    'title' => __('port.filters.disabled'),
-                    'external' => false,
-                ],
-                [
-                    'icon' => $ignore ? 'fa-regular fa-square-check' : 'fa-regular fa-square',
-                    'url' => $ignore ? $request->fullUrlWithoutQuery('ignore') : $request->fullUrlWithQuery(['ignore' => 1]),
-                    'title' => __('port.filters.ignored'),
-                    'external' => false,
-                ],
-            ],
+            'page_links' => $this->pageLinks($request),
             'perPage' => $this->perPage,
             'sort' => $this->sortOrder,
             'next_order' => $this->sortOrder == 'asc' ? 'desc' : 'asc',
@@ -389,5 +359,40 @@ class PortsController implements DeviceTab
         }
 
         return $request->route('vars', 'detail'); // fourth segment is called vars to handle legacy urls
+    }
+
+    private function pageLinks(Request $request): array
+    {
+        $disabled = $request->input('disabled');
+        $ignore = $request->input('ignore');
+        $admin = $request->input('admin') == 'any';
+        $status = $request->input('status') == 'up';
+
+        return [
+            [
+                'icon' => $status ? 'fa-regular fa-square-check' : 'fa-regular fa-square',
+                'url' => $status ? $request->fullUrlWithoutQuery('status') : $request->fullUrlWithQuery(['status' => 'up']),
+                'title' => __('port.filters.status_up'),
+                'external' => false,
+            ],
+            [
+                'icon' => $admin ? 'fa-regular fa-square-check' : 'fa-regular fa-square',
+                'url' => $admin ? $request->fullUrlWithoutQuery('admin') : $request->fullUrlWithQuery(['admin' => 'any']),
+                'title' => __('port.filters.admin_down'),
+                'external' => false,
+            ],
+            [
+                'icon' => $disabled ? 'fa-regular fa-square-check' : 'fa-regular fa-square',
+                'url' => $disabled ? $request->fullUrlWithoutQuery('disabled') : $request->fullUrlWithQuery(['disabled' => 1]),
+                'title' => __('port.filters.disabled'),
+                'external' => false,
+            ],
+            [
+                'icon' => $ignore ? 'fa-regular fa-square-check' : 'fa-regular fa-square',
+                'url' => $ignore ? $request->fullUrlWithoutQuery('ignore') : $request->fullUrlWithQuery(['ignore' => 1]),
+                'title' => __('port.filters.ignored'),
+                'external' => false,
+            ],
+        ];
     }
 }
