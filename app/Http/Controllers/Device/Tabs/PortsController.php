@@ -364,9 +364,6 @@ class PortsController implements DeviceTab
             };
         }
 
-        $segments = $request->segments();
-        $tab_index = array_search('device', $segments) + 3;
-
-        return empty($segments[$tab_index]) ? 'detail' : $segments[$tab_index];
+        return $request->route('vars', 'detail'); // fourth segment is called vars to handle legacy urls
     }
 }
