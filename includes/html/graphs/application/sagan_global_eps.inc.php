@@ -8,8 +8,6 @@ $printtotal = 0;
 $addarea = 0;
 $transparency = 15;
 
-$rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id]);
-
 $rrd_list = [];
 
 foreach (\App\Models\Application::query()->where('app_type', 'sagan')->lazy() as $app) {
