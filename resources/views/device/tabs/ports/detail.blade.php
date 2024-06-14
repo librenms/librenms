@@ -13,7 +13,7 @@
         </tr>
         </thead>
         @foreach($data['ports'] as $port)
-            @include('device.tabs.ports.port_row')
+            @include('device.tabs.ports.includes.port_row')
         @endforeach
     </table>
     <div class="tw-flex tw-flex-row-reverse tw-m-3">

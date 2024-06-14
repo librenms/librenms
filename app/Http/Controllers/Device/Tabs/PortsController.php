@@ -78,8 +78,8 @@ class PortsController implements DeviceTab
             'to' => ['regex:/^(int|[+-]\d+[hdmy])$/'],
         ]);
 
-        $tab = $request->segment(4);
-        $this->detail = empty($tab) || $tab == 'detail';
+        $tab = $this->parseTab($request);
+        $this->detail = $tab == 'detail';
         $data = match ($tab) {
             'links' => $this->linksData($device),
             'xdsl' => $this->xdslData($device),
@@ -94,7 +94,7 @@ class PortsController implements DeviceTab
 
         return array_merge([
             'tab' => $tab,
-            'details' => empty($tab) || $tab == 'detail',
+            'details' => $this->detail,
             'submenu' => [
                 $this->getTabs($device),
                 __('Graphs') => $this->getGraphLinks(),
@@ -350,5 +350,23 @@ class PortsController implements DeviceTab
             ->when($request->input('status', 'any') != 'any', fn(Builder $q, $admin) => $q->where('ifOperStatus', $request->input('status')))
             ->orderBy($orderBy, $this->sortOrder)
             ->hasAccess(Auth::user())->with($relationships);
+    }
+
+    /**
+     * get the ports sub tab name including handling legacy urls
+     */
+    private function parseTab(Request $request): string
+    {
+        if (preg_match('#view=([^/]+)#', $request->fullUrl(), $matches)) {
+            return match ($matches[1]) {
+                'neighbours' => 'links',
+                default => $matches[1],
+            };
+        }
+
+        $segments = $request->segments();
+        $tab_index = array_search('device', $segments) + 3;
+
+        return empty($segments[$tab_index]) ? 'detail' : $segments[$tab_index];
     }
 }

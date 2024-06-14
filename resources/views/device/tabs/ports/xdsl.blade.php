@@ -13,7 +13,7 @@
         </thead>
         @foreach($data['adsl'] as $dslPort)
             <tr>
-                @include('device.tabs.ports.xdsl_base_columns')
+                @include('device.tabs.ports.includes.xdsl_base_columns')
                 <td>
                     {{ \LibreNMS\Util\Number::formatSi($dslPort->adslAtucChanCurrTxRate, 2, 3, 'bps') }}/{{ \LibreNMS\Util\Number::formatSi($dslPort->adslAturChanCurrTxRate, 2, 3, 'bps') }}
                     <br />
@@ -43,7 +43,7 @@
         @endforeach
 
         @foreach($data['vdsl'] as $dslPort)
-            @include('device.tabs.ports.xdsl_base_columns')
+            @include('device.tabs.ports.includes.xdsl_base_columns')
             <td>
                 {{ \LibreNMS\Util\Number::formatSi($dslPort->xdsl2ChStatusActDataRateXtuc, 2, 3, 'bps') }}/{{ \LibreNMS\Util\Number::formatSi($dslPort->xdsl2ChStatusActDataRateXtur, 2, 3, 'bps') }}
                 <br />
