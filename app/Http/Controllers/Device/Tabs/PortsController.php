@@ -30,8 +30,9 @@ use App\Models\Link;
 use App\Models\Port;
 use App\Models\Pseudowire;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use LibreNMS\Config;
@@ -111,11 +112,12 @@ class PortsController implements DeviceTab
             $relationships[] = 'ipv6Networks.ipv6';
         }
 
+        /** @var Collection|LengthAwarePaginator<Port> $ports */
         $ports = $this->getFilteredPortsQuery($device, $request, $relationships)->paginate($this->perPage);
 
         $data = [
             'ports' => $ports,
-            'neighbors' => $ports->keyBy('port_id')->map(fn ($port) => $this->findPortNeighbors($port)),
+            'neighbors' => $ports->keyBy('port_id')->map(fn (Port $port) => $this->findPortNeighbors($port)),
             'graphs' => [
                 'bits' => [['type' => 'port_bits', 'title' => trans('Traffic'), 'vars' => [['from' => '-1d'], ['from' => '-7d'], ['from' => '-30d'], ['from' => '-1y']]]],
                 'upkts' => [['type' => 'port_upkts', 'title' => trans('Packets (Unicast)'), 'vars' => [['from' => '-1d'], ['from' => '-7d'], ['from' => '-30d'], ['from' => '-1y']]]],
@@ -324,7 +326,7 @@ class PortsController implements DeviceTab
         return $graph_links;
     }
 
-    private function getFilteredPortsQuery(Device $device, Request $request, array $relationships = []): HasMany
+    private function getFilteredPortsQuery(Device $device, Request $request, array $relationships = []): Builder
     {
         $this->perPage = $request->input('perPage', 15);
         $this->sortOrder = $request->input('order', 'asc');
@@ -336,14 +338,14 @@ class PortsController implements DeviceTab
             default => 'ifIndex',
         };
 
-        return $device->ports()
+        return Port::where('device_id', $device->device_id)
             ->isNotDeleted()
+            ->hasAccess(Auth::user())->with($relationships)
             ->when(! $request->input('disabled'), fn (Builder $q, $disabled) => $q->where('disabled', 0))
             ->when(! $request->input('ignore'), fn (Builder $q, $disabled) => $q->where('ignore', 0))
             ->when($request->input('admin') != 'any', fn (Builder $q, $admin) => $q->where('ifAdminStatus', $request->input('admin', 'up')))
             ->when($request->input('status', 'any') != 'any', fn (Builder $q, $admin) => $q->where('ifOperStatus', $request->input('status')))
-            ->orderBy($orderBy, $this->sortOrder)
-            ->hasAccess(Auth::user())->with($relationships);
+            ->orderBy($orderBy, $this->sortOrder);
     }
 
     /**
