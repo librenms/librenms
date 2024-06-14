@@ -106,7 +106,7 @@ foreach ($tables as [$table, $num_oid, $value_oid, $descr_oid, $mib, $mib_dir]) 
         create_state_index($state_name, $states);
 
         foreach ($temp as $index => $entry) {
-            if (! str_contains($index, '54.')) { //Because Dell is buggy
+            if (array_key_exists($value_oid, $entry)) { // ward against extra data from newer MIBs
                 if ($state_name == 'dell.intrusionStatus') {
                     $descr = $descr_oid;
                 } elseif ($state_name == 'dell.batteryState') {
