@@ -41,7 +41,7 @@ class PortsController implements DeviceTab
 {
     private bool $detail = false;
     private int $perPage = 15;
-    private string $sortOrder = 'asd';
+    private string $sortOrder = 'asc';
 
     public function visible(Device $device): bool
     {
