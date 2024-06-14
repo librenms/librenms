@@ -290,25 +290,25 @@ class PortsController implements DeviceTab
                 'name' => __('port.graphs.bits'),
                 'url' => 'graphs?type=bits',
                 'sub_name' => __('Mini'),
-                'sub_url' => 'mini_graphs?type=bits'
+                'sub_url' => 'mini_graphs?type=bits',
             ],
             [
                 'name' => __('port.graphs.upkts'),
                 'url' => 'graphs?type=upkts',
                 'sub_name' => __('Mini'),
-                'sub_url' => 'mini_graphs?type=upkts'
+                'sub_url' => 'mini_graphs?type=upkts',
             ],
             [
                 'name' => __('port.graphs.nupkts'),
                 'url' => 'graphs?type=nupkts',
                 'sub_name' => __('Mini'),
-                'sub_url' => 'mini_graphs?type=nupkts'
+                'sub_url' => 'mini_graphs?type=nupkts',
             ],
             [
                 'name' => __('port.graphs.errors'),
                 'url' => 'graphs?type=errors',
                 'sub_name' => __('Mini'),
-                'sub_url' => 'mini_graphs?type=errors'
+                'sub_url' => 'mini_graphs?type=errors',
             ],
         ];
 
@@ -317,7 +317,7 @@ class PortsController implements DeviceTab
                 'name' => __('port.graphs.etherlike'),
                 'url' => 'graphs?type=etherlike',
                 'sub_name' => __('Mini'),
-                'sub_url' => 'mini_graphs?type=etherlike'
+                'sub_url' => 'mini_graphs?type=etherlike',
             ];
         }
 
@@ -338,10 +338,10 @@ class PortsController implements DeviceTab
 
         return $device->ports()
             ->isNotDeleted()
-            ->when(!$request->input('disabled'), fn(Builder $q, $disabled) => $q->where('disabled', 0))
-            ->when(!$request->input('ignore'), fn(Builder $q, $disabled) => $q->where('ignore', 0))
-            ->when($request->input('admin') != 'any', fn(Builder $q, $admin) => $q->where('ifAdminStatus', $request->input('admin', 'up')))
-            ->when($request->input('status', 'any') != 'any', fn(Builder $q, $admin) => $q->where('ifOperStatus', $request->input('status')))
+            ->when(! $request->input('disabled'), fn (Builder $q, $disabled) => $q->where('disabled', 0))
+            ->when(! $request->input('ignore'), fn (Builder $q, $disabled) => $q->where('ignore', 0))
+            ->when($request->input('admin') != 'any', fn (Builder $q, $admin) => $q->where('ifAdminStatus', $request->input('admin', 'up')))
+            ->when($request->input('status', 'any') != 'any', fn (Builder $q, $admin) => $q->where('ifOperStatus', $request->input('status')))
             ->orderBy($orderBy, $this->sortOrder)
             ->hasAccess(Auth::user())->with($relationships);
     }
