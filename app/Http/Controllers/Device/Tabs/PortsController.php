@@ -98,7 +98,6 @@ class PortsController implements DeviceTab
             'submenu' => [
                 $this->getTabs($device),
                 __('Graphs') => $this->getGraphLinks(),
-                __('Mini Graphs') => $this->getGraphLinks('mini_graphs'),
             ],
             'page_links' => [
                 [
@@ -314,17 +313,42 @@ class PortsController implements DeviceTab
     /**
      * @return array[]
      */
-    private function getGraphLinks(string $urlSlug = 'graphs'): array
+    private function getGraphLinks(): array
     {
         $graph_links = [
-            ['name' => __('port.graphs.bits'), 'url' => $urlSlug . '?type=bits'],
-            ['name' => __('port.graphs.upkts'), 'url' => $urlSlug . '?type=upkts'],
-            ['name' => __('port.graphs.nupkts'), 'url' => $urlSlug . '?type=nupkts'],
-            ['name' => __('port.graphs.errors'), 'url' => $urlSlug . '?type=errors'],
+            [
+                'name' => __('port.graphs.bits'),
+                'url' => 'graphs?type=bits',
+                'sub_name' => __('Mini'),
+                'sub_url' => 'mini_graphs?type=bits'
+            ],
+            [
+                'name' => __('port.graphs.upkts'),
+                'url' => 'graphs?type=upkts',
+                'sub_name' => __('Mini'),
+                'sub_url' => 'mini_graphs?type=upkts'
+            ],
+            [
+                'name' => __('port.graphs.nupkts'),
+                'url' => 'graphs?type=nupkts',
+                'sub_name' => __('Mini'),
+                'sub_url' => 'mini_graphs?type=nupkts'
+            ],
+            [
+                'name' => __('port.graphs.errors'),
+                'url' => 'graphs?type=errors',
+                'sub_name' => __('Mini'),
+                'sub_url' => 'mini_graphs?type=errors'
+            ],
         ];
 
         if (Config::get('enable_ports_etherlike')) {
-            $graph_links[] = ['name' => __('port.graphs.etherlike'), 'url' => $urlSlug . '?type=etherlike'];
+            $graph_links[] = [
+                'name' => __('port.graphs.etherlike'),
+                'url' => 'graphs?type=etherlike',
+                'sub_name' => __('Mini'),
+                'sub_url' => 'mini_graphs?type=etherlike'
+            ];
         }
 
         return $graph_links;
