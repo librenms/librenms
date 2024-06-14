@@ -30,14 +30,18 @@ use App\Models\Link;
 use App\Models\Port;
 use App\Models\Pseudowire;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use LibreNMS\Config;
 use LibreNMS\Interfaces\UI\DeviceTab;
 
 class PortsController implements DeviceTab
 {
     private bool $detail = false;
+    private int $perPage = 15;
+    private string $sortOrder = 'asd';
 
     public function visible(Device $device): bool
     {
@@ -61,11 +65,25 @@ class PortsController implements DeviceTab
 
     public function data(Device $device, Request $request): array
     {
+        Validator::validate($request->all(), [
+            'perPage' => 'int',
+            'sort' => 'in:media,mac,port,traffic,speed',
+            'order' => 'in:asc,desc',
+            'disabled' => 'in:0,1',
+            'ignore' => 'in:0,1',
+            'admin' => 'in:up,down,testing,any',
+            'status' => 'in:up,down,testing,unknown,dormant,notPresent,lowerLayerDown,any',
+            'type' => 'in:bits,upkts,nupkts,errors,etherlike',
+            'from' => ['regex:/^(int|[+-]\d+[hdmy])$/'],
+            'to' => ['regex:/^(int|[+-]\d+[hdmy])$/'],
+        ]);
+
         $tab = $request->segment(4);
         $this->detail = empty($tab) || $tab == 'detail';
         $data = match ($tab) {
             'links' => $this->linksData($device),
             'xdsl' => $this->xdslData($device),
+            'graphs', 'mini_graphs' => $this->graphData($device, $request),
             default => $this->portData($device, $request),
         };
 
@@ -79,12 +97,8 @@ class PortsController implements DeviceTab
             'details' => empty($tab) || $tab == 'detail',
             'submenu' => [
                 $this->getTabs($device),
-                __('Graphs') => [
-                    ['name' => __('port.graphs.bits'), 'url' => 'bits'],
-                    ['name' => __('port.graphs.upkts'), 'url' => 'upkts'],
-                    ['name' => __('port.graphs.nupkts'), 'url' => 'nupkts'],
-                    ['name' => __('port.graphs.errors'), 'url' => 'errors'],
-                ],
+                __('Graphs') => $this->getGraphLinks(),
+                __('Mini Graphs') => $this->getGraphLinks('mini_graphs'),
             ],
             'page_links' => [
                 [
@@ -108,35 +122,18 @@ class PortsController implements DeviceTab
                 [
                     'icon' => $ignore ? 'fa-regular fa-square-check' : 'fa-regular fa-square',
                     'url' => $ignore ? $request->fullUrlWithoutQuery('ignore') : $request->fullUrlWithQuery(['ignore' => 1]),
-                    'title' => __('port.filters.disabled'),
+                    'title' => __('port.filters.ignored'),
                     'external' => false,
                 ],
             ],
+            'perPage' => $this->perPage,
+            'sort' => $this->sortOrder,
+            'next_order' => $this->sortOrder == 'asc' ? 'desc' : 'asc',
         ], $data);
     }
 
     private function portData(Device $device, Request $request): array
     {
-        Validator::validate($request->all(), [
-            'perPage' => 'int',
-            'sort' => 'in:media,mac,port,traffic,speed',
-            'order' => 'in:asc,desc',
-            'disabled' => 'in:0,1',
-            'ignore' => 'in:0,1',
-            'admin' => 'in:up,down,testing,any',
-            'status' => 'in:up,down,testing,unknown,dormant,notPresent,lowerLayerDown,any',
-        ]);
-        $perPage = $request->input('perPage', 15);
-        $sort = $request->input('sort', 'port');
-        $orderBy = match ($sort) {
-            'traffic' => \DB::raw('ports.ifInOctets_rate + ports.ifOutOctets_rate'),
-            'speed' => 'ifSpeed',
-            'media' => 'ifType',
-            'mac' => 'ifPhysAddress',
-            default => 'ifIndex',
-        };
-        $order = $request->input('order', 'asc');
-
         $relationships = ['groups', 'ipv4', 'ipv6', 'vlans', 'adsl', 'vdsl'];
         if ($this->detail) {
             $relationships[] = 'links';
@@ -145,21 +142,11 @@ class PortsController implements DeviceTab
             $relationships[] = 'ipv6Networks.ipv6';
         }
 
-        $ports = $device->ports()
-            ->isNotDeleted()
-            ->when(! $request->input('disabled'), fn (Builder $q, $disabled) => $q->where('disabled', 0))
-            ->when(! $request->input('ignore'), fn (Builder $q, $disabled) => $q->where('ignore', 0))
-            ->when($request->input('admin') != 'any', fn (Builder $q, $admin) => $q->where('ifAdminStatus', $request->input('admin', 'up')))
-            ->when($request->input('status', 'any') != 'any', fn (Builder $q, $admin) => $q->where('ifOperStatus', $request->input('status')))
-            ->orderBy($orderBy, $order)
-            ->hasAccess(Auth::user())->with($relationships)
-            ->paginate($perPage);
+        $ports = $this->getFilteredPortsQuery($device, $request, $relationships)->paginate($this->perPage);
 
         $data = [
             'ports' => $ports,
-            'perPage' => $perPage,
-            'sort' => $sort,
-            'next_order' => $order == 'asc' ? 'desc' : 'asc',
+            'neighbors' => $ports->keyBy('port_id')->map(fn ($port) => $this->findPortNeighbors($port)),
             'graphs' => [
                 'bits' => [['type' => 'port_bits', 'title' => trans('Traffic'), 'vars' => [['from' => '-1d'], ['from' => '-7d'], ['from' => '-30d'], ['from' => '-1y']]]],
                 'upkts' => [['type' => 'port_upkts', 'title' => trans('Packets (Unicast)'), 'vars' => [['from' => '-1d'], ['from' => '-7d'], ['from' => '-30d'], ['from' => '-1y']]]],
@@ -167,7 +154,6 @@ class PortsController implements DeviceTab
             ],
         ];
 
-        $data['neighbors'] = $ports->keyBy('port_id')->map(fn ($port) => $this->findPortNeighbors($port));
         if ($this->detail) {
             $data['neighbor_ports'] = Port::with('device')
                 ->hasAccess(Auth::user())
@@ -273,6 +259,14 @@ class PortsController implements DeviceTab
         $neighbors[$port_id][$type] = 1;
     }
 
+    private function graphData(Device $device, Request $request): array
+    {
+        return [
+            'graph_type' => 'port_' . $request->get('type'),
+            'ports' => $this->getFilteredPortsQuery($device, $request)->get(),
+        ];
+    }
+
     private function xdslData(Device $device): array
     {
         $device->portsAdsl->load('port');
@@ -315,5 +309,46 @@ class PortsController implements DeviceTab
         }
 
         return $tabs;
+    }
+
+    /**
+     * @return array[]
+     */
+    private function getGraphLinks(string $urlSlug = 'graphs'): array
+    {
+        $graph_links = [
+            ['name' => __('port.graphs.bits'), 'url' => $urlSlug . '?type=bits'],
+            ['name' => __('port.graphs.upkts'), 'url' => $urlSlug . '?type=upkts'],
+            ['name' => __('port.graphs.nupkts'), 'url' => $urlSlug . '?type=nupkts'],
+            ['name' => __('port.graphs.errors'), 'url' => $urlSlug . '?type=errors'],
+        ];
+
+        if (Config::get('enable_ports_etherlike')) {
+            $graph_links[] = ['name' => __('port.graphs.etherlike'), 'url' => $urlSlug . '?type=etherlike'];
+        }
+
+        return $graph_links;
+    }
+
+    private function getFilteredPortsQuery(Device $device, Request $request, array $relationships = []): HasMany
+    {
+        $this->perPage = $request->input('perPage', 15);
+        $this->sortOrder = $request->input('order', 'asc');
+        $orderBy = match ($request->input('sort', 'port')) {
+            'traffic' => \DB::raw('ports.ifInOctets_rate + ports.ifOutOctets_rate'),
+            'speed' => 'ifSpeed',
+            'media' => 'ifType',
+            'mac' => 'ifPhysAddress',
+            default => 'ifIndex',
+        };
+
+        return $device->ports()
+            ->isNotDeleted()
+            ->when(!$request->input('disabled'), fn(Builder $q, $disabled) => $q->where('disabled', 0))
+            ->when(!$request->input('ignore'), fn(Builder $q, $disabled) => $q->where('ignore', 0))
+            ->when($request->input('admin') != 'any', fn(Builder $q, $admin) => $q->where('ifAdminStatus', $request->input('admin', 'up')))
+            ->when($request->input('status', 'any') != 'any', fn(Builder $q, $admin) => $q->where('ifOperStatus', $request->input('status')))
+            ->orderBy($orderBy, $this->sortOrder)
+            ->hasAccess(Auth::user())->with($relationships);
     }
 }

@@ -16,6 +16,7 @@ return [
         'upkts' => 'Unicast Packets',
         'nupkts' => 'Non-Unicast Packets',
         'errors' => 'Errors',
+        'etherlike' => 'Etherlike',
     ],
     'mtu_label' => 'MTU :mtu',
     'tabs' => [
