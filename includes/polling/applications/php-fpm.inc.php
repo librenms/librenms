@@ -60,6 +60,7 @@ $var_mappings = [
     'slow_requests' => 'slow requests',
     'start_since' => 'start since',
     'total_processes' => 'total processes',
+    'last_request_cpu' => 'last request cpu',
 ];
 
 $new_app_data = [
