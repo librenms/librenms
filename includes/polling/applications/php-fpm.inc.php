@@ -87,7 +87,7 @@ foreach ($extend_return['data']['pools'] as $pool => $pool_stats) {
         $rrd_name = ['app', $name, $app->app_id, 'pools___' . $pool . '___' . $stat];
         $fields = ['data' => $extend_return['data']['pools'][$pool][$stat_key]];
 
-        $metrics['pools___' . $instance . '___' . $stat] = $extend_return['data']['pools'][$pool][$stat_key];
+        $metrics['pools___' . $pool . '___' . $stat] = $extend_return['data']['pools'][$pool][$stat_key];
 
         if ($stat == 'accepted_conn' || $stat == 'slow_requests') {
             $rrd_def = $counter_rrd_def;
