@@ -20,7 +20,7 @@
             @endforeach
         @endif
     </td>
-    <td>
+    <td @if($collapsing)class="tw-hidden md:tw-table-cell"@endif>
         @forelse($port->groups as $group)
             <div>{{ $group->name }}</div>
         @empty
@@ -79,7 +79,7 @@
             </div>
         @endif
     </td>
-    <td>
+    <td @if($collapsing)class="tw-hidden sm:tw-table-cell"@endif>
         @if($port->adsl)
             <div>{{ $port->adsl->adslLineCoding }}/{{ \LibreNMS\Util\Rewrite::dslLineType($port->adsl->adslLineType) }}</div>
             <div>{{ __('port.xdsl.sync_stat', ['down' => \LibreNMS\Util\Number::formatSi($port->adsl->adslAtucChanCurrTxRate, 2, 3, 'bps'), 'up' => \LibreNMS\Util\Number::formatSi($port->adsl->adslAturChanCurrTxRate, 2, 3, 'bps')]) }}</div>
@@ -98,7 +98,7 @@
         <div>{{ $port->ifPhysAddress }}</div>
         <div>{{ $port->ifMtu ? __('port.mtu_label', ['mtu' => $port->ifMtu]) : '' }}</div>
     </td>
-    <td>
+    <td @if($collapsing)class="tw-hidden md:tw-table-cell"@endif>
         <x-expandable height="4em">
             @foreach($data['neighbors'][$port->port_id] as $port_id => $neighbor)
                 <div>
