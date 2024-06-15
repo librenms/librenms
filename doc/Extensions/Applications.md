@@ -1846,26 +1846,41 @@ using it as a agent.
 
 1. Copy the shell script, phpfpmsp, to the desired host
 ```
-wget https://github.com/librenms/librenms-agent/raw/master/snmp/phpfpmsp -O /etc/snmp/phpfpmsp
+wget https://github.com/librenms/librenms-agent/raw/master/snmp/php-fpm -O /etc/snmp/php-fpm
 ```
 
 2. Make the script executable
 ```
-chmod +x /etc/snmp/phpfpmsp
+chmod +x /etc/snmp/php-fpm
+```
+
+3. Install the depends.
+```shell
+# FreeBSD
+pkg install p5-File-Slurp p5-JSON p5-String-ShellQuote p5-MIME-Base64
+# Debian
+apt-get install libfile-slurp-perl libjson-perl libstring-shellquote-perl libmime-base64-perl
 ```
 
 3. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
 ```
-extend phpfpmsp /etc/snmp/phpfpmsp
+extend phpfpmsp /etc/snmp/php-fpm
 ```
 
-4. Edit /etc/snmp/phpfpmsp to include the status URL for the PHP-FPM
-   pool you are monitoring.
+5. Create the config file
+   `/usr/local/etc/php-fpm_extend.json`. Alternate locations may be
+   specified using the the `-f` switch. Akin to like below. For more
+   information, see `/etc/snmp/php-fpm --help`.
+```json
+{
+"pools":{
+         "thefrog": "https://thefrog/fpm-status",
+         "foobar": "https://foo.bar/fpm-status"
+    }
+}
+```
 
-5. Restart snmpd on your host
-
-It is worth noting that this only monitors a single pool. If you want
-to monitor multiple pools, this won't do it.
+6. Restart snmpd on the host
 
 The application should be auto-discovered as described at the top of
 the page. If it is not, please follow the steps set out under `SNMP
