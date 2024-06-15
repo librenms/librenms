@@ -72,16 +72,26 @@ $metrics = [
 
 $old_app_data = $app->data;
 
-$rrd_def = RrdDefinition::make()
+$counter_rrd_def = RrdDefinition::make()
+    ->addDataset('data', 'DERIVE', 0);
+
+$gauge_rrd_def = RrdDefinition::make()
     ->addDataset('data', 'GAUGE', 0);
 
 // process instances
 foreach ($extend_return['data']['pools'] as $pool => $pool_stats) {
+    $new_app_data['pools'][] = $pool;
     foreach ($var_mappings as $stat => $stat_key) {
         $rrd_name = ['app', $name, $app->app_id, 'instances___' . $stat];
         $fields = ['data' => $extend_return['data']['pools'][$pool][$stat_key]];
 
-        $metrics['pools___' . $instance . '___' . $stat] = $value;
+        $metrics['pools___' . $instance . '___' . $stat] = $extend_return['data']['pools'][$pool][$stat_key];
+
+        if ($stat == 'accepted_conn') {
+            $rrd_def = $counter_rrd_def;
+        } else {
+            $rrd_def = $gauge_rrd_def;
+        }
 
         $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
         data_update($device, 'app', $tags, $fields);
@@ -93,15 +103,23 @@ foreach ($var_mappings as $stat => $stat_key) {
     $rrd_name = ['app', $name, $app->app_id, 'totals___' . $stat];
     $fields = ['data' => $extend_return['data']['totals'][$stat_key]];
 
-    $metrics['totals_' . $stat] = $value;
+    $metrics['totals_' . $stat] = $extend_return['data']['totals'][$stat_key];
+
+    if ($stat == 'accepted_conn') {
+        $rrd_def = $counter_rrd_def;
+    } else {
+        $rrd_def = $gauge_rrd_def;
+    }
 
     $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
     data_update($device, 'app', $tags, $fields);
 }
 
 // check for added or removed instances
-$added_pools = array_diff($new_app_data['pools'], $old_app_data['pools']);
-$removed_pools = array_diff($old_data['pools'], $$new_app_data['pools'])   ;
+$old_pools = $old_app_data['pools'] ?? [];
+$new_pools = $new_app_data['pools'] ?? [];
+$added_pools = array_diff($new_pools, $old_pools);
+$removed_pools = array_diff($old_pools, $new_pools);
 
 // if we have any changes in pools, log it
 if (count($added_pools) > 0 || count($removed_pools) > 0) {
