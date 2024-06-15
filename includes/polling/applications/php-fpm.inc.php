@@ -59,6 +59,7 @@ $var_mappings = [
     'max_listen_queue' => 'max listen queue',
     'slow_requests' => 'slow requests',
     'start_since' => 'start since',
+    'total_processes' => 'total processes',
 ];
 
 $new_app_data = [
@@ -78,16 +79,16 @@ $counter_rrd_def = RrdDefinition::make()
 $gauge_rrd_def = RrdDefinition::make()
     ->addDataset('data', 'GAUGE', 0);
 
-// process instances
+// process pools
 foreach ($extend_return['data']['pools'] as $pool => $pool_stats) {
     $new_app_data['pools'][] = $pool;
     foreach ($var_mappings as $stat => $stat_key) {
-        $rrd_name = ['app', $name, $app->app_id, 'instances___' . $stat];
+        $rrd_name = ['app', $name, $app->app_id, 'pools___' . $pool . '___' . $stat];
         $fields = ['data' => $extend_return['data']['pools'][$pool][$stat_key]];
 
         $metrics['pools___' . $instance . '___' . $stat] = $extend_return['data']['pools'][$pool][$stat_key];
 
-        if ($stat == 'accepted_conn') {
+        if ($stat == 'accepted_conn' || $stat == 'slow_requests') {
             $rrd_def = $counter_rrd_def;
         } else {
             $rrd_def = $gauge_rrd_def;
@@ -105,7 +106,7 @@ foreach ($var_mappings as $stat => $stat_key) {
 
     $metrics['totals_' . $stat] = $extend_return['data']['totals'][$stat_key];
 
-    if ($stat == 'accepted_conn') {
+    if ($stat == 'accepted_conn' || $stat == 'slow_requests') {
         $rrd_def = $counter_rrd_def;
     } else {
         $rrd_def = $gauge_rrd_def;
@@ -115,7 +116,7 @@ foreach ($var_mappings as $stat => $stat_key) {
     data_update($device, 'app', $tags, $fields);
 }
 
-// check for added or removed instances
+// check for added or removed pools
 $old_pools = $old_app_data['pools'] ?? [];
 $new_pools = $new_app_data['pools'] ?? [];
 $added_pools = array_diff($new_pools, $old_pools);

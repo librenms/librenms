@@ -1,7 +1,8 @@
 <?php
 
-$descr = 'slow_requests';
+$descr = 'Slow Requests';
 $stat = 'slow_requests';
+$unit_text = 'Requests/S';
 
 require 'php-fpm-include.php';
 
