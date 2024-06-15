@@ -43,6 +43,8 @@ if ($app_data['version'] == 'legacy') {
     $graphs = [
         'php-fpm_v1_combined' => 'Combined',
         'php-fpm_v1_accepted_conn' => 'Connections Per Second',
+        'php-fpm_v1_last_request_cpu' => 'Last Request CPU',
+        'php-fpm_v1_slow_requests' => 'Slow Requests',
         'php-fpm_v1_active_processes' => 'Active Procs',
         'php-fpm_v1_idle_processes' => 'Idle Procs',
         'php-fpm_v1_total_processes' => 'Total Procs',
@@ -51,7 +53,6 @@ if ($app_data['version'] == 'legacy') {
         'php-fpm_v1_max_listen_queue' => 'Max Listen Queue',
         'php-fpm_v1_listen_queue_len' => 'Listen Queue Len',
         'php-fpm_v1_max_children_reached' => 'Max Children Reached',
-        'php-fpm_v1_slow_requests' => 'Slow Requests',
         'php-fpm_v1_start_since' => 'Uptime',
     ];
 }
