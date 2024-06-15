@@ -40,7 +40,7 @@
         </x-port-link>
         </div>
     </td>
-    <td>
+    <td class="tw-whitespace-nowrap">
         <div>
             <i class="fa fa-long-arrow-left fa-lg tw-text-green-600" aria-hidden="true"></i>
             <span style="color: {{ \LibreNMS\Util\Color::percent($port->in_rate, $port->ifSpeed) }}">{{ \LibreNMS\Util\Number::formatSi($port->ifInOctets_rate * 8, 2, 3, 'bps') }}</span>
