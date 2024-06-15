@@ -42,7 +42,8 @@ try {
 
     $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
     data_update($device, 'app', $tags, $fields);
-    update_application($app, $phpfpm, $fields);
+
+    update_application($app, 'OK', $fields);
 
     return;
 }
@@ -69,18 +70,47 @@ $metrics = [
     'errored' => $extend_return['data']['errored'],
 ];
 
+$old_app_data = $app->data;
+
 $rrd_def = RrdDefinition::make()
     ->addDataset('data', 'GAUGE', 0);
 
-// process totals
-foreach ($var_mappings as $stat => $stat_key) {
-    if (isset($extend_return['data']['totals'][$stat_key])) {
-        $rrd_name = ['app', $name, $app->app_id, 'totals___' . $stat];
-        $fields = ['data' => $extend_return['data']['totals'][$stat_key]];
+// process instances
+foreach ($extend_return['data']['pools'] as $pool => $pool_stats) {
+    foreach ($var_mappings as $stat => $stat_key) {
+        $rrd_name = ['app', $name, $app->app_id, 'instances___' . $stat];
+        $fields = ['data' => $extend_return['data']['pools'][$pool][$stat_key]];
 
-        $metrics['totals_' . $stat] = $value;
+        $metrics['pools___' . $instance . '___' . $stat] = $value;
 
         $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
         data_update($device, 'app', $tags, $fields);
     }
 }
+
+// process totals
+foreach ($var_mappings as $stat => $stat_key) {
+    $rrd_name = ['app', $name, $app->app_id, 'totals___' . $stat];
+    $fields = ['data' => $extend_return['data']['totals'][$stat_key]];
+
+    $metrics['totals_' . $stat] = $value;
+
+    $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
+    data_update($device, 'app', $tags, $fields);
+}
+
+// check for added or removed instances
+$added_pools = array_diff($new_app_data['pools'], $old_app_data['pools']);
+$removed_pools = array_diff($old_data['pools'], $$new_app_data['pools'])   ;
+
+// if we have any changes in pools, log it
+if (count($added_pools) > 0 || count($removed_pools) > 0) {
+    $log_message = 'Suricata Instance Change:';
+    $log_message .= count($added_pools) > 0 ? ' Added ' . implode(',', $added_pools) : '';
+    $log_message .= count($removed_pools) > 0 ? ' Removed ' . implode(',', $added_pools) : '';
+    log_event($log_message, $device, 'application');
+}
+
+$app->data = $new_app_data;
+
+update_application($app, 'OK', $metrics);
