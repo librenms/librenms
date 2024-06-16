@@ -43,6 +43,7 @@ class PortsController implements DeviceTab
     private bool $detail = false;
     private int $perPage = 15;
     private string $sortOrder = 'asc';
+    private string $sortColumn = 'default';
 
     public function visible(Device $device): bool
     {
@@ -97,7 +98,7 @@ class PortsController implements DeviceTab
             ],
             'page_links' => $this->pageLinks($request),
             'perPage' => $this->perPage,
-            'sort' => $this->sortOrder,
+            'sort' => $this->sortColumn,
             'next_order' => $this->sortOrder == 'asc' ? 'desc' : 'asc',
         ], $data);
     }
@@ -330,11 +331,14 @@ class PortsController implements DeviceTab
     {
         $this->perPage = $request->input('perPage', 15);
         $this->sortOrder = $request->input('order', 'asc');
-        $orderBy = match ($request->input('sort', 'port')) {
+        $this->sortColumn = $request->input('sort', 'default');
+
+        $orderBy = match ($this->sortColumn) {
             'traffic' => \DB::raw('ports.ifInOctets_rate + ports.ifOutOctets_rate'),
             'speed' => 'ifSpeed',
             'media' => 'ifType',
             'mac' => 'ifPhysAddress',
+            'port' => 'ifName',
             default => 'ifIndex',
         };
 
