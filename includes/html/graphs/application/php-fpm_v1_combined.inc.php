@@ -28,12 +28,12 @@ foreach ($proc_stats as $stat => $descr) {
         $filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___' . $stat]);
     }
     if (Rrd::checkRrdExists($filename)) {
-            $rrd_list[] = [
-                'filename' => $filename,
-                'descr' => $descr,
-                'ds' => 'data',
-            ];
+        $rrd_list[] = [
+            'filename' => $filename,
+            'descr' => $descr,
+            'ds' => 'data',
+        ];
     }
-};
+}
 
 require 'includes/html/graphs/generic_multi_line.inc.php';

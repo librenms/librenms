@@ -33,7 +33,7 @@ if (Rrd::checkRrdExists($filename)) {
                 'ds' => 'data',
             ];
         }
-    };
+    }
 } else {
     $filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id]);
     if (Rrd::checkRrdExists($filename)) {
