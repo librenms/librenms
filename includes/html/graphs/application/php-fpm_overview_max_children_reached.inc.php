@@ -3,6 +3,7 @@
 $name = 'php-fpm';
 
 $descr = 'Max Chldrn Reached';
+$unit_text='Per Second';
 $ds = 'data';
 
 $filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___max_children_reached']);

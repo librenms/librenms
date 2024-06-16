@@ -2,6 +2,7 @@
 
 $descr = 'Max Children Reached';
 $stat = 'max_children_reached';
+$unit_text = 'Per Second';
 
 require 'php-fpm-include.php';
 

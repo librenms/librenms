@@ -89,7 +89,7 @@ foreach ($extend_return['data']['pools'] as $pool => $pool_stats) {
 
         $metrics['pools___' . $pool . '___' . $stat] = $extend_return['data']['pools'][$pool][$stat_key];
 
-        if ($stat == 'accepted_conn' || $stat == 'slow_requests') {
+        if ($stat == 'accepted_conn' || $stat == 'slow_requests' || $stat == 'max_children_reached') {
             $rrd_def = $counter_rrd_def;
         } else {
             $rrd_def = $gauge_rrd_def;
@@ -107,7 +107,7 @@ foreach ($var_mappings as $stat => $stat_key) {
 
     $metrics['totals_' . $stat] = $extend_return['data']['totals'][$stat_key];
 
-    if ($stat == 'accepted_conn' || $stat == 'slow_requests') {
+    if ($stat == 'accepted_conn' || $stat == 'slow_requests' || $stat == 'max_children_reached') {
         $rrd_def = $counter_rrd_def;
     } else {
         $rrd_def = $gauge_rrd_def;
