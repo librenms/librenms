@@ -23,7 +23,7 @@
                     "app_state_prev": "UNKNOWN",
                     "app_status": "",
                     "app_instance": "",
-                    "data": null,
+                    "data":  "{\"version\":1,\"pools\":[\"thefrog\"]}",
                     "deleted_at": null
                 }
             ],
@@ -97,12 +97,6 @@
                 {
                     "metric": "pools___thefrog___start_since",
                     "value": 31334,
-                    "value_prev": null,
-                    "app_type": "php-fpm"
-                },
-                {
-                    "metric": "pools___thefrog___start_time",
-                    "value": 1718481994,
                     "value_prev": null,
                     "app_type": "php-fpm"
                 },
