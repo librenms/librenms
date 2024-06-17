@@ -147,7 +147,7 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
 
         foreach ($processors as $processor) {
             $processor->processor_descr = substr($processor->processor_descr, 0, 64);
-            $processors[] = $processor;
+            $processor->processor_type = substr($processor->processor_type, 0, 16);
         }
 
         if (isset($processors) && is_array($processors)) {

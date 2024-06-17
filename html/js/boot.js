@@ -34,13 +34,13 @@ toastr.options = {
     titleClass: 'tw-text-xl tw-leading-7 tw-font-semibold tw-capitalize',
     messageClass: 'tw-mt-1 tw-text-base tw-leading-5 tw-text-gray-500 dark:tw-text-white',
     iconClasses: {
-        error: 'flasher-error tw-text-red-600 tw-border-red-600',
-        info: 'flasher-info tw-text-blue-600 tw-border-blue-600',
-        success: 'flasher-success tw-text-green-600 tw-border-green-600',
-        warning: 'flasher-warning tw-text-yellow-600 tw-border-yellow-600'
+        error: 'toast-error tw-text-red-600 tw-border-red-600',
+        info: 'toast-info tw-text-blue-600 tw-border-blue-600',
+        success: 'toast-success tw-text-green-600 tw-border-green-600',
+        warning: 'toast-warning tw-text-yellow-600 tw-border-yellow-600'
     },
     timeOut: 12000,
     progressBar: true,
     progressClass: 'toast-progress tw-h-1 tw-bg-current tw-absolute tw-bottom-0 tw-left-0 tw-mr-0.5',
-    containerId: 'flasher-container-top-right'
+    containerId: 'toast-container-top-right'
 };

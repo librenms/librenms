@@ -133,35 +133,37 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
     echo PHP_EOL;
 } elseif ($device['os'] == 'pbn' || $device['os'] == 'bdcom') {
     echo ' NMS-LLDP-MIB: ';
-    $lldp_array = SnmpQuery::hideMib()->walk('NMS-LLDP-MIB::lldpRemoteSystemsData')->table();
-    foreach ($lldp_array as $key => $lldp) {
-        d_echo($lldp);
-        $interface = get_port_by_ifIndex($device['device_id'], $lldp['lldpRemLocalPortNum']);
-        $remote_device_id = find_device_id($lldp['lldpRemSysName']);
+    $lldp_array = SnmpQuery::hideMib()->walk('NMS-LLDP-MIB::lldpRemoteSystemsData')->table(2);
+    foreach ($lldp_array as $key => $lldp_array_inner) {
+        foreach ($lldp_array_inner as $ifIndex => $lldp) {
+            d_echo($lldp);
+            $interface = get_port_by_ifIndex($device['device_id'], $lldp['lldpRemLocalPortNum']);
+            $remote_device_id = find_device_id($lldp['lldpRemSysName']);
 
-        if (! $remote_device_id &&
-                \LibreNMS\Util\Validate::hostname($lldp['lldpRemSysName']) &&
-                ! can_skip_discovery($lldp['lldpRemSysName'], $lldp['lldpRemSysDesc'] &&
-                    Config::get('autodiscovery.xdp') === true)
-        ) {
-            $remote_device_id = discover_new_device($lldp['lldpRemSysName'], $device, 'LLDP', $interface);
-        }
+            if (! $remote_device_id &&
+                    \LibreNMS\Util\Validate::hostname($lldp['lldpRemSysName']) &&
+                    ! can_skip_discovery($lldp['lldpRemSysName'], $lldp['lldpRemSysDesc'] &&
+                        Config::get('autodiscovery.xdp') === true)
+            ) {
+                $remote_device_id = discover_new_device($lldp['lldpRemSysName'], $device, 'LLDP', $interface);
+            }
 
-        if ($interface['port_id'] && $lldp['lldpRemSysName'] && $lldp['lldpRemPortId']) {
-            $remote_port_id = find_port_id($lldp['lldpRemPortDesc'], $lldp['lldpRemPortId'], $remote_device_id);
-            discover_link(
-                $interface['port_id'],
-                'lldp',
-                $remote_port_id,
-                $lldp['lldpRemSysName'],
-                $lldp['lldpRemPortId'],
-                null,
-                $lldp['lldpRemSysDesc'],
-                $device['device_id'],
-                $remote_device_id
-            );
-        }
-    }//end foreach
+            if ($interface['port_id'] && $lldp['lldpRemSysName'] && $lldp['lldpRemPortId']) {
+                $remote_port_id = find_port_id($lldp['lldpRemPortDesc'], $lldp['lldpRemPortId'], $remote_device_id);
+                discover_link(
+                    $interface['port_id'],
+                    'lldp',
+                    $remote_port_id,
+                    $lldp['lldpRemSysName'],
+                    $lldp['lldpRemPortId'],
+                    null,
+                    $lldp['lldpRemSysDesc'],
+                    $device['device_id'],
+                    $remote_device_id
+                );
+            }
+        } //end foreach $lldp_array_inner
+    }//end foreach $lldp_array
     echo PHP_EOL;
 } elseif ($device['os'] == 'timos') {
     echo ' TIMETRA-LLDP-MIB: ';

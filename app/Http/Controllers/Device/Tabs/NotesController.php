@@ -54,7 +54,7 @@ class NotesController implements DeviceTab
         return __('Notes');
     }
 
-    public function data(Device $device): array
+    public function data(Device $device, Request $request): array
     {
         return [];
     }

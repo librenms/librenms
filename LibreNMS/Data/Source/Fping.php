@@ -117,7 +117,8 @@ class Fping
         $process->run(function ($type, $output) use ($callback, &$partial) {
             // stdout contains individual ping responses, stderr contains summaries
             if ($type == Process::ERR) {
-                foreach (explode(PHP_EOL, $output) as $line) {
+                $lines = explode(PHP_EOL, $output);
+                foreach ($lines as $index => $line) {
                     if ($line) {
                         Log::debug("Fping OUTPUT|$line PARTIAL|$partial");
                         try {
@@ -125,8 +126,8 @@ class Fping
                             call_user_func($callback, $response);
                             $partial = '';
                         } catch (FpingUnparsableLine $e) {
-                            // handle possible partial line
-                            $partial = $e->unparsedLine;
+                            // handle possible partial line (only save it if it is the last line of output)
+                            $partial = $index === array_key_last($lines) ? $e->unparsedLine : '';
                         }
                     }
                 }

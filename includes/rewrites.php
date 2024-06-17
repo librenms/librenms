@@ -165,21 +165,7 @@ function short_port_descr($desc)
 
 function rewrite_adslLineType($adslLineType)
 {
-    $adslLineTypes = [
-        'noChannel' => 'No Channel',
-        'fastOnly' => 'Fastpath',
-        'interleavedOnly' => 'Interleaved',
-        'fastOrInterleaved' => 'Fast/Interleaved',
-        'fastAndInterleaved' => 'Fast+Interleaved',
-    ];
-
-    foreach ($adslLineTypes as $type => $text) {
-        if ($adslLineType == $type) {
-            $adslLineType = $text;
-        }
-    }
-
-    return $adslLineType;
+    return \LibreNMS\Util\Rewrite::dslLineType($adslLineType);
 }
 
 function ipmiSensorName($hardwareId, $sensorIpmi)

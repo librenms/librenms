@@ -802,7 +802,8 @@ class Device extends BaseModel
 
     public function maps(): HasManyThrough
     {
-        return $this->hasManyThrough(CustomMap::class, CustomMapNode::class, 'device_id', 'custom_map_id', 'device_id', 'custom_map_id');
+        return $this->hasManyThrough(CustomMap::class, CustomMapNode::class, 'device_id', 'custom_map_id', 'device_id', 'custom_map_id')
+            ->distinct();
     }
 
     public function mefInfo(): HasMany

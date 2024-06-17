@@ -210,6 +210,18 @@ class Rewrite
         return $location;
     }
 
+    public static function dslLineType(string $lineType): string
+    {
+        return match ($lineType) {
+            'noChannel' => 'No Channel',
+            'fastOnly' => 'Fastpath',
+            'interleavedOnly' => 'Interleaved',
+            'fastOrInterleaved' => 'Fast/Interleaved',
+            'fastAndInterleaved' => 'Fast+Interleaved',
+            default => $lineType,
+        };
+    }
+
     public static function vmwareGuest($guest_id)
     {
         $guests = [

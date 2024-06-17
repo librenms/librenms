@@ -20,8 +20,7 @@ $tables = [
     ['systemBatteryTable', '.1.3.6.1.4.1.674.10892.5.4.600.50.1.5.', 'systemBatteryStatus', 'systemBatteryLocationName'],
 ];
 
-foreach ($tables as $tablevalue) {
-    [$table_oid, $num_oid, $value_oid, $descr_oid] = $tablevalue;
+foreach ($tables as [$table_oid, $num_oid, $value_oid, $descr_oid]) {
     $temp = snmpwalk_cache_multi_oid($device, $table_oid, [], 'IDRAC-MIB-SMIv2', null, '-OQUse');
     // '-OQUsetX'
 

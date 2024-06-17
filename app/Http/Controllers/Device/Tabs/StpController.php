@@ -26,6 +26,7 @@
 namespace App\Http\Controllers\Device\Tabs;
 
 use App\Models\Device;
+use Illuminate\Http\Request;
 use LibreNMS\Interfaces\UI\DeviceTab;
 use LibreNMS\Util\Url;
 
@@ -51,7 +52,7 @@ class StpController implements DeviceTab
         return __('STP');
     }
 
-    public function data(Device $device): array
+    public function data(Device $device, Request $request): array
     {
         $active_vlan = Url::parseOptions('vlan', 1);
         $stpInstances = $device->stpInstances;

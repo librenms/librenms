@@ -63,6 +63,20 @@ class Submenu extends Component
      */
     public function isSelected($url)
     {
+        // check for get parameters
+        $parsed_url = parse_url($url);
+        if (isset($parsed_url['query']) && $parsed_url['path'] === $this->selected) {
+            parse_str($parsed_url['query'], $vars);
+            $request = request();
+            foreach ($vars as $key => $value) {
+                if ($request->input($key) !== $value) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
         return $url === $this->selected;
     }
 

@@ -18,7 +18,7 @@ echo "<span style='font-weight: bold;'>Neighbours</span> &#187; ";
 
 $selection = basename($vars['selection'] ?? 'list');
 
-unset($sep);
+$sep = '';
 foreach ($datas as $type) {
     echo $sep;
 

@@ -356,6 +356,53 @@ function init_map(id, config = {}) {
             (config.layer in baseMaps ? baseMaps[config.layer] : roads).addTo(leaflet);
             leaflet.layerControl._container.style.display = (config.readonly ? 'none' : 'block');
         });
+    } else if (config.engine === 'esri') {
+        leaflet.setMaxZoom(18);
+        // use vector maps if we have an API key
+        if (config.api_key) {
+            loadjs('js/esri-leaflet.js', function () {
+                loadjs('js/esri-leaflet-vector.js', function () {
+                    var roads = L.esri.Vector.vectorBasemapLayer("ArcGIS:Streets", {
+                        apikey: config.api_key
+                    });
+                    var topology = L.esri.Vector.vectorBasemapLayer("ArcGIS:Topographic", {
+                        apikey: config.api_key
+                    });
+                    var satellite = L.esri.Vector.vectorBasemapLayer("ArcGIS:Imagery", {
+                        apikey: config.api_key
+                    });
+
+                    baseMaps = {
+                        "Streets": roads,
+                        "Topography": topology,
+                        "Satellite": satellite
+                    };
+                    leaflet.layerControl = L.control.layers(baseMaps, null, {position: 'bottomleft'}).addTo(leaflet);
+                    (config.layer in baseMaps ? baseMaps[config.layer] : roads).addTo(leaflet);
+                    leaflet.layerControl._container.style.display = (config.readonly ? 'none' : 'block');
+                });
+            });
+        } else {
+            let attribution = 'Powered by <a href="https://www.esri.com/">Esri</a> | Esri Community Maps Contributors, Maxar, Microsoft, Iowa DNR, © OpenStreetMap, Microsoft, TomTom, Garmin, SafeGraph, GeoTechnologies, Inc, METI/NASA, USGS, EPA, NPS, US Census Bureau, USDA, USFWS';
+            var roads = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+                attribution: attribution
+            });
+            var topology = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x', {
+                attribution: attribution
+            });
+            var satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                attribution: attribution
+            });
+
+            baseMaps = {
+                "Streets": roads,
+                "Topography": topology,
+                "Satellite": satellite
+            };
+            leaflet.layerControl = L.control.layers(baseMaps, null, {position: 'bottomleft'}).addTo(leaflet);
+            (config.layer in baseMaps ? baseMaps[config.layer] : roads).addTo(leaflet);
+            leaflet.layerControl._container.style.display = (config.readonly ? 'none' : 'block');
+        }
     } else {
         leaflet.setMaxZoom(20);
         const tile_url = config.tile_url ? config.tile_url : '{s}.tile.openstreetmap.org';

@@ -12,6 +12,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Blade;
 use LibreNMS\Config;
+use LibreNMS\Interfaces\UI\DeviceTab;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Graph;
 use LibreNMS\Util\Url;
@@ -83,11 +84,14 @@ class DeviceController extends Controller
         $parent_id = Vminfo::guessFromDevice($device)->value('device_id');
         $overview_graphs = $this->buildDeviceGraphArrays($device);
 
+        /** @var DeviceTab[] $tabs */
         $tabs = array_map(function ($class) {
             return app()->make($class);
         }, array_filter($this->tabs, 'class_exists')); // TODO remove filter
-        $title = $tabs[$current_tab]->name();
-        $data = $tabs[$current_tab]->data($device);
+        $tab_controller = $tabs[$current_tab];
+        $title = $tab_controller->name();
+        $data = $tab_controller->data($device, $request);
+        $page_links = $data['page_links'] ?? [];
 
         // Device Link Menu, select the primary link
         $device_links = $this->deviceLinkMenu($device, $current_tab);

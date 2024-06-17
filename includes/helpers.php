@@ -115,3 +115,19 @@ if (! function_exists('preg_match_any')) {
         return false;
     }
 }
+
+if (! function_exists('toast')) {
+    /**
+     * send a toastr popup or return ToastInterface
+     */
+    function toast(?string $title = null, ?string $message = null, string $level = 'info', ?array $options = null)
+    {
+        $toast = app(\App\Http\Interfaces\ToastInterface::class);
+
+        if (! is_null($message)) {
+            return $toast->message($title, $message, $level, $options);
+        }
+
+        return $toast;
+    }
+}

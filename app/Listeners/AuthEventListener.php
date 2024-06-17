@@ -33,7 +33,7 @@ class AuthEventListener
 
         DB::table('authlog')->insert(['user' => $user->username ?: '', 'address' => Request::ip(), 'result' => 'Logged In']);
 
-        flash()->addInfo('Welcome ' . ($user->realname ?: $user->username));
+        toast()->info('Welcome ' . ($user->realname ?: $user->username));
     }
 
     /**

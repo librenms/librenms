@@ -5,6 +5,7 @@ module.exports = {
       './resources/**/*.blade.php',
       './resources/**/*.js',
       './resources/**/*.vue',
+      './html/js/boot.js',
   ],
   darkMode: 'class',
   theme: {
