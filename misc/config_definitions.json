@@ -5214,6 +5214,62 @@
             "default": true,
             "type": "boolean"
         },
+        "ports_ui.default_sort": {
+            "order": 10,
+            "group": "webui",
+            "section": "ports",
+            "default": "ifIndex",
+            "type": "select",
+            "options": [
+                "ifIndex",
+                "mac",
+                "media",
+                "port",
+                "speed",
+                "traffic"
+            ]
+        },
+        "ports_ui.show_disabled": {
+            "order": 50,
+            "group": "webui",
+            "section": "ports",
+            "default": false,
+            "type": "boolean"
+        },
+        "ports_ui.show_ignored": {
+            "order": 60,
+            "group": "webui",
+            "section": "ports",
+            "default": false,
+            "type": "boolean"
+        },
+        "ports_ui.filter_admin_status": {
+            "order": 70,
+            "group": "webui",
+            "section": "ports",
+            "default": "up",
+            "type": "select",
+            "options": [
+                "up",
+                "down",
+                "any"
+            ]
+        },
+        "ports_ui.filter_oper_status": {
+            "order": 80,
+            "group": "webui",
+            "section": "ports",
+            "default": "up",
+            "type": "select",
+            "options": [
+                "up",
+                "down",
+                "notPresent",
+                "lowerLayerDown",
+                "unknown",
+                "any"
+            ]
+        },
         "port_descr_parser": {
             "default": "includes/port-descr-parser.inc.php",
             "type": "text"
