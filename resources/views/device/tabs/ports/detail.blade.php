@@ -19,14 +19,15 @@
     <div class="tw-flex tw-flex-row-reverse tw-m-3">
         {{ $data['ports']->links('pagination::tailwind', ['perPage' => $data['perPage']]) }}
         @isset($data['perPage'])
-            <x-select :options="['10', '25', '100', 'all']"
+            <x-select :options="['15', '25', '100', 'all']"
                       {{-- location.herf = --}}
                       x-on:change="
                       const params = new URLSearchParams(window.location.search);
                       params.set('perPage', $event.target.value);
+                      params.delete('page');
                       window.location.search = params.toString();
                       " x-data="{}"
-                      :selected="$data['perPage']"
+                      selected="{{ $data['perPage'] }}"
                       name="perPage"
                       label="{{ __('Per Page') }}"
                       class="tw-mx-4"></x-select>
