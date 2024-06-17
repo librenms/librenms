@@ -10,9 +10,14 @@
         </thead>
         @foreach($data['links'] as $link)
             <tr>
-                <td><x-port-link :port="$link->port"></x-port-link>
-                    @if($link->port->getLabel() !== $link->port->getDescription() )
-                        <br />{{ $link->port->getDescription() }}
+                <td>
+                    @if($link->port)
+                        <x-port-link :port="$link->port"></x-port-link>
+                        @if($link->port->getLabel() !== $link->port->getDescription() )
+                            <br />{{ $link->port->getDescription() }}
+                        @endif
+                    @else
+                        {{ __('port.unknown_port') }}
                     @endif
                 </td>
                 <td>
