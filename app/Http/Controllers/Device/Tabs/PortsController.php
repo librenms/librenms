@@ -41,7 +41,7 @@ use LibreNMS\Interfaces\UI\DeviceTab;
 class PortsController implements DeviceTab
 {
     private bool $detail = false;
-    private int $perPage = 15;
+    private int|string $perPage = 15;
     private string $sortOrder = 'asc';
     private string $sortColumn = 'default';
 
@@ -68,7 +68,8 @@ class PortsController implements DeviceTab
     public function data(Device $device, Request $request): array
     {
         Validator::validate($request->all(), [
-            'perPage' => 'int',
+            'page' => 'int',
+            'perPage' => ['regex:/^(\d+|all)$/'],
             'sort' => 'in:media,mac,port,traffic,speed',
             'order' => 'in:asc,desc',
             'disabled' => 'in:0,1',
@@ -113,8 +114,10 @@ class PortsController implements DeviceTab
             $relationships[] = 'ipv6Networks.ipv6';
         }
 
-        /** @var Collection|LengthAwarePaginator<Port> $ports */
-        $ports = $this->getFilteredPortsQuery($device, $request, $relationships)->paginate($this->perPage);
+        /** @var Collection<Port>|LengthAwarePaginator<Port> $ports */
+        $ports = $this->getFilteredPortsQuery($device, $request, $relationships)
+            ->paginate(fn ($total) => $this->perPage == 'all' ? $total : (int) $this->perPage)
+            ->appends('perPage', $this->perPage);
 
         $data = [
             'ports' => $ports,

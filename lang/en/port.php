@@ -25,6 +25,7 @@ return [
         'links' => 'Neighbors',
         'xdsl' => 'xDSL',
     ],
+    'unknown_port' => 'Unknown Port',
     'vlan_count' => 'VLANs: :count',
     'vlan_label' => 'VLAN: :label',
     'xdsl' => [
