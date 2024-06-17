@@ -334,7 +334,7 @@ class PortsController implements DeviceTab
     {
         $this->perPage = $request->input('perPage', 32);
         $this->sortOrder = $request->input('order', 'asc');
-        $this->sortColumn = $request->input('sort', 'default');
+        $this->sortColumn = $request->input('sort', Config::get('ports_ui.default_sort'));
 
         $orderBy = match ($this->sortColumn) {
             'traffic' => \DB::raw('ports.ifInOctets_rate + ports.ifOutOctets_rate'),
@@ -348,10 +348,10 @@ class PortsController implements DeviceTab
         return Port::where('device_id', $device->device_id)
             ->isNotDeleted()
             ->hasAccess(Auth::user())->with($relationships)
-            ->when(! $request->input('disabled'), fn (Builder $q, $disabled) => $q->where('disabled', 0))
-            ->when(! $request->input('ignore'), fn (Builder $q, $disabled) => $q->where('ignore', 0))
-            ->when($request->input('admin') != 'any', fn (Builder $q, $admin) => $q->where('ifAdminStatus', $request->input('admin', 'up')))
-            ->when($request->input('status', 'any') != 'any', fn (Builder $q, $admin) => $q->where('ifOperStatus', $request->input('status')))
+            ->when(! $request->input('disabled', Config::get('ports_ui.show_disabled')), fn (Builder $q, $disabled) => $q->where('disabled', 0))
+            ->when(! $request->input('ignore', Config::get('ports_ui.show_disabled')), fn (Builder $q, $disabled) => $q->where('ignore', 0))
+            ->when($request->input('admin', Config::get('ports_ui.filter_admin_status')) != 'any', fn (Builder $q, $admin) => $q->where('ifAdminStatus', $request->input('admin', 'up')))
+            ->when($request->input('status', Config::get('ports_ui.filter_oper_status')) != 'any', fn (Builder $q, $admin) => $q->where('ifOperStatus', $request->input('status')))
             ->orderBy($orderBy, $this->sortOrder);
     }
 

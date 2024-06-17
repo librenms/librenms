@@ -5259,7 +5259,7 @@
             "order": 80,
             "group": "webui",
             "section": "ports",
-            "default": "up",
+            "default": "any",
             "type": "select",
             "options": [
                 "up",
