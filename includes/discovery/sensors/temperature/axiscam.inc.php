@@ -4,29 +4,29 @@ echo 'AXIS Temperatures ';
 
 // Set Temp Limits based on Device Description
 switch (true) {
-    case stristr($device['sysDescr'],'P1425-LE'):
-        $high_limit = "50";
-        $high_warn_limit = "40";
-        $low_warn_limit = "-20";
-        $low_limit = "-30";
+    case stristr($device['sysDescr'], 'P1425-LE'):
+        $high_limit = '50';
+        $high_warn_limit = '40';
+        $low_warn_limit = '-20';
+        $low_limit = '-30';
         break;
-    case stristr($device['sysDescr'],'P1435-LE'):
-        $high_limit = "60";
-        $high_warn_limit = "50";
-        $low_warn_limit = "-20";
-        $low_limit = "-30";
+    case stristr($device['sysDescr'], 'P1435-LE'):
+        $high_limit = '60';
+        $high_warn_limit = '50';
+        $low_warn_limit = '-20';
+        $low_limit = '-30';
         break;
-    case stristr($device['sysDescr'],'P1455-LE'):
-        $high_limit = "60";
-        $high_warn_limit = "50";
-        $low_warn_limit = "-30";
-        $low_limit = "-40";
+    case stristr($device['sysDescr'], 'P1455-LE'):
+        $high_limit = '60';
+        $high_warn_limit = '50';
+        $low_warn_limit = '-30';
+        $low_limit = '-40';
         break;
-    case stristr($device['sysDescr'],'P5676-LE'):
-        $high_limit = "50";
-        $high_warn_limit = "40";
-        $low_warn_limit = "-20";
-        $low_limit = "-30";
+    case stristr($device['sysDescr'], 'P5676-LE'):
+        $high_limit = '50';
+        $high_warn_limit = '40';
+        $low_warn_limit = '-20';
+        $low_limit = '-30';
         break;
     default:
         $high_limit = null;
@@ -49,5 +49,5 @@ foreach (array_keys($oids) as $index) {
     $current = $oids[$index]['tempSensorValue'];
     $oid = $cur_oid . $index;
 
-    discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, 'axiscam', 'Temperature Sensor ' . $index, '1', '1',  $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current);
+    discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, 'axiscam', 'Temperature Sensor ' . $index, '1', '1', $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current);
 }
