@@ -41,7 +41,7 @@ use LibreNMS\Interfaces\UI\DeviceTab;
 class PortsController implements DeviceTab
 {
     private bool $detail = false;
-    private int|string $perPage = 15;
+    private int|string $perPage = 32;
     private string $sortOrder = 'asc';
     private string $sortColumn = 'default';
 
@@ -332,7 +332,7 @@ class PortsController implements DeviceTab
 
     private function getFilteredPortsQuery(Device $device, Request $request, array $relationships = []): Builder
     {
-        $this->perPage = $request->input('perPage', 15);
+        $this->perPage = $request->input('perPage', 32);
         $this->sortOrder = $request->input('order', 'asc');
         $this->sortColumn = $request->input('sort', 'default');
 
