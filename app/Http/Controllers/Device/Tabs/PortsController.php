@@ -116,7 +116,7 @@ class PortsController implements DeviceTab
 
         /** @var Collection<Port>|LengthAwarePaginator<Port> $ports */
         $ports = $this->getFilteredPortsQuery($device, $request, $relationships)
-            ->paginate(fn($total) => $this->perPage == 'all' ? $total : (int) $this->perPage)
+            ->paginate(fn ($total) => $this->perPage == 'all' ? $total : (int) $this->perPage)
             ->appends('perPage', $this->perPage);
 
         $data = [
