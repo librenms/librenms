@@ -50,7 +50,7 @@ class PortsController implements DeviceTab
         'disabled' => false,
         'ignored' => false,
         'admin' => 'up',
-        'status' => 'any'
+        'status' => 'any',
     ];
 
     public function visible(Device $device): bool
