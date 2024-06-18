@@ -347,7 +347,11 @@ class PortsController implements DeviceTab
         $this->settings = $input + $saved + $this->defaults;
 
         if ($this->settings != $saved) {
-            UserPref::setPref($request->user(), 'ports_ui_settings', $this->settings);
+            if ($this->settings == $this->defaults) {
+                UserPref::forgetPref($request->user(), 'ports_ui_settings');
+            } else {
+                UserPref::setPref($request->user(), 'ports_ui_settings', $this->settings);
+            }
         }
     }
 
