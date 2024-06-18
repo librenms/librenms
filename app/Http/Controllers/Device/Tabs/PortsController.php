@@ -29,6 +29,7 @@ use App\Models\Device;
 use App\Models\Link;
 use App\Models\Port;
 use App\Models\Pseudowire;
+use App\Models\UserPref;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -41,9 +42,16 @@ use LibreNMS\Interfaces\UI\DeviceTab;
 class PortsController implements DeviceTab
 {
     private bool $detail = false;
-    private int|string $perPage = 32;
-    private string $sortOrder = 'asc';
-    private string $sortColumn = 'default';
+    private array $settings = [];
+    private array $defaults = [
+        'perPage' => 32,
+        'sort' => 'ifIndex',
+        'order' => 'asc',
+        'disabled' => false,
+        'ignored' => false,
+        'admin' => 'up',
+        'status' => 'any'
+    ];
 
     public function visible(Device $device): bool
     {
@@ -73,7 +81,7 @@ class PortsController implements DeviceTab
             'sort' => 'in:media,mac,port,traffic,speed',
             'order' => 'in:asc,desc',
             'disabled' => 'in:0,1',
-            'ignore' => 'in:0,1',
+            'ignored' => 'in:0,1',
             'admin' => 'in:up,down,testing,any',
             'status' => 'in:up,down,testing,unknown,dormant,notPresent,lowerLayerDown,any',
             'type' => 'in:bits,upkts,nupkts,errors,etherlike',
@@ -81,6 +89,7 @@ class PortsController implements DeviceTab
             'to' => ['regex:/^(int|[+-]\d+[hdmy])$/'],
         ]);
 
+        $this->loadSettings($request);
         $tab = $this->parseTab($request);
         $this->detail = $tab == 'detail';
         $data = match ($tab) {
@@ -98,9 +107,9 @@ class PortsController implements DeviceTab
                 __('Graphs') => $this->getGraphLinks(),
             ],
             'page_links' => $this->pageLinks($request),
-            'perPage' => $this->perPage,
-            'sort' => $this->sortColumn,
-            'next_order' => $this->sortOrder == 'asc' ? 'desc' : 'asc',
+            'perPage' => $this->settings['perPage'],
+            'sort' => $this->settings['sort'],
+            'next_order' => $this->settings['order'] == 'asc' ? 'desc' : 'asc',
         ], $data);
     }
 
@@ -115,9 +124,9 @@ class PortsController implements DeviceTab
         }
 
         /** @var Collection<Port>|LengthAwarePaginator<Port> $ports */
-        $ports = $this->getFilteredPortsQuery($device, $request, $relationships)
-            ->paginate(fn ($total) => $this->perPage == 'all' ? $total : (int) $this->perPage) // @phpstan-ignore-line missing closure type
-            ->appends('perPage', $this->perPage);
+        $ports = $this->getFilteredPortsQuery($device, $relationships)
+            ->paginate(fn ($total) => $this->settings['perPage'] == 'all' ? $total : (int) $this->settings['perPage']) // @phpstan-ignore-line missing closure type
+            ->appends('perPage', $this->settings['perPage']);
 
         $data = [
             'ports' => $ports,
@@ -238,7 +247,7 @@ class PortsController implements DeviceTab
     {
         return [
             'graph_type' => 'port_' . $request->get('type'),
-            'ports' => $this->getFilteredPortsQuery($device, $request)->get(),
+            'ports' => $this->getFilteredPortsQuery($device)->get(),
         ];
     }
 
@@ -330,13 +339,21 @@ class PortsController implements DeviceTab
         return $graph_links;
     }
 
-    private function getFilteredPortsQuery(Device $device, Request $request, array $relationships = []): Builder
+    private function loadSettings(Request $request): void
     {
-        $this->perPage = $request->input('perPage', 32);
-        $this->sortOrder = $request->input('order', 'asc');
-        $this->sortColumn = $request->input('sort', Config::get('ports_ui.default_sort'));
+        $input = $request->only(['perPage', 'sort', 'order', 'disabled', 'ignored', 'admin', 'status']);
+        $saved = UserPref::getPref($request->user(), 'ports_ui_settings') ?? [];
 
-        $orderBy = match ($this->sortColumn) {
+        $this->settings = $input + $saved + $this->defaults;
+
+        if ($this->settings != $saved) {
+            UserPref::setPref($request->user(), 'ports_ui_settings', $this->settings);
+        }
+    }
+
+    private function getFilteredPortsQuery(Device $device, array $relationships = []): Builder
+    {
+        $orderBy = match ($this->settings['sort']) {
             'traffic' => \DB::raw('ports.ifInOctets_rate + ports.ifOutOctets_rate'),
             'speed' => 'ifSpeed',
             'media' => 'ifType',
@@ -348,11 +365,11 @@ class PortsController implements DeviceTab
         return Port::where('device_id', $device->device_id)
             ->isNotDeleted()
             ->hasAccess(Auth::user())->with($relationships)
-            ->when(! $request->input('disabled', Config::get('ports_ui.show_disabled')), fn (Builder $q, $disabled) => $q->where('disabled', 0))
-            ->when(! $request->input('ignore', Config::get('ports_ui.show_disabled')), fn (Builder $q, $disabled) => $q->where('ignore', 0))
-            ->when($request->input('admin', Config::get('ports_ui.filter_admin_status')) != 'any', fn (Builder $q, $admin) => $q->where('ifAdminStatus', $request->input('admin', 'up')))
-            ->when($request->input('status', Config::get('ports_ui.filter_oper_status')) != 'any', fn (Builder $q, $admin) => $q->where('ifOperStatus', $request->input('status')))
-            ->orderBy($orderBy, $this->sortOrder);
+            ->when(! $this->settings['disabled'], fn (Builder $q, $disabled) => $q->where('disabled', 0))
+            ->when(! $this->settings['ignored'], fn (Builder $q, $disabled) => $q->where('ignore', 0))
+            ->when($this->settings['admin'] != 'any', fn (Builder $q, $admin) => $q->where('ifAdminStatus', $this->settings['admin']))
+            ->when($this->settings['status'] != 'any', fn (Builder $q, $admin) => $q->where('ifOperStatus', $this->settings['status']))
+            ->orderBy($orderBy, $this->settings['order']);
     }
 
     /**
@@ -372,10 +389,10 @@ class PortsController implements DeviceTab
 
     private function pageLinks(Request $request): array
     {
-        $disabled = $request->input('disabled');
-        $ignore = $request->input('ignore');
-        $admin = $request->input('admin') == 'any';
-        $status = $request->input('status') == 'up';
+        $disabled = $this->settings['disabled'];
+        $ignored = $this->settings['ignored'];
+        $admin = $this->settings['admin'] == 'any';
+        $status = $this->settings['status'] == 'up';
 
         return [
             [
@@ -397,8 +414,8 @@ class PortsController implements DeviceTab
                 'external' => false,
             ],
             [
-                'icon' => $ignore ? 'fa-regular fa-square-check' : 'fa-regular fa-square',
-                'url' => $ignore ? $request->fullUrlWithoutQuery('ignore') : $request->fullUrlWithQuery(['ignore' => 1]),
+                'icon' => $ignored ? 'fa-regular fa-square-check' : 'fa-regular fa-square',
+                'url' => $ignored ? $request->fullUrlWithoutQuery('ignored') : $request->fullUrlWithQuery(['ignored' => 1]),
                 'title' => __('port.filters.ignored'),
                 'external' => false,
             ],

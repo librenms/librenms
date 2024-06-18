@@ -80,7 +80,6 @@ return [
             'availability-map' => ['name' => 'Availability Map Settings'],
             'graph' => ['name' => 'Graph Settings'],
             'dashboard' => ['name' => 'Dashboard Settings'],
-            'ports' => ['name' => 'Ports'],
             'port-descr' => ['name' => 'Interface Description Parsing'],
             'search' => ['name' => 'Search Settings'],
             'style' => ['name' => 'Style'],
@@ -1305,23 +1304,6 @@ return [
             ],
             'printer-supplies' => [
                 'description' => 'Printer Supplies',
-            ],
-        ],
-        'ports_ui' => [
-            'default_sort' => [
-                'description' => 'Device Ports: Default Sort',
-            ],
-            'filter_admin_status' => [
-                'description' => 'Device Ports: Filter Admin Status',
-            ],
-            'filter_oper_status' => [
-                'description' => 'Device Ports: Filter Operational Status',
-            ],
-            'show_disabled' => [
-                'description' => 'Device Ports: Show Disabled',
-            ],
-            'show_ignored' => [
-                'description' => 'Device Ports: Show Ignored',
             ],
         ],
         'ports_fdb_purge' => [
