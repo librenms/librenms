@@ -401,25 +401,25 @@ class PortsController implements DeviceTab
         return [
             [
                 'icon' => $status ? 'fa-regular fa-square-check' : 'fa-regular fa-square',
-                'url' => $status ? $request->fullUrlWithoutQuery('status') : $request->fullUrlWithQuery(['status' => 'up']),
+                'url' => $request->fullUrlWithQuery(['status' => $status ? $this->defaults['status'] : 'up']),
                 'title' => __('port.filters.status_up'),
                 'external' => false,
             ],
             [
                 'icon' => $admin ? 'fa-regular fa-square-check' : 'fa-regular fa-square',
-                'url' => $admin ? $request->fullUrlWithoutQuery('admin') : $request->fullUrlWithQuery(['admin' => 'any']),
+                'url' => $request->fullUrlWithQuery(['admin' => $admin ? $this->defaults['admin'] : 'any']),
                 'title' => __('port.filters.admin_down'),
                 'external' => false,
             ],
             [
                 'icon' => $disabled ? 'fa-regular fa-square-check' : 'fa-regular fa-square',
-                'url' => $disabled ? $request->fullUrlWithoutQuery('disabled') : $request->fullUrlWithQuery(['disabled' => 1]),
+                'url' => $request->fullUrlWithQuery(['disabled' => ! $disabled]),
                 'title' => __('port.filters.disabled'),
                 'external' => false,
             ],
             [
                 'icon' => $ignored ? 'fa-regular fa-square-check' : 'fa-regular fa-square',
-                'url' => $ignored ? $request->fullUrlWithoutQuery('ignored') : $request->fullUrlWithQuery(['ignored' => 1]),
+                'url' => $request->fullUrlWithQuery(['ignored' => ! $ignored]),
                 'title' => __('port.filters.ignored'),
                 'external' => false,
             ],
