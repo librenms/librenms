@@ -95,6 +95,9 @@ class LdapAuthorizationAuthorizer extends AuthorizerBase
 
         $filter = '(' . Config::get('auth_ldap_prefix') . $username . ')';
         $search = ldap_search($this->ldap_connection, trim(Config::get('auth_ldap_suffix'), ','), $filter);
+        if ($search === false) {
+            throw new AuthenticationException('User search failed: ' . ldap_error($this->ldap_connection));
+        }
         $entries = ldap_get_entries($this->ldap_connection, $search);
         if ($entries['count']) {
             /*
