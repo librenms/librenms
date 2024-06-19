@@ -1726,7 +1726,7 @@ tr.search:nth-child(odd) {
 
 .gridster * {
   margin:0;
-  text-align: center;
+  text-align: left;
 }
 
 .grid ul {
