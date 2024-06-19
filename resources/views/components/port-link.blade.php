@@ -7,7 +7,8 @@
     <x-slot name="body">
         <div>
             @foreach($graphs as $graph)
-                <x-graph-row loading="lazy" :port="$port" :type="$graph['type'] ?? 'port_bits'" :title="$graph['title'] ?? null" :graphs="$fillDefaultVars($graph['vars'] ?? [])"></x-graph-row>
+                <x-graph-row loading="lazy" :port="$port" :type="$graph['type'] ?? 'port_bits'" :title="$graph['title'] ?? null"
+                             :graphs="$fillDefaultVars($graph['vars'] ?? [['from' => '-1d'], ['from' => '-7d'], ['from' => '-30d'], ['from' => '-1y']])"/>
             @endforeach
         </div>
     </x-slot>
