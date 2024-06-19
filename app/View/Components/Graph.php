@@ -130,6 +130,7 @@ class Graph extends Component
         return ! in_array($key, [
             'legend',
             'height',
+            'loading',
         ]);
     }
 
