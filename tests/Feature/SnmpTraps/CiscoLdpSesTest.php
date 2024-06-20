@@ -52,7 +52,7 @@ UDP: [$device->ip]:64610->[127.0.0.1]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 17:58:59.10
 SNMPv2-MIB::snmpTrapOID.0 MPLS-LDP-MIB::mplsLdpSessionDown
 MPLS-LDP-MIB::mplsLdpEntityPeerObjects.4.1.1.78.41.184.3.0.0.1311357842.78.41.184.1.0.0 = INTEGER: 1
-IF-MIB::ifIndex.$port->ifIndex = INTEGER: $port->ifIndex",
+IF-MIB::ifIndex.0 $port->ifIndex",
             "LDP session on interface $port->ifDescr is down",
             'Could not handle CiscoLdpSesDown trap',
             [Severity::Warning],
@@ -76,7 +76,7 @@ UDP: [$device->ip]:64610->[127.0.0.1]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 17:58:59.10
 SNMPv2-MIB::snmpTrapOID.0 MPLS-LDP-MIB::mplsLdpSessionDown
 MPLS-LDP-MIB::mplsLdpEntityPeerObjects.4.1.1.78.41.184.3.0.0.1311357842.78.41.184.1.0.0 = INTEGER: 5
-IF-MIB::ifIndex.$port->ifIndex = INTEGER: $port->ifIndex",
+IF-MIB::ifIndex.0 $port->ifIndex",
             "LDP session on interface $port->ifDescr is up",
             'Could not handle CiscoLdpSesUp trap',
             [Severity::Ok],
