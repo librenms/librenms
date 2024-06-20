@@ -44,7 +44,7 @@ class CiscoLdpSesTest extends SnmpTrapTestCase
         $port = Port::factory()->make(['ifAdminStatus' => 'up', 'ifOperStatus' => 'up']); /** @var Port $port */
         $device->ports()->save($port);
 
-        $warning = "Snmptrap LdpSesDown: Could not find port at ifIndex $port->ifIndex for device: $device->hostname";
+        $warning = "Snmptrap ciscoLdpSesDown: Could not find port at ifIndex $port->ifIndex for device: $device->hostname";
         \Log::shouldReceive('warning')->never()->with($warning);
 
         $this->assertTrapLogsMessage("$device->hostname
@@ -68,7 +68,7 @@ IF-MIB::ifIndex.0 $port->ifIndex",
         /** @var Port $port */
         $device->ports()->save($port);
 
-        $warning = "Snmptrap LdpSesUp: Could not find port at ifIndex $port->ifIndex for device: $device->hostname";
+        $warning = "Snmptrap ciscoLdpSesUp: Could not find port at ifIndex $port->ifIndex for device: $device->hostname";
         \Log::shouldReceive('warning')->never()->with($warning);
 
         $this->assertTrapLogsMessage("$device->hostname
