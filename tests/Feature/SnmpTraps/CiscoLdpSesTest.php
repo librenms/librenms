@@ -78,9 +78,9 @@ SNMPv2-MIB::snmpTrapOID.0 MPLS-LDP-MIB::mplsLdpSessionDown
 MPLS-LDP-MIB::mplsLdpEntityPeerObjects.4.1.1.78.41.184.3.0.0.1311357842.78.41.184.1.0.0 = INTEGER: 5
 IF-MIB::ifIndex.$port->ifIndex = INTEGER: $port->ifIndex",
             "LDP session on interface $port->ifDescr is up",
-	    'Could not handle JnxLdpSesUp trap',
-	    [Severity::Ok],
-	    $device,
+            'Could not handle CiscoLdpSesUp trap',
+            [Severity::Ok],
+            $device,
         );
     }
 }
