@@ -1,0 +1,42 @@
+{{- if .Values.librenms.snmp_scanner.enabled }}
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: {{ .Release.Name }}-snmp-scanner
+spec:
+  schedule: "{{.Values.librenms.snmp_scanner.cron }}"
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          annotations:
+            checksum/config: {{ include "librenms.configChecksum" . }}
+        spec:
+          volumes:
+          - name: files
+            configMap:
+              name: {{ .Release.Name }}-files
+          containers:
+          - name: snmp-scanner
+            image: '{{ .Values.librenms.image.repository }}:{{ .Values.librenms.image.tag }}'
+            imagePullPolicy: Always
+            envFrom:
+            - configMapRef:
+                name: {{ .Release.Name }}
+            volumeMounts:
+            - name: files
+              mountPath: /opt/librenms/config.d/custom.php
+              subPath: custom.php
+              readOnly: true
+            command:
+            - '/opt/librenms/snmp-scan.py'
+            - '-v'
+            {{- if .Values.librenms.snmp_scanner.resources }}
+            resources: {{ toYaml .Values.librenms.snmp_scanner.resources | nindent 14 }}
+            {{- end }}
+            {{- with .Values.librenms.snmp_scanner.extraEnvs }}
+            env:
+            {{- toYaml . | nindent 8 }}
+            {{- end }}
+          restartPolicy: OnFailure
+{{ end }}

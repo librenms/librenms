@@ -1,0 +1,29 @@
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: {{ .Release.Name }}
+data:
+  TZ: {{ .Values.librenms.timezone}}
+  DB_TIMEOUT: "60"
+  REDIS_HOST: {{ .Release.Name }}-redis-master
+  REDIS_PORT: "6379"
+  REDIS_DB: "0"
+  RRDCACHED_SERVER: "{{ .Release.Name }}-rrdcached:42217"
+  CACHE_DRIVER: redis
+  SESSION_DRIVER: redis
+  DB_HOST: {{ .Release.Name }}-mysql
+  DB_USERNAME: {{.Values.mysql.auth.username}}
+  DB_DATABASE: {{.Values.mysql.auth.database}}
+--- 
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: {{ .Release.Name }}-files
+data:
+  custom.php: |-
+{{ tpl (.Files.Get "files/custom.php") . | indent 4 }}
+  env: |-
+{{ tpl (.Files.Get "files/env") . | indent 4 }}
+  init.sh: |-
+{{ tpl (.Files.Get "files/init.sh") . | indent 4 }}

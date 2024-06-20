@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ .Release.Name }}-poller
+spec:
+  replicas: {{ .Values.librenms.poller.replicas }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ .Release.Name }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  serviceName: "poller"
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include "librenms.configChecksum" . }}
+      labels:
+        app.kubernetes.io/name: {{ .Release.Name }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+      volumes:
+      - name: env-volume
+        emptyDir: {}
+      - name: files
+        configMap:
+          name: {{ .Release.Name }}-files
+      - name: mysql
+        secret:
+          secretName: {{ .Release.Name }}-mysql
+      initContainers:
+        - name: init
+          image: busybox:1.28
+          command: ["/bin/sh","/data/files/init.sh"]
+          volumeMounts:
+          - name: env-volume
+            mountPath: /data/env-volume
+          - name: files
+            mountPath: /data/files
+      containers:
+      - name: poller
+        image: '{{ .Values.librenms.image.repository }}:{{ .Values.librenms.image.tag }}'
+        imagePullPolicy: Always
+        env:
+        - name: SIDECAR_DISPATCHER
+          value: "1"
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Release.Name }}-mysql
+              key: mysql-password
+        {{- with .Values.librenms.poller.extraEnvs }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+        envFrom:
+        - configMapRef:
+            name: {{ .Release.Name }}
+        volumeMounts:
+        - name: files
+          mountPath: /data/config/custom.php
+          subPath: custom.php
+          readOnly: true
+        - name: env-volume
+          mountPath: /data/.env
+          subPath: env
+        - name: mysql
+          mountPath: "/opt/secrets/mysql/"
+          readOnly: true
+        {{- if .Values.librenms.poller.resources }}
+        resources: {{ toYaml .Values.librenms.poller.resources | nindent 10 }}
+        {{- end }}
+        readinessProbe: 
+          exec:
+            command: ["nc", "-z", "-v", "-w1", "{{ .Release.Name }}-mysql", "3306"]
+          initialDelaySeconds: 0
+          periodSeconds: 1
+          failureThreshold: 3

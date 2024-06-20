@@ -1,0 +1,121 @@
+# Default values for librenms.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+
+librenms:
+  image:
+    repository: librenms/librenms
+    tag: 24.5.0
+
+  # Timezone used by librenms for communication with RRD cached
+  timezone: UTC
+
+  # Custom configuration options for LibreNMS. Fore more infomation on options
+  # in this file check the following link:
+  # https://docs.librenms.org/Support/Configuration/
+  configuration: |-
+    $config['distributed_poller_group']          = '0';
+    $config['distributed_poller']                = true;
+  
+  # Laravel appkey used by LibreNMS, a default is set for useability it is
+  # recommended to replace this with your own key
+  appkey: base64:Qh1eBwRfpgNHWByDDqhaX0I/0hnE/VDRiLHLnjwrZRw=
+  
+  # Frontend container configurations options
+  frontend:
+    replicas: 1
+    readinessProbe:
+      httpGet:
+        path: /login
+        port: 8000
+      initialDelaySeconds: 30
+      periodSeconds: 60
+      timeoutSeconds: 10
+    resources:
+      requests:
+        cpu: 50m
+        memory: 150M
+
+  # Distributed poller container configurations options
+  poller:
+    replicas: 2
+    resources:
+      requests:
+        cpu: 500m
+        memory: 200M
+
+  # SNMP network discovery scanner cron job. This job is optional and only use
+  # when having snmp network discovery enabled. For this to work either set the 
+  # 'nets' confifuration in the custom config on in the admin interface
+  # See the following link for more information: 
+  # https://docs.librenms.org/Extensions/Auto-Discovery/
+  snmp_scanner:
+    enabled: false
+    cron: 15 * * * *
+    resources:
+      requests:
+        cpu: 500m
+        memory: 200M
+    # Extra environment variable for LibreNMS SNMP scanner container
+    extraEnvs: {}
+
+  # Extra environment variable for LibreNMS container
+  extraEnvs: {}
+
+  # RRD cached is the tool that allows for distributed polling and is mandatory
+  # in this LibreNMS helm chart. See the rrdcached documentation for more 
+  # information: https://oss.oetiker.ch/rrdtool/doc/rrdcached.en.html
+  rrdcached:
+    image:
+      repository: crazymax/rrdcached
+      tag: 1.8.0
+    persistence:
+      enabled: true
+      journal:
+        size: 20Gi
+      rrdcached:
+        size: 100Gi
+    resources:
+      requests:
+        cpu: 100m
+        memory: 500M
+    livenessProbe:
+      tcpSocket:
+        port: 42217
+      initialDelaySeconds: 15
+      periodSeconds: 20
+    envs:
+    - name: TZ
+      value: "Europe/Amsterdam"
+    - name: WRITE_JITTER
+      value: '1800'
+    - name: WRITE_TIMEOUT
+      value: '1800'
+
+    # Extra environment variable for RRDCACHED container
+    extraEnvs: {}
+
+# Configuration for MySQL dependency chart by Bitnami. See their chart for 
+# more information: https://github.com/bitnami/charts/tree/master/bitnami/mysql
+mysql:
+  enabled: true
+  auth:
+    username: librenms
+    database: librenms
+
+# Configuration for redis dependency chart by Bitnami. See their chart for 
+# more information: https://github.com/bitnami/charts/tree/master/bitnami/redis
+redis:
+  enabled: true
+  auth:
+    enabled: false
+    sentinel: false
+
+  sentinel:
+    enabled: false
+
+  master:
+    disableCommands: []
+
+  architecture: standalone

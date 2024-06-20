@@ -1,0 +1,2 @@
+<?php
+{{.Values.librenms.configuration}}

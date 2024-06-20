@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-frontend
+spec:
+  replicas: {{ .Values.librenms.frontend.replicas }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ .Release.Name }}
+      app.kubernetes.io/instance: frontend
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include "librenms.configChecksum" . }}
+      labels:
+        app.kubernetes.io/name: {{ .Release.Name }}
+        app.kubernetes.io/instance: frontend
+    spec:
+      volumes:
+      - name: env-volume
+        emptyDir: {}
+      - name: files
+        configMap:
+          name: {{ .Release.Name }}-files
+      - name: mysql
+        secret:
+          secretName: {{ .Release.Name }}-mysql
+          optional: false 
+      initContainers:
+        - name: init
+          image: busybox:1.28
+          command: ["/bin/sh","/data/files/init.sh"]
+          volumeMounts:
+          - name: env-volume
+            mountPath: /data/env-volume
+          - name: files
+            mountPath: /data/files
+      containers:
+      - name: librenms
+        image: '{{ .Values.librenms.image.repository }}:{{ .Values.librenms.image.tag }}'
+        imagePullPolicy: Always
+        envFrom:
+        - configMapRef:
+            name: {{ .Release.Name }}
+        env:
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Release.Name }}-mysql
+              key: mysql-password
+        {{- with .Values.librenms.extraEnvs }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+        volumeMounts:
+        - name: files
+          mountPath: /data/files
+        - name: files
+          mountPath: /data/config/custom.php
+          subPath: custom.php
+          readOnly: true
+        - name: mysql
+          mountPath: "/opt/secrets/mysql/"
+        - name: env-volume
+          mountPath: /data/.env
+          subPath: env
+        {{- if .Values.librenms.frontend.resources }}
+        resources: {{ toYaml .Values.librenms.frontend.resources | nindent 10 }}
+        {{- end }}
+        {{- if .Values.librenms.frontend.readinessProbe }}
+        readinessProbe: {{ toYaml .Values.librenms.frontend.readinessProbe | nindent 10 }}
+        {{- end }}
+        ports:
+        - name: http
+          containerPort: 8000

@@ -1,0 +1,1 @@
+APP_KEY={{.Values.librenms.appkey}}
