@@ -27,11 +27,11 @@
 
 namespace LibreNMS\Tests\Feature\SnmpTraps;
 
+use App\Models\Device;
+use App\Models\Port;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Tests\Traits\RequiresDatabase;
-use App\Models\Device;
-use App\Models\Port;
 
 class CiscoLdpSesTest extends SnmpTrapTestCase
 {
@@ -51,8 +51,8 @@ MPLS-LDP-MIB::mplsLdpEntityPeerObjects.4.1.1.78.41.184.3.0.0.1311357842.78.41.18
 IF-MIB::ifIndex $port->ifIndex",
             "LDP session DOWN on interface $port->ifDescr",
             'Could not handle ciscoLdpSesDown trap',
-	    [Severity::Warning],
-	    $device,
+            [Severity::Warning],
+            $device,
         );
     }
 
@@ -69,8 +69,8 @@ MPLS-LDP-MIB::mplsLdpEntityPeerObjects.4.1.1.78.41.184.3.0.0.1311357842.78.41.18
 IF-MIB::ifIndex $port->ifIndex",
             "LDP session UP on interface $port->ifDescr",
             'Could not handle CiscoLdpSesUp trap',
-	    [Severity::Ok],
-	    $device,
+            [Severity::Ok],
+            $device,
         );
     }
 }
