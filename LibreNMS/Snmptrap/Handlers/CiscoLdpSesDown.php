@@ -47,7 +47,7 @@ class CiscoLdpSesDown implements SnmptrapHandler
         $ifIndex = $trap->getOidData($trap->findOid('IF-MIB::ifIndex'));
         $port = $device->ports()->where('ifIndex', $ifIndex)->first();
         /*
-	if (! $port) {
+        if (! $port) {
             $trap->log("Snmptrap ciscoLdpSesDown: Could not find port at ifIndex $ifIndex for device: $device->hostname", Severity::Warning);
             Log::warning("Snmptrap ciscoLdpSesDown: Could not find port at ifIndex $ifIndex for device: " . $device->hostname);
 

@@ -56,7 +56,7 @@ IF-MIB::ifIndex.0 $port->ifIndex",
             "LDP session DOWN on interface $port->ifDescr",
             'Could not handle ciscoLdpSesDown trap',
             [Severity::Warning],
-//            $device,
+            $device,
         );
     }
 
@@ -80,7 +80,7 @@ IF-MIB::ifIndex.0 $port->ifIndex",
             "LDP session UP on interface $port->ifDescr",
             'Could not handle CiscoLdpSesUp trap',
             [Severity::Ok],
-//            $device,
+            $device,
         );
     }
 }
