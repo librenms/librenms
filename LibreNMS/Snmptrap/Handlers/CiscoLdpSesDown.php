@@ -54,7 +54,7 @@ class CiscoLdpSesDown implements SnmptrapHandler
             return;
         }
         */
-	$severity = Severity::Warning;
-	$trap->log("LDP session DOWN on interface $port->ifDescr", $severity);
+        $severity = Severity::Warning;
+        $trap->log("LDP session DOWN on interface $port->ifDescr", $severity);
     }
 }
