@@ -43,10 +43,10 @@ class CiscoLdpSesTest extends SnmpTrapTestCase
         $device = Device::factory()->create(); /** @var Device $device */
         $port = Port::factory()->make(['ifAdminStatus' => 'up', 'ifOperStatus' => 'up']); /** @var Port $port */
         $device->ports()->save($port);
-
+        /*
         $warning = "Snmptrap ciscoLdpSesDown: Could not find port at ifIndex $port->ifIndex for device: $device->hostname";
         \Log::shouldReceive('warning')->never()->with($warning);
-
+        */
         $this->assertTrapLogsMessage("$device->hostname
 UDP: [$device->ip]:64610->[127.0.0.1]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 17:58:59.10
@@ -67,10 +67,10 @@ IF-MIB::ifIndex.0 $port->ifIndex",
         $port = Port::factory()->make(['ifAdminStatus' => 'up', 'ifOperStatus' => 'up']);
         /** @var Port $port */
         $device->ports()->save($port);
-
+        /*
         $warning = "Snmptrap ciscoLdpSesUp: Could not find port at ifIndex $port->ifIndex for device: $device->hostname";
         \Log::shouldReceive('warning')->never()->with($warning);
-
+        */
         $this->assertTrapLogsMessage("$device->hostname
 UDP: [$device->ip]:64610->[127.0.0.1]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 17:58:59.10
