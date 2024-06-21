@@ -27,8 +27,6 @@
 
 namespace LibreNMS\Tests\Feature\SnmpTraps;
 
-use App\Models\Device;
-use App\Models\Port;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Tests\Traits\RequiresDatabase;
@@ -56,11 +54,11 @@ TRAP,
 
     public function testCiscoLdpSesUpTrap(): void
     {
-	    $this->assertTrapLogsMessage(<<<'TRAP'
+        $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
 UDP: [$device->ip]:64610->[127.0.0.1]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 17:58:59.10
-SNMPv2-MIB::snmpTrapOID.0 MPLS-LDP-MIB::mplsLdpSessionDown
+SNMPv2-MIB::snmpTrapOID.0 MPLS-LDP-MIB::mplsLdpSessionUp
 MPLS-LDP-MIB::mplsLdpEntityPeerObjects.4.1.1.78.41.184.3.0.0.1311357842.78.41.184.1.0.0 = INTEGER: 5
 IF-MIB::ifIndex.51 = INTEGER: 51
 TRAP,
