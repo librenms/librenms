@@ -48,7 +48,8 @@ class CiscoLdpSesUp implements SnmptrapHandler
         $port = $device->ports()->where('ifIndex', $ifIndex)->first();
 
         if (! $port) {
-            Log::warning("Snmptrap CiscoLdpSesUp: Could not find port at ifIndex $ifIndex for device: " . $device->hostname);
+            $trap->log("Snmptrap CiscoLdpSesUp: Could not find port at ifIndex $ifIndex for device: $device->hostname", Severity::Warning);		
+//            Log::warning("Snmptrap CiscoLdpSesUp: Could not find port at ifIndex $ifIndex for device: " . $device->hostname);
 
             return;
         }
