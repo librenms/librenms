@@ -30,6 +30,8 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Tests\Traits\RequiresDatabase;
+use App\Models\Device;
+use App\Models\Port;
 
 class CiscoLdpSesTest extends SnmpTrapTestCase
 {
@@ -38,33 +40,37 @@ class CiscoLdpSesTest extends SnmpTrapTestCase
 
     public function testCiscoLdpSesDownTrap(): void
     {
-        $this->assertTrapLogsMessage(<<<'TRAP'
-{{ hostname }}
-UDP: [{{ ip }}]:64610->[127.0.0.1]:162
+        $device = Device::factory()->create();
+        $port = Port::factory()->make(['ifAdminStatus' => 'up', 'ifOperStatus' => 'up']);
+        $device->ports()->save($port);
+        $this->assertTrapLogsMessage("$device->hostname
+UDP: [$device->ip]:64610->[127.0.0.1]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 17:58:59.10
 SNMPv2-MIB::snmpTrapOID.0 MPLS-LDP-MIB::mplsLdpSessionDown
 MPLS-LDP-MIB::mplsLdpEntityPeerObjects.4.1.1.78.41.184.3.0.0.1311357842.78.41.184.1.0.0 = INTEGER: 1
-IF-MIB::ifIndex 51
-TRAP,
-            'LDP session DOWN on interface Gi0/0/1',
+IF-MIB::ifIndex $port->ifIndex",
+            "LDP session DOWN on interface $port->ifDescr",
             'Could not handle ciscoLdpSesDown trap',
-            [Severity::Warning],
+	    [Severity::Warning],
+	    $device,
         );
     }
 
     public function testCiscoLdpSesUpTrap(): void
     {
-        $this->assertTrapLogsMessage(<<<'TRAP'
-{{ hostname }}
-UDP: [{{ ip }}]:64610->[127.0.0.1]:162
+        $device = Device::factory()->create();
+        $port = Port::factory()->make(['ifAdminStatus' => 'up', 'ifOperStatus' => 'up']);
+        $device->ports()->save($port);
+        $this->assertTrapLogsMessage("$device->hostname
+UDP: [$device->ip]:64610->[127.0.0.1]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 17:58:59.10
 SNMPv2-MIB::snmpTrapOID.0 MPLS-LDP-MIB::mplsLdpSessionUp
 MPLS-LDP-MIB::mplsLdpEntityPeerObjects.4.1.1.78.41.184.3.0.0.1311357842.78.41.184.1.0.0 = INTEGER: 5
-IF-MIB::ifIndex 51
-TRAP,
-            'LDP session UP on interface Gi0/0/1',
+IF-MIB::ifIndex $port->ifIndex",
+            "LDP session UP on interface $port->ifDescr",
             'Could not handle CiscoLdpSesUp trap',
-            [Severity::Ok],
+	    [Severity::Ok],
+	    $device,
         );
     }
 }
