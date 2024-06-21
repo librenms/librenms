@@ -40,7 +40,7 @@ class CiscoLdpSesTest extends SnmpTrapTestCase
 
     public function testCiscoLdpSesDownTrap(): void
     {
-        $this->assertTrapLogsMessage(<<<'TRAP' 
+        $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
 UDP: [{{ ip }}]:64610->[127.0.0.1]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 17:58:59.10
@@ -56,7 +56,7 @@ TRAP,
 
     public function testCiscoLdpSesUpTrap(): void
     {
-	    $this->assertTrapLogsMessage(<<<'TRAP' 
+	    $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
 UDP: [$device->ip]:64610->[127.0.0.1]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 17:58:59.10
