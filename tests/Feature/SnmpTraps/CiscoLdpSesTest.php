@@ -53,7 +53,7 @@ DISMAN-EVENT-MIB::sysUpTimeInstance 17:58:59.10
 SNMPv2-MIB::snmpTrapOID.0 MPLS-LDP-MIB::mplsLdpSessionDown
 MPLS-LDP-MIB::mplsLdpEntityPeerObjects.4.1.1.78.41.184.3.0.0.1311357842.78.41.184.1.0.0 = INTEGER: 1
 IF-MIB::ifIndex $port->ifIndex",
-            "LDP session DOWN on interface $port->ifDescr",
+            "LDP session DOWN on interface $port->ifName",
             'Could not handle ciscoLdpSesDown trap',
             [Severity::Warning],
             $device,
@@ -77,7 +77,7 @@ DISMAN-EVENT-MIB::sysUpTimeInstance 17:58:59.10
 SNMPv2-MIB::snmpTrapOID.0 MPLS-LDP-MIB::mplsLdpSessionDown
 MPLS-LDP-MIB::mplsLdpEntityPeerObjects.4.1.1.78.41.184.3.0.0.1311357842.78.41.184.1.0.0 = INTEGER: 5
 IF-MIB::ifIndex $port->ifIndex",
-            "LDP session UP on interface $port->ifDescr",
+            "LDP session UP on interface $port->ifName",
             'Could not handle CiscoLdpSesUp trap',
             [Severity::Ok],
             $device,

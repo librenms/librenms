@@ -54,6 +54,6 @@ class CiscoLdpSesUp implements SnmptrapHandler
             return;
         }
         */
-        $trap->log("LDP session UP on interface $port->ifDescr", Severity::Ok);
+        $trap->log("LDP session UP on interface $port->ifName", Severity::Ok);
     }
 }
