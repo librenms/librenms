@@ -296,3 +296,4 @@ nav:
       - OpenWRT: Support/Device-Notes/Openwrt.md
       - RouterOS: Support/Device-Notes/Routeros.md
       - Supermicro: Extensions/Supermicro.md
+      - Fortigate: Support/Device-Notes/Fortigate.md
