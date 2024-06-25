@@ -1,4 +1,4 @@
-To gather Port IP info & routing info for Fortigates, disable the append-index feature.
+To gather Port IP info & routing info for Fortigates, disable the append-index feature.  This feature appends VDOM to the index, breaking standard MIBs.
 ```
 config system snmp sysinfo
     set append-index disable
