@@ -137,6 +137,16 @@
 
             network.on('click', function (properties) {
                 if (properties.nodes > 0) {
+                    let cur_highlighted = $('#highlight_node').val();
+                    if (cur_highlighted == properties.nodes) {
+                        $('#highlight_node').val(-1).trigger('change');
+                    } else {
+                        $('#highlight_node').val(properties.nodes).trigger('change');
+                    }
+                }
+            });
+            network.on('doubleClick', function (properties) {
+                if (properties.nodes > 0) {
                     window.location.href = "device/device="+properties.nodes+"/"
                 }
             });
