@@ -191,6 +191,7 @@ if ($device['location_id'] && $location = Location::find($device['location_id'])
                 let zoom = (device_location.lat === 0 && device_location.lng === 0) ? 2 : 17;
                 device_map.setView(device_location, zoom);
                 device_marker.dragging.enable();
+                L.control.fullscreen({ position: "topright" }).addTo(device_map);
                 ';
 
     # If we are configured to show all devices on map
