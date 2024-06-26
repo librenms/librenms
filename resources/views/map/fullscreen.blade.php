@@ -144,9 +144,8 @@ html, body, #fullscreen-map {
         var links = {};
 @if($show_netmap && $netmap_source == 'depends')
         $.post( '{{ route('maps.getdevices') }}', {disabled: 0, location_valid: 1, disabled_alerts: {{$netmap_include_disabled_alerts}}, link_type: '{{$netmap_source}}'})
-        $.get( '{{ route('maps.getdevices') }}', {disabled: 0, location_valid: 1, disabled_alerts: {{$netmap_include_disabled_alerts}}, link_type: '{{$netmap_source}}'})
 @else
-        $.get( '{{ route('maps.getdevices') }}', {disabled: 0, location_valid: 1, disabled_alerts: {{$netmap_include_disabled_alerts}}})
+        $.post( '{{ route('maps.getdevices') }}', {disabled: 0, location_valid: 1, disabled_alerts: {{$netmap_include_disabled_alerts}}})
 @endif
             .done(function( data ) {
                 $.each( data, function( device_id, device ) {
