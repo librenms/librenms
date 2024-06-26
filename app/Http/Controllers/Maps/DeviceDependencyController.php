@@ -32,6 +32,105 @@ use LibreNMS\Config;
 
 class DeviceDependencyController extends Controller
 {
+    protected $isolatedDeviceId = -1;
+
+    protected $deviceIdAll = [];
+
+    private $parentDeviceIds = [];
+
+    protected static function deviceList($request)
+    {
+        $group_id = $request->get('group');
+        $valid_loc = $request->get('location_valid');
+        $disabled = $request->get('disabled');
+        $ignore = $request->get('ignore');
+        $disabled_alerts = $request->get('disabled_alerts');
+
+        $deviceQuery = Device::hasAccess($request->user())->with('location');
+
+        if ($group_id) {
+            $deviceQuery->inDeviceGroup($group_id);
+        }
+
+        if (! is_null($disabled)) {
+            if ($disabled) {
+                $deviceQuery->where('disabled','<>','0');
+            } else {
+                $deviceQuery->where('disabled','=','0');
+            }
+        }
+
+        if (! is_null($ignore)) {
+            if ($ignore) {
+                $deviceQuery->where('ignore','<>','0');
+            } else {
+                $deviceQuery->where('ignore','=','0');
+            }
+        }
+
+        if (! is_null($disabled_alerts)) {
+            if ($disabled_alerts) {
+                $deviceQuery->where('disable_notify','<>','0');
+            } else {
+                $deviceQuery->where('disable_notify','=','0');
+            }
+        }
+
+        if ($valid_loc) {
+            $deviceQuery->whereHas('location', function ($query) {
+                    $query->whereNotNull('lng')
+                        ->whereNotNull('lat')
+                        ->where('lng','<>','')
+                        ->where('lat','<>','');
+                });
+        }
+
+        if (! $group_id) {
+            return $deviceQuery->with('parents')->get();
+        }
+
+        $devices = $deviceQuery->with([
+                'parents' => function ($query) use ($request) {
+                    $query->hasAccess($request->user());
+                },
+                'children' => function ($query) use ($request) {
+                    $query->hasAccess($request->user());
+                }, ])
+            ->get();
+
+        return $devices->merge($devices->map->only('children', 'parents')->flatten())->loadMissing('parents', 'location');
+    }
+
+    protected function highlightDevices($devices_by_id, $device_id_list)
+    {
+        $new_device_list = [];
+        foreach ($devices_by_id as $device) {
+            if (in_array($device['id'], $device_id_list)) {
+                $new_device_list[] = array_merge($device, $this->nodeHighlightStyle());
+                continue;
+            }
+            $new_device_list[] = $device;
+        }
+
+        return $new_device_list;
+    }
+
+    protected function getParentDevices($device)
+    {
+        foreach ($device->parents as $parent) {
+            if (! in_array($parent->device_id, $this->deviceIdAll)) {
+                continue;
+            }
+            if (in_array($parent->device_id, $this->parentDeviceIds)) {
+                continue;
+            }
+            $this->parentDeviceIds[] = $parent->device_id;
+            if ($parent) {
+                $this->getParentDevices($parent);
+            }
+        }
+    }
+
     // Device Dependency Map
     public function dependencyMap(Request $request)
     {
@@ -50,5 +149,26 @@ class DeviceDependencyController extends Controller
         ];
 
         return view('map.device-dependency', $data);
+    }
+
+    // Device Dependency JSON
+    public function dependencyJSON(Request $request)
+    {
+        // List all devices
+        $device_list = [];
+        foreach (self::deviceList($request) as $device) {
+            $device_list[$device->device_id] = [
+                    'id'      => $device->device_id,
+                    'icon'    => $device->icon,
+                    'sname'   => $device->shortDisplayName(),
+                    'status'  => $device->status,
+                    'url'     => Url::deviceUrl($device->device_id),
+                    'lat'     => $device->location->lat,
+                    'lng'     => $device->location->lng,
+                    'parents' => $device->parents->map->only('device_id')->flatten(),
+                ];
+        }
+
+        return response()->json($device_list);
     }
 }
