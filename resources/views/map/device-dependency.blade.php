@@ -16,8 +16,10 @@
         <option value="0">None</option>
         <option value="-1">Isolated Devices</option>
     </select>
-    <input type="checkbox" class="custom-control-input" id="showparentdevicepath" onChange="refreshMap()">
+    <input type="checkbox" class="custom-control-input" id="showparentdevicepath" onChange="updateHighlight(this)">
     <label class="custom-control-label" for="showparentdevicepath">{{ __('Highlight Dependencies to Root Device') }}</label>
+    <input type="checkbox" class="custom-control-input" id="showchilddevicepath" onChange="updateHighlight(this)">
+    <label class="custom-control-label" for="showchilddevicepath">{{ __('Highlight All Child Devices') }}</label>
 </div>
 </div>
 </div>
@@ -52,9 +54,23 @@
 
     var Countdown;
 
+    function updateHighlight(hlcb) {
+        if (hlcb.id == 'showchilddevicepath') {
+            $("#showparentdevicepath").prop( "checked", false );
+        } else if (hlcb.id == 'showparentdevicepath') {
+            $("#showchilddevicepath").prop( "checked", false );
+        }
+        refreshMap();
+    }
+
     function refreshMap() {
         var highlight = $("#highlight_node").val();
-        var showpath = $("#showparentdevicepath")[0].checked ? 1 : 0;
+        var showpath = 0;
+        if ($("#showparentdevicepath")[0].checked) {
+            showpath = 1;
+        } else if ($("#showchilddevicepath")[0].checked) {
+            showpath = -1;
+        }
 @if($group_id)
         var group = {{$group_id}};
 @else

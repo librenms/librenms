@@ -543,8 +543,8 @@ class MapDataController extends Controller
             }
         }
 
-        // Highlight all parents if required
-        if ($request->showpath && $request->highlight_node > 0) {
+        if ($request->showpath > 0 && $request->highlight_node > 0) {
+            // Highlight all parents if required
             $processed_parents = [];
             $this_parents = $device_list[$request->highlight_node]['parents'];
 
@@ -560,6 +560,28 @@ class MapDataController extends Controller
                     $next_parents = array_merge($next_parents, $device_list[$parent_id]['parents']->toArray());
                 }
                 $this_parents = $next_parents;
+            }
+        } elseif ($request->showpath < 0 && $request->highlight_node > 0) {
+            // Highlight all children if required
+            $processed_children = [];
+            $this_children = array_keys($device_child_map[$request->highlight_node]);
+
+            while (count($this_children) > 0) {
+                $next_children = [];
+                foreach ($this_children as $child_id) {
+                    if (array_key_exists($child_id, $processed_children)) {
+                        continue;
+                    }
+                    $processed_children[$child_id] = true;
+
+                    if (count($device_list[$child_id]['parents']) === 1) {
+                        $device_list[$child_id]['style'] = array_merge($device_list[$child_id]['style'], $this->nodeHighlightStyle());
+                        if (array_key_exists($child_id, $device_child_map)) {
+                            $next_children = array_merge($next_children, array_keys($device_child_map[$child_id]));
+                        }
+                    }
+                }
+                $this_children = $next_children;
             }
         }
 
