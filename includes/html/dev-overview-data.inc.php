@@ -285,8 +285,6 @@ if ($device['location_id'] && $location = Location::find($device['location_id'])
                         });
                     }
                 });';
-    } else {
-        echo 'device_marker.dragging.disable();';
     }
     echo '
         }
