@@ -1,4 +1,4 @@
-mib: NMS-CHASSIS:NMS-FAN-TRAP:NMS-POWER-MIB:NMS-GPON-MIB:NMS-EPON-OLT-PON
+mib: NMS-CHASSIS:NMS-FAN-TRAP:NMS-POWER-MIB:NMS-GPON-MIB:NMS-EPON-OLT-PON:NMS-IF-MIB:IF-MIB
 modules:
     mempools:
         data:
@@ -30,18 +30,192 @@ modules:
                 oid: nmscardCPUUtilization
                 num_oid: '.1.3.6.1.4.1.3320.3.6.10.1.11.{{ $index }}'
     sensors:
+        data:
+            -
+                oid:
+                 - ifName
+                 - vendname
+                 - sfpSeqNum
+                 - waveLen
+                 - sfpPresentStatus
         temperature:
             data:
                 -
                     oid: nmscardTemperature
                     num_oid: '.1.3.6.1.4.1.3320.3.6.10.1.13.{{ $index }}'
                     descr: 'Temperature {{ $index }}'
+                -
+                    oid: ifSfpParameterTable
+                    value: temperature
+                    num_oid: '.1.3.6.1.4.1.3320.9.63.1.7.1.4.{{ $index }}'
+                    descr: '{{ $ifName }} temperature'
+                    index: 'ifSfpParameterTable.temperature.{{ $index }}'
+                    group: 'Transceiver: {{ $ifName }} (Vendor: {{ $vendname }} S/N: {{ $sfpSeqNum }} {{ $waveLen }}nm)'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    divisor: 256
+                    skip_values: -65535
+                    low_limit: -10
+                    low_warn_limit: -5
+                    warn_limit: 75
+                    high_limit: 80
         voltage:
             data:
                 -
                     oid: nmscardVoltage
                     num_oid: '.1.3.6.1.4.1.3320.3.6.10.1.14.{{ $index }}'
                     descr: 'Voltage {{ $index }}'
+                -
+                    oid: ifSfpParameterTable
+                    value: vlotage
+                    num_oid: '.1.3.6.1.4.1.3320.9.63.1.7.1.5.{{ $index }}'
+                    descr: '{{ $ifName }} voltage'
+                    index: 'ifSfpParameterTable.vlotage.{{ $index }}'
+                    group: 'Transceiver: {{ $ifName }} (Vendor: {{ $vendname }} S/N: {{ $sfpSeqNum }} {{ $waveLen }}nm)'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    divisor: 10000
+                    skip_values: -65535
+                    low_limit: 3
+                    low_warn_limit: 3.1
+                    warn_limit: 3.5
+                    high_limit: 3.6
+        current:
+            data:
+                -
+                    oid: ifSfpParameterTable
+                    value: curr1
+                    num_oid: '.1.3.6.1.4.1.3320.9.63.1.7.1.6.{{ $index }}'
+                    descr: '{{ $ifName }} current1'
+                    index: 'ifSfpParameterTable.curr1.{{ $index }}'
+                    group: 'Transceiver: {{ $ifName }} (Vendor: {{ $vendname }} S/N: {{ $sfpSeqNum }} {{ $waveLen }}nm)'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    divisor: 500000
+                    skip_values: -65535
+                -
+                    oid: ifSfpParameterTable
+                    value: curr2
+                    num_oid: '.1.3.6.1.4.1.3320.9.63.1.7.1.10.{{ $index }}'
+                    descr: '{{ $ifName }} current2'
+                    index: 'ifSfpParameterTable.curr2.{{ $index }}'
+                    group: 'Transceiver: {{ $ifName }} (Vendor: {{ $vendname }} S/N: {{ $sfpSeqNum }} {{ $waveLen }}nm)'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    divisor: 500000
+                    skip_values: -65535
+                -
+                    oid: ifSfpParameterTable
+                    value: curr3
+                    num_oid: '.1.3.6.1.4.1.3320.9.63.1.7.1.13.{{ $index }}'
+                    descr: '{{ $ifName }} current3'
+                    index: 'ifSfpParameterTable.curr3.{{ $index }}'
+                    group: 'Transceiver: {{ $ifName }} (Vendor: {{ $vendname }} S/N: {{ $sfpSeqNum }} {{ $waveLen }}nm)'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    divisor: 500000
+                    skip_values: -65535
+                -
+                    oid: ifSfpParameterTable
+                    value: curr4
+                    num_oid: '.1.3.6.1.4.1.3320.9.63.1.7.1.16.{{ $index }}'
+                    descr: '{{ $ifName }} current4'
+                    index: 'ifSfpParameterTable.curr4.{{ $index }}'
+                    group: 'Transceiver: {{ $ifName }} (Vendor: {{ $vendname }} S/N: {{ $sfpSeqNum }} {{ $waveLen }}nm)'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    divisor: 500000
+                    skip_values: -65535
+        dbm:
+            data:
+                -
+                    oid: ifSfpParameterTable
+                    value: rxPower1
+                    num_oid: '.1.3.6.1.4.1.3320.9.63.1.7.1.3.{{ $index }}'
+                    descr: '{{ $ifName }} rxPower1'
+                    index: 'ifSfpParameterTable.rxPower1.{{ $index }}'
+                    group: 'Transceiver: {{ $ifName }} (Vendor: {{ $vendname }} S/N: {{ $sfpSeqNum }} {{ $waveLen }}nm)'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    divisor: 100
+                    skip_values: -65535
+                -
+                    oid: ifSfpParameterTable
+                    value: rxPower2
+                    num_oid: '.1.3.6.1.4.1.3320.9.63.1.7.1.9.{{ $index }}'
+                    descr: '{{ $ifName }} rxPower2'
+                    index: 'ifSfpParameterTable.rxPower2.{{ $index }}'
+                    group: 'Transceiver: {{ $ifName }} (Vendor: {{ $vendname }} S/N: {{ $sfpSeqNum }} {{ $waveLen }}nm)'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    divisor: 100
+                    skip_values: -65535
+                -
+                    oid: ifSfpParameterTable
+                    value: rxPower3
+                    num_oid: '.1.3.6.1.4.1.3320.9.63.1.7.1.12.{{ $index }}'
+                    descr: '{{ $ifName }} rxPower3'
+                    index: 'ifSfpParameterTable.rxPower3.{{ $index }}'
+                    group: 'Transceiver: {{ $ifName }} (Vendor: {{ $vendname }} S/N: {{ $sfpSeqNum }} {{ $waveLen }}nm)'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    divisor: 100
+                    skip_values: -65535
+                -
+                    oid: ifSfpParameterTable
+                    value: rxPower4
+                    num_oid: '.1.3.6.1.4.1.3320.9.63.1.7.1.15.{{ $index }}'
+                    descr: '{{ $ifName }} rxPower4'
+                    index: 'ifSfpParameterTable.rxPower4.{{ $index }}'
+                    group: 'Transceiver: {{ $ifName }} (Vendor: {{ $vendname }} S/N: {{ $sfpSeqNum }} {{ $waveLen }}nm)'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    divisor: 100
+                    skip_values: -65535
+                -
+                    oid: ifSfpParameterTable
+                    value: txPower1
+                    num_oid: '.1.3.6.1.4.1.3320.9.63.1.7.1.2.{{ $index }}'
+                    descr: '{{ $ifName }} txPower1'
+                    index: 'ifSfpParameterTable.txPower1.{{ $index }}'
+                    group: 'Transceiver: {{ $ifName }} (Vendor: {{ $vendname }} S/N: {{ $sfpSeqNum }} {{ $waveLen }}nm)'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    divisor: 100
+                    skip_values: -65535
+                -
+                    oid: ifSfpParameterTable
+                    value: txPower2
+                    num_oid: '.1.3.6.1.4.1.3320.9.63.1.7.1.8.{{ $index }}'
+                    descr: '{{ $ifName }} txPower2'
+                    index: 'ifSfpParameterTable.txPower2.{{ $index }}'
+                    group: 'Transceiver: {{ $ifName }} (Vendor: {{ $vendname }} S/N: {{ $sfpSeqNum }} {{ $waveLen }}nm)'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    divisor: 100
+                    skip_values: -65535
+                -
+                    oid: ifSfpParameterTable
+                    value: txPower3
+                    num_oid: '.1.3.6.1.4.1.3320.9.63.1.7.1.11.{{ $index }}'
+                    descr: '{{ $ifName }} txPower3'
+                    index: 'ifSfpParameterTable.txPower3.{{ $index }}'
+                    group: 'Transceiver: {{ $ifName }} (Vendor: {{ $vendname }} S/N: {{ $sfpSeqNum }} {{ $waveLen }}nm)'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    divisor: 100
+                    skip_values: -65535
+                -
+                    oid: ifSfpParameterTable
+                    value: txPower4
+                    num_oid: '.1.3.6.1.4.1.3320.9.63.1.7.1.14.{{ $index }}'
+                    descr: '{{ $ifName }} txPower4'
+                    index: 'ifSfpParameterTable.txPower4.{{ $index }}'
+                    group: 'Transceiver: {{ $ifName }} (Vendor: {{ $vendname }} S/N: {{ $sfpSeqNum }} {{ $waveLen }}nm)'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    divisor: 100
+                    skip_values: -65535
         humidity:
             data:        
                 -
@@ -66,6 +240,23 @@ modules:
                         - { descr: arithmetic_overflow_exception, graph: 0, value: 12, generic: 2 }
                         - { descr: trap_exception, graph: 0, value: 13, generic: 2 }
                         - { descr: deadlock_software_exception, graph: 0, value: 16, generic: 2 }
+                -
+                    oid: ifSfpParameterTable
+                    value: sfpLostStatus
+                    num_oid: '.1.3.6.1.4.1.3320.9.63.1.7.1.21.{{ $index }}'
+                    descr: 'LOS'
+                    index: 'ifSfpParameterTable.sfpLostStatus.{{ $index }}'
+                    group: 'Transceiverr: {{ $ifName }} (Vendor: {{ $vendname }} S/N: {{ $sfpSeqNum }} {{ $waveLen }}nm)'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    states:
+                        - { descr: normal, graph: 1, value: 1, generic: 0 }
+                        - { descr: lost, graph: 2, value: 2, generic: 2 }
+                    skip_values:
+                        - # skip ports with no tansceiver inserted
+                            oid: sfpPresentStatus 
+                            op: '='
+                            value: 2
                 -
                     oid: FanStatus
                     num_oid: '.1.3.6.1.4.1.3320.9.187.4.1.2.{{ $index }}'
