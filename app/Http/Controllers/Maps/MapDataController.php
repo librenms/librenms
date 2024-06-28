@@ -498,7 +498,7 @@ class MapDataController extends Controller
                 'style' => self::deviceStyle($device, $request->highlight_node),
                 'lat' => $device->location ? $device->location->lat : null,
                 'lng' => $device->location ? $device->location->lng : null,
-                'parents' => ($request->link_type == 'depends') ? $device->parents->pluck('device_id') : collect(),
+                'parents' => ($request->link_type == 'depends') ? $device->parents->pluck('device_id', 'device_id') : collect(),
                 'children' => ($request->link_type == 'depends') ? $device->children->pluck('device_id', 'device_id') : collect(),
                 'maintenance' => array_key_exists($device->device_id, $maintdevicesmap) ? 1 : 0,
             ];
@@ -530,7 +530,7 @@ class MapDataController extends Controller
 
                 foreach ($this_level_devices->keys() as $device_id) {
                     // Highlight isolated devices if needed
-                    if ($request->highlight_node == -1 && count($device->children) === 0 && count($device_list[$device_id]['parents']) == 0) {
+                    if ($request->highlight_node == -1 && $device->children->count() === 0 && $device_list[$device_id]['parents']->count() == 0) {
                         $device_list[$device_id]['style'] = array_merge($device_list[$device_id]['style'], $this->nodeHighlightStyle());
                     }
 
@@ -565,8 +565,8 @@ class MapDataController extends Controller
                 $processed_parents = [];
                 $this_parents = $device_list[$request->highlight_node]['parents'];
 
-                while (count($this_parents) > 0) {
-                    $next_parents = [];
+                while ($this_parents->count() > 0) {
+                    $next_parents = collect();
                     foreach ($this_parents as $parent_id) {
                         if (array_key_exists($parent_id, $processed_parents)) {
                             continue;
@@ -574,7 +574,7 @@ class MapDataController extends Controller
                         $processed_parents[$parent_id] = true;
 
                         $device_list[$parent_id]['style'] = array_merge($device_list[$parent_id]['style'], $this->nodeHighlightStyle());
-                        $next_parents = array_merge($next_parents, $device_list[$parent_id]['parents']->toArray());
+                        $next_parents = $next_parents->union($device_list[$parent_id]['parents']);
                     }
                     $this_parents = $next_parents;
                 }
@@ -583,7 +583,7 @@ class MapDataController extends Controller
                 $processed_children = [];
                 $this_children = $device_list[$request->highlight_node]['children'];
 
-                while (count($this_children) > 0) {
+                while ($this_children->count() > 0) {
                     $next_children = collect();
                     foreach ($this_children as $child_id) {
                         if (array_key_exists($child_id, $processed_children)) {
@@ -591,7 +591,7 @@ class MapDataController extends Controller
                         }
                         $processed_children[$child_id] = true;
 
-                        if (count($device_list[$child_id]['parents']) === 1) {
+                        if ($device_list[$child_id]['parents']->count() === 1) {
                             $device_list[$child_id]['style'] = array_merge($device_list[$child_id]['style'], $this->nodeHighlightStyle());
                             $next_children = $next_children->merge($device_list[$child_id]['children']);
                         }
