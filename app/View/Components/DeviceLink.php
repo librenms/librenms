@@ -46,6 +46,10 @@ class DeviceLink extends Component
      */
     public function render()
     {
+        if (! $this->device->exists) {
+            return view('components.device-link-missing');
+        }
+
         if (! $this->device->canAccess(auth()->user())) {
             return view('components.device-link-no-access');
         }
