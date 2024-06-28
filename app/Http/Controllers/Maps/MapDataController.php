@@ -591,10 +591,8 @@ class MapDataController extends Controller
                         }
                         $processed_children[$child_id] = true;
 
-                        if ($device_list[$child_id]['parents']->count() === 1) {
-                            $device_list[$child_id]['style'] = array_merge($device_list[$child_id]['style'], $this->nodeHighlightStyle());
-                            $next_children = $next_children->merge($device_list[$child_id]['children']);
-                        }
+                        $device_list[$child_id]['style'] = array_merge($device_list[$child_id]['style'], $this->nodeHighlightStyle());
+                        $next_children = $next_children->merge($device_list[$child_id]['children']);
                     }
                     $this_children = $next_children;
                 }
