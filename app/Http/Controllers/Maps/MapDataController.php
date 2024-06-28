@@ -41,7 +41,7 @@ use LibreNMS\Util\Url;
 
 class MapDataController extends Controller
 {
-    protected static function geoLinks($request)
+    protected static function geoLinks(Request $request): Collection
     {
         $user = $request->user();
 
@@ -95,7 +95,7 @@ class MapDataController extends Controller
             });
     }
 
-    protected static function portsWithLinks($request, $remote_port_attr)
+    protected static function portsWithLinks(Request $request, string $remote_port_attr): Collection
     {
         $user = $request->user();
         $disabled = $request->disabled;
@@ -261,7 +261,7 @@ class MapDataController extends Controller
         return $linkQuery->get();
     }
 
-    protected static function deviceList($request)
+    protected static function deviceList(Request $request): Collection
     {
         $group_id = $request->group;
         $devices = $request->devices;
@@ -311,8 +311,8 @@ class MapDataController extends Controller
         }
 
         if ($valid_loc) {
-            $deviceQuery->whereHas('location', function ($query) {
-                $query->whereNotNull('lng')
+            $deviceQuery->whereHas('location', function ($q) {
+                $q->whereNotNull('lng')
                     ->whereNotNull('lat')
                     ->where('lng', '<>', '')
                     ->where('lat', '<>', '');
@@ -321,29 +321,36 @@ class MapDataController extends Controller
 
         if (! $group_id) {
             if ($linkType == 'depends') {
-                return $deviceQuery->with('parents')->get();
+                return $deviceQuery->with([
+                    'parents' => function ($q) use ($request) {
+                        $q->hasAccess($request->user());
+                    },
+                    'children' => function ($q) use ($request) {
+                        $q->hasAccess($request->user());
+                    }, ])
+                ->get();
             } else {
                 return $deviceQuery->get();
             }
         }
 
         if ($linkType == 'depends') {
-            $devices = $deviceQuery->with([
-                'parents' => function ($query) use ($request) {
-                    $query->hasAccess($request->user());
+            return $deviceQuery->with([
+                'parents' => function ($q) use ($request, $group_id) {
+                    $q->hasAccess($request->user())
+                        ->inDeviceGroup($group_id);
                 },
-                'children' => function ($query) use ($request) {
-                    $query->hasAccess($request->user());
+                'children' => function ($q) use ($request, $group_id) {
+                    $q->hasAccess($request->user())
+                        ->inDeviceGroup($group_id);
                 }, ])
             ->get();
-
-            return $devices->merge($devices->map->only('children', 'parents')->flatten())->loadMissing('parents', 'location');
         } else {
             return $deviceQuery->get();
         }
     }
 
-    protected function linkSpeedWidth($speed)
+    protected function linkSpeedWidth(int $speed): float
     {
         $speed /= 1000000000;
         if ($speed > 500000) {
@@ -359,7 +366,7 @@ class MapDataController extends Controller
         return round(0.77 * pow($speed, 0.25));
     }
 
-    protected function linkUseColour($link_pct)
+    protected function linkUseColour(float $link_pct): int
     {
         $link_pct = round(2 * $link_pct, -1) / 2;
         if ($link_pct > 100) {
@@ -372,7 +379,7 @@ class MapDataController extends Controller
         return Config::get("network_map_legend.$link_pct");
     }
 
-    protected function nodeDisabledStyle()
+    protected function nodeDisabledStyle(): array
     {
         return [
             'color' => [
@@ -386,7 +393,7 @@ class MapDataController extends Controller
         ];
     }
 
-    protected function nodeHighlightStyle()
+    protected function nodeHighlightStyle(): array
     {
         return [
             'color' => [
@@ -399,7 +406,7 @@ class MapDataController extends Controller
         ];
     }
 
-    protected function nodeDownStyle()
+    protected function nodeDownStyle(): array
     {
         return [
             'color' => [
@@ -414,7 +421,7 @@ class MapDataController extends Controller
         ];
     }
 
-    protected function nodeUpStyle()
+    protected function nodeUpStyle(): array
     {
         return [
             'color' => null,
@@ -424,7 +431,7 @@ class MapDataController extends Controller
         ];
     }
 
-    protected function deviceStyle($device, $highlight_node = 0)
+    protected function deviceStyle($device, $highlight_node = 0): array
     {
         if ($device->disabled) {
             $device_style = $this->nodeDisabledStyle();
@@ -442,7 +449,7 @@ class MapDataController extends Controller
     }
 
     // GET Device
-    public function getDevices(Request $request)
+    public function getDevices(Request $request): Response
     {
         // Get all devices under maintenance
         $maintdevices = AlertSchedule::isActive()
@@ -460,8 +467,7 @@ class MapDataController extends Controller
         }
 
         // For manual level we need to track some items
-        $next_level_devices = [];
-        $device_child_map = [];
+        $next_level_devices = collect();
         $processed_devices = [];
 
         // List all devices
@@ -473,18 +479,6 @@ class MapDataController extends Controller
                 $updowntime = \LibreNMS\Util\Time::formatInterval(time() - strtotime($device->last_polled));
             } else {
                 $updowntime = '';
-            }
-
-            foreach ($device->parents as $parent) {
-                // Keep track of all children for a given device ID
-                if (! array_key_exists($parent->device_id, $device_child_map)) {
-                    $device_child_map[$parent->device_id] = [];
-                }
-                $device_child_map[$parent->device_id][$device->device_id] = true;
-            }
-            if (! count($device->parents)) {
-                // This is a top level device
-                $next_level_devices[$device->device_id] = true;
             }
 
             $device_list[$device->device_id] = [
@@ -502,86 +496,106 @@ class MapDataController extends Controller
                 'style' => self::deviceStyle($device, $request->highlight_node),
                 'lat' => $device->location ? $device->location->lat : null,
                 'lng' => $device->location ? $device->location->lng : null,
-                'parents' => ($request->link_type == 'depends') ? $device->parents->map->only('device_id')->flatten() : [],
+                'parents' => ($request->link_type == 'depends') ? $device->parents->pluck('device_id') : collect(),
+                'children' => ($request->link_type == 'depends') ? $device->children->pluck('device_id', 'device_id') : collect(),
                 'maintenance' => array_key_exists($device->device_id, $maintdevicesmap) ? 1 : 0,
             ];
-        }
 
-        // Add levels to each device
-        $this_level = 0;
-        while (count($next_level_devices)) {
-            $this_level_devices = $next_level_devices;
-            $next_level_devices = [];
+            // Only use parent IDs below if it is being returned
+            $parent_ids = $device_list[$device->device_id]['parents'];
 
-            foreach (array_keys($this_level_devices) as $device_id) {
-                // Highlight isolated devices if needed
-                if ($request->highlight_node == -1 && ! array_key_exists($device_id, $device_child_map) && count($device_list[$device_id]['parents']) == 0) {
-                    $device_list[$device_id]['style'] = array_merge($device_list[$device_id]['style'], $this->nodeHighlightStyle());
-                }
-
-                // Ignore if the device has already been processed
-                if (array_key_exists($device_id, $processed_devices)) {
-                    continue;
-                }
-
-                // Set device level and mark as processed
-                $device_list[$device_id]['level'] = $this_level;
-                $processed_devices[$device_id] = true;
-
-                // Add any child devices to be processed next
-                if (array_key_exists($device_id, $device_child_map)) {
-                    $next_level_devices = $next_level_devices + $device_child_map[$device_id];
-                }
+            // Get a list of parents that are not direct children
+            $parent_only_ids = $parent_ids;
+            if ($parent_only_ids->count() && $device->children->count()) {
+                $child_ids = $device_list[$device->device_id]['children'];
+                $parent_only_ids = $parent_only_ids->filter(function (int $parent_id, int $k) use ($child_ids) {
+                    return ! $child_ids->has($parent_id);
+                });
             }
-            $this_level++;
-        }
 
-        // If any device does not have a level it is linked to missing parents, so set to level 0
-        foreach (array_keys($device_list) as $device_id) {
-            if (! array_key_exists('level', $device_list[$device_id])) {
-                $device_list[$device_id]['level'] = 0;
+            // This is a top level device because it has no parents that are not direct children
+            if (! $parent_only_ids->count() ) {
+                $next_level_devices->put($device->device_id, $device->device_id);
             }
         }
 
-        if ($request->showpath > 0 && $request->highlight_node > 0) {
-            // Highlight all parents if required
-            $processed_parents = [];
-            $this_parents = $device_list[$request->highlight_node]['parents'];
+        if ($request->link_type == 'depends') {
+            // Add levels to each device
+            $this_level = 0;
+            while ($next_level_devices->count()) {
+                $this_level_devices = $next_level_devices;
+                $next_level_devices = collect();
 
-            while (count($this_parents) > 0) {
-                $next_parents = [];
-                foreach ($this_parents as $parent_id) {
-                    if (array_key_exists($parent_id, $processed_parents)) {
+                foreach ($this_level_devices->keys() as $device_id) {
+                    // Highlight isolated devices if needed
+                    if ($request->highlight_node == -1 && count($device->children) === 0 && count($device_list[$device_id]['parents']) == 0) {
+                        $device_list[$device_id]['style'] = array_merge($device_list[$device_id]['style'], $this->nodeHighlightStyle());
+                    }
+
+                    // Ignore if the device has already been processed
+                    if (array_key_exists($device_id, $processed_devices)) {
                         continue;
                     }
-                    $processed_parents[$parent_id] = true;
 
-                    $device_list[$parent_id]['style'] = array_merge($device_list[$parent_id]['style'], $this->nodeHighlightStyle());
-                    $next_parents = array_merge($next_parents, $device_list[$parent_id]['parents']->toArray());
-                }
-                $this_parents = $next_parents;
-            }
-        } elseif ($request->showpath < 0 && $request->highlight_node > 0) {
-            // Highlight all children if required
-            $processed_children = [];
-            $this_children = array_keys($device_child_map[$request->highlight_node]);
+                    // Set device level and mark as processed
+                    $device_list[$device_id]['level'] = $this_level;
+                    $processed_devices[$device_id] = true;
 
-            while (count($this_children) > 0) {
-                $next_children = [];
-                foreach ($this_children as $child_id) {
-                    if (array_key_exists($child_id, $processed_children)) {
-                        continue;
+                    // Add any child devices to be processed next
+                    if(array_key_exists('children', $device_list[$device_id])) {
+                        $next_level_devices = $next_level_devices->union($device_list[$device_id]['children']);
+                    } else {
+                        print_r($device_list[$device_id]);
                     }
-                    $processed_children[$child_id] = true;
+                }
+                $this_level++;
+            }
 
-                    if (count($device_list[$child_id]['parents']) === 1) {
-                        $device_list[$child_id]['style'] = array_merge($device_list[$child_id]['style'], $this->nodeHighlightStyle());
-                        if (array_key_exists($child_id, $device_child_map)) {
-                            $next_children = array_merge($next_children, array_keys($device_child_map[$child_id]));
+            // If any device does not have a level it is linked to missing parents, so set to level 0
+            foreach (array_keys($device_list) as $device_id) {
+                if (! array_key_exists('level', $device_list[$device_id])) {
+                    $device_list[$device_id]['level'] = 0;
+                }
+            }
+
+            if ($request->showpath > 0 && $request->highlight_node > 0) {
+                // Highlight all parents if required
+                $processed_parents = [];
+                $this_parents = $device_list[$request->highlight_node]['parents'];
+
+                while (count($this_parents) > 0) {
+                    $next_parents = [];
+                    foreach ($this_parents as $parent_id) {
+                        if (array_key_exists($parent_id, $processed_parents)) {
+                            continue;
+                        }
+                        $processed_parents[$parent_id] = true;
+
+                        $device_list[$parent_id]['style'] = array_merge($device_list[$parent_id]['style'], $this->nodeHighlightStyle());
+                        $next_parents = array_merge($next_parents, $device_list[$parent_id]['parents']->toArray());
+                    }
+                    $this_parents = $next_parents;
+                }
+            } elseif ($request->showpath < 0 && $request->highlight_node > 0) {
+                // Highlight all children if required
+                $processed_children = [];
+                $this_children = $device_list[$request->highlight_node]['children'];
+
+                while (count($this_children) > 0) {
+                    $next_children = collect();
+                    foreach ($this_children as $child_id) {
+                        if (array_key_exists($child_id, $processed_children)) {
+                            continue;
+                        }
+                        $processed_children[$child_id] = true;
+
+                        if (count($device_list[$child_id]['parents']) === 1) {
+                            $device_list[$child_id]['style'] = array_merge($device_list[$child_id]['style'], $this->nodeHighlightStyle());
+                            $next_children = $next_children->merge($device_list[$child_id]['children']);
                         }
                     }
+                    $this_children = $next_children;
                 }
-                $this_children = $next_children;
             }
         }
 
@@ -589,7 +603,7 @@ class MapDataController extends Controller
     }
 
     // GET Device Links by device
-    public function getDeviceLinks(Request $request)
+    public function getDeviceLinks(Request $request): Response
     {
         // List all links
         $link_list = [];
@@ -687,7 +701,7 @@ class MapDataController extends Controller
     }
 
     // GET Device Links grouped by geographic locations
-    public function getGeographicLinks(Request $request)
+    public function getGeographicLinks(Request $request): Response
     {
         // List all links
         $link_list = [];
@@ -727,7 +741,7 @@ class MapDataController extends Controller
     }
 
     // GET Device services
-    public function getServices(Request $request)
+    public function getServices(Request $request): Response
     {
         $group_id = $request->device_group;
         $services = Service::hasAccess($request->user())->with('device');
