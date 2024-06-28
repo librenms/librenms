@@ -33,6 +33,8 @@ use App\Models\Link;
 use App\Models\Port;
 use App\Models\Service;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -449,7 +451,7 @@ class MapDataController extends Controller
     }
 
     // GET Device
-    public function getDevices(Request $request): Response
+    public function getDevices(Request $request): JsonResponse
     {
         // Get all devices under maintenance
         $maintdevices = AlertSchedule::isActive()
@@ -603,7 +605,7 @@ class MapDataController extends Controller
     }
 
     // GET Device Links by device
-    public function getDeviceLinks(Request $request): Response
+    public function getDeviceLinks(Request $request): JsonResponse
     {
         // List all links
         $link_list = [];
@@ -701,7 +703,7 @@ class MapDataController extends Controller
     }
 
     // GET Device Links grouped by geographic locations
-    public function getGeographicLinks(Request $request): Response
+    public function getGeographicLinks(Request $request): JsonResponse
     {
         // List all links
         $link_list = [];
@@ -741,7 +743,7 @@ class MapDataController extends Controller
     }
 
     // GET Device services
-    public function getServices(Request $request): Response
+    public function getServices(Request $request): JsonResponse
     {
         $group_id = $request->device_group;
         $services = Service::hasAccess($request->user())->with('device');
