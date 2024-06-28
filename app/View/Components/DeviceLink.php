@@ -46,7 +46,7 @@ class DeviceLink extends Component
      */
     public function render()
     {
-        if (! $this->device->exists) {
+        if (empty($this->device->device_id)) {
             return view('components.device-link-missing');
         }
 
