@@ -546,8 +546,6 @@ class MapDataController extends Controller
                     // Add any child devices to be processed next
                     if(array_key_exists('children', $device_list[$device_id])) {
                         $next_level_devices = $next_level_devices->union($device_list[$device_id]['children']);
-                    } else {
-                        print_r($device_list[$device_id]);
                     }
                 }
                 $this_level++;
