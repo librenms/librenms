@@ -3697,7 +3697,7 @@
   @media (min-width: 768px) {
     .navbar-right .dropdown-menu {
       right: 0;
-      left: auto;
+      /* left: auto; !! - let dropdowns.less handle */
     }
     .navbar-right .dropdown-menu-left {
       right: auto;

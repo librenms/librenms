@@ -293,6 +293,7 @@ nav:
       - Asuswrt-Merlin: Support/Device-Notes/AsuswrtMerlin.md
       - Carel pCOweb: Support/Device-Notes/Carel-pCOweb-Devices.md
       - Dell OpenManage: Extensions/Dell-OpenManage.md
+      - Fortigate: Support/Device-Notes/Fortigate.md
       - OpenWRT: Support/Device-Notes/Openwrt.md
       - RouterOS: Support/Device-Notes/Routeros.md
       - Supermicro: Extensions/Supermicro.md

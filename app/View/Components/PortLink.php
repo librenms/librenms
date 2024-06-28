@@ -87,7 +87,6 @@ class PortLink extends Component
         return array_map(function ($graph_vars) {
             return array_merge([
                 'from' => '-1d',
-                'type' => 'port_bits',
                 'legend' => 'yes',
                 'text' => '',
             ], Arr::wrap($graph_vars));
