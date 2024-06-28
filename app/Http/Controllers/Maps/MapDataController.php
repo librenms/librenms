@@ -516,7 +516,7 @@ class MapDataController extends Controller
             }
 
             // This is a top level device because it has no parents that are not direct children
-            if (! $parent_only_ids->count() ) {
+            if (! $parent_only_ids->count()) {
                 $next_level_devices->put($device->device_id, $device->device_id);
             }
         }
@@ -549,7 +549,7 @@ class MapDataController extends Controller
                     $processed_devices[$device_id] = true;
 
                     // Add any child devices to be processed next
-                    if(array_key_exists('children', $device_list[$device_id])) {
+                    if (array_key_exists('children', $device_list[$device_id])) {
                         $next_level_devices = $next_level_devices->union($device_list[$device_id]['children']);
                     }
                 }
