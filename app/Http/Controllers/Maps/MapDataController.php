@@ -529,6 +529,11 @@ class MapDataController extends Controller
                 $next_level_devices = collect();
 
                 foreach ($this_level_devices->keys() as $device_id) {
+                    // Ignore if a child is found that has been filtered from the device list
+                    if (! array_key_exists($device_id, $device_list)) {
+                        continue;
+                    }
+
                     // Highlight isolated devices if needed
                     if ($request->highlight_node == -1 && $device->children->count() === 0 && $device_list[$device_id]['parents']->count() == 0) {
                         $device_list[$device_id]['style'] = array_merge($device_list[$device_id]['style'], $this->nodeHighlightStyle());
@@ -584,13 +589,17 @@ class MapDataController extends Controller
                 while ($this_children->count() > 0) {
                     $next_children = collect();
                     foreach ($this_children as $child_id) {
+                        // Ignore if a child is found that has been filtered from the device list
+                        if (! array_key_exists($child_id, $device_list)) {
+                            continue;
+                        }
                         if (array_key_exists($child_id, $processed_children)) {
                             continue;
                         }
                         $processed_children[$child_id] = true;
 
                         $device_list[$child_id]['style'] = array_merge($device_list[$child_id]['style'], $this->nodeHighlightStyle());
-                        $next_children = $next_children->merge($device_list[$child_id]['children']);
+                        $next_children = $next_children->union($device_list[$child_id]['children']);
                     }
                     $this_children = $next_children;
                 }
