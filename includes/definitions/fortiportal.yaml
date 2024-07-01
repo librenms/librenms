@@ -18,4 +18,4 @@ discovery_modules:
 discovery:
     -
         sysObjectID:
-            - .1.3.6.1.4.1.12356.123.1 #Fortiportal
+            - .1.3.6.1.4.1.12356.123.1.1.1 #Fortiportal specific OID
