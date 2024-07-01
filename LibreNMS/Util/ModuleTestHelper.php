@@ -664,7 +664,7 @@ class ModuleTestHelper
                 if (empty($module_data['discovery']) && empty($module_data['poller'])) {
                     continue;
                 }
-                if (isset($module_data['discovery']) && isset($module_data['poller'])&& $module_data['discovery'] == $module_data['poller']) {
+                if (isset($module_data['discovery']) && isset($module_data['poller']) && $module_data['discovery'] == $module_data['poller']) {
                     $existing_data[$module] = [
                         'discovery' => $module_data['discovery'],
                         'poller' => 'matches discovery',
