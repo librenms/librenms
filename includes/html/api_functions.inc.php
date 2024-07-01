@@ -3206,7 +3206,7 @@ function del_location(Illuminate\Http\Request $request)
         'location_id' => 0,
     ];
     dbUpdate($data, 'devices', '`location_id` = ?', [$location_id]);
-    $result = dbDelete('locations', '`location` = ? ', [$location]);
+    $result = dbDelete('locations', '`id` = ? ', [$location_id]);
     if ($result == 1) {
         return api_success_noresult(201, "Location $location has been deleted successfully");
     }
