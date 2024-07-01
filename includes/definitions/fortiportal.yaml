@@ -1,0 +1,21 @@
+os: fortiportal
+text: 'Fortinet Fortiportal'
+type: server
+icon: fortinet
+mib_dir: fortinet
+empty_ifdescr: true
+ifname: true
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_fortigate_cpu, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+poller_modules:
+    storage: false #Fortiportal will fill RRD with temporary storage volumes
+    ports: false #Fortiportal will fill RRD with temporary ports
+discovery_modules:
+    storage: false
+    ports: false
+discovery:
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.12356.123.1 #Fortiportal
