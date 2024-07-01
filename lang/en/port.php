@@ -28,6 +28,7 @@ return [
     'unknown_port' => 'Unknown Port',
     'vlan_count' => 'VLANs: :count',
     'vlan_label' => 'VLAN: :label',
+    'vrf_label' => 'VRF: :name',
     'xdsl' => [
         'sync_stat' => 'Sync: :down/:up',
         'attainable_stat' => 'Max: :down/:up',

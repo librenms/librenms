@@ -78,7 +78,7 @@ class Snmpsim
             passthru($this->getCmd(false) . ' --validate-data');
 
             if (! is_executable($this->findSnmpsimd())) {
-                echo "\nCould not find snmpsim, you can install it with 'pip install snmpsim'.  If it is already installed, make sure snmpsimd or snmpsimd.py is in PATH\n";
+                echo "\nCould not find snmpsim, you can install it with 'pip install snmpsim-lextudio'.  If it is already installed, make sure snmpsimd, snmpsim-command-responder or snmpsimd.py is in PATH\n";
             } else {
                 echo "\nFailed to start Snmpsim. Scroll up for error.\n";
             }
@@ -179,7 +179,10 @@ class Snmpsim
     {
         $cmd = Config::locateBinary('snmpsimd');
         if (! is_executable($cmd)) {
-            $cmd = Config::locateBinary('snmpsimd.py');
+            $cmd = Config::locateBinary('snmpsim-command-responder');
+            if (! is_executable($cmd)) {
+                $cmd = Config::locateBinary('snmpsimd.py');
+            }
         }
 
         return $cmd;
