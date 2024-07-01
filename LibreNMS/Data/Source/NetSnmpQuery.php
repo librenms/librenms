@@ -418,7 +418,7 @@ class NetSnmpQuery implements SnmpQueryInterface
                 if (Cache::driver($driver)->has($key)) {
                     Log::debug("Cache hit for $command " . implode(',', $oids));
                 } else {
-                    Log::debug("Cache miss for $command " . implode(',', $oids) . ", grabbing fresh data.");
+                    Log::debug("Cache miss for $command " . implode(',', $oids) . ', grabbing fresh data.');
                 }
             }
         }
