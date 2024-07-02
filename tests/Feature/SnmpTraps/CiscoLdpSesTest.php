@@ -41,7 +41,7 @@ class CiscoLdpSesTest extends SnmpTrapTestCase
     public function testCiscoLdpSesDownTrap(): void
     {
         $device = Device::factory()->create();
-        $port = Port::factory()->make(['ifAdminStatus' => 'up', 'ifOperStatus' => 'up']);
+        $port = Port::factory()->make(['ifAdminStatus' => 'up', 'ifOperStatus' => 'up', 'ifDescr' => 'GigabitEthernet0/1']);
         $device->ports()->save($port);
         $this->assertTrapLogsMessage("$device->hostname
 UDP: [$device->ip]:64610->[127.0.0.1]:162
@@ -59,7 +59,7 @@ IF-MIB::ifIndex $port->ifIndex",
     public function testCiscoLdpSesUpTrap(): void
     {
         $device = Device::factory()->create();
-        $port = Port::factory()->make(['ifAdminStatus' => 'up', 'ifOperStatus' => 'up']);
+        $port = Port::factory()->make(['ifAdminStatus' => 'up', 'ifOperStatus' => 'up', 'ifDescr' => 'GigabitEthernet0/1']);
         $device->ports()->save($port);
         $this->assertTrapLogsMessage("$device->hostname
 UDP: [$device->ip]:64610->[127.0.0.1]:162
