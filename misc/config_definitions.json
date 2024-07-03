@@ -1041,14 +1041,6 @@
                 "{{ $ip }}":  "ip"
             }
         },
-        "device_perf_purge": {
-            "default": 7,
-            "units": "days",
-            "group": "system",
-            "section": "cleanup",
-            "order": 7,
-            "type": "integer"
-        },
         "device_traffic_descr": {
             "default": [
                 "/loopback/",
@@ -1727,10 +1719,6 @@
             "default": false,
             "type": "boolean"
         },
-        "enable_port_relationship": {
-            "default": true,
-            "type": "boolean"
-        },
         "enable_ports_adsl": {
             "default": true,
             "type": "boolean"
@@ -1740,10 +1728,6 @@
             "type": "boolean"
         },
         "enable_ports_junoseatmvp": {
-            "default": false,
-            "type": "boolean"
-        },
-        "enable_ports_poe": {
             "default": false,
             "type": "boolean"
         },
@@ -1843,7 +1827,8 @@
                 "value": [
                     "google",
                     "mapquest",
-                    "bing"
+                    "bing",
+                    "esri"
                 ]
             }
         },
@@ -1864,7 +1849,8 @@
                 "google": "Google Maps",
                 "openstreetmap": "OpenStreetMap",
                 "mapquest": "MapQuest",
-                "bing": "Bing Maps"
+                "bing": "Bing Maps",
+                "esri": "ESRI ArcGIS"
             }
         },
         "geoloc.latlng": {
@@ -1880,6 +1866,28 @@
                     "google",
                     "mapquest",
                     "bing"
+                ]
+            }
+        },
+        "geoloc.layer": {
+            "default": "Streets",
+            "group": "external",
+            "section": "location",
+            "order": 7,
+            "type": "select",
+            "options": {
+                "Streets":  "Streets",
+                "Sattelite": "Sattelite",
+                "Topography":  "Topography"
+            },
+            "when": {
+                "setting": "geoloc.engine",
+                "operator": "in",
+                "value": [
+                    "google",
+                    "mapquest",
+                    "bing",
+                    "esri"
                 ]
             }
         },
@@ -4537,6 +4545,13 @@
                 "115200": "36 hours",
                 "153600": "48 hours"
             },
+            "type": "array"
+        },
+        "nfsen_base": {
+            "default": [],
+            "group": "external",
+            "section": "nfsen",
+            "order": 10,
             "type": "array"
         },
         "nfsen_split_char": {

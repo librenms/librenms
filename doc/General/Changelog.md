@@ -1,3 +1,214 @@
+## 24.6.0
+*(2024-06-16)*
+
+A big thank you to the following 20 contributors this last month:
+
+  - [murrant](https://github.com/murrant) (13)
+  - [VVelox](https://github.com/VVelox) (7)
+  - [PipoCanaja](https://github.com/PipoCanaja) (3)
+  - [dependabot](https://github.com/apps/dependabot) (2)
+  - [Npeca75](https://github.com/Npeca75) (2)
+  - [ashwath129](https://github.com/ashwath129) (2)
+  - [electrocret](https://github.com/electrocret) (2)
+  - [scamp](https://github.com/scamp) (1)
+  - [nicolasberens](https://github.com/nicolasberens) (1)
+  - [sorano](https://github.com/sorano) (1)
+  - [GonBlank](https://github.com/GonBlank) (1)
+  - [jepke](https://github.com/jepke) (1)
+  - [EinGlasVollKakao](https://github.com/EinGlasVollKakao) (1)
+  - [Cougar](https://github.com/Cougar) (1)
+  - [whitej46](https://github.com/whitej46) (1)
+  - [cadirol](https://github.com/cadirol) (1)
+  - [santiag0z](https://github.com/santiag0z) (1)
+  - [rons4](https://github.com/rons4) (1)
+  - [freddy36](https://github.com/freddy36) (1)
+  - [cjsoftuk](https://github.com/cjsoftuk) (1)
+
+Thanks to maintainers and others that helped with pull requests this month:
+
+  - [murrant](https://github.com/murrant) (18)
+  - [Jellyfrog](https://github.com/Jellyfrog) (12)
+  - [electrocret](https://github.com/electrocret) (9)
+  - [PipoCanaja](https://github.com/PipoCanaja) (1)
+
+#### Feature
+* ESRI ArcGIS geo map support ([#16059](https://github.com/librenms/librenms/pull/16059)) - [murrant](https://github.com/murrant)
+
+#### Device
+* Update Dell MIBs ([#16120](https://github.com/librenms/librenms/pull/16120)) - [murrant](https://github.com/murrant)
+* Add TI-G102i (.46) and TI-PG1284i (.34) ([#16099](https://github.com/librenms/librenms/pull/16099)) - [nicolasberens](https://github.com/nicolasberens)
+* Add "Bullet Camera" in Axis discovery. ([#16098](https://github.com/librenms/librenms/pull/16098)) - [sorano](https://github.com/sorano)
+* [vlans] Add VLANs information to Huawei VRP os ([#16089](https://github.com/librenms/librenms/pull/16089)) - [Npeca75](https://github.com/Npeca75)
+* Cisco Catalyst 1300 recognition ([#16080](https://github.com/librenms/librenms/pull/16080)) - [jepke](https://github.com/jepke)
+* Fix Ruckus Unleashed product ID for OS detection ([#16067](https://github.com/librenms/librenms/pull/16067)) - [Cougar](https://github.com/Cougar)
+* Fix error in riverbed ([#16066](https://github.com/librenms/librenms/pull/16066)) - [murrant](https://github.com/murrant)
+* Update Hatteras DSLAM name ([#16054](https://github.com/librenms/librenms/pull/16054)) - [cadirol](https://github.com/cadirol)
+* Add initial support for socomec-ups ([#16018](https://github.com/librenms/librenms/pull/16018)) - [Npeca75](https://github.com/Npeca75)
+* Fix bdcom/pbn neighbour discovery ([#15935](https://github.com/librenms/librenms/pull/15935)) - [freddy36](https://github.com/freddy36)
+* Add support for new sensors on Firebrick 9000 models. ([#15842](https://github.com/librenms/librenms/pull/15842)) - [cjsoftuk](https://github.com/cjsoftuk)
+
+#### Webui
+* Fix popup toast messages (Remove Flasher) ([#16090](https://github.com/librenms/librenms/pull/16090)) - [murrant](https://github.com/murrant)
+* Handle $app_data['disks'] not being set for SMART app page display ([#16087](https://github.com/librenms/librenms/pull/16087)) - [VVelox](https://github.com/VVelox)
+* Edit Current Map menu entry ([#16084](https://github.com/librenms/librenms/pull/16084)) - [murrant](https://github.com/murrant)
+* Fix device summary widget alignment and dropdown color on dark theme ([#16083](https://github.com/librenms/librenms/pull/16083)) - [GonBlank](https://github.com/GonBlank)
+* Fix duplicate maps in relationship ([#16081](https://github.com/librenms/librenms/pull/16081)) - [murrant](https://github.com/murrant)
+* Manage Maps limit width ([#16055](https://github.com/librenms/librenms/pull/16055)) - [murrant](https://github.com/murrant)
+* Widget hot refresh & worldmap cleanup ([#16053](https://github.com/librenms/librenms/pull/16053)) - [murrant](https://github.com/murrant)
+* Align the buttons (Edit and Delete) to the right in Map Management ([#16052](https://github.com/librenms/librenms/pull/16052)) - [santiag0z](https://github.com/santiag0z)
+
+#### Alerting
+* AlertOps alert transport ([#16050](https://github.com/librenms/librenms/pull/16050)) - [ashwath129](https://github.com/ashwath129)
+* SIGNL4 Alert Transport ([#16037](https://github.com/librenms/librenms/pull/16037)) - [rons4](https://github.com/rons4)
+
+#### Applications
+* Fix display of graphs on the multi-server app page for Mojo CAPE Submit ([#16094](https://github.com/librenms/librenms/pull/16094)) - [VVelox](https://github.com/VVelox)
+* Two minor fixes for sagan ([#16082](https://github.com/librenms/librenms/pull/16082)) - [VVelox](https://github.com/VVelox)
+* Fix path related issues for ss and systemd applications ([#16045](https://github.com/librenms/librenms/pull/16045)) - [VVelox](https://github.com/VVelox)
+* Add Suricata 7 support to Suricata ([#16044](https://github.com/librenms/librenms/pull/16044)) - [VVelox](https://github.com/VVelox)
+
+#### Api
+* Return error when no device ports found ([#16043](https://github.com/librenms/librenms/pull/16043)) - [murrant](https://github.com/murrant)
+
+#### Settings
+* Add nfsen_base to config_definitions.json ([#16065](https://github.com/librenms/librenms/pull/16065)) - [whitej46](https://github.com/whitej46)
+* Remove device_perf_purge ([#16057](https://github.com/librenms/librenms/pull/16057)) - [electrocret](https://github.com/electrocret)
+* Remove enable_ports_poe ([#16056](https://github.com/librenms/librenms/pull/16056)) - [electrocret](https://github.com/electrocret)
+
+#### Bug
+* Bug - Sorting FDB table by devices ([#16116](https://github.com/librenms/librenms/pull/16116)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Fix typo in device edit page ([#16096](https://github.com/librenms/librenms/pull/16096)) - [murrant](https://github.com/murrant)
+* Fix fping bulk ([#16085](https://github.com/librenms/librenms/pull/16085)) - [murrant](https://github.com/murrant)
+* Fix duplication of processor entries & limit length of type ([#16075](https://github.com/librenms/librenms/pull/16075)) - [EinGlasVollKakao](https://github.com/EinGlasVollKakao)
+
+#### Refactor
+* Rename index_string to str_index_as_numeric ([#15916](https://github.com/librenms/librenms/pull/15916)) - [PipoCanaja](https://github.com/PipoCanaja)
+
+#### Documentation
+* Note the suffix/prefix stuff for LDAP auth ([#16091](https://github.com/librenms/librenms/pull/16091)) - [VVelox](https://github.com/VVelox)
+* Clean up SMART docs a bit ([#16086](https://github.com/librenms/librenms/pull/16086)) - [VVelox](https://github.com/VVelox)
+* Update Transports.md to add documentation for AlertOps ([#16058](https://github.com/librenms/librenms/pull/16058)) - [ashwath129](https://github.com/ashwath129)
+
+#### Misc
+* Don't run poller validations when there are no devices ([#16088](https://github.com/librenms/librenms/pull/16088)) - [murrant](https://github.com/murrant)
+
+#### Mibs
+* Fix ECS4120 MIB, resolves #16093 ([#16101](https://github.com/librenms/librenms/pull/16101)) - [scamp](https://github.com/scamp)
+
+#### Dependencies
+* Bump braces from 3.0.2 to 3.0.3 ([#16105](https://github.com/librenms/librenms/pull/16105)) - [dependabot](https://github.com/apps/dependabot)
+* Bump composer/composer from 2.7.1 to 2.7.7 ([#16104](https://github.com/librenms/librenms/pull/16104)) - [dependabot](https://github.com/apps/dependabot)
+
+
+## 24.5.0
+*(2024-05-19)*
+
+A big thank you to the following 23 contributors this last month:
+
+  - [murrant](https://github.com/murrant) (24)
+  - [santiag0z](https://github.com/santiag0z) (5)
+  - [eskyuu](https://github.com/eskyuu) (3)
+  - [sogadm](https://github.com/sogadm) (2)
+  - [Jarod2801](https://github.com/Jarod2801) (2)
+  - [Pikamander2](https://github.com/Pikamander2) (1)
+  - [scamp](https://github.com/scamp) (1)
+  - [ottorei](https://github.com/ottorei) (1)
+  - [whitej46](https://github.com/whitej46) (1)
+  - [sonic45132](https://github.com/sonic45132) (1)
+  - [fbouynot](https://github.com/fbouynot) (1)
+  - [EinGlasVollKakao](https://github.com/EinGlasVollKakao) (1)
+  - [h-barnhart](https://github.com/h-barnhart) (1)
+  - [sarabveer](https://github.com/sarabveer) (1)
+  - [netravnen](https://github.com/netravnen) (1)
+  - [jthiltges](https://github.com/jthiltges) (1)
+  - [hatboxen](https://github.com/hatboxen) (1)
+  - [electrocret](https://github.com/electrocret) (1)
+  - [washcroft](https://github.com/washcroft) (1)
+  - [Npeca75](https://github.com/Npeca75) (1)
+  - [paulierco](https://github.com/paulierco) (1)
+  - [drshawnkwang](https://github.com/drshawnkwang) (1)
+  - [systeembeheerder](https://github.com/systeembeheerder) (1)
+
+Thanks to maintainers and others that helped with pull requests this month:
+
+  - [murrant](https://github.com/murrant) (22)
+  - [Jellyfrog](https://github.com/Jellyfrog) (13)
+  - [electrocret](https://github.com/electrocret) (3)
+  - [ottorei](https://github.com/ottorei) (1)
+  - [PipoCanaja](https://github.com/PipoCanaja) (1)
+
+#### Feature
+* Custom Maps: geo map and color backgrounds ([#16020](https://github.com/librenms/librenms/pull/16020)) - [murrant](https://github.com/murrant)
+* Show custom maps in device overview ([#15985](https://github.com/librenms/librenms/pull/15985)) - [murrant](https://github.com/murrant)
+* New Map Menu ([#15969](https://github.com/librenms/librenms/pull/15969)) - [murrant](https://github.com/murrant)
+* Mysql PDO options to support SSL/TLS client communication ([#15832](https://github.com/librenms/librenms/pull/15832)) - [drshawnkwang](https://github.com/drshawnkwang)
+* Snmpscan.py output errors and nodns ([#15673](https://github.com/librenms/librenms/pull/15673)) - [murrant](https://github.com/murrant)
+
+#### Breaking Change
+* Linux MegaRAID SAS fixes ([#15566](https://github.com/librenms/librenms/pull/15566)) - [eskyuu](https://github.com/eskyuu)
+
+#### Device
+* Use null coalescing on Panos.php ([#16019](https://github.com/librenms/librenms/pull/16019)) - [ottorei](https://github.com/ottorei)
+* Improved powerwalker sensors ([#15999](https://github.com/librenms/librenms/pull/15999)) - [EinGlasVollKakao](https://github.com/EinGlasVollKakao)
+* Added initial support for ULAF+ devices ([#15997](https://github.com/librenms/librenms/pull/15997)) - [Jarod2801](https://github.com/Jarod2801)
+* Correct swapped SET and WHERE parameters in bgp-peers/dell-os10.inc.php ([#15983](https://github.com/librenms/librenms/pull/15983)) - [jthiltges](https://github.com/jthiltges)
+* Added FibroLAN devices ([#15967](https://github.com/librenms/librenms/pull/15967)) - [Jarod2801](https://github.com/Jarod2801)
+* New velocloud devices ([#15958](https://github.com/librenms/librenms/pull/15958)) - [paulierco](https://github.com/paulierco)
+
+#### Webui
+* Fix issue loading session preferences ([#16041](https://github.com/librenms/librenms/pull/16041)) - [murrant](https://github.com/murrant)
+* Device location map zoom out when location N/A ([#16034](https://github.com/librenms/librenms/pull/16034)) - [murrant](https://github.com/murrant)
+* Added read permission test to the custom map model ([#16030](https://github.com/librenms/librenms/pull/16030)) - [eskyuu](https://github.com/eskyuu)
+* Do not allow the legend nodes to trigger the node edit modal ([#16026](https://github.com/librenms/librenms/pull/16026)) - [eskyuu](https://github.com/eskyuu)
+* Mobile menu full height ([#16011](https://github.com/librenms/librenms/pull/16011)) - [murrant](https://github.com/murrant)
+* Map Management: Show Groups ([#16005](https://github.com/librenms/librenms/pull/16005)) - [murrant](https://github.com/murrant)
+* Change custom map editor icon ([#16004](https://github.com/librenms/librenms/pull/16004)) - [murrant](https://github.com/murrant)
+* Custom Map: Show crosshairs when adding ([#15978](https://github.com/librenms/librenms/pull/15978)) - [murrant](https://github.com/murrant)
+* On-demand map menu items ([#15971](https://github.com/librenms/librenms/pull/15971)) - [murrant](https://github.com/murrant)
+* Custom Maps: make edit title clickable ([#15965](https://github.com/librenms/librenms/pull/15965)) - [murrant](https://github.com/murrant)
+* [webui] sort ports in VLANs blade ([#15960](https://github.com/librenms/librenms/pull/15960)) - [Npeca75](https://github.com/Npeca75)
+
+#### Graphs
+* Fix icmp ping y-axis over 1000ms ([#16039](https://github.com/librenms/librenms/pull/16039)) - [murrant](https://github.com/murrant)
+* Fix graph_type variable (svg / png) ([#15972](https://github.com/librenms/librenms/pull/15972)) - [washcroft](https://github.com/washcroft)
+
+#### Snmp Traps
+* SNMP Traps - Ciena AAA ([#15998](https://github.com/librenms/librenms/pull/15998)) - [h-barnhart](https://github.com/h-barnhart)
+
+#### Bug
+* Fix downtime in corner cases ([#16040](https://github.com/librenms/librenms/pull/16040)) - [murrant](https://github.com/murrant)
+* Fix WirelessSensor incorrect model ([#16016](https://github.com/librenms/librenms/pull/16016)) - [whitej46](https://github.com/whitej46)
+* Merge duplicate toBytes functions ([#15994](https://github.com/librenms/librenms/pull/15994)) - [murrant](https://github.com/murrant)
+* Fix systemd graphs using wrong rrd filename variable ([#15988](https://github.com/librenms/librenms/pull/15988)) - [sarabveer](https://github.com/sarabveer)
+* Rrd source does not work with rrdcached ([#15974](https://github.com/librenms/librenms/pull/15974)) - [murrant](https://github.com/murrant)
+* Git ignore custom map images ([#15966](https://github.com/librenms/librenms/pull/15966)) - [murrant](https://github.com/murrant)
+* Packet_loss macros quick fix ([#15961](https://github.com/librenms/librenms/pull/15961)) - [murrant](https://github.com/murrant)
+
+#### Cleanup
+* Fix incorrect number of seconds in a day ([#16042](https://github.com/librenms/librenms/pull/16042)) - [Pikamander2](https://github.com/Pikamander2)
+
+#### Documentation
+* [DOC] Update Customizing-the-Web-UI.md ([#16025](https://github.com/librenms/librenms/pull/16025)) - [santiag0z](https://github.com/santiag0z)
+* [DOC] Install LibreNMS: add Icons ([#16017](https://github.com/librenms/librenms/pull/16017)) - [santiag0z](https://github.com/santiag0z)
+* Set httpd_cache_t type to /opt/librenms/cache ([#16000](https://github.com/librenms/librenms/pull/16000)) - [fbouynot](https://github.com/fbouynot)
+* Update to Material for MkDocs 8.3.9 -\> 9.5.20 ([#15996](https://github.com/librenms/librenms/pull/15996)) - [santiag0z](https://github.com/santiag0z)
+* Update link to LibreNMS origin blog post ([#15981](https://github.com/librenms/librenms/pull/15981)) - [hatboxen](https://github.com/hatboxen)
+* Remove poller_name from docs ([#15979](https://github.com/librenms/librenms/pull/15979)) - [electrocret](https://github.com/electrocret)
+* Update packet_loss docs ([#15962](https://github.com/librenms/librenms/pull/15962)) - [murrant](https://github.com/murrant)
+* Update Dispatcher-Service.md ([#15705](https://github.com/librenms/librenms/pull/15705)) - [systeembeheerder](https://github.com/systeembeheerder)
+
+#### Translation
+* Massive changes to the Chinese interface translation. ([#16009](https://github.com/librenms/librenms/pull/16009)) - [sogadm](https://github.com/sogadm)
+* Chinese translation fixesChinese translation fixes ([#15991](https://github.com/librenms/librenms/pull/15991)) - [sogadm](https://github.com/sogadm)
+
+#### Tests
+* Always run tests ([#16024](https://github.com/librenms/librenms/pull/16024)) - [murrant](https://github.com/murrant)
+
+#### Mibs
+* Update MIB for Edge-Core ECS4120-Series ([#16023](https://github.com/librenms/librenms/pull/16023)) - [scamp](https://github.com/scamp)
+* Update to latest revision ([#15984](https://github.com/librenms/librenms/pull/15984)) - [netravnen](https://github.com/netravnen)
+
+
 ## 24.4.0
 *(2024-04-19)*
 

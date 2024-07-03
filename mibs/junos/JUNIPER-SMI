@@ -1,6 +1,6 @@
 --
 -- Juniper Enterprise Specific MIB: Structure of Management Information
--- 
+--
 -- Copyright (c) 2002-2013, Juniper Networks, Inc.
 -- All rights reserved.
 --
@@ -26,13 +26,13 @@ juniperMIB MODULE-IDENTITY
     DESCRIPTION
             "The Structure of Management Information for Juniper Networks."
     REVISION     "201007090000Z"    -- Jul 09, 2010
-    DESCRIPTION  
+    DESCRIPTION
              "Added jnxLicenseMibRoot branch."
     REVISION     "200910290000Z"    -- Oct 29, 2009
-    DESCRIPTION  
+    DESCRIPTION
              "Added jnxCosNotifications branch."
     REVISION     "201006180000Z"    -- Jun 18, 2010
-    DESCRIPTION  
+    DESCRIPTION
              "Added jnxLicenseMibRoot branch."
     REVISION    "200304170100Z" -- 17-Apr-03
     DESCRIPTION
@@ -117,7 +117,41 @@ juniperMIB MODULE-IDENTITY
     REVISION    "202003250000Z" --25-Mar-20
     DESCRIPTION
             "Add jnxTLBNotifications"
+
+    REVISION    "202202250000Z" --25-Feb-22
+    DESCRIPTION
+            "Add jnxAsicExtMemTraps"
+
+    REVISION    "202202250000Z" --25-Feb-22
+    DESCRIPTION
+            "Add jnxAsicExtMemOKTraps"
     ::= { enterprises 2636 }
+
+-- for integer counters that wrap in less than one hour with only 32 bits
+Integer64 ::= TEXTUAL-CONVENTION
+       STATUS      current
+       DESCRIPTION
+           "A 64-bit signed integer.  The value is restricted to
+           the BER serialization of the following ASN.1 type:
+               I64TYPE ::= [122] IMPLICIT I64Type
+           (note: the value 122 is the sum of '30'h and '4a'h)
+           The BER serialization of the length for values of
+           this type must use the definite length, short
+           encoding form.
+
+           For example, the BER serialization of value 129
+           of type I64TYPE is '9f7a020081'h.  (The tag is '9f7a'h;
+           the length is '02'h; and the value is '0081'h.) The
+           BER serialization of value '9f7a020081'h of data
+           type Opaque is '44059f7a020081'h. (The tag is '44'h;
+           the length is '05'h; and the value is '9f7a020081'h.)
+           Also for example, the BER serialization of value -129
+           of type I64TYPE is '9f7a02ff7f'h.  (The tag is '9f7a'h;
+           the length is '02'h; and the value is 'ff7f'h.) The
+           BER serialization of value '9f7a02ff7f'h of data
+           type Opaque is '44059f7a02ff7f'h. (The tag is '44'h;
+           the length is '05'h; and the value is '9f7a02ff7f'h.)"
+       SYNTAX      Opaque (SIZE(4..11))
 
 --
 -- Juniper MIB tree structure
@@ -135,8 +169,8 @@ jnxProducts OBJECT-IDENTITY
     -- The following OIDs are used as the basis for identifying other
     -- Juniper products.
     --
-    -- jnxMediaFlow refers to the root MIB object for Juniper's 
-    -- Media Flow Controller, a non-JUNOS based product. 
+    -- jnxMediaFlow refers to the root MIB object for Juniper's
+    -- Media Flow Controller, a non-JUNOS based product.
     jnxMediaFlow                    OBJECT IDENTIFIER ::= { jnxProducts 2 }
 
     --
@@ -161,7 +195,7 @@ jnxServices OBJECT-IDENTITY
             "The root of Juniper's Services OIDs."
     ::= { juniperMIB 2 }
 
-jnxMibs OBJECT-IDENTITY 
+jnxMibs OBJECT-IDENTITY
     STATUS  current
     DESCRIPTION
             "The root of Juniper's MIB objects."
@@ -189,10 +223,10 @@ jnxMibs OBJECT-IDENTITY
     jnxUtilMibRoot             OBJECT IDENTIFIER ::= { jnxMibs 47 }
 
     -- juniper l2ald Mib
-    jnxl2aldMibRoot            OBJECT IDENTIFIER ::= { jnxMibs 48 } 
+    jnxl2aldMibRoot            OBJECT IDENTIFIER ::= { jnxMibs 48 }
 
     -- juniper L2tp Mib
-    jnxL2tpMibRoot             OBJECT IDENTIFIER ::= { jnxMibs 49 } 
+    jnxL2tpMibRoot             OBJECT IDENTIFIER ::= { jnxMibs 49 }
 
     -- juniper RPM Mib
     jnxRpmMibRoot              OBJECT IDENTIFIER ::= { jnxMibs 50 }
@@ -236,16 +270,16 @@ jnxMibs OBJECT-IDENTITY
     -- juniper Subscriber MIB
     jnxSubscriberMibRoot       OBJECT IDENTIFIER ::= { jnxMibs 64 }
 
-    -- juniper MAG MIB 
+    -- juniper MAG MIB
     jnxMagMibRoot              OBJECT IDENTIFIER ::= { jnxMibs 65 }
 
     -- Root of juniper MobileGateway MIBs
     jnxMobileGatewayMibRoot    OBJECT IDENTIFIER ::= { jnxMibs 66 }
 
-    -- juniper PPPOE MIB 
+    -- juniper PPPOE MIB
     jnxPppoeMibRoot            OBJECT IDENTIFIER ::= { jnxMibs 67 }
 
-    -- juniper PPP MIB 
+    -- juniper PPP MIB
     jnxPppMibRoot            OBJECT IDENTIFIER ::= { jnxMibs 68 }
 
     -- junosV App Engine MIB
@@ -271,13 +305,13 @@ jnxMibs OBJECT-IDENTITY
     jnxSnmpSetMibRoot        OBJECT IDENTIFIER ::= { jnxMibs 76 }
 
     -- TWAMP Client mib
-    jnxTwampMibRoot          OBJECT IDENTIFIER ::= { jnxMibs 77 } 
+    jnxTwampMibRoot          OBJECT IDENTIFIER ::= { jnxMibs 77 }
 
 --    jnxSoamPmMib         OBJECT IDENTIFIER ::= { jnxMibs 78 }
 
     -- juniper Video Monitoring MIB
     jnxVmonMibRoot          OBJECT IDENTIFIER ::= { jnxMibs 79 }
-    
+
     -- juniper SCG TDF config mib
     jnxSGMibRoot           OBJECT IDENTIFIER ::= { jnxMibs 80 }
 
@@ -345,7 +379,7 @@ jnxTraps OBJECT-IDENTITY
     -- juniper FRU config traps
     jnxFruTraps                OBJECT IDENTIFIER ::= { jnxTraps 23 }
     jnxSnmpSetTraps              OBJECT IDENTIFIER ::= { jnxTraps 24 }
-    
+
     jnxDomLaneNotifications    OBJECT IDENTIFIER ::= { jnxTraps 25 }
 
     -- TWAMP Client traps
@@ -361,6 +395,10 @@ jnxTraps OBJECT-IDENTITY
     jnxjSysmonNotifications     OBJECT IDENTIFIER ::= { jnxTraps 31 }
 
     jnxTLBNotifications	    OBJECT IDENTIFIER ::= { jnxTraps 32 }
+
+    jnxAsicExtMemTraps     OBJECT IDENTIFIER ::= { jnxTraps 33 }
+
+    jnxAsicExtMemOKTraps     OBJECT IDENTIFIER ::= { jnxTraps 34 }
 
 --  This is the top-level object identifier registry used by Juniper
 --  products for SNMP modules containing experimental MIB definitions.
@@ -387,14 +425,14 @@ jnxNsm OBJECT IDENTIFIER ::= { juniperMIB 6 }
 jnxCA OBJECT IDENTIFIER ::= { juniperMIB 7 }
 
 --
--- This is the top-level object identifier registry used by the 
--- Carrier AAA software product (Parksteet). 
+-- This is the top-level object identifier registry used by the
+-- Carrier AAA software product (Parksteet).
 --
 jnxAAA OBJECT IDENTIFIER ::= { juniperMIB 8 }
 
 --
--- This is the top-level object identifier registry used by the 
--- Advanced Insight Manager. 
+-- This is the top-level object identifier registry used by the
+-- Advanced Insight Manager.
 --
 jnxAdvancedInsightMgr OBJECT IDENTIFIER ::= { juniperMIB 9 }
 

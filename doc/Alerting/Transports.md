@@ -49,6 +49,23 @@ alerts from many other monitoring tools on a single screen.
 | Alert state | critical |
 | Recover state | cleared |
 
+## AlertOps
+
+Using AlertOps integration with LibreNMS, you can seamlessly forward alerts to AlertOps with detailed information. AlertOps acts as a dispatcher for LibreNMS alerts, allowing you to determine the right individuals or teams to notify based on on-call schedules. Notifications can be sent via various channels including email, text messages (SMS), phone calls, and mobile push notifications for iOS & Android devices. Additionally, AlertOps provides escalation policies to ensure alerts are appropriately managed until they are assigned or closed. You can also filter out/aggregate alerts based on different values.
+
+To set up the integration:
+
+- Create a LibreNMS Integration: Sign up for an AlertOps account and create a LibreNMS integration from the integrations page. This will generate an Inbound Integration Endpoint URL that you'll need to copy to LibreNMS.
+
+- Configure LibreNMS Integration: In LibreNMS, navigate to the integration settings and paste the inbound integration URL obtained from AlertOps.
+
+**Example:**
+
+| Config | Example |
+| ------ | ------- |
+| WebHook URL | <https://url/path/to/webhook> |
+
+
 ## Alertmanager
 
 Alertmanager is an alert handling software, initially developed for
@@ -763,6 +780,22 @@ Sensu to LibreNMS alerts, they'll be lost on the next event (silences will work)
 | Sensu Namespace | eu-west               |
 | Check Prefix    | lnms                  |
 | Source Key      | hostname              |
+
+## SIGNL4
+
+SIGNL4 offers critical alerting, incident response and service dispatching for operating critical infrastructure. It alerts you persistently via app push, SMS text, voice calls, and email including tracking, escalation, on-call duty scheduling and collaboration.
+
+Integrating SIGNL4 with LibreNMS to forward critical alerts with detailed information to responsible people or on-call teams. The integration supports triggering as well as closing alerts.
+
+In the configuration for your SIGNL4 alert transport you just need to enter your SIGNL4 webhook URL including team or integration secret.
+
+**Example:**
+
+| Config | Example |
+| ------ | ------- |
+| Webhook URL | https://connect.signl4.com/webhook/{team-secret} |
+
+You can find more information about the integration [here](https://docs.signl4.com/integrations/librenms/librenms.html).
 
 ## Slack
 

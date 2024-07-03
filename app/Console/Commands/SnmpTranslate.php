@@ -6,6 +6,7 @@ use App\Models\Device;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use LibreNMS\Data\Source\SnmpResponse;
+use LibreNMS\Util\Oid;
 use SnmpQuery;
 
 class SnmpTranslate extends SnmpFetch
@@ -37,6 +38,14 @@ class SnmpTranslate extends SnmpFetch
         $res = new SnmpResponse('');
         // translate does not support multiple oids (should it?)
         foreach ($this->oids as $oid) {
+            if (Oid::isNumeric($oid)) {
+                $translated = SnmpQuery::numeric(false)->mibs(['ALL'])->translate($oid);
+                $response = new SnmpResponse($translated . PHP_EOL);
+                $res = $res->append($response);
+
+                continue;
+            }
+
             $translated = SnmpQuery::numeric($this->numeric)->translate($oid);
 
             // if we got the same back (ignoring . prefix) swap numeric
@@ -44,7 +53,7 @@ class SnmpTranslate extends SnmpFetch
                 $translated = SnmpQuery::numeric(! $this->numeric)->translate($oid);
             }
 
-            $res->append(new SnmpResponse($translated . PHP_EOL));
+            $res = $res->append(new SnmpResponse($translated . PHP_EOL));
         }
 
         return $res;

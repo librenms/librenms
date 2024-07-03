@@ -279,7 +279,13 @@ class Device extends BaseModel
      */
     public function downSince(): Carbon
     {
-        return Carbon::createFromTimestamp((int) $this->getCurrentOutage()?->going_down);
+        $deviceOutage = $this->getCurrentOutage();
+
+        if ($deviceOutage) {
+            return Carbon::createFromTimestamp((int) $deviceOutage->going_down);
+        }
+
+        return $this->last_polled ?? Carbon::now();
     }
 
     /**
@@ -796,7 +802,8 @@ class Device extends BaseModel
 
     public function maps(): HasManyThrough
     {
-        return $this->hasManyThrough(CustomMap::class, CustomMapNode::class, 'device_id', 'custom_map_id', 'device_id', 'custom_map_id');
+        return $this->hasManyThrough(CustomMap::class, CustomMapNode::class, 'device_id', 'custom_map_id', 'device_id', 'custom_map_id')
+            ->distinct();
     }
 
     public function mefInfo(): HasMany

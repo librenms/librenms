@@ -790,6 +790,8 @@ script it self at the top.
 
 ## FreeBSD NFS Client
 
+Superseded by the generalized NFS support.
+
 ### SNMP Extend
 
 1. Copy the shell script, fbsdnfsserver, to the desired host
@@ -814,6 +816,8 @@ the page. If it is not, please follow the steps set out under `SNMP
 Extend` heading top of page.
 
 ## FreeBSD NFS Server
+
+Superseded by the generalized NFS support.
 
 ### SNMP Extend
 
@@ -1578,7 +1582,62 @@ Extend` heading top of page.
 [Install the agent](Agent-Setup.md) on this device if it isn't already
 and copy the `nginx` script to `/usr/lib/check_mk_agent/local/`
 
-## NFS Server
+## NFS
+
+Provides both NFS client and server support.
+
+Currently supported OSes are as below.
+
+- FreeBSD
+- Linux
+
+### SNMPd extend
+
+1. Download the extend.
+```
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/nfs -O /etc/snmp/nfs
+```
+
+2. Make it executable.
+```
+chmod +x /etc/snmp/nfs
+```
+
+3. Add it to snmpd.conf.
+```
+extend nfs /usr/bin/env PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin /etc/snmp/nfs
+```
+
+4. Restart snmpd on your host
+
+5. Either wait for it to be rediscovered, rediscover it, or enable it.
+
+If using SELinux, the following is needed.
+
+1. `setsebool -P nis_enabled 1`
+
+2. Make a file (snmp_nfs.te) with the following contents and install
+   the policy with the command `semodule -i snmp_nfs.te`.
+```
+module snmp_nfs 1.0;
+
+require {
+        type mountd_port_t;
+        type snmpd_t;
+        type hi_reserved_port_t;
+        class tcp_socket { name_bind name_connect };
+        class udp_socket name_bind;
+}
+
+#============= snmpd_t ==============
+allow snmpd_t hi_reserved_port_t:tcp_socket name_bind;
+allow snmpd_t hi_reserved_port_t:udp_socket name_bind;
+allow snmpd_t mountd_port_t:tcp_socket name_connect;
+```
+
+## Linux NFS Server
+
+Superseded by the generalized NFS support.
 
 Export the NFS stats from as server.
 
@@ -2728,12 +2787,19 @@ dnf install smartmontools perl-JSON perl-MIME-Base64
 chmod +x /etc/snmp/smart
 ```
 
-4. Edit your snmpd.conf file and add:
+4. Setup a cronjob to run it. This ensures slow to poll disks won't
+   result in errors.
+
 ```
-extend smart /etc/snmp/smart
+ */5 * * * * /etc/snmp/smart -u -Z
 ```
 
-5. You will also need to create the config file, which defaults to the same path as the script,
+5. Edit your snmpd.conf file and add:
+```
+extend smart /bin/cat /var/cache/smart
+```
+
+6. You will also need to create the config file, which defaults to the same path as the script,
 but with .config appended. So if the script is located at /etc/snmp/smart, the config file
 will be `/etc/snmp/smart.config`. Alternatively you can also specific a config via `-c`.
 
@@ -2773,32 +2839,11 @@ it should be.
 
 6. Restart snmpd on your host
 
-If you have a large number of more than one or two disks on a system,
-you should consider adding this to cron. Also make sure the cache file
-is some place it can be written to.
-
-```
- */5 * * * * /etc/snmp/smart -u
-```
-
-7. If your snmp agent runs as user "snmp", edit your sudo users
-   (usually `visudo`) and add at the bottom:
-```
-snmp ALL=(ALL) NOPASSWD: /etc/snmp/smart, /usr/bin/env smartctl
-```
-
-and modify your snmpd.conf file accordingly, sudo can be excluded if
-running it via cron:
-
-```
-extend smart /usr/bin/sudo /etc/snmp/smart
-```
-
 The application should be auto-discovered as described at the top of
 the page. If it is not, please follow the steps set out under `SNMP
 Extend` heading top of page.
 
-8. Optionally setup nightly self tests for the disks. The exend will
+7. Optionally setup nightly self tests for the disks. The exend will
    run the specified test on all configured disks if called with the
    -t flag and the name of the SMART test to run.
 

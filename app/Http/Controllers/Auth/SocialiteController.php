@@ -74,7 +74,7 @@ class SocialiteController extends Controller
         if (array_key_exists('error', $request->query())) {
             $error = $request->query('error');
             $error_description = $request->query('error_description');
-            flash()->addError($error . ': ' . $error_description);
+            toast()->error($error . ': ' . $error_description);
 
             return redirect()->route('login');
         }
@@ -121,7 +121,7 @@ class SocialiteController extends Controller
 
             return redirect()->intended();
         } catch (AuthenticationException $e) {
-            flash()->addError($e->getMessage());
+            toast()->error($e->getMessage());
         }
 
         return redirect()->route('login');

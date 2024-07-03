@@ -45,9 +45,9 @@ $bg = '#ffffff';
 
 $show_all = 1;
 
-echo "<div class=ifcell style='margin: 0px;'><table width=100% cellpadding=10 cellspacing=0>";
+echo "<div style='margin: 0px; width: 100%'><table class='iftable' cellpadding=10 cellspacing=0A>";
 
-require 'includes/html/print-interface.inc.php';
+echo view('device.tabs.ports.includes.port_row', ['port' => $port, 'collapsing' => false]);
 
 echo '</table></div>';
 

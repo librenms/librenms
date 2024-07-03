@@ -196,7 +196,7 @@ class DeviceController extends TableController
         } elseif ($device->status == 0) {
             return 'label-danger';
         } else {
-            $warning_time = \LibreNMS\Config::get('uptime_warning', 84600);
+            $warning_time = \LibreNMS\Config::get('uptime_warning', 86400);
             if ($device->uptime < $warning_time && $device->uptime != 0) {
                 return 'label-warning';
             }
