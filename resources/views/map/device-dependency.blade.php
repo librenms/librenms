@@ -77,7 +77,7 @@
         var group = null;
 @endif
 
-        $.post( '{{ route('maps.getdevices') }}', {disabled: 0, disabled_alerts: 0, link_type: "depends", url_type: "links", group: group, highlight_node: highlight, showpath: showpath})
+        $.post( '{{ route('maps.getdevices') }}', {disabled: 0, disabled_alerts: null, link_type: "depends", url_type: "links", group: group, highlight_node: highlight, showpath: showpath})
             .done(function( data ) {
                 function deviceSort(a,b) {
                     return (data[a]["sname"] > data[b]["sname"]) ? 1 : -1;
