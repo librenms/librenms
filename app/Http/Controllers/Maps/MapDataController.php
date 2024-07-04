@@ -352,7 +352,7 @@ class MapDataController extends Controller
         }
     }
 
-    protected function linkSpeedWidth(int $speed): float
+    protected function linkSpeedWidth(int|null $speed): float
     {
         $speed /= 1000000000;
         if ($speed > 500000) {
@@ -368,7 +368,7 @@ class MapDataController extends Controller
         return round(0.77 * pow($speed, 0.25));
     }
 
-    protected function linkUseColour(float $link_pct): int
+    protected function linkUseColour(float $link_pct): string
     {
         $link_pct = round(2 * $link_pct, -1) / 2;
         if ($link_pct > 100) {
