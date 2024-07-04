@@ -438,7 +438,7 @@ class MapDataController extends Controller
         if ($device->disabled) {
             $device_style = $this->nodeDisabledStyle();
         } elseif (! $device->status) {
-            $device_style = $this->nodeDownStyle();
+            $device_style = $device->disable_notify ? $this->nodeDisabledStyle() : $this->nodeDownStyle();
         } else {
             $device_style = $this->nodeUpStyle();
         }
