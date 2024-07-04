@@ -12,6 +12,9 @@ discovery:
     - sysObjectID:
         - .1.3.6.1.4.1.850.1.5
         - .1.3.6.1.4.1.850.1.7
+
+bad_if:
+    - lo
 discovery_modules:
     arp-table: false
     bgp-peers: false
