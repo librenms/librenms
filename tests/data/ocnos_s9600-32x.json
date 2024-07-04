@@ -2209,7 +2209,7 @@
                     "multiplier": 1,
                     "divisor": 1000,
                     "transform_function": null,
-                    "status": 1,
+                    "status": 4,
                     "threshold_min_critical": -20.51,
                     "threshold_min_warning": -21.49,
                     "threshold_max_warning": -2.5,
