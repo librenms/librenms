@@ -12,3 +12,34 @@ discovery:
     - sysObjectID:
         - .1.3.6.1.4.1.850.1.5
         - .1.3.6.1.4.1.850.1.7
+discovery_modules:
+    arp-table: false
+    bgp-peers: false
+    cisco-vrf-lite: false
+    fdb-table: false
+    hr-device: false
+    ipmi: false
+    mpls: false
+    ntp: false
+    ospf: false
+    ports-stack: false
+    sensors: false
+    services: false
+    storage: false
+    stp: false
+    ucd-diskio: false
+    vlans: false
+    wireless: false
+poller_modules:
+    applications: false
+    bgp-peers: false
+    hr-mib: false
+    ipmi: false
+    ntp: false
+    ospf: false
+    sensors: false
+    storage: false
+    stp: false
+    ucd-diskio: false
+    ucd-mib: false
+    wireless: false
