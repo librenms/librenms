@@ -373,6 +373,11 @@ class PortsController implements DeviceTab
             ->when(! $this->settings['ignored'], fn (Builder $q, $disabled) => $q->where('ignore', 0))
             ->when($this->settings['admin'] != 'any', fn (Builder $q, $admin) => $q->where('ifAdminStatus', $this->settings['admin']))
             ->when($this->settings['status'] != 'any', fn (Builder $q, $admin) => $q->where('ifOperStatus', $this->settings['status']))
+            ->when($this->settings['sort'] == 'port', fn (Builder $q, $sort) => $q
+                ->orderByRaw('SOUNDEX(ifName) ' . $this->settings['order'])
+                ->orderByRaw('CHAR_LENGTH(ifName) ' . $this->settings['order'])
+                ->orderByRaw('lower(ifName) ' . $this->settings['order'])
+            )
             ->orderBy($orderBy, $this->settings['order']);
     }
 
