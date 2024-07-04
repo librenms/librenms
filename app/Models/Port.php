@@ -393,4 +393,9 @@ class Port extends DeviceRelatedModel
     {
         return $this->hasMany(PortVlan::class, 'port_id');
     }
+
+    public function vrf()
+    {
+        return $this->hasOne(Vrf::class, 'vrf_id', 'ifVrf');
+    }
 }
