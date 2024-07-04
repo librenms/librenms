@@ -58,7 +58,7 @@
             {{ \LibreNMS\Util\Number::formatBi($port->ifOutUcastPkts_rate, 2, 3, 'pps') }}
         </div>
     </td>
-    <td>
+    <td class="tw-whitespace-nowrap">
         @if($port->ifSpeed)
             <div>{{ \LibreNMS\Util\Number::formatSi($port->ifSpeed, 2, 3, 'bps') }}</div>
         @endif
@@ -72,10 +72,13 @@
                         <span title="{{ $port->vlans->pluck('vlan')->implode(',') }}">{{ __('port.vlan_count', ['count' => $port->vlans->count()]) }}</span>
                     @elseif($port->vlans->count() == 1 || $port->ifVlan)
                         {{ __('port.vlan_label', ['label' => $port->vlans->first()->vlan ?: $port->ifVlan]) }}
-                    @elseif($port->ifVrf)
-                        {{ Vrf::where('vrf_id', $port->ifVrf)->value('vrf_name') }}
                     @endif
                 </a>
+            </div>
+        @endif
+        @if($port->ifVrf)
+            <div>
+                {{ __('port.vrf_label', ['name' => $port->vrf?->vrf_name]) }}
             </div>
         @endif
     </td>
