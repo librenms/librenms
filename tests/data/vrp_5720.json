@@ -6537,8 +6537,8 @@
                     "ifName": "InLoopBack0",
                     "portName": null,
                     "ifIndex": 1,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "false",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -6637,8 +6637,8 @@
                     "ifName": "NULL0",
                     "portName": null,
                     "ifIndex": 2,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "false",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -6737,8 +6737,8 @@
                     "ifName": "Console9/0/0",
                     "portName": null,
                     "ifIndex": 3,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -12737,8 +12737,8 @@
                     "ifName": "LoopBack1",
                     "portName": null,
                     "ifIndex": 66,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "false",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -13947,7 +13947,7 @@
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
                     "bgpPeerLastErrorText": null,
-                    "bgpPeerIface": null,
+                    "bgpPeerIface": 66,
                     "bgpLocalAddr": "3.3.3.3",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
@@ -13970,7 +13970,7 @@
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
                     "bgpPeerLastErrorText": null,
-                    "bgpPeerIface": null,
+                    "bgpPeerIface": 66,
                     "bgpLocalAddr": "3.3.3.3",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
@@ -16661,5 +16661,66 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "discovery-protocols": {
+        "discovery": {
+            "links": [
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "LNS-Huawei",
+                    "remote_port": "GigabitEthernet0/0/7 (14a0f8cfaf39)",
+                    "remote_platform": null,
+                    "remote_version": "Huawei AR1220E Huawei Versatile Routing Platform Software  VRP (R) software,Version 5.160 (AR1220E V200R007C00SPC900) Copyright (C) 2011-2016 Huawei Technologies Co., Ltd",
+                    "ifAlias": "GigabitEthernet0/0/14",
+                    "ifDescr": "GigabitEthernet0/0/14",
+                    "ifName": "GigabitEthernet0/0/14"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "pm-test",
+                    "remote_port": "GigabitEthernet0/0/1 (488eef716810)",
+                    "remote_platform": null,
+                    "remote_version": "S5720-56C-PWR-EI-AC\nHuawei Versatile Routing Platform Software\r\nVRP (R) software, Version 5.170 (S5720 V200R010C00SPC600)\r\nCopyright (C) 2000-2016 HUAWEI TECH CO., LTD",
+                    "ifAlias": "MEth0/0/1",
+                    "ifDescr": "MEth0/0/1",
+                    "ifName": "MEth0/0/1"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "CE-NG",
+                    "remote_port": "10GE1/0/42 (b4fbf9adb881)",
+                    "remote_platform": null,
+                    "remote_version": "Huawei Versatile Routing Platform Software\nVRP (R) software, Version 8.150 (CE6855HI V200R002C50SPC800)\r\nCopyright (C) 2012-2017 Huawei Technologies Co., Ltd.\r\nHUAWEI CE6855-48S6Q-HI",
+                    "ifAlias": "XGigabitEthernet0/0/1",
+                    "ifDescr": "XGigabitEthernet0/0/1",
+                    "ifName": "XGigabitEthernet0/0/1"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "Zrih",
+                    "remote_port": "XGigabitEthernet0/0/1 (488eef716160)",
+                    "remote_platform": null,
+                    "remote_version": "S5720-56C-PWR-EI-AC\nHuawei Versatile Routing Platform Software\r\nVRP (R) software, Version 5.170 (S5720 V200R010C00SPC600)\r\nCopyright (C) 2000-2016 HUAWEI TECH CO., LTD",
+                    "ifAlias": "XGigabitEthernet0/0/2",
+                    "ifDescr": "XGigabitEthernet0/0/2",
+                    "ifName": "XGigabitEthernet0/0/2"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "CE-NG",
+                    "remote_port": "10GE1/0/41 (b4fbf9adb881)",
+                    "remote_platform": null,
+                    "remote_version": "Huawei Versatile Routing Platform Software\nVRP (R) software, Version 8.150 (CE6855HI V200R002C50SPC800)\r\nCopyright (C) 2012-2017 Huawei Technologies Co., Ltd.\r\nHUAWEI CE6855-48S6Q-HI",
+                    "ifAlias": "XGigabitEthernet0/0/4",
+                    "ifDescr": "XGigabitEthernet0/0/4",
+                    "ifName": "XGigabitEthernet0/0/4"
+                }
+            ]
+        }
     }
 }
