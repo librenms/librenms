@@ -22,7 +22,7 @@ class SyncMetricStatus implements CastsAttributes
     /**
      * Prepare the given value for storage.
      *
-     * @param  TransceiverMetric $model
+     * @param  TransceiverMetric  $model
      * @param  array<string, mixed>  $attributes
      */
     public function set(Model $model, string $key, mixed $value, array $attributes): array
