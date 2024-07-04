@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use LibreNMS\Enum\TransceiverMetricStatus;
 use LibreNMS\Interfaces\Models\Keyable;
 
+/** @property TransceiverMetricStatus $status Work around issue with phpstan */
 class TransceiverMetric extends DeviceRelatedModel implements Keyable
 {
     use HasFactory;
