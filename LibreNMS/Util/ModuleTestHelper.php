@@ -546,7 +546,7 @@ class ModuleTestHelper
 
         // don't allow external DNS queries that could fail
         app()->bind(\LibreNMS\Util\AutonomousSystem::class, function ($app, $parameters) {
-            $asn = $parameters['asn'];
+            $asn = $parameters['asn'] ?? '?';
             $mock = \Mockery::mock(\LibreNMS\Util\AutonomousSystem::class);
             $mock->shouldReceive('name')->withAnyArgs()->zeroOrMoreTimes()->andReturnUsing(function () use ($asn) {
                 return "AS$asn-MOCK-TEXT";
@@ -664,7 +664,7 @@ class ModuleTestHelper
                 if (empty($module_data['discovery']) && empty($module_data['poller'])) {
                     continue;
                 }
-                if ($module_data['discovery'] == $module_data['poller']) {
+                if (isset($module_data['discovery']) && isset($module_data['poller']) && $module_data['discovery'] == $module_data['poller']) {
                     $existing_data[$module] = [
                         'discovery' => $module_data['discovery'],
                         'poller' => 'matches discovery',

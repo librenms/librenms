@@ -1,7 +1,7 @@
 --
 -- Juniper Enterprise Specific MIB: Ping MIB
--- 
--- Copyright (c) 2001-2012, Juniper Networks, Inc.
+--
+-- Copyright (c) 2001-2021, Juniper Networks, Inc.
 -- All rights reserved.
 --
 -- The contents of this document are subject to change without notice.
@@ -47,6 +47,10 @@ jnxPingMIB MODULE-IDENTITY
              related entries in mib-2, pingMIB."
 
     -- revision history
+    REVISION "202107190000Z" -- July 19 00:00:00 2021 UTC
+    DESCRIPTION
+             "Updated RTT, Jitter Traps with results,
+              Removed ununsed jnxPingMaxRttThreshold and stale entries."
     REVISION "201109200000Z" -- September 20 00:00:00 2011 UTC
     DESCRIPTION
             "Updated the jnxPingCtlTargetPort description."
@@ -74,7 +78,7 @@ jnxPingImplementationTypeDomains OBJECT IDENTIFIER ::= { jnxPingMIB 2 }
 jnxPingIcmpTimeStamp OBJECT-IDENTITY
     STATUS      current
     DESCRIPTION
-        "Indicates that an implementation is using the Internet  
+        "Indicates that an implementation is using the Internet
         Control Message Protocol (ICMP) 'TimeStamp' facility.
         This probe-type provides egress and ingress delay measurements."
     ::= { jnxPingImplementationTypeDomains 1 }
@@ -111,7 +115,7 @@ jnxPingUdpTimestamp OBJECT-IDENTITY
     STATUS      current
     DESCRIPTION
         "Indicates that an implementation is using a UDP timestamp query to
-        calculate a round trip time. This probe-type provides egress and 
+        calculate a round trip time. This probe-type provides egress and
         ingress delay measurements"
     ::= { jnxPingImplementationTypeDomains 6 }
 
@@ -214,10 +218,10 @@ jnxPingCtlIfName  OBJECT-TYPE
     DESCRIPTION
         "Setting this object to an interface name prior to starting a remote
         ping operation directs the ping probes to be transmitted over the
-        specified interface.  To specify the interface index instead, see 
+        specified interface.  To specify the interface index instead, see
         pingCtlIfIndex.  The interface name must be specified under interfaces
         statement of the JUNOS configuration.  A zero length string value for
-        this object means that this option is not enabled.  The following 
+        this object means that this option is not enabled.  The following
         values may be set simultaneously, however, only one value is used.
         The precedence order is a follows:
             pingCtlIfIndex (see pingCtlTable in pingMIB)
@@ -239,7 +243,7 @@ jnxPingCtlRoutingIfIndex OBJECT-TYPE
         necessarily be the interface packets are transmitted on.  By default,
         the source address of the packets will be set to the address of the
         interface chosen.  pingCtlSourceAddress should be used to override
-        the choice for source address if necessary. A value of zero for this 
+        the choice for source address if necessary. A value of zero for this
         object means that this option is not enabled.
         NOTE: deprecated by jnxPingCtlRoutingInstanceName"
     DEFVAL { 0 }
@@ -306,13 +310,13 @@ jnxPingCtlRttJitterThreshold  OBJECT-TYPE
         of any test.  Jitter is defined as the difference between the
         maximum and minimum round trip times measured over the course of
         a single test (jnxPingResultsMaxRttUs minus jnxPingResultsMinRttUs).
-        If the measured jitter exceeds this threshold, a 
+        If the measured jitter exceeds this threshold, a
         jnxPingRttJitterThresholdExceeded trap will be sent."
     DEFVAL { 0 }
     ::= { jnxPingCtlEntry 9 }
 
 jnxPingCtlEgressTimeThreshold  OBJECT-TYPE
-    SYNTAX      Unsigned32 (0..60000000)  
+    SYNTAX      Unsigned32 (0..60000000)
     UNITS       "microseconds"
     MAX-ACCESS  read-create
     STATUS      current
@@ -324,9 +328,9 @@ jnxPingCtlEgressTimeThreshold  OBJECT-TYPE
         supported probe type with this property."
     DEFVAL { 0 }
     ::= { jnxPingCtlEntry 10 }
- 
+
 jnxPingCtlEgressStdDevThreshold  OBJECT-TYPE
-    SYNTAX      Unsigned32 (0..60000000)  
+    SYNTAX      Unsigned32 (0..60000000)
     UNITS       "microseconds"
     MAX-ACCESS  read-create
     STATUS      current
@@ -340,9 +344,9 @@ jnxPingCtlEgressStdDevThreshold  OBJECT-TYPE
         supported probe type with this property."
     DEFVAL { 0 }
     ::= { jnxPingCtlEntry 11 }
- 
+
 jnxPingCtlEgressJitterThreshold  OBJECT-TYPE
-    SYNTAX      Unsigned32 (0..60000000)  
+    SYNTAX      Unsigned32 (0..60000000)
     UNITS       "microseconds"
     MAX-ACCESS  read-create
     STATUS      current
@@ -360,7 +364,7 @@ jnxPingCtlEgressJitterThreshold  OBJECT-TYPE
     ::= { jnxPingCtlEntry 12 }
 
 jnxPingCtlIngressTimeThreshold  OBJECT-TYPE
-    SYNTAX      Unsigned32 (0..60000000)  
+    SYNTAX      Unsigned32 (0..60000000)
     UNITS       "microseconds"
     MAX-ACCESS  read-create
     STATUS      current
@@ -372,9 +376,9 @@ jnxPingCtlIngressTimeThreshold  OBJECT-TYPE
         supported probe type with this property."
     DEFVAL { 0 }
     ::= { jnxPingCtlEntry 13 }
- 
+
 jnxPingCtlIngressStddevThreshold  OBJECT-TYPE
-    SYNTAX      Unsigned32 (0..60000000)  
+    SYNTAX      Unsigned32 (0..60000000)
     UNITS       "microseconds"
     MAX-ACCESS  read-create
     STATUS      current
@@ -388,9 +392,9 @@ jnxPingCtlIngressStddevThreshold  OBJECT-TYPE
         supported probe type with this property."
     DEFVAL { 0 }
     ::= { jnxPingCtlEntry 14 }
- 
+
 jnxPingCtlIngressJitterThreshold  OBJECT-TYPE
-    SYNTAX      Unsigned32 (0..60000000)  
+    SYNTAX      Unsigned32 (0..60000000)
     UNITS       "microseconds"
     MAX-ACCESS  read-create
     STATUS      current
@@ -439,29 +443,29 @@ jnxPingCtlIngressJitterThreshold  OBJECT-TYPE
             notification when the configured egress threshold is exceeded.
             This applies only if the probe type supports one way measurments.
         egressStdDevThreshold(4) - Generate a
-            jnxPingEgressStdDevThresholdExceeded notification when the 
+            jnxPingEgressStdDevThresholdExceeded notification when the
             configured egress standard deviation threshold is exceeded.
             This applies only if the probe type supports one way measurments.
-        egressJitterThreshold(5) - Generate a 
-            jnxPingEgressJitterThresholdExceeded notification when the 
+        egressJitterThreshold(5) - Generate a
+            jnxPingEgressJitterThresholdExceeded notification when the
             configured egress jitter threshold is exceeded.
             This applies only if the probe type supports one way measurments.
         ingressThreshold(6)   - Generate a jnxPingIngressThresholdExceeded
             notification when the configured ingress threshold is exceeded.
             This applies only if the probe type supports one way measurments.
         ingressStdDevThreshold(7) - Generate a
-            jnxPingIngressStdDevThresholdExceeded notification when the 
+            jnxPingIngressStdDevThresholdExceeded notification when the
             configured ingress standard deviation threshold is exceeded.
             This applies only if the probe type supports one way measurments.
-        ingressJitterThreshold(8) - Generate a 
-            jnxPingIngressJitterThresholdExceeded notification when the 
+        ingressJitterThreshold(8) - Generate a
+            jnxPingIngressJitterThresholdExceeded notification when the
             configured ingress jitter threshold is exceeded.
             This applies only if the probe type supports one way measurments.
-        The value of this object defaults to zero, indicating
-        that none of the above options have been selected.
+            The value of this object defaults to zero, indicating
+            that none of the above options have been selected.
         maxrttThreshold(9) - Generate a jnxPingMaxRttThresholdExceeded
-            notification when the configured max rtt threshold
-            is exceeded."
+            notification at the end of test session when rtt of any of the probe
+            exceeds the configured rtt threshold."
     ::= { jnxPingCtlEntry 16 }
 
 jnxPingCtlTargetPort  OBJECT-TYPE
@@ -479,7 +483,7 @@ jnxPingCtlJseriesHWTimeStamp  OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "Use to enable the RPM Hardware Timestamp feature on J-series routers.
-         For M/T series routers, use the jnxPingCtlIfName and 
+         For M/T series routers, use the jnxPingCtlIfName and
          pingCtlByPassRouteTable objects to redirect probes to the AS Pic.
          For those routers, this object must have the value: false."
     DEFVAL { false }
@@ -493,16 +497,16 @@ jnxPingCtlOneWayHWTimeStamp  OBJECT-TYPE
         "Use this object to enable Hardware Timestamp-based one-way
          measurements.  If this object is not enabled (ie, set to true),
          no Hardware Timestamp based one way measurements or calculations
-         will be performed for this control entry.  This object applies to 
+         will be performed for this control entry.  This object applies to
          all Juniper routers.  Note, due to clock synchronization artifacts,
          many one-way jitter measurements & calculations may include signifacant
-         variations, in some cases  orders of magnitude greater than the round 
+         variations, in some cases  orders of magnitude greater than the round
          trip times."
     DEFVAL { false }
     ::= { jnxPingCtlEntry 19 }
 
 jnxPingCtlMovAvgSize  OBJECT-TYPE
-    SYNTAX      Unsigned32 
+    SYNTAX      Unsigned32
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -522,7 +526,7 @@ jnxPingCtlMXseriesHWTimeStamp  OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "Use to enable the RPM Hardware Timestamp feature on MX-series routers.
-         For M/T series routers, use the jnxPingCtlIfName and 
+         For M/T series routers, use the jnxPingCtlIfName and
          pingCtlByPassRouteTable objects to redirect probes to the AS PIC.
          For those routers, this object must have the value: false."
     DEFVAL { false }
@@ -538,16 +542,6 @@ jnxPingCtlEXseriesHWTimeStamp  OBJECT-TYPE
     DEFVAL { false }
     ::= { jnxPingCtlEntry 22 }
 
-jnxPingMaxRttThreshold OBJECT-TYPE
-    SYNTAX      Unsigned32 (0..6000000)
-    UNITS       "microseconds"
-    MAX-ACCESS  read-create
-    STATUS      current
-    DESCRIPTION
-        "Maximum round trip time allowed.  If this threshold is crossed
-        by any probe of a test, a jnxPingMaxRttThresholdExceeded trap will be sent."
-    DEFVAL { 0 }
-    ::= { jnxPingCtlEntry 23 }
 --
 -- Ping Results Table extensions
 --
@@ -652,7 +646,7 @@ jnxPingResultsStdDevRttUs OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The standard deviation of the round trip delays measured 
+        "The standard deviation of the round trip delays measured
         during this test.  Measured in microseconds."
     ::= { jnxPingResultsEntry 6 }
 
@@ -665,7 +659,7 @@ jnxPingResultsEgressUs OBJECT-TYPE
         "The egress trip delays measured for the most recent successful probe
         during this test.  Measured in microseconds.
         This applies only if the probe type (pingCtlType)
-        provides one-way delay measurements.  For all other probe types, 
+        provides one-way delay measurements.  For all other probe types,
         their values are irrelevant and will return 0."
     ::= { jnxPingResultsEntry 7 }
 
@@ -678,7 +672,7 @@ jnxPingResultsMinEgressUs OBJECT-TYPE
         "The minimum of the egress trip delays measured over all
         probes during this test.  Measured in microseconds.
         This applies only if the probe type (pingCtlType)
-        provides one-way delay measurements.  For all other probe types, 
+        provides one-way delay measurements.  For all other probe types,
         their values are irrelevant and will return 0."
     ::= { jnxPingResultsEntry 8 }
 
@@ -691,7 +685,7 @@ jnxPingResultsMaxEgressUs OBJECT-TYPE
         "The maximum of the egress trip delays measured over all
         probes during this test.  Measured in microseconds.
         This applies only if the probe type (pingCtlType)
-        provides one-way delay measurements.  For all other probe types, 
+        provides one-way delay measurements.  For all other probe types,
         their values are irrelevant and will return 0."
     ::= { jnxPingResultsEntry 9 }
 
@@ -704,7 +698,7 @@ jnxPingResultsAvgEgressUs OBJECT-TYPE
         "The average of the egress trip delays measured over all
         probes during this test.  Measured in microseconds.
         This applies only if the probe type (pingCtlType)
-        provides one-way delay measurements.  For all other probe types, 
+        provides one-way delay measurements.  For all other probe types,
         their values are irrelevant and will return 0."
     ::= { jnxPingResultsEntry 10 }
 
@@ -717,7 +711,7 @@ jnxPingResultsStddevEgressUs OBJECT-TYPE
         "The standard deviation of the egress trip delays measured over all
         probes during this test.  Measured in microseconds.
         This applies only if the probe type (pingCtlType)
-        provides one-way delay measurements.  For all other probe types, 
+        provides one-way delay measurements.  For all other probe types,
         their values are irrelevant and will return 0."
     ::= { jnxPingResultsEntry 11 }
 
@@ -730,7 +724,7 @@ jnxPingResultsIngressUs OBJECT-TYPE
         "The ingress trip delays measured for the most recent successful probe
         during this test.  Measured in microseconds.
         This applies only if the probe type (pingCtlType)
-        provides one-way delay measurements.  For all other probe types, 
+        provides one-way delay measurements.  For all other probe types,
         their values are irrelevant and will return 0."
     ::= { jnxPingResultsEntry 12 }
 
@@ -743,10 +737,10 @@ jnxPingResultsMinIngressUs OBJECT-TYPE
         "The minimum of the ingress trip delays measured for over all
         probes during this test.  Measured in microseconds.
         This applies only if the probe type (pingCtlType)
-        provides one-way delay measurements.  For all other probe types, 
+        provides one-way delay measurements.  For all other probe types,
         their values are irrelevant and will return 0."
     ::= { jnxPingResultsEntry 13 }
-    
+
 jnxPingResultsMaxIngressUs OBJECT-TYPE
     SYNTAX      Unsigned32
     UNITS       "microseconds"
@@ -756,7 +750,7 @@ jnxPingResultsMaxIngressUs OBJECT-TYPE
         "The maximum of the ingress trip delays measured over all
         probes during this test.  Measured in microseconds.
         This applies only if the probe type (pingCtlType)
-        provides one-way delay measurements.  For all other probe types, 
+        provides one-way delay measurements.  For all other probe types,
         their values are irrelevant and will return 0."
     ::= { jnxPingResultsEntry 14 }
 
@@ -769,7 +763,7 @@ jnxPingResultsAvgIngressUs OBJECT-TYPE
         "The average of the ingress trip delays measured over all
         probes during this test.  Measured in microseconds.
         This applies only if the probe type (pingCtlType)
-        provides one-way delay measurements.  For all other probe types, 
+        provides one-way delay measurements.  For all other probe types,
         their values are irrelevant and will return 0."
     ::= { jnxPingResultsEntry 15 }
 
@@ -782,7 +776,7 @@ jnxPingResultsStddevIngressUs OBJECT-TYPE
         "The standard deviation of the ingress trip delays measured over all
         probes during this test.  Measured in microseconds.
         This applies only if the probe type (pingCtlType)
-        provides one-way delay measurements.  For all other probe types, 
+        provides one-way delay measurements.  For all other probe types,
         their values are irrelevant and will return 0."
     ::= { jnxPingResultsEntry 16 }
 
@@ -805,7 +799,7 @@ jnxPingResultsJitterEgressUs OBJECT-TYPE
         "The jitter of the egress trip delays measured for all the probes
         during this test.  Measured in microseconds.
         This applies only if the probe type (pingCtlType)
-        provides one-way delay measurements.  For all other probe types, 
+        provides one-way delay measurements.  For all other probe types,
         their values are irrelevant and will return 0."
     ::= { jnxPingResultsEntry 18 }
 
@@ -818,7 +812,7 @@ jnxPingResultsJitterIngressUs OBJECT-TYPE
         "The jitter of the ingress trip delays measured for all the probes
         during this test.  Measured in microseconds.
         This applies only if the probe type (pingCtlType)
-        provides one-way delay measurements.  For all other probe types, 
+        provides one-way delay measurements.  For all other probe types,
         their values are irrelevant and will return 0."
     ::= { jnxPingResultsEntry 19 }
 
@@ -845,7 +839,7 @@ jnxPingResultsOwnerIndex OBJECT-TYPE
     DESCRIPTION
         "This object has the same value as pingCtlOwnerIndex and is provided
         for those applications that are unable to parse the value of
-        pingCtlOwnerIndex from the instance portion of the OIDs belonging to 
+        pingCtlOwnerIndex from the instance portion of the OIDs belonging to
         this table."
     ::= { jnxPingResultsEntry 22 }
 
@@ -856,7 +850,7 @@ jnxPingResultsTestName OBJECT-TYPE
     DESCRIPTION
         "This object has the same value as pingCtlTestName and is provided
         for those applications that are unable to parse the value of
-        pingCtlTestName from the instance portion of the OIDs belonging to 
+        pingCtlTestName from the instance portion of the OIDs belonging to
         this table."
     ::= { jnxPingResultsEntry 23 }
 
@@ -912,9 +906,9 @@ jnxPingProbeHistoryJitterUs OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The time difference measured in microseconds between the maximum 
-        and minimum round trip times.  Each history entry provides a running 
-        calculation of the jitter (calculated over the current test) at the 
+        "The time difference measured in microseconds between the maximum
+        and minimum round trip times.  Each history entry provides a running
+        calculation of the jitter (calculated over the current test) at the
         time a probe was completed."
 
     ::= { jnxPingProbeHistoryEntry 2 }
@@ -933,9 +927,9 @@ jnxPingProbeHistoryResponseEgressUs OBJECT-TYPE
     ::= { jnxPingProbeHistoryEntry 3 }
 
 jnxPingProbeHistoryResponseIngressUs OBJECT-TYPE
-    SYNTAX      Unsigned32 
+    SYNTAX      Unsigned32
     UNITS       "microseconds"
-    MAX-ACCESS  read-only  
+    MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "The amount of time measured in microseconds from when
@@ -952,8 +946,8 @@ jnxPingProbeHistoryEgressJitterUs OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The time difference measured in microseconds between the maximum
-        and minimum egress trip times.  Each history entry provides a running 
-        calculation of the jitter (calculated over the current test) at the 
+        and minimum egress trip times.  Each history entry provides a running
+        calculation of the jitter (calculated over the current test) at the
         time a probe was completed.
         This applies only if the probe type (pingCtlType) provides one way
         delay measurements.
@@ -967,8 +961,8 @@ jnxPingProbeHistoryIngressJitterUs OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The time difference measured in microseconds between the maximum
-        and minimum ingress trip times.  Each history entry provides a running 
-        calculation of the jitter (calculated over the current test) at the 
+        and minimum ingress trip times.  Each history entry provides a running
+        calculation of the jitter (calculated over the current test) at the
         time a probe was completed.
         This applies only if the probe type (pingCtlType) provides one way
         delay measurements.
@@ -986,7 +980,7 @@ jnxPingLastTestResultTable OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "Stores result of the most recently completed test. Entry corresponding
-         to a test will be created only after completion of first test." 
+         to a test will be created only after completion of first test."
    ::= { jnxPingObjects 5 }
 
 jnxPingLastTestResultEntry OBJECT-TYPE
@@ -1196,14 +1190,14 @@ jnxPingLastTestResultStddevIngressUs OBJECT-TYPE
         provides one-way delay measurements.  For all other probe types,
         their values are irrelevant and will return 0."
     ::= { jnxPingLastTestResultEntry 15 }
-    
+
 jnxPingLastTestResultPeakToPeakJitterRttUs OBJECT-TYPE
     SYNTAX      Unsigned32
     UNITS       "microseconds"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "This indicates the difference  between the min and max delays over 
+        "This indicates the difference  between the min and max delays over
         the course of the last completed test. Measured in microseconds."
     ::= { jnxPingLastTestResultEntry 16 }
 
@@ -1213,8 +1207,8 @@ jnxPingLastTestResultPeakToPeakJitterEgressUs OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "This indicates the difference  between the min and max egress trip 
-        delays over the course of the last completed test.  Measured in 
+        "This indicates the difference  between the min and max egress trip
+        delays over the course of the last completed test.  Measured in
         microseconds. This applies only if the probe type (pingCtlType) provides
         one-way delay measurements. For all other probe types, their values are
         irrelevant and will return 0."
@@ -1226,7 +1220,7 @@ jnxPingLastTestResultPeakToPeakJitterIngressUs OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "This indicates the difference  between the min and max ingress trip 
+        "This indicates the difference  between the min and max ingress trip
         delays over the course of the last completed test.  Measured in
         microseconds. This applies only if the probe type (pingCtlType) provides
         one-way delay measurements. For all other probe types, their values are
@@ -1249,7 +1243,7 @@ jnxPingLastTestResultTime OBJECT-TYPE
     jnxPingNotificationPrefix OBJECT-IDENTITY
         STATUS current
         DESCRIPTION
-            "All Juniper-specific ping notifications are registered under 
+            "All Juniper-specific ping notifications are registered under
             this branch."
         ::= { jnxPingNotifications 0 }
 
@@ -1272,12 +1266,12 @@ jnxPingLastTestResultTime OBJECT-TYPE
          }
          STATUS  current
          DESCRIPTION
-             "This notification is generated when the round trip time 
+             "This notification is generated when the round trip time
              (jnxPingCtlRttThreshold) exceeds the configured
              threshold (jnxPingCtlRttThreshold) and the rttThreshold bit is
              set in jnxPingCtlTrapGeneration."
          ::= { jnxPingNotificationPrefix 1 }
-    
+
     jnxPingRttStdDevThresholdExceeded NOTIFICATION-TYPE
          OBJECTS {
            pingCtlTargetAddressType,
@@ -1298,7 +1292,7 @@ jnxPingLastTestResultTime OBJECT-TYPE
          STATUS  current
          DESCRIPTION
              "This notification is generated when the standard deviation of
-             the round trip time (jnxPingResultsStdDevRttUs) exceeds the 
+             the round trip time (jnxPingResultsStdDevRttUs) exceeds the
              configured threshold (jnxPingCtlRttStdDevThreshold) and the
              rttStdDevThreshold bit is set in jnxPingCtlTrapGeneration."
          ::= { jnxPingNotificationPrefix 2 }
@@ -1317,16 +1311,17 @@ jnxPingLastTestResultTime OBJECT-TYPE
            pingResultsSentProbes,
            pingResultsRttSumOfSquares,
            pingResultsLastGoodProbe,
-           jnxPingCtlRttJitterThreshold
+           jnxPingCtlRttJitterThreshold,
+           jnxPingResultsJitterRttUs
          }
          STATUS  current
          DESCRIPTION
              "This notification is generated when the round trip time jitter
-             (jnxPingResultsMaxRttUs minus jnxPingResultsMinRttUs) exceeds the 
+             (jnxPingResultsMaxRttUs minus jnxPingResultsMinRttUs) exceeds the
              configured threshold (jnxPingCtlRttJitterThreshold) and the
              rttJitterThreshold bit is set in jnxPingCtlTrapGeneration."
          ::= { jnxPingNotificationPrefix 3 }
-    
+
     jnxPingEgressThresholdExceeded NOTIFICATION-TYPE
          OBJECTS {
            pingCtlTargetAddressType,
@@ -1345,9 +1340,9 @@ jnxPingLastTestResultTime OBJECT-TYPE
          }
          STATUS  current
          DESCRIPTION
-             "This notification is generated when the egress time 
+             "This notification is generated when the egress time
              (jnxPingResultsEgressUs) exceeds the configured
-             threshold (jnxPingCtlEgressTimeThreshold) and the 
+             threshold (jnxPingCtlEgressTimeThreshold) and the
              egressThreshold bit is set in jnxPingCtlTrapGeneration."
          ::= { jnxPingNotificationPrefix 4 }
 
@@ -1371,7 +1366,7 @@ jnxPingLastTestResultTime OBJECT-TYPE
          STATUS  current
          DESCRIPTION
              "This notification is generated when the standard deviation of
-             the egress time (jnxPingResultsStddevEgressUs) exceeds the 
+             the egress time (jnxPingResultsStddevEgressUs) exceeds the
              configured threshold (jnxPingCtlEgressStdDevThreshold) and the
              egressStdDevThreshold bit is set in jnxPingCtlTrapGeneration."
          ::= { jnxPingNotificationPrefix 5 }
@@ -1389,14 +1384,15 @@ jnxPingLastTestResultTime OBJECT-TYPE
            pingResultsProbeResponses,
            pingResultsSentProbes,
            pingResultsLastGoodProbe,
-           jnxPingCtlEgressJitterThreshold
+           jnxPingCtlEgressJitterThreshold,
+           jnxPingResultsJitterEgressUs
          }
          STATUS  current
          DESCRIPTION
              "This notification is generated when the egress time jitter
-             (jnxPingResultsMaxEgressUs minus jnxPingResultsMinEgressUs) 
+             (jnxPingResultsMaxEgressUs minus jnxPingResultsMinEgressUs)
              exceeds the configured threshold (jnxPingCtlEgressJitterThreshold)
-             and the egressJitterThreshold bit is set in 
+             and the egressJitterThreshold bit is set in
              jnxPingCtlTrapGeneration."
          ::= { jnxPingNotificationPrefix 6 }
 
@@ -1418,9 +1414,9 @@ jnxPingLastTestResultTime OBJECT-TYPE
          }
          STATUS  current
          DESCRIPTION
-             "This notification is generated when the ingress time 
+             "This notification is generated when the ingress time
              (jnxPingResultsIngressUs) exceeds the configured
-             threshold (jnxPingCtlIngressTimeThreshold) and the 
+             threshold (jnxPingCtlIngressTimeThreshold) and the
              ingressThreshold bit is set in jnxPingCtlTrapGeneration."
          ::= { jnxPingNotificationPrefix 7 }
 
@@ -1437,14 +1433,13 @@ jnxPingLastTestResultTime OBJECT-TYPE
            pingResultsProbeResponses,
            pingResultsSentProbes,
            pingResultsLastGoodProbe,
-           jnxPingResultsStddevIngressUs,
            jnxPingCtlIngressStddevThreshold,
            jnxPingResultsStddevIngressUs
          }
          STATUS  current
          DESCRIPTION
              "This notification is generated when the standard deviation of
-             the ingress time (jnxPingResultsStddevIngressUs) exceeds the 
+             the ingress time (jnxPingResultsStddevIngressUs) exceeds the
              configured threshold (jnxPingCtlIngressStddevThreshold) and the
              ingressStdDevThreshold bit is set in jnxPingCtlTrapGeneration."
          ::= { jnxPingNotificationPrefix 8 }
@@ -1462,14 +1457,15 @@ jnxPingLastTestResultTime OBJECT-TYPE
            pingResultsProbeResponses,
            pingResultsSentProbes,
            pingResultsLastGoodProbe,
-           jnxPingCtlIngressJitterThreshold
+           jnxPingCtlIngressJitterThreshold,
+           jnxPingResultsJitterIngressUs
          }
          STATUS  current
          DESCRIPTION
              "This notification is generated when the ingress time jitter
-             (jnxPingResultsMaxIngressUs minus jnxPingResultsMinIngressUs) 
+             (jnxPingResultsMaxIngressUs minus jnxPingResultsMinIngressUs)
              exceeds the configured threshold (jnxPingCtlIngressJitterThreshold)
-             and the ingressJitterThreshold bit is set in 
+             and the ingressJitterThreshold bit is set in
              jnxPingCtlTrapGeneration."
          ::= { jnxPingNotificationPrefix 9 }
 

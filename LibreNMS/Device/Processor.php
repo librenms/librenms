@@ -258,7 +258,7 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
             return [];
         }
 
-        return YamlDiscovery::discover($os, get_class(), $discovery);
+        return YamlDiscovery::discover($os, get_called_class(), $discovery);
     }
 
     /**

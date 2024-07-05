@@ -184,7 +184,10 @@ $graphs['exim-stats'] = [
     'queue',
 ];
 $graphs['php-fpm'] = [
-    'stats',
+    'overview_combined',
+    'overview_slow_requests',
+    'overview_max_childen_reached',
+    'v1_last_request_cpu',
 ];
 $graphs['nvidia'] = [
     'sm',

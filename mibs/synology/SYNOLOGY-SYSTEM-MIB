@@ -5,21 +5,21 @@ IMPORTS
 				FROM SNMPv2-CONF
 	enterprises, MODULE-IDENTITY, OBJECT-TYPE, Integer32
 				FROM SNMPv2-SMI;
-				
+
 synoSystem MODULE-IDENTITY
     LAST-UPDATED "201309110000Z"
     ORGANIZATION "www.synology.com"
     CONTACT-INFO
-         "postal:   Jay Pan
-          email:    jaypan@synology.com"
+         "Synology Inc.
+          Email: snmp@synology.com"
     DESCRIPTION
         "Characteristics of the system information"
     REVISION     "201309110000Z"
     DESCRIPTION
         "Second draft."
-    ::= { synology 1 }		
+    ::= { synology 1 }
 
-synology	 OBJECT IDENTIFIER 
+synology	 OBJECT IDENTIFIER
 	::= { enterprises 6574 }
 
 systemStatus OBJECT-TYPE
@@ -122,8 +122,19 @@ upgradeAvailable OBJECT-TYPE
 	 Others(5): If DSM is upgrading or downloading, the status will show others."
     ::= { dsmInfo 4 }
 
+controllerNumber OBJECT-TYPE
+    SYNTAX    Integer32
+    MAX-ACCESS  read-only
+    STATUS    current
+    DESCRIPTION
+    "Synology system controller number
+    Controller A(0)
+    Controller B(1)
+	"
+    ::= { synoSystem 6 }
 
-systemConformance OBJECT IDENTIFIER ::= { synoSystem 6 }
+
+systemConformance OBJECT IDENTIFIER ::= { synoSystem 7 }
 systemCompliances OBJECT IDENTIFIER ::= { systemConformance 1 }
 systemGroups 			OBJECT IDENTIFIER ::= { systemConformance 2 }
 
@@ -146,7 +157,8 @@ systemGroup OBJECT-GROUP
 			  modelName,
 			  serialNumber,
 			  version,
-			  upgradeAvailable }
+			  upgradeAvailable,
+			  controllerNumber}
     STATUS  current
     DESCRIPTION
             "A collection of objects providing basic information

@@ -1,0 +1,184 @@
+{
+    "applications": {
+        "discovery": {
+            "applications": [
+                {
+                    "app_type": "php-fpm",
+                    "app_state": "UNKNOWN",
+                    "discovered": 1,
+                    "app_state_prev": null,
+                    "app_status": "",
+                    "app_instance": "",
+                    "data": null,
+                    "deleted_at": null
+                }
+            ]
+        },
+        "poller": {
+            "applications": [
+                {
+                    "app_type": "php-fpm",
+                    "app_state": "OK",
+                    "discovered": 1,
+                    "app_state_prev": "UNKNOWN",
+                    "app_status": "",
+                    "app_instance": "",
+                    "data":  "{\"version\":1,\"pools\":[\"thefrog\"]}",
+                    "deleted_at": null
+                }
+            ],
+            "application_metrics": [
+                {
+                    "metric": "errored",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "php-fpm"
+                },
+                {
+                    "metric": "pools___thefrog___accepted_conn",
+                    "value": 6839,
+                    "value_prev": null,
+                    "app_type": "php-fpm"
+                },
+                {
+                    "metric": "pools___thefrog___active_processes",
+                    "value": 1,
+                    "value_prev": null,
+                    "app_type": "php-fpm"
+                },
+                {
+                    "metric": "pools___thefrog___idle_processes",
+                    "value": 4,
+                    "value_prev": null,
+                    "app_type": "php-fpm"
+                },
+                {
+                    "metric": "pools___thefrog___last_request_cpu",
+                    "value": 50.75,
+                    "value_prev": null,
+                    "app_type": "php-fpm"
+                },
+                {
+                    "metric": "pools___thefrog___listen_queue",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "php-fpm"
+                },
+                {
+                    "metric": "pools___thefrog___listen_queue_len",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "php-fpm"
+                },
+                {
+                    "metric": "pools___thefrog___max_active_processes",
+                    "value": 5,
+                    "value_prev": null,
+                    "app_type": "php-fpm"
+                },
+                {
+                    "metric": "pools___thefrog___max_children_reached",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "php-fpm"
+                },
+                {
+                    "metric": "pools___thefrog___max_listen_queue",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "php-fpm"
+                },
+                {
+                    "metric": "pools___thefrog___slow_requests",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "php-fpm"
+                },
+                {
+                    "metric": "pools___thefrog___start_since",
+                    "value": 31334,
+                    "value_prev": null,
+                    "app_type": "php-fpm"
+                },
+                {
+                    "metric": "pools___thefrog___total_processes",
+                    "value": 5,
+                    "value_prev": null,
+                    "app_type": "php-fpm"
+                },
+                {
+                    "metric": "totals_accepted_conn",
+                    "value": 33127,
+                    "value_prev": null,
+                    "app_type": "php-fpm"
+                },
+                {
+                    "metric": "totals_active_processes",
+                    "value": 5,
+                    "value_prev": null,
+                    "app_type": "php-fpm"
+                },
+                {
+                    "metric": "totals_idle_processes",
+                    "value": 18,
+                    "value_prev": null,
+                    "app_type": "php-fpm"
+                },
+                {
+                    "metric": "totals_last_request_cpu",
+                    "value": 472.63,
+                    "value_prev": null,
+                    "app_type": "php-fpm"
+                },
+                {
+                    "metric": "totals_listen_queue",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "php-fpm"
+                },
+                {
+                    "metric": "totals_listen_queue_len",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "php-fpm"
+                },
+                {
+                    "metric": "totals_max_active_processes",
+                    "value": 17,
+                    "value_prev": null,
+                    "app_type": "php-fpm"
+                },
+                {
+                    "metric": "totals_max_children_reached",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "php-fpm"
+                },
+                {
+                    "metric": "totals_max_listen_queue",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "php-fpm"
+                },
+                {
+                    "metric": "totals_slow_requests",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "php-fpm"
+                },
+                {
+                    "metric": "totals_start_since",
+                    "value": 31334,
+                    "value_prev": null,
+                    "app_type": "php-fpm"
+                },
+                {
+                    "metric": "totals_total_processes",
+                    "value": 23,
+                    "value_prev": null,
+                    "app_type": "php-fpm"
+                }
+            ]
+        }
+    }
+}
