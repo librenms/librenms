@@ -17,8 +17,7 @@
                     "icon": "tplink.svg"
                 }
             ]
-        },
-        "poller": "matches discovery"
+        }
     },
     "ports": {
         "discovery": {
