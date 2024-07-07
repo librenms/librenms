@@ -84,24 +84,24 @@ foreach ($interface_client_map as $interface => $client_list) {
         }
 
         array_push($mappings[$finterface], $fclient);
-        $bytes_rcvd = is_int($client_data['bytes_rcvd'])
+        $bytes_rcvd = is_numeric($client_data['bytes_rcvd'])
             ? $client_data['bytes_rcvd']
             : null;
-        $bytes_sent = is_int($client_data['bytes_sent'])
+        $bytes_sent = is_numeric($client_data['bytes_sent'])
             ? $client_data['bytes_sent']
             : null;
-        $minutes_since_last_handshake = is_int(
+        $minutes_since_last_handshake = is_numeric(
             $client_data['minutes_since_last_handshake']
         )
             ? $client_data['minutes_since_last_handshake']
             : null;
 
-        if (is_int($bytes_rcvd)) {
+        if (is_numeric($bytes_rcvd)) {
             $bytes_rcvd_total_intf += $bytes_rcvd;
             $bytes_rcvd_total += $bytes_rcvd;
         }
 
-        if (is_int($bytes_sent)) {
+        if (is_numeric($bytes_sent)) {
             $bytes_sent_total_intf += $bytes_sent;
             $bytes_sent_total += $bytes_sent;
         }
