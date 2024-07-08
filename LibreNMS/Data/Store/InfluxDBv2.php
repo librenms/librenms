@@ -31,6 +31,7 @@ use InfluxDB2\Client;
 use InfluxDB2\Model\WritePrecision;
 use InfluxDB2\Point;
 use LibreNMS\Config;
+use LibreNMS\Util\IP;
 use Log;
 
 class InfluxDBv2 extends BaseDatastore
@@ -60,8 +61,17 @@ class InfluxDBv2 extends BaseDatastore
      * @param  array|mixed  $fields  The data to update in an associative array, the order must be consistent with rrd_def,
      *                               single values are allowed and will be paired with $measurement
      */
+
+
     public function put($device, $measurement, $tags, $fields)
     {
+        // Transform $device['ip'] to be ingestable by inNetworks
+        $ip = IP::parse($device['ip']);
+
+        if ($ip->inNetworks(Config::get('influxdbv2.nets-exclude'))) {
+          return;
+        }
+
         $stat = Measurement::start('write');
         $tmp_fields = [];
         $tmp_tags['hostname'] = $device['hostname'];
@@ -83,15 +93,16 @@ class InfluxDBv2 extends BaseDatastore
 
         if (empty($tmp_fields)) {
             Log::warning('All fields empty, skipping update', ['orig_fields' => $fields]);
-
             return;
         }
 
-        Log::debug('InfluxDB data: ', [
-            'measurement' => $measurement,
-            'tags' => $tmp_tags,
-            'fields' => $tmp_fields,
-        ]);
+        if (Config::get('influxdbv2.debug') === true) {
+            Log::debug('InfluxDB data: ', [
+                'measurement' => $measurement,
+                'tags' => $tmp_tags,
+                'fields' => $tmp_fields,
+            ]);
+        }
 
         // Get a WriteApi instance from the client
         $client = self::createFromConfig();
@@ -133,7 +144,7 @@ class InfluxDBv2 extends BaseDatastore
         $organization = Config::get('influxdbv2.organization', '');
         $allow_redirects = Config::get('influxdbv2.allow_redirects', true);
         $token = Config::get('influxdbv2.token', '');
-
+        $debug = Config::get('influxdbv2.debug', false);
         $client = new Client([
             'url' => $transport . '://' . $host . ':' . $port,
             'token' => $token,
@@ -141,7 +152,7 @@ class InfluxDBv2 extends BaseDatastore
             'org' => $organization,
             'precision' => WritePrecision::S,
             'allow_redirects' => $allow_redirects,
-            'debug' => true,
+            'debug' => $debug
         ]);
 
         return $client;
