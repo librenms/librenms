@@ -2437,8 +2437,8 @@
                     "ifName": "Console41",
                     "portName": null,
                     "ifIndex": 41,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -2537,8 +2537,8 @@
                     "ifName": "Loopback0",
                     "portName": null,
                     "ifIndex": 1000,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -2637,8 +2637,8 @@
                     "ifName": "VLAN1",
                     "portName": null,
                     "ifIndex": 1001,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -2737,8 +2737,8 @@
                     "ifName": "VLAN3",
                     "portName": null,
                     "ifIndex": 1003,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -3206,5 +3206,22 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "discovery-protocols": {
+        "discovery": {
+            "links": [
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "Klubovna-d",
+                    "remote_port": "bridge1-LANklub (90a4deacdea1)",
+                    "remote_platform": null,
+                    "remote_version": "MikroTik RouterOS 6.42.5 (stable) RB433GL",
+                    "ifAlias": "Ethernet Port on unit 1, port 8",
+                    "ifDescr": "Ethernet Port on unit 1, port 8",
+                    "ifName": "Port8"
+                }
+            ]
+        }
     }
 }
