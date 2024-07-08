@@ -12682,23 +12682,23 @@
                     "active": 1,
                     "protocol": "lldp",
                     "remote_hostname": "aruba-iscsi-2",
-                    "remote_port": "1/1/54 (0050e740a200)",
-                    "remote_platform": null,
-                    "remote_version": "Aruba JL635A  GL.10.04.2000",
-                    "ifAlias": "40G-Link_to_aruba-iscsi-2",
-                    "ifDescr": "1/1/54",
-                    "ifName": "1/1/54"
-                },
-                {
-                    "active": 1,
-                    "protocol": "lldp",
-                    "remote_hostname": "aruba-iscsi-2",
                     "remote_port": "1/1/53 (0050e740a200)",
                     "remote_platform": null,
                     "remote_version": "Aruba JL635A  GL.10.04.2000",
                     "ifAlias": "40G-Link_To_aruba-iscsi-2",
                     "ifDescr": "1/1/53",
                     "ifName": "1/1/53"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "aruba-iscsi-2",
+                    "remote_port": "1/1/54 (0050e740a200)",
+                    "remote_platform": null,
+                    "remote_version": "Aruba JL635A  GL.10.04.2000",
+                    "ifAlias": "40G-Link_to_aruba-iscsi-2",
+                    "ifDescr": "1/1/54",
+                    "ifName": "1/1/54"
                 },
                 {
                     "active": 1,
