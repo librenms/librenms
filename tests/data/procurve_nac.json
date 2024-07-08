@@ -12450,5 +12450,26 @@
                 }
             ]
         }
+    },
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.11.2.3.7.11.139",
+                    "sysDescr": "HP J9775A 2530-48G Switch, revision YA.16.11.0014, ROM YA.15.20 (/ws/swbuildm/rel_beluru_qaoff/code/build/lakes(swbuildm_rel_beluru_qaoff_rel_beluru)) (Formerly ProCurve)",
+                    "sysContact": null,
+                    "version": "YA.16.11.0014",
+                    "hardware": "J9775A 2530-48G",
+                    "features": null,
+                    "location": null,
+                    "os": "procurve",
+                    "type": "network",
+                    "serial": null,
+                    "icon": "hpe.svg"
+                }
+            ]
+        },
+        "poller": "matches discovery"
     }
 }
