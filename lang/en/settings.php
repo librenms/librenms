@@ -978,7 +978,14 @@ return [
                 'description' => 'Allow Redirects',
                 'help' => 'To allow redirect from the InfluxDB server',
             ],
-
+            'debug' => [
+                'description' => 'Debug',
+                'help' => 'To enable or disable verbose output to CLI',
+            ],
+            'nets-exclude' => [
+                'description' => 'Excluded networks',
+                'help' => 'Networks excluded from sending data to InfluxDBv2',
+            ],
         ],
         'ipmitool' => [
             'description' => 'Path to ipmtool',
