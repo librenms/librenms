@@ -170,11 +170,13 @@ $mappings_updated = false;
 // get old mappings
 $old_mappings = $app->data['mappings'] ?? [];
 
+// update here even if there are no added or reel in any changes for table info display
+$app->data = ['mappings' => $mappings, 'data' => $interface_client_map];
+
 // check for interface changes
 $added_interfaces = array_diff_key($mappings, $old_mappings);
 $removed_interfaces = array_diff_key($old_mappings, $mappings);
 if (count($added_interfaces) > 0 || count($removed_interfaces) > 0) {
-    $app->data = ['mappings' => $mappings];
     $mappings_updated = true;
     $log_message = 'Wireguard Interfaces Change:';
     $log_message .=
