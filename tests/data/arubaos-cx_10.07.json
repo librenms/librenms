@@ -12992,23 +12992,23 @@
                     "active": 1,
                     "protocol": "lldp",
                     "remote_hostname": "switch-name",
-                    "remote_port": "24 (000000000000)",
-                    "remote_platform": null,
-                    "remote_version": "HP J9727A 2920-24G-PoE+ Switch, revision WB.15.16.0008, ROM WB.15.05 (/ws/swbuildm/rel_orlando_qaoff/code/build/anm(swbuildm_rel_orlando_qaoff_rel_orlando))",
-                    "ifAlias": "to idf",
-                    "ifDescr": "1/1/48",
-                    "ifName": "1/1/48"
-                },
-                {
-                    "active": 1,
-                    "protocol": "lldp",
-                    "remote_hostname": "switch-name",
                     "remote_port": "23 (000000000000)",
                     "remote_platform": null,
                     "remote_version": "HP J9727A 2920-24G-PoE+ Switch, revision WB.15.16.0008, ROM WB.15.05 (/ws/swbuildm/rel_orlando_qaoff/code/build/anm(swbuildm_rel_orlando_qaoff_rel_orlando))",
                     "ifAlias": "to idf",
                     "ifDescr": "1/1/47",
                     "ifName": "1/1/47"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "switch-name",
+                    "remote_port": "24 (000000000000)",
+                    "remote_platform": null,
+                    "remote_version": "HP J9727A 2920-24G-PoE+ Switch, revision WB.15.16.0008, ROM WB.15.05 (/ws/swbuildm/rel_orlando_qaoff/code/build/anm(swbuildm_rel_orlando_qaoff_rel_orlando))",
+                    "ifAlias": "to idf",
+                    "ifDescr": "1/1/48",
+                    "ifName": "1/1/48"
                 },
                 {
                     "active": 1,
