@@ -32076,5 +32076,88 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "discovery-protocols": {
+        "discovery": {
+            "links": [
+                {
+                    "active": 1,
+                    "protocol": "cdp",
+                    "remote_hostname": "acme-fr-ap-011",
+                    "remote_port": "GigabitEthernet0",
+                    "remote_platform": "cisco AIR-AP2702I-UXK9",
+                    "remote_version": "Cisco IOS Software, C2700 Software (AP3G2-K9W8-M), Version 15.3(3)JC14, RELEASE SOFTWARE (fc1)\nTechnical Support: http://www.cisco.com/techsupport\nCopyright (c) 1986-2017 by Cisco Systems, Inc.\nCompiled Sun 29-Oct-17 17:15 by prod_rel_team",
+                    "ifAlias": "*** Link to acme-fr-ap-011 int Gi0 ***",
+                    "ifDescr": "GigabitEthernet1/0/3",
+                    "ifName": "Gi1/0/3"
+                },
+                {
+                    "active": 1,
+                    "protocol": "cdp",
+                    "remote_hostname": "acme-fr-ap-012",
+                    "remote_port": "GigabitEthernet0",
+                    "remote_platform": "cisco AIR-AP2702I-UXK9",
+                    "remote_version": "Cisco IOS Software, C2700 Software (AP3G2-K9W8-M), Version 15.3(3)JC14, RELEASE SOFTWARE (fc1)\nTechnical Support: http://www.cisco.com/techsupport\nCopyright (c) 1986-2017 by Cisco Systems, Inc.\nCompiled Sun 29-Oct-17 17:15 by prod_rel_team",
+                    "ifAlias": "*** Link to acme-fr-ap-012 int Gi0 ***",
+                    "ifDescr": "GigabitEthernet3/0/3",
+                    "ifName": "Gi3/0/3"
+                },
+                {
+                    "active": 1,
+                    "protocol": "cdp",
+                    "remote_hostname": "acme-fr-ap-013",
+                    "remote_port": "GigabitEthernet0",
+                    "remote_platform": "cisco AIR-AP2702I-UXK9",
+                    "remote_version": "Cisco IOS Software, C2700 Software (AP3G2-K9W8-M), Version 15.3(3)JC14, RELEASE SOFTWARE (fc1)\nTechnical Support: http://www.cisco.com/techsupport\nCopyright (c) 1986-2017 by Cisco Systems, Inc.\nCompiled Sun 29-Oct-17 17:15 by prod_rel_team",
+                    "ifAlias": "*** Link to acme-fr-ap-013 int Gi0 ***",
+                    "ifDescr": "GigabitEthernet1/0/4",
+                    "ifName": "Gi1/0/4"
+                },
+                {
+                    "active": 1,
+                    "protocol": "cdp",
+                    "remote_hostname": "acme-fr-ap-014",
+                    "remote_port": "GigabitEthernet0",
+                    "remote_platform": "cisco AIR-AP2702I-UXK9",
+                    "remote_version": "Cisco IOS Software, C2700 Software (AP3G2-K9W8-M), Version 15.3(3)JC14, RELEASE SOFTWARE (fc1)\nTechnical Support: http://www.cisco.com/techsupport\nCopyright (c) 1986-2017 by Cisco Systems, Inc.\nCompiled Sun 29-Oct-17 17:15 by prod_rel_team",
+                    "ifAlias": "*** Link to acme-fr-ap-014 int Gi0 ***",
+                    "ifDescr": "GigabitEthernet3/0/4",
+                    "ifName": "Gi3/0/4"
+                },
+                {
+                    "active": 1,
+                    "protocol": "cdp",
+                    "remote_hostname": "acme-fr-ap-015",
+                    "remote_port": "GigabitEthernet0",
+                    "remote_platform": "cisco AIR-AP2702I-UXK9",
+                    "remote_version": "Cisco IOS Software, C2700 Software (AP3G2-K9W8-M), Version 15.3(3)JC14, RELEASE SOFTWARE (fc1)\nTechnical Support: http://www.cisco.com/techsupport\nCopyright (c) 1986-2017 by Cisco Systems, Inc.\nCompiled Sun 29-Oct-17 17:15 by prod_rel_team",
+                    "ifAlias": "*** Link to acme-fr-ap-015 int Gi0 ***",
+                    "ifDescr": "GigabitEthernet1/0/5",
+                    "ifName": "Gi1/0/5"
+                },
+                {
+                    "active": 1,
+                    "protocol": "cdp",
+                    "remote_hostname": "acme-fr-s-001",
+                    "remote_port": "GigabitEthernet1/0/3",
+                    "remote_platform": "cisco WS-C3850-12S",
+                    "remote_version": "Cisco IOS Software, IOS-XE Software, Catalyst L3 Switch Software (CAT3K_CAA-UNIVERSALK9-M), Version 03.07.05E RELEASE SOFTWARE (fc1)\nTechnical Support: http://www.cisco.com/techsupport\nCopyright (c) 1986-2017 by Cisco Systems, Inc.\nCompiled Fri 10-Feb-17",
+                    "ifAlias": "*** Link to acme-fr-s-001 int Gi1/0/3 ***",
+                    "ifDescr": "GigabitEthernet1/0/52",
+                    "ifName": "Gi1/0/52"
+                },
+                {
+                    "active": 1,
+                    "protocol": "cdp",
+                    "remote_hostname": "acme-fr-s-001",
+                    "remote_port": "GigabitEthernet3/0/2",
+                    "remote_platform": "cisco WS-C3850-12S",
+                    "remote_version": "Cisco IOS Software, IOS-XE Software, Catalyst L3 Switch Software (CAT3K_CAA-UNIVERSALK9-M), Version 03.07.05E RELEASE SOFTWARE (fc1)\nTechnical Support: http://www.cisco.com/techsupport\nCopyright (c) 1986-2017 by Cisco Systems, Inc.\nCompiled Fri 10-Feb-17",
+                    "ifAlias": "*** Link to acme-fr-s-001 int Gi3/0/2 ***",
+                    "ifDescr": "GigabitEthernet3/0/52",
+                    "ifName": "Gi3/0/52"
+                }
+            ]
+        }
     }
 }
