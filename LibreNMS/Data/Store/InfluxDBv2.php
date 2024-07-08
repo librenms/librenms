@@ -61,15 +61,13 @@ class InfluxDBv2 extends BaseDatastore
      * @param  array|mixed  $fields  The data to update in an associative array, the order must be consistent with rrd_def,
      *                               single values are allowed and will be paired with $measurement
      */
-
-
     public function put($device, $measurement, $tags, $fields)
     {
         // Transform $device['ip'] to be ingestable by inNetworks
         $ip = IP::parse($device['ip']);
 
         if ($ip->inNetworks(Config::get('influxdbv2.nets-exclude'))) {
-          return;
+            return;
         }
 
         $stat = Measurement::start('write');
@@ -93,6 +91,7 @@ class InfluxDBv2 extends BaseDatastore
 
         if (empty($tmp_fields)) {
             Log::warning('All fields empty, skipping update', ['orig_fields' => $fields]);
+            
             return;
         }
 
@@ -152,7 +151,7 @@ class InfluxDBv2 extends BaseDatastore
             'org' => $organization,
             'precision' => WritePrecision::S,
             'allow_redirects' => $allow_redirects,
-            'debug' => $debug
+            'debug' => $debug,
         ]);
 
         return $client;
