@@ -11137,8 +11137,8 @@
                     "ifName": "null0",
                     "portName": null,
                     "ifIndex": 190,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "false",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -33149,5 +33149,22 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "discovery-protocols": {
+        "discovery": {
+            "links": [
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "1DC-0_MP-S6600",
+                    "remote_port": "link-aggregation 31 (00017a6a001e)",
+                    "remote_platform": null,
+                    "remote_version": "MyPower (R) Operating System SoftwareCopyright (C) 2009 Maipu Communication Technology Co., Ltd. All Rights Reserved.",
+                    "ifAlias": "link-aggregation 31",
+                    "ifDescr": "link-aggregation 31",
+                    "ifName": "link-aggregation 31"
+                }
+            ]
+        }
     }
 }
