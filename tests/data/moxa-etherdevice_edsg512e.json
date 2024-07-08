@@ -3030,5 +3030,22 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "discovery-protocols": {
+        "discovery": {
+            "links": [
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "EDS-SW01",
+                    "remote_port": "10 (0090e8a01234)",
+                    "remote_platform": null,
+                    "remote_version": "EDS Switch",
+                    "ifAlias": "Ethernet Port G3",
+                    "ifDescr": "Ethernet Port G3",
+                    "ifName": "Ethernet Port G3"
+                }
+            ]
+        }
     }
 }
