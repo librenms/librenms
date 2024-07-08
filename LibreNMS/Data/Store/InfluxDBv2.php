@@ -91,7 +91,7 @@ class InfluxDBv2 extends BaseDatastore
 
         if (empty($tmp_fields)) {
             Log::warning('All fields empty, skipping update', ['orig_fields' => $fields]);
-            
+
             return;
         }
 
