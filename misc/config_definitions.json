@@ -4122,6 +4122,21 @@
             "section": "influxdbv2",
             "order": 7
         },
+        "influxdbv2.debug": {
+            "default": false,
+            "type": "boolean",
+            "group": "poller",
+            "section": "influxdbv2",
+            "order": 8
+        },
+        "influxdbv2.nets-exclude": {
+            "group": "poller",
+            "section": "influxdbv2",
+            "order": 9,
+            "type": "array",
+            "default": [
+            ]
+        },
         "install_dir": {
             "type": "directory"
         },
