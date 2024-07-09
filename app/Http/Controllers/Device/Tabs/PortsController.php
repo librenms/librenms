@@ -53,6 +53,11 @@ class PortsController implements DeviceTab
         'status' => 'any',
     ];
 
+    /**
+     * @var array<int, Collection>
+     */
+    private array $port_stack_cache;
+
     public function visible(Device $device): bool
     {
         return $device->ports()->exists();
@@ -94,6 +99,7 @@ class PortsController implements DeviceTab
         $this->detail = $tab == 'detail';
         $data = match ($tab) {
             'links' => $this->linksData($device),
+            'transceivers' => $this->transceiversData($device),
             'xdsl' => $this->xdslData($device),
             'graphs', 'mini_graphs' => $this->graphData($device, $request),
             default => $this->portData($device, $request),
@@ -121,6 +127,7 @@ class PortsController implements DeviceTab
             $relationships[] = 'pseudowires.endpoints';
             $relationships[] = 'ipv4Networks.ipv4';
             $relationships[] = 'ipv6Networks.ipv6';
+            $relationships[] = 'transceivers.metrics';
         }
 
         /** @var Collection<Port>|LengthAwarePaginator<Port> $ports */
@@ -207,9 +214,7 @@ class PortsController implements DeviceTab
         // port stack
         // fa-expand portlink: local is low port
         // fa-compress portlink: local is high portPort
-        $stacks = \DB::table('ports_stack')->where('device_id', $port->device_id)
-            ->where(fn ($q) => $q->where('port_id_high', $port->port_id)->orWhere('port_id_low', $port->port_id))->get();
-        foreach ($stacks as $stack) {
+        foreach ($this->findPortStacks($port) as $stack) {
             if ($stack->port_id_low) {
                 $this->addPortNeighbor($neighbors, 'stack_low', $stack->port_id_low);
             }
@@ -251,6 +256,15 @@ class PortsController implements DeviceTab
         ];
     }
 
+    private function transceiversData(Device $device): array
+    {
+        $device->load(['transceivers.port', 'transceivers.metrics']);
+
+        return [
+            'transceivers' => $device->transceivers,
+        ];
+    }
+
     private function xdslData(Device $device): array
     {
         $device->portsAdsl->load('port');
@@ -282,6 +296,10 @@ class PortsController implements DeviceTab
 
         if ($device->portsFdb()->exists()) {
             $tabs[] = ['name' => __('port.tabs.fdb'), 'url' => 'fdb'];
+        }
+
+        if ($device->transceivers()->exists()) {
+            $tabs[] = ['name' => __('port.tabs.transceivers'), 'url' => 'transceivers'];
         }
 
         if ($device->links()->exists()) {
@@ -429,5 +447,17 @@ class PortsController implements DeviceTab
                 'external' => false,
             ],
         ];
+    }
+
+    /**
+     * Because we don't have a relationship for portstacks, fetch all of them for the device to cut down on queries
+     */
+    private function findPortStacks($port): Collection
+    {
+        if (! isset($this->port_stack_cache[$port->device_id])) {
+            $this->port_stack_cache[$port->device_id] = \DB::table('ports_stack')->where('device_id', $port->device_id)->get();
+        }
+
+        return $this->port_stack_cache[$port->device_id]->where(fn ($sp) => $sp->port_id_high == $port->port_id || $sp->port_id_low == $port->port_id);
     }
 }

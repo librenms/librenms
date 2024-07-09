@@ -450,7 +450,7 @@ function check_valid_sensors($device, $class, $valid, $poller_type = 'snmp')
             $class = $entry['sensor_class'];
             d_echo($index . ' -> ' . $type . "\n");
 
-            if (! $valid[$class][$type][$index]) {
+            if (empty($valid[$class][$type][$index])) {
                 echo '-';
                 if ($class == 'state') {
                     dbDelete('sensors_to_state_indexes', '`sensor_id` =  ?', [$entry['sensor_id']]);

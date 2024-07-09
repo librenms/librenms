@@ -26,16 +26,21 @@
 namespace LibreNMS\OS;
 
 use App\Models\Device;
+use App\Models\Port;
 use App\Models\Sla;
+use App\Models\Transceiver;
+use App\Models\TransceiverMetric;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\SlaDiscovery;
+use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\Interfaces\Polling\SlaPolling;
 use LibreNMS\RRD\RrdDefinition;
+use SnmpQuery;
 
-class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling
+class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling, TransceiverDiscovery
 {
     public function discoverOS(Device $device): void
     {
@@ -183,5 +188,197 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling
             default:
                 return str_replace('ping', '', $rtt_type);
         }
+    }
+
+    public function discoverTransceivers(): Collection
+    {
+        $ifIndexToPortId = Port::query()->where('device_id', $this->getDeviceId())->select(['port_id', 'ifIndex', 'ifName'])->get()->keyBy('ifIndex');
+        $entPhysical = SnmpQuery::walk('ENTITY-MIB::entityPhysical')->table(1);
+
+        return SnmpQuery::cache()->walk('JUNIPER-DOM-MIB::jnxDomCurrentTable')->mapTable(function ($data, $ifIndex) use ($ifIndexToPortId, $entPhysical) {
+            $ent = $this->findTransceiverEntityByPortName($entPhysical, $ifIndexToPortId->get($ifIndex)?->ifName);
+            if (empty($ent)) {
+                return null; // no module
+            }
+
+            return new Transceiver([
+                'port_id' => $ifIndexToPortId->get($ifIndex)->port_id,
+                'index' => $ifIndex,
+                'type' => $ent['ENTITY-MIB::entPhysicalName'] ?? null,
+                'vendor' => $ent['ENTITY-MIB::entPhysicalMfgName'] ?? null,
+                'model' => $ent['ENTITY-MIB::entPhysicalModelName'] ?? null,
+                'revision' => $ent['ENTITY-MIB::entPhysicalHardwareRev'] ?? null,
+                'serial' => $ent['ENTITY-MIB::entPhysicalSerialNum'] ?? null,
+                'channels' => $data['JUNIPER-DOM-MIB::jnxDomCurrentModuleLaneCount'] ?? 0,
+            ]);
+        })->filter();
+    }
+
+    public function discoverTransceiverMetrics(Collection $transceivers): Collection
+    {
+        $metrics = new Collection;
+        $xcData = SnmpQuery::cache()->walk('JUNIPER-DOM-MIB::jnxDomCurrentTable')->table(1);
+        $channelData = SnmpQuery::walk('JUNIPER-DOM-MIB::jnxDomModuleLaneTable')->table(2);
+
+        foreach ($xcData as $ifIndex => $data) {
+            $transceiver_id = $transceivers->get($ifIndex)?->id ?? 0;
+            if ($transceiver_id === 0) {
+                continue; // no transceiver
+            }
+
+            // RX Power
+            if (isset($channelData[$ifIndex])) {
+                // lanes
+                foreach ($channelData[$ifIndex] as $laneIndex => $lane) {
+                    $metrics->push(new TransceiverMetric([
+                        'transceiver_id' => $transceiver_id,
+                        'type' => 'power-rx',
+                        'oid' => ".1.3.6.1.4.1.2636.3.60.1.2.1.1.6.$ifIndex.$laneIndex",
+                        'value' => $lane['JUNIPER-DOM-MIB::jnxDomCurrentLaneRxLaserPower'] / 100,
+                        'channel' => $laneIndex,
+                        'divisor' => 100,
+                        'threshold_min_critical' => isset($data['JUNIPER-DOM-MIB::jnxDomCurrentRxLaserPowerLowAlarmThreshold']) ? $data['JUNIPER-DOM-MIB::jnxDomCurrentRxLaserPowerLowAlarmThreshold'] / 100 : null,
+                        'threshold_min_warning' => isset($data['JUNIPER-DOM-MIB::jnxDomCurrentRxLaserPowerLowWarningThreshold']) ? $data['JUNIPER-DOM-MIB::jnxDomCurrentRxLaserPowerLowWarningThreshold'] / 100 : null,
+                        'threshold_max_warning' => isset($data['JUNIPER-DOM-MIB::jnxDomCurrentRxLaserPowerHighWarningThreshold']) ? $data['JUNIPER-DOM-MIB::jnxDomCurrentRxLaserPowerHighWarningThreshold'] / 100 : null,
+                        'threshold_max_critical' => isset($data['JUNIPER-DOM-MIB::jnxDomCurrentRxLaserPowerHighAlarmThreshold']) ? $data['JUNIPER-DOM-MIB::jnxDomCurrentRxLaserPowerHighAlarmThreshold'] / 100 : null,
+                    ]));
+                }
+            } elseif (isset($data['JUNIPER-DOM-MIB::jnxDomCurrentRxLaserPower'])) {
+                $metrics->push(new TransceiverMetric([
+                    'transceiver_id' => $transceiver_id,
+                    'type' => 'power-rx',
+                    'oid' => ".1.3.6.1.4.1.2636.3.60.1.1.1.1.5.$ifIndex",
+                    'value' => $data['JUNIPER-DOM-MIB::jnxDomCurrentLaneTxLaserOutputPower'] / 100,
+                    'divisor' => 100,
+                    'threshold_min_critical' => isset($data['JUNIPER-DOM-MIB::jnxDomCurrentRxLaserPowerLowAlarmThreshold']) ? $data['JUNIPER-DOM-MIB::jnxDomCurrentRxLaserPowerLowAlarmThreshold'] / 100 : null,
+                    'threshold_min_warning' => isset($data['JUNIPER-DOM-MIB::jnxDomCurrentRxLaserPowerLowWarningThreshold']) ? $data['JUNIPER-DOM-MIB::jnxDomCurrentRxLaserPowerLowWarningThreshold'] / 100 : null,
+                    'threshold_max_warning' => isset($data['JUNIPER-DOM-MIB::jnxDomCurrentRxLaserPowerHighWarningThreshold']) ? $data['JUNIPER-DOM-MIB::jnxDomCurrentRxLaserPowerHighWarningThreshold'] / 100 : null,
+                    'threshold_max_critical' => isset($data['JUNIPER-DOM-MIB::jnxDomCurrentRxLaserPowerHighAlarmThreshold']) ? $data['JUNIPER-DOM-MIB::jnxDomCurrentRxLaserPowerHighAlarmThreshold'] / 100 : null,
+                ]));
+            }
+
+            // TX Power
+            if (isset($channelData[$ifIndex])) {
+                // lanes
+                foreach ($channelData[$ifIndex] as $laneIndex => $lane) {
+                    $metrics->push(new TransceiverMetric([
+                        'transceiver_id' => $transceiver_id,
+                        'type' => 'power-tx',
+                        'oid' => ".1.3.6.1.4.1.2636.3.60.1.2.1.1.8.$ifIndex.$laneIndex",
+                        'value' => $lane['JUNIPER-DOM-MIB::jnxDomCurrentLaneTxLaserOutputPower'] / 100,
+                        'channel' => $laneIndex,
+                        'divisor' => 100,
+                        'threshold_min_critical' => isset($data['JUNIPER-DOM-MIB::jnxDomCurrentTxLaserOutputPowerLowAlarmThreshold']) ? $data['JUNIPER-DOM-MIB::jnxDomCurrentTxLaserOutputPowerLowAlarmThreshold'] / 100 : null,
+                        'threshold_min_warning' => isset($data['JUNIPER-DOM-MIB::jnxDomCurrentTxLaserOutputPowerLowWarningThreshold']) ? $data['JUNIPER-DOM-MIB::jnxDomCurrentTxLaserOutputPowerLowWarningThreshold'] / 100 : null,
+                        'threshold_max_warning' => isset($data['JUNIPER-DOM-MIB::jnxDomCurrentTxLaserOutputPowerHighWarningThreshold']) ? $data['JUNIPER-DOM-MIB::jnxDomCurrentTxLaserOutputPowerHighWarningThreshold'] / 100 : null,
+                        'threshold_max_critical' => isset($data['JUNIPER-DOM-MIB::jnxDomCurrentTxLaserOutputPowerHighAlarmThreshold']) ? $data['JUNIPER-DOM-MIB::jnxDomCurrentTxLaserOutputPowerHighAlarmThreshold'] / 100 : null,
+                    ]));
+                }
+            } elseif (isset($data['JUNIPER-DOM-MIB::jnxDomCurrentTxLaserOutputPower'])) {
+                $metrics->push(new TransceiverMetric([
+                    'transceiver_id' => $transceiver_id,
+                    'type' => 'power-tx',
+                    'oid' => ".1.3.6.1.4.1.2636.3.60.1.1.1.1.7.$ifIndex",
+                    'value' => $data['JUNIPER-DOM-MIB::jnxDomCurrentTxLaserOutputPower'] / 100,
+                    'divisor' => 100,
+                    'threshold_min_critical' => isset($data['JUNIPER-DOM-MIB::jnxDomCurrentTxLaserOutputPowerLowAlarmThreshold']) ? $data['JUNIPER-DOM-MIB::jnxDomCurrentTxLaserOutputPowerLowAlarmThreshold'] / 100 : null,
+                    'threshold_min_warning' => isset($data['JUNIPER-DOM-MIB::jnxDomCurrentTxLaserOutputPowerLowWarningThreshold']) ? $data['JUNIPER-DOM-MIB::jnxDomCurrentTxLaserOutputPowerLowWarningThreshold'] / 100 : null,
+                    'threshold_max_warning' => isset($data['JUNIPER-DOM-MIB::jnxDomCurrentTxLaserOutputPowerHighWarningThreshold']) ? $data['JUNIPER-DOM-MIB::jnxDomCurrentTxLaserOutputPowerHighWarningThreshold'] / 100 : null,
+                    'threshold_max_critical' => isset($data['JUNIPER-DOM-MIB::jnxDomCurrentTxLaserOutputPowerHighAlarmThreshold']) ? $data['JUNIPER-DOM-MIB::jnxDomCurrentTxLaserOutputPowerHighAlarmThreshold'] / 100 : null,
+                ]));
+            }
+
+            // Bias Current
+            if (isset($channelData[$ifIndex])) {
+                // lanes
+                foreach ($channelData[$ifIndex] as $laneIndex => $lane) {
+                    $metrics->push(new TransceiverMetric([
+                        'transceiver_id' => $transceiver_id,
+                        'type' => 'bias',
+                        'oid' => ".1.3.6.1.4.1.2636.3.60.1.2.1.1.7.$ifIndex.$laneIndex",
+                        'value' => $lane['JUNIPER-DOM-MIB::jnxDomCurrentLaneTxLaserBiasCurrent'] / 1000,
+                        'channel' => $laneIndex,
+                        'divisor' => 1000,
+                        'threshold_min_critical' => isset($data['JUNIPER-DOM-MIB::jnxDomCurrentTxLaserBiasCurrentLowAlarmThreshold']) ? $data['JUNIPER-DOM-MIB::jnxDomCurrentTxLaserBiasCurrentLowAlarmThreshold'] / 1000 : null,
+                        'threshold_min_warning' => isset($data['JUNIPER-DOM-MIB::jnxDomCurrentTxLaserBiasCurrentLowWarningThreshold']) ? $data['JUNIPER-DOM-MIB::jnxDomCurrentTxLaserBiasCurrentLowWarningThreshold'] / 1000 : null,
+                        'threshold_max_warning' => isset($data['JUNIPER-DOM-MIB::jnxDomCurrentTxLaserBiasCurrentHighWarningThreshold']) ? $data['JUNIPER-DOM-MIB::jnxDomCurrentTxLaserBiasCurrentHighWarningThreshold'] / 1000 : null,
+                        'threshold_max_critical' => isset($data['JUNIPER-DOM-MIB::jnxDomCurrentTxLaserBiasCurrentHighAlarmThreshold']) ? $data['JUNIPER-DOM-MIB::jnxDomCurrentTxLaserBiasCurrentHighAlarmThreshold'] / 1000 : null,
+                    ]));
+                }
+            } elseif (isset($data['JUNIPER-DOM-MIB::jnxDomCurrentTxLaserBiasCurrent'])) {
+                $metrics->push(new TransceiverMetric([
+                    'transceiver_id' => $transceiver_id,
+                    'type' => 'bias',
+                    'oid' => ".1.3.6.1.4.1.2636.3.60.1.1.1.1.6.$ifIndex",
+                    'value' => $data['JUNIPER-DOM-MIB::jnxDomCurrentTxLaserBiasCurrent'] / 1000,
+                    'divisor' => 1000,
+                    'threshold_min_critical' => isset($data['JUNIPER-DOM-MIB::jnxDomCurrentTxLaserBiasCurrentLowAlarmThreshold']) ? $data['JUNIPER-DOM-MIB::jnxDomCurrentTxLaserBiasCurrentLowAlarmThreshold'] / 1000 : null,
+                    'threshold_min_warning' => isset($data['JUNIPER-DOM-MIB::jnxDomCurrentTxLaserBiasCurrentLowWarningThreshold']) ? $data['JUNIPER-DOM-MIB::jnxDomCurrentTxLaserBiasCurrentLowWarningThreshold'] / 1000 : null,
+                    'threshold_max_warning' => isset($data['JUNIPER-DOM-MIB::jnxDomCurrentTxLaserBiasCurrentHighWarningThreshold']) ? $data['JUNIPER-DOM-MIB::jnxDomCurrentTxLaserBiasCurrentHighWarningThreshold'] / 1000 : null,
+                    'threshold_max_critical' => isset($data['JUNIPER-DOM-MIB::jnxDomCurrentTxLaserBiasCurrentHighAlarmThreshold']) ? $data['JUNIPER-DOM-MIB::jnxDomCurrentTxLaserBiasCurrentHighAlarmThreshold'] / 1000 : null,
+                ]));
+            }
+
+            // Temperature
+            if (isset($channelData[$ifIndex])) {
+                // lanes
+                foreach ($channelData[$ifIndex] as $laneIndex => $lane) {
+                    $metrics->push(new TransceiverMetric([
+                        'transceiver_id' => $transceiver_id,
+                        'type' => 'temperature',
+                        'oid' => ".1.3.6.1.4.1.2636.3.60.1.2.1.1.9.$ifIndex.$laneIndex",
+                        'value' => $lane['JUNIPER-DOM-MIB::jnxDomCurrentLaneLaserTemperature'],
+                        'channel' => $laneIndex,
+                        'threshold_min_critical' => $data['JUNIPER-DOM-MIB::jnxDomCurrentModuleTemperatureLowAlarmThreshold'] ?? null,
+                        'threshold_min_warning' => $data['JUNIPER-DOM-MIB::jnxDomCurrentModuleTemperatureLowWarningThreshold'] ?? null,
+                        'threshold_max_warning' => $data['JUNIPER-DOM-MIB::jnxDomCurrentModuleTemperatureHighWarningThreshold'] ?? null,
+                        'threshold_max_critical' => $data['JUNIPER-DOM-MIB::jnxDomCurrentModuleTemperatureHighAlarmThreshold'] ?? null,
+                    ]));
+                }
+            } elseif (isset($data['JUNIPER-DOM-MIB::jnxDomCurrentModuleTemperature'])) {
+                $metrics->push(new TransceiverMetric([
+                    'transceiver_id' => $transceiver_id,
+                    'type' => 'temperature',
+                    'oid' => ".1.3.6.1.4.1.2636.3.60.1.1.1.1.8.$ifIndex",
+                    'value' => $data['JUNIPER-DOM-MIB::jnxDomCurrentModuleTemperature'],
+                    'threshold_min_critical' => $data['JUNIPER-DOM-MIB::jnxDomCurrentModuleTemperatureLowAlarmThreshold'] ?? null,
+                    'threshold_min_warning' => $data['JUNIPER-DOM-MIB::jnxDomCurrentModuleTemperatureLowWarningThreshold'] ?? null,
+                    'threshold_max_warning' => $data['JUNIPER-DOM-MIB::jnxDomCurrentModuleTemperatureHighWarningThreshold'] ?? null,
+                    'threshold_max_critical' => $data['JUNIPER-DOM-MIB::jnxDomCurrentModuleTemperatureHighAlarmThreshold'] ?? null,
+                ]));
+            }
+
+            // Voltage
+            if (isset($data['JUNIPER-DOM-MIB::jnxDomCurrentModuleVoltage'])) {
+                $metrics->push(new TransceiverMetric([
+                    'transceiver_id' => $transceiver_id,
+                    'type' => 'voltage',
+                    'oid' => ".1.3.6.1.4.1.2636.3.60.1.1.1.1.25.$ifIndex",
+                    'value' => $data['JUNIPER-DOM-MIB::jnxDomCurrentModuleVoltage'] / 1000,
+                    'divisor' => 1000,
+                    'threshold_min_critical' => isset($data['JUNIPER-DOM-MIB::jnxDomCurrentModuleVoltageLowAlarmThreshold']) ? $data['JUNIPER-DOM-MIB::jnxDomCurrentModuleVoltageLowAlarmThreshold'] / 1000 : null,
+                    'threshold_min_warning' => isset($data['JUNIPER-DOM-MIB::jnxDomCurrentModuleVoltageLowWarningThreshold']) ? $data['JUNIPER-DOM-MIB::jnxDomCurrentModuleVoltageLowWarningThreshold'] / 1000 : null,
+                    'threshold_max_warning' => isset($data['JUNIPER-DOM-MIB::jnxDomCurrentModuleVoltageHighWarningThreshold']) ? $data['JUNIPER-DOM-MIB::jnxDomCurrentModuleVoltageHighWarningThreshold'] / 1000 : null,
+                    'threshold_max_critical' => isset($data['JUNIPER-DOM-MIB::jnxDomCurrentModuleVoltageHighAlarmThreshold']) ? $data['JUNIPER-DOM-MIB::jnxDomCurrentModuleVoltageHighAlarmThreshold'] / 1000 : null,
+                ]));
+            }
+        }
+
+        return $metrics;
+    }
+
+    private function findTransceiverEntityByPortName(array $entPhysical, string $ifName): array
+    {
+        if (preg_match('#-(\d+/\d+/\d+)#', $ifName, $matches)) {
+            $expected_tail = ' @ ' . $matches[1];
+
+            foreach ($entPhysical as $entity) {
+                if (isset($entity['ENTITY-MIB::entPhysicalDescr']) && str_ends_with($entity['ENTITY-MIB::entPhysicalDescr'], $expected_tail)) {
+                    return $entity;
+                }
+            }
+        }
+
+        return [];
     }
 }

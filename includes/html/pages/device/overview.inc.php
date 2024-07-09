@@ -25,6 +25,7 @@ PluginManager::call(DeviceOverviewHook::class, ['device' => DeviceCache::getPrim
 });
 
 require 'overview/ports.inc.php';
+require 'overview/transceivers.inc.php';
 
 if ($device['os'] == 'cimc') {
     require 'overview/cimc.inc.php';

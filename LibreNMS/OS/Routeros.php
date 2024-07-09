@@ -25,6 +25,9 @@
 
 namespace LibreNMS\OS;
 
+use App\Models\Transceiver;
+use App\Models\TransceiverMetric;
+use Illuminate\Support\Collection;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessCcqDiscovery;
@@ -38,12 +41,15 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessRsrpDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRsrqDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessSinrDiscovery;
+use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Util\Number;
 
 class Routeros extends OS implements
     OSPolling,
+    TransceiverDiscovery,
     WirelessCcqDiscovery,
     WirelessClientsDiscovery,
     WirelessFrequencyDiscovery,
@@ -496,5 +502,85 @@ class Routeros extends OS implements
             $datastore->put($this->getDeviceArray(), 'routeros_pppoe_sessions', $tags, $fields);
             $this->enableGraph('routeros_pppoe_sessions');
         }
+    }
+
+    public function discoverTransceivers(): Collection
+    {
+        $ifIndexToPortId = $this->getDevice()->ports()->pluck('port_id', 'ifIndex');
+
+        return \SnmpQuery::cache()->walk('MIKROTIK-MIB::mtxrOpticalTable')->mapTable(function ($data, $ifIndex) use ($ifIndexToPortId) {
+            $wavelength = isset($data['MIKROTIK-MIB::mtxrOpticalWavelength']) && $data['MIKROTIK-MIB::mtxrOpticalWavelength'] != '.00' ? Number::cast($data['MIKROTIK-MIB::mtxrOpticalWavelength']) : null;
+
+            return new Transceiver([
+                'port_id' => $ifIndexToPortId->get($ifIndex),
+                'index' => $ifIndex,
+                'vendor' => $data['MIKROTIK-MIB::mtxrOpticalVendorName'] ?? null,
+                'serial' => $data['MIKROTIK-MIB::mtxrOpticalVendorSerial'] ?? null,
+                'wavelength' => $wavelength == 65535 ? null : $wavelength, // NA value = 65535.00
+            ]);
+        });
+    }
+
+    public function discoverTransceiverMetrics(Collection $transceivers): Collection
+    {
+        $data = \SnmpQuery::cache()->walk('MIKROTIK-MIB::mtxrOpticalTable');
+        $metrics = new Collection;
+
+        foreach ($data->table(2) as $ifIndex => $module) {
+            // Temperature
+            if (isset($module['MIKROTIK-MIB::mtxrOpticalTemperature']) && $module['MIKROTIK-MIB::mtxrOpticalTemperature'] != 0) {
+                $metrics->push(new TransceiverMetric([
+                    'transceiver_id' => $transceivers->get($ifIndex)->id,
+                    'type' => 'temperature',
+                    'value' => Number::cast($module['MIKROTIK-MIB::mtxrOpticalTemperature']),
+                    'oid' => ".1.3.6.1.4.1.14988.1.1.19.1.1.6.$ifIndex",
+                ]));
+            }
+
+            // Voltage
+            if (isset($module['MIKROTIK-MIB::mtxrOpticalSupplyVoltage']) && $module['MIKROTIK-MIB::mtxrOpticalSupplyVoltage'] != 0) {
+                $metrics->push(new TransceiverMetric([
+                    'transceiver_id' => $transceivers->get($ifIndex)->id,
+                    'type' => 'voltage',
+                    'value' => Number::cast($module['MIKROTIK-MIB::mtxrOpticalSupplyVoltage']),
+                    'divisor' => 1000,
+                    'oid' => ".1.3.6.1.4.1.14988.1.1.19.1.1.7.$ifIndex",
+                ]));
+            }
+
+            // Bias Current
+            if (isset($module['MIKROTIK-MIB::mtxrOpticalTxBiasCurrent']) && $module['MIKROTIK-MIB::mtxrOpticalTxBiasCurrent'] != 0) {
+                $metrics->push(new TransceiverMetric([
+                    'transceiver_id' => $transceivers->get($ifIndex)->id,
+                    'type' => 'bias',
+                    'value' => Number::cast($module['MIKROTIK-MIB::mtxrOpticalTxBiasCurrent']),
+                    'oid' => ".1.3.6.1.4.1.14988.1.1.19.1.1.8.$ifIndex",
+                ]));
+            }
+
+            // TX Power
+            if (isset($module['MIKROTIK-MIB::mtxrOpticalTxPower']) && $module['MIKROTIK-MIB::mtxrOpticalTxPower'] != 0) {
+                $metrics->push(new TransceiverMetric([
+                    'transceiver_id' => $transceivers->get($ifIndex)->id,
+                    'type' => 'power-tx',
+                    'value' => Number::cast($module['MIKROTIK-MIB::mtxrOpticalTxPower']),
+                    'divisor' => 1000,
+                    'oid' => ".1.3.6.1.4.1.14988.1.1.19.1.1.9.$ifIndex",
+                ]));
+            }
+
+            // RX Power
+            if (isset($module['MIKROTIK-MIB::mtxrOpticalRxPower']) && $module['MIKROTIK-MIB::mtxrOpticalRxPower'] != 0) {
+                $metrics->push(new TransceiverMetric([
+                    'transceiver_id' => $transceivers->get($ifIndex)->id,
+                    'type' => 'power-rx',
+                    'value' => Number::cast($module['MIKROTIK-MIB::mtxrOpticalRxPower']),
+                    'divisor' => 1000,
+                    'oid' => ".1.3.6.1.4.1.14988.1.1.19.1.1.10.$ifIndex",
+                ]));
+            }
+        }
+
+        return $metrics;
     }
 }

@@ -31,18 +31,18 @@ use Illuminate\Support\Collection;
 trait SyncsModels
 {
     /**
-     * Sync several models for a device's relationship
+     * Sync several models for a parentModel's relationship
      * Model must implement \LibreNMS\Interfaces\Models\Keyable interface
      *
-     * @param  \App\Models\Device  $device
+     * @param  \Illuminate\Database\Eloquent\Model  $parentModel
      * @param  string  $relationship
      * @param  \Illuminate\Support\Collection  $models  \LibreNMS\Interfaces\Models\Keyable
      * @return \Illuminate\Support\Collection
      */
-    protected function syncModels($device, $relationship, $models): Collection
+    protected function syncModels($parentModel, $relationship, $models): Collection
     {
         $models = $models->keyBy->getCompositeKey();
-        $existing = $device->$relationship->groupBy->getCompositeKey();
+        $existing = $parentModel->$relationship->groupBy->getCompositeKey();
 
         foreach ($existing as $exist_key => $existing_rows) {
             if ($models->offsetExists($exist_key)) {
@@ -64,12 +64,12 @@ trait SyncsModels
         }
 
         $new = $models->diffKeys($existing);
-        if (is_a($device->$relationship(), HasManyThrough::class)) {
+        if (is_a($parentModel->$relationship(), HasManyThrough::class)) {
             // if this is a distant relation, the models need the intermediate relationship set
             // just save assuming things are correct
             $new->each->save();
         } else {
-            $device->$relationship()->saveMany($new);
+            $parentModel->$relationship()->saveMany($new);
         }
 
         return $existing->map->first()->merge($new);

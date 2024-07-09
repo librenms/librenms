@@ -27,9 +27,12 @@
 namespace LibreNMS\OS\Shared;
 
 use App\Models\Device;
+use App\Models\EntPhysical;
 use App\Models\Mempool;
 use App\Models\PortsNac;
 use App\Models\Sla;
+use App\Models\Transceiver;
+use App\Models\TransceiverMetric;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use LibreNMS\Device\Processor;
@@ -38,6 +41,7 @@ use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Discovery\SlaDiscovery;
 use LibreNMS\Interfaces\Discovery\StpInstanceDiscovery;
+use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
 use LibreNMS\Interfaces\Polling\NacPolling;
 use LibreNMS\Interfaces\Polling\SlaPolling;
 use LibreNMS\OS;
@@ -52,7 +56,8 @@ class Cisco extends OS implements
     ProcessorDiscovery,
     MempoolsDiscovery,
     NacPolling,
-    SlaPolling
+    SlaPolling,
+    TransceiverDiscovery
 {
     use YamlOSDiscovery {
         YamlOSDiscovery::discoverOS as discoverYamlOS;
@@ -555,5 +560,76 @@ class Cisco extends OS implements
         }
 
         return null;
+    }
+
+    public function discoverTransceivers(): Collection
+    {
+        // use data collected by entPhysical module if available
+        $dbSfpCages = $this->getDevice()->entityPhysical()->where('entPhysicalVendorType', 'cevContainerSFP')->pluck('entPhysicalIndex');
+        if ($dbSfpCages->isNotEmpty()) {
+            $data = $this->getDevice()->entityPhysical()->whereIn('entPhysicalContainedIn', $dbSfpCages)->get()->keyBy('entPhysicalIndex');
+        } else {
+            // fetch data via snmp
+            $snmpData = collect(\SnmpQuery::cache()->hideMib()->mibs(['CISCO-ENTITY-VENDORTYPE-OID-MIB'])->walk('ENTITY-MIB::entPhysicalTable')->table(1));
+            if ($snmpData->isEmpty()) {
+                return new Collection;
+            }
+
+            $sfpCages = $snmpData->filter(fn ($ent) => $ent['ENTITY-MIB::entPhysicalVendorType'] == 'CISCO-ENTITY-VENDORTYPE-OID-MIB::cevContainerSFP');
+            $data = $snmpData->filter(fn ($ent) => $sfpCages->has($ent['ENTITY-MIB::entPhysicalContainedIn'] ?? null));
+        }
+        $ifIndexToPortId = $this->getDevice()->ports()->pluck('port_id', 'ifIndex');
+
+        return $data->map(function ($ent, $index) use ($ifIndexToPortId) {
+            return new Transceiver([
+                'port_id' => $ifIndexToPortId->get($ent['entPhysicalAlias'] ?? null, 0),
+                'index' => $index,
+                'type' => $ent['entPhysicalDescr'] ?? null,
+                'vendor' => $ent['entPhysicalMfgName'] ?? null,
+                'revision' => $ent['entPhysicalHardwareRev'] ?? null,
+                'model' => $ent['entPhysicalModelName'] ?? null,
+                'serial' => $ent['entPhysicalSerialNum'] ?? null,
+            ]);
+        });
+    }
+
+    public function discoverTransceiverMetrics(Collection $transceivers): Collection
+    {
+        $data = $this->getDevice()->entityPhysical()->whereIn('entPhysicalContainedIn', $transceivers->pluck('index'))->get()->keyBy('entPhysicalIndex');
+        if ($data->isEmpty()) {
+            $data = collect(\SnmpQuery::cache()->hideMib()->mibs(['CISCO-ENTITY-VENDORTYPE-OID-MIB'])->walk('ENTITY-MIB::entPhysicalTable')->table(1));
+
+            if ($data->isEmpty()) {
+                return new Collection;
+            }
+        }
+
+        $values = \SnmpQuery::walk('CISCO-ENTITY-SENSOR-MIB::entSensorValueTable')->table(1);
+        $metrics = new Collection;
+
+        foreach ($transceivers as $transceiver) {
+            $metrics = $metrics->merge($data->filter(fn ($ent) => $ent['entPhysicalContainedIn'] == $transceiver->index)
+                ->map(function ($ent, $index) use ($transceiver, $values) {
+                    $sensorValues = $values[$index];
+                    $divisor = pow(10, $sensorValues['CISCO-ENTITY-SENSOR-MIB::entSensorPrecision'] ?? 0);
+
+                    return new TransceiverMetric([
+                        'transceiver_id' => $transceiver->id,
+                        'type' => match ($ent['entPhysicalVendorType']) {
+                            'cevSensorTransceiverRxPwr' => 'power-rx',
+                            'cevSensorTransceiverTxPwr' => 'power-tx',
+                            'cevSensorTransceiverCurrent' => 'bias',
+                            'cevSensorTransceiverVoltage' => 'voltage',
+                            'cevSensorTransceiverTemp' => 'temperature',
+                            default => strtolower(str_replace('cevSensorTransceiver', '', $ent['entPhysicalVendorType'])),
+                        },
+                        'oid' => ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.$index",
+                        'value' => $sensorValues['CISCO-ENTITY-SENSOR-MIB::entSensorValue'] / $divisor,
+                        'divisor' => $divisor,
+                    ]);
+                }));
+        }
+
+        return $metrics;
     }
 }

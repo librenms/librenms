@@ -380,6 +380,141 @@ Output:
 }
 ```
 
+### `get_port_transceiver`
+
+Get transceiver info with metrics
+
+Route: `/api/v0/ports/:portid/transceiver`
+
+- portid must be an integer
+
+Example:
+
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/ports/50736/transceiver
+```
+
+Output:
+
+```json
+{
+    "status": "ok",
+    "transceivers": [
+        {
+            "id": 13,
+            "created_at": "2024-06-26T23:46:06.000000Z",
+            "updated_at": "2024-06-27T00:00:07.000000Z",
+            "device_id": 3138,
+            "port_id": 50736,
+            "index": "51",
+            "type": "10G_BASE_SR_SFP",
+            "vendor": "HPE",
+            "oui": "64 9D 99",
+            "model": null,
+            "revision": "1",
+            "serial": "AAA0000AAA00",
+            "date": null,
+            "ddm": true,
+            "encoding": null,
+            "cable": "MM",
+            "distance": 300,
+            "wavelength": 850,
+            "connector": "LC",
+            "channels": 1,
+            "metrics": [
+                {
+                    "id": 4,
+                    "transceiver_id": 13,
+                    "channel": 0,
+                    "type": "power-tx",
+                    "value": -2.37,
+                    "value_prev": -2.32,
+                    "threshold_min_critical": -6,
+                    "threshold_min_warning": -5,
+                    "threshold_max_warning": -1,
+                    "threshold_max_critical": 0
+                },
+                {
+                    "id": 5,
+                    "transceiver_id": 13,
+                    "channel": 0,
+                    "type": "power-rx",
+                    "value": -2.15,
+                    "value_prev": -2.14,
+                    "threshold_min_critical": -20,
+                    "threshold_min_warning": -18.01,
+                    "threshold_max_warning": -1,
+                    "threshold_max_critical": 0
+                },
+                {
+                    "id": 6,
+                    "transceiver_id": 13,
+                    "channel": 0,
+                    "type": "temperature",
+                    "value": 27,
+                    "value_prev": 25,
+                    "threshold_min_critical": -13000,
+                    "threshold_min_warning": -8000,
+                    "threshold_max_warning": 73000,
+                    "threshold_max_critical": 78000
+                },
+                {
+                    "id": 6,
+                    "transceiver_id": 13,
+                    "channel": 0,
+                    "type": "bias",
+                    "value": 325,
+                    "value_prev": 5.94,
+                    "threshold_min_critical": 2.9,
+                    "threshold_min_warning": 3,
+                    "threshold_max_warning": 3.6,
+                    "threshold_max_critical": 3.7
+                }
+            ]
+        }
+    ]
+}
+```
+
+### `update_transceiver_metric_thresholds`
+
+Update the thesholds for a transceiver metric.  You will need to supply the metric id, which can by found
+by the get_port_transceiver api endpoint.
+
+Route: `/api/v0/ports/transceiver/metric/:transceiver_metric_id`
+
+Input (JSON):
+
+- threshold_min_critical: The minimum critical value (numeric)
+- threshold_min_warning: The minimum warning value (numeric)
+- threshold_max_warning: The maximum warning value (numeric)
+- threshold_max_critical: The maximum critical value (numeric)
+
+Example:
+
+```curl
+curl -X PATCH -d '{"threshold_min_critical": -30}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/ports/transceiver/metric/4
+```
+
+Output:
+```json
+{
+    "status": "ok",
+    "transceiver_metric": {
+        "id": 4,
+        "transceiver_id": 102,
+        "channel": 0,
+        "type": "power-tx",
+        "value": -2.2,
+        "value_prev": -2.2,
+        "threshold_min_critical": -30,
+        "threshold_min_warning": null,
+        "threshold_max_warning": null,
+        "threshold_max_critical": null
+    }
+}
+```
+
 ### `get_port_description`
 
 Get the description (`ifAlias`) for a given port id.

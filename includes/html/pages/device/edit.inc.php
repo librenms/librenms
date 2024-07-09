@@ -13,6 +13,9 @@ if (! Auth::user()->hasGlobalAdmin()) {
     $panes['snmp'] = 'SNMP';
     if (! $device['snmp_disable']) {
         $panes['ports'] = 'Port Settings';
+        if (DeviceCache::get($device['device_id'])->transceivers()->exists()) {
+            $panes['transceivers'] = __('port.tabs.transceivers');
+        }
     }
 
     if (dbFetchCell('SELECT COUNT(*) FROM `bgpPeers` WHERE `device_id` = ? LIMIT 1', [$device['device_id']]) > 0) {
