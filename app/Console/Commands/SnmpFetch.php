@@ -31,7 +31,7 @@ abstract class SnmpFetch extends LnmsCommand
         parent::__construct();
         $this->addArgument('device spec', InputArgument::REQUIRED, trans('commands.snmp:fetch.arguments.device spec'));
         $this->addArgument('oid(s)', InputArgument::OPTIONAL | InputArgument::IS_ARRAY, trans('commands.snmp:fetch.arguments.oid(s)'));
-        $this->addOption('output', 'o', InputOption::VALUE_REQUIRED, trans('commands.snmp:fetch.options.output', ['formats' => '[value, values, table]']));
+        $this->addOption('output', 'o', InputOption::VALUE_REQUIRED, trans('commands.snmp:fetch.options.output', ['formats' => '[value, values, table, index-table]']));
         $this->addOption('depth', 'd', InputOption::VALUE_REQUIRED, trans('commands.snmp:fetch.options.depth'), 1);
         $this->addOption('numeric', 'i', InputOption::VALUE_NONE, trans('commands.snmp:fetch.options.numeric'));
     }
@@ -48,7 +48,7 @@ abstract class SnmpFetch extends LnmsCommand
         $this->type = substr($this->name, 5); // 'snmp:<type>'
         $this->deviceSpec = $this->argument('device spec');
         $this->oids = $this->argument('oid(s)') ?: [];
-        $this->numeric = $this->hasOption('numeric') ? $this->option('numeric') : null;
+        $this->numeric = $this->hasOption('numeric') ? $this->option('numeric') : null;  // // @phpstan-ignore-line larastan.console.undefinedOption
         $this->depth = (int) $this->option('depth');
         $this->outputFormat = $this->option('output') ?: match ($this->type) {
             'walk' => 'table',
