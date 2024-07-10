@@ -1550,5 +1550,107 @@
                 }
             ]
         }
+    },
+    "entity-physical": {
+        "discovery": {
+            "entPhysical": [
+                {
+                    "entPhysicalIndex": 1,
+                    "entPhysicalDescr": "LQM-C",
+                    "entPhysicalClass": "module",
+                    "entPhysicalName": "Slot1",
+                    "entPhysicalHardwareRev": "B13",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "8.2.6",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "true",
+                    "entPhysicalModelName": "LQM-C",
+                    "entPhysicalVendorType": "zeroDotZero",
+                    "entPhysicalSerialNum": "HK00621533",
+                    "entPhysicalContainedIn": 10,
+                    "entPhysicalParentRelPos": 1,
+                    "entPhysicalMfgName": "Teleste",
+                    "ifIndex": null
+                },
+                {
+                    "entPhysicalIndex": 2,
+                    "entPhysicalDescr": "LQM-C",
+                    "entPhysicalClass": "module",
+                    "entPhysicalName": "Slot2",
+                    "entPhysicalHardwareRev": "B13",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "8.2.6",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "true",
+                    "entPhysicalModelName": "LQM-C",
+                    "entPhysicalVendorType": "zeroDotZero",
+                    "entPhysicalSerialNum": "HK01101528",
+                    "entPhysicalContainedIn": 10,
+                    "entPhysicalParentRelPos": 2,
+                    "entPhysicalMfgName": "Teleste",
+                    "ifIndex": null
+                },
+                {
+                    "entPhysicalIndex": 3,
+                    "entPhysicalDescr": "LQM-C",
+                    "entPhysicalClass": "module",
+                    "entPhysicalName": "Slot3",
+                    "entPhysicalHardwareRev": "B15",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "8.2.6",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "true",
+                    "entPhysicalModelName": "LQM-C",
+                    "entPhysicalVendorType": "zeroDotZero",
+                    "entPhysicalSerialNum": "HK00731803",
+                    "entPhysicalContainedIn": 10,
+                    "entPhysicalParentRelPos": 3,
+                    "entPhysicalMfgName": "Teleste",
+                    "ifIndex": null
+                },
+                {
+                    "entPhysicalIndex": 10,
+                    "entPhysicalDescr": "LCH-D",
+                    "entPhysicalClass": "chassis",
+                    "entPhysicalName": "Chassis",
+                    "entPhysicalHardwareRev": "C12",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "8.2.6",
+                    "entPhysicalAlias": "Luminato",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "true",
+                    "entPhysicalModelName": "LCH-D",
+                    "entPhysicalVendorType": "zeroDotZero",
+                    "entPhysicalSerialNum": "HK01421528",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": -1,
+                    "entPhysicalMfgName": "Teleste",
+                    "ifIndex": null
+                },
+                {
+                    "entPhysicalIndex": 11,
+                    "entPhysicalDescr": "LPS-E",
+                    "entPhysicalClass": "powerSupply",
+                    "entPhysicalName": "PSU",
+                    "entPhysicalHardwareRev": "B10",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "true",
+                    "entPhysicalModelName": "LPS-E",
+                    "entPhysicalVendorType": "zeroDotZero",
+                    "entPhysicalSerialNum": "HK01871531",
+                    "entPhysicalContainedIn": 10,
+                    "entPhysicalParentRelPos": 7,
+                    "entPhysicalMfgName": "Teleste",
+                    "ifIndex": null
+                }
+            ]
+        },
+        "poller": "matches discovery"
     }
 }

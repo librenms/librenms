@@ -4819,7 +4819,7 @@
                     "sysContact": "<private>",
                     "version": "WebSmart 1.00.043",
                     "hardware": "AT-GS950/24",
-                    "features": "",
+                    "features": null,
                     "location": "<private>",
                     "os": "allied",
                     "type": "network",
