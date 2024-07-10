@@ -1,41 +1,10 @@
+
 <?php
 
-/**
- * Builds a graph array and outputs the graph.
- *
- * @param  string  $gtype
- * @param  string  $app_id
- * @param  null|string  $interface
- * @param  null|string  $client
- * @param  string  $gtext
- */
-function wireguard_graph_printer($gtype, $app_id, $interface, $client, $gtext)
-{
-    $graph_type = $gtype;
-    $graph_array['height'] = '100';
-    $graph_array['width'] = '215';
-    $graph_array['to'] = time();
-    $graph_array['id'] = $app_id;
-    $graph_array['type'] = 'application_' . $gtype;
-    if (! is_null($interface)) {
-        $graph_array['interface'] = $interface;
-    }
-    if (! is_null($client)) {
-        $graph_array['client'] = $client;
-    }
-    echo '<div class="panel panel-default">
-    <div class="panel-heading">
-        <h3 class="panel-title">' .
-        $gtext .
-        '</h3>
-    </div>
-    <div class="panel-body">
-    <div class="row">';
-    include 'includes/html/print-graphrow.inc.php';
-    echo '</div>';
-    echo '</div>';
-    echo '</div>';
-}
+use App\Models\Device;
+use App\Models\Ipv4Address;
+use App\Models\Ipv6Address;
+use App\Models\Port;
 
 $link_array = [
     'page' => 'device',
@@ -45,17 +14,24 @@ $link_array = [
 ];
 
 $interface_client_map = $app->data['mappings'] ?? [];
-$graph_map = [
-    'interface' => [
-        'clients' => [],
-        'total' => [],
-    ],
-    'total' => [],
-];
+$returned_data = $app->data['data'] ?? [];
+
 
 print_optionbar_start();
 
-echo generate_link('All Interfaces', $link_array);
+$label =
+    (!isset($vars['wg_page']) && !isset($vars['interface']))
+            ? '<span class="pagemenu-selected">All Interfaces</span>'
+            : 'All Interfaces';
+if (sizeof($returned_data) > 0) {
+    echo generate_link($label, $link_array);
+    echo ' | ';
+    $label =
+        $vars['wg_page'] == 'details'
+        ? '<span class="pagemenu-selected">Details</span>'
+        : 'Details';
+}
+echo generate_link($label, $link_array, ['wg_page' => 'details']);
 echo ' | Interfaces: ';
 
 // generate interface links on the host application page
@@ -76,73 +52,148 @@ foreach ($interface_client_map as $interface => $client_list) {
 
 print_optionbar_end();
 
-// generates the global wireguard graph mapping
-if (! isset($vars['interface'])) {
-    $graph_map['total'] = [
-        'wireguard_traffic' => 'Wireguard Total Traffic',
+if (isset($vars['wg_page']) and $vars['wg_page'] == 'details') {
+    $table_info = [
+        'headers' => [
+            'Name',
+            'Interface',
+            'PubKey',
+            'Recv',
+            'Sent',
+            'Endpoint IP',
+            'Port',
+            'Last Handshake',
+            'Allowed IPs',
+        ],
+        'rows' => [],
     ];
-}
-
-foreach ($interface_client_map as $interface => $client_list) {
-    if (
-        ! isset($vars['interface']) ||
-        (isset($vars['interface']) && $interface == $vars['interface'])
-    ) {
-        // generates the interface graph mapping
-        $graph_map['interface']['total'][$interface] = [
-            'wireguard_traffic' => $interface . ' ' . 'Total Traffic',
-        ];
-        foreach ($client_list as $client) {
-            // generates the interface+client graph mapping
-            $graph_map['interface']['clients'][$interface][$client] = [
-                'wireguard_traffic' => $interface . ' ' . $client . ' Traffic',
-                'wireguard_time' => $interface .
-                    ' ' .
-                    $client .
-                    ' Minutes Since Last Handshake',
-            ];
+    foreach ($returned_data as $returned_data_key => $interface) {
+        $port = Port::with('device')->firstWhere(['ifName' => $returned_data_key, 'device_id' => $device['device_id']]);
+        if (isset($port)) {
+            $interface_info_raw = true;
+            $interface_info = generate_port_link([
+                'label' => $port->label,
+                'port_id' => $port->port_id,
+                'ifName' => $port->ifName,
+                'device_id' => $port->device_id,
+            ]);
+        } else {
+            $interface_info_raw = false;
         }
-    }
-}
-
-// print graphs
-foreach ($graph_map as $category => $category_map) {
-    foreach ($category_map as $subcategory => $subcategory_map) {
-        if ($category === 'total') {
-            // print graphs for global wireguard metrics
-            wireguard_graph_printer(
-                $subcategory,
-                $app['app_id'],
-                null,
-                null,
-                $subcategory_map
-            );
-        } elseif ($category === 'interface') {
-            foreach ($subcategory_map as $interface => $interface_map) {
-                foreach ($interface_map as $client => $client_map) {
-                    if ($subcategory === 'total') {
-                        // print graphs for wireguard interface metrics
-                        wireguard_graph_printer(
-                            $client,
-                            $app['app_id'],
-                            $interface,
-                            null,
-                            $client_map
-                        );
-                    } elseif ($subcategory === 'clients') {
-                        foreach ($client_map as $gtype => $gtext) {
-                            // print graphs for wireguard interface+client metrics
-                            wireguard_graph_printer(
-                                $gtype,
-                                $app['app_id'],
-                                $interface,
-                                $client,
-                                $gtext
-                            );
+        foreach ($interface as $interface_key => $peer) {
+            $name = $interface_key;
+            $name_raw = false;
+            // see if the hostname resolves to a hostname of a device
+            if (isset($peer['hostname']) && ! is_null($peer['hostname'])) {
+                $peer_dev = Device::firstWhere(['hostname' => $peer['hostname']]);
+                if (isset($peer_dev)) {
+                    $name_raw = true;
+                    $name = generate_device_link(['device_id' => $peer_dev->device_id], $name);
+                }
+            }
+            // if this is null, it means the extend did not return it as that options is set to 0
+            if (is_null($peer['pubkey'])) {
+                $peer['pubkey'] = '*hidden*';
+            }
+            // ensure we have something set for endpoint host
+            if (! isset($peer['endpoint_host']) || is_null($peer['endpoint_host'])) {
+                $peer['endpoint_host']='';
+            } else { // if we have data, see if we can resolve that to a machine for generating dev/if links
+                $endpoint_raw = false;
+                if (preg_match('/^[\:A-Fa-f0-9]+$/', $peer['endpoint_host'])) {
+                    $ip_info=Ipv6Address::firstWhere(['ipv6_address' => $peer['endpoint_host']]);
+                } elseif (preg_match('/^[\.0-9]+$/', $peer['endpoint_host'])) {
+                    $ip_info=Ipv4Address::firstWhere(['ipv4_address' => $peer['endpoint_host']]);
+                }
+                if (isset($ip_info)) {
+                    $endpoint_raw = true;
+                    $port = Port::with('device')->firstWhere(['port_id' => $ip_info->port_id]);
+                    $peer['endpoint_host']=$peer['endpoint_host'].'('.generate_device_link(['device_id' => $port->device_id]) . ', ' .
+                        generate_port_link([
+                            'label' => $port->label,
+                            'port_id' => $port->port_id,
+                            'ifName' => $port->ifName,
+                            'device_id' => $port->device_id,
+                        ]) . ')';
+                }
+            }
+            // ensure we have something set for the endpoint port
+            if (! isset($peer['endpoint_port']) || is_null($peer['endpoint_port'])) {
+                $peer['endpoint_port']='';
+            }
+            // build string of allowed IPs
+            $allowed_ips = '';
+            if (isset($peer['allowed_ips']) && ! is_null($peer['allowed_ips']) && is_array($peer['allowed_ips'])) {
+                foreach ($peer['allowed_ips'] as $allowed_ips_key => $allowed_ip) {
+                    $ip_found = false;
+                    if (preg_match('/^[\:A-Fa-f0-9]+$/', $allowed_ip)) {
+                        $ip_info=Ipv6Address::firstWhere(['ipv6_address' => $allowed_ip]);
+                        if (isset($ip_info)) {
+                            $ip_found = true;
+                        }
+                    } elseif (preg_match('/^[\.0-9]+$/', $allowed_ip)) {
+                        $ip_info=Ipv4Address::firstWhere(['ipv4_address' => $allowed_ip]);
+                        if (isset($ip_info)) {
+                            $ip_found = true;
+                        }
+                    }
+                    if ($ip_found) {
+                        $port = Port::with('device')->firstWhere(['port_id' => $ip_info->port_id]);
+                        $ip_info_string=generate_device_link(['device_id' => $port->device_id], $allowed_ip).'('.
+                            generate_port_link([
+                                'label' => $port->label,
+                                'port_id' => $port->port_id,
+                                'ifName' => $port->ifName,
+                                'device_id' => $port->device_id,
+                            ]) . ')';
+                        if ($allowed_ips == '') {
+                            $allowed_ips = $ip_info_string;
+                        } else {
+                            $allowed_ips = $allowed_ips.', '.$ip_info_string;
+                        }
+                    } else {
+                        if ($allowed_ips == '') {
+                            $allowed_ips = $allowed_ip;
+                        } else {
+                            $allowed_ips = $allowed_ips.', '.$allowed_ip;
                         }
                     }
                 }
             }
+
+            $row = [
+                [ 'data' => $name, 'raw' => $name_raw ],
+                [ 'data' => $interface_info, 'raw' => $interface_info_raw ],
+                [ 'data' => $peer['pubkey'] ],
+                [ 'data' => $peer['bytes_rcvd'] ],
+                [ 'data' => $peer['bytes_sent'] ],
+                [ 'data' => $peer['endpoint_host'] , 'raw' => $endpoint_raw],
+                [ 'data' => $peer['endpoint_port'] ],
+                [ 'data' => sprintf('%01.2f', $peer['minutes_since_last_handshake']) ],
+                [ 'data' => $allowed_ips, 'raw' => true ],
+            ];
+            $table_info['rows'][] = $row;
         }
     }
+    echo view('widgets/sortable_table', $table_info);
+}
+
+foreach ($graphs as $key => $text) {
+    $graph_type = $key;
+    $graph_array['height'] = '100';
+    $graph_array['width'] = '215';
+    $graph_array['to'] = time();
+    $graph_array['id'] = $app['app_id'];
+    $graph_array['type'] = 'application_' . $key;
+
+    echo '<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">' . $text . '</h3>
+    </div>
+    <div class="panel-body">
+    <div class="row">';
+    include 'includes/html/print-graphrow.inc.php';
+    echo '</div>';
+    echo '</div>';
+    echo '</div>';
 }
