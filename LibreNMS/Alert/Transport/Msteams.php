@@ -69,7 +69,6 @@ class Msteams extends Transport
         $client->withBody($data, 'application/json');
         $res = $client->post($this->config['msteam-url'], $data);
 
-
         if ($res->successful()) {
             return true;
         }
