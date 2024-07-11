@@ -92,6 +92,105 @@ if (isset($vars['interface']) && isset($interface_client_map[$vars['interface']]
     }
 }
 
+// if displaying peer information, display additional useful information
+if (isset($vars['interface']) &&
+    isset($interface_client_map[$vars['interface']]) &&
+    isset($vars['client']) &&
+    isset($returned_data[$vars['interface']][$vars['client']]) &&
+    ! isset($vars['wg_page'])
+) {
+    $peer = $returned_data[$vars['interface']][$vars['client']];
+    echo "\n<hr>Hostname: ";
+    if (isset($peer['hostname'])) {
+        $peer_dev = Device::firstWhere(['hostname' => $peer['hostname']]);
+        if (isset($peer_dev)) {
+            echo generate_device_link(['device_id' => $peer_dev->device_id], $name)."<br>\n";
+        } else {
+            echo htmlspecialchars($peer['hostname'])."<br>\n";
+        }
+    } else {
+        echo "*unknown*<br>\n";
+    }
+    echo 'PubKey: ';
+    if (is_null($peer['pubkey'])) {
+        echo "*hidden*<br>\n";
+    } else {
+        echo htmlspecialchars($peer['pubkey'])."<br>\n";
+    }
+    echo 'Interface: ';
+    $port = Port::with('device')->firstWhere(['ifName' => $vars['interface'], 'device_id' => $device['device_id']]);
+    if (isset($port)) {
+        echo generate_port_link([
+            'label' => $port->label,
+            'port_id' => $port->port_id,
+            'ifName' => $port->ifName,
+            'device_id' => $port->device_id,
+        ])."<br>\n";
+    } else {
+        echo htmlspecialchars($vars['interface'])."<br>\n";
+    }
+    echo 'Endpoint Host: ';
+    if (preg_match('/^[\:A-Fa-f0-9]+$/', $peer['endpoint_host'])) {
+        $ip_info = Ipv6Address::firstWhere(['ipv6_address' => $peer['endpoint_host']]);
+    } elseif (preg_match('/^[\.0-9]+$/', $peer['endpoint_host'])) {
+        $ip_info = Ipv4Address::firstWhere(['ipv4_address' => $peer['endpoint_host']]);
+    }
+    if (isset($ip_info)) {
+        $port = Port::with('device')->firstWhere(['port_id' => $ip_info->port_id]);
+        echo $peer['endpoint_host']. '(' . generate_device_link(['device_id' => $port->device_id]) . ', ' .
+            generate_port_link([
+                'label' => $port->label,
+                'port_id' => $port->port_id,
+                'ifName' => $port->ifName,
+                'device_id' => $port->device_id,
+            ]) . ")<br>\n";
+    } else {
+        echo htmlspecialchars($peer['endpoint_host'])."<br>\n";
+    }
+    echo 'Endpoint Port: '.htmlspecialchars($peer['endpoint_port'])."<br>\n";
+    echo 'Minutes Since Last Handshake: '.htmlspecialchars($peer['minutes_since_last_handshake'])."<br>\n";
+    echo 'Allowed IPs: ';
+    $allowed_ips = '';
+    if (isset($peer['allowed_ips']) && ! is_null($peer['allowed_ips']) && is_array($peer['allowed_ips'])) {
+        foreach ($peer['allowed_ips'] as $allowed_ips_key => $allowed_ip) {
+            $ip_found = false;
+            if (preg_match('/^[\:A-Fa-f0-9]+$/', $allowed_ip)) {
+                $ip_info = Ipv6Address::firstWhere(['ipv6_address' => $allowed_ip]);
+                if (isset($ip_info)) {
+                    $ip_found = true;
+                }
+            } elseif (preg_match('/^[\.0-9]+$/', $allowed_ip)) {
+                $ip_info = Ipv4Address::firstWhere(['ipv4_address' => $allowed_ip]);
+                if (isset($ip_info)) {
+                    $ip_found = true;
+                }
+            }
+            if ($ip_found) {
+                $port = Port::with('device')->firstWhere(['port_id' => $ip_info->port_id]);
+                $ip_info_string = generate_device_link(['device_id' => $port->device_id], $allowed_ip) . '(' .
+                    generate_port_link([
+                        'label' => $port->label,
+                        'port_id' => $port->port_id,
+                        'ifName' => $port->ifName,
+                        'device_id' => $port->device_id,
+                    ]) . ')';
+                if ($allowed_ips == '') {
+                    $allowed_ips = $ip_info_string;
+                } else {
+                    $allowed_ips = $allowed_ips . ', ' . $ip_info_string;
+                }
+            } else {
+                if ($allowed_ips == '') {
+                    $allowed_ips = htmlspecialchars($allowed_ip);
+                } else {
+                    $allowed_ips = $allowed_ips . ', ' . htmlspecialchars($allowed_ip);
+                }
+            }
+        }
+    }
+    echo $allowed_ips."<br>\n";
+}
+
 print_optionbar_end();
 
 if (isset($vars['wg_page']) and $vars['wg_page'] == 'details') {
@@ -197,9 +296,9 @@ if (isset($vars['wg_page']) and $vars['wg_page'] == 'details') {
                         }
                     } else {
                         if ($allowed_ips == '') {
-                            $allowed_ips = $allowed_ip;
+                            $allowed_ips = htmlspecialchars($allowed_ip);
                         } else {
-                            $allowed_ips = $allowed_ips . ', ' . $allowed_ip;
+                            $allowed_ips = $allowed_ips . ', ' . htmlspecialchars($allowed_ip);
                         }
                     }
                 }
