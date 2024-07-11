@@ -104,9 +104,9 @@ if (isset($vars['interface']) &&
     if (isset($peer['hostname'])) {
         $peer_dev = Device::firstWhere(['hostname' => $peer['hostname']]);
         if (isset($peer_dev)) {
-            echo generate_device_link(['device_id' => $peer_dev->device_id], $name)."<br>\n";
+            echo generate_device_link(['device_id' => $peer_dev->device_id], $name) . "<br>\n";
         } else {
-            echo htmlspecialchars($peer['hostname'])."<br>\n";
+            echo htmlspecialchars($peer['hostname']) . "<br>\n";
         }
     } else {
         echo "*unknown*<br>\n";
@@ -115,7 +115,7 @@ if (isset($vars['interface']) &&
     if (is_null($peer['pubkey'])) {
         echo "*hidden*<br>\n";
     } else {
-        echo htmlspecialchars($peer['pubkey'])."<br>\n";
+        echo htmlspecialchars($peer['pubkey']) . "<br>\n";
     }
     echo 'Interface: ';
     $port = Port::with('device')->firstWhere(['ifName' => $vars['interface'], 'device_id' => $device['device_id']]);
@@ -125,9 +125,9 @@ if (isset($vars['interface']) &&
             'port_id' => $port->port_id,
             'ifName' => $port->ifName,
             'device_id' => $port->device_id,
-        ])."<br>\n";
+        ]) . "<br>\n";
     } else {
-        echo htmlspecialchars($vars['interface'])."<br>\n";
+        echo htmlspecialchars($vars['interface']) . "<br>\n";
     }
     echo 'Endpoint Host: ';
     if (preg_match('/^[\:A-Fa-f0-9]+$/', $peer['endpoint_host'])) {
@@ -137,7 +137,7 @@ if (isset($vars['interface']) &&
     }
     if (isset($ip_info)) {
         $port = Port::with('device')->firstWhere(['port_id' => $ip_info->port_id]);
-        echo $peer['endpoint_host']. '(' . generate_device_link(['device_id' => $port->device_id]) . ', ' .
+        echo $peer['endpoint_host'] . '(' . generate_device_link(['device_id' => $port->device_id]) . ', ' .
             generate_port_link([
                 'label' => $port->label,
                 'port_id' => $port->port_id,
@@ -145,10 +145,10 @@ if (isset($vars['interface']) &&
                 'device_id' => $port->device_id,
             ]) . ")<br>\n";
     } else {
-        echo htmlspecialchars($peer['endpoint_host'])."<br>\n";
+        echo htmlspecialchars($peer['endpoint_host']) . "<br>\n";
     }
-    echo 'Endpoint Port: '.htmlspecialchars($peer['endpoint_port'])."<br>\n";
-    echo 'Minutes Since Last Handshake: '.htmlspecialchars($peer['minutes_since_last_handshake'])."<br>\n";
+    echo 'Endpoint Port: ' . htmlspecialchars($peer['endpoint_port']) . "<br>\n";
+    echo 'Minutes Since Last Handshake: ' . htmlspecialchars($peer['minutes_since_last_handshake']) . "<br>\n";
     echo 'Allowed IPs: ';
     $allowed_ips = '';
     if (isset($peer['allowed_ips']) && ! is_null($peer['allowed_ips']) && is_array($peer['allowed_ips'])) {
@@ -188,7 +188,7 @@ if (isset($vars['interface']) &&
             }
         }
     }
-    echo $allowed_ips."<br>\n";
+    echo $allowed_ips . "<br>\n";
 }
 
 print_optionbar_end();
