@@ -15,6 +15,9 @@ $link_array = [
 $interface_client_map = $app->data['mappings'] ?? [];
 $returned_data = $app->data['data'] ?? [];
 
+// put interfaces in order
+ksort($interface_client_map);
+
 print_optionbar_start();
 
 $label =
@@ -67,8 +70,11 @@ foreach ($interface_client_map as $interface => $client_list) {
     $i++;
 }
 
-//
+// if we have a interface specified and it exists, print a list of peers
 if (isset($vars['interface']) && isset($interface_client_map[$vars['interface']])) {
+    // order the peer information for the interface
+    asort($interface_client_map[$vars['interface']]);
+
     $i = 0;
     echo '<br>Peers: ';
     foreach ($interface_client_map[$vars['interface']] as $peer_key => $peer) {
@@ -103,7 +109,9 @@ if (isset($vars['wg_page']) and $vars['wg_page'] == 'details') {
         ],
         'rows' => [],
     ];
+    ksort($returned_data);
     foreach ($returned_data as $returned_data_key => $interface) {
+        ksort($interface);
         $port = Port::with('device')->firstWhere(['ifName' => $returned_data_key, 'device_id' => $device['device_id']]);
         if (isset($port)) {
             $interface_info_raw = true;
