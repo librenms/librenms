@@ -125,8 +125,8 @@ class CustomMapDataController extends Controller
                     $edges[$edgeid]['colour_to'] = $this->speedColour($edges[$edgeid]['port_topct']);
                     $edges[$edgeid]['colour_from'] = $this->speedColour($edges[$edgeid]['port_frompct']);
                 }
-                $edges[$edgeid]['port_topct'] = round($edges[$edgeid]['port_topct'],2);
-                $edges[$edgeid]['port_frompct'] = round($edges[$edgeid]['port_frompct'],2);
+                $edges[$edgeid]['port_topct'] = round($edges[$edgeid]['port_topct'], 2);
+                $edges[$edgeid]['port_frompct'] = round($edges[$edgeid]['port_frompct'], 2);
                 $edges[$edgeid]['port_tobps'] = $this->rateString($rateto);
                 $edges[$edgeid]['port_frombps'] = $this->rateString($ratefrom);
                 $edges[$edgeid]['width_to'] = $this->speedWidth($speedto);
