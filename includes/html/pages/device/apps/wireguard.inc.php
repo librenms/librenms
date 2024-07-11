@@ -76,7 +76,7 @@ if (isset($vars['interface']) && isset($interface_client_map[$vars['interface']]
             $vars['client'] == $peer
             ? '<span class="pagemenu-selected">' . $peer . '</span>'
             : $peer;
-        echo generate_link($label, $link_array, ['interface' => $interface, 'client'=>$peer]);
+        echo generate_link($label, $link_array, ['interface' => $interface, 'client' => $peer]);
 
         if ($i < count(array_keys($interface_client_map[$vars['interface']])) - 1) {
             echo ', ';
