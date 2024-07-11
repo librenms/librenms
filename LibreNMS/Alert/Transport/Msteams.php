@@ -42,8 +42,8 @@ class Msteams extends Transport
         "items": [
           {
             "type": "TextBlock",
-            "text": "'. $alert_data['title'] .'",
-            "color": "'. $translate_color .'",
+            "text": "' . $alert_data['title'] . '",
+            "color": "' . $translate_color . '",
             "weight": "bolder",
             "size": "medium"
           }
@@ -54,7 +54,7 @@ class Msteams extends Transport
         "items": [
           {
             "type": "TextBlock",
-            "text": "'. strip_tags($alert_data['msg'], '<strong><em><h1><h2><h3><strike><ul><ol><li><pre><blockquote><a><img><p>') .'",
+            "text": "' . strip_tags($alert_data['msg'], '<strong><em><h1><h2><h3><strike><ul><ol><li><pre><blockquote><a><img><p>') . '",
             "wrap": true
           }
         ]
@@ -74,7 +74,7 @@ class Msteams extends Transport
             return true;
         }
 
-        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $data['text'], $data);
+        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $data, $data);
     }
 
     public static function configTemplate(): array
