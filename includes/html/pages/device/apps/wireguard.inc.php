@@ -24,7 +24,7 @@ $label =
     (! isset($vars['wg_page']) && ! isset($vars['interface']))
             ? '<span class="pagemenu-selected">All Interfaces</span>'
             : 'All Interfaces';
-    echo generate_link($label, $link_array);
+echo generate_link($label, $link_array);
 if (count($returned_data) > 0) {
     echo ' | ';
     $label =
