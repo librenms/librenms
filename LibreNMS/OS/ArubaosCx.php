@@ -48,14 +48,14 @@ class ArubaosCx extends \LibreNMS\OS implements NacPolling
                     'username' => '',
                     'timeout' => '',
                 ];
-                $rowSet[$macKey]['authc_status'] = $macEntry['arubaWiredPacAuthState'];
+                $rowSet[$macKey]['authc_status'] = $macEntry['arubaWiredPacAuthState'] ?? '';
                 $rowSet[$macKey]['mac_address'] = $macKey;
-                $rowSet[$macKey]['authz_by'] = $macEntry['arubaWiredPacOnboardedMethods'];
-                $rowSet[$macKey]['username'] = $macEntry['arubaWiredPacUserName'];
-                $rowSet[$macKey]['vlan'] = $macEntry['arubaWiredPacVlanId'];
+                $rowSet[$macKey]['authz_by'] = $macEntry['arubaWiredPacOnboardedMethods'] ?? '';
+                $rowSet[$macKey]['username'] = $macEntry['arubaWiredPacUserName'] ?? '';
+                $rowSet[$macKey]['vlan'] = $macEntry['arubaWiredPacVlanId'] ?? '';
                 $rowSet[$macKey]['port_id'] = $ifIndex_map->get($ifIndex, 0);
                 $rowSet[$macKey]['auth_id'] = $ifIndex;
-                $rowSet[$macKey]['method'] = $macEntry['arubaWiredPacOnboardedMethods'];
+                $rowSet[$macKey]['method'] = $macEntry['arubaWiredPacOnboardedMethods'] ?? '';
             }
         }
         
