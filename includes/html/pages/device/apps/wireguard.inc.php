@@ -36,11 +36,30 @@ echo ' | Interfaces: ';
 $i = 0;
 foreach ($interface_client_map as $interface => $client_list) {
     $label =
-        $vars['interface'] == $interface
+        ($vars['interface'] == $interface && ! isset($vars['wg_page']))
             ? '<span class="pagemenu-selected">' . $interface . '</span>'
             : $interface;
 
     echo generate_link($label, $link_array, ['interface' => $interface]);
+
+    echo '(';
+
+    $label =
+        ($vars['interface'] == $interface && $vars['wg_page'] == 'peer_bw')
+            ? '<span class="pagemenu-selected">' . 'BW' . '</span>'
+            : 'BW';
+
+    echo generate_link($label, $link_array, ['interface' => $interface, 'wg_page' => 'peer_bw']);
+
+    echo ', ';
+
+    $label =
+        ($vars['interface'] == $interface && $vars['wg_page'] == 'peer_last')
+            ? '<span class="pagemenu-selected">' . 'Last' . '</span>'
+            : 'Last';
+    echo generate_link($label, $link_array, ['interface' => $interface, 'wg_page' => 'peer_last']);
+
+    echo ')';
 
     if ($i < count(array_keys($interface_client_map)) - 1) {
         echo ', ';
@@ -51,7 +70,7 @@ foreach ($interface_client_map as $interface => $client_list) {
 //
 if (isset($vars['interface']) && isset($interface_client_map[$vars['interface']])) {
     $i = 0;
-    echo '<br>Clients: ';
+    echo '<br>Peers: ';
     foreach ($interface_client_map[$vars['interface']] as $peer_key => $peer) {
         $label =
             $vars['client'] == $peer
@@ -200,6 +219,32 @@ if (isset($vars['wg_page']) and $vars['wg_page'] == 'details') {
             'description' => 'Total Wireguard Traffic',
         ],
     ];
+} elseif (isset($vars['interface']) && ! isset($vars['client']) && $vars['wg_page'] == 'peer_bw') {
+    $graphs = [
+        'interface_total' => [
+            'type' => 'wireguard_traffic',
+            'description' => 'Total Wireguard Traffic, ' . $vars['interface'],
+            'interface' => $vars['interface'],
+        ],
+    ];
+    foreach ($interface_client_map[$vars['interface']] as $peer_key => $peer) {
+        $graphs['peer_bw_' . $peer] = [
+            'type' => 'wireguard_traffic',
+            'description' => 'Peer Traffic, ' . $vars['interface'] . ' - ' . $peer,
+            'interface' => $vars['interface'],
+            'client' => $peer,
+        ];
+    }
+} elseif (isset($vars['interface']) && ! isset($vars['client']) && $vars['wg_page'] == 'peer_last') {
+    $graphs = [];
+    foreach ($interface_client_map[$vars['interface']] as $peer_key => $peer) {
+        $graphs['peer_last_' . $peer] = [
+            'type' => 'wireguard_time',
+            'description' => 'Peer Minutes Since Last Handshake , ' . $vars['interface'] . ' - ' . $peer,
+            'interface' => $vars['interface'],
+            'client' => $peer,
+        ];
+    }
 } elseif (isset($vars['interface']) && ! isset($vars['client'])) {
     $graphs = [
         'interface_total' => [
@@ -212,13 +257,13 @@ if (isset($vars['wg_page']) and $vars['wg_page'] == 'details') {
     $graphs = [
         'client_bw' => [
             'type' => 'wireguard_traffic',
-            'description' => 'Client Traffic, ' . $vars['interface'] . ' - ' . $vars['client'],
+            'description' => 'Peer Traffic, ' . $vars['interface'] . ' - ' . $vars['client'],
             'interface' => $vars['interface'],
             'client' => $vars['client'],
         ],
         'client_handshake' => [
             'type' => 'wireguard_time',
-            'description' => 'Client Minutes Since Last Handshake , ' . $vars['interface'] . ' - ' . $vars['client'],
+            'description' => 'Peer Minutes Since Last Handshake , ' . $vars['interface'] . ' - ' . $vars['client'],
             'interface' => $vars['interface'],
             'client' => $vars['client'],
         ],
