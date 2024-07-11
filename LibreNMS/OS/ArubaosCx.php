@@ -25,10 +25,7 @@ namespace LibreNMS\OS;
 
 use App\Models\PortsNac;
 use Illuminate\Support\Collection;
-use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Polling\NacPolling;
-use LibreNMS\Interfaces\Polling\OSPolling;
-use LibreNMS\RRD\RrdDefinition;
 use SnmpQuery;
 
 class ArubaosCx extends \LibreNMS\OS implements NacPolling
