@@ -24,15 +24,15 @@ $label =
     (! isset($vars['wg_page']) && ! isset($vars['interface']))
             ? '<span class="pagemenu-selected">All Interfaces</span>'
             : 'All Interfaces';
-if (count($returned_data) > 0) {
     echo generate_link($label, $link_array);
+if (count($returned_data) > 0) {
     echo ' | ';
     $label =
         $vars['wg_page'] == 'details'
         ? '<span class="pagemenu-selected">Details</span>'
         : 'Details';
+    echo generate_link($label, $link_array, ['wg_page' => 'details']);
 }
-echo generate_link($label, $link_array, ['wg_page' => 'details']);
 echo ' | Interfaces: ';
 
 // generate interface links on the host application page
