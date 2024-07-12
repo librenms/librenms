@@ -8,6 +8,19 @@ use LibreNMS\Util\IP;
 $peers = dbFetchRows('SELECT * FROM `bgpPeers` AS B LEFT JOIN `vrfs` AS V ON `B`.`vrf_id` = `V`.`vrf_id` WHERE `B`.`device_id` = ?', [$device['device_id']]);
 
 if (! empty($peers)) {
+    $intFields = [
+        'bgpPeerRemoteAs',
+        'bgpPeerLastErrorCode',
+        'bgpPeerLastErrorSubCode',
+        'bgpPeerIface',
+        'bgpPeerInUpdates',
+        'bgpPeerOutUpdates',
+        'bgpPeerInTotalMessages',
+        'bgpPeerOutTotalMessages',
+        'bgpPeerOutFsmEstablishedTime',
+        'bgpPeerInUpdateElapsedTime',
+    ];
+
     $generic = false;
     if ($device['os'] == 'junos') {
         $peer_data_check = snmpwalk_cache_long_oid($device, 'jnxBgpM2PeerIndex', '.1.3.6.1.4.1.2636.5.1.1.2.1.1.1.14', [], 'BGP4-V2-MIB-JUNIPER', 'junos');
@@ -421,7 +434,7 @@ if (! empty($peers)) {
                 $peer_data = [];
 
                 foreach ($oid_map as $source => $target) {
-                    $v = isset($peer_data_raw[$source]) ? $peer_data_raw[$source] : '';
+                    $v = isset($peer_data_raw[$source]) ? $peer_data_raw[$source] : (in_array($target, $intFields) ? 0 : '');
 
                     if (Str::contains($source, 'LocalAddr')) {
                         try {

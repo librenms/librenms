@@ -10749,5 +10749,107 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "entity-physical": {
+        "discovery": {
+            "entPhysical": [
+                {
+                    "entPhysicalIndex": 64,
+                    "entPhysicalDescr": "Stack",
+                    "entPhysicalClass": "stack",
+                    "entPhysicalName": "Stack",
+                    "entPhysicalHardwareRev": "",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "false",
+                    "entPhysicalModelName": "",
+                    "entPhysicalVendorType": "zeroDotZero.0",
+                    "entPhysicalSerialNum": "",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": -1,
+                    "entPhysicalMfgName": "",
+                    "ifIndex": null
+                },
+                {
+                    "entPhysicalIndex": 67108992,
+                    "entPhysicalDescr": "GS1900-48",
+                    "entPhysicalClass": "chassis",
+                    "entPhysicalName": "GS1900-48",
+                    "entPhysicalHardwareRev": "",
+                    "entPhysicalFirmwareRev": "2.0.0.59413",
+                    "entPhysicalSoftwareRev": "2.10.68857",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "false",
+                    "entPhysicalModelName": "GS1900-48",
+                    "entPhysicalVendorType": "zeroDotZero.0",
+                    "entPhysicalSerialNum": "S192L02000374",
+                    "entPhysicalContainedIn": 64,
+                    "entPhysicalParentRelPos": 1,
+                    "entPhysicalMfgName": "ZyXEL, Inc.",
+                    "ifIndex": null
+                },
+                {
+                    "entPhysicalIndex": 68157952,
+                    "entPhysicalDescr": "Slot",
+                    "entPhysicalClass": "container",
+                    "entPhysicalName": "Slot",
+                    "entPhysicalHardwareRev": "",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "false",
+                    "entPhysicalModelName": "",
+                    "entPhysicalVendorType": "zeroDotZero.0",
+                    "entPhysicalSerialNum": "",
+                    "entPhysicalContainedIn": 67108992,
+                    "entPhysicalParentRelPos": 1,
+                    "entPhysicalMfgName": "",
+                    "ifIndex": null
+                },
+                {
+                    "entPhysicalIndex": 68420352,
+                    "entPhysicalDescr": "GS1900-48",
+                    "entPhysicalClass": "module",
+                    "entPhysicalName": "GS1900-48",
+                    "entPhysicalHardwareRev": "",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "false",
+                    "entPhysicalModelName": "",
+                    "entPhysicalVendorType": "zeroDotZero.0",
+                    "entPhysicalSerialNum": "",
+                    "entPhysicalContainedIn": 68157952,
+                    "entPhysicalParentRelPos": 1,
+                    "entPhysicalMfgName": "",
+                    "ifIndex": null
+                },
+                {
+                    "entPhysicalIndex": 68424704,
+                    "entPhysicalDescr": "RTL8393M",
+                    "entPhysicalClass": "other",
+                    "entPhysicalName": "",
+                    "entPhysicalHardwareRev": "",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "false",
+                    "entPhysicalModelName": "",
+                    "entPhysicalVendorType": "zeroDotZero.0",
+                    "entPhysicalSerialNum": "",
+                    "entPhysicalContainedIn": 68420352,
+                    "entPhysicalParentRelPos": 1,
+                    "entPhysicalMfgName": "",
+                    "ifIndex": null
+                }
+            ]
+        },
+        "poller": "matches discovery"
     }
 }

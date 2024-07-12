@@ -788,5 +788,31 @@
                 }
             ]
         }
+    },
+    "entity-physical": {
+        "discovery": {
+            "entPhysical": [
+                {
+                    "entPhysicalIndex": 1,
+                    "entPhysicalDescr": "CloudVM Intel Corporation 440BX Desktop Reference Platform Intel Corporation",
+                    "entPhysicalClass": "other",
+                    "entPhysicalName": "vcsa.foobar.local",
+                    "entPhysicalHardwareRev": "N/A",
+                    "entPhysicalFirmwareRev": "6.00",
+                    "entPhysicalSoftwareRev": "4.19.115-1.ph3-",
+                    "entPhysicalAlias": "VMware, Inc. VMware, Inc.",
+                    "entPhysicalAssetID": "No Asset Tag",
+                    "entPhysicalIsFRU": "false",
+                    "entPhysicalModelName": "VMware Virtual Platform",
+                    "entPhysicalVendorType": "zeroDotZero.0",
+                    "entPhysicalSerialNum": "VMware-43 1c 58 a2 1c d4 34 54-7",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": -1,
+                    "entPhysicalMfgName": "VMware, Inc.",
+                    "ifIndex": null
+                }
+            ]
+        },
+        "poller": "matches discovery"
     }
 }

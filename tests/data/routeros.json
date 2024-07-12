@@ -3617,5 +3617,88 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "entity-physical": {
+        "discovery": {
+            "entPhysical": [
+                {
+                    "entPhysicalIndex": 65536,
+                    "entPhysicalDescr": "RouterOS 6.40.5 (stable) on RB952Ui-5ac2nD",
+                    "entPhysicalClass": "chassis",
+                    "entPhysicalName": "MIPS 24Kc V7.4",
+                    "entPhysicalHardwareRev": "",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "false",
+                    "entPhysicalModelName": "",
+                    "entPhysicalVendorType": "zeroDotZero",
+                    "entPhysicalSerialNum": "",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": -1,
+                    "entPhysicalMfgName": "",
+                    "ifIndex": null
+                },
+                {
+                    "entPhysicalIndex": 131073,
+                    "entPhysicalDescr": "Atheros Communications Inc. unknown device (rev: 0)",
+                    "entPhysicalClass": "unknown",
+                    "entPhysicalName": "00:00.0",
+                    "entPhysicalHardwareRev": "",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "false",
+                    "entPhysicalModelName": "0x0050",
+                    "entPhysicalVendorType": "zeroDotZero",
+                    "entPhysicalSerialNum": "",
+                    "entPhysicalContainedIn": 65536,
+                    "entPhysicalParentRelPos": -1,
+                    "entPhysicalMfgName": "0x168c",
+                    "ifIndex": null
+                },
+                {
+                    "entPhysicalIndex": 131074,
+                    "entPhysicalDescr": "Airgo Networks Inc unknown device (rev: 0)",
+                    "entPhysicalClass": "unknown",
+                    "entPhysicalName": "00:00.0",
+                    "entPhysicalHardwareRev": "",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "false",
+                    "entPhysicalModelName": "0x1001",
+                    "entPhysicalVendorType": "zeroDotZero",
+                    "entPhysicalSerialNum": "",
+                    "entPhysicalContainedIn": 65536,
+                    "entPhysicalParentRelPos": -1,
+                    "entPhysicalMfgName": "0x17cb",
+                    "ifIndex": null
+                },
+                {
+                    "entPhysicalIndex": 262145,
+                    "entPhysicalDescr": "Linux 3.3.5 ehci_hcd RB400 EHCI",
+                    "entPhysicalClass": "unknown",
+                    "entPhysicalName": "1:1",
+                    "entPhysicalHardwareRev": "",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "false",
+                    "entPhysicalModelName": "0x0002",
+                    "entPhysicalVendorType": "zeroDotZero",
+                    "entPhysicalSerialNum": "rb400_usb",
+                    "entPhysicalContainedIn": 65536,
+                    "entPhysicalParentRelPos": -1,
+                    "entPhysicalMfgName": "0x1d6b",
+                    "ifIndex": null
+                }
+            ]
+        },
+        "poller": "matches discovery"
     }
 }

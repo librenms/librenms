@@ -1973,5 +1973,31 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "entity-physical": {
+        "discovery": {
+            "entPhysical": [
+                {
+                    "entPhysicalIndex": 1,
+                    "entPhysicalDescr": "WAP371 Wireless-AC/N Dual Radio Access Point with Single Point Setup",
+                    "entPhysicalClass": "chassis",
+                    "entPhysicalName": "WAP371-A-K9",
+                    "entPhysicalHardwareRev": "V03",
+                    "entPhysicalFirmwareRev": "1.3.0.4",
+                    "entPhysicalSoftwareRev": "1.3.0.4",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "true",
+                    "entPhysicalModelName": "WAP371-A-K9",
+                    "entPhysicalVendorType": "zeroDotZero",
+                    "entPhysicalSerialNum": "CCQ22111GBS",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": -1,
+                    "entPhysicalMfgName": "Cisco Systems, Inc",
+                    "ifIndex": null
+                }
+            ]
+        },
+        "poller": "matches discovery"
     }
 }

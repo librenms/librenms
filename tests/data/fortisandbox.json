@@ -1274,5 +1274,31 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "entity-physical": {
+        "discovery": {
+            "entPhysical": [
+                {
+                    "entPhysicalIndex": 1,
+                    "entPhysicalDescr": "FortiSandbox FSA VM, HW Serial#: FSAVM00000000000",
+                    "entPhysicalClass": "chassis",
+                    "entPhysicalName": "FSA VM",
+                    "entPhysicalHardwareRev": "",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "FortiSandbox v3.1,build0124,130621",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "true",
+                    "entPhysicalModelName": "FSA VM",
+                    "entPhysicalVendorType": "enterprises.12356.20000.20000.0",
+                    "entPhysicalSerialNum": "FSAVM00000000000",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": -1,
+                    "entPhysicalMfgName": "FortiSandbox",
+                    "ifIndex": null
+                }
+            ]
+        },
+        "poller": "matches discovery"
     }
 }

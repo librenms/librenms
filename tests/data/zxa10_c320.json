@@ -2752,5 +2752,88 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "entity-physical": {
+        "discovery": {
+            "entPhysical": [
+                {
+                    "entPhysicalIndex": 1,
+                    "entPhysicalDescr": "C320 shelf",
+                    "entPhysicalClass": "container",
+                    "entPhysicalName": "",
+                    "entPhysicalHardwareRev": "",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "false",
+                    "entPhysicalModelName": "C320_SHELF",
+                    "entPhysicalVendorType": "",
+                    "entPhysicalSerialNum": "210108318193",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": -1,
+                    "entPhysicalMfgName": "ZTE",
+                    "ifIndex": null
+                },
+                {
+                    "entPhysicalIndex": 10,
+                    "entPhysicalDescr": "8 ports GPON OLT line card.",
+                    "entPhysicalClass": "chassis",
+                    "entPhysicalName": "",
+                    "entPhysicalHardwareRev": "140600",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "V2.1.0",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "true",
+                    "entPhysicalModelName": "GTGO",
+                    "entPhysicalVendorType": "",
+                    "entPhysicalSerialNum": "731946300021",
+                    "entPhysicalContainedIn": 1,
+                    "entPhysicalParentRelPos": 0,
+                    "entPhysicalMfgName": "ZTE",
+                    "ifIndex": null
+                },
+                {
+                    "entPhysicalIndex": 30,
+                    "entPhysicalDescr": "General Power Card.",
+                    "entPhysicalClass": "powerSupply",
+                    "entPhysicalName": "",
+                    "entPhysicalHardwareRev": "",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "V1.01",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "true",
+                    "entPhysicalModelName": "PRAM",
+                    "entPhysicalVendorType": "",
+                    "entPhysicalSerialNum": "734971900061",
+                    "entPhysicalContainedIn": 1,
+                    "entPhysicalParentRelPos": 2,
+                    "entPhysicalMfgName": "ZTE",
+                    "ifIndex": null
+                },
+                {
+                    "entPhysicalIndex": 40,
+                    "entPhysicalDescr": "Type A switch management card.",
+                    "entPhysicalClass": "chassis",
+                    "entPhysicalName": "",
+                    "entPhysicalHardwareRev": "131201",
+                    "entPhysicalFirmwareRev": "V2.1.0",
+                    "entPhysicalSoftwareRev": "V2.1.0",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "true",
+                    "entPhysicalModelName": "SMXA",
+                    "entPhysicalVendorType": "",
+                    "entPhysicalSerialNum": "734499700312",
+                    "entPhysicalContainedIn": 1,
+                    "entPhysicalParentRelPos": 3,
+                    "entPhysicalMfgName": "ZTE",
+                    "ifIndex": null
+                }
+            ]
+        },
+        "poller": "matches discovery"
     }
 }

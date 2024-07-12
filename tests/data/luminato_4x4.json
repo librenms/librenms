@@ -3525,5 +3525,88 @@
                 }
             ]
         }
+    },
+    "entity-physical": {
+        "discovery": {
+            "entPhysical": [
+                {
+                    "entPhysicalIndex": 1,
+                    "entPhysicalDescr": "LDM-C",
+                    "entPhysicalClass": "module",
+                    "entPhysicalName": "Slot1",
+                    "entPhysicalHardwareRev": "C10",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "true",
+                    "entPhysicalModelName": "LDM-C",
+                    "entPhysicalVendorType": "zeroDotZero",
+                    "entPhysicalSerialNum": "HK00362035",
+                    "entPhysicalContainedIn": 10,
+                    "entPhysicalParentRelPos": 1,
+                    "entPhysicalMfgName": "Teleste",
+                    "ifIndex": null
+                },
+                {
+                    "entPhysicalIndex": 2,
+                    "entPhysicalDescr": "LDM-C",
+                    "entPhysicalClass": "module",
+                    "entPhysicalName": "Slot2",
+                    "entPhysicalHardwareRev": "C10",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "true",
+                    "entPhysicalModelName": "LDM-C",
+                    "entPhysicalVendorType": "zeroDotZero",
+                    "entPhysicalSerialNum": "HK00552112",
+                    "entPhysicalContainedIn": 10,
+                    "entPhysicalParentRelPos": 2,
+                    "entPhysicalMfgName": "Teleste",
+                    "ifIndex": null
+                },
+                {
+                    "entPhysicalIndex": 3,
+                    "entPhysicalDescr": "LDM-C",
+                    "entPhysicalClass": "module",
+                    "entPhysicalName": "Slot3",
+                    "entPhysicalHardwareRev": "C10",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "true",
+                    "entPhysicalModelName": "LDM-C",
+                    "entPhysicalVendorType": "zeroDotZero",
+                    "entPhysicalSerialNum": "HK00332035",
+                    "entPhysicalContainedIn": 10,
+                    "entPhysicalParentRelPos": 3,
+                    "entPhysicalMfgName": "Teleste",
+                    "ifIndex": null
+                },
+                {
+                    "entPhysicalIndex": 10,
+                    "entPhysicalDescr": "LMC-A",
+                    "entPhysicalClass": "chassis",
+                    "entPhysicalName": "Chassis",
+                    "entPhysicalHardwareRev": "B13",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "20.8.23",
+                    "entPhysicalAlias": "H1-Izbiste",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "true",
+                    "entPhysicalModelName": "LMC-A",
+                    "entPhysicalVendorType": "zeroDotZero",
+                    "entPhysicalSerialNum": "HK01672034",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": -1,
+                    "entPhysicalMfgName": "Teleste",
+                    "ifIndex": null
+                }
+            ]
+        },
+        "poller": "matches discovery"
     }
 }

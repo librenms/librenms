@@ -7021,5 +7021,31 @@
                 }
             ]
         }
+    },
+    "entity-physical": {
+        "discovery": {
+            "entPhysical": [
+                {
+                    "entPhysicalIndex": 1,
+                    "entPhysicalDescr": "Fibrolan, uFalcon-MX, SW: 7.4.35.4, SN: 708320030095",
+                    "entPhysicalClass": "chassis",
+                    "entPhysicalName": "<private>",
+                    "entPhysicalHardwareRev": "1.2.1.6.1",
+                    "entPhysicalFirmwareRev": "5.9.15",
+                    "entPhysicalSoftwareRev": "7.4.35.4",
+                    "entPhysicalAlias": "None",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "true",
+                    "entPhysicalModelName": "uFalcon-MX",
+                    "entPhysicalVendorType": "enterprises.4467.1000.350",
+                    "entPhysicalSerialNum": "708320030095",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": -1,
+                    "entPhysicalMfgName": "Fibrolan",
+                    "ifIndex": null
+                }
+            ]
+        },
+        "poller": "matches discovery"
     }
 }

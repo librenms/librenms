@@ -36,7 +36,7 @@ modules:
             - MOXA-EDSG512E-MIB::switchModel.0
             - MOXA-EDSG516E-MIB::switchModel.0
             - MOXA-EDSP506E-MIB::switchModel.0
-            - MOXA-EDSP510A8POE-MIB::switchModel
+            - MOXA-EDSP510A8POE-MIB::switchModel.0
             - MOXA-EDSG512E8POE-MIB::switchModel
         version:
             - MOXA-IKS6726A-MIB::firmwareVersion
@@ -44,7 +44,7 @@ modules:
             - MOXA-EDSG512E-MIB::firmwareVersion.0
             - MOXA-EDSG516E-MIB::firmwareVersion.0
             - MOXA-EDSP506E-MIB::firmwareVersion.0
-            - MOXA-EDSP510A8POE-MIB::firmwareVersion
+            - MOXA-EDSP510A8POE-MIB::firmwareVersion.0
             - MOXA-EDSG512E8POE-MIB::firmwareVersion
         serial:
             - MOXA-EDSG508E-MIB::serialNumber
@@ -320,4 +320,3 @@ modules:
                     states:
                         - { value:  0, generic: 2, graph: 0, descr: not present }
                         - { value:  1, generic: 0, graph: 0, descr: present }
-

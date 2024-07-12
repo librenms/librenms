@@ -2299,5 +2299,88 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "entity-physical": {
+        "discovery": {
+            "entPhysical": [
+                {
+                    "entPhysicalIndex": 40100,
+                    "entPhysicalDescr": "1xge-3x10ge-radio-channel-single",
+                    "entPhysicalClass": "module",
+                    "entPhysicalName": "MINI-LINK 6352 80/21H",
+                    "entPhysicalHardwareRev": "R2A",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "CXP9026371/3 R15A411",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "true",
+                    "entPhysicalModelName": "UKL 501 57/21H",
+                    "entPhysicalVendorType": "zeroDotZero",
+                    "entPhysicalSerialNum": "CR9P103835",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": 0,
+                    "entPhysicalMfgName": "",
+                    "ifIndex": null
+                },
+                {
+                    "entPhysicalIndex": 60100,
+                    "entPhysicalDescr": "",
+                    "entPhysicalClass": "module",
+                    "entPhysicalName": "Removable Memory Module",
+                    "entPhysicalHardwareRev": "R2A",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "true",
+                    "entPhysicalModelName": "RYS 110 243/1",
+                    "entPhysicalVendorType": "zeroDotZero",
+                    "entPhysicalSerialNum": "BS82000242",
+                    "entPhysicalContainedIn": 40100,
+                    "entPhysicalParentRelPos": 0,
+                    "entPhysicalMfgName": "",
+                    "ifIndex": null
+                },
+                {
+                    "entPhysicalIndex": 70102,
+                    "entPhysicalDescr": "1000base-lx-10",
+                    "entPhysicalClass": "module",
+                    "entPhysicalName": "LC",
+                    "entPhysicalHardwareRev": "0000",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "true",
+                    "entPhysicalModelName": "SFP LX",
+                    "entPhysicalVendorType": "zeroDotZero",
+                    "entPhysicalSerialNum": "",
+                    "entPhysicalContainedIn": 40100,
+                    "entPhysicalParentRelPos": 0,
+                    "entPhysicalMfgName": "Optech",
+                    "ifIndex": null
+                },
+                {
+                    "entPhysicalIndex": 80100,
+                    "entPhysicalDescr": "Wi-Fi Adapter -> NOT AVAILABLE",
+                    "entPhysicalClass": "module",
+                    "entPhysicalName": "Wi-Fi Adapter -> NOT AVAILABLE",
+                    "entPhysicalHardwareRev": "UNKNOWN",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "UNKNOWN",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "true",
+                    "entPhysicalModelName": "UNKNOWN",
+                    "entPhysicalVendorType": "zeroDotZero",
+                    "entPhysicalSerialNum": "UNKNOWN",
+                    "entPhysicalContainedIn": 40100,
+                    "entPhysicalParentRelPos": 0,
+                    "entPhysicalMfgName": "",
+                    "ifIndex": null
+                }
+            ]
+        },
+        "poller": "matches discovery"
     }
 }

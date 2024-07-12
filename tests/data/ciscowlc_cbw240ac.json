@@ -689,5 +689,107 @@
                 }
             ]
         }
+    },
+    "entity-physical": {
+        "discovery": {
+            "entPhysical": [
+                {
+                    "entPhysicalIndex": 1,
+                    "entPhysicalDescr": "Cisco Business Wireless 240AC Access Point",
+                    "entPhysicalClass": "",
+                    "entPhysicalName": "Cisco Business Wireless",
+                    "entPhysicalHardwareRev": "V01",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "10.7.1.0",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "",
+                    "entPhysicalModelName": "CBW240AC-B",
+                    "entPhysicalVendorType": "",
+                    "entPhysicalSerialNum": "PSZ00000000",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": -1,
+                    "entPhysicalMfgName": "",
+                    "ifIndex": null
+                },
+                {
+                    "entPhysicalIndex": 8,
+                    "entPhysicalDescr": "Cisco Business 200AC Series (IEEE 802.11ac) Access Point",
+                    "entPhysicalClass": "",
+                    "entPhysicalName": "CBW240",
+                    "entPhysicalHardwareRev": "V01",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "10.7.1.0",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "",
+                    "entPhysicalModelName": "CBW240AC-B",
+                    "entPhysicalVendorType": "",
+                    "entPhysicalSerialNum": "PSZ00000001",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": -1,
+                    "entPhysicalMfgName": "",
+                    "ifIndex": null
+                },
+                {
+                    "entPhysicalIndex": 24,
+                    "entPhysicalDescr": "Cisco Business 200AC Series (IEEE 802.11ac) Access Point",
+                    "entPhysicalClass": "",
+                    "entPhysicalName": "CBW240",
+                    "entPhysicalHardwareRev": "V01",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "10.7.1.0",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "",
+                    "entPhysicalModelName": "CBW240AC-B",
+                    "entPhysicalVendorType": "",
+                    "entPhysicalSerialNum": "PSZ00000002",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": -1,
+                    "entPhysicalMfgName": "",
+                    "ifIndex": null
+                },
+                {
+                    "entPhysicalIndex": 32,
+                    "entPhysicalDescr": "Cisco Business 200AC Series (IEEE 802.11ac) Access Point",
+                    "entPhysicalClass": "",
+                    "entPhysicalName": "CBW240",
+                    "entPhysicalHardwareRev": "V01",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "10.7.1.0",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "",
+                    "entPhysicalModelName": "CBW240AC-B",
+                    "entPhysicalVendorType": "",
+                    "entPhysicalSerialNum": "PSZ00000003",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": -1,
+                    "entPhysicalMfgName": "",
+                    "ifIndex": null
+                },
+                {
+                    "entPhysicalIndex": 48,
+                    "entPhysicalDescr": "Cisco Business 100AC Series (IEEE 802.11ac) Access Point",
+                    "entPhysicalClass": "",
+                    "entPhysicalName": "CBW140",
+                    "entPhysicalHardwareRev": "V01",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "10.7.1.0",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "",
+                    "entPhysicalModelName": "CBW142ACM-B-NA",
+                    "entPhysicalVendorType": "",
+                    "entPhysicalSerialNum": "KWC00000004",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": -1,
+                    "entPhysicalMfgName": "",
+                    "ifIndex": null
+                }
+            ]
+        },
+        "poller": "matches discovery"
     }
 }

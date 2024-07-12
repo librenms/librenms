@@ -30,7 +30,7 @@ class EltexMes23xx extends OS
     /**
      * Specific HexToString for Eltex
      */
-    public function normData(string $par = ''): string
+    public static function normData(string $par = ''): string
     {
         $tmp = str_replace([':', ' '], '', trim(strtoupper($par)));
         $ret = preg_match('/^[0-9A-F]+$/', $tmp) ? hex2str($tmp) : $par; //if string is pure hex, convert to ascii

@@ -3339,5 +3339,31 @@
                 }
             ]
         }
+    },
+    "entity-physical": {
+        "discovery": {
+            "entPhysical": [
+                {
+                    "entPhysicalIndex": 1,
+                    "entPhysicalDescr": "Cisco Application Deployment Engine",
+                    "entPhysicalClass": "other",
+                    "entPhysicalName": "",
+                    "entPhysicalHardwareRev": "V01",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "Cisco ADE-OS 3.0",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "0",
+                    "entPhysicalModelName": "ISE-VM-K9",
+                    "entPhysicalVendorType": "zeroDotZero.0",
+                    "entPhysicalSerialNum": "Fxxxx8MB3DB",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": -1,
+                    "entPhysicalMfgName": "Cisco Systems Inc.",
+                    "ifIndex": null
+                }
+            ]
+        },
+        "poller": "matches discovery"
     }
 }

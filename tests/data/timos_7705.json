@@ -8709,5 +8709,50 @@
                 }
             ]
         }
+    },
+    "entity-physical": {
+        "discovery": {
+            "entPhysical": [
+                {
+                    "entPhysicalIndex": 2,
+                    "entPhysicalDescr": "7705 IOM",
+                    "entPhysicalClass": "",
+                    "entPhysicalName": "iom-sar",
+                    "entPhysicalHardwareRev": "1.0",
+                    "entPhysicalFirmwareRev": null,
+                    "entPhysicalSoftwareRev": null,
+                    "entPhysicalAlias": null,
+                    "entPhysicalAssetID": null,
+                    "entPhysicalIsFRU": null,
+                    "entPhysicalModelName": "",
+                    "entPhysicalVendorType": "iom-sar",
+                    "entPhysicalSerialNum": "",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": 0,
+                    "entPhysicalMfgName": "",
+                    "ifIndex": null
+                },
+                {
+                    "entPhysicalIndex": 6,
+                    "entPhysicalDescr": "1g/10g 7705 SAR-8 CSM",
+                    "entPhysicalClass": "",
+                    "entPhysicalName": "csmv2-10g",
+                    "entPhysicalHardwareRev": "1.0",
+                    "entPhysicalFirmwareRev": null,
+                    "entPhysicalSoftwareRev": null,
+                    "entPhysicalAlias": null,
+                    "entPhysicalAssetID": null,
+                    "entPhysicalIsFRU": null,
+                    "entPhysicalModelName": "",
+                    "entPhysicalVendorType": "csmv2-10g",
+                    "entPhysicalSerialNum": "",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": 0,
+                    "entPhysicalMfgName": "",
+                    "ifIndex": null
+                }
+            ]
+        },
+        "poller": "matches discovery"
     }
 }
