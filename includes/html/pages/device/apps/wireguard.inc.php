@@ -303,7 +303,7 @@ if (isset($vars['wg_page']) and $vars['wg_page'] == 'details') {
                     }
                 }
             }
-            $peer['pubkey'] = generate_link($peer['pubkey'], $link_array, ['interface' => $returned_data_key, 'client' => $interface_key]);
+            $peer['pubkey'] = generate_link(htmlspecialchars($peer['pubkey']), $link_array, ['interface' => $returned_data_key, 'client' => $interface_key]);
             $row = [
                 ['data' => $name, 'raw' => $name_raw],
                 ['data' => $interface_info, 'raw' => $interface_info_raw],
