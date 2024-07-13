@@ -19,10 +19,6 @@ bgp-peers:
         - { left: bgpPeers.vrf_id, right: vrfs.vrf_id, select: [vrfs.bgpLocalAs as vrfLocalAs] }
     bgpPeers_cbgp:
         excluded_fields: [device_id]
-entity-physical:
-    entPhysical:
-        excluded_fields: [device_id, entPhysical_id]
-        order_by: entPhysicalIndex
 fdb-table:
     ports_fdb:
         excluded_fields: [device_id, ports_fdb_id, port_id, vlan_id, created_at, updated_at]

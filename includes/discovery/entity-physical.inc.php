@@ -1,7 +1,14 @@
 <?php
 
 use LibreNMS\Config;
+use LibreNMS\OS;
 
+if (! $os instanceof OS) {
+    $os = OS::make($device);
+}
+(new \LibreNMS\Modules\EntityPhysical())->discover($os);
+
+return;
 if (Config::get('enable_inventory')) {
     // Legacy entPhysical - junos/timos/cisco
     include 'includes/discovery/entity-physical/entity-physical.inc.php';
