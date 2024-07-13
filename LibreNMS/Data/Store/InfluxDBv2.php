@@ -27,11 +27,11 @@
 namespace LibreNMS\Data\Store;
 
 use App\Polling\Measure\Measurement;
+use App\Models\Device;
 use InfluxDB2\Client;
 use InfluxDB2\Model\WritePrecision;
 use InfluxDB2\Point;
 use LibreNMS\Config;
-use LibreNMS\Util\IP;
 use Log;
 
 class InfluxDBv2 extends BaseDatastore
@@ -63,11 +63,14 @@ class InfluxDBv2 extends BaseDatastore
      */
     public function put($device, $measurement, $tags, $fields)
     {
-        // Transform $device['ip'] to be ingestable by inNetworks
-        $ip = IP::parse($device['ip']);
-
-        if ($ip->inNetworks(Config::get('influxdbv2.nets-exclude'))) {
-            return;
+        $device_data = Device::find($device['device_id']);
+        $device_groups = $device_data->groups;
+        foreach ($device_groups as $group) {
+            // The group name will always be parsed as lowercase, even when uppercase in the GUI.
+            if (in_array(strtoupper($group->name), array_map('strtoupper', Config::get('influxdbv2.groups-exclude')))) {
+                Log::warning("Skipped parsing to InfluxDBv2, device is in group: " . $group->name);
+                return;
+            }
         }
 
         $stat = Measurement::start('write');
