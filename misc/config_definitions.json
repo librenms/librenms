@@ -4129,7 +4129,7 @@
             "section": "influxdbv2",
             "order": 8
         },
-        "influxdbv2.nets-exclude": {
+        "influxdbv2.groups-exclude": {
             "group": "poller",
             "section": "influxdbv2",
             "order": 9,
