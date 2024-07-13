@@ -26,8 +26,8 @@
 
 namespace LibreNMS\Data\Store;
 
-use App\Polling\Measure\Measurement;
 use App\Models\Device;
+use App\Polling\Measure\Measurement;
 use InfluxDB2\Client;
 use InfluxDB2\Model\WritePrecision;
 use InfluxDB2\Point;
@@ -69,6 +69,7 @@ class InfluxDBv2 extends BaseDatastore
             // The group name will always be parsed as lowercase, even when uppercase in the GUI.
             if (in_array(strtoupper($group->name), array_map('strtoupper', Config::get('influxdbv2.groups-exclude')))) {
                 Log::warning("Skipped parsing to InfluxDBv2, device is in group: " . $group->name);
+
                 return;
             }
         }
