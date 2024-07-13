@@ -982,9 +982,9 @@ return [
                 'description' => 'Debug',
                 'help' => 'To enable or disable verbose output to CLI',
             ],
-            'nets-exclude' => [
-                'description' => 'Excluded networks',
-                'help' => 'Networks excluded from sending data to InfluxDBv2',
+            'groups-exclude' => [
+                'description' => 'Excluded device groups',
+                'help' => 'Device groups excluded from sending data to InfluxDBv2',
             ],
         ],
         'ipmitool' => [
