@@ -40,7 +40,7 @@ continue to function as normal.
     lnms config:set influxdbv2.allow_redirect true
     lmns config:set influxdbv2.organization 'librenms'
     lmns config:set influxdbv2.debug false
-    lmns config:set influxdbv2.nets-exclude ["10.10.10.10/24","20.20.20.20/32"]
+    lmns config:set influxdbv2.groups-exclude ["group_name_1","group_name_2"]
     ```
 
 The same data stored within rrd will be sent to InfluxDB and
