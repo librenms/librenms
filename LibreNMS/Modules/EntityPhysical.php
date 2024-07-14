@@ -7,6 +7,7 @@ use App\Models\EntPhysical;
 use App\Observers\ModuleModelObserver;
 use LibreNMS\DB\SyncsModels;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
+use LibreNMS\Interfaces\Discovery\EntityPhysicalDiscovery;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
 use LibreNMS\Polling\ModuleStatus;
@@ -44,29 +45,11 @@ class EntityPhysical implements Module
      */
     public function discover(OS $os): void
     {
-        $data = \SnmpQuery::hideMib()->enumStrings()
-            ->mibs(['CISCO-ENTITY-VENDORTYPE-OID-MIB'])
-            ->walk('ENTITY-MIB::entPhysicalTable');
-
-        if (! $data->isValid()) {
+        if (! $os instanceof EntityPhysicalDiscovery) {
             return;
         }
 
-        $mapping = \SnmpQuery::walk('ENTITY-MIB::entAliasMappingIdentifier')->table(2);
-
-        $inventory = $data->mapTable(function ($data, $entityPhysicalIndex) use ($mapping) {
-            $entityPhysical = new EntPhysical($data);
-            $entityPhysical->entPhysicalIndex = $entityPhysicalIndex;
-
-            // fill ifIndex
-            if (isset($mapping[$entityPhysicalIndex][0]['ENTITY-MIB::entAliasMappingIdentifier'])) {
-                if (preg_match('/IF-MIB::ifIndex\[(\d+)]/', $mapping[$entityPhysicalIndex][0]['ENTITY-MIB::entAliasMappingIdentifier'], $matches)) {
-                    $entityPhysical->ifIndex = $matches[1];
-                }
-            }
-
-            return $entityPhysical;
-        });
+        $inventory = $os->discoverEntityPhysical();
 
         ModuleModelObserver::observe(EntPhysical::class);
         $this->syncModels($os->getDevice(), 'entityPhysical', $inventory);
