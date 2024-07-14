@@ -64,13 +64,17 @@ class InfluxDBv2 extends BaseDatastore
     public function put($device, $measurement, $tags, $fields)
     {
         $device_data = DeviceCache::get($device['device_id']);
-        $device_groups = $device_data->groups;
-        foreach ($device_groups as $group) {
-            // The group name will always be parsed as lowercase, even when uppercase in the GUI.
-            if (in_array(strtoupper($group->name), array_map('strtoupper', Config::get('influxdbv2.groups-exclude')))) {
-                Log::warning('Skipped parsing to InfluxDBv2, device is in group: ' . $group->name);
+        $excluded_groups = Config::get('influxdbv2.groups-exclude');
 
-                return;
+        if (! empty($excluded_groups)) {
+            $device_groups = $device_data->groups;
+            foreach ($device_groups as $group) {
+                // The group name will always be parsed as lowercase, even when uppercase in the GUI.
+                if (in_array(strtoupper($group->name), array_map('strtoupper', $excluded_groups))) {
+                    Log::warning('Skipped parsing to InfluxDBv2, device is in group: ' . $group->name);
+    
+                    return;
+                }
             }
         }
 
