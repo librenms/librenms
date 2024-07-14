@@ -11081,7 +11081,7 @@
                 {
                     "entPhysicalIndex": 2110,
                     "entPhysicalDescr": "Power Supply 0 @ 0/0/*",
-                    "entPhysicalClass": "",
+                    "entPhysicalClass": null,
                     "entPhysicalName": "Power Supply 0 @ 0/0/*",
                     "entPhysicalHardwareRev": "REV 04",
                     "entPhysicalFirmwareRev": null,
@@ -11100,7 +11100,7 @@
                 {
                     "entPhysicalIndex": 2120,
                     "entPhysicalDescr": "Power Supply 1 @ 0/1/*",
-                    "entPhysicalClass": "",
+                    "entPhysicalClass": null,
                     "entPhysicalName": "Power Supply 1 @ 0/1/*",
                     "entPhysicalHardwareRev": "REV 04",
                     "entPhysicalFirmwareRev": null,
@@ -11119,7 +11119,7 @@
                 {
                     "entPhysicalIndex": 4110,
                     "entPhysicalDescr": "Fan Tray 0 @ 0/0/*",
-                    "entPhysicalClass": "",
+                    "entPhysicalClass": null,
                     "entPhysicalName": "Fan Tray 0 @ 0/0/*",
                     "entPhysicalHardwareRev": "",
                     "entPhysicalFirmwareRev": null,
@@ -11138,7 +11138,7 @@
                 {
                     "entPhysicalIndex": 4120,
                     "entPhysicalDescr": "Fan Tray 1 @ 0/1/*",
-                    "entPhysicalClass": "",
+                    "entPhysicalClass": null,
                     "entPhysicalName": "Fan Tray 1 @ 0/1/*",
                     "entPhysicalHardwareRev": "",
                     "entPhysicalFirmwareRev": null,
@@ -11157,7 +11157,7 @@
                 {
                     "entPhysicalIndex": 4130,
                     "entPhysicalDescr": "Fan Tray 2 @ 0/2/*",
-                    "entPhysicalClass": "",
+                    "entPhysicalClass": null,
                     "entPhysicalName": "Fan Tray 2 @ 0/2/*",
                     "entPhysicalHardwareRev": "",
                     "entPhysicalFirmwareRev": null,
@@ -11176,7 +11176,7 @@
                 {
                     "entPhysicalIndex": 4140,
                     "entPhysicalDescr": "Fan Tray 3 @ 0/3/*",
-                    "entPhysicalClass": "",
+                    "entPhysicalClass": null,
                     "entPhysicalName": "Fan Tray 3 @ 0/3/*",
                     "entPhysicalHardwareRev": "",
                     "entPhysicalFirmwareRev": null,
@@ -11195,7 +11195,7 @@
                 {
                     "entPhysicalIndex": 4150,
                     "entPhysicalDescr": "Fan Tray 4 @ 0/4/*",
-                    "entPhysicalClass": "",
+                    "entPhysicalClass": null,
                     "entPhysicalName": "Fan Tray 4 @ 0/4/*",
                     "entPhysicalHardwareRev": "",
                     "entPhysicalFirmwareRev": null,
@@ -11214,7 +11214,7 @@
                 {
                     "entPhysicalIndex": 7100,
                     "entPhysicalDescr": "FPC: QFX5100-48S-6Q @ 0/*/*",
-                    "entPhysicalClass": "",
+                    "entPhysicalClass": null,
                     "entPhysicalName": "FPC: QFX5100-48S-6Q @ 0/*/*",
                     "entPhysicalHardwareRev": "REV 09",
                     "entPhysicalFirmwareRev": null,
@@ -11233,7 +11233,7 @@
                 {
                     "entPhysicalIndex": 8110,
                     "entPhysicalDescr": "PIC: 48x10G-6x40G @ 0/0/*",
-                    "entPhysicalClass": "",
+                    "entPhysicalClass": null,
                     "entPhysicalName": "PIC: 48x10G-6x40G @ 0/0/*",
                     "entPhysicalHardwareRev": "",
                     "entPhysicalFirmwareRev": null,
@@ -11252,7 +11252,7 @@
                 {
                     "entPhysicalIndex": 9100,
                     "entPhysicalDescr": "Routing Engine 0",
-                    "entPhysicalClass": "",
+                    "entPhysicalClass": null,
                     "entPhysicalName": "Routing Engine 0",
                     "entPhysicalHardwareRev": "",
                     "entPhysicalFirmwareRev": null,

@@ -15783,7 +15783,7 @@
                     "entPhysicalIsFRU": "true",
                     "entPhysicalModelName": "NTK809XA",
                     "entPhysicalVendorType": "",
-                    "entPhysicalSerialNum": "",
+                    "entPhysicalSerialNum": null,
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "Ciena",
