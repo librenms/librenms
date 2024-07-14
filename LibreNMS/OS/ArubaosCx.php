@@ -58,12 +58,12 @@ class ArubaosCx extends \LibreNMS\OS implements NacPolling
                 $rowSet[$macKey]['method'] = $macEntry['arubaWiredPacOnboardedMethods'] ?? '';
             }
         }
-        
+
         foreach ($rowSet as $row) {
             var_dump($row);
             $nac->put($row['mac_address'], new PortsNac($row));
         }
-        
+
         return $nac;
     }
 }
