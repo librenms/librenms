@@ -26,7 +26,7 @@
 
 namespace LibreNMS\Data\Store;
 
-use App\Models\Device;
+use App\Facades\DeviceCache;
 use App\Polling\Measure\Measurement;
 use InfluxDB2\Client;
 use InfluxDB2\Model\WritePrecision;
@@ -63,7 +63,7 @@ class InfluxDBv2 extends BaseDatastore
      */
     public function put($device, $measurement, $tags, $fields)
     {
-        $device_data = Device::find($device['device_id']);
+        $device_data = DeviceCache::get($device['device_id']);
         $device_groups = $device_data->groups;
         foreach ($device_groups as $group) {
             // The group name will always be parsed as lowercase, even when uppercase in the GUI.
