@@ -198,7 +198,7 @@ class Sensor implements DiscoveryModule, PollerModule
             'WHERE `device_id`=? AND `sensor_class`=? AND `sensor_type`=? AND `sensor_index`=?',
             [$this->device_id, $this->type, $this->subtype, $this->index]
         );
-        $this->sensor_id = $sensor['sensor_id'];
+        $this->sensor_id = $sensor['sensor_id'] ?? null;
 
         return $sensor;
     }
