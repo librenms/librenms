@@ -536,8 +536,8 @@ custom_maps:
     - { Field: created_at, Type: timestamp, 'Null': true, Extra: '' }
     - { Field: updated_at, Type: timestamp, 'Null': true, Extra: '' }
     - { Field: menu_group, Type: varchar(100), 'Null': true, Extra: '' }
-UpdUpdate    - { Field: background_type, Type: varchar(16), 'Null': false, Extra: '', Default: none }
-    - { Field: background_data, Type: text, 'Null': true, Extra: '' }
+    - { Field: background_type, Type: varchar(16), 'Null': false, Extra: '', Default: 'none' }
+    - { Field: background_data, Type: 'text', 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [custom_map_id], Unique: true, Type: BTREE }
 custom_map_backgrounds:
