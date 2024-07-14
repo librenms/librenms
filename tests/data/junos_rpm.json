@@ -13206,7 +13206,7 @@
                 {
                     "entPhysicalIndex": 1100,
                     "entPhysicalDescr": "midplane",
-                    "entPhysicalClass": "",
+                    "entPhysicalClass": null,
                     "entPhysicalName": "midplane",
                     "entPhysicalHardwareRev": "REV 56",
                     "entPhysicalFirmwareRev": null,
@@ -13225,7 +13225,7 @@
                 {
                     "entPhysicalIndex": 2100,
                     "entPhysicalDescr": "PEM 0",
-                    "entPhysicalClass": "",
+                    "entPhysicalClass": null,
                     "entPhysicalName": "PEM 0",
                     "entPhysicalHardwareRev": "",
                     "entPhysicalFirmwareRev": null,
@@ -13244,7 +13244,7 @@
                 {
                     "entPhysicalIndex": 4100,
                     "entPhysicalDescr": "SRX240 PowerSupply fan 1",
-                    "entPhysicalClass": "",
+                    "entPhysicalClass": null,
                     "entPhysicalName": "SRX240 PowerSupply fan 1",
                     "entPhysicalHardwareRev": "",
                     "entPhysicalFirmwareRev": null,
@@ -13263,7 +13263,7 @@
                 {
                     "entPhysicalIndex": 4200,
                     "entPhysicalDescr": "SRX240 PowerSupply fan 2",
-                    "entPhysicalClass": "",
+                    "entPhysicalClass": null,
                     "entPhysicalName": "SRX240 PowerSupply fan 2",
                     "entPhysicalHardwareRev": "",
                     "entPhysicalFirmwareRev": null,
@@ -13282,7 +13282,7 @@
                 {
                     "entPhysicalIndex": 4300,
                     "entPhysicalDescr": "SRX240 CPU fan 1",
-                    "entPhysicalClass": "",
+                    "entPhysicalClass": null,
                     "entPhysicalName": "SRX240 CPU fan 1",
                     "entPhysicalHardwareRev": "",
                     "entPhysicalFirmwareRev": null,
@@ -13301,7 +13301,7 @@
                 {
                     "entPhysicalIndex": 4400,
                     "entPhysicalDescr": "SRX240 CPU fan 2",
-                    "entPhysicalClass": "",
+                    "entPhysicalClass": null,
                     "entPhysicalName": "SRX240 CPU fan 2",
                     "entPhysicalHardwareRev": "",
                     "entPhysicalFirmwareRev": null,
@@ -13320,7 +13320,7 @@
                 {
                     "entPhysicalIndex": 4500,
                     "entPhysicalDescr": "SRX240 IO  fan 1",
-                    "entPhysicalClass": "",
+                    "entPhysicalClass": null,
                     "entPhysicalName": "SRX240 IO  fan 1",
                     "entPhysicalHardwareRev": "",
                     "entPhysicalFirmwareRev": null,
@@ -13339,7 +13339,7 @@
                 {
                     "entPhysicalIndex": 4600,
                     "entPhysicalDescr": "SRX240 IO  fan 2",
-                    "entPhysicalClass": "",
+                    "entPhysicalClass": null,
                     "entPhysicalName": "SRX240 IO  fan 2",
                     "entPhysicalHardwareRev": "",
                     "entPhysicalFirmwareRev": null,
@@ -13358,7 +13358,7 @@
                 {
                     "entPhysicalIndex": 7100,
                     "entPhysicalDescr": "FPC: FPC @ 0/*/*",
-                    "entPhysicalClass": "",
+                    "entPhysicalClass": null,
                     "entPhysicalName": "FPC: FPC @ 0/*/*",
                     "entPhysicalHardwareRev": "",
                     "entPhysicalFirmwareRev": null,
@@ -13377,7 +13377,7 @@
                 {
                     "entPhysicalIndex": 8110,
                     "entPhysicalDescr": "PIC: 16x GE Base PIC @ 0/0/*",
-                    "entPhysicalClass": "",
+                    "entPhysicalClass": null,
                     "entPhysicalName": "PIC: 16x GE Base PIC @ 0/0/*",
                     "entPhysicalHardwareRev": "",
                     "entPhysicalFirmwareRev": null,
@@ -13396,7 +13396,7 @@
                 {
                     "entPhysicalIndex": 9100,
                     "entPhysicalDescr": "Routing Engine",
-                    "entPhysicalClass": "",
+                    "entPhysicalClass": null,
                     "entPhysicalName": "Routing Engine",
                     "entPhysicalHardwareRev": "REV 56",
                     "entPhysicalFirmwareRev": null,
@@ -13415,7 +13415,7 @@
                 {
                     "entPhysicalIndex": 9110,
                     "entPhysicalDescr": "USB Hub",
-                    "entPhysicalClass": "",
+                    "entPhysicalClass": null,
                     "entPhysicalName": "USB Hub",
                     "entPhysicalHardwareRev": "",
                     "entPhysicalFirmwareRev": null,

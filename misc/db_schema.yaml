@@ -778,21 +778,21 @@ entPhysical:
     - { Field: entPhysical_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
     - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: entPhysicalIndex, Type: int, 'Null': false, Extra: '' }
-    - { Field: entPhysicalDescr, Type: text, 'Null': false, Extra: '' }
-    - { Field: entPhysicalClass, Type: text, 'Null': false, Extra: '' }
-    - { Field: entPhysicalName, Type: text, 'Null': false, Extra: '' }
+    - { Field: entPhysicalDescr, Type: text, 'Null': true, Extra: '' }
+    - { Field: entPhysicalClass, Type: text, 'Null': true, Extra: '' }
+    - { Field: entPhysicalName, Type: text, 'Null': true, Extra: '' }
     - { Field: entPhysicalHardwareRev, Type: varchar(64), 'Null': true, Extra: '' }
     - { Field: entPhysicalFirmwareRev, Type: varchar(64), 'Null': true, Extra: '' }
     - { Field: entPhysicalSoftwareRev, Type: varchar(64), 'Null': true, Extra: '' }
     - { Field: entPhysicalAlias, Type: varchar(32), 'Null': true, Extra: '' }
     - { Field: entPhysicalAssetID, Type: varchar(32), 'Null': true, Extra: '' }
     - { Field: entPhysicalIsFRU, Type: varchar(8), 'Null': true, Extra: '' }
-    - { Field: entPhysicalModelName, Type: text, 'Null': false, Extra: '' }
+    - { Field: entPhysicalModelName, Type: text, 'Null': true, Extra: '' }
     - { Field: entPhysicalVendorType, Type: text, 'Null': true, Extra: '' }
-    - { Field: entPhysicalSerialNum, Type: text, 'Null': false, Extra: '' }
-    - { Field: entPhysicalContainedIn, Type: int, 'Null': false, Extra: '' }
-    - { Field: entPhysicalParentRelPos, Type: int, 'Null': false, Extra: '' }
-    - { Field: entPhysicalMfgName, Type: text, 'Null': false, Extra: '' }
+    - { Field: entPhysicalSerialNum, Type: text, 'Null': true, Extra: '' }
+    - { Field: entPhysicalContainedIn, Type: int, 'Null': false, Extra: '', Default: '0' }
+    - { Field: entPhysicalParentRelPos, Type: int, 'Null': false, Extra: '', Default: '-1' }
+    - { Field: entPhysicalMfgName, Type: text, 'Null': true, Extra: '' }
     - { Field: ifIndex, Type: int, 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [entPhysical_id], Unique: true, Type: BTREE }
