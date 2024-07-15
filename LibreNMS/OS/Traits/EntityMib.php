@@ -30,13 +30,15 @@ use Illuminate\Support\Collection;
 
 trait EntityMib
 {
+    protected ?string $entityVendorTypeMib = null;
+
     public function discoverEntityPhysical(): Collection
     {
-        $data = \SnmpQuery::hideMib()->enumStrings()
-            ->mibDir('cisco')
-            ->mibs(['CISCO-ENTITY-VENDORTYPE-OID-MIB'])
-            ->walk('ENTITY-MIB::entPhysicalTable');
-
+        $snmpQuery = \SnmpQuery::hideMib()->enumStrings();
+        if (isset($this->entityVendorTypeMib)) {
+            $snmpQuery = $snmpQuery->mibs([$this->entityVendorTypeMib]);
+        }
+        $data = $snmpQuery->walk('ENTITY-MIB::entPhysicalTable');
 
         if (! $data->isValid()) {
             return new Collection;

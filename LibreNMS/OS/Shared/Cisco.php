@@ -62,6 +62,13 @@ class Cisco extends OS implements
         OS\Traits\EntityMib::discoverEntityPhysical as discoverBaseEntityPhysical;
     }
 
+    protected function __construct(array &$device)
+    {
+        parent::__construct($device);
+
+        $this->entityVendorTypeMib = 'CISCO-ENTITY-VENDORTYPE-OID-MIB';
+    }
+
     public function discoverOS(Device $device): void
     {
         // yaml discovery overrides this
