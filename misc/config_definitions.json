@@ -1719,10 +1719,6 @@
             "default": false,
             "type": "boolean"
         },
-        "enable_port_relationship": {
-            "default": true,
-            "type": "boolean"
-        },
         "enable_ports_adsl": {
             "default": true,
             "type": "boolean"
@@ -4125,6 +4121,21 @@
             "group": "poller",
             "section": "influxdbv2",
             "order": 7
+        },
+        "influxdbv2.debug": {
+            "default": false,
+            "type": "boolean",
+            "group": "poller",
+            "section": "influxdbv2",
+            "order": 8
+        },
+        "influxdbv2.groups-exclude": {
+            "group": "poller",
+            "section": "influxdbv2",
+            "order": 9,
+            "type": "array",
+            "default": [
+            ]
         },
         "install_dir": {
             "type": "directory"

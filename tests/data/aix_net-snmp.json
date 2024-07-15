@@ -8,7 +8,7 @@
                     "sysDescr": "AIX testhost 1 7 <private>",
                     "sysContact": "<private>",
                     "version": "7.1",
-                    "hardware": "",
+                    "hardware": null,
                     "features": null,
                     "location": "<private>",
                     "os": "aix",

@@ -1886,33 +1886,5 @@
             ]
         },
         "poller": "matches discovery"
-    },
-    "discovery-protocols": {
-        "discovery": {
-            "links": [
-                {
-                    "active": 1,
-                    "protocol": "lldp",
-                    "remote_hostname": "Neighbour Hostname",
-                    "remote_port": "ACCESS PORT-1-1-1-5 (0080ea6dfdd0)",
-                    "remote_platform": null,
-                    "remote_version": "FSP150CC-GE114S.",
-                    "ifAlias": "Port Alias",
-                    "ifDescr": "eth-0-1",
-                    "ifName": "eth-0-1"
-                },
-                {
-                    "active": 1,
-                    "protocol": "lldp",
-                    "remote_hostname": "Switch Name",
-                    "remote_port": "Gig1/1/15 (0014d052a05d)",
-                    "remote_platform": null,
-                    "remote_version": "",
-                    "ifAlias": "Port Alias",
-                    "ifDescr": "eth-0-4",
-                    "ifName": "eth-0-4"
-                }
-            ]
-        }
     }
 }

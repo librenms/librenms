@@ -790,6 +790,8 @@ script it self at the top.
 
 ## FreeBSD NFS Client
 
+Superseded by the generalized NFS support.
+
 ### SNMP Extend
 
 1. Copy the shell script, fbsdnfsserver, to the desired host
@@ -814,6 +816,8 @@ the page. If it is not, please follow the steps set out under `SNMP
 Extend` heading top of page.
 
 ## FreeBSD NFS Server
+
+Superseded by the generalized NFS support.
 
 ### SNMP Extend
 
@@ -1578,7 +1582,62 @@ Extend` heading top of page.
 [Install the agent](Agent-Setup.md) on this device if it isn't already
 and copy the `nginx` script to `/usr/lib/check_mk_agent/local/`
 
-## NFS Server
+## NFS
+
+Provides both NFS client and server support.
+
+Currently supported OSes are as below.
+
+- FreeBSD
+- Linux
+
+### SNMPd extend
+
+1. Download the extend.
+```
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/nfs -O /etc/snmp/nfs
+```
+
+2. Make it executable.
+```
+chmod +x /etc/snmp/nfs
+```
+
+3. Add it to snmpd.conf.
+```
+extend nfs /usr/bin/env PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin /etc/snmp/nfs
+```
+
+4. Restart snmpd on your host
+
+5. Either wait for it to be rediscovered, rediscover it, or enable it.
+
+If using SELinux, the following is needed.
+
+1. `setsebool -P nis_enabled 1`
+
+2. Make a file (snmp_nfs.te) with the following contents and install
+   the policy with the command `semodule -i snmp_nfs.te`.
+```
+module snmp_nfs 1.0;
+
+require {
+        type mountd_port_t;
+        type snmpd_t;
+        type hi_reserved_port_t;
+        class tcp_socket { name_bind name_connect };
+        class udp_socket name_bind;
+}
+
+#============= snmpd_t ==============
+allow snmpd_t hi_reserved_port_t:tcp_socket name_bind;
+allow snmpd_t hi_reserved_port_t:udp_socket name_bind;
+allow snmpd_t mountd_port_t:tcp_socket name_connect;
+```
+
+## Linux NFS Server
+
+Superseded by the generalized NFS support.
 
 Export the NFS stats from as server.
 
@@ -1846,26 +1905,41 @@ using it as a agent.
 
 1. Copy the shell script, phpfpmsp, to the desired host
 ```
-wget https://github.com/librenms/librenms-agent/raw/master/snmp/phpfpmsp -O /etc/snmp/phpfpmsp
+wget https://github.com/librenms/librenms-agent/raw/master/snmp/php-fpm -O /etc/snmp/php-fpm
 ```
 
 2. Make the script executable
 ```
-chmod +x /etc/snmp/phpfpmsp
+chmod +x /etc/snmp/php-fpm
+```
+
+3. Install the depends.
+```shell
+# FreeBSD
+pkg install p5-File-Slurp p5-JSON p5-String-ShellQuote p5-MIME-Base64
+# Debian
+apt-get install libfile-slurp-perl libjson-perl libstring-shellquote-perl libmime-base64-perl
 ```
 
 3. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
 ```
-extend phpfpmsp /etc/snmp/phpfpmsp
+extend phpfpmsp /etc/snmp/php-fpm
 ```
 
-4. Edit /etc/snmp/phpfpmsp to include the status URL for the PHP-FPM
-   pool you are monitoring.
+5. Create the config file
+   `/usr/local/etc/php-fpm_extend.json`. Alternate locations may be
+   specified using the the `-f` switch. Akin to like below. For more
+   information, see `/etc/snmp/php-fpm --help`.
+```json
+{
+"pools":{
+         "thefrog": "https://thefrog/fpm-status",
+         "foobar": "https://foo.bar/fpm-status"
+    }
+}
+```
 
-5. Restart snmpd on your host
-
-It is worth noting that this only monitors a single pool. If you want
-to monitor multiple pools, this won't do it.
+6. Restart snmpd on the host
 
 The application should be auto-discovered as described at the top of
 the page. If it is not, please follow the steps set out under `SNMP
@@ -3417,35 +3491,52 @@ The Wireguard application polls the Wireguard service and scrapes all client sta
 
 1. Copy the python script, wireguard.py, to the desired host
 ```
-wget https://github.com/librenms/librenms-agent/raw/master/snmp/wireguard.py -O /etc/snmp/wireguard.py
+wget https://github.com/librenms/librenms-agent/raw/master/snmp/wireguard.pl -O /etc/snmp/wireguard.pl
 ```
 
-2. Make the script executable
+2. Install the depends.
 ```
-chmod +x /etc/snmp/wireguard.py
-```
-
-3. Edit your snmpd.conf file and add:
-```
-extend wireguard /etc/snmp/wireguard.py
+# FreeBSD
+pkg install p5-JSON p5-File-Slurp p5-MIME-Base64
+# Debian
+apt-get install libjson-perl libmime-base64-perl libfile-slurp-perl
 ```
 
-4. Create a /etc/snmp/wireguard.json file and specify:
-    1. (optional) "wg_cmd" - String path to the wg binary ["/usr/bin/wg"]
-    2. "public_key_to_arbitrary_name" - A dictionary to convert between the publickey assigned to the client (specified in the wireguard interface conf file) to an arbitrary, friendly name.  The friendly names MUST be unique within each interface.  Also note that the interface name and friendly names are used in the RRD filename, so using special characters is highly discouraged.
+3. Make the script executable
 ```
-{
-    "wg_cmd": "/bin/wg",
-    "public_key_to_arbitrary_name": {
-        "wg0": {
-            "z1iSIymFEFi/PS8rR19AFBle7O4tWowMWuFzHO7oRlE=": "client1",
-            "XqWJRE21Fw1ke47mH1yPg/lyWqCCfjkIXiS6JobuhTI=": "server.domain.com"
-        }
-    }
-}
+chmod +x /etc/snmp/wireguard.pl
 ```
 
-5. Restart snmpd.
+4. Edit your snmpd.conf file and add:
+```
+extend wireguard /etc/snmp/wireguard.pl
+```
+
+5. Create the optional config file,
+   `/usr/local/etc/wireguard_extend.json`.
+
+| key                          | default     | description                                                 |
+|------------------------------|-------------|-------------------------------------------------------------|
+| include_pubkey               | 0           | Include the pubkey with the return.                         |
+| use_short_hostname           | 1           | If the hostname should be shortened to just the first part. |
+| public_key_to_arbitrary_name | {}          | A hash of pubkeys to name mappings.                         |
+| pubkey_resolvers             | <see below> | Resolvers to use for the pubkeys.                           |
+
+The default for `pubkey_resolvers` is
+`config,endpoint_if_first_allowed_is_subnet_use_hosts,endpoint_if_first_allowed_is_subnet_use_ip,first_allowed_use_hosts,first_allowed_use_ip`.
+
+| resolver                                       | description                                                                                          |
+|------------------------------------------------|------------------------------------------------------------------------------------------------------|
+| config                                         | Use the mappings from `.public_key_to_arbitrary_name` .                                              |
+| endpoint_if_first_allowed_is_subnet_use_hosts  | If the first allowed IP is a subnet, see if a matching IP can be found in hosts for the endpoint.    |
+| endpoint_if_first_allowed_is_subnet_use_getent | If the first allowed IP is a subnet, see if a hit can be found for the endpoint IP via getent hosts. |
+| endpoint_if_first_allowed_is_subnet_use_ip     | If the first allowed IP is a subnet, use the endpoint IP for the name.                               |
+| first_allowed_use_hosts                        | See if a match can be found in hosts for the first allowed IP.                                       |
+| first_allowed_use_getent                       | Use getent hosts to see try to fetch a match for the first allowed IP.                               |
+| first_allowed_use_ip                           | Use the first allowed IP as the name.                                                                |
+
+
+6. Restart snmpd.
 
 ## ZFS
 

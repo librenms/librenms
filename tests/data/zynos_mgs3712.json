@@ -3288,55 +3288,5 @@
             ]
         },
         "poller": "matches discovery"
-    },
-    "discovery-protocols": {
-        "discovery": {
-            "links": [
-                {
-                    "active": 1,
-                    "protocol": "lldp",
-                    "remote_hostname": "<private>",
-                    "remote_port": "15",
-                    "remote_platform": null,
-                    "remote_version": "<private>",
-                    "ifAlias": "<private>",
-                    "ifDescr": "swp08",
-                    "ifName": "1/09"
-                },
-                {
-                    "active": 1,
-                    "protocol": "lldp",
-                    "remote_hostname": "<private>",
-                    "remote_port": "1",
-                    "remote_platform": null,
-                    "remote_version": "<private>",
-                    "ifAlias": "<private>",
-                    "ifDescr": "swp09",
-                    "ifName": "1/10"
-                },
-                {
-                    "active": 1,
-                    "protocol": "lldp",
-                    "remote_hostname": "<private>",
-                    "remote_port": "LAN-1 (010203040506)",
-                    "remote_platform": null,
-                    "remote_version": "<private>",
-                    "ifAlias": "swp03",
-                    "ifDescr": "swp03",
-                    "ifName": "1/04"
-                },
-                {
-                    "active": 1,
-                    "protocol": "lldp",
-                    "remote_hostname": "ks-office-sw-d",
-                    "remote_port": "1 (e4186bfb2ead)",
-                    "remote_platform": null,
-                    "remote_version": "GS1900-24",
-                    "ifAlias": "swp06",
-                    "ifDescr": "swp06",
-                    "ifName": "1/07"
-                }
-            ]
-        }
     }
 }
