@@ -3491,35 +3491,52 @@ The Wireguard application polls the Wireguard service and scrapes all client sta
 
 1. Copy the python script, wireguard.py, to the desired host
 ```
-wget https://github.com/librenms/librenms-agent/raw/master/snmp/wireguard.py -O /etc/snmp/wireguard.py
+wget https://github.com/librenms/librenms-agent/raw/master/snmp/wireguard.pl -O /etc/snmp/wireguard.pl
 ```
 
-2. Make the script executable
+2. Install the depends.
 ```
-chmod +x /etc/snmp/wireguard.py
-```
-
-3. Edit your snmpd.conf file and add:
-```
-extend wireguard /etc/snmp/wireguard.py
+# FreeBSD
+pkg install p5-JSON p5-File-Slurp p5-MIME-Base64
+# Debian
+apt-get install libjson-perl libmime-base64-perl libfile-slurp-perl
 ```
 
-4. Create a /etc/snmp/wireguard.json file and specify:
-    1. (optional) "wg_cmd" - String path to the wg binary ["/usr/bin/wg"]
-    2. "public_key_to_arbitrary_name" - A dictionary to convert between the publickey assigned to the client (specified in the wireguard interface conf file) to an arbitrary, friendly name.  The friendly names MUST be unique within each interface.  Also note that the interface name and friendly names are used in the RRD filename, so using special characters is highly discouraged.
+3. Make the script executable
 ```
-{
-    "wg_cmd": "/bin/wg",
-    "public_key_to_arbitrary_name": {
-        "wg0": {
-            "z1iSIymFEFi/PS8rR19AFBle7O4tWowMWuFzHO7oRlE=": "client1",
-            "XqWJRE21Fw1ke47mH1yPg/lyWqCCfjkIXiS6JobuhTI=": "server.domain.com"
-        }
-    }
-}
+chmod +x /etc/snmp/wireguard.pl
 ```
 
-5. Restart snmpd.
+4. Edit your snmpd.conf file and add:
+```
+extend wireguard /etc/snmp/wireguard.pl
+```
+
+5. Create the optional config file,
+   `/usr/local/etc/wireguard_extend.json`.
+
+| key                          | default     | description                                                 |
+|------------------------------|-------------|-------------------------------------------------------------|
+| include_pubkey               | 0           | Include the pubkey with the return.                         |
+| use_short_hostname           | 1           | If the hostname should be shortened to just the first part. |
+| public_key_to_arbitrary_name | {}          | A hash of pubkeys to name mappings.                         |
+| pubkey_resolvers             | <see below> | Resolvers to use for the pubkeys.                           |
+
+The default for `pubkey_resolvers` is
+`config,endpoint_if_first_allowed_is_subnet_use_hosts,endpoint_if_first_allowed_is_subnet_use_ip,first_allowed_use_hosts,first_allowed_use_ip`.
+
+| resolver                                       | description                                                                                          |
+|------------------------------------------------|------------------------------------------------------------------------------------------------------|
+| config                                         | Use the mappings from `.public_key_to_arbitrary_name` .                                              |
+| endpoint_if_first_allowed_is_subnet_use_hosts  | If the first allowed IP is a subnet, see if a matching IP can be found in hosts for the endpoint.    |
+| endpoint_if_first_allowed_is_subnet_use_getent | If the first allowed IP is a subnet, see if a hit can be found for the endpoint IP via getent hosts. |
+| endpoint_if_first_allowed_is_subnet_use_ip     | If the first allowed IP is a subnet, use the endpoint IP for the name.                               |
+| first_allowed_use_hosts                        | See if a match can be found in hosts for the first allowed IP.                                       |
+| first_allowed_use_getent                       | Use getent hosts to see try to fetch a match for the first allowed IP.                               |
+| first_allowed_use_ip                           | Use the first allowed IP as the name.                                                                |
+
+
+6. Restart snmpd.
 
 ## ZFS
 
