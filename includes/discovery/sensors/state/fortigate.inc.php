@@ -45,7 +45,7 @@ if ($systemMode == 'activePassive' || $systemMode == 'activeActive') {
     // So fgHaStatsSyncStatus.1 (primary node) will *always* return 0. FortiNet does not consider this
     // a bug (reference: Fortinet ticket 9671105)
 
-    // So if we have a 2-node cluster and either one of the nodes goes offline, no alert or warning 
+    // So if we have a 2-node cluster and either one of the nodes goes offline, no alert or warning
     // can be seen in the UI. The sync status will remain 1 (In-Sync) for node/index 1 and index 2
     // will cease to exist. Again, Fortinet considers this expected behavior.
 
