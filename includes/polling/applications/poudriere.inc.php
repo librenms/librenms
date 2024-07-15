@@ -9,9 +9,7 @@ try {
     $returned = json_app_get($device, $name, 1);
 } catch (JsonAppException $e) {
     echo PHP_EOL . $name . ':' . $e->getCode() . ':' . $e->getMessage() . PHP_EOL;
-
     update_application($app, $e->getCode() . ':' . $e->getMessage(), []); // Set empty metrics and error message
-
     return;
 }
 
@@ -72,7 +70,10 @@ $stat_vars=[
 
 $metrics = [];
 $old_data = $app->data;
-$new_data = [];
+$new_data = [
+    'status' => $returned['data']['status'],
+    'build_info' => $returned['data']['build_info']
+];
 
 $data = $returned['data'];
 
