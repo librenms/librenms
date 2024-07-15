@@ -1,23 +1,24 @@
 {
     "os": {
-        "poller": {
+        "discovery": {
             "devices": [
                 {
-                    "sysName": "127.1.6.1",
+                    "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.12356.101.1.5004",
                     "sysDescr": "",
-                    "sysContact": null,
-                    "version": "v2c",
-                    "hardware": null,
+                    "sysContact": "<private>",
+                    "version": "v5.6.6,build1630,180913 (GA)",
+                    "hardware": "FGT_500D",
                     "features": null,
-                    "location": null,
-                    "os": "generic",
-                    "type": "",
-                    "serial": null,
-                    "icon": "generic.svg"
+                    "location": "<private>",
+                    "os": "fortigate",
+                    "type": "firewall",
+                    "serial": "FGT5HD3916803570",
+                    "icon": "fortinet.svg"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {
@@ -4536,8 +4537,8 @@
                     "ifName": "modem",
                     "portName": null,
                     "ifIndex": 19,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
@@ -4636,8 +4637,8 @@
                     "ifName": "ssl.root",
                     "portName": null,
                     "ifIndex": 22,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "false",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -4736,8 +4737,8 @@
                     "ifName": "npu0_vlink0",
                     "portName": null,
                     "ifIndex": 23,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
@@ -4836,8 +4837,8 @@
                     "ifName": "npu0_vlink1",
                     "portName": null,
                     "ifIndex": 24,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
@@ -5136,8 +5137,8 @@
                     "ifName": "KMB.canteen",
                     "portName": null,
                     "ifIndex": 27,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "false",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -5336,8 +5337,8 @@
                     "ifName": "KMB_LDAP",
                     "portName": null,
                     "ifIndex": 29,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "false",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -6647,7 +6648,7 @@
                     "ospfIfMetricValue": 0,
                     "ospfIfMetricStatus": "notInService",
                     "context_name": "",
-                    "ifIndex": null
+                    "ifIndex": 25
                 }
             ],
             "ospf_instances": [
