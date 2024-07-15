@@ -1007,8 +1007,8 @@ return [
             'description' => 'Exibir links de rede no mapa',
             'help' => 'Mostrar os links de rede entre as diferentes localizações no mapa (tipo weathermap)',
         ],
-		 'nfdump' => [
-             'description' => 'Caminho para nfdump',
+		'nfdump' => [
+            'description' => 'Caminho para nfdump',
         ],
         'nfsen_enable' => [
             'description' => 'Habilitar NfSen',
