@@ -46,16 +46,13 @@ if ($systemMode == 'activePassive' || $systemMode == 'activeActive') {
     // a bug (reference: Fortinet ticket 9671105)
 
     // So if we have a 2-node cluster and either one of the nodes goes offline, no alert or warning 
-    // can be seen in the UI. The sync status will remain 0 (In-Sync) for node/index 1 and index 2
-    // will no longer exist. Again, Fortinet considers this expected behavior.
+    // can be seen in the UI. The sync status will remain 1 (In-Sync) for node/index 1 and index 2
+    // will cease to exist. Again, Fortinet considers this expected behavior.
 
-    // For this reason we create a sensor that will change to 'critical' when the number of nodes in the
-    // cluster drops to 1 (one-node cluster). Code borrowed from commit 591384f
-
+    // Use the 'Cluster State' sensor to create an alert when this value drops to 1.
     // -- Rudy Broersma
 
     // Per node sync status
-
     $stateName = 'fgHaStatsSyncStatus';
 
     $states = [
