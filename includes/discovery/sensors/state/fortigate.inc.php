@@ -42,7 +42,7 @@ if ($systemMode == 'activePassive' || $systemMode == 'activeActive') {
     // removes the cluster member from the configuration after a few minutes and the cluster status becomes OK
 
     // Additionally, a FortiGate cluster is always in-sync with the primary.
-    // So fgHaStatsSyncStatus.1 (primary node) will *always* return 0. FortiNet does not consider this
+    // So fgHaStatsSyncStatus.1 (primary node) will *always* return 1. FortiNet does not consider this
     // a bug (reference: Fortinet ticket 9671105)
 
     // So if we have a 2-node cluster and either one of the nodes goes offline, no alert or warning
