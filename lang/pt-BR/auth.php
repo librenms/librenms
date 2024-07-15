@@ -17,5 +17,5 @@ return [
     'failed' => 'Estas credenciais não correspondem aos nossos registros.',
     'password' => 'A senha fornecida está incorreta.',
     'throttle' => 'Muitas tentativas de login. Por favor, tente novamente em :seconds segundos.',
-    'disabled' => 'Sua conta está desativada, por favor, entre em contato com o administrador.'
-];
+    'disabled' => 'Sua conta está desativada, por favor, entre em contato com o administrador.',
+;
