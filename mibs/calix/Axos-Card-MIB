@@ -115,7 +115,9 @@ axosCardProvType OBJECT-TYPE
                     ce201(17),
                     e3_2_xgs(18),
                     frwy(19),
-                    xg3201(21)
+                    xg3201(21),
+                    asm5001(22),
+                    xg1601(23)
                 }
     MAX-ACCESS  read-only
     STATUS      current
@@ -144,7 +146,9 @@ axosCardActualType OBJECT-TYPE
                     ce201(17),
                     e3_2_xgs(18),
                     frwy(19),
-                    xg3201(21)
+                    xg3201(21),
+                    asm5001(22),
+                    xg1601(23)
                 }
     MAX-ACCESS  read-only
     STATUS      current
