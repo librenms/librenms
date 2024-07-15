@@ -3629,5 +3629,29 @@
                 }
             ]
         }
+    },
+    "nac": {
+        "poller": {
+            "ports_nac": [
+                {
+                    "auth_id": "1/1/11",
+                    "domain": "",
+                    "username": "username",
+                    "mac_address": "0:4:f2:bc:95:2",
+                    "ip_address": "",
+                    "host_mode": "",
+                    "authz_status": "",
+                    "authz_by": "dot1x",
+                    "authc_status": "authenticated",
+                    "method": "dot1x",
+                    "timeout": "",
+                    "time_left": null,
+                    "vlan": 0,
+                    "time_elapsed": null,
+                    "historical": 0,
+                    "ifIndex": 11
+                }
+            ]
+        }
     }
 }
