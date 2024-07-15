@@ -80,7 +80,7 @@ class NetSnmpQuery implements SnmpQueryInterface
      */
     private array $mibDirs = [];
     private string $context = '';
-    private array|string $options = [self::DEFAULT_FLAGS];
+    private array|string $options = [self::DEFAULT_FLAGS, '-Pu'];
     private Device $device;
     private bool $abort = false;
     private bool $cache = false;
@@ -312,7 +312,9 @@ class NetSnmpQuery implements SnmpQueryInterface
 
         // user did not specify numeric, output full text
         if (! in_array('-On', $this->options)) {
-            $this->options[] = '-OS';
+            if (! in_array('-Os', $this->options)) {
+                $this->options[] = '-OS'; // show full oid, unless hideMib is set
+            }
         } elseif (Oid::isNumeric($oid)) {
             return Str::start($oid, '.'); // numeric to numeric optimization
         }
