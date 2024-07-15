@@ -33,6 +33,7 @@ trait EntityMib
     public function discoverEntityPhysical(): Collection
     {
         $data = \SnmpQuery::hideMib()->enumStrings()
+            ->mibDir('cisco')
             ->mibs(['CISCO-ENTITY-VENDORTYPE-OID-MIB'])
             ->walk('ENTITY-MIB::entPhysicalTable');
 
