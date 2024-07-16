@@ -1373,419 +1373,419 @@ return [
             ],
         ],
         'radius' => [
-			'default_roles' => [
-				'description' => 'Funções padrão do usuário',
-				'help' => 'Define as funções que serão atribuídas ao usuário, a menos que o Radius envie atributos que especifiquem função(ões)',
-			],
-			'enforce_roles' => [
-				'description' => 'Impor funções no login',
-				'help' => 'Se ativado, as funções serão definidas para as especificadas pelo atributo Filter-ID ou radius.default_roles no login. Caso contrário, elas serão definidas quando o usuário for criado e nunca mais serão alteradas depois disso.',
-			],
-		],
-		'reporting' => [
-			'error' => [
-				'description' => 'Enviar Relatórios de Erros',
-				'help' => 'Envia determinados erros para o LibreNMS para análise e correção',
-			],
-			'usage' => [
-				'description' => 'Enviar Relatórios de Uso',
-				'help' => 'Envia relatório de uso e versão para o LibreNMS. Para excluir estatísticas anônimas, visite a página Sobre. Você pode visualizar estatísticas em https://stats.librenms.org',
-			],
-			'dump_errors' => [
-				'description' => 'Despejar erros de depuração (Poderá quebrar sua instalação)',
-				'help' => 'Despejar erros que normalmente são ocultados para que você, como desenvolvedor, possa encontrar e corrigir possíveis problemas.',
-			],
-			'throttle' => [
-				'description' => 'Limitar Relatórios de Erros',
-				'help' => 'Relatórios serão enviados apenas a determinado quantidade de segundos. Sem isso, se você tiver um erro em um código comum, os relatórios podem sair fora do controle. Defina como 0 para desativar a limitação.',
-			],
-		],
-		'route_purge' => [
-			'description' => 'Entradas de Rota mais antigas que',
-			'help' => 'Limpeza feita pelo script daily.sh',
-		],
-		'rrd' => [
-			'heartbeat' => [
-				'description' => 'Alterar o valor de heartbeat do rrd (padrão 600)',
-			],
-			'step' => [
-				'description' => 'Alterar o valor de step do rrd (padrão 300)',
-			],
-		],
-		'rrd_dir' => [
-			'description' => 'Localização do RRD',
-			'help' => 'Localização dos arquivos rrd. O padrão é rrd dentro do diretório LibreNMS. Alterar essa configuração não move os arquivos rrd.',
-		],
-		'rrd_purge' => [
-			'description' => 'Arquivos RRD mais antigos que',
-			'help' => 'Limpeza feita pelo script daily.sh',
-		],
-		'rrd_rra' => [
-			'description' => 'Configurações de Formato RRD',
-			'help' => 'Isso não pode ser alterado sem excluir seus arquivos RRD existentes, embora se possa, conceitualmente, aumentar ou diminuir o tamanho de cada RRA se tiver problemas de desempenho ou se tiver um subsistema de I/O muito rápido sem preocupações de desempenho.',
-		],
-		'rrdcached' => [
-			'description' => 'Habilitar rrdcached (socket)',
-			'help' => 'Habilita o rrdcached definindo a localização do socket rrdcached. Pode ser socket unix ou de rede (unix:/run/rrdcached.sock ou localhost:42217)',
-		],
-		'rrdtool' => [
-			'description' => 'Caminho para rrdtool',
-		],
-		'rrdtool_tune' => [
-			'description' => 'Ajustar todos os arquivos de porta rrd para usar valores máximos',
-			'help' => 'Ajuste automático do valor máximo para arquivos de porta rrd',
-		],
-		'rrdtool_version' => [
-			'description' => 'Define a versão do rrdtool no seu servidor',
-			'help' => 'Qualquer coisa acima de 1.5.5 suporta todos os recursos que o LibreNMS usa, não defina um valor maior do que a versão instalada',
-		],
-		'service_poller_enabled' => [
-			'description' => 'Habilitar Polling',
-			'help' => 'Habilitar workers de polling. Define o valor padrão para todos os nós.',
-		],
-		'service_master_timeout' => [
-			'description' => 'Tempo de Expiração do Dispatcher Mestre',
-			'help' => 'O tempo antes que o bloqueio mestre expire. Se o mestre desaparecer, levará esse tempo para outro nó assumir. No entanto, se demorar mais do que o tempo limite para despachar o trabalho, você terá múltiplos mestres',
-		],
-		'service_poller_workers' => [
-			'description' => 'Workers de Poller',
-			'help' => 'Quantidade de workers de polling a serem gerados. Define o valor padrão para todos os nós.',
-		],
-		'service_poller_frequency' => [
-			'description' => 'Frequência de Polling (Aviso!)',
-			'help' => 'Com que frequência pollar os dispositivos. Define o valor padrão para todos os nós. Aviso! Alterar isso sem corrigir os arquivos rrd quebrará os gráficos. Veja a documentação para mais informações.',
-		],
-		'service_poller_down_retry' => [
-			'description' => 'Repetir Dispositivo Inativo',
-			'help' => 'Se um dispositivo estiver inativo quando a polling for tentada, este é o tempo de espera antes de tentar novamente. Define o valor padrão para todos os nós.',
-		],
-		'service_discovery_enabled' => [
-			'description' => 'Descoberta Habilitada',
-			'help' => 'Habilitar workers de descoberta. Define o valor padrão para todos os nós.',
-		],
-		'service_discovery_workers' => [
-			'description' => 'Workers de Descoberta',
-			'help' => 'Quantidade de workers de descoberta a serem executados. Configurar muito alto pode causar sobrecarga. Define o valor padrão para todos os nós.',
-		],
-		'service_discovery_frequency' => [
-			'description' => 'Frequência de Descoberta',
-			'help' => 'Com que frequência executar a descoberta de dispositivos. Define o valor padrão para todos os nós. O padrão é 4 vezes ao dia.',
-		],
-		'service_services_enabled' => [
-			'description' => 'Serviços Habilitados',
-			'help' => 'Habilitar workers de serviços. Define o valor padrão para todos os nós.',
-		],
-		'service_services_workers' => [
-			'description' => 'Workers de Serviços',
-			'help' => 'Quantidade de workers de serviços. Define o valor padrão para todos os nós.',
-		],
-		'service_services_frequency' => [
-			'description' => 'Frequência de Serviços',
-			'help' => 'Com que frequência executar serviços. Isso deve coincidir com a frequência de polling. Define o valor padrão para todos os nós.',
-		],
-		'service_billing_enabled' => [
-			'description' => 'Tarifação Habilitada',
-			'help' => 'Habilitar workers de tarifação. Define o valor padrão para todos os nós.',
-		],
-		'service_billing_frequency' => [
-			'description' => 'Frequência de Tarifação',
-			'help' => 'Com que frequência coletar dados de tarifação. Define o valor padrão para todos os nós.',
-		],
-		'service_billing_calculate_frequency' => [
-			'description' => 'Frequência de Cálculo de Tarifação',
-			'help' => 'Com que frequência calcular a tarifação. Define o valor padrão para todos os nós.',
-		],
-		'service_alerting_enabled' => [
-			'description' => 'Alertas Habilitados',
-			'help' => 'Habilitar o worker de alertas. Define o valor padrão para todos os nós.',
-		],
-		'service_alerting_frequency' => [
-			'description' => 'Frequência de Alertas',
-			'help' => 'Com que frequência as regras de alerta são verificadas. Note que os dados são atualizados apenas com base na frequência de polling. Define o valor padrão para todos os nós.',
-		],
-		'service_ping_enabled' => [
-			'description' => 'Fast Ping Habilitado',
-			'help' => 'O Fast Ping apenas pinga dispositivos para verificar se estão ativos ou inativos. Define o valor padrão para todos os nós.',
-		],
-		'service_update_enabled' => [
-			'description' => 'Manutenção Diária Habilitada',
-			'help' => 'Executa o script de manutenção daily.sh e reinicia o serviço de dispatcher depois. Define o valor padrão para todos os nós.',
-		],
-		'service_update_frequency' => [
-			'description' => 'Frequência de Manutenção',
-			'help' => 'Com que frequência executar a manutenção diária. O padrão é 1 dia. É altamente recomendável não alterar isso. Define o valor padrão para todos os nós.',
-		],
-		'service_loglevel' => [
-			'description' => 'Nível de Log',
-			'help' => 'Nível de log do serviço de dispatcher. Define o valor padrão para todos os nós.',
-		],
-		'service_watchdog_enabled' => [
-			'description' => 'Watchdog Habilitado',
-			'help' => 'O Watchdog monitora o arquivo de log e reinicia o serviço se ele não for atualizado. Define o valor padrão para todos os nós.',
-		],
-		'service_watchdog_log' => [
-			'description' => 'Arquivo de Log a ser Monitorado',
-			'help' => 'O padrão é o arquivo de log do LibreNMS. Define o valor padrão para todos os nós.',
-		],
-		'sfdp' => [
-			'description' => 'Caminho para sfdp',
-		],
-		'shorthost_target_length' => [
-			'description' => 'Comprimento máximo do nome de host encurtado',
-			'help' => 'Reduz o nome de host para o comprimento máximo, mas sempre completa as partes do subdomínio',
-		],
-		'site_style' => [
-			'description' => 'Tema Padrão',
-			'options' => [
-				'blue' => 'Azul',
-				'dark' => 'Escuro',
-				'light' => 'Claro',
-				'mono' => 'Mono',
-			],
-		],
-		'snmp' => [
-			'transports' => [
-				'description' => 'Transporte (prioridade)',
-				'help' => 'Selecione os transportes habilitados e ordene-os conforme desejar que sejam tentados.',
-			],
-			'version' => [
-				'description' => 'Versão (prioridade)',
-				'help' => 'Selecione as versões habilitadas e ordene-as conforme desejar que sejam tentadas.',
-			],
-			'community' => [
-				'description' => 'Comunidades (prioridade)',
-				'help' => 'Insira as strings de comunidade para v1 e v2c e ordene-as conforme desejar que sejam tentadas',
-			],
-			'max_oid' => [
-				'description' => 'Máximo de OIDs',
-				'help' => 'Máximo de OIDs por consulta. Pode ser sobrescrito em níveis de sistema operacional e dispositivo.',
-			],
-			'max_repeaters' => [
-				'description' => 'Máximo de Repetidores',
-				'help' => 'Defina repetidores para usar em solicitações bulk SNMP',
-			],
-			'oids' => [
-				'no_bulk' => [
-					'description' => 'Desativar bulk SNMP para OIDs',
-					'help' => 'Desativa a operação bulk SNMP para certos OIDs. Geralmente, isso deve ser definido em um sistema operacional. O formato deve ser MIB::OID',
-				],
-				'unordered' => [
-					'description' => 'Permitir respostas SNMP fora de ordem para OIDs',
-					'help' => 'Ignorar OIDs fora de ordem nas respostas SNMP para certos OIDs. OIDs fora de ordem podem resultar em um loop de OID durante um snmpwalk. Geralmente, isso deve ser definido em um sistema operacional. O formato deve ser MIB::OID',
-				],
-			],
-			'port' => [
-				'description' => 'Porta',
-				'help' => 'Defina a porta TCP/UDP a ser usada para SNMP',
-			],
-			'timeout' => [
-				'description' => 'Tempo de Espera',
-				'help' => 'Tempo de espera SNMP em segundos',
-			],
-			'retries' => [
-				'description' => 'Repetições',
-				'help' => 'quantas vezes tentar novamente a consulta',
-			],
-			'v3' => [
-				'description' => 'Autenticação SNMP v3 (prioridade)',
-				'help' => 'Configure as variáveis de autenticação v3 e ordene-as conforme desejar que sejam tentadas',
-				'auth' => 'Autenticação',
-				'crypto' => 'Criptografia',
-				'fields' => [
-					'authalgo' => 'Algoritmo',
-					'authlevel' => 'Nível',
-					'authname' => 'Nome de Usuário',
-					'authpass' => 'Senha',
-					'cryptoalgo' => 'Algoritmo',
-					'cryptopass' => 'Senha',
-				],
-				'level' => [
-					'noAuthNoPriv' => 'Sem Autenticação, Sem Privacidade',
-					'authNoPriv' => 'Autenticação, Sem Privacidade',
-					'authPriv' => 'Autenticação e Privacidade',
-				],
-			],
-		],
-		'snmpbulkwalk' => [
-			'description' => 'Caminho para snmpbulkwalk',
-		],
-		'snmpget' => [
-			'description' => 'Caminho para snmpget',
-		],
-		'snmpgetnext' => [
-			'description' => 'Caminho para snmpgetnext',
-		],
-		'snmptranslate' => [
-			'description' => 'Caminho para snmptranslate',
-		],
-		'snmptraps' => [
-			'eventlog' => [
-				'description' => 'Criar registro de eventos para snmptraps',
-				'help' => 'Independentemente da ação que pode ser mapeada para o trap',
-			],
-			'eventlog_detailed' => [
-				'description' => 'Habilitar logs detalhados',
-				'help' => 'Adicionar todos os OIDs recebidos com o trap no registro de eventos',
-			],
-		],
-		'snmpwalk' => [
-			'description' => 'Caminho para snmpwalk',
-		],
-		'syslog_filter' => [
-			'description' => 'Filtrar mensagens syslog contendo',
-		],
-		'syslog_purge' => [
-			'description' => 'Entradas de Syslog mais antigas que',
-			'help' => 'Limpeza feita pelo script daily.sh',
-		],
-		'title_image' => [
-			'description' => 'Imagem do Título',
-			'help' => 'Substitui a imagem padrão do título.',
-		],
-		'traceroute' => [
-			'description' => 'Caminho para traceroute',
-		],
-		'twofactor' => [
-			'description' => 'Dois Fatores',
-			'help' => 'Permitir que os usuários ativem e usem Senhas de Uso Único Baseadas em Tempo (TOTP) ou Baseadas em Contador (HOTP)',
-		],
-		'twofactor_lock' => [
-			'description' => 'Tempo de Limitação de Dois Fatores (segundos)',
-			'help' => 'Tempo de bloqueio para esperar em segundos antes de permitir novas tentativas se a autenticação de Dois Fatores falhar 3 vezes consecutivas - solicitará ao usuário que aguarde esse tempo. Defina como 0 para desativar, resultando em um bloqueio permanente da conta e uma mensagem ao usuário para contatar o administrador',
-		],
-		'unix-agent' => [
-			'connection-timeout' => [
-				'description' => 'Tempo de espera da conexão do agente Unix',
-			],
-			'port' => [
-				'description' => 'Porta padrão do agente Unix',
-				'help' => 'Porta padrão para o agente Unix (check_mk)',
-			],
-			'read-timeout' => [
-				'description' => 'Tempo de espera de leitura do agente Unix',
-			],
-		],
-		'update' => [
-			'description' => 'Habilitar atualizações em ./daily.sh',
-		],
-		'update_channel' => [
-			'description' => 'Canal de Atualização',
-			'options' => [
-				'master' => 'Diário',
-				'release' => 'Mensal',
-			],
-		],
-		'uptime_warning' => [
-			'description' => 'Mostrar Dispositivo como aviso se Uptime abaixo de (segundos)',
-			'help' => 'Mostra Dispositivo como aviso se o Uptime estiver abaixo desse valor. Padrão 24h',
-		],
-		'virsh' => [
-			'description' => 'Caminho para virsh',
-		],
-		'webui' => [
-			'availability_map_box_size' => [
-				'description' => 'Largura da caixa de disponibilidade',
-				'help' => 'Insira a largura desejada do bloco em pixels para o tamanho da caixa na visualização completa',
-			],
-			'availability_map_compact' => [
-				'description' => 'Visualização compacta do mapa de disponibilidade',
-				'help' => 'Visualização do mapa de disponibilidade com pequenos indicadores',
-			],
-			'availability_map_sort_status' => [
-				'description' => 'Ordenar por status',
-				'help' => 'Ordenar dispositivos e serviços por status',
-			],
-			'availability_map_use_device_groups' => [
-				'description' => 'Usar filtro de grupos de dispositivos',
-				'help' => 'Habilitar uso do filtro de grupos de dispositivos',
-			],
-			'default_dashboard_id' => [
-				'description' => 'Dashboard padrão',
-				'help' => 'Dashboard_id padrão global para todos os usuários que não têm seu próprio padrão definido',
-			],
-			'dynamic_graphs' => [
-				'description' => 'Habilitar gráficos dinâmicos',
-				'help' => 'Habilitar gráficos dinâmicos; permite zoom e pan em gráficos',
-			],
-			'global_search_result_limit' => [
-				'description' => 'Definir o limite máximo de resultados de pesquisa',
-				'help' => 'Limite global de resultados de pesquisa',
-			],
-			'graph_stacked' => [
-				'description' => 'Usar gráficos empilhados',
-				'help' => 'Exibir gráficos empilhados em vez de gráficos invertidos',
-			],
-			'graph_stat_percentile_disable' => [
-				'description' => 'Desativar percentual para gráficos de estatísticas globalmente',
-				'help' => 'Desativa a exibição dos valores e linhas percentuais para gráficos que exibem esses',
-			],
-			'graph_type' => [
-				'description' => 'Definir o tipo de gráfico',
-				'help' => 'Definir o tipo de gráfico padrão',
-				'options' => [
-					'png' => 'PNG',
-					'svg' => 'SVG',
-				],
-			],
-			'min_graph_height' => [
-				'description' => 'Definir a altura mínima do gráfico',
-				'help' => 'Altura mínima do gráfico (padrão: 300)',
-			],
-		],
-		'device_display_default' => [
-			'description' => 'Nome de Exibição do Dispositivo',
-			'help' => 'Define o nome de exibição padrão para todos os dispositivos (pode ser substituído por dispositivo). Nome do host/IP: Mostre apenas o nome do host ou IP com o qual o dispositivo foi adicionado. sysName: Mostre apenas o sysName do SNMP. Nome do host ou sysName: Mostre o nome do host, mas se for um IP, mostre o sysName.',
-			'options' => [
-				'hostname' => 'Nome do Host / IP',
-				'sysName_fallback' => 'Nome do Host, fallback para sysName para IPs',
-				'sysName' => 'sysName',
-				'ip' => 'IP / Nome do Host',
-			],
-		],
-		'device_location_map_open' => [
-			'description' => 'Abrir Mapa de Localização',
-			'help' => 'O Mapa de Localização é exibido por padrão',
-		],
-		'whois' => [
-			'description' => 'Caminho para whois',
-		],
-		'smokeping.integration' => [
-			'description' => 'Habilitar',
-			'help' => 'Habilitar integração com Smokeping',
-		],
-		'smokeping.dir' => [
-			'description' => 'Caminho para rrds',
-			'help' => 'Caminho completo para os RRDs do Smokeping',
-		],
-		'smokeping.pings' => [
-			'description' => 'Pings',
-			'help' => 'Número de pings configurados no Smokeping',
-		],
-		'smokeping.url' => [
-			'description' => 'URL para smokeping',
-			'help' => 'URL completa para a GUI do smokeping',
-		],
-		],
-		'twofactor' => [
-		'description' => 'Habilitar Autenticação de Dois Fatores',
-		'help' => 'Habilita a autenticação de Dois Fatores. Você deve configurar cada conta para torná-la ativa.',
-		],
-		'units' => [
-		'days' => 'dias',
-		'ms' => 'ms',
-		'seconds' => 'segundos',
-		],
-		'validate' => [
-		'boolean' => ':value não é um booleano válido',
-		'color' => ':value não é um código de cor hexadecimal válido',
-		'email' => ':value não é um email válido',
-		'float' => ':value não é um float',
-		'integer' => ':value não é um inteiro',
-		'password' => 'A senha está incorreta',
-		'select' => ':value não é um valor permitido',
-		'text' => ':value não é permitido',
-		'array' => 'Formato inválido',
-		'executable' => ':value não é um executável válido',
-		'directory' => ':value não é um diretório válido',
-		],
+            'default_roles' => [
+                'description' => 'Funções padrão do usuário',
+                'help' => 'Define as funções que serão atribuídas ao usuário, a menos que o Radius envie atributos que especifiquem função(ões)',
+            ],
+            'enforce_roles' => [
+                'description' => 'Impor funções no login',
+                'help' => 'Se ativado, as funções serão definidas para as especificadas pelo atributo Filter-ID ou radius.default_roles no login. Caso contrário, elas serão definidas quando o usuário for criado e nunca mais serão alteradas depois disso.',
+            ],
+        ],
+        'reporting' => [
+            'error' => [
+                'description' => 'Enviar Relatórios de Erros',
+                'help' => 'Envia determinados erros para o LibreNMS para análise e correção',
+            ],
+            'usage' => [
+                'description' => 'Enviar Relatórios de Uso',
+                'help' => 'Envia relatório de uso e versão para o LibreNMS. Para excluir estatísticas anônimas, visite a página Sobre. Você pode visualizar estatísticas em https://stats.librenms.org',
+            ],
+            'dump_errors' => [
+                'description' => 'Despejar erros de depuração (Poderá quebrar sua instalação)',
+                'help' => 'Despejar erros que normalmente são ocultados para que você, como desenvolvedor, possa encontrar e corrigir possíveis problemas.',
+            ],
+            'throttle' => [
+                'description' => 'Limitar Relatórios de Erros',
+                'help' => 'Relatórios serão enviados apenas a determinado quantidade de segundos. Sem isso, se você tiver um erro em um código comum, os relatórios podem sair fora do controle. Defina como 0 para desativar a limitação.',
+            ],
+        ],
+        'route_purge' => [
+            'description' => 'Entradas de Rota mais antigas que',
+            'help' => 'Limpeza feita pelo script daily.sh',
+        ],
+        'rrd' => [
+            'heartbeat' => [
+                'description' => 'Alterar o valor de heartbeat do rrd (padrão 600)',
+            ],
+            'step' => [
+                'description' => 'Alterar o valor de step do rrd (padrão 300)',
+            ],
+        ],
+        'rrd_dir' => [
+            'description' => 'Localização do RRD',
+            'help' => 'Localização dos arquivos rrd. O padrão é rrd dentro do diretório LibreNMS. Alterar essa configuração não move os arquivos rrd.',
+        ],
+        'rrd_purge' => [
+            'description' => 'Arquivos RRD mais antigos que',
+            'help' => 'Limpeza feita pelo script daily.sh',
+        ],
+        'rrd_rra' => [
+            'description' => 'Configurações de Formato RRD',
+            'help' => 'Isso não pode ser alterado sem excluir seus arquivos RRD existentes, embora se possa, conceitualmente, aumentar ou diminuir o tamanho de cada RRA se tiver problemas de desempenho ou se tiver um subsistema de I/O muito rápido sem preocupações de desempenho.',
+        ],
+        'rrdcached' => [
+            'description' => 'Habilitar rrdcached (socket)',
+            'help' => 'Habilita o rrdcached definindo a localização do socket rrdcached. Pode ser socket unix ou de rede (unix:/run/rrdcached.sock ou localhost:42217)',
+        ],
+        'rrdtool' => [
+            'description' => 'Caminho para rrdtool',
+        ],
+        'rrdtool_tune' => [
+            'description' => 'Ajustar todos os arquivos de porta rrd para usar valores máximos',
+            'help' => 'Ajuste automático do valor máximo para arquivos de porta rrd',
+        ],
+        'rrdtool_version' => [
+            'description' => 'Define a versão do rrdtool no seu servidor',
+            'help' => 'Qualquer coisa acima de 1.5.5 suporta todos os recursos que o LibreNMS usa, não defina um valor maior do que a versão instalada',
+        ],
+        'service_poller_enabled' => [
+            'description' => 'Habilitar Polling',
+            'help' => 'Habilitar workers de polling. Define o valor padrão para todos os nós.',
+        ],
+        'service_master_timeout' => [
+            'description' => 'Tempo de Expiração do Dispatcher Mestre',
+            'help' => 'O tempo antes que o bloqueio mestre expire. Se o mestre desaparecer, levará esse tempo para outro nó assumir. No entanto, se demorar mais do que o tempo limite para despachar o trabalho, você terá múltiplos mestres',
+        ],
+        'service_poller_workers' => [
+            'description' => 'Workers de Poller',
+            'help' => 'Quantidade de workers de polling a serem gerados. Define o valor padrão para todos os nós.',
+        ],
+        'service_poller_frequency' => [
+            'description' => 'Frequência de Polling (Aviso!)',
+            'help' => 'Com que frequência pollar os dispositivos. Define o valor padrão para todos os nós. Aviso! Alterar isso sem corrigir os arquivos rrd quebrará os gráficos. Veja a documentação para mais informações.',
+        ],
+        'service_poller_down_retry' => [
+            'description' => 'Repetir Dispositivo Inativo',
+            'help' => 'Se um dispositivo estiver inativo quando a polling for tentada, este é o tempo de espera antes de tentar novamente. Define o valor padrão para todos os nós.',
+        ],
+        'service_discovery_enabled' => [
+            'description' => 'Descoberta Habilitada',
+            'help' => 'Habilitar workers de descoberta. Define o valor padrão para todos os nós.',
+        ],
+        'service_discovery_workers' => [
+            'description' => 'Workers de Descoberta',
+            'help' => 'Quantidade de workers de descoberta a serem executados. Configurar muito alto pode causar sobrecarga. Define o valor padrão para todos os nós.',
+        ],
+        'service_discovery_frequency' => [
+            'description' => 'Frequência de Descoberta',
+            'help' => 'Com que frequência executar a descoberta de dispositivos. Define o valor padrão para todos os nós. O padrão é 4 vezes ao dia.',
+        ],
+        'service_services_enabled' => [
+            'description' => 'Serviços Habilitados',
+            'help' => 'Habilitar workers de serviços. Define o valor padrão para todos os nós.',
+        ],
+        'service_services_workers' => [
+            'description' => 'Workers de Serviços',
+            'help' => 'Quantidade de workers de serviços. Define o valor padrão para todos os nós.',
+        ],
+        'service_services_frequency' => [
+            'description' => 'Frequência de Serviços',
+            'help' => 'Com que frequência executar serviços. Isso deve coincidir com a frequência de polling. Define o valor padrão para todos os nós.',
+        ],
+        'service_billing_enabled' => [
+            'description' => 'Tarifação Habilitada',
+            'help' => 'Habilitar workers de tarifação. Define o valor padrão para todos os nós.',
+        ],
+        'service_billing_frequency' => [
+            'description' => 'Frequência de Tarifação',
+            'help' => 'Com que frequência coletar dados de tarifação. Define o valor padrão para todos os nós.',
+        ],
+        'service_billing_calculate_frequency' => [
+            'description' => 'Frequência de Cálculo de Tarifação',
+            'help' => 'Com que frequência calcular a tarifação. Define o valor padrão para todos os nós.',
+        ],
+        'service_alerting_enabled' => [
+            'description' => 'Alertas Habilitados',
+            'help' => 'Habilitar o worker de alertas. Define o valor padrão para todos os nós.',
+        ],
+        'service_alerting_frequency' => [
+            'description' => 'Frequência de Alertas',
+            'help' => 'Com que frequência as regras de alerta são verificadas. Note que os dados são atualizados apenas com base na frequência de polling. Define o valor padrão para todos os nós.',
+        ],
+        'service_ping_enabled' => [
+            'description' => 'Fast Ping Habilitado',
+            'help' => 'O Fast Ping apenas pinga dispositivos para verificar se estão ativos ou inativos. Define o valor padrão para todos os nós.',
+        ],
+        'service_update_enabled' => [
+            'description' => 'Manutenção Diária Habilitada',
+            'help' => 'Executa o script de manutenção daily.sh e reinicia o serviço de dispatcher depois. Define o valor padrão para todos os nós.',
+        ],
+        'service_update_frequency' => [
+            'description' => 'Frequência de Manutenção',
+            'help' => 'Com que frequência executar a manutenção diária. O padrão é 1 dia. É altamente recomendável não alterar isso. Define o valor padrão para todos os nós.',
+        ],
+        'service_loglevel' => [
+            'description' => 'Nível de Log',
+            'help' => 'Nível de log do serviço de dispatcher. Define o valor padrão para todos os nós.',
+        ],
+        'service_watchdog_enabled' => [
+            'description' => 'Watchdog Habilitado',
+            'help' => 'O Watchdog monitora o arquivo de log e reinicia o serviço se ele não for atualizado. Define o valor padrão para todos os nós.',
+        ],
+        'service_watchdog_log' => [
+            'description' => 'Arquivo de Log a ser Monitorado',
+            'help' => 'O padrão é o arquivo de log do LibreNMS. Define o valor padrão para todos os nós.',
+        ],
+        'sfdp' => [
+            'description' => 'Caminho para sfdp',
+        ],
+        'shorthost_target_length' => [
+            'description' => 'Comprimento máximo do nome de host encurtado',
+            'help' => 'Reduz o nome de host para o comprimento máximo, mas sempre completa as partes do subdomínio',
+        ],
+        'site_style' => [
+            'description' => 'Tema Padrão',
+            'options' => [
+                'blue' => 'Azul',
+                'dark' => 'Escuro',
+                'light' => 'Claro',
+                'mono' => 'Mono',
+            ],
+        ],
+        'snmp' => [
+            'transports' => [
+                'description' => 'Transporte (prioridade)',
+                'help' => 'Selecione os transportes habilitados e ordene-os conforme desejar que sejam tentados.',
+            ],
+            'version' => [
+                'description' => 'Versão (prioridade)',
+                'help' => 'Selecione as versões habilitadas e ordene-as conforme desejar que sejam tentadas.',
+            ],
+            'community' => [
+                'description' => 'Comunidades (prioridade)',
+                'help' => 'Insira as strings de comunidade para v1 e v2c e ordene-as conforme desejar que sejam tentadas',
+            ],
+            'max_oid' => [
+                'description' => 'Máximo de OIDs',
+                'help' => 'Máximo de OIDs por consulta. Pode ser sobrescrito em níveis de sistema operacional e dispositivo.',
+            ],
+            'max_repeaters' => [
+                'description' => 'Máximo de Repetidores',
+                'help' => 'Defina repetidores para usar em solicitações bulk SNMP',
+            ],
+            'oids' => [
+                'no_bulk' => [
+                	'description' => 'Desativar bulk SNMP para OIDs',
+                	'help' => 'Desativa a operação bulk SNMP para certos OIDs. Geralmente, isso deve ser definido em um sistema operacional. O formato deve ser MIB::OID',
+                ],
+                'unordered' => [
+                	'description' => 'Permitir respostas SNMP fora de ordem para OIDs',
+                	'help' => 'Ignorar OIDs fora de ordem nas respostas SNMP para certos OIDs. OIDs fora de ordem podem resultar em um loop de OID durante um snmpwalk. Geralmente, isso deve ser definido em um sistema operacional. O formato deve ser MIB::OID',
+                ],
+            ],
+            'port' => [
+                'description' => 'Porta',
+                'help' => 'Defina a porta TCP/UDP a ser usada para SNMP',
+            ],
+            'timeout' => [
+                'description' => 'Tempo de Espera',
+                'help' => 'Tempo de espera SNMP em segundos',
+            ],
+            'retries' => [
+                'description' => 'Repetições',
+                'help' => 'quantas vezes tentar novamente a consulta',
+            ],
+            'v3' => [
+                'description' => 'Autenticação SNMP v3 (prioridade)',
+                'help' => 'Configure as variáveis de autenticação v3 e ordene-as conforme desejar que sejam tentadas',
+                'auth' => 'Autenticação',
+                'crypto' => 'Criptografia',
+                'fields' => [
+                	'authalgo' => 'Algoritmo',
+                	'authlevel' => 'Nível',
+                	'authname' => 'Nome de Usuário',
+                	'authpass' => 'Senha',
+                	'cryptoalgo' => 'Algoritmo',
+                	'cryptopass' => 'Senha',
+                ],
+                'level' => [
+                	'noAuthNoPriv' => 'Sem Autenticação, Sem Privacidade',
+                	'authNoPriv' => 'Autenticação, Sem Privacidade',
+                	'authPriv' => 'Autenticação e Privacidade',
+                ],
+            ],
+        ],
+        'snmpbulkwalk' => [
+            'description' => 'Caminho para snmpbulkwalk',
+        ],
+        'snmpget' => [
+            'description' => 'Caminho para snmpget',
+        ],
+        'snmpgetnext' => [
+            'description' => 'Caminho para snmpgetnext',
+        ],
+        'snmptranslate' => [
+            'description' => 'Caminho para snmptranslate',
+        ],
+        'snmptraps' => [
+            'eventlog' => [
+                'description' => 'Criar registro de eventos para snmptraps',
+                'help' => 'Independentemente da ação que pode ser mapeada para o trap',
+            ],
+            'eventlog_detailed' => [
+                'description' => 'Habilitar logs detalhados',
+                'help' => 'Adicionar todos os OIDs recebidos com o trap no registro de eventos',
+            ],
+        ],
+        'snmpwalk' => [
+            'description' => 'Caminho para snmpwalk',
+        ],
+        'syslog_filter' => [
+            'description' => 'Filtrar mensagens syslog contendo',
+        ],
+        'syslog_purge' => [
+            'description' => 'Entradas de Syslog mais antigas que',
+            'help' => 'Limpeza feita pelo script daily.sh',
+        ],
+        'title_image' => [
+            'description' => 'Imagem do Título',
+            'help' => 'Substitui a imagem padrão do título.',
+        ],
+        'traceroute' => [
+            'description' => 'Caminho para traceroute',
+        ],
+        'twofactor' => [
+            'description' => 'Dois Fatores',
+            'help' => 'Permitir que os usuários ativem e usem Senhas de Uso Único Baseadas em Tempo (TOTP) ou Baseadas em Contador (HOTP)',
+        ],
+        'twofactor_lock' => [
+            'description' => 'Tempo de Limitação de Dois Fatores (segundos)',
+            'help' => 'Tempo de bloqueio para esperar em segundos antes de permitir novas tentativas se a autenticação de Dois Fatores falhar 3 vezes consecutivas - solicitará ao usuário que aguarde esse tempo. Defina como 0 para desativar, resultando em um bloqueio permanente da conta e uma mensagem ao usuário para contatar o administrador',
+        ],
+        'unix-agent' => [
+            'connection-timeout' => [
+                'description' => 'Tempo de espera da conexão do agente Unix',
+            ],
+            'port' => [
+                'description' => 'Porta padrão do agente Unix',
+                'help' => 'Porta padrão para o agente Unix (check_mk)',
+            ],
+            'read-timeout' => [
+                'description' => 'Tempo de espera de leitura do agente Unix',
+            ],
+        ],
+        'update' => [
+            'description' => 'Habilitar atualizações em ./daily.sh',
+        ],
+        'update_channel' => [
+            'description' => 'Canal de Atualização',
+            'options' => [
+                'master' => 'Diário',
+                'release' => 'Mensal',
+            ],
+        ],
+        'uptime_warning' => [
+            'description' => 'Mostrar Dispositivo como aviso se Uptime abaixo de (segundos)',
+            'help' => 'Mostra Dispositivo como aviso se o Uptime estiver abaixo desse valor. Padrão 24h',
+        ],
+        'virsh' => [
+            'description' => 'Caminho para virsh',
+        ],
+        'webui' => [
+            'availability_map_box_size' => [
+                'description' => 'Largura da caixa de disponibilidade',
+                'help' => 'Insira a largura desejada do bloco em pixels para o tamanho da caixa na visualização completa',
+            ],
+            'availability_map_compact' => [
+                'description' => 'Visualização compacta do mapa de disponibilidade',
+                'help' => 'Visualização do mapa de disponibilidade com pequenos indicadores',
+            ],
+            'availability_map_sort_status' => [
+                'description' => 'Ordenar por status',
+                'help' => 'Ordenar dispositivos e serviços por status',
+            ],
+            'availability_map_use_device_groups' => [
+                'description' => 'Usar filtro de grupos de dispositivos',
+                'help' => 'Habilitar uso do filtro de grupos de dispositivos',
+            ],
+            'default_dashboard_id' => [
+                'description' => 'Dashboard padrão',
+                'help' => 'Dashboard_id padrão global para todos os usuários que não têm seu próprio padrão definido',
+            ],
+            'dynamic_graphs' => [
+                'description' => 'Habilitar gráficos dinâmicos',
+                'help' => 'Habilitar gráficos dinâmicos; permite zoom e pan em gráficos',
+            ],
+            'global_search_result_limit' => [
+                'description' => 'Definir o limite máximo de resultados de pesquisa',
+                'help' => 'Limite global de resultados de pesquisa',
+            ],
+            'graph_stacked' => [
+                'description' => 'Usar gráficos empilhados',
+                'help' => 'Exibir gráficos empilhados em vez de gráficos invertidos',
+            ],
+            'graph_stat_percentile_disable' => [
+                'description' => 'Desativar percentual para gráficos de estatísticas globalmente',
+                'help' => 'Desativa a exibição dos valores e linhas percentuais para gráficos que exibem esses',
+            ],
+            'graph_type' => [
+                'description' => 'Definir o tipo de gráfico',
+                'help' => 'Definir o tipo de gráfico padrão',
+                'options' => [
+                	'png' => 'PNG',
+                	'svg' => 'SVG',
+                ],
+            ],
+            'min_graph_height' => [
+                'description' => 'Definir a altura mínima do gráfico',
+                'help' => 'Altura mínima do gráfico (padrão: 300)',
+            ],
+        ],
+        'device_display_default' => [
+            'description' => 'Nome de Exibição do Dispositivo',
+            'help' => 'Define o nome de exibição padrão para todos os dispositivos (pode ser substituído por dispositivo). Nome do host/IP: Mostre apenas o nome do host ou IP com o qual o dispositivo foi adicionado. sysName: Mostre apenas o sysName do SNMP. Nome do host ou sysName: Mostre o nome do host, mas se for um IP, mostre o sysName.',
+            'options' => [
+                'hostname' => 'Nome do Host / IP',
+                'sysName_fallback' => 'Nome do Host, fallback para sysName para IPs',
+                'sysName' => 'sysName',
+                'ip' => 'IP / Nome do Host',
+            ],
+        ],
+        'device_location_map_open' => [
+            'description' => 'Abrir Mapa de Localização',
+            'help' => 'O Mapa de Localização é exibido por padrão',
+        ],
+        'whois' => [
+            'description' => 'Caminho para whois',
+        ],
+        'smokeping.integration' => [
+            'description' => 'Habilitar',
+            'help' => 'Habilitar integração com Smokeping',
+        ],
+        'smokeping.dir' => [
+            'description' => 'Caminho para rrds',
+            'help' => 'Caminho completo para os RRDs do Smokeping',
+        ],
+        'smokeping.pings' => [
+            'description' => 'Pings',
+            'help' => 'Número de pings configurados no Smokeping',
+        ],
+        'smokeping.url' => [
+            'description' => 'URL para smokeping',
+            'help' => 'URL completa para a GUI do smokeping',
+        ],
+        ],
+        'twofactor' => [
+        'description' => 'Habilitar Autenticação de Dois Fatores',
+        'help' => 'Habilita a autenticação de Dois Fatores. Você deve configurar cada conta para torná-la ativa.',
+        ],
+        'units' => [
+        'days' => 'dias',
+        'ms' => 'ms',
+        'seconds' => 'segundos',
+        ],
+        'validate' => [
+        'boolean' => ':value não é um booleano válido',
+        'color' => ':value não é um código de cor hexadecimal válido',
+        'email' => ':value não é um email válido',
+        'float' => ':value não é um float',
+        'integer' => ':value não é um inteiro',
+        'password' => 'A senha está incorreta',
+        'select' => ':value não é um valor permitido',
+        'text' => ':value não é permitido',
+        'array' => 'Formato inválido',
+        'executable' => ':value não é um executável válido',
+        'directory' => ':value não é um diretório válido',
+        ],
 ];
