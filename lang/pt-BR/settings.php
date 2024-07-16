@@ -1765,17 +1765,17 @@ return [
             'description' => 'URL para smokeping',
             'help' => 'URL completa para a GUI do smokeping',
         ],
-        ],
-        'twofactor' => [
+    ],
+    'twofactor' => [
         'description' => 'Habilitar Autenticação de Dois Fatores',
         'help' => 'Habilita a autenticação de Dois Fatores. Você deve configurar cada conta para torná-la ativa.',
-        ],
-        'units' => [
+    ],
+    'units' => [
         'days' => 'dias',
         'ms' => 'ms',
         'seconds' => 'segundos',
-        ],
-        'validate' => [
+    ],
+    'validate' => [
         'boolean' => ':value não é um booleano válido',
         'color' => ':value não é um código de cor hexadecimal válido',
         'email' => ':value não é um email válido',
@@ -1787,5 +1787,5 @@ return [
         'array' => 'Formato inválido',
         'executable' => ':value não é um executável válido',
         'directory' => ':value não é um diretório válido',
-        ],
+    ],
 ];
