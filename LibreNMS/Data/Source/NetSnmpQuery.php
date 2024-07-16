@@ -513,6 +513,8 @@ class NetSnmpQuery implements SnmpQueryInterface
                 Eventlog::log('Unsupported SNMP authentication algorithm - ' . $code, $this->device, 'poller', Severity::Error);
             } elseif (Str::startsWith($error, 'Invalid privacy protocol specified')) {
                 Eventlog::log('Unsupported SNMP privacy algorithm - ' . $code, $this->device, 'poller', Severity::Error);
+            } elseif (Str::startsWith($error, 'Timeout: No Response')) {
+                Eventlog::log('SNMP timeout encountered - ' . $code, $this->device, 'poller', Severity::Warning);
             }
             Log::debug('Exitcode: ' . $code, [$error]);
         }
