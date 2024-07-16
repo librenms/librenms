@@ -30,8 +30,6 @@ use Illuminate\Support\Collection;
 
 trait EntityMib
 {
-    protected ?string $entityVendorTypeMib = null;
-
     public function discoverEntityPhysical(): Collection
     {
         $snmpQuery = \SnmpQuery::hideMib()->enumStrings();
@@ -52,7 +50,7 @@ trait EntityMib
 
             // fill ifIndex
             if (isset($mapping[$entityPhysicalIndex][0]['ENTITY-MIB::entAliasMappingIdentifier'])) {
-                if (preg_match('/IF-MIB::ifIndex\[(\d+)]/', $mapping[$entityPhysicalIndex][0]['ENTITY-MIB::entAliasMappingIdentifier'], $matches)) {
+                if (preg_match('/(IF-MIB::)?ifIndex\[(\d+)]/', $mapping[$entityPhysicalIndex][0]['ENTITY-MIB::entAliasMappingIdentifier'], $matches)) {
                     $entityPhysical->ifIndex = $matches[1];
                 }
             }

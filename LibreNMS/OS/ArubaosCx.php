@@ -30,13 +30,7 @@ use SnmpQuery;
 
 class ArubaosCx extends \LibreNMS\OS implements NacPolling
 {
-    protected function __construct(array &$device)
-    {
-        parent::__construct($device);
-
-        $this->entityVendorTypeMib = 'ARUBAWIRED-NETWORKING-OID';
-    }
-
+    protected ?string $entityVendorTypeMib = 'ARUBAWIRED-NETWORKING-OID';
 
     public function pollNac()
     {

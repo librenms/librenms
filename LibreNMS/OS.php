@@ -96,6 +96,8 @@ class OS implements
     private $cache; // data cache
     private $pre_cache; // pre-fetch data cache
 
+    protected ?string $entityVendorTypeMib = null;
+
     /**
      * OS constructor. Not allowed to be created directly.  Use OS::make()
      */

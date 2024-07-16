@@ -174,4 +174,11 @@ class StringHelpers
 
         return implode($seperator, $hex);
     }
+
+    public static function trimHexGarbage(string $string): string
+    {
+        $regex = '/(\.{6,7}.{1,2}\.{0,5})?([0-9a-f]{2} )+([0-9a-f]{2})?$/';
+
+        return preg_replace($regex,'', str_replace("\n", '', $string));
+    }
 }
