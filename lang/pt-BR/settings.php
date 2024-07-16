@@ -978,7 +978,14 @@ return [
                 'description' => 'Permitir Redirecionamentos',
                 'help' => 'Permitir redirecionamento do servidor InfluxDB',
             ],
-
+            'debug' => [
+                'description' => 'Depuração',
+                'help' => 'Para ativar ou desativar a saída detalhada via CLI',
+            ],
+            'groups-exclude' => [
+                'description' => 'Grupos de dispositivos excluídos',
+                'help' => 'Grupos de dispositivos excluídos do envio de dados para InfluxDBv2',
+            ],
         ],
         'ipmitool' => [
             'description' => 'Caminho para ipmtool',
@@ -1007,7 +1014,7 @@ return [
             'description' => 'Exibir links de rede no mapa',
             'help' => 'Mostrar os links de rede entre as diferentes localizações no mapa (tipo weathermap)',
         ],
-		'nfdump' => [
+        'nfdump' => [
             'description' => 'Caminho para nfdump',
         ],
         'nfsen_enable' => [
@@ -1365,14 +1372,14 @@ return [
                 'help' => 'Redes/IPs que não serão descobertos automaticamente. Também exclui IPs das Redes de Descoberta Automática',
             ],
         ],
-		 'radius' => [
-			 'default_roles' => [
-				 'description' => 'Funções padrão do usuário',
-				 'help' => 'Define as funções que serão atribuídas ao usuário, a menos que o Radius envie atributos que especifiquem função(ões)',
-        ],
-		     'enforce_roles' => [
-				 'description' => 'Impor funções no login',
-				 'help' => 'Se ativado, as funções serão definidas para as especificadas pelo atributo Filter-ID ou radius.default_roles no login. Caso contrário, elas serão definidas quando o usuário for criado e nunca mais serão alteradas depois disso.',
+        'radius' => [
+			'default_roles' => [
+				'description' => 'Funções padrão do usuário',
+				'help' => 'Define as funções que serão atribuídas ao usuário, a menos que o Radius envie atributos que especifiquem função(ões)',
+			],
+			'enforce_roles' => [
+				'description' => 'Impor funções no login',
+				'help' => 'Se ativado, as funções serão definidas para as especificadas pelo atributo Filter-ID ou radius.default_roles no login. Caso contrário, elas serão definidas quando o usuário for criado e nunca mais serão alteradas depois disso.',
 			],
 		],
 		'reporting' => [
