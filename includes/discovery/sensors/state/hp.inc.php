@@ -20,7 +20,8 @@
  * @link       https://www.librenms.org
  *
  * @copyright  2017 Neil Lathwood
- * @author     Neil Lathwood <neil@lathwood.co.uk>, Rudy Broersma <r.broersma@ctnet.nl>
+ * @author     Neil Lathwood <neil@lathwood.co.uk>
+ * @author     Rudy Broersma <r.broersma@ctnet.nl>
  */
 
 // One could add more entries from deviceGroup, but this will do as a start
