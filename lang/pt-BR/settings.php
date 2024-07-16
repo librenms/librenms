@@ -1566,12 +1566,12 @@ return [
             ],
             'oids' => [
                 'no_bulk' => [
-                	'description' => 'Desativar bulk SNMP para OIDs',
-                	'help' => 'Desativa a operação bulk SNMP para certos OIDs. Geralmente, isso deve ser definido em um sistema operacional. O formato deve ser MIB::OID',
+                    'description' => 'Desativar bulk SNMP para OIDs',
+                    'help' => 'Desativa a operação bulk SNMP para certos OIDs. Geralmente, isso deve ser definido em um sistema operacional. O formato deve ser MIB::OID',
                 ],
                 'unordered' => [
-                	'description' => 'Permitir respostas SNMP fora de ordem para OIDs',
-                	'help' => 'Ignorar OIDs fora de ordem nas respostas SNMP para certos OIDs. OIDs fora de ordem podem resultar em um loop de OID durante um snmpwalk. Geralmente, isso deve ser definido em um sistema operacional. O formato deve ser MIB::OID',
+                    'description' => 'Permitir respostas SNMP fora de ordem para OIDs',
+                    'help' => 'Ignorar OIDs fora de ordem nas respostas SNMP para certos OIDs. OIDs fora de ordem podem resultar em um loop de OID durante um snmpwalk. Geralmente, isso deve ser definido em um sistema operacional. O formato deve ser MIB::OID',
                 ],
             ],
             'port' => [
@@ -1592,17 +1592,17 @@ return [
                 'auth' => 'Autenticação',
                 'crypto' => 'Criptografia',
                 'fields' => [
-                	'authalgo' => 'Algoritmo',
-                	'authlevel' => 'Nível',
-                	'authname' => 'Nome de Usuário',
-                	'authpass' => 'Senha',
-                	'cryptoalgo' => 'Algoritmo',
-                	'cryptopass' => 'Senha',
+                    'authalgo' => 'Algoritmo',
+                    'authlevel' => 'Nível',
+                    'authname' => 'Nome de Usuário',
+                    'authpass' => 'Senha',
+                    'cryptoalgo' => 'Algoritmo',
+                    'cryptopass' => 'Senha',
                 ],
                 'level' => [
-                	'noAuthNoPriv' => 'Sem Autenticação, Sem Privacidade',
-                	'authNoPriv' => 'Autenticação, Sem Privacidade',
-                	'authPriv' => 'Autenticação e Privacidade',
+                    'noAuthNoPriv' => 'Sem Autenticação, Sem Privacidade',
+                    'authNoPriv' => 'Autenticação, Sem Privacidade',
+                    'authPriv' => 'Autenticação e Privacidade',
                 ],
             ],
         ],
@@ -1723,8 +1723,8 @@ return [
                 'description' => 'Definir o tipo de gráfico',
                 'help' => 'Definir o tipo de gráfico padrão',
                 'options' => [
-                	'png' => 'PNG',
-                	'svg' => 'SVG',
+                    'png' => 'PNG',
+                    'svg' => 'SVG',
                 ],
             ],
             'min_graph_height' => [
