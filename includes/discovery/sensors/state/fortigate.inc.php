@@ -20,8 +20,8 @@
  * @link       https://www.librenms.org
  *
  * @copyright  2020 Net Entertainment AB
- * @copyright  2024 CTNET BV
  * @author     Patrik Jonsson <patrik.jonsson@gmail.com>
+ * @copyright  2024 CTNET BV
  * @author     Rudy Broersma <r.broersma@ctnet.nl>
  */
 $index = 0;
