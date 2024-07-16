@@ -156,7 +156,78 @@ if (isset($vars['poudriere_page']) && $vars['poudriere_page'] == 'detials') {
         };
         echo view('widgets/sortable_table', $table);
     }
+    if (isset($app_data['history']) && ! is_null($app_data['history'])) {
+        echo "<b><center>History</center></b><br>\n";
+        $table = [
+            'headers' => [
+                'Set',
+                'Ports',
+                'Jail',
+                'Build',
+                'Status',
+                'Queue',
+                'Built',
+                'Fail',
+                'Skip',
+                'Ignore',
+                'Fetch',
+                'Remain',
+                'Time',
+                'Logs',
+            ],
+            'rows' => [],
+        ];
+        $status_split = explode("\n", $app_data['history']);
+        $status_split_int = 1;
+        while (isset($status_split[$status_split_int])) {
+            $line = preg_replace("/^\s+/", '', $status_split[$status_split_int]);
+            $row = preg_split("/\s+/", $line, 14);
+            if (isset($row[13])) {
+                $table['rows'][] = [
+                    ['data' => $row[0]],
+                    ['data' => $row[1]],
+                    ['data' => $row[2]],
+                    ['data' => $row[3]],
+                    ['data' => $row[4]],
+                    ['data' => $row[5]],
+                    ['data' => $row[6]],
+                    ['data' => $row[7]],
+                    ['data' => $row[8]],
+                    ['data' => $row[9]],
+                    ['data' => $row[10]],
+                    ['data' => $row[11]],
+                    ['data' => $row[12]],
+                    ['data' => $row[13]],
+                ];
+            }
+            $status_split_int++;
+        }
+        echo view('widgets/sortable_table', $table);
+    }
     print_optionbar_end();
+} else {
+    $graphs = [
+        [
+            'type' => 'status',
+            'description' => 'General Status',
+        ],
+        [
+            'type' => 'phase',
+            'description' => 'Build Phase',
+        ],
+        [
+            'type' =>  'time',
+            'description' => 'Build Time',
+        ],
+        [
+            'type' =>  'log_size',
+            'description' => 'Log Size',
+        ],
+        [
+            'type' => 'package_size',
+            'description' => 'Package Size',
+        ],
+    ];
 }
 
 foreach ($graphs as $key => $graph_info) {
