@@ -19,8 +19,10 @@
  *
  * @link       https://www.librenms.org
  *
- * @copyright  2020 Net Entertainment AB, 2024 CTNET BV
- * @author     Patrik Jonsson <patrik.jonsson@gmail.com>, Rudy Broersma <r.broersma@ctnet.nl>
+ * @copyright  2020 Net Entertainment AB
+ * @copyright  2024 CTNET BV
+ * @author     Patrik Jonsson <patrik.jonsson@gmail.com>
+ * @author     Rudy Broersma <r.broersma@ctnet.nl>
  */
 $index = 0;
 $fgHaSystemMode_num = '.1.3.6.1.4.1.12356.101.13.1.1.0';
