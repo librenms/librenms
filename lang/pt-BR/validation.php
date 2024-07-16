@@ -190,7 +190,7 @@ return [
 
     'results' => [
         'autofix' => 'Tentar corrigir automaticamente',
-        'fix' => 'Corrigir',
+        'fix' => 'Correção',
         'fixed' => 'Correção concluída, atualize para executar as validações novamente.',
         'fetch_failed' => 'Falha ao buscar resultados de validação',
         'backend_failed' => 'Falha ao carregar dados do backend, verifique o console para erro.',
