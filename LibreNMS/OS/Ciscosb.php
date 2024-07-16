@@ -31,6 +31,13 @@ use LibreNMS\OS;
 
 class Ciscosb extends OS implements OSDiscovery
 {
+    protected function __construct(array &$device)
+    {
+        parent::__construct($device);
+
+        $this->entityVendorTypeMib = 'CISCO-ENTITY-VENDORTYPE-OID-MIB';
+    }
+
     public function discoverOS(Device $device): void
     {
         parent::discoverOS($device); // yaml
