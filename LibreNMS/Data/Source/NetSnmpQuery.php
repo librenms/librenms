@@ -141,15 +141,19 @@ class NetSnmpQuery implements SnmpQueryInterface
      *
      * @param  string|null  $context  Version 2/3 context name
      * @param  string|null  $v3_prefix  Optional context prefix to prepend for Version 3 queries
+     * @param  string|null  $options  Optional Snmp optionflags
      * @return \LibreNMS\Data\Source\SnmpQueryInterface
      */
-    public function context(?string $context, ?string $v3_prefix = null): SnmpQueryInterface
+    public function context(?string $context, ?string $v3_prefix = null, ?string $options = null): SnmpQueryInterface
     {
         if ($context && $this->device->snmpver === 'v3') {
             $context = $v3_prefix . $context;
         }
 
         $this->context = $context;
+        if ($options) {
+            $this->options = Arr::wrap($options);
+        }
 
         return $this;
     }
