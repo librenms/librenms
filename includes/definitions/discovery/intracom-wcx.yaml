@@ -1,0 +1,355 @@
+---
+mib: PTP-MODEM-MIB:ICOM-ETHER-MIB:ICOM-ENTITY-SENSOR-EXT-MIB:ICOM-MODEM-PERF-MIB:ICOM-PERFHIST-TC-MIB:ICOM-SFP-MIB
+modules:
+    os:
+        hardware: '.1.3.6.1.2.1.1.1.0'
+        serial: '.1.3.6.1.4.1.1807.32.1.1.1.2.1'
+        version: '.1.3.6.1.4.1.1807.13.1.3.1.10.9'
+        features: '.1.3.6.1.4.1.1807.101.1.2.1.3.1'
+
+    sensors:
+        pre-cache:
+            data:
+                -
+                    interface_names:
+                    oid: ifName
+                    num_oid: '.1.3.6.1.2.1.31.1.1.1.1.{{ $index }}'
+                -
+                    interface_descr:
+                    oid: ifDescr
+                    num_oid: '.1.3.6.1.2.1.2.2.1.2.{{ $index }}'
+                -
+                    interface_alias:
+                    oid: ifAlias
+                    num_oid: '.1.3.6.1.2.1.31.1.1.1.18.{{ $index }}'
+                -
+                    sensor_names:
+                    oid: entPhysicalName
+                    num_oid: '.1.3.6.1.2.1.47.1.1.1.1.2.{{ $index }}'
+                -
+        temperature:
+            options:
+                skip_value_lt: 1
+                skip_value_gt: 100000
+            data:
+                -
+                    oid: icomEntSensorValue
+                    num_oid: '.1.3.6.1.4.1.1807.30.1.1.1.4.{{ $index }}'
+                    descr: ' {{ $entPhysicalName }}.{{ $index }} '
+                    index: 'icomEntSensorValue.{{ $index }}'
+                    group: 'Unit Temperatures'
+                    divisor: 1000
+                    low_limit: -5
+                    high_limit: 65
+                    low_warn_limit: 5
+                    warn_limit: 60
+                -
+        signal:
+            data:
+                -
+                    oid: oduRSSI
+                    num_oid: '.1.3.6.1.4.1.1807.55.1.2.4.1.3.{{ $index }}'
+                    descr: 'ODU RX Signal - ODU.{{ $index }}'
+                    index: 'oduRSSI.{{ $index }}'
+                    group: 'Modem.{{ $index }} - from .55 OID dependent on community.#'
+                    divisor: -10
+                    low_limit: -76
+                    high_limit: -20
+                    low_warn_limit: -68
+                    warn_limit: -25
+                -
+                    oid: oduCurrentTxPower
+                    num_oid: '.1.3.6.1.4.1.1807.55.1.2.3.1.4.{{ $index }}'
+                    descr: 'ODU TX Power - ODU.{{ $index }}'
+                    index: 'oduCurrentTxPower.{{ $index }}'
+                    divisor: 10
+                    group: 'Modem.{{ $index }} - from .55 OID dependent on community.#'
+                    low_limit: -5
+                    high_limit: 22
+                    low_warn_limit: -3
+                    warn_limit: 20
+                -
+                    oid: modemStatRxNormalizedMSE
+                    num_oid: '.1.3.6.1.4.1.1807.55.1.1.3.1.9.{{ $index }}'
+                    descr: 'RX SNR - Modem.{{ $index }}'
+                    index: 'modemStatRxNormalizedMSE.{{ $index }}'
+                    group: 'Modem.{{ $index }} - from .55 OID dependent on community.#'
+                    divisor: 10
+                    multiplier: -1
+                    low_limit: 14
+                    high_limit: 45
+                    low_warn_limit: 18
+                    warn_limit: 50
+                -
+                    oid: oduPif
+                    num_oid: '.1.3.6.1.4.1.1807.55.1.2.4.1.4.{{ $index }}'
+                    descr: 'IF Power - ODU.{{ $index }}'
+                    index: 'oduPif.{{ $index }}'
+                    group: 'Modem.{{ $index }} - from .55 OID dependent on community.#'
+                    divisor: 10
+                    multiplier: 1
+                    low_limit: -16.5
+                    high_limit: 0
+                    low_warn_limit: -10
+                    warn_limit: 2
+                -
+                    oid: icomModemPerfRfuCurrentAvgRssi
+                    num_oid: '.1.3.6.1.4.1.1807.71.1.19.1.8.{{ $index }}'
+                    descr: 'Average RX RSSI - ODU.{{ $index }}'
+                    index: 'icomModemPerfRfuCurrentAvgRssi.{{ $index }}'
+                    group: ' Average over last Minute - ODU.{{ $index }}'
+                    divisor: -10
+                    low_limit: -76
+                    high_limit: -20
+                    low_warn_limit: -68
+                    warn_limit: -25
+                -
+                    oid: icomModemPerfRfuCurrentAvgTxPower
+                    num_oid: '.1.3.6.1.4.1.1807.71.1.19.1.5.{{ $index }}'
+                    descr: 'Average TX Power - ODU.{{ $index }}'
+                    index: 'icomModemPerfRfuCurrentAvgTxPower.{{ $index }}'
+                    group: ' Average over last Minute - ODU.{{ $index }}'
+                    divisor: 10
+                    low_limit: -5
+                    high_limit: 22
+                    low_warn_limit: -3
+                    warn_limit: 20
+                -
+        bitrate:
+            data:
+                -
+                    oid: icomEthStatsTxBitRate
+                    num_oid: '.1.3.6.1.4.1.1807.65.1.3.1.2.{{ $index }}'
+                    descr: 'TX Throughput - {{ $ifName }}'
+                    index: 'icomEthStatsTxBitRate.{{ $index }}'
+                    group: 'Ethernet {{ $ifName }} - {{ $ifAlias }}'
+                    divisor: 1
+                    multiplier: 1000
+                -
+                    oid: icomEthStatsRxBitRate
+                    num_oid: '.1.3.6.1.4.1.1807.65.1.3.1.3.{{ $index }}'
+                    descr: 'RX Throughput - {{ $ifName }}'
+                    index: 'icomEthStatsRxBitRate.{{ $index }}'
+                    group: 'Ethernet {{ $ifName }} - {{ $ifAlias }}'
+                    divisor: 1
+                    multiplier: 1000
+                -
+                    oid: icomEthPerfCurrentMaxTxBitRate
+                    num_oid: '.1.3.6.1.4.1.1807.65.2.2.1.8.{{ $index }}'
+                    descr: Max TX Bitrate - {{ $ifName }}
+                    index: 'icomEthPerfCurrentMaxTxBitRate.{{ $index }}'
+                    group: '{{ $ifName }} - Max Bitrate last minute'
+                    divisor: 1
+                    multiplier: 1000
+                    skip_values:
+                        -
+                            oid: ifName
+                            op: not_in_array
+                            value: ['modem1', 'modem2', 'modem0/1', 'modem0/2', 'modem1/1', 'modem2/1']
+                -
+                    oid: icomEthPerfCurrentMaxRxBitRate
+                    num_oid: '.1.3.6.1.4.1.1807.65.2.2.1.10.{{ $index }}'
+                    descr: Max RX Bitrate - {{ $ifName }}
+                    index: 'icomEthPerfCurrentMaxRxBitRate.{{ $index }}'
+                    group: '{{ $ifName }} - Max Bitrate last minute'
+                    divisor: 1
+                    multiplier: 1000
+                    skip_values:
+                        -
+                            oid: ifName
+                            op: not_in_array
+                            value: ['modem1', 'modem2', 'modem0/1', 'modem0/2', 'modem1/1', 'modem2/1']
+                -
+        count:
+            data:
+                -
+                    oid: icomModemPerfStatusCurrentLossOfLink
+                    num_oid: '.1.3.6.1.4.1.1807.71.1.2.1.24.{{ $index }}'
+                    descr: 'Loss Of Link last 1 min - Modem.{{ $index }}'
+                    index: 'icomModemPerfStatusCurrentLossOfLink.{{ $index }}'
+                    group: 'Averaging Counters - Modem.{{ $index }}'
+                -
+                    oid: icomModemPerfG826CurrentESs
+                    num_oid: '.1.3.6.1.4.1.1807.71.1.11.1.5.{{ $index }}'
+                    descr: 'G.826 ES last 15 min - Modem.{{ $index }}'
+                    index: 'icomModemPerfG826CurrentESs.{{ $index }}'
+                    group: 'Averaging Counters - Modem.{{ $index }}'
+                -
+                    oid: icomModemPerfG826CurrentSESs
+                    num_oid: '.1.3.6.1.4.1.1807.71.1.11.1.6.{{ $index }}'
+                    descr: 'G.826 SES last 15 min - Modem.{{ $index }}'
+                    index: 'icomModemPerfG826CurrentSESs.{{ $index }}'
+                    group: 'Averaging Counters - Modem.{{ $index }}'
+                -
+                    oid: icomModemPerfG826CurrentUASs
+                    num_oid: '.1.3.6.1.4.1.1807.71.1.11.1.8.{{ $index }}'
+                    descr: 'G.826 UAS last 15 min - Modem.{{ $index }}'
+                    index: 'icomModemPerfG826CurrentUASs.{{ $index }}'
+                    group: 'Averaging Counters - Modem.{{ $index }}'
+                -
+                    oid: icomModemPerfStatsCurrentOutService
+                    num_oid: '.1.3.6.1.4.1.1807.71.1.7.1.4.{{ $index }}'
+                    descr: 'Out of Service last 15 min - Modem.{{ $index }}'
+                    index: 'icomModemPerfStatsCurrentOutService.{{ $index }}'
+                    group: 'Averaging Counters - Modem.{{ $index }}'
+                    divisor: 1
+                    multiplier: 1
+                -
+                    oid: icomModemPerfStatusCurrentAvgLpdcStress
+                    num_oid: '.1.3.6.1.4.1.1807.71.1.2.1.15.{{ $index }}'
+                    descr: 'RX LDPC Decoder Stress last 1 min - Modem.{{ $index }}'
+                    index: 'icomModemPerfStatusCurrentAvgLpdcStress.{{ $index }}'
+                    group: 'Averaging Counters - Modem.{{ $index }}'
+                -
+                    oid: modemTxAirthroughput
+                    num_oid: '.1.3.6.1.4.1.1807.55.1.1.3.1.15.{{ $index }}'
+                    descr: 'Air TX Capacity - Modem.{{ $index }}'
+                    # descr: 'Air TX Capacity'
+                    index: 'modemTxAirthroughput.{{ $index }}'
+                    group: 'Modem Air Rate - Modem.{{ $index }} (dependent on community.#)'
+                    divisor: 1
+                    multiplier: 1000
+                -
+                    oid: modemRxAirthroughput
+                    num_oid: '.1.3.6.1.4.1.1807.55.1.1.3.1.16.{{ $index }}'
+                    descr: 'Air RX Capacity - Modem.{{ $index }}'
+                    # descr: 'Air RX Capacity'
+                    index: 'modemRxAirthroughput.{{ $index }}'
+                    group: 'Modem Air Rate - Modem.{{ $index }} (dependent on community.#)'
+                    divisor: 1
+                    multiplier: 1000
+                -
+        percent:
+            options:
+                skip_value_gt: 100000
+            data:
+                -
+                    oid: icomModemPerfStatusCurrentAvgTxBwUtil
+                    num_oid: '.1.3.6.1.4.1.1807.71.1.2.1.18.{{ $index }}'
+                    descr: 'TX BW Utilization - Modem.{{ $index }}'
+                    index: 'icomModemPerfStatusCurrentAvgTxBwUtil.{{ $index }}'
+                    group: 'Modem {{ $index }} - Average over last 1 Minute'
+                    divisor: 100
+                    multiplier: 1
+                -
+                    oid: icomModemPerfStatusCurrentAvgRxBwUtil
+                    num_oid: '.1.3.6.1.4.1.1807.71.1.2.1.21.{{ $index }}'
+                    descr: 'RX BW Utilization - Modem.{{ $index }}'
+                    index: 'icomModemPerfStatusCurrentAvgRxBwUtil.{{ $index }}'
+                    group: 'Modem {{ $index }} - Average over last 1 Minute'
+                    divisor: 100
+                    multiplier: 1
+                -
+        frequency:
+            data:
+                -
+                    oid: oduCurrentTxFrequency
+                    num_oid: '.1.3.6.1.4.1.1807.55.1.2.3.1.3.{{ $index }}'
+                    index: 'oduCurrentTxFrequency.{{ $index }}'
+                    descr: 'TX Frequency - ODU.{{ $index }}'
+                    multiplier: 1000
+                    group: '(rounded (2DP should be 3) - dependent on community.#'
+                    low_limit: 0
+                    high_limit: 86000000000
+                    low_warn_limit: 0
+                    warn_limit: 86000000000
+                -
+        state:
+            data:
+                -
+                    oid: oduBandSelection
+                    num_oid: '.1.3.6.1.4.1.1807.55.1.2.1.1.2.{{ $index }}'
+                    index: 'oduBandSelection.{{ $index }}'
+                    descr: 'Bandwidth - Modem.{{ $index }}'
+                    group: 'Modem.{{ $index }} - from .55 OID dependent on community.#'
+                    states:
+                        - { value: 0, generic: 0, graph: 1, descr: 7 MHz }
+                        - { value: 1, generic: 0, graph: 1, descr: 14 MHz }
+                        - { value: 2, generic: 0, graph: 1, descr: 28 MHz }
+                        - { value: 3, generic: 0, graph: 1, descr: 56 MHz }
+                        - { value: 4, generic: 0, graph: 1, descr: 40 MHz }
+                        - { value: 5, generic: 0, graph: 1, descr: 20 MHz }
+                        - { value: 6, generic: 0, graph: 1, descr: 14 MHz Narrow Band }
+                        - { value: 7, generic: 0, graph: 1, descr: 250 MHz }
+                        - { value: 8, generic: 0, graph: 1, descr: 500 MHz }
+                        - { value: 9, generic: 0, graph: 1, descr: 10 MHz }
+                        - { value: 10, generic: 0, graph: 1, descr: 30 MHz }
+                        - { value: 11, generic: 0, graph: 1, descr: 50 MHz }
+                        - { value: 12, generic: 0, graph: 1, descr: 112 MHz }
+                        - { value: 13, generic: 0, graph: 1, descr: 750 MHz }
+                        - { value: 14, generic: 0, graph: 1, descr: 1000 MHz }
+                        - { value: 15, generic: 0, graph: 1, descr: 1500 MHz }
+                        - { value: 16, generic: 0, graph: 1, descr: 100 MHz }
+                        - { value: 17, generic: 0, graph: 1, descr: 62.5 MHz }
+                        - { value: 18, generic: 0, graph: 1, descr: 125 MHz }
+                        - { value: 19, generic: 0, graph: 1, descr: 2000 MHz }
+                        - { value: 20, generic: 0, graph: 1, descr: 60 MHz }
+                        - { value: 21, generic: 0, graph: 1, descr: 80 MHz }
+                -
+                    oid: remoteModemLinkStatus
+                    num_oid: '.1.3.6.1.4.1.1807.55.1.1.9.1.2.{{ $index }}'
+                    index: 'remoteModemLinkStatus.{{ $index }}'
+                    descr: 'Remote Modem Link Status - Modem.{{ $index }}'
+                    group: 'Modem.{{ $index }} - from .55 OID dependent on community.#'
+                    states:
+                        - { value: 0, generic: 2, graph: 1, descr: Unlocked }
+                        - { value: 1, generic: 0, graph: 1, descr: Locked }
+                        - { value: 2, generic: 2, graph: 1, descr: Offline }
+                -
+                    oid: icomModemPerfStatusCurrentModTxPhyMod
+                    num_oid: '.1.3.6.1.4.1.1807.71.1.2.1.9.{{ $index }}'
+                    index: 'icomModemPerfStatusCurrentModTxPhyMod.{{ $index }}'
+                    descr: 'TX Modulation - Modem.{{ $index }}'
+                    group: 'Average Modulation over last minute - Modem.{{ $index }}'
+                    states:
+                        - { value: 0, generic: 2, graph: 1, descr: Link down }
+                        - { value: 1, generic: 1, graph: 1, descr: 4QAM }
+                        - { value: 2, generic: 1, graph: 1, descr: 4QAM }
+                        - { value: 3, generic: 0, graph: 1, descr: 16QAM }
+                        - { value: 4, generic: 0, graph: 1, descr: 16QAM }
+                        - { value: 5, generic: 0, graph: 1, descr: 32QAM }
+                        - { value: 6, generic: 0, graph: 1, descr: 64QAM }
+                        - { value: 7, generic: 0, graph: 1, descr: 128QAM }
+                        - { value: 8, generic: 0, graph: 1, descr: 256QAM }
+                        - { value: 9, generic: 0, graph: 1, descr: 512QAM }
+                        - { value: 10, generic: 0, graph: 1, descr: 1024QAM }
+                        - { value: 11, generic: 0, graph: 1, descr: 2048QAM }
+                        - { value: 12, generic: 0, graph: 1, descr: 4096QAM }
+                        - { value: 13, generic: 0, graph: 1, descr: None }
+                        - { value: 14, generic: 0, graph: 1, descr: None }
+                        - { value: 15, generic: 0, graph: 1, descr: None }
+                        - { value: 16, generic: 2, graph: 1, descr: Link down }
+                -
+                    oid: icomModemPerfStatusCurrentModRxPhyMod
+                    num_oid: '.1.3.6.1.4.1.1807.71.1.2.1.12.{{ $index }}'
+                    index: 'icomModemPerfStatusCurrentModRxPhyMod.{{ $index }}'
+                    descr: 'RX Modulation - Modem.{{ $index }}'
+                    group: 'Average Modulation over last minute - Modem.{{ $index }}'
+                    states:
+                        - { value: 0, generic: 2, graph: 1, descr: Link down }
+                        - { value: 1, generic: 1, graph: 1, descr: 4QAM }
+                        - { value: 2, generic: 1, graph: 1, descr: 4QAM }
+                        - { value: 3, generic: 0, graph: 1, descr: 16QAM }
+                        - { value: 4, generic: 0, graph: 1, descr: 16QAM }
+                        - { value: 5, generic: 0, graph: 1, descr: 32QAM }
+                        - { value: 6, generic: 0, graph: 1, descr: 64QAM }
+                        - { value: 7, generic: 0, graph: 1, descr: 128QAM }
+                        - { value: 8, generic: 0, graph: 1, descr: 256QAM }
+                        - { value: 9, generic: 0, graph: 1, descr: 512QAM }
+                        - { value: 10, generic: 0, graph: 1, descr: 1024QAM }
+                        - { value: 11, generic: 0, graph: 1, descr: 2048QAM }
+                        - { value: 12, generic: 0, graph: 1, descr: 4096QAM }
+                        - { value: 13, generic: 0, graph: 1, descr: None }
+                        - { value: 14, generic: 0, graph: 1, descr: None }
+                        - { value: 15, generic: 0, graph: 1, descr: None }
+                        - { value: 16, generic: 2, graph: 1, descr: Link down }
+                -
+                    oid: modemXpicConfEnabled
+                    num_oid: '.1.3.6.1.4.1.1807.55.1.1.14.1.2.{{ $index }}'
+                    index: 'modemXpicConfEnabled.{{ $index }}'
+                    descr: 'XPIC Status'
+                    group: 'XPIC - Modem.{{ $index }}'
+                    states:
+                        - { value: 1, generic: 1, graph: 1, descr: Enabled }
+                        - { value: 2, generic: 1, graph: 1, descr: Disabled}
+                -

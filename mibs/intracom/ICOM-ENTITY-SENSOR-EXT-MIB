@@ -1,0 +1,857 @@
+ICOM-ENTITY-SENSOR-EXT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+   MODULE-IDENTITY, OBJECT-TYPE, Integer32, Unsigned32
+      FROM SNMPv2-SMI
+   TruthValue, TEXTUAL-CONVENTION ,TimeStamp
+      FROM SNMPv2-TC
+   MODULE-COMPLIANCE, OBJECT-GROUP
+      FROM SNMPv2-CONF
+   entPhysicalIndex
+      FROM ENTITY-MIB
+   EntitySensorDataType,EntitySensorDataScale,EntitySensorPrecision, 
+   EntitySensorValue, EntitySensorStatus
+	  FROM ENTITY-SENSOR-MIB	   
+   IcomDateTimeType
+      FROM ICOM-PERFHIST-TC-MIB
+   intracom
+      FROM ICOM-SMI;        
+
+
+icomEntitySensorExtMib   MODULE-IDENTITY
+   LAST-UPDATED             "201506030000Z"     -- 03 June 2015
+   ORGANIZATION             "Intracom S.A."
+   CONTACT-INFO        
+      "Intracom DSLAM Management Group
+      EMail:		  manap@intracom.gr
+      Phone:
+      Co-editor:
+      EMail:	      
+      Phone:  "
+   DESCRIPTION  
+   " This module provides the objects related to the management of system 
+   physical entities. The mib is based on the CISCO-ENTITY-SENSOR.
+   The MIB includes the following proprietary objects:
+1.icomEntSensorValueTable   
+2.icomEntSensorThresholdTable
+3.icomEntitySensorPerfEnable
+4.icomEntitySensorPerfCurrentTable
+5.icomEntitySensorPerf1MinIntervalTable
+6.icomEntitySensorPerf15MinIntervalTable
+7.icomEntitySensorPerf1DayIntervalTable
+"
+
+-- Revision History
+       REVISION	    "201506030000Z"     --       03 June 2015
+       DESCRIPTION  "Add icomEntitySensorPerf* performance objects."
+
+       REVISION	    "201309200000Z"     --       20 Sept 2013
+       DESCRIPTION  "Updated description of icomEntSensorFailureStatus."
+
+       REVISION	    "201307120000Z"	       --    12 July 2013
+       DESCRIPTION  "New icomEntSensorFailureStatus MO added in icomEntSensorValueEntry."
+
+       REVISION	    "201201160000Z"	       --    16 January 2012
+       DESCRIPTION  "Initial version of the MIB."
+
+::= { intracom 30 }
+
+
+SensorThresholdSeverity ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "sensor threshold severity.  Valid values are:
+
+        other(1)    : a severity other than those listed below.
+        minor(10)   : Minor Problem threshold.
+        major(20)   : Major Problem threshold.
+        critical(30): Critical problem threshold. A system might shut
+                      down the sensor associated FRU automatically if
+                      the sensor value reach the critical problem
+                      threshold."
+    SYNTAX INTEGER {
+        other(1),
+        minor(10),
+        major(20),
+        critical(30)
+    }
+
+SensorThresholdRelation ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "sensor threshold relational operator types.  valid values are:
+
+        lessThan(1):        if the sensor value is less than
+                            the threshold value
+        lessOrEqual(2):     if the sensor value is less than or equal to
+                            the threshold value
+        greaterThan(3):     if the sensor value is greater than
+                            the threshold value
+        greaterOrEqual(4):  if the sensor value is greater than or equal
+                            to the threshold value
+        equalTo(5):         if the sensor value is equal to
+                            the threshold value
+        notEqualTo(6):      if the sensor value is not equal to
+                            the threshold value
+        "
+    SYNTAX INTEGER {
+        lessThan(1),
+        lessOrEqual(2),
+        greaterThan(3),
+        greaterOrEqual(4),
+        equalTo(5),
+        notEqualTo(6)
+    }
+
+--
+-- MIB variables
+-- 
+
+-- icomEntitySensorExtObjects OBJECT IDENTIFIER ::= { icomEntitySensorExtMib 1}
+
+
+icomEntitySensorExtSensorValues OBJECT IDENTIFIER ::= { icomEntitySensorExtMib 1 }
+
+icomEntitySensorExtSensorThresholds OBJECT IDENTIFIER ::= { icomEntitySensorExtMib 2 }
+
+icomEntitySensorGroups OBJECT IDENTIFIER ::= { icomEntitySensorExtMib 3 }
+icomEntitySensorPerfObjects OBJECT IDENTIFIER ::= { icomEntitySensorExtMib 4 }
+icomEntitySensorConformance OBJECT IDENTIFIER ::= { icomEntitySensorExtMib 5 }
+
+--
+-- entSensorValueTable 
+-- 
+icomEntSensorValueTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF IcomEntSensorValueEntry 
+    MAX-ACCESS    not-accessible
+    STATUS        current 
+    DESCRIPTION
+        "This table lists the type, scale, and present value
+        of a sensor listed in the Entity-MIB entPhysicalTable."
+    ::= { icomEntitySensorExtSensorValues 1 }
+
+icomEntSensorValueEntry OBJECT-TYPE
+    SYNTAX        IcomEntSensorValueEntry 
+    MAX-ACCESS    not-accessible
+    STATUS        current 
+    DESCRIPTION   
+        "An entSensorValueTable entry describes the 
+        present reading of a sensor, the measurement units
+        and scale, and sensor operational status."
+    INDEX         { entPhysicalIndex }
+    ::= { icomEntSensorValueTable 1 }
+
+IcomEntSensorValueEntry ::= SEQUENCE {
+    icomEntSensorType            EntitySensorDataType,
+    icomEntSensorScale           EntitySensorDataScale,
+    icomEntSensorPrecision       EntitySensorPrecision,
+    icomEntSensorValue           EntitySensorValue,
+    icomEntSensorStatus          EntitySensorStatus,
+    icomEntSensorValueTimeStamp  TimeStamp,
+    icomEntSensorValueUpdateRate Integer32,
+    icomEntSensorFailureStatus   Integer32
+    }
+
+icomEntSensorType OBJECT-TYPE
+    SYNTAX        EntitySensorDataType 
+    MAX-ACCESS    read-only
+    STATUS        current 
+    DESCRIPTION
+        "This variable indicates the type of data 
+        reported by the icomEntSensorValue.
+
+        This variable is set by the agent at start-up
+        and the value does not change during operation."
+    ::= { icomEntSensorValueEntry 1 }
+
+icomEntSensorScale OBJECT-TYPE
+    SYNTAX        EntitySensorDataScale 
+    MAX-ACCESS    read-only
+    STATUS        current 
+    DESCRIPTION
+        "This variable indicates the exponent to apply
+        to sensor values reported by entSensorValue.
+
+        This variable is set by the agent at start-up
+        and the value does not change during operation."
+    ::= { icomEntSensorValueEntry 2 }
+
+icomEntSensorPrecision OBJECT-TYPE
+    SYNTAX        EntitySensorPrecision 
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This variable indicates the number of decimal
+        places of precision in fixed-point
+        sensor values reported by entSensorValue.
+
+        This variable is set to 0 when entSensorType
+        is not a fixed-point type:  voltsAC(1), voltsDC(2), 
+        amperes(3), watts(4), hertz(5), celsius(6), or cmm(9).
+
+        This variable is set by the agent at start-up
+        and the value does not change during operation."
+    ::= { icomEntSensorValueEntry 3 }
+
+icomEntSensorValue OBJECT-TYPE
+    SYNTAX        EntitySensorValue 
+    MAX-ACCESS    read-only
+    STATUS        current 
+    DESCRIPTION
+        "This variable reports the most recent measurement seen
+        by the sensor.
+
+        To correctly display or interpret this variable's value, 
+        you must also know entSensorType, entSensorScale, and 
+        entSensorPrecision.
+
+        However, you can compare entSensorValue with the threshold
+        values given in entSensorThresholdTable without any semantic
+        knowledge.
+        "
+    ::= { icomEntSensorValueEntry 4 }
+
+icomEntSensorStatus OBJECT-TYPE
+    SYNTAX        EntitySensorStatus 
+    MAX-ACCESS    read-only
+    STATUS        current 
+    DESCRIPTION
+        "This variable indicates the present operational status
+        of the sensor."
+    ::= { icomEntSensorValueEntry 5 }
+
+icomEntSensorValueTimeStamp OBJECT-TYPE
+    SYNTAX        TimeStamp
+    MAX-ACCESS    read-only
+    STATUS        current 
+    DESCRIPTION
+        "This variable indicates the age of the value reported by 
+        entSensorValue"
+    ::= { icomEntSensorValueEntry 6 }
+
+icomEntSensorValueUpdateRate  OBJECT-TYPE
+    SYNTAX        Integer32
+    UNITS         "seconds"
+    MAX-ACCESS    read-only
+    STATUS        current 
+    DESCRIPTION
+        "This variable indicates the rate that the agent
+        updates icomEntSensorValue."
+    ::= { icomEntSensorValueEntry 7 }
+
+icomEntSensorFailureStatus  OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates the Power Supply operational status details.
+        OmniBAS-8W: For Power Supplies (entPhysicalIndex 6 and 16), each bit of the object
+        value corresponds to a power supply status detail as indicated in the following list:
+            b0: pwrCableExist,
+            b1: pgSoftStart,
+            b2: plus48VFuse,
+            b3: 48VA,
+            b4: 48VB,
+            b5: 48VBP,
+            b6: 12VTotal,
+            b7: 12VLocal. "
+    ::= { icomEntSensorValueEntry 8 }
+
+--
+-- icomEntSensorThresholdTable 
+-- 
+
+icomEntSensorThresholdTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF IcomEntSensorThresholdEntry 
+    MAX-ACCESS    not-accessible
+    STATUS        current 
+    DESCRIPTION
+        "This table lists the threshold severity, relation, and
+        comparison value, for a sensor listed in the Entity-MIB 
+        entPhysicalTable."
+    ::= { icomEntitySensorExtSensorThresholds 1 }
+
+icomEntSensorThresholdEntry OBJECT-TYPE
+    SYNTAX        IcomEntSensorThresholdEntry 
+    MAX-ACCESS    not-accessible
+    STATUS        current 
+    DESCRIPTION   
+         "An icomEntSensorThresholdTable entry describes the 
+         thresholds for a sensor: the threshold severity,
+         the threshold value, the relation, and the 
+         evaluation of the threshold.
+
+         Only entities of type sensor(8) are listed in this table.
+         Only pre-configured thresholds are listed in this table.
+
+         Entries are created by the agent at system startup and
+         FRU insertion.  Entries are deleted by the agent at
+         FRU removal."
+    INDEX         { entPhysicalIndex, icomEntSensorThresholdIndex }
+    ::= { icomEntSensorThresholdTable 1 }
+
+IcomEntSensorThresholdEntry ::= SEQUENCE {
+    icomEntSensorThresholdIndex      Integer32,
+    icomEntSensorThresholdSeverity   SensorThresholdSeverity,
+    icomEntSensorThresholdRelation   SensorThresholdRelation,
+    icomEntSensorThresholdValue      EntitySensorValue,
+    icomEntSensorThresholdEvaluation TruthValue,
+    icomEntSensorThresholdNotificationEnable TruthValue
+    }
+
+icomEntSensorThresholdIndex OBJECT-TYPE
+    SYNTAX        Integer32 (1..99999999)
+    MAX-ACCESS    not-accessible
+    STATUS        current 
+    DESCRIPTION
+        "An index that uniquely identifies an entry
+        in the icomEntSensorThresholdTable. This index
+        permits the same sensor to have several 
+        different thresholds."
+    ::= { icomEntSensorThresholdEntry 1 }
+
+icomEntSensorThresholdSeverity OBJECT-TYPE
+    SYNTAX        SensorThresholdSeverity 
+    MAX-ACCESS    read-write
+    STATUS        current 
+    DESCRIPTION
+        "This variable indicates the severity of this threshold."
+    ::= { icomEntSensorThresholdEntry 2 }
+
+icomEntSensorThresholdRelation OBJECT-TYPE
+    SYNTAX        SensorThresholdRelation 
+    MAX-ACCESS    read-write
+    STATUS        current 
+    DESCRIPTION
+        "This variable indicates the relation between sensor value 
+        (entSensorValue) and threshold value (entSensorThresholdValue), 
+        required to trigger the alarm.  when evaluating the relation, 
+        entSensorValue is on the left of entSensorThresholdRelation, 
+        entSensorThresholdValue is on the right. 
+
+        in pseudo-code, the evaluation-alarm mechanism is:
+ 
+        ...
+        if (entSensorStatus == ok) then
+            if (evaluate(entSensorValue, entSensorThresholdRelation,  
+                entSensorThresholdValue)) 
+            then
+                if (entSensorThresholdNotificationEnable == true)) 
+                then
+                    raise_alarm(sensor's entPhysicalIndex);
+                endif
+            endif
+        endif
+        ...
+        "
+    ::= { icomEntSensorThresholdEntry 3 }
+
+icomEntSensorThresholdValue OBJECT-TYPE
+    SYNTAX        EntitySensorValue 
+    MAX-ACCESS    read-write
+    STATUS        current 
+    DESCRIPTION
+        "This variable indicates the value of the threshold.
+
+        To correctly display or interpret this variable's value, 
+        you must also know icomEntSensorType, icomEntSensorScale, and 
+        icomEntSensorPrecision.
+
+        However, you can directly compare icomEntSensorValue
+        with the threshold values given in icomEntSensorThresholdTable 
+        without any semantic knowledge.
+        "
+    ::= { icomEntSensorThresholdEntry 4 }
+
+icomEntSensorThresholdEvaluation  OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This variable indicates the result of the most
+        recent evaluation of the threshold.  If the threshold
+        condition is true, entSensorThresholdEvaluation 
+        is true(1).  If the threshold condition is false, 
+        entSensorThresholdEvaluation is false(2).
+
+        Thresholds are evaluated at the rate indicated by 
+        icomEntSensorValueUpdateRate.        
+        "
+    ::= { icomEntSensorThresholdEntry 5 }
+
+icomEntSensorThresholdNotificationEnable OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "This variable controls generation of 
+        icomEntSensorThresholdNotification for this threshold.
+
+        When this variable is true(1), generation of 
+        icomEntSensorThresholdNotification is enabled.  When this
+        variable is false(2), generation of 
+        icomEntSensorThresholdNotification is disabled.
+
+        This variable only controls generation of 
+        icomEntSensorThresholdNotification.
+        "
+    ::= { icomEntSensorThresholdEntry 6 }
+
+--=========================================================
+-- icomEntitySensorPerfEnable
+--=========================================================
+
+icomEntitySensorPerfEnable OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+       "This object enables/disables the collection of historical
+        performance statistics for the sensors.
+
+        If value is set to 'true(1)', then collection of historical
+        performance statistics is enabled.
+
+        If value is set to 'false(2)', then collection of historical
+        performance statistics is disabled. Any existing historical
+        performance statistics will be discarded.
+
+        This object is persistent, and its value must be retained across
+        reinitializations of the management system.
+       "
+    DEFVAL { true }
+    ::= { icomEntitySensorPerfObjects 1 }
+
+-- -------------------------------------------------------------
+-- icomEntitySensorPerfCurrentTable
+-- -------------------------------------------------------------
+
+icomEntitySensorPerfCurrentTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF IcomEntitySensorPerfCurrentEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+       "This table provides sensor performance statistics for the current
+        1-minute interval.
+       "
+    ::= { icomEntitySensorPerfObjects 2 }
+
+icomEntitySensorPerfCurrentEntry OBJECT-TYPE
+    SYNTAX       IcomEntitySensorPerfCurrentEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+       "An entry (conceptual row) in the icomEntitySensorPerfCurrentTable.
+       "
+    INDEX  { entPhysicalIndex }
+    ::= { icomEntitySensorPerfCurrentTable 1 }
+
+IcomEntitySensorPerfCurrentEntry ::= SEQUENCE {
+    icomEntitySensorPerfCurrentSuspect        TruthValue,
+    icomEntitySensorPerfCurrentSensorValue    EntitySensorValue
+}
+
+icomEntitySensorPerfCurrentSuspect OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+       "This variable indicates if the data for this interval have been
+        marked as suspect.
+
+        Value 'true(1)' indicates that the related performance data have
+        been marked as suspect.
+
+        Value 'false(2)' indicates that the related performance data
+        have not been marked as suspect.
+       "
+    REFERENCE
+       "ITU-T G.7710/Y.1701 clause 10.1.6.1
+       "
+    ::= { icomEntitySensorPerfCurrentEntry 1 }
+
+icomEntitySensorPerfCurrentSensorValue OBJECT-TYPE
+    SYNTAX       EntitySensorValue
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Current sensor measurement in the current 1-minute interval.
+        "
+    ::= { icomEntitySensorPerfCurrentEntry 2 }
+
+-- -------------------------------------------------------------
+-- icomEntitySensorPerf1MinIntervalTable
+-- -------------------------------------------------------------
+
+icomEntitySensorPerf1MinIntervalTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF IcomEntitySensorPerf1MinIntervalEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+       "This table provides sensor performance statistics for historical
+        (completed) 1-minute intervals.
+
+        This table will have a maximum of 60 entries of completed 1-minute
+        intervals, to provide historical statistics for one hour.
+       "
+    ::= { icomEntitySensorPerfObjects 3 }
+
+icomEntitySensorPerf1MinIntervalEntry OBJECT-TYPE
+    SYNTAX       IcomEntitySensorPerf1MinIntervalEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+       "An entry (conceptual row) in the
+        icomEntitySensorPerf1MinIntervalTable.
+       "
+    INDEX  { entPhysicalIndex,
+             icomEntitySensorPerf1MinIntervalNumber
+           }
+    ::= { icomEntitySensorPerf1MinIntervalTable 1 }
+
+IcomEntitySensorPerf1MinIntervalEntry ::= SEQUENCE {
+    icomEntitySensorPerf1MinIntervalNumber      Unsigned32,
+    icomEntitySensorPerf1MinIntervalEndTime     IcomDateTimeType,
+    icomEntitySensorPerf1MinIntervalSuspect     TruthValue,
+    icomEntitySensorPerf1MinIntervalSensorValue EntitySensorValue
+}
+
+icomEntitySensorPerf1MinIntervalNumber OBJECT-TYPE
+    SYNTAX       Unsigned32 (1..60)
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+       "A number that identifies the interval for which the set of
+        statistics is available. The interval identified by 1 is the
+        most recently completed 1-minute interval, and the interval
+        identified by N is the interval immediately preceding the one
+        identified by N-1.
+       "
+    ::= { icomEntitySensorPerf1MinIntervalEntry 1 }
+
+icomEntitySensorPerf1MinIntervalEndTime OBJECT-TYPE
+    SYNTAX       IcomDateTimeType
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+       "The time that this measurement interval ended.
+       "
+    REFERENCE
+       "ITU-T G.7710/Y.1701 clause 10.1.6.1
+       "
+    ::= { icomEntitySensorPerf1MinIntervalEntry 2 }
+
+icomEntitySensorPerf1MinIntervalSuspect OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+       "This variable indicates if the data for this interval have been
+        marked as suspect.
+
+        Value 'true(1)' indicates that the related performance data have
+        been marked as suspect.
+
+        Value 'false(2)' indicates that the related performance data
+        have not been marked as suspect.
+       "
+    REFERENCE
+       "ITU-T G.7710/Y.1701 clause 10.1.6.1
+       "
+    ::= { icomEntitySensorPerf1MinIntervalEntry 3 }
+
+icomEntitySensorPerf1MinIntervalSensorValue OBJECT-TYPE
+    SYNTAX       EntitySensorValue
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Snapshot of the sensor measurement at the end of this completed
+         1-minute interval.
+        "
+    ::= { icomEntitySensorPerf1MinIntervalEntry 4 }
+
+-- -------------------------------------------------------------
+-- icomEntitySensorPerf15MinIntervalTable
+-- -------------------------------------------------------------
+
+icomEntitySensorPerf15MinIntervalTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF IcomEntitySensorPerf15MinIntervalEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+       "This table provides sensor performance statistics for historical
+        (completed) 15-minute intervals.
+
+        This table will have a maximum of 96 entries of completed
+        15-minute intervals, to provide historical statistics for one day.
+       "
+    ::= { icomEntitySensorPerfObjects 4 }
+
+icomEntitySensorPerf15MinIntervalEntry OBJECT-TYPE
+    SYNTAX       IcomEntitySensorPerf15MinIntervalEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+       "An entry (conceptual row) in the
+        icomEntitySensorPerf15MinIntervalTable.
+       "
+    INDEX  { entPhysicalIndex,
+             icomEntitySensorPerf15MinIntervalNumber
+           }
+    ::= { icomEntitySensorPerf15MinIntervalTable 1 }
+
+IcomEntitySensorPerf15MinIntervalEntry ::= SEQUENCE {
+    icomEntitySensorPerf15MinIntervalNumber         Unsigned32,
+    icomEntitySensorPerf15MinIntervalEndTime        IcomDateTimeType,
+    icomEntitySensorPerf15MinIntervalSuspect        TruthValue,
+    icomEntitySensorPerf15MinIntervalMinSensorValue EntitySensorValue,
+    icomEntitySensorPerf15MinIntervalMaxSensorValue EntitySensorValue,
+    icomEntitySensorPerf15MinIntervalAvgSensorValue EntitySensorValue
+}
+
+icomEntitySensorPerf15MinIntervalNumber OBJECT-TYPE
+    SYNTAX       Unsigned32 (1..96)
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+       "A number that identifies the interval for which the set of
+        statistics is available. The interval identified by 1 is the
+        most recently completed 15-minute interval, and the interval
+        identified by N is the interval immediately preceding the one
+        identified by N-1.
+       "
+    ::= { icomEntitySensorPerf15MinIntervalEntry 1 }
+
+icomEntitySensorPerf15MinIntervalEndTime OBJECT-TYPE
+    SYNTAX       IcomDateTimeType
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+       "The time that this measurement interval ended.
+       "
+    REFERENCE
+       "ITU-T G.7710/Y.1701 clause 10.1.6.1
+       "
+    ::= { icomEntitySensorPerf15MinIntervalEntry 2 }
+
+icomEntitySensorPerf15MinIntervalSuspect OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+       "This variable indicates if the data for this interval have been
+        marked as suspect.
+
+        Value 'true(1)' indicates that the related performance data have
+        been marked as suspect.
+
+        Value 'false(2)' indicates that the related performance data
+        have not been marked as suspect.
+       "
+    REFERENCE
+       "ITU-T G.7710/Y.1701 clause 10.1.6.1
+       "
+    ::= { icomEntitySensorPerf15MinIntervalEntry 3 }
+
+icomEntitySensorPerf15MinIntervalMinSensorValue OBJECT-TYPE
+    SYNTAX       EntitySensorValue
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Minimum sensor measurement in this completed 15-minute interval.
+        "
+    ::= { icomEntitySensorPerf15MinIntervalEntry 4 }
+
+icomEntitySensorPerf15MinIntervalMaxSensorValue OBJECT-TYPE
+    SYNTAX       EntitySensorValue
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Maximum sensor measurement in this completed 15-minute interval.
+        "
+    ::= { icomEntitySensorPerf15MinIntervalEntry 5 }
+
+icomEntitySensorPerf15MinIntervalAvgSensorValue OBJECT-TYPE
+    SYNTAX       EntitySensorValue
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Average sensor measurement in this completed 15-minute interval.
+        "
+    ::= { icomEntitySensorPerf15MinIntervalEntry 6 }
+
+-- -------------------------------------------------------------
+-- icomEntitySensorPerf1DayIntervalTable
+-- -------------------------------------------------------------
+
+icomEntitySensorPerf1DayIntervalTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF IcomEntitySensorPerf1DayIntervalEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+       "This table provides sensor performance statistics for historical
+        (completed) 1-day intervals.
+
+        This table will have a maximum of 30 entries of completed
+        1-day intervals, to provide historical statistics for one month.
+       "
+    ::= { icomEntitySensorPerfObjects 5 }
+
+icomEntitySensorPerf1DayIntervalEntry OBJECT-TYPE
+    SYNTAX       IcomEntitySensorPerf1DayIntervalEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+       "An entry (conceptual row) in the
+        icomEntitySensorPerf1DayIntervalTable.
+       "
+    INDEX  { entPhysicalIndex,
+             icomEntitySensorPerf1DayIntervalNumber
+           }
+    ::= { icomEntitySensorPerf1DayIntervalTable 1 }
+
+IcomEntitySensorPerf1DayIntervalEntry ::= SEQUENCE {
+    icomEntitySensorPerf1DayIntervalNumber         Unsigned32,
+    icomEntitySensorPerf1DayIntervalEndTime        IcomDateTimeType,
+    icomEntitySensorPerf1DayIntervalSuspect        TruthValue,
+    icomEntitySensorPerf1DayIntervalMinSensorValue EntitySensorValue,
+    icomEntitySensorPerf1DayIntervalMaxSensorValue EntitySensorValue,
+    icomEntitySensorPerf1DayIntervalAvgSensorValue EntitySensorValue
+}
+
+icomEntitySensorPerf1DayIntervalNumber OBJECT-TYPE
+    SYNTAX       Unsigned32 (1..30)
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+       "A number that identifies the interval for which the set of
+        statistics is available. The interval identified by 1 is the
+        most recently completed 1-day interval, and the interval
+        identified by N is the interval immediately preceding the one
+        identified by N-1.
+       "
+    ::= { icomEntitySensorPerf1DayIntervalEntry 1 }
+
+icomEntitySensorPerf1DayIntervalEndTime OBJECT-TYPE
+    SYNTAX       IcomDateTimeType
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+       "The time that this measurement interval ended.
+       "
+    REFERENCE
+       "ITU-T G.7710/Y.1701 clause 10.1.6.1
+       "
+    ::= { icomEntitySensorPerf1DayIntervalEntry 2 }
+
+icomEntitySensorPerf1DayIntervalSuspect OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+       "This variable indicates if the data for this interval have been
+        marked as suspect.
+
+        Value 'true(1)' indicates that the related performance data have
+        been marked as suspect.
+
+        Value 'false(2)' indicates that the related performance data
+        have not been marked as suspect.
+       "
+    REFERENCE
+       "ITU-T G.7710/Y.1701 clause 10.1.6.1
+       "
+    ::= { icomEntitySensorPerf1DayIntervalEntry 3 }
+
+icomEntitySensorPerf1DayIntervalMinSensorValue OBJECT-TYPE
+    SYNTAX       EntitySensorValue
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Minimum sensor measurement in this completed 1-day interval.
+        "
+    ::= { icomEntitySensorPerf1DayIntervalEntry 4 }
+
+icomEntitySensorPerf1DayIntervalMaxSensorValue OBJECT-TYPE
+    SYNTAX       EntitySensorValue
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Maximum sensor measurement in this completed 1-day interval.
+        "
+    ::= { icomEntitySensorPerf1DayIntervalEntry 5 }
+
+icomEntitySensorPerf1DayIntervalAvgSensorValue OBJECT-TYPE
+    SYNTAX       EntitySensorValue
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Average sensor measurement in this completed 1-day interval.
+        "
+    ::= { icomEntitySensorPerf1DayIntervalEntry 6 }
+
+   --
+   -- Compliance statements
+   --
+
+icomEntitySensorCompliance  MODULE-COMPLIANCE
+    STATUS            current
+    DESCRIPTION
+        "The compliance statement for icomSyslog MIB"
+    MODULE -- This Module
+    MANDATORY-GROUPS { icomEntitySensorGroup, icomEntitySensorPerfGroup }
+    ::= { icomEntitySensorConformance 1 }
+
+icomEntitySensorGroup OBJECT-GROUP
+    OBJECTS {  
+	icomEntSensorType,
+	icomEntSensorScale,
+	icomEntSensorPrecision,
+	icomEntSensorValue,
+	icomEntSensorStatus,
+	icomEntSensorValueTimeStamp,
+	icomEntSensorValueUpdateRate,
+	icomEntSensorFailureStatus,
+	icomEntSensorThresholdSeverity,
+	icomEntSensorThresholdRelation,
+	icomEntSensorThresholdValue,
+	icomEntSensorThresholdEvaluation,
+	icomEntSensorThresholdNotificationEnable
+    }
+
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects for icomEntitySensors"
+::= { icomEntitySensorGroups 1 }
+
+icomEntitySensorPerfGroup OBJECT-GROUP
+    OBJECTS {
+              icomEntitySensorPerfEnable,
+
+              icomEntitySensorPerfCurrentSuspect,
+              icomEntitySensorPerfCurrentSensorValue,
+
+              icomEntitySensorPerf1MinIntervalEndTime,
+              icomEntitySensorPerf1MinIntervalSuspect,
+              icomEntitySensorPerf1MinIntervalSensorValue,
+
+              icomEntitySensorPerf15MinIntervalEndTime,
+              icomEntitySensorPerf15MinIntervalSuspect,
+              icomEntitySensorPerf15MinIntervalMinSensorValue,
+              icomEntitySensorPerf15MinIntervalMaxSensorValue,
+              icomEntitySensorPerf15MinIntervalAvgSensorValue,
+
+              icomEntitySensorPerf1DayIntervalEndTime,
+              icomEntitySensorPerf1DayIntervalSuspect,
+              icomEntitySensorPerf1DayIntervalMinSensorValue,
+              icomEntitySensorPerf1DayIntervalMaxSensorValue,
+              icomEntitySensorPerf1DayIntervalAvgSensorValue
+    }
+    STATUS  current
+    DESCRIPTION
+        "A collection of performance objects for icomEntitySensorExtMib.
+        "
+    ::= { icomEntitySensorGroups 2 }
+
+
+END
