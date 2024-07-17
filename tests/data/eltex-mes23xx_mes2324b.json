@@ -10532,5 +10532,99 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "discovery-protocols": {
+        "discovery": {
+            "links": [
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "soada-mkt",
+                    "remote_port": "BR-Switch/Bond-SW22/eth1-Bond-SW22 (cc2de03db618)",
+                    "remote_platform": null,
+                    "remote_version": "MikroTik RouterOS 7.1 (testing) Dec/01/2021 14:07:27 RB3011UiAS",
+                    "ifAlias": "LAG-1-23",
+                    "ifDescr": "gigabitethernet1/0/23",
+                    "ifName": "gi1/0/23"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "soada-mkt",
+                    "remote_port": "BR-Switch/Bond-SW22/eth2-Bond-SW22 (cc2de03db618)",
+                    "remote_platform": null,
+                    "remote_version": "MikroTik RouterOS 7.1 (testing) Dec/01/2021 14:07:27 RB3011UiAS",
+                    "ifAlias": "LAG-1-24",
+                    "ifDescr": "gigabitethernet1/0/24",
+                    "ifName": "gi1/0/24"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "soada-srv-b",
+                    "remote_port": "eth0 (e0d55eb559ee)",
+                    "remote_platform": null,
+                    "remote_version": "Ubuntu 18.04.6 LTS Linux 4.15.0-163-generic #171-Ubuntu SMP Fri Nov 5 11:55:11 UTC 2021 x86_64",
+                    "ifAlias": "Tr-Srv-B",
+                    "ifDescr": "gigabitethernet1/0/16",
+                    "ifName": "gi1/0/16"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "soada-srv-j",
+                    "remote_port": "eth0 (1c6f654e5707)",
+                    "remote_platform": null,
+                    "remote_version": "Linux 2.6.32-754.12.1.el6.i686 #1 SMP Tue Apr 9 15:21:44 UTC 2019 i686",
+                    "ifAlias": "Tr-Srv-J",
+                    "ifDescr": "gigabitethernet1/0/15",
+                    "ifName": "gi1/0/15"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "soada-srv-nms",
+                    "remote_port": "eth0 (003067a82fc4)",
+                    "remote_platform": null,
+                    "remote_version": "Ubuntu 20.04.3 LTS Linux 5.4.0-91-generic #102-Ubuntu SMP Fri Nov 5 16:31:28 UTC 2021 x86_64",
+                    "ifAlias": "Tr-Srv-NMS",
+                    "ifDescr": "gigabitethernet1/0/17",
+                    "ifName": "gi1/0/17"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "soada-wr20",
+                    "remote_port": "eth0.1 (ac84c625a3e8)",
+                    "remote_platform": null,
+                    "remote_version": "OpenWRT_19.07",
+                    "ifAlias": "Trunk-K20-SW",
+                    "ifDescr": "gigabitethernet1/0/10",
+                    "ifName": "gi1/0/10"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "soada-wr22",
+                    "remote_port": "eth0 (e894f6a7525f)",
+                    "remote_platform": null,
+                    "remote_version": "OpenWRT_19.07",
+                    "ifAlias": "Trunk-K22-AP",
+                    "ifDescr": "gigabitethernet1/0/9",
+                    "ifName": "gi1/0/9"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "soada-wr31",
+                    "remote_port": "eth1 (f8d11194f1b1)",
+                    "remote_platform": null,
+                    "remote_version": "OpenWRT_19.07",
+                    "ifAlias": "Trunk-K31-AP",
+                    "ifDescr": "gigabitethernet1/0/8",
+                    "ifName": "gi1/0/8"
+                }
+            ]
+        }
     }
 }
