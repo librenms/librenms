@@ -81,15 +81,9 @@ class Snmpsim extends Process
             $setupProcess->setTty($print_output);
             $setupProcess->run();
 
-            $installProcess = new Process([$snmpsim_venv_path . '/bin/pip', 'install', 'snmpsim-lextudio']);
+            $installProcess = new Process([$snmpsim_venv_path . '/bin/pip', 'install', 'snmpsim']);
             $installProcess->setTty($print_output);
             $installProcess->run();
-
-            // patch snmpsim
-            $path = exec($this->getVenvPath('bin/python') . " -c 'import site; print(site.getsitepackages()[0])'");
-            $command = new Process(['patch', '-p1', '-i', base_path('misc/snmpsim_listening_output.patch')], $path);
-            $command->setTty($print_output);
-            $command->run();
         }
     }
 
