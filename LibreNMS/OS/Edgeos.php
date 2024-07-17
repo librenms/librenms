@@ -30,7 +30,6 @@ use App\Models\EntPhysical;
 use LibreNMS\OS\Traits\EntityMib;
 use LibreNMS\Util\StringHelpers;
 
-
 class Edgeos extends \LibreNMS\OS
 {
     use EntityMib {

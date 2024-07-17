@@ -72,7 +72,7 @@ class Axos extends OS implements OSDiscovery
                 'entPhysicalIndex' => $shelf_index,
                 'entPhysicalDescr' => "Shelf $shelf",
                 'entPhysicalClass' => 'container',
-//                'entPhysicalModelName' => '100-01449', // Not known, this is E7-2 part number
+                //                'entPhysicalModelName' => '100-01449', // Not known, this is E7-2 part number
                 'entPhysicalContainedIn' => 1,
                 'entPhysicalParentRelPos' => $shelf,
                 'entPhysicalIsFRU' => 'false',

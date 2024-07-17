@@ -179,6 +179,6 @@ class StringHelpers
     {
         $regex = '/((\.{2,}.{1,2})?\.+)?([0-9a-f]{2} )*([0-9a-f]{2})?$/';
 
-        return preg_replace($regex,'', str_replace("\n", '', $string));
+        return preg_replace($regex, '', str_replace("\n", '', $string));
     }
 }

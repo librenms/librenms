@@ -6,5 +6,4 @@ use LibreNMS\OS;
 
 class Radlan extends OS
 {
-
 }
