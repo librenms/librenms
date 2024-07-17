@@ -253,6 +253,10 @@ modules:
                             op: '<='
                             value: 0
                         -
+                            oid: hwEntityOpticalLaneRxPower
+                            op: 'exists'
+                            value: true
+                        -
                             oid: hwEntityAdminStatus
                             op: '='
                             value: 12
@@ -299,6 +303,10 @@ modules:
                             op: '<='
                             value: 0
                         -
+                            oid: hwEntityOpticalLaneTxPower
+                            op: 'exists'
+                            value: true
+                        -
                             oid: hwEntityAdminStatus
                             op: '='
                             value: 12
@@ -336,16 +344,14 @@ modules:
                     descr: '{{ $entPhysicalName }} Rx'
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: ports
-                    index: 'lane-rx-{{ $index }}'
+                    index: 'rx-{{ $index }}'
                     divisor: 100
                     group: '{{ $entPhysicalName }}'
                     high_limit: hwEntityOpticalRxHighThreshold
+                    warn_limit: hwEntityOpticalRxHighWarnThreshold
+                    low_warn_limit: hwEntityOpticalRxLowWarnThreshold
                     low_limit: hwEntityOpticalRxLowThreshold
                     skip_values:
-                        -
-                            oid: hwEntityOpticalRxPower
-                            op: '>'
-                            value: 0
                         -
                             oid: hwEntityAdminStatus
                             op: '='
@@ -357,15 +363,13 @@ modules:
                     descr: '{{ $entPhysicalName }} Tx'
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: ports
-                    index: 'lane-tx-{{ $index }}'
+                    index: 'tx-{{ $index }}'
                     group: '{{ $entPhysicalName }}'
                     high_limit: hwEntityOpticalTxHighThreshold
+                    warn_limit: hwEntityOpticalTxHighWarnThreshold
+                    low_warn_limit: hwEntityOpticalTxLowWarnThreshold
                     low_limit: hwEntityOpticalTxLowThreshold
                     skip_values:
-                        -
-                            oid: hwEntityOpticalTxPower
-                            op: '>'
-                            value: 0
                         -
                             oid: hwEntityAdminStatus
                             op: '='
