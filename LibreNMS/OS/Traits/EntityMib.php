@@ -42,20 +42,33 @@ trait EntityMib
             return new Collection;
         }
 
-        $mapping = \SnmpQuery::walk('ENTITY-MIB::entAliasMappingIdentifier')->table(2);
+        $entPhysicalToIfIndexMap = $this->getIfIndexEntPhysicalMap();
 
-        return $data->mapTable(function ($data, $entityPhysicalIndex) use ($mapping) {
+        return $data->mapTable(function ($data, $entityPhysicalIndex) use ($entPhysicalToIfIndexMap) {
             $entityPhysical = new EntPhysical($data);
             $entityPhysical->entPhysicalIndex = $entityPhysicalIndex;
-
-            // fill ifIndex
-            if (isset($mapping[$entityPhysicalIndex][0]['ENTITY-MIB::entAliasMappingIdentifier'])) {
-                if (preg_match('/ifIndex[\[.](\d+)/', $mapping[$entityPhysicalIndex][0]['ENTITY-MIB::entAliasMappingIdentifier'], $matches)) {
-                    $entityPhysical->ifIndex = $matches[1];
-                }
-            }
+            $entityPhysical->ifIndex = $entPhysicalToIfIndexMap[$entityPhysicalIndex] ?? null;
 
             return $entityPhysical;
         });
+    }
+
+    /**
+     * @return array<int, int>
+     */
+    protected function getIfIndexEntPhysicalMap(): array
+    {
+        $mapping = \SnmpQuery::cache()->walk('ENTITY-MIB::entAliasMappingIdentifier')->table(2);
+        $map = [];
+
+        foreach ($mapping as $entityPhysicalIndex => $data) {
+            if (isset($data[0]['ENTITY-MIB::entAliasMappingIdentifier'])) {
+                if (preg_match('/ifIndex[\[.](\d+)/', $mapping[$entityPhysicalIndex][0]['ENTITY-MIB::entAliasMappingIdentifier'], $matches)) {
+                    $map[$entityPhysicalIndex] = $matches[1];
+                }
+            }
+        }
+
+        return $map;
     }
 }
