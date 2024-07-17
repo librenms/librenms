@@ -168,7 +168,7 @@ jobs:
         name: Start SNMP
         if: matrix.skip-unit-check != '1'
         run: |
-          ~/.local/bin/snmpsimd.py --data-dir=tests/snmpsim --agent-udpv4-endpoint=127.1.6.2:1162 --logging-method=file:/tmp/snmpsimd.log &
+          ~/.local/bin/snmpsim-command-responder-lite --data-dir=tests/snmpsim --agent-udpv4-endpoint=127.1.6.2:1162 --log-level=error --logging-method=file:/tmp/snmpsimd.log &
       -
         name: lnms dev:check ci
         run: |
