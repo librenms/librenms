@@ -62,7 +62,7 @@ class CienaSds extends OS
                 'entPhysicalName' => $contents['cienaCesChassisPowerSupplySlotName'] ?? null,
                 'entPhysicalModelName' => $contents['cienaCesChassisPowerSupplyPartNum'] ?? null,
                 'entPhysicalSerialNum' => $contents['cienaCesChassisPowerSupplySerialNumber'] ?? null,
-                'entPhysicalContainedIn' => '41' . $contents['cienaCesChassisPowerSupplyChassisIndx'] ?? null,
+                'entPhysicalContainedIn' => '41' . ($contents['cienaCesChassisPowerSupplyChassisIndx'] ?? null),
                 'entPhysicalMfgName' => 'Ciena',
                 'entPhysicalParentRelPos' => $contents['cienaCesChassisPowerSupplySlotIndx'] ?? null,
                 'entPhysicalHardwareRev' => $contents['cienaCesChassisPowerSupplyRevInfo'] ?? null,
@@ -96,7 +96,7 @@ class CienaSds extends OS
                 'entPhysicalContainedIn' => '42' . $tray_data['cienaCesChassisFanTrayChassisIndx'],
                 'entPhysicalMfgName' => 'Ciena',
                 'entPhysicalParentRelPos' => $tray_data['cienaCesChassisFanTraySlotIndx'],
-                'entPhysicalIsFRU' => $tray_data['cienaCesChassisFanTrayType'] = '2' ? 'true' : 'false',
+                'entPhysicalIsFRU' => $tray_data['cienaCesChassisFanTrayType'] == '2' ? 'true' : 'false',
             ]));
         }
 

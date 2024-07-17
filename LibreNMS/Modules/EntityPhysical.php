@@ -7,7 +7,6 @@ use App\Models\EntPhysical;
 use App\Observers\ModuleModelObserver;
 use LibreNMS\DB\SyncsModels;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
-use LibreNMS\Interfaces\Discovery\EntityPhysicalDiscovery;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
 use LibreNMS\Polling\ModuleStatus;
@@ -45,10 +44,6 @@ class EntityPhysical implements Module
      */
     public function discover(OS $os): void
     {
-        if (! $os instanceof EntityPhysicalDiscovery) {
-            return;
-        }
-
         $inventory = $os->discoverEntityPhysical();
 
         ModuleModelObserver::observe(EntPhysical::class);
