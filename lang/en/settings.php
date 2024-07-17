@@ -78,6 +78,7 @@ return [
         ],
         'webui' => [
             'availability-map' => ['name' => 'Availability Map Settings'],
+            'custom-map' => ['name' => 'Custom Map Settings'],
             'graph' => ['name' => 'Graph Settings'],
             'dashboard' => ['name' => 'Dashboard Settings'],
             'port-descr' => ['name' => 'Interface Description Parsing'],
@@ -496,6 +497,94 @@ return [
         'core_descr' => [
             'description' => 'Core Port Types',
             'help' => 'Ports of the listed description type(s) will be shown under the core ports menu entry.  See Interface Description Parsing docs for more info.',
+        ],
+        'custom_map' => [
+            'background_type' => [
+                'description' => 'Background Type',
+                'help' => 'Default background type for new maps. Requires background data set.',
+            ],
+            'background_data' => [
+                'color' => [
+                    'description' => 'Background Color',
+                    'help' => 'Initial color for map background',
+                ],
+                'lat' => [
+                    'description' => 'Background Map Lattitude',
+                    'help' => 'Initial lattitude for background geo map',
+                ],
+                'lng' => [
+                    'description' => 'Background Map Longitude',
+                    'help' => 'Initial longitude for background geo map',
+                ],
+                'layer' => [
+                    'description' => 'Background Map Layer',
+                    'help' => 'Initial map layer for background geo map',
+                ],
+                'zoom' => [
+                    'description' => 'Background Map Zoom',
+                    'help' => 'Initial map zoom for background geo map',
+                ],
+            ],
+            'edge_font_color' => [
+                'description' => 'Edge Text Color',
+                'help' => 'Default font color for edge labels',
+            ],
+            'edge_font_face' => [
+                'description' => 'Edge Font',
+                'help' => 'Default font face for edge labels',
+            ],
+            'edge_font_size' => [
+                'description' => 'Edge Text Size',
+                'help' => 'Default font size for edge labels',
+            ],
+            'edge_seperation' => [
+                'description' => 'Edge Seperation',
+                'help' => 'Default edge seperation for new maps',
+            ],
+            'height' => [
+                'description' => 'Map Height',
+                'help' => 'Default map height for new maps',
+            ],
+            'node_align' => [
+                'description' => 'Node Alignment',
+                'help' => 'Default node aligment for new maps',
+            ],
+            'node_background' => [
+                'description' => 'Node Background',
+                'help' => 'Default background color for node labels',
+            ],
+            'node_border' => [
+                'description' => 'Node Border',
+                'help' => 'Default border color for node labels',
+            ],
+            'node_font_color' => [
+                'description' => 'Node Text Color',
+                'help' => 'Default font color for node labels',
+            ],
+            'node_font_face' => [
+                'description' => 'Node Font',
+                'help' => 'Default font for node labels',
+            ],
+            'node_font_size' => [
+                'description' => 'Node Text Size',
+                'help' => 'Default font size for node labels',
+            ],
+            'node_size' => [
+                'description' => 'Node Size',
+                'help' => 'Default size for nodes',
+            ],
+            'node_type' => [
+                'description' => 'Node Display Type',
+                'help' => 'Default display type for nodes',
+            ],
+            'reverse_arrows' => [
+                'description' => 'Reverse Edge Arrows',
+                'help' => 'Default arrow direction. Towards center (default) or towards ends',
+            ],
+            'width' => [
+                'description' => 'Map Width',
+                'help' => 'Default map width for new maps',
+            ],
         ],
         'customers_descr' => [
             'description' => 'Customer Port Types',
