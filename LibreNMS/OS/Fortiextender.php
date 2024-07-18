@@ -25,15 +25,12 @@
 
 namespace LibreNMS\OS;
 
-use App\Models\Device;
 use LibreNMS\Device\WirelessSensor;
-use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessSinrDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRsrpDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRsrqDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
 use LibreNMS\OS\Shared\Fortinet;
-use LibreNMS\RRD\RrdDefinition;
 
 class Fortiextender extends Fortinet implements
     WirelessSinrDiscovery,
@@ -41,14 +38,13 @@ class Fortiextender extends Fortinet implements
     WirelessRsrqDiscovery,
     WirelessRssiDiscovery
 {
-
     public function discoverWirelessSinr()
     {
         $sinr_group = snmpwalk_group($this->getDeviceArray(), 'fextInfoModemStatusSINR', 'FORTINET-FORTIEXTENDER-MIB', 1);
         $oid = '.1.3.6.1.4.1.12356.121.21.3.1.1.28.';
 
         $sinr = [];
-        foreach($sinr_group as $key => $sinr_entry) {
+        foreach ($sinr_group as $key => $sinr_entry) {
             $sinr[] = new WirelessSensor('sinr', $this->getDeviceId(), $oid . $key, 'fortiextender', $key, 'Modem ' . $key);
         }
 
@@ -61,7 +57,7 @@ class Fortiextender extends Fortinet implements
         $oid = '.1.3.6.1.4.1.12356.121.21.3.1.1.29.';
 
         $rsrp = [];
-        foreach($rsrp_group as $key => $rsrp_entry) {
+        foreach ($rsrp_group as $key => $rsrp_entry) {
             $rsrp[] = new WirelessSensor('rsrp', $this->getDeviceId(), $oid . $key, 'fortiextender', $key, 'Modem ' . $key);
         }
 
@@ -74,7 +70,7 @@ class Fortiextender extends Fortinet implements
         $oid = '.1.3.6.1.4.1.12356.121.21.3.1.1.30.';
 
         $rsrq = [];
-        foreach($rsrq_group as $key => $rsrq_entry) {
+        foreach ($rsrq_group as $key => $rsrq_entry) {
             $rsrq[] = new WirelessSensor('rsrq', $this->getDeviceId(), $oid . $key, 'fortiextender', $key, 'Modem ' . $key);
         }
 
@@ -87,7 +83,7 @@ class Fortiextender extends Fortinet implements
         $oid = '.1.3.6.1.4.1.12356.121.21.3.1.1.22.';
 
         $rsrq = [];
-        foreach($rsrq_group as $key => $rsrq_entry) {
+        foreach ($rsrq_group as $key => $rsrq_entry) {
             $rsrq[] = new WirelessSensor('rssi', $this->getDeviceId(), $oid . $key, 'fortiextender', $key, 'Modem ' . $key);
         }
 
