@@ -178,7 +178,9 @@ class StringHelpers
     public static function hexToAscii(string $hex, string $seperator = ''): string
     {
         if ($seperator) {
-            $hex = str_replace($seperator, '', str_replace($seperator . '00', '', $hex));
+            $escaped_seperator = preg_quote($seperator);
+            $no_nulls = preg_replace("/(00$escaped_seperator(00)?|{$escaped_seperator}00)/", '', $hex);
+            $hex = str_replace($seperator, '', $no_nulls);
         }
 
         $string = '';

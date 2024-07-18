@@ -20468,7 +20468,7 @@
                     "entPhysicalDescr": "sfp-sfpplus",
                     "entPhysicalClass": "sfp-cage",
                     "entPhysicalName": "SC",
-                    "entPhysicalHardwareRev": "\u0000\u0000\u0000\u0000",
+                    "entPhysicalHardwareRev": "",
                     "entPhysicalFirmwareRev": null,
                     "entPhysicalSoftwareRev": null,
                     "entPhysicalAlias": null,
