@@ -15,7 +15,7 @@ foreach ($stats_list as $stat_to_add) {
     if (isset($vars['poudriere_set'])) {
         $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'jps___' . $vars['poudriere_set'] . '___' . $stat_to_add['stat']]);
     } else {
-        $rrD_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals_' . $stat_to_add['stat']]);
+        $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals_' . $stat_to_add['stat']]);
     }
 
 

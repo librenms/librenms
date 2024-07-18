@@ -21,10 +21,10 @@ echo generate_link($label, $link_array);
 echo ' | ';
 
 // print the link to the details page
-$label = (! isset($vars['poudriere_page']) && $vars['poudriere_page'] != 'detials')
+$label = (! isset($vars['poudriere_page']) && $vars['poudriere_page'] != 'details')
     ? 'Details'
     : '<span class="pagemenu-selected">Details</span>';
-echo generate_link($label, $link_array, ['poudriere_page' => 'detials']);
+echo generate_link($label, $link_array, ['poudriere_page' => 'details']);
 echo ' | Sets: ';
 
 $index_int = 0;
@@ -42,7 +42,7 @@ foreach ($app_data['sets'] as $index => $set_name) {
 print_optionbar_end();
 
 $graphs = [];
-if (isset($vars['poudriere_page']) && $vars['poudriere_page'] == 'detials') {
+if (isset($vars['poudriere_page']) && $vars['poudriere_page'] == 'details') {
     print_optionbar_start();
     if (isset($app_data['status']) && ! is_null($app_data['status'])) {
         echo "<b><center>Status</center></b><br>\n";
@@ -236,7 +236,7 @@ foreach ($graphs as $key => $graph_info) {
     $graph_array['width'] = '215';
     $graph_array['to'] = time();
     $graph_array['id'] = $app['app_id'];
-    $graph_array['type'] = 'application_' . $graph_info['type'];
+    $graph_array['type'] = 'application_' . $name . '_' . $graph_info['type'];
     if (isset($vars['poudriere_set'])) {
         $graph_array['poudriere_set'] = $vars['poudriere_set'];
     }

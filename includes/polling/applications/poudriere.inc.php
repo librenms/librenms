@@ -83,7 +83,7 @@ $gauge_rrd_def = RrdDefinition::make()
 // process total stats, .data.stats
 foreach ($stat_vars as $key => $stat) {
     $var_name = 'totals_'.$stat;
-    $value = $data['stats'][$var_name];
+    $value = $data['stats'][$stat];
     $rrd_name = ['app', $name, $app->app_id, $var_name];
     $fields = ['data' => $value];
     $metrics[$var_name] = $value;
@@ -97,7 +97,7 @@ foreach ($data['jailANDportsANDset'] as $jps_key => $jps) {
     $sets[] = $jps_key;
     foreach ($stat_vars as $key => $stat) {
         $var_name = 'jps___'.$jps_key.'___'.$stat;
-        $value = $jps[$var_name];
+        $value = $jps[$stat];
         $rrd_name = ['app', $name, $app->app_id, $var_name];
         $fields = ['data' => $value];
         $metrics[$var_name] = $value;
