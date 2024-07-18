@@ -402,10 +402,10 @@ if (! empty($peers)) {
                             'bgpPeerLastError' => 'bgpPeerLastErrorCode',
                             'bgpPeerIface' => 'bgpPeerIface',
                         ];
-		    } elseif ($device['os'] == 'routeros') {
-			$peer_identifier = $peer['bgpPeerIdentifier'];
-			$mib = 'BGP4-MIB';
-			// RouterOS as of 7.15.2 does not support bgpPeerInUpdateElapsedTime.
+                    } elseif ($device['os'] == 'routeros') {
+                        $peer_identifier = $peer['bgpPeerIdentifier'];
+                        $mib = 'BGP4-MIB';
+                        // RouterOS as of 7.15.2 does not support bgpPeerInUpdateElapsedTime.
                         $oid_map = [
                             'bgpPeerState' => 'bgpPeerState',
                             'bgpPeerAdminStatus' => 'bgpPeerAdminStatus',
