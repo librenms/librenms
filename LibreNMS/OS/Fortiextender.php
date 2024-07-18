@@ -26,10 +26,10 @@
 namespace LibreNMS\OS;
 
 use LibreNMS\Device\WirelessSensor;
-use LibreNMS\Interfaces\Discovery\Sensors\WirelessSinrDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRsrpDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRsrqDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessSinrDiscovery;
 use LibreNMS\OS\Shared\Fortinet;
 
 class Fortiextender extends Fortinet implements
