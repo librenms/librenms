@@ -175,10 +175,30 @@ class StringHelpers
         return implode($seperator, $hex);
     }
 
+    public static function hexToAscii(string $hex, string $seperator = ''): string
+    {
+        if ($seperator) {
+            $hex = str_replace($seperator, '', str_replace($seperator . '00', '', $hex));
+        }
+
+        $string = '';
+
+        for ($i = 0; $i < strlen($hex) - 1; $i += 2) {
+            $string .= chr(hexdec(substr($hex, $i, 2)));
+        }
+
+        return $string;
+    }
+
     public static function trimHexGarbage(string $string): string
     {
         $regex = '/((\.{2,}.{1,2})?\.+)?([0-9a-f]{2} )*([0-9a-f]{2})?$/';
 
         return preg_replace($regex, '', str_replace("\n", '', $string));
+    }
+
+    public static function isHex(string $string): bool
+    {
+        return (bool) preg_match('/^[a-f0-9][a-f0-9]( [a-f0-9][a-f0-9])*$/is', trim($string));
     }
 }

@@ -27,6 +27,7 @@ use App\Models\EntPhysical;
 use Illuminate\Support\Collection;
 use LibreNMS\OS\Shared\Radlan;
 use LibreNMS\OS\Traits\EntityMib;
+use LibreNMS\Util\StringHelpers;
 use SnmpQuery;
 
 class EltexMes23xx extends Radlan
@@ -68,9 +69,6 @@ class EltexMes23xx extends Radlan
      */
     protected function normData(string $par = ''): string
     {
-        $tmp = str_replace([':', ' '], '', trim(strtoupper($par)));
-        $ret = preg_match('/^([0-9A-F][0-9A-F])+$/', $tmp) ? hex2str($tmp) : $par; //if string is pure hex, convert to ascii
-
-        return $ret;
+        return StringHelpers::isHex($par) ? StringHelpers::hexToAscii($par, ' ') : $par;
     }
 }

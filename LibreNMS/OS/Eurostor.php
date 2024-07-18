@@ -7,6 +7,7 @@ use App\Models\EntPhysical;
 use Illuminate\Support\Collection;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\OS;
+use LibreNMS\Util\StringHelpers;
 use SnmpQuery;
 
 class Eurostor extends OS implements OSDiscovery
@@ -28,8 +29,8 @@ class Eurostor extends OS implements OSDiscovery
         }
 
         // Sometimes firmware outputs serial as hex-string
-        if (isHexString($device->serial)) {
-            $device->serial = snmp_hexstring($device->serial);
+        if (StringHelpers::isHex($device->serial)) {
+            $device->serial = StringHelpers::hexToAscii($device->serial, ' ');
         }
     }
 
