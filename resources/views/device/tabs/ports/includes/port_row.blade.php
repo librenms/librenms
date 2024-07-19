@@ -102,7 +102,7 @@
         <div>{{ $port->ifMtu ? __('port.mtu_label', ['mtu' => $port->ifMtu]) : '' }}</div>
     </td>
     <td @if($collapsing)class="tw-hidden md:tw-table-cell"@endif>
-        <x-expandable height="4.3em">
+        <x-expandable height="5.75em">
             @foreach($data['neighbors'][$port->port_id] as $port_id => $neighbor)
                 <div>
                     @php
