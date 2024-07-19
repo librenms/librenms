@@ -52,6 +52,7 @@ class PortsController implements DeviceTab
         'admin' => 'up',
         'status' => 'any',
     ];
+    private ?array $ifIndexToPortIdMap = null;
 
     public function visible(Device $device): bool
     {
@@ -121,6 +122,8 @@ class PortsController implements DeviceTab
             $relationships[] = 'pseudowires.endpoints';
             $relationships[] = 'ipv4Networks.ipv4';
             $relationships[] = 'ipv6Networks.ipv6';
+            $relationships['stackParent'] = fn($q) => $q->select('port_id');
+            $relationships['stackChildren'] = fn($q) => $q->select('port_id');
         }
 
         /** @var Collection<Port>|LengthAwarePaginator<Port> $ports */
@@ -205,17 +208,13 @@ class PortsController implements DeviceTab
         }
 
         // port stack
-        // fa-expand portlink: local is low port
-        // fa-compress portlink: local is high portPort
-        $stacks = \DB::table('ports_stack')->where('device_id', $port->device_id)
-            ->where(fn ($q) => $q->where('port_id_high', $port->ifIndex)->orWhere('port_id_low', $port->ifIndex))->get();
-        foreach ($stacks as $stack) {
-            if ($stack->port_id_low) {
-                $this->addPortNeighbor($neighbors, 'stack_low', Port::where('device_id', $port->device_id)->where('ifIndex', $stack->port_id_low)->value('port_id'));
-            }
-            if ($stack->port_id_high) {
-                $this->addPortNeighbor($neighbors, 'stack_high', Port::where('device_id', $port->device_id)->where('ifIndex', $stack->port_id_high)->value('port_id'));
-            }
+        // fa-expand stack_parent: local is a child port
+        // fa-compress stack_child: local is a parent port
+        foreach ($port->stackParent as $stackParent) {
+            $this->addPortNeighbor($neighbors, 'stack_parent', $stackParent->port_id);
+        }
+        foreach ($port->stackChildren as $stackChild) {
+            $this->addPortNeighbor($neighbors, 'stack_child', $stackChild->port_id);
         }
 
         // PAGP members/parent
@@ -369,7 +368,6 @@ class PortsController implements DeviceTab
         return Port::where('device_id', $device->device_id)
             ->isNotDeleted()
             ->hasAccess(Auth::user())->with($relationships)
-            ->where('ifDescr', 'LIKE', 'Port-channel%')
             ->when(! $this->settings['disabled'], fn (Builder $q, $disabled) => $q->where('disabled', 0))
             ->when(! $this->settings['ignored'], fn (Builder $q, $disabled) => $q->where('ignore', 0))
             ->when($this->settings['admin'] != 'any', fn (Builder $q, $admin) => $q->where('ifAdminStatus', $this->settings['admin']))

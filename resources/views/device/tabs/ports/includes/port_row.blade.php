@@ -113,9 +113,9 @@
                             <i class="fa fa-link" aria-hidden="true"></i>
                         @elseif(isset($neighbor['pseudowire']))
                             <i class="fa fa-arrows-left-right" aria-hidden="true"></i>
-                        @elseif(isset($neighbor['stack_low']))
+                        @elseif(isset($neighbor['stack_parent']))
                             <i class="fa fa-expand" aria-hidden="true"></i>
-                        @elseif(isset($neighbor['stack_high']))
+                        @elseif(isset($neighbor['stack_child']))
                             <i class="fa fa-compress" aria-hidden="true"></i>
                         @elseif(isset($neighbor['pagp']))
                             <i class="fa fa-cube tw-text-green-600" aria-hidden="true"></i>
