@@ -102,7 +102,7 @@
         <div>{{ $port->ifMtu ? __('port.mtu_label', ['mtu' => $port->ifMtu]) : '' }}</div>
     </td>
     <td @if($collapsing)class="tw-hidden md:tw-table-cell"@endif>
-        <x-expandable height="4em">
+        <x-expandable height="4.3em">
             @foreach($data['neighbors'][$port->port_id] as $port_id => $neighbor)
                 <div>
                     @php
@@ -110,17 +110,17 @@
                     @endphp
                     @if($np)
                         @if(isset($neighbor['link']))
-                            <i class="fa fa-link fa-lg" aria-hidden="true"></i>
+                            <i class="fa fa-link" aria-hidden="true"></i>
                         @elseif(isset($neighbor['pseudowire']))
-                            <i class="fa fa-arrows-left-right fa-lg" aria-hidden="true"></i>
+                            <i class="fa fa-arrows-left-right" aria-hidden="true"></i>
                         @elseif(isset($neighbor['stack_low']))
-                            <i class="fa fa-expand fa-lg" aria-hidden="true"></i>
+                            <i class="fa fa-expand" aria-hidden="true"></i>
                         @elseif(isset($neighbor['stack_high']))
-                            <i class="fa fa-compress fa-lg" aria-hidden="true"></i>
+                            <i class="fa fa-compress" aria-hidden="true"></i>
                         @elseif(isset($neighbor['pagp']))
-                            <i class="fa fa-cube fa-lg tw-text-green-600" aria-hidden="true"></i>
+                            <i class="fa fa-cube tw-text-green-600" aria-hidden="true"></i>
                         @else
-                            <i class="fa fa-arrow-right fa-lg" aria-hidden="true"></i>
+                            <i class="fa fa-arrow-right" aria-hidden="true"></i>
                         @endif
 
                         <x-port-link :port="$np"></x-port-link>
