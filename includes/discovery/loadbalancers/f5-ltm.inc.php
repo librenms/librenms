@@ -164,24 +164,24 @@ if (! empty($f5CertEntry) || ! empty($ltmBwcEntry) || ! empty($ltmVirtualServEnt
             //let's check when the cert expires
             if ($result['daysLeft'] <= 0) {
                 $result['status'] = 2;
-                $result['error'] = "CRITICAL: Certificate is expired!";
+                $result['error'] = 'CRITICAL: Certificate is expired!';
             } elseif ($result['daysLeft'] <= $CERT_THRESHOLD_CRITICAL) {
                 $result['status'] = 2;
-                $result['error'] = "CRITICAL: Certificate is about to expire in " . $result['daysLeft'] . " days!";
+                $result['error'] = 'CRITICAL: Certificate is about to expire in ' . $result['daysLeft'] . ' days!';
             } elseif ($result['daysLeft'] <= $CERT_THRESHOLD_WARNING) {
                 $result['status'] = 1;
-                $result['error'] = "WARNING: Certificate is about to expire in " . $result['daysLeft'] . " days!";
+                $result['error'] = 'WARNING: Certificate is about to expire in ' . $result['daysLeft'] . ' days!';
             } else {
                 $result['status'] = 0;
-                $result['error'] = "";
+                $result['error'] = '';
             }
 
             // Do we have any results
             if (count($result) > 0) {
                 // Let's log some debugging
-                d_echo("\n\n" . $result['type'] . ' - ' . $result['label'] . ': ' . $result['daysLeft'] . "\n");
-                d_echo('    Status:  ' . $result['status'] . "\n");
-                d_echo('    Message: ' . $result['error'] . "\n");
+                d_echo('\n\n' . $result['type'] . ' - ' . $result['label'] . ': ' . $result['daysLeft'] . '\n');
+                d_echo('    Status:  ' . $result['status'] . '\n');
+                d_echo('    Message: ' . $result['error'] . '\n');
 
                 // Add this result to the master array.
                 $tblBigIP[] = $result;

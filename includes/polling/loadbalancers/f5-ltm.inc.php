@@ -94,7 +94,7 @@ if (! empty($components)) {
             // expiration value from snmpwalk is in seconds since 01.01.1970
             // we substract the current time, to get the time left until expiration
             // and convert it into days, for better human readability
-            $array['daysLeft'] = intval(( $f5_stats['f5-cert'][$UID][$CERT_BASE_OID_NAME] - getdate()[0]) / (3600 * 24));
+            $array['daysLeft'] = intval(($f5_stats['f5-cert'][$UID][$CERT_BASE_OID_NAME] - getdate()[0]) / (3600 * 24));
             $array['raw'] = $f5_stats['f5-cert'][$UID][$CERT_BASE_OID_NAME];
 
             // Let's log some debugging
