@@ -157,7 +157,7 @@ if (! empty($f5CertEntry) || ! empty($ltmBwcEntry) || ! empty($ltmVirtualServEnt
             // expiration value from snmpwalk is in seconds since 01.01.1970
             // we substract the current time, to get the time left until expiration
             // and convert it into days, for better human readability
-            $result['daysLeft'] = intval(( $array[$CERT_BASE_OID_NAME] - getdate()[0]) / (3600 * 24));
+            $result['daysLeft'] = intval(($array[$CERT_BASE_OID_NAME] - getdate()[0]) / (3600 * 24));
             // UID might be to long for use in a RRD filename, use a hash instead
             $result['hash'] = hash('crc32', $result['UID']);
 

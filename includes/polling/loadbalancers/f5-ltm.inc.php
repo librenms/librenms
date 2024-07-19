@@ -104,7 +104,6 @@ if (! empty($components)) {
             d_echo('    Days until expiration: ' . $array['daysLeft'] . "\n");
             d_echo('    RAW: ' . $array['raw'] . "\n");
 
-
             //let's check when the cert expires
             if ($array['daysLeft'] <= 0) {
                 $array['status'] = 2;
@@ -119,7 +118,6 @@ if (! empty($components)) {
                 $array['status'] = 0;
                 $array['error'] = '';
             }
-
         } elseif ($type == 'f5-ltm-bwc') {
             $rrd_def = RrdDefinition::make()
                 ->addDataset('pktsin', 'COUNTER', 0)
@@ -138,7 +136,6 @@ if (! empty($components)) {
             d_echo("\n\nComponent: " . $key . "\n");
             d_echo('    Type: ' . $type . "\n");
             d_echo('    Label: ' . $label . "\n");
-
         } elseif ($type == 'f5-ltm-vs') {
             $rrd_def = RrdDefinition::make()
                 ->addDataset('pktsin', 'COUNTER', 0)
