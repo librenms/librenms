@@ -1,4 +1,5 @@
 <?php
+
 $link_array = [
     'page' => 'device',
     'device' => $device['device_id'],

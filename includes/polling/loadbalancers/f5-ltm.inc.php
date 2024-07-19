@@ -86,18 +86,18 @@ if (! empty($components)) {
         $hash = $array['hash'];
         $rrd_name = [$type, $label, $hash];
 
-	if ($type == 'f5-cert') {
-	    $CERT_BASE_OID_NAME = 'sysCertificateFileObjectExpirationDate';
-	    $CERT_THRESHOLD_WARNING = 30;       // If Cert expires in less than this value (in days) => status = warning
-	    $CERT_THRESHOLD_CRITICAL = 10;      // If Cert expires in less than this value (in days) => status = critical
+        if ($type == 'f5-cert') {
+            $CERT_BASE_OID_NAME = 'sysCertificateFileObjectExpirationDate';
+            $CERT_THRESHOLD_WARNING = 30;       // If Cert expires in less than this value (in days) => status = warning
+            $CERT_THRESHOLD_CRITICAL = 10;      // If Cert expires in less than this value (in days) => status = critical
 
             // expiration value from snmpwalk is in seconds since 01.01.1970
             // we substract the current time, to get the time left until expiration
-	    // and convert it into days, for better human readability
-	    $array['daysLeft'] = intval(( $f5_stats['f5-cert'][$UID][$CERT_BASE_OID_NAME] - getdate()[0]) / (3600 * 24));
-	    $array['raw'] = $f5_stats['f5-cert'][$UID][$CERT_BASE_OID_NAME];
+            // and convert it into days, for better human readability
+            $array['daysLeft'] = intval(( $f5_stats['f5-cert'][$UID][$CERT_BASE_OID_NAME] - getdate()[0]) / (3600 * 24));
+            $array['raw'] = $f5_stats['f5-cert'][$UID][$CERT_BASE_OID_NAME];
 
-	    // Let's log some debugging
+            // Let's log some debugging
             d_echo("\n\nComponent: " . $key . "\n");
             d_echo('    Type: ' . $type . "\n");
             d_echo('    Label: ' . $label . "\n");
@@ -105,22 +105,22 @@ if (! empty($components)) {
             d_echo('    RAW: ' . $array['raw'] . "\n");
 
 
-	     //let's check when the cert expires
+            //let's check when the cert expires
             if ($array['daysLeft'] <= 0) {
                 $array['status'] = 2;
-                $array['error'] = "CRITICAL: Certificate is expired!";
+                $array['error'] = 'CRITICAL: Certificate is expired!';
             } elseif ($array['daysLeft'] <= $CERT_THRESHOLD_CRITICAL) {
                 $array['status'] = 2;
-                $array['error'] = "CRITICAL: Certificate is about to expire in " . $array['daysLeft'] . " days!";
+                $array['error'] = 'CRITICAL: Certificate is about to expire in ' . $array['daysLeft'] . ' days!';
             } elseif ($array['daysLeft'] <= $CERT_THRESHOLD_WARNING) {
                 $array['status'] = 1;
-                $array['error'] = "WARNING: Certificate is about to expire in " . $array['daysLeft'] . " days!";
+                $array['error'] = 'WARNING: Certificate is about to expire in ' . $array['daysLeft'] . ' days!';
             } else {
                 $array['status'] = 0;
-                $array['error'] = "";
+                $array['error'] = '';
             }
 
-	} elseif ($type == 'f5-ltm-bwc') {
+        } elseif ($type == 'f5-ltm-bwc') {
             $rrd_def = RrdDefinition::make()
                 ->addDataset('pktsin', 'COUNTER', 0)
                 ->addDataset('bytesin', 'COUNTER', 0)
