@@ -402,21 +402,6 @@ if (! empty($peers)) {
                             'bgpPeerLastError' => 'bgpPeerLastErrorCode',
                             'bgpPeerIface' => 'bgpPeerIface',
                         ];
-                    } elseif ($device['os'] == 'routeros') {
-                        $peer_identifier = $peer['bgpPeerIdentifier'];
-                        $mib = 'BGP4-MIB';
-                        // RouterOS as of 7.15.2 does not support bgpPeerInUpdateElapsedTime.
-                        $oid_map = [
-                            'bgpPeerState' => 'bgpPeerState',
-                            'bgpPeerAdminStatus' => 'bgpPeerAdminStatus',
-                            'bgpPeerInUpdates' => 'bgpPeerInUpdates',
-                            'bgpPeerOutUpdates' => 'bgpPeerOutUpdates',
-                            'bgpPeerInTotalMessages' => 'bgpPeerInTotalMessages',
-                            'bgpPeerOutTotalMessages' => 'bgpPeerOutTotalMessages',
-                            'bgpPeerFsmEstablishedTime' => 'bgpPeerFsmEstablishedTime',
-                            'bgpPeerLocalAddr' => 'bgpLocalAddr', // silly db field name
-                            'bgpPeerLastError' => 'bgpPeerLastErrorCode',
-                        ];
                     } else {
                         $peer_identifier = $peer['bgpPeerIdentifier'];
                         $mib = 'BGP4-MIB';
@@ -527,6 +512,7 @@ if (! empty($peers)) {
         $peer_data['bgpPeerOutUpdates'] = set_numeric($peer_data['bgpPeerOutUpdates']);
         $peer_data['bgpPeerInTotalMessages'] = set_numeric($peer_data['bgpPeerInTotalMessages']);
         $peer_data['bgpPeerOutTotalMessages'] = set_numeric($peer_data['bgpPeerOutTotalMessages']);
+        $peer_data['bgpPeerInUpdateElapsedTime'] = set_numeric($peer_data['bgpPeerInUpdateElapsedTime']);
 
         $fields = [
             'bgpPeerOutUpdates' => $peer_data['bgpPeerOutUpdates'],
