@@ -208,13 +208,13 @@ class PortsController implements DeviceTab
         // fa-expand portlink: local is low port
         // fa-compress portlink: local is high portPort
         $stacks = \DB::table('ports_stack')->where('device_id', $port->device_id)
-            ->where(fn ($q) => $q->where('port_id_high', $port->port_id)->orWhere('port_id_low', $port->port_id))->get();
+            ->where(fn ($q) => $q->where('port_id_high', $port->ifIndex)->orWhere('port_id_low', $port->ifIndex))->get();
         foreach ($stacks as $stack) {
             if ($stack->port_id_low) {
-                $this->addPortNeighbor($neighbors, 'stack_low', $stack->port_id_low);
+                $this->addPortNeighbor($neighbors, 'stack_low', Port::where('device_id', $port->device_id)->where('ifIndex', $stack->port_id_low)->value('port_id'));
             }
             if ($stack->port_id_high) {
-                $this->addPortNeighbor($neighbors, 'stack_high', $stack->port_id_high);
+                $this->addPortNeighbor($neighbors, 'stack_high', Port::where('device_id', $port->device_id)->where('ifIndex', $stack->port_id_high)->value('port_id'));
             }
         }
 
@@ -369,6 +369,7 @@ class PortsController implements DeviceTab
         return Port::where('device_id', $device->device_id)
             ->isNotDeleted()
             ->hasAccess(Auth::user())->with($relationships)
+            ->where('ifDescr', 'LIKE', 'Port-channel%')
             ->when(! $this->settings['disabled'], fn (Builder $q, $disabled) => $q->where('disabled', 0))
             ->when(! $this->settings['ignored'], fn (Builder $q, $disabled) => $q->where('ignore', 0))
             ->when($this->settings['admin'] != 'any', fn (Builder $q, $admin) => $q->where('ifAdminStatus', $this->settings['admin']))
