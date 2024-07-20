@@ -113,8 +113,8 @@ When I left the company, it was monitoring:
 
 As our goal was more to catch alerts and monitor overall trends we went with a 10 minute polling cycle.
 Polling the above would take roughly 8 minutes and 120GHz worth of CPU across all VMs. 
-CPUs were older Xeons (E5). In order to help with your efforts in scaling, I included in 
-the diagram below the resources allocated to each VM as well as the utilization durring polling.
+CPUs were older Xeons (E5). The diagram below shows the CPU and RAM utilization of each VM during polling.
+Disk space utilization for SQL/RRD is also included.
 
 Device discovery was split off into its own VM as that process would take multiple hours.
 
