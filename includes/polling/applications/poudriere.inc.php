@@ -72,7 +72,8 @@ $metrics = [];
 $old_data = $app->data;
 $new_data = [
     'status' => $returned['data']['status'],
-    'build_info' => $returned['data']['build_info']
+    'build_info' => $returned['data']['build_info'],
+    'history' => $returned['data']['history'],
 ];
 
 $data = $returned['data'];
