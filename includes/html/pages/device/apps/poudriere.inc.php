@@ -216,11 +216,11 @@ if (isset($vars['poudriere_page']) && $vars['poudriere_page'] == 'details') {
             'description' => 'Build Phase',
         ],
         [
-            'type' =>  'time',
+            'type' => 'time',
             'description' => 'Build Time',
         ],
         [
-            'type' =>  'log_size',
+            'type' => 'log_size',
             'description' => 'Log Size',
         ],
         [
