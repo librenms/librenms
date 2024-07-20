@@ -4,8 +4,8 @@ $unit_text = 'bytes';
 
 $stats_list = [
     'package_size_all' => [
-      'stat' => 'package_size_all',
-      'descr' => 'all',
+        'stat' => 'package_size_all',
+        'descr' => 'all',
     ],
     'package_size_building' => [
         'stat' => 'package_size_building',

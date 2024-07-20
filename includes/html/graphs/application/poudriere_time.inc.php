@@ -4,8 +4,8 @@ $unit_text = 'seconds';
 
 $stats_list = [
     'TIME' => [
-      'stat' => 'TIME',
-      'descr' => 'TIME',
+        'stat' => 'TIME',
+        'descr' => 'TIME',
     ],
 ];
 

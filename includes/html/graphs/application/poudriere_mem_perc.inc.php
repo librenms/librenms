@@ -4,8 +4,8 @@ $unit_text = '';
 
 $stats_list = [
     'percent-memory' => [
-      'stat' => 'percent-memory',
-      'descr' => 'Mem%',
+        'stat' => 'percent-memory',
+        'descr' => 'Mem%',
     ],
 ];
 

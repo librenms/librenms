@@ -4,8 +4,8 @@ $unit_text = 'bytes';
 
 $stats_list = [
     'log_size_done' => [
-      'stat' => 'log_size_done',
-      'descr' => 'done',
+        'stat' => 'log_size_done',
+        'descr' => 'done',
     ],
     'log_size_latest' => [
         'stat' => 'log_size_latest',
