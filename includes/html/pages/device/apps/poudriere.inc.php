@@ -227,6 +227,74 @@ if (isset($vars['poudriere_page']) && $vars['poudriere_page'] == 'details') {
             'type' => 'package_size',
             'description' => 'Package Size',
         ],
+        [
+            'type' => 'cpu_perc',
+            'description' => 'CPU%',
+        ],
+        [
+            'type' => 'mem_perc',
+            'description' => 'Memory%',
+        ],
+        [
+            'type' => 'cpu_time',
+            'description' => 'Time, CPU',
+        ],
+            [
+            'type' => 'user_time',
+            'description' => 'Time, User',
+        ],
+        [
+            'type' => 'system_time',
+            'description' => 'Time, System',
+        ],
+        [
+            'type' => 'rss',
+            'description' => 'RSS',
+        ],
+        [
+            'type' => 'threads',
+            'description' => 'Threads',
+        ],
+        [
+            'type' => 'major_faults',
+            'description' => 'Faults, Major',
+        ],
+        [
+            'type' => 'minor_faults',
+            'description' => 'Faults, Minor',
+        ],
+        [
+            'type' => 'swaps',
+            'description' => 'Swaps',
+        ],
+        [
+            'type' => 'stack_size',
+            'description' => 'Size, Stack',
+        ],
+        [
+            'type' => 'data_size',
+            'description' => 'Size, Data',
+        ],
+        [
+            'type' => 'text_size',
+            'description' => 'Size, Text',
+        ],
+            [
+            'type' => 'read_blocks',
+            'description' => 'Read Blocks',
+        ],
+        [
+            'type' => 'copy_on_write_faults',
+            'description' => 'COW Faults',
+        ],
+        [
+            'type' => 'voluntary_context_switches',
+            'description' => 'Context Switches, Voluntary',
+        ],
+        [
+            'type' => 'involuntary_context_switches',
+            'description' => 'Context Switches, Involuntary',
+        ],
     ];
 }
 

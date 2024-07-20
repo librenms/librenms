@@ -1,5 +1,9 @@
 <?php
 
+$unit_text = 'count';
+
+$colours = 'rainbow';
+
 $stats_list = [
     'check-sanity' => [
         'stat' => 'check-sanity',

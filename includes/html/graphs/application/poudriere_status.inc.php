@@ -1,5 +1,7 @@
 <?php
 
+$unit_text = 'count';
+
 $stats_list = [
     'QUEUE' => [
       'stat' => 'QUEUE',
