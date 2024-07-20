@@ -41,7 +41,7 @@ use LibreNMS\Interfaces\UI\DeviceTab;
 
 class PortsController implements DeviceTab
 {
-    private bool $detail = false;
+    private bool $detail = true;
     private array $settings = [];
     private array $defaults = [
         'perPage' => 32,
