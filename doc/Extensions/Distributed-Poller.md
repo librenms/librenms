@@ -112,9 +112,13 @@ When I left the company, it was monitoring:
 * ~480,000 other objects/sensors.
 
 As our goal was more to catch alerts and monitor overall trends we went with a 10 minute polling cycle.
-Polling the above would take roughly 8 minutes and 120GHz worth of CPU across all VMs. CPUs were older Xeons (E5).
-In order to help with your efforts in scaling, I included in the diagram below the resources allocated to each VM 
-as well as the utilization durring a polling cycle.
+Polling the above would take roughly 8 minutes and 120GHz worth of CPU across all VMs. 
+CPUs were older Xeons (E5). In order to help with your efforts in scaling, I included in 
+the diagram below the resources allocated to each VM as well as the utilization durring polling.
+
+Device discovery was split off into its own VM as that process would take multiple hours.
+
+
 
 ![ESXi Example Setup](@= config.site_url =@/img/librenms-distributed-diagram-esxi.png)
 
@@ -141,6 +145,39 @@ Workers were assigned in the following way:
   * ping: 1
   * poller: 40
   * services: 8
+
+Each poller had on average 19,500/24,000 worker seconds consumed.
+
+RRDCached is incredibly important; this setup ran on spinning disks
+due to the wonders of caching.
+
+I very strongly recommend setting up recursive DNS on your discovery 
+and polling servers. While I used DNSMASQ there are many options.
+
+SQL tuner will help you quite a bit. You'll also want to increase your 
+maximum connections amount to support the pollers. This setup was at 500.
+Less important, but putting ~12GB of the database in RAM was reported to 
+have helped web UI performance as well as some DB-heavy Tableau reports.
+RAM was precious in this environment or it would've been more, but it
+wasn't necessary either.
+
+Be careful with keeping the default value for 'Device Down Retry' as it
+can eat up quite a lot of poller activity. I freed up over 20,000 worker seconds
+when setting this to only happen once or twice per 10-minute polling cycle. 
+The impact of this will vary depending on the percentage of down device in your system.
+This example had it set at 400 seconds.
+
+Also be wary of keeping event log and syslog entries for too long as it can
+have a pretty negative effect on web UI performance.
+
+To resolve an issue with large device groups the php fpm max input vars was increased to 20000.
+
+All of these VMs were within the same physical data center so latency was minimal.
+
+The decision of redis over the other locking methods was arbitrary but in over 2 years 
+I never had to touch that VM aside from security updates.
+
+This install used the service instead of cron.
 
 ## Architecture
 
