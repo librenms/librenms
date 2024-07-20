@@ -10,10 +10,11 @@ try {
 } catch (JsonAppException $e) {
     echo PHP_EOL . $name . ':' . $e->getCode() . ':' . $e->getMessage() . PHP_EOL;
     update_application($app, $e->getCode() . ':' . $e->getMessage(), []); // Set empty metrics and error message
+
     return;
 }
 
-$stat_vars=[
+$stat_vars = [
     'BUILT',
     'FAIL',
     'FETCH',
@@ -83,7 +84,7 @@ $gauge_rrd_def = RrdDefinition::make()
 
 // process total stats, .data.stats
 foreach ($stat_vars as $key => $stat) {
-    $var_name = 'totals_'.$stat;
+    $var_name = 'totals_' . $stat;
     $value = $data['stats'][$stat];
     $rrd_name = ['app', $name, $app->app_id, $var_name];
     $fields = ['data' => $value];
@@ -97,7 +98,7 @@ $sets = [];
 foreach ($data['jailANDportsANDset'] as $jps_key => $jps) {
     $sets[] = $jps_key;
     foreach ($stat_vars as $key => $stat) {
-        $var_name = 'jps___'.$jps_key.'___'.$stat;
+        $var_name = 'jps___' . $jps_key . '___' . $stat;
         $value = $jps[$stat];
         $rrd_name = ['app', $name, $app->app_id, $var_name];
         $fields = ['data' => $value];

@@ -1,7 +1,7 @@
 <?php
 
 $name = 'poudriere';
-if (!isset($colours)) {
+if (! isset($colours)) {
     $colours = 'psychedelic';
 }
 $dostack = 0;
@@ -17,7 +17,6 @@ foreach ($stats_list as $stat_to_add) {
     } else {
         $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals_' . $stat_to_add['stat']]);
     }
-
 
     if (Rrd::checkRrdExists($rrd_filename)) {
         $rrd_list[] = [

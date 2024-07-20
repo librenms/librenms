@@ -29,7 +29,7 @@ echo ' | Sets: ';
 
 $index_int = 0;
 foreach ($app_data['sets'] as $index => $set_name) {
-    $label = (!isset($vars['poudriere_set']) || $vars['poudriere_set'] != $set_name)
+    $label = (! isset($vars['poudriere_set']) || $vars['poudriere_set'] != $set_name)
         ? $set_name
         : '<span class="pagemenu-selected">' . $set_name . '</span>';
     $index_int++;
@@ -117,14 +117,14 @@ if (isset($vars['poudriere_page']) && $vars['poudriere_page'] == 'details') {
             if (preg_match('/\[.*\]\ +\[.*\]\ +\[.*\]/', $line)) {
                 $row = preg_split("/\s+/", $line, 14);
                 if (isset($row[0])) {
-                    $current_set=preg_replace("/[\[\]]/", "", $row[0]);
+                    $current_set = preg_replace("/[\[\]]/", '', $row[0]);
                 } else {
-                    $current_set='';
+                    $current_set = '';
                 }
                 if (isset($row[1])) {
-                    $current_build=preg_replace("/[\[\]]/", "", $row[1]);
+                    $current_build = preg_replace("/[\[\]]/", '', $row[1]);
                 } else {
-                    $current_build='';
+                    $current_build = '';
                 }
             } elseif (preg_match('/^\[.*\]/', $line)) {
                 $line_split = preg_split("/[^\w\d\-\,\.\:\/\@\%]+/", $line, 14);
@@ -138,22 +138,22 @@ if (isset($vars['poudriere_page']) && $vars['poudriere_page'] == 'details') {
                     $mem_perc = $line_split[8];
                 }
                 $table['rows'][] = [
-                    [ 'data' => $current_set ],
-                    [ 'data' => $current_build ],
-                    [ 'data' => $line_split[1] ],
-                    [ 'data' => $line_split[2] ],
-                    [ 'data' => $line_split[3] ],
-                    [ 'data' => $line_split[4] ],
-                    [ 'data' => $line_split[5] ],
-                    [ 'data' => $line_split[6] ],
-                    [ 'data' => $tmp_fs ],
-                    [ 'data' => $cpu_perc ],
-                    [ 'data' => $mem_perc ],
+                    ['data' => $current_set],
+                    ['data' => $current_build],
+                    ['data' => $line_split[1]],
+                    ['data' => $line_split[2]],
+                    ['data' => $line_split[3]],
+                    ['data' => $line_split[4]],
+                    ['data' => $line_split[5]],
+                    ['data' => $line_split[6]],
+                    ['data' => $tmp_fs],
+                    ['data' => $cpu_perc],
+                    ['data' => $mem_perc],
                 ];
             }
 
             $build_split_int++;
-        };
+        }
         echo view('widgets/sortable_table', $table);
     }
     if (isset($app_data['history']) && ! is_null($app_data['history'])) {
@@ -239,7 +239,7 @@ if (isset($vars['poudriere_page']) && $vars['poudriere_page'] == 'details') {
             'type' => 'cpu_time',
             'description' => 'Time, CPU',
         ],
-            [
+        [
             'type' => 'user_time',
             'description' => 'Time, User',
         ],
@@ -279,7 +279,7 @@ if (isset($vars['poudriere_page']) && $vars['poudriere_page'] == 'details') {
             'type' => 'text_size',
             'description' => 'Size, Text',
         ],
-            [
+        [
             'type' => 'read_blocks',
             'description' => 'Read Blocks',
         ],

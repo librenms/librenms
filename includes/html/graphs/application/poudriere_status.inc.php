@@ -4,8 +4,8 @@ $unit_text = 'count';
 
 $stats_list = [
     'QUEUE' => [
-      'stat' => 'QUEUE',
-      'descr' => 'QUEUE',
+        'stat' => 'QUEUE',
+        'descr' => 'QUEUE',
     ],
     'BUILT' => [
         'stat' => 'BUILT',
