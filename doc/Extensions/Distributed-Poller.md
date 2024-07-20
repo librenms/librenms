@@ -98,7 +98,7 @@ running within an OpenStack environment with some commodity hardware
 for remote pollers. Here's a diagram of how you can scale LibreNMS
 out:
 
-![Example Setup](@= config.site_url =@/img/librenms-distributed-diagram.png)
+![OpenStack Example Setup](@= config.site_url =@/img/librenms-distributed-diagram-openstack.png)
 
 ### ESXi
 This is a distributed setup that I created for a regional hybrid ISP 
@@ -113,6 +113,10 @@ When I left the company, it was monitoring:
 
 As our goal was more to catch alerts and monitor overall trends we went with a 10 minute polling cycle.
 Polling the above would take roughly 8 minutes and 120GHz worth of CPU across all VMs. CPUs were older Xeons (E5).
+In order to help with your efforts in scaling, I included in the diagram below the resources allocated to each VM 
+as well as the utilization durring a polling cycle.
+
+
 
 ## Architecture
 
