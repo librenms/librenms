@@ -116,7 +116,31 @@ Polling the above would take roughly 8 minutes and 120GHz worth of CPU across al
 In order to help with your efforts in scaling, I included in the diagram below the resources allocated to each VM 
 as well as the utilization durring a polling cycle.
 
+![ESXi Example Setup](@= config.site_url =@/img/librenms-distributed-diagram-esxi.png)
 
+Workers were assigned in the following way:
+
+* Web/RRD Server:
+  * alerting: 1
+  * billing: 2
+  * discovery: 0
+  * ping: 1
+  * poller: 10
+  * services: 16
+* Discovery Server:
+  * alerting: 1
+  * billing: 2
+  * discovery: 60
+  * ping: 1
+  * poller: 5
+  * services: 8
+* Pollers
+  * alerting: 1
+  * billing: 2
+  * discovery: 0
+  * ping: 1
+  * poller: 40
+  * services: 8
 
 ## Architecture
 
