@@ -101,6 +101,18 @@ out:
 ![Example Setup](@= config.site_url =@/img/librenms-distributed-diagram.png)
 
 ### ESXi
+This is a distributed setup that I created for a regional hybrid ISP 
+(fixed wireless/fiber optic backhaul). It was created at around the 
+~4,000 device mark to transition from multiple separate instances to one more central.
+When I left the company, it was monitoring:
+* 10,800 devices
+* 307,700 ports
+* 37,000 processors
+* 17,000 wireless sensors
+* ~480,000 other objects/sensors.
+
+As our goal was more to catch alerts and monitor overall trends we went with a 10 minute polling cycle.
+Polling the above would take roughly 8 minutes and 120GHz worth of CPU across all VMs. CPUs were older Xeons (E5).
 
 ## Architecture
 
