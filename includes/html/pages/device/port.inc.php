@@ -47,7 +47,6 @@ $show_all = 1;
 
 echo "<div style='margin: 0px; width: 100%'><table class='iftable'>";
 
-
 echo view('device.tabs.ports.includes.port_row', [
     'port' => $port,
     'data' => [
