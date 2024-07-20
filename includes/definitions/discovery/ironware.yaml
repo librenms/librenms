@@ -1,4 +1,4 @@
-mib: FOUNDRY-SN-AGENT-MIB:FOUNDRY-SN-SWITCH-GROUP-MIB:FOUNDRY-SN-STACKING-MIB
+mib: FOUNDRY-SN-AGENT-MIB:FOUNDRY-SN-SWITCH-GROUP-MIB:FOUNDRY-SN-STACKING-MIB:FDRY-POE-MIB
 modules:
     mempools:
         pre-cache:
@@ -171,3 +171,19 @@ modules:
                         - { value: 1, descr: other, graph: 0, generic: 3 }
                         - { value: 2, descr: up, graph: 1, generic: 0 }
                         - { value: 3, descr: down, graph: 0, generic: 2 }
+        power:
+            data:
+                -
+                    oid: snAgentPoeGblPowerCapacityTotal
+                    num_oid: '.1.3.6.1.4.1.1991.1.1.2.14.1.1.0'
+                    descr: 'Inline Power Capacity'
+                    divisor: 1000
+                    index: '0'
+                    value: snAgentPoeGblPowerCapacityTotal
+                -
+                    oid: snAgentPoeGblPowerCapacityFree
+                    num_oid: '.1.3.6.1.4.1.1991.1.1.2.14.1.2.0'
+                    descr: 'Inline Power Capacity Available'
+                    divisor: 1000
+                    index: '1'
+                    value: snAgentPoeGblPowerCapacityFree
