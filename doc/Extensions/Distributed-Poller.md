@@ -89,8 +89,9 @@ CACHE_DRIVER=memcached
 If you want to use memcached, you will also need to install an additional
 Python 3 python-memcached package.
 
-## Example Setup
+## Example Setups
 
+### OpenStack
 Below is an example setup based on a real deployment which at the time
 of writing covers over 2,500 devices and 50,000 ports. The setup is
 running within an OpenStack environment with some commodity hardware
@@ -98,6 +99,8 @@ for remote pollers. Here's a diagram of how you can scale LibreNMS
 out:
 
 ![Example Setup](@= config.site_url =@/img/librenms-distributed-diagram.png)
+
+### ESXi
 
 ## Architecture
 
