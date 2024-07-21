@@ -236,6 +236,10 @@ if (isset($vars['poudriere_page']) && $vars['poudriere_page'] == 'details') {
             'description' => 'Memory%',
         ],
         [
+            'type' => 'time_comparison',
+            'description' => 'Time Comparison(CPU, User, System)',
+        ],
+        [
             'type' => 'cpu_time',
             'description' => 'Time, CPU',
         ],
@@ -268,6 +272,10 @@ if (isset($vars['poudriere_page']) && $vars['poudriere_page'] == 'details') {
             'description' => 'Swaps',
         ],
         [
+            'type' => 'size_comparison',
+            'description' => 'Size, Comparison(Stack, Data, Text)',
+        ],
+        [
             'type' => 'stack_size',
             'description' => 'Size, Stack',
         ],
@@ -286,6 +294,10 @@ if (isset($vars['poudriere_page']) && $vars['poudriere_page'] == 'details') {
         [
             'type' => 'copy_on_write_faults',
             'description' => 'COW Faults',
+        ],
+        [
+            'type' => 'context_switches_comparison',
+            'description' => 'Context Switches Comparison(Voluntary, Involuntary)',
         ],
         [
             'type' => 'voluntary_context_switches',
