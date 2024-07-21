@@ -5524,6 +5524,20 @@
             "section": "prometheus",
             "order": 4
         },
+        "prometheus.user": {
+            "default": "",
+            "type": "text",
+            "group": "poller",
+            "section": "prometheus",
+            "order": 5
+        },
+        "prometheus.password": {
+            "default": "",
+            "type": "text",
+            "group": "poller",
+            "section": "prometheus",
+            "order": 6
+        },
         "public_status": {
             "default": false,
             "group": "auth",
