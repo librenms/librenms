@@ -260,7 +260,7 @@ foreach ($rule_list as $rule) {
 
     // Name
 
-    echo '<td>' . $rule['name'] . '</td>';
+    echo '<td><a href="' . url('alerts?rule_id='.$rule['id']) .'" data-container="body" data-toggle="popover" data-placement="right" data-content="View active alerts for this rule" target="_blank">' . $rule['name'] . '</a></td>';
 
     // Devices (and Groups)
 
@@ -317,7 +317,7 @@ foreach ($rule_list as $rule) {
     }
     if (! $devices && ! $groups && ! $locations) {
         // All Devices
-        echo '<a href="' . url('devices') . '" data-container="body" data-toggle="popover" data-placement=" . $popover_position . " data-content="View All Devices" target="_blank">All Devices</a><br>';
+        echo '<a href="' . url('devices') . '" data-container="body" data-toggle="popover" data-placement="' . $popover_position . '" data-content="View All Devices" target="_blank">All Devices</a><br>';
     }
 
     echo '</td>';
