@@ -43,9 +43,8 @@ class Compare
     public static function values($a, $b, $comparison = '=')
     {
         // handle PHP8 change to implicit casting
-        if (is_numeric($a) || is_numeric($b)) {
+        if (is_numeric($a) || is_int($b)) {
             $a = Number::cast($a);
-            $b = is_array($b) ? $b : Number::cast($b);
         }
 
         switch ($comparison) {

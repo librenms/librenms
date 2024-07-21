@@ -10,13 +10,11 @@ modules:
                     oid:
                         - cpiPduOutletName
                         - cpiPduOutletDescription
-                    snmp_flags: ['-OeQUsb', '-Pu']
         current:
             data:
                 -
                     oid: cpiPduOutletCurrent
                     value: cpiPduOutletCurrent
-                    snmp_flags: ['-OeQUsb', '-Pu']
                     num_oid: '.1.3.6.1.4.1.30932.1.10.1.4.10.1.6.{{ $index }}'
                     descr: '{{ $cpiPduOutletName }}'
                     index: '{{ $index }}'
@@ -26,7 +24,6 @@ modules:
                 -
                     oid: cpiPduOutletVoltage
                     value: cpiPduOutletVoltage
-                    snmp_flags: ['-OeQUsb', '-Pu']
                     num_oid: '.1.3.6.1.4.1.30932.1.10.1.4.10.1.7.{{ $index }}'
                     descr: '{{ $cpiPduOutletName }}'
                     index: '{{ $index }}'
@@ -35,7 +32,6 @@ modules:
             data:
                 -
                     oid: cpiPduOutletPower
-                    snmp_flags: ['-OeQUsb', '-Pu']
                     num_oid: '.1.3.6.1.4.1.30932.1.10.1.4.10.1.8.{{ $index }}'
                     descr: '{{ $cpiPduOutletName }}'
                     index: '{{ $index }}'
@@ -43,7 +39,6 @@ modules:
             data:
                 -
                     oid: cpiPduOutletEnergy
-                    snmp_flags: ['-OeQUsb', '-Pu']
                     num_oid: '.1.3.6.1.4.1.30932.1.10.1.4.10.1.10.{{ $index }}'
                     descr: '{{ $cpiPduOutletName }}'
                     index: '{{ $index }}'
@@ -53,7 +48,6 @@ modules:
                 -
                     oid: cpiPduOutletControl
                     value: cpiPduOutletControl
-                    snmp_flags: ['-OeQUsb', '-Pu']
                     num_oid: '.1.3.6.1.4.1.30932.1.10.1.4.10.1.11.{{ $index }}'
                     descr: '{{ $cpiPduOutletName }}'
                     state_name: cpiPduOutletControl

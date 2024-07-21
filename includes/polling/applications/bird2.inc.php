@@ -5,7 +5,7 @@ use Carbon\Carbon;
 
 $name = 'bird2';
 
-$birdOutput = snmp_get($device, 'nsExtendOutputFull.' . \LibreNMS\Util\Oid::ofString($name), '-Oqv', 'NET-SNMP-EXTEND-MIB');
+$birdOutput = snmp_get($device, 'nsExtendOutputFull.' . \LibreNMS\Util\Oid::encodeString($name), '-Oqv', 'NET-SNMP-EXTEND-MIB');
 
 // make sure we actually get something back
 if (empty($birdOutput)) {

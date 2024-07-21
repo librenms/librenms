@@ -50,6 +50,7 @@ use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\Interfaces\Polling\SlaPolling;
 use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Util\Oid;
 
 class Vrp extends OS implements
     MempoolsDiscovery,
@@ -419,7 +420,7 @@ class Vrp extends OS implements
 
         foreach ($staTable as $ssid => $sta) {
             //Convert string to num_oid
-            $numSsid = strlen($ssid) . '.' . implode('.', unpack('c*', $ssid));
+            $numSsid = Oid::encodeString($ssid);
             $ssid_oid_array = []; // keep all OIDs of different freqs for a single SSID, to compute each SSID sta count, all freqs included
             foreach ($sta as $staFreq => $count) {
                 $oid = $oidMap[$staFreq] . $numSsid;

@@ -46,7 +46,7 @@ modules:
                     value: eipDnsStatValue
                     num_oid: '.1.3.6.1.4.1.2440.1.4.2.3.1.3.{{ $str_index_as_numeric }}'
                     descr: '{{ $eipDnsStatName }}'
-                    index: 'counter__{{ $index }}'
+                    index: 'counter__{{ $index_string }}'
                     rrd_type: 'COUNTER'
                     group: 'DNS'
                     skip_values:
@@ -76,7 +76,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.2440.1.3.2.22.1.3.{{ $str_index_as_numeric }}'
                     descr: '{{ $eipDhcpStatName }}'
                     rrd_type: 'COUNTER'
-                    index: 'counter__{{ $index }}'
+                    index: 'counter__{{ $index_string }}'
                     group: 'DHCP'
         state:
              data:
