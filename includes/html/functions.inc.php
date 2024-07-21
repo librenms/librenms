@@ -746,6 +746,7 @@ function alert_details($details)
                     'proto' => 'bgp',
                 ]) .
                 "'>" . $tmp_alerts['bgpPeerIdentifier'] . '</a>';
+            $fault_detail .= ', Desc '. $tmp_alerts['bgpPeerDescr'] ?? '';
             $fault_detail .= ', AS' . $tmp_alerts['bgpPeerRemoteAs'];
             $fault_detail .= ', State ' . $tmp_alerts['bgpPeerState'];
             $fallback = false;
