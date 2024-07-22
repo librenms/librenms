@@ -164,7 +164,13 @@ class SocialiteController extends Controller
             ! empty($claims)
         ) {
             $roles = [];
-            $attributes = $this->socialite_user->getRaw();
+            $attributes = [];
+            $attribute_list = $this->socialite_user->getRaw();
+            foreach ($attribute_list as $a) {
+                $attribute_name = $a->getName();
+                $attribute_values = $a->getAllAttributeValues();
+                $attributes[$attribute_name] = $attribute_values;
+            }
 
             foreach ($scopes as $scope) {
                 foreach (Arr::wrap($attributes[$scope] ?? []) as $scope_data) {
