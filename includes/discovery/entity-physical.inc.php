@@ -3,7 +3,7 @@
 use LibreNMS\Config;
 use LibreNMS\OS;
 
-if (! $os instanceof OS) {
+if (! isset($os) || ! $os instanceof OS) {
     $os = OS::make($device);
 }
 (new \LibreNMS\Modules\EntityPhysical())->discover($os);

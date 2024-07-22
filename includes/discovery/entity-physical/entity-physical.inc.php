@@ -4,11 +4,7 @@ use Illuminate\Support\Str;
 
 echo "\nCaching OIDs:";
 
-if ($device['os'] == 'junos') {
-    $entity_array = [];
-    echo ' jnxBoxAnatomy';
-    $entity_array = snmpwalk_cache_oid($device, 'jnxBoxAnatomy', $entity_array, 'JUNIPER-MIB');
-} elseif ($device['os'] == 'timos') {
+if ($device['os'] == 'timos') {
     $entity_array = [];
     echo 'tmnxHwObjs';
     $entity_array = snmpwalk_cache_multi_oid($device, 'tmnxHwObjs', $entity_array, 'TIMETRA-CHASSIS-MIB', 'nokia');
@@ -90,28 +86,7 @@ if ($device['os'] == 'saf-cfm') {
 
 foreach ($entity_array as $entPhysicalIndex => $entry) {
     $ifIndex = 0;
-    if ($device['os'] == 'junos') {
-        // Juniper's MIB doesn't have the same objects as the Entity MIB, so some values
-        // are made up here.
-        $entPhysicalDescr = $entry['jnxContentsDescr'];
-        $entPhysicalContainedIn = $entry['jnxContainersWithin'];
-        $entPhysicalClass = $entry['jnxBoxClass'];
-        $entPhysicalName = $entry['jnxOperatingDescr'];
-        $entPhysicalSerialNum = $entry['jnxContentsSerialNo'];
-        $entPhysicalModelName = $entry['jnxContentsPartNo'];
-        $entPhysicalMfgName = 'Juniper';
-        $entPhysicalVendorType = 'Juniper';
-        $entPhysicalParentRelPos = -1;
-        $entPhysicalHardwareRev = $entry['jnxContentsRevision'];
-        $entPhysicalFirmwareRev = $entry['entPhysicalFirmwareRev'];
-        $entPhysicalSoftwareRev = $entry['entPhysicalSoftwareRev'];
-        $entPhysicalIsFRU = $entry['jnxFruType'];
-        $entPhysicalAlias = $entry['entPhysicalAlias'];
-        $entPhysicalAssetID = $entry['entPhysicalAssetID'];
-        // fix for issue 1865, $entPhysicalIndex, as it contains a quad dotted number on newer Junipers
-        // using str_replace to remove all dots should fix this even if it changes in future
-        $entPhysicalIndex = str_replace('.', '', $entPhysicalIndex);
-    } elseif ($device['os'] == 'timos') {
+    if ($device['os'] == 'timos') {
         $entPhysicalDescr = $entry['tmnxCardTypeDescription'];
         $entPhysicalContainedIn = $entry['tmnxHwContainedIn'];
         $entPhysicalClass = $entry['tmnxHwClass'];
