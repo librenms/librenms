@@ -46,7 +46,7 @@ if (! empty($snmpData)) {
     $upsnut = [
         4 => ['descr' => 'Battery Voltage', 'LL' => 0, 'LW' => 0, 'W' => null, 'H' => 60],
         5 => ['descr' => 'Battery Nominal', 'LL' => 0, 'LW' => 0, 'W' => null, 'H' => 60],
-        6 => ['descr' => 'Line Nominal', 'LL' => 0, 'LW' => 0, 'W' => null, 'H' => 0],
+        6 => ['descr' => 'Line Nominal', 'LL' => null, 'LW' => null, 'W' => null, 'H' => null],
         7 => ['descr' => 'Input Voltage', 'LL' => 200, 'LW' => 0, 'W' => null, 'H' => 280],
     ];
     foreach ($snmpData as $index => $upsData) {

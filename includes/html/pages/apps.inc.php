@@ -184,7 +184,10 @@ $graphs['exim-stats'] = [
     'queue',
 ];
 $graphs['php-fpm'] = [
-    'stats',
+    'overview_combined',
+    'overview_slow_requests',
+    'overview_max_childen_reached',
+    'v1_last_request_cpu',
 ];
 $graphs['nvidia'] = [
     'sm',
@@ -550,6 +553,12 @@ $graphs['borgbackup'] = [
     'errored',
     'locked',
     'locked_for',
+];
+$graphs['nfs'] = [
+    'server_rpc',
+    'server_cache',
+    'client_rpc',
+    'client_cache',
 ];
 
 echo '<div class="panel panel-default">';

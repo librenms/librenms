@@ -31,6 +31,26 @@ use LibreNMS\OS;
 
 class FsSwitch extends OS implements ProcessorDiscovery
 {
+    public static function normalizeTransceiverValues($value): float
+    {
+        // Convert fixed-point integer thresholds to float
+        $type = gettype($value);
+        if ($type === 'integer') {
+            // Thresholds are integers
+            $value /= 100.0;
+        }
+
+        return $value;
+    }
+
+    public static function normalizeTransceiverValuesCurrent($value): float
+    {
+        $value = FsSwitch::normalizeTransceiverValues($value);
+        $value *= 0.001; // mA to A
+
+        return $value;
+    }
+
     /**
      * Discover processors.
      * Returns an array of LibreNMS\Device\Processor objects that have been discovered
