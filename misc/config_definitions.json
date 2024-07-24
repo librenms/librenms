@@ -6527,6 +6527,34 @@
             "default": true,
             "type": "boolean"
         },
+        "webui.alert_map_box_size": {
+            "default": 165,
+            "group": "webui",
+            "section": "alert-map",
+            "order": 3,
+            "type": "text"
+        },
+        "webui.alert_map_compact": {
+            "default": false,
+            "group": "webui",
+            "section": "alert-map",
+            "order": 0,
+            "type": "boolean"
+        },
+        "webui.alert_map_sort_status": {
+            "default": false,
+            "group": "webui",
+            "section": "alert-map",
+            "order": 1,
+            "type": "boolean"
+        },
+        "webui.alert_map_use_device_groups": {
+            "default": false,
+            "group": "webui",
+            "section": "alert-map",
+            "order": 2,
+            "type": "boolean"
+        },
         "webui.availability_map_box_size": {
             "default": 165,
             "group": "webui",
