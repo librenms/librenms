@@ -43,6 +43,7 @@ class DashboardController extends Controller
         'alerts',
         'alertlog',
         'alertlog-stats',
+        'alert-map',
         'availability-map',
         'component-status',
         'custom-map',
