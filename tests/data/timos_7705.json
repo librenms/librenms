@@ -8716,7 +8716,7 @@
                 {
                     "entPhysicalIndex": 2,
                     "entPhysicalDescr": "7705 IOM",
-                    "entPhysicalClass": "",
+                    "entPhysicalClass": null,
                     "entPhysicalName": "iom-sar",
                     "entPhysicalHardwareRev": "1.0",
                     "entPhysicalFirmwareRev": null,
@@ -8724,18 +8724,18 @@
                     "entPhysicalAlias": null,
                     "entPhysicalAssetID": null,
                     "entPhysicalIsFRU": null,
-                    "entPhysicalModelName": "",
+                    "entPhysicalModelName": null,
                     "entPhysicalVendorType": "iom-sar",
-                    "entPhysicalSerialNum": "",
+                    "entPhysicalSerialNum": null,
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": 0,
-                    "entPhysicalMfgName": "",
+                    "entPhysicalMfgName": null,
                     "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 6,
                     "entPhysicalDescr": "1g/10g 7705 SAR-8 CSM",
-                    "entPhysicalClass": "",
+                    "entPhysicalClass": null,
                     "entPhysicalName": "csmv2-10g",
                     "entPhysicalHardwareRev": "1.0",
                     "entPhysicalFirmwareRev": null,
@@ -8743,12 +8743,12 @@
                     "entPhysicalAlias": null,
                     "entPhysicalAssetID": null,
                     "entPhysicalIsFRU": null,
-                    "entPhysicalModelName": "",
+                    "entPhysicalModelName": null,
                     "entPhysicalVendorType": "csmv2-10g",
-                    "entPhysicalSerialNum": "",
+                    "entPhysicalSerialNum": null,
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": 0,
-                    "entPhysicalMfgName": "",
+                    "entPhysicalMfgName": null,
                     "ifIndex": null
                 }
             ]

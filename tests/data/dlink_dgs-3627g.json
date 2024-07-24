@@ -10327,5 +10327,198 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "discovery-protocols": {
+        "discovery": {
+            "links": [
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "PCM F10A SW 121.136",
+                    "remote_port": "00 22 B0 B5 5C E9 (0022b0b55ce9)",
+                    "remote_platform": null,
+                    "remote_version": "Fast Ethernet Switch",
+                    "ifAlias": "D-Link DGS-3627G R3.00.B47 Port 1",
+                    "ifDescr": "D-Link DGS-3627G R3.00.B47 Port 1",
+                    "ifName": "1/1"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "PCM F9 SW 121.141",
+                    "remote_port": "40 9B CD DB 2E 99 (409bcddb2e99)",
+                    "remote_platform": null,
+                    "remote_version": "Gigabit Ethernet Switch",
+                    "ifAlias": "D-Link DGS-3627G R3.00.B47 Port 10",
+                    "ifDescr": "D-Link DGS-3627G R3.00.B47 Port 10",
+                    "ifName": "1/10"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "PCM F10 WLAN SW 121.145",
+                    "remote_port": "40 9B CD DB 52 39 (409bcddb5239)",
+                    "remote_platform": null,
+                    "remote_version": "Gigabit Ethernet Switch",
+                    "ifAlias": "D-Link DGS-3627G R3.00.B47 Port 11",
+                    "ifDescr": "D-Link DGS-3627G R3.00.B47 Port 11",
+                    "ifName": "1/11"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "PCM F10 SW 121.138",
+                    "remote_port": "40 9B CD DB 31 D9 (409bcddb31d9)",
+                    "remote_platform": null,
+                    "remote_version": "Gigabit Ethernet Switch",
+                    "ifAlias": "D-Link DGS-3627G R3.00.B47 Port 12",
+                    "ifDescr": "D-Link DGS-3627G R3.00.B47 Port 12",
+                    "ifName": "1/12"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "PCM F10 SW 121.137",
+                    "remote_port": "40 9B CD DB 2F F9 (409bcddb2ff9)",
+                    "remote_platform": null,
+                    "remote_version": "Gigabit Ethernet Switch",
+                    "ifAlias": "D-Link DGS-3627G R3.00.B47 Port 13",
+                    "ifDescr": "D-Link DGS-3627G R3.00.B47 Port 13",
+                    "ifName": "1/13"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "PCM F10 VOIP SW 121.144",
+                    "remote_port": "40 9B CD DB 4A 79 (409bcddb4a79)",
+                    "remote_platform": null,
+                    "remote_version": "Gigabit Ethernet Switch",
+                    "ifAlias": "D-Link DGS-3627G R3.00.B47 Port 14",
+                    "ifDescr": "D-Link DGS-3627G R3.00.B47 Port 14",
+                    "ifName": "1/14"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "PCM F24 WLAN SW 121.145",
+                    "remote_port": "40 9B CD DB 43 F9 (409bcddb43f9)",
+                    "remote_platform": null,
+                    "remote_version": "Gigabit Ethernet Switch",
+                    "ifAlias": "D-Link DGS-3627G R3.00.B47 Port 17",
+                    "ifDescr": "D-Link DGS-3627G R3.00.B47 Port 17",
+                    "ifName": "1/17"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "PCM F14 GYM WLAN SW 121.146",
+                    "remote_port": "40 9B CD DB 44 19 (409bcddb4419)",
+                    "remote_platform": null,
+                    "remote_version": "Gigabit Ethernet Switch",
+                    "ifAlias": "D-Link DGS-3627G R3.00.B47 Port 18",
+                    "ifDescr": "D-Link DGS-3627G R3.00.B47 Port 18",
+                    "ifName": "1/18"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "PCM F16E SW 121.130",
+                    "remote_port": "31 2F 32 35 00 (0015e93e151a)",
+                    "remote_platform": null,
+                    "remote_version": "Fast Ethernet Switch",
+                    "ifAlias": "D-Link DGS-3627G R3.00.B47 Port 2",
+                    "ifDescr": "D-Link DGS-3627G R3.00.B47 Port 2",
+                    "ifName": "1/2"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "MK2-USR-BB2",
+                    "remote_port": "TenGigabitEthernet 0/31 (00749c3da8eb)",
+                    "remote_platform": null,
+                    "remote_version": "Ruijie Full 10G Routing Switch(S6220-48XS6QXS-H) By Ruijie Networks",
+                    "ifAlias": "D-Link DGS-3627G R3.00.B47 Port 25",
+                    "ifDescr": "D-Link DGS-3627G R3.00.B47 Port 25",
+                    "ifName": "1/25"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "PCM F16G SW 121.132",
+                    "remote_port": "10 62 EB B0 C7 18 (1062ebb0c718)",
+                    "remote_platform": null,
+                    "remote_version": "Gigabit Ethernet Switch",
+                    "ifAlias": "D-Link DGS-3627G R3.00.B47 Port 3",
+                    "ifDescr": "D-Link DGS-3627G R3.00.B47 Port 3",
+                    "ifName": "1/3"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "PCM F16I SW 121.131",
+                    "remote_port": "40 9B CD 14 BC D9 (409bcd14bcd9)",
+                    "remote_platform": null,
+                    "remote_version": "Gigabit Ethernet Switch",
+                    "ifAlias": "D-Link DGS-3627G R3.00.B47 Port 4",
+                    "ifDescr": "D-Link DGS-3627G R3.00.B47 Port 4",
+                    "ifName": "1/4"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "PCM F16I SW 121.133",
+                    "remote_port": "84 C9 B2 8E 97 55 (84c9b28e9755)",
+                    "remote_platform": null,
+                    "remote_version": "Gigabit Ethernet Switch",
+                    "ifAlias": "D-Link DGS-3627G R3.00.B47 Port 5",
+                    "ifDescr": "D-Link DGS-3627G R3.00.B47 Port 5",
+                    "ifName": "1/5"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "PCM F10 SW 121.153",
+                    "remote_port": "18 0F 76 0C BB B9 (180f760cbbb9)",
+                    "remote_platform": null,
+                    "remote_version": "Gigabit Ethernet Switch",
+                    "ifAlias": "D-Link DGS-3627G R3.00.B47 Port 6",
+                    "ifDescr": "D-Link DGS-3627G R3.00.B47 Port 6",
+                    "ifName": "1/6"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "PCM F16 SW 121.129",
+                    "remote_port": "40 9B CD DB 35 99 (409bcddb3599)",
+                    "remote_platform": null,
+                    "remote_version": "Gigabit Ethernet Switch",
+                    "ifAlias": "D-Link DGS-3627G R3.00.B47 Port 7",
+                    "ifDescr": "D-Link DGS-3627G R3.00.B47 Port 7",
+                    "ifName": "1/7"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "PCM F9 WLAN SW 121.142",
+                    "remote_port": "40 9B CD DB 41 F9 (409bcddb41f9)",
+                    "remote_platform": null,
+                    "remote_version": "Gigabit Ethernet Switch",
+                    "ifAlias": "D-Link DGS-3627G R3.00.B47 Port 8",
+                    "ifDescr": "D-Link DGS-3627G R3.00.B47 Port 8",
+                    "ifName": "1/8"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "PCM F9 SW 121.140",
+                    "remote_port": "40 9B CD DB 2B B9 (409bcddb2bb9)",
+                    "remote_platform": null,
+                    "remote_version": "Gigabit Ethernet Switch",
+                    "ifAlias": "D-Link DGS-3627G R3.00.B47 Port 9",
+                    "ifDescr": "D-Link DGS-3627G R3.00.B47 Port 9",
+                    "ifName": "1/9"
+                }
+            ]
+        }
     }
 }
