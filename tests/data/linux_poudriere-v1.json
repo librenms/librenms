@@ -107,12 +107,6 @@
                     "app_type": "poudriere"
                 },
                 {
-                    "metric": "jps___13relengAMD64-default___FETCH",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "poudriere"
-                },
-                {
                     "metric": "jps___13relengAMD64-default___fetch",
                     "value": 0,
                     "value_prev": null,
