@@ -2,7 +2,7 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="mapDeleteModalLabel">{{ __('map.custom.edit.map.delete') }}</h5>
+                <h5 class="modal-title" id="mapDeleteModalLabel" data-text="{{ __('map.custom.edit.map.delete') }}"></h5>
             </div>
             <div class="modal-footer">
                 <center>

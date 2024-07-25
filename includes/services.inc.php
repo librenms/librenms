@@ -259,8 +259,8 @@ function check_service($command)
         [$ds,$values] = explode('=', trim($string));
 
         // Keep the first value, discard the others.
-        [$value] = explode(';', trim($values));
-        $value = trim($value);
+        $value = explode(';', trim($values));
+        $value = trim($value[0] ?? '');
 
         // Set an empty uom
         $uom = '';

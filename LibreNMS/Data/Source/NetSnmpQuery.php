@@ -80,7 +80,7 @@ class NetSnmpQuery implements SnmpQueryInterface
      */
     private array $mibDirs = [];
     private string $context = '';
-    private array|string $options = [self::DEFAULT_FLAGS];
+    private array|string $options = [self::DEFAULT_FLAGS, '-Pu'];
     private Device $device;
     private bool $abort = false;
     private bool $cache = false;
@@ -312,7 +312,9 @@ class NetSnmpQuery implements SnmpQueryInterface
 
         // user did not specify numeric, output full text
         if (! in_array('-On', $this->options)) {
-            $this->options[] = '-OS';
+            if (! in_array('-Os', $this->options)) {
+                $this->options[] = '-OS'; // show full oid, unless hideMib is set
+            }
         } elseif (Oid::isNumeric($oid)) {
             return Str::start($oid, '.'); // numeric to numeric optimization
         }
@@ -407,8 +409,21 @@ class NetSnmpQuery implements SnmpQueryInterface
     private function exec(string $command, array $oids): SnmpResponse
     {
         // use runtime(array) cache if requested. The 'null' driver will simply return the value without caching
-        $driver = $this->cache ? 'array' : 'null';
-        $key = $this->cache ? $this->getCacheKey($command, $oids) : '';
+        $driver = 'null';
+        $key = '';
+
+        if ($this->cache) {
+            $driver = 'array';
+            $key = $this->getCacheKey($command, $oids);
+
+            if (Debug::isEnabled()) {
+                if (Cache::driver($driver)->has($key)) {
+                    Log::debug("Cache hit for $command " . implode(',', $oids));
+                } else {
+                    Log::debug("Cache miss for $command " . implode(',', $oids) . ', grabbing fresh data.');
+                }
+            }
+        }
 
         return Cache::driver($driver)->rememberForever($key, function () use ($command, $oids) {
             $measure = Measurement::start($command);
@@ -546,6 +561,6 @@ class NetSnmpQuery implements SnmpQueryInterface
         $oids = implode(',', $oids);
         $options = implode(',', $this->options);
 
-        return "$type|{$this->device->hostname}|$this->context|$oids|$options";
+        return "$type|{$this->device->hostname}|{$this->device->community}|$this->context|$oids|$options";
     }
 }

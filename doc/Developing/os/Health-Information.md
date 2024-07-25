@@ -90,7 +90,8 @@ are as follows:
   automatically by discovery process. This parameter is still required to
   submit a pull request. This is the numerical OID that contains
   `value`. This should usually include `{{ $index }}`.
-  In case the index is a string, `{{ $index_string }}` can be used instead.
+  In case the index is a string, `{{ $str_index_as_numeric }}` can be used instead and will convert
+the string to the equivalent OID representation.
 - `divisor` (optional): This is the divisor to use against the returned `value`.
 - `multiplier` (optional): This is the multiplier to use against the returned `value`.
 - `low_limit` (optional): This is the critical low threshold that
@@ -117,10 +118,11 @@ are as follows:
   over (see note below).
 - `skip_value_lt` (optional): If sensor value is less than this, skip the discovery.
 - `skip_value_gt` (optional): If sensor value is greater than this, skip the discovery.
-- `entPhysicalIndex` (optional): If the sensor belongs to a physical
-  entity then you can specify the index here.
-- `entPhysicalIndex_measured` (optional): If the sensor belongs to a
-  physical entity then you can specify the entity type here.
+- `entPhysicalIndex` and `entPhysicalIndex_measured` (optional) : If the
+  sensor belongs to a physical entity then you can link them here. The currently
+  supported variants are :
+    - `entPhysicalIndex` contains the entPhysicalIndex from entPhysical table, and `entPhysicalIndex_measured` is NULL
+    - `entPhysicalIndex` contains "ifIndex" value of the linked port and `entPhysicalIndex_measured` contains "ports"
 - `user_func` (optional): You can provide a function name for the
   sensors value to be processed through (i.e. Convert fahrenheit to
   celsius use `fahrenheit_to_celsius`)

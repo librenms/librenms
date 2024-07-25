@@ -1,0 +1,32 @@
+WESTERMO-WEOS-TECHPREVIEW-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    NOTIFICATION-TYPE
+    FROM SNMPv2-SMI
+
+    otherNotificationPrefix
+    FROM WESTERMO-WEOS-MIB;
+
+-- -------------------------------------------------------------
+-- Notification group
+-- -------------------------------------------------------------
+-- -------------------------------------------------------------
+-- Notification: Other
+-- -------------------------------------------------------------
+
+remoteTriggerSet NOTIFICATION-TYPE
+OBJECTS { remoteTriggerStatus }
+      STATUS current
+      DESCRIPTION
+          "Notification associated with Remote trigger state."
+      ::= { otherNotificationPrefix 1 }
+
+remoteTriggerTimeout NOTIFICATION-TYPE
+OBJECTS { remoteTriggerStatus }
+      STATUS current
+      DESCRIPTION
+          "Notification associated with Remote triggert state."
+      ::= { otherNotificationPrefix 2 }
+
+
+END

@@ -4,10 +4,10 @@
 -- Wednesday, March 19, 2014 at 14:06:58 
 
 --  ===================================================================
--- Copyright (C) 2015 by HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2020 by HUAWEI TECHNOLOGIES. All rights reserved.
 -- Description:
 -- Reference:
--- Version: V1.07
+-- Version: V1.08
 -- ===================================================================
 
 	HUAWEI-SWITCH-L2MAM-EXT-MIB DEFINITIONS ::= BEGIN
@@ -31,7 +31,7 @@
 	
 		-- 1.3.6.1.4.1.2011.5.25.315
 		hwSWITCH-L2MAM-EXT MODULE-IDENTITY 
-			LAST-UPDATED "201508041600Z"		--  August 4, 2015 at 16:00 GMT
+			LAST-UPDATED "202012181600Z"		--  December 18, 2020 at 16:00 GMT
 			ORGANIZATION 
 				"Huawei Technologies Co.,Ltd."
 			CONTACT-INFO 
@@ -43,6 +43,10 @@
 				 Email: support@huawei.com"
 			DESCRIPTION 
 				"THIS IS THE LAYER 2 MAC-ADDRESS MANAGEMENT MIB."
+
+                REVISION "202012181600Z" 
+                DESCRIPTION 
+                "Add code hwSlotMuxMacUsageAlarm and hwSlotMuxMacUsageResume"
 
                                                                 REVISION "201508041600Z"		-- August 4, 2015 at 16:00 GMT
 		                      DESCRIPTION 
@@ -72,83 +76,95 @@
                                                        DESCRIPTION 
                                                       "Add code hwMacTrapPortCfgAlarm" 
 
-			REVISION "200406080000Z"		-- June 08, 2004 at 00:00 GMT
-			DESCRIPTION 
-				"
-				V1.00, Inital version.
-				"
-			REVISION "199610310000Z"		-- October 31, 1996 at 00:00 GMT
-			DESCRIPTION 
-				"Initial version (version 1), published as
-				RFC 2037."
-			REVISION "199912070000Z"		-- December 07, 1999 at 00:00 GMT
-			DESCRIPTION 
-				"Initial Version of Entity MIB (Version 2).
-				This revision obsoletes RFC 2037.
-				This version published as RFC 2737."
-			REVISION "200406080000Z"		-- June 08, 2004 at 00:00 GMT
-			DESCRIPTION 
-				"
-				V1.00, Inital version.
-				"
-			REVISION "200406080000Z"		-- June 08, 2004 at 00:00 GMT
-			DESCRIPTION 
-				"
-				V1.00, Inital version.
-				"
-			REVISION "199610310000Z"		-- October 31, 1996 at 00:00 GMT
-			DESCRIPTION 
-				"Initial version (version 1), published as
-				RFC 2037."
-			REVISION "199912070000Z"		-- December 07, 1999 at 00:00 GMT
-			DESCRIPTION 
-				"Initial Version of Entity MIB (Version 2).
-				This revision obsoletes RFC 2037.
-				This version published as RFC 2737."
-			REVISION "200406080000Z"		-- June 08, 2004 at 00:00 GMT
-			DESCRIPTION 
-				"
-				V1.00, Inital version.
-				"
-			REVISION "199610310000Z"		-- October 31, 1996 at 00:00 GMT
-			DESCRIPTION 
-				"Initial version (version 1), published as
-				RFC 2037."
-			REVISION "199912070000Z"		-- December 07, 1999 at 00:00 GMT
-			DESCRIPTION 
-				"Initial Version of Entity MIB (Version 2).
-				This revision obsoletes RFC 2037.
-				This version published as RFC 2737."
-			REVISION "199610310000Z"		-- October 31, 1996 at 00:00 GMT
-			DESCRIPTION 
-				"Initial version (version 1), published as
-				RFC 2037."
-			REVISION "199912070000Z"		-- December 07, 1999 at 00:00 GMT
-			DESCRIPTION 
-				"Initial Version of Entity MIB (Version 2).
-				This revision obsoletes RFC 2037.
-				This version published as RFC 2737."
-			REVISION "200406080000Z"		-- June 08, 2004 at 00:00 GMT
-			DESCRIPTION 
-				"
-				V1.00, Inital version.
-				"
-			REVISION "200406080000Z"		-- June 08, 2004 at 00:00 GMT
-			DESCRIPTION 
-				"
-				V1.00, Inital version.
-				"
-			REVISION "200406080000Z"		-- June 08, 2004 at 00:00 GMT
-			DESCRIPTION 
-				"
-				V1.00, Inital version.
-				"
-			REVISION "201008111600Z"		-- August 11, 2010 at 16:00 GMT
-			DESCRIPTION 
-				"V1.00, initial version."
 			REVISION "201402141600Z"		-- February 14, 2014 at 16:00 GMT
 			DESCRIPTION 
 				"Add code hwMacTrapPortCfgAlarm"
+
+REVISION "201008111600Z"		-- August 11, 2010 at 16:00 GMT
+			DESCRIPTION 
+				"V1.00, initial version."
+
+			REVISION "200406080000Z"		-- June 08, 2004 at 00:00 GMT
+			DESCRIPTION 
+				"
+				V1.00, Inital version.
+				"
+			
+			REVISION "200406080000Z"		-- June 08, 2004 at 00:00 GMT
+			DESCRIPTION 
+				"
+				V1.00, Inital version.
+				"
+			REVISION "200406080000Z"		-- June 08, 2004 at 00:00 GMT
+			DESCRIPTION 
+				"
+				V1.00, Inital version.
+				"
+			
+			REVISION "200406080000Z"		-- June 08, 2004 at 00:00 GMT
+			DESCRIPTION 
+				"
+				V1.00, Inital version.
+				"
+			
+			REVISION "200406080000Z"		-- June 08, 2004 at 00:00 GMT
+			DESCRIPTION 
+				"
+				V1.00, Inital version.
+				"
+			REVISION "200406080000Z"		-- June 08, 2004 at 00:00 GMT
+			DESCRIPTION 
+				"
+				V1.00, Inital version.
+				"
+
+REVISION "200406080000Z"		-- June 08, 2004 at 00:00 GMT
+			DESCRIPTION 
+				"V1.00, Inital version."
+
+REVISION "199912070000Z"		-- December 07, 1999 at 00:00 GMT
+			DESCRIPTION 
+				"Initial Version of Entity MIB (Version 2).
+				This revision obsoletes RFC 2037.
+				This version published as RFC 2737."
+
+REVISION "199912070000Z"		-- December 07, 1999 at 00:00 GMT
+			DESCRIPTION 
+				"Initial Version of Entity MIB (Version 2).
+				This revision obsoletes RFC 2037.
+				This version published as RFC 2737."
+			
+			REVISION "199912070000Z"		-- December 07, 1999 at 00:00 GMT
+			DESCRIPTION 
+				"Initial Version of Entity MIB (Version 2).
+				This revision obsoletes RFC 2037.
+				This version published as RFC 2737."
+
+REVISION "199912070000Z"		-- December 07, 1999 at 00:00 GMT
+			DESCRIPTION 
+				"Initial Version of Entity MIB (Version 2).
+				This revision obsoletes RFC 2037.
+				This version published as RFC 2737."
+
+REVISION "199610310000Z"		-- October 31, 1996 at 00:00 GMT
+			DESCRIPTION 
+				"Initial version (version 1), published as
+				RFC 2037."
+
+REVISION "199610310000Z"		-- October 31, 1996 at 00:00 GMT
+			DESCRIPTION 
+				"Initial version (version 1), published as
+				RFC 2037."
+
+REVISION "199610310000Z"		-- October 31, 1996 at 00:00 GMT
+			DESCRIPTION 
+				"Initial version (version 1), published as
+				RFC 2037."
+
+REVISION "199610310000Z"		-- October 31, 1996 at 00:00 GMT
+			DESCRIPTION 
+				"Initial version (version 1), published as
+				RFC 2037."
 
                                                                	::= { hwDatacomm 315 }
 
@@ -342,6 +358,25 @@
 			DESCRIPTION 
 				"Description."
 			::= { hwSwitchL2MamExtTraps 9 }
+
+		-- 1.3.6.1.4.1.2011.5.25.315.3.10
+		hwSlotMuxMacUsageAlarm NOTIFICATION-TYPE
+			OBJECTS { hwBaseTrapEventType, hwBaseTrapSeverity, hwBaseTrapProbableCause, hwMacEntityUsage, hwMacEntityUsageThreshold, entPhysicalName }
+			STATUS current
+			DESCRIPTION 
+				"This notification indicates the MUX MAC usage of the slot raising the threshold
+				"
+			::= { hwSwitchL2MamExtTraps 10 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.315.3.11
+		hwSlotMuxMacUsageResume NOTIFICATION-TYPE
+			OBJECTS { hwBaseTrapEventType, hwBaseTrapSeverity, hwBaseTrapProbableCause, hwMacEntityUsage, hwMacEntityUsageThreshold, entPhysicalName }
+			STATUS current
+			DESCRIPTION 
+				"This notification indicates the MUX MAC usage of the slot falling the threshold
+				"
+			::= { hwSwitchL2MamExtTraps 11 }
 		
 		-- 1.3.6.1.4.1.2011.5.25.315.4
 		hwSwitchL2MamExtConformance OBJECT IDENTIFIER ::= { hwSWITCH-L2MAM-EXT 4 }
@@ -386,7 +421,7 @@
 		-- 1.3.6.1.4.1.2011.5.25.315.4.2.3
 		hwL2MAMExtTrapGroup NOTIFICATION-GROUP
 			NOTIFICATIONS { hwMacTrapAlarm, hwMacTrapPortCfgAlarm, hwPortVlanSecureMacAlarm, hwPortsecStaticFlpAlarm, hwSlotMacUsageFallingThreshold, 
-				hwSlotMacUsageRaisingThreshold, hwMacTrapHashConflictAlarm, hwTrunkMemSpeedDifferentAlarm, hwTrunkMemSpeedDifferentResume }
+				hwSlotMacUsageRaisingThreshold, hwMacTrapHashConflictAlarm, hwTrunkMemSpeedDifferentAlarm, hwTrunkMemSpeedDifferentResume, hwSlotMuxMacUsageAlarm, hwSlotMuxMacUsageResume}
 			STATUS current
 			DESCRIPTION 
 				"The trap enable group."

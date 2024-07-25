@@ -17,6 +17,7 @@ use App\Models\Availability;
 use App\Models\Device;
 use App\Models\DeviceGroup;
 use App\Models\DeviceOutage;
+use App\Models\Ipv4Mac;
 use App\Models\Location;
 use App\Models\MplsSap;
 use App\Models\MplsService;
@@ -313,12 +314,10 @@ function list_devices(Illuminate\Http\Request $request)
     $query = $request->get('query');
     $param = [];
 
-    if (empty($order)) {
-        $order = 'hostname';
-    }
-
-    if (stristr($order, ' desc') === false && stristr($order, ' asc') === false) {
-        $order = 'd.`' . $order . '` ASC';
+    if (preg_match('/^([a-z_]+)(?: (desc|asc))?$/i', $order, $matches)) {
+        $order = "d.`$matches[1]` " . ($matches[2] ?? 'ASC');
+    } else {
+        $order = 'd.`hostname` ASC';
     }
 
     $select = ' d.*, GROUP_CONCAT(dd.device_id) AS dependency_parent_id, GROUP_CONCAT(dd.hostname) AS dependency_parent_hostname, `location`, `lat`, `lng` ';
@@ -538,6 +537,33 @@ function maintenance_device(Illuminate\Http\Request $request)
     } else {
         return api_success_noresult(201, "Device {$device->hostname} ({$device->device_id}) moved into maintenance mode" . ($duration ? " for {$duration}h" : ''));
     }
+}
+
+function device_under_maintenance(Illuminate\Http\Request $request)
+{
+    // return whether or not a device is in an active maintenance window
+
+    $hostname = $request->route('hostname');
+
+    if (empty($hostname)) {
+        return api_error(400, 'No hostname has been provided to get maintenance status');
+    }
+
+    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $model = null;
+    if ($device_id) {
+        $model = DeviceCache::get((int) $device_id);
+    }
+
+    if (! $model) {
+        return api_error(404, "Device $hostname not found");
+    }
+
+    return check_device_permission($device_id, function () use ($model) {
+        $maintenance = $model->isUnderMaintenance() ?? false;
+
+        return api_success($maintenance, 'is_under_maintenance');
+    });
 }
 
 function device_availability(Illuminate\Http\Request $request)
@@ -904,7 +930,7 @@ function get_graphs(Illuminate\Http\Request $request)
         ];
         $graphs[] = [
             'desc' => 'Ping Response',
-            'name' => 'device_ping_perf',
+            'name' => 'device_icmp_perf',
         ];
         foreach (dbFetchRows('SELECT * FROM device_graphs WHERE device_id = ? ORDER BY graph', [$device_id]) as $graph) {
             $desc = Config::get("graph_types.device.{$graph['graph']}.descr");
@@ -1044,6 +1070,10 @@ function get_port_graphs(Illuminate\Http\Request $request): JsonResponse
 
     $ports = $device->ports()->isNotDeleted()->hasAccess(Auth::user())
         ->select($columns)->orderBy('ifIndex')->get();
+
+    if ($ports->isEmpty()) {
+        return api_error(404, 'No ports found');
+    }
 
     return api_success($ports, 'ports');
 }
@@ -2780,23 +2810,21 @@ function list_arp(Illuminate\Http\Request $request)
     }
 
     if ($query === 'all') {
-        $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
-        $arp = dbFetchRows('SELECT `ipv4_mac`.* FROM `ipv4_mac` LEFT JOIN `ports` ON `ipv4_mac`.`port_id` = `ports`.`port_id` WHERE `ports`.`device_id` = ?', [$device_id]);
+        $arp = $request->has('device')
+            ? \DeviceCache::get($hostname)->macs
+            : Ipv4Mac::all();
     } elseif ($cidr) {
         try {
             $ip = new IPv4("$query/$cidr");
-            $arp = dbFetchRows(
-                'SELECT * FROM `ipv4_mac` WHERE (inet_aton(`ipv4_address`) & ?) = ?',
-                [ip2long($ip->getNetmask()), ip2long($ip->getNetworkAddress())]
-            );
+            $arp = Ipv4Mac::whereRaw('(inet_aton(`ipv4_address`) & ?) = ?', [ip2long($ip->getNetmask()), ip2long($ip->getNetworkAddress())])->get();
         } catch (InvalidIpException $e) {
             return api_error(400, 'Invalid Network Address');
         }
     } elseif (filter_var($query, FILTER_VALIDATE_MAC)) {
         $mac = Mac::parse($query)->hex();
-        $arp = dbFetchRows('SELECT * FROM `ipv4_mac` WHERE `mac_address`=?', [$mac]);
+        $arp = Ipv4Mac::where('mac_address', $mac);
     } else {
-        $arp = dbFetchRows('SELECT * FROM `ipv4_mac` WHERE `ipv4_address`=?', [$query]);
+        $arp = Ipv4Mac::where('ipv4_address', $query);
     }
 
     return api_success($arp, 'arp');
@@ -3178,7 +3206,7 @@ function del_location(Illuminate\Http\Request $request)
         'location_id' => 0,
     ];
     dbUpdate($data, 'devices', '`location_id` = ?', [$location_id]);
-    $result = dbDelete('locations', '`location` = ? ', [$location]);
+    $result = dbDelete('locations', '`id` = ? ', [$location_id]);
     if ($result == 1) {
         return api_success_noresult(201, "Location $location has been deleted successfully");
     }

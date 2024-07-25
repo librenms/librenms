@@ -1,10 +1,11 @@
 <?php
 
-require_once 'includes/systemd-shared.inc.php';
-
+use LibreNMS\Config;
 use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\Exceptions\JsonAppMissingKeysException;
 use LibreNMS\RRD\RrdDefinition;
+
+require_once Config::get('install_dir') . '/includes/systemd-shared.inc.php';
 
 $name = 'systemd';
 $output = 'OK';

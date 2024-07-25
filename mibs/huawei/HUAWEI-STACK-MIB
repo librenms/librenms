@@ -1,11 +1,11 @@
 -- =====================================================================
--- Copyright (C) 2017 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2022 by  HUAWEI TECHNOLOGIES. All rights reserved.
 --
 -- Description: Huawei Stack MIB
 -- Reference:   HUAWEI Stack MIB
--- Version:  V1.60
+-- Version:  V1.69
 -- History:
--- Friday, May 06, 2011 at 15:29:31
+-- Monday, Aug 29, 2022 at 10:58:30
 --
 -- =====================================================================
 HUAWEI-STACK-MIB DEFINITIONS ::= BEGIN
@@ -25,7 +25,7 @@ HUAWEI-STACK-MIB DEFINITIONS ::= BEGIN
             FROM HUAWEI-MIB;
 
     huaweiStackMIB MODULE-IDENTITY
-                  LAST-UPDATED "201705081100Z"           
+                  LAST-UPDATED "202208291058Z"           
                   ORGANIZATION 
                   "Huawei Technologies Co.,Ltd."
                   CONTACT-INFO  
@@ -35,9 +35,38 @@ HUAWEI-STACK-MIB DEFINITIONS ::= BEGIN
             People's Republic of China
             Website: http://www.huawei.com
             Email: support@huawei.com
-           "           
+           "        
+
         DESCRIPTION 
-        " "	
+        " "
+        REVISION "202208291058Z"   
+        DESCRIPTION "Updated to include support for STACK" 
+
+        	REVISION "202202242233Z"
+        DESCRIPTION "Updated to include support for STACK" 
+			REVISION "202112091813Z"
+        DESCRIPTION "Updated to include support for STACK" 
+               REVISION "202110132013Z"
+        DESCRIPTION "Updated to include support for STACK" 
+
+                REVISION "202109161930Z"   
+        DESCRIPTION "Updated to include support for STACK" 
+
+		REVISION "202011090930Z"   
+        DESCRIPTION "Add hwPhyStackPortDownResume, hwCssLinkDownResume" 
+
+		REVISION "201812260930Z"   
+        DESCRIPTION "Add CSS traps for CSS ISSU upgrade" 
+	
+        REVISION "201810241121Z"   
+        DESCRIPTION "Add hwStackPortLinkErr" 
+	
+        REVISION "201808082100Z"   
+        DESCRIPTION "Add hwCssMemberPortEnableTable information table for STACK" 
+        
+        REVISION "201808082000Z"   
+        DESCRIPTION "Add stack port information table for STACK" 
+
         REVISION "201705081100Z"   
         DESCRIPTION "Updated to include support for STACK" 
 	
@@ -1365,13 +1394,92 @@ HUAWEI-STACK-MIB DEFINITIONS ::= BEGIN
             "When the loop recover in stack member port, send a SNMP trap to network manager."
             ::= { hwStackEventsV2  63 }
 	    
-	hwStackAutoConfigFailed NOTIFICATION-TYPE
+        hwStackAutoConfigFailed NOTIFICATION-TYPE
             OBJECTS { hwStackAutoConfigFailedSlotID, hwStackAutoConfigFailedIfName, hwStackAutoConfigFailedReason }
             STATUS current
             DESCRIPTION
             "When failed auto change to stack port,send a SNMP trap to network manager."
             ::= { hwStackEventsV2  64 }	    
-	
+
+        hwStackPortLinkErr NOTIFICATION-TYPE
+            OBJECTS { hwStackLocalIfName,hwStackPeerIfName,hwStackConnectErrReason }
+            STATUS current
+            DESCRIPTION
+                " When the stack port connect error,send 
+                a SNMP trap to network manager."
+            ::= { hwStackEventsV2  65 }	
+
+        hwPhyStackPortDownResume NOTIFICATION-TYPE
+            OBJECTS { hwStackLocalIfName }
+            STATUS current
+            DESCRIPTION
+                " When the stack port is resumed from down state,send 
+                a SNMP trap to network manager."
+            ::= { hwStackEventsV2  66 }      
+
+        hwSipPortHaveMediumAlarm NOTIFICATION-TYPE
+            OBJECTS {hwStackSipIfName}
+            STATUS current
+            DESCRIPTION
+                "When a medium was inserted into the SIP port which cannot be used for out-of-band stacking."
+            ::= { hwStackEventsV2  67 }
+
+        hwSipPortHaveMediumAlarmResume NOTIFICATION-TYPE
+            OBJECTS {hwStackSipIfName}
+            STATUS current
+            DESCRIPTION
+                "When a medium was removed from the SIP port which cannot be used for out-of-band stacking."
+            ::= { hwStackEventsV2  68 }
+
+        hwSipPortLinkProtocolAlarm NOTIFICATION-TYPE
+            OBJECTS {hwStackSipIfName}
+            STATUS current
+            DESCRIPTION     
+                "When the protocol state of the sip-port is down, send an SNMP trap to the network manager."
+            ::= { hwStackEventsV2 69 }
+			
+        hwSipPortLinkProtocolAlarmResume NOTIFICATION-TYPE
+            OBJECTS {hwStackSipIfName}
+            STATUS current
+            DESCRIPTION     
+                "When the physical status and protocol status of the sip-port are up or down at the same time, send an SNMP trap to the network manager."
+            ::= { hwStackEventsV2 70}
+
+        hwStackSubCardMismatch NOTIFICATION-TYPE
+            OBJECTS {hwStackLocalIfName}
+            STATUS current
+            DESCRIPTION     
+                "When the subcard mode or subcard type of the stack port is mismatch with old subcard, send an SNMP trap to the network manager."
+            ::= { hwStackEventsV2 71}
+            
+        hwStackSubCardNotSupport NOTIFICATION-TYPE
+            OBJECTS {hwStackLocalIfName}
+            STATUS current
+            DESCRIPTION     
+                "The subcard type is not support stack function."
+            ::= { hwStackEventsV2 72}
+
+        hwStackSubCardNotSupportResume NOTIFICATION-TYPE
+            OBJECTS {hwStackLocalIfName}
+            STATUS current
+            DESCRIPTION     
+                "The subcard which is not support stack function is support stack function."
+            ::= { hwStackEventsV2 73}
+
+        hwStackProPacketTamper NOTIFICATION-TYPE
+            OBJECTS {hwStackPeerSlotName, hwPacketPaddingContent}
+            STATUS current
+            DESCRIPTION     
+                "The CSS or stack protocol packets are tampered with."
+            ::= { hwStackEventsV2 74}         
+
+       hwStackProPacketTamperResume NOTIFICATION-TYPE
+            OBJECTS {hwStackPeerSlotName, hwPacketPaddingContent}
+            STATUS current
+            DESCRIPTION     
+                "The fault that CSS or stack protocol packets are tampered with has been rectified."
+            ::= { hwStackEventsV2 75}  
+
 --
 --  TABLE: hwStackUpgradeTable definition
 --
@@ -2064,6 +2172,7 @@ HUAWEI-STACK-MIB DEFINITIONS ::= BEGIN
             DESCRIPTION
                 " Error-down reason."
             ::= { hwStackTrapObject 16 } 
+
             
      hwStackVlanConflictDescription OBJECT-TYPE
 				 SYNTAX OCTET STRING
@@ -2136,7 +2245,265 @@ HUAWEI-STACK-MIB DEFINITIONS ::= BEGIN
 			   DESCRIPTION
 			   "Auto configration failed reason."
 			   ::= { hwStackTrapObject 25 }
-		    
+
+       hwStackSipIfName OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                " The current number of member port in Fabric-Port, which protocol state is up."
+            ::= { hwStackTrapObject 26 }
+
+       hwStackPeerSlotName OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                " The pper slot name."
+            ::= { hwStackTrapObject 27 }
+
+      hwPacketPaddingContent OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The packert padding content"
+            ::= { hwStackTrapObject 28 }
+
+--
+--  TABLE: hwStackPortInfoTable definition
+--			   			   
+	hwStackPortInfoTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwStackPortInfoEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Table of Stack port information."
+			::= { hwStackObject 33 }
+
+		hwStackPortInfoEntry OBJECT-TYPE
+			SYNTAX HwStackPortInfoEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Entry of Stack port information table."
+			INDEX { hwStackPortSlotId, hwStackPortPortId }
+			::= { hwStackPortInfoTable 1 }
+
+		HwStackPortInfoEntry ::=
+			SEQUENCE { 
+				hwStackPortSlotId
+					Integer32,
+				hwStackPortPortId
+					Integer32,
+				hwStackPortSpeed
+					OCTET STRING, 
+				hwStackPortOperStatus
+					INTEGER, 
+				hwStackPortAdminStatus
+					INTEGER,
+				hwStackPortInOctets
+					Counter64,  
+				hwStackPortInUcastPkts
+					Counter64, 
+				hwStackPortInMcastPkts
+					Counter64, 
+				hwStackPortInBcastPkts
+					Counter64, 
+				hwStackPortInDiscards
+					Counter64, 
+				hwStackPortInErrors
+					Counter64, 
+				hwStackPortInCRCErrors
+					Counter64, 
+				hwStackPortOutOctets
+					Counter64, 
+				hwStackPortOutUcastPkts
+					Counter64, 
+				hwStackPortOutMcastPkts
+					Counter64, 
+				hwStackPortOutBcastPkts
+					Counter64, 
+				hwStackPortOutDiscards
+					Counter64, 
+				hwStackPortOutErrors
+					Counter64,
+				hwStackPortInBandRate
+					Integer32,      
+				hwStackPortOutBandRate
+					Integer32                
+					
+		   }
+
+		hwStackPortSlotId OBJECT-TYPE
+			SYNTAX Integer32 (0..8)
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Slot id of Stack port."
+			::= { hwStackPortInfoEntry 1 }
+
+		hwStackPortPortId OBJECT-TYPE
+			SYNTAX Integer32 (1..2)
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Port id of Stack port."
+			::= { hwStackPortInfoEntry 2 }
+
+		hwStackPortSpeed OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Speed of Stack port."
+			::= { hwStackPortInfoEntry 3 }
+			
+		hwStackPortOperStatus OBJECT-TYPE
+			SYNTAX INTEGER
+				   {
+				   down(0),
+				   up(1)
+				   }
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Oper status of Stack port."
+			::= { hwStackPortInfoEntry 4 }        
+			
+		hwStackPortAdminStatus OBJECT-TYPE
+			SYNTAX INTEGER
+				   {
+				   undoshutdown(0),
+				   shutdown(1)
+				   }
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Admin status of Stack port."
+			::= { hwStackPortInfoEntry 5 }                
+			
+		hwStackPortInOctets OBJECT-TYPE
+			SYNTAX Counter64 
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The total number of octets received on the interface."
+			::= { hwStackPortInfoEntry 6 }
+
+		hwStackPortInUcastPkts OBJECT-TYPE
+			SYNTAX Counter64 
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The total number of unicast packets received on the interface."
+			::= { hwStackPortInfoEntry 7 }
+
+		hwStackPortInMcastPkts OBJECT-TYPE
+			SYNTAX Counter64 
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The total number of multicast packets received on the interface."
+			::= { hwStackPortInfoEntry 8 }
+
+		hwStackPortInBcastPkts OBJECT-TYPE
+			SYNTAX Counter64 
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The total number of broadcast packets received on the interface."
+			::= { hwStackPortInfoEntry 9 }
+
+		hwStackPortInDiscards OBJECT-TYPE
+			SYNTAX Counter64 
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The number of inbound packets which were discarded."
+			::= { hwStackPortInfoEntry 10 }
+
+		hwStackPortInErrors OBJECT-TYPE
+			SYNTAX Counter64 
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The number of inbound packets which were error."
+			::= { hwStackPortInfoEntry 11 }
+
+		hwStackPortInCRCErrors OBJECT-TYPE
+			SYNTAX Counter64 
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The number of inbound packets which were CRC error."
+			::= { hwStackPortInfoEntry 12 }
+
+		hwStackPortOutOctets OBJECT-TYPE
+			SYNTAX Counter64 
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The total number of octets sent on the interface."
+			::= { hwStackPortInfoEntry 13 }
+
+		hwStackPortOutUcastPkts OBJECT-TYPE
+			SYNTAX Counter64 
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The total number of unicast packets sent from the interface."
+			::= { hwStackPortInfoEntry 14 }
+
+		hwStackPortOutMcastPkts OBJECT-TYPE
+			SYNTAX Counter64 
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The total number of multicast packets sent from the interface."
+			::= { hwStackPortInfoEntry 15 }
+
+		hwStackPortOutBcastPkts OBJECT-TYPE
+			SYNTAX Counter64 
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The total number of broadcast packets sent from the interface."
+			::= { hwStackPortInfoEntry 16 }
+
+		hwStackPortOutDiscards OBJECT-TYPE
+			SYNTAX Counter64 
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The number of outbound packets which were discarded."
+			::= { hwStackPortInfoEntry 17 }
+			
+		hwStackPortOutErrors OBJECT-TYPE
+			SYNTAX Counter64 
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The number of outbound packets which were error."
+			::= { hwStackPortInfoEntry 18 }   
+
+		hwStackPortInBandRate OBJECT-TYPE
+			SYNTAX Integer32 (0..100)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The input bandwidth utilization of Stack port."
+			::= { hwStackPortInfoEntry 19 }
+			
+		hwStackPortOutBandRate OBJECT-TYPE
+			SYNTAX Integer32 (0..100)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The output bandwidth utilization of Stack port."
+			::= { hwStackPortInfoEntry 20 }		    
+
+
 		    
 			     	           
     hwCssObject OBJECT IDENTIFIER ::= { huaweiStackMIB 3 }
@@ -2372,13 +2739,21 @@ HUAWEI-STACK-MIB DEFINITIONS ::= BEGIN
             "CSS trap message port id parameter."
         ::= { hwCssTrapObjects 9 }
         
-   hwCssTrapConfigureFailedSlotId OBJECT-TYPE
+    hwCssTrapConfigureFailedSlotId OBJECT-TYPE
             SYNTAX OCTET STRING
             MAX-ACCESS accessible-for-notify
             STATUS current
             DESCRIPTION
                 "CSS configure failed trap message slot id parameter."
-            ::= { hwCssTrapObjects 10 }
+            ::= { hwCssTrapObjects 10 }			
+			
+	hwCssIssuFailReason OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The fail reason of CSS ISSU upgrade."
+			::= { hwCssTrapObjects 12 }	
 
 
     hwCssTraps OBJECT IDENTIFIER ::= { hwCssTrap 2 }
@@ -2519,7 +2894,28 @@ HUAWEI-STACK-MIB DEFINITIONS ::= BEGIN
         DESCRIPTION 
             "CSS connect error trap message."
         ::= { hwCssTraps 19 }
+		
 
+	hwCssIssuUpgradeComplete NOTIFICATION-TYPE
+			STATUS current
+			DESCRIPTION 
+				"CSS ISSU upgrade complete trap message."
+			::= { hwCssTraps 20 }
+			
+	hwCssIssuUpgradeFail NOTIFICATION-TYPE
+			OBJECTS { hwCssIssuFailReason }
+			STATUS current
+			DESCRIPTION 
+				"CSS ISSU upgrade failure trap message."
+			::= { hwCssTraps 21 }
+			
+    hwCssLinkDownResume NOTIFICATION-TYPE
+        OBJECTS { hwCssTrapFrameId1, hwCssTrapSlotId1, hwCssTrapPortId1 }
+        STATUS current
+        DESCRIPTION 
+            "CSS link down resume trap message."
+        ::= { hwCssTraps 22 }
+		
 hwCssPortInfoTable OBJECT-TYPE
         SYNTAX SEQUENCE OF HwCssPortInfoEntry
         MAX-ACCESS not-accessible
@@ -2580,7 +2976,12 @@ hwCssPortInfoTable OBJECT-TYPE
             hwCssPortOutDiscards
                 Counter64, 
             hwCssPortOutErrors
-                Counter64 
+                Counter64,
+            hwCssPortInBandRate
+                Integer32,      
+            hwCssPortOutBandRate
+                Integer32                
+                
        }
 
     hwCssPortFrameId OBJECT-TYPE
@@ -2757,7 +3158,23 @@ hwCssPortInfoTable OBJECT-TYPE
         STATUS current
         DESCRIPTION
             "The number of outbound packets which were error."
-        ::= { hwCssPortInfoEntry 21 }        
+        ::= { hwCssPortInfoEntry 21 }   
+
+    hwCssPortInBandRate OBJECT-TYPE
+        SYNTAX Integer32 (0..100)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The input bandwidth utilization of CSS port."
+        ::= { hwCssPortInfoEntry 22 }
+        
+    hwCssPortOutBandRate OBJECT-TYPE
+        SYNTAX Integer32 (0..100)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The output bandwidth utilization of CSS port."
+        ::= { hwCssPortInfoEntry 23 }
 
     hwCssLinkInfoTable OBJECT-TYPE
         SYNTAX SEQUENCE OF HwCssLinkInfoEntry
@@ -2888,7 +3305,48 @@ hwCssPortInfoTable OBJECT-TYPE
        STATUS current
        DESCRIPTION
            "Speed of CSS link."
-       ::= { hwCssLinkInfoEntry 11 }   
+       ::= { hwCssLinkInfoEntry 11 } 
+       
+       
+         
+    hwCssMemberPortEnableTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF HwCssMemberPortEnableEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Table of CSS physical port. "
+       ::= { hwCssObject 6 }
+
+    hwCssMemberPortEnableEntry OBJECT-TYPE
+        SYNTAX HwCssMemberPortEnableEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Provide information of the physical port. "
+        INDEX { entPhysicalIndex }
+        ::= { hwCssMemberPortEnableTable 1 }
+
+    HwCssMemberPortEnableEntry ::=
+        SEQUENCE {  
+            hwEnableCssMode
+                INTEGER
+         }
+
+    hwEnableCssMode OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+           yes(1),
+           no(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "If enable CSS mode. "
+        DEFVAL { no }
+        ::= { hwCssMemberPortEnableEntry 1 }  
+       
+       
+    
 --
 -- Node compliance check
 --
@@ -2956,7 +3414,8 @@ hwCssPortInfoTable OBJECT-TYPE
                         hwStackMemberPortSpeedDifferentAlarm, hwStackMemberPortSpeedDifferentAlarmResume,hwStackMemberPortProtocolAlarm,hwStackMemberPortProtocolAlarmResume,hwPhyStackVlanConflict,
                         hwStackLinkTopoAlarm,hwStackLinkTopoAlarmResume,hwStackMemberPortTypeDifferentAlarm,hwStackMemberPortTypeDifferentAlarmResume,
                         hwStackLinkTopoSinglePortAlarm,hwStackLinkTopoSinglePortAlarmResume, hwStackSipPortSingleLinkAlarm, hwStackSipPortSingleLinkAlarmResume, hwStackPortErrorDown, 
-						hwStackPortErrorDownRecovery, hwStackSetUpFailure,hwStackMemberPortLoopAlarm,hwStackMemberPortLoopAlarmResume,hwStackAutoConfigFailed
+                        hwStackPortErrorDownRecovery, hwStackSetUpFailure,hwStackMemberPortLoopAlarm,hwStackMemberPortLoopAlarmResume,hwStackAutoConfigFailed,hwStackPortLinkErr,hwPhyStackPortDownResume,hwSipPortHaveMediumAlarm,hwSipPortHaveMediumAlarmResume,
+                        hwSipPortLinkProtocolAlarm, hwSipPortLinkProtocolAlarmResume,hwStackSubCardMismatch,hwStackSubCardNotSupport,hwStackSubCardNotSupportResume,hwStackProPacketTamper,hwStackProPacketTamperResume
                         }
         STATUS current
         DESCRIPTION
@@ -2970,7 +3429,8 @@ hwCssPortInfoTable OBJECT-TYPE
                  hwStackCfgConflictStackId, hwStackFabricPort, hwStackFabricMemberPort,
                  hwStackMemberId, hwStackLeafMemberId, hwStackReason, hwStackLeafPort,
                  hwStackCurrentLinkNum, hwFabricCurrentLinkNum, hwStackErrorDownRecoverReason, hwStackPortErrorDownType, 
-				 hwStackSetUpFailureDescription, hwStackLocalSlotID, hwStackPeerSlotID,hwStackAutoConfigFailedSlotID,hwStackAutoConfigFailedIfName,hwStackAutoConfigFailedReason
+                 hwStackSetUpFailureDescription, hwStackLocalSlotID, hwStackPeerSlotID,hwStackAutoConfigFailedSlotID,hwStackAutoConfigFailedIfName,hwStackAutoConfigFailedReason,hwStackSipIfName,
+                 hwStackPeerSlotName, hwPacketPaddingContent
                  }
         STATUS current
         DESCRIPTION
@@ -3007,7 +3467,7 @@ hwCssPortInfoTable OBJECT-TYPE
     
     hwCssTrapObjectGroup OBJECT-GROUP
         OBJECTS { hwCssTrapFrameId2, hwCssTrapSlotId2, hwCssTrapPortId2, hwCssTrapFrameId3, hwCssTrapSlotId3, 
-            hwCssTrapPortId3, hwCssTrapFrameId1, hwCssTrapSlotId1, hwCssTrapPortId1,hwCssTrapConfigureFailedSlotId }
+            hwCssTrapPortId3, hwCssTrapFrameId1, hwCssTrapSlotId1, hwCssTrapPortId1,hwCssTrapConfigureFailedSlotId, hwCssIssuFailReason}
         STATUS current
         DESCRIPTION 
             "CSS mib group: trap."
@@ -3019,7 +3479,8 @@ hwCssPortInfoTable OBJECT-TYPE
                         hwCssEstablish, hwCssFastUpgradeFail, hwCssPhyCsuConnectError, 
                         hwCssLpuInvalidLicense, hwCssPortConfigureFailed, hwCssPortUpDownAlarm, hwCssPortCrcErrorAlarm,
                         hwCssPortErrorDown, hwCssPortErrorDownRecover, hwCssPhyVs08ConnectError, hwCssStandbyError, 
-                        hwCssStandbyErrorRestore, hwCssPortStateError, hwCssPhyCardConnectError}
+                        hwCssStandbyErrorRestore, hwCssPortStateError, hwCssPhyCardConnectError, 
+						hwCssIssuUpgradeComplete, hwCssIssuUpgradeFail, hwCssLinkDownResume}
         STATUS current
         DESCRIPTION 
             "CSS mib group: notification."

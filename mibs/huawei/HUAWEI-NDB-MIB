@@ -1,0 +1,188 @@
+-- ===================================================================
+-- Copyright (C) 2020 by HUAWEI TECHNOLOGIES. All rights reserved.
+-- Description: 
+-- Reference:
+-- Version: V2.00
+-- ===================================================================
+
+
+    HUAWEI-NDB-MIB DEFINITIONS ::= BEGIN
+ 
+        IMPORTS                                            
+            OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP            
+                FROM SNMPv2-CONF            
+            DisplayString, RowStatus                        
+                FROM SNMPv2-TC
+            TimeTicks, Integer32, Unsigned32, IpAddress, Counter32, OBJECT-TYPE, 
+            MODULE-IDENTITY, NOTIFICATION-TYPE            
+                FROM SNMPv2-SMI
+            hwDatacomm            
+                FROM HUAWEI-MIB;    
+    
+        hwNDB MODULE-IDENTITY 
+            LAST-UPDATED "202009161045Z"        
+            ORGANIZATION 
+                  "Huawei Technologies Co.,Ltd."
+            CONTACT-INFO 
+                  "Huawei Industrial Base
+  Bantian, Longgang
+   Shenzhen 518129
+   People's Republic of China
+   Website: http://www.huawei.com
+   Email: support@huawei.com
+ "
+			DESCRIPTION 
+				"This file is used for NDB alarm."
+
+            REVISION    "202009161045Z"   
+            DESCRIPTION "V2.00, Change the OID to 367 and the parent node to hwDatacomm."
+            REVISION    "202009151045Z"   
+            DESCRIPTION "V1.00, initial version."			
+            ::= { hwDatacomm 367 }
+
+    
+        hwNDBObjects OBJECT IDENTIFIER ::= { hwNDB 1 }	
+	     
+        --1.3.6.1.4.1.2011.5.25.367.1.1
+        hwNDBResourceTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwNDBResourceEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+ 	"This table container the objects infomation of network DB resource traps."
+            ::= { hwNDBObjects 1 }
+
+        -- 1.3.6.1.4.1.2011.2.25.367.1.1.1
+        hwNDBResourceEntry OBJECT-TYPE
+        SYNTAX HwNDBResourceEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "the entry of network DB resource trap."
+        INDEX { hwNDBSlot, hwNDBCpu, hwNDBReasonId }
+        ::= { hwNDBResourceTable 1 }
+        
+        HwNDBResourceEntry ::=
+        SEQUENCE {
+        hwNDBSlot 
+        OCTET STRING,
+        hwNDBCpu 
+        Integer32,
+        hwNDBReasonId 
+        Integer32,
+	    hwNDBReason
+        OCTET STRING,
+        hwNDBThreshold 
+        Integer32,
+        hwNDBCurrent
+        Integer32
+        }
+        
+        -- 1.3.6.1.4.1.2011.2.25.367.1.1.1.1
+        hwNDBSlot OBJECT-TYPE
+        SYNTAX OCTET STRING
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+        "The slot string of traps."
+        ::= { hwNDBResourceEntry 1 }
+        
+        -- 1.3.6.1.4.1.2011.2.25.367.1.1.1.2
+        hwNDBCpu OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+        "The cpu id of traps"
+        ::= { hwNDBResourceEntry 2 }
+
+        -- 1.3.6.1.4.1.2011.2.25.367.1.1.1.3   
+        hwNDBReasonId OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+        "Indicates the ID of the fault cause of the NDB resource"
+        ::= { hwNDBResourceEntry 3 }
+		
+        -- 1.3.6.1.4.1.2011.2.25.367.1.1.1.4
+        hwNDBReason OBJECT-TYPE
+        SYNTAX OCTET STRING
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+        "Indicates the cause of the NDB resource alarm"
+        ::= { hwNDBResourceEntry 4 }
+        
+        -- 1.3.6.1.4.1.2011.2.25.367.1.1.1.5
+        hwNDBThreshold OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+        "This alarm threshold of traps"
+        ::= { hwNDBResourceEntry 5 }
+        
+        -- 1.3.6.1.4.1.2011.2.25.367.1.1.1.6
+        hwNDBCurrent OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+        "The alarm current value of traps"
+        ::= { hwNDBResourceEntry 6 }
+
+        hwNDBTrap OBJECT IDENTIFIER ::= { hwNDB 2 }
+
+        hwNDBTraps OBJECT IDENTIFIER ::= { hwNDBTrap 2 }
+
+        -- 1.3.6.1.4.1.2011.5.25.367.2.2.1
+		hwNDBResThresholdExceed NOTIFICATION-TYPE
+        OBJECTS {hwNDBSlot, hwNDBCpu, hwNDBReasonId, hwNDBReason, hwNDBThreshold, hwNDBCurrent}
+		STATUS current
+		DESCRIPTION 
+		"The usage of NDB resources exceeds the alarm threshold."
+		::= { hwNDBTraps 1 }
+
+        -- 1.3.6.1.4.1.2011.5.25.367.2.2.2
+		hwNDBResThresholdExceedResume NOTIFICATION-TYPE
+        OBJECTS {hwNDBSlot, hwNDBCpu, hwNDBReasonId, hwNDBReason, hwNDBThreshold, hwNDBCurrent}
+		STATUS current
+		DESCRIPTION 
+		"The usage of NDB resources is less than the threshold."
+		::= { hwNDBTraps 2 }	
+        
+        hwNDBConformance OBJECT IDENTIFIER ::= { hwNDB 3 }
+
+
+        hwNDBGroups OBJECT IDENTIFIER ::= { hwNDBConformance 1 }
+        
+        hwNDBObjectGroup OBJECT-GROUP
+            OBJECTS {hwNDBSlot, hwNDBCpu, hwNDBReasonId, hwNDBReason, hwNDBThreshold, hwNDBCurrent}
+            STATUS current
+            DESCRIPTION 
+                "The object group."
+            ::= { hwNDBGroups 1 }
+
+        hwNDBNotificationGroup NOTIFICATION-GROUP
+            NOTIFICATIONS {hwNDBResThresholdExceed, hwNDBResThresholdExceedResume}
+            STATUS current
+            DESCRIPTION 
+                "The notification group."
+            ::= { hwNDBGroups 2 }		
+		
+		
+        hwNDBCompliances OBJECT IDENTIFIER ::= { hwNDBConformance 2 }		
+        hwNDBCompliance MODULE-COMPLIANCE
+            STATUS current
+            DESCRIPTION 
+                "The core compliance statement for all implementations."
+            MODULE 
+--                MANDATORY-GROUPS { hwNDBObjectGroup, hwNDBNotificationGroup }
+            ::= { hwNDBCompliances 1 }
+
+    END
+
+--
+-- HUAWEI-NDB-MIB.mib
+--

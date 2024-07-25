@@ -381,7 +381,6 @@ main () {
                                "eventlog"
                                "authlog"
                                "callback"
-                               "device_perf"
                                "purgeusers"
                                "bill_data"
                                "alert_log"
