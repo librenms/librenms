@@ -330,7 +330,7 @@
                 },
                 {
                     "metric": "jps___13relengAMD64-default___written-blocks",
-                    "value": null,
+                    "value": 0,
                     "value_prev": null,
                     "app_type": "poudriere"
                 },
@@ -636,7 +636,7 @@
                 },
                 {
                     "metric": "jps___13relengI386-default___written-blocks",
-                    "value": null,
+                    "value": 0,
                     "value_prev": null,
                     "app_type": "poudriere"
                 },
@@ -720,12 +720,6 @@
                 },
                 {
                     "metric": "totals_FETCH",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "poudriere"
-                },
-                {
-                    "metric": "totals_fetch",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "poudriere"
