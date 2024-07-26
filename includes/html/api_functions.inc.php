@@ -2805,8 +2805,6 @@ function list_arp(Illuminate\Http\Request $request)
 
     if (empty($query)) {
         return api_error(400, 'No valid IP/MAC provided');
-    } elseif ($query === 'all' && empty($hostname)) {
-        return api_error(400, 'Device argument is required when requesting all entries');
     }
 
     if ($query === 'all') {
@@ -2822,9 +2820,9 @@ function list_arp(Illuminate\Http\Request $request)
         }
     } elseif (filter_var($query, FILTER_VALIDATE_MAC)) {
         $mac = Mac::parse($query)->hex();
-        $arp = Ipv4Mac::where('mac_address', $mac);
+        $arp = Ipv4Mac::where('mac_address', $mac)->get();
     } else {
-        $arp = Ipv4Mac::where('ipv4_address', $query);
+        $arp = Ipv4Mac::where('ipv4_address', $query)->get();
     }
 
     return api_success($arp, 'arp');
