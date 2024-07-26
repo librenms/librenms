@@ -11,13 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('ports_stack', function (Blueprint $table) {
-            $table->id()->first();
-            $table->unsignedBigInteger('high_port_id')->nullable()->after('port_id_high');
-            $table->unsignedBigInteger('low_port_id')->nullable()->after('port_id_low');
-            $table->renameColumn('port_id_high', 'high_ifIndex');
-            $table->renameColumn('port_id_low', 'low_ifIndex');
-        });
+        if (! Schema::hasColumn('ports_stack', 'id')) {
+            Schema::table('ports_stack', function (Blueprint $table) {
+                $table->id()->first();
+                $table->unsignedBigInteger('high_port_id')->nullable()->after('port_id_high');
+                $table->unsignedBigInteger('low_port_id')->nullable()->after('port_id_low');
+                $table->renameColumn('port_id_high', 'high_ifIndex');
+                $table->renameColumn('port_id_low', 'low_ifIndex');
+            });
+        }
     }
 
     /**
