@@ -1,7 +1,5 @@
 <?php
 
-use Illuminate\Support\Str;
-
 echo "\nCaching OIDs:";
 
 if ($device['os'] == 'timos') {
@@ -23,65 +21,6 @@ if ($device['os'] == 'vrp') {
     $entity_array = snmpwalk_cache_oid($device, 'hwEntityBoardType', $entity_array, 'ENTITY-MIB:HUAWEI-ENTITY-EXTENT-MIB');
     echo ' hwEntityBomEnDesc';
     $entity_array = snmpwalk_cache_oid($device, 'hwEntityBomEnDesc', $entity_array, 'ENTITY-MIB:HUAWEI-ENTITY-EXTENT-MIB');
-}
-if ($device['os'] == 'saf-cfm') {
-    $entity_array = [];
-    echo ' saf-cfmAnatomy';
-    $oid = '.1.3.6.1.4.1.7571.100.1.1.2.22';
-    $device_array = snmpwalk_cache_oid($device, $oid, [], 'SAF-MPMUX-MIB')[0];
-
-    $entity_array[1] = [
-        'entPhysicalDescr' => $device_array['termProduct'],
-        'entPhysicalVendorType' => $device_array['termProduct'],
-        'entPhysicalContainedIn' => '0',
-        'entPhysicalClass' => 'chassis',
-        'entPhysicalParentRelPos' => '-1',
-        'entPhysicalName' => 'Chassis',
-        'entPhysicalSerialNum' => $device_array['serialNumber'],
-        'entPhysicalMfgName' => 'SAF',
-        'entPhysicalModelName' => $device_array['serialNumber'],
-        'entPhysicalIsFRU' => 'true',
-    ];
-
-    foreach ([1 => 'rf1Version', 2 => 'rf2Version'] as $index => $item) {
-        $entity_array[] = [
-            'entPhysicalDescr' => $device_array[$item],
-            'entPhysicalVendorType' => 'radio',
-            'entPhysicalContainedIn' => 1,
-            'entPhysicalClass' => 'module',
-            'entPhysicalParentRelPos' => $index,
-            'entPhysicalName' => "Radio $index",
-            'entPhysicalIsFRU' => 'true',
-        ];
-    }
-
-    if ($device_array['termProduct'] == 'SAF CFM-M4P-MUX') {
-        foreach (range(1, 4) as $index) {
-            $entity_array[] = [
-                'entPhysicalDescr' => 'Module Container',
-                'entPhysicalVendorType' => 'containerSlot',
-                'entPhysicalContainedIn' => 1,
-                'entPhysicalClass' => 'container',
-                'entPhysicalParentRelPos' => $index + 2,
-                'entPhysicalName' => "Slot $index",
-                'entPhysicalIsFRU' => 'false',
-            ];
-        }
-
-        foreach ([1 => 'm1Description', 2 => 'm2Description', 3 => 'm3Description', 4 => 'm4Description'] as $index => $item) {
-            if (! Str::contains($device_array[$item], 'N/A')) {
-                $entity_array[] = [
-                    'entPhysicalDescr' => $device_array[$item],
-                    'entPhysicalVendorType' => 'module',
-                    'entPhysicalContainedIn' => $index + 3,
-                    'entPhysicalClass' => 'module',
-                    'entPhysicalParentRelPos' => 1,
-                    'entPhysicalName' => "Module $index",
-                    'entPhysicalIsFRU' => 'true',
-                ];
-            }
-        }
-    }
 }
 
 foreach ($entity_array as $entPhysicalIndex => $entry) {
