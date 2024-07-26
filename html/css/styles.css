@@ -793,7 +793,7 @@ p.vspace { padding-top: 3px; padding-bottom: 3px; }
 }
 
 .graphcell, .ifcell, .devicecell, .datacell { margin: 0px 0px 7px 0px; padding: 7px; border: 0px; background: #e8e8e8; float: left; }
-.iftable td { padding: 0 15px; }
+.iftable td { padding: 0 15px; line-height: 1.42857143; }
 
 .datacell { clear: both; }
 .devicecell { margin: 2px auto; }
