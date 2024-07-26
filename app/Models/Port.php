@@ -373,12 +373,12 @@ class Port extends DeviceRelatedModel
         return $this->hasMany(Pseudowire::class, 'port_id');
     }
 
-    public function stackChildren()
+    public function stackChildren(): HasManyThrough
     {
         return $this->hasManyThrough(Port::class, PortStack::class, 'low_port_id', 'port_id', 'port_id', 'high_port_id');
     }
 
-    public function stackParent()
+    public function stackParent(): HasManyThrough
     {
         return $this->hasManyThrough(Port::class, PortStack::class, 'high_port_id', 'port_id', 'port_id', 'low_port_id');
     }

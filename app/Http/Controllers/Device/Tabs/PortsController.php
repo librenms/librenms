@@ -52,7 +52,6 @@ class PortsController implements DeviceTab
         'admin' => 'up',
         'status' => 'any',
     ];
-    private ?array $ifIndexToPortIdMap = null;
 
     public function visible(Device $device): bool
     {
