@@ -4437,8 +4437,8 @@
                     "ifName": "Logical-int 1",
                     "portName": null,
                     "ifIndex": 20000,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "false",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -4537,8 +4537,8 @@
                     "ifName": "1",
                     "portName": null,
                     "ifIndex": 100000,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "false",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -4637,8 +4637,8 @@
                     "ifName": "5",
                     "portName": null,
                     "ifIndex": 100004,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "false",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -4737,8 +4737,8 @@
                     "ifName": "11",
                     "portName": null,
                     "ifIndex": 100010,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "false",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -4837,8 +4837,8 @@
                     "ifName": "20",
                     "portName": null,
                     "ifIndex": 100019,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "false",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -4937,8 +4937,8 @@
                     "ifName": "1",
                     "portName": null,
                     "ifIndex": 300000,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "false",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -5931,5 +5931,181 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "ports-stack": {
+        "discovery": {
+            "ports_stack": [
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 100004,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 50,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 51,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 52,
+                    "low_ifIndex": 100004,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 53,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 54,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 55,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 56,
+                    "low_ifIndex": 100019,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 57,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 58,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 59,
+                    "low_ifIndex": 100004,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 60,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 61,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 62,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 62,
+                    "low_ifIndex": 100010,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 62,
+                    "low_ifIndex": 100019,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 63,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 63,
+                    "low_ifIndex": 100010,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 63,
+                    "low_ifIndex": 100019,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 64,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 64,
+                    "low_ifIndex": 100004,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 64,
+                    "low_ifIndex": 100010,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 64,
+                    "low_ifIndex": 100019,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 65,
+                    "low_ifIndex": 100004,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 65,
+                    "low_ifIndex": 100010,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 66,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 66,
+                    "low_ifIndex": 100010,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 66,
+                    "low_ifIndex": 100019,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1000,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1001,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1001,
+                    "low_ifIndex": 100004,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1002,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1003,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                }
+            ]
+        }
     }
 }

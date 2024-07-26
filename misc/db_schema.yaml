@@ -1698,12 +1698,16 @@ ports_perms:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
 ports_stack:
   Columns:
+    - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
     - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
-    - { Field: port_id_high, Type: 'int unsigned', 'Null': false, Extra: '' }
-    - { Field: port_id_low, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: high_ifIndex, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: high_port_id, Type: 'bigint unsigned', 'Null': true, Extra: '' }
+    - { Field: low_ifIndex, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: low_port_id, Type: 'bigint unsigned', 'Null': true, Extra: '' }
     - { Field: ifStackStatus, Type: varchar(32), 'Null': false, Extra: '' }
   Indexes:
-    ports_stack_device_id_port_id_high_port_id_low_unique: { Name: ports_stack_device_id_port_id_high_port_id_low_unique, Columns: [device_id, port_id_high, port_id_low], Unique: true, Type: BTREE }
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
+    ports_stack_device_id_port_id_high_port_id_low_unique: { Name: ports_stack_device_id_port_id_high_port_id_low_unique, Columns: [device_id, high_ifIndex, low_ifIndex], Unique: true, Type: BTREE }
 ports_statistics:
   Columns:
     - { Field: port_id, Type: 'int unsigned', 'Null': false, Extra: '' }
