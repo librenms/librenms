@@ -26,6 +26,7 @@ namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
 use LibreNMS\Enum\AlertState;
+use LibreNMS\Util\Http;
 
 class Ilert extends Transport
 {
@@ -53,23 +54,25 @@ class Ilert extends Transport
 
     public function contactILert($alert_data, $opts): bool
     {
-        $data = ['apiKey' => $opts, 'eventType' => $alert_data['event_type'], 'summary' => $alert_data['msg']];
-        $data = json_encode($data);
+        $data = [
+            'apiKey' => $opts,
+            'eventType' => $alert_data['event_type'],
+            'summary' => $alert_data['msg'],
+        ];
 
-        $curl = curl_init('https://api.ilert.com/api/events');
-        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'POST');
-        curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curl, CURLOPT_HTTPHEADER, [
-            'Content-Type: application/json',
-            'Content-Length: ' . strlen($data),
-        ]);
+        $headers = [
+            'Content-Type' => 'application/json',
+            'Content-Length' => strlen(json_encode($data)),
+        ];
 
-        $ret = curl_exec($curl);
-        $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        $http_client = Http::client();
+        $http_client->withHeaders($headers);
+        $response = $http_client->post('https://api.ilert.com/api/events', $data);
 
-        if ($code != 202) {
-            var_dump($ret);
+        $return_status = $response->status();
+
+        if ($return_status != 202) {
+            var_dump($response);
 
             return false;
         }
