@@ -461,6 +461,8 @@ def wrapper(
         logger.critical("Bogus wrapper type called")
         sys.exit(3)
 
+    maxlocks = 0
+    minlocks = 0
     sconfig = DBConfig()
     sconfig.populate(config)
     db_connection = LibreNMS.DB(sconfig)
