@@ -5,6 +5,10 @@ $unit_text = 'Count';
 $colours = 'rainbow';
 
 $stats_list = [
+    '300' => [
+        'stat' => '300',
+        'descr' => '300',
+    ],
     '301' => [
         'stat' => '301',
         'descr' => '301',
