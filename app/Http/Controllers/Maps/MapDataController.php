@@ -97,7 +97,7 @@ class MapDataController extends Controller
             });
     }
 
-    protected static function portsWithLinks(Request $request, string $remote_port_attr): Collection<Port>
+    protected static function portsWithLinks(Request $request, string $remote_port_attr)
     {
         $user = $request->user();
         $disabled = $request->disabled;
@@ -263,7 +263,7 @@ class MapDataController extends Controller
         return $linkQuery->get();
     }
 
-    protected static function deviceList(Request $request): Collection<Device>
+    protected static function deviceList(Request $request)
     {
         $group_id = $request->group;
         $devices = $request->devices;
