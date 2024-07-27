@@ -469,7 +469,8 @@ class MapDataController extends Controller
         }
 
         // For manual level we need to track some items
-        $next_level_devices = collect();
+        $no_parent_devices = collect();
+        $parent_peer_devices = collect();
         $processed_devices = [];
 
         // List all devices
@@ -506,54 +507,66 @@ class MapDataController extends Controller
             // Only use parent IDs below if it is being returned
             $parent_ids = $device_list[$device->device_id]['parents'];
 
-            // Get a list of parents that are not direct children
-            $parent_only_ids = $parent_ids;
-            if ($parent_only_ids->count() && $device->children->count()) {
-                $child_ids = $device_list[$device->device_id]['children'];
-                $parent_only_ids = $parent_only_ids->filter(function (int $parent_id, int $k) use ($child_ids) {
-                    return ! $child_ids->has($parent_id);
-                });
-            }
+            if (! $parent_ids->count()) {
+                // No parents
+                $no_parent_devices->put($device->device_id, $device->device_id);
+            } else {
+                // Get a list of parents that are not direct children
+                $parent_only_ids = $parent_ids;
+                if ($device->children->count()) {
+                    $child_ids = $device_list[$device->device_id]['children'];
+                    $parent_only_ids = $parent_only_ids->filter(function (int $parent_id, int $k) use ($child_ids) {
+                        return ! $child_ids->has($parent_id);
+                    });
+                }
 
-            // This is a top level device because it has no parents that are not direct children
-            if (! $parent_only_ids->count()) {
-                $next_level_devices->put($device->device_id, $device->device_id);
+                // All parents are peers becuase they are also children
+                if (! $parent_only_ids->count()) {
+                    $parent_peer_devices->put($device->device_id, $device->device_id);
+                }
             }
         }
 
         if ($request->link_type == 'depends') {
-            // Add levels to each device
-            $this_level = 0;
-            while ($next_level_devices->count()) {
-                $this_level_devices = $next_level_devices;
-                $next_level_devices = collect();
+            // Check multiple lists of possible top level devices.
+            // If a device is found in the tree of the first list, it will be ignored on subsequent checks.
+            $top_level_check = [$no_parent_devices, $parent_peer_devices];
 
-                foreach ($this_level_devices->keys() as $device_id) {
-                    // Ignore if a child is found that has been filtered from the device list
-                    if (! array_key_exists($device_id, $device_list)) {
-                        continue;
+            foreach ($top_level_check as $next_level_devices) {
+                // Start at level 0 each time
+                $this_level = 0;
+
+                while ($next_level_devices->count()) {
+                    $this_level_devices = $next_level_devices;
+                    $next_level_devices = collect();
+
+                    foreach ($this_level_devices->keys() as $device_id) {
+                        // Ignore if this device is not in the returned array
+                        if (! array_key_exists($device_id, $device_list)) {
+                            continue;
+                        }
+
+                        // Ignore if the device has already been processed
+                        if (array_key_exists($device_id, $processed_devices)) {
+                            continue;
+                        }
+
+                        // Highlight isolated devices if needed
+                        if ($request->highlight_node == -1 && $device->children->count() === 0 && $device_list[$device_id]['parents']->count() == 0) {
+                            $device_list[$device_id]['style'] = array_merge($device_list[$device_id]['style'], $this->nodeHighlightStyle());
+                        }
+
+                        // Set device level and mark as processed
+                        $device_list[$device_id]['level'] = $this_level;
+                        $processed_devices[$device_id] = true;
+
+                        // Add any child devices to be processed next
+                        if (array_key_exists('children', $device_list[$device_id])) {
+                            $next_level_devices = $next_level_devices->union($device_list[$device_id]['children']);
+                        }
                     }
-
-                    // Highlight isolated devices if needed
-                    if ($request->highlight_node == -1 && $device->children->count() === 0 && $device_list[$device_id]['parents']->count() == 0) {
-                        $device_list[$device_id]['style'] = array_merge($device_list[$device_id]['style'], $this->nodeHighlightStyle());
-                    }
-
-                    // Ignore if the device has already been processed
-                    if (array_key_exists($device_id, $processed_devices)) {
-                        continue;
-                    }
-
-                    // Set device level and mark as processed
-                    $device_list[$device_id]['level'] = $this_level;
-                    $processed_devices[$device_id] = true;
-
-                    // Add any child devices to be processed next
-                    if (array_key_exists('children', $device_list[$device_id])) {
-                        $next_level_devices = $next_level_devices->union($device_list[$device_id]['children']);
-                    }
+                    $this_level++;
                 }
-                $this_level++;
             }
 
             // If any device does not have a level it is linked to missing parents, so set to level 0
