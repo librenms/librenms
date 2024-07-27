@@ -43,7 +43,7 @@ use LibreNMS\Util\Url;
 
 class MapDataController extends Controller
 {
-    protected static function geoLinks(Request $request): Collection
+    protected static function geoLinks(Request $request)
     {
         $user = $request->user();
 
@@ -97,7 +97,7 @@ class MapDataController extends Controller
             });
     }
 
-    protected static function portsWithLinks(Request $request, string $remote_port_attr): Collection
+    protected static function portsWithLinks(Request $request, string $remote_port_attr): Collection<Port>
     {
         $user = $request->user();
         $disabled = $request->disabled;
@@ -263,7 +263,7 @@ class MapDataController extends Controller
         return $linkQuery->get();
     }
 
-    protected static function deviceList(Request $request)
+    protected static function deviceList(Request $request): Collection<Device>
     {
         $group_id = $request->group;
         $devices = $request->devices;
@@ -551,8 +551,10 @@ class MapDataController extends Controller
                             continue;
                         }
 
+                        $device_record = $device_list[$device_id];
+
                         // Highlight isolated devices if needed
-                        if ($request->highlight_node == -1 && $device->children->count() === 0 && $device_list[$device_id]['parents']->count() == 0) {
+                        if ($request->highlight_node == -1 && $device_record['children']->count() === 0 && $device_record['parents']->count() == 0) {
                             $device_list[$device_id]['style'] = array_merge($device_list[$device_id]['style'], $this->nodeHighlightStyle());
                         }
 
