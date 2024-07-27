@@ -5,7 +5,7 @@
                 {
                     "app_type": "http_access_log_combined",
                     "app_state": "UNKNOWN",
-                    "discovered": "1",
+                    "discovered": 1,
                     "app_state_prev": null,
                     "app_status": "",
                     "app_instance": "",
@@ -19,7 +19,7 @@
                 {
                     "app_type": "http_access_log_combined",
                     "app_state": "OK",
-                    "discovered": "1",
+                    "discovered": 1,
                     "app_state_prev": "UNKNOWN",
                     "app_status": "",
                     "app_instance": "",
@@ -1116,7 +1116,7 @@
                 },
                 {
                     "metric": "totals_bytes_mean",
-                    "value": 7814.41232227488,
+                    "value": 7814.4123222749,
                     "value_prev": null,
                     "app_type": "http_access_log_combined"
                 },
@@ -1134,7 +1134,7 @@
                 },
                 {
                     "metric": "totals_bytes_mode",
-                    "value": "238",
+                    "value": 238,
                     "value_prev": null,
                     "app_type": "http_access_log_combined"
                 },
