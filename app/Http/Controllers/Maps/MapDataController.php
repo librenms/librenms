@@ -49,7 +49,7 @@ class MapDataController extends Controller
 
         // Return a blank array for unknown link types
         if ($request->link_type != 'xdp') {
-            return [];
+            return collect();
         }
 
         $linkQuery = Link::with('port', 'device', 'remoteDevice', 'device.location', 'remoteDevice.location')
@@ -263,7 +263,7 @@ class MapDataController extends Controller
         return $linkQuery->get();
     }
 
-    protected static function deviceList(Request $request): Collection
+    protected static function deviceList(Request $request)
     {
         $group_id = $request->group;
         $devices = $request->devices;
@@ -561,9 +561,7 @@ class MapDataController extends Controller
                         $processed_devices[$device_id] = true;
 
                         // Add any child devices to be processed next
-                        if (array_key_exists('children', $device_list[$device_id])) {
-                            $next_level_devices = $next_level_devices->union($device_list[$device_id]['children']);
-                        }
+                        $next_level_devices = $next_level_devices->union($device_list[$device_id]['children']);
                     }
                     $this_level++;
                 }

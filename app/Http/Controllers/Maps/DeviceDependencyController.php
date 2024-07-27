@@ -28,6 +28,7 @@ namespace App\Http\Controllers\Maps;
 use App\Http\Controllers\Controller;
 use App\Models\DeviceGroup;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 use LibreNMS\Config;
 
 class DeviceDependencyController extends Controller

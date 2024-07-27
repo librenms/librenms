@@ -29,6 +29,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Device;
 use App\Models\DeviceGroup;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 use LibreNMS\Config;
 use LibreNMS\Util\Url;
 

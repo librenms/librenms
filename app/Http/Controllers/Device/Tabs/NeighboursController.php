@@ -27,6 +27,7 @@ namespace App\Http\Controllers\Device\Tabs;
 
 use App\Models\Device;
 use App\Models\Link;
+use Illuminate\Http\Request;
 use LibreNMS\Config;
 use LibreNMS\Interfaces\UI\DeviceTab;
 use LibreNMS\Util\Url;
