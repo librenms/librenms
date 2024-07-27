@@ -12,8 +12,9 @@ $logs = $app->data['logs'];
 
 $descr_len = 12;
 
-if (!isset($vars['log_stat'])) {
+if (! isset($vars['log_stat'])) {
     d_echo('$vars["log_stat"] undef');
+
     return;
 } elseif ($vars['log_stat'] == 'bytes'
           || $vars['log_stat'] == 'bytes_max'
