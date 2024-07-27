@@ -21,57 +21,57 @@ echo generate_link($label, $link_array);
 
 echo ' | Details(';
 
-$label = (!isset($vars['access_log_page']) ||  $vars['access_log_page'] != 'bytes')
+$label = (! isset($vars['access_log_page']) || $vars['access_log_page'] != 'bytes')
     ? 'Bytes'
     : '<span class="pagemenu-selected">Bytes</span>';
-echo generate_link($label, $link_array, ['access_log_page'=>'bytes']).',';
+echo generate_link($label, $link_array, ['access_log_page'=>'bytes']) . ',';
 
-$label = (!isset($vars['access_log_page']) ||  $vars['access_log_page'] != 'method')
+$label = (! isset($vars['access_log_page']) || $vars['access_log_page'] != 'method')
     ? 'Method'
     : '<span class="pagemenu-selected">Method</span>';
-echo generate_link($label, $link_array, ['access_log_page'=>'method']).',';
+echo generate_link($label, $link_array, ['access_log_page'=>'method']) . ',';
 
-$label = (!isset($vars['access_log_page']) || $vars['access_log_page'] != 'version')
+$label = (! isset($vars['access_log_page']) || $vars['access_log_page'] != 'version')
     ? 'Version'
     : '<span class="pagemenu-selected">Version</span>';
-echo generate_link($label, $link_array, ['access_log_page'=>'version']).',';
+echo generate_link($label, $link_array, ['access_log_page'=>'version']) . ',';
 
-$label = (!isset($vars['access_log_page']) || $vars['access_log_page'] != 'log_size')
+$label = (! isset($vars['access_log_page']) || $vars['access_log_page'] != 'log_size')
     ? 'Log Size'
     : '<span class="pagemenu-selected">Log Size</span>';
-echo generate_link($label, $link_array, ['access_log_page'=>'log_size']).',';
+echo generate_link($label, $link_array, ['access_log_page'=>'log_size']) . ',';
 
-$label = (!isset($vars['access_log_page']) || $vars['access_log_page'] != 'refer')
+$label = (! isset($vars['access_log_page']) || $vars['access_log_page'] != 'refer')
     ? 'Refer'
     : '<span class="pagemenu-selected">Refer</span>';
-echo generate_link($label, $link_array, ['access_log_page'=>'refer']).',';
+echo generate_link($label, $link_array, ['access_log_page'=>'refer']) . ',';
 
-$label = (!isset($vars['access_log_page']) || $vars['access_log_page'] != 'user')
+$label = (! isset($vars['access_log_page']) || $vars['access_log_page'] != 'user')
     ? 'User'
     : '<span class="pagemenu-selected">User</span>';
-echo generate_link($label, $link_array, ['access_log_page'=>'user']).',';
+echo generate_link($label, $link_array, ['access_log_page'=>'user']) . ',';
 
-$label = (!isset($vars['access_log_page']) || $vars['access_log_page'] != '1xx')
+$label = (! isset($vars['access_log_page']) || $vars['access_log_page'] != '1xx')
     ? '1xx'
     : '<span class="pagemenu-selected">1xx</span>';
-echo generate_link($label, $link_array, ['access_log_page'=>'1xx']).',';
+echo generate_link($label, $link_array, ['access_log_page'=>'1xx']) . ',';
 
-$label = (!isset($vars['access_log_page']) || $vars['access_log_page'] != '2xx')
+$label = (! isset($vars['access_log_page']) || $vars['access_log_page'] != '2xx')
     ? '2xx'
     : '<span class="pagemenu-selected">2xx</span>';
-echo generate_link($label, $link_array, ['access_log_page'=>'2xx']).',';
+echo generate_link($label, $link_array, ['access_log_page'=>'2xx']) . ',';
 
-$label = (!isset($vars['access_log_page']) || $vars['access_log_page'] != '3xx')
+$label = (! isset($vars['access_log_page']) || $vars['access_log_page'] != '3xx')
     ? '3xx'
     : '<span class="pagemenu-selected">2xx</span>';
-echo generate_link($label, $link_array, ['access_log_page'=>'3xx']).',';
+echo generate_link($label, $link_array, ['access_log_page'=>'3xx']) . ',';
 
-$label = (!isset($vars['access_log_page']) || $vars['access_log_page'] != '4xx')
+$label = (! isset($vars['access_log_page']) || $vars['access_log_page'] != '4xx')
     ? '4xx'
     : '<span class="pagemenu-selected">4xx</span>';
-echo generate_link($label, $link_array, ['access_log_page'=>'4xx']).',';
+echo generate_link($label, $link_array, ['access_log_page'=>'4xx']) . ',';
 
-$label = (!isset($vars['access_log_page']) || $vars['access_log_page'] != '5xx')
+$label = (! isset($vars['access_log_page']) || $vars['access_log_page'] != '5xx')
     ? '5xx'
     : '<span class="pagemenu-selected">5xx</span>';
 echo generate_link($label, $link_array, ['access_log_page'=>'5xx']);
@@ -93,25 +93,25 @@ foreach ($app_data['logs'] as $index => $log_name) {
 print_optionbar_end();
 
 if (isset($vars['access_log_page']) && $vars['access_log_page'] == 'bytes') {
-    $graphs=[];
+    $graphs = [];
     $stats = [
-                'bytes' => 'Bytes',
-                'bytes_max' => 'Bytes, Max',
-                'bytes_mean' => 'Bytes, Mean',
-                'bytes_median' => 'Bytes, Median',
-                'bytes_mode' => 'Bytes, Mode',
-                'bytes_min' => 'Bytes, Min',
-                'bytes_range' => 'Bytes, Range',
+        'bytes' => 'Bytes',
+        'bytes_max' => 'Bytes, Max',
+        'bytes_mean' => 'Bytes, Mean',
+        'bytes_median' => 'Bytes, Median',
+        'bytes_mode' => 'Bytes, Mode',
+        'bytes_min' => 'Bytes, Min',
+        'bytes_range' => 'Bytes, Range',
     ];
     foreach ($stats as $key => $val) {
-        $graphs[]=[
+        $graphs[] = [
             'type' => 'stat',
             'description' => $val,
             'stat' => $key,
         ];
-    };
+    }
 } elseif (isset($vars['access_log_page']) && $vars['access_log_page'] == 'method') {
-    $graphs=[];
+    $graphs = [];
     $stats = [
         'CONNECT',
         'DELETE',
@@ -123,68 +123,68 @@ if (isset($vars['access_log_page']) && $vars['access_log_page'] == 'bytes') {
         'PUT',
     ];
     foreach ($stats as $key => $val) {
-        $graphs[]=[
+        $graphs[] = [
             'type' => 'stat',
             'description' => $val,
             'stat' => $val,
         ];
-    };
+    }
 } elseif (isset($vars['access_log_page']) && $vars['access_log_page'] == 'version') {
-    $graphs=[];
+    $graphs = [];
     $stats = [
-                'http1_0' => 'HTTP/1.0',
-                'http1_1' => 'HTTP/1.1',
-                'http2' => 'HTTP/2',
-                'http3' => 'HTTP/3',
+        'http1_0' => 'HTTP/1.0',
+        'http1_1' => 'HTTP/1.1',
+        'http2' => 'HTTP/2',
+        'http3' => 'HTTP/3',
     ];
     foreach ($stats as $key => $val) {
-        $graphs[]=[
+        $graphs[] = [
             'type' => 'stat',
             'description' => $val,
             'stat' => $key,
         ];
-    };
+    }
 } elseif (isset($vars['access_log_page']) && $vars['access_log_page'] == 'log_size') {
-    $graphs=[];
+    $graphs = [];
     $stats = [
-                'size' => 'Log Size',
-                'error_size' => 'Error Log Size',
+        'size' => 'Log Size',
+        'error_size' => 'Error Log Size',
     ];
     foreach ($stats as $key => $val) {
-        $graphs[]=[
+        $graphs[] = [
             'type' => 'stat',
             'description' => $val,
             'stat' => $key,
         ];
-    };
+    }
 } elseif (isset($vars['access_log_page']) && $vars['access_log_page'] == 'refer') {
-    $graphs=[];
+    $graphs = [];
     $stats = [
-                'refer' => 'Refer Set, not "-"',
-                'no_refer' => 'No Refer Set, "-"',
+        'refer' => 'Refer Set, not "-"',
+        'no_refer' => 'No Refer Set, "-"',
     ];
     foreach ($stats as $key => $val) {
-        $graphs[]=[
+        $graphs[] = [
             'type' => 'stat',
             'description' => $val,
             'stat' => $key,
         ];
-    };
+    }
 } elseif (isset($vars['access_log_page']) && $vars['access_log_page'] == 'user') {
-    $graphs=[];
+    $graphs = [];
     $stats = [
-                'user' => 'User Set, not "-"',
-                'no_user' => 'No User Set, "-"',
+        'user' => 'User Set, not "-"',
+        'no_user' => 'No User Set, "-"',
     ];
     foreach ($stats as $key => $val) {
-        $graphs[]=[
+        $graphs[] = [
             'type' => 'stat',
             'description' => $val,
             'stat' => $key,
         ];
-    };
+    }
 } elseif (isset($vars['access_log_page']) && $vars['access_log_page'] == '1xx') {
-    $graphs=[];
+    $graphs = [];
     $stats = [
         '1xx' => 'Any 1xx Response Code',
         '100' => '100: Continue',
@@ -193,14 +193,14 @@ if (isset($vars['access_log_page']) && $vars['access_log_page'] == 'bytes') {
         '103' => '103: Early Hints (RFC 8297)',
     ];
     foreach ($stats as $key => $val) {
-        $graphs[]=[
+        $graphs[] = [
             'type' => 'stat',
             'description' => $val,
             'stat' => $key,
         ];
-    };
+    }
 } elseif (isset($vars['access_log_page']) && $vars['access_log_page'] == '2xx') {
-    $graphs=[];
+    $graphs = [];
     $stats = [
         '2xx' => 'Any 2xx Response Code',
         '200' => '200: OK',
@@ -216,14 +216,14 @@ if (isset($vars['access_log_page']) && $vars['access_log_page'] == 'bytes') {
         '226' => '226 IM Used (RFC 3229)',
     ];
     foreach ($stats as $key => $val) {
-        $graphs[]=[
+        $graphs[] = [
             'type' => 'stat',
             'description' => $val,
             'stat' => $key,
         ];
-    };
+    }
 } elseif (isset($vars['access_log_page']) && $vars['access_log_page'] == '3xx') {
-    $graphs=[];
+    $graphs = [];
     $stats = [
         '3xx' => 'Any 3xx Response Code',
         '300' => '300: Multiple Choices',
@@ -237,14 +237,14 @@ if (isset($vars['access_log_page']) && $vars['access_log_page'] == 'bytes') {
         '308' => '308 Permanent Redirect',
     ];
     foreach ($stats as $key => $val) {
-        $graphs[]=[
+        $graphs[] = [
             'type' => 'stat',
             'description' => $val,
             'stat' => $key,
         ];
-    };
+    }
 } elseif (isset($vars['access_log_page']) && $vars['access_log_page'] == '4xx') {
-    $graphs=[];
+    $graphs = [];
     $stats = [
         '4xx' => 'Any 4xx Response Code',
         '400' => '400: Bad Request',
@@ -285,14 +285,14 @@ if (isset($vars['access_log_page']) && $vars['access_log_page'] == 'bytes') {
         '499' => '499: nginx Client Closed Request',
     ];
     foreach ($stats as $key => $val) {
-        $graphs[]=[
+        $graphs[] = [
             'type' => 'stat',
             'description' => $val,
             'stat' => $key,
         ];
-    };
+    }
 } elseif (isset($vars['access_log_page']) && $vars['access_log_page'] == '5xx') {
-    $graphs=[];
+    $graphs = [];
     $stats = [
         '5xx' => 'Any 5xx Response Code',
         '500' => '500: Internal Server Error',
@@ -309,12 +309,12 @@ if (isset($vars['access_log_page']) && $vars['access_log_page'] == 'bytes') {
         '511' => '511: Network Authentication Required (RFC 6585)',
     ];
     foreach ($stats as $key => $val) {
-        $graphs[]=[
+        $graphs[] = [
             'type' => 'stat',
             'description' => $val,
             'stat' => $key,
         ];
-    };
+    }
 } else {
     $graphs = [
         [
