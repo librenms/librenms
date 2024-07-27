@@ -33,7 +33,7 @@ use LibreNMS\Config;
 class AvailabilityMapController extends Controller
 {
     // Availability Map
-    public function availabilityMap(Request $request)
+    public function availabilityMap(Request $request): View
     {
         $data = [
             'page_refresh' => Config::get('page_refresh', 300),

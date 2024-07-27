@@ -33,7 +33,7 @@ use LibreNMS\Config;
 class DeviceDependencyController extends Controller
 {
     // Device Dependency Map
-    public function dependencyMap(Request $request)
+    public function dependencyMap(Request $request): View
     {
         $group_id = $request->get('group');
 

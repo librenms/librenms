@@ -32,7 +32,7 @@ use LibreNMS\Config;
 
 class FullscreenMapController extends Controller
 {
-    protected static function fullscreenMap(Request $request)
+    protected static function fullscreenMap(Request $request): View
     {
         $group_name = null;
         if ($request->get('group')) {
