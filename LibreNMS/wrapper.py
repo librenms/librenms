@@ -102,7 +102,7 @@ wrappers = {
         "total_exec_time": 21600,
     },
     "poller": {
-        "executable": "lnms",
+        "executable": "lnms.sh",
         "option": "device:poll -q",
         "table_name": "devices",
         "memc_touch_time": 10,
