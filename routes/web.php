@@ -253,7 +253,6 @@ Route::middleware(['auth'])->group(function () {
             Route::post('top-interfaces', 'TopInterfacesController');
             Route::post('top-errors', 'TopErrorsController');
             Route::post('worldmap', 'WorldMapController')->name('widget.worldmap');
-            Route::get('worldmap', 'WorldMapController@getData')->name('widget.worldmap.data');
             Route::post('alertlog-stats', 'AlertlogStatsController');
         });
     });

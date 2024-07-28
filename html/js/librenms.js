@@ -417,10 +417,10 @@ function destroy_map(id) {
 
 function populate_map_markers(map_id, group_radius = 10, status = [0,1], device_group = 0) {
     $.ajax({
-        type: "GET",
-        url: ajax_url + '/dash/worldmap',
+        type: "POST",
+        url: '/maps/getdevices',
         dataType: "json",
-        data: { status: status, device_group: device_group },
+        data: { location_valid: 1, disabled: 0, disabled_alerts: 0, status: status, device_group: device_group },
         success: function (data) {
             var redMarker = L.AwesomeMarkers.icon({
                 icon: 'server',
@@ -435,24 +435,21 @@ function populate_map_markers(map_id, group_radius = 10, status = [0,1], device_
                 markerColor: 'green', prefix: 'fa', iconColor: 'white'
             });
 
-            var markers = data.map((device) => {
-                var markerData = {title: device.name};
-                switch (device.status) {
-                    case 0: // down
-                        markerData.icon = redMarker;
-                        markerData.zIndexOffset = 5000;
-                        break;
-                    case 3: // down + maintenance
-                        markerData.icon = blueMarker;
-                        markerData.zIndexOffset = 10000;
-                        break;
-                    default: // up
-                        markerData.icon = greenMarker;
-                        markerData.zIndexOffset = 0;
+            var markers = Object.values(data).map((device) => {
+                var markerData = {title: device.sname};
+                if (device.status) { // up
+                    markerData.icon = greenMarker;
+                    markerData.zIndexOffset = 0;
+                } else if (device.maintenance == 1) { // down + maintenance
+                    markerData.icon = blueMarker;
+                    markerData.zIndexOffset = 10000;
+                } else { // down
+                    markerData.icon = redMarker;
+                    markerData.zIndexOffset = 5000;
                 }
 
                 var marker = L.marker(new L.LatLng(device.lat, device.lng), markerData);
-                marker.bindPopup(`<a href="${device.url}"><img src="${device.icon}" width="32" height="32" alt=""> ${device.name}</a>`);
+                marker.bindPopup(`<a href="${device.url}"><img src="${device.icon}" width="32" height="32" alt=""> ${device.sname}</a>`);
                 return marker;
             });
 
