@@ -5433,6 +5433,13 @@
             "default": true,
             "type": "boolean"
         },
+        "poller_modules.port-security": {
+            "order": 460,
+                "group": "poller",
+                "section": "poller_modules",
+                "default": false,
+                "type": "boolean"
+            },
         "port_descr_parser": {
             "default": "includes/port-descr-parser.inc.php",
             "type": "text"

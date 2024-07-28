@@ -1401,6 +1401,9 @@ return [
             'printer-supplies' => [
                 'description' => 'Printer Supplies',
             ],
+            'port-security' => [
+                'description' => 'Port Security',
+            ],
         ],
         'ports_fdb_purge' => [
             'description' => 'Port FDB entries older than',
