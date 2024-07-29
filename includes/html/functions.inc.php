@@ -735,7 +735,19 @@ function alert_details($details)
             $fault_detail .= generate_sensor_link($tmp_alerts, $tmp_alerts['name']) . ';&nbsp; <br>' . $details;
             $fallback = false;
         }
-
+        
+        if (isset($tmp_alerts['service_id '])) {
+            $fault_detail .= "Service: <a href='" .
+                \LibreNMS\Util\Url::generate([
+                    'page' => 'device',
+                    'device' => $tmp_alerts['device_id'],
+                    'tab' => 'services',
+                ]) .
+                "'>" . $tmp_alerts['service_name'] . '</a>';
+            $fault_detail .= ',Type:' . $tmp_alerts['service_type'];
+            $fallback = false;
+        }
+        
         if (isset($tmp_alerts['bgpPeer_id'])) {
             // If we have a bgpPeer_id, we format the data accordingly
             $fault_detail .= "BGP peer <a href='" .
