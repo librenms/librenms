@@ -743,10 +743,10 @@ function alert_details($details)
                     'device' => $tmp_alerts['device_id'],
                     'tab' => 'services',
                 ]) .
-                "'>" . $tmp_alerts['service_name'] . '</a><br>';
-            $fault_detail .= ', Type' . $tmp_alerts['service_type'] . '<br>';
-            $fault_detail .= ', Param' . $tmp_alerts['service_param'] . '<br>';
-            $fault_detail .= ', Msg' . $tmp_alerts['service_message'];
+                "'>" . $tmp_alerts['service_name'] . '</a>';
+            $fault_detail .= ',<br>Type' . $tmp_alerts['service_type'];
+            $fault_detail .= ',<br>Param' . $tmp_alerts['service_param'];
+            $fault_detail .= ',<br>Msg' . $tmp_alerts['service_message'];
             $fallback = false;
         }
 
