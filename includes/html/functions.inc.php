@@ -737,16 +737,16 @@ function alert_details($details)
         }
 
         if (isset($tmp_alerts['service_id'])) {
-            $fault_detail .= "Service <a href='" .
+            $fault_detail .= "Service: <a href='" .
                 \LibreNMS\Util\Url::generate([
                     'page' => 'device',
                     'device' => $tmp_alerts['device_id'],
                     'tab' => 'services',
                 ]) .
                 "'>" . $tmp_alerts['service_name'] . '</a>';
-            $fault_detail .= ',<br>Type' . $tmp_alerts['service_type'];
-            $fault_detail .= ',<br>Param' . $tmp_alerts['service_param'];
-            $fault_detail .= ',<br>Msg' . $tmp_alerts['service_message'];
+            $fault_detail .= ',<br>Type: ' . $tmp_alerts['service_type'];
+            $fault_detail .= ',<br>Param: ' . $tmp_alerts['service_param'];
+            $fault_detail .= ',<br>Msg: ' . $tmp_alerts['service_message'];
             $fallback = false;
         }
 
