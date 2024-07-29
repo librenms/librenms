@@ -216,3 +216,25 @@ If you are having caching issues, you can clear the file based opcache with `rm 
 
 Debian 12 users, be aware php 8.2 current stable version (8.2.7) creates segmentation faults when opcache uses file cache. Issue should be this one https://github.com/php/php-src/issues/10914 
 Using sury packages or disabling file cache solves the issue
+
+## PHP-FPM for poller
+
+You can create a FPM pool for PHP pollers to reduce the CPU load of the poller processes.
+
+You need to create a librenms-poller.conf file as follows.  Possible locations: `/etc/php/8.1/fpm/pool.d/librenms-poller.conf`, `/etc/php/8.2/fpm/pool.d/librenms-poller.conf`, or `/etc/php-fpm.d/librenms-poller.conf`
+```
+[librenms-poller]
+user = librenms
+group = librenms
+
+listen = /var/run/php/php-fpm-librenms-poller.sock
+listen.owner = librenms
+listen.group = librenms
+
+pm = dynamic
+pm.max_children = 10000
+pm.start_servers = 10
+pm.min_spare_servers = 10
+pm.max_spare_servers = 100
+pm.process_idle_timeout = 300
+```
