@@ -544,7 +544,7 @@ class PollerQueueManager(QueueManager):
                 if self.config.debug
                 else ("device:poll", device_id, "-q")
             )
-            exit_code, output = LibreNMS.call_script("lnms", args)
+            exit_code, output = LibreNMS.call_script("lnms.sh", args)
 
             if self.config.log_output:
                 with open(
