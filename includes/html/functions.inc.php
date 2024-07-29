@@ -745,6 +745,8 @@ function alert_details($details)
                 ]) .
                 "'>" . $tmp_alerts['service_name'] . '</a>';
             $fault_detail .= ',Type:' . $tmp_alerts['service_type'];
+            $fault_detail .= ',Param:' . $tmp_alerts['service_param'];
+            $fault_detail .= ',Msg:' . $tmp_alerts['service_message'];
             $fallback = false;
         }
 
