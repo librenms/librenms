@@ -221,6 +221,8 @@ Using sury packages or disabling file cache solves the issue
 
 You can create a FPM pool for PHP pollers to reduce the CPU load of the poller processes.
 
+The `cgi-fcgi` binary needs to be installed.  This is found in the `libfcgi-bin` package on Debian based systems.
+
 You need to create a librenms-poller.conf file as follows.  Possible locations: `/etc/php/8.1/fpm/pool.d/librenms-poller.conf`, `/etc/php/8.2/fpm/pool.d/librenms-poller.conf`, or `/etc/php-fpm.d/librenms-poller.conf`
 ```
 [librenms-poller]
