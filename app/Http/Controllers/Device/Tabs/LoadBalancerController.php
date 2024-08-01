@@ -71,6 +71,9 @@ class LoadBalancerController implements DeviceTab
             if (isset($component_count['f5-gtm-pool'])) {
                 $this->tabs[] = 'gtm_pool';
             }
+            if (isset($component_count['f5-cert'])) {
+                $this->tabs[] = 'f5-cert';
+            }
         }
     }
 
