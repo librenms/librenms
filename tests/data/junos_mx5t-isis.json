@@ -11587,7 +11587,7 @@
                 {
                     "entPhysicalIndex": 1100,
                     "entPhysicalDescr": "midplane",
-                    "entPhysicalClass": "",
+                    "entPhysicalClass": null,
                     "entPhysicalName": "midplane",
                     "entPhysicalHardwareRev": "REV 08",
                     "entPhysicalFirmwareRev": null,
@@ -11606,7 +11606,7 @@
                 {
                     "entPhysicalIndex": 2100,
                     "entPhysicalDescr": "PEM 0",
-                    "entPhysicalClass": "",
+                    "entPhysicalClass": null,
                     "entPhysicalName": "PEM 0",
                     "entPhysicalHardwareRev": "Rev 04",
                     "entPhysicalFirmwareRev": null,
@@ -11625,7 +11625,7 @@
                 {
                     "entPhysicalIndex": 4100,
                     "entPhysicalDescr": "Fan Tray",
-                    "entPhysicalClass": "",
+                    "entPhysicalClass": null,
                     "entPhysicalName": "Fan Tray",
                     "entPhysicalHardwareRev": "",
                     "entPhysicalFirmwareRev": null,
@@ -11644,7 +11644,7 @@
                 {
                     "entPhysicalIndex": 4110,
                     "entPhysicalDescr": "Fan 1",
-                    "entPhysicalClass": "",
+                    "entPhysicalClass": null,
                     "entPhysicalName": "Fan 1",
                     "entPhysicalHardwareRev": "",
                     "entPhysicalFirmwareRev": null,
@@ -11663,7 +11663,7 @@
                 {
                     "entPhysicalIndex": 4120,
                     "entPhysicalDescr": "Fan 2",
-                    "entPhysicalClass": "",
+                    "entPhysicalClass": null,
                     "entPhysicalName": "Fan 2",
                     "entPhysicalHardwareRev": "",
                     "entPhysicalFirmwareRev": null,
@@ -11682,7 +11682,7 @@
                 {
                     "entPhysicalIndex": 4130,
                     "entPhysicalDescr": "Fan 3",
-                    "entPhysicalClass": "",
+                    "entPhysicalClass": null,
                     "entPhysicalName": "Fan 3",
                     "entPhysicalHardwareRev": "",
                     "entPhysicalFirmwareRev": null,
@@ -11701,7 +11701,7 @@
                 {
                     "entPhysicalIndex": 4140,
                     "entPhysicalDescr": "Fan 4",
-                    "entPhysicalClass": "",
+                    "entPhysicalClass": null,
                     "entPhysicalName": "Fan 4",
                     "entPhysicalHardwareRev": "",
                     "entPhysicalFirmwareRev": null,
@@ -11720,7 +11720,7 @@
                 {
                     "entPhysicalIndex": 4150,
                     "entPhysicalDescr": "Fan 5",
-                    "entPhysicalClass": "",
+                    "entPhysicalClass": null,
                     "entPhysicalName": "Fan 5",
                     "entPhysicalHardwareRev": "",
                     "entPhysicalFirmwareRev": null,
@@ -11739,7 +11739,7 @@
                 {
                     "entPhysicalIndex": 6100,
                     "entPhysicalDescr": "TFEB MX5-T",
-                    "entPhysicalClass": "",
+                    "entPhysicalClass": null,
                     "entPhysicalName": "TFEB MX5-T",
                     "entPhysicalHardwareRev": "REV 08",
                     "entPhysicalFirmwareRev": null,
@@ -11758,7 +11758,7 @@
                 {
                     "entPhysicalIndex": 6110,
                     "entPhysicalDescr": "TFEB Intake temperature sensor",
-                    "entPhysicalClass": "",
+                    "entPhysicalClass": null,
                     "entPhysicalName": "TFEB Intake temperature sensor",
                     "entPhysicalHardwareRev": "REV 08",
                     "entPhysicalFirmwareRev": null,
@@ -11777,7 +11777,7 @@
                 {
                     "entPhysicalIndex": 7100,
                     "entPhysicalDescr": "FPC: MPC BUILTIN @ 0/*/*",
-                    "entPhysicalClass": "",
+                    "entPhysicalClass": null,
                     "entPhysicalName": "FPC: MPC BUILTIN @ 0/*/*",
                     "entPhysicalHardwareRev": "",
                     "entPhysicalFirmwareRev": null,
@@ -11796,7 +11796,7 @@
                 {
                     "entPhysicalIndex": 7200,
                     "entPhysicalDescr": "FPC: MPC BUILTIN @ 1/*/*",
-                    "entPhysicalClass": "",
+                    "entPhysicalClass": null,
                     "entPhysicalName": "FPC: MPC BUILTIN @ 1/*/*",
                     "entPhysicalHardwareRev": "",
                     "entPhysicalFirmwareRev": null,
@@ -11815,7 +11815,7 @@
                 {
                     "entPhysicalIndex": 8110,
                     "entPhysicalDescr": "PIC: 4x 10GE XFP @ 0/0/*",
-                    "entPhysicalClass": "",
+                    "entPhysicalClass": null,
                     "entPhysicalName": "PIC: 4x 10GE XFP @ 0/0/*",
                     "entPhysicalHardwareRev": "",
                     "entPhysicalFirmwareRev": null,
@@ -11834,7 +11834,7 @@
                 {
                     "entPhysicalIndex": 8210,
                     "entPhysicalDescr": "PIC: 10x 1GE(LAN) SFP @ 1/0/*",
-                    "entPhysicalClass": "",
+                    "entPhysicalClass": null,
                     "entPhysicalName": "PIC: 10x 1GE(LAN) SFP @ 1/0/*",
                     "entPhysicalHardwareRev": "REV 26",
                     "entPhysicalFirmwareRev": null,
@@ -11853,7 +11853,7 @@
                 {
                     "entPhysicalIndex": 8220,
                     "entPhysicalDescr": "PIC: 10x 1GE(LAN) SFP @ 1/1/*",
-                    "entPhysicalClass": "",
+                    "entPhysicalClass": null,
                     "entPhysicalName": "PIC: 10x 1GE(LAN) SFP @ 1/1/*",
                     "entPhysicalHardwareRev": "REV 26",
                     "entPhysicalFirmwareRev": null,
@@ -11872,7 +11872,7 @@
                 {
                     "entPhysicalIndex": 9100,
                     "entPhysicalDescr": "Routing Engine",
-                    "entPhysicalClass": "",
+                    "entPhysicalClass": null,
                     "entPhysicalName": "Routing Engine",
                     "entPhysicalHardwareRev": "",
                     "entPhysicalFirmwareRev": null,
@@ -11891,7 +11891,7 @@
                 {
                     "entPhysicalIndex": 10100,
                     "entPhysicalDescr": "FPM",
-                    "entPhysicalClass": "",
+                    "entPhysicalClass": null,
                     "entPhysicalName": "FPM",
                     "entPhysicalHardwareRev": "",
                     "entPhysicalFirmwareRev": null,
@@ -11910,7 +11910,7 @@
                 {
                     "entPhysicalIndex": 10110,
                     "entPhysicalDescr": "FPM Board",
-                    "entPhysicalClass": "",
+                    "entPhysicalClass": null,
                     "entPhysicalName": "FPM Board",
                     "entPhysicalHardwareRev": "",
                     "entPhysicalFirmwareRev": null,
@@ -11929,7 +11929,7 @@
                 {
                     "entPhysicalIndex": 10120,
                     "entPhysicalDescr": "FPM Display",
-                    "entPhysicalClass": "",
+                    "entPhysicalClass": null,
                     "entPhysicalName": "FPM Display",
                     "entPhysicalHardwareRev": "",
                     "entPhysicalFirmwareRev": null,
@@ -11948,7 +11948,7 @@
                 {
                     "entPhysicalIndex": 10130,
                     "entPhysicalDescr": "FPM",
-                    "entPhysicalClass": "",
+                    "entPhysicalClass": null,
                     "entPhysicalName": "FPM",
                     "entPhysicalHardwareRev": "",
                     "entPhysicalFirmwareRev": null,
@@ -11967,7 +11967,7 @@
                 {
                     "entPhysicalIndex": 10140,
                     "entPhysicalDescr": "FPM",
-                    "entPhysicalClass": "",
+                    "entPhysicalClass": null,
                     "entPhysicalName": "FPM",
                     "entPhysicalHardwareRev": "",
                     "entPhysicalFirmwareRev": null,
@@ -11986,7 +11986,7 @@
                 {
                     "entPhysicalIndex": 10150,
                     "entPhysicalDescr": "FPM",
-                    "entPhysicalClass": "",
+                    "entPhysicalClass": null,
                     "entPhysicalName": "FPM",
                     "entPhysicalHardwareRev": "",
                     "entPhysicalFirmwareRev": null,
@@ -12005,7 +12005,7 @@
                 {
                     "entPhysicalIndex": 20110,
                     "entPhysicalDescr": "MIC: 4x 10GE XFP @ 0/0/*",
-                    "entPhysicalClass": "",
+                    "entPhysicalClass": null,
                     "entPhysicalName": "MIC: 4x 10GE XFP @ 0/0/*",
                     "entPhysicalHardwareRev": "",
                     "entPhysicalFirmwareRev": null,
@@ -12024,7 +12024,7 @@
                 {
                     "entPhysicalIndex": 20210,
                     "entPhysicalDescr": "MIC: 3D 20x 1GE(LAN) SFP @ 1/0/*",
-                    "entPhysicalClass": "",
+                    "entPhysicalClass": null,
                     "entPhysicalName": "MIC: 3D 20x 1GE(LAN) SFP @ 1/0/*",
                     "entPhysicalHardwareRev": "REV 26",
                     "entPhysicalFirmwareRev": null,
@@ -12043,5 +12043,55 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "discovery-protocols": {
+        "discovery": {
+            "links": [
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "lab-s1",
+                    "remote_port": "612 (182ad384c247)",
+                    "remote_platform": null,
+                    "remote_version": "Juniper Networks, Inc. ex2300-48p Ethernet Switch, kernel JUNOS 18.2R3-S1.7, Build date: 2019-08-30 11:36:11 UTC Copyright (c) 1996-2019 Juniper Networks, Inc.",
+                    "ifAlias": "ge-1/1/0",
+                    "ifDescr": "ge-1/1/0",
+                    "ifName": "ge-1/1/0"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "lab-s1",
+                    "remote_port": "514 (182ad384c247)",
+                    "remote_platform": null,
+                    "remote_version": "Juniper Networks, Inc. ex2300-48p Ethernet Switch, kernel JUNOS 18.2R3-S1.7, Build date: 2019-08-30 11:36:11 UTC Copyright (c) 1996-2019 Juniper Networks, Inc.",
+                    "ifAlias": "ge-1/1/9",
+                    "ifDescr": "ge-1/1/9",
+                    "ifName": "ge-1/1/9"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "lab-er100.lab.local",
+                    "remote_port": "TenGigE0/0/0/20 (70617b993081)",
+                    "remote_platform": null,
+                    "remote_version": "7.2.1, NCS540L",
+                    "ifAlias": "lab-er100",
+                    "ifDescr": "xe-0/0/0",
+                    "ifName": "xe-0/0/0"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "lab-er2",
+                    "remote_port": "xe-0/0/1 (a8d0e555c6d0)",
+                    "remote_platform": null,
+                    "remote_version": "Juniper Networks, Inc. mx5-t internet router, kernel JUNOS 17.3R3-S9.3, Build date: 2020-08-17 23:23:22 UTC Copyright (c) 1996-2020 Juniper Networks, Inc.",
+                    "ifAlias": "lab-er2",
+                    "ifDescr": "xe-0/0/1",
+                    "ifName": "xe-0/0/1"
+                }
+            ]
+        }
     }
 }

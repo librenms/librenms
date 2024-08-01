@@ -59,13 +59,6 @@ class CustomMap extends BaseModel
         'background_data',
     ];
 
-    // default values for attributes
-    protected $attributes = [
-        'options' => '{"interaction":{"dragNodes":false,"dragView":false,"zoomView":false},"manipulation":{"enabled":false},"physics":{"enabled":false}}',
-        'newnodeconfig' => '{"borderWidth":1,"color":{"border":"#2B7CE9","background":"#D2E5FF"},"font":{"color":"#343434","size":14,"face":"arial"},"icon":[],"label":true,"shape":"box","size":25}',
-        'newedgeconfig' => '{"arrows":{"to":{"enabled":true}},"smooth":{"type":"dynamic"},"font":{"color":"#343434","size":12,"face":"arial"},"label":true}',
-    ];
-
     /**
      * Get background data intended to be passed to javascript to configure the background
      */

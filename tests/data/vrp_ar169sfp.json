@@ -3547,7 +3547,7 @@
                 },
                 {
                     "entPhysicalIndex": 5,
-                    "entPhysicalDescr": "",
+                    "entPhysicalDescr": null,
                     "entPhysicalClass": "container",
                     "entPhysicalName": "Board slot 0",
                     "entPhysicalHardwareRev": "",
@@ -3556,7 +3556,7 @@
                     "entPhysicalAlias": "",
                     "entPhysicalAssetID": "",
                     "entPhysicalIsFRU": "false",
-                    "entPhysicalModelName": "",
+                    "entPhysicalModelName": null,
                     "entPhysicalVendorType": "zeroDotZero",
                     "entPhysicalSerialNum": "",
                     "entPhysicalContainedIn": 3,

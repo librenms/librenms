@@ -147,13 +147,17 @@ class SocialiteController extends Controller
         $user->realname = $this->buildRealName();
 
         $user->save();
+
+        $default_role = LibreNMSConfig::get('auth.socialite.default_role');
+        if ($default_role !== null && $default_role != 'none') {
+            $user->setRoles([$default_role], true);
+        }
     }
 
     private function setRolesFromClaim(string $provider, $user): bool
     {
         $scopes = LibreNMSConfig::get('auth.socialite.scopes');
         $claims = LibreNMSConfig::get('auth.socialite.claims');
-        $default_role = LibreNMSConfig::get('auth.socialite.default_role');
 
         if (is_array($scopes) &&
             $this->socialite_user instanceof \Laravel\Socialite\AbstractUser &&
@@ -172,12 +176,6 @@ class SocialiteController extends Controller
 
                 return true;
             }
-        }
-
-        if ($default_role !== null && $default_role != 'none') {
-            $user->setRoles([$default_role], false);
-
-            return true;
         }
 
         return false;

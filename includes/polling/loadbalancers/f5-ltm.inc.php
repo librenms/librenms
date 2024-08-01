@@ -33,7 +33,7 @@ $components = $components[$device['device_id']] ?? [];
 
 // We extracted all the components for this device, now lets only get the LTM ones.
 $keep = [];
-$types = ['f5-ltm-vs', 'f5-ltm-bwc', 'f5-ltm-pool', 'f5-ltm-poolmember'];
+$types = ['f5-ltm-vs', 'f5-ltm-bwc', 'f5-ltm-pool', 'f5-ltm-poolmember', 'f5-cert'];
 foreach ($components as $k => $v) {
     foreach ($types as $type) {
         if ($v['type'] == $type) {
@@ -46,6 +46,8 @@ $components = $keep;
 // Only collect SNMP data if we have enabled components
 if (! empty($components)) {
     // Let's gather the stats..
+    $f5_stats['f5-cert'] = snmpwalk_group($device, '.1.3.6.1.4.1.3375.2.1.15.1.2.1.5', 'F5-BIGIP-SYSTEM-MIB');
+
     $f5_stats['ltmVirtualServStatEntryPktsin'] = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.10.2.3.1.6', 0);
     $f5_stats['ltmVirtualServStatEntryPktsout'] = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.10.2.3.1.8', 0);
     $f5_stats['ltmVirtualServStatEntryBytesin'] = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.10.2.3.1.7', 0);
@@ -84,7 +86,39 @@ if (! empty($components)) {
         $hash = $array['hash'];
         $rrd_name = [$type, $label, $hash];
 
-        if ($type == 'f5-ltm-bwc') {
+        if ($type == 'f5-cert') {
+            $CERT_BASE_OID_NAME = 'sysCertificateFileObjectExpirationDate';
+            $CERT_THRESHOLD_WARNING = 30;       // If Cert expires in less than this value (in days) => status = warning
+            $CERT_THRESHOLD_CRITICAL = 10;      // If Cert expires in less than this value (in days) => status = critical
+
+            // expiration value from snmpwalk is in seconds since 01.01.1970
+            // we substract the current time, to get the time left until expiration
+            // and convert it into days, for better human readability
+            $array['daysLeft'] = intval(($f5_stats['f5-cert'][$UID][$CERT_BASE_OID_NAME] - getdate()[0]) / (3600 * 24));
+            $array['raw'] = $f5_stats['f5-cert'][$UID][$CERT_BASE_OID_NAME];
+
+            // Let's log some debugging
+            d_echo("\n\nComponent: " . $key . "\n");
+            d_echo('    Type: ' . $type . "\n");
+            d_echo('    Label: ' . $label . "\n");
+            d_echo('    Days until expiration: ' . $array['daysLeft'] . "\n");
+            d_echo('    RAW: ' . $array['raw'] . "\n");
+
+            //let's check when the cert expires
+            if ($array['daysLeft'] <= 0) {
+                $array['status'] = 2;
+                $array['error'] = 'CRITICAL: Certificate is expired!';
+            } elseif ($array['daysLeft'] <= $CERT_THRESHOLD_CRITICAL) {
+                $array['status'] = 2;
+                $array['error'] = 'CRITICAL: Certificate is about to expire in ' . $array['daysLeft'] . ' days!';
+            } elseif ($array['daysLeft'] <= $CERT_THRESHOLD_WARNING) {
+                $array['status'] = 1;
+                $array['error'] = 'WARNING: Certificate is about to expire in ' . $array['daysLeft'] . ' days!';
+            } else {
+                $array['status'] = 0;
+                $array['error'] = '';
+            }
+        } elseif ($type == 'f5-ltm-bwc') {
             $rrd_def = RrdDefinition::make()
                 ->addDataset('pktsin', 'COUNTER', 0)
                 ->addDataset('bytesin', 'COUNTER', 0)

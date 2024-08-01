@@ -16457,5 +16457,330 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "discovery-protocols": {
+        "discovery": {
+            "links": [
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "APA49B.CD28.E340",
+                    "remote_port": "0 (a49bcd28e340)",
+                    "remote_platform": null,
+                    "remote_version": "Cisco AP Software, ap1g7-k9w8 Version: 17.3.3.26\nTechnical Support: http://www.cisco.com/techsupport\nCopyright (c) 1986-2021 by Cisco Systems, Inc.\nCompiled Wed",
+                    "ifAlias": "CISCO_AP_INDOOR",
+                    "ifDescr": "gigabitethernet1/0/16",
+                    "ifName": "gi1/0/16"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "APA49B.CD28.E0F4",
+                    "remote_port": "0 (a49bcd28e0f4)",
+                    "remote_platform": null,
+                    "remote_version": "Cisco AP Software, ap1g7-k9w8 Version: 17.3.3.26\nTechnical Support: http://www.cisco.com/techsupport\nCopyright (c) 1986-2021 by Cisco Systems, Inc.\nCompiled Wed",
+                    "ifAlias": "CISCO_AP_INDOOR",
+                    "ifDescr": "gigabitethernet1/0/17",
+                    "ifName": "gi1/0/17"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "APA49B.CD28.A4E0",
+                    "remote_port": "0 (a49bcd28a4e0)",
+                    "remote_platform": null,
+                    "remote_version": "Cisco AP Software, ap1g7-k9w8 Version: 17.3.3.26\nTechnical Support: http://www.cisco.com/techsupport\nCopyright (c) 1986-2021 by Cisco Systems, Inc.\nCompiled Wed",
+                    "ifAlias": "CISCO_AP_INDOOR",
+                    "ifDescr": "gigabitethernet1/0/18",
+                    "ifName": "gi1/0/18"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "APA49B.CD28.E358",
+                    "remote_port": "0 (a49bcd28e358)",
+                    "remote_platform": null,
+                    "remote_version": "Cisco AP Software, ap1g7-k9w8 Version: 17.3.3.26\nTechnical Support: http://www.cisco.com/techsupport\nCopyright (c) 1986-2021 by Cisco Systems, Inc.\nCompiled Wed",
+                    "ifAlias": "CISCO_AP_INDOOR",
+                    "ifDescr": "gigabitethernet1/0/19",
+                    "ifName": "gi1/0/19"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "APA49B.CD28.F630",
+                    "remote_port": "0 (a49bcd28f630)",
+                    "remote_platform": null,
+                    "remote_version": "Cisco AP Software, ap1g7-k9w8 Version: 17.3.3.26\nTechnical Support: http://www.cisco.com/techsupport\nCopyright (c) 1986-2021 by Cisco Systems, Inc.\nCompiled Wed",
+                    "ifAlias": "CISCO_AP_INDOOR",
+                    "ifDescr": "gigabitethernet1/0/20",
+                    "ifName": "gi1/0/20"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "APA49B.CD28.F118",
+                    "remote_port": "0 (a49bcd28f118)",
+                    "remote_platform": null,
+                    "remote_version": "Cisco AP Software, ap1g7-k9w8 Version: 17.3.3.26\nTechnical Support: http://www.cisco.com/techsupport\nCopyright (c) 1986-2021 by Cisco Systems, Inc.\nCompiled Wed",
+                    "ifAlias": "CISCO_AP_INDOOR",
+                    "ifDescr": "gigabitethernet1/0/21",
+                    "ifName": "gi1/0/21"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "APA49B.CD28.ECA8",
+                    "remote_port": "0 (a49bcd28eca8)",
+                    "remote_platform": null,
+                    "remote_version": "Cisco AP Software, ap1g7-k9w8 Version: 17.3.3.26\nTechnical Support: http://www.cisco.com/techsupport\nCopyright (c) 1986-2021 by Cisco Systems, Inc.\nCompiled Wed",
+                    "ifAlias": "CISCO_AP_INDOOR",
+                    "ifDescr": "gigabitethernet1/0/22",
+                    "ifName": "gi1/0/22"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "AP84F1.47B3.2AD4",
+                    "remote_port": "0 (84f147b32ad4)",
+                    "remote_platform": null,
+                    "remote_version": "Cisco AP Software, ap1g7-k9w8 Version: 17.3.3.26\nTechnical Support: http://www.cisco.com/techsupport\nCopyright (c) 1986-2021 by Cisco Systems, Inc.\nCompiled Wed",
+                    "ifAlias": "CISCO_AP_INDOOR",
+                    "ifDescr": "gigabitethernet1/0/23",
+                    "ifName": "gi1/0/23"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "APA49B.CD28.D7F4",
+                    "remote_port": "0 (a49bcd28d7f4)",
+                    "remote_platform": null,
+                    "remote_version": "Cisco AP Software, ap1g7-k9w8 Version: 17.3.3.26\nTechnical Support: http://www.cisco.com/techsupport\nCopyright (c) 1986-2021 by Cisco Systems, Inc.\nCompiled Wed",
+                    "ifAlias": "CISCO_AP_INDOOR",
+                    "ifDescr": "gigabitethernet1/0/24",
+                    "ifName": "gi1/0/24"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "APA49B.CD28.8868",
+                    "remote_port": "0 (a49bcd288868)",
+                    "remote_platform": null,
+                    "remote_version": "Cisco AP Software, ap1g7-k9w8 Version: 17.3.3.26\nTechnical Support: http://www.cisco.com/techsupport\nCopyright (c) 1986-2021 by Cisco Systems, Inc.\nCompiled Wed",
+                    "ifAlias": "CISCO_AP_INDOOR",
+                    "ifDescr": "gigabitethernet1/0/25",
+                    "ifName": "gi1/0/25"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "APA49B.CD28.B664",
+                    "remote_port": "0 (a49bcd28b664)",
+                    "remote_platform": null,
+                    "remote_version": "Cisco AP Software, ap1g7-k9w8 Version: 17.3.3.26\nTechnical Support: http://www.cisco.com/techsupport\nCopyright (c) 1986-2021 by Cisco Systems, Inc.\nCompiled Wed",
+                    "ifAlias": "CISCO_AP_INDOOR",
+                    "ifDescr": "gigabitethernet1/0/26",
+                    "ifName": "gi1/0/26"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "APA49B.CD28.8708",
+                    "remote_port": "0 (a49bcd288708)",
+                    "remote_platform": null,
+                    "remote_version": "Cisco AP Software, ap1g7-k9w8 Version: 17.3.3.26\nTechnical Support: http://www.cisco.com/techsupport\nCopyright (c) 1986-2021 by Cisco Systems, Inc.\nCompiled Wed",
+                    "ifAlias": "CISCO_AP_INDOOR",
+                    "ifDescr": "gigabitethernet1/0/27",
+                    "ifName": "gi1/0/27"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "APA49B.CD28.E3D8",
+                    "remote_port": "0 (a49bcd28e3d8)",
+                    "remote_platform": null,
+                    "remote_version": "Cisco AP Software, ap1g7-k9w8 Version: 17.3.3.26\nTechnical Support: http://www.cisco.com/techsupport\nCopyright (c) 1986-2021 by Cisco Systems, Inc.\nCompiled Wed",
+                    "ifAlias": "CISCO_AP_INDOOR",
+                    "ifDescr": "gigabitethernet1/0/28",
+                    "ifName": "gi1/0/28"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "APA49B.CD28.E0A4",
+                    "remote_port": "0 (a49bcd28e0a4)",
+                    "remote_platform": null,
+                    "remote_version": "Cisco AP Software, ap1g7-k9w8 Version: 17.3.3.26\nTechnical Support: http://www.cisco.com/techsupport\nCopyright (c) 1986-2021 by Cisco Systems, Inc.\nCompiled Wed",
+                    "ifAlias": "CISCO_AP_INDOOR",
+                    "ifDescr": "gigabitethernet1/0/29",
+                    "ifName": "gi1/0/29"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "APA49B.CD28.BAD4",
+                    "remote_port": "0 (a49bcd28bad4)",
+                    "remote_platform": null,
+                    "remote_version": "Cisco AP Software, ap1g7-k9w8 Version: 17.3.3.26\nTechnical Support: http://www.cisco.com/techsupport\nCopyright (c) 1986-2021 by Cisco Systems, Inc.\nCompiled Wed",
+                    "ifAlias": "CISCO_AP_INDOOR",
+                    "ifDescr": "gigabitethernet1/0/30",
+                    "ifName": "gi1/0/30"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "APA49B.CD28.B390",
+                    "remote_port": "0 (a49bcd28b390)",
+                    "remote_platform": null,
+                    "remote_version": "Cisco AP Software, ap1g7-k9w8 Version: 17.3.3.26\nTechnical Support: http://www.cisco.com/techsupport\nCopyright (c) 1986-2021 by Cisco Systems, Inc.\nCompiled Wed",
+                    "ifAlias": "CISCO_AP_INDOOR",
+                    "ifDescr": "gigabitethernet1/0/31",
+                    "ifName": "gi1/0/31"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "APA49B.CD28.EF7C",
+                    "remote_port": "0 (a49bcd28ef7c)",
+                    "remote_platform": null,
+                    "remote_version": "Cisco AP Software, ap1g7-k9w8 Version: 17.3.3.26\nTechnical Support: http://www.cisco.com/techsupport\nCopyright (c) 1986-2021 by Cisco Systems, Inc.\nCompiled Wed",
+                    "ifAlias": "CISCO_AP_INDOOR",
+                    "ifDescr": "gigabitethernet1/0/32",
+                    "ifName": "gi1/0/32"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "AP84F1.47B3.2BC0",
+                    "remote_port": "0 (84f147b32bc0)",
+                    "remote_platform": null,
+                    "remote_version": "Cisco AP Software, ap1g7-k9w8 Version: 17.3.3.26\nTechnical Support: http://www.cisco.com/techsupport\nCopyright (c) 1986-2021 by Cisco Systems, Inc.\nCompiled Wed",
+                    "ifAlias": "CISCO_AP_OUTDOOR",
+                    "ifDescr": "gigabitethernet1/0/11",
+                    "ifName": "gi1/0/11"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "AP84F1.47B3.1E60",
+                    "remote_port": "0 (84f147b31e60)",
+                    "remote_platform": null,
+                    "remote_version": "Cisco AP Software, ap1g7-k9w8 Version: 17.3.3.26\nTechnical Support: http://www.cisco.com/techsupport\nCopyright (c) 1986-2021 by Cisco Systems, Inc.\nCompiled Wed",
+                    "ifAlias": "CISCO_AP_OUTDOOR",
+                    "ifDescr": "gigabitethernet1/0/12",
+                    "ifName": "gi1/0/12"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "AP84F1.47B3.2ADC",
+                    "remote_port": "0 (84f147b32adc)",
+                    "remote_platform": null,
+                    "remote_version": "Cisco AP Software, ap1g7-k9w8 Version: 17.3.3.26\nTechnical Support: http://www.cisco.com/techsupport\nCopyright (c) 1986-2021 by Cisco Systems, Inc.\nCompiled Wed",
+                    "ifAlias": "CISCO_AP_OUTDOOR",
+                    "ifDescr": "gigabitethernet1/0/13",
+                    "ifName": "gi1/0/13"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "AP84F1.47B1.F42C",
+                    "remote_port": "0 (84f147b1f42c)",
+                    "remote_platform": null,
+                    "remote_version": "Cisco AP Software, ap1g7-k9w8 Version: 17.3.3.26\nTechnical Support: http://www.cisco.com/techsupport\nCopyright (c) 1986-2021 by Cisco Systems, Inc.\nCompiled Wed",
+                    "ifAlias": "CISCO_AP_OUTDOOR",
+                    "ifDescr": "gigabitethernet1/0/14",
+                    "ifName": "gi1/0/14"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "AP84F1.47B2.2390",
+                    "remote_port": "0 (84f147b22390)",
+                    "remote_platform": null,
+                    "remote_version": "Cisco AP Software, ap1g7-k9w8 Version: 17.3.3.26\nTechnical Support: http://www.cisco.com/techsupport\nCopyright (c) 1986-2021 by Cisco Systems, Inc.\nCompiled Wed",
+                    "ifAlias": "CISCO_AP_OUTDOOR",
+                    "ifDescr": "gigabitethernet1/0/15",
+                    "ifName": "gi1/0/15"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "bt-stadion-payload-ap-07",
+                    "remote_port": "bridge1/vlan75-payload (2cc81b5ba251)",
+                    "remote_platform": null,
+                    "remote_version": "MikroTik RouterOS 6.47.9 (long-term) RBcAPL-2nD",
+                    "ifAlias": "MKT_AP1",
+                    "ifDescr": "gigabitethernet1/0/1",
+                    "ifName": "gi1/0/1"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "bt-stadion-payload-ap-07",
+                    "remote_port": "ether1 (2cc81b5ba251)",
+                    "remote_platform": null,
+                    "remote_version": "MikroTik RouterOS 6.47.9 (long-term) RBcAPL-2nD",
+                    "ifAlias": "MKT_AP1",
+                    "ifDescr": "gigabitethernet1/0/1",
+                    "ifName": "gi1/0/1"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "bt-stadion-payload-ap-05",
+                    "remote_port": "bridge1/vlan75-payload (2cc81b5ba309)",
+                    "remote_platform": null,
+                    "remote_version": "MikroTik RouterOS 6.47.9 (long-term) RBcAPL-2nD",
+                    "ifAlias": "MKT_AP2",
+                    "ifDescr": "gigabitethernet1/0/2",
+                    "ifName": "gi1/0/2"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "bt-stadion-payload-ap-05",
+                    "remote_port": "ether1 (2cc81b5ba309)",
+                    "remote_platform": null,
+                    "remote_version": "MikroTik RouterOS 6.47.9 (long-term) RBcAPL-2nD",
+                    "ifAlias": "MKT_AP2",
+                    "ifDescr": "gigabitethernet1/0/2",
+                    "ifName": "gi1/0/2"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "bt-stadion-payload-ap-08",
+                    "remote_port": "bridge1/vlan75 (2cc81b5ba1d5)",
+                    "remote_platform": null,
+                    "remote_version": "MikroTik RouterOS 6.47.9 (long-term) RBcAPL-2nD",
+                    "ifAlias": "xxx",
+                    "ifDescr": "gigabitethernet1/0/10",
+                    "ifName": "gi1/0/10"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "bt-stadion-payload-ap-08",
+                    "remote_port": "ether1 (2cc81b5ba1d5)",
+                    "remote_platform": null,
+                    "remote_version": "MikroTik RouterOS 6.47.9 (long-term) RBcAPL-2nD",
+                    "ifAlias": "xxx",
+                    "ifDescr": "gigabitethernet1/0/10",
+                    "ifName": "gi1/0/10"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "Zapad",
+                    "remote_port": "eth0/0/3 ()",
+                    "remote_platform": null,
+                    "remote_version": "Bosch Communication Systems,IPX_TGX,OMNEO7.01.8012 P0.0.0",
+                    "ifAlias": "xxx",
+                    "ifDescr": "gigabitethernet1/0/9",
+                    "ifName": "gi1/0/9"
+                }
+            ]
+        }
     }
 }

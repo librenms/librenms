@@ -26,6 +26,7 @@
 
 namespace LibreNMS\Data\Store;
 
+use App\Facades\DeviceCache;
 use App\Polling\Measure\Measurement;
 use InfluxDB2\Client;
 use InfluxDB2\Model\WritePrecision;
@@ -62,6 +63,21 @@ class InfluxDBv2 extends BaseDatastore
      */
     public function put($device, $measurement, $tags, $fields)
     {
+        $device_data = DeviceCache::get($device['device_id']);
+        $excluded_groups = Config::get('influxdbv2.groups-exclude');
+
+        if (! empty($excluded_groups)) {
+            $device_groups = $device_data->groups;
+            foreach ($device_groups as $group) {
+                // The group name will always be parsed as lowercase, even when uppercase in the GUI.
+                if (in_array(strtoupper($group->name), array_map('strtoupper', $excluded_groups))) {
+                    Log::warning('Skipped parsing to InfluxDBv2, device is in group: ' . $group->name);
+
+                    return;
+                }
+            }
+        }
+
         $stat = Measurement::start('write');
         $tmp_fields = [];
         $tmp_tags['hostname'] = $device['hostname'];
@@ -87,11 +103,13 @@ class InfluxDBv2 extends BaseDatastore
             return;
         }
 
-        Log::debug('InfluxDB data: ', [
-            'measurement' => $measurement,
-            'tags' => $tmp_tags,
-            'fields' => $tmp_fields,
-        ]);
+        if (Config::get('influxdbv2.debug') === true) {
+            Log::debug('InfluxDB data: ', [
+                'measurement' => $measurement,
+                'tags' => $tmp_tags,
+                'fields' => $tmp_fields,
+            ]);
+        }
 
         // Get a WriteApi instance from the client
         $client = self::createFromConfig();
@@ -133,7 +151,7 @@ class InfluxDBv2 extends BaseDatastore
         $organization = Config::get('influxdbv2.organization', '');
         $allow_redirects = Config::get('influxdbv2.allow_redirects', true);
         $token = Config::get('influxdbv2.token', '');
-
+        $debug = Config::get('influxdbv2.debug', false);
         $client = new Client([
             'url' => $transport . '://' . $host . ':' . $port,
             'token' => $token,
@@ -141,7 +159,7 @@ class InfluxDBv2 extends BaseDatastore
             'org' => $organization,
             'precision' => WritePrecision::S,
             'allow_redirects' => $allow_redirects,
-            'debug' => true,
+            'debug' => $debug,
         ]);
 
         return $client;

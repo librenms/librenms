@@ -736,6 +736,20 @@ function alert_details($details)
             $fallback = false;
         }
 
+        if (isset($tmp_alerts['service_id'])) {
+            $fault_detail .= "Service: <a href='" .
+                \LibreNMS\Util\Url::generate([
+                    'page' => 'device',
+                    'device' => $tmp_alerts['device_id'],
+                    'tab' => 'services',
+                ]) .
+                "'>" . $tmp_alerts['service_name'] . '</a>';
+            $fault_detail .= ',<br>Type: ' . $tmp_alerts['service_type'];
+            $fault_detail .= ',<br>Param: ' . $tmp_alerts['service_param'];
+            $fault_detail .= ',<br>Msg: ' . $tmp_alerts['service_message'];
+            $fallback = false;
+        }
+
         if (isset($tmp_alerts['bgpPeer_id'])) {
             // If we have a bgpPeer_id, we format the data accordingly
             $fault_detail .= "BGP peer <a href='" .
@@ -746,6 +760,7 @@ function alert_details($details)
                     'proto' => 'bgp',
                 ]) .
                 "'>" . $tmp_alerts['bgpPeerIdentifier'] . '</a>';
+            $fault_detail .= ', Desc ' . $tmp_alerts['bgpPeerDescr'] ?? '';
             $fault_detail .= ', AS' . $tmp_alerts['bgpPeerRemoteAs'];
             $fault_detail .= ', State ' . $tmp_alerts['bgpPeerState'];
             $fallback = false;

@@ -216,23 +216,19 @@ class SnmpResponse
             return new Collection;
         }
 
-        return collect($this->values())
-            ->map(function ($value, $oid) {
-                $parts = $this->getOidParts($oid);
-                $key = array_shift($parts);
+        $data = [];
+        foreach ($this->values() as $key => $value) {
+            $parts = $this->getOidParts($key);
+            $oid = array_shift($parts);
+            $data[implode('][', $parts)][$oid] = $value;
+        }
 
-                return [
-                    '_index' => implode('][', $parts),
-                    $key => $value,
-                ];
-            })
-            ->groupBy('_index')
-            ->map(function ($values, $index) use ($callback) {
-                $values = array_merge(...$values);
-                unset($values['_index']);
+        $return = new Collection;
+        foreach ($data as $index => $values) {
+            $return->push(call_user_func($callback, $values, ...explode('][', (string) $index)));
+        }
 
-                return call_user_func($callback, $values, ...explode('][', (string) $index));
-            });
+        return $return;
     }
 
     /**

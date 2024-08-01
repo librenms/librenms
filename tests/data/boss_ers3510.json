@@ -3213,5 +3213,22 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "discovery-protocols": {
+        "discovery": {
+            "links": [
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "cox-base-vsp4k1",
+                    "remote_port": "1/1 (f81547e32200)",
+                    "remote_platform": null,
+                    "remote_version": "VSP-4450GSX-PWR+ (7.1.1.0)",
+                    "ifAlias": "fap: cox-base-vsp4k1",
+                    "ifDescr": "Extreme Networks Ethernet Routing Switch 3510GT PWR+ Module - Port 1",
+                    "ifName": "1/1"
+                }
+            ]
+        }
     }
 }

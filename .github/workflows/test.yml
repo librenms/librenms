@@ -99,7 +99,7 @@ jobs:
         name: Pip install
         run: |
           python3 -m pip install --upgrade pip
-          python3 -m pip install --upgrade --user snmpsim pylint python-memcached mysqlclient
+          python3 -m pip install --upgrade --user pylint python-memcached mysqlclient
       -
         name: Composer validate
         run: |
@@ -128,6 +128,10 @@ jobs:
         name: Composer install
         run: |
           composer install --prefer-dist --no-interaction --no-progress
+      -
+        name: Snmpsim setup
+        run: |
+          php lnms dev:simulate --setup-venv
       -
         name: Artisan dusk:chrome-driver
         if: matrix.skip-web-check != '1'
@@ -168,7 +172,7 @@ jobs:
         name: Start SNMP
         if: matrix.skip-unit-check != '1'
         run: |
-          ~/.local/bin/snmpsimd.py --data-dir=tests/snmpsim --agent-udpv4-endpoint=127.1.6.2:1162 --logging-method=file:/tmp/snmpsimd.log &
+          .python_venvs/snmpsim/bin/snmpsim-command-responder-lite --data-dir=tests/snmpsim --agent-udpv4-endpoint=127.1.6.2:1162 --log-level=error --logging-method=file:/tmp/snmpsimd.log &
       -
         name: lnms dev:check ci
         run: |

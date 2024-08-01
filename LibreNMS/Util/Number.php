@@ -153,7 +153,8 @@ class Number
      */
     public static function calculatePercent($part, $total, int $precision = 2): float
     {
-        if ($total == 0) {
+        // ensure total is strict positive and part is positive
+        if ($total <= 0 || $part < 0) {
             return 0;
         }
 

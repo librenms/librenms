@@ -8578,5 +8578,81 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "ports-stack": {
+        "discovery": {
+            "ports_stack": [
+                {
+                    "high_ifIndex": 2113143041,
+                    "low_ifIndex": 2113151233,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 2113151233,
+                    "low_ifIndex": 2096390401,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 2129920257,
+                    "low_ifIndex": 2129928449,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 2129928449,
+                    "low_ifIndex": 2096390401,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 2132254951,
+                    "low_ifIndex": 2134647015,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 2146697473,
+                    "low_ifIndex": 2146705665,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 2146697601,
+                    "low_ifIndex": 2146705793,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 2146705665,
+                    "low_ifIndex": 2146722049,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 2146705793,
+                    "low_ifIndex": 2146722049,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 2146722049,
+                    "low_ifIndex": 2132254951,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 2146722049,
+                    "low_ifIndex": 2147410305,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 2146722049,
+                    "low_ifIndex": 2147410306,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 2147410305,
+                    "low_ifIndex": 2073833473,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 2147410305,
+                    "low_ifIndex": 2147426433,
+                    "ifStackStatus": "active"
+                }
+            ]
+        }
     }
 }

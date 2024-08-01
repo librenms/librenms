@@ -103,7 +103,7 @@ wrappers = {
     },
     "poller": {
         "executable": "lnms",
-        "option": "device:poll -q",
+        "option": "device:poll",
         "table_name": "devices",
         "memc_touch_time": 10,
         "stepping": 300,
@@ -288,8 +288,13 @@ def poll_worker(
                 if modules is not None and len(str(modules).strip()):
                     module_str = re.sub("\s", "", str(modules).strip())
                     command = command + " -m {}".format(module_str)
-                if debug:
+
+                # enable debug output otherwise, set -q for lnms commands
+                if wrappers[wrapper_type]["executable"] == "lnms":
+                    command = command + (" -vv" if debug else " -q")
+                elif debug:
                     command = command + " -d"
+
                 exit_code, output = command_runner(
                     command,
                     shell=True,
@@ -456,6 +461,8 @@ def wrapper(
         logger.critical("Bogus wrapper type called")
         sys.exit(3)
 
+    maxlocks = 0
+    minlocks = 0
     sconfig = DBConfig()
     sconfig.populate(config)
     db_connection = LibreNMS.DB(sconfig)

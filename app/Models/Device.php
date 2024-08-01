@@ -871,6 +871,11 @@ class Device extends BaseModel
         return $this->hasMany(\App\Models\PortsNac::class, 'device_id', 'device_id');
     }
 
+    public function portsStack(): HasMany
+    {
+        return $this->hasMany(\App\Models\PortStack::class, 'device_id', 'device_id');
+    }
+
     public function portsStp(): HasMany
     {
         return $this->hasMany(\App\Models\PortStp::class, 'device_id', 'device_id');

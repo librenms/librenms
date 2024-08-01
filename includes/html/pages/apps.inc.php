@@ -554,6 +554,12 @@ $graphs['borgbackup'] = [
     'locked',
     'locked_for',
 ];
+$graphs['nfs'] = [
+    'server_rpc',
+    'server_cache',
+    'client_rpc',
+    'client_cache',
+];
 
 echo '<div class="panel panel-default">';
 echo '<div class="panel-heading">';

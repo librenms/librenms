@@ -1,0 +1,23 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": null,
+                    "sysObjectID": ".1.3.6.1.4.1.850.1.5",
+                    "sysDescr": "TrippLite B093-004-2E4U, Linux 3.10.0-uc0 armv7l, TrippLite/B093 Version 4.12.3 a5834656 -- Tue May 17 17:25:30 UTC 2022",
+                    "sysContact": null,
+                    "version": "4.12.3",
+                    "hardware": "B093-004-2E4U",
+                    "features": null,
+                    "location": null,
+                    "os": "trippliteconsole",
+                    "type": "appliance",
+                    "serial": null,
+                    "icon": "tripplite.svg"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}

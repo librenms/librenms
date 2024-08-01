@@ -13,11 +13,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('ports_stack', function (Blueprint $table) {
+            $table->id();
             $table->unsignedInteger('device_id');
-            $table->unsignedInteger('port_id_high');
-            $table->unsignedInteger('port_id_low');
+            $table->unsignedInteger('high_ifIndex');
+            $table->unsignedBigInteger('high_port_id')->nullable();
+            $table->unsignedInteger('low_ifIndex');
+            $table->unsignedBigInteger('low_port_id')->nullable();
             $table->string('ifStackStatus', 32);
-            $table->unique(['device_id', 'port_id_high', 'port_id_low']);
+            $table->unique(['device_id', 'high_ifIndex', 'low_ifIndex']);
         });
     }
 

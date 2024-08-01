@@ -48,9 +48,9 @@ class CustomMapController extends Controller
             'maps' => CustomMap::orderBy('name')->get(['custom_map_id', 'name', 'menu_group'])->groupBy('menu_group')->sortKeys(),
             'name' => 'New Map',
             'menu_group' => null,
-            'node_align' => 10,
-            'edge_separation' => 10,
-            'reverse_arrows' => 0,
+            'node_align' => Config::get('custom_map.node_align', 10),
+            'edge_separation' => Config::get('custom_map.edge_seperation', 10),
+            'reverse_arrows' => Config::get('custom_map.reverse_arrows', false) ? 'true' : 'false',
             'legend' => [
                 'x' => -1,
                 'y' => -1,
@@ -59,10 +59,11 @@ class CustomMapController extends Controller
                 'hide_overspeed' => 0,
                 'font_size' => 14,
             ],
-            'background_type' => null,
+            'background_type' => Config::get('custom_map.background_type', 'none'),
+            'background_data' => Config::get('custom_map.background_data'),
             'map_conf' => [
-                'height' => '800px',
-                'width' => '1800px',
+                'width' => Config::get('custom_map.width', '1800px'),
+                'height' => Config::get('custom_map.height', '800px'),
                 'interaction' => [
                     'dragNodes' => true,
                     'dragView' => false,
@@ -154,7 +155,57 @@ class CustomMapController extends Controller
 
     public function store(CustomMapSettingsRequest $request): JsonResponse
     {
-        return $this->update($request, new CustomMap);
+        // create a new map with default values
+        $map = new CustomMap;
+        $map->options = [
+            'interaction' => [
+                'dragNodes' => false,
+                'dragView' => false,
+                'zoomView' => false,
+            ],
+            'manipulation' => [
+                'enabled' => false,
+            ],
+            'physics' => [
+                'enabled' => false,
+            ],
+        ];
+        $map->newnodeconfig = [
+            'borderWidth' => 1,
+            'color' => [
+                'border' => Config::get('custom_map.node_border', '#2B7CE9'),
+                'background' => Config::get('custom_map.node_background', '#D2E5FF'),
+            ],
+            'font' => [
+                'color' => Config::get('custom_map.node_font_color', '#343434'),
+                'size' => Config::get('custom_map.node_font_size', 14),
+                'face' => Config::get('custom_map.node_font_face', 'arial'),
+            ],
+            'icon' => [],
+            'label' => true,
+            'shape' => Config::get('custom_map.node_type', 'box'),
+            'size' => Config::get('custom_map.node_size', 25),
+        ];
+        $map->newedgeconfig = [
+            'arrows' => [
+                'to' => [
+                    'enabled' => true,
+                ],
+            ],
+            'smooth' => [
+                'type' => 'dynamic',
+            ],
+            'font' => [
+                'color' => Config::get('custom_map.edge_font_color', '#343434'),
+                'size' => Config::get('custom_map.edge_font_size', 12),
+                'face' => Config::get('custom_map.edge_font_face', 'arial'),
+            ],
+            'label' => true,
+        ];
+        $map->background_type = Config::get('custom_map.background_type', 'none');
+        $map->background_data = Config::get('custom_map.background_data');
+
+        return $this->update($request, $map);
     }
 
     public function update(CustomMapSettingsRequest $request, CustomMap $map): JsonResponse

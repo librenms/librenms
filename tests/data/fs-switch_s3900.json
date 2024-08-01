@@ -6137,8 +6137,8 @@
                     "ifName": "Console363",
                     "portName": null,
                     "ifIndex": 363,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -6237,8 +6237,8 @@
                     "ifName": "Loopback0",
                     "portName": null,
                     "ifIndex": 746,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -6337,8 +6337,8 @@
                     "ifName": "VLAN1",
                     "portName": null,
                     "ifIndex": 1001,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -6437,8 +6437,8 @@
                     "ifName": "VLAN30",
                     "portName": null,
                     "ifIndex": 1030,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -6537,8 +6537,8 @@
                     "ifName": "VLAN32",
                     "portName": null,
                     "ifIndex": 1032,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -8057,5 +8057,66 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "discovery-protocols": {
+        "discovery": {
+            "links": [
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "GS1900-ModemSide",
+                    "remote_port": "8 (60319781e864)",
+                    "remote_platform": null,
+                    "remote_version": "GS1900-10HP",
+                    "ifAlias": "Ethernet Port on unit 1, port 12",
+                    "ifDescr": "Ethernet Port on unit 1, port 12",
+                    "ifName": "Port12"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "IrvingNH.wyc.local",
+                    "remote_port": "internal6 (906cacb9f31d)",
+                    "remote_platform": null,
+                    "remote_version": "FortiGate-60E v6.0.7,build0302,191112 (GA)",
+                    "ifAlias": "To 60E",
+                    "ifDescr": "Ethernet Port on unit 1, port 1",
+                    "ifName": "Port1"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "RB450Gx4@Home",
+                    "remote_port": "bridge-Home_19216820/ether1 (cc2de0f329fd)",
+                    "remote_platform": null,
+                    "remote_version": "MikroTik RouterOS 6.45.7 (stable) RB450Gx4",
+                    "ifAlias": "To RB450Gx4 eth01",
+                    "ifDescr": "Ethernet Port on unit 1, port 13",
+                    "ifName": "Port13"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "RB450Gx4@Home",
+                    "remote_port": "bridge-LAN/vlan32 (021557a47f40)",
+                    "remote_platform": null,
+                    "remote_version": "MikroTik RouterOS 6.45.7 (stable) RB450Gx4",
+                    "ifAlias": "To RB450Gx4 eth01",
+                    "ifDescr": "Ethernet Port on unit 1, port 13",
+                    "ifName": "Port13"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "GS1900-TVSide",
+                    "remote_port": "10 (04bf6d23906b)",
+                    "remote_platform": null,
+                    "remote_version": "GS1900-10HP",
+                    "ifAlias": "Trunk to TV side",
+                    "ifDescr": "Ethernet Port on unit 1, port 25",
+                    "ifName": "Port25"
+                }
+            ]
+        }
     }
 }

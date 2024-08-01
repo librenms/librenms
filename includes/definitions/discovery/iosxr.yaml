@@ -17,3 +17,8 @@ modules:
                         - { value:  4, generic: 1, graph: 0, descr: 'speak' }
                         - { value:  5, generic: 0, graph: 0, descr: 'standby' }
                         - { value:  6, generic: 0, graph: 0, descr: 'active' }
+                    skip_values:
+                        -
+                          oid: cHsrpGrpVirtualIpAddr
+                          op: '='
+                          value: '0.0.0.0'

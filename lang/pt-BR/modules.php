@@ -1,0 +1,36 @@
+<?php
+
+return [
+    'slas' => [
+        'types' => [
+            'dhcp' => 'DHCP',
+            'dlsw' => 'DLSW',
+            'dns' => 'DNS',
+            'DnsQuery' => 'Consulta DNS',
+            'echo' => 'ICMP Ping',
+            'ethernetJitter' => 'Jitter Ethernet',
+            'ethernetPing' => 'Ping Ethernet',
+            'fileIO' => 'Arquivo I/O',
+            'ftp' => 'FTP',
+            'http' => 'HTTP',
+            'HttpGet' => 'HTTP Get',
+            'HttpGetMetadata' => 'HTTP Get Metadata',
+            'IcmpEcho' => 'Echo ICMP',
+            'icmpjitter' => 'Jitter ICMP',
+            'IcmpTimeStamp' => 'Timestamp ICMP',
+            'jitter' => 'Jitter',
+            'lspGroup' => 'Grupo LSP',
+            'lspPing' => 'Ping LSP',
+            'lspPingPseudowire' => 'Ping Pseudowire LSP',
+            'lspTrace' => 'Rastreamento LSP',
+            'NtpQuery' => 'Consulta NTP',
+            'pathEcho' => 'Ping ICMP de Caminho',
+            'rtp' => 'RTP',
+            'script' => 'Script',
+            'tcpConnect' => 'Conexão TCP',
+            'udpEcho' => 'Ping UDP',
+            'UdpTimestamp' => 'Timestamp UDP',
+            'voip' => 'VoIP',
+        ],
+    ],
+];

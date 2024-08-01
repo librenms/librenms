@@ -13053,7 +13053,7 @@
                 {
                     "entPhysicalIndex": 1100,
                     "entPhysicalDescr": "midplane",
-                    "entPhysicalClass": "",
+                    "entPhysicalClass": null,
                     "entPhysicalName": "midplane",
                     "entPhysicalHardwareRev": "",
                     "entPhysicalFirmwareRev": null,
@@ -13072,7 +13072,7 @@
                 {
                     "entPhysicalIndex": 7100,
                     "entPhysicalDescr": "FPC: Virtual FPC @ 0/*/*",
-                    "entPhysicalClass": "",
+                    "entPhysicalClass": null,
                     "entPhysicalName": "FPC: Virtual FPC @ 0/*/*",
                     "entPhysicalHardwareRev": "",
                     "entPhysicalFirmwareRev": null,
@@ -13091,7 +13091,7 @@
                 {
                     "entPhysicalIndex": 8110,
                     "entPhysicalDescr": "PIC: Virtual @ 0/0/*",
-                    "entPhysicalClass": "",
+                    "entPhysicalClass": null,
                     "entPhysicalName": "PIC: Virtual @ 0/0/*",
                     "entPhysicalHardwareRev": "",
                     "entPhysicalFirmwareRev": null,
@@ -13110,7 +13110,7 @@
                 {
                     "entPhysicalIndex": 9100,
                     "entPhysicalDescr": "Routing Engine 0",
-                    "entPhysicalClass": "",
+                    "entPhysicalClass": null,
                     "entPhysicalName": "Routing Engine 0",
                     "entPhysicalHardwareRev": "",
                     "entPhysicalFirmwareRev": null,
@@ -13129,7 +13129,7 @@
                 {
                     "entPhysicalIndex": 20110,
                     "entPhysicalDescr": "MIC: Virtual @ 0/0/*",
-                    "entPhysicalClass": "",
+                    "entPhysicalClass": null,
                     "entPhysicalName": "MIC: Virtual @ 0/0/*",
                     "entPhysicalHardwareRev": "",
                     "entPhysicalFirmwareRev": null,

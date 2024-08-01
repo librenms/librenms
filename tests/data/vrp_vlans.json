@@ -7715,5 +7715,26 @@
                 }
             ]
         }
+    },
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.2011.2.23.95",
+                    "sysDescr": "S5328C-EI\nHuawei Versatile Routing Platform Software \r\n VRP (R) software,Version 5.110 (S5300 V200R001C00SPC300) \r\n Copyright (C) 2007 Huawei Technologies Co., Ltd.",
+                    "sysContact": null,
+                    "version": "5.110 (V200R001C00SPC300) [31]",
+                    "hardware": "S5300",
+                    "features": null,
+                    "location": null,
+                    "os": "vrp",
+                    "type": "network",
+                    "serial": null,
+                    "icon": "huawei.svg"
+                }
+            ]
+        },
+        "poller": "matches discovery"
     }
 }

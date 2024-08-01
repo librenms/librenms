@@ -963,6 +963,210 @@
             "default": [""],
             "type": "array"
         },
+        "custom_map.background_type": {
+            "default": "none",
+            "type": "select",
+            "group": "webui",
+            "section": "custom-map",
+            "order": 98,
+            "options": {
+                "color": "Color",
+                "map": "Map",
+                "none": "None"
+            }
+        },
+        "custom_map.background_data.color": {
+            "default": "#badaee",
+            "type": "color",
+            "group": "webui",
+            "section": "custom-map",
+            "order": 100,
+            "options": {
+                "Streets":  "Streets",
+                "Sattelite": "Sattelite",
+                "Topography":  "Topography"
+            },
+            "when": {
+                "setting": "custom_map.background_type",
+                "operator": "equals",
+                "value": "color"
+            }
+        },
+        "custom_map.background_data.lat": {
+            "default": 40,
+            "type": "float",
+            "group": "webui",
+            "section": "custom-map",
+            "order": 101,
+            "when": {
+                "setting": "custom_map.background_type",
+                "operator": "equals",
+                "value": "map"
+            }
+        },
+        "custom_map.background_data.layer": {
+            "default": null,
+            "type": "select",
+            "group": "webui",
+            "section": "custom-map",
+            "order": 104,
+            "options": {
+                "Streets":  "Streets",
+                "Sattelite": "Sattelite",
+                "Topography":  "Topography"
+            },
+            "when": {
+                "setting": "custom_map.background_type",
+                "operator": "equals",
+                "value": "map"
+            }
+        },
+        "custom_map.background_data.lng": {
+            "default": -20,
+            "type": "float",
+            "group": "webui",
+            "section": "custom-map",
+            "order": 102,
+            "when": {
+                "setting": "custom_map.background_type",
+                "operator": "equals",
+                "value": "map"
+            }
+        },
+        "custom_map.background_data.zoom": {
+            "default": 3,
+            "type": "integer",
+            "group": "webui",
+            "section": "custom-map",
+            "order": 103,
+            "when": {
+                "setting": "custom_map.background_type",
+                "operator": "equals",
+                "value": "map"
+            }
+        },
+        "custom_map.edge_font_color": {
+            "default": "#343434",
+            "type": "color",
+            "group": "webui",
+            "section": "custom-map",
+            "order": 53
+        },
+        "custom_map.edge_font_face": {
+            "default": "arial",
+            "type": "text",
+            "group": "webui",
+            "section": "custom-map",
+            "order": 51
+        },
+        "custom_map.edge_font_size": {
+            "default": 12,
+            "type": "integer",
+            "group": "webui",
+            "section": "custom-map",
+            "order": 52
+        },
+        "custom_map.edge_seperation": {
+            "default": 10,
+            "type": "integer",
+            "group": "webui",
+            "section": "custom-map",
+            "order": 22
+        },
+        "custom_map.height": {
+            "default": "1800px",
+            "type": "text",
+            "group": "webui",
+            "section": "custom-map",
+            "order": 2
+        },
+        "custom_map.node_align": {
+            "default": 10,
+            "type": "integer",
+            "group": "webui",
+            "section": "custom-map",
+            "order": 21
+        },
+        "custom_map.node_background": {
+            "default": "#D2E5FF",
+            "type": "color",
+            "group": "webui",
+            "section": "custom-map",
+            "order": 41
+        },
+        "custom_map.node_border": {
+            "default": "#2B7CE9",
+            "type": "color",
+            "group": "webui",
+            "section": "custom-map",
+            "order": 42
+        },
+        "custom_map.node_font_color": {
+            "default": "#343434",
+            "type": "color",
+            "group": "webui",
+            "section": "custom-map",
+            "order": 45
+        },
+        "custom_map.node_font_face": {
+            "default": "arial",
+            "type": "text",
+            "group": "webui",
+            "section": "custom-map",
+            "order": 43
+        },
+        "custom_map.node_font_size": {
+            "default": 14,
+            "type": "integer",
+            "group": "webui",
+            "section": "custom-map",
+            "order": 44
+        },
+        "custom_map.node_size": {
+            "default": 25,
+            "type": "integer",
+            "group": "webui",
+            "section": "custom-map",
+            "order": 40
+        },
+        "custom_map.node_type": {
+            "default": "box",
+            "type": "select",
+            "group": "webui",
+            "section": "custom-map",
+            "order": 39,
+            "options": {
+                "box": "Box",
+                "circle": "Circle",
+                "database": "Database",
+                "ellipse": "Ellipse",
+                "text": "Text",
+                "device_image": "Device Image",
+                "device_image_circle": "Device Image (Circular)",
+                "diamond": "Diamond",
+                "dot": "Dot",
+                "star": "Star",
+                "triangle": "Triangle",
+                "triangle_inverted": "Triangle Inverted",
+                "hexagon": "Hexagon",
+                "square": "Square",
+                "icon": "Icon"
+            }
+        },
+        "custom_map.reverse_arrows": {
+            "default": false,
+            "type": "boolean",
+            "group": "webui",
+            "section": "custom-map",
+            "order": 23
+        },
+        "custom_map.width": {
+            "default": "800px",
+            "type": "text",
+            "group": "webui",
+            "section": "custom-map",
+            "order": 1
+        },
         "customers_descr": {
             "default": ["cust"],
             "type": "array",
@@ -4122,6 +4326,21 @@
             "section": "influxdbv2",
             "order": 7
         },
+        "influxdbv2.debug": {
+            "default": false,
+            "type": "boolean",
+            "group": "poller",
+            "section": "influxdbv2",
+            "order": 8
+        },
+        "influxdbv2.groups-exclude": {
+            "group": "poller",
+            "section": "influxdbv2",
+            "order": 9,
+            "type": "array",
+            "default": [
+            ]
+        },
         "install_dir": {
             "type": "directory"
         },
@@ -5304,6 +5523,20 @@
             "group": "poller",
             "section": "prometheus",
             "order": 4
+        },
+        "prometheus.user": {
+            "default": "",
+            "type": "text",
+            "group": "poller",
+            "section": "prometheus",
+            "order": 5
+        },
+        "prometheus.password": {
+            "default": "",
+            "type": "text",
+            "group": "poller",
+            "section": "prometheus",
+            "order": 6
         },
         "public_status": {
             "default": false,

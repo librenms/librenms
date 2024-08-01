@@ -31,7 +31,7 @@ $components = $components[$device['device_id']] ?? [];
 
 // We extracted all the components for this device, now lets only get the LTM ones.
 $keep = [];
-$types = [$module, 'bigip', 'f5-ltm-bwc', 'f5-ltm-vs', 'f5-ltm-pool', 'f5-ltm-poolmember'];
+$types = [$module, 'bigip', 'f5-ltm-bwc', 'f5-ltm-vs', 'f5-ltm-pool', 'f5-ltm-poolmember', 'f5-cert'];
 foreach ($components as $k => $v) {
     foreach ($types as $type) {
         if ($v['type'] == $type) {
@@ -43,6 +43,18 @@ $components = $keep;
 
 // Begin our master array, all other values will be processed into this array.
 $tblBigIP = [];
+
+// Cert OIDs
+$f5CertOID = '.1.3.6.1.4.1.3375.2.1.15.1.2.1.5';
+//$f5CertEntry = [];
+// check for installed certs
+$f5CertEntry = snmpwalk_group($device, $f5CertOID, 'F5-BIGIP-SYSTEM-MIB');
+//If no Certs are found skip this part
+if (! empty($f5CertEntry)) {
+    d_echo('Found Certificates!');
+} else {
+    d_echo('No Certificates found\n');
+}
 
 // Virtual Server Data
 $ltmVirtualServOID = [
@@ -125,9 +137,57 @@ if (! empty($ltmBwcEntry['name'])) {
  * False == no object found - this is not an error, OID doesn't exist.
  * null  == timeout or something else that caused an error, OID may exist but we couldn't get it.
  */
-if (! empty($ltmBwcEntry) || ! empty($ltmVirtualServEntry) || ! empty($ltmPoolEntry) || ! empty($ltmPoolMemberEntry)) {
+if (! empty($f5CertEntry) || ! empty($ltmBwcEntry) || ! empty($ltmVirtualServEntry) || ! empty($ltmPoolEntry) || ! empty($ltmPoolMemberEntry)) {
     // No Nulls, lets go....
     d_echo("Objects Found:\n");
+
+    // Process Certificates
+    $CERT_BASE_OID_NAME = 'sysCertificateFileObjectExpirationDate';
+    $CERT_THRESHOLD_WARNING = 30;	// If Cert expires in less than this value (in days) => status = warning
+    $CERT_THRESHOLD_CRITICAL = 10;	// If Cert expires in less than this value (in days) => status = critical
+
+    if (is_array($f5CertEntry)) {
+        foreach ($f5CertEntry as $cert => $array) {
+            $result = [];
+
+            $result['type'] = 'f5-cert';
+            $result['UID'] = $cert;
+            $result['label'] = $cert;
+            $result['raw'] = $array[$CERT_BASE_OID_NAME];
+            // expiration value from snmpwalk is in seconds since 01.01.1970
+            // we substract the current time, to get the time left until expiration
+            // and convert it into days, for better human readability
+            $result['daysLeft'] = intval(($array[$CERT_BASE_OID_NAME] - getdate()[0]) / (3600 * 24));
+            // UID might be to long for use in a RRD filename, use a hash instead
+            $result['hash'] = hash('crc32', $result['UID']);
+
+            //let's check when the cert expires
+            if ($result['daysLeft'] <= 0) {
+                $result['status'] = 2;
+                $result['error'] = 'CRITICAL: Certificate is expired!';
+            } elseif ($result['daysLeft'] <= $CERT_THRESHOLD_CRITICAL) {
+                $result['status'] = 2;
+                $result['error'] = 'CRITICAL: Certificate is about to expire in ' . $result['daysLeft'] . ' days!';
+            } elseif ($result['daysLeft'] <= $CERT_THRESHOLD_WARNING) {
+                $result['status'] = 1;
+                $result['error'] = 'WARNING: Certificate is about to expire in ' . $result['daysLeft'] . ' days!';
+            } else {
+                $result['status'] = 0;
+                $result['error'] = '';
+            }
+
+            // Do we have any results
+            if (count($result) > 0) {
+                // Let's log some debugging
+                d_echo('\n\n' . $result['type'] . ' - ' . $result['label'] . ': ' . $result['daysLeft'] . '\n');
+                d_echo('    Status:  ' . $result['status'] . '\n');
+                d_echo('    Message: ' . $result['error'] . '\n');
+
+                // Add this result to the master array.
+                $tblBigIP[] = $result;
+            }
+        }
+    }
 
     // Process the Virtual Servers
     if (is_array($ltmVirtualServEntry['name'])) {
@@ -314,6 +374,7 @@ if (! empty($ltmBwcEntry) || ! empty($ltmVirtualServEntry) || ! empty($ltmPoolEn
      *
      * Let's loop over the SNMP data to see if we need to ADD or UPDATE any components.
      */
+
     foreach ($tblBigIP as $key => $array) {
         $component_key = false;
 

@@ -277,6 +277,47 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
             $dot1d_array = snmpwalk_group($device, 'dot1dBasePortIfIndex', 'BRIDGE-MIB');
             $lldp_ports = snmpwalk_group($device, 'lldpLocPortId', 'LLDP-MIB');
         }
+    } else {
+        echo ' LLDP-V2-MIB: ';
+        $lldpv2_array = SnmpQuery::hideMib()->walk('LLDP-V2-MIB::lldpV2RemTable')->table(4);
+    }
+
+    $mapV2toV1 = [
+        'lldpV2RemChassisIdSubtype' => 'lldpRemChassisIdSubtype',
+        'lldpV2RemChassisId' => 'lldpRemChassisId',
+        'lldpV2RemPortIdSubtype' => 'lldpRemPortIdSubtype',
+        'lldpV2RemPortId' => 'lldpRemPortId',
+        'lldpV2RemPortDesc' => 'lldpRemPortDesc',
+        'lldpV2RemSysName' => 'lldpRemSysName',
+        'lldpV2RemSysDesc' => 'lldpRemSysDesc',
+        'lldpV2RemSysCapSupported' => 'lldpRemSysCapSupported',
+        'lldpV2RemSysCapEnabled' => 'lldpRemSysCapEnabled',
+        'lldpV2RemRemoteChanges' => 'lldpRemRemoteChanges',
+        'lldpV2RemTooManyNeighbors' => 'lldpRemTooManyNeighbors',
+        'lldpV2RemManAddrTable' => 'lldpRemManAddrTable',
+        'lldpV2RemManAddrEntry' => 'lldpRemManAddrEntry',
+        'lldpV2RemManAddrSubtype' => 'lldpRemManAddrSubtype',
+        'lldpV2RemManAddr' => 'lldpRemManAddr',
+        'lldpV2RemManAddrIfSubtype' => 'lldpRemManAddrIfSubtype',
+        'lldpV2RemManAddrIfId' => 'lldpRemManAddrIfId',
+        'lldpV2RemManAddrOID' => 'lldpRemManAddrOID',
+    ];
+
+    if (! empty($lldpv2_array)) {
+        // map it to lldp_array
+        foreach ($lldpv2_array as $lldpV2RemTimeMark => $value) {
+            foreach ($value as $lldpV2RemLocalIfIndex => $value) {
+                foreach ($value as $lldpV2RemLocalDestMACAddress => $value) {
+                    foreach ($value as $lldpV2RemIndex => $lldpv2_array_entries) {
+                        foreach ($lldpv2_array_entries as $key => $value) {
+                            $newKey = $mapV2toV1[$key] ?? $key;
+                            $lldp_array[$lldpV2RemTimeMark][$lldpV2RemLocalIfIndex][$lldpV2RemIndex][$newKey] = $value;
+                        }
+                        $lldp_array[$lldpV2RemTimeMark][$lldpV2RemLocalIfIndex][$lldpV2RemIndex]['lldpRemLocalDestMACAddress'] = $lldpV2RemLocalDestMACAddress;
+                    }
+                }
+            }
+        }
     }
 
     foreach ($lldp_array as $key => $lldp_if_array) {
