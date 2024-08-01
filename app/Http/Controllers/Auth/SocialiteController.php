@@ -164,12 +164,16 @@ class SocialiteController extends Controller
             ! empty($claims)
         ) {
             $roles = [];
-            $attributes = [];
-            $attribute_list = $this->socialite_user->getRaw();
-            foreach ($attribute_list as $a) {
-                $attribute_name = $a->getName();
-                $attribute_values = $a->getAllAttributeValues();
-                $attributes[$attribute_name] = $attribute_values;
+            //saml, convert raw user attribute list to key/value pairs
+            if ($this->socialite_user instanceof \SocialiteProviders\Saml2\User) {
+                $attribute_list = $this->socialite_user->getRaw();
+                foreach ($attribute_list as $a) {
+                    $attribute_name = $a->getName();
+                    $attribute_values = $a->getAllAttributeValues();
+                    $attributes[$attribute_name] = $attribute_values;
+                }
+            } else {
+               $attributes = $this->socialite_user->getRaw();
             }
 
             foreach ($scopes as $scope) {
