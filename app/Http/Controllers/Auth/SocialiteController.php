@@ -173,7 +173,7 @@ class SocialiteController extends Controller
                     $attributes[$attribute_name] = $attribute_values;
                 }
             } else {
-               $attributes = $this->socialite_user->getRaw();
+                $attributes = $this->socialite_user->getRaw();
             }
 
             foreach ($scopes as $scope) {
