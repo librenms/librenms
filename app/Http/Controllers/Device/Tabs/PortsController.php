@@ -41,7 +41,7 @@ use LibreNMS\Interfaces\UI\DeviceTab;
 
 class PortsController implements DeviceTab
 {
-    private bool $detail = false;
+    private bool $detail = true;
     private array $settings = [];
     private array $defaults = [
         'perPage' => 32,
@@ -121,6 +121,8 @@ class PortsController implements DeviceTab
             $relationships[] = 'pseudowires.endpoints';
             $relationships[] = 'ipv4Networks.ipv4';
             $relationships[] = 'ipv6Networks.ipv6';
+            $relationships['stackParent'] = fn ($q) => $q->select('port_id');
+            $relationships['stackChildren'] = fn ($q) => $q->select('port_id');
         }
 
         /** @var Collection<Port>|LengthAwarePaginator<Port> $ports */
@@ -205,17 +207,13 @@ class PortsController implements DeviceTab
         }
 
         // port stack
-        // fa-expand portlink: local is low port
-        // fa-compress portlink: local is high portPort
-        $stacks = \DB::table('ports_stack')->where('device_id', $port->device_id)
-            ->where(fn ($q) => $q->where('port_id_high', $port->port_id)->orWhere('port_id_low', $port->port_id))->get();
-        foreach ($stacks as $stack) {
-            if ($stack->port_id_low) {
-                $this->addPortNeighbor($neighbors, 'stack_low', $stack->port_id_low);
-            }
-            if ($stack->port_id_high) {
-                $this->addPortNeighbor($neighbors, 'stack_high', $stack->port_id_high);
-            }
+        // fa-expand stack_parent: local is a child port
+        // fa-compress stack_child: local is a parent port
+        foreach ($port->stackParent as $stackParent) {
+            $this->addPortNeighbor($neighbors, 'stack_parent', $stackParent->port_id);
+        }
+        foreach ($port->stackChildren as $stackChild) {
+            $this->addPortNeighbor($neighbors, 'stack_child', $stackChild->port_id);
         }
 
         // PAGP members/parent

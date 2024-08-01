@@ -50,7 +50,7 @@ class CustomMapController extends Controller
             'menu_group' => null,
             'node_align' => Config::get('custom_map.node_align', 10),
             'edge_separation' => Config::get('custom_map.edge_seperation', 10),
-            'reverse_arrows' => Config::get('custom_map.reverse_arrows', false),
+            'reverse_arrows' => Config::get('custom_map.reverse_arrows', false) ? 'true' : 'false',
             'legend' => [
                 'x' => -1,
                 'y' => -1,

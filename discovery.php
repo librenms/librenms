@@ -23,6 +23,7 @@ if (! isset($options['q'])) {
     echo \LibreNMS\Config::get('project_name') . " Discovery\n";
 }
 
+$where = '';
 if (isset($options['h'])) {
     if ($options['h'] == 'odd') {
         $options['n'] = '1';

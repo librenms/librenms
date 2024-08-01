@@ -45,9 +45,20 @@ $bg = '#ffffff';
 
 $show_all = 1;
 
-echo "<div style='margin: 0px; width: 100%'><table class='iftable' cellpadding=10 cellspacing=0A>";
+echo "<div style='margin: 0px; width: 100%'><table class='iftable'>";
 
-echo view('device.tabs.ports.includes.port_row', ['port' => $port, 'collapsing' => false]);
+echo view('device.tabs.ports.includes.port_row', [
+    'port' => $port,
+    'data' => [
+        'neighbors' => [$port->port_id => (new \App\Http\Controllers\Device\Tabs\PortsController())->findPortNeighbors($port)],
+        'graphs' => [
+            'bits' => [['type' => 'port_bits', 'title' => trans('Traffic'), 'vars' => [['from' => '-1d'], ['from' => '-7d'], ['from' => '-30d'], ['from' => '-1y']]]],
+            'upkts' => [['type' => 'port_upkts', 'title' => trans('Packets (Unicast)'), 'vars' => [['from' => '-1d'], ['from' => '-7d'], ['from' => '-30d'], ['from' => '-1y']]]],
+            'errors' => [['type' => 'port_errors', 'title' => trans('Errors'), 'vars' => [['from' => '-1d'], ['from' => '-7d'], ['from' => '-30d'], ['from' => '-1y']]]],
+        ],
+    ],
+    'collapsing' => false,
+]);
 
 echo '</table></div>';
 

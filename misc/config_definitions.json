@@ -1071,7 +1071,7 @@
             "type": "integer",
             "group": "webui",
             "section": "custom-map",
-            "order": 21
+            "order": 22
         },
         "custom_map.height": {
             "default": "1800px",
@@ -1085,7 +1085,7 @@
             "type": "integer",
             "group": "webui",
             "section": "custom-map",
-            "order": 22
+            "order": 21
         },
         "custom_map.node_background": {
             "default": "#D2E5FF",
