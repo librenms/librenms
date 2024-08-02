@@ -17298,5 +17298,50 @@
                 }
             ]
         }
+    },
+    "entity-physical": {
+        "discovery": {
+            "entPhysical": [
+                {
+                    "entPhysicalIndex": 90,
+                    "entPhysicalDescr": "IXR-s CPM",
+                    "entPhysicalClass": null,
+                    "entPhysicalName": "cpm-ixr-s",
+                    "entPhysicalHardwareRev": "1.0",
+                    "entPhysicalFirmwareRev": null,
+                    "entPhysicalSoftwareRev": null,
+                    "entPhysicalAlias": null,
+                    "entPhysicalAssetID": null,
+                    "entPhysicalIsFRU": null,
+                    "entPhysicalModelName": null,
+                    "entPhysicalVendorType": "cpm-ixr-s",
+                    "entPhysicalSerialNum": null,
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": 0,
+                    "entPhysicalMfgName": null,
+                    "ifIndex": null
+                },
+                {
+                    "entPhysicalIndex": 92,
+                    "entPhysicalDescr": "48p 10GE SFP+, 6p 100GE QSFP28",
+                    "entPhysicalClass": null,
+                    "entPhysicalName": "imm48-sfp++6-qsfp28",
+                    "entPhysicalHardwareRev": "1.0",
+                    "entPhysicalFirmwareRev": null,
+                    "entPhysicalSoftwareRev": null,
+                    "entPhysicalAlias": null,
+                    "entPhysicalAssetID": null,
+                    "entPhysicalIsFRU": null,
+                    "entPhysicalModelName": null,
+                    "entPhysicalVendorType": "imm48-sfp++6-qsfp28",
+                    "entPhysicalSerialNum": null,
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": 0,
+                    "entPhysicalMfgName": null,
+                    "ifIndex": null
+                }
+            ]
+        },
+        "poller": "matches discovery"
     }
 }

@@ -85,6 +85,15 @@ class Color
         ];
     }
 
+    public static function percent(int|float $numerator = null, int|float $denominator = null, int|float $percent = null): string
+    {
+        $percent = $percent ? round($percent) : Number::calculatePercent($numerator, $denominator, 0);
+        $r = min(255, 5 * ($percent - 25));
+        $b = max(0, 255 - (5 * ($percent + 25)));
+
+        return sprintf('#%02x%02x%02x', $r, $b, $b);
+    }
+
     /**
      * Get highlight color based on device status
      */

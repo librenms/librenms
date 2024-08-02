@@ -41,7 +41,12 @@ if (! isset($colours)) {
     $colours = 'rainbow_stats_purple';
 }
 
-if (! isset($descr_len)) {
+if (! isset($descr_len) && isset($descr)) {
+    $descr_len = strlen($descr);
+    if ($descr_len < 12) {
+        $descr_len = 12;
+    }
+} elseif (! isset($descr_len)) {
     $descr_len = 12;
 }
 

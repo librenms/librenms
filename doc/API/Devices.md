@@ -1046,7 +1046,7 @@ Input:
   - ipv4: search by IPv4 address
   - ipv6: search by IPv6 address (compressed or uncompressed)
   - location: search by location
-  - location_id: serach by locaiton_id
+  - location_id: search by location_id
   - hostname: search by hostname
   - sysName: search by sysName
   - display: search by display name
@@ -1099,6 +1099,31 @@ Output:
    "icon": null
   }
  ]
+}
+```
+
+### `device_under_maintenance`
+
+Get the current maintenance status of a device.
+
+Route: `/api/v0/devices/:hostname/maintenance`
+
+Input:
+
+ -
+
+Example:
+
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/maintenance
+```
+
+Output:
+
+```json
+{
+    "status": "ok",
+    "is_under_maintenance": true
 }
 ```
 

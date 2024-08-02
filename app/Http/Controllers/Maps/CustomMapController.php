@@ -45,11 +45,12 @@ class CustomMapController extends Controller
     public function index(): View
     {
         return view('map.custom-manage', [
-            'maps' => CustomMap::orderBy('name')->get(['custom_map_id', 'name']),
+            'maps' => CustomMap::orderBy('name')->get(['custom_map_id', 'name', 'menu_group'])->groupBy('menu_group')->sortKeys(),
             'name' => 'New Map',
-            'node_align' => 10,
-            'edge_separation' => 10,
-            'reverse_arrows' => 0,
+            'menu_group' => null,
+            'node_align' => Config::get('custom_map.node_align', 10),
+            'edge_separation' => Config::get('custom_map.edge_seperation', 10),
+            'reverse_arrows' => Config::get('custom_map.reverse_arrows', false) ? 'true' : 'false',
             'legend' => [
                 'x' => -1,
                 'y' => -1,
@@ -58,10 +59,11 @@ class CustomMapController extends Controller
                 'hide_overspeed' => 0,
                 'font_size' => 14,
             ],
-            'background' => null,
+            'background_type' => Config::get('custom_map.background_type', 'none'),
+            'background_data' => Config::get('custom_map.background_data'),
             'map_conf' => [
-                'height' => '800px',
-                'width' => '1800px',
+                'width' => Config::get('custom_map.width', '1800px'),
+                'height' => Config::get('custom_map.height', '800px'),
                 'interaction' => [
                     'dragNodes' => true,
                     'dragView' => false,
@@ -97,14 +99,16 @@ class CustomMapController extends Controller
         $map_conf = $map->options;
         $map_conf['width'] = $map->width;
         $map_conf['height'] = $map->height;
-        $data = [
+
+        return view('map.custom-view', [
             'edit' => false,
             'map_id' => $map->custom_map_id,
             'name' => $map->name,
+            'menu_group' => $map->menu_group,
             'reverse_arrows' => $map->reverse_arrows,
             'legend' => $this->legendConfig($map),
-            'background' => (bool) $map->background_suffix,
-            'bgversion' => $map->background_version,
+            'background_type' => $map->background_type,
+            'background_config' => $map->getBackgroundConfig(),
             'page_refresh' => Config::get('page_refresh', 300),
             'map_conf' => $map_conf,
             'base_url' => Config::get('base_url'),
@@ -113,9 +117,7 @@ class CustomMapController extends Controller
             'vmargin' => 20,
             'hmargin' => 20,
             'screenshot' => $screenshot,
-        ];
-
-        return view('map.custom-view', $data);
+        ]);
     }
 
     public function edit(CustomMap $map): View
@@ -123,6 +125,7 @@ class CustomMapController extends Controller
         $data = [
             'map_id' => $map->custom_map_id,
             'name' => $map->name,
+            'menu_group' => $map->menu_group,
             'node_align' => $map->node_align,
             'edge_separation' => $map->edge_separation,
             'reverse_arrows' => $map->reverse_arrows,
@@ -130,8 +133,8 @@ class CustomMapController extends Controller
             'newedge_conf' => $map->newedgeconfig,
             'newnode_conf' => $map->newnodeconfig,
             'map_conf' => $map->options,
-            'background' => (bool) $map->background_suffix,
-            'bgversion' => $map->background_version,
+            'background_type' => $map->background_type,
+            'background_config' => $map->getBackgroundConfig(),
             'edit' => true,
             'vmargin' => 20,
             'hmargin' => 20,
@@ -152,7 +155,57 @@ class CustomMapController extends Controller
 
     public function store(CustomMapSettingsRequest $request): JsonResponse
     {
-        return $this->update($request, new CustomMap);
+        // create a new map with default values
+        $map = new CustomMap;
+        $map->options = [
+            'interaction' => [
+                'dragNodes' => false,
+                'dragView' => false,
+                'zoomView' => false,
+            ],
+            'manipulation' => [
+                'enabled' => false,
+            ],
+            'physics' => [
+                'enabled' => false,
+            ],
+        ];
+        $map->newnodeconfig = [
+            'borderWidth' => 1,
+            'color' => [
+                'border' => Config::get('custom_map.node_border', '#2B7CE9'),
+                'background' => Config::get('custom_map.node_background', '#D2E5FF'),
+            ],
+            'font' => [
+                'color' => Config::get('custom_map.node_font_color', '#343434'),
+                'size' => Config::get('custom_map.node_font_size', 14),
+                'face' => Config::get('custom_map.node_font_face', 'arial'),
+            ],
+            'icon' => [],
+            'label' => true,
+            'shape' => Config::get('custom_map.node_type', 'box'),
+            'size' => Config::get('custom_map.node_size', 25),
+        ];
+        $map->newedgeconfig = [
+            'arrows' => [
+                'to' => [
+                    'enabled' => true,
+                ],
+            ],
+            'smooth' => [
+                'type' => 'dynamic',
+            ],
+            'font' => [
+                'color' => Config::get('custom_map.edge_font_color', '#343434'),
+                'size' => Config::get('custom_map.edge_font_size', 12),
+                'face' => Config::get('custom_map.edge_font_face', 'arial'),
+            ],
+            'label' => true,
+        ];
+        $map->background_type = Config::get('custom_map.background_type', 'none');
+        $map->background_data = Config::get('custom_map.background_data');
+
+        return $this->update($request, $map);
     }
 
     public function update(CustomMapSettingsRequest $request, CustomMap $map): JsonResponse
@@ -163,6 +216,7 @@ class CustomMapController extends Controller
         return response()->json([
             'id' => $map->custom_map_id,
             'name' => $map->name,
+            'menu_group' => $map->menu_group,
             'width' => $map->width,
             'height' => $map->height,
             'reverse_arrows' => $map->reverse_arrows,

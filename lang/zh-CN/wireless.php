@@ -11,9 +11,10 @@ return [
     |
     */
 
+    'title' => '无线',
     'ap-count' => [
-        'short' => 'AP 数量',
-        'long' => 'AP 数量',
+        'short' => 'AP数量',
+        'long' => '接入点计数',
         'unit' => '',
     ],
     'clients' => [
@@ -28,22 +29,22 @@ return [
     ],
     'ccq' => [
         'short' => 'CCQ',
-        'long' => '客户端联机质量',
+        'long' => '客户端连接质量',
         'unit' => '%',
     ],
     'errors' => [
         'short' => '错误',
-        'long' => '错误数量',
+        'long' => '错误计数',
         'unit' => '',
     ],
     'error-ratio' => [
-        'short' => '错误率',
-        'long' => '位/封包错误率',
+        'short' => '错误比率',
+        'long' => '位/包错误比率',
         'unit' => '%',
     ],
     'error-rate' => [
-        'short' => 'BER',
-        'long' => '位错误率',
+        'short' => '误码率',
+        'long' => '比特误码率',
         'unit' => 'bps',
     ],
     'frequency' => [
@@ -54,7 +55,7 @@ return [
     'distance' => [
         'short' => '距离',
         'long' => '距离',
-        'unit' => 'm',
+        'unit' => '米',
     ],
     'mse' => [
         'short' => 'MSE',
@@ -64,47 +65,71 @@ return [
     'noise-floor' => [
         'short' => '背景噪声',
         'long' => '背景噪声',
-        'unit' => 'dBm/Hz',
+        'unit' => 'dBm',
     ],
     'power' => [
-        'short' => '电力/讯号',
-        'long' => 'TX/RX 电力或讯号',
+        'short' => '功率/信号',
+        'long' => '发射/接收功率或信号强度',
         'unit' => 'dBm',
     ],
     'quality' => [
-        'short' => '品质',
-        'long' => '品质',
+        'short' => '质量',
+        'long' => '质量',
         'unit' => '%',
     ],
     'rate' => [
-        'short' => '传送率',
-        'long' => 'TX/RX 传送率',
+        'short' => '速率',
+        'long' => '发射/接收速率',
         'unit' => 'bps',
     ],
     'rssi' => [
         'short' => 'RSSI',
-        'long' => '接收讯号强度指针',
+        'long' => '接收信号强度指示',
         'unit' => 'dBm',
     ],
     'snr' => [
-        'short' => 'SNR',
-        'long' => '讯号噪讯比',
+        'short' => '信噪比',
+        'long' => '信号与噪声比',
         'unit' => 'dB',
+    ],
+    'sinr' => [
+        'short' => 'SINR',
+        'long' => '信号与干扰加噪声比',
+        'unit' => 'dB',
+    ],
+    'rsrq' => [
+        'short' => 'RSRQ',
+        'long' => '接收参考信号质量',
+        'unit' => 'dB',
+    ],
+    'rsrp' => [
+        'short' => 'RSRP',
+        'long' => '接收参考信号功率',
+        'unit' => 'dBm',
     ],
     'ssr' => [
         'short' => 'SSR',
-        'long' => '讯号强度比',
+        'long' => '信号强度比',
         'unit' => 'dB',
     ],
     'utilization' => [
-        'short' => '使用率',
-        'long' => '使用率',
+        'short' => '利用率',
+        'long' => '利用率',
         'unit' => '%',
     ],
     'xpi' => [
         'short' => 'XPI',
-        'long' => '交互极化干扰',
+        'long' => '交叉极化干扰',
         'unit' => 'dB',
     ],
-
+    'cell' => [
+        'short' => '小区',
+        'long' => '小区',
+        'unit' => '',
+    ],
+    'channel' => [
+        'short' => '信道',
+        'long' => '信道',
+        'unit' => '',
+    ],
 ];

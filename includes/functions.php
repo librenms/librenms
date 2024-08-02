@@ -71,10 +71,7 @@ function logfile($string)
 
 function percent_colour($perc)
 {
-    $r = min(255, 5 * ($perc - 25));
-    $b = max(0, 255 - (5 * ($perc + 25)));
-
-    return sprintf('#%02x%02x%02x', $r, $b, $b);
+    return \LibreNMS\Util\Color::percent(percent: $perc);
 }
 
 /**

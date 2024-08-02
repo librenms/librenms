@@ -23,6 +23,15 @@
     </div>
 
     <div class="form-group">
+        <label for="init_layer-{{ $id }}" class="control-label" title="{{ __('settings.settings.geoloc.layer.help') }}">{{ __('settings.settings.geoloc.layer.description') }}</label>
+        <select class="form-control" name="init_layer" id="init_layer-{{ $id }}">
+            <option value="Streets" @if($init_layer == 'Streets') selected @endif>{{ __('settings.settings.geoloc.layer.options.Streets') }}</option>
+            <option value="Satellite" @if($init_layer == 'Satellite') selected @endif>{{ __('settings.settings.geoloc.layer.options.Satellite') }}</option>
+            <option value="Topography" @if($init_layer == 'Topography') selected @endif>{{ __('settings.settings.geoloc.layer.options.Topography') }}</option>
+        </select>
+    </div>
+
+    <div class="form-group">
         <label for="group_radius-{{ $id }}" class="control-label">{{ __('Grouping radius') }}</label>
         <input class="form-control" name="group_radius" id="group_radius-{{ $id }}" type="number" value="{{ $group_radius }}" placeholder="{{ __('default 80') }}">
     </div>

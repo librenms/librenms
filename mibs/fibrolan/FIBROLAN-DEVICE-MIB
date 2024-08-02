@@ -1,0 +1,752 @@
+--  =======================================================================
+--  File		: FIBROLAN-DEVICE-MIB.mib
+--  Description		: Private MIB file for Fibrolan device level objects
+--  Author		: Shamir Stein
+--
+--  Copyright Fibrolan, 2009. All rights reserved.
+--
+--  Reproduction of this document is authorized on condition that this
+--  copyright notice is included.
+--  =======================================================================
+
+FIBROLAN-DEVICE-MIB	DEFINITIONS ::= BEGIN
+
+	IMPORTS
+
+		OBJECT-TYPE,
+		IpAddress,
+		MODULE-IDENTITY,
+		Integer32,
+		Unsigned32,
+		TimeTicks,
+		NOTIFICATION-TYPE		FROM SNMPv2-SMI
+
+		DisplayString			FROM SNMPv2-TC
+
+		FlTemperature,
+		FlUtilization,
+		FlFileServerType,
+		FlFileXferDirection,
+		fibrolanGeneric			FROM FIBROLAN-COMMON-MIB;
+
+
+	flDevice		MODULE-IDENTITY
+		LAST-UPDATED	"201607150000Z"
+		ORGANIZATION	"Fibrolan Ltd."
+		CONTACT-INFO	"support@fibrolan.com"
+		DESCRIPTION	"The MIB module to describe a Fibrolan device's
+				 system level attributes. This module includes the
+				 relevant traps as well.
+				 This module is part of Fibrolan's group of generic
+				 MIB modules.
+				 Copyright (C) Fibrolan Ltd. (2009)."
+		REVISION	"201607150000Z"
+		DESCRIPTION	"Re-added and modified the portMacLimit trap.
+					It now includes the ifIndex in the varbind."
+		REVISION	"201509150000Z"
+		DESCRIPTION	"Removed the flUserName object.
+				 Removed the flMbdDirection object.
+				 Removed the flCircuitID object.
+				 Modified flDeviceTemperatureAlarmStatus to enum.
+				 Modified flDevicePsuAlarmStatus to enum.
+				 Changed last changed objects type to TimeTicks.
+				 Added ranges to objects where applicable.
+				 Removed index from psuStatusChange's varbind.
+				 Removed the following traps (some obsolete and others
+				 will be moved to a dedicated MIB): authUnauthorizedLogin, 
+				 microBurstDetected, macViolation, portMacLimit, circuitUp,
+				 circuitDown, synceLock, synceLossLock.
+				 Removed Conformance and Compliance statements, for the sake
+				 of MIB simplicity and readability (causes 
+				 Misc object description changes.
+				 Misc cleanup."
+		REVISION	"201509010000Z"
+		DESCRIPTION	"Added dedicated PSU index and added it to the trap as well.
+				 Added configuration change trap."
+		REVISION	"201502010000Z"
+		DESCRIPTION	"Added PSU fan status for single fan fail (out of two),
+				 Added portMacLimit trap, fixed OIDs of microBurstDetected
+				 and macViolation traps (were swapped)"
+		REVISION	"200905050000Z"
+		DESCRIPTION	"Changed type of temperature, PSU and CPU alarm status
+				 variables from Unsigned32 to Integer32"
+		REVISION	"200903190000Z"
+		DESCRIPTION	"Removed psuInstalled and psuRemoved traps. The
+				 corresponding events trigger the psuStatusChange
+				 trap, with the relevant status variables.
+				 Renumbered traps (OIDs under flDeviceNotifications)
+				 accordingly."
+		REVISION	"200902160000Z"
+		DESCRIPTION	"Initial version (version 1)."
+	::= { fibrolanGeneric  10 }
+
+
+	flDeviceNotifications		OBJECT IDENTIFIER ::= { flDevice  0 }
+	flDeviceMIBObjects		OBJECT IDENTIFIER ::= { flDevice  1 }
+
+-- ************************************************************
+-- System reboot
+-- ************************************************************
+	flDeviceReboot			OBJECT-TYPE
+		SYNTAX			INTEGER
+					{
+						ready		(0),
+						notReady	(1),
+						reboot		(2)
+					}
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"Trigger a system reboot.
+					 The following sequence must be performed in order
+					 for the operation to be triggered:
+					 - read the object's value - must be 'ready'
+					 - set the value to 'notReady' (acts as a sema4 lock)
+					 - set the value to 'reboot'"
+	::= { flDeviceMIBObjects  10 }
+
+-- ************************************************************
+-- Restore system default configuration
+-- ************************************************************
+	flDeviceRestoreDefaults		OBJECT-TYPE
+		SYNTAX			INTEGER
+					{
+						ready		(0),
+						notReady	(1),
+						restoreDefaults	(2)
+					}
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"Trigger a system restore defaults operation.
+					 The following sequence must be performed in order
+					 for the operation to be triggered:
+					 - read the object's value - must be 'ready'
+					 - set the value to 'notReady' (acts as a sema4 lock)
+					 - set the value to 'restoreDefaults'."
+	::= { flDeviceMIBObjects  11 }
+
+-- ************************************************************
+-- Save system configuration
+-- ************************************************************
+	flDeviceSaveConfig		OBJECT-TYPE
+		SYNTAX			INTEGER
+					{
+						ready		(0),
+						notReady	(1),
+						saveConfig	(2)
+					}
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"Trigger save of the running config to NV memory
+					 (normally becomes the startup config).
+					 The following sequence must be performed in order
+					 for the operation to be triggered:
+					 - read the object's value - must be 'ready'
+					 - set the value to 'notReady' (acts as a sema4 lock)
+					 - set the value to 'saveConfig'."
+	::= { flDeviceMIBObjects  12 }
+
+-- ************************************************************
+-- Device temperature
+-- ************************************************************
+	flDeviceTemperature		OBJECT-TYPE
+		SYNTAX			FlTemperature
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The internal device temperature in degrees Centigrade."
+	::= { flDeviceMIBObjects  13 }
+
+-- ************************************************************
+-- Device temperature alarms enable
+-- ************************************************************
+	flDeviceTemperatureAlarmsEnable		OBJECT-TYPE
+		SYNTAX				INTEGER
+						{
+							enable		(1),
+							disable		(2)
+						}
+		MAX-ACCESS			read-write
+		STATUS				current
+		DESCRIPTION			"Determine whether temperature traps are generated.
+						 When disabled, the alarm status object should not be
+						 polled (will indicate no alarm)."
+	::= { flDeviceMIBObjects  14 }
+
+-- ************************************************************
+-- Device temperature alarm status
+-- ************************************************************
+	flDeviceTemperatureAlarmStatus		OBJECT-TYPE
+		SYNTAX				INTEGER
+						{
+							ok	(1),
+							high	(2),
+							low	(4)
+						}
+		MAX-ACCESS			read-only
+		STATUS				current
+		DESCRIPTION			"This variable indicates the alarm status of the 
+						 device's temperature."
+	::= { flDeviceMIBObjects  15 }
+
+-- ************************************************************
+-- Device temperature status last change
+-- ************************************************************
+	flDeviceTemperatureStatusLastChange	OBJECT-TYPE
+		SYNTAX				TimeTicks
+		MAX-ACCESS			read-only
+		STATUS				current
+		DESCRIPTION			"The value of MIB II's sysUpTime object at the time
+						 the device entered its current temperature status
+						 state.  If the current state was entered prior to
+						 the last re-initialization of the proxy-agent, then
+						 this object contains a zero value."
+	::= { flDeviceMIBObjects  16 }
+
+
+-- ************************************************************
+-- PSU Status table 
+-- ************************************************************
+	flDevicePsuStatusTable			OBJECT-TYPE
+		SYNTAX				SEQUENCE OF FlDevicePsuStatusEntry
+		MAX-ACCESS			not-accessible
+		STATUS				current
+		DESCRIPTION			"Device Power Supply Unit (PSU) status table."
+	::= { flDeviceMIBObjects  100 }
+
+	flDevicePsuStatusEntry			OBJECT-TYPE
+		SYNTAX				FlDevicePsuStatusEntry
+		MAX-ACCESS			not-accessible
+		STATUS				current
+		DESCRIPTION			"The entries of the PSU status table"
+		INDEX				{ flDevicePsuIndex }
+	::= { flDevicePsuStatusTable  1 }
+
+	FlDevicePsuStatusEntry ::=		SEQUENCE
+	{
+		flDevicePsuIndex		Integer32,
+		flDevicePsuInstalled		INTEGER,
+		flDevicePsuStatus		INTEGER,
+		flDevicePsuFanStatus		INTEGER,
+		flDevicePsuAlarmsEnable		INTEGER,
+		flDevicePsuAlarmStatus		INTEGER,
+		flDevicePsuStatusLastChange	TimeTicks
+	}
+
+	flDevicePsuIndex			OBJECT-TYPE
+		SYNTAX				Integer32 (1..3)
+		MAX-ACCESS			not-accessible
+		STATUS				current
+		DESCRIPTION			"The index of the PSU."
+	::= { flDevicePsuStatusEntry  1 }
+
+	flDevicePsuInstalled			OBJECT-TYPE
+		SYNTAX				INTEGER
+						{
+							unknown		(1),
+							installed	(2),
+							notInstalled	(3)
+						}
+		MAX-ACCESS			read-only
+		STATUS				current
+		DESCRIPTION			"Indicates whether PSU is installed or not (in slot)"
+	::= { flDevicePsuStatusEntry  2 }
+
+	flDevicePsuStatus			OBJECT-TYPE
+		SYNTAX				INTEGER
+						{
+							unknown	(1),
+							ok	(2),
+							fail	(3)
+						}
+		MAX-ACCESS			read-only
+		STATUS				current
+		DESCRIPTION			"PSU operational status (supplying adequate
+						 power/voltage)"
+	::= { flDevicePsuStatusEntry  3 }
+
+	flDevicePsuFanStatus			OBJECT-TYPE
+		SYNTAX				INTEGER
+						{
+							unknown		(1),
+							notApplicable	(2),
+							ok		(3),
+							fail		(4),
+							singleFail	(5)
+						}
+		MAX-ACCESS			read-only
+		STATUS				current
+		DESCRIPTION			"PSU fan operational status (if applicable).
+						 singleFail indicates one of two (or more) fans
+						 have failed." 
+	::= { flDevicePsuStatusEntry  4 }
+
+	flDevicePsuAlarmsEnable			OBJECT-TYPE
+		SYNTAX				INTEGER
+						{
+							enable		(1),
+							disable		(2)
+						}
+		MAX-ACCESS			read-write
+		STATUS				current
+		DESCRIPTION			"Determine whether PSU traps are generated for this PSU
+						 slot. When disabled, the alarm status object should not
+						 be polled (will indicate no alarm)."
+	::= { flDevicePsuStatusEntry  5 }
+
+	flDevicePsuAlarmStatus			OBJECT-TYPE
+		SYNTAX				INTEGER
+						{
+							ok		(1),
+							psuNotInstalled	(2),
+							psuDown		(4),
+							fanDown		(8),
+							singleFanDown	(16)
+						}
+		MAX-ACCESS			read-only
+		STATUS				current
+		DESCRIPTION			"This variable indicates the alarm status of the
+						 device's PSUs. fanDown indicates all fans of the
+						 power supply are down."
+	::= { flDevicePsuStatusEntry  6 }
+
+	flDevicePsuStatusLastChange		OBJECT-TYPE
+		SYNTAX    			TimeTicks
+		MAX-ACCESS			read-only
+		STATUS				current
+		DESCRIPTION			"The value of MIB II's sysUpTime object at the time
+						 the PSU entered its current state. If the current state
+						 was entered prior to the last re-initialization of the
+						 proxy-agent, then this object contains a zero value."
+	::= { flDevicePsuStatusEntry  7 }
+
+-- ************************************************************
+-- Device update table 
+-- ************************************************************
+	flDeviceUpdateTable			OBJECT-TYPE
+		SYNTAX				SEQUENCE OF FlDeviceUpdateEntry
+		MAX-ACCESS			not-accessible
+		STATUS				current
+		DESCRIPTION			"Device (remote) update table.
+						 This table is used for uploading and
+						 downloading of maintenance related files (i.e.
+						 upgrades and configuration) from and to the
+						 system.
+						 In order to perform an update operation, the
+						 following objects should be set (assuming the
+						 operation is supported by the system):
+						 - operation type
+						 - remote file server type
+						 - remote file server address
+						 - operation direction (up/download)
+						 - file name
+						 After these have been set, the action may be
+						 triggered by the start object.
+						 Update status can be monitored via the status
+						 and error status objects."
+	::= { flDeviceMIBObjects  110 }
+
+	flDeviceUpdateEntry			OBJECT-TYPE
+		SYNTAX				FlDeviceUpdateEntry
+		MAX-ACCESS			not-accessible
+		STATUS				current
+		DESCRIPTION			"The entries of the device udpate table."
+		INDEX				{ flDeviceUpdateTableIndex }
+	::= { flDeviceUpdateTable  1 }
+
+	FlDeviceUpdateEntry ::=			SEQUENCE
+	{
+		flDeviceUpdateTableIndex		Unsigned32,
+		flDeviceUpdateType			INTEGER,
+		flDeviceUpdateFileServerType		FlFileServerType,
+		flDeviceUpdateFileServerAddress		IpAddress,
+		flDeviceUpdateFileXferDirection		FlFileXferDirection,
+		flDeviceUpdateFileName			DisplayString,
+		flDeviceUpdateStart			INTEGER,
+		flDeviceUpdateStatus			INTEGER,
+		flDeviceUpdateErrorStatus		INTEGER,
+		flDeviceUpdateErrorCode			Integer32,
+		flDeviceUpdateUrl			DisplayString
+	}
+
+	flDeviceUpdateTableIndex		OBJECT-TYPE
+		SYNTAX				Unsigned32 (0..0)
+		MAX-ACCESS			not-accessible
+		STATUS				current
+		DESCRIPTION			"Table index."
+	::= { flDeviceUpdateEntry  1 }
+
+	flDeviceUpdateType			OBJECT-TYPE
+		SYNTAX				INTEGER
+						{
+							other		(1),
+							software	(2),
+							firmware	(3),
+							system		(4),
+							config		(5),
+							script		(6)
+						}
+		MAX-ACCESS			read-write
+		STATUS				current
+		DESCRIPTION			"Update type (target)."
+	::= { flDeviceUpdateEntry  2 }
+
+	flDeviceUpdateFileServerType		OBJECT-TYPE
+		SYNTAX				FlFileServerType
+		MAX-ACCESS			read-write
+		STATUS				current
+		DESCRIPTION			"The type of remote file server (e.g. TFTP),
+						 from which the update file will be retrieved, or to
+						 which it will be saved.
+						 The type is effectively the file transfer protocol used.
+						 If the desired protocol is not present in the list,
+						 other(1) should be selected."
+	::= { flDeviceUpdateEntry  3 }
+
+	flDeviceUpdateFileServerAddress		OBJECT-TYPE
+		SYNTAX				IpAddress
+		MAX-ACCESS			read-write
+		STATUS				current
+		DESCRIPTION			"The IP address of the remote file server (e.g. TFTP),
+						 from which the update file will be retrieved, or to
+						 which it will be saved.
+						 Address must be a valid unicast IP address."
+	::= { flDeviceUpdateEntry  4 }
+
+	flDeviceUpdateFileXferDirection		OBJECT-TYPE
+		SYNTAX				FlFileXferDirection
+		MAX-ACCESS			read-write
+		STATUS				current
+		DESCRIPTION			"The direction in which the update file transfer will
+						 be performed: to or from the remote server."
+	::= { flDeviceUpdateEntry  5 }
+
+	flDeviceUpdateFileName			OBJECT-TYPE
+		SYNTAX				DisplayString (SIZE (0..255))
+		MAX-ACCESS			read-write
+		STATUS				current
+		DESCRIPTION			"The name of the update file. Some systems may not
+						 support this object, in which case the name is set
+						 using the version name object.
+						 The file name may include a remote path."
+	::= { flDeviceUpdateEntry  6 }
+
+	flDeviceUpdateStart			OBJECT-TYPE
+		SYNTAX				INTEGER
+						{
+							ready		(0),
+							notReady	(1),
+							start		(2)
+						}
+		MAX-ACCESS			read-write
+		STATUS				current
+		DESCRIPTION			"Trigger the update process.
+						 Setting this object to start(2) will initiate the
+						 update operation.
+						 This can be done only when the object's value is
+						 ready(0). If notReady(1) is indicated, the operation
+						 should not be attempted and may be rejected by the
+						 device."
+	::= { flDeviceUpdateEntry  7 }
+
+	flDeviceUpdateStatus			OBJECT-TYPE
+		SYNTAX				INTEGER
+						{
+							other			(1),
+							notStarted		(2),
+							loadingFile		(3),
+							savingFile		(4),
+							verifyingFile		(5),
+							updateInProgress	(6),
+							updateComplete		(7),-- operation fully complete
+							updateIncomplete	(8),-- operation partially complete
+							updateFailed		(9)
+						}
+		MAX-ACCESS			read-only
+		STATUS				current
+		DESCRIPTION			"Status of the update process.
+						 Some systems or update processes may support this
+						 object partially (i.e. not implement all states)."
+	::= { flDeviceUpdateEntry  8 }
+
+	flDeviceUpdateErrorStatus		OBJECT-TYPE
+		SYNTAX				INTEGER
+						{
+							noError			(1),
+							other			(2),
+							fileNotFound		(3),
+							serverTimeout		(4),
+							fileInvalid		(5),
+							updateError		(6)
+						}
+		MAX-ACCESS			read-only
+		STATUS				current
+		DESCRIPTION			"Status of the update process.
+						 Some systems or update processes may support this
+						 object partially (i.e. not implement all errors)."
+	::= { flDeviceUpdateEntry  9 }
+
+	flDeviceUpdateErrorCode			OBJECT-TYPE
+		SYNTAX				Integer32 (0..10000)
+		MAX-ACCESS			read-only
+		STATUS				current
+		DESCRIPTION			"Indicates the error code of the last update operation.
+						 If no errors occured (operation completed successfully)
+						 this object should be 0.
+						 The meaning of the error code depends on the update
+						 type. For example: in a configuration file load (from
+						 the server) this value can be the line number within
+						 the config file which contained the error.
+						 Refer to relevant system documentation for further
+						 details."
+	::= { flDeviceUpdateEntry  10 }
+
+	flDeviceUpdateUrl			OBJECT-TYPE
+		SYNTAX				DisplayString (SIZE (0..255))
+		MAX-ACCESS			read-write
+		STATUS				current
+		DESCRIPTION			"The URL string of the update file.
+						 In most systems, when this field is used,
+						 other fields (e.g. IP address) will not be
+						 used."
+	::= { flDeviceUpdateEntry  11 }
+
+
+-- ************************************************************
+-- CPU Status table 
+-- ************************************************************
+	flDeviceCpuStatusTable			OBJECT-TYPE
+		SYNTAX				SEQUENCE OF FlDeviceCpuStatusEntry
+		MAX-ACCESS			not-accessible
+		STATUS				current
+		DESCRIPTION			"CPU Status table. Provides information regarding
+						 system's CPU(s) and memory resources.
+						 This table is extending the relevant entries
+						 in the Entity MIB (physical, for CPUs).
+						 This table has some common objects with the
+						 HOST-RESOURCES-MIB (RFC2790)."
+	::= { flDeviceMIBObjects  120 }
+
+	flDeviceCpuStatusEntry			OBJECT-TYPE
+		SYNTAX				FlDeviceCpuStatusEntry
+		MAX-ACCESS			not-accessible
+		STATUS				current
+		DESCRIPTION			"The entries of the CPU Status table."
+		INDEX				{ flDeviceCpuIndex }
+	::= { flDeviceCpuStatusTable  1 }
+
+	FlDeviceCpuStatusEntry ::=		SEQUENCE
+	{
+		flDeviceCpuIndex		Integer32,
+		flDeviceCpuUtilization		FlUtilization,
+		flDeviceMemoryUtilization	FlUtilization,
+		flDeviceNvMemoryUtilization	FlUtilization,
+		flDeviceCpuAlarmsEnable		INTEGER,
+		flDeviceCpuAlarmStatus		Integer32,
+		flDeviceCpuStatusLastChange	TimeTicks
+	}
+
+	flDeviceCpuIndex			OBJECT-TYPE
+		SYNTAX				Integer32 (0..2)
+		MAX-ACCESS			not-accessible
+		STATUS				current
+		DESCRIPTION			"Index of the CPU table (will be 0 only in most systems)."
+	::= { flDeviceCpuStatusEntry  1 }
+
+	flDeviceCpuUtilization			OBJECT-TYPE
+		SYNTAX				FlUtilization
+		MAX-ACCESS			read-only
+		STATUS				current
+		DESCRIPTION			"Utilization (load) of the CPU in percents of maximum
+						 capacity."
+	::= { flDeviceCpuStatusEntry  2 }
+
+	flDeviceMemoryUtilization		OBJECT-TYPE
+		SYNTAX				FlUtilization
+		MAX-ACCESS			read-only
+		STATUS				current
+		DESCRIPTION			"Utilization (usage) of the memory in percents of
+						 physical memory size."
+	::= { flDeviceCpuStatusEntry  3 }
+
+	flDeviceNvMemoryUtilization		OBJECT-TYPE
+		SYNTAX				FlUtilization
+		MAX-ACCESS			read-only
+		STATUS				current
+		DESCRIPTION			"Utilization (usage) of the NV memory in percents of
+						 physical NV memory size."
+	::= { flDeviceCpuStatusEntry  4 }
+
+	flDeviceCpuAlarmsEnable			OBJECT-TYPE
+		SYNTAX				INTEGER
+						{
+							enable		(1),
+							disable		(2)
+						}
+		MAX-ACCESS			read-write
+		STATUS				current
+		DESCRIPTION			"Determine whether CPU traps are generated.
+						 When disabled, the alarm status object should not
+						 be polled (will indicate no alarm)."
+	::= { flDeviceCpuStatusEntry  5 }
+
+	flDeviceCpuAlarmStatus			OBJECT-TYPE
+		SYNTAX				Integer32
+		MAX-ACCESS			read-only
+		STATUS				current
+		DESCRIPTION			"This variable indicates the alarm status of the
+						 device's CPU(s) and memory.
+						 This object is a bitmap represented as a sum;
+						 therefore, it can represent multiple alarms.
+						 The noAlarm bit must be set if and only if no other
+						 flag is set.
+						 The various alarm bit positions  (right to left) are
+						 as follows:
+						 1		noAlarm				No active alarms
+						 2		cpuUtilizationHigh		CPU util exceeds
+												threshold
+						 3		memoryUtilizationHigh		Memory util exceeds
+												threshold"
+	::= { flDeviceCpuStatusEntry  6 }
+
+	flDeviceCpuStatusLastChange		OBJECT-TYPE
+		SYNTAX				TimeTicks
+		MAX-ACCESS			read-only
+		STATUS				current
+		DESCRIPTION			"The value of MIB II's sysUpTime object at the time
+						 the CPU entered its current state. If the current state
+						 was entered prior to the last re-initialization of the
+						 proxy-agent, then this object contains a zero value."
+	::= { flDeviceCpuStatusEntry  7 }
+
+-- ************************************************************
+-- Alarm thresholds table
+-- ************************************************************
+
+	flDeviceAlarmThresholdTable		OBJECT-TYPE
+		SYNTAX				SEQUENCE OF FlDeviceAlarmThresholdEntry
+		MAX-ACCESS			not-accessible
+		STATUS				current
+		DESCRIPTION			"Alarm thresholds table. This table provides
+						 configuration facilities for threshold
+						 crossing alarms (TCA) defined in this MIB
+						 module."
+	::= { flDeviceMIBObjects  500 }
+
+	flDeviceAlarmThresholdEntry		OBJECT-TYPE
+		SYNTAX				FlDeviceAlarmThresholdEntry
+		MAX-ACCESS			not-accessible
+		STATUS				current
+		DESCRIPTION			"The entries of the alarm threshold table."
+		INDEX				{ flDeviceAlarmThresholdTableIndex }
+	::= { flDeviceAlarmThresholdTable  1 }
+
+	FlDeviceAlarmThresholdEntry ::=		SEQUENCE
+	{
+		flDeviceAlarmThresholdTableIndex		Unsigned32,
+		flDeviceAlarmThresholdType			INTEGER,
+		flDeviceAlarmThresholdValue			Integer32,
+		flDeviceAlarmThresholdClearValue		Integer32
+	}
+
+	flDeviceAlarmThresholdTableIndex	OBJECT-TYPE
+		SYNTAX				Unsigned32 (0..31)
+		MAX-ACCESS			not-accessible
+		STATUS				current
+		DESCRIPTION			"Table index."
+	::= { flDeviceAlarmThresholdEntry  1 }
+
+	flDeviceAlarmThresholdType		OBJECT-TYPE
+		SYNTAX				INTEGER
+						{
+							other			(1),
+							temperatureHigh		(2),
+							temperatureLow		(3),
+							cpuUtilHigh		(4),
+							memoryUtilHigh		(5)
+						}
+		MAX-ACCESS			read-only
+		STATUS				current
+		DESCRIPTION			"The type of the threshold (enumerated).
+						 This object is expected to be extended with new types
+						 in future revisions."
+	::= { flDeviceAlarmThresholdEntry  2 }
+
+	flDeviceAlarmThresholdValue		OBJECT-TYPE
+		SYNTAX				Integer32 (-100..100)
+		MAX-ACCESS			read-write
+		STATUS				current
+		DESCRIPTION			"The threshold value beyond which the alarm is active.
+						 Note: the type of the threshold determines whether this
+						 value is the upper bound for the alarm activation (e.g.
+						 temperatureHigh) or the lower bound (e.g.
+						 temperatureLow)."
+	::= { flDeviceAlarmThresholdEntry  3 }
+
+	flDeviceAlarmThresholdClearValue	OBJECT-TYPE
+		SYNTAX				Integer32 (-100..100)
+		MAX-ACCESS			read-write
+		STATUS				current
+		DESCRIPTION			"The threshold value below which the alarm is cleared.
+						 Note: the type of the threshold determines whether this
+						 value is the upper bound for the alarm activation (e.g.
+						 temperatureLow) or the lower bound (e.g.
+						 temperatureHigh)."
+	::= { flDeviceAlarmThresholdEntry  4 }
+
+-- ************************************************************
+-- ************************************************************
+-- Trap (notifications) definitions
+-- ************************************************************
+-- ************************************************************
+
+	psuStatusChange				NOTIFICATION-TYPE
+		OBJECTS				{ flDevicePsuAlarmStatus,
+						  flDevicePsuStatusLastChange }
+		STATUS				current
+		DESCRIPTION			"PSU module state changed (fail or fan fail).
+						 Vars: PSU alarm status, PSU status last
+						 change"
+	::= { flDeviceNotifications  10 }
+
+	dyingGasp				NOTIFICATION-TYPE
+		STATUS				current
+		DESCRIPTION			"Device is losing power.
+						 This is the only trap that will be generated when the
+						 device is experiencing total power loss.
+						 Cleared by a coldStart alarm.
+						 Vars: none."
+	::= { flDeviceNotifications  11 }
+
+	temperatureStatusChange			NOTIFICATION-TYPE
+		OBJECTS				{ flDeviceTemperatureAlarmStatus,
+						  flDeviceTemperatureStatusLastChange }
+		STATUS				current
+		DESCRIPTION			"Device's internal temperature status has changed.
+						 Vars: temperature alarm status, temperature last change"
+	::= { flDeviceNotifications  12 }
+
+	cpuStatusChange				NOTIFICATION-TYPE
+		OBJECTS				{ flDeviceCpuAlarmStatus,
+						  flDeviceCpuStatusLastChange }
+		STATUS				current
+		DESCRIPTION			"CPU (or memory) status has changed.
+						 Vars: CPU alarm status, PCU status last
+						 change"
+	::= { flDeviceNotifications  13 }
+
+	configChanged				NOTIFICATION-TYPE
+		STATUS				current
+		DESCRIPTION			"Device configuration has changed.
+						 Indicates the startup config was updated
+						 (even if it wasn't changed), as a result
+						 of a copy running to startup operation."
+	::= { flDeviceNotifications  50 }
+
+	portMacLimit		NOTIFICATION-TYPE --MAC limit trap
+		OBJECTS			{ 	ifIndex }
+		STATUS			current
+		DESCRIPTION		"MAC limit reached on port.
+						Vars: port number"
+		::=  { flDeviceNotifications 19 }
+
+
+END

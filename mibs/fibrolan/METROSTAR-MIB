@@ -1,0 +1,665 @@
+--  =======================================================================
+--  File              : MetroStar.mib
+--  Description       : Private MIB file for FIBROLAN MetroStar I system
+--  By                : Shamir Stein
+--  MIB Version       : 1.4
+--  MetroStar Version : 1.6.2/build 12
+--  Date              : March 27, 2008
+--  =======================================================================
+--
+--
+-- Copyright Fibrolan, 2008. All rights reserved.
+--
+-- Reproduction of this document is authorized on condition that this
+-- copyright notice is included.
+--
+FIBROLAN-MIB-METRO-STAR   DEFINITIONS ::= BEGIN
+ 
+	 IMPORTS
+		--OBJECT-TYPE                   FROM RFC-1212
+		--enterprises					FROM RFC1155-SMI
+		DisplayString								FROM RFC1213-MIB
+		MODULE-COMPLIANCE, OBJECT-GROUP				FROM SNMPv2-CONF
+		OBJECT-TYPE, IpAddress, MODULE-IDENTITY,
+				Integer32, enterprises				FROM SNMPv2-SMI;
+
+
+  flMetroStar  MODULE-IDENTITY
+       LAST-UPDATED "0803270000Z"  
+       ORGANIZATION "Fibrolan ltd"
+       CONTACT-INFO
+         "http://www.fibrolan.com"
+       DESCRIPTION
+         "The MIB module to describe MetroStar main interface.
+          Copyright (C) Fibrolan Ltd (2008)."
+	::= { enterprises 4467 100 100 }
+
+
+    -- conformance information
+     flMetroStarMIBConformance
+                   OBJECT IDENTIFIER ::= { flMetroStar  1 }
+
+     flMetroStarMIBCompliances  OBJECT IDENTIFIER ::= { flMetroStarMIBConformance 1 }
+     flMetroStarMIBGroups       OBJECT IDENTIFIER ::= { flMetroStarMIBConformance 2 }
+
+
+	-- compliance statements
+     flMetroStarMIBCompliance MODULE-COMPLIANCE
+              STATUS  current
+              DESCRIPTION
+                      "The compliance statement for flMetroStar entities
+                      which implement the flMcm1xxMv MIB."
+              MODULE  -- this module
+                  MANDATORY-GROUPS { flMetroStarPsuGroup, flMetroStarModulesGroup,
+									 flMetroStarSwUpgradeGroup, flMetroStarConfigUploadGroup }
+              ::= { flMetroStarMIBCompliances 1 }
+
+
+
+     flMetroStarPsuGroup	OBJECT-GROUP
+	        OBJECTS		{ flMsChassisPsuIndex,
+						  flMsChassisPsuStatus }
+            STATUS  current
+            DESCRIPTION
+                    "A collection of objects providing basic
+                    instrumentation of the MetroStar extended channel entity."
+            ::= { flMetroStarMIBGroups 1 }
+
+     flMetroStarModulesGroup	OBJECT-GROUP
+	        OBJECTS		{ flMsChassisModuleNumber,
+			              flMsChassisModuleType,
+			              flMsChassisChannelNumber,
+			 	      flMsChassisChannelTpLink, --n/a for MCM1000X, local port for MCM1000X-RL
+			              flMsChassisChannelFoLink, --port link for MCM1000X, remote port for MCM1000X-RL
+			              flMsChassisChannelRemoteDevice,
+			              flMsChassisChannelRemoteState,
+			              flMsChassisChannelRemoteTpLink }
+            STATUS  current
+            DESCRIPTION
+                    "A collection of objects providing basic
+                    instrumentation of the MetroStar extended link entity."
+            ::= { flMetroStarMIBGroups 2 }
+
+     flMetroStarSwUpgradeGroup		OBJECT-GROUP
+	        OBJECTS		{ flMsSwUpgradeTableIndex,
+						  flMsSwUpgradeTftpServer,
+						  flMsSwUpgradeCurrentVersion,
+						  flMsSwUpgradeRollbackVersion,
+						  flMsSwUpgradeNewVersion,
+						  flMsSwUpgradeRemoteFileName,
+						  flMsSwUpgradeRemotePath,
+						  flMsSwUpgradeAutoReboot,
+						  flMsSwUpgradeProcessBegin,
+						  flMsSwUpgradeRollback,
+						  flMsSwUpgradeProcessStatus }
+            STATUS  current
+            DESCRIPTION
+                    "A collection of objects providing basic
+                    instrumentation of the MetroStar SW upgrade entity."
+            ::= { flMetroStarMIBGroups 3 }
+
+     flMetroStarConfigUploadGroup	OBJECT-GROUP
+	        OBJECTS		{ flMsConfigUploadIndex,
+						  flMsConfigUploadTftpServer,
+						  flMsConfigUploadFileName,
+						  flMsConfigUploadFileStatus,
+						  flMsConfigUploadRemotePath,
+						  flMsConfigUploadProcessBegin,
+						  flMsConfigUploadProcessStatus }
+            STATUS  current
+            DESCRIPTION
+                    "A collection of objects providing basic
+                    instrumentation of the MetroStar config upload entity"
+            ::= { flMetroStarMIBGroups 4 }
+
+
+-- ************************************************************
+-- ************************************************************
+-- FibroLan Object Identifier Definition
+-- ************************************************************
+-- ************************************************************
+
+
+fibrolan            OBJECT IDENTIFIER ::= { enterprises       4467 }
+
+fibrolanSNMP        OBJECT IDENTIFIER ::= { fibrolan           100 }
+
+--flMetroStar			OBJECT IDENTIFIER ::= { fibrolanSNMP        100 }
+
+flMsChassis		    OBJECT IDENTIFIER ::= { flMetroStar			  10 }
+
+
+-- ************************************************************
+-- Objects in the FIBROLAN MetroStar Group
+-- ************************************************************
+
+     flMsChassisDeviceTemperature        OBJECT-TYPE
+		 SYNTAX    Integer32
+         MAX-ACCESS   read-only
+		 STATUS      current
+         DESCRIPTION
+         "Temperature sensor reading"
+	 ::= { flMsChassis 1 }
+
+
+-- ************************************************************
+-- PSU table 
+-- ************************************************************
+     flMsChassisPsuTable               OBJECT-TYPE
+         SYNTAX  SEQUENCE OF FlMsChassisPsuEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "This table shows the chassis' PSUs status"
+     ::= { flMsChassis 2 }
+
+     flMsChassisPsuEntry               OBJECT-TYPE
+         SYNTAX  FlMsChassisPsuEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "The entries of the table."
+         INDEX { flMsChassisPsuIndex }
+     ::= { flMsChassisPsuTable 1 }
+
+		FlMsChassisPsuEntry ::= SEQUENCE
+		{
+			 flMsChassisPsuIndex				Integer32,
+			 flMsChassisPsuStatus				INTEGER 
+		}
+
+     flMsChassisPsuIndex                 OBJECT-TYPE
+		 SYNTAX    Integer32
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Number of PSU" 
+	 ::= { flMsChassisPsuEntry 1 }
+
+     flMsChassisPsuStatus        OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								fail			(0),
+								ok				(1),
+								notInstalled    (2)
+						   }
+         MAX-ACCESS     read-only
+         STATUS    current
+         DESCRIPTION
+         "PSU status"
+	 ::= { flMsChassisPsuEntry 2 }
+
+
+-- ************************************************************
+-- Module table 
+-- ************************************************************
+     flMsChassisModuleTable               OBJECT-TYPE
+         SYNTAX  SEQUENCE OF FlMsChassisModuleEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "This table shows the chassis' modules status"
+     ::= { flMsChassis 3 }
+
+     flMsChassisModuleEntry               OBJECT-TYPE
+         SYNTAX  FlMsChassisModuleEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "The entries of the table."
+         INDEX { flMsChassisModuleNumber, 
+				 flMsChassisChannelNumber}
+     ::= { flMsChassisModuleTable 1 }
+
+		FlMsChassisModuleEntry ::= SEQUENCE
+		{
+			 flMsChassisModuleNumber			Integer32,
+			 flMsChassisModuleType				INTEGER,
+			 flMsChassisChannelNumber			Integer32,
+			 flMsChassisChannelTpLink			INTEGER,
+			 flMsChassisChannelFoLink			INTEGER,
+			 flMsChassisChannelRemoteDevice		INTEGER,
+			 flMsChassisChannelRemoteState		INTEGER,
+			 flMsChassisChannelRemoteTpLink		INTEGER
+		}
+
+     flMsChassisModuleNumber                 OBJECT-TYPE
+		 SYNTAX    Integer32
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Number of module (slot)" 
+	 ::= { flMsChassisModuleEntry 1 }
+
+     flMsChassisModuleType                 OBJECT-TYPE
+		 SYNTAX    INTEGER	{
+								unknown		(0),
+								mcm100-02	(1),
+								mcm110-02	(2),
+								mcm100-01	(3),
+								mcm1000s	(4),
+								mcm1000t	(5),
+								mcm110-01	(6),
+								mcm100-rl	(7),
+								acm110-14	(8),
+								acm110-12	(9),
+								msm100u		(10),
+								mcm100-1e1	(11),
+								mcm100-2e1	(12),
+								mdx41		(13),
+								mdx81		(14),
+								msm622u		(15),
+								pcm110-8e1	(16),
+								pcm110-4e1	(17),
+								pcm110-8t1	(18),
+								pcm110-4t1	(19),
+								mcm1000x-rl	(20),
+								mcm1000x	(21),
+								mcm100-1t1	(22),
+								mcm100-2t1	(23),
+								msm2500u	(24),
+								mcm1000x-rl-4e1	(25),
+								mcm1000x-rl-4t1	(26),
+								mdx21		(27),
+								mddx51		(28),
+								mdx81-e		(29),
+								mdx41-sfa	(30),
+								mdx41-sfb	(31),
+								fadm1-47	(32),
+								fadm1-49	(33),
+								fadm1-51	(34),
+								fadm1-53	(35),
+								fadm1-55	(36),
+								fadm1-57	(37),
+								fadm1-59	(38),
+								fadm1-61	(39),
+								fadm2-47	(40),
+								fadm2-49	(41),
+								fadm2-51	(42),
+								fadm2-53	(43),
+								fadm2-55	(44),
+								fadm2-57	(45),
+								fadm2-59	(46),
+								fadm2-61	(47),
+								mdx41-3		(48),
+								mdx41-3sa	(49),
+								none		(9999)
+							}
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Type of module" 
+	 ::= { flMsChassisModuleEntry 2 }
+
+	 flMsChassisChannelNumber                 OBJECT-TYPE
+		 SYNTAX    Integer32
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Number of channel within module" 
+	 ::= { flMsChassisModuleEntry 3 }
+
+	 flMsChassisChannelTpLink                 OBJECT-TYPE
+		 SYNTAX    INTEGER	{
+								off			(0),
+								on			(1),
+								n-a			(2)
+							}
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Channel TP link status" 
+	 ::= { flMsChassisModuleEntry 4 }
+
+	 flMsChassisChannelFoLink                 OBJECT-TYPE
+		 SYNTAX    INTEGER	{
+								off			(0),
+								on			(1)
+							}
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Channel FO link status" 
+	 ::= { flMsChassisModuleEntry 5 }
+
+	 flMsChassisChannelRemoteDevice           OBJECT-TYPE
+		 SYNTAX    INTEGER	{
+								none		(0),
+								hcon-ma		(1),
+								scon1ma		(2),
+								fcon1ma		(3),
+								lta41ma		(4),
+								gsm1000ma	(5),
+								gsm1010ma	(6),
+								atara100	(7),
+								lta41-1e1	(8),
+								lta41-2e1	(9),
+								atara1000	(10),
+								fcon1f		(11),
+								atara1000rm	(12),
+								gsm1000x	(13),
+								lta41-1t1	(14),
+								lta41-2t1	(15),
+								lta41-4e1	(16),
+								lta41-4t1	(17),
+								unknown		(9999)
+							}
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Channel remote MA device (if present)" 
+	 ::= { flMsChassisModuleEntry 6 }
+
+	 flMsChassisChannelRemoteState           OBJECT-TYPE
+		 SYNTAX    INTEGER	{
+								none		(0),
+								ok			(1),
+								powerFail	(2)
+							}
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Channel remote MA device state (if present)" 
+	 ::= { flMsChassisModuleEntry 7 }
+
+	 flMsChassisChannelRemoteTpLink                 OBJECT-TYPE
+		 SYNTAX    INTEGER	{
+								off			(0),
+								on			(1)
+							}
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Remote device's TP link status" 
+	 ::= { flMsChassisModuleEntry 8 }
+
+
+-- ************************************************************
+-- Objects in the FIBROLAN MetroStar Group
+-- ************************************************************
+
+     flMsChassisSwVersion        OBJECT-TYPE
+		 SYNTAX    DisplayString
+         MAX-ACCESS     read-only
+         STATUS    current
+         DESCRIPTION
+         "Managment software version"
+	 ::= { flMsChassis 4 }	
+
+
+-- ************************************************************
+-- Software upgrade table 
+-- ************************************************************
+     flMsSwUpgradeTable               OBJECT-TYPE
+         SYNTAX  SEQUENCE OF FlMsSwUpgradeEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "This table shows the software upgrade status"
+     ::= { flMsChassis 5 }
+
+     flMsChassisSwUpgradeEntry               OBJECT-TYPE
+         SYNTAX  FlMsSwUpgradeEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "The entries of the software upgrade table."
+         INDEX { flMsSwUpgradeTableIndex}
+     ::= { flMsSwUpgradeTable 1 }
+
+		FlMsSwUpgradeEntry ::= SEQUENCE
+		{
+			 flMsSwUpgradeTableIndex		Integer32,
+			 flMsSwUpgradeTftpServer		IpAddress,
+			 flMsSwUpgradeCurrentVersion	DisplayString,
+			 flMsSwUpgradeRollbackVersion	DisplayString,
+			 flMsSwUpgradeNewVersion		DisplayString,
+			 flMsSwUpgradeRemoteFileName	DisplayString,
+			 flMsSwUpgradeRemotePath		DisplayString,
+			 flMsSwUpgradeAutoReboot		INTEGER,
+			 flMsSwUpgradeProcessBegin		INTEGER,
+			 flMsSwUpgradeRollback			INTEGER,
+			 flMsSwUpgradeProcessStatus     INTEGER
+		}
+
+      flMsSwUpgradeTableIndex                 OBJECT-TYPE
+ 	  	 SYNTAX    Integer32(1..11)
+         MAX-ACCESS     read-only
+	     STATUS    current
+		 DESCRIPTION
+		 "SW upgrade entry number" 
+  	  ::= { flMsChassisSwUpgradeEntry  1 }
+
+      flMsSwUpgradeTftpServer                 OBJECT-TYPE
+ 	  	 SYNTAX    IpAddress
+         MAX-ACCESS     read-write
+	     STATUS    current
+		 DESCRIPTION
+		 "TFTP server IP address" 
+  	  ::= { flMsChassisSwUpgradeEntry  2 }
+
+	 flMsSwUpgradeCurrentVersion				OBJECT-TYPE
+		 SYNTAX    DisplayString
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Agent's current software version" 
+    ::= { flMsChassisSwUpgradeEntry  3 }
+
+	 flMsSwUpgradeRollbackVersion				OBJECT-TYPE
+		 SYNTAX    DisplayString
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Agent's rollback software version" 
+    ::= { flMsChassisSwUpgradeEntry  4 }
+
+	 flMsSwUpgradeNewVersion				    OBJECT-TYPE
+		 SYNTAX    DisplayString
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Agent's new software version" 
+    ::= { flMsChassisSwUpgradeEntry  5 }
+
+	 flMsSwUpgradeRemoteFileName				OBJECT-TYPE
+		 SYNTAX    DisplayString
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Agent's remote file name" 
+    ::= { flMsChassisSwUpgradeEntry  6 }
+
+	 flMsSwUpgradeRemotePath				OBJECT-TYPE
+		 SYNTAX    DisplayString
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Remote file name path" 
+    ::= { flMsChassisSwUpgradeEntry  7 }
+
+	 flMsSwUpgradeAutoReboot                 OBJECT-TYPE
+		 SYNTAX    INTEGER	{
+								off			(1),
+								on			(2)
+							}
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Auto-Reboot mode" 
+	 ::= { flMsChassisSwUpgradeEntry  8 }
+			
+	 flMsSwUpgradeProcessBegin                 OBJECT-TYPE
+		 SYNTAX    INTEGER	{
+								normal			(1),
+								upgrade			(2)
+							}
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Begin upgrade process" 
+	 ::= { flMsChassisSwUpgradeEntry  9 }
+
+	flMsSwUpgradeRollback				OBJECT-TYPE
+		 SYNTAX    INTEGER	{
+								normal			(1),
+								rollback		(2)
+							}
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Begin SW Rollback to previous version" 
+	 ::= { flMsChassisSwUpgradeEntry  10 }
+
+ 	 flMsSwUpgradeProcessStatus                 OBJECT-TYPE
+		 SYNTAX    INTEGER	{
+								notStarted				(1),
+								upgradeFailed			(2),
+								upgradeComplete			(3),
+								retrievingFile			(4),
+								erasingFlash			(5),
+								programmingFlash		(6),
+								verifyingFlash			(7),
+								rollbackInProgress		(8),
+								rollbackComplete		(9)
+							}
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Software upgrade process status" 
+	 ::= { flMsChassisSwUpgradeEntry  11 }
+
+
+-- ************************************************************
+-- Configuration upload table 
+-- ************************************************************
+     flMsConfigUploadTable               OBJECT-TYPE
+         SYNTAX  SEQUENCE OF FlMsConfigUploadEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "This table allows config upload and status monitoring"
+     ::= { flMsChassis 6 }
+
+     flMsConfigUploadEntry               OBJECT-TYPE
+         SYNTAX  FlMsConfigUploadEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "The entries of the software download table."
+         INDEX { flMsConfigUploadIndex}
+     ::= { flMsConfigUploadTable 1 }
+
+		FlMsConfigUploadEntry ::= SEQUENCE
+		{
+			 flMsConfigUploadIndex			Integer32,
+			 flMsConfigUploadTftpServer		IpAddress,
+			 flMsConfigUploadFileName		DisplayString,
+			 flMsConfigUploadFileStatus		INTEGER,
+			 flMsConfigUploadRemotePath		DisplayString,
+			 flMsConfigUploadProcessBegin   INTEGER,
+			 flMsConfigUploadProcessStatus  INTEGER
+		}
+
+
+      flMsConfigUploadIndex             OBJECT-TYPE
+ 	  	 SYNTAX    Integer32(1..7)
+         MAX-ACCESS     read-only
+	     STATUS    current
+		 DESCRIPTION
+		 "Configuration upload table's entry number" 
+  	  ::= { flMsConfigUploadEntry  1 }
+
+      flMsConfigUploadTftpServer                 OBJECT-TYPE
+ 	  	 SYNTAX    IpAddress
+         MAX-ACCESS     read-write
+	     STATUS    current
+		 DESCRIPTION
+		 "TFTP server IP address" 
+  	  ::= { flMsConfigUploadEntry  2 }
+
+	 flMsConfigUploadFileName				OBJECT-TYPE
+		 SYNTAX    DisplayString
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Configuration file name" 
+    ::= { flMsConfigUploadEntry  3 }
+
+	flMsConfigUploadFileStatus				OBJECT-TYPE
+		 SYNTAX    INTEGER	{
+								notLoaded		(1),
+								loaded			(2)
+							}
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Configuration upload status" 
+	 ::= { flMsConfigUploadEntry  4 }
+
+	 flMsConfigUploadRemotePath			OBJECT-TYPE
+		 SYNTAX    DisplayString
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Remote configuration file path" 
+    ::= { flMsConfigUploadEntry  5 }
+
+	flMsConfigUploadProcessBegin			OBJECT-TYPE
+		 SYNTAX    INTEGER	{
+								normal				(1),
+								uploadConfig		(2)
+							}
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Start configuration upload process" 
+	 ::= { flMsConfigUploadEntry  6 }
+
+	flMsConfigUploadProcessStatus			OBJECT-TYPE
+		 SYNTAX    INTEGER	{
+								uploadNotStarted			(1),
+								fileLoadInProcess			(2), 
+								fileLoadFailed				(3),
+								fileLoadComplete			(4),
+								configInProgress  	        (5),
+								configLoadedOk			    (6),
+								partiallyConfigured			(7),
+								configFailed				(8)
+							}
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Configuration upload process status" 
+	 ::= { flMsConfigUploadEntry  7 }
+
+
+-- ************************************************************
+-- Confirmation for Rebooting the system
+-- ************************************************************
+     flMsChassisConfirm        OBJECT-TYPE
+		 SYNTAX    DisplayString
+         MAX-ACCESS     read-write
+         STATUS    current
+         DESCRIPTION
+         "Confirmation for rebooting the system"
+	 ::= { flMsChassis 7 }
+
+-- ************************************************************
+-- Rebooting the system
+-- ************************************************************
+     flMsChassisRebootSystem        OBJECT-TYPE
+		 SYNTAX    INTEGER
+						{
+							normal   (1),
+							reboot   (2)
+						}
+         MAX-ACCESS     read-write
+         STATUS    current
+         DESCRIPTION
+         "Rebooting the system"
+	 ::= { flMsChassis 8 }
+
+
+
+END
+

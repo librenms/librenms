@@ -4917,5 +4917,50 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "entity-physical": {
+        "discovery": {
+            "entPhysical": [
+                {
+                    "entPhysicalIndex": 10,
+                    "entPhysicalDescr": "Chassis",
+                    "entPhysicalClass": "chassis",
+                    "entPhysicalName": "Chassis",
+                    "entPhysicalHardwareRev": "",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "false",
+                    "entPhysicalModelName": "Infra93",
+                    "entPhysicalVendorType": "",
+                    "entPhysicalSerialNum": "",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": 0,
+                    "entPhysicalMfgName": "TAIT",
+                    "ifIndex": null
+                },
+                {
+                    "entPhysicalIndex": 140,
+                    "entPhysicalDescr": "PMU",
+                    "entPhysicalClass": "module",
+                    "entPhysicalName": "PMU",
+                    "entPhysicalHardwareRev": null,
+                    "entPhysicalFirmwareRev": null,
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "true",
+                    "entPhysicalModelName": null,
+                    "entPhysicalVendorType": "",
+                    "entPhysicalSerialNum": null,
+                    "entPhysicalContainedIn": 10,
+                    "entPhysicalParentRelPos": 0,
+                    "entPhysicalMfgName": "TAIT",
+                    "ifIndex": null
+                }
+            ]
+        },
+        "poller": "matches discovery"
     }
 }
