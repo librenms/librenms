@@ -27,11 +27,11 @@ namespace App\Http\Controllers\Widgets;
 
 use App\Models\Application;
 use App\Models\Bill;
+use App\Models\Customoid;
 use App\Models\Device;
 use App\Models\MuninPlugin;
 use App\Models\Port;
 use App\Models\Service;
-use App\Models\Customoid;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -99,8 +99,8 @@ class GraphController extends WidgetController
         } elseif ($type == 'customoid') {
             if ($customoid = Customoid::find($settings['graph_customoid'])) {
                 return $customoid->device->displayName() . ' / ' . $type . ' / ' . $customoid->customoid_descr;
+            }
         }
-    }
 
         // fall back for types where we couldn't find the item
         if ($settings['graph_type']) {
@@ -203,7 +203,7 @@ class GraphController extends WidgetController
             if ($customoid = Customoid::find($settings['graph_customoid'])) {
                 $params[] = 'device=' . $customoid->device_id;
                 $params[] = 'id=' . $customoid->customoid_id;
-                $settings['graph_type'] = 'customoid_' . $customoid->customoid_descr ;
+                $settings['graph_type'] = 'customoid_' . $customoid->customoid_descr;
             }
         } elseif ($type == 'aggregate') {
             $aggregate_type = $this->getGraphType(false);
