@@ -1055,8 +1055,8 @@
                     "ifName": "sit0",
                     "portName": null,
                     "ifIndex": 2,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
@@ -1155,8 +1155,8 @@
                     "ifName": "dl2t0",
                     "portName": null,
                     "ifIndex": 3,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
@@ -1355,8 +1355,8 @@
                     "ifName": "wlan0",
                     "portName": null,
                     "ifIndex": 5,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -1455,8 +1455,8 @@
                     "ifName": "wlan1",
                     "portName": null,
                     "ifIndex": 6,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -1555,8 +1555,8 @@
                     "ifName": "brtrunk",
                     "portName": null,
                     "ifIndex": 7,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -1655,8 +1655,8 @@
                     "ifName": "wlan0vap1",
                     "portName": null,
                     "ifIndex": 8,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -1755,8 +1755,8 @@
                     "ifName": "wlan1vap1",
                     "portName": null,
                     "ifIndex": 9,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -1973,5 +1973,62 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "entity-physical": {
+        "discovery": {
+            "entPhysical": [
+                {
+                    "entPhysicalIndex": 1,
+                    "entPhysicalDescr": "WAP371 Wireless-AC/N Dual Radio Access Point with Single Point Setup",
+                    "entPhysicalClass": "chassis",
+                    "entPhysicalName": "WAP371-A-K9",
+                    "entPhysicalHardwareRev": "V03",
+                    "entPhysicalFirmwareRev": "1.3.0.4",
+                    "entPhysicalSoftwareRev": "1.3.0.4",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "true",
+                    "entPhysicalModelName": "WAP371-A-K9",
+                    "entPhysicalVendorType": "zeroDotZero",
+                    "entPhysicalSerialNum": "CCQ22111GBS",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": -1,
+                    "entPhysicalMfgName": "Cisco Systems, Inc",
+                    "ifIndex": null
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    },
+    "ports-stack": {
+        "discovery": {
+            "ports_stack": [
+                {
+                    "high_ifIndex": 4,
+                    "low_ifIndex": 7,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 5,
+                    "low_ifIndex": 7,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 6,
+                    "low_ifIndex": 7,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 8,
+                    "low_ifIndex": 7,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 9,
+                    "low_ifIndex": 7,
+                    "ifStackStatus": "active"
+                }
+            ]
+        }
     }
 }

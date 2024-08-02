@@ -546,7 +546,7 @@ class ModuleTestHelper
 
         // don't allow external DNS queries that could fail
         app()->bind(\LibreNMS\Util\AutonomousSystem::class, function ($app, $parameters) {
-            $asn = $parameters['asn'];
+            $asn = $parameters['asn'] ?? '?';
             $mock = \Mockery::mock(\LibreNMS\Util\AutonomousSystem::class);
             $mock->shouldReceive('name')->withAnyArgs()->zeroOrMoreTimes()->andReturnUsing(function () use ($asn) {
                 return "AS$asn-MOCK-TEXT";
@@ -560,17 +560,17 @@ class ModuleTestHelper
         }
 
         // Remove existing device in case it didn't get removed previously
-        if (($existing_device = device_by_name($snmpsim->getIp())) && isset($existing_device['device_id'])) {
+        if (($existing_device = device_by_name($snmpsim->ip)) && isset($existing_device['device_id'])) {
             delete_device($existing_device['device_id']);
         }
 
         // Add the test device
         try {
             $new_device = new Device([
-                'hostname' => $snmpsim->getIp(),
+                'hostname' => $snmpsim->ip,
                 'version' => 'v2c',
                 'community' => $this->file_name,
-                'port' => $snmpsim->getPort(),
+                'port' => $snmpsim->port,
                 'disabled' => 1, // disable to block normal pollers
             ]);
             (new ValidateDeviceAndCreate($new_device, true))->execute();
@@ -647,7 +647,7 @@ class ModuleTestHelper
         $data = array_merge_recursive($data, $this->dumpDb($device_id, $polled_modules, 'poller'));
 
         // Remove the test device, we don't need the debug from this
-        if ($device['hostname'] == $snmpsim->getIp()) {
+        if ($device['hostname'] == $snmpsim->ip) {
             Debug::set(false);
             delete_device($device_id);
         }
@@ -664,7 +664,7 @@ class ModuleTestHelper
                 if (empty($module_data['discovery']) && empty($module_data['poller'])) {
                     continue;
                 }
-                if ($module_data['discovery'] == $module_data['poller']) {
+                if (isset($module_data['discovery']) && isset($module_data['poller']) && $module_data['discovery'] == $module_data['poller']) {
                     $existing_data[$module] = [
                         'discovery' => $module_data['discovery'],
                         'poller' => 'matches discovery',

@@ -19,6 +19,10 @@ bgp-peers:
         - { left: bgpPeers.vrf_id, right: vrfs.vrf_id, select: [vrfs.bgpLocalAs as vrfLocalAs] }
     bgpPeers_cbgp:
         excluded_fields: [device_id]
+entity-physical:
+    entPhysical:
+        excluded_fields: [device_id, entPhysical_id]
+        order_by: entPhysicalIndex
 fdb-table:
     ports_fdb:
         excluded_fields: [device_id, ports_fdb_id, port_id, vlan_id, created_at, updated_at]
@@ -91,3 +95,10 @@ cisco-mac-accounting:
             - { left: mac_accounting.port_id, right: ports.port_id, select: [ifIndex] }
         custom_where: WHERE ports.device_id=?
         order_by: ports.ifIndex, mac
+discovery-protocols:
+    links:
+        joins: 
+            - { left: links.local_port_id, right: ports.port_id, select: [ports.ifAlias, ports.ifDescr, ports.ifName] }
+        custom_where: WHERE links.local_device_id=?
+        excluded_fields: [local_device_id, local_port_id, remote_port_id, remote_device_id, id]
+        order_by: ports.ifAlias,ports.ifDescr,ports.ifName,remote_hostname,remote_version,remote_port

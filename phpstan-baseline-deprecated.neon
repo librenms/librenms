@@ -3346,14 +3346,6 @@ parameters:
 
 		-
 			message: """
-				#^Call to deprecated function dbFetchRows\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 1
-			path: includes/html/pages/device/neighbours/list.inc.php
-
-		-
-			message: """
 				#^Call to deprecated function dbFetchRow\\(\\)\\:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
 			"""
@@ -4071,14 +4063,6 @@ parameters:
 			"""
 			count: 1
 			path: includes/html/print-graph-alerts.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function dbFetchRows\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 2
-			path: includes/html/print-interface-adsl.inc.php
 
 		-
 			message: """

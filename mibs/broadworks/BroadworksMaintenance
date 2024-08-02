@@ -1,0 +1,974 @@
+--===============================================================
+-- File Name : BroadworksMaintenance.mib
+-- Date      : 08/15/2002
+-- Author    : BroadSoft Inc.
+--===============================================================
+
+BroadworksMaintenance	DEFINITIONS ::= BEGIN
+	IMPORTS
+		DisplayString
+			FROM SNMPv2-TC
+		MODULE-COMPLIANCE, OBJECT-GROUP          
+			FROM SNMPv2-CONF
+		enterprises, MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-TYPE, Gauge32, Counter32, Integer32, Unsigned32
+			FROM SNMPv2-SMI;
+
+
+	
+	broadsoft	MODULE-IDENTITY
+		LAST-UPDATED	"200508161000Z"
+		ORGANIZATION	"Broadsoft, Inc"
+		CONTACT-INFO	"Broadsoft, Inc
+220 Perry Parkway
+Gaithersburg, MD  20877
+301-977-9440"
+		DESCRIPTION		
+				"This is the System Management Information structure for the
+				Broadsoft enterprise."
+		REVISION		"200606090930Z"
+		DESCRIPTION		
+				"Modified patching tables."				
+		REVISION		"200603231935Z"
+		DESCRIPTION		
+				"Added alarm thresholds."				
+		REVISION		"200508161000Z"
+		DESCRIPTION		
+				"Added MIB conformance section."
+		REVISION		"200009191431Z"
+		DESCRIPTION		
+				""
+		::=  {  enterprises  6431  }
+
+	broadworks	OBJECT IDENTIFIER
+		::=  {  broadsoft  1  }
+
+	common	OBJECT IDENTIFIER
+		::=  {  broadworks  1  }
+
+	managedObjects	OBJECT IDENTIFIER
+		::=  {  common  2  }
+
+	thresholds	OBJECT IDENTIFIER
+		::=  {  common  3  }
+
+	reservedModule	OBJECT IDENTIFIER
+		::=  {  common  10  }
+
+	bwMtcMibConformance	OBJECT IDENTIFIER
+		::=  {  common  20  }
+
+	moServerModule	OBJECT IDENTIFIER
+		::=  {  managedObjects  1  }
+
+	moSoftwareVersionModule	OBJECT IDENTIFIER
+		::=  {  managedObjects  2  }
+
+	moDeviceModule	OBJECT IDENTIFIER
+		::=  {  managedObjects  3  }
+		
+	thCounterModule	OBJECT IDENTIFIER
+		::=  {  thresholds  1  }
+
+	thGaugeModule	OBJECT IDENTIFIER
+		::=  {  thresholds  2  }
+		
+	thAlarmModule	OBJECT IDENTIFIER
+		::=  {  thresholds  3  }
+
+
+-- moServerModule modules  ...........................................
+
+	bwServerType	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"Gives the broadworks server type: { Application Server | Network Server | Media Server | Relay Server }"
+		::=  {  moServerModule  1  }
+
+	bwRedundancyType	OBJECT-TYPE	
+		SYNTAX			INTEGER { nonRedundant(0), primary(1), seconday(2) }
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"Gives the broadworks server redundancy type: { Primary | Secondary | NotRedundant }"
+		::=  {  moServerModule  2  }
+
+	bwActiveSoftwareVersion	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"Gives the version of the active software version. An operator can change the active software version by setting this field."
+		::=  {  moServerModule  3  }
+
+	bwAdminState	OBJECT-TYPE	
+		SYNTAX			INTEGER { lock(0), locking(1), unlock(2), shuttingDown(3), stopped(4), forceLock(5) }
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"Server admin state. 0- Lock, 1- Locking, 2- Unlock, 3- ShuttingDown, 4- Stopped, 5- Forced Lock"
+		::=  {  moServerModule  4  }
+
+	bwOperationalState	OBJECT-TYPE	
+		SYNTAX			INTEGER { enabled(0), disabled(1) }
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"Server operational state. 0- Enabled, 1- Disabled"
+		::=  {  moServerModule  5  }
+
+	bwResetServer	OBJECT-TYPE	
+		SYNTAX			INTEGER { set(0), reset(1), hardReset(2), revertReset(3), hardRevertReset(4) }
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"Remotely reset the BroadWorks server. The reset action kicks in when the counter is set to 1."
+		::=  {  moServerModule  6  }
+
+
+	bwSubComponentTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  BwSubComponentEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	
+			"This table exposes some key BroadWorks server sub components. It may or may not be empty depending on the server"
+		::=  {  moServerModule  7 }
+
+	bwTargetSoftwareVersion	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"Gives the target software version. If the server is reset, the active server software version will be updated."
+		::=  {  moServerModule  8  }
+
+	bwRevertBackupLocation OBJECT-TYPE
+		SYNTAX  DisplayString
+		MAX-ACCESS read-write
+		STATUS  current
+		DESCRIPTION
+				"Gives the location of the backup file to use if using the revert option of the reset command."
+		::= { moServerModule 9 }
+
+-- sub components table  ...........................................
+
+	bwSubComponentEntry	OBJECT-TYPE
+		SYNTAX		BwSubComponentEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	
+			"This row contains information about a software component in the system"
+		INDEX		{  bwSubComponentIndex  }
+		::=  { bwSubComponentTable 1 }
+
+	BwSubComponentEntry  ::=  SEQUENCE {
+		bwSubComponentIndex Unsigned32,
+		bwSubComponentName  DisplayString,
+		bwSubComponentInfo  DisplayString
+		}
+
+	bwSubComponentIndex	OBJECT-TYPE	
+		SYNTAX			Unsigned32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This integer represents the a software component index in the system"
+		::=  {  bwSubComponentEntry  1  }
+		
+	bwSubComponentName	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"The name of an exposed subcomponent"
+		::=  {  bwSubComponentEntry  2  }
+		
+	bwSubComponentInfo	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"Displays status information about the component"
+		::=  {  bwSubComponentEntry  3  }
+		
+
+-- moSoftwareVersionModule modules  ...........................................
+
+	bwUpdateSoftwareVersionTable OBJECT-TYPE
+		SYNTAX			INTEGER { idle(0), reload(1) }
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This counter is used to reload the installed software table. To do so, just set this register to 1 (reload)"
+		::=  {  moSoftwareVersionModule  1  }
+
+	bwSoftwareVersionTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  BwSoftwareVersionEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	
+			"This table has an entry per software version installed on the server"
+		::=  { moSoftwareVersionModule  2 }
+		
+	bwSoftwarePatchTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  BwSoftwarePatchEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	
+			"This table has an entry per service packs installed for each sofware versions"
+		::=  { moSoftwareVersionModule  3 }
+		
+	bwSoftwareThirdPartyTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  BwSoftwareThirdPartyEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	
+			"This table has an entry for third party software version used by the BroadWorks server"
+		::=  { moSoftwareVersionModule  4 }
+		
+	bwSoftwarePatchHistoryTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  BwSoftwarePatchHistoryEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	
+			"This table contains information about all operation performed on patches."
+		::=  { moSoftwareVersionModule  5 }
+		
+	bwSoftwarePatchImpactedFileTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  BwSoftwarePatchImpactedFileEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	
+			"This table contains information about files modified by the patches applied on the system."
+		::=  { moSoftwareVersionModule  6 }
+		
+-- Installed software versions table  ...........................................
+
+	bwSoftwareVersionEntry	OBJECT-TYPE
+		SYNTAX		BwSoftwareVersionEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	
+			"This row contains information on a particular braodworks software version installed on the server"
+		INDEX		{  bwSoftwareVersionIndex  }
+		::=  { bwSoftwareVersionTable 1 }
+
+	BwSoftwareVersionEntry  ::=  SEQUENCE {
+		bwSoftwareVersionIndex Unsigned32,
+		bwSoftwareVersionName  DisplayString,
+		bwSoftwareVersionInstallDate DisplayString,
+		bwSoftwareVersionStatus  INTEGER
+		}
+
+	bwSoftwareVersionIndex	OBJECT-TYPE	
+		SYNTAX			Unsigned32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This integer represents the a group index in the system"
+		::=  {  bwSoftwareVersionEntry  1  }
+		
+	bwSoftwareVersionName	OBJECT-TYPE	
+		SYNTAX			DisplayString 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"The name of a software load installed on the server."
+		::=  {  bwSoftwareVersionEntry  2  }
+
+	bwSoftwareVersionInstallDate	OBJECT-TYPE	
+		SYNTAX			DisplayString 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"Installation date for this software version."
+		::=  {  bwSoftwareVersionEntry  3  }
+
+	bwSoftwareVersionStatus	OBJECT-TYPE	
+		SYNTAX			INTEGER { installed(0), active(1) }
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"The status of a software version."
+		::=  {  bwSoftwareVersionEntry  4  }
+
+
+-- Patches table  ...........................................
+
+	bwSoftwarePatchEntry	OBJECT-TYPE
+		SYNTAX		BwSoftwarePatchEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	
+			"This row contains information on a particular braodworks patch installed on the server"
+		INDEX		{  bwSoftwarePatchIndex  }
+		::=  { bwSoftwarePatchTable 1 }
+
+	BwSoftwarePatchEntry  ::=  SEQUENCE {
+		bwSoftwarePatchIndex Unsigned32,
+		bwSoftwarePatchName  DisplayString,
+		bwSoftwarePatchInstallDate  DisplayString,
+		bwSoftwarePatchState  INTEGER,
+		bwSoftwarePatchBundle  DisplayString
+		}
+
+	bwSoftwarePatchIndex	OBJECT-TYPE	
+		SYNTAX			Unsigned32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This integer an index of a patch installed in the system"
+		::=  {  bwSoftwarePatchEntry  1  }
+		
+	bwSoftwarePatchVersionName	OBJECT-TYPE	
+		SYNTAX			DisplayString 
+		MAX-ACCESS		read-only
+		STATUS			obsolete
+		DESCRIPTION		
+				"The name of a software load for which this patch applies.
+This field was obsoleted in BroadWorks release 14.0."
+		::=  {  bwSoftwarePatchEntry  2  }
+
+	bwSoftwarePatchName	OBJECT-TYPE	
+		SYNTAX			DisplayString 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"Patch name."
+		::=  {  bwSoftwarePatchEntry  3  }
+
+	bwSoftwarePatchType	OBJECT-TYPE	
+		SYNTAX			DisplayString 
+		MAX-ACCESS		read-only
+		STATUS			obsolete
+		DESCRIPTION		
+				"Patch type.
+This field was obsoleted in BroadWorks release 14.0."
+		::=  {  bwSoftwarePatchEntry  4  }
+
+	bwSoftwarePatchInstallDate	OBJECT-TYPE	
+		SYNTAX			DisplayString 
+		MAX-ACCESS		read-only
+		STATUS			obsolete
+		DESCRIPTION		
+				"This field was obsoleted in BroadWorks release 14.0."
+		::=  {  bwSoftwarePatchEntry  5  }
+
+	bwSoftwarePatchState	OBJECT-TYPE	
+		SYNTAX			INTEGER { installed(0), active(1), installedPendingActive(2), activePendingInstalled(3), deleted(4), installedMissingDependencies(5) }
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"The state of the patch."
+		::=  {  bwSoftwarePatchEntry  6  }
+
+	bwSoftwarePatchOperation	OBJECT-TYPE	
+		SYNTAX			INTEGER { none(0), apply(1), remove(2), delete(3) }
+		MAX-ACCESS		read-write
+		STATUS			obsolete
+		DESCRIPTION		
+				"This field was obsoleted in BroadWorks release 14.0."
+		::=  {  bwSoftwarePatchEntry  7  }
+
+	bwSoftwarePatchBundle		OBJECT-TYPE	
+		SYNTAX			DisplayString 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"Patch Bundle name of the patch."
+		::=  {  bwSoftwarePatchEntry  8  }
+
+-- Installed 3rd party software versions table  ...........................................
+
+	bwSoftwareThirdPartyEntry	OBJECT-TYPE
+		SYNTAX		BwSoftwareThirdPartyEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	
+			"This row contains information on an installed 3rd party software version"
+		INDEX		{  bwSoftwareThirdPartyIndex  }
+		::=  { bwSoftwareThirdPartyTable 1 }
+
+	BwSoftwareThirdPartyEntry  ::=  SEQUENCE {
+		bwSoftwareThirdPartyIndex Unsigned32,
+		bwSoftwareThirdPartyName  DisplayString,
+		bwSoftwareThirdPartyVersion  DisplayString,
+		bwSoftwareThirdPartyStatus  INTEGER
+		}
+
+	bwSoftwareThirdPartyIndex	OBJECT-TYPE	
+		SYNTAX			Unsigned32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This integer represents the a group index in the system"
+		::=  {  bwSoftwareThirdPartyEntry  1  }
+		
+	bwSoftwareThirdPartyName	OBJECT-TYPE	
+		SYNTAX			DisplayString 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"The name of a software load for which this service pack applies"
+		::=  {  bwSoftwareThirdPartyEntry  2  }
+
+	bwSoftwareThirdPartyVersion	OBJECT-TYPE	
+		SYNTAX			DisplayString 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"A 3rd party software version id"
+		::=  {  bwSoftwareThirdPartyEntry  3  }
+
+	bwSoftwareThirdPartyStatus	OBJECT-TYPE	
+		SYNTAX			INTEGER { installed(0), active(1) }
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"The status of a 3rd party software version."
+		::=  {  bwSoftwareThirdPartyEntry  4  }
+
+
+-- Patches History table  ...........................................
+
+	bwSoftwarePatchHistoryEntry	OBJECT-TYPE
+		SYNTAX		BwSoftwarePatchHistoryEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	
+			"Entry of the patch history table containing history of operations applied to patches."
+		INDEX		{  bwSoftwarePatchIndex  }
+		::=  { bwSoftwarePatchHistoryTable 1 }
+
+	BwSoftwarePatchHistoryEntry  ::=  SEQUENCE {
+		bwSoftwarePatchHistoryIndex Unsigned32,
+		bwSoftwarePatchHistPatchName  DisplayString,
+		bwSoftwarePatchHistTimeStamp  DisplayString,
+		bwSoftwarePatchHistNewState INTEGER
+		}
+
+	bwSoftwarePatchHistoryIndex	OBJECT-TYPE	
+		SYNTAX			Unsigned32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This integer an index of a patch operation history."
+		::=  {  bwSoftwarePatchHistoryEntry  1  }
+		
+	bwSoftwarePatchHistPatchName	OBJECT-TYPE	
+		SYNTAX			DisplayString 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"The name of the patch against which the operation was applied."
+		::=  {  bwSoftwarePatchHistoryEntry  2  }
+
+	bwSoftwarePatchHistTimeStamp	OBJECT-TYPE	
+		SYNTAX			DisplayString 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"The time stamp of the patch operation."
+		::=  {  bwSoftwarePatchHistoryEntry  3  }
+
+	bwSoftwarePatchHistNewState	OBJECT-TYPE	
+		SYNTAX			INTEGER { installed(0), active(1), installedPendingActive(2), activePendingInstalled(3), deleted(4), installedMissingDependencies(5) }
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"The new state of the patch."
+		::=  {  bwSoftwarePatchHistoryEntry  4  }
+
+-- Patches Impacted Files table  ...........................................
+
+	bwSoftwarePatchImpactedFileEntry	OBJECT-TYPE
+		SYNTAX		BwSoftwarePatchImpactedFileEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	
+			"Entry of the patch impacted file table containing information about files modified by patches."
+		INDEX		{  bwSoftwarePatchIndex  }
+		::=  { bwSoftwarePatchImpactedFileTable 1 }
+
+	BwSoftwarePatchImpactedFileEntry  ::=  SEQUENCE {
+		bwSoftwarePatchImpactedFileIndex Unsigned32,
+		bwSoftwarePatchImpactedFilePatchName  DisplayString,
+		bwSoftwarePatchImpactedFileFileName  DisplayString
+		}
+
+	bwSoftwarePatchImpactedFileIndex	OBJECT-TYPE	
+		SYNTAX			Unsigned32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This integer an index of an impacted file/patch name."
+		::=  {  bwSoftwarePatchImpactedFileEntry  1  }
+		
+	bwSoftwarePatchImpactedFilePatchName	OBJECT-TYPE	
+		SYNTAX			DisplayString 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"The name of the patch."
+		::=  {  bwSoftwarePatchImpactedFileEntry  2  }
+
+	bwSoftwarePatchImpactedFileFileName	OBJECT-TYPE	
+		SYNTAX			DisplayString 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"The name of an impacted file."
+		::=  {  bwSoftwarePatchImpactedFileEntry  3  }
+
+-- moDeviceModule modules  ...........................................
+
+	bwManagedObjectsTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  BwManagedObjectsEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	
+			"Table of all sub-managed objects under BroadWorks control"
+		::=  { moDeviceModule  1 }
+
+	bwManagedObjectsEntry	OBJECT-TYPE
+		SYNTAX		BwManagedObjectsEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	
+			"This row contains information on a particular sub-managed object"
+		INDEX		{  bwManagedObjectsIndex  }
+		::=  { bwManagedObjectsTable 1 }
+
+	BwManagedObjectsEntry  ::=  SEQUENCE {
+		bwManagedObjectsIndex Unsigned32,
+		bwManagedObjectsName  DisplayString,
+		bwManagedObjectsProtocol  DisplayString,
+		bwManagedObjectsType  DisplayString,
+		bwManagedObjectsAdminState INTEGER,
+		bwManagedObjectsOperationalState INTEGER
+		}
+
+	bwManagedObjectsIndex	OBJECT-TYPE	
+		SYNTAX			Unsigned32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This integer represents the a managed object index in the system"
+		::=  {  bwManagedObjectsEntry  1  }
+		
+	bwManagedObjectsName	OBJECT-TYPE	
+		SYNTAX			DisplayString 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"The name of a managed object controlled by BroadWorks"
+		::=  {  bwManagedObjectsEntry  2  }
+
+	bwManagedObjectsProtocol	OBJECT-TYPE	
+		SYNTAX			DisplayString 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"The protocol supported by a managed object controlled by BroadWorks"
+		::=  {  bwManagedObjectsEntry  3  }
+
+	bwManagedObjectsType	OBJECT-TYPE	
+		SYNTAX			DisplayString 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"The type of a managed object controlled by BroadWorks"
+		::=  {  bwManagedObjectsEntry  4  }
+
+	bwManagedObjectsAdminState	OBJECT-TYPE	
+		SYNTAX			INTEGER { lock(0), locking(1), unlock(2) }
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"The administrative state of a managed object controlled by BroadWorks. 0- Lock, 1- locking, 2- Unlock"
+		::=  {  bwManagedObjectsEntry  5  }
+
+	bwManagedObjectsOperationalState	OBJECT-TYPE	
+		SYNTAX			INTEGER { enabled(0), disabled(1) }
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"The operational state of a managed object controlled by BroadWorks. 0- Enabled, 1- Disabled"
+		::=  {  bwManagedObjectsEntry  6  }
+
+
+-- Counter thresholds modules  ...........................................
+
+	bwCounterThresholdTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  BwCounterThresholdEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	
+			"Table of all the thresholds set against counters in the system"
+		::=  { thCounterModule  1 }
+
+	bwCounterThresholdEntry	OBJECT-TYPE
+		SYNTAX		BwCounterThresholdEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	
+			"This row contains information on a particular counter threshold"
+		INDEX		{  bwCounterThresholdIndex  }
+		::=  { bwCounterThresholdTable 1 }
+
+	BwCounterThresholdEntry  ::=  SEQUENCE {
+		bwCounterThresholdIndex Unsigned32,
+		bwCounterThresholdDescription DisplayString,
+		bwCounterThresholdName  DisplayString,
+		bwCounterThresholdInitialValue Integer32,
+		bwCounterThresholdOffsetValue Integer32,
+		bwCounterThresholdCurrentValue Gauge32,
+		bwCounterThresholdSeverity INTEGER,
+		bwCounterThresholdControl INTEGER
+		}
+
+	bwCounterThresholdIndex	OBJECT-TYPE	
+		SYNTAX			Unsigned32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This integer represents the index of a counter threshold in the system"
+		::=  {  bwCounterThresholdEntry  1  }
+		
+	bwCounterThresholdDescription	OBJECT-TYPE	
+		SYNTAX			DisplayString 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"A description for this threshold."
+		::=  {  bwCounterThresholdEntry  2  }
+
+	bwCounterThresholdName	OBJECT-TYPE	
+		SYNTAX			DisplayString 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"The name of a counter."
+		::=  {  bwCounterThresholdEntry  3  }
+
+	bwCounterThresholdInitialValue	OBJECT-TYPE	
+		SYNTAX			Integer32 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"The initial counter threshold value"
+		::=  {  bwCounterThresholdEntry  4  }
+
+	bwCounterThresholdOffsetValue	OBJECT-TYPE	
+		SYNTAX			Integer32 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"The offset to be added to the current threshold value once an alarm has been sent"
+		::=  {  bwCounterThresholdEntry  5  }
+
+	bwCounterThresholdCurrentValue	OBJECT-TYPE	
+		SYNTAX			Gauge32 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"The threshold value at which the next alarm will be generated"
+		::=  {  bwCounterThresholdEntry  6  }
+
+	bwCounterThresholdSeverity	OBJECT-TYPE	
+		SYNTAX			INTEGER  {
+					informational ( 0 ) ,
+					low ( 1 ) ,
+					medium ( 2 ) ,
+					high ( 3 ) ,
+					critical ( 4 ) } 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"The severity of the alarm to be sent"
+		::=  {  bwCounterThresholdEntry  7  }
+
+	bwCounterThresholdControl	OBJECT-TYPE	
+		SYNTAX			INTEGER { inactive(0), active(1), delete(2), create(3), invalid(4) }
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This scalar controls the life cycle of the threshold. Setting this counter to create(3) using an unused index creates a row with the specified index. Setting it with an already used index has no effect. Setting this counter to delete(2) removes the entry."
+		::=  {  bwCounterThresholdEntry  8  }
+
+-- Gauge thresholds modules  ...........................................
+
+	bwGaugeThresholdTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  BwGaugeThresholdEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	
+			"Table of all the thresholds set against gauges in the system"
+		::=  { thGaugeModule  1 }
+
+	bwGaugeThresholdEntry	OBJECT-TYPE
+		SYNTAX		BwGaugeThresholdEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	
+			"This row contains information on a particular gauge threshold"
+		INDEX		{  bwGaugeThresholdIndex  }
+		::=  { bwGaugeThresholdTable 1 }
+
+	BwGaugeThresholdEntry  ::=  SEQUENCE {
+		bwGaugeThresholdIndex Unsigned32,
+		bwGaugeThresholdDescription DisplayString,
+		bwGaugeThresholdName  DisplayString,
+		bwGaugeThresholdNotifyLow Integer32,
+		bwGaugeThresholdNotifyHigh Integer32,
+		bwGaugeThresholdSeverity INTEGER,
+		bwGaugeThresholdControl INTEGER
+		}
+
+	bwGaugeThresholdIndex	OBJECT-TYPE	
+		SYNTAX			Unsigned32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This integer represents the index of a gauge threshold in the system"
+		::=  {  bwGaugeThresholdEntry  1  }
+		
+	bwGaugeThresholdDescription	OBJECT-TYPE	
+		SYNTAX			DisplayString 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"A description for this threshold."
+		::=  {  bwGaugeThresholdEntry  2  }
+
+	bwGaugeThresholdName	OBJECT-TYPE	
+		SYNTAX			DisplayString 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"The name of a gauge."
+		::=  {  bwGaugeThresholdEntry  3  }
+
+	bwGaugeThresholdNotifyLow	OBJECT-TYPE	
+		SYNTAX			Integer32 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"The gauge value at which an alarm will be generated when the gauge value reaches or crosses the NotifyHigh level in a rising direction.  Subsequent similar crossings of the NotifyHigh level will not generate an alarm until the gauge has reached or crossed the corresponding NotifyLow level."
+		::=  {  bwGaugeThresholdEntry  4  }
+
+	bwGaugeThresholdNotifyHigh	OBJECT-TYPE	
+		SYNTAX			Integer32 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"The gauge value at which an alarm will be generated when the gauge value reaches or crosses the NotifyLow level in a falling direction.  Subsequent similar crossings of the NotifyLow level will not generate an alarm until the gauge has reached or crossed the corresponding NotifyHigh level."
+		::=  {  bwGaugeThresholdEntry  5  }
+
+	bwGaugeThresholdSeverity	OBJECT-TYPE	
+		SYNTAX			INTEGER  {
+					informational ( 0 ) ,
+					low ( 1 ) ,
+					medium ( 2 ) ,
+					high ( 3 ) ,
+					critical ( 4 ) } 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"The severity of the alarm to be sent"
+		::=  {  bwGaugeThresholdEntry  6  }
+
+	bwGaugeThresholdControl	OBJECT-TYPE	
+		SYNTAX			INTEGER { inactive(0), active(1), delete(2), create(3), invalid(4) }
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This scalar controls the life cycle of the threshold. Setting this gauge to delete(2) removes the entry."
+		::=  {  bwGaugeThresholdEntry  7  }
+
+-- Alarm thresholds modules  ...........................................
+
+	bwAlarmThresholdTable		OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  BwAlarmThresholdEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	
+			"Table of all the thresholds set against alarms in the system"
+		::=  { thAlarmModule  1 }
+
+	bwAlarmThresholdEntry		OBJECT-TYPE
+		SYNTAX		BwAlarmThresholdEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	
+			"This row contains information on a particular alarm threshold"
+		INDEX		{  bwAlarmThresholdIndex  }
+		::=  { bwAlarmThresholdTable 1 }
+
+	BwAlarmThresholdEntry  ::=  SEQUENCE {
+		bwAlarmThresholdIndex Unsigned32,
+		bwAlarmThresholdName  DisplayString,
+		bwAlarmThresholdMaxNumTrapsPerTimePeriod Integer32,
+		bwAlarmThresholdTimePeriodInSeconds Integer32,
+		bwAlarmThresholdProblemTextVarNum1 Integer32,
+		bwAlarmThresholdProblemTextVarNum2 Integer32,
+		bwAlarmThresholdProblemTextVarNum3 Integer32,
+		bwAlarmThresholdProblemTextVarNum4 Integer32,
+		bwAlarmThresholdProblemTextVarNum5 Integer32,
+		bwAlarmThresholdMinimumSeverity INTEGER,
+		bwAlarmThresholdControl INTEGER
+		}
+
+	bwAlarmThresholdIndex		OBJECT-TYPE	
+		SYNTAX			Unsigned32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This integer represents the index of an alarm threshold in the system"
+		::=  {  bwAlarmThresholdEntry  1  }
+
+	bwAlarmThresholdName		OBJECT-TYPE	
+		SYNTAX			DisplayString 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"The name of an alarm or DEFAULT if the threshold applies to all alarms in the system"
+		::=  {  bwAlarmThresholdEntry  2  }
+
+	bwAlarmThresholdMaxNumTrapsPerTimePeriod	OBJECT-TYPE	
+		SYNTAX			Integer32 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"The maximum number of traps that the system outputs per sliding time period. If set to 0 (zero), the alarm is suppressed and the system does not output any trap for this alarm filter."
+		::=  {  bwAlarmThresholdEntry  3  }
+
+	bwAlarmThresholdTimePeriodInSeconds	OBJECT-TYPE	
+		SYNTAX			Integer32 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"The time period used for threshold calculation, in seconds."
+		::=  {  bwAlarmThresholdEntry  4  }
+
+	bwAlarmThresholdProblemTextVarNum1	OBJECT-TYPE	
+		SYNTAX			Integer32 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"To further refine a threshold, specify the position number of the variable data within the alarm problem text (1, 2, 3, etc.) that together with the alarm name, define the actual threshold. For example, if the alarm has five problem text variables: 1-deviceName, 2-deviceAddress, 3-devicePort, 4-errorType, 5-errorCode, and if the alarm threshold is to limit the number of traps for a given deviceName, devicePort, and errorType, then bwAlarmThresholdProblemTextVarNum1 should be set to 1, bwAlarmThresholdProblemTextVarNum2 should be set to 3, and bwAlarmThresholdProblemTextVarNum3 should be set to 4. To ignore filtering based on problem text variables, set to 0 (zero)."
+		::=  {  bwAlarmThresholdEntry  5  }
+
+	bwAlarmThresholdProblemTextVarNum2	OBJECT-TYPE	
+		SYNTAX			Integer32 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"To further refine a threshold, specify the position number of the variable data within the alarm problem text (1, 2, 3, etc.) that together with the alarm name, define the actual threshold. For example, if the alarm has five problem text variables: 1-deviceName, 2-deviceAddress, 3-devicePort, 4-errorType, 5-errorCode, and if the alarm threshold is to limit the number of traps for a given deviceName, devicePort, and errorType, then bwAlarmThresholdProblemTextVarNum1 should be set to 1, bwAlarmThresholdProblemTextVarNum2 should be set to 3, and bwAlarmThresholdProblemTextVarNum3 should be set to 4. To ignore filtering based on problem text variables, set to 0 (zero)."
+		::=  {  bwAlarmThresholdEntry  6  }
+
+	bwAlarmThresholdProblemTextVarNum3	OBJECT-TYPE	
+		SYNTAX			Integer32 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"To further refine a threshold, specify the position number of the variable data within the alarm problem text (1, 2, 3, etc.) that together with the alarm name, define the actual threshold. For example, if the alarm has five problem text variables: 1-deviceName, 2-deviceAddress, 3-devicePort, 4-errorType, 5-errorCode, and if the alarm threshold is to limit the number of traps for a given deviceName, devicePort, and errorType, then bwAlarmThresholdProblemTextVarNum1 should be set to 1, bwAlarmThresholdProblemTextVarNum2 should be set to 3, and bwAlarmThresholdProblemTextVarNum3 should be set to 4. To ignore filtering based on problem text variables, set to 0 (zero)."
+		::=  {  bwAlarmThresholdEntry  7  }
+
+	bwAlarmThresholdProblemTextVarNum4	OBJECT-TYPE	
+		SYNTAX			Integer32 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"To further refine a threshold, specify the position number of the variable data within the alarm problem text (1, 2, 3, etc.) that together with the alarm name, define the actual threshold. For example, if the alarm has five problem text variables: 1-deviceName, 2-deviceAddress, 3-devicePort, 4-errorType, 5-errorCode, and if the alarm threshold is to limit the number of traps for a given deviceName, devicePort, and errorType, then bwAlarmThresholdProblemTextVarNum1 should be set to 1, bwAlarmThresholdProblemTextVarNum2 should be set to 3, and bwAlarmThresholdProblemTextVarNum3 should be set to 4. To ignore filtering based on problem text variables, set to 0 (zero)."
+		::=  {  bwAlarmThresholdEntry  8  }
+
+	bwAlarmThresholdProblemTextVarNum5	OBJECT-TYPE	
+		SYNTAX			Integer32 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"To further refine a threshold, specify the position number of the variable data within the alarm problem text (1, 2, 3, etc.) that together with the alarm name, define the actual threshold. For example, if the alarm has five problem text variables: 1-deviceName, 2-deviceAddress, 3-devicePort, 4-errorType, 5-errorCode, and if the alarm threshold is to limit the number of traps for a given deviceName, devicePort, and errorType, then bwAlarmThresholdProblemTextVarNum1 should be set to 1, bwAlarmThresholdProblemTextVarNum2 should be set to 3, and bwAlarmThresholdProblemTextVarNum3 should be set to 4. To ignore filtering based on problem text variables, set to 0 (zero)."
+		::=  {  bwAlarmThresholdEntry  9  }
+
+	bwAlarmThresholdMinimumSeverity	OBJECT-TYPE	
+		SYNTAX			INTEGER { informational ( 0 ) , low ( 1 ) , medium ( 2 ) , high ( 3 ) , critical ( 4 ) }
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This is the minimum alarm severity under which alarms start to be discarded."
+		::=  {  bwAlarmThresholdEntry  10  }
+
+	bwAlarmThresholdControl	OBJECT-TYPE	
+		SYNTAX			INTEGER { inactive(0), active(1), delete(2), create(3), invalid(4) }
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+				"This scalar controls the life cycle of the threshold. Setting this threshold to create(3) using an unused index creates a row with the specified index. Setting it with an already used index has no effect. Setting this threshold to delete(2) removes the entry."
+		::=  {  bwAlarmThresholdEntry  11  }
+
+
+-- reserved modules  ...........................................
+
+	bwReservedScalar OBJECT-TYPE
+		SYNTAX			INTEGER { notUsed ( 0 ) }
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+				"This is a reserved counter"
+		::=  {  reservedModule  1  }
+
+-- BroadWorks Common managed object MIB Conformance Definition  ...........................................
+
+bwMtcMibGroups		OBJECT IDENTIFIER ::= { bwMtcMibConformance 1 }
+bwMtcMibCompliancy	OBJECT IDENTIFIER ::= { bwMtcMibConformance 2 }
+
+-- units of conformance
+
+bwMoServerGroup    OBJECT-GROUP
+    OBJECTS { bwServerType, bwRedundancyType, bwActiveSoftwareVersion, bwAdminState, bwOperationalState, bwResetServer, bwSubComponentTable, bwTargetSoftwareVersion, bwSubComponentIndex, bwSubComponentName, bwSubComponentInfo }
+    STATUS  current
+    DESCRIPTION
+       "This group defines managed object server attributes."
+    ::= { bwMtcMibGroups 1 }
+
+bwMoSoftwareVersionsGroup    OBJECT-GROUP
+    OBJECTS { bwUpdateSoftwareVersionTable, bwSoftwareVersionTable, bwSoftwarePatchTable, bwSoftwareThirdPartyTable, bwSoftwareVersionIndex, bwSoftwareVersionName, bwSoftwareVersionInstallDate, bwSoftwareVersionStatus, bwSoftwarePatchIndex, bwSoftwarePatchName, bwSoftwarePatchInstallDate, bwSoftwarePatchState, bwSoftwarePatchBundle, bwSoftwareThirdPartyIndex, bwSoftwareThirdPartyName, bwSoftwareThirdPartyVersion, bwSoftwareThirdPartyStatus, bwSoftwarePatchHistoryTable, bwSoftwarePatchHistoryIndex, bwSoftwarePatchHistPatchName,bwSoftwarePatchHistTimeStamp, bwSoftwarePatchHistNewState, bwSoftwarePatchImpactedFileTable, bwSoftwarePatchImpactedFileIndex, bwSoftwarePatchImpactedFilePatchName, bwSoftwarePatchImpactedFileFileName }
+    STATUS  current
+    DESCRIPTION
+       "This group defines the software version attributes for the managed object."
+    ::= { bwMtcMibGroups 2 }
+
+bwMoDeviceGroup    OBJECT-GROUP
+    OBJECTS { bwManagedObjectsTable, bwManagedObjectsIndex, bwManagedObjectsName, bwManagedObjectsProtocol, bwManagedObjectsType, bwManagedObjectsAdminState, bwManagedObjectsOperationalState }
+    STATUS  current
+    DESCRIPTION
+       "This group defines the counters used to manage the access or network devices monitored by this managed object."
+    ::= { bwMtcMibGroups 3 }
+
+bwMoThresholdsGroup    OBJECT-GROUP
+    OBJECTS { bwCounterThresholdTable, bwCounterThresholdIndex, bwCounterThresholdDescription, bwCounterThresholdName, bwCounterThresholdInitialValue, bwCounterThresholdOffsetValue, bwCounterThresholdCurrentValue, bwCounterThresholdSeverity, bwCounterThresholdControl, bwGaugeThresholdTable, bwGaugeThresholdIndex, bwGaugeThresholdDescription, bwGaugeThresholdName, bwGaugeThresholdNotifyLow, bwGaugeThresholdNotifyHigh, bwGaugeThresholdSeverity, bwGaugeThresholdControl, bwAlarmThresholdTable, bwAlarmThresholdIndex, bwAlarmThresholdName, bwAlarmThresholdMaxNumTrapsPerTimePeriod, bwAlarmThresholdTimePeriodInSeconds, bwAlarmThresholdProblemTextVarNum1, bwAlarmThresholdProblemTextVarNum2, bwAlarmThresholdProblemTextVarNum3, bwAlarmThresholdProblemTextVarNum4, bwAlarmThresholdProblemTextVarNum5, bwAlarmThresholdMinimumSeverity, bwAlarmThresholdControl }
+    STATUS  current
+    DESCRIPTION
+       "This group defines the threshold control for this managed object."
+    ::= { bwMtcMibGroups 4 }
+
+bwMoReserveGroup    OBJECT-GROUP
+    OBJECTS { bwReservedScalar }
+    STATUS  current
+    DESCRIPTION
+       "MIB reserved section."
+    ::= { bwMtcMibGroups 10 }
+
+-- 
+bwMoBasicCompliance MODULE-COMPLIANCE
+	STATUS current
+     	DESCRIPTION
+		"BroadWorks Common managed object MIB compliance"
+	MODULE -- this module
+		MANDATORY-GROUPS { bwMoServerGroup, bwMoSoftwareVersionsGroup, bwMoDeviceGroup, bwMoThresholdsGroup, bwMoReserveGroup }
+	::= { bwMtcMibCompliancy 1 }
+
+END
+
