@@ -1,0 +1,675 @@
+-- *****************************************************************
+-- NMS-EPON-OLT-PON.MIB:  NMS OLT-COMM MIB file
+-- AUG 2009
+-- *****************************************************************
+--
+
+               NMS-EPON-OLT-PON DEFINITIONS ::= BEGIN
+
+               IMPORTS
+                    Counter, IpAddress, Counter
+			FROM RFC1155-SMI
+		    OBJECT-TYPE
+			FROM RFC-1212
+                    DisplayString, PhysAddress,ifDescr
+			FROM RFC1213-MIB
+		    nmsEPONGroup
+			FROM NMS-SMI
+		    opIfTxPowerCurr,opIfTemperature,opIfVolt,opIfCurrent
+		        FROM NMS-OPTICAL-PORT-MIB
+		    RowStatus
+		    	FROM SNMPv2-TC;
+		    
+          
+               nmsEponOltPon         OBJECT IDENTIFIER ::= { nmsEPONGroup 6 }
+
+               nmseponoltponTable OBJECT-TYPE
+                   SYNTAX  SEQUENCE OF NMSEponOltPonEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A list of epon olt pon property table entries."
+                   ::= { nmsEponOltPon 1 }
+
+               nmsEponOltPonEntry OBJECT-TYPE
+                   SYNTAX NMSEponOltPonEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A collection of additional objects in the
+                            epon olt pon property table."
+                   INDEX { ponIfIndex }
+               ::= { nmseponoltponTable 1 }
+
+               NMSEponOltPonEntry ::=
+                   SEQUENCE {
+                       ponIfIndex
+                           INTEGER,
+                       llidSequenceNo
+                           INTEGER,
+                       onuAuthMethod
+                           INTEGER,
+                       isCheckOnuMac
+                           INTEGER,
+                       isPONBelongtoPSG
+                           INTEGER,
+                       pONBelongtoPSGID
+                           INTEGER,
+                       isUsingMpcpRegisteAckDelayTime
+                           INTEGER,
+                       mpcpRegisteAckDelayTime
+                           INTEGER,
+                       ponIfAdminStatus
+                           INTEGER,
+                       ponIfInFecStatus
+                           INTEGER,
+                       ponIfOutFecStatus
+                           INTEGER,
+                       ponIfLaserStatus
+                           INTEGER,
+                       isOnuDataSwitch
+                           INTEGER,
+                       ponIfProtectedStatus
+                           INTEGER,
+                       ponIfDynamicMacLearningStatus
+                           INTEGER,
+                       ponIfMacACL
+                           DisplayString,
+                       ponIfIpACL
+                           DisplayString,
+                       fiberProtectHandInHand
+                           INTEGER,
+                       FiberProtectGroup
+                           INTEGER,
+                       splittingRatio
+                           INTEGER,
+                       activeOnuNum 
+                           INTEGER,
+                       inactiveOnuNum 
+                           INTEGER,
+                       llidIfindexString
+                           OCTET STRING
+                         
+                   }
+
+          -- The following section describes the components of the
+          -- table.
+
+               ponIfIndex OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The only diid of PON port in System."
+                   ::= { nmsEponOltPonEntry 1 } 
+
+               llidSequenceNo OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Currnet LLID seqence number."
+                   ::= { nmsEponOltPonEntry 2 } 
+
+               onuAuthMethod OBJECT-TYPE
+                   SYNTAX  INTEGER {
+                          none(0),
+                          manual(1),
+                          mac(3),
+                          loid(4),
+                          hybrid(6)
+                               	    }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU authentication method."
+                   ::= { nmsEponOltPonEntry 3 } 
+
+               isCheckOnuMac OBJECT-TYPE
+                   SYNTAX  INTEGER {
+                          yes(1),
+                          no(2)
+                               	    }
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Check ONU MAC when registering."
+                   ::= { nmsEponOltPonEntry 4 } 
+
+               isPONBelongtoPSG OBJECT-TYPE
+                   SYNTAX  INTEGER {
+                          alone-pon(0),
+                          b-psg(1),
+                          active-pon(2),
+                          standby-pon(3),
+                          c-psg(4)
+                               	    }
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Check if PON belongs to PSG."
+                   ::= { nmsEponOltPonEntry 5 } 
+
+               pONBelongtoPSGID OBJECT-TYPE
+                   SYNTAX  INTEGER 
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "PSG ID that PON belongs to."
+                   ::= { nmsEponOltPonEntry 6 } 
+
+               isUsingMpcpRegisteAckDelayTime OBJECT-TYPE
+                   SYNTAX  INTEGER {
+                          yes(1),
+                          no(2)
+                               	    }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "If using MPCP registe Ack delay time."
+                   ::= { nmsEponOltPonEntry 7 } 
+
+               mpcpRegisteAckDelayTime OBJECT-TYPE
+                   SYNTAX  INTEGER(1..50)
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "MPCP registe Ack delay time,range is 1-50ms."
+                   ::= { nmsEponOltPonEntry 8 } 
+
+               ponIfAdminStatus OBJECT-TYPE
+                   SYNTAX  INTEGER {
+                          up(1),
+                          down(2)
+                               	    }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "PON interface Administration Status."
+                   ::= { nmsEponOltPonEntry 9 } 
+                   
+               ponIfInFecStatus OBJECT-TYPE
+                   SYNTAX  INTEGER {
+                          on(1),
+                          off(2)
+                               	    }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "PON interface in FEC Status."
+                   ::= { nmsEponOltPonEntry 10 } 
+
+               ponIfOutFecStatus OBJECT-TYPE
+                   SYNTAX  INTEGER {
+                          on(1),
+                          off(2)
+                               	    }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "PON interface out FEC Status."
+                   ::= { nmsEponOltPonEntry 11 } 
+
+               ponIfLaserStatus OBJECT-TYPE
+                   SYNTAX  INTEGER {
+                          on(1),
+                          off(2)
+                               	    }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "PON interface Laser Status."
+                   ::= { nmsEponOltPonEntry 12 } 
+
+               isOnuDataSwitch OBJECT-TYPE
+                   SYNTAX  INTEGER {
+                          on(1),
+                          off(2)
+                               	    }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "PON interface data exchange Status with ONU."
+                   ::= { nmsEponOltPonEntry 13 } 
+
+               ponIfProtectedStatus OBJECT-TYPE
+                   SYNTAX  INTEGER {
+                          on(1),
+                          off(2)
+                               	    }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "PON interface protected Status."
+                   ::= { nmsEponOltPonEntry 14 } 
+
+               ponIfDynamicMacLearningStatus OBJECT-TYPE
+                   SYNTAX  INTEGER {
+                          on(1),
+                          off(2)
+                               	    }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "PON interface dynamic MAC address learning Status."
+                   ::= { nmsEponOltPonEntry 15 } 
+
+               ponIfMacACL OBJECT-TYPE
+                   SYNTAX  DisplayString 
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "PON interface MAC address ACL."
+                   ::= { nmsEponOltPonEntry 16 } 
+
+               ponIfIpACL OBJECT-TYPE
+                   SYNTAX  DisplayString 
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "PON interface IP address ACL."
+                   ::= { nmsEponOltPonEntry 17 } 
+
+               fiberProtectHandInHand OBJECT-TYPE
+                   SYNTAX  INTEGER 
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Fiber protect hand in hand. 1-enable,2-disable. Default is disable."
+                   ::= { nmsEponOltPonEntry 18 } 
+
+               fiberProtectGroup OBJECT-TYPE
+                   SYNTAX  INTEGER 
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Fiber protect group. The range of groupID is 0-32. 0 means disable. Default is disable."
+                   ::= { nmsEponOltPonEntry 19 } 
+
+               splittingRatio  OBJECT-TYPE
+                   SYNTAX  INTEGER 
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Fiber splits ratio, for each OLT PON port, which means the max number of ONU."
+                   ::= { nmsEponOltPonEntry 20 } 
+
+               activeOnuNum  OBJECT-TYPE
+                   SYNTAX  INTEGER 
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Currnet active ONU number."
+                   ::= { nmsEponOltPonEntry 21 } 
+
+               inactiveOnuNum  OBJECT-TYPE
+                   SYNTAX  INTEGER 
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Currnet inactive ONU number."
+                   ::= { nmsEponOltPonEntry 22 } 
+
+               llidIfindexString  OBJECT-TYPE
+                   SYNTAX  OCTET STRING 
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Llid ports ifindex string. Seperated with comma."
+                   ::= { nmsEponOltPonEntry 23 } 
+
+
+
+
+
+
+               ponOpticsParameterAlarmSetTable OBJECT-TYPE
+                   SYNTAX  SEQUENCE OF PonOpticsParameterAlarmSetEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A list of epon olt pon optics Parameter Alarm set table entries."
+                   ::= { nmsEponOltPon 2 }
+
+               ponOpticsParameterAlarmSetEntry OBJECT-TYPE
+                   SYNTAX PonOpticsParameterAlarmSetEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A collection of additional objects in the epon olt pon optics Parameter Alarm set table."
+                   INDEX { ifIndex }
+               ::= { ponOpticsParameterAlarmSetTable 1 }
+
+               PonOpticsParameterAlarmSetEntry ::=
+                   SEQUENCE {
+                       ifIndex
+                           INTEGER,
+                       txPowerAlarmUpLimitEnable
+                       	   INTEGER,
+                       txPowerAlarmUpLimitThreshold
+                       	   INTEGER,
+                       txPowerAlarmUpLimitClearThreshold
+                       	   INTEGER,
+                       txPowerAlarmLowLimitEnable
+                       	   INTEGER,
+                       txPowerAlarmLowLimitThreshold
+                       	   INTEGER,
+                       txPowerAlarmLowLimitClearThreshold
+                       	   INTEGER,
+                       temperatureAlarmUpLimitEnable
+                       	   INTEGER,
+                       temperatureAlarmUpLimitThreshold
+                       	   INTEGER,
+                       temperatureAlarmUpLimitClearThreshold
+                       	   INTEGER,
+                       temperatureAlarmLowLimitEnable
+                       	   INTEGER,
+                       temperatureAlarmLowLimitThreshold
+                       	   INTEGER,
+                       temperatureAlarmLowLimitClearThreshold
+                       	   INTEGER,
+                       voltageAlarmUpLimitEnable
+                       	   INTEGER,
+                       voltageAlarmUpLimitThreshold
+                       	   INTEGER,
+                       voltageAlarmUpLimitClearThreshold
+                       	   INTEGER,
+                       voltageAlarmLowLimitEnable
+                       	   INTEGER,
+                       voltageAlarmLowLimitThreshold
+                       	   INTEGER,
+                       voltageAlarmLowLimitClearThreshold
+                       	   INTEGER,
+                       currentAlarmUpLimitEnable
+                       	   INTEGER,
+                       currentAlarmUpLimitThreshold
+                       	   INTEGER,
+                       currentAlarmUpLimitClearThreshold
+                       	   INTEGER,
+                       currentAlarmLowLimitEnable
+                       	   INTEGER,
+                       currentAlarmLowLimitThreshold
+                       	   INTEGER,
+                       currentAlarmLowLimitClearThreshold
+                       	   INTEGER
+
+		}
+
+               ifIndex OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The only diid of PON port in System."
+                   ::= { ponOpticsParameterAlarmSetEntry 1 } 
+
+               txPowerAlarmUpLimitEnable OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                                    enable(1),
+                                    disable(2)
+                                  }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Enable or disable the alarm of PON hign TX power. 1-enable, 2-disable. Default is disable."
+                   ::= { ponOpticsParameterAlarmSetEntry 2 } 
+
+               txPowerAlarmUpLimitThreshold OBJECT-TYPE
+                   SYNTAX  INTEGER(-400..82)
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The upper threshold of tx power alarm. The unit is 0.1DBm. The range is -400-82. Default is 82."
+                   ::= { ponOpticsParameterAlarmSetEntry 3 } 
+
+               txPowerAlarmUpLimitClearThreshold OBJECT-TYPE
+                   SYNTAX  INTEGER(-400..82)
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The upper threshold of tx power alarm cleared. The unit is 0.1DBm. The range is -400-82. Default is 82."
+                   ::= { ponOpticsParameterAlarmSetEntry 4 } 
+
+               txPowerAlarmLowLimitEnable OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                                    enable(1),
+                                    disable(2)
+                                  }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Enable or disable the alarm of PON low TX power. 1-enable, 2-disable. Default is disable."
+                   ::= { ponOpticsParameterAlarmSetEntry 5 } 
+
+               txPowerAlarmLowLimitThreshold OBJECT-TYPE
+                   SYNTAX  INTEGER(-400..82)
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The low threshold of tx power alarm. The unit is 0.1DBm. The range is -400-82. Default is -400."
+                   ::= { ponOpticsParameterAlarmSetEntry 6 } 
+
+               txPowerAlarmLowLimitClearThreshold OBJECT-TYPE
+                   SYNTAX  INTEGER(-400..82)
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The low threshold tx power alarm cleared. The unit is 0.1DBm. The range is -400-82. Default is -400."
+                   ::= { ponOpticsParameterAlarmSetEntry 7 } 
+
+               temperatureAlarmUpLimitEnable OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                                    enable(1),
+                                    disable(2)
+                                  }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Enable or disable the alarm of PON high temperature. 1-enable, 2-disable. Default is disable."
+                   ::= { ponOpticsParameterAlarmSetEntry 8 } 
+
+               temperatureAlarmUpLimitThreshold OBJECT-TYPE
+                   SYNTAX  INTEGER(-1280..1280)
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The upper threshold of temperature alarm. The unit is 0.1 degree. The range is -1280-1280. Default is 1280."
+                   ::= { ponOpticsParameterAlarmSetEntry 9 } 
+
+               temperatureAlarmUpLimitClearThreshold OBJECT-TYPE
+                   SYNTAX  INTEGER(-1280..1280)
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The upper threshold temperature alarm cleared. The unit is 0.1 degree. The range is -1280-1280. Default is 1280."
+                   ::= { ponOpticsParameterAlarmSetEntry 10 } 
+
+               temperatureAlarmLowLimitEnable OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                                    enable(1),
+                                    disable(2)
+                                  }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Enable or disable the alarm of PON low temperature. 1-enable, 2-disable. Default is disable."
+                   ::= { ponOpticsParameterAlarmSetEntry 11 } 
+
+               temperatureAlarmLowLimitThreshold OBJECT-TYPE
+                   SYNTAX  INTEGER(-1280..1280)
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The low threshold of temperature alarm. The unit is 0.1 degree. The range is -1280-1280. Default is -1280."
+                   ::= { ponOpticsParameterAlarmSetEntry 12 } 
+
+               temperatureAlarmLowLimitClearThreshold OBJECT-TYPE
+                   SYNTAX  INTEGER(-1280..1280)
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The low threshold temperature alarm cleared. The unit is 0.1 degree. The range is -1280-1280. Default is -1280."
+                   ::= { ponOpticsParameterAlarmSetEntry 13 } 
+
+               voltageAlarmUpLimitEnable OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                                    enable(1),
+                                    disable(2)
+                                  }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Enable or disable the alarm of PON high voltage. 1-enable, 2-disable. Default is disable."
+                   ::= { ponOpticsParameterAlarmSetEntry 14 } 
+
+               voltageAlarmUpLimitThreshold OBJECT-TYPE
+                   SYNTAX  INTEGER(0..65)
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The upper threshold of voltage alarm. The unit is 0.1V. The range is 0-65. Default is 65."
+                   ::= { ponOpticsParameterAlarmSetEntry 15 } 
+
+               voltageAlarmUpLimitClearThreshold OBJECT-TYPE
+                   SYNTAX  INTEGER(0..65)
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The upper threshold voltage alarm cleared. The unit is 0.1V. The range is 0-65. Default is 65."
+                   ::= { ponOpticsParameterAlarmSetEntry 16 } 
+
+               voltageAlarmLowLimitEnable OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                                    enable(1),
+                                    disable(2)
+                                  }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Enable or disable the alarm of PON low voltage. 1-enable, 2-disable. Default is disable."
+                   ::= { ponOpticsParameterAlarmSetEntry 17 } 
+
+               voltageAlarmLowLimitThreshold OBJECT-TYPE
+                   SYNTAX  INTEGER(0..65)
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The low threshold of voltage alarm. The unit is 0.1V. The range is 0-65. Default is 0."
+                   ::= { ponOpticsParameterAlarmSetEntry 18 } 
+
+               voltageAlarmLowLimitClearThreshold OBJECT-TYPE
+                   SYNTAX  INTEGER(0..65)
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The low threshold voltage alarm cleared. The unit is 0.1V. The range is 0-65. Default is 0."
+                   ::= { ponOpticsParameterAlarmSetEntry 19 } 
+
+               currentAlarmUpLimitEnable OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                                    enable(1),
+                                    disable(2)
+                                  }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Enable or disable the alarm of PON high current. 1-enable, 2-disable. Default is disable."
+                   ::= { ponOpticsParameterAlarmSetEntry 20 } 
+
+               currentAlarmUpLimitThreshold OBJECT-TYPE
+                   SYNTAX  INTEGER(0..1310)
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The upper threshold of current alarm. The unit is 0.1mA. The range is 0-1310. Default is 1310."
+                   ::= { ponOpticsParameterAlarmSetEntry 21 } 
+
+               currentAlarmUpLimitClearThreshold OBJECT-TYPE
+                   SYNTAX  INTEGER(0..1310)
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The upper threshold current alarm cleared. The unit is 0.1mA. The range is 0-1310. Default is 1310."
+                   ::= { ponOpticsParameterAlarmSetEntry 22 } 
+
+               currentAlarmLowLimitEnable OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                                    enable(1),
+                                    disable(2)
+                                  }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Enable or disable the alarm of PON hign TX power. 1-enable, 2-disable. Default is disable."
+                   ::= { ponOpticsParameterAlarmSetEntry 23 } 
+
+               currentAlarmLowLimitThreshold OBJECT-TYPE
+                   SYNTAX  INTEGER(0..1310)
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The low threshold of current alarm. The unit is 0.1mA. The range is 0-1310. Default is 0."
+                   ::= { ponOpticsParameterAlarmSetEntry 24 } 
+
+               currentAlarmLowLimitClearThreshold OBJECT-TYPE
+                   SYNTAX  INTEGER(0..1310)
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The low threshold current alarm cleared. The unit is 0.1mA. The range is 0-1310. Default is 0."
+                   ::= { ponOpticsParameterAlarmSetEntry 25 } 
+
+
+
+-- Notifications
+	ponSfpParameterAlarmsNotifications OBJECT IDENTIFIER
+                                ::= { nmsEponOltPon 3 }
+                                
+                                
+        alarmStatus OBJECT-TYPE
+            SYNTAX  INTEGER{
+                             above(1),
+                             below(2),
+                             normal(3)
+                           }
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+                    "Alarm status definition. 1-above, 2-below, 3-normal."
+            ::= { ponSfpParameterAlarmsNotifications 1 } 
+                         
+
+
+	ponSfpParameterAlarmsNotification NOTIFICATION-TYPE
+    		OBJECTS {
+                       ponIfIndex,
+                       ifDescr,
+                       alarmStatus,
+                       opIfTxPowerCurr,
+                       opIfTemperature,
+                       opIfVolt,
+                       opIfCurrent
+    		}
+    		STATUS      current
+    		DESCRIPTION
+        	"The agent generates this trap when olt optical module  works in abnormal status or return to normal ."
+    		::= { ponSfpParameterAlarmsNotifications 2 }
+
+-- PON port migration
+
+               ponPortMigration       OBJECT IDENTIFIER ::= { nmsEponOltPon 4 }
+              
+               ponPortMigLlidSet  OBJECT-TYPE
+                   SYNTAX  OCTET STRING 
+                   ACCESS  write-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Llid ports ifindex string. Seperated with semicolon. For example, if we migrate the PON port configuration from port EPON3/1(llid:25) to 
+                             port EPON3/2(llid:26), this value should be set to '25;26'."
+                   ::= { ponPortMigration 1 } 
+
+              
+
+
+
+END

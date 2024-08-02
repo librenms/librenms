@@ -13046,5 +13046,107 @@
                 }
             ]
         }
+    },
+    "entity-physical": {
+        "discovery": {
+            "entPhysical": [
+                {
+                    "entPhysicalIndex": 1100,
+                    "entPhysicalDescr": "midplane",
+                    "entPhysicalClass": null,
+                    "entPhysicalName": "midplane",
+                    "entPhysicalHardwareRev": "",
+                    "entPhysicalFirmwareRev": null,
+                    "entPhysicalSoftwareRev": null,
+                    "entPhysicalAlias": null,
+                    "entPhysicalAssetID": null,
+                    "entPhysicalIsFRU": null,
+                    "entPhysicalModelName": "",
+                    "entPhysicalVendorType": "Juniper",
+                    "entPhysicalSerialNum": "",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": -1,
+                    "entPhysicalMfgName": "Juniper",
+                    "ifIndex": null
+                },
+                {
+                    "entPhysicalIndex": 7100,
+                    "entPhysicalDescr": "FPC: Virtual FPC @ 0/*/*",
+                    "entPhysicalClass": null,
+                    "entPhysicalName": "FPC: Virtual FPC @ 0/*/*",
+                    "entPhysicalHardwareRev": "",
+                    "entPhysicalFirmwareRev": null,
+                    "entPhysicalSoftwareRev": null,
+                    "entPhysicalAlias": null,
+                    "entPhysicalAssetID": null,
+                    "entPhysicalIsFRU": "flexible",
+                    "entPhysicalModelName": "",
+                    "entPhysicalVendorType": "Juniper",
+                    "entPhysicalSerialNum": "",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": -1,
+                    "entPhysicalMfgName": "Juniper",
+                    "ifIndex": null
+                },
+                {
+                    "entPhysicalIndex": 8110,
+                    "entPhysicalDescr": "PIC: Virtual @ 0/0/*",
+                    "entPhysicalClass": null,
+                    "entPhysicalName": "PIC: Virtual @ 0/0/*",
+                    "entPhysicalHardwareRev": "",
+                    "entPhysicalFirmwareRev": null,
+                    "entPhysicalSoftwareRev": null,
+                    "entPhysicalAlias": null,
+                    "entPhysicalAssetID": null,
+                    "entPhysicalIsFRU": "portInte",
+                    "entPhysicalModelName": "BUILTIN",
+                    "entPhysicalVendorType": "Juniper",
+                    "entPhysicalSerialNum": "BUILTIN",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": -1,
+                    "entPhysicalMfgName": "Juniper",
+                    "ifIndex": null
+                },
+                {
+                    "entPhysicalIndex": 9100,
+                    "entPhysicalDescr": "Routing Engine 0",
+                    "entPhysicalClass": null,
+                    "entPhysicalName": "Routing Engine 0",
+                    "entPhysicalHardwareRev": "",
+                    "entPhysicalFirmwareRev": null,
+                    "entPhysicalSoftwareRev": null,
+                    "entPhysicalAlias": null,
+                    "entPhysicalAssetID": null,
+                    "entPhysicalIsFRU": "routingE",
+                    "entPhysicalModelName": "",
+                    "entPhysicalVendorType": "Juniper",
+                    "entPhysicalSerialNum": "",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": -1,
+                    "entPhysicalMfgName": "Juniper",
+                    "ifIndex": null
+                },
+                {
+                    "entPhysicalIndex": 20110,
+                    "entPhysicalDescr": "MIC: Virtual @ 0/0/*",
+                    "entPhysicalClass": null,
+                    "entPhysicalName": "MIC: Virtual @ 0/0/*",
+                    "entPhysicalHardwareRev": "",
+                    "entPhysicalFirmwareRev": null,
+                    "entPhysicalSoftwareRev": null,
+                    "entPhysicalAlias": null,
+                    "entPhysicalAssetID": null,
+                    "entPhysicalIsFRU": "portInte",
+                    "entPhysicalModelName": "",
+                    "entPhysicalVendorType": "Juniper",
+                    "entPhysicalSerialNum": "",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": -1,
+                    "entPhysicalMfgName": "Juniper",
+                    "ifIndex": null
+                }
+            ]
+        },
+        "poller": "matches discovery"
     }
 }

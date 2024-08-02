@@ -10,8 +10,8 @@ synoDisk MODULE-IDENTITY
     LAST-UPDATED "201309110000Z"
     ORGANIZATION "www.synology.com"
     CONTACT-INFO
-         "postal:   Jay Pan
-          email:    jaypan@synology.com"
+         "Synology Inc.
+          Email: snmp@synology.com"
     DESCRIPTION
         "Characteristics of the disk information"
     REVISION     "201309110000Z"
@@ -45,12 +45,19 @@ DiskEntry ::= SEQUENCE {
 	diskModel		OCTET STRING,
 	diskType		OCTET STRING,
 	diskStatus		Integer32,
-	diskTemperature	Integer32
+	diskTemperature	Integer32,
+	diskRole        OCTET STRING,
+	diskRetry       Integer32,
+	diskBadSector         Integer32,
+	diskIdentifyFail Integer32,
+	diskRemainLife  Integer32,
+    diskName        OCTET STRING,
+	diskHealthStatus Integer32
 }
 
 diskIndex OBJECT-TYPE
     SYNTAX	   Integer32(0..2147483647)
-    MAX-ACCESS	  not-accessible
+    MAX-ACCESS	  read-only
     STATUS	   current
     DESCRIPTION
     "The index of disk table"
@@ -112,6 +119,83 @@ diskTemperature OBJECT-TYPE
 	"
     ::= { diskEntry 6 }
 
+diskRole OBJECT-TYPE
+    SYNTAX	  OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS	  current
+    DESCRIPTION
+    "Synology disk role
+	 The role of the disk in system.
+	 Could be:
+	 data, cache, hotspare, none
+	"
+    ::= { diskEntry 7 }
+
+diskRetry OBJECT-TYPE
+    SYNTAX	   Integer32
+    MAX-ACCESS	  read-only
+    STATUS	   current
+    DESCRIPTION
+    "Synology disk retry count
+	 The count of each disk connection retries.
+	"
+    ::= { diskEntry 8 }
+
+diskBadSector OBJECT-TYPE
+    SYNTAX	   Integer32
+    MAX-ACCESS	  read-only
+    STATUS	   current
+    DESCRIPTION
+    "Synology disk bad sector count
+	 The count of each disk I/O bad sector.
+	"
+    ::= { diskEntry 9 }
+
+diskIdentifyFail OBJECT-TYPE
+    SYNTAX	   Integer32
+    MAX-ACCESS	  read-only
+    STATUS	   current
+    DESCRIPTION
+    "Synology disk identify fail count
+	 The count of each disk identify fails.
+	"
+    ::= { diskEntry 10 }
+
+diskRemainLife OBJECT-TYPE
+    SYNTAX	   Integer32
+    MAX-ACCESS	  read-only
+    STATUS	   current
+    DESCRIPTION
+    "Synology disk remainLife
+	 The estimate remain life of each disk.
+	"
+    ::= { diskEntry 11 }
+
+diskName OBJECT-TYPE
+    SYNTAX	  OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS	  current
+    DESCRIPTION
+    "Synology disk name
+	 The name of disk which align to storage manager.
+	"
+    ::= { diskEntry 12 }
+
+diskHealthStatus OBJECT-TYPE
+    SYNTAX	  Integer32(1..5)
+    MAX-ACCESS  read-only
+    STATUS	  current
+    DESCRIPTION
+    "Synology disk health status
+	 Each meanings of status represented describe below.
+
+	 Normal(1):   The disk health status is normal.
+	 Warning(2):  The disk health status is warning.
+	 Critical(3): The disk health status is critical.
+	 Failing(4):  The disk health status is failing.
+	"
+    ::= { diskEntry 13 }
+
 diskConformance OBJECT IDENTIFIER ::= { synoDisk 2 }
 diskCompliances OBJECT IDENTIFIER ::= { diskConformance 1 }
 diskGroups 		OBJECT IDENTIFIER ::= { diskConformance 2 }
@@ -127,11 +211,19 @@ diskCompliance MODULE-COMPLIANCE
     ::= { diskCompliances 1 }
 
 diskGroup OBJECT-GROUP
-    OBJECTS { diskID,
+    OBJECTS { diskIndex,
+              diskID,
               diskModel,
               diskType,
               diskStatus,
-              diskTemperature}
+              diskTemperature,
+	      diskRole,
+	      diskRetry,
+	      diskBadSector,
+	      diskIdentifyFail,
+	      diskRemainLife,
+          diskName,
+          diskHealthStatus}
     STATUS  current
     DESCRIPTION
             "A collection of objects providing basic information

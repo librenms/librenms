@@ -678,5 +678,69 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "entity-physical": {
+        "discovery": {
+            "entPhysical": [
+                {
+                    "entPhysicalIndex": 65536,
+                    "entPhysicalDescr": "RouterOS 6.45.7 (stable) on RBLHGR",
+                    "entPhysicalClass": "chassis",
+                    "entPhysicalName": "MIPS 24Kc V7.4",
+                    "entPhysicalHardwareRev": "",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "false",
+                    "entPhysicalModelName": "",
+                    "entPhysicalVendorType": "zeroDotZero",
+                    "entPhysicalSerialNum": "",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": -1,
+                    "entPhysicalMfgName": "",
+                    "ifIndex": null
+                },
+                {
+                    "entPhysicalIndex": 262145,
+                    "entPhysicalDescr": "Linux 3.3.5 ehci_hcd RB400 EHCI",
+                    "entPhysicalClass": "unknown",
+                    "entPhysicalName": "1-0",
+                    "entPhysicalHardwareRev": "",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "false",
+                    "entPhysicalModelName": "0x0002",
+                    "entPhysicalVendorType": "zeroDotZero",
+                    "entPhysicalSerialNum": "rb400_usb",
+                    "entPhysicalContainedIn": 65536,
+                    "entPhysicalParentRelPos": -1,
+                    "entPhysicalMfgName": "0x1d6b",
+                    "ifIndex": null
+                },
+                {
+                    "entPhysicalIndex": 262146,
+                    "entPhysicalDescr": "'MikroTik' 'R11e-4G'",
+                    "entPhysicalClass": "unknown",
+                    "entPhysicalName": "1-1",
+                    "entPhysicalHardwareRev": "",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "false",
+                    "entPhysicalModelName": "0x0003",
+                    "entPhysicalVendorType": "zeroDotZero",
+                    "entPhysicalSerialNum": "9CB903B1E0AB",
+                    "entPhysicalContainedIn": 65536,
+                    "entPhysicalParentRelPos": -1,
+                    "entPhysicalMfgName": "0x2cd2",
+                    "ifIndex": null
+                }
+            ]
+        },
+        "poller": "matches discovery"
     }
 }

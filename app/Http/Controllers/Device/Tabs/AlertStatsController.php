@@ -26,6 +26,7 @@
 namespace App\Http\Controllers\Device\Tabs;
 
 use App\Models\Device;
+use Illuminate\Http\Request;
 use LibreNMS\Interfaces\UI\DeviceTab;
 
 class AlertStatsController implements DeviceTab
@@ -50,7 +51,7 @@ class AlertStatsController implements DeviceTab
         return __('Alert Stats');
     }
 
-    public function data(Device $device): array
+    public function data(Device $device, Request $request): array
     {
         return [];
     }
