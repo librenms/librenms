@@ -28,13 +28,11 @@ namespace LibreNMS;
 use App\Models\ComponentPref;
 use App\Models\ComponentStatusLog;
 use App\Models\Eventlog;
-use Illuminate\Database\Eloquent\Casts\Attribute;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use LibreNMS\Enum\Severity;
 use Log;
 
-class Component extends Model
+class Component
 {
     /*
      * These fields are used in the component table. They are returned in the array
@@ -49,29 +47,6 @@ class Component extends Model
         'disabled' => 0,
         'error' => '',
     ];
-
-    /* Mutators */
-    protected function error(): Attribute
-    {
-        return Attribute::make(
-            set: fn (string $value) => substr($value, 0, 255),
-        );
-    }
-
-    protected function label(): Attribute
-    {
-        return Attribute::make(
-            set: fn (string $value) => substr($value, 0, 255),
-        );
-    }
-
-    protected function type(): Attribute
-    {
-        return Attribute::make(
-            set: fn (string $value) => substr($value, 0, 50),
-        );
-    }
-    /* End Mutators */
 
     public function getComponentCount($device_id = null)
     {
