@@ -17,4 +17,3 @@ modules:
                         - { value: 3, generic: 0, graph: 1, descr: ok }
                         - { value: 4, generic: 1, graph: 1, descr: warning }
                         - { value: 5, generic: 2, graph: 1, descr: failed }
-                -
