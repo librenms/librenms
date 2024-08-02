@@ -774,7 +774,7 @@ function alert_details($details)
                     'id' => $tmp_alerts['mempool_id'],
                     'type' => 'mempool_usage',
                 ]) .
-                "'>" . ($tmp_alerts['mempool_descr'] ?? 'link'). '</a>';
+                "'>" . ($tmp_alerts['mempool_descr'] ?? 'link') . '</a>';
             $fault_detail .= ', Usage ' . $tmp_alerts['mempool_perc'] . '% &nbsp;';
             $fallback = false;
         }
