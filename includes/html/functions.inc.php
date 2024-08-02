@@ -766,6 +766,20 @@ function alert_details($details)
             $fallback = false;
         }
 
+        if (isset($tmp_alerts['mempool_id'])) {
+            // If we have a mempool_id, we format the data accordingly
+            $fault_detail .= "MemoryPool <a href='" .
+                \LibreNMS\Util\Url::generate([
+                    'page' => 'graphs',
+                    'id' => $tmp_alerts['mempool_id'],
+                    'type' => 'mempool_usage',
+                ]) .
+                "'>" . $tmp_alerts[''] . '</a>';
+            $fault_detail .= ', Desc ' . $tmp_alerts['mempool_descr'] ?? '';
+            $fault_detail .= ', Usage' . $tmp_alerts['mempool_perc'];
+            $fallback = false;
+        }
+
         if ($tmp_alerts['type'] && isset($tmp_alerts['label'])) {
             if ($tmp_alerts['error'] == '') {
                 $fault_detail .= ' ' . $tmp_alerts['type'] . ' - ' . $tmp_alerts['label'] . ';&nbsp;';
