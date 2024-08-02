@@ -53,6 +53,27 @@ class Component extends DeviceRelatedModel
         $this->attributes['ignore'] = (int) $ignore;
     }
 
+    protected function error(): Attribute
+    {
+        return Attribute::make(
+            set: fn (string $value) => substr($value, 0, 255),
+        );
+    }
+
+    protected function label(): Attribute
+    {
+        return Attribute::make(
+            set: fn (string $value) => substr($value, 0, 255),
+        );
+    }
+
+    protected function type(): Attribute
+    {
+        return Attribute::make(
+            set: fn (string $value) => substr($value, 0, 50),
+        );
+    }
+
     // ---- Define Relationships ----
 
     public function logs(): HasMany
