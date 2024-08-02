@@ -229,7 +229,6 @@ class Component
 
                 // update component attributes
                 $component->fill($update);
-
                 if ($component->isDirty()) {
                     // Log the update to the Eventlog.
                     $message = "Component $component->id has been modified: ";
