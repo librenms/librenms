@@ -27494,7 +27494,7 @@
         "discovery": {
             "pseudowires": [
                 {
-                    "peer_ldp_id": 10246,
+                    "peer_ldp_id": 183894018,
                     "cpwVcID": 111111,
                     "cpwOid": 2147483647,
                     "pw_type": "ethernet",
@@ -27505,7 +27505,7 @@
                     "ifIndex": 74
                 },
                 {
-                    "peer_ldp_id": 10246,
+                    "peer_ldp_id": 183894018,
                     "cpwVcID": 123456,
                     "cpwOid": 2147483647,
                     "pw_type": "ethernetVPLS",
