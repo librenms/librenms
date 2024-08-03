@@ -2,16 +2,13 @@
 
 namespace Database\Factories;
 
-use App\Models\Component;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-/** @extends Factory<Component> */
+/** @extends Factory<\App\Models\Component> */
 class ComponentFactory extends Factory
 {
     /**
      * Define the model's default state.
-     *
-     * @return array
      */
     public function definition(): array
     {

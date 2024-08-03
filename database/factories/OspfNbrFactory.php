@@ -2,16 +2,13 @@
 
 namespace Database\Factories;
 
-use App\Models\OspfNbr;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-/** @extends Factory<OspfNbr> */
+/** @extends Factory<\App\Models\OspfNbr> */
 class OspfNbrFactory extends Factory
 {
     /**
      * Define the model's default state.
-     *
-     * @return array
      */
     public function definition(): array
     {
