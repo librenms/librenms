@@ -4,7 +4,7 @@ namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-/** @extends Factory<BgpPeer> */
+/** @extends Factory<\App\Models\BgpPeer> */
 class BgpPeerFactory extends Factory
 {
     /**

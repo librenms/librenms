@@ -4,7 +4,7 @@ namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-/** @extends Factory<Location> */
+/** @extends Factory<\App\Models\Location> */
 class LocationFactory extends Factory
 {
     /**

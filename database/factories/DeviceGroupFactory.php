@@ -4,7 +4,7 @@ namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-/** @extends Factory<DeviceGroup> */
+/** @extends Factory<\App\Models\DeviceGroup> */
 class DeviceGroupFactory extends Factory
 {
     /**

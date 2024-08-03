@@ -4,7 +4,7 @@ namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-/** @extends Factory<Component> */
+/** @extends Factory<\App\Models\Component> */
 class ComponentFactory extends Factory
 {
     /**

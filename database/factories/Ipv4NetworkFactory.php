@@ -4,7 +4,7 @@ namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-/** @extends Factory<Ipv4Network> */
+/** @extends Factory<\App\Models\Ipv4Network> */
 class Ipv4NetworkFactory extends Factory
 {
     /**

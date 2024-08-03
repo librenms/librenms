@@ -4,7 +4,7 @@ namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-/** @extends Factory<OspfNbr> */
+/** @extends Factory<\App\Models\OspfNbr> */
 class OspfNbrFactory extends Factory
 {
     /**
