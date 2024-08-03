@@ -113,7 +113,7 @@ if (isset($options['f'])) {
 
 // Now use the saved data to update the saved database data
 $snmpsim = new Snmpsim();
-$snmpsim->setupVenv();
+$snmpsim->setupVenv(true);
 $snmpsim->start();
 echo "Waiting for snmpsim to initialize...\n";
 $snmpsim->waitForStartup();
