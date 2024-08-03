@@ -2,17 +2,14 @@
 
 namespace Database\Factories;
 
-use App\Models\Vminfo;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use LibreNMS\Enum\PowerState;
 
-/** @extends Factory<Vminfo> */
+/** @extends Factory<\App\Models\Vminfo> */
 class VminfoFactory extends Factory
 {
     /**
      * Define the model's default state.
-     *
-     * @return array
      */
     public function definition(): array
     {

@@ -19,7 +19,6 @@ return new class extends Migration
             $table->unsignedTinyInteger('opstatus')->default(0)->after('opstatus_old');
         });
 
-        /** @phpstan-ignore-next-line */
         foreach (\App\Models\Sla::where('opstatus_old', '>', 0)->select(['sla_id', 'opstatus_old'])->lazy() as $sla) {
             /** @phpstan-ignore-next-line */
             $sla->opstatus = $sla->opstatus_old;
