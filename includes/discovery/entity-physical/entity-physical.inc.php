@@ -2,19 +2,14 @@
 
 echo "\nCaching OIDs:";
 
-if ($device['os'] == 'timos') {
-    $entity_array = [];
-    echo 'tmnxHwObjs';
-    $entity_array = snmpwalk_cache_multi_oid($device, 'tmnxHwObjs', $entity_array, 'TIMETRA-CHASSIS-MIB', 'nokia');
-} else {
-    $entity_array = [];
-    echo ' entPhysicalEntry';
-    $entity_array = snmpwalk_cache_oid($device, 'entPhysicalEntry', $entity_array, 'ENTITY-MIB:CISCO-ENTITY-VENDORTYPE-OID-MIB');
 
-    if (! empty($entity_array)) {
-        echo ' entAliasMappingIdentifier';
-        $entity_array = snmpwalk_cache_twopart_oid($device, 'entAliasMappingIdentifier', $entity_array, 'ENTITY-MIB:IF-MIB');
-    }
+$entity_array = [];
+echo ' entPhysicalEntry';
+$entity_array = snmpwalk_cache_oid($device, 'entPhysicalEntry', $entity_array, 'ENTITY-MIB:CISCO-ENTITY-VENDORTYPE-OID-MIB');
+
+if (! empty($entity_array)) {
+    echo ' entAliasMappingIdentifier';
+    $entity_array = snmpwalk_cache_twopart_oid($device, 'entAliasMappingIdentifier', $entity_array, 'ENTITY-MIB:IF-MIB');
 }
 if ($device['os'] == 'vrp') {
     echo ' hwEntityBoardType';
@@ -25,24 +20,7 @@ if ($device['os'] == 'vrp') {
 
 foreach ($entity_array as $entPhysicalIndex => $entry) {
     $ifIndex = 0;
-    if ($device['os'] == 'timos') {
-        $entPhysicalDescr = $entry['tmnxCardTypeDescription'];
-        $entPhysicalContainedIn = $entry['tmnxHwContainedIn'];
-        $entPhysicalClass = $entry['tmnxHwClass'];
-        $entPhysicalName = $entry['tmnxCardTypeName'];
-        $entPhysicalSerialNum = $entry['tmnxHwSerialNumber'];
-        $entPhysicalModelName = $entry['tmnxHwMfgBoardNumber'];
-        $entPhysicalMfgName = $entry['tmnxHwMfgBoardNumber'];
-        $entPhysicalVendorType = $entry['tmnxCardTypeName'];
-        $entPhysicalParentRelPos = $entry['tmnxHwParentRelPos'];
-        $entPhysicalHardwareRev = '1.0';
-        $entPhysicalFirmwareRev = $entry['tmnxHwBootCodeVersion'];
-        $entPhysicalSoftwareRev = $entry['tmnxHwBootCodeVersion'];
-        $entPhysicalIsFRU = $entry['tmnxHwIsFRU'];
-        $entPhysicalAlias = $entry['tmnxHwAlias'];
-        $entPhysicalAssetID = $entry['tmnxHwAssetID'];
-        $entPhysicalIndex = str_replace('.', '', $entPhysicalIndex);
-    } elseif ($device['os'] == 'vrp') {
+    if ($device['os'] == 'vrp') {
         //Add some details collected in the VRP Entity Mib
         $entPhysicalDescr = $entry['hwEntityBomEnDesc'];
         $entPhysicalContainedIn = $entry['entPhysicalContainedIn'];
