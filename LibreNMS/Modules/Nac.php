@@ -83,7 +83,7 @@ class Nac implements Module
             //filter out historical entries
             $existing_entries = $os->getDevice()->portsNac()
                 ->where('historical', 0)
-                ->keyBy('mac_address');
+                ->get()->keyBy('mac_address');
 
             // update existing models
             foreach ($nac_entries as $nac_entry) {
