@@ -775,7 +775,7 @@ function alert_details($details)
                     'type' => 'mempool_usage',
                 ]) .
                 "'>" . ($tmp_alerts['mempool_descr'] ?? 'link') . '</a>';
-            $fault_detail .= ', Usage ' . $tmp_alerts['mempool_perc'] . '% &nbsp;';
+            $fault_detail .= '<br> &nbsp; &nbsp; &nbsp; Usage ' . $tmp_alerts['mempool_perc'] . '%, &nbsp; Free ' . \LibreNMS\Util\Number::formatSi($tmp_alerts['mempool_free']) . ',&nbsp; Size ' . \LibreNMS\Util\Number::formatSi($tmp_alerts['mempool_total']);
             $fallback = false;
         }
 
