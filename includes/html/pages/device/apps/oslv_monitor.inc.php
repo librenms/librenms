@@ -22,7 +22,7 @@ if (isset($app_data['backend']) && $app_data['backend'] == 'FreeBSD') {
     echo ' | Jails: ';
     $index_int = 0;
     foreach ($app_data['oslvms'] as $index => $oslvm) {
-        $label = (!isset($vars['oslvm']) || $vars['oslvm'] != $oslvm)
+        $label = (! isset($vars['oslvm']) || $vars['oslvm'] != $oslvm)
             ? $oslvm
             : '<span class="pagemenu-selected">' . $oslvm . '</span>';
         $index_int++;
@@ -71,7 +71,7 @@ if (isset($app_data['backend']) && $app_data['backend'] == 'cgroups') {
         foreach ($podman_containers as $index => $oslvm) {
             $oslvm_name = $oslvm;
             $oslvm_name = preg_replace('/^p\_/', '', $oslvm_name);
-            $label = (!isset($vars['oslvm']) || $vars['oslvm'] != $oslvm)
+            $label = (! isset($vars['oslvm']) || $vars['oslvm'] != $oslvm)
             ? $oslvm_name
             : '<span class="pagemenu-selected">' . $oslvm_name . '</span>';
             $index_int++;
@@ -87,7 +87,7 @@ if (isset($app_data['backend']) && $app_data['backend'] == 'cgroups') {
         foreach ($docker_containers as $index => $oslvm) {
             $oslvm_name = $oslvm;
             $oslvm_name = preg_replace('/^d\_/', '', $oslvm_name);
-            $label = (!isset($vars['oslvm']) || $vars['oslvm'] != $oslvm)
+            $label = (! isset($vars['oslvm']) || $vars['oslvm'] != $oslvm)
                 ? $oslvm_name
                 : '<span class="pagemenu-selected">' . $oslvm_name . '</span>';
             $index_int++;
@@ -104,7 +104,7 @@ if (isset($app_data['backend']) && $app_data['backend'] == 'cgroups') {
         foreach ($systemd_containers as $index => $oslvm) {
             $oslvm_name = $oslvm;
             $oslvm_name = preg_replace('/^s\_/', '', $oslvm_name);
-            $label = (!isset($vars['oslvm']) || $vars['oslvm'] != $oslvm)
+            $label = (! isset($vars['oslvm']) || $vars['oslvm'] != $oslvm)
                 ? $oslvm_name
                 : '<span class="pagemenu-selected">' . $oslvm_name . '</span>';
             $index_int++;
@@ -121,7 +121,7 @@ if (isset($app_data['backend']) && $app_data['backend'] == 'cgroups') {
         foreach ($user_containers as $index => $oslvm) {
             $oslvm_name = $oslvm;
             $oslvm_name = preg_replace('/^u\_/', '', $oslvm_name);
-            $label = (!isset($vars['oslvm']) || $vars['oslvm'] != $oslvm)
+            $label = (! isset($vars['oslvm']) || $vars['oslvm'] != $oslvm)
                 ? $oslvm_name
                 : '<span class="pagemenu-selected">' . $oslvm_name . '</span>';
             $index_int++;
@@ -136,7 +136,7 @@ if (isset($app_data['backend']) && $app_data['backend'] == 'cgroups') {
         echo "\n<br>Other Containers<b>:</b> ";
         $index_int = 0;
         foreach ($other_containers as $index => $oslvm) {
-            $label = (!isset($vars['oslvm']) || $vars['oslvm'] != $oslvm)
+            $label = (! isset($vars['oslvm']) || $vars['oslvm'] != $oslvm)
                 ? $oslvm
                 : '<span class="pagemenu-selected">' . $oslvm . '</span>';
             $index_int++;
