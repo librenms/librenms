@@ -19,7 +19,7 @@ $label = isset($vars['oslvm'])
 echo generate_link($label, $link_array);
 
 if (isset($app_data['backend']) && $app_data['backend'] == 'FreeBSD') {
-    echo " | Jails: ";
+    echo ' | Jails: ';
     $index_int = 0;
     foreach ($app_data['oslvms'] as $index => $oslvm) {
         $label = (!isset($vars['oslvm']) || $vars['oslvm'] != $oslvm)
@@ -34,13 +34,13 @@ if (isset($app_data['backend']) && $app_data['backend'] == 'FreeBSD') {
 
     if (isset($vars['oslvm']) && isset($app_data['oslvm_data'][$vars['oslvm']])) {
         if (isset($app_data['oslvm_data'][$vars['oslvm']]['path'])) {
-            echo "\n<br>Path: ".$app_data['oslvm_data'][$vars['oslvm']]['path']."<br>\n";
+            echo "\n<br>Path: " . $app_data['oslvm_data'][$vars['oslvm']]['path'] . "<br>\n";
         }
         if (isset($app_data['oslvm_data'][$vars['oslvm']]['ipv4'])) {
-            echo "\n<br>IPv4: ".$app_data['oslvm_data'][$vars['oslvm']]['ipv4']."<br>\n";
+            echo "\n<br>IPv4: " . $app_data['oslvm_data'][$vars['oslvm']]['ipv4'] . "<br>\n";
         }
         if (isset($app_data['oslvm_data'][$vars['oslvm']]['ipv6'])) {
-            echo "\n<br>IPv6: ".$app_data['oslvm_data'][$vars['oslvm']]['ipv6']."<br>\n";
+            echo "\n<br>IPv6: " . $app_data['oslvm_data'][$vars['oslvm']]['ipv6'] . "<br>\n";
         }
     }
 }
