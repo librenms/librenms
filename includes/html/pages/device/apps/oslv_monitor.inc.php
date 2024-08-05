@@ -78,7 +78,7 @@ if (isset($app_data['backend']) && $app_data['backend'] == 'FreeBSD') {
                 $path_graph_array['bg'] = 'ffffff00';
                 $path_minigraph = \LibreNMS\Util\Url::lazyGraphTag($path_graph_array);
 
-                # table used to prevent breaking
+                // table used to prevent breaking
                 echo "\n<br><table><tr><td>Path:&nbsp</td><td>" . \LibreNMS\Util\Url::overlibLink($path_link, $path, $path_overlib_content) .
                     '</td><td>&nbsp(' . round($storage_info['storage_perc']) . '%)</td><td>' .
                     \LibreNMS\Util\Url::overlibLink($path_link, $path_minigraph, $path_overlib_content) . "</td></td></table><br>\n";
