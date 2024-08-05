@@ -110,12 +110,15 @@ $stat_vars = [
     'zswpin',
     'zswpout',
     'zswpwb',
+    'size',
 ];
 
 $gauge_vars = [
     'procs' => 1,
     'copy-on-write-faults' => 1,
     'cpu-time' => 1,
+    'cpu_usage_per' => 1,
+    'mem_usage_per' => 1,
     'data-size' => 1,
     'elapsed-times' => 1,
     'involuntary-context-switches' => 1,
@@ -164,6 +167,7 @@ $gauge_vars = [
     'slab_reclaimable' => 1,
     'slab_unreclaimable' => 1,
     'slab' => 1,
+    'size' => 1,
 ];
 
 $gauge_rrd_def = RrdDefinition::make()
@@ -177,7 +181,8 @@ $data = $returned['data'];
 $metrics = [];
 $old_data = $app->data;
 $new_data = [
-    'backend' => $data['backend']
+    'backend' => $data['backend'],
+    'oslvm_data' => [],
 ];
 
 // process total stats, .data.totals
@@ -200,6 +205,14 @@ foreach ($stat_vars as $key => $stat) {
 // process each oslvm under .data.oslvms
 $oslvms = [];
 foreach ($data['oslvms'] as $oslvms_key => $oslvms_stats) {
+    if ($data['backend'] == 'FreeBSD') {
+        $new_data['oslvm_data'][$oslvms_key] = [
+            'ipv4' => $oslvms_stats['ipv4'],
+            'ipv6' => $oslvms_stats['ipv6'],
+            'path' => $oslvms_stats['path'],
+        ];
+    }
+
     $oslvms[] = $oslvms_key;
     foreach ($stat_vars as $key => $stat) {
         if (isset($oslvms_stats[$stat])) {
