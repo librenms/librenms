@@ -131,6 +131,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('plugin/p={pluginName}', 'PluginLegacyController@redirect');
     Route::any('plugin/v1/{plugin:plugin_name}/{other?}', PluginLegacyController::class)->where('other', '(.*)')->name('plugin.legacy');
     Route::get('plugin/{plugin:plugin_name}', PluginPageController::class)->name('plugin.page');
+    Route::get('plugin/images/{plugin:plugin_name}/{file}', 'PluginImageController@image')->name('plugin.image');
 
     // old route redirects
     Route::permanentRedirect('poll-log', 'poller/log');
