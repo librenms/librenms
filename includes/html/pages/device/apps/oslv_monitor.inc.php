@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\Storage;
+
 $name = 'oslv_monitor';
 
 $link_array = [
@@ -34,7 +36,55 @@ if (isset($app_data['backend']) && $app_data['backend'] == 'FreeBSD') {
 
     if (isset($vars['oslvm']) && isset($app_data['oslvm_data'][$vars['oslvm']])) {
         if (isset($app_data['oslvm_data'][$vars['oslvm']]['path'])) {
-            echo "\n<br>Path: " . $app_data['oslvm_data'][$vars['oslvm']]['path'] . "<br>\n";
+            $path = $app_data['oslvm_data'][$vars['oslvm']]['path'];
+            $path = preg_replace('/\/$/', '', $path);
+            $storage_info = Storage::firstWhere(
+                ['storage_descr' => $path],
+                ['device_id' => $device['device_id']]
+            );
+            if (! isset($storage_info) && ! preg_match('/^\/+$/', $path)) {
+                $data_path_tmp = $path;
+                $data_path_tmp = preg_replace('/\/[^\/]+$/', '', $data_path_tmp);
+                while ($data_path_tmp != '' && ! isset($storage_info)) {
+                    $storage_info = Storage::firstWhere(
+                        ['storage_descr' => $data_path_tmp],
+                        ['device_id' => $device['device_id']]
+                    );
+                    if (! isset($storage_info)) {
+                        $data_path_tmp = preg_replace('/\/[^\/]+$/', '', $data_path_tmp);
+                    }
+                }
+            }
+            if (isset($storage_info)) {
+                $path_graph_array = [];
+                $path_graph_array['height'] = '100';
+                $path_graph_array['width'] = '210';
+                $path_graph_array['to'] = \LibreNMS\Config::get('time.now');
+                $path_graph_array['id'] = $storage_info['storage_id'];
+                $path_graph_array['type'] = 'storage_usage';
+                $path_graph_array['from'] = \LibreNMS\Config::get('time.day');
+                $path_graph_array['legend'] = 'no';
+
+                $path_link_array = $path_graph_array;
+                $path_link_array['page'] = 'graphs';
+                unset($rpath_link_array['height'], $path_link_array['width'], $path_link_array['legend']);
+
+                $path_link = \LibreNMS\Util\Url::generate($path_link_array);
+
+                $path_overlib_content = generate_overlib_content($path_graph_array, $device['hostname'] . ' - ' . $storage_info['storage_descr']);
+
+                $path_graph_array['width'] = 80;
+                $path_graph_array['height'] = 20;
+                $path_graph_array['bg'] = 'ffffff00';
+                $path_minigraph = \LibreNMS\Util\Url::lazyGraphTag($path_graph_array);
+
+                # table used to prevent breaking
+                echo "\n<br><table><tr><td>Path:&nbsp</td><td>" . \LibreNMS\Util\Url::overlibLink($path_link, $path, $path_overlib_content) .
+                    '</td><td>&nbsp(' . round($storage_info['storage_perc']) . '%)</td><td>' .
+                    \LibreNMS\Util\Url::overlibLink($path_link, $path_minigraph, $path_overlib_content) . "</td></td></table><br>\n";
+            } else {
+                echo "\n<br>Path: " . $app_data['oslvm_data'][$vars['oslvm']]['path'] . "<br>\n";
+            }
         }
         if (isset($app_data['oslvm_data'][$vars['oslvm']]['ipv4'])) {
             echo "\n<br>IPv4: " . $app_data['oslvm_data'][$vars['oslvm']]['ipv4'] . "<br>\n";
