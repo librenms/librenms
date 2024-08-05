@@ -65,7 +65,7 @@
         "fakerphp/faker": "^1.9.1",
         "friendsofphp/php-cs-fixer": "^v3.4",
         "larastan/larastan": "^2.9",
-        "laravel/dusk": "^7.4",
+        "laravel/dusk": "^8.2.2",
         "mockery/mockery": "^1.4.4",
         "nunomaduro/collision": "^7.0",
         "php-parallel-lint/php-parallel-lint": "^1.1",

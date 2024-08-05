@@ -2,16 +2,13 @@
 
 namespace Database\Factories;
 
-use App\Models\DeviceGroup;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-/** @extends Factory<DeviceGroup> */
+/** @extends Factory<\App\Models\DeviceGroup> */
 class DeviceGroupFactory extends Factory
 {
     /**
      * Define the model's default state.
-     *
-     * @return array
      */
     public function definition(): array
     {

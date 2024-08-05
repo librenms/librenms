@@ -2,16 +2,13 @@
 
 namespace Database\Factories;
 
-use App\Models\Location;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-/** @extends Factory<Location> */
+/** @extends Factory<\App\Models\Location> */
 class LocationFactory extends Factory
 {
     /**
      * Define the model's default state.
-     *
-     * @return array
      */
     public function definition(): array
     {

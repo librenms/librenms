@@ -1,0 +1,148 @@
+mib: GUDEADS-ESB7213-MIB:GUDEADS-ESB7214-MIB
+modules:
+    sensors:
+        temperature:
+            data:
+                -
+                    oid: esb7213SensorTable
+                    value: esb7213TempSensor
+                    num_oid: '.1.3.6.1.4.1.28507.66.1.6.1.1.2.{{ $index }}'
+                    descr: 'Temperature'
+                    index: 'esb7213TempSensor.{{ $index }}'
+                    group: 'Sensor {{ $index }} ({{ esb7213ExtSensorName }})'
+                    divisor: 10
+
+                -
+                    oid: esb7213SensorTable
+                    value: esb7213DewPoint
+                    num_oid: '.1.3.6.1.4.1.28507.66.1.6.1.1.6.{{ $index }}'
+                    descr: 'Dew Point'
+                    index: 'esb7213DewPoint.{{ $index }}'
+                    group: 'Sensor {{ $index }} ({{ esb7213ExtSensorName }})'
+                    divisor: 10
+
+                -
+                    oid: esb7213SensorTable
+                    value: esb7213DewPointDiff
+                    num_oid: '.1.3.6.1.4.1.28507.66.1.6.1.1.7.{{ $index }}'
+                    descr: 'Dew Diff'
+                    index: 'esb7213DewPointDiff.{{ $index }}'
+                    group: 'Sensor {{ $index }} ({{ esb7213ExtSensorName }})'
+                    divisor: 10
+
+                -
+                    oid: esb7214SensorTable
+                    value: esb7214TempSensor
+                    num_oid: '.1.3.6.1.4.1.28507.67.1.6.1.1.2.{{ $index }}'
+                    descr: 'Temperature'
+                    index: 'esb7214TempSensor.{{ $index }}'
+                    group: 'Sensor {{ $index }} ({{ esb7214ExtSensorName }})'
+                    divisor: 10
+
+                -
+                    oid: esb7214SensorTable
+                    value: esb7214DewPoint
+                    num_oid: '.1.3.6.1.4.1.28507.67.1.6.1.1.6.{{ $index }}'
+                    descr: 'Dew Point'
+                    index: 'esb7214DewPoint.{{ $index }}'
+                    group: 'Sensor {{ $index }} ({{ esb7214ExtSensorName }})'
+                    divisor: 10
+
+                -
+                    oid: esb7214SensorTable
+                    value: esb7214DewPointDiff
+                    num_oid: '.1.3.6.1.4.1.28507.67.1.6.1.1.7.{{ $index }}'
+                    descr: 'Dew Diff'
+                    index: 'esb7214DewPointDiff.{{ $index }}'
+                    group: 'Sensor {{ $index }} ({{ esb7214ExtSensorName }})'
+                    divisor: 10
+        humidity:
+            data:
+                -
+                    oid: esb7213SensorTable
+                    value: esb7213HygroSensor
+                    num_oid: '.1.3.6.1.4.1.28507.66.1.6.1.1.3.{{ $index }}'
+                    descr: 'Humidity'
+                    index: 'esb7213HygroSensor.{{ $index }}'
+                    group: 'Sensor {{ $index }} ({{ esb7213ExtSensorName }})'
+                    divisor: 10
+
+                -
+                    oid: esb7214SensorTable
+                    value: esb7214HygroSensor
+                    num_oid: '.1.3.6.1.4.1.28507.67.1.6.1.1.3.{{ $index }}'
+                    descr: 'Humidity'
+                    index: 'esb7214HygroSensor.{{ $index }}'
+                    group: 'Sensor {{ $index }} ({{ esb7214ExtSensorName }})'
+                    divisor: 10
+        pressure:
+            data:
+                -
+                    oid: esb7213SensorTable
+                    value: esb7213AirPressure
+                    num_oid: '.1.3.6.1.4.1.28507.66.1.6.1.1.5.{{ $index }}'
+                    descr: 'Pressure'
+                    index: 'esb7213AirPressure.{{ $index }}'
+                    group: 'Sensor {{ $index }} ({{ esb7213ExtSensorName }})'
+                    divisor: 10
+
+                -
+                    oid: esb7214SensorTable
+                    value: esb7214AirPressure
+                    num_oid: '.1.3.6.1.4.1.28507.67.1.6.1.1.5.{{ $index }}'
+                    descr: 'Pressure'
+                    index: 'esb7214AirPressure.{{ $index }}'
+                    group: 'Sensor {{ $index }} ({{ esb7214ExtSensorName }})'
+                    divisor: 10
+        state:
+            data:
+                -
+                    oid: esb7213POE
+                    num_oid: '.1.3.6.1.4.1.28507.66.1.5.10.{{ $index }}'
+                    descr: 'Available'
+                    group: POE
+                    state_name: 'esb7213POE'
+                    states:
+                        - { descr: No, graph: 1, value: 0, generic: 3 }
+                        - { descr: Yes, graph: 1, value: 1, generic: 0 }
+                -
+                    oid: esb7214POE
+                    num_oid: '.1.3.6.1.4.1.28507.67.1.5.10.{{ $index }}'
+                    descr: 'Available'
+                    group: POE
+                    state_name: 'esb7214POE'
+                    states:
+                        - { descr: No, graph: 1, value: 0, generic: 0 }
+                        - { descr: Yes, graph: 1, value: 1, generic: 0 }
+
+                -
+                    oid: esb7214portTable
+                    value: esb7214PortState
+                    num_oid: '.1.3.6.1.4.1.28507.67.1.3.1.2.1.3.{{ $index }}'
+                    descr: 'Relay'
+                    group: 'Output {{ $index }} ({{ esb7214PortName }})'
+                    state_name: 'esb7214PortState'
+                    states:
+                        - { descr: Off, graph: 1, value: 0, generic: 1 }
+                        - { descr: On, graph: 1, value: 1, generic: 0 }
+                -
+                    oid: esb7214InputTable
+                    value: esb7214Input
+                    num_oid: '.1.3.6.1.4.1.28507.67.1.5.6.2.1.2.{{ $index }}'
+                    descr: 'Logical state'
+                    group: 'Input {{ $index }} ({{ esb7214InputName }})'
+                    state_name: 'esb7214Input'
+                    states:
+                        - { descr: Low, graph: 1, value: 0, generic: 1 }
+                        - { descr: High, graph: 1, value: 1, generic: 0 }
+
+
+
+        count:
+            data:
+                -
+                    oid: esb7214portTable
+                    value: esb7214PortSwitchCount
+                    num_oid: '.1.3.6.1.4.1.28507.67.1.3.1.2.1.4.{{ $index }}'
+                    descr: 'Toggle count {{ esb7214PortName }}'
+                    group: Relay
