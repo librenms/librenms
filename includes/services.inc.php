@@ -247,8 +247,10 @@ function check_service($command)
     // Split out the response and the performance data.
     [$response, $perf] = explode('|', $response_string);
 
-    // Split each performance metric
-    $perf_arr = explode(' ', $perf);
+    // Split performance metrics into an array
+    preg_match_all('/\'[^\']*\'\S*|\S+/', $perf, $perf_arr);
+    // preg_match_all returns a 2D array, we only need the first one
+    $perf_arr = $perf_arr[0];
 
     // Create an array for our metrics.
     $metrics = [];
