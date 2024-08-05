@@ -232,6 +232,10 @@ if (isset($app_data['backend']) && $app_data['backend'] == 'FreeBSD') {
             'description' => 'Processes',
         ],
         [
+            'type' => 'sock',
+            'description' => 'Sock, network transmission buffers size',
+        ],
+        [
             'type' => 'ops_rwd',
             'description' => 'Ops, Read/Write/Discard',
         ],
@@ -241,15 +245,15 @@ if (isset($app_data['backend']) && $app_data['backend'] == 'FreeBSD') {
         ],
         [
             'type' => 'sizes',
-            'description' => 'Size, Data, Text in Kbytes',
+            'description' => 'Size, Data, Text in kbytes',
         ],
         [
             'type' => 'rss',
-            'description' => 'Real Memory(Resident Set Size) in Kbytes',
+            'description' => 'Real Memory(Resident Set Size) in kbytes',
         ],
         [
             'type' => 'vsz',
-            'description' => 'Virtual Size in Kbytes',
+            'description' => 'Virtual Size in kbytes',
         ],
         [
             'type' => 'faults',
@@ -266,6 +270,14 @@ if (isset($app_data['backend']) && $app_data['backend'] == 'FreeBSD') {
         [
             'type' => 'pg',
             'description' => 'Page Stats, non faults',
+        ],
+        [
+            'type' => 'mem_misc',
+            'description' => 'Misc. Memory Stats',
+        ],
+        [
+            'type' => 'thp_activity',
+            'description' => 'Transparent Huge Page Activity',
         ],
     ];
 }
