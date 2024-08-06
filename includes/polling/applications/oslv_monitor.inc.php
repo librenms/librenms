@@ -184,6 +184,7 @@ $old_data = $app->data;
 $new_data = [
     'backend' => $data['backend'],
     'oslvm_data' => [],
+    'inactive' => [],
 ];
 
 // process total stats, .data.totals
@@ -205,12 +206,18 @@ foreach ($stat_vars as $key => $stat) {
 
 // process each oslvm under .data.oslvms
 $oslvms = [];
+$current_time = time();
 foreach ($data['oslvms'] as $oslvms_key => $oslvms_stats) {
     if ($data['backend'] == 'FreeBSD') {
         $new_data['oslvm_data'][$oslvms_key] = [
             'ipv4' => $oslvms_stats['ipv4'],
             'ipv6' => $oslvms_stats['ipv6'],
             'path' => $oslvms_stats['path'],
+            'seen' => $current_time,
+        ];
+    } else {
+        $new_data['oslvm_data'][$oslvms_key] = [
+            'seen' => $current_time,
         ];
     }
 
@@ -238,6 +245,16 @@ $old_oslvms = $old_data['oslvms'] ?? [];
 $added_oslvms = array_diff($oslvms, $old_oslvms);
 $removed_oslvms = array_diff($old_oslvms, $oslvms);
 $new_data['oslvms'] = $oslvms;
+
+// process unseen items, save info for ones that were last seen with in the specified time
+$back_till = $current_time - \LibreNMS\Config::get('apps.oslv_monitor.seen_age');
+foreach ($removed_oslvms as $key => $oslvm) {
+    if (isset($old_data['oslvm_data']) && isset($old_data['oslvm_data'][$oslvm]) &&
+        isset($old_data['oslvm_data'][$oslvm]['seen']) && $back_till <= $old_data['oslvm_data'][$oslvm]['seen']) {
+        $new_data['oslvm_data'][$oslvm] = $old_data['oslvm_data'][$oslvm];
+        $new_data['inactive'][] = $oslvm;
+    }
+}
 
 $app->data = $new_data;
 

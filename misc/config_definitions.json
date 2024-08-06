@@ -383,6 +383,10 @@
             "default": 8082,
             "type": "integer"
         },
+        "apps.oslv_monitor.seen_age": {
+            "default": 604800,
+            "type": "integer"
+        },
         "apps.sneck.polling_time_diff": {
             "default": false,
             "type": "boolean"
