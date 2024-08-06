@@ -247,7 +247,7 @@ $removed_oslvms = array_diff($old_oslvms, $oslvms);
 $new_data['oslvms'] = $oslvms;
 
 // process unseen items, save info for ones that were last seen with in the specified time
-$back_till = $current_time - \LibreNMS\Config::get('apps.oslv_monitor.seen_age');
+$back_till = $current_time - \LibreNMS\Config::get('apps.oslv_monitor.seen_age', 604800);
 foreach ($removed_oslvms as $key => $oslvm) {
     if (isset($old_data['oslvm_data']) && isset($old_data['oslvm_data'][$oslvm]) &&
         isset($old_data['oslvm_data'][$oslvm]['seen']) && $back_till <= $old_data['oslvm_data'][$oslvm]['seen']) {
