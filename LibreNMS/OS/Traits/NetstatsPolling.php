@@ -31,17 +31,17 @@ trait NetstatsPolling
 {
     public function pollIcmpNetstats(array $oids): array
     {
-        return SnmpQuery::get($oids)->values();
+        return SnmpQuery::walk('IP-MIB::icmpGroup')->values();
     }
 
     public function pollIpNetstats(array $oids): array
     {
-        return SnmpQuery::get($oids)->values();
+        return SnmpQuery::walk('IP-MIB::ipGroup')->values();
     }
 
     public function pollSnmpNetstats(array $oids): array
     {
-        return SnmpQuery::get($oids)->values();
+        return SnmpQuery::walk('SNMPv2-MIB::snmp')->values();
     }
 
     public function pollIpForwardNetstats(array $oids): array
@@ -51,11 +51,11 @@ trait NetstatsPolling
 
     public function pollUdpNetstats(array $oids): array
     {
-        return SnmpQuery::get($oids)->values();
+        return SnmpQuery::walk('UDP-MIB::udpBaseGroup')->values();
     }
 
     public function pollTcpNetstats(array $oids): array
     {
-        return SnmpQuery::get($oids)->values();
+        return SnmpQuery::get('TCP-MIB::tcpBaseGroup')->values();
     }
 }
