@@ -218,6 +218,13 @@ return [
             ],
         ],
         'database' => [
+            'CheckDatabaseConnected' => [
+                'fail' => 'Unable to connect to database',
+                'fail_connect' => 'Unable to connect to database. Confirm database server is running and connection info is correct.  Check DB_HOST, DB_PORT, and DB_NAME in environment or in :env_file',
+                'fail_access' => 'Database connected, but user does not have permission to access database. Run SQL query to grant permissions (change localhost to local hostname if datababase is remote)',
+                'fail_auth' => 'Database credentials incorrect. Double check credentials in DB_USERNAME and DB_PASSWORD either in environment or in :env_file',
+                'ok' => 'Database Connected',
+            ],
             'CheckDatabaseTableNamesCase' => [
                 'fail' => 'You have lower_case_table_names set to 1 or true in mysql config.',
                 'fix' => 'Set lower_case_table_names=0 in your mysql config file in the [mysqld] section.',
