@@ -36,7 +36,7 @@ class HealthCheck extends Command
         $redisStatus = $redisResult->getStatus();
         if ($redisStatus == ValidationResult::WARNING) {
             $this->warn($redisResult->getMessage());
-        } elseif($redisStatus == ValidationResult::FAILURE) {
+        } elseif ($redisStatus == ValidationResult::FAILURE) {
             $this->error($redisResult->getMessage());
 
             return 1;
@@ -45,7 +45,7 @@ class HealthCheck extends Command
         // check database
         $dbResult = (new CheckDatabaseConnected)->validate();
         $dbStatus = $dbResult->getStatus();
-        if($dbStatus == ValidationResult::FAILURE) {
+        if ($dbStatus == ValidationResult::FAILURE) {
             $this->error($dbResult->getMessage() . ($dbResult->getList()[0] ?? ''));
 
             return 1;
@@ -63,7 +63,7 @@ class HealthCheck extends Command
                 }
 
                 if (filemtime($health_file) < (time() - 30)) {
-                    $this->error("Dispacher service missed three heartbeats");
+                    $this->error('Dispacher service missed three heartbeats');
 
                     return 1;
                 }
