@@ -108,7 +108,7 @@ class CheckDatabaseConnected implements Validation
 
             $service = $finder->find('service');
             if ($service) {
-                return "service start mysqld"; // probably correct :D
+                return 'service start mysqld'; // probably correct :D
             }
         }
 
