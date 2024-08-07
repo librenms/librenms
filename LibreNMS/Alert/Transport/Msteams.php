@@ -22,31 +22,58 @@ class Msteams extends Transport
 
     public function deliverAlert(array $alert_data): bool
     {
-        $data = [
-            'title' => $alert_data['title'],
-            'themeColor' => self::getColorForState($alert_data['state']),
-            'text' => strip_tags($alert_data['msg'], '<strong><em><h1><h2><h3><strike><ul><ol><li><pre><blockquote><a><img><p>'),
-            'summary' => $alert_data['title'],
-        ];
-
+        $translate_color = $alert_data['state'] == '1'
+            ? 'Attention'
+            : 'Good';
+        $data = '
+{
+       "type":"message",
+       "attachments":[
+          {
+             "contentType":"application/vnd.microsoft.card.adaptive",
+             "contentUrl":null,
+             "content":{
+                "$schema":"http://adaptivecards.io/schemas/adaptive-card.json",
+                        "type": "AdaptiveCard",
+                        "version": "1.4",
+    "body": [
+      {
+        "type": "Container",
+        "items": [
+          {
+            "type": "TextBlock",
+            "text": "' . $alert_data['title'] . '",
+            "color": "' . $translate_color . '",
+            "weight": "bolder",
+            "size": "medium"
+          }
+        ]
+      },
+      {
+        "type": "Container",
+        "items": [
+          {
+            "type": "TextBlock",
+            "text": "' . strip_tags($alert_data['msg'], '<strong><em><h1><h2><h3><strike><ul><ol><li><pre><blockquote><a><img><p>') . '",
+            "wrap": true
+          }
+        ]
+      }
+    ]
+   }
+  }
+ ]
+}  
+';
         $client = Http::client();
-
-        // template will contain raw json
-        if ($this->config['use-json'] === 'on') {
-            $msg = $alert_data['uid'] === '000'
-                ? $this->messageCard() // use pre-made MessageCard for tests
-                : $alert_data['msg'];
-
-            $client->withBody($msg, 'application/json');
-        }
-
+        $client->withBody($data, 'application/json');
         $res = $client->post($this->config['msteam-url'], $data);
 
         if ($res->successful()) {
             return true;
         }
 
-        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $data['text'], $data);
+        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $data, $data);
     }
 
     public static function configTemplate(): array
@@ -54,66 +81,15 @@ class Msteams extends Transport
         return [
             'config' => [
                 [
-                    'title' => 'Webhook URL',
+                    'title' => 'Flow URL',
                     'name' => 'msteam-url',
-                    'descr' => 'Microsoft Teams Webhook URL',
+                    'descr' => 'Microsoft Teams workflow URL',
                     'type' => 'text',
-                ],
-                [
-                    'title' => 'Use JSON?',
-                    'name' => 'use-json',
-                    'descr' => 'Compose MessageCard with JSON rather than Markdown. Your template must be valid MessageCard JSON',
-                    'type' => 'checkbox',
-                    'default' => false,
                 ],
             ],
             'validation' => [
                 'msteam-url' => 'required|url',
             ],
         ];
-    }
-
-    private function messageCard(): string
-    {
-        return '{
-    "@context": "https://schema.org/extensions",
-    "@type": "MessageCard",
-    "potentialAction": [
-        {
-            "@type": "OpenUri",
-            "name": "View MessageCard Reference",
-            "targets": [
-                {
-                    "os": "default",
-                    "uri": "https://learn.microsoft.com/en-us/outlook/actionable-messages/message-card-reference"
-                }
-            ]
-        },
-        {
-            "@type": "OpenUri",
-            "name": "View LibreNMS Website",
-            "targets": [
-                {
-                    "os": "default",
-                    "uri": "https://www.librenms.org/"
-                }
-            ]
-        }
-    ],
-    "sections": [
-        {
-            "facts": [
-                {
-                    "name": "Next Action:",
-                    "value": "Make your alert template emit valid MessageCard Json"
-                }
-            ],
-            "text": "You have successfully sent a pre-formatted MessageCard message to teams."
-        }
-    ],
-    "summary": "Test Successful",
-    "themeColor": "0072C6",
-    "title": "Test MessageCard"
-}';
     }
 }
