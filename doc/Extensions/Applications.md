@@ -1851,6 +1851,41 @@ chmod +x /etc/snmp/opensips-stats.sh
 extend opensips /etc/snmp/opensips-stats.sh
 ```
 
+## OS Level Virtualization Monitoring
+
+| OS      | Supported                        |
+|---------|----------------------------------|
+| FreeBSD | jails                            |
+| Linux   | cgroups(Docker, Podman included) |
+
+### SNMP Extend
+
+1. Install the depends...
+
+```shell
+# FreeBSD
+pkg install p5-Clone p5-File-Slurp p5-JSON p5-Mime-Base64 p5-App-cpanminus
+
+# Debian
+apt-get install libclone-perl libfile-slurp-perl libjson-perl libmime-base64-perl cpanminus
+```
+
+2. Install... `cpanm OSLV::Monitor`
+
+3. Setup cron.
+
+```
+ */5 * * * * /usr/local/bin/oslv_monitor -q > /dev/null 2> /dev/null
+```
+
+4. Setup snmpd.
+
+```
+extend oslv_monitor /bin/cat /var/cache/oslv_monitor/snmp
+```
+
+Wait for it to be rediscovered by LibreNMS.
+
 ## OS Updates
 
 A small shell script that checks your system package manager for any
