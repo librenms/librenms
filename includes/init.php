@@ -100,7 +100,7 @@ if (! module_selected('nodb', $init_modules)) {
             echo "Check the install docs for more info: https://docs.librenms.org/Installation/\n";
         }
 
-        exit;
+        exit(1);
     }
 }
 \LibreNMS\DB\Eloquent::setStrictMode(false); // disable strict mode for legacy code...
