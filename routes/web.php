@@ -188,6 +188,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('munin', 'MuninPluginController')->name('ajax.select.munin');
             Route::get('role', 'RoleController')->name('ajax.select.role');
             Route::get('service', 'ServiceController')->name('ajax.select.service');
+            Route::get('customoid', 'CustomoidController')->name('ajax.select.customoid');
             Route::get('template', 'ServiceTemplateController')->name('ajax.select.template');
             Route::get('poller-group', 'PollerGroupController')->name('ajax.select.poller-group');
             Route::get('port', 'PortController')->name('ajax.select.port');
