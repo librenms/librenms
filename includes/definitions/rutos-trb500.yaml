@@ -1,4 +1,4 @@
-os: rutos
+os: rutos-trb500
 type: network
 group: unix
 text: 'Teltonika rutos TRB series'
