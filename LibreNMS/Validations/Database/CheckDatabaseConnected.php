@@ -39,7 +39,7 @@ class CheckDatabaseConnected implements Validation
     public function validate(): ValidationResult
     {
         try {
-            if (DB::connection()?->getPdo()) {
+            if (DB::connection()->getPdo()) {
                 DB::select('select 1 from migrations limit 1'); // test query
 
                 return ValidationResult::ok(trans('validation.validations.database.CheckDatabaseConnected.ok'));
@@ -91,7 +91,7 @@ class CheckDatabaseConnected implements Validation
     {
         $host = config('database.connections.database.' . config('database.default') . '.host');
         $fix = null;
-        if (empty($host) || $host == 'localhost' || str_starts_with($host, '127.') || str_starts_with($host, '127.')) {
+        if (empty($host) || $host == 'localhost' || str_starts_with($host, '127.')) {
             $finder = new ExecutableFinder;
             $systemctl = $finder->find('systemctl');
             if ($systemctl) {
