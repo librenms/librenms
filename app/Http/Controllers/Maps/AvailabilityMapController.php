@@ -1,8 +1,8 @@
 <?php
 /**
- * DependencyController.php
+ * AvailabilityMapController.php
  *
- * Controller for graphing Relationships
+ * Controller for availability maps
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,8 +19,8 @@
  *
  * @link       https://www.librenms.org
  *
- * @copyright  2019 Thomas Berberich
- * @author     Thomas Berberich <sourcehhdoctor@gmail.com>
+ * @copyright  2023 Steven Wilton
+ * @author     Steven Wilton <swilton@fluentit.com.au>
  */
 
 namespace App\Http\Controllers\Maps;
@@ -31,25 +31,22 @@ use Illuminate\Http\Request;
 use Illuminate\View\View;
 use LibreNMS\Config;
 
-class DeviceDependencyController extends Controller
+class AvailabilityMapController extends Controller
 {
-    // Device Dependency Map
-    public function dependencyMap(Request $request): View
+    // Availability Map
+    public function availabilityMap(Request $request): View
     {
-        $group_id = $request->get('group');
-
-        $group_name = DeviceGroup::where('id', '=', $group_id)->first('name');
-        if (! empty($group_name)) {
-            $group_name = $group_name->name;
-        }
-
         $data = [
             'page_refresh' => Config::get('page_refresh', 300),
-            'group_id' => $group_id,
-            'options' => Config::get('network_map_vis_options'),
-            'group_name' => $group_name,
+            'compact' => Config::get('webui.availability_map_compact'),
+            'box_size' => Config::get('webui.availability_map_box_size'),
+            'sort' => Config::get('webui.availability_map_sort_status') ? 'status' : 'hostname',
+            'use_groups' => Config::get('webui.availability_map_use_device_groups'),
+            'services' => Config::get('show_services'),
+            'uptime_warn' => Config::get('uptime_warning'),
+            'devicegroups' => Config::get('webui.availability_map_use_device_groups') ? DeviceGroup::hasAccess($request->user())->orderBy('name')->get(['id', 'name']) : [],
         ];
 
-        return view('map.device-dependency', $data);
+        return view('map.availability', $data);
     }
 }
