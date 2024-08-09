@@ -1,4 +1,7 @@
 <div style="margin: 15px;">
+
+<div style="display: flex; align-items: center; justify-content: center;"><img style="transform: scale(0.6);" src="/plugin/images/ExamplePlugin/LibreNMS-Logo.png"></img></div>
+
 <h4>{{ $plugin_name }} Settings:</h4>
 
 <!-- Example of free-form settings, real plugins should use specific fields -->
