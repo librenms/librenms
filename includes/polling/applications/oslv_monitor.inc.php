@@ -262,7 +262,7 @@ $app->data = $new_data;
 if (count($added_oslvms) > 0 || count($removed_oslvms) > 0) {
     $log_message = 'OSLV Change:';
     $log_message .= count($added_oslvms) > 0 ? ' Added ' . implode(',', $added_oslvms) : '';
-    $log_message .= count($removed_oslvms) > 0 ? ' Removed ' . implode(',', $added_oslvms) : '';
+    $log_message .= count($removed_oslvms) > 0 ? ' Removed ' . implode(',', $removed_oslvms) : '';
     log_event($log_message, $device, 'application');
 }
 
