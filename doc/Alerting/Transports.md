@@ -873,6 +873,73 @@ You need a token you can find on your personnal space.
 | API URL | http://api.smsmode.com/http/1.6/sendSMS.do |
 | Options | accessToken=_PUT_HERE_YOUR_TOKEN_<br/> numero=_PUT_HERE_DESTS_NUMBER_COMMA_SEPARATED_<br />message={{ $msg }} |
 
+## SNMP Traps
+
+SNMP traps are usually the preferred way to integrate a system to a northbound service which correlates several alarms.
+This transport will send traps with information from alarms using TRAPv2 or INFORM PDUs (limited to v2c) in conformance
+to [RFC2578](https://www.rfc-editor.org/rfc/rfc2578).
+
+A new MIB file describing the structures has been contributed by Tigo Technology Center, but any other trap definition could be used.
+
+**Example:**
+
+| Config | Example |
+| ------ | ------- |
+| Transport type | Snmptrap |
+| Destination host | noc.mycompany.com |
+| SNMP Trap transport | UDP |
+| Community | out-community |
+| Trap Definition | TTC-NOTIFICATIONS-MIB::daEvent |
+| PDU | TRAPv2 |
+| MIB file directory | /opt/librenms/mibs/ttc |
+
+### Templates
+
+Templates are important in this case, and must be specific to the transport since they map OID/varbinds to the alarm information.
+
+**Catch all template**
+
+```
+daTitle s "{{ $alert->title }}"
+daAlertID i {{ $alert->id }}
+daEventID i {{ $alert->uid }}
+daState i {{ $alert->state}}
+daSeverity s {{ $alert->severity }}
+daRuleID i {{ $alert->rule_id }}
+daRuleName s "{{ $alert->name }}"
+daProcedure s "{{ $alert->proc }}"
+daTimestamp s "{{ $alert->timestamp }}"
+@if ($alert->state == 0) daTimeElapsed s "{{ $alert->elapsed }}" @endif 
+daDeviceID i {{ $alert->device_id }}
+daDevHostname s "{{ $alert->hostname }}"
+daDevSysName s "{{ $alert->sysName }}"
+daDevMgmtIP s "{{ $alert->ip }}"
+daDevSysDescr s "{{ $alert->sysDescr }}"
+daDevOS s "{{ $alert->os }}"
+daDevType s "{{ $alert->type }}"
+daDevHardware s "{{ $alert->hardware }}"
+daDevVersion s "{{ $alert->version }}"
+daDevFeatures s "{{ $alert->features }}"
+daDevSerial s "{{ $alert->serial }}"
+daDevLocation s "{{ $alert->location }}"
+daDevUptime t "{{ $alert->uptime }}"
+daDevShortUptime s "{{ $alert->uptime_short }}"
+daDevLongUptime s "{{ $alert->uptime_long }}"
+daDevPurpose s "{{ $alert->description }}"
+daDevNotes s "{{ $alert->notes }}"
+daACKNotes s "{{ $alert->alert_notes }}"
+daDevPingTimestamp s "{{ $alert->ping_timestamp }}"
+daDevPingLoss s "{{ $alert->ping_loss }}"
+daDevPingMin s "{{ $alert->ping_min }}"
+daDevPingMax s "{{ $alert->ping_max }}"
+daDevPingAvg s "{{ $alert->ping_avg }}"
+@if ($alert->faults)
+@foreach ($alert->faults as $key => $value)
+daFaultTableEntryDetail.{{ $key }} s "{{ $value['string'] }}"
+@endforeach
+@endif
+```
+
 ## Splunk
 
 LibreNMS can send alerts to a Splunk instance and provide all device
