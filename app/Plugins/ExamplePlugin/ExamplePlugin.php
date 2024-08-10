@@ -4,10 +4,10 @@ namespace App\Plugins\ExamplePlugin;
 
 use App\Models\Plugin;
 
-class ExamplePlugin extends Plugin
+class ExamplePlugin
 {
-    public static function boot()
+    public function myFunction()
     {
+        return;
     }
 }
-

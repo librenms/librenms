@@ -54,12 +54,21 @@ class PluginProvider extends ServiceProvider
         foreach (glob(base_path('app/Plugins/*/*.php')) as $file) {
             if (preg_match('#^(.*/([^/]+))/([^/.]+)\.php#', $file, $matches)) {
                 $plugin_name = $matches[2]; // containing directory name
+                $class_file_no_ext = $matches[3]; // contains file name, without directory or extension
+
                 if ($plugin_name == 'Hooks') {
                     continue;  // don't load the hooks :D
                 }
 
+                if ($class_file_no_ext == "routes") {
+                    // We can load the routes.php file
+                    $this->loadRoutesFrom($file);
+                    continue; // done here
+                }
+
+                $class = $this->className($plugin_name, $class_file_no_ext);
+
                 try {
-                    $class = $this->className($plugin_name, $matches[3]);
                     $hook_type = $this->hookType($class);
 
                     // publish hooks in class
@@ -73,6 +82,7 @@ class PluginProvider extends ServiceProvider
                 } catch (PluginDoesNotImplementHookException $e) {
                     // No hook in that class, but we can still load it for code.
                 }
+
             }
         }
     }
@@ -87,10 +97,14 @@ class PluginProvider extends ServiceProvider
      */
     protected function hookType(string $class): string
     {
-        foreach (class_parents($class) as $parent) {
-            if (Str::startsWith($parent, 'App\Plugins\Hooks\\')) {
-                return $parent;
+        try {
+            foreach (class_parents($class) as $parent) {
+                if (Str::startsWith($parent, 'App\Plugins\Hooks\\')) {
+                    return $parent;
+                }
             }
+        } catch (\Exception $e) {
+            // class cannot be found, so we don't have to look for a Hook anyway
         }
 
         throw new PluginDoesNotImplementHookException($class);
