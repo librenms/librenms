@@ -58,16 +58,20 @@ class PluginProvider extends ServiceProvider
                     continue;  // don't load the hooks :D
                 }
 
-                $class = $this->className($plugin_name, $matches[3]);
-                $hook_type = $this->hookType($class);
+                try {
+                    $class = $this->className($plugin_name, $matches[3]);
+                    $hook_type = $this->hookType($class);
 
-                // publish hooks in class
-                $hook_published = $manager->publishHook($plugin_name, $hook_type, $class);
+                    // publish hooks in class
+                    $hook_published = $manager->publishHook($plugin_name, $hook_type, $class);
 
-                // register view namespace
-                if ($hook_published && ! in_array($plugin_name, $plugin_view_location_registered)) {
-                    $plugin_view_location_registered[] = $plugin_name;  // don't register twice
-                    $this->loadViewsFrom($matches[1], $plugin_name);
+                    // register view namespace
+                    if ($hook_published && ! in_array($plugin_name, $plugin_view_location_registered)) {
+                        $plugin_view_location_registered[] = $plugin_name;  // don't register twice
+                        $this->loadViewsFrom($matches[1], $plugin_name);
+                    }
+                } catch (PluginDoesNotImplementHookException $e) {
+                    // No hook in that class, but we can still load it for code.
                 }
             }
         }
