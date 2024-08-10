@@ -82,7 +82,6 @@ class PluginProvider extends ServiceProvider
                 } catch (PluginDoesNotImplementHookException $e) {
                     // No hook in that class, but we can still load it for code.
                 }
-
             }
         }
     }
