@@ -60,7 +60,7 @@ class PluginProvider extends ServiceProvider
                     continue;  // don't load the hooks :D
                 }
 
-                if ($class_file_no_ext == "routes") {
+                if ($class_file_no_ext == 'routes') {
                     // We can load the routes.php file
                     $this->loadRoutesFrom($file);
                     continue; // done here

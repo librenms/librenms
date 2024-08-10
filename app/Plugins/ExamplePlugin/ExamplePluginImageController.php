@@ -2,10 +2,8 @@
 
 namespace App\Plugins\ExamplePlugin;
 
-use App\Models\Plugin;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-
+use Illuminate\Http\Request;
 
 class ExamplePluginImageController extends Controller
 {
