@@ -3,8 +3,9 @@
 With plugins you can extend LibreNMS with special functions that are
 specific to your setup or are not relevant or interesting for all community members.
 
-You are able to intervene in defined places in the behavior of
-the website, without it coming to problems with future updates.
+A few hooks are defined in LibreNMS to call the plugins. You are able to intervene 
+in those defined places in the behavior of the application without risking problems 
+with future updates.
 
 This documentation will give you a basis for writing a plugin for
 LibreNMS. An example plugin is included in the LibreNMS distribution.
@@ -14,19 +15,21 @@ LibreNMS. An example plugin is included in the LibreNMS distribution.
 
 Plugins in version 2 need to be installed into app/Plugins
 
->Note: Plugins are disabled when the have an error, to show errors instead set plugins.show_errors
+>Note: Plugins are disabled when the have an error, to show errors instead, set plugins.show_errors:
+`lnms config:set plugins.show_errors  true`
 
 The structure of a plugin is follows:
 
 ```
 app/Plugins
-            /PluginName
+            /PluginName (mandatory)
                        /DeviceOverview.php
                        /Menu.php
                        /Page.php
                        /PortTab.php
                        /Settings.php
-                       /resources/views
+                       /ResourceAccessor.php
+                       /resources/views (mandatory depending if the matching class above requires it)
                                        /device-overview.blade.php
                                        /menu.blade.php
                                        /page.blade.php
@@ -38,12 +41,10 @@ The above structure is checked before a plugin can be installed.
 
 All file/folder names are case sensitive and must match the structure.
 
-Only the blade files that are really needed need to be created. A plugin manager
+Only the class & blade files that are really needed need to be created. A plugin manager
 will then load a hook that has a basic functionality.
 
-If you want to customize the basic behavior of the hooks, you can create a
-class in 'app/Plugins/PluginName' and overload the hook methods.
-
+- DeviceOverview.php :: This is the class computing the data for the matching blade device-overview.blade.php.
 - device-overview.blade.php :: This is called in the Device
   Overview page. You receive the $device as a object per default, you can do your
   work here and display your results in a frame.
@@ -67,18 +68,22 @@ class in 'app/Plugins/PluginName' and overload the hook methods.
     </div>
 </div>
 ```
-
+- PortTab.php :: This is the class computing the data for the matching blade port-tab.blade.php
 - port-tab.blade.php :: This is called in the Port page,
   in the "Plugins" menu_option that will appear when your plugin gets
   enabled. In this blade, you can do your work and display your
   results in a frame.
 
+- Menu.php :: This is the class computing the data for the matching blade menu.blade.php
 - menu.blade.php :: For a menu entry
 
+- Page.php :: This is the class computing the data for the matching blade menu.blade.php
 - page.blade.pho :: Here is a good place to add a own LibreNMS page without dependence with a device. A good place to create your own lists with special requirements and behavior.
 
+- Settings.php :: This is the class computing the data for the matching blade settings.blade.php
 - settings.blade.php :: If you need your own settings and variables, you can have a look in the ExamplePlugin.
 
+- ResourceAccessor.php :: This is a class with no matching blade, intended to allow File/Image download (both static or dynamically generated. Can be used to create reports.
 
 ### PHP Hooks customization
 
@@ -137,7 +142,7 @@ https://laravel.com/docs/packages
 > This is untested, please come to discord and share any expriences and update this documentation!
 
 
-## Version 1 Plugin System structure (legacy verion)
+## Version 1 Plugin System structure (legacy version)
 
 Plugins need to be installed into html/plugins
 
