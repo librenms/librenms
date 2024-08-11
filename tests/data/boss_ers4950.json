@@ -10237,8 +10237,8 @@
                     "ifName": "11/2",
                     "portName": null,
                     "ifIndex": 8193,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -10337,8 +10337,8 @@
                     "ifName": "ifc55001 OOB #0",
                     "portName": null,
                     "ifIndex": 55001,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
@@ -12627,5 +12627,44 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "discovery-protocols": {
+        "discovery": {
+            "links": [
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "hole-ap8432-F0B783",
+                    "remote_port": "ge1 (b85001f0b783)",
+                    "remote_platform": null,
+                    "remote_version": "AP-8432-680B30-US, Version 5.9.3.0-018R",
+                    "ifAlias": "Extreme Networks Ethernet Routing Switch 4950GTS-PWR+ Module - Port 2",
+                    "ifDescr": "Extreme Networks Ethernet Routing Switch 4950GTS-PWR+ Module - Port 2",
+                    "ifName": "1/2"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "cox-base-vsp8k1",
+                    "remote_port": "1/1 (b0adaa434400)",
+                    "remote_platform": null,
+                    "remote_version": "VSP-8284XSQ (7.1.1.0)",
+                    "ifAlias": "fa: uplink",
+                    "ifDescr": "Extreme Networks Ethernet Routing Switch 4950GTS-PWR+ Module - Port 49",
+                    "ifName": "1/49"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "cox-base-vsp8k2",
+                    "remote_port": "1/1 (b0adaa42fc00)",
+                    "remote_platform": null,
+                    "remote_version": "VSP-8284XSQ (7.1.1.0)",
+                    "ifAlias": "fa: uplink",
+                    "ifDescr": "Extreme Networks Ethernet Routing Switch 4950GTS-PWR+ Module - Port 50",
+                    "ifName": "1/50"
+                }
+            ]
+        }
     }
 }

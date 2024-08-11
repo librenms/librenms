@@ -13896,5 +13896,385 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "discovery-protocols": {
+        "discovery": {
+            "links": [
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "aruba-ap-name",
+                    "remote_port": "00:00:00:00:00:00 (000000000000)",
+                    "remote_platform": null,
+                    "remote_version": "ArubaOS (MODEL: 515), Version Aruba AP",
+                    "ifAlias": "1/1/1",
+                    "ifDescr": "1/1/1",
+                    "ifName": "1/1/1"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "aruba-ap-name",
+                    "remote_port": "00:00:00:00:00:00 (000000000000)",
+                    "remote_platform": null,
+                    "remote_version": "ArubaOS (MODEL: 515), Version Aruba AP",
+                    "ifAlias": "1/1/10",
+                    "ifDescr": "1/1/10",
+                    "ifName": "1/1/10"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "aruba-ap-name",
+                    "remote_port": "00:00:00:00:00:00 (000000000000)",
+                    "remote_platform": null,
+                    "remote_version": "ArubaOS (MODEL: 515), Version Aruba AP",
+                    "ifAlias": "1/1/11",
+                    "ifDescr": "1/1/11",
+                    "ifName": "1/1/11"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "aruba-ap-name",
+                    "remote_port": "00:00:00:00:00:00 (000000000000)",
+                    "remote_platform": null,
+                    "remote_version": "ArubaOS (MODEL: 515), Version Aruba AP",
+                    "ifAlias": "1/1/12",
+                    "ifDescr": "1/1/12",
+                    "ifName": "1/1/12"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "aruba-ap-name",
+                    "remote_port": "00:00:00:00:00:00 (000000000000)",
+                    "remote_platform": null,
+                    "remote_version": "ArubaOS (MODEL: 515), Version Aruba AP",
+                    "ifAlias": "1/1/13",
+                    "ifDescr": "1/1/13",
+                    "ifName": "1/1/13"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "aruba-ap-name",
+                    "remote_port": "00:00:00:00:00:00 (000000000000)",
+                    "remote_platform": null,
+                    "remote_version": "ArubaOS (MODEL: 515), Version Aruba AP",
+                    "ifAlias": "1/1/14",
+                    "ifDescr": "1/1/14",
+                    "ifName": "1/1/14"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "aruba-ap-name",
+                    "remote_port": "00:00:00:00:00:00 (000000000000)",
+                    "remote_platform": null,
+                    "remote_version": "ArubaOS (MODEL: 515), Version Aruba AP",
+                    "ifAlias": "1/1/15",
+                    "ifDescr": "1/1/15",
+                    "ifName": "1/1/15"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "aruba-ap-name",
+                    "remote_port": "00:00:00:00:00:00 (000000000000)",
+                    "remote_platform": null,
+                    "remote_version": "ArubaOS (MODEL: 515), Version Aruba AP",
+                    "ifAlias": "1/1/16",
+                    "ifDescr": "1/1/16",
+                    "ifName": "1/1/16"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "aruba-ap-name",
+                    "remote_port": "00:00:00:00:00:00 (000000000000)",
+                    "remote_platform": null,
+                    "remote_version": "ArubaOS (MODEL: 515), Version Aruba AP",
+                    "ifAlias": "1/1/17",
+                    "ifDescr": "1/1/17",
+                    "ifName": "1/1/17"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "aruba-ap-name",
+                    "remote_port": "00:00:00:00:00:00 (000000000000)",
+                    "remote_platform": null,
+                    "remote_version": "ArubaOS (MODEL: 515), Version Aruba AP",
+                    "ifAlias": "1/1/18",
+                    "ifDescr": "1/1/18",
+                    "ifName": "1/1/18"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "aruba-ap-name",
+                    "remote_port": "00:00:00:00:00:00 (000000000000)",
+                    "remote_platform": null,
+                    "remote_version": "ArubaOS (MODEL: 515), Version Aruba AP",
+                    "ifAlias": "1/1/19",
+                    "ifDescr": "1/1/19",
+                    "ifName": "1/1/19"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "aruba-ap-name",
+                    "remote_port": "00:00:00:00:00:00 (000000000000)",
+                    "remote_platform": null,
+                    "remote_version": "ArubaOS (MODEL: 515), Version Aruba AP",
+                    "ifAlias": "1/1/2",
+                    "ifDescr": "1/1/2",
+                    "ifName": "1/1/2"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "aruba-ap-name",
+                    "remote_port": "00:00:00:00:00:00 (000000000000)",
+                    "remote_platform": null,
+                    "remote_version": "ArubaOS (MODEL: 515), Version Aruba AP",
+                    "ifAlias": "1/1/20",
+                    "ifDescr": "1/1/20",
+                    "ifName": "1/1/20"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "aruba-ap-name",
+                    "remote_port": "00:00:00:00:00:00 (000000000000)",
+                    "remote_platform": null,
+                    "remote_version": "ArubaOS (MODEL: 515), Version Aruba AP",
+                    "ifAlias": "1/1/21",
+                    "ifDescr": "1/1/21",
+                    "ifName": "1/1/21"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "aruba-ap-name",
+                    "remote_port": "00:00:00:00:00:00 (000000000000)",
+                    "remote_platform": null,
+                    "remote_version": "ArubaOS (MODEL: 515), Version Aruba AP",
+                    "ifAlias": "1/1/22",
+                    "ifDescr": "1/1/22",
+                    "ifName": "1/1/22"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "aruba-ap-name",
+                    "remote_port": "00:00:00:00:00:00 (000000000000)",
+                    "remote_platform": null,
+                    "remote_version": "ArubaOS (MODEL: 515), Version Aruba AP",
+                    "ifAlias": "1/1/23",
+                    "ifDescr": "1/1/23",
+                    "ifName": "1/1/23"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "aruba-ap-name",
+                    "remote_port": "00:00:00:00:00:00 (000000000000)",
+                    "remote_platform": null,
+                    "remote_version": "ArubaOS (MODEL: 515), Version Aruba AP",
+                    "ifAlias": "1/1/24",
+                    "ifDescr": "1/1/24",
+                    "ifName": "1/1/24"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "aruba-ap-name",
+                    "remote_port": "00:00:00:00:00:00 (000000000000)",
+                    "remote_platform": null,
+                    "remote_version": "ArubaOS (MODEL: 515), Version Aruba AP",
+                    "ifAlias": "1/1/25",
+                    "ifDescr": "1/1/25",
+                    "ifName": "1/1/25"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "aruba-ap-name",
+                    "remote_port": "00:00:00:00:00:00 (000000000000)",
+                    "remote_platform": null,
+                    "remote_version": "ArubaOS (MODEL: 515), Version Aruba AP",
+                    "ifAlias": "1/1/26",
+                    "ifDescr": "1/1/26",
+                    "ifName": "1/1/26"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "aruba-ap-name",
+                    "remote_port": "00:00:00:00:00:00 (000000000000)",
+                    "remote_platform": null,
+                    "remote_version": "ArubaOS (MODEL: 515), Version Aruba AP",
+                    "ifAlias": "1/1/3",
+                    "ifDescr": "1/1/3",
+                    "ifName": "1/1/3"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "aruba-ap-name",
+                    "remote_port": "00:00:00:00:00:00 (000000000000)",
+                    "remote_platform": null,
+                    "remote_version": "ArubaOS (MODEL: 515), Version Aruba AP",
+                    "ifAlias": "1/1/4",
+                    "ifDescr": "1/1/4",
+                    "ifName": "1/1/4"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "switch-name",
+                    "remote_port": "50 (000000000000)",
+                    "remote_platform": null,
+                    "remote_version": "ProCurve J4899A Switch 2650, revision H.10.108, ROM H.08.02 (/sw/code/build/fish)",
+                    "ifAlias": "1/1/41",
+                    "ifDescr": "1/1/41",
+                    "ifName": "1/1/41"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "switch-name",
+                    "remote_port": "50 (000000000000)",
+                    "remote_platform": null,
+                    "remote_version": "ProCurve J4899A Switch 2650, revision H.10.108, ROM H.08.02 (/sw/code/build/fish)",
+                    "ifAlias": "1/1/44",
+                    "ifDescr": "1/1/44",
+                    "ifName": "1/1/44"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "switch-name",
+                    "remote_port": "50 (000000000000)",
+                    "remote_platform": null,
+                    "remote_version": "ProCurve J4899A Switch 2650, revision H.10.108, ROM H.08.02 (/sw/code/build/fish)",
+                    "ifAlias": "1/1/45",
+                    "ifDescr": "1/1/45",
+                    "ifName": "1/1/45"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "switch-name",
+                    "remote_port": "50 (000000000000)",
+                    "remote_platform": null,
+                    "remote_version": "ProCurve J4899A Switch 2650, revision H.10.119, ROM H.08.02 (/sw/code/build/fish)",
+                    "ifAlias": "1/1/46",
+                    "ifDescr": "1/1/46",
+                    "ifName": "1/1/46"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "aruba-ap-name",
+                    "remote_port": "00:00:00:00:00:00 (000000000000)",
+                    "remote_platform": null,
+                    "remote_version": "ArubaOS (MODEL: 515), Version Aruba AP",
+                    "ifAlias": "1/1/5",
+                    "ifDescr": "1/1/5",
+                    "ifName": "1/1/5"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "aruba-ap-name",
+                    "remote_port": "00:00:00:00:00:00 (000000000000)",
+                    "remote_platform": null,
+                    "remote_version": "ArubaOS (MODEL: 515), Version Aruba AP",
+                    "ifAlias": "1/1/6",
+                    "ifDescr": "1/1/6",
+                    "ifName": "1/1/6"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "aruba-ap-name",
+                    "remote_port": "00:00:00:00:00:00 (000000000000)",
+                    "remote_platform": null,
+                    "remote_version": "ArubaOS (MODEL: 515), Version Aruba AP",
+                    "ifAlias": "1/1/7",
+                    "ifDescr": "1/1/7",
+                    "ifName": "1/1/7"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "aruba-ap-name",
+                    "remote_port": "00:00:00:00:00:00 (000000000000)",
+                    "remote_platform": null,
+                    "remote_version": "ArubaOS (MODEL: 515), Version Aruba AP",
+                    "ifAlias": "1/1/8",
+                    "ifDescr": "1/1/8",
+                    "ifName": "1/1/8"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "aruba-ap-name",
+                    "remote_port": "00:00:00:00:00:00 (000000000000)",
+                    "remote_platform": null,
+                    "remote_version": "ArubaOS (MODEL: 515), Version Aruba AP",
+                    "ifAlias": "1/1/9",
+                    "ifDescr": "1/1/9",
+                    "ifName": "1/1/9"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "switch-name",
+                    "remote_port": "23 (000000000000)",
+                    "remote_platform": null,
+                    "remote_version": "HP J9727A 2920-24G-PoE+ Switch, revision WB.15.16.0008, ROM WB.15.05 (/ws/swbuildm/rel_orlando_qaoff/code/build/anm(swbuildm_rel_orlando_qaoff_rel_orlando))",
+                    "ifAlias": "to idf",
+                    "ifDescr": "1/1/47",
+                    "ifName": "1/1/47"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "switch-name",
+                    "remote_port": "24 (000000000000)",
+                    "remote_platform": null,
+                    "remote_version": "HP J9727A 2920-24G-PoE+ Switch, revision WB.15.16.0008, ROM WB.15.05 (/ws/swbuildm/rel_orlando_qaoff/code/build/anm(swbuildm_rel_orlando_qaoff_rel_orlando))",
+                    "ifAlias": "to idf",
+                    "ifDescr": "1/1/48",
+                    "ifName": "1/1/48"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "switch-name",
+                    "remote_port": "1/1/17 (000000000000)",
+                    "remote_platform": null,
+                    "remote_version": "Aruba JL635A  GL.10.06.0110",
+                    "ifAlias": "uplink",
+                    "ifDescr": "1/1/51",
+                    "ifName": "1/1/51"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "switch-name",
+                    "remote_port": "1/1/17 (000000000000)",
+                    "remote_platform": null,
+                    "remote_version": "Aruba JL635A  GL.10.06.0110",
+                    "ifAlias": "uplink",
+                    "ifDescr": "1/1/52",
+                    "ifName": "1/1/52"
+                }
+            ]
+        }
     }
 }

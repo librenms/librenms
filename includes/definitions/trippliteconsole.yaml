@@ -1,0 +1,17 @@
+os: trippliteconsole
+text: 'TrippLite console server'
+type: appliance
+icon: tripplite
+group: tripplite
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+mib_dir: poweralert
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.850.1.5
+        - .1.3.6.1.4.1.850.1.7
+
+bad_if:
+    - lo

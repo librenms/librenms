@@ -8,13 +8,11 @@ use App\Models\Port;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use LibreNMS\Util\IPv4;
 
-/** @extends Factory<Ipv4Address> */
+/** @extends Factory<\App\Models\Ipv4Address> */
 class Ipv4AddressFactory extends Factory
 {
     /**
      * Define the model's default state.
-     *
-     * @return array
      */
     public function definition(): array
     {

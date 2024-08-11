@@ -1,0 +1,680 @@
+BAICELLS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Unsigned32,
+    Gauge32, Counter32, Counter64, IpAddress, mib-2,enterprises
+                                       FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP    FROM SNMPv2-CONF
+    InetAddress, InetAddressType,
+    InetPortNumber                     FROM INET-ADDRESS-MIB
+    DisplayString                      FROM SNMPv2-TC;
+
+baicells OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+                "The root of the sub-tree assigned to Baicells."
+        -- 1.3.6.1.4.1.53058
+        ::= { enterprises 53058 }
+
+baicellsCPE OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+                "The root of the sub-tree assigned to Baicells CPE."
+        -- 1.3.6.1.4.1.53058.1
+        ::= { baicells 2 }
+
+
+deviceInfo MODULE-IDENTITY
+    LAST-UPDATED "202104220000Z"
+    ORGANIZATION "Baicells Company"
+    CONTACT-INFO
+	"https://www.baicells.com/cn/"    
+    DESCRIPTION
+	""
+    ::= { baicellsCPE 1 }
+	
+lteSettingsStatus MODULE-IDENTITY
+    LAST-UPDATED "202104220000Z"
+    ORGANIZATION "Baicells Company"
+    CONTACT-INFO
+	"https://www.baicells.com/cn/"
+    DESCRIPTION
+	""
+    ::= { baicellsCPE 2 }
+
+lteStatus MODULE-IDENTITY
+    LAST-UPDATED "202104220000Z"
+    ORGANIZATION "Baicells Company"
+    CONTACT-INFO
+	"https://www.baicells.com/cn/"
+    DESCRIPTION
+	""
+    ::= { baicellsCPE 3 }
+
+webSetting MODULE-IDENTITY
+    LAST-UPDATED "202104220000Z"
+    ORGANIZATION "Baicells Company"
+    CONTACT-INFO
+	"https://www.baicells.com/cn/"
+    DESCRIPTION
+	""
+    ::= { baicellsCPE 4 }
+
+mapnQos MODULE-IDENTITY
+    LAST-UPDATED "200005110000Z"
+    ORGANIZATION "IETF RMON MIB Working Group"
+    CONTACT-INFO
+	"baicells"    
+    DESCRIPTION
+	""
+    ::= { baicellsCPE 5 }
+	
+managementServer MODULE-IDENTITY
+    LAST-UPDATED "202104220000Z"
+    ORGANIZATION "Baicells Company"
+    CONTACT-INFO
+	"https://www.baicells.com/cn/"
+    DESCRIPTION
+	""
+    ::= { baicellsCPE 6 }
+	
+wanIpConn MODULE-IDENTITY
+    LAST-UPDATED "202104220000Z"
+    ORGANIZATION "Baicells Company"
+    CONTACT-INFO
+	"https://www.baicells.com/cn/"
+    DESCRIPTION
+	""
+    ::= { baicellsCPE 7 }
+
+SpecVersion OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "SpecVersion."
+    ::= { deviceInfo 1 }
+
+ProvisioningCode OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+	DESCRIPTION
+        "Provisioning Code."
+    ::= { deviceInfo 2 }
+
+Manufacturer OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+	DESCRIPTION
+        "Manufacturer."
+    ::= { deviceInfo 3 }
+
+
+ManufacturerOUI OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+	DESCRIPTION
+        "Manufacturer OUI."
+    ::= { deviceInfo 4 }
+
+ProductClass OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+	DESCRIPTION
+        "Product Class."
+    ::= { deviceInfo 5 }
+
+SerialNumber OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+	DESCRIPTION
+        "SN Code."
+    ::= { deviceInfo 6 }
+
+
+HardwareVersion OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+	DESCRIPTION
+        "Hardware Version."
+    ::= { deviceInfo 7 }
+
+SoftwareVersion OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+	DESCRIPTION
+        "Software Version."
+    ::= { deviceInfo 8 }
+
+UpTime OBJECT-TYPE
+    SYNTAX      Interger
+    MAX-ACCESS  read-only
+    STATUS      current
+	DESCRIPTION
+        "Up	Time."
+    ::= { deviceInfo 9 }
+
+DeviceLog OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+	DESCRIPTION
+        "device log."
+    ::= { deviceInfo 10 }
+
+MemoryTotal OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+	DESCRIPTION
+        "Total Memory."
+    ::= { deviceInfo 11 }
+
+MemoryFree OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+	DESCRIPTION
+        "Free Memory."
+    ::= { deviceInfo 12 }
+
+	
+DownLinkMCS OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Down Link MCS."
+    ::= { lteSettingsStatus 1 }
+
+UpLinkMCS OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+	DESCRIPTION
+        "Up Link MCS."
+    ::= { lteSettingsStatus 2 }
+
+
+DownLinkFrequency OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+	DESCRIPTION
+        "down link frequency."
+    ::= { lteSettingsStatus 3 }
+
+UpLinkFrequency OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+	DESCRIPTION
+        "up Link Frequency."
+    ::= { lteSettingsStatus 4 }
+
+BandWidth OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+	DESCRIPTION
+        "band width."
+    ::= {  lteSettingsStatus 5 }
+
+AntRSRP0 OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+	DESCRIPTION
+        "Antenna 0 RSRP."
+    ::= { lteSettingsStatus 7 }
+
+AntRSRP1 OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+	DESCRIPTION
+        "Antenna 1 RSRP."
+    ::= { lteSettingsStatus 8 }
+
+AntRSRQ OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+	DESCRIPTION
+        "Antenna RSRQ."
+    ::= { lteSettingsStatus 9 }
+
+
+AntSINR OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+	DESCRIPTION
+        "Antenna SINR."
+    ::= { lteSettingsStatus 10 }
+
+AntCINR0 OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+	DESCRIPTION
+        "Antenna 0 cinr."
+    ::= { lteSettingsStatus 11 }
+
+AntCINR1 OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+	DESCRIPTION
+        "Antenna 1 cinr."
+    ::= { lteSettingsStatus 12 }
+
+TxPower OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+	DESCRIPTION
+        "Tx power."
+    ::= { lteSettingsStatus 13 }
+
+
+PCI OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+	DESCRIPTION
+        "pci."
+    ::= {  lteSettingsStatus 14 }
+
+eNBID OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+	DESCRIPTION
+        "eNodeB ID."
+    ::= { lteSettingsStatus 15 }
+
+CellID OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+	DESCRIPTION
+        "Cell ID."
+    ::= { lteSettingsStatus 16 }
+
+MCC OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+	DESCRIPTION
+        "MCC."
+    ::= { lteSettingsStatus 17 }
+
+MNC OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+	DESCRIPTION
+        "MNC."
+    ::= { lteSettingsStatus 18 }
+
+LTEStatus OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+	DESCRIPTION
+        "LTE Status."
+    ::= { lteSettingsStatus 19 }
+
+ScanMode OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+	DESCRIPTION
+        "lte scan mode"
+    ::= { lteSettingsStatus 20 }
+
+PciLock OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+	DESCRIPTION
+        "PCI lock."
+    ::= { lteSettingsStatus 21 }
+
+LanIP OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+	DESCRIPTION
+        "Lan IP."
+    ::= { lteSettingsStatus 22 }
+
+LanSubnet OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+	DESCRIPTION
+        "Lan Subnet."
+    ::= { lteSettingsStatus 23 }
+
+WanIP OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+	DESCRIPTION
+        "Wan IP."
+    ::= { lteSettingsStatus 24 }
+
+WanSubnet OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+	DESCRIPTION
+        "Wan Subnet."
+    ::= { lteSettingsStatus 25 }
+
+WanGateWay OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+	DESCRIPTION
+        "Wan GateWay."
+    ::= { lteSettingsStatus 26 }
+
+IMEI OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "IMEI."
+    ::= { lteStatus 2 }
+
+IMSI OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "IMSI."
+    ::= { lteStatus 3 }
+
+DeviceUpTime OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Device up time."
+    ::= { lteStatus 4 }
+
+ConnectionTime OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Connection time."
+    ::= { lteStatus 5 }
+
+LteStatus OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Lte status."
+    ::= { lteStatus 6 }
+
+LteMode OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+	DESCRIPTION
+        "Lte mode."
+    ::= { lteStatus 7 }
+
+
+Operator OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+	DESCRIPTION
+        "Operator."
+    ::= { lteStatus 8 }
+
+
+SignalStrength OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+	DESCRIPTION
+        "Signal strength."
+    ::= { lteStatus 9 }
+
+DownloadRate OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+	DESCRIPTION
+        "Download rate."
+    ::= { lteStatus 12 }
+
+MaxDownloadRate OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+	DESCRIPTION
+        "Max download rate."
+    ::= { lteStatus 13 }
+
+MinDownloadRate OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+	DESCRIPTION
+        "Min download rate."
+    ::= { lteStatus 14 }
+
+UploadRate OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+	DESCRIPTION
+        "Upload rate."
+    ::= { lteStatus 15 }
+
+
+MaxUploadRate OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+	DESCRIPTION
+        "Max upload rate."
+    ::= { lteStatus 16 }
+
+
+MinUploadRate OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+	DESCRIPTION
+        "Min upload rate."
+    ::= { lteStatus 17 }
+
+DnsServer OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+	DESCRIPTION
+        "Dns server."
+    ::= { lteStatus 18 }
+
+LanMacAddress OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+	DESCRIPTION
+        "Lan mac address."
+    ::= { lteStatus 19 }
+
+
+SendPackages OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+	DESCRIPTION
+        "Send packages."
+    ::= { lteStatus 20 }
+
+
+RecvPakcages OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+	DESCRIPTION
+        "Receive pakcages."
+    ::= { lteStatus 21 }
+
+Apn1IpAddress OBJECT-TYPE
+    SYNTAX	DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+	DESCRIPTION
+        "Apn1 IP address."
+    ::= { lteStatus 22 }
+
+
+Apn2IpAddress OBJECT-TYPE
+    SYNTAX	DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+	DESCRIPTION
+        "Apn2 IP address."
+    ::= { lteStatus 23 }
+
+Apn3IpAddress OBJECT-TYPE
+    SYNTAX	DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+	DESCRIPTION
+        "Apn3 IP address."
+    ::= { lteStatus 24 }
+
+Apn4IpAddress OBJECT-TYPE
+    SYNTAX	DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+	DESCRIPTION
+        "Apn4 IP address."
+    ::= { lteStatus 25 }
+
+HttpsEnable OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Https enable."
+    ::= { webSetting 1 }
+
+HttpsWanEnable OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Https wan enable."
+    ::= { webSetting 2 }
+	
+MapnQos OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The module name."
+    ::= { mapnQos 1 }
+
+PeriodicInformEnable OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Periodic inform enable."
+    ::= { managementServer 4 }
+
+PeriodicInformInterval OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Periodic inform interval."
+    ::= { managementServer 5 }
+
+PeriodicInformTime OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Periodic inform time."
+    ::= { managementServer 6 }
+
+ConnectionRequestURL OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Connection request URL."
+    ::= { managementServer 1 }
+
+ConnectionRequestUsername OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Connection request user name."
+    ::= { managementServer 2 }
+
+ConnectionRequestPassword OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Connection request password."
+    ::= { managementServer 3 }	
+
+CloudKey OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "cloud key."
+    ::= { managementServer 10 }	
+
+WanConnIp OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Wan connection Ip."
+    ::= { wanIpConn 1 }
+
+ExtIP OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Wan connection Ip."
+    ::= { wanIpConn 2 }
+
+WanMacAddress OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Wan mac address."
+    ::= { wanIpConn 6 }
+
+
+END

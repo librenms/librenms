@@ -3337,8 +3337,8 @@
                     "ifName": "InLoopBack0",
                     "portName": null,
                     "ifIndex": 1,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "false",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -3437,8 +3437,8 @@
                     "ifName": "NULL0",
                     "portName": null,
                     "ifIndex": 2,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "false",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -8194,5 +8194,33 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "discovery-protocols": {
+        "discovery": {
+            "links": [
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "acme-pm7-s-110",
+                    "remote_port": "GigabitEthernet2/0/47 (488eef716260)",
+                    "remote_platform": null,
+                    "remote_version": "S5720-56C-PWR-EI-AC\nHuawei Versatile Routing Platform Software\r\nVRP (R) software, Version 5.170 (S5720 V200R010C00SPC600)\r\nCopyright (C) 2000-2016 HUAWEI TECH CO., LTD",
+                    "ifAlias": "HUAWEI, AC Series, GigabitEthernet0/0/24 Interface",
+                    "ifDescr": "GigabitEthernet0/0/24",
+                    "ifName": "GigabitEthernet0/0/24"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "TestAP-NAME",
+                    "remote_port": "MultiGE0/0/0 (506f77eadca0)",
+                    "remote_platform": null,
+                    "remote_version": "Huawei AP AP7050DN-E\nHuawei Versatile Routing Platform Software\r\nVRP (R) software,Version 5.170 (AP7050DN-E V200R010C00SPC500)\r\nCopyright (C) 2011-2016 Huawei Technologies Co., Ltd",
+                    "ifAlias": "Interface 0/0/1 desc",
+                    "ifDescr": "GigabitEthernet0/0/1",
+                    "ifName": "GigabitEthernet0/0/1"
+                }
+            ]
+        }
     }
 }

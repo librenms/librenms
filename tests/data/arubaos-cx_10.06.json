@@ -42101,5 +42101,297 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "discovery-protocols": {
+        "discovery": {
+            "links": [
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "port-description",
+                    "remote_port": "48 (000000000000)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "port-description",
+                    "ifDescr": "1/1/13",
+                    "ifName": "1/1/13"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "port-description",
+                    "remote_port": "49 (000000000000)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "port-description",
+                    "ifDescr": "1/1/14",
+                    "ifName": "1/1/14"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "port-description",
+                    "remote_port": "10 (000000000000)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "port-description",
+                    "ifDescr": "1/1/15",
+                    "ifName": "1/1/15"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "port-description",
+                    "remote_port": "26 (000000000000)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "port-description",
+                    "ifDescr": "1/1/16",
+                    "ifName": "1/1/16"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "port-description",
+                    "remote_port": "1/1/52 (000000000000)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "port-description",
+                    "ifDescr": "1/1/17",
+                    "ifName": "1/1/17"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "port-description",
+                    "remote_port": "52 (000000000000)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "port-description",
+                    "ifDescr": "1/1/18",
+                    "ifName": "1/1/18"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "port-description",
+                    "remote_port": "52 (000000000000)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "port-description",
+                    "ifDescr": "1/1/19",
+                    "ifName": "1/1/19"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "port-description",
+                    "remote_port": "49 (000000000000)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "port-description",
+                    "ifDescr": "1/1/20",
+                    "ifName": "1/1/20"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "port-description",
+                    "remote_port": "1/1/51 (000000000000)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "port-description",
+                    "ifDescr": "1/1/21",
+                    "ifName": "1/1/21"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "port-description",
+                    "remote_port": "51 (000000000000)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "port-description",
+                    "ifDescr": "1/1/22",
+                    "ifName": "1/1/22"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "port-description",
+                    "remote_port": "52 (000000000000)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "port-description",
+                    "ifDescr": "1/1/23",
+                    "ifName": "1/1/23"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "port-description",
+                    "remote_port": "49 (000000000000)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "port-description",
+                    "ifDescr": "1/1/24",
+                    "ifName": "1/1/24"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "port-description",
+                    "remote_port": "50 (000000000000)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "port-description",
+                    "ifDescr": "1/1/25",
+                    "ifName": "1/1/25"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "port-description",
+                    "remote_port": "49 (000000000000)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "port-description",
+                    "ifDescr": "1/1/26",
+                    "ifName": "1/1/26"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "port-description",
+                    "remote_port": "1/1/51 (000000000000)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "port-description",
+                    "ifDescr": "1/1/27",
+                    "ifName": "1/1/27"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "port-description",
+                    "remote_port": "1/1/52 (000000000000)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "port-description",
+                    "ifDescr": "1/1/29",
+                    "ifName": "1/1/29"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "port-description",
+                    "remote_port": "1/1/52 (000000000000)",
+                    "remote_platform": null,
+                    "remote_version": "Aruba JL727A  ML.10.07.0020",
+                    "ifAlias": "port-description",
+                    "ifDescr": "1/1/3",
+                    "ifName": "1/1/3"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "port-description",
+                    "remote_port": "1/1/51 (000000000000)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "port-description",
+                    "ifDescr": "1/1/30",
+                    "ifName": "1/1/30"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "port-description",
+                    "remote_port": "swp15 (000000000000)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "port-description",
+                    "ifDescr": "1/1/54",
+                    "ifName": "1/1/54"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "port-description",
+                    "remote_port": "51 (000000000000)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "port-description",
+                    "ifDescr": "1/1/6",
+                    "ifName": "1/1/6"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "port-description",
+                    "remote_port": "1/1/52 (000000000000)",
+                    "remote_platform": null,
+                    "remote_version": "Aruba JL659A  FL.10.07.0010",
+                    "ifAlias": "port-description",
+                    "ifDescr": "1/1/7",
+                    "ifName": "1/1/7"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "port-description",
+                    "remote_port": "51 (000000000000)",
+                    "remote_platform": null,
+                    "remote_version": "Aruba JL357A 2540-48G-PoE+-4SFP+ Switch, revision YC.16.10.0012, ROM YC.16.01.0002 (/ws/swbuildm/rel_ajanta_qaoff/code/build/cpm(swbuildm_rel_ajanta_qaoff_rel_ajanta))",
+                    "ifAlias": "port-description",
+                    "ifDescr": "1/1/8",
+                    "ifName": "1/1/8"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "port-description",
+                    "remote_port": "52 (000000000000)",
+                    "remote_platform": null,
+                    "remote_version": "Aruba JL357A 2540-48G-PoE+-4SFP+ Switch, revision YC.16.10.0011, ROM YC.16.01.0002 (/ws/swbuildm/rel_ajanta_qaoff/code/build/cpm(swbuildm_rel_ajanta_qaoff_rel_ajanta))",
+                    "ifAlias": "port-description",
+                    "ifDescr": "1/1/9",
+                    "ifName": "1/1/9"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "port-description",
+                    "remote_port": "1/1/55 (000000000000)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "VSX ISL",
+                    "ifDescr": "1/1/55",
+                    "ifName": "1/1/55"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "port-description",
+                    "remote_port": "1/1/56 (000000000000)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "VSX ISL",
+                    "ifDescr": "1/1/56",
+                    "ifName": "1/1/56"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "port-description",
+                    "remote_port": "1/1/1 (000000000000)",
+                    "remote_platform": null,
+                    "remote_version": "Aruba JL635A  GL.10.06.0110",
+                    "ifAlias": "VSX-keepalive-Link",
+                    "ifDescr": "1/1/1",
+                    "ifName": "1/1/1"
+                }
+            ]
+        }
     }
 }
