@@ -12,12 +12,12 @@
 |
 */
 
-require __DIR__.'/vendor/autoload.php';
+require __DIR__ . '/vendor/autoload.php';
 
 // Check that we don't run this as the wrong user and break the install
 \App\Checks::runningUser();
 
-$app = require_once __DIR__.'/bootstrap/app.php';
+$app = require_once __DIR__ . '/bootstrap/app.php';
 
 /*
 |--------------------------------------------------------------------------
