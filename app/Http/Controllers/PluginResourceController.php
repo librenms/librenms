@@ -12,11 +12,10 @@ class PluginResourceController extends Controller
     /**
      * Get a resource (file, image, etc) from a plugin and provide it to the user.
      *
-     * @param  Request $request
-     * @param  Plugin $plugin
-     * @param  string $path | null
+     * @param  Request   $request
+     * @param  Plugin   $plugin
+     * @param  string   $path  | null
      * @return string | null
-     *
      */
     public function getResource(Request $request, Plugin $plugin, string $path = null)
     {

@@ -81,9 +81,8 @@ class PluginProvider extends ServiceProvider
      *
      * @param  string  $class
      * @return string | null
-     *
      */
-    protected function hookType(string $class): string
+    protected function hookType(string $class): ?string
     {
         foreach (class_parents($class) as $parent) {
             if (Str::startsWith($parent, 'App\Plugins\Hooks\\')) {
