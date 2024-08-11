@@ -15,7 +15,7 @@ LibreNMS. An example plugin is included in the LibreNMS distribution.
 
 Plugins in version 2 need to be installed into app/Plugins
 
->Note: Plugins are disabled when the have an error, to show errors instead, set plugins.show_errors:
+>Note: Plugins are disabled when they throw an error/exception. In order to show errors instead, set plugins.show_errors:  
 `lnms config:set plugins.show_errors  true`
 
 The structure of a plugin is follows:
@@ -37,9 +37,7 @@ app/Plugins
                                        /settings.blade.php
 ```
 
-The above structure is checked before a plugin can be installed.
-
-All file/folder names are case sensitive and must match the structure.
+All file/folder names are case-sensitive and must match the structure.
 
 Only the class & blade files that are really needed need to be created. A plugin manager
 will then load a hook that has a basic functionality.
@@ -91,8 +89,10 @@ PHP code should run inside your hooks method and not your blade view.
 The built in hooks support authorize and data methods.
 
 These methods are called with [Dependency Injection](https://laravel.com/docs/container#method-invocation-and-injection)
-Hooks with relevant database models will include them in these calls.
+Hooks with relevant database models will include them in these calls. Each class file will implement at most one hook.
 Additionally, the settings argument may be included to inject the plugin settings into the method.
+
+Note that namespace in all class files must match `PluginName`.
 
 #### Data
 
