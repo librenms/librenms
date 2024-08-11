@@ -27,7 +27,6 @@ namespace App\Plugins\Hooks;
 
 use App\Models\User;
 use Illuminate\Contracts\Foundation\Application;
-use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 
 abstract class ResourceAccessorHook
@@ -41,15 +40,15 @@ abstract class ResourceAccessorHook
 
     public function processRequest(Request $request, string $path, array $settings)
     {
-        return (['action' => 'abort', 'abort_type' => 404]);
+        return ['action' => 'abort', 'abort_type' => 404];
     }
 
     final public function handle(string $pluginName, Request $request, string $path, array $settings, Application $app)
     {
-        return ($app->call([$this, 'processRequest'], [
+        return $app->call([$this, 'processRequest'], [
             'request' => $request,
             'path' => $path,
             'settings' => $settings,
-        ]));
+        ]);
     }
 }

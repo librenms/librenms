@@ -25,7 +25,6 @@
 
 namespace App\Providers;
 
-use App\Exceptions\PluginDoesNotImplementHookException;
 use App\Plugins\PluginManager;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
@@ -81,9 +80,8 @@ class PluginProvider extends ServiceProvider
      * Check if a hook is extended by the given class.
      *
      * @param  string  $class
-     * @return string
+     * @return string | null
      *
-     * @throws \App\Exceptions\PluginDoesNotImplementHookException
      */
     protected function hookType(string $class): string
     {

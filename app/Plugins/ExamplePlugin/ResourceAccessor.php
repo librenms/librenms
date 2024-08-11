@@ -25,28 +25,25 @@
 
 namespace App\Plugins\ExamplePlugin;
 
-use App\Plugins\Hooks\ResourceAccessorHook;
 use App\Models\User;
-use App\Models\Device;
-use Illuminate\Contracts\Foundation\Application;
-use Illuminate\Support\Str;
+use App\Plugins\Hooks\ResourceAccessorHook;
 use Illuminate\Http\Request;
 
-// This ResourceHook is called from a Controller, and allows any plugin to publish files, images, etc, to be downloaded
+// This ResourceHook is called from the PluginResourceController, and allows the plugin to publish files, images, etc
 
 class ResourceAccessor extends ResourceAccessorHook
 {
     public function authorize(User $user): bool
     {
-        // In this example, we check if the user has a custom role/permission 
-        // return $user->can('download-reports') 
+        // In this example, we check if the user has a custom role/permission
+        // return $user->can('download-reports')
         return true;
     }
 
     // process the request, and returns
     //   - A response() as defined here : https://laravel.com/docs/responses
     //   - An array with the following syntax:
-    //      ['action' => 'abort', 'abort_type' => 403], more details here : https://laravel.com/docs/errors#http-exceptions
+    //      ['action' => 'abort', 'abort_type' => 403], more details here: https://laravel.com/docs/errors#http-exceptions
 
     public function processRequest(Request $request, string $path, array $settings)
     {
@@ -55,15 +52,15 @@ class ResourceAccessor extends ResourceAccessorHook
 
         // if you use a real file, better check if it exists and is readable, and return the proper abort instruction for the framework
         if (! is_file($full_path)) {
-            return (['action' => 'abort', 'abort_type' => 404]);
+            return ['action' => 'abort', 'abort_type' => 404];
         }
         if (! is_readable($full_path)) {
-            return (['action' => 'abort', 'abort_type' => 403]);
+            return ['action' => 'abort', 'abort_type' => 403];
         }
 
         $result = response()->file($full_path); // to return an image or a file to be displayed inline
         //$result = response()->download($full_path); // to force the browser to download the file
 
-        return ($result);
+        return $result;
     }
 }
