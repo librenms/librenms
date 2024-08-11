@@ -59,7 +59,11 @@ class PluginProvider extends ServiceProvider
                 }
 
                 $class = $this->className($plugin_name, $matches[3]);
-                $hook_type = $this->hookType($class);
+
+                // If we find a hook, we handle it, if not we continue with next class
+                if (is_null($hook_type = $this->hookType($class))) {
+                    continue;
+                }
 
                 // publish hooks in class
                 $hook_published = $manager->publishHook($plugin_name, $hook_type, $class);
@@ -89,7 +93,8 @@ class PluginProvider extends ServiceProvider
             }
         }
 
-        throw new PluginDoesNotImplementHookException($class);
+        // if we haven't found one
+        return null;
     }
 
     protected function className(string $dir, string $name): string
