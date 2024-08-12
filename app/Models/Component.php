@@ -57,21 +57,21 @@ class Component extends DeviceRelatedModel
     public function error(): Attribute
     {
         return Attribute::make(
-            set: fn (?string $value) => substr($value, 0, 255) ?? null,
+            set: fn (?string $value) => is_null($value) ? null : substr($value, 0, 255),
         );
     }
 
     public function label(): Attribute
     {
         return Attribute::make(
-            set: fn (?string $value) => substr($value, 0, 255) ?? null,
+            set: fn (?string $value) => is_null($value) ? null : substr($value, 0, 255),
         );
     }
 
     public function type(): Attribute
     {
         return Attribute::make(
-            set: fn (?string $value) => substr($value, 0, 50) ?? null,
+            set: fn (?string $value) => is_null($value) ? null : substr($value, 0, 50),
         );
     }
 
