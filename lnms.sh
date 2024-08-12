@@ -8,7 +8,7 @@ then
 
     SCRIPT_FILENAME=/opt/librenms/lnms.php \
     REQUEST_METHOD=GET \
-    QUERY_STRING="$@" \
+    QUERY_STRING="$*" \
     cgi-fcgi -bind -connect /var/run/php/php-fpm-librenms-poller.sock | while read -r line
     do
         if [ $IGNORE -gt 0 ]
