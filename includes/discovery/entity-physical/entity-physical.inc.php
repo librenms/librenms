@@ -11,12 +11,6 @@ if (! empty($entity_array)) {
     echo ' entAliasMappingIdentifier';
     $entity_array = snmpwalk_cache_twopart_oid($device, 'entAliasMappingIdentifier', $entity_array, 'ENTITY-MIB:IF-MIB');
 }
-if ($device['os'] == 'vrp') {
-    echo ' hwEntityBoardType';
-    $entity_array = snmpwalk_cache_oid($device, 'hwEntityBoardType', $entity_array, 'ENTITY-MIB:HUAWEI-ENTITY-EXTENT-MIB');
-    echo ' hwEntityBomEnDesc';
-    $entity_array = snmpwalk_cache_oid($device, 'hwEntityBomEnDesc', $entity_array, 'ENTITY-MIB:HUAWEI-ENTITY-EXTENT-MIB');
-}
 
 foreach ($entity_array as $entPhysicalIndex => $entry) {
     $ifIndex = 0;

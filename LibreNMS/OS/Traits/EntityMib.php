@@ -62,10 +62,9 @@ trait EntityMib
         $map = [];
 
         foreach ($mapping as $entityPhysicalIndex => $data) {
-            if (isset($data[0]['ENTITY-MIB::entAliasMappingIdentifier'])) {
-                if (preg_match('/ifIndex[\[.](\d+)/', $mapping[$entityPhysicalIndex][0]['ENTITY-MIB::entAliasMappingIdentifier'], $matches)) {
-                    $map[$entityPhysicalIndex] = $matches[1];
-                }
+            $id = $data[0]['ENTITY-MIB::entAliasMappingIdentifier'] ?? $data[1]['ENTITY-MIB::entAliasMappingIdentifier'] ?? null;
+            if ($id && preg_match('/ifIndex[\[.](\d+)/', $id, $matches)) {
+                $map[$entityPhysicalIndex] = $matches[1];
             }
         }
 
