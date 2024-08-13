@@ -6903,7 +6903,7 @@
                     "entPhysicalClass": "module",
                     "entPhysicalName": "IPU 3",
                     "entPhysicalHardwareRev": "IPU REV B",
-                    "entPhysicalFirmwareRev": "CPU: EPLD ver 004, FPGA ver 009, FPGA2 ver 008  NPU: FPGA ver 01",
+                    "entPhysicalFirmwareRev": "CPU: EPLD ver 004, FPGA ver 009, FPGA2 ver 008  NPU: FPGA ver 018, FPGA2 ver 007",
                     "entPhysicalSoftwareRev": "BootROM ver 04.73",
                     "entPhysicalAlias": "",
                     "entPhysicalAssetID": "",
