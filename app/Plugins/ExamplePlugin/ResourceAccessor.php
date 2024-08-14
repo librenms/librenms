@@ -42,8 +42,8 @@ class ResourceAccessor extends ResourceAccessorHook
 
     // process the request, and returns
     //   - A response() as defined here : https://laravel.com/docs/responses
-    //   - An array with the following syntax:
-    //      ['action' => 'abort', 'abort_type' => 403], more details here: https://laravel.com/docs/errors#http-exceptions
+    //
+    //   -> May throw \Symfony\Component\HttpKernel\Exception\HttpException to return HTTP error codes (https://laravel.com/docs/errors#http-exceptions)
 
     public function processRequest(Request $request, string $path, array $settings)
     {
@@ -62,8 +62,18 @@ class ResourceAccessor extends ResourceAccessorHook
             );
         }
 
-        $result = response()->file($full_path); // to return an image or a file to be displayed inline
-        //$result = response()->download($full_path); // to force the browser to download the file
+        // Various possible responses() methods are documented here : https://laravel.com/docs/responses
+
+        // to return an image or a file to be displayed inline
+        $result = response()->file($full_path);
+
+        // tell the browser to download the file in $full_path and save it as $name
+        //$result = response()->download($full_path, $name);
+
+        // to build dynamically a file from code and expose it as $name for the browser
+        //$result = response()->streamDownload(function() {  
+        //    echo "Content of the file";
+        //}, $name);
 
         return $result;
     }
