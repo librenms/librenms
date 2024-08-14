@@ -48,6 +48,7 @@ modules:
                     value: dcpInterfaceTxPower
                     descr: '{{ $dcpInterfaceName }} - TX'
                     index: 'dcpInterfaceTxPower.{{ $index }}'
+                    skip_values:
                     -
                         oid: dcpInterfaceStatus
                         op: '!='
