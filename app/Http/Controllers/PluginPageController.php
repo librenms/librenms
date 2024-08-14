@@ -6,6 +6,7 @@ use App\Models\Plugin;
 use App\Plugins\Hooks\PageHook;
 use App\Plugins\PluginManager;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facaces\Auth;
 
 class PluginPageController extends Controller
 {
@@ -23,7 +24,7 @@ class PluginPageController extends Controller
             'settings_view' => 'plugins.missing',
             'settings' => [],
         ],
-            (array) $manager->call(PageHook::class, [], $plugin->plugin_name)->first()
+            (array) $manager->call(PageHook::class, ['user' => Auth::User()], $plugin->plugin_name)->first()
         );
 
         return view('plugins.settings', $data);
