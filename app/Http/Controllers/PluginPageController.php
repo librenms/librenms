@@ -24,7 +24,7 @@ class PluginPageController extends Controller
             'settings_view' => 'plugins.missing',
             'settings' => [],
         ],
-            (array) $manager->call(PageHook::class, ['user' => Auth::User()], $plugin->plugin_name)->first()
+            (array) $manager->call(PageHook::class, ['user' => Auth::user()], $plugin->plugin_name)->first()
         );
 
         return view('plugins.settings', $data);
