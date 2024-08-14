@@ -4,8 +4,8 @@ namespace LibreNMS\Data\Store;
 
 use App\Facades\DeviceCache;
 use App\Polling\Measure\Measurement;
-use LibreNMS\Config;
 use Illuminate\Support\Facades\Log;
+use LibreNMS\Config;
 use RdKafka\Conf;
 use RdKafka\Producer;
 
