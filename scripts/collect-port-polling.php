@@ -16,6 +16,7 @@ $options = getopt('dh:e:', ['help']);
 Config::set('rrd.enable', false);
 Config::set('influxdb.enable', false);
 Config::set('influxdbv2.enable', false);
+Config::set('kafka.enable', false);
 Config::set('nographite', true);
 
 function print_help()
