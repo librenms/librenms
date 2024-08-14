@@ -26,6 +26,10 @@ class PluginResourceController extends Controller
 
         // If we have a hook for resources implemented in the passed plugin, we call it.
         // if not, we abort(404).
-        return PluginManager::call(ResourceAccessorHook::class, ['request' => $request, 'path' => $path], $plugin->plugin_name)->first() ?? abort(404);
+        $response = PluginManager::call(ResourceAccessorHook::class, ['request' => $request, 'path' => $path], $plugin->plugin_name)->first();
+        if (!is_null($response)) {
+            return $response;
+        }
+        abort(404);
     }
 }

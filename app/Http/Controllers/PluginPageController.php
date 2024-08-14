@@ -6,7 +6,7 @@ use App\Models\Plugin;
 use App\Plugins\Hooks\PageHook;
 use App\Plugins\PluginManager;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facaces\Auth;
+use Illuminate\Support\Facades\Auth;
 
 class PluginPageController extends Controller
 {

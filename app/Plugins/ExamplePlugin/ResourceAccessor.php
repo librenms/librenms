@@ -52,10 +52,14 @@ class ResourceAccessor extends ResourceAccessorHook
 
         // if you use a real file, better check if it exists and is readable, and return the proper abort instruction for the framework
         if (! is_file($full_path)) {
-            return ['action' => 'abort', 'abort_type' => 404];
+            throw new \Symfony\Component\HttpKernel\Exception\HttpException(
+                statusCode: 404,
+            );
         }
         if (! is_readable($full_path)) {
-            return ['action' => 'abort', 'abort_type' => 403];
+            throw new \Symfony\Component\HttpKernel\Exception\HttpException(
+                statusCode: 403,
+            );
         }
 
         $result = response()->file($full_path); // to return an image or a file to be displayed inline
