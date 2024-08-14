@@ -38,9 +38,9 @@ modules:
                     index: 'dcpInterfaceRxPower.{{ $index }}'
                     skip_values:
                     -
-                      oid: dcpInterfaceStatus
-                      op: '!='
-                      value: 1
+                        oid: dcpInterfaceStatus
+                        op: '!='
+                        value: 1
                 -
                     oid: dcpInterfaceTable
                     num_oid: '.1.3.6.1.4.1.30826.2.2.1.1.1.1.4.{{ $index }}'
@@ -49,9 +49,9 @@ modules:
                     descr: '{{ $dcpInterfaceName }} - TX'
                     index: 'dcpInterfaceTxPower.{{ $index }}'
                     -
-                      oid: dcpInterfaceStatus
-                      op: '!='
-                      value: 1
+                        oid: dcpInterfaceStatus
+                        op: '!='
+                        value: 1
                 -
                     oid: dcpLinkviewTable
                     num_oid: '.1.3.6.1.4.1.30826.2.2.3.1.1.1.14.{{ $index }}'
