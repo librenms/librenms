@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Auth;
 
 class PluginPageController extends Controller
 {
-    public function __invoke(PluginManager $manager, Plugin $plugin): \Illuminate\Contracts\View\View
+    public function __invoke(PluginManager $manager, Plugin $plugin, string $path = ''): \Illuminate\Contracts\View\View
     {
         if (! $manager->pluginEnabled($plugin->plugin_name)) {
             abort(404, trans('plugins.errors.disabled', ['plugin' => $plugin->plugin_name]));
@@ -24,7 +24,7 @@ class PluginPageController extends Controller
             'settings_view' => 'plugins.missing',
             'settings' => [],
         ],
-            (array) $manager->call(PageHook::class, ['user' => Auth::user()], $plugin->plugin_name)->first()
+            (array) $manager->call(PageHook::class, ['user' => Auth::user(), 'path' => $path], $plugin->plugin_name)->first()
         );
 
         return view('plugins.settings', $data);

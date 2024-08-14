@@ -75,8 +75,8 @@ will then load a hook that has a basic functionality.
 - Menu.php :: This is the class computing the data for the matching blade menu.blade.php
 - menu.blade.php :: For a menu entry
 
-- Page.php :: This is the class computing the data for the matching blade menu.blade.php
-- page.blade.pho :: Here is a good place to add a own LibreNMS page without dependence with a device. A good place to create your own lists with special requirements and behavior.
+- Page.php :: This is the class computing the data for the matching blade menu.blade.php. It receives the path that was requested in the browser.
+- page.blade.php :: Here is a good place to add a own LibreNMS page without dependence with a device. A good place to create your own lists with special requirements and behavior. More blades can be added as necessary.
 
 - Settings.php :: This is the class computing the data for the matching blade settings.blade.php
 - settings.blade.php :: If you need your own settings and variables, you can have a look in the ExamplePlugin.

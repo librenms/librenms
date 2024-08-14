@@ -132,6 +132,7 @@ Route::middleware(['auth'])->group(function () {
     Route::any('plugin/v1/{plugin:plugin_name}/{other?}', PluginLegacyController::class)->where('other', '(.*)')->name('plugin.legacy');
     Route::get('plugin/{plugin:plugin_name}/resources/{path}', 'PluginResourceController@getResource')->where('path', '.*')->name('plugin.ressource');
     Route::get('plugin/{plugin:plugin_name}', PluginPageController::class)->name('plugin.page');
+    Route::get('plugin/{plugin:plugin_name}/{path}', PluginPageController::class)->where('path', '.*')->name('plugin.subpage');
 
     // old route redirects
     Route::permanentRedirect('poll-log', 'poller/log');

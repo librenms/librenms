@@ -38,17 +38,19 @@ abstract class PageHook
         return true;
     }
 
+    //public function data(array $settings = [], string $path = ''): array
     public function data(): array
     {
         return [];
     }
 
-    final public function handle(string $pluginName, array $settings, Application $app): array
+    final public function handle(string $pluginName, string $path, array $settings, Application $app): array
     {
         return array_merge([
             'settings_view' => Str::start($this->view, "$pluginName::"),
         ], $app->call([$this, 'data'], [
             'settings' => $settings,
+            'path' => $path,
         ]));
     }
 }

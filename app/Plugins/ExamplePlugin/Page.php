@@ -53,7 +53,7 @@ class Page extends PageHook
     // override the data function to add additional data to be accessed in the view
     // default just passes the stored data through
     // inside the blade, all variables will be named based on the key in the returned array
-    public function data(): array
+    public function data(array $settings = [], string $path = ''): array
     {
         // run any calculations here
         $username = auth()->user()->username;
