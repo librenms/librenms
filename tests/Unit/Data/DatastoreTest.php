@@ -41,6 +41,7 @@ class DatastoreTest extends TestCase
             'graphite',
             'influxdb',
             'influxdbv2',
+            'kafka',
             'opentsdb',
             'prometheus',
             'rrd',
@@ -62,6 +63,7 @@ class DatastoreTest extends TestCase
         Config::set('graphite.enable', true);
         Config::set('influxdb.enable', true);
         Config::set('influxdbv2.enable', true);
+        Config::set('kafka.enable', true);
         Config::set('opentsdb.enable', true);
         Config::set('prometheus.enable', true);
 
@@ -75,6 +77,7 @@ class DatastoreTest extends TestCase
             'LibreNMS\Data\Store\Graphite',
             'LibreNMS\Data\Store\InfluxDB',
             'LibreNMS\Data\Store\InfluxDBv2',
+            'LibreNMS\Data\Store\Kafka',
             'LibreNMS\Data\Store\OpenTSDB',
             'LibreNMS\Data\Store\Prometheus',
         ];
