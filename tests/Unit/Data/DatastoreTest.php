@@ -63,9 +63,9 @@ class DatastoreTest extends TestCase
         Config::set('graphite.enable', true);
         Config::set('influxdb.enable', true);
         Config::set('influxdbv2.enable', true);
-        Config::set('kafka.enable', true);
         Config::set('opentsdb.enable', true);
         Config::set('prometheus.enable', true);
+        Config::set('kafka.enable', true);
 
         $ds = $this->app->make('Datastore');
         $stores = $ds->getStores();
@@ -77,9 +77,9 @@ class DatastoreTest extends TestCase
             'LibreNMS\Data\Store\Graphite',
             'LibreNMS\Data\Store\InfluxDB',
             'LibreNMS\Data\Store\InfluxDBv2',
-            'LibreNMS\Data\Store\Kafka',
             'LibreNMS\Data\Store\OpenTSDB',
             'LibreNMS\Data\Store\Prometheus',
+            'LibreNMS\Data\Store\Kafka', 
         ];
 
         $this->assertEquals($expected_enabled, $enabled, 'Expected all non-default stores to be initialized');
