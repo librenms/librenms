@@ -25,6 +25,7 @@
 
 namespace App\Providers;
 
+use function Clue\StreamFilter\fun;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
 use LibreNMS\Data\Store\Datastore;
@@ -65,12 +66,20 @@ class DatastoreServiceProvider extends ServiceProvider
 
         // additional bindings
         $this->registerInflux();
+        $this->registerKafka();
     }
 
     public function registerInflux()
     {
         $this->app->singleton('InfluxDB\Database', function ($app) {
             return \LibreNMS\Data\Store\InfluxDB::createFromConfig();
+        });
+    }
+
+    public function registerKafka()
+    {
+        $this->app->singleton('RdKafka\Producer', function ($app) {
+            return \LibreNMS\Data\Store\Kafka::createFromConfig();
         });
     }
 }
