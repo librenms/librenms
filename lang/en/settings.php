@@ -62,6 +62,7 @@ return [
             'graphite' => ['name' => 'Datastore: Graphite'],
             'influxdb' => ['name' => 'Datastore: InfluxDB'],
             'influxdbv2' => ['name' => 'Datastore: InfluxDBv2'],
+            'kafka' => ['name' => 'Datastore: Kafka'],
             'opentsdb' => ['name' => 'Datastore: OpenTSDB'],
             'ping' => ['name' => 'Ping'],
             'prometheus' => ['name' => 'Datastore: Prometheus'],
@@ -1074,6 +1075,58 @@ return [
             'groups-exclude' => [
                 'description' => 'Excluded device groups',
                 'help' => 'Device groups excluded from sending data to InfluxDBv2',
+            ],
+        ],
+        'kafka' => [
+            'enable' => [
+                'description' => 'Enable',
+                'help' => 'Exports metrics to Kafka using the idealo/php-rdkafka-ffi',
+            ],
+            'groups-exclude' => [
+                'description' => 'Excluded device groups',
+                'help' => 'Device groups excluded from sending data to Kafka',
+            ],
+            'debug' => [
+                'description' => 'Debug',
+                'help' => 'To enable or disable verbose output to CLI'
+            ],
+            'broker.list' => [
+                'description' => 'Broker\'s servers list',
+                'help' => 'List as csv of kafka broker\'s servers'
+            ],
+            'idempotence' => [
+                'description' => 'Idempotence',
+                'help' => 'Producer idempotence ensures that duplicates are not introduced due to unexpected retries'
+            ],
+            'topic' => [
+                'description' => 'Topic',
+                'help' => 'The categories used to organize messages'
+            ],
+            'ssl' => [
+                'enable' => [
+                    'description' => 'SSL Enable',
+                    'help' => 'Enable SSL support in Kafka'
+                ],
+                'protocol' => [
+                    'description' => 'SSL Protocol',
+                    'help' => 'The SSL protocol to be used in Kafka. Default "ssl"'
+                ],
+                'ca.location' => [
+                    'description' => 'SSL Certificate Authority Location',
+                    'help' => 'The SSL CA file path location to be used in Kafka'
+                ],
+                'certificate.location' => [
+                    'description' => 'SSL Certificate Location',
+                    'help' => ' The SSL Certificate file location to be used in Kafka'
+                ],
+                'key.location' => [
+                    'description' => 'SSL Certificate Key Location',
+                    'help' => 'The SSL certificate key file location to be used in Kafka'
+                ],
+                'key.password' => [
+                    'description' => 'SSL Certificate Key Password',
+                    'help' => 'The SSL certificate key\'s password to be used in Kafka'
+                ],
             ],
         ],
         'ipmitool' => [
