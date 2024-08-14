@@ -1088,7 +1088,7 @@ return [
             ],
             'debug' => [
                 'description' => 'Debug',
-                'help' => 'To enable or disable verbose output to CLI'
+                'help' => 'To enable or disable verbose output to CLI',
             ],
             'broker.list' => [
                 'description' => 'Broker\'s servers list',
