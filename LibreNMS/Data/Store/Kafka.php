@@ -138,7 +138,7 @@ class Kafka extends BaseDatastore
     /**
      * Create a instance of Kafka Producer
      *
-     * @return Database
+     * @return Producer
      */
     public static function createFromConfig()
     {
