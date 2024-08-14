@@ -62,6 +62,7 @@ return [
             'graphite' => ['name' => 'Datastore: Graphite'],
             'influxdb' => ['name' => 'Datastore: InfluxDB'],
             'influxdbv2' => ['name' => 'Datastore: InfluxDBv2'],
+            'kafka' => ['name' => 'Datastore: Kafka'],
             'opentsdb' => ['name' => 'Datastore: OpenTSDB'],
             'ping' => ['name' => 'Ping'],
             'prometheus' => ['name' => 'Datastore: Prometheus'],

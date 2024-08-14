@@ -59,6 +59,7 @@ return [
             'distributed' => ['name' => 'Розподілений опитувач'],
             'graphite' => ['name' => 'Сховище даних: Graphite'],
             'influxdb' => ['name' => 'Сховище даних: InfluxDB'],
+            'kafka' => ['name' => 'Сховище даних: Kafka'],
             'opentsdb' => ['name' => 'Сховище даних: OpenTSDB'],
             'ping' => ['name' => 'Ping'],
             'prometheus' => ['name' => 'Сховище даних: Prometheus'],
