@@ -69,7 +69,7 @@ class DatastoreTest extends TestCase
 
         $ds = $this->app->make('Datastore');
         $stores = $ds->getStores();
-        $this->assertCount(5, $stores, 'Incorrect number of default stores enabled');
+        $this->assertCount(6, $stores, 'Incorrect number of default stores enabled');
 
         $enabled = array_map('get_class', $stores);
 
