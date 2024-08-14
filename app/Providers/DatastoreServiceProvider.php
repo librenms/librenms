@@ -25,7 +25,6 @@
 
 namespace App\Providers;
 
-use function Clue\StreamFilter\fun;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
 use LibreNMS\Data\Store\Datastore;
