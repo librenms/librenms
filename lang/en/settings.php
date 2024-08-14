@@ -1092,40 +1092,40 @@ return [
             ],
             'broker.list' => [
                 'description' => 'Broker\'s servers list',
-                'help' => 'List as csv of kafka broker\'s servers'
+                'help' => 'List as csv of kafka broker\'s servers',
             ],
             'idempotence' => [
                 'description' => 'Idempotence',
-                'help' => 'Producer idempotence ensures that duplicates are not introduced due to unexpected retries'
+                'help' => 'Producer idempotence ensures that duplicates are not introduced due to unexpected retries',
             ],
             'topic' => [
                 'description' => 'Topic',
-                'help' => 'The categories used to organize messages'
+                'help' => 'The categories used to organize messages',
             ],
             'ssl' => [
                 'enable' => [
                     'description' => 'SSL Enable',
-                    'help' => 'Enable SSL support in Kafka'
+                    'help' => 'Enable SSL support in Kafka',
                 ],
                 'protocol' => [
                     'description' => 'SSL Protocol',
-                    'help' => 'The SSL protocol to be used in Kafka. Default "ssl"'
+                    'help' => 'The SSL protocol to be used in Kafka. Default "ssl"',
                 ],
                 'ca.location' => [
                     'description' => 'SSL Certificate Authority Location',
-                    'help' => 'The SSL CA file path location to be used in Kafka'
+                    'help' => 'The SSL CA file path location to be used in Kafka',
                 ],
                 'certificate.location' => [
                     'description' => 'SSL Certificate Location',
-                    'help' => ' The SSL Certificate file location to be used in Kafka'
+                    'help' => ' The SSL Certificate file location to be used in Kafka',
                 ],
                 'key.location' => [
                     'description' => 'SSL Certificate Key Location',
-                    'help' => 'The SSL certificate key file location to be used in Kafka'
+                    'help' => 'The SSL certificate key file location to be used in Kafka',
                 ],
                 'key.password' => [
                     'description' => 'SSL Certificate Key Password',
-                    'help' => 'The SSL certificate key\'s password to be used in Kafka'
+                    'help' => 'The SSL certificate key\'s password to be used in Kafka',
                 ],
             ],
         ],
