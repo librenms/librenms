@@ -13,7 +13,7 @@ looking to send data to any other version of Kafka than you should adapt the sou
 
 ## Requirements
 
-- PHP ^7.4 or ^8.0 with extensions FFI and xmlwriter enabled
+- Extensions FFI and xmlwriter enabled
 - librdkafka
 - librdkafka-dev
 
