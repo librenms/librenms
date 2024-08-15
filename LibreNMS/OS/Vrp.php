@@ -27,6 +27,7 @@ namespace LibreNMS\OS;
 
 use App\Models\AccessPoint;
 use App\Models\Device;
+use App\Models\EntPhysical;
 use App\Models\Mempool;
 use App\Models\PortsNac;
 use App\Models\Sla;
@@ -79,7 +80,7 @@ class Vrp extends OS implements
             'HUAWEI-ENTITY-EXTENT-MIB::hwEntityBomEnDesc',
         ])->table(1);
 
-        foreach ($inventory as $entry) {
+        $inventory->each(function (EntPhysical $entry) use ($extra) {
             if (isset($entry->entPhysicalIndex)) {
                 if (! empty($extra[$entry->entPhysicalIndex]['HUAWEI-ENTITY-EXTENT-MIB::hwEntityBomEnDesc'])) {
                     $entry->entPhysicalDescr = $extra[$entry->entPhysicalIndex]['HUAWEI-ENTITY-EXTENT-MIB::hwEntityBomEnDesc'];
@@ -89,7 +90,7 @@ class Vrp extends OS implements
                     $entry->entPhysicalModelName = $extra[$entry->entPhysicalIndex]['HUAWEI-ENTITY-EXTENT-MIB::hwEntityBoardType'];
                 }
             }
-        }
+        });
 
         return $inventory;
     }
