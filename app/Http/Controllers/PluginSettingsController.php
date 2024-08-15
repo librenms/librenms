@@ -4,13 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\Plugin;
 use App\Plugins\Hooks\SettingsHook;
-use App\Plugins\PluginManager;
 use Illuminate\Http\Request;
+use LibreNMS\Interfaces\Plugins\PluginManagerInterface;
 use LibreNMS\Util\Notifications;
 
 class PluginSettingsController extends Controller
 {
-    public function __invoke(PluginManager $manager, Plugin $plugin): \Illuminate\Contracts\View\View
+    public function __invoke(PluginManagerInterface $manager, Plugin $plugin): \Illuminate\Contracts\View\View
     {
         if (! $manager->pluginEnabled($plugin->plugin_name)) {
             abort(404, trans('plugins.errors.disabled', ['plugin' => $plugin->plugin_name]));
@@ -24,7 +24,7 @@ class PluginSettingsController extends Controller
             'settings_view' => 'plugins.missing',
             'settings' => [],
         ],
-            (array) $manager->call(SettingsHook::class, [], $plugin->plugin_name)->first()
+            $manager->call(SettingsHook::class, [], $plugin->plugin_name)[0] ?? []
         );
 
         return view('plugins.settings', $data);

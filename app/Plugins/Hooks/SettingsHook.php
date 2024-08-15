@@ -29,7 +29,7 @@ use App\Models\User;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\Str;
 
-abstract class SettingsHook
+abstract class SettingsHook implements \LibreNMS\Interfaces\Plugins\Hooks\SettingsHook
 {
     public string $view = 'resources.views.settings';
 

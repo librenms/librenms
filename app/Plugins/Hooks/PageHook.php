@@ -29,7 +29,7 @@ use App\Models\User;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\Str;
 
-abstract class PageHook
+abstract class PageHook implements \LibreNMS\Interfaces\Plugins\Hooks\SinglePageHook
 {
     public string $view = 'resources.views.page';
 
