@@ -268,7 +268,7 @@ return [
         ],
         'poller' => [
             'CheckActivePoller' => [
-                'fail' => '未检测到活动的轮询方法',
+                'fail' => '轮询器未运行。  过去 :interval 秒内没有运行任何轮询器。',
                 'both_fail' => '调度程序服务和Python包装器最近都处于活动状态，这可能导致双重轮询',
                 'ok' => '找到活动的轮询器',
             ],

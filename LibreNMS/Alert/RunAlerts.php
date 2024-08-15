@@ -432,7 +432,7 @@ class RunAlerts
                     }
                 }
 
-                if (in_array($alert['state'], [AlertState::ACTIVE, AlertState::WORSE, AlertState::BETTER]) && ! empty($rextra['count']) && ($rextra['count'] == -1 || $alert['details']['count']++ < $rextra['count'])) {
+                if (in_array($alert['state'], [AlertState::ACTIVE, AlertState::WORSE, AlertState::BETTER]) && ! empty($rextra['count']) && isset($alert['details']['count']) && ($rextra['count'] == -1 || $alert['details']['count']++ < $rextra['count'])) {
                     if ($alert['details']['count'] < $rextra['count']) {
                         $noacc = true;
                     }
