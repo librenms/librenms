@@ -20,7 +20,7 @@ class PluginPageController extends Controller
             'title' => trans('plugins.settings_page', ['plugin' => $plugin->plugin_name]),
             'plugin_name' => $plugin->plugin_name,
             'plugin_id' => Plugin::where('plugin_name', $plugin->plugin_name)->value('plugin_id'),
-            'settings_view' => 'plugins.missing',
+            'content_view' => 'plugins.missing',
             'settings' => [],
         ],
             $manager->call(SinglePageHook::class, [], $plugin->plugin_name)[0] ?? []

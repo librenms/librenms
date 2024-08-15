@@ -48,7 +48,7 @@ abstract class SettingsHook implements \LibreNMS\Interfaces\Plugins\Hooks\Settin
     final public function handle(string $pluginName, array $settings, Application $app): array
     {
         return array_merge([
-            'settings_view' => Str::start($this->view, "$pluginName::"),
+            'content_view' => Str::start($this->view, "$pluginName::"),
         ], $this->data($app->call([$this, 'data'], [
             'settings' => $settings,
         ])));
