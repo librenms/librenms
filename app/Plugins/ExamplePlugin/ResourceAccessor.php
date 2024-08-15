@@ -71,7 +71,7 @@ class ResourceAccessor extends ResourceAccessorHook
         //$result = response()->download($full_path, $name);
 
         // to build dynamically a file from code and expose it as $name for the browser
-        //$result = response()->streamDownload(function() {  
+        //$result = response()->streamDownload(function() {
         //    echo "Content of the file";
         //}, $name);
 
