@@ -181,6 +181,7 @@ class Vrp extends OS implements
                     $txpow = $radio['hwWlanRadioActualEIRP'] ?? 0;
                     $interference = $radio['hwWlanRadioChInterferenceRate'] ?? 0;
                     $radioutil = $radio['hwWlanRadioChUtilizationRate'] ?? 0;
+                    $radioutil = ($radioutil > 100 || $radioutil < 0) ? -1 : $radioutil;
                     $numasoclients = $clientPerRadio[$ap_id][$r_id] ?? 0;
                     $radio['hwWlanRadioType'] = $radio['hwWlanRadioType'] ?? 0;
 
@@ -260,7 +261,7 @@ class Vrp extends OS implements
                         'mac_addr' => $mac,
                         'channel' => $channel,
                         'txpow' => $txpow,
-                        'radioutil' => ($radioutil > 100 || $radioutil < 0) ? -1 : $radioutil,
+                        'radioutil' => $radioutil,
                         'numasoclients' => $numasoclients,
                         'nummonclients' => $nummonclients,
                         'numactbssid' => $numactbssid,
