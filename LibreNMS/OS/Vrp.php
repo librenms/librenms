@@ -260,7 +260,7 @@ class Vrp extends OS implements
                         'mac_addr' => $mac,
                         'channel' => $channel,
                         'txpow' => $txpow,
-                        'radioutil' => $radioutil,
+                        'radioutil' => ($radioutil > 100 || $radioutil < 0) ? -1 : $radioutil,
                         'numasoclients' => $numasoclients,
                         'nummonclients' => $nummonclients,
                         'numactbssid' => $numactbssid,
