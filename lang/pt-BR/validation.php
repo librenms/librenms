@@ -268,7 +268,7 @@ return [
         ],
         'poller' => [
             'CheckActivePoller' => [
-                'fail' => 'Nenhum método de polling ativo detectado',
+                'fail' => 'O Poller não está em execução.  Nenhum poller foi executado nos últimos :interval segundos',
                 'both_fail' => 'Tanto o Dispatcher Service quanto o Python Wrapper estiveram ativos recentemente, isso pode causar duplo polling',
                 'ok' => 'Pollers ativos encontrados',
             ],

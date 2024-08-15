@@ -118,6 +118,20 @@ class Validator
     }
 
     /**
+     * Get overall status
+     */
+    public function getStatus(): int
+    {
+        return array_reduce($this->results, function ($compound, array $results) {
+            foreach ($results as $result) {
+                $compound = min($compound, $result->getStatus());
+            }
+
+            return $compound;
+        }, ValidationResult::SUCCESS);
+    }
+
+    /**
      * Get the ValidationResults for a specific validation group.
      *
      * @param  string|null  $validation_group
