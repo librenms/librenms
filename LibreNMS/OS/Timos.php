@@ -995,7 +995,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
                 $inventory->push(new EntPhysical([
                     'entPhysicalIndex' => $tmnxHwIndex,
                     'entPhysicalClass' => $entry['TIMETRA-CHASSIS-MIB::tmnxHwClass'],
-//                    'entPhysicalDescr' => $entry['TIMETRA-CHASSIS-MIB::tmnxHwID'],
+                    //                    'entPhysicalDescr' => $entry['TIMETRA-CHASSIS-MIB::tmnxHwID'],
                     'entPhysicalName' => $entry['TIMETRA-CHASSIS-MIB::tmnxHwName'],
                     'entPhysicalModelName' => $entry['TIMETRA-CHASSIS-MIB::tmnxHwMfgBoardNumber'],
                     'entPhysicalSerialNum' => $entry['TIMETRA-CHASSIS-MIB::tmnxHwSerialNumber'],

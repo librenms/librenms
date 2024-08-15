@@ -137,6 +137,7 @@ class Linux extends Shared\Unix implements VminfoDiscovery
         $string = str_replace("\n", '', $string);
         if (StringHelpers::isHex($string)) {
             $ascii = StringHelpers::hexToAscii($string, ' ');
+
             return preg_split('/[^ -~]/', $ascii)[0] ?? $ascii;
         }
 

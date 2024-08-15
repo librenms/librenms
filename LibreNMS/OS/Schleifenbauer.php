@@ -73,7 +73,7 @@ class Schleifenbauer extends \LibreNMS\OS
             ]));
             $inventory->push(new EntPhysical([
                 'entPhysicalIndex' => 1,
-                'entPhysicalDescr' => "Databus Ring State Sensor (0 = open, 1 = closed)",
+                'entPhysicalDescr' => 'Databus Ring State Sensor (0 = open, 1 = closed)',
                 'entPhysicalClass' => 'sensor',
                 'entPhysicalName' => 'State Sensor',
                 'entPhysicalContainedIn' => 0,
@@ -82,7 +82,7 @@ class Schleifenbauer extends \LibreNMS\OS
             ]));
             $inventory->push(new EntPhysical([
                 'entPhysicalIndex' => 1,
-                'entPhysicalDescr' => "Duplicate Device Address Sensor (#)",
+                'entPhysicalDescr' => 'Duplicate Device Address Sensor (#)',
                 'entPhysicalClass' => 'sensor',
                 'entPhysicalName' => 'State Sensor',
                 'entPhysicalContainedIn' => 0,
@@ -91,7 +91,7 @@ class Schleifenbauer extends \LibreNMS\OS
             ]));
             $inventory->push(new EntPhysical([
                 'entPhysicalIndex' => 1,
-                'entPhysicalDescr' => "New Device Detection Sensor (#)",
+                'entPhysicalDescr' => 'New Device Detection Sensor (#)',
                 'entPhysicalClass' => 'sensor',
                 'entPhysicalName' => 'State Sensor',
                 'entPhysicalContainedIn' => 0,
@@ -252,7 +252,6 @@ class Schleifenbauer extends \LibreNMS\OS
 
         return $inventory;
     }
-
 
     private function enumerateSensors(Collection $inventory, int $inputIndex, string $entPhysicalName): void
     {

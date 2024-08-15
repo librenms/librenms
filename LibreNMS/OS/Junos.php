@@ -144,9 +144,11 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling
                     $chassis = $containers->firstWhere('entPhysicalClass', 'chassis');
                     if ($chassis) {
                         $chassis->entPhysicalSerialNum = $entry['jnxContentsSerialNo'] ?? null;
+
                         return null;
                     }
                 }
+
                 // Juniper's MIB doesn't have the same objects as the Entity MIB, so some values are made up here.
                 return new EntPhysical([
                     'entPhysicalIndex' => $container + $indexL1 * 1000000 + $indexL2 * 10000 + $indexL3 * 100,
@@ -261,8 +263,8 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling
      * jnxEX4300MPSlotFPC.0 > MP Slot FPC
      * jnxEX4300MediaCardSpacePIC.0 > Media Card Space PIC
      * jnxEX4300MPRE0.0 > MPRE0
- */
-    function parseType(?string $type, ?string $chassisName): ?string
+     */
+    public function parseType(?string $type, ?string $chassisName): ?string
     {
         if ($type === null) {
             return $type;
@@ -274,14 +276,14 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling
 
         // $chassisName is known
         $name = preg_replace("/jnx($chassisName)?([^.]+).*/", '$2', $type);
-        $words = preg_split('/(^[^A-Z]+|[A-Z][^A-Z0-9]+)/', $name, -1, PREG_SPLIT_NO_EMPTY|PREG_SPLIT_DELIM_CAPTURE);
+        $words = preg_split('/(^[^A-Z]+|[A-Z][^A-Z0-9]+)/', $name, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
 
         return implode(' ', $words);
     }
 
-    function parseClass($type): ?string
+    public function parseClass($type): ?string
     {
-        return match($type) {
+        return match ($type) {
             'jnxFan' => 'fan',
             'jnxPower' => 'powerSupply',
 

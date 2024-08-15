@@ -68,7 +68,6 @@ class Vrp extends OS implements
         EntityMib::discoverEntityPhysical as discoverBaseEntityPhysical;
     }
 
-
     public function discoverEntityPhysical(): Collection
     {
         // normal ENTITY-MIB collection
