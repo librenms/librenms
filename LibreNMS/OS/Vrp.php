@@ -355,7 +355,7 @@ class Vrp extends OS implements
 
             // update the DB
             foreach ($portAuthSessionEntry as $authId => $portAuthSessionEntryParameters) {
-                if (! array_key_exists('hwAccessInterface', $portAuthSessionEntryParameters)) {
+                if (! array_key_exists('hwAccessInterface', $portAuthSessionEntryParameters) || ! array_key_exists('hwAccessInterface', $portAuthSessionEntryParameters)) {
                     continue;
                 }
                 $mac_address = strtolower(implode(array_map('zeropad', explode(':', $portAuthSessionEntryParameters['hwAccessMACAddress']))));
