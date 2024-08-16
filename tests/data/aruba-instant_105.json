@@ -2143,7 +2143,7 @@
                     "entPhysicalName": "24:de:c6:c3:52:da 10.4.1.26 Cluster Master",
                     "entPhysicalHardwareRev": null,
                     "entPhysicalFirmwareRev": null,
-                    "entPhysicalSoftwareRev": "'6.4.4.8-4.2.4.12",
+                    "entPhysicalSoftwareRev": "6.4.4.8-4.2.4.12",
                     "entPhysicalAlias": null,
                     "entPhysicalAssetID": null,
                     "entPhysicalIsFRU": null,
