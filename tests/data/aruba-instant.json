@@ -2666,7 +2666,7 @@
                     "entPhysicalName": "instant-ap-src-1 10.128.0.11 Cluster Master",
                     "entPhysicalHardwareRev": null,
                     "entPhysicalFirmwareRev": null,
-                    "entPhysicalSoftwareRev": "v2c",
+                    "entPhysicalSoftwareRev": "8.4.0.0-8.4.0.0",
                     "entPhysicalAlias": null,
                     "entPhysicalAssetID": null,
                     "entPhysicalIsFRU": null,
