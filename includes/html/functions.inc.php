@@ -742,11 +742,13 @@ function alert_details($details)
                     'page' => 'device',
                     'device' => $tmp_alerts['device_id'],
                     'tab' => 'services',
+                    'view' => 'detail',
                 ]) .
-                "'>" . $tmp_alerts['service_name'] . '</a>';
-            $fault_detail .= ',<br>Type: ' . $tmp_alerts['service_type'];
-            $fault_detail .= ',<br>Param: ' . $tmp_alerts['service_param'];
-            $fault_detail .= ',<br>Msg: ' . $tmp_alerts['service_message'];
+                "'>" . ($tmp_alerts['service_name'] ?? '') . ' (' . $tmp_alerts['service_type'] . ')' . '</a>';
+            $fault_detail .= 'Service Host: ' . ($tmp_alerts['service_ip'] != '' ? $tmp_alerts['service_ip'] : format_hostname(DeviceCache::get($tmp_alerts['device_id']))) . ',<br>';
+            $fault_detail .= ($tmp_alerts['service_desc'] != '') ? ('Description: ' . $tmp_alerts['service_desc'] . ',<br>') : '';
+            $fault_detail .= ($tmp_alerts['service_param'] != '') ? ('Param: ' . $tmp_alerts['service_param'] . ',<br>') : '';
+            $fault_detail .= 'Msg: ' . $tmp_alerts['service_message'];
             $fallback = false;
         }
 
@@ -763,6 +765,19 @@ function alert_details($details)
             $fault_detail .= ', Desc ' . $tmp_alerts['bgpPeerDescr'] ?? '';
             $fault_detail .= ', AS' . $tmp_alerts['bgpPeerRemoteAs'];
             $fault_detail .= ', State ' . $tmp_alerts['bgpPeerState'];
+            $fallback = false;
+        }
+
+        if (isset($tmp_alerts['mempool_id'])) {
+            // If we have a mempool_id, we format the data accordingly
+            $fault_detail .= "MemoryPool <a href='" .
+                \LibreNMS\Util\Url::generate([
+                    'page' => 'graphs',
+                    'id' => $tmp_alerts['mempool_id'],
+                    'type' => 'mempool_usage',
+                ]) .
+                "'>" . ($tmp_alerts['mempool_descr'] ?? 'link') . '</a>';
+            $fault_detail .= '<br> &nbsp; &nbsp; &nbsp; Usage ' . $tmp_alerts['mempool_perc'] . '%, &nbsp; Free ' . \LibreNMS\Util\Number::formatSi($tmp_alerts['mempool_free']) . ',&nbsp; Size ' . \LibreNMS\Util\Number::formatSi($tmp_alerts['mempool_total']);
             $fallback = false;
         }
 

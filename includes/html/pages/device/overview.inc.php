@@ -1,6 +1,6 @@
 <?php
 
-use App\Plugins\Hooks\DeviceOverviewHook;
+use LibreNMS\Interfaces\Plugins\Hooks\DeviceOverviewHook;
 
 $overview = 1;
 
@@ -20,9 +20,9 @@ require 'includes/html/dev-groups-overview-data.inc.php';
 require 'overview/puppet_agent.inc.php';
 
 echo LibreNMS\Plugins::call('device_overview_container', [$device]);
-PluginManager::call(DeviceOverviewHook::class, ['device' => DeviceCache::getPrimary()])->each(function ($view) {
+foreach (PluginManager::call(DeviceOverviewHook::class, ['device' => DeviceCache::getPrimary()]) as $view) {
     echo $view;
-});
+}
 
 require 'overview/ports.inc.php';
 
