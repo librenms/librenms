@@ -1,3 +1,112 @@
+## 24.8.0
+*(2024-08-15)*
+
+A big thank you to the following 19 contributors this last month:
+
+  - [murrant](https://github.com/murrant) (18)
+  - [PipoCanaja](https://github.com/PipoCanaja) (5)
+  - [Npeca75](https://github.com/Npeca75) (2)
+  - [Jellyfrog](https://github.com/Jellyfrog) (2)
+  - [nicolasberens](https://github.com/nicolasberens) (2)
+  - [electrocret](https://github.com/electrocret) (2)
+  - [dethmetaljeff](https://github.com/dethmetaljeff) (2)
+  - [xorrkaz](https://github.com/xorrkaz) (2)
+  - [rudybroersma](https://github.com/rudybroersma) (2)
+  - [TheMysteriousX](https://github.com/TheMysteriousX) (1)
+  - [dependabot](https://github.com/apps/dependabot) (1)
+  - [ethan-bmn](https://github.com/ethan-bmn) (1)
+  - [suom1](https://github.com/suom1) (1)
+  - [hatboxen](https://github.com/hatboxen) (1)
+  - [freddy36](https://github.com/freddy36) (1)
+  - [Ferris-0815](https://github.com/Ferris-0815) (1)
+  - [mib1185](https://github.com/mib1185) (1)
+  - [ervin09](https://github.com/ervin09) (1)
+  - [x0ul](https://github.com/x0ul) (1)
+
+Thanks to maintainers and others that helped with pull requests this month:
+
+  - [murrant](https://github.com/murrant) (11)
+  - [Jellyfrog](https://github.com/Jellyfrog) (10)
+  - [PipoCanaja](https://github.com/PipoCanaja) (7)
+  - [electrocret](https://github.com/electrocret) (4)
+  - [f0o](https://github.com/f0o) (1)
+  - [VVelox](https://github.com/VVelox) (1)
+
+#### Breaking Change
+* Fix Port Channel ([#16227](https://github.com/librenms/librenms/pull/16227)) - [murrant](https://github.com/murrant)
+
+#### Device
+* Bug - Fix CISCO-BGP4-MIB logic ([#16260](https://github.com/librenms/librenms/pull/16260)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Add support for GUDE Expert Sensor Box ([#16257](https://github.com/librenms/librenms/pull/16257)) - [Jellyfrog](https://github.com/Jellyfrog)
+* Add skip_values to iosxr hsrp ([#16251](https://github.com/librenms/librenms/pull/16251)) - [electrocret](https://github.com/electrocret)
+* Improve Fiberstore S3900 series support ([#16225](https://github.com/librenms/librenms/pull/16225)) - [freddy36](https://github.com/freddy36)
+* Add support for FortiNet FortiExtender ([#16219](https://github.com/librenms/librenms/pull/16219)) - [rudybroersma](https://github.com/rudybroersma)
+* F5-Loadbalancer module to support an expiration check of the installed certificates ([#16217](https://github.com/librenms/librenms/pull/16217)) - [Ferris-0815](https://github.com/Ferris-0815)
+* Add value 0 to HP Physical Drive Status (meaning no disk is inserted) ([#16211](https://github.com/librenms/librenms/pull/16211)) - [rudybroersma](https://github.com/rudybroersma)
+* Tripplite console server ([#16156](https://github.com/librenms/librenms/pull/16156)) - [nicolasberens](https://github.com/nicolasberens)
+* Device - Adding support to Infortrend DS3016 ([#16070](https://github.com/librenms/librenms/pull/16070)) - [ervin09](https://github.com/ervin09)
+* Device - Added Baicells Atom OD04 CPE support ([#14838](https://github.com/librenms/librenms/pull/14838)) - [x0ul](https://github.com/x0ul)
+
+#### Webui
+* [webui] sort vlan tooltip by vlanid ([#16266](https://github.com/librenms/librenms/pull/16266)) - [Npeca75](https://github.com/Npeca75)
+* Add Servicename to Alert Detail ([#16249](https://github.com/librenms/librenms/pull/16249)) - [electrocret](https://github.com/electrocret)
+* Update graph timezone data ([#16244](https://github.com/librenms/librenms/pull/16244)) - [murrant](https://github.com/murrant)
+* Fix custom map default settings error ([#16236](https://github.com/librenms/librenms/pull/16236)) - [murrant](https://github.com/murrant)
+* Add link on alert-rules page to display active alerts for rule ([#16232](https://github.com/librenms/librenms/pull/16232)) - [dethmetaljeff](https://github.com/dethmetaljeff)
+* Custom map defaults ([#16212](https://github.com/librenms/librenms/pull/16212)) - [murrant](https://github.com/murrant)
+* Make also the total in and out interface errors selectable on the ports list ([#16073](https://github.com/librenms/librenms/pull/16073)) - [mib1185](https://github.com/mib1185)
+
+#### Alerting
+* Add bgp peer description to alert_detail ([#16233](https://github.com/librenms/librenms/pull/16233)) - [dethmetaljeff](https://github.com/dethmetaljeff)
+
+#### Api
+* Fix list_arp API ([#16243](https://github.com/librenms/librenms/pull/16243)) - [murrant](https://github.com/murrant)
+
+#### Discovery
+* Discovery, make sure where is set ([#16237](https://github.com/librenms/librenms/pull/16237)) - [murrant](https://github.com/murrant)
+* Discovery - LLDPv2 support extension, and discovery-protocols tests ([#16113](https://github.com/librenms/librenms/pull/16113)) - [PipoCanaja](https://github.com/PipoCanaja)
+
+#### Polling
+* Nac polling improvement ([#16265](https://github.com/librenms/librenms/pull/16265)) - [murrant](https://github.com/murrant)
+* Fix poller wrapper debug option ([#16214](https://github.com/librenms/librenms/pull/16214)) - [murrant](https://github.com/murrant)
+
+#### Authentication
+* Set `default_role` when registering instead of at every login ([#16235](https://github.com/librenms/librenms/pull/16235)) - [suom1](https://github.com/suom1)
+
+#### Bug
+* Fix alert bug when key missing ([#16281](https://github.com/librenms/librenms/pull/16281)) - [murrant](https://github.com/murrant)
+* Remove file differing by case only ([#16280](https://github.com/librenms/librenms/pull/16280)) - [TheMysteriousX](https://github.com/TheMysteriousX)
+* Fix runtime cache ([#16272](https://github.com/librenms/librenms/pull/16272)) - [murrant](https://github.com/murrant)
+* Bug - Fixing 'cisco-pw' cpwVcMplsPeerLdpID ([#16268](https://github.com/librenms/librenms/pull/16268)) - [PipoCanaja](https://github.com/PipoCanaja)
+* [webui] fix port_row.blade generate vlan link ([#16256](https://github.com/librenms/librenms/pull/16256)) - [Npeca75](https://github.com/Npeca75)
+* Bug - services - fix splitting of perfdata ([#16255](https://github.com/librenms/librenms/pull/16255)) - [nicolasberens](https://github.com/nicolasberens)
+* Cleanup - Ensure percentage is calculated out of positive values only ([#16250](https://github.com/librenms/librenms/pull/16250)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Fix error from MikroTik routers when updating BGP peer info ([#16224](https://github.com/librenms/librenms/pull/16224)) - [xorrkaz](https://github.com/xorrkaz)
+* Fix snmpsim in CI ([#16213](https://github.com/librenms/librenms/pull/16213)) - [murrant](https://github.com/murrant)
+
+#### Refactor
+* Refactor SnmpResponse mapTable ([#16238](https://github.com/librenms/librenms/pull/16238)) - [murrant](https://github.com/murrant)
+
+#### Cleanup
+* Mark addhost.php as deprecated ([#16283](https://github.com/librenms/librenms/pull/16283)) - [murrant](https://github.com/murrant)
+* Validate.php proper exit code ([#16274](https://github.com/librenms/librenms/pull/16274)) - [murrant](https://github.com/murrant)
+* Remove FILTER_SANITIZE_STRING ([#16264](https://github.com/librenms/librenms/pull/16264)) - [murrant](https://github.com/murrant)
+
+#### Documentation
+* Update Devices.md ([#16252](https://github.com/librenms/librenms/pull/16252)) - [ethan-bmn](https://github.com/ethan-bmn)
+* Docs Update: Large Scale LibreNMS Deployment Example ([#16226](https://github.com/librenms/librenms/pull/16226)) - [hatboxen](https://github.com/hatboxen)
+
+#### Misc
+* Add support for Prometheus pushgateway basic auth ([#16230](https://github.com/librenms/librenms/pull/16230)) - [xorrkaz](https://github.com/xorrkaz)
+
+#### Internal Features
+* Improve Snmpsim usage to ease testing ([#15471](https://github.com/librenms/librenms/pull/15471)) - [murrant](https://github.com/murrant)
+
+#### Dependencies
+* Update PHP dependencies ([#16263](https://github.com/librenms/librenms/pull/16263)) - [murrant](https://github.com/murrant)
+* Bump postcss from 7.0.39 to 8.4.40 ([#16262](https://github.com/librenms/librenms/pull/16262)) - [dependabot](https://github.com/apps/dependabot)
+
+
 ## 24.7.0
 *(2024-07-17)*
 

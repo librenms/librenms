@@ -43,6 +43,7 @@
         "laravel/tinker": "^2.8",
         "laravel/ui": "^4.2",
         "librenms/laravel-vue-i18n-generator": "dev-master",
+        "librenms/plugin-interfaces": "^1.0",
         "mews/purifier": "^3.4",
         "nunomaduro/laravel-console-summary": "^1.9",
         "pear/console_color2": "^0.1",

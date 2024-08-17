@@ -314,6 +314,7 @@ class RunAlerts
                         $chk[$i]['ip'] = inet6_ntop($chk[$i]['ip']);
                     }
                 }
+                $alert['details']['rule'] ??= []; // if details.rule is missing, set it to an empty array
                 $o = count($alert['details']['rule']);
                 $n = count($chk);
                 $ret = 'Alert #' . $alert['id'];
