@@ -6,6 +6,7 @@ use App\Models\Plugin;
 use Illuminate\Http\Request;
 use LibreNMS\Interfaces\Plugins\Hooks\SinglePageHook;
 use LibreNMS\Interfaces\Plugins\PluginManagerInterface;
+use Illuminate\Support\Facades\Auth;
 
 class PluginPageController extends Controller
 {
