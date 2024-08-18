@@ -272,8 +272,8 @@ class MenuComposer
         // Plugins
         $vars['has_v1_plugins'] = Plugins::count() != 0;
         $vars['v1_plugin_menu'] = Plugins::call('menu');
-        $vars['has_v2_plugins'] = PluginManager::hasHooks(MenuEntryHook::class);
-        $vars['menu_hooks'] = PluginManager::call(MenuEntryHook::class);
+        $vars['has_v2_plugins'] = PluginManager::hasHooks(MenuEntryHook::class, ['user' => $user]);
+        $vars['menu_hooks'] = PluginManager::call(MenuEntryHook::class, ['user' => $user]);
 
         $vars['browser_push'] = $user->hasBrowserPushTransport();
 
