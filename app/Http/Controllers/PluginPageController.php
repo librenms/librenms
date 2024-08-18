@@ -4,9 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Plugin;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use LibreNMS\Interfaces\Plugins\Hooks\SinglePageHook;
 use LibreNMS\Interfaces\Plugins\PluginManagerInterface;
-use Illuminate\Support\Facades\Auth;
 
 class PluginPageController extends Controller
 {
