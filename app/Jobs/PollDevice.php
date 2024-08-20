@@ -135,6 +135,10 @@ class PollDevice implements ShouldQueue
                     $this->logger->info("#### Load poller module $module ####\n");
                     $this->logger->debug($module_status);
 
+                    if (is_array($status)) {
+                        Config::set('poller_submodules.' . $module, $status);
+                    }
+
                     $instance->poll($this->os, $datastore);
                 }
             } catch (Throwable $e) {

@@ -151,7 +151,7 @@ class DevicePoll extends LnmsCommand
     {
         if (! empty($module_overrides)) {
             $modules = array_map(function ($module, $status) {
-                return $module . (is_array($status) ? '(' . implode(',', $submodules) . ')' : '');
+                return $module . (is_array($status) ? '(' . implode(',', $status) . ')' : '');
             }, array_keys($module_overrides), array_values($module_overrides));
 
             Log::debug('Override poller modules: ' . implode(', ', $modules));
