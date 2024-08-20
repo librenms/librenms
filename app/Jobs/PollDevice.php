@@ -15,7 +15,6 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use LibreNMS\Config;
 use LibreNMS\Enum\Severity;
-use LibreNMS\Exceptions\DeviceDownException;
 use LibreNMS\OS;
 use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\RRD\RrdDefinition;
@@ -23,7 +22,6 @@ use LibreNMS\Util\Dns;
 use LibreNMS\Util\Module;
 use Psr\Log\LoggerInterface;
 use Throwable;
-
 
 class PollDevice implements ShouldQueue
 {
@@ -38,13 +36,14 @@ class PollDevice implements ShouldQueue
     private $os;
 
     /**
-     * @param int $device_id
-     * @param array<string, bool|string[]> $module_overrides
+     * @param  int  $device_id
+     * @param  array<string, bool|string[]>  $module_overrides
      */
     public function __construct(
         public int $device_id,
         public array $module_overrides = [],
-    ) {}
+    ) {
+    }
 
     /**
      * Execute the job.
