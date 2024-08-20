@@ -134,7 +134,7 @@ class DevicePoll extends LnmsCommand
         $devices = Device::whereDeviceSpec($this->argument('device spec'))->pluck('device_id');
 
         if (\config('queue.default') == 'sync') {
-            $this->error("Queue driver is sync, work will run in process.");
+            $this->error('Queue driver is sync, work will run in process.');
             sleep(1);
         }
 
