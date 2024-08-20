@@ -33,10 +33,15 @@ class DevicePoll extends LnmsCommand
         $this->addArgument('device spec', InputArgument::REQUIRED);
         $this->addOption('modules', 'm', InputOption::VALUE_REQUIRED);
         $this->addOption('no-data', 'x', InputOption::VALUE_NONE);
+        $this->addOption('dispatch', 'd', InputOption::VALUE_NONE);
     }
 
     public function handle(MeasurementManager $measurements): int
     {
+        if ($this->option('dispatch')) {
+            return $this->dispatchWork();
+        }
+
         $this->configureOutputOptions();
 
         if ($this->option('no-data')) {
@@ -48,7 +53,6 @@ class DevicePoll extends LnmsCommand
         }
 
         try {
-
             if ($this->getOutput()->isVerbose()) {
                 Log::debug(Version::get()->header());
                 \LibreNMS\Util\OS::updateCache(true); // Force update of OS Cache
@@ -121,6 +125,26 @@ class DevicePoll extends LnmsCommand
         $this->error(trans('commands.device:poll.errors.none_polled'));
 
         return 1; // failed to poll
+    }
+
+    private function dispatchWork()
+    {
+        \Log::setDefaultDriver('stack');
+        $module_overrides = Module::parseUserOverrides(explode(',', $this->option('modules') ?? ''));
+        $devices = Device::whereDeviceSpec($this->argument('device spec'))->pluck('device_id');
+
+        if (\config('queue.default') == 'sync') {
+            $this->error("Queue driver is sync, work will run in process.");
+            sleep(1);
+        }
+
+        foreach ($devices as $device_id) {
+            PollDevice::dispatch($device_id, $module_overrides);
+        }
+
+        $this->line('Submitted work for ' . $devices->count() . ' devices');
+
+        return 0;
     }
 
     private function printModules(array $module_overrides): void
