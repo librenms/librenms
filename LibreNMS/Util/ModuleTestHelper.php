@@ -26,6 +26,7 @@
 namespace LibreNMS\Util;
 
 use App\Actions\Device\ValidateDeviceAndCreate;
+use App\Jobs\PollDevice;
 use App\Models\Device;
 use DeviceCache;
 use Illuminate\Database\Eloquent\Model;
@@ -35,7 +36,6 @@ use LibreNMS\Config;
 use LibreNMS\Data\Source\SnmpResponse;
 use LibreNMS\Exceptions\FileNotFoundException;
 use LibreNMS\Exceptions\InvalidModuleException;
-use LibreNMS\Poller;
 
 class ModuleTestHelper
 {
@@ -178,8 +178,7 @@ class ModuleTestHelper
         Debug::set();
         Debug::setVerbose();
         discover_device($device, $this->parseArgs('discovery'));
-        $poller = app(Poller::class, ['device_spec' => $device_id, 'module_override' => $this->modules]);
-        $poller->poll();
+        (new PollDevice($device_id, $this->modules))->handle();
         Debug::set($save_debug);
         Debug::setVerbose($save_vdebug);
         $collection_output = ob_get_contents();
@@ -627,8 +626,7 @@ class ModuleTestHelper
         ob_start();
 
         \Log::setDefaultDriver('console');
-        $poller = app(Poller::class, ['device_spec' => $device_id, 'module_override' => $this->modules]);
-        $poller->poll();
+        (new PollDevice($device_id, $this->modules))->handle();
 
         $this->poller_output = ob_get_contents();
         if ($this->quiet) {

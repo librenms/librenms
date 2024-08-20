@@ -63,4 +63,21 @@ class Module
             $manual,
         );
     }
+
+    public static function parseUserOverrides(array $overrides): array
+    {
+        $modules = [];
+
+        foreach ($overrides as $index => $module) {
+            // parse submodules (only supported by some modules)
+            if (str_contains($module, '/')) {
+                [$module, $submodule] = explode('/', $module, 2);
+                $modules[$module][] = $submodule;
+            } elseif (self::exists($module) || self::legacyPollingExists($module)) {
+                $modules[$module] = true;
+            }
+        }
+
+        return $modules;
+    }
 }
