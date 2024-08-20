@@ -42,11 +42,6 @@ echo '
 require 'overview/processors.inc.php';
 require 'overview/mempools.inc.php';
 require 'overview/storage.inc.php';
-
-if (! isset($entity_state)) {
-    $entity_state = get_dev_entity_state($device['device_id']);
-}
-
 require 'overview/toner.inc.php';
 require 'overview/sensors/charge.inc.php';
 require 'overview/sensors/temperature.inc.php';

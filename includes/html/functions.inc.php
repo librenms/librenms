@@ -259,34 +259,6 @@ function print_percentage_bar($width, $height, $percent, $left_text, $left_colou
     ]);
 }
 
-function generate_entity_link($type, $entity, $text = null, $graph_type = null)
-{
-    global $entity_cache;
-
-    if (is_numeric($entity)) {
-        $entity = get_entity_by_id_cache($type, $entity);
-    }
-
-    switch ($type) {
-        case 'port':
-            $link = generate_port_link($entity, $text, $graph_type);
-            break;
-
-        case 'storage':
-            if (empty($text)) {
-                $text = $entity['storage_descr'];
-            }
-
-            $link = generate_link($text, ['page' => 'device', 'device' => $entity['device_id'], 'tab' => 'health', 'metric' => 'storage']);
-            break;
-
-        default:
-            $link = $entity[$type . '_id'];
-    }
-
-    return $link;
-}//end generate_entity_link()
-
 /**
  * Extract type and subtype from a complex graph type, also makes sure variables are file name safe.
  *
