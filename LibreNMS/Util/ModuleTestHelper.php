@@ -312,7 +312,7 @@ class ModuleTestHelper
      * Probably needs to be more robust
      *
      * @param  array  $modules
-     * @return array
+     * @return array<string, bool|string[]>
      *
      * @throws InvalidModuleException
      */
@@ -320,17 +320,22 @@ class ModuleTestHelper
     {
         // generate a full list of modules
         $full_list = [];
-        foreach ($modules as $module) {
+        foreach ($modules as $index => $module) {
+            $module = is_string($index) ? $index : $module;
+
             // only allow valid modules
-            if (! (Config::has("poller_modules.$module") || Config::has("discovery_modules.$module"))) {
+            if (! Module::exists($module)) {
                 throw new InvalidModuleException("Invalid module name: $module");
             }
 
-            $full_list = array_merge($full_list, Module::fromName($module)->dependencies());
-            $full_list[] = $module;
+            foreach (Module::fromName($module)->dependencies() as $dependency) {
+                $full_list[$dependency] = true;
+            }
+
+            $full_list[$module] = true;
         }
 
-        return array_unique($full_list);
+        return $full_list;
     }
 
     private function parseArgs($type)
@@ -339,7 +344,7 @@ class ModuleTestHelper
             return false;
         }
 
-        return parse_modules($type, ['m' => implode(',', $this->modules)]);
+        return parse_modules($type, ['m' => implode(',', array_keys($this->modules))]);
     }
 
     private function qPrint($var)
