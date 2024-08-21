@@ -212,6 +212,7 @@ class Vrp extends OS implements
                     $txpow = $radio['hwWlanRadioActualEIRP'] ?? 0;
                     $interference = $radio['hwWlanRadioChInterferenceRate'] ?? 0;
                     $radioutil = $radio['hwWlanRadioChUtilizationRate'] ?? 0;
+                    $radioutil = ($radioutil > 100 || $radioutil < 0) ? -1 : $radioutil;
                     $numasoclients = $clientPerRadio[$ap_id][$r_id] ?? 0;
                     $radio['hwWlanRadioType'] = $radio['hwWlanRadioType'] ?? 0;
 
@@ -385,6 +386,9 @@ class Vrp extends OS implements
 
             // update the DB
             foreach ($portAuthSessionEntry as $authId => $portAuthSessionEntryParameters) {
+                if (! array_key_exists('hwAccessInterface', $portAuthSessionEntryParameters) || ! array_key_exists('hwAccessMACAddress', $portAuthSessionEntryParameters)) {
+                    continue;
+                }
                 $mac_address = strtolower(implode(array_map('zeropad', explode(':', $portAuthSessionEntryParameters['hwAccessMACAddress']))));
                 $port_id = $ifName_map->get($portAuthSessionEntryParameters['hwAccessInterface'], 0);
                 if ($port_id <= 0) {
