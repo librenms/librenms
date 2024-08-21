@@ -36,7 +36,7 @@ if ($device['os_group'] == 'cisco') {
     $oid_list = ['crasEmailNumSessions.0', 'crasIPSecNumSessions.0', 'crasL2LNumSessions.0', 'crasLBNumSessions.0', 'crasSVCNumSessions.0', 'crasWebvpnNumSessions.0'];
     $data = snmp_get_multi($device, $oid_list, '-OUQs', 'CISCO-REMOTE-ACCESS-MONITOR-MIB');
 
-    if(empty($data[0])) {
+    if (empty($data[0])) {
         return;
     }
 
