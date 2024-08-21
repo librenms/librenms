@@ -14604,7 +14604,7 @@
                     "entPhysicalAssetID": "",
                     "entPhysicalIsFRU": "false",
                     "entPhysicalModelName": "",
-                    "entPhysicalVendorType": "cevContainer.291",
+                    "entPhysicalVendorType": "cevContainerFixedLinkModuleSlot",
                     "entPhysicalSerialNum": "",
                     "entPhysicalContainedIn": 1000,
                     "entPhysicalParentRelPos": 11,

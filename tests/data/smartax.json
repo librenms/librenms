@@ -11455,7 +11455,7 @@
                     "entPhysicalContainedIn": 3400020,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "HISILICON",
-                    "ifIndex": 2147483647
+                    "ifIndex": 4194304000
                 },
                 {
                     "entPhysicalIndex": 3400022,
@@ -11474,7 +11474,7 @@
                     "entPhysicalContainedIn": 3400020,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "HISILICON",
-                    "ifIndex": 2147483647
+                    "ifIndex": 4194304256
                 },
                 {
                     "entPhysicalIndex": 3400023,
@@ -11493,7 +11493,7 @@
                     "entPhysicalContainedIn": 3400020,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "HISILICON",
-                    "ifIndex": 2147483647
+                    "ifIndex": 4194304512
                 },
                 {
                     "entPhysicalIndex": 3400024,
@@ -11512,7 +11512,7 @@
                     "entPhysicalContainedIn": 3400020,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "HISILICON",
-                    "ifIndex": 2147483647
+                    "ifIndex": 4194304768
                 },
                 {
                     "entPhysicalIndex": 3400025,
@@ -11531,7 +11531,7 @@
                     "entPhysicalContainedIn": 3400020,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "HISILICON",
-                    "ifIndex": 2147483647
+                    "ifIndex": 4194305024
                 },
                 {
                     "entPhysicalIndex": 3400026,
@@ -11550,7 +11550,7 @@
                     "entPhysicalContainedIn": 3400020,
                     "entPhysicalParentRelPos": 6,
                     "entPhysicalMfgName": "HISILICON",
-                    "ifIndex": 2147483647
+                    "ifIndex": 4194305280
                 },
                 {
                     "entPhysicalIndex": 3400027,
@@ -11569,7 +11569,7 @@
                     "entPhysicalContainedIn": 3400020,
                     "entPhysicalParentRelPos": 7,
                     "entPhysicalMfgName": "HISILICON",
-                    "ifIndex": 2147483647
+                    "ifIndex": 4194305536
                 },
                 {
                     "entPhysicalIndex": 3400028,
@@ -11588,7 +11588,7 @@
                     "entPhysicalContainedIn": 3400020,
                     "entPhysicalParentRelPos": 8,
                     "entPhysicalMfgName": "HISILICON",
-                    "ifIndex": 2147483647
+                    "ifIndex": 4194305792
                 },
                 {
                     "entPhysicalIndex": 3400029,
@@ -11607,7 +11607,7 @@
                     "entPhysicalContainedIn": 3400020,
                     "entPhysicalParentRelPos": 9,
                     "entPhysicalMfgName": "HISILICON",
-                    "ifIndex": 2147483647
+                    "ifIndex": 4194306048
                 },
                 {
                     "entPhysicalIndex": 3400030,
@@ -11626,7 +11626,7 @@
                     "entPhysicalContainedIn": 3400020,
                     "entPhysicalParentRelPos": 10,
                     "entPhysicalMfgName": "HISILICON",
-                    "ifIndex": 2147483647
+                    "ifIndex": 4194306304
                 },
                 {
                     "entPhysicalIndex": 3400031,
@@ -11645,7 +11645,7 @@
                     "entPhysicalContainedIn": 3400020,
                     "entPhysicalParentRelPos": 11,
                     "entPhysicalMfgName": "HISILICON",
-                    "ifIndex": 2147483647
+                    "ifIndex": 4194306560
                 },
                 {
                     "entPhysicalIndex": 3400032,
@@ -11664,7 +11664,7 @@
                     "entPhysicalContainedIn": 3400020,
                     "entPhysicalParentRelPos": 12,
                     "entPhysicalMfgName": "HISILICON",
-                    "ifIndex": 2147483647
+                    "ifIndex": 4194306816
                 },
                 {
                     "entPhysicalIndex": 3400033,
@@ -11683,7 +11683,7 @@
                     "entPhysicalContainedIn": 3400020,
                     "entPhysicalParentRelPos": 13,
                     "entPhysicalMfgName": "HISILICON",
-                    "ifIndex": 2147483647
+                    "ifIndex": 4194307072
                 },
                 {
                     "entPhysicalIndex": 3400034,
@@ -11702,7 +11702,7 @@
                     "entPhysicalContainedIn": 3400020,
                     "entPhysicalParentRelPos": 14,
                     "entPhysicalMfgName": "HISILICON",
-                    "ifIndex": 2147483647
+                    "ifIndex": 4194307328
                 },
                 {
                     "entPhysicalIndex": 3400035,
@@ -11721,7 +11721,7 @@
                     "entPhysicalContainedIn": 3400020,
                     "entPhysicalParentRelPos": 15,
                     "entPhysicalMfgName": "HISILICON",
-                    "ifIndex": 2147483647
+                    "ifIndex": 4194307584
                 },
                 {
                     "entPhysicalIndex": 3400036,
@@ -11740,7 +11740,7 @@
                     "entPhysicalContainedIn": 3400020,
                     "entPhysicalParentRelPos": 16,
                     "entPhysicalMfgName": "HISILICON",
-                    "ifIndex": 2147483647
+                    "ifIndex": 4194307840
                 },
                 {
                     "entPhysicalIndex": 3400800,
@@ -11797,7 +11797,7 @@
                     "entPhysicalContainedIn": 3401580,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "HISILICON",
-                    "ifIndex": 2147483647
+                    "ifIndex": 4194312192
                 },
                 {
                     "entPhysicalIndex": 3401582,
@@ -11816,7 +11816,7 @@
                     "entPhysicalContainedIn": 3401580,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "HISILICON",
-                    "ifIndex": 2147483647
+                    "ifIndex": 4194312448
                 },
                 {
                     "entPhysicalIndex": 3401583,
@@ -11835,7 +11835,7 @@
                     "entPhysicalContainedIn": 3401580,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "HISILICON",
-                    "ifIndex": 2147483647
+                    "ifIndex": 4194312704
                 },
                 {
                     "entPhysicalIndex": 3401584,
@@ -11854,7 +11854,7 @@
                     "entPhysicalContainedIn": 3401580,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "HISILICON",
-                    "ifIndex": 2147483647
+                    "ifIndex": 4194312960
                 },
                 {
                     "entPhysicalIndex": 3401585,
@@ -11873,7 +11873,7 @@
                     "entPhysicalContainedIn": 3401580,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "HISILICON",
-                    "ifIndex": 2147483647
+                    "ifIndex": 4194313216
                 },
                 {
                     "entPhysicalIndex": 3401586,
@@ -11892,7 +11892,7 @@
                     "entPhysicalContainedIn": 3401580,
                     "entPhysicalParentRelPos": 6,
                     "entPhysicalMfgName": "HISILICON",
-                    "ifIndex": 2147483647
+                    "ifIndex": 4194313472
                 },
                 {
                     "entPhysicalIndex": 3401587,
@@ -11911,7 +11911,7 @@
                     "entPhysicalContainedIn": 3401580,
                     "entPhysicalParentRelPos": 7,
                     "entPhysicalMfgName": "HISILICON",
-                    "ifIndex": 2147483647
+                    "ifIndex": 4194313728
                 },
                 {
                     "entPhysicalIndex": 3401588,
@@ -11930,7 +11930,7 @@
                     "entPhysicalContainedIn": 3401580,
                     "entPhysicalParentRelPos": 8,
                     "entPhysicalMfgName": "HISILICON",
-                    "ifIndex": 2147483647
+                    "ifIndex": 4194313984
                 },
                 {
                     "entPhysicalIndex": 3401589,
@@ -11949,7 +11949,7 @@
                     "entPhysicalContainedIn": 3401580,
                     "entPhysicalParentRelPos": 9,
                     "entPhysicalMfgName": "HISILICON",
-                    "ifIndex": 2147483647
+                    "ifIndex": 4194314240
                 },
                 {
                     "entPhysicalIndex": 3401590,
@@ -11968,7 +11968,7 @@
                     "entPhysicalContainedIn": 3401580,
                     "entPhysicalParentRelPos": 10,
                     "entPhysicalMfgName": "HISILICON",
-                    "ifIndex": 2147483647
+                    "ifIndex": 4194314496
                 },
                 {
                     "entPhysicalIndex": 3401591,
@@ -11987,7 +11987,7 @@
                     "entPhysicalContainedIn": 3401580,
                     "entPhysicalParentRelPos": 11,
                     "entPhysicalMfgName": "HISILICON",
-                    "ifIndex": 2147483647
+                    "ifIndex": 4194314752
                 },
                 {
                     "entPhysicalIndex": 3401592,
@@ -12006,7 +12006,7 @@
                     "entPhysicalContainedIn": 3401580,
                     "entPhysicalParentRelPos": 12,
                     "entPhysicalMfgName": "HISILICON",
-                    "ifIndex": 2147483647
+                    "ifIndex": 4194315008
                 },
                 {
                     "entPhysicalIndex": 3401593,
@@ -12025,7 +12025,7 @@
                     "entPhysicalContainedIn": 3401580,
                     "entPhysicalParentRelPos": 13,
                     "entPhysicalMfgName": "HISILICON",
-                    "ifIndex": 2147483647
+                    "ifIndex": 4194315264
                 },
                 {
                     "entPhysicalIndex": 3401594,
@@ -12044,7 +12044,7 @@
                     "entPhysicalContainedIn": 3401580,
                     "entPhysicalParentRelPos": 14,
                     "entPhysicalMfgName": "HISILICON",
-                    "ifIndex": 2147483647
+                    "ifIndex": 4194315520
                 },
                 {
                     "entPhysicalIndex": 3401595,
@@ -12063,7 +12063,7 @@
                     "entPhysicalContainedIn": 3401580,
                     "entPhysicalParentRelPos": 15,
                     "entPhysicalMfgName": "HISILICON",
-                    "ifIndex": 2147483647
+                    "ifIndex": 4194315776
                 },
                 {
                     "entPhysicalIndex": 3401596,
@@ -12082,7 +12082,7 @@
                     "entPhysicalContainedIn": 3401580,
                     "entPhysicalParentRelPos": 16,
                     "entPhysicalMfgName": "HISILICON",
-                    "ifIndex": 2147483647
+                    "ifIndex": 4194316032
                 },
                 {
                     "entPhysicalIndex": 3402360,

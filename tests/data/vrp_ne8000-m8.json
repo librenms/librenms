@@ -13353,7 +13353,7 @@
                 },
                 {
                     "entPhysicalIndex": 17240323,
-                    "entPhysicalDescr": "",
+                    "entPhysicalDescr": "GigabitEthernet0/7/2",
                     "entPhysicalClass": "port",
                     "entPhysicalName": "GigabitEthernet0/7/2",
                     "entPhysicalHardwareRev": "",
@@ -13391,7 +13391,7 @@
                 },
                 {
                     "entPhysicalIndex": 17240325,
-                    "entPhysicalDescr": "",
+                    "entPhysicalDescr": "GigabitEthernet0/7/4",
                     "entPhysicalClass": "port",
                     "entPhysicalName": "GigabitEthernet0/7/4",
                     "entPhysicalHardwareRev": "",
@@ -13410,7 +13410,7 @@
                 },
                 {
                     "entPhysicalIndex": 17240326,
-                    "entPhysicalDescr": "",
+                    "entPhysicalDescr": "GigabitEthernet0/7/5",
                     "entPhysicalClass": "port",
                     "entPhysicalName": "GigabitEthernet0/7/5",
                     "entPhysicalHardwareRev": "",
@@ -13429,7 +13429,7 @@
                 },
                 {
                     "entPhysicalIndex": 17240327,
-                    "entPhysicalDescr": "",
+                    "entPhysicalDescr": "GigabitEthernet0/7/6",
                     "entPhysicalClass": "port",
                     "entPhysicalName": "GigabitEthernet0/7/6",
                     "entPhysicalHardwareRev": "",
@@ -13448,7 +13448,7 @@
                 },
                 {
                     "entPhysicalIndex": 17240328,
-                    "entPhysicalDescr": "",
+                    "entPhysicalDescr": "GigabitEthernet0/7/7",
                     "entPhysicalClass": "port",
                     "entPhysicalName": "GigabitEthernet0/7/7",
                     "entPhysicalHardwareRev": "",
@@ -13562,7 +13562,7 @@
                 },
                 {
                     "entPhysicalIndex": 17305859,
-                    "entPhysicalDescr": "",
+                    "entPhysicalDescr": "GigabitEthernet0/8/2",
                     "entPhysicalClass": "port",
                     "entPhysicalName": "GigabitEthernet0/8/2",
                     "entPhysicalHardwareRev": "",
@@ -13581,7 +13581,7 @@
                 },
                 {
                     "entPhysicalIndex": 17305860,
-                    "entPhysicalDescr": "",
+                    "entPhysicalDescr": "GigabitEthernet0/8/3",
                     "entPhysicalClass": "port",
                     "entPhysicalName": "GigabitEthernet0/8/3",
                     "entPhysicalHardwareRev": "",
@@ -13600,7 +13600,7 @@
                 },
                 {
                     "entPhysicalIndex": 17305861,
-                    "entPhysicalDescr": "",
+                    "entPhysicalDescr": "GigabitEthernet0/8/4",
                     "entPhysicalClass": "port",
                     "entPhysicalName": "GigabitEthernet0/8/4",
                     "entPhysicalHardwareRev": "",
@@ -13619,7 +13619,7 @@
                 },
                 {
                     "entPhysicalIndex": 17305862,
-                    "entPhysicalDescr": "",
+                    "entPhysicalDescr": "GigabitEthernet0/8/5",
                     "entPhysicalClass": "port",
                     "entPhysicalName": "GigabitEthernet0/8/5",
                     "entPhysicalHardwareRev": "",
@@ -13638,7 +13638,7 @@
                 },
                 {
                     "entPhysicalIndex": 17305863,
-                    "entPhysicalDescr": "",
+                    "entPhysicalDescr": "GigabitEthernet0/8/6",
                     "entPhysicalClass": "port",
                     "entPhysicalName": "GigabitEthernet0/8/6",
                     "entPhysicalHardwareRev": "",
@@ -13676,7 +13676,7 @@
                 },
                 {
                     "entPhysicalIndex": 17305865,
-                    "entPhysicalDescr": "",
+                    "entPhysicalDescr": "GigabitEthernet0/8/8",
                     "entPhysicalClass": "port",
                     "entPhysicalName": "GigabitEthernet0/8/8",
                     "entPhysicalHardwareRev": "",
@@ -13714,7 +13714,7 @@
                 },
                 {
                     "entPhysicalIndex": 17367040,
-                    "entPhysicalDescr": "",
+                    "entPhysicalDescr": "IPU slot 9",
                     "entPhysicalClass": "container",
                     "entPhysicalName": "IPU slot 9",
                     "entPhysicalHardwareRev": "",
@@ -13733,7 +13733,7 @@
                 },
                 {
                     "entPhysicalIndex": 17432576,
-                    "entPhysicalDescr": "",
+                    "entPhysicalDescr": "IPU slot 10",
                     "entPhysicalClass": "container",
                     "entPhysicalName": "IPU slot 10",
                     "entPhysicalHardwareRev": "",
@@ -13771,7 +13771,7 @@
                 },
                 {
                     "entPhysicalIndex": 17432832,
-                    "entPhysicalDescr": "",
+                    "entPhysicalDescr": "CFCARD slot 10/0",
                     "entPhysicalClass": "container",
                     "entPhysicalName": "CFCARD slot 10/0",
                     "entPhysicalHardwareRev": "",
@@ -13790,7 +13790,7 @@
                 },
                 {
                     "entPhysicalIndex": 17436928,
-                    "entPhysicalDescr": "",
+                    "entPhysicalDescr": "CFCARD 10/0",
                     "entPhysicalClass": "module",
                     "entPhysicalName": "CFCARD 10/0",
                     "entPhysicalHardwareRev": "",
@@ -13809,7 +13809,7 @@
                 },
                 {
                     "entPhysicalIndex": 17441025,
-                    "entPhysicalDescr": "",
+                    "entPhysicalDescr": "Ethernet0/0/0",
                     "entPhysicalClass": "port",
                     "entPhysicalName": "Ethernet0/0/0",
                     "entPhysicalHardwareRev": "",
@@ -13828,7 +13828,7 @@
                 },
                 {
                     "entPhysicalIndex": 17498112,
-                    "entPhysicalDescr": "",
+                    "entPhysicalDescr": "POWER slot 11",
                     "entPhysicalClass": "container",
                     "entPhysicalName": "POWER slot 11",
                     "entPhysicalHardwareRev": "",
@@ -13866,7 +13866,7 @@
                 },
                 {
                     "entPhysicalIndex": 17563648,
-                    "entPhysicalDescr": "",
+                    "entPhysicalDescr": "POWER slot 12",
                     "entPhysicalClass": "container",
                     "entPhysicalName": "POWER slot 12",
                     "entPhysicalHardwareRev": "",
@@ -13904,7 +13904,7 @@
                 },
                 {
                     "entPhysicalIndex": 17629184,
-                    "entPhysicalDescr": "",
+                    "entPhysicalDescr": "FAN slot 13",
                     "entPhysicalClass": "container",
                     "entPhysicalName": "FAN slot 13",
                     "entPhysicalHardwareRev": "",
@@ -13942,7 +13942,7 @@
                 },
                 {
                     "entPhysicalIndex": 17694720,
-                    "entPhysicalDescr": "",
+                    "entPhysicalDescr": "CLK slot 14",
                     "entPhysicalClass": "container",
                     "entPhysicalName": "CLK slot 14",
                     "entPhysicalHardwareRev": "",
@@ -13961,7 +13961,7 @@
                 },
                 {
                     "entPhysicalIndex": 17760256,
-                    "entPhysicalDescr": "",
+                    "entPhysicalDescr": "CLK slot 15",
                     "entPhysicalClass": "container",
                     "entPhysicalName": "CLK slot 15",
                     "entPhysicalHardwareRev": "",
@@ -13980,7 +13980,7 @@
                 },
                 {
                     "entPhysicalIndex": 17760257,
-                    "entPhysicalDescr": "",
+                    "entPhysicalDescr": "CLK 15",
                     "entPhysicalClass": "module",
                     "entPhysicalName": "CLK 15",
                     "entPhysicalHardwareRev": "",

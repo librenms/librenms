@@ -27,6 +27,7 @@ namespace LibreNMS\OS;
 
 use App\Models\AccessPoint;
 use App\Models\Device;
+use App\Models\EntPhysical;
 use App\Models\Mempool;
 use App\Models\PortsNac;
 use App\Models\Sla;
@@ -49,6 +50,7 @@ use LibreNMS\Interfaces\Polling\NacPolling;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\Interfaces\Polling\SlaPolling;
 use LibreNMS\OS;
+use LibreNMS\OS\Traits\EntityMib;
 use LibreNMS\RRD\RrdDefinition;
 
 class Vrp extends OS implements
@@ -63,6 +65,35 @@ class Vrp extends OS implements
     OSDiscovery
 {
     use SyncsModels;
+    use EntityMib {
+        EntityMib::discoverEntityPhysical as discoverBaseEntityPhysical;
+    }
+
+    public function discoverEntityPhysical(): Collection
+    {
+        // normal ENTITY-MIB collection
+        $inventory = $this->discoverBaseEntityPhysical();
+
+        // add additional data from Huawei MIBs
+        $extra = \SnmpQuery::walk([
+            'HUAWEI-ENTITY-EXTENT-MIB::hwEntityBoardType',
+            'HUAWEI-ENTITY-EXTENT-MIB::hwEntityBomEnDesc',
+        ])->table(1);
+
+        $inventory->each(function (EntPhysical $entry) use ($extra) {
+            if (isset($entry->entPhysicalIndex)) {
+                if (! empty($extra[$entry->entPhysicalIndex]['HUAWEI-ENTITY-EXTENT-MIB::hwEntityBomEnDesc'])) {
+                    $entry->entPhysicalDescr = $extra[$entry->entPhysicalIndex]['HUAWEI-ENTITY-EXTENT-MIB::hwEntityBomEnDesc'];
+                }
+
+                if (! empty($extra[$entry->entPhysicalIndex]['HUAWEI-ENTITY-EXTENT-MIB::hwEntityBoardType'])) {
+                    $entry->entPhysicalModelName = $extra[$entry->entPhysicalIndex]['HUAWEI-ENTITY-EXTENT-MIB::hwEntityBoardType'];
+                }
+            }
+        });
+
+        return $inventory;
+    }
 
     public function discoverMempools()
     {
