@@ -80,7 +80,7 @@ class Core implements Module
             Eventlog::log('Device OS changed: ' . $device->getOriginal('os') . ' -> ' . $device->os, $device, 'system', Severity::Notice);
             $os->getDeviceArray()['os'] = $device->os;
 
-            echo 'Changed ';
+            Log::info('OS Changed ');
         }
 
         // Set type to a predefined type for the OS if it's not already set
@@ -92,7 +92,7 @@ class Core implements Module
 
         $device->save();
 
-        echo 'OS: ' . Config::getOsSetting($device->os, 'text') . " ($device->os)\n\n";
+        Log::notice('OS: ' . Config::getOsSetting($device->os, 'text') . " ($device->os)\n");
     }
 
     public function shouldPoll(OS $os, ModuleStatus $status): bool
@@ -270,7 +270,7 @@ class Core implements Module
 
         if (! empty($agent_data['uptime'])) {
             $uptime = round((float) substr($agent_data['uptime'], 0, strpos($agent_data['uptime'], ' ')));
-            echo "Using UNIX Agent Uptime ($uptime)\n";
+            Log::info("Using UNIX Agent Uptime ($uptime)");
         } else {
             $uptime_data = SnmpQuery::make()->get(['SNMP-FRAMEWORK-MIB::snmpEngineTime.0', 'HOST-RESOURCES-MIB::hrSystemUptime.0'])->values();
 
