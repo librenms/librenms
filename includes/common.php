@@ -168,22 +168,6 @@ function get_port_by_ifIndex($device_id, $ifIndex)
     return dbFetchRow('SELECT * FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ?', [$device_id, $ifIndex]);
 }
 
-function get_entity_by_id_cache($type, $id)
-{
-    global $entity_cache;
-
-    $table = $type == 'storage' ? $type : $type . 's';
-
-    if (is_array($entity_cache[$type][$id])) {
-        $entity = $entity_cache[$type][$id];
-    } else {
-        $entity = dbFetchRow('SELECT * FROM `' . $table . '` WHERE `' . $type . '_id` = ?', [$id]);
-        $entity_cache[$type][$id] = $entity;
-    }
-
-    return $entity;
-}
-
 function get_port_by_id($port_id)
 {
     if (is_numeric($port_id)) {
@@ -297,17 +281,6 @@ function set_dev_attrib($device, $attrib_type, $attrib_value)
 function get_dev_attribs($device_id)
 {
     return DeviceCache::get((int) $device_id)->getAttribs();
-}
-
-function get_dev_entity_state($device)
-{
-    $state = [];
-    foreach (dbFetchRows('SELECT * FROM entPhysical_state WHERE `device_id` = ?', [$device]) as $entity) {
-        $state['group'][$entity['group']][$entity['entPhysicalIndex']][$entity['subindex']][$entity['key']] = $entity['value'];
-        $state['index'][$entity['entPhysicalIndex']][$entity['subindex']][$entity['group']][$entity['key']] = $entity['value'];
-    }
-
-    return $state;
 }
 
 function get_dev_attrib($device, $attrib_type)

@@ -252,12 +252,6 @@ function snmp_hexstring($hex)
     return hex2str(str_replace(' ', '', str_replace(' 00', '', $hex)));
 }
 
-// Check if the supplied string is an SNMP hex string
-function isHexString($str)
-{
-    return (bool) preg_match('/^[a-f0-9][a-f0-9]( [a-f0-9][a-f0-9])*$/is', trim($str));
-}
-
 /**
  * Check if port is valid to poll.
  * Settings: empty_ifdescr, good_if, bad_if, bad_if_regexp, bad_ifname_regexp, bad_ifalias_regexp, bad_iftype, bad_ifoperstatus
