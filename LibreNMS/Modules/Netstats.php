@@ -26,6 +26,7 @@
 namespace LibreNMS\Modules;
 
 use App\Models\Device;
+use Illuminate\Support\Facades\Log;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\Polling\Netstats\IcmpNetstatsPolling;
@@ -201,7 +202,7 @@ class Netstats implements Module
     {
         foreach ($this->types as $type => $interface) {
             if ($os instanceof $interface) {
-                echo "$type ";
+                Log::info("$type ");
                 $method = (new \ReflectionClass($interface))->getMethods()[0]->getName();
                 $data = $os->$method($this->oids[$type]);
 
@@ -224,7 +225,6 @@ class Netstats implements Module
                 }
             }
         }
-        echo PHP_EOL;
     }
 
     /**

@@ -30,6 +30,7 @@ use App\Models\IsisAdjacency;
 use App\Observers\ModuleModelObserver;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 use LibreNMS\DB\SyncsModels;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\IsIsDiscovery;
@@ -172,7 +173,7 @@ class Isis implements Module
         $data = snmpwalk_cache_twopart_oid($os->getDeviceArray(), 'isisISAdjState', [], 'ISIS-MIB');
 
         if (count($data) !== $adjacencies->where('isisISAdjState', 'up')->count()) {
-            echo 'New Adjacencies, running discovery';
+            Log::info('New Adjacencies, running discovery');
 
             // don't enable, might be a bad heuristic
             return $this->fillNew($adjacencies, $this->discoverIsIsMib($os));
