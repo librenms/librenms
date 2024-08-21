@@ -95,7 +95,6 @@ class PrinterSupplies implements Module
         $toner_snmp = snmp_get_multi_oid($device, $toner_data->pluck('supply_oid')->toArray());
 
         foreach ($toner_data as $toner) {
-
             $raw_toner = $toner_snmp[$toner['supply_oid']] ?? null;
             $tonerperc = self::getTonerLevel($device, $raw_toner, $toner['supply_capacity'] ?? null);
             Log::info('Checking toner ' . $toner['supply_descr'] . "... $tonerperc %");
