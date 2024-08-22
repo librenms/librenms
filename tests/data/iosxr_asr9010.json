@@ -10037,8 +10037,8 @@
                     "ifName": "Null0",
                     "portName": null,
                     "ifIndex": 2,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "false",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -10437,8 +10437,8 @@
                     "ifName": "Loopback0",
                     "portName": null,
                     "ifIndex": 10,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "false",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -10537,8 +10537,8 @@
                     "ifName": "Loopback99",
                     "portName": null,
                     "ifIndex": 11,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "false",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -11137,8 +11137,8 @@
                     "ifName": "dwdm0/7/0/0",
                     "portName": null,
                     "ifIndex": 23,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -11237,8 +11237,8 @@
                     "ifName": "dwdm0/7/0/1",
                     "portName": null,
                     "ifIndex": 24,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -11337,8 +11337,8 @@
                     "ifName": "dwdm0/7/0/2",
                     "portName": null,
                     "ifIndex": 25,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -11437,8 +11437,8 @@
                     "ifName": "dwdm0/7/0/3",
                     "portName": null,
                     "ifIndex": 26,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -13837,8 +13837,8 @@
                     "ifName": "dwdm0/0/0/0",
                     "portName": null,
                     "ifIndex": 54,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -13937,8 +13937,8 @@
                     "ifName": "dwdm0/0/0/1",
                     "portName": null,
                     "ifIndex": 55,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -14037,8 +14037,8 @@
                     "ifName": "dwdm0/0/0/2",
                     "portName": null,
                     "ifIndex": 56,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -14137,8 +14137,8 @@
                     "ifName": "dwdm0/0/0/3",
                     "portName": null,
                     "ifIndex": 57,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -52118,5 +52118,270 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "ports-stack": {
+        "discovery": {
+            "ports_stack": [
+                {
+                    "high_ifIndex": 31,
+                    "low_ifIndex": 97,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 31,
+                    "low_ifIndex": 98,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 31,
+                    "low_ifIndex": 99,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 31,
+                    "low_ifIndex": 100,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 32,
+                    "low_ifIndex": 91,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 32,
+                    "low_ifIndex": 102,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 32,
+                    "low_ifIndex": 104,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 32,
+                    "low_ifIndex": 110,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 32,
+                    "low_ifIndex": 113,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 32,
+                    "low_ifIndex": 120,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 32,
+                    "low_ifIndex": 129,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 32,
+                    "low_ifIndex": 130,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 33,
+                    "low_ifIndex": 112,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 33,
+                    "low_ifIndex": 124,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 33,
+                    "low_ifIndex": 125,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 34,
+                    "low_ifIndex": 107,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 34,
+                    "low_ifIndex": 109,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 36,
+                    "low_ifIndex": 117,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 62,
+                    "low_ifIndex": 126,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 62,
+                    "low_ifIndex": 128,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 64,
+                    "low_ifIndex": 87,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 64,
+                    "low_ifIndex": 88,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 64,
+                    "low_ifIndex": 89,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 64,
+                    "low_ifIndex": 90,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 64,
+                    "low_ifIndex": 131,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 65,
+                    "low_ifIndex": 93,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 65,
+                    "low_ifIndex": 94,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 65,
+                    "low_ifIndex": 95,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 65,
+                    "low_ifIndex": 96,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 65,
+                    "low_ifIndex": 127,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 66,
+                    "low_ifIndex": 116,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 81,
+                    "low_ifIndex": 114,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 81,
+                    "low_ifIndex": 119,
+                    "ifStackStatus": "active"
+                }
+            ]
+        }
+    },
+    "cisco-pw": {
+        "discovery": {
+            "pseudowires": [
+                {
+                    "peer_ldp_id": 2147483647,
+                    "cpwVcID": 50,
+                    "cpwOid": 2147483647,
+                    "pw_type": "ethernet",
+                    "pw_psntype": "mpls",
+                    "pw_local_mtu": 0,
+                    "pw_peer_mtu": 0,
+                    "pw_descr": "",
+                    "ifIndex": null
+                },
+                {
+                    "peer_ldp_id": 2147483647,
+                    "cpwVcID": 51,
+                    "cpwOid": 2147483647,
+                    "pw_type": "ethernet",
+                    "pw_psntype": "mpls",
+                    "pw_local_mtu": 0,
+                    "pw_peer_mtu": 0,
+                    "pw_descr": "",
+                    "ifIndex": null
+                },
+                {
+                    "peer_ldp_id": 2147483647,
+                    "cpwVcID": 52,
+                    "cpwOid": 2147483647,
+                    "pw_type": "ethernet",
+                    "pw_psntype": "mpls",
+                    "pw_local_mtu": 0,
+                    "pw_peer_mtu": 0,
+                    "pw_descr": "",
+                    "ifIndex": null
+                },
+                {
+                    "peer_ldp_id": 2147483647,
+                    "cpwVcID": 53,
+                    "cpwOid": 2147483647,
+                    "pw_type": "ethernet",
+                    "pw_psntype": "mpls",
+                    "pw_local_mtu": 0,
+                    "pw_peer_mtu": 0,
+                    "pw_descr": "",
+                    "ifIndex": null
+                },
+                {
+                    "peer_ldp_id": 2147483647,
+                    "cpwVcID": 100,
+                    "cpwOid": 2147483647,
+                    "pw_type": "ethernetVPLS",
+                    "pw_psntype": "mpls",
+                    "pw_local_mtu": 0,
+                    "pw_peer_mtu": 0,
+                    "pw_descr": "",
+                    "ifIndex": null
+                },
+                {
+                    "peer_ldp_id": 2147483647,
+                    "cpwVcID": 101,
+                    "cpwOid": 2147483647,
+                    "pw_type": "ethernetVPLS",
+                    "pw_psntype": "mpls",
+                    "pw_local_mtu": 0,
+                    "pw_peer_mtu": 0,
+                    "pw_descr": "",
+                    "ifIndex": null
+                },
+                {
+                    "peer_ldp_id": 2147483647,
+                    "cpwVcID": 102,
+                    "cpwOid": 2147483647,
+                    "pw_type": "ethernetVPLS",
+                    "pw_psntype": "mpls",
+                    "pw_local_mtu": 0,
+                    "pw_peer_mtu": 0,
+                    "pw_descr": "",
+                    "ifIndex": null
+                },
+                {
+                    "peer_ldp_id": 2147483647,
+                    "cpwVcID": 103,
+                    "cpwOid": 2147483647,
+                    "pw_type": "ethernetVPLS",
+                    "pw_psntype": "mpls",
+                    "pw_local_mtu": 0,
+                    "pw_peer_mtu": 0,
+                    "pw_descr": "",
+                    "ifIndex": null
+                }
+            ]
+        }
     }
 }

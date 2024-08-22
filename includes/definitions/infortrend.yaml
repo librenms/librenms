@@ -2,6 +2,10 @@ os: infortrend
 text: 'EonStor GS DS-3016'
 type: storage
 icon: infortrend
+<<<<<<< HEAD
+=======
+mib_dir: infortrend
+>>>>>>> 00124e1e6fa4029f64a2df6d6d58cfe41460b923
 group: Infortrend
 over:
     - { graph: device_processor, text: 'CPU Usage' }

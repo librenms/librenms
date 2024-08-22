@@ -314,6 +314,7 @@ class RunAlerts
                         $chk[$i]['ip'] = inet6_ntop($chk[$i]['ip']);
                     }
                 }
+                $alert['details']['rule'] ??= []; // if details.rule is missing, set it to an empty array
                 $o = count($alert['details']['rule']);
                 $n = count($chk);
                 $ret = 'Alert #' . $alert['id'];
@@ -432,7 +433,7 @@ class RunAlerts
                     }
                 }
 
-                if (in_array($alert['state'], [AlertState::ACTIVE, AlertState::WORSE, AlertState::BETTER]) && ! empty($rextra['count']) && ($rextra['count'] == -1 || $alert['details']['count']++ < $rextra['count'])) {
+                if (in_array($alert['state'], [AlertState::ACTIVE, AlertState::WORSE, AlertState::BETTER]) && ! empty($rextra['count']) && isset($alert['details']['count']) && ($rextra['count'] == -1 || $alert['details']['count']++ < $rextra['count'])) {
                     if ($alert['details']['count'] < $rextra['count']) {
                         $noacc = true;
                     }

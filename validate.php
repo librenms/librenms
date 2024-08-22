@@ -51,7 +51,7 @@ if (isset($options['h'])) {
         Example: ./validate.php -g mail.
 
         ";
-    exit;
+    exit(1);
 }
 
 if (function_exists('posix_getuid') && posix_getuid() === 0) {
@@ -62,7 +62,7 @@ if (function_exists('posix_getuid') && posix_getuid() === 0) {
 // Check autoload
 if (! file_exists('vendor/autoload.php')) {
     print_fail('Composer has not been run, dependencies are missing', './scripts/composer_wrapper.php install --no-dev');
-    exit;
+    exit(1);
 }
 
 require_once 'vendor/autoload.php';
@@ -114,17 +114,17 @@ if ($validator->getGroupStatus('dependencies') == ValidationResult::FAILURE) {
 }
 
 if ($pre_checks_failed) {
-    exit;
+    exit(1);
 }
 
-$init_modules = [];
+$init_modules = ['nodb'];
 require 'includes/init.php';
 
 // make sure install_dir is set correctly, or the next includes will fail
 if (! file_exists(Config::get('install_dir') . '/.env')) {
     $suggested = realpath(__DIR__);
     print_fail('\'install_dir\' config setting is not set correctly.', "It should probably be set to: $suggested");
-    exit;
+    exit(1);
 }
 
 if (\LibreNMS\DB\Eloquent::isConnected()) {
@@ -144,8 +144,15 @@ if (isset($options['g'])) {
     $modules = []; // all modules
 }
 
+// the code below may not show the database check above, always print it
+if (! in_array('database', $modules)) {
+    $validator->printResults('database');
+}
+
 // run checks
 $validator->validate($modules, isset($options['s']) || ! empty($modules));
+
+exit($validator->getStatus() ? 0 : 1);
 
 function print_header()
 {

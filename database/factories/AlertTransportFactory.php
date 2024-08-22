@@ -5,6 +5,7 @@ namespace Database\Factories;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use LibreNMS\Alert\Transport;
 
+/** @extends Factory<\App\Models\AlertTransport> */
 class AlertTransportFactory extends Factory
 {
     public function definition(): array

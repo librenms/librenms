@@ -3,11 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Plugin;
-use App\Plugins\PluginManager;
+use LibreNMS\Interfaces\Plugins\PluginManagerInterface;
 
 class PluginAdminController extends Controller
 {
-    public function __invoke(PluginManager $manager): \Illuminate\Contracts\View\View
+    public function __invoke(PluginManagerInterface $manager): \Illuminate\Contracts\View\View
     {
         // legacy v1 plugins
         \LibreNMS\Plugins::scanNew();

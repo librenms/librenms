@@ -33,7 +33,7 @@ class Page extends PageHook
 {
     // point to the view for your plugin's settings
     // this is the default name so you can create the blade file as in this plugin
-    // by ommitting the variable, or point to another one
+    // by omitting the variable, or point to another one
 
 //    public string $view = 'resources.views.page';
 
