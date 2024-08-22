@@ -30,6 +30,7 @@ use App\Models\EntPhysical;
 use App\Models\Sla;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\SlaDiscovery;
 use LibreNMS\Interfaces\Polling\OSPolling;
@@ -190,7 +191,7 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling
 
             $sla->rtt = ($data[$owner][$test]['jnxPingResultsAvgRttUs'] ?? 0) / 1000;
             $time = Carbon::parse($data[$owner][$test]['jnxPingResultsTime'] ?? null)->toDateTimeString();
-            echo 'SLA : ' . $rtt_type . ' ' . $owner . ' ' . $test . '... ' . $sla->rtt . 'ms at ' . $time . "\n";
+            Log::info('SLA : ' . $rtt_type . ' ' . $owner . ' ' . $test . '... ' . $sla->rtt . 'ms at ' . $time);
 
             $collected = ['rtt' => $sla->rtt];
 

@@ -27,6 +27,7 @@ namespace LibreNMS\OS\Traits;
 
 use App\Models\Mempool;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 use LibreNMS\Device\Processor;
 
 trait UcdResources
@@ -39,7 +40,7 @@ trait UcdResources
      */
     public function discoverProcessors()
     {
-        echo 'UCD Resources: ';
+        Log::info('UCD Resources: ');
 
         return [
             Processor::discover(
