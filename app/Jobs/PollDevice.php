@@ -13,6 +13,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 use LibreNMS\Config;
 use LibreNMS\Enum\Severity;
 use LibreNMS\OS;
@@ -20,14 +21,12 @@ use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Dns;
 use LibreNMS\Util\Module;
-use Psr\Log\LoggerInterface;
 use Throwable;
 
 class PollDevice implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    private LoggerInterface $logger;
     private ?\App\Models\Device $device = null;
     private ?array $deviceArray = null;
     /**
@@ -48,9 +47,8 @@ class PollDevice implements ShouldQueue
     /**
      * Execute the job.
      */
-    public function handle(LoggerInterface $logger)
+    public function handle()
     {
-        $this->logger = $logger;
         $this->initDevice();
         PollingDevice::dispatch($this->device);
         $this->os = OS::make($this->deviceArray);
@@ -77,7 +75,7 @@ class PollDevice implements ShouldQueue
             }
 
             $this->os->persistGraphs($this->device->status); // save graphs but don't delete any if device is down
-            $this->logger->info(sprintf("Enabled graphs (%s): %s\n\n",
+            Log::info(sprintf("Enabled graphs (%s): %s\n\n",
                 $this->device->graphs->count(),
                 $this->device->graphs->pluck('graph')->implode(' ')
             ));
@@ -86,13 +84,13 @@ class PollDevice implements ShouldQueue
         // finalize the device poll
         $this->device->save();
 
-        $this->logger->info(sprintf("\n>>> Polled %s (%s) in %0.3f seconds <<<",
+        Log::info(sprintf("\n>>> Polled %s (%s) in %0.3f seconds <<<",
             $this->device->displayName(),
             $this->device->device_id,
             $measurement->getDuration()));
 
         // add log file line, this is used by the simple python dispatcher watchdog
-        \Log::channel('single')->alert(sprintf('INFO: device:poll %s (%s) polled in %0.3fs',
+        Log::channel('single')->alert(sprintf('INFO: device:poll %s (%s) polled in %0.3fs',
             $this->device->hostname,
             $this->device->device_id,
             $measurement->getDuration()));
@@ -131,8 +129,8 @@ class PollDevice implements ShouldQueue
                 $should_poll = $instance->shouldPoll($this->os, $module_status);
 
                 if ($should_poll) {
-                    $this->logger->info("#### Load poller module $module ####\n");
-                    $this->logger->debug($module_status);
+                    Log::info("#### Load poller module $module ####\n");
+                    Log::debug($module_status);
 
                     if (is_array($status)) {
                         Config::set('poller_submodules.' . $module, $status);
@@ -142,16 +140,16 @@ class PollDevice implements ShouldQueue
                 }
             } catch (Throwable $e) {
                 // isolate module exceptions so they don't disrupt the polling process
-                $this->logger->error("%rError polling $module module for {$this->device->hostname}.%n $e", ['color' => true]);
+                Log::error("%rError polling $module module for {$this->device->hostname}.%n $e", ['color' => true]);
                 Eventlog::log("Error polling $module module. Check log file for more details.", $this->device, 'poller', Severity::Error);
                 report($e);
             }
 
             if ($should_poll) {
-                $this->logger->info('');
+                Log::info('');
                 app(MeasurementManager::class)->printChangedStats();
                 $this->saveModulePerformance($module, $module_start, $start_memory);
-                $this->logger->info("#### Unload poller module $module ####\n");
+                Log::info("#### Unload poller module $module ####\n");
             }
         }
     }
@@ -161,7 +159,7 @@ class PollDevice implements ShouldQueue
         $module_time = microtime(true) - $start_time;
         $module_mem = (memory_get_usage() - $start_memory);
 
-        $this->logger->info(sprintf(">> Runtime for poller module '%s': %.4f seconds with %s bytes", $module, $module_time, $module_mem));
+        Log::info(sprintf(">> Runtime for poller module '%s': %.4f seconds with %s bytes", $module, $module_time, $module_mem));
 
         app('Datastore')->put($this->deviceArray, 'poller-perf', [
             'module' => $module,
@@ -194,17 +192,17 @@ class PollDevice implements ShouldQueue
         if (Config::get('rrd.enable', true) && ! is_dir($host_rrd)) {
             try {
                 mkdir($host_rrd);
-                $this->logger->info("Created directory : $host_rrd");
+                Log::info("Created directory : $host_rrd");
             } catch (\ErrorException $e) {
                 Eventlog::log("Failed to create rrd directory: $host_rrd", $this->device);
-                $this->logger->error($e);
+                Log::error($e);
             }
         }
     }
 
     private function printDeviceInfo(?string $group): void
     {
-        $this->logger->info(sprintf(<<<'EOH'
+        Log::info(sprintf(<<<'EOH'
 Hostname:  %s %s
 ID:        %s
 OS:        %s

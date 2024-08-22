@@ -31,7 +31,6 @@ use App\Models\Device;
 use DeviceCache;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Data\Source\SnmpResponse;
@@ -179,7 +178,7 @@ class ModuleTestHelper
         Debug::set();
         Debug::setVerbose();
         discover_device($device, $this->parseArgs('discovery'));
-        (new PollDevice($device_id, $this->modules))->handle(Log::getLogger());
+        (new PollDevice($device_id, $this->modules))->handle();
         Debug::set($save_debug);
         Debug::setVerbose($save_vdebug);
         $collection_output = ob_get_contents();
@@ -632,7 +631,7 @@ class ModuleTestHelper
         ob_start();
 
         \Log::setDefaultDriver('console');
-        (new PollDevice($device_id, $this->modules))->handle(Log::getLogger());
+        (new PollDevice($device_id, $this->modules))->handle();
 
         $this->poller_output = ob_get_contents();
         if ($this->quiet) {
