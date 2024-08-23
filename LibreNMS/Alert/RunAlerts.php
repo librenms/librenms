@@ -319,19 +319,19 @@ class RunAlerts
                 $alert['details']['rule'] ??= []; // if details.rule is missing, set it to an empty array
                 $ret = 'Alert #' . $alert['id'];
                 $state = AlertState::CLEAR;
-                
+
                 $rule_diff = $this->diffBetweenRule($chk, $alert['details']['rule']);
                 $chk_diff = $this->diffBetweenRule($alert['details']['rule'], $chk);
 
-                if (!empty($rule_diff) && !empty($chk_diff)) {
+                if (! empty($rule_diff) && ! empty($chk_diff)) {
                     $ret .= ' Changed';
                     $state = AlertState::CHANGED;
                     $alert['details']['diff'] = ['added' => $rule_diff, 'resolved' => $chk_diff];
-                } else if (!empty($rule_diff)) {
+                } elseif (! empty($rule_diff)) {
                     $ret .= ' Worsens';
                     $state = AlertState::WORSE;
                     $alert['details']['diff'] = ['added' => $rule_diff];
-                } else if (empty($chk_diff)) {
+                } elseif (empty($chk_diff)) {
                     $ret .= ' Betters';
                     $state = AlertState::BETTER;
                     $alert['details']['diff'] = ['resolved' => $chk_diff];
@@ -357,25 +357,26 @@ class RunAlerts
     /**
      * Find new elements in the array of rule (alert match)
      * PHP array_diff is not working well for it
-     * 
+     *
      * @param array array1
      * @param array array2
      * @return array diff
-     */    
-    private function diffBetweenRule($array1, $array2) {
+     */
+    private function diffBetweenRule($array1, $array2) 
+    {
         $newElements = [];
         
         foreach ($array1 as $key => $value) {
             if (is_array($value)) {
-                if(!isset($array2[$key])) {
+                if(! isset($array2[$key])) {
                     $newElements[$key] = $value;
                 } else {
                     $new_diff = $this->diffBetweenRule($value, $array2[$key]);
-                    if (!empty($new_diff)) {
+                    if (! empty($new_diff)) {
                         $newElements[$key] = $new_diff;
                     }
                 }
-            } else if (!array_key_exists($key, $array2)) {
+            } else if (! array_key_exists($key, $array2)) {
                 $newElements[$key] = $value;
             }
         }
