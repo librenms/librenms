@@ -395,12 +395,12 @@ class RunAlerts
     {
         $array1Keys = [];
         foreach ($array1 as $element1) {
-            $idFields1 = $this->extractIdFields($element1);
-            $array1Keys[] = $this->generateComparisonKey($element1, $idFields1);
+            $idFields1 = $this->extractIdFieldsForFault($element1);
+            $array1Keys[] = $this->generateComparisonKeyForFault($element1, $idFields1);
         }
         $newElements = array_filter($array2, function ($element2) use ($array1Keys) {
-            $idFields2 = $this->extractIdFields($element2);
-            $key = $this->generateComparisonKey($element2, $idFields2);
+            $idFields2 = $this->extractIdFieldsForFault($element2);
+            $key = $this->generateComparisonKeyForFault($element2, $idFields2);
 
             return ! in_array($key, $array1Keys);
         });
