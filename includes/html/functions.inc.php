@@ -659,7 +659,7 @@ function alert_details($details)
     if (isset($details['diff'])) {
         // Check if we have added
         if (isset($details['diff']['added'])) {
-            foreach ($details['diff']['added'] ?? [] as $oa => $tmp_alerts_added) {
+            foreach (array_values($details['diff']['added'] ?? []) as $oa => $tmp_alerts_added) {
                 $fault_detail = format_alert_details($oa, $tmp_alerts_added, 'Added');
                 $max_row_length = strlen(strip_tags($fault_detail)) > $max_row_length ? strlen(strip_tags($fault_detail)) : $max_row_length;
                 $all_fault_detail .= $fault_detail;
@@ -668,7 +668,7 @@ function alert_details($details)
 
         // Check if we have resolved
         if (isset($details['diff']['resolved'])) {
-            foreach ($details['diff']['resolved'] ?? [] as $or => $tmp_alerts_resolved) {
+            foreach (array_values($details['diff']['resolved'] ?? []) as $or => $tmp_alerts_resolved) {
                 $fault_detail = format_alert_details($or, $tmp_alerts_resolved, 'Resolved');
                 $max_row_length = strlen(strip_tags($fault_detail)) > $max_row_length ? strlen(strip_tags($fault_detail)) : $max_row_length;
                 $all_fault_detail .= $fault_detail;
@@ -676,8 +676,8 @@ function alert_details($details)
         }
     }
 
-    foreach ($details['rule'] ?? [] as $o => $tmp_alerts) {
-        $fault_detail = format_alert_details($o, $tmp_alerts);
+    foreach ($details['rule'] ?? [] as $o => $tmp_alerts_rule) {
+        $fault_detail = format_alert_details($o, $tmp_alerts_rule);
         $max_row_length = strlen(strip_tags($fault_detail)) > $max_row_length ? strlen(strip_tags($fault_detail)) : $max_row_length;
         $all_fault_detail .= $fault_detail;
     }//end foreach
@@ -685,12 +685,12 @@ function alert_details($details)
     return [$all_fault_detail, $max_row_length];
 }//end alert_details()
 
-function format_alert_details($o, $tmp_alerts, $type_info = null)
+function format_alert_details($alert_idx, $tmp_alerts, $type_info = null)
 {
     $fault_detail = '';
     $fallback = true;
     $fault_detail .= $type_info ? $type_info . '&nbsp;' : '';
-    $fault_detail .= '#' . ($o + 1) . ':&nbsp;';
+    $fault_detail .= '#' . ($alert_idx + 1) . ':&nbsp;';
     if (isset($tmp_alerts['bill_id'])) {
         $fault_detail .= '<a href="' . \LibreNMS\Util\Url::generate(['page' => 'bill', 'bill_id' => $tmp_alerts['bill_id']], []) . '">' . $tmp_alerts['bill_name'] . '</a>;&nbsp;';
         $fallback = false;
