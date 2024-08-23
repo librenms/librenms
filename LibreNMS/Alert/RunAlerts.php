@@ -358,8 +358,8 @@ class RunAlerts
      * Find new elements in the array of rule (alert match)
      * PHP array_diff is not working well for it
      *
-     * @param array $array1
-     * @param array $array2
+     * @param  array  $array1
+     * @param  array  $array2
      * @return array diff
      */
     private function diffBetweenRule($array1, $array2)
