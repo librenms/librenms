@@ -320,8 +320,8 @@ class RunAlerts
                 $ret = 'Alert #' . $alert['id'];
                 $state = AlertState::CLEAR;
 
-                $rule_diff = $this->diffBetweenRule($chk, $alert['details']['rule']);
-                $chk_diff = $this->diffBetweenRule($alert['details']['rule'], $chk);
+                $rule_diff = $this->diffBetweenFaults($chk, $alert['details']['rule']);
+                $chk_diff = $this->diffBetweenFaults($alert['details']['rule'], $chk);
 
                 if (! empty($rule_diff) && ! empty($chk_diff)) {
                     $ret .= ' Changed';
@@ -353,32 +353,55 @@ class RunAlerts
     }
 
     /**
-     * Find new elements in the array of rule (alert match)
-     * PHP array_diff is not working well for it
-     *
-     * @param  array  $array1
-     * @param  array  $array2
-     * @return array diff
+     * Extract the fields that are used to identify the elements in the array of a "fault"
+     * 
+     * @param  array  $element
+     * @return array
      */
-    private function diffBetweenRule($array1, $array2)
+    private function extractIdFieldsForFault($element)
     {
-        $newElements = [];
+        return array_filter(array_keys($element), function($key) {
+            // Exclude location_id as it may change and it's not relevant for the comparison
+            return strpos($key, '_id') !== false && $key !== 'location_id';
+        });
+    }
 
-        foreach ($array1 as $key => $value) {
-            if (is_array($value)) {
-                if (! isset($array2[$key])) {
-                    $newElements[$key] = $value;
-                } else {
-                    $new_diff = $this->diffBetweenRule($value, $array2[$key]);
-                    if (! empty($new_diff)) {
-                        $newElements[$key] = $new_diff;
-                    }
-                }
-            } elseif (! array_key_exists($key, $array2)) {
-                $newElements[$key] = $value;
-            }
+    /**
+     * Generate a comparison key for an element based on the fields that identify it for a "fault"
+     * 
+     * @param  array  $element
+     * @param  array  $idFields
+     * @return string
+     */
+    private function generateComparisonKeyForFault($element, $idFields)
+    {
+        $keyParts = [];
+        foreach ($idFields as $field) {
+            $keyParts[] = isset($element[$field]) ? $element[$field] : '';
         }
+        return implode('|', $keyParts);
+    }
 
+    /**
+     * Find new elements in the array for faults
+     * PHP array_diff is not working well for it
+     * 
+     * @param  array  array1
+     * @param  array  array2
+     * @return array
+     */        
+    private function diffBetweenFaults($array1, $array2)
+    {
+        $array1Keys = [];
+        foreach ($array1 as $element1) {
+            $idFields1 = $this->extractIdFields($element1);
+            $array1Keys[] = $this->generateComparisonKey($element1, $idFields1);
+        }
+        $newElements = array_filter($array2, function ($element2) use ($array1Keys) {
+            $idFields2 = $this->extractIdFields($element2);
+            $key = $this->generateComparisonKey($element2, $idFields2);
+            return !in_array($key, $array1Keys);
+        });
         return $newElements;
     }
 
