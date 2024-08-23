@@ -141,6 +141,8 @@ class RunAlerts
                 $obj['title'] .= ' got worse';
             } elseif ($alert['state'] == AlertState::BETTER) {
                 $obj['title'] .= ' got better';
+            } elseif ($alert['state'] == AlertState::CHANGED) {
+                $obj['title'] .= ' got changed';
             }
 
             foreach ($extra['rule'] as $incident) {
@@ -315,18 +317,24 @@ class RunAlerts
                     }
                 }
                 $alert['details']['rule'] ??= []; // if details.rule is missing, set it to an empty array
-                $o = count($alert['details']['rule']);
-                $n = count($chk);
                 $ret = 'Alert #' . $alert['id'];
                 $state = AlertState::CLEAR;
-                if ($n > $o) {
+                
+                $rule_diff = $this->diffBetweenRule($chk, $alert['details']['rule']);
+                $chk_diff = $this->diffBetweenRule($alert['details']['rule'], $chk);
+
+                if (!empty($rule_diff) && !empty($chk_diff)) {
+                    $ret .= ' Changed';
+                    $state = AlertState::CHANGED;
+                    $alert['details']['diff'] = ['added' => $rule_diff, 'resolved' => $chk_diff];
+                } else if (!empty($rule_diff)) {
                     $ret .= ' Worsens';
                     $state = AlertState::WORSE;
-                    $alert['details']['diff'] = array_diff($chk, $alert['details']['rule']);
-                } elseif ($n < $o) {
+                    $alert['details']['diff'] = ['added' => $rule_diff];
+                } else if (empty($chk_diff)) {
                     $ret .= ' Betters';
                     $state = AlertState::BETTER;
-                    $alert['details']['diff'] = array_diff($alert['details']['rule'], $chk);
+                    $alert['details']['diff'] = ['resolved' => $chk_diff];
                 }
 
                 if ($state > AlertState::CLEAR && $n > 0) {
@@ -344,6 +352,35 @@ class RunAlerts
                 }
             }
         }
+    }
+
+    /**
+     * Find new elements in the array of rule (alert match)
+     * PHP array_diff is not working well for it
+     * 
+     * @param array array1
+     * @param array array2
+     * @return array diff
+     */    
+    private function diffBetweenRule($array1, $array2) {
+        $newElements = [];
+        
+        foreach ($array1 as $key => $value) {
+            if (is_array($value)) {
+                if(!isset($array2[$key])) {
+                    $newElements[$key] = $value;
+                } else {
+                    $new_diff = $this->diffBetweenRule($value, $array2[$key]);
+                    if (!empty($new_diff)) {
+                        $newElements[$key] = $new_diff;
+                    }
+                }
+            } else if (!array_key_exists($key, $array2)) {
+                $newElements[$key] = $value;
+            }
+        }
+
+        return $newElements;
     }
 
     public function loadAlerts($where)
@@ -438,7 +475,7 @@ class RunAlerts
                     }
                 }
 
-                if (in_array($alert['state'], [AlertState::ACTIVE, AlertState::WORSE, AlertState::BETTER]) && ! empty($rextra['count']) && ($rextra['count'] == -1 || $alert['details']['count']++ < $rextra['count'])) {
+                if (in_array($alert['state'], [AlertState::ACTIVE, AlertState::WORSE, AlertState::BETTER, AlertState::CHANGED]) && ! empty($rextra['count']) && ($rextra['count'] == -1 || $alert['details']['count']++ < $rextra['count'])) {
                     if ($alert['details']['count'] < $rextra['count']) {
                         $noacc = true;
                     }
@@ -555,6 +592,7 @@ class RunAlerts
             AlertState::ACKNOWLEDGED => 'acknowledgment',
             AlertState::WORSE => 'got worse',
             AlertState::BETTER => 'got better',
+            AlertState::CHANGED => 'got changed',
         ];
 
         $severity = match ($obj['state']) {

@@ -654,9 +654,45 @@ function alert_details($details)
 
     $max_row_length = 0;
     $all_fault_detail = '';
+
+    // Check if we have a diff (alert status changed, worse and better)
+    if (isset($details['diff'])) {
+        // Check if we have added
+        if (isset($details['diff']['added'])) {
+            foreach ($details['diff']['added'] ?? [] as $o => $tmp_alerts) {
+                $fault_detail = format_alert_details($o, $tmp_alerts, 'Added');
+                $max_row_length = strlen(strip_tags($fault_detail)) > $max_row_length ? strlen(strip_tags($fault_detail)) : $max_row_length;
+                $all_fault_detail .= $fault_detail;
+                
+            }//end foreach
+        }
+
+        // Check if we have resolved
+        if (isset($details['diff']['resolved'])) {
+            foreach ($details['diff']['resolved'] ?? [] as $o => $tmp_alerts) {
+                $fault_detail = format_alert_details($o, $tmp_alerts, 'Resolved');
+                $max_row_length = strlen(strip_tags($fault_detail)) > $max_row_length ? strlen(strip_tags($fault_detail)) : $max_row_length;
+                $all_fault_detail .= $fault_detail;
+                
+            }//end foreach
+        }
+
+    }
+
     foreach ($details['rule'] ?? [] as $o => $tmp_alerts) {
-        $fault_detail = '';
+        $fault_detail = format_alert_details($o, $tmp_alerts);
+        $max_row_length = strlen(strip_tags($fault_detail)) > $max_row_length ? strlen(strip_tags($fault_detail)) : $max_row_length;
+        $all_fault_detail .= $fault_detail;
+        
+    }//end foreach
+
+    return [$all_fault_detail, $max_row_length];
+}//end alert_details()
+
+function format_alert_details($o, $tmp_alerts, $type_info = null) {
+    $fault_detail = '';
         $fallback = true;
+        $fault_detail .= $type_info ? $type_info . '&nbsp;' : '';
         $fault_detail .= '#' . ($o + 1) . ':&nbsp;';
         if (isset($tmp_alerts['bill_id'])) {
             $fault_detail .= '<a href="' . \LibreNMS\Util\Url::generate(['page' => 'bill', 'bill_id' => $tmp_alerts['bill_id']], []) . '">' . $tmp_alerts['bill_name'] . '</a>;&nbsp;';
@@ -799,13 +835,8 @@ function alert_details($details)
 
         $fault_detail .= '<br>';
 
-        $max_row_length = strlen(strip_tags($fault_detail)) > $max_row_length ? strlen(strip_tags($fault_detail)) : $max_row_length;
-
-        $all_fault_detail .= $fault_detail;
-    }//end foreach
-
-    return [$all_fault_detail, $max_row_length];
-}//end alert_details()
+        return $fault_detail;
+}
 
 function dynamic_override_config($type, $name, $device)
 {

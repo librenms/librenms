@@ -56,6 +56,9 @@ foreach (dbFetchRows($full_query, $param) as $alert_entry) {
     } elseif ($alert_state == '4') {
         $glyph_color = 'khaki';
         $text = 'Better';
+    } elseif ($alert_state == '5') {
+        $glyph_color = 'yellow';
+        $text = 'Changed';
     } else {
         $glyph_color = 'red';
         $text = 'Unknown state';
