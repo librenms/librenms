@@ -354,13 +354,13 @@ class RunAlerts
 
     /**
      * Extract the fields that are used to identify the elements in the array of a "fault"
-     * 
+     *
      * @param  array  $element
      * @return array
      */
     private function extractIdFieldsForFault($element)
     {
-        return array_filter(array_keys($element), function($key) {
+        return array_filter(array_keys($element), function ($key) {
             // Exclude location_id as it may change and it's not relevant for the comparison
             return strpos($key, '_id') !== false && $key !== 'location_id';
         });
@@ -368,7 +368,7 @@ class RunAlerts
 
     /**
      * Generate a comparison key for an element based on the fields that identify it for a "fault"
-     * 
+     *
      * @param  array  $element
      * @param  array  $idFields
      * @return string
@@ -379,17 +379,18 @@ class RunAlerts
         foreach ($idFields as $field) {
             $keyParts[] = isset($element[$field]) ? $element[$field] : '';
         }
+
         return implode('|', $keyParts);
     }
 
     /**
      * Find new elements in the array for faults
      * PHP array_diff is not working well for it
-     * 
+     *
      * @param  array  array1
      * @param  array  array2
      * @return array
-     */        
+     */
     private function diffBetweenFaults($array1, $array2)
     {
         $array1Keys = [];
@@ -400,8 +401,10 @@ class RunAlerts
         $newElements = array_filter($array2, function ($element2) use ($array1Keys) {
             $idFields2 = $this->extractIdFields($element2);
             $key = $this->generateComparisonKey($element2, $idFields2);
-            return !in_array($key, $array1Keys);
+
+            return ! in_array($key, $array1Keys);
         });
+
         return $newElements;
     }
 
