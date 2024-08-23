@@ -387,8 +387,8 @@ class RunAlerts
      * Find new elements in the array for faults
      * PHP array_diff is not working well for it
      *
-     * @param  array  array1
-     * @param  array  array2
+     * @param  array  $array1
+     * @param  array  $array2
      * @return array
      */
     private function diffBetweenFaults($array1, $array2)
