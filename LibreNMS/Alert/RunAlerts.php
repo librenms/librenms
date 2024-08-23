@@ -362,13 +362,13 @@ class RunAlerts
      * @param array array2
      * @return array diff
      */
-    private function diffBetweenRule($array1, $array2) 
+    private function diffBetweenRule($array1, $array2)
     {
         $newElements = [];
-        
+
         foreach ($array1 as $key => $value) {
             if (is_array($value)) {
-                if(! isset($array2[$key])) {
+                if (! isset($array2[$key])) {
                     $newElements[$key] = $value;
                 } else {
                     $new_diff = $this->diffBetweenRule($value, $array2[$key]);
@@ -376,7 +376,7 @@ class RunAlerts
                         $newElements[$key] = $new_diff;
                     }
                 }
-            } else if (! array_key_exists($key, $array2)) {
+            } elseif (! array_key_exists($key, $array2)) {
                 $newElements[$key] = $value;
             }
         }

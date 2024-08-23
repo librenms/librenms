@@ -674,7 +674,6 @@ function alert_details($details)
                 $all_fault_detail .= $fault_detail;
             }//end foreach
         }
-
     }
 
     foreach ($details['rule'] ?? [] as $o => $tmp_alerts) {
