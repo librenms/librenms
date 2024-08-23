@@ -337,7 +337,7 @@ class RunAlerts
                     $alert['details']['diff'] = ['resolved' => $chk_diff];
                 }
 
-                if ($state > AlertState::CLEAR && $n > 0) {
+                if ($state > AlertState::CLEAR && (! empty($rule_diff) || ! empty($chk_diff))) {
                     $alert['details']['rule'] = $chk;
                     if (dbInsert([
                         'state' => $state,
@@ -347,8 +347,6 @@ class RunAlerts
                     ], 'alert_log')) {
                         dbUpdate(['state' => $state, 'open' => 1, 'alerted' => 1], 'alerts', 'rule_id = ? && device_id = ?', [$alert['rule_id'], $alert['device_id']]);
                     }
-
-                    echo $ret . ' (' . $o . '/' . $n . ")\r\n";
                 }
             }
         }
