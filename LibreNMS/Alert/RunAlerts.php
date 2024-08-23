@@ -331,7 +331,7 @@ class RunAlerts
                     $ret .= ' Worsens';
                     $state = AlertState::WORSE;
                     $alert['details']['diff'] = ['added' => $rule_diff];
-                } elseif (empty($chk_diff)) {
+                } elseif (! empty($chk_diff)) {
                     $ret .= ' Betters';
                     $state = AlertState::BETTER;
                     $alert['details']['diff'] = ['resolved' => $chk_diff];
