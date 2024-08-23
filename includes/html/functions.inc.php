@@ -659,8 +659,8 @@ function alert_details($details)
     if (isset($details['diff'])) {
         // Check if we have added
         if (isset($details['diff']['added'])) {
-            foreach ($details['diff']['added'] ?? [] as $o => $tmp_alerts) {
-                $fault_detail = format_alert_details($o, $tmp_alerts, 'Added');
+            foreach ($details['diff']['added'] ?? [] as $oa => $tmp_alerts_added) {
+                $fault_detail = format_alert_details($oa, $tmp_alerts_added, 'Added');
                 $max_row_length = strlen(strip_tags($fault_detail)) > $max_row_length ? strlen(strip_tags($fault_detail)) : $max_row_length;
                 $all_fault_detail .= $fault_detail;
             }//end foreach
@@ -668,8 +668,8 @@ function alert_details($details)
 
         // Check if we have resolved
         if (isset($details['diff']['resolved'])) {
-            foreach ($details['diff']['resolved'] ?? [] as $o => $tmp_alerts) {
-                $fault_detail = format_alert_details($o, $tmp_alerts, 'Resolved');
+            foreach ($details['diff']['resolved'] ?? [] as $or => $tmp_alerts_resolved) {
+                $fault_detail = format_alert_details($or, $tmp_alerts_resolved, 'Resolved');
                 $max_row_length = strlen(strip_tags($fault_detail)) > $max_row_length ? strlen(strip_tags($fault_detail)) : $max_row_length;
                 $all_fault_detail .= $fault_detail;
             }//end foreach
