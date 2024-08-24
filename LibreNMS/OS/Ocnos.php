@@ -41,7 +41,7 @@ class Ocnos extends OS implements EntityPhysicalDiscovery
             foreach ($chassisPsu as $cmmSysPSUIndex => $psu) {
                 $inventory->push(new EntPhysical([
                     'entPhysicalIndex' => $cmmStackUnitIndex * 1000 + $cmmSysPSUIndex,
-                    'entPhysicalDescr' => $psu['IPI-CMM-CHASSIS-MIB::cmmPsuType'],
+                    'entPhysicalDescr' => (isset($psu['IPI-CMM-CHASSIS-MIB::cmmPsuType']) && $psu['IPI-CMM-CHASSIS-MIB::cmmPsuType'] != 'not-applicable') ? $psu['IPI-CMM-CHASSIS-MIB::cmmPsuType'] : null,
                     'entPhysicalClass' => 'powerSupply',
                     'entPhysicalName' => $psu['IPI-CMM-CHASSIS-MIB::cmmSysPowerSupplyType'] ?? null,
                     'entPhysicalModelName' => $psu['IPI-CMM-CHASSIS-MIB::cmmPsuPartNum'] ?? null,
@@ -77,7 +77,7 @@ class Ocnos extends OS implements EntityPhysicalDiscovery
         $transceivers = SnmpQuery::enumStrings()->walk('IPI-CMM-CHASSIS-MIB::cmmTransEEPROMTable')->table(2);
         foreach ($transceivers as $cmmStackUnitIndex => $chassisTransceivers) {
             foreach ($chassisTransceivers as $cmmTransIndex => $transceiver) {
-                $sfp = new EntPhysical([
+                $inventory->push(new EntPhysical([
                     'entPhysicalIndex' => $cmmStackUnitIndex * 10000 + $cmmTransIndex,
                     'entPhysicalDescr' => $this->describeTransceiver($transceiver),
                     'entPhysicalClass' => 'module',
@@ -90,12 +90,9 @@ class Ocnos extends OS implements EntityPhysicalDiscovery
                     'entPhysicalHardwareRev' => $transceiver['IPI-CMM-CHASSIS-MIB::cmmTransVendorRevision'] ?? null,
                     'entPhysicalIsFRU' => 'true',
                     'ifIndex' => $this->guessPortId($cmmTransIndex, $transceiver['IPI-CMM-CHASSIS-MIB::cmmTransType'] ?? 'missing')
-                ]);
-                dump($sfp->toArray());
-                $inventory->push($sfp);
+                ]));
             }
         }
-//        dd($inventory->toArray());
 
         return $inventory;
     }
@@ -132,8 +129,10 @@ class Ocnos extends OS implements EntityPhysicalDiscovery
     {
         $description = $transceiver['IPI-CMM-CHASSIS-MIB::cmmTransType'] ?? '';
 
-        if (isset($transceiver['IPI-CMM-CHASSIS-MIB::cmmTransExtEthCompliance'])) {
+        if (isset($transceiver['IPI-CMM-CHASSIS-MIB::cmmTransExtEthCompliance']) && $transceiver['IPI-CMM-CHASSIS-MIB::cmmTransExtEthCompliance'] != 'unavailable') {
             $description .= ' ' . str_replace('eec-', '', $transceiver['IPI-CMM-CHASSIS-MIB::cmmTransExtEthCompliance']);
+        } elseif (isset($transceiver['IPI-CMM-CHASSIS-MIB::cmmTransEthCompliance']) && $transceiver['IPI-CMM-CHASSIS-MIB::cmmTransEthCompliance'] != 'unavailable') {
+            $description .= ' ' . str_replace('ec-', '', $transceiver['IPI-CMM-CHASSIS-MIB::cmmTransEthCompliance']);
         }
 
         if (isset($transceiver['IPI-CMM-CHASSIS-MIB::cmmTransLengthKmtrs']) && $transceiver['IPI-CMM-CHASSIS-MIB::cmmTransLengthKmtrs'] > 0) {
@@ -174,8 +173,6 @@ class Ocnos extends OS implements EntityPhysicalDiscovery
             'Ufi Space S9500-30XS-P' => $prefix . ($cmmTransType == 'qsfp' ? $cmmTransIndex - 29 : $cmmTransIndex - 1),
             default => null, // no port map, so we can't guess
         };
-
-        dump($portName);
 
         if ($portName === null) {
             return 0; // give up
