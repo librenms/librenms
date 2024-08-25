@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Plugin;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use LibreNMS\Interfaces\Plugins\Hooks\SinglePageHook;
 use LibreNMS\Interfaces\Plugins\PluginManagerInterface;
 
@@ -24,7 +23,7 @@ class PluginPageController extends Controller
             'content_view' => 'plugins.missing',
             'settings' => [],
         ],
-            $manager->call(SinglePageHook::class, ['user' => Auth::user()], $plugin->plugin_name)[0] ?? []
+            $manager->call(SinglePageHook::class, [], $plugin->plugin_name)[0] ?? []
         );
 
         return view('plugins.settings', $data);
