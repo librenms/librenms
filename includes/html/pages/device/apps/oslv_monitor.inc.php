@@ -7,6 +7,8 @@ use App\Models\Storage;
 
 $name = 'oslv_monitor';
 
+$device_obj = DeviceCache::get($device['device_id']);
+
 $link_array = [
     'page' => 'device',
     'device' => $device['device_id'],
@@ -198,7 +200,7 @@ if (isset($app_data['backend']) && $app_data['backend'] == 'cgroups') {
         $index_int = 0;
         foreach ($seen_systemd_containers as $index => $oslvm) {
             $oslvm_name = $oslvm;
-            $oslvm_name = preg_replace('/^d\_/', '', $oslvm_name);
+            $oslvm_name = preg_replace('/^s\_/', '', $oslvm_name);
             $label = (! isset($vars['oslvm']) || $vars['oslvm'] != $oslvm)
             ? $oslvm_name
             : '<span class="pagemenu-selected">' . $oslvm_name . '</span>';
@@ -284,86 +286,145 @@ if (isset($app_data['backend']) && $app_data['backend'] == 'cgroups') {
 }
 
 if (isset($vars['oslvm']) && isset($app_data['oslvm_data'][$vars['oslvm']])) {
-    if (isset($app_data['oslvm_data'][$vars['oslvm']]['path'])) {
-        $path = $app_data['oslvm_data'][$vars['oslvm']]['path'];
-        $path = preg_replace('/\/$/', '', $path);
-        $storage_info = Storage::firstWhere(
-            ['storage_descr' => $path],
-            ['device_id' => $device['device_id']]
-        );
-        if (! isset($storage_info) && ! preg_match('/^\/+$/', $path)) {
-            $data_path_tmp = $path;
-            $data_path_tmp = preg_replace('/\/[^\/]+$/', '', $data_path_tmp);
-            while ($data_path_tmp != '' && ! isset($storage_info)) {
-                $storage_info = Storage::firstWhere(
-                    ['storage_descr' => $data_path_tmp],
-                    ['device_id' => $device['device_id']]
-                );
-                if (! isset($storage_info)) {
-                    $data_path_tmp = preg_replace('/\/[^\/]+$/', '', $data_path_tmp);
+    if (isset($app_data['oslvm_data'][$vars['oslvm']]['path'][0])) {
+        $table_info = [
+            'headers' => [
+                'Path',
+                'Mount Point',
+                'Usage',
+                '',
+                ],
+            'rows' => [],
+        ];
+        foreach ($app_data['oslvm_data'][$vars['oslvm']]['path'] as $index => $path) {
+            $path = preg_replace('/\/$/', '', $path);
+            $mount_path = $path;
+            $mount_path_raw = false;
+            $mount_path_usage = '';
+            $mount_path_usage_raw = false;
+            $mount_path_usage_graph = '';
+            $mount_path_usage_graph_raw = false;
+            $storage_info = Storage::firstWhere(
+                ['storage_descr' => $mount_path],
+                ['device_id' => $device['device_id']]
+            );
+            if (! isset($storage_info) && ! preg_match('/^\/+$/', $mount_path)) {
+                $mount_path = preg_replace('/\/[^\/]+$/', '', $mount_path);
+                while ($mount_path != '' && ! isset($storage_info)) {
+                    $storage_info = Storage::firstWhere(
+                        ['storage_descr' => $mount_path],
+                        ['device_id' => $device['device_id']]
+                    );
+                    if (! isset($storage_info)) {
+                        $mount_path = preg_replace('/\/[^\/]+$/', '', $mount_path);
+                    }
                 }
             }
-        }
-        if (isset($storage_info)) {
-            $path_graph_array = [];
-            $path_graph_array['height'] = '100';
-            $path_graph_array['width'] = '210';
-            $path_graph_array['to'] = \LibreNMS\Config::get('time.now');
-            $path_graph_array['id'] = $storage_info['storage_id'];
-            $path_graph_array['type'] = 'storage_usage';
-            $path_graph_array['from'] = \LibreNMS\Config::get('time.day');
-            $path_graph_array['legend'] = 'no';
+            if (isset($storage_info)) {
+                $mount_path_raw = true;
+                $mount_path_usage_raw = true;
+                $mount_path_usage_graph_raw = true;
 
-            $path_link_array = $path_graph_array;
-            $path_link_array['page'] = 'graphs';
-            unset($rpath_link_array['height'], $path_link_array['width'], $path_link_array['legend']);
+                $path_graph_array = [];
+                $path_graph_array['height'] = '100';
+                $path_graph_array['width'] = '210';
+                $path_graph_array['to'] = \LibreNMS\Config::get('time.now');
+                $path_graph_array['id'] = $storage_info['storage_id'];
+                $path_graph_array['type'] = 'storage_usage';
+                $path_graph_array['from'] = \LibreNMS\Config::get('time.day');
+                $path_graph_array['legend'] = 'no';
 
-            $path_link = \LibreNMS\Util\Url::generate($path_link_array);
+                $path_link_array = $path_graph_array;
+                $path_link_array['page'] = 'graphs';
+                unset($rpath_link_array['height'], $path_link_array['width'], $path_link_array['legend']);
 
-            $path_overlib_content = generate_overlib_content($path_graph_array, $device['hostname'] . ' - ' . $storage_info['storage_descr']);
+                $path_link = \LibreNMS\Util\Url::generate($path_link_array);
 
-            $path_graph_array['width'] = 80;
-            $path_graph_array['height'] = 20;
-            $path_graph_array['bg'] = 'ffffff00';
-            $path_minigraph = \LibreNMS\Util\Url::lazyGraphTag($path_graph_array);
+                $path_overlib_content = generate_overlib_content($path_graph_array, $device['hostname'] . ' - ' . $storage_info['storage_descr']);
 
-            // table used to prevent breaking
-            echo "\n<br><table><tr><td>Path:&nbsp</td><td>" . \LibreNMS\Util\Url::overlibLink($path_link, $path, $path_overlib_content) .
-                '</td><td>&nbsp(' . round($storage_info['storage_perc']) . '%)</td><td>' .
-                \LibreNMS\Util\Url::overlibLink($path_link, $path_minigraph, $path_overlib_content) . "</td></td></table>\n";
-        } else {
-            echo "\n<br>Path: " . $app_data['oslvm_data'][$vars['oslvm']]['path'] . "<br>\n";
-        }
-    }
-    if (isset($app_data['oslvm_data'][$vars['oslvm']]['ipv4'][0])) {
-        //echo "\nIPv4: " . $app_data['oslvm_data'][$vars['oslvm']]['ipv4'] . "<br>\n";
-        echo "\nIPv4: ";
-        foreach ($app_data['oslvm_data'][$vars['oslvm']]['ipv4'] as $index => $ip) {
-            /*
-            $ip_info = Ipv4Address::firstWhere([
-                ['ipv4_addresses.ipv4_address' => $ip],
-                ['ports.device_id' => $device['device_id']]
-            ])->leftJoin('ports', 'ipv4_addresses.port_id', '=', 'ports.port_id');
-            if (isset($ip_info)) {
-                echo var_dump($ip_info);
+                $path_graph_array['width'] = 80;
+                $path_graph_array['height'] = 20;
+                $path_graph_array['bg'] = 'ffffff00';
+                $path_minigraph = \LibreNMS\Util\Url::lazyGraphTag($path_graph_array);
+
+                $mount_path = \LibreNMS\Util\Url::overlibLink($path_link, $mount_path, $path_overlib_content);
+                $mount_path_usage = round($storage_info['storage_perc']) . '% ';
+                $mount_path_usage_graph =  \LibreNMS\Util\Url::overlibLink($path_link, $path_minigraph, $path_overlib_content);
             }
-            */
-            echo $ip."\n";
-            $index++;
-            if (isset($app_data['oslvm_data'][$vars['oslvm']]['ipv4'][$index])) {
-                echo "\n";
-            };
         }
-        echo "<br>\n";
+        $table_info['rows'][] = [
+            [
+                'data' => $path,
+            ],
+            [
+                'data' => $mount_path,
+                'raw' => $mount_path_raw,
+            ],
+            [
+                'data' => $mount_path_usage,
+                'raw' => $mount_path_usage_raw,
+            ],
+            [
+                'data' => $mount_path_usage_graph,
+                'raw' => $mount_path_usage_graph_raw,
+            ],
+        ];
+        echo view('widgets/sortable_table', $table_info);
     }
-    if (isset($app_data['oslvm_data'][$vars['oslvm']]['ipv6'][0])) {
-        echo "\nIPv6: ";
-        foreach ($app_data['oslvm_data'][$vars['oslvm']]['ipv6'] as $index => $ip) {
-            echo $ip."\n";
-            $index++;
-            if (isset($app_data['oslvm_data'][$vars['oslvm']]['ipv6'][$index])) {
-                echo "\n";
-            };
+    if (isset($app_data['oslvm_data'][$vars['oslvm']]['ip'][0])) {
+        $table_info = [
+            'headers' => [
+                'IP',
+                'Interface',
+                'Device',
+                ],
+            'rows' => [],
+        ];
+        foreach ($app_data['oslvm_data'][$vars['oslvm']]['ip'] as $index => $ip) {
+            $device = '';
+            $device_raw = false;
+            $interface = '';
+            $interface_raw = false;
+            if (preg_match('/^[\:A-Fa-f0-9]+$/', $ip)) {
+                if (!preg_match('/^::1/', $ip)) {
+                    $ip_obj = Ipv6Address::firstWhere(['ipv6_address' => $ip]);
+                } else {
+                    $interface = 'loopback';
+                }
+            } elseif (preg_match('/^[\.0-9]+$/', $ip)) {
+                if (!preg_match('/^127./', $ip)) {
+                    $ip_obj = Ipv4Address::firstWhere(['ipv4_address' => $ip]);
+                } else {
+                    $interface = 'loopback';
+                }
+            }
+            // if we have a non-loopback IP and found a hit for it, add additional info
+            if (isset($ip_obj)) {
+                $interface_raw = true;
+                $device_raw = true;
+                $port = Port::with('device')->firstWhere(['port_id' => $ip_obj->port_id]);
+                $interface = generate_port_link([
+                        'label' => $port->label,
+                        'port_id' => $port->port_id,
+                        'ifName' => $port->ifName,
+                        'device_id' => $port->device_id,
+                    ]);
+                $device = generate_device_link(['device_id' => $port->device_id]);
+            }
+            $table_info['rows'][] = [
+                [
+                    'data' => $ip,
+                ],
+                [
+                    'data' => $interface,
+                    'raw' => $interface_raw,
+                ],
+                [
+                    'data' => $device,
+                    'raw' => $device_raw,
+                ],
+            ];
+            echo view('widgets/sortable_table', $table_info);
         }
         echo "<br>\n";
     }
