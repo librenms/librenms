@@ -18,12 +18,12 @@ class Menu extends MenuEntryHook
     public function authorize(\Illuminate\Contracts\Auth\Authenticatable $user, array $settings = []): bool
     {
         /**
-            // menu entry shown if users has the global-read role and there is a setting that has > one entries in it
-            return $user->can('global-read') && isset($settings['some_data']) && count($settings['some_data']) > 0;
-
-            // allow every logged in user
-            return true;
-        **/
+         * // menu entry shown if users has the global-read role and there is a setting that has > one entries in it
+         * return $user->can('global-read') && isset($settings['some_data']) && count($settings['some_data']) > 0;
+         *
+         * // allow every logged in user
+         * return true;
+         **/
 
         // Allow users with GLOBAL_READ or better
         return $user->can('global-read');
