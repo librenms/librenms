@@ -39,7 +39,7 @@ class DevicePoll extends LnmsCommand
 
     public function handle(MeasurementManager $measurements): int
     {
-        if ($this->argument('device spec') == "-") {
+        if ($this->argument('device spec') == '-') {
             $stdin = fopen( 'php://stdin', 'r' );
             $job_args = [];
             array_walk(array_filter($this->options()), function ($val, $opt) use (&$job_args) {
@@ -50,11 +50,11 @@ class DevicePoll extends LnmsCommand
 
             $verbosity = $this->getOutput()->getVerbosity();
             if ($verbosity >= 256) {
-                $job_args["-vvv"] = true;
+                $job_args['-vvv'] = true;
             } elseif ($verbosity >= 128) {
-                $job_args["-vv"] = true;
+                $job_args['-vv'] = true;
             } elseif ($verbosity >= 64) {
-                $job_args["-v"] = true;
+                $job_args['-v'] = true;
             }
 
             while ($line = trim(fgets($stdin))) {
