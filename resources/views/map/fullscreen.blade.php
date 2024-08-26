@@ -132,10 +132,11 @@ html, body, #fullscreen-map {
     function refreshMap() {
         var devices = {};
         var links = {};
+        var device_group = {{ $group_id ? $group_id : 'null' }};
 @if($show_netmap && $netmap_source == 'depends')
-        $.post( '{{ route('maps.getdevices') }}', {disabled: 0, location_valid: 1, disabled_alerts: {{$netmap_include_disabled_alerts}}, link_type: '{{$netmap_source}}'})
+        $.post( '{{ route('maps.getdevices') }}', {disabled: 0, location_valid: 1, disabled_alerts: {{$netmap_include_disabled_alerts}}, group: device_group, link_type: '{{$netmap_source}}'})
 @else
-        $.post( '{{ route('maps.getdevices') }}', {disabled: 0, location_valid: 1, disabled_alerts: {{$netmap_include_disabled_alerts}}})
+        $.post( '{{ route('maps.getdevices') }}', {disabled: 0, location_valid: 1, disabled_alerts: {{$netmap_include_disabled_alerts}}, group: device_group})
 @endif
             .done(function( data ) {
                 $.each( data, function( device_id, device ) {
@@ -199,7 +200,7 @@ html, body, #fullscreen-map {
                 $("#countdown").css("border", "1px solid red");
             });
 @if($show_netmap && $netmap_source == 'xdp')
-        $.post( '{{ route('maps.getgeolinks') }}', {link_type: '{{$netmap_source}}'})
+        $.post( '{{ route('maps.getgeolinks') }}', {link_type: '{{$netmap_source}}', group: device_group})
             .done(function( data ) {
                 $.each( data, function( link_id, link) {
                     if(link_id in link_markers) {

@@ -84,10 +84,20 @@ class MapDataController extends Controller
 
         $group_id = $request->group;
         if ($group_id) {
-            $linkQuery->join('device_group_device AS ldg', 'ld.device_id', '=', 'ldg.device_id')
-                ->join('device_group_device AS rdg', 'rd.device_id', '=', 'rdg.device_id')
-                ->where('rdg.device_group_id', '=', $group_id)
-                ->where('ldg.device_group_id', '=', $group_id);
+            $linkQuery->whereHas('remoteDevice', function ($q) use ($group_id) {
+                $q->whereIn('device_id', function ($q) use ($group_id) {
+                    $q->select('device_id')
+                    ->from('device_group_device')
+                    ->where('device_group_id', $group_id);
+                });
+            })
+            ->whereHas('device', function ($q) use ($group_id) {
+                $q->whereIn('device_id', function ($q) use ($group_id) {
+                    $q->select('device_id')
+                    ->from('device_group_device')
+                    ->where('device_group_id', $group_id);
+                });
+            });
         }
 
         return $linkQuery->get()
