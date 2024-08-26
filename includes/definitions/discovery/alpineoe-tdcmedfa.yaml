@@ -27,7 +27,6 @@ modules:
                     descr: 'Slot {{ $index }}'
                     index: 'alpineTEBISlotTemperature.{{ $index }}'
                     entPhysicalIndex: '{{ $index }}'
-                    entPhysicalIndex_measured: 'Slot'
                     low_limit: alpineTeatTempLowAlarmThld
                     low_warn_limit: alpineTeatTempLowWarningThld
                     warn_limit : alpineTeatTempHighWarningThld
@@ -40,7 +39,6 @@ modules:
                     descr: 'Slot {{ $index }}'
                     index: 'gceTemperature.{{ $index }}'
                     entPhysicalIndex: '{{ $index }}'
-                    entPhysicalIndex_measured: 'EDFA'
                     high_limit : gceaTemperatureThld
                     group: 'EDFA'
         state:
@@ -52,7 +50,6 @@ modules:
                     descr: 'Slot {{ $index }} : Power 1'
                     index: 'alpineTEBISlotPower1Status.{{ $index }}'
                     entPhysicalIndex: '{{ $index }}'
-                    entPhysicalIndex_measured: 'Slot'
                     group: 'Power'
                     state_name: powerAlarm
                     states:
@@ -67,7 +64,6 @@ modules:
                     descr: 'Slot {{ $index }} : Power 2'
                     index: 'alpineTEBISlotPower2Status.{{ $index }}'
                     entPhysicalIndex: '{{ $index }}'
-                    entPhysicalIndex_measured: 'Slot'
                     group: 'Power'
                     state_name: powerAlarm
                     states:
@@ -81,7 +77,6 @@ modules:
                     descr: 'Slot {{ $index }} : PSU Input'
                     index: 'alpineTEPowerCardPowerInStatus.{{ $index }}'
                     entPhysicalIndex: '{{ $index }}'
-                    entPhysicalIndex_measured: 'Slot'
                     group: 'Power'
                     state_name: psuPresence
                     states:
@@ -95,7 +90,6 @@ modules:
                     descr: 'Slot {{ $index }} : PSU Output'
                     index: 'alpineTEPowerCardPowerOutStatus.{{ $index }}'
                     entPhysicalIndex: '{{ $index }}'
-                    entPhysicalIndex_measured: 'Slot'
                     group: 'Power'
                     state_name: powerOutAlarm
                     states:
@@ -110,7 +104,6 @@ modules:
                     descr: 'Slot {{ $index }} : Alarm Input Loss'
                     index: 'geaiLossInputAlarm.{{ $index }}'
                     entPhysicalIndex: '{{ $index }}'
-                    entPhysicalIndex_measured: 'EDFA'
                     group: 'Alarm'
                     state_name: lossAlarm
                     states:
@@ -124,7 +117,6 @@ modules:
                     descr: 'Slot {{ $index }} : Alarm Output Loss'
                     index: 'geaiLossOutputAlarm.{{ $index }}'
                     entPhysicalIndex: '{{ $index }}'
-                    entPhysicalIndex_measured: 'EDFA'
                     group: 'Alarm'
                     state_name: lossAlarm
                     states:
@@ -138,7 +130,6 @@ modules:
                     descr: 'Slot {{ $index }} : Status'
                     index: 'alpineTESlotStatus.{{ $index }}'
                     entPhysicalIndex: '{{ $index }}'
-                    entPhysicalIndex_measured: 'Slot'
                     group: 'Slot'
                     state_name: slotStatus
                     states:
@@ -152,7 +143,6 @@ modules:
                     descr: 'Slot {{ $index }} : Fan 1'
                     index: 'alpineTEFanCardFan1Status.{{ $index }}'
                     entPhysicalIndex: '{{ $index }}'
-                    entPhysicalIndex_measured: 'Slot'
                     group: 'Fan'
                     state_name: fanStatus
                     states:
@@ -166,7 +156,6 @@ modules:
                     descr: 'Slot {{ $index }} : Fan 2'
                     index: 'alpineTEFanCardFan2Status.{{ $index }}'
                     entPhysicalIndex: '{{ $index }}'
-                    entPhysicalIndex_measured: 'Slot'
                     group: 'Fan'
                     state_name: fanStatus
                     states:
@@ -180,7 +169,6 @@ modules:
                     descr: 'Slot {{ $index }} : Fan 3'
                     index: 'alpineTEFanCardFan3Status.{{ $index }}'
                     entPhysicalIndex: '{{ $index }}'
-                    entPhysicalIndex_measured: 'Slot'
                     group: 'Fan'
                     state_name: fanStatus
                     states:
@@ -194,7 +182,6 @@ modules:
                     descr: 'Slot {{ $index }} : Work mode'
                     index: 'gctiWorkMode.{{ $index }}'
                     entPhysicalIndex: '{{ $index }}'
-                    entPhysicalIndex_measured: 'TDCM'
                     group: 'Mode'
                     state_name: workModeTDCM
                     states:
@@ -208,7 +195,6 @@ modules:
                     descr: 'Slot {{ $index }} : Save config'
                     index: 'gctiSaveConfig.{{ $index }}'
                     entPhysicalIndex: '{{ $index }}'
-                    entPhysicalIndex_measured: 'TDCM'
                     state_name: saveConfigStatus
                     group: 'Config'
                     states:
@@ -222,7 +208,6 @@ modules:
                     num_oid: '.1.3.6.1.4.1.52326.1.1.1.1.3.{{ $index }}'
                     descr: 'Slot {{ $index }} : Work mode'
                     entPhysicalIndex: '{{ $index }}'
-                    entPhysicalIndex_measured: 'EDFA'
                     group: 'Mode'
                     index: 'gceMode.{{ $index }}'
                     state_name: workModeEDFA
@@ -237,7 +222,6 @@ modules:
                     descr: 'Slot {{ $index }} : Save config'
                     index: 'gceSaveConfig.{{ $index }}'
                     entPhysicalIndex: '{{ $index }}'
-                    entPhysicalIndex_measured: 'EDFA'
                     state_name: saveConfigStatus
                     group: 'Config'
                     states:
@@ -252,7 +236,6 @@ modules:
                     descr: 'Slot {{ $index }} : Common alarm'
                     index: 'geaiCommonAlarm.{{ $index }}'
                     entPhysicalIndex: '{{ $index }}'
-                    entPhysicalIndex_measured: 'EDFA'
                     group: 'Alarm'
                     state_name: commonAlarm
                     states:
@@ -266,7 +249,6 @@ modules:
                     descr: 'Slot {{ $index }} : Temperature alarm'
                     index: 'geaiPumpTemperatureAlarm.{{ $index }}'
                     entPhysicalIndex: '{{ $index }}'
-                    entPhysicalIndex_measured: 'EDFA'
                     group: 'Alarm'
                     state_name: tempAlarm
                     states:
@@ -280,7 +262,6 @@ modules:
                     descr: 'Slot {{ $index }} : Bias alarm'
                     index: 'geaiPumpBiasAlarm.{{ $index }}'
                     entPhysicalIndex: '{{ $index }}'
-                    entPhysicalIndex_measured: 'EDFA'
                     group: 'Alarm'
                     state_name: biasAlarm
                     states:
@@ -297,7 +278,6 @@ modules:
                     descr: 'Slot {{ $index }} : Fan 1'
                     index: 'alpineTEFanCardFan1Speed.{{ $index }}'
                     entPhysicalIndex: '{{ $index }}'
-                    entPhysicalIndex_measured: 'Slot'
 
                 -
                     oid: alpineTdcmEdfaSystem
@@ -306,7 +286,6 @@ modules:
                     descr: 'Slot {{ $index }} : Fan 2'
                     index: 'alpineTEFanCardFan2Speed.{{ $index }}'
                     entPhysicalIndex: '{{ $index }}'
-                    entPhysicalIndex_measured: 'Slot'
 
                 -
                     oid: alpineTdcmEdfaSystem
@@ -315,7 +294,6 @@ modules:
                     descr: 'Slot {{ $index }} : Fan 3'
                     index: 'alpineTEFanCardFan3Speed.{{ $index }}'
                     entPhysicalIndex: '{{ $index }}'
-                    entPhysicalIndex_measured: 'Slot'
 
         dbm:
             data:
@@ -326,7 +304,6 @@ modules:
                     descr: 'Slot {{ $index }} : Power Input'
                     index: 'gceInputPower.{{ $index }}'
                     entPhysicalIndex: '{{ $index }}'
-                    entPhysicalIndex_measured: 'EDFA'
                     low_limit: gceaInputPowerThld
                     group: 'Input'
 
@@ -337,7 +314,6 @@ modules:
                     descr: 'Slot {{ $index }} : Power Output'
                     index: 'gceOuputPower.{{ $index }}'
                     entPhysicalIndex: '{{ $index }}'
-                    entPhysicalIndex_measured: 'EDFA'
                     low_limit: gceaOutputPowerThld
                     group: 'Output'
 
@@ -348,7 +324,6 @@ modules:
                     descr: 'Slot {{ $index }} : Power Output Target'
                     index: 'gceOutputPowerTarget.{{ $index }}'
                     entPhysicalIndex: '{{ $index }}'
-                    entPhysicalIndex_measured: 'EDFA'
                     group: 'Output'
 
         quality_factor:
@@ -360,7 +335,6 @@ modules:
                     descr: 'Slot {{ $index }} : Gain'
                     index: 'gceGain.{{ $index }}'
                     entPhysicalIndex: '{{ $index }}'
-                    entPhysicalIndex_measured: 'EDFA'
 
                 -
                     oid: alpineGenCardEdfa
@@ -369,7 +343,6 @@ modules:
                     descr: 'Slot {{ $index }} : Gain Target'
                     index: 'gceGainTarget.{{ $index }}'
                     entPhysicalIndex: '{{ $index }}'
-                    entPhysicalIndex_measured: 'EDFA'
 
         voltage:
             data:
@@ -380,7 +353,6 @@ modules:
                     descr: 'Slot {{ $index }} : Power 1'
                     index: 'alpineTEBISlotPower1Val.{{ $index }}'
                     entPhysicalIndex: '{{ $index }}'
-                    entPhysicalIndex_measured: 'Slot'
                     group: 'Power'
                 -
                     oid: alpineTdcmEdfaSystem
@@ -389,7 +361,6 @@ modules:
                     descr: 'Slot {{ $index }} : Power 2'
                     index: 'alpineTEBISlotPower2Val.{{ $index }}'
                     entPhysicalIndex: '{{ $index }}'
-                    entPhysicalIndex_measured: 'Slot'
                     group: 'Power'
 
                 -
@@ -399,7 +370,6 @@ modules:
                     descr: 'Slot {{ $index }} : PSU Ouput'
                     index: 'alpineTEPowerCardPowerOutVal.{{ $index }}'
                     entPhysicalIndex: '{{ $index }}'
-                    entPhysicalIndex_measured: 'Slot'
                     group: 'Power'
 
                 -
@@ -409,7 +379,6 @@ modules:
                     descr: 'Slot {{ $index }} : Fan'
                     index: 'alpineTEFanCardPower1Val.{{ $index }}'
                     entPhysicalIndex: '{{ $index }}'
-                    entPhysicalIndex_measured: 'Slot'
                     group: 'Fan'
 
         count:
@@ -421,7 +390,6 @@ modules:
                     descr: 'Slot {{ $index }} : Fans'
                     index: 'alpineTEFanCardFansTotalCnt.{{ $index }}'
                     entPhysicalIndex: '{{ $index }}'
-                    entPhysicalIndex_measured: 'Slot'
                     group: 'Fan'
                 -
                     oid: alpineTdcmEdfaSystem
@@ -430,7 +398,6 @@ modules:
                     descr: 'Slot {{ $index }} : Powers'
                     index: 'alpineTEBISlotPowerTotalCnt.{{ $index }}'
                     entPhysicalIndex: '{{ $index }}'
-                    entPhysicalIndex_measured: 'Slot'
                     group: 'Power'
 
         chromatic_dispersion:
@@ -442,7 +409,6 @@ modules:
                     descr: 'Slot {{ $index }} : Default'
                     index: 'gctiDefaultDispersion.{{ $index }}'
                     entPhysicalIndex: '{{ $index }}'
-                    entPhysicalIndex_measured: 'TDCM'
 
                 -
                     oid: alpineGenCardTdcm
@@ -451,5 +417,4 @@ modules:
                     descr: 'Slot {{ $index }} : Current'
                     index: 'gctiCurrentDispersion.{{ $index }}'
                     entPhysicalIndex: '{{ $index }}'
-                    entPhysicalIndex_measured: 'TDCM'
 

@@ -111,10 +111,17 @@ if ($options['f'] === 'ports_fdb') {
     $ret = lock_and_purge('ports_fdb', 'updated_at < DATE_SUB(NOW(), INTERVAL ? DAY)');
     exit($ret);
 }
+
+if ($options['f'] === 'ports_nac') {
+    $ret = lock_and_purge('ports_nac', 'updated_at < DATE_SUB(NOW(), INTERVAL ? DAY)');
+    exit($ret);
+}
+
 if ($options['f'] === 'route') {
     $ret = lock_and_purge('route', 'updated_at < DATE_SUB(NOW(), INTERVAL ? DAY)');
     exit($ret);
 }
+
 if ($options['f'] === 'eventlog') {
     $ret = lock_and_purge('eventlog', 'datetime < DATE_SUB(NOW(), INTERVAL ? DAY)');
     exit($ret);
@@ -127,11 +134,6 @@ if ($options['f'] === 'authlog') {
 
 if ($options['f'] === 'callback') {
     \LibreNMS\Util\Stats::submit();
-}
-
-if ($options['f'] === 'device_perf') {
-    $ret = lock_and_purge('device_perf', 'timestamp < DATE_SUB(NOW(),INTERVAL ? DAY)');
-    exit($ret);
 }
 
 if ($options['f'] === 'ports_purge') {

@@ -50,8 +50,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        \Illuminate\Pagination\Paginator::useBootstrap();
-
         $this->bootCustomBladeDirectives();
         $this->bootCustomValidators();
         $this->configureMorphAliases();

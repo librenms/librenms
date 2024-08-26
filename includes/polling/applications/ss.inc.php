@@ -1,10 +1,11 @@
 <?php
 
-require_once 'includes/ss-shared.inc.php';
-
+use LibreNMS\Config;
 use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\Exceptions\JsonAppMissingKeysException;
 use LibreNMS\RRD\RrdDefinition;
+
+require_once Config::get('install_dir') . '/includes/ss-shared.inc.php';
 
 $name = 'ss';
 $output_success = 'OK';
@@ -81,8 +82,7 @@ foreach ($ss_section_list as $gen_type) {
     } elseif (in_array($gen_type, $ss_af_list)) {
         array_push($allowed_afs, $gen_type);
     } else {
-        $fgen_type = is_string($gen_type) ? filter_var($gen_type, FILTER_SANITIZE_STRING) : null;
-        $log_message = 'Socket Statistics Invalid Socket or AF Returned by Script: ' . $fgen_type;
+        $log_message = 'Socket Statistics Invalid Socket or AF Returned by Script: ' . $gen_type;
         log_event($log_message, $device, 'application');
         continue;
     }
@@ -134,8 +134,7 @@ foreach ($ss_section_list as $gen_type) {
             if (in_array($netid, $ss_socket_list)) {
                 array_push($allowed_sockets, $netid);
             } else {
-                $fgen_type = is_string($gen_type) ? filter_var($gen_type, FILTER_SANITIZE_STRING) : null;
-                $log_message = 'Socket Statistics Invalid Socket Returned by Script: ' . $fgen_type;
+                $log_message = 'Socket Statistics Invalid Socket Returned by Script: ' . $gen_type;
                 log_event($log_message, $device, 'application');
                 continue;
             }

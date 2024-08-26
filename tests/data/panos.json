@@ -5859,5 +5859,31 @@
                 }
             ]
         }
+    },
+    "entity-physical": {
+        "discovery": {
+            "entPhysical": [
+                {
+                    "entPhysicalIndex": 1,
+                    "entPhysicalDescr": "PA-VM",
+                    "entPhysicalClass": "chassis",
+                    "entPhysicalName": "PA-VM",
+                    "entPhysicalHardwareRev": "1.0",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "9.0.7",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "false",
+                    "entPhysicalModelName": "PA-VM",
+                    "entPhysicalVendorType": "enterprises.25461.2.3.29",
+                    "entPhysicalSerialNum": "015351000009999",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": -1,
+                    "entPhysicalMfgName": "Palo Alto Networks",
+                    "ifIndex": null
+                }
+            ]
+        },
+        "poller": "matches discovery"
     }
 }

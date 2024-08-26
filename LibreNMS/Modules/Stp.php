@@ -28,6 +28,7 @@ namespace LibreNMS\Modules;
 use App\Models\Device;
 use App\Models\PortStp;
 use App\Observers\ModuleModelObserver;
+use Illuminate\Support\Facades\Log;
 use LibreNMS\DB\SyncsModels;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
@@ -56,16 +57,14 @@ class Stp implements Module
         $device = $os->getDevice();
 
         $instances = $os->discoverStpInstances();
-        echo 'Instances: ';
+        Log::info('Instances: ');
         ModuleModelObserver::observe(\App\Models\Stp::class);
         $this->syncModels($device, 'stpInstances', $instances);
 
         $ports = $os->discoverStpPorts($instances);
-        echo "\nPorts: ";
+        Log::info('Ports: ');
         ModuleModelObserver::observe(PortStp::class);
         $this->syncModels($device, 'stpPorts', $ports);
-
-        echo PHP_EOL;
     }
 
     public function shouldPoll(OS $os, ModuleStatus $status): bool
@@ -77,13 +76,13 @@ class Stp implements Module
     {
         $device = $os->getDevice();
 
-        echo 'Instances: ';
+        Log::info('Instances: ');
         $instances = $device->stpInstances;
         $instances = $os->pollStpInstances($instances);
         ModuleModelObserver::observe(\App\Models\Stp::class);
         $this->syncModels($device, 'stpInstances', $instances);
 
-        echo "\nPorts: ";
+        Log::info('Ports: ');
         $ports = $device->stpPorts;
         ModuleModelObserver::observe(PortStp::class);
         $this->syncModels($device, 'stpPorts', $ports);

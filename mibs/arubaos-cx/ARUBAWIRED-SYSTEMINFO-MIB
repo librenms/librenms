@@ -1,0 +1,223 @@
+--**MOD+************************************************************************
+--* Module:    ARUBAWIRED-SYSTEMINFO-MIB :SYSTEMINFO MIB file
+--*
+--* (c) Copyright 2020-2021,2023,2022 Hewlett Packard Enterprise Development LP
+--* All Rights Reserved.
+--*
+--* The contents of this software are proprietary and confidential
+--* to the Hewlett-Packard Development Company, L.P.  No part of this
+--* program may be photocopied, reproduced, or translated into another
+--* programming language without prior written consent of the
+--* Hewlett-Packard Development Company, L.P.
+--*
+--* Purpose: This file contains MIB definition of ARUBAWIRED-SYSTEMINFO-MIB
+--*
+--**MOD-************************************************************************
+
+ARUBAWIRED-SYSTEMINFO-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    DisplayString
+        FROM SNMPv2-TC
+    wndFeatures
+        FROM ARUBAWIRED-NETWORKING-OID;
+
+arubaWiredSystemInfoMIB MODULE-IDENTITY
+    LAST-UPDATED "202111080000Z" -- November 08, 2021
+    ORGANIZATION "HPE/Aruba Networking Division"
+    CONTACT-INFO "Hewlett Packard Company
+                  8000 Foothills Blvd.
+                  Roseville, CA 95747"
+    DESCRIPTION
+        "This MIB module contains HPE proprietary
+         percentage of resource utilization of the system."
+
+    REVISION     "202111080000Z" -- November 08, 2021
+    DESCRIPTION  "Initial revision."
+    ::= { wndFeatures 22 }
+
+-- **********************************************************************
+-- System Info notifications
+-- **********************************************************************
+
+arubaWiredSystemInfoNotifications OBJECT IDENTIFIER
+      ::= { arubaWiredSystemInfoMIB 0 }
+arubaWiredSystemInfoObjects       OBJECT IDENTIFIER
+      ::= { arubaWiredSystemInfoMIB 1 }
+arubaWiredSystemInfoConformance   OBJECT IDENTIFIER
+      ::= { arubaWiredSystemInfoMIB 2 }
+
+arubaWiredSystemInfo  OBJECT IDENTIFIER
+      ::= { arubaWiredSystemInfoObjects 0 }
+
+-- **********************************************************************
+-- System Info Objects
+-- **********************************************************************
+
+arubaWiredSystemInfoTable OBJECT-TYPE
+      SYNTAX      SEQUENCE OF ArubaWiredSystemInfoEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION "This table contains CPU, Memory, and Storage
+                   resource utilization of the system."
+      ::= { arubaWiredSystemInfo 1 }
+
+arubaWiredSystemInfoEntry OBJECT-TYPE
+      SYNTAX      ArubaWiredSystemInfoEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION "Information about the resource utilization of
+                   CPU, Memory, and Storage value in the percentage."
+      INDEX       {
+                    arubaWiredSystemInfoModuleType,
+                    arubaWiredSystemInfoModuleName
+                  }
+      ::= { arubaWiredSystemInfoTable 1 }
+
+ArubaWiredSystemInfoEntry ::=
+    SEQUENCE {
+        arubaWiredSystemInfoModuleType       DisplayString,
+        arubaWiredSystemInfoModuleName       DisplayString,
+        arubaWiredSystemInfoCpu              Unsigned32,
+        arubaWiredSystemInfoMemory           Unsigned32,
+        arubaWiredSystemInfoStorageNos       Unsigned32,
+        arubaWiredSystemInfoStorageLog       Unsigned32,
+        arubaWiredSystemInfoStorageCoredump  Unsigned32,
+        arubaWiredSystemInfoStorageSecurity  Unsigned32,
+        arubaWiredSystemInfoStorageSelftest  Unsigned32,
+        arubaWiredSystemInfoCpuAvgOneMin     Unsigned32,
+        arubaWiredSystemInfoCpuAvgFiveMin    Unsigned32
+    }
+
+arubaWiredSystemInfoModuleType OBJECT-TYPE
+      SYNTAX      DisplayString (SIZE(0..30))
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION "Identification of the module type for the system."
+      ::= { arubaWiredSystemInfoEntry 1 }
+
+arubaWiredSystemInfoModuleName OBJECT-TYPE
+      SYNTAX      DisplayString (SIZE(0..30))
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION "Identification of the module name for the system."
+      ::= { arubaWiredSystemInfoEntry 2 }
+
+arubaWiredSystemInfoCpu OBJECT-TYPE
+      SYNTAX      Unsigned32 (0..100)
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "The percentage of CPU utilization of the subsystem
+                   averaged across all the CPUs of the system."
+      ::= { arubaWiredSystemInfoEntry 3 }
+
+arubaWiredSystemInfoMemory OBJECT-TYPE
+      SYNTAX      Unsigned32 (0..100)
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "The memory usage of subsystem in percentage."
+      ::= { arubaWiredSystemInfoEntry 4 }
+
+arubaWiredSystemInfoStorageNos OBJECT-TYPE
+      SYNTAX      Unsigned32 (0..100)
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "The percentage of utilization of network
+                   operating system storage partition."
+      ::= { arubaWiredSystemInfoEntry 5 }
+
+arubaWiredSystemInfoStorageLog OBJECT-TYPE
+      SYNTAX      Unsigned32 (0..100)
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "The percentage of utilization of logs
+                   storage partition."
+      ::= { arubaWiredSystemInfoEntry 6 }
+
+arubaWiredSystemInfoStorageCoredump OBJECT-TYPE
+      SYNTAX      Unsigned32 (0..100)
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "The percentage of utilization of core dump
+                   storage partition."
+      ::= { arubaWiredSystemInfoEntry 7 }
+
+arubaWiredSystemInfoStorageSecurity OBJECT-TYPE
+      SYNTAX      Unsigned32 (0..100)
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "The percentage of utilization of security
+                   storage partition."
+      ::= { arubaWiredSystemInfoEntry 8 }
+
+arubaWiredSystemInfoStorageSelftest OBJECT-TYPE
+      SYNTAX      Unsigned32 (0..100)
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "The percentage of utilization of self test
+                   storage partition."
+      ::= { arubaWiredSystemInfoEntry 9 }
+
+arubaWiredSystemInfoCpuAvgOneMin OBJECT-TYPE
+      SYNTAX      Unsigned32 (0..100)
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "The percentage of CPU utilization of the subsystem
+                   averaged across all the CPUs of the system period
+                   of one minute"
+      ::= { arubaWiredSystemInfoEntry 10 }
+
+arubaWiredSystemInfoCpuAvgFiveMin OBJECT-TYPE
+      SYNTAX      Unsigned32 (0..100)
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "The percentage of CPU utilization of the subsystem
+                   averaged across all the CPUs of the system period
+                   of five minutes"
+      ::= { arubaWiredSystemInfoEntry 11 }
+
+-- **********************************************************************
+-- compliance statements
+-- **********************************************************************
+
+arubaWiredSystemInfoCompliances OBJECT IDENTIFIER
+      ::= { arubaWiredSystemInfoConformance 1 }
+
+arubaWiredSystemInfoGroups      OBJECT IDENTIFIER
+      ::= { arubaWiredSystemInfoConformance 2 }
+
+arubaWiredSystemInfoTableGroup OBJECT-GROUP
+      OBJECTS     {
+                    arubaWiredSystemInfoCpu,
+                    arubaWiredSystemInfoMemory,
+                    arubaWiredSystemInfoStorageNos,
+                    arubaWiredSystemInfoStorageLog,
+                    arubaWiredSystemInfoStorageCoredump,
+                    arubaWiredSystemInfoStorageSecurity,
+                    arubaWiredSystemInfoStorageSelftest,
+                    arubaWiredSystemInfoCpuAvgOneMin,
+                    arubaWiredSystemInfoCpuAvgFiveMin
+                  }
+      STATUS      current
+      DESCRIPTION "A collection of objects providing information on the
+                   percentage of utilization of CPU, Memory, and Storage
+                   of the system."
+      ::= { arubaWiredSystemInfoGroups 1 }
+
+arubaWiredSystemInfoCompliance MODULE-COMPLIANCE
+      STATUS      current
+      DESCRIPTION "The compliance statement for devices implementing
+                   the ARUBA WIRED SYSTEMINFO Mib."
+      MODULE
+      MANDATORY-GROUPS
+      {
+         arubaWiredSystemInfoTableGroup
+      }
+      ::= { arubaWiredSystemInfoCompliances 1 }
+
+END
+

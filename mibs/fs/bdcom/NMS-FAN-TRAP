@@ -1,0 +1,307 @@
+-- *****************************************************************
+-- NMS-FAN-TRAP.MIB: NMS FAN TRAP MIB
+--
+-- JAN 2010
+-- Edit by LIUQIANG
+-- Copyright (c) 2010 by NMS, Inc.
+-- All rights reserved.
+-- *****************************************************************
+
+NMS-FAN-TRAP DEFINITIONS ::= BEGIN
+
+
+
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,INTEGER,
+    Integer32, Unsigned32                       FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP,
+    NOTIFICATION-GROUP                          FROM SNMPv2-CONF
+    nmsEPONGroup,nmsMgmt                                 FROM NMS-SMI;
+
+
+               fanTrap         OBJECT IDENTIFIER ::= { nmsMgmt 187 }
+
+
+
+    
+-- Notifications
+          fanStatus OBJECT-TYPE
+              SYNTAX  INTEGER {
+                          normal(1), 
+                          --normal(-268435456),     
+                          stop(0)
+                          }
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "Fan status, 1-normal, 2-stop."
+              ::= { fanTrap 1 }
+
+	nmsFanNotifications OBJECT IDENTIFIER
+                                ::= { fanTrap 2 }
+
+
+	nmsFanNotification NOTIFICATION-TYPE
+    		OBJECTS {
+                       fanStatus
+                        }
+    		STATUS      current
+    		DESCRIPTION
+        	"The agent generates this notification when fan stops or resumes ."
+    		::= { nmsFanNotifications 1 }
+    		
+        fanRunningStatus        OBJECT IDENTIFIER ::= { fanTrap 3 }
+    		
+        fan1RunningStatus OBJECT-TYPE
+              SYNTAX  INTEGER {
+                          normal(1),     
+                          stop(2),
+                          unused(3)
+                          }
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Fan 1 status, 1-normal, 2-stop, unused(3)."
+              ::= { fanRunningStatus 1 }
+    		
+        fan2RunningStatus OBJECT-TYPE
+              SYNTAX  INTEGER {
+                          normal(1),     
+                          stop(2),
+                          unused(3)
+                          }
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Fan 2 status, 1-normal, 2-stop, unused(3)."
+              ::= { fanRunningStatus 2 }
+    		
+        fan3RunningStatus OBJECT-TYPE
+              SYNTAX  INTEGER {
+                          normal(1),     
+                          stop(2),
+                          unused(3)
+                          }
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Fan 3 status, 1-normal, 2-stop, unused(3)."
+              ::= { fanRunningStatus 3 }
+    		
+        fan4RunningStatus OBJECT-TYPE
+              SYNTAX  INTEGER {
+                          normal(1),     
+                          stop(2),
+                          unused(3)
+                          }
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Fan 4 status, 1-normal, 2-stop, unused(3)."
+              ::= { fanRunningStatus 4 }
+    		
+        fan5RunningStatus OBJECT-TYPE
+              SYNTAX  INTEGER {
+                          normal(1),     
+                          stop(2),
+                          unused(3)
+                          }
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Fan 5 status, 1-normal, 2-stop, unused(3)."
+              ::= { fanRunningStatus 5 }
+    		
+        fan6RunningStatus OBJECT-TYPE
+              SYNTAX  INTEGER {
+                          normal(1),     
+                          stop(2),
+                          unused(3)
+                          }
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Fan 6 status, 1-normal, 2-stop, unused(3)."
+              ::= { fanRunningStatus 6 }
+    		
+        fan7RunningStatus OBJECT-TYPE
+              SYNTAX  INTEGER {
+                          normal(1),     
+                          stop(2),
+                          unused(3)
+                          }
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Fan 7 status, 1-normal, 2-stop, unused(3)."
+              ::= { fanRunningStatus 7 }
+    		
+        fan8RunningStatus OBJECT-TYPE
+              SYNTAX  INTEGER {
+                          normal(1),     
+                          stop(2),
+                          unused(3)
+                          }
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Fan 8 status, 1-normal, 2-stop, unused(3)."
+              ::= { fanRunningStatus 8 }
+    		
+        fan9RunningStatus OBJECT-TYPE
+              SYNTAX  INTEGER {
+                          normal(1),     
+                          stop(2),
+                          unused(3)
+                          }
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Fan 9 status, 1-normal, 2-stop, unused(3)."
+              ::= { fanRunningStatus 9 }
+    		
+        fan10RunningStatus OBJECT-TYPE
+              SYNTAX  INTEGER {
+                          normal(1),     
+                          stop(2),
+                          unused(3)
+                          }
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Fan 10 status, 1-normal, 2-stop, unused(3)."
+              ::= { fanRunningStatus 10 }
+    		
+        fan11RunningStatus OBJECT-TYPE
+              SYNTAX  INTEGER {
+                          normal(1),     
+                          stop(2),
+                          unused(3)
+                          }
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Fan 11 status, 1-normal, 2-stop, unused(3)."
+              ::= { fanRunningStatus 11 }
+    		
+        fan12RunningStatus OBJECT-TYPE
+              SYNTAX  INTEGER {
+                          normal(1),     
+                          stop(2),
+                          unused(3)
+                          }
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Fan 12 status, 1-normal, 2-stop, unused(3)."
+              ::= { fanRunningStatus 12 }
+    		
+        fan13RunningStatus OBJECT-TYPE
+              SYNTAX  INTEGER {
+                          normal(1),     
+                          stop(2),
+                          unused(3)
+                          }
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Fan 13 status, 1-normal, 2-stop, unused(3)."
+              ::= { fanRunningStatus 13 }
+    		
+        fan14RunningStatus OBJECT-TYPE
+              SYNTAX  INTEGER {
+                          normal(1),     
+                          stop(2),
+                          unused(3)
+                          }
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Fan 14 status, 1-normal, 2-stop, unused(3)."
+              ::= { fanRunningStatus 14 }
+    		
+        fan15RunningStatus OBJECT-TYPE
+              SYNTAX  INTEGER {
+                          normal(1),     
+                          stop(2),
+                          unused(3)
+                          }
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Fan 15 status, 1-normal, 2-stop, unused(3)."
+              ::= { fanRunningStatus 15 }
+    		
+--***********************************************************--
+          FanTable OBJECT-TYPE
+                   SYNTAX  SEQUENCE OF FanTableEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A list of fan-devices entries."
+                   ::= { fanTrap 4 }
+
+               FanTableEntry OBJECT-TYPE
+                   SYNTAX  FanTableEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A collection of fan-devices"
+                   INDEX { FanIndex }
+               ::= { FanTable 1 }
+
+               FanTableEntry ::=
+                   SEQUENCE {
+                       FanIndex
+                           INTEGER,
+                       FanStatus
+                           INTEGER,
+                       FanSpeed
+                       	   INTEGER,
+                       FanShelfNum
+                       	   INTEGER
+                  }
+
+
+               FanIndex OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Index of fan-device"
+                   ::= { FanTableEntry 1 }
+
+
+               FanStatus OBJECT-TYPE
+                   SYNTAX  INTEGER{ 
+                          normal(1),     
+                          stop(2),
+                          unused(3)                                    
+                                   }
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Fan-device status."
+                   ::= { FanTableEntry 2 }
+
+
+
+               FanSpeed OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Fan-device speed."
+                   ::= { FanTableEntry 3 }
+               FanShelfNum OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Fan-device shelf number."
+                   ::= { FanTableEntry 4 }
+                       
+
+              
+END

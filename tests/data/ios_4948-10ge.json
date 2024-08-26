@@ -19,5 +19,69 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "entity-physical": {
+        "discovery": {
+            "entPhysical": [
+                {
+                    "entPhysicalIndex": 1,
+                    "entPhysicalDescr": null,
+                    "entPhysicalClass": null,
+                    "entPhysicalName": "Switch System",
+                    "entPhysicalHardwareRev": null,
+                    "entPhysicalFirmwareRev": null,
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": null,
+                    "entPhysicalAssetID": null,
+                    "entPhysicalIsFRU": null,
+                    "entPhysicalModelName": "",
+                    "entPhysicalVendorType": null,
+                    "entPhysicalSerialNum": "<private>",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": -1,
+                    "entPhysicalMfgName": null,
+                    "ifIndex": null
+                },
+                {
+                    "entPhysicalIndex": 1000,
+                    "entPhysicalDescr": null,
+                    "entPhysicalClass": null,
+                    "entPhysicalName": null,
+                    "entPhysicalHardwareRev": null,
+                    "entPhysicalFirmwareRev": null,
+                    "entPhysicalSoftwareRev": null,
+                    "entPhysicalAlias": null,
+                    "entPhysicalAssetID": null,
+                    "entPhysicalIsFRU": null,
+                    "entPhysicalModelName": "WS-C4948-10GE",
+                    "entPhysicalVendorType": null,
+                    "entPhysicalSerialNum": null,
+                    "entPhysicalContainedIn": 2,
+                    "entPhysicalParentRelPos": -1,
+                    "entPhysicalMfgName": null,
+                    "ifIndex": null
+                },
+                {
+                    "entPhysicalIndex": 1001,
+                    "entPhysicalDescr": null,
+                    "entPhysicalClass": null,
+                    "entPhysicalName": null,
+                    "entPhysicalHardwareRev": null,
+                    "entPhysicalFirmwareRev": null,
+                    "entPhysicalSoftwareRev": null,
+                    "entPhysicalAlias": null,
+                    "entPhysicalAssetID": null,
+                    "entPhysicalIsFRU": null,
+                    "entPhysicalModelName": "",
+                    "entPhysicalVendorType": null,
+                    "entPhysicalSerialNum": "",
+                    "entPhysicalContainedIn": 1000,
+                    "entPhysicalParentRelPos": -1,
+                    "entPhysicalMfgName": null,
+                    "ifIndex": null
+                }
+            ]
+        },
+        "poller": "matches discovery"
     }
 }

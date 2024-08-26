@@ -17,6 +17,7 @@ use App\Models\Availability;
 use App\Models\Device;
 use App\Models\DeviceGroup;
 use App\Models\DeviceOutage;
+use App\Models\Ipv4Mac;
 use App\Models\Location;
 use App\Models\MplsSap;
 use App\Models\MplsService;
@@ -313,12 +314,10 @@ function list_devices(Illuminate\Http\Request $request)
     $query = $request->get('query');
     $param = [];
 
-    if (empty($order)) {
-        $order = 'hostname';
-    }
-
-    if (stristr($order, ' desc') === false && stristr($order, ' asc') === false) {
-        $order = 'd.`' . $order . '` ASC';
+    if (preg_match('/^([a-z_]+)(?: (desc|asc))?$/i', $order, $matches)) {
+        $order = "d.`$matches[1]` " . ($matches[2] ?? 'ASC');
+    } else {
+        $order = 'd.`hostname` ASC';
     }
 
     $select = ' d.*, GROUP_CONCAT(dd.device_id) AS dependency_parent_id, GROUP_CONCAT(dd.hostname) AS dependency_parent_hostname, `location`, `lat`, `lng` ';
@@ -538,6 +537,33 @@ function maintenance_device(Illuminate\Http\Request $request)
     } else {
         return api_success_noresult(201, "Device {$device->hostname} ({$device->device_id}) moved into maintenance mode" . ($duration ? " for {$duration}h" : ''));
     }
+}
+
+function device_under_maintenance(Illuminate\Http\Request $request)
+{
+    // return whether or not a device is in an active maintenance window
+
+    $hostname = $request->route('hostname');
+
+    if (empty($hostname)) {
+        return api_error(400, 'No hostname has been provided to get maintenance status');
+    }
+
+    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $model = null;
+    if ($device_id) {
+        $model = DeviceCache::get((int) $device_id);
+    }
+
+    if (! $model) {
+        return api_error(404, "Device $hostname not found");
+    }
+
+    return check_device_permission($device_id, function () use ($model) {
+        $maintenance = $model->isUnderMaintenance() ?? false;
+
+        return api_success($maintenance, 'is_under_maintenance');
+    });
 }
 
 function device_availability(Illuminate\Http\Request $request)
@@ -904,7 +930,7 @@ function get_graphs(Illuminate\Http\Request $request)
         ];
         $graphs[] = [
             'desc' => 'Ping Response',
-            'name' => 'device_ping_perf',
+            'name' => 'device_icmp_perf',
         ];
         foreach (dbFetchRows('SELECT * FROM device_graphs WHERE device_id = ? ORDER BY graph', [$device_id]) as $graph) {
             $desc = Config::get("graph_types.device.{$graph['graph']}.descr");
@@ -1045,6 +1071,10 @@ function get_port_graphs(Illuminate\Http\Request $request): JsonResponse
     $ports = $device->ports()->isNotDeleted()->hasAccess(Auth::user())
         ->select($columns)->orderBy('ifIndex')->get();
 
+    if ($ports->isEmpty()) {
+        return api_error(404, 'No ports found');
+    }
+
     return api_success($ports, 'ports');
 }
 
@@ -1107,6 +1137,62 @@ function get_port_info(Illuminate\Http\Request $request)
     });
 }
 
+function update_port_description(Illuminate\Http\Request $request)
+{
+    $port_id = $request->route('portid');
+    $port = Port::hasAccess(Auth::user())
+        ->where([
+            'port_id' => $port_id,
+        ])->first();
+    if (empty($port)) {
+        return api_error(400, 'Invalid port ID.');
+    }
+
+    $data = json_decode($request->getContent(), true);
+    $field = 'description';
+    $description = $data[$field];
+
+    if (empty($description)) {
+        // from update-ifalias.inc.php:
+        // "Set to repoll so we avoid using ifDescr on port poll"
+        $description = 'repoll';
+    }
+
+    $port->ifAlias = $description;
+    $port->save();
+
+    $ifName = $port->ifName;
+    $device = $port->device_id;
+
+    if ($description == 'repoll') {
+        // No description provided, clear description
+        del_dev_attrib($port, 'ifName:' . $ifName); // "port" object has required device_id
+        log_event("$ifName Port ifAlias cleared via API", $device, 'interface', 3, $port_id);
+
+        return api_success_noresult(200, 'Port description cleared.');
+    } else {
+        // Prevent poller from overwriting new description
+        set_dev_attrib($port, 'ifName:' . $ifName, 1); // see above
+        log_event("$ifName Port ifAlias set via API: $description", $device, 'interface', 3, $port_id);
+
+        return api_success_noresult(200, 'Port description updated.');
+    }
+}
+
+function get_port_description(Illuminate\Http\Request $request)
+{
+    $port_id = $request->route('portid');
+    $port = Port::hasAccess(Auth::user())
+        ->where([
+            'port_id' => $port_id,
+        ])->first();
+    if (empty($port)) {
+        return api_error(400, 'Invalid port ID.');
+    } else {
+        return api_success($port->ifAlias, 'port_description');
+    }
+}
+
 /**
  * @throws \LibreNMS\Exceptions\ApiException
  */
@@ -1158,17 +1244,10 @@ function get_all_ports(Illuminate\Http\Request $request): JsonResponse
 function get_port_stack(Illuminate\Http\Request $request)
 {
     $hostname = $request->route('hostname');
-    // use hostname as device_id if it's all digits
-    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $device = DeviceCache::get($hostname);
 
-    return check_device_permission($device_id, function ($device_id) use ($request) {
-        if ($request->get('valid_mappings')) {
-            $mappings = dbFetchRows("SELECT * FROM `ports_stack` WHERE (`device_id` = ? AND `ifStackStatus` = 'active' AND (`port_id_high` != '0' AND `port_id_low` != '0')) ORDER BY `port_id_high`", [$device_id]);
-        } else {
-            $mappings = dbFetchRows("SELECT * FROM `ports_stack` WHERE `device_id` = ? AND `ifStackStatus` = 'active' ORDER BY `port_id_high`", [$device_id]);
-        }
-
-        return api_success($mappings, 'mappings');
+    return check_device_permission($device->device_id, function () use ($device) {
+        return api_success($device->portsStack, 'mappings');
     });
 }
 
@@ -2177,6 +2256,162 @@ function add_device_group(Illuminate\Http\Request $request)
     return api_success($deviceGroup->id, 'id', 'Device group ' . $deviceGroup->name . ' created', 201);
 }
 
+function update_device_group(Illuminate\Http\Request $request)
+{
+    $data = json_decode($request->getContent(), true);
+    if (json_last_error() || ! is_array($data)) {
+        return api_error(400, "We couldn't parse the provided json. " . json_last_error_msg());
+    }
+
+    $name = $request->route('name');
+    if (! $name) {
+        return api_error(400, 'No device group name provided');
+    }
+
+    $deviceGroup = ctype_digit($name) ? DeviceGroup::find($name) : DeviceGroup::where('name', $name)->first();
+
+    if (! $deviceGroup) {
+        return api_error(404, "Device group $name not found");
+    }
+
+    $rules = [
+        'name' => 'sometimes|string|unique:device_groups',
+        'desc' => 'sometimes|string',
+        'type' => 'sometimes|in:dynamic,static',
+        'devices' => 'array|required_if:type,static',
+        'devices.*' => 'integer',
+        'rules' => 'json|required_if:type,dynamic',
+    ];
+
+    $v = Validator::make($data, $rules);
+    if ($v->fails()) {
+        return api_error(422, $v->messages());
+    }
+
+    if (! empty($data['rules'])) {
+        // Only use the rules if they are able to be parsed by the QueryBuilder
+        $query = QueryBuilderParser::fromJson($data['rules'])->toSql();
+        if (empty($query)) {
+            return api_error(500, "We couldn't parse your rule");
+        }
+    }
+
+    $validatedData = $v->safe()->only(['name', 'desc', 'type']);
+    $deviceGroup->fill($validatedData);
+
+    if ($deviceGroup->type == 'static' && array_key_exists('devices', $data)) {
+        $deviceGroup->devices()->sync($data['devices']);
+    }
+
+    if ($deviceGroup->type == 'dynamic' && ! empty($data['rules'])) {
+        $deviceGroup->rules = json_decode($data['rules']);
+    }
+
+    try {
+        $deviceGroup->save();
+    } catch (\Illuminate\Database\QueryException $e) {
+        return api_error(500, 'Failed to save changes device group');
+    }
+
+    return api_success_noresult(200, "Device group $name updated");
+}
+
+function delete_device_group(Illuminate\Http\Request $request)
+{
+    $name = $request->route('name');
+    if (! $name) {
+        return api_error(400, 'No device group name provided');
+    }
+
+    $deviceGroup = ctype_digit($name) ? DeviceGroup::find($name) : DeviceGroup::where('name', $name)->first();
+
+    if (! $deviceGroup) {
+        return api_error(404, "Device group $name not found");
+    }
+
+    $deleted = $deviceGroup->delete();
+
+    if (! $deleted) {
+        return api_error(500, "Device group $name could not be removed");
+    }
+
+    return api_success_noresult(200, "Device group $name deleted");
+}
+
+function update_device_group_add_devices(Illuminate\Http\Request $request)
+{
+    $data = json_decode($request->getContent(), true);
+    if (json_last_error() || ! is_array($data)) {
+        return api_error(400, "We couldn't parse the provided json. " . json_last_error_msg());
+    }
+
+    $name = $request->route('name');
+    if (! $name) {
+        return api_error(400, 'No device group name provided');
+    }
+
+    $deviceGroup = ctype_digit($name) ? DeviceGroup::find($name) : DeviceGroup::where('name', $name)->first();
+
+    if (! $deviceGroup) {
+        return api_error(404, "Device group $name not found");
+    }
+
+    if ('static' != $deviceGroup->type) {
+        return api_error(422, 'Only static device group can have devices added');
+    }
+
+    $rules = [
+        'devices' => 'array',
+        'devices.*' => 'integer',
+    ];
+
+    $v = Validator::make($data, $rules);
+    if ($v->fails()) {
+        return api_error(422, $v->messages());
+    }
+
+    $deviceGroup->devices()->syncWithoutDetaching($data['devices']);
+
+    return api_success_noresult(200, 'Devices added');
+}
+
+function update_device_group_remove_devices(Illuminate\Http\Request $request)
+{
+    $data = json_decode($request->getContent(), true);
+    if (json_last_error() || ! is_array($data)) {
+        return api_error(400, "We couldn't parse the provided json. " . json_last_error_msg());
+    }
+
+    $name = $request->route('name');
+    if (! $name) {
+        return api_error(400, 'No device group name provided');
+    }
+
+    $deviceGroup = ctype_digit($name) ? DeviceGroup::find($name) : DeviceGroup::where('name', $name)->first();
+
+    if (! $deviceGroup) {
+        return api_error(404, "Device group $name not found");
+    }
+
+    if ('static' != $deviceGroup->type) {
+        return api_error(422, 'Only static device group can have devices added');
+    }
+
+    $rules = [
+        'devices' => 'array',
+        'devices.*' => 'integer',
+    ];
+
+    $v = Validator::make($data, $rules);
+    if ($v->fails()) {
+        return api_error(422, $v->messages());
+    }
+
+    $deviceGroup->devices()->detach($data['devices']);
+
+    return api_success_noresult(200, 'Devices removed');
+}
+
 function get_device_groups(Illuminate\Http\Request $request)
 {
     $hostname = $request->route('hostname');
@@ -2563,28 +2798,24 @@ function list_arp(Illuminate\Http\Request $request)
 
     if (empty($query)) {
         return api_error(400, 'No valid IP/MAC provided');
-    } elseif ($query === 'all' && empty($hostname)) {
-        return api_error(400, 'Device argument is required when requesting all entries');
     }
 
     if ($query === 'all') {
-        $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
-        $arp = dbFetchRows('SELECT `ipv4_mac`.* FROM `ipv4_mac` LEFT JOIN `ports` ON `ipv4_mac`.`port_id` = `ports`.`port_id` WHERE `ports`.`device_id` = ?', [$device_id]);
+        $arp = $request->has('device')
+            ? \DeviceCache::get($hostname)->macs
+            : Ipv4Mac::all();
     } elseif ($cidr) {
         try {
             $ip = new IPv4("$query/$cidr");
-            $arp = dbFetchRows(
-                'SELECT * FROM `ipv4_mac` WHERE (inet_aton(`ipv4_address`) & ?) = ?',
-                [ip2long($ip->getNetmask()), ip2long($ip->getNetworkAddress())]
-            );
+            $arp = Ipv4Mac::whereRaw('(inet_aton(`ipv4_address`) & ?) = ?', [ip2long($ip->getNetmask()), ip2long($ip->getNetworkAddress())])->get();
         } catch (InvalidIpException $e) {
             return api_error(400, 'Invalid Network Address');
         }
     } elseif (filter_var($query, FILTER_VALIDATE_MAC)) {
         $mac = Mac::parse($query)->hex();
-        $arp = dbFetchRows('SELECT * FROM `ipv4_mac` WHERE `mac_address`=?', [$mac]);
+        $arp = Ipv4Mac::where('mac_address', $mac)->get();
     } else {
-        $arp = dbFetchRows('SELECT * FROM `ipv4_mac` WHERE `ipv4_address`=?', [$query]);
+        $arp = Ipv4Mac::where('ipv4_address', $query)->get();
     }
 
     return api_success($arp, 'arp');
@@ -2966,7 +3197,7 @@ function del_location(Illuminate\Http\Request $request)
         'location_id' => 0,
     ];
     dbUpdate($data, 'devices', '`location_id` = ?', [$location_id]);
-    $result = dbDelete('locations', '`location` = ? ', [$location]);
+    $result = dbDelete('locations', '`id` = ? ', [$location_id]);
     if ($result == 1) {
         return api_success_noresult(201, "Location $location has been deleted successfully");
     }

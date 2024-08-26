@@ -1,0 +1,173 @@
+          TRAP-MIB DEFINITIONS ::= BEGIN
+
+          IMPORTS
+			    TRAP-TYPE
+                          FROM RFC-1215
+            devicePortIndex,  deviceLinkIndex, 
+            deviceLinkName, deviceLinkAlarm,  agtPortIndex, 
+            agtSWVersion, agtConnectedDevice
+                          FROM ULAF2-MIB
+                          
+            cmrwLocalTokenTicket, extendedTrapsType
+                          FROM ULAFPLUS-MIB;
+
+--------------------------------------------------------------------------------
+lineLinkDown TRAP-TYPE
+  ENTERPRISE devicePortIndex
+  VARIABLES   { devicePortIndex,  deviceLinkIndex }
+  DESCRIPTION
+    "LineLinkDown
+    
+    This trap reports that a line card has been removed from a rack
+    or a desktop line has been disconnected"
+  ::= 10
+
+lineLinkUp TRAP-TYPE
+  ENTERPRISE devicePortIndex
+  VARIABLES   { devicePortIndex,  deviceLinkIndex, deviceLinkName, deviceLinkAlarm }
+  DESCRIPTION
+    "LineLinkUp
+    
+    This trap reports that a line card has been inserted into the rack
+    or that a desktop line has been discovered"
+  ::= 11
+
+deviceLinkDown TRAP-TYPE
+  ENTERPRISE agtPortIndex
+  VARIABLES   { agtPortIndex }
+  DESCRIPTION
+    "DeviceLinkDown
+    
+    This trap reports that a rack or a desktop device has been disconnected
+    from a proxy agent (not applicable to OMI SNMP)"
+  ::= 12
+
+deviceLinkUp TRAP-TYPE
+  ENTERPRISE agtPortIndex
+  VARIABLES   { agtPortIndex, agtConnectedDevice }
+  DESCRIPTION
+    "DeviceLinkUp
+    
+    This trap reports that a rack or a desktop device has been connected
+    to a proxy agent (not applicable to OMI SNMP)"
+  ::= 13
+
+warmStart TRAP-TYPE
+  ENTERPRISE agtSWVersion
+  VARIABLES   { agtSWVersion }
+  DESCRIPTION
+    "WarmStart
+    
+    This trap reports that a proxy agent or OMI SNMP has started"
+  ::= 17
+
+urgentAlarm TRAP-TYPE
+  ENTERPRISE devicePortIndex
+  VARIABLES   { devicePortIndex,  deviceLinkIndex, deviceLinkAlarm }
+  DESCRIPTION
+    "UrgentAlarm
+    
+    This trap reports that an alarm state on a line has changed and
+    that line's current alarm summary is 'Urgent'"
+  ::= 18
+
+nonUrgentAlarm TRAP-TYPE
+  ENTERPRISE devicePortIndex
+  VARIABLES   { devicePortIndex,  deviceLinkIndex, deviceLinkAlarm }
+  DESCRIPTION
+    "NonUrgentAlarm
+    
+    This trap reports that an alarm state on a line has changed and
+    that line's current alarm summary is 'Non-urgent'"
+  ::= 19
+
+noAlarm TRAP-TYPE
+  ENTERPRISE devicePortIndex
+  VARIABLES   { devicePortIndex,  deviceLinkIndex, deviceLinkAlarm }
+  DESCRIPTION
+    "NoAlarm
+    
+    This trap reports that an alarm state on a line has changed and
+    that line's current alarm summary is 'No Alarm'"
+  ::= 22
+
+loopChange TRAP-TYPE
+  ENTERPRISE devicePortIndex
+  VARIABLES   { devicePortIndex,  deviceLinkIndex }
+  DESCRIPTION
+    "LoopChange
+    
+    This trap reports that either a 'loop command' or a 'loop state' has
+    changed on the line"
+  ::= 25
+
+accessChange TRAP-TYPE
+  ENTERPRISE devicePortIndex
+  VARIABLES   { devicePortIndex,  deviceLinkIndex, cmrwLocalTokenTicket }
+  DESCRIPTION
+    "AccessChange
+    
+    This trap reports that either the 'token possesion' has changed or
+    that the 'EOC state' has changed for the line"
+  ::= 26
+
+perform15min TRAP-TYPE
+  ENTERPRISE devicePortIndex
+  VARIABLES   { devicePortIndex,  deviceLinkIndex }
+  DESCRIPTION
+    "Perform15Min
+    
+    This trap reports that a 15 minute performance measurement interval
+    has been completed and new data is ready for retrieval"
+  ::= 27
+
+perform24h TRAP-TYPE
+  ENTERPRISE devicePortIndex
+  VARIABLES   { devicePortIndex,  deviceLinkIndex }
+  DESCRIPTION
+    "Perform24h
+    
+    This trap reports that a 24 hour performance measurement interval
+    has been completed and new data is ready for retrieval"
+  ::= 28
+
+rebootPlus TRAP-TYPE
+  ENTERPRISE devicePortIndex
+  VARIABLES   { devicePortIndex,  deviceLinkIndex }
+  DESCRIPTION
+    "RebootPlus
+    
+    This trap reports that either the LT or the NT of the line
+    has rebooted"
+  ::= 29
+
+berMeasurement TRAP-TYPE
+  ENTERPRISE devicePortIndex
+  VARIABLES   { devicePortIndex,  deviceLinkIndex }
+  DESCRIPTION
+    "BerMeasurement
+    
+    This trap reports that the state of the BER measurement for
+    the line has changed"
+  ::= 30
+
+flashErased TRAP-TYPE
+  ENTERPRISE devicePortIndex
+  VARIABLES   { devicePortIndex,  deviceLinkIndex }
+  DESCRIPTION
+    "FlashErased
+    
+    This trap reports that the flash has been erased (after starting download)"
+  ::= 31
+
+extendedTrap TRAP-TYPE
+  ENTERPRISE devicePortIndex
+  VARIABLES   { devicePortIndex,  deviceLinkIndex,  extendedTrapsType }
+  DESCRIPTION
+    "ExtendedTrap
+    
+    This trap reports that an 'extended' trap has been received from the
+    line. The exact cause for the extended trap is contained in the
+    extendedTrapsType variable binding."
+  ::= 32
+END

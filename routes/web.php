@@ -4,6 +4,10 @@ use App\Http\Controllers\AboutController;
 use App\Http\Controllers\AlertController;
 use App\Http\Controllers\AlertTransportController;
 use App\Http\Controllers\Auth\SocialiteController;
+use App\Http\Controllers\Maps\CustomMapBackgroundController;
+use App\Http\Controllers\Maps\CustomMapController;
+use App\Http\Controllers\Maps\CustomMapDataController;
+use App\Http\Controllers\Maps\DeviceDependencyController;
 use App\Http\Controllers\PushNotificationController;
 use App\Http\Controllers\ValidateController;
 use App\Http\Middleware\AuthenticateGraph;
@@ -77,9 +81,15 @@ Route::middleware(['auth'])->group(function () {
         ->name('device')->where('vars', '.*');
 
     // Maps
-    Route::prefix('maps')->namespace('Maps')->group(function () {
-        Route::get('devicedependency', 'DeviceDependencyController@dependencyMap');
+    Route::prefix('maps')->group(function () {
+        Route::resource('custom', CustomMapController::class, ['as' => 'maps'])
+            ->parameters(['custom' => 'map'])->except('create');
+        Route::get('custom/{map}/background', [CustomMapBackgroundController::class, 'get'])->name('maps.custom.background');
+        Route::post('custom/{map}/background', [CustomMapBackgroundController::class, 'save'])->name('maps.custom.background.save');
+        Route::get('custom/{map}/data', [CustomMapDataController::class, 'get'])->name('maps.custom.data');
+        Route::post('custom/{map}/data', [CustomMapDataController::class, 'save'])->name('maps.custom.data.save');
     });
+    Route::get('maps/devicedependency', [DeviceDependencyController::class, 'dependencyMap']);
 
     // dashboard
     Route::resource('dashboard', 'DashboardController')->except(['create', 'edit']);
@@ -161,6 +171,7 @@ Route::middleware(['auth'])->group(function () {
         Route::prefix('select')->namespace('Select')->group(function () {
             Route::get('application', 'ApplicationController')->name('ajax.select.application');
             Route::get('bill', 'BillController')->name('ajax.select.bill');
+            Route::get('custom-map-menu-group', 'CustomMapMenuGroupController')->name('ajax.select.custom-map-menu-group');
             Route::get('dashboard', 'DashboardController')->name('ajax.select.dashboard');
             Route::get('device', 'DeviceController')->name('ajax.select.device');
             Route::get('device-field', 'DeviceFieldController')->name('ajax.select.device-field');
@@ -226,7 +237,8 @@ Route::middleware(['auth'])->group(function () {
             Route::post('top-devices', 'TopDevicesController');
             Route::post('top-interfaces', 'TopInterfacesController');
             Route::post('top-errors', 'TopErrorsController');
-            Route::post('worldmap', 'WorldMapController');
+            Route::post('worldmap', 'WorldMapController')->name('widget.worldmap');
+            Route::get('worldmap', 'WorldMapController@getData')->name('widget.worldmap.data');
             Route::post('alertlog-stats', 'AlertlogStatsController');
         });
     });

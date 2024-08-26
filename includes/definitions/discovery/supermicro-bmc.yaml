@@ -1,0 +1,201 @@
+mib: ATEN-IPMI-MIB
+modules:
+    os:
+        hardware: ATEN-IPMI-MIB::productPartNumber.0
+        version:
+            - ATEN-IPMI-MIB::bmcMajorVesion.0
+            - ATEN-IPMI-MIB::bmcMinorVesion.0
+            - ATEN-IPMI-MIB::bmcBuildVesion.0
+        version_template: '{{ ATEN-IPMI-MIB::bmcMajorVesion.0 }}.{{ ATEN-IPMI-MIB::bmcMinorVesion.0 }}.{{ ATEN-IPMI-MIB::bmcBuildVesion.0 }}'
+        features: ATEN-IPMI-MIB::biosVesion.0
+        features_template: "Bios {{ ATEN-IPMI-MIB::biosVesion.0 }}"
+        serial: ATEN-IPMI-MIB::productSerialNumber.0
+    sensors:
+        temperature:
+            data:
+                -
+                    oid: temperature1
+                    value: temperature1
+                    num_oid: '.1.3.6.1.4.1.21317.1.14.2.1.9.{{ $index }}'
+                    descr: 'PSU {{ $index }} Temperature 1'
+                    index: 'temperature1.{{ $index }}'
+                -
+                    oid: temperature2
+                    value: temperature2
+                    num_oid: '.1.3.6.1.4.1.21317.1.14.2.1.10.{{ $index }}'
+                    descr: 'PSU {{ $index }} Temperature 2'
+                    index: 'temperature2.{{ $index }}'
+                -
+                    oid: sensorTable
+                    value: sensorReading
+                    num_oid: '.1.3.6.1.4.1.21317.1.3.1.2.{{ $index }}'
+                    descr: sensorIDString
+                    index: 'sensorReading.{{ $index }}'
+                    skip_values:
+                        -
+                            oid: sensorIDString
+                            op: 'not_contains'
+                            value: "Temp"
+                        -
+                            oid: lcThreshold
+                            op: '='
+                            value: 0
+                    low_warn_limit: lcThreshold
+                    warn_limit: ucThreshold
+                    low_limit: lnrThreshold
+                    high_limit: unrThreshold
+        fanspeed:
+            data:
+                -
+                    oid: fanRPM1
+                    value: fanRPM1
+                    num_oid: '.1.3.6.1.4.1.21317.1.14.2.1.11.{{ $index }}'
+                    descr: 'PSU {{ $index }} Fan 1'
+                    index: 'fanRPM1.{{ $index }}'
+                    skip_values: 0
+                -
+                    oid: fanRPM2
+                    value: fanRPM2
+                    num_oid: '.1.3.6.1.4.1.21317.1.14.2.1.12.{{ $index }}'
+                    descr: 'PSU {{ $index }} Fan 2'
+                    index: 'fanRPM2.{{ $index }}'
+                    skip_values: 0
+                -
+                    oid: sensorTable
+                    value: sensorReading
+                    num_oid: '.1.3.6.1.4.1.21317.1.3.1.2.{{ $index }}'
+                    descr: sensorIDString
+                    index: 'sensorReading.{{ $index }}'
+                    skip_values:
+                        -
+                            oid: sensorIDString
+                            op: 'not_contains'
+                            value: "FAN"
+                        -
+                            oid: lcThreshold
+                            op: '='
+                            value: 0
+                    low_warn_limit: lcThreshold
+                    warn_limit: ucThreshold
+                    low_limit: lnrThreshold
+                    high_limit: unrThreshold
+        voltage:
+            data:
+                -
+                    oid: inputVoltage
+                    value: inputVoltage
+                    num_oid: '.1.3.6.1.4.1.21317.1.14.2.1.3.{{ $index }}'
+                    descr: 'PSU {{ $index }} Input Voltage'
+                    index: 'inputVoltage.{{ $index }}'
+                -
+                    oid: sensorTable
+                    value: sensorReading
+                    num_oid: '.1.3.6.1.4.1.21317.1.3.1.2.{{ $index }}'
+                    descr: sensorIDString
+                    index: 'sensorReading.{{ $index }}'
+                    skip_values:
+                        -
+                            oid: sensorIDString
+                            op: 'not_contains'
+                            value: "V"
+                        -
+                            oid: sensorIDString
+                            op: 'contains'
+                            value: "Temp"
+                        -
+                            oid: sensorIDString
+                            op: 'in_array'
+                            value: ['VBAT']
+                    low_warn_limit: lcThreshold
+                    warn_limit: ucThreshold
+                    low_limit: lnrThreshold
+                    high_limit: unrThreshold
+        current:
+            data:
+                -
+                    oid: inputCurrent
+                    value: inputCurrent
+                    num_oid: '.1.3.6.1.4.1.21317.1.14.2.1.4.{{ $index }}'
+                    descr: 'PSU {{ $index }} Input Current'
+                    index: 'inputCurrent.{{ $index }}'
+        power:
+            data:
+                -
+                    oid: inputPower
+                    value: inputPower
+                    num_oid: '.1.3.6.1.4.1.21317.1.14.2.1.5.{{ $index }}'
+                    descr: 'PSU {{ $index }} Input Power'
+                    index: 'inputPower.{{ $index }}'
+        state:
+            data:
+                -
+                    oid: psuStatus
+                    value: psuStatus
+                    num_oid: '.1.3.6.1.4.1.21317.1.14.2.1.2.{{ $index }}'
+                    descr: 'PSU {{ $index }} Status'
+                    index: 'psuStatus.{{ $index }}'
+                    states:
+                        - { value: 0, descr: "Not Present",  graph: 1, generic: 2 }
+                        - { value: 1, descr: "Present: OK" , graph: 1, generic: 0  }
+                        - { value: 3, descr: "Present: Failed" , graph: 1, generic: 2  }
+                -
+                    oid: sensorTable
+                    value: sensorReading
+                    num_oid: '.1.3.6.1.4.1.21317.1.3.1.2.{{ $index }}'
+                    descr: sensorIDString
+                    index: 'sensorReading.{{ $index }}'
+                    skip_values:
+                        -
+                            oid: sensorIDString
+                            op: '!='
+                            value: "Chassis Intru"
+                    state_name: "Chassis Intru"
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "General Chassis Intrusion." , graph: 1, generic: 2  }
+                -
+                    oid: sensorTable
+                    value: sensorReading
+                    num_oid: '.1.3.6.1.4.1.21317.1.3.1.2.{{ $index }}'
+                    descr: sensorIDString
+                    index: 'sensorReading.{{ $index }}'
+                    skip_values:
+                        -
+                            oid: sensorIDString
+                            op: '!='
+                            value: "VBAT"
+                    state_name: "VBAT"
+                    states:
+                        - { value: 0, descr: "Not Present", graph: 1, generic: 2 }
+                        - { value: 2, descr: "Present: Failed", graph: 1, generic: 2 }
+                        - { value: 4, descr: "Present: OK" , graph: 1, generic: 0  }
+                -
+                    oid: sensorTable
+                    value: sensorReading
+                    num_oid: '.1.3.6.1.4.1.21317.1.3.1.2.{{ $index }}'
+                    descr: sensorIDString
+                    index: sensorTableSensorNr.{{ $index }}
+                    state_name: smSensorState
+                    skip_values:
+                        -
+                            oid: sensorIDString
+                            op: 'not_contains'
+                            value: 'Status'
+                        -   
+                            oid: sensorIDString
+                            op: 'regex'
+                            value: "/^PS. Status/"
+                    states:
+                        - { descr: On, graph: 1, value: 1, generic: 0 }
+                        - { descr: Off, graph: 1, value: 0, generic: 2 }
+                -
+                    oid: powerStatus
+                    value: powerStatus
+                    num_oid: '.1.3.6.1.4.1.21317.1.4.{{ $index }}'
+                    descr: 'Power Status {{ $index }}'
+                    index: powerStatusSensorNr.{{ $index }}
+                    state_name: smPowerState
+                    states:
+                        - { descr: On, graph: 1, value: 1, generic: 0 }
+                        - { descr: Off, graph: 1, value: 0, generic: 2 }
+                        - { descr: Reset, graph: 1, value: 2, generic: 1 }

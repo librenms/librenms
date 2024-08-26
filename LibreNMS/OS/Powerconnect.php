@@ -25,14 +25,18 @@
 
 namespace LibreNMS\OS;
 
+use App\Models\PortsNac;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use LibreNMS\Device\Processor;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
+use LibreNMS\Interfaces\Polling\NacPolling;
 use LibreNMS\Interfaces\Polling\ProcessorPolling;
 use LibreNMS\OS;
 use LibreNMS\OS\Traits\VxworksProcessorUsage;
+use SnmpQuery;
 
-class Powerconnect extends OS implements ProcessorDiscovery, ProcessorPolling
+class Powerconnect extends OS implements ProcessorDiscovery, ProcessorPolling, NacPolling
 {
     // pull in VxWorks processor parsing, but allow us to extend it
     use VxworksProcessorUsage {
@@ -111,5 +115,86 @@ class Powerconnect extends OS implements ProcessorDiscovery, ProcessorPolling
         }
 
         return $data;
+    }
+
+    private static function decode_string(string $s): string
+    {
+        $s = str_replace("\n", ' ', $s);
+        $characters = explode(' ', $s);
+
+        $res = '';
+        foreach ($characters as $char) {
+            if (trim($char) === '') {
+                continue;
+            }
+
+            if ($char === '00') {
+                break;
+            }
+            $res .= chr(hexdec($char));
+        }
+
+        return $res;
+    }
+
+    public function pollNac()
+    {
+        $nac = new Collection();
+
+        $authMgrEnabled = SnmpQuery::mibs(['DNOS-AUTHENTICATION-MANAGER-MIB'])->mibDir('dell')->hideMib()->enumStrings()->get('agentAuthMgrAdminMode.0')->value();
+        if ($authMgrEnabled !== 'enable') {
+            d_echo('AuthMgr not enabled.');
+
+            return $nac;
+        }
+
+        $table = SnmpQuery::mibs(['DNOS-AUTHENTICATION-MANAGER-MIB'])->mibDir('dell')->hideMib()->enumStrings()->walk('agentAuthMgrClientStatusTable')->table(2);
+        if (count($table) === 0) {
+            d_echo('Client status table is empty, not processing NAC entries.');
+
+            return $nac;
+        }
+
+        $hostmode = SnmpQuery::mibs(['DNOS-AUTHENTICATION-MANAGER-MIB'])->mibDir('dell')->hideMib()->enumStrings()->walk('agentAuthMgrPortHostMode')->valuesByIndex();
+        foreach ($table as &$row) {
+            if ($row['agentAuthMgrClientAuthState'] === 'success') {
+                $row['agentAuthMgrClientAuthState'] = 'authcSuccess';
+            } elseif ($row['agentAuthMgrClientAuthState'] === 'failed') {
+                $row['agentAuthMgrClientAuthState'] = 'authcFailed';
+            }
+
+            $row['agentAuthMgrClientAuthstatus'] = match ($row['agentAuthMgrClientAuthstatus']) {
+                'authorized' => 'authorizationSuccess',
+                'unauthorized' => 'authorizationFailed',
+                default => $row['agentAuthMgrClientAuthstatus']
+            };
+
+            $row['agentAuthMgrPortHostMode'] = $hostmode[$row['agentAuthMgrInterface']]['agentAuthMgrPortHostMode'] ?? '';
+        }
+
+        $ifIndex_map = $this->getDevice()->ports()->pluck('port_id', 'ifIndex');
+
+        foreach ($table as $authIndex => $data) {
+            $mac_address = $data['agentAuthMgrClientMacAddress'];
+
+            $nac->put($mac_address, new PortsNac([
+                'port_id' => $ifIndex_map->get($data['agentAuthMgrInterface'], 0),
+                'mac_address' => $mac_address,
+                'auth_id' => $authIndex,
+                'domain' => '',
+                'username' => self::decode_string($data['agentAuthMgrClientUserName']),
+                'ip_address' => '',
+                'host_mode' => $data['agentAuthMgrPortHostMode'],
+                'authz_status' => $data['agentAuthMgrClientAuthstatus'],
+                'authz_by' => $data['agentAuthMgrClientAuthVlanAssignedReason'] ?? 'unknown',
+                'timeout' => $data['agentAuthMgrClientSessionTimeout'],
+                'vlan' => $data['agentAuthMgrClientVlanAssigned'] ?? 'unknown',
+                'authc_status' => $data['agentAuthMgrClientAuthState'],
+                'method' => $data['agentAuthMgrClientAuthMethod'] ?? '',
+                'time_elapsed' => $data['agentAuthMgrClientSessionTime'],
+            ]));
+        }
+
+        return $nac;
     }
 }

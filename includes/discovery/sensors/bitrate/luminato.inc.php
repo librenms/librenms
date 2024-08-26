@@ -41,11 +41,19 @@ if (is_array($pre_cache['transfer'])) {
             unset($defrate);
             $mnr = $pre_cache['transfer'][$key]['ifExtModule']; //module nr
             $mname = $pre_cache['entPhysicalDescr'][$mnr]['entPhysicalDescr']; //module name
-            if ($mname == 'LQM-C' || $mname == 'LDM-C') { //QAM module
-                $defrate = 50; //default bitrate for QAM module
-            }
-            if ($mname == 'LAS-D') { //AsiOut module
-                $defrate = 60; //default bitrate for AsiOut module
+            switch ($mname) {
+                case 'LAS-D':		// AsiOut
+                case 'LRT-C':		// DVB-T/T2
+                case 'LCM-B':		// DVB-T
+                case 'LRS-D':		// DVB-S2
+                case 'LCM-B':		// DVB-T
+                    $defrate = 60;
+                    break;
+                case 'LQM-C':		// QAM module
+                case 'LDM-C':		// QAM module
+                default:
+                    $defrate = 50;
+                    break;
             }
             if (isset($defrate)) {
                 $type = 'Transfer_' . $mname;

@@ -17,7 +17,7 @@
                         <i class="fa fa-plus"></i> {{ __('New Service Template') }}
                     </a>
                     <button type="button" title="{{ __('Apply Service Templates') }}" class="btn btn-success" aria-label="{{ __('Apply Service Templates') }}"
-                            onclick="applyAll_st(this, '{{ route('services.templates.applyAll') }}')">
+                            onclick="applyAll_st(this)">
                         <i
                             class="fa fa-refresh" aria-hidden="true"></i> {{ __('Apply Service Templates') }}</button>
                 </div>
@@ -49,18 +49,32 @@
                             <td>{{ __(ucfirst($template->type)) }}</td>
                             <td>{{ $template->type == 'dynamic' ? $template->getDeviceParser()->toSql(false) : '' }}</td>
                             <td>
-                                <button type="button" title="{{ __('Apply Services for this Service Template') }}" class="btn btn-success btn-sm" aria-label="{{ __('Apply') }}"
-                                    onclick="apply_st(this, '{{ $template->name }}', '{{ $template->id }}', '{{ route('services.templates.apply', $template->id) }}')">
-                                    <i class="fa fa-refresh" aria-hidden="true"></i></button>
-                                <button type="button" title="{{ __('Remove Services for this Service Template') }}" class="btn btn-warning btn-sm" aria-label="{{ __('Remove') }}"
-                                    onclick="remove_st(this, '{{ $template->name }}', '{{ $template->id }}', '{{ route('services.templates.remove', $template->id) }}')">
-                                    <i class="fa fa-ban" aria-hidden="true"></i></button>
-                                <a type="button" title="{{ __('Edit Service Template') }}" class="btn btn-primary btn-sm" aria-label="{{ __('Edit') }}"
-                                    href="{{ route('services.templates.edit', $template->id) }}">
-                                    <i class="fa fa-pencil" aria-hidden="true"></i></a>
-                                <button type="button" class="btn btn-danger btn-sm" title="{{ __('Delete Service Template') }}" aria-label="{{ __('Delete') }}"
-                                    onclick="delete_st(this, '{{ $template->name }}', '{{ $template->id }}', '{{ route('services.templates.destroy', $template->id) }}')">
-                                    <i class="fa fa-trash" aria-hidden="true"></i></button>
+                                <button type="button" title="{{ __('Apply Services for this Service Template') }}"
+                                        class="btn btn-success btn-sm" aria-label="{{ __('Apply') }}"
+                                        data-template-name="{{ $template->name }}"
+                                        data-template-id="{{ $template->id }}"
+                                        onclick="apply_st(this)">
+                                    <i class="fa fa-refresh" aria-hidden="true"></i>
+                                </button>
+                                <button type="button" title="{{ __('Remove Services for this Service Template') }}"
+                                        class="btn btn-warning btn-sm" aria-label="{{ __('Remove') }}"
+                                        data-template-name="{{ $template->name }}"
+                                        data-template-id="{{ $template->id }}"
+                                        onclick="remove_st(this)">
+                                    <i class="fa fa-ban" aria-hidden="true"></i>
+                                </button>
+                                <a type="button" title="{{ __('Edit Service Template') }}"
+                                   class="btn btn-primary btn-sm" aria-label="{{ __('Edit') }}"
+                                   href="{{ route('services.templates.edit', $template->id) }}">
+                                    <i class="fa fa-pencil" aria-hidden="true"></i>
+                                </a>
+                                <button type="button" class="btn btn-danger btn-sm"
+                                        title="{{ __('Delete Service Template') }}" aria-label="{{ __('Delete') }}"
+                                        data-template-name="{{ $template->name }}"
+                                        data-template-id="{{ $template->id }}"
+                                        onclick="delete_st(this)">
+                                    <i class="fa fa-trash" aria-hidden="true"></i>
+                                </button>
                             </td>
                         </tr>
                     @endforeach
@@ -151,7 +165,11 @@
 
 @section('scripts')
     <script>
-        function apply_st(button, name, id, url) {
+        function apply_st(button) {
+            var id = button.dataset.templateId;
+            var name = button.dataset.templateName;
+            var url = "{{ route('services.templates.apply', ':template-id') }}".replace(':template-id', id);
+
             if (confirm('{{ __('Are you sure you want to create Services for ') }}' + name + '?')) {
                 $.ajax({
                     url: url,
@@ -165,7 +183,9 @@
                 });
             }
         }
-        function applyAll_st(button, url) {
+        function applyAll_st(button) {
+            var url = "{{ route('services.templates.applyAll') }}";
+
             if (confirm('{{ __('Are you sure you want to Apply All Service Templates?') }}')) {
                 $.ajax({
                     url: url,
@@ -179,7 +199,11 @@
                 });
             }
         }
-        function remove_st(button, name, id, url) {
+        function remove_st(button) {
+            var id = button.dataset.templateId;
+            var name = button.dataset.templateName;
+            var url = "{{ route('services.templates.remove', ':template-id') }}".replace(':template-id', id);
+
             if (confirm('{{ __('Are you sure you want to remove all Services created by ') }}' + name + '?')) {
                 $.ajax({
                     url: url,
@@ -195,8 +219,12 @@
 
             return false;
         }
-        function delete_st(button, name, id, url) {
+        function delete_st(button) {
             var index = button.parentNode.parentNode.rowIndex;
+            var id = button.dataset.templateId;
+            var name = button.dataset.templateName;
+            var url = "{{ route('services.templates.destroy', ':template-id') }}".replace(':template-id', id);
+
             if (confirm('{{ __('Are you sure you want to delete AND remove all Services created by ') }}' + name + '?')) {
                 $.ajax({
                     url: url,

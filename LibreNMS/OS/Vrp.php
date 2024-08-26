@@ -27,6 +27,7 @@ namespace LibreNMS\OS;
 
 use App\Models\AccessPoint;
 use App\Models\Device;
+use App\Models\EntPhysical;
 use App\Models\Mempool;
 use App\Models\PortsNac;
 use App\Models\Sla;
@@ -34,6 +35,7 @@ use App\Observers\ModuleModelObserver;
 use Carbon\Carbon;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use LibreNMS\DB\SyncsModels;
 use LibreNMS\Device\Processor;
@@ -49,6 +51,7 @@ use LibreNMS\Interfaces\Polling\NacPolling;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\Interfaces\Polling\SlaPolling;
 use LibreNMS\OS;
+use LibreNMS\OS\Traits\EntityMib;
 use LibreNMS\RRD\RrdDefinition;
 
 class Vrp extends OS implements
@@ -63,6 +66,35 @@ class Vrp extends OS implements
     OSDiscovery
 {
     use SyncsModels;
+    use EntityMib {
+        EntityMib::discoverEntityPhysical as discoverBaseEntityPhysical;
+    }
+
+    public function discoverEntityPhysical(): Collection
+    {
+        // normal ENTITY-MIB collection
+        $inventory = $this->discoverBaseEntityPhysical();
+
+        // add additional data from Huawei MIBs
+        $extra = \SnmpQuery::walk([
+            'HUAWEI-ENTITY-EXTENT-MIB::hwEntityBoardType',
+            'HUAWEI-ENTITY-EXTENT-MIB::hwEntityBomEnDesc',
+        ])->table(1);
+
+        $inventory->each(function (EntPhysical $entry) use ($extra) {
+            if (isset($entry->entPhysicalIndex)) {
+                if (! empty($extra[$entry->entPhysicalIndex]['HUAWEI-ENTITY-EXTENT-MIB::hwEntityBomEnDesc'])) {
+                    $entry->entPhysicalDescr = $extra[$entry->entPhysicalIndex]['HUAWEI-ENTITY-EXTENT-MIB::hwEntityBomEnDesc'];
+                }
+
+                if (! empty($extra[$entry->entPhysicalIndex]['HUAWEI-ENTITY-EXTENT-MIB::hwEntityBoardType'])) {
+                    $entry->entPhysicalModelName = $extra[$entry->entPhysicalIndex]['HUAWEI-ENTITY-EXTENT-MIB::hwEntityBoardType'];
+                }
+            }
+        });
+
+        return $inventory;
+    }
 
     public function discoverMempools()
     {
@@ -181,8 +213,14 @@ class Vrp extends OS implements
                     $txpow = $radio['hwWlanRadioActualEIRP'] ?? 0;
                     $interference = $radio['hwWlanRadioChInterferenceRate'] ?? 0;
                     $radioutil = $radio['hwWlanRadioChUtilizationRate'] ?? 0;
+                    $radioutil = ($radioutil > 100 || $radioutil < 0) ? -1 : $radioutil;
                     $numasoclients = $clientPerRadio[$ap_id][$r_id] ?? 0;
                     $radio['hwWlanRadioType'] = $radio['hwWlanRadioType'] ?? 0;
+
+                    if ($txpow > 127) {
+                        // means the radio is disabled for some reason.
+                        $txpow = 0;
+                    }
 
                     $type = 'dot11';
 
@@ -349,6 +387,9 @@ class Vrp extends OS implements
 
             // update the DB
             foreach ($portAuthSessionEntry as $authId => $portAuthSessionEntryParameters) {
+                if (! array_key_exists('hwAccessInterface', $portAuthSessionEntryParameters) || ! array_key_exists('hwAccessMACAddress', $portAuthSessionEntryParameters)) {
+                    continue;
+                }
                 $mac_address = strtolower(implode(array_map('zeropad', explode(':', $portAuthSessionEntryParameters['hwAccessMACAddress']))));
                 $port_id = $ifName_map->get($portAuthSessionEntryParameters['hwAccessInterface'], 0);
                 if ($port_id <= 0) {
@@ -524,7 +565,7 @@ class Vrp extends OS implements
 
             $sla->rtt = ($data[$owner][$test]['pingResultsAverageRtt'] ?? 0) / $divisor;
             $time = Carbon::parse($data[$owner][$test]['pingResultsLastGoodProbe'] ?? null)->toDateTimeString();
-            echo 'SLA : ' . $rtt_type . ' ' . $owner . ' ' . $test . '... ' . $sla->rtt . 'ms at ' . $time . "\n";
+            Log::info('SLA : ' . $rtt_type . ' ' . $owner . ' ' . $test . '... ' . $sla->rtt . 'ms at ' . $time);
 
             $collected = ['rtt' => $sla->rtt];
 

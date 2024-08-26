@@ -910,7 +910,6 @@
                 "sonet",
                 "atmSubInterface",
                 "aal5",
-                "shdsl",
                 "mpls"
             ]
         },
@@ -964,6 +963,210 @@
             "default": [""],
             "type": "array"
         },
+        "custom_map.background_type": {
+            "default": "none",
+            "type": "select",
+            "group": "webui",
+            "section": "custom-map",
+            "order": 98,
+            "options": {
+                "color": "Color",
+                "map": "Map",
+                "none": "None"
+            }
+        },
+        "custom_map.background_data.color": {
+            "default": "#badaee",
+            "type": "color",
+            "group": "webui",
+            "section": "custom-map",
+            "order": 100,
+            "options": {
+                "Streets":  "Streets",
+                "Sattelite": "Sattelite",
+                "Topography":  "Topography"
+            },
+            "when": {
+                "setting": "custom_map.background_type",
+                "operator": "equals",
+                "value": "color"
+            }
+        },
+        "custom_map.background_data.lat": {
+            "default": 40,
+            "type": "float",
+            "group": "webui",
+            "section": "custom-map",
+            "order": 101,
+            "when": {
+                "setting": "custom_map.background_type",
+                "operator": "equals",
+                "value": "map"
+            }
+        },
+        "custom_map.background_data.layer": {
+            "default": null,
+            "type": "select",
+            "group": "webui",
+            "section": "custom-map",
+            "order": 104,
+            "options": {
+                "Streets":  "Streets",
+                "Sattelite": "Sattelite",
+                "Topography":  "Topography"
+            },
+            "when": {
+                "setting": "custom_map.background_type",
+                "operator": "equals",
+                "value": "map"
+            }
+        },
+        "custom_map.background_data.lng": {
+            "default": -20,
+            "type": "float",
+            "group": "webui",
+            "section": "custom-map",
+            "order": 102,
+            "when": {
+                "setting": "custom_map.background_type",
+                "operator": "equals",
+                "value": "map"
+            }
+        },
+        "custom_map.background_data.zoom": {
+            "default": 3,
+            "type": "integer",
+            "group": "webui",
+            "section": "custom-map",
+            "order": 103,
+            "when": {
+                "setting": "custom_map.background_type",
+                "operator": "equals",
+                "value": "map"
+            }
+        },
+        "custom_map.edge_font_color": {
+            "default": "#343434",
+            "type": "color",
+            "group": "webui",
+            "section": "custom-map",
+            "order": 53
+        },
+        "custom_map.edge_font_face": {
+            "default": "arial",
+            "type": "text",
+            "group": "webui",
+            "section": "custom-map",
+            "order": 51
+        },
+        "custom_map.edge_font_size": {
+            "default": 12,
+            "type": "integer",
+            "group": "webui",
+            "section": "custom-map",
+            "order": 52
+        },
+        "custom_map.edge_seperation": {
+            "default": 10,
+            "type": "integer",
+            "group": "webui",
+            "section": "custom-map",
+            "order": 22
+        },
+        "custom_map.height": {
+            "default": "1800px",
+            "type": "text",
+            "group": "webui",
+            "section": "custom-map",
+            "order": 2
+        },
+        "custom_map.node_align": {
+            "default": 10,
+            "type": "integer",
+            "group": "webui",
+            "section": "custom-map",
+            "order": 21
+        },
+        "custom_map.node_background": {
+            "default": "#D2E5FF",
+            "type": "color",
+            "group": "webui",
+            "section": "custom-map",
+            "order": 41
+        },
+        "custom_map.node_border": {
+            "default": "#2B7CE9",
+            "type": "color",
+            "group": "webui",
+            "section": "custom-map",
+            "order": 42
+        },
+        "custom_map.node_font_color": {
+            "default": "#343434",
+            "type": "color",
+            "group": "webui",
+            "section": "custom-map",
+            "order": 45
+        },
+        "custom_map.node_font_face": {
+            "default": "arial",
+            "type": "text",
+            "group": "webui",
+            "section": "custom-map",
+            "order": 43
+        },
+        "custom_map.node_font_size": {
+            "default": 14,
+            "type": "integer",
+            "group": "webui",
+            "section": "custom-map",
+            "order": 44
+        },
+        "custom_map.node_size": {
+            "default": 25,
+            "type": "integer",
+            "group": "webui",
+            "section": "custom-map",
+            "order": 40
+        },
+        "custom_map.node_type": {
+            "default": "box",
+            "type": "select",
+            "group": "webui",
+            "section": "custom-map",
+            "order": 39,
+            "options": {
+                "box": "Box",
+                "circle": "Circle",
+                "database": "Database",
+                "ellipse": "Ellipse",
+                "text": "Text",
+                "device_image": "Device Image",
+                "device_image_circle": "Device Image (Circular)",
+                "diamond": "Diamond",
+                "dot": "Dot",
+                "star": "Star",
+                "triangle": "Triangle",
+                "triangle_inverted": "Triangle Inverted",
+                "hexagon": "Hexagon",
+                "square": "Square",
+                "icon": "Icon"
+            }
+        },
+        "custom_map.reverse_arrows": {
+            "default": false,
+            "type": "boolean",
+            "group": "webui",
+            "section": "custom-map",
+            "order": 23
+        },
+        "custom_map.width": {
+            "default": "800px",
+            "type": "text",
+            "group": "webui",
+            "section": "custom-map",
+            "order": 1
+        },
         "customers_descr": {
             "default": ["cust"],
             "type": "array",
@@ -998,10 +1201,6 @@
         "dateformat.time": {
             "default": "H:i:s",
             "type": "text"
-        },
-        "debug.run_trace": {
-            "default": false,
-            "type": "boolean"
         },
         "default_port_group": {
             "default": 0,
@@ -1045,14 +1244,6 @@
                 "{{ $sysName }}":  "sysName",
                 "{{ $ip }}":  "ip"
             }
-        },
-        "device_perf_purge": {
-            "default": 7,
-            "units": "days",
-            "group": "system",
-            "section": "cleanup",
-            "order": 7,
-            "type": "integer"
         },
         "device_traffic_descr": {
             "default": [
@@ -1732,10 +1923,6 @@
             "default": false,
             "type": "boolean"
         },
-        "enable_port_relationship": {
-            "default": true,
-            "type": "boolean"
-        },
         "enable_ports_adsl": {
             "default": true,
             "type": "boolean"
@@ -1745,10 +1932,6 @@
             "type": "boolean"
         },
         "enable_ports_junoseatmvp": {
-            "default": false,
-            "type": "boolean"
-        },
-        "enable_ports_poe": {
             "default": false,
             "type": "boolean"
         },
@@ -1848,7 +2031,8 @@
                 "value": [
                     "google",
                     "mapquest",
-                    "bing"
+                    "bing",
+                    "esri"
                 ]
             }
         },
@@ -1869,7 +2053,8 @@
                 "google": "Google Maps",
                 "openstreetmap": "OpenStreetMap",
                 "mapquest": "MapQuest",
-                "bing": "Bing Maps"
+                "bing": "Bing Maps",
+                "esri": "ESRI ArcGIS"
             }
         },
         "geoloc.latlng": {
@@ -1885,6 +2070,28 @@
                     "google",
                     "mapquest",
                     "bing"
+                ]
+            }
+        },
+        "geoloc.layer": {
+            "default": "Streets",
+            "group": "external",
+            "section": "location",
+            "order": 7,
+            "type": "select",
+            "options": {
+                "Streets":  "Streets",
+                "Sattelite": "Sattelite",
+                "Topography":  "Topography"
+            },
+            "when": {
+                "setting": "geoloc.engine",
+                "operator": "in",
+                "value": [
+                    "google",
+                    "mapquest",
+                    "bing",
+                    "esri"
                 ]
             }
         },
@@ -4057,6 +4264,83 @@
             "section": "influxdb",
             "order": 8
         },
+	"influxdbv2.enable": {
+            "default": false,
+            "type": "boolean",
+            "group": "poller",
+            "section": "influxdbv2",
+            "order": 0
+        },
+        "influxdbv2.transport": {
+            "default": "http",
+            "type": "select",
+            "options": {
+                "http": "HTTP",
+                "https": "HTTPS"
+            },
+            "group": "poller",
+            "section": "influxdbv2",
+            "order": 1
+        },
+        "influxdbv2.host": {
+            "default": "127.0.0.1",
+            "type": "text",
+            "group": "poller",
+            "section": "influxdbv2",
+            "order": 2,
+            "validate": {
+                "value": "ip_or_hostname"
+            }
+        },
+        "influxdbv2.port": {
+            "default": 8086,
+            "type": "integer",
+            "group": "poller",
+            "section": "influxdbv2",
+            "order": 3
+        },
+        "influxdbv2.bucket": {
+            "default": "librenms",
+            "type": "text",
+            "group": "poller",
+            "section": "influxdbv2",
+            "order": 4
+        },
+        "influxdbv2.organization": {
+            "default": "librenms",
+            "type": "text",
+            "group": "poller",
+            "section": "influxdbv2",
+            "order": 5
+        },
+        "influxdbv2.allow_redirects": {
+            "default": false,
+            "type": "boolean",
+            "group": "poller",
+            "section": "influxdbv2",
+            "order": 6
+        },
+        "influxdbv2.token": {
+            "type": "password",
+            "group": "poller",
+            "section": "influxdbv2",
+            "order": 7
+        },
+        "influxdbv2.debug": {
+            "default": false,
+            "type": "boolean",
+            "group": "poller",
+            "section": "influxdbv2",
+            "order": 8
+        },
+        "influxdbv2.groups-exclude": {
+            "group": "poller",
+            "section": "influxdbv2",
+            "order": 9,
+            "type": "array",
+            "default": [
+            ]
+        },
         "install_dir": {
             "type": "directory"
         },
@@ -4482,6 +4766,13 @@
             },
             "type": "array"
         },
+        "nfsen_base": {
+            "default": [],
+            "group": "external",
+            "section": "nfsen",
+            "order": 10,
+            "type": "array"
+        },
         "nfsen_split_char": {
             "group": "external",
             "section": "nfsen",
@@ -4673,7 +4964,7 @@
             "type": "oxidized-maps",
             "validate": {
                 "value": "array",
-                "value.*": "array|keys_in:hostname,sysName,sysDescr,sysObjectID,hardware,os,location,ip,purpose,notes",
+                "value.*": "array|keys_in:hostname,sysName,sysDescr,sysObjectID,hardware,os,location,ip,purpose,notes,poller_group",
                 "value.*.*": "array|min:1",
                 "value.*.*.*": "array|size:2|keys_in:match,regex,value",
                 "value.*.*.*.value": "required|string",
@@ -5161,6 +5452,14 @@
             "order": 5,
             "type": "integer"
         },
+        "ports_nac_purge": {
+            "default": 10,
+            "units": "days",
+            "group": "system",
+            "section": "cleanup",
+            "order": 6,
+            "type": "integer"
+        },
         "ports_page_default": {
             "default": "details",
             "type": "select",
@@ -5231,6 +5530,20 @@
             "group": "poller",
             "section": "prometheus",
             "order": 4
+        },
+        "prometheus.user": {
+            "default": "",
+            "type": "text",
+            "group": "poller",
+            "section": "prometheus",
+            "order": 5
+        },
+        "prometheus.password": {
+            "default": "",
+            "type": "text",
+            "group": "poller",
+            "section": "prometheus",
+            "order": 6
         },
         "public_status": {
             "default": false,
@@ -5856,7 +6169,7 @@
             "order": 1
         },
         "twofactor": {
-            "default": "false",
+            "default": false,
             "type": "boolean",
             "group": "auth",
             "section": "general",

@@ -184,7 +184,10 @@ $graphs['exim-stats'] = [
     'queue',
 ];
 $graphs['php-fpm'] = [
-    'stats',
+    'overview_combined',
+    'overview_slow_requests',
+    'overview_max_childen_reached',
+    'v1_last_request_cpu',
 ];
 $graphs['nvidia'] = [
     'sm',
@@ -326,16 +329,16 @@ $graphs['freeradius'] = [
     'queue',
 ];
 $graphs['suricata'] = [
-    'alert',
-    'packets',
-    'nasty_delta',
-    'nasty_percent',
-    'dec_proto',
-    'flow_proto',
-    'app_flows',
-    'app_tx',
-    'bytes',
-    'mem_use',
+    'packets_overview',
+    'nasty_delta_overview',
+    'nasty_percent_overview',
+    'dec_proto_overview',
+    'flow_proto_overview',
+    'app_flows_overview',
+    'app_tx_overview',
+    'bytes_overview',
+    'mem_use_overview',
+    'uptime_overview',
 ];
 $graphs['zfs'] = [
     'arc_misc',
@@ -450,6 +453,7 @@ $graphs['pwrstatd'] = [
     'minutes',
 ];
 $graphs['systemd'] = [
+    'all',
     'sub',
     'active',
     'load',
@@ -523,6 +527,20 @@ $graphs['privoxy'] = [
 ];
 $graphs['ss'] = [
     'sockets',
+    'dccp',
+    'inet',
+    'inet6',
+    'link',
+    'mptcp',
+    'netlink',
+    'raw',
+    'sctp',
+    'tcp',
+    'tipc',
+    'udp',
+    'unix',
+    'vsock',
+    'xdp',
 ];
 $graphs['borgbackup'] = [
     'unique_csize',
@@ -535,6 +553,12 @@ $graphs['borgbackup'] = [
     'errored',
     'locked',
     'locked_for',
+];
+$graphs['nfs'] = [
+    'server_rpc',
+    'server_cache',
+    'client_rpc',
+    'client_cache',
 ];
 
 echo '<div class="panel panel-default">';

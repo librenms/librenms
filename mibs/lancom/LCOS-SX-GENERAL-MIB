@@ -1,0 +1,689 @@
+LCOS-SX-GENERAL-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32,
+    Integer32, Counter64, Gauge32, enterprises FROM SNMPv2-SMI
+    DisplayString, TEXTUAL-CONVENTION          FROM SNMPv2-TC;
+
+lcosSXGeneral MODULE-IDENTITY
+    LAST-UPDATED "202006230000Z"
+    ORGANIZATION "LANCOM Systems GmbH"
+    CONTACT-INFO
+        "
+        Adenauerstrasse 20 / B2
+        52146 Wuerselen
+        Germany
+
+        Phone:  +49 (0)2405 49 93 6 0
+        Fax:    +49 (0)2405 49 93 6 99
+        E-Mail: info@lancom.de"
+    DESCRIPTION
+        "Management information base definitions"
+    REVISION      "202006230000Z"
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { enterprises lancom-systems(2356) 100 }
+
+MonitoringSensorType ::= TEXTUAL-CONVENTION
+  STATUS      current
+  DESCRIPTION
+    "Sensor type values."
+  SYNTAX      INTEGER {
+                        fixed(1),
+                        removable(2),
+                        fixedAC(3),
+                        removableDC(4),
+                        fixedDC(5),
+                        removableAC(6)
+                      }
+
+MonitoringModuleStatus ::= TEXTUAL-CONVENTION
+  STATUS      current
+  DESCRIPTION
+    "Module (fan, PSU) status values."
+  SYNTAX      INTEGER {
+                        notpresent(1),
+                        operational(2),
+                        failed(3),
+                        powering(4),
+                        nopower(5),
+                        notpowering(6),
+                        incompatible(7),
+                        warning(8),
+                        present(9)
+                      }
+
+MonitoringTempSensorStatus ::= TEXTUAL-CONVENTION
+  STATUS      current
+  DESCRIPTION
+    "Temperatur sensor status values."
+  SYNTAX      INTEGER {
+                        low(0),
+                        normal(1),
+                        warning(2),
+                        critical(3),
+                        shutdown(4),
+                        notpresent(5),
+                        notoperational(6)
+                      }
+
+-- =============================================================================
+-- {NODE} 1.3.6.1.4.1.2356.100.0
+lcsNotificationGrp OBJECT IDENTIFIER ::= { lcosSXGeneral 0 }
+
+-- =============================================================================
+lcsTraps OBJECT IDENTIFIER ::= { lcsNotificationGrp 1 }
+
+lcsTrapsTemperatureStateChange NOTIFICATION-TYPE
+  OBJECTS {
+                lcsMonitoringTempUnitIndex,
+                lcsNotificationTemperatureStatusCurrent,
+                lcsNotificationTemperatureStatusPrevious
+          }
+  STATUS             current
+  DESCRIPTION
+      "Trap is sent when the system temperature crosses a threshold. 
+       To avoid rapid flapping between states, a hysteresis may
+       be applied."
+  ::= { lcsTraps 100 }
+
+lcsTrapsFanStateChange NOTIFICATION-TYPE
+  OBJECTS {
+                lcsMonitoringFanIndex,
+                lcsNotificationStateChangeEvent
+           }
+  STATUS             current
+  DESCRIPTION
+      "Trap is sent when fan state change happens."
+  ::= { lcsTraps 101 }
+
+lcsTrapsPSUStateChange NOTIFICATION-TYPE
+  OBJECTS {
+                lcsMonitoringPSUIndex,
+                lcsNotificationStateChangeEvent
+           }
+  STATUS             current
+  DESCRIPTION
+      "Trap is sent when Power Supply state change happens."
+  ::= { lcsTraps 102 }
+
+-- =============================================================================
+lcsNotificationVars OBJECT IDENTIFIER ::= { lcsNotificationGrp 2 }
+
+lcsNotificationStateChangeEvent OBJECT-TYPE
+  SYNTAX      INTEGER {
+                        insertion(1),
+                        removal(2),
+                        becomeoperational(3),
+                        failure(4),
+                        losepower(5)
+                      }
+  MAX-ACCESS  accessible-for-notify
+  STATUS      current
+  DESCRIPTION
+     "This event describes state change events of a fan or power supply.
+       insertion          - hot-pluggable fan or power supply was inserted
+       removal            - hot-pluggable fan or power supply was removed
+       becomeoperational  - fan or power supply became operational after failure state
+       failure            - fan or power supply failure happened
+       losepower          - a power supply was operational, but the power to it has been disconnected or has failed"
+  ::= { lcsNotificationVars 100 }
+
+lcsNotificationTemperatureStatusCurrent OBJECT-TYPE
+  SYNTAX      MonitoringTempSensorStatus
+  MAX-ACCESS  accessible-for-notify
+  STATUS      current
+  DESCRIPTION
+      "The current status of the temperature sensor."
+  ::= { lcsNotificationVars 101 }
+
+lcsNotificationTemperatureStatusPrevious OBJECT-TYPE
+  SYNTAX      MonitoringTempSensorStatus
+  MAX-ACCESS  accessible-for-notify
+  STATUS      current
+  DESCRIPTION
+      "The previous status of the temperatur sensor, i.e. before this events triggered."
+  ::= { lcsNotificationVars 102 }
+
+-- =============================================================================
+-- {NODE} 1.3.6.1.4.1.2356.100.1
+lcsStatus OBJECT IDENTIFIER ::= { lcosSXGeneral 1 }
+
+-- =============================================================================
+lcsMonitoring OBJECT IDENTIFIER ::= { lcsStatus 1 }
+
+-- lcsMonitoringTempSensorsTable
+
+lcsMonitoringTempSensorsTable OBJECT-TYPE
+  SYNTAX      SEQUENCE OF LcsMonitoringTempSensorsTableEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "Table of temperature sensors on the device."
+  ::= { lcsMonitoring 1 }
+
+lcsMonitoringTempSensorsTableEntry OBJECT-TYPE
+  SYNTAX      LcsMonitoringTempSensorsTableEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "Temperature sensor entry."
+  INDEX       { lcsMonitoringTempSensorUnitIndex, lcsMonitoringTempSensorIndex }
+  ::= { lcsMonitoringTempSensorsTable 1 }
+
+LcsMonitoringTempSensorsTableEntry    ::= SEQUENCE {
+  lcsMonitoringTempSensorUnitIndex        Unsigned32,
+  lcsMonitoringTempSensorIndex            Unsigned32,
+  lcsMonitoringTempSensorDescription      DisplayString,
+  lcsMonitoringTempSensorType             MonitoringSensorType,
+  lcsMonitoringTempSensorState            MonitoringTempSensorStatus,
+  lcsMonitoringTempSensorTemperature      Integer32
+}
+
+lcsMonitoringTempSensorUnitIndex OBJECT-TYPE
+  SYNTAX      Unsigned32 (0..12)
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "Device stacking unit index where the sensor is on, 1 if device is not
+     capable of stacking."
+  ::= { lcsMonitoringTempSensorsTableEntry 1 }
+
+lcsMonitoringTempSensorIndex OBJECT-TYPE
+  SYNTAX      Unsigned32 (0..15)
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "Index of the temperature sensor on the device, repeating for multiple
+     stacking units."
+  ::= { lcsMonitoringTempSensorsTableEntry 2 }
+
+lcsMonitoringTempSensorDescription OBJECT-TYPE
+  SYNTAX      DisplayString
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "Description of the temperature sensor."
+  ::= { lcsMonitoringTempSensorsTableEntry 3 }
+
+lcsMonitoringTempSensorType OBJECT-TYPE
+  SYNTAX      MonitoringSensorType
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "Type of the temperature sensor. Usually fixed(1)."
+  ::= { lcsMonitoringTempSensorsTableEntry 4 }
+
+lcsMonitoringTempSensorState OBJECT-TYPE
+  SYNTAX      MonitoringTempSensorStatus
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "State of the temperature sensor."
+  ::= { lcsMonitoringTempSensorsTableEntry 5 }
+
+lcsMonitoringTempSensorTemperature OBJECT-TYPE
+  SYNTAX      Integer32
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "Temperature measured by the temperature sensor."
+  ::= { lcsMonitoringTempSensorsTableEntry 6 }
+
+-- lcsMonitoringTempUnitTable
+
+lcsMonitoringTempUnitTable OBJECT-TYPE
+  SYNTAX      SEQUENCE OF LcsMonitoringTempUnitEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "Table of temperature state per unit."
+  ::= { lcsMonitoring 2 }
+
+lcsMonitoringTempUnitEntry OBJECT-TYPE
+  SYNTAX      LcsMonitoringTempUnitEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "Unit temperatur state entry."
+  INDEX { lcsMonitoringTempUnitIndex }
+  ::= { lcsMonitoringTempUnitTable 1 }
+
+LcsMonitoringTempUnitEntry      ::= SEQUENCE {
+  lcsMonitoringTempUnitIndex        Unsigned32,
+  lcsMonitoringTempUnitState        MonitoringTempSensorStatus,
+  lcsMonitoringTempUnitTemperature  Integer32
+}
+
+lcsMonitoringTempUnitIndex OBJECT-TYPE
+  SYNTAX      Unsigned32 (1..12)
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "Unit index of the unit, 1 if device is not capable of stacking."
+  ::= { lcsMonitoringTempUnitEntry 1 }
+
+lcsMonitoringTempUnitState OBJECT-TYPE
+  SYNTAX      MonitoringTempSensorStatus
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "The temperature state of the unit."
+  ::= { lcsMonitoringTempUnitEntry 2 }
+
+lcsMonitoringTempUnitTemperature OBJECT-TYPE
+  SYNTAX      Integer32
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "The highest temperature currently reported by any sensor on the unit."
+  ::= { lcsMonitoringTempUnitEntry 3 }
+
+-- lcsMonitoringFansTable
+
+lcsMonitoringFansTable OBJECT-TYPE
+  SYNTAX      SEQUENCE OF LcsMonitoringFansTableEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "Table of fans on the device."
+  ::= { lcsMonitoring 3 }
+
+lcsMonitoringFansTableEntry OBJECT-TYPE
+  SYNTAX      LcsMonitoringFansTableEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "Fan entry."
+  INDEX       { lcsMonitoringFanUnitIndex, lcsMonitoringFanIndex }
+  ::= { lcsMonitoringFansTable 1 }
+
+LcsMonitoringFansTableEntry   ::= SEQUENCE {
+  lcsMonitoringFanUnitIndex       Unsigned32,
+  lcsMonitoringFanIndex           Unsigned32,
+  lcsMonitoringFanDescription     DisplayString,
+  lcsMonitoringFanType            MonitoringSensorType,
+  lcsMonitoringFanState           MonitoringModuleStatus,
+  lcsMonitoringFanTemperature     Integer32
+}
+
+lcsMonitoringFanUnitIndex OBJECT-TYPE
+  SYNTAX      Unsigned32 (0..12)
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "Device stacking unit index where the fan is on, 1 if device is not
+     capable of stacking."
+  ::= { lcsMonitoringFansTableEntry 1 }
+
+lcsMonitoringFanIndex OBJECT-TYPE
+  SYNTAX      Unsigned32 (0..15)
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "Index of the fan on the device, repeating for multiple
+     stacking units."
+  ::= { lcsMonitoringFansTableEntry 2 }
+
+lcsMonitoringFanDescription OBJECT-TYPE
+  SYNTAX      DisplayString
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "Description of the fan."
+  ::= { lcsMonitoringFansTableEntry 3 }
+
+lcsMonitoringFanType OBJECT-TYPE
+  SYNTAX      MonitoringSensorType
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "Type of the fan. Usually fixed(1) oder removable(2)."
+  ::= { lcsMonitoringFansTableEntry 4 }
+
+lcsMonitoringFanState OBJECT-TYPE
+  SYNTAX      MonitoringModuleStatus
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "State of the fan."
+  ::= { lcsMonitoringFansTableEntry 5 }
+
+lcsMonitoringFanSpeed OBJECT-TYPE
+  SYNTAX      Gauge32
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "Speed of the fan in RPM."
+  ::= { lcsMonitoringFansTableEntry 6 }
+
+-- lcsMonitoringPSUTable
+
+lcsMonitoringPSUTable OBJECT-TYPE
+  SYNTAX      SEQUENCE OF LcsMonitoringPSUTableEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "Table of power supply units on the device."
+  ::= { lcsMonitoring 4 }
+
+lcsMonitoringPSUTableEntry OBJECT-TYPE
+  SYNTAX      LcsMonitoringPSUTableEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "Power supply unit entry."
+  INDEX       { lcsMonitoringPSUUnitIndex, lcsMonitoringPSUIndex }
+  ::= { lcsMonitoringPSUTable 1 }
+
+LcsMonitoringPSUTableEntry    ::= SEQUENCE {
+  lcsMonitoringPSUUnitIndex       Unsigned32,
+  lcsMonitoringPSUIndex           Unsigned32,
+  lcsMonitoringPSUDescription     DisplayString,
+  lcsMonitoringPSUType            MonitoringSensorType,
+  lcsMonitoringPSUState           MonitoringModuleStatus
+}
+
+lcsMonitoringPSUUnitIndex OBJECT-TYPE
+  SYNTAX      Unsigned32 (0..12)
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "Device stacking unit index where the PSU is on, 1 if device is not
+     capable of stacking."
+  ::= { lcsMonitoringPSUTableEntry 1 }
+
+lcsMonitoringPSUIndex OBJECT-TYPE
+  SYNTAX      Unsigned32 (0..15)
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "Index of the PSU on the device, repeating for multiple
+     stacking units."
+  ::= { lcsMonitoringPSUTableEntry 2 }
+
+lcsMonitoringPSUDescription OBJECT-TYPE
+  SYNTAX      DisplayString
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "Description of the PSU."
+  ::= { lcsMonitoringPSUTableEntry 3 }
+
+lcsMonitoringPSUType OBJECT-TYPE
+  SYNTAX      MonitoringSensorType
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "Type of the PSU."
+  ::= { lcsMonitoringPSUTableEntry 4 }
+
+lcsMonitoringPSUState OBJECT-TYPE
+  SYNTAX      MonitoringModuleStatus
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "State of the PSU."
+  ::= { lcsMonitoringPSUTableEntry 5 }
+
+
+-- =============================================================================
+-- {NODE} 1.3.6.1.4.1.2356.100.2
+lcsConfiguration OBJECT IDENTIFIER ::= { lcosSXGeneral 2 }
+
+-- =============================================================================
+lcsLMC OBJECT IDENTIFIER ::= { lcsConfiguration 1500 }
+
+LMCStatus ::= TEXTUAL-CONVENTION
+  STATUS      current
+  DESCRIPTION
+    "Management, Monitoring and Control Status."
+  SYNTAX      INTEGER {
+                        unpaired(0),
+                        paired(1),
+                        disabled(2),
+                        disabledByWLC(3),
+                        operating(4),
+                        httpProtocolError(5),
+                        httpConnectionError(6),
+                        dnsError(7),
+                        memoryError(8),
+                        notYet(9),
+                        redirect(10),
+                        authenticationError(11),
+                        error(12),
+                        certificateStorageError(13),
+                        pairedAndClaimed(14),
+                        certificateError(15),
+                        deactivatedNoActivationCode(16)
+                      }
+
+lcsLMCOperating OBJECT-TYPE
+  SYNTAX      Unsigned32
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+      "LMC Operating Switch
+      0:Disable
+      1:Enable
+      2:Try"
+  ::= { lcsLMC 1 }
+
+lcsLMCConfigViaDHCP OBJECT-TYPE
+  SYNTAX      Unsigned32
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+      "Enables LMC configuration via DHCP option 43
+      0:Disable
+      1:Enable"
+  ::= { lcsLMC 2 }
+
+lcsLMCDomain OBJECT-TYPE
+  SYNTAX      DisplayString
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+      "LMC Domain for example cloud.lancom.de"
+  ::= { lcsLMC 3 }
+
+
+lcsLMCAutoRenew OBJECT-TYPE
+  SYNTAX      Unsigned32
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+    "Renew DHCP lease early when connection to LMC is not possible
+     0:Disabled
+     1:Enabled"
+  ::= { lcsLMC 4 }
+
+lcsLMCRolloutProjectID OBJECT-TYPE
+  SYNTAX      DisplayString
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+      "LMC Project rollout information string"
+  ::= { lcsLMC 5 }
+
+lcsLMCRolloutLocationID OBJECT-TYPE
+  SYNTAX      DisplayString
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+    "LMC Location rollout information string"
+  ::= { lcsLMC 6 }
+
+lcsLMCRolloutRole OBJECT-TYPE
+  SYNTAX      DisplayString
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+    "LMC Role rollout information string"
+  ::= { lcsLMC 7 }
+
+
+lcsLMCZeroTouchSupport OBJECT-TYPE
+  SYNTAX      Unsigned32
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "Support for Zero Touch
+     0:No
+     1:Yes"
+  ::= { lcsLMC 50 }
+
+lcsLMCPairingTokenPresent OBJECT-TYPE
+  SYNTAX      Unsigned32
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "Paring Token present
+     0:No
+     1:Yes"
+  ::= { lcsLMC 51 }
+
+
+lcsLMCManagementStatus OBJECT-TYPE
+  SYNTAX      LMCStatus
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "Management status"
+  ::= { lcsLMC 53 }
+
+lcsLMCControlStatus OBJECT-TYPE
+  SYNTAX      LMCStatus
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "Control status"
+
+   ::= { lcsLMC 54 }
+
+lcsLMCMonitoringStatus OBJECT-TYPE
+  SYNTAX      LMCStatus
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "Monitoring status"
+  ::= { lcsLMC 55 }
+
+
+lcsLMCConfigModified OBJECT-TYPE
+  SYNTAX      Unsigned32
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "Configuration modified by LMC
+     0:No
+     1:Yes"
+  ::= { lcsLMC 57 }
+
+lcsLMCDeviceID OBJECT-TYPE
+  SYNTAX      DisplayString
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "Device ID"
+  ::= { lcsLMC 58 }
+
+lcsLMCStackingStatus OBJECT-TYPE
+  SYNTAX      Unsigned32
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "0:NotSupported
+     1:StackingDisabled
+     2:StackingConfigured
+     3:StackingActive
+     4:StackingUnitConfigurationActive"
+  ::= { lcsLMC 59 }
+
+lcsLMCStatusRTT OBJECT-TYPE
+  SYNTAX      Unsigned32
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "Heartbeat round trip time"
+  ::= { lcsLMC 100 }
+
+-- lcsLMCTransportStatusTable
+
+lcsLMCTransportStatusTable OBJECT-TYPE
+  SYNTAX   SEQUENCE OF  LcsLMCTransportStatusTableEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "Transport status"
+  ::= {     lcsLMC 101 }
+
+lcsLMCTransportStatusTableEntry OBJECT-TYPE
+  SYNTAX  LcsLMCTransportStatusTableEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "Transport number"
+  INDEX    {     lcsLMCTransportStatusTransportNumberIndex  }
+    ::= {     lcsLMCTransportStatusTable 1 }
+
+LcsLMCTransportStatusTableEntry             ::= SEQUENCE {
+  lcsLMCTransportStatusTransportNumberIndex     Integer32,
+  lcsLMCTransportStatusServiceName              DisplayString,
+  lcsLMCTransportStatusHttpRequests             Counter64,
+  lcsLMCTransportStatusHttpRequestsErrors       Counter64,
+  lcsLMCTransportStatusTXBytes                  Counter64,
+  lcsLMCTransportStatusRXBytes                  Counter64
+}
+
+lcsLMCTransportStatusTransportNumberIndex OBJECT-TYPE
+  SYNTAX      Integer32 (0..2147483647)
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "Transport status index"
+  ::= {     lcsLMCTransportStatusTableEntry 1 }
+
+lcsLMCTransportStatusServiceName OBJECT-TYPE
+  SYNTAX      DisplayString
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "Service name"
+  ::= {     lcsLMCTransportStatusTableEntry 2 }
+
+lcsLMCTransportStatusHttpRequests OBJECT-TYPE
+  SYNTAX      Counter64
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "Number of Http requests"
+  ::= {     lcsLMCTransportStatusTableEntry 3 }
+
+lcsLMCTransportStatusHttpRequestsErrors OBJECT-TYPE
+  SYNTAX      Counter64
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "Number of Http request errors"
+  ::= {     lcsLMCTransportStatusTableEntry 4 }
+
+lcsLMCTransportStatusTXBytes OBJECT-TYPE
+  SYNTAX      Counter64
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "Number of transmitted bytes"
+  ::= {     lcsLMCTransportStatusTableEntry 5 }
+
+lcsLMCTransportStatusRXBytes OBJECT-TYPE
+  SYNTAX      Counter64
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "Number of received bytes"
+  ::= {     lcsLMCTransportStatusTableEntry 7 }
+
+
+
+END

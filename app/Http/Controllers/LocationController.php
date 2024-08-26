@@ -11,13 +11,15 @@ class LocationController extends Controller
 {
     public function index()
     {
-        $maps_api = Config::get('geoloc.api_key');
         $data = [
-            'maps_api' => $maps_api,
-            'maps_engine' => $maps_api ? Config::get('geoloc.engine') : '',
+            'maps_config' => [
+                'engine' => Config::get('geoloc.engine'),
+                'api_key' => Config::get('geoloc.api_key'),
+                'tile_url' => Config::get('leaflet.tile_url', '{s}.tile.openstreetmap.org'),
+            ],
+            'graph_template' => '',
         ];
 
-        $data['graph_template'] = '';
         Config::set('enable_lazy_load', false);
         $graph_array = [
             'type' => 'location_bits',

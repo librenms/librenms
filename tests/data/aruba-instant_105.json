@@ -2094,5 +2094,69 @@
                 }
             ]
         }
+    },
+    "entity-physical": {
+        "discovery": {
+            "entPhysical": [
+                {
+                    "entPhysicalIndex": 1,
+                    "entPhysicalDescr": "0.0.0.0",
+                    "entPhysicalClass": "chassis",
+                    "entPhysicalName": "instant-C3:52:DA",
+                    "entPhysicalHardwareRev": null,
+                    "entPhysicalFirmwareRev": null,
+                    "entPhysicalSoftwareRev": null,
+                    "entPhysicalAlias": null,
+                    "entPhysicalAssetID": null,
+                    "entPhysicalIsFRU": null,
+                    "entPhysicalModelName": "Instant Virtual Controller Cluster",
+                    "entPhysicalVendorType": null,
+                    "entPhysicalSerialNum": "d750fa7701c9617fe72f583a7f7a1407220796cd3f1e5ef5cb",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": -1,
+                    "entPhysicalMfgName": "Aruba",
+                    "ifIndex": null
+                },
+                {
+                    "entPhysicalIndex": 2,
+                    "entPhysicalDescr": "24:de:c6:c3:50:a4",
+                    "entPhysicalClass": "other",
+                    "entPhysicalName": "24:de:c6:c3:50:a4 10.4.1.27 Cluster Member",
+                    "entPhysicalHardwareRev": null,
+                    "entPhysicalFirmwareRev": null,
+                    "entPhysicalSoftwareRev": "6.4.4.8-4.2.4.12",
+                    "entPhysicalAlias": null,
+                    "entPhysicalAssetID": null,
+                    "entPhysicalIsFRU": null,
+                    "entPhysicalModelName": "ap105",
+                    "entPhysicalVendorType": "accessPoint",
+                    "entPhysicalSerialNum": "BT0489813",
+                    "entPhysicalContainedIn": 1,
+                    "entPhysicalParentRelPos": -1,
+                    "entPhysicalMfgName": "Aruba",
+                    "ifIndex": null
+                },
+                {
+                    "entPhysicalIndex": 3,
+                    "entPhysicalDescr": "24:de:c6:c3:52:da",
+                    "entPhysicalClass": "other",
+                    "entPhysicalName": "24:de:c6:c3:52:da 10.4.1.26 Cluster Master",
+                    "entPhysicalHardwareRev": null,
+                    "entPhysicalFirmwareRev": null,
+                    "entPhysicalSoftwareRev": "6.4.4.8-4.2.4.12",
+                    "entPhysicalAlias": null,
+                    "entPhysicalAssetID": null,
+                    "entPhysicalIsFRU": null,
+                    "entPhysicalModelName": "ap105",
+                    "entPhysicalVendorType": "accessPoint",
+                    "entPhysicalSerialNum": "BT0490379",
+                    "entPhysicalContainedIn": 1,
+                    "entPhysicalParentRelPos": -1,
+                    "entPhysicalMfgName": "Aruba",
+                    "ifIndex": null
+                }
+            ]
+        },
+        "poller": "matches discovery"
     }
 }

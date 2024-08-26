@@ -1,0 +1,235 @@
+CIENA-PRO-SOFTWARE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    cienaPro
+        FROM CIENA-SMI
+    DateTime
+        FROM CIENA-PRO-TYPES-MIB
+    MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC;
+
+cienaProSoftwareMIB MODULE-IDENTITY
+    LAST-UPDATED "202010010000Z"
+    ORGANIZATION
+        "Ciena Corporation"
+    CONTACT-INFO
+        "Web: http://www.ciena.com
+         Postal:   7035 Ridge Road
+                   Hanover, Maryland 21076
+                   U.S.A
+         Phone:    +1 800-921-1144
+         Fax:      +1 410-694-5750"
+    DESCRIPTION
+        "This module defines software upgrade support for Ciena Platform's."
+    REVISION    "202010010000Z"
+    DESCRIPTION
+        "Initial Revision."
+    ::= { cienaPro 2 }
+
+--
+-- Textual Conventions
+--
+UpgradeOpState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Software upgrade operational state."
+    SYNTAX      INTEGER {
+        unknown(0),
+        idle(1), 
+        loadInProgress(2),
+        loadComplete(3),
+        loadFailed(4),
+        invokeInProgress(5),
+        invokeComplete(6),
+        invokeFailed(7),
+        installationInProgress(8),
+        installationComplete(9),
+        installationFailed(10),
+        commitInProgress(11),
+        commitComplete(12),
+        commitFailed(13),
+        cancelInProgress(14),
+        cancelComplete(15),
+        cancelFailed(16),
+        deleteInProgress(17),
+        deleteComplete(18),
+        deleteFailed(19),
+        automaticUpgradeInProgress(20),
+        automaticUpgradeComplete(21),
+        automaticUpgradeFailed(22),
+        moduleColdRestartRequired(23),
+        componentUpgradeInProgress(24),
+        componentUpgradeComplete(25),
+        componentUpgradeFailed(26),
+        deliveryInProgress(27),
+        deliveryComplete(28),
+        deliveryFailed(29)
+    }
+
+UpgradeOperation ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Software upgrade operation"
+    SYNTAX      INTEGER {
+        unknown(0),
+        none(1),
+        softwareInstall(2),
+        softwareDeliver(3),
+        softwareLoad(4),
+        softwareActivate(5),
+        softwareCommit(6),
+        softwareCancel(7),
+        softwareDelete(8),
+        autoUpgrade(9)
+    }
+               
+OperationResultType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Software upgrade result"
+    SYNTAX      INTEGER {
+        ok(0), 
+        failed(1),
+        unknownError(2),
+        timeout(3),
+        packageDeliveryFailure(4),
+        packageValidationFailure(5),
+        insufficientDiskSpace(6),
+        packageExtractionFailure(7),
+        systemError(8),
+        dependentServiceError(9),
+        packageInformationUnavailable(10),
+        upgradeVersionUnknown(11),
+        authenticationFailure(12),
+        fileNotFound(13),
+        fileTransferFailure(14),
+        invalidUri(15),
+        invalidState(16),
+        dataConversionFailure(17),
+        licenseCheckFailure(18)
+    }
+
+--
+-- Node definitions
+--
+
+cienaProSoftware OBJECT IDENTIFIER
+    ::= { cienaProSoftwareMIB 1 }
+
+cienaProSoftwareUpgradeOperationalState OBJECT-TYPE
+    SYNTAX      UpgradeOpState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Current software manager state.
+         Examples: <op>-in-progress, <op>-complete, <op>-failed or Idle."
+    ::= { cienaProSoftware 1 }
+
+cienaProSoftwareEntityReportedState OBJECT-TYPE
+    SYNTAX      UpgradeOpState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Current state reported by the managed upgrade entity.
+         Examples: <op>-in-progress, <op>-complete, <op>-failed or Idle."
+    ::= { cienaProSoftware 2 }
+
+cienaProSoftwareOperationInProgress OBJECT-TYPE
+    SYNTAX      UpgradeOperation
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Current software manager operation in progress, if applicable."
+    ::= { cienaProSoftware 3 }
+
+cienaProSoftwareOperationStartTimestamp OBJECT-TYPE
+    SYNTAX      DateTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Timestamp when the current software manager operation in progress started.
+         (Not supported in this software release version)."
+    ::= { cienaProSoftware 4 }
+
+cienaProSoftwareLastOperation OBJECT-TYPE
+    SYNTAX      UpgradeOperation
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Timestamp when the current software manager operation in progress started.
+         (Not supported in this software release version)."
+    ::= { cienaProSoftware 5 }
+
+cienaProSoftwareLastOperationResult OBJECT-TYPE
+    SYNTAX      OperationResultType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Result of the last completed software manager operation."
+    ::= { cienaProSoftware 6 }
+
+cienaProSoftwareLastOperationResultStr OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Result description details of the last completed software manager operation."
+    ::= { cienaProSoftware 7 }
+
+cienaProSoftwareLastOperationStartTimestamp OBJECT-TYPE
+    SYNTAX      DateTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Timestamp when the Timestamp when the last software manager operation had started."
+    ::= { cienaProSoftware 8 }
+
+cienaProSoftwareLastOperationEndTimestamp OBJECT-TYPE
+    SYNTAX      DateTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Timestamp when the last software manager operation completed."
+    ::= { cienaProSoftware 9 }
+
+cienaProSoftwareCommittedVersion OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Last successfully upgraded software release version.
+         Format: RLS-xx.yy.zz.bbbb."
+    ::= { cienaProSoftware 10 }
+
+cienaProSoftwareActiveVersion OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Target software release version which was activated by an upgrade.
+         UNKNOWN implies an upgrade is required.
+         Format: RLS-xx.yy.zz.bbbb."
+    ::= { cienaProSoftware 11 }
+
+cienaProSoftwareUpgradeToVersion OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Target software release version of an in-progress upgrade.
+         Format: RLS-xx.yy.zz.bbbb."
+    ::= { cienaProSoftware 12 }
+
+cienaProSoftwareRunningVersion OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Actual software release version that is currently running
+         and is expected to match active-version after an upgrade is completed.
+         Format: RLS-xx.yy.zz.bbbb."
+    ::= { cienaProSoftware 13 }
+
+END -- end of module CIENA-PRO-SOFTWARE-MIB.

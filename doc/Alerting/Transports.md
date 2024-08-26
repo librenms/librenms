@@ -49,6 +49,23 @@ alerts from many other monitoring tools on a single screen.
 | Alert state | critical |
 | Recover state | cleared |
 
+## AlertOps
+
+Using AlertOps integration with LibreNMS, you can seamlessly forward alerts to AlertOps with detailed information. AlertOps acts as a dispatcher for LibreNMS alerts, allowing you to determine the right individuals or teams to notify based on on-call schedules. Notifications can be sent via various channels including email, text messages (SMS), phone calls, and mobile push notifications for iOS & Android devices. Additionally, AlertOps provides escalation policies to ensure alerts are appropriately managed until they are assigned or closed. You can also filter out/aggregate alerts based on different values.
+
+To set up the integration:
+
+- Create a LibreNMS Integration: Sign up for an AlertOps account and create a LibreNMS integration from the integrations page. This will generate an Inbound Integration Endpoint URL that you'll need to copy to LibreNMS.
+
+- Configure LibreNMS Integration: In LibreNMS, navigate to the integration settings and paste the inbound integration URL obtained from AlertOps.
+
+**Example:**
+
+| Config | Example |
+| ------ | ------- |
+| WebHook URL | <https://url/path/to/webhook> |
+
+
 ## Alertmanager
 
 Alertmanager is an alert handling software, initially developed for
@@ -342,26 +359,49 @@ Configuration of the LibreNMS IRC-Bot is described [here](https://github.com/lib
 
 ## JIRA
 
-You can have LibreNMS create issues on a Jira instance for critical
-and warning alerts. The Jira transport only sets  summary and
-description fields. Therefore your Jira project must not have any
-other mandatory field for the provided issuetype. The config fields
-that need to set are Jira URL, Jira username, Jira password, Project
-key, and issue type.  Currently http authentication is used to access
-Jira and Jira username and password will be stored as cleartext in the
-LibreNMS database.
+You can have LibreNMS create issues on a Jira instance for critical and warning
+ alerts using either the Jira REST API or webhooks. 
+Custom fields allow you to add any required fields beyond summary and description
+ fields in case mandatory fields are required by your Jira project/issue type 
+ configuration. Custom fields are defined in JSON format but ustom fields allow 
+ you to add any required fields beyond summary and description fields in case 
+ mandatory fields are required by your Jira project/issue type configuration. 
+ Custom fields are defined in JSON format. Currently http authentication is used 
+ to access Jira and Jira username and password will be stored as cleartext in the 
+ LibreNMS database.
+
+### REST API
+The config fields that need to set for Jira REST API are: Jira Open URL, Jira username, 
+Jira password, Project key, and issue type.  
+
+> Note: REST API is that it is only able to open new tickets.
+
+### Webhooks
+The config fields that need to set for webhooks are: Jira Open URL, Jira Close URL,
+ Jira username, Jira password and webhook ID.
+
+> Note: Webhooks allow more control over how alerts are handled in Jira. With webhooks, 
+> recovery messages can be sent to a different URL than alerts. Additionally, a custom 
+> conditional logic can be built using the webhook payload and ID to automatically close 
+> an open ticket if predefined conditions are met.
+
 
 [Jira Issue Types](https://confluence.atlassian.com/adminjiracloud/issue-types-844500742.html)
+[Jira Webhooks](https://developer.atlassian.com/cloud/jira/platform/webhooks/)
 
 **Example:**
 
 | Config | Example |
 | ------ | ------- |
-| URL | <https://myjira.mysite.com> |
 | Project Key | JIRAPROJECTKEY |
 | Issue Type | Myissuetype |
+| Open URL | <https://myjira.mysite.com> /  <https://webhook-open-url> |
+| Close URL | <https://webhook-close-url>  |
 | Jira Username | myjirauser |
 | Jira Password | myjirapass |
+| Enable webhook | ON/OFF |
+| Webhook ID | alert_id |
+| Custom Fileds | {"components":[{"id":"00001"}], "source": "LibrenNMS"} |
 
 ## Jira Service Management
 
@@ -741,6 +781,22 @@ Sensu to LibreNMS alerts, they'll be lost on the next event (silences will work)
 | Check Prefix    | lnms                  |
 | Source Key      | hostname              |
 
+## SIGNL4
+
+SIGNL4 offers critical alerting, incident response and service dispatching for operating critical infrastructure. It alerts you persistently via app push, SMS text, voice calls, and email including tracking, escalation, on-call duty scheduling and collaboration.
+
+Integrating SIGNL4 with LibreNMS to forward critical alerts with detailed information to responsible people or on-call teams. The integration supports triggering as well as closing alerts.
+
+In the configuration for your SIGNL4 alert transport you just need to enter your SIGNL4 webhook URL including team or integration secret.
+
+**Example:**
+
+| Config | Example |
+| ------ | ------- |
+| Webhook URL | https://connect.signl4.com/webhook/{team-secret} |
+
+You can find more information about the integration [here](https://docs.signl4.com/integrations/librenms/librenms.html).
+
 ## Slack
 
 The Slack transport will POST the alert message to your Slack Incoming
@@ -751,16 +807,36 @@ only required value is for url, without this  then no call to Slack will be made
 
 We currently support the following attachment options:
 
-`author_name`
+- `author_name`
+
+We currently support the following global message options:
+
+- `channel_name` : Slack channel name (without the leading '#') to which the alert will go
+- `icon_emoji` : Emoji name in colon format to use as the author icon
 
 [Slack docs](https://api.slack.com/docs/message-attachments)
+
+The alert template can make use of
+[Slack markdown](https://api.slack.com/reference/surfaces/formatting#basic-formatting).
+In the Slack markdown dialect, custom links are denoted with HTML angled
+brackets, but LibreNMS strips these out. To support embedding custom links in alerts,
+use the bracket/parentheses markdown syntax for links.  For example if you would
+typically use this for a Slack link:
+
+`<https://www.example.com|My Link>`
+
+Use this in your alert template:
+
+`[My Link](https://www.example.com)`
 
 **Example:**
 
 | Config | Example |
 | ------ | ------- |
 | Webhook URL | <https://slack.com/url/somehook> |
-| Slack Options | author_name=Me |
+| Channel | network-alerts |
+| Author Name | LibreNMS Bot |
+| Icon | `:scream:` |
 
 ## SMSEagle
 

@@ -363,10 +363,6 @@ return [
             'description' => 'Journaux de connexions plus anciens que',
             'help' => 'Nettoyage effectué par daily.sh',
         ],
-        'device_perf_purge' => [
-            'description' => 'Stats de performances plus anciennes que',
-            'help' => 'Statistiques de performances des équipements. Le nettoyage effectué par daily.sh',
-        ],
         'discovery_modules' => [
             'arp-table' => [
                 'description' => 'Table ARP',
@@ -915,6 +911,10 @@ return [
         ],
         'ports_fdb_purge' => [
             'description' => 'Table port FDB, entrées plus anciennes que',
+            'help' => 'Nettoyage effectué par daily.sh',
+        ],
+        'ports_nac_purge' => [
+            'description' => 'Table port NAC, entrées plus anciennes que',
             'help' => 'Nettoyage effectué par daily.sh',
         ],
         'ports_purge' => [

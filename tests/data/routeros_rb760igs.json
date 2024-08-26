@@ -2833,5 +2833,69 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "entity-physical": {
+        "discovery": {
+            "entPhysical": [
+                {
+                    "entPhysicalIndex": 65536,
+                    "entPhysicalDescr": "RouterOS 7.1.1 (stable) on RB760iGS",
+                    "entPhysicalClass": "chassis",
+                    "entPhysicalName": "MIPS 1004Kc V2.15",
+                    "entPhysicalHardwareRev": "",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "false",
+                    "entPhysicalModelName": "",
+                    "entPhysicalVendorType": "zeroDotZero",
+                    "entPhysicalSerialNum": "",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": -1,
+                    "entPhysicalMfgName": "",
+                    "ifIndex": null
+                },
+                {
+                    "entPhysicalIndex": 262145,
+                    "entPhysicalDescr": "Linux 5.6.3 xhci-hcd xHCI Host Controller",
+                    "entPhysicalClass": "unknown",
+                    "entPhysicalName": "1-0",
+                    "entPhysicalHardwareRev": "",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "false",
+                    "entPhysicalModelName": "0x0002",
+                    "entPhysicalVendorType": "zeroDotZero",
+                    "entPhysicalSerialNum": "1e1c0000.xhci",
+                    "entPhysicalContainedIn": 65536,
+                    "entPhysicalParentRelPos": -1,
+                    "entPhysicalMfgName": "0x1d6b",
+                    "ifIndex": null
+                },
+                {
+                    "entPhysicalIndex": 262146,
+                    "entPhysicalDescr": "Linux 5.6.3 xhci-hcd xHCI Host Controller",
+                    "entPhysicalClass": "unknown",
+                    "entPhysicalName": "2-0",
+                    "entPhysicalHardwareRev": "",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "false",
+                    "entPhysicalModelName": "0x0003",
+                    "entPhysicalVendorType": "zeroDotZero",
+                    "entPhysicalSerialNum": "1e1c0000.xhci",
+                    "entPhysicalContainedIn": 65536,
+                    "entPhysicalParentRelPos": -1,
+                    "entPhysicalMfgName": "0x1d6b",
+                    "ifIndex": null
+                }
+            ]
+        },
+        "poller": "matches discovery"
     }
 }

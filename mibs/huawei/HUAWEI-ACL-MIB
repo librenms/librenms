@@ -1,9 +1,9 @@
 -- ====================================================================
--- Copyright (C) 2017 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2021 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- 
 -- Description: Huawei Acl MIB Definition
 -- Reference:   Huawei Enterprise MIB
--- Version:     V2.20
+-- Version:     V2.31
 -- History:
 --         Version:     V2.0
 --             Wang Ning,2002-11-29,Reunification version based on the Fix-Net MIBs 
@@ -74,6 +74,37 @@
 --         Version:     V2.19
 --             qiujindou, 2017-7-3.
 --             1, Amend some English descriptions, based on V2.18
+--         Version:     V2.21
+--             chenyang, 2018-5-22.
+--             1, Add hwAclIpv6AdvancedTcpFlag and hwAclIpv6AdvancedTcpFlagMask in hwAclIpv6AdvancedRuleTable, based on V2.20
+--         Version:     V2.22
+--             chenyang, 2018-6-1.
+--             1, Change description of hwAclAdvancedPrecedence, hwAclAdvancedTos and hwAclAdvancedDscp in hwAclAdvancedRuleTable, based on V2.21
+--             2, Change description of hwAclIpv6AdvancedPrecedence, hwAclIpv6AdvancedTos and hwAclIpv6AdvancedDscp in hwAclIpv6AdvancedRuleTable, based on V2.21
+--         Version:     V2.23
+--             tanminghuan, 2019-5-6.
+--             1, Add hwAclIpv6UserRuleTable , based on V2.23
+--         Version:     V2.24
+--             zhanjianhui, 2019-11-30.
+--             1, Add hwAclIpv6BasicSrcWild, hwAclIpv6AdvancedSrcWild and hwAclIpv6AdvancedDestWild, based on V2.23
+--         Version:     V2.25
+--             zhuzhiyong, 2020-04-08.
+--             1, hwAclIpv6NumGroupAclType, add key ucl(4), based on V2.24
+--         Version:     V2.26
+--             zhuzhiyong, 2020-05-29.
+--             1, Add hwCounterResourceTrapsTable and hwMeterResourceTrapsTable, based on V2.25
+--         Version:     V2.27
+--             liuhuan, 2020-07-23.
+--             1, Correct wrong translation information, based on V2.26
+--         Version:     V2.28
+--             zhangye, 2020-09-19.
+--             1, Modified the description of hwAclNumGroupAclNum, based on V2.27
+--         Version:     V2.29
+--             zhangye, 2021-01-05.
+--             1, Modified the description of hwAclNumGroupAclNum, based on V2.28
+--         Version:     V2.30
+--             hanyaohui, 2021-03-01.
+--             1, Modified the description of hwAclResourceInfoTrap, based on V2.29
 -- ========================================================================
 
 HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
@@ -91,7 +122,7 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         Ipv6Address                        FROM IPV6-TC;
 
     hwAcl MODULE-IDENTITY 
-        LAST-UPDATED "201708171200Z"        -- Aug 17, 2017 at 15:00 GMT
+        LAST-UPDATED "202110262112Z"        -- Oct 01, 2021 at 21:12 GMT
         ORGANIZATION "Huawei Technologies Co.,Ltd."
         CONTACT-INFO                           
            "Huawei Industrial Base            
@@ -118,6 +149,40 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
             ACL classifies data packets through these device interface applied
             rules, by which the device decides which packets can be received 
             and which should be rejected."
+        REVISION "202110262112Z"
+        DESCRIPTION
+            "Add table of hwAclIPPoolHostNameTable"
+        REVISION "202103012111Z"
+        DESCRIPTION
+            "Modified the description of hwAclResourceInfoTrap"
+        REVISION "202101051016Z"
+        DESCRIPTION
+            "Modified the description of hwAclPortPoolPortOp"
+        REVISION "202009191457Z"
+        DESCRIPTION
+            "Modified the description of hwAclNumGroupAclNum"
+        REVISION "202007231140Z"
+        DESCRIPTION
+            "Correct wrong translation information"
+        REVISION "202005290941Z"
+        DESCRIPTION
+            "Add hwCounterResourceTrapsTable and hwMeterResourceTrapsTable."
+        REVISION "202004081106Z"
+        DESCRIPTION
+            " hwAclIpv6NumGroupAclType, add key ucl(4) "	
+        REVISION "201911301714Z"
+        DESCRIPTION
+            "Add hwAclIpv6BasicSrcWild and hwAclIpv6AdvancedSrcWild and hwAclIpv6AdvancedDestWild"
+         REVISION "201905062200Z"       --may 06, 2019 at 22:00 GMT
+         DESCRIPTION
+             "Add hwAclIpv6UserRuleTable"
+        REVISION "201806012200Z"
+        DESCRIPTION
+            "Change description of hwAclAdvancedPrecedence, hwAclAdvancedTos and hwAclAdvancedDscp in hwAclAdvancedRuleTable.
+             Change description of hwAclIpv6AdvancedPrecedence, hwAclIpv6AdvancedTos and hwAclIpv6AdvancedDscp in hwAclIpv6AdvancedRuleTable."
+        REVISION "201805221200Z"
+        DESCRIPTION
+            "Add hwAclIpv6AdvancedTcpFlag and hwAclIpv6AdvancedTcpFlagMask in hwAclIpv6AdvancedRuleTable"
         REVISION "201708171200Z"
         DESCRIPTION
             "modify description of hwAclNumGroupTable and hwAclIpv6NumGroupTable"
@@ -132,6 +197,9 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
             "Add hwAclIpv6AdvancedSrcPoolName in hwAclIpv6AdvancedRuleTable
              Add hwAclIPPoolApplyBGPPeer in hwAclIPPoolTable.
              Add hwAclIPPool6Table."
+        REVISION "201608260000Z"
+        DESCRIPTION
+            " hwAclIpv6NumGroupAclType, add key interface(3) "	    
         REVISION "201605061200Z"
         DESCRIPTION
             "Add hwAclBasicVrfAny in hwAclBasicRuleTable
@@ -158,6 +226,9 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         REVISION "201410282100Z"
         DESCRIPTION
             "Add hwAclAdvancedPktLenOp, hwAclAdvancedPktLenBegin and hwAclAdvancedPktLenEnd in hwAclAdvancedRuleTable." 
+        REVISION "201408051606Z"
+        DESCRIPTION
+           "Chang  hwAclNumGroupAclName in hwAclIpv6NumGroupTable and hwAclIpv6NumGroupAclName in hwAclNumGroupTable  value length"
         REVISION "201406200948Z"
         DESCRIPTION
             "Add hwAclAdvancedVni, hwAclAdvancedIgmpType, hwAclAdvancedTtlOp, hwAclAdvancedTtlExpire, hwAclAdvancedTtlExpireEnd in hwAclAdvancedRuleTable." 
@@ -183,12 +254,6 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         REVISION "201309050000Z"
         DESCRIPTION
             "Add hwAclIpv6BasicSrcMask in hwAclIpv6BasicRuleTable; Add hwAclIpv6AdvancedSrcMask, hwAclIpv6AdvancedDestMask in hwAclIpv6AdvancedRuleTable"
-        REVISION "201408051606Z"
-        DESCRIPTION
-           "Chang  hwAclNumGroupAclName in hwAclIpv6NumGroupTable and hwAclIpv6NumGroupAclName in hwAclNumGroupTable  value length"
-        REVISION "201608260000Z"
-        DESCRIPTION
-            " hwAclIpv6NumGroupAclType, add key interface(3) "	    
          ::= { huaweiMgmt 1 }
 
     --
@@ -246,17 +311,7 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         STATUS current
         DESCRIPTION
             "The index of acl group, identifying an ACL. 
-             The object specifies the range of an ACL number. 
-             The basic ACL is represented by the number 
-             in the range 2000 through 2999. The advanced ACL is 
-             represented by the number in the range 3000 through 
-             3999. The interface-based ACL is represented by the 
-             number in the range 1000 to 1999. The User Defined ACL is 
-             represented by the number in the range 5000 through 
-             5999. The User ACL is represented by the number in the range 6000 through 
-             9999. The Mpls ACL is represented by the number in the range 10000 through 
-             10999. The name ACL is represented by the number 
-             in the range 42768 through 76535."
+             The object specifies the range of an ACL number."
         ::= { hwAclNumGroupEntry 1 }  
     
     -- 1.3.6.1.4.1.2011.5.1.1.2.1.2
@@ -333,7 +388,7 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
-            "RowStatus, Now support three value:CreateAndGo,Active,Destroy."
+            "RowStatus, Now support three value: CreateAndGo, Active, Destroy."
         ::= { hwAclNumGroupEntry 7 }  
         
       -- 1.3.6.1.4.1.2011.5.1.1.2.1.8
@@ -423,7 +478,7 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS read-only
         STATUS current
         DESCRIPTION
-            "The index of basic acl group, the index range is (1..99 | 2000..2999 | 42768..76535 )."
+            "The index of basic acl group, the index range is (1..99 | 2000..2999 | 42768..76535)."
         ::= { hwAclBasicRuleEntry 1 }
     
     -- 1.3.6.1.4.1.2011.5.1.1.4.1.2
@@ -444,8 +499,8 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
             ACL when configuration sequence is adopted; otherwise, 
             it will be placed based on the 'Depth-first' principle.
             When ACL rules are following the 'Depth-first' principle,
-            the number of an ACL rule must be given 0 ,but it will be assigned
-            by step automatically;otherwise,this rule will not be created."
+            the number of an ACL rule must be given 0, but it will be assigned
+            by step automatically; otherwise, this rule will not be created."
         ::= { hwAclBasicRuleEntry 2 }
     
     -- 1.3.6.1.4.1.2011.5.1.1.4.1.3
@@ -563,7 +618,7 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
-            "RowStatus, Now support three value:CreateAndGo,Active and Destroy."
+            "RowStatus, Now support three value: CreateAndGo, Active and Destroy."
         ::= { hwAclBasicRuleEntry 12 }
     
     -- 1.3.6.1.4.1.2011.5.1.1.4.1.13    
@@ -725,8 +780,8 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
             ACL when configuration sequence is adopted; otherwise, 
             it will be placed based on the 'Depth-first' principle.
             When ACL rules are following the 'Depth-first' principle,
-            the number of an ACL rule must be given 0 ,but it will be assigned
-            by step automatically;otherwise,this rule will not be created."
+            the number of an ACL rule must be given 0, but it will be assigned
+            by step automatically; otherwise, this rule will not be created."
         ::= { hwAclAdvancedRuleEntry 2 }
     
     -- 1.3.6.1.4.1.2011.5.1.1.5.1.3
@@ -886,7 +941,7 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         DESCRIPTION
             "The value of this object identifies the precedence sub-field.
 	     It is the higher three bits of the ToS field in an IP header.
-	     The value ranges from 0 to 7."
+	     The value ranges from 0 to 7. The invalid value is 255."
         ::= { hwAclAdvancedRuleEntry 15 }
     
     -- 1.3.6.1.4.1.2011.5.1.1.5.1.16
@@ -897,7 +952,7 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         DESCRIPTION
             "The value of this object identifies the ToS sub-field.
 	     This field covers four bits after the higher three bits of the ToS field in an IP header.
-	     The value ranges from 0 to 15."
+	     The value ranges from 0 to 15. The invalid value is 255."
         ::= { hwAclAdvancedRuleEntry 16 }
     
     -- 1.3.6.1.4.1.2011.5.1.1.5.1.17
@@ -907,7 +962,7 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         STATUS current
         DESCRIPTION
             "The value of this object identifies the higher six bits of the ToS field in an IP header.
-	     The value ranges from 0 to 63."
+	     The value ranges from 0 to 63. The invalid value is 255."
         ::= { hwAclAdvancedRuleEntry 17 }
     
     -- 1.3.6.1.4.1.2011.5.1.1.5.1.18
@@ -928,7 +983,7 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         DESCRIPTION
             "The object indicates the time range of an advanced acl rule. 
             When the current time is in the time range, the rule is valid.
-            Zero value declares that the acl rule has no time range.The 
+            Zero value declares that the acl rule has no time range. The 
             invalid value is 0."
         ::= { hwAclAdvancedRuleEntry 19 }
     
@@ -1025,7 +1080,7 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
-            "RowStatus, Now support three state:CreateAndGo,Active,Destroy."
+            "RowStatus, Now support three state: CreateAndGo, Active, Destroy."
         ::= { hwAclAdvancedRuleEntry 27 }
 
     -- 1.3.6.1.4.1.2011.5.1.1.5.1.28   
@@ -1073,7 +1128,7 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         STATUS current
         DESCRIPTION
             "The object indicates the protocol type of the rule.
-            It specifies the protocol type over IP.The number of IP protocol is 65535."
+            It specifies the protocol type over IP. The number of IP protocol is 65535."
         ::= { hwAclAdvancedRuleEntry 32 }
 
    -- 1.3.6.1.4.1.2011.5.1.1.5.1.33
@@ -1302,8 +1357,8 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
             ACL when configuration sequence is adopted; otherwise, 
             it will be placed based on the 'Depth-first' principle.
             When ACL rules are following the 'Depth-first' principle,
-            the number of an ACL rule must be given 0 ,but it will be assigned
-            by step automatically;otherwise,this rule will not be created."
+            the number of an ACL rule must be given 0, but it will be assigned
+            by step automatically; otherwise, this rule will not be created."
         ::= { hwAclIfRuleEntry 2 }
     
     -- 1.3.6.1.4.1.2011.5.1.1.6.1.3
@@ -1548,7 +1603,7 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         STATUS current
         DESCRIPTION
             "The object indicates the protocol type of the rule.
-            It specifies the protocol type over IP.The number of IP protocol is 0."
+            It specifies the protocol type over IP. The number of IP protocol is 0."
         ::= { hwAclUserRuleEntry 4 }
     
     -- 1.3.6.1.4.1.2011.5.1.1.7.1.5
@@ -1722,7 +1777,7 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         DESCRIPTION
             "The object indicates the time range of an User acl rule. 
             When the current time is in the time range, the rule is valid.
-            Zero value declares that the acl rule has no time range.The 
+            Zero value declares that the acl rule has no time range. The 
             invalid value is 0."
         ::= { hwAclUserRuleEntry 19 }
     
@@ -1858,7 +1913,7 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
-            "RowStatus, Now support three state:CreateAndGo,Active,Destroy."
+            "RowStatus, Now support three state: CreateAndGo, Active, Destroy."
         ::= { hwAclUserRuleEntry 31 }
     
     -- 1.3.6.1.4.1.2011.5.1.1.7.1.32
@@ -2004,7 +2059,9 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
             hwAclIpv6BasicSrcMask
                 Ipv6Address,
             hwAclIpv6BasicVrfAny
-                TruthValue
+                TruthValue,
+            hwAclIpv6BasicSrcWild
+                Ipv6Address
             }
 
     -- 1.3.6.1.4.1.2011.5.1.1.12.1.1
@@ -2034,7 +2091,7 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
             ACL when configuration sequence is adopted; otherwise, 
             it will be placed based on the 'Depth-first' principle.
             When ACL rules are following the 'Depth-first' principle,
-            the number of an ACL rule must be given 0 ,but it will be assigned
+            the number of an ACL rule must be given 0, but it will be assigned
             automatically; otherwise, this rule will not be created."
         ::= { hwAclIpv6BasicRuleEntry 2 }
     
@@ -2079,7 +2136,7 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         STATUS current
         DESCRIPTION
             "The value of this object identifies the index of the time range during which an 
-	    ACL6 rule can be applied.The value ranges from 0 to 256.The value 0 is invalid, 
+	    ACL6 rule can be applied. The value ranges from 0 to 256. The value 0 is invalid, 
 	    indicating that no time range is specified for the rule."
         ::= { hwAclIpv6BasicRuleEntry 6 }
     
@@ -2177,6 +2234,15 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
             "The object indicates whether or not matching any VPN-instance."
         ::= { hwAclIpv6BasicRuleEntry 15 }
 
+    -- 1.3.6.1.4.1.2011.5.1.1.12.1.16
+    hwAclIpv6BasicSrcWild OBJECT-TYPE
+        SYNTAX Ipv6Address
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the wildcard mask of the source IPv6 address."
+        ::= { hwAclIpv6BasicRuleEntry 16 }
+
     -- 1.3.6.1.4.1.2011.5.1.1.13
     hwAclIpv6AdvancedRuleTable OBJECT-TYPE
         SYNTAX SEQUENCE OF HwAclIpv6AdvancedRuleEntry
@@ -2267,7 +2333,15 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
             hwAclIpv6AdvancedSrcPoolName
                 OCTET STRING,
             hwAclIpv6AdvancedVni
-                Integer32
+                Integer32,
+            hwAclIpv6AdvancedTcpFlag
+                Integer32,
+            hwAclIpv6AdvancedTcpFlagMask
+                Integer32,
+            hwAclIpv6AdvancedSrcWild
+                Ipv6Address,
+            hwAclIpv6AdvancedDestWild
+                Ipv6Address
          }
 
     -- 1.3.6.1.4.1.2011.5.1.1.13.1.1
@@ -2297,8 +2371,8 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
             ACL when configuration sequence is adopted; otherwise, 
             it will be placed based on the 'Depth-first' principle.
             When ACL rules are following the 'Depth-first' principle,
-            the number of an ACL rule must be given 0 ,but it will be assigned
-            automatically;otherwise,this rule will not be created."
+            the number of an ACL rule must be given 0, but it will be assigned
+            automatically; otherwise, this rule will not be created."
         ::= { hwAclIpv6AdvancedRuleEntry 2 }
     
     -- 1.3.6.1.4.1.2011.5.1.1.13.1.3
@@ -2455,7 +2529,7 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         DESCRIPTION
             "The value of this object identifies the precedence sub-field.
 	    It is the higher three bits of the ToS field in an IPv6 header.
-	    The value ranges from 0 to 7."
+	    The value ranges from 0 to 7. The invalid value is 255."
         ::= { hwAclIpv6AdvancedRuleEntry 15 }
     
     -- 1.3.6.1.4.1.2011.5.1.1.13.1.16
@@ -2466,7 +2540,7 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         DESCRIPTION
             "The value of this object identifies the ToS sub-field.
 	    This field covers four bits after the higher three bits of the ToS field in an IPv6 header.
-	    The value ranges from 0 to 15."
+	    The value ranges from 0 to 15. The invalid value is 255."
         ::= { hwAclIpv6AdvancedRuleEntry 16 }
     
     -- 1.3.6.1.4.1.2011.5.1.1.13.1.17
@@ -2476,7 +2550,7 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         STATUS current
         DESCRIPTION
             "The value of this object identifies the higher seven bits of the ToS field in an IPv6 header.
-	    The value ranges from 0 to 63."
+	    The value ranges from 0 to 63. The invalid value is 255."
         ::= { hwAclIpv6AdvancedRuleEntry 17 }
     
     -- 1.3.6.1.4.1.2011.5.1.1.13.1.18
@@ -2516,7 +2590,7 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
-            "The value of this obejct identifies the code of an ICMPv6 message. 
+            "The value of this object identifies the code of an ICMPv6 message. 
 	    The value ranges from 0 to 255. The value 65535 is invalid."
         ::= { hwAclIpv6AdvancedRuleEntry 21 }
     
@@ -2584,7 +2658,7 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
-            "RowStatus, Now support three state:CreateAndGo,Active,Destroy."
+            "RowStatus, Now support three state: CreateAndGo, Active, Destroy."
         ::= { hwAclIpv6AdvancedRuleEntry 27 } 
         
     -- 1.3.6.1.4.1.2011.5.1.1.13.1.28
@@ -2622,7 +2696,7 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         STATUS current
         DESCRIPTION
             "The object indicates the protocol type of the rule.
-            It specifies the protocol type over IP.The number of IPv6 protocol is 65535."
+            It specifies the protocol type over IP. The number of IPv6 protocol is 65535."
         ::= { hwAclIpv6AdvancedRuleEntry 31 }
     
     -- 1.3.6.1.4.1.2011.5.1.1.13.1.32
@@ -2664,7 +2738,45 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
              The invalid value is 0."
         ::= { hwAclIpv6AdvancedRuleEntry 35 }
         
-    -- 1.3.6.1.4.1.2011.5.1.1.14
+    -- 1.3.6.1.4.1.2011.5.1.1.13.1.36   
+    hwAclIpv6AdvancedTcpFlag OBJECT-TYPE
+        SYNTAX Integer32 (-1|0..63)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the code of TCP Sync flag(0~63),
+             The invalid value is -1."
+        ::= { hwAclIpv6AdvancedRuleEntry 36 }
+
+        -- 1.3.6.1.4.1.2011.5.1.1.13.1.37
+    hwAclIpv6AdvancedTcpFlagMask OBJECT-TYPE
+        SYNTAX Integer32 (0..63)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the mask of tcp-flag.
+            The invalid value is 0."
+        ::= { hwAclIpv6AdvancedRuleEntry 37 }
+
+        -- 1.3.6.1.4.1.2011.5.1.1.13.1.38
+    hwAclIpv6AdvancedSrcWild OBJECT-TYPE
+        SYNTAX Ipv6Address
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the wildcard mask of the source IPv6 address."
+        ::= { hwAclIpv6AdvancedRuleEntry 38 }
+
+        -- 1.3.6.1.4.1.2011.5.1.1.13.1.39
+    hwAclIpv6AdvancedDestWild OBJECT-TYPE
+        SYNTAX Ipv6Address
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the wildcard mask of the destination IPv6 address."
+        ::= { hwAclIpv6AdvancedRuleEntry 39 }
+
+        -- 1.3.6.1.4.1.2011.5.1.1.14
     hwAclEthernetFrameRuleTable OBJECT-TYPE
         SYNTAX SEQUENCE OF HwAclEthernetFrameRuleEntry
         MAX-ACCESS not-accessible
@@ -2760,8 +2872,8 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
             ACL when configuration sequence is adopted; otherwise, 
             it will be placed based on the 'Depth-first' principle.
             When ACL rules are following the 'Depth-first' principle,
-            the number of an ACL rule must be given 0 ,but it will be assigned
-            by step automatically;otherwise,this rule will not be created."
+            the number of an ACL rule must be given 0, but it will be assigned
+            by step automatically; otherwise, this rule will not be created."
         ::= { hwAclEthernetFrameRuleEntry 2 }
     
     -- 1.3.6.1.4.1.2011.5.1.1.14.1.3
@@ -3535,7 +3647,8 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         {
             basic(1),
             advanced(2),
-            interface(3)
+            interface(3),
+            ucl(4)
         }
     MAX-ACCESS read-create
     STATUS current
@@ -3548,7 +3661,7 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
-                "RowStatus, Now support three value:CreateAndGo,Active,Destroy."
+                "RowStatus, Now support three value: CreateAndGo, Active, Destroy."
             ::= { hwAclIpv6NumGroupEntry 51 }
 
     hwAclIpv6NumGroupStep OBJECT-TYPE
@@ -3633,7 +3746,7 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
             it will be placed based on the 'Depth-first' principle.
             When ACL rules are following the 'Depth-first' principle,
             the number of an ACL6 rule must be given 0, but it will be assigned
-            automatically;otherwise, this rule will not be created."
+            automatically; otherwise, this rule will not be created."
         ::= { hwAclIpv6IfRuleEntry 2 }
     
     hwAclIpv6IfAct OBJECT-TYPE
@@ -3809,8 +3922,8 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
             ACL when configuration sequence is adopted; otherwise, 
             it will be placed based on the 'Depth-first' principle.
             When ACL rules are following the 'Depth-first' principle,
-            the number of an ACL rule must be given 0 ,but it will be assigned
-            by step automatically;otherwise,this rule will not be created."
+            the number of an ACL rule must be given 0, but it will be assigned
+            by step automatically; otherwise, this rule will not be created."
         ::= { hwAclMplsRuleEntry 2 }
     
     -- 1.3.6.1.4.1.2011.5.1.1.18.1.3
@@ -4037,7 +4150,7 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
-            "RowStatus, Now support three value:CreateAndGo,Active and Destroy."
+            "RowStatus, Now support three value: CreateAndGo, Active and Destroy."
         ::= { hwAclMplsRuleEntry 21 }        
 
     -- 1.3.6.1.4.1.2011.5.1.1.18.1.22
@@ -4378,13 +4491,13 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
-            "The object indicates the Port operation.
-            'lt' means less than,
-            'eq' means equal to,
-            'gt' means greater than,
-            'neq' means not equal to,
-            'range' means between,
-            'invalid' means this operation of the rule is invalid."
+            "Operator that compares port numbers in an ACL port pool. The options are as follows:
+             lt (matching packets whose port number is smaller than the specified port number)
+             eq (matching packets with the specified port number)
+             gt (matching packets whose port number is greater than the specified port number)
+             neq (matching packets whose port number is different from the specified port number)
+             invalid (invalid rule matching operation)
+             range (matching packets with a specified port number in a certain range). Only range requires two port numbers as the operand. Other values require only one port number as the operand."
         ::= { hwAclPortPoolPortEntry 3 }
 
     -- 1.3.6.1.4.1.2011.5.1.1.23.1.4
@@ -4481,6 +4594,603 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
             "Row status."
         ::= { hwAclIPPool6Entry 4 }
 
+		-- 1.3.6.1.4.1.2011.5.1.1.25
+		hwAclIpv6UserRuleTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwAclIpv6UserRuleEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwAclMibObjects 25 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.1.1.25.1
+		hwAclIpv6UserRuleEntry OBJECT-TYPE
+			SYNTAX HwAclIpv6UserRuleEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { hwAclIpv6UserAclNum, hwAclIpv6UserSubitem }
+			::= { hwAclIpv6UserRuleTable 1 }
+
+		
+		HwAclIpv6UserRuleEntry ::=
+			SEQUENCE { 
+				hwAclIpv6UserAclNum
+					Integer32,
+				hwAclIpv6UserSubitem
+					Unsigned32,
+				hwAclIpv6UserAct
+					INTEGER,
+				hwAclIpv6UserProtocol
+					Integer32,
+				hwAclIpv6UserSrcIp
+					OCTET STRING,
+				hwAclIpv6UserSrcPrefix
+					Integer32,
+				hwAclIpv6UserSrcOp
+					INTEGER,
+				hwAclIpv6UserSrcPort1
+					Integer32,
+				hwAclIpv6UserSrcPort2
+					Integer32,
+				hwAclIpv6UserSrcUserGroup
+					Integer32,
+				hwAclIpv6UserSrcDomainId
+					Integer32,
+				hwAclIpv6UserSrcDomainName
+					OCTET STRING,
+				hwAclIpv6UserDestIp
+					OCTET STRING,
+				hwAclIpv6UserDestPrefix
+					Integer32,
+				hwAclIpv6UserDestOp
+					INTEGER,
+				hwAclIpv6UserDestPort1
+					Integer32,
+				hwAclIpv6UserDestPort2
+					Integer32,
+				hwAclIpv6UserDestUserGroup
+					Integer32,
+				hwAclIpv6UserDestDomainId
+					Integer32,
+				hwAclIpv6UserDestDomainName
+					OCTET STRING,
+				hwAclIpv6UserPrecedence
+					Integer32,
+				hwAclIpv6UserTos
+					Integer32,
+				hwAclIpv6UserDscp
+					Integer32,
+				hwAclIpv6UserEstablish
+					INTEGER,
+				hwAclIpv6UserTimeRangeIndex
+					Integer32,
+				hwAclIpv6UserIcmpType
+					Integer32,
+				hwAclIpv6UserIcmpCode
+					Integer32,
+				hwAclIpv6UserFragment
+					INTEGER,
+				hwAclIpv6UserLog
+					INTEGER,
+				hwAclIpv6UserEnable
+					INTEGER,
+				hwAclIpv6UserCount
+					Counter64,
+				hwAclIpv6UserVrfName
+					OCTET STRING,
+				hwAclIpv6UserDescription
+					OCTET STRING,
+				hwAclIpv6UserRowStatus
+					INTEGER,
+				hwAclIpv6UserSrcModeType
+					Integer32,
+				hwAclIpv6UserDestModeType
+					Integer32
+			 }
+
+		-- 1.3.6.1.4.1.2011.5.1.1.25.1.1
+		hwAclIpv6UserAclNum OBJECT-TYPE
+			SYNTAX Integer32 (3000..3999 | 42768..75535)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The index of ipv6 User acl table, the index range is (3000..3999 | 42768..75535)."
+			::= { hwAclIpv6UserRuleEntry 1 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.1.1.25.1.2
+		hwAclIpv6UserSubitem OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The object specifies the number of an ipv6 User ACL rule.
+"
+			::= { hwAclIpv6UserRuleEntry 2 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.1.1.25.1.3
+		hwAclIpv6UserAct OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				permit(1),
+				deny(2)
+				}
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The object indicates the action of an ipv6 User acl rule.
+"
+			::= { hwAclIpv6UserRuleEntry 3 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.1.1.25.1.4
+		hwAclIpv6UserProtocol OBJECT-TYPE
+			SYNTAX Integer32 (0..255)
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The object indicates the protocol type of the rule.
+
+				            It specifies the protocol type over IP. The number of IPv6 protocol is 0."
+			::= { hwAclIpv6UserRuleEntry 4 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.1.1.25.1.5
+		hwAclIpv6UserSrcIp OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (16))
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The object indicates the source IPv6-address of an ipv6 User acl rule."
+			::= { hwAclIpv6UserRuleEntry 5 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.1.1.25.1.6
+		hwAclIpv6UserSrcPrefix OBJECT-TYPE
+			SYNTAX Integer32 (0..128)
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The object indicates the source IPv6-address prefix length of an ipv6 User acl rule."
+			::= { hwAclIpv6UserRuleEntry 6 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.1.1.25.1.7
+		hwAclIpv6UserSrcOp OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				lt(1),
+				eq(2),
+				gt(3),
+				neq(4),
+				range(5),
+				invalid(255)
+				}
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The object indicates the source Port operation symbol of an ipv6 User acl
+"
+			::= { hwAclIpv6UserRuleEntry 7 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.1.1.25.1.8
+		hwAclIpv6UserSrcPort1 OBJECT-TYPE
+			SYNTAX Integer32 (0..65535)
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The object indicates the fourth layer source port2."
+			::= { hwAclIpv6UserRuleEntry 8 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.1.1.25.1.9
+		hwAclIpv6UserSrcPort2 OBJECT-TYPE
+			SYNTAX Integer32 (0..65535)
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The object indicates the source user group of an ipv6 User acl rule."
+			::= { hwAclIpv6UserRuleEntry 9 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.1.1.25.1.10
+		hwAclIpv6UserSrcUserGroup OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The object indicates the source passthrough domain  of an ipv6 User acl rule."
+			::= { hwAclIpv6UserRuleEntry 10 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.1.1.25.1.11
+		hwAclIpv6UserSrcDomainId OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The object indicates the source passthrough domain Id of an ipv6 User acl rule."
+			::= { hwAclIpv6UserRuleEntry 11 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.1.1.25.1.12
+		hwAclIpv6UserSrcDomainName OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (3..127))
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The object indicates the source passthrough domain  of an ipv6 User acl rule."
+			::= { hwAclIpv6UserRuleEntry 12 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.1.1.25.1.13
+		hwAclIpv6UserDestIp OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (16))
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The object indicates the destination IPv6-address of an ipv6 User acl rule."
+			::= { hwAclIpv6UserRuleEntry 13 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.1.1.25.1.14
+		hwAclIpv6UserDestPrefix OBJECT-TYPE
+			SYNTAX Integer32 (0..128)
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The object indicates the destination IPv6-address prefix length of an ipv6 User acl rule."
+			::= { hwAclIpv6UserRuleEntry 14 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.1.1.25.1.15
+		hwAclIpv6UserDestOp OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				lt(1),
+				eq(2),
+				gt(3),
+				neq(4),
+				range(5),
+				invalid(255)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The object indicates the destination Port operation symbol of an ipv6 User
+"
+			::= { hwAclIpv6UserRuleEntry 15 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.1.1.25.1.16
+		hwAclIpv6UserDestPort1 OBJECT-TYPE
+			SYNTAX Integer32 (0..65535)
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The object indicates the fourth layer destination port1."
+			::= { hwAclIpv6UserRuleEntry 16 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.1.1.25.1.17
+		hwAclIpv6UserDestPort2 OBJECT-TYPE
+			SYNTAX Integer32 (0..65535)
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The object indicates the fourth layer destination port2."
+			::= { hwAclIpv6UserRuleEntry 17 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.1.1.25.1.18
+		hwAclIpv6UserDestUserGroup OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The object indicates the destination user group of an ipv6 User acl rule."
+			::= { hwAclIpv6UserRuleEntry 18 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.1.1.25.1.19
+		hwAclIpv6UserDestDomainId OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The object indicates the destination passthrough domain of an ipv6 User acl rule."
+			::= { hwAclIpv6UserRuleEntry 19 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.1.1.25.1.20
+		hwAclIpv6UserDestDomainName OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (3..127))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The object indicates the destination passthrough domain of an ipv6 User acl rule."
+			::= { hwAclIpv6UserRuleEntry 20 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.1.1.25.1.21
+		hwAclIpv6UserPrecedence OBJECT-TYPE
+			SYNTAX Integer32 (0..7 | 255)
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The object indicates the value of IPv6-packet's precedence, 
+"
+			::= { hwAclIpv6UserRuleEntry 21 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.1.1.25.1.22
+		hwAclIpv6UserTos OBJECT-TYPE
+			SYNTAX Integer32 (0..15 | 255)
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The object indicates the value of IPv6-packet's TOS,
+"
+			::= { hwAclIpv6UserRuleEntry 22 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.1.1.25.1.23
+		hwAclIpv6UserDscp OBJECT-TYPE
+			SYNTAX Integer32 (0..63 | 255)
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The object indicates the value of frame.The invalid 
+"
+			::= { hwAclIpv6UserRuleEntry 23 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.1.1.25.1.24
+		hwAclIpv6UserEstablish OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				true(1),
+				false(2)
+				}
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The object indicates whether or not establishing."
+			::= { hwAclIpv6UserRuleEntry 24 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.1.1.25.1.25
+		hwAclIpv6UserTimeRangeIndex OBJECT-TYPE
+			SYNTAX Integer32 (0..256)
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The object indicates the time range of an ipv6 User acl rule. 
+"
+			::= { hwAclIpv6UserRuleEntry 25 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.1.1.25.1.26
+		hwAclIpv6UserIcmpType OBJECT-TYPE
+			SYNTAX Integer32 (0..255 | 65535)
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The object indicates the type of ICMPv6 packet. 
+"
+			::= { hwAclIpv6UserRuleEntry 26 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.1.1.25.1.27
+		hwAclIpv6UserIcmpCode OBJECT-TYPE
+			SYNTAX Integer32 (0..255 | 65535)
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The object indicates the code of ICMPv6 packet.
+"
+			::= { hwAclIpv6UserRuleEntry 27 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.1.1.25.1.28
+		hwAclIpv6UserFragment OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				fragmentSubseq(0),
+				fragment(1),
+				none(255)
+				}
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The object indicates the type of the packet.     
+
+				         1: fragment, indicating that the packet is a fragment
+
+				         255: none, invalid value
+
+				         This object cannot be modified once a rule is created.
+"
+			::= { hwAclIpv6UserRuleEntry 28 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.1.1.25.1.29
+		hwAclIpv6UserLog OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				true(1),
+				false(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The object indicates whether to log the matched packets. The log 
+
+				            contents include sequence number of ACL rule, 
+
+				            packets passed or discarded, upper layer protocol type over IP, 
+
+				            source/destination address, source/destination port number, 
+
+				            and number of packets"
+			::= { hwAclIpv6UserRuleEntry 29 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.1.1.25.1.30
+		hwAclIpv6UserEnable OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				enabled(1),
+				disabled(2)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The object indicates whether the rule is valid or invalid."
+			::= { hwAclIpv6UserRuleEntry 30 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.1.1.25.1.31
+		hwAclIpv6UserCount OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The object indicates the statistics of matched packets by the rule."
+			::= { hwAclIpv6UserRuleEntry 31 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.1.1.25.1.32
+		hwAclIpv6UserVrfName OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..31))
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The object indicates the VRF name of this rule, 
+
+				            It specifies the VPN-instance to which the packet belongs."
+			::= { hwAclIpv6UserRuleEntry 32 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.1.1.25.1.33
+		hwAclIpv6UserDescription OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..127))
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The object indicates the description of this IPv6 User rule.
+"
+			::= { hwAclIpv6UserRuleEntry 33 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.1.1.25.1.34
+		hwAclIpv6UserRowStatus OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				active(1),
+				notInService(2),
+				notReady(3),
+				createAndGo(4),
+				createAndWait(5),
+				destroy(6)
+				}
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"RowStatus, Now support three state: CreateAndGo, Active, Destroy."
+			::= { hwAclIpv6UserRuleEntry 34 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.1.1.25.1.35
+		hwAclIpv6UserSrcModeType OBJECT-TYPE
+			SYNTAX Integer32 (0..6)
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The object indicates ACL's mode type"
+			::= { hwAclIpv6UserRuleEntry 35 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.1.1.25.1.36
+		hwAclIpv6UserDestModeType OBJECT-TYPE
+			SYNTAX Integer32 (0..6)
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The object indicates ACL's mode type"
+			::= { hwAclIpv6UserRuleEntry 36 }
+
+    -- 1.3.6.1.4.1.2011.5.1.1.26
+	hwAclIPPoolHostNameTable OBJECT-TYPE
+	    SYNTAX SEQUENCE OF HwAclIPPoolHostNameEntry
+	    MAX-ACCESS not-accessible
+	    STATUS current
+	    DESCRIPTION
+	    "Configure the host name of IP pool."
+	    ::= { hwAclMibObjects 26 }
+
+	-- 1.3.6.1.4.1.2011.5.1.1.26.1
+	hwAclIPPoolHostNameEntry OBJECT-TYPE
+	    SYNTAX HwAclIPPoolHostNameEntry
+	    MAX-ACCESS not-accessible
+	    STATUS current
+	    DESCRIPTION
+	    "Each entry is a host name of IP pool."
+	    INDEX { hwAclIPPoolHostIPPoolIndex, hwAclIPPoolHostNameIndex }
+	    ::= { hwAclIPPoolHostNameTable 1 }
+
+	HwAclIPPoolHostNameEntry ::=
+        SEQUENCE {
+        hwAclIPPoolHostIPPoolIndex
+        Integer32,
+        hwAclIPPoolHostNameIndex
+        Integer32,
+        hwAclIPPoolHostNameName
+        OCTET STRING,
+        hwAclIPPoolHostNameRowStatus
+        RowStatus
+        }
+
+	-- 1.3.6.1.4.1.2011.5.1.1.26.1.1
+	hwAclIPPoolHostIPPoolIndex OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "This object indicates the level 1 index, that is, the index of an IP address pool used by an ACL."
+        ::= { hwAclIPPoolHostNameEntry 1 }
+
+	-- 1.3.6.1.4.1.2011.5.1.1.26.1.2
+	hwAclIPPoolHostNameIndex OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "This object indicates the level 2 index, that is, the index of an host name in an IP address pool used by an ACL."
+        ::= { hwAclIPPoolHostNameEntry 2 }
+
+	-- 1.3.6.1.4.1.2011.5.1.1.26.1.3
+	hwAclIPPoolHostNameName OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (1..255))
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+        "The object indicates the host name."
+        ::= { hwAclIPPoolHostNameEntry 3 }
+
+	-- 1.3.6.1.4.1.2011.5.1.1.26.1.4
+        hwAclIPPoolHostNameRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+        "Row status."
+        ::= { hwAclIPPoolHostNameEntry 4 }
     --    Acl Trap MIB definition
     -- 
     -- 1.3.6.1.4.1.2011.5.1.2
@@ -4571,6 +5281,223 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         "Group for all acl resource traps."
         ::= { hwAclResourceTrapsGroups 1 }
 
+    -- 1.3.6.1.4.1.2011.5.1.2.2.1.2
+    hwCounterResourceTrapsTable OBJECT IDENTIFIER ::= { hwAclTraps 2 }
+
+    -- 1.3.6.1.4.1.2011.5.1.2.2.1.2.1
+    hwCounterResSlotStr OBJECT-TYPE
+        SYNTAX OCTET STRING
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+        "The infomation of slot."
+        ::= { hwCounterResourceTrapsTable 1 }
+
+    -- 1.3.6.1.4.1.2011.5.1.2.2.1.2.2
+    hwCounterResStage OBJECT-TYPE
+        SYNTAX OCTET STRING
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+        "The stage where trap infomation exists."
+        ::= { hwCounterResourceTrapsTable 2 }
+
+    -- 1.3.6.1.4.1.2011.5.1.2.2.1.2.3
+    hwCounterResLimit OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+        "The usage of counter resource."
+        ::= { hwCounterResourceTrapsTable 3 }
+
+    -- 1.3.6.1.4.1.2011.5.1.2.2.1.2.4
+    hwCounterResourceTrapsEntry OBJECT IDENTIFIER ::= { hwCounterResourceTrapsTable 4 }
+
+    -- 1.3.6.1.4.1.2011.5.1.2.2.1.2.4.1
+    hwCounterResThresholdExceedClear NOTIFICATION-TYPE
+        OBJECTS { hwCounterResLimit, hwCounterResSlotStr, hwCounterResStage }
+        STATUS current
+        DESCRIPTION
+        "Acl counter resource lack clear trap"
+        ::= { hwCounterResourceTrapsEntry 1 }
+
+    -- 1.3.6.1.4.1.2011.5.1.2.2.1.2.4.2
+    hwCounterResThresholdExceed NOTIFICATION-TYPE
+        OBJECTS { hwCounterResLimit, hwCounterResSlotStr, hwCounterResStage }
+        STATUS current
+        DESCRIPTION
+        "Acl counter resource lack trap"
+        ::= { hwCounterResourceTrapsEntry 2 }
+
+    -- 1.3.6.1.4.1.2011.5.1.2.2.1.2.4.3
+    hwCounterResTotalCountExceedClear NOTIFICATION-TYPE
+        OBJECTS { hwCounterResLimit, hwCounterResSlotStr, hwCounterResStage }
+        STATUS current
+        DESCRIPTION
+        "Acl counter resource full clear trap"
+        ::= { hwCounterResourceTrapsEntry 3 }
+
+    -- 1.3.6.1.4.1.2011.5.1.2.2.1.2.4.4
+    hwCounterResTotalCountExceed NOTIFICATION-TYPE
+        OBJECTS { hwCounterResLimit, hwCounterResSlotStr, hwCounterResStage }
+        STATUS current
+        DESCRIPTION
+        "Acl counter resource full trap"
+        ::= { hwCounterResourceTrapsEntry 4 }
+
+    -- 1.3.6.1.4.1.2011.5.1.2.2.1.2.5
+    hwCounterResourceTrapsGroups OBJECT IDENTIFIER ::= { hwCounterResourceTrapsTable 5 }
+
+    -- 1.3.6.1.4.1.2011.5.1.2.2.1.2.5.1
+    hwCounterResourceTrapsGroup NOTIFICATION-GROUP
+        NOTIFICATIONS { hwCounterResThresholdExceedClear, hwCounterResThresholdExceed, hwCounterResTotalCountExceedClear, hwCounterResTotalCountExceed }
+        STATUS current
+        DESCRIPTION
+        "Group for all acl counter resource traps."
+        ::= { hwCounterResourceTrapsGroups 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.1.2.2.1.3
+    hwMeterResourceTrapsTable OBJECT IDENTIFIER ::= { hwAclTraps 3 }
+
+    -- 1.3.6.1.4.1.2011.5.1.2.2.1.3.1
+    hwMeterResSlotStr OBJECT-TYPE
+        SYNTAX OCTET STRING
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+        "The infomation of slot."
+        ::= { hwMeterResourceTrapsTable 1 }
+
+    -- 1.3.6.1.4.1.2011.5.1.2.2.1.3.2
+    hwMeterResStage OBJECT-TYPE
+        SYNTAX OCTET STRING
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+        "The stage where trap infomation exists."
+        ::= { hwMeterResourceTrapsTable 2 }
+
+    -- 1.3.6.1.4.1.2011.5.1.2.2.1.3.3
+    hwMeterResLimit OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+        "The usage of meter resource."
+        ::= { hwMeterResourceTrapsTable 3 }
+
+    -- 1.3.6.1.4.1.2011.5.1.2.2.1.3.4
+    hwMeterResourceTrapsEntry OBJECT IDENTIFIER ::= { hwMeterResourceTrapsTable 4 }
+
+    -- 1.3.6.1.4.1.2011.5.1.2.2.1.3.4.1
+    hwMeterResThresholdExceedClear NOTIFICATION-TYPE
+        OBJECTS { hwMeterResLimit, hwMeterResSlotStr, hwMeterResStage }
+        STATUS current
+        DESCRIPTION
+        "Acl meter resource lack clear trap"
+        ::= { hwMeterResourceTrapsEntry 1 }
+
+    -- 1.3.6.1.4.1.2011.5.1.2.2.1.3.4.2
+    hwMeterResThresholdExceed NOTIFICATION-TYPE
+        OBJECTS { hwMeterResLimit, hwMeterResSlotStr, hwMeterResStage }
+        STATUS current
+        DESCRIPTION
+        "Acl meter resource lack trap"
+        ::= { hwMeterResourceTrapsEntry 2 }
+
+    -- 1.3.6.1.4.1.2011.5.1.2.2.1.3.4.3
+    hwMeterResTotalCountExceedClear NOTIFICATION-TYPE
+        OBJECTS { hwMeterResLimit, hwMeterResSlotStr, hwMeterResStage }
+        STATUS current
+        DESCRIPTION
+        "Acl meter resource full clear trap"
+        ::= { hwMeterResourceTrapsEntry 3 }
+
+    -- 1.3.6.1.4.1.2011.5.1.2.2.1.3.4.4
+    hwMeterResTotalCountExceed NOTIFICATION-TYPE
+        OBJECTS { hwMeterResLimit, hwMeterResSlotStr, hwMeterResStage }
+        STATUS current
+        DESCRIPTION
+        "Acl meter resource full trap"
+        ::= { hwMeterResourceTrapsEntry 4 }
+
+    -- 1.3.6.1.4.1.2011.5.1.2.2.1.3.5
+    hwMeterResourceTrapsGroups OBJECT IDENTIFIER ::= { hwMeterResourceTrapsTable 5 }
+
+    -- 1.3.6.1.4.1.2011.5.1.2.2.1.3.5.1
+    hwMeterResourceTrapsGroup NOTIFICATION-GROUP
+        NOTIFICATIONS { hwMeterResThresholdExceedClear, hwMeterResThresholdExceed, hwMeterResTotalCountExceedClear, hwMeterResTotalCountExceed }
+        STATUS current
+        DESCRIPTION
+        "Group for all acl meter resource traps."
+        ::= { hwMeterResourceTrapsGroups 1 }
+
+    -- 1.3.6.1.4.1.2011.5.1.2.3
+    hwAclResourceInfoTrap OBJECT IDENTIFIER ::= { hwAclMibTrap 3 }
+
+    -- 1.3.6.1.4.1.2011.5.1.2.3.1
+    hwAclResourceOverloadTrap NOTIFICATION-TYPE
+        OBJECTS { hwAclResourceTotal, hwAclResourceUsed, hwAclResourceUsage}
+        STATUS current
+        DESCRIPTION
+        "The device acl resources were overloaded"
+        ::= { hwAclResourceInfoTrap 1 }
+
+    -- 1.3.6.1.4.1.2011.5.1.2.3.2
+    hwAclResourceResumeTrap NOTIFICATION-TYPE
+        OBJECTS { hwAclResourceTotal, hwAclResourceUsed, hwAclResourceUsage}
+        STATUS current
+        DESCRIPTION
+        "The device acl resources were resumed"
+        ::= { hwAclResourceInfoTrap 2 }
+
+    -- 1.3.6.1.4.1.2011.5.1.2.3.3
+    hwAclResourceEmptyTrap NOTIFICATION-TYPE
+        OBJECTS { hwAclResourceTotal, hwAclResourceUsed, hwAclResourceAlamInfo}
+        STATUS current
+        DESCRIPTION
+        "The device acl resources were not enough"
+        ::= { hwAclResourceInfoTrap 3 }
+
+    -- 1.3.6.1.4.1.2011.5.1.2.3.4
+    hwAclResourceItem OBJECT IDENTIFIER ::= { hwAclResourceInfoTrap 4 }
+
+    -- 1.3.6.1.4.1.2011.5.1.2.3.4.1
+    hwAclResourceTotal OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+        "The total num of rule resource."
+        ::= { hwAclResourceItem 1 }
+
+    -- 1.3.6.1.4.1.2011.5.1.2.3.4.2
+    hwAclResourceUsed OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+        "The used num of rule resource."
+        ::= { hwAclResourceItem 2 }
+
+    -- 1.3.6.1.4.1.2011.5.1.2.3.4.3
+    hwAclResourceUsage OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+        "The usage of rule resource."
+        ::= { hwAclResourceItem 3 }
+
+    -- 1.3.6.1.4.1.2011.5.1.2.3.4.4
+    hwAclResourceAlamInfo OBJECT-TYPE
+        SYNTAX OCTET STRING
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+        "The empty infomation of rule resource."
+        ::= { hwAclResourceItem 4 }
 
     --    Acl MIB Conformance definition
     -- 
@@ -4685,57 +5612,66 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
     hwAclMibGroups OBJECT IDENTIFIER ::= { hwAclMibConformance 2 }
     
     -- 1.3.6.1.4.1.2011.5.1.3.2.1
-        hwAclGroup OBJECT-GROUP
-            OBJECTS { hwAclNumGroupMatchOrder, hwAclNumGroupSubitemNum, hwAclNumGroupAclName, hwAclBasicAct, hwAclBasicSrcIp, 
-        hwAclBasicSrcWild, hwAclBasicTimeRangeIndex, hwAclBasicFragments, hwAclBasicLog, hwAclBasicEnable, 
-        hwAclBasicCount, hwAclBasicVrfAny, hwAclBasicRowStatus, hwAclAdvancedAct, hwAclAdvancedProtocol, hwAclAdvancedSrcIp, 
-        hwAclAdvancedSrcWild, hwAclAdvancedSrcOp, hwAclAdvancedSrcPort1, hwAclAdvancedSrcPort2, hwAclAdvancedDestIp, 
-        hwAclAdvancedDestWild, hwAclAdvancedDestOp, hwAclAdvancedDestPort1, hwAclAdvancedDestPort2, hwAclAdvancedPrecedence, 
-        hwAclAdvancedTos, hwAclAdvancedDscp, hwAclAdvancedEstablish, hwAclAdvancedTimeRangeIndex, hwAclAdvancedIcmpType, 
-        hwAclAdvancedIcmpCode, hwAclAdvancedFragments, hwAclAdvancedLog, hwAclAdvancedEnable, hwAclAdvancedCount, 
-        hwAclAdvancedRowStatus, hwAclAdvancedTcpSyncFlag, hwAclAdvancedSrcPoolName, hwAclAdvancedDestPoolName, 
-        hwAclAdvancedProtocolNew, hwAclAdvancedVni, hwAclAdvancedIgmpType, hwAclAdvancedTtlOp, hwAclAdvancedTtlExpire, 
-        hwAclAdvancedTtlExpireEnd, hwAclAdvancedSrcPortPoolName, hwAclAdvancedDestPortPoolName, hwAclAdvancedIcmpTypeEnd, hwAclAdvancedVrfAny, hwAclIfAct, hwAclIfIndex, hwAclIfAny, 
-        hwAclIfTimeRangeIndex, hwAclIfLog, hwAclIfEnable, hwAclIfCount, hwAclIfRowStatus, 
-        hwAclUserAct, hwAclUserProtocol, hwAclUserSrcIp, hwAclUserSrcWild, hwAclUserSrcOp, 
-        hwAclUserSrcPort1, hwAclUserSrcPort2, hwAclUserDestIp, hwAclUserDestWild, hwAclUserDestOp, 
-        hwAclUserDestPort1, hwAclUserDestPort2, hwAclUserPrecedence, hwAclUserTos, hwAclUserDscp, 
-        hwAclUserEstablish, hwAclUserTimeRangeIndex, hwAclUserIcmpType, hwAclUserIcmpCode, hwAclUserFragments, 
-        hwAclUserLog, hwAclUserEnable, hwAclUserCount, hwAclUserSrcUserGroupName, hwAclUserDestUserGroupName, 
-        hwAclUserSrcModeType, hwAclUserDestModeType, hwAclUserRowStatus, hwAclCompileEnableFlag, hwAclNumGroupAclNum, 
-        hwAclBasicAclNum, hwAclBasicSubitem, hwAclAdvancedAclNum, hwAclAdvancedSubitem, hwAclIfAclNum, 
-        hwAclIfSubitem, hwAclUserAclNum, hwAclUserSubitem, hwAclUserVrfName, hwAclUserTcpSyncFlag, 
-        hwAclEthernetFrameEncapType, hwAclEthernetFrameDoubleTag, hwAclEthernetFrameVlanId, hwAclEthernetFrameVlanIdMask, hwAclEthernetFrameCVlanId, 
-        hwAclEthernetFrameCVlanIdMask, hwAclAppliedStatMode, hwAclAppliedStatCount, hwAclAppliedLimitCir, hwAclAppliedLimitPir, 
-        hwAclAppliedLimitCbs, hwAclAppliedLimitPbs, hwAclAppliedLimitGreenAction, hwAclAppliedLimitGreenValue, hwAclAppliedLimitYellowAction, 
-        hwAclAppliedLimitYellowValue, hwAclAppliedLimitRedAction, hwAclAppliedLimitRedValue, hwAclAppliedMirrObservedPort, hwAclAppliedMirrRspanVlan, 
-        hwAclAppliedRedirectIfIndex, hwAclAppliedRedirectIpAddr, hwAclAppliedRedirectIpv6Addr, hwAclAppliedRemarkVlan, hwAclAppliedRemarkCVlan, 
-        hwAclAppliedRemark8021p, hwAclAppliedRemarkDscp, hwAclAppliedRemarkIpPre, hwAclAppliedRemarkLocalPre, hwAclAppliedRemarkMacAddr, 
-        hwAclAppliedRowStatus, hwAclCompileNumGroupStatus, hwAclNumGroupStep, hwAclNumGroupDescription, hwAclNumGroupCountClear, 
-        hwAclNumGroupRowStatus, hwAclBasicVrfName, hwAclAdvancedVrfName, hwAclIpv6BasicAct, hwAclIpv6BasicSrcIp, 
-        hwAclIpv6BasicSrcPrefix, hwAclIpv6BasicTimeRangeIndex, hwAclIpv6BasicFragment, hwAclIpv6BasicLog, hwAclIpv6BasicEnable, 
-        hwAclIpv6BasicCount, hwAclIpv6BasicVrfName, hwAclIpv6BasicRowStatus, hwAclIpv6BasicVrfAny, hwAclIpv6AdvancedAct, hwAclIpv6AdvancedProtocol, 
-        hwAclIpv6AdvancedSrcIp, hwAclIpv6AdvancedSrcPrefix, hwAclIpv6AdvancedSrcOp, hwAclIpv6AdvancedSrcPort1, hwAclIpv6AdvancedSrcPort2, 
-        hwAclIpv6AdvancedDestIp, hwAclIpv6AdvancedDestPrefix, hwAclIpv6AdvancedDestOp, hwAclIpv6AdvancedDestPort1, hwAclIpv6AdvancedDestPort2, 
-        hwAclIpv6AdvancedPrecedence, hwAclIpv6AdvancedTos, hwAclIpv6AdvancedDscp, hwAclIpv6AdvancedEstablish, hwAclIpv6AdvancedTimeRangeIndex, 
-        hwAclIpv6AdvancedIcmpType, hwAclIpv6AdvancedIcmpCode, hwAclIpv6AdvancedFragment, hwAclIpv6AdvancedLog, hwAclIpv6AdvancedEnable, 
-        hwAclIpv6AdvancedCount, hwAclIpv6AdvancedVrfName, hwAclIpv6AdvancedRowStatus, hwAclIpv6AdvancedProtocolNew, hwAclIpv6AdvancedIcmpTypeEnd, hwAclIpv6AdvancedVrfAny, hwAclEthernetFrameAct, hwAclEthernetFrameType, 
-        hwAclEthernetFrameTypeMask, hwAclEthernetFrameSrcMac, hwAclEthernetFrameSrcMacMask, hwAclEthernetFrameDstMac, hwAclEthernetFrameDstMacMask, 
-        hwAclEthernetFrameTimeRangeIndex, hwAclEthernetFrameLog, hwAclEthernetFrameEnable, hwAclEthernetFrameCount,  
-        hwAclEthernetFrameRowStatus, hwAclEthernetFrameRule8021p, hwAclEthernetFrameRuleCVlan8021p,
-        hwAclIpv6NumGroupMatchOrder, hwAclIpv6NumGroupSubitemNum, hwAclIpv6NumGroupCountClear, hwAclIpv6NumGroupRowStatus, hwAclIpv6NumGroupAclName,
-        hwAclIpv6IfAct, hwAclIpv6IfIndex, hwAclIpv6IfAny, hwAclIpv6IfTimeRangeIndex, hwAclIpv6IfLog, hwAclIpv6IfEnable, hwAclIpv6IfCount, hwAclIpv6IfRowStatus, 
-        hwAclMplsAct, hwAclMplsExp1, hwAclMplsExp2,
-        hwAclMplsExp3, hwAclMplsExp4, hwAclMplsLabel1, hwAclMplsLabel2, hwAclMplsLabel3,
-        hwAclMplsLabel4, hwAclMplsTTLOP1, hwAclMplsTTL1Begin, hwAclMplsTTL1End,
-        hwAclMplsTTLOP2, hwAclMplsTTL2Begin, hwAclMplsTTL2End, 
-        hwAclMplsTTLOP3, hwAclMplsTTL3Begin, hwAclMplsTTL3End, hwAclMplsRowStatus, hwAclMplsCount, hwAclIpv6BasicSrcMask, hwAclIpv6AdvancedSrcMask, hwAclIpv6AdvancedDestMask,
-        hwAclIPPoolIndex, hwAclIPPoolName, hwAclIPPoolRowStatus,
-        hwAclIPPoolIPPoolIndex, hwAclIPPoolIPIndex, hwAclIPPoolIPIpAdd, hwAclIPPoolIPIpWild, hwAclIPPoolIPRowStatus,
-        hwAclPortPoolIndex, hwAclPortPoolName, hwAclPortPoolRowStatus,
-        hwAclPortPoolPortPoolIndex, hwAclPortPoolPortIndex, hwAclPortPoolPortOp, hwAclPortPoolPortNumBegin, hwAclPortPoolPortNumEnd, hwAclPortPoolPortRowStatus}
-        STATUS current
-        DESCRIPTION 
-            "A collection of objects providing mandatory acl information."
-        ::= { hwAclMibGroups 1 }
+		hwAclGroup OBJECT-GROUP
+			OBJECTS { hwAclNumGroupMatchOrder, hwAclNumGroupSubitemNum, hwAclNumGroupAclName, hwAclBasicAct, hwAclBasicSrcIp, 
+				hwAclBasicSrcWild, hwAclBasicTimeRangeIndex, hwAclBasicFragments, hwAclBasicLog, hwAclBasicEnable, 
+				hwAclBasicCount, hwAclBasicVrfAny, hwAclBasicRowStatus, hwAclAdvancedAct, hwAclAdvancedProtocol, 
+				hwAclAdvancedSrcIp, hwAclAdvancedSrcWild, hwAclAdvancedSrcOp, hwAclAdvancedSrcPort1, hwAclAdvancedSrcPort2, 
+				hwAclAdvancedDestIp, hwAclAdvancedDestWild, hwAclAdvancedDestOp, hwAclAdvancedDestPort1, hwAclAdvancedDestPort2, 
+				hwAclAdvancedPrecedence, hwAclAdvancedTos, hwAclAdvancedDscp, hwAclAdvancedEstablish, hwAclAdvancedTimeRangeIndex, 
+				hwAclAdvancedIcmpType, hwAclAdvancedIcmpCode, hwAclAdvancedFragments, hwAclAdvancedLog, hwAclAdvancedEnable, 
+				hwAclAdvancedCount, hwAclAdvancedRowStatus, hwAclAdvancedTcpSyncFlag, hwAclAdvancedSrcPoolName, hwAclAdvancedDestPoolName, 
+				hwAclAdvancedProtocolNew, hwAclAdvancedVni, hwAclAdvancedIgmpType, hwAclAdvancedTtlOp, hwAclAdvancedTtlExpire, 
+				hwAclAdvancedTtlExpireEnd, hwAclAdvancedSrcPortPoolName, hwAclAdvancedDestPortPoolName, hwAclAdvancedIcmpTypeEnd, hwAclAdvancedVrfAny, 
+				hwAclIfAct, hwAclIfIndex, hwAclIfAny, hwAclIfTimeRangeIndex, hwAclIfLog, 
+				hwAclIfEnable, hwAclIfCount, hwAclIfRowStatus, hwAclUserAct, hwAclUserProtocol, 
+				hwAclUserSrcIp, hwAclUserSrcWild, hwAclUserSrcOp, hwAclUserSrcPort1, hwAclUserSrcPort2, 
+				hwAclUserDestIp, hwAclUserDestWild, hwAclUserDestOp, hwAclUserDestPort1, hwAclUserDestPort2, 
+				hwAclUserPrecedence, hwAclUserTos, hwAclUserDscp, hwAclUserEstablish, hwAclUserTimeRangeIndex, 
+				hwAclUserIcmpType, hwAclUserIcmpCode, hwAclUserFragments, hwAclUserLog, hwAclUserEnable, 
+				hwAclUserCount, hwAclUserSrcUserGroupName, hwAclUserDestUserGroupName, hwAclUserSrcModeType, hwAclUserDestModeType, 
+				hwAclUserRowStatus, hwAclCompileEnableFlag, hwAclNumGroupAclNum, hwAclBasicAclNum, hwAclBasicSubitem, 
+				hwAclAdvancedAclNum, hwAclAdvancedSubitem, hwAclIfAclNum, hwAclIfSubitem, hwAclUserAclNum, 
+				hwAclUserSubitem, hwAclUserVrfName, hwAclUserTcpSyncFlag, hwAclEthernetFrameEncapType, hwAclEthernetFrameDoubleTag, 
+				hwAclEthernetFrameVlanId, hwAclEthernetFrameVlanIdMask, hwAclEthernetFrameCVlanId, hwAclEthernetFrameCVlanIdMask, hwAclAppliedStatMode, 
+				hwAclAppliedStatCount, hwAclAppliedLimitCir, hwAclAppliedLimitPir, hwAclAppliedLimitCbs, hwAclAppliedLimitPbs, 
+				hwAclAppliedLimitGreenAction, hwAclAppliedLimitGreenValue, hwAclAppliedLimitYellowAction, hwAclAppliedLimitYellowValue, hwAclAppliedLimitRedAction, 
+				hwAclAppliedLimitRedValue, hwAclAppliedMirrObservedPort, hwAclAppliedMirrRspanVlan, hwAclAppliedRedirectIfIndex, hwAclAppliedRedirectIpAddr, 
+				hwAclAppliedRedirectIpv6Addr, hwAclAppliedRemarkVlan, hwAclAppliedRemarkCVlan, hwAclAppliedRemark8021p, hwAclAppliedRemarkDscp, 
+				hwAclAppliedRemarkIpPre, hwAclAppliedRemarkLocalPre, hwAclAppliedRemarkMacAddr, hwAclAppliedRowStatus, hwAclCompileNumGroupStatus, 
+				hwAclNumGroupStep, hwAclNumGroupDescription, hwAclNumGroupCountClear, hwAclNumGroupRowStatus, hwAclBasicVrfName, 
+				hwAclAdvancedVrfName, hwAclIpv6BasicAct, hwAclIpv6BasicSrcIp, hwAclIpv6BasicSrcPrefix, hwAclIpv6BasicTimeRangeIndex, 
+				hwAclIpv6BasicFragment, hwAclIpv6BasicLog, hwAclIpv6BasicEnable, hwAclIpv6BasicCount, hwAclIpv6BasicVrfName, 
+				hwAclIpv6BasicRowStatus, hwAclIpv6BasicVrfAny, hwAclIpv6BasicSrcWild, hwAclIpv6AdvancedAct, hwAclIpv6AdvancedProtocol, hwAclIpv6AdvancedSrcIp, 
+				hwAclIpv6AdvancedSrcPrefix, hwAclIpv6AdvancedSrcOp, hwAclIpv6AdvancedSrcPort1, hwAclIpv6AdvancedSrcPort2, hwAclIpv6AdvancedDestIp, 
+				hwAclIpv6AdvancedDestPrefix, hwAclIpv6AdvancedDestOp, hwAclIpv6AdvancedDestPort1, hwAclIpv6AdvancedDestPort2, hwAclIpv6AdvancedPrecedence, 
+				hwAclIpv6AdvancedTos, hwAclIpv6AdvancedDscp, hwAclIpv6AdvancedEstablish, hwAclIpv6AdvancedTimeRangeIndex, hwAclIpv6AdvancedIcmpType, 
+				hwAclIpv6AdvancedIcmpCode, hwAclIpv6AdvancedFragment, hwAclIpv6AdvancedLog, hwAclIpv6AdvancedEnable, hwAclIpv6AdvancedCount, 
+				hwAclIpv6AdvancedVrfName, hwAclIpv6AdvancedRowStatus, hwAclIpv6AdvancedProtocolNew, hwAclIpv6AdvancedIcmpTypeEnd, hwAclIpv6AdvancedVrfAny, 
+				hwAclIpv6AdvancedSrcPoolName, hwAclIpv6AdvancedVni, hwAclIpv6AdvancedTcpFlag, hwAclIpv6AdvancedTcpFlagMask, 
+                                                                             hwAclIpv6AdvancedSrcWild, hwAclIpv6AdvancedDestWild, hwAclEthernetFrameAct, 
+				hwAclEthernetFrameType, hwAclEthernetFrameTypeMask, hwAclEthernetFrameSrcMac, hwAclEthernetFrameSrcMacMask, hwAclEthernetFrameDstMac, 
+				hwAclEthernetFrameDstMacMask, hwAclEthernetFrameTimeRangeIndex, hwAclEthernetFrameLog, hwAclEthernetFrameEnable, hwAclEthernetFrameCount, 
+				hwAclEthernetFrameRowStatus, hwAclEthernetFrameRule8021p, hwAclEthernetFrameRuleCVlan8021p, hwAclIpv6NumGroupMatchOrder, hwAclIpv6NumGroupSubitemNum, 
+				hwAclIpv6NumGroupCountClear, hwAclIpv6NumGroupRowStatus, hwAclIpv6NumGroupAclName, hwAclIpv6IfAct, hwAclIpv6IfIndex, 
+				hwAclIpv6IfAny, hwAclIpv6IfTimeRangeIndex, hwAclIpv6IfLog, hwAclIpv6IfEnable, hwAclIpv6IfCount, 
+				hwAclIpv6IfRowStatus, hwAclMplsAct, hwAclMplsExp1, hwAclMplsExp2, hwAclMplsExp3, 
+				hwAclMplsExp4, hwAclMplsLabel1, hwAclMplsLabel2, hwAclMplsLabel3, hwAclMplsLabel4, 
+				hwAclMplsTTLOP1, hwAclMplsTTL1Begin, hwAclMplsTTL1End, hwAclMplsTTLOP2, hwAclMplsTTL2Begin, 
+				hwAclMplsTTL2End, hwAclMplsTTLOP3, hwAclMplsTTL3Begin, hwAclMplsTTL3End, hwAclMplsRowStatus, 
+				hwAclIpv6UserDestModeType, hwAclIpv6UserSrcModeType, hwAclIpv6UserCount, hwAclIpv6UserRowStatus, hwAclIpv6UserEnable, 
+				hwAclIpv6UserLog, hwAclIpv6UserFragment, hwAclIpv6UserIcmpCode, hwAclIpv6UserIcmpType, hwAclIpv6UserTimeRangeIndex, 
+				hwAclIpv6UserEstablish, hwAclIpv6UserTos, hwAclIpv6UserPrecedence, hwAclIpv6UserDestPort2, hwAclIpv6UserDestPort1, 
+				hwAclIpv6UserDestOp, hwAclIpv6UserDestPrefix, hwAclIpv6UserDestIp, hwAclIpv6UserSrcPort2, hwAclIpv6UserSrcPort1, 
+				hwAclIpv6UserSrcOp, hwAclIpv6UserSrcPrefix, hwAclIpv6UserSrcIp, hwAclIpv6UserProtocol, hwAclIpv6UserAct, 
+				hwAclIpv6UserAclNum, hwAclMplsCount, hwAclIpv6BasicSrcMask, hwAclIpv6AdvancedSrcMask, hwAclIpv6AdvancedDestMask, 
+				hwAclIPPoolIndex, hwAclIPPoolName, hwAclIPPoolRowStatus, hwAclIPPoolIPPoolIndex, hwAclIPPoolIPIndex, 
+				hwAclIPPoolIPIpAdd, hwAclIPPoolIPIpWild, hwAclIPPoolIPRowStatus, hwAclPortPoolIndex, hwAclPortPoolName, 
+				hwAclPortPoolRowStatus, hwAclPortPoolPortPoolIndex, hwAclPortPoolPortIndex, hwAclPortPoolPortOp, hwAclPortPoolPortNumBegin, 
+				hwAclPortPoolPortNumEnd, hwAclPortPoolPortRowStatus,
+                hwAclIPPoolHostIPPoolIndex, hwAclIPPoolHostNameIndex, hwAclIPPoolHostNameName, hwAclIPPoolHostNameRowStatus }
+			STATUS current
+			DESCRIPTION 
+				"A collection of objects providing mandatory acl information."
+			::= { hwAclMibGroups 1 }
 END

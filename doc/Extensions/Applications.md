@@ -790,6 +790,8 @@ script it self at the top.
 
 ## FreeBSD NFS Client
 
+Superseded by the generalized NFS support.
+
 ### SNMP Extend
 
 1. Copy the shell script, fbsdnfsserver, to the desired host
@@ -814,6 +816,8 @@ the page. If it is not, please follow the steps set out under `SNMP
 Extend` heading top of page.
 
 ## FreeBSD NFS Server
+
+Superseded by the generalized NFS support.
 
 ### SNMP Extend
 
@@ -1074,32 +1078,45 @@ extend icecast /etc/snmp/icecast-stats.sh
 
 A small python3 script that reports current DHCP leases stats and pool usage of ISC DHCP Server.
 
-Also you have to install the dhcpd-pools Package.
-Under Ubuntu/Debian just run `apt install dhcpd-pools` or under
-FreeBSD `pkg install dhcpd-pools`.
+Also you have to install the dhcpd-pools and the required Perl
+modules. Under Ubuntu/Debian just run `apt install
+cpanminus ; cpanm Net::ISC::DHCPd::Leases Mime::Base64 File::Slurp` or under FreeBSD
+`pkg install p5-JSON p5-MIME-Base64 p5-App-cpanminus p5-File-Slurp ; cpanm Net::ISC::DHCPd::Leases`.
 
 ### SNMP Extend
 
 1. Copy the shell script to the desired host.
 ```
-wget https://github.com/librenms/librenms-agent/raw/master/snmp/dhcp.py -O /etc/snmp/dhcp.py
+wget https://github.com/librenms/librenms-agent/raw/master/snmp/dhcp -O /etc/snmp/dhcp
 ```
 
 2. Make the script executable
 ```
-chmod +x /etc/snmp/dhcp.py
+chmod +x /etc/snmp/dhcp
 ```
 
-3. Edit your config file, Content of an example /etc/snmp/dhcp.json
+3. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
 ```
-{"leasefile": "/var/lib/dhcp/dhcpd.leases" }
+# without using cron
+extend dhcpstats /etc/snmp/dhcp -Z
+# using cron
+extend dhcpstats /bin/cat /var/cache/dhcp_extend
 ```
-Key 'leasefile' specifies the path to your lease file.
 
-4. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
+4. If on a slow system running it via cron may be needed.
 ```
-extend dhcpstats /etc/snmp/dhcp.py
+*/5 * * * * /etc/snmp/dhcp -Z -w /var/cache/dhcp_extend
 ```
+
+The following options are also supported.
+
+| Option     | Description                     |
+|------------|---------------------------------|
+| `-c $file` | Path to dhcpd.conf.             |
+| `-l $file` | Path to lease file.             |
+| `-Z`       | Enable GZip+Base64 compression. |
+| `-d`       | Do not de-dup.                  |
+| `-w $file` | File to write it out to.        |
 
 5. Restart snmpd on your host
 
@@ -1199,8 +1216,8 @@ extend linux_config_files /etc/snmp/linux_config_files.py
 ```
 
 4. (Optional on an RPM-based distribution) Create a /etc/snmp/linux_config_files.json file and specify the following:
-a.) "pkg_system" - String designating the distribution name of the system.  At the moment only "rpm" is supported ["rpm"]
-b.) "pkg_tool_cmd" - String path to the package tool binary ["/sbin/rpmconf"]
+    1. "pkg_system" - String designating the distribution name of the system.  At the moment only "rpm" is supported ["rpm"]
+    2. "pkg_tool_cmd" - String path to the package tool binary ["/sbin/rpmconf"]
 ```
 {
     "pkg_system": "rpm",
@@ -1565,7 +1582,62 @@ Extend` heading top of page.
 [Install the agent](Agent-Setup.md) on this device if it isn't already
 and copy the `nginx` script to `/usr/lib/check_mk_agent/local/`
 
-## NFS Server
+## NFS
+
+Provides both NFS client and server support.
+
+Currently supported OSes are as below.
+
+- FreeBSD
+- Linux
+
+### SNMPd extend
+
+1. Download the extend.
+```
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/nfs -O /etc/snmp/nfs
+```
+
+2. Make it executable.
+```
+chmod +x /etc/snmp/nfs
+```
+
+3. Add it to snmpd.conf.
+```
+extend nfs /usr/bin/env PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin /etc/snmp/nfs
+```
+
+4. Restart snmpd on your host
+
+5. Either wait for it to be rediscovered, rediscover it, or enable it.
+
+If using SELinux, the following is needed.
+
+1. `setsebool -P nis_enabled 1`
+
+2. Make a file (snmp_nfs.te) with the following contents and install
+   the policy with the command `semodule -i snmp_nfs.te`.
+```
+module snmp_nfs 1.0;
+
+require {
+        type mountd_port_t;
+        type snmpd_t;
+        type hi_reserved_port_t;
+        class tcp_socket { name_bind name_connect };
+        class udp_socket name_bind;
+}
+
+#============= snmpd_t ==============
+allow snmpd_t hi_reserved_port_t:tcp_socket name_bind;
+allow snmpd_t hi_reserved_port_t:udp_socket name_bind;
+allow snmpd_t mountd_port_t:tcp_socket name_connect;
+```
+
+## Linux NFS Server
+
+Superseded by the generalized NFS support.
 
 Export the NFS stats from as server.
 
@@ -1833,26 +1905,41 @@ using it as a agent.
 
 1. Copy the shell script, phpfpmsp, to the desired host
 ```
-wget https://github.com/librenms/librenms-agent/raw/master/snmp/phpfpmsp -O /etc/snmp/phpfpmsp
+wget https://github.com/librenms/librenms-agent/raw/master/snmp/php-fpm -O /etc/snmp/php-fpm
 ```
 
 2. Make the script executable
 ```
-chmod +x /etc/snmp/phpfpmsp
+chmod +x /etc/snmp/php-fpm
+```
+
+3. Install the depends.
+```shell
+# FreeBSD
+pkg install p5-File-Slurp p5-JSON p5-String-ShellQuote p5-MIME-Base64
+# Debian
+apt-get install libfile-slurp-perl libjson-perl libstring-shellquote-perl libmime-base64-perl
 ```
 
 3. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
 ```
-extend phpfpmsp /etc/snmp/phpfpmsp
+extend phpfpmsp /etc/snmp/php-fpm
 ```
 
-4. Edit /etc/snmp/phpfpmsp to include the status URL for the PHP-FPM
-   pool you are monitoring.
+5. Create the config file
+   `/usr/local/etc/php-fpm_extend.json`. Alternate locations may be
+   specified using the the `-f` switch. Akin to like below. For more
+   information, see `/etc/snmp/php-fpm --help`.
+```json
+{
+"pools":{
+         "thefrog": "https://thefrog/fpm-status",
+         "foobar": "https://foo.bar/fpm-status"
+    }
+}
+```
 
-5. Restart snmpd on your host
-
-It is worth noting that this only monitors a single pool. If you want
-to monitor multiple pools, this won't do it.
+6. Restart snmpd on the host
 
 The application should be auto-discovered as described at the top of
 the page. If it is not, please follow the steps set out under `SNMP
@@ -2018,6 +2105,36 @@ moderate usage.
 The application should be auto-discovered as described at the top of
 the page. If it is not, please follow the steps set out under `SNMP
 Extend` heading top of page.
+
+## Poudriere
+
+### SNMP Extend
+
+1. Copy the extend into place
+```
+wget https://github.com/librenms/librenms-agent/raw/master/snmp/poudriere -O /usr/local/etc/snmp/poudriere
+```
+
+2. Make it executable.
+```
+chmod +x /usr/local/etc/snmp/poudriere
+```
+
+3. Install the depends
+```
+pkg install p5-Data-Dumper p5-JSON p5-MIME-Base64 p5-File-Slurp
+```
+
+4. Setup the cronjob. The extend needs to be ran as root. See
+`poudriere --help` for option info.
+```
+4/5 * * * * root /usr/local/etc/snmp/poudriere -q -a -w -z
+```
+
+5. Add the extend to snmpd.conf and restart snmpd
+```
+extend poudriere cat /var/cache/poudriere.json.snmp
+```
 
 ## PowerDNS
 
@@ -2715,12 +2832,19 @@ dnf install smartmontools perl-JSON perl-MIME-Base64
 chmod +x /etc/snmp/smart
 ```
 
-4. Edit your snmpd.conf file and add:
+4. Setup a cronjob to run it. This ensures slow to poll disks won't
+   result in errors.
+
 ```
-extend smart /etc/snmp/smart
+ */5 * * * * /etc/snmp/smart -u -Z
 ```
 
-5. You will also need to create the config file, which defaults to the same path as the script,
+5. Edit your snmpd.conf file and add:
+```
+extend smart /bin/cat /var/cache/smart
+```
+
+6. You will also need to create the config file, which defaults to the same path as the script,
 but with .config appended. So if the script is located at /etc/snmp/smart, the config file
 will be `/etc/snmp/smart.config`. Alternatively you can also specific a config via `-c`.
 
@@ -2760,32 +2884,11 @@ it should be.
 
 6. Restart snmpd on your host
 
-If you have a large number of more than one or two disks on a system,
-you should consider adding this to cron. Also make sure the cache file
-is some place it can be written to.
-
-```
- */5 * * * * /etc/snmp/smart -u
-```
-
-7. If your snmp agent runs as user "snmp", edit your sudo users
-   (usually `visudo`) and add at the bottom:
-```
-snmp ALL=(ALL) NOPASSWD: /etc/snmp/smart, /usr/bin/env smartctl
-```
-
-and modify your snmpd.conf file accordingly, sudo can be excluded if
-running it via cron:
-
-```
-extend smart /usr/bin/sudo /etc/snmp/smart
-```
-
 The application should be auto-discovered as described at the top of
 the page. If it is not, please follow the steps set out under `SNMP
 Extend` heading top of page.
 
-8. Optionally setup nightly self tests for the disks. The exend will
+7. Optionally setup nightly self tests for the disks. The exend will
    run the specified test on all configured disks if called with the
    -t flag and the name of the SMART test to run.
 
@@ -3011,34 +3114,34 @@ sagan_stat_check](https://metacpan.org/dist/Sagan-Monitoring/view/bin/sagan_stat
 
 ## Socket Statistics (ss)
 
-The Socket Statistics application polls ss and scrapes socket statuses.  Individual sockets and address families may be filtered out within the script's optional configuration JSON file.
+The Socket Statistics application polls ss and scrapes socket statuses.  Individual sockets and address-families may be filtered out within the script's optional configuration JSON file.
 
-a. The following socket types are polled directly.  Filtering a socket will disable direct polling as-well-as indirect polling via any address families that list the socket as their child:
+1. The following socket types are polled directly.  Filtering a socket type will disable direct polling as-well-as indirect polling within any address-families that list the socket type as their child:
 ```
-dccp (also exists within AF inet,inet6)
-mptcp (also exists within AF inet,inet6)
-raw (also exists within AF inet,inet6)
-sctp (also exists within AF inet,inet6)
-tcp (also exists within AF inet,inet6)
-udp (also exists within AF inet,inet6)
+dccp (also exists within address-families "inet" and "inet6")
+mptcp (also exists within address-families "inet" and "inet6")
+raw (also exists within address-families "inet" and "inet6")
+sctp (also exists within address-families "inet" and "inet6")
+tcp (also exists within address-families "inet" and "inet6")
+udp (also exists within address-families "inet" and "inet6")
 xdp
 ```
 
-b. The following socket types are polled within an address family only:
+2. The following socket types are polled within an address-family only:
 ```
-inet6 (within AF inet6)
-p_dgr (within AF link)
-p_raw (within AF link)
-ti_dg (within AF tipc)
-ti_rd (within AF tipc)
-ti_sq (within AF tipc)
-ti_st (within AF tipc)
-v_dgr (within AF vsock)
-v_str (within AF vsock)
-unknown (within AF inet,inet6,link,tipc,vsock)
+inet6 (within address-family "inet6")
+p_dgr (within address-family "link")
+p_raw (within address-family "link")
+ti_dg (within address-family "tipc")
+ti_rd (within address-family "tipc")
+ti_sq (within address-family "tipc")
+ti_st (within address-family "tipc")
+v_dgr (within address-family "vsock")
+v_str (within address-family "vsock")
+unknown (within address-families "inet", "inet6", "link", "tipc", and "vsock")
 ```
 
-c. The following address families are polled directly, however, they also have socket types within their address family "umbrella".  Filtering a socket will filter it from the address family.  Filtering an address family will filter out all of its child sockets UNLESS those child sockets are polled directly; see (a) above:
+3. The following address-families are polled directly and have their child socket types tab-indented below them.  Filtering a socket type (see "1" above) will filter it from the address-family.  Filtering an address-family will filter out all of its child socket types.  However, if those socket types are not DIRECTLY filtered out (see "1" above), then they will continue to be monitored either directly or within other address-families in which they exist:
 ```
 inet
     dccp
@@ -3096,9 +3199,9 @@ extend ss /etc/snmp/ss.py
 ```
 
 4. (Optional) Create a /etc/snmp/ss.json file and specify:
-    a.) "ss_cmd" - String path to the ss binary: ["/sbin/ss"]
-    b.) "socket_types"  - A comma-delimited list of socket types to include.  The following socket types are valid: dccp, icmp6, mptcp, p_dgr, p_raw, raw, sctp, tcp, ti_dg, ti_rd, ti_sq, ti_st, u_dgr, u_seq, u_str, udp, unknown, v_dgr, v_dgr, xdp.  Please note that the "unknown" socket type is represented in ss output with the netid "???".  Please also note that the p_dgr and p_raw socket types are specific to the "link" address family; the ti_dg, ti_rd, ti_sq, and ti_st socket types are specific to the "tipc" address family; the u_dgr, u_seq, and u_str socket types are specific to the "unix" address family; and the v_dgr and v_str socket types are specific to the "vsock" address family.  Filtering out the parent address families for the aforementioned will also filter out their specific socket types.  Specifying "all" includes all of the socket types.  For example: to include only tcp, udp, icmp6 sockets, you would specify "tcp,udp,icmp6": ["all"]
-    c.) "addr_families" - A comma-delimited list of address families to include.  The following families are valid: inet, inet6, link, netlink, tipc, unix, vsock.  As mentioned above under (b), filtering out the link, tipc, unix, or vsock address families will also filter out their respective socket types.  Specifying "all" includes all of the families.  For example: to include only inet and inet6 families, you would specify "inet,inet6": ["all"]
+    1. "ss_cmd" - String path to the ss binary: ["/sbin/ss"]
+    2. "socket_types" - A comma-delimited list of socket types to include.  The following socket types are valid: dccp, icmp6, mptcp, p_dgr, p_raw, raw, sctp, tcp, ti_dg, ti_rd, ti_sq, ti_st, u_dgr, u_seq, u_str, udp, unknown, v_dgr, v_dgr, xdp.  Please note that the "unknown" socket type is represented in /sbin/ss output with the netid "???".  Please also note that the p_dgr and p_raw socket types are specific to the "link" address family; the ti_dg, ti_rd, ti_sq, and ti_st socket types are specific to the "tipc" address family; the u_dgr, u_seq, and u_str socket types are specific to the "unix" address family; and the v_dgr and v_str socket types are specific to the "vsock" address family.  Filtering out the parent address families for the aforementioned will also filter out their specific socket types.  Specifying "all" includes all of the socket types.  For example: to include only tcp, udp, icmp6 sockets, you would specify "tcp,udp,icmp6": ["all"]
+    3. "addr_families" - A comma-delimited list of address families to include.  The following families are valid: inet, inet6, link, netlink, tipc, unix, vsock.  As mentioned above under (b), filtering out the link, tipc, unix, or vsock address families will also filter out their respective socket types.  Specifying "all" includes all of the families.  For example: to include only inet and inet6 families, you would specify "inet,inet6": ["all"]
 ```
 {
     "ss_cmd": "/sbin/ss",
@@ -3106,7 +3209,7 @@ extend ss /etc/snmp/ss.py
     "addr_families": "all"
 }
 ```
-In order to filter out usually unused socket types, it is recommended to go with the following JSON:
+In order to filter out uncommon/unused socket types, the following JSON configuration is recommended:
 ```
 {
     "ss_cmd": "/sbin/ss",
@@ -3115,8 +3218,7 @@ In order to filter out usually unused socket types, it is recommended to go with
 }
 ```
 
-
-5. (Optional) If you have SELinux in Enforcing mode, you must add a module so the script can access socket state:
+5. (Optional) If SELinux is in Enforcing mode, you must add a module so the script can poll sockets:
 ```
 cat << EOF > snmpd_ss.te
 module snmp_ss 1.0;
@@ -3136,7 +3238,6 @@ semodule -i snmpd_ss.pp
 ```
 
 6. Restart snmpd.
-
 
 ## Suricata
 
@@ -3212,8 +3313,8 @@ extend systemd /etc/snmp/systemd.py
 ```
 
 4. (Optional) Create a /etc/snmp/systemd.json file and specify:
-    a.) "systemctl_cmd" - String path to the systemctl binary [Default: "/usr/bin/systemctl"]
-    b.) "include_inactive_units" - True/False string to include inactive units in results [Default: "False"]
+    1. "systemctl_cmd" - String path to the systemctl binary [Default: "/usr/bin/systemctl"]
+    2. "include_inactive_units" - True/False string to include inactive units in results [Default: "False"]
 ```
 {
     "systemctl_cmd": "/bin/systemctl",
@@ -3246,7 +3347,6 @@ semodule -i snmpd_systemctl.pp
 ```
 
 6. Restart snmpd.
-
 
 ## TinyDNS aka djbdns
 
@@ -3415,41 +3515,58 @@ extend voipmon /etc/snmp/voipmon-stats.sh
 
 ## Wireguard
 
-The wireguard application polls the Wireguard service and scrapes all client statistics for all interfaces configured as Wireguard interfaces.
+The Wireguard application polls the Wireguard service and scrapes all client statistics for all interfaces configured as Wireguard interfaces.
 
 ### SNMP Extend
 
 1. Copy the python script, wireguard.py, to the desired host
 ```
-wget https://github.com/librenms/librenms-agent/raw/master/snmp/wireguard.py -O /etc/snmp/wireguard.py
+wget https://github.com/librenms/librenms-agent/raw/master/snmp/wireguard.pl -O /etc/snmp/wireguard.pl
 ```
 
-2. Make the script executable
+2. Install the depends.
 ```
-chmod +x /etc/snmp/wireguard.py
-```
-
-3. Edit your snmpd.conf file and add:
-```
-extend wireguard /etc/snmp/wireguard.py
+# FreeBSD
+pkg install p5-JSON p5-File-Slurp p5-MIME-Base64
+# Debian
+apt-get install libjson-perl libmime-base64-perl libfile-slurp-perl
 ```
 
-4. Create a /etc/snmp/wireguard.json file and specify:
-a.) (optional) "wg_cmd" - String path to the wg binary ["/usr/bin/wg"]
-b.) "public_key_to_arbitrary_name" - A dictionary to convert between the publickey assigned to the client (specified in the wireguard interface conf file) to an arbitrary, friendly name.  The friendly names MUST be unique within each interface.  Also note that the interface name and friendly names are used in the RRD filename, so using special characters is highly discouraged.
+3. Make the script executable
 ```
-{
-    "wg_cmd": "/bin/wg",
-    "public_key_to_arbitrary_name": {
-        "wg0": {
-            "z1iSIymFEFi/PS8rR19AFBle7O4tWowMWuFzHO7oRlE=": "client1",
-            "XqWJRE21Fw1ke47mH1yPg/lyWqCCfjkIXiS6JobuhTI=": "server.domain.com"
-        }
-    }
-}
+chmod +x /etc/snmp/wireguard.pl
 ```
 
-5. Restart snmpd.
+4. Edit your snmpd.conf file and add:
+```
+extend wireguard /etc/snmp/wireguard.pl
+```
+
+5. Create the optional config file,
+   `/usr/local/etc/wireguard_extend.json`.
+
+| key                          | default     | description                                                 |
+|------------------------------|-------------|-------------------------------------------------------------|
+| include_pubkey               | 0           | Include the pubkey with the return.                         |
+| use_short_hostname           | 1           | If the hostname should be shortened to just the first part. |
+| public_key_to_arbitrary_name | {}          | A hash of pubkeys to name mappings.                         |
+| pubkey_resolvers             | <see below> | Resolvers to use for the pubkeys.                           |
+
+The default for `pubkey_resolvers` is
+`config,endpoint_if_first_allowed_is_subnet_use_hosts,endpoint_if_first_allowed_is_subnet_use_ip,first_allowed_use_hosts,first_allowed_use_ip`.
+
+| resolver                                       | description                                                                                          |
+|------------------------------------------------|------------------------------------------------------------------------------------------------------|
+| config                                         | Use the mappings from `.public_key_to_arbitrary_name` .                                              |
+| endpoint_if_first_allowed_is_subnet_use_hosts  | If the first allowed IP is a subnet, see if a matching IP can be found in hosts for the endpoint.    |
+| endpoint_if_first_allowed_is_subnet_use_getent | If the first allowed IP is a subnet, see if a hit can be found for the endpoint IP via getent hosts. |
+| endpoint_if_first_allowed_is_subnet_use_ip     | If the first allowed IP is a subnet, use the endpoint IP for the name.                               |
+| first_allowed_use_hosts                        | See if a match can be found in hosts for the first allowed IP.                                       |
+| first_allowed_use_getent                       | Use getent hosts to see try to fetch a match for the first allowed IP.                               |
+| first_allowed_use_ip                           | Use the first allowed IP as the name.                                                                |
+
+
+6. Restart snmpd.
 
 ## ZFS
 
@@ -3458,7 +3575,7 @@ b.) "public_key_to_arbitrary_name" - A dictionary to convert between the publick
 1: Install the depends.
 ```
 ### FreeBSD
-pkg install p5-JSON p5-MIME-Base64 p5-Gzip-Faster
+pkg install p5-JSON p5-MIME-Base64 p5-Gzip-Faster p5-File-Slurp
 ### Debian
 apt-get install -y cpanminus zlib1g-dev
 cpanm Mime::Base64 JSON Gzip::Faster
