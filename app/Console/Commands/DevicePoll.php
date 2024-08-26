@@ -40,7 +40,7 @@ class DevicePoll extends LnmsCommand
     public function handle(MeasurementManager $measurements): int
     {
         if ($this->argument('device spec') == '-') {
-            $stdin = fopen( 'php://stdin', 'r' );
+            $stdin = fopen('php://stdin', 'r');
             $job_args = [];
             array_walk(array_filter($this->options()), function ($val, $opt) use (&$job_args) {
                 if ($opt !== 'verbose') {
