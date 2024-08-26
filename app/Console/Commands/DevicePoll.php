@@ -39,11 +39,39 @@ class DevicePoll extends LnmsCommand
 
     public function handle(MeasurementManager $measurements): int
     {
-        if ($this->option('dispatch')) {
-            return $this->dispatchWork();
+        if ($this->argument('device spec') == "-") {
+            $stdin = fopen( 'php://stdin', 'r' );
+            $job_args = [];
+            array_walk(array_filter($this->options()), function ($val, $opt) use (&$job_args) {
+                if ($opt !== 'verbose') {
+                    $job_args["--$opt"] = $val;
+                }
+            });
+
+            $verbosity = $this->getOutput()->getVerbosity();
+            if ($verbosity >= 256) {
+                $job_args["-vvv"] = true;
+            } elseif ($verbosity >= 128) {
+                $job_args["-vv"] = true;
+            } elseif ($verbosity >= 64) {
+                $job_args["-v"] = true;
+            }
+
+            while ($line = trim(fgets($stdin))) {
+                $job_args['device spec'] = $line;
+                Artisan::call('device:poll', $job_args);
+            }
+
+            fclose($stdin);
+
+            return 0;
         }
 
         $this->configureOutputOptions();
+
+        if ($this->option('dispatch')) {
+            return $this->dispatchWork();
+        }
 
         if ($this->option('no-data')) {
             LibrenmsConfig::set('rrd.enable', false);
@@ -78,17 +106,17 @@ class DevicePoll extends LnmsCommand
 
     private function dispatchWork(): int
     {
-        \Log::setDefaultDriver('stack');
-        $modules = ModuleList::fromUserOverrides($this->option('modules'));
-        $devices = Device::whereDeviceSpec($this->argument('device spec'))->pluck('device_id');
+        $module_overrides = Module::parseUserOverrides(explode(',', $this->option('modules') ?? ''));
+        $devices = Device::whereDeviceSpec($this->argument('device spec'))->select('device_id', 'poller_group')->get();
 
         if (\config('queue.default') == 'sync') {
             $this->error('Queue driver is sync, work will run in process.');
             sleep(1);
         }
 
-        foreach ($devices as $device_id) {
-            PollDevice::dispatch($device_id, $modules);
+        foreach ($devices as $device) {
+            Log::debug('Submitted work for device ID ' . $device['device_id'] . ' to queue poller-' . $device['poller_group']);
+            PollDevice::dispatch($device['device_id'], $module_overrides)->onQueue('poller-' . $device['poller_group']);
         }
 
         $this->line('Submitted work for ' . $devices->count() . ' devices');
