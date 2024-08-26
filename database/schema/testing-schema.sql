@@ -2019,6 +2019,18 @@ CREATE TABLE `port_groups` (
   UNIQUE KEY `port_groups_name_unique` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `port_security`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `port_security` (
+  `port_id` int(10) unsigned NOT NULL DEFAULT 0,
+  `device_id` int(10) NOT NULL DEFAULT 0,
+  `cpsIfMaxSecureMacAddr` int(10) DEFAULT NULL,
+  `cpsIfStickyEnable` int(10) DEFAULT NULL,
+  UNIQUE KEY `port_security_port_id_unique` (`port_id`),
+  KEY `port_security_device_id_index` (`device_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `ports`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
