@@ -41,5 +41,4 @@ class PortTab extends PortTabHook
 
         return true; // allow every logged in user to access
     }
-
 }
