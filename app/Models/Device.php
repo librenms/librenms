@@ -701,7 +701,7 @@ class Device extends BaseModel
         } elseif ($deviceSpec == 'odd') {
             return $query->whereRaw('device_id % 2 = 1');
         } elseif ($deviceSpec == 'needs_polling') {
-            return $query->where('disabled',0)->where(function ($query) {
+            return $query->where('disabled', 0)->where(function ($query) {
                 $pollfreq = \LibreNMS\Config::get('service_poller_frequency') - 1;
                 $query->whereNull('last_polled')
                     ->orWhereRaw("last_polled <= DATE_ADD(DATE_ADD(NOW(), INTERVAL -$pollfreq SECOND), INTERVAL COALESCE(`last_polled_timetaken`, 0) SECOND)");
