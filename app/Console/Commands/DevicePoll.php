@@ -50,7 +50,7 @@ class DevicePoll extends LnmsCommand
             $stdin = fopen('php://stdin', 'r');
             $job_args = [];
 	    $temp_ags = array_filter($this->options());
-            array_walk(array_filter($temp_args, function ($val, $opt) use (&$job_args) {
+            array_walk($temp_args, function ($val, $opt) use (&$job_args) {
                 if ($opt !== 'verbose') {
                     $job_args["--$opt"] = $val;
                 }
