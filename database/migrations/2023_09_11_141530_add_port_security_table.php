@@ -14,6 +14,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('port_security', function (Blueprint $table) {
+            $table->id();
             $table->integer('port_id')->unsigned()->default(0)->unique();
             $table->integer('device_id')->unsigned()->default(0)->index();
             $table->integer('cpsIfMaxSecureMacAddr')->nullable();
