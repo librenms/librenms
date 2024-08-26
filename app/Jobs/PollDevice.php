@@ -23,6 +23,7 @@ use LibreNMS\Enum\Severity;
 use LibreNMS\OS;
 use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Util\Debug;
 use LibreNMS\Util\Dns;
 use LibreNMS\Util\Module;
 use LibreNMS\Util\ModuleList;

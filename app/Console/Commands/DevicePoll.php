@@ -11,6 +11,13 @@ use App\Models\Device;
 use App\PerDeviceProcess;
 use App\Polling\Measure\MeasurementManager;
 use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Log;
+use LibreNMS\Config;
+use LibreNMS\Polling\Result;
+use LibreNMS\Util\Module;
+use LibreNMS\Util\Version;
 use LibreNMS\Enum\ProcessType;
 use LibreNMS\Util\ModuleList;
 use Symfony\Component\Console\Input\InputArgument;
@@ -42,7 +49,8 @@ class DevicePoll extends LnmsCommand
         if ($this->argument('device spec') == '-') {
             $stdin = fopen('php://stdin', 'r');
             $job_args = [];
-            array_walk(array_filter($this->options()), function ($val, $opt) use (&$job_args) {
+	    $temp_ags = array_filter($this->options());
+            array_walk(array_filter($temp_args, function ($val, $opt) use (&$job_args) {
                 if ($opt !== 'verbose') {
                     $job_args["--$opt"] = $val;
                 }
