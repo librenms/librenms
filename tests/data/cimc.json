@@ -376,50 +376,5 @@
             ]
         },
         "poller": "matches discovery"
-    },
-    "entity-physical": {
-        "discovery": {
-            "entPhysical": [
-                {
-                    "entPhysicalIndex": 3,
-                    "entPhysicalDescr": "Intel(R) Xeon(R) CPU E5-2630 v3 @ 2.40GHz - 8 Cores, 16 Threads",
-                    "entPhysicalClass": "cpu",
-                    "entPhysicalName": "Processor",
-                    "entPhysicalHardwareRev": null,
-                    "entPhysicalFirmwareRev": null,
-                    "entPhysicalSoftwareRev": null,
-                    "entPhysicalAlias": null,
-                    "entPhysicalAssetID": null,
-                    "entPhysicalIsFRU": "FALSE",
-                    "entPhysicalModelName": "Intel(R) Xeon(R) CPU E5-2630 v3 @ 2.40GHz",
-                    "entPhysicalVendorType": "rack-unit-1/board/cpu-1",
-                    "entPhysicalSerialNum": "Not Specified",
-                    "entPhysicalContainedIn": 2,
-                    "entPhysicalParentRelPos": -1,
-                    "entPhysicalMfgName": null,
-                    "ifIndex": null
-                },
-                {
-                    "entPhysicalIndex": 3,
-                    "entPhysicalDescr": "Intel(R) Xeon(R) CPU E5-2630 v3 @ 2.40GHz - 8 Cores, 16 Threads",
-                    "entPhysicalClass": "cpu",
-                    "entPhysicalName": "Processor",
-                    "entPhysicalHardwareRev": null,
-                    "entPhysicalFirmwareRev": null,
-                    "entPhysicalSoftwareRev": null,
-                    "entPhysicalAlias": null,
-                    "entPhysicalAssetID": null,
-                    "entPhysicalIsFRU": "FALSE",
-                    "entPhysicalModelName": "Intel(R) Xeon(R) CPU E5-2630 v3 @ 2.40GHz",
-                    "entPhysicalVendorType": "rack-unit-1/board/cpu-2",
-                    "entPhysicalSerialNum": "Not Specified",
-                    "entPhysicalContainedIn": 2,
-                    "entPhysicalParentRelPos": -1,
-                    "entPhysicalMfgName": null,
-                    "ifIndex": null
-                }
-            ]
-        },
-        "poller": "matches discovery"
     }
 }

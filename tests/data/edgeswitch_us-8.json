@@ -2442,7 +2442,7 @@
                     "entPhysicalFirmwareRev": "",
                     "entPhysicalSoftwareRev": "",
                     "entPhysicalAlias": "None",
-                    "entPhysicalAssetID": "",
+                    "entPhysicalAssetID": null,
                     "entPhysicalIsFRU": "true",
                     "entPhysicalModelName": "UBNT-USW",
                     "entPhysicalVendorType": "enterprises.41112.1",

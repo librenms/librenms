@@ -26,10 +26,6 @@ foreach (PluginManager::call(DeviceOverviewHook::class, ['device' => DeviceCache
 
 require 'overview/ports.inc.php';
 
-if ($device['os'] == 'cimc') {
-    require 'overview/cimc.inc.php';
-}
-
 if ($device['os'] == 'ping') {
     require 'overview/ping.inc.php';
 }
@@ -42,14 +38,6 @@ echo '
 require 'overview/processors.inc.php';
 require 'overview/mempools.inc.php';
 require 'overview/storage.inc.php';
-
-if (! isset($entity_state)) {
-    $entity_state = get_dev_entity_state($device['device_id']);
-}
-if (! empty($entity_state['group']['c6kxbar'])) {
-    require 'overview/c6kxbar.inc.php';
-}
-
 require 'overview/toner.inc.php';
 require 'overview/sensors/charge.inc.php';
 require 'overview/sensors/temperature.inc.php';

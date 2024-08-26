@@ -28,6 +28,7 @@ namespace LibreNMS\Modules;
 use App\Models\Device;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use LibreNMS\Component;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
@@ -74,7 +75,7 @@ class LegacyModule implements Module
     public function discover(OS $os): void
     {
         if (! \LibreNMS\Util\Module::legacyDiscoveryExists($this->name)) {
-            echo "Module $this->name does not exist, please remove it from your configuration";
+            Log::error("Module $this->name does not exist, please remove it from your configuration");
 
             return;
         }
@@ -99,7 +100,7 @@ class LegacyModule implements Module
     public function poll(OS $os, DataStorageInterface $datastore): void
     {
         if (! \LibreNMS\Util\Module::legacyPollingExists($this->name)) {
-            echo "Module $this->name does not exist, please remove it from your configuration";
+            Log::error("Module $this->name does not exist, please remove it from your configuration");
 
             return;
         }

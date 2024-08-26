@@ -391,6 +391,22 @@
             "type": "integer",
             "minimum": 1
         },
+        "syslog_hook": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "regex": {
+                        "type": "string"
+                    },
+                    "script": {
+                        "type": "string"
+                    }
+                },
+                "required": ["regex", "script"],
+                "additionalProperties": false
+            }
+        },
         "ifXmcbc": {
             "type": "boolean"
         },
