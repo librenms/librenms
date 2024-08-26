@@ -163,6 +163,7 @@ abstract class SnmpFetch extends LnmsCommand
         $type = $this->type;
 
         return SnmpQuery::make()
+            ->enumStrings()
             ->numeric($this->numeric)
             ->device($device)
             ->$type($this->oids);
