@@ -29,7 +29,7 @@ class PortTab extends PortTabHook
         ];
     }
 
-    // The authorize method will determine if the user will see this tab or not 
+    // The authorize method will determine if the user will see this tab or not
     // if you want all users to see it, simple return true
     public function authorize(\Illuminate\Contracts\Auth\Authenticatable $user, \App\Models\Port $port): bool
     {
