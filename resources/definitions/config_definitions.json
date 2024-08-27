@@ -6657,6 +6657,17 @@
             "section": "sensors",
             "order": 4
         },
+        "scheduler.poll.enabled": {
+            "default": false,
+            "type": "boolean"
+        },
+        "service_poller_enabled": {
+            "default": true,
+            "group": "poller",
+            "section": "distributed",
+            "order": 5,
+            "type": "boolean"
+        },
         "service_poller_workers": {
             "default": 24,
             "group": "poller",
