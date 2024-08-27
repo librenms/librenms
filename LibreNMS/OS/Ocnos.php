@@ -89,7 +89,7 @@ class Ocnos extends OS implements EntityPhysicalDiscovery
                     'entPhysicalParentRelPos' => $cmmTransIndex,
                     'entPhysicalHardwareRev' => $transceiver['IPI-CMM-CHASSIS-MIB::cmmTransVendorRevision'] ?? null,
                     'entPhysicalIsFRU' => 'true',
-                    'ifIndex' => $this->guessPortId($cmmTransIndex, $transceiver['IPI-CMM-CHASSIS-MIB::cmmTransType'] ?? 'missing')
+                    'ifIndex' => $this->guessPortId($cmmTransIndex, $transceiver['IPI-CMM-CHASSIS-MIB::cmmTransType'] ?? 'missing'),
                 ]));
             }
         }
@@ -182,7 +182,6 @@ class Ocnos extends OS implements EntityPhysicalDiscovery
 
         // load port name to port_id map
         $ifNameToIndex = array_flip(SnmpQuery::walk('IF-MIB::ifName')->pluck());
-
 
         return $ifNameToIndex[$portName] ?? 0;
     }
