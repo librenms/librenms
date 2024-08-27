@@ -352,6 +352,11 @@ class RunAlerts
                     $ret .= ' Betters';
                     $state = AlertState::BETTER;
                     Eventlog::log('A better was detected but the diff was not, ensure that a "id" or "_id" field is available for rule ' . $alert['name'], $alert['device_id'], 'alert', Severity::Warning);
+                // Failsafe if the diff didn't return any results
+                } else {
+                    $ret .= ' Changed';
+                    $state = AlertState::CHANGED;
+                    Eventlog::log('A changed was detected but the diff was not, ensure that a "id" or "_id" field is available for rule ' . $alert['name'], $alert['device_id'], 'alert', Severity::Warning);
                 }
 
                 $alert['details']['rule'] = $chk;
@@ -404,7 +409,7 @@ class RunAlerts
      *
      * @param  array  $array1
      * @param  array  $array2
-     * @return array  [$added, $removed]
+     * @return array [$added, $removed]
      */
     private function diffBetweenFaults($array1, $array2)
     {
