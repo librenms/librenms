@@ -346,11 +346,6 @@ class RunAlerts
                     $ret .= ' Betters';
                     $state = AlertState::BETTER;
                     Eventlog::log('A better was detected but the diff was not, ensure that a "id" or "_id" field is available for rule ' . $alert['name'], $alert['device_id'], 'alert', Severity::Warning);
-                // Failsafe if the diff didn't return any results
-                } else {
-                    $ret .= ' Changed';
-                    $state = AlertState::CHANGED;
-                    Eventlog::log('A changed was detected but the diff was not, ensure that a "id" or "_id" field is available for rule ' . $alert['name'], $alert['device_id'], 'alert', Severity::Warning);
                 }
 
                 if ($state > AlertState::CLEAR && $current_alert_count > 0) {
