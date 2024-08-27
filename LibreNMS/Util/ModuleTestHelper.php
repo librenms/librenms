@@ -572,7 +572,7 @@ class ModuleTestHelper
         try {
             $new_device = new Device([
                 'hostname' => $snmpsim->ip,
-                'version' => 'v2c',
+                'snmpver' => 'v2c',
                 'community' => $this->file_name,
                 'port' => $snmpsim->port,
                 'disabled' => 1, // disable to block normal pollers
