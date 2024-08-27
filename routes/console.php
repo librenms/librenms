@@ -8,6 +8,7 @@ use App\Console\Commands\MaintenanceFetchOuis;
 use App\Console\Commands\MaintenanceFetchRSS;
 use App\Console\Commands\MaintenanceRefreshSslCertificates;
 use App\Facades\LibrenmsConfig;
+use App\Jobs\DispatchPollingWork;
 use App\Jobs\PingCheck;
 use App\Models\Eventlog;
 use Illuminate\Support\Facades\Artisan;
@@ -166,6 +167,11 @@ Artisan::command('scan
 Schedule::call(function (): void {
     Cache::put('scheduler_working', now()->timestamp, now()->addMinutes(6));
 })->name('schedule operational check')->everyFiveMinutes();
+
+Schedule::when(fn (): bool => LibrenmsConfig::get('scheduler.poll.enabled'))
+    ->everyTenSeconds()
+    ->onOneServer()
+    ->job(new DispatchPollingWork);
 
 // schedule maintenance, should be after all others
 $maintenance_log_file = LibrenmsConfig::get('log_dir') . '/maintenance.log';

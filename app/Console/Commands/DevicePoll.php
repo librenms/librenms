@@ -7,6 +7,7 @@ use App\Console\Commands\Traits\ProcessesDevices;
 use App\Console\LnmsCommand;
 use App\Events\DevicePolled;
 use App\Facades\LibrenmsConfig;
+use App\Jobs\DispatchPollingWork;
 use App\Jobs\PollDevice;
 use App\Models\Device;
 use App\PerDeviceProcess;
@@ -84,18 +85,25 @@ class DevicePoll extends LnmsCommand
     {
         $modules = ModuleList::fromUserOverrides($this->option('modules'));
         $devices = Device::whereDeviceSpec($this->argument('device spec'))->pluck('device_id');
+        $enabled = LibrenmsConfig::get('scheduler.poll.enabled');
 
-        if (\config('queue.default') == 'sync') {
-            $this->error('Queue driver is sync, work will run in process.');
-            sleep(1);
+        if (! $enabled) {
+            $this->error('Scheduler based polling is disabled');
+
+            return 1;
         }
 
-        foreach ($devices as $device_id) {
-            PollDevice::dispatch($device_id, $modules);
+        if ($this->argument('device spec') !== 'all') {
+            $this->error('Dispatch only supports all devices');
+
+            return 1;
         }
 
-        $this->line('Submitted work for ' . $devices->count() . ' devices');
-
-        return 0;
+        $this->line('Dispatching polling work... press ctrl-c to cancel');
+        while (true) {  // @phpstan-ignore while.alwaysTrue (keep dispatching until ctrl-c)
+            $this->output->write('.');
+            DispatchPollingWork::dispatchSync(); // just do the dispatch work in this process
+            sleep(10);
+        }
     }
 }
