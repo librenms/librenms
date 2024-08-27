@@ -678,7 +678,7 @@ foreach ($ports as $port) {
                 } else {
                     $current_oid = $this_port['ifAlias'];
                 }
-                // prevent invalid non-utf8 characters
+                // Prevent invalid non-utf8 characters
                 $current_oid = mb_convert_encoding($current_oid, 'UTF-8', mb_detect_encoding($current_oid, mb_list_encodings(), true));
             }
             if ($oid == 'ifSpeed') {
