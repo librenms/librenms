@@ -40,24 +40,29 @@ class Programs extends BaseValidation
     public function validate(Validator $validator): void
     {
         // Check programs
-        $bins = ['fping', 'rrdtool', 'snmpwalk', 'snmpget', 'snmpgetnext', 'snmpbulkwalk'];
-        foreach ($bins as $bin) {
-            if (! ($cmd = $this->findExecutable($bin))) {
+        foreach (Config::getAllExecutables() as $name => $path) {
+            switch ($name) {
+                case 'fping':
+                    $this->extraFpingChecks($validator, $path);
+                    break;
+                case 'fping6':
+                    $this->checkFping6($validator, $path);
+                    break;
+            }
+
+            if (Config::getExecutable($path) == $path) {
                 $validator->fail(
-                    "$bin location is incorrect or bin not installed.",
-                    "Install $bin or manually set the path to $bin by placing the following in config.php: " .
-                    "\$config['$bin'] = '/path/to/$bin';"
+                    "$name location is incorrect or bin not installed.",
+                    "Install $name or manually set the path to $path by running the following: " .
+                    "lnms config:set /path/to/$path"
                 );
-            } elseif ($bin == 'fping') {
-                $this->extraFpingChecks($validator, $cmd);
-                $this->checkFping6($validator, $cmd);
             }
         }
     }
 
-    public function checkFping6(Validator $validator, $fping)
+    public function checkFping6(Validator $validator, string $fping): void
     {
-        $fping6 = $this->findExecutable('fping6');
+        $fping6 = Config::getExecutable('fping6');
         $fping6 = (! is_executable($fping6) && is_executable($fping)) ? "$fping -6" : $fping6;
 
         $validator->execAsUser("$fping6 ::1 2>&1", $output, $return);
@@ -84,7 +89,7 @@ class Programs extends BaseValidation
         }
     }
 
-    public function extraFpingChecks(Validator $validator, $cmd)
+    public function extraFpingChecks(Validator $validator, string $cmd): void
     {
         $validator->execAsUser("$cmd 127.0.0.1 2>&1", $output, $return);
         $output = implode(' ', $output);
@@ -96,14 +101,14 @@ class Programs extends BaseValidation
         $this->failFping($validator, $cmd, $output);
     }
 
-    private function failFping($validator, $cmd, $output)
+    private function failFping(Validator $validator, string $cmd, string $output): void
     {
         $validator->info('fping FAILURES can be ignored if running LibreNMS in a jail without ::1. You may want to test it manually: fping ::1');
         $validator->fail(
             "$cmd could not be executed. $cmd must have CAP_NET_RAW capability (getcap) or suid. Selinux exclusions may be required.\n ($output)"
         );
 
-        if ($getcap = $this->findExecutable('getcap')) {
+        if ($getcap = Config::getExecutable('getcap')) {
             $getcap_out = shell_exec("$getcap $cmd");
             preg_match("#^$cmd = (.*)$#", $getcap_out, $matches);
 
@@ -116,19 +121,5 @@ class Programs extends BaseValidation
         } elseif (! (fileperms($cmd) & 2048)) {
             $validator->fail("$cmd should be suid!", "chmod u+s $cmd");
         }
-    }
-
-    public function findExecutable($bin)
-    {
-        if (is_executable(Config::get($bin))) {
-            return Config::get($bin);
-        }
-
-        $located = Config::locateBinary($bin);
-        if (is_executable($located)) {
-            return $located;
-        }
-
-        return false;
     }
 }
