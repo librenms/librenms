@@ -310,25 +310,19 @@ class RunAlerts
                 }
                 $chk = dbFetchRows($alert['query'], [$alert['device_id']]);
                 //make sure we can json_encode all the datas later
-                $cnt = count($chk);
-                for ($i = 0; $i < $cnt; $i++) {
+                $current_alert_count = count($chk);
+                for ($i = 0; $i < $current_alert_count; $i++) {
                     if (isset($chk[$i]['ip'])) {
                         $chk[$i]['ip'] = inet6_ntop($chk[$i]['ip']);
                     }
                 }
                 $alert['details']['rule'] ??= []; // if details.rule is missing, set it to an empty array
                 $ret = 'Alert #' . $alert['id'];
-
-                $previous_alert_count = count($alert['details']['rule']);
-                $current_alert_count = count($chk);
-
-                // If the count is 0, it would be a clear and it's not this function that will do it
-                if ($current_alert_count == 0) {
-                    continue;
-                }
+                $state = AlertState::CLEAR;
 
                 // Get the added and resolved items
                 [$added_diff, $resolved_diff] = $this->diffBetweenFaults($alert['details']['rule'], $chk);
+                $previous_alert_count = count($alert['details']['rule']);
 
                 if (! empty($added_diff) && ! empty($resolved_diff)) {
                     $ret .= ' Changed';
@@ -359,14 +353,18 @@ class RunAlerts
                     Eventlog::log('A changed was detected but the diff was not, ensure that a "id" or "_id" field is available for rule ' . $alert['name'], $alert['device_id'], 'alert', Severity::Warning);
                 }
 
-                $alert['details']['rule'] = $chk;
-                if (dbInsert([
-                    'state' => $state,
-                    'device_id' => $alert['device_id'],
-                    'rule_id' => $alert['rule_id'],
-                    'details' => gzcompress(json_encode($alert['details']), 9),
-                ], 'alert_log')) {
-                    dbUpdate(['state' => $state, 'open' => 1, 'alerted' => 1], 'alerts', 'rule_id = ? && device_id = ?', [$alert['rule_id'], $alert['device_id']]);
+                if ($state > AlertState::CLEAR && $current_alert_count > 0) {
+                    $alert['details']['rule'] = $chk;
+                    if (dbInsert([
+                        'state' => $state,
+                        'device_id' => $alert['device_id'],
+                        'rule_id' => $alert['rule_id'],
+                        'details' => gzcompress(json_encode($alert['details']), 9),
+                    ], 'alert_log')) {
+                        dbUpdate(['state' => $state, 'open' => 1, 'alerted' => 1], 'alerts', 'rule_id = ? && device_id = ?', [$alert['rule_id'], $alert['device_id']]);
+                    }
+
+                    echo $ret . ' (' . $previous_alert_count . '/' . $current_alert_count . ")\r\n";
                 }
             }
         }
