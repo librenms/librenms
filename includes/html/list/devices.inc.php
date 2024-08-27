@@ -22,6 +22,9 @@
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
+
+use App\Facades\DeviceCache;
+
 $query = '';
 $where = [];
 $params = [];
@@ -62,7 +65,7 @@ $sql = "SELECT `device_id`, `hostname`, `sysName`, `display` FROM `devices` $que
 $devices = array_map(function ($device) {
     return [
         'id' => $device['device_id'],
-        'text' => format_hostname($device),
+        'text' => DeviceCache::get($device['device_id'])->displayName(),
     ];
 }, dbFetchRows($sql, $params));
 
