@@ -6,7 +6,6 @@ use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Mac;
 use LibreNMS\Util\Number;
-use LibreNMS\Util\StringHelpers;
 
 // Build SNMP Cache Array
 $data_oids = [
