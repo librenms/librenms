@@ -657,8 +657,8 @@ function alert_details($details)
 
     // Check if we have a diff (alert status changed, worse and better)
     if (isset($details['diff'])) {
-        // Add a "title" for the resume
-        $all_fault_detail .= '<b>Resume:</b><br>';
+        // Add a "title" for the modifications
+        $all_fault_detail .= '<b>Modifications:</b><br>';
 
         // Check if we have added
         if (isset($details['diff']['added'])) {
