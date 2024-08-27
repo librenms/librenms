@@ -657,6 +657,9 @@ function alert_details($details)
 
     // Check if we have a diff (alert status changed, worse and better)
     if (isset($details['diff'])) {
+        // Add a "title" for the resume
+        $all_fault_detail .= '<b>Resume:</b><br>';
+
         // Check if we have added
         if (isset($details['diff']['added'])) {
             foreach (array_values($details['diff']['added'] ?? []) as $oa => $tmp_alerts_added) {
@@ -674,6 +677,9 @@ function alert_details($details)
                 $all_fault_detail .= $fault_detail;
             }//end foreach
         }
+
+        // Add a "title" for the complete list
+        $all_fault_detail .= '<br><b>All current items:</b><br>';
     }
 
     foreach ($details['rule'] ?? [] as $o => $tmp_alerts_rule) {
