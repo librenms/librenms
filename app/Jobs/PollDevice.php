@@ -52,7 +52,7 @@ class PollDevice implements ShouldQueue, ShouldBeUnique
         return "PollDevice:$this->device_id";
     }
 
-    public function uniqueId(): string
+    public function uniqueId(): int
     {
         return $this->device_id;
     }
