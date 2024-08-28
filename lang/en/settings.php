@@ -1218,7 +1218,7 @@ return [
             ],
             'ignore_device_groups' => [
                 'description' => 'Do not backup these LibreNMS groups',
-                'help' => 'If a device is a member of any of these LibreNMS groups it will get ignored.'
+                'help' => 'If a device is a member of any of these LibreNMS groups it will get ignored.',
             ],
         ],
         'password' => [

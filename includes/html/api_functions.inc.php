@@ -1596,7 +1596,7 @@ function list_oxidized(Illuminate\Http\Request $request)
     $ignoredDeviceGroupNames = Config::get('oxidized.ignore_device_groups', []);
 
     $ignoredDeviceGroups = [];
-    if (!empty($ignoredDeviceGroupNames)) {
+    if (! empty($ignoredDeviceGroupNames)) {
         $ignoredDeviceGroups = DB::table('device_groups')
                                   ->whereIn('name', $ignoredDeviceGroupNames)
                                   ->pluck('id')
@@ -1604,13 +1604,12 @@ function list_oxidized(Illuminate\Http\Request $request)
     }
 
     $ignoredDeviceIds = [];
-    if (!empty($ignoredDeviceGroups)) {
+    if (! empty($ignoredDeviceGroups)) {
         $ignoredDeviceIds = DB::table('device_group_device')
                               ->whereIn('device_group_id', $ignoredDeviceGroups)
                               ->pluck('device_id')
                               ->toArray();
     }
-
 
     $devices = Device::query()
             ->with('attribs')
