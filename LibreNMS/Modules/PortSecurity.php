@@ -77,13 +77,27 @@ class PortSecurity implements Module
         $table = 'port_security';
         $port_id_field = 'port_id';
         $device_id_field = 'device_id';
-        $sticky_macs_field = 'cpsIfStickyEnable';
+        $port_sec_enabled_field = 'cpsIfPortSecurityEnable';
+        $port_sec_status_field = 'cpsIfPortSecurityStatus';
         $max_macs_field = 'cpsIfMaxSecureMacAddr';
+        $cur_mac_count_field = 'cpsIfCurrentSecureMacAddrCount';
+        $violation_action_field = 'cpsIfViolationAction';
+        $violation_count_field = 'cpsIfViolationCount';
+        $last_mac_field = 'cpsIfSecureLastMacAddress';
+        $sticky_macs_field = 'cpsIfStickyEnable';
+        // $last_vlan_field = 'cpsIfSecureLastMacAddrVlanId';
         $device = $os->getDeviceArray();
         if ($device['os'] == 'ios' || $device['os'] == 'iosxe') {
             $port_stats = [];
-            $port_stats = snmpwalk_cache_oid($device, 'cpsIfStickyEnable', $port_stats, 'CISCO-PORT-SECURITY-MIB');
+            $port_stats = snmpwalk_cache_oid($device, 'cpsIfPortSecurityEnable', $port_stats, 'CISCO-PORT-SECURITY-MIB');
+            $port_stats = snmpwalk_cache_oid($device, 'cpsIfPortSecurityStatus', $port_stats, 'CISCO-PORT-SECURITY-MIB');
             $port_stats = snmpwalk_cache_oid($device, 'cpsIfMaxSecureMacAddr', $port_stats, 'CISCO-PORT-SECURITY-MIB');
+            $port_stats = snmpwalk_cache_oid($device, 'cpsIfCurrentSecureMacAddrCount', $port_stats, 'CISCO-PORT-SECURITY-MIB');
+            $port_stats = snmpwalk_cache_oid($device, 'cpsIfViolationAction', $port_stats, 'CISCO-PORT-SECURITY-MIB');
+            $port_stats = snmpwalk_cache_oid($device, 'cpsIfViolationCount', $port_stats, 'CISCO-PORT-SECURITY-MIB');
+            $port_stats = snmpwalk_cache_oid($device, 'cpsIfSecureLastMacAddress', $port_stats, 'CISCO-PORT-SECURITY-MIB');
+            $port_stats = snmpwalk_cache_oid($device, 'cpsIfStickyEnable', $port_stats, 'CISCO-PORT-SECURITY-MIB');
+            // $port_stats = snmpwalk_cache_oid($device, 'cpsIfSecureLastMacAddrVlanId', $port_stats, 'CISCO-PORT-SECURITY-MIB');
 
             // End Building SNMP Cache Array
 
@@ -120,7 +134,9 @@ class PortSecurity implements Module
                 $port_id = get_port_id($ports_mapped, $snmp_data, $port_association_mode);
                 //Verifying if port is currently in ports table
                 foreach ($port_info as $port) {
+                    echo 'Searching ' . $port_id;
                     if ($port['port_id'] == $port_id) {
+                        echo 'Match';
                         $exists_port = true;
                         break;
                     }
@@ -137,17 +153,52 @@ class PortSecurity implements Module
                 $output = DB::table('ports')->where($where)->get();
                 $port_info = json_decode(json_encode($output), true);
                 // Only concerned with physical ports
-                if ($port_info[0]['ifType'] == 'ethernetCsmacd') {
-                    // Checking if port already exists in port_security table. Update if yes, insert if not.
-                    $port_sec_info = DB::table($table)->select($port_id_field, $device_id_field)->get();
-                    $max_macs_value = $snmp_data['cpsIfMaxSecureMacAddr'];
-                    $sticky_macs_value = $snmp_data['cpsIfStickyEnable'];
-                    if ($port_sec_info) {
-                        $update = [$sticky_macs_field => $sticky_macs_value, $max_macs_field => $max_macs_value];
-                        $output = DB::table($table)->where($port_id_field, $port_id)->update($update);
-                    } else {
-                        $insert_info = [$port_id_field => $port_id, $device_id_field => $device_id, $sticky_macs_field => $sticky_macs_value, $max_macs_field => $max_macs_value];
-                        $output = DB::table($table)->insert($insert_info);
+                if ($exists_port) {
+                    if ($port_info[0]['ifType'] == 'ethernetCsmacd') {
+                        // Checking if port already exists in port_security table. Update if yes, insert if not.
+                        //$port_sec_info = DB::table($table)->select($port_id_field, $device_id_field)->get();
+                        $port_sec_enabled_value = $snmp_data['cpsIfPortSecurityEnable'];
+                        $port_sec_status_value = $snmp_data['cpsIfPortSecurityStatus'];
+                        $max_macs_value = $snmp_data['cpsIfMaxSecureMacAddr'];
+                        $cur_mac_count_value = $snmp_data['cpsIfCurrentSecureMacAddrCount'];
+                        $violation_action_value = $snmp_data['cpsIfViolationAction'];
+                        $violation_count_value = $snmp_data['cpsIfViolationCount'];
+                        $last_mac_value = $snmp_data['cpsIfSecureLastMacAddress'];
+                        $sticky_macs_value = $snmp_data['cpsIfStickyEnable'];
+                        // $last_vlan_value = $snmp_data['cpsIfSecureLastMacAddrVlanId'];
+                        if ($exists_port_sec) {
+                            if ($port_sec_info) {
+                                echo 'Updating port ' . $port_id . ' ';
+                                $update = [
+                                    $port_sec_enabled_field => $port_sec_enabled_value,
+                                    $port_sec_status_field => $port_sec_status_value,
+                                    $max_macs_field => $max_macs_value,
+                                    $cur_mac_count_field => $cur_mac_count_value,
+                                    $violation_action_field => $violation_action_value,
+                                    $violation_count_field => $violation_count_value,
+                                    $last_mac_field => $last_mac_value,
+                                    $sticky_macs_field => $sticky_macs_value,
+                                    // $last_vlan_field => $last_vlan_value,
+                                ];
+                                $output = DB::table($table)->where($port_id_field, $port_id)->update($update);
+                            }
+                        } else {
+                            echo 'Inserting port ' . $port_id . ' ';
+                            $insert_info = [
+                                $port_id_field => $port_id,
+                                $device_id_field => $device_id,
+                                $port_sec_enabled_field => $port_sec_enabled_value,
+                                $port_sec_status_field => $port_sec_status_value,
+                                $max_macs_field => $max_macs_value,
+                                $cur_mac_count_field => $cur_mac_count_value,
+                                $violation_action_field => $violation_action_value,
+                                $violation_count_field => $violation_count_value,
+                                $last_mac_field => $last_mac_value,
+                                $sticky_macs_field => $sticky_macs_value,
+                                // $last_vlan_field => $last_vlan_value,
+                            ];
+                            $output = DB::table($table)->insert($insert_info);
+                        }
                     }
                 }
             }//end foreach

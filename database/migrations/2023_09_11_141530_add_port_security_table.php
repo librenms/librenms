@@ -22,7 +22,7 @@ return new class extends Migration
             $table->integer('cpsIfMaxSecureMacAddr')->nullable();
             $table->integer('cpsIfCurrentSecureMacAddrCount')->nullable();
             $table->string('cpsIfViolationAction', 32)->nullable();
-            $table->integer('cpsIfViolationCount')->nullable();
+            $table->int('cpsIfViolationCount')->nullable();
             $table->string('cpsIfSecureLastMacAddress', 20)->nullable();
             $table->string('cpsIfStickyEnable', 5)->nullable();
             // $table->integer('cpsIfSecureLastMacAddrVlanId')->nullable();

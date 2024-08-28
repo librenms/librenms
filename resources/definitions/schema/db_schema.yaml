@@ -1679,8 +1679,15 @@ port_security:
     - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
     - { Field: port_id, Type: 'int unsigned', 'Null': false, Extra: '', Default: '0' }
     - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '', Default: '0' }
+    - { Field: cpsIfPortSecurityEnable, Type: varchar(5), 'Null': true, Extra: '' }
+    - { Field: cpsIfPortSecurityStatus, Type: varchar(32), 'Null': true, Extra: '' }
     - { Field: cpsIfMaxSecureMacAddr, Type: int, 'Null': true, Extra: '' }
+    - { Field: cpsIfCurrentSecureMacAddrCount, Type: int, 'Null': true, Extra: '' }
+    - { Field: cpsIfViolationAction, Type: varchar(32), 'Null': true, Extra: '' }
+    - { Field: cpsIfViolationCount, Type: int, 'Null': true, Extra: '' }
+    - { Field: cpsIfSecureLastMacAddress, Type: varchar(20), 'Null': true, Extra: '' }
     - { Field: cpsIfStickyEnable, Type: varchar(5), 'Null': true, Extra: '' }
+    - { Field: cpsIfSecureLastMacAddrVlanId, Type: int, 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     port_security_port_id_unique: { Name: port_security_port_id_unique, Columns: [port_id], Unique: true, Type: BTREE }
