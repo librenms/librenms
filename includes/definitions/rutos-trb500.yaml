@@ -1,6 +1,5 @@
 os: rutos-trb500
-type: network
-group: unix
+type: wireless
 text: 'Teltonika rutos TRB series'
 icon: teltonika
 ifXmcbc: true
@@ -10,14 +9,6 @@ over:
     - { graph: device_processor, text: 'Processor Usage' }
     - { graph: device_mempool, text: 'Memory Usage' }
     - { graph: device_storage, text: 'Storage Usage' }
-poller_modules:
-    bgp-peers: false
-    ospf: false
-    stp: false
-discovery_modules:
-    applications: false
-    bgp-peers: false
-    stp: false
 processor_stacked: true
 discovery:
     -

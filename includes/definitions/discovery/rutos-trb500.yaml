@@ -5,12 +5,12 @@ modules:
         serial: TELTONIKA-TRB500-MIB::serial.0
         version: TELTONIKA-TRB500-MIB::fwVersion.0
     sensors:
+
         pre-cache:
             data:
                 -
                     oid:
                         - mOperator
-                        - mNetworkType
                         - ioSystemName
         temperature:
             data:
@@ -43,56 +43,6 @@ modules:
                     states:
                         - { descr: Low, graph: 1, value: 0, generic: 0 }
                         - { descr: High, graph: 1, value: 1, generic: 2 }
-                -
-                    oid: mSimState
-                    num_oid: ".1.3.6.1.4.1.48690.2.2.1.9.{{ $index }}"
-                    descr: SIM State
-                    group: Mobile
-                    state_name: TELTONIKA-TRB500-MIB::SimState
-                    states:
-                        - { descr: inserted, graph: 1, value: 0, generic: 0 }
-                        - { descr: not inserted, graph: 1, value: 1, generic: 2 }
-                        - { descr: unknown, graph: 1, value: 2, generic: 3 }
-                -
-                    oid: mPinState
-                    num_oid: ".1.3.6.1.4.1.48690.2.2.1.10.{{ $index }}"
-                    descr: SIM PIN State
-                    group: Mobile
-                    state_name: TELTONIKA-TRB500-MIB::PinState
-                    states:
-                        - { descr: PIN REQUIRED, graph: 1, value: 0, generic: 2 }
-                        - { descr: NOT READY, graph: 1, value: 1, generic: 1 }
-                        - { descr: READY, graph: 1, value: 2, generic: 0 }
-                        - { descr: unknown, graph: 1, value: 3, generic: 3 }
-                -
-                    oid: mNetState
-                    num_oid: ".1.3.6.1.4.1.48690.2.2.1.11.{{ $index }}"
-                    descr: Mobile Net State
-                    group: Mobile
-                    state_name: TELTONIKA-TRB500-MIB::NetState
-                    states:
-                        - { descr: searching, graph: 1, value: 0, generic: 1 }
-                        - { descr: registered (home), graph: 1, value: 1, generic: 0 }
-                        - { descr: registered (roaming), graph: 1, value: 2, generic: 1 }
-                        - { descr: unknown, graph: 1, value: 3, generic: 3 }
-                        - { descr: unregistered, graph: 1, value: 4, generic: 2 }
-                -
-                    oid:  mConnectionState
-                    num_oid: ".1.3.6.1.4.1.48690.2.2.1.15.{{ $index }}"
-                    descr: "Connection State ({{ $mOperator }})"
-                    group: Mobile
-                    index: "mConnectionState.{{ $index }}"
-                    state_name: TELTONIKA-TRB500-MIB::ConnectionState
-                    states:
-                        - { descr: Connected, graph: 1, value: 0, generic: 0 }
-                        - { descr: Not connected, graph: 1, value: 1, generic: 2 }
-                        - { descr: Disconnected, graph: 1, value: 2, generic: 2 }
-                -
-                    oid: mNetworkType
-                    num_oid: ".1.3.6.1.4.1.48690.2.2.1.16.{{ $index }}"
-                    descr: "Connection Type ({{ $mNetworkType }})"
-                    group: Mobile
-                    index: "mNetworkType.{{ $index }}"
 
         count:
             data:
