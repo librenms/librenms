@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\DB;
 use LibreNMS\Cache\PermissionsCache;
 use LibreNMS\Config;
 use LibreNMS\Util\IP;
@@ -198,6 +199,26 @@ class AppServiceProvider extends ServiceProvider
             }
 
             return false;
+	});
+        Validator::extend('device_group_names', function ($attribute, $value): bool {
+            if (is_string($value)) {
+                $value = [$value];
+            }
+
+            // Ensure $value is an array
+            if (! is_array($value)) {
+                return false;
+            }
+
+            $validGroupNames = array_map('strtolower', DB::table('device_groups')->pluck('name')->toArray());
+
+            foreach ($value as $groupName) {
+                if (! in_array(strtolower($groupName), $validGroupNames)) {
+                    return false;
+                }
+            }
+
+            return true;
         });
     }
 }

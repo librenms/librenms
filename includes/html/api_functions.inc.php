@@ -1592,6 +1592,26 @@ function get_oxidized_config(Illuminate\Http\Request $request)
 function list_oxidized(Illuminate\Http\Request $request)
 {
     $return = [];
+
+    $ignoredDeviceGroupNames = Config::get('oxidized.ignore_device_groups', []);
+
+    $ignoredDeviceGroups = [];
+    if (!empty($ignoredDeviceGroupNames)) {
+        $ignoredDeviceGroups = DB::table('device_groups')
+                                  ->whereIn('name', $ignoredDeviceGroupNames)
+                                  ->pluck('id')
+                                  ->toArray();
+    }
+
+    $ignoredDeviceIds = [];
+    if (!empty($ignoredDeviceGroups)) {
+        $ignoredDeviceIds = DB::table('device_group_device')
+                              ->whereIn('device_group_id', $ignoredDeviceGroups)
+                              ->pluck('device_id')
+                              ->toArray();
+    }
+
+
     $devices = Device::query()
             ->with('attribs')
              ->where('disabled', 0)
@@ -1600,6 +1620,7 @@ function list_oxidized(Illuminate\Http\Request $request)
              })
              ->whereNotIn('type', Config::get('oxidized.ignore_types', []))
              ->whereNotIn('os', Config::get('oxidized.ignore_os', []))
+             ->whereNotIn('devices.device_id', $ignoredDeviceIds)
              ->whereAttributeDisabled('override_Oxidized_disable')
              ->select(['devices.device_id', 'hostname', 'sysName', 'sysDescr', 'sysObjectID', 'hardware', 'os', 'ip', 'location_id', 'purpose', 'notes', 'poller_group'])
              ->get();
