@@ -1714,39 +1714,39 @@ ports_statistics:
     - { Field: ifInNUcastPkts, Type: 'bigint unsigned', 'Null': true, Extra: '' }
     - { Field: ifInNUcastPkts_prev, Type: 'bigint unsigned', 'Null': true, Extra: '' }
     - { Field: ifInNUcastPkts_delta, Type: bigint, 'Null': true, Extra: '' }
-    - { Field: ifInNUcastPkts_rate, Type: int, 'Null': true, Extra: '' }
+    - { Field: ifInNUcastPkts_rate, Type: bigint, 'Null': true, Extra: '' }
     - { Field: ifOutNUcastPkts, Type: 'bigint unsigned', 'Null': true, Extra: '' }
     - { Field: ifOutNUcastPkts_prev, Type: 'bigint unsigned', 'Null': true, Extra: '' }
     - { Field: ifOutNUcastPkts_delta, Type: bigint, 'Null': true, Extra: '' }
-    - { Field: ifOutNUcastPkts_rate, Type: int, 'Null': true, Extra: '' }
+    - { Field: ifOutNUcastPkts_rate, Type: bigint, 'Null': true, Extra: '' }
     - { Field: ifInDiscards, Type: 'bigint unsigned', 'Null': true, Extra: '' }
     - { Field: ifInDiscards_prev, Type: 'bigint unsigned', 'Null': true, Extra: '' }
     - { Field: ifInDiscards_delta, Type: bigint, 'Null': true, Extra: '' }
-    - { Field: ifInDiscards_rate, Type: int, 'Null': true, Extra: '' }
+    - { Field: ifInDiscards_rate, Type: bigint, 'Null': true, Extra: '' }
     - { Field: ifOutDiscards, Type: 'bigint unsigned', 'Null': true, Extra: '' }
     - { Field: ifOutDiscards_prev, Type: 'bigint unsigned', 'Null': true, Extra: '' }
     - { Field: ifOutDiscards_delta, Type: bigint, 'Null': true, Extra: '' }
-    - { Field: ifOutDiscards_rate, Type: int, 'Null': true, Extra: '' }
+    - { Field: ifOutDiscards_rate, Type: bigint, 'Null': true, Extra: '' }
     - { Field: ifInUnknownProtos, Type: 'bigint unsigned', 'Null': true, Extra: '' }
     - { Field: ifInUnknownProtos_prev, Type: 'bigint unsigned', 'Null': true, Extra: '' }
     - { Field: ifInUnknownProtos_delta, Type: bigint, 'Null': true, Extra: '' }
-    - { Field: ifInUnknownProtos_rate, Type: int, 'Null': true, Extra: '' }
+    - { Field: ifInUnknownProtos_rate, Type: bigint, 'Null': true, Extra: '' }
     - { Field: ifInBroadcastPkts, Type: 'bigint unsigned', 'Null': true, Extra: '' }
     - { Field: ifInBroadcastPkts_prev, Type: 'bigint unsigned', 'Null': true, Extra: '' }
     - { Field: ifInBroadcastPkts_delta, Type: bigint, 'Null': true, Extra: '' }
-    - { Field: ifInBroadcastPkts_rate, Type: int, 'Null': true, Extra: '' }
+    - { Field: ifInBroadcastPkts_rate, Type: bigint, 'Null': true, Extra: '' }
     - { Field: ifOutBroadcastPkts, Type: 'bigint unsigned', 'Null': true, Extra: '' }
     - { Field: ifOutBroadcastPkts_prev, Type: 'bigint unsigned', 'Null': true, Extra: '' }
     - { Field: ifOutBroadcastPkts_delta, Type: bigint, 'Null': true, Extra: '' }
-    - { Field: ifOutBroadcastPkts_rate, Type: int, 'Null': true, Extra: '' }
+    - { Field: ifOutBroadcastPkts_rate, Type: bigint, 'Null': true, Extra: '' }
     - { Field: ifInMulticastPkts, Type: 'bigint unsigned', 'Null': true, Extra: '' }
     - { Field: ifInMulticastPkts_prev, Type: 'bigint unsigned', 'Null': true, Extra: '' }
     - { Field: ifInMulticastPkts_delta, Type: bigint, 'Null': true, Extra: '' }
-    - { Field: ifInMulticastPkts_rate, Type: int, 'Null': true, Extra: '' }
+    - { Field: ifInMulticastPkts_rate, Type: bigint, 'Null': true, Extra: '' }
     - { Field: ifOutMulticastPkts, Type: 'bigint unsigned', 'Null': true, Extra: '' }
     - { Field: ifOutMulticastPkts_prev, Type: 'bigint unsigned', 'Null': true, Extra: '' }
     - { Field: ifOutMulticastPkts_delta, Type: bigint, 'Null': true, Extra: '' }
-    - { Field: ifOutMulticastPkts_rate, Type: int, 'Null': true, Extra: '' }
+    - { Field: ifOutMulticastPkts_rate, Type: bigint, 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [port_id], Unique: true, Type: BTREE }
 ports_stp:

@@ -1738,6 +1738,9 @@ tr.search:nth-child(odd) {
     line-height: 100%;
 }
 
+.gridster .awesome-marker {
+  text-align: center;
+}
 
 .gridster {
     margin: 0 auto;
