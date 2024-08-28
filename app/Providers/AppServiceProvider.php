@@ -199,7 +199,7 @@ class AppServiceProvider extends ServiceProvider
             }
 
             return false;
-   });
+        });
         Validator::extend('device_group_names', function ($attribute, $value): bool {
             if (is_string($value)) {
                 $value = [$value];
