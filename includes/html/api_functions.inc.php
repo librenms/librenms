@@ -1371,11 +1371,11 @@ function get_port_security_by_hostname(Illuminate\Http\Request $request)
     }
     // Check if user has permission for device
     $permission = check_device_permission($device_id);
-    if ($permission !== true)  {
-   	    return $permission;
+    if ($permission !== true) {
+        return $permission;
     }
     $port = dbFetchRows('SELECT * FROM `port_security` WHERE `device_id` = ?', [$device_id]);
-    
+
     return api_success($port, 'port');
 }
 
