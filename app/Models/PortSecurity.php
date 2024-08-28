@@ -10,13 +10,20 @@ class PortSecurity extends DeviceRelatedModel implements Keyable
     use HasFactory;
 
     protected $table = 'port_security';
-    protected $primaryKey = 'port_id';
+    // protected $primaryKey = 'port_id';
     public $timestamps = false;
     protected $fillable = [
         'port_id',
         'device_id',
+        'cpsIfPortSecurityEnable',
+        'cpsIfPortSecurityStatus',
         'cpsIfMaxSecureMacAddr',
+        'cpsIfCurrentSecureMacAddrCount',
+        'cpsIfViolationAction',
+        'cpsIfViolationCount',
+        'cpsIfSecureLastMacAddress',
         'cpsIfStickyEnable',
+        'cpsIfSecureLastMacAddrVlanId'
     ];
 
     public function getCompositeKey()

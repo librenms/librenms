@@ -172,6 +172,12 @@ Route::prefix('v0')->namespace('\App\Api\Controllers')->group(function () {
     Route::get('inventory/{hostname}', 'LegacyApiController@get_inventory')->name('get_inventory');
     Route::get('inventory/{hostname}/all', 'LegacyApiController@get_inventory_for_device')->name('get_inventory_for_device');
 
+    Route::prefix('port_security')->group(function () {
+        Route::get('port/{portid}', 'LegacyApiController@get_port_security_by_port')->name('get_port_security_by_port');
+        Route::get('device/{hostname}', 'LegacyApiController@get_port_security_by_hostname')->name('get_port_security_by_hostname');
+        Route::get('', 'LegacyApiController@get_all_port_security')->name('get_port_security_all');
+    });
+
     // Route not found
     Route::any('/{path?}', 'LegacyApiController@api_not_found')->where('path', '.*');
 });
