@@ -1687,7 +1687,7 @@ port_security:
     - { Field: cpsIfViolationCount, Type: int, 'Null': true, Extra: '' }
     - { Field: cpsIfSecureLastMacAddress, Type: varchar(20), 'Null': true, Extra: '' }
     - { Field: cpsIfStickyEnable, Type: varchar(5), 'Null': true, Extra: '' }
-    - { Field: cpsIfSecureLastMacAddrVlanId, Type: int, 'Null': true, Extra: '' }
+    # - { Field: cpsIfSecureLastMacAddrVlanId, Type: int, 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     port_security_port_id_unique: { Name: port_security_port_id_unique, Columns: [port_id], Unique: true, Type: BTREE }
