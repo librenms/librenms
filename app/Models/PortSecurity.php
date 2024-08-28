@@ -23,7 +23,7 @@ class PortSecurity extends DeviceRelatedModel implements Keyable
         'cpsIfViolationCount',
         'cpsIfSecureLastMacAddress',
         'cpsIfStickyEnable',
-        'cpsIfSecureLastMacAddrVlanId'
+        'cpsIfSecureLastMacAddrVlanId',
     ];
 
     public function getCompositeKey()

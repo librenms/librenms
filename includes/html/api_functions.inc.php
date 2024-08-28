@@ -26,7 +26,6 @@ use App\Models\PollerGroup;
 use App\Models\Port;
 use App\Models\PortGroup;
 use App\Models\PortsFdb;
-use App\Models\PortSecurity;
 use App\Models\Sensor;
 use App\Models\ServiceTemplate;
 use App\Models\UserPref;
@@ -1289,11 +1288,11 @@ function get_port_security_by_hostname(Illuminate\Http\Request $request)
     }
     // Check if user has permission for device
     $permission = check_device_permission($device_id);
-    if ($permission !== true)  {
-   	    return $permission;
+    if ($permission !== true) {
+        return $permission;
     }
     $port = dbFetchRows('SELECT * FROM `port_security` WHERE `device_id` = ?', [$device_id]);
-    
+
     return api_success($port, 'port');
 }
 
