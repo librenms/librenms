@@ -17,7 +17,6 @@
  */
 
 if ($device['os'] == 'rutos-trb500') {
-
     $oidsSimState = snmpwalk_cache_oid($device, 'mSimState', [], 'TELTONIKA-TRB500-MIB', '-OteQUsb');
     $oidsConnectionState = snmpwalk_cache_oid($device, 'mConnectionState', [], 'TELTONIKA-TRB500-MIB', '-OteQUsb');
     $oidsPinState = snmpwalk_cache_oid($device, 'mPinState', [], 'TELTONIKA-TRB500-MIB', '-OteQUsb');
@@ -29,7 +28,6 @@ if ($device['os'] == 'rutos-trb500') {
         'not inserted' => 2,
         'unknown' => 3,
     ];
-
     $connectionStateMapping = [
         'Connected' => 1,
         'Disconnected' => 2,
@@ -103,7 +101,6 @@ if ($device['os'] == 'rutos-trb500') {
         'LTE_NR5G' => 37,
         'Unknown' => 38,
     ];
-
 
     $simState = [
         ['value' => 1, 'generic' => 0, 'graph' => 1, 'descr' => 'inserted'],
@@ -314,4 +311,3 @@ if ($device['os'] == 'rutos-trb500') {
 
     unset($oidsSimState, $oidsConnectionState, $oidsPinState, $oidsNetState, $oidsNetworkType, $index, $entry);
 }
-?>
