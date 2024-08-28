@@ -13,7 +13,7 @@
  */
 
 $component = new LibreNMS\Component();
-$components = $component->getComponents($device['device_id'], ['filter' => ['ignore' => ['=', 0]]]);
+$components = $component->getComponents($device['device_id'], ['filter' => ['disabled' => ['=', 0]]]);
 
 // We only care about our device id.
 $components = $components[$device['device_id']];
