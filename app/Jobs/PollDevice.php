@@ -58,6 +58,11 @@ class PollDevice implements ShouldQueue, ShouldBeUnique
         return $this->device_id;
     }
 
+    public function displayName(): string
+    {
+        return "PollDevice:$this->device_id";
+    }
+
     /**
      * Execute the job.
      */
