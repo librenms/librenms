@@ -45,6 +45,7 @@ if (isset($app_data['backend']) && $app_data['backend'] == 'FreeBSD') {
     if (isset($app_data['inactive']) && isset($app_data['inactive'][0])) {
         echo "\n<br>Old Jails: ";
         sort($app_data['inactive']);
+        $index_int = 0;
         foreach ($app_data['inactive'] as $index => $oslvm) {
             $label = (! isset($vars['inactive']) || $vars['oslvm'] != $oslvm)
                 ? $oslvm
@@ -376,57 +377,119 @@ if (isset($vars['oslvm']) && isset($app_data['oslvm_data'][$vars['oslvm']])) {
             'headers' => [
                 'IP',
                 'Interface',
-                'Device',
+                'Speed',
+                'Pkts/Sec In',
+                'Pkts/Sec Out',
+                'Bytes/Sec In',
+                'Bytes/Sec Out',
+                'Errors/Sec In',
+                'Errors/Sec Out',
+                'Gateway',
+                'GW If',
                 ],
             'rows' => [],
         ];
-        foreach ($app_data['oslvm_data'][$vars['oslvm']]['ip'] as $index => $ip) {
-            $device = '';
-            $device_raw = false;
+        foreach ($app_data['oslvm_data'][$vars['oslvm']]['ip'] as $index => $ip_data) {
+            $ip = '';
             $interface = '';
             $interface_raw = false;
-            if (preg_match('/^[\:A-Fa-f0-9]+$/', $ip)) {
-                if (!preg_match('/^::1/', $ip)) {
-                    $ip_obj = Ipv6Address::firstWhere(['ipv6_address' => $ip]);
+            $gw_ip = '';
+            $gw_interface = '';
+            $gw_interface_raw = false;
+            $if_speed = '';
+            $ifInUcastPkts_rate = '';
+            $ifOutUcastPkts_rate = '';
+            $ifInErrors_rate = '';
+            $ifOutErrors_rate = '';
+            $ifOutErrors_rate = '';
+            $ifInOctets_rate = '';
+            $ifOutOctets_rate = '';
+            if (isset($ip_data) && ! is_null($ip_data)) {
+                if (is_array($ip_data)) {
+                    if (isset($ip_data['ip']) && ! is_null($ip_data['ip'])) {
+                        $ip = $ip_data['ip'];
+                    }
+                    if (isset($ip_data['gw']) && ! is_null($ip_data['gw'])) {
+                        $gw_ip = $ip_data['gw'];
+                    }
+                    if (isset($ip_data['if']) && ! is_null($ip_data['if'])) {
+                        $interface = $ip_data['if'];
+                        $port = Port::with('device')->firstWhere(['device_id' => $app->device_id, 'ifName' => $interface]);
+                        if (isset($port)) {
+                            $interface_raw = true;
+                            $interface = generate_port_link([
+                                'label' => $port->label,
+                                'port_id' => $port->port_id,
+                                'ifName' => $port->ifName,
+                                'device_id' => $port->device_id,
+                            ]);
+                        }
+                        $if_speed = $port->ifSpeed;
+                        $ifInUcastPkts_rate = $port->ifInUcastPkts_rate;
+                        $ifOutUcastPkts_rate = $port->ifOutUcastPkts_rate;
+                        $ifInErrors_rate = $port->ifInErrors_rate;
+                        $ifOutErrors_rate = $port->ifOutErrors_rate;
+                        $ifInOctets_rate = $port->ifInOctets_rate;
+                        $ifOutOctets_rate = $port->ifOutOctets_rate;
+                    }
+                    if (isset($ip_data['gw_if']) && ! is_null($ip_data['gw_if'])) {
+                        $gw_interface = $ip_data['gw_if'];
+                        $port = Port::with('device')->firstWhere(['device_id' => $app->device_id, 'ifName' => $gw_interface]);
+                        if (isset($port)) {
+                            $gw_interface_raw = true;
+                            $gw_interface = generate_port_link([
+                                'label' => $port->label,
+                                'port_id' => $port->port_id,
+                                'ifName' => $port->ifName,
+                                'device_id' => $port->device_id,
+                            ]);
+                        }
+                    }
                 } else {
-                    $interface = 'loopback';
-                }
-            } elseif (preg_match('/^[\.0-9]+$/', $ip)) {
-                if (!preg_match('/^127./', $ip)) {
-                    $ip_obj = Ipv4Address::firstWhere(['ipv4_address' => $ip]);
-                } else {
-                    $interface = 'loopback';
+                    $ip = $ip_data;
                 }
             }
-            // if we have a non-loopback IP and found a hit for it, add additional info
-            if (isset($ip_obj)) {
-                $interface_raw = true;
-                $device_raw = true;
-                $port = Port::with('device')->firstWhere(['port_id' => $ip_obj->port_id]);
-                $interface = generate_port_link([
-                        'label' => $port->label,
-                        'port_id' => $port->port_id,
-                        'ifName' => $port->ifName,
-                        'device_id' => $port->device_id,
-                    ]);
-                $device = generate_device_link(['device_id' => $port->device_id]);
+            if ($ip != '') {
+                $table_info['rows'][] = [
+                    [
+                        'data' => $ip,
+                    ],
+                    [
+                        'data' => $interface,
+                        'raw' => $interface_raw,
+                    ],
+                    [
+                        'data' => $if_speed,
+                    ],
+                    [
+                        'data' => $ifInUcastPkts_rate,
+                    ],
+                    [
+                        'data' => $ifOutUcastPkts_rate,
+                    ],
+                    [
+                        'data' => $ifInOctets_rate,
+                    ],
+                    [
+                        'data' => $ifOutOctets_rate,
+                    ],
+                    [
+                        'data' => $ifInErrors_rate,
+                    ],
+                    [
+                        'data' => $ifOutErrors_rate,
+                    ],
+                    [
+                        'data' => $gw_ip,
+                    ],
+                    [
+                        'data' => $gw_interface,
+                        'raw' => $gw_interface_raw,
+                    ],
+                ];
             }
-            $table_info['rows'][] = [
-                [
-                    'data' => $ip,
-                ],
-                [
-                    'data' => $interface,
-                    'raw' => $interface_raw,
-                ],
-                [
-                    'data' => $device,
-                    'raw' => $device_raw,
-                ],
-            ];
-            echo view('widgets/sortable_table', $table_info);
         }
-        echo "<br>\n";
+        echo view('widgets/sortable_table', $table_info);
     }
 }
 
