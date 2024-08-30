@@ -182,6 +182,21 @@ if ($device['os_group'] == 'cisco') {
                     }
                 }
 
+                if ($type == 'dbm') {
+                    if ($warn_limit_low == 0) {
+                        $warn_limit_low = 0.1;
+                    }
+                    if ($limit_low == 0) {
+                        $limit_low = 0.1;
+                    }
+                    if ($warn_limit == 0) {
+                        $warn_limit = -0.1;
+                    }
+                    if ($limit == 0) {
+                        $limit = -0.1;
+                    }
+                }
+
                 // End Threshold code
                 $ok = true;
 
