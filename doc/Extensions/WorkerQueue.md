@@ -2,7 +2,7 @@
 
 > Status: Release Candidate
 
-Laravel worker queues are a new way to schedule different jobs.  It uses the 
+Laravel worker queues are a new way to schedule different jobs.  It uses the
 in-built scheduler to run jobs as needed.  One of the results of the configuration
 below is that less PHP processes are being launched, resulting in reduced CPU usage
 of the polling processes.
@@ -66,7 +66,7 @@ REDIS_SENTINEL_PASSWORD=SentinelPasswordGoesHere
 REDIS_SENTINEL_USERNAME=SentinelUsernameGoesHere
 ```
 
-For more information on ACL's, see <https://redis.io/docs/management/security/acl/> 
+For more information on ACL's, see <https://redis.io/docs/management/security/acl/>
 
 Note that if you use Sentinel, you may still need `REDIS_PASSWORD`, `REDIS_USERNAME`, `REDIS_DB` and `REDIS_TIMEOUT` - Sentinel just provides the address of the instance currently accepting writes and manages failover. It's possible (and recommended) to have authentication both on Sentinel and the managed Redis instances.
 
@@ -82,7 +82,7 @@ Restart the supervisor process once the file has been created.
 ```
 [program:librenms-dispatcher]
 process_name=%(program_name)s_%(process_num)02d
-command=/opt/librenms/artisan queue:work --sleep=0.5 --maxjobs=1000
+command=/opt/librenms/artisan queue:work --sleep=0.5 --max-jobs=1000
 autostart=true
 autorestart=true
 stopasgroup=true
@@ -94,7 +94,7 @@ stdout_logfile=/opt/librenms/logs/queueworker.log
 
 [program:librenms-poller]
 process_name=%(program_name)s_%(process_num)02d
-command=/opt/librenms/artisan queue:work --queue=poller-0 --sleep=0.5 --maxjobs=1000
+command=/opt/librenms/artisan queue:work --queue=poller-0 --sleep=0.5 --max-jobs=1000
 autostart=true
 autorestart=true
 stopasgroup=true
@@ -109,7 +109,7 @@ stdout_logfile=/opt/librenms/logs/queueworker.log
 
 Additional configuration settings can be set in your config.
 
-Disable polling in python worker 
+Disable polling in python worker
 
 !!! setting "poller/distributed"
     ```bash
