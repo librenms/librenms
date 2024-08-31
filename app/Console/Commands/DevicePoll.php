@@ -7,6 +7,7 @@ use App\Console\LnmsCommand;
 use App\Events\DevicePolled;
 use App\Facades\LibrenmsConfig;
 use App\Jobs\PollDevice;
+use App\Jobs\DispatchPollJobs;
 use App\Models\Device;
 use App\PerDeviceProcess;
 use App\Polling\Measure\MeasurementManager;
@@ -66,8 +67,10 @@ class DevicePoll extends LnmsCommand
             }
 
             while ($line = trim(fgets($stdin))) {
-                $job_args['device spec'] = $line;
-                Artisan::call('device:poll', $job_args);
+                if ($line != "-") {
+                    $job_args['device spec'] = $line;
+                    Artisan::call('device:poll', $job_args);
+                }
             }
 
             fclose($stdin);
@@ -78,7 +81,12 @@ class DevicePoll extends LnmsCommand
         $this->configureOutputOptions();
 
         if ($this->option('dispatch')) {
-            return $this->dispatchWork();
+            if (\config('queue.default') == 'sync') {
+                $this->error('Queue driver is sync, work will run in process.');
+                sleep(1);
+            } else {
+                return $this->dispatchWork();
+            }
         }
 
         if ($this->option('no-data')) {
@@ -115,19 +123,8 @@ class DevicePoll extends LnmsCommand
     private function dispatchWork(): int
     {
         $module_overrides = Module::parseUserOverrides(explode(',', $this->option('modules') ?? ''));
-        $devices = Device::whereDeviceSpec($this->argument('device spec'))->select('device_id', 'poller_group')->get();
 
-        if (\config('queue.default') == 'sync') {
-            $this->error('Queue driver is sync, work will run in process.');
-            sleep(1);
-        }
-
-        foreach ($devices as $device) {
-            Log::debug('Submitted work for device ID ' . $device['device_id'] . ' to queue poller-' . $device['poller_group']);
-            PollDevice::dispatch($device['device_id'], $module_overrides)->onQueue('poller-' . $device['poller_group']);
-        }
-
-        $this->line('Submitted work for ' . $devices->count() . ' devices');
+        DispatchPollJobs::dispatchSync($this->argument('device spec'), $this->getOutput()->getVerbosity(), $module_overrides);
 
         return 0;
     }
