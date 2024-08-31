@@ -36,7 +36,7 @@ class DispatchPollJobs implements ShouldQueue
         if (\config('queue.default') != 'sync') {
             // Queue poller jobs if not configured for service worker
             if (! Config::get('service_poller_enabled')) {
-                $devices = Device::whereDeviceSpec($this->device_spec))->select('device_id', 'poller_group')->get();
+                $devices = Device::whereDeviceSpec($this->device_spec)->select('device_id', 'poller_group')->get();
 
                 foreach ($devices as $device) {
                     Log::debug('Submitted work for device ID ' . $device['device_id'] . ' to queue poller-' . $device['poller_group']);
