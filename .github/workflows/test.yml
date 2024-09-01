@@ -99,6 +99,8 @@ jobs:
         name: Install Google Chrome
         uses: browser-actions/setup-chrome@v1
         if: matrix.skip-web-check != '1'
+        with:
+          chrome-version: stable
       -
         name: Pip install
         run: |
