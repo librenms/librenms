@@ -20,9 +20,9 @@ abstract class DuskTestCase extends BaseTestCase
      */
     public static function prepare()
     {
-        dump($_ENV);
+        dump(getenv('GITHUB_ACTIONS'));
 
-        if (! static::runningInSail() && isset($_ENV['GITHUB_ACTIONS'])) {
+        if (! static::runningInSail() && ! getenv('GITHUB_ACTIONS')) {
             static::startChromeDriver();
         }
     }
