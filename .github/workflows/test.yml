@@ -96,6 +96,10 @@ jobs:
           sudo apt-get -qq update
           sudo apt-get install -y fping python3-pip python3-setuptools snmp sqlite3
       -
+        name: Install Google Chrome
+        uses: browser-actions/setup-chrome@v1
+        run: chrome --version
+      -
         name: Pip install
         run: |
           python3 -m pip install --upgrade pip
