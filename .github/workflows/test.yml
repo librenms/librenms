@@ -6,7 +6,7 @@ on:
       - 'master'
   pull_request:
     branches:
-      - 'master'
+      - 'master'c
 
 permissions:
   contents: read # to fetch code (actions/checkout)
@@ -14,6 +14,7 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-22.04
+    container: ubuntu
     strategy:
       fail-fast: false
       matrix:
