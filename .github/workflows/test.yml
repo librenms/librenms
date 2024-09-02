@@ -14,7 +14,6 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-22.04
-    container: ubuntu
     strategy:
       fail-fast: false
       matrix:
