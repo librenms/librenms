@@ -47,7 +47,7 @@ use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\IP;
 use SnmpQuery;
 
-class Iosxewlc extends Ciscowlc implements
+class Iosxewlc extends Iosxe implements
     OSPolling,
     WirelessCellDiscovery,
     WirelessChannelDiscovery,
