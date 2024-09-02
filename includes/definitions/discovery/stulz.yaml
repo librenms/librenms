@@ -3,8 +3,9 @@ modules:
     sensors:
         pre-cache:
             data:
-                - oid:
-                    -  unitsettingName
+                - 
+                    oid:
+                        -  unitsettingName
         state:
             data:
                 -
