@@ -593,67 +593,6 @@ function discover_storage(&$valid, $device, $index, $type, $mib, $descr, $size, 
     }//end if
 }
 
-function discover_entity_physical(&$valid, $device, $entPhysicalIndex, $entPhysicalDescr, $entPhysicalClass, $entPhysicalName, $entPhysicalModelName, $entPhysicalSerialNum, $entPhysicalContainedIn, $entPhysicalMfgName, $entPhysicalParentRelPos, $entPhysicalVendorType, $entPhysicalHardwareRev, $entPhysicalFirmwareRev, $entPhysicalSoftwareRev, $entPhysicalIsFRU, $entPhysicalAlias, $entPhysicalAssetID, $ifIndex)
-{
-    d_echo("Discover Inventory Item: $entPhysicalIndex, $entPhysicalDescr, $entPhysicalClass, $entPhysicalName, $entPhysicalModelName, $entPhysicalSerialNum, $entPhysicalContainedIn, $entPhysicalMfgName, $entPhysicalParentRelPos, $entPhysicalVendorType, $entPhysicalHardwareRev, $entPhysicalFirmwareRev, $entPhysicalSoftwareRev, $entPhysicalIsFRU, $entPhysicalAlias, $entPhysicalAssetID, $ifIndex\n");
-
-    if ($entPhysicalDescr || $entPhysicalName) {
-        if (dbFetchCell('SELECT COUNT(entPhysical_id) FROM `entPhysical` WHERE `device_id` = ? AND `entPhysicalIndex` = ?', [$device['device_id'], $entPhysicalIndex]) == '0') {
-            $insert_data = [
-                'device_id' => $device['device_id'],
-                'entPhysicalIndex' => $entPhysicalIndex,
-                'entPhysicalDescr' => $entPhysicalDescr,
-                'entPhysicalClass' => $entPhysicalClass,
-                'entPhysicalName' => $entPhysicalName,
-                'entPhysicalModelName' => $entPhysicalModelName,
-                'entPhysicalSerialNum' => $entPhysicalSerialNum,
-                'entPhysicalContainedIn' => $entPhysicalContainedIn,
-                'entPhysicalMfgName' => $entPhysicalMfgName,
-                'entPhysicalParentRelPos' => $entPhysicalParentRelPos,
-                'entPhysicalVendorType' => $entPhysicalVendorType,
-                'entPhysicalHardwareRev' => $entPhysicalHardwareRev,
-                'entPhysicalFirmwareRev' => $entPhysicalFirmwareRev,
-                'entPhysicalSoftwareRev' => $entPhysicalSoftwareRev,
-                'entPhysicalIsFRU' => $entPhysicalIsFRU,
-                'entPhysicalAlias' => $entPhysicalAlias,
-                'entPhysicalAssetID' => $entPhysicalAssetID,
-            ];
-            if (! empty($ifIndex)) {
-                $insert_data['ifIndex'] = $ifIndex;
-            }
-
-            $inserted = dbInsert($insert_data, 'entPhysical');
-            echo '+';
-            log_event('Inventory Item added: index ' . $entPhysicalIndex . ' descr ' . $entPhysicalDescr, $device, 'entity-physical', 3, $inserted);
-        } else {
-            echo '.';
-            $update_data = [
-                'entPhysicalIndex' => $entPhysicalIndex,
-                'entPhysicalDescr' => $entPhysicalDescr,
-                'entPhysicalClass' => $entPhysicalClass,
-                'entPhysicalName' => $entPhysicalName,
-                'entPhysicalModelName' => $entPhysicalModelName,
-                'entPhysicalSerialNum' => $entPhysicalSerialNum,
-                'entPhysicalContainedIn' => $entPhysicalContainedIn,
-                'entPhysicalMfgName' => $entPhysicalMfgName,
-                'entPhysicalParentRelPos' => $entPhysicalParentRelPos,
-                'entPhysicalVendorType' => $entPhysicalVendorType,
-                'entPhysicalHardwareRev' => $entPhysicalHardwareRev,
-                'entPhysicalFirmwareRev' => $entPhysicalFirmwareRev,
-                'entPhysicalSoftwareRev' => $entPhysicalSoftwareRev,
-                'entPhysicalIsFRU' => $entPhysicalIsFRU,
-                'entPhysicalAlias' => $entPhysicalAlias,
-                'entPhysicalAssetID' => $entPhysicalAssetID,
-                'ifIndex' => $ifIndex,
-            ];
-            dbUpdate($update_data, 'entPhysical', '`device_id`=? AND `entPhysicalIndex`=?', [$device['device_id'], $entPhysicalIndex]);
-        }//end if
-        $valid[$entPhysicalIndex] = 1;
-    }//end if
-}
-
-//end discover_entity_physical()
-
 function discover_process_ipv6(&$valid, $ifIndex, $ipv6_address, $ipv6_prefixlen, $ipv6_origin, $context_name = '')
 {
     global $device;

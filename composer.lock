@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "277d3c3cae41b8c97cf6e330393f124a",
+    "content-hash": "cfd22f9b26f539a6adc0ee571737bfcf",
     "packages": [
         {
             "name": "amenadiel/jpgraph",
@@ -3181,6 +3181,41 @@
             "time": "2024-07-26T10:48:47+00:00"
         },
         {
+            "name": "librenms/plugin-interfaces",
+            "version": "1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/librenms/plugin-interfaces.git",
+                "reference": "7a196c3e47c5c5eb140f895dde6ceac998cf7b48"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/librenms/plugin-interfaces/zipball/7a196c3e47c5c5eb140f895dde6ceac998cf7b48",
+                "reference": "7a196c3e47c5c5eb140f895dde6ceac998cf7b48",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.1"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "LibreNMS\\Interfaces\\Plugins\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "0BSD"
+            ],
+            "description": "Interfaces required to create a LibreNMS Plugin",
+            "homepage": "https://www.librenms.org/",
+            "support": {
+                "issues": "https://github.com/librenms/plugin-interfaces/issues",
+                "source": "https://github.com/librenms/plugin-interfaces/tree/1.0"
+            },
+            "time": "2024-08-15T15:23:53+00:00"
+        },
+        {
             "name": "mews/purifier",
             "version": "3.4.2",
             "source": {
@@ -4006,28 +4041,28 @@
         },
         {
             "name": "paragonie/sodium_compat",
-            "version": "v2.0.1",
+            "version": "v1.21.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/paragonie/sodium_compat.git",
-                "reference": "f65c82939ab17aeff538f9bf6d582f65cc7f255e"
+                "reference": "bb312875dcdd20680419564fe42ba1d9564b9e37"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/paragonie/sodium_compat/zipball/f65c82939ab17aeff538f9bf6d582f65cc7f255e",
-                "reference": "f65c82939ab17aeff538f9bf6d582f65cc7f255e",
+                "url": "https://api.github.com/repos/paragonie/sodium_compat/zipball/bb312875dcdd20680419564fe42ba1d9564b9e37",
+                "reference": "bb312875dcdd20680419564fe42ba1d9564b9e37",
                 "shasum": ""
             },
             "require": {
-                "php": "^8.1",
-                "php-64bit": "*"
+                "paragonie/random_compat": ">=1",
+                "php": "^5.2.4|^5.3|^5.4|^5.5|^5.6|^7|^8"
             },
             "require-dev": {
-                "phpunit/phpunit": "^7|^8|^9",
-                "vimeo/psalm": "^4|^5"
+                "phpunit/phpunit": "^3|^4|^5|^6|^7|^8|^9"
             },
             "suggest": {
-                "ext-sodium": "Better performance, password hashing (Argon2i), secure memory management (memzero), and better security."
+                "ext-libsodium": "PHP < 7.0: Better performance, password hashing (Argon2i), secure memory management (memzero), and better security.",
+                "ext-sodium": "PHP >= 7.0: Better performance, password hashing (Argon2i), secure memory management (memzero), and better security."
             },
             "type": "library",
             "autoload": {
@@ -4086,9 +4121,9 @@
             ],
             "support": {
                 "issues": "https://github.com/paragonie/sodium_compat/issues",
-                "source": "https://github.com/paragonie/sodium_compat/tree/v2.0.1"
+                "source": "https://github.com/paragonie/sodium_compat/tree/v1.21.1"
             },
-            "time": "2024-04-24T12:06:31+00:00"
+            "time": "2024-04-22T22:05:04+00:00"
         },
         {
             "name": "pear/console_color2",

@@ -314,6 +314,7 @@ class RunAlerts
                         $chk[$i]['ip'] = inet6_ntop($chk[$i]['ip']);
                     }
                 }
+                $alert['details']['rule'] ??= []; // if details.rule is missing, set it to an empty array
                 $o = count($alert['details']['rule']);
                 $n = count($chk);
                 $ret = 'Alert #' . $alert['id'];
@@ -391,6 +392,11 @@ class RunAlerts
                 $rextra['recovery'] = true;
             }
 
+            if (! isset($alert['details']['count'])) {
+                // make sure count is set for below code, in legacy code null would get type juggled to 0
+                $alert['details']['count'] = 0;
+            }
+
             $chk = dbFetchRow('SELECT alerts.alerted,devices.ignore,devices.disabled FROM alerts,devices WHERE alerts.device_id = ? && devices.device_id = alerts.device_id && alerts.rule_id = ?', [$alert['device_id'], $alert['rule_id']]);
 
             if ($chk['alerted'] == $alert['state']) {
@@ -432,7 +438,7 @@ class RunAlerts
                     }
                 }
 
-                if (in_array($alert['state'], [AlertState::ACTIVE, AlertState::WORSE, AlertState::BETTER]) && ! empty($rextra['count']) && isset($alert['details']['count']) && ($rextra['count'] == -1 || $alert['details']['count']++ < $rextra['count'])) {
+                if (in_array($alert['state'], [AlertState::ACTIVE, AlertState::WORSE, AlertState::BETTER]) && ! empty($rextra['count']) && ($rextra['count'] == -1 || $alert['details']['count']++ < $rextra['count'])) {
                     if ($alert['details']['count'] < $rextra['count']) {
                         $noacc = true;
                     }

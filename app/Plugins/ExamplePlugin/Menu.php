@@ -15,12 +15,18 @@ class Menu extends MenuEntryHook
 //    public string $view = 'resources.views.menu';
 
     // this will determine if the menu entry should be shown to the user
-    public function authorize(\App\Models\User $user, array $settings = []): bool
+    public function authorize(\Illuminate\Contracts\Auth\Authenticatable $user, array $settings = []): bool
     {
-        // menu entry shown if users has the global-read role and there is a setting that has > one entries in it
-//        return $user->can('global-read') && isset($settings['some_data']) && count($settings['some_data']) > 0;
+        /**
+         * // menu entry shown if users has the global-read role and there is a setting that has > one entries in it
+         * return $user->can('global-read') && isset($settings['some_data']) && count($settings['some_data']) > 0;
+         *
+         * // allow every logged in user
+         * return true;
+         **/
 
-        return true; // allow every logged in user
+        // Allow users with GLOBAL_READ or better
+        return $user->can('global-read');
     }
 
     // override the data function to add additional data to be accessed in the view

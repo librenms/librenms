@@ -19,31 +19,5 @@
             ]
         },
         "poller": "matches discovery"
-    },
-    "entity-physical": {
-        "discovery": {
-            "entPhysical": [
-                {
-                    "entPhysicalIndex": 1,
-                    "entPhysicalDescr": "",
-                    "entPhysicalClass": "",
-                    "entPhysicalName": "SPA112",
-                    "entPhysicalHardwareRev": "",
-                    "entPhysicalFirmwareRev": "",
-                    "entPhysicalSoftwareRev": "0.00.51",
-                    "entPhysicalAlias": "",
-                    "entPhysicalAssetID": "",
-                    "entPhysicalIsFRU": "",
-                    "entPhysicalModelName": "SPA112",
-                    "entPhysicalVendorType": "",
-                    "entPhysicalSerialNum": "",
-                    "entPhysicalContainedIn": 0,
-                    "entPhysicalParentRelPos": 0,
-                    "entPhysicalMfgName": "",
-                    "ifIndex": null
-                }
-            ]
-        },
-        "poller": "matches discovery"
     }
 }

@@ -28,6 +28,7 @@ namespace LibreNMS\OS;
 use App\Models\Device;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\OS;
+use LibreNMS\Util\StringHelpers;
 
 class Areca extends OS implements OSDiscovery
 {
@@ -36,8 +37,8 @@ class Areca extends OS implements OSDiscovery
         parent::discoverOS($device); //yaml
 
         // Sometimes firmware outputs serial as hex-string
-        if (isHexString($device->serial)) {
-            $device->serial = snmp_hexstring($device->serial);
+        if (StringHelpers::isHex($device->serial)) {
+            $device->serial = StringHelpers::hexToAscii($device->serial, ' ');
         }
     }
 }
