@@ -20,32 +20,26 @@
  * @link       https://www.librenms.org
  *
  * @copyright  2024 LibreNMS Contributors
- * 
  */
 
 namespace LibreNMS\OS;
 
-use App\Models\AccessPoint;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Log;				   
+use App\Models\AccessPoint;			   
 use LibreNMS\DB\SyncsModels;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessApCountDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessCellDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessChannelDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRsrpDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRsrqDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
-use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
-use LibreNMS\Interfaces\Discovery\Sensors\WirelessApCountDiscovery;
-use LibreNMS\Interfaces\Polling\IsIsPolling;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\OS\Traits\CiscoCellular;
 use LibreNMS\RRD\RrdDefinition;
-use LibreNMS\Util\IP;
-use SnmpQuery;
+
 
 class Iosxewlc extends Iosxe implements
     OSPolling,
@@ -208,19 +202,17 @@ class Iosxewlc extends Iosxe implements
 
         return $sensors;
     }
-
     /**
      * Discover wireless capacity.  This is a percent. Type is capacity.
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
      *
      * @return array Sensors
      */
-    
     public function discoverWirelessApCount()
     {
         $oids = [
-	    'CISCO-LWAPP-AP-MIB::cLApGlobalAPConnectCount.0',
-	    'CISCO-LWAPP-AP-MIB::cLApGlobalMaxApsSupported.0',
+	        'CISCO-LWAPP-AP-MIB::cLApGlobalAPConnectCount.0',
+	        'CISCO-LWAPP-AP-MIB::cLApGlobalMaxApsSupported.0',
         ];
         $data = snmp_get_multi($this->getDeviceArray(), $oids);
 
