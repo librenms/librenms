@@ -2,6 +2,7 @@
 /**
  * Iosxe.php
  *
+ * Cisco IOS-XE Wireless LAN Controller
  * Cisco IOS-XE ISIS Neighbors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -32,6 +33,12 @@ use Illuminate\Support\Facades\Log;
 use LibreNMS\DB\SyncsModels;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\IsIsDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessCellDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessChannelDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessRsrpDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessRsrqDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
 use LibreNMS\Interfaces\Polling\IsIsPolling;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\OS\Traits\CiscoCellular;
@@ -42,12 +49,17 @@ class Iosxe extends Ciscowlc implements
     IsIsDiscovery,
     IsIsPolling,
     OSPolling,
-    WirelessCellDiscovery
-
+    WirelessCellDiscovery,
+    WirelessChannelDiscovery,
+    WirelessRssiDiscovery,
+    WirelessRsrqDiscovery,
+    WirelessRsrpDiscovery,
+    WirelessSnrDiscovery
 {
     use SyncsModels;
     use CiscoCellular;
 
+    public function pollOS(DataStorageInterface $datastore): void
 
     /**
      * Array of shortened ISIS codes
