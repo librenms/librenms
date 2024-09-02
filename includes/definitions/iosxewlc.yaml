@@ -1,7 +1,7 @@
-os: iosxe
+os: iosxewlc
 group: cisco
-text: 'Cisco WLC IOS-XE'
-type: network
+text: 'Cisco IOS-XE WLC'
+type: wireless
 ifXmcbc: true
 over:
     - { graph: device_bits, text: 'Device Traffic' }
@@ -13,12 +13,9 @@ icon: cisco
 mib_dir: cisco
 poller_modules:
     cisco-cef: true
-    cisco-mac-accounting: true
     slas: true
 discovery_modules:
     cisco-cef: true
-    slas: true
-    cisco-mac-accounting: true
     vrf: true
     cisco-vrf-lite: true
 discovery:
@@ -28,7 +25,3 @@ discovery:
             - .1.3.6.1.4.1.9.1.2861
             - .1.3.6.1.4.1.9.1.2530
             - .1.3.6.1.4.1.9.1.2669
-            
-bad_iftype:
-    - macSecControlledIF
-    - macSecUncontrolledIF
