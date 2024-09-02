@@ -1,0 +1,1528 @@
+--  ==========================================================================
+--  File              : MsTraps.mib
+--  Description       : Private MIB file for FibroLAN MetroStar I system traps 
+--  By                : Tal Katz-Touaf
+--  MIB Version       : 2.2
+--  MetroStar Version : 1.7.0/build 19
+--  Date              : May 24 , 2010
+--  ==========================================================================
+--
+--
+-- Copyright Fibrolan, 2010. All rights reserved.
+--
+-- Reproduction of this document is authorized on condition that this
+-- copyright notice is included.
+
+
+--Versions history:
+--1.0.0 (28/11/02) - Initial version
+--1.0.4 (18/02/03) - Name of PSU index changed; Name of slot index changed; Remote device overheat added; Remote device TP limk up/down added
+--1.0.8 (10/04/03) - GBE link/SD traps added
+--1.1.0 (21/05/03) - Vars indications added
+--1.2.1 (08/12/03) - Chassis and link indexes added; Module index name changed
+--1.2.2 (14/01/04) - Variables change; Remote LX traps removed
+--1.2.3 (17/02/04) - MCM100-RL traps added
+--1.2.5 (10/06/04) - Signal detected/lost trap added; Remote device redundant link traps added
+--1.3.0b(25/07/04) - E1 traps added
+--1.4.0b(01/12/04) - Descriptions rephrased; OFC traps added
+--1.4.1d(28/03/05) - Variables change
+--1.5.0b(08/09/05) - Temperature normal traps added; Remote UNI FO link traps added
+-- not released: 1.5.2b() - SFP traps added
+--1.6.0b(21/06/06) - Remote device FO signal detected/lost added; SFP traps changed and re-assigned
+--1.6.0 (03/07/06) - Variables added
+--1.6.2 (27/03/08) - Added trap severity object and variables. Traps descriptions revised. Traps version applicability added. Added MCM1000X-RL traps.
+--1.7.0 (24/05/10) - Cannot manage remote device using old MA version trap added
+
+
+FIBROLAN-MIB-MS-TRAPS   DEFINITIONS ::= BEGIN
+
+	 IMPORTS
+		OBJECT-TYPE, enterprises	FROM SNMPv2-SMI
+		TRAP-TYPE			FROM RFC-1215
+		flMsChassisModuleNumber, flMsChassisChannelNumber, flMsChassisPsuIndex	FROM FIBROLAN-MIB-METRO-STAR
+		flMcm1xxChannelExtMvPortDescription	FROM FIBROLAN-MIB-MCM1xx
+		flLta41ma-V2PortNumber			FROM FIBROLAN-MIB-LTA41MA
+		flMcm1000ChannelExtMvPortDescription	FROM FIBROLAN-MIB-GBE-MCM1000
+		flMsMcm100xE1PortIndex, flMsMcm100xE1PortDescription	FROM FIBROLAN-MIB-MCM100-xE1		
+		flSfpDevicePortIndex	FROM FIBROLAN-MIB-SFP;
+
+
+fibrolan             OBJECT IDENTIFIER ::= { enterprises       4467 }
+
+fibrolanSNMP         OBJECT IDENTIFIER ::= { fibrolan           100 }
+
+flTrapSeverity	OBJECT-TYPE
+	SYNTAX	INTEGER {
+				off	(0),
+				info	(1),
+				warning	(2),
+				error	(3),
+				fatal	(4)
+			}
+         MAX-ACCESS    read-only
+         STATUS    current
+         DESCRIPTION
+         "Trap severity"
+	 ::= { fibrolanSNMP  1 }
+
+-- *******************************************************
+-- chassis level traps
+-- *******************************************************
+
+	-- module traps
+
+	-- this trap is applicable from SW version 1.0.0 (initial version)
+	moduleInstalled TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+		VARIABLES	{ flTrapSeverity, flMsChassisModuleNumber }
+		DESCRIPTION
+		"New module installed.
+		Vars: trap severity, slot number"
+		::= 5000
+
+	-- this trap is applicable from SW version 1.0.0 (initial version)
+	moduleRemoved TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+		VARIABLES   { flTrapSeverity, flMsChassisModuleNumber }
+		DESCRIPTION
+		"Module removed.
+		Vars: trap severity, slot number"
+		::= 5001
+
+	-- PSU traps
+
+	-- this trap is applicable from SW version 1.0.0 (initial version)
+	psuInstalled TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+		VARIABLES   { flTrapSeverity, flMsChassisPsuIndex }
+		DESCRIPTION
+		"PSU module installed.
+		Vars: trap severity, PSU number"
+		::= 5010
+
+	-- this trap is applicable from SW version 1.0.0 (initial version)
+	psuRemoved TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+		VARIABLES   { flTrapSeverity, flMsChassisPsuIndex }
+		DESCRIPTION
+		"PSU module removed.
+		Vars: trap severity, PSU number"
+		::= 5011
+
+	-- this trap is applicable from SW version 1.0.0 (initial version)
+	psuUp TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+		VARIABLES   { flTrapSeverity, flMsChassisPsuIndex }
+		DESCRIPTION
+		"PSU module is up.
+		Vars: trap severity, PSU number"
+		::= 5012
+
+	-- this trap is applicable from SW version 1.0.0 (initial version)
+	psuDown TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+		VARIABLES   { flTrapSeverity, flMsChassisPsuIndex }
+		DESCRIPTION
+		"PSU module is down.
+		Vars: trap severity, PSU number"
+		::= 5013
+
+	-- temperature trap
+
+	-- this trap is applicable from SW version 1.0.0 (initial version)
+	overHeat TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+		VARIABLES   { flTrapSeverity }
+		DESCRIPTION
+		"Temperature higher than 65 degrees, for more than 1 minute.
+		Vars: trap severity"
+		::= 5020
+
+	-- this trap is applicable from SW version 1.5.0
+	temperatureNormal TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+		VARIABLES   { flTrapSeverity }
+		DESCRIPTION
+		"Chassis temperature back to normal for more than 1 minute (clears over-heat alarm).
+		Vars: trap severity"
+		::= 5021
+
+
+
+
+
+
+-- *******************************************************
+-- module level traps
+-- *******************************************************
+
+	-- remote device connection traps
+
+	-- this trap is applicable from SW version 1.0.0 (initial version)
+	remoteDeviceConnected TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+		VARIABLES	{ flTrapSeverity,
+				flMsChassisModuleNumber, 
+				flMsChassisChannelNumber,
+				flMcm1xxChannelExtMvPortDescription }
+		DESCRIPTION
+		"A new remote MA device has been connected and detected.
+		Vars: trap severity, slot number, channel number, channel description"
+		::= 5030
+
+	-- this trap is applicable from SW version 1.0.0 (initial version)
+	remoteDeviceDisconnected TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber, 
+				flMsChassisChannelNumber,
+				flMcm1xxChannelExtMvPortDescription }
+		DESCRIPTION
+		"A remote MA device has been disconnected.
+		Vars: trap severity, slot number, channel number, channel description"
+		::= 5031
+
+	-- this trap is applicable from SW version 1.0.0 (initial version)
+	remoteDevicePowerFail TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber, 
+				flMsChassisChannelNumber,
+				flMcm1xxChannelExtMvPortDescription }
+		DESCRIPTION
+		"A remote MA device had a power failure.
+		Vars: trap severity, slot number, channel number, channel description"
+		::= 5032
+
+	-- this trap is applicable from SW version 1.0.4
+	remoteDeviceOverHeat TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber, 
+				flMsChassisChannelNumber }
+		DESCRIPTION
+		"Temperature in remote device is higher than 65 degrees, for more than 1 minute.
+		Vars: trap severity, slot number, channel number"
+		::= 5033
+
+	-- this trap is applicable from SW version 1.5.0
+	remoteDeviceTemperatureNormal TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber, 
+				flMsChassisChannelNumber }
+		DESCRIPTION
+		"Remote device temperature back to normal for more than 1 minute (clears over-heat alarm).
+  		Vars: trap severity, slot number, channel number"
+		::= 5034
+
+	-- local link state traps
+
+	-- this trap is applicable from SW version 1.0.0 (initial version)
+	tpLinkDown TRAP-TYPE 
+		ENTERPRISE  fibrolanSNMP
+		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber, 
+				flMsChassisChannelNumber,
+				flMcm1xxChannelExtMvPortDescription }
+		DESCRIPTION
+		"Local (module) TP link down.
+		This trap is sent when a local module's TP port fails.
+		Vars: trap severity, slot number, channel number, channel description"
+		::= 5040
+
+	-- this trap is applicable from SW version 1.0.0 (initial version)
+	tpLinkUp TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber, 
+				flMsChassisChannelNumber,
+				flMcm1xxChannelExtMvPortDescription }
+		DESCRIPTION
+		"Local (module) TP link up.
+		This trap is sent when a local module's TP port's link is activated.
+		Vars: trap severity, slot number, channel number, channel description"
+		::= 5041
+
+	-- this trap is applicable from SW version 1.0.0 (initial version)
+	foLinkDown TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber, 
+				flMsChassisChannelNumber,
+				flMcm1xxChannelExtMvPortDescription }
+		DESCRIPTION
+		"Local (module) FO link down.
+		This trap is sent when a local module's FO port fails.
+		Applicable for all FE modules and for local FO SFP devices.
+		Vars: trap severity, slot number, channel number, channel description"
+		::= 5042
+
+	-- this trap is applicable from SW version 1.0.0 (initial version)
+	foLinkUp TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber, 
+				flMsChassisChannelNumber,
+				flMcm1xxChannelExtMvPortDescription }
+		DESCRIPTION
+		"Local (module) FO link up.
+		This trap is sent when a local module's FO port's link is activated.
+		Applicable for all FE modules and for local FO SFP devices.
+		Vars: trap severity, slot number, channel number, channel description"
+		::= 5043
+
+	-- this trap is applicable from SW version 1.2.5
+	signalLost TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber, 
+				flMsChassisChannelNumber,
+				flMcm1xxChannelExtMvPortDescription }
+		DESCRIPTION
+		"Local (module) signal lost.
+		This trap is sent when a local module's FO port's signal is lost.
+		Applicable for MSM100U/MSM622U and for local FO SFP devices.
+		Vars: trap severity, slot number, port number, port description"
+		::= 5044
+
+	-- this trap is applicable from SW version 1.2.5
+	signalDetected TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber, 
+				flMsChassisChannelNumber,
+				flMcm1xxChannelExtMvPortDescription }
+		DESCRIPTION
+		"Local (module) signal detected.
+		This trap is sent when a local module's FO port's signal is detected.
+		Applicable for MSM100U/MSM622U and for local FO SFP devices.
+		Vars: trap severity, slot number, port number, port description"
+		::= 5045
+
+
+	-- remote link state traps
+
+	-- this trap is applicable from SW version 1.0.4
+	remoteDeviceTpLinkDown TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber, 
+				flMsChassisChannelNumber,
+				flMcm1xxChannelExtMvPortDescription }
+		DESCRIPTION
+		"Remote device: TP link down.
+		This trap is sent when a remote devices's TP UNI port fails.
+		Applicable for FE and GE remote devices which has a TP UNI port and for remote TP UNI SFP devices.
+		Vars: trap severity, master slot number, channel number, channel description"
+		::= 5050
+
+	-- this trap is applicable from SW version 1.0.4
+	remoteDeviceTpLinkUp TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+		VARIABLES	 { flTrapSeverity, 
+				flMsChassisModuleNumber, 
+				flMsChassisChannelNumber,
+				flMcm1xxChannelExtMvPortDescription }
+		DESCRIPTION
+		"Remote device: TP link up.
+		This trap is sent when a remote device's TP UNI port's link is activated.
+		Applicable for FE and GE remote devices which has a TP UNI port and for remote TP UNI SFP devices.
+		Vars: trap severity, master slot number, channel number, channel description"
+		::= 5051
+
+	-- this trap is applicable from SW version 1.5.0
+	remoteDeviceUniFoLinkDown TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber, 
+				flMsChassisChannelNumber,
+				flMcm1xxChannelExtMvPortDescription }
+		DESCRIPTION
+		"Remote device: UNI FO link down.
+		This trap is sent when a remote devices's FO UNI port fails.
+		Applicable for FCON1F/MA UNI port and for remote FO UNI SFP devices.
+		Vars: trap severity, master slot number, channel number, channel description"
+		::= 5052
+
+	-- this trap is applicable from SW version 1.5.0
+	remoteDeviceUniFoLinkUp TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber, 
+				flMsChassisChannelNumber,
+				flMcm1xxChannelExtMvPortDescription }
+		DESCRIPTION
+		"Remote device: UNI FO link up.
+		This trap is sent when a remote devices's FO UNI port's link is activated.
+		Applicable for FCON1F/MA UNI port and for remote FO UNI SFP devices.
+		Vars: trap severity, master slot number, channel number, channel description"
+		::= 5053
+
+	-- this trap is applicable from SW version 1.6.0
+	remoteDeviceUniFoSigLost TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber, 
+				flMsChassisChannelNumber,
+				flMcm1xxChannelExtMvPortDescription }
+		DESCRIPTION
+		"Remote device: UNI FO signal lost.
+		This trap is sent when a remote device's FO UNI port's signal is lost.
+		Applicable for remote FO UNI SFP devices.
+		Vars: trap severity, master slot number, channel number, channel description"
+		::= 5054
+	
+	-- this trap is applicable from SW version 1.6.0
+	remoteDeviceUniFoSigDetect TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber, 
+				flMsChassisChannelNumber,
+				flMcm1xxChannelExtMvPortDescription }
+		DESCRIPTION
+		"Remote device: UNI FO signal detected.
+		This trap is sent when a remote device's FO UNI port's signal is detected.
+		Applicable for remote FO UNI SFP devices.
+		Vars: trap severity, master slot number, channel number, channel description"
+		::= 5055
+
+
+	-- remote link state traps (in multi-port devices)
+
+	-- this trap is applicable from SW version 1.0.0 (initial version)
+	remoteDeviceTpPortLinkDown TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber, 
+				flMsChassisChannelNumber,
+				flLta41ma-V2PortNumber,
+				flMcm1xxChannelExtMvPortDescription }
+		DESCRIPTION
+		"Remote device: TP link down.
+		This trap is sent when a remote device's TP port fails.
+		Applicable for multiple TP ports devices, i.e LTA aggregators.
+		Vars: trap severity, master slot number, channel number, port number, port description"
+		::= 5060
+
+	-- this trap is applicable from SW version 1.0.0 (initial version)
+	remoteDeviceTpPortLinkUp TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber, 
+				flMsChassisChannelNumber,
+				flLta41ma-V2PortNumber,
+				flMcm1xxChannelExtMvPortDescription }
+		DESCRIPTION
+		"Remote device: TP port link up.
+		This trap is sent when a remote device's TP port is activated.
+		Applicable for multiple TP ports devices, i.e LTA aggregators.
+		Vars: trap severity, master slot number, channel number, port number, port description"
+		::= 5061
+
+
+
+	-- GBE traps
+
+	-- local link/SD
+
+	-- this trap is applicable from SW version 1.0.8
+	lxLinkDown TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber,
+				flMsChassisChannelNumber,
+				flMcm1000ChannelExtMvPortDescription }
+		DESCRIPTION
+		"Local (module) LX link down.
+		This trap is sent when a local module's LX FO port fails.
+		Applicable for GE local modules, i.e MCM1000T, MCM1000S.
+		Vars: trap severity, slot number, channel number, channel description"
+		::= 5070
+
+	-- this trap is applicable from SW version 1.0.8
+	lxLinkUp TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber,
+				flMsChassisChannelNumber,
+				flMcm1000ChannelExtMvPortDescription }
+		DESCRIPTION
+		"Local (module) LX link up.
+		This trap is sent when a local module's LX FO port is activated.
+		Applicable for GE local modules, i.e MCM1000T, MCM1000S.
+		Vars: trap severity, slot number, channel number, channel description"
+		::= 5071
+
+	-- this trap is applicable from SW version 1.0.8
+	sxLinkDown TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber,
+				flMsChassisChannelNumber,
+				flMcm1000ChannelExtMvPortDescription }
+		DESCRIPTION
+		"Local (module) SX link down.
+		This trap is sent when a local module's SX FO port fails.
+		Applicable for GE local modules with 2 FO ports, i.e MCM1000S.
+		Vars: trap severity, slot number, channel number, channel description"
+		::= 5072
+
+	-- this trap is applicable from SW version 1.0.8
+	sxLinkUp TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber,
+				flMsChassisChannelNumber,
+				flMcm1000ChannelExtMvPortDescription }
+		DESCRIPTION
+		"Local (module) SX link up.
+		This trap is sent when a local module's SX FO port is activated.
+		Applicable for GE local modules with 2 FO ports, i.e MCM1000S.
+		Vars: trap severity, slot number, channel number, channel description"
+		::= 5073
+
+	-- this trap is applicable from SW version 1.0.8
+	lxSignalLost TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber,
+				flMsChassisChannelNumber,
+				flMcm1000ChannelExtMvPortDescription }
+		DESCRIPTION
+		"Local (module) LX signal lost.
+		This trap is sent when a local module's LX FO port's signal is lost.
+		Applicable for GE local modules, i.e MCM1000T, MCM1000S.
+		Vars: trap severity, slot number, channel number, channel description"
+		::= 5074
+
+	-- this trap is applicable from SW version 1.0.8
+	lxSignalDetected TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber,
+				flMsChassisChannelNumber,
+				flMcm1000ChannelExtMvPortDescription }
+		DESCRIPTION
+		"Local (module) LX signal detected.
+		This trap is sent when a local module's LX FO port's signal is detected.
+		Applicable for GE local modules, i.e MCM1000T, MCM1000S.
+		Vars: trap severity, slot number, channel number, channel description"
+		::= 5075
+
+	-- this trap is applicable from SW version 1.0.8
+	sxSignalLost TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber,
+				flMsChassisChannelNumber,
+				flMcm1000ChannelExtMvPortDescription }
+		DESCRIPTION
+		"Local (module) SX signal lost.
+		This trap is sent when a local module's SX FO port's signal is lost.
+		Applicable for GE local modules with 2 FO ports, i.e MCM1000S.
+		Vars: trap severity, slot number, channel number, channel description"
+		::= 5076
+
+	-- this trap is applicable from SW version 1.0.8
+	sxSignalDetected TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber,
+				flMsChassisChannelNumber,
+				flMcm1000ChannelExtMvPortDescription }
+		DESCRIPTION
+		"Local (module) SX signal detected.
+		This trap is sent when a local module's SX FO port's signal is detected.
+		Applicable for GE local modules with 2 FO ports, i.e MCM1000S.
+		Vars: trap severity, slot number, channel number, channel description"
+		::= 5077
+
+	-- remote link/SD
+
+	-- this trap is applicable from SW version 1.0.8
+	remoteSxLinkDown TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber,
+				flMsChassisChannelNumber,
+				flMcm1000ChannelExtMvPortDescription }
+		DESCRIPTION
+		"Remote device: SX link down.
+		This trap is sent when a remote device's SX FO port fails.
+		Applicable for GE remote devices with 2 FO ports, i.e GSM1000/MA.
+		Vars: trap severity, slot number, channel number, channel description"
+		::= 5082
+
+	-- this trap is applicable from SW version 1.0.8
+	remoteSxLinkUp TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber,
+				flMsChassisChannelNumber,
+				flMcm1000ChannelExtMvPortDescription }
+		DESCRIPTION
+		"Remote device: SX link up.
+		This trap is sent when a remote device's SX FO port is activated.
+		Applicable for GE remote devices with 2 FO ports, i.e GSM1000/MA.
+		Vars: trap severity, slot number, channel number, channel description"
+		::= 5083
+
+	-- this trap is applicable from SW version 1.0.8
+	remoteSxSignalLost TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber,
+				flMsChassisChannelNumber,
+				flMcm1000ChannelExtMvPortDescription }
+		DESCRIPTION
+		"Remote device: SX signal lost.
+		This trap is sent when a remote devicee's SX FO port's signal is lost.
+		Applicable for GE remote devices with 2 FO ports, i.e GSM1000/MA.
+		Vars: trap severity, slot number, channel number, channel description"
+		::= 5086
+
+	-- this trap is applicable from SW version 1.0.8
+	remoteSxSignalDetected TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+  		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber,
+				flMsChassisChannelNumber,
+				flMcm1000ChannelExtMvPortDescription }
+		DESCRIPTION
+		"Remote device: SX signal detected.
+		This trap is sent when a remote devicee's SX FO port's signal is detected.
+		Applicable for GE remote devices with 2 FO ports, i.e GSM1000/MA.
+		Vars: trap severity, slot number, channel number, channel description"
+		::= 5087
+
+
+	-- mcm100-rl
+
+	-- this trap is applicable from SW version 1.2.3
+	mainToBckpTpLink	 TRAP-TYPE	-- Unused
+		ENTERPRISE  fibrolanSNMP
+		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber,
+				flMcm1xxChannelExtMvPortDescription }
+		DESCRIPTION
+		"Switched from Main to Backup TP link.
+		Vars: trap severity, slot number"
+		::= 5088
+
+	-- this trap is applicable from SW version 1.2.3
+	bckpToMainTpLink	 TRAP-TYPE	-- Unused
+		ENTERPRISE  fibrolanSNMP
+		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber,
+				flMcm1xxChannelExtMvPortDescription }
+		DESCRIPTION
+		"Switched from Backup to Main TP link.
+		Vars: trap severity, slot number"
+		::= 5089
+
+	-- this trap is applicable from SW version 1.2.3
+	mainToBckpFoLink	 TRAP-TYPE	-- Unused
+		ENTERPRISE  fibrolanSNMP
+		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber,
+				flMcm1xxChannelExtMvPortDescription }
+		DESCRIPTION
+		"Switched from Main to Backup FO link.
+		Vars: trap severity, slot number"
+		::= 5090
+
+	-- this trap is applicable from SW version 1.2.3
+	bckpToMainFoLink	 TRAP-TYPE	-- Unused
+		ENTERPRISE  fibrolanSNMP
+		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber,
+				flMcm1xxChannelExtMvPortDescription }
+		DESCRIPTION
+		"Switched from Backup to Main FO link.
+		Vars: trap severity, slot number"
+		::= 5091
+
+	-- this trap is applicable from SW version 1.2.3
+	mainTpLinkUp	 TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber, 
+				flMcm1xxChannelExtMvPortDescription }
+		DESCRIPTION
+		"Main TP link up.
+		This trap is sent when a MCM100RL's main TP port is activated.
+		Vars: trap severity, slot number, port description"
+		::= 5092
+
+	-- this trap is applicable from SW version 1.2.3
+	mainTpLinkDown	 TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber , 
+			        flMcm1xxChannelExtMvPortDescription }
+		DESCRIPTION
+		"Main TP link down.
+		This trap is sent when a MCM100RL's main TP port fails.
+		Vars: trap severity, slot number, port description"
+		::= 5093
+
+	-- this trap is applicable from SW version 1.2.3
+	mainFoLinkUp	 TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber, 
+			        flMcm1xxChannelExtMvPortDescription }
+		DESCRIPTION
+		"Main Fo link up.
+		This trap is sent when a MCM100RL's main FO port is activated.
+		Vars: trap severity, slot number, port description"
+		::= 5094
+
+	-- this trap is applicable from SW version 1.2.3
+	mainFoLinkDown	 TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber, 
+			        flMcm1xxChannelExtMvPortDescription }
+		DESCRIPTION
+		"Main Fo link down.
+		This trap is sent when a MCM100RL's main FO port fails.
+		Vars: trap severity, slot number, port description"
+		::= 5095
+
+	-- this trap is applicable from SW version 1.2.3
+	bckpTpLinkUp	 TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber,
+			        flMcm1xxChannelExtMvPortDescription }
+		DESCRIPTION
+		"Backup TP link up.
+		This trap is sent when a MCM100RL's backup TP port is activated.
+		Vars: trap severity, slot number, port description"
+		::= 5096
+
+	-- this trap is applicable from SW version 1.2.3
+	bckpTpLinkDown	 TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber, 
+			        flMcm1xxChannelExtMvPortDescription }
+		DESCRIPTION
+		"Backup TP link down.
+		This trap is sent when a MCM100RL's backup TP port fails.
+		Vars: trap severity, slot number, port description"
+		::= 5097
+
+	-- this trap is applicable from SW version 1.2.3
+	bckpFoLinkUp	 TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber,
+			        flMcm1xxChannelExtMvPortDescription }
+		DESCRIPTION
+		"Backup FO link up.
+		This trap is sent when a MCM100RL's backup FO port is activated.
+		Vars: trap severity, slot number, port description"
+		::= 5098
+
+	-- this trap is applicable from SW version 1.2.3
+	bckpFoLinkDown	 TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber, 
+			        flMcm1xxChannelExtMvPortDescription }
+		DESCRIPTION
+		"Backup FO link down.
+		This trap is sent when a MCM100RL's backup FO port fails.
+		Vars: trap severity, slot number, port description"
+		::= 5099
+
+	--mcm1000x-rl
+
+	-- this trap is applicable from SW version 1.6.2
+	mainToBckpLink	 TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber,
+				flMcm1000xrlPortIndex }
+		DESCRIPTION
+		"Local Main to Backup link switchover.
+		This trap is sent when a MCM1000X-RL's main port link is switched to the backup port.
+		Vars: trap severity, slot number, port number"
+		::= 5100
+
+	-- this trap is applicable from SW version 1.6.2
+	bckpToMainLink	 TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber,
+				flMcm1000xrlPortIndex }
+		DESCRIPTION
+		"Local Backup to Main link switchover.
+		This trap is sent when a MCM1000X-RL's backup port link is switched to the main port.
+		Vars: trap severity, slot number, port number"
+		::= 5101
+
+	-- this trap is applicable from SW version 1.6.2
+	mainTpSfpLinkUp	 TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber,
+				flMcm1000xrlPortIndex,
+				flMcm1000xrlChannelDescription }
+		DESCRIPTION
+		"Local Main TP SFP link up.
+		This trap is sent when a MCM1000X-RL's main TP SFP port is activated.
+		Vars: trap severity, slot number, port number, channel description"
+		::= 5110
+
+	-- this trap is applicable from SW version 1.6.2
+	mainTpSfpLinkDown	 TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber,
+				flMcm1000xrlPortIndex,
+			        flMcm1000xrlChannelDescription }
+		DESCRIPTION
+		"Local Main TP link down.
+		This trap is sent when a MCM1000X-RL's main TP SFP port fails.
+		Vars: trap severity, slot number, port number, channel description"
+		::= 5111
+
+	-- this trap is applicable from SW version 1.6.2
+	mainFoSfpLinkUp	 TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber,
+				flMcm1000xrlPortIndex,
+			        flMcm1000xrlChannelDescription }
+		DESCRIPTION
+		"Local Main Fo link up.
+		This trap is sent when a MCM1000X-RL's main FO SFP port is activated.
+		Vars: trap severity, slot number, port number, channel description"
+		::= 5112
+
+	-- this trap is applicable from SW version 1.6.2
+	mainFoSfpLinkDown	 TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber,
+				flMcm1000xrlPortIndex,
+			        flMcm1000xrlChannelDescription }
+		DESCRIPTION
+		"Local Main Fo link down.
+		This trap is sent when a MCM1000X-RL's main FO SFP port fails.
+		Vars: trap severity, slot number, port number, channel description"
+		::= 5113
+
+	-- this trap is applicable from SW version 1.6.2
+	bckpTpSfpLinkUp	 TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber,
+				flMcm1000xrlPortIndex,
+			        flMcm1000xrlChannelDescription }
+		DESCRIPTION
+		"Local Backup TP link up.
+		This trap is sent when a MCM1000X-RL's backup TP SFP port is activated.
+		Vars: trap severity, slot number, port number, channel description"
+		::= 5114
+
+	-- this trap is applicable from SW version 1.6.2
+	bckpTpSfpLinkDown	 TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber,
+				flMcm1000xrlPortIndex,
+			        flMcm1000xrlChannelDescription }
+		DESCRIPTION
+		"Local Backup TP link down.
+		This trap is sent when a MCM1000X-RL's backup TP SFP port fails.
+		Vars: trap severity, slot number, port number, channel description"
+		::= 5115
+
+	-- this trap is applicable from SW version 1.6.2
+	bckpFoSfpLinkUp	 TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber,
+				flMcm1000xrlPortIndex,
+			        flMcm1000xrlChannelDescription }
+		DESCRIPTION
+		"Local Backup FO link up.
+		This trap is sent when a MCM1000X-RL's backup FO SFP port is activated.
+		Vars: trap severity, slot number, port number, channel description"
+		::= 5116
+
+	-- this trap is applicable from SW version 1.6.2
+	bckpFoSfpLinkDown	 TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber,
+				flMcm1000xrlPortIndex,
+			        flMcm1000xrlChannelDescription }
+		DESCRIPTION
+		"Local Backup FO link down.
+		This trap is sent when a MCM1000X-RL's backup FO SFP port fails.
+		Vars: trap severity, slot number, port number, channel description"
+		::= 5117
+
+	-- this trap is applicable from SW version 1.6.2
+	mainFoSfpSignalDetected TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber,
+				flMcm1000xrlPortIndex,
+				flMcm1000xrlChannelDescription }
+		DESCRIPTION
+		"Local Main FO SFP signal detected.
+		This trap is sent when a MCM1000X-RL's main FO SFP port's signal is detected.
+		Vars: trap severity, slot number, port number, channel description"
+		::= 5120
+
+	-- this trap is applicable from SW version 1.6.2
+	mainFoSfpSignalLost TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber,
+				flMcm1000xrlPortIndex,
+				flMcm1000xrlChannelDescription }
+		DESCRIPTION
+		"Local Main FO SFP signal lost.
+		This trap is sent when a MCM1000X-RL's main FO SFP port's signal is lost.
+		Vars: trap severity, slot number, port number, channel description"
+		::= 5121
+
+	-- this trap is applicable from SW version 1.6.2
+	bckpFoSfpSignalDetected TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber,
+				flMcm1000xrlPortIndex,
+				flMcm1000xrlChannelDescription }
+		DESCRIPTION
+		"Local Backup FO SFP signal detected.
+		This trap is sent when a MCM1000X-RL's backup FO SFP port's signal is detected.
+		Vars: trap severity, slot number, port number, channel description"
+		::= 5122
+
+	-- this trap is applicable from SW version 1.6.2
+	bckpFoSfpSignalLost TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber,
+				flMcm1000xrlPortIndex,
+				flMcm1000xrlChannelDescription }
+		DESCRIPTION
+		"Local Backup FO SFP signal lost.
+		This trap is sent when a MCM1000X-RL's backup FO SFP port's signal is lost.
+		Vars: trap severity, slot number, port number, channel description"
+		::= 5123
+
+
+	--remote redundant link state
+
+	-- this trap is applicable from SW version 1.2.5
+	remoteDeviceBckpTpLinkUp TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+  		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber, 
+				flMsChassisChannelNumber,
+				flMcm1xxChannelExtMvPortDescription }
+		DESCRIPTION
+		"Remote device: Backup TP link up.
+		This trap is sent when a remote device's backup TP port is activated.
+		Applicable for all ATARA devices.
+		Vars: trap severity, master slot number, channel number, port description"
+		::= 5200
+
+	-- this trap is applicable from SW version 1.2.5
+	remoteDeviceBckpTpLinkDown TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+  		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber, 
+				flMsChassisChannelNumber,
+				flMcm1xxChannelExtMvPortDescription }
+		DESCRIPTION
+		"Remote device: Backup TP link down.
+		This trap is sent when a remote device's backup TP port fails.
+		Applicable for all ATARA devices.
+		Vars: trap severity, master slot number, channel number, port description"
+		::= 5201
+
+	-- this trap is applicable from SW version 1.2.5
+	remoteDeviceMainTpLinkUp TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+  		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber, 
+				flMsChassisChannelNumber,
+				flMcm1xxChannelExtMvPortDescription }
+		DESCRIPTION
+		"Remote device: Main TP link up.
+		This trap is sent when a remote device's main TP port is activated.
+		Applicable for all ATARA devices.
+		Vars: trap severity, master slot number, channel number, port description"
+		::= 5202
+
+	-- this trap is applicable from SW version 1.2.5
+	remoteDeviceMainTpLinkDown TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+  		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber, 
+				flMsChassisChannelNumber,
+				flMcm1xxChannelExtMvPortDescription }
+		DESCRIPTION
+		"Remote device: Main TP link down.
+		This trap is sent when a remote device's main TP port fails.
+		Applicable for all ATARA devices.
+		Vars: trap severity, master slot number, channel number, port description"
+		::= 5203
+
+	-- this trap is applicable from SW version 1.2.5
+	remoteDeviceBckp2MainFoLink TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+  		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber, 
+				flMsChassisChannelNumber,
+				flMcm1xxChannelExtMvPortDescription }
+		DESCRIPTION
+		"Remote device: Backup to Main FO link.
+		This trap is sent when a remote device's FO port in use switch from backup to main.
+		Applicable for all ATARA devices.
+		Vars: trap severity, master slot number, channel number, port description"
+		::= 5204
+
+	-- this trap is applicable from SW version 1.2.5
+	remoteDeviceMain2BckpFoLink TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+  		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber, 
+				flMsChassisChannelNumber,
+				flMcm1xxChannelExtMvPortDescription }
+		DESCRIPTION
+		"Remote device: Main to Backup FO link.
+		This trap is sent when a remote device's FO port in use switch from main to backup.
+		Applicable for all ATARA devices.
+		Vars: trap severity, master slot number, channel number, port description"
+		::= 5205
+
+	-- this trap is applicable from SW version 1.2.5
+	remoteDeviceBckpFoLinkUp TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+  		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber, 
+				flMsChassisChannelNumber,
+				flMcm1xxChannelExtMvPortDescription }
+		DESCRIPTION
+		"Remote device: Backup FO link up.
+		This trap is sent when a remote device's backup FO port is activated.
+		Applicable for all ATARA devices.
+		Vars: trap severity, master slot number, channel number, port description"
+		::= 5206
+
+	-- this trap is applicable from SW version 1.2.5
+	remoteDeviceBckpFoLinkDown TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+  		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber, 
+				flMsChassisChannelNumber,
+				flMcm1xxChannelExtMvPortDescription }
+		DESCRIPTION
+		"Remote device: Backup FO link down.
+		This trap is sent when a remote device's backup FO port fails.
+		Applicable for all ATARA devices.
+		Vars: trap severity, master slot number, channel number, port description"
+		::= 5207
+
+	-- this trap is applicable from SW version 1.2.5
+	remoteDeviceBckp2MainTpLink TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+  		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber, 
+				flMsChassisChannelNumber,
+				flMcm1xxChannelExtMvPortDescription }
+		DESCRIPTION
+		"Remote device: Backup to Main TP link.
+		This trap is sent when a remote device's TP port in use switch from backup to main.
+		Applicable for all ATARA devices.
+		Vars: trap severity, master slot number, channel number, port description"
+		::= 5208
+
+	-- this trap is applicable from SW version 1.2.5
+	remoteDeviceMain2BckpTpLink TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+  		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber, 
+				flMsChassisChannelNumber,
+				flMcm1xxChannelExtMvPortDescription }
+		DESCRIPTION
+		"Remote device: Main to Backup TP link.
+		This trap is sent when a remote device's TP port in use switch from main to backup.
+		Applicable for all ATARA devices.
+		Vars: trap severity, master slot number, channel number, port description"
+		::= 5209
+
+-- E1/T1 related traps
+
+	-- this trap is applicable from SW version 1.3.0
+	localE1LosDetected TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+  		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber, 
+				flMsMcm100xE1PortIndex,
+				flMsMcm100xE1PortDescription }
+		DESCRIPTION
+		"Local E1/T1 LOS condition detected.
+		Applicable for E1/T1 local modules, i.e. MCM100-xE1/T1 and PCM110.
+		Vars: trap severity, slot number, E1/T1 port number, E1/T1 port description"
+		::= 5300
+
+	-- this trap is applicable from SW version 1.3.0
+	remoteE1LosDetected TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+  		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber,
+				flMsChassisChannelNumber,
+				flMsMcm100xE1PortIndex,
+				flMsMcm100xE1PortDescription }
+		DESCRIPTION
+		"Remote E1/T1 LOS condition detected.
+		Applicable for E1/T1 remote devices, i.e. LTA-xE1/T1.
+		Vars: trap severity, slot number, channel number, E1/T1 port number, E1/T1 port description"
+		::= 5301
+
+	-- this trap is applicable from SW version 1.3.0
+	localE1SignalDetected TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+  		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber, 
+				flMsMcm100xE1PortIndex,
+				flMsMcm100xE1PortDescription }
+		DESCRIPTION
+		"Local E1/T1 signal detected.
+		Applicable for E1/T1 local modules, i.e. MCM100-xE1/T1 and PCM110.
+		Vars: trap severity, slot number, E1/T1 port number, E1/T1 port description"
+		::= 5302
+
+	-- this trap is applicable from SW version 1.3.0
+	remoteE1SignalDetected TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+  		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber,
+				flMsChassisChannelNumber,
+				flMsMcm100xE1PortIndex,
+				flMsMcm100xE1PortDescription }
+		DESCRIPTION
+		"Remote E1/T1 signal detected.
+		Applicable for E1/T1 remote devices, i.e. LTA-xE1/T1.
+		Vars: trap severity, slot number, channel number, E1/T1 port number, E1/T1 port description"
+		::= 5303
+
+	-- this trap is applicable from SW version 1.3.0
+	localE1AisDetected TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+  		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber, 
+				flMsMcm100xE1PortIndex,
+				flMsMcm100xE1PortDescription }
+		DESCRIPTION
+		"Local E1/T1 AIS detected.
+		Applicable for E1/T1 local modules, i.e. MCM100-xE1/T1 and PCM110.
+		Vars: trap severity, slot number, E1/T1 port number, E1/T1 port description"
+		::= 5304
+
+	-- this trap is applicable from SW version 1.3.0
+	remoteE1AisDetected TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+  		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber,
+				flMsChassisChannelNumber,
+				flMsMcm100xE1PortIndex,
+				flMsMcm100xE1PortDescription }
+		DESCRIPTION
+		"Remote E1/T1 AIS detected.
+		Applicable for E1/T1 remote devices, i.e. LTA-xE1/T1.
+		Vars: trap severity, slot number, channel number, E1/T1 port number, E1/T1 port description"
+		::= 5305
+
+	-- this trap is applicable from SW version 1.3.0
+	localE1AisStopped TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+  		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber, 
+				flMsMcm100xE1PortIndex,
+				flMsMcm100xE1PortDescription }
+		DESCRIPTION
+		"Local E1/T1 AIS stream stopped.
+		Applicable for E1/T1 local modules, i.e. MCM100-xE1/T1 and PCM110.
+		Vars: trap severity, slot number, E1/T1 port number, E1/T1 port description"
+		::= 5306
+
+	-- this trap is applicable from SW version 1.3.0
+	remoteE1AisStopped TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+  		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber,
+				flMsChassisChannelNumber,
+				flMsMcm100xE1PortIndex,
+				flMsMcm100xE1PortDescription }
+		DESCRIPTION
+		"Remote E1/T1 AIS stream stopped.
+		Applicable for E1/T1 remote devices, i.e. LTA-xE1/T1.
+		Vars: trap severity, slot number, channel number, E1/T1 port number, E1/T1 port description"
+		::= 5307
+
+
+-- *******************************************************
+-- Offline Configuration related traps
+-- *******************************************************
+	-- this trap is applicable from SW version 1.4.0
+	offlineConfigConflictModule TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber }
+		DESCRIPTION
+		"Conflict detected: offline configuration and actual module dont match.
+		Vars: trap severity, slot number"
+		::= 5500
+
+	-- this trap is applicable from SW version 1.4.0
+	offlineConfigConflictRemote TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+  		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber,
+				flMsChassisChannelNumber }
+		DESCRIPTION
+		"Conflict detected: offline configuration and actual CPE dont match.
+		Vars: trap severity, slot number, channel number"
+		::= 5501
+
+
+-- *******************************************************
+-- SFP related traps
+-- *******************************************************
+
+	-- this trap is applicable from SW version 1.6.0
+	localSfpPluggedIn TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+  		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber, 
+				flMsChassisChannelNumber,
+				flSfpDevicePortIndex,
+				flMcm1000ChannelExtMvPortDescription }
+		DESCRIPTION
+		"Local device: SFP plugged in.
+		Vars: trap severity, slot number, channel number, port number, port description"
+		::= 5600
+
+	-- this trap is applicable from SW version 1.6.0
+	localSfpUnplugged TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+  		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber, 
+				flMsChassisChannelNumber,
+				flSfpDevicePortIndex,
+				flMcm1000ChannelExtMvPortDescription }
+		DESCRIPTION
+		"Local device: SFP unplugged.
+		Vars: trap severity, slot number, channel number, port number, port description"
+		::= 5601
+
+	-- this trap is applicable from SW version 1.6.0
+	localSfpTxPowerLow TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+  		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber, 
+				flMsChassisChannelNumber,
+				flSfpDevicePortIndex,
+				flMcm1000ChannelExtMvPortDescription }
+		DESCRIPTION
+		"Local device: SFP Tx power low.
+		Vars: trap severity, slot number, channel number, port number, port description"
+		::= 5602
+
+	-- this trap is applicable from SW version 1.6.0
+	localSfpTxPowerNormal TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+  		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber, 
+				flMsChassisChannelNumber,
+				flSfpDevicePortIndex,
+				flMcm1000ChannelExtMvPortDescription }
+		DESCRIPTION
+		"Local device: SFP Tx power normal.
+		Vars: trap severity, slot number, channel number, port number, port description"
+		::= 5603
+
+	-- this trap is applicable from SW version 1.6.0
+	remoteSfpPluggedIn TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+  		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber, 
+				flMsChassisChannelNumber,
+				flSfpDevicePortIndex,
+				flMcm1000ChannelExtMvPortDescription }
+		DESCRIPTION
+		"remote device: SFP plugged in.
+		Vars: trap severity, slot number, channel number, port number, port description"
+		::= 5604
+
+	-- this trap is applicable from SW version 1.6.0
+	remoteSfpUnplugged TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+  		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber, 
+				flMsChassisChannelNumber,
+				flSfpDevicePortIndex,
+				flMcm1000ChannelExtMvPortDescription }
+		DESCRIPTION
+		"remote device: SFP unplugged.
+		Vars: trap severity, slot number, channel number, port number, port description"
+		::= 5605
+
+	-- this trap is applicable from SW version 1.6.0
+	remoteSfpTxPowerLow TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+  		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber, 
+				flMsChassisChannelNumber,
+				flSfpDevicePortIndex,
+				flMcm1000ChannelExtMvPortDescription }
+		DESCRIPTION
+		"remote device: SFP Tx power low.
+		Vars: trap severity, slot number, channel number, port number, port description"
+		::= 5606
+
+	-- this trap is applicable from SW version 1.6.0
+	remoteSfpTxPowerNormal TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+  		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber, 
+				flMsChassisChannelNumber,
+				flSfpDevicePortIndex,
+				flMcm1000ChannelExtMvPortDescription }
+		DESCRIPTION
+		"remote device: SFP Tx power normal.
+		Vars: trap severity, slot number, channel number, port number, port description"
+		::= 5607
+
+
+-- *******************************************************
+-- SFP related traps in redundancy devices
+-- *******************************************************
+
+	-- this trap is applicable from SW version 1.6.2
+	localMainSfpPluggedIn TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+  		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber, 
+				flSfpDevicePortIndex,
+				flMcm1000ChannelExtMvPortDescription }
+		DESCRIPTION
+		"Local device: Main SFP plugged in.
+		Vars: trap severity, slot number, port number, port description"
+		::= 5650
+
+	-- this trap is applicable from SW version 1.6.2
+	localMainSfpUnplugged TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+  		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber, 
+				flSfpDevicePortIndex,
+				flMcm1000ChannelExtMvPortDescription }
+		DESCRIPTION
+		"Local device: Main SFP unplugged.
+		Vars: trap severity, slot number, port number, port description"
+		::= 5651
+
+	-- this trap is applicable from SW version 1.6.2
+	localMainSfpTxPowerLow TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+  		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber, 
+				flSfpDevicePortIndex,
+				flMcm1000ChannelExtMvPortDescription }
+		DESCRIPTION
+		"Local device: Main SFP Tx power low.
+		Vars: trap severity, slot number, port number, port description"
+		::= 5652
+
+	-- this trap is applicable from SW version 1.6.2
+	localMainSfpTxPowerNormal TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+  		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber, 
+				flSfpDevicePortIndex,
+				flMcm1000ChannelExtMvPortDescription }
+		DESCRIPTION
+		"Local device: Main SFP Tx power normal.
+		Vars: trap severity, slot number, port number, port description"
+		::= 5653
+
+	-- this trap is applicable from SW version 1.6.2
+	localBckpSfpPluggedIn TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+  		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber, 
+				flSfpDevicePortIndex,
+				flMcm1000ChannelExtMvPortDescription }
+		DESCRIPTION
+		"Local device: Backup SFP plugged in.
+		Vars: trap severity, slot number, port number, port description"
+		::= 5654
+
+	-- this trap is applicable from SW version 1.6.2
+	localBckpSfpUnplugged TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+  		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber, 
+				flSfpDevicePortIndex,
+				flMcm1000ChannelExtMvPortDescription }
+		DESCRIPTION
+		"Local device: Backup SFP unplugged.
+		Vars: trap severity, slot number, port number, port description"
+		::= 5655
+
+	-- this trap is applicable from SW version 1.6.2
+	localBckpSfpTxPowerLow TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+  		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber, 
+				flSfpDevicePortIndex,
+				flMcm1000ChannelExtMvPortDescription }
+		DESCRIPTION
+		"Local device: Backup SFP Tx power low.
+		Vars: trap severity, slot number, port number, port description"
+		::= 5656
+
+	-- this trap is applicable from SW version 1.6.2
+	localBckpSfpTxPowerNormal TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+  		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber, 
+				flSfpDevicePortIndex,
+				flMcm1000ChannelExtMvPortDescription }
+		DESCRIPTION
+		"Local device: Backup SFP Tx power normal.
+		Vars: trap severity, slot number, port number, port description"
+		::= 5657
+
+	-- this trap is applicable from SW version 1.7.0
+	remoteMainSfpPluggedIn TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+  		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber, 
+				flMsChassisChannelNumber,
+				flSfpDevicePortIndex,
+				flMcm1000ChannelExtMvPortDescription }
+		DESCRIPTION
+		"remote device: Main SFP plugged in.
+		Vars: trap severity, slot number, channel number, port number, port description"
+		::= 5658
+
+	-- this trap is applicable from SW version 1.7.0
+	remoteMainSfpUnplugged TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+  		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber, 
+				flMsChassisChannelNumber,
+				flSfpDevicePortIndex,
+				flMcm1000ChannelExtMvPortDescription }
+		DESCRIPTION
+		"remote device: Main SFP unplugged.
+		Vars: trap severity, slot number, channel number, port number, port description"
+		::= 5659
+
+	-- this trap is applicable from SW version 1.7.0
+	remoteMainSfpTxPowerLow TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+  		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber, 
+				flMsChassisChannelNumber,
+				flSfpDevicePortIndex,
+				flMcm1000ChannelExtMvPortDescription }
+		DESCRIPTION
+		"remote device: Main SFP Tx power low.
+		Vars: trap severity, slot number, channel number, port number, port description"
+		::= 5660
+
+	-- this trap is applicable from SW version 1.7.0
+	remoteMainSfpTxPowerNormal TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+  		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber, 
+				flMsChassisChannelNumber,
+				flSfpDevicePortIndex,
+				flMcm1000ChannelExtMvPortDescription }
+		DESCRIPTION
+		"remote device: Main SFP Tx power normal.
+		Vars: trap severity, slot number, channel number, port number, port description"
+		::= 5661
+
+	-- this trap is applicable from SW version 1.7.0
+	remoteBckpSfpPluggedIn TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+  		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber, 
+				flMsChassisChannelNumber,
+				flSfpDevicePortIndex,
+				flMcm1000ChannelExtMvPortDescription }
+		DESCRIPTION
+		"remote device: Backup SFP plugged in.
+		Vars: trap severity, slot number, channel number, port number, port description"
+		::= 5662
+
+	-- this trap is applicable from SW version 1.7.0
+	remoteBckpSfpUnplugged TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+  		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber, 
+				flMsChassisChannelNumber,
+				flSfpDevicePortIndex,
+				flMcm1000ChannelExtMvPortDescription }
+		DESCRIPTION
+		"remote device: Backup SFP unplugged.
+		Vars: trap severity, slot number, channel number, port number, port description"
+		::= 5663
+
+	-- this trap is applicable from SW version 1.7.0
+	remoteBckpSfpTxPowerLow TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+  		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber, 
+				flMsChassisChannelNumber,
+				flSfpDevicePortIndex,
+				flMcm1000ChannelExtMvPortDescription }
+		DESCRIPTION
+		"remote device: Backup SFP Tx power low.
+		Vars: trap severity, slot number, channel number, port number, port description"
+		::= 5664
+
+	-- this trap is applicable from SW version 1.7.0
+	remoteMainSfpTxPowerNormal TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+  		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber, 
+				flMsChassisChannelNumber,
+				flSfpDevicePortIndex,
+				flMcm1000ChannelExtMvPortDescription }
+		DESCRIPTION
+		"remote device: Backup SFP Tx power normal.
+		Vars: trap severity, slot number, channel number, port number, port description"
+		::= 5665
+
+	-- this trap is applicable from SW version 1.7.0 / build 19
+	remoteDevUsingOldMaVersion TRAP-TYPE
+		ENTERPRISE  fibrolanSNMP
+  		VARIABLES	{ flTrapSeverity, 
+				flMsChassisModuleNumber, 
+				flMsChassisChannelNumber,
+				flSfpDevicePortIndex,
+				flMcm1000ChannelExtMvPortDescription }
+		DESCRIPTION
+		"Cannot manage remote device using old MA version.
+		Vars: trap severity, slot number, channel number, port number, port description"
+		::= 6000
+END

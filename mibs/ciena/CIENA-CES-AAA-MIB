@@ -1,0 +1,252 @@
+CIENA-CES-AAA-MIB DEFINITIONS ::= BEGIN
+
+	IMPORTS
+		cienaGlobalMacAddress
+			FROM CIENA-GLOBAL-MIB
+		cienaCommon, cienaCesConfig, cienaCesNotifications
+			FROM CIENA-SMI
+		CienaGlobalSeverity
+			FROM CIENA-TC
+		enterprises, IpAddress, Unsigned32,
+		MODULE-IDENTITY, OBJECT-IDENTITY, NOTIFICATION-TYPE
+			FROM SNMPv2-SMI
+		DisplayString, MacAddress, TruthValue,
+		TEXTUAL-CONVENTION
+			FROM SNMPv2-TC;
+
+--
+-- Node definitions
+--
+	-- 1.3.6.1.4.1.1271.2.1.60
+	cienaCesAAAMIB MODULE-IDENTITY
+		LAST-UPDATED "202212060000Z"		-- December 6, 2022 at 00:00 GMT (202212060000Z)
+		ORGANIZATION
+			"Ciena Corp."
+		CONTACT-INFO
+			"   Mib Meister
+			7035 Ridge Road
+			Hanover, Maryland 21076
+			USA
+			Phone:  +1 800 921 1144
+			Email:  support@ciena.com"
+		DESCRIPTION
+			"This MIB module defines objects and notifications used by User Authentication,
+			Authorization and Accounting (AAA) services on system."
+		REVISION "202212060000Z"		-- December 6, 2022 at 00:00 GMT (202212060000Z)
+		DESCRIPTION
+			"Added support for TACACS server events cienaCesAAATacacsServerStatusEvent,
+			cienaCesAAAAllTacacsServersDownEvent and support for LDAP server events
+			cienaCesAAALdapServerStatusEvent, cienaCesAAAAllLdapServersDownEvent."
+		REVISION "202108110000Z"		-- August 11, 2021 at 00:00 GMT (202108110000Z)
+		DESCRIPTION
+			"Initial creation."
+	::= { cienaCesConfig 60 }
+
+	-- 1.3.6.1.4.1.1271.2.1.60.1
+	cienaCesAAAMibObjects OBJECT IDENTIFIER ::= { cienaCesAAAMIB 1 }
+
+	-- 1.3.6.1.4.1.1271.2.1.60.1.1
+	cienaCesAAAUserName OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..32))
+		ACCESS accessible-for-notify
+		STATUS current
+		DESCRIPTION
+			"User credentials used by a remote host to connect to the system."
+	::= { cienaCesAAAMibObjects 1 }
+
+	-- 1.3.6.1.4.1.1271.2.1.60.1.2
+	cienaCesAAAHostIp OBJECT-TYPE
+		SYNTAX IpAddress
+		ACCESS accessible-for-notify
+		STATUS current
+		DESCRIPTION
+			"IP address of a remote host trying to connect to the system."
+	::= { cienaCesAAAMibObjects 2 }
+
+	-- 1.3.6.1.4.1.1271.2.1.60.1.3
+	cienaCesAAAUserPort OBJECT-TYPE
+		SYNTAX Unsigned32
+		ACCESS accessible-for-notify
+		STATUS current
+		DESCRIPTION
+			"Port number used by a remote host to connect for an ssh or telnet session."
+	::= { cienaCesAAAMibObjects 3 }
+
+	-- 1.3.6.1.4.1.1271.2.1.60.1.4
+	cienaCesAAAUserAuthenticationServiceType OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			local(1),
+			tacacs(2),
+			radius(3),
+			radsec(4)
+		}
+		ACCESS accessible-for-notify
+		STATUS current
+		DESCRIPTION
+			"User authentication service being used, local or remote."
+	::= { cienaCesAAAMibObjects 4 }
+
+	-- 1.3.6.1.4.1.1271.2.1.60.1.5
+	cienaCesAAAUserAuthenticationStatus OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			success(1),
+			failure(2)
+		}
+		ACCESS accessible-for-notify
+		STATUS current
+		DESCRIPTION
+			"User authentication status as success or failure."
+	::= { cienaCesAAAMibObjects 5 }
+
+	-- 1.3.6.1.4.1.1271.2.1.60.1.6
+	cienaCesAAAUserAuthenticationDescription OBJECT-TYPE
+		SYNTAX DisplayString
+		ACCESS accessible-for-notify
+		STATUS current
+		DESCRIPTION
+			"Detailed description of the user authentication event."
+	::= { cienaCesAAAMibObjects 6 }
+
+	-- 1.3.6.1.4.1.1271.2.1.60.1.7
+	cienaCesAAAServerGroup OBJECT-TYPE
+		SYNTAX DisplayString
+		ACCESS accessible-for-notify
+		STATUS current
+		DESCRIPTION
+			"Server group to which TACACS server belongs."
+	::= { cienaCesAAAMibObjects 7 }
+
+	-- 1.3.6.1.4.1.1271.2.1.60.1.8
+	cienaCesAAATacacsServer OBJECT-TYPE
+		SYNTAX DisplayString
+		ACCESS accessible-for-notify
+		STATUS current
+		DESCRIPTION
+			"IP address of the TACACS server."
+	::= { cienaCesAAAMibObjects 8 }
+
+	-- 1.3.6.1.4.1.1271.2.1.60.1.9
+	cienaCesAAAServerStatus OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			available(1),
+			unreachable(2)
+		}
+		ACCESS accessible-for-notify
+		STATUS current
+		DESCRIPTION
+			"Status of the TACACS server."
+	::= { cienaCesAAAMibObjects 9 }
+
+	-- 1.3.6.1.4.1.1271.2.1.60.1.10
+	cienaCesAAAAllServerDownStatus OBJECT-TYPE
+		SYNTAX TruthValue
+		ACCESS accessible-for-notify
+		STATUS current
+		DESCRIPTION
+			"Describes if all the TACACS servers are down or not."
+	::= { cienaCesAAAMibObjects 10 }
+
+	-- 1.3.6.1.4.1.1271.2.1.60.1.11
+	cienaCesAAALdapServer OBJECT-TYPE
+		SYNTAX DisplayString
+		ACCESS accessible-for-notify
+		STATUS current
+		DESCRIPTION
+			"IP address or hostname of LDAP server."
+	::= { cienaCesAAAMibObjects 11 }
+
+	-- 1.3.6.1.4.1.1271.2.1.60.1.12
+	cienaCesAAAUser OBJECT-TYPE
+		SYNTAX DisplayString
+		ACCESS accessible-for-notify
+		STATUS current
+		DESCRIPTION
+			"IP address or hostname of LDAP server."
+	::= { cienaCesAAAMibObjects 12 }
+
+	-- 1.3.6.1.4.1.1271.2.1.60.1.13
+	cienaCesAAANacmGroup OBJECT-TYPE
+		SYNTAX DisplayString
+		ACCESS accessible-for-notify
+		STATUS current
+		DESCRIPTION
+			"IP address or hostname of LDAP server."
+	::= { cienaCesAAAMibObjects 13 }
+
+	-- 1.3.6.1.4.1.1271.2.1.60.1.14
+	cienaCesAAALdapServerStatus OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			available(1),
+			unavailable(2),
+			ruleparseerror(3)
+		}
+		ACCESS accessible-for-notify
+		STATUS current
+		DESCRIPTION
+			"IP address or hostname of LDAP server."
+	::= { cienaCesAAAMibObjects 14 }
+
+	-- 1.3.6.1.4.1.1271.2.2.111
+	cienaCesAAAMIBNotificationPrefix OBJECT IDENTIFIER ::= { cienaCesNotifications 111 }
+
+	-- 1.3.6.1.4.1.1271.2.2.111.0
+	cienaCesAAAMIBNotification OBJECT IDENTIFIER ::= { cienaCesAAAMIBNotificationPrefix 0 }
+
+	-- 1.3.6.1.4.1.1271.2.2.111.0.1
+	cienaCesAAAUserAuthenticationEvent NOTIFICATION-TYPE
+		OBJECTS { cienaGlobalSeverity, cienaGlobalMacAddress, cienaCesAAAUserName, 
+		cienaCesAAAHostIp, cienaCesAAAUserPort, 
+		cienaCesAAAUserAuthenticationServiceType, 
+		cienaCesAAAUserAuthenticationStatus, 
+		cienaCesAAAUserAuthenticationDescription } 
+		STATUS current
+		DESCRIPTION
+			"This notification is generated when an authentication event,
+			as identified by the value of cienaCesAAAUserAuthenticationStatus
+			has occurred."
+	::= { cienaCesAAAMIBNotification 1 }
+
+	-- 1.3.6.1.4.1.1271.2.2.111.0.2
+	cienaCesAAATacacsServerStatusEvent NOTIFICATION-TYPE
+		OBJECTS { cienaGlobalSeverity, cienaGlobalMacAddress, cienaCesAAAServerGroup, 
+		cienaCesAAATacacsServer, cienaCesAAAServerStatus } 
+		STATUS current
+		DESCRIPTION
+			"This notification is generated when a TACACS server is not reachable."
+	::= { cienaCesAAAMIBNotification 2 }
+
+	-- 1.3.6.1.4.1.1271.2.2.111.0.3
+	cienaCesAAAAllTacacsServersDownEvent NOTIFICATION-TYPE
+		OBJECTS { cienaGlobalSeverity, cienaGlobalMacAddress, cienaCesAAAServerGroup, 
+		cienaCesAAAAllServerDownStatus } 
+		STATUS current
+		DESCRIPTION
+			"This notification is generated when all the configured TACACS
+			servers are not reachable."
+	::= { cienaCesAAAMIBNotification 3 }
+
+	-- 1.3.6.1.4.1.1271.2.2.111.0.4
+	cienaCesAAALdapServerStatusEvent NOTIFICATION-TYPE
+		OBJECTS { cienaGlobalSeverity, cienaGlobalMacAddress, cienaCesAAALdapServer, 
+		cienaCesAAAUser, cienaCesAAANacmGroup, cienaCesAAALdapServerStatus } 
+		STATUS current
+		DESCRIPTION
+			"This notification is generated when an LDAP server is not reachable
+			or NACM rule downloaded from LDAP server is not parsed correctly."
+	::= { cienaCesAAAMIBNotification 4 }
+
+	-- 1.3.6.1.4.1.1271.2.2.111.0.5
+	cienaCesAAAAllLdapServersDownEvent NOTIFICATION-TYPE
+		OBJECTS { cienaGlobalSeverity, cienaGlobalMacAddress, 
+		cienaCesAAAAllServerDownStatus } 
+		STATUS current
+		DESCRIPTION
+			"This notification is generated when all the configured LDAP servers
+			are not reachable/available."
+	::= { cienaCesAAAMIBNotification 5 }
+
+END
