@@ -2,7 +2,6 @@
 /**
  * Iosxe.php
  *
- * Cisco IOS-XE Wireless LAN Controller
  * Cisco IOS-XE ISIS Neighbors
  *
  * This program is free software: you can redistribute it and/or modify
