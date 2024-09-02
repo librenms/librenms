@@ -40,7 +40,6 @@ use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\OS\Traits\CiscoCellular;
 use LibreNMS\RRD\RrdDefinition;
 
-
 class Iosxewlc extends Iosxe implements
     OSPolling,
     WirelessCellDiscovery,
@@ -151,13 +150,13 @@ class Iosxewlc extends Iosxe implements
         $this->getDevice()->accessPoints->whereNotIn('accesspoint_id', $valid_ap_ids)->each->delete();
     }
 
-    
     /**
      * Discover wireless client counts. Type is clients.
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
      *
      * @return array Sensors
      */
+    
     public function discoverWirelessClients()
     {
         $counts = $this->getCacheByIndex('bsnDot11EssNumberOfMobileStations', 'AIRESPACE-WIRELESS-MIB');
@@ -202,6 +201,7 @@ class Iosxewlc extends Iosxe implements
 
         return $sensors;
     }
+    
     /**
      * Discover wireless capacity.  This is a percent. Type is capacity.
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
@@ -211,8 +211,8 @@ class Iosxewlc extends Iosxe implements
     public function discoverWirelessApCount()
     {
         $oids = [
-	        'CISCO-LWAPP-AP-MIB::cLApGlobalAPConnectCount.0',
-	        'CISCO-LWAPP-AP-MIB::cLApGlobalMaxApsSupported.0',
+	         'CISCO-LWAPP-AP-MIB::cLApGlobalAPConnectCount.0',
+	         'CISCO-LWAPP-AP-MIB::cLApGlobalMaxApsSupported.0',
         ];
         $data = snmp_get_multi($this->getDeviceArray(), $oids);
 
