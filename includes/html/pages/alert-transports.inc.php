@@ -14,9 +14,9 @@ if (Auth::user()->hasGlobalAdmin()) {
             if (class_exists($class)) {
                 $transport = app($class);
                 if ($transport->handleOauth($request)) {
-                    flash()->addSuccess("$transport_name added successfully.");
+                    toast()->sucess("$transport_name added successfully.");
                 } else {
-                    flash()->addError("$transport_name was not added. Check the log for details.");
+                    toast()->error("$transport_name was not added. Check the log for details.");
                 }
             }
         }

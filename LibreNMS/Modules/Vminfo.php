@@ -64,7 +64,6 @@ class Vminfo implements \LibreNMS\Interfaces\Module
             ModuleModelObserver::observe(\App\Models\Vminfo::class);
             $this->syncModels($os->getDevice(), 'vminfo', $vms);
         }
-        echo PHP_EOL;
     }
 
     public function shouldPoll(OS $os, ModuleStatus $status): bool

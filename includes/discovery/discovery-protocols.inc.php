@@ -131,37 +131,39 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
         }//end foreach
     }
     echo PHP_EOL;
-} elseif ($device['os'] == 'pbn' || $device['os'] == 'bdcom') {
+} elseif ($device['os'] == 'pbn' || $device['os'] == 'bdcom' || $device['os'] == 'fs-bdcom') {
     echo ' NMS-LLDP-MIB: ';
-    $lldp_array = SnmpQuery::hideMib()->walk('NMS-LLDP-MIB::lldpRemoteSystemsData')->table();
-    foreach ($lldp_array as $key => $lldp) {
-        d_echo($lldp);
-        $interface = get_port_by_ifIndex($device['device_id'], $lldp['lldpRemLocalPortNum']);
-        $remote_device_id = find_device_id($lldp['lldpRemSysName']);
+    $lldp_array = SnmpQuery::hideMib()->walk('NMS-LLDP-MIB::lldpRemoteSystemsData')->table(2);
+    foreach ($lldp_array as $key => $lldp_array_inner) {
+        foreach ($lldp_array_inner as $ifIndex => $lldp) {
+            d_echo($lldp);
+            $interface = get_port_by_ifIndex($device['device_id'], $lldp['lldpRemLocalPortNum']);
+            $remote_device_id = find_device_id($lldp['lldpRemSysName']);
 
-        if (! $remote_device_id &&
-                \LibreNMS\Util\Validate::hostname($lldp['lldpRemSysName']) &&
-                ! can_skip_discovery($lldp['lldpRemSysName'], $lldp['lldpRemSysDesc'] &&
-                    Config::get('autodiscovery.xdp') === true)
-        ) {
-            $remote_device_id = discover_new_device($lldp['lldpRemSysName'], $device, 'LLDP', $interface);
-        }
+            if (! $remote_device_id &&
+                    \LibreNMS\Util\Validate::hostname($lldp['lldpRemSysName']) &&
+                    ! can_skip_discovery($lldp['lldpRemSysName'], $lldp['lldpRemSysDesc'] &&
+                        Config::get('autodiscovery.xdp') === true)
+            ) {
+                $remote_device_id = discover_new_device($lldp['lldpRemSysName'], $device, 'LLDP', $interface);
+            }
 
-        if ($interface['port_id'] && $lldp['lldpRemSysName'] && $lldp['lldpRemPortId']) {
-            $remote_port_id = find_port_id($lldp['lldpRemPortDesc'], $lldp['lldpRemPortId'], $remote_device_id);
-            discover_link(
-                $interface['port_id'],
-                'lldp',
-                $remote_port_id,
-                $lldp['lldpRemSysName'],
-                $lldp['lldpRemPortId'],
-                null,
-                $lldp['lldpRemSysDesc'],
-                $device['device_id'],
-                $remote_device_id
-            );
-        }
-    }//end foreach
+            if ($interface['port_id'] && $lldp['lldpRemSysName'] && $lldp['lldpRemPortId']) {
+                $remote_port_id = find_port_id($lldp['lldpRemPortDesc'], $lldp['lldpRemPortId'], $remote_device_id);
+                discover_link(
+                    $interface['port_id'],
+                    'lldp',
+                    $remote_port_id,
+                    $lldp['lldpRemSysName'],
+                    $lldp['lldpRemPortId'],
+                    null,
+                    $lldp['lldpRemSysDesc'],
+                    $device['device_id'],
+                    $remote_device_id
+                );
+            }
+        } //end foreach $lldp_array_inner
+    }//end foreach $lldp_array
     echo PHP_EOL;
 } elseif ($device['os'] == 'timos') {
     echo ' TIMETRA-LLDP-MIB: ';
@@ -274,6 +276,47 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
         } else {
             $dot1d_array = snmpwalk_group($device, 'dot1dBasePortIfIndex', 'BRIDGE-MIB');
             $lldp_ports = snmpwalk_group($device, 'lldpLocPortId', 'LLDP-MIB');
+        }
+    } else {
+        echo ' LLDP-V2-MIB: ';
+        $lldpv2_array = SnmpQuery::hideMib()->walk('LLDP-V2-MIB::lldpV2RemTable')->table(4);
+    }
+
+    $mapV2toV1 = [
+        'lldpV2RemChassisIdSubtype' => 'lldpRemChassisIdSubtype',
+        'lldpV2RemChassisId' => 'lldpRemChassisId',
+        'lldpV2RemPortIdSubtype' => 'lldpRemPortIdSubtype',
+        'lldpV2RemPortId' => 'lldpRemPortId',
+        'lldpV2RemPortDesc' => 'lldpRemPortDesc',
+        'lldpV2RemSysName' => 'lldpRemSysName',
+        'lldpV2RemSysDesc' => 'lldpRemSysDesc',
+        'lldpV2RemSysCapSupported' => 'lldpRemSysCapSupported',
+        'lldpV2RemSysCapEnabled' => 'lldpRemSysCapEnabled',
+        'lldpV2RemRemoteChanges' => 'lldpRemRemoteChanges',
+        'lldpV2RemTooManyNeighbors' => 'lldpRemTooManyNeighbors',
+        'lldpV2RemManAddrTable' => 'lldpRemManAddrTable',
+        'lldpV2RemManAddrEntry' => 'lldpRemManAddrEntry',
+        'lldpV2RemManAddrSubtype' => 'lldpRemManAddrSubtype',
+        'lldpV2RemManAddr' => 'lldpRemManAddr',
+        'lldpV2RemManAddrIfSubtype' => 'lldpRemManAddrIfSubtype',
+        'lldpV2RemManAddrIfId' => 'lldpRemManAddrIfId',
+        'lldpV2RemManAddrOID' => 'lldpRemManAddrOID',
+    ];
+
+    if (! empty($lldpv2_array)) {
+        // map it to lldp_array
+        foreach ($lldpv2_array as $lldpV2RemTimeMark => $value) {
+            foreach ($value as $lldpV2RemLocalIfIndex => $value) {
+                foreach ($value as $lldpV2RemLocalDestMACAddress => $value) {
+                    foreach ($value as $lldpV2RemIndex => $lldpv2_array_entries) {
+                        foreach ($lldpv2_array_entries as $key => $value) {
+                            $newKey = $mapV2toV1[$key] ?? $key;
+                            $lldp_array[$lldpV2RemTimeMark][$lldpV2RemLocalIfIndex][$lldpV2RemIndex][$newKey] = $value;
+                        }
+                        $lldp_array[$lldpV2RemTimeMark][$lldpV2RemLocalIfIndex][$lldpV2RemIndex]['lldpRemLocalDestMACAddress'] = $lldpV2RemLocalDestMACAddress;
+                    }
+                }
+            }
         }
     }
 

@@ -151,16 +151,6 @@ parameters:
 			path: LibreNMS/Util/Graph.php
 
 		-
-			message: "#^Property LibreNMS\\\\Util\\\\Snmpsim\\:\\:\\$proc \\(LibreNMS\\\\Proc\\) in isset\\(\\) is not nullable\\.$#"
-			count: 2
-			path: LibreNMS/Util/Snmpsim.php
-
-		-
-			message: "#^Unreachable statement \\- code above always terminates\\.$#"
-			count: 1
-			path: LibreNMS/Util/Snmpsim.php
-
-		-
 			message: "#^Static method Silber\\\\Bouncer\\\\BouncerFacade\\:\\:role\\(\\) invoked with 0 parameters, 1 required\\.$#"
 			count: 1
 			path: app/Console/Commands/AddUserCommand.php

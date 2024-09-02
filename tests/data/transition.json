@@ -3829,5 +3829,31 @@
                 }
             ]
         }
+    },
+    "entity-physical": {
+        "discovery": {
+            "entPhysical": [
+                {
+                    "entPhysicalIndex": 1,
+                    "entPhysicalDescr": "S3290-42 GigaBit Ethernet Switch",
+                    "entPhysicalClass": "other",
+                    "entPhysicalName": "Device",
+                    "entPhysicalHardwareRev": "",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "S3290-42 (standalone) 2.0.4",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "true",
+                    "entPhysicalModelName": "",
+                    "entPhysicalVendorType": "zeroDotZero.0.0.0.0.0.0",
+                    "entPhysicalSerialNum": "14535957",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": 0,
+                    "entPhysicalMfgName": "Transition Networks",
+                    "ifIndex": null
+                }
+            ]
+        },
+        "poller": "matches discovery"
     }
 }

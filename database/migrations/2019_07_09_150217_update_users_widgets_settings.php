@@ -12,7 +12,6 @@ return new class extends Migration
      */
     public function up(): void
     {
-        /** @phpstan-ignore-next-line */
         $widgets = UserWidget::where('widget_id', 1)->get();
         foreach ($widgets as $widget) {
             $settings = $widget->settings;
@@ -32,7 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        /** @phpstan-ignore-next-line */
         $widgets = UserWidget::where('widget_id', 1)->get();
         foreach ($widgets as $widget) {
             $settings = $widget->settings;

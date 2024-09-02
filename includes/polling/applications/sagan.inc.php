@@ -78,7 +78,8 @@ foreach ($sagan['data'] as $instance => $stats) {
     $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
     data_update($device, 'app', $tags, $fields);
 }
-$old_instances = $app->app['instances'];
+
+$old_instances = $app->app['instances'] ?? [];
 
 //check for added instances
 $added_instances = array_values(array_diff($instances, $old_instances));
@@ -88,12 +89,13 @@ $removed_instances = array_values(array_diff($old_instances, $instances));
 
 // if we have any instance changes, log it
 if (sizeof($added_instances) > 0 or sizeof($removed_instances) > 0) {
-    $app->data = ['instances' => $instances];
     $log_message = 'Sagan Instance Change:';
     $log_message .= count($added_instances) > 0 ? ' Added ' . json_encode($added_instances) : '';
     $log_message .= count($removed_instances) > 0 ? ' Removed ' . json_encode($added_instances) : '';
     log_event($log_message, $device, 'application');
 }
+
+$app->data = ['instances' => $instances];
 
 //
 // all done so update the app metrics

@@ -154,6 +154,7 @@ OUT;
         $process->shouldReceive('getCommandLine');
         $process->shouldReceive('run')->withArgs(function ($callback) {
             // simulate incremental output (not always one full line per callback)
+            call_user_func($callback, Process::ERR, "ICMP unreachable\n"); // this line should be ignored
             call_user_func($callback, Process::ERR, "192.168.1.4 : xmt/rcv/%loss = 3/3/0%, min/avg/max = 0.62/0.71/0.93\nhostname    : xmt/rcv/%loss = 3/0/100%");
             call_user_func($callback, Process::ERR, "invalid:characters!: Name or service not known\n\n1.1.1.1 : xmt/rcv/%loss = 3/2/33%");
             call_user_func($callback, Process::ERR, ", min/avg/max = 0.024/0.037/0.054\n");

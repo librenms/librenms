@@ -167,6 +167,30 @@ class Device extends BaseModel
         return null;
     }
 
+    public function hasSnmpInfo(): bool
+    {
+        if ($this->snmpver == 'v3') {
+            if ($this->authlevel == 'authNoPriv') {
+                return ! empty($this->authname) && ! empty($this->authpass);
+            }
+
+            if ($this->authlevel == 'authPriv') {
+                return ! empty($this->authname)
+                    && ! empty($this->authpass)
+                    && ! empty($this->cryptoalgo)
+                    && ! empty($this->cryptopass);
+            }
+
+            return $this->authlevel !== 'noAuthNoPriv'; // reject if not noAuthNoPriv
+        }
+
+        if ($this->snmpver == 'v2c' || $this->snmpver == 'v1') {
+            return ! empty($this->community);
+        }
+
+        return false; // no known snmpver
+    }
+
     /**
      * Get VRF contexts to poll.
      * If no contexts are found, return the default context ''
@@ -802,7 +826,8 @@ class Device extends BaseModel
 
     public function maps(): HasManyThrough
     {
-        return $this->hasManyThrough(CustomMap::class, CustomMapNode::class, 'device_id', 'custom_map_id', 'device_id', 'custom_map_id');
+        return $this->hasManyThrough(CustomMap::class, CustomMapNode::class, 'device_id', 'custom_map_id', 'device_id', 'custom_map_id')
+            ->distinct();
     }
 
     public function mefInfo(): HasMany
@@ -868,6 +893,11 @@ class Device extends BaseModel
     public function portsNac(): HasMany
     {
         return $this->hasMany(\App\Models\PortsNac::class, 'device_id', 'device_id');
+    }
+
+    public function portsStack(): HasMany
+    {
+        return $this->hasMany(\App\Models\PortStack::class, 'device_id', 'device_id');
     }
 
     public function portsStp(): HasMany

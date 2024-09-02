@@ -137,7 +137,7 @@ https://laravel.com/docs/packages
 > This is untested, please come to discord and share any expriences and update this documentation!
 
 
-## Version 1 Plugin System structure (legacy verion)
+## Version 1 Plugin System structure (legacy version)
 
 Plugins need to be installed into html/plugins
 

@@ -29,6 +29,7 @@ namespace LibreNMS\OS;
 use App\Models\IsisAdjacency;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 use LibreNMS\DB\SyncsModels;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\IsIsDiscovery;
@@ -124,7 +125,7 @@ class Iosxe extends Ciscowlc implements
         $up_count = array_count_values($states)['up'] ?? 0;
 
         if ($up_count !== $adjacencies->count()) {
-            echo 'New Adjacencies, running discovery';
+            Log::info('New Adjacencies, running discovery');
 
             return $this->fillNew($adjacencies, $this->discoverIsIs());
         }

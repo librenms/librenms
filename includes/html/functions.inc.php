@@ -259,34 +259,6 @@ function print_percentage_bar($width, $height, $percent, $left_text, $left_colou
     ]);
 }
 
-function generate_entity_link($type, $entity, $text = null, $graph_type = null)
-{
-    global $entity_cache;
-
-    if (is_numeric($entity)) {
-        $entity = get_entity_by_id_cache($type, $entity);
-    }
-
-    switch ($type) {
-        case 'port':
-            $link = generate_port_link($entity, $text, $graph_type);
-            break;
-
-        case 'storage':
-            if (empty($text)) {
-                $text = $entity['storage_descr'];
-            }
-
-            $link = generate_link($text, ['page' => 'device', 'device' => $entity['device_id'], 'tab' => 'health', 'metric' => 'storage']);
-            break;
-
-        default:
-            $link = $entity[$type . '_id'];
-    }
-
-    return $link;
-}//end generate_entity_link()
-
 /**
  * Extract type and subtype from a complex graph type, also makes sure variables are file name safe.
  *
@@ -736,6 +708,22 @@ function alert_details($details)
             $fallback = false;
         }
 
+        if (isset($tmp_alerts['service_id'])) {
+            $fault_detail .= "Service: <a href='" .
+                \LibreNMS\Util\Url::generate([
+                    'page' => 'device',
+                    'device' => $tmp_alerts['device_id'],
+                    'tab' => 'services',
+                    'view' => 'detail',
+                ]) .
+                "'>" . ($tmp_alerts['service_name'] ?? '') . ' (' . $tmp_alerts['service_type'] . ')' . '</a>';
+            $fault_detail .= 'Service Host: ' . ($tmp_alerts['service_ip'] != '' ? $tmp_alerts['service_ip'] : format_hostname(DeviceCache::get($tmp_alerts['device_id']))) . ',<br>';
+            $fault_detail .= ($tmp_alerts['service_desc'] != '') ? ('Description: ' . $tmp_alerts['service_desc'] . ',<br>') : '';
+            $fault_detail .= ($tmp_alerts['service_param'] != '') ? ('Param: ' . $tmp_alerts['service_param'] . ',<br>') : '';
+            $fault_detail .= 'Msg: ' . $tmp_alerts['service_message'];
+            $fallback = false;
+        }
+
         if (isset($tmp_alerts['bgpPeer_id'])) {
             // If we have a bgpPeer_id, we format the data accordingly
             $fault_detail .= "BGP peer <a href='" .
@@ -746,8 +734,22 @@ function alert_details($details)
                     'proto' => 'bgp',
                 ]) .
                 "'>" . $tmp_alerts['bgpPeerIdentifier'] . '</a>';
+            $fault_detail .= ', Desc ' . $tmp_alerts['bgpPeerDescr'] ?? '';
             $fault_detail .= ', AS' . $tmp_alerts['bgpPeerRemoteAs'];
             $fault_detail .= ', State ' . $tmp_alerts['bgpPeerState'];
+            $fallback = false;
+        }
+
+        if (isset($tmp_alerts['mempool_id'])) {
+            // If we have a mempool_id, we format the data accordingly
+            $fault_detail .= "MemoryPool <a href='" .
+                \LibreNMS\Util\Url::generate([
+                    'page' => 'graphs',
+                    'id' => $tmp_alerts['mempool_id'],
+                    'type' => 'mempool_usage',
+                ]) .
+                "'>" . ($tmp_alerts['mempool_descr'] ?? 'link') . '</a>';
+            $fault_detail .= '<br> &nbsp; &nbsp; &nbsp; Usage ' . $tmp_alerts['mempool_perc'] . '%, &nbsp; Free ' . \LibreNMS\Util\Number::formatSi($tmp_alerts['mempool_free']) . ',&nbsp; Size ' . \LibreNMS\Util\Number::formatSi($tmp_alerts['mempool_total']);
             $fallback = false;
         }
 

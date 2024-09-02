@@ -27,6 +27,7 @@ if (! Auth::user()->hasGlobalAdmin()) {
     exit('ERROR: You need to be admin');
 }
 
+use App\Facades\DeviceCache;
 use LibreNMS\Alerting\QueryBuilderParser;
 use LibreNMS\Enum\AlertState;
 
@@ -260,7 +261,7 @@ foreach ($rule_list as $rule) {
 
     // Name
 
-    echo '<td>' . $rule['name'] . '</td>';
+    echo '<td><a href="' . url('alerts/rule_id='.$rule['id']) .'" data-container="body" data-toggle="popover" data-placement="right" data-content="View active alerts for this rule" target="_blank">' . $rule['name'] . '</a></td>';
 
     // Devices (and Groups)
 
@@ -301,7 +302,7 @@ foreach ($rule_list as $rule) {
         $device_query = 'SELECT devices.device_id,devices.hostname FROM alert_device_map, devices WHERE alert_device_map.rule_id=? and alert_device_map.device_id = devices.device_id ORDER BY hostname';
         $device_maps = dbFetchRows($device_query, [$rule['id']]);
         foreach ($device_maps as $device_map) {
-            $devices .= $except_device_or_group . '<a href="' . url('device/device=' . $device_map['device_id'] . '/tab=edit/') . '" data-container="body" data-toggle="popover" data-placement="' . $popover_position . '" data-content="' . htmlentities($device_map['hostname']) . '" title="' . $devices_msg . '" target="_blank">' . htmlentities($device_map['hostname']) . '</a><br>';
+            $devices .= $except_device_or_group . '<a href="' . url('device/device=' . $device_map['device_id'] . '/tab=edit/') . '" data-container="body" data-toggle="popover" data-placement="' . $popover_position . '" data-content="' . htmlentities($device_map['hostname']) . '" title="' . $devices_msg . '" target="_blank">' . htmlentities(DeviceCache::get($device_map['device_id'])->displayName()) . '</a><br>';
         }
     }
 
@@ -317,7 +318,7 @@ foreach ($rule_list as $rule) {
     }
     if (! $devices && ! $groups && ! $locations) {
         // All Devices
-        echo '<a href="' . url('devices') . '" data-container="body" data-toggle="popover" data-placement=" . $popover_position . " data-content="View All Devices" target="_blank">All Devices</a><br>';
+        echo '<a href="' . url('devices') . '" data-container="body" data-toggle="popover" data-placement="' . $popover_position . '" data-content="View All Devices" target="_blank">All Devices</a><br>';
     }
 
     echo '</td>';
@@ -385,7 +386,7 @@ foreach ($rule_list as $rule) {
 
     $status_popover = 'top';
 
-    echo "<td><span data-toggle='popover' data-placement='$status_popover' data-content='$status_msg' id='alert-rule-" . $rule['id'] . "' class='fa fa-fw fa-2x fa-" . $ico . ' text-' . $col . "'></span> ";
+    echo "<td><a href=" . url('alerts/rule_id='.$rule['id']) ."><span data-toggle='popover' data-placement='$status_popover' data-content='$status_msg' id='alert-rule-" . $rule['id'] . "' class='fa fa-fw fa-2x fa-" . $ico . ' text-' . $col . "'></span></a>";
     if ($rule_extra['mute'] === true) {
         echo "<div data-toggle='popover' data-content='Alerts for " . $rule['name'] . " are muted' class='fa fa-fw fa-2x fa-volume-off text-primary' aria-hidden='true'></div>";
     }

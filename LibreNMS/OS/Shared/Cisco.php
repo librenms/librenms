@@ -27,11 +27,13 @@
 namespace LibreNMS\OS\Shared;
 
 use App\Models\Device;
+use App\Models\EntPhysical;
 use App\Models\Mempool;
 use App\Models\PortsNac;
 use App\Models\Sla;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 use LibreNMS\Device\Processor;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
@@ -57,6 +59,11 @@ class Cisco extends OS implements
     use YamlOSDiscovery {
         YamlOSDiscovery::discoverOS as discoverYamlOS;
     }
+    use OS\Traits\EntityMib {
+        OS\Traits\EntityMib::discoverEntityPhysical as discoverBaseEntityPhysical;
+    }
+
+    protected ?string $entityVendorTypeMib = 'CISCO-ENTITY-VENDORTYPE-OID-MIB';
 
     public function discoverOS(Device $device): void
     {
@@ -211,6 +218,65 @@ class Cisco extends OS implements
         }
 
         return $mempools;
+    }
+
+    public function discoverEntityPhysical(): Collection
+    {
+        $inventory = $this->discoverBaseEntityPhysical();
+
+        $os = $this->getDevice()->os;
+
+        // discover cellular device info
+        if ($os == 'ios' or $os == 'iosxe') {
+            $cellData = \SnmpQuery::hideMib()->walk('CISCO-WAN-3G-MIB::c3gGsmIdentityTable');
+            $baseIndex = $inventory->max('entPhysicalIndex'); // maintain compatability with buggy old code
+
+            foreach ($cellData->table(1) as $index => $entry) {
+                if (isset($entry['c3gImsi'])) {
+                    $inventory->push(new EntPhysical([
+                        'entPhysicalIndex' => ++$baseIndex,
+                        'entPhysicalDescr' => $entry['c3gImsi'],
+                        'entPhysicalVendorType' => 'sim',
+                        'entPhysicalContainedIn' => $index,
+                        'entPhysicalClass' => 'module',
+                        'entPhysicalParentRelPos' => '-1',
+                        'entPhysicalName' => 'sim',
+                        'entPhysicalModelName' => 'IMSI',
+                        'entPhysicalIsFRU' => 'true',
+                    ]));
+                }
+
+                if (isset($entry['c3gImei'])) {
+                    $inventory->push(new EntPhysical([
+                        'entPhysicalIndex' => ++$baseIndex,
+                        'entPhysicalDescr' => $entry['c3gImei'],
+                        'entPhysicalVendorType' => 'modem',
+                        'entPhysicalContainedIn' => $index,
+                        'entPhysicalClass' => 'module',
+                        'entPhysicalParentRelPos' => '-1',
+                        'entPhysicalName' => 'modem',
+                        'entPhysicalModelName' => 'IMEI',
+                        'entPhysicalIsFRU' => 'false',
+                    ]));
+                }
+
+                if (isset($entry['c3gIccId'])) {
+                    $inventory->push(new EntPhysical([
+                        'entPhysicalIndex' => ++$baseIndex,
+                        'entPhysicalDescr' => $entry['c3gIccId'],
+                        'entPhysicalVendorType' => 'sim',
+                        'entPhysicalContainedIn' => $index,
+                        'entPhysicalClass' => 'module',
+                        'entPhysicalParentRelPos' => '-1',
+                        'entPhysicalName' => 'sim',
+                        'entPhysicalModelName' => 'ICCID',
+                        'entPhysicalIsFRU' => 'true',
+                    ]));
+                }
+            }
+        }
+
+        return $inventory;
     }
 
     /**
@@ -439,7 +505,7 @@ class Cisco extends OS implements
             // Use Nagios Status codes. 0: Good, 2: Critical
             $sla->opstatus = $data[$sla_nr]['rttMonLatestRttOperSense'] == 1 ? 0 : 2;
 
-            echo 'SLA ' . $sla_nr . ': ' . $rtt_type . ' ' . $sla['owner'] . ' ' . $sla['tag'] . '... ' . $sla->rtt . 'ms at ' . $time . "\n";
+            Log::info('SLA ' . $sla_nr . ': ' . $rtt_type . ' ' . $sla['owner'] . ' ' . $sla['tag'] . '... ' . $sla->rtt . 'ms at ' . $time);
 
             $collected = ['rtt' => $sla->rtt];
 

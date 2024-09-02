@@ -42,7 +42,7 @@
     <link href="{{ asset('css/query-builder.default.min.css') }}" rel="stylesheet">
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
     <link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet">
-    <link href="{{ asset(LibreNMS\Config::get('stylesheet', 'css/styles.css')) }}?ver=22052024" rel="stylesheet">
+    <link href="{{ asset(LibreNMS\Config::get('stylesheet', 'css/styles.css')) }}?ver=13062024" rel="stylesheet">
     <link href="{{ asset('css/' . LibreNMS\Config::get('applied_site_style', 'light') . '.css?ver=632417643') }}" rel="stylesheet">
     @foreach(LibreNMS\Config::get('webui.custom_css', []) as $custom_css)
         <link href="{{ $custom_css }}" rel="stylesheet">
@@ -78,7 +78,6 @@
     </script>
     <script src="{{ asset('js/librenms.js?ver=22052024') }}"></script>
     <script type="text/javascript" src="{{ asset('js/overlib_mini.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('js/flasher.min.js?ver=0.6.1') }}"></script>
     <script type="text/javascript" src="{{ asset('js/toastr.min.js?ver=05072021') }}"></script>
     <script type="text/javascript" src="{{ asset('js/boot.js?ver=10272021') }}"></script>
     <script>
@@ -119,7 +118,7 @@
 
 @yield('scripts')
 
-@flasher_render
+<x-toast />
 
 @stack('scripts')
 </body>

@@ -954,33 +954,34 @@ lnms config:set os.iosxe.disabled_sensors_regex '/PEM Iout/'
 Mounted storage / mount points to ignore in discovery and polling.
 
 !!! setting "discovery/storage"
-   ```bash
-    lnms config:set ignore_mount_removable true
-    lnms config:set ignore_mount_network true
-    lnms config:set ignore_mount_optical true
 
-    lnms config:set ignore_mount.+ /kern
-    lnms config:set ignore_mount.+ /mnt/cdrom
-    lnms config:set ignore_mount.+ /proc
-    lnms config:set ignore_mount.+ /dev
+```bash
+lnms config:set ignore_mount_removable true
+lnms config:set ignore_mount_network true
+lnms config:set ignore_mount_optical true
 
-    lnms config:set ignore_mount_string.+ packages
-    lnms config:set ignore_mount_string.+ devfs
-    lnms config:set ignore_mount_string.+ procfs
-    lnms config:set ignore_mount_string.+ UMA
-    lnms config:set ignore_mount_string.+ MALLOC
+lnms config:set ignore_mount.+ /kern
+lnms config:set ignore_mount.+ /mnt/cdrom
+lnms config:set ignore_mount.+ /proc
+lnms config:set ignore_mount.+ /dev
 
-    lnms config:set ignore_mount_regexp.+ '/on: \/packages/'
-    lnms config:set ignore_mount_regexp.+ '/on: \/dev/'
-    lnms config:set ignore_mount_regexp.+ '/on: \/proc/'
-    lnms config:set ignore_mount_regexp.+ '/on: \/junos^/'
-    lnms config:set ignore_mount_regexp.+ '/on: \/junos\/dev/'
-    lnms config:set ignore_mount_regexp.+ '/on: \/jail\/dev/'
-    lnms config:set ignore_mount_regexp.+ '/^(dev|proc)fs/'
-    lnms config:set ignore_mount_regexp.+ '/^\/dev\/md0/'
-    lnms config:set ignore_mount_regexp.+ '/^\/var\/dhcpd\/dev,/'
-    lnms config:set ignore_mount_regexp.+ '/UMA/'
-    ```
+lnms config:set ignore_mount_string.+ packages
+lnms config:set ignore_mount_string.+ devfs
+lnms config:set ignore_mount_string.+ procfs
+lnms config:set ignore_mount_string.+ UMA
+lnms config:set ignore_mount_string.+ MALLOC
+
+lnms config:set ignore_mount_regexp.+ '/on: \/packages/'
+lnms config:set ignore_mount_regexp.+ '/on: \/dev/'
+lnms config:set ignore_mount_regexp.+ '/on: \/proc/'
+lnms config:set ignore_mount_regexp.+ '/on: \/junos^/'
+lnms config:set ignore_mount_regexp.+ '/on: \/junos\/dev/'
+lnms config:set ignore_mount_regexp.+ '/on: \/jail\/dev/'
+lnms config:set ignore_mount_regexp.+ '/^(dev|proc)fs/'
+lnms config:set ignore_mount_regexp.+ '/^\/dev\/md0/'
+lnms config:set ignore_mount_regexp.+ '/^\/var\/dhcpd\/dev,/'
+lnms config:set ignore_mount_regexp.+ '/UMA/'
+```
 
 Custom storage warning percentage
 

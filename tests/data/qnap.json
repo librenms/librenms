@@ -3627,5 +3627,31 @@
                 }
             ]
         }
+    },
+    "entity-physical": {
+        "discovery": {
+            "entPhysical": [
+                {
+                    "entPhysicalIndex": 1,
+                    "entPhysicalDescr": "QNAP Turbo NAS TVS-871U-RP",
+                    "entPhysicalClass": "chassis",
+                    "entPhysicalName": "Turbo NAS TVS-871U-RP",
+                    "entPhysicalHardwareRev": "1.0",
+                    "entPhysicalFirmwareRev": "\\\"4.3.3",
+                    "entPhysicalSoftwareRev": "\\4.3.3",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "0",
+                    "entPhysicalModelName": "TVS-871U-RP",
+                    "entPhysicalVendorType": "zeroDotZero.0",
+                    "entPhysicalSerialNum": "Q157I12451",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": 0,
+                    "entPhysicalMfgName": "QNAP",
+                    "ifIndex": null
+                }
+            ]
+        },
+        "poller": "matches discovery"
     }
 }

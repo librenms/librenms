@@ -54,25 +54,25 @@
                 },
                 {
                     "metric": "foobar_dashboard_1_pids",
-                    "value": 6.0,
+                    "value": 6,
                     "value_prev": null,
                     "app_type": "docker"
                 },
                 {
                     "metric": "foobar_dashboard_1_size_root_fs",
-                    "value": 0.0,
+                    "value": 0,
                     "value_prev": null,
                     "app_type": "docker"
                 },
                 {
                     "metric": "foobar_dashboard_1_size_rw",
-                    "value": 0.0,
+                    "value": 0,
                     "value_prev": null,
                     "app_type": "docker"
                 },
                 {
                     "metric": "foobar_dashboard_1_uptime",
-                    "value": 0.0,
+                    "value": 0,
                     "value_prev": null,
                     "app_type": "docker"
                 },
@@ -102,31 +102,31 @@
                 },
                 {
                     "metric": "foobar_laravel.test_1_pids",
-                    "value": 4.0,
+                    "value": 4,
                     "value_prev": null,
                     "app_type": "docker"
                 },
                 {
                     "metric": "foobar_laravel.test_1_size_root_fs",
-                    "value": 0.0,
+                    "value": 0,
                     "value_prev": null,
                     "app_type": "docker"
                 },
                 {
                     "metric": "foobar_laravel.test_1_size_rw",
-                    "value": 0.0,
+                    "value": 0,
                     "value_prev": null,
                     "app_type": "docker"
                 },
                 {
                     "metric": "foobar_laravel.test_1_uptime",
-                    "value": 0.0,
+                    "value": 0,
                     "value_prev": null,
                     "app_type": "docker"
                 },
                 {
                     "metric": "foobar_meilisearch_1_cpu_usage",
-                    "value": 0.0,
+                    "value": 0,
                     "value_prev": null,
                     "app_type": "docker"
                 },
@@ -150,25 +150,25 @@
                 },
                 {
                     "metric": "foobar_meilisearch_1_pids",
-                    "value": 15.0,
+                    "value": 15,
                     "value_prev": null,
                     "app_type": "docker"
                 },
                 {
                     "metric": "foobar_meilisearch_1_size_root_fs",
-                    "value": 0.0,
+                    "value": 0,
                     "value_prev": null,
                     "app_type": "docker"
                 },
                 {
                     "metric": "foobar_meilisearch_1_size_rw",
-                    "value": 0.0,
+                    "value": 0,
                     "value_prev": null,
                     "app_type": "docker"
                 },
                 {
                     "metric": "foobar_meilisearch_1_uptime",
-                    "value": 0.0,
+                    "value": 0,
                     "value_prev": null,
                     "app_type": "docker"
                 },
@@ -198,25 +198,25 @@
                 },
                 {
                     "metric": "foobar_mysql_1_pids",
-                    "value": 38.0,
+                    "value": 38,
                     "value_prev": null,
                     "app_type": "docker"
                 },
                 {
                     "metric": "foobar_mysql_1_size_root_fs",
-                    "value": 0.0,
+                    "value": 0,
                     "value_prev": null,
                     "app_type": "docker"
                 },
                 {
                     "metric": "foobar_mysql_1_size_rw",
-                    "value": 0.0,
+                    "value": 0,
                     "value_prev": null,
                     "app_type": "docker"
                 },
                 {
                     "metric": "foobar_mysql_1_uptime",
-                    "value": 0.0,
+                    "value": 0,
                     "value_prev": null,
                     "app_type": "docker"
                 },
@@ -246,25 +246,25 @@
                 },
                 {
                     "metric": "foobar_redis_1_pids",
-                    "value": 5.0,
+                    "value": 5,
                     "value_prev": null,
                     "app_type": "docker"
                 },
                 {
                     "metric": "foobar_redis_1_size_root_fs",
-                    "value": 0.0,
+                    "value": 0,
                     "value_prev": null,
                     "app_type": "docker"
                 },
                 {
                     "metric": "foobar_redis_1_size_rw",
-                    "value": 0.0,
+                    "value": 0,
                     "value_prev": null,
                     "app_type": "docker"
                 },
                 {
                     "metric": "foobar_redis_1_uptime",
-                    "value": 0.0,
+                    "value": 0,
                     "value_prev": null,
                     "app_type": "docker"
                 },

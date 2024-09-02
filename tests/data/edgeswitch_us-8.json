@@ -2429,5 +2429,31 @@
                 }
             ]
         }
+    },
+    "entity-physical": {
+        "discovery": {
+            "entPhysical": [
+                {
+                    "entPhysicalIndex": 1,
+                    "entPhysicalDescr": "USW GigaBit Ethernet Switch",
+                    "entPhysicalClass": "chassis",
+                    "entPhysicalName": "Bio3",
+                    "entPhysicalHardwareRev": "",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "None",
+                    "entPhysicalAssetID": null,
+                    "entPhysicalIsFRU": "true",
+                    "entPhysicalModelName": "UBNT-USW",
+                    "entPhysicalVendorType": "enterprises.41112.1",
+                    "entPhysicalSerialNum": "System MAC: fc-ec-da-bf-69-55",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": -1,
+                    "entPhysicalMfgName": "",
+                    "ifIndex": null
+                }
+            ]
+        },
+        "poller": "matches discovery"
     }
 }
