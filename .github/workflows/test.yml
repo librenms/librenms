@@ -133,10 +133,10 @@ jobs:
         run: |
           php lnms dev:simulate --setup-venv
       -
-        name: Artisan dusk:chrome-driver
+        name: Start ChromeDriver
         if: matrix.skip-web-check != '1'
         run: |
-          php artisan dusk:chrome-driver --detect
+          $CHROMEWEBDRIVER/chromedriver --port=9515 &
       -
         name: Copy seeded config
         run: cp "${GITHUB_WORKSPACE}/tests/testing_config.yaml" "${GITHUB_WORKSPACE}/database/seeders/config/"
