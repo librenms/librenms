@@ -152,11 +152,11 @@ if ($device['os_group'] == 'cisco') {
                             continue;
                         }
                         // Critical Limit
-                        if (($key['entSensorThresholdSeverity'] == 'major' || $key['entSensorThresholdSeverity'] == 'critical') && ($key['entSensorThresholdValue'] != 0) && ($key['entSensorThresholdRelation'] == 'greaterOrEqual' || $key['entSensorThresholdRelation'] == 'greaterThan')) {
+                        if (($key['entSensorThresholdSeverity'] == 'major' || $key['entSensorThresholdSeverity'] == 'critical') && ($key['entSensorThresholdRelation'] == 'greaterOrEqual' || $key['entSensorThresholdRelation'] == 'greaterThan')) {
                             $limit = ($key['entSensorThresholdValue'] * $multiplier / $divisor);
                         }
 
-                        if (($key['entSensorThresholdSeverity'] == 'major' || $key['entSensorThresholdSeverity'] == 'critical') && ($key['entSensorThresholdValue'] != 0) && ($key['entSensorThresholdRelation'] == 'lessOrEqual' || $key['entSensorThresholdRelation'] == 'lessThan')) {
+                        if (($key['entSensorThresholdSeverity'] == 'major' || $key['entSensorThresholdSeverity'] == 'critical') && ($key['entSensorThresholdRelation'] == 'lessOrEqual' || $key['entSensorThresholdRelation'] == 'lessThan')) {
                             $limit_low = ($key['entSensorThresholdValue'] * $multiplier / $divisor);
                         }
 
@@ -179,21 +179,6 @@ if ($device['os_group'] == 'cisco') {
                     }
                     if ($limit_low == 0) {
                         $limit_low = -5;
-                    }
-                }
-
-                if ($type == 'dbm') {
-                    if ($warn_limit_low == 0) {
-                        $warn_limit_low = 0.1;
-                    }
-                    if ($limit_low == 0) {
-                        $limit_low = 0.1;
-                    }
-                    if ($warn_limit == 0) {
-                        $warn_limit = -0.1;
-                    }
-                    if ($limit == 0) {
-                        $limit = -0.1;
                     }
                 }
 
