@@ -59,8 +59,6 @@ class Iosxe extends Ciscowlc implements
     use SyncsModels;
     use CiscoCellular;
 
-    public function pollOS(DataStorageInterface $datastore): void
-
     /**
      * Array of shortened ISIS codes
      *
