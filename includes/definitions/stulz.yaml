@@ -4,7 +4,45 @@ type: environment
 icon: stulz
 over:
     - { graph: device_bits, text: 'Device Traffic' }
-snmp_bulk: true
 discovery:
     - sysObjectID:
-        - .1.3.6.1.4.1.29462.
+        - .1.3.6.1.4.1.29462.10
+discovery_modules:
+    arp-table: false
+    cisco-pw: false
+    discovery-protocols: false
+    hr-device: false
+    os: false
+    ports: false
+    processors: false
+    services: false
+    sensors: true
+    bgp-peers: false
+    cisco-vrf-lite: false
+    fdb-table: false
+    mpls: false
+    ntp: false
+    storage: false
+    stp: false
+    ucd-diskio: false
+    vlans: false
+    wireless: false
+poller_modules:
+    applications: false
+    availability: false
+    customoid: true
+    entity-physical: true
+    hr-mib: false
+    mempools: true
+    mpls: false
+    netstats: true
+    ntp: false
+    os: false
+    ports: true
+    sensors: true
+    stp: false
+    ucd-diskio: false
+    ucd-mib: false
+    bgp-peers: false
+    ipmi: false
+    ospf: false
