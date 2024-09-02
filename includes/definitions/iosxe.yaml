@@ -37,13 +37,13 @@ discovery_modules:
     xdsl: true
 discovery:
     -
+        sysDescr_except:
+            - C9800
         sysDescr:
             - IOS-XE
             - IOSXE
             - LINUX_IOSD
             - CAT3K_CAA
-        sysDescr_except:
-            - C9800
             
 bad_iftype:
     - macSecControlledIF
