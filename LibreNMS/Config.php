@@ -27,7 +27,7 @@ namespace LibreNMS;
 
 use App\Facades\LibrenmsConfig;
 
-/** @deprecated Please use the facade App\Facades\LibrenmsConfig instead */
+// not yet: @deprecated Please use the facade App\Facades\LibrenmsConfig instead
 class Config
 {
     /**
