@@ -257,9 +257,11 @@ class ConfigRepository
                 echo $e;
             }
 
-            if ($e instanceof \Illuminate\Database\QueryException) {
+            if ($e instanceof \Illuminate\Database\QueryException && $e->getCode() !== '42S02') {
                 // re-throw, else Config service provider get stuck in a loop
-                // if there is an error (database not connected etc)
+                // if there is an error (database not connected)
+                // unless it is table not found (migrations have not been run yet)
+
                 throw $e;
             }
 
