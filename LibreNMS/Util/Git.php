@@ -39,7 +39,7 @@ class Git
     /** @var string */
     private $install_dir;
 
-    public function __construct(int $cache)
+    public function __construct(int $cache = 0)
     {
         $this->runtimeCacheExternalTTL = $cache;
         $this->install_dir = realpath(__DIR__ . '/../..');
