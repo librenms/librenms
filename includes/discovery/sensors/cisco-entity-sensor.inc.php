@@ -229,10 +229,10 @@ if ($device['os_group'] == 'cisco') {
                         $user_func = 'mw_to_dbm';
                         $type = 'dbm';
                         $multiplier = 1000;
-                        $limit_low = mw_to_dbm($limit_low * $multiplier);
-                        $warn_limit_low = mw_to_dbm($warn_limit_low * $multiplier);
-                        $warn_limit = mw_to_dbm($warn_limit * $multiplier);
-                        $limit = mw_to_dbm($limit * $multiplier);
+                        $limit_low = isset($limit_low) ? round(mw_to_dbm($limit_low * $multiplier), 3) : null;
+                        $warn_limit_low = isset($limit_low) ? round(mw_to_dbm($warn_limit_low * $multiplier), 3) : null;
+                        $warn_limit = isset($limit_low) ? round(mw_to_dbm($warn_limit * $multiplier), 3) : null;
+                        $limit = isset($limit_low) ? round(mw_to_dbm($limit * $multiplier), 3) : null;
                         $current = mw_to_dbm($current * $multiplier);
                         //echo("\n".$valid['sensor'].", $type, $device, $oid, $index, 'cisco-entity-sensor', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, $user_func");
                         discover_sensor($valid['sensor'], $type, $device, $oid, $index, 'cisco-entity-sensor', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entry['entSensorMeasuredEntity'], $user_func);
