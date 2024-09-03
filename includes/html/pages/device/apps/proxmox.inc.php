@@ -25,7 +25,7 @@ if (! \LibreNMS\Config::get('enable_proxmox')) {
         'proxmox_traffic' => 'Traffic',
     ];
 
-    foreach (proxmox_node_vms(var_get('device')) as $nvm) {
+    foreach (proxmox_node_vms(Request::get('device')) as $nvm) {
         $vm = proxmox_vm_info($nvm['vmid'], $nvm['cluster']);
 
         foreach ($vm['ports'] as $port) {
@@ -45,7 +45,7 @@ if (! \LibreNMS\Config::get('enable_proxmox')) {
 
                 echo '<h3>' . $text . ' ' . $port['port'] . '@' . $vm['description'] . '</h3>';
 
-                echo "<tr bgcolor='$row_colour'><td colspan=5>";
+                echo '<tr><td colspan=5>';
 
                 include 'includes/html/print-graphrow.inc.php';
 
