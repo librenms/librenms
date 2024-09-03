@@ -2,20 +2,20 @@
 
 namespace App\Jobs;
 
-use App\Models\Device;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Config;
+use LibreNMS\Util\Debug;
 
 class DispatchPollJobs implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
-
 
     /**
      * @param  int  $verbosity
@@ -46,12 +46,14 @@ class DispatchPollJobs implements ShouldQueue
         // Make sure this polling methos is enabled
         if (! $this->enabled) {
             Log::debug('You need to set polling_method to scheduler in your config ');
+
             return;
         }
 
-        // Make sure we have configured job queueing
-        if (\config('queue.default') == 'sync') {
+        // Make sure we have configured job queueing unless we are running in debug mode
+        if (\config('queue.default') == 'sync' && ! Debug::isEnabled()) {
             Log::error('You need to configure a QUEUE_CONNECTION driver before you can queue tasks');
+
             return;
         }
 
