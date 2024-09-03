@@ -235,7 +235,7 @@ class Iosxe extends Ciscowlc implements
             $adjacency->isisISAdjLastUpTime = $this->parseAdjacencyTime($uptime['CISCO-IETF-ISIS-MIB::ciiISAdjLastUpTime' . $adjacency->index] ?? 0);
         });
     }
-    
+
     /**
      * Discover wireless client counts. Type is clients.
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
@@ -286,7 +286,7 @@ class Iosxe extends Ciscowlc implements
 
         return $sensors;
     }
-    
+
     /**
      * Discover wireless capacity.  This is a percent. Type is capacity.
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
