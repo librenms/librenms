@@ -37,8 +37,6 @@ discovery_modules:
     xdsl: true
 discovery:
     -
-        sysDescr_except:
-            - C9800
         sysDescr:
             - IOS-XE
             - IOSXE
