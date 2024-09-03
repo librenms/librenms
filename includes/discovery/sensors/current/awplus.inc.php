@@ -28,7 +28,7 @@ if ($pre_cache['awplus-sfpddm']) {
                 $low_warn_limit,
                 $high_warn_limit,
                 $high_limit,
-                $data['atPluggableDiagTxBiasStatusReading'],
+                $data['atPluggableDiagTxBiasStatusReading'] / $divisor,
                 'snmp',
                 $ifIndex,
                 null,
