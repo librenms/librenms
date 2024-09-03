@@ -82,7 +82,7 @@ Restart the supervisor process once the file has been created.
 ```
 [program:librenms-dispatcher]
 process_name=%(program_name)s_%(process_num)02d
-command=/opt/librenms/artisan queue:work --sleep=0.5 --max-jobs=1000
+command=/opt/librenms/artisan queue:work --sleep=0.5 --max-jobs=100
 autostart=true
 autorestart=true
 stopasgroup=true
@@ -94,7 +94,7 @@ stdout_logfile=/opt/librenms/logs/queueworker.log
 
 [program:librenms-poller]
 process_name=%(program_name)s_%(process_num)02d
-command=/opt/librenms/artisan queue:work --queue=poller-0 --sleep=0.5 --max-jobs=1000
+command=/opt/librenms/artisan queue:work --queue=poller-0 --sleep=0.5 --max-jobs=100
 autostart=true
 autorestart=true
 stopasgroup=true
