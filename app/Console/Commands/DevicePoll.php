@@ -46,7 +46,12 @@ class DevicePoll extends LnmsCommand
     public function handle(MeasurementManager $measurements): int
     {
         if ($this->option('dispatch')) {
-            return $this->dispatchWork();
+            if (\config('queue.default') == 'sync') {
+                $this->error('Queue driver is sync, work will run in process.');
+                sleep(1);
+            } else {
+                return $this->dispatchWork();
+            }
         }
 
         $this->configureOutputOptions();
@@ -84,17 +89,11 @@ class DevicePoll extends LnmsCommand
 
     private function dispatchWork(): int
     {
-        \Log::setDefaultDriver('stack');
         $module_overrides = Module::parseUserOverrides(explode(',', $this->option('modules') ?? ''));
-        $devices = Device::whereDeviceSpec($this->argument('device spec'))->pluck('device_id');
+        $devices = Device::whereDeviceSpec($this->argument('device spec'))->select('device_id', 'poller_group')->get();
 
-        if (\config('queue.default') == 'sync') {
-            $this->error('Queue driver is sync, work will run in process.');
-            sleep(1);
-        }
-
-        foreach ($devices as $device_id) {
-            PollDevice::dispatch($device_id, $module_overrides);
+        foreach ($devices as $device) {
+            PollDevice::dispatch($device['device_id'], $module_overrides, $this->getOutput()->getVerbosity())->onQueue('poller-' . $device['poller_group']);
         }
 
         $this->line('Submitted work for ' . $devices->count() . ' devices');
