@@ -1084,16 +1084,16 @@ function get_sensor_label_color($sensor, $type = 'sensors')
     if (is_null($sensor)) {
         return 'label-unknown';
     }
-    if (! is_null($sensor['sensor_limit_warn']) && $sensor['sensor_current'] > $sensor['sensor_limit_warn']) {
+    if (! is_null($sensor['sensor_limit_warn']) && $sensor['sensor_current'] >= $sensor['sensor_limit_warn']) {
         $label_style = 'label-warning';
     }
-    if (! is_null($sensor['sensor_limit_low_warn']) && $sensor['sensor_current'] < $sensor['sensor_limit_low_warn']) {
+    if (! is_null($sensor['sensor_limit_low_warn']) && $sensor['sensor_current'] <= $sensor['sensor_limit_low_warn']) {
         $label_style = 'label-warning';
     }
-    if (! is_null($sensor['sensor_limit']) && $sensor['sensor_current'] > $sensor['sensor_limit']) {
+    if (! is_null($sensor['sensor_limit']) && $sensor['sensor_current'] >= $sensor['sensor_limit']) {
         $label_style = 'label-danger';
     }
-    if (! is_null($sensor['sensor_limit_low']) && $sensor['sensor_current'] < $sensor['sensor_limit_low']) {
+    if (! is_null($sensor['sensor_limit_low']) && $sensor['sensor_current'] <= $sensor['sensor_limit_low']) {
         $label_style = 'label-danger';
     }
     $unit = __("$type.{$sensor['sensor_class']}.unit");
