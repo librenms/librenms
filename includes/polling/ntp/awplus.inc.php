@@ -13,11 +13,11 @@
 
 use LibreNMS\RRD\RrdDefinition;
 
-$tmp_module = 'ntp';
+$type = 'ntp';
 
 $component = new LibreNMS\Component();
 $options = [];
-$options['filter']['type'] = ['=', $tmp_module];
+$options['filter']['type'] = ['=', $type];
 $options['filter']['disabled'] = ['=', 0];
 $options['filter']['ignore'] = ['=', 0];
 
@@ -60,7 +60,7 @@ if ($components) {
         $rrd['delay'] = str_replace(' milliseconds', '', $rrd['delay']);
         $rrd['delay'] = $rrd['delay'] / 1000; // Convert to seconds
         $rrd['dispersion'] = $atNtpAssociationEntry[$array['UID']]['atNtpAssociationDisp'];
-        $tags = compact('ntp', 'rrd_name', 'rrd_def', 'peer');
+        $tags = compact('type', 'rrd_name', 'rrd_def', 'peer');
         data_update($device, 'ntp', $tags, $rrd);
 
         // Let's print some debugging info.
@@ -81,4 +81,4 @@ if ($components) {
 } // end if count components
 
 // Clean-up after yourself!
-unset($type, $components, $component, $options, $tmp_module);
+unset($type, $components, $component, $options, $type);
