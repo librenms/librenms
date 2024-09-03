@@ -8,6 +8,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Config;
 
@@ -39,8 +40,15 @@ class DispatchPollJobs implements ShouldQueue
                 $devices = Device::whereDeviceSpec($this->device_spec)->select('device_id', 'poller_group')->get();
 
                 foreach ($devices as $device) {
-                    Log::debug('Submitted work for device ID ' . $device['device_id'] . ' to queue poller-' . $device['poller_group']);
-                    PollDevice::dispatch($device['device_id'], $this->module_overrides, $this->verbosity)->onQueue('poller-' . $device['poller_group']);
+                    // Lock this device for 30 seconds to avoid scheduling too frequently when the device is offline
+                    $lock = Cache::lock('device:poll:' . $device['device_id'], 30);
+
+                    if ($lock->get()) {
+                        Log::debug('Submitted work for device ID ' . $device['device_id'] . ' to queue poller-' . $device['poller_group']);
+                        PollDevice::dispatch($device['device_id'], $this->module_overrides, $this->verbosity)->onQueue('poller-' . $device['poller_group']);
+                    } else {
+                        Log::warning('Device ID ' . $device['device_id'] . ' needs to wait more time before it can be queued again');
+                    }
                 }
 
                 Log::debug('Submitted work for ' . $devices->count() . ' devices');
