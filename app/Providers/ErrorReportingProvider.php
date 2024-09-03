@@ -106,7 +106,7 @@ class ErrorReportingProvider extends \Spatie\LaravelIgnition\IgnitionServiceProv
         }
 
         // safety check so we don't leak early reports (but reporting should not be loaded before the config is)
-        if (! LibrenmsConfig::isRegistered()) {
+        if (! app()->bound('librenms-config')) {
             return false;
         }
 

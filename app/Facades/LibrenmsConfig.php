@@ -35,11 +35,6 @@ class LibrenmsConfig extends Facade
         return 'librenms-config';
     }
 
-    public static function isRegistered(): bool
-    {
-        return app()->bound('librenms-config');
-    }
-
     public static function reload(): void
     {
         App::forgetInstance('librenms-config'); // clear singleton
