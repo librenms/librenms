@@ -2,13 +2,10 @@
 
 namespace App\Observers;
 
-use App\Facades\DeviceCache;
 use App\Models\Eventlog;
 use App\Models\Sensor;
-use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Foundation\Application;
 use LibreNMS\Enum\Severity;
-use LibreNMS\Util\Time;
 
 class SensorObserver
 {
