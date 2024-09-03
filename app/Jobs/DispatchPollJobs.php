@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
@@ -19,11 +20,13 @@ class DispatchPollJobs implements ShouldQueue
 
     /**
      * @param  int  $verbosity
+     * @param  int  $lock_time
      * @param  bool|null  $enabled
      * @param  int|null  $find_time
      */
     public function __construct(
         public int $verbosity = -1,
+        public int $lock_time = 30,
         public bool|null $enabled = null,
         public int|null $find_time = null,
     ) {
