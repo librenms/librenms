@@ -240,7 +240,7 @@ then passed to `discover_sensor()`.
 
 `discover_sensor()` Accepts the following arguments:
 
-- &$valid = This is always $valid['sensor'], do not pass any other values.
+- &$valid = This is always null. This is unused.
 - $class = Required. This is the sensor class from the table above (i.e humidity).
 - $device = Required. This is the $device array.
 - $oid = Required. This must be the numerical OID for where the data
@@ -374,7 +374,7 @@ foreach ($pre_cache['adva_fsp150_ports'] as $index => $entry) {
             $descrRx = dbFetchCell('SELECT `ifName` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ?', [$entry['cmEthernetTrafficPortIfIndex'], $device['device_id']]) . ' Rx Power';
 
             discover_sensor(
-                $valid['sensor'],
+                null,
                 'dbm',
                 $device,
                 $oidRx,
@@ -396,7 +396,7 @@ foreach ($pre_cache['adva_fsp150_ports'] as $index => $entry) {
             $descrTx = dbFetchCell('SELECT `ifName` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ?', [$entry['cmEthernetTrafficPortIfIndex'], $device['device_id']]) . ' Tx Power';
 
             discover_sensor(
-                $valid['sensor'],
+                null,
                 'dbm',
                 $device,
                 $oidTx,

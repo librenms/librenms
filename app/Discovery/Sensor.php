@@ -76,14 +76,4 @@ class Sensor
     {
         return $this->models;
     }
-
-    /**
-     * Reset all state of this singleton
-     */
-    public function reset(Device $device): void
-    {
-        $this->models = new Collection;
-        $this->discovered = [];
-        $this->device = $device;
-    }
 }
