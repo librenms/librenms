@@ -13,7 +13,6 @@
 
 # Others #
 ##########
-.vscode-server/
 __pycache__
 *.pyc
 *.swp
