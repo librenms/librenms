@@ -8,7 +8,6 @@
  | request an environment variable to be created upstream or send a pull request.
  */
 
-use App\Facades\LibrenmsConfig;
 use Monolog\Handler\NullHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\SyslogUdpHandler;
@@ -81,7 +80,7 @@ return [
 
         'single' => [
             'driver' => 'single',
-            'path' => env('APP_LOG', LibrenmsConfig::isRegistered() ? LibrenmsConfig::get('log_file') : base_path('logs/librenms.log')),
+            'path' => env('APP_LOG', base_path('logs/librenms.log')),
             'formatter' => \App\Logging\NoColorFormatter::class,
             'level' => env('LOG_LEVEL', 'error'),
             'replace_placeholders' => true,
@@ -89,7 +88,7 @@ return [
 
         'daily' => [
             'driver' => 'daily',
-            'path' => env('APP_LOG', LibrenmsConfig::isRegistered() ? LibrenmsConfig::get('log_file') : base_path('logs/librenms.log')),
+            'path' => env('APP_LOG', base_path('logs/librenms.log')),
             'formatter' => \App\Logging\NoColorFormatter::class,
             'level' => env('LOG_LEVEL', 'error'),
             'days' => 14,
