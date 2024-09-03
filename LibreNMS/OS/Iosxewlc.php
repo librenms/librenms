@@ -24,7 +24,7 @@
 
 namespace LibreNMS\OS;
 
-use App\Models\AccessPoint;			   
+use App\Models\AccessPoint;
 use LibreNMS\DB\SyncsModels;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
@@ -156,7 +156,7 @@ class Iosxewlc extends Iosxe implements
      *
      * @return array Sensors
      */
-    
+
     public function discoverWirelessClients()
     {
         $counts = $this->getCacheByIndex('bsnDot11EssNumberOfMobileStations', 'AIRESPACE-WIRELESS-MIB');
@@ -201,7 +201,7 @@ class Iosxewlc extends Iosxe implements
 
         return $sensors;
     }
-    
+
     /**
      * Discover wireless capacity.  This is a percent. Type is capacity.
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
@@ -211,8 +211,8 @@ class Iosxewlc extends Iosxe implements
     public function discoverWirelessApCount()
     {
         $oids = [
-	         'CISCO-LWAPP-AP-MIB::cLApGlobalAPConnectCount.0',
-	         'CISCO-LWAPP-AP-MIB::cLApGlobalMaxApsSupported.0',
+            'CISCO-LWAPP-AP-MIB::cLApGlobalAPConnectCount.0',
+            'CISCO-LWAPP-AP-MIB::cLApGlobalMaxApsSupported.0',
         ];
         $data = snmp_get_multi($this->getDeviceArray(), $oids);
 
