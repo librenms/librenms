@@ -50,7 +50,7 @@ class ErrorReportingProvider extends \Spatie\LaravelIgnition\IgnitionServiceProv
     /** @var string|null */
     private static $instanceId;
 
-    private ?int $throttle =  null;
+    private ?int $throttle = null;
 
     public function boot(): void
     {
