@@ -247,7 +247,7 @@ if ($device['os_group'] == 'cisco') {
         $entity_array
     );
 
-    foreach(array_flip($entitysensor) as $type) {
+    foreach (array_flip($entitysensor) as $type) {
         app('sensor-discovery')->sync(sensor_class: $type, poller_type: 'snmp');
     }
 }//end if

@@ -26,9 +26,7 @@
 namespace App\Discovery;
 
 use App\Models\Device;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Log;
 use LibreNMS\DB\SyncsModels;
 
 class Sensor

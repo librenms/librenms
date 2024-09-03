@@ -2,7 +2,6 @@
 
 namespace App\Providers;
 
-use App\Models\Device;
 use App\Models\Sensor;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Database\Eloquent\Relations\Relation;
