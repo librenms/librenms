@@ -8,12 +8,12 @@
                     "sysDescr": "Infortrend SNMP agent",
                     "sysContact": "<private>",
                     "version": null,
-                    "hardware": null,
+                    "hardware": "DS 3016",
                     "features": null,
                     "location": "<private>",
                     "os": "infortrend",
                     "type": "storage",
-                    "serial": null,
+                    "serial": "8485243",
                     "icon": "infortrend.png"
                 }
             ]
