@@ -93,7 +93,7 @@ class DevicePoll extends LnmsCommand
         }
 
         foreach ($devices as $device) {
-            PollDevice::dispatch($device['device_id'], $module_overrides, $this->getOutput()->getVerbosity())->onQueue('poller-' . $device['poller_group']);
+            PollDevice::dispatch($device->device_id, $module_overrides, $this->getOutput()->getVerbosity())->onQueue('poller-' . $device->poller_group);
         }
 
         $this->line('Submitted work for ' . $devices->count() . ' devices');
