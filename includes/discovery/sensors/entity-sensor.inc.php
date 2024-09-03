@@ -185,6 +185,11 @@ if (! empty($entity_oids)) {
             if (isset($entry['entPhySensorOperStatus']) && ($entry['entPhySensorOperStatus'] === 'unavailable' || $entry['entPhySensorOperStatus'] === 'nonoperational')) {
                 $valid_sensor = false;
             }
+
+            if ($entry['entPhySensorValue'] == '-1000000000') {
+                $valid_sensor = false;
+            }
+
             if ($valid_sensor && dbFetchCell("SELECT COUNT(*) FROM `sensors` WHERE device_id = ? AND `sensor_class` = ? AND `sensor_type` = 'cisco-entity-sensor' AND `sensor_index` = ?", [$device['device_id'], $type, $index]) == '0') {
                 // Check to make sure we've not already seen this sensor via cisco's entity sensor mib
                 if ($type == 'power' && $device['os'] == 'arista_eos' && preg_match('/DOM (R|T)x Power/i', $descr)) {
