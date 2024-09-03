@@ -30,15 +30,11 @@ class DispatchPollJobs implements ShouldQueue
         public bool|null $enabled = null,
         public int|null $find_time = null,
     ) {
-        if (is_null($find_time)) {
-            $this->find_time = Config::get('service_poller_frequency', Config::get('rrd.step', 300)) - 1;
-        }
+        $this->find_time ??= Config::get('service_poller_frequency', Config::get('rrd.step', 300)) - 1;
 
-        if (is_null($enabled)) {
-            //$this->enabled = (Config::get('polling_method') == 'scheduler');
-            // Temporary until the config option above exists
-            $this->enabled = (! Config::get('service_poller_enabled'));
-        }
+        //$this->enabled ??= Config::get('polling_method') == 'scheduler';
+        // Temporary until the config option above exists
+        $this->enabled ??= ! Config::get('service_poller_enabled');
     }
 
     /**
@@ -54,7 +50,7 @@ class DispatchPollJobs implements ShouldQueue
         }
 
         // Make sure we have configured job queueing unless we are running in debug mode
-        if (\config('queue.default') == 'sync' && ! Debug::isEnabled()) {
+        if (\config('queue.default') == 'sync') {
             Log::error('You need to configure a QUEUE_CONNECTION driver before you can queue tasks');
 
             return;
@@ -72,12 +68,12 @@ class DispatchPollJobs implements ShouldQueue
 
         foreach ($devices as $device) {
             // Lock this device for 30 seconds to avoid scheduling too frequently when the device is offline
-            $lock = Cache::lock('device:poll:' . $device['device_id'], $this->lock_time);
+            $lock = Cache::lock('device:poll:' . $device->device_id, $this->lock_time);
             if ($lock->get()) {
-                Log::debug('Submitted work for device ID ' . $device['device_id'] . ' to queue poller-' . $device['poller_group']);
-                PollDevice::dispatch($device['device_id'], verbosity: $this->verbosity)->onQueue('poller-' . $device['poller_group']);
+                Log::debug('Submitted work for device ID ' . $device->device_id . ' to queue poller-' . $device->poller_group);
+                PollDevice::dispatch($device->device_id, verbosity: $this->verbosity)->onQueue('poller-' . $device->poller_group);
             } else {
-                Log::warning('Device ID ' . $device['device_id'] . ' needs to wait more time before it can be queued again');
+                Log::warning('Device ID ' . $device->device_id . ' needs to wait more time before it can be queued again');
             }
         }
         Log::debug('Submitted work for ' . $devices->count() . ' devices');
