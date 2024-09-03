@@ -30,7 +30,7 @@ use App\Models\AccessPoint;
 use App\Models\IsisAdjacency;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Log;   
+use Illuminate\Support\Facades\Log;
 use LibreNMS\DB\SyncsModels;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
@@ -235,6 +235,7 @@ class Iosxe extends Ciscowlc implements
             $adjacency->isisISAdjLastUpTime = $this->parseAdjacencyTime($uptime['CISCO-IETF-ISIS-MIB::ciiISAdjLastUpTime' . $adjacency->index] ?? 0);
         });
     }
+    
     /**
      * Discover wireless client counts. Type is clients.
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
@@ -285,18 +286,18 @@ class Iosxe extends Ciscowlc implements
 
         return $sensors;
     }
+    
     /**
      * Discover wireless capacity.  This is a percent. Type is capacity.
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
      *
      * @return array Sensors
      */
-    
     public function discoverWirelessApCount()
     {
         $oids = [
-	    'CISCO-LWAPP-AP-MIB::cLApGlobalAPConnectCount.0',
-	    'CISCO-LWAPP-AP-MIB::cLApGlobalMaxApsSupported.0',
+            'CISCO-LWAPP-AP-MIB::cLApGlobalAPConnectCount.0',
+            'CISCO-LWAPP-AP-MIB::cLApGlobalMaxApsSupported.0',
         ];
         $data = snmp_get_multi($this->getDeviceArray(), $oids);
 
