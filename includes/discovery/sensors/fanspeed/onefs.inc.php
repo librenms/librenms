@@ -30,7 +30,7 @@ foreach ($oids as $index => $entry) {
         $descr = $entry['fanDescription'];
         $oid = '.1.3.6.1.4.1.12124.2.53.1.4.' . $index;
         $current = $entry['fanSpeed'];
-        discover_sensor($valid['sensor'], 'fanspeed', $device, $oid, $index, 'onefs', $descr, '1', '1', 0, 0, 5000, 9000, $current);
+        discover_sensor(null, 'fanspeed', $device, $oid, $index, 'onefs', $descr, '1', '1', 0, 0, 5000, 9000, $current);
     }
 }
 

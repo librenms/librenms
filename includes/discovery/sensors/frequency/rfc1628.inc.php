@@ -19,7 +19,7 @@ foreach ($input_freq as $index => $data) {
     $data['upsInputFrequency'] = Number::cast($data['upsInputFrequency']);
 
     discover_sensor(
-        $valid['sensor'],
+        null,
         'frequency',
         $device,
         $freq_oid,
@@ -42,7 +42,7 @@ if (is_numeric($output_freq)) {
     $divisor = get_device_divisor($device, $pre_cache['poweralert_serial'] ?? '', 'frequency', $freq_oid);
 
     discover_sensor(
-        $valid['sensor'],
+        null,
         'frequency',
         $device,
         $freq_oid,
@@ -65,7 +65,7 @@ if (is_numeric($bypass_freq)) {
     $divisor = get_device_divisor($device, $pre_cache['poweralert_serial'] ?? '', 'frequency', $freq_oid);
 
     discover_sensor(
-        $valid['sensor'],
+        null,
         'frequency',
         $device,
         $freq_oid,

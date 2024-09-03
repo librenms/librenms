@@ -13,7 +13,7 @@ foreach ($fabosSfpRxPower as $oid => $entry) {
             $ifIndex = $index + 1073741823;
             if ($ifAdminStatus[$ifIndex] == '1') {
                 discover_sensor(
-                    $valid['sensor'],
+                    null,
                     'dbm',
                     $device,
                     ".$oid.$index",
@@ -44,7 +44,7 @@ foreach ($fabosSfpTxPower as $oid => $entry) {
             $ifIndex = $index + 1073741823;
             if ($ifAdminStatus[$ifIndex] == '1') {
                 discover_sensor(
-                    $valid['sensor'],
+                    null,
                     'dbm',
                     $device,
                     ".$oid.$index",

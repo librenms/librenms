@@ -73,7 +73,7 @@ foreach ($octetSetup as $entry) {
         foreach ($onStates as $index => $value) {
             $port_number = $index + 1;
             discover_sensor(
-                $valid['sensor'],
+                null,
                 'state',
                 $device,
                 $entry['num_oid'],

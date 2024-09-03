@@ -30,7 +30,7 @@ foreach ($oids as $index => $entry) {
         $descr = $entry['tempSensorDescription'];
         $oid = '.1.3.6.1.4.1.12124.2.54.1.4.' . $index;
         $current = $entry['tempSensorValue'];
-        discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, 'onefs', $descr, '1', '1', null, null, null, null, $current);
+        discover_sensor(null, 'temperature', $device, $oid, $index, 'onefs', $descr, '1', '1', null, null, null, null, $current);
     }
 }
 

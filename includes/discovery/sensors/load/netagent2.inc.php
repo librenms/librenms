@@ -48,7 +48,7 @@ if ($in_phaseNum == '1') {
         $descr = 'Output load';
 
         discover_sensor(
-            $valid['sensor'],
+            null,
             'load',
             $device,
             $load_oid,
@@ -84,7 +84,7 @@ if ($in_phaseNum == '3') {
         $descr = 'Out L1 (R)';
 
         discover_sensor(
-            $valid['sensor'],
+            null,
             'load',
             $device,
             $load_oid,
@@ -116,7 +116,7 @@ if ($in_phaseNum == '3') {
         $descr = 'Out L2 (S)';
 
         discover_sensor(
-            $valid['sensor'],
+            null,
             'load',
             $device,
             $load_oid,
@@ -148,7 +148,7 @@ if ($in_phaseNum == '3') {
         $descr = 'Out L3 (T)';
 
         discover_sensor(
-            $valid['sensor'],
+            null,
             'load',
             $device,
             $load_oid,

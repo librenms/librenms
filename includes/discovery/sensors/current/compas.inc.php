@@ -29,7 +29,7 @@ $index = 'es1dc1DataRectifiersRectifiersOutCurrent';
 if (is_numeric($rectifiersOutputCurrent) && is_numeric($rectifiersOutputCurrentMax)) {
     $sensorType = 'compas';
     $descr = 'Output Current';
-    discover_sensor($valid['sensor'], 'current', $device, $curOID, $index, $sensorType, $descr, '1', '1', null, null, null, $rectifiersOutputCurrentMax, $rectifiersOutputCurrent);
+    discover_sensor(null, 'current', $device, $curOID, $index, $sensorType, $descr, '1', '1', null, null, null, $rectifiersOutputCurrentMax, $rectifiersOutputCurrent);
 }
 $loadCurrent = snmp_get($device, 'es1dc1DataLoadLoadCurrent.0', '-Ovqe', 'SITE-MONITORING-MIB');
 $curOID = '.1.3.6.1.4.1.26854.3.2.1.20.1.20.1.13.3.52.0';
@@ -37,7 +37,7 @@ $index = 'es1dc1DataLoadLoadCurrent';
 if (is_numeric($loadCurrent)) {
     $sensorType = 'compas';
     $descr = 'Load Current';
-    discover_sensor($valid['sensor'], 'current', $device, $curOID, $index, $sensorType, $descr, '1', '1', null, null, null, null, $loadCurrent);
+    discover_sensor(null, 'current', $device, $curOID, $index, $sensorType, $descr, '1', '1', null, null, null, null, $loadCurrent);
 }
 $batteryInputCurrent = snmp_get($device, 'es1dc1DataBatBatInputCurrent.0', '-Ovqe', 'SITE-MONITORING-MIB');
 $curOID = '.1.3.6.1.4.1.26854.3.2.1.20.1.20.1.13.3.61.0';
@@ -45,5 +45,5 @@ $index = 'es1dc1DataBatBatInputCurrent';
 if (is_numeric($batteryInputCurrent)) {
     $sensorType = 'compas';
     $descr = 'Battery Input Current';
-    discover_sensor($valid['sensor'], 'current', $device, $curOID, $index, $sensorType, $descr, '1', '1', null, null, null, null, $batteryInputCurrent);
+    discover_sensor(null, 'current', $device, $curOID, $index, $sensorType, $descr, '1', '1', null, null, null, null, $batteryInputCurrent);
 }

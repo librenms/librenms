@@ -46,7 +46,7 @@ if (! empty($eltexPhyTransceiverDiagnosticTable['txBiasCurrent'])) {
             $descr = get_port_by_index_cache($device['device_id'], $ifIndex)['ifName'];
             $oid = Oid::toNumeric('ELTEX-PHY-MIB::eltexPhyTransceiverDiagnosticCurrentValue.' . $ifIndex . '.3.1');
             discover_sensor(
-                $valid['sensor'],
+                null,
                 'current',
                 $device,
                 $oid,

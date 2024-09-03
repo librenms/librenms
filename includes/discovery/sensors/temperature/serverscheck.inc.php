@@ -42,7 +42,7 @@ foreach ($pre_cache['serverscheck_control'] as $oid_name => $oid_value) {
             if (is_numeric($current)) {
                 $index = str_replace('.0', '', $oid_name);
                 $descr = $oid_value;
-                discover_sensor($valid['sensor'], 'temperature', $device, $serverscheck_oids[$tmp_oid], $index, 'serverscheck', $descr, 1, 1, null, null, null, null, $current);
+                discover_sensor(null, 'temperature', $device, $serverscheck_oids[$tmp_oid], $index, 'serverscheck', $descr, 1, 1, null, null, null, null, $current);
             }
         }
         $temp_x++;

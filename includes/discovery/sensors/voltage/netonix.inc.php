@@ -32,7 +32,7 @@ if (is_array($oids)) {
             $oid = '.1.3.6.1.4.1.46242.4.1.3.' . $index;
             $current = $entry['voltage'];
             $divisor = 100;
-            discover_sensor($valid['sensor'], 'voltage', $device, $oid, $index, $device['os'], $descr, $divisor, '1', null, null, null, null, $current);
+            discover_sensor(null, 'voltage', $device, $oid, $index, $device['os'], $descr, $divisor, '1', null, null, null, null, $current);
         }
     }
 }

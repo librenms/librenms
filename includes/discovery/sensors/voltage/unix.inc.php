@@ -34,7 +34,7 @@ if (! empty($snmpData)) {
         $value = intval($lmData[$type . 'Value']) / $divisor;
         if (! empty($descr)) {
             $oid = Oid::toNumeric('LM-SENSORS-MIB::' . $type . 'Value.' . $index);
-            discover_sensor($valid['sensor'], 'voltage', $device, $oid, $index, 'lmsensors', $descr, $divisor, 1, null, null, null, null, $value, 'snmp', null, null, null, 'lmsensors');
+            discover_sensor(null, 'voltage', $device, $oid, $index, 'lmsensors', $descr, $divisor, 1, null, null, null, null, $value, 'snmp', null, null, null, 'lmsensors');
         }
     }
 }
@@ -55,7 +55,7 @@ if (! empty($snmpData)) {
             if (is_numeric($value)) {
                 $oid = Oid::toNumeric('NET-SNMP-EXTEND-MIB::nsExtendOutLine."ups-nut".' . $index);
                 discover_sensor(
-                    $valid['sensor'],
+                    null,
                     'voltage',
                     $device,
                     $oid,

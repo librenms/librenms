@@ -29,7 +29,7 @@ if (is_numeric($data['lcIa'][1])) {
     $index = 'lcIa';
     $descr = 'Phase A';
     $current = $data['lcIa'][1];
-    discover_sensor($valid['sensor'], 'current', $device, $current_oid, $index, 'powerlogic', $descr, 1, 1, null, null, null, null, $current);
+    discover_sensor(null, 'current', $device, $current_oid, $index, 'powerlogic', $descr, 1, 1, null, null, null, null, $current);
 }
 
 if (is_numeric($data['lcIb'][1])) {
@@ -37,7 +37,7 @@ if (is_numeric($data['lcIb'][1])) {
     $index = 'lcIb';
     $descr = 'Phase B';
     $current = $data['lcIb'][1];
-    discover_sensor($valid['sensor'], 'current', $device, $current_oid, $index, 'powerlogic', $descr, 1, 1, null, null, null, null, $current);
+    discover_sensor(null, 'current', $device, $current_oid, $index, 'powerlogic', $descr, 1, 1, null, null, null, null, $current);
 }
 
 if (is_numeric($data['lcIc'][1])) {
@@ -45,7 +45,7 @@ if (is_numeric($data['lcIc'][1])) {
     $index = 'lcIc';
     $descr = 'Phase C';
     $current = $data['lcIc'][1];
-    discover_sensor($valid['sensor'], 'current', $device, $current_oid, $index, 'powerlogic', $descr, 1, 1, null, null, null, null, $current);
+    discover_sensor(null, 'current', $device, $current_oid, $index, 'powerlogic', $descr, 1, 1, null, null, null, null, $current);
 }
 
 unset($data);

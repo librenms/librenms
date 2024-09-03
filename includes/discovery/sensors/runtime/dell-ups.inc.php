@@ -21,5 +21,5 @@ if (is_numeric($temp) && ! is_null($temp)) {
     $low_limit_warn = 10;
     $warn_limit = 2000;
     $high_limit = 3000;
-    discover_sensor($valid['sensor'], 'runtime', $device, $oid, '0', 'dell-ups', $descr, $divisor, '1', $low_limit, $low_limit_warn, $warn_limit, $high_limit, $current);
+    discover_sensor(null, 'runtime', $device, $oid, '0', 'dell-ups', $descr, $divisor, '1', $low_limit, $low_limit_warn, $warn_limit, $high_limit, $current);
 }

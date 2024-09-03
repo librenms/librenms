@@ -47,7 +47,7 @@ if (! empty($eltexPhyTransceiverDiagnosticTable['txOpticalPower'])) {
             $descr = get_port_by_index_cache($device['device_id'], $ifIndex)['ifName'];
             $oid = Oid::toNumeric('ELTEX-PHY-MIB::eltexPhyTransceiverDiagnosticCurrentValue.' . $ifIndex . '.4.1');
             discover_sensor(
-                $valid['sensor'],
+                null,
                 'dbm',
                 $device,
                 $oid,
@@ -82,7 +82,7 @@ if (! empty($eltexPhyTransceiverDiagnosticTable['rxOpticalPower'])) {
             $descr = get_port_by_index_cache($device['device_id'], $ifIndex)['ifName'];
             $oid = Oid::toNumeric('ELTEX-PHY-MIB::eltexPhyTransceiverDiagnosticCurrentValue.' . $ifIndex . '.5.1');
             discover_sensor(
-                $valid['sensor'],
+                null,
                 'dbm',
                 $device,
                 $oid,

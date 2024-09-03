@@ -51,7 +51,7 @@ foreach (array_keys($psline_data) as $index) {
     $current = $psline_data[$index]['lgpPduPsLineEntryEcHundredths'];
 
     discover_sensor(
-        $valid['sensor'],
+        null,
         $class,
         $device,
         $oid,
@@ -94,7 +94,7 @@ foreach (array_keys($ps_data) as $index) {
     $current = $ps_data[$index]['lgpPduPsEntryEcNeutral'];
 
     discover_sensor(
-        $valid['sensor'],
+        null,
         $class,
         $device,
         $oid,
@@ -139,7 +139,7 @@ foreach (array_keys($rb_data) as $index) {
     $group = 'Line to Neutral';
 
     discover_sensor(
-        $valid['sensor'],
+        null,
         $class,
         $device,
         $oid,

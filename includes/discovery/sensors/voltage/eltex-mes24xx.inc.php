@@ -46,7 +46,7 @@ if (! empty($eltexPhyTransceiverDiagnosticTable['supplyVoltage'])) {
             $descr = get_port_by_index_cache($device['device_id'], $ifIndex)['ifName'];
             $oid = Oid::toNumeric('ELTEX-PHY-MIB::eltexPhyTransceiverDiagnosticCurrentValue.' . $ifIndex . '.2.1');
             discover_sensor(
-                $valid['sensor'],
+                null,
                 'voltage',
                 $device,
                 $oid,

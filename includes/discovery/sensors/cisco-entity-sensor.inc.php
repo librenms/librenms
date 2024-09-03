@@ -222,7 +222,7 @@ if ($device['os_group'] == 'cisco') {
                         }
                     }
 
-                    discover_sensor($valid['sensor'], $type, $device, $oid, $index, 'cisco-entity-sensor', ucwords($descr), $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entry['entSensorMeasuredEntity'], null);
+                    discover_sensor(null, $type, $device, $oid, $index, 'cisco-entity-sensor', ucwords($descr), $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entry['entSensorMeasuredEntity'], null);
                     //Cisco IOS-XR : add a fake sensor to graph as dbm
                     if ($type == 'power' and $device['os'] == 'iosxr' and (preg_match('/power (R|T)x/i', $descr) or preg_match('/(R|T)x Power/i', $descr) or preg_match('/(R|T)x Lane/i', $descr))) {
                         // convert Watts to dbm
@@ -234,8 +234,7 @@ if ($device['os_group'] == 'cisco') {
                         $limit = 10 * log10($limit * 1000);
                         $current = round(10 * log10($current * 1000), 3);
                         $multiplier = 1000;
-                        //echo("\n".$valid['sensor'].", $type, $device, $oid, $index, 'cisco-entity-sensor', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, $user_func");
-                        discover_sensor($valid['sensor'], $type, $device, $oid, $index, 'cisco-entity-sensor', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entry['entSensorMeasuredEntity'], $user_func);
+                        discover_sensor(null, $type, $device, $oid, $index, 'cisco-entity-sensor', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entry['entSensorMeasuredEntity'], $user_func);
                     }
                 }
 
@@ -247,4 +246,8 @@ if ($device['os_group'] == 'cisco') {
     unset(
         $entity_array
     );
+
+    foreach(array_flip($entitysensor) as $type) {
+        app('sensor-discovery')->sync(sensor_class: $type, poller_type: 'snmp');
+    }
 }//end if

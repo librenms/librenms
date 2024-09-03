@@ -26,7 +26,7 @@ if ($oids) {
         }
 
         if (is_numeric($current) && $current >= 0) {
-            discover_sensor($valid['sensor'], 'temperature', $device, $temperature_oid, 'tempHumidSensorTempValue' . $sensor_index, 'sentry3', $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current, 'snmp', null, null, $user_func);
+            discover_sensor(null, 'temperature', $device, $temperature_oid, 'tempHumidSensorTempValue' . $sensor_index, 'sentry3', $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current, 'snmp', null, null, $user_func);
         }
     }
 }

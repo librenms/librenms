@@ -31,6 +31,6 @@ foreach ($tables as $tablevalue) {
         } else {
             $descr = ucwords($temp[$index][$tablevalue['descr']]);
         }
-        discover_sensor($valid['sensor'], 'count', $device, $cur_oid . $index, $index, $state_name, $descr, 1, 1, null, null, null, null, $temp[$index][$tablevalue['state_name']], 'snmp', $index);
+        discover_sensor(null, 'count', $device, $cur_oid . $index, $index, $state_name, $descr, 1, 1, null, null, null, null, $temp[$index][$tablevalue['state_name']], 'snmp', $index);
     }
 }

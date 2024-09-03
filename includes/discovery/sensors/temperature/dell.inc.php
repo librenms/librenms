@@ -23,6 +23,6 @@ if (is_array($temp)) {
         $warnlimit = $temp[$index]['temperatureProbeUpperNonCriticalThreshold'] / $divisor;
         $limit = $temp[$index]['temperatureProbeUpperCriticalThreshold'] / $divisor;
 
-        discover_sensor($valid['sensor'], 'temperature', $device, $cur_oid . $index, $index, 'dell', $descr, $divisor, '1', $lowlimit, $low_warn_limit, $warnlimit, $limit, $value, 'snmp', $index);
+        discover_sensor(null, 'temperature', $device, $cur_oid . $index, $index, 'dell', $descr, $divisor, '1', $lowlimit, $low_warn_limit, $warnlimit, $limit, $value, 'snmp', $index);
     }
 }

@@ -28,7 +28,7 @@ foreach ($pre_cache['geist_pdu_iec'] as $index => $data) {
     $descr = $data['ctrl3ChIECName'] . ' Phase A';
     $oid = $current_oid . $index;
     if ($value > 0) {
-        discover_sensor($valid['sensor'], 'voltage', $device, $oid, 'ctrl3ChIECVoltsA', 'geist-pdu', $descr, 1, 1, null, null, null, null, $value);
+        discover_sensor(null, 'voltage', $device, $oid, 'ctrl3ChIECVoltsA', 'geist-pdu', $descr, 1, 1, null, null, null, null, $value);
     }
 
     $value = $data['ctrl3ChIECVoltsB'];
@@ -36,7 +36,7 @@ foreach ($pre_cache['geist_pdu_iec'] as $index => $data) {
     $descr = $data['ctrl3ChIECName'] . ' Phase B';
     $oid = $current_oid . $index;
     if ($value > 0) {
-        discover_sensor($valid['sensor'], 'voltage', $device, $oid, 'ctrl3ChIECVoltsB', 'geist-pdu', $descr, 1, 1, null, null, null, null, $value);
+        discover_sensor(null, 'voltage', $device, $oid, 'ctrl3ChIECVoltsB', 'geist-pdu', $descr, 1, 1, null, null, null, null, $value);
     }
 
     $value = $data['ctrl3ChIECVoltsC'];
@@ -44,6 +44,6 @@ foreach ($pre_cache['geist_pdu_iec'] as $index => $data) {
     $descr = $data['ctrl3ChIECName'] . ' Phase C';
     $oid = $current_oid . $index;
     if ($value > 0) {
-        discover_sensor($valid['sensor'], 'voltage', $device, $oid, 'ctrl3ChIECVoltsC', 'geist-pdu', $descr, 1, 1, null, null, null, null, $value);
+        discover_sensor(null, 'voltage', $device, $oid, 'ctrl3ChIECVoltsC', 'geist-pdu', $descr, 1, 1, null, null, null, null, $value);
     }
 }

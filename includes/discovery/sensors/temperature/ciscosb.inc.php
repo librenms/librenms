@@ -28,7 +28,7 @@ foreach ($pre_cache['ciscosb_rlPhyTestGetResult'] as $index => $ciscosb_data) {
         $entPhysicalIndex = $index;
         $entPhysicalIndex_measured = 'ports';
         if (is_numeric($temperature) && ($value['rlPhyTestTableTransceiverSupply'] != 0)) {
-            discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, $sensor_type, $descr, $divisor, $multiplier, null, null, null, null, $temperature, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured);
+            discover_sensor(null, 'temperature', $device, $oid, $index, $sensor_type, $descr, $divisor, $multiplier, null, null, null, null, $temperature, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured);
         }
     }
 }

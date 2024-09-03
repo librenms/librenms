@@ -31,5 +31,5 @@ if (! empty($runtime)) {
     $descr = 'Runtime';
     $low_limit = 5;
     $low_limit_warn = 10;
-    discover_sensor($valid['sensor'], 'runtime', $device, $runtime_oid, $index, $type, $descr, 1, 1, $low_limit, $low_limit_warn, null, null, $runtime);
+    discover_sensor(null, 'runtime', $device, $runtime_oid, $index, $type, $descr, 1, 1, $low_limit, $low_limit_warn, null, null, $runtime);
 }

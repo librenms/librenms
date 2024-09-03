@@ -23,7 +23,7 @@ if (Str::startsWith($device['sysObjectID'], '.1.3.6.1.4.1.8741.6')) {
     $current = snmp_get($device, '.1.3.6.1.4.1.8741.6.2.1.9.0', '-Ovq');
 
     discover_sensor(
-        $valid['sensor'],
+        null,
         'count',
         $device,
         '.1.3.6.1.4.1.8741.6.2.1.9.0', // SNWL-SSLVPN-MIB::activeUserLicense.0

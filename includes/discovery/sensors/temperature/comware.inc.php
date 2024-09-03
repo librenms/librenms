@@ -32,7 +32,7 @@ if (! empty($entphydata)) {
                 }
                 $cur_oid = '.1.3.6.1.4.1.25506.2.6.1.1.1.1.12.';
                 discover_sensor(
-                    $valid['sensor'],
+                    null,
                     'temperature',
                     $device,
                     $cur_oid . $tempindex,
@@ -74,6 +74,6 @@ foreach ($pre_cache['comware_oids'] as $index => $entry) {
         $entPhysicalIndex_measured = 'ports';
 
         $descr = makeshortif($interface['ifDescr']) . ' Module';
-        discover_sensor($valid['sensor'], 'temperature', $device, $oid, 'temp-trans-' . $index, 'comware', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured);
+        discover_sensor(null, 'temperature', $device, $oid, 'temp-trans-' . $index, 'comware', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured);
     }
 }

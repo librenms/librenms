@@ -24,7 +24,7 @@ foreach ($pre_cache['ciscosb_rlPhyTestGetResult'] as $index => $ciscosb_data) {
             $dbm = $value['rlPhyTestTableTxOutput'] / $divisor;
             $entPhysicalIndex = $index;
             $entPhysicalIndex_measured = 'ports';
-            discover_sensor($valid['sensor'], 'dbm', $device, $oid, 'tx-' . $index, $sensor_type, $descr, $divisor, $multiplier, null, null, null, null, $dbm, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured);
+            discover_sensor(null, 'dbm', $device, $oid, 'tx-' . $index, $sensor_type, $descr, $divisor, $multiplier, null, null, null, null, $dbm, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured);
         }
         if (isset($value['rlPhyTestTableRxOpticalPower']) && is_numeric($value['rlPhyTestTableRxOpticalPower']) && ($value['rlPhyTestTableTxOutput'] != 0)) {
             $oid = '.1.3.6.1.4.1.9.6.1.101.90.1.2.1.3.' . $index . '.9';
@@ -34,7 +34,7 @@ foreach ($pre_cache['ciscosb_rlPhyTestGetResult'] as $index => $ciscosb_data) {
             $dbm = $value['rlPhyTestTableRxOpticalPower'] / $divisor;
             $entPhysicalIndex = $index;
             $entPhysicalIndex_measured = 'ports';
-            discover_sensor($valid['sensor'], 'dbm', $device, $oid, 'rx-' . $index, $sensor_type, $descr, $divisor, $multiplier, null, null, null, null, $dbm, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured);
+            discover_sensor(null, 'dbm', $device, $oid, 'rx-' . $index, $sensor_type, $descr, $divisor, $multiplier, null, null, null, null, $dbm, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured);
         }
     }
 }

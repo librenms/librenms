@@ -22,6 +22,6 @@ if (is_array($temp)) {
         $warnlimit = $temp[$index]['coolingDeviceUpperNonCriticalThreshold'];
         $limit = $temp[$index]['coolingDeviceUpperCriticalThreshold'];
 
-        discover_sensor($valid['sensor'], 'fanspeed', $device, $cur_oid . $index, $index, 'dell', $descr, '0', '1', $lowlimit, $low_warn_limit, $warnlimit, $limit, $value, 'snmp', $index);
+        discover_sensor(null, 'fanspeed', $device, $cur_oid . $index, $index, 'dell', $descr, '0', '1', $lowlimit, $low_warn_limit, $warnlimit, $limit, $value, 'snmp', $index);
     }
 }
