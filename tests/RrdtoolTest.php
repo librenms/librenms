@@ -97,8 +97,10 @@ class RrdtoolTest extends TestCase
     private function buildCommandProxy($command, $filename, $options)
     {
         $mock = $this->mock(Rrd::class)->makePartial(); // avoid constructor
+        // @phpstan-ignore method.protected
         $mock->loadConfig(); // load config every time to clear cached settings
 
+        // @phpstan-ignore method.protected
         return $mock->buildCommand($command, $filename, $options);
     }
 }

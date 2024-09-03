@@ -50,7 +50,7 @@ class Rrd extends BaseDatastore
     private $version;
     /** @var string */
     private $rrdcached;
-    /** @var array */
+    /** @var string */
     private $rra;
     /** @var int */
     private $step;
