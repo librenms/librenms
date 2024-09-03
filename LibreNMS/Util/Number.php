@@ -169,7 +169,7 @@ class Number
             if ($value > $maxSignedValue) {
                 $signedValue = $value - $maxSignedValue * 2 - 2;
 
-                // if conversion was successfull, the number will still be in the valid range
+                // if conversion was successful, the number will still be in the valid range
                 if ($signedValue > $maxSignedValue) {
                     throw new \InvalidArgumentException('Unsigned value exceeds the maximum representable value of ' . $integerSize->name);
                 }
