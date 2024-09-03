@@ -2,9 +2,9 @@ mib: IFT-SNMP-MIB
 modules:
    os:
         serial: 
-            - IFT-SNMP-MIB::serialNum
+            - IFT-SNMP-MIB::serialNum.0
         hardware:
-            - IFT-SNMP-MIB::privateLogoModel
+            - IFT-SNMP-MIB::privateLogoModel.0
    sensors:
        temperature:
             data:
