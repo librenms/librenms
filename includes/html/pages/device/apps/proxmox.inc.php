@@ -45,7 +45,7 @@ if (! \LibreNMS\Config::get('enable_proxmox')) {
 
                 echo '<h3>' . $text . ' ' . $port['port'] . '@' . $vm['description'] . '</h3>';
 
-                echo "<tr><td colspan=5>";
+                echo '<tr><td colspan=5>';
 
                 include 'includes/html/print-graphrow.inc.php';
 
