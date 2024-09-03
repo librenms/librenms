@@ -156,7 +156,6 @@ class Iosxewlc extends Iosxe implements
      *
      * @return array Sensors
      */
-
     public function discoverWirelessClients()
     {
         $counts = $this->getCacheByIndex('bsnDot11EssNumberOfMobileStations', 'AIRESPACE-WIRELESS-MIB');
