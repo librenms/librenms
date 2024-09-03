@@ -148,7 +148,7 @@ if ($device['os_group'] == 'cisco') {
                 if (isset($t_oids[$index]) && is_array($t_oids[$index])) {
                     foreach ($t_oids[$index] as $t_index => $key) {
                         // Skip invalid treshold values
-                        if (!isset($key['entSensorThresholdValue']) || $key['entSensorThresholdValue'] == '-32768') {
+                        if (! isset($key['entSensorThresholdValue']) || $key['entSensorThresholdValue'] == '-32768') {
                             continue;
                         }
                         // Critical Limit
