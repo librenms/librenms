@@ -88,7 +88,7 @@ autorestart=true
 stopasgroup=true
 killasgroup=true
 user=librenms
-numprocs=1
+numprocs=10
 redirect_stderr=true
 stdout_logfile=/opt/librenms/logs/queueworker.log
 
