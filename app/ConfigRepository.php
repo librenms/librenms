@@ -36,7 +36,6 @@ use LibreNMS\Util\Debug;
 use LibreNMS\Util\Version;
 use Log;
 
-
 class ConfigRepository
 {
     private array $config = [];
