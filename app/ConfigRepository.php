@@ -334,6 +334,7 @@ class ConfigRepository
         if (! Eloquent::isConnected()) {
             return;  // don't even try if no DB
         }
+        dump(__FUNCTION__, array_map(fn($a) => ($a['file'] ?? '') . ': ' . ($a['line'] ?? ''), debug_backtrace()));
 
         try {
             \App\Models\Config::get(['config_name', 'config_value'])
