@@ -35,6 +35,7 @@ T = Tune RRD files.
 | <1.5.5  | Yes       | G,U      |
 | >=1.5.5 | No        | G,C,U    |
 | >=1.6.x | No        | G,C,U    |
+| >=1.8.x | No        | G,C,U,T  |
 
 It is recommended that you monitor your LibreNMS server with LibreNMS
 so you can view the disk I/O usage delta.
