@@ -7,12 +7,10 @@ use App\Console\LnmsCommand;
 use App\Events\DevicePolled;
 use App\Facades\LibrenmsConfig;
 use App\Jobs\PollDevice;
-use App\Jobs\DispatchPollJobs;
 use App\Models\Device;
 use App\PerDeviceProcess;
 use App\Polling\Measure\MeasurementManager;
 use Illuminate\Database\QueryException;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Config;
@@ -47,47 +45,11 @@ class DevicePoll extends LnmsCommand
 
     public function handle(MeasurementManager $measurements): int
     {
-        if ($this->argument('device spec') == '-') {
-            $stdin = fopen('php://stdin', 'r');
-            $job_args = [];
-            $temp_args = array_filter($this->options());
-            array_walk($temp_args, function ($val, $opt) use (&$job_args) {
-                if ($opt !== 'verbose') {
-                    $job_args["--$opt"] = $val;
-                }
-            });
-
-            $verbosity = $this->getOutput()->getVerbosity();
-            if ($verbosity >= 256) {
-                $job_args['-vvv'] = true;
-            } elseif ($verbosity >= 128) {
-                $job_args['-vv'] = true;
-            } elseif ($verbosity >= 64) {
-                $job_args['-v'] = true;
-            }
-
-            while ($line = trim(fgets($stdin))) {
-                if ($line != "-") {
-                    $job_args['device spec'] = $line;
-                    Artisan::call('device:poll', $job_args);
-                }
-            }
-
-            fclose($stdin);
-
-            return 0;
+        if ($this->option('dispatch')) {
+            return $this->dispatchWork();
         }
 
         $this->configureOutputOptions();
-
-        if ($this->option('dispatch')) {
-            if (\config('queue.default') == 'sync') {
-                $this->error('Queue driver is sync, work will run in process.');
-                sleep(1);
-            } else {
-                return $this->dispatchWork();
-            }
-        }
 
         if ($this->option('no-data')) {
             LibrenmsConfig::set('rrd.enable', false);
@@ -122,9 +84,20 @@ class DevicePoll extends LnmsCommand
 
     private function dispatchWork(): int
     {
+        \Log::setDefaultDriver('stack');
         $module_overrides = Module::parseUserOverrides(explode(',', $this->option('modules') ?? ''));
+        $devices = Device::whereDeviceSpec($this->argument('device spec'))->pluck('device_id');
 
-        DispatchPollJobs::dispatchSync($this->argument('device spec'), $this->getOutput()->getVerbosity(), $module_overrides);
+        if (\config('queue.default') == 'sync') {
+            $this->error('Queue driver is sync, work will run in process.');
+            sleep(1);
+        }
+
+        foreach ($devices as $device_id) {
+            PollDevice::dispatch($device_id, $module_overrides);
+        }
+
+        $this->line('Submitted work for ' . $devices->count() . ' devices');
 
         return 0;
     }
