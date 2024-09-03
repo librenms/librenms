@@ -30,6 +30,7 @@ use App\Models\GraphType;
 use Exception;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use LibreNMS\DB\Eloquent;
 use LibreNMS\Util\Debug;
@@ -38,7 +39,7 @@ use Log;
 
 class ConfigRepository
 {
-    private array $config = [];
+    private array $config;
 
     /**
      * Load the config, if the database connected, pull in database settings.
@@ -47,13 +48,21 @@ class ConfigRepository
      */
     public function __construct()
     {
-        // merge all config sources together config_definitions.json > db config > config.php
-        $this->loadDefaults();
-        $this->loadDB();
-        $this->loadUserConfigFile($this->config);
+        // load config settings that can be cached
+        $cache_ttl = config('librenms.config_cache_ttl');
+        $this->config = Cache::driver($cache_ttl == 0 ? 'null' : 'file')->remember('librenms-config', $cache_ttl, function () {
+            $this->config = [];
+            // merge all config sources together config_definitions.json > db config > config.php
+            $this->loadPreUserConfigDefaults();
+            $this->loadDB();
+            $this->loadUserConfigFile($this->config);
+            $this->loadPostUserConfigDefaults();
 
-        // final cleanups and validations
-        $this->processConfig();
+            return $this->config;
+        });
+
+        // set config settings that must change every run
+        $this->loadRuntimeSettings();
     }
 
     /**
@@ -64,24 +73,6 @@ class ConfigRepository
     public function getDefinitions(): array
     {
         return json_decode(file_get_contents($this->get('install_dir') . '/misc/config_definitions.json'), true)['config'];
-    }
-
-    private function loadDefaults(): void
-    {
-        $this->config['install_dir'] = realpath(__DIR__ . '/..');
-        $definitions = $this->getDefinitions();
-
-        foreach ($definitions as $path => $def) {
-            if (array_key_exists('default', $def)) {
-                Arr::set($this->config, $path, $def['default']);
-            }
-        }
-
-        // load macros from json
-        $macros = json_decode(file_get_contents($this->get('install_dir') . '/misc/macros.json'), true);
-        Arr::set($this->config, 'alert.macros.rule', $macros);
-
-        $this->processDefaults();
     }
 
     /**
@@ -378,8 +369,21 @@ class ConfigRepository
     /**
      * Handle defaults that are set programmatically
      */
-    private function processDefaults(): void
+    private function loadPreUserConfigDefaults(): void
     {
+        $this->config['install_dir'] = realpath(__DIR__ . '/..');
+        $definitions = $this->getDefinitions();
+
+        foreach ($definitions as $path => $def) {
+            if (array_key_exists('default', $def)) {
+                Arr::set($this->config, $path, $def['default']);
+            }
+        }
+
+        // load macros from json
+        $macros = json_decode(file_get_contents($this->get('install_dir') . '/misc/macros.json'), true);
+        Arr::set($this->config, 'alert.macros.rule', $macros);
+
         Arr::set($this->config, 'log_dir', $this->get('install_dir') . '/logs');
         Arr::set($this->config, 'distributed_poller_name', php_uname('n'));
 
@@ -400,28 +404,12 @@ class ConfigRepository
         ));
     }
 
-    /**
-     * Process the config after it has been loaded.
-     * Make sure certain variables have been set properly and
-     */
-    private function processConfig(): void
+    private function loadPostUserConfigDefaults(): void
     {
-        // If we're on SSL, let's properly detect it
-        if (
-            isset($_SERVER['HTTPS']) ||
-            (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https')
-        ) {
-            $this->set('base_url', preg_replace('/^http:/', 'https:', $this->get('base_url', '')));
-        }
-
-        $this->set('base_url', Str::finish($this->get('base_url', ''), '/'));
-
         if (! $this->get('email_from')) {
             $this->set('email_from', '"' . $this->get('project_name') . '" <' . $this->get('email_user') . '@' . php_uname('n') . '>');
         }
-
         // Define some variables if they aren't set by user definition in config_definitions.json
-        $this->set('applied_site_style', $this->get('site_style'));
         $this->setDefault('html_dir', '%s/html', ['install_dir']);
         $this->setDefault('rrd_dir', '%s/rrd', ['install_dir']);
         $this->setDefault('mib_dir', '%s/mibs', ['install_dir']);
@@ -473,10 +461,24 @@ class ConfigRepository
             self::persist('reporting.usage', (bool) Callback::get('enabled'));
         }
 
-        $this->populateTime();
-
         // populate legacy DB credentials, just in case something external uses them.  Maybe remove this later
         $this->populateLegacyDbCredentials();
+    }
+
+    private function loadRuntimeSettings(): void
+    {
+        // If we're on SSL, let's properly detect it
+        if (
+            isset($_SERVER['HTTPS']) ||
+            (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https')
+        ) {
+            $this->set('base_url', preg_replace('/^http:/', 'https:', $this->get('base_url', '')));
+        }
+        $this->set('base_url', Str::finish($this->get('base_url', ''), '/'));
+
+        $this->set('applied_site_style', $this->get('site_style'));
+
+        $this->populateTime();
     }
 
     /**
