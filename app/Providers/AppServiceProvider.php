@@ -2,13 +2,13 @@
 
 namespace App\Providers;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Sensor;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
 use LibreNMS\Cache\PermissionsCache;
-use LibreNMS\Config;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Validate;
 use Validator;
@@ -32,7 +32,7 @@ class AppServiceProvider extends ServiceProvider
             return new \LibreNMS\Cache\Device();
         });
         $this->app->singleton('git', function ($app) {
-            return new \LibreNMS\Util\Git();
+            return new \LibreNMS\Util\Git(0, $app->make('librenms-config'));
         });
 
         $this->app->bind(\App\Models\Device::class, function () {
@@ -56,13 +56,13 @@ class AppServiceProvider extends ServiceProvider
         $this->bootObservers();
     }
 
-    private function bootCustomBladeDirectives()
+    private function bootCustomBladeDirectives(): void
     {
         Blade::if('config', function ($key, $value = true) {
-            return \LibreNMS\Config::get($key) == $value;
+            return LibrenmsConfig::get($key) == $value;
         });
         Blade::if('notconfig', function ($key) {
-            return ! \LibreNMS\Config::get($key);
+            return ! LibrenmsConfig::get($key);
         });
         Blade::if('admin', function () {
             return auth()->check() && auth()->user()->isAdmin();
@@ -109,7 +109,7 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->alias(\LibreNMS\Interfaces\Geocoder::class, 'geocoder');
         $this->app->bind(\LibreNMS\Interfaces\Geocoder::class, function ($app) {
-            $engine = Config::get('geoloc.engine');
+            $engine = LibrenmsConfig::get('geoloc.engine');
 
             switch ($engine) {
                 case 'mapquest':
