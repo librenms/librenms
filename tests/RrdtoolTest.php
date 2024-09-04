@@ -100,7 +100,6 @@ class RrdtoolTest extends TestCase
         // @phpstan-ignore method.protected
         $mock->loadConfig(); // load config every time to clear cached settings
 
-        // @phpstan-ignore method.protected
         return $mock->buildCommand($command, $filename, $options);
     }
 }
