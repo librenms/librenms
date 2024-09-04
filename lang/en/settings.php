@@ -67,12 +67,14 @@ return [
             'prometheus' => ['name' => 'Datastore: Prometheus'],
             'rrdtool' => ['name' => 'Datastore: RRDTool'],
             'snmp' => ['name' => 'SNMP'],
+            'servicedaemon' => ['name' => 'Service Daemon'],
             'poller_modules' => ['name' => 'Poller Modules'],
         ],
         'system' => [
             'cleanup' => ['name' => 'Cleanup'],
             'proxy' => ['name' => 'Proxy'],
             'updates' => ['name' => 'Updates'],
+            'scheduledtasks' => ['name' => 'Scheduled Tasks'],
             'server' => ['name' => 'Server'],
             'reporting' => ['name' => 'Reporting'],
         ],
@@ -1525,9 +1527,31 @@ return [
             'description' => 'Sets the version of rrdtool on your server',
             'help' => 'Anything over 1.5.5 supports all features LibreNMS uses, do not set higher than your installed version',
         ],
-        'service_poller_enabled' => [
-            'description' => 'Enable Polling',
-            'help' => 'Enable poller workers. Sets the default value for all nodes.',
+        'schedule_type' => [
+            'billing' => [
+                'description' => 'Billing',
+                'help' => 'Choose the default scheduler for the billing task. Legacy will use cron if the crontab entry exists and the service daemon if the legacy config option service_billing_enabled is set to true.  Other options will only allow the configured scheduler to work unless the schedule_type.billing is set locally in config.php',
+            ],
+            'discovery' => [
+                'description' => 'Discovery',
+                'help' => 'Choose the default scheduler for the discovery tasks. Legacy will use cron if the crontab entry exists and the service daemon if the legacy config option service_discovery_enabled is set to true.  Other options will only allow the configured scheduler to work unless the schedule_type.discovery is set locally in config.php',
+            ],
+            'ping' => [
+                'description' => 'Fast Ping',
+                'help' => 'Choose the default scheduler for the fast ping tasks. Legacy will use the service daemon if the legacy config option service_ping_enabled is set to true.  Other options will only allow the configured scheduler to work unless the schedule_type.ping is set locally in config.php',
+            ],
+            'poller' => [
+                'description' => 'Poller',
+                'help' => 'Choose the default scheduler for the poller task. Legacy will use cron if the crontab entry exists and the service daemon if the legacy config option service_poller_enabled is set to true.  Other options will only allow the configured scheduler to work unless the schedule_type.poller is set locally in config.php',
+            ],
+            'services' => [
+                'description' => 'Services',
+                'help' => 'Choose the default scheduler for the services task. Legacy will use cron if the crontab entry exists and the service daemon if the legacy config option service_services_enabled is set to true.  Other options will only allow the configured scheduler to work unless the schedule_type.services is set locally in config.php',
+            ],
+            'update' => [
+                'description' => 'Update',
+                'help' => 'Choose the default scheduler for the daily update task. Legacy will use cron if the crontab entry exists and the service daemon if the legacy config option service_update_enabled is set to true.  Other options will only allow the configured scheduler to work unless the schedule_type.update is set locally in config.php',
+            ],
         ],
         'service_master_timeout' => [
             'description' => 'Master Dispatcher Timeout',
@@ -1545,10 +1569,6 @@ return [
             'description' => 'Device Down Retry',
             'help' => 'If a device is down when polling is attempted. This is the amount of time to wait before retrying. Sets the default value for all nodes.',
         ],
-        'service_discovery_enabled' => [
-            'description' => 'Discovery Enabled',
-            'help' => 'Enable discovery workers. Sets the default value for all nodes.',
-        ],
         'service_discovery_workers' => [
             'description' => 'Discovery Workers',
             'help' => 'Amount of discovery workers to run. Setting too high can cause overload. Sets the default value for all nodes.',
@@ -1556,10 +1576,6 @@ return [
         'service_discovery_frequency' => [
             'description' => 'Discovery Frequency',
             'help' => 'How often to run device discovery. Sets the default value for all nodes. Default is 4 times a day.',
-        ],
-        'service_services_enabled' => [
-            'description' => 'Services Enabled',
-            'help' => 'Enable services workers. Sets the default value for all nodes.',
         ],
         'service_services_workers' => [
             'description' => 'Services Workers',
@@ -1569,10 +1585,6 @@ return [
             'description' => 'Services Frequency',
             'help' => 'How often to run services. This should match poller frequency. Sets the default value for all nodes.',
         ],
-        'service_billing_enabled' => [
-            'description' => 'Billing Enabled',
-            'help' => 'Enable billing workers. Sets the default value for all nodes.',
-        ],
         'service_billing_frequency' => [
             'description' => 'Billing Frequency',
             'help' => 'How often to collect billing data. Sets the default value for all nodes.',
@@ -1581,21 +1593,9 @@ return [
             'description' => 'Billing Calculate Frequency',
             'help' => 'How often to calculate bill usage. Sets the default value for all nodes.',
         ],
-        'service_alerting_enabled' => [
-            'description' => 'Alerting Enabled',
-            'help' => 'Enable the alerting worker. Sets the default value for all nodes.',
-        ],
         'service_alerting_frequency' => [
             'description' => 'Alerting Frequency',
             'help' => 'How often alert rules are checked. Note that data is only updated based on poller frequency. Sets the default value for all nodes.',
-        ],
-        'service_ping_enabled' => [
-            'description' => 'Fast Ping Enabled',
-            'help' => 'Fast Ping just pings devices to check if they are up or down. Sets the default value for all nodes.',
-        ],
-        'service_update_enabled' => [
-            'description' => 'Daily Maintenance Enabled',
-            'help' => 'Run daily.sh maintenance script and restart the dispatcher service afterwards. Sets the default value for all nodes.',
         ],
         'service_update_frequency' => [
             'description' => 'Maintenance Frequency',

@@ -5710,21 +5710,90 @@
             "order": 12,
             "type": "text"
         },
+        "schedule_type.alerting": {
+            "default": "legacy",
+            "type": "select",
+            "options": {
+                "legacy": "Legacy",
+                "cron": "Cron",
+                "service": "Service Daemon"
+            }
+        },
+        "schedule_type.billing": {
+            "default": "legacy",
+            "group": "system",
+            "section": "scheduledtasks",
+            "type": "select",
+            "options": {
+                "legacy": "Legacy",
+                "cron": "Cron",
+                "service": "Service Daemon"
+            }
+        },
+        "schedule_type.discovery": {
+            "default": "legacy",
+            "group": "system",
+            "section": "scheduledtasks",
+            "type": "select",
+            "options": {
+                "legacy": "Legacy",
+                "cron": "Cron",
+                "service": "Service Daemon"
+            }
+        },
+        "schedule_type.ping": {
+            "default": "legacy",
+            "group": "system",
+            "section": "scheduledtasks",
+            "type": "select",
+            "options": {
+                "legacy": "Legacy",
+                "diabled": "Disabled",
+                "service": "Service Daemon"
+            }
+        },
+        "schedule_type.poller": {
+            "default": "legacy",
+            "group": "system",
+            "section": "scheduledtasks",
+            "type": "select",
+            "options": {
+                "legacy": "Legacy",
+                "cron": "Cron",
+                "service": "Service Daemon",
+                "schedule": "Laravel Schedule"
+            }
+        },
+        "schedule_type.services": {
+            "default": "legacy",
+            "group": "system",
+            "section": "scheduledtasks",
+            "type": "select",
+            "options": {
+                "legacy": "Legacy",
+                "cron": "Cron",
+                "service": "Service Daemon"
+            }
+        },
+        "schedule_type.update": {
+            "default": "legacy",
+            "group": "system",
+            "section": "scheduledtasks",
+            "type": "select",
+            "options": {
+                "legacy": "Legacy",
+                "cron": "Cron",
+                "service": "Service Daemon"
+            }
+        },
         "sensors.guess_limits": {
             "default": true,
-            "type": "boolean"
-        },
-        "service_poller_enabled": {
-            "default": true,
-            "group": "poller",
-            "section": "distributed",
-            "order": 5,
             "type": "boolean"
         },
         "service_poller_workers": {
             "default": 24,
             "group": "poller",
-            "section": "distributed",
+            "section": "servicedaemon",
             "order": 6,
             "type": "integer",
             "units": "Workers"
@@ -5732,7 +5801,7 @@
         "service_poller_frequency": {
             "default": 300,
             "group": "poller",
-            "section": "distributed",
+            "section": "servicedaemon",
             "order": 7,
             "type": "integer",
             "units": "Seconds"
@@ -5740,22 +5809,15 @@
         "service_poller_down_retry": {
             "default": 60,
             "group": "poller",
-            "section": "distributed",
+            "section": "servicedaemon",
             "order": 8,
             "type": "integer",
             "units": "Seconds"
         },
-        "service_discovery_enabled": {
-            "default": true,
-            "group": "poller",
-            "section": "distributed",
-            "order": 9,
-            "type": "boolean"
-        },
         "service_discovery_workers": {
             "default": 16,
             "group": "poller",
-            "section": "distributed",
+            "section": "servicedaemon",
             "order": 10,
             "type": "integer",
             "units": "Workers"
@@ -5763,22 +5825,15 @@
         "service_discovery_frequency": {
             "default": 21600,
             "group": "poller",
-            "section": "distributed",
+            "section": "servicedaemon",
             "order": 11,
             "type": "integer",
             "units": "Seconds"
         },
-        "service_services_enabled": {
-            "default": true,
-            "group": "poller",
-            "section": "distributed",
-            "order": 12,
-            "type": "boolean"
-        },
         "service_services_workers": {
             "default": 8,
             "group": "poller",
-            "section": "distributed",
+            "section": "servicedaemon",
             "order": 13,
             "type": "integer",
             "units": "Workers"
@@ -5786,22 +5841,15 @@
         "service_services_frequency": {
             "default": 300,
             "group": "poller",
-            "section": "distributed",
+            "section": "servicedaemon",
             "order": 14,
             "type": "integer",
             "units": "Seconds"
         },
-        "service_billing_enabled": {
-            "default": true,
-            "group": "poller",
-            "section": "distributed",
-            "order": 15,
-            "type": "boolean"
-        },
         "service_billing_frequency": {
             "default": 300,
             "group": "poller",
-            "section": "distributed",
+            "section": "servicedaemon",
             "order": 16,
             "type": "integer",
             "units": "Seconds"
@@ -5809,52 +5857,31 @@
         "service_billing_calculate_frequency": {
             "default": 60,
             "group": "poller",
-            "section": "distributed",
+            "section": "servicedaemon",
             "order": 17,
             "type": "integer",
             "units": "Seconds"
         },
-        "service_alerting_enabled": {
-            "default": true,
-            "group": "poller",
-            "section": "distributed",
-            "order": 18,
-            "type": "boolean"
-        },
         "service_alerting_frequency": {
             "default": 60,
             "group": "poller",
-            "section": "distributed",
+            "section": "servicedaemon",
             "order": 19,
             "type": "integer",
             "units": "Seconds"
         },
-        "service_ping_enabled": {
-            "default": false,
-            "group": "poller",
-            "section": "distributed",
-            "order": 20,
-            "type": "boolean"
-        },
         "ping_rrd_step": {
             "default": 60,
             "group": "poller",
-            "section": "distributed",
+            "section": "servicedaemon",
             "order": 21,
             "type": "integer",
             "units": "Seconds"
         },
-        "service_update_enabled": {
-            "default": true,
-            "group": "poller",
-            "section": "distributed",
-            "order": 22,
-            "type": "boolean"
-        },
         "service_update_frequency": {
             "default": 86400,
             "group": "poller",
-            "section": "distributed",
+            "section": "servicedaemon",
             "order": 23,
             "type": "integer",
             "units": "Seconds"
@@ -5862,7 +5889,7 @@
         "service_loglevel": {
             "default": "INFO",
             "group": "poller",
-            "section": "distributed",
+            "section": "servicedaemon",
             "order": 24,
             "type": "select",
             "options": {
@@ -5876,7 +5903,7 @@
         "service_master_timeout": {
             "default": 20,
             "group": "poller",
-            "section": "distributed",
+            "section": "servicedaemon",
             "order": 25,
             "type": "integer",
             "units": "seconds"
@@ -5884,7 +5911,7 @@
         "service_watchdog_enabled": {
             "default": false,
             "group": "poller",
-            "section": "distributed",
+            "section": "servicedaemon",
             "order": 26,
             "type": "boolean"
         },
