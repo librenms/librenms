@@ -47,6 +47,7 @@ class MaintenanceDatabaseCleanup extends LnmsCommand
         } catch (Exception $e) {
             // Log the error message to the console
             $this->error("Error: {$e->getMessage()}");
+
             return 1;
         }
     }
