@@ -33,7 +33,7 @@ class MaintenanceDatabaseCleanup extends LnmsCommand
             $deleted_alerts = Alert::leftJoin('alert_rules', 'alerts.rule_id', '=', 'alert_rules.id')
                 ->whereNull('alert_rules.id')
                 ->delete();
-            
+
             $this->info("Deleted $deleted_alerts orphaned Alerts");
 
             // Delete all orphaned alert logs and return the number of rows deleted
