@@ -1,11 +1,6 @@
 mib: Stulz-WIB8000-MIB
 modules:
     sensors:
-        pre-cache:
-            data:
-                - 
-                    oid:
-                        -  unitsettingName
         state:
             data:
                 -
