@@ -37,8 +37,8 @@ class CliColorFormatter extends \Monolog\Formatter\LineFormatter
     public function __construct()
     {
         parent::__construct(
-            "[%datetime%] %message% %context% %extra%\n",
-            'Y-m-d\TH:i:s',
+            "%message% %context% %extra%\n",
+            null,
             true,
             true
         );
