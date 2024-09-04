@@ -1548,10 +1548,6 @@ return [
                 'description' => 'Services',
                 'help' => 'Choose the default scheduler for the services task. Legacy will use cron if the crontab entry exists and the service daemon if the legacy config option service_services_enabled is set to true.  Other options will only allow the configured scheduler to work unless the schedule_type.services is set locally in config.php',
             ],
-            'update' => [
-                'description' => 'Update',
-                'help' => 'Choose the default scheduler for the daily update task. Legacy will use cron if the crontab entry exists and the service daemon if the legacy config option service_update_enabled is set to true.  Other options will only allow the configured scheduler to work unless the schedule_type.update is set locally in config.php',
-            ],
         ],
         'service_master_timeout' => [
             'description' => 'Master Dispatcher Timeout',
@@ -1596,6 +1592,10 @@ return [
         'service_alerting_frequency' => [
             'description' => 'Alerting Frequency',
             'help' => 'How often alert rules are checked. Note that data is only updated based on poller frequency. Sets the default value for all nodes.',
+        ],
+        'service_update_enabled' => [
+            'description' => 'Daily Maintenance Enabled',
+            'help' => 'Run daily.sh maintenance script and restart the dispatcher service afterwards. Sets the default value for all nodes.',
         ],
         'service_update_frequency' => [
             'description' => 'Maintenance Frequency',

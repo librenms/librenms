@@ -5775,17 +5775,6 @@
                 "service": "Service Daemon"
             }
         },
-        "schedule_type.update": {
-            "default": "legacy",
-            "group": "system",
-            "section": "scheduledtasks",
-            "type": "select",
-            "options": {
-                "legacy": "Legacy",
-                "cron": "Cron",
-                "service": "Service Daemon"
-            }
-        },
         "sensors.guess_limits": {
             "default": true,
             "type": "boolean"
@@ -5877,6 +5866,13 @@
             "order": 21,
             "type": "integer",
             "units": "Seconds"
+        },
+        "service_update_enabled": {
+            "default": true,
+            "group": "poller",
+            "section": "servicedaemon",
+            "order": 22,
+            "type": "boolean"
         },
         "service_update_frequency": {
             "default": 86400,
