@@ -37,7 +37,7 @@ if (! empty($battery_current) || $battery_current == 0) {
     $descr = 'Battery Current';
 
     discover_sensor(
-        $valid['sensor'],
+        null,
         'current',
         $device,
         $battery_current_oid,

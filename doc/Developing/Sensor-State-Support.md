@@ -138,7 +138,7 @@ if (!empty($oids)) {
     $num_oid = '.1.3.6.1.4.1.9.9.13.1.5.1.3.';
     foreach ($oids as $index => $entry) {
         //Discover Sensors
-        discover_sensor($valid['sensor'], 'state', $device, $num_oid.$index, $index, $state_name, $entry['ciscoEnvMonSupplyStatusDescr'], '1', '1', null, null, null, null, $entry['ciscoEnvMonSupplyState'], 'snmp', $index);
+        discover_sensor(null, 'state', $device, $num_oid.$index, $index, $state_name, $entry['ciscoEnvMonSupplyStatusDescr'], '1', '1', null, null, null, null, $entry['ciscoEnvMonSupplyState'], 'snmp', $index);
 
         //Create Sensor To State Index
         create_sensor_to_state_index($device, $state_name, $index);

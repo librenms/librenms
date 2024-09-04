@@ -21,6 +21,6 @@ if (is_array($temp)) {
     foreach ($temp as $index => $entry) {
         $descr = 'Unit Temperature ' . $index;
         echo " $descr, ";
-        discover_sensor($valid['sensor'], 'temperature', $device, $cur_oid . $index, $index, 'wlc', $descr, '1', '1', null, $low[$index]['bsnTemperatureAlarmLowLimit'], $high[$index]['bsnTemperatureAlarmHighLimit'], null, $temp[$index]['bsnSensorTemperature'], 'snmp', $index);
+        discover_sensor(null, 'temperature', $device, $cur_oid . $index, $index, 'wlc', $descr, '1', '1', null, $low[$index]['bsnTemperatureAlarmLowLimit'], $high[$index]['bsnTemperatureAlarmHighLimit'], null, $temp[$index]['bsnSensorTemperature'], 'snmp', $index);
     }
 }

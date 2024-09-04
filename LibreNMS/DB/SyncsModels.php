@@ -25,8 +25,11 @@
 
 namespace LibreNMS\DB;
 
+use App\Models\Device;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Support\Collection;
+use LibreNMS\Interfaces\Models\Keyable;
 
 trait SyncsModels
 {
@@ -36,13 +39,13 @@ trait SyncsModels
      *
      * @param  \App\Models\Device  $device
      * @param  string  $relationship
-     * @param  \Illuminate\Support\Collection  $models  \LibreNMS\Interfaces\Models\Keyable
+     * @param  \Illuminate\Support\Collection<Keyable>  $models  \LibreNMS\Interfaces\Models\Keyable
      * @return \Illuminate\Support\Collection
      */
-    protected function syncModels($device, $relationship, $models): Collection
+    protected function syncModels($device, $relationship, $models, $existing = null): Collection
     {
         $models = $models->keyBy->getCompositeKey();
-        $existing = $device->$relationship->groupBy->getCompositeKey();
+        $existing = ($existing ?? $device->$relationship)->groupBy->getCompositeKey();
 
         foreach ($existing as $exist_key => $existing_rows) {
             if ($models->offsetExists($exist_key)) {
@@ -73,6 +76,24 @@ trait SyncsModels
         }
 
         return $existing->map->first()->merge($new);
+    }
+
+    /**
+     * Sync a sub-group of models to the database
+     *
+     * @param  Collection<Keyable>  $models
+     */
+    public function syncModelsByGroup(Device $device, string $relationship, Collection $models, array $where): Collection
+    {
+        $filter = function ($models, $params) {
+            foreach ($params as $key => $value) {
+                $models = $models->where($key, '=', $value);
+            }
+
+            return $models;
+        };
+
+        return $this->syncModels($device, $relationship, $models->when($where, $filter), $device->$relationship->when($where, $filter));
     }
 
     /**

@@ -18,7 +18,7 @@ foreach ($pre_cache['procurve_hpicfXcvrInfoTable'] as $index => $entry) {
         $entPhysicalIndex_measured = 'ports';
         foreach ($dbquery as $dbindex => $dbresult) {
             $descr = makeshortif($dbresult['ifDescr']) . ' Port Supply Voltage';
-            discover_sensor($valid['sensor'], 'voltage', $device, $oid, 'hpicfXcvrVoltage.' . $index, 'procurve', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured);
+            discover_sensor(null, 'voltage', $device, $oid, 'hpicfXcvrVoltage.' . $index, 'procurve', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured);
         }
     }
 }

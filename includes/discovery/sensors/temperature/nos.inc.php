@@ -26,7 +26,7 @@ foreach (explode("\n", $oids) as $data) {
         if (! strstr($descr, 'No') and ! strstr($value, 'No')) {
             $descr = str_replace('"', '', $descr);
             $descr = trim($descr);
-            discover_sensor($valid['sensor'], 'temperature', $device, $value_oid, $oididx, 'nos', $descr, '1', '1', null, null, '80', '100', $value);
+            discover_sensor(null, 'temperature', $device, $value_oid, $oididx, 'nos', $descr, '1', '1', null, null, '80', '100', $value);
         }
     }
 }

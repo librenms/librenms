@@ -51,7 +51,7 @@ if ($in_phaseNum == '1') {
         $descr = 'Input frequency';
 
         discover_sensor(
-            $valid['sensor'],
+            null,
             'frequency',
             $device,
             $in_frequency_oid,
@@ -83,7 +83,7 @@ if ($in_phaseNum == '1') {
         $descr = 'Output frequency';
 
         discover_sensor(
-            $valid['sensor'],
+            null,
             'frequency',
             $device,
             $out_frequency_oid,
@@ -119,7 +119,7 @@ if ($in_phaseNum == '3') {
         $descr = 'Input frequency';
 
         discover_sensor(
-            $valid['sensor'],
+            null,
             'frequency',
             $device,
             $in_frequency_oid,
@@ -151,7 +151,7 @@ if ($in_phaseNum == '3') {
         $descr = 'Output frequency';
 
         discover_sensor(
-            $valid['sensor'],
+            null,
             'frequency',
             $device,
             $in_frequency_oid,
@@ -183,7 +183,7 @@ if ($in_phaseNum == '3') {
         $descr = 'Bypass frequency';
 
         discover_sensor(
-            $valid['sensor'],
+            null,
             'frequency',
             $device,
             $in_frequency_oid,

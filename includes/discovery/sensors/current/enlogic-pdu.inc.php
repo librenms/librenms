@@ -35,7 +35,7 @@ foreach ($pre_cache['enlogic_pdu_input'] as $index => $data) {
         $high_warn = $data['pduInputPhaseConfigCurrentUpperWarningThreshold'];
         $current = $data['pduInputPhaseStatusCurrent'];
         if ($current > 0) {
-            discover_sensor($valid['sensor'], 'current', $device, $oid, $tmp_index, $type, $descr, $divisor, '1', $low_limit, $low_warn, $high_warn, $high_limit, $current);
+            discover_sensor(null, 'current', $device, $oid, $tmp_index, $type, $descr, $divisor, '1', $low_limit, $low_warn, $high_warn, $high_limit, $current);
         }
     }
 }
@@ -53,7 +53,7 @@ foreach ($pre_cache['enlogic_pdu_circuit'] as $index => $data) {
         $high_warn = $data['pduCircuitBreakerConfigUpperWarningThreshold'];
         $current = $data['pduCircuitBreakerStatusCurrent'];
         if ($current > 0) {
-            discover_sensor($valid['sensor'], 'current', $device, $oid, $tmp_index, $type, $descr, $divisor, '1', $low_limit, $low_warn, $high_warn, $high_limit, $current);
+            discover_sensor(null, 'current', $device, $oid, $tmp_index, $type, $descr, $divisor, '1', $low_limit, $low_warn, $high_warn, $high_limit, $current);
         }
     }
 }

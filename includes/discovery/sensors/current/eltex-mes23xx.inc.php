@@ -37,7 +37,7 @@ if ($pre_cache['eltex-mes23xx-sfp']) {
                 $descr = $tmp['ifName'];
                 $oid = '.1.3.6.1.4.1.89.90.1.2.1.3.' . $ifIndex . '.7';
                 discover_sensor(
-                    $valid['sensor'],
+                    null,
                     'current',
                     $device,
                     $oid,

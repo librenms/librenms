@@ -40,7 +40,7 @@ if (is_array($pre_cache['sdi480status'])) {
             $value = $snr / $divisor;
             $group = 'Inputs';
             discover_sensor(
-                $valid['sensor'],
+                null,
                 'snr',
                 $device,
                 $oid,

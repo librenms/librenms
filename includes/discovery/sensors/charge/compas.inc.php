@@ -28,5 +28,5 @@ $index = 0;
 if (is_numeric($chargeCapacity)) {
     $sensorType = 'compas';
     $descr = 'Battery Charge';
-    discover_sensor($valid['sensor'], 'charge', $device, $curOID, $index, $sensorType, $descr, '1', '1', null, null, null, null, $chargeCapacity);
+    discover_sensor(null, 'charge', $device, $curOID, $index, $sensorType, $descr, '1', '1', null, null, null, null, $chargeCapacity);
 }

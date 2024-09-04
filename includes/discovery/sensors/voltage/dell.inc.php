@@ -35,7 +35,7 @@ foreach ((array) $temp as $index => $entry) {
         $warnlimit = $entry['voltageProbeUpperNonCriticalThreshold'] / $divisor;
         $limit = $entry['voltageProbeUpperCriticalThreshold'] / $divisor;
 
-        discover_sensor($valid['sensor'], 'voltage', $device, $cur_oid . $index, $index, 'dell', $descr, $divisor, '1', $lowlimit, $low_warn_limit, $warnlimit, $limit, $value, 'snmp', $index);
+        discover_sensor(null, 'voltage', $device, $cur_oid . $index, $index, 'dell', $descr, $divisor, '1', $lowlimit, $low_warn_limit, $warnlimit, $limit, $value, 'snmp', $index);
     }
 }
 

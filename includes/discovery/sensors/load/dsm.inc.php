@@ -29,5 +29,5 @@ $ups_device_model = str_replace('"', '', snmp_get($device, $ups_device_model_oid
 $ups_load_oid = '.1.3.6.1.4.1.6574.4.2.12.1.0';
 $ups_load = snmp_get($device, $ups_load_oid, '-Oqv');
 if (is_numeric($ups_load)) {
-    discover_sensor($valid['sensor'], 'load', $device, $ups_load_oid, 0, 'snmp', $ups_device_manufacturer . ' ' . $ups_device_model . ' - UPS Load', '1', '1', 0, null, null, 100, intval($ups_load));
+    discover_sensor(null, 'load', $device, $ups_load_oid, 0, 'snmp', $ups_device_manufacturer . ' ' . $ups_device_model . ' - UPS Load', '1', '1', 0, null, null, 100, intval($ups_load));
 }

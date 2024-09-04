@@ -39,7 +39,7 @@ foreach ($prefixes as $prefix => $numOidPrefix) {
             $lowWarnLimit = $oid[$prefix . 'Thresh3'];
             $highLimit = $oid[$prefix . 'Thresh1'];
             $highWarnLimit = $oid[$prefix . 'Thresh2'];
-            discover_sensor($valid['sensor'], 'humidity', $device, $num_oid, $prefix . 'LiveRaw.' . $index, 'webmon', $descr, '1', '1', $lowLimit, $lowWarnLimit, $highWarnLimit, $highLimit, $value, 'snmp', null, null, null, $group);
+            discover_sensor(null, 'humidity', $device, $num_oid, $prefix . 'LiveRaw.' . $index, 'webmon', $descr, '1', '1', $lowLimit, $lowWarnLimit, $highWarnLimit, $highLimit, $value, 'snmp', null, null, null, $group);
         }
     }
 }

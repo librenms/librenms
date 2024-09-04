@@ -32,7 +32,7 @@ if (is_array($pre_cache['adva_fsp3kr7_Card'])) {
             $current = $pre_cache['adva_fsp3kr7_Card'][$index]['eqptPhysInstValueTemp'] / $divisor;
 
             discover_sensor(
-                $valid['sensor'],
+                null,
                 'temperature',
                 $device,
                 $oid,

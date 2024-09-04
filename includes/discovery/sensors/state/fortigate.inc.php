@@ -78,7 +78,7 @@ if ($systemMode == 'activePassive' || $systemMode == 'activeActive') {
         // Setup a sensor for the cluster sync state
 
         discover_sensor(
-            $valid['sensor'],
+            null,
             'state',
             $device,
             $fgHaStatsSyncStatus_num . '.' . $index,

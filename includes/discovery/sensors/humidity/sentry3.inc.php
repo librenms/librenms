@@ -19,7 +19,7 @@ if ($oids) {
         $current = $data['tempHumidSensorHumidValue'];
 
         if (is_numeric($current) && $current >= 0) {
-            discover_sensor($valid['sensor'], 'humidity', $device, $humidity_oid, 'tempHumidSensorHumidValue' . $sensor_index, 'sentry3', $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current);
+            discover_sensor(null, 'humidity', $device, $humidity_oid, 'tempHumidSensorHumidValue' . $sensor_index, 'sentry3', $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current);
         }
     }
 }

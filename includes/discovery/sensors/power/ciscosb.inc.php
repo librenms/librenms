@@ -20,7 +20,7 @@ if (is_array($temp)) {
             $port_descr = get_port_by_index_cache($device['device_id'], preg_replace('/^\d+\./', '', $index));
             $descr = trim($port_descr['ifDescr'] . ' PoE');
             $highlimit = isset($temp[$index]['rlPethPsePortOperPowerLimit']) ? $temp[$index]['rlPethPsePortOperPowerLimit'] / $divisor : null;
-            discover_sensor($valid['sensor'], 'power', $device, $cur_oid . $index, $index, 'ciscosb', $descr, $divisor, '1', null, null, null, $highlimit, $temp[$index]['rlPethPsePortOutputPower'] / $divisor, 'snmp', $index);
+            discover_sensor(null, 'power', $device, $cur_oid . $index, $index, 'ciscosb', $descr, $divisor, '1', null, null, null, $highlimit, $temp[$index]['rlPethPsePortOutputPower'] / $divisor, 'snmp', $index);
         }
     }
 }

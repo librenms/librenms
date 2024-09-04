@@ -52,6 +52,6 @@ foreach (array_keys($mge_env_data) as $index) {
     if ($current != 0) {
         // Humidity = 0 -> Sensor not available
         // FIXME true for MGE as wel as APC?
-        discover_sensor($valid['sensor'], 'humidity', $device, $oid, $index, $sensorType, $descr, '1', '1', $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current);
+        discover_sensor(null, 'humidity', $device, $oid, $index, $sensorType, $descr, '1', '1', $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current);
     }
 }//end foreach

@@ -35,7 +35,7 @@ if (! empty($inputVoltage)) {
     $type = 'ict-psu';
     $currentValue = $inputVoltage / $divisor;
     echo "got in\n";
-    discover_sensor($valid['sensor'], 'voltage', $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $currentValue);
+    discover_sensor(null, 'voltage', $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $currentValue);
 }
 
 // Output Voltage
@@ -50,5 +50,5 @@ if (! empty($outputVoltage)) {
     $type = 'ict-psu';
     $currentValue = $outputVoltage / $divisor;
 
-    discover_sensor($valid['sensor'], 'voltage', $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $currentValue);
+    discover_sensor(null, 'voltage', $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $currentValue);
 }

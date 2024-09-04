@@ -59,7 +59,7 @@ if (! empty($snmpData)) {
             create_state_index($state_name, $states);
 
             //Discover Sensors
-            discover_sensor($valid['sensor'], 'state', $device, $oid, $sensor_oid, $state_name, $descr, '1', '1', null, null, null, null, $value, 'snmp', null, null, null, 'ups-nut');
+            discover_sensor(null, 'state', $device, $oid, $sensor_oid, $state_name, $descr, '1', '1', null, null, null, null, $value, 'snmp', null, null, null, 'ups-nut');
 
             //Create Sensor To State Index
             create_sensor_to_state_index($device, $state_name, $sensor_oid);

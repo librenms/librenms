@@ -206,7 +206,7 @@ if ($device['os_group'] == 'unix' || $device['os'] == 'windows') {
 
     if (! empty($agent_sensors)) {
         echo 'Sensors: ';
-        check_valid_sensors($device, 'temperature', $valid['sensor'], 'agent');
+        app('sensor-discovery')->sync(sensor_class: 'temperature', poller_type: 'agent');
         d_echo($agent_sensors);
         if (count($agent_sensors) > 0) {
             record_sensor_data($device, $agent_sensors);

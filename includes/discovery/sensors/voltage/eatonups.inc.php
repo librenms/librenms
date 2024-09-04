@@ -13,7 +13,7 @@ foreach ($oids as $volt_id => $data) {
     $type = 'xups';
     $index = '1.2.5.' . $volt_id;
 
-    discover_sensor($valid['sensor'], 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $volt);
+    discover_sensor(null, 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $volt);
 }
 
 // XUPS-MIB::xupsInputVoltage.1 = INTEGER: 228
@@ -30,7 +30,7 @@ foreach ($oids as $volt_id => $data) {
     $current = $data['xupsInputVoltage'] / $divisor;
     $index = '3.4.1.2.' . $volt_id;
 
-    discover_sensor($valid['sensor'], 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
+    discover_sensor(null, 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
 }
 
 // XUPS-MIB::xupsOutputVoltage.1 = INTEGER: 228
@@ -48,7 +48,7 @@ foreach ($oids as $volt_id => $data) {
     $current = $data['xupsOutputVoltage'] / $divisor;
     $index = '4.4.1.2.' . $volt_id;
 
-    discover_sensor($valid['sensor'], 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
+    discover_sensor(null, 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
 }
 
 // XUPS-MIB::xupsBypassNumPhases.0 = INTEGER: 1
@@ -66,5 +66,5 @@ foreach ($oids as $volt_id => $data) {
     $current = $data['xupsBypassVoltage'] / $divisor;
     $index = '5.3.1.2.' . $volt_id;
 
-    discover_sensor($valid['sensor'], 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
+    discover_sensor(null, 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
 }

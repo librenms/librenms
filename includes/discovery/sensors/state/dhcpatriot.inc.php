@@ -96,7 +96,7 @@ foreach ($oids as $index => $entry) {
 
     if (! empty($current)) {
         discover_sensor(
-            $valid['sensor'],
+            null,
             $class,
             $device,
             $oid,

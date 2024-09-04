@@ -26,7 +26,7 @@ if ($oids) {
             $temp_id = $temperature_id . '.' . $x;
             $descr = 'Temp Sensor';
             $x++;
-            discover_sensor($valid['sensor'], 'temperature', $device, $temperature_oid, $temp_id, 'netapp', $descr, '1', '1', $low_limit, $low_warn_limit, $warn_limit, $high_limit, $temperature);
+            discover_sensor(null, 'temperature', $device, $temperature_oid, $temp_id, 'netapp', $descr, '1', '1', $low_limit, $low_warn_limit, $warn_limit, $high_limit, $temperature);
         }
     }
 }

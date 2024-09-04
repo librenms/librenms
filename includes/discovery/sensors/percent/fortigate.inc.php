@@ -25,7 +25,7 @@ if (! empty($fgDhcpTables)) {
         $fgDhcpServerID = $indexSplit[1];
 
         discover_sensor(
-            $valid['sensor'],
+            null,
             'percent',
             $device,
             '.1.3.6.1.4.1.12356.101.23.2.1.1.2.' . $index,

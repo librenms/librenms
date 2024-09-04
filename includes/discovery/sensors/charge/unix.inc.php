@@ -36,7 +36,7 @@ if (! empty($snmpData)) {
             if (! empty($value)) {
                 $oid = Oid::toNumeric('NET-SNMP-EXTEND-MIB::nsExtendOutLine."ups-nut".' . $index);
                 discover_sensor(
-                    $valid['sensor'],
+                    null,
                     'charge',
                     $device,
                     $oid,

@@ -14,7 +14,7 @@ if (is_array($f5_chassis)) {
         $sensorType = 'f5';
         $oid = '.1.3.6.1.4.1.3375.2.1.3.2.3.2.1.2.' . $index;
 
-        discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, $sensorType, $descr, '1', '1', null, null, null, null, $current);
+        discover_sensor(null, 'temperature', $device, $oid, $index, $sensorType, $descr, '1', '1', null, null, null, null, $current);
     }
 }
 
@@ -33,6 +33,6 @@ if (is_array($f5cpu)) {
         $sensorType = 'f5';
         $oid = '.1.3.6.1.4.1.3375.2.1.3.6.2.1.2.' . $index;
 
-        discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, $sensorType, $descr, '1', '1', null, null, null, null, $current);
+        discover_sensor(null, 'temperature', $device, $oid, $index, $sensorType, $descr, '1', '1', null, null, null, null, $current);
     }
 }

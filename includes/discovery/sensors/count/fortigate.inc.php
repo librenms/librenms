@@ -24,7 +24,7 @@ if (! empty($licenseOids)) {
             $descr = $entry['fgLicContractDesc'];
 
             discover_sensor(
-                $valid['sensor'],
+                null,
                 'count',
                 $device,
                 '.1.3.6.1.4.1.12356.101.4.6.3.1.2.1.2.' . $index,
@@ -64,7 +64,7 @@ foreach ($session_rate as $descr => $oid) {
     $result = str_replace(' Sessions Per Second', '', $result);
 
     discover_sensor(
-        $valid['sensor'],
+        null,
         'count',
         $device,
         $oid_num . '.0',
@@ -97,7 +97,7 @@ if ($systemMode == 'activePassive' || $systemMode == 'activeActive') {
 
     // Create a count sensor and set warning to current cluster count
     discover_sensor(
-        $valid['sensor'],
+        null,
         'count',
         $device,
         $fgHaStatsIndex_num,

@@ -9,7 +9,7 @@ $secs_on_battery = snmp_get($device, $secs_on_battery_oid, '-Oqv');
 if (is_numeric($secs_on_battery)) {
     $divisor = get_device_divisor($device, $pre_cache['poweralert_serial'] ?? '', 'runtime', $secs_on_battery_oid);
     discover_sensor(
-        $valid['sensor'],
+        null,
         'runtime',
         $device,
         $secs_on_battery_oid,
@@ -33,7 +33,7 @@ $est_battery_time = snmp_get($device, $est_battery_time_oid, '-Ovq');
 if (is_numeric($est_battery_time)) {
     $divisor = get_device_divisor($device, $pre_cache['poweralert_serial'] ?? '', 'runtime', $est_battery_time_oid);
     discover_sensor(
-        $valid['sensor'],
+        null,
         'runtime',
         $device,
         $est_battery_time_oid,

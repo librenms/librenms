@@ -3,8 +3,6 @@
 use LibreNMS\Config;
 use LibreNMS\OS;
 
-$valid['sensor'] = [];
-
 /** @var OS $os */
 $pre_cache = $os->preCache();
 
@@ -84,7 +82,7 @@ $run_sensors = [
 // filter submodules
 $run_sensors = array_intersect($run_sensors, Config::get('discovery_submodules.sensors', $run_sensors));
 
-sensors($run_sensors, $os, $valid, $pre_cache);
+sensors($run_sensors, $os, $pre_cache);
 unset(
     $pre_cache,
     $run_sensors,
