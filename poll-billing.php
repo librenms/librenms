@@ -12,6 +12,7 @@
  */
 
 use LibreNMS\Billing;
+use LibreNMS\Config;
 use LibreNMS\Data\Store\Datastore;
 use LibreNMS\Util\Debug;
 
@@ -27,6 +28,14 @@ if (isset($argv[1]) && is_numeric($argv[1])) {
 
 Debug::set(isset($options['d']));
 Datastore::init();
+
+$scheduler = Config::get('schedule_type.billing');
+if ($scheduler != 'legacy' && $scheduler != 'cron') {
+    if (Debug::isEnabled()) {
+        echo "Billing is not enabled for cron scheduling\n";
+    }
+    exit(0);
+}
 
 $poller_start = microtime(true);
 echo "Starting Polling Session ... \n\n";

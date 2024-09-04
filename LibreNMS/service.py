@@ -157,7 +157,7 @@ class ServiceConfig(DBConfig):
         self.services.frequency = config.get(
             "service_services_frequency", ServiceConfig.services.frequency
         )
-        self.billing.enabled = config.get("service_billing_enabled", True)
+        self.billing.enabled = config.get("service_billing_enabled", True) if config.get("schedule_type.billing", "legacy") == "legacy" else config.get("schedule_type.billing", "legacy") == "service"
         self.billing.frequency = config.get(
             "service_billing_frequency", ServiceConfig.billing.frequency
         )

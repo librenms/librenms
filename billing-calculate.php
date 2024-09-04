@@ -10,16 +10,28 @@
  */
 
 use LibreNMS\Billing;
+use LibreNMS\Config;
+use LibreNMS\Util\Debug;
 use LibreNMS\Util\Number;
 
 $init_modules = [];
 require __DIR__ . '/includes/init.php';
 
-$options = getopt('r');
+$options = getopt('rd');
 
 if (isset($options['r'])) {
     echo "Clearing history table.\n";
     DB::table('bill_history')->truncate();
+}
+
+Debug::set(isset($options['d']));
+
+$scheduler = Config::get('schedule_type.billing');
+if ($scheduler != 'legacy' && $scheduler != 'cron') {
+    if (Debug::isEnabled()) {
+        echo "Billing is not enabled for cron scheduling\n";
+    }
+    exit(0);
 }
 
 foreach (dbFetchRows('SELECT * FROM `bills` ORDER BY `bill_id`') as $bill) {
