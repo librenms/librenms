@@ -18,10 +18,16 @@ Connect to the server command line and follow the instructions below.
 
 ## Install Required Packages
 
+=== "Ubuntu 24.04"
+    === "NGINX"
+        ```
+        apt install acl curl fping git graphviz imagemagick mariadb-client mariadb-server mtr-tiny nginx-full nmap php-cli php-curl php-fpm php-gd php-gmp php-json php-mbstring php-mysql php-snmp php-xml php-zip rrdtool snmp snmpd unzip python3-command-runner python3-pymysql python3-dotenv python3-redis python3-setuptools python3-psutil python3-systemd python3-pip whois traceroute
+        ```
+
 === "Ubuntu 22.04"
     === "NGINX"
         ```
-        apt install acl curl fping git graphviz imagemagick mariadb-client mariadb-server mtr-tiny nginx-full nmap php-cli php-curl php-fpm php-gd php-gmp php-json php-mbstring php-mysql php-snmp php-xml php-zip rrdtool snmp snmpd unzip python3-pymysql python3-dotenv python3-redis python3-setuptools python3-systemd python3-pip whois traceroute
+        apt install acl curl fping git graphviz imagemagick mariadb-client mariadb-server mtr-tiny nginx-full nmap php-cli php-curl php-fpm php-gd php-gmp php-json php-mbstring php-mysql php-snmp php-xml php-zip rrdtool snmp snmpd unzip python3-command-runner python3-pymysql python3-dotenv python3-redis python3-setuptools python3-psutil python3-systemd python3-pip whois traceroute
         ```
 
 === "Ubuntu 20.04"
@@ -110,6 +116,12 @@ See <https://php.net/manual/en/timezones.php> for a list of supported
 timezones.  Valid examples are: "America/New_York", "Australia/Brisbane", "Etc/UTC".
 Ensure date.timezone is set in php.ini to your preferred time zone.
 
+=== "Ubuntu 24.04"
+    ```bash
+    vi /etc/php/8.3/fpm/php.ini
+    vi /etc/php/8.3/cli/php.ini
+    ```
+
 === "Ubuntu 22.04"
     ```bash
     vi /etc/php/8.1/fpm/php.ini
@@ -141,6 +153,11 @@ timedatectl set-timezone Etc/UTC
 
 
 ## Configure MariaDB
+
+=== "Ubuntu 24.04"
+    ```
+    vi /etc/mysql/mariadb.conf.d/50-server.cnf
+    ```
 
 === "Ubuntu 22.04"
     ```
@@ -192,6 +209,12 @@ exit
 
 ## Configure PHP-FPM
 
+=== "Ubuntu 24.04"
+    ```bash
+    cp /etc/php/8.3/fpm/pool.d/www.conf /etc/php/8.3/fpm/pool.d/librenms.conf
+    vi /etc/php/8.3/fpm/pool.d/librenms.conf
+    ```
+
 === "Ubuntu 22.04"
     ```bash
     cp /etc/php/8.1/fpm/pool.d/www.conf /etc/php/8.1/fpm/pool.d/librenms.conf
@@ -236,6 +259,44 @@ If there are no other PHP web applications on this server, you may remove www.co
 Feel free to tune the performance settings in librenms.conf to meet your needs.
 
 ## Configure Web Server
+
+=== "Ubuntu 24.04"
+    === "NGINX"
+        ```bash
+        vi /etc/nginx/conf.d/librenms.conf
+        ```
+
+        Add the following config, edit `server_name` as required:
+
+        ```nginx
+        server {
+         listen      80;
+         server_name librenms.example.com;
+         root        /opt/librenms/html;
+         index       index.php;
+
+         charset utf-8;
+         gzip on;
+         gzip_types text/css application/javascript text/javascript application/x-javascript image/svg+xml text/plain text/xsd text/xsl text/xml image/x-icon;
+         location / {
+          try_files $uri $uri/ /index.php?$query_string;
+         }
+         location ~ [^/]\.php(/|$) {
+          fastcgi_pass unix:/run/php-fpm-librenms.sock;
+          fastcgi_split_path_info ^(.+\.php)(/.+)$;
+          include fastcgi.conf;
+         }
+         location ~ /\.(?!well-known).* {
+          deny all;
+         }
+        }
+        ```
+
+        ```bash
+        rm /etc/nginx/sites-enabled/default /etc/nginx/sites-available/default
+        systemctl restart nginx
+        systemctl restart php8.3-fpm
+        ```
 
 === "Ubuntu 22.04"
     === "NGINX"
@@ -473,6 +534,9 @@ Feel free to tune the performance settings in librenms.conf to meet your needs.
 
 ## SELinux
 
+=== "Ubuntu 24.04"
+    SELinux not enabled by default
+
 === "Ubuntu 22.04"
     SELinux not enabled by default
 
@@ -539,6 +603,8 @@ Feel free to tune the performance settings in librenms.conf to meet your needs.
     SELinux not enabled by default
 
 ## Allow access through firewall
+=== "Ubuntu 24.04"
+    Firewall not enabled by default
 
 === "Ubuntu 22.04"
     Firewall not enabled by default
