@@ -143,7 +143,11 @@ class ServiceConfig(DBConfig):
         self.poller.frequency = config.get(
             "service_poller_frequency", ServiceConfig.poller.frequency
         )
-        self.discovery.enabled = config.get("service_discovery_enabled", True) if config.get("schedule_type").get("discovery", "legacy") == "legacy" else config.get("schedule_type").get("discovery", "legacy") == "service"
+        self.discovery.enabled = (
+            config.get("service_discovery_enabled", True)
+            if config.get("schedule_type").get("discovery", "legacy") == "legacy"
+            else config.get("schedule_type").get("discovery", "legacy") == "service"
+        )
         self.discovery.workers = config.get(
             "service_discovery_workers", ServiceConfig.discovery.workers
         )
@@ -157,7 +161,11 @@ class ServiceConfig(DBConfig):
         self.services.frequency = config.get(
             "service_services_frequency", ServiceConfig.services.frequency
         )
-        self.billing.enabled = config.get("service_billing_enabled", True) if config.get("schedule_type").get("billing", "legacy") == "legacy" else config.get("schedule_type").get("billing", "legacy") == "service"
+        self.billing.enabled = (
+            config.get("service_billing_enabled", True)
+            if config.get("schedule_type").get("billing", "legacy") == "legacy"
+            else config.get("schedule_type").get("billing", "legacy") == "service"
+        )
         self.billing.frequency = config.get(
             "service_billing_frequency", ServiceConfig.billing.frequency
         )
