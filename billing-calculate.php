@@ -29,7 +29,8 @@ Debug::set(isset($options['d']));
 $scheduler = Config::get('schedule_type.billing');
 if (! isset($options['f']) && $scheduler != 'default' && $scheduler != 'cron') {
     if (Debug::isEnabled()) {
-        echo "Billing is not enabled for cron scheduling\n";
+        echo "Billing is not enabled for cron scheduling.  Add the -f command ar
+gument if you want to force this command to run.\n";
     }
     exit(0);
 }

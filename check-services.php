@@ -51,7 +51,7 @@ if (isset($options['h'])) {
     $scheduler = Config::get('schedule_type.services');
     if ($scheduler != 'default' && $scheduler != 'cron') {
         if (Debug::isEnabled()) {
-            echo "Discovery is not enabled for cron scheduling\n";
+            echo "Services are not enabled for cron scheduling\n";
         }
         exit(0);
     }
