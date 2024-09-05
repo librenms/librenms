@@ -5713,6 +5713,9 @@
         "schedule_type.alerting": {
             "default": "legacy",
             "type": "select",
+            "group": "system",
+            "section": "scheduledtasks",
+            "order": 1,
             "options": {
                 "legacy": "Legacy",
                 "cron": "Cron",
@@ -5723,6 +5726,7 @@
             "default": "legacy",
             "group": "system",
             "section": "scheduledtasks",
+            "order": 2,
             "type": "select",
             "options": {
                 "legacy": "Legacy",
@@ -5734,6 +5738,7 @@
             "default": "legacy",
             "group": "system",
             "section": "scheduledtasks",
+            "order": 3,
             "type": "select",
             "options": {
                 "legacy": "Legacy",
@@ -5745,6 +5750,7 @@
             "default": "legacy",
             "group": "system",
             "section": "scheduledtasks",
+            "order": 4,
             "type": "select",
             "options": {
                 "legacy": "Legacy",
@@ -5756,6 +5762,7 @@
             "default": "legacy",
             "group": "system",
             "section": "scheduledtasks",
+            "order": 5,
             "type": "select",
             "options": {
                 "legacy": "Legacy",
@@ -5768,6 +5775,7 @@
             "default": "legacy",
             "group": "system",
             "section": "scheduledtasks",
+            "order": 6,
             "type": "select",
             "options": {
                 "legacy": "Legacy",
