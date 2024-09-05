@@ -98,7 +98,7 @@ if (count($services) > '0') {
         echo '<td>' . $service['service_name'] . '</td>';
         echo '<td>' . $service['service_type'] . '</td>';
         echo '<td>' . $service['service_message'] . '</td>';
-        echo '<td>' . $service['service_descr'] . '</td>';
+        echo '<td>' . $service['service_desc'] . '</td>';
         echo '<td>' . \LibreNMS\Util\Time::formatInterval(time() - $service['service_changed']) . '</td>';
         echo '<td>';
         echo '<div class="pull-right">';
