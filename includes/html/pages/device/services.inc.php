@@ -67,33 +67,48 @@ if (count($services) > '0') {
     // Loop over each service, pulling out the details.
 
     echo '<table class="table table-hover table-condensed">';
+    echo '<thead>';
+    echo '<th style="width:1%;max-width:1%;"></th>';
+    echo '<th style="width:10%;max-width: 10%;">Name</th>';
+    echo '<th style="width:10%;max-width: 10%;">Check Type</th>';
+    echo '<th >Message</th>';
+    echo '<th style="width:16%;max-width: 25%;">Description</th>';
+    echo '<th style="width:15%;max-width: 15%;">Last Changed</th>';
+    echo '<th style="width:100px;max-width: 100px;"></th>';
+    echo '</thead>';
 
     foreach ($services as $service) {
         $service['service_ds'] = htmlspecialchars_decode($service['service_ds']);
         if ($service['service_status'] == '2') {
-            $status = '<span class="alert-status label-danger"><span class="device-services-page">' . $service['service_type'] . '</span></span>';
+            $status_title = 'CRITICAL';
+            $status_label = 'danger';
         } elseif ($service['service_status'] == '1') {
-            $status = '<span class="alert-status label-warning"><span class="device-services-page">' . $service['service_type'] . '</span></span>';
+            $status_title = 'WARNING';
+            $status_label = 'warning';
         } elseif ($service['service_status'] == '0') {
-            $status = '<span class="alert-status label-success"><span class="device-services-page">' . $service['service_type'] . '</span></span>';
+            $status_title = 'OK';
+            $status_label = 'success';
         } else {
-            $status = '<span class="alert-status label-info"><span class="device-services-page">' . $service['service_type'] . '</span></span>';
+            $status_title = 'UNKNOWN';
+            $status_label = 'info';
         }
 
-        echo '<tr id="row_' . $service['service_id'] . '">';
-        echo '<td class="col-sm-12">';
-        echo '<div class="col-sm-1">' . $status . '</div>';
-        echo '<div class="col-sm-2 text-muted">' . \LibreNMS\Util\Time::formatInterval(time() - $service['service_changed']) . '</div>';
-        echo '<div class="col-sm-2 text-muted">' . $service['service_desc'] . '</div>';
-        echo '<div class="col-sm-5">' . nl2br(trim($service['service_message'])) . '</div>';
-        echo '<div class="col-sm-2">';
+        echo '<tr>';
+        echo '<td><span data-toggle="tooltip" title="' . $status_title . '" class="alert-status label-' . $status_label . '"></span></td>';
+        echo '<td>' . $service['service_name'] . '</td>';
+        echo '<td>' . $service['service_type'] . '</td>';
+        echo '<td>' . $service['service_message'] . '</td>';
+        echo '<td>' . $service['service_descr'] . '</td>';
+        echo '<td>' . \LibreNMS\Util\Time::formatInterval(time() - $service['service_changed']) . '</td>';
+        echo '<td>';
         echo '<div class="pull-right">';
+        
         if (Auth::user()->hasGlobalAdmin()) {
             echo "<button type='button' class='btn btn-primary btn-sm' aria-label='Edit' data-toggle='modal' data-target='#create-service' data-service_id='{$service['service_id']}' name='edit-service'><i class='fa fa-pencil' aria-hidden='true'></i></button>
         <button type='button' class='btn btn-danger btn-sm' aria-label='Delete' data-toggle='modal' data-target='#confirm-delete' data-service_id='{$service['service_id']}' name='delete-service'><i class='fa fa-trash' aria-hidden='true'></i></button";
         }
         echo '</div>';
-        echo '</div>';
+        echo '</tr>';
 
         if ($vars['view'] == 'details') {
             // if we have a script for this check, use it.
@@ -116,7 +131,7 @@ if (count($services) > '0') {
                 $graph_array['ds'] = $k;
 
                 echo '<tr>';
-                echo '<td colspan="5"><div class="col-sm-12">';
+                echo '<td colspan="7"><div class="col-sm-12">';
 
                 include 'includes/html/print-graphrow.inc.php';
 
