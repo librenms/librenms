@@ -210,7 +210,7 @@ These settings are related and should be investigated and set accordingly.
 The below values are not defaults or recommended.
 
 ```php
-$config['service_poller_enabled']           = true;
+$config['scheduler_type.ping']              = 'service';
 ```
 ```php
 $config['service_poller_workers']           = 16;
@@ -222,7 +222,7 @@ $config['service_poller_frequency']         = 300;
 $config['service_poller_down_retry']        = 5;
 ```
 ```php
-$config['service_discovery_enabled']        = true;
+$config['scheduler_type.discovery']         = 'service';
 ```
 ```php
 $config['service_discovery_workers']        = 16;
@@ -231,7 +231,7 @@ $config['service_discovery_workers']        = 16;
 $config['service_discovery_frequency']      = 3600;
 ```
 ```php
-$config['service_services_enabled']         = true;
+$config['scheduler_type.services']          = 'service';
 ```
 ```php
 $config['service_services_workers']         = 16;

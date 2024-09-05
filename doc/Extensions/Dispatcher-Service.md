@@ -122,6 +122,9 @@ the number of workers.
     lnms config:set service_poller_workers 24
     lnms config:set service_services_workers 8
     lnms config:set service_discovery_workers 16
+    lnms config:set scheduler_type.poller service
+    lnms config:set scheduler_type.services service
+    lnms config:set scheduler_type.discovery service
     ```
 
 Optional Settings
@@ -131,6 +134,8 @@ Optional Settings
     lnms config:set service_poller_frequency 300
     lnms config:set service_services_frequency 300
     lnms config:set service_discovery_frequency 21600
+    lnms config:set scheduler_type.alert service
+    lnms config:set scheduler_type.billing service
     lnms config:set service_billing_frequency 300
     lnms config:set service_billing_calculate_frequency 60
     lnms config:set service_poller_down_retry 60
@@ -166,8 +171,14 @@ Maximum WS equals the number of workers multiplied with the number of seconds in
 The [fast ping](Fast-Ping-Check.md) scheduler is disabled by default.
 You can enable it by setting the following:
 
+```bash
+lnms config:set scheduler_type.ping service
+```
+
+OR
+
 ```php
-$config['service_ping_enabled'] = true;
+$config['scheduler_type.ping'] = 'service';
 ```
 
 ## Watchdog
