@@ -33,11 +33,20 @@ use LibreNMS\Util\Debug;
 $init_modules = ['alerts', 'laravel'];
 require __DIR__ . '/includes/init.php';
 
-$options = getopt('d::');
+$options = getopt('fd::');
 
 if (Debug::set(isset($options['d']))) {
     echo "DEBUG!\n";
 }
+
+$scheduler = Config::get('schedule_type.discovery');
+if (! isset($options['f']) && $scheduler != 'legacy' && $scheduler != 'cron') {
+    if (Debug::isEnabled()) {
+        echo "Alerts are not enabled for cron scheduling\n";
+    }
+    exit(0);
+}
+
 
 $alerts_lock = Cache::lock('alerts', \LibreNMS\Config::get('service_alerting_frequency'));
 if ($alerts_lock->get()) {

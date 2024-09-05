@@ -506,7 +506,7 @@ class AlertQueueManager(TimedQueueManager):
 
     def do_work(self, device_id, group):
         logger.info("Checking alerts")
-        args = ("-d") if self.config.debug else ()
+        args = ("-d", "-f") if self.config.debug else ("-f")
         exit_code, output = LibreNMS.call_script("alerts.php", args)
 
         if self.config.log_output:
