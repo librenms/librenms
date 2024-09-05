@@ -138,8 +138,8 @@ class ServiceConfig(DBConfig):
         # new options
         self.poller.enabled = (
             config.get("service_poller_enabled", True)
-            if config.get("schedule_type").get("poller", "legacy") == "legacy"
-            else config.get("schedule_type").get("poller", "legacy") == "service"
+            if config.get("schedule_type").get("poller", "default") == "default"
+            else config.get("schedule_type").get("poller", "default") == "service"
         )
         self.poller.workers = config.get(
             "service_poller_workers", ServiceConfig.poller.workers
@@ -149,8 +149,8 @@ class ServiceConfig(DBConfig):
         )
         self.discovery.enabled = (
             config.get("service_discovery_enabled", True)
-            if config.get("schedule_type").get("discovery", "legacy") == "legacy"
-            else config.get("schedule_type").get("discovery", "legacy") == "service"
+            if config.get("schedule_type").get("discovery", "default") == "default"
+            else config.get("schedule_type").get("discovery", "default") == "service"
         )
         self.discovery.workers = config.get(
             "service_discovery_workers", ServiceConfig.discovery.workers
@@ -160,8 +160,8 @@ class ServiceConfig(DBConfig):
         )
         self.services.enabled = (
             config.get("service_services_enabled", True)
-            if config.get("schedule_type").get("services", "legacy") == "legacy"
-            else config.get("schedule_type").get("services", "legacy") == "service"
+            if config.get("schedule_type").get("services", "default") == "default"
+            else config.get("schedule_type").get("services", "default") == "service"
         )
         self.services.workers = config.get(
             "service_services_workers", ServiceConfig.services.workers
@@ -171,8 +171,8 @@ class ServiceConfig(DBConfig):
         )
         self.billing.enabled = (
             config.get("service_billing_enabled", True)
-            if config.get("schedule_type").get("billing", "legacy") == "legacy"
-            else config.get("schedule_type").get("billing", "legacy") == "service"
+            if config.get("schedule_type").get("billing", "default") == "default"
+            else config.get("schedule_type").get("billing", "default") == "service"
         )
         self.billing.frequency = config.get(
             "service_billing_frequency", ServiceConfig.billing.frequency
@@ -182,16 +182,16 @@ class ServiceConfig(DBConfig):
         )
         self.alerting.enabled = (
             config.get("service_alerting_enabled", True)
-            if config.get("schedule_type").get("alerting", "legacy") == "legacy"
-            else config.get("schedule_type").get("alerting", "legacy") == "service"
+            if config.get("schedule_type").get("alerting", "default") == "default"
+            else config.get("schedule_type").get("alerting", "default") == "service"
         )
         self.alerting.frequency = config.get(
             "service_alerting_frequency", ServiceConfig.alerting.frequency
         )
         self.ping.enabled = (
             config.get("service_ping_enabled", False)
-            if config.get("schedule_type").get("ping", "legacy") == "legacy"
-            else config.get("schedule_type").get("ping", "legacy") == "service"
+            if config.get("schedule_type").get("ping", "default") == "default"
+            else config.get("schedule_type").get("ping", "default") == "service"
         )
         self.ping.frequency = config.get("ping_rrd_step", ServiceConfig.ping.frequency)
         self.down_retry = config.get(

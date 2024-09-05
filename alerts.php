@@ -40,7 +40,7 @@ if (Debug::set(isset($options['d']))) {
 }
 
 $scheduler = Config::get('schedule_type.discovery');
-if (! isset($options['f']) && $scheduler != 'legacy' && $scheduler != 'cron') {
+if (! isset($options['f']) && $scheduler != 'default' && $scheduler != 'cron') {
     if (Debug::isEnabled()) {
         echo "Alerts are not enabled for cron scheduling\n";
     }

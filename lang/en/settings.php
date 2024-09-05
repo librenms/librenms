@@ -1530,23 +1530,23 @@ return [
         'schedule_type' => [
             'billing' => [
                 'description' => 'Billing',
-                'help' => 'Choose the default scheduler for the billing task. Legacy will use cron if the crontab entry exists and the service daemon if the legacy config option service_billing_enabled is set to true.  Other options will only allow the configured scheduler to work unless the schedule_type.billing is set locally in config.php',
+                'help' => 'Billing task sceduler. Default will use cron if the crontab entry exists and the service daemon if the legacy config option service_billing_enabled is set to true.',
             ],
             'discovery' => [
                 'description' => 'Discovery',
-                'help' => 'Choose the default scheduler for the discovery tasks. Legacy will use cron if the crontab entry exists and the service daemon if the legacy config option service_discovery_enabled is set to true.  Other options will only allow the configured scheduler to work unless the schedule_type.discovery is set locally in config.php',
+                'help' => 'Discovery task sceduler. Default will use cron if the crontab entry exists and the service daemon if the legacy config option service_discovery_enabled is set to true.',
             ],
             'ping' => [
                 'description' => 'Fast Ping',
-                'help' => 'Choose the default scheduler for the fast ping tasks. Legacy will use the service daemon if the legacy config option service_ping_enabled is set to true.  Other options will only allow the configured scheduler to work unless the schedule_type.ping is set locally in config.php',
+                'help' => 'Fast ping task sceduler. Default will use the service daemon if the legacy config option service_ping_enabled is set to true.',
             ],
             'poller' => [
                 'description' => 'Poller',
-                'help' => 'Choose the default scheduler for the poller task. Legacy will use cron if the crontab entry exists and the service daemon if the legacy config option service_poller_enabled is set to true.  Other options will only allow the configured scheduler to work unless the schedule_type.poller is set locally in config.php',
+                'help' => 'Poller task sceduler. Default will use cron if the crontab entry exists and the service daemon if the legacy config option service_poller_enabled is set to true.',
             ],
             'services' => [
                 'description' => 'Services',
-                'help' => 'Choose the default scheduler for the services task. Legacy will use cron if the crontab entry exists and the service daemon if the legacy config option service_services_enabled is set to true.  Other options will only allow the configured scheduler to work unless the schedule_type.services is set locally in config.php',
+                'help' => 'Services task sceduler. Default will use cron if the crontab entry exists and the service daemon if the legacy config option service_services_enabled is set to true.',
             ],
         ],
         'service_master_timeout' => [

@@ -5711,74 +5711,74 @@
             "type": "text"
         },
         "schedule_type.alerting": {
-            "default": "legacy",
+            "default": "default",
             "type": "select",
             "group": "system",
             "section": "scheduledtasks",
             "order": 1,
             "options": {
-                "legacy": "Legacy",
+                "default": "Default",
                 "cron": "Cron",
                 "service": "Service Daemon"
             }
         },
         "schedule_type.billing": {
-            "default": "legacy",
+            "default": "default",
             "group": "system",
             "section": "scheduledtasks",
             "order": 2,
             "type": "select",
             "options": {
-                "legacy": "Legacy",
+                "default": "Default",
                 "cron": "Cron",
                 "service": "Service Daemon"
             }
         },
         "schedule_type.discovery": {
-            "default": "legacy",
+            "default": "default",
             "group": "system",
             "section": "scheduledtasks",
             "order": 3,
             "type": "select",
             "options": {
-                "legacy": "Legacy",
+                "default": "Default",
                 "cron": "Cron",
                 "service": "Service Daemon"
             }
         },
         "schedule_type.ping": {
-            "default": "legacy",
+            "default": "default",
             "group": "system",
             "section": "scheduledtasks",
             "order": 4,
             "type": "select",
             "options": {
-                "legacy": "Legacy",
+                "default": "Default",
                 "diabled": "Disabled",
                 "service": "Service Daemon"
             }
         },
         "schedule_type.poller": {
-            "default": "legacy",
+            "default": "default",
             "group": "system",
             "section": "scheduledtasks",
             "order": 5,
             "type": "select",
             "options": {
-                "legacy": "Legacy",
+                "default": "Default",
                 "cron": "Cron",
                 "service": "Service Daemon",
                 "schedule": "Laravel Schedule"
             }
         },
         "schedule_type.services": {
-            "default": "legacy",
+            "default": "default",
             "group": "system",
             "section": "scheduledtasks",
             "order": 6,
             "type": "select",
             "options": {
-                "legacy": "Legacy",
+                "default": "Default",
                 "cron": "Cron",
                 "service": "Service Daemon"
             }
