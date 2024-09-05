@@ -23,14 +23,14 @@ if (isset($argv[1]) && is_numeric($argv[1])) {
     // allow old cli style
     $options = ['b' => $argv[1]];
 } else {
-    $options = getopt('db:');
+    $options = getopt('fdb:');
 }
 
 Debug::set(isset($options['d']));
 Datastore::init();
 
 $scheduler = Config::get('schedule_type.billing');
-if ($scheduler != 'legacy' && $scheduler != 'cron') {
+if (! isset($options['f']) && $scheduler != 'legacy' && $scheduler != 'cron') {
     if (Debug::isEnabled()) {
         echo "Billing is not enabled for cron scheduling\n";
     }

@@ -17,7 +17,7 @@ use LibreNMS\Util\Number;
 $init_modules = [];
 require __DIR__ . '/includes/init.php';
 
-$options = getopt('rd');
+$options = getopt('frd');
 
 if (isset($options['r'])) {
     echo "Clearing history table.\n";
@@ -27,7 +27,7 @@ if (isset($options['r'])) {
 Debug::set(isset($options['d']));
 
 $scheduler = Config::get('schedule_type.billing');
-if ($scheduler != 'legacy' && $scheduler != 'cron') {
+if (! isset($options['f']) && $scheduler != 'legacy' && $scheduler != 'cron') {
     if (Debug::isEnabled()) {
         echo "Billing is not enabled for cron scheduling\n";
     }
