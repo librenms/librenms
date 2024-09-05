@@ -137,7 +137,7 @@ class ServiceConfig(DBConfig):
 
         # new options
         self.poller.enabled = (
-            config.get("service_poller_enabled", True)  # unused
+            config.get("service_poller_enabled", True)
             if config.get("schedule_type").get("poller", "legacy") == "legacy"
             else config.get("schedule_type").get("poller", "legacy") == "service"
         )
