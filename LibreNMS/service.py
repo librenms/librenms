@@ -154,7 +154,11 @@ class ServiceConfig(DBConfig):
         self.discovery.frequency = config.get(
             "service_discovery_frequency", ServiceConfig.discovery.frequency
         )
-        self.services.enabled = config.get("service_services_enabled", True)
+        self.services.enabled = (
+            config.get("service_services_enabled", True)
+            if config.get("schedule_type").get("services", "legacy") == "legacy"
+            else config.get("schedule_type").get("services", "legacy") == "service"
+        )
         self.services.workers = config.get(
             "service_services_workers", ServiceConfig.services.workers
         )

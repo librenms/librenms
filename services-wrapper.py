@@ -44,6 +44,12 @@ log_dir = config["log_dir"]
 log_file = os.path.join(log_dir, WRAPPER_TYPE + "_wrapper.log")
 logger = LibreNMS.logger_get_logger(log_file, debug=args.debug)
 
+scheduler = config.get("schedule_type").get("services", "legacy")
+enabled = True if scheduler == "legacy" else scheduler == "cron"
+if not enabled:
+    logger.debug("Services are not enabled for cron scheduling")
+    sys.exit(0)
+
 try:
     amount_of_workers = int(args.amount_of_workers)
 except (IndexError, ValueError):
