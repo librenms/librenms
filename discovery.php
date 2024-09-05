@@ -19,14 +19,6 @@ Log::setDefaultDriver('console');
 $sqlparams = [];
 $options = getopt('h:m:i:n:d::v::a::q', ['os:', 'type:']);
 
-if (Debug::set(isset($options['d']), false) || isset($options['v'])) {
-    echo \LibreNMS\Util\Version::get()->header();
-
-    echo "DEBUG!\n";
-    Debug::setVerbose(isset($options['v']));
-    \LibreNMS\Util\OS::updateCache(true); // Force update of OS Cache
-}
-
 if (! isset($options['q'])) {
     echo \LibreNMS\Config::get('project_name') . " Discovery\n";
 }
@@ -55,14 +47,6 @@ if (isset($options['h'])) {
             $doing = $options['h'];
         }
     }//end if
-} else {
-    $scheduler = Config::get('schedule_type.discovery');
-    if ($scheduler != 'legacy' && $scheduler != 'cron') {
-        if (Debug::isEnabled()) {
-            echo "Discovery is not enabled for cron scheduling\n";
-        }
-        exit(0);
-    }
 }//end if
 
 if (isset($options['os'])) {
@@ -78,6 +62,14 @@ if (isset($options['type'])) {
 if (isset($options['i']) && $options['i'] && isset($options['n'])) {
     $where .= ' AND MOD(device_id,' . $options['i'] . ") = '" . $options['n'] . "'";
     $doing = $options['n'] . '/' . $options['i'];
+}
+
+if (Debug::set(isset($options['d']), false) || isset($options['v'])) {
+    echo \LibreNMS\Util\Version::get()->header();
+
+    echo "DEBUG!\n";
+    Debug::setVerbose(isset($options['v']));
+    \LibreNMS\Util\OS::updateCache(true); // Force update of OS Cache
 }
 
 if (! $where) {
