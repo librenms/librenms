@@ -47,7 +47,6 @@ if (! isset($options['f']) && $scheduler != 'default' && $scheduler != 'cron') {
     exit(0);
 }
 
-
 $alerts_lock = Cache::lock('alerts', \LibreNMS\Config::get('service_alerting_frequency'));
 if ($alerts_lock->get()) {
     $alerts = new RunAlerts();
