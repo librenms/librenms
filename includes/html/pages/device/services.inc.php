@@ -102,7 +102,7 @@ if (count($services) > '0') {
         echo '<td>' . \LibreNMS\Util\Time::formatInterval(time() - $service['service_changed']) . '</td>';
         echo '<td>';
         echo '<div class="pull-right">';
-        
+
         if (Auth::user()->hasGlobalAdmin()) {
             echo "<button type='button' class='btn btn-primary btn-sm' aria-label='Edit' data-toggle='modal' data-target='#create-service' data-service_id='{$service['service_id']}' name='edit-service'><i class='fa fa-pencil' aria-hidden='true'></i></button>
         <button type='button' class='btn btn-danger btn-sm' aria-label='Delete' data-toggle='modal' data-target='#confirm-delete' data-service_id='{$service['service_id']}' name='delete-service'><i class='fa fa-trash' aria-hidden='true'></i></button";
