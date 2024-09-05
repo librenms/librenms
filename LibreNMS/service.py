@@ -136,7 +136,11 @@ class ServiceConfig(DBConfig):
         self.log_level = config.get("poller_service_loglevel", ServiceConfig.log_level)
 
         # new options
-        self.poller.enabled = config.get("service_poller_enabled", True)  # unused
+        self.poller.enabled = (
+            config.get("service_poller_enabled", True)  # unused
+            if config.get("schedule_type").get("poller", "legacy") == "legacy"
+            else config.get("schedule_type").get("poller", "legacy") == "service"
+        )
         self.poller.workers = config.get(
             "service_poller_workers", ServiceConfig.poller.workers
         )
