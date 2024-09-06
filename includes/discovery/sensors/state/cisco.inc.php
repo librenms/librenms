@@ -34,6 +34,10 @@ $tables = [
     ['num_oid' => '.1.3.6.1.4.1.9.9.601.1.3.1.1.4.',    'oid' => 'crepSegmentComplete',                  'state_name' => 'crepSegmentComplete',          'mib' => 'CISCO-RESILIENT-ETHERNET-PROTOCOL-MIB',             'descr' => 'REP State - Segment '],
 ];
 
+$swrolenumber = 0;
+$swstatenumber = 0;
+$repsegmentnumber = 0;
+
 foreach ($tables as $tablevalue) {
     //Some switches on 15.x expose this information regardless if they are stacked or not, we try to mitigate that by doing the following.
     if (($tablevalue['oid'] == 'cswGlobals' || $tablevalue['oid'] == 'cswSwitchRole' || $tablevalue['oid'] == 'cswSwitchState' || $tablevalue['oid'] == 'cswStackPortOperStatus') && $redundant_data == 'false' && count($role_data) == 1) {
@@ -44,7 +48,7 @@ foreach ($tables as $tablevalue) {
     $cur_oid = $tablevalue['num_oid'];
 
     if (is_array($temp)) {
-        if (isset($temp[0]) && $temp[0][$tablevalue['state_name']] == 'nonRedundant' || $temp[0]['cswMaxSwitchNum'] == '1') {
+        if ((isset($temp[0][$tablevalue['state_name']]) && $temp[0][$tablevalue['state_name']] == 'nonRedundant') || (isset($temp[0]['cswMaxSwitchNum']) && $temp[0]['cswMaxSwitchNum'] == '1')) {
             break;
         }
 
@@ -200,11 +204,11 @@ foreach ($tables as $tablevalue) {
 
         foreach ($temp as $index => $entry) {
             $state_group = null;
-            if ($tablevalue['state_name'] == 'ciscoEnvMonTemperatureState' && (empty($temp[$index][$tablevalue['descr']]))) {
+            if ($tablevalue['state_name'] == 'ciscoEnvMonTemperatureState' && (empty($entry[$tablevalue['descr']]))) {
                 d_echo('Invalid sensor, skipping..');
             } else {
                 //Discover Sensors
-                $descr = ucwords($temp[$index][$tablevalue['descr']]);
+                $descr = ucwords($entry[$tablevalue['descr']] ?? 'State');
                 if ($state_name == 'cRFStatusUnitState' || $state_name == 'cRFStatusPeerUnitState' || $state_name == 'cRFCfgRedundancyOperMode' || $state_name == 'cswRingRedundant') {
                     $descr = $tablevalue['descr'];
                 } elseif ($state_name == 'cswSwitchRole') {
@@ -225,7 +229,7 @@ foreach ($tables as $tablevalue) {
                     $repsegmentnumber++;
                     $descr = $tablevalue['descr'] . $repsegmentnumber;
                 }
-                discover_sensor(null, 'state', $device, $cur_oid . $index, $index, $state_name, trim($descr), 1, 1, null, null, null, null, $temp[$index][$tablevalue['state_name']], 'snmp', $index, null, null, $state_group);
+                discover_sensor(null, 'state', $device, $cur_oid . $index, $index, $state_name, trim($descr), 1, 1, null, null, null, null, $entry[$tablevalue['state_name']], 'snmp', $index, null, null, $state_group);
 
                 //Create Sensor To State Index
                 create_sensor_to_state_index($device, $state_name, $index);
