@@ -26,19 +26,15 @@
 
 namespace LibreNMS\OS;
 
-use App\Models\AccessPoint;
 use App\Models\IsisAdjacency;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\DB\SyncsModels;
-use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\IsIsDiscovery;
-use LibreNMS\Interfaces\Discovery\Sensors\WirelessApCountDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessCellDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessChannelDiscovery;
-use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRsrpDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRsrqDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
@@ -46,7 +42,6 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
 use LibreNMS\Interfaces\Polling\IsIsPolling;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\OS\Traits\CiscoCellular;
-use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\IP;
 use SnmpQuery;
 
@@ -59,108 +54,10 @@ class Iosxe extends Ciscowlc implements
     WirelessRssiDiscovery,
     WirelessRsrqDiscovery,
     WirelessRsrpDiscovery,
-    WirelessSnrDiscovery,
-    WirelessClientsDiscovery,
-    WirelessApCountDiscovery
+    WirelessSnrDiscovery
 {
     use SyncsModels;
     use CiscoCellular;
-
-    public function pollOS(DataStorageInterface $datastore): void
-    {
-        $device = $this->getDeviceArray();
-        $apNames = \SnmpQuery::enumStrings()->walk('AIRESPACE-WIRELESS-MIB::bsnAPName')->table(1);
-        $radios = \SnmpQuery::enumStrings()->walk('AIRESPACE-WIRELESS-MIB::bsnAPIfTable')->table(2);
-        \SnmpQuery::walk('AIRESPACE-WIRELESS-MIB::bsnAPIfLoadChannelUtilization')->table(2, $radios);
-        $interferences = \SnmpQuery::walk('AIRESPACE-WIRELESS-MIB::bsnAPIfInterferencePower')->table(3);
-
-        $numAccessPoints = count($apNames);
-        $numClients = 0;
-
-        foreach ($radios as $radio) {
-            foreach ($radio as $slot) {
-                $numClients += $slot['AIRESPACE-WIRELESS-MIB::bsnApIfNoOfUsers'] ?? 0;
-            }
-        }
-
-        $rrd_def = RrdDefinition::make()
-            ->addDataset('NUMAPS', 'GAUGE', 0, 12500000000)
-            ->addDataset('NUMCLIENTS', 'GAUGE', 0, 12500000000);
-
-        $fields = [
-            'NUMAPS' => $numAccessPoints,
-            'NUMCLIENTS' => $numClients,
-        ];
-
-        $tags = compact('rrd_def');
-        $datastore->put($device, 'ciscowlc', $tags, $fields);
-
-        $db_aps = $this->getDevice()->accessPoints->keyBy->getCompositeKey();
-        $valid_ap_ids = [];
-
-        foreach ($radios as $mac => $radio) {
-            foreach ($radio as $slot => $value) {
-                $channel = str_replace('ch', '', $value['AIRESPACE-WIRELESS-MIB::bsnAPIfPhyChannelNumber'] ?? '');
-
-                $ap = new AccessPoint([
-                    'device_id' => $this->getDeviceId(),
-                    'name' => $apNames[$mac]['AIRESPACE-WIRELESS-MIB::bsnAPName'] ?? '',
-                    'radio_number' => $slot,
-                    'type' => $value['AIRESPACE-WIRELESS-MIB::bsnAPIfType'] ?? '',
-                    'mac_addr' => $mac,
-                    'channel' => $channel,
-                    'txpow' => $value['AIRESPACE-WIRELESS-MIB::bsnAPIfPhyTxPowerLevel'] ?? 0,
-                    'radioutil' => $value['AIRESPACE-WIRELESS-MIB::bsnAPIfLoadChannelUtilization'] ?? 0,
-                    'numasoclients' => $value['AIRESPACE-WIRELESS-MIB::bsnApIfNoOfUsers'] ?? 0,
-                    'nummonclients' => 0,
-                    'nummonbssid' => 0,
-                    'interference' => 128 + ($interferences[$mac][$slot][$channel]['AIRESPACE-WIRELESS-MIB::bsnAPIfInterferencePower'] ?? -128), // why are we adding 128?
-                ]);
-
-                d_echo($ap->toArray());
-
-                // if there is a numeric channel, assume the rest of the data is valid, I guess
-                if (! is_numeric($channel)) {
-                    continue;
-                }
-
-                $rrd_def = RrdDefinition::make()
-                    ->addDataset('channel', 'GAUGE', 0, 200)
-                    ->addDataset('txpow', 'GAUGE', 0, 200)
-                    ->addDataset('radioutil', 'GAUGE', 0, 100)
-                    ->addDataset('nummonclients', 'GAUGE', 0, 500)
-                    ->addDataset('nummonbssid', 'GAUGE', 0, 200)
-                    ->addDataset('numasoclients', 'GAUGE', 0, 500)
-                    ->addDataset('interference', 'GAUGE', 0, 2000);
-
-                $datastore->put($device, 'arubaap', [
-                    'name' => $ap->name,
-                    'radionum' => $ap->radio_number,
-                    'rrd_name' => ['arubaap', $ap->name . $ap->radio_number],
-                    'rrd_def' => $rrd_def,
-                ], $ap->only([
-                    'channel',
-                    'txpow',
-                    'radioutil',
-                    'nummonclients',
-                    'nummonbssid',
-                    'numasoclients',
-                    'interference',
-                ]));
-
-                /** @var AccessPoint $db_ap */
-                if ($db_ap = $db_aps->get($ap->getCompositeKey())) {
-                    $ap = $db_ap->fill($ap->getAttributes());
-                }
-
-                $ap->save(); // persist ap
-                $valid_ap_ids[] = $ap->accesspoint_id;
-            }
-        }
-
-        // delete invalid aps
-        $this->getDevice()->accessPoints->whereNotIn('accesspoint_id', $valid_ap_ids)->each->delete();
-    }
 
     /**
      * Array of shortened ISIS codes
@@ -234,94 +131,6 @@ class Iosxe extends Ciscowlc implements
             $adjacency->isisISAdjState = $states['CISCO-IETF-ISIS-MIB::ciiISAdjState' . $adjacency->index] ?? $adjacency->isisISAdjState;
             $adjacency->isisISAdjLastUpTime = $this->parseAdjacencyTime($uptime['CISCO-IETF-ISIS-MIB::ciiISAdjLastUpTime' . $adjacency->index] ?? 0);
         });
-    }
-
-    /**
-     * Discover wireless client counts. Type is clients.
-     * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
-     *
-     * @return array Sensors
-     */
-    public function discoverWirelessClients()
-    {
-        $counts = $this->getCacheByIndex('bsnDot11EssNumberOfMobileStations', 'AIRESPACE-WIRELESS-MIB');
-        if (empty($counts)) {
-            return []; // no counts to be had
-        }
-
-        $ssids = $this->getCacheByIndex('bsnDot11EssSsid', 'AIRESPACE-WIRELESS-MIB');
-        if (empty($ssids)) {
-            //  Try to check the LWAPP mib
-            $ssids = $this->getCacheByIndex('cLWlanSsid', 'CISCO-LWAPP-WLAN-MIB');
-        }
-
-        $sensors = [];
-        $total_oids = [];
-        $total = 0;
-        foreach ($counts as $index => $count) {
-            $oid = '.1.3.6.1.4.1.14179.2.1.1.1.38.' . $index;
-            $total_oids[] = $oid;
-            $total += $count;
-
-            $sensors[] = new WirelessSensor(
-                'clients',
-                $this->getDeviceId(),
-                $oid,
-                'ciscowlc-ssid',
-                $index,
-                'SSID: ' . $ssids[$index],
-                $count
-            );
-        }
-
-        $sensors[] = new WirelessSensor(
-            'clients',
-            $this->getDeviceId(),
-            $total_oids,
-            'ciscowlc',
-            0,
-            'Clients: Total',
-            $total
-        );
-
-        return $sensors;
-    }
-
-    /**
-     * Discover wireless capacity.  This is a percent. Type is capacity.
-     * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
-     *
-     * @return array Sensors
-     */
-    public function discoverWirelessApCount()
-    {
-        $oids = [
-            'CISCO-LWAPP-AP-MIB::cLApGlobalAPConnectCount.0',
-            'CISCO-LWAPP-AP-MIB::cLApGlobalMaxApsSupported.0',
-        ];
-        $data = snmp_get_multi($this->getDeviceArray(), $oids);
-
-        if (isset($data[0]['cLApGlobalAPConnectCount'])) {
-            return [
-                new WirelessSensor(
-                    'ap-count',
-                    $this->getDeviceId(),
-                    '.1.3.6.1.4.1.9.9.513.1.3.35.0',
-                    'ciscowlc',
-                    0,
-                    'Connected APs',
-                    $data[0]['cLApGlobalAPConnectCount'],
-                    1,
-                    1,
-                    'sum',
-                    null,
-                    $data[0]['cLApGlobalMaxApsSupported'],
-                    0
-                ),
-            ];
-        }
-
-        return [];
     }
 
     /**
