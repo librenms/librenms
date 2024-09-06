@@ -95,7 +95,6 @@ class Snmpsim extends Process
                 Log::info($installProcess->getOutput());
                 Log::error($installProcess->getErrorOutput());
             }
-
         }
     }
 
