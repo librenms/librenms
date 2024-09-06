@@ -66,12 +66,17 @@ interface Module
     public function poll(OS $os, DataStorageInterface $datastore): void;
 
     /**
+     * Check if data exists for this module
+     */
+    public function dataExists(Device $device): bool;
+
+    /**
      * Remove all DB data for this module.
      * This will be run when the module is disabled.
      *
      * @param  \App\Models\Device  $device
      */
-    public function cleanup(Device $device): void;
+    public function cleanup(Device $device): int;
 
     /**
      * Dump current module data for the given device for tests.

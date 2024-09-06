@@ -107,18 +107,6 @@ class Isis implements Module
         $updated->each->save();
     }
 
-    /**
-     * Remove all DB data for this module.
-     * This will be run when the module is disabled.
-     */
-    public function cleanup(Device $device): void
-    {
-        $device->isisAdjacencies()->delete();
-
-        // clean up legacy components from old code
-        $device->components()->where('type', 'ISIS')->delete();
-    }
-
     public function discoverIsIsMib(OS $os): Collection
     {
         // Check if the device has any ISIS enabled interfaces
@@ -195,6 +183,23 @@ class Isis implements Module
     protected function parseAdjacencyTime($data): int
     {
         return (int) (max($data['isisISAdjLastUpTime'] ?? 1, 1) / 100);
+    }
+
+    public function dataExists(Device $device): bool
+    {
+        return $device->isisAdjacencies()->exists() || $device->components()->where('type', 'ISIS')->exists();
+    }
+
+    /**
+     * Remove all DB data for this module.
+     * This will be run when the module is disabled.
+     */
+    public function cleanup(Device $device): int
+    {
+        // clean up legacy components from old code
+        $legacyDeleted = $device->components()->where('type', 'ISIS')->delete();
+
+        return $device->isisAdjacencies()->delete() + $legacyDeleted;
     }
 
     /**

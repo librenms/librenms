@@ -75,6 +75,8 @@ Route::middleware(['auth'])->group(function () {
     // Device Tabs
     Route::prefix('device/{device}')->namespace('Device\Tabs')->name('device.')->group(function () {
         Route::put('notes', 'NotesController@update')->name('notes.update');
+        Route::put('module/{module}', [\App\Http\Controllers\Device\Tabs\ModuleController::class, 'update'])->name('module.update');
+        Route::delete('module/{module}', [\App\Http\Controllers\Device\Tabs\ModuleController::class, 'delete'])->name('module.delete');
     });
 
     Route::match(['get', 'post'], 'device/{device}/{tab?}/{vars?}', 'DeviceController@index')

@@ -88,10 +88,17 @@ class Stp implements Module
         $this->syncModels($device, 'stpPorts', $ports);
     }
 
-    public function cleanup(Device $device): void
+    public function dataExists(Device $device): bool
     {
-        $device->stpInstances()->delete();
-        $device->stpPorts()->delete();
+        return $device->stpInstances()->exists() || $device->stpPorts()->exists();
+    }
+
+    public function cleanup(Device $device): int
+    {
+        $deleted = $device->stpInstances()->delete();
+        $deleted += $device->stpPorts()->delete();
+
+        return $deleted;
     }
 
     /**
