@@ -102,6 +102,12 @@ if (isset($os_name) && isset($variant)) {
     $os_list = ModuleTestHelper::findOsWithData($modules);
 }
 
+if (empty($os_list)) {
+    echo "No matching snmprec(s) found.\n";
+
+    exit(1);
+}
+
 if (isset($options['f'])) {
     if (count($os_list) != 1) {
         echo "Failed to create test data, -f/--file option can be used with one os/variant combination.\n";
@@ -113,7 +119,7 @@ if (isset($options['f'])) {
 
 // Now use the saved data to update the saved database data
 $snmpsim = new Snmpsim();
-$snmpsim->setupVenv();
+$snmpsim->setupVenv(true);
 $snmpsim->start();
 echo "Waiting for snmpsim to initialize...\n";
 $snmpsim->waitForStartup();
