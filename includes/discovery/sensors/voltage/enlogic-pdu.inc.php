@@ -34,7 +34,7 @@ foreach ($pre_cache['enlogic_pdu_input'] as $index => $data) {
         $high_warn = $data['pduInputPhaseConfigVoltageUpperWarningThreshold'];
         $current = $data['pduInputPhaseStatusVoltage'];
         if ($current > 0) {
-            discover_sensor($valid['sensor'], 'voltage', $device, $oid, $index, $type, $descr, $divisor, '1', $low_limit, $low_warn, $high_warn, $high_limit, $current);
+            discover_sensor(null, 'voltage', $device, $oid, $index, $type, $descr, $divisor, '1', $low_limit, $low_warn, $high_warn, $high_limit, $current);
         }
     }
 }

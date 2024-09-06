@@ -28,7 +28,7 @@ foreach ($pre_cache['wipipe_oids'] as $index => $entry) {
         $currentsignal = $entry['mdmSignalStrength'];
         // Discover Sensor
         discover_sensor(
-            $valid['sensor'],
+            null,
             'dbm',
             $device,
             $oid,

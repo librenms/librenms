@@ -15,7 +15,7 @@ if ($pre_cache['awplus-sfpddm']) {
             $descr = $tmp['ifName'];
             $oid = '.1.3.6.1.4.1.207.8.4.4.3.28.1.3.1.3.' . $index;
             discover_sensor(
-                $valid['sensor'],
+                null,
                 'current',
                 $device,
                 $oid,

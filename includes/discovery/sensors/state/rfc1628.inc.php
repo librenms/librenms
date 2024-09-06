@@ -27,7 +27,7 @@ if (is_numeric($state)) {
 
     $sensor_index = 0;
     discover_sensor(
-        $valid['sensor'],
+        null,
         'state',
         $device,
         '.1.3.6.1.2.1.33.1.2.1.0',
@@ -69,7 +69,7 @@ if (is_numeric($state)) {
 
     $sensor_index = 0;
     discover_sensor(
-        $valid['sensor'],
+        null,
         'state',
         $device,
         '.1.3.6.1.2.1.33.1.4.1.0',
@@ -111,7 +111,7 @@ if (is_numeric($state)) {
     $sensor_index = 0;
     $oid = oid::toNumeric('UPS-MIB::upsTestResultsSummary.0');
     discover_sensor(
-        $valid['sensor'],
+        null,
         'state',
         $device,
         $oid,

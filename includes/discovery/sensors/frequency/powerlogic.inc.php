@@ -29,7 +29,7 @@ if (is_numeric($data['fFrequency'][1])) {
     $index = 'fFrequency';
     $descr = 'Frequency';
     $current = $data['fFrequency'][1];
-    discover_sensor($valid['sensor'], 'frequency', $device, $current_oid, $index, 'powerlogic', $descr, 1, 1, null, null, null, null, $current);
+    discover_sensor(null, 'frequency', $device, $current_oid, $index, 'powerlogic', $descr, 1, 1, null, null, null, null, $current);
 }
 
 unset($data);
