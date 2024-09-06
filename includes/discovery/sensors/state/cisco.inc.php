@@ -209,10 +209,10 @@ foreach ($tables as $tablevalue) {
                     $stack_port_descr = get_port_by_index_cache($device['device_id'], $index);
                     $descr = $tablevalue['descr'] . $stack_port_descr['ifDescr'];
                 } elseif ($state_name == 'cefcFRUPowerOperStatus') {
-                    $descr = SnmpQuery::get( 'ENTITY-MIB::entPhysicalName.' . $index)->value();
+                    $descr = SnmpQuery::get('ENTITY-MIB::entPhysicalName.' . $index)->value();
                 } elseif ($state_name == 'c3gModemStatus' || $state_name == 'c3gGsmCurrentBand' || $state_name == 'c3gGsmPacketService' || $state_name == 'c3gGsmCurrentRoamingStatus' || $state_name == 'c3gGsmSimStatus') {
                     $descr = $tablevalue['descr'];
-                    $state_group = SnmpQuery::get( 'ENTITY-MIB::entPhysicalName.' . $index)->value();
+                    $state_group = SnmpQuery::get('ENTITY-MIB::entPhysicalName.' . $index)->value();
                 } elseif ($state_name == 'crepSegmentComplete') {
                     $repsegmentnumber++;
                     $descr = $tablevalue['descr'] . $repsegmentnumber;
