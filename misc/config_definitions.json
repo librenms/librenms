@@ -5719,7 +5719,7 @@
             "options": {
                 "unrestricted": "Unrestricted",
                 "cron": "Cron",
-                "service": "Service Daemon"
+                "dispatcherservice": "Dispatcher Service"
             }
         },
         "schedule_type.billing": {
@@ -5731,7 +5731,7 @@
             "options": {
                 "unrestricted": "Unrestricted",
                 "cron": "Cron",
-                "service": "Service Daemon"
+                "dispatcherservice": "Dispatcher Service"
             }
         },
         "schedule_type.discovery": {
@@ -5743,7 +5743,7 @@
             "options": {
                 "unrestricted": "Unrestricted",
                 "cron": "Cron",
-                "service": "Service Daemon"
+                "dispatcherservice": "Dispatcher Service"
             }
         },
         "schedule_type.ping": {
@@ -5755,7 +5755,7 @@
             "options": {
                 "unrestricted": "Unrestricted",
                 "diabled": "Disabled",
-                "service": "Service Daemon"
+                "dispatcherservice": "Dispatcher Service"
             }
         },
         "schedule_type.poller": {
@@ -5767,7 +5767,7 @@
             "options": {
                 "unrestricted": "Unrestricted",
                 "cron": "Cron",
-                "service": "Service Daemon",
+                "dispatcherservice": "Dispatcher Service",
                 "schedule": "Laravel Schedule"
             }
         },
@@ -5780,7 +5780,7 @@
             "options": {
                 "unrestricted": "Unrestricted",
                 "cron": "Cron",
-                "service": "Service Daemon"
+                "dispatcherservice": "Dispatcher Service"
             }
         },
         "sensors.guess_limits": {
@@ -5790,7 +5790,7 @@
         "service_poller_workers": {
             "default": 24,
             "group": "poller",
-            "section": "servicedaemon",
+            "section": "dispatcherservice",
             "order": 6,
             "type": "integer",
             "units": "Workers"
@@ -5798,7 +5798,7 @@
         "service_poller_frequency": {
             "default": 300,
             "group": "poller",
-            "section": "servicedaemon",
+            "section": "dispatcherservice",
             "order": 7,
             "type": "integer",
             "units": "Seconds"
@@ -5806,7 +5806,7 @@
         "service_poller_down_retry": {
             "default": 60,
             "group": "poller",
-            "section": "servicedaemon",
+            "section": "dispatcherservice",
             "order": 8,
             "type": "integer",
             "units": "Seconds"
@@ -5814,7 +5814,7 @@
         "service_discovery_workers": {
             "default": 16,
             "group": "poller",
-            "section": "servicedaemon",
+            "section": "dispatcherservice",
             "order": 10,
             "type": "integer",
             "units": "Workers"
@@ -5822,7 +5822,7 @@
         "service_discovery_frequency": {
             "default": 21600,
             "group": "poller",
-            "section": "servicedaemon",
+            "section": "dispatcherservice",
             "order": 11,
             "type": "integer",
             "units": "Seconds"
@@ -5830,7 +5830,7 @@
         "service_services_workers": {
             "default": 8,
             "group": "poller",
-            "section": "servicedaemon",
+            "section": "dispatcherservice",
             "order": 13,
             "type": "integer",
             "units": "Workers"
@@ -5838,7 +5838,7 @@
         "service_services_frequency": {
             "default": 300,
             "group": "poller",
-            "section": "servicedaemon",
+            "section": "dispatcherservice",
             "order": 14,
             "type": "integer",
             "units": "Seconds"
@@ -5846,7 +5846,7 @@
         "service_billing_frequency": {
             "default": 300,
             "group": "poller",
-            "section": "servicedaemon",
+            "section": "dispatcherservice",
             "order": 16,
             "type": "integer",
             "units": "Seconds"
@@ -5854,7 +5854,7 @@
         "service_billing_calculate_frequency": {
             "default": 60,
             "group": "poller",
-            "section": "servicedaemon",
+            "section": "dispatcherservice",
             "order": 17,
             "type": "integer",
             "units": "Seconds"
@@ -5862,7 +5862,7 @@
         "service_alerting_frequency": {
             "default": 60,
             "group": "poller",
-            "section": "servicedaemon",
+            "section": "dispatcherservice",
             "order": 19,
             "type": "integer",
             "units": "Seconds"
@@ -5870,7 +5870,7 @@
         "ping_rrd_step": {
             "default": 60,
             "group": "poller",
-            "section": "servicedaemon",
+            "section": "dispatcherservice",
             "order": 21,
             "type": "integer",
             "units": "Seconds"
@@ -5878,14 +5878,14 @@
         "service_update_enabled": {
             "default": true,
             "group": "poller",
-            "section": "servicedaemon",
+            "section": "dispatcherservice",
             "order": 22,
             "type": "boolean"
         },
         "service_update_frequency": {
             "default": 86400,
             "group": "poller",
-            "section": "servicedaemon",
+            "section": "dispatcherservice",
             "order": 23,
             "type": "integer",
             "units": "Seconds"
@@ -5893,7 +5893,7 @@
         "service_loglevel": {
             "default": "INFO",
             "group": "poller",
-            "section": "servicedaemon",
+            "section": "dispatcherservice",
             "order": 24,
             "type": "select",
             "options": {
@@ -5907,7 +5907,7 @@
         "service_master_timeout": {
             "default": 20,
             "group": "poller",
-            "section": "servicedaemon",
+            "section": "dispatcherservice",
             "order": 25,
             "type": "integer",
             "units": "seconds"
@@ -5915,7 +5915,7 @@
         "service_watchdog_enabled": {
             "default": false,
             "group": "poller",
-            "section": "servicedaemon",
+            "section": "dispatcherservice",
             "order": 26,
             "type": "boolean"
         },

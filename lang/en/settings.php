@@ -67,7 +67,7 @@ return [
             'prometheus' => ['name' => 'Datastore: Prometheus'],
             'rrdtool' => ['name' => 'Datastore: RRDTool'],
             'snmp' => ['name' => 'SNMP'],
-            'servicedaemon' => ['name' => 'Service Daemon'],
+            'dispatcherservice' => ['name' => 'Dispatcher Service'],
             'poller_modules' => ['name' => 'Poller Modules'],
         ],
         'system' => [

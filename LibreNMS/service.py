@@ -138,8 +138,8 @@ class ServiceConfig(DBConfig):
         # new options
         self.poller.enabled = (
             config.get("service_poller_enabled", True)
-            if config.get("schedule_type").get("poller", "unrestricted") == "legacy"
-            else config.get("schedule_type").get("poller", "unrestricted") == "service"
+            if config.get("schedule_type").get("poller", "unrestricted") == "unrestricted"
+            else config.get("schedule_type").get("poller", "unrestricted") == "dispatcherservice"
         )
         self.poller.workers = config.get(
             "service_poller_workers", ServiceConfig.poller.workers
@@ -149,8 +149,8 @@ class ServiceConfig(DBConfig):
         )
         self.discovery.enabled = (
             config.get("service_discovery_enabled", True)
-            if config.get("schedule_type").get("discovery", "unrestricted") == "legacy"
-            else config.get("schedule_type").get("discovery", "unrestricted") == "service"
+            if config.get("schedule_type").get("discovery", "unrestricted") == "unrestricted"
+            else config.get("schedule_type").get("discovery", "unrestricted") == "dispatcherservice"
         )
         self.discovery.workers = config.get(
             "service_discovery_workers", ServiceConfig.discovery.workers
@@ -160,8 +160,8 @@ class ServiceConfig(DBConfig):
         )
         self.services.enabled = (
             config.get("service_services_enabled", True)
-            if config.get("schedule_type").get("services", "unrestricted") == "legacy"
-            else config.get("schedule_type").get("services", "unrestricted") == "service"
+            if config.get("schedule_type").get("services", "unrestricted") == "unrestricted"
+            else config.get("schedule_type").get("services", "unrestricted") == "dispatcherservice"
         )
         self.services.workers = config.get(
             "service_services_workers", ServiceConfig.services.workers
@@ -171,8 +171,8 @@ class ServiceConfig(DBConfig):
         )
         self.billing.enabled = (
             config.get("service_billing_enabled", True)
-            if config.get("schedule_type").get("billing", "unrestricted") == "legacy"
-            else config.get("schedule_type").get("billing", "unrestricted") == "service"
+            if config.get("schedule_type").get("billing", "unrestricted") == "unrestricted"
+            else config.get("schedule_type").get("billing", "unrestricted") == "dispatcherservice"
         )
         self.billing.frequency = config.get(
             "service_billing_frequency", ServiceConfig.billing.frequency
@@ -182,16 +182,16 @@ class ServiceConfig(DBConfig):
         )
         self.alerting.enabled = (
             config.get("service_alerting_enabled", True)
-            if config.get("schedule_type").get("alerting", "unrestricted") == "legacy"
-            else config.get("schedule_type").get("alerting", "unrestricted") == "service"
+            if config.get("schedule_type").get("alerting", "unrestricted") == "unrestricted"
+            else config.get("schedule_type").get("alerting", "unrestricted") == "dispatcherservice"
         )
         self.alerting.frequency = config.get(
             "service_alerting_frequency", ServiceConfig.alerting.frequency
         )
         self.ping.enabled = (
             config.get("service_ping_enabled", False)
-            if config.get("schedule_type").get("ping", "unrestricted") == "legacy"
-            else config.get("schedule_type").get("ping", "unrestricted") == "service"
+            if config.get("schedule_type").get("ping", "unrestricted") == "unrestricted"
+            else config.get("schedule_type").get("ping", "unrestricted") == "dispatcherservice"
         )
         self.ping.frequency = config.get("ping_rrd_step", ServiceConfig.ping.frequency)
         self.down_retry = config.get(

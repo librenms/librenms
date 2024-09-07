@@ -122,9 +122,9 @@ the number of workers.
     lnms config:set service_poller_workers 24
     lnms config:set service_services_workers 8
     lnms config:set service_discovery_workers 16
-    lnms config:set schedule_type.poller service
-    lnms config:set schedule_type.services service
-    lnms config:set schedule_type.discovery service
+    lnms config:set schedule_type.poller dispatcherservice
+    lnms config:set schedule_type.services dispatcherservice
+    lnms config:set schedule_type.discovery dispatcherservice
     ```
 
 Optional Settings
@@ -134,8 +134,8 @@ Optional Settings
     lnms config:set service_poller_frequency 300
     lnms config:set service_services_frequency 300
     lnms config:set service_discovery_frequency 21600
-    lnms config:set schedule_type.alert service
-    lnms config:set schedule_type.billing service
+    lnms config:set schedule_type.alert dispatcherservice
+    lnms config:set schedule_type.billing dispatcherservice
     lnms config:set service_billing_frequency 300
     lnms config:set service_billing_calculate_frequency 60
     lnms config:set service_poller_down_retry 60
@@ -173,7 +173,7 @@ You can enable it by setting the following:
 
 !!! setting "poller/scheduledtasks"
     ```bash
-    lnms config:set schedule_type.ping service
+    lnms config:set schedule_type.ping dispatcherservice
     ```
 
 ## Watchdog

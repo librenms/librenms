@@ -211,7 +211,7 @@ The below values are not defaults or recommended.
 
 !!! setting "poller/scheduledtasks"
     ```bash
-    lnms config:set schedule_type.services service
+    lnms config:set schedule_type.services dispatcherservice
     ```
 
 !!! setting "poller/servicedaemon"
