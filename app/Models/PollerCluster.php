@@ -102,6 +102,15 @@ class PollerCluster extends Model
             $groups = PollerGroup::list();
         }
 
+        $scheduleType = \LibreNMS\Config::get('schedule_type');
+
+        $pollerGloballyEnabled = $scheduleType['poller'] == 'unrestricted' ? \LibreNMS\Config::get('service_poller_enabled', true) : $scheduleType['poller'] == 'dispatcher';
+        $discoveryGloballyEnabled = $scheduleType['discovery'] == 'unrestricted' ? \LibreNMS\Config::get('service_discovery_enabled', true) : $scheduleType['discovery'] == 'dispatcher';
+        $servicesGloballyEnabled = $scheduleType['services'] == 'unrestricted' ? \LibreNMS\Config::get('service_services_enabled', true) : $scheduleType['services'] == 'dispatcher';
+        $alertGloballyEnabled = $scheduleType['alert'] == 'unrestricted' ? \LibreNMS\Config::get('service_alerting_enabled', true) : $scheduleType['alert'] == 'dispatcher';
+        $billingGloballyEnabled = $scheduleType['billing'] == 'unrestricted' ? \LibreNMS\Config::get('service_billing_enabled', true) : $scheduleType['billing'] == 'dispatcher';
+        $pingGloballyEnabled = $scheduleType['ping'] == 'unrestricted' ? \LibreNMS\Config::get('service_ping_enabled', true) : $scheduleType['ping'] == 'dispatcher';
+
         return [
             [
                 'name' => 'poller_groups',
@@ -112,8 +121,8 @@ class PollerCluster extends Model
             ],
             [
                 'name' => 'poller_enabled',
-                'default' => \LibreNMS\Config::get('service_poller_enabled'),
-                'value' => (bool) ($this->poller_enabled ?? \LibreNMS\Config::get('service_poller_enabled')),
+                'default' => $pollerGloballyEnabled,
+                'value' => (bool) ($this->poller_enabled ?? $pollerGloballyEnabled),
                 'type' => 'boolean',
             ],
             [
@@ -140,8 +149,8 @@ class PollerCluster extends Model
             ],
             [
                 'name' => 'discovery_enabled',
-                'default' => \LibreNMS\Config::get('service_discovery_enabled'),
-                'value' => (bool) ($this->discovery_enabled ?? \LibreNMS\Config::get('service_discovery_enabled')),
+                'default' => $discoveryGloballyEnabled,
+                'value' => (bool) ($this->discovery_enabled ?? $discoveryGloballyEnabled),
                 'type' => 'boolean',
             ],
             [
@@ -161,8 +170,8 @@ class PollerCluster extends Model
             ],
             [
                 'name' => 'services_enabled',
-                'default' => \LibreNMS\Config::get('service_services_enabled'),
-                'value' => (bool) ($this->services_enabled ?? \LibreNMS\Config::get('service_services_enabled')),
+                'default' => $servicesGloballyEnabled,
+                'value' => (bool) ($this->services_enabled ?? $servicesGloballyEnabled),
                 'type' => 'boolean',
             ],
             [
@@ -182,8 +191,8 @@ class PollerCluster extends Model
             ],
             [
                 'name' => 'billing_enabled',
-                'default' => \LibreNMS\Config::get('service_billing_enabled'),
-                'value' => (bool) ($this->billing_enabled ?? \LibreNMS\Config::get('service_billing_enabled')),
+                'default' => $billingGloballyEnabled,
+                'value' => (bool) ($this->billing_enabled ?? $billingGloballyEnabled),
                 'type' => 'boolean',
             ],
             [
@@ -204,8 +213,8 @@ class PollerCluster extends Model
             ],
             [
                 'name' => 'alerting_enabled',
-                'default' => \LibreNMS\Config::get('service_alerting_enabled'),
-                'value' => (bool) ($this->alerting_enabled ?? \LibreNMS\Config::get('service_alerting_enabled')),
+                'default' => $alertGloballyEnabled,
+                'value' => (bool) ($this->alerting_enabled ?? $alertGloballyEnabled),
                 'type' => 'boolean',
             ],
             [
@@ -218,8 +227,8 @@ class PollerCluster extends Model
             ],
             [
                 'name' => 'ping_enabled',
-                'default' => \LibreNMS\Config::get('service_ping_enabled'),
-                'value' => (bool) ($this->ping_enabled ?? \LibreNMS\Config::get('service_ping_enabled')),
+                'default' => $pingGloballyEnabled,
+                'value' => (bool) ($this->ping_enabled ?? $pingGloballyEnabled),
                 'type' => 'boolean',
             ],
             [
