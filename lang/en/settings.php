@@ -1542,7 +1542,7 @@ return [
                 'help' => 'Billing task scheduling method. Legacy will use cron if the crontab entry exists and the dispatcher service if the legacy config option service_billing_enabled is set to true.',
                 'options' => [
                     'legacy' => 'Legacy (Unrestricted)',
-                    'cron' => 'Cron (alerts.php)',
+                    'cron' => 'Cron (poll-billing.php and billing-calculate.php)',
                     'dispatcher' => 'Dispatcher Service',
                 ],
             ],
