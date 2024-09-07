@@ -1528,25 +1528,61 @@ return [
             'help' => 'Anything over 1.5.5 supports all features LibreNMS uses, do not set higher than your installed version',
         ],
         'schedule_type' => [
+            'alerting' => [
+                'description' => 'Alerting',
+                'help' => 'Alerting task scheduling method. Legacy will use cron if the crontab entry exists and the dispatcher service if the legacy config option service_billing_enabled is set to true.',
+                'options' => [
+                    'legacy' => 'Legacy (Unrestricted)',
+                    'cron' => 'Cron (alerts.php)',
+                    'dispatcher' => 'Dispatcher Service',
+                ],
+            ],
             'billing' => [
                 'description' => 'Billing',
                 'help' => 'Billing task scheduling method. Legacy will use cron if the crontab entry exists and the dispatcher service if the legacy config option service_billing_enabled is set to true.',
+                'options' => [
+                    'legacy' => 'Legacy (Unrestricted)',
+                    'cron' => 'Cron (alerts.php)',
+                    'dispatcher' => 'Dispatcher Service',
+                ],
             ],
             'discovery' => [
                 'description' => 'Discovery',
                 'help' => 'Discovery task scheduling method. Legacy will use cron if the crontab entry exists and the dispatcher service if the legacy config option service_discovery_enabled is set to true.',
+                'options' => [
+                    'legacy' => 'Legacy (Unrestricted)',
+                    'cron' => 'Cron (discovery.php)',
+                    'dispatcher' => 'Dispatcher Service',
+                ],
             ],
             'ping' => [
                 'description' => 'Fast Ping',
                 'help' => 'Fast ping task scheduling method. Legacy will use cron if the crontab entry exists and use the dispatcher service if the legacy config option service_ping_enabled is set to true.',
+                'options' => [
+                    'legacy' => 'Legacy (Unrestricted)',
+                    'disabled' => 'Disabled (pings only during polling)',
+                    'cron' => 'Cron (ping.php)',
+                    'dispatcher' => 'Dispatcher Service',
+                ],
             ],
             'poller' => [
                 'description' => 'Poller',
                 'help' => 'Poller task scheduling method. Legacy will use cron if the crontab entry exists and the dispatcher service if the legacy config option service_poller_enabled is set to true.',
+                'options' => [
+                    'legacy' => 'Legacy (Unrestricted)',
+                    'cron' => 'Cron (poller.php)',
+                    'dispatcher' => 'Dispatcher Service',
+                    'scheduler' => 'LibreNMS Scheduler',
+                ],
             ],
             'services' => [
                 'description' => 'Services',
                 'help' => 'Services task scheduling method. Legacy will use cron if the crontab entry exists and the dispatcher service if the legacy config option service_services_enabled is set to true.',
+                'options' => [
+                    'legacy' => 'Legacy (Unrestricted)',
+                    'cron' => 'Cron (check-services.php)',
+                    'dispatcher' => 'Dispatcher Service',
+                ],
             ],
         ],
         'service_master_timeout' => [

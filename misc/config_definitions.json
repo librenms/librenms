@@ -5717,9 +5717,9 @@
             "section": "scheduledtasks",
             "order": 1,
             "options": {
-                "legacy": "Legacy (Unrestricted)",
-                "cron": "Cron",
-                "dispatcher": "Dispatcher Service"
+                "legacy": "legacy",
+                "cron": "cron",
+                "dispatcher": "dispatcher"
             }
         },
         "schedule_type.billing": {
@@ -5729,9 +5729,9 @@
             "order": 2,
             "type": "select",
             "options": {
-                "legacy": "Legacy (Unrestricted)",
-                "cron": "Cron",
-                "dispatcher": "Dispatcher Service"
+                "legacy": "legacy",
+                "cron": "cron",
+                "dispatcher": "dispatcher"
             }
         },
         "schedule_type.discovery": {
@@ -5741,9 +5741,9 @@
             "order": 3,
             "type": "select",
             "options": {
-                "legacy": "Legacy (Unrestricted)",
-                "cron": "Cron",
-                "dispatcher": "Dispatcher Service"
+                "legacy": "legacy",
+                "cron": "cron",
+                "dispatcher": "dispatcher"
             }
         },
         "schedule_type.ping": {
@@ -5753,10 +5753,10 @@
             "order": 4,
             "type": "select",
             "options": {
-                "legacy": "Legacy (Unrestricted)",
-                "disabled": "Disabled",
-                "cron": "Cron",
-                "dispatcher": "Dispatcher Service"
+                "legacy": "legacy",
+                "disabled": "disabled",
+                "cron": "cron",
+                "dispatcher": "dispatcher"
             }
         },
         "schedule_type.poller": {
@@ -5766,10 +5766,10 @@
             "order": 5,
             "type": "select",
             "options": {
-                "legacy": "Legacy (Unrestricted)",
-                "cron": "Cron",
-                "dispatcher": "Dispatcher Service",
-                "scheduler": "LibreNMS Scheduler"
+                "legacy": "legacy",
+                "cron": "cron",
+                "dispatcher": "dispatcher",
+                "scheduler": "scheduler"
             }
         },
         "schedule_type.services": {
@@ -5779,9 +5779,9 @@
             "order": 6,
             "type": "select",
             "options": {
-                "legacy": "Legacy (Unrestricted)",
-                "cron": "Cron",
-                "dispatcher": "Dispatcher Service"
+                "legacy": "legacy",
+                "cron": "cron",
+                "dispatcher": "dispatcher"
             }
         },
         "sensors.guess_limits": {
