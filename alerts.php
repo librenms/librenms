@@ -40,7 +40,7 @@ if (Debug::set(isset($options['d']))) {
 }
 
 $scheduler = Config::get('schedule_type.alerting');
-if (! isset($options['f']) && $scheduler != 'default' && $scheduler != 'cron') {
+if (! isset($options['f']) && $scheduler != 'unrestricted' && $scheduler != 'cron') {
     if (Debug::isEnabled()) {
         echo "Alerts are not enabled for cron scheduling.  Add the -f command argument if you want to force this command to run.\n";
     }

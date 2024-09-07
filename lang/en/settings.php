@@ -1530,23 +1530,23 @@ return [
         'schedule_type' => [
             'billing' => [
                 'description' => 'Billing',
-                'help' => 'Billing task sceduler. Default will use cron if the crontab entry exists and the service daemon if the legacy config option service_billing_enabled is set to true.',
+                'help' => 'Billing task sceduler. Unrestricted will use cron if the crontab entry exists and the service daemon if the legacy config option service_billing_enabled is set to true.',
             ],
             'discovery' => [
                 'description' => 'Discovery',
-                'help' => 'Discovery task sceduler. Default will use cron if the crontab entry exists and the service daemon if the legacy config option service_discovery_enabled is set to true.',
+                'help' => 'Discovery task sceduler. Unrestricted will use cron if the crontab entry exists and the service daemon if the legacy config option service_discovery_enabled is set to true.',
             ],
             'ping' => [
                 'description' => 'Fast Ping',
-                'help' => 'Fast ping task sceduler. Default will use the service daemon if the legacy config option service_ping_enabled is set to true.',
+                'help' => 'Fast ping task sceduler. Unrestricted will use the service daemon if the legacy config option service_ping_enabled is set to true.',
             ],
             'poller' => [
                 'description' => 'Poller',
-                'help' => 'Poller task sceduler. Default will use cron if the crontab entry exists and the service daemon if the legacy config option service_poller_enabled is set to true.',
+                'help' => 'Poller task sceduler. Unrestricted will use cron if the crontab entry exists and the service daemon if the legacy config option service_poller_enabled is set to true.',
             ],
             'services' => [
                 'description' => 'Services',
-                'help' => 'Services task sceduler. Default will use cron if the crontab entry exists and the service daemon if the legacy config option service_services_enabled is set to true.',
+                'help' => 'Services task sceduler. Unrestricted will use cron if the crontab entry exists and the service daemon if the legacy config option service_services_enabled is set to true.',
             ],
         ],
         'service_master_timeout' => [

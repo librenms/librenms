@@ -5711,74 +5711,74 @@
             "type": "text"
         },
         "schedule_type.alerting": {
-            "default": "default",
+            "default": "unrestricted",
             "type": "select",
             "group": "system",
             "section": "scheduledtasks",
             "order": 1,
             "options": {
-                "default": "Default",
+                "unrestricted": "Unrestricted",
                 "cron": "Cron",
                 "service": "Service Daemon"
             }
         },
         "schedule_type.billing": {
-            "default": "default",
+            "default": "unrestricted",
             "group": "system",
             "section": "scheduledtasks",
             "order": 2,
             "type": "select",
             "options": {
-                "default": "Default",
+                "unrestricted": "Unrestricted",
                 "cron": "Cron",
                 "service": "Service Daemon"
             }
         },
         "schedule_type.discovery": {
-            "default": "default",
+            "default": "unrestricted",
             "group": "system",
             "section": "scheduledtasks",
             "order": 3,
             "type": "select",
             "options": {
-                "default": "Default",
+                "unrestricted": "Unrestricted",
                 "cron": "Cron",
                 "service": "Service Daemon"
             }
         },
         "schedule_type.ping": {
-            "default": "default",
+            "default": "unrestricted",
             "group": "system",
             "section": "scheduledtasks",
             "order": 4,
             "type": "select",
             "options": {
-                "default": "Default",
+                "unrestricted": "Unrestricted",
                 "diabled": "Disabled",
                 "service": "Service Daemon"
             }
         },
         "schedule_type.poller": {
-            "default": "default",
+            "default": "unrestricted",
             "group": "system",
             "section": "scheduledtasks",
             "order": 5,
             "type": "select",
             "options": {
-                "default": "Default",
+                "unrestricted": "Unrestricted",
                 "cron": "Cron",
                 "service": "Service Daemon",
                 "schedule": "Laravel Schedule"
             }
         },
         "schedule_type.services": {
-            "default": "default",
+            "default": "unrestricted",
             "group": "system",
             "section": "scheduledtasks",
             "order": 6,
             "type": "select",
             "options": {
-                "default": "Default",
+                "unrestricted": "Unrestricted",
                 "cron": "Cron",
                 "service": "Service Daemon"
             }
