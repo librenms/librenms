@@ -5719,7 +5719,7 @@
             "options": {
                 "unrestricted": "Unrestricted",
                 "cron": "Cron",
-                "dispatcherservice": "Dispatcher Service"
+                "dispatcher": "Dispatcher Service"
             }
         },
         "schedule_type.billing": {
@@ -5731,7 +5731,7 @@
             "options": {
                 "unrestricted": "Unrestricted",
                 "cron": "Cron",
-                "dispatcherservice": "Dispatcher Service"
+                "dispatcher": "Dispatcher Service"
             }
         },
         "schedule_type.discovery": {
@@ -5743,7 +5743,7 @@
             "options": {
                 "unrestricted": "Unrestricted",
                 "cron": "Cron",
-                "dispatcherservice": "Dispatcher Service"
+                "dispatcher": "Dispatcher Service"
             }
         },
         "schedule_type.ping": {
@@ -5755,7 +5755,7 @@
             "options": {
                 "unrestricted": "Unrestricted",
                 "diabled": "Disabled",
-                "dispatcherservice": "Dispatcher Service"
+                "dispatcher": "Dispatcher Service"
             }
         },
         "schedule_type.poller": {
@@ -5767,8 +5767,8 @@
             "options": {
                 "unrestricted": "Unrestricted",
                 "cron": "Cron",
-                "dispatcherservice": "Dispatcher Service",
-                "schedule": "Laravel Schedule"
+                "dispatcher": "Dispatcher Service",
+                "scheduler": "LibreNMS Scheduler"
             }
         },
         "schedule_type.services": {
@@ -5780,7 +5780,7 @@
             "options": {
                 "unrestricted": "Unrestricted",
                 "cron": "Cron",
-                "dispatcherservice": "Dispatcher Service"
+                "dispatcher": "Dispatcher Service"
             }
         },
         "sensors.guess_limits": {
