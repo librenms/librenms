@@ -5754,7 +5754,8 @@
             "type": "select",
             "options": {
                 "legacy": "Legacy (Unrestricted)",
-                "diabled": "Disabled",
+                "disabled": "Disabled",
+                "cron": "Cron",
                 "dispatcher": "Dispatcher Service"
             }
         },
