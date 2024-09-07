@@ -117,7 +117,7 @@ Additional configuration settings can be set in your config.
 The defaults are shown here - it's recommended that you at least tune
 the number of workers.
 
-!!! setting "poller/distributed"
+!!! setting "poller/servicedaemon"
     ```bash
     lnms config:set service_poller_workers 24
     lnms config:set service_services_workers 8
@@ -129,7 +129,7 @@ the number of workers.
 
 Optional Settings
 
-!!! setting "poller/distributed"
+!!! setting "poller/servicedaemon"
     ```bash
     lnms config:set service_poller_frequency 300
     lnms config:set service_services_frequency 300
@@ -171,15 +171,10 @@ Maximum WS equals the number of workers multiplied with the number of seconds in
 The [fast ping](Fast-Ping-Check.md) scheduler is disabled by default.
 You can enable it by setting the following:
 
-```bash
-lnms config:set schedule_type.ping service
-```
-
-OR
-
-```php
-$config['schedule_type.ping'] = 'service';
-```
+!!! setting "poller/scheduledtasks"
+    ```bash
+    lnms config:set schedule_type.ping service
+    ```
 
 ## Watchdog
 
