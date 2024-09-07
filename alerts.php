@@ -39,7 +39,7 @@ if (Debug::set(isset($options['d']))) {
     echo "DEBUG!\n";
 }
 
-$scheduler = Config::get('schedule_type.alerting');
+$scheduler = \LibreNMS\Config::get('schedule_type.alerting');
 if (! isset($options['f']) && $scheduler != 'legacy' && $scheduler != 'cron') {
     if (Debug::isEnabled()) {
         echo "Alerts are not enabled for cron scheduling.  Add the -f command argument if you want to force this command to run.\n";
