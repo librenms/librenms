@@ -104,12 +104,12 @@ class PollerCluster extends Model
 
         $scheduleType = \LibreNMS\Config::get('schedule_type');
 
-        $pollerGloballyEnabled = $scheduleType['poller'] == 'unrestricted' ? \LibreNMS\Config::get('service_poller_enabled', true) : $scheduleType['poller'] == 'dispatcher';
-        $discoveryGloballyEnabled = $scheduleType['discovery'] == 'unrestricted' ? \LibreNMS\Config::get('service_discovery_enabled', true) : $scheduleType['discovery'] == 'dispatcher';
-        $servicesGloballyEnabled = $scheduleType['services'] == 'unrestricted' ? \LibreNMS\Config::get('service_services_enabled', true) : $scheduleType['services'] == 'dispatcher';
-        $alertGloballyEnabled = $scheduleType['alert'] == 'unrestricted' ? \LibreNMS\Config::get('service_alerting_enabled', true) : $scheduleType['alert'] == 'dispatcher';
-        $billingGloballyEnabled = $scheduleType['billing'] == 'unrestricted' ? \LibreNMS\Config::get('service_billing_enabled', true) : $scheduleType['billing'] == 'dispatcher';
-        $pingGloballyEnabled = $scheduleType['ping'] == 'unrestricted' ? \LibreNMS\Config::get('service_ping_enabled', true) : $scheduleType['ping'] == 'dispatcher';
+        $pollerGloballyEnabled = $scheduleType['poller'] == 'legacy' ? \LibreNMS\Config::get('service_poller_enabled', true) : $scheduleType['poller'] == 'dispatcher';
+        $discoveryGloballyEnabled = $scheduleType['discovery'] == 'legacy' ? \LibreNMS\Config::get('service_discovery_enabled', true) : $scheduleType['discovery'] == 'dispatcher';
+        $servicesGloballyEnabled = $scheduleType['services'] == 'legacy' ? \LibreNMS\Config::get('service_services_enabled', true) : $scheduleType['services'] == 'dispatcher';
+        $alertGloballyEnabled = $scheduleType['alert'] == 'legacy' ? \LibreNMS\Config::get('service_alerting_enabled', true) : $scheduleType['alert'] == 'dispatcher';
+        $billingGloballyEnabled = $scheduleType['billing'] == 'legacy' ? \LibreNMS\Config::get('service_billing_enabled', true) : $scheduleType['billing'] == 'dispatcher';
+        $pingGloballyEnabled = $scheduleType['ping'] == 'legacy' ? \LibreNMS\Config::get('service_ping_enabled', true) : $scheduleType['ping'] == 'dispatcher';
 
         return [
             [

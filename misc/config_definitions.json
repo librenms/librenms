@@ -5711,74 +5711,74 @@
             "type": "text"
         },
         "schedule_type.alerting": {
-            "default": "unrestricted",
+            "default": "legacy",
             "type": "select",
             "group": "system",
             "section": "scheduledtasks",
             "order": 1,
             "options": {
-                "unrestricted": "Unrestricted",
+                "legacy": "Legacy (Unrestricted)",
                 "cron": "Cron",
                 "dispatcher": "Dispatcher Service"
             }
         },
         "schedule_type.billing": {
-            "default": "unrestricted",
+            "default": "legacy",
             "group": "system",
             "section": "scheduledtasks",
             "order": 2,
             "type": "select",
             "options": {
-                "unrestricted": "Unrestricted",
+                "legacy": "Legacy (Unrestricted)",
                 "cron": "Cron",
                 "dispatcher": "Dispatcher Service"
             }
         },
         "schedule_type.discovery": {
-            "default": "unrestricted",
+            "default": "legacy",
             "group": "system",
             "section": "scheduledtasks",
             "order": 3,
             "type": "select",
             "options": {
-                "unrestricted": "Unrestricted",
+                "legacy": "Legacy (Unrestricted)",
                 "cron": "Cron",
                 "dispatcher": "Dispatcher Service"
             }
         },
         "schedule_type.ping": {
-            "default": "unrestricted",
+            "default": "legacy",
             "group": "system",
             "section": "scheduledtasks",
             "order": 4,
             "type": "select",
             "options": {
-                "unrestricted": "Unrestricted",
+                "legacy": "Legacy (Unrestricted)",
                 "diabled": "Disabled",
                 "dispatcher": "Dispatcher Service"
             }
         },
         "schedule_type.poller": {
-            "default": "unrestricted",
+            "default": "legacy",
             "group": "system",
             "section": "scheduledtasks",
             "order": 5,
             "type": "select",
             "options": {
-                "unrestricted": "Unrestricted",
+                "legacy": "Legacy (Unrestricted)",
                 "cron": "Cron",
                 "dispatcher": "Dispatcher Service",
                 "scheduler": "LibreNMS Scheduler"
             }
         },
         "schedule_type.services": {
-            "default": "unrestricted",
+            "default": "legacy",
             "group": "system",
             "section": "scheduledtasks",
             "order": 6,
             "type": "select",
             "options": {
-                "unrestricted": "Unrestricted",
+                "legacy": "Legacy (Unrestricted)",
                 "cron": "Cron",
                 "dispatcher": "Dispatcher Service"
             }

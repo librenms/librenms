@@ -49,7 +49,7 @@ if (isset($options['h'])) {
     }
 } else {
     $scheduler = Config::get('schedule_type.services');
-    if ($scheduler != 'unrestricted' && $scheduler != 'cron') {
+    if ($scheduler != 'legacy' && $scheduler != 'cron') {
         if (Debug::isEnabled()) {
             echo "Services are not enabled for cron scheduling\n";
         }
