@@ -31,10 +31,7 @@ class DispatchPollJobs implements ShouldQueue
         public int|null $find_time = null,
     ) {
         $this->find_time ??= Config::get('service_poller_frequency', Config::get('rrd.step', 300)) - 1;
-
-        //$this->enabled ??= Config::get('polling_method') == 'scheduler';
-        // Temporary until the config option above exists
-        $this->enabled ??= ! Config::get('service_poller_enabled');
+        $this->enabled ??= Config::get('schedule_type.poller') == 'scheduler';
     }
 
     /**
