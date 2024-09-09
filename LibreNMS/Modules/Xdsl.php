@@ -101,13 +101,20 @@ class Xdsl implements Module
         }
     }
 
+    public function dataExists(Device $device): bool
+    {
+        return $device->portsAdsl()->exists() || $device->portsVdsl()->exists();
+    }
+
     /**
      * @inheritDoc
      */
-    public function cleanup(Device $device): void
+    public function cleanup(Device $device): int
     {
-        $device->portsAdsl()->delete();
-        $device->portsVdsl()->delete();
+        $deleted = $device->portsAdsl()->delete();
+        $deleted += $device->portsVdsl()->delete();
+
+        return $deleted;
     }
 
     /**

@@ -58,12 +58,17 @@ class EntityPhysical implements Module
         // no polling
     }
 
+    public function dataExists(Device $device): bool
+    {
+        return $device->entityPhysical()->exists();
+    }
+
     /**
      * @inheritDoc
      */
-    public function cleanup(Device $device): void
+    public function cleanup(Device $device): int
     {
-        $device->entityPhysical()->delete();
+        return $device->entityPhysical()->delete();
     }
 
     /**

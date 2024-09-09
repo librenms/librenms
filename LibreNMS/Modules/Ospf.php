@@ -243,15 +243,25 @@ class Ospf implements Module
         }
     }
 
+    public function dataExists(Device $device): bool
+    {
+        return $device->ospfPorts()->exists()
+            || $device->ospfNbrs()->exists()
+            || $device->ospfAreas()->exists()
+            || $device->ospfInstances()->exists();
+    }
+
     /**
      * @inheritDoc
      */
-    public function cleanup(Device $device): void
+    public function cleanup(Device $device): int
     {
-        $device->ospfPorts()->delete();
-        $device->ospfNbrs()->delete();
-        $device->ospfAreas()->delete();
-        $device->ospfInstances()->delete();
+        $deleted = $device->ospfPorts()->delete();
+        $deleted += $device->ospfNbrs()->delete();
+        $deleted += $device->ospfAreas()->delete();
+        $deleted += $device->ospfInstances()->delete();
+
+        return $deleted;
     }
 
     /**

@@ -227,12 +227,17 @@ class Netstats implements Module
         }
     }
 
+    public function dataExists(Device $device): bool
+    {
+        return false; // no database data
+    }
+
     /**
      * @inheritDoc
      */
-    public function cleanup(Device $device): void
+    public function cleanup(Device $device): int
     {
-        // no cleanup
+        return 0; // no cleanup
     }
 
     /**

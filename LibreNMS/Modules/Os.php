@@ -109,12 +109,17 @@ class Os implements Module
         $this->handleChanges($os);
     }
 
+    public function dataExists(Device $device): bool
+    {
+        return false; // data part of device
+    }
+
     /**
      * @inheritDoc
      */
-    public function cleanup(Device $device): void
+    public function cleanup(Device $device): int
     {
-        // no cleanup needed
+        return 0; // no cleanup needed
     }
 
     /**
