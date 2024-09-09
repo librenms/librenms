@@ -87,7 +87,7 @@ foreach ($tables as $tablevalue) {
             ],
             'cswRingRedundant' => [
                 ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'true'],
-                ['value' => 2, 'generic' => 2, 'graph' => 0, 'descr' => 'false'],
+                ['value' => 2, 'generic' => 1, 'graph' => 0, 'descr' => 'false'],
             ],
             'cswSwitchRole' => [
                 ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'master'],
