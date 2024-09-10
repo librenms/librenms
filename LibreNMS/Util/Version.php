@@ -25,9 +25,9 @@
 
 namespace LibreNMS\Util;
 
-use App\ConfigRepository;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
+use LibreNMS\Config;
 use LibreNMS\DB\Eloquent;
 use Symfony\Component\Process\Process;
 
@@ -38,22 +38,20 @@ class Version
 
     /** @var Git convenience instance */
     public $git;
-    private ConfigRepository $config;
 
-    public function __construct(ConfigRepository $config)
+    public function __construct()
     {
-        $this->config = $config;
         $this->git = Git::make();
     }
 
     public static function get(): Version
     {
-        return new static(app('librenms-config'));
+        return new static;
     }
 
     public function release(): string
     {
-        return $this->config->get('update_channel') == 'master' ? 'master' : self::VERSION;
+        return Config::get('update_channel') == 'master' ? 'master' : self::VERSION;
     }
 
     public function date(string $format = 'c'): string
@@ -137,7 +135,7 @@ class Version
 
     public function rrdtool(): string
     {
-        $process = new Process([$this->config->get('rrdtool', 'rrdtool'), '--version']);
+        $process = new Process([Config::get('rrdtool', 'rrdtool'), '--version']);
         $process->run();
         preg_match('/^RRDtool ([\w.]+) /', $process->getOutput(), $matches);
 
@@ -146,7 +144,7 @@ class Version
 
     public function netSnmp(): string
     {
-        $process = new Process([$this->config->get('snmpget', 'snmpget'), '-V']);
+        $process = new Process([Config::get('snmpget', 'snmpget'), '-V']);
 
         $process->run();
         preg_match('/[\w.]+$/', $process->getErrorOutput(), $matches);

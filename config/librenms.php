@@ -53,13 +53,4 @@
 
      'node_id' => env('NODE_ID'),
 
-     /*
-     |--------------------------------------------------------------------------
-     | Config Cache TTL
-     |--------------------------------------------------------------------------
-     |
-     | Amount of seconds to allow the config to be cached.  0 means no cache.
-     */
-
-     'config_cache_ttl' => env('CONFIG_CACHE_TTL', 0),
  ];
