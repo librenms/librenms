@@ -40,7 +40,7 @@ class LibrenmsConfig extends Facade
         App::forgetInstance('librenms-config'); // clear singleton
         self::clearResolvedInstances(); // clear facade resolved instances cache
     }
-    
+
     public static function populateLegacyDbCredentials()
     {
         $db = config('database.default');
