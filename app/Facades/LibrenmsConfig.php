@@ -40,4 +40,16 @@ class LibrenmsConfig extends Facade
         App::forgetInstance('librenms-config'); // clear singleton
         self::clearResolvedInstances(); // clear facade resolved instances cache
     }
+    
+    public static function populateLegacyDbCredentials()
+    {
+        $db = config('database.default');
+
+        self::set('db_host', config("database.connections.$db.host", 'localhost'));
+        self::set('db_name', config("database.connections.$db.database", 'librenms'));
+        self::set('db_user', config("database.connections.$db.username", 'librenms'));
+        self::set('db_pass', config("database.connections.$db.password"));
+        self::set('db_port', config("database.connections.$db.port", 3306));
+        self::set('db_socket', config("database.connections.$db.unix_socket"));
+    }
 }
