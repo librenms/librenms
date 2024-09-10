@@ -21,6 +21,11 @@ class Kafka extends BaseDatastore
         return Config::get('kafka.enable', false);
     }
 
+    public static function getKafkaFlushTimeout()
+    {
+        return Config::get('kafka.flush.timeout', 50);
+    }
+
     /**
      * Datastore-independent function which should be used for all polled metrics.
      *
@@ -59,13 +64,14 @@ class Kafka extends BaseDatastore
 
             // start
             $stat = Measurement::start('write');
+
             $tmp_fields = [];
-            $tmp_tags['hostname'] = $device['hostname'];
+
             foreach ($tags as $k => $v) {
                 if (empty($v)) {
                     $v = '_blank_';
                 }
-                $tmp_tags[$k] = $v;
+                $tmp_fields[$k] = $v;
             }
             foreach ($fields as $k => $v) {
                 if ($k == 'time') {
@@ -83,33 +89,25 @@ class Kafka extends BaseDatastore
                 return;
             }
 
+            $tmp_fields['hostname'] = $device['hostname'];
+            $tmp_fields['measurement'] = $measurement;
+
             if (Config::get('kafka.debug') === true) {
                 Log::debug('Kafka data: ', [
                     'measurement' => $measurement,
-                    'tags' => $tmp_tags,
                     'fields' => $tmp_fields,
                 ]);
             }
 
-            // summary data
-            $data['device'] = $device_data;
-            $data['fields'] = $tmp_fields;
-            $data['tags'] = $tmp_tags;
-            $data['measurement'] = $measurement;
-
             // end
             $this->recordStatistic($stat->end());
 
-            $dataArr = json_encode($data);
+            $dataArr = json_encode($tmp_fields);
             $topic->produce(RD_KAFKA_PARTITION_UA, 0, $dataArr);
             $producer->poll(0);
 
-            for ($flushRetries = 0; $flushRetries < 10; $flushRetries++) {
-                $result = $producer->flush(10000);
-                if (RD_KAFKA_RESP_ERR_NO_ERROR === $result) {
-                    break;
-                }
-            }
+            // flush remaining message in the queue
+            $result = $producer->flush(self::getKafkaFlushTimeout());
 
             if (RD_KAFKA_RESP_ERR_NO_ERROR !== $result) {
                 Log::warning('KAFKA: Was unable to flush, messages might be lost!');
@@ -146,14 +144,31 @@ class Kafka extends BaseDatastore
         $conf->set('bootstrap.servers', Config::get('kafka.broker.list', 'kafka:9092'));
         $conf->set('enable.idempotence', Config::get('kafka.idempotence', 'false'));
 
+        // check if debug for ssl was set and enable it
+        $confKafkaSSLDebug = Config::get('kafka.security.debug', null);
+        $confKafkaSSLDebug != null || strlen($confKafkaSSLDebug) !== 0 ? $conf->set('debug', $confKafkaSSLDebug) : null;
+
         // config ssl
         $isSslEnabled = Config::get('kafka.ssl.enable', false);
         if ($isSslEnabled) {
             $conf->set('security.protocol', Config::get('kafka.ssl.protocol', 'ssl'));
-            $conf->set('ssl.ca.location', Config::get('kafka.ssl.ca.location', '/etc/kafka/secrets/ca-cert'));
-            $conf->set('ssl.certificate.location', Config::get('kafka.ssl.certificate.location', '/etc/kafka/secrets/cert.pem'));
-            $conf->set('ssl.key.location', Config::get('kafka.ssl.key.location', '/etc/kafka/secrets/cert.key'));
-            $conf->set('ssl.key.password', Config::get('kafka.ssl.key.password', 'datahub'));
+            $conf->set('ssl.endpoint.identification.algorithm', 'none');
+
+            // prepare all necessary librenms kafka config with associated rdkafka key
+            $kafkaSSLConfigs = [
+                'kafka.ssl.keystore.location' => 'ssl.keystore.location',
+                'kafka.ssl.keystore.password' => 'ssl.keystore.password',
+                'kafka.ssl.ca.location' => 'ssl.ca.location',
+                'kafka.ssl.certificate.location' => 'ssl.certificate.location',
+                'kafka.ssl.key.location' => 'ssl.key.location',
+                'kafka.ssl.key.password' => 'ssl.key.password',
+            ];
+
+            // fetch kafka config values, if exists, associate its value to rdkafka key
+            foreach ($kafkaSSLConfigs as $configKey => $kafkaKey) {
+                $configValue = Config::get($configKey, null);
+                $configValue != null || strlen($configValue) !== 0 ? $conf->set($kafkaKey, $configValue) : null;
+            }
         }
 
         return new Producer($conf);
@@ -161,7 +176,7 @@ class Kafka extends BaseDatastore
 
     public static function getTopicName()
     {
-        return Config::get('kafka.topic', 'netmetrix');
+        return Config::get('kafka.topic', 'librenms');
     }
 
     /**

@@ -4361,68 +4361,96 @@
             "section": "kafka",
             "order": 2
         },
+        "kafka.security.debug": {
+            "default": "",
+            "type": "text",
+            "group": "poller",
+            "section": "kafka",
+            "order": 3
+        },
         "kafka.broker.list": {
             "default": "localhost:9092",
             "type": "text",
             "group": "poller",
             "section": "kafka",
-            "order": 3
+            "order": 4
         },
         "kafka.idempotence": {
             "default": false,
             "type": "boolean",
             "group": "poller",
             "section": "kafka",
-            "order": 4
+            "order": 5
         },
         "kafka.topic": {
-            "default": "netmetrix",
+            "default": "librenms",
             "type": "text",
             "group": "poller",
             "section": "kafka",
-            "order": 5
+            "order": 6
         },
         "kafka.ssl.enable": {
             "default": false,
             "type": "boolean",
             "group": "poller",
             "section": "kafka",
-            "order": 6
+            "order": 7
         },
         "kafka.ssl.protocol": {
             "default": "ssl",
             "type": "text",
             "group": "poller",
             "section": "kafka",
-            "order": 7
-        },
-        "kafka.ssl.ca.location": {
-            "default": "/etc/kafka/secrets/ca-cert",
-            "type": "text",
-            "group": "poller",
-            "section": "kafka",
             "order": 8
         },
-        "kafka.ssl.certificate.location": {
-            "default": "/etc/kafka/secrets/cert.pem",
+        "kafka.ssl.ca.location": {
+            "default": "",
             "type": "text",
             "group": "poller",
             "section": "kafka",
             "order": 9
         },
-        "kafka.ssl.key.location": {
-            "default": "/etc/kafka/secrets/cert.key",
+        "kafka.ssl.certificate.location": {
+            "default": "",
             "type": "text",
             "group": "poller",
             "section": "kafka",
             "order": 10
         },
-        "kafka.ssl.key.password": {
-            "default": "datahub",
+        "kafka.ssl.key.location": {
+            "default": "",
             "type": "text",
             "group": "poller",
             "section": "kafka",
             "order": 11
+        },
+        "kafka.ssl.key.password": {
+            "default": "",
+            "type": "text",
+            "group": "poller",
+            "section": "kafka",
+            "order": 12
+        },
+        "kafka.ssl.keystore.location": {
+            "default": "",
+            "type": "text",
+            "group": "poller",
+            "section": "kafka",
+            "order": 13
+        },
+        "kafka.ssl.keystore.password": {
+            "default": "",
+            "type": "text",
+            "group": "poller",
+            "section": "kafka",
+            "order": 14
+        },
+        "kafka.flush.timeout": {
+            "default": 50,
+            "type": "integer",
+            "group": "poller",
+            "section": "kafka",
+            "order": 15
         },
         "install_dir": {
             "type": "directory"

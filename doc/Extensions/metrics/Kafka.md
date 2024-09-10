@@ -34,6 +34,7 @@ continue to function as normal.
 ```bash
 lnms config:set kafka.enable true
 lnms config:set kafka.debug false
+lnms config:set kafka.security.debug 'security'
 lnms config:set kafka.broker.list 'kafka:9092'
 lnms config:set kafka.idempotence true
 lnms config:set kafka.topic 'librenms'
@@ -43,8 +44,13 @@ lnms config:set kafka.ssl.protocol 'ssl'
 lnms config:set kafka.ssl.ca.location '/etc/kafka/secrets/ca-cert'
 lnms config:set kafka.ssl.certificate.location '/etc/kafka/secrets/cert.pem'
 lnms config:set kafka.ssl.key.location '/etc/kafka/secrets/cert.key'
-lnms config:set kafka.ssl.key.password 'datahub'
+lnms config:set kafka.ssl.key.password 'pass'
+lnms config:set kafka.ssl.keystore.location '/etc/kafka/secrets/keystore.jks'
+lnms config:set kafka.ssl.keystore.password 'pass'
+lnms config:set kafka.flush.timeout 50
 ```
+
+For more information about the configuration, please consult https://github.com/confluentinc/librdkafka/blob/master/CONFIGURATION.md
 
 The same data stored within rrd will be sent to Kafka and
 recorded. You can then create graphs within Grafana or Kafka to display the
