@@ -100,12 +100,17 @@ class Availability implements Module
         $os->getDevice()->availability()->whereNotIn('availability_id', $valid_ids)->delete();
     }
 
+    public function dataExists(Device $device): bool
+    {
+        return $device->availability()->exists();
+    }
+
     /**
      * @inheritDoc
      */
-    public function cleanup(Device $device): void
+    public function cleanup(Device $device): int
     {
-        $device->availability()->delete();
+        return $device->availability()->delete();
     }
 
     /**

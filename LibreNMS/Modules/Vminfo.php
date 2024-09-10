@@ -64,7 +64,6 @@ class Vminfo implements \LibreNMS\Interfaces\Module
             ModuleModelObserver::observe(\App\Models\Vminfo::class);
             $this->syncModels($os->getDevice(), 'vminfo', $vms);
         }
-        echo PHP_EOL;
     }
 
     public function shouldPoll(OS $os, ModuleStatus $status): bool
@@ -94,12 +93,17 @@ class Vminfo implements \LibreNMS\Interfaces\Module
         $this->discover($os);
     }
 
+    public function dataExists(Device $device): bool
+    {
+        return $device->vminfo()->exists();
+    }
+
     /**
      * @inheritDoc
      */
-    public function cleanup(Device $device): void
+    public function cleanup(Device $device): int
     {
-        $device->vminfo()->delete();
+        return $device->vminfo()->delete();
     }
 
     /**

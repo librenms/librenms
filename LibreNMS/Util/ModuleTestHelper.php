@@ -26,6 +26,7 @@
 namespace LibreNMS\Util;
 
 use App\Actions\Device\ValidateDeviceAndCreate;
+use App\Jobs\PollDevice;
 use App\Models\Device;
 use DeviceCache;
 use Illuminate\Database\Eloquent\Model;
@@ -35,7 +36,6 @@ use LibreNMS\Config;
 use LibreNMS\Data\Source\SnmpResponse;
 use LibreNMS\Exceptions\FileNotFoundException;
 use LibreNMS\Exceptions\InvalidModuleException;
-use LibreNMS\Poller;
 
 class ModuleTestHelper
 {
@@ -179,8 +179,7 @@ class ModuleTestHelper
         Debug::set();
         Debug::setVerbose();
         discover_device($device, $this->parseArgs('discovery'));
-        $poller = app(Poller::class, ['device_spec' => $device_id, 'module_override' => $this->modules]);
-        $poller->poll();
+        (new PollDevice($device_id, $this->modules))->handle();
         Debug::set($save_debug);
         Debug::setVerbose($save_vdebug);
         $collection_output = ob_get_contents();
@@ -313,7 +312,7 @@ class ModuleTestHelper
      * Probably needs to be more robust
      *
      * @param  array  $modules
-     * @return array
+     * @return array<string, bool|string[]>
      *
      * @throws InvalidModuleException
      */
@@ -321,17 +320,22 @@ class ModuleTestHelper
     {
         // generate a full list of modules
         $full_list = [];
-        foreach ($modules as $module) {
+        foreach ($modules as $index => $module) {
+            $module = is_string($index) ? $index : $module;
+
             // only allow valid modules
-            if (! (Config::has("poller_modules.$module") || Config::has("discovery_modules.$module"))) {
+            if (! Module::exists($module)) {
                 throw new InvalidModuleException("Invalid module name: $module");
             }
 
-            $full_list = array_merge($full_list, Module::fromName($module)->dependencies());
-            $full_list[] = $module;
+            foreach (Module::fromName($module)->dependencies() as $dependency) {
+                $full_list[$dependency] = true;
+            }
+
+            $full_list[$module] = true;
         }
 
-        return array_unique($full_list);
+        return $full_list;
     }
 
     private function parseArgs($type)
@@ -340,7 +344,7 @@ class ModuleTestHelper
             return false;
         }
 
-        return parse_modules($type, ['m' => implode(',', $this->modules)]);
+        return parse_modules($type, ['m' => implode(',', array_keys($this->modules))]);
     }
 
     private function qPrint($var)
@@ -569,7 +573,7 @@ class ModuleTestHelper
         try {
             $new_device = new Device([
                 'hostname' => $snmpsim->ip,
-                'version' => 'v2c',
+                'snmpver' => 'v2c',
                 'community' => $this->file_name,
                 'port' => $snmpsim->port,
                 'disabled' => 1, // disable to block normal pollers
@@ -628,8 +632,7 @@ class ModuleTestHelper
         ob_start();
 
         \Log::setDefaultDriver('console');
-        $poller = app(Poller::class, ['device_spec' => $device_id, 'module_override' => $this->modules]);
-        $poller->poll();
+        (new PollDevice($device_id, $this->modules))->handle();
 
         $this->poller_output = ob_get_contents();
         if ($this->quiet) {

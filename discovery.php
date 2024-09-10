@@ -105,6 +105,7 @@ global $device;
 foreach (dbFetchRows("SELECT * FROM `devices` WHERE disabled = 0 $where ORDER BY device_id DESC", $sqlparams) as $device) {
     $device_start = microtime(true);
     DeviceCache::setPrimary($device['device_id']);
+    App::forgetInstance('sensor-discovery');
 
     if (discover_device($device, $module_override)) {
         $discovered_devices++;

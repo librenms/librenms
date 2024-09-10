@@ -52,7 +52,7 @@ if ($device['os'] === 'boss') {
                 $descr = "BOSS Unit $unit: $entry[s5ChasComDescr]";
             }
             //Discover Sensors
-            discover_sensor($valid['sensor'], 'state', $device, $cur_oid . $index, "s5ChasComOperState.$index", $state_name, $descr, 1, 1, null, null, null, null, $entry['s5ChasComOperState']);
+            discover_sensor(null, 'state', $device, $cur_oid . $index, "s5ChasComOperState.$index", $state_name, $descr, 1, 1, null, null, null, null, $entry['s5ChasComOperState']);
             //Create Sensor To State Index
             create_sensor_to_state_index($device, $state_name, "s5ChasComOperState.$index");
             $temp_unit = $unit;

@@ -30,4 +30,4 @@ device neighbour page, or building device groups and using the device
 group maps will be more usable on large networks.
 
 ## Settings
-The map display can be configured by altering the [VisJS-Config.md](Vis JS Options)
+The map display can be configured by altering the [Vis JS Options](VisJS-Config.md)

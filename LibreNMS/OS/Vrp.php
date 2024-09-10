@@ -35,6 +35,7 @@ use App\Observers\ModuleModelObserver;
 use Carbon\Carbon;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use LibreNMS\DB\SyncsModels;
 use LibreNMS\Device\Processor;
@@ -398,15 +399,15 @@ class Vrp extends OS implements
                     'port_id' => $ifName_map->get($portAuthSessionEntryParameters['hwAccessInterface'] ?? null, 0),
                     'mac_address' => $mac_address,
                     'auth_id' => $authId,
-                    'domain' => $portAuthSessionEntryParameters['hwAccessDomain'] ?? null,
+                    'domain' => $portAuthSessionEntryParameters['hwAccessDomain'] ?? '',
                     'username' => $portAuthSessionEntryParameters['hwAccessUserName'] ?? '',
-                    'ip_address' => $portAuthSessionEntryParameters['hwAccessIPAddress'] ?? null,
+                    'ip_address' => $portAuthSessionEntryParameters['hwAccessIPAddress'] ?? '',
                     'authz_by' => $portAuthSessionEntryParameters['hwAccessType'] ?? '',
                     'authz_status' => $portAuthSessionEntryParameters['hwAccessAuthorizetype'] ?? '',
                     'host_mode' => $portAuthSessionEntryParameters['hwAccessAuthType'] ?? 'default',
-                    'timeout' => $portAuthSessionEntryParameters['hwAccessSessionTimeout'] ?? null,
+                    'timeout' => $portAuthSessionEntryParameters['hwAccessSessionTimeout'] ?? '',
                     'time_elapsed' => $portAuthSessionEntryParameters['hwAccessOnlineTime'] ?? null,
-                    'authc_status' => $portAuthSessionEntryParameters['hwAccessCurAuthenPlace'] ?? null,
+                    'authc_status' => $portAuthSessionEntryParameters['hwAccessCurAuthenPlace'] ?? '',
                     'method' => $portAuthSessionEntryParameters['hwAccessAuthtype'] ?? '',
                     'vlan' => $portAuthSessionEntryParameters['hwAccessVLANID'] ?? null,
                 ]));
@@ -564,7 +565,7 @@ class Vrp extends OS implements
 
             $sla->rtt = ($data[$owner][$test]['pingResultsAverageRtt'] ?? 0) / $divisor;
             $time = Carbon::parse($data[$owner][$test]['pingResultsLastGoodProbe'] ?? null)->toDateTimeString();
-            echo 'SLA : ' . $rtt_type . ' ' . $owner . ' ' . $test . '... ' . $sla->rtt . 'ms at ' . $time . "\n";
+            Log::info('SLA : ' . $rtt_type . ' ' . $owner . ' ' . $test . '... ' . $sla->rtt . 'ms at ' . $time);
 
             $collected = ['rtt' => $sla->rtt];
 

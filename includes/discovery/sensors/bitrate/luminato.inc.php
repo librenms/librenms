@@ -67,7 +67,7 @@ if (is_array($pre_cache['transfer'])) {
                 $limitwarn = $defrate * 0.8; //80%
                 $lowlimit = 0;
                 $lowwarnlimit = $defrate * 0.1; //10%
-                discover_sensor($valid['sensor'], 'bitrate', $device, $oid, $key, $type, $descr, $divisor, 1, $lowlimit, $lowwarnlimit, $limitwarn, $limit, $value, 'snmp', null, null, null, $group);
+                discover_sensor(null, 'bitrate', $device, $oid, $key, $type, $descr, $divisor, 1, $lowlimit, $lowwarnlimit, $limitwarn, $limit, $value, 'snmp', null, null, null, $group);
             }
         }
     }

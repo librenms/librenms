@@ -50,8 +50,6 @@ class Linux extends Shared\Unix implements VminfoDiscovery
             return $vms;
         }
 
-        echo PHP_EOL;
-
         return $this->discoverVmwareVminfo();
     }
 

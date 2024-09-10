@@ -101,12 +101,17 @@ class PortsStack implements Module
         // no polling
     }
 
+    public function dataExists(Device $device): bool
+    {
+        return $device->portsStack()->exists();
+    }
+
     /**
      * @inheritDoc
      */
-    public function cleanup(Device $device): void
+    public function cleanup(Device $device): int
     {
-        $device->portsStack()->delete();
+        return $device->portsStack()->delete();
     }
 
     /**

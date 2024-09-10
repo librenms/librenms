@@ -5,13 +5,35 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use LibreNMS\Interfaces\Models\Keyable;
 
-class Sensor extends DeviceRelatedModel
+class Sensor extends DeviceRelatedModel implements Keyable
 {
     use HasFactory;
 
     public $timestamps = false;
     protected $primaryKey = 'sensor_id';
+    protected $fillable = [
+        'poller_type',
+        'sensor_class',
+        'device_id',
+        'sensor_oid',
+        'sensor_index',
+        'sensor_type',
+        'sensor_descr',
+        'sensor_divisor',
+        'sensor_multiplier',
+        'sensor_limit',
+        'sensor_limit_warn',
+        'sensor_limit_low',
+        'sensor_limit_low_warn',
+        'sensor_current',
+        'entPhysicalIndex',
+        'entPhysicalIndex_measured',
+        'user_func',
+        'group',
+        'rrd_type',
+    ];
     protected static $icons = [
         'airflow' => 'angle-double-right',
         'ber' => 'sort-amount-desc',
@@ -75,6 +97,32 @@ class Sensor extends DeviceRelatedModel
         return self::$icons;
     }
 
+    public function guessLimits(): void
+    {
+        $this->sensor_limit = match ($this->sensor_class) {
+            'temperature' => $this->sensor_current - 10,
+            'voltage' => $this->sensor_current * 0.85,
+            'humidity' => 30,
+            'fanspeed' => $this->sensor_current * 0.80,
+            'power_factor' => -1,
+            'signal' => -80,
+            'airflow', 'snr', 'frequency', 'pressure', 'cooling' => $this->sensor_current * 0.95,
+            default => null,
+        };
+
+        $this->sensor_limit_low = match ($this->sensor_class) {
+            'temperature' => $this->sensor_current + 20,
+            'voltage' => $this->sensor_current * 1.15,
+            'humidity' => 70,
+            'fanspeed' => $this->sensor_current * 1.80,
+            'power_factor' => 1,
+            'signal' => -30,
+            'load' => 80,
+            'airflow', 'snr', 'frequency', 'pressure', 'cooling' => $this->sensor_current * 1.05,
+            default => null,
+        };
+    }
+
     // ---- Define Relationships ----
     public function events(): MorphMany
     {
@@ -84,5 +132,15 @@ class Sensor extends DeviceRelatedModel
     public function translations(): BelongsToMany
     {
         return $this->belongsToMany(StateTranslation::class, 'sensors_to_state_indexes', 'sensor_id', 'state_index_id');
+    }
+
+    public function getCompositeKey(): string
+    {
+        return "$this->poller_type-$this->sensor_class-$this->device_id-$this->sensor_type-$this->sensor_index";
+    }
+
+    public function syncGroup(): string
+    {
+        return "$this->sensor_class-$this->poller_type";
     }
 }

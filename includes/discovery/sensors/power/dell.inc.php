@@ -35,7 +35,7 @@ foreach ((array) $temp as $index => $entry) {
         $warnlimit = $entry['amperageProbeUpperNonCriticalThreshold'] / $divisor;
         $limit = $entry['amperageProbeUpperCriticalThreshold'] / $divisor;
 
-        discover_sensor($valid['sensor'], 'power', $device, $cur_oid . $index, $index, 'dell', $descr, $divisor, '1', $lowlimit, $low_warn_limit, $warnlimit, $limit, $value, 'snmp', $index);
+        discover_sensor(null, 'power', $device, $cur_oid . $index, $index, 'dell', $descr, $divisor, '1', $lowlimit, $low_warn_limit, $warnlimit, $limit, $value, 'snmp', $index);
     }
 }
 

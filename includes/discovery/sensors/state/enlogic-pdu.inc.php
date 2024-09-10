@@ -40,7 +40,7 @@ foreach ($pre_cache['enlogic_pdu_status'] as $index => $data) {
 
         $descr = "Load state #$index";
         //Discover Sensors
-        discover_sensor($valid['sensor'], 'state', $device, $oid, $index, $state_name, $descr, 1, 1, null, null, null, null, $current);
+        discover_sensor(null, 'state', $device, $oid, $index, $state_name, $descr, 1, 1, null, null, null, null, $current);
         //Create Sensor To State Index
         create_sensor_to_state_index($device, $state_name, $index);
     }
@@ -64,7 +64,7 @@ foreach ($pre_cache['enlogic_pdu_input'] as $index => $data) {
             create_state_index($state_name, $states);
 
             //Discover Sensors
-            discover_sensor($valid['sensor'], 'state', $device, $oid, $tmp_index, $state_name, $descr, 1, 1, null, null, null, null, $current);
+            discover_sensor(null, 'state', $device, $oid, $tmp_index, $state_name, $descr, 1, 1, null, null, null, null, $current);
             //Create Sensor To State Index
             create_sensor_to_state_index($device, $state_name, $tmp_index);
         }
@@ -85,7 +85,7 @@ foreach ($pre_cache['enlogic_pdu_input'] as $index => $data) {
             create_state_index($state_name, $states);
 
             //Discover Sensors
-            discover_sensor($valid['sensor'], 'state', $device, $oid, $tmp_index, $state_name, $descr, 1, 1, null, null, null, null, $current);
+            discover_sensor(null, 'state', $device, $oid, $tmp_index, $state_name, $descr, 1, 1, null, null, null, null, $current);
             //Create Sensor To State Index
             create_sensor_to_state_index($device, $state_name, $tmp_index);
         }
@@ -111,7 +111,7 @@ foreach ($pre_cache['enlogic_pdu_circuit'] as $index => $data) {
 
             $descr = "Circuit breaker state {$data['pduCircuitBreakerLabel']}";
             //Discover Sensors
-            discover_sensor($valid['sensor'], 'state', $device, $oid, $index, $state_name, $descr, 1, 1, null, null, null, null, $current);
+            discover_sensor(null, 'state', $device, $oid, $index, $state_name, $descr, 1, 1, null, null, null, null, $current);
             //Create Sensor To State Index
             create_sensor_to_state_index($device, $state_name, $index);
         }

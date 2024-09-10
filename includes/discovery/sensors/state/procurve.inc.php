@@ -38,6 +38,6 @@ foreach ($pre_cache['procurve_hpicfSensorTable'] as $index => $data) {
     ];
     create_state_index($state_name, $states);
 
-    discover_sensor($valid['sensor'], 'state', $device, $state_oid . $index, $state_index, $state_name, $state_descr, '1', '1', null, null, null, null, $state);
+    discover_sensor(null, 'state', $device, $state_oid . $index, $state_index, $state_name, $state_descr, '1', '1', null, null, null, null, $state);
     create_sensor_to_state_index($device, $state_name, $state_index);
 }

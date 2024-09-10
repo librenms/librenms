@@ -26,10 +26,6 @@ foreach (PluginManager::call(DeviceOverviewHook::class, ['device' => DeviceCache
 
 require 'overview/ports.inc.php';
 
-if ($device['os'] == 'cimc') {
-    require 'overview/cimc.inc.php';
-}
-
 if ($device['os'] == 'ping') {
     require 'overview/ping.inc.php';
 }

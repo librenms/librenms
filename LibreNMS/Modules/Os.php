@@ -28,6 +28,8 @@ namespace LibreNMS\Modules;
 use App\Models\Device;
 use App\Models\Eventlog;
 use App\Models\Location;
+use App\Observers\DeviceObserver;
+use Illuminate\Support\Facades\Log;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
@@ -107,12 +109,17 @@ class Os implements Module
         $this->handleChanges($os);
     }
 
+    public function dataExists(Device $device): bool
+    {
+        return false; // data part of device
+    }
+
     /**
      * @inheritDoc
      */
-    public function cleanup(Device $device): void
+    public function cleanup(Device $device): int
     {
-        // no cleanup needed
+        return 0; // no cleanup needed
     }
 
     /**
@@ -135,12 +142,12 @@ class Os implements Module
 
         $device->icon = basename(Url::findOsImage($device->os, $device->features, null, 'images/os/'));
 
-        echo trans('device.attributes.location') . ': ' . $device->location?->display() . PHP_EOL;
+        Log::info(trans('device.attributes.location') . ': ' . $device->location?->display());
         foreach (['hardware', 'version', 'features', 'serial'] as $attribute) {
             if (isset($device->$attribute)) {
                 $device->$attribute = trim($device->$attribute);
             }
-            echo \App\Observers\DeviceObserver::attributeChangedMessage($attribute, $device->$attribute, $device->getOriginal($attribute)) . PHP_EOL;
+            Log::info(DeviceObserver::attributeChangedMessage($attribute, $device->$attribute, $device->getOriginal($attribute)));
         }
 
         $device->save();

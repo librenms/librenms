@@ -36,6 +36,6 @@ foreach ($data as $index => $value) {
         $tempCurr = $value;
         $temperature_oid = '.' . $temp_oid . '.' . $index;
         $descr = $descr_data[$index];
-        discover_sensor($valid['sensor'], 'temperature', $device, $temperature_oid, $index, 'smartax', $descr, '1', '1', null, null, null, null, $tempCurr);
+        discover_sensor(null, 'temperature', $device, $temperature_oid, $index, 'smartax', $descr, '1', '1', null, null, null, null, $tempCurr);
     }
 }
