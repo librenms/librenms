@@ -23,6 +23,7 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
+use LibreNMS\Config;
 use LibreNMS\Util\Snmpsim;
 
 $install_dir = realpath(__DIR__ . '/..');
@@ -83,6 +84,7 @@ if (getenv('DBTEST')) {
     unset($db_config);
 }
 
+Config::reload(); // reload the config including database config
 \LibreNMS\Util\OS::updateCache(true); // Force update of OS Cache
 
 app()->terminate(); // destroy the bootstrap Laravel application

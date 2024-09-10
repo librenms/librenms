@@ -2,7 +2,7 @@
 /**
  * ConfigTest.php
  *
- * Tests for App\Facades\Config
+ * Tests for LibreNMS\Config
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,17 +25,17 @@
 
 namespace LibreNMS\Tests;
 
-use App\ConfigRepository;
 use LibreNMS\Config;
 
 class ConfigTest extends TestCase
 {
-    private \ReflectionProperty $config;
+    private $config;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->config = new \ReflectionProperty(ConfigRepository::class, 'config');
+        $this->config = new \ReflectionProperty(Config::class, 'config');
+        $this->config->setAccessible(true);
     }
 
     public function testGetBasic(): void
@@ -46,9 +46,8 @@ class ConfigTest extends TestCase
 
     public function testSetBasic(): void
     {
-        $instance = $this->app->make('librenms-config');
         Config::set('basics', 'first');
-        $this->assertEquals('first', $this->config->getValue($instance)['basics']);
+        $this->assertEquals('first', $this->config->getValue()['basics']);
     }
 
     public function testGet(): void
@@ -138,10 +137,9 @@ class ConfigTest extends TestCase
 
     public function testSet(): void
     {
-        $instance = $this->app->make('librenms-config');
         Config::set('you.and.me', "I'll be there");
 
-        $this->assertEquals("I'll be there", $this->config->getValue($instance)['you']['and']['me']);
+        $this->assertEquals("I'll be there", $this->config->getValue()['you']['and']['me']);
     }
 
     public function testSetPersist(): void
@@ -208,10 +206,9 @@ class ConfigTest extends TestCase
      */
     private function setConfig($function)
     {
-        $instance = $this->app->make('librenms-config');
-        $config = $this->config->getValue($instance);
+        $config = $this->config->getValue();
         $function($config);
-        $this->config->setValue($instance, $config);
+        $this->config->setValue($config);
     }
 
     public function testForget(): void
