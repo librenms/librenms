@@ -17,24 +17,14 @@ class DBConfig:
     db_ssl_ca = "/etc/ssl/certs/ca-certificates.crt"
 
     def populate(self, _config):
-        self.db_host = os.getenv(
-            "DB_HOST", _config.get("db_host", self.db_host)
-        )
-        self.db_name = os.getenv(
-            "DB_DATABASE", _config.get("db_name", self.db_name)
-        )
-        self.db_pass = os.getenv(
-            "DB_PASSWORD", _config.get("db_pass", self.db_pass)
-        )
-        self.db_port = int(
-            os.getenv("DB_PORT", _config.get("db_port", self.db_port))
-        )
+        self.db_host = os.getenv("DB_HOST", _config.get("db_host", self.db_host))
+        self.db_name = os.getenv("DB_DATABASE", _config.get("db_name", self.db_name))
+        self.db_pass = os.getenv("DB_PASSWORD", _config.get("db_pass", self.db_pass))
+        self.db_port = int(os.getenv("DB_PORT", _config.get("db_port", self.db_port)))
         self.db_socket = os.getenv(
             "DB_SOCKET", _config.get("db_socket", self.db_socket)
         )
-        self.db_user = os.getenv(
-            "DB_USERNAME", _config.get("db_user", self.db_user)
-        )
+        self.db_user = os.getenv("DB_USERNAME", _config.get("db_user", self.db_user))
         self.db_sslmode = os.getenv(
             "DB_SSLMODE", _config.get("db_sslmode", self.db_sslmode)
         )
