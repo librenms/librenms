@@ -154,6 +154,50 @@ def get_time_tag(step):  # Type: int
 
 # EOC
 
+def fpm_runner(command, args):
+    import LibreNMS.FCGI as fcgi
+    import re
+
+    retcode = 0
+
+    # TODO: Make this read config for either host + port OR path
+    fpmCmd = fcgi.FCGI(path="/var/run/php/php-fpm-librenms-poller.sock")
+
+    fpmCmd.send_request({
+        'SCRIPT_FILENAME': command,
+        'REQUEST_METHOD': 'GET',
+        'QUERY_STRING': args,
+    })
+
+    allData = ""
+    requestId, data, error, complete = fpmCmd.recv_message()
+    while not complete:
+        dataStr = data.decode('utf-8')
+        if error:
+            logger.error(dataStr)
+            retcode = 1
+        else:
+            allData += dataStr
+
+        requestId, data, error, complete = fpmCmd.recv_message()
+
+    retSearch = re.compile('(lnms_exit_status:)(\d+)\n')
+    retMatch = retSearch.search(allData)
+    if retMatch != None:
+        retcode = int(retMatch.group(2))
+        retSpan = retMatch.span()
+
+        ret = ""
+        if retSpan[0] > 0:
+            ret += allData[:retSpan[0]]
+
+        if retSpan[1] < len(allData):
+            ret += allData[retSpan[1]:]
+    else:
+        ret = allData
+
+    return retcode, ret
+
 
 def print_worker(print_queue, wrapper_type):  # Type: Queue  # Type: str
     """
@@ -282,9 +326,16 @@ def poll_worker(
                     os.path.dirname(os.path.dirname(os.path.realpath(__file__))),
                     wrappers[wrapper_type]["executable"],
                 )
-                command = "/usr/bin/env php {} {} {}".format(
-                    executable, wrappers[wrapper_type]["option"], device_id
-                )
+                # TODO: Make this check for FPM config
+                if wrapper_type != "poller":
+                    command = "/usr/bin/env php {} {} {}".format(
+                        executable, wrappers[wrapper_type]["option"], device_id
+                    )
+                else:
+                    command = "{} {}".format(
+                        wrappers[wrapper_type]["option"], device_id
+                    )
+
                 if modules is not None and len(str(modules).strip()):
                     module_str = re.sub("\s", "", str(modules).strip())
                     command = command + " -m {}".format(module_str)
@@ -295,12 +346,19 @@ def poll_worker(
                 elif debug:
                     command = command + " -d"
 
-                exit_code, output = command_runner(
-                    command,
-                    shell=True,
-                    timeout=PER_DEVICE_TIMEOUT,
-                    valid_exit_codes=VALID_EXIT_CODES,
-                )
+                # TODO: Make this check for FPM config
+                if wrapper_type == "poller":
+                    exit_code, output = fpm_runner(
+                        executable,
+                        command.replace(" ","&"),
+                    )
+                else:
+                    exit_code, output = command_runner(
+                        command,
+                        shell=True,
+                        timeout=PER_DEVICE_TIMEOUT,
+                        valid_exit_codes=VALID_EXIT_CODES,
+                    )
                 if exit_code not in [0, 6]:
                     logger.error(
                         "Thread {} exited with code {}".format(

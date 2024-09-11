@@ -22,7 +22,7 @@
  * @author Steven Wilton <swilton@fluentit.com.au>
  */
 
-namespace LibreNMS;
+namespace App;
 
 use Symfony\Component\Console\Output\Output;
 

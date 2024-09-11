@@ -239,4 +239,6 @@ pm.start_servers = 10
 pm.min_spare_servers = 10
 pm.max_spare_servers = 100
 pm.process_idle_timeout = 300
+
+security.limit_extensions =
 ```

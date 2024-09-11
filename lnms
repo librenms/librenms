@@ -35,9 +35,18 @@ define('ARTISAN_BINARY', 'lnms');
 
 $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
 
+$cli = array_key_exists('argv', $_SERVER);
+if ($cli) {
+    $output = new Symfony\Component\Console\Output\ConsoleOutput;
+} else {
+    $_SERVER['argv'] = array_map(function ($q) { return urldecode($q); }, explode('&', 'lnms&' . $_SERVER['QUERY_STRING']));
+
+    $output = new App\EchoOutput;
+}
+
 $status = $kernel->handle(
     $input = new Symfony\Component\Console\Input\ArgvInput,
-    new Symfony\Component\Console\Output\ConsoleOutput
+    $output
 );
 
 /*
@@ -52,5 +61,9 @@ $status = $kernel->handle(
 */
 
 $kernel->terminate($input, $status);
+
+if (! $cli) {
+    echo "lnms_exit_status:$status" . PHP_EOL;
+}
 
 exit($status);
