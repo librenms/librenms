@@ -1,0 +1,1002 @@
+PDU-AC-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+
+DisplayString FROM RFC1213-MIB
+OBJECT-TYPE FROM RFC-1212
+enterprises FROM RFC1155-SMI;
+algcom OBJECT IDENTIFIER ::= { enterprises 49136 }
+pdu OBJECT IDENTIFIER ::= { algcom 200 }
+
+pduGlobal OBJECT IDENTIFIER ::=  { pdu 1 }
+portName OBJECT IDENTIFIER ::= { pdu 2 }
+portDesc OBJECT IDENTIFIER ::= { pdu 3 }
+portStat OBJECT IDENTIFIER ::= { pdu 4 }
+portStatN OBJECT IDENTIFIER ::= { pdu 5 }
+portVolt OBJECT IDENTIFIER ::= { pdu 6 }
+portCurr OBJECT IDENTIFIER ::= { pdu 7 }
+portPwr OBJECT IDENTIFIER ::=  { pdu 8 }
+portUVAlr OBJECT IDENTIFIER ::= { pdu 9 }
+portOVAlr OBJECT IDENTIFIER ::= { pdu 10 }
+portUVSDAlr OBJECT IDENTIFIER ::= { pdu 11 }
+portOVSDAlr OBJECT IDENTIFIER ::= { pdu 12 }
+portOCAlr OBJECT IDENTIFIER ::= { pdu 13 }
+portFailAlr OBJECT IDENTIFIER ::= { pdu 14 }
+busAlr OBJECT IDENTIFIER ::=   { pdu 15 }
+portOCSD OBJECT IDENTIFIER ::= { pdu 16 }
+
+pduGlobalModel OBJECT-TYPE
+	SYNTAX DisplayString
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"PDU Model"
+	::= { pduGlobal 1 }
+
+pduGlobalBusVoltage OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"PDU bus voltage [mV]"
+	::= { pduGlobal 2 }
+
+pduGlobalBusCurrent OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"PDU bus current [mA]"
+	::= { pduGlobal 3 }
+	
+pduGlobalBusPower OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"PDU bus power [mW]"
+	::= { pduGlobal 4 }
+
+pduGlobalClock OBJECT-TYPE
+	SYNTAX DisplayString
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Internal date/time"
+	::= { pduGlobal 5 }
+
+
+portNameP1 OBJECT-TYPE
+	SYNTAX DisplayString
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 1 name"
+	::= { portName 1 }
+
+portNameP2 OBJECT-TYPE
+	SYNTAX DisplayString
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 2 name"
+	::= { portName 2 }
+
+portNameP3 OBJECT-TYPE
+	SYNTAX DisplayString
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 3 name"
+	::= { portName 3 }
+
+portNameP4 OBJECT-TYPE
+	SYNTAX DisplayString
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 4 name"
+	::= { portName 4 }
+
+portNameP5 OBJECT-TYPE
+	SYNTAX DisplayString
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 5 name"
+	::= { portName 5 }
+
+portNameP6 OBJECT-TYPE
+	SYNTAX DisplayString
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 6 name"
+	::= { portName 6 }
+
+portNameP7 OBJECT-TYPE
+	SYNTAX DisplayString
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 7 name"
+	::= { portName 7 }
+
+portNameP8 OBJECT-TYPE
+	SYNTAX DisplayString
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 8 name"
+	::= { portName 8 }
+
+
+portDescP1 OBJECT-TYPE
+	SYNTAX DisplayString
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 1 label"
+	::= { portDesc 1 }
+
+portDescP2 OBJECT-TYPE
+	SYNTAX DisplayString
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 2 label"
+	::= { portDesc 2 }
+
+portDescP3 OBJECT-TYPE
+	SYNTAX DisplayString
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 3 label"
+	::= { portDesc 3 }
+
+portDescP4 OBJECT-TYPE
+	SYNTAX DisplayString
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 4 label"
+	::= { portDesc 4 }
+
+portDescP5 OBJECT-TYPE
+	SYNTAX DisplayString
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 5 label"
+	::= { portDesc 5 }
+
+portDescP6 OBJECT-TYPE
+	SYNTAX DisplayString
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 6 label"
+	::= { portDesc 6 }
+
+portDescP7 OBJECT-TYPE
+	SYNTAX DisplayString
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 7 label"
+	::= { portDesc 7 }
+
+portDescP8 OBJECT-TYPE
+	SYNTAX DisplayString
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 8 label"
+	::= { portDesc 8 }
+
+
+portStatP1 OBJECT-TYPE
+	SYNTAX DisplayString
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 1 state (readable)"
+	::= { portStat 1 }
+
+portStatP2 OBJECT-TYPE
+	SYNTAX DisplayString
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 2 state (readable)"
+	::= { portStat 2 }
+
+portStatP3 OBJECT-TYPE
+	SYNTAX DisplayString
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 3 state (readable)"
+	::= { portStat 3 }
+
+portStatP4 OBJECT-TYPE
+	SYNTAX DisplayString
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 4 state (readable)"
+	::= { portStat 4 }
+
+portStatP5 OBJECT-TYPE
+	SYNTAX DisplayString
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 5 state (readable)"
+	::= { portStat 5 }
+
+portStatP6 OBJECT-TYPE
+	SYNTAX DisplayString
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 6 state (readable)"
+	::= { portStat 6 }
+
+portStatP7 OBJECT-TYPE
+	SYNTAX DisplayString
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 7 state (readable)"
+	::= { portStat 7 }
+
+portStatP8 OBJECT-TYPE
+	SYNTAX DisplayString
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 8 state (readable)"
+	::= { portStat 8 }
+
+
+portStatNP1 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 1 state"
+	::= { portStatN 1 }
+
+portStatNP2 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 2 state"
+	::= { portStatN 2 }
+
+portStatNP3 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 3 state"
+	::= { portStatN 3 }
+
+portStatNP4 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 4 state"
+	::= { portStatN 4 }
+
+portStatNP5 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 5 state"
+	::= { portStatN 5 }
+
+portStatNP6 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 6 state"
+	::= { portStatN 6 }
+
+portStatNP7 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 7 state"
+	::= { portStatN 7 }
+
+portStatNP8 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 8 state"
+	::= { portStatN 8 }
+
+
+portVoltP1 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 1 voltage [mV]"
+	::= { portVolt 1 }
+
+portVoltP2 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 2 voltage [mV]"
+	::= { portVolt 2 }
+
+portVoltP3 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 3 voltage [mV]"
+	::= { portVolt 3 }
+
+portVoltP4 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 4 voltage [mV]"
+	::= { portVolt 4 }
+
+portVoltP5 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 5 voltage [mV]"
+	::= { portVolt 5 }
+
+portVoltP6 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 6 voltage [mV]"
+	::= { portVolt 6 }
+
+portVoltP7 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 7 voltage [mV]"
+	::= { portVolt 7 }
+
+portVoltP8 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 8 voltage [mV]"
+	::= { portVolt 8 }
+
+
+portCurrP1 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 1 current [mA]"
+	::= { portCurr 1 }
+
+portCurrP2 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 2 current [mA]"
+	::= { portCurr 2 }
+
+portCurrP3 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 3 current [mA]"
+	::= { portCurr 3 }
+
+portCurrP4 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 4 current [mA]"
+	::= { portCurr 4 }
+
+portCurrP5 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 5 current [mA]"
+	::= { portCurr 5 }
+
+portCurrP6 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 6 current [mA]"
+	::= { portCurr 6 }
+
+portCurrP7 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 7 current [mA]"
+	::= { portCurr 7 }
+
+portCurrP8 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 8 current [mA]"
+	::= { portCurr 8 }
+
+
+portPwrP1 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 1 power [mW]"
+	::= { portPwr 1 }
+
+portPwrP2 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 2 power [mW]"
+	::= { portPwr 2 }
+
+portPwrP3 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 3 power [mW]"
+	::= { portPwr 3 }
+
+portPwrP4 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 4 power [mW]"
+	::= { portPwr 4 }
+
+portPwrP5 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 5 power [mW]"
+	::= { portPwr 5 }
+
+portPwrP6 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 6 power [mW]"
+	::= { portPwr 6 }
+
+portPwrP7 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 7 power [mW]"
+	::= { portPwr 7 }
+
+portPwrP8 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 8 power [mW]"
+	::= { portPwr 8 }
+
+
+portUVAlrP1 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 1 under-voltage alarm"
+	::= { portUVAlr 1 }
+
+portUVAlrP2 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 2 under-voltage alarm"
+	::= { portUVAlr 2 }
+
+portUVAlrP3 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 3 under-voltage alarm"
+	::= { portUVAlr 3 }
+
+portUVAlrP4 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 4 under-voltage alarm"
+	::= { portUVAlr 4 }
+
+portUVAlrP5 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 5 under-voltage alarm"
+	::= { portUVAlr 5 }
+
+portUVAlrP6 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 6 under-voltage alarm"
+	::= { portUVAlr 6 }
+
+portUVAlrP7 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 7 under-voltage alarm"
+	::= { portUVAlr 7 }
+
+portUVAlrP8 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 8 under-voltage alarm"
+	::= { portUVAlr 8 }
+
+
+portOVAlrP1 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 1 over-voltage alarm"
+	::= { portOVAlr 1 }
+
+portOVAlrP2 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 2 over-voltage alarm"
+	::= { portOVAlr 2 }
+
+portOVAlrP3 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 3 over-voltage alarm"
+	::= { portOVAlr 3 }
+
+portOVAlrP4 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 4 over-voltage alarm"
+	::= { portOVAlr 4 }
+
+portOVAlrP5 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 5 over-voltage alarm"
+	::= { portOVAlr 5 }
+
+portOVAlrP6 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 6 over-voltage alarm"
+	::= { portOVAlr 6 }
+
+portOVAlrP7 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 7 over-voltage alarm"
+	::= { portOVAlr 7 }
+
+portOVAlrP8 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 8 over-voltage alarm"
+	::= { portOVAlr 8 }
+
+
+portUVSDAlrP1 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 1 under-voltage shut down alarm"
+	::= { portUVSDAlr 1 }
+
+portUVSDAlrP2 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 2 under-voltage shut down alarm"
+	::= { portUVSDAlr 2 }
+
+portUVSDAlrP3 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 3 under-voltage shut down alarm"
+	::= { portUVSDAlr 3 }
+
+portUVSDAlrP4 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 4 under-voltage shut down alarm"
+	::= { portUVSDAlr 4 }
+
+portUVSDAlrP5 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 5 under-voltage shut down alarm"
+	::= { portUVSDAlr 5 }
+
+portUVSDAlrP6 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 6 under-voltage shut down alarm"
+	::= { portUVSDAlr 6 }
+
+portUVSDAlrP7 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 7 under-voltage shut down alarm"
+	::= { portUVSDAlr 7 }
+
+portUVSDAlrP8 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 8 under-voltage shut down alarm"
+	::= { portUVSDAlr 8 }
+
+
+portOVSDAlrP1 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 1 over-voltage shut down alarm"
+	::= { portOVSDAlr 1 }
+
+portOVSDAlrP2 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 2 over-voltage shut down alarm"
+	::= { portOVSDAlr 2 }
+
+portOVSDAlrP3 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 3 over-voltage shut down alarm"
+	::= { portOVSDAlr 3 }
+
+portOVSDAlrP4 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 4 over-voltage shut down alarm"
+	::= { portOVSDAlr 4 }
+
+portOVSDAlrP5 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 5 over-voltage shut down alarm"
+	::= { portOVSDAlr 5 }
+
+portOVSDAlrP6 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 6 over-voltage shut down alarm"
+	::= { portOVSDAlr 6 }
+
+portOVSDAlrP7 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 7 over-voltage shut down alarm"
+	::= { portOVSDAlr 7 }
+
+portOVSDAlrP8 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 8 over-voltage shut down alarm"
+	::= { portOVSDAlr 8 }
+
+
+portOCAlrP1 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 1 over-current alarm"
+	::= { portOCAlr 1 }
+
+portOCAlrP2 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 2 over-current alarm"
+	::= { portOCAlr 2 }
+
+portOCAlrP3 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 3 over-current alarm"
+	::= { portOCAlr 3 }
+
+portOCAlrP4 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 4 over-current alarm"
+	::= { portOCAlr 4 }
+
+portOCAlrP5 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 5 over-current alarm"
+	::= { portOCAlr 5 }
+
+portOCAlrP6 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 6 over-current alarm"
+	::= { portOCAlr 6 }
+
+portOCAlrP7 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 7 over-current alarm"
+	::= { portOCAlr 7 }
+
+portOCAlrP8 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 8 over-current alarm"
+	::= { portOCAlr 8 }
+
+
+portFailAlrP1 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 1 fail alarm"
+	::= { portFailAlr 1 }
+
+portFailAlrP2 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 2 fail alarm"
+	::= { portFailAlr 2 }
+
+portFailAlrP3 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 3 fail alarm"
+	::= { portFailAlr 3 }
+
+portFailAlrP4 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 4 fail alarm"
+	::= { portFailAlr 4 }
+
+portFailAlrP5 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 5 fail alarm"
+	::= { portFailAlr 5 }
+
+portFailAlrP6 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 6 fail alarm"
+	::= { portFailAlr 6 }
+
+portFailAlrP7 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 7 fail alarm"
+	::= { portFailAlr 7 }
+
+portFailAlrP8 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 8 fail alarm"
+	::= { portFailAlr 8 }
+
+
+busAlrUndVolt OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Bus under voltage alarm"
+	::= { busAlr 1 }
+	
+busAlrOvrVolt OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Bus over voltage alarm"
+	::= { busAlr 2 }
+	
+busAlrOvrCurr OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Bus over current alarm"
+	::= { busAlr 3 }
+
+portOCSDP1 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 1 over-current shut down"
+	::= { portOCSD 1 }
+
+portOCSDP2 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 2 over-current shut down"
+	::= { portOCSD 2 }
+
+portOCSDP3 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 3 over-current shut down"
+	::= { portOCSD 3 }
+
+portOCSDP4 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 4 over-current shut down"
+	::= { portOCSD 4 }
+
+portOCSDP5 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 5 over-current shut down"
+	::= { portOCSD 5 }
+
+portOCSDP6 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 6 over-current shut down"
+	::= { portOCSD 6 }
+
+portOCSDP7 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 7 over-current shut down"
+	::= { portOCSD 7 }
+
+portOCSDP8 OBJECT-TYPE
+	SYNTAX GAUGE
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Port 8 over-current shut down"
+	::= { portOCSD 8 }
+
+END
+
