@@ -1,0 +1,152 @@
+mib: SM9S-MIB
+
+modules:
+    sensors:
+
+        pre-cache:
+                data:
+                   -
+                     oid:
+                        - sensorName
+                        - sensorDescription
+                          #- desc01
+                          #- desc04
+                          #- desc05
+                          #- desc06
+                          #- desc10
+                          #- desc11
+                          #- desc12
+                          #- desc26
+                          #- desc31
+        voltage:
+                data:
+                   -
+                     oid: sensorValue
+                       #value: acVoltage
+                     num_oid: '.1.3.6.1.4.1.49136.100.3.5.{{ $index }}'
+                     divisor: 1000
+                     descr: '{{ $sensorName }} - {{ $sensorDescription }}'
+                     index: 'sensorValue.5.{{ $index }}'
+                     skip_values:
+                         -   oid: sensorName
+                             op: '!='
+                             value: 'AC voltage 1'
+
+                   -
+                     oid: sensorValue
+                       #value: dcVoltage
+                     num_oid: '.1.3.6.1.4.1.49136.100.3.6.{{ $index }}'
+                     divisor: 1000
+                     descr: '{{ sensorName }} - {{ $sensorDescription }}'
+                     index: 'sensorValue.6.{{ $index }}'
+                     skip_values:
+                         -   oid: sensorName
+                             op: '!='
+                             value: 'DC voltage 1'
+
+        temperature:
+                data:
+                    -
+                     oid: sensorValue
+                       #value: ambientTemperature
+                     num_oid: '.1.3.6.1.4.1.49136.100.3.1.{{ $index }}'
+                     multiplier: 1
+                     descr: '{{ sensorName }} - {{ $sensorDescription }}'
+                     index: 'sensorValue.1.{{ $index }}'
+                     skip_values:
+                         -   oid: sensorName
+                             op: '!='
+                             value: 'Temperature 1'
+
+        humidity:
+                data:
+                    -
+                     oid: sensorValue
+                       #value: ambientHumidity
+                     num_oid: '.1.3.6.1.4.1.49136.100.3.4.{{ $index }}'
+                     multiplier: 1
+                     descr: '{{ sensorName }} - {{ $sensorDescription }}'
+                     index: 'sensorValue.4.{{ $index }}'
+                     skip_values:
+                         -   oid: sensorName
+                             op: '!='
+                             value: 'Relative humidity 1'
+
+        state:
+                data:
+                   -
+                     oid: sensorValue
+                       #value: dryContactInput01
+                     num_oid: '.1.3.6.1.4.1.49136.100.3.10.{{ $index }}'
+                     descr: '{{ sensorName }} - {{ $sensorDescription }}'
+                     group: Dry Contact Input
+                     index: 'dryContactInput01.{{ $index }}'
+                     states:
+                         - { value: -1, generic: 3, graph: 0, descr: 'null' }
+                         - { value:  0, generic: 0, graph: 0, descr: closed }
+                         - { value:  1, generic: 2, graph: 0, descr: open }
+                     skip_values:
+                         -   oid: sensorName
+                             op: '!='
+                             value: 'Dry contact 1'
+                   -
+                     oid: sensorValue
+                       #value: dryContactInput02
+                     num_oid: '.1.3.6.1.4.1.49136.100.3.11.{{ $index }}'
+                     descr: '{{ sensorName }} - {{ $sensorDescription }}'
+                     group: Dry Contact Input
+                     index: 'dryContactInput02.{{ $index }}'
+                     states:
+                         - { value: -1, generic: 3, graph: 0, descr: 'null' }
+                         - { value:  0, generic: 0, graph: 0, descr: closed }
+                         - { value:  1, generic: 2, graph: 0, descr: open }
+                     skip_values:
+                         -   oid: sensorName
+                             op: '!='
+                             value: 'Dry contact 2'
+                   -
+                     oid: sensorValue
+                       #value: dryContactInput03
+                     num_oid: '.1.3.6.1.4.1.49136.100.3.12.{{ $index }}'
+                     descr: '{{ sensorName }} - {{ $sensorDescription }}'
+                     group: Dry Contact Input
+                     index: 'dryContactInput03.{{ $index }}'
+                     states:
+                         - { value: -1, generic: 3, graph: 0, descr: 'null' }
+                         - { value:  0, generic: 0, graph: 0, descr: closed }
+                         - { value:  1, generic: 2, graph: 0, descr: open }
+                     skip_values:
+                         -   oid: sensorName
+                             op: '!='
+                             value: 'Dry contact 3'
+                   -
+                     oid: sensorValue
+                       #value: digitalInput01
+                     num_oid: '.1.3.6.1.4.1.49136.100.3.26.{{ $index }}'
+                     descr: '{{ sensorName }} - {{ $sensorDescription }}'
+                     group: Digital Input
+                     index: 'digitalInput01.{{ $index }}'
+                     states:
+                         - { value: -1, generic: 3, graph: 0, descr: 'null' }
+                         - { value:  0, generic: 0, graph: 0, descr: open }
+                         - { value:  1, generic: 2, graph: 0, descr: closed }
+                     skip_values:
+                         -   oid: sensorName
+                             op: '!='
+                             value: 'Digital sensor input 1'
+                   -
+                     oid: sensorValue
+                       #value: relayOutput01
+                     num_oid: '.1.3.6.1.4.1.49136.100.3.31.{{ $index }}'
+                     descr: '{{ sensorName }} - {{ $sensorDescription }}'
+                     group: Relay Output
+                     index: 'relayOutput01.{{ $index }}'
+                     states:
+                         - { value: -1, generic: 3, graph: 0, descr: 'null' }
+                         - { value:  0, generic: 0, graph: 0, descr: open }
+                         - { value:  1, generic: 2, graph: 0, descr: closed }
+                     skip_values:
+                         -   oid: sensorName
+                             op: '!='
+                             value: 'Relay output 1'
+

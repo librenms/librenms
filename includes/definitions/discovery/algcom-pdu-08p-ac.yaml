@@ -1,0 +1,191 @@
+mib: PDU-X-MIB
+modules:
+    sensors:
+
+        pre-cache:
+                data:
+                   -
+                     oid:
+                        - portName
+                        - portDescription
+
+        voltage:
+                data:
+                   -
+                     oid: busVoltage
+                     num_oid: '.1.3.6.1.4.1.49136.200.1.2.{{ $index }}'
+                     divisor: 1000
+                     descr: 'Bus Voltage'
+                     group: Bus
+                     index: 'busVoltage.{{ $index }}'
+                   -
+                     oid: portVoltage
+                     num_oid: '.1.3.6.1.4.1.49136.200.6.{{ $index }}'
+                     divisor: 1000
+                     descr: '{{ $portName }} - {{ $portDescription }} - Voltage'
+                     group: Port
+                     index: 'portVoltage.{{ $index }}'
+
+        current:
+                data:
+                    -
+                      oid: busCurrent
+                      num_oid: '.1.3.6.1.4.1.49136.200.1.3.{{ $index }}'
+                      divisor: 1000
+                      descr: 'Bus Total Output Current'
+                      group: Bus
+                      index: 'busCurrent.{{ $index }}'
+                    -
+                      oid: portCurrent
+                      num_oid: '.1.3.6.1.4.1.49136.200.7.{{ $index }}'
+                      divisor: 1000
+                      descr: '{{ $portName }} - {{ $portDescription }} - Current'
+                      group: Port
+                      index: 'portCurrent.{{ $index }}'
+
+        power:
+                data:
+                    -
+                      oid: busPower
+                      num_oid: '.1.3.6.1.4.1.49136.200.1.4.{{ $index }}'
+                      divisor: 1000
+                      descr: 'Bus Total Output Power'
+                      group: Bus
+                      index: 'busPower.{{ $index }}'
+
+                    -
+                      oid: portPower
+                      num_oid: '.1.3.6.1.4.1.49136.200.8.{{ $index }}'
+                      divisor: 1000
+                      descr: '{{ $portName }} - {{ $portDescription }} - Power'
+                      group: Port
+                      index: 'portPower.{{ $index }}'
+
+
+        state:
+                data:
+                    -
+                      oid: portStateNumeric
+                      num_oid: '.1.3.6.1.4.1.49136.200.5.{{ $index }}'
+                      descr: '{{ $portName }} - {{ $portDescription }} - State'
+                      group: Port State
+                      index: 'portStateNumeric.{{ $index }}'
+                      states:
+                          - { value: -1, generic: 3, graph: 0, descr: 'null' }
+                          - { value:  0, generic: 1, graph: 0, descr: OFF }
+                          - { value:  1, generic: 0, graph: 0, descr: ON }
+                          - { value:  2, generic: 2, graph: 0, descr: undefined }
+                          - { value:  3, generic: 1, graph: 0, descr: REBOOT }
+
+                    -
+                      oid: busUnderVoltage
+                      num_oid: '.1.3.6.1.4.1.49136.200.15.1.{{ $index }}'
+                      descr: 'Bus UnderVoltage'
+                      group: Bus Alarms
+                      index: 'busUnderVoltage.{{ $index }}'
+                      states:
+                          - { value: -1, generic: 3, graph: 0, descr: 'null' }
+                          - { value:  0, generic: 0, graph: 0, descr: NORMAL }
+                          - { value:  1, generic: 1, graph: 0, descr: ALARM }
+
+                    -
+                      oid: busOverVoltage
+                      num_oid: '.1.3.6.1.4.1.49136.200.15.2.{{ $index }}'
+                      descr: 'Bus OverVoltage'
+                      group: Bus Alarms
+                      index: 'busOverVoltage.{{ $index }}'
+                      states:
+                          - { value: -1, generic: 3, graph: 0, descr: 'null' }
+                          - { value:  0, generic: 0, graph: 0, descr: NORMAL }
+                          - { value:  1, generic: 1, graph: 0, descr: ALARM }
+
+                    -
+                      oid: busOverCurrent
+                      num_oid: '.1.3.6.1.4.1.49136.200.15.3.{{ $index }}'
+                      descr: 'Bus OverCurrent'
+                      group: Bus Alarms
+                      index: 'busOverCurrent.{{ $index }}'
+                      states:
+                          - { value: -1, generic: 3, graph: 0, descr: 'null' }
+                          - { value:  0, generic: 0, graph: 0, descr: NORMAL }
+                          - { value:  1, generic: 1, graph: 0, descr: ALARM }
+
+
+                    -
+                      oid: portUnderVoltageAlarm
+                      num_oid: '.1.3.6.1.4.1.49136.200.9.{{ $index }}'
+                      descr: '{{ $portName }} - {{ $portDescription }} UnderVoltageAlarm'
+                      group: '{{ $portName }} - {{ $portDescription }} Alarms'
+                      index: 'portUnderVoltageAlarm.{{ $index }}'
+                      states:
+                          - { value: -1, generic: 3, graph: 0, descr: 'null' }
+                          - { value:  0, generic: 0, graph: 0, descr: NORMAL }
+                          - { value:  1, generic: 1, graph: 0, descr: ALARM }
+
+                    -
+                      oid: portOverVoltageAlarm
+                      num_oid: '.1.3.6.1.4.1.49136.200.10.{{ $index }}'
+                      descr: '{{ $portName }} - {{ $portDescription }} OverVoltageAlarm'
+                      group: '{{ $portName }} - {{ $portDescription }} Alarms'
+                      index: 'portOverVoltageAlarm.{{ $index }}'
+                      states:
+                          - { value: -1, generic: 3, graph: 0, descr: 'null' }
+                          - { value:  0, generic: 0, graph: 0, descr: NORMAL }
+                          - { value:  1, generic: 1, graph: 0, descr: ALARM }
+
+                    -
+                      oid: portUnderVoltageShutdown
+                      num_oid: '.1.3.6.1.4.1.49136.200.11.{{ $index }}'
+                      descr: '{{ $portName }} - {{ $portDescription }} UnderVoltageShutdown'
+                      group: '{{ $portName }} - {{ $portDescription }} Alarms'
+                      index: 'portUnderVoltageShutdown.{{ $index }}'
+                      states:
+                          - { value: -1, generic: 3, graph: 0, descr: 'null' }
+                          - { value:  0, generic: 0, graph: 0, descr: NORMAL }
+                          - { value:  1, generic: 2, graph: 0, descr: SHUTDOWN }
+
+                    -
+                      oid: portOverVoltageShutdown
+                      num_oid: '.1.3.6.1.4.1.49136.200.12.{{ $index }}'
+                      descr: '{{ $portName }} - {{ $portDescription }} OverVoltageShutdown'
+                      group: '{{ $portName }} - {{ $portDescription }} Alarms'
+                      index: 'portOverVoltageShutdown.{{ $index }}'
+                      states:
+                          - { value: -1, generic: 3, graph: 0, descr: 'null' }
+                          - { value:  0, generic: 0, graph: 0, descr: NORMAL }
+                          - { value:  1, generic: 2, graph: 0, descr: SHUTDOWN }
+
+                    -
+                      oid: portOverCurrentAlarm
+                      num_oid: '.1.3.6.1.4.1.49136.200.13.{{ $index }}'
+                      descr: '{{ $portName }} - {{ $portDescription }} OverCurrentAlarm'
+                      group: '{{ $portName }} - {{ $portDescription }} Alarms'
+                      index: 'portOverCurrentAlarm.{{ $index }}'
+                      states:
+                          - { value: -1, generic: 3, graph: 0, descr: 'null' }
+                          - { value:  0, generic: 0, graph: 0, descr: NORMAL }
+                          - { value:  1, generic: 1, graph: 0, descr: ALARM }
+
+                    -
+                      oid: portOverCurrentShutdown
+                      num_oid: '.1.3.6.1.4.1.49136.200.16.{{ $index }}'
+                      descr: '{{ $portName }} - {{ $portDescription }} OverCurrentShutdown'
+                      group: '{{ $portName }} - {{ $portDescription }} Alarms'
+                      index: 'portOverCurrentShutdown.{{ $index }}'
+                      states:
+                          - { value: -1, generic: 3, graph: 0, descr: 'null' }
+                          - { value:  0, generic: 0, graph: 0, descr: NORMAL }
+                          - { value:  1, generic: 2, graph: 0, descr: SHUTDOWN }
+
+                    -
+                      oid: portFailAlarm
+                      num_oid: '.1.3.6.1.4.1.49136.200.14.{{ $index }}'
+                      descr: '{{ $portName }} - {{ $portDescription }} PortFailAlarm'
+                      group: '{{ $portName }} - {{ $portDescription }} Alarms'
+                      index: 'portFailAlarm.{{ $index }}'
+                      states:
+                          - { value: -1, generic: 3, graph: 0, descr: 'null' }
+                          - { value:  0, generic: 0, graph: 0, descr: NORMAL }
+                          - { value:  1, generic: 2, graph: 0, descr: PORT_FAIL }
+
+
