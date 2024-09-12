@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use LibreNMS\Interfaces\Models\Keyable;
 
@@ -129,9 +130,14 @@ class Sensor extends DeviceRelatedModel implements Keyable
         return $this->morphMany(Eventlog::class, 'events', 'type', 'reference');
     }
 
+    public function stateIndex(): HasOneThrough
+    {
+        return $this->hasOneThrough(StateIndex::class, SensorToStateIndex::class, 'sensor_id', 'state_index_id', 'sensor_id', 'state_index_id');
+    }
+
     public function translations(): BelongsToMany
     {
-        return $this->belongsToMany(StateTranslation::class, 'sensors_to_state_indexes', 'sensor_id', 'state_index_id');
+        return $this->belongsToMany(StateTranslation::class, 'sensors_to_state_indexes', 'sensor_id', 'state_index_id', 'sensor_id', 'state_index_id');
     }
 
     public function getCompositeKey(): string

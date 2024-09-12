@@ -26,6 +26,9 @@
 namespace App\Discovery;
 
 use App\Models\Device;
+use App\Models\SensorToStateIndex;
+use App\Models\StateIndex;
+use App\Models\StateTranslation;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Config;
@@ -40,6 +43,8 @@ class Sensor
     private array $discovered = [];
     private string $relationship = 'sensors';
     private Device $device;
+    /** @var Collection<StateTranslation>[] */
+    private array $states = [];
 
     public function __construct(Device $device)
     {
@@ -65,6 +70,20 @@ class Sensor
         return $this;
     }
 
+    public function withStateTranslations(string $stateName, array $states): static
+    {
+        $this->states[$stateName] = collect($states)->map(function (array $state) {
+            return new StateTranslation([
+                'state_descr' => $state['descr'],
+                'state_draw_graph' => $state['graph'],
+                'state_value' => $state['value'],
+                'state_generic_value' => $state['generic'],
+            ]);
+        });
+
+        return $this;
+    }
+
     public function isDiscovered(string $type): bool
     {
         return $this->discovered[$type] ?? false;
@@ -78,6 +97,8 @@ class Sensor
             $synced = $this->syncModelsByGroup($this->device, 'sensors', $this->getModels(), $params);
             $this->discovered[$type] = true;
 
+            $this->syncStates($synced);
+
             return $synced;
         }
 
@@ -88,6 +109,7 @@ class Sensor
     {
         return $this->models;
     }
+
 
     public function canSkip(\App\Models\Sensor $sensor): bool
     {
@@ -106,5 +128,39 @@ class Sensor
         }
 
         return false;
+    }
+
+    private function syncStates(Collection $sensors): void
+    {
+        $stateSensors = $sensors->where('sensor_class', 'state');
+
+        if ($stateSensors->isEmpty()) {
+            return;
+        }
+
+        $usedStates = $stateSensors->pluck('sensor_type');
+        $existingStateIndexes = StateIndex::whereIn('state_name', $usedStates)->get()->keyBy('state_name');
+
+        foreach ($usedStates as $stateName) {
+            $stateIndex = $existingStateIndexes->get($stateName);
+
+            // create new state indexes
+            if($stateIndex == null) {
+                $stateIndex = StateIndex::create(['state_name' => $stateName]);
+                $existingStateIndexes->put($stateName, $stateIndex);
+            }
+
+            // sync the translations to make sure they are up to date
+            $this->syncModels($stateIndex, 'translations', $this->states[$stateName]);
+        }
+
+        // update sensor to state indexes
+        foreach ($stateSensors as $stateSensor) {
+            $state_index_id = $existingStateIndexes->get($stateSensor->sensor_type)->state_index_id;
+            SensorToStateIndex::updateOrCreate(
+                ['sensor_id' => $stateSensor->sensor_id],
+                ['state_index_id' => $state_index_id],
+            );
+        }
     }
 }

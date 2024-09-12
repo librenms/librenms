@@ -493,106 +493,16 @@ function dnslookup($device, $type = false, $return = false)
  *
  * @param  string  $state_name  the unique name for this state translation
  * @param  array  $states  array of states, each must contain keys: descr, graph, value, generic
- * @return int|null
+ * @return void
  */
 function create_state_index($state_name, $states = [])
 {
-    $state_index_id = dbFetchCell('SELECT `state_index_id` FROM state_indexes WHERE state_name = ? LIMIT 1', [$state_name]);
-    if (! is_numeric($state_index_id)) {
-        $state_index_id = dbInsert(['state_name' => $state_name], 'state_indexes');
-
-        // legacy code, return index so states are created
-        if (empty($states)) {
-            return $state_index_id;
-        }
-    }
-
-    // check or synchronize states
-    if (empty($states)) {
-        $translations = dbFetchRows('SELECT * FROM `state_translations` WHERE `state_index_id` = ?', [$state_index_id]);
-        if (count($translations) == 0) {
-            // If we don't have any translations something has gone wrong so return the state_index_id so they get created.
-            return $state_index_id;
-        }
-    } else {
-        sync_sensor_states($state_index_id, $states);
-    }
-
-    return null;
-}
-
-/**
- * Synchronize the sensor state translations with the database
- *
- * @param  int  $state_index_id  index of the state
- * @param  array  $states  array of states, each must contain keys: descr, graph, value, generic
- */
-function sync_sensor_states($state_index_id, $states)
-{
-    $new_translations = array_reduce($states, function ($array, $state) use ($state_index_id) {
-        $array[$state['value']] = [
-            'state_index_id' => $state_index_id,
-            'state_descr' => $state['descr'],
-            'state_draw_graph' => $state['graph'],
-            'state_value' => $state['value'],
-            'state_generic_value' => $state['generic'],
-        ];
-
-        return $array;
-    }, []);
-
-    $existing_translations = dbFetchRows(
-        'SELECT `state_index_id`,`state_descr`,`state_draw_graph`,`state_value`,`state_generic_value` FROM `state_translations` WHERE `state_index_id`=?',
-        [$state_index_id]
-    );
-
-    foreach ($existing_translations as $translation) {
-        $value = $translation['state_value'];
-        if (isset($new_translations[$value])) {
-            if ($new_translations[$value] != $translation) {
-                dbUpdate(
-                    $new_translations[$value],
-                    'state_translations',
-                    '`state_index_id`=? AND `state_value`=?',
-                    [$state_index_id, $value]
-                );
-            }
-
-            // this translation is synchronized, it doesn't need to be inserted
-            unset($new_translations[$value]);
-        } else {
-            dbDelete('state_translations', '`state_index_id`=? AND `state_value`=?', [$state_index_id, $value]);
-        }
-    }
-
-    // insert any new translations
-    dbBulkInsert($new_translations, 'state_translations');
+    app('sensor-discovery')->withStateTranslations($state_name, $states);
 }
 
 function create_sensor_to_state_index($device, $state_name, $index)
 {
-    $sensor_entry = dbFetchRow('SELECT sensor_id FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ? AND `sensor_type` = ? AND `sensor_index` = ?', [
-        'state',
-        $device['device_id'],
-        $state_name,
-        $index,
-    ]);
-    $state_indexes_entry = dbFetchRow('SELECT state_index_id FROM `state_indexes` WHERE `state_name` = ?', [
-        $state_name,
-    ]);
-    if (! empty($sensor_entry['sensor_id']) && ! empty($state_indexes_entry['state_index_id'])) {
-        $insert = [
-            'sensor_id' => $sensor_entry['sensor_id'],
-            'state_index_id' => $state_indexes_entry['state_index_id'],
-        ];
-        foreach ($insert as $key => $val_check) {
-            if (! isset($val_check)) {
-                unset($insert[$key]);
-            }
-        }
-
-        dbInsert($insert, 'sensors_to_state_indexes');
-    }
+    // no op
 }
 
 function delta_to_bits($delta, $period)
