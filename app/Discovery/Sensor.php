@@ -151,7 +151,7 @@ class Sensor
             }
 
             // sync the translations to make sure they are up to date, set state_index_id
-            $stateTranslations = $this->states[$stateName]->map(fn($s) => $s->state_index_id = $stateIndex->state_index_id);
+            $stateTranslations = $this->states[$stateName]->map(fn ($s) => $s->state_index_id = $stateIndex->state_index_id);
             $this->syncModels($stateIndex, 'translations', $stateTranslations);
         }
 
