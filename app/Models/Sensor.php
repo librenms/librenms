@@ -158,7 +158,7 @@ class Sensor extends DeviceRelatedModel implements Keyable
             'sensor_current',
         ]);
         $data[] = "(limits: LL: $this->sensor_limit_low, LW: $this->sensor_limit_low_warn, W: $this->sensor_limit_warn, H: $this->sensor_limit)";
-        $data[] = "rrd_type = $this->sensor_rrd_type";
+        $data[] = "rrd_type = $this->rrd_type";
 
         return implode(', ', $data);
     }
