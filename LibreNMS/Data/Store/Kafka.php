@@ -74,11 +74,12 @@ class Kafka extends BaseDatastore
 
                 if (in_array($measurement, $excluded_measurement_arr)) {
                     Log::warning('KAFKA: Skipped parsing to Kafka, measurement is in measurement-excluded: ' . $measurement);
+
                     return;
                 }
             }
 
-            if($excluded_device_fields != null && strlen($excluded_device_fields) > 0) {
+            if ($excluded_device_fields != null && strlen($excluded_device_fields) > 0) {
                 // convert into array
                 $excluded_device_fields_arr = explode(',', $excluded_device_fields);
             }
