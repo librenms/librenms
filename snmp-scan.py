@@ -33,6 +33,7 @@ from sys import stdout
 from time import time
 
 Result = namedtuple("Result", ["ip", "hostname", "outcome", "output"])
+args = {}
 
 
 class Outcome:
@@ -263,7 +264,9 @@ Example: 192.168.0.1/32 will be treated as a single host address""",
     chdir(install_dir)
     try:
         CONFIG = json.loads(
-            check_output(["/usr/bin/env", "php", "lnms", "config:get", "--dump"]).decode()
+            check_output(
+                ["/usr/bin/env", "php", "lnms", "config:get", "--dump"]
+            ).decode()
         )
     except CalledProcessError as e:
         parser.error(
