@@ -283,9 +283,7 @@ def poll_worker(
                     os.path.dirname(os.path.dirname(os.path.realpath(__file__))),
                     wrappers[wrapper_type]["executable"],
                 )
-                command = "/usr/bin/env php {}".format(
-                    executable
-                )
+                command = "/usr/bin/env php {}".format(executable)
                 args = [wrappers[wrapper_type]["option"], str(device_id)]
 
                 if modules is not None and len(str(modules).strip()):
@@ -434,7 +432,6 @@ def wrapper(
     else:
         DISTRIBUTED_POLLING = False
     # EOC
-
 
     s_time = time.time()
 
