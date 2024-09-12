@@ -55,7 +55,7 @@ class Sensor
 
             return $this;
         }
-
+        $sensor->device_id ??= \DeviceCache::getPrimary()->device_id;
         $this->models->push($sensor);
         $this->discovered[$sensor->syncGroup()] = false;
 
