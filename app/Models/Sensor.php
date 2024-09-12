@@ -143,4 +143,23 @@ class Sensor extends DeviceRelatedModel implements Keyable
     {
         return "$this->sensor_class-$this->poller_type";
     }
+
+    public function __toString()
+    {
+        $data = $this->only([
+            'sensor_oid',
+            'sensor_index',
+            'sensor_type',
+            'sensor_descr',
+            'poller_type',
+            'sensor_divisor',
+            'sensor_multiplier',
+            'entPhysicalIndex',
+            'sensor_current',
+            ]);
+        $data[] = "(limits: LL: $this->sensor_limit_low, LW: $this->sensor_limit_low_warn, W: $this->sensor_limit_warn, H: $this->sensor_limit)";
+        $data[] = "rrd_type = $this->sensor_rrd_type";
+
+        return implode(', ', $data);
+    }
 }

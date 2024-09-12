@@ -27,6 +27,8 @@ namespace App\Discovery;
 
 use App\Models\Device;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
+use LibreNMS\Config;
 use LibreNMS\DB\SyncsModels;
 
 class Sensor
@@ -47,8 +49,18 @@ class Sensor
 
     public function discover(\App\Models\Sensor $sensor): static
     {
+        if ($this->canSkip($sensor)) {
+            Log::info('~');
+            Log::debug("Skipped Sensor: $sensor");
+
+            return $this;
+        }
+
         $this->models->push($sensor);
         $this->discovered[$sensor->syncGroup()] = false;
+
+        Log::debug("Discovered Sensor: $sensor");
+        Log::info("$sensor->sensor_descr: Cur $sensor->sensor_current, Low: $sensor->sensor_limit_low, Low Warn: $sensor->sensor_limit_low_warn, Warn: $sensor->sensor_limit_warn, High: $sensor->sensor_limit");
 
         return $this;
     }
@@ -75,5 +87,24 @@ class Sensor
     public function getModels(): Collection
     {
         return $this->models;
+    }
+
+    public function canSkip(\App\Models\Sensor $sensor): bool
+    {
+        if (! empty($sensor->sensor_class) && (Config::getOsSetting($this->device->os, "disabled_sensors.$sensor->sensor_class") || Config::get("disabled_sensors.$sensor->sensor_class"))) {
+            return true;
+        }
+        foreach (Config::getCombined($this->device->os, 'disabled_sensors_regex') as $skipRegex) {
+            if (! empty($sensor->sensor_descr) && preg_match($skipRegex, $sensor->sensor_descr)) {
+                return true;
+            }
+        }
+        foreach (Config::getCombined($this->device->os, "disabled_sensors_regex.$sensor->sensor_class") as $skipRegex) {
+            if (! empty($sensor->sensor_descr) && preg_match($skipRegex, $sensor->sensor_descr)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
