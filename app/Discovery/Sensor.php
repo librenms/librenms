@@ -145,7 +145,7 @@ class Sensor
             $stateIndex = $existingStateIndexes->get($stateName);
 
             // create new state indexes
-            if($stateIndex == null) {
+            if ($stateIndex == null) {
                 $stateIndex = StateIndex::create(['state_name' => $stateName]);
                 $existingStateIndexes->put($stateName, $stateIndex);
             }

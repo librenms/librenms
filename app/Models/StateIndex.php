@@ -15,7 +15,6 @@ class StateIndex extends Model
     protected $table = 'state_indexes';
     protected $fillable = ['state_name'];
 
-
     public function sensors(): HasManyThrough
     {
         return $this->hasManyThrough(Sensor::class, SensorToStateIndex::class, 'state_index_id', 'sensor_id', 'state_index_id', 'sensor_id');

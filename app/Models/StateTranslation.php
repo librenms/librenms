@@ -31,7 +31,7 @@ use LibreNMS\Interfaces\Models\Keyable;
 
 class StateTranslation extends Model implements Keyable
 {
-    const CREATED_AT = false;
+    const CREATED_AT = null;
     const UPDATED_AT = 'state_lastupdated';
     protected $primaryKey = 'state_translation_id';
     protected $fillable = [
