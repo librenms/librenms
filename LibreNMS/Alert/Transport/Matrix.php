@@ -44,8 +44,7 @@ class Matrix extends Transport
 
         $message = SimpleTemplate::parse($message, $alert_data);
 
-        $msgtype = $alert_data['severity'] == 'critical' ? 'm.notice' : 'm.text';
-        $body = ['body' => strip_tags($message), 'formatted_body' => "$message", 'msgtype' => $msgtype, 'format' => 'org.matrix.custom.html'];
+        $body = ['body' => strip_tags($message), 'formatted_body' => "$message", 'msgtype' => 'm.notice', 'format' => 'org.matrix.custom.html'];
 
         $res = Http::client()
             ->withToken($authtoken)
