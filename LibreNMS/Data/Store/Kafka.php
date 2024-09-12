@@ -48,13 +48,19 @@ class Kafka extends BaseDatastore
             $topic = $producer->newTopic(Kafka::getTopicName());
 
             $device_data = DeviceCache::get($device['device_id']);
-            $excluded_groups = Config::get('kafka.groups-exclude');
+            $excluded_groups = Config::get('kafka.groups-exclude'); // comman separated string
+            $excluded_measurement = Config::get('kafka.measurement-exclude'); // comman separated string
+            $excluded_device_fields = Config::get('kafka.device-fields-exclude'); // comman separated string
+            $excluded_device_fields_arr = [];
 
-            if (! empty($excluded_groups)) {
+            if ($excluded_groups != null && strlen($excluded_groups) > 0) {
+                // convert into array
+                $excluded_groups_arr = explode(',', strtoupper($excluded_groups));
+
                 $device_groups = $device_data->groups;
                 foreach ($device_groups as $group) {
                     // The group name will always be parsed as lowercase, even when uppercase in the GUI.
-                    if (in_array(strtoupper($group->name), array_map('strtoupper', $excluded_groups))) {
+                    if (in_array(strtoupper($group->name), $excluded_groups_arr)) {
                         Log::warning('KAFKA: Skipped parsing to Kafka, device is in group: ' . $group->name);
 
                         return;
@@ -62,16 +68,32 @@ class Kafka extends BaseDatastore
                 }
             }
 
+            if ($excluded_measurement != null && strlen($excluded_measurement) > 0) {
+                // convert into array
+                $excluded_measurement_arr = explode(',', $excluded_measurement);
+
+                if (in_array($measurement, $excluded_measurement_arr)) {
+                    Log::warning('KAFKA: Skipped parsing to Kafka, measurement is in measurement-excluded: ' . $measurement);
+                    return;
+                }
+            }
+
+            if($excluded_device_fields != null && strlen($excluded_device_fields) > 0) {
+                // convert into array
+                $excluded_device_fields_arr = explode(',', $excluded_device_fields);
+            }
+
             // start
             $stat = Measurement::start('write');
 
             $tmp_fields = [];
+            $tmp_tags = [];
 
             foreach ($tags as $k => $v) {
                 if (empty($v)) {
                     $v = '_blank_';
                 }
-                $tmp_fields[$k] = $v;
+                $tmp_tags[$k] = $v;
             }
             foreach ($fields as $k => $v) {
                 if ($k == 'time') {
@@ -89,8 +111,13 @@ class Kafka extends BaseDatastore
                 return;
             }
 
-            $tmp_fields['hostname'] = $device['hostname'];
-            $tmp_fields['measurement'] = $measurement;
+            // create and organize data
+            $filteredDeviceData = array_diff_key($device, array_flip($excluded_device_fields_arr));
+
+            $resultArr['measurement'] = $measurement;
+            $resultArr['device'] = $filteredDeviceData;
+            $resultArr['fields'] = $tmp_fields;
+            $resultArr['tags'] = $tmp_tags;
 
             if (Config::get('kafka.debug') === true) {
                 Log::debug('Kafka data: ', [
@@ -102,7 +129,7 @@ class Kafka extends BaseDatastore
             // end
             $this->recordStatistic($stat->end());
 
-            $dataArr = json_encode($tmp_fields);
+            $dataArr = json_encode($resultArr);
             $topic->produce(RD_KAFKA_PARTITION_UA, 0, $dataArr);
             $producer->poll(0);
 

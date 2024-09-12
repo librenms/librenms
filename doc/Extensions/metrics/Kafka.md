@@ -38,7 +38,9 @@ lnms config:set kafka.security.debug 'security'
 lnms config:set kafka.broker.list 'kafka:9092'
 lnms config:set kafka.idempotence true
 lnms config:set kafka.topic 'librenms'
-lmns config:set kafka.groups-exclude ["group_name_1","group_name_2"]
+lmns config:set kafka.groups-exclude "group_name_1,group_name_2"
+lmns config:set kafka.measurement-exclude "measurement_name_1,measurement_name_2"
+lmns config:set kafka.device-fields-exclude "device_id,ip"
 lnms config:set kafka.ssl.enable true
 lnms config:set kafka.ssl.protocol 'ssl'
 lnms config:set kafka.ssl.ca.location '/etc/kafka/secrets/ca-cert'

@@ -1084,7 +1084,15 @@ return [
             ],
             'groups-exclude' => [
                 'description' => 'Excluded device groups',
-                'help' => 'Device groups excluded from sending data to Kafka',
+                'help' => 'Device groups excluded from sending data to Kafka. Comman separated',
+            ],
+            'measurement-exclude' => [
+                'description' => 'Excluded measurements',
+                'help' => 'Discovery modules to be excluded from sending to kafka. Comman separated',
+            ],
+            'device-fields-exclude' => [
+                'description' => 'Excluded device fields',
+                'help' => 'Device fields to be excluded from sending to kafka. Comman separated',
             ],
             'debug' => [
                 'description' => 'Debug',
