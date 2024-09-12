@@ -18,12 +18,9 @@ def fpm_runner(command, args, path=None, host=None, port=None):
     allData = ""
     requestId, data, error, complete = fpmCmd.recv_message()
     while not complete:
-        dataStr = data.decode("utf-8")
+        allData += data.decode("utf-8")
         if error:
-            logger.error(dataStr)
             retcode = 1
-        else:
-            allData += dataStr
 
         requestId, data, error, complete = fpmCmd.recv_message()
 
