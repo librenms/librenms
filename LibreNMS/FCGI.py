@@ -1,4 +1,48 @@
 import socket
+import re
+
+
+def fpm_runner(command, args, path=None, host=None, port=None):
+    retcode = 0
+
+    fpmCmd = FCGI(path=path, host=host, port=port)
+
+    fpmCmd.send_request(
+        {
+            "SCRIPT_FILENAME": command,
+            "REQUEST_METHOD": "GET",
+            "QUERY_STRING": args,
+        }
+    )
+
+    allData = ""
+    requestId, data, error, complete = fpmCmd.recv_message()
+    while not complete:
+        dataStr = data.decode("utf-8")
+        if error:
+            logger.error(dataStr)
+            retcode = 1
+        else:
+            allData += dataStr
+
+        requestId, data, error, complete = fpmCmd.recv_message()
+
+    retSearch = re.compile("(lnms_exit_status:)(\d+)\n")
+    retMatch = retSearch.search(allData)
+    if retMatch != None:
+        retcode = int(retMatch.group(2))
+        retSpan = retMatch.span()
+
+        output = ""
+        if retSpan[0] > 0:
+            output += allData[: retSpan[0]]
+
+        if retSpan[1] < len(allData):
+            output += allData[retSpan[1] :]
+    else:
+        output = allData
+
+    return retcode, output
 
 class FCGI:
     __FCGI_VERSION_1 = 1
@@ -20,7 +64,6 @@ class FCGI:
     __FCGI_UNKNOWN_TYPE = 11
 
     __FCGI_HEADER_LEN = 8
-
 
     def __init__(self, host=None, port=None, path=None, timeout=10, keepalive=False):
         self.host = host
@@ -94,14 +137,14 @@ class FCGI:
         self.requestId = 1
 
     def __recv(self, size):
-        data = ''
+        data = ""
         try:
             data = self.sock.recv(size)
         except socket.error:
             self.close()
         return data
 
-    def send_request(self, nameValPairs={}, postData=''):
+    def send_request(self, nameValPairs={}, postData=""):
         if self.sock == None:
             self.connect()
 
@@ -112,13 +155,17 @@ class FCGI:
             params = bytearray()
             for (name, val) in nameValPairs.items():
                 params.extend(self.__encodeNameVal(name, val))
-            request.extend(self.__encodeRecord(self.__FCGI_PARAMS, params, self.requestId))
+            request.extend(
+                self.__encodeRecord(self.__FCGI_PARAMS, params, self.requestId)
+            )
 
-        request.extend(self.__encodeRecord(self.__FCGI_PARAMS, '', self.requestId))
+        request.extend(self.__encodeRecord(self.__FCGI_PARAMS, "", self.requestId))
 
         if postData:
-           request.extend(self.__encodeRecord(self.__FCGI_STDIN, postData, self.requestId))
-        request.extend(self.__encodeRecord(self.__FCGI_STDIN, '', self.requestId))
+            request.extend(
+                self.__encodeRecord(self.__FCGI_STDIN, postData, self.requestId)
+            )
+        request.extend(self.__encodeRecord(self.__FCGI_STDIN, "", self.requestId))
 
         self.requestId += 1
         self.requests += 1

@@ -52,6 +52,7 @@ import uuid
 from argparse import ArgumentParser
 
 import LibreNMS
+from LibreNMS.FCGI import fpm_runner
 from LibreNMS.command_runner import command_runner
 from LibreNMS.config import DBConfig
 
@@ -153,50 +154,6 @@ def get_time_tag(step):  # Type: int
 
 
 # EOC
-
-def fpm_runner(command, args):
-    import LibreNMS.FCGI as fcgi
-    import re
-
-    retcode = 0
-
-    # TODO: Make this read config for either host + port OR path
-    fpmCmd = fcgi.FCGI(path="/var/run/php/php-fpm-librenms-poller.sock")
-
-    fpmCmd.send_request({
-        'SCRIPT_FILENAME': command,
-        'REQUEST_METHOD': 'GET',
-        'QUERY_STRING': args,
-    })
-
-    allData = ""
-    requestId, data, error, complete = fpmCmd.recv_message()
-    while not complete:
-        dataStr = data.decode('utf-8')
-        if error:
-            logger.error(dataStr)
-            retcode = 1
-        else:
-            allData += dataStr
-
-        requestId, data, error, complete = fpmCmd.recv_message()
-
-    retSearch = re.compile('(lnms_exit_status:)(\d+)\n')
-    retMatch = retSearch.search(allData)
-    if retMatch != None:
-        retcode = int(retMatch.group(2))
-        retSpan = retMatch.span()
-
-        ret = ""
-        if retSpan[0] > 0:
-            ret += allData[:retSpan[0]]
-
-        if retSpan[1] < len(allData):
-            ret += allData[retSpan[1]:]
-    else:
-        ret = allData
-
-    return retcode, ret
 
 
 def print_worker(print_queue, wrapper_type):  # Type: Queue  # Type: str
@@ -326,35 +283,32 @@ def poll_worker(
                     os.path.dirname(os.path.dirname(os.path.realpath(__file__))),
                     wrappers[wrapper_type]["executable"],
                 )
-                # TODO: Make this check for FPM config
-                if wrapper_type != "poller":
-                    command = "/usr/bin/env php {} {} {}".format(
-                        executable, wrappers[wrapper_type]["option"], device_id
-                    )
-                else:
-                    command = "{} {}".format(
-                        wrappers[wrapper_type]["option"], device_id
-                    )
+                command = "/usr/bin/env php {}".format(
+                    executable
+                )
+                args = [wrappers[wrapper_type]["option"], str(device_id)]
 
                 if modules is not None and len(str(modules).strip()):
                     module_str = re.sub("\s", "", str(modules).strip())
-                    command = command + " -m {}".format(module_str)
+                    args.append("-m")
+                    args.append(module_str)
 
                 # enable debug output otherwise, set -q for lnms commands
                 if wrappers[wrapper_type]["executable"] == "lnms":
-                    command = command + (" -vv" if debug else " -q")
+                    args.append("-vv" if debug else "-q")
                 elif debug:
-                    command = command + " -d"
+                    args.append("-d")
 
-                # TODO: Make this check for FPM config
+                # TODO: Make this check for FPM config and pass in correct args
                 if wrapper_type == "poller":
                     exit_code, output = fpm_runner(
                         executable,
-                        command.replace(" ","&"),
+                        "&".join(args),
+                        path="/var/run/php/php-fpm-librenms-poller.sock",
                     )
                 else:
                     exit_code, output = command_runner(
-                        command,
+                        "{} {}".format(command, " ".join(args)),
                         shell=True,
                         timeout=PER_DEVICE_TIMEOUT,
                         valid_exit_codes=VALID_EXIT_CODES,
@@ -363,8 +317,6 @@ def poll_worker(
                     logger.error(
                         "Thread {} exited with code {}".format(
                             threading.current_thread().name, exit_code
-                        )
-                    )
                     ERRORS += 1
                     logger.error(output)
                 elif exit_code == 5:
@@ -480,6 +432,7 @@ def wrapper(
     else:
         DISTRIBUTED_POLLING = False
     # EOC
+
 
     s_time = time.time()
 
