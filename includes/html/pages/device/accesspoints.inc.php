@@ -102,7 +102,7 @@ if ($count > $results) {
     if ($showing_end > $count) {
         $showing_end = $count;
     }
-    echo "<p class=\"pagination\">Showing $showing_start to $showing_end of $count alert rules</p>";
+    echo "<p class=\"pagination\">Showing $showing_start to $showing_end of $count access pints</p>";
     echo '</div>';
     echo '</div>';
 }
