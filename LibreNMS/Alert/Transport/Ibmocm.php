@@ -16,7 +16,7 @@ use LibreNMS\Util\Proxy;
 
 class Ibmocm extends Transport
 {
-    protected $name = 'IBM On Call Manager';
+    protected string $name = 'IBM On Call Manager';
     public function deliverAlert($obj, $opts)
     {
         // Set the OCM URL if configured
