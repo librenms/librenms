@@ -40,6 +40,7 @@ class SensorObserver
         $guess_limits = \LibreNMS\Config::get('sensors.guess_limits', true);
         if ($guess_limits && $sensor->sensor_current !== null && $sensor->sensor_limit === null && $sensor->sensor_limit_low === null) {
             $sensor->guessLimits();
+            $sensor->save();
         }
 
         EventLog::log('Sensor Added: ' . $sensor->sensor_class . ' ' . $sensor->sensor_type . ' ' . $sensor->sensor_index . ' ' . $sensor->sensor_descr, $sensor->device_id, 'sensor', Severity::Notice, $sensor->sensor_id);
