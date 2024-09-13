@@ -14,6 +14,7 @@ class StateIndex extends Model
     public $timestamps = false;
     protected $table = 'state_indexes';
     protected $fillable = ['state_name'];
+    protected $primaryKey = 'state_index_id';
 
     public function sensors(): HasManyThrough
     {
