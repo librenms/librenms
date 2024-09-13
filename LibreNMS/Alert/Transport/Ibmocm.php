@@ -18,6 +18,7 @@ use LibreNMS\Util\Http;
 class Ibmocm extends Transport
 {
     protected string $name = 'IBM On Call Manager';
+
     public function deliverAlert(array $alert_data): bool
     {
         $url = $this->config['ocm-url'];
