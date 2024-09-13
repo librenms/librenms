@@ -110,7 +110,6 @@ class Sensor
         return $this->models;
     }
 
-
     public function canSkip(\App\Models\Sensor $sensor): bool
     {
         if (! empty($sensor->sensor_class) && (Config::getOsSetting($this->device->os, "disabled_sensors.$sensor->sensor_class") || Config::get("disabled_sensors.$sensor->sensor_class"))) {
