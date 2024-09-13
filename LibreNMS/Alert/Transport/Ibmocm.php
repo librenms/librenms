@@ -5,8 +5,6 @@
  * @author Jayna Rogers rokinchikie@gmail.com
  * @copyright Jayna Rogers 2024
  * @license GPL
- * @package LibreNMS
- * @subpackage Alerts
  */
 
 namespace LibreNMS\Alert\Transport;
