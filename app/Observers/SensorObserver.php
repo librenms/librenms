@@ -21,7 +21,7 @@ class SensorObserver
     {
         // fix inverted limits
         if ($sensor->sensor_limit !== null && $sensor->sensor_limit_low !== null && $sensor->sensor_limit_low > $sensor->sensor_limit) {
-            Log::error("Fixing swapped sensor limits");
+            Log::error('Fixing swapped sensor limits');
 
             // Fix high/low thresholds (i.e. on negative numbers)
             [$sensor->sensor_limit, $sensor->sensor_limit_low] = [$sensor->sensor_limit_low, $sensor->sensor_limit];
