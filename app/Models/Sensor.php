@@ -99,7 +99,7 @@ class Sensor extends DeviceRelatedModel implements Keyable
 
     public function guessLimits(): void
     {
-        $this->sensor_limit = match ($this->sensor_class) {
+        $this->sensor_limit_low = match ($this->sensor_class) {
             'temperature' => $this->sensor_current - 10,
             'voltage' => $this->sensor_current * 0.85,
             'humidity' => 30,
@@ -110,7 +110,7 @@ class Sensor extends DeviceRelatedModel implements Keyable
             default => null,
         };
 
-        $this->sensor_limit_low = match ($this->sensor_class) {
+        $this->sensor_limit = match ($this->sensor_class) {
             'temperature' => $this->sensor_current + 20,
             'voltage' => $this->sensor_current * 1.15,
             'humidity' => 70,
