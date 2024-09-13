@@ -142,9 +142,9 @@ class Sensor
         $existingStateIndexes = StateIndex::whereIn('state_name', $usedStates)->get()->keyBy('state_name');
 
         foreach ($usedStates as $stateName) {
-            // make sure the state translations were given
+            // make sure the state translations were given for this state name
             if (! isset($this->states[$stateName])) {
-                Log::error("Non existent state translations ($stateName) set by sensor: " . $stateSensors->where('sensor_type', $stateName)->first()?->sensor_descr);
+                Log::error("Non existent state name ($stateName) set by sensor: " . $stateSensors->where('sensor_type', $stateName)->first()?->sensor_descr);
 
                 continue;
             }
@@ -169,11 +169,15 @@ class Sensor
 
         // update sensor to state indexes
         foreach ($stateSensors as $stateSensor) {
-            $state_index_id = $existingStateIndexes->get($stateSensor->sensor_type)->state_index_id;
-            SensorToStateIndex::updateOrCreate(
-                ['sensor_id' => $stateSensor->sensor_id],
-                ['state_index_id' => $state_index_id],
-            );
+            $state_index_id = $existingStateIndexes->get($stateSensor->sensor_type)?->state_index_id;
+
+            // only map if sensor gave a valid state name
+            if ($state_index_id) {
+                SensorToStateIndex::updateOrCreate(
+                    ['sensor_id' => $stateSensor->sensor_id],
+                    ['state_index_id' => $state_index_id],
+                );
+            }
         }
     }
 }
