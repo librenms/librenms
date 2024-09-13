@@ -16,22 +16,13 @@ use LibreNMS\Util\Proxy;
 
 class Ibmocm extends Transport
 {
-    protected string $name = 'IBM On Call Manager';
-    public function deliverAlert(array $alert_data): bool
+    // No type declaration here, just the protected property
+    protected $name = 'IBM On Call Manager';
+
+    // Corrected method signature to match the LibreNMS Transport interface
+    public function deliverAlert($alert_data, $opts): bool
     {
-        // Set the OCM URL if configured
-        if (! empty($this->config)) {
-            $opts['url'] = $this->config['ocm-url'];
-        }
-
-        return $this->contactOCM($obj, $opts);
-    }
-
-    public function contactOCM($obj, $opts)
-    {
-        $url = $opts['url'];
-
-        // Initialize the cURL request
+        $url = $this->config['ocm-url'];
         $curl = curl_init();
 
         Proxy::applyToCurl($curl);
@@ -40,25 +31,25 @@ class Ibmocm extends Transport
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($curl, CURLOPT_HTTPHEADER, ['Content-Type: application/json', 'Accept: application/json']);
 
-        // Build the JSON payload
+        // Build the JSON payload from the $alert_data array
         $payload = [
-            'hostname' => $obj['hostname'] ?? null,
-            'sysName' => $obj['sysName'] ?? null,
-            'id' => $obj['id'] ?? null,
-            'uid' => $obj['uid'] ?? null,
-            'sysDescr' => $obj['sysDescr'] ?? null,
-            'severity' => $obj['severity'] ?? null,
-            'os' => $obj['os'] ?? null,
-            'type' => $obj['type'] ?? null,
-            'ip' => $obj['ip'] ?? null,
-            'hardware' => $obj['hardware'] ?? null,
-            'version' => $obj['version'] ?? null,
-            'uptime' => $obj['uptime'] ?? null,
-            'uptime_short' => $obj['uptime_short'] ?? null,
-            'timestamp' => $obj['timestamp'] ?? time(),
-            'description' => $obj['description'] ?? null,
-            'title' => $obj['title'] ?? null,
-            'state' => $obj['state'] ?? null,
+            'hostname' => $alert_data['hostname'] ?? null,
+            'sysName' => $alert_data['sysName'] ?? null,
+            'id' => $alert_data['id'] ?? null,
+            'uid' => $alert_data['uid'] ?? null,
+            'sysDescr' => $alert_data['sysDescr'] ?? null,
+            'severity' => $alert_data['severity'] ?? null,
+            'os' => $alert_data['os'] ?? null,
+            'type' => $alert_data['type'] ?? null,
+            'ip' => $alert_data['ip'] ?? null,
+            'hardware' => $alert_data['hardware'] ?? null,
+            'version' => $alert_data['version'] ?? null,
+            'uptime' => $alert_data['uptime'] ?? null,
+            'uptime_short' => $alert_data['uptime_short'] ?? null,
+            'timestamp' => $alert_data['timestamp'] ?? time(),
+            'description' => $alert_data['description'] ?? null,
+            'title' => $alert_data['title'] ?? null,
+            'state' => $alert_data['state'] ?? null,
         ];
 
         curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($payload));
@@ -69,8 +60,7 @@ class Ibmocm extends Transport
 
         // Handle errors
         if ($code != 200) {
-            var_dump('Error when sending post request to IBM On Call Manager. Response code: ' . $code . ' Response body: ' . $ret); // Proper debugging needed
-
+            var_dump('Error when sending post request to IBM On Call Manager. Response code: ' . $code . ' Response body: ' . $ret);
             return false;
         }
 
