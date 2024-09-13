@@ -150,6 +150,13 @@ class Sensor
                 $existingStateIndexes->put($stateName, $stateIndex);
             }
 
+            // make sure the state translations were given
+            if (! isset($this->states[$stateName])) {
+                Log::error("Non existent state translations ($stateName) set by sensor: " . $stateSensors->where('sensor_type', $stateName)->first()?->sensor_descr);
+
+                continue;
+            }
+
             // set state_index_id
             $stateTranslations = $this->states[$stateName];
             foreach ($stateTranslations as $translation) {
