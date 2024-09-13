@@ -16,11 +16,9 @@ use LibreNMS\Util\Proxy;
 
 class Ibmocm extends Transport
 {
-    // No type declaration here, just the protected property
-    protected $name = 'IBM On Call Manager';
+    protected string $name = 'IBM On Call Manager';
 
-    // Corrected method signature to match the LibreNMS Transport interface
-    public function deliverAlert($alert_data, $opts): bool
+    public function deliverAlert(array $alert_data): bool
     {
         $url = $this->config['ocm-url'];
         $curl = curl_init();
@@ -67,7 +65,8 @@ class Ibmocm extends Transport
         return true;
     }
 
-    public static function configTemplate()
+    // Updated to include return type declaration
+    public static function configTemplate(): array
     {
         return [
             'config' => [
