@@ -10,7 +10,7 @@ class SensorToStateIndex extends Model
     protected $table = 'sensors_to_state_indexes';
     protected $primaryKey = 'sensors_to_state_translations_id';
     public $timestamps = false;
-    protected $fillable = ['state_index_id'];
+    protected $fillable = ['sensor_id', 'state_index_id'];
 
     public function sensor(): HasOne
     {
