@@ -52,7 +52,6 @@ import uuid
 from argparse import ArgumentParser
 
 import LibreNMS
-from LibreNMS.FCGI import fpm_runner
 from LibreNMS.command_runner import command_runner
 from LibreNMS.config import DBConfig
 
@@ -103,7 +102,7 @@ wrappers = {
         "total_exec_time": 21600,
     },
     "poller": {
-        "executable": "lnms",
+        "executable": "lnms.sh",
         "option": "device:poll",
         "table_name": "devices",
         "memc_touch_time": 10,
@@ -283,34 +282,25 @@ def poll_worker(
                     os.path.dirname(os.path.dirname(os.path.realpath(__file__))),
                     wrappers[wrapper_type]["executable"],
                 )
-                command = "/usr/bin/env php {}".format(executable)
-                args = [wrappers[wrapper_type]["option"], str(device_id)]
-
+                command = "/usr/bin/env php {} {} {}".format(
+                    executable, wrappers[wrapper_type]["option"], device_id
+                )
                 if modules is not None and len(str(modules).strip()):
                     module_str = re.sub("\s", "", str(modules).strip())
-                    args.append("-m")
-                    args.append(module_str)
+                    command = command + " -m {}".format(module_str)
 
                 # enable debug output otherwise, set -q for lnms commands
                 if wrappers[wrapper_type]["executable"] == "lnms":
-                    args.append("-vv" if debug else "-q")
+                    command = command + (" -vv" if debug else " -q")
                 elif debug:
-                    args.append("-d")
+                    command = command + " -d"
 
-                # TODO: Make this check for FPM config and pass in correct args
-                if wrapper_type == "poller":
-                    exit_code, output = fpm_runner(
-                        executable,
-                        "&".join(args),
-                        path="/var/run/php/php-fpm-librenms-poller.sock",
-                    )
-                else:
-                    exit_code, output = command_runner(
-                        "{} {}".format(command, " ".join(args)),
-                        shell=True,
-                        timeout=PER_DEVICE_TIMEOUT,
-                        valid_exit_codes=VALID_EXIT_CODES,
-                    )
+                exit_code, output = command_runner(
+                    command,
+                    shell=True,
+                    timeout=PER_DEVICE_TIMEOUT,
+                    valid_exit_codes=VALID_EXIT_CODES,
+                )
                 if exit_code not in [0, 6]:
                     logger.error(
                         "Thread {} exited with code {}".format(

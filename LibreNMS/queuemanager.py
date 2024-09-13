@@ -7,8 +7,6 @@ from subprocess import CalledProcessError
 import pymysql
 
 import LibreNMS
-from LibreNMS.FCGI import fpm_runner
-import os
 
 logger = logging.getLogger(__name__)
 
@@ -546,15 +544,7 @@ class PollerQueueManager(QueueManager):
                 if self.config.debug
                 else ("device:poll", device_id, "-q")
             )
-            # TODO: Make this check for FPM config and pass in correct args
-            if True:
-                exit_code, output = fpm_runner(
-                    "{}/lnms".format(os.path.dirname(os.path.dirname(os.path.realpath(__file__)))),
-                    "&".join(args),
-                    path="/var/run/php/php-fpm-librenms-poller.sock"
-                )
-            else:
-                exit_code, output = LibreNMS.call_script("lnms", args)
+            exit_code, output = LibreNMS.call_script("lnms.sh", args)
 
             if self.config.log_output:
                 with open(
