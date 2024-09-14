@@ -26,13 +26,16 @@
 namespace App\Discovery;
 
 use App\Models\Device;
+use App\Models\Eventlog;
 use App\Models\SensorToStateIndex;
 use App\Models\StateIndex;
 use App\Models\StateTranslation;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Config;
 use LibreNMS\DB\SyncsModels;
+use LibreNMS\Enum\Severity;
 
 class Sensor
 {
@@ -150,8 +153,14 @@ class Sensor
 
             // create new state indexes
             if ($stateIndex == null) {
-                $stateIndex = StateIndex::create(['state_name' => $stateName]);
-                $existingStateIndexes->put($stateName, $stateIndex);
+                try {
+                    $stateIndex = StateIndex::create(['state_name' => $stateName]);
+                    $existingStateIndexes->put($stateName, $stateIndex);
+                } catch (UniqueConstraintViolationException) {
+                    Eventlog::log("Duplicate state name $stateName (with case mismatch)", $this->device, 'sensor', Severity::Error, $stateSensors->where('sensor_type', $stateName)->first()?->sensor_id);
+
+                    continue;
+                }
             }
 
             // set state_index_id
