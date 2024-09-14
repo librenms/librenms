@@ -74,8 +74,8 @@ class Sensor
     }
 
     /**
-     * @param string $stateName
-     * @param StateTranslation[] $states
+     * @param  string  $stateName
+     * @param  StateTranslation[]  $states
      * @return $this
      */
     public function withStateTranslations(string $stateName, array $states): static
