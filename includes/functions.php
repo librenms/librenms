@@ -8,6 +8,7 @@
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
 
+use App\Models\StateTranslation;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Enum\Severity;
@@ -495,9 +496,16 @@ function dnslookup($device, $type = false, $return = false)
  * @param  array  $states  array of states, each must contain keys: descr, graph, value, generic
  * @return void
  */
-function create_state_index($state_name, $states = [])
+function create_state_index($state_name, $states = []): void
 {
-    app('sensor-discovery')->withStateTranslations($state_name, $states);
+    app('sensor-discovery')->withStateTranslations($state_name, array_map(function ($state) {
+        return new StateTranslation([
+            'state_descr' => $state['descr'],
+            'state_draw_graph' => $state['graph'],
+            'state_value' => $state['value'],
+            'state_generic_value' => $state['generic'],
+        ]);
+    }, $states));
 }
 
 function create_sensor_to_state_index($device, $state_name, $index)

@@ -43,7 +43,7 @@ class Sensor
     private array $discovered = [];
     private string $relationship = 'sensors';
     private Device $device;
-    /** @var Collection<StateTranslation>[] */
+    /** @var array<string, StateTranslation[]> */
     private array $states = [];
 
     public function __construct(Device $device)
@@ -70,16 +70,14 @@ class Sensor
         return $this;
     }
 
+    /**
+     * @param string $stateName
+     * @param StateTranslation[] $states
+     * @return $this
+     */
     public function withStateTranslations(string $stateName, array $states): static
     {
-        $this->states[$stateName] = collect($states)->map(function (array $state) {
-            return new StateTranslation([
-                'state_descr' => $state['descr'],
-                'state_draw_graph' => $state['graph'],
-                'state_value' => $state['value'],
-                'state_generic_value' => $state['generic'],
-            ]);
-        });
+        $this->states[$stateName] = collect($states);
 
         return $this;
     }
