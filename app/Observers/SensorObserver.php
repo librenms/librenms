@@ -6,6 +6,7 @@ use App\Models\Eventlog;
 use App\Models\Sensor;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Log;
+use LibreNMS\Config;
 use LibreNMS\Enum\Severity;
 
 class SensorObserver
@@ -34,9 +35,8 @@ class SensorObserver
 
     public function creating(Sensor $sensor): void
     {
-        $guess_limits = \LibreNMS\Config::get('sensors.guess_limits', true);
-        if ($guess_limits && $sensor->sensor_current !== null && $sensor->sensor_limit === null && $sensor->sensor_limit_low === null) {
-            $sensor->guessLimits();
+        if (Config::get('sensors.guess_limits') && $sensor->sensor_current !== null) {
+            $sensor->guessLimits($sensor->sensor_limit === null, $sensor->sensor_limit_low === null);
         }
     }
 
@@ -49,6 +49,7 @@ class SensorObserver
     public function created(Sensor $sensor): void
     {
         EventLog::log('Sensor Added: ' . $sensor->sensor_class . ' ' . $sensor->sensor_type . ' ' . $sensor->sensor_index . ' ' . $sensor->sensor_descr, $sensor->device_id, 'sensor', Severity::Notice, $sensor->sensor_id);
+        Log::info("$sensor->sensor_descr: Cur $sensor->sensor_current, Low: $sensor->sensor_limit_low, Low Warn: $sensor->sensor_limit_low_warn, Warn: $sensor->sensor_limit_warn, High: $sensor->sensor_limit");
 
         if ($this->runningInConsole) {
             echo '+';

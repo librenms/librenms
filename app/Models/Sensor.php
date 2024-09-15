@@ -98,30 +98,34 @@ class Sensor extends DeviceRelatedModel implements Keyable
         return self::$icons;
     }
 
-    public function guessLimits(): void
+    public function guessLimits(bool $high, bool $low): void
     {
-        $this->sensor_limit_low = match ($this->sensor_class) {
-            'temperature' => $this->sensor_current - 10,
-            'voltage' => $this->sensor_current * 0.85,
-            'humidity' => 30,
-            'fanspeed' => $this->sensor_current * 0.80,
-            'power_factor' => -1,
-            'signal' => -80,
-            'airflow', 'snr', 'frequency', 'pressure', 'cooling' => $this->sensor_current * 0.95,
-            default => null,
-        };
+        if ($low) {
+            $this->sensor_limit_low = match ($this->sensor_class) {
+                'temperature' => $this->sensor_current - 10,
+                'voltage' => $this->sensor_current * 0.85,
+                'humidity' => 30,
+                'fanspeed' => $this->sensor_current * 0.80,
+                'power_factor' => -1,
+                'signal' => -80,
+                'airflow', 'snr', 'frequency', 'pressure', 'cooling' => $this->sensor_current * 0.95,
+                default => null,
+            };
+        }
 
-        $this->sensor_limit = match ($this->sensor_class) {
-            'temperature' => $this->sensor_current + 20,
-            'voltage' => $this->sensor_current * 1.15,
-            'humidity' => 70,
-            'fanspeed' => $this->sensor_current * 1.80,
-            'power_factor' => 1,
-            'signal' => -30,
-            'load' => 80,
-            'airflow', 'snr', 'frequency', 'pressure', 'cooling' => $this->sensor_current * 1.05,
-            default => null,
-        };
+        if ($high) {
+            $this->sensor_limit = match ($this->sensor_class) {
+                'temperature' => $this->sensor_current + 20,
+                'voltage' => $this->sensor_current * 1.15,
+                'humidity' => 70,
+                'fanspeed' => $this->sensor_current * 1.80,
+                'power_factor' => 1,
+                'signal' => -30,
+                'load' => 80,
+                'airflow', 'snr', 'frequency', 'pressure', 'cooling' => $this->sensor_current * 1.05,
+                default => null,
+            };
+        }
     }
 
     // ---- Define Relationships ----
