@@ -118,7 +118,7 @@ class OSModulesTest extends DBTestCase
         // output all discovery and poller output if debug mode is enabled for phpunit
         $phpunit_debug = in_array('--debug', $_SERVER['argv'], true);
 
-        foreach ($modules as $module) {
+        foreach ($modules as $module => $module_status) {
             $expected = $expected_data[$module]['discovery'] ?? [];
             $actual = $results[$module]['discovery'] ?? [];
             $this->checkTestData($expected, $actual, 'Discovered', $os, $module, $filename, $helper, $phpunit_debug);
