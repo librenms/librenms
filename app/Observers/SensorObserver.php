@@ -5,6 +5,7 @@ namespace App\Observers;
 use App\Models\Eventlog;
 use App\Models\Sensor;
 use Illuminate\Foundation\Application;
+use Illuminate\Support\Facades\Log;
 use LibreNMS\Enum\Severity;
 
 class SensorObserver
@@ -20,12 +21,22 @@ class SensorObserver
     {
         // fix inverted limits
         if ($sensor->sensor_limit !== null && $sensor->sensor_limit_low !== null && $sensor->sensor_limit_low > $sensor->sensor_limit) {
+            Log::error('Fixing swapped sensor limits');
+
             // Fix high/low thresholds (i.e. on negative numbers)
             [$sensor->sensor_limit, $sensor->sensor_limit_low] = [$sensor->sensor_limit_low, $sensor->sensor_limit];
         }
 
         if ($this->runningInConsole && ! $sensor->isDirty()) {
             echo '.';
+        }
+    }
+
+    public function creating(Sensor $sensor): void
+    {
+        $guess_limits = \LibreNMS\Config::get('sensors.guess_limits', true);
+        if ($guess_limits && $sensor->sensor_current !== null && $sensor->sensor_limit === null && $sensor->sensor_limit_low === null) {
+            $sensor->guessLimits();
         }
     }
 
@@ -37,11 +48,6 @@ class SensorObserver
      */
     public function created(Sensor $sensor): void
     {
-        $guess_limits = \LibreNMS\Config::get('sensors.guess_limits', true);
-        if ($guess_limits && $sensor->sensor_current !== null && $sensor->sensor_limit === null && $sensor->sensor_limit_low === null) {
-            $sensor->guessLimits();
-        }
-
         EventLog::log('Sensor Added: ' . $sensor->sensor_class . ' ' . $sensor->sensor_type . ' ' . $sensor->sensor_index . ' ' . $sensor->sensor_descr, $sensor->device_id, 'sensor', Severity::Notice, $sensor->sensor_id);
 
         if ($this->runningInConsole) {

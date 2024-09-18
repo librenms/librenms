@@ -208,11 +208,6 @@ function discover_sensor($unused, $class, $device, $oid, $index, $type, $descr, 
     if (! is_numeric($divisor)) {
         $divisor = 1;
     }
-    if (can_skip_sensor($device, $class, $descr)) {
-        return false;
-    }
-
-    d_echo("Discover sensor: $oid, $index, $type, $descr, $poller_type, $divisor, $multiplier, $entPhysicalIndex, $current, (limits: LL: $low_limit, LW: $low_warn_limit, W: $warn_limit, H: $high_limit), rrd_type = $rrd_type \n");
 
     app('sensor-discovery')->discover(new \App\Models\Sensor([
         'poller_type' => $poller_type,
@@ -635,7 +630,7 @@ function discovery_process($os, $sensor_class, $pre_cache)
     $discovery = $os->getDiscovery('sensors');
     $device = $os->getDeviceArray();
 
-    if (! empty($discovery[$sensor_class]) && ! can_skip_sensor($device, $sensor_class, '')) {
+    if (! empty($discovery[$sensor_class]) && ! app('sensor-discovery')->canSkip(new \App\Models\Sensor(['sensor_class' => $sensor_class]))) {
         $sensor_options = [];
         if (isset($discovery[$sensor_class]['options'])) {
             $sensor_options = $discovery[$sensor_class]['options'];
@@ -747,7 +742,6 @@ function discovery_process($os, $sensor_class, $pre_cache)
                         $value = ($value / $divisor) * $multiplier;
                     }
 
-                    echo "$descr: Cur $value, Low: $low_limit, Low Warn: $low_warn_limit, Warn: $warn_limit, High: $high_limit" . PHP_EOL;
                     $entPhysicalIndex = YamlDiscovery::replaceValues('entPhysicalIndex', $index, null, $data, $pre_cache) ?: null;
                     $entPhysicalIndex_measured = isset($data['entPhysicalIndex_measured']) ? $data['entPhysicalIndex_measured'] : null;
 
@@ -972,33 +966,6 @@ function add_cbgp_peer($device, $peer, $afi, $safi)
         ];
         dbInsert($cbgp, 'bgpPeers_cbgp');
     }
-}
-
-/**
- * check if we should skip this sensor from discovery
- *
- * @param  $device
- * @param  string  $sensor_class
- * @param  string  $sensor_descr
- * @return bool
- */
-function can_skip_sensor($device, $sensor_class = '', $sensor_descr = '')
-{
-    if (! empty($sensor_class) && (Config::getOsSetting($device['os'], "disabled_sensors.$sensor_class") || Config::get("disabled_sensors.$sensor_class"))) {
-        return true;
-    }
-    foreach (Config::getCombined($device['os'], 'disabled_sensors_regex') as $skipRegex) {
-        if (! empty($sensor_descr) && preg_match($skipRegex, $sensor_descr)) {
-            return true;
-        }
-    }
-    foreach (Config::getCombined($device['os'], "disabled_sensors_regex.$sensor_class") as $skipRegex) {
-        if (! empty($sensor_descr) && preg_match($skipRegex, $sensor_descr)) {
-            return true;
-        }
-    }
-
-    return false;
 }
 
 /**
