@@ -194,7 +194,7 @@ nav:
       - Varnish: Extensions/Varnish.md
   - 3rd Party Integration:
     - Integrations:
-     - Check_MK Setup: Extensions/Agent-Setup.md
+      - Check_MK Setup: Extensions/Agent-Setup.md
       - Gateone: Extensions/Gateone.md
       - Graylog: Extensions/Graylog.md
       - Nagios Plugins: Extensions/Services.md
