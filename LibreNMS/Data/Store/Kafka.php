@@ -78,6 +78,7 @@ class Kafka extends BaseDatastore
 
                 if (in_array($measurement, $excluded_measurement_arr)) {
                     Log::warning('KAFKA: Skipped parsing to Kafka, measurement is in measurement-excluded: ' . $measurement);
+
                     return;
                 }
             }
@@ -146,7 +147,6 @@ class Kafka extends BaseDatastore
                     Log::warning('KAFKA: Was unable to flush, messages might be lost!');
                 }
             }
-
         } catch (\Throwable $th) {
             Log::warning($th);
         }
