@@ -107,7 +107,7 @@ extra:
   article_nav_top: false
   article_nav_bottom: true
   php:
-    version_min: 8.1
+    version_min: 8.2
   social:
     - icon: fontawesome/brands/github
       link: https://github.com/librenms/
