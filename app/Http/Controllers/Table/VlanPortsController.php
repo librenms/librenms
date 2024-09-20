@@ -3,13 +3,14 @@
 namespace App\Http\Controllers\Table;
 
 use App\Models\Port;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use LibreNMS\Util\Url;
 
 class VlanPortsController extends TableController
 {
-    protected function sortFields($request)
+    protected function sortFields($request): array
     {
         return [
             'device' => 'device_id',
@@ -22,7 +23,7 @@ class VlanPortsController extends TableController
 
     private int $vlanId;
 
-    protected function baseQuery(Request $request)
+    protected function baseQuery(Request $request): Builder
     {
         $this->validate($request, ['vlan' => 'integer']);
         $this->vlanId = $request->get('vlan', 1);
@@ -51,19 +52,17 @@ class VlanPortsController extends TableController
     }
 
     /**
-     * @param  Port  $port
-     * @return array
+     * @param  Port  $model
      */
-    public function formatItem($port)
+    public function formatItem($model): array
     {
-//        dd($port->toArray());
         return [
-            'device' => Url::deviceLink($port->device),
-            'port' => Url::portLink($port),
+            'device' => Url::deviceLink($model->device),
+            'port' => Url::portLink($model),
             // left joined columns
-            'untagged' => $port->untagged,
-            'state' => $port->state,
-            'cost' => $port->cost,
+            'untagged' => $model['untagged'],
+            'state' => $model['state'],
+            'cost' => $model['cost'],
         ];
     }
 }
