@@ -119,8 +119,8 @@ class OSModulesTest extends DBTestCase
         $phpunit_debug = in_array('--debug', $_SERVER['argv'], true);
 
         foreach ($modules as $module => $module_status) {
-            $expected = $expected_data[$module]['discovery'] ?? [];
-            $actual = $results[$module]['discovery'] ?? [];
+            $expected = $expected_data[$module]['discovery'] ?? null;
+            $actual = $results[$module]['discovery'] ?? null;
             $this->checkTestData($expected, $actual, 'Discovered', $os, $module, $filename, $helper, $phpunit_debug);
 
             // modules without polling
@@ -129,9 +129,9 @@ class OSModulesTest extends DBTestCase
             }
 
             if ($expected_data[$module]['poller'] !== 'matches discovery') {
-                $expected = $expected_data[$module]['poller'] ?? [];
+                $expected = $expected_data[$module]['poller'] ?? null;
             }
-            $actual = $results[$module]['poller'] ?? [];
+            $actual = $results[$module]['poller'] ?? null;
             $this->checkTestData($expected, $actual, 'Polled', $os, $module, $filename, $helper, $phpunit_debug);
         }
 

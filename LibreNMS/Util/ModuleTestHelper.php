@@ -774,7 +774,7 @@ class ModuleTestHelper
             if (isset($this->discovery_module_output[$module])) {
                 return $this->discovery_module_output[$module];
             } else {
-                return "Module $module not run. Modules: " . implode(',', array_keys($this->poller_module_output));
+                return "Module $module not run. Modules: " . implode(',', array_keys($this->discovery_module_output));
             }
         }
 
