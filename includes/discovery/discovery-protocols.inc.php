@@ -205,23 +205,22 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
 } elseif ($device['os'] == 'jetstream') {
     echo ' JETSTREAM-LLDP MIB: ';
 
-    $lldp_array = SnmpQuery::hideMib()->walk('TPLINK-LLDPINFO-MIB::lldpNeighborInfoEntry')->table();
+    $lldp = SnmpQuery::hideMib()->walk('TPLINK-LLDPINFO-MIB::lldpNeighborInfoEntry')->table();
 
-    foreach ($lldp_array as $key => $lldp) {
-        if (! is_array($lldp['lldpNeighborPortIndexId'])) {
+    foreach ($lldp['lldpNeighborPortIndexId'] as $IndexId => $lldp_data) {
+        if (! is_array($lldp_data)) {
             // code below will fail so no need to finish this loop occurence.
             continue;
         }
-        $IndexId = key($lldp['lldpNeighborPortIndexId']);
 
-        $local_ifName = $lldp['lldpNeighborPortId'][$IndexId];
+        $local_ifName = $lldp['lldpNeighborPortId'][$IndexId][1];
         $local_port_id = find_port_id('gigabitEthernet ' . $local_ifName, null, $device['device_id']);
 
-        $remote_device_id = find_device_id($lldp['lldpNeighborDeviceName'][$IndexId]);
-        $remote_device_name = $lldp['lldpNeighborDeviceName'][$IndexId];
-        $remote_device_sysDescr = $lldp['lldpNeighborDeviceDescr'][$IndexId];
-        $remote_device_ip = $lldp['lldpNeighborManageIpAddr'][$IndexId];
-        $remote_port_descr = $lldp['lldpNeighborPortIdDescr'][$IndexId];
+        $remote_device_id = find_device_id($lldp['lldpNeighborDeviceName'][$IndexId][1]);
+        $remote_device_name = $lldp['lldpNeighborDeviceName'][$IndexId][1];
+        $remote_device_sysDescr = $lldp['lldpNeighborDeviceDescr'][$IndexId][1];
+        $remote_device_ip = $lldp['lldpNeighborManageIpAddr'][$IndexId][1];
+        $remote_port_descr = $lldp['lldpNeighborPortIdDescr'][$IndexId][1];
         $remote_port_id = find_port_id($remote_port_descr, null, $remote_device_id);
 
         if (! $remote_device_id &&
