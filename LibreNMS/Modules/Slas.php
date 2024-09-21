@@ -119,7 +119,7 @@ class Slas implements Module
     /**
      * @inheritDoc
      */
-    public function dump(Device $device)
+    public function dump(Device $device, string $type): ?array
     {
         return [
             'slas' => $device->slas()->orderBy('sla_nr')

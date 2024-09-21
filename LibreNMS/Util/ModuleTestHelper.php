@@ -733,8 +733,8 @@ class ModuleTestHelper
 
         // only dump data for the given modules (and modules that support dumping)
         foreach ($modules as $module) {
-            $module_data = Module::fromName($module)->dump(DeviceCache::get($device_id));
-            if ($module_data !== false) {
+            $module_data = Module::fromName($module)->dump(DeviceCache::get($device_id), $type);
+            if ($module_data !== null) {
                 $data[$module][$type] = $this->dumpToArray($module_data);
             }
         }

@@ -267,8 +267,12 @@ class Ospf implements Module
     /**
      * @inheritDoc
      */
-    public function dump(Device $device)
+    public function dump(Device $device, string $type): ?array
     {
+        if ($type == 'discovery') {
+            return null;
+        }
+
         return [
             'ospf_ports' => $device->ospfPorts()
                 ->leftJoin('ports', 'ospf_ports.port_id', 'ports.port_id')

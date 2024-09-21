@@ -120,7 +120,7 @@ class Xdsl implements Module
     /**
      * @inheritDoc
      */
-    public function dump(Device $device)
+    public function dump(Device $device, string $type): ?array
     {
         return [
             'ports_adsl' => $device->portsAdsl()->orderBy('ifIndex')

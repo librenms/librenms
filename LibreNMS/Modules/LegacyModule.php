@@ -130,12 +130,19 @@ class LegacyModule implements Module
     /**
      * @inheritDoc
      */
-    public function dump(Device $device)
+    public function dump(Device $device, string $type): ?array
     {
+        if ($type == 'discovery' && ! \LibreNMS\Util\Module::legacyDiscoveryExists($this->name)) {
+            return null;
+        }
+        if ($type == 'poller' && ! \LibreNMS\Util\Module::legacyPollingExists($this->name)) {
+            return null;
+        }
+
         $data = [];
         $dump_rules = $this->moduleDumpDefinition();
         if (empty($dump_rules)) {
-            return false; // not supported for this legacy module
+            return null; // not supported for this legacy module
         }
 
         foreach ($dump_rules as $table => $info) {

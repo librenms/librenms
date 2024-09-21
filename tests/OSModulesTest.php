@@ -174,10 +174,13 @@ class OSModulesTest extends DBTestCase
         });
     }
 
-    private function checkTestData(array $expected, array $actual, string $type, string $os, mixed $module, string $filename, ModuleTestHelper $helper, bool $phpunit_debug): void
+    private function checkTestData(?array $expected, ?array $actual, string $type, string $os, mixed $module, string $filename, ModuleTestHelper $helper, bool $phpunit_debug): void
     {
         // try simple and fast comparison first, if that fails, do a costly/well formatted comparison
         if ($expected != $actual) {
+            $this->assertNotNull($actual, "OS $os: $type $module no data generated when it is expected");
+            $this->assertNotNull($expected, "OS $os: $type $module generates data when none is expected");
+
             $message = Color::colorize('bg-red', "OS $os: $type $module data does not match that found in $filename");
             $message .= PHP_EOL;
             $message .= ($type == 'Discovered'

@@ -243,9 +243,9 @@ class Netstats implements Module
     /**
      * @inheritDoc
      */
-    public function dump(Device $device)
+    public function dump(Device $device, string $type): ?array
     {
-        return false; // no database data to dump (may add rrd later)
+        return null; // no database data to dump (may add rrd later)
     }
 
     private function statName(string $oid): string
