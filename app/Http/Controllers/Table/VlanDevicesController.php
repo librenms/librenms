@@ -37,11 +37,11 @@ class VlanDevicesController extends TableController
             ])
             ->withCount(['ports' => function ($query) {
                 $query->distinct()->where('ifVlan', $this->vlanId)
-                    ->orWhereHas('vlans', fn($q) => $q->where('vlan', $this->vlanId));
+                    ->orWhereHas('vlans', fn ($q) => $q->where('vlan', $this->vlanId));
             }])
             ->where(function ($query) {
                 $query->where('vlans.vlan_vlan', $this->vlanId)
-                    ->orWhereHas('ports', fn($q) => $q->where('ifVlan', $this->vlanId));
+                    ->orWhereHas('ports', fn ($q) => $q->where('ifVlan', $this->vlanId));
             })
         ->leftJoin('vlans', function ($join) {
             $join->on('devices.device_id', '=', 'vlans.device_id')
