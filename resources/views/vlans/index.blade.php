@@ -6,7 +6,7 @@
     <div class="container-fluid">
         <x-panel body-class="!tw-p-0">
             <x-slot name="heading">
-                <h2 class="panel-title" class="tw-bg-inherit">{{ __('VLAN') }}
+                <h2 class="panel-title tw-bg-inherit">{{ __('VLAN') }}
                 <select id="vlan-select" class="tw-bg-inherit">
                     @foreach($vlanIds as $vlanId)
                         <option>{{ $vlanId }}</option>
