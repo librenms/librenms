@@ -216,7 +216,6 @@ LldpV2PortIdSubtype ::= TEXTUAL-CONVENTION
     }
 
 LldpV2PortId ::= TEXTUAL-CONVENTION
-    DISPLAY-HINT "1x:"
     STATUS      current
     DESCRIPTION
             "This TC describes the format of a port identifier string.
