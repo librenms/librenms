@@ -156,7 +156,7 @@
                     "bgpPeerRemoteAs": 64513,
                     "bgpPeerState": "established",
                     "bgpPeerAdminStatus": "start",
-                    "bgpPeerLastErrorCode": null,
+                    "bgpPeerLastErrorCode": 0,
                     "bgpPeerLastErrorSubCode": null,
                     "bgpPeerLastErrorText": null,
                     "bgpPeerIface": null,
@@ -179,7 +179,7 @@
                     "bgpPeerRemoteAs": 64513,
                     "bgpPeerState": "established",
                     "bgpPeerAdminStatus": "start",
-                    "bgpPeerLastErrorCode": null,
+                    "bgpPeerLastErrorCode": 0,
                     "bgpPeerLastErrorSubCode": null,
                     "bgpPeerLastErrorText": null,
                     "bgpPeerIface": null,
@@ -313,6 +313,32 @@
                     "type": "network",
                     "serial": "FOC1426Y2AY",
                     "icon": "cisco.svg"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    },
+    "entity-physical": {
+        "discovery": {
+            "entPhysical": [
+                {
+                    "entPhysicalIndex": 1001,
+                    "entPhysicalDescr": null,
+                    "entPhysicalClass": null,
+                    "entPhysicalName": null,
+                    "entPhysicalHardwareRev": null,
+                    "entPhysicalFirmwareRev": null,
+                    "entPhysicalSoftwareRev": null,
+                    "entPhysicalAlias": null,
+                    "entPhysicalAssetID": null,
+                    "entPhysicalIsFRU": null,
+                    "entPhysicalModelName": "WS-C3560G-24TS-S",
+                    "entPhysicalVendorType": null,
+                    "entPhysicalSerialNum": "FOC1426Y2AY",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": -1,
+                    "entPhysicalMfgName": null,
+                    "ifIndex": null
                 }
             ]
         },
