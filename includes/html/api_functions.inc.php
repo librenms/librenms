@@ -1262,6 +1262,7 @@ function update_device_port_notes(Illuminate\Http\Request $request): JsonRespons
     $hostname = $request->route('hostname');
     // use hostname as device_id if it's all digits
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $device = device_by_id_cache($device_id);
 
     $data = json_decode($request->getContent(), true);
     $field = 'notes';
@@ -1270,7 +1271,7 @@ function update_device_port_notes(Illuminate\Http\Request $request): JsonRespons
         return api_error(400, 'Port field to patch has not been supplied.');
     }
 
-    if (set_dev_attrib($device_id, 'port_id_notes:' . $portid, $content)) {
+    if (set_dev_attrib($device, 'port_id_notes:' . $portid, $content)) {
         return api_success_noresult(200, 'Port ' . $field . ' field has been updated');
     } else {
         return api_error(500, 'Port ' . $field . ' field failed to be updated');
