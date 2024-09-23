@@ -277,10 +277,17 @@ class Ospf implements Module
             'ospf_ports' => $device->ospfPorts()
                 ->leftJoin('ports', 'ospf_ports.port_id', 'ports.port_id')
                 ->select(['ospf_ports.*', 'ifIndex'])
+                ->orderBy('ospf_port_id')->orderBy('context_name')
                 ->get()->map->makeHidden(['id', 'device_id', 'port_id']),
-            'ospf_instances' => $device->ospfInstances->map->makeHidden(['id', 'device_id']),
-            'ospf_areas' => $device->ospfAreas->map->makeHidden(['id', 'device_id']),
-            'ospf_nbrs' => $device->ospfNbrs->map->makeHidden(['id', 'device_id']),
+            'ospf_instances' => $device->ospfInstances()
+                ->orderBy('ospf_instance_id')->orderBy('context_name')
+                ->get()->map->makeHidden(['id', 'device_id']),
+            'ospf_areas' => $device->ospfAreas()
+                ->orderBy('ospfAreaId')->orderBy('context_name')
+                ->get()->map->makeHidden(['id', 'device_id']),
+            'ospf_nbrs' => $device->ospfNbrs()
+                ->orderBy('ospf_nbr_id')->orderBy('context_name')
+                ->get()->map->makeHidden(['id', 'device_id']),
         ];
     }
 }
