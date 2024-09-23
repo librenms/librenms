@@ -119,8 +119,8 @@ class OSModulesTest extends DBTestCase
         $phpunit_debug = in_array('--debug', $_SERVER['argv'], true);
 
         foreach ($modules as $module => $module_status) {
-            $expected = $expected_data[$module]['discovery'] ?? [];
-            $actual = $results[$module]['discovery'] ?? [];
+            $expected = $expected_data[$module]['discovery'] ?? null;
+            $actual = $results[$module]['discovery'] ?? null;
             $this->checkTestData($expected, $actual, 'Discovered', $os, $module, $filename, $helper, $phpunit_debug);
 
             // modules without polling
@@ -129,9 +129,9 @@ class OSModulesTest extends DBTestCase
             }
 
             if ($expected_data[$module]['poller'] !== 'matches discovery') {
-                $expected = $expected_data[$module]['poller'] ?? [];
+                $expected = $expected_data[$module]['poller'] ?? null;
             }
-            $actual = $results[$module]['poller'] ?? [];
+            $actual = $results[$module]['poller'] ?? null;
             $this->checkTestData($expected, $actual, 'Polled', $os, $module, $filename, $helper, $phpunit_debug);
         }
 
@@ -174,10 +174,13 @@ class OSModulesTest extends DBTestCase
         });
     }
 
-    private function checkTestData(array $expected, array $actual, string $type, string $os, mixed $module, string $filename, ModuleTestHelper $helper, bool $phpunit_debug): void
+    private function checkTestData(?array $expected, ?array $actual, string $type, string $os, mixed $module, string $filename, ModuleTestHelper $helper, bool $phpunit_debug): void
     {
         // try simple and fast comparison first, if that fails, do a costly/well formatted comparison
         if ($expected != $actual) {
+            $this->assertNotNull($actual, "OS $os: $type $module no data generated when it is expected");
+            $this->assertNotNull($expected, "OS $os: $type $module generates data when none is expected");
+
             $message = Color::colorize('bg-red', "OS $os: $type $module data does not match that found in $filename");
             $message .= PHP_EOL;
             $message .= ($type == 'Discovered'

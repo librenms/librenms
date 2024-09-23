@@ -337,7 +337,7 @@
                     "group": "Modem 0 on Cellular0",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": 0,
+                    "sensor_current": 12,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
@@ -362,7 +362,7 @@
                     "group": "Modem 0 on Cellular0",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": 0,
+                    "sensor_current": 2,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
@@ -387,7 +387,7 @@
                     "group": "Modem 0 on Cellular0",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": 0,
+                    "sensor_current": 10,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
@@ -412,7 +412,7 @@
                     "group": "Modem 0 on Cellular0",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": 0,
+                    "sensor_current": 2,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
@@ -437,7 +437,7 @@
                     "group": "Modem 0 on Cellular0",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": 0,
+                    "sensor_current": 3,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
@@ -462,7 +462,7 @@
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": 0,
+                    "sensor_current": 2,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
@@ -487,7 +487,7 @@
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": 0,
+                    "sensor_current": 1,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
@@ -512,7 +512,7 @@
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": 0,
+                    "sensor_current": 1,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
@@ -537,7 +537,7 @@
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": 0,
+                    "sensor_current": 1,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
@@ -555,6 +555,31 @@
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.9.9.176.1.2.14.0",
+                    "sensor_index": "0",
+                    "sensor_type": "cRFCfgRedundancyOperMode",
+                    "sensor_descr": "VSS Mode",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 1,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": "0",
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": "cRFCfgRedundancyOperMode"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.9.9.176.1.1.4.0",
                     "sensor_index": "0",
                     "sensor_type": "cRFStatusPeerUnitState",
@@ -562,7 +587,7 @@
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": 0,
+                    "sensor_current": 2,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
@@ -587,7 +612,7 @@
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": 0,
+                    "sensor_current": 14,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
@@ -1139,6 +1164,62 @@
                     "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 2
+                },
+                {
+                    "state_name": "cRFCfgRedundancyOperMode",
+                    "state_descr": "nonRedundant",
+                    "state_draw_graph": 0,
+                    "state_value": 1,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "cRFCfgRedundancyOperMode",
+                    "state_descr": "staticLoadShareNonRedundant",
+                    "state_draw_graph": 0,
+                    "state_value": 2,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "cRFCfgRedundancyOperMode",
+                    "state_descr": "dynamicLoadShareNonRedundant",
+                    "state_draw_graph": 0,
+                    "state_value": 3,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "cRFCfgRedundancyOperMode",
+                    "state_descr": "staticLoadShareRedundant",
+                    "state_draw_graph": 0,
+                    "state_value": 4,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "cRFCfgRedundancyOperMode",
+                    "state_descr": "dynamicLoadShareRedundant",
+                    "state_draw_graph": 0,
+                    "state_value": 5,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "cRFCfgRedundancyOperMode",
+                    "state_descr": "coldStandbyRedundant",
+                    "state_draw_graph": 0,
+                    "state_value": 6,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "cRFCfgRedundancyOperMode",
+                    "state_descr": "warmStandbyRedundant",
+                    "state_draw_graph": 0,
+                    "state_value": 7,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "cRFCfgRedundancyOperMode",
+                    "state_descr": "hotStandbyRedundant",
+                    "state_draw_graph": 0,
+                    "state_value": 8,
+                    "state_generic_value": 0
                 },
                 {
                     "state_name": "cRFStatusPeerUnitState",
@@ -1438,7 +1519,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": "14",
                     "entPhysicalIndex_measured": null,
-                    "sensor_prev": 0,
+                    "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
                     "state_name": "c3gGsmCurrentBand"
@@ -1463,7 +1544,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": "14",
                     "entPhysicalIndex_measured": null,
-                    "sensor_prev": 0,
+                    "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
                     "state_name": "c3gGsmCurrentRoamingStatus"
@@ -1488,7 +1569,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": "14",
                     "entPhysicalIndex_measured": null,
-                    "sensor_prev": 0,
+                    "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
                     "state_name": "c3gGsmPacketService"
@@ -1513,7 +1594,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": "14",
                     "entPhysicalIndex_measured": null,
-                    "sensor_prev": 0,
+                    "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
                     "state_name": "c3gGsmSimStatus"
@@ -1538,7 +1619,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": "14",
                     "entPhysicalIndex_measured": null,
-                    "sensor_prev": 0,
+                    "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
                     "state_name": "c3gModemStatus"
@@ -1563,7 +1644,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": "3",
                     "entPhysicalIndex_measured": null,
-                    "sensor_prev": 0,
+                    "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
                     "state_name": "cefcFRUPowerOperStatus"
@@ -1588,7 +1669,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": "1",
                     "entPhysicalIndex_measured": null,
-                    "sensor_prev": 0,
+                    "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
                     "state_name": "ciscoEnvMonSupplyState"
@@ -1613,7 +1694,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": "2",
                     "entPhysicalIndex_measured": null,
-                    "sensor_prev": 0,
+                    "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
                     "state_name": "ciscoEnvMonSupplyState"
@@ -1638,10 +1719,35 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": "1",
                     "entPhysicalIndex_measured": null,
-                    "sensor_prev": 0,
+                    "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
                     "state_name": "ciscoEnvMonTemperatureState"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.9.9.176.1.2.14.0",
+                    "sensor_index": "0",
+                    "sensor_type": "cRFCfgRedundancyOperMode",
+                    "sensor_descr": "VSS Mode",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 0,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": "0",
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": 1,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": "cRFCfgRedundancyOperMode"
                 },
                 {
                     "sensor_deleted": 0,
@@ -1663,7 +1769,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": "0",
                     "entPhysicalIndex_measured": null,
-                    "sensor_prev": 0,
+                    "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
                     "state_name": "cRFStatusPeerUnitState"
@@ -1688,7 +1794,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": "0",
                     "entPhysicalIndex_measured": null,
-                    "sensor_prev": 0,
+                    "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
                     "state_name": "cRFStatusUnitState"
@@ -2231,6 +2337,62 @@
                     "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 2
+                },
+                {
+                    "state_name": "cRFCfgRedundancyOperMode",
+                    "state_descr": "nonRedundant",
+                    "state_draw_graph": 0,
+                    "state_value": 1,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "cRFCfgRedundancyOperMode",
+                    "state_descr": "staticLoadShareNonRedundant",
+                    "state_draw_graph": 0,
+                    "state_value": 2,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "cRFCfgRedundancyOperMode",
+                    "state_descr": "dynamicLoadShareNonRedundant",
+                    "state_draw_graph": 0,
+                    "state_value": 3,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "cRFCfgRedundancyOperMode",
+                    "state_descr": "staticLoadShareRedundant",
+                    "state_draw_graph": 0,
+                    "state_value": 4,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "cRFCfgRedundancyOperMode",
+                    "state_descr": "dynamicLoadShareRedundant",
+                    "state_draw_graph": 0,
+                    "state_value": 5,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "cRFCfgRedundancyOperMode",
+                    "state_descr": "coldStandbyRedundant",
+                    "state_draw_graph": 0,
+                    "state_value": 6,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "cRFCfgRedundancyOperMode",
+                    "state_descr": "warmStandbyRedundant",
+                    "state_draw_graph": 0,
+                    "state_value": 7,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "cRFCfgRedundancyOperMode",
+                    "state_descr": "hotStandbyRedundant",
+                    "state_draw_graph": 0,
+                    "state_value": 8,
+                    "state_generic_value": 0
                 },
                 {
                     "state_name": "cRFStatusPeerUnitState",

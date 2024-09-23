@@ -74,7 +74,7 @@ class EntityPhysical implements Module
     /**
      * @inheritDoc
      */
-    public function dump(Device $device)
+    public function dump(Device $device, string $type): ?array
     {
         return [
             'entPhysical' => $device->entityPhysical()->orderBy('entPhysicalIndex')

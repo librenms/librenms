@@ -8430,8 +8430,8 @@
                     "sdpLastMgmtChange": 4,
                     "sdpLastStatusChange": 0,
                     "sdpActiveLspType": "not-applicable",
-                    "sdpFarEndInetAddressType": "ipv4",
-                    "sdpFarEndInetAddress": "10.1.97.30"
+                    "sdpFarEndInetAddress": "10.1.97.30",
+                    "sdpFarEndInetAddressType": "ipv4"
                 }
             ],
             "mpls_sdp_binds": [
@@ -8503,8 +8503,8 @@
                     "sdpLastMgmtChange": 4,
                     "sdpLastStatusChange": 0,
                     "sdpActiveLspType": "not-applicable",
-                    "sdpFarEndInetAddressType": "ipv4",
-                    "sdpFarEndInetAddress": "10.1.97.30"
+                    "sdpFarEndInetAddress": "10.1.97.30",
+                    "sdpFarEndInetAddressType": "ipv4"
                 }
             ],
             "mpls_sdp_binds": [
@@ -8797,5 +8797,46 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "ports-stack": {
+        "discovery": {
+            "ports_stack": [
+                {
+                    "high_ifIndex": 35684352,
+                    "low_ifIndex": 2,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 37781504,
+                    "low_ifIndex": 3,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 46170112,
+                    "low_ifIndex": 1509949473,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 46235648,
+                    "low_ifIndex": 131073,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 46235648,
+                    "low_ifIndex": 131074,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 46333952,
+                    "low_ifIndex": 1509949478,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1509949473,
+                    "low_ifIndex": 131075,
+                    "ifStackStatus": "active"
+                }
+            ]
+        }
     }
 }
