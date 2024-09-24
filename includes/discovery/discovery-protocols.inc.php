@@ -303,13 +303,30 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
         'lldpV2RemManAddrOID' => 'lldpRemManAddrOID',
     ];
 
-    if (! empty($lldpv2_array)) {
+    if (!empty($lldpv2_array)) {
         // map it to lldp_array
         foreach ($lldpv2_array as $lldpV2RemTimeMark => $value) {
             foreach ($value as $lldpV2RemLocalIfIndex => $value) {
                 foreach ($value as $lldpV2RemLocalDestMACAddress => $value) {
                     foreach ($value as $lldpV2RemIndex => $lldpv2_array_entries) {
                         foreach ($lldpv2_array_entries as $key => $value) {
+                            // Check if 'lldpV2RemPortIdSubtype' is of type 'interfaceName(5)' and create the variable $rem_port_id_subtype to use it later
+                            if ($key === 'lldpV2RemPortIdSubtype' && $value == '5') {
+                                $rem_port_id_subtype = '5';  // Assign the port subtype
+                            }
+    
+                            // Check if 'lldpV2RemPortId' should be converted to ASCII
+                            if ($key === 'lldpV2RemPortId' && $rem_port_id_subtype === '5') {
+                                // Remove colons to check if it's a hexadecimal string
+                                $hex_value = str_replace(':', '', $value);
+                                if (ctype_xdigit($hex_value)) {
+                                    // Convert the hexadecimal value to ASCII
+                                    $value = hex2bin($hex_value);                                                    
+                                    // Update the value of lldpV2RemPortId to ASCII
+                                    $lldp_array[$lldpV2RemTimeMark][$lldpV2RemLocalIfIndex][$lldpV2RemIndex]['lldpV2RemPortId'] = $value;
+                                }
+                            }
+
                             $newKey = $mapV2toV1[$key] ?? $key;
                             $lldp_array[$lldpV2RemTimeMark][$lldpV2RemLocalIfIndex][$lldpV2RemIndex][$newKey] = $value;
                         }
