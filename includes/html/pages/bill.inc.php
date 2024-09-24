@@ -10,7 +10,7 @@ if (Auth::user()->hasGlobalAdmin()) {
     include 'includes/html/pages/bill/actions.inc.php';
 }
 
-if (!Bill::find($bill_id)) {
+if (!Bill::where('bill_id', $bill_id)->exists()) {
     echo "Bill does not exist";
 } elseif (bill_permitted($bill_id)) {
     $bill_data = dbFetchRow('SELECT * FROM bills WHERE bill_id = ?', [$bill_id]);
