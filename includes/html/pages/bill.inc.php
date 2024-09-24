@@ -11,7 +11,7 @@ if (Auth::user()->hasGlobalAdmin()) {
 }
 
 if (!Bill::where('bill_id', $bill_id)->exists()) {
-    echo "Bill does not exist";
+    abort(404);
 } elseif (bill_permitted($bill_id)) {
     $bill_data = dbFetchRow('SELECT * FROM bills WHERE bill_id = ?', [$bill_id]);
 
