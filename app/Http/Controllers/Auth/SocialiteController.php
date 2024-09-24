@@ -125,8 +125,6 @@ class SocialiteController extends Controller
 
             return redirect()->route('login')->with('block_auto_redirect', true);
         }
-
-        return redirect()->route('login');
     }
 
     private function register(string $provider): void
