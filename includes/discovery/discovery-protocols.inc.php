@@ -303,7 +303,7 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
         'lldpV2RemManAddrOID' => 'lldpRemManAddrOID',
     ];
 
-    if (!empty($lldpv2_array)) {
+    if (! empty($lldpv2_array)) {
         // map it to lldp_array
         foreach ($lldpv2_array as $lldpV2RemTimeMark => $value) {
             foreach ($value as $lldpV2RemLocalIfIndex => $value) {
