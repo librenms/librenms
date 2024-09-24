@@ -125,7 +125,7 @@ class PortsController extends TableController
             ->when($request->get('state'), function (Builder $query, $state) {
                 switch ($state) {
                     case 'down':
-                        return $query->where('ifAdminStatus', 'up')->where('ifOperStatus', 'down');
+                        return $query->where('ifAdminStatus', 'up')->where('ifOperStatus', '!=', 'up');
                     case 'up':
                         return $query->where('ifAdminStatus', 'up')->where('ifOperStatus', 'up');
                     case 'admindown':
