@@ -37,7 +37,7 @@ foreach (explode("\n", $oids) as $data) {
             $limit = snmp_get($device, $limit_oid, '-Oqv', 'IDRAC-MIB-SMIv2');
             $lowlimit = snmp_get($device, $lowlimit_oid, '-Oqv', 'IDRAC-MIB-SMIv2');
 
-            discover_sensor($valid['sensor'], 'temperature', $device, $temperature_oid, $temperature_id, 'drac', $descr, '10', '1', $lowlimit / 10, $lowwarnlimit / 10, $warnlimit / 10, $limit / 10, $temperature / 10);
+            discover_sensor(null, 'temperature', $device, $temperature_oid, $temperature_id, 'drac', $descr, '10', '1', $lowlimit / 10, $lowwarnlimit / 10, $warnlimit / 10, $limit / 10, $temperature / 10);
         }
     }//end if
 }

@@ -125,17 +125,22 @@ class Core implements Module
         $device->save();
     }
 
-    public function cleanup(Device $device): void
+    public function dataExists(Device $device): bool
     {
-        // nothing to cleanup
+        return false; // no module specific data
+    }
+
+    public function cleanup(Device $device): int
+    {
+        return 0; // nothing to cleanup
     }
 
     /**
      * @inheritDoc
      */
-    public function dump(Device $device)
+    public function dump(Device $device, string $type): ?array
     {
-        return false; // all data here is stored in the devices table and covered by the os module
+        return null; // all data here is stored in the devices table and covered by the os module
     }
 
     /**

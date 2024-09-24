@@ -14,6 +14,6 @@ if (is_array($oids)) {
         $oid = '.1.3.6.1.4.1.890.1.5.1.1.6.1.2.' . $index;
         $current = $entry['accessSwitchSysTempCurValue'];
         $divisor = '1';
-        discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, 'zyxel-ies', $descr, '1', '1', null, $entry['accessSwitchSysTempHighThresh'], null, null, $current);
+        discover_sensor(null, 'temperature', $device, $oid, $index, 'zyxel-ies', $descr, '1', '1', null, $entry['accessSwitchSysTempHighThresh'], null, null, $current);
     }
 }

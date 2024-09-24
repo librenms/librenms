@@ -11,5 +11,5 @@ if ($oids) {
     $type = 'cyberpower';
     $descr = 'Input';
     $voltage = $voltage / 10;
-    discover_sensor($valid['sensor'], 'voltage', $device, $oid, '0', $type, $descr, $divisor, '1', null, null, null, null, $voltage);
+    discover_sensor(null, 'voltage', $device, $oid, '0', $type, $descr, $divisor, '1', null, null, null, null, $voltage);
 }

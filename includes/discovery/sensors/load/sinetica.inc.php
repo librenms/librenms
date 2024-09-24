@@ -36,5 +36,5 @@ foreach ($oids as $oid => $data) {
     $type = 'sinetica';
     $index = '4.4.1.5.' . $current_id;
 
-    discover_sensor($valid['sensor'], 'load', $device, $current_oid, $index, $type, $descr, 1, 1, null, null, null, null, $current);
+    discover_sensor(null, 'load', $device, $current_oid, $index, $type, $descr, 1, 1, null, null, null, null, $current);
 }

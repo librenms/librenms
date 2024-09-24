@@ -14,6 +14,6 @@ if (! empty($oids)) {
     if (! empty($oids)) {
         [,$current] = explode(' ', $oids);
         $descr = 'System voltage';
-        discover_sensor($valid['sensor'], 'voltage', $device, $num_oid . '.' . $sensor_index, $text_oid . '.' . $sensor_index, $type, $descr, 1, 1, null, null, null, null, $current);
+        discover_sensor(null, 'voltage', $device, $num_oid . '.' . $sensor_index, $text_oid . '.' . $sensor_index, $type, $descr, 1, 1, null, null, null, null, $current);
     }
 }

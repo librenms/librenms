@@ -437,14 +437,18 @@ function add_device(Illuminate\Http\Request $request)
             $device->snmpver = $data['version'];
         }
 
+        $force_add = ! empty($data['force_add']);
+
         if (! empty($data['snmp_disable'])) {
             $device->os = $data['os'] ?? 'ping';
             $device->sysName = $data['sysName'] ?? '';
             $device->hardware = $data['hardware'] ?? '';
             $device->snmp_disable = 1;
+        } elseif ($force_add && ! $device->hasSnmpInfo()) {
+            return api_error(400, 'SNMP information is required when force adding a device');
         }
 
-        (new ValidateDeviceAndCreate($device, ! empty($data['force_add']), ! empty($data['ping_fallback'])))->execute();
+        (new ValidateDeviceAndCreate($device, $force_add, ! empty($data['ping_fallback'])))->execute();
     } catch (Exception $e) {
         return api_error(500, $e->getMessage());
     }

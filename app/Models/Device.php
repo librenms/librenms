@@ -167,6 +167,30 @@ class Device extends BaseModel
         return null;
     }
 
+    public function hasSnmpInfo(): bool
+    {
+        if ($this->snmpver == 'v3') {
+            if ($this->authlevel == 'authNoPriv') {
+                return ! empty($this->authname) && ! empty($this->authpass);
+            }
+
+            if ($this->authlevel == 'authPriv') {
+                return ! empty($this->authname)
+                    && ! empty($this->authpass)
+                    && ! empty($this->cryptoalgo)
+                    && ! empty($this->cryptopass);
+            }
+
+            return $this->authlevel !== 'noAuthNoPriv'; // reject if not noAuthNoPriv
+        }
+
+        if ($this->snmpver == 'v2c' || $this->snmpver == 'v1') {
+            return ! empty($this->community);
+        }
+
+        return false; // no known snmpver
+    }
+
     /**
      * Get VRF contexts to poll.
      * If no contexts are found, return the default context ''
@@ -382,9 +406,9 @@ class Device extends BaseModel
         $this->save();
     }
 
-    public function getAttrib($name)
+    public function getAttrib($name, $default = null)
     {
-        return $this->attribs->pluck('attrib_value', 'attrib_type')->get($name);
+        return $this->attribs->pluck('attrib_value', 'attrib_type')->get($name, $default);
     }
 
     public function setAttrib($name, $value)
