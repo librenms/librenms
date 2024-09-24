@@ -76,7 +76,7 @@ class SocialiteController extends Controller
             $error_description = $request->query('error_description');
             toast()->error($error . ': ' . $error_description);
 
-            return redirect()->route('login');
+            return redirect()->route('login')->with('block_auto_redirect', true);
         }
 
         $this->socialite_user = Socialite::driver($provider)->user();
@@ -122,6 +122,8 @@ class SocialiteController extends Controller
             return redirect()->intended();
         } catch (AuthenticationException $e) {
             toast()->error($e->getMessage());
+
+            return redirect()->route('login')->with('block_auto_redirect', true);
         }
 
         return redirect()->route('login');
