@@ -313,8 +313,7 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
                             // Check if 'lldpV2RemPortIdSubtype' is of type 'interfaceName(5)' and create the variable $rem_port_id_subtype to use it later
                             if ($key === 'lldpV2RemPortIdSubtype' && $value == '5') {
                                 $rem_port_id_subtype = '5';  // Assign the port subtype
-                            }
-    
+                            }                         
                             // Check if 'lldpV2RemPortId' should be converted to ASCII
                             if ($key === 'lldpV2RemPortId' && $rem_port_id_subtype === '5') {
                                 // Remove colons to check if it's a hexadecimal string
@@ -326,7 +325,6 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
                                     $lldp_array[$lldpV2RemTimeMark][$lldpV2RemLocalIfIndex][$lldpV2RemIndex]['lldpV2RemPortId'] = $value;
                                 }
                             }
-
                             $newKey = $mapV2toV1[$key] ?? $key;
                             $lldp_array[$lldpV2RemTimeMark][$lldpV2RemLocalIfIndex][$lldpV2RemIndex][$newKey] = $value;
                         }
