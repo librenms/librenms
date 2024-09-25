@@ -68,7 +68,6 @@ class Sensor
         $this->discovered[$sensor->syncGroup()] = false;
 
         Log::debug("Discovered Sensor: $sensor");
-        Log::info("$sensor->sensor_descr: Cur $sensor->sensor_current, Low: $sensor->sensor_limit_low, Low Warn: $sensor->sensor_limit_low_warn, Warn: $sensor->sensor_limit_warn, High: $sensor->sensor_limit");
 
         return $this;
     }

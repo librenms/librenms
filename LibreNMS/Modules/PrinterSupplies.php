@@ -152,7 +152,7 @@ class PrinterSupplies implements Module
     /**
      * @inheritDoc
      */
-    public function dump(Device $device)
+    public function dump(Device $device, string $type): ?array
     {
         return [
             'printer_supplies' => $device->printerSupplies()->orderBy('supply_oid')->orderBy('supply_index')

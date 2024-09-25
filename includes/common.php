@@ -739,7 +739,15 @@ function string_to_float($value)
  */
 function uw_to_dbm($value)
 {
-    return $value <= 0 ? -60 : 10 * log10($value / 1000);
+    if ($value < 0) {
+        return null;
+    }
+
+    if ($value == 0) {
+        return -60;
+    }
+
+    return 10 * log10($value / 1000);
 }
 
 /**
@@ -748,7 +756,15 @@ function uw_to_dbm($value)
  */
 function mw_to_dbm($value)
 {
-    return $value <= 0 ? -60 : 10 * log10($value);
+    if ($value < 0) {
+        return null;
+    }
+
+    if ($value == 0) {
+        return -60;
+    }
+
+    return 10 * log10($value);
 }
 
 /**

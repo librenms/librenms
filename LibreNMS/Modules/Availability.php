@@ -116,8 +116,12 @@ class Availability implements Module
     /**
      * @inheritDoc
      */
-    public function dump(Device $device)
+    public function dump(Device $device, string $type): ?array
     {
+        if ($type == 'discovery') {
+            return null;
+        }
+
         return [
             'availability' => $device->availability()->orderBy('duration')
                 ->get()->map->makeHidden(['availability_id', 'device_id']),

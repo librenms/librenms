@@ -14,6 +14,6 @@
             </x-port-link>
             </div>
         </x-slot>
-        <x-graph-row loading="lazy" columns="responsive" :port="$port" :type="$data['graph_type']" :graphs="[['from' => '-1d'], ['from' => '-1w'], ['from' => '-1m'], ['from' => '-1y']]" legend="no"></x-graph-row>
+        <x-graph-row loading="lazy" columns="responsive" :port="$port" :type="$data['graph_type']" :graphs="[['from' => '-1d'], ['from' => '-1week'], ['from' => '-1month'], ['from' => '-1y']]" legend="no"></x-graph-row>
     </x-panel>
 @endforeach
