@@ -766,7 +766,7 @@ websrv08.dc4.eu.corp.example.net gets shortened to websrv08.dc4.eu.cen).
 - Sensu will reject rules with special characters - the Transport will attempt
 to fix up rule names, but it's best to stick to letters, numbers and spaces
 - The transport only deals in absolutes - it ignores the got worse/got better
-/got changed states
+/changed states
 - The agent will buffer alerts, but LibreNMS will not - if your agent is
 offline, alerts will be dropped
 - There is no backchannel between Sensu and LibreNMS - if you make changes in

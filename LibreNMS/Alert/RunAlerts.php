@@ -142,7 +142,7 @@ class RunAlerts
             } elseif ($alert['state'] == AlertState::BETTER) {
                 $obj['title'] .= ' got better';
             } elseif ($alert['state'] == AlertState::CHANGED) {
-                $obj['title'] .= ' got changed';
+                $obj['title'] .= ' changed';
             }
 
             foreach ($extra['rule'] as $incident) {
@@ -647,7 +647,7 @@ class RunAlerts
             AlertState::ACKNOWLEDGED => 'acknowledgment',
             AlertState::WORSE => 'got worse',
             AlertState::BETTER => 'got better',
-            AlertState::CHANGED => 'got changed',
+            AlertState::CHANGED => 'changed',
         ];
 
         $severity = match ($obj['state']) {
