@@ -186,7 +186,7 @@ class DiscordTest extends TestCase
         $transport = new Transport\Discord(new AlertTransport([
             'transport_config' => [
                 'url' => 'https://discord.com/api/webhooks/number/id',
-                'options' => '',
+                'options' => 'tts=true' . PHP_EOL . 'content=This is a text',
                 'discord-embed-fields' => 'hostname,severity',
             ],
         ]));
@@ -206,6 +206,8 @@ class DiscordTest extends TestCase
             assertEquals($request->header('Content-Type')[0], 'application/json');
             assertEquals(
                 [
+                    'tts' => 'true',
+                    'content' => 'This is a text',
                     'embeds' => [
                         [
                             'title' => '#000 Testing transport from LibreNMS',
