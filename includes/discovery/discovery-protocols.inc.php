@@ -310,21 +310,6 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
                 foreach ($value as $lldpV2RemLocalDestMACAddress => $value) {
                     foreach ($value as $lldpV2RemIndex => $lldpv2_array_entries) {
                         foreach ($lldpv2_array_entries as $key => $value) {
-                            // Check if 'lldpV2RemPortIdSubtype' is of type 'interfaceName(5)' and create the variable $rem_port_id_subtype to use it later
-                            if ($key === 'lldpV2RemPortIdSubtype' && $value == '5') {
-                                $rem_port_id_subtype = '5';  // Assign the port subtype
-                            }                         
-                            // Check if 'lldpV2RemPortId' should be converted to ASCII
-                            if ($key === 'lldpV2RemPortId' && $rem_port_id_subtype === '5') {
-                                // Remove colons to check if it's a hexadecimal string
-                                $hex_value = str_replace(':', '', $value);
-                                if (ctype_xdigit($hex_value)) {
-                                    // Convert the hexadecimal value to ASCII
-                                    $value = hex2bin($hex_value);                                                    
-                                    // Update the value of lldpV2RemPortId to ASCII
-                                    $lldp_array[$lldpV2RemTimeMark][$lldpV2RemLocalIfIndex][$lldpV2RemIndex]['lldpV2RemPortId'] = $value;
-                                }
-                            }
                             $newKey = $mapV2toV1[$key] ?? $key;
                             $lldp_array[$lldpV2RemTimeMark][$lldpV2RemLocalIfIndex][$lldpV2RemIndex][$newKey] = $value;
                         }
@@ -354,6 +339,10 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
             d_echo($lldp_instance);
 
             foreach ($lldp_instance as $entry_instance => $lldp) {
+                // If lldpRemPortIdSubtype is 5 and lldpRemPortId is hex, convert it to ASCII.
+				if ($lldp['lldpRemPortIdSubtype'] == 5 && ctype_xdigit(str_replace([' ', ':', '-'], '', strtolower($lldp['lldpRemPortId'])))) {
+					$lldp['lldpRemPortId'] = StringHelpers::hexToAscii($lldp['lldpRemPortId'], ':');
+				}
                 // normalize MAC address if present
                 $remote_port_mac = '';
                 $remote_port_name = $lldp['lldpRemPortId'];
