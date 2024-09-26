@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Discord.php
  *
@@ -40,8 +41,16 @@ class Discord extends Transport
         'name' => 'Rule Name',
     ];
 
+    /**
+     * Composes a Discord JSON message and delivers it using HTTP POST
+     * Uses https://discord.com/developers/docs/resources/message#embed-object
+     *
+     * @param array $alert_data
+     * @return bool
+     */
     public function deliverAlert(array $alert_data): bool
     {
+        // options INI fields for the message
         $added_fields = $this->parseUserOptions($this->config['options']);
 
         $discord_title = '#' . $alert_data['uid'] . ' ' . $alert_data['title'];
@@ -64,6 +73,8 @@ class Discord extends Transport
                 ],
             ],
         ];
+
+        // add INI option fields to the message
         if (! empty($added_fields)) {
             $data = array_merge($data, $added_fields);
         }
@@ -82,6 +93,13 @@ class Discord extends Transport
         throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $discord_msg, $data);
     }
 
+    /**
+     * Convert an html <img src=""> tag to a json Discord message Embed Image Structure
+     * https://discord.com/developers/docs/resources/message#embed-object-embed-image-structure
+     *
+     * @param array $data
+     * @return array
+     */
     private function embedGraphs(array $data): array
     {
         $count = 1;
@@ -98,6 +116,20 @@ class Discord extends Transport
         return $data;
     }
 
+    /**
+     * Converts comma-separated values into an array of name-value pairs.
+     *
+     * @param array $alert_data Array containing the values.
+     * @return array An array of name-value pairs.
+     *
+     * @example
+     * Example with 'hostname,sysDescr' as fields:
+     * $result will be:
+     * [
+     *     ['name' => 'Hostname', 'value' => 'server1'],
+     *     ['name' => 'SysDescr', 'value' => 'Linux server description'],
+     * ]
+     */
     public function createDiscordFields(array $alert_data): array
     {
         $result = [];
