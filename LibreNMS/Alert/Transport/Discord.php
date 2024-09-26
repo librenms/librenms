@@ -33,6 +33,7 @@ namespace LibreNMS\Alert\Transport;
 use LibreNMS\Alert\Transport;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
 use LibreNMS\Util\Http;
+use Ramsey\Uuid\Type\Integer;
 
 class Discord extends Transport
 {
@@ -50,35 +51,30 @@ class Discord extends Transport
      */
     public function deliverAlert(array $alert_data): bool
     {
-        // options INI fields for the message
-        $added_fields = $this->parseUserOptions($this->config['options']);
-
-        $discord_title = '#' . $alert_data['uid'] . ' ' . $alert_data['title'];
-        $discord_msg = $alert_data['msg'];
-        $color = hexdec(preg_replace('/[^\dA-Fa-f]/', '', self::getColorForState($alert_data['state'])));
-
-        // Special handling for the elapsed text in the footer if the elapsed is not set.
-        $footer_text = $alert_data['elapsed'] ? 'alert took ' . $alert_data['elapsed'] : '';
 
         $data = [
             'embeds' => [
                 [
-                    'title' => $discord_title,
-                    'color' => $color,
-                    'description' => $discord_msg,
-                    'fields' => $this->createDiscordFields($alert_data),
+                    'title' => $this->createTitle($alert_data),
+                    'color' => $this->colorOfAlertState($alert_data),
+                    'description' => $alert_data['msg'],
+                    'fields' => $this->addEmbedFields($alert_data),
                     'footer' => [
-                        'text' => $footer_text,
+                        'text' => $this->createFooter($alert_data),
                     ],
                 ],
             ],
         ];
+
+        // options INI fields
+        $added_fields = $this->parseUserOptions($this->config['options']);
 
         // add INI option fields to the message
         if (! empty($added_fields)) {
             $data = array_merge($data, $added_fields);
         }
 
+        //convert html img to json @todo renombrar método
         $data = $this->embedGraphs($data);
 
         // remove all remaining HTML tags
@@ -90,7 +86,26 @@ class Discord extends Transport
             return true;
         }
 
-        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $discord_msg, $data);
+        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $alert_data['msg'], $data);
+    }
+
+
+
+    private function createTitle(array $alert_data): string
+    {
+        return '#' . $alert_data['uid'] . ' ' . $alert_data['title'];
+    }
+
+    private function colorOfAlertState(array $alert_data): int
+    {
+        $hexColor = self::getColorForState($alert_data['state']);
+        $sanitized = preg_replace('/[^\dA-Fa-f]/', '', $hexColor);
+        return hexdec($sanitized);
+    }
+
+    private function createFooter(array $alert_data): string
+    {
+        return $alert_data['elapsed'] ? 'alert took ' . $alert_data['elapsed'] : '';
     }
 
     /**
@@ -118,6 +133,7 @@ class Discord extends Transport
 
     /**
      * Converts comma-separated values into an array of name-value pairs.
+     * https://discord.com/developers/docs/resources/message#embed-object-embed-field-structure
      *
      * @param array $alert_data Array containing the values.
      * @return array An array of name-value pairs.
@@ -130,7 +146,7 @@ class Discord extends Transport
      *     ['name' => 'SysDescr', 'value' => 'Linux server description'],
      * ]
      */
-    public function createDiscordFields(array $alert_data): array
+    public function addEmbedFields(array $alert_data): array
     {
         $result = [];
 
