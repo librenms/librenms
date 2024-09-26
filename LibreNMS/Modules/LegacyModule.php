@@ -93,8 +93,8 @@ class LegacyModule implements Module
 
     public function shouldPoll(OS $os, ModuleStatus $status): bool
     {
-        // all legacy modules require snmp except ipmi and unix-agent
-        return $status->isEnabledAndDeviceUp($os->getDevice(), check_snmp: ! in_array($this->name, ['ipmi', 'unix-agent']));
+        // all legacy modules require snmp except ipmi and unix-agent and ganeti-vminfo
+        return $status->isEnabledAndDeviceUp($os->getDevice(), check_snmp: ! in_array($this->name, ['ipmi', 'unix-agent', 'ganeti-vminfo']));
     }
 
     public function poll(OS $os, DataStorageInterface $datastore): void

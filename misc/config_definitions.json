@@ -5085,6 +5085,13 @@
             "type": "boolean",
             "default": false
         },
+        "poller_modules.ganeti-vminfo": {
+            "order": 350,
+            "group": "poller",
+            "section": "poller_modules",
+            "default": false,
+            "type": "boolean"
+        },
         "poller_modules.unix-agent": {
             "order": 420,
             "group": "poller",
