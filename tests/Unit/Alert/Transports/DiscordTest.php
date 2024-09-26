@@ -33,7 +33,6 @@ use Illuminate\Support\Facades\Http;
 use LibreNMS\Alert\AlertData;
 use LibreNMS\Alert\Transport;
 use LibreNMS\Tests\TestCase;
-
 use function PHPUnit\Framework\assertEquals;
 use function PHPUnit\Framework\assertTrue;
 
@@ -74,7 +73,7 @@ class DiscordTest extends TestCase
                                 ],
                             ],
                             'footer' => [
-                                'text' => "alert took 11s",
+                                'text' => 'alert took 11s',
                             ],
                         ],
                     ],
@@ -121,7 +120,7 @@ class DiscordTest extends TestCase
                                 ],
                             ],
                             'footer' => [
-                                'text' => "alert took 11s",
+                                'text' => 'alert took 11s',
                             ],
                         ],
                     ],
@@ -168,7 +167,7 @@ class DiscordTest extends TestCase
                                 ],
                             ],
                             'footer' => [
-                                'text' => "alert took 11s",
+                                'text' => 'alert took 11s',
                             ],
                         ],
                     ],
@@ -209,16 +208,16 @@ class DiscordTest extends TestCase
                         'description' => 'This is a test alert',
                         'fields' => [
                             [
-                                'name' => "Hostname",
-                                'value' => "my-hostname.com",
+                                'name' => 'Hostname',
+                                'value' => 'my-hostname.com',
                             ],
                             [
-                                'name' => "Severity",
-                                'value' => "critical",
+                                'name' => 'Severity',
+                                'value' => 'critical',
                             ],
                         ],
                         'footer' => [
-                            'text' => "alert took 11s",
+                            'text' => 'alert took 11s',
                         ],
                     ],
                 ],
