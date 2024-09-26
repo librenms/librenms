@@ -2,6 +2,7 @@
 
 use LibreNMS\Config;
 use LibreNMS\Util\IP;
+use LibreNMS\Util\StringHelpers;
 
 global $link_exists;
 
@@ -340,6 +341,10 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
             d_echo($lldp_instance);
 
             foreach ($lldp_instance as $entry_instance => $lldp) {
+                // If lldpRemPortIdSubtype is 5 and lldpRemPortId is hex, convert it to ASCII.
+                if ($lldp['lldpRemPortIdSubtype'] == 5 && ctype_xdigit(str_replace([' ', ':', '-'], '', strtolower($lldp['lldpRemPortId'])))) {
+                    $lldp['lldpRemPortId'] = StringHelpers::hexToAscii($lldp['lldpRemPortId'], ':');
+                }
                 // normalize MAC address if present
                 $remote_port_mac = '';
                 $remote_port_name = $lldp['lldpRemPortId'];
