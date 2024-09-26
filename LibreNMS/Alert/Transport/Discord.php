@@ -118,7 +118,7 @@ class Discord extends Transport
     private function embedGraphs(array $data): array
     {
         $count = 1;
-        $data['embeds'][0]['description'] = preg_replace_callback('#<img class="librenms-graph" src="(.*?)" />#', function ($match) use (&$data, &$count) {
+        $data['embeds'][0]['description'] = preg_replace_callback('#<img class="librenms-graph" src="(.*?)"\s*/>#', function ($match) use (&$data, &$count) {
             $data['embeds'][] = [
                 'image' => [
                     'url' => $match[1],

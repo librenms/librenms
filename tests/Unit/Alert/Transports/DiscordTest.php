@@ -194,34 +194,46 @@ class DiscordTest extends TestCase
         /** @var Device $mock_device */
         $mock_device = Device::factory()->make(['hostname' => 'my-hostname.com']);
 
-        $transport->deliverAlert(AlertData::testData($mock_device));
+        $alert_data = AlertData::testData($mock_device);
+
+        $alert_data['msg'] = 'This test alert should not have image <img class="librenms-graph" src="google.jpeg" /> or <h2>html tags</h2></br>';
+
+        $transport->deliverAlert($alert_data);
 
         Http::assertSent(function (Request $request) {
             assertEquals($request->url(), 'https://discord.com/api/webhooks/number/id');
             assertEquals($request->method(), 'POST');
             assertEquals($request->header('Content-Type')[0], 'application/json');
-            assertEquals($request->data(), [
-                'embeds' => [
-                    [
-                        'title' => '#000 Testing transport from LibreNMS',
-                        'color' => 16711680,
-                        'description' => 'This is a test alert',
-                        'fields' => [
-                            [
-                                'name' => 'Hostname',
-                                'value' => 'my-hostname.com',
+            assertEquals(
+                [
+                    'embeds' => [
+                        [
+                            'title' => '#000 Testing transport from LibreNMS',
+                            'color' => 16711680,
+                            'description' => 'This test alert should not have image [Image 1] or html tags',
+                            'fields' => [
+                                [
+                                    'name' => 'Hostname',
+                                    'value' => 'my-hostname.com',
+                                ],
+                                [
+                                    'name' => 'Severity',
+                                    'value' => 'critical',
+                                ],
                             ],
-                            [
-                                'name' => 'Severity',
-                                'value' => 'critical',
+                            'footer' => [
+                                'text' => 'alert took 11s',
                             ],
                         ],
-                        'footer' => [
-                            'text' => 'alert took 11s',
+                        [
+                            'image' => [
+                                'url' => 'google.jpeg',
+                            ],
                         ],
                     ],
                 ],
-            ]);
+                $request->data()
+            );
 
             return true;
         });
