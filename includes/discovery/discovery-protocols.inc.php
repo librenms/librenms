@@ -2,6 +2,7 @@
 
 use LibreNMS\Config;
 use LibreNMS\Util\IP;
+use LibreNMS\Util\StringHelpers;
 
 global $link_exists;
 
