@@ -271,7 +271,7 @@ Here an example using 3 numbers, any amount of numbers is supported:
 The Discord transport will POST the alert message to your Discord
 Incoming WebHook. The only required value is Discord URL, without this no call to Discord will be made. 
 
-Graphs can be included in the template: ```<img class="librenms-graph" src=""/>'```. The rest of the html tags are stripped from the message.
+Graphs can be included in the template using: ```<img class="librenms-graph" src=""/>```. The rest of the html tags are stripped from the message.
 
 
  The Options field supports JSON/Form Params listed
