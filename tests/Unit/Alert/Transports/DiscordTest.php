@@ -66,12 +66,7 @@ class DiscordTest extends TestCase
                             'title' => '#000 Testing transport from LibreNMS',
                             'color' => 16711680,
                             'description' => 'This is a test alert',
-                            'fields' => [
-                                [
-                                    'name' => '',
-                                    'value' => 'Error: Invalid Field',
-                                ],
-                            ],
+                            'fields' => [],
                             'footer' => [
                                 'text' => 'alert took 11s',
                             ],
@@ -91,8 +86,8 @@ class DiscordTest extends TestCase
 
         $transport = new Transport\Discord(new AlertTransport([
             'transport_config' => [
-                'url' => '',
-                'options' => 'option notINIFormat',
+                'url' => 'https://discord.com/api/webhooks/number/id',
+                'options' => 'multi-line options not in INIFormat' . PHP_EOL . 'are ignored',
                 'discord-embed-fields' => '',
             ],
         ]));
@@ -103,7 +98,7 @@ class DiscordTest extends TestCase
         $transport->deliverAlert(AlertData::testData($mock_device));
 
         Http::assertSent(function (Request $request) {
-            assertEquals('', $request->url());
+            assertEquals('https://discord.com/api/webhooks/number/id', $request->url());
             assertEquals('POST', $request->method());
             assertEquals('application/json', $request->header('Content-Type')[0]);
             assertEquals(
@@ -113,12 +108,7 @@ class DiscordTest extends TestCase
                             'title' => '#000 Testing transport from LibreNMS',
                             'color' => 16711680,
                             'description' => 'This is a test alert',
-                            'fields' => [
-                                [
-                                    'name' => '',
-                                    'value' => 'Error: Invalid Field',
-                                ],
-                            ],
+                            'fields' => [],
                             'footer' => [
                                 'text' => 'alert took 11s',
                             ],
@@ -138,9 +128,9 @@ class DiscordTest extends TestCase
 
         $transport = new Transport\Discord(new AlertTransport([
             'transport_config' => [
-                'url' => '',
+                'url' => 'https://discord.com/api/webhooks/number/id',
                 'options' => '',
-                'discord-embed-fields' => 'hostname other',
+                'discord-embed-fields' => 'hostname severity',
             ],
         ]));
 
@@ -150,7 +140,7 @@ class DiscordTest extends TestCase
         $transport->deliverAlert(AlertData::testData($mock_device));
 
         Http::assertSent(function (Request $request) {
-            assertEquals('', $request->url());
+            assertEquals('https://discord.com/api/webhooks/number/id', $request->url());
             assertEquals('POST', $request->method());
             assertEquals('application/json', $request->header('Content-Type')[0]);
             assertEquals(
@@ -162,7 +152,7 @@ class DiscordTest extends TestCase
                             'description' => 'This is a test alert',
                             'fields' => [
                                 [
-                                    'name' => 'Hostname other',
+                                    'name' => 'Hostname severity',
                                     'value' => 'Error: Invalid Field',
                                 ],
                             ],
@@ -187,7 +177,7 @@ class DiscordTest extends TestCase
             'transport_config' => [
                 'url' => 'https://discord.com/api/webhooks/number/id',
                 'options' => 'tts=true' . PHP_EOL . 'content=This is a text',
-                'discord-embed-fields' => 'hostname,severity',
+                'discord-embed-fields' => 'hostname,severity,wrongfield',
             ],
         ]));
 
@@ -221,6 +211,10 @@ class DiscordTest extends TestCase
                                 [
                                     'name' => 'Severity',
                                     'value' => 'critical',
+                                ],
+                                [
+                                    'name' => 'Wrongfield',
+                                    'value' => 'Error: Invalid Field',
                                 ],
                             ],
                             'footer' => [

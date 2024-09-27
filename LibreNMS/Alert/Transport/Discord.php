@@ -37,7 +37,6 @@ use Ramsey\Uuid\Type\Integer;
 
 class Discord extends Transport
 {
-    public const DEFAULT_EMBEDS = 'hostname,name,timestamp,severity';
     private array $embedFieldTranslations = [
         'name' => 'Rule Name',
     ];
@@ -128,10 +127,10 @@ class Discord extends Transport
      */
     private function embedGraphs(): array
     {
-        $data = $this->discord_message;
-
+        $regex =  '#<img class="librenms-graph" src="(.*?)"\s*/>#';
         $count = 1;
-        $this->discord_message['embeds'][0]['description'] = preg_replace_callback('#<img class="librenms-graph" src="(.*?)"\s*/>#', function ($match) use (&$count) {
+
+        $this->discord_message['embeds'][0]['description'] = preg_replace_callback($regex, function ($match) use (&$count) {
             $this->discord_message['embeds'][] = [
                 'image' => [
                     'url' => $match[1],
@@ -163,9 +162,16 @@ class Discord extends Transport
     {
         $result = [];
 
-        $fields = explode(',', $this->config['discord-embed-fields'] ?? self::DEFAULT_EMBEDS);
+        if (empty($this->config['discord-embed-fields'])) {
+            return $result;
+        }
+
+        $fields = explode(',', $this->config['discord-embed-fields']);
 
         foreach ($fields as $field) {
+
+            $field = trim($field);
+
             $result[] = [
                 'name' => $this->embedFieldTranslations[$field] ?? ucfirst($field),
                 'value' => $alert_data[$field] ?? 'Error: Invalid Field',
@@ -194,9 +200,8 @@ class Discord extends Transport
                 [
                     'title' => 'Fields to embed in the alert',
                     'name' => 'discord-embed-fields',
-                    'descr' => 'Comma seperated list of fields from the alert to attach to the Discord message',
+                    'descr' => 'Comma seperated list from the alert to embed i.e. hostname,name,timestamp,severity',
                     'type' => 'text',
-                    'default' => self::DEFAULT_EMBEDS,
                 ],
             ],
             'validation' => [
