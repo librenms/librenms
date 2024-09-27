@@ -44,41 +44,30 @@ class Discord extends Transport
 
     /**
      * Composes a Discord JSON message and delivers it using HTTP POST
-     * Uses https://discord.com/developers/docs/resources/message#embed-object
+     * https://discord.com/developers/docs/resources/message#create-message
      *
      * @param array $alert_data
      * @return bool
      */
     public function deliverAlert(array $alert_data): bool
     {
-
         $data = [
             'embeds' => [
                 [
-                    'title' => $this->createTitle($alert_data),
-                    'color' => $this->colorOfAlertState($alert_data),
-                    'description' => $alert_data['msg'],
-                    'fields' => $this->addEmbedFields($alert_data),
+                    'title' => $this->getTitle($alert_data),
+                    'color' => $this->getColorOfAlertState($alert_data),
+                    'description' => $this->getDescription($alert_data),
+                    'fields' => $this->getEmbedFields($alert_data),
                     'footer' => [
-                        'text' => $this->createFooter($alert_data),
+                        'text' => $this->getFooter($alert_data),
                     ],
                 ],
             ],
         ];
 
-        // options INI fields
-        $added_fields = $this->parseUserOptions($this->config['options']);
-
-        // add INI option fields to the message
-        if (! empty($added_fields)) {
-            $data = array_merge($data, $added_fields);
-        }
-
-        //convert html img to json @todo renombrar método
+        $data = $this->includeINIFields($data);
         $data = $this->embedGraphs($data);
-
-        // remove all remaining HTML tags
-        $data['embeds'][0]['description'] = strip_tags($data['embeds'][0]['description']);
+        $data = $this->stripHTMLTagsFromDescription($data);
 
         $res = Http::client()->post($this->config['url'], $data);
 
@@ -89,24 +78,48 @@ class Discord extends Transport
         throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $alert_data['msg'], $data);
     }
 
-
-
-    private function createTitle(array $alert_data): string
+    private function getTitle(array $alert_data): string
     {
         return '#' . $alert_data['uid'] . ' ' . $alert_data['title'];
     }
 
-    private function colorOfAlertState(array $alert_data): int
+    private function stripHTMLTagsFromDescription(array $data): array
+    {
+        $data['embeds'][0]['description'] = strip_tags($data['embeds'][0]['description']);
+        return $data;
+    }
+
+    private function getColorOfAlertState(array $alert_data): int
     {
         $hexColor = self::getColorForState($alert_data['state']);
         $sanitized = preg_replace('/[^\dA-Fa-f]/', '', $hexColor);
         return hexdec($sanitized);
     }
 
-    private function createFooter(array $alert_data): string
+    private function getDescription(array $alert_data): string
+    {
+        return $alert_data['msg'];
+    }
+
+
+    private function getFooter(array $alert_data): string
     {
         return $alert_data['elapsed'] ? 'alert took ' . $alert_data['elapsed'] : '';
     }
+
+    private function includeINIFields(array $data): array
+    {
+        // options INI fields
+        $added_fields = $this->parseUserOptions($this->config['options']);
+
+        // add INI option fields to the message
+        if (! empty($added_fields)) {
+            $data = array_merge($data, $added_fields);
+        }
+
+        return $data;
+    }
+
 
     /**
      * Convert an html <img src=""> tag to a json Discord message Embed Image Structure
@@ -146,7 +159,7 @@ class Discord extends Transport
      *     ['name' => 'SysDescr', 'value' => 'Linux server description'],
      * ]
      */
-    public function addEmbedFields(array $alert_data): array
+    public function getEmbedFields(array $alert_data): array
     {
         $result = [];
 
