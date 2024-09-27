@@ -11412,9 +11412,9 @@
         "discovery": {
             "bgpPeers": [
                 {
-                    "astext": "AS399693-MOCK-TEXT",
+                    "astext": "AS65534-MOCK-TEXT",
                     "bgpPeerIdentifier": "100.127.0.200",
-                    "bgpPeerRemoteAs": 399693,
+                    "bgpPeerRemoteAs": 65534,
                     "bgpPeerState": "idle",
                     "bgpPeerAdminStatus": "stop",
                     "bgpPeerLastErrorCode": null,
@@ -11431,13 +11431,13 @@
                     "bgpPeerFsmEstablishedTime": 0,
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
-                    "bgpLocalAs": 399693,
+                    "bgpLocalAs": 65534,
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "AS399693-MOCK-TEXT",
+                    "astext": "AS65534-MOCK-TEXT",
                     "bgpPeerIdentifier": "100.127.0.201",
-                    "bgpPeerRemoteAs": 399693,
+                    "bgpPeerRemoteAs": 65534,
                     "bgpPeerState": "idle",
                     "bgpPeerAdminStatus": "stop",
                     "bgpPeerLastErrorCode": null,
@@ -11454,7 +11454,7 @@
                     "bgpPeerFsmEstablishedTime": 0,
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
-                    "bgpLocalAs": 399693,
+                    "bgpLocalAs": 65534,
                     "vrfLocalAs": null
                 }
             ]
@@ -11462,9 +11462,9 @@
         "poller": {
             "bgpPeers": [
                 {
-                    "astext": "AS399693-MOCK-TEXT",
+                    "astext": "AS65534-MOCK-TEXT",
                     "bgpPeerIdentifier": "100.127.0.200",
-                    "bgpPeerRemoteAs": 399693,
+                    "bgpPeerRemoteAs": 65534,
                     "bgpPeerState": "established",
                     "bgpPeerAdminStatus": "start",
                     "bgpPeerLastErrorCode": 6,
@@ -11481,13 +11481,13 @@
                     "bgpPeerFsmEstablishedTime": 298301,
                     "bgpPeerInUpdateElapsedTime": 10,
                     "context_name": "",
-                    "bgpLocalAs": 399693,
+                    "bgpLocalAs": 65534,
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "AS399693-MOCK-TEXT",
+                    "astext": "AS65534-MOCK-TEXT",
                     "bgpPeerIdentifier": "100.127.0.201",
-                    "bgpPeerRemoteAs": 399693,
+                    "bgpPeerRemoteAs": 65534,
                     "bgpPeerState": "idle",
                     "bgpPeerAdminStatus": "start",
                     "bgpPeerLastErrorCode": 4,
@@ -11504,7 +11504,7 @@
                     "bgpPeerFsmEstablishedTime": 483867,
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
-                    "bgpLocalAs": 399693,
+                    "bgpLocalAs": 65534,
                     "vrfLocalAs": null
                 }
             ]

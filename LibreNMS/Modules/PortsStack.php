@@ -117,8 +117,12 @@ class PortsStack implements Module
     /**
      * @inheritDoc
      */
-    public function dump(Device $device)
+    public function dump(Device $device, string $type): ?array
     {
+        if ($type == 'poller') {
+            return null;
+        }
+
         return [
             'ports_stack' => $device->portsStack()
                 ->orderBy('high_ifIndex')->orderBy('low_ifIndex')

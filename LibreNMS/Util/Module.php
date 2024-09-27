@@ -61,7 +61,7 @@ class Module
     public static function pollingStatus(string $module_name, Device $device, ?bool $manual = null): ModuleStatus
     {
         return new ModuleStatus(
-            Config::get("poller_modules.$module_name", false),
+            Config::get("poller_modules.$module_name"),
             Config::get("os.{$device->os}.poller_modules.$module_name"),
             $device->getAttrib("poll_$module_name"),
             $manual,

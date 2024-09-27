@@ -125,7 +125,7 @@ class Os implements Module
     /**
      * @inheritDoc
      */
-    public function dump(Device $device)
+    public function dump(Device $device, string $type): ?array
     {
         // get data fresh from the database
         return [

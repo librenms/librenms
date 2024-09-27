@@ -138,9 +138,9 @@ class Core implements Module
     /**
      * @inheritDoc
      */
-    public function dump(Device $device)
+    public function dump(Device $device, string $type): ?array
     {
-        return false; // all data here is stored in the devices table and covered by the os module
+        return null; // all data here is stored in the devices table and covered by the os module
     }
 
     /**

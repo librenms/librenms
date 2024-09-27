@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Bill;
 use LibreNMS\Billing;
 use LibreNMS\Util\Number;
 
@@ -9,7 +10,9 @@ if (Auth::user()->hasGlobalAdmin()) {
     include 'includes/html/pages/bill/actions.inc.php';
 }
 
-if (bill_permitted($bill_id)) {
+if (!Bill::where('bill_id', $bill_id)->exists()) {
+    abort(404);
+} elseif (bill_permitted($bill_id)) {
     $bill_data = dbFetchRow('SELECT * FROM bills WHERE bill_id = ?', [$bill_id]);
 
     $bill_name = $bill_data['bill_name'];

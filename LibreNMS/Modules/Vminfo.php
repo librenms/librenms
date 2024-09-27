@@ -109,7 +109,7 @@ class Vminfo implements \LibreNMS\Interfaces\Module
     /**
      * @inheritDoc
      */
-    public function dump(Device $device)
+    public function dump(Device $device, string $type): ?array
     {
         return [
             'vminfo' => $device->vminfo()->orderBy('vmwVmVMID')

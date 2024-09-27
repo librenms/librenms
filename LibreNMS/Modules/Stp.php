@@ -104,7 +104,7 @@ class Stp implements Module
     /**
      * @inheritDoc
      */
-    public function dump(Device $device)
+    public function dump(Device $device, string $type): ?array
     {
         return [
             'stp' => $device->stpInstances()->orderBy('bridgeAddress')
