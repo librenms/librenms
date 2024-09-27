@@ -46,7 +46,7 @@ class Discord extends Transport
      * Composes a Discord JSON message and delivers it using HTTP POST
      * https://discord.com/developers/docs/resources/message#create-message
      *
-     * @param array $alert_data
+     * @param  array  $alert_data
      * @return bool
      */
     public function deliverAlert(array $alert_data): bool
@@ -145,7 +145,7 @@ class Discord extends Transport
      * Converts comma-separated values into an array of name-value pairs.
      * https://discord.com/developers/docs/resources/message#embed-object-embed-field-structure
      *
-     * @param array $alert_data Array containing the values.
+     * * @param  array  $alert_data  Array containing the values.
      * @return array An array of name-value pairs.
      *
      * @example
