@@ -42,6 +42,8 @@ class Discord extends Transport
         'name' => 'Rule Name',
     ];
 
+    private array $discord_message = [];
+
     /**
      * Composes a Discord JSON message and delivers it using HTTP POST
      * https://discord.com/developers/docs/resources/message#create-message
@@ -51,7 +53,7 @@ class Discord extends Transport
      */
     public function deliverAlert(array $alert_data): bool
     {
-        $data = [
+        $this->discord_message = [
             'embeds' => [
                 [
                     'title' => $this->getTitle($alert_data),
@@ -65,17 +67,17 @@ class Discord extends Transport
             ],
         ];
 
-        $data = $this->includeINIFields($data);
-        $data = $this->embedGraphs($data);
-        $data = $this->stripHTMLTagsFromDescription($data);
+        $this->includeINIFields();
+        $this->embedGraphs();
+        $this->stripHTMLTagsFromDescription();
 
-        $res = Http::client()->post($this->config['url'], $data);
+        $res = Http::client()->post($this->config['url'], $this->discord_message);
 
         if ($res->successful()) {
             return true;
         }
 
-        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $alert_data['msg'], $data);
+        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $alert_data['msg'], $this->discord_message);
     }
 
     private function getTitle(array $alert_data): string
@@ -83,10 +85,10 @@ class Discord extends Transport
         return '#' . $alert_data['uid'] . ' ' . $alert_data['title'];
     }
 
-    private function stripHTMLTagsFromDescription(array $data): array
+    private function stripHTMLTagsFromDescription(): array
     {
-        $data['embeds'][0]['description'] = strip_tags($data['embeds'][0]['description']);
-        return $data;
+        $this->discord_message['embeds'][0]['description'] = strip_tags($this->discord_message['embeds'][0]['description']);
+        return $this->discord_message;
     }
 
     private function getColorOfAlertState(array $alert_data): int
@@ -101,25 +103,21 @@ class Discord extends Transport
         return $alert_data['msg'];
     }
 
-
     private function getFooter(array $alert_data): string
     {
         return $alert_data['elapsed'] ? 'alert took ' . $alert_data['elapsed'] : '';
     }
 
-    private function includeINIFields(array $data): array
+    private function includeINIFields(): array
     {
-        // options INI fields
-        $added_fields = $this->parseUserOptions($this->config['options']);
+        $ini_fileds = $this->parseUserOptions($this->config['options']);
 
-        // add INI option fields to the message
-        if (! empty($added_fields)) {
-            $data = array_merge($data, $added_fields);
+        if (! empty($ini_fileds)) {
+            $this->discord_message = array_merge($this->discord_message, $ini_fileds);
         }
 
-        return $data;
+        return $this->discord_message;
     }
-
 
     /**
      * Convert an html <img src=""> tag to a json Discord message Embed Image Structure
@@ -128,20 +126,22 @@ class Discord extends Transport
      * @param array $data
      * @return array
      */
-    private function embedGraphs(array $data): array
+    private function embedGraphs(): array
     {
+        $data = $this->discord_message;
+
         $count = 1;
-        $data['embeds'][0]['description'] = preg_replace_callback('#<img class="librenms-graph" src="(.*?)"\s*/>#', function ($match) use (&$data, &$count) {
-            $data['embeds'][] = [
+        $this->discord_message['embeds'][0]['description'] = preg_replace_callback('#<img class="librenms-graph" src="(.*?)"\s*/>#', function ($match) use (&$count) {
+            $this->discord_message['embeds'][] = [
                 'image' => [
                     'url' => $match[1],
                 ],
             ];
 
             return '[Image ' . ($count++) . ']';
-        }, $data['embeds'][0]['description']);
+        }, $this->discord_message['embeds'][0]['description']);
 
-        return $data;
+        return $this->discord_message;
     }
 
     /**
