@@ -33,7 +33,6 @@ namespace LibreNMS\Alert\Transport;
 use LibreNMS\Alert\Transport;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
 use LibreNMS\Util\Http;
-use Ramsey\Uuid\Type\Integer;
 
 class Discord extends Transport
 {
@@ -122,12 +121,11 @@ class Discord extends Transport
      * Convert an html <img src=""> tag to a json Discord message Embed Image Structure
      * https://discord.com/developers/docs/resources/message#embed-object-embed-image-structure
      *
-     * @param array $data
      * @return array
      */
     private function embedGraphs(): array
     {
-        $regex =  '#<img class="librenms-graph" src="(.*?)"\s*/>#';
+        $regex = '#<img class="librenms-graph" src="(.*?)"\s*/>#';
         $count = 1;
 
         $this->discord_message['embeds'][0]['description'] = preg_replace_callback($regex, function ($match) use (&$count) {

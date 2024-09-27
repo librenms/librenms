@@ -34,7 +34,6 @@ use LibreNMS\Alert\AlertData;
 use LibreNMS\Alert\Transport;
 use LibreNMS\Tests\TestCase;
 use function PHPUnit\Framework\assertEquals;
-use function PHPUnit\Framework\assertTrue;
 
 class DiscordTest extends TestCase
 {
