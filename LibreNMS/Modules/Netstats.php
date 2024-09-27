@@ -227,20 +227,25 @@ class Netstats implements Module
         }
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function cleanup(Device $device): void
+    public function dataExists(Device $device): bool
     {
-        // no cleanup
+        return false; // no database data
     }
 
     /**
      * @inheritDoc
      */
-    public function dump(Device $device)
+    public function cleanup(Device $device): int
     {
-        return false; // no database data to dump (may add rrd later)
+        return 0; // no cleanup
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function dump(Device $device, string $type): ?array
+    {
+        return null; // no database data to dump (may add rrd later)
     }
 
     private function statName(string $oid): string

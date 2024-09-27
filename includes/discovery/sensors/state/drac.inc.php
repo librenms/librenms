@@ -82,7 +82,7 @@ foreach ($tables as [$table_oid, $num_oid, $value_oid, $descr_oid]) {
                     $descr = $entry[$descr_oid];
                 }
                 discover_sensor(
-                    $valid['sensor'],
+                    null,
                     'state',
                     $device,
                     $num_oid . $index,

@@ -39,7 +39,7 @@ foreach ($oids as $oid) {
         ];
         create_state_index($state_name, $states);
 
-        discover_sensor($valid['sensor'], 'state', $device, $oid, $index, $state_name, $descr, 1, 1, null, null, null, null, $state, 'snmp', $index);
+        discover_sensor(null, 'state', $device, $oid, $index, $state_name, $descr, 1, 1, null, null, null, null, $state, 'snmp', $index);
         //Create Sensor To State Index
         create_sensor_to_state_index($device, $state_name, $index);
         $index++;
@@ -77,7 +77,7 @@ foreach ($oids as $oid) {
         ];
         create_state_index($state_name, $states);
 
-        discover_sensor($valid['sensor'], 'state', $device, $oid, $index, $state_name, $descr, 1, 1, null, null, null, null, $state, 'snmp', $index);
+        discover_sensor(null, 'state', $device, $oid, $index, $state_name, $descr, 1, 1, null, null, null, null, $state, 'snmp', $index);
         //Create Sensor To State Index
         create_sensor_to_state_index($device, $state_name, $index);
         $index++;
@@ -111,7 +111,7 @@ foreach ($data as $oid => $array) {
         ];
         create_state_index($state_name, $states);
 
-        discover_sensor($valid['sensor'], 'state', $device, $oid, $index, $state_name, $descr, 1, 1, null, null, null, null, $state, 'snmp', $index);
+        discover_sensor(null, 'state', $device, $oid, $index, $state_name, $descr, 1, 1, null, null, null, null, $state, 'snmp', $index);
         //Create Sensor To State Index
         create_sensor_to_state_index($device, $state_name, $index);
         $index++;

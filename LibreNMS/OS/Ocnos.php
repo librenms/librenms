@@ -17,7 +17,7 @@ class Ocnos extends OS implements EntityPhysicalDiscovery
         $inventory = new Collection;
 
         $stacks = SnmpQuery::walk('IPI-CMM-CHASSIS-MIB::cmmStackUnitTable')->table(1);
-        SnmpQuery::walk('IPI-CMM-CHASSIS-MIB::cmmSysSwModuleTable')->table(1, $stacks);
+        SnmpQuery::walk('IPI-CMM-CHASSIS-MIB::cmmSysSwModuleTable')->table(1, $stacks); // software version
         foreach ($stacks as $cmmStackUnitIndex => $stack) {
             $inventory->push(new EntPhysical([
                 'entPhysicalIndex' => $cmmStackUnitIndex,
@@ -173,6 +173,7 @@ class Ocnos extends OS implements EntityPhysicalDiscovery
             'Ufi Space S9500-30XS-P' => $prefix . ($cmmTransType == 'qsfp' ? $cmmTransIndex - 29 : $cmmTransIndex - 1),
             'Edgecore 7316-26XB-O-48V-F' => $prefix . ($cmmTransType == 'qsfp' ? $cmmTransIndex - 1 : $cmmTransIndex - 3),
             'Edgecore 5912-54X-O-AC-F' => $prefix . $cmmTransIndex,
+            'Edgecore 7712-32X-O-AC-F' => $prefix . $cmmTransIndex . '/1',
             default => null, // no port map, so we can't guess
         };
 
@@ -181,7 +182,7 @@ class Ocnos extends OS implements EntityPhysicalDiscovery
         }
 
         // load port name to port_id map
-        $ifNameToIndex = array_flip(SnmpQuery::walk('IF-MIB::ifName')->pluck());
+        $ifNameToIndex = array_flip(SnmpQuery::cache()->walk('IF-MIB::ifName')->pluck());
 
         return $ifNameToIndex[$portName] ?? 0;
     }

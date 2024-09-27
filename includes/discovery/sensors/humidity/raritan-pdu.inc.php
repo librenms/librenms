@@ -41,7 +41,7 @@ foreach ($pre_cache['raritan_extSensorConfig'] as $index => $data) {
         $sensor_available = $measure_data['measurementsExternalSensorIsAvailable'];
         $user_func = null;
         if (is_numeric($current) && $current >= 0 && $sensor_available === 'true') {
-            discover_sensor($valid['sensor'], 'humidity', $device, $oid, 'measurementsExternalSensorValue.' . $index, 'raritan', $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current, 'snmp', null, null, $user_func);
+            discover_sensor(null, 'humidity', $device, $oid, 'measurementsExternalSensorValue.' . $index, 'raritan', $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current, 'snmp', null, null, $user_func);
         }
     }
 }
@@ -60,7 +60,7 @@ foreach ($oids as $index => $sensor) {
         $limit_low_warn = $sensor['externalSensorLowerCriticalThreshold'] / $divisor;
         $offset++;
         if (is_numeric($hum_current) && $hum_current >= 0) {
-            discover_sensor($valid['sensor'], 'humidity', $device, $oid, $offset, 'raritan', $descr, $divisor, $multiplier, $limit_low, $limit_low_warn, $limit_high_warn, $limit_high, $hum_current);
+            discover_sensor(null, 'humidity', $device, $oid, $offset, 'raritan', $descr, $divisor, $multiplier, $limit_low, $limit_low_warn, $limit_high_warn, $limit_high, $hum_current);
         }
     }
 }

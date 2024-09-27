@@ -406,9 +406,9 @@ class Device extends BaseModel
         $this->save();
     }
 
-    public function getAttrib($name)
+    public function getAttrib($name, $default = null)
     {
-        return $this->attribs->pluck('attrib_value', 'attrib_type')->get($name);
+        return $this->attribs->pluck('attrib_value', 'attrib_type')->get($name, $default);
     }
 
     public function setAttrib($name, $value)

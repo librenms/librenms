@@ -10,7 +10,7 @@ for ($i = 1; $i <= 3; $i++) {
     $lowlimit = 0;
     $limit = null;
 
-    discover_sensor($valid['sensor'], 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $volt);
+    discover_sensor(null, 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $volt);
 }
 
 for ($i = 1; $i <= 3; $i++) {
@@ -23,5 +23,5 @@ for ($i = 1; $i <= 3; $i++) {
     $lowlimit = 0;
     $limit = null;
 
-    discover_sensor($valid['sensor'], 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $volt);
+    discover_sensor(null, 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $volt);
 }

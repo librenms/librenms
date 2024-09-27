@@ -20,7 +20,7 @@ if ($oids) {
             $oid = '.1.3.6.1.4.1.3375.2.1.3.2.1.2.1.3.' . $index;
             $fanspeed = $fanspeed / $divisor;
             if ($fanspeed >= 0) {
-                discover_sensor($valid['sensor'], 'fanspeed', $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $fanspeed);
+                discover_sensor(null, 'fanspeed', $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $fanspeed);
             }
         }
     }

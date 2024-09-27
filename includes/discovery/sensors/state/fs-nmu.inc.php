@@ -40,7 +40,7 @@ if (is_numeric($power1)) {
     create_state_index($state_name, $states);
 
     $descr = 'Power 1 State';
-    discover_sensor($valid['sensor'], 'state', $device, $oid_power1, $index, $state_name, $descr, 1, 1, null, null, null, null, $power1, 'snmp', $index);
+    discover_sensor(null, 'state', $device, $oid_power1, $index, $state_name, $descr, 1, 1, null, null, null, null, $power1, 'snmp', $index);
 
     create_sensor_to_state_index($device, $state_name, $index);
 }
@@ -55,7 +55,7 @@ if (is_numeric($power2)) {
     create_state_index($state_name, $states);
 
     $descr = 'Power 2 State';
-    discover_sensor($valid['sensor'], 'state', $device, $oid_power2, $index, $state_name, $descr, 1, 1, null, null, null, null, $power2, 'snmp', $index);
+    discover_sensor(null, 'state', $device, $oid_power2, $index, $state_name, $descr, 1, 1, null, null, null, null, $power2, 'snmp', $index);
 
     create_sensor_to_state_index($device, $state_name, $index);
 }
@@ -70,7 +70,7 @@ if (is_numeric($fan)) {
     create_state_index($state_name, $states);
 
     $descr = 'Fan State';
-    discover_sensor($valid['sensor'], 'state', $device, $oid_fan, $index, $state_name, $descr, 1, 1, null, null, null, null, $fan, 'snmp', $index);
+    discover_sensor(null, 'state', $device, $oid_fan, $index, $state_name, $descr, 1, 1, null, null, null, null, $fan, 'snmp', $index);
 
     create_sensor_to_state_index($device, $state_name, $index);
 }

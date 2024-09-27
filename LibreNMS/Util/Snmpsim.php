@@ -25,6 +25,7 @@
 
 namespace LibreNMS\Util;
 
+use Illuminate\Support\Facades\Log;
 use Symfony\Component\Process\Process;
 
 class Snmpsim extends Process
@@ -75,15 +76,25 @@ class Snmpsim extends Process
         $snmpsim_venv_path = $this->getVenvPath();
 
         if (! $this->isVenvSetUp()) {
-            \Log::info('Setting up snmpsim virtual env in ' . $snmpsim_venv_path);
+            Log::info('Setting up snmpsim virtual env in ' . $snmpsim_venv_path);
 
             $setupProcess = new Process(['python', '-m', 'venv', $snmpsim_venv_path]);
             $setupProcess->setTty($print_output);
             $setupProcess->run();
 
+            if (! $setupProcess->isSuccessful()) {
+                Log::info($setupProcess->getOutput());
+                Log::error($setupProcess->getErrorOutput());
+            }
+
             $installProcess = new Process([$snmpsim_venv_path . '/bin/pip', 'install', 'snmpsim']);
             $installProcess->setTty($print_output);
             $installProcess->run();
+
+            if (! $installProcess->isSuccessful()) {
+                Log::info($installProcess->getOutput());
+                Log::error($installProcess->getErrorOutput());
+            }
         }
     }
 

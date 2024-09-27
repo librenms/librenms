@@ -46,6 +46,7 @@ Route::middleware(['auth'])->group(function () {
     Route::any('inventory', \App\Http\Controllers\InventoryController::class)->name('inventory');
     Route::get('inventory/purge', [\App\Http\Controllers\InventoryController::class, 'purge'])->name('inventory.purge');
     Route::resource('port', 'PortController')->only('update');
+    Route::get('vlans', [\App\Http\Controllers\VlansController::class, 'index'])->name('vlans.index');
     Route::prefix('poller')->group(function () {
         Route::get('', 'PollerController@pollerTab')->name('poller.index');
         Route::get('log', 'PollerController@logTab')->name('poller.log');
@@ -75,6 +76,8 @@ Route::middleware(['auth'])->group(function () {
     // Device Tabs
     Route::prefix('device/{device}')->namespace('Device\Tabs')->name('device.')->group(function () {
         Route::put('notes', 'NotesController@update')->name('notes.update');
+        Route::put('module/{module}', [\App\Http\Controllers\Device\Tabs\ModuleController::class, 'update'])->name('module.update');
+        Route::delete('module/{module}', [\App\Http\Controllers\Device\Tabs\ModuleController::class, 'delete'])->name('module.delete');
     });
 
     Route::match(['get', 'post'], 'device/{device}/{tab?}/{vars?}', 'DeviceController@index')
@@ -213,6 +216,8 @@ Route::middleware(['auth'])->group(function () {
             Route::post('routes', 'RoutesTablesController');
             Route::post('syslog', 'SyslogController');
             Route::post('tnmsne', 'TnmsneController')->name('table.tnmsne');
+            Route::post('vlan-ports', 'VlanPortsController')->name('table.vlan-ports');
+            Route::post('vlan-devices', 'VlanDevicesController')->name('table.vlan-devices');
             Route::post('vminfo', 'VminfoController');
         });
 

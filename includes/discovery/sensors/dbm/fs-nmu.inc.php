@@ -72,7 +72,7 @@ if (is_numeric($a1_tx)) {
     $divisor = '100';
     $multiplier = '1';
     discover_sensor(
-        $valid['sensor'],
+        null,
         'dbm',
         $device,
         $oid_a1_tx,
@@ -97,7 +97,7 @@ if (is_numeric($a1_rx)) {
     $divisor = '100';
     $multiplier = '1';
     discover_sensor(
-        $valid['sensor'],
+        null,
         'dbm',
         $device,
         $oid_a1_rx,
@@ -122,7 +122,7 @@ if (is_numeric($a2_tx)) {
     $divisor = '100';
     $multiplier = '1';
     discover_sensor(
-        $valid['sensor'],
+        null,
         'dbm',
         $device,
         $oid_a2_tx,
@@ -147,7 +147,7 @@ if (is_numeric($a2_rx)) {
     $divisor = '100';
     $multiplier = '1';
     discover_sensor(
-        $valid['sensor'],
+        null,
         'dbm',
         $device,
         $oid_a2_rx,
@@ -170,7 +170,7 @@ if (is_numeric($b1_tx)) {
     $descr = 'B1 Tx Power';
     $index = 'vSFPB1TxPower.0';
     discover_sensor(
-        $valid['sensor'],
+        null,
         'dbm',
         $device,
         $oid_b1_tx,
@@ -195,7 +195,7 @@ if (is_numeric($b1_rx)) {
     $divisor = '100';
     $multiplier = '1';
     discover_sensor(
-        $valid['sensor'],
+        null,
         'dbm',
         $device,
         $oid_b1_rx,
@@ -220,7 +220,7 @@ if (is_numeric($b2_tx)) {
     $divisor = '100';
     $multiplier = '1';
     discover_sensor(
-        $valid['sensor'],
+        null,
         'dbm',
         $device,
         $oid_b2_tx,
@@ -245,7 +245,7 @@ if (is_numeric($b2_rx)) {
     $divisor = '100';
     $multiplier = '1';
     discover_sensor(
-        $valid['sensor'],
+        null,
         'dbm',
         $device,
         $oid_b2_rx,
@@ -270,7 +270,7 @@ if (is_numeric($c1_tx)) {
     $divisor = '100';
     $multiplier = '1';
     discover_sensor(
-        $valid['sensor'],
+        null,
         'dbm',
         $device,
         $oid_c1_tx,
@@ -295,7 +295,7 @@ if (is_numeric($c1_rx)) {
     $divisor = '100';
     $multiplier = '1';
     discover_sensor(
-        $valid['sensor'],
+        null,
         'dbm',
         $device,
         $oid_c1_rx,
@@ -320,7 +320,7 @@ if (is_numeric($c2_tx)) {
     $divisor = '100';
     $multiplier = '1';
     discover_sensor(
-        $valid['sensor'],
+        null,
         'dbm',
         $device,
         $oid_c2_tx,
@@ -345,7 +345,7 @@ if (is_numeric($c2_rx)) {
     $divisor = '100';
     $multiplier = '1';
     discover_sensor(
-        $valid['sensor'],
+        null,
         'dbm',
         $device,
         $oid_c2_rx,
@@ -368,7 +368,7 @@ if (is_numeric($d1_tx)) {
     $descr = 'D1 Tx Power';
     $index = 'vSFPD1TxPower.0';
     discover_sensor(
-        $valid['sensor'],
+        null,
         'dbm',
         $device,
         $oid_d1_tx,
@@ -393,7 +393,7 @@ if (is_numeric($d1_rx)) {
     $divisor = '100';
     $multiplier = '1';
     discover_sensor(
-        $valid['sensor'],
+        null,
         'dbm',
         $device,
         $oid_d1_rx,
@@ -418,7 +418,7 @@ if (is_numeric($d2_tx)) {
     $divisor = '100';
     $multiplier = '1';
     discover_sensor(
-        $valid['sensor'],
+        null,
         'dbm',
         $device,
         $oid_d2_tx,
@@ -443,7 +443,7 @@ if (is_numeric($d2_rx)) {
     $divisor = '100';
     $multiplier = '1';
     discover_sensor(
-        $valid['sensor'],
+        null,
         'dbm',
         $device,
         $oid_d2_rx,
