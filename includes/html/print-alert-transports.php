@@ -34,10 +34,10 @@ if (Auth::user()->hasGlobalAdmin()) {
 foreach (\App\Models\AlertTransport::orderBy('transport_name', 'asc')->get() as $transport) {
     $instance = $transport->instance();
     echo "<tr id=\"alert-transport-{$transport->transport_id}\">";
-    echo '<td>' . $transport->transport_name . '</td>';
-    echo '<td>' . $instance->name() . '</td>';
+    echo '<td>' . htmlentities($transport->transport_name) . '</td>';
+    echo '<td>' . htmlentities($instance->name()) . '</td>';
     echo $transport->is_default ? '<td>Yes</td>' : '<td>No</td>';
-    echo '<td class="col-sm-4"><i>' . nl2br($instance->displayDetails()) . '</i></td>';
+    echo '<td class="col-sm-4"><i>' . nl2br(htmlentities($instance->displayDetails())) . '</i></td>';
 
     echo '<td>';
     // Add action buttons for admin users only
@@ -76,14 +76,14 @@ if (Auth::user()->hasGlobalAdmin()) {
 $query = 'SELECT `transport_group_id` AS `id`, `transport_group_name` AS `name` FROM `alert_transport_groups` order by `name`';
 foreach (dbFetchRows($query) as $group) {
     echo "<tr id=\"alert-transport-group-{$group['id']}\">";
-    echo '<td>' . $group['name'] . '</td>';
+    echo '<td>' . htmlentities($group['name']) . '</td>';
 
     //List out the members of each group
     $query = 'SELECT `transport_type`, `transport_name` FROM `transport_group_transport` AS `a` LEFT JOIN `alert_transports` AS `b` ON `a`.`transport_id`=`b`.`transport_id` WHERE `transport_group_id`=? order by `transport_name`';
     $members = dbFetchRows($query, [$group['id']]);
     echo '<td>';
     foreach ($members as $member) {
-        echo '<i>' . ucfirst($member['transport_type']) . ': ' . $member['transport_name'] . '<br /></i>';
+        echo '<i>' . htmlentities(ucfirst($member['transport_type'])) . ': ' . htmlentities($member['transport_name']) . '<br /></i>';
     }
     echo '</td>';
     echo '<td>';
