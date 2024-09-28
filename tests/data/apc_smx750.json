@@ -494,7 +494,7 @@
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": 521,
+                    "sensor_current": 1523,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": 0,
