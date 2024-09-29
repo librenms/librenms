@@ -629,7 +629,7 @@ class Cisco extends OS implements
     public function discoverTransceivers(): Collection
     {
         // use data collected by entPhysical module if available
-        $dbSfpCages = $this->getDevice()->entityPhysical()->where('entPhysicalVendorType', 'cevContainerSFP')->pluck('ifIndex', 'entPhysicalIndex');
+        $dbSfpCages = $this->getDevice()->entityPhysical()->whereIn('entPhysicalVendorType', ['cevContainerSFP', 'cevContainerGbic', 'cevContainer10GigBasePort', 'cevContainerTransceiver', 'cevContainerXFP', 'cevContainer40GigBasePort', 'cevContainerCFP', 'cevContainerCXP', 'cevContainerCPAK', 'cevContainerNCS4KSFP', 'cevContainerQSFP28SR', 'cevContainerQSFP28LR', 'cevContainerQSFP28CR'])->pluck('ifIndex', 'entPhysicalIndex');
         if ($dbSfpCages->isNotEmpty()) {
             $data = $this->getDevice()->entityPhysical()->whereIn('entPhysicalContainedIn', $dbSfpCages->keys())->get()->map(function ($ent) use ($dbSfpCages) {
                 if (empty($ent->ifIndex) && $dbSfpCages->has($ent->entPhysicalContainedIn)) {
