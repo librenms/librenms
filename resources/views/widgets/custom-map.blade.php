@@ -216,7 +216,7 @@
                     var centreX = Math.round(network_width / 2);
                     network.moveTo({position: {x: centreX, y: centreY}, scale: 1});
 
-                    setCustomMapBackground('custom-map', bgtype, bgdata);
+                    setCustomMapBackground('custom-map-{{ $id }}', bgtype, bgdata);
 
                     network.on('doubleClick', function (properties) {
                         edge_id = null;
