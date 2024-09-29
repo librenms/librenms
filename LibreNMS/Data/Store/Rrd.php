@@ -372,7 +372,7 @@ class Rrd extends BaseDatastore
      */
     public function dirFromHost($host)
     {
-        $host = str_replace(':', '_', trim($host, '[]'));
+        $host = self::safeName(trim($host, '[]'));
 
         return implode('/', [$this->rrd_dir, $host]);
     }
