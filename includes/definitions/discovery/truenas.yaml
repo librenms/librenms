@@ -1,5 +1,7 @@
 mib: FREENAS-MIB
 modules:
+    os:
+        sysDescr_regex: '/(?:TrueNAS-)(?<version>\S*).*\. Hardware: (?<hardware>.*).*\./'
     sensors:
         count:
             data:
