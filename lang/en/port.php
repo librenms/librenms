@@ -56,16 +56,6 @@ return [
             'voltage' => 'V',
         ],
     ],
-    'transceiver_metrics' => [
-        'fields' => [
-            'type' => 'Metric',
-            'value' => 'Current',
-            'threshold_min_critical' => 'Min Critical',
-            'threshold_min_warning' => 'Min Warning',
-            'threshold_max_warning' => 'Max Warning',
-            'threshold_max_critical' => 'Max Critical',
-        ],
-    ],
     'unknown_port' => 'Unknown Port',
     'vlan_count' => 'VLANs: :count',
     'vlan_label' => 'VLAN: :label',
