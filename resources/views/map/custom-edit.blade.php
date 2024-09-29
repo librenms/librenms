@@ -560,14 +560,6 @@
         $('#bgModal').modal('show');
     }
 
-    function checkColourReset(itemColour, defaultColour, resetControlId) {
-        if(!itemColour || itemColour.toLowerCase() == defaultColour.toLowerCase()) {
-            $("#" + resetControlId).attr('disabled','disabled');
-        } else {
-            $("#" + resetControlId).removeAttr('disabled');
-        }
-    }
-
     function checkEditNode(data) {
         // If we have an ID that is non numeric, we can check node type further
         if(data.id && isNaN(data.id)) {

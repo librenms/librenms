@@ -132,6 +132,14 @@
     var port_search_device_id_1 = 0;
     var port_search_device_id_2 = 0;
 
+    function edgeCheckColourReset(itemColour, defaultColour, resetControlId) {
+        if(!itemColour || itemColour.toLowerCase() == defaultColour.toLowerCase()) {
+            $("#" + resetControlId).attr('disabled','disabled');
+        } else {
+            $("#" + resetControlId).removeAttr('disabled');
+        }
+    }
+
     function edgePortClear() {
         $("#portsearch").val('');
         $("#portsearch").trigger('change');
@@ -269,7 +277,7 @@
         $("#edgeto").val(edgedata.edge2.from);
 
         edgePortSearchUpdate($("#edgefrom").val(), $("#edgeto").val(), edgedata.id);
-        checkColourReset(edgedata.edge1.font.color, newedgeconf.font.color, "edgecolourtextreset");
+        edgeCheckColourReset(edgedata.edge1.font.color, newedgeconf.font.color, "edgecolourtextreset");
 
         $("#edgestyle").val(edgedata.edge1.smooth.type);
         $("#edgetextface").val(edgedata.edge1.font.face);
