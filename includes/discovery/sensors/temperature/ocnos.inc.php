@@ -31,7 +31,7 @@ if ($os instanceof \LibreNMS\OS\Ocnos) {
                         'entPhysicalIndex' => $cmmStackUnitIndex * 10000 + $cmmTransIndex,
                         'entPhysicalIndex_measured' => 'port',
                         'user_func' => null,
-                        'group' => $ifName,
+                        'group' => 'transceiver',
                     ]));
 
                     continue 2; // common across channels
