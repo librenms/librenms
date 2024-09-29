@@ -74,7 +74,7 @@
                                     <input class="form-check-input" type="checkbox" role="switch" id="edgebpsshow">
                                 </div>
                             </div>
-                            <div class="form-group row">
+                            <div class="form-group row existing-edge">
                                 <label for="edgelabel" class="col-sm-3 control-label">{{ __('map.custom.edit.edge.label') }}</label>
                                 <div class="col-sm-9">
                                     <input type=text id="edgelabel" class="form-control input-sm" value="" />
