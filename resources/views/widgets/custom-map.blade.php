@@ -174,7 +174,6 @@
                     });
 
                     if ({{ $map->legend_x }} >= 0) {
-                        // TODO: Scale
                         let legend_font_size =  Math.floor(scale * {{ $map->legend_font_size }});
                         let y_pos =  Math.floor(scale * {{ $map->legend_y }});
                         let x_pos =  Math.floor(scale * {{ $map->legend_x }});
