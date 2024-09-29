@@ -967,7 +967,7 @@ function get_oxidized_nodes_list()
 
         // Generate local time string
         $formatted_local_time = $local_date->format('Y-m-d H:i:s T');
-        
+
         echo '<tr>
         <td>' . $device['device_id'] . '</td>
         <td>' . $object['name'] . '</td>
