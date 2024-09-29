@@ -1572,7 +1572,6 @@ return [
                     'legacy' => 'Legacy (Unrestricted)',
                     'cron' => 'Cron (poller.php)',
                     'dispatcher' => 'Dispatcher Service',
-                    'scheduler' => 'LibreNMS Scheduler',
                 ],
             ],
             'services' => [
