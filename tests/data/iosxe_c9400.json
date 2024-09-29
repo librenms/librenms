@@ -34298,5 +34298,87 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "transceivers": {
+        "discovery": {
+            "transceivers": [
+                {
+                    "index": "2072",
+                    "entity_physical_index": 50,
+                    "type": "10G AOC2M",
+                    "vendor": "CISCO-AVAGO",
+                    "oui": null,
+                    "model": "SFP-10G-AOC2M",
+                    "revision": "V01",
+                    "serial": "A1111111111-A",
+                    "date": null,
+                    "ddm": null,
+                    "encoding": null,
+                    "cable": null,
+                    "distance": null,
+                    "wavelength": null,
+                    "connector": null,
+                    "channels": 1,
+                    "ifIndex": 50
+                },
+                {
+                    "index": "2078",
+                    "entity_physical_index": 51,
+                    "type": "GE T",
+                    "vendor": "CISCO-AVAGO",
+                    "oui": null,
+                    "model": "ABCU-5710RZ-CS5",
+                    "revision": "",
+                    "serial": "AGM11111111",
+                    "date": null,
+                    "ddm": null,
+                    "encoding": null,
+                    "cable": null,
+                    "distance": null,
+                    "wavelength": null,
+                    "connector": null,
+                    "channels": 1,
+                    "ifIndex": 51
+                },
+                {
+                    "index": "3072",
+                    "entity_physical_index": 60,
+                    "type": "10G AOC2M",
+                    "vendor": "CISCO-AVAGO",
+                    "oui": null,
+                    "model": "SFP-10G-AOC2M",
+                    "revision": "V01",
+                    "serial": "A4Z2150K132-A",
+                    "date": null,
+                    "ddm": null,
+                    "encoding": null,
+                    "cable": null,
+                    "distance": null,
+                    "wavelength": null,
+                    "connector": null,
+                    "channels": 1,
+                    "ifIndex": 60
+                },
+                {
+                    "index": "3078",
+                    "entity_physical_index": 61,
+                    "type": "GE T",
+                    "vendor": "CISCO-AVAGO",
+                    "oui": null,
+                    "model": "ABCU-5710RZ-CS5",
+                    "revision": "",
+                    "serial": "AGM204442RB",
+                    "date": null,
+                    "ddm": null,
+                    "encoding": null,
+                    "cable": null,
+                    "distance": null,
+                    "wavelength": null,
+                    "connector": null,
+                    "channels": 1,
+                    "ifIndex": 61
+                }
+            ]
+        }
     }
 }

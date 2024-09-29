@@ -3496,5 +3496,30 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "transceivers": {
+        "discovery": {
+            "transceivers": [
+                {
+                    "index": "4125",
+                    "entity_physical_index": null,
+                    "type": "GE LX",
+                    "vendor": "FLEXOPTIX",
+                    "oui": null,
+                    "model": "GLC-LH-SMD",
+                    "revision": "V01",
+                    "serial": "F798YLY",
+                    "date": null,
+                    "ddm": null,
+                    "encoding": null,
+                    "cable": null,
+                    "distance": null,
+                    "wavelength": null,
+                    "connector": null,
+                    "channels": 1,
+                    "ifIndex": null
+                }
+            ]
+        }
     }
 }

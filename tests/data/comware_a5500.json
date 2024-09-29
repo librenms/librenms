@@ -5837,8 +5837,8 @@
                     "ifName": "NULL0",
                     "portName": null,
                     "ifIndex": 29,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "false",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -5937,8 +5937,8 @@
                     "ifName": "Vlan-interface10",
                     "portName": null,
                     "ifIndex": 33,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "false",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -8107,5 +8107,30 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "transceivers": {
+        "discovery": {
+            "transceivers": [
+                {
+                    "index": "26",
+                    "entity_physical_index": 26,
+                    "type": "1000_BASE_LX_SFP",
+                    "vendor": "HPE",
+                    "oui": null,
+                    "model": null,
+                    "revision": null,
+                    "serial": "210231A0LSX10B000123",
+                    "date": null,
+                    "ddm": 1,
+                    "encoding": null,
+                    "cable": "SM",
+                    "distance": 10000,
+                    "wavelength": 1310,
+                    "connector": null,
+                    "channels": 1,
+                    "ifIndex": 26
+                }
+            ]
+        }
     }
 }
