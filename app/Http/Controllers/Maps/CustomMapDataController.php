@@ -294,7 +294,7 @@ class CustomMapDataController extends Controller
 
     private function rateString(int $rate): string
     {
-        return Number::formatSi($rate, 0, 0, 'bps');
+        return Number::formatSi($rate, 2, 3, 'bps');
     }
 
     private function snmpSpeed(string $speeds): int
