@@ -963,10 +963,10 @@ function get_oxidized_nodes_list()
         $utc_time = $object['time'];
         $utc_date = new DateTime($utc_time, new DateTimeZone('UTC'));
         $local_timezone = new DateTimeZone(date_default_timezone_get());
-        $local_date = $utc_date->setTimezone($local_timezone); 
+        $local_date = $utc_date->setTimezone($local_timezone);
 
         // Generate local time string
-        $formatted_local_time = $local_date->format('Y-m-d H:i:s T'); 
+        $formatted_local_time = $local_date->format('Y-m-d H:i:s T');
         
         echo '<tr>
         <td>' . $device['device_id'] . '</td>
