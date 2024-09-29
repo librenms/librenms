@@ -1074,7 +1074,7 @@
             "order": 22
         },
         "custom_map.height": {
-            "default": "1800px",
+            "default": "800px",
             "type": "text",
             "group": "webui",
             "section": "custom-map",
@@ -1161,7 +1161,7 @@
             "order": 23
         },
         "custom_map.width": {
-            "default": "800px",
+            "default": "1800px",
             "type": "text",
             "group": "webui",
             "section": "custom-map",
