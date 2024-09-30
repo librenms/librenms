@@ -49,7 +49,7 @@
             for (let i=0; i < num_steps; i++) {
                 let this_pct = Math.round(pct_step * i);
                 let legend_step = {id: "legend_" + i.toString(), label: this_pct.toString().padStart(3, " ") + "%", shape: "box", borderWidth: 0, x: x_pos, y: y_pos, font: {face: 'courier new', size: font_size, color: "black"}, color: {background: custommapLegendPctDefaultColour(this_pct)}};
-                network_nodes.add(legend_step);
+                nodes.add(legend_step);
                 y_pos += y_inc;
             }
             nodes.flush();
@@ -93,7 +93,7 @@
         });
     }
 
-    function custommapGetNodeCfg(nodeid, node, screenshot) {
+    function custommapGetNodeCfg(nodeid, node, scale, screenshot) {
         var node_cfg = {};
         node_cfg.id = nodeid;
 
@@ -107,10 +107,10 @@
         node_cfg.label = screenshot ? node.label.replace(/./g, ' ') : node.label;
         node_cfg.shape = node.style;
         node_cfg.borderWidth = node.border_width;
-        node_cfg.x = node.x_pos;
-        node_cfg.y = node.y_pos;
-        node_cfg.font = {face: node.text_face, size: node.text_size, color: node.text_colour};
-        node_cfg.size = node.size;
+        node_cfg.x = Math.floor(scale * node.x_pos);
+        node_cfg.y = Math.floor(scale * node.y_pos);
+        node_cfg.font = {face: node.text_face, size: Math.floor(scale * node.text_size), color: node.text_colour};
+        node_cfg.size = Math.floor(scale * node.size);
         node_cfg.color = {background: node.colour_bg_view, border: node.colour_bdr_view};
         if(node.style == "icon") {
             node_cfg.icon = {face: 'FontAwesome', code: String.fromCharCode(parseInt(node.icon, 16)), size: node.size, color: node.colour_bdr};

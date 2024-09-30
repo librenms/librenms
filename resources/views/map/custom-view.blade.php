@@ -77,7 +77,7 @@
             .done(function( data ) {
                 // Add/update nodes
                 $.each( data.nodes, function( nodeid, node) {
-                    var node_cfg = custommapGetNodeCfg(nodeid, node, screenshot);
+                    var node_cfg = custommapGetNodeCfg(nodeid, node, 1, screenshot);
                     if(node.device_id) {
                         node_device_map[nodeid] = {device_id: node.device_id, device_name: node.device_name};
                         delete node_link_map[nodeid];
@@ -132,7 +132,7 @@
                 });
 
                 // Re-draw the legend
-                custommapRedrawDefaultLegend(network_nodes, 1, legend.num_steps, legend.x, legend.y, legend.font_size, legend.hide_invalid, legend.hide_overspeed);
+                custommapRedrawDefaultLegend(network_nodes, 1, legend.steps, legend.x, legend.y, legend.font_size, legend.hide_invalid, legend.hide_overspeed);
 
                 // Flush in order to make sure nodes exist for edges to connect to
                 network_nodes.flush();
