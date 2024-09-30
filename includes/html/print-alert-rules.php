@@ -27,6 +27,7 @@ if (! Auth::user()->hasGlobalAdmin()) {
     exit('ERROR: You need to be admin');
 }
 
+use App\Facades\DeviceCache;
 use LibreNMS\Alerting\QueryBuilderParser;
 use LibreNMS\Enum\AlertState;
 
@@ -301,7 +302,7 @@ foreach ($rule_list as $rule) {
         $device_query = 'SELECT devices.device_id,devices.hostname FROM alert_device_map, devices WHERE alert_device_map.rule_id=? and alert_device_map.device_id = devices.device_id ORDER BY hostname';
         $device_maps = dbFetchRows($device_query, [$rule['id']]);
         foreach ($device_maps as $device_map) {
-            $devices .= $except_device_or_group . '<a href="' . url('device/device=' . $device_map['device_id'] . '/tab=edit/') . '" data-container="body" data-toggle="popover" data-placement="' . $popover_position . '" data-content="' . htmlentities($device_map['hostname']) . '" title="' . $devices_msg . '" target="_blank">' . htmlentities($device_map['hostname']) . '</a><br>';
+            $devices .= $except_device_or_group . '<a href="' . url('device/device=' . $device_map['device_id'] . '/tab=edit/') . '" data-container="body" data-toggle="popover" data-placement="' . $popover_position . '" data-content="' . htmlentities($device_map['hostname']) . '" title="' . $devices_msg . '" target="_blank">' . htmlentities(DeviceCache::get($device_map['device_id'])->displayName()) . '</a><br>';
         }
     }
 

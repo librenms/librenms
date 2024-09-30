@@ -117,9 +117,14 @@ class LegacyModule implements Module
         Debug::enableErrorReporting(); // and back to normal
     }
 
-    public function cleanup(Device $device): void
+    public function dataExists(Device $device): bool
     {
-        // TODO: Implement cleanup() method.
+        return false; // impossible to determine for legacy modules
+    }
+
+    public function cleanup(Device $device): int
+    {
+        return 0; // Not possible to cleanup legacy modules
     }
 
     /**

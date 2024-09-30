@@ -135,13 +135,18 @@ class PrinterSupplies implements Module
         }
     }
 
+    public function dataExists(Device $device): bool
+    {
+        return $device->printerSupplies()->exists();
+    }
+
     /**
      * Remove all DB data for this module.
      * This will be run when the module is disabled.
      */
-    public function cleanup(Device $device): void
+    public function cleanup(Device $device): int
     {
-        $device->printerSupplies()->delete();
+        return $device->printerSupplies()->delete();
     }
 
     /**

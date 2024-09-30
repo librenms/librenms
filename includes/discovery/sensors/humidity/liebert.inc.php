@@ -43,7 +43,7 @@ foreach ($lib_data as $index => $data) {
 
     if (is_numeric($current)) {
         $descr = $data['lgpEnvHumidityDescrRel'];
-        discover_sensor($valid['sensor'], 'humidity', $device, $oid, $new_index, 'liebert', $descr, $divisor, 1, $low_limit, null, null, $high_limit, $current / $divisor);
+        discover_sensor(null, 'humidity', $device, $oid, $new_index, 'liebert', $descr, $divisor, 1, $low_limit, null, null, $high_limit, $current / $divisor);
     }
 }
 
@@ -63,7 +63,7 @@ if (is_numeric($return_humidity)) {
     $oid = '.1.3.6.1.4.1.476.1.42.3.4.2.1.2.0';
     $index = 'lgpEnvReturnAirHumidity.0';
     $descr = 'Return Air Humidity';
-    discover_sensor($valid['sensor'], 'humidity', $device, $oid, $index, 'liebert', $descr, $divisor, '1', null, null, null, null, $return_humidity);
+    discover_sensor(null, 'humidity', $device, $oid, $index, 'liebert', $descr, $divisor, '1', null, null, null, null, $return_humidity);
 }
 
 $supply_humidity = snmp_get($device, 'lgpEnvSupplyAirHumidity.0', '-Oqv');
@@ -71,5 +71,5 @@ if (is_numeric($supply_humidity)) {
     $oid = '.1.3.6.1.4.1.476.1.42.3.4.2.1.3.0';
     $index = 'lgpEnvSupplyAirHumidity.0';
     $descr = 'Supply Air Humidity';
-    discover_sensor($valid['sensor'], 'humidity', $device, $oid, $index, 'liebert', $descr, $divisor, '1', null, null, null, null, $supply_humidity);
+    discover_sensor(null, 'humidity', $device, $oid, $index, 'liebert', $descr, $divisor, '1', null, null, null, null, $supply_humidity);
 }

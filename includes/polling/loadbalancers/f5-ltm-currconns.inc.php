@@ -25,7 +25,6 @@ $error_poolaction[6] = 'None';
 
 $component = new LibreNMS\Component();
 $options['filter']['disabled'] = ['=', 0];
-$options['filter']['ignore'] = ['=', 0];
 $components = $component->getComponents($device['device_id'], $options);
 
 // We only care about our device id.

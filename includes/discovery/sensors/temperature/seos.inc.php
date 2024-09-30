@@ -17,7 +17,7 @@ foreach (explode("\n", $oids) as $data) {
         $temperature = snmp_get($device, $oid, '-Oqv');
         $descr = str_replace('"', '', $descr);
 
-        discover_sensor($valid['sensor'], 'temperature', $device, $oid, $insert_index, $type, $descr, 1, '1', null, null, null, null, $temperature);
+        discover_sensor(null, 'temperature', $device, $oid, $insert_index, $type, $descr, 1, '1', null, null, null, null, $temperature);
         $insert_index++;
     }
 }
@@ -34,7 +34,7 @@ foreach (explode("\n", $oids) as $data) {
         $temperature = snmp_get($device, $oid, '-Oqv');
         $descr = str_replace('"', '', $descr);
 
-        discover_sensor($valid['sensor'], 'temperature', $device, $oid, $insert_index, $type, $descr, 1, '1', null, null, null, null, $temperature);
+        discover_sensor(null, 'temperature', $device, $oid, $insert_index, $type, $descr, 1, '1', null, null, null, null, $temperature);
         $insert_index++;
     }
 }

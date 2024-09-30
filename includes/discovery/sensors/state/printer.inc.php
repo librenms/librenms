@@ -17,7 +17,7 @@ if (is_numeric($state)) {
     );
     $sensor_index = 0;
     discover_sensor(
-        $valid['sensor'],
+        null,
         'state',
         $device,
         '.1.3.6.1.2.1.25.3.2.1.5.1',
@@ -84,7 +84,7 @@ if ($state) {
     d_echo('Printer error state: ' . $state_name . ': ' . $state);
     $sensor_index = 0;
     discover_sensor(
-        $valid['sensor'],
+        null,
         'state',
         $device,
         '.1.3.6.1.2.1.25.3.5.1.2.1',

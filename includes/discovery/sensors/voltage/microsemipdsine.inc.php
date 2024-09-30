@@ -35,5 +35,5 @@ if (! empty($mainVoltage)) {
     $oid = '.1.3.6.1.4.1.7428.1.2.2.1.1.2.1';
     $current_value = $mainVoltage / $divisor;
 
-    discover_sensor($valid['sensor'], 'voltage', $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current_value);
+    discover_sensor(null, 'voltage', $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current_value);
 }

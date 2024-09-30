@@ -148,9 +148,14 @@ class Mempools implements Module
         return $mempools;
     }
 
-    public function cleanup(Device $device): void
+    public function dataExists(Device $device): bool
     {
-        $device->mempools()->delete();
+        return $device->mempools()->exists();
+    }
+
+    public function cleanup(Device $device): int
+    {
+        return $device->mempools()->delete();
     }
 
     /**

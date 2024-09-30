@@ -165,20 +165,34 @@ class Mpls implements Module
         }
     }
 
+    public function dataExists(Device $device): bool
+    {
+        return $device->mplsLsps()->exists()
+         || $device->mplsLspPaths()->exists()
+         || $device->mplsSdps()->exists()
+         || $device->mplsServices()->exists()
+         || $device->mplsSaps()->exists()
+         || $device->mplsSdpBinds()->exists()
+         || $device->mplsTunnelArHops()->exists()
+         || $device->mplsTunnelCHops()->exists();
+    }
+
     /**
      * Remove all DB data for this module.
      * This will be run when the module is disabled.
      */
-    public function cleanup(Device $device): void
+    public function cleanup(Device $device): int
     {
-        $device->mplsLsps()->delete();
-        $device->mplsLspPaths()->delete();
-        $device->mplsSdps()->delete();
-        $device->mplsServices()->delete();
-        $device->mplsSaps()->delete();
-        $device->mplsSdpBinds()->delete();
-        $device->mplsTunnelArHops()->delete();
-        $device->mplsTunnelCHops()->delete();
+        $deleted = $device->mplsLsps()->delete();
+        $deleted += $device->mplsLspPaths()->delete();
+        $deleted += $device->mplsSdps()->delete();
+        $deleted += $device->mplsServices()->delete();
+        $deleted += $device->mplsSaps()->delete();
+        $deleted += $device->mplsSdpBinds()->delete();
+        $deleted += $device->mplsTunnelArHops()->delete();
+        $deleted += $device->mplsTunnelCHops()->delete();
+
+        return $deleted;
     }
 
     /**
