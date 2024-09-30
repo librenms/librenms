@@ -26,7 +26,7 @@ function show_device_group($device_group_id) {
         }
         ?>
         </span>
-        <?php echo $device_group_name ?>
+        <?php echo htmlentities($device_group_name) ?>
     </div>
     <?php
 }
