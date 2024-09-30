@@ -536,8 +536,8 @@ custom_maps:
     - { Field: created_at, Type: timestamp, 'Null': true, Extra: '' }
     - { Field: updated_at, Type: timestamp, 'Null': true, Extra: '' }
     - { Field: menu_group, Type: varchar(100), 'Null': true, Extra: '' }
-    - { Field: background_type, Type: varchar(16), 'Null': false, Extra: '', Default: 'none' }
-    - { Field: background_data, Type: 'text', 'Null': true, Extra: '' }
+    - { Field: background_type, Type: varchar(16), 'Null': false, Extra: '', Default: none }
+    - { Field: background_data, Type: text, 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [custom_map_id], Unique: true, Type: BTREE }
 custom_map_backgrounds:
@@ -2179,6 +2179,32 @@ tnmsneinfo:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     tnmsneinfo_device_id_index: { Name: tnmsneinfo_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
     tnmsneinfo_neid_index: { Name: tnmsneinfo_neid_index, Columns: [neID], Unique: false, Type: BTREE }
+transceivers:
+  Columns:
+    - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
+    - { Field: created_at, Type: timestamp, 'Null': true, Extra: '' }
+    - { Field: updated_at, Type: timestamp, 'Null': true, Extra: '' }
+    - { Field: device_id, Type: bigint, 'Null': false, Extra: '' }
+    - { Field: port_id, Type: bigint, 'Null': false, Extra: '' }
+    - { Field: index, Type: varchar(255), 'Null': false, Extra: '' }
+    - { Field: entity_physical_index, Type: int, 'Null': true, Extra: '' }
+    - { Field: type, Type: varchar(128), 'Null': true, Extra: '' }
+    - { Field: vendor, Type: varchar(16), 'Null': true, Extra: '' }
+    - { Field: oui, Type: varchar(16), 'Null': true, Extra: '' }
+    - { Field: model, Type: varchar(32), 'Null': true, Extra: '' }
+    - { Field: revision, Type: varchar(16), 'Null': true, Extra: '' }
+    - { Field: serial, Type: varchar(32), 'Null': true, Extra: '' }
+    - { Field: date, Type: date, 'Null': true, Extra: '' }
+    - { Field: ddm, Type: tinyint, 'Null': true, Extra: '' }
+    - { Field: encoding, Type: varchar(16), 'Null': true, Extra: '' }
+    - { Field: cable, Type: varchar(16), 'Null': true, Extra: '' }
+    - { Field: distance, Type: int, 'Null': true, Extra: '' }
+    - { Field: wavelength, Type: int, 'Null': true, Extra: '' }
+    - { Field: connector, Type: varchar(16), 'Null': true, Extra: '' }
+    - { Field: channels, Type: smallint, 'Null': false, Extra: '', Default: '1' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
+    transceivers_device_id_entity_physical_index_index: { Name: transceivers_device_id_entity_physical_index_index, Columns: [device_id, entity_physical_index], Unique: false, Type: BTREE }
 transport_group_transport:
   Columns:
     - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }

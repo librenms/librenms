@@ -84,6 +84,8 @@ interface Module
      * You should always order the data by a non-transient column.
      * Some id fields may need to be joined to tie back to non-transient data.
      * Module may return null if testing is not supported or required.
+     *
+     * @param  string  $type  Type is either discovery or poller
      */
     public function dump(Device $device, string $type): ?array;
 }

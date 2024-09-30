@@ -110,7 +110,8 @@ the string to the equivalent OID representation.
   key with in the table or a static string, optionally using `{{ index }}`.
 - `group` (optional): Groups sensors together under in the webui,
   displaying this text. Not specifying this will put the sensors in
-  the default group.
+  the default group. If group is set to `transceiver` it will be shown with the port
+  instead of in with all the generic sensors (You must also set `entPhysicalIndex` to ifIndex)
 - `index` (optional): This is the index value we use to uniquely
   identify this sensor. `{{ $index }}` will be replaced by the `index`
   from the snmp walk.

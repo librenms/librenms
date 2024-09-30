@@ -6,6 +6,7 @@ if ($oids) {
     echo ' APC Runtime ';
     [$oid,$current] = explode(' ', $oids);
     $divisor = 6000;
+    $current /= $divisor;
     $type = 'apc';
     $index = 'upsAdvBatteryRunTimeRemaining.0';
     $descr = 'Runtime';

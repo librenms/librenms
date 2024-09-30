@@ -1,8 +1,30 @@
 <tr>
     <td>
-        <x-port-link :port="$port">
-            <span class="tw-text-3xl tw-font-bold"><i class="fa fa-tag" aria-hidden='true'></i> {{ $port->getLabel() }}</span>
-        </x-port-link>
+        <div>
+            <x-port-link :port="$port" class="tw-inline">
+                <span class="tw-text-3xl tw-font-bold"><i class="fa fa-tag" aria-hidden='true'></i> {{ $port->getLabel() }}</span>
+            </x-port-link>
+            @if($data['tab'] != 'basic')
+            @foreach($port->transceivers as $transceiver)
+                @php
+                    $transceiver->setRelation('port', $port); // save a query
+                @endphp
+                <x-popup>
+                    <a href="{{ \LibreNMS\Util\Url::generate(['page' => 'device', 'device' => $port->device_id, 'tab' => 'port','port' => $port->port_id], ['view' => 'transceiver']) }}" class="tw-text-current">
+                        <span class="tw-ml-3 tw-text-3xl"><x-icons.transceiver/></span>
+                    </a>
+                    <x-slot name="body" class="tw-p-0">
+                        @if(array_filter($transceiver->only(['type', 'vendor', 'model', 'revision', 'serial', 'data', 'ddm', 'encoding', 'cable', 'distance', 'wavelength', 'connector'])))
+                            <div class="tw-opacity-90 tw-p-4 tw-border-b-2 tw-border-solid tw-border-gray-200 dark:tw-border-dark-gray-200 tw-rounded-t-lg">
+                                <x-transceiver :transceiver="$transceiver" :portlink="false"></x-transceiver>
+                            </div>
+                        @endif
+                        <x-transceiver-sensors :transceiver="$transceiver" class="tw-p-3"></x-transceiver-sensors>
+                    </x-slot>
+                </x-popup>
+            @endforeach
+            @endif
+        </div>
         <div>
             @if($port->ifInErrors_delta > 0 || $port->ifOutErrors_delta > 0)
                 <a href="{{ route('device', ['device' => $port->device_id, 'tab' => 'port', 'vars' => 'port=' . $port->port_id]) }}"><i class="fa fa-flag fa-lg tw-text-red-600"></i></a>
