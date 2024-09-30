@@ -73,19 +73,7 @@
 
                 custommapRedrawDefaultLegend(network_nodes, scale, {{ $map->legend_steps }}, {{ $map->legend_x }}, {{ $map->legend_y }}, {{ $map->legend_font_size }}, {{ $map->legend_hide_invalid }}, {{ $map->legend_hide_overspeed }});
 
-                // Flush in order to make sure nodes exist for edges to connect to
-                network_nodes.flush();
-                network_edges.flush();
-
-                var container = document.getElementById('custom-map-{{ $id }}');
-                network = new vis.Network(container, {nodes: network_nodes, edges: network_edges, stabilize: true}, network_options);
-
-                // width/height might be % get values in pixels
-                var centreY = Math.round(network_height / 2);
-                var centreX = Math.round(network_width / 2);
-                network.moveTo({position: {x: centreX, y: centreY}, scale: 1});
-
-                setCustomMapBackground('custom-map-{{ $id }}', bgtype, bgdata);
+                network = custommapCreateNetwork('custom-map-{{ $id }}', network_nodes, network_edges, network_options, bgtype, bgdata);
 
                 network.on('doubleClick', function (properties) {
                     edge_id = null;

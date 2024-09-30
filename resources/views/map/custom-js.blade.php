@@ -56,13 +56,13 @@
         }
     }
 
-    function custommapCreateNetwork(elementId, nodes, edges, options) {
+    function custommapCreateNetwork(elementId, nodes, edges, options, bgtype, bgdata) {
         // Flush the nodes and edges so they are rendered immediately
         nodes.flush();
         edges.flush();
 
         var container = document.getElementById(elementId);
-        network = new vis.Network(container, {nodes: nodes, edges: edges, stabilize: true}, options);
+        var network = new vis.Network(container, {nodes: nodes, edges: edges, stabilize: true}, options);
 
         // width/height might be % get values in pixels
         network_height = $($(container).children(".vis-network")[0]).height();
@@ -71,26 +71,9 @@
         var centreX = Math.round(network_width / 2);
         network.moveTo({position: {x: centreX, y: centreY}, scale: 1});
 
-        setCustomMapBackground('custom-map', bgtype, bgdata);
+        setCustomMapBackground(elementId, bgtype, bgdata);
 
-        network.on('doubleClick', function (properties) {
-            edge_id = null;
-            if (properties.nodes.length > 0) {
-                if(properties.nodes[0] in node_device_map) {
-                    window.location.href = "device/"+node_device_map[properties.nodes[0]].device_id;
-                } else if (properties.nodes[0] in node_link_map) {
-                    window.location.href = '{{ route('maps.custom.show', ['map' => '?']) }}'.replace('?', node_link_map[properties.nodes[0]]);
-                } else if (properties.nodes[0].endsWith('_mid')) {
-                    edge_id = properties.nodes[0].split("_")[0];
-                }
-            } else if (properties.edges.length > 0) {
-                edge_id = properties.edges[0].split("_")[0];
-            }
-
-            if (edge_id && (edge_id in edge_port_map)) {
-               window.location.href = 'device/device=' + edge_port_map[edge_id].device_id + '/tab=port/port=' + edge_port_map[edge_id].port_id + '/';
-            }
-        });
+        return network;
     }
 
     function custommapGetNodeCfg(nodeid, node, scale, screenshot) {
