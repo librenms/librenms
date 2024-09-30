@@ -18,16 +18,16 @@
         return '#ff00ff';
     }
 
-    function custommapRedrawDefaultLegend(nodes, scale, num_steps, x_pos, y_pos, font_size, hide_invalid, hide_overspeed) {
+    function custommapRedrawDefaultLegend(nodes, num_steps, x_pos, y_pos, font_size, hide_invalid, hide_overspeed) {
         // Clear out the old legend
         old_nodes = nodes.get({filter: function(node) { return node.id.startsWith("legend_") }});
         old_nodes.forEach((node) => {
             nodes.remove(node.id);
         });
         if (x_pos >= 0) {
-            font_size =  Math.floor(scale * font_size);
-            y_pos =  Math.floor(scale * y_pos);
-            x_pos =  Math.floor(scale * x_pos);
+            font_size =  font_size;
+            y_pos =  y_pos;
+            x_pos =  x_pos;
             let y_inc = font_size + 10;
 
             let legend_header = {id: "legend_header", label: "<b>Legend</b>", shape: "box", borderWidth: 0, x: x_pos, y: y_pos, font: {multi: 'html', size: font_size}, color: {background: "white"}};
@@ -56,7 +56,7 @@
         }
     }
 
-    function custommapCreateNetwork(elementId, nodes, edges, options, bgtype, bgdata) {
+    function custommapCreateNetwork(elementId, scale, nodes, edges, options, bgtype, bgdata) {
         // Flush the nodes and edges so they are rendered immediately
         nodes.flush();
         edges.flush();
@@ -67,16 +67,22 @@
         // width/height might be % get values in pixels
         network_height = $($(container).children(".vis-network")[0]).height();
         network_width = $($(container).children(".vis-network")[0]).width();
-        var centreY = Math.round(network_height / 2);
-        var centreX = Math.round(network_width / 2);
-        network.moveTo({position: {x: centreX, y: centreY}, scale: 1});
+        var centreY = Math.round(network_height / (2 * scale));
+        var centreX = Math.round(network_width / (2 * scale));
+        network.moveTo({position: {x: centreX, y: centreY}, scale: scale});
 
         setCustomMapBackground(elementId, bgtype, bgdata);
+
+        network.on('zoom', function (data) {
+            if(data.scale < scale) {
+                network.moveTo({position: {x: centreX, y: centreY}, scale: scale});
+            }
+        });
 
         return network;
     }
 
-    function custommapGetNodeCfg(nodeid, node, scale, screenshot) {
+    function custommapGetNodeCfg(nodeid, node, screenshot, custom_image_base) {
         var node_cfg = {};
         node_cfg.id = nodeid;
 
@@ -90,10 +96,10 @@
         node_cfg.label = screenshot ? node.label.replace(/./g, ' ') : node.label;
         node_cfg.shape = node.style;
         node_cfg.borderWidth = node.border_width;
-        node_cfg.x = Math.floor(scale * node.x_pos);
-        node_cfg.y = Math.floor(scale * node.y_pos);
-        node_cfg.font = {face: node.text_face, size: Math.floor(scale * node.text_size), color: node.text_colour};
-        node_cfg.size = Math.floor(scale * node.size);
+        node_cfg.x = node.x_pos;
+        node_cfg.y = node.y_pos;
+        node_cfg.font = {face: node.text_face, size: node.text_size, color: node.text_colour};
+        node_cfg.size = node.size;
         node_cfg.color = {background: node.colour_bg_view, border: node.colour_bdr_view};
         if(node.style == "icon") {
             node_cfg.icon = {face: 'FontAwesome', code: String.fromCharCode(parseInt(node.icon, 16)), size: node.size, color: node.colour_bdr};
@@ -117,14 +123,14 @@
         return node_cfg;
     }
 
-    function custommapGetEdgeCfg(edgeid, edge, scale, fromto, reverse_arrows) {
+    function custommapGetEdgeCfg(edgeid, edge, fromto, reverse_arrows) {
         if (Boolean(reverse_arrows)) {
             arrows = {from: {enabled: true, scaleFactor: 0.6}, to: {enabled: false}};
         } else {
             arrows = {to: {enabled: true, scaleFactor: 0.6}, from: {enabled: false}};
         }
 
-        var edge_cfg = {id: edgeid + "_" + fromto, to: edgeid + "_mid", arrows: arrows, font: {face: edge.text_face, size: Math.floor(scale * edge.text_size), color: edge.text_colour}, smooth: {type: edge.style}};
+        var edge_cfg = {id: edgeid + "_" + fromto, to: edgeid + "_mid", arrows: arrows, font: {face: edge.text_face, size: edge.text_size, color: edge.text_colour}, smooth: {type: edge.style}};
         if (fromto == "from") {
             edge_cfg.from = edge.custom_map_node1_id;
             var port_pct = Boolean(reverse_arrows) ? edge.port_topct : edge.port_frompct;
@@ -167,10 +173,10 @@
         return edge_cfg;
     }
 
-    function custommapGetEdgeMidCfg(edgeid, edge, scale, screenshot) {
-        var mid_x =  Math.floor(scale * edge.mid_x);
-        var mid_y =  Math.floor(scale * edge.mid_y);
+    function custommapGetEdgeMidCfg(edgeid, edge, screenshot) {
+        var mid_x =  edge.mid_x;
+        var mid_y =  edge.mid_y;
 
-        return {id: edgeid + "_mid", shape: "dot", size: 0, x: mid_x, y: mid_y, label: screenshot ? '' : edge.label, font: {face: edge.text_face, size:  Math.floor(scale * edge.text_size), color: edge.text_colour}};
+        return {id: edgeid + "_mid", shape: "dot", size: 0, x: mid_x, y: mid_y, label: screenshot ? '' : edge.label, font: {face: edge.text_face, size:  edge.text_size, color: edge.text_colour}};
     }
 </script>

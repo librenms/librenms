@@ -31,11 +31,9 @@
     (function () {
         var bgtype = {{ Js::from($map->background_type) }};
         var bgdata = {{ Js::from($background_config) }};
-        var custom_image_base = "{{ $base_url }}images/custommap/icons/";
         var reverse_arrows = {{$map->reverse_arrows}};
         var legend = @json($map->legend);
-        var network_height = Math.floor($("#custom-map-{{ $id }}").height());
-        var network_width = Math.floor($("#custom-map-{{ $id }}").width());
+        var custom_image_base = "{{ $base_url }}images/custommap/icons/";
         var network_nodes = new vis.DataSet({queue: {delay: 100}});
         var network_edges = new vis.DataSet({queue: {delay: 100}});
         var node_device_map = {};
@@ -50,7 +48,7 @@
             .done(function( data ) {
                 // Add/update nodes
                 $.each( data.nodes, function( nodeid, node) {
-                    var node_cfg = custommapGetNodeCfg(nodeid, node, scale, false);
+                    var node_cfg = custommapGetNodeCfg(nodeid, node, false, custom_image_base);
                     if(node.device_id) {
                         node_device_map[nodeid] = {device_id: node.device_id, device_name: node.device_name};
                     } else if(node.linked_map_name) {
@@ -60,9 +58,9 @@
                 });
 
                 $.each( data.edges, function( edgeid, edge) {
-                    var mid = custommapGetEdgeMidCfg(edgeid, edge, scale, false);
-                    var edge1 = custommapGetEdgeCfg(edgeid, edge, scale, "from", reverse_arrows);
-                    var edge2 = custommapGetEdgeCfg(edgeid, edge, scale, "to", reverse_arrows);
+                    var mid = custommapGetEdgeMidCfg(edgeid, edge, false);
+                    var edge1 = custommapGetEdgeCfg(edgeid, edge, "from", reverse_arrows);
+                    var edge2 = custommapGetEdgeCfg(edgeid, edge, "to", reverse_arrows);
 
                     if(edge.port_id) {
                         edge_port_map[edgeid] = {device_id: edge.device_id, port_id: edge.port_id};
@@ -71,9 +69,9 @@
                     network_edges.add([edge1, edge2]);
                 });
 
-                custommapRedrawDefaultLegend(network_nodes, scale, {{ $map->legend_steps }}, {{ $map->legend_x }}, {{ $map->legend_y }}, {{ $map->legend_font_size }}, {{ $map->legend_hide_invalid }}, {{ $map->legend_hide_overspeed }});
+                custommapRedrawDefaultLegend(network_nodes, {{ $map->legend_steps }}, {{ $map->legend_x }}, {{ $map->legend_y }}, {{ $map->legend_font_size }}, {{ $map->legend_hide_invalid }}, {{ $map->legend_hide_overspeed }});
 
-                network = custommapCreateNetwork('custom-map-{{ $id }}', network_nodes, network_edges, network_options, bgtype, bgdata);
+                network = custommapCreateNetwork('custom-map-{{ $id }}', scale, network_nodes, network_edges, network_options, bgtype, bgdata);
 
                 network.on('doubleClick', function (properties) {
                     edge_id = null;
