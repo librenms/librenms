@@ -112,9 +112,9 @@ if (! empty($entity_oids)) {
             }
             $valid_sensor = check_entity_sensor($descr, $device);
             $type = $entitysensor[$entry['entPhySensorType']];
-            
+
             // Try to handle the scale
-            match ($entry['entPhySensorScale'] ) {
+            match ($entry['entPhySensorScale']) {
                 'nano' => [$divisor, $multiplier] = ['1000000000', '1'],
                 'micro' => [$divisor, $multiplier] = ['1000000', '1'],
                 'milli' => [$divisor, $multiplier] = ['1000', '1'],
@@ -125,13 +125,12 @@ if (! empty($entity_oids)) {
                 'yocto' => [$divisor, $multiplier] = ['1', '1'],
                 default => [$divisor, $multiplier] = ['1', '1'],
             };
-            
+
             if (is_numeric($entry['entPhySensorPrecision']) && $entry['entPhySensorPrecision'] > 0) {
                 $divisor .= str_pad('', $entry['entPhySensorPrecision'], '0');
             }
 
             $current = ($current * $multiplier / $divisor);
-
             if ($type == 'temperature') {
                 if ($current > '200') {
                     $valid_sensor = false;
