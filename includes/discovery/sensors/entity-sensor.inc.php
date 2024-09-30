@@ -149,7 +149,13 @@ if (! empty($entity_oids)) {
                 $divisor = $divisor . str_pad('', $entry['entPhySensorPrecision'], '0');
             }
 
-            $current = ($current * $multiplier / $divisor);
+            // Avoid DivisionByZeroError
+            if ($divisor == 0) {
+                $current = 0;
+            } else {
+                $current = ($current * $multiplier / $divisor);
+            }
+
             if ($type == 'temperature') {
                 if ($current > '200') {
                     $valid_sensor = false;
