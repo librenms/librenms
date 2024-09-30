@@ -115,6 +115,7 @@ if (! empty($entity_oids)) {
 
             // Try to handle the scale
             match ($entry['entPhySensorScale']) {
+                'zepto' => [$divisor, $multiplier] = ['1000000000000000000', '1'],
                 'nano' => [$divisor, $multiplier] = ['1000000000', '1'],
                 'micro' => [$divisor, $multiplier] = ['1000000', '1'],
                 'milli' => [$divisor, $multiplier] = ['1000', '1'],
