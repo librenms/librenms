@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use LibreNMS\Interfaces\Models\Keyable;
 
@@ -97,30 +98,34 @@ class Sensor extends DeviceRelatedModel implements Keyable
         return self::$icons;
     }
 
-    public function guessLimits(): void
+    public function guessLimits(bool $high, bool $low): void
     {
-        $this->sensor_limit = match ($this->sensor_class) {
-            'temperature' => $this->sensor_current - 10,
-            'voltage' => $this->sensor_current * 0.85,
-            'humidity' => 30,
-            'fanspeed' => $this->sensor_current * 0.80,
-            'power_factor' => -1,
-            'signal' => -80,
-            'airflow', 'snr', 'frequency', 'pressure', 'cooling' => $this->sensor_current * 0.95,
-            default => null,
-        };
+        if ($high) {
+            $this->sensor_limit = match ($this->sensor_class) {
+                'temperature' => $this->sensor_current + 20,
+                'voltage' => $this->sensor_current * 1.15,
+                'humidity' => 70,
+                'fanspeed' => $this->sensor_current * 1.80,
+                'power_factor' => 1,
+                'signal' => -30,
+                'load' => 80,
+                'airflow', 'snr', 'frequency', 'pressure', 'cooling' => $this->sensor_current * 1.05,
+                default => null,
+            };
+        }
 
-        $this->sensor_limit_low = match ($this->sensor_class) {
-            'temperature' => $this->sensor_current + 20,
-            'voltage' => $this->sensor_current * 1.15,
-            'humidity' => 70,
-            'fanspeed' => $this->sensor_current * 1.80,
-            'power_factor' => 1,
-            'signal' => -30,
-            'load' => 80,
-            'airflow', 'snr', 'frequency', 'pressure', 'cooling' => $this->sensor_current * 1.05,
-            default => null,
-        };
+        if ($low) {
+            $this->sensor_limit_low = match ($this->sensor_class) {
+                'temperature' => $this->sensor_current - 10,
+                'voltage' => $this->sensor_current * 0.85,
+                'humidity' => 30,
+                'fanspeed' => $this->sensor_current * 0.80,
+                'power_factor' => -1,
+                'signal' => -80,
+                'airflow', 'snr', 'frequency', 'pressure', 'cooling' => $this->sensor_current * 0.95,
+                default => null,
+            };
+        }
     }
 
     // ---- Define Relationships ----
@@ -129,9 +134,14 @@ class Sensor extends DeviceRelatedModel implements Keyable
         return $this->morphMany(Eventlog::class, 'events', 'type', 'reference');
     }
 
+    public function stateIndex(): HasOneThrough
+    {
+        return $this->hasOneThrough(StateIndex::class, SensorToStateIndex::class, 'sensor_id', 'state_index_id', 'sensor_id', 'state_index_id');
+    }
+
     public function translations(): BelongsToMany
     {
-        return $this->belongsToMany(StateTranslation::class, 'sensors_to_state_indexes', 'sensor_id', 'state_index_id');
+        return $this->belongsToMany(StateTranslation::class, 'sensors_to_state_indexes', 'sensor_id', 'state_index_id', 'sensor_id', 'state_index_id');
     }
 
     public function getCompositeKey(): string
@@ -142,5 +152,24 @@ class Sensor extends DeviceRelatedModel implements Keyable
     public function syncGroup(): string
     {
         return "$this->sensor_class-$this->poller_type";
+    }
+
+    public function __toString()
+    {
+        $data = $this->only([
+            'sensor_oid',
+            'sensor_index',
+            'sensor_type',
+            'sensor_descr',
+            'poller_type',
+            'sensor_divisor',
+            'sensor_multiplier',
+            'entPhysicalIndex',
+            'sensor_current',
+        ]);
+        $data[] = "(limits: LL: $this->sensor_limit_low, LW: $this->sensor_limit_low_warn, W: $this->sensor_limit_warn, H: $this->sensor_limit)";
+        $data[] = "rrd_type = $this->rrd_type";
+
+        return implode(', ', $data);
     }
 }

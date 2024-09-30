@@ -40,7 +40,7 @@ $repsegmentnumber = 0;
 
 foreach ($tables as $tablevalue) {
     //Some switches on 15.x expose this information regardless if they are stacked or not, we try to mitigate that by doing the following.
-    if (($tablevalue['oid'] == 'cswGlobals' || $tablevalue['oid'] == 'cswSwitchRole' || $tablevalue['oid'] == 'cswSwitchState' || $tablevalue['oid'] == 'cswStackPortOperStatus') && $redundant_data == 'false' && count($role_data) <= 1) {
+    if (in_array($tablevalue['oid'], ['CISCO-STACKWISE-MIB::cswGlobals', 'CISCO-STACKWISE-MIB::cswSwitchRole', 'CISCO-STACKWISE-MIB::cswSwitchState', 'CISCO-STACKWISE-MIB::cswStackPortOperStatus']) && $redundant_data == 'false' && count($role_data) <= 1) {
         continue;
     }
 

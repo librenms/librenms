@@ -5,6 +5,8 @@ namespace App\Observers;
 use App\Models\Eventlog;
 use App\Models\Sensor;
 use Illuminate\Foundation\Application;
+use Illuminate\Support\Facades\Log;
+use LibreNMS\Config;
 use LibreNMS\Enum\Severity;
 
 class SensorObserver
@@ -18,14 +20,30 @@ class SensorObserver
 
     public function saving(Sensor $sensor): void
     {
-        // fix inverted limits
-        if ($sensor->sensor_limit !== null && $sensor->sensor_limit_low !== null && $sensor->sensor_limit_low > $sensor->sensor_limit) {
-            // Fix high/low thresholds (i.e. on negative numbers)
-            [$sensor->sensor_limit, $sensor->sensor_limit_low] = [$sensor->sensor_limit_low, $sensor->sensor_limit];
-        }
-
         if ($this->runningInConsole && ! $sensor->isDirty()) {
             echo '.';
+        }
+    }
+
+    public function creating(Sensor $sensor): void
+    {
+        // fix inverted warn limits
+        if ($sensor->sensor_limit_warn !== null && $sensor->sensor_limit_low_warn !== null && $sensor->sensor_limit_low_warn > $sensor->sensor_limit_warn) {
+            Log::error('Fixing swapped sensor warn limits');
+
+            // Fix high/low thresholds (i.e. on negative numbers)
+            [$sensor->sensor_limit_warn, $sensor->sensor_limit_low_warn] = [$sensor->sensor_limit_low_warn, $sensor->sensor_limit_warn];
+        }
+
+        if (Config::get('sensors.guess_limits') && $sensor->sensor_current !== null) {
+            $sensor->guessLimits($sensor->sensor_limit === null, $sensor->sensor_limit_low === null);
+        }
+
+        // Fix high/low thresholds (i.e. on negative numbers)
+        if ($sensor->sensor_limit !== null && $sensor->sensor_limit_low > $sensor->sensor_limit) {
+            Log::error('Fixing swapped sensor limits');
+
+            [$sensor->sensor_limit, $sensor->sensor_limit_low] = [$sensor->sensor_limit_low, $sensor->sensor_limit];
         }
     }
 
@@ -37,12 +55,8 @@ class SensorObserver
      */
     public function created(Sensor $sensor): void
     {
-        $guess_limits = \LibreNMS\Config::get('sensors.guess_limits', true);
-        if ($guess_limits && $sensor->sensor_current !== null && $sensor->sensor_limit === null && $sensor->sensor_limit_low === null) {
-            $sensor->guessLimits();
-        }
-
         EventLog::log('Sensor Added: ' . $sensor->sensor_class . ' ' . $sensor->sensor_type . ' ' . $sensor->sensor_index . ' ' . $sensor->sensor_descr, $sensor->device_id, 'sensor', Severity::Notice, $sensor->sensor_id);
+        Log::info("$sensor->sensor_descr: Cur $sensor->sensor_current, Low: $sensor->sensor_limit_low, Low Warn: $sensor->sensor_limit_low_warn, Warn: $sensor->sensor_limit_warn, High: $sensor->sensor_limit");
 
         if ($this->runningInConsole) {
             echo '+';
