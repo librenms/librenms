@@ -20,9 +20,21 @@ if (Auth::user()->hasGlobalAdmin()) {
             echo generate_link('Latest', ['page' => 'device', 'device' => $device['device_id'], 'tab' => 'showconfig']);
         }
 
-        if (Config::get('rancid_repo_type') == 'svn' && function_exists('svn_log')) {
+        if (Config::get('rancid_repo_type') == 'svn') {
             $sep = ' | ';
-            $svnlogs = svn_log($rancid_file, SVN_REVISION_HEAD, null, 8);
+
+            $process = new Process(['svn', 'log', '-l 8', '-q', '--xml', $rancid_file], $rancid_path);
+            $process->run();
+            $svnlogs_xmlstring = $process->getOutput();
+            $svnlogs = [];
+
+            $svnlogs_xml = simplexml_load_string($svnlogs_xmlstring);
+            foreach ($svnlogs_xml->logentry as $svnlogentry) {
+                $rev = $svnlogentry['revision'];
+                $ts = strtotime($svnlogentry->date);
+                $svnlogs[] = ['rev' => $rev, 'date' => $ts];
+            }
+
             $revlist = [];
 
             foreach ($svnlogs as $svnlog) {
@@ -33,7 +45,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                     echo '<span class="pagemenu-selected">';
                 }
 
-                $linktext = 'r' . $svnlog['rev'] . ' <small>' . date(Config::get('dateformat.byminute'), strtotime($svnlog['date'])) . '</small>';
+                $linktext = 'r' . $svnlog['rev'] . ' <small>' . date(Config::get('dateformat.byminute'), $svnlog['date']) . '</small>';
                 echo generate_link($linktext, ['page' => 'device', 'device' => $device['device_id'], 'tab' => 'showconfig', 'rev' => $svnlog['rev']]);
 
                 if ($vars['rev'] == $svnlog['rev']) {
@@ -80,18 +92,15 @@ if (Auth::user()->hasGlobalAdmin()) {
         print_optionbar_end();
 
         if (Config::get('rancid_repo_type') == 'svn') {
-            if (function_exists('svn_log') && in_array($vars['rev'], $revlist)) {
-                [$diff, $errors] = svn_diff($rancid_file, $vars['rev'] - 1, $rancid_file, $vars['rev']);
+            if (in_array($vars['rev'], $revlist)) {
+                $process = new Process(['svn', 'diff', '-c', "r".$vars['rev'], $rancid_file], $rancid_path);
+                $process->run();
+                $diff = $process->getOutput();
                 if (! $diff) {
                     $text = 'No Difference';
                 } else {
-                    $text = '';
-                    while (! feof($diff)) {
-                        $text .= fread($diff, 8192);
-                    }
-
-                    fclose($diff);
-                    fclose($errors);
+                    $text = $diff;
+                    $previous_config = $vars['rev'] . '^';
                 }
             } else {
                 $fh = fopen($rancid_file, 'r');
