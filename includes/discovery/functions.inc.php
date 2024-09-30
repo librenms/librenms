@@ -125,6 +125,9 @@ function discover_new_device($hostname, $device, $method, $interface = null)
  */
 function discover_device(&$device, $force_module = false)
 {
+    DeviceCache::setPrimary($device['device_id']);
+    App::forgetInstance('sensor-discovery');
+
     if ($device['snmp_disable'] == '1') {
         return true;
     }

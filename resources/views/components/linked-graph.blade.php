@@ -1,1 +1,1 @@
-<a href="{{ $link }}" {{ $attributes->filter($filterAttributes) }}><img width="{{ $width }}" height="{{ $height }}" src="{{ $src }}" alt="{{ $type }}" class="graph-image" {{ $attributes->only('loading') }}></a>
+<a href="{{ $link }}" {{ $attributes->filter($filterAttributes) }}>@include('components.graph')</a>

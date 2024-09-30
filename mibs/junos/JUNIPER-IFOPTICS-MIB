@@ -663,7 +663,8 @@ JnxOpticsConfigEntry ::=
               5 - CFP
               6 - CFP+  
               7 - Non pluggable 
-              8 - QSFP DWDM"
+              8 - QSFP DWDM
+              9 - QSFP56DD"
         ::= { jnxOpticsConfigEntry 5 }
 
 
