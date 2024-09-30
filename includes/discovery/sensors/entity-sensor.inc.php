@@ -112,49 +112,25 @@ if (! empty($entity_oids)) {
             }
             $valid_sensor = check_entity_sensor($descr, $device);
             $type = $entitysensor[$entry['entPhySensorType']];
-            // FIXME this stuff is foul
-            if ($entry['entPhySensorScale'] == 'nano') {
-                $divisor = '1000000000';
-                $multiplier = '1';
-            }
-            if ($entry['entPhySensorScale'] == 'micro') {
-                $divisor = '1000000';
-                $multiplier = '1';
-            }
-            if ($entry['entPhySensorScale'] == 'milli') {
-                $divisor = '1000';
-                $multiplier = '1';
-            }
-            if ($entry['entPhySensorScale'] == 'units') {
-                $divisor = '1';
-                $multiplier = '1';
-            }
-            if ($entry['entPhySensorScale'] == 'kilo') {
-                $divisor = '1';
-                $multiplier = '1000';
-            }
-            if ($entry['entPhySensorScale'] == 'mega') {
-                $divisor = '1';
-                $multiplier = '1000000';
-            }
-            if ($entry['entPhySensorScale'] == 'giga') {
-                $divisor = '1';
-                $multiplier = '1000000000';
-            }
-            if ($entry['entPhySensorScale'] == 'yocto') {
-                $divisor = '1';
-                $multiplier = '1';
-            }
-            if (is_numeric($entry['entPhySensorPrecision']) && $entry['entPhySensorPrecision'] > '0') {
-                $divisor = $divisor . str_pad('', $entry['entPhySensorPrecision'], '0');
+            
+            // Try to handle the scale
+            match ($entry['entPhySensorScale'] ) {
+                'nano' => [$divisor, $multiplier] = ['1000000000', '1'],
+                'micro' => [$divisor, $multiplier] = ['1000000', '1'],
+                'milli' => [$divisor, $multiplier] = ['1000', '1'],
+                'units' => [$divisor, $multiplier] = ['1', '1'],
+                'kilo' => [$divisor, $multiplier] = ['1', '1000'],
+                'mega' => [$divisor, $multiplier] = ['1', '1000000'],
+                'giga' => [$divisor, $multiplier] = ['1', '1000000000'],
+                'yocto' => [$divisor, $multiplier] = ['1', '1'],
+                default => [$divisor, $multiplier] = ['1', '1'],
+            };
+            
+            if (is_numeric($entry['entPhySensorPrecision']) && $entry['entPhySensorPrecision'] > 0) {
+                $divisor .= str_pad('', $entry['entPhySensorPrecision'], '0');
             }
 
-            // Avoid DivisionByZeroError
-            if ($divisor == 0) {
-                $current = 0;
-            } else {
-                $current = ($current * $multiplier / $divisor);
-            }
+            $current = ($current * $multiplier / $divisor);
 
             if ($type == 'temperature') {
                 if ($current > '200') {
