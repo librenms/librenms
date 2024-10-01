@@ -967,8 +967,7 @@ function get_oxidized_nodes_list()
 
             // Generate local time string
             $formatted_local_time = $local_date->format('Y-m-d H:i:s T');
-        }
-        catch (Exception $e) {
+        } catch (Exception $e) {
             // Just display the current value of $object['time'];
             $formatted_local_time = $object['time'];
         }
