@@ -114,17 +114,17 @@ if (! empty($entity_oids)) {
             $type = $entitysensor[$entry['entPhySensorType']];
 
             // Try to handle the scale
-            match ($entry['entPhySensorScale']) {
-                'zepto' => [$divisor, $multiplier] = ['1000000000000000000', '1'],
-                'nano' => [$divisor, $multiplier] = ['1000000000', '1'],
-                'micro' => [$divisor, $multiplier] = ['1000000', '1'],
-                'milli' => [$divisor, $multiplier] = ['1000', '1'],
-                'units' => [$divisor, $multiplier] = ['1', '1'],
-                'kilo' => [$divisor, $multiplier] = ['1', '1000'],
-                'mega' => [$divisor, $multiplier] = ['1', '1000000'],
-                'giga' => [$divisor, $multiplier] = ['1', '1000000000'],
-                'yocto' => [$divisor, $multiplier] = ['1', '1'],
-                default => [$divisor, $multiplier] = ['1', '1'],
+            [$divisor, $multiplier] = match ($entry['entPhySensorScale']) {
+                'zepto' => [1000000000000000000, 1],
+                'nano' => [1000000000, 1],
+                'micro' => [1000000, 1],
+                'milli' => [1000, 1],
+                'units' => [1, 1],
+                'kilo' => [1, 1000],
+                'mega' => [1, 1000000],
+                'giga' => [1, 1000000000],
+                'yocto' => [1, 1],
+                default => [1, 1],
             };
 
             if (is_numeric($entry['entPhySensorPrecision']) && $entry['entPhySensorPrecision'] > 0) {
