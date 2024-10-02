@@ -21,39 +21,41 @@ if (Auth::user()->hasGlobalAdmin()) {
         }
 
         if (Config::get('rancid_repo_type') == 'svn') {
-            $sep = ' | ';
-
             $svn_binary = Config::locateBinary('svn');
-            $process = new Process([$svn_binary, 'log', '-l 8', '-q', '--xml', $rancid_file], $rancid_path);
-            $process->run();
-            $svnlogs_xmlstring = $process->getOutput();
-            $svnlogs = [];
-
-            $svnlogs_xml = simplexml_load_string($svnlogs_xmlstring);
-            foreach ($svnlogs_xml->logentry as $svnlogentry) {
-                $rev = $svnlogentry['revision'];
-                $ts = strtotime($svnlogentry->date);
-                $svnlogs[] = ['rev' => $rev, 'date' => $ts];
-            }
-
-            $revlist = [];
-
-            foreach ($svnlogs as $svnlog) {
-                echo $sep;
-                $revlist[] = $svnlog['rev'];
-
-                if ($vars['rev'] == $svnlog['rev']) {
-                    echo '<span class="pagemenu-selected">';
-                }
-
-                $linktext = 'r' . $svnlog['rev'] . ' <small>' . date(Config::get('dateformat.byminute'), $svnlog['date']) . '</small>';
-                echo generate_link($linktext, ['page' => 'device', 'device' => $device['device_id'], 'tab' => 'showconfig', 'rev' => $svnlog['rev']]);
-
-                if ($vars['rev'] == $svnlog['rev']) {
-                    echo '</span>';
-                }
-
+            if (is_executable($svn_binary)) {
                 $sep = ' | ';
+
+                $process = new Process([$svn_binary, 'log', '-l 8', '-q', '--xml', $rancid_file], $rancid_path);
+                $process->run();
+                $svnlogs_xmlstring = $process->getOutput();
+                $svnlogs = [];
+
+                $svnlogs_xml = simplexml_load_string($svnlogs_xmlstring);
+                foreach ($svnlogs_xml->logentry as $svnlogentry) {
+                    $rev = $svnlogentry['revision'];
+                    $ts = strtotime($svnlogentry->date);
+                    $svnlogs[] = ['rev' => $rev, 'date' => $ts];
+                }
+
+                $revlist = [];
+                
+                foreach ($svnlogs as $svnlog) {
+                    echo $sep;
+                    $revlist[] = $svnlog['rev'];
+    
+                    if ($vars['rev'] == $svnlog['rev']) {
+                        echo '<span class="pagemenu-selected">';
+                    }
+    
+                    $linktext = 'r' . $svnlog['rev'] . ' <small>' . date(Config::get('dateformat.byminute'), $svnlog['date']) . '</small>';
+                    echo generate_link($linktext, ['page' => 'device', 'device' => $device['device_id'], 'tab' => 'showconfig', 'rev' => $svnlog['rev']]);
+    
+                    if ($vars['rev'] == $svnlog['rev']) {
+                        echo '</span>';
+                    }
+
+                    $sep = ' | ';
+                }
             }
         }//end if
         if (Config::get('rancid_repo_type') == 'git') {
@@ -93,8 +95,8 @@ if (Auth::user()->hasGlobalAdmin()) {
         print_optionbar_end();
 
         if (Config::get('rancid_repo_type') == 'svn') {
-            if (in_array($vars['rev'], $revlist)) {
-                $svn_binary = Config::locateBinary('svn');
+            $svn_binary = Config::locateBinary('svn');
+            if (is_executable($svn_binary) && in_array($vars['rev'], $revlist)) {
                 $process = new Process([$svn_binary, 'diff', '-c', 'r' . $vars['rev'], $rancid_file], $rancid_path);
                 $process->run();
                 $diff = $process->getOutput();
