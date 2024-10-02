@@ -85,8 +85,14 @@ function poll_service($service)
 
         // Set the DS in the DB if it is blank.
         $DS = [];
-        foreach ($perf as $k => $v) {
-            $DS[$k] = ['uom' => $v['uom'], 'full_name' => $v['full_name']];
+        if (isset($check_ds)) {
+            foreach (json_decode($check_ds) as $k => $v) {
+                $DS[$k] = $v;
+            }
+        } else {
+            foreach ($perf as $k => $v) {
+                $DS[$k] = $v['uom'];
+            }
         }
         d_echo('Service DS: ' . json_encode($DS, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) . "\n");
         if (($service['service_ds'] == '{}') || ($service['service_ds'] == '')) {
@@ -95,8 +101,8 @@ function poll_service($service)
 
         // rrd definition
         $rrd_def = new RrdDefinition();
-        foreach ($perf as $k => $v) {
-            if (($v['uom'] == 'c') && ! preg_match('/[Uu]ptime/', (string) $k)) {
+        foreach ($DS as $k => $v) {
+            if (($v == 'c') && ! preg_match('/[Uu]ptime/', $k)) {
                 // This is a counter, create the DS as such
                 $rrd_def->addDataset($k, 'COUNTER', 0);
             } else {
