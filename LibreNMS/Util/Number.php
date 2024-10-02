@@ -66,7 +66,7 @@ class Number
 
         for ($sf_adj = 0; $sf_adj < $sf; $sf_adj++) {
             if (pow(10, $sf_adj) > $value) {
-               break;
+                break;
             }
         }
 
