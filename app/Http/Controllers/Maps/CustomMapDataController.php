@@ -117,7 +117,10 @@ class CustomMapDataController extends Controller
                     $edges[$edgeid]['port_topct'] = $rateto / $speedto * 100.0;
                     $edges[$edgeid]['port_frompct'] = $ratefrom / $speedfrom * 100.0;
                 }
-                if ($edge->port->ifOperStatus != 'up') {
+                if (! $edge->port->device->status) {
+                    $edges[$edgeid]['colour_to'] = 'darkred';
+                    $edges[$edgeid]['colour_from'] = 'darkred';
+                } elseif ($edge->port->ifOperStatus != 'up') {
                     // If the port is not online, show the same as speed unknown
                     $edges[$edgeid]['colour_to'] = $this->speedColour(-1.0);
                     $edges[$edgeid]['colour_from'] = $this->speedColour(-1.0);
@@ -166,6 +169,7 @@ class CustomMapDataController extends Controller
                     $device_style = $this->nodeDisabledStyle();
                 } elseif (! $node->device->status) {
                     $device_style = $this->nodeDownStyle();
+                    $nodes[$nodeid]['text_colour'] = 'darkred';
                 } else {
                     $device_style = $this->nodeUpStyle();
                 }
