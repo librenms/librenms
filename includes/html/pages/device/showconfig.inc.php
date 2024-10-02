@@ -38,18 +38,18 @@ if (Auth::user()->hasGlobalAdmin()) {
                 }
 
                 $revlist = [];
-                
+
                 foreach ($svnlogs as $svnlog) {
                     echo $sep;
                     $revlist[] = $svnlog['rev'];
-    
+
                     if ($vars['rev'] == $svnlog['rev']) {
                         echo '<span class="pagemenu-selected">';
                     }
-    
+
                     $linktext = 'r' . $svnlog['rev'] . ' <small>' . date(Config::get('dateformat.byminute'), $svnlog['date']) . '</small>';
                     echo generate_link($linktext, ['page' => 'device', 'device' => $device['device_id'], 'tab' => 'showconfig', 'rev' => $svnlog['rev']]);
-    
+
                     if ($vars['rev'] == $svnlog['rev']) {
                         echo '</span>';
                     }
