@@ -1572,7 +1572,8 @@ tr.search:nth-child(odd) {
 }
 
 .minigraph-div {
-  display: block;
+  display: flex;
+  justify-content: center;
   padding: 3px;
   margin: 3px;
   min-width: 183px;
@@ -1581,7 +1582,7 @@ tr.search:nth-child(odd) {
   max-height: 90px;
   text-align: center;
   float: left;
-  background-color: #e9e9e9;
+  /* background-color: #e9e9e9; */
   border: solid 1px;
   border-color: #e9e9e9;
 }
