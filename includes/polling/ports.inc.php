@@ -791,11 +791,29 @@ foreach ($ports as $port) {
 
                 $oid_prev = $oid . '_prev';
                 if (isset($port[$oid])) {
-                    $oid_diff = (intval($current_oid ?? 0) - intval($port[$oid]));
+                    $current_value = intval($current_oid ?? 0);
+                    $previous_value = intval($port[$oid]);
+
+                    // Determine the maximum counter value based on the OID type
+                    if (isset($port_stats[$ifIndex]['ifHighSpeed']) && is_numeric($port_stats[$ifIndex]['ifHighSpeed']) && $port_stats[$ifIndex]['ifHighSpeed'] > 0) {
+                        $max_counter_value = intval(18446744073709551615); // 64-bit counter
+                    } else {
+                        $max_counter_value = intval(4294967295); // 32-bit counter
+                    }
+
+                    if ($current_value >= $previous_value) {
+                        $oid_diff = $current_value - $previous_value;
+                    } else {
+                        // Handle rollover
+                        $oid_diff = ($max_counter_value - $previous_value) + $current_value + 1;
+                    }
+
                     $oid_rate = ($oid_diff / $polled_period);
+
+                    // Handle negative rate case
                     if ($oid_rate < 0) {
-                        $oid_rate = '0';
-                        $oid_diff = '0';
+                        $oid_rate = 0;
+                        $oid_diff = 0;
                         echo "negative $oid";
                     }
 
