@@ -27,7 +27,7 @@ foreach ($tempTable as $ifIndex => $current) {
                 'entPhysicalIndex' => $ifIndex,
                 'entPhysicalIndex_measured' => 'port',
                 'user_func' => 'fsParseChannelValue',
-                'group' => $ifName,
+                'group' => 'transceiver',
             ]));
 
             break; // only discover one sensor

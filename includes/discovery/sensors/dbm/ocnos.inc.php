@@ -31,7 +31,7 @@ if ($os instanceof \LibreNMS\OS\Ocnos) {
                         'sensor_limit_low' => isset($channel_data['IPI-CMM-CHASSIS-MIB::cmmTransTxPowerCriticalThresholdMin']) ? $channel_data['IPI-CMM-CHASSIS-MIB::cmmTransTxPowerCriticalThresholdMin'] / $divisor : null,
                         'sensor_limit_low_warn' => isset($channel_data['IPI-CMM-CHASSIS-MIB::cmmTransTxPowerAlertThresholdMin']) ? $channel_data['IPI-CMM-CHASSIS-MIB::cmmTransTxPowerAlertThresholdMin'] / $divisor : null,
                         'sensor_current' => isset($channel_data['IPI-CMM-CHASSIS-MIB::cmmTransTxPower']) ? $channel_data['IPI-CMM-CHASSIS-MIB::cmmTransTxPower'] / $divisor : null,
-                        'entPhysicalIndex' => null, // TODO
+                        'entPhysicalIndex' => $cmmStackUnitIndex * 10000 + $cmmTransIndex,
                         'entPhysicalIndex_measured' => 'port',
                         'user_func' => null,
                         'group' => 'transceiver',

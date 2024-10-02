@@ -12,7 +12,7 @@ use SnmpQuery;
 
 class Ocnos extends OS implements EntityPhysicalDiscovery, TransceiverDiscovery
 {
-    private bool $sfpSeen = false;
+    private ?bool $portBreakoutEnabled = null;
     private ?Collection $ifNamePortIdMap = null;
 
     public function discoverEntityPhysical(): Collection
@@ -171,13 +171,8 @@ class Ocnos extends OS implements EntityPhysicalDiscovery, TransceiverDiscovery
             default => 'ge',
         };
 
-        // Handle UfiSpace S9600 10G breakout, which is optionally enabled
-        if ($cmmTransType == 'sfp') {
-            $this->sfpSeen = true;
-        }
-
         return match ($this->getDevice()->hardware) {
-            'Ufi Space S9600-32X-R' => $prefix . ($this->sfpSeen ? ($cmmTransType == 'qsfp' ? $cmmTransIndex - 5 : $cmmTransIndex - 2) : $cmmTransIndex - 1),
+            'Ufi Space S9600-32X-R' => $prefix . ($this->portBreakoutEnabled() ? ($cmmTransType == 'qsfp' ? $cmmTransIndex - 5 : $cmmTransIndex - 2) : $cmmTransIndex - 1),
             'Ufi Space S9510-28DC-B' => $prefix . ($cmmTransIndex - 1),
             'Ufi Space S9500-30XS-P' => $prefix . ($cmmTransType == 'qsfp' ? $cmmTransIndex - 29 : $cmmTransIndex - 1),
             'Edgecore 7316-26XB-O-48V-F' => $prefix . ($cmmTransType == 'qsfp' ? $cmmTransIndex - 1 : $cmmTransIndex - 3),
@@ -259,5 +254,18 @@ class Ocnos extends OS implements EntityPhysicalDiscovery, TransceiverDiscovery
                 'entity_physical_index' => $cmmStackUnitIndex * 10000 + $cmmTransIndex,
             ]);
         });
+    }
+
+    private function portBreakoutEnabled(): bool
+    {
+        // Handle UfiSpace S9600 10G breakout, which is optionally enabled
+        if ($this->portBreakoutEnabled === null) {
+            // check for xe ports in ifTable
+            $this->portBreakoutEnabled = $this->getDevice()->ports()->exists()
+                ? $this->getDevice()->ports()->where('ifName', 'LIKE', 'xe%')->exists() // ports module has run
+                : str_contains(SnmpQuery::cache()->walk('IF-MIB::ifName')->raw, 'xe'); // no ports in db
+        }
+
+        return $this->portBreakoutEnabled;
     }
 }
