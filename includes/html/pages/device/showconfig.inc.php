@@ -93,7 +93,7 @@ if (Auth::user()->hasGlobalAdmin()) {
 
         if (Config::get('rancid_repo_type') == 'svn') {
             if (in_array($vars['rev'], $revlist)) {
-                $process = new Process(['svn', 'diff', '-c', "r" . $vars['rev'], $rancid_file], $rancid_path);
+                $process = new Process(['svn', 'diff', '-c', 'r' . $vars['rev'], $rancid_file], $rancid_path);
                 $process->run();
                 $diff = $process->getOutput();
                 if (! $diff) {
