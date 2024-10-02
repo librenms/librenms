@@ -169,7 +169,10 @@ class CustomMapDataController extends Controller
                     $device_style = $this->nodeDisabledStyle();
                 } elseif (! $node->device->status) {
                     $device_style = $this->nodeDownStyle();
-                    $nodes[$nodeid]['text_colour'] = 'darkred';
+                    // Change the text colour as long as we have not been requested by the editor
+                    if ($request->headers->get('referer') && ! str_ends_with(parse_url($request->headers->get('referer'), PHP_URL_PATH), '/edit')) {
+                        $nodes[$nodeid]['text_colour'] = 'darkred';
+                    }
                 } else {
                     $device_style = $this->nodeUpStyle();
                 }
