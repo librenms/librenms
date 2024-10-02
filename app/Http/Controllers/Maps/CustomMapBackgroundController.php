@@ -28,6 +28,7 @@ namespace App\Http\Controllers\Maps;
 use App\Http\Controllers\Controller;
 use App\Models\CustomMap;
 use App\Models\CustomMapBackground;
+use enshrined\svgSanitize\Sanitizer;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Cache;
 
@@ -96,13 +97,23 @@ class CustomMapBackgroundController extends Controller
             if ($request->image) {
                 // if image type and we have image data (new image) save it
                 $background = $map->background ?? new CustomMapBackground;
-                $background->background_image = $request->image->getContent();
+
+                $image_content = $request->image->getContent();
+                $mimeType = $request->image->getMimeType();
+
+                // sanitize SVGs
+                if ($mimeType == 'image/svg+xml') {
+                    $image_content = (new Sanitizer)->sanitize($image_content);
+                }
+
+                $background->background_image = $image_content;
+
                 $map->background()->save($background);
                 Cache::driver('file')->forget($this->getCacheKey($map)); // clear old image cache if present
                 $map->background_data = array_merge($map->background_data ?? [], [
                     'version' => md5($background->background_image),
                     'original_filename' => $request->image->getClientOriginalName(),
-                    'mime' => $request->image->getMimeType(),
+                    'mime' => $mimeType,
                 ]);
             }
         } elseif ($map->getOriginal('background_type') == 'image') {
