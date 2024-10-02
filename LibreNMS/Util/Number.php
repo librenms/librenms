@@ -64,7 +64,13 @@ class Number
             $value = $value * -1;
         }
 
-        return self::cast(number_format(round($value, $round), $sf, '.', '')) . " $ext$suffix";
+        for ($sf_adj = 0; $sf_adj < $sf; $sf_adj++) {
+            if (pow(10, $sf_adj) > $value) {
+               break;
+            }
+        }
+
+        return self::cast(number_format(round($value, $round), $sf - $sf_adj, '.', '')) . " $ext$suffix";
     }
 
     public static function formatBi($value, $round = 2, $sf = 3, $suffix = 'B'): string
