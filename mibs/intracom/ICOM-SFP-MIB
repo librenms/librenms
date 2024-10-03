@@ -1,0 +1,1714 @@
+ICOM-SFP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY,  OBJECT-TYPE, NOTIFICATION-TYPE,  Integer32, Unsigned32
+            FROM SNMPv2-SMI
+    SnmpAdminString
+            FROM SNMP-FRAMEWORK-MIB
+	TEXTUAL-CONVENTION, TruthValue
+	        FROM SNMPv2-TC
+    MODULE-COMPLIANCE,  OBJECT-GROUP, NOTIFICATION-GROUP
+            FROM SNMPv2-CONF
+	InterfaceIndex
+	        FROM IF-MIB
+    intracom
+            FROM ICOM-SMI;
+
+icomSfpMib MODULE-IDENTITY
+    LAST-UPDATED "201907300000Z"     -- 30 July 2019
+    ORGANIZATION "Intracom-Telecom S.A."
+    CONTACT-INFO
+       "Intracom SSD
+        Editor: Th. Kallimanis
+        EMail: tks@intracom-telecom.com
+        Phone:
+        Co-editor:
+        EMail:
+        Phone:
+       "
+    DESCRIPTION
+        "This MIB module describes proprietary objects of Intracom to support Inventory and
+         Digital Diagnostic Monitoring of Optical Transceivers of SFP and SFP+ type.
+         The MIB includes also the configuration and status objects regarding to
+         the Automatic Laser Shutdown feature of an SFM module (ITU-T G.664)
+		 The ICOM-SFP-MIB consists of the following groups:
+
+		 1. icomSfpInventory
+		 2. icomSfpDiagnostics
+		 3. icomSfpNotifications
+		 4. icomSfpAls
+		"
+
+-- Revision History
+
+    REVISION            "201907300000Z"     -- 30 July 2019
+    DESCRIPTION
+        "
+         This is the initial version of this MIB.
+        "
+    ::= { intracom 124 }
+
+
+icomSfpNotifications	OBJECT IDENTIFIER ::= { icomSfpMib 0 }
+icomSfpInventory		OBJECT IDENTIFIER ::= { icomSfpMib 1 }
+icomSfpDiagnostics		OBJECT IDENTIFIER ::= { icomSfpMib 2 }
+icomSfpMibConformance   OBJECT IDENTIFIER ::= { icomSfpMib 3 }
+icomSfpMibCompliances   OBJECT IDENTIFIER ::= { icomSfpMibConformance 1 }
+icomSfpMibGroups        OBJECT IDENTIFIER ::= { icomSfpMibConformance 2 }
+icomSfpAls       		OBJECT IDENTIFIER ::= { icomSfpMib 4 }
+
+-- -------------------------------------------------------------
+-- Textual Conventions
+-- -------------------------------------------------------------
+SfpDiagThreshold ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+      "Threshold values of the SFP and SFP+ optical transceivers
+      for supply Voltage, Tx Bias Current, Tx Power, Rx Power."
+    SYNTAX  Unsigned32 (0..65535)
+
+SfpDiagTempThreshold ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-2"
+    STATUS       current
+    DESCRIPTION
+      "Threshold values of the SFP and SFP+ optical trasceivers."
+    SYNTAX  Integer32 (-12800..12800)
+
+-- -------------------------------------------------------------
+-- SFP Trap objects
+-- -------------------------------------------------------------
+
+icomSfpAlarmsTrap NOTIFICATION-TYPE
+    OBJECTS { icomSfpDiagAlarms }
+    STATUS  current
+    DESCRIPTION
+	    "This trap is sent when the icomSfpDiagAlarms becomes from zero to non zero
+        (indicating SFP alarm existence at this interface) and vice versa
+        (indicating no SFP alarm existence at this interface)."
+	::= { icomSfpNotifications 1 }
+
+icomSfpWarningsTrap NOTIFICATION-TYPE
+    OBJECTS { icomSfpDiagWarnings }
+    STATUS  current
+    DESCRIPTION
+	    "This trap is sent when the icomSfpDiagWarnings becomes from zero to non zero
+	    (indicating SFP Warning existence at this interface) and vice versa
+	    (indicating no SFP alarm existence at this interface)."
+    ::= { icomSfpNotifications 2 }
+
+-- -------------------------------------------------------------
+-- The SFP Inventory Table
+-- -------------------------------------------------------------
+
+icomSfpInvTable	 OBJECT-TYPE
+    SYNTAX       SEQUENCE OF IcomSfpInvEntry
+    MAX-ACCESS   not-accessible
+    STATUS  	 current
+    DESCRIPTION
+	    "The SFP Inventory table."
+    ::= { icomSfpInventory 1 }
+
+icomSfpInvEntry OBJECT-TYPE
+    SYNTAX      IcomSfpInvEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+	    "An entry in the SFP Inventory table.
+        The index to this table is the same as the ifIndex of the SFP.
+        The SFP Inventory Table contain an entry for each module of a
+        type SFP."
+    INDEX   { icomSfpInvInterface }
+    ::= { icomSfpInvTable 1 }
+
+IcomSfpInvEntry ::=
+    SEQUENCE {
+        icomSfpInvInterface				        InterfaceIndex,
+        icomSfpInvId  				            INTEGER,
+        icomSfpInvExtId			                INTEGER,
+        icomSfpInvConnectorCode			        INTEGER,
+        icomSfpInv10GPlusInfinibandCompliance	BITS,
+        icomSfpInvEsconCompliance		        BITS,
+        icomSfpInvSonetCompliance		        BITS,
+        icomSfpInvGbeCompliance			        BITS,
+		icomSfpInvFcLLCompliance		        BITS,
+		icomSfpInvFcTechCompliance              BITS,
+		icomSfpInvSFPplusCableCompliance        BITS,
+		icomSfpInvFcTxMediaCompliance           BITS,
+		icomSfpInvFcSpeedCompliance             BITS,
+        icomSfpInvEncodingCode			        INTEGER,
+        icomSfpInvNominalBitRate		        Unsigned32,
+        icomSfpInvRateId                        Unsigned32,
+        icomSfpInvLengthSMFKm		 	        Unsigned32,
+        icomSfpInvLengthSMF100m			        Unsigned32,
+        icomSfpInvLength50u10m			        Unsigned32,
+        icomSfpInvLength62u10m			        Unsigned32,
+        icomSfpInvLengthCopper1m		        Unsigned32,
+        icomSfpInvLength50u10mOM3		        Unsigned32,
+        icomSfpInvVendorName			        SnmpAdminString,
+        icomSfpInvVendorOUI				        OCTET STRING,
+        icomSfpInvVendorPN				        SnmpAdminString,
+        icomSfpInvVendorRev				        SnmpAdminString,
+        icomSfpInvWaveLength			        Unsigned32,
+        icomSfpInvExtendedOptions		        BITS,
+        icomSfpInvMaxBitRate			        Unsigned32,
+        icomSfpInvMinBitRate			        Unsigned32,
+        icomSfpInvVendorSN				        SnmpAdminString,
+        icomSfpInvDateCode				        SnmpAdminString,
+        icomSfpInvDiagnosticMonitoring	        BITS,
+        icomSfpInvEnhanceOptions		        BITS,
+        icomSfpInv8472Compliance		        INTEGER,
+        icomSfpInvTransceiverCodes              OCTET STRING
+	}
+
+icomSfpInvInterface OBJECT-TYPE
+    SYNTAX  	    InterfaceIndex
+    MAX-ACCESS      not-accessible
+    STATUS  	    current
+    DESCRIPTION
+	    "The Interface Index of the corresponding system port that uses
+		Optical Transceiver module."
+    ::= { icomSfpInvEntry 1 }
+
+icomSfpInvId    OBJECT-TYPE
+    SYNTAX      INTEGER { unknown(0),
+                          gbic(1),
+                          module(2),
+                          sfpOrSfpPlus(3),
+                          xfp(6),
+                          sfpDwdm(11),
+                          qsfp(12),
+                          qsfpPlus(13),
+                          cfp(14),
+                          cxp(15)
+	                    }
+    MAX-ACCESS  read-only
+    STATUS  	current
+    DESCRIPTION
+	    "The identifier value specifies the physical device described by the serial information.
+		This value shall be included in the serial data. The defined identifier values are:
+          00h - Unknown or unspecified
+          01h - GBIC
+          02h - Module/connector soldered to motherboard
+          03h - 1310 SFP
+          04-0Ah - Reserved for XFP and other platforms
+          0Bh - DWDM SFP
+          80-FFh - Vendor specific."
+    REFERENCE   "DWDM MSA Table 2.3.1 and 2.3.2, SFP-8472 Table 3.1 and 3.2"
+    ::= { icomSfpInvEntry 2 }
+
+icomSfpInvExtId OBJECT-TYPE
+    SYNTAX      INTEGER { modDef0(0),
+                          modDef1(1),
+                          modDef2(2),
+                          modDef3(3),
+                          modDef4(4),
+                          modDef5(5),
+                          modDef6(6),
+                          modDef7(7)
+	                    }
+    MAX-ACCESS  read-only
+    STATUS  	current
+    DESCRIPTION
+        "The extended identifier value provides additional information about the 1310 transceiver.
+		The defined identifier values are:
+          00h GBIC definition is not specified or the GBIC definition is not
+              compliant with a defined MOD_DEF. See product specification
+              for details.
+          01h GBIC is compliant with MOD_DEF 1
+          02h GBIC is compliant with MOD_DEF 2
+          03h GBIC is compliant with MOD_DEF 3
+          04h GBIC/SFP function is defined by serial ID only
+          05h GBIC is compliant with MOD_DEF 5
+          06h GBIC is compliant with MOD_DEF 6
+          07h GBIC is compliant with MOD_DEF 7
+          08-FFh Reserved. "
+    REFERENCE   "SFP-8472 Table 3.1 and 3.3"
+    ::= { icomSfpInvEntry 3 }
+
+icomSfpInvConnectorCode OBJECT-TYPE
+    SYNTAX          INTEGER { conUnknown(0),
+                              conSc(1),
+                              conFcCopper1(2),
+                              conFcCopper2(3),
+                              conBncTnc(4),
+                              conFcCoaxial(5),
+                              conFiberJack(6),
+                              conLc(7),
+                              conMtRj(8),
+                              conMu(9),
+                              comSg(10),
+                              conOpticalPigtail(11),
+                              conHssdc2(32),
+                              conCopperPigtail(33)
+                            }
+	MAX-ACCESS      read-only
+	STATUS  	    current
+	DESCRIPTION
+        "The identifier value specifies the physical device described by the serial information.
+		This value shall be included in the serial data. The defined identifier values are:
+          00h - Unknown or unspecified
+          01h - SC
+          02h - Fibre Channel Style 1 copper connector
+          03h - Fibre Channel Style 2 copper connector
+          04h - BNC/TNC
+          05h - Fibre Channel coaxial headers
+          06h - FiberJack
+          07h - LC
+          08h - MT-RJ
+          09h - MU
+          0Ah - SG
+          0Bh - Optical pigtail
+          0Ch - 1Fh - Reserved
+          20h - HSSDC II
+          21h - Copper Pigtail
+          22h - 7Fh - Reserved
+          80-FFh - Vendor specific."
+    REFERENCE   "SFP-8472 Table 3.1 and 3.4."
+	::= { icomSfpInvEntry 4 }
+
+icomSfpInv10GPlusInfinibandCompliance OBJECT-TYPE
+	SYNTAX  	          BITS { eth10GBaseER(0),
+	                             eth10GBaseLRM(1),
+	                             eth10GBaseLR(2),
+	                             eth10GBaseSR(3),
+	                             infiniband1XSX(4),
+	                             infiniband1XLX(5),
+	                             infiniband1XCopperActive(6),
+	                             infiniband1XCopperPassive(7)
+	                           }
+	MAX-ACCESS            read-only
+	STATUS                current
+	DESCRIPTION
+		"The following bit significant indicators define the 10G interfaces
+		that are supported by the transceiver.
+		The defined identifier bits at SFF-8472 Memory in relation to object's Bits Syntax are:
+		  Bit 0: 10G Base-ER (SFF-8472, A0h,Byte 3 Bit 7)
+		  Bit 1: 10G Base-LRM (SFF-8472, A0h,Byte 3 Bit 6)
+		  Bit 2: 10G Base-LR (SFF-8472, A0h,Byte 3 Bit 5)
+		  Bit 3: 10G Base-SR (SFF-8472, A0h,Byte 3 Bit 4)
+        The following bit significant indicators define the Infiniband interfaces
+		that are supported by the transceiver.
+		The defined identifier bits at SFF-8472 Memory in relation to object's Bits Syntax are
+          Bit 4: 1X SX (SFF-8472, A0h,Byte 3 Bit 3)
+          Bit 5: 1X LX (SFF-8472, A0h,Byte 3 Bit 2)
+          Bit 6: 1X Copper Active (SFF-8472, A0h,Byte 3 Bit 1)
+          Bit 7: 1X Copper Passive (SFF-8472, A0h,Byte 3 Bit 0)."
+    REFERENCE   "SFP-8472 Table 3.1 and 3.5."
+	::= { icomSfpInvEntry 5 }
+
+icomSfpInvEsconCompliance OBJECT-TYPE
+	SYNTAX  	          BITS { esconMMF(0),
+                                 esconSSF(1)
+	                           }
+	MAX-ACCESS            read-only
+	STATUS  	          current
+	DESCRIPTION
+		"The following bit significant indicators define the ESCON interfaces
+		that are supported by the transceiver. The defined identifier values are:
+          Bit 0: ESCON MMF,  1310nm LED
+          Bit 1: ESCON SMF,  1310nm Laser"
+    REFERENCE   "SFP-8472 Table 3.1 and 3.5."
+	::= { icomSfpInvEntry 6 }
+
+icomSfpInvSonetCompliance OBJECT-TYPE
+        SYNTAX       BITS { sfpSonetUnallocB5b7(0),
+                            sfpSonetOC12LongReach(1),
+                            sfpSonetOC12IntermediateReach(2),
+                            sfpSonetOC12ShortReach(3),
+                            sfpSonetUnallocB5b3(4),
+                            sfpSonetOC3LongReach(5),
+                            sfpSonetOC3IntermediateReach(6),
+                            sfpSonetOC3ShortReach(7),
+                            sfpSonetNotUsedB4b7(8),
+                            sfpSonetNotUsedB4b6(9),
+                            sfpSonetOC192ShortReach(10),
+                            sfpSonetReachSpecifier1(11),
+                            sfpSonetReachSpecifier2(12),
+                            sfpSonetOC48LongReach(13),
+                            sfpSonetOC48IntermediateReach(14),
+                            sfpSonetOC48ShortReach(15)
+                          }
+	MAX-ACCESS       read-only
+	STATUS  	     current
+	DESCRIPTION
+		"The following bit significant indicators define the SONET interfaces
+		that are supported by the transceiver.
+		The defined identifier bits at SFF-8472 Memory in relation to object's Bits Syntax are:
+          Bit 0: Unallocated: SFF-8472 A0h, byte 5 bit 7
+          Bit 1: OC-12 long reach: SFF-8472 A0h, byte 5 bit 6
+          Bit 2: OC-12 intermediate reach: SFF-8472 A0h, byte 5 bit 5
+          Bit 3: OC-12 short reach: SFF-8472 A0h, byte 5 bit 4
+          Bit 4: Unallocated: : SFF-8472 A0h, byte 5 bit 3
+          Bit 5: OC-3 long reach: SFF-8472 A0h, byte 5 bit 2
+          Bit 6: OC-3 intermediate reach: SFF-8472 A0h, byte 5 bit 1
+          Bit 7: OC-3 short reach: SFF-8472 A0h, byte 5 bit 0
+          Bit 8: Not used: SFF-8472 A0h, byte 4 bit 7
+          Bit 9: Not used: SFF-8472 A0h, byte 4 bit 6
+          Bit 10: OC192 short reach: SFF-8472 A0h, byte 4 bit 5
+          Bit 11: SONET reach specifier bit 1: SFF-8472 A0h, byte 4 bit 4
+          Bit 12: SONET reach specifier bit 2: SFF-8472 A0h, byte 4 Bits 3
+          Bit 13: OC48 long reach: SFF-8472 A0h, byte 4 bit 2
+          Bit 14: OC48 intermediate reach: SFF-8472 A0h, byte 4 bit 1
+          Bit 15: OC48 short reach: SFF-8472 A0h, byte 4 bit 0."
+    REFERENCE  "SFP-8472 Table 3.1,  3.5 and 3.5a."
+	::= { icomSfpInvEntry 7 }
+
+icomSfpInvGbeCompliance OBJECT-TYPE
+	SYNTAX  	BITS { sfpBasePX(0),
+                       sfpBaseBX10(1),
+                       sfp100baseFX(2),
+                       sfp100baseLXLX10(3),
+                       sfp1000baseT(4),
+                       sfp1000baseCX(5),
+                       sfp1000baseLX(6),
+	                   sfp1000baseSX(7)
+	                 }
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The following bit significant indicators define the Infiniband interfaces
+		that are supported by the transceiver. The defined identifier values are:
+          Bit 0: BASE-PX
+          Bit 1: BASE-BX10
+          Bit 2: 100BASE-FX
+          Bit 3: 100BASE-LX/LX10
+          Bit 4: 1000BASE-T
+          Bit 5: 1000BASE-CX
+          Bit 6: 1000BASE-LX
+          Bit 7: 1000BASE-SX."
+    REFERENCE   "SFP-8472 Table 3.1 and 3.5"
+	::= { icomSfpInvEntry 8 }
+
+icomSfpInvFcLLCompliance OBJECT-TYPE
+	SYNTAX  	BITS { fcLinkLengthV(0),
+                       fcLinkLengthS(1),
+                       fcLinkLengthI(2),
+                       fcLinkLengthL(3),
+                       fcLinkLengthM(4)
+                     }
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The following bit significant indicators define the Fiber Channel Link Length
+		values that are supported by the transceiver. The defined values are
+		(in relation to object's Bits Syntax):
+          Bit 0: very long distance (V), SFF-8472 A0h, byte 7, bit 7
+          Bit 1: short distance (S), , SFF-8472 A0h, byte 7, bit 6
+          Bit 2: intermediate distance (I), , SFF-8472 A0h, byte 7, bit 5
+          Bit 3: long distance (L), , SFF-8472 A0h, byte 7, bit 4
+          Bit 4: medium distance (M), , SFF-8472 A0h, byte 7, bit 3."
+    REFERENCE   "SFP-8472 Table 3.1 and 3.5"
+	::= { icomSfpInvEntry 9 }
+
+icomSfpInvFcTechCompliance OBJECT-TYPE
+	SYNTAX  	BITS { fcTechIntraEL(0),
+                       fcTechSN(1),
+                       fcTechSL(2),
+                       fcTechLL(3),
+                       fcTechNotUsedB8b3(4),
+                       fcTechNotUsedB8b2(5),
+                       fcTechNotUsedB8b1(6),
+                       fcTechNotUsedB8b0(7),
+                       fcTechNotUsedB7b7(8),
+                       fcTechNotUsedB7b6(9),
+                       fcTechNotUsedB7b5(10),
+                       fcTechNotUsedB7b4(11),
+                       fcTechNotUsedB7b3(12),
+                       fcTechSA(13),
+                       fcTechLC(14),
+                       fcTechInterEL(15)
+	                 }
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The following bit significant indicators define the Fibre Channel Technology
+		values that are supported by the transceiver.
+        The defined identifier bits at SFF-8472 Memory in relation to object's Bits Syntax are:
+          Bit 0: Electrical intra-enclosure (EL), SFF-8472 A0h, byte 8, bit 7
+          Bit 1: Shortwave laser w/o OFC (SN), SFF-8472 A0h, byte 8, bit 6
+          Bit 2: Shortwave laser w/ OFC (SL), SFF-8472 A0h, byte 8, bit 5
+          Bit 3: Longwave laser (LL), SFF-8472 A0h, byte 8, bit 4
+          Bits 4-12: Not Used
+          Bit 13: Shortwave laser, linear Rx (SA), SFF-8472 A0h, byte 7, bit 2
+          Bit 14: Longwave laser (LC), SFF-8472 A0h, byte 7, bit 1
+          Bit 15: Electrical inter-enclosure (EL), SFF-8472 A0h, byte 7, bit 0."
+    REFERENCE   "SFP-8472 Table 3.1 and 3.5"
+	::= { icomSfpInvEntry 10 }
+
+icomSfpInvSFPplusCableCompliance OBJECT-TYPE
+    SYNTAX  	BITS { cableActive(0),
+                       cablePassive(1)
+	                 }
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The following bit significant indicators define the Cable Technology values
+		that are supported by the transceiver. The defined values are:
+          Bit 0: Cable Active, SFF-8472 A0h, byte 8, bit 3
+          Bit 1: Cable Passive, SFF-8472 A0h, byte 8, bit 2."
+    REFERENCE   "SFP-8472 Table 3.1 and 3.5"
+	::= { icomSfpInvEntry 11 }
+
+icomSfpInvFcTxMediaCompliance OBJECT-TYPE
+    SYNTAX  	BITS { fcTxMediaTW(0),
+                       fcTxMediaTP(1),
+                       fcTxMediaMI(2),
+                       fcTxMediaTV(3),
+                       fcTxMediaM6(4),
+                       fcTxMediaM5M5E(5),
+                       fcTxMediaUnallocB9b1(6),
+                       fcTxMediaSM(7)
+	                 }
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The following bit significant indicators define the Fiber Channel Transmission Media
+		values that are supported by the transceiver.
+		The defined identifier bits at SFF-8472 Memory in relation to object's Bits Syntax are:
+          Bit 0: Twin Axial Pair (TW), SFF-8472 A0h, byte 9, bit 7
+          Bit 1: Shielded Twisted Pair (TP), SFF-8472 A0h, byte 9, bit 6
+          Bit 2: Miniature Coax (MI), SFF-8472 A0h, byte 9, bit 5
+          Bit 3: Video Coax (TV), SFF-8472 A0h, byte 9, bit 4
+          Bit 4: Multi-mode,  62.5m (M6), SFF-8472 A0h, byte 9, bit 3
+          Bit 5: Multi-mode,  50 m (M5), SFF-8472 A0h, byte 9, bit 2
+          Bit 6: Unallocated, SFF-8472 A0h, byte 9, bit 1
+          Bit 7: Single Mode (SM), SFF-8472 A0h, byte 9, bit 0."
+    REFERENCE   "SFP-8472 Table 3.1 and 3.5"
+	::= { icomSfpInvEntry 12 }
+
+icomSfpInvFcSpeedCompliance OBJECT-TYPE
+	SYNTAX  	BITS { fcSpeed1200MBps(0),
+                       fcSpeed800MBps(1),
+                       fcSpeed1600MBps(2),
+                       fcSpeed400MBps(3),
+                       fcSpeedUnallocB10b3(4),
+                       fcSpeed200MBps(5),
+                       fcSpeedUnallocB10b1(6),
+                       fcSpeed100MBps(7)
+	                 }
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The following bit significant indicators define the Fiber Channel Speed
+		values that are supported by the transceiver.
+		The defined identifier bits at SFF-8472 Memory in relation to object's Bits Syntax are:
+          Bit 0: 1200 MB/Sec, SFF-8472 A0h, byte 10, bit 7
+          Bit 1: 800  MB/Sec, SFF-8472 A0h, byte 10, bit 6
+          Bit 2: 1600 MB/Sec, SFF-8472 A0h, byte 10, bit 5
+          Bit 3: 400  MB/Sec, SFF-8472 A0h, byte 10, bit 4
+          Bit 4: Unallocated, SFF-8472 A0h, byte 10, bit 3
+          Bit 5: 200 MB/Sec, SFF-8472 A0h, byte 10, bit 2
+          Bit 6: Unallocated, SFF-8472 A0h, byte 10, bit 1
+          Bit 7: 100  MB/Sec, SFF-8472 A0h, byte 10, bit 0."
+    REFERENCE   "SFP-8472 Table 3.1 and 3.5"
+	::= { icomSfpInvEntry 13 }
+
+icomSfpInvEncodingCode OBJECT-TYPE
+	SYNTAX             INTEGER { encUnspecified(0),
+	                             enc8B10B(1),
+	                             enc4B5B(2),
+	                             encNrz(3),
+	                             encManchester(4),
+	                             encSonet(5),
+	                             enc64B66B(6)
+	                           }
+	MAX-ACCESS         read-only
+	STATUS  	       current
+	DESCRIPTION
+		"The encoding value indicates the serial encoding mechanism that is the
+		nominal design target of the particular transceiver.
+		The value shall be contained in the serial data.
+		The	defined encoding values are:
+          00h: Unspecified
+          01h: 8B10B
+          02h: 4B5B
+          03h: NRZ
+          04h: Manchester
+          05h: SONET Scrambled
+          06h -FFh: Reserved."
+    REFERENCE   "SFP-8472 Table 3.1 and 3.6"
+	::= { icomSfpInvEntry 14 }
+
+icomSfpInvNominalBitRate OBJECT-TYPE
+	SYNTAX  	         Unsigned32
+	MAX-ACCESS           read-only
+	STATUS  	         current
+	DESCRIPTION
+		"The nominal bit (signaling) rate (BR, nominal) is specified in units of 100 MBd,
+		rounded off to the nearest 100 MBd. The bit rate includes those bits necessary to
+		encode and delimit the signal as well as those bits carrying data information.
+		A value of 0 indicates that the bit rate is not specified and must be determined
+		from the transceiver technology. The actual information transfer rate will depend
+		on the encoding of the data, as defined by the encoding value."
+    REFERENCE   "SFP-8472 Table 3.1."
+	::= { icomSfpInvEntry 15 }
+
+icomSfpInvRateId   OBJECT-TYPE
+	SYNTAX         Unsigned32
+	MAX-ACCESS     read-only
+	STATUS  	   current
+	DESCRIPTION
+		"The encoding value indicates the serial encoding mechanism that is the
+		nominal design target of the particular transceiver.
+		The value shall be contained in the serial data.
+		The	defined encoding values are:
+          00h: Unspecified
+          01h: 4/2/1G Rate_Select & AS0/AS1
+          02h: 8/4/2G Rx Rate_Select only
+          03h: Unspecified
+          04h: 8/4/2G Tx Rate_Select only
+          05h: Unspecified
+          06h: 8/4/2G Independent Rx & Tx Rate_select
+          07h: Unspecified
+          08h: 16/8/4G Rx Rate_select only) High=16G only, Low=8G/4G
+          09h: Unspecified
+          0Ah: 16/8/4G Independent Rx, Tx Rate_select) High=16G only, Low=8G/4G
+          0Bh -FFh: Unallocated."
+    REFERENCE   "SFP-8472 Table 3.1 and 3.6a"
+	::= { icomSfpInvEntry 16 }
+
+icomSfpInvLengthSMFKm  OBJECT-TYPE
+	SYNTAX  	       Unsigned32
+	MAX-ACCESS         read-only
+	STATUS  	       current
+	DESCRIPTION
+		"Addition to EEPROM data from original GBIC definition.
+		This value specifies the link length that is supported by the transceiver while
+		operating in compliance with the applicable standards using single mode fiber.
+		The value is in units of Kilometers. A value of 255 means that the transceiver
+		supports a link length greater than 254 km.
+		A value of zero means that the transceiver does not support single mode
+		fiber or that the length information must be determined from the transceiver
+		technology."
+    REFERENCE   "DWDM MSA Table 2.3.1,  SFP-8472 Table 3.1."
+	::= { icomSfpInvEntry 17 }
+
+icomSfpInvLengthSMF100m  OBJECT-TYPE
+	SYNTAX  	         Unsigned32
+	MAX-ACCESS           read-only
+	STATUS  	         current
+	DESCRIPTION
+		"This value specifies the link length that is supported by the transceiver
+		while operating in compliance with the applicable standards using
+		single mode fiber.
+		The value is in units of 100 meters. A value of 255 means that the transceiver
+		supports a link length greater than 25.4 km.
+		A value of zero means that the transceiver does not support single mode
+		fiber or that the length information must be determined from the transceiver
+		technology."
+    REFERENCE   "SFP-8472 Table 3.1."
+	::= { icomSfpInvEntry 18 }
+
+icomSfpInvLength50u10m  OBJECT-TYPE
+	SYNTAX  	        Unsigned32
+	MAX-ACCESS          read-only
+	STATUS  	        current
+	DESCRIPTION
+		"This value specifies the link length that is supported by the transceiver
+		while operating in compliance with the applicable standards using 50 micron
+		multi-mode fiber OM2 [500MHz*km at 850nm].
+		The value is in units of 10 meters. A value of 255 means that the transceiver
+		supports a link length greater than 2.54 km.
+		A value of zero means that the transceiver does not support 50 micron
+		multimode OM2 [500MHz*km at 850nm] fiber or that the length information
+		must be determined from the transceiver technology."
+    REFERENCE   "SFP-8472 Table 3.1."
+	::= { icomSfpInvEntry 19 }
+
+icomSfpInvLength62u10m  OBJECT-TYPE
+	SYNTAX  	        Unsigned32
+	MAX-ACCESS          read-only
+	STATUS  	        current
+	DESCRIPTION
+		"This value specifies the link length that is supported by the transceiver
+		while operating in compliance with the applicable standards using 62.5 micron
+		multi-mode fiber OM1 [200 MHz*km at  850nm, 500 MHz*km at 1310nm].
+		The value is in units of 10 meters. A value of 255 means that the transceiver
+		supports a link length greater than 2.54 km.
+		A value of zero means that the transceiver does not support 50 micron
+		multimode OM1 [200 MHz*km at  850nm, 500 MHz*km at 1310nm]  fiber
+		or that the length information must be determined from the
+		transceiver technology.
+		It is common for the transceiver to support both 50 micron and 62.5 micron
+		fiber."
+    REFERENCE   "SFP-8472 Table 3.1."
+	::= { icomSfpInvEntry 20 }
+
+icomSfpInvLengthCopper1m  OBJECT-TYPE
+	SYNTAX  	          Unsigned32
+	MAX-ACCESS            read-only
+	STATUS  	          current
+	DESCRIPTION
+		"This value specifies the link length that is supported by the transceiver
+		while operating in compliance with the applicable standards using copper cable.
+		The value is in units of 1 meter. A value of 255 means that the transceiver
+		supports a link length greater than 254 meters.
+		A value of zero means that the transceiver does not support copper cables
+		or that the length information must be determined from the
+		transceiver technology."
+    REFERENCE   "SFP-8472 Table 3.1."
+	::= { icomSfpInvEntry 21 }
+
+icomSfpInvLength50u10mOM3  OBJECT-TYPE
+	SYNTAX  	           Unsigned32
+	MAX-ACCESS             read-only
+	STATUS  	           current
+	DESCRIPTION
+		"This value specifies the link length that is supported by the transceiver
+		while operating in compliance with the applicable standards using 50 micron
+		multi-mode fiber OM3 [2000 MHz*km] .
+		The value is in units of 10 meters. A value of 255 means that the transceiver
+		supports a link length greater than 2.54 km.
+		A value of zero means that the transceiver does not support 50 micron
+		multimode OM3 [2000 MHz*km]  fiber or that the length information
+		must be determined from the transceiver technology."
+    REFERENCE   "SFP-8472 Table 3.1."
+	::= { icomSfpInvEntry 22 }
+
+icomSfpInvVendorName  OBJECT-TYPE
+    SYNTAX            SnmpAdminString  (SIZE (0..16))
+    MAX-ACCESS        read-only
+    STATUS            current
+    DESCRIPTION
+		"The vendor name is a 16 character field that contains ASCII characters,
+		left-aligned and padded on the right with ASCII spaces (20h).
+		The vendor name shall be the full name of the corporation,
+		a commonly accepted abbreviation of the name of the corporation,
+		the SCSI company code for the corporation,  or the stock exchange code
+		for the corporation.
+		At least one of the vendor name or the vendor OUI fields shall contain
+		valid serial data."
+    REFERENCE   "SFP-8472 Table 3.1."
+	::= { icomSfpInvEntry 23 }
+
+icomSfpInvVendorOUI  OBJECT-TYPE
+    SYNTAX           OCTET STRING(SIZE(3))
+    MAX-ACCESS       read-only
+    STATUS           current
+    DESCRIPTION
+		"The vendor organizationally unique identifier field (vendor OUI)
+		is a 3-byte field that contains the IEEE Company Identifier for the
+		vendor. A value of all zero in the 3-byte field indicates that
+		the Vendor OUI is unspecified."
+    REFERENCE   "SFP-8472 Table 3.1."
+	::= { icomSfpInvEntry 24 }
+
+icomSfpInvVendorPN  OBJECT-TYPE
+    SYNTAX          SnmpAdminString  (SIZE (0..16))
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+		"The vendor part number (vendor PN) is a 16-byte field that contains
+		ASCII characters,  left-aligned and padded on the right with ASCII
+		spaces (20h),  defining the vendor part number or product name.
+		A value of all zero in the 16-byte field indicates that the
+		vendor PN is unspecified."
+    REFERENCE   "SFP-8472 Table 3.1."
+	::= { icomSfpInvEntry 25 }
+
+icomSfpInvVendorRev  OBJECT-TYPE
+    SYNTAX           SnmpAdminString  (SIZE (0..4))
+    MAX-ACCESS       read-only
+    STATUS           current
+    DESCRIPTION
+		"The vendor revision number (vendor rev) is a 4-byte field that
+		contains ASCII characters,  left-aligned and padded on the right with
+		ASCII spaces (20h),  defining the vendor's product revision number.
+		A value of all zero in the 4-byte field indicates that
+		the vendor PN is unspecified."
+    REFERENCE   "SFP-8472 Table 3.1."
+	::= { icomSfpInvEntry 26 }
+
+icomSfpInvWaveLength  OBJECT-TYPE
+    SYNTAX            Unsigned32
+    MAX-ACCESS        read-only
+    STATUS            current
+    DESCRIPTION
+		"The laser wavelength is equal to the integer value in nm
+		 if the icomSfpInvId is not sfpDwdm(11) otherwise the
+		 unit is 0.01 Nano Meter(nm)."
+    REFERENCE   "SFP-8472 Table 3.1."
+	::= { icomSfpInvEntry 27 }
+
+icomSfpInvExtendedOptions OBJECT-TYPE
+    SYNTAX        BITS { extOptUnAlloc7(0),
+                         extOptUnAlloc6(1),
+                         extOptRateSelect(2),
+                         extOptTxDisable(3),
+                         extOptTxFault(4),
+                         extOptSignalDetect(5),
+                         extOptRxLos(6)
+                       }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+		"Specify the bitmap options implemented in the transceiver as described in.
+		The SFF-8472 memory A0h address 65 byte definition in relation to object's Bits syntax is:
+		  Bit 0: Unallocated (Bit7)
+		  Bit 1: Unallocated (Bit6)
+		  Bit 2: RATE_SELECT (Bit5)
+		         NOTE: Lack of implementation does not indicate lack of
+				       simultaneous compliance with multiple standard rates.
+				       Compliance with particular standards should be determined
+				       from Transceiver Code.
+		  Bit 3: TX_DISABLE (Bit4)
+		         It is implemented and disables the serial output
+		  Bit 4: TX_FAULT (Bit3)
+		         This signal is implemented (See SFP MSA)
+		  Bit 5: Loss of Signal (Bit2) implemented, signal inverted from standard
+		         definition in SFP MSA (often called Signal Detect).
+				 NOTE: This is not standard SFP/GBIC behavior and should
+				       be avoided,  since non-interoperable behavior results.
+		  Bit 6: Loss of Signal (Bit1) implemented, signal as defined in SFP MSA
+		         (often called Rx_LOS)."
+    REFERENCE   "SFP-8472 Table 3.1 and 3.7."
+	::= { icomSfpInvEntry 28 }
+
+icomSfpInvMaxBitRate OBJECT-TYPE
+    SYNTAX           Unsigned32
+    MAX-ACCESS       read-only
+    STATUS           current
+    DESCRIPTION
+		"The upper bit rate limit at which the transceiver will still meet its
+		specifications (BR,  max) is specified in units of 1% above the nominal
+		bit rate.
+		A value of zero indicates that this field is not specified."
+    REFERENCE   "DWDM MSA Table 2.3.1,  SFP-8472 Table 3.1."
+	::= { icomSfpInvEntry 29 }
+
+icomSfpInvMinBitRate  OBJECT-TYPE
+    SYNTAX            Unsigned32
+    MAX-ACCESS        read-only
+    STATUS            current
+    DESCRIPTION
+		"The lower bit rate limit at which the transceiver will still meet its
+		specifications (BR,  min) is specified in units of 1% below the nominal
+		bit rate.
+		A value of zero indicates that this field is not specified."
+    REFERENCE   "DWDM MSA Table 2.3.1,  SFP-8472 Table 3.1."
+	::= { icomSfpInvEntry 30 }
+
+icomSfpInvVendorSN  OBJECT-TYPE
+    SYNTAX          SnmpAdminString  (SIZE (0..16))
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+		"The vendor serial number (vendor SN) is a 16 character field that
+		contains ASCII characters,  left-aligned and padded on the right with
+		ASCII spaces (20h),  defining thevendor's serial number for the transceiver.
+		A value of all zero in the 16-byte field indicates that the vendor PN is
+		unspecified."
+    REFERENCE   "SFP-8472 Table 3.1."
+	::= { icomSfpInvEntry 31 }
+
+icomSfpInvDateCode   OBJECT-TYPE
+    SYNTAX           SnmpAdminString  (SIZE (6))
+    MAX-ACCESS       read-only
+    STATUS           current
+    DESCRIPTION
+		"The date code is an 6-byte field that contains the vendor's date
+		code in ASCII characters. The date code is mandatory.
+		The date code shall be in the format: <yy><mm><dd>."
+    REFERENCE   "SFP-8472 Table 3.1 and 3.8."
+	::= { icomSfpInvEntry 32 }
+
+icomSfpInvDiagnosticMonitoring OBJECT-TYPE
+    SYNTAX        BITS { legacyRsrvd(0),
+                         ddmImplemented(1),
+                         intCalib(2),
+                         extCalib(3),
+                         rxAvgPower(4),
+                         addressChangeRequired(5)
+                       }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+		"A field with 8 single bit indicators which describe the
+		optional digital diagnostic features implemented in the transceiver.
+		Since transceivers will not necessarily implement all optional
+		features described in this document,  the 'Enhanced Options' bit field
+		allows the host system to determine which functions are
+		available over the 2 wire serial bus.
+		The SFF-8472 A0h Memory address 92 byte assignment in relation to object's Bits Syntax is:
+          Bit 0: Reserved for legacy diagnostic implementations (Bit 7).
+		  		 Must be '0' for compliance with this document.
+          Bit 1: Digital diagnostic monitoring implemented (Bits 6).
+				 Must be '1' for compliance with this document.
+          Bit 2: Internally Calibrated (Bit 5)
+          Bit 3: Externally Calibrated (Bit 4)
+          Bit 4: Received power measurement type 0 = OMA,
+                 1 = Average Power (Bit 3)
+          Bit 5: Address change required (Bit 2)."
+    REFERENCE   "SFP-8472 Table 3.1 and 3.9."
+	::= { icomSfpInvEntry 33 }
+
+icomSfpInvEnhanceOptions OBJECT-TYPE
+    SYNTAX        BITS { enhOptAlarmsWarnings(0),
+                         enhOptTxDisable(1),
+                         enhOptTxFault(2),
+                         enhOptRxLos(3),
+                         enhOptRateSelect(4),
+                         enhPtAppSelectSFF8079(5),
+                         enhOptRateSelectSFF8431(6)
+                       }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+		"A field with 8 single bit indicators which describe the
+		optional digital diagnostic features implemented in the transceiver.
+		Since transceivers will not necessarily implement all optional features
+		described in this document,  the 'Enhanced Options' bit field allows the
+		host system to determine which functions are available over the 2 wire
+		serial bus. A '1' indicates that the particular function is
+		implemented in the transceiver.
+		The SFF-8472 A0h Memory address 93 byte assignment in relation to object's Bits Syntax is:
+		  Bit 0: Optional Alarm/warning flags implemented for all monitored quantities (Bit 7)
+          Bit 1: Optional Soft TX_DISABLE control and monitoring implemented (Bit 6)
+          Bit 2: Optional Soft TX_FAULT monitoring implemented (Bit 5)
+          Bit 3: Optional Soft RX_LOS monitoring implemented (Bit 4)
+          Bit 4: Optional Soft RATE_SELECT control and monitoring implemented (Bit 3)
+          Bit 5: Optional Application Select control implemented per SFF-8079 (Bit 2)
+          Bit 6: Optional soft Rate Select control implemented per SFF-8431 (Bit 1)."
+    REFERENCE   "SFP-8472 Table 3.1 and 3.10."
+	::= { icomSfpInvEntry 34 }
+
+icomSfpInv8472Compliance OBJECT-TYPE
+    SYNTAX      INTEGER { noDiag(0),
+    	                  rev93(1),
+    	                  rev95(2),
+                          rev102(3),
+                          rev104(4),
+                          rev110(5)
+                        }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+		"An unsigned integer that indicates which feature set(s) are
+		implemented in the transceiver.
+		The defined values are:
+          0 - Digital diagnostic functionality not included or undefined.
+          1 - Includes functionality described in Rev 9.3 SFF-8472.
+          2 - Includes functionality described in Rev 9.5 SFF-8472.
+          3 - Includes functionality described in Rev 10.2 SFF-8472.
+          4 - Includes functionality described in Rev 10.4 SFF-8472.
+          5 - Includes functionality described in Rev 11.0 SFF-8472."
+    REFERENCE   "SFP-8472 Table 3.1 and 3.12."
+	::= { icomSfpInvEntry 35 }
+
+icomSfpInvTransceiverCodes OBJECT-TYPE
+    SYNTAX                 OCTET STRING(SIZE(9))
+    MAX-ACCESS             read-only
+    STATUS                 current
+    DESCRIPTION
+		"The Transceiver Codes are bit-significant Indicators that define
+		 the electronic or optical interfaces, supported by the transceiver.
+		 It includes Bytes 10 to 3 of Address A0h in the Memory of the
+		 transceiver plus Byte 36 (Highest Significant Byte 10 and lowest
+		 Byte 36)."
+    REFERENCE   "SFP-8472 Table 3.1 and 3.5."
+	::= { icomSfpInvEntry 36 }
+
+-- -------------------------------------------------------------
+-- The SFP Diagnostic Table
+-- -------------------------------------------------------------
+
+icomSfpDiagTable	OBJECT-TYPE
+	SYNTAX          SEQUENCE OF IcomSfpDiagEntry
+	MAX-ACCESS      not-accessible
+	STATUS          current
+	DESCRIPTION
+		"The SFP diagnostic table.
+		The table defines the status and control of the alarms and warnings
+		of the SFP and SFP+ optical trasceivers as well as their thresholds."
+	::= { icomSfpDiagnostics 1 }
+
+icomSfpDiagEntry OBJECT-TYPE
+	SYNTAX       IcomSfpDiagEntry
+	MAX-ACCESS   not-accessible
+	STATUS       current
+	DESCRIPTION
+		"An entry in the SFP diagnostic table.
+		The index to this table is the same as the ifIndex of the SFP.
+		The SFP Diagnostic Table contain and entry for each SFP module."
+	INDEX   { icomSfpDiagInterface }
+	::= { icomSfpDiagTable 1 }
+
+IcomSfpDiagEntry ::=
+    SEQUENCE {
+        icomSfpDiagInterface                    InterfaceIndex,
+		icomSfpDiagHighTempAlmThreshold			SfpDiagTempThreshold,
+		icomSfpDiagLowTempAlmThreshold			SfpDiagTempThreshold,
+		icomSfpDiagHighTempWrnThreshold			SfpDiagTempThreshold,
+		icomSfpDiagLowTempWrnThreshold			SfpDiagTempThreshold,
+		icomSfpDiagHighVoltAlmThreshold			SfpDiagThreshold,
+		icomSfpDiagLowVoltAlmThreshold			SfpDiagThreshold,
+		icomSfpDiagHighVoltWrnThreshold			SfpDiagThreshold,
+		icomSfpDiagLowVoltWrnThreshold			SfpDiagThreshold,
+		icomSfpDiagHighTxBiasAlmThreshold		SfpDiagThreshold,
+		icomSfpDiagLowTxBiasAlmThreshold		SfpDiagThreshold,
+		icomSfpDiagHighTxBiasWrnThreshold		SfpDiagThreshold,
+		icomSfpDiagLowTxBiasWrnThreshold		SfpDiagThreshold,
+		icomSfpDiagHighTxPowerAlmThreshold		SfpDiagThreshold,
+		icomSfpDiagLowTxPowerAlmThreshold		SfpDiagThreshold,
+		icomSfpDiagHighTxPowerWrnThreshold		SfpDiagThreshold,
+		icomSfpDiagLowTxPowerWrnThreshold		SfpDiagThreshold,
+		icomSfpDiagHighRxPowerAlmThreshold		SfpDiagThreshold,
+		icomSfpDiagLowRxPowerAlmThreshold		SfpDiagThreshold,
+		icomSfpDiagHighRxPowerWrnThreshold		SfpDiagThreshold,
+		icomSfpDiagLowRxPowerWrnThreshold		SfpDiagThreshold,
+		icomSfpDiagModuleTemperature			SfpDiagTempThreshold,
+		icomSfpDiagSupplyVoltage				Unsigned32,
+		icomSfpDiagTxBias						Unsigned32,
+		icomSfpDiagTxOutputPower				Unsigned32,
+		icomSfpDiagRxInputPower					Unsigned32,
+		icomSfpDiagRxLOSPinOut                  TruthValue,
+		icomSfpDiagTxFaultPinOut                TruthValue,
+		icomSfpDiagRateSelectPinIn              TruthValue,
+		icomSfpDiagTxDisablePinIn               TruthValue,
+		icomSfpDiagAlarms						BITS,
+		icomSfpDiagAlarmsMask					BITS,
+		icomSfpDiagWarnings						BITS,
+		icomSfpDiagWarningsMask					BITS
+}
+
+icomSfpDiagInterface OBJECT-TYPE
+	SYNTAX  	     InterfaceIndex
+	MAX-ACCESS       not-accessible
+	STATUS  	     current
+	DESCRIPTION
+	    "The Interface Index of the corresponding system port that uses
+	    Optical Transceiver module."
+	::= { icomSfpDiagEntry 1 }
+
+icomSfpDiagHighTempAlmThreshold OBJECT-TYPE
+    SYNTAX                      SfpDiagTempThreshold
+    MAX-ACCESS                  read-write
+    STATUS                      current
+    DESCRIPTION
+		"The threshold value for high temperature alarm in hundredths
+		of degrees Celsius."
+    REFERENCE   "SFP-8472 Table 3.15."
+	::= { icomSfpDiagEntry 2 }
+
+icomSfpDiagLowTempAlmThreshold OBJECT-TYPE
+    SYNTAX                     SfpDiagTempThreshold
+    MAX-ACCESS                 read-write
+    STATUS                     current
+    DESCRIPTION
+		"The threshold value for low temperature alarm in hundredths
+		of degrees Celsius."
+    REFERENCE   "SFP-8472 Table 3.15."
+	::= { icomSfpDiagEntry 3 }
+
+icomSfpDiagHighTempWrnThreshold OBJECT-TYPE
+    SYNTAX                      SfpDiagTempThreshold
+    MAX-ACCESS                  read-write
+    STATUS                      current
+    DESCRIPTION
+		"The threshold value for high temperature warning in hundredths
+		of degrees Celsius."
+    REFERENCE   "SFP-8472 Table 3.15."
+	::= { icomSfpDiagEntry 4 }
+
+icomSfpDiagLowTempWrnThreshold OBJECT-TYPE
+    SYNTAX                     SfpDiagTempThreshold
+    MAX-ACCESS                 read-write
+    STATUS                     current
+    DESCRIPTION
+		"The threshold value for low temperature warning in hundredths
+		of degrees Celsius."
+    REFERENCE   "SFP-8472 Table 3.15."
+	::= { icomSfpDiagEntry 5 }
+
+icomSfpDiagHighVoltAlmThreshold OBJECT-TYPE
+    SYNTAX                      SfpDiagThreshold
+    MAX-ACCESS                  read-write
+    STATUS                      current
+    DESCRIPTION
+		"The threshold value for high voltage alarm. The value 0
+		means 0 uVolts. An increment on one is equivalent to 100 uVolt,
+		yielding a total range of +6.55 Volts."
+    REFERENCE   "SFP-8472 Table 3.15."
+	::= { icomSfpDiagEntry 6 }
+
+icomSfpDiagLowVoltAlmThreshold OBJECT-TYPE
+    SYNTAX                     SfpDiagThreshold
+    MAX-ACCESS                 read-write
+    STATUS                     current
+    DESCRIPTION
+		"The threshold value for low voltage alarm. The value 0
+		means 0 uVolts. An increment on one is equivalent to 100 uVolt,
+		yielding a total range of +6.55 Volts."
+    REFERENCE   "SFP-8472 Table 3.15."
+	::= { icomSfpDiagEntry 7 }
+
+icomSfpDiagHighVoltWrnThreshold OBJECT-TYPE
+    SYNTAX                      SfpDiagThreshold
+    MAX-ACCESS                  read-write
+    STATUS                      current
+    DESCRIPTION
+		"The threshold value for high voltage warning. The value 0
+		means 0 uVolts. An increment on one is equivalent to 100 uVolt,
+		yielding a total range of +6.55 Volts."
+    REFERENCE   "SFP-8472 Table 3.15."
+	::= { icomSfpDiagEntry 8 }
+
+icomSfpDiagLowVoltWrnThreshold OBJECT-TYPE
+    SYNTAX                     SfpDiagThreshold
+    MAX-ACCESS                 read-write
+    STATUS                     current
+    DESCRIPTION
+		"The threshold value for low voltage warning. The value 0
+		means 0 uVolts. An increment on one is equivalent to 100 uVolt,
+		yielding a total range of +6.55 Volts."
+    REFERENCE   "SFP-8472 Table 3.15."
+	::= { icomSfpDiagEntry 9 }
+
+icomSfpDiagHighTxBiasAlmThreshold OBJECT-TYPE
+    SYNTAX                        SfpDiagThreshold
+    MAX-ACCESS                    read-write
+    STATUS                        current
+    DESCRIPTION
+		"The threshold value for high tx laser bias current alarm. The value 0
+		means 0 uA. An increment on one is equivalent to 2 uA,
+		yielding a total range of 0 to 131 mA."
+    REFERENCE   "SFP-8472 Table 3.15."
+	::= { icomSfpDiagEntry 10 }
+
+icomSfpDiagLowTxBiasAlmThreshold OBJECT-TYPE
+    SYNTAX                       SfpDiagThreshold
+    MAX-ACCESS                   read-write
+    STATUS                       current
+    DESCRIPTION
+		"The threshold value for low tx laser bias current alarm. The value 0
+		means 0 uA. An increment on one is equivalent to 2 uA,
+		yielding a total range of 0 to 131 mA."
+    REFERENCE   "SFP-8472 Table 3.15."
+	::= { icomSfpDiagEntry 11 }
+
+icomSfpDiagHighTxBiasWrnThreshold OBJECT-TYPE
+    SYNTAX                        SfpDiagThreshold
+    MAX-ACCESS                    read-write
+    STATUS                        current
+    DESCRIPTION
+		"The threshold value for high tx laser bias current warning. The value 0
+		means 0 uA. An increment on one is equivalent to 2 uA,
+		yielding a total range of 0 to 131 mA."
+    REFERENCE   "SFP-8472 Table 3.15."
+	::= { icomSfpDiagEntry 12 }
+
+icomSfpDiagLowTxBiasWrnThreshold OBJECT-TYPE
+    SYNTAX                       SfpDiagThreshold
+    MAX-ACCESS                   read-write
+    STATUS                       current
+    DESCRIPTION
+		"The threshold value for low tx laser bias current warning. The value 0
+		means 0 uA. An increment on one is equivalent to 2 uA,
+		yielding a total range of 0 to 131 mA."
+    REFERENCE   "SFP-8472 Table 3.15."
+	::= { icomSfpDiagEntry 13 }
+
+icomSfpDiagHighTxPowerAlmThreshold OBJECT-TYPE
+    SYNTAX                         SfpDiagThreshold
+    MAX-ACCESS                     read-write
+    STATUS                         current
+    DESCRIPTION
+		"The threshold value for high TX power alarm. The value 0
+		means 0 uWatts. An increment on one is equivalent to 0.1 uW,
+		yielding a total range of 0 to 6.5535 mW."
+    REFERENCE   "SFP-8472 Table 3.15."
+	::= { icomSfpDiagEntry 14 }
+
+icomSfpDiagLowTxPowerAlmThreshold OBJECT-TYPE
+    SYNTAX                        SfpDiagThreshold
+    MAX-ACCESS                    read-write
+    STATUS                        current
+    DESCRIPTION
+		"The threshold value for low TX power alarm. The value 0
+		means 0 uWatts. An increment on one is equivalent to 0.1 uW,
+		yielding a total range of 0 to 6.5535 mW."
+    REFERENCE   "SFP-8472 Table 3.15."
+	::= { icomSfpDiagEntry 15 }
+
+icomSfpDiagHighTxPowerWrnThreshold OBJECT-TYPE
+    SYNTAX                         SfpDiagThreshold
+    MAX-ACCESS                     read-write
+    STATUS                         current
+    DESCRIPTION
+		"The threshold value for high TX power warning. The value 0
+		means 0 uWatts. An increment on one is equivalent to 0.1 uW,
+		yielding a total range of 0 to 6.5535 mW."
+    REFERENCE   "SFP-8472 Table 3.15."
+	::= { icomSfpDiagEntry 16 }
+
+icomSfpDiagLowTxPowerWrnThreshold OBJECT-TYPE
+    SYNTAX                        SfpDiagThreshold
+    MAX-ACCESS                    read-write
+    STATUS                        current
+    DESCRIPTION
+		"The threshold value for low TX power warning. The value 0
+		means 0 uWatts. An increment on one is equivalent to 0.1 uW,
+		yielding a total range of 0 to 6.5535 mW."
+    REFERENCE   "SFP-8472 Table 3.15."
+	::= { icomSfpDiagEntry 17 }
+
+icomSfpDiagHighRxPowerAlmThreshold OBJECT-TYPE
+    SYNTAX                         SfpDiagThreshold
+    MAX-ACCESS                     read-write
+    STATUS                         current
+    DESCRIPTION
+		"The threshold value for high RX power alarm. The value 0
+		means 0 uWatts. An increment on one is equivalent to 0.1 uW,
+		yielding a total range of 0 to 6.5535 mW."
+    REFERENCE   "SFP-8472 Table 3.15."
+	::= { icomSfpDiagEntry 18 }
+
+icomSfpDiagLowRxPowerAlmThreshold OBJECT-TYPE
+    SYNTAX                        SfpDiagThreshold
+    MAX-ACCESS                    read-write
+    STATUS                        current
+    DESCRIPTION
+		"The threshold value for low RX power alarm. The value 0
+		means 0 uWatts. An increment on one is equivalent to 0.1 uW,
+		yielding a total range of 0 to 6.5535 mW."
+    REFERENCE   "SFP-8472 Table 3.15."
+	::= { icomSfpDiagEntry 19 }
+
+icomSfpDiagHighRxPowerWrnThreshold OBJECT-TYPE
+    SYNTAX                         SfpDiagThreshold
+    MAX-ACCESS                     read-write
+    STATUS                         current
+    DESCRIPTION
+		"The threshold value for high RX power warning. The value 0
+		means 0 uWatts. An increment on one is equivalent to 0.1 uW,
+		yielding a total range of 0 to 6.5 mW."
+    REFERENCE   "SFP-8472 Table 3.15."
+	::= { icomSfpDiagEntry 20 }
+
+icomSfpDiagLowRxPowerWrnThreshold OBJECT-TYPE
+    SYNTAX                        SfpDiagThreshold
+    MAX-ACCESS                    read-write
+    STATUS                        current
+    DESCRIPTION
+		"The threshold value for low RX power warning. The value 0
+		means 0 uWatts. An increment on one is equivalent to 0.1 uW,
+		yielding a total range of 0 to 6.5535 mW."
+    REFERENCE   "SFP-8472 Table 3.15."
+	::= { icomSfpDiagEntry 21 }
+
+icomSfpDiagModuleTemperature OBJECT-TYPE
+    SYNTAX                   SfpDiagTempThreshold
+    MAX-ACCESS               read-only
+    STATUS                   current
+    DESCRIPTION
+        "Internally measured module temperature in hundredths
+        of degrees Celsius."
+    REFERENCE   "SFP-8472 Table 3.17."
+	::= { icomSfpDiagEntry 22 }
+
+icomSfpDiagSupplyVoltage OBJECT-TYPE
+    SYNTAX               Unsigned32 (0..65535)
+    MAX-ACCESS           read-only
+    STATUS               current
+    DESCRIPTION
+		"Internally measured supply voltage in transceiver. The value 0 means 0 Volts.
+		An increment on one is equivalent to 100 uVolt,
+		yielding a total range of +6.55 Volts.
+		Accuracy is vendor specific but must be better than +/-3% of the
+		manufacturer's nominal value over specified operating temperature and voltage."
+    REFERENCE   "SFP-8472 Table 3.17."
+	::= { icomSfpDiagEntry 23 }
+
+icomSfpDiagTxBias  OBJECT-TYPE
+    SYNTAX         Unsigned32 (0..65535)
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+		"Internally measured TX Bias Current. The value 0
+		means 0 Volt. An increment on one is equivalent to 2 uA,
+		yielding a total range of 0 to 131 mA.
+		Accuracy is vendor specific but must be better than +/-3dB over specified
+		temperature and voltage. Data is not valid when the transmitter is disabled."
+    REFERENCE   "SFP-8472 Table 3.17."
+	::= { icomSfpDiagEntry 24 }
+
+icomSfpDiagTxOutputPower OBJECT-TYPE
+    SYNTAX               Unsigned32 (0..65535)
+    MAX-ACCESS           read-only
+    STATUS               current
+    DESCRIPTION
+		"Measured TX output power. The value 0
+		means 0 Watts. An increment on one is equivalent to 0.1 uW,
+		yielding a total range of 0 to 6.5535 mW.
+		For the vendor specified wavelength, accuracy shall be better than +/-3dB
+		over specified temperature and voltage."
+    REFERENCE   "SFP-8472 Table 3.17."
+	::= { icomSfpDiagEntry 25 }
+
+icomSfpDiagRxInputPower OBJECT-TYPE
+    SYNTAX              Unsigned32 (0..65535)
+    MAX-ACCESS          read-only
+    STATUS              current
+    DESCRIPTION
+		"Measured RX input power. The value 0
+		means 0 Watts. An increment on one is equivalent to 0.1 uW,
+		yielding a total range of 0 to 6.5535 mW.
+		For the vendor specified wavelength, accuracy shall be better than +/-3dB
+		over specified temperature and voltage."
+    REFERENCE   "SFP-8472 Table 3.17."
+	::= { icomSfpDiagEntry 26 }
+
+icomSfpDiagRxLOSPinOut OBJECT-TYPE
+    SYNTAX             TruthValue
+    MAX-ACCESS         read-only
+    STATUS             current
+    DESCRIPTION
+        "This contains the True / False state of the SFP Rx LOS (output) pin. It is
+         True if the SFP has detected Loss-Of-Signal. located at I2c
+         address 0xa2, address: 110, mask 0x02"
+    ::= { icomSfpDiagEntry 27 }
+
+icomSfpDiagTxFaultPinOut OBJECT-TYPE
+    SYNTAX               TruthValue
+    MAX-ACCESS           read-only
+    STATUS               current
+    DESCRIPTION
+        "This contains the True / False state of the SFP Tx Fault (output) pin.
+         It is True if the SFP has detected a Tx fault condition.
+         located at I2C address 0xa2, Byte 110, mask 0x04"
+    ::= { icomSfpDiagEntry 28 }
+
+icomSfpDiagRateSelectPinIn OBJECT-TYPE
+    SYNTAX                 TruthValue
+    MAX-ACCESS             read-only
+    STATUS                 current
+    DESCRIPTION
+        "This contains the True / False state of the SFP RX Rate Select (input)
+         pin. This function is not implemented on Finisar SFPs. located
+         at I2C address 0xa2, Byte 110, mask 0x10"
+    ::= { icomSfpDiagEntry 29 }
+
+icomSfpDiagTxDisablePinIn OBJECT-TYPE
+    SYNTAX                TruthValue
+    MAX-ACCESS            read-only
+    STATUS                current
+    DESCRIPTION
+        "This contains the True / False state of the SFP TX Disable (input) pin.
+         located at I2C address 0xa2, Byte 110, mask 0x80"
+    ::= { icomSfpDiagEntry 30 }
+
+icomSfpDiagAlarms OBJECT-TYPE
+    SYNTAX        BITS { sfpAlarmTempHigh(0),
+                         sfpAlarmTempLow(1),
+                         sfpAlarmVoltageHigh(2),
+                         sfpAlarmVoltageLow(3),
+                         sfpAlarmTxBiasHigh(4),
+                         sfpAlarmTxBiasLow(5),
+                         sfpAlarmTxPowerHigh(6),
+                         sfpAlarmTxPowerLow(7),
+                         sfpAlarmRxPowerHigh(8),
+                         sfpAlarmRxPowerLow(9)
+                       }
+	MAX-ACCESS    read-only
+	STATUS        current
+	DESCRIPTION
+		"This object indicates the Alarms of the SFP module.
+		The icomSfpDiagAlarms is a bit map represented as a sum,  therefore,
+		it can represent multiple failures (alarms) simultaneously.
+	    The various bit positions are:
+		  Bit 0:  Temp High Alarm Set when internal temperature exceeds high alarm threshold.
+		  Bit 1:  Temp Low Alarm Set when internal temperature is below low alarm threshold.
+		  Bit 2:  Vcc High Alarm Set when internal supply voltage exceeds high alarm threshold.
+		  Bit 3:  Vcc Low Alarm Set when internal supply voltage is below low alarm threshold.
+		  Bit 4:  TX Bias High Alarm Set when TX Bias current exceeds high alarm threshold.
+		  Bit 5:  TX Bias Low Alarm Set when TX Bias current is below low alarm threshold.
+		  Bit 6:  TX Power High Alarm Set when TX output power exceeds high alarm threshold.
+		  Bit 7:  TX Power Low Alarm Set when TX output power is below low alarm threshold.
+		  Bit 8:  RX Power High Alarm Set when Received Power exceeds high alarm threshold.
+		  Bit 9:  RX Power Low Alarm Set when Received Power is below low alarm threshold."
+    REFERENCE   "SFP-8472 Table 3.18."
+     ::= { icomSfpDiagEntry 31 }
+
+icomSfpDiagAlarmsMask OBJECT-TYPE
+    SYNTAX        BITS { sfpAlarmMaskTempHigh(0),
+                         sfpAlarmMaskTempLow(1),
+                         sfpAlarmMaskVoltageHigh(2),
+                         sfpAlarmMaskVoltageLow(3),
+                         sfpAlarmMaskTxBiasHigh(4),
+                         sfpAlarmMaskTxBiasLow(5),
+                         sfpAlarmMaskTxPowerHigh(6),
+                         sfpAlarmMaskTxPowerLow(7),
+                         sfpAlarmMaskRxPowerHigh(8),
+                         sfpAlarmMaskRxPowerLow(9)
+                       }
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"This object indicates the Masking of the Alarms of the SFP module.
+		The icomSfpDiagAlarmsMask is a bit map. Any of the alarm and warning flags can
+		be masked by writing a 1 to the corresponding bits.
+	    The various bit positions are:
+		  Bit 0:  Temp High Alarm Mask Set.
+		  Bit 1:  Temp Low Alarm Mask Set.
+		  Bit 2:  Vcc High Alarm Mask Set.
+		  Bit 3:  Vcc Low Alarm Mask Set.
+		  Bit 4:  TX Bias High Alarm Mask Set.
+		  Bit 5:  TX Bias Low Alarm Mask Set.
+		  Bit 6:  TX Power High Alarm Mask Set.
+		  Bit 7:  TX Power Low Alarm Mask Set.
+		  Bit 8:  RX Power High Alarm Mask Set.
+		  Bit 9:  RX Power Low Alarm Mask Set."
+    REFERENCE   "SFP-8472 Table 3.18."
+     ::= { icomSfpDiagEntry 32 }
+
+icomSfpDiagWarnings OBJECT-TYPE
+    SYNTAX        BITS { sfpWarningTempHigh(0),
+                         sfpWarningTempLow(1),
+                         sfpWarningVoltageHigh(2),
+                         sfpWarningVoltageLow(3),
+                         sfpWarningTxBiasHigh(4),
+                         sfpWarningTxBiasLow(5),
+                         sfpWarningTxPowerHigh(6),
+                         sfpWarningTxPowerLow(7),
+                         sfpWarningRxPowerHigh(8),
+                         sfpWarningRxPowerLow(9)
+                       }
+	MAX-ACCESS    read-only
+	STATUS        current
+	DESCRIPTION
+		"This object indicates the Warnings of the SFP module.
+		The icomSfpDiagWarnings is a bit map represented as a sum,  therefore,
+		it can represent multiple failures (Warnings) simultaneously.
+	    The various bit positions are:
+		  Bit 0:  Temp High Warning Set when internal temperature exceeds high warning threshold.
+		  Bit 1:  Temp Low Warning Set when internal temperature is below low warning threshold.
+		  Bit 2:  Vcc High Warning Set when internal supply voltage exceeds high warning threshold.
+		  Bit 3:  Vcc Low Warning Set when internal supply voltage is below low warning threshold.
+		  Bit 4:  TX Bias High Warning Set when TX Bias current exceeds high warning threshold.
+		  Bit 5:  TX Bias Low Warning Set when TX Bias current is below low warning threshold.
+		  Bit 6:  TX Power High Warning Set when TX output power exceeds high warning threshold.
+		  Bit 7:  TX Power Low Warning Set when TX output power is below low warning threshold.
+		  Bit 8:  RX Power High Warning Set when Received Power exceeds high warning threshold.
+		  Bit 9:  RX Power Low Warning Set when Received Power is below low warning threshold."
+    REFERENCE   "SFP-8472 Table 3.18."
+     ::= { icomSfpDiagEntry 33 }
+
+icomSfpDiagWarningsMask OBJECT-TYPE
+    SYNTAX        BITS { sfpWarningMaskTempHigh(0),
+                         sfpWarningMaskTempLow(1),
+                         sfpWarningMaskVoltageHigh(2),
+                         sfpWarningMaskVoltageLow(3),
+                         sfpWarningMaskTxBiasHigh(4),
+                         sfpWarningMaskTxBiasLow(5),
+                         sfpWarningMaskTxPowerHigh(6),
+                         sfpWarningMaskTxPowerLow(7),
+                         sfpWarningMaskRxPowerHigh(8),
+                         sfpWarningMaskRxPowerLow(9)
+                       }
+	MAX-ACCESS    read-write
+	STATUS        current
+	DESCRIPTION
+		"This object indicates the Masking of the Warnings of the SFP module.
+		The icomSfpDiagWarningsMask is a bit map. Any of the alarm and warning flags can
+		be masked by writing a 1 to the corresponding bits.
+	    The various bit positions are:
+		  Bit 0:  Temp High Warning Mask Set.
+		  Bit 1:  Temp Low Warning Mask Set.
+		  Bit 2:  Vcc High Warning Mask Set.
+		  Bit 3:  Vcc Low Warning Mask Set.
+		  Bit 4:  TX Bias High Warning Mask Set.
+		  Bit 5:  TX Bias Low Warning Mask Set.
+		  Bit 6:  TX Power High Warning Mask Set.
+		  Bit 7:  TX Power Low Warning Mask Set.
+		  Bit 8:  RX Power High Warning Mask Set.
+		  Bit 9:  RX Power Low Warning Mask Set."
+    REFERENCE   "SFP-8472 Table 3.18."
+     ::= { icomSfpDiagEntry 34 }
+
+-- -------------------------------------------------------------
+-- The SFP ALS Configuration Table
+-- -------------------------------------------------------------
+
+icomSfpAlsCfgTable	 OBJECT-TYPE
+    SYNTAX       SEQUENCE OF IcomSfpAlsCfgEntry
+    MAX-ACCESS   not-accessible
+    STATUS  	 current
+    DESCRIPTION
+	    "The SFP ALS Configuration table to
+	     configure the attributes of Automatic Laser Shutdown
+         feature."
+    ::= { icomSfpAls 1 }
+
+icomSfpAlsCfgEntry OBJECT-TYPE
+    SYNTAX      IcomSfpAlsCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+	    "An entry in the SFP ALS Configuration table.
+        The index to this table is the same as the ifIndex of the SFP.
+        The SFP ALS Configuration Table contain an entry for each module
+        of a type SFP."
+    INDEX   { icomSfpAlsCfgInterface }
+    ::= { icomSfpAlsCfgTable 1 }
+
+IcomSfpAlsCfgEntry ::=
+    SEQUENCE {
+        icomSfpAlsCfgInterface	        InterfaceIndex,
+        icomSfpAlsCfgRestartMode	        INTEGER,
+        icomSfpAlsCfgPulseInterval              Integer32,
+        icomSfpAlsCfgPulseWidth                 Integer32
+	}
+
+icomSfpAlsCfgInterface OBJECT-TYPE
+    SYNTAX  	    InterfaceIndex
+    MAX-ACCESS      not-accessible
+    STATUS  	    current
+    DESCRIPTION
+	    "The Interface Index of the corresponding system port that uses
+		Optical Transceiver module."
+    ::= { icomSfpAlsCfgEntry 1 }
+
+icomSfpAlsCfgRestartMode    OBJECT-TYPE
+    SYNTAX      INTEGER { disable(1),
+                          auto   (2),
+                          manual (3)
+	                    }
+    MAX-ACCESS  read-write
+    STATUS  	current
+    DESCRIPTION
+	    " o disable: Disabled mode. If mode is disabled, ALS is disabled.
+	        LOS will not cause laser shutdown.
+          o manual: Manual restart mode. The laser is turned off when the ALS agent
+            detects an LOS for 500 ms. After ALS is engaged, a manual command is issued
+            that turns on the laser for the time period of the pulse width.
+            The laser is turned on when the LOS has been cleared for 100 ms.
+          o auto: Automatic restart mode. ?The laser is shut down for the time period
+           of pulse interval after the ALS agent detects a LOS for 500 ms.
+           Then, the laser automatically turns on for the time period of the
+           selected pulse width. If an LOS still exists at that time,
+           the laser is shut down again. This pattern continues until
+           the LOS is cleared for 100 ms; Then, the laser will stay on."
+    DEFVAL { disable }
+    ::= { icomSfpAlsCfgEntry 2 }
+
+icomSfpAlsCfgPulseInterval    OBJECT-TYPE
+    SYNTAX        Integer32 (100..20000)
+    UNITS         "seconds"
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The pulse interval indicates the time period of the ALS restart
+        when the laser transmitter is off at the time between two
+        consecutive laser transmissions and
+        applies to the automatic restart mode only."
+    DEFVAL { 100 }
+    ::= { icomSfpAlsCfgEntry 3 }
+
+icomSfpAlsCfgPulseWidth    OBJECT-TYPE
+    SYNTAX        Integer32 (2..200)
+    UNITS         "seconds"
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The pulse width indicates the time period of the ALS restart
+         that the laser becomes on and applies to the automatic restart mode
+         and manual restart mode."
+    DEFVAL { 2 }
+    ::= { icomSfpAlsCfgEntry 4 }
+
+-- -------------------------------------------------------------
+-- The SFP ALS Status Table
+-- -------------------------------------------------------------
+
+icomSfpAlsStatusTable	 OBJECT-TYPE
+    SYNTAX       SEQUENCE OF IcomSfpAlsStatusEntry
+    MAX-ACCESS   not-accessible
+    STATUS  	 current
+    DESCRIPTION
+	    "The SFP ALS Status table to
+	     get status of ALS feature."
+    ::= { icomSfpAls 2 }
+
+icomSfpAlsStatusEntry OBJECT-TYPE
+    SYNTAX      IcomSfpAlsStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+	    "An entry in the SFP ALS Status table.
+        The index to this table is the same as the ifIndex of the SFP.
+        The SFP ALS Action Table contain an entry for each module
+        of a type SFP."
+    INDEX   { icomSfpAlsCfgInterface }
+    ::= { icomSfpAlsStatusTable 1 }
+
+IcomSfpAlsStatusEntry ::=
+    SEQUENCE {
+        icomSfpAlsStatusOperStatus  INTEGER
+	}
+
+icomSfpAlsStatusOperStatus   OBJECT-TYPE
+    SYNTAX      INTEGER { disable(1),
+                          auto   (2),
+                          manual (3),
+                          idle   (4)
+	                    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Actual Status of the ALS process."
+    ::= { icomSfpAlsStatusEntry 1 }
+
+-- -------------------------------------------------------------
+-- The SFP ALS Action Table
+-- -------------------------------------------------------------
+
+icomSfpAlsActTable	 OBJECT-TYPE
+    SYNTAX       SEQUENCE OF IcomSfpAlsActEntry
+    MAX-ACCESS   not-accessible
+    STATUS  	 current
+    DESCRIPTION
+	    "The SFP ALS Action table to
+	     trigger actions relevant Automatic Laser Shutdown
+         feature."
+    ::= { icomSfpAls 3 }
+
+icomSfpAlsActEntry OBJECT-TYPE
+    SYNTAX      IcomSfpAlsActEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+	    "An entry in the SFP ALS Action table.
+        The index to this table is the same as the ifIndex of the SFP.
+        The SFP ALS Action Table contain an entry for each module
+        of a type SFP."
+    INDEX   { icomSfpAlsCfgInterface }
+    ::= { icomSfpAlsActTable 1 }
+
+IcomSfpAlsActEntry ::=
+    SEQUENCE {
+        icomSfpAlsActManualRestart              TruthValue
+	}
+
+icomSfpAlsActManualRestart   OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Action to trigger the Manual Restart of ALS.
+         Setting to true triggers the ALS Manual Restart."
+    DEFVAL { false }
+    ::= { icomSfpAlsActEntry 1 }
+
+-- Conformance information
+
+--=========================================================
+-- Compliance statement
+--=========================================================
+
+icomSfpMibCompliance  MODULE-COMPLIANCE
+    STATUS            current
+    DESCRIPTION
+        "The compliance statement for icomSfpMib.
+        "
+    MODULE -- This Module
+    MANDATORY-GROUPS { icomSfpGroup,
+                       icomSfpNotificationsGroup }
+    ::= { icomSfpMibCompliances 1 }
+
+icomSfpGroup OBJECT-GROUP
+    OBJECTS {
+        icomSfpInvId,
+        icomSfpInvExtId,
+        icomSfpInvConnectorCode,
+        icomSfpInv10GPlusInfinibandCompliance,
+        icomSfpInvEsconCompliance,
+        icomSfpInvSonetCompliance,
+        icomSfpInvGbeCompliance,
+        icomSfpInvFcLLCompliance,
+		icomSfpInvFcTechCompliance,
+		icomSfpInvSFPplusCableCompliance,
+		icomSfpInvFcTxMediaCompliance,
+		icomSfpInvFcSpeedCompliance,
+        icomSfpInvEncodingCode,
+        icomSfpInvNominalBitRate,
+        icomSfpInvRateId,
+        icomSfpInvLengthSMFKm,
+        icomSfpInvLengthSMF100m,
+        icomSfpInvLength50u10m,
+        icomSfpInvLength62u10m,
+        icomSfpInvLengthCopper1m,
+        icomSfpInvLength50u10mOM3,
+        icomSfpInvVendorName,
+        icomSfpInvVendorOUI,
+        icomSfpInvVendorPN,
+        icomSfpInvVendorRev,
+        icomSfpInvWaveLength,
+        icomSfpInvExtendedOptions,
+        icomSfpInvMaxBitRate,
+        icomSfpInvMinBitRate,
+        icomSfpInvVendorSN,
+        icomSfpInvDateCode,
+        icomSfpInvDiagnosticMonitoring,
+        icomSfpInvEnhanceOptions,
+        icomSfpInv8472Compliance,
+        icomSfpInvTransceiverCodes,
+
+        icomSfpDiagHighTempAlmThreshold,
+        icomSfpDiagLowTempAlmThreshold,
+        icomSfpDiagHighTempWrnThreshold,
+        icomSfpDiagLowTempWrnThreshold,
+        icomSfpDiagHighVoltAlmThreshold,
+        icomSfpDiagLowVoltAlmThreshold,
+        icomSfpDiagHighVoltWrnThreshold,
+        icomSfpDiagLowVoltWrnThreshold,
+        icomSfpDiagHighTxBiasAlmThreshold,
+        icomSfpDiagLowTxBiasAlmThreshold,
+        icomSfpDiagHighTxBiasWrnThreshold,
+        icomSfpDiagLowTxBiasWrnThreshold,
+        icomSfpDiagHighTxPowerAlmThreshold,
+        icomSfpDiagLowTxPowerAlmThreshold,
+        icomSfpDiagHighTxPowerWrnThreshold,
+        icomSfpDiagLowTxPowerWrnThreshold,
+        icomSfpDiagHighRxPowerAlmThreshold,
+        icomSfpDiagLowRxPowerAlmThreshold,
+        icomSfpDiagHighRxPowerWrnThreshold,
+        icomSfpDiagLowRxPowerWrnThreshold,
+        icomSfpDiagModuleTemperature,
+        icomSfpDiagSupplyVoltage,
+        icomSfpDiagTxBias,
+        icomSfpDiagTxOutputPower,
+        icomSfpDiagRxInputPower,
+        icomSfpDiagRxLOSPinOut,
+        icomSfpDiagTxFaultPinOut,
+        icomSfpDiagRateSelectPinIn,
+        icomSfpDiagTxDisablePinIn,
+        icomSfpDiagAlarms,
+        icomSfpDiagAlarmsMask,
+        icomSfpDiagWarnings,
+        icomSfpDiagWarningsMask,
+
+        icomSfpAlsCfgRestartMode,
+        icomSfpAlsCfgPulseInterval,
+        icomSfpAlsCfgPulseWidth,
+
+        icomSfpAlsStatusOperStatus,
+
+        icomSfpAlsActManualRestart
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects for icomSfpMib."
+    ::= { icomSfpMibGroups 1 }
+
+icomSfpNotificationsGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        icomSfpAlarmsTrap,
+        icomSfpWarningsTrap
+    }
+    STATUS	current
+    DESCRIPTION
+        "A collection of SFP Diagnostics Notifications."
+    ::= { icomSfpMibGroups 2 }
+
+
+END
