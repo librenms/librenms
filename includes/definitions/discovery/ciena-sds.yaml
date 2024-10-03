@@ -12,14 +12,12 @@ modules:
                 value: cienaCesChassisCPUHealthCurrMeasurement
                 num_oid: '.1.3.6.1.4.1.1271.2.1.5.1.2.1.4.5.1.4.{{ $index }}'
                 descr: 'Slot {{ $subindex1 }} CPU'
-                snmp_flags: '-OQUsbe'
             -
                 oid: wwpLeosSystemCpuUtilization
                 value: wwpLeosSystemCpuUtilizationLast5Seconds
                 num_oid: '.1.3.6.1.4.1.6141.2.60.12.1.11.1.{{ $index }}'
                 descr: 'CPU Utilization 5'
                 index: cpu5.{{ $index }}
-                snmp_flags: '-OQUsbe'
                 #low_limit: wwpLeosSystemCpuUtilizationLast5SecondsMinimum
                 #high_limit: wwpLeosSystemCpuUtilizationLast5SecondsMaximum
             -
@@ -91,7 +89,6 @@ modules:
                     descr: cienaCesChassisFanTempName
                     low_limit: cienaCesChassisFanTempLoThreshold
                     high_limit: cienaCesChassisFanTempHiThreshold
-                    snmp_flags: '-OQUsbe'
                     group: 'Fans'
                 -
                     oid: cienaCesChassisIomTempHealthTable
@@ -100,7 +97,6 @@ modules:
                     descr: 'Slot {{ $subindex1 }} I/O Module'
                     low_limit: cienaCesChassisIomTempHealthMinThreshold
                     high_limit: cienaCesChassisIomTempHealthMaxThreshold
-                    snmp_flags: '-OQUsbe'
                     group: 'I/O Modules'
                 -
                     oid: cienaCesModuleTempSensorTable
@@ -110,7 +106,6 @@ modules:
                     low_limit: cienaCesModuleSensorLowTempThreshold
                     high_limit: cienaCesModuleSensorHighTempThreshold
                     index: 'module-temp-{{ $index }}'
-                    snmp_flags: '-OQUsbe'
                     group: 'Modules'
                 -
                     oid: cienaCesPortXcvrTable
@@ -121,7 +116,6 @@ modules:
                     entPhysicalIndex_measured: 'ports'
                     low_limit: cienaCesPortXcvrLowTempAlarmThreshold
                     high_limit: cienaCesPortXcvrHighTempAlarmThreshold
-                    snmp_flags: '-OQUsbe'
                     group: 'Transceivers'
                     skip_values:
                         -
@@ -153,7 +147,6 @@ modules:
                     entPhysicalIndex: '51{{ $subindex1 }}'
                     descr: cienaCesChassisFanName
                     low_limit: cienaCesChassisFanMinSpeed
-                    snmp_flags: '-OQUsbe'
         voltage:
             data:
                 -
@@ -167,7 +160,6 @@ modules:
                     divisor: 1000
                     group: 'Power Supplies'
                     index: 'psu-v-{{ $index }}'
-                    snmp_flags: '-OQUsbe'
                 -
                     oid: cienaCesPortXcvrTable
                     value: cienaCesPortXcvrVcc
@@ -178,7 +170,6 @@ modules:
                     low_limit: cienaCesPortXcvrLowVccAlarmThreshold
                     high_limit: cienaCesPortXcvrHighVccAlarmThreshold
                     divisor: 1000
-                    snmp_flags: '-OQUsbe'
                     group: 'Transceivers'
                     index: 'xcvr-vcc-{{ $index }}'
                     skip_values:
@@ -198,7 +189,6 @@ modules:
                     low_limit: 0
                     high_limit: cienaCesPortXcvrHighBiasAlarmThreshold
                     divisor: 1000
-                    snmp_flags: '-OQUsbe'
                     group: 'Transceivers'
                     index: 'xcvr-i-{{ $index }}'
                     skip_values:
@@ -218,7 +208,6 @@ modules:
                     low_limit: cienaCesPortXcvrLowRxPwAlarmThreshold
                     high_limit: cienaCesPortXcvrHighRxPwAlarmThreshold
                     divisor: 1000000
-                    snmp_flags: '-OQUsbe'
                     group: 'Transceiver Rx Power'
                     index: 'rx-{{ $index }}'
                     skip_values:
@@ -236,7 +225,6 @@ modules:
                     low_limit: -1
                     high_limit: cienaCesPortXcvrHighRxPwAlarmThreshold
                     divisor: 1000000
-                    snmp_flags: '-OQUsbe'
                     group: 'Transceiver Rx Power'
                     index: 'rx2-{{ $index }}'
                     skip_values:
@@ -254,7 +242,6 @@ modules:
                     low_limit: cienaCesPortXcvrLowTxPwAlarmThreshold
                     high_limit: cienaCesPortXcvrHighTxPwAlarmThreshold
                     divisor: 1000000
-                    snmp_flags: '-OQUsbe'
                     group: 'Transceiver Tx Power'
                     index: 'tx-{{ $index }}'
                     skip_values:
@@ -275,7 +262,6 @@ modules:
                     descr: 'Slot {{ $subindex1 }} MAC Table Entries'
                     low_limit: 0
                     high_limit: cienaCesChassisMACHealthMaxThreshold
-                    snmp_flags: '-OQUsbe'
                     group: 'Service Line Modules'
         state:
             data:
@@ -290,7 +276,6 @@ modules:
                         - { value: 2, generic: 1, graph: 0, descr: warning }
                         - { value: 3, generic: 1, graph: 0, descr: degraded }
                         - { value: 4, generic: 1, graph: 0, descr: faulted }
-                    snmp_flags: '-OQUsbe'
                     group: 'CPU'
                 -
                     oid: wwpLeosSystemCpuUtilization
@@ -303,7 +288,6 @@ modules:
                         - { value: 2, generic: 1, graph: 0, descr: warning }
                         - { value: 3, generic: 1, graph: 0, descr: degraded }
                         - { value: 4, generic: 1, graph: 0, descr: faulted }
-                    snmp_flags: '-OQUsbe'
                     group: 'CPU'
                 -
                     oid: wwpLeosSystemCpuUtilization
@@ -316,7 +300,6 @@ modules:
                         - { value: 2, generic: 1, graph: 0, descr: warning }
                         - { value: 3, generic: 1, graph: 0, descr: degraded }
                         - { value: 4, generic: 1, graph: 0, descr: faulted }
-                    snmp_flags: '-OQUsbe'
                     group: 'CPU'
                 -
                     oid: cienaCesPortXcvrTable
@@ -339,7 +322,6 @@ modules:
                         - { value: 1, generic: 0, graph: 0, descr: disabled }
                         - { value: 2, generic: 0, graph: 0, descr: generic }
                         - { value: 3, generic: 0, graph: 0, descr: enhanced }
-                    snmp_flags: '-OQUsbe'
                     group: 'Transceiver FEC Mode'
                 -
                     oid: cienaCesPortXcvrTable
@@ -361,7 +343,6 @@ modules:
                     states:
                         - { value: 1, generic: 0, graph: 0, descr: enabled }
                         - { value: 2, generic: 0, graph: 0, descr: disabled }
-                    snmp_flags: '-OQUsbe'
                     group: 'Transceiver Tx State'
                 -
                     oid: cienaCesPortXcvrTable
@@ -383,7 +364,6 @@ modules:
                     states:
                         - { value: 1, generic: 2, graph: 0, descr: fault }
                         - { value: 2, generic: 0, graph: 0, descr: noFault }
-                    snmp_flags: '-OQUsbe'
                     group: 'Transceiver Tx Fault'
                 -
                     oid: cienaCesPremiumFeatureStatusTable
@@ -399,7 +379,6 @@ modules:
                         - { value: 3, generic: 0, graph: 0, descr: fullyActive }
                         - { value: 4, generic: 1, graph: 0, descr: someLicenseKeyMissing }
                         - { value: 5, generic: 1, graph: 0, descr: licenseViolation }
-                    snmp_flags: '-OQUsbe'
                     group: 'License Status'
                 -
                     oid: cienaCesChassisProcessHealthTable
@@ -413,7 +392,6 @@ modules:
                         - { value: 3, generic: 1, graph: 0, descr: warning }
                         - { value: 4, generic: 1, graph: 0, descr: degraded }
                         - { value: 5, generic: 2, graph: 0, descr: faulted }
-                    snmp_flags: '-OQUsbe'
                     group: 'Process Health'
                 -
                     oid: cienaCesChassisThreadHealthTable
@@ -427,7 +405,6 @@ modules:
                         - { value: 3, generic: 1, graph: 0, descr: warning }
                         - { value: 4, generic: 1, graph: 0, descr: degraded }
                         - { value: 5, generic: 2, graph: 0, descr: faulted }
-                    snmp_flags: '-OQUsbe'
                     group: 'Thread Health'
                 -
                     oid: cienaCesChassisFanTrayTable
@@ -442,7 +419,6 @@ modules:
                         - { value: 3, generic: 2, graph: 0, descr: rpm-warning }
                         - { value: 4, generic: 2, graph: 0, descr: uninstalled }
                         - { value: 5, generic: 3, graph: 0, descr: unknown }
-                    snmp_flags: '-OQUsbe'
                     group: 'Fan Trays'
                 -
                     oid: cienaCesChassisFanTable
@@ -456,7 +432,6 @@ modules:
                         - { value: 3, generic: 2, graph: 0, descr: rpm-warning }
                         - { value: 4, generic: 2, graph: 0, descr: uninstalled }
                         - { value: 5, generic: 3, graph: 0, descr: unknown }
-                    snmp_flags: '-OQUsbe'
                     group: 'Fans'
                 -
                     oid: cienaCesChassisPowerOutputVoltageHealthTable
@@ -469,7 +444,6 @@ modules:
                         - { value: 3, generic: 1, graph: 0, descr: warning }
                         - { value: 4, generic: 1, graph: 0, descr: degraded }
                         - { value: 5, generic: 2, graph: 0, descr: faulted }
-                    snmp_flags: '-OQUsbe'
                     group: 'Power Supplies'
                 -
                     oid: cienaCesChassisPowerTable
@@ -483,7 +457,6 @@ modules:
                         - { value: 3, generic: 1, graph: 0, descr: unequipped }
                         - { value: 99, generic: 3, graph: 0, descr: unknown }
                     skip_values: 99
-                    snmp_flags: '-OQUsbe'
                     group: 'Power Supplies'
                 -
                     oid: cienaCesChassisPowerTable
@@ -600,7 +573,6 @@ modules:
                         - { value: 3, generic: 1, graph: 0, descr: warning }
                         - { value: 4, generic: 1, graph: 0, descr: degraded }
                         - { value: 5, generic: 2, graph: 0, descr: faulted }
-                    snmp_flags: '-OQUsbe'
                     group: 'Disk'
                     skip_values:
                         -
@@ -619,7 +591,6 @@ modules:
                         - { value: 3, generic: 1, graph: 0, descr: warning }
                         - { value: 4, generic: 1, graph: 0, descr: degraded }
                         - { value: 5, generic: 2, graph: 0, descr: faulted }
-                    snmp_flags: '-OQUsbe'
                     group: 'Disk'
                     skip_values:
                         -
@@ -638,7 +609,6 @@ modules:
                         - { value: 3, generic: 1, graph: 0, descr: warning }
                         - { value: 4, generic: 1, graph: 0, descr: degraded }
                         - { value: 5, generic: 2, graph: 0, descr: faulted }
-                    snmp_flags: '-OQUsbe'
                     group: 'Disk'
                     skip_values:
                         -
@@ -657,7 +627,6 @@ modules:
                         - { value: 3, generic: 1, graph: 0, descr: warning }
                         - { value: 4, generic: 1, graph: 0, descr: degraded }
                         - { value: 5, generic: 2, graph: 0, descr: faulted }
-                    snmp_flags: '-OQUsbe'
                     group: 'Power Supplies'
                     skip_values:
                         -
@@ -676,7 +645,6 @@ modules:
                         - { value: 3, generic: 1, graph: 0, descr: warning }
                         - { value: 4, generic: 1, graph: 0, descr: degraded }
                         - { value: 5, generic: 2, graph: 0, descr: faulted }
-                    snmp_flags: '-OQUsbe'
                     group: 'Power Supplies'
                     skip_values:
                         -
@@ -695,7 +663,6 @@ modules:
                         - { value: 3, generic: 1, graph: 0, descr: warning }
                         - { value: 4, generic: 1, graph: 0, descr: degraded }
                         - { value: 5, generic: 2, graph: 0, descr: faulted }
-                    snmp_flags: '-OQUsbe'
                     group: 'Power Supplies'
                     skip_values:
                         -
@@ -714,7 +681,6 @@ modules:
                         - { value: 3, generic: 1, graph: 0, descr: warning }
                         - { value: 4, generic: 1, graph: 0, descr: degraded }
                         - { value: 5, generic: 2, graph: 0, descr: faulted }
-                    snmp_flags: '-OQUsbe'
                     group: 'Power Supplies'
                     skip_values:
                         -
@@ -733,7 +699,6 @@ modules:
                         - { value: 3, generic: 1, graph: 0, descr: warning }
                         - { value: 4, generic: 1, graph: 0, descr: degraded }
                         - { value: 5, generic: 2, graph: 0, descr: faulted }
-                    snmp_flags: '-OQUsbe'
                     group: 'Power Supplies'
                     skip_values:
                         -
@@ -752,7 +717,6 @@ modules:
                         - { value: 3, generic: 1, graph: 0, descr: warning }
                         - { value: 4, generic: 1, graph: 0, descr: degraded }
                         - { value: 5, generic: 2, graph: 0, descr: faulted }
-                    snmp_flags: '-OQUsbe'
                     group: 'Power Supplies'
                     skip_values:
                         -
@@ -771,7 +735,6 @@ modules:
                         - { value: 3, generic: 1, graph: 0, descr: warning }
                         - { value: 4, generic: 1, graph: 0, descr: degraded }
                         - { value: 5, generic: 2, graph: 0, descr: faulted }
-                    snmp_flags: '-OQUsbe'
                     group: 'Power Supplies'
                     skip_values:
                         -
@@ -790,7 +753,6 @@ modules:
                         - { value: 3, generic: 1, graph: 0, descr: warning }
                         - { value: 4, generic: 1, graph: 0, descr: degraded }
                         - { value: 5, generic: 2, graph: 0, descr: faulted }
-                    snmp_flags: '-OQUsbe'
                     group: 'Switch Modules'
                 -
                     oid: cienaCesChassisSMHealthTable
@@ -804,7 +766,6 @@ modules:
                         - { value: 3, generic: 1, graph: 0, descr: warning }
                         - { value: 4, generic: 1, graph: 0, descr: degraded }
                         - { value: 5, generic: 2, graph: 0, descr: faulted }
-                    snmp_flags: '-OQUsbe'
                     group: 'Switch Modules'
                 -
                     oid: cienaCesChassisMemoryHealthTable
@@ -818,7 +779,6 @@ modules:
                         - { value: 3, generic: 1, graph: 0, descr: warning }
                         - { value: 4, generic: 1, graph: 0, descr: degraded }
                         - { value: 5, generic: 2, graph: 0, descr: faulted }
-                    snmp_flags: '-OQUsbe'
                     group: 'Memory'
                     skip_values:
                         -
@@ -837,7 +797,6 @@ modules:
                         - { value: 3, generic: 1, graph: 0, descr: warning }
                         - { value: 4, generic: 1, graph: 0, descr: degraded }
                         - { value: 5, generic: 2, graph: 0, descr: faulted }
-                    snmp_flags: '-OQUsbe'
                     group: 'Memory'
                     skip_values:
                         -
@@ -856,7 +815,6 @@ modules:
                         - { value: 3, generic: 1, graph: 0, descr: warning }
                         - { value: 4, generic: 1, graph: 0, descr: degraded }
                         - { value: 5, generic: 2, graph: 0, descr: faulted }
-                    snmp_flags: '-OQUsbe'
                     group: 'Memory'
                     skip_values:
                         -
@@ -875,7 +833,6 @@ modules:
                         - { value: 3, generic: 1, graph: 0, descr: warning }
                         - { value: 4, generic: 1, graph: 0, descr: degraded }
                         - { value: 5, generic: 2, graph: 0, descr: faulted }
-                    snmp_flags: '-OQUsbe'
                     group: 'Memory'
                     skip_values:
                         -
@@ -894,7 +851,6 @@ modules:
                         - { value: 3, generic: 1, graph: 0, descr: warning }
                         - { value: 4, generic: 1, graph: 0, descr: degraded }
                         - { value: 5, generic: 2, graph: 0, descr: faulted }
-                    snmp_flags: '-OQUsbe'
                     group: 'Memory'
                     skip_values:
                         -
@@ -913,7 +869,6 @@ modules:
                         - { value: 3, generic: 1, graph: 0, descr: warning }
                         - { value: 4, generic: 1, graph: 0, descr: degraded }
                         - { value: 5, generic: 2, graph: 0, descr: faulted }
-                    snmp_flags: '-OQUsbe'
                     group: 'Memory'
                     skip_values:
                         -
@@ -932,7 +887,6 @@ modules:
                         - { value: 3, generic: 1, graph: 0, descr: warning }
                         - { value: 4, generic: 1, graph: 0, descr: degraded }
                         - { value: 5, generic: 2, graph: 0, descr: faulted }
-                    snmp_flags: '-OQUsbe'
                     group: 'CPU'
                 -
                     oid: cienaCesRapsVirtualRingTable
@@ -947,7 +901,6 @@ modules:
                         - { value: 4, generic: 1, graph: 0, descr: recovering }
                         - { value: 5, generic: 1, graph: 0, descr: init }
                         - { value: 6, generic: 3, graph: 0, descr: none }
-                    snmp_flags: '-OQUsbe'
                     group: 'G.8032'
                 -
                     oid: cienaCesRapsVirtualRingTable
@@ -964,7 +917,6 @@ modules:
                         - { value: 6, generic: 1, graph: 0, descr: provisioningMismatch }
                         - { value: 7, generic: 1, graph: 0, descr: noRapsPduReceived }
                         - { value: 8, generic: 1, graph: 0, descr: noRplOwnerDetected }
-                    snmp_flags: '-OQUsbe'
                     group: 'G.8032'
                 -
                     oid: cienaCesRapsVirtualRingTable
@@ -976,7 +928,6 @@ modules:
                         - { value: 1, generic: 1, graph: 0, descr: disabled }
                         - { value: 2, generic: 0, graph: 0, descr: forwarding }
                         - { value: 3, generic: 0, graph: 0, descr: blocked }
-                    snmp_flags: '-OQUsbe'
                     group: 'G.8032'
                 -
                     oid: cienaCesRapsVirtualRingTable
@@ -988,7 +939,6 @@ modules:
                         - { value: 1, generic: 1, graph: 0, descr: disabled }
                         - { value: 2, generic: 0, graph: 0, descr: forwarding }
                         - { value: 3, generic: 0, graph: 0, descr: blocked }
-                    snmp_flags: '-OQUsbe'
                     group: 'G.8032'
                 -
                     oid: cienaCesRapsVirtualRingTable
@@ -1003,7 +953,6 @@ modules:
                         - { value: 4, generic: 0, graph: 0, descr: localForceSwitch }
                         - { value: 5, generic: 0, graph: 0, descr: remoteForceSwitch }
                         - { value: 6, generic: 1, graph: 0, descr: remoteSignalFailure }
-                    snmp_flags: '-OQUsbe'
                     group: 'G.8032'
                 -
                     oid: cienaCesRapsVirtualRingTable
@@ -1018,5 +967,4 @@ modules:
                         - { value: 4, generic: 0, graph: 0, descr: localForceSwitch }
                         - { value: 5, generic: 0, graph: 0, descr: remoteForceSwitch }
                         - { value: 6, generic: 1, graph: 0, descr: remoteSignalFailure }
-                    snmp_flags: '-OQUsbe'
                     group: 'G.8032'
