@@ -25,6 +25,7 @@
 
 namespace LibreNMS\OS;
 
+use App\Models\Transceiver;
 use App\Models\AccessPoint;
 use App\Models\Device;
 use App\Models\EntPhysical;
