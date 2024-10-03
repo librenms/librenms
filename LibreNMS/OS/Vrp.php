@@ -70,8 +70,6 @@ class Vrp extends OS implements
 {
     use SyncsModels;
     use EntityMib {EntityMib::discoverEntityPhysical as discoverBaseEntityPhysical;}
-    use Illuminate\Support\Collection;
-    use SnmpQuery;
 
     public function discoverEntityPhysical(): Collection
     {
