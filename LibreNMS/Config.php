@@ -32,9 +32,12 @@ use Illuminate\Database\QueryException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use LibreNMS\Data\Store\Rrd;
+use LibreNMS\DB\Eloquent;
 use LibreNMS\Util\Debug;
+use LibreNMS\Util\Notifications;
 use LibreNMS\Util\Version;
 use Log;
+use Symfony\Component\Process\Process;
 
 class Config
 {
@@ -138,6 +141,60 @@ class Config
         }
 
         return Arr::get(self::$config, $key, $default);
+    }
+
+    public static function getExecutable(string $key): string
+    {
+        $binary = self::get($key, $key);
+
+        if (Str::startsWith($binary, '/')) {
+            return $binary;
+        }
+
+        $process = new Process(['whereis', '-b', $binary]);
+        $process->run();
+        if ($process->getExitCode() === 0) {
+            $output = trim($process->getOutput());
+            $list = substr($output, strpos($output, ':') + 1);
+            $possible_targets = explode(' ', $list);
+        } else {
+            $process = new Process(['which', $binary]);
+            $process->run();
+            $possible_targets = [trim($process->getOutput())];
+        }
+
+        foreach ($possible_targets as $target) {
+            if (is_executable($target)) {
+                self::persist($key, $target);
+
+                return $target;
+            }
+        }
+
+        if (Eloquent::isConnected()) {
+            Notifications::create(
+                'Missing executable',
+                "The executable: $binary, cannot be found in your \$PATH, please make sure you install it!",
+                'Config',
+                1
+            );
+        }
+
+        return $binary;
+    }
+
+    public static function getAllExecutables(): array
+    {
+        $definitions = self::getDefinitions();
+        $executables = [];
+
+        foreach ($definitions as $key => $definition) {
+            if ($definition['type'] == 'executable') {
+                $executables[$key] = $definition['default'];
+            }
+        }
+
+        return $executables;
     }
 
     /**
@@ -460,13 +517,6 @@ class Config
             self::persist('device_display_default', $display_value);
         }
 
-        // make sure we have full path to binaries in case PATH isn't set
-        foreach (['fping', 'fping6', 'snmpgetnext', 'rrdtool', 'traceroute'] as $bin) {
-            if (! is_executable(self::get($bin))) {
-                self::persist($bin, self::locateBinary($bin));
-            }
-        }
-
         if (! self::has('rrdtool_version')) {
             self::persist('rrdtool_version', Rrd::version());
         }
@@ -513,28 +563,6 @@ class Config
             }
             self::set($new, self::get($old));
         }
-    }
-
-    /**
-     * Locate the actual path of a binary
-     *
-     * @param  string  $binary
-     * @return mixed
-     */
-    public static function locateBinary($binary)
-    {
-        if (! Str::contains($binary, '/')) {
-            $output = `whereis -b $binary`;
-            $list = trim(substr($output, strpos($output, ':') + 1));
-            $targets = explode(' ', $list);
-            foreach ($targets as $target) {
-                if (is_executable($target)) {
-                    return $target;
-                }
-            }
-        }
-
-        return $binary;
     }
 
     private static function populateTime()
