@@ -521,13 +521,6 @@
             "order": 5,
             "type": "boolean"
         },
-        "auth_ad_debug": {
-            "default": false,
-            "group": "auth",
-            "section": "ad",
-            "order": 20,
-            "type": "boolean"
-        },
         "auth_ad_domain": {
             "group": "auth",
             "section": "ad",
@@ -590,13 +583,6 @@
             "validate": {
                 "value": ["regex:#^ldaps?://([-0-9a-zA-Z_.]+|\\[[a-fA-F0-9:]{3,39}\\])(:\\d+)?(\\s+ldaps?://([-0-9a-zA-Z_.]+|\\[[a-fA-F0-9:]{3,39}\\])(:\\d+)?)*$#"]
             }
-        },
-        "auth_ad_require_groupmembership": {
-            "default": false,
-            "group": "auth",
-            "section": "ad",
-            "order": 8,
-            "type": "boolean"
         },
         "auth_ad_starttls": {
             "default": "disabled",
@@ -4877,14 +4863,6 @@
             "section": "nfsen",
             "order": 0,
             "type": "boolean"
-        },
-
-        "nfsen_base": {
-            "default": "/var/nfsen/",
-            "group": "external",
-            "section": "nfsen",
-            "order": 1,
-            "type": "text"
         },
         "nfsen_rrds": {
             "default": [
