@@ -1501,7 +1501,7 @@ parameters:
 				#^Call to deprecated function dbFetchCell\\(\\)\\:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
 			"""
-			count: 6
+			count: 10
 			path: includes/discovery/vrf.inc.php
 
 		-
@@ -1509,7 +1509,7 @@ parameters:
 				#^Call to deprecated function dbFetchRow\\(\\)\\:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
 			"""
-			count: 3
+			count: 4
 			path: includes/discovery/vrf.inc.php
 
 		-
@@ -1525,7 +1525,7 @@ parameters:
 				#^Call to deprecated function dbInsert\\(\\)\\:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
 			"""
-			count: 3
+			count: 4
 			path: includes/discovery/vrf.inc.php
 
 		-
@@ -1533,7 +1533,7 @@ parameters:
 				#^Call to deprecated function dbUpdate\\(\\)\\:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
 			"""
-			count: 7
+			count: 9
 			path: includes/discovery/vrf.inc.php
 
 		-
