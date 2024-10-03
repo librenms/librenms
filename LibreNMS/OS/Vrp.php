@@ -96,7 +96,7 @@ class Vrp extends OS implements
 
         return $inventory;
     }
-    
+
     public function discoverTransceivers(): Collection
     {
         // Get a map of ifIndex to port_id for proper association with ports
