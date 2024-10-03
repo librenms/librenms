@@ -35,5 +35,4 @@ foreach ($pre_cache['infineragroove_portTable'] as $index => $data) {
         $value = $data['portTxOpticalPower'];
         discover_sensor(null, 'dbm', $device, $oid, 'portTxOpticalPower.' . $index, 'infinera-groove', $descr, null, '1', null, null, null, null, $value);
     }
-
 }
