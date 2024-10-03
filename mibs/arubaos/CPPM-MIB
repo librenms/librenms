@@ -1,0 +1,1707 @@
+-- CPPM 6.7.0.XXXXX
+-- vim:set ts=4 sw=4:
+CPPM-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+       TEXTUAL-CONVENTION FROM SNMPv2-TC 
+
+       MODULE-IDENTITY,
+       OBJECT-TYPE,
+       snmpModules,
+       Integer32,
+	   Counter32,
+	   Counter64,
+	   IpAddress,
+       TimeTicks,
+	   NOTIFICATION-TYPE
+           FROM SNMPv2-SMI
+
+       DisplayString,
+	   MacAddress
+           FROM SNMPv2-TC
+
+       OBJECT-GROUP
+           FROM SNMPv2-CONF
+	   clearpass 
+			FROM ARUBA-MIB;
+
+   cppmMIB MODULE-IDENTITY 
+       LAST-UPDATED "0611272030Z"
+       ORGANIZATION "Aruba Wireless Networks"
+       CONTACT-INFO
+            "Postal:    1322 Crossman Avenue
+                        Sunnyvale, CA 94089	
+            E-mail:     dl-support@arubanetworks.com
+            Phone:      +1 408 227 4500"
+       DESCRIPTION
+           "This MIB module defines MIB objects which provide
+            information about ClearPass system." 
+       REVISION        "0611272030Z"
+       DESCRIPTION
+           "The initial revision."
+       ::= { clearpass 1 }
+
+    cppmServerInfoGroup OBJECT IDENTIFIER ::= { cppmMIB 1 }       
+    cppmProcInfoGroup OBJECT IDENTIFIER ::= { cppmMIB 2 }
+    cppmNetworkInfoGroup OBJECT IDENTIFIER ::= { cppmMIB 3 }
+
+    cppmTraps OBJECT IDENTIFIER ::= { cppmMIB 200 }
+
+    cppmSystemTable  OBJECT-TYPE 
+	  SYNTAX       SEQUENCE OF CppmSystemTableEntry 
+	  MAX-ACCESS   not-accessible
+      STATUS       current 
+      DESCRIPTION 
+	  	"
+			This table lists ClearPass System entries.
+		"
+	
+      ::= { cppmServerInfoGroup 1 } 
+
+    cppmSystemTableEntry OBJECT-TYPE 
+       SYNTAX       CppmSystemTableEntry 
+       MAX-ACCESS   not-accessible
+       STATUS       current 
+       DESCRIPTION 
+             "
+                This table lists CPPM System attributes
+             "
+          INDEX { cppmSystemIdx }
+       ::= { cppmSystemTable 1 } 
+
+   CppmSystemTableEntry ::=
+   SEQUENCE {
+        cppmSystemModel          DisplayString,
+        cppmSystemSerialNumber   DisplayString,
+        cppmSystemVersion        DisplayString,
+        cppmSystemHostname       DisplayString,
+        cppmClusterNodeType      DisplayString,
+        cppmZoneName             DisplayString,
+        cppmNumClusterNodes      Integer32,
+        cppmNwMgmtPortIPAddress  IpAddress,
+        cppmNwMgmtPortMACAddress DisplayString,
+        cppmNwDataPortIPAddress  IpAddress,
+        cppmNwDataPortMACAddress DisplayString,
+        cppmSystemMemoryTotal    Counter64,
+        cppmSystemMemoryFree     Counter64,
+        cppmSystemDiskSpaceTotal Counter64,
+        cppmSystemDiskSpaceFree  Counter64,
+        cppmSystemNumCPUs        Integer32,
+        cppmSystemUptime         TimeTicks,
+        cppmSystemIdx            Integer32,
+        cppmHardwareFanStatus DisplayString,
+	cppmHardwarePowerStatus DisplayString,
+	cppmHardwarePowerStatusDetails DisplayString,
+        cppmHardwareDiskStatus DisplayString	
+   }
+
+   cppmSystemModel OBJECT-TYPE
+       SYNTAX      DisplayString(SIZE(0..64))
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "ClearPass server model"
+       ::= { cppmSystemTableEntry 1 }
+
+   cppmSystemSerialNumber OBJECT-TYPE
+       SYNTAX      DisplayString(SIZE(0..255))
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "ClearPass server serial number"
+       ::= { cppmSystemTableEntry 2 }
+
+   cppmSystemVersion OBJECT-TYPE
+       SYNTAX      DisplayString(SIZE(0..64))
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "ClearPass server product version"
+       ::= { cppmSystemTableEntry 3 }
+
+   cppmSystemHostname OBJECT-TYPE
+       SYNTAX      DisplayString(SIZE(0..64))
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "ClearPass server hostname"
+       ::= { cppmSystemTableEntry 4 }
+
+   cppmClusterNodeType OBJECT-TYPE
+       SYNTAX      DisplayString(SIZE(0..64))
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "ClearPass cluster node type"
+       ::= { cppmSystemTableEntry 5 }
+
+   cppmZoneName OBJECT-TYPE
+       SYNTAX      DisplayString(SIZE(0..64))
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "ClearPass zone name"
+       ::= { cppmSystemTableEntry 6 }
+
+   cppmNumClusterNodes OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Total number of nodes in the ClearPass cluster"
+       ::= { cppmSystemTableEntry 7 }
+
+   cppmNwMgmtPortIPAddress OBJECT-TYPE
+       SYNTAX      IpAddress 
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "ClearPass server management port IP Address"
+       ::= { cppmSystemTableEntry 8 }
+
+   cppmNwMgmtPortMACAddress OBJECT-TYPE
+       SYNTAX       DisplayString(SIZE(0..18))
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+            "ClearPass server management port MAC Address"
+      ::= { cppmSystemTableEntry 9 }
+
+   cppmNwDataPortIPAddress OBJECT-TYPE
+       SYNTAX      IpAddress 
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "ClearPass server data port IP Address"
+       ::= { cppmSystemTableEntry 10 }
+
+   cppmNwDataPortMACAddress OBJECT-TYPE
+       SYNTAX       DisplayString(SIZE(0..18))
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+            "ClearPass server data port MAC Address"
+      ::= { cppmSystemTableEntry 11 }
+
+   cppmSystemMemoryTotal OBJECT-TYPE
+       SYNTAX      Counter64
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Total amount of memory available (bytes) in the ClearPass server"
+       ::= { cppmSystemTableEntry 12 }
+
+   cppmSystemMemoryFree OBJECT-TYPE
+       SYNTAX      Counter64 
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Amount of free memory (bytes) in the ClearPass server"
+       ::= { cppmSystemTableEntry 13 }
+
+   cppmSystemDiskSpaceTotal OBJECT-TYPE
+       SYNTAX      Counter64
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Total amount of disk space available (bytes) in the ClearPass server"
+       ::= { cppmSystemTableEntry 14 }
+
+   cppmSystemDiskSpaceFree OBJECT-TYPE
+       SYNTAX      Counter64
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Amount of free disk space (bytes) in the ClearPass server"
+       ::= { cppmSystemTableEntry 15 }
+
+   cppmSystemNumCPUs OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Total number of CPUs in the ClearPass server"
+       ::= { cppmSystemTableEntry 16 }
+
+   cppmSystemUptime OBJECT-TYPE
+       SYNTAX      TimeTicks
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "ClearPass server uptime"
+       ::= { cppmSystemTableEntry 17 }
+
+   cppmSystemIdx OBJECT-TYPE
+       SYNTAX      Integer32(0..100)
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+            "ClearPass server index"
+       ::= { cppmSystemTableEntry 18 }
+   
+   cppmHardwareFanStatus OBJECT-TYPE
+       SYNTAX      DisplayString(SIZE(0..255))
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+	    "Total number of fans and status of each fan on a ClearPass hardware appliance"
+       ::= { cppmSystemTableEntry 19 }
+
+   cppmHardwarePowerStatus OBJECT-TYPE
+       SYNTAX      DisplayString(SIZE(0..255))
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Number of power supply units and the overall condition of power supply subsystem on a ClearPass hardware appliance"
+       ::= { cppmSystemTableEntry 20 }
+
+   cppmHardwarePowerStatusDetails OBJECT-TYPE
+       SYNTAX      DisplayString(SIZE(0..255))
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Number of voltage probes and their status on a ClearPass hardware appliance"
+       ::= { cppmSystemTableEntry 21 }
+
+   cppmHardwareDiskStatus OBJECT-TYPE
+       SYNTAX      DisplayString(SIZE(0..255))
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Disk drive statistics on the ClearPass appliance"
+       ::= { cppmSystemTableEntry 22 }
+
+-- radiusAuthTable contains information about the authentication source and
+-- counters in clearpass
+
+    radiusServerTable  OBJECT-TYPE 
+	  SYNTAX       SEQUENCE OF RadiusServerTableEntry 
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+	  	"
+			This table lists ClearPass RADIUS server attributes.
+		"
+	
+      ::= { cppmProcInfoGroup 1 } 
+
+   radiusServerTableEntry OBJECT-TYPE 
+      SYNTAX       RadiusServerTableEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION
+        "
+            This table lists the RADIUS global counters in CPPM. 
+        "
+          INDEX { cppmSystemHostname }
+      ::= { radiusServerTable 1 }        
+
+   RadiusServerTableEntry ::=
+    SEQUENCE {
+        radPolicyEvalTime      Integer32,
+        radAuthRequestTime     Integer32,
+        radServerCounterSuccess  Integer32,
+        radServerCounterFailure  Integer32,
+        radServerCounterCount    Integer32
+    }
+
+    radPolicyEvalTime OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Total time taken (ms) for policy evaluation from RADIUS server
+            prespective.
+            "
+        ::= { radiusServerTableEntry 1 }
+
+    radAuthRequestTime OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Total time taken (ms) for RADIUS request end-to-end.
+            "
+        ::= { radiusServerTableEntry 2 }
+
+    radServerCounterSuccess OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Successful RADIUS request count.
+            "
+        ::= { radiusServerTableEntry 3 }
+
+    radServerCounterFailure OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Failed RADIUS request count.
+            "
+        ::= { radiusServerTableEntry 4 }
+
+    radServerCounterCount OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Total RADIUS request count.
+            "
+        ::= { radiusServerTableEntry 5 }
+
+    radiusServerAuthTable  OBJECT-TYPE 
+	  SYNTAX       SEQUENCE OF RadiusServerAuthTableEntry 
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+	  	"
+			This table lists ClearPass RADIUS server authentication
+            attributes.
+		"
+	
+      ::= { cppmProcInfoGroup 2 } 
+
+   radiusServerAuthTableEntry OBJECT-TYPE 
+      SYNTAX       RadiusServerAuthTableEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION
+        "
+            This table lists the authentication sources in CPPM. 
+            Servers are identified by name.
+        "
+	  INDEX { radAuthSourceIdx }
+      ::= { radiusServerAuthTable 1 }        
+      
+    RadiusServerAuthTableEntry ::=
+      SEQUENCE {
+          radAuthSourceIdx         Integer32,
+          radAuthSourceName        DisplayString,
+          radAuthCounterSuccess    Integer32,
+          radAuthCounterFailure    Integer32,
+          radAuthCounterCount      Integer32,
+          radAuthCounterTime       Integer32
+      }
+
+    radAuthSourceIdx OBJECT-TYPE
+         SYNTAX       Integer32(1..65535)
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			RadiusServerAuthTableEntry index.
+            "
+        ::= { radiusServerAuthTableEntry 1 }
+
+    radAuthSourceName OBJECT-TYPE
+         SYNTAX       DisplayString(SIZE(0..255))
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Name of the authentication source used for RADIUS authentication
+            "
+        ::= { radiusServerAuthTableEntry 2 }
+
+    radAuthCounterSuccess OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Total number of successful RADIUS authentications.
+            "
+        ::= { radiusServerAuthTableEntry 3 }
+
+    radAuthCounterFailure OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Total number of failed RADIUS authentications.
+            "
+        ::= { radiusServerAuthTableEntry 4 }
+
+    radAuthCounterCount OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Total number of RADIUS authentications.
+            "
+        ::= { radiusServerAuthTableEntry 5 }
+
+    radAuthCounterTime OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Time taken (ms) to authenticate against an authentication source.
+            "
+        ::= { radiusServerAuthTableEntry 6 }
+
+    policyServerTable  OBJECT-TYPE 
+	  SYNTAX       SEQUENCE OF PolicyServerTableEntry 
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+	  	"
+			This table lists ClearPass Policy Server attributes. 
+		"
+	
+      ::= { cppmProcInfoGroup 3 } 
+
+   policyServerTableEntry OBJECT-TYPE 
+      SYNTAX       PolicyServerTableEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION
+        "
+            This table lists the Policy Server global counters in CPPM. 
+        "
+          INDEX { cppmSystemHostname }
+      ::= { policyServerTable 1 }        
+
+   PolicyServerTableEntry ::=
+    SEQUENCE {
+        psServicePolicyEvalCount        Integer32,
+        psRolemappingPolicyEvalCount    Integer32,
+        psPosturePolicyEvalCount        Integer32,
+        psAuditPolicyEvalCount          Integer32,
+        psRestrictionPolicyEvalCount    Integer32,
+        psEnforcementPolicyEvalCount    Integer32,
+        psServicePolicyEvalTime         Integer32,
+        psRolemappingPolicyEvalTime     Integer32,
+        psPosturePolicyEvalTime         Integer32,
+        psAuditPolicyEvalTime           Integer32,
+        psRestrictionPolicyEvalTime     Integer32,
+        psEnforcementPolicyEvalTime     Integer32,
+        psSessionlogTime                Integer32,
+        psAuthCounterSuccess            Integer32,
+        psAuthCounterFailure            Integer32,
+        psAuthCounterTotal              Integer32,
+        dailySuccessAuthCount           Integer32,
+        dailyFailedAuthCount            Integer32,
+        dailyTotalAuthCount             Integer32
+    }
+
+    psServicePolicyEvalCount OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Total number of service policies evaluated.
+            "
+        ::= { policyServerTableEntry 1 }
+
+    psRolemappingPolicyEvalCount OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Total number of role mapping policies evaluated.
+            "
+        ::= { policyServerTableEntry 2 }
+
+    psPosturePolicyEvalCount OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Total number of posture policies evaluated.
+            "
+        ::= { policyServerTableEntry 3 }
+
+    psAuditPolicyEvalCount OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Total number of audit policies evaluated.
+            "
+        ::= { policyServerTableEntry 4 }
+
+    psRestrictionPolicyEvalCount OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Total number of restriction policies evaluated.
+            "
+        ::= { policyServerTableEntry 5 }
+
+    psEnforcementPolicyEvalCount OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Total number of enforcement policies evaluated.
+            "
+        ::= { policyServerTableEntry 6 }
+
+    psServicePolicyEvalTime OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Time taken (ms) for the evaluation of service policies.
+            "
+        ::= { policyServerTableEntry 7 }
+
+    psRolemappingPolicyEvalTime OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Time taken (ms) for the evaluation of role mapping policies.
+            "
+        ::= { policyServerTableEntry 8 }
+
+    psPosturePolicyEvalTime OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Time taken (ms) for the evaluation of posture policies.
+            "
+        ::= { policyServerTableEntry 9 }
+
+    psAuditPolicyEvalTime OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Time taken (ms) for the evaluation of audit policies.
+            "
+        ::= { policyServerTableEntry 10 }
+
+    psRestrictionPolicyEvalTime OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Time taken (ms) for the evaluation of restriction policies.
+            "
+        ::= { policyServerTableEntry 11 }
+
+    psEnforcementPolicyEvalTime OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Time taken (ms) for the evaluation of enforcement policies.
+            "
+        ::= { policyServerTableEntry 12 }
+
+    psSessionlogTime OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Time taken (ms) for session logging.
+            "
+        ::= { policyServerTableEntry 13 }
+
+    psAuthCounterSuccess OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Total number of successful authentications computed on the 
+            Policy Server.
+            "
+        ::= { policyServerTableEntry 14 }
+
+    psAuthCounterFailure OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Total number of failed authentications computed on the 
+            Policy Server.
+            "
+        ::= { policyServerTableEntry 15 }
+
+    psAuthCounterTotal OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Total number of authentications computed on the 
+            Policy Server.
+            "
+        ::= { policyServerTableEntry 16 }
+
+    dailySuccessAuthCount OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+                        Total number of successful authentications computed over 24 hours
+            "
+        ::= { policyServerTableEntry 17 }
+
+    dailyFailedAuthCount OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+                        Total number of failed authentications computed over 24 hours
+            "
+        ::= { policyServerTableEntry 18 }
+
+    dailyTotalAuthCount OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+                        Total number of authentications computed over 24 hours
+            "
+        ::= { policyServerTableEntry 19 }
+
+    policyServerProtoTable  OBJECT-TYPE 
+	  SYNTAX       SEQUENCE OF PolicyServerProtoTableEntry 
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+	  	"
+			This table lists ClearPass Policy Server protocol specific
+            attributes.
+		"
+	
+      ::= { cppmProcInfoGroup 4 } 
+
+   policyServerProtoTableEntry OBJECT-TYPE 
+      SYNTAX       PolicyServerProtoTableEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION
+        "
+            This table lists the Policy Server protocol global counters in CPPM. 
+        "
+          INDEX { psProtocolIdx }
+      ::= { policyServerProtoTable 1 }        
+
+   PolicyServerProtoTableEntry ::=
+    SEQUENCE {
+        psProtocolIdx        Integer32,
+        psProtocolName       DisplayString,
+        psPolicyEvalTime     Integer32
+    }
+
+    psProtocolIdx OBJECT-TYPE
+         SYNTAX       Integer32(0..255)
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Protocol index for the protocol used in policy evaluation on the 
+            Policy Server.
+            "
+        ::= { policyServerProtoTableEntry 1 }
+
+    psProtocolName OBJECT-TYPE
+         SYNTAX       DisplayString(SIZE(0..32))
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Protocol name used in the policy evaluation.
+            "
+        ::= { policyServerProtoTableEntry 2 }
+
+    psPolicyEvalTime OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Total time taken (ms) for the protocol specific policy evaluation on the 
+            Policy Server.
+            "
+        ::= { policyServerProtoTableEntry 3 }
+
+    policyServerAutzTable  OBJECT-TYPE 
+	  SYNTAX       SEQUENCE OF PolicyServerAutzTableEntry 
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+	  	"
+			This table lists ClearPass Policy Server authorization attributes.
+		"
+	
+      ::= { cppmProcInfoGroup 5 } 
+
+   policyServerAutzTableEntry OBJECT-TYPE 
+      SYNTAX       PolicyServerAutzTableEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION
+        "
+            This table lists the authorization sources in CPPM. 
+            Servers are identified by name.
+        "
+	  INDEX { psAutzSourceIdx }
+      ::= { policyServerAutzTable 1 }        
+      
+    PolicyServerAutzTableEntry ::=
+      SEQUENCE {
+          psAutzSourceIdx         Integer32,
+          psAutzSourceName        DisplayString,
+          psAutzCounterSuccess    Integer32,
+          psAutzCounterFailure    Integer32,
+          psAutzCounterCount      Integer32,
+          psAutzCounterTime       Integer32
+      }
+
+    psAutzSourceIdx OBJECT-TYPE
+         SYNTAX       Integer32(1..65535)
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Authorization source index.
+            "
+        ::= { policyServerAutzTableEntry 1 }
+
+    psAutzSourceName OBJECT-TYPE
+         SYNTAX       DisplayString(SIZE(0..255))
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Name of the authorization source used for Policy authorizations
+            "
+        ::= { policyServerAutzTableEntry 2 }
+
+    psAutzCounterSuccess OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Total number of successful Policy authorizations.
+            "
+        ::= { policyServerAutzTableEntry 3 }
+
+    psAutzCounterFailure OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Total number of failed Policy authorizations.
+            "
+        ::= { policyServerAutzTableEntry 4 }
+
+    psAutzCounterCount OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Total number of Policy authorizations.
+            "
+        ::= { policyServerAutzTableEntry 5 }
+
+    psAutzCounterTime OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Time taken (ms) for Policy authorizations.
+            "
+        ::= { policyServerAutzTableEntry 6 }
+
+    webAuthProtoTable  OBJECT-TYPE 
+	  SYNTAX       SEQUENCE OF WebAuthProtoTableEntry
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+	  	"
+			This table lists ClearPass Web Authentication protocol attributes. 
+		"
+	
+      ::= { cppmProcInfoGroup 6 } 
+
+   webAuthProtoTableEntry OBJECT-TYPE 
+      SYNTAX       WebAuthProtoTableEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION
+        "
+            This table lists the web authentication details in CPPM. 
+        "
+          INDEX { waProtocolIdx }
+      ::= { webAuthProtoTable 1 }        
+      
+    WebAuthProtoTableEntry ::=
+      SEQUENCE {
+          waProtocolIdx           Integer32,
+          waProtocolName          DisplayString,
+          waAuthCounterSuccess    Integer32,
+          waAuthCounterFailure    Integer32,
+          waAuthCounterCount      Integer32,
+          waAuthCounterTime       Integer32,
+          waAuthCounterAuthTime   Integer32,
+          waServicePolicyEvalTime Integer32,
+          waPolicyEvalTime        Integer32
+      }
+
+    waProtocolIdx OBJECT-TYPE
+         SYNTAX       Integer32(0..255)
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Web Authentication protocol index.
+            "
+        ::= { webAuthProtoTableEntry 1 }
+
+    waProtocolName OBJECT-TYPE
+         SYNTAX       DisplayString(SIZE(0..32))
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Protocol name used in the Web Authentication
+            "
+        ::= { webAuthProtoTableEntry 2 }
+
+    waAuthCounterSuccess OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Total number of successful Web authentications.
+            "
+        ::= { webAuthProtoTableEntry 3 }
+
+    waAuthCounterFailure OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Total number of failed Web authentications.
+            "
+        ::= { webAuthProtoTableEntry 4 }
+
+    waAuthCounterCount OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Total number of Web authentications.
+            "
+        ::= { webAuthProtoTableEntry 5 }
+
+    waAuthCounterTime OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Total time taken (ms) for Web authentications.
+            "
+        ::= { webAuthProtoTableEntry 6 }
+
+    waAuthCounterAuthTime OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Time taken (ms) to perform Web Authentication for PAP/TokenServer
+            authentication.
+            "
+        ::= { webAuthProtoTableEntry 7 }
+
+    waServicePolicyEvalTime OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Time taken (ms) for Web Authentication service policy
+            evaluation.
+            "
+        ::= { webAuthProtoTableEntry 8 }
+
+    waPolicyEvalTime OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Time taken (ms) for Web Authentication policy
+            evaluation.
+            "
+        ::= { webAuthProtoTableEntry 9 }
+
+    tacacsAuthTable  OBJECT-TYPE 
+	  SYNTAX       SEQUENCE OF TacacsAuthTableEntry
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+	  	"
+			This table lists ClearPass TACACS Server authentication
+            attributes.
+		"
+	
+      ::= { cppmProcInfoGroup 7 } 
+
+   tacacsAuthTableEntry OBJECT-TYPE 
+      SYNTAX       TacacsAuthTableEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION
+        "
+            This table lists the TACACS+ authentication details in CPPM. 
+        "
+          INDEX { cppmSystemHostname }
+      ::= { tacacsAuthTable 1 }        
+      
+    TacacsAuthTableEntry ::=
+      SEQUENCE {
+          tacAuthCounterSuccess    Integer32,
+          tacAuthCounterFailure    Integer32,
+          tacAuthCounterCount      Integer32,
+          tacAuthCounterTime       Integer32,
+          tacAuthCounterAuthTime   Integer32,
+          tacServicePolicyEvalTime Integer32,
+          tacPolicyEvalTime        Integer32
+      }
+
+    tacAuthCounterSuccess OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Total number of successful TACACS+ authentications.
+            "
+        ::= { tacacsAuthTableEntry 1 }
+
+    tacAuthCounterFailure OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Total number of failed TACACS+ authentications.
+            "
+        ::= { tacacsAuthTableEntry 2 }
+
+    tacAuthCounterCount OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Total number of TACACS+ authentications.
+            "
+        ::= { tacacsAuthTableEntry 3 }
+
+    tacAuthCounterTime OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Total time taken (ms) to perform TACACS+ authentications end-to-end.
+            "
+        ::= { tacacsAuthTableEntry 4 }
+
+    tacAuthCounterAuthTime OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Time taken (ms) for TACACS+ authentications.
+            "
+        ::= { tacacsAuthTableEntry 5 }
+
+    tacServicePolicyEvalTime OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Time taken (ms) for TACACS+ service policy evaluation.
+            "
+        ::= { tacacsAuthTableEntry 6 }
+
+    tacPolicyEvalTime OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Time taken (ms) for TACACS+ policy evaluation.
+            "
+        ::= { tacacsAuthTableEntry 7 }
+
+    tacacsAutzTable  OBJECT-TYPE 
+	  SYNTAX       SEQUENCE OF TacacsAutzTableEntry
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+	  	"
+			This table lists ClearPass TACACS Server authorization attributes.
+		"
+	
+      ::= { cppmProcInfoGroup 8 } 
+
+   tacacsAutzTableEntry OBJECT-TYPE 
+      SYNTAX       TacacsAutzTableEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION
+        "
+            This table lists the TACACS+ authorization details in CPPM. 
+        "
+          INDEX { cppmSystemHostname }
+      ::= { tacacsAutzTable 1 }        
+      
+    TacacsAutzTableEntry ::=
+      SEQUENCE {
+          tacAutzCounterSuccess    Integer32,
+          tacAutzCounterFailure    Integer32,
+          tacAutzCounterCount      Integer32,
+          tacAutzCounterTime       Integer32
+      }
+
+    tacAutzCounterSuccess OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Total number of successful TACACS+ authorizations.
+            "
+        ::= { tacacsAutzTableEntry 1 }
+
+    tacAutzCounterFailure OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Total number of failed TACACS+ authorizations.
+            "
+        ::= { tacacsAutzTableEntry 2 }
+
+    tacAutzCounterCount OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Total number of TACACS+ authorizations.
+            "
+        ::= { tacacsAutzTableEntry 3 }
+
+    tacAutzCounterTime OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Total time taken (ms) to perform TACACS+ authorization end-to-end.
+            "
+        ::= { tacacsAutzTableEntry 4 }
+
+    networkTrafficTable OBJECT-TYPE 
+	  SYNTAX       SEQUENCE OF NetworkTrafficTableEntry
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+	  	"
+			This table lists ClearPass Network Traffic attributes.
+		"
+	
+      ::= { cppmNetworkInfoGroup 1 } 
+
+   networkTrafficTableEntry OBJECT-TYPE 
+      SYNTAX       NetworkTrafficTableEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION
+        "
+            This table lists the Network Traffic details in CPPM. 
+        "
+          INDEX { nwAppIdx }
+      ::= { networkTrafficTable 1 }        
+      
+    NetworkTrafficTableEntry ::=
+      SEQUENCE {
+          nwAppIdx              Integer32,  
+          nwAppName             DisplayString,
+          nwAppPort             Integer32,
+          nwTrafficTotal        Counter64
+      }
+
+    nwAppIdx     OBJECT-TYPE
+         SYNTAX       Integer32(1..65535)
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Network application index.
+            "
+        ::= { networkTrafficTableEntry 1 }
+
+    nwAppName     OBJECT-TYPE
+         SYNTAX       DisplayString(SIZE(0..255))
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Network application name
+            "
+        ::= { networkTrafficTableEntry 2 }
+
+    nwAppPort     OBJECT-TYPE
+         SYNTAX       Integer32(1..65535)
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Network application port number.
+            "
+        ::= { networkTrafficTableEntry 3 }
+
+    nwTrafficTotal     OBJECT-TYPE
+         SYNTAX       Counter64 
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Total network traffic in bytes.
+            "
+        ::= { networkTrafficTableEntry 4 }
+
+        
+-- Traps
+-- This group defines all the traps related to the ClearPass platform. 
+clearpassTrapObjectsGroup      OBJECT IDENTIFIER ::= { cppmTraps 100 }
+
+cppmNodeName OBJECT-TYPE
+         SYNTAX       DisplayString(SIZE(0..64))
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+				This object is used in the traps to indicate the 
+				ClearPass Server.
+            "
+::= { clearpassTrapObjectsGroup 1 }
+
+cppmNodeIp OBJECT-TYPE
+         SYNTAX       IpAddress
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			This object contains the ClearPass Server Management IP address.
+            "
+::= { clearpassTrapObjectsGroup 2 }
+
+cppmClusterServerIp OBJECT-TYPE
+         SYNTAX       IpAddress
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			This object contains the IP Address of a ClearPass Cluster Server.
+            "
+::= { clearpassTrapObjectsGroup 3 }
+
+cppmNodeApplicationName OBJECT-TYPE
+         SYNTAX       DisplayString(SIZE(0..255))
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+				This object is used in the traps to indicate the 
+				ClearPass Server Application.
+            "
+::= { clearpassTrapObjectsGroup 4 }
+
+cppmNodeCertApplicationName OBJECT-TYPE
+         SYNTAX       DisplayString(SIZE(0..255))
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+				This object is used in the traps to indicate the 
+				certificate associated with ClearPass Server Application.
+            "
+::= { clearpassTrapObjectsGroup 5 }
+
+cppmLicenseDaysRemaining OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			This object represents number of days remaining prior
+			to a license expiry
+            "
+::= { clearpassTrapObjectsGroup 6 }
+
+cppmActivationDaysRemaining OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			This object represents number of days remaining prior
+			to an activation expiry of ClearPass license
+            "
+::= { clearpassTrapObjectsGroup 7 }
+
+cppmCertDaysRemaining OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			This object represents number of days remaining prior
+			to a certificate expiry
+            "
+::= { clearpassTrapObjectsGroup 8 }
+
+cppmDiskSpaceRemaining OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			This object represents the percentage of disk space remaining
+			in the ClearPass Server
+            "
+::= { clearpassTrapObjectsGroup 9 }
+
+cppmMemoryRemaining OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			This object represents the percentage of memory remaining
+			in the ClearPass Server
+            "
+::= { clearpassTrapObjectsGroup 10 }
+
+cppmClusterOutOfSyncMinutes OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			This object represents the number of mimutes since the node is 
+            out of synchronization with ClearPass cluster
+            "
+::= { clearpassTrapObjectsGroup 11 }
+
+cppmClusterLicenseTotalCount OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			This object represents the total license count
+			in the ClearPass Server
+            "
+::= { clearpassTrapObjectsGroup 12 }
+
+cppmClusterLicenseUsageCount OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			This object represents the used license count
+			in the ClearPass Server
+            "
+::= { clearpassTrapObjectsGroup 13 }
+
+cppmResourceUnit OBJECT-TYPE
+         SYNTAX       DisplayString(SIZE(0..10))
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+				This object is used in the traps to indicate the 
+				resource (disk, memory) units.
+            "
+::= { clearpassTrapObjectsGroup 14 }
+
+cppmImageFile OBJECT-TYPE
+         SYNTAX       DisplayString(SIZE(0..255))
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+				This object is used in the traps to indicate the 
+				image file used in update and upgrade.
+            "
+::= { clearpassTrapObjectsGroup 15 }
+
+cppmImageInstallStatus OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+				This object is used in the traps to indicate the 
+				image file installation status.
+            "
+::= { clearpassTrapObjectsGroup 16 }
+
+cppmServiceName OBJECT-TYPE
+         SYNTAX       DisplayString(SIZE(0..255))
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+				This object is used in the traps to indicate the 
+			    service name used in service operations.
+            "
+::= { clearpassTrapObjectsGroup 17 }
+
+cppmServiceStatus OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+				This object is used in the traps to indicate the 
+				service status.
+            "
+::= { clearpassTrapObjectsGroup 18 }
+
+cppmLicenseApplicationName OBJECT-TYPE
+         SYNTAX       DisplayString(SIZE(0..255))
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+				This object is used in the traps to indicate the 
+				ClearPass License Application name.
+            "
+::= { clearpassTrapObjectsGroup 19 }
+
+cppmLicenseOverrunDailyCount OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+				This object is used in the traps to indicate the 
+				number of times the license used count exceeds
+                total count for a ClearPass Application license
+            "
+::= { clearpassTrapObjectsGroup 20 }
+
+cppmTrapMessage OBJECT-TYPE
+         SYNTAX       DisplayString(SIZE(0..4096))
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+				This object is used in the traps to indicate the 
+				detailed trap message.
+            "
+::= { clearpassTrapObjectsGroup 35 }
+
+cppmCPUAverageLoad OBJECT-TYPE
+         SYNTAX       DisplayString(SIZE(0..10)) 
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+                                This object is used in the traps to indicate CPU load average.
+            "
+::= { clearpassTrapObjectsGroup 37 }
+
+-- Trap definitions
+
+cppmLicenseExpiry NOTIFICATION-TYPE
+         OBJECTS { cppmLicenseDaysRemaining,
+             cppmNodeApplicationName, cppmTrapMessage }
+         STATUS       current
+         DESCRIPTION
+            "
+			A trap which indicates that one or more licenses associated with
+            the <cppmNodeApplicationName> on the
+			ClearPass Server will expire in <cppmLicenseDaysRemaining> days
+            "
+::= { cppmTraps 1001 }
+
+cppmActivationExpiry NOTIFICATION-TYPE
+         OBJECTS { cppmActivationDaysRemaining,
+             cppmNodeApplicationName, cppmTrapMessage }
+         STATUS       current
+         DESCRIPTION
+            "
+			A trap which indicates that one or more licensing activations associated with
+            the <cppmNodeApplicationName> on the
+			ClearPass Server will expire in <cppmActivationDaysRemaining> days
+            "
+::= { cppmTraps 1002 }
+
+cppmNodeCertExpiry NOTIFICATION-TYPE
+         OBJECTS { cppmNodeCertApplicationName,
+             cppmCertDaysRemaining, cppmTrapMessage }
+         STATUS       current
+         DESCRIPTION
+            "
+			A trap which indicates that server certificate associated with
+            the <cppmNodeCertApplicationName> on the
+			ClearPass Server will expire in <cppmCertDaysRemaining> days
+            "
+::= { cppmTraps 1003 }
+
+cppmLowDiskSpace NOTIFICATION-TYPE
+         OBJECTS { cppmDiskSpaceRemaining, cppmResourceUnit, cppmTrapMessage }
+         STATUS       current
+         DESCRIPTION
+            "
+			A trap which indicates that the system is running on low disk
+            space as indicated by <cppmDiskSpaceRemaining>
+            "
+::= { cppmTraps 1004 }
+
+cppmLowMemory NOTIFICATION-TYPE
+         OBJECTS { cppmMemoryRemaining, cppmResourceUnit, cppmTrapMessage }
+         STATUS       current
+         DESCRIPTION
+            "
+			A trap which indicates that the system is running on low memory
+            as indicated by <cppmMemoryRemaining>
+            "
+::= { cppmTraps 1005 }
+
+cppmClusterNodeAddNotification NOTIFICATION-TYPE
+         OBJECTS { cppmClusterServerIp, cppmTrapMessage }
+         STATUS       current
+         DESCRIPTION
+            "
+			A trap which indicates the addition of ClearPass node into the cluster.
+            <cppmClusterServerIp> indicates the IP Address of the node
+            added to the cluster.
+            "
+::= { cppmTraps 1006 }
+
+cppmClusterNodeDelNotification NOTIFICATION-TYPE
+         OBJECTS { cppmClusterServerIp, cppmTrapMessage }
+         STATUS       current
+         DESCRIPTION
+            "
+			A trap which indicates the deletion of ClearPass node from the cluster.
+            <cppmClusterServerIp> indicates the IP Address of the node
+            removed from the cluster.
+            "
+::= { cppmTraps 1007 }
+
+cppmClusterNodePromNotification NOTIFICATION-TYPE
+         OBJECTS { cppmClusterServerIp, cppmTrapMessage }
+         STATUS       current
+         DESCRIPTION
+            "
+			A trap which indicates the promotion of ClearPass node as publisher in the cluster.
+            <cppmClusterServerIp> indicates the IP Address of the node
+            promoted to the publisher.
+            "
+::= { cppmTraps 1008 }
+
+cppmClusterNodeDbldNotification NOTIFICATION-TYPE
+         OBJECTS { cppmClusterServerIp, cppmTrapMessage }
+         STATUS       current
+         DESCRIPTION
+            "
+			A trap which indicates the disabling of ClearPass node in the cluster.
+            <cppmClusterServerIp> indicates the IP Address of the node
+            disabled.
+            "
+::= { cppmTraps 1009 }
+
+cppmClusterNodeNSyncNotification NOTIFICATION-TYPE
+         OBJECTS { cppmClusterServerIp, cppmClusterOutOfSyncMinutes, cppmTrapMessage }
+         STATUS       current
+         DESCRIPTION
+            "
+			A trap which indicates the ClearPass node in out of sync state in the cluster.
+            <cppmClusterServerIp> indicates the IP Address of the node
+            <cppmClusterOutOfSyncMinutes> indicates the number of mins since
+            the node is in out of sync state.
+            "
+::= { cppmTraps 1010 }
+
+cppmClusterPwdChangeNotification NOTIFICATION-TYPE
+         OBJECTS { cppmTrapMessage }
+         STATUS       current
+         DESCRIPTION
+            "
+			A trap which indicates cluster password change.
+            "
+::= { cppmTraps 1011 }
+
+cppmConfigReset NOTIFICATION-TYPE
+         OBJECTS { cppmTrapMessage }
+         STATUS       current
+         DESCRIPTION
+            "
+			A trap which indicates the configuration reset of ClearPass node.
+            "
+::= { cppmTraps 1012 }
+
+cppmConfigRestore NOTIFICATION-TYPE
+         OBJECTS { cppmTrapMessage }
+         STATUS       current
+         DESCRIPTION
+            "
+			A trap which indicates the configuration restore of ClearPass node.
+            "
+::= { cppmTraps 1013 }
+
+cppmUpdateNotification NOTIFICATION-TYPE
+         OBJECTS { cppmImageFile, cppmImageInstallStatus, cppmTrapMessage }
+         STATUS       current
+         DESCRIPTION
+            "
+			A trap which indicates the update install notification on ClearPass node.
+            "
+::= { cppmTraps 1014 }
+
+cppmUpgradeNotification NOTIFICATION-TYPE
+         OBJECTS { cppmImageFile, cppmImageInstallStatus, cppmTrapMessage }
+         STATUS       current
+         DESCRIPTION
+            "
+			A trap which indicates the upgrade install notification on ClearPass node.
+            "
+::= { cppmTraps 1015 }
+
+cppmClusterLicenseUsage NOTIFICATION-TYPE
+         OBJECTS { cppmNodeApplicationName,
+             cppmClusterLicenseTotalCount,
+             cppmClusterLicenseUsageCount, cppmTrapMessage }
+         STATUS       current
+         DESCRIPTION
+            "
+			A trap which indicates the ClearPass cluster license utilization details of the application.
+            <cppmNodeApplicationName> indicates the name of the application,
+            <cppmClusterLicenseTotalCount> indicates total cluster-wide
+            license count of the application,
+            <cppmClusterLicenseUsageCount> indicates the used
+            cluster-wide license count of the application.
+            "
+::= { cppmTraps 1016 }
+
+cppmServiceStopNotification NOTIFICATION-TYPE
+         OBJECTS { cppmServiceName, cppmServiceStatus, cppmTrapMessage }
+         STATUS       current
+         DESCRIPTION
+            "
+			A trap which indicates stopping of ClearPass service.
+            <cppmServiceName> indicates name of the service being stopped.
+            <cppmServiceStatus> indicates status of the service stop operation.
+            <cppmTrapMessage> contains service messages.
+            "
+::= { cppmTraps 1017 }
+
+cppmServiceStartNotification NOTIFICATION-TYPE
+         OBJECTS { cppmServiceName, cppmServiceStatus, cppmTrapMessage }
+         STATUS       current
+         DESCRIPTION
+            "
+			A trap which indicates starting of ClearPass service.
+            <cppmServiceName> indicates name of the service being started.
+            <cppmServiceStatus> indicates status of the service start operation.
+            <cppmTrapMessage> contains service messages.
+            "
+::= { cppmTraps 1018 }
+
+cppmServiceRestartNotification NOTIFICATION-TYPE
+         OBJECTS { cppmServiceName, cppmServiceStatus, cppmTrapMessage }
+         STATUS       current
+         DESCRIPTION
+            "
+			A trap which indicates restarting of ClearPass service.
+            <cppmServiceName> indicates name of the service being restarted.
+            <cppmServiceStatus> indicates status of the service restart operation.
+            <cppmTrapMessage> contains service messages.
+            "
+::= { cppmTraps 1019 }
+
+cppmHighCPULoadNotification NOTIFICATION-TYPE
+         OBJECTS { cppmCPUAverageLoad, cppmTrapMessage }
+         STATUS       current
+         DESCRIPTION
+            "
+                        A trap which indicates CPU load exceeds threshold on Clearpass Appliance.
+            "
+::= { cppmTraps 1021 }
+
+cppmCoreDumpNotification NOTIFICATION-TYPE
+         OBJECTS { cppmTrapMessage }
+         STATUS       current
+         DESCRIPTION
+            "
+                        A trap which indicates core dump has been generated on Clearpass Appliance
+            "
+::= { cppmTraps 1022 }
+
+cppmClusterLicenseOverrun NOTIFICATION-TYPE
+         OBJECTS { cppmLicenseApplicationName,
+             cppmLicenseOverrunDailyCount,
+             cppmTrapMessage }
+         STATUS       current
+         DESCRIPTION
+            "
+			A trap which indicates that ClearPass cluster license has overrun for an application.
+            <cppmLicenseApplicationName> indicates the name of the application,
+            <cppmLicenseOverrunDailyCount> indicates number of times the cluster-wide
+            license count of the application exceeded total count in a day.
+            "
+::= { cppmTraps 1023 }
+
+
+END
