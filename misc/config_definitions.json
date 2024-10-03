@@ -778,8 +778,40 @@
                 "http-auth": "HTTP Authentication",
                 "ad-authorization": "Externally authenticated AD",
                 "ldap-authorization": "Externally authenticated LDAP",
-                "sso": "Single Sign On"
+                "sso": "Single Sign On",
+                "pamnss": "PAM + NSS"
             }
+        },
+        "auth_pamnss_service": {
+            "default": "librenms",
+            "group": "auth",
+            "section": "pamnss",
+            "order": 0,
+            "type": "text"
+        },
+        "auth_pamnss_admin_group": {
+            "group": "auth",
+            "section": "pamnss",
+            "order": 1,
+            "type": "text"
+        },
+        "auth_pamnss_user_group": {
+            "group": "auth",
+            "section": "pamnss",
+            "order": 2,
+            "type": "text"
+        },
+        "auth_pamnss_global_read_group": {
+            "group": "auth",
+            "section": "pamnss",
+            "order": 3,
+            "type": "text"
+        },
+        "auth_pamnss_demo_group": {
+            "group": "auth",
+            "section": "pamnss",
+            "order": 4,
+            "type": "text"
         },
         "auth_remember": {
             "default": 30,
