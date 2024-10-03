@@ -393,6 +393,11 @@ class Port extends DeviceRelatedModel
         return $this->hasMany(PortStp::class, 'port_id');
     }
 
+    public function transceivers(): HasMany
+    {
+        return $this->hasMany(Transceiver::class, 'port_id');
+    }
+
     public function users(): BelongsToMany
     {
         // FIXME does not include global read

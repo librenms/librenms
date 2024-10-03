@@ -205,7 +205,7 @@ class Isis implements Module
     /**
      * @inheritDoc
      */
-    public function dump(Device $device)
+    public function dump(Device $device, string $type): ?array
     {
         return [
             'isis_adjacencies' => $device->isisAdjacencies()->orderBy('index')

@@ -6,7 +6,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\Models\Keyable;
+use LibreNMS\Util\Number;
 
 class Sensor extends DeviceRelatedModel implements Keyable
 {
@@ -98,33 +100,72 @@ class Sensor extends DeviceRelatedModel implements Keyable
         return self::$icons;
     }
 
-    public function guessLimits(): void
+    public function guessLimits(bool $high, bool $low): void
     {
-        $this->sensor_limit_low = match ($this->sensor_class) {
-            'temperature' => $this->sensor_current - 10,
-            'voltage' => $this->sensor_current * 0.85,
-            'humidity' => 30,
-            'fanspeed' => $this->sensor_current * 0.80,
-            'power_factor' => -1,
-            'signal' => -80,
-            'airflow', 'snr', 'frequency', 'pressure', 'cooling' => $this->sensor_current * 0.95,
-            default => null,
-        };
+        if ($high) {
+            $this->sensor_limit = match ($this->sensor_class) {
+                'temperature' => $this->sensor_current + 20,
+                'voltage' => $this->sensor_current * 1.15,
+                'humidity' => 70,
+                'fanspeed' => $this->sensor_current * 1.80,
+                'power_factor' => 1,
+                'signal' => -30,
+                'load' => 80,
+                'airflow', 'snr', 'frequency', 'pressure', 'cooling' => $this->sensor_current * 1.05,
+                default => null,
+            };
+        }
 
-        $this->sensor_limit = match ($this->sensor_class) {
-            'temperature' => $this->sensor_current + 20,
-            'voltage' => $this->sensor_current * 1.15,
-            'humidity' => 70,
-            'fanspeed' => $this->sensor_current * 1.80,
-            'power_factor' => 1,
-            'signal' => -30,
-            'load' => 80,
-            'airflow', 'snr', 'frequency', 'pressure', 'cooling' => $this->sensor_current * 1.05,
-            default => null,
+        if ($low) {
+            $this->sensor_limit_low = match ($this->sensor_class) {
+                'temperature' => $this->sensor_current - 10,
+                'voltage' => $this->sensor_current * 0.85,
+                'humidity' => 30,
+                'fanspeed' => $this->sensor_current * 0.80,
+                'power_factor' => -1,
+                'signal' => -80,
+                'airflow', 'snr', 'frequency', 'pressure', 'cooling' => $this->sensor_current * 0.95,
+                default => null,
+            };
+        }
+    }
+
+    /**
+     * Format current value for user display including units.
+     */
+    public function formatValue(): string
+    {
+        $units = __('sensors.' . $this->sensor_class . '.unit');
+
+        return match ($this->sensor_class) {
+            'current', 'power' => Number::formatSi($this->sensor_current, 3, 3, $units),
+            'dbm' => round($this->sensor_current, 3) . " $units",
+            default => "$this->sensor_current $units",
         };
     }
 
+    public function currentStatus(): Severity
+    {
+        if ($this->sensor_limit !== null && $this->sensor_current >= $this->sensor_limit) {
+            return Severity::Error;
+        }
+        if ($this->sensor_limit_low !== null && $this->sensor_current <= $this->sensor_limit_low) {
+            return Severity::Error;
+        }
+
+        if ($this->sensor_limit_warn !== null && $this->sensor_current >= $this->sensor_limit_warn) {
+            return Severity::Warning;
+        }
+
+        if ($this->sensor_limit_low_warn !== null && $this->sensor_current <= $this->sensor_limit_low_warn) {
+            return Severity::Warning;
+        }
+
+        return Severity::Ok;
+    }
+
     // ---- Define Relationships ----
+
     public function events(): MorphMany
     {
         return $this->morphMany(Eventlog::class, 'events', 'type', 'reference');

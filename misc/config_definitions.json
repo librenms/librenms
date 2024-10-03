@@ -1074,7 +1074,7 @@
             "order": 22
         },
         "custom_map.height": {
-            "default": "1800px",
+            "default": "800px",
             "type": "text",
             "group": "webui",
             "section": "custom-map",
@@ -1161,7 +1161,7 @@
             "order": 23
         },
         "custom_map.width": {
-            "default": "800px",
+            "default": "1800px",
             "type": "text",
             "group": "webui",
             "section": "custom-map",
@@ -1389,6 +1389,13 @@
             "group": "discovery",
             "section": "discovery_modules",
             "default": false,
+            "type": "boolean"
+        },
+        "discovery_modules.transceivers": {
+            "order": 322,
+            "group": "discovery",
+            "section": "discovery_modules",
+            "default": true,
             "type": "boolean"
         },
         "discovery_modules.entity-physical": {
@@ -5188,6 +5195,13 @@
             "group": "poller",
             "section": "poller_modules",
             "default": false,
+            "type": "boolean"
+        },
+        "poller_modules.transceivers": {
+            "order": 322,
+            "group": "poller",
+            "section": "poller_modules",
+            "default": true,
             "type": "boolean"
         },
         "poller_modules.customoid": {
