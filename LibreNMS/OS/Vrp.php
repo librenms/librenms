@@ -102,17 +102,36 @@ class Vrp extends OS implements
         // Get a map of ifIndex to port_id for proper association with ports
         $ifIndexToPortId = $this->getDevice()->ports()->pluck('port_id', 'ifIndex');
 
+        // EntityPhysicalIndex to ifIndex
+        $entityToIfIndex = \SnmpQuery::walk('ENTITY-MIB::entAliasMappingIdentifier')->mapTable(function ($data, $entPhysicalIndex) {
+            preg_match('/\d+/', $data['ENTITY-MIB::entAliasMappingIdentifier'], $matches);
+            if (empty($matches[0])) {
+                return null;
+            }
+            return ['entIndex' => $entPhysicalIndex, 'ifIndex' => $matches[0]];
+        })->pluck('ifIndex', 'entIndex');
+
         // Walk through the MIB table for transceiver information
-        return \SnmpQuery::walk('HUAWEI-ENTITY-EXTENT-MIB::hwOpticalModuleInfoTable')->mapTable(function ($data, $ifIndex) use ($ifIndexToPortId) {
+        return \SnmpQuery::walk('HUAWEI-ENTITY-EXTENT-MIB::hwOpticalModuleInfoTable')->mapTable(function ($data, $entIndex) use ($entityToIfIndex, $ifIndexToPortId) {
             // Skip inactive transceivers
             if ($data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalType'] === 'inactive') {
+                return null;
+            }
+            // Skip when it is not a plugable optic
+            if ($data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalType'] === '0') {
                 return null;
             }
             // Handle cases where required data might not be available (fallback to null)
             $cable = $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalCableType'] ?? null;
             $distance = $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalDistance'] ?? null;
             $wavelength = $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalWaveLengthExact'] ?? null;
-
+            $ifIndex = $entityToIfIndex->get($entIndex);
+            d_echo ($ifIndex);
+            $port_id = $ifIndexToPortId->get($ifIndex) ?? null;
+            if (is_null($port_id)) {
+                // Invalid
+                return null;
+            }
             // Create a new Transceiver object with the retrieved data
             return new Transceiver([
                 'port_id' => $ifIndexToPortId->get($ifIndex),  // Map ifIndex to port_id
