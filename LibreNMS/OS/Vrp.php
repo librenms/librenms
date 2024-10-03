@@ -25,13 +25,13 @@
 
 namespace LibreNMS\OS;
 
-use App\Models\Transceiver;
 use App\Models\AccessPoint;
 use App\Models\Device;
 use App\Models\EntPhysical;
 use App\Models\Mempool;
 use App\Models\PortsNac;
 use App\Models\Sla;
+use App\Models\Transceiver;
 use App\Observers\ModuleModelObserver;
 use Carbon\Carbon;
 use Illuminate\Support\Arr;
@@ -48,13 +48,13 @@ use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessApCountDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\Interfaces\Discovery\SlaDiscovery;
+use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
 use LibreNMS\Interfaces\Polling\NacPolling;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\Interfaces\Polling\SlaPolling;
 use LibreNMS\OS;
 use LibreNMS\OS\Traits\EntityMib;
 use LibreNMS\RRD\RrdDefinition;
-use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
 
 class Vrp extends OS implements
     MempoolsDiscovery,
@@ -98,38 +98,37 @@ class Vrp extends OS implements
 
         return $inventory;
     }
-     public function discoverTransceivers(): Collection
-   {
-    // Get a map of ifIndex to port_id for proper association with ports
-    $ifIndexToPortId = $this->getDevice()->ports()->pluck('port_id', 'ifIndex');
-
-    // Walk through the MIB table for transceiver information
-    return \SnmpQuery::walk('HUAWEI-ENTITY-EXTENT-MIB::hwOpticalModuleInfoTable')->mapTable(function ($data, $ifIndex) use ($ifIndexToPortId) {
-        // Skip inactive transceivers
-        if ($data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalType'] === 'inactive') {
-            return null;
-        }
-
-        // Handle cases where required data might not be available (fallback to null)
-        $cable = $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalCableType'] ?? null;
-        $distance = $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalDistance'] ?? null;
-        $wavelength = $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalWaveLengthExact'] ?? null;
-
-        // Create a new Transceiver object with the retrieved data
-        return new Transceiver([
-            'port_id' => $ifIndexToPortId->get($ifIndex),  // Map ifIndex to port_id
-            'index' => $ifIndex,
-            'vendor' => $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalVenderName'] ?? null,
-            'type' => $data['HUAWEI-ENTITY-EXTENT-MIB::transceiveType'] ?? null,
-            'model' => $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalVenderPn'] ?? null,
-            'serial' => $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalVendorSn'] ?? null,
-            'cable' => $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalMode'] ?? null,
-            'distance' => $data['HUAWEI-ENTITY-EXTENT-MIB:hwEntityOpticalTransferDistance'] ?? null,
-            'wavelength' => $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalWaveLengthExact'] ?? null,
-            'entity_physical_index' => $ifIndex,
-        ]);
-    })->filter();  // Filter out null values
-   }
+    public function discoverTransceivers(): Collection
+     {
+         // Get a map of ifIndex to port_id for proper association with ports
+         $ifIndexToPortId = $this->getDevice()->ports()->pluck('port_id', 'ifIndex');
+ 
+         // Walk through the MIB table for transceiver information
+         return \SnmpQuery::walk('HUAWEI-ENTITY-EXTENT-MIB::hwOpticalModuleInfoTable')->mapTable(function ($data, $ifIndex) use ($ifIndexToPortId) {
+             // Skip inactive transceivers
+             if ($data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalType'] === 'inactive') {
+                 return null;
+             }
+             // Handle cases where required data might not be available (fallback to null)
+             $cable = $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalCableType'] ?? null;
+             $distance = $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalDistance'] ?? null;
+             $wavelength = $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalWaveLengthExact'] ?? null;
+ 
+             // Create a new Transceiver object with the retrieved data
+             return new Transceiver([
+                 'port_id' => $ifIndexToPortId->get($ifIndex),  // Map ifIndex to port_id
+                 'index' => $ifIndex,
+                 'vendor' => $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalVenderName'] ?? null,
+                 'type' => $data['HUAWEI-ENTITY-EXTENT-MIB::transceiveType'] ?? null,
+                 'model' => $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalVenderPn'] ?? null,
+                 'serial' => $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalVendorSn'] ?? null,
+                 'cable' => $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalMode'] ?? null,
+                 'distance' => $data['HUAWEI-ENTITY-EXTENT-MIB:hwEntityOpticalTransferDistance'] ?? null,
+                 'wavelength' => $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalWaveLengthExact'] ?? null,
+                 'entity_physical_index' => $ifIndex,
+             ]);
+         })->filter();  // Filter out null values
+     }
     public function discoverMempools()
     {
         $mempools = new Collection();
