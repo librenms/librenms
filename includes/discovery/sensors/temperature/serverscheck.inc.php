@@ -38,7 +38,7 @@ foreach ($pre_cache['serverscheck_control'] as $oid_name => $oid_value) {
     if (Str::contains($oid_name, 'name')) {
         $tmp_oid = 'sensor' . $temp_x . 'Value.0';
         $current = $pre_cache['serverscheck_control'][$tmp_oid];
-        if (Str::contains($oid_value, ['Temp', 'BR'])) {
+        if (Str::contains($oid_value, ['Temp', 'BR'], ignoreCase: true)) {
             if (is_numeric($current)) {
                 $index = str_replace('.0', '', $oid_name);
                 $descr = $oid_value;
