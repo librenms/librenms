@@ -357,6 +357,21 @@ Configuration of the LibreNMS IRC-Bot is described [here](https://github.com/lib
 | ------ | ------- |
 | IRC | enabled |
 
+## IBM On Call Manager
+
+LibreNMS can make use of IBM On Call Manager, this is done by utilizing an API
+key you create by adding the LiberNMS integration.
+
+API Keys can be found under 'Integrations' in the IBM On Call Manager portal after selecting LibreNMS as the integration.
+
+IBM On Call Manager uses a webhook to send the name of the alert rule. It will include the name or ip address of the system sending the alert, the name of the alert, the severity, timestamp, the OS, location, and the unique id. 
+
+**Example:**
+
+| Config | Example |
+| ------ | ------- |
+| API Key | randomsample |
+
 ## JIRA
 
 You can have LibreNMS create issues on a Jira instance for critical and warning
