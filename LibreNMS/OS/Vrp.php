@@ -69,9 +69,9 @@ class Vrp extends OS implements
     OSDiscovery
 {
     use SyncsModels;
-    use EntityMib {
-        EntityMib::discoverEntityPhysical as discoverBaseEntityPhysical;
-    }
+    use EntityMib {EntityMib::discoverEntityPhysical as discoverBaseEntityPhysical;}
+    use Illuminate\Support\Collection;
+    use SnmpQuery;
 
     public function discoverEntityPhysical(): Collection
     {
@@ -98,6 +98,7 @@ class Vrp extends OS implements
 
         return $inventory;
     }
+    
     public function discoverTransceivers(): Collection
      {
          // Get a map of ifIndex to port_id for proper association with ports
