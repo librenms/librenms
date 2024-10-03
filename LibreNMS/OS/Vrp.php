@@ -103,7 +103,7 @@ class Vrp extends OS implements
     $ifIndexToPortId = $this->getDevice()->ports()->pluck('port_id', 'ifIndex');
 
     // Walk through the MIB table for transceiver information
-    return SnmpQuery::cache()->walk('HUAWEI-ENTITY-EXTENT-MIB::hwOpticalModuleInfoTable')->mapTable(function ($data, $ifIndex) use ($ifIndexToPortId) {
+    return \SnmpQuery::walk('HUAWEI-ENTITY-EXTENT-MIB::hwOpticalModuleInfoTable')->mapTable(function ($data, $ifIndex) use ($ifIndexToPortId) {
         // Skip inactive transceivers
         if ($data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalType'] === 'inactive') {
             return null;
