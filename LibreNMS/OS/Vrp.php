@@ -108,7 +108,7 @@ class Vrp extends OS implements
             if (empty($matches[0])) {
                 return null;
             }
-            
+
             return ['entIndex' => $entPhysicalIndex, 'ifIndex' => $matches[0]];
         })->pluck('ifIndex', 'entIndex');
 
@@ -132,7 +132,7 @@ class Vrp extends OS implements
                 // Invalid
                 return null;
             }
-            
+
             // Create a new Transceiver object with the retrieved data
             return new Transceiver([
                 'port_id' => $ifIndexToPortId->get($ifIndex),  // Map ifIndex to port_id
