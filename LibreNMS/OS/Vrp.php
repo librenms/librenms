@@ -112,6 +112,7 @@ class Vrp extends OS implements
             $cable = $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalCableType'] ?? null;
             $distance = $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalDistance'] ?? null;
             $wavelength = $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalWaveLengthExact'] ?? null;
+
             // Create a new Transceiver object with the retrieved data
             return new Transceiver([
                 'port_id' => $ifIndexToPortId->get($ifIndex),  // Map ifIndex to port_id
