@@ -5,11 +5,11 @@ $unit_text = 'Count';
 $stats_list = [
     'user' => [
         'stat' => 'user',
-        'descr' => 'Present',
+        'descr' => 'UserPresent',
     ],
     'no_user' => [
         'stat' => 'no_user',
-        'descr' => 'Not Present',
+        'descr' => 'User!Present',
     ],
 ];
 

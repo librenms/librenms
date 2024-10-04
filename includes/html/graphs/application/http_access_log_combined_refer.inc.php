@@ -5,11 +5,11 @@ $unit_text = 'Count';
 $stats_list = [
     'refer' => [
         'stat' => 'refer',
-        'descr' => 'Present',
+        'descr' => 'Refer Present',
     ],
     'no_refer' => [
         'stat' => 'no_refer',
-        'descr' => 'Not Present',
+        'descr' => 'Refer!Present',
     ],
 ];
 

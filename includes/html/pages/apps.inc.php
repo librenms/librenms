@@ -553,7 +553,7 @@ $graphs['http_access_log_combined'] = [
     'methods',
     'version',
     'refer',
-    'uiser',
+    'user',
     'log_size',
     'error_size',
 ];
