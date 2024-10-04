@@ -127,12 +127,12 @@ class Vrp extends OS implements
             $distance = $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalDistance'] ?? null;
             $wavelength = $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalWaveLengthExact'] ?? null;
             $ifIndex = $entityToIfIndex->get($entIndex);
+            d_echo ($ifIndex);
             $port_id = $ifIndexToPortId->get($ifIndex) ?? null;
             if (is_null($port_id)) {
                 // Invalid
                 return null;
             }
-
             // Create a new Transceiver object with the retrieved data
             return new Transceiver([
                 'port_id' => $ifIndexToPortId->get($ifIndex),  // Map ifIndex to port_id
@@ -144,7 +144,7 @@ class Vrp extends OS implements
                 'cable' => $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalMode'] ?? null,
                 'distance' => $data['HUAWEI-ENTITY-EXTENT-MIB:hwEntityOpticalTransferDistance'] ?? null,
                 'wavelength' => $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalWaveLengthExact'] ?? null,
-                'entity_physical_index' => $ifIndex,
+                'entity_physical_index' => $entIndex,
             ]);
         })->filter();  // Filter out null values
     }
