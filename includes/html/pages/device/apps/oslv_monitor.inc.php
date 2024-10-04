@@ -27,7 +27,7 @@ echo generate_link($label, $link_array);
 
 if (isset($app_data['backend']) && $app_data['backend'] == 'FreeBSD') {
     if (!isset($app_data['inactive']) || !isset($app_data['inactive'][0])) {
-        echo "\n | Jails: \n";
+        echo "<br>\nJails: \n";
     } else {
         echo "\n<br>Current Jails: \n";
     }
@@ -223,6 +223,9 @@ if (isset($app_data['backend']) && $app_data['backend'] == 'cgroups') {
         foreach ($user_containers as $index => $oslvm) {
             $oslvm_name = $oslvm;
             $oslvm_name = preg_replace('/^u\_/', '', $oslvm_name);
+            if (isset($app_data['uid_mapping'][$oslvm_name])) {
+                $oslvm_name=$oslvm_name . '(' . $app_data['uid_mapping'][$oslvm_name]['name'] . ')';
+            }
             $label = (! isset($vars['oslvm']) || $vars['oslvm'] != $oslvm)
                 ? $oslvm_name
                 : '<span class="pagemenu-selected">' . $oslvm_name . '</span>';
@@ -238,7 +241,10 @@ if (isset($app_data['backend']) && $app_data['backend'] == 'cgroups') {
         $index_int = 0;
         foreach ($seen_user_containers as $index => $oslvm) {
             $oslvm_name = $oslvm;
-            $oslvm_name = preg_replace('/^d\_/', '', $oslvm_name);
+            $oslvm_name = preg_replace('/^u\_/', '', $oslvm_name);
+            if (isset($app_data['uid_mapping'][$oslvm_name])) {
+                $oslvm_name=$oslvm_name . '(' . $app_data['uid_mapping'][$oslvm_name]['name'] . ')';
+            }
             $label = (! isset($vars['oslvm']) || $vars['oslvm'] != $oslvm)
             ? $oslvm_name
             : '<span class="pagemenu-selected">' . $oslvm_name . '</span>';
