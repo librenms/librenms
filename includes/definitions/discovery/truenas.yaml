@@ -1,4 +1,4 @@
-mib: FREENAS-MIB
+mib: FREENAS-MIB        # Used for FreeNAS and TrueNAS-CORE
 modules:
     os:
         sysDescr_regex: '/(?:TrueNAS-)(?<version>\S*).*\. Hardware: (?<hardware>.*).*\./'
