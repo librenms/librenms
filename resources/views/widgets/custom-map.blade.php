@@ -48,7 +48,7 @@
             .done(function( data ) {
                 // Add/update nodes
                 $.each( data.nodes, function( nodeid, node) {
-                    var node_cfg = custommapGetNodeCfg(nodeid, node, false, custom_image_base);
+                    var node_cfg = custommap.getNodeCfg(nodeid, node, false, custom_image_base);
                     if(node.device_id) {
                         node_device_map[nodeid] = {device_id: node.device_id, device_name: node.device_name};
                     } else if(node.linked_map_name) {
@@ -58,9 +58,9 @@
                 });
 
                 $.each( data.edges, function( edgeid, edge) {
-                    var mid = custommapGetEdgeMidCfg(edgeid, edge, false);
-                    var edge1 = custommapGetEdgeCfg(edgeid, edge, "from", reverse_arrows);
-                    var edge2 = custommapGetEdgeCfg(edgeid, edge, "to", reverse_arrows);
+                    var mid = custommap.getEdgeMidCfg(edgeid, edge, false);
+                    var edge1 = custommap.getEdgeCfg(edgeid, edge, "from", reverse_arrows);
+                    var edge2 = custommap.getEdgeCfg(edgeid, edge, "to", reverse_arrows);
 
                     if(edge.port_id) {
                         edge_port_map[edgeid] = {device_id: edge.device_id, port_id: edge.port_id};
@@ -69,9 +69,9 @@
                     network_edges.add([edge1, edge2]);
                 });
 
-                custommapRedrawDefaultLegend(network_nodes, {{ $map->legend_steps }}, {{ $map->legend_x }}, {{ $map->legend_y }}, {{ $map->legend_font_size }}, {{ $map->legend_hide_invalid }}, {{ $map->legend_hide_overspeed }});
+                custommap.redrawDefaultLegend(network_nodes, {{ $map->legend_steps }}, {{ $map->legend_x }}, {{ $map->legend_y }}, {{ $map->legend_font_size }}, {{ $map->legend_hide_invalid }}, {{ $map->legend_hide_overspeed }});
 
-                network = custommapCreateNetwork('custom-map-{{ $id }}', scale, network_nodes, network_edges, network_options, bgtype, bgdata);
+                network = custommap.createNetwork('custom-map-{{ $id }}', scale, network_nodes, network_edges, network_options, bgtype, bgdata);
 
                 network.on('doubleClick', function (properties) {
                     edge_id = null;

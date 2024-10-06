@@ -75,7 +75,7 @@
             .done(function( data ) {
                 // Add/update nodes
                 $.each( data.nodes, function( nodeid, node) {
-                    var node_cfg = custommapGetNodeCfg(nodeid, node, screenshot, custom_image_base);
+                    var node_cfg = custommap.getNodeCfg(nodeid, node, screenshot, custom_image_base);
                     if(node.device_id) {
                         node_device_map[nodeid] = {device_id: node.device_id, device_name: node.device_name};
                         delete node_link_map[nodeid];
@@ -95,9 +95,9 @@
                 });
 
                 $.each( data.edges, function( edgeid, edge) {
-                    var mid = custommapGetEdgeMidCfg(edgeid, edge, screenshot);
-                    var edge1 = custommapGetEdgeCfg(edgeid, edge, "from", reverse_arrows);
-                    var edge2 = custommapGetEdgeCfg(edgeid, edge, "to", reverse_arrows);
+                    var mid = custommap.getEdgeMidCfg(edgeid, edge, screenshot);
+                    var edge1 = custommap.getEdgeCfg(edgeid, edge, "from", reverse_arrows);
+                    var edge2 = custommap.getEdgeCfg(edgeid, edge, "to", reverse_arrows);
                     if(edge.port_id) {
                         edge_port_map[edgeid] = {device_id: edge.device_id, port_id: edge.port_id};
                     } else {
@@ -130,7 +130,7 @@
                 });
 
                 // Re-draw the legend
-                custommapRedrawDefaultLegend(network_nodes, legend.steps, legend.x, legend.y, legend.font_size, legend.hide_invalid, legend.hide_overspeed);
+                custommap.redrawDefaultLegend(network_nodes, legend.steps, legend.x, legend.y, legend.font_size, legend.hide_invalid, legend.hide_overspeed);
 
                 // Flush in order to make sure nodes exist for edges to connect to
                 network_nodes.flush();
@@ -146,7 +146,7 @@
 
         // Initialise map if it does not exist
         if (! network) {
-            network = custommapCreateNetwork("custom-map", 1, network_nodes, network_edges, network_options, bgtype, bgdata);
+            network = custommap.createNetwork("custom-map", 1, network_nodes, network_edges, network_options, bgtype, bgdata);
 
             network.on('doubleClick', function (properties) {
                 edge_id = null;
