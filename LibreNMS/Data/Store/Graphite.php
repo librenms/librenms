@@ -42,7 +42,6 @@ class Graphite extends BaseDatastore
         parent::__construct();
         $host = Config::get('graphite.host');
         $port = Config::get('graphite.port', 2003);
-        $laravelenabled = \Illuminate\Support\Facades\Config::get('graphite.enable');
         if ($this->shouldConnect()) {
             $this->connection = $socketFactory->createClient("$host:$port");
         }
