@@ -27,17 +27,14 @@ namespace LibreNMS\Modules;
 
 use App\Models\Device;
 use App\Models\Port;
+use App\Observers\ModuleModelObserver;
 use Illuminate\Support\Facades\DB;
-use LibreNMS\Config;
 use LibreNMS\DB\SyncsModels;
-use LibreNMS\Enum\PortAssociationMode;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
+use LibreNMS\Interfaces\Polling\PortSecurityPolling;
 use LibreNMS\OS;
 use LibreNMS\Polling\ModuleStatus;
-use App\Observers\ModuleModelObserver;
-use SnmpQuery;
-use LibreNMS\Interfaces\Polling\PortSecurityPolling;
 
 class PortSecurity implements Module
 {
@@ -108,7 +105,7 @@ class PortSecurity implements Module
                 $port_key[$if_index] = $port_id;
                 $portsec_snmp[$if_index]['ifIndex'] = $if_index;
 
-                if (array_key_exists($if_index,  $portsec_snmp)) {
+                if (array_key_exists($if_index, $portsec_snmp)) {
                     $portsec_snmp[$if_index]['port_id'] = $port_id;
                     $portsec_snmp[$if_index]['device_id'] = $device_id;
                 }
@@ -137,7 +134,7 @@ class PortSecurity implements Module
                     $entry = $entry->toArray();
                     unset($entry['id']);
                     // This OID currently always returns null so doesn't poulate $portsec_snmp
-                    if (!array_key_exists('cpsIfSecureLastMacAddrVlanId', $record)) {
+                    if (! array_key_exists('cpsIfSecureLastMacAddrVlanId', $record)) {
                         unset($entry['cpsIfSecureLastMacAddrVlanId']);
                     }
                     // Checking that polled data exists and doesn't
@@ -145,15 +142,13 @@ class PortSecurity implements Module
                         unset($record['port_id']);
                         $update->where('port_id', $port_id)->update($record);
                     }
-                }
-                elseif (array_key_exists('cpsIfPortSecurityEnable', $record)) {
+                } elseif (array_key_exists('cpsIfPortSecurityEnable', $record)) {
                     $update->where('port_id', $port_id)->update($record);
                 }
             }
             ModuleModelObserver::observe(\App\Models\PortSecurity::class);
             $this->syncModels($device, 'portSecurity', $os->pollPortSecurity($portsec));
         }
-        return;
     }
 
     /**
@@ -167,7 +162,7 @@ class PortSecurity implements Module
     /**
      * @inheritDoc
      */
-    public function dump(Device $device)
+    public function dump(Device $device, , string $type): ?array
     {
         return [
             'PortSecurity' => $device->portSecurity()->orderBy('port_id')
