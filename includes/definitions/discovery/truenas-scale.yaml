@@ -118,6 +118,7 @@ modules:
                 -
                     oid: hddTempTable
                     value: hddTempValue
+                    divisor: 1000
                     descr: '{{ $hddTempDevice }}'
                     index: hddTempValue.'{{ $index }}'
         state:
