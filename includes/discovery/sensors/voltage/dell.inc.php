@@ -37,6 +37,15 @@ foreach ((array) $temp as $index => $entry) {
 
         discover_sensor(null, 'voltage', $device, $cur_oid . $index, $index, 'dell', $descr, $divisor, '1', $lowlimit, $low_warn_limit, $warnlimit, $limit, $value, 'snmp', $index);
     }
+
+    unset(
+        $descr,
+        $value,
+        $lowlimit,
+        $low_warn_limit,
+        $warnlimit,
+        $limit
+    );
 }
 
 unset(
