@@ -145,7 +145,7 @@ class Kafka extends BaseDatastore
                 $result = $producer->flush(self::getKafkaFlushTimeout());
 
                 if (RD_KAFKA_RESP_ERR_NO_ERROR !== $result) {
-                    Log::warning('KAFKA: Was unable to flush ( '.$result.' ), messages might be lost!');
+                    Log::warning('KAFKA: Was unable to flush ( ' .$result. ' ), messages might be lost!');
                     Log::warning(Library::rd_kafka_err2str($result));
                 }
             }
