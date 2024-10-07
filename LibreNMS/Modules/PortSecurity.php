@@ -78,6 +78,8 @@ class PortSecurity implements Module
         }
         if ($os instanceof PortSecurityPolling) {
             // Polling for current data
+            $port_id = 0;
+            $record = [];
             $device = $os->getDevice()->toArray();
             $portsec_snmp = [];
             $portsec_snmp = snmpwalk_cache_oid($device, 'cpsIfPortSecurityEnable', $portsec_snmp, 'CISCO-PORT-SECURITY-MIB');
@@ -154,9 +156,9 @@ class PortSecurity implements Module
     /**
      * @inheritDoc
      */
-    public function cleanup(Device $device): void
+    public function cleanup(Device $device): int
     {
-        $device->portSecurity()->delete();
+        return $device->portSecurity()->delete();
     }
 
     /**
