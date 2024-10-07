@@ -29,11 +29,31 @@ foreach ((array) $temp as $index => $entry) {
     $descr = $entry['amperageProbeLocationName'];
     if ($entry['amperageProbeType'] === 'amperageProbeTypeIsSystemWatts') {
         $divisor = 1;
-        $value = $entry['amperageProbeReading'];
-        $lowlimit = $entry['amperageProbeLowerCriticalThreshold'] / $divisor;
-        $low_warn_limit = $entry['amperageProbeLowerCriticalThreshold'] / $divisor;
-        $warnlimit = $entry['amperageProbeUpperNonCriticalThreshold'] / $divisor;
-        $limit = $entry['amperageProbeUpperCriticalThreshold'] / $divisor;
+        if (isset($entry['amperageProbeReading'])) {
+                $value = $entry['amperageProbeReading'];
+        } else {
+                $value = null;
+        }
+        if (isset($entry['amperageProbeLowerCriticalThreshold'])) {
+                $lowlimit = $entry['amperageProbeLowerCriticalThreshold'] / $divisor;
+        } else {
+                $lowlimit = null;
+        }
+        if (isset($entry['amperageProbeLowerCriticalThreshold'])) {
+                $low_warn_limit = $entry['amperageProbeLowerCriticalThreshold'] / $divisor;
+        } else {
+                $low_warn_limit = null;
+        }
+        if (isset($entry['amperageProbeUpperNonCriticalThreshold'])) {
+                $warnlimit = $entry['amperageProbeUpperNonCriticalThreshold'] / $divisor;
+        } else {
+                $warnlimit = null;
+        }
+        if (isset($entry['amperageProbeUpperCriticalThreshold'])) {
+                $limit = $entry['amperageProbeUpperCriticalThreshold'] / $divisor;
+        } else {
+                $limit = null;
+        }
 
         discover_sensor(null, 'power', $device, $cur_oid . $index, $index, 'dell', $descr, $divisor, '1', $lowlimit, $low_warn_limit, $warnlimit, $limit, $value, 'snmp', $index);
     }
