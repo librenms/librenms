@@ -162,7 +162,7 @@ class PortSecurity implements Module
     /**
      * @inheritDoc
      */
-    public function dump(Device $device, , string $type): ?array
+    public function dump(Device $device, string $type): ?array
     {
         return [
             'PortSecurity' => $device->portSecurity()->orderBy('port_id')
