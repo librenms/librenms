@@ -3465,6 +3465,18 @@
             },
             "type": "graph"
         },
+        "graph_types": {
+        "device": {
+            "routeros_queues": {
+                "section": "network",
+                "order": 0,
+                "descr": "Mikrotik Queues"
+            }
+             }
+             },
+
+        
+
         "graph_types.device.rutos_2xx_mobileDataUsage": {
             "default": {
                 "section": "network",
