@@ -113,6 +113,13 @@ modules:
                     num_oid: .1.3.6.1.4.1.50536.1.5.3.{{ $index }}
                     descr: 'ZIL Operations last 10 seconds'
                     index: zfsZilstatOps10sec.{{ $index }}
+        temperature:
+            data:
+                -
+                    oid: hddTempTable
+                    value: hddTempValue
+                    descr: '{{ $hddTempDevice }}'
+                    index: hddTempValue.'{{ $index }}'
         state:
             data:
                 -
