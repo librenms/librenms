@@ -46,6 +46,13 @@ use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\Interfaces\Polling\PortSecurityPolling;
 use LibreNMS\OS\Shared\Cisco;
 use LibreNMS\OS\Traits\CiscoCellular;
+use LibreNMS\Interfaces\Polling\PortSecurityPolling;
+use LibreNMS\Interfaces\Polling\OSPolling;
+use Illuminate\Support\Collection;
+use SnmpQuery;
+use LibreNMS\OS;
+use App\Models\Device;
+use App\Observers\ModuleModelObserver;
 
 class Ios extends Cisco implements
     WirelessCellDiscovery,
@@ -62,7 +69,11 @@ class Ios extends Cisco implements
 
     public function pollOS(DataStorageInterface $datastore): void
     {
+<<<<<<< HEAD
         // Don't poll Ciscowlc FIXME remove when wireless-controller module exists
+=======
+       	// Don't poll Ciscowlc FIXME remove when wireless-controller module exists
+>>>>>>> 4cc4269ddd (Adding inheritance and interface, and optimizing polling.)
     }
 
     /**
@@ -109,6 +120,7 @@ class Ios extends Cisco implements
 
         return $sensors;
     }
+<<<<<<< HEAD
 
 <<<<<<< HEAD
     public function pollPortSecurity($os, $device): Collection
@@ -231,3 +243,12 @@ class Ios extends Cisco implements
 >>>>>>> 4cbc88a538 (Cisco os discovery cleanups (#17868))
     }
 }
+=======
+    public function pollPortSecurity(Collection $os): Collection
+    {
+        $portsec = $os;
+
+        return $portsec;
+    }
+}
+>>>>>>> abab5288e0 (Adding inheritance and interface, and optimizing polling.)

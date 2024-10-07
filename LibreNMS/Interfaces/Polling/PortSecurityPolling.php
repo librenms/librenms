@@ -25,19 +25,16 @@
 
 namespace LibreNMS\Interfaces\Polling;
 
-use App\Models\Device;
 use App\Models\PortSecurity;
-use Illuminate\Database\Eloquent\Collection;
-use LibreNMS\OS;
+use Illuminate\Support\Collection;
 
 interface PortSecurityPolling
 {
     /**
      * Poll the ports for port-security data
      *
-     * @param  OS  $os
-     * @param  Device  $device
+     * @param  Collection<PortSecurity>  $portsec
      * @return Collection<PortSecurity>
      */
-    public function pollPortSecurity(OS $os, Device $device): Collection;
+    public function pollPortSecurity(Collection $portsec): Collection;
 }
