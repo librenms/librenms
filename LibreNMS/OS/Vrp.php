@@ -138,7 +138,7 @@ class Vrp extends OS implements
             // Create a new Transceiver object with the retrieved data
             return new Transceiver([
                 'port_id' => $ifIndexToPortId->get($ifIndex),  // Map ifIndex to port_id
-                'index' => $ifIndex,
+                'index' => $entIndex,
                 'vendor' => $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalVenderName'] ?? null,
                 'type' => $data['HUAWEI-ENTITY-EXTENT-MIB::transceiveType'] ?? null,
                 'model' => $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalVenderPn'] ?? null,
