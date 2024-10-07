@@ -28,6 +28,7 @@
 namespace LibreNMS\OS;
 
 use App\Facades\PortCache;
+use App\Models\Device;
 use App\Models\IsisAdjacency;
 use App\Models\Port;
 use Illuminate\Database\Eloquent\Collection as Eloq_Collection;
@@ -47,9 +48,6 @@ use LibreNMS\Interfaces\Polling\PortSecurityPolling;
 use LibreNMS\OS\Traits\CiscoCellular;
 use LibreNMS\Util\IP;
 use SnmpQuery;
-use LibreNMS\OS;
-use App\Models\Device;
-use App\Observers\ModuleModelObserver;
 
 class Iosxe extends Ciscowlc implements
     IsIsDiscovery,

@@ -26,13 +26,10 @@
 
 namespace LibreNMS\OS;
 
-<<<<<<< HEAD
 use App\Models\Device;
 use App\Models\Port;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Str;
-=======
->>>>>>> 4cbc88a538 (Cisco os discovery cleanups (#17868))
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessCellDiscovery;
@@ -48,11 +45,8 @@ use LibreNMS\OS\Shared\Cisco;
 use LibreNMS\OS\Traits\CiscoCellular;
 use LibreNMS\Interfaces\Polling\PortSecurityPolling;
 use LibreNMS\Interfaces\Polling\OSPolling;
-use Illuminate\Support\Collection;
-use SnmpQuery;
-use LibreNMS\OS;
-use App\Models\Device;
-use App\Observers\ModuleModelObserver;
+use LibreNMS\OS\Shared\Cisco;
+use LibreNMS\OS\Traits\CiscoCellular;
 
 class Ios extends Cisco implements
     WirelessCellDiscovery,
@@ -69,11 +63,7 @@ class Ios extends Cisco implements
 
     public function pollOS(DataStorageInterface $datastore): void
     {
-<<<<<<< HEAD
         // Don't poll Ciscowlc FIXME remove when wireless-controller module exists
-=======
-       	// Don't poll Ciscowlc FIXME remove when wireless-controller module exists
->>>>>>> 4cc4269ddd (Adding inheritance and interface, and optimizing polling.)
     }
 
     /**
@@ -120,9 +110,6 @@ class Ios extends Cisco implements
 
         return $sensors;
     }
-<<<<<<< HEAD
-
-<<<<<<< HEAD
     public function pollPortSecurity($os, $device): Collection
     {
         // Polling for current data
@@ -203,7 +190,6 @@ class Ios extends Cisco implements
         }
 
         return $portsec;
-=======
     private function mapToEntPhysical(array &$data): array
     {
         // try DB first
@@ -240,15 +226,5 @@ class Ios extends Cisco implements
         }
 
         return $data;
->>>>>>> 4cbc88a538 (Cisco os discovery cleanups (#17868))
     }
 }
-=======
-    public function pollPortSecurity(Collection $os): Collection
-    {
-        $portsec = $os;
-
-        return $portsec;
-    }
-}
->>>>>>> abab5288e0 (Adding inheritance and interface, and optimizing polling.)
