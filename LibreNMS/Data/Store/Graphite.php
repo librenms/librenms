@@ -42,10 +42,10 @@ class Graphite extends BaseDatastore
     {
         parent::__construct();
         $this->config = $config ?? new Config();
+        $host = $this->config::get('graphite.host');
+        $port = $this->config::get('graphite.port', 2003);
 
         if ($this->shouldConnect()) {
-            $host = $this->config::get('graphite.host');
-            $port = $this->config::get('graphite.port', 2003);
             $this->connection = $socketFactory->createClient("$host:$port");
         }
 

@@ -41,10 +41,10 @@ class OpenTSDB extends BaseDatastore
     {
         parent::__construct();
         $this->config = $config ?? new Config();
+        $host = $this->config::get('opentsdb.host');
+        $port = $this->config::get('opentsdb.port', 2181);
 
         if ($this->shouldConnect()) {
-            $host = $this->config::get('opentsdb.host');
-            $port = $this->config::get('opentsdb.port', 2181);
             $this->connection = $socketFactory->createClient("$host:$port");
         }
 
