@@ -8,10 +8,11 @@ use Illuminate\Support\Facades\Log;
 use LibreNMS\Config;
 use RdKafka\Conf;
 use RdKafka\Producer;
+use RdKafka\FFI\Library;
 
 class Kafka extends BaseDatastore
 {
-    private const PRODUCER_MAXIMUM_QUEUE_ACUMULATED_MESSAGES = 100;
+    private const PRODUCER_MAXIMUM_QUEUE_ACUMULATED_MESSAGES = 1000;
 
     public function getName()
     {
@@ -65,7 +66,7 @@ class Kafka extends BaseDatastore
                 foreach ($device_groups as $group) {
                     // The group name will always be parsed as lowercase, even when uppercase in the GUI.
                     if (in_array(strtoupper($group->name), $excluded_groups_arr)) {
-                        Log::warning('KAFKA: Skipped parsing to Kafka, device is in group: ' . $group->name);
+                        Log::debug('KAFKA: Skipped parsing to Kafka, device is in group: ' . $group->name);
 
                         return;
                     }
@@ -77,7 +78,7 @@ class Kafka extends BaseDatastore
                 $excluded_measurement_arr = explode(',', $excluded_measurement);
 
                 if (in_array($measurement, $excluded_measurement_arr)) {
-                    Log::warning('KAFKA: Skipped parsing to Kafka, measurement is in measurement-excluded: ' . $measurement);
+                    Log::debug('KAFKA: Skipped parsing to Kafka, measurement is in measurement-excluded: ' . $measurement);
 
                     return;
                 }
@@ -144,7 +145,8 @@ class Kafka extends BaseDatastore
                 $result = $producer->flush(self::getKafkaFlushTimeout());
 
                 if (RD_KAFKA_RESP_ERR_NO_ERROR !== $result) {
-                    Log::warning('KAFKA: Was unable to flush, messages might be lost!');
+                    Log::warning('KAFKA: Was unable to flush ('.$result.'), messages might be lost!');
+                    Log::warning(Library::rd_kafka_err2str($result));
                 }
             }
         } catch (\Throwable $th) {
