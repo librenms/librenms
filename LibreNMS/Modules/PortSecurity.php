@@ -26,6 +26,7 @@
 namespace LibreNMS\Modules;
 
 use App\Models\Device;
+use App\Models\Port;
 use Illuminate\Support\Facades\DB;
 use LibreNMS\Config;
 use LibreNMS\DB\SyncsModels;
@@ -34,6 +35,9 @@ use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
 use LibreNMS\Polling\ModuleStatus;
+use App\Observers\ModuleModelObserver;
+use SnmpQuery;
+use LibreNMS\Interfaces\Polling\PortSecurityPolling;
 
 class PortSecurity implements Module
 {
@@ -49,7 +53,7 @@ class PortSecurity implements Module
 
     public function shouldDiscover(OS $os, ModuleStatus $status): bool
     {
-        return $status->isEnabledAndDeviceUp($os->getDevice());
+        return $status->isEnabledAndDeviceUp($os->getDevice()) && $os instanceof PortSecurityDiscovery;
     }
 
     /**
@@ -62,7 +66,7 @@ class PortSecurity implements Module
 
     public function shouldPoll(OS $os, ModuleStatus $status): bool
     {
-        return $status->isEnabledAndDeviceUp($os->getDevice());
+        return $status->isEnabledAndDeviceUp($os->getDevice()) && $os instanceof PortSecurityPolling;
     }
 
     /**
@@ -72,145 +76,84 @@ class PortSecurity implements Module
      */
     public function poll(OS $os, DataStorageInterface $datastore): void
     {
-        $table = 'port_security';
-        $port_id_field = 'port_id';
-        $device_id_field = 'device_id';
-        $port_sec_enabled_field = 'cpsIfPortSecurityEnable';
-        $port_sec_status_field = 'cpsIfPortSecurityStatus';
-        $max_macs_field = 'cpsIfMaxSecureMacAddr';
-        $cur_mac_count_field = 'cpsIfCurrentSecureMacAddrCount';
-        $violation_action_field = 'cpsIfViolationAction';
-        $violation_count_field = 'cpsIfViolationCount';
-        $last_mac_field = 'cpsIfSecureLastMacAddress';
-        $sticky_macs_field = 'cpsIfStickyEnable';
-        // $last_vlan_field = 'cpsIfSecureLastMacAddrVlanId';
-        $device = $os->getDeviceArray();
-        if ($device['os'] == 'ios' || $device['os'] == 'iosxe') {
-            $port_stats = [];
-            $port_stats = snmpwalk_cache_oid($device, 'cpsIfPortSecurityEnable', $port_stats, 'CISCO-PORT-SECURITY-MIB');
-            $port_stats = snmpwalk_cache_oid($device, 'cpsIfPortSecurityStatus', $port_stats, 'CISCO-PORT-SECURITY-MIB');
-            $port_stats = snmpwalk_cache_oid($device, 'cpsIfMaxSecureMacAddr', $port_stats, 'CISCO-PORT-SECURITY-MIB');
-            $port_stats = snmpwalk_cache_oid($device, 'cpsIfCurrentSecureMacAddrCount', $port_stats, 'CISCO-PORT-SECURITY-MIB');
-            $port_stats = snmpwalk_cache_oid($device, 'cpsIfViolationAction', $port_stats, 'CISCO-PORT-SECURITY-MIB');
-            $port_stats = snmpwalk_cache_oid($device, 'cpsIfViolationCount', $port_stats, 'CISCO-PORT-SECURITY-MIB');
-            $port_stats = snmpwalk_cache_oid($device, 'cpsIfSecureLastMacAddress', $port_stats, 'CISCO-PORT-SECURITY-MIB');
-            $port_stats = snmpwalk_cache_oid($device, 'cpsIfStickyEnable', $port_stats, 'CISCO-PORT-SECURITY-MIB');
-            // $port_stats = snmpwalk_cache_oid($device, 'cpsIfSecureLastMacAddrVlanId', $port_stats, 'CISCO-PORT-SECURITY-MIB');
+        if ($os->getDevice()->portSecurity->isEmpty()) {
+            return;
+        }
+        if ($os instanceof PortSecurityPolling) {
+            // Polling for current data
+            $device = $os->getDevice()->toArray();
+            $portsec_snmp = [];
+            $portsec_snmp = snmpwalk_cache_oid($device, 'cpsIfPortSecurityEnable', $portsec_snmp, 'CISCO-PORT-SECURITY-MIB');
+            $portsec_snmp = snmpwalk_cache_oid($device, 'cpsIfPortSecurityStatus', $portsec_snmp, 'CISCO-PORT-SECURITY-MIB');
+            $portsec_snmp = snmpwalk_cache_oid($device, 'cpsIfMaxSecureMacAddr', $portsec_snmp, 'CISCO-PORT-SECURITY-MIB');
+            $portsec_snmp = snmpwalk_cache_oid($device, 'cpsIfCurrentSecureMacAddrCount', $portsec_snmp, 'CISCO-PORT-SECURITY-MIB');
+            $portsec_snmp = snmpwalk_cache_oid($device, 'cpsIfViolationAction', $portsec_snmp, 'CISCO-PORT-SECURITY-MIB');
+            $portsec_snmp = snmpwalk_cache_oid($device, 'cpsIfViolationCount', $portsec_snmp, 'CISCO-PORT-SECURITY-MIB');
+            $portsec_snmp = snmpwalk_cache_oid($device, 'cpsIfSecureLastMacAddress', $portsec_snmp, 'CISCO-PORT-SECURITY-MIB');
+            $portsec_snmp = snmpwalk_cache_oid($device, 'cpsIfStickyEnable', $portsec_snmp, 'CISCO-PORT-SECURITY-MIB');
+            $portsec_snmp = snmpwalk_cache_oid($device, 'cpsIfSecureLastMacAddrVlanId', $portsec_snmp, 'CISCO-PORT-SECURITY-MIB');
 
-            // End Building SNMP Cache Array
+            // Storing all polled data into an array using ifIndex as the index
+            // Getting all ports from device. Port has to exist in ports table to be populated in port_security
+            // Using ifIndex to map the port-security data to a port_id to compare/update against the correct records
+            $ports = new Port();
+            $device = $os->getDevice();
+            $device_id = $device->device_id;
+            $port_list = $ports->select('port_id', 'ifIndex')->where('device_id', $device_id)->get()->toArray();
+            $port_key = [];
 
-            // By default libreNMS uses the ifIndex to associate ports on devices with ports discoverd/polled
-            // before and stored in the database. On Linux boxes this is a problem as ifIndexes may be
-            // unstable between reboots or (re)configuration of tunnel interfaces (think: GRE/OpenVPN/Tinc/...)
-            // The port association configuration allows to choose between association via ifIndex, ifName,
-            // or maybe other means in the future. The default port association mode still is ifIndex for
-            // compatibility reasons.
-            $port_association_mode = Config::get('default_port_association_mode');
-            if ($device['port_association_mode']) {
-                $port_association_mode = PortAssociationMode::getName($device['port_association_mode']);
+            foreach ($port_list as $item) {
+                $if_index = $item['ifIndex'];
+                $port_id = $item['port_id'];
+                $port_key[$if_index] = $port_id;
+                $portsec_snmp[$if_index]['ifIndex'] = $if_index;
+
+                if (array_key_exists($if_index,  $portsec_snmp)) {
+                    $portsec_snmp[$if_index]['port_id'] = $port_id;
+                    $portsec_snmp[$if_index]['device_id'] = $device_id;
+                }
             }
 
-            // Build array of ports in the database and an ifIndex/ifName -> port_id map
-            $ports_mapped = get_ports_mapped($device['device_id']);
-            $ports_db = $ports_mapped['ports'];
+            // Assigning port_id and device_id to SNMP array for comparison
+            $portsec = $os->pollPortSecurity($device->portSecurity);
+            $portsec_db = $portsec->makeHidden('laravel_through_key');
+            foreach ($portsec_snmp as $item) {
+                $if_index = $item['ifIndex'];
+                if (array_key_exists('ifIndex', $portsec_snmp[$if_index]) and array_key_exists($portsec_snmp[$if_index]['ifIndex'], $port_key)) {
+                    $portsec_snmp[$if_index]['port_id'] = $port_key[$portsec_snmp[$if_index]['ifIndex']];
+                    $portsec_snmp[$if_index]['device_id'] = $device_id;
+                }
 
-            $default_port_group = Config::get('default_port_group');
+                if (array_key_exists($if_index, $port_key)) {
+                    $port_id = $port_key[$if_index];
+                    $record = $portsec_snmp[$if_index];
+                    unset($record['ifIndex']);
+                }
 
-            // Looping through all of the ports
-            $device_id = $device['device_id'];
-            $where = [[$device_id_field, $device_id]];
-            $ports_output = DB::table('ports')->select($port_id_field, 'ifType')->where($where)->get();
-            $port_info = json_decode(json_encode($ports_output), true);
-            $port_sec_output = DB::table($table)->where($where)->get();
-            $port_sec_info = json_decode(json_encode($port_sec_output), true);
+                $update = new \App\Models\PortSecurity;
+                $entry = $portsec->where('port_id', $port_id)->first();
 
-            foreach ($port_stats as $ifIndex => $snmp_data) {
-                $exists_port = false;
-                $exists_port_sec = false;
-                $snmp_data['ifIndex'] = $ifIndex; // Store ifIndex in port entry
-                // Get port_id according to port_association_mode used for this device
-                $port_id = get_port_id($ports_mapped, $snmp_data, $port_association_mode);
-                //Verifying if port is currently in ports table
-                foreach ($port_info as $port) {
-                    echo 'Searching ' . $port_id;
-                    if ($port['port_id'] == $port_id) {
-                        echo 'Match';
-                        $exists_port = true;
-                        break;
+                if ($entry) {
+                    $entry = $entry->toArray();
+                    unset($entry['id']);
+                    // This OID currently always returns null so doesn't poulate $portsec_snmp
+                    if (!array_key_exists('cpsIfSecureLastMacAddrVlanId', $record)) {
+                        unset($entry['cpsIfSecureLastMacAddrVlanId']);
+                    }
+                    // Checking that polled data exists and doesn't
+                    if (array_key_exists('cpsIfPortSecurityEnable', $record) and $record != $entry) {
+                        unset($record['port_id']);
+                        $update->where('port_id', $port_id)->update($record);
                     }
                 }
-                //Verifying if port is currently in port_security table
-                foreach ($port_sec_info as $port_sec) {
-                    if ($port_sec['port_id'] == $port_id) {
-                        $exists_port_sec = true;
-                        break;
-                    }
+                elseif (array_key_exists('cpsIfPortSecurityEnable', $record)) {
+                    $update->where('port_id', $port_id)->update($record);
                 }
-                // Needs to be an existing port. Checking if it's in the ports table
-                // Only concerned with physical ports
-                if ($exists_port) {
-                    if ($port_info[0]['ifType'] == 'ethernetCsmacd') {
-                        // Checking if port already exists in port_security table. Update if yes, insert if not.
-                        //$port_sec_info = DB::table($table)->select($port_id_field, $device_id_field)->get();
-                        $port_sec_enabled_value = $snmp_data['cpsIfPortSecurityEnable'];
-                        $port_sec_status_value = $snmp_data['cpsIfPortSecurityStatus'];
-                        $max_macs_value = $snmp_data['cpsIfMaxSecureMacAddr'];
-                        $cur_mac_count_value = $snmp_data['cpsIfCurrentSecureMacAddrCount'];
-                        $violation_action_value = $snmp_data['cpsIfViolationAction'];
-                        $violation_count_value = $snmp_data['cpsIfViolationCount'];
-                        $last_mac_value = $snmp_data['cpsIfSecureLastMacAddress'];
-                        $sticky_macs_value = $snmp_data['cpsIfStickyEnable'];
-                        // $last_vlan_value = $snmp_data['cpsIfSecureLastMacAddrVlanId'];
-                        if ($exists_port_sec) {
-                            if ($port_sec_info) {
-                                echo 'Updating port ' . $port_id . ' ';
-                                $update = [
-                                    $port_sec_enabled_field => $port_sec_enabled_value,
-                                    $port_sec_status_field => $port_sec_status_value,
-                                    $max_macs_field => $max_macs_value,
-                                    $cur_mac_count_field => $cur_mac_count_value,
-                                    $violation_action_field => $violation_action_value,
-                                    $violation_count_field => $violation_count_value,
-                                    $last_mac_field => $last_mac_value,
-                                    $sticky_macs_field => $sticky_macs_value,
-                                    // $last_vlan_field => $last_vlan_value,
-                                ];
-                                $output = DB::table($table)->where($port_id_field, $port_id)->update($update);
-                            }
-                        } else {
-                            echo 'Inserting port ' . $port_id . ' ';
-                            $insert_info = [
-                                $port_id_field => $port_id,
-                                $device_id_field => $device_id,
-                                $port_sec_enabled_field => $port_sec_enabled_value,
-                                $port_sec_status_field => $port_sec_status_value,
-                                $max_macs_field => $max_macs_value,
-                                $cur_mac_count_field => $cur_mac_count_value,
-                                $violation_action_field => $violation_action_value,
-                                $violation_count_field => $violation_count_value,
-                                $last_mac_field => $last_mac_value,
-                                $sticky_macs_field => $sticky_macs_value,
-                                // $last_vlan_field => $last_vlan_value,
-                            ];
-                            $output = DB::table($table)->insert($insert_info);
-                        }
-                    }
-                } else {
-                    echo 'port_id ' . $port_id . ' does not exist in ports table';
-                }
-            }//end foreach
-
-            unset(
-                $ports_mapped,
-                $port
-            );
-
-            echo "\n";
-
-            // Clear Variables Here
-            unset($port_stats);
-            unset($ports_db);
+            }
+            ModuleModelObserver::observe(\App\Models\PortSecurity::class);
+            $this->syncModels($device, 'portSecurity', $os->pollPortSecurity($portsec));
         }
+        return;
     }
 
     /**
