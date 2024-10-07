@@ -37,12 +37,11 @@ class OpenTSDB extends BaseDatastore
     protected $connection;
     private $config;
 
-
-    public function __construct(\Socket\Raw\Factory $socketFactory, \LibreNMS\Config $config = null)
+    public function __construct(\Socket\Raw\Factory $socketFactory, Config $config = null)
     {
         parent::__construct();
-        $this->config = $config ?? new \LibreNMS\Config();
-        
+        $this->config = $config ?? new Config();
+
         if ($this->shouldConnect()) {
             $host = $this->config::get('opentsdb.host');
             $port = $this->config::get('opentsdb.port', 2181);
@@ -135,7 +134,7 @@ class OpenTSDB extends BaseDatastore
     {
         return Config::get('opentsdb.enable', false);
     }
-    
+
     /**
      * Checks if the datastore wants rrdtags to be sent when issuing put()
      *
@@ -148,8 +147,8 @@ class OpenTSDB extends BaseDatastore
 
     private function shouldConnect()
     {
-        return ($this->config::get('opentsdb.enable', false) && 
-            $this->config::get('opentsdb.host') && 
-            $this->config::get('opentsdb.port', 2181));
+        return $this->config::get('opentsdb.enable', false) &&
+            $this->config::get('opentsdb.host') &&
+            $this->config::get('opentsdb.port', 2181);
     }
 }

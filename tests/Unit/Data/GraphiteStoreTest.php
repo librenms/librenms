@@ -112,11 +112,13 @@ class GraphiteStoreTest extends TestCase
         return $graphite;
     }
 
-    private function getTestConfig() {
+    private function getTestConfig()
+    {
         $config = new \LibreNMS\Config;
         $config::set('graphite.enable', true);
         $config::set('graphite.host', 'mibesthostnowplease');
         $config::set('opentsdb.port', 2003);
+
         return $config;
     }
 }

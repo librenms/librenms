@@ -38,11 +38,11 @@ class Graphite extends BaseDatastore
     protected $prefix;
     private $config;
 
-    public function __construct(\Socket\Raw\Factory $socketFactory, \LibreNMS\Config $config = null)
+    public function __construct(\Socket\Raw\Factory $socketFactory, Config $config = null)
     {
         parent::__construct();
-        $this->config = $config ?? new \LibreNMS\Config();
-        
+        $this->config = $config ?? new Config();
+
         if ($this->shouldConnect()) {
             $host = $this->config::get('graphite.host');
             $port = $this->config::get('graphite.port', 2003);
@@ -145,8 +145,8 @@ class Graphite extends BaseDatastore
 
     public function shouldConnect()
     {
-        return ($this->config::get('graphite.enable', false) && 
-            $this->config::get('graphite.host') && 
-            $this->config::get('graphite.port', 2181));
+        return $this->config::get('graphite.enable', false) &&
+            $this->config::get('graphite.host') &&
+            $this->config::get('graphite.port', 2181);
     }
 }
