@@ -36,15 +36,13 @@ class Graphite extends BaseDatastore
     protected $connection;
 
     protected $prefix;
-    private $config;
 
-    public function __construct(\Socket\Raw\Factory $socketFactory, Config $config = null)
+    public function __construct(\Socket\Raw\Factory $socketFactory)
     {
         parent::__construct();
-        $this->config = $config ?? new Config();
-        $host = $this->config::get('graphite.host');
-        $port = $this->config::get('graphite.port', 2003);
-
+        $host = Config::get('graphite.host');
+        $port = Config::get('graphite.port', 2003);
+        $laravelenabled = \Illuminate\Support\Facades\Config::get('graphite.enable');
         if ($this->shouldConnect()) {
             $this->connection = $socketFactory->createClient("$host:$port");
         }
@@ -55,7 +53,7 @@ class Graphite extends BaseDatastore
             Log::error("Graphite connection to $host has failed!");
         }
 
-        $this->prefix = $this->config::get('graphite.prefix', '');
+        $this->prefix = \LibreNMS\Config::get('graphite.prefix', '');
     }
 
     public function getName()
@@ -145,8 +143,8 @@ class Graphite extends BaseDatastore
 
     public function shouldConnect()
     {
-        return $this->config::get('graphite.enable', false) &&
-            $this->config::get('graphite.host') &&
-            $this->config::get('graphite.port', 2181);
+        return \LibreNMS\Config::get('graphite.enable', false) &&
+        \LibreNMS\Config::get('graphite.host') &&
+        \LibreNMS\Config::get('graphite.port', 2181);
     }
 }

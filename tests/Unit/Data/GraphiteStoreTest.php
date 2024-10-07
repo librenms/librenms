@@ -42,6 +42,7 @@ class GraphiteStoreTest extends TestCase
 
         // fix the date
         Carbon::setTestNow(Carbon::createFromTimestamp($this->timestamp));
+        $this->setGraphiteEnabledGlobally();
     }
 
     protected function tearDown(): void
@@ -61,7 +62,7 @@ class GraphiteStoreTest extends TestCase
         $this->expectException(\Socket\Raw\Exception::class);
         $this->expectExceptionMessage('Failed to handle connect exception');
 
-        new Graphite($mockSocketFactory, $this->getTestConfig());
+        new Graphite($mockSocketFactory);
     }
 
     public function testSocketWriteError(): void
@@ -107,12 +108,12 @@ class GraphiteStoreTest extends TestCase
         $mockFactory->shouldReceive('createClient')
             ->andReturn($mockSocket);
 
-        $graphite = new Graphite($mockFactory, $this->getTestConfig());
+        $graphite = new Graphite($mockFactory);
 
         return $graphite;
     }
 
-    private function getTestConfig()
+    private function setGraphiteEnabledGlobally()
     {
         $config = new \LibreNMS\Config;
         $config::set('graphite.enable', true);
