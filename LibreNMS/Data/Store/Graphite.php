@@ -36,18 +36,17 @@ class Graphite extends BaseDatastore
     protected $connection;
 
     protected $prefix;
+    private $config;
 
-    public function __construct(\Socket\Raw\Factory $socketFactory)
+    public function __construct(\Socket\Raw\Factory $socketFactory, \LibreNMS\Config $config = null)
     {
         parent::__construct();
-        $host = Config::get('graphite.host');
-        $port = Config::get('graphite.port', 2003);
-        try {
-            if (self::isEnabled() && $host && $port) {
-                $this->connection = $socketFactory->createClient("$host:$port");
-            }
-        } catch (\Exception $e) {
-            d_echo($e->getMessage());
+        $this->config = $config ?? new \LibreNMS\Config();
+        
+        if ($this->shouldConnect()) {
+            $host = $this->config::get('graphite.host');
+            $port = $this->config::get('graphite.port', 2003);
+            $this->connection = $socketFactory->createClient("$host:$port");
         }
 
         if ($this->connection) {
@@ -56,7 +55,7 @@ class Graphite extends BaseDatastore
             Log::error("Graphite connection to $host has failed!");
         }
 
-        $this->prefix = Config::get('graphite.prefix', '');
+        $this->prefix = $this->config::get('graphite.prefix', '');
     }
 
     public function getName()
@@ -142,5 +141,12 @@ class Graphite extends BaseDatastore
         } catch (\Socket\Raw\Exception $e) {
             Log::error('Graphite write error: ' . $e->getMessage());
         }
+    }
+
+    public function shouldConnect()
+    {
+        return ($this->config::get('graphite.enable', false) && 
+            $this->config::get('graphite.host') && 
+            $this->config::get('graphite.port', 2181));
     }
 }

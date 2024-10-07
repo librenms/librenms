@@ -54,12 +54,14 @@ class GraphiteStoreTest extends TestCase
 
     public function testSocketConnectError(): void
     {
-        $mockFactory = \Mockery::mock(\Socket\Raw\Factory::class);
+        $mockSocketFactory = \Mockery::mock(\Socket\Raw\Factory::class);
+        $mockSocketFactory->shouldReceive('createClient')
+            ->andThrow(\Socket\Raw\Exception::class, 'Failed to handle connect exception');
 
-        $mockFactory->shouldReceive('createClient')
-            ->andThrow('Socket\Raw\Exception', 'Failed to handle connect exception');
+        $this->expectException(\Socket\Raw\Exception::class);
+        $this->expectExceptionMessage('Failed to handle connect exception');
 
-        new Graphite($mockFactory);
+        new Graphite($mockSocketFactory, $this->getTestConfig());
     }
 
     public function testSocketWriteError(): void
@@ -71,6 +73,8 @@ class GraphiteStoreTest extends TestCase
             ->andThrow('Socket\Raw\Exception', 'Did not handle socket exception');
 
         $graphite->put(['hostname' => 'test'], 'fake', ['rrd_name' => 'name'], ['one' => 1]);
+
+        $mockSocket->shouldHaveReceived('write');
     }
 
     public function testSimpleWrite(): void
@@ -88,6 +92,8 @@ class GraphiteStoreTest extends TestCase
         $mockSocket->shouldReceive('write')
             ->with("testhost.testmeasure.rrd_name.ifOut 53453 $this->timestamp\n");
         $graphite->put($device, $measurement, $tags, $fields);
+
+        $mockSocket->shouldHaveReceived('write');
     }
 
     /**
@@ -101,8 +107,16 @@ class GraphiteStoreTest extends TestCase
         $mockFactory->shouldReceive('createClient')
             ->andReturn($mockSocket);
 
-        $graphite = new Graphite($mockFactory);
+        $graphite = new Graphite($mockFactory, $this->getTestConfig());
 
         return $graphite;
+    }
+
+    private function getTestConfig() {
+        $config = new \LibreNMS\Config;
+        $config::set('graphite.enable', true);
+        $config::set('graphite.host', 'mibesthostnowplease');
+        $config::set('opentsdb.port', 2003);
+        return $config;
     }
 }
