@@ -121,6 +121,7 @@ modules:
                     divisor: 1000
                     descr: '{{ $hddTempDevice }}'
                     index: hddTempValue.'{{ $index }}'
+                    group: 'hdd temperature'
         state:
             data:
                 -
