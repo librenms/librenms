@@ -16,27 +16,27 @@ $cur_oid = '.1.3.6.1.4.1.674.10892.1.700.12.1.6.';
 if (is_array($temp)) {
     foreach ($temp as $index => $entry) {
         $descr = $temp[$index]['coolingDeviceLocationName'];
-        if (isset($temp[$index]['coolingDeviceReading']) {
+        if (isset($temp[$index]['coolingDeviceReading'])) {
             $value = $temp[$index]['coolingDeviceReading'];
         } else {
             $value = null;
         }
-        if (isset($temp[$index]['coolingDeviceLowerCriticalThreshold']) {
+        if (isset($temp[$index]['coolingDeviceLowerCriticalThreshold'])) {
             $lowlimit = $temp[$index]['coolingDeviceLowerCriticalThreshold'];
         } else {
             $lowlimit = null;
         }
-        if (isset($temp[$index]['coolingDeviceLowerNonCriticalThreshold']) {
+        if (isset($temp[$index]['coolingDeviceLowerNonCriticalThreshold'])) {
                 $low_warn_limit = $temp[$index]['coolingDeviceLowerNonCriticalThreshold'];
         } else {
             $low_warn_limit = null;
         }
-        if (isset($temp[$index]['coolingDeviceUpperNonCriticalThreshold']) {
+        if (isset($temp[$index]['coolingDeviceUpperNonCriticalThreshold'])) {
             $warnlimit = $temp[$index]['coolingDeviceUpperNonCriticalThreshold'];
         } else {
             $warnlimit = null;
         }
-        if (isset($temp[$index]['coolingDeviceUpperCriticalThreshold']) {
+        if (isset($temp[$index]['coolingDeviceUpperCriticalThreshold'])) {
             $limit = $temp[$index]['coolingDeviceUpperCriticalThreshold'];
         } else {
             $limit = null;
