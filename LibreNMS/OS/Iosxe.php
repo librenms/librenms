@@ -104,13 +104,11 @@ class Iosxe extends Ciscowlc implements
                         'port_id' => $this->ifIndexToId($circuits[$circuit_index]['CISCO-IETF-ISIS-MIB::ciiCircIfIndex']),
                         'isisCircAdminState' => $circuits[$circuit_index]['CISCO-IETF-ISIS-MIB::ciiCircAdminState'] ?? 'down',
                         'isisISAdjState' => $adjacency_data['CISCO-IETF-ISIS-MIB::ciiISAdjState'] ?? 'down',
-                        'isisISAdjNeighSysType' => Arr::get($this->isis_codes, $adjacency_data['CISCO-IETF-ISIS-MIB::ciiISAdjNeighSysType'] ?? '', 'unkn
-own'),
+                        'isisISAdjNeighSysType' => Arr::get($this->isis_codes, $adjacency_data['CISCO-IETF-ISIS-MIB::ciiISAdjNeighSysType'] ?? '', 'unknown'),
                         'isisISAdjNeighSysID' => $this->formatIsIsId($adjacency_data['CISCO-IETF-ISIS-MIB::ciiISAdjNeighSysID'] ?? ''),
                         'isisISAdjNeighPriority' => $adjacency_data['CISCO-IETF-ISIS-MIB::ciiISAdjNeighPriority'] ?? '',
                         'isisISAdjLastUpTime' => $this->parseAdjacencyTime($adjacency_data['CISCO-IETF-ISIS-MIB::ciiISAdjLastUpTime'] ?? 0),
-                        'isisISAdjAreaAddress' => implode(',', array_map([$this, 'formatIsIsId'], $adjacency_data['CISCO-IETF-ISIS-MIB::ciiISAdjAreaAddr
-ess'] ?? [])),
+                        'isisISAdjAreaAddress' => implode(',', array_map([$this, 'formatIsIsId'], $adjacency_data['CISCO-IETF-ISIS-MIB::ciiISAdjAreaAddress'] ?? [])),
                         'isisISAdjIPAddrType' => implode(',', $adjacency_data['CISCO-IETF-ISIS-MIB::ciiISAdjIPAddrType'] ?? []),
                         'isisISAdjIPAddrAddress' => implode(',', array_map(function ($ip) {
                             return (string) IP::fromHexString($ip, true);
