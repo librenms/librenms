@@ -115,7 +115,6 @@ class PortSecurity implements Module
 
             // Assigning port_id and device_id to SNMP array for comparison
             $portsec = $os->pollPortSecurity($device->portSecurity);
-            print_r(gettype($portsec))
             $portsec_db = $portsec->makeHidden('laravel_through_key');
             foreach ($portsec_snmp as $item) {
                 $if_index = $item['ifIndex'];
