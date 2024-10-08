@@ -541,21 +541,30 @@ class PollerQueueManager(QueueManager):
             # We need to check if the device was polled recently to prevent a race condition
             # We have 3 cases:
             # 1. The last_polled_timetaken is greater than the poller frequency, we can poll the device
-            # The last_polled_timetaken is less than the poller frequency cap to maximum 15 seconds 
+            # The last_polled_timetaken is less than the poller frequency cap to maximum 15 seconds
             #   2. If the last_polled is greater than the cap, we can poll the device
             #   3. If the last_polled is less than the cap, we skip polling the device
             select_last_polled = self._db.query(
                 "SELECT last_polled >= NOW() - INTERVAL LEAST(%s - last_polled_timetaken, 15) SECOND AS is_poll_recent, "
                 "last_polled, last_polled_timetaken FROM devices WHERE device_id=%s",
-                (self.config.poller.frequency, device_id)
+                (self.config.poller.frequency, device_id),
             )
             value_last_polled = select_last_polled.fetchone()
-            logger.info("Last polled timestamp for device {}: {} (is_poll_recent: {}, last_polled_timetaken: {})".format(
-                device_id, value_last_polled[1], value_last_polled[0], value_last_polled[2]
-            ))
+            logger.info(
+                "Last polled timestamp for device {}: {} (is_poll_recent: {}, last_polled_timetaken: {})".format(
+                    device_id,
+                    value_last_polled[1],
+                    value_last_polled[0],
+                    value_last_polled[2],
+                )
+            )
             # If is_poll_recent is 1, then the device was polled recently
             if value_last_polled[0] == 1:
-                logger.warning("Skipping polling for device {} as it was polled recently".format(device_id))
+                logger.warning(
+                    "Skipping polling for device {} as it was polled recently".format(
+                        device_id
+                    )
+                )
                 self.unlock(device_id)
                 return
 
