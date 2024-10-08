@@ -27,32 +27,32 @@ $cur_oid = '.1.3.6.1.4.1.674.10892.1.600.20.1.6.';
 
 foreach ((array) $temp as $index => $entry) {
     $descr = $entry['voltageProbeLocationName'];
-    if ($entry['voltageProbeType'] != 'voltageProbeTypeIsDiscrete') {
+    if ($entry['voltageProbeType'] != 'voltageProbeTypeIsDiscrete')) {
         $divisor = 1000;
         if (isset($entry['voltageProbeReading']) {
-                $value = $entry['voltageProbeReading'];
+            $value = $entry['voltageProbeReading'];
         } else {
-                $value = null;
+            $value = null;
         }
-        if (isset($entry['voltageProbeLowerCriticalThreshold']) {
-                $lowlimit = $entry['voltageProbeLowerCriticalThreshold'] / $divisor;
+        if (isset($entry['voltageProbeLowerCriticalThreshold'])) {
+            $lowlimit = $entry['voltageProbeLowerCriticalThreshold'] / $divisor;
         } else {
-                $lowlimit = null;
+            $lowlimit = null;
         }
-        if (isset($entry['voltageProbeLowerCriticalThreshold']) {
-                $low_warn_limit = $entry['voltageProbeLowerCriticalThreshold'] / $divisor;
+        if (isset($entry['voltageProbeLowerCriticalThreshold'])) {
+            $low_warn_limit = $entry['voltageProbeLowerCriticalThreshold'] / $divisor;
         } else {
-                $low_warn_limit = null;
+            $low_warn_limit = null;
         }
-        if (isset($entry['voltageProbeUpperNonCriticalThreshold']) {
-                $warnlimit = $entry['voltageProbeUpperNonCriticalThreshold'] / $divisor;
+        if (isset($entry['voltageProbeUpperNonCriticalThreshold'])) {
+            $warnlimit = $entry['voltageProbeUpperNonCriticalThreshold'] / $divisor;
         } else {
-                $warnlimit = null;
+            $warnlimit = null;
         }
-        if (isset($entry['voltageProbeUpperCriticalThreshold']) {
-                $limit = $entry['voltageProbeUpperCriticalThreshold'] / $divisor;
+        if (isset($entry['voltageProbeUpperCriticalThreshold'])) {
+            $limit = $entry['voltageProbeUpperCriticalThreshold'] / $divisor;
         } else {
-                $limit = null;
+            $limit = null;
         }
 
         discover_sensor(null, 'voltage', $device, $cur_oid . $index, $index, 'dell', $descr, $divisor, '1', $lowlimit, $low_warn_limit, $warnlimit, $limit, $value, 'snmp', $index);
