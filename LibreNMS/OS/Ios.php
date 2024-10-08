@@ -39,12 +39,16 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessRsrpDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRsrqDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
+<<<<<<< HEAD
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\Interfaces\Polling\PortSecurityPolling;
 use LibreNMS\OS\Shared\Cisco;
 use LibreNMS\OS\Traits\CiscoCellular;
 use LibreNMS\Interfaces\Polling\PortSecurityPolling;
+=======
+>>>>>>> 727ce5f8dd (Fixing analyzer errors.)
 use LibreNMS\Interfaces\Polling\OSPolling;
+use LibreNMS\Interfaces\Polling\PortSecurityPolling;
 use LibreNMS\OS\Shared\Cisco;
 use LibreNMS\OS\Traits\CiscoCellular;
 
