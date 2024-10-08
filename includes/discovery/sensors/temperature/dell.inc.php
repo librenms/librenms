@@ -17,31 +17,11 @@ $divisor = '10';
 if (is_array($temp)) {
     foreach ($temp as $index => $entry) {
         $descr = $temp[$index]['temperatureProbeLocationName'];
-        if (isset($temp[$index]['temperatureProbeReading'])) {
-            $value = $temp[$index]['temperatureProbeReading'] / $divisor;
-        } else {
-            $value = null;
-        }
-        if (isset($temp[$index]['temperatureProbeLowerCriticalThreshold'])) {
-            $lowlimit = $temp[$index]['temperatureProbeLowerCriticalThreshold'] / $divisor;
-        } else {
-            $lowlimit = null;
-        }
-        if (isset($temp[$index]['temperatureProbeLowerNonCriticalThreshold'])) {
-            $low_warn_limit = $temp[$index]['temperatureProbeLowerNonCriticalThreshold'] / $divisor;
-        } else {
-            $low_warn_limit = null;
-        }
-        if (isset($temp[$index]['temperatureProbeUpperNonCriticalThreshold'])) {
-            $warnlimit = $temp[$index]['temperatureProbeUpperNonCriticalThreshold'] / $divisor;
-        } else {
-            $warnlimit = null;
-        }
-        if (isset($temp[$index]['temperatureProbeUpperCriticalThreshold'])) {
-            $limit = $temp[$index]['temperatureProbeUpperCriticalThreshold'] / $divisor;
-        } else {
-            $limit = null;
-        }
+        (isset($temp[$index]['temperatureProbeReading'])) ? $value = $temp[$index]['temperatureProbeReading'] / $divisor : $value = null;
+        (isset($temp[$index]['temperatureProbeLowerCriticalThreshold'])) ? $lowlimit = $temp[$index]['temperatureProbeLowerCriticalThreshold'] / $divisor : $lowlimit = null;
+        (isset($temp[$index]['temperatureProbeLowerNonCriticalThreshold'])) ? $low_warn_limit = $temp[$index]['temperatureProbeLowerNonCriticalThreshold'] / $divisor : $low_warn_limit = null;
+        (isset($temp[$index]['temperatureProbeUpperNonCriticalThreshold'])) ? $warnlimit = $temp[$index]['temperatureProbeUpperNonCriticalThreshold'] / $divisor : $warnlimit = null;
+        (isset($temp[$index]['temperatureProbeUpperCriticalThreshold'])) ? $limit = $temp[$index]['temperatureProbeUpperCriticalThreshold'] / $divisor : $limit = null;
 
         discover_sensor(null, 'temperature', $device, $cur_oid . $index, $index, 'dell', $descr, $divisor, '1', $lowlimit, $low_warn_limit, $warnlimit, $limit, $value, 'snmp', $index);
 
