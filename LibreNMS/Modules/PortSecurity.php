@@ -32,6 +32,7 @@ use Illuminate\Support\Facades\DB;
 use LibreNMS\DB\SyncsModels;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
+use LibreNMS\Interfaces\Polling\PortSecurityDiscovery;
 use LibreNMS\Interfaces\Polling\PortSecurityPolling;
 use LibreNMS\OS;
 use LibreNMS\Polling\ModuleStatus;
