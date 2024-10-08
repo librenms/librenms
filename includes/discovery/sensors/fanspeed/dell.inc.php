@@ -27,7 +27,7 @@ if (is_array($temp)) {
             $lowlimit = null;
         }
         if (isset($temp[$index]['coolingDeviceLowerNonCriticalThreshold'])) {
-                $low_warn_limit = $temp[$index]['coolingDeviceLowerNonCriticalThreshold'];
+            $low_warn_limit = $temp[$index]['coolingDeviceLowerNonCriticalThreshold'];
         } else {
             $low_warn_limit = null;
         }
@@ -43,7 +43,7 @@ if (is_array($temp)) {
         }
 
         discover_sensor(null, 'fanspeed', $device, $cur_oid . $index, $index, 'dell', $descr, '0', '1', $lowlimit, $low_warn_limit, $warnlimit, $limit, $value, 'snmp', $index);
-        
+
         unset(
             $descr,
             $value,
