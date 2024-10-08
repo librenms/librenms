@@ -29,7 +29,7 @@ foreach ((array) $temp as $index => $entry) {
     $descr = $entry['voltageProbeLocationName'];
     if ($entry['voltageProbeType'] != 'voltageProbeTypeIsDiscrete') {
         $divisor = 1000;
-        if (isset($entry['voltageProbeReading']) {
+        if (isset($entry['voltageProbeReading'])) {
             $value = $entry['voltageProbeReading'];
         } else {
             $value = null;
