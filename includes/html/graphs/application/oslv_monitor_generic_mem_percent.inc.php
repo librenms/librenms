@@ -3,9 +3,9 @@
 $unit_text = '';
 
 $stats_list = [
-    'mem_usage_per' => [
+    'freebsd' => [
         'stat' => 'percent-memory',
-        'descr' => 'Mem%',
+        'descr' => 'Memory%',
     ],
 ];
 

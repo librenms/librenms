@@ -4,7 +4,7 @@ $unit_text = '';
 
 $stats_list = [
     'cpu_usage_per' => [
-        'stat' => 'cpu_usage_per',
+        'stat' => 'percent-cpu',
         'descr' => 'CPU%',
     ],
 ];
