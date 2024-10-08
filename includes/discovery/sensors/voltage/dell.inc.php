@@ -27,7 +27,7 @@ $cur_oid = '.1.3.6.1.4.1.674.10892.1.600.20.1.6.';
 
 foreach ((array) $temp as $index => $entry) {
     $descr = $entry['voltageProbeLocationName'];
-    if ($entry['voltageProbeType'] != 'voltageProbeTypeIsDiscrete')) {
+    if ($entry['voltageProbeType'] != 'voltageProbeTypeIsDiscrete') {
         $divisor = 1000;
         if (isset($entry['voltageProbeReading']) {
             $value = $entry['voltageProbeReading'];
