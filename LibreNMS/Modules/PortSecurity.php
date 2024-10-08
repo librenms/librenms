@@ -115,6 +115,7 @@ class PortSecurity implements Module
 
             // Assigning port_id and device_id to SNMP array for comparison
             $portsec = $os->pollPortSecurity($device->portSecurity);
+            print_r(gettype($portsec))
             $portsec_db = $portsec->makeHidden('laravel_through_key');
             foreach ($portsec_snmp as $item) {
                 $if_index = $item['ifIndex'];
@@ -151,6 +152,11 @@ class PortSecurity implements Module
             ModuleModelObserver::observe(\App\Models\PortSecurity::class);
             $this->syncModels($device, 'portSecurity', $os->pollPortSecurity($portsec));
         }
+    }
+
+    public function dataExists(Device $device): bool
+    {
+        return $device->portSecurity()->exists();
     }
 
     /**
