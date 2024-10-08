@@ -42,7 +42,7 @@ if (is_array($temp)) {
         } else {
             $limit = null;
         }
-        
+
         discover_sensor(null, 'temperature', $device, $cur_oid . $index, $index, 'dell', $descr, $divisor, '1', $lowlimit, $low_warn_limit, $warnlimit, $limit, $value, 'snmp', $index);
 
         unset(
