@@ -165,6 +165,11 @@ $gauge_vars = [
     'size' => 1,
 ];
 
+if ($data['backend'] != 'FreeBSD') {
+    unset($gauge_vars['major-faults']);
+    unset($gauge_vars['minor-faults']);
+}
+
 $gauge_rrd_def = RrdDefinition::make()
     ->addDataset('data', 'GAUGE', 0);
 

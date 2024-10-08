@@ -1,6 +1,10 @@
 <?php
 
-$unit_text = '(u)secs/sec';
+$unit_text = 'secs/sec';
+
+if (isset($app->data['backend']) &&  $app->data['backend'] == 'cgroups') {
+    $unit_text = 'usecs/sec';
+}
 
 $stats_list = [
     'cpu-time' => [
