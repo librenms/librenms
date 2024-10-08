@@ -571,8 +571,7 @@ class PollerQueueManager(QueueManager):
             except pymysql.err.Error as e:
                 logger.critical(
                     "A DB Exception occurred while checking the last_polled of device {}: {}".format(
-                        device_id,
-                        str(e)
+                        device_id, str(e)
                     )
                 )
                 self.unlock(device_id)
@@ -580,8 +579,7 @@ class PollerQueueManager(QueueManager):
             except Exception as e:
                 logger.error(
                     "An exception occurred while checking the last_polled of device {}: {}".format(
-                        device_id,
-                        str(e)
+                        device_id, str(e)
                     )
                 )
                 self.unlock(device_id)
