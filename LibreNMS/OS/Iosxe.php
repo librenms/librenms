@@ -26,10 +26,10 @@
 
 namespace LibreNMS\OS;
 
+use App\Models\Device;
 use App\Models\IsisAdjacency;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Log;
 use LibreNMS\DB\SyncsModels;
 use LibreNMS\Interfaces\Discovery\IsIsDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessCellDiscovery;
@@ -40,6 +40,7 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
 use LibreNMS\Interfaces\Polling\IsIsPolling;
 use LibreNMS\Interfaces\Polling\OSPolling;
+use LibreNMS\Interfaces\Polling\PortSecurityPolling;
 use LibreNMS\OS\Traits\CiscoCellular;
 use LibreNMS\Util\IP;
 use SnmpQuery;
@@ -48,6 +49,7 @@ class Iosxe extends Ciscowlc implements
     IsIsDiscovery,
     IsIsPolling,
     OSPolling,
+    PortSecurityPolling,
     WirelessCellDiscovery,
     WirelessChannelDiscovery,
     WirelessRssiDiscovery,
@@ -119,7 +121,7 @@ class Iosxe extends Ciscowlc implements
         $up_count = array_count_values($states)['up'] ?? 0;
 
         if ($up_count !== $adjacencies->count()) {
-            Log::info('New Adjacencies, running discovery');
+            echo 'New Adjacencies, running discovery';
 
             return $this->fillNew($adjacencies, $this->discoverIsIs());
         }
@@ -146,5 +148,12 @@ class Iosxe extends Ciscowlc implements
     protected function formatIsIsId(string $raw): string
     {
         return str_replace(' ', '.', trim($raw));
+    }
+
+    public function pollPortSecurity(Collection $os): Collection
+    {
+        $portsec = $os;
+
+        return $portsec;
     }
 }

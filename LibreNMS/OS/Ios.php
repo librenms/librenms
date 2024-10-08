@@ -25,8 +25,10 @@
 
 namespace LibreNMS\OS;
 
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessCellDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessChannelDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
@@ -34,6 +36,8 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessRsrpDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRsrqDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
+use LibreNMS\Interfaces\Polling\OSPolling;
+use LibreNMS\Interfaces\Polling\PortSecurityPolling;
 use LibreNMS\OS\Shared\Cisco;
 use LibreNMS\OS\Traits\CiscoCellular;
 
@@ -44,9 +48,16 @@ class Ios extends Cisco implements
     WirelessRssiDiscovery,
     WirelessRsrqDiscovery,
     WirelessRsrpDiscovery,
-    WirelessSnrDiscovery
+    WirelessSnrDiscovery,
+    PortSecurityPolling,
+    OSPolling
 {
     use CiscoCellular;
+
+    public function pollOS(DataStorageInterface $datastore): void
+    {
+        // Don't poll Ciscowlc FIXME remove when wireless-controller module exists
+    }
 
     /**
      * @return array Sensors
@@ -101,5 +112,12 @@ class Ios extends Cisco implements
         }
 
         return $sensors;
+    }
+
+    public function pollPortSecurity(Collection $os): Collection
+    {
+        $portsec = $os;
+
+        return $portsec;
     }
 }
