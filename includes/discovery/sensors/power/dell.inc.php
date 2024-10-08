@@ -29,31 +29,11 @@ foreach ((array) $temp as $index => $entry) {
     $descr = $entry['amperageProbeLocationName'];
     if ($entry['amperageProbeType'] === 'amperageProbeTypeIsSystemWatts') {
         $divisor = 1;
-        if (isset($entry['amperageProbeReading'])) {
-            $value = $entry['amperageProbeReading'];
-        } else {
-            $value = null;
-        }
-        if (isset($entry['amperageProbeLowerCriticalThreshold'])) {
-            $lowlimit = $entry['amperageProbeLowerCriticalThreshold'] / $divisor;
-        } else {
-            $lowlimit = null;
-        }
-        if (isset($entry['amperageProbeLowerCriticalThreshold'])) {
-            $low_warn_limit = $entry['amperageProbeLowerCriticalThreshold'] / $divisor;
-        } else {
-            $low_warn_limit = null;
-        }
-        if (isset($entry['amperageProbeUpperNonCriticalThreshold'])) {
-            $warnlimit = $entry['amperageProbeUpperNonCriticalThreshold'] / $divisor;
-        } else {
-            $warnlimit = null;
-        }
-        if (isset($entry['amperageProbeUpperCriticalThreshold'])) {
-            $limit = $entry['amperageProbeUpperCriticalThreshold'] / $divisor;
-        } else {
-            $limit = null;
-        }
+        (isset($entry['amperageProbeReading'])) ? $value = $entry['amperageProbeReading'] : $value = null;
+        (isset($entry['amperageProbeLowerCriticalThreshold'])) ? $lowlimit = $entry['amperageProbeLowerCriticalThreshold'] / $divisor : $lowlimit = null;
+        (isset($entry['amperageProbeLowerCriticalThreshold'])) ? $low_warn_limit = $entry['amperageProbeLowerCriticalThreshold'] / $divisor : $low_warn_limit = null;
+        (isset($entry['amperageProbeUpperNonCriticalThreshold'])) ? $warnlimit = $entry['amperageProbeUpperNonCriticalThreshold'] / $divisor : $warnlimit = null;
+        (isset($entry['amperageProbeUpperCriticalThreshold'])) ? $limit = $entry['amperageProbeUpperCriticalThreshold'] / $divisor : $limit = null;
 
         discover_sensor(null, 'power', $device, $cur_oid . $index, $index, 'dell', $descr, $divisor, '1', $lowlimit, $low_warn_limit, $warnlimit, $limit, $value, 'snmp', $index);
     }
