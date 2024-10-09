@@ -442,6 +442,7 @@ $graphs['oslv_monitor'] = [
     'generic_rss',
     'generic_vsz',
     'generic_faults',
+    'generic_switches',
     'generic_rw_amount',
     'generic_rw_ops',
     'generic_cows',

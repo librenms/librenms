@@ -168,6 +168,8 @@ $gauge_vars = [
 if ($data['backend'] != 'FreeBSD') {
     unset($gauge_vars['major-faults']);
     unset($gauge_vars['minor-faults']);
+    unset($gauge_vars['involuntary-context-switches']);
+    unset($gauge_vars['voluntary-context-switches']);
 }
 
 $gauge_rrd_def = RrdDefinition::make()

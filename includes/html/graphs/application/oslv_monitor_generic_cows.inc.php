@@ -1,6 +1,6 @@
 <?php
 
-$unit_text = 'faults/sec';
+$unit_text = 'COWs/sec';
 
 $stats_list = [
     'copy-on-write-faults' => [
