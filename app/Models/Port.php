@@ -105,6 +105,20 @@ class Port extends DeviceRelatedModel
     }
 
     /**
+     * Get a label containing both the ifName and ifAlias if they differ.
+     */
+    public function getFullLabel(): string
+    {
+        $label = $this->getLabel();
+
+        if ($label == $this->ifAlias || empty($this->ifAlias)) {
+            return $label;
+        }
+
+        return "$label - $this->ifAlias";
+    }
+
+    /**
      * Get the description of this port
      */
     public function getDescription(): string
