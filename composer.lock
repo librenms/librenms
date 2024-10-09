@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f0710dd2ad14bbdbb2de3767987681df",
+    "content-hash": "fee5d24447dced4397e26066f8c9ee59",
     "packages": [
         {
             "name": "amenadiel/jpgraph",
@@ -1176,6 +1176,51 @@
             "time": "2023-10-06T06:47:41+00:00"
         },
         {
+            "name": "enshrined/svg-sanitize",
+            "version": "0.20.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/darylldoyle/svg-sanitizer.git",
+                "reference": "068d9fcf912c88a0471d101d95a2caa87c50aee7"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/darylldoyle/svg-sanitizer/zipball/068d9fcf912c88a0471d101d95a2caa87c50aee7",
+                "reference": "068d9fcf912c88a0471d101d95a2caa87c50aee7",
+                "shasum": ""
+            },
+            "require": {
+                "ext-dom": "*",
+                "ext-libxml": "*",
+                "php": "^7.1 || ^8.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^6.5 || ^8.5"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "enshrined\\svgSanitize\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-2.0-or-later"
+            ],
+            "authors": [
+                {
+                    "name": "Daryll Doyle",
+                    "email": "daryll@enshrined.co.uk"
+                }
+            ],
+            "description": "An SVG sanitizer for PHP",
+            "support": {
+                "issues": "https://github.com/darylldoyle/svg-sanitizer/issues",
+                "source": "https://github.com/darylldoyle/svg-sanitizer/tree/0.20.0"
+            },
+            "time": "2024-09-05T10:18:12+00:00"
+        },
+        {
             "name": "ezyang/htmlpurifier",
             "version": "v4.17.0",
             "source": {
@@ -1896,76 +1941,6 @@
                 }
             ],
             "time": "2023-12-03T19:50:20+00:00"
-        },
-        {
-            "name": "idealo/php-rdkafka-ffi",
-            "version": "v0.5.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/idealo/php-rdkafka-ffi.git",
-                "reference": "18d49e21d77da8d5ac37327433a0b44bece36ab6"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/idealo/php-rdkafka-ffi/zipball/18d49e21d77da8d5ac37327433a0b44bece36ab6",
-                "reference": "18d49e21d77da8d5ac37327433a0b44bece36ab6",
-                "shasum": ""
-            },
-            "require": {
-                "ext-ffi": "*",
-                "php": "^7.4 || ^8.0"
-            },
-            "conflict": {
-                "ext-rdkafka": "*"
-            },
-            "require-dev": {
-                "composer/semver": "^3.2",
-                "ircmaxell/php-c-parser": "dev-master#fd8f5efefd0fcc6c5119d945694acaa3a6790ada",
-                "klitsche/dog": "^0.4",
-                "klitsche/ffigen": "0.8.1",
-                "phpbench/phpbench": "^1.1",
-                "phpunit/phpunit": "^9.4",
-                "symfony/css-selector": "^5.1",
-                "symfony/dom-crawler": "^5.1",
-                "symplify/easy-coding-standard": "^10.0"
-            },
-            "suggest": {
-                "ext-pcntl": "*",
-                "ext-zend opcache": "*"
-            },
-            "type": "library",
-            "autoload": {
-                "files": [
-                    "src/constants.php",
-                    "src/functions.php"
-                ],
-                "psr-4": {
-                    "": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "Apache-2.0"
-            ],
-            "authors": [
-                {
-                    "name": "Dirk Adler",
-                    "email": "dirk.adler@idealo.de"
-                }
-            ],
-            "description": "PHP Kafka client - binding librdkafka via FFI",
-            "keywords": [
-                "client",
-                "ffi",
-                "kafka",
-                "librdkafka",
-                "php"
-            ],
-            "support": {
-                "issues": "https://github.com/idealo/php-rdkafka-ffi/issues",
-                "source": "https://github.com/idealo/php-rdkafka-ffi/tree/v0.5.0"
-            },
-            "time": "2023-01-21T20:47:01+00:00"
         },
         {
             "name": "influxdata/influxdb-client-php",
