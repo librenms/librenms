@@ -1216,6 +1216,10 @@ return [
                 'description' => 'URL to your Oxidized API',
                 'help' => 'Oxidized API url (For example: http://127.0.0.1:8888)',
             ],
+            'ignore_device_groups' => [
+                'description' => 'Do not backup these LibreNMS groups',
+                'help' => 'If a device is a member of any of these LibreNMS groups it will get ignored.',
+            ],
         ],
         'password' => [
             'min_length' => [

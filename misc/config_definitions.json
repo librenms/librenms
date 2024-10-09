@@ -4950,6 +4950,16 @@
                 "value.*": "exists:devices,type"
             }
         },
+        "oxidized.ignore_device_groups": {
+            "default": [],
+            "type": "array",
+            "group": "external",
+            "section": "oxidized",
+            "order": 9,
+            "validate": {
+                "value.*": "device_group_names"
+            }
+        },
         "oxidized.maps": {
             "default": {
                 "os": {
