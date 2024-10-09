@@ -2132,6 +2132,13 @@ label {
   background-color: #D9534F;
 }
 
+.availability-map-oldview-box-ignored {
+  height:12px;
+  width:12px;
+  float:left;
+  background-color: #36393D;
+}
+
 .availability-map-widget-header {
   line-height:34px;
 }
