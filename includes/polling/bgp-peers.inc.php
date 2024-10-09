@@ -7,6 +7,8 @@ use LibreNMS\Util\IP;
 
 $peers = dbFetchRows('SELECT * FROM `bgpPeers` AS B LEFT JOIN `vrfs` AS V ON `B`.`vrf_id` = `V`.`vrf_id` WHERE `B`.`device_id` = ?', [$device['device_id']]);
 
+$vrfs = array_keys(DeviceCache::getPrimary()->vrfs->pluck('vrf_id', 'vrf_oid')->toArray());
+
 if (! empty($peers)) {
     $intFields = [
         'bgpPeerRemoteAs',
@@ -26,6 +28,11 @@ if (! empty($peers)) {
         $peer_data_check = snmpwalk_cache_long_oid($device, 'jnxBgpM2PeerIndex', '.1.3.6.1.4.1.2636.5.1.1.2.1.1.1.14', [], 'BGP4-V2-MIB-JUNIPER', 'junos');
     } elseif ($device['os_group'] === 'arista') {
         $peer_data_check = snmpwalk_cache_oid($device, 'aristaBgp4V2PeerRemoteAs', [], 'ARISTA-BGP4V2-MIB');
+        foreach ($vrfs as $vrf_name) {
+            $peer_data_check = array_merge(
+                $peer_data_check,
+                snmp_walk_arista($device, $device['community'], $vrf_name, 'aristaBgp4V2PeerRemoteAs', [], 'ARISTA-BGP4V2-MIB'));
+        }
     } elseif ($device['os'] === 'dell-os10') {
         $peer_data_check = snmpwalk_cache_oid($device, 'os10bgp4V2PeerRemoteAs', [], 'DELLEMC-OS10-BGP4V2-MIB', 'dell'); // practically identical MIB as arista
     } elseif ($device['os'] === 'timos') {
@@ -429,6 +436,16 @@ if (! empty($peers)) {
                     return "$oid.$peer_identifier";
                 }, array_keys($oid_map));
                 $peer_data_raw = snmp_get_multi($device, $get_oids, '-OQUs', $mib);
+
+                if (empty($peer_data_raw)) {
+                    foreach ($vrfs as $vrf_name) {
+                        $result = snmp_get_multi_arista($device, $device['community'], $vrf_name, $get_oids, '-OQUs', $mib);
+                        if (! empty($result)) {
+                            $peer_data_raw = $result;
+                        }
+                    }
+                }
+
                 $peer_data_raw = reset($peer_data_raw);  // get the first element of the array
 
                 $peer_data = [];
@@ -667,7 +684,22 @@ if (! empty($peers)) {
                         $tmp_peer = $peer['bgpPeerIdentifier'];
                     }
                     $a_prefixes = snmpwalk_cache_multi_oid($device, 'aristaBgp4V2PrefixInPrefixesAccepted', $a_prefixes, 'ARISTA-BGP4V2-MIB', null, '-OQUs');
+
+                    foreach ($vrfs as $vrf_name) {
+                        $result = snmp_walk_arista($device, $device['community'], $vrf_name, 'aristaBgp4V2PrefixInPrefixesAccepted', $a_prefixes, 'ARISTA-BGP4V2-MIB', null, '-OQUs');
+                        if (! empty($result)) {
+                            $a_prefixes = $result;
+                        }
+                    }
+
                     $out_prefixes = snmpwalk_cache_multi_oid($device, 'aristaBgp4V2PrefixOutPrefixes', $out_prefixes, 'ARISTA-BGP4V2-MIB', null, '-OQUs');
+
+                    foreach ($vrfs as $vrf_name) {
+                        $result = snmp_walk_arista($device, $device['community'], $vrf_name, 'aristaBgp4V2PrefixOutPrefixes', $out_prefixes, 'ARISTA-BGP4V2-MIB', null, '-OQUs');
+                        if (! empty($result)) {
+                            $out_prefixes = $result;
+                        }
+                    }
 
                     $cbgpPeerAcceptedPrefixes = $a_prefixes["1.$afi.$tmp_peer.$afi.$safi"]['aristaBgp4V2PrefixInPrefixesAccepted'];
                     $cbgpPeerAdvertisedPrefixes = $out_prefixes["1.$afi.$tmp_peer.$afi.$safi"]['aristaBgp4V2PrefixOutPrefixes'];
