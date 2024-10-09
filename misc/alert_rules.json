@@ -825,5 +825,15 @@
                                          ],"valid":false},
     "name": "SMART: one or more disk is has self test unknown failures",
     "severity": "critical"
+  },
+  {
+    "rule": "mempools.mempool_class = \"system\" && mempools.mempool_descr = \"Physical memory\" && mempools.mempool_perc >= 95",
+    "name": "High Memory Usage, >= 95% in use",
+    "severity": "critical"
+  },
+  {
+    "rule": "mempools.mempool_class = \"system\" && mempools.mempool_descr = \"Physical memory\" && mempools.mempool_perc >= 90",
+    "name": "High Memory Usage, >= 90% in use",
+    "severity": "warning"
   }
 ]
