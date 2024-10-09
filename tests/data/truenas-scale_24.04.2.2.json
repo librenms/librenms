@@ -8,7 +8,7 @@
                     "sysDescr": "TrueNAS-SCALE-24.04.2.2. Hardware: x86_64 Intel(R) Core(TM) i7-4790 CPU @ 3.60GHz. Software: Linux 6.6.32-production+truenas (revision #1 SMP PREEMPT_DYNAMIC Sat Sep 14 14:36:03 UTC 2024)",
                     "sysContact": "<private>",
                     "version": "24.04.2.2",
-                    "hardware": "x86_64 Intel(R) Core(TM) i7-4790 CPU @ 3.60GHz. Software: Linux 6.6",
+                    "hardware": "x86_64 Intel(R) Core(TM) i7-4790 CPU @ 3.60GHz",
                     "features": null,
                     "location": "<private>",
                     "os": "truenas-scale",

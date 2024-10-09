@@ -1,7 +1,7 @@
 mib: TRUENAS-MIB        # Used for TrueNAS-SCALE only
 modules:
     os:
-        sysDescr_regex: '/(?:TrueNAS-SCALE-)(?<version>\S*).*\. Hardware: (?<hardware>.*).*\./'
+        sysDescr_regex: '/(?:TrueNAS-SCALE-)(?<version>\S*).*\. Hardware: (?<hardware>.*).*\. Software.*/'
     sensors:
         count:
             data:
