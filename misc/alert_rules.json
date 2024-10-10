@@ -798,5 +798,32 @@
     "rule": "applications.app_type = \"cape\" && application_metrics.metric = \"error\" && application_metrics.value > 0",
     "name": "CAPE Errors > 0",
     "severity": "critical"
+  },
+  {
+    "builder": {"condition":"AND","rules":[
+                                           {"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"smart"},
+                                           {"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"regex","value":"disk.*fail.*"},
+                                           {"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"number","operator":"greater_or_equal","value":"1"}
+                                         ],"valid":false},
+    "name": "SMART: one or more disk is has failures",
+    "severity": "critical"
+  },
+  {
+    "builder": {"condition":"AND","rules":[
+                                           {"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"smart"},
+                                           {"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"regex","value":"disk.*readfailure"},
+                                           {"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"number","operator":"greater_or_equal","value":"1"}
+                                         ],"valid":false},
+    "name": "SMART: one or more disk is has self test read failures",
+    "severity": "critical"
+  },
+  {
+    "builder": {"condition":"AND","rules":[
+                                           {"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"smart"},
+                                           {"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"regex","value":"disk.*unknownfail"},
+                                           {"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"number","operator":"greater_or_equal","value":"1"}
+                                         ],"valid":false},
+    "name": "SMART: one or more disk is has self test unknown failures",
+    "severity": "critical"
   }
 ]

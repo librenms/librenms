@@ -218,7 +218,7 @@
                     var mid_x = edge.mid_x;
                     var mid_y = edge.mid_y;
 
-                    var mid = {id: edgeid + "_mid", shape: "dot", size: 0, x: mid_x, y: mid_y, label: screenshot ? '' : edge.label};
+                    var mid = {id: edgeid + "_mid", shape: "dot", size: 0, x: mid_x, y: mid_y, label: screenshot ? '' : edge.label, font: {face: edge.text_face, size: edge.text_size, color: edge.text_colour}};
 
                     if (Boolean(reverse_arrows)) {
                         arrows = {from: {enabled: true, scaleFactor: 0.6}, to: {enabled: false}};
