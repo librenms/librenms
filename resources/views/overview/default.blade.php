@@ -172,6 +172,7 @@
 @endsection
 
 @push('scripts')
+@include('map.custom-js')
 <script type="text/javascript">
     var gridster;
 
