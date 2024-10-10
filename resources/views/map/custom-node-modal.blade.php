@@ -405,6 +405,7 @@
 
     function nodeDefaultsSave() {
         newnodeconf.shape = $("#nodestyle").val();
+        newnodeconf.size = $("#nodesize").val();
         newnodeconf.font.face = $("#nodetextface").val();
         newnodeconf.font.size = $("#nodetextsize").val();
         newnodeconf.font.color = $("#nodetextcolour").val();
