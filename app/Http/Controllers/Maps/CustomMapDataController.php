@@ -139,6 +139,12 @@ class CustomMapDataController extends Controller
 
         foreach ($map->nodes as $node) {
             $nodeid = $node->custom_map_node_id;
+            if ($node->linked_custom_map_id > 0) {
+                $nodes_down = CustomMapNode::where('custom_map_id', $node->linked_custom_map_id)->whereRelation('device', 'status', 0)->get();
+                if (count($nodes_down) > 0) {
+                    $node->colour_bg = 'darkred';
+                }
+            }
             $nodes[$nodeid] = [
                 'custom_map_node_id' => $node->custom_map_node_id,
                 'device_id' => $node->device_id,
