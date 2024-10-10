@@ -43,6 +43,9 @@ class CustomMapDataController extends Controller
     {
         $this->authorize('view', $map);
 
+        // eager load relationships
+        $map->load(['nodes.device', 'nodes.device.location', 'nodes.linked_map']);
+
         $edges = [];
         $nodes = [];
 

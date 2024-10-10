@@ -29,6 +29,7 @@ class VlanDevicesController extends TableController
         $this->vlanId = $request->get('vlan', 1);
 
         return Device::distinct()
+            ->with('location')
             ->select([
                 'devices.*',
                 'vlans.vlan_name',

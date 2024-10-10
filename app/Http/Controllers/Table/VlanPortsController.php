@@ -37,7 +37,7 @@ class VlanPortsController extends TableController
         $this->validate($request, ['vlan' => 'integer']);
         $this->vlanId = $request->get('vlan', 1);
 
-        return Port::with('device')
+        return Port::with(['device', 'device.location'])
             ->leftJoin('ports_vlans', 'ports.port_id', 'ports_vlans.port_id')
             ->where(function ($query) {
                 $query->where(fn ($q) => $q->where('ifVlan', $this->vlanId)->whereNull('ports_vlans.vlan'))

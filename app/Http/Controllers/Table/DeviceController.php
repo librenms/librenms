@@ -93,7 +93,9 @@ class DeviceController extends TableController
     protected function baseQuery($request)
     {
         /** @var Builder $query */
-        $query = Device::hasAccess($request->user())->with('location')->withCount(['ports', 'sensors', 'wirelessSensors']);
+        $query = Device::hasAccess($request->user())
+            ->with(['location', 'groups'])
+            ->withCount(['ports', 'sensors', 'wirelessSensors']);
 
         // if searching or sorting the location field, join the locations table
         if ($request->get('searchPhrase') || in_array('location', array_keys($request->get('sort', [])))) {
