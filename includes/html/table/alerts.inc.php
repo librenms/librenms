@@ -22,6 +22,7 @@ $alert_states = [
     'acknowledged' => 2,
     'worse' => 3,
     'better' => 4,
+    'changed' => 5,
 ];
 
 $show_recovered = false;
@@ -141,11 +142,13 @@ foreach (dbFetchRows($sql, $param) as $alert) {
 
     if ((int) $alert['state'] === 0) {
         $msg = '';
-    } elseif ((int) $alert['state'] === 1 || (int) $alert['state'] === 3 || (int) $alert['state'] === 4) {
+    } elseif ((int) $alert['state'] === 1 || (int) $alert['state'] === 3 || (int) $alert['state'] === 4 || (int) $alert['state'] === 5) {
         if ((int) $alert['state'] === 3) {
             $msg = '<i class="fa fa-angle-double-down" style="font-size:20px;" aria-hidden="true" title="Status got worse"></i>';
         } elseif ((int) $alert['state'] === 4) {
             $msg = '<i class="fa fa-angle-double-up" style="font-size:20px;" aria-hidden="true" title="Status got better"></i>';
+        } elseif ((int) $alert['state'] === 5) {
+            $msg = '<i class="fa fa-angle-double-up" style="font-size:20px;" aria-hidden="true" title="Status changed"></i>';
         }
     } elseif ((int) $alert['state'] === 2) {
         if ($info['until_clear'] === false) {
