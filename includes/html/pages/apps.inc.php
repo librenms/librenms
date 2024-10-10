@@ -433,6 +433,25 @@ $graphs['sagan'] = [
     'uptime',
     'alert',
 ];
+$graphs['oslv_monitor'] = [
+    'generic_cpu_percent',
+    'generic_mem_percent',
+    'generic_time',
+    'generic_procs',
+    'generic_sizes',
+    'generic_rss',
+    'generic_vsz',
+    'generic_faults',
+    'generic_switches',
+    'generic_rw_amount',
+    'generic_rw_ops',
+    'generic_cows',
+    'generic_net_buff_size',
+    'generic_messages',
+    'generic_etime',
+    'generic_swaps',
+    'generic_signals_taken',
+];
 $graphs['hv-monitor'] = [
     'status',
     'memory',
