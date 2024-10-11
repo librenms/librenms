@@ -423,8 +423,13 @@ class RedisLock(Lock):
     def __init__(self, namespace="lock", sentinel_kwargs=None, **redis_kwargs):
         import redis  # pylint: disable=import-error
         from redis.sentinel import Sentinel  # pylint: disable=import-error
+        from redis.retry import Retry
+        from redis.exceptions import (TimeoutError, ConnectionError)
+        from redis.backoff import ConstantBackoff
 
         redis_kwargs["decode_responses"] = True
+        redis_kwargs["retry"] = Retry(ConstantBackoff(backoff=2), 5)
+        redis_kwargs["retry_on_error"] = [ConnectionError, ConnectionRefusedError, TimeoutError]
         if redis_kwargs.get("sentinel") and redis_kwargs.get("sentinel_service"):
             sentinels = [
                 tuple(l.split(":")) for l in redis_kwargs.pop("sentinel").split(",")
@@ -434,7 +439,7 @@ class RedisLock(Lock):
                 k: v
                 for k, v in redis_kwargs.items()
                 if k
-                in ["decode_responses", "username", "password", "db", "socket_timeout"]
+                in ["decode_responses", "username", "password", "db", "socket_timeout", "retry", "retry_on_error"]
             }
             self._redis = Sentinel(
                 sentinels, sentinel_kwargs=sentinel_kwargs, **kwargs
@@ -533,8 +538,13 @@ class RedisUniqueQueue(object):
     def __init__(self, name, namespace="queue", sentinel_kwargs=None, **redis_kwargs):
         import redis  # pylint: disable=import-error
         from redis.sentinel import Sentinel  # pylint: disable=import-error
+        from redis.retry import Retry
+        from redis.exceptions import (TimeoutError, ConnectionError)
+        from redis.backoff import ConstantBackoff
 
         redis_kwargs["decode_responses"] = True
+        redis_kwargs["retry"] = Retry(ConstantBackoff(backoff=2), 5)
+        redis_kwargs["retry_on_error"] = [ConnectionError, ConnectionRefusedError, TimeoutError]
         if redis_kwargs.get("sentinel") and redis_kwargs.get("sentinel_service"):
             sentinels = [
                 tuple(l.split(":")) for l in redis_kwargs.pop("sentinel").split(",")
@@ -544,7 +554,7 @@ class RedisUniqueQueue(object):
                 k: v
                 for k, v in redis_kwargs.items()
                 if k
-                in ["decode_responses", "username", "password", "db", "socket_timeout"]
+                in ["decode_responses", "username", "password", "db", "socket_timeout", "retry", "retry_on_error"]
             }
             self._redis = Sentinel(
                 sentinels, sentinel_kwargs=sentinel_kwargs, **kwargs
