@@ -317,6 +317,9 @@
                                 </a></li>
                         @endif
 
+                        <li><a href="{{ route('vlans.index') }}"><i class="fa fa-tasks fa-fw fa-lg"
+                                                            aria-hidden="true"></i> {{ __('VLANs') }}</a></li>
+
                         @config('enable_billing')
                         <li><a href="{{ url('bills') }}"><i class="fa fa-money fa-fw fa-lg"
                                                             aria-hidden="true"></i> {{ __('Traffic Bills') }}</a></li>

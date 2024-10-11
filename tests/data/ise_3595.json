@@ -13,7 +13,7 @@
                     "location": "<private>",
                     "os": "ise",
                     "type": "server",
-                    "serial": "<private>",
+                    "serial": "AAA9999Z999",
                     "icon": "cisco.svg"
                 }
             ]
@@ -2446,7 +2446,7 @@
                     "entPhysicalIsFRU": "0",
                     "entPhysicalModelName": "SNS-3595-K9",
                     "entPhysicalVendorType": "zeroDotZero.0",
-                    "entPhysicalSerialNum": "FCH2204V176",
+                    "entPhysicalSerialNum": "AAA9999Z999",
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "Cisco Systems Inc.",

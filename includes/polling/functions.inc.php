@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Str;
+use LibreNMS\Config;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\JsonAppBase64DecodeException;
 use LibreNMS\Exceptions\JsonAppBlankJsonException;
@@ -40,8 +41,8 @@ function bulk_sensor_snmpget($device, $sensors)
 function sensor_precache($device, $type)
 {
     $sensor_cache = [];
-    if (file_exists('includes/polling/sensors/pre-cache/' . $device['os'] . '.inc.php')) {
-        include 'includes/polling/sensors/pre-cache/' . $device['os'] . '.inc.php';
+    if (file_exists(Config::get('install_dir') . '/includes/polling/sensors/pre-cache/' . $device['os'] . '.inc.php')) {
+        include Config::get('install_dir') . '/includes/polling/sensors/pre-cache/' . $device['os'] . '.inc.php';
     }
 
     return $sensor_cache;
@@ -76,11 +77,10 @@ function poll_sensor($device, $class)
             $mibdir = null;
 
             $sensor_value = trim(str_replace('"', '', $snmp_data[$sensor['sensor_oid']] ?? ''));
-
-            if (file_exists('includes/polling/sensors/' . $class . '/' . $device['os'] . '.inc.php')) {
-                require 'includes/polling/sensors/' . $class . '/' . $device['os'] . '.inc.php';
-            } elseif (isset($device['os_group']) && file_exists('includes/polling/sensors/' . $class . '/' . $device['os_group'] . '.inc.php')) {
-                require 'includes/polling/sensors/' . $class . '/' . $device['os_group'] . '.inc.php';
+            if (file_exists(Config::get('install_dir') . '/includes/polling/sensors/' . $class . '/' . $device['os'] . '.inc.php')) {
+                require Config::get('install_dir') . '/includes/polling/sensors/' . $class . '/' . $device['os'] . '.inc.php';
+            } elseif (isset($device['os_group']) && file_exists(Config::get('install_dir') . '/includes/polling/sensors/' . $class . '/' . $device['os_group'] . '.inc.php')) {
+                require Config::get('install_dir') . '/includes/polling/sensors/' . $class . '/' . $device['os_group'] . '.inc.php';
             }
 
             if ($class == 'state') {

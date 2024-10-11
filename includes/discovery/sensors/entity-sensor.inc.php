@@ -112,41 +112,23 @@ if (! empty($entity_oids)) {
             }
             $valid_sensor = check_entity_sensor($descr, $device);
             $type = $entitysensor[$entry['entPhySensorType']];
-            // FIXME this stuff is foul
-            if ($entry['entPhySensorScale'] == 'nano') {
-                $divisor = '1000000000';
-                $multiplier = '1';
-            }
-            if ($entry['entPhySensorScale'] == 'micro') {
-                $divisor = '1000000';
-                $multiplier = '1';
-            }
-            if ($entry['entPhySensorScale'] == 'milli') {
-                $divisor = '1000';
-                $multiplier = '1';
-            }
-            if ($entry['entPhySensorScale'] == 'units') {
-                $divisor = '1';
-                $multiplier = '1';
-            }
-            if ($entry['entPhySensorScale'] == 'kilo') {
-                $divisor = '1';
-                $multiplier = '1000';
-            }
-            if ($entry['entPhySensorScale'] == 'mega') {
-                $divisor = '1';
-                $multiplier = '1000000';
-            }
-            if ($entry['entPhySensorScale'] == 'giga') {
-                $divisor = '1';
-                $multiplier = '1000000000';
-            }
-            if ($entry['entPhySensorScale'] == 'yocto') {
-                $divisor = '1';
-                $multiplier = '1';
-            }
-            if (is_numeric($entry['entPhySensorPrecision']) && $entry['entPhySensorPrecision'] > '0') {
-                $divisor = $divisor . str_pad('', $entry['entPhySensorPrecision'], '0');
+
+            // Try to handle the scale
+            [$divisor, $multiplier] = match ($entry['entPhySensorScale']) {
+                'zepto' => [1000000000000000000, 1],
+                'nano' => [1000000000, 1],
+                'micro' => [1000000, 1],
+                'milli' => [1000, 1],
+                'units' => [1, 1],
+                'kilo' => [1, 1000],
+                'mega' => [1, 1000000],
+                'giga' => [1, 1000000000],
+                'yocto' => [1, 1],
+                default => [1, 1],
+            };
+
+            if (is_numeric($entry['entPhySensorPrecision']) && $entry['entPhySensorPrecision'] > 0) {
+                $divisor .= str_pad('', $entry['entPhySensorPrecision'], '0');
             }
 
             $current = ($current * $multiplier / $divisor);

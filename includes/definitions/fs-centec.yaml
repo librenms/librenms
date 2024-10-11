@@ -2,7 +2,7 @@ os: fs-centec
 text: 'Fiberstore (Centec CNOS)'
 type: network
 icon: fs
-group: fs-centec
+group: fs
 mib_dir: fs/centec
 over:
     - { graph: device_bits, text: 'Device Traffic' }

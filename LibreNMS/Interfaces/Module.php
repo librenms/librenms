@@ -83,9 +83,9 @@ interface Module
      * Make sure to hide transient fields, such as id and date.
      * You should always order the data by a non-transient column.
      * Some id fields may need to be joined to tie back to non-transient data.
-     * Module may return false if testing is not supported or required.
+     * Module may return null if testing is not supported or required.
      *
-     * @return array|false
+     * @param  string  $type  Type is either discovery or poller
      */
-    public function dump(Device $device);
+    public function dump(Device $device, string $type): ?array;
 }
