@@ -1,33 +1,28 @@
 # Sensor State Support
 
-### Introduction
+## Introduction
 
 This section will explain how to implement support for sensor state. It will also cover the basic concepts of sensor state monitoring.
 
 Sensor state support in LibreNMS allows users to monitor and visualize the status of sensors that report qualitative states, rather than numerical values, in a more understandable and efficient manner. Instead of displaying raw numeric values, LibreNMS translates those values into generic states, such as "OK", "Warning", "Critical", and "Unknown".
 
-### Logic
+## Key Concepts
 
 For sensor state monitoring, we have 4 DB tables we need to concentrate about.
 
-- sensors
-- state_indexes
-- state_translations
-- sensors_to_state_indexes
-
 We will just briefly tie a comment to each one of them.
 
-#### Sensors
+### Table: sensors
 
 *Each time a sensor needs to be polled, the system needs to know which
 sensor is it that it need to poll, at what oid is this sensor located
 and what class the sensor is etc. This information is fetched from the sensors table.*
 
-#### state_indexes
+### Table: state_indexes
 
 *Is where we keep track of which state sensors we monitor.*
 
-#### state_translations
+### Table: state_translations
 
 *Is where we map the possible returned state sensor values to a
 generic LibreNMS value, in order to make displaying and alerting more
@@ -43,11 +38,11 @@ sensor(state_index) where these values are actually returned from.*
 3 = Unknown
 ```
 
-#### sensors_to_state_indexes
+### Table: sensors_to_state_indexes
 
 *Is as you might have guessed, where the sensor_id is mapped to a state_index_id.*
 
-### Example
+## Example
 
 For YAML based state discovery:
 
@@ -109,7 +104,7 @@ modules:
                         - { value: 5, generic: 2, graph: 0, descr: failure }
 ```
 
-### Advanced Example
+## Advanced Example
 
 For advanced state discovery:
 
