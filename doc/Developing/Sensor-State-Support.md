@@ -41,20 +41,20 @@ sensor(state_index) where these values are actually returned from.*
 ```
 
  ### Generic States translations
+
 LibreNMS offers flexibility in handling sensor states, which can be represented as either strings or numbers via SNMP. 
 
-If the sensor state input is a string (i.e. "ONLINE") librenms will use the the 'descr' field and translate it to the desired generic state (0, 1, 2 or 3)
+If the sensor state input is a string (i.e. "ONLINE") librenms will use the the 'descr' field and finally translate it to the desired generic state (0, 1, 2 or 3)
 - { value: 0, **descr: online**, graph: 1, **generic: 0** }
 
-If the sensor state input is a number (i.e. "4" that represents the offline state) librenms will use the 'value' field and translate it to the desired generic state (0, 1, 2 or 3).  
+If the sensor state input is a number (i.e. "4" that represents the offline state) librenms will use the 'value' field and finally translate it to the desired generic state (0, 1, 2 or 3).  
 - { **value: 0**, descr: offline, graph: 1, **generic: 2** }
-Note: the desc field here is used to visualize the value on screen, but not as an input.
 
-The translations works like this: description -> value -> generic & graph fields
-https://github.com/librenms/librenms/blob/7d450345dff29d31d52eeaf7193028c6d5ffbf67/includes/discovery/functions.inc.php#L661
+!!! note
+    Here the descr field is used to visualize the value on screen, but not as an input to translate to a generic state because the state input is a number.
+    For more details check a code example[ here](https://github.com/librenms/librenms/blob/0fbaaf7a7473bba6d346cb8bcb80d95324836c98/includes/discovery/functions.inc.php#L683C13-L683C55).
 
-
-## Example
+## YAML Example
 
 For YAML based state discovery:
 
