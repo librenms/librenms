@@ -33,7 +33,7 @@ class Unifios extends \LibreNMS\OS
     {
         parent::discoverOS($device); // yaml
         // Ubiquiti UnifiOS UDM 4.1.13 Linux 4.19.152 al324
-        list($ubi, $os, $prod, $ver, $linux, $linver, $proc) = explode(" ", $device->sysDescr);
+        [$ubi, $os, $prod, $ver, $linux, $linver, $proc] = explode(' ', $device->sysDescr);
         $device->version = $ver;
         $device->hardware = $prod;
     }
