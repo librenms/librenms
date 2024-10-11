@@ -45,7 +45,7 @@ sensor(state_index) where these values are actually returned from.*
 LibreNMS offers flexibility in handling sensor states, which can be represented as either strings or numbers via SNMP. 
 
 If the sensor state input is a string (i.e. "ONLINE") librenms will use the the 'descr' field and finally translate it to the desired generic state (0, 1, 2 or 3)
-- { value: 0, **descr: online**, graph: 1, **generic: 0** }
+- { value: 4, **descr: online**, graph: 1, **generic: 0** }
 
 If the sensor state input is a number (i.e. "4" that represents the offline state) librenms will use the 'value' field and finally translate it to the desired generic state (0, 1, 2 or 3).  
 - { **value: 0**, descr: offline, graph: 1, **generic: 2** }
