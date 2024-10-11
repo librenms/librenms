@@ -4,23 +4,25 @@
 
 This section will explain how to implement support for sensor state. It will also cover the basic concepts of sensor state monitoring.
 
-Sensor state support in LibreNMS allows users to monitor and visualize the status of sensors that report qualitative states, rather than numerical values, in a more understandable and efficient manner. Instead of displaying raw numeric values, LibreNMS translates those values into generic states, such as "OK", "Warning", "Critical", and "Unknown".
+LibreNMS simplifies sensor state monitoring by translating raw values into understandable generic states like "OK", "Warning", "Critical", and "Unknown", enabling consistent visualization and easier analysis.
 
 ## Key Concepts
 
-For sensor state monitoring, we have 4 DB tables we need to concentrate about.
-
-We will just briefly tie a comment to each one of them.
+For sensor state monitoring, we have 4 DB tables we need to concentrate about. These tables act as a bridge between the raw information provided by each sensor and the standardized representation (generic state) that LibreNMS uses for visualization and alert generation.
 
 ### Table: sensors
 
 *Each time a sensor needs to be polled, the system needs to know which
-sensor is it that it need to poll, at what oid is this sensor located
-and what class the sensor is etc. This information is fetched from the sensors table.*
+sensor (regardless of its type) is it that it needs to poll and its description, 
+at what oid is this sensor located, what class the sensor is, etc.*
+
+### Table: sensors_to_state_indexes
+
+*Is as you might have guessed, where the sensor_id is mapped to a state_index_id.*
 
 ### Table: state_indexes
 
-*Is where we keep track of which state sensors we monitor.*
+*Is where we keep track of the state information we monitor.*
 
 ### Table: state_translations
 
@@ -38,9 +40,6 @@ sensor(state_index) where these values are actually returned from.*
 3 = Unknown
 ```
 
-### Table: sensors_to_state_indexes
-
-*Is as you might have guessed, where the sensor_id is mapped to a state_index_id.*
 
 ## Example
 
