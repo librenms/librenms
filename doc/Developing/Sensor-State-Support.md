@@ -2,13 +2,19 @@
 
 ## Introduction
 
-This section will explain how to implement support for sensor state. It will also cover the basic concepts of sensor state monitoring.
+This section will explain how to implement support for sensor state. 
+It will also cover the basic concepts of sensor state monitoring.
 
-LibreNMS simplifies sensor state monitoring by translating raw values into understandable generic states like "OK", "Warning", "Critical", and "Unknown", enabling consistent visualization and easier analysis.
+LibreNMS simplifies sensor state monitoring by translating raw values 
+into understandable generic states like "OK", "Warning", "Critical", and 
+"Unknown", enabling consistent visualization and easier analysis.
 
 ## Key Concepts
 
-For sensor state monitoring, we have 4 DB tables we need to concentrate about. These tables act as a bridge between the raw information provided by each sensor and the standardized representation (generic state) that LibreNMS uses for visualization and alert generation.
+For sensor state monitoring, we have 4 DB tables we need to concentrate about. 
+These tables act as a bridge between the raw information provided by each sensor 
+and the standardized representation (generic state) that LibreNMS uses 
+for visualization and alert generation.
 
 ### Table: sensors
 
@@ -18,7 +24,8 @@ at what oid is this sensor located, what class the sensor is, etc.*
 
 ### Table: sensors_to_state_indexes
 
-*Is as you might have guessed, where the sensor_id is mapped to a state_index_id.*
+*Is as you might have guessed, where the sensor_id is mapped 
+to a state_index_id.*
 
 ### Table: state_indexes
 
@@ -42,17 +49,23 @@ sensor(state_index) where these values are actually returned from.*
 
  ### Generic States translations
 
-LibreNMS offers flexibility in handling sensor states, which can be represented as either strings or numbers via SNMP. 
+LibreNMS offers flexibility in handling sensor states, which can be represented 
+as either strings or numbers via SNMP. 
 
-If the sensor state input is a string (i.e. "ONLINE") librenms will use the the 'descr' field and finally translate it to the desired generic state (0, 1, 2 or 3)
+If the sensor state input is a string (i.e. "ONLINE") 
+librenms will use the 'descr' field and finally translate it to the desired 
+generic state (0, 1, 2 or 3)
 - { value: 4, **descr: online**, graph: 1, **generic: 0** }
 
-If the sensor state input is a number (i.e. "4" that represents the offline state) librenms will use the 'value' field and finally translate it to the desired generic state (0, 1, 2 or 3).  
+If the sensor state input is a number (i.e. "4" representing the offline state) 
+librenms will use the 'value' field and finally translate it to the desired 
+generic state (0, 1, 2 or 3).  
 - { **value: 0**, descr: offline, graph: 1, **generic: 2** }
 
 !!! note
-    Here the descr field is used to visualize the value on screen, but not as an input to translate to a generic state because the state input is a number.
-    For more details check a code example[ here](https://github.com/librenms/librenms/blob/0fbaaf7a7473bba6d346cb8bcb80d95324836c98/includes/discovery/functions.inc.php#L683C13-L683C55).
+    Here the descr field is used as a label to visualize the value on screen, 
+    but not as an input to translate to a generic state because the state input
+    is a number.
 
 ## YAML Example
 
@@ -122,7 +135,8 @@ For advanced state discovery:
 
 This example will be based on a Cisco power supply sensor and is all
 it takes to have sensor state support for Cisco power supplies in Cisco
-switches. The file should be located in /includes/discovery/sensors/state/cisco.inc.php.
+switches. The file should be located in 
+/includes/discovery/sensors/state/cisco.inc.php.
 
 ```php
 <?php
