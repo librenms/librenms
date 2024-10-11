@@ -26,10 +26,9 @@
 namespace LibreNMS\OS;
 
 use LibreNMS\Device\Processor;
-use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\OS;
 
-class FsSwitch extends OS implements ProcessorDiscovery
+class FsSwitch extends OS
 {
     public static function normalizeTransceiverValues($value): float
     {

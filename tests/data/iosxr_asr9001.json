@@ -13619,7 +13619,7 @@
                     "sensor_index": "13795549",
                     "sensor_type": "cisco-entity-sensor",
                     "sensor_descr": "Module Mau 0/0/2/2 - Current 0/0/2/2",
-                    "group": null,
+                    "group": "transceiver",
                     "sensor_divisor": 10000,
                     "sensor_multiplier": 1,
                     "sensor_current": 0.0329,
@@ -13644,7 +13644,7 @@
                     "sensor_index": "1930929",
                     "sensor_type": "cisco-entity-sensor",
                     "sensor_descr": "Module Mau 0/0/0/3 - Current 0/0/0/3",
-                    "group": null,
+                    "group": "transceiver",
                     "sensor_divisor": 10000,
                     "sensor_multiplier": 1,
                     "sensor_current": 0.0305,
@@ -13669,7 +13669,7 @@
                     "sensor_index": "31558363",
                     "sensor_type": "cisco-entity-sensor",
                     "sensor_descr": "Module Mau 0/0/2/0 - Current 0/0/2/0",
-                    "group": null,
+                    "group": "transceiver",
                     "sensor_divisor": 10000,
                     "sensor_multiplier": 1,
                     "sensor_current": 0.0305,
@@ -13694,7 +13694,7 @@
                     "sensor_index": "40983240",
                     "sensor_type": "cisco-entity-sensor",
                     "sensor_descr": "Module Mau 0/0/1/1 - Current 0/0/1/1",
-                    "group": null,
+                    "group": "transceiver",
                     "sensor_divisor": 10000,
                     "sensor_multiplier": 1,
                     "sensor_current": 0.0244,
@@ -13769,7 +13769,7 @@
                     "sensor_index": "60048938",
                     "sensor_type": "cisco-entity-sensor",
                     "sensor_descr": "Module Mau 0/0/1/3 - Current 0/0/1/3",
-                    "group": null,
+                    "group": "transceiver",
                     "sensor_divisor": 10000,
                     "sensor_multiplier": 1,
                     "sensor_current": -3.2768,
@@ -13794,7 +13794,7 @@
                     "sensor_index": "18708510",
                     "sensor_type": "cisco-entity-sensor",
                     "sensor_descr": "module mau 0/0/0/3 - power Rx 0/0/0/3",
-                    "group": null,
+                    "group": "transceiver",
                     "sensor_divisor": 10000000,
                     "sensor_multiplier": 1000,
                     "sensor_current": -2.3306690616272,
@@ -13819,7 +13819,7 @@
                     "sensor_index": "24205691",
                     "sensor_type": "cisco-entity-sensor",
                     "sensor_descr": "module mau 0/0/1/1 - power Rx 0/0/1/1",
-                    "group": null,
+                    "group": "transceiver",
                     "sensor_divisor": 10000000,
                     "sensor_multiplier": 1000,
                     "sensor_current": -5.145625189237,
@@ -13844,7 +13844,7 @@
                     "sensor_index": "26493680",
                     "sensor_type": "cisco-entity-sensor",
                     "sensor_descr": "module mau 0/0/1/3 - power Tx 0/0/1/3",
-                    "group": null,
+                    "group": "transceiver",
                     "sensor_divisor": 10000000,
                     "sensor_multiplier": 1000,
                     "sensor_current": 0,
@@ -13869,7 +13869,7 @@
                     "sensor_index": "30573226",
                     "sensor_type": "cisco-entity-sensor",
                     "sensor_descr": "module mau 0/0/2/2 - power Rx 0/0/2/2",
-                    "group": null,
+                    "group": "transceiver",
                     "sensor_divisor": 10000000,
                     "sensor_multiplier": 1000,
                     "sensor_current": 0.52078030484169,
@@ -13894,7 +13894,7 @@
                     "sensor_index": "35484503",
                     "sensor_type": "cisco-entity-sensor",
                     "sensor_descr": "module mau 0/0/0/3 - power Tx 0/0/0/3",
-                    "group": null,
+                    "group": "transceiver",
                     "sensor_divisor": 10000000,
                     "sensor_multiplier": 1000,
                     "sensor_current": -1.7496355877865,
@@ -13919,7 +13919,7 @@
                     "sensor_index": "43271261",
                     "sensor_type": "cisco-entity-sensor",
                     "sensor_descr": "module mau 0/0/1/3 - power Rx 0/0/1/3",
-                    "group": null,
+                    "group": "transceiver",
                     "sensor_divisor": 10000000,
                     "sensor_multiplier": 1000,
                     "sensor_current": 0,
@@ -13944,7 +13944,7 @@
                     "sensor_index": "47349219",
                     "sensor_type": "cisco-entity-sensor",
                     "sensor_descr": "module mau 0/0/2/2 - power Tx 0/0/2/2",
-                    "group": null,
+                    "group": "transceiver",
                     "sensor_divisor": 10000000,
                     "sensor_multiplier": 1000,
                     "sensor_current": -1.1952940719622,
@@ -13969,7 +13969,7 @@
                     "sensor_index": "48336040",
                     "sensor_type": "cisco-entity-sensor",
                     "sensor_descr": "module mau 0/0/2/0 - power Rx 0/0/2/0",
-                    "group": null,
+                    "group": "transceiver",
                     "sensor_divisor": 10000000,
                     "sensor_multiplier": 1000,
                     "sensor_current": -5.6050940961032,
@@ -13994,7 +13994,7 @@
                     "sensor_index": "65113653",
                     "sensor_type": "cisco-entity-sensor",
                     "sensor_descr": "module mau 0/0/2/0 - power Tx 0/0/2/0",
-                    "group": null,
+                    "group": "transceiver",
                     "sensor_divisor": 10000000,
                     "sensor_multiplier": 1000,
                     "sensor_current": -2.1126614117229,
@@ -14019,7 +14019,7 @@
                     "sensor_index": "7429666",
                     "sensor_type": "cisco-entity-sensor",
                     "sensor_descr": "module mau 0/0/1/1 - power Tx 0/0/1/1",
-                    "group": null,
+                    "group": "transceiver",
                     "sensor_divisor": 10000000,
                     "sensor_multiplier": 1000,
                     "sensor_current": -4.4916039493421,
@@ -14419,7 +14419,7 @@
                     "sensor_index": "18708510",
                     "sensor_type": "cisco-entity-sensor",
                     "sensor_descr": "Module Mau 0/0/0/3 - Power Rx 0/0/0/3",
-                    "group": null,
+                    "group": "transceiver",
                     "sensor_divisor": 10000000,
                     "sensor_multiplier": 1,
                     "sensor_current": 0.0005847,
@@ -14469,7 +14469,7 @@
                     "sensor_index": "24205691",
                     "sensor_type": "cisco-entity-sensor",
                     "sensor_descr": "Module Mau 0/0/1/1 - Power Rx 0/0/1/1",
-                    "group": null,
+                    "group": "transceiver",
                     "sensor_divisor": 10000000,
                     "sensor_multiplier": 1,
                     "sensor_current": 0.0003058,
@@ -14494,7 +14494,7 @@
                     "sensor_index": "26493680",
                     "sensor_type": "cisco-entity-sensor",
                     "sensor_descr": "Module Mau 0/0/1/3 - Power Tx 0/0/1/3",
-                    "group": null,
+                    "group": "transceiver",
                     "sensor_divisor": 10000000,
                     "sensor_multiplier": 1,
                     "sensor_current": -0.0032768,
@@ -14519,7 +14519,7 @@
                     "sensor_index": "30573226",
                     "sensor_type": "cisco-entity-sensor",
                     "sensor_descr": "Module Mau 0/0/2/2 - Power Rx 0/0/2/2",
-                    "group": null,
+                    "group": "transceiver",
                     "sensor_divisor": 10000000,
                     "sensor_multiplier": 1,
                     "sensor_current": 0.0011274,
@@ -14544,7 +14544,7 @@
                     "sensor_index": "35484503",
                     "sensor_type": "cisco-entity-sensor",
                     "sensor_descr": "Module Mau 0/0/0/3 - Power Tx 0/0/0/3",
-                    "group": null,
+                    "group": "transceiver",
                     "sensor_divisor": 10000000,
                     "sensor_multiplier": 1,
                     "sensor_current": 0.0006684,
@@ -14569,7 +14569,7 @@
                     "sensor_index": "43271261",
                     "sensor_type": "cisco-entity-sensor",
                     "sensor_descr": "Module Mau 0/0/1/3 - Power Rx 0/0/1/3",
-                    "group": null,
+                    "group": "transceiver",
                     "sensor_divisor": 10000000,
                     "sensor_multiplier": 1,
                     "sensor_current": -0.0032768,
@@ -14594,7 +14594,7 @@
                     "sensor_index": "47349219",
                     "sensor_type": "cisco-entity-sensor",
                     "sensor_descr": "Module Mau 0/0/2/2 - Power Tx 0/0/2/2",
-                    "group": null,
+                    "group": "transceiver",
                     "sensor_divisor": 10000000,
                     "sensor_multiplier": 1,
                     "sensor_current": 0.0007594,
@@ -14619,7 +14619,7 @@
                     "sensor_index": "48336040",
                     "sensor_type": "cisco-entity-sensor",
                     "sensor_descr": "Module Mau 0/0/2/0 - Power Rx 0/0/2/0",
-                    "group": null,
+                    "group": "transceiver",
                     "sensor_divisor": 10000000,
                     "sensor_multiplier": 1,
                     "sensor_current": 0.0002751,
@@ -14644,7 +14644,7 @@
                     "sensor_index": "65113653",
                     "sensor_type": "cisco-entity-sensor",
                     "sensor_descr": "Module Mau 0/0/2/0 - Power Tx 0/0/2/0",
-                    "group": null,
+                    "group": "transceiver",
                     "sensor_divisor": 10000000,
                     "sensor_multiplier": 1,
                     "sensor_current": 0.0006148,
@@ -14669,7 +14669,7 @@
                     "sensor_index": "7429666",
                     "sensor_type": "cisco-entity-sensor",
                     "sensor_descr": "Module Mau 0/0/1/1 - Power Tx 0/0/1/1",
-                    "group": null,
+                    "group": "transceiver",
                     "sensor_divisor": 10000000,
                     "sensor_multiplier": 1,
                     "sensor_current": 0.0003555,
@@ -15044,7 +15044,7 @@
                     "sensor_index": "14782338",
                     "sensor_type": "cisco-entity-sensor",
                     "sensor_descr": "Module Mau 0/0/2/0 - 0/0/2/0",
-                    "group": null,
+                    "group": "transceiver",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_current": 32.3,
@@ -15369,7 +15369,7 @@
                     "sensor_index": "52262180",
                     "sensor_type": "cisco-entity-sensor",
                     "sensor_descr": "Module Mau 0/0/0/3 - 0/0/0/3",
-                    "group": null,
+                    "group": "transceiver",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_current": 18.5,
@@ -15419,7 +15419,7 @@
                     "sensor_index": "57760853",
                     "sensor_type": "cisco-entity-sensor",
                     "sensor_descr": "Module Mau 0/0/1/1 - 0/0/1/1",
-                    "group": null,
+                    "group": "transceiver",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_current": 16,
@@ -15469,7 +15469,7 @@
                     "sensor_index": "64126832",
                     "sensor_type": "cisco-entity-sensor",
                     "sensor_descr": "Module Mau 0/0/2/2 - 0/0/2/2",
-                    "group": null,
+                    "group": "transceiver",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_current": 30.8,
@@ -15519,7 +15519,7 @@
                     "sensor_index": "9716067",
                     "sensor_type": "cisco-entity-sensor",
                     "sensor_descr": "Module Mau 0/0/1/3 - 0/0/1/3",
-                    "group": null,
+                    "group": "transceiver",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_current": -3276.8,
@@ -15619,7 +15619,7 @@
                     "sensor_index": "14780750",
                     "sensor_type": "cisco-entity-sensor",
                     "sensor_descr": "Module Mau 0/0/2/0 - Voltage 0/0/2/0",
-                    "group": null,
+                    "group": "transceiver",
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
                     "sensor_current": 3.264,
@@ -17119,7 +17119,7 @@
                     "sensor_index": "57759233",
                     "sensor_type": "cisco-entity-sensor",
                     "sensor_descr": "Module Mau 0/0/1/1 - Voltage 0/0/1/1",
-                    "group": null,
+                    "group": "transceiver",
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
                     "sensor_current": 3.34,
@@ -17269,7 +17269,7 @@
                     "sensor_index": "64125244",
                     "sensor_type": "cisco-entity-sensor",
                     "sensor_descr": "Module Mau 0/0/2/2 - Voltage 0/0/2/2",
-                    "group": null,
+                    "group": "transceiver",
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
                     "sensor_current": 3.223,
@@ -17594,7 +17594,7 @@
                     "sensor_index": "9714479",
                     "sensor_type": "cisco-entity-sensor",
                     "sensor_descr": "Module Mau 0/0/1/3 - Voltage 0/0/1/3",
-                    "group": null,
+                    "group": "transceiver",
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
                     "sensor_current": -32.768,
@@ -17989,7 +17989,7 @@
                     "sensor_index": "13795549",
                     "sensor_type": "cisco-entity-sensor",
                     "sensor_descr": "Module Mau 0/0/2/2 - Current 0/0/2/2",
-                    "group": null,
+                    "group": "transceiver",
                     "sensor_divisor": 10000,
                     "sensor_multiplier": 1,
                     "sensor_current": 0.0329,
@@ -18014,7 +18014,7 @@
                     "sensor_index": "1930929",
                     "sensor_type": "cisco-entity-sensor",
                     "sensor_descr": "Module Mau 0/0/0/3 - Current 0/0/0/3",
-                    "group": null,
+                    "group": "transceiver",
                     "sensor_divisor": 10000,
                     "sensor_multiplier": 1,
                     "sensor_current": 0.0305,
@@ -18039,7 +18039,7 @@
                     "sensor_index": "31558363",
                     "sensor_type": "cisco-entity-sensor",
                     "sensor_descr": "Module Mau 0/0/2/0 - Current 0/0/2/0",
-                    "group": null,
+                    "group": "transceiver",
                     "sensor_divisor": 10000,
                     "sensor_multiplier": 1,
                     "sensor_current": 0.0305,
@@ -18064,7 +18064,7 @@
                     "sensor_index": "40983240",
                     "sensor_type": "cisco-entity-sensor",
                     "sensor_descr": "Module Mau 0/0/1/1 - Current 0/0/1/1",
-                    "group": null,
+                    "group": "transceiver",
                     "sensor_divisor": 10000,
                     "sensor_multiplier": 1,
                     "sensor_current": 0.0244,
@@ -18139,7 +18139,7 @@
                     "sensor_index": "60048938",
                     "sensor_type": "cisco-entity-sensor",
                     "sensor_descr": "Module Mau 0/0/1/3 - Current 0/0/1/3",
-                    "group": null,
+                    "group": "transceiver",
                     "sensor_divisor": 10000,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -18164,7 +18164,7 @@
                     "sensor_index": "18708510",
                     "sensor_type": "cisco-entity-sensor",
                     "sensor_descr": "module mau 0/0/0/3 - power Rx 0/0/0/3",
-                    "group": null,
+                    "group": "transceiver",
                     "sensor_divisor": 10000000,
                     "sensor_multiplier": 1000,
                     "sensor_current": -2.3306690616272,
@@ -18189,7 +18189,7 @@
                     "sensor_index": "24205691",
                     "sensor_type": "cisco-entity-sensor",
                     "sensor_descr": "module mau 0/0/1/1 - power Rx 0/0/1/1",
-                    "group": null,
+                    "group": "transceiver",
                     "sensor_divisor": 10000000,
                     "sensor_multiplier": 1000,
                     "sensor_current": -5.145625189237,
@@ -18214,7 +18214,7 @@
                     "sensor_index": "26493680",
                     "sensor_type": "cisco-entity-sensor",
                     "sensor_descr": "module mau 0/0/1/3 - power Tx 0/0/1/3",
-                    "group": null,
+                    "group": "transceiver",
                     "sensor_divisor": 10000000,
                     "sensor_multiplier": 1000,
                     "sensor_current": -60,
@@ -18239,7 +18239,7 @@
                     "sensor_index": "30573226",
                     "sensor_type": "cisco-entity-sensor",
                     "sensor_descr": "module mau 0/0/2/2 - power Rx 0/0/2/2",
-                    "group": null,
+                    "group": "transceiver",
                     "sensor_divisor": 10000000,
                     "sensor_multiplier": 1000,
                     "sensor_current": 0.52078030484169,
@@ -18264,7 +18264,7 @@
                     "sensor_index": "35484503",
                     "sensor_type": "cisco-entity-sensor",
                     "sensor_descr": "module mau 0/0/0/3 - power Tx 0/0/0/3",
-                    "group": null,
+                    "group": "transceiver",
                     "sensor_divisor": 10000000,
                     "sensor_multiplier": 1000,
                     "sensor_current": -1.7496355877865,
@@ -18289,7 +18289,7 @@
                     "sensor_index": "43271261",
                     "sensor_type": "cisco-entity-sensor",
                     "sensor_descr": "module mau 0/0/1/3 - power Rx 0/0/1/3",
-                    "group": null,
+                    "group": "transceiver",
                     "sensor_divisor": 10000000,
                     "sensor_multiplier": 1000,
                     "sensor_current": -60,
@@ -18314,7 +18314,7 @@
                     "sensor_index": "47349219",
                     "sensor_type": "cisco-entity-sensor",
                     "sensor_descr": "module mau 0/0/2/2 - power Tx 0/0/2/2",
-                    "group": null,
+                    "group": "transceiver",
                     "sensor_divisor": 10000000,
                     "sensor_multiplier": 1000,
                     "sensor_current": -1.1952940719622,
@@ -18339,7 +18339,7 @@
                     "sensor_index": "48336040",
                     "sensor_type": "cisco-entity-sensor",
                     "sensor_descr": "module mau 0/0/2/0 - power Rx 0/0/2/0",
-                    "group": null,
+                    "group": "transceiver",
                     "sensor_divisor": 10000000,
                     "sensor_multiplier": 1000,
                     "sensor_current": -5.6050940961032,
@@ -18364,7 +18364,7 @@
                     "sensor_index": "65113653",
                     "sensor_type": "cisco-entity-sensor",
                     "sensor_descr": "module mau 0/0/2/0 - power Tx 0/0/2/0",
-                    "group": null,
+                    "group": "transceiver",
                     "sensor_divisor": 10000000,
                     "sensor_multiplier": 1000,
                     "sensor_current": -2.1126614117229,
@@ -18389,7 +18389,7 @@
                     "sensor_index": "7429666",
                     "sensor_type": "cisco-entity-sensor",
                     "sensor_descr": "module mau 0/0/1/1 - power Tx 0/0/1/1",
-                    "group": null,
+                    "group": "transceiver",
                     "sensor_divisor": 10000000,
                     "sensor_multiplier": 1000,
                     "sensor_current": -4.4916039493421,
@@ -18789,7 +18789,7 @@
                     "sensor_index": "18708510",
                     "sensor_type": "cisco-entity-sensor",
                     "sensor_descr": "Module Mau 0/0/0/3 - Power Rx 0/0/0/3",
-                    "group": null,
+                    "group": "transceiver",
                     "sensor_divisor": 10000000,
                     "sensor_multiplier": 1,
                     "sensor_current": 0.0005847,
@@ -18839,7 +18839,7 @@
                     "sensor_index": "24205691",
                     "sensor_type": "cisco-entity-sensor",
                     "sensor_descr": "Module Mau 0/0/1/1 - Power Rx 0/0/1/1",
-                    "group": null,
+                    "group": "transceiver",
                     "sensor_divisor": 10000000,
                     "sensor_multiplier": 1,
                     "sensor_current": 0.0003058,
@@ -18864,7 +18864,7 @@
                     "sensor_index": "26493680",
                     "sensor_type": "cisco-entity-sensor",
                     "sensor_descr": "Module Mau 0/0/1/3 - Power Tx 0/0/1/3",
-                    "group": null,
+                    "group": "transceiver",
                     "sensor_divisor": 10000000,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -18889,7 +18889,7 @@
                     "sensor_index": "30573226",
                     "sensor_type": "cisco-entity-sensor",
                     "sensor_descr": "Module Mau 0/0/2/2 - Power Rx 0/0/2/2",
-                    "group": null,
+                    "group": "transceiver",
                     "sensor_divisor": 10000000,
                     "sensor_multiplier": 1,
                     "sensor_current": 0.0011274,
@@ -18914,7 +18914,7 @@
                     "sensor_index": "35484503",
                     "sensor_type": "cisco-entity-sensor",
                     "sensor_descr": "Module Mau 0/0/0/3 - Power Tx 0/0/0/3",
-                    "group": null,
+                    "group": "transceiver",
                     "sensor_divisor": 10000000,
                     "sensor_multiplier": 1,
                     "sensor_current": 0.0006684,
@@ -18939,7 +18939,7 @@
                     "sensor_index": "43271261",
                     "sensor_type": "cisco-entity-sensor",
                     "sensor_descr": "Module Mau 0/0/1/3 - Power Rx 0/0/1/3",
-                    "group": null,
+                    "group": "transceiver",
                     "sensor_divisor": 10000000,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -18964,7 +18964,7 @@
                     "sensor_index": "47349219",
                     "sensor_type": "cisco-entity-sensor",
                     "sensor_descr": "Module Mau 0/0/2/2 - Power Tx 0/0/2/2",
-                    "group": null,
+                    "group": "transceiver",
                     "sensor_divisor": 10000000,
                     "sensor_multiplier": 1,
                     "sensor_current": 0.0007594,
@@ -18989,7 +18989,7 @@
                     "sensor_index": "48336040",
                     "sensor_type": "cisco-entity-sensor",
                     "sensor_descr": "Module Mau 0/0/2/0 - Power Rx 0/0/2/0",
-                    "group": null,
+                    "group": "transceiver",
                     "sensor_divisor": 10000000,
                     "sensor_multiplier": 1,
                     "sensor_current": 0.0002751,
@@ -19014,7 +19014,7 @@
                     "sensor_index": "65113653",
                     "sensor_type": "cisco-entity-sensor",
                     "sensor_descr": "Module Mau 0/0/2/0 - Power Tx 0/0/2/0",
-                    "group": null,
+                    "group": "transceiver",
                     "sensor_divisor": 10000000,
                     "sensor_multiplier": 1,
                     "sensor_current": 0.0006148,
@@ -19039,7 +19039,7 @@
                     "sensor_index": "7429666",
                     "sensor_type": "cisco-entity-sensor",
                     "sensor_descr": "Module Mau 0/0/1/1 - Power Tx 0/0/1/1",
-                    "group": null,
+                    "group": "transceiver",
                     "sensor_divisor": 10000000,
                     "sensor_multiplier": 1,
                     "sensor_current": 0.0003555,
@@ -19414,7 +19414,7 @@
                     "sensor_index": "14782338",
                     "sensor_type": "cisco-entity-sensor",
                     "sensor_descr": "Module Mau 0/0/2/0 - 0/0/2/0",
-                    "group": null,
+                    "group": "transceiver",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_current": 32.3,
@@ -19739,7 +19739,7 @@
                     "sensor_index": "52262180",
                     "sensor_type": "cisco-entity-sensor",
                     "sensor_descr": "Module Mau 0/0/0/3 - 0/0/0/3",
-                    "group": null,
+                    "group": "transceiver",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_current": 18.5,
@@ -19789,7 +19789,7 @@
                     "sensor_index": "57760853",
                     "sensor_type": "cisco-entity-sensor",
                     "sensor_descr": "Module Mau 0/0/1/1 - 0/0/1/1",
-                    "group": null,
+                    "group": "transceiver",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_current": 16,
@@ -19839,7 +19839,7 @@
                     "sensor_index": "64126832",
                     "sensor_type": "cisco-entity-sensor",
                     "sensor_descr": "Module Mau 0/0/2/2 - 0/0/2/2",
-                    "group": null,
+                    "group": "transceiver",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_current": 30.8,
@@ -19889,7 +19889,7 @@
                     "sensor_index": "9716067",
                     "sensor_type": "cisco-entity-sensor",
                     "sensor_descr": "Module Mau 0/0/1/3 - 0/0/1/3",
-                    "group": null,
+                    "group": "transceiver",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -19989,7 +19989,7 @@
                     "sensor_index": "14780750",
                     "sensor_type": "cisco-entity-sensor",
                     "sensor_descr": "Module Mau 0/0/2/0 - Voltage 0/0/2/0",
-                    "group": null,
+                    "group": "transceiver",
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
                     "sensor_current": 3.264,
@@ -21489,7 +21489,7 @@
                     "sensor_index": "57759233",
                     "sensor_type": "cisco-entity-sensor",
                     "sensor_descr": "Module Mau 0/0/1/1 - Voltage 0/0/1/1",
-                    "group": null,
+                    "group": "transceiver",
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
                     "sensor_current": 3.34,
@@ -21639,7 +21639,7 @@
                     "sensor_index": "64125244",
                     "sensor_type": "cisco-entity-sensor",
                     "sensor_descr": "Module Mau 0/0/2/2 - Voltage 0/0/2/2",
-                    "group": null,
+                    "group": "transceiver",
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
                     "sensor_current": 3.223,
@@ -21964,7 +21964,7 @@
                     "sensor_index": "9714479",
                     "sensor_type": "cisco-entity-sensor",
                     "sensor_descr": "Module Mau 0/0/1/3 - Voltage 0/0/1/3",
-                    "group": null,
+                    "group": "transceiver",
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -22858,7 +22858,7 @@
                     "entPhysicalContainedIn": 5457613,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "",
-                    "ifIndex": null
+                    "ifIndex": 27
                 },
                 {
                     "entPhysicalIndex": 5225733,
@@ -22991,7 +22991,7 @@
                     "entPhysicalContainedIn": 42108634,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "",
-                    "ifIndex": null
+                    "ifIndex": 45
                 },
                 {
                     "entPhysicalIndex": 6762374,
@@ -23333,7 +23333,7 @@
                     "entPhysicalContainedIn": 22732977,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "",
-                    "ifIndex": null
+                    "ifIndex": 22
                 },
                 {
                     "entPhysicalIndex": 10090737,
@@ -23352,7 +23352,7 @@
                     "entPhysicalContainedIn": 22233606,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "",
-                    "ifIndex": null
+                    "ifIndex": 32
                 },
                 {
                     "entPhysicalIndex": 10527011,
@@ -23371,7 +23371,7 @@
                     "entPhysicalContainedIn": 39163160,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "",
-                    "ifIndex": null
+                    "ifIndex": 41
                 },
                 {
                     "entPhysicalIndex": 11426991,
@@ -23409,7 +23409,7 @@
                     "entPhysicalContainedIn": 55939153,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "",
-                    "ifIndex": null
+                    "ifIndex": 40
                 },
                 {
                     "entPhysicalIndex": 11630420,
@@ -23523,7 +23523,7 @@
                     "entPhysicalContainedIn": 39508938,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "",
-                    "ifIndex": null
+                    "ifIndex": 25
                 },
                 {
                     "entPhysicalIndex": 12510322,
@@ -23542,7 +23542,7 @@
                     "entPhysicalContainedIn": 22383991,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "",
-                    "ifIndex": null
+                    "ifIndex": 38
                 },
                 {
                     "entPhysicalIndex": 12905956,
@@ -23637,7 +23637,7 @@
                     "entPhysicalContainedIn": 5607998,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "",
-                    "ifIndex": null
+                    "ifIndex": 39
                 },
                 {
                     "entPhysicalIndex": 14585855,
@@ -23770,7 +23770,7 @@
                     "entPhysicalContainedIn": 39009631,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "",
-                    "ifIndex": null
+                    "ifIndex": 33
                 },
                 {
                     "entPhysicalIndex": 15526104,
@@ -23922,7 +23922,7 @@
                     "entPhysicalContainedIn": 25550897,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "",
-                    "ifIndex": null
+                    "ifIndex": 19
                 },
                 {
                     "entPhysicalIndex": 17977066,
@@ -23998,7 +23998,7 @@
                     "entPhysicalContainedIn": 5460821,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "",
-                    "ifIndex": null
+                    "ifIndex": 35
                 },
                 {
                     "entPhysicalIndex": 19337222,
@@ -24644,7 +24644,7 @@
                     "entPhysicalContainedIn": 22235226,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "",
-                    "ifIndex": null
+                    "ifIndex": 28
                 },
                 {
                     "entPhysicalIndex": 28091685,
@@ -24815,7 +24815,7 @@
                     "entPhysicalContainedIn": 39011219,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "",
-                    "ifIndex": null
+                    "ifIndex": 29
                 },
                 {
                     "entPhysicalIndex": 29047573,
@@ -24948,7 +24948,7 @@
                     "entPhysicalContainedIn": 39161540,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "",
-                    "ifIndex": null
+                    "ifIndex": 37
                 },
                 {
                     "entPhysicalIndex": 31368921,
@@ -25157,7 +25157,7 @@
                     "entPhysicalContainedIn": 5955364,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "",
-                    "ifIndex": null
+                    "ifIndex": 23
                 },
                 {
                     "entPhysicalIndex": 35064942,
@@ -25689,7 +25689,7 @@
                     "entPhysicalContainedIn": 55787308,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "",
-                    "ifIndex": null
+                    "ifIndex": 34
                 },
                 {
                     "entPhysicalIndex": 41889607,
@@ -25708,7 +25708,7 @@
                     "entPhysicalContainedIn": 8773284,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "",
-                    "ifIndex": null
+                    "ifIndex": 18
                 },
                 {
                     "entPhysicalIndex": 41903305,
@@ -25727,7 +25727,7 @@
                     "entPhysicalContainedIn": 42328478,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "",
-                    "ifIndex": null
+                    "ifIndex": 20
                 },
                 {
                     "entPhysicalIndex": 41983486,
@@ -26050,7 +26050,7 @@
                     "entPhysicalContainedIn": 55788896,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "",
-                    "ifIndex": null
+                    "ifIndex": 30
                 },
                 {
                     "entPhysicalIndex": 45825250,
@@ -26202,7 +26202,7 @@
                     "entPhysicalContainedIn": 58886311,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "",
-                    "ifIndex": null
+                    "ifIndex": 44
                 },
                 {
                     "entPhysicalIndex": 48146598,
@@ -26335,7 +26335,7 @@
                     "entPhysicalContainedIn": 25332609,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "",
-                    "ifIndex": null
+                    "ifIndex": 42
                 },
                 {
                     "entPhysicalIndex": 49803247,
@@ -26981,7 +26981,7 @@
                     "entPhysicalContainedIn": 5456057,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "",
-                    "ifIndex": null
+                    "ifIndex": 31
                 },
                 {
                     "entPhysicalIndex": 58757859,
@@ -27133,7 +27133,7 @@
                     "entPhysicalContainedIn": 8555060,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "",
-                    "ifIndex": null
+                    "ifIndex": 43
                 },
                 {
                     "entPhysicalIndex": 60048938,
@@ -27190,7 +27190,7 @@
                     "entPhysicalContainedIn": 56286551,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "",
-                    "ifIndex": null
+                    "ifIndex": 24
                 },
                 {
                     "entPhysicalIndex": 61759766,
@@ -27399,7 +27399,7 @@
                     "entPhysicalContainedIn": 59102851,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "",
-                    "ifIndex": null
+                    "ifIndex": 21
                 },
                 {
                     "entPhysicalIndex": 63237143,
@@ -27494,7 +27494,7 @@
                     "entPhysicalContainedIn": 22238498,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "",
-                    "ifIndex": null
+                    "ifIndex": 36
                 },
                 {
                     "entPhysicalIndex": 64765592,
@@ -27513,7 +27513,7 @@
                     "entPhysicalContainedIn": 22731389,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "",
-                    "ifIndex": null
+                    "ifIndex": 26
                 },
                 {
                     "entPhysicalIndex": 64922623,
@@ -27676,6 +27676,107 @@
                     "pw_peer_mtu": 0,
                     "pw_descr": "PBB-EDGE:BD-I-100001",
                     "ifIndex": null
+                }
+            ]
+        }
+    },
+    "transceivers": {
+        "discovery": {
+            "transceivers": [
+                {
+                    "index": "15526104",
+                    "entity_physical_index": 25,
+                    "type": "1000BASE-T SFP (NEBS 3), UTP, 100m",
+                    "vendor": "",
+                    "oui": null,
+                    "model": "SFP-GE-T",
+                    "revision": "V02",
+                    "serial": "T1510200002",
+                    "date": null,
+                    "ddm": null,
+                    "encoding": null,
+                    "cable": null,
+                    "distance": null,
+                    "wavelength": null,
+                    "connector": null,
+                    "channels": 1,
+                    "ifIndex": 25
+                },
+                {
+                    "index": "30054631",
+                    "entity_physical_index": 42,
+                    "type": "10GBASE-LR SFP+ Module for SMF",
+                    "vendor": "",
+                    "oui": null,
+                    "model": "SFP-10G-LR",
+                    "revision": "V02",
+                    "serial": "S1601213098",
+                    "date": null,
+                    "ddm": null,
+                    "encoding": null,
+                    "cable": null,
+                    "distance": null,
+                    "wavelength": null,
+                    "connector": null,
+                    "channels": 1,
+                    "ifIndex": 42
+                },
+                {
+                    "index": "31415605",
+                    "entity_physical_index": 44,
+                    "type": "10GBASE-LR SFP+ Module for SMF",
+                    "vendor": "",
+                    "oui": null,
+                    "model": "SFP-10G-LR",
+                    "revision": "V01",
+                    "serial": "S1709020011",
+                    "date": null,
+                    "ddm": null,
+                    "encoding": null,
+                    "cable": null,
+                    "distance": null,
+                    "wavelength": null,
+                    "connector": null,
+                    "channels": 1,
+                    "ifIndex": 44
+                },
+                {
+                    "index": "37336673",
+                    "entity_physical_index": 21,
+                    "type": "Multirate 10GBASE-LR and OC-192/STM-64 SR-1 XFP, SMF",
+                    "vendor": "",
+                    "oui": null,
+                    "model": "XFP-10GLR-OC192SR",
+                    "revision": "V03",
+                    "serial": "S1702060052",
+                    "date": null,
+                    "ddm": null,
+                    "encoding": null,
+                    "cable": null,
+                    "distance": null,
+                    "wavelength": null,
+                    "connector": null,
+                    "channels": 1,
+                    "ifIndex": 21
+                },
+                {
+                    "index": "66227682",
+                    "entity_physical_index": 23,
+                    "type": "1000BASE-LX/LH SFP transceiver module, MMF/SMF, 1310nm, DOM",
+                    "vendor": "",
+                    "oui": null,
+                    "model": "GLC-LH-SMD",
+                    "revision": "V01",
+                    "serial": "S1809290080",
+                    "date": null,
+                    "ddm": null,
+                    "encoding": null,
+                    "cable": null,
+                    "distance": null,
+                    "wavelength": null,
+                    "connector": null,
+                    "channels": 1,
+                    "ifIndex": 23
                 }
             ]
         }
