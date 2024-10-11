@@ -2,9 +2,9 @@
 
 ### Introduction
 
-In this section we are briefly going to walk through, what it takes to
-write sensor state support. We will also briefly get around the
-concepts of the current sensor state monitoring.
+This section will explain how to implement support for sensor state. It will also cover the basic concepts of sensor state monitoring.
+
+Sensor state support in LibreNMS allows users to monitor and visualize the status of sensors that report qualitative states, rather than numerical values, in a more understandable and efficient manner. Instead of displaying raw numeric values, LibreNMS translates those values into generic states, such as "OK", "Warning", "Critical", and "Unknown".
 
 ### Logic
 
