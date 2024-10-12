@@ -54,31 +54,7 @@
                             <div class="form-group row">
                                 <label for="maplegend" class="col-sm-3 control-label">{{ __('map.custom.edit.map.enable_legend') }}</label>
                                 <div class="col-sm-9">
-                                    <input class="form-check-input" type="checkbox" role="switch" id="maplegend" onChange="toggleMapLegend()">
-                                </div>
-                            </div>
-                            <div class="form-group row maplegend">
-                                <label for="maplegendfontsize" class="col-sm-4 control-label">{{ __('map.custom.edit.map.legend.font_size') }}</label>
-                                <div class="col-sm-8">
-                                    <input type=number id="maplegendfontsize" class="form-control input-sm" value={{ $legend['font_size'] }} />
-                                </div>
-                            </div>
-                            <div class="form-group row maplegend">
-                                <label for="maplegendsteps" class="col-sm-4 control-label">{{ __('map.custom.edit.map.legend.steps') }}</label>
-                                <div class="col-sm-8">
-                                    <input type=number id="maplegendsteps" class="form-control input-sm" value={{ $legend['steps'] }} />
-                                </div>
-                            </div>
-                            <div class="form-group row maplegend">
-                                <label for="maplegendhideinvalid" class="col-sm-4 control-label">{{ __('map.custom.edit.map.legend.hideinvalid') }}</label>
-                                <div class="col-sm-8">
-                                    <input class="form-check-input" type="checkbox" role="switch" id="maplegendhideinvalid">
-                                </div>
-                            </div>
-                            <div class="form-group row maplegend">
-                                <label for="maplegendhideoverspeed" class="col-sm-4 control-label">{{ __('map.custom.edit.map.legend.hideoverspeed') }}</label>
-                                <div class="col-sm-8">
-                                    <input class="form-check-input" type="checkbox" role="switch" id="maplegendhideoverspeed">
+                                    <input class="form-check-input" type="checkbox" role="switch" id="maplegend">
                                 </div>
                             </div>
                             <hr>
@@ -104,7 +80,6 @@
     var node_align = {{$node_align}};
     var edge_sep = {{$edge_separation}};
     var reverse_arrows = {{$reverse_arrows}};
-    var legend = @json($legend);
 
     function saveMapSettings() {
         $("#map-saveButton").attr('disabled','disabled');
@@ -197,22 +172,9 @@
         });
     }
 
-    function toggleMapLegend() {
-        if($("#maplegend").prop('checked')) {
-            $(".maplegend").show();
-        } else {
-            $(".maplegend").hide();
-        }
-    }
-
     $(document).ready(function () {
-        if(legend.x < 0 || legend.y < 0) {
-            $(".maplegend").hide();
-        }
         $("#mapreversearrows").bootstrapSwitch('state', Boolean(reverse_arrows));
         $("#maplegend").bootstrapSwitch('state', (legend.x >= 0 && legend.y >= 0));
-        $("#maplegendhideinvalid").bootstrapSwitch('state', Boolean(legend.hide_invalid));
-        $("#maplegendhideoverspeed").bootstrapSwitch('state', Boolean(legend.hide_overspeed));
         init_select2("#mapmenugroup", "custom-map-menu-group", {}, @json($menu_group ?? null), "{{ __('map.custom.edit.map.no_group') }}", {
             tags: true,
             createTag: function (params) {
