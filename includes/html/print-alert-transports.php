@@ -43,8 +43,8 @@ foreach (\App\Models\AlertTransport::orderBy('transport_name', 'asc')->get() as 
     // Add action buttons for admin users only
     if (Auth::user()->hasGlobalAdmin()) {
         echo "<div class='btn-group btn-group-sm' role='group'>";
-        echo "<button type='button' class='btn btn-primary btn-sm' data-toggle='modal' data-popover='popover' data-target='#edit-alert-transport' data-transport_id='" . $transport->transport_id . "' name='edit-alert-rule' data-container='body' data-content='Edit transport'><i class='fa fa-lg fa-pencil' aria-hidden='true'></i></button> ";
-        echo "<button type='button' class='btn btn-danger btn-sm' aria-label='Delete' data-toggle='modal' data-target='#delete-alert-transport' data-transport_id='" . $transport->transport_id . "' name='delete-alert-transport' data-container='body' data-popover='popover' data-content='Delete transport'><i class='fa fa-lg fa-trash' aria-hidden='true'></i></button>";
+        echo "<button type='button' class='btn btn-primary btn-sm' data-toggle='modal' data-popover='popover' data-target='#edit-alert-transport' data-transport_id='" . $transport->transport_id . "' name='edit-alert-rule' data-content='Edit transport'><i class='fa fa-lg fa-pencil' aria-hidden='true'></i></button> ";
+        echo "<button type='button' class='btn btn-danger btn-sm' aria-label='Delete' data-toggle='modal' data-target='#delete-alert-transport' data-transport_id='" . $transport->transport_id . "' name='delete-alert-transport' data-popover='popover' data-content='Delete transport'><i class='fa fa-lg fa-trash' aria-hidden='true'></i></button>";
         echo "<button type='button' class='btn btn-warning btn-sm' data-transport_id='" . $transport->transport_id . "' data-transport='{$transport->transport_type}' name='test-transport' id='test-transport' data-popover='popover' data-content='Test transport'><i class='fa fa-lg fa-check' aria-hidden='true'></i></button> ";
         echo '</div>';
     }
@@ -89,8 +89,8 @@ foreach (dbFetchRows($query) as $group) {
     echo '<td>';
     if (Auth::user()->hasGlobalAdmin()) {
         echo "<div class='btn-group btn-group-sm' role='group'>";
-        echo "<button type='button' class='btn btn-primary btn-sm' data-toggle='modal' data-popover='popover' data-target='#edit-transport-group' data-group_id='" . $group['id'] . "' data-container='body' data-content='Edit transport group'><i class='fa fa-lg fa-pencil' aria-hidden='true'></i></button> ";
-        echo "<button type='button' class='btn btn-danger btn-sm' aria-label='Delete' data-toggle='modal' data-popover='popover' data-target='#delete-transport-group' data-group_id='" . $group['id'] . "' data-container='body' data-content='Delete transport group'><i class='fa fa-lg fa-trash' aria-hidden='true'></i></button>";
+        echo "<button type='button' class='btn btn-primary btn-sm' data-toggle='modal' data-popover='popover' data-target='#edit-transport-group' data-group_id='" . $group['id'] . "' data-content='Edit transport group'><i class='fa fa-lg fa-pencil' aria-hidden='true'></i></button> ";
+        echo "<button type='button' class='btn btn-danger btn-sm' aria-label='Delete' data-toggle='modal' data-popover='popover' data-target='#delete-transport-group' data-group_id='" . $group['id'] . "' data-content='Delete transport group'><i class='fa fa-lg fa-trash' aria-hidden='true'></i></button>";
         echo '</div>';
     }
     echo '</td>';
