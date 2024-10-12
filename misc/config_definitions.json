@@ -1080,6 +1080,10 @@
             "section": "custom-map",
             "order": 2
         },
+        "custom_map.legend_colours": {
+            "default": null,
+            "type": "text"
+        },
         "custom_map.node_align": {
             "default": 10,
             "type": "integer",

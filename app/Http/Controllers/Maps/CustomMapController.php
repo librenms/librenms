@@ -58,6 +58,7 @@ class CustomMapController extends Controller
                 'hide_invalid' => 0,
                 'hide_overspeed' => 0,
                 'font_size' => 14,
+                'colours' => Config::get('custom_map.legend_colours', null),
             ],
             'background_type' => Config::get('custom_map.background_type', 'none'),
             'background_data' => Config::get('custom_map.background_data'),
@@ -256,6 +257,7 @@ class CustomMapController extends Controller
             'hide_invalid' => $map->legend_hide_invalid,
             'hide_overspeed' => $map->legend_hide_overspeed,
             'font_size' => $map->legend_font_size,
+            'colours' => $map->legend_colours,
         ];
 
         return $legend;
