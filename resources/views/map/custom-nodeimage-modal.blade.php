@@ -10,7 +10,7 @@
                 <x-input id="nodeimage"
                          x-ref="nodeimage"
                          type="file"
-                         label="{{ __('map.custom.nodeimage.image') }}"
+                         label="{{ __('map.custom.nodeimage.upload') }}"
                          accept="image/png,image/jpeg,image/svg+xml,image/gif"
                          onChange="imageModalSetImage(event)">
                 </x-input>
