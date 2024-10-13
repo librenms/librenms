@@ -19,7 +19,7 @@
       <button type=button value="mapbg" id="map-bgEndAdjustButton" class="btn btn-primary" onclick="endBackgroundMapAdjust()" style="display:none">{{ __('map.custom.edit.bg.adjust_map_finish') }}</button>
       <button type=button value="editnodedefaults" id="map-nodeDefaultsButton" class="btn btn-primary" onclick="nodeEdit(newnodeconf)">{{ __('map.custom.edit.node.edit_defaults') }}</button>
       <button type=button value="editedgedefaults" id="map-edgeDefaultsButton" class="btn btn-primary" onclick="edgeEditDefaults()">{{ __('map.custom.edit.edge.edit_defaults') }}</button>
-      <button type=button value="togglelegend" id="map-legendToggleButton" class="btn btn-primary" onclick="toggleLegend()">{{ __('map.custom.edit.edge.legend_toggle') }}</button>
+      <button type=button value="togglelegend" id="map-legendToggleButton" class="btn btn-primary" onclick="toggleLegend()">{{ __('map.custom.edit.map.legend_toggle') }}</button>
     </div>
     <div class="col-md-2">
       <center>
