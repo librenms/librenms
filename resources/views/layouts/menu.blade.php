@@ -133,7 +133,9 @@
                                                               aria-hidden="true"></i> {{ __('All Devices') }}</a>
                             <ul class="dropdown-menu scrollable-menu">
                             @foreach($device_types as $type)
-                                <li><a href="{{ url("devices/type=$type") }}"><i class="fa fa-angle-double-right fa-fw fa-lg" aria-hidden="true"></i> {{ ucfirst($type) }}</a></li>
+                                @if($type != '')
+                                    <li><a href="{{ url("devices/type=$type") }}"><i class="fa fa-angle-double-right fa-fw fa-lg" aria-hidden="true"></i> {{ ucfirst($type) }}</a></li>
+                                @endif
                             @endforeach
                         </ul></li>
                     @else

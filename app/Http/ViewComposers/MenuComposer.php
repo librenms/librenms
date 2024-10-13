@@ -82,7 +82,7 @@ class MenuComposer
         $vars['device_groups'] = DeviceGroup::hasAccess($user)->orderBy('name')->get(['device_groups.id', 'name', 'desc']);
         $vars['package_count'] = Package::hasAccess($user)->count();
 
-        $vars['device_types'] = Device::hasAccess($user)->select('type')->distinct()->where('type', '!=', '')->orderBy('type')->pluck('type');
+        $vars['device_types'] = Device::hasAccess($user)->select('type')->distinct()->orderBy('type')->pluck('type');
 
         $vars['locations'] = (Config::get('show_locations') && Config::get('show_locations_dropdown')) ?
             Location::hasAccess($user)->where('location', '!=', '')->orderBy('location')->get(['location', 'id']) :
