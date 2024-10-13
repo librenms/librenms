@@ -99,6 +99,7 @@
         }
 
         redrawLegend();
+        mapLegendResetColours();
         $("#mapLegendModal").modal('hide');
         $("#map-saveDataButton").show();
     }
