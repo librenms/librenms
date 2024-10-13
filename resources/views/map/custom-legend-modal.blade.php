@@ -55,6 +55,18 @@
                                 <div class="col-sm-2">
                                 </div>
                             </div>
+                            <div class="form-group row customcolours" id="customcolourrow0">
+                                <label for="maplegendcolourpct0" class="col-sm-4 control-label">{{ __('map.custom.edit.map.legend.colour_lower_pct') }} 1</label>
+                                <div class="col-sm-2">
+                                    <input type=number disabled class="form-control input-sm" id="maplegendcolourpct0" value="0">
+                                </div>
+                                <label for="maplegendcolour0" class="col-sm-2 control-label">{{ __('map.custom.edit.map.legend.colour') }} 1</label>
+                                <div class="col-sm-2">
+                                    <input type=color class="form-control input-sm" id="maplegendcolour0" value="#00FF00">
+                                </div>
+                                <div class="col-sm-4">
+                                </div>
+                            </div>
                             <div class="form-group row customcolours">
                                 <div class="col-md-12" id="maplegendcolours">
                                 </div>
@@ -147,13 +159,19 @@
 
         $("#maplegendcolourinvalid").val(colours["-1"]);
         $("#maplegendcolourdown").val(colours["-2"]);
-        let colournum = 0;
+        $("#maplegendcolour0").val(colours["0"]);
+        let colournum = 1;
+        let max_pct = 0;
         Object.keys(colours).sort((a,b) => a > b).forEach((pct_key) => {
             let pct = parseFloat(pct_key);
-            if(!isNaN(pct) && pct >= 0.0) {
+            if(!isNaN(pct) && pct > 0.0) {
                 mapLegendAddColour(colournum++, pct, colours[pct_key]);
+                max_pct = pct;
             }
         });
+        while(colournum < legend.steps) {
+            mapLegendAddColour(colournum++, max_pct+=10, "#000000");
+        }
     }
 
     function mapLegendChangeSteps() {
@@ -165,22 +183,27 @@
 
         let i = 0;
         let maxpct = 0;
-        for(i = 0; i < steps; i++) {
+        for(i = 1; i < steps; i++) {
+            // First check if there is an existing row
             let this_pct = $("#maplegendcolourpct" + i);
             if(this_pct.length) {
                 maxpct = parseFloat(this_pct.val());
             } else {
+                // Next check if we are re-adding a row that was removed without saving
                 let this_node = network_nodes.get("legend_" + i);
                 if(this_node) {
-                    let pct = parseInt(this_node.label.replace('%', ''));
+                    let pct = parseFloat(this_node.label.replace('%', ''));
                     mapLegendAddColour(i, pct, this_node.color.background);
-                    maxpct = parseFloat(this_pct.val());
+                    maxpct = pct;
                 } else {
-                    mapLegendAddColour(i, maxpct+=10, "#000000");
+                    // Default to percentage based colour
+                    maxpct+=10;
+                    mapLegendAddColour(i, maxpct, legendPctColour(maxpct));
                 }
             }
         }
 
+        // Remove any rows that are not needed any more
         let this_row = $("#customcolourrow" + i);
         while(this_row.length) {
             this_row.remove();
