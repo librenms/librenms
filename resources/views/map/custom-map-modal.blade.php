@@ -126,6 +126,7 @@
     var map_name = "{{ $name ?? '' }}";
     var map_node_align = {{ $node_align ?? 10 }};
     var map_edge_separation = {{ $edge_separation ?? 10 }};
+    var map_options = {{ Js::from($map_options) }};
 
     function saveMapSettings() {
         $("#map-saveButton").attr('disabled','disabled');
