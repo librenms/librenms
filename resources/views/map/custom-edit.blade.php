@@ -430,6 +430,28 @@
         return '#ff00ff';
     }
 
+    function toggleLegend() {
+        var width = $("#mapwidth").val();
+        var mapwdith = 100;
+        if (!isNaN(width)) {
+            mapwidth = width;
+        } else if (width.includes("px")) {
+            mapwidth = width.replace("px", "");
+        } else if (width.includes("%")) {
+            mapwidth = window.innerWidth * width.replace("%", "") / 100;
+        }
+
+        // Update the x and y coordinates
+        if (legend.x < 0) {
+            legend.x = mapwidth - 50;
+            legend.y = 100;
+        } else {
+            legend.x = -1;
+            legend.y = -1;
+        }
+        redrawLegend();
+    }
+
     function redrawLegend() {
         // Clear out the old legend
         old_nodes = network_nodes.get({filter: function(node) { return node.id.startsWith("legend_") }});
