@@ -46,7 +46,7 @@ class CustomMapDataController extends Controller
         $edges = [];
         $nodes = [];
 
-        if($map->legend_colours) {
+        if ($map->legend_colours) {
             $sorted_colours = $map->legend_colours;
             ksort($sorted_colours, SORT_NUMERIC);
         }
@@ -122,24 +122,24 @@ class CustomMapDataController extends Controller
                     $edges[$edgeid]['port_frompct'] = $ratefrom / $speedfrom * 100.0;
                 }
                 if (! $edge->port->device->status) {
-                    if($map->legend_colours) {
-                        $edges[$edgeid]['colour_to'] = $map->legend_colours["-2"];
-                        $edges[$edgeid]['colour_from'] = $map->legend_colours["-2"];
+                    if ($map->legend_colours) {
+                        $edges[$edgeid]['colour_to'] = $map->legend_colours['-2'];
+                        $edges[$edgeid]['colour_from'] = $map->legend_colours['-2'];
                     } else {
                         $edges[$edgeid]['colour_to'] = 'darkred';
                         $edges[$edgeid]['colour_from'] = 'darkred';
                     }
                 } elseif ($edge->port->ifOperStatus != 'up') {
                     // If the port is not online, show the same as speed unknown
-                    if($map->legend_colours) {
-                        $edges[$edgeid]['colour_to'] = $map->legend_colours["-1"];
-                        $edges[$edgeid]['colour_from'] = $map->legend_colours["-1"];
+                    if ($map->legend_colours) {
+                        $edges[$edgeid]['colour_to'] = $map->legend_colours['-1'];
+                        $edges[$edgeid]['colour_from'] = $map->legend_colours['-1'];
                     } else {
                         $edges[$edgeid]['colour_to'] = $this->speedColour(-1.0);
                         $edges[$edgeid]['colour_from'] = $this->speedColour(-1.0);
                     }
                 } else {
-                    if($map->legend_colours) {
+                    if ($map->legend_colours) {
                         $edges[$edgeid]['colour_to'] = $this->fixedColour($sorted_colours, $edges[$edgeid]['port_topct']);
                         $edges[$edgeid]['colour_from'] = $this->fixedColour($sorted_colours, $edges[$edgeid]['port_frompct']);
                     } else {
@@ -333,13 +333,14 @@ class CustomMapDataController extends Controller
 
     private function fixedColour(array $colours, float $pct): string
     {
-        $last_colour = "black";
-        foreach($colours as $colour_pct => $colour) {
-            if($colour_pct > $pct) {
+        $last_colour = 'black';
+        foreach ($colours as $colour_pct => $colour) {
+            if ($colour_pct > $pct) {
                 break;
             }
             $last_colour = $colour;
         }
+
         return $last_colour;
     }
 

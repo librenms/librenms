@@ -201,7 +201,7 @@ class CustomMapController extends Controller
         $map->background_type = Config::get('custom_map.background_type', 'none');
         $map->background_data = Config::get('custom_map.background_data');
         $map->legend_colours = $this->getDefaultLegendColours();
-        if($map->legend_colours) {
+        if ($map->legend_colours) {
             $map->legend_steps = count($map->legend_colours) - 2;
         }
 
@@ -270,12 +270,12 @@ class CustomMapController extends Controller
         $ret = Config::get('custom_map.legend_colours', null);
 
         // Return null if there is no config
-        if(! $ret) {
+        if (! $ret) {
             return null;
         }
 
-        foreach(array_keys($ret) as $key){
-            if(! is_numeric($key)) {
+        foreach (array_keys($ret) as $key){
+            if (! is_numeric($key)) {
                 // Delete keys that are not numeric
                 unset($ret[$key]);
             } elseif (! preg_match('/^#[A-Fa-f0-0]{6}$/', $ret[$key])) {
@@ -285,17 +285,17 @@ class CustomMapController extends Controller
         }
 
         // Make sure a value exists for device down
-        if(! array_key_exists("-2", $ret)) {
+        if (! array_key_exists("-2", $ret)) {
             $ret["-2"] = "#8B0000";
         }
 
         // Make sure a value exists for invalid
-        if(! array_key_exists("-1", $ret)) {
+        if (! array_key_exists("-1", $ret)) {
             $ret["-1"] = "#000000";
         }
 
         // Make sure a value exists for 0
-        if(! array_key_exists("0", $ret)) {
+        if (! array_key_exists("0", $ret)) {
             $ret["0"] = "#00FF00";
         }
 
