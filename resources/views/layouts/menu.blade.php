@@ -127,15 +127,18 @@
                        data-toggle="dropdown"><i class="fa fa-server fa-fw fa-lg fa-nav-icons hidden-md"
                                                  aria-hidden="true"></i> <span class="hidden-sm">{{ __('Devices') }}</span></a>
                     <ul class="dropdown-menu">
-                    @if($no_devices)
+                    @if($no_devices_added)
                     <li><a href="#"><i class="fa fa-server fa-fw fa-lg" aria-hidden="true"></i> {{ __('No Devices') }}</a>
                     @else
                     <li @class(['dropdown-submenu' => $device_types->isNotEmpty()])><a href="{{ url('devices') }}"><i class="fa fa-server fa-fw fa-lg" aria-hidden="true"></i> {{ __('All Devices') }}</a>
+                        @if($device_types->isNotEmpty())
                         <ul class="dropdown-menu scrollable-menu">
                         @foreach($device_types as $type)
                             <li><a href="{{ url("devices/type=$type") }}"><i class="fa fa-angle-double-right fa-fw fa-lg" aria-hidden="true"></i> {{ ucfirst($type) }}</a></li>
                         @endforeach
-                    </ul></li>
+                        </ul>
+                        @endif
+                    </li>
                     @endif
 
                     @if($device_groups->isNotEmpty())
