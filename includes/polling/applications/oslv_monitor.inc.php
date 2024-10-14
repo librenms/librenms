@@ -152,6 +152,8 @@ foreach ($data['oslvms'] as $oslvms_key => $oslvms_stats) {
         'seen' => $current_time,
     ];
 
+    $metrics['running_' . $oslvms_key] = 1;
+
     $oslvms[] = $oslvms_key;
     foreach ($stat_vars as $key => $stat) {
         if (isset($oslvms_stats[$stat])) {
@@ -181,6 +183,7 @@ foreach ($old_data['oslvm_data'] as $key => $oslvm) {
         $back_till <= $old_data['oslvm_data'][$key]['seen']) {
         $new_data['oslvm_data'][$key] = $old_data['oslvm_data'][$key];
         $new_data['inactive'][] = $key;
+        $metrics['running_' . $key] = 0;
     }
 }
 
