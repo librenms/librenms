@@ -262,7 +262,7 @@ class CustomMapController extends Controller
             $images[$image->custom_map_node_image_id] = $image->name;
         }
 
-        asort ($images);
+        asort($images);
 
         return $images;
     }

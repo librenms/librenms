@@ -39,6 +39,7 @@ class CustomMapNodeImageController extends Controller
     public function index(): View
     {
         $this->authorize('update');
+
         return view('map.custom-nodeimage-manage', [
             'images' => CustomMapNodeImage::orderBy('name')->get(),
         ]);
@@ -111,7 +112,7 @@ class CustomMapNodeImageController extends Controller
     public function destroy(CustomMapNodeImage $image): Response
     {
         $this->authorize('update', $image);
-        if($image->nodes->count() > 0) {
+        if ($image->nodes->count() > 0) {
             return response('Image is in use', 403)
                       ->header('Content-Type', 'text/plain');
         }
