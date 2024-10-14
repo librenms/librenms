@@ -98,6 +98,7 @@ if ($device['os_group'] == 'unix' || $device['os'] == 'windows') {
 
         include 'unix-agent/packages.inc.php';
         include 'unix-agent/munin-plugins.inc.php';
+        include 'unix-agent/lnx-thermal.inc.php';
 
         foreach (array_keys($agent_data) as $key) {
             if (file_exists("includes/polling/unix-agent/$key.inc.php")) {
