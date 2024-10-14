@@ -18,6 +18,10 @@ $link_array = [
 
 $app_data = $app->data;
 
+if (!isset($app_data['has']) || !is_array($app_data['has'])) {
+    $app_data['has']=[];
+}
+
 print_optionbar_start();
 
 $label = isset($vars['oslvm'])
@@ -543,6 +547,24 @@ $graphs = [
         'description' => 'Elapsed Time',
     ],
 ];
+if ($app_data['has']['rwdblocks']) {
+    $graphs[]=    [
+        'type' => 'blocks',
+        'description' => 'Read/Write Blocks Per Second',
+    ];
+}
+if ($app_data['has']['rwdops']) {
+    $graphs[]=    [
+        'type' => 'ops_rwd',
+        'description' => 'Read/Write Ops Per Second',
+    ];
+}
+if ($app_data['has']['rwdbytes']) {
+    $graphs[]=    [
+        'type' => 'ops_rwd',
+        'description' => 'Read/Write Bytes Per Second',
+    ];
+}
 
 foreach ($graphs as $key => $graph_info) {
     $graph_type = $graph_info['type'];
