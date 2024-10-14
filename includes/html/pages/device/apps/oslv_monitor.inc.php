@@ -501,137 +501,48 @@ if (isset($vars['oslvm']) && isset($app_data['oslvm_data'][$vars['oslvm']])) {
 
 print_optionbar_end();
 
-if (isset($app_data['backend']) && $app_data['backend'] == 'FreeBSD') {
-    $graphs = [
-        [
-            'type' => 'cpu_percent',
-            'description' => 'CPU Usage Percent',
-        ],
-        [
-            'type' => 'mem_percent',
-            'description' => 'Memory Usage Percent',
-        ],
-        [
-            'type' => 'time',
-            'description' => 'CPU/System Time in secs/sec',
-        ],
-        [
-            'type' => 'procs',
-            'description' => 'Processes',
-        ],
-        [
-            'type' => 'blocks',
-            'description' => 'Blocks, Read/Write',
-        ],
-        [
-            'type' => 'cows',
-            'description' => 'Copy-on-Write Faults',
-        ],
-        [
-            'type' => 'sizes',
-            'description' => 'Data, Stack, Text in Kbytes',
-        ],
-        [
-            'type' => 'rss',
-            'description' => 'Real Memory(Resident Set Size) in Kbytes',
-        ],
-        [
-            'type' => 'vsz',
-            'description' => 'Virtual Size in Kbytes',
-        ],
-        [
-            'type' => 'messages',
-            'description' => 'Messages, Sent/Received',
-        ],
-        [
-            'type' => 'faults',
-            'description' => 'Faults, Major/Minor',
-        ],
-        [
-            'type' => 'switches',
-            'description' => 'Context Switches, (In)Voluntary',
-        ],
-        [
-            'type' => 'swaps',
-            'description' => 'Swaps',
-        ],
-        [
-            'type' => 'signals_taken',
-            'description' => 'Signals Taken',
-        ],
-        [
-            'type' => 'etime',
-            'description' => 'Elapsed Time in seconds',
-        ],
-    ];
-} elseif (isset($app_data['backend']) && $app_data['backend'] == 'cgroups') {
-    $graphs = [
-        [
-            'type' => 'cpu_percent',
-            'description' => 'CPU Usage Percent',
-        ],
-        [
-            'type' => 'mem_percent',
-            'description' => 'Memory Usage Percent',
-        ],
-        [
-            'type' => 'time',
-            'description' => 'CPU/System Time in secs/sec',
-        ],
-        [
-            'type' => 'procs',
-            'description' => 'Processes',
-        ],
-        [
-            'type' => 'sock',
-            'description' => 'Sock, network transmission buffers size',
-        ],
-        [
-            'type' => 'ops_rwd',
-            'description' => 'Ops, Read/Write/Discard',
-        ],
-        [
-            'type' => 'bytes_rwd',
-            'description' => 'Bytes, Read/Write/Discard',
-        ],
-        [
-            'type' => 'sizes',
-            'description' => 'Size, Data, Text in kbytes',
-        ],
-        [
-            'type' => 'rss',
-            'description' => 'Real Memory(Resident Set Size) in kbytes',
-        ],
-        [
-            'type' => 'vsz',
-            'description' => 'Virtual Size in kbytes',
-        ],
-        [
-            'type' => 'faults',
-            'description' => 'Faults, Major/Minor',
-        ],
-        [
-            'type' => 'zswap',
-            'description' => 'ZSwap Size',
-        ],
-        [
-            'type' => 'zswap_activity',
-            'description' => 'ZSwap, Activity',
-        ],
-        [
-            'type' => 'pg',
-            'description' => 'Page Stats, non faults',
-        ],
-        [
-            'type' => 'mem_misc',
-            'description' => 'Misc. Memory Stats',
-        ],
-        [
-            'type' => 'thp_activity',
-            'description' => 'Transparent Huge Page Activity',
-        ],
-    ];
-}
+$graphs = [
+    [
+        'type' => 'cpu_percent',
+        'description' => 'CPU Usage Percent',
+    ],
+    [
+        'type' => 'mem_percent',
+        'description' => 'Memory Usage Percent',
+    ],
+    [
+        'type' => 'time',
+        'description' => 'CPU/System/User Time in secs/sec',
+    ],
+    [
+        'type' => 'procs',
+        'description' => 'Processes',
+    ],
+    [
+        'type' => 'sizes',
+        'description' => 'Size, Data, Text in kbytes',
+    ],
+    [
+        'type' => 'rss',
+        'description' => 'Real Memory(Resident Set Size) in kbytes',
+    ],
+    [
+        'type' => 'vsz',
+        'description' => 'Virtual Size in kbytes',
+    ],
+    [
+        'type' => 'faults',
+        'description' => 'Minor/Major Faults Per Second',
+    ],
+    [
+        'type' => 'switches',
+        'description' => 'Context Switches Per Second',
+    ],
+    [
+        'type' => 'etimes',
+        'description' => 'Elapsed Time',
+    ],
+];
 
 foreach ($graphs as $key => $graph_info) {
     $graph_type = $graph_info['type'];
@@ -639,7 +550,7 @@ foreach ($graphs as $key => $graph_info) {
     $graph_array['width'] = '215';
     $graph_array['to'] = time();
     $graph_array['id'] = $app['app_id'];
-    $graph_array['type'] = 'application_' . $name . '_' . $app_data['backend'] . '_' . $graph_info['type'];
+    $graph_array['type'] = 'application_' . $name . '_' . $graph_info['type'];
     if (isset($vars['oslvm'])) {
         $graph_array['oslvm'] = $vars['oslvm'];
     }

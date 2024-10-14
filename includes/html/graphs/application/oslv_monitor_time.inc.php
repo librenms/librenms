@@ -11,6 +11,10 @@ $stats_list = [
         'stat' => 'system-time',
         'descr' => 'System',
     ],
+    'user-time' => [
+        'stat' => 'user-time',
+        'descr' => 'User',
+    ],
 ];
 
 require 'oslv_monitor-common.inc.php';

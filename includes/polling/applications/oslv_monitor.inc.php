@@ -110,73 +110,8 @@ $stat_vars = [
     'size',
 ];
 
-$gauge_vars = [
-    'procs' => 1,
-    'copy-on-write-faults' => 1,
-    'cpu-time' => 1,
-    'data-size' => 1,
-    'elapsed-times' => 1,
-    'involuntary-context-switches' => 1,
-    'major-faults' => 1,
-    'minor-faults' => 1,
-    'percent-cpu' => 1,
-    'percent-memory' => 1,
-    'procs' => 1,
-    'read-blocks' => 1,
-    'received-messages' => 1,
-    'rss' => 1,
-    'sent-messages' => 1,
-    'signals-taken' => 1,
-    'stack-size' => 1,
-    'swaps' => 1,
-    'system-time' => 1,
-    'text-size' => 1,
-    'user-time' => 1,
-    'virtual-size' => 1,
-    'voluntary-context-switches' => 1,
-    'written-blocks' => 1,
-    'anon' => 1,
-    'file' => 1,
-    'kernel' => 1,
-    'kernel_stack' => 1,
-    'pagetables' => 1,
-    'sec_pagetables' => 1,
-    'percpu' => 1,
-    'sock' => 1,
-    'vmalloc' => 1,
-    'shmem' => 1,
-    'zswap' => 1,
-    'zswapped' => 1,
-    'file_mapped' => 1,
-    'file_dirty' => 1,
-    'file_writeback' => 1,
-    'swapcached' => 1,
-    'anon_thp' => 1,
-    'file_thp' => 1,
-    'shmem_thp' => 1,
-    'inactive_anon' => 1,
-    'active_anon' => 1,
-    'inactive_file' => 1,
-    'active_file' => 1,
-    'unevictable' => 1,
-    'slab_reclaimable' => 1,
-    'slab_unreclaimable' => 1,
-    'slab' => 1,
-    'size' => 1,
-];
-
-if ($data['backend'] != 'FreeBSD') {
-    unset($gauge_vars['major-faults']);
-    unset($gauge_vars['minor-faults']);
-    unset($gauge_vars['involuntary-context-switches']);
-    unset($gauge_vars['voluntary-context-switches']);
-}
-
 $gauge_rrd_def = RrdDefinition::make()
     ->addDataset('data', 'GAUGE', 0);
-
-$counter_rrd_def = RrdDefinition::make()
-    ->addDataset('data', 'COUNTER', 0);
 
 $data = $returned['data'];
 
@@ -187,7 +122,12 @@ $new_data = [
     'uid_mapping' => $data['uid_mapping'],
     'oslvm_data' => [],
     'inactive' => [],
+    'has' => [],
 ];
+
+if (isset($data['has']) && is_array($data['has'])) {
+    $new_data['has']=$data['has'];
+}
 
 // process total stats, .data.totals
 foreach ($stat_vars as $key => $stat) {
@@ -197,11 +137,7 @@ foreach ($stat_vars as $key => $stat) {
         $rrd_name = ['app', $name, $app->app_id, $var_name];
         $fields = ['data' => $value];
         $metrics[$var_name] = $value;
-        if (isset($gauge_vars[$stat])) {
-            $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $gauge_rrd_def, 'rrd_name' => $rrd_name];
-        } else {
-            $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $counter_rrd_def, 'rrd_name' => $rrd_name];
-        }
+        $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $gauge_rrd_def, 'rrd_name' => $rrd_name];
         data_update($device, 'app', $tags, $fields);
     }
 }
@@ -224,11 +160,7 @@ foreach ($data['oslvms'] as $oslvms_key => $oslvms_stats) {
             $rrd_name = ['app', $name, $app->app_id, $var_name];
             $fields = ['data' => $value];
             $metrics[$var_name] = $value;
-            if (isset($gauge_vars[$stat])) {
-                $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $gauge_rrd_def, 'rrd_name' => $rrd_name];
-            } else {
-                $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $counter_rrd_def, 'rrd_name' => $rrd_name];
-            }
+            $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $gauge_rrd_def, 'rrd_name' => $rrd_name];
             data_update($device, 'app', $tags, $fields);
         }
     }

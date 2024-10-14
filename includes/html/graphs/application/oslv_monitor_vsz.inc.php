@@ -3,9 +3,9 @@
 $unit_text = 'Kbytes';
 
 $stats_list = [
-    'bytes' => [
-        'stat' => 'rss',
-        'descr' => 'RSS',
+    'virtual-size' => [
+        'stat' => 'virtual-size',
+        'descr' => 'VSZ',
     ],
 ];
 
