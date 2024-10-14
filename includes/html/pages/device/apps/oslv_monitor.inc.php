@@ -29,11 +29,15 @@ $label = isset($vars['oslvm'])
     : '<span class="pagemenu-selected">Totals</span>';
 echo generate_link($label, $link_array);
 
-if (isset($app_data['backend']) && $app_data['backend'] == 'FreeBSD') {
+if (isset($app_data['backend']) && $app_data['backend'] != 'cgroups') {
+    $oslvm_name='Jails';
+    if ($app_data['backend'] != 'FreeBSD') {
+        $oslvm_name='OSLVMs';
+    }
     if (!isset($app_data['inactive']) || !isset($app_data['inactive'][0])) {
-        echo "<br>\nJails: \n";
+        echo "<br>\n" . $oslvm_name . ": \n";
     } else {
-        echo "\n<br>Current Jails: \n";
+        echo "\n<br>Current " . $oslvm_name . ": \n";
     }
     $index_int = 0;
     foreach ($app_data['oslvms'] as $index => $oslvm) {
@@ -47,7 +51,7 @@ if (isset($app_data['backend']) && $app_data['backend'] == 'FreeBSD') {
         }
     }
     if (isset($app_data['inactive']) && isset($app_data['inactive'][0])) {
-        echo "\n<br>Old Jails: ";
+        echo "\n<br>Old " . $oslvm_name . ": ";
         sort($app_data['inactive']);
         $index_int = 0;
         foreach ($app_data['inactive'] as $index => $oslvm) {
@@ -611,6 +615,34 @@ if ($app_data['has']['linux_mem_stats']) {
     $graphs[]=    [
         'type' => 'cgroups_zswap_activity',
         'description' => 'Zswap Activity',
+    ];
+    $graphs[]=    [
+        'type' => 'cgroups_workingset',
+        'description' => 'Workingset Stats',
+    ];
+}
+if ($app_data['has']['throttled_time']) {
+    $graphs[]=    [
+        'type' => 'throttled_time',
+        'description' => 'CPU Throttled Time Seconds Per Second',
+    ];
+}
+if ($app_data['has']['throttled_count']) {
+    $graphs[]=    [
+        'type' => 'throttled_count',
+        'description' => 'CPU Throttled Events Per Second',
+    ];
+}
+if ($app_data['has']['burst_time']) {
+    $graphs[]=    [
+        'type' => 'burst_time',
+        'description' => 'CPU Burst Time Seconds Per Second',
+    ];
+}
+if ($app_data['has']['burst_count']) {
+    $graphs[]=    [
+        'type' => 'burst_count',
+        'description' => 'CPU Burst Events Per Second',
     ];
 }
 
