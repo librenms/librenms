@@ -450,7 +450,7 @@ $graphs['oslv_monitor'] = [
     'etime',
     'swaps',
     'signals_taken',
-    'switches'
+    'switches',
 ];
 $graphs['hv-monitor'] = [
     'status',
@@ -590,9 +590,9 @@ $link_array = [
     'tab' => 'apps',
 ];
 
-$apps = \LibreNMS\Util\ObjectCache::applications()->flatten();
+$apps = LibreNMS\Util\ObjectCache::applications()->flatten();
 foreach ($apps as $app) {
-    $app_state = \LibreNMS\Util\Html::appStateIcon($app->app_state);
+    $app_state = LibreNMS\Util\Html::appStateIcon($app->app_state);
     if (! empty($app_state['icon'])) {
         $app_state_info = '<font color="' . $app_state['color'] . '"><i title="' . $app_state['hover_text'] . '" class="fa ' . $app_state['icon'] . ' fa-fw fa-lg" aria-hidden="true"></i></font>';
     } else {

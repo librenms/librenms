@@ -2,7 +2,7 @@
 
 $unit_text = 'blocks/sec';
 
-if (isset($app->data['backend']) &&  $app->data['backend'] == 'cgroups') {
+if (isset($app->data['backend']) && $app->data['backend'] == 'cgroups') {
     $unit_text = 'bytes/sec';
 }
 

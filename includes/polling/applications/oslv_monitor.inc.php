@@ -123,7 +123,7 @@ $new_data = [
 ];
 
 if (isset($data['has']) && is_array($data['has'])) {
-    $new_data['has']=$data['has'];
+    $new_data['has'] = $data['has'];
 }
 
 // process total stats, .data.totals
@@ -174,9 +174,9 @@ $new_data['oslvms'] = $oslvms;
 
 // process unseen items, save info for ones that were last seen with in the specified time
 // 604800 seconds = 7 days
-$back_till = $current_time - \LibreNMS\Config::get('apps.oslv_monitor.seen_age', 604800);
+$back_till = $current_time - LibreNMS\Config::get('apps.oslv_monitor.seen_age', 604800);
 foreach ($old_data['oslvm_data'] as $key => $oslvm) {
-    if (!isset($new_data['oslvm_data'][$key]) && isset($old_data['oslvm_data'][$key]['seen']) &&
+    if (! isset($new_data['oslvm_data'][$key]) && isset($old_data['oslvm_data'][$key]['seen']) &&
         $back_till <= $old_data['oslvm_data'][$key]['seen']) {
         $new_data['oslvm_data'][$key] = $old_data['oslvm_data'][$key];
         $new_data['inactive'][] = $key;

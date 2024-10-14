@@ -18,8 +18,8 @@ $link_array = [
 
 $app_data = $app->data;
 
-if (!isset($app_data['has']) || !is_array($app_data['has'])) {
-    $app_data['has']=[];
+if (! isset($app_data['has']) || ! is_array($app_data['has'])) {
+    $app_data['has'] = [];
 }
 
 print_optionbar_start();
@@ -30,11 +30,11 @@ $label = isset($vars['oslvm'])
 echo generate_link($label, $link_array);
 
 if (isset($app_data['backend']) && $app_data['backend'] != 'cgroups') {
-    $oslvm_name='Jails';
+    $oslvm_name = 'Jails';
     if ($app_data['backend'] != 'FreeBSD') {
-        $oslvm_name='OSLVMs';
+        $oslvm_name = 'OSLVMs';
     }
-    if (!isset($app_data['inactive']) || !isset($app_data['inactive'][0])) {
+    if (! isset($app_data['inactive']) || ! isset($app_data['inactive'][0])) {
         echo "<br>\n" . $oslvm_name . ": \n";
     } else {
         echo "\n<br>Current " . $oslvm_name . ": \n";
@@ -51,7 +51,7 @@ if (isset($app_data['backend']) && $app_data['backend'] != 'cgroups') {
         }
     }
     if (isset($app_data['inactive']) && isset($app_data['inactive'][0])) {
-        echo "\n<br>Old " . $oslvm_name . ": ";
+        echo "\n<br>Old " . $oslvm_name . ': ';
         sort($app_data['inactive']);
         $index_int = 0;
         foreach ($app_data['inactive'] as $index => $oslvm) {
@@ -111,7 +111,7 @@ if (isset($app_data['backend']) && $app_data['backend'] == 'cgroups') {
     sort($seen_user_containers);
 
     if (isset($podman_containers[0])) {
-        if (!isset($seen_podman_containers[0])) {
+        if (! isset($seen_podman_containers[0])) {
             echo "\n<br>Podman Containers<b>:</b> \n";
         } else {
             echo "\n<br>Current Podman Containers<b>:</b> \n";
@@ -148,7 +148,7 @@ if (isset($app_data['backend']) && $app_data['backend'] == 'cgroups') {
     }
 
     if (isset($docker_containers[0])) {
-        if (!isset($seen_docker_containers[0])) {
+        if (! isset($seen_docker_containers[0])) {
             echo "\n<br>Docker Containers<b>:</b> \n";
         } else {
             echo "\n<br>Current Docker Containers<b>:</b> \n";
@@ -185,7 +185,7 @@ if (isset($app_data['backend']) && $app_data['backend'] == 'cgroups') {
     }
 
     if (isset($systemd_containers[0])) {
-        if (!isset($seen_systemd_containers[0])) {
+        if (! isset($seen_systemd_containers[0])) {
             echo "\n<br>SystemD Containers<b>:</b> \n";
         } else {
             echo "\n<br>Current SystemD Containers<b>:</b> \n";
@@ -222,7 +222,7 @@ if (isset($app_data['backend']) && $app_data['backend'] == 'cgroups') {
     }
 
     if (isset($user_containers[0])) {
-        if (!isset($seen_user_containers[0])) {
+        if (! isset($seen_user_containers[0])) {
             echo "\n<br>User Containers<b>:</b> \n";
         } else {
             echo "\n<br>Current User Containers<b>:</b> \n";
@@ -232,7 +232,7 @@ if (isset($app_data['backend']) && $app_data['backend'] == 'cgroups') {
             $oslvm_name = $oslvm;
             $oslvm_name = preg_replace('/^u\_/', '', $oslvm_name);
             if (isset($app_data['uid_mapping'][$oslvm_name])) {
-                $oslvm_name=$oslvm_name . '(' . $app_data['uid_mapping'][$oslvm_name]['name'] . ')';
+                $oslvm_name = $oslvm_name . '(' . $app_data['uid_mapping'][$oslvm_name]['name'] . ')';
             }
             $label = (! isset($vars['oslvm']) || $vars['oslvm'] != $oslvm)
                 ? $oslvm_name
@@ -251,7 +251,7 @@ if (isset($app_data['backend']) && $app_data['backend'] == 'cgroups') {
             $oslvm_name = $oslvm;
             $oslvm_name = preg_replace('/^u\_/', '', $oslvm_name);
             if (isset($app_data['uid_mapping'][$oslvm_name])) {
-                $oslvm_name=$oslvm_name . '(' . $app_data['uid_mapping'][$oslvm_name]['name'] . ')';
+                $oslvm_name = $oslvm_name . '(' . $app_data['uid_mapping'][$oslvm_name]['name'] . ')';
             }
             $label = (! isset($vars['oslvm']) || $vars['oslvm'] != $oslvm)
             ? $oslvm_name
@@ -265,7 +265,7 @@ if (isset($app_data['backend']) && $app_data['backend'] == 'cgroups') {
     }
 
     if (isset($other_containers[0])) {
-        if (!isset($seen_other_containers[0])) {
+        if (! isset($seen_other_containers[0])) {
             echo "\n<br>Other Containers<b>:</b> \n";
         } else {
             echo "\n<br>Current Other Containers<b>:</b> \n";
@@ -308,7 +308,7 @@ if (isset($vars['oslvm']) && isset($app_data['oslvm_data'][$vars['oslvm']])) {
                 'Mount Point',
                 'Usage',
                 '',
-                ],
+            ],
             'rows' => [],
         ];
         foreach ($app_data['oslvm_data'][$vars['oslvm']]['path'] as $index => $path) {
@@ -343,28 +343,28 @@ if (isset($vars['oslvm']) && isset($app_data['oslvm_data'][$vars['oslvm']])) {
                 $path_graph_array = [];
                 $path_graph_array['height'] = '100';
                 $path_graph_array['width'] = '210';
-                $path_graph_array['to'] = \LibreNMS\Config::get('time.now');
+                $path_graph_array['to'] = LibreNMS\Config::get('time.now');
                 $path_graph_array['id'] = $storage_info['storage_id'];
                 $path_graph_array['type'] = 'storage_usage';
-                $path_graph_array['from'] = \LibreNMS\Config::get('time.day');
+                $path_graph_array['from'] = LibreNMS\Config::get('time.day');
                 $path_graph_array['legend'] = 'no';
 
                 $path_link_array = $path_graph_array;
                 $path_link_array['page'] = 'graphs';
                 unset($rpath_link_array['height'], $path_link_array['width'], $path_link_array['legend']);
 
-                $path_link = \LibreNMS\Util\Url::generate($path_link_array);
+                $path_link = LibreNMS\Util\Url::generate($path_link_array);
 
                 $path_overlib_content = generate_overlib_content($path_graph_array, $device['hostname'] . ' - ' . $storage_info['storage_descr']);
 
                 $path_graph_array['width'] = 80;
                 $path_graph_array['height'] = 20;
                 $path_graph_array['bg'] = 'ffffff00';
-                $path_minigraph = \LibreNMS\Util\Url::lazyGraphTag($path_graph_array);
+                $path_minigraph = LibreNMS\Util\Url::lazyGraphTag($path_graph_array);
 
-                $mount_path = \LibreNMS\Util\Url::overlibLink($path_link, $mount_path, $path_overlib_content);
+                $mount_path = LibreNMS\Util\Url::overlibLink($path_link, $mount_path, $path_overlib_content);
                 $mount_path_usage = round($storage_info['storage_perc']) . '% ';
-                $mount_path_usage_graph =  \LibreNMS\Util\Url::overlibLink($path_link, $path_minigraph, $path_overlib_content);
+                $mount_path_usage_graph = LibreNMS\Util\Url::overlibLink($path_link, $path_minigraph, $path_overlib_content);
             }
         }
         $table_info['rows'][] = [
@@ -400,7 +400,7 @@ if (isset($vars['oslvm']) && isset($app_data['oslvm_data'][$vars['oslvm']])) {
                 'Errors/Sec Out',
                 'Gateway',
                 'GW If',
-                ],
+            ],
             'rows' => [],
         ];
         foreach ($app_data['oslvm_data'][$vars['oslvm']]['ip'] as $index => $ip_data) {
@@ -552,95 +552,95 @@ $graphs = [
     ],
 ];
 if ($app_data['has']['rwdblocks']) {
-    $graphs[]=    [
+    $graphs[] = [
         'type' => 'blocks',
         'description' => 'Read/Write Blocks Per Second',
     ];
 }
 if ($app_data['has']['rwdops']) {
-    $graphs[]=    [
+    $graphs[] = [
         'type' => 'ops_rwd',
         'description' => 'Read/Write Ops Per Second',
     ];
 }
 if ($app_data['has']['rwdbytes']) {
-    $graphs[]=    [
+    $graphs[] = [
         'type' => 'ops_rwd',
         'description' => 'Read/Write Bytes Per Second',
     ];
 }
 if ($app_data['has']['signals-taken']) {
-    $graphs[]=    [
+    $graphs[] = [
         'type' => 'signals_taken',
         'description' => 'Signals Taken Per Second',
     ];
 }
 if ($app_data['has']['recv_sent_msgs']) {
-    $graphs[]=    [
+    $graphs[] = [
         'type' => 'recv_sent_msgs',
         'description' => 'Signals Taken Per Second',
     ];
 }
 if ($app_data['has']['cows']) {
-    $graphs[]=    [
+    $graphs[] = [
         'type' => 'cows',
         'description' => 'COWs Per Second',
     ];
 }
 if ($app_data['has']['swaps']) {
-    $graphs[]=    [
+    $graphs[] = [
         'type' => 'swaps',
         'description' => 'Swaps Per Second',
     ];
 }
 if ($app_data['has']['sock']) {
-    $graphs[]=    [
+    $graphs[] = [
         'type' => 'sock',
         'description' => 'Socket Buffer Size In Bytes',
     ];
 }
 if ($app_data['has']['linux_mem_stats']) {
-    $graphs[]=    [
+    $graphs[] = [
         'type' => 'cgroups_pg',
         'description' => 'Linux Pg Memory Stats',
     ];
-    $graphs[]=    [
+    $graphs[] = [
         'type' => 'cgroups_mem_misc',
         'description' => 'Misc Linux Memory Stats',
     ];
-    $graphs[]=    [
+    $graphs[] = [
         'type' => 'cgroups_zswap',
         'description' => 'Zswap Size',
     ];
-    $graphs[]=    [
+    $graphs[] = [
         'type' => 'cgroups_zswap_activity',
         'description' => 'Zswap Activity',
     ];
-    $graphs[]=    [
+    $graphs[] = [
         'type' => 'cgroups_workingset',
         'description' => 'Workingset Stats',
     ];
 }
 if ($app_data['has']['throttled_time']) {
-    $graphs[]=    [
+    $graphs[] = [
         'type' => 'throttled_time',
         'description' => 'CPU Throttled Time Seconds Per Second',
     ];
 }
 if ($app_data['has']['throttled_count']) {
-    $graphs[]=    [
+    $graphs[] = [
         'type' => 'throttled_count',
         'description' => 'CPU Throttled Events Per Second',
     ];
 }
 if ($app_data['has']['burst_time']) {
-    $graphs[]=    [
+    $graphs[] = [
         'type' => 'burst_time',
         'description' => 'CPU Burst Time Seconds Per Second',
     ];
 }
 if ($app_data['has']['burst_count']) {
-    $graphs[]=    [
+    $graphs[] = [
         'type' => 'burst_count',
         'description' => 'CPU Burst Events Per Second',
     ];
