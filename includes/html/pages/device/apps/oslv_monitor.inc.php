@@ -1,7 +1,5 @@
 <?php
 
-use App\Models\Ipv4Address;
-use App\Models\Ipv6Address;
 use App\Models\Port;
 use App\Models\Storage;
 
