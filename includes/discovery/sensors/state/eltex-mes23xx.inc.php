@@ -1,6 +1,6 @@
 <?php
 /*
- * LibreNMS discovery module for Eltex-mes23xx SFP Voltage
+ * LibreNMS discovery module for Eltex-mes23xx SFP LOS
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,33 +18,42 @@
  * @package    LibreNMS
  * @link       https://www.librenms.org
  *
- * @copyright  2022 Peca Nesovanovic
+ * @copyright  2024 Peca Nesovanovic
  *
  * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  */
-$divisor = 1000000;
+$divisor = 1;
 $multiplier = 1;
 
 $oids = SnmpQuery::cache()->hideMib()->walk('ELTEX-MES-PHYSICAL-DESCRIPTION-MIB::eltPhdTransceiverThresholdTable')->table(2);
 $oids = SnmpQuery::cache()->hideMib()->walk('RADLAN-PHY-MIB::rlPhyTestGetResult')->table(1, $oids);
 
-foreach ($oids as $ifIndex => $data) {
-    if (isset($data['rlPhyTestGetResult']['rlPhyTestTableTransceiverSupply'])) {
-        $value = $data['rlPhyTestGetResult']['rlPhyTestTableTransceiverSupply'] / $divisor;
-        $high_limit = $data['supply']['eltPhdTransceiverThresholdHighAlarm'] / $divisor;
-        $high_warn_limit = $data['supply']['eltPhdTransceiverThresholdHighWarning'] / $divisor;
-        $low_warn_limit = $data['supply']['eltPhdTransceiverThresholdLowWarning'] / $divisor;
-        $low_limit = $data['supply']['eltPhdTransceiverThresholdLowAlarm'] / $divisor;
-        $descr = get_port_by_index_cache($device['device_id'], $ifIndex)['ifName'];
-        $oid = '.1.3.6.1.4.1.89.90.1.2.1.3.' . $ifIndex . '.6';
+$states = [
+    ['value' => 0, 'generic' => 0, 'graph' => 1, 'descr' => 'False'],
+    ['value' => 1, 'generic' => 2, 'graph' => 1, 'descr' => 'True'],
+];
 
+foreach ($oids as $ifIndex => $data) {
+    if (isset($data['rlPhyTestGetResult']['rlPhyTestTableLOS'])) {
+        $value = $data['rlPhyTestGetResult']['rlPhyTestTableLOS'] / $divisor;
+        $high_limit = null;
+        $high_warn_limit = null;
+        $low_warn_limit = null;
+        $low_limit = null;
+        $descr = get_port_by_index_cache($device['device_id'], $ifIndex)['ifName'];
+        $oid = '.1.3.6.1.4.1.89.90.1.2.1.3.' . $ifIndex . '.11';
+
+        // Create State Index
+        create_state_index('rlPhyTestTableLOS', $states ?? []);
+
+        // Discover Sensor
         app('sensor-discovery')->discover(new \App\Models\Sensor([
             'poller_type' => 'snmp',
-            'sensor_class' => 'voltage',
+            'sensor_class' => 'state',
             'sensor_oid' => $oid,
-            'sensor_index' => 'SfpVolt' . $ifIndex,
-            'sensor_type' => 'rlPhyTestTableTransceiverSupply',
-            'sensor_descr' => 'SfpVolt-' . $descr,
+            'sensor_index' => 'SfpLOS' . $ifIndex,
+            'sensor_type' => 'rlPhyTestTableLOS',
+            'sensor_descr' => 'SfpLOS-' . $descr,
             'sensor_divisor' => $divisor,
             'sensor_multiplier' => $multiplier,
             'sensor_limit_low' => $low_limit,
@@ -57,5 +66,7 @@ foreach ($oids as $ifIndex => $data) {
             'user_func' => null,
             'group' => 'transceiver',
         ]));
+
+        create_sensor_to_state_index($device, 'rlPhyTestTableLOS', $ifIndex);
     }
 }
