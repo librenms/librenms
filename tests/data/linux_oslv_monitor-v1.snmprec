@@ -1,0 +1,308 @@
+{
+    "applications": {
+        "discovery": {
+            "applications": [
+                {
+                    "app_type": "oslv_monitor",
+                    "app_state": "UNKNOWN",
+                    "discovered": "1",
+                    "app_state_prev": null,
+                    "app_status": "",
+                    "app_instance": "",
+                    "data": null
+                }
+            ]
+        },
+        "poller": {
+            "applications": [
+                {
+                    "app_type": "oslv_monitor",
+                    "app_state": "OK",
+                    "discovered": "1",
+                    "app_state_prev": "UNKNOWN",
+                    "app_status": "",
+                    "app_instance": "",
+                    "data": null
+                }
+            ],
+            "application_metrics": [
+                {
+                    "metric": "oslvms_13relengI386-default_copy-on-write-faults",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "oslv_monitor"
+                },
+                {
+                    "metric": "oslvms_13relengI386-default_cpu-time",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "oslv_monitor"
+                },
+                {
+                    "metric": "oslvms_13relengI386-default_data-size",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "oslv_monitor"
+                },
+                {
+                    "metric": "oslvms_13relengI386-default_elapsed-times",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "oslv_monitor"
+                },
+                {
+                    "metric": "oslvms_13relengI386-default_involuntary-context-switches",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "oslv_monitor"
+                },
+                {
+                    "metric": "oslvms_13relengI386-default_major-faults",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "oslv_monitor"
+                },
+                {
+                    "metric": "oslvms_13relengI386-default_minor-faults",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "oslv_monitor"
+                },
+                {
+                    "metric": "oslvms_13relengI386-default_percent-cpu",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "oslv_monitor"
+                },
+                {
+                    "metric": "oslvms_13relengI386-default_percent-memory",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "oslv_monitor"
+                },
+                {
+                    "metric": "oslvms_13relengI386-default_procs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "oslv_monitor"
+                },
+                {
+                    "metric": "oslvms_13relengI386-default_read-blocks",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "oslv_monitor"
+                },
+                {
+                    "metric": "oslvms_13relengI386-default_received-messages",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "oslv_monitor"
+                },
+                {
+                    "metric": "oslvms_13relengI386-default_rss",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "oslv_monitor"
+                },
+                {
+                    "metric": "oslvms_13relengI386-default_sent-messages",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "oslv_monitor"
+                },
+                {
+                    "metric": "oslvms_13relengI386-default_signals-taken",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "oslv_monitor"
+                },
+                {
+                    "metric": "oslvms_13relengI386-default_stack-size",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "oslv_monitor"
+                },
+                {
+                    "metric": "oslvms_13relengI386-default_swaps",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "oslv_monitor"
+                },
+                {
+                    "metric": "oslvms_13relengI386-default_system-time",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "oslv_monitor"
+                },
+                {
+                    "metric": "oslvms_13relengI386-default_text-size",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "oslv_monitor"
+                },
+                {
+                    "metric": "oslvms_13relengI386-default_user-time",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "oslv_monitor"
+                },
+                {
+                    "metric": "oslvms_13relengI386-default_virtual-size",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "oslv_monitor"
+                },
+                {
+                    "metric": "oslvms_13relengI386-default_voluntary-context-switches",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "oslv_monitor"
+                },
+                {
+                    "metric": "oslvms_13relengI386-default_written-blocks",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "oslv_monitor"
+                },
+                {
+                    "metric": "totals_copy-on-write-faults",
+                    "value": 0.21,
+                    "value_prev": null,
+                    "app_type": "oslv_monitor"
+                },
+                {
+                    "metric": "totals_cpu-time",
+                    "value": 0.4148,
+                    "value_prev": null,
+                    "app_type": "oslv_monitor"
+                },
+                {
+                    "metric": "totals_data-size",
+                    "value": 556,
+                    "value_prev": null,
+                    "app_type": "oslv_monitor"
+                },
+                {
+                    "metric": "totals_elapsed-times",
+                    "value": 10064,
+                    "value_prev": null,
+                    "app_type": "oslv_monitor"
+                },
+                {
+                    "metric": "totals_involuntary-context-switches",
+                    "value": 0.0833333333333333,
+                    "value_prev": null,
+                    "app_type": "oslv_monitor"
+                },
+                {
+                    "metric": "totals_major-faults",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "oslv_monitor"
+                },
+                {
+                    "metric": "totals_minor-faults",
+                    "value": 144.093333333333,
+                    "value_prev": null,
+                    "app_type": "oslv_monitor"
+                },
+                {
+                    "metric": "totals_percent-cpu",
+                    "value": 18.8,
+                    "value_prev": null,
+                    "app_type": "oslv_monitor"
+                },
+                {
+                    "metric": "totals_percent-memory",
+                    "value": 0.3,
+                    "value_prev": null,
+                    "app_type": "oslv_monitor"
+                },
+                {
+                    "metric": "totals_procs",
+                    "value": 4,
+                    "value_prev": null,
+                    "app_type": "oslv_monitor"
+                },
+                {
+                    "metric": "totals_read-blocks",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "oslv_monitor"
+                },
+                {
+                    "metric": "totals_received-messages",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "oslv_monitor"
+                },
+                {
+                    "metric": "totals_rss",
+                    "value": 343356,
+                    "value_prev": null,
+                    "app_type": "oslv_monitor"
+                },
+                {
+                    "metric": "totals_sent-messages",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "oslv_monitor"
+                },
+                {
+                    "metric": "totals_signals-taken",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "oslv_monitor"
+                },
+                {
+                    "metric": "totals_stack-size",
+                    "value": 1152,
+                    "value_prev": null,
+                    "app_type": "oslv_monitor"
+                },
+                {
+                    "metric": "totals_swaps",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "oslv_monitor"
+                },
+                {
+                    "metric": "totals_system-time",
+                    "value": 0.00813333333333334,
+                    "value_prev": null,
+                    "app_type": "oslv_monitor"
+                },
+                {
+                    "metric": "totals_text-size",
+                    "value": 69896,
+                    "value_prev": null,
+                    "app_type": "oslv_monitor"
+                },
+                {
+                    "metric": "totals_user-time",
+                    "value": 0.406666666666667,
+                    "value_prev": null,
+                    "app_type": "oslv_monitor"
+                },
+                {
+                    "metric": "totals_virtual-size",
+                    "value": 408680,
+                    "value_prev": null,
+                    "app_type": "oslv_monitor"
+                },
+                {
+                    "metric": "totals_voluntary-context-switches",
+                    "value": 0.0366666666666667,
+                    "value_prev": null,
+                    "app_type": "oslv_monitor"
+                },
+                {
+                    "metric": "totals_written-blocks",
+                    "value": 0.02,
+                    "value_prev": null,
+                    "app_type": "oslv_monitor"
+                }
+            ]
+        }
+    }
+}
