@@ -76,7 +76,7 @@ class EltexMes23xx extends Radlan implements TransceiverDiscovery
                 return new Transceiver([
                     'port_id' => $ifIndexToPortId->get($ifIndex, 0),
                     'index' => $ifIndex,
-                    'connector' => strtoupper($data['eltPhdTransceiverInfoConnectorType']) ?? null,
+                    'connector' => $data['eltPhdTransceiverInfoConnectorType'] ? strtoupper($data['eltPhdTransceiverInfoConnectorType']) : null,
                     'distance' => $data['eltPhdTransceiverInfoTransferDistance'] ?? null,
                     'model' => $data['eltPhdTransceiverInfoPartNumber'] ?? null,
                     'revision' => $data['eltPhdTransceiverInfoVendorRev'] ?? null,
