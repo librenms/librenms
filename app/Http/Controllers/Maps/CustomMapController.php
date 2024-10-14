@@ -274,7 +274,7 @@ class CustomMapController extends Controller
             return null;
         }
 
-        foreach (array_keys($ret) as $key){
+        foreach (array_keys($ret) as $key) {
             if (! is_numeric($key)) {
                 // Delete keys that are not numeric
                 unset($ret[$key]);
@@ -285,18 +285,18 @@ class CustomMapController extends Controller
         }
 
         // Make sure a value exists for device down
-        if (! array_key_exists("-2", $ret)) {
-            $ret["-2"] = "#8B0000";
+        if (! array_key_exists('-2', $ret)) {
+            $ret['-2'] = '#8B0000';
         }
 
         // Make sure a value exists for invalid
-        if (! array_key_exists("-1", $ret)) {
-            $ret["-1"] = "#000000";
+        if (! array_key_exists('-1', $ret)) {
+            $ret['-1'] = '#000000';
         }
 
         // Make sure a value exists for 0
-        if (! array_key_exists("0", $ret)) {
-            $ret["0"] = "#00FF00";
+        if (! array_key_exists('0', $ret)) {
+            $ret['0'] = '#00FF00';
         }
 
         return $ret;
