@@ -565,6 +565,36 @@ if ($app_data['has']['rwdbytes']) {
         'description' => 'Read/Write Bytes Per Second',
     ];
 }
+if ($app_data['has']['signals-taken']) {
+    $graphs[]=    [
+        'type' => 'signals_taken',
+        'description' => 'Signals Taken Per Second',
+    ];
+}
+if ($app_data['has']['recv_sent_msgs']) {
+    $graphs[]=    [
+        'type' => 'recv_sent_msgs',
+        'description' => 'Signals Taken Per Second',
+    ];
+}
+if ($app_data['has']['cows']) {
+    $graphs[]=    [
+        'type' => 'cows',
+        'description' => 'COWs Per Second',
+    ];
+}
+if ($app_data['has']['swaps']) {
+    $graphs[]=    [
+        'type' => 'swaps',
+        'description' => 'Swaps Per Second',
+    ];
+}
+if ($app_data['has']['sock']) {
+    $graphs[]=    [
+        'type' => 'sock',
+        'description' => 'Socket Buffer Size In Bytes',
+    ];
+}
 
 foreach ($graphs as $key => $graph_info) {
     $graph_type = $graph_info['type'];
