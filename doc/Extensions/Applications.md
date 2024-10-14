@@ -1984,6 +1984,7 @@ The following mappings are done though.
 - usage_usec -> cpu-time
 - system_usec -> system-time
 - user_usec -> user-time
+- throttled_usecs -> throttled-time
 
 ## OS Updates
 
