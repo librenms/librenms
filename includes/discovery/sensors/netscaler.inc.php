@@ -30,7 +30,7 @@ foreach ($ns_sensor_array as $descr => $data) {
 
     if (is_numeric($current) && $type) {
         discover_sensor(
-            $valid['sensor'],
+            null,
             $type,
             $device,
             $oid,

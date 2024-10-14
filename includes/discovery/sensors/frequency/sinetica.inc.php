@@ -32,7 +32,7 @@ if (! empty($output_current) || $output_current == 0) {
     $type = 'sinetica';
     $index = '4.2.0';
 
-    discover_sensor($valid['sensor'], 'frequency', $device, $output_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
+    discover_sensor(null, 'frequency', $device, $output_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
 }
 
 $bypass_oid = '.1.3.6.1.4.1.13891.101.5.1.0';
@@ -45,7 +45,7 @@ if (! empty($bypass_current) || $bypass_current == 0) {
     $type = 'sinetica';
     $index = '5.1.0';
 
-    discover_sensor($valid['sensor'], 'frequency', $device, $bypass_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
+    discover_sensor(null, 'frequency', $device, $bypass_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
 }
 
 $oids = snmpwalk_cache_oid_num($device, '.1.3.6.1.4.1.13891.101.3.3.1.2', []);
@@ -63,5 +63,5 @@ foreach ($oids as $oid => $data) {
     $type = 'sinetica';
     $index = '3.3.1.2.' . $current_id;
 
-    discover_sensor($valid['sensor'], 'frequency', $device, $current_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
+    discover_sensor(null, 'frequency', $device, $current_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
 }
