@@ -173,7 +173,7 @@ class CustomMapDataController extends Controller
                 'style' => $node->style,
                 'icon' => $node->icon,
                 'image' => $node->image,
-                'nodeimage' => $node->node_image_id,
+                'nodeimage' => $node->nodeimage ? $node->nodeimage->custom_map_node_image_id : null,
                 'size' => $node->size,
                 'border_width' => $node->border_width,
                 'text_face' => $node->text_face,
