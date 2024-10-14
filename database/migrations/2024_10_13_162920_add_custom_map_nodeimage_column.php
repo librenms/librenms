@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('custom_map_nodes', function (Blueprint $table) {
             $table->integer('node_image_id')->nullable()->unsigned()->index()->after('image');
-            $table->foreign('node_image_id')->references('custom_map_node_image_id')->on('custom_map_node_images')->onDelete('RESTRICT');
+            $table->foreign('node_image_id')->references('custom_map_node_image_id')->on('custom_map_node_images');
         });
     }
 
