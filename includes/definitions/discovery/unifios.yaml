@@ -1,0 +1,4 @@
+modules:
+    os:
+        # Ubiquiti UniFi UDM 4.1.13 Linux 4.19.152 al324
+        sysDescr_regex: '/^Ubiquiti UniFi (?<hardware>\S+) (?<version>\S+)/'
