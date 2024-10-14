@@ -20,29 +20,42 @@
             </div>
         </x-slot>
 
-        @foreach($images as $image)
-            <div id="image-{{ $image->custom_map_node_image_id }}" class="even:tw-bg-gray-50 dark:even:tw-bg-zinc-900">
-                <div class="tw-flex tw-justify-between tw-p-3 tw-items-center hover:tw-bg-gray-100 dark:hover:tw-bg-gray-600">
-                    <div id="imagename-{{ $image->custom_map_node_image_id }}">{{ $image->name }}</div>
-                    <div>
-                        <img src="{{ route('maps.nodeimage.show', ['image' => $image->custom_map_node_image_id ]) }}" width="25" height="25">
-                    </div>
-                    <div class="tw-whitespace-nowrap">
-                        <button class="btn btn-default" onclick="imageModalEdit({{ $image->custom_map_node_image_id }});">
-                            <i class="fa fa-pencil" aria-hidden="true"></i>
-                            <span class="tw-hidden sm:tw-inline" aria-hidden="false">{{ __('Edit') }}</span>
-                        </button>
-                        <button class="btn btn-danger"
-                                onclick="startImageDelete(this)"
-                                data-image-name="{{ $image->name }}"
-                                data-image-id="{{ $image->custom_map_node_image_id}}"
-                        ><i class="fa fa-trash" aria-hidden="true"></i>
-                            <span class="tw-hidden sm:tw-inline" aria-hidden="false">{{ __('Delete') }}</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        @endforeach
     </x-panel>
 </div>
+@endsection
+
+@section('scripts')
+<script>
+    function appendImageRow(node_image_id, name) {
+        $("#manage-custom-nodeimages").append('' +
+'        <div id="image-' + node_image_id + '" class="even:tw-bg-gray-50 dark:even:tw-bg-zinc-900">' +
+'            <div class="tw-flex tw-justify-between tw-p-3 tw-items-center hover:tw-bg-gray-100 dark:hover:tw-bg-gray-600">' +
+'                <div id="imagename-' + node_image_id + '">' + name + '</div>' +
+'                <div>' +
+'                    <img id="imageview-' + node_image_id + '" src="' + '{{ route('maps.nodeimage.show', ['image' => '?' ]) }}'.replace("?", node_image_id) + '" width="25" height="25">' +
+'                </div>' +
+'                <div class="tw-whitespace-nowrap">' +
+'                    <button class="btn btn-default" onclick="imageModalEdit(' + node_image_id + ');">' +
+'                        <i class="fa fa-pencil" aria-hidden="true"></i>' +
+'                        <span class="tw-hidden sm:tw-inline" aria-hidden="false">{{ __('Edit') }}</span>' +
+'                    </button>' +
+'                    <button class="btn btn-danger"' +
+'                            onclick="startImageDelete(this)"' +
+'                            data-image-name="' + name + '"' +
+'                            data-image-id="' + node_image_id + '"' +
+'                    ><i class="fa fa-trash" aria-hidden="true"></i>' +
+'                        <span class="tw-hidden sm:tw-inline" aria-hidden="false">{{ __('Delete') }}</span>' +
+'                    </button>' +
+'                </div>' +
+'            </div>' +
+'        </div>' +
+        '');
+    }
+
+    $(document).ready(function () {
+        @foreach($images as $image)
+        appendImageRow({{ $image->custom_map_node_image_id }}, '{{ $image->name }}');
+        @endforeach
+    });
+</script>
 @endsection

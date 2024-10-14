@@ -49,6 +49,7 @@
         imageModalData.image_name = $("#imagename-" + image_id).text().trim();
         imageModalReset();
         $('#imageModal').modal({backdrop: 'static', keyboard: false}, 'show');
+        $("#nodeimage").val('');
     }
 
     function imageModalReset() {
@@ -102,6 +103,14 @@
                 } else {
                     $("#nodeimageerror").hide();
                     imageModalClose();
+
+                    if(imageModalData.image_id) {
+                        imgurl = $("#imageview-" + imageModalData.image_id).attr("src").split('?')[0];
+                        $("#imageview-" + imageModalData.image_id).attr("src", imgurl + "?" + data.version)
+                        $("#imagename-" + imageModalData.image_id).text(data.name)
+                    } else {
+                        appendImageRow(data.id, data.name);
+                    }
                 }
             })
         })

@@ -84,6 +84,9 @@ class CustomMapNodeImageController extends Controller
 
         return response()->json([
             'result' => 'success',
+            'id' => $image->custom_map_node_image_id,
+            'name' => $image->name,
+            'version' => $image->version,
         ]);
     }
 
@@ -101,11 +104,13 @@ class CustomMapNodeImageController extends Controller
         return response()->json([
             'result' => 'success',
             'name' => $request['name'],
+            'version' => $image->version,
         ]);
     }
 
     public function destroy(CustomMapNodeImage $image): Response
     {
+        $this->authorize('update', $image);
         if($image->nodes->count() > 0) {
             return response('Image is in use', 403)
                       ->header('Content-Type', 'text/plain');
