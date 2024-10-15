@@ -1894,7 +1894,7 @@ The following keys are used in the JSON config file.
     - include :: A array of regular expressions to include.
         Default :: ["^.*$"]
 
-    - exlcude :: A array of regular expressions to exlclude.
+    - exclude :: A array of regular expressions to exlclude.
         Default :: undef
 
     - backend :: Override the the backend and automatically choose it.
