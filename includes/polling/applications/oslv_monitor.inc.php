@@ -141,7 +141,7 @@ foreach ($stat_vars as $key => $stat) {
 
 // process each oslvm under .data.oslvms
 $oslvms = [];
-$current_time = time();
+$current_time = now()->format('U');
 foreach ($data['oslvms'] as $oslvms_key => $oslvms_stats) {
     $new_data['oslvm_data'][$oslvms_key] = [
         'ip' => $oslvms_stats['ip'],
