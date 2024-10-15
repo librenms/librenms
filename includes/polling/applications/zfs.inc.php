@@ -9,7 +9,8 @@ $name = 'zfs';
 $not_legacy = 1;
 
 try {
-    $zfs = json_app_get($device, $name, 1)['data'];
+    $all_return = json_app_get($device, $name, 1);
+    $zfs = $all_return['data'];
 } catch (JsonAppMissingKeysException $e) {
     //old version with out the data key
     $zfs = $e->getParsedJson();
@@ -228,6 +229,40 @@ $fields = [
     'l2_writes_sent' => $zfs['l2_writes_sent'],
 ];
 
+$rrd_def_gauge = RrdDefinition::make()
+    ->addDataset('data', 'GAUGE', 0);
+
+$gauges_to_check_for = [
+    'asyncq_read_a',
+    'asyncq_read_p',
+    'asyncq_wait_w',
+    'asyncq_write_a',
+    'asyncq_write_p',
+    'bandwidth_r',
+    'bandwidth_w',
+    'disk_wait_r',
+    'disk_wait_w',
+    'operations_r',
+    'operations_w',
+    'read_errors',
+    'checksum_errors',
+    'write_errors',
+    'scrub_wait',
+    'scrubq_read_a',
+    'scrubq_read_p',
+    'syncq_read_a',
+    'syncq_read_p',
+    'syncq_wait_r',
+    'syncq_wait_w',
+    'syncq_write_a',
+    'syncq_write_p',
+    'total_wait_r',
+    'total_wait_w',
+    'trim_wait',
+    'trimq_write_a',
+    'trimq_write_p',
+];
+
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
 data_update($device, 'app', $tags, $fields);
 
@@ -298,13 +333,20 @@ $old_pools = $app->data['pools'] ?? [];
 $added_pools = array_diff($pools, $old_pools);
 $removed_pools = array_diff($old_pools, $pools);
 
-// if we have any source pools, save and log
+// if we have any pool changes log it
 if (count($added_pools) > 0 || count($removed_pools) > 0) {
     $log_message = 'ZFS Pool Change:';
     $log_message .= count($added_pools) > 0 ? ' Added ' . implode(',', $added_pools) : '';
     $log_message .= count($removed_pools) > 0 ? ' Removed ' . implode(',', $added_pools) : '';
     log_event($log_message, $device, 'application');
 }
-$app->data = ['pools' => $pools, 'health' => $health, 'l2_errors' => $zfs['l2_errors']];
+
+// update the app data
+$app->data = [
+    'pools' => $pools,
+    'health' => $health,
+    'version' => $all_return['version'],
+    'l2_errors' => $zfs['l2_errors']
+];
 
 update_application($app, 'OK', $metrics);
