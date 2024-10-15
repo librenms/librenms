@@ -26,9 +26,7 @@
 namespace LibreNMS\Modules;
 
 use App\Models\Device;
-use App\Models\Port;
 use App\Observers\ModuleModelObserver;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use LibreNMS\DB\SyncsModels;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
@@ -94,10 +92,9 @@ class PortSecurity implements Module
     /**
      * @inheritDoc
      */
-    public function cleanup(Device $device): void
+    public function cleanup(Device $device): int
     {
-        return;
-        //return $device->portSecurity()->delete();
+        return $device->portSecurity()->delete();
     }
 
     /**

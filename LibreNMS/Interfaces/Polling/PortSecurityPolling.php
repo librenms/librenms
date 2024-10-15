@@ -25,7 +25,6 @@
 
 namespace LibreNMS\Interfaces\Polling;
 
-use App\Models\Device;
 use App\Models\PortSecurity;
 use Illuminate\Database\Eloquent\Collection;
 
