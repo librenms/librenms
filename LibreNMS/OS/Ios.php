@@ -27,8 +27,7 @@ namespace LibreNMS\OS;
 
 use App\Models\Device;
 use App\Models\Port;
-use Illuminate\Database\Eloquent\Collection as Eloq_Collection;
-use Illuminate\Support\Collection;
+use Illuminate\Database\Eloquent\Collection
 use Illuminate\Support\Str;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
@@ -117,7 +116,7 @@ class Ios extends Cisco implements
         return $sensors;
     }
 
-    public function pollPortSecurity($os, $device): Eloq_Collection
+    public function pollPortSecurity($os, $device): Collection
     {
         // Polling for current data
         $port_id = 0;
@@ -181,9 +180,9 @@ class Ios extends Cisco implements
                 unset($entry['laravel_through_key']);
                 // This OID currently always returns null so doesn't poulate $portsec_snmp
                 if (! array_key_exists('cpsIfSecureLastMacAddrVlanId', $record)) {
-                        unset($entry['cpsIfSecureLastMacAddrVlanId']);
-                    }
-                    // Checking that polled data exists and doesn't match. Else if polled data exists, insert a new record.
+                    unset($entry['cpsIfSecureLastMacAddrVlanId']);
+                }
+                // Checking that polled data exists and doesn't match. Else if polled data exists, insert a new record.
                 if (array_key_exists('cpsIfPortSecurityEnable', $record) and $record != $entry) {
                     unset($record['port_id']);
                     //echo "Updating\n";
