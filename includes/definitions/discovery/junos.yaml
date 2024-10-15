@@ -265,10 +265,15 @@ modules:
                 -
                     oid: jnxRpmResultsSummaryTable
                     value: jnxRpmResSumPercentLost
-                    num_oid: '.1.3.6.1.4.1.2636.3.50.1.2.1.{{ $str_index_as_numeric }}'
+                    num_oid: '.1.3.6.1.4.1.2636.3.50.1.2.1.{{ $index }}'
                     group: RPM Probes
-                    descr: '{{ $index }} Probe Loss'
+                    descr: '{{ $index_string0 }} {{ $index_string1 }} Probe Loss'
                     index: 'jnxRpmResSumPercentLost.{{ $index }}'
+                    skip_values:
+                        -
+                            oid: index
+                            op: 'not_ends'
+                            value: '.2' # only the last completed test result
         count:
             data:
                 -
