@@ -26,10 +26,13 @@
 
 namespace LibreNMS\OS;
 
+use App\Models\Device;
+use App\Models\Port;
+use Illuminate\Database\Eloquent\Collection as Eloq_Collection;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
-use LibreNMS\DB\SyncsModels;
-use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessCellDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessChannelDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
@@ -41,13 +44,6 @@ use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\Interfaces\Polling\PortSecurityPolling;
 use LibreNMS\OS\Shared\Cisco;
 use LibreNMS\OS\Traits\CiscoCellular;
-use Illuminate\Support\Collection;
-use SnmpQuery;
-use LibreNMS\OS;
-use App\Models\Device;
-use App\Models\Port;
-use App\Observers\ModuleModelObserver;
-use Illuminate\Database\Eloquent\Collection as Eloq_Collection;
 
 class Ios extends Cisco implements
     WirelessCellDiscovery,
@@ -264,7 +260,7 @@ class Ios extends Cisco implements
             if (array_key_exists($if_index, $portsec_snmp)) {
                 $portsec_snmp[$if_index]['port_id'] = $port_id;
                 $portsec_snmp[$if_index]['device_id'] = $device_id;
-	        }
+            }
         }
 
         // Assigning port_id and device_id to SNMP array for comparison
@@ -281,7 +277,7 @@ class Ios extends Cisco implements
                 $port_id = $port_key[$if_index];
                 $record = $portsec_snmp[$if_index];
                 unset($record['ifIndex']);
-	        }
+            }
 
             $update = new \App\Models\PortSecurity;
             $entry = $portsec->where('port_id', $port_id)->first();
