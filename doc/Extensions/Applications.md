@@ -1033,7 +1033,7 @@ apt-get install libfile-slurp-perl libmime-base64-perl libjson-perl libstatistic
 5. If on large setups where it won't complete in a timely manner, run
    it via cron.
 ```
-4/5 * * * * root /etc/snmp/http_access_log_combined -b -q -w
+*/5 * * * * root /etc/snmp/http_access_log_combined -b -q -w
 ```
 
 6. Add it to `snmpd.conf`.
@@ -1085,7 +1085,7 @@ foo:443-error.log
 bar-access.log
 ```
 
-Then the generated the auto generated stuff would be a like below.
+Then the auto generated stuff would be a like below.
 
 ```JSON
 {
