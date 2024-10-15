@@ -1,0 +1,1258 @@
+{
+    "applications": {
+        "discovery": {
+            "applications": [
+                {
+                    "app_type": "http_access_log_combined",
+                    "app_state": "UNKNOWN",
+                    "discovered": 1,
+                    "app_state_prev": null,
+                    "app_status": "",
+                    "app_instance": "",
+                    "data": null,
+                    "deleted_at": null
+                }
+            ]
+        },
+        "poller": {
+            "applications": [
+                {
+                    "app_type": "http_access_log_combined",
+                    "app_state": "OK",
+                    "discovered": 1,
+                    "app_state_prev": "UNKNOWN",
+                    "app_status": "",
+                    "app_instance": "",
+                    "data": "{\"logs\":[\"foo:443\"]}",
+                    "deleted_at": null
+                }
+            ],
+            "application_metrics": [
+                {
+                    "metric": "logs___foo:443___100",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___101",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___102",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___103",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___1xx",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___200",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___201",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___202",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___203",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___204",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___205",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___206",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___207",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___208",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___218",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___226",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___2xx",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___300",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___301",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___302",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___303",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___304",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___305",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___306",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___307",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___308",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___3xx",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___400",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___401",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___402",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___403",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___404",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___405",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___406",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___407",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___408",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___409",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___410",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___411",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___412",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___413",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___414",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___415",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___416",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___417",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___419",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___420",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___421",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___422",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___423",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___424",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___425",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___426",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___428",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___429",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___431",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___444",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___451",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___494",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___495",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___496",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___497",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___499",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___4xx",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___500",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___501",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___502",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___503",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___504",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___505",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___506",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___507",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___508",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___509",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___510",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___511",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___5xx",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___bytes",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___bytes_max",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___bytes_mean",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___bytes_median",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___bytes_min",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___bytes_mode",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___bytes_range",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___CONNECT",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___DELETE",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___error_size",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___GET",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___HEAD",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___http1_0",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___http1_1",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___http2",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___http3",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___no_refer",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___no_user",
+                    "value": 6,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___OPTIONS",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___PATCH",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___POST",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___PUT",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___refer",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___size",
+                    "value": 96616,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "logs___foo:443___user",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_100",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_101",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_102",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_103",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_1xx",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_200",
+                    "value": 108,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_201",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_202",
+                    "value": 11,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_203",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_204",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_205",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_206",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_207",
+                    "value": 101,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_208",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_218",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_226",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_2xx",
+                    "value": 220,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_300",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_301",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_302",
+                    "value": 1,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_303",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_304",
+                    "value": 57,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_305",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_306",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_307",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_308",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_3xx",
+                    "value": 58,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_400",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_401",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_402",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_403",
+                    "value": 6,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_404",
+                    "value": 2,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_405",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_406",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_407",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_408",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_409",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_410",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_411",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_412",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_413",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_414",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_415",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_416",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_417",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_419",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_420",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_421",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_422",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_423",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_424",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_425",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_426",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_428",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_429",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_431",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_444",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_451",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_494",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_495",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_496",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_497",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_499",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_4xx",
+                    "value": 8,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_500",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_501",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_502",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_503",
+                    "value": 9,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_504",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_505",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_506",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_507",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_508",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_509",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_510",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_511",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_5xx",
+                    "value": 9,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_bytes",
+                    "value": 1648841,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_bytes_max",
+                    "value": 704286,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_bytes_mean",
+                    "value": 7814.4123222749,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_bytes_median",
+                    "value": 238,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_bytes_min",
+                    "value": 65,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_bytes_mode",
+                    "value": 238,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_bytes_range",
+                    "value": 704221,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_CONNECT",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_DELETE",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_error_size",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_GET",
+                    "value": 169,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_HEAD",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_http1_0",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_http1_1",
+                    "value": 295,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_http2",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_http3",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_no_refer",
+                    "value": 267,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_no_user",
+                    "value": 299,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_OPTIONS",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_PATCH",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_POST",
+                    "value": 22,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_PUT",
+                    "value": 3,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_refer",
+                    "value": 28,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_size",
+                    "value": 15851780,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                },
+                {
+                    "metric": "totals_user",
+                    "value": 3,
+                    "value_prev": null,
+                    "app_type": "http_access_log_combined"
+                }
+            ]
+        }
+    }
+}
