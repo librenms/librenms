@@ -1891,13 +1891,13 @@ An optional config file may be specified via -f or placed at
 
 The following keys are used in the JSON config file.
 
-    - include :: A array of regular expressions to include.
+    - include :: An array of regular expressions to include.
         Default :: ["^.*$"]
 
-    - exclude :: A array of regular expressions to exlclude.
+    - exclude :: An array of regular expressions to exlclude.
         Default :: undef
 
-    - backend :: Override the the backend and automatically choose it.
+    - backend :: Override the backend and automatically choose it.
 
     - time_divider :: Override the time_divider value. The default value varies
         per backend and if it is needed.
