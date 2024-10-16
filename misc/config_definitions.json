@@ -6100,6 +6100,13 @@
             "order": 12,
             "type": "executable"
         },
+        "snmptrap": {
+            "default": "/usr/bin/snmptrap",
+            "group": "external",
+            "section": "binaries",
+            "order": 13,
+            "type": "executable"
+        },
         "sso.create_users": {
             "default": true,
             "type": "boolean"
