@@ -1,0 +1,15 @@
+---
+os: intracom-bx-osdr
+text: 'Intracom BX/OSDR Microwave'
+type: wireless
+icon: icom_icon_2x
+snmp_bulk: false
+mib_dir: intracom
+over:
+    - {graph: device_bitrate, text: 'Device Traffic'}
+    - { graph: device_signal, text: 'Signal Level' }
+    - { graph: device_ping_perf, text: 'Ping Times' }
+discovery:
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.1807.1.2.60
