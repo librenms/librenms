@@ -273,7 +273,7 @@ class Core implements Module
             return;
         }
 
-        if (! empty($agent_data['uptime'])) {
+        if (! empty($agent_data['uptime']) && $device['os'] != 'windows') {
             $uptime = round((float) substr($agent_data['uptime'], 0, strpos($agent_data['uptime'], ' ')));
             Log::info("Using UNIX Agent Uptime ($uptime)");
         } else {
