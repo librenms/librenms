@@ -121,7 +121,7 @@ foreach (dbFetchRows("SELECT * FROM `bgpPeers` WHERE `device_id` = ? $extra_sql 
     unset($alert);
     unset($peerhost, $peername);
 
-    // load the peer identifier in to an object
+    // load the peer identifier into an object
     $peer['bgpPeerIdentifierObject'] = IP::parse($peer['bgpPeerIdentifier'], true);
     
     if ($peer['bgpPeerState'] == 'established') {
@@ -202,7 +202,7 @@ foreach (dbFetchRows("SELECT * FROM `bgpPeers` WHERE `device_id` = ? $extra_sql 
     }
 
     // make ipv6 look pretty
-    $peer['bgpPeerIdentifierPretty'] = (string) $peer['bgpPeerIdentifier'];
+    $peer['bgpPeerIdentifierPretty'] = (string) $peer['bgpPeerIdentifierObject'];
 
     // display overlib graphs
     $graph_array = [];
