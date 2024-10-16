@@ -1603,14 +1603,26 @@ wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/nfs -
 chmod +x /etc/snmp/nfs
 ```
 
-3. Add it to snmpd.conf.
+3. Install the requirements.
+```
+# debian
+apt-get install libfile-slurp-perl libjson-perl libmime-base64-perl
+
+# freebsd
+pkg install p5-File-Slurp p5-JSON p5-MIME-Base64
+
+# rhel / alma
+dnf install perl-File-Slurp perl-JSON perl-MIME-Base64
+```
+
+4. Add it to snmpd.conf.
 ```
 extend nfs /usr/bin/env PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin /etc/snmp/nfs
 ```
 
-4. Restart snmpd on your host
+5. Restart snmpd on your host
 
-5. Either wait for it to be rediscovered, rediscover it, or enable it.
+6. Either wait for it to be rediscovered, rediscover it, or enable it.
 
 If using SELinux, the following is needed.
 
@@ -1618,21 +1630,40 @@ If using SELinux, the following is needed.
 
 2. Make a file (snmp_nfs.te) with the following contents and install
    the policy with the command `semodule -i snmp_nfs.te`.
+
 ```
-module snmp_nfs 1.0;
+module local_snmp 1.0;
 
 require {
-        type mountd_port_t;
-        type snmpd_t;
-        type hi_reserved_port_t;
-        class tcp_socket { name_bind name_connect };
-        class udp_socket name_bind;
+    type snmpd_t;
+    type portmap_port_t;
+    type sysctl_rpc_t;
+    type device_t;
+    type mountd_port_t;
+    type hi_reserved_port_t;
+    class tcp_socket { name_bind name_connect };
+    class udp_socket name_bind;
+    class dir search;
+    class file { read getattr open };
+    class chr_file { open ioctl read write };
 }
 
-#============= snmpd_t ==============
+# Allow snmpd_t to connect to tcp_socket of type portmap_port_t
+allow snmpd_t portmap_port_t:tcp_socket name_connect;
 allow snmpd_t hi_reserved_port_t:tcp_socket name_bind;
 allow snmpd_t hi_reserved_port_t:udp_socket name_bind;
 allow snmpd_t mountd_port_t:tcp_socket name_connect;
+
+# Allow snmpd_t to search directories and access files of type sysctl_rpc_t
+allow snmpd_t sysctl_rpc_t:dir search;
+allow snmpd_t sysctl_rpc_t:file { read getattr open };
+
+# Allow snmpd_t to perform open, ioctl, read, and write operations on chr_file of type device_t
+allow snmpd_t device_t:chr_file { open ioctl read write };
+
+# this policy allows : 
+# zfs extension (fixes root needs to run this)
+# nfs extension (fixes file not found error)
 ```
 
 ## Linux NFS Server
