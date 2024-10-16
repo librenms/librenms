@@ -125,6 +125,8 @@ foreach ($port_stats as $ifIndex => $snmp_data) {
 
         // Port newly discovered?
         if (! isset($ports_db[$port_id]) || ! is_array($ports_db[$port_id])) {
+            dbDelete('ports', '`device_id` = ? AND `ifIndex` = ?', [$device['device_id'], $ifIndex]);
+            
             $snmp_data['device_id'] = $device['device_id'];
             $port_id = dbInsert($snmp_data, 'ports');
 
