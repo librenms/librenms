@@ -123,7 +123,7 @@ foreach (dbFetchRows("SELECT * FROM `bgpPeers` WHERE `device_id` = ? $extra_sql 
 
     // load the peer identifier into an object
     $peer['bgpPeerIdentifierObject'] = IP::parse($peer['bgpPeerIdentifier'], true);
-    
+
     if ($peer['bgpPeerState'] == 'established') {
         $col = 'green';
     } else {
