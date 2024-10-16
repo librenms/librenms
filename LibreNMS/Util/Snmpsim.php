@@ -78,7 +78,7 @@ class Snmpsim extends Process
         if (! $this->isVenvSetUp()) {
             Log::info('Setting up snmpsim virtual env in ' . $snmpsim_venv_path);
 
-            $setupProcess = new Process(['python', '-m', 'venv', $snmpsim_venv_path]);
+            $setupProcess = new Process(['/usr/bin/env', 'python3', '-m', 'venv', $snmpsim_venv_path]);
             $setupProcess->setTty($print_output);
             $setupProcess->run();
 

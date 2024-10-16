@@ -1779,16 +1779,16 @@ chmod +x /etc/snmp/opensearch
 3. Install the required Perl dependencies.
 ```
 # FreeBSD
-pkg install p5-JSON p5-libwww
+pkg install p5-JSON p5-File-Slurp p5-MIME-Base64 p5-LWP-Protocol-https
 # Debian/Ubuntu
-apt-get install libjson-perl libwww-perl
+apt-get install libjson-perl libfile-slurp-perl liblwp-protocol-https-perl libmime-base64-perl
 # cpanm
-cpanm JSON Libwww
+cpanm JSON Libwww File::Slurp LWP::Protocol::HTTPS MIME::Base64
 ```
 
 4. Update your snmpd.conf.
 ```
-extend opensearch /bin/cat /var/cache/opensearch.json
+extend opensearch /bin/cat /var/cache/opensearch.json.snmp
 ```
 
 5. Update root crontab with. This is required as it will this will
@@ -1796,10 +1796,18 @@ likely time out otherwise. Use `*/1` if you want to have the most
 recent stats when polled or to `*/5` if you just want at exactly a 5
 minute interval.
 ```
-*/5 * * * * /etc/snmp/opensearch > /var/cache/opensearch.json
+*/5 * * * * /etc/snmp/opensearch -w -q
 ```
 
 6. Enable it or wait for the device to be re-disocvered.
+
+Alternatively cron can be skipped and the extend can be told to run
+like below, but if under heavy load it time out waiting for Opensearch
+to respond.
+
+```
+extend opensearch /etc/snmp/opensearch
+```
 
 ## Open Grid Scheduler
 

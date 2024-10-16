@@ -1794,6 +1794,7 @@ ports_vlans:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [port_vlan_id], Unique: true, Type: BTREE }
     ports_vlans_device_id_port_id_vlan_unique: { Name: ports_vlans_device_id_port_id_vlan_unique, Columns: [device_id, port_id, vlan], Unique: true, Type: BTREE }
+    ports_vlans_port_id_index: { Name: ports_vlans_port_id_index, Columns: [port_id], Unique: false, Type: BTREE }
 port_groups:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }

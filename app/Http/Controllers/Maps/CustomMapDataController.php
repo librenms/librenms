@@ -137,6 +137,7 @@ class CustomMapDataController extends Controller
             }
         }
 
+        /** @var CustomMapNode $node */
         foreach ($map->nodes as $node) {
             $nodeid = $node->custom_map_node_id;
             $nodes[$nodeid] = [
@@ -160,29 +161,22 @@ class CustomMapDataController extends Controller
                 'x_pos' => $node->x_pos,
                 'y_pos' => $node->y_pos,
             ];
+
+            // set status for linked map
+            if ($node->linkedMapIsDown()) {
+                $this->setNodeDownStyle($nodes[$nodeid], $request);
+            }
+
+            // set up linked device and status
             if ($node->device) {
                 $nodes[$nodeid]['device_name'] = $node->device->hostname . '(' . $node->device->sysName . ')';
                 $nodes[$nodeid]['device_image'] = $node->device->icon;
                 $nodes[$nodeid]['device_info'] = Url::deviceLink($node->device, null, [], 0, 0, 0, 0);
 
                 if ($node->device->disabled) {
-                    $device_style = $this->nodeDisabledStyle();
+                    $this->setNodeDisabledStyle($nodes[$nodeid]);
                 } elseif (! $node->device->status) {
-                    $device_style = $this->nodeDownStyle();
-                    // Change the text colour as long as we have not been requested by the editor
-                    if ($request->headers->get('referer') && ! str_ends_with(parse_url($request->headers->get('referer'), PHP_URL_PATH), '/edit')) {
-                        $nodes[$nodeid]['text_colour'] = 'darkred';
-                    }
-                } else {
-                    $device_style = $this->nodeUpStyle();
-                }
-
-                if ($device_style['background']) {
-                    $nodes[$nodeid]['colour_bg_view'] = $device_style['background'];
-                }
-
-                if ($device_style['border']) {
-                    $nodes[$nodeid]['colour_bdr_view'] = $device_style['border'];
+                    $this->setNodeDownStyle($nodes[$nodeid], $request);
                 }
             }
         }
@@ -341,27 +335,25 @@ class CustomMapDataController extends Controller
         return (strlen((string) $speed) - 5) / 2.0;
     }
 
-    protected function nodeDisabledStyle(): array
+    protected function setNodeDisabledStyle(array &$node_data_array): void
     {
-        return [
-            'border' => Config::get('network_map_legend.di.border'),
-            'background' => Config::get('network_map_legend.di.node'),
-        ];
+        $node_data_array['colour_bg_view'] = Config::get('network_map_legend.di.border');
+        $node_data_array['colour_bdr_view'] = Config::get('network_map_legend.di.node');
     }
 
-    protected function nodeDownStyle(): array
+    protected function setNodeDownStyle(array &$node_data_array, Request $request): void
     {
-        return [
-            'border' => Config::get('network_map_legend.dn.border'),
-            'background' => Config::get('network_map_legend.dn.node'),
-        ];
+        $node_data_array['colour_bg_view'] = Config::get('network_map_legend.dn.node');
+        $node_data_array['colour_bdr_view'] = Config::get('network_map_legend.dn.border');
+        // Change the text colour as long as we have not been requested by the editor
+        if ($request->headers->get('referer') && ! str_ends_with(parse_url($request->headers->get('referer'), PHP_URL_PATH), '/edit')) {
+            $node_data_array['text_colour'] = 'darkred';
+        }
     }
 
-    protected function nodeUpStyle(): array
+    protected function setNodeUpStyle(array &$node_data_array, CustomMapNode $node): void
     {
-        return [
-            'border' => null,
-            'background' => null,
-        ];
+        $node_data_array['colour_bg_view'] = $node->colour_bg;
+        $node_data_array['colour_bdr_view'] = $node->colour_bdr;
     }
 }

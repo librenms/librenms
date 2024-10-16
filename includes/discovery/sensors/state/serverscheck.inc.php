@@ -31,6 +31,9 @@ $serverscheck_oids = [
     'sensor3Value.0' => '.1.3.6.1.4.1.17095.3.10.0',
     'sensor4Value.0' => '.1.3.6.1.4.1.17095.3.14.0',
     'sensor5Value.0' => '.1.3.6.1.4.1.17095.3.18.0',
+    'sensor6Value.0' => '.1.3.6.1.4.1.17095.3.22.0',
+    'sensor7Value.0' => '.1.3.6.1.4.1.17095.3.26.0',
+    'sensor8Value.0' => '.1.3.6.1.4.1.17095.3.30.0',
 ];
 
 foreach ($pre_cache['serverscheck_control'] as $oid_name => $oid_value) {

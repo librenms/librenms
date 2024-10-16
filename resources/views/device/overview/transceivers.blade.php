@@ -10,7 +10,7 @@
                 <x-panel body-class="!tw-p-0">
                     <x-slot name="heading">
                         @if($transceiver->port)
-                        <x-port-link :port="$transceiver->port"></x-port-link>
+                        <x-port-link :port="$transceiver->port" :vars="['view' => 'transceiver']"></x-port-link>
                         @endif
                         <x-icons.transceiver></x-icons.transceiver> {{ $transceiver->vendor }} {{ $transceiver->type }}
                     </x-slot>

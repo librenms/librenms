@@ -196,4 +196,21 @@
             }
         }
     }
+
+    function startBackgroundMapAdjust() {
+        $('#map-editButton,#map-nodeDefaultsButton,#map-edgeDefaultsButton,#map-bgButton').hide();
+        $('#map-bgEndAdjustButton').show();
+    }
+
+    function endBackgroundMapAdjust() {
+        $('#map-editButton,#map-nodeDefaultsButton,#map-edgeDefaultsButton,#map-bgButton').show();
+        $('#map-bgEndAdjustButton').hide();
+
+        document.getElementById('custom-map-bg-geo-map').style.zIndex = '1';
+        const leaflet = get_map('custom-map-bg-geo-map');
+        if (leaflet) {
+            disable_map_interaction(leaflet)
+        }
+        editMapBackground();
+    }
 </script>

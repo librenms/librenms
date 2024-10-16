@@ -33,11 +33,6 @@ class DeviceObserver
      */
     public function updated(Device $device): void
     {
-        // handle device dependency updates
-        if ($device->isDirty('max_depth')) {
-            $device->children->each->updateMaxDepth();
-        }
-
         // log up/down status changes
         if ($device->isDirty(['status', 'status_reason'])) {
             $type = $device->status ? 'up' : 'down';

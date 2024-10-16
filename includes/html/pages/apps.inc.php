@@ -560,6 +560,32 @@ $graphs['nfs'] = [
     'client_rpc',
     'client_cache',
 ];
+$graphs['poudriere'] = [
+    'status',
+    'phase',
+    'time',
+    'log_size',
+    'package_size',
+    'cpu_perc',
+    'mem_perc',
+    'time_comparison',
+    'user_time',
+    'system_time',
+    'rss',
+    'threads',
+    'major_faults',
+    'minor_faults',
+    'swaps',
+    'size_comparison',
+    'stack_size',
+    'data_size',
+    'text_size',
+    'read_blocks',
+    'copy_on_write_faults',
+    'context_switches_comparison',
+    'voluntary_context_switches',
+    'involuntary_context_switches',
+];
 
 echo '<div class="panel panel-default">';
 echo '<div class="panel-heading">';

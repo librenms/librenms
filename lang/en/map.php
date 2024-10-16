@@ -128,6 +128,7 @@ return [
             'edge' => [
                 'new' => 'New Edge',
                 'add' => 'Add Edge',
+                'edit' => 'Edit Edge',
                 'defaults_title' => 'Edge Default Config',
                 'from' => 'From',
                 'to' => 'To',
