@@ -942,6 +942,18 @@ isis_adjacencies:
     isis_adjacencies_device_id_index: { Name: isis_adjacencies_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
     isis_adjacencies_ifindex_index: { Name: isis_adjacencies_ifindex_index, Columns: [ifIndex], Unique: false, Type: BTREE }
     isis_adjacencies_port_id_index: { Name: isis_adjacencies_port_id_index, Columns: [port_id], Unique: false, Type: BTREE }
+jobs:
+  Columns:
+    - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
+    - { Field: queue, Type: varchar(255), 'Null': false, Extra: '' }
+    - { Field: payload, Type: longtext, 'Null': false, Extra: '' }
+    - { Field: attempts, Type: 'tinyint unsigned', 'Null': false, Extra: '' }
+    - { Field: reserved_at, Type: 'int unsigned', 'Null': true, Extra: '' }
+    - { Field: available_at, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: created_at, Type: 'int unsigned', 'Null': false, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
+    jobs_queue_index: { Name: jobs_queue_index, Columns: [queue], Unique: false, Type: BTREE }
 juniAtmVp:
   Columns:
     - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
