@@ -283,6 +283,7 @@ $pool_rrd_def = RrdDefinition::make()
 $metrics = $zfs; // copy $zfs data to $metrics
 unset($metrics['pools']); // remove pools it is an array, re-add data below
 
+$zpool_status = $app->data['status_info'] ?? [];
 foreach ($zfs['pools'] as $pool) {
     $pools[] = $pool['name'];
     $rrd_name = ['app', $name, $app->app_id, $pool['name']];
@@ -302,6 +303,24 @@ foreach ($zfs['pools'] as $pool) {
     // insert flattened pool metrics into the metrics array
     foreach ($fields as $field => $value) {
         $metrics['pool_' . $pool['name'] . '_' . $field] = $value;
+    }
+
+    // process new guage stuff for pools
+    foreach ($gauges_to_check_for as $gauge_var) {
+        if (isset($pool[$gauge_var])) {
+            $metrics['pool_' . $pool['name'] . '_' . $gauge_var] = $pool[$gauge_var];
+            $rrd_name = ['app', $name, $app->app_id, $pool['name'] . '____' . $gauge_var];
+            $fields = [
+                'data' => $pool[$gauge_var],
+            ];
+            $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def_gauge, 'rrd_name' => $rrd_name];
+            data_update($device, 'app', $tags, $fields);
+        }
+    }
+
+    // save the status if it exists
+    if (isset($pool['status'])) {
+        $zpool_status[$pool['name']] = $pool['status'];
     }
 }
 
@@ -346,7 +365,8 @@ $app->data = [
     'pools' => $pools,
     'health' => $health,
     'version' => $all_return['version'],
-    'l2_errors' => $zfs['l2_errors']
+    'l2_errors' => $zfs['l2_errors'],
+    'status_info' => $zpool_status,
 ];
 
 update_application($app, 'OK', $metrics);

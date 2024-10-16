@@ -14,6 +14,8 @@ echo ' | ' . generate_link('L2', $link_array, ['zfs_page' => 'l2']);
 echo ' | Pools: ';
 
 $pools = $app->data['pools'] ?? [];
+$status_info = $app->data['status_info'] ?? [];
+$version = $app->data['version'] ?? 2;
 sort($pools);
 foreach ($pools as $index => $pool) {
     $label = $vars['pool'] == $pool
@@ -27,6 +29,10 @@ foreach ($pools as $index => $pool) {
     }
 }
 
+if (isset($vars['pool']) && isset($status_info[$vars['pool']])) {
+    echo '<hr><tt>' . str_replace(' ', '&nbsp;', str_replace("\n", "<br>", htmlspecialchars($status_info[$vars['pool']]))) . "</tt>\n";
+}
+
 print_optionbar_end();
 
 if (isset($vars['pool'])) {
@@ -35,6 +41,21 @@ if (isset($vars['pool'])) {
         'zfs_pool_cap' => 'Pool Capacity',
         'zfs_pool_frag' => 'Pool Fragmentation',
     ];
+    if ($version >= 2) {
+        $graphs['zfs_pool_operations'] = 'Pool Operations';
+        $graphs['zfs_pool_bandwidth'] = 'Pool Bandwidth';
+        $graphs['zfs_pool_total_wait'] = 'Pool Total Wait';
+        $graphs['zfs_pool_disk_wait'] = 'Pool Disk Wait';
+        $graphs['zfs_pool_asyncq_wait'] = 'Pool AsyncQ Wait';
+        $graphs['zfs_pool_scrub_wait'] = 'Pool Scrub Wait';
+        $graphs['zfs_pool_trim_wait'] = 'Pool Trim Wait';
+        $graphs['zfs_pool_syncq_read'] = 'Pool SyncQ Read';
+        $graphs['zfs_pool_syncq_write'] = 'Pool SyncQ Write';
+        $graphs['zfs_pool_asyncq_read'] = 'Pool AsyncQ Read';
+        $graphs['zfs_pool_asyncq_write'] = 'Pool AsyncQ Write';
+        $graphs['zfs_pool_scrubq_read'] = 'Pool ScrubQ Read';
+        $graphs['zfs_pool_trimq_write'] = 'Pool TrimQ Write';
+    }
 } elseif (isset($vars['zfs_page']) && $vars['zfs_page'] == 'l2') {
     $graphs = [
         'zfs_l2_size' => 'L2 size in bytes',
