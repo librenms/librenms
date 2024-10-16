@@ -54,7 +54,8 @@ class MempoolsController extends TableController
             return Device::hasAccess($request->user())->has('mempools')->with('mempools');
         }
 
-        $query = Mempool::hasAccess($request->user())->with('device');
+        $query = Mempool::hasAccess($request->user())
+            ->with(['device', 'device.location']);
 
         // join devices table to sort by hostname or search
         if (array_key_exists('hostname', $request->get('sort', $this->default_sort)) || $request->get('searchPhrase')) {
