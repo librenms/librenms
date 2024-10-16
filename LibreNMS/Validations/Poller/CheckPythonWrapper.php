@@ -46,7 +46,7 @@ class CheckPythonWrapper implements \LibreNMS\Interfaces\Validation
         }
 
         // check if cron is installed, then try to check if the cron entries are enabled.
-        $cron = Config::locateBinary('cron');
+        $cron = Config::getExecutable('cron');
         if ($cron !== 'cron') { // cron is installed
             if ($this->wrapperCronEnabled()) {
                 return $this->checkPythonWrapper();
