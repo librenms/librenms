@@ -58,6 +58,7 @@ class CustomMapSettingsRequest extends FormRequest
             'legend_font_size' => 'integer',
             'legend_hide_invalid' => 'boolean',
             'legend_hide_overspeed' => 'boolean',
+            'options' => 'string',
         ];
     }
 }

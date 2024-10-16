@@ -67,6 +67,9 @@ return [
                     'hideinvalid' => 'Hide Invalid',
                     'hideoverspeed' => 'Hide 100%+',
                 ],
+                'zoom' => 'Pan and Zoom',
+                'dragnodes' => 'Move Nodes',
+                'physics' => 'Physics Engine',
             ],
             'node' => [
                 'new' => 'New Node',
