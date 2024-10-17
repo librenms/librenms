@@ -58,6 +58,7 @@ class CustomMapDataController extends Controller
                 'showpct' => $edge->showpct,
                 'showbps' => $edge->showbps,
                 'label' => $edge->label,
+                'fixed_width' => $edge->fixed_width,
                 'text_face' => $edge->text_face,
                 'text_size' => $edge->text_size,
                 'text_colour' => $edge->text_colour,
@@ -268,6 +269,7 @@ class CustomMapDataController extends Controller
                 $dbedge->showpct = filter_var($edge['showpct'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
                 $dbedge->showbps = filter_var($edge['showbps'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
                 $dbedge->label = $edge['label'] ? $edge['label'] : '';
+                $dbedge->fixed_width = $edge['fixed_width'];
                 $dbedge->style = $edge['style'];
                 $dbedge->text_face = $edge['text_face'];
                 $dbedge->text_size = $edge['text_size'];
