@@ -37,6 +37,7 @@ class CustomMap extends BaseModel
     protected $primaryKey = 'custom_map_id';
     protected $casts = [
         'options' => 'array',
+        'legend_colours' => 'array',
         'newnodeconfig' => 'array',
         'newedgeconfig' => 'array',
         'background_data' => 'array',

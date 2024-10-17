@@ -130,7 +130,7 @@
                 });
 
                 // Re-draw the legend
-                custommap.redrawDefaultLegend(network_nodes, legend.steps, legend.x, legend.y, legend.font_size, legend.hide_invalid, legend.hide_overspeed);
+                custommap.redrawDefaultLegend(network_nodes, legend.steps, legend.x, legend.y, legend.font_size, legend.hide_invalid, legend.hide_overspeed, legend.colours);
 
                 // Flush in order to make sure nodes exist for edges to connect to
                 network_nodes.flush();

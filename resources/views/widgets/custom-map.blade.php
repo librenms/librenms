@@ -69,7 +69,7 @@
                     network_edges.add([edge1, edge2]);
                 });
 
-                custommap.redrawDefaultLegend(network_nodes, {{ $map->legend_steps }}, {{ $map->legend_x }}, {{ $map->legend_y }}, {{ $map->legend_font_size }}, {{ $map->legend_hide_invalid }}, {{ $map->legend_hide_overspeed }});
+                custommap.redrawDefaultLegend(network_nodes, {{ $map->legend_steps }}, {{ $map->legend_x }}, {{ $map->legend_y }}, {{ $map->legend_font_size }}, {{ $map->legend_hide_invalid }}, {{ $map->legend_hide_overspeed }}, {{ Js::from($map->legend_colours) }});
 
                 network = custommap.createNetwork('custom-map-{{ $id }}', scale, network_nodes, network_edges, network_options, bgtype, bgdata);
 

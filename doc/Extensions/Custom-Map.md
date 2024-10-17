@@ -150,3 +150,42 @@ page refreshes.
 You can add your own images to use on the custom map by copying files into the
 html/images/custommap/icons/ directory.  Any files with a .svg, .png or .jpg extension
 will be shown in the image selection drop-down in the custom map editor.
+
+## Default configuration
+
+The default configuration for all new maps can be set with the following commands:
+
+```bash
+lnms config:set custom_map.background_type
+lnms config:set custom_map.background_data.color "#badaee"
+lnms config:set custom_map.background_data.lat 40
+lnms config:set custom_map.background_data.layer
+lnms config:set custom_map.background_data.lng "-20"
+lnms config:set custom_map.background_data.zoom 3
+lnms config:set custom_map.edge_font_color "#343434"
+lnms config:set custom_map.edge_font_face arial
+lnms config:set custom_map.edge_font_size 12
+lnms config:set custom_map.edge_seperation 10
+lnms config:set custom_map.height "800px"
+lnms config:set custom_map.legend_colours '{ "0": "#0000ff", "10": "#00ff00" }'
+lnms config:set custom_map.node_align 10
+lnms config:set custom_map.node_background "#D2E5FF"
+lnms config:set custom_map.node_border "#2B7CE9"
+lnms config:set custom_map.node_font_color "#343434"
+lnms config:set custom_map.node_font_face arial
+lnms config:set custom_map.node_font_size 14
+lnms config:set custom_map.node_size 25
+lnms config:set custom_map.node_type
+lnms config:set custom_map.reverse_arrows false
+lnms config:set custom_map.width "1800px"
+```
+
+All options can be reset to default by excluding the value argument.
+
+Options with special requirements are as follows:
+ - All colours should be specified using the hex representation, and not colour names
+ - background_type background_data.layer and node_type will only accept valid values (see misc/config_definition.json)
+ - custom_map.legend_colours is an array of lower percent and colour.  This means in the example above, lines will be green from 0-10%, then blue above 10%.
+   - There is a special value of "-1" in the legend colours for when the interface is offline, or the port speed could not be determined
+   - There is a special value of "-2" in the legend colours for when the device an interface is connected to is offline
+   - The default legend_colours config is null, which means lines will change gradually from green->orange->red->purple as they go from 0-50-100-150%.
