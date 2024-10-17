@@ -254,14 +254,14 @@
                         <li><a href="{{ route('maps.custom.index') }}">
                             <i class="fa fa-pen fa-fw fa-lg" aria-hidden="true"></i> {{ __('Custom Map Editor') }}
                         </a></li>
-                        <li><a href="{{ route('maps.nodeimage.index') }}">
-                            <i class="fa fa-image fa-fw fa-lg" aria-hidden="true"></i> {{ __('Custom Node Image Manager') }}
-                        </a></li>
                         @if(Route::is('maps.custom.show'))
                         <li><a href="{{ route('maps.custom.edit', ['map' => Route::current()->parameter('map')]) }}">
                             <i class="fa fa-pen-to-square fa-fw fa-lg" aria-hidden="true"></i> {{ __('Edit Current Map') }}
                         </a></li>
                         @endif
+                        <li><a href="{{ route('maps.nodeimage.index') }}">
+                            <i class="fa fa-image fa-fw fa-lg" aria-hidden="true"></i> {{ __('Custom Node Image Manager') }}
+                        </a></li>
                         @endadmin
 
                     </ul>
