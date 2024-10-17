@@ -255,7 +255,7 @@
                             <i class="fa fa-pen fa-fw fa-lg" aria-hidden="true"></i> {{ __('Custom Map Editor') }}
                         </a></li>
                         <li><a href="{{ route('maps.nodeimage.index') }}">
-                            <i class="fa fa-pen fa-fw fa-lg" aria-hidden="true"></i> {{ __('Custom Node Image Manager') }}
+                            <i class="fa fa-image fa-fw fa-lg" aria-hidden="true"></i> {{ __('Custom Node Image Manager') }}
                         </a></li>
                         @if(Route::is('maps.custom.show'))
                         <li><a href="{{ route('maps.custom.edit', ['map' => Route::current()->parameter('map')]) }}">
