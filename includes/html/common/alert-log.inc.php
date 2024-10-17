@@ -25,6 +25,7 @@ $alert_states = [
     //    'Acknowledged' => 2,
     'Worse' => 3,
     'Better' => 4,
+    'Changed' => 5,
 ];
 
 $alert_severities = [
@@ -124,6 +125,7 @@ $common_output[] = '<div class="form-group"> \
                <option value="1">Alert</option> \
                <option value="3">Worse</option> \
                <option value="4">Better</option> \
+               <option value="5">Changed</option> \
                </select> \
                </div> \
                <div class="form-group"> \
