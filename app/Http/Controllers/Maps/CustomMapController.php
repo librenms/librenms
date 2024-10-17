@@ -28,6 +28,7 @@ namespace App\Http\Controllers\Maps;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CustomMapSettingsRequest;
 use App\Models\CustomMap;
+use App\Models\CustomMapNodeImage;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
