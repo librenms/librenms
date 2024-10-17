@@ -162,7 +162,7 @@
         $("#maplegendcolour0").val(colours["0"]);
         let colournum = 1;
         let max_pct = 0;
-        Object.keys(colours).sort((a,b) => a > b).forEach((pct_key) => {
+        Object.keys(colours).sort((a,b) => parseInt(a) > parseInt(b)).forEach((pct_key) => {
             let pct = parseFloat(pct_key);
             if(!isNaN(pct) && pct > 0.0) {
                 mapLegendAddColour(colournum++, pct, colours[pct_key]);

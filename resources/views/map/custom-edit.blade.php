@@ -478,7 +478,7 @@
 
             if(legend.colours) {
                 let i = 0;
-                Object.keys(legend.colours).sort((a,b) => a > b).forEach((pct_key) => {
+                Object.keys(legend.colours).sort((a,b) => parseInt(a) > parseInt(b)).forEach((pct_key) => {
                     let this_pct = parseFloat(pct_key);
                     if(!isNaN(this_pct) && this_pct >= 0.0) {
                         let legend_step = {id: "legend_" + i.toString(), label: this_pct.toString().padStart(3, " ") + "%", shape: "box", borderWidth: 0, x: legend.x, y: y_pos, font: {face: 'courier new', size: legend.font_size, color: "black"}, color: {background: legend.colours[pct_key]}};
