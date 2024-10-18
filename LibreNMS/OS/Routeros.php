@@ -501,7 +501,62 @@ class Routeros extends OS implements
             $datastore->put($this->getDeviceArray(), 'routeros_pppoe_sessions', $tags, $fields);
             $this->enableGraph('routeros_pppoe_sessions');
         }
+
+define('QUEUE_OID_BASE', '1.3.6.1.4.1.14988.1.1.2.1.1'); // Base OID for Mikrotik queues
+
+// Fetch SNMP data for all queues using snmpwalk_cache_multi_oid
+$snmp_data = snmpwalk_cache_multi_oid($this->getDeviceArray(), QUEUE_OID_BASE, [], 'MIKROTIK-MIB');
+
+// Initialize aggregation variables
+$total_bytes_in = 0;
+$total_bytes_out = 0;
+$total_packets_in = 0;
+$total_packets_out = 0;
+
+// Iterate through all queues to aggregate metrics
+foreach ($snmp_data as $queue) {
+    // Extract metrics with default values if not set
+    $bytes_in = isset($queue['mtxrQueueSimpleBytesIn']) && is_numeric($queue['mtxrQueueSimpleBytesIn']) ? $queue['mtxrQueueSimpleBytesIn'] : 0;
+    $bytes_out = isset($queue['mtxrQueueSimpleBytesOut']) && is_numeric($queue['mtxrQueueSimpleBytesOut']) ? $queue['mtxrQueueSimpleBytesOut'] : 0;
+    $packets_in = isset($queue['mtxrQueueSimplePacketsIn']) && is_numeric($queue['mtxrQueueSimplePacketsIn']) ? $queue['mtxrQueueSimplePacketsIn'] : 0;
+    $packets_out = isset($queue['mtxrQueueSimplePacketsOut']) && is_numeric($queue['mtxrQueueSimplePacketsOut']) ? $queue['mtxrQueueSimplePacketsOut'] : 0;
+
+    // Aggregate the metrics
+    $total_bytes_in += $bytes_in;
+    $total_bytes_out += $bytes_out;
+    $total_packets_in += $packets_in;
+    $total_packets_out += $packets_out;
+}
+
+// Check if there's any valid data to store
+if ($total_bytes_in === 0 && $total_bytes_out === 0 && $total_packets_in === 0 && $total_packets_out === 0) {
+    echo "No valid queue data found for device: " . $this->getDeviceArray() . "\n";
+    return;
+}
+
+// Initialize the RRD definition for the unified graph
+$rrd_def = RrdDefinition::make()
+    ->addDataset('total_bytes_in', 'COUNTER', 0)
+    ->addDataset('total_bytes_out', 'COUNTER', 0)
+    ->addDataset('total_packets_in', 'COUNTER', 0)
+    ->addDataset('total_packets_out', 'COUNTER', 0);
+
+// Prepare the fields array with aggregated data
+$fields = [
+    'total_bytes_in'    => $total_bytes_in,
+    'total_bytes_out'   => $total_bytes_out,
+    'total_packets_in'  => $total_packets_in,
+    'total_packets_out' => $total_packets_out,
+];
+
+// Store the aggregated SNMP data in a single RRD file
+$datastore->put($this->getDeviceArray(), 'routeros_queues', ['rrd_def' => $rrd_def], $fields);
+
+// Enable the unified graph for all queues
+$this->enableGraph('routeros_queues');
+
     }
+
 
     public function discoverTransceivers(): Collection
     {
