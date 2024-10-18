@@ -145,6 +145,6 @@ class CustomMapNodeImageController extends Controller
 
     private function getCacheKey(CustomMapNodeImage $image): string
     {
-        return 'custommap_nodeimage_' . $image->custom_map_nodeimage_id . ':' . ($image->version ?? '');
+        return 'custommap_nodeimage_' . $image->custom_map_node_image_id . ':' . ($image->version ?? '');
     }
 }
