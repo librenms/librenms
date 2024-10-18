@@ -47,6 +47,14 @@ if (isset($options['h'])) {
             $params[] = $options['h'];
         }
     }
+} else {
+    $scheduler = Config::get('schedule_type.services');
+    if ($scheduler != 'legacy' && $scheduler != 'cron') {
+        if (Debug::isEnabled()) {
+            echo "Services are not enabled for cron scheduling\n";
+        }
+        exit(0);
+    }
 }
 
 $sql = 'SELECT D.*,S.*,attrib_value  FROM `devices` AS D'
