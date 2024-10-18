@@ -1,0 +1,1743 @@
+TERACOM-TCW210-TH-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, enterprises, IpAddress, Integer32, snmpModules 		
+															FROM SNMPv2-SMI
+	DateAndTime, MacAddress, DisplayString					FROM SNMPv2-TC
+	TEXTUAL-CONVENTION										FROM SNMPv2-TC
+	MODULE-COMPLIANCE, OBJECT-GROUP , NOTIFICATION-GROUP      						
+															FROM SNMPv2-CONF;
+	
+snmpMIB MODULE-IDENTITY
+    LAST-UPDATED "202104160000Z"
+	ORGANIZATION "TERACOM"
+	CONTACT-INFO
+			"EMail:	info@teracomsystems.com"
+	DESCRIPTION
+			"The MIB module for TCW210-TH SNMP entities."
+	REVISION      "202104160000Z"
+	DESCRIPTION
+			"TCW210-THv1.2"
+	::= { snmpModules 1 }
+
+teracom                           	OBJECT IDENTIFIER ::=  { enterprises 38783 }
+tcw210th                           	OBJECT IDENTIFIER ::=  { teracom 4 }
+trapNotifications                  	OBJECT IDENTIFIER ::=  { tcw210th 0 }
+product                            	OBJECT IDENTIFIER ::=  { tcw210th 1 }
+setup                              	OBJECT IDENTIFIER ::=  { tcw210th 2 }
+monitorNcontrol                    	OBJECT IDENTIFIER ::=  { tcw210th 3 }
+
+tcw210thMIBConformance				OBJECT IDENTIFIER ::=  { tcw210th 4 }
+
+tcw210thMIBCompliances         		OBJECT IDENTIFIER ::= { tcw210thMIBConformance 1 }
+tcw210thMIBGroups  					OBJECT IDENTIFIER ::= { tcw210thMIBConformance 2 }
+
+
+SensorId ::= TEXTUAL-CONVENTION
+       DISPLAY-HINT "16a"
+       STATUS  current
+       DESCRIPTION
+	      "Sensor ROM code in ASCII HEX format"
+       SYNTAX    OCTET STRING (SIZE (16))
+	   
+SensorValue ::= TEXTUAL-CONVENTION
+       DISPLAY-HINT "d-3"
+       STATUS  current
+       DESCRIPTION
+	      "Sensor value x1000 in Integer format"
+       SYNTAX    Integer32
+	      	
+ALARMSTATUS ::=  TEXTUAL-CONVENTION
+       STATUS  current
+       DESCRIPTION
+           "Alarm status"
+       SYNTAX    INTEGER
+ 			{normal(0),alarm(1)}
+			
+			
+name    OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+      "Name of product"
+   ::= { product 1 }
+   
+
+version    OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+      "Version string"
+   ::= { product 2 }
+   
+dateTime    OBJECT-TYPE
+   SYNTAX DateAndTime
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+      "Date and time"
+   ::= { product 3 }
+
+network                             	OBJECT IDENTIFIER ::=  { setup 1 }
+
+deviceID OBJECT-TYPE
+    SYNTAX  MacAddress
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "Device ID is Default MAC Address"
+    ::= { network 1 }
+	
+hostName  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..38))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Host Name"
+    ::= { network 2 }
+	
+deviceIP OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "Device IP Address"
+    ::= { network 3 }
+	
+io                             		OBJECT IDENTIFIER ::=  { setup 2 }
+sensorsSetup                      	OBJECT IDENTIFIER ::=  { io 1 }
+
+sensor1setup                      	OBJECT IDENTIFIER ::=  { sensorsSetup 1 }
+sensor2setup                      	OBJECT IDENTIFIER ::=  { sensorsSetup 2 }
+sensor3setup                      	OBJECT IDENTIFIER ::=  { sensorsSetup 3 }
+sensor4setup                      	OBJECT IDENTIFIER ::=  { sensorsSetup 4 }
+sensor5setup                      	OBJECT IDENTIFIER ::=  { sensorsSetup 5 }
+sensor6setup                      	OBJECT IDENTIFIER ::=  { sensorsSetup 6 }
+sensor7setup                      	OBJECT IDENTIFIER ::=  { sensorsSetup 7 }
+sensor8setup                      	OBJECT IDENTIFIER ::=  { sensorsSetup 8 }
+
+s1description  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..12))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Sensor1 description"
+    ::= { sensor1setup 1 }
+
+sensor11setup                      	OBJECT IDENTIFIER ::=  { sensor1setup 2 }
+sensor12setup                      	OBJECT IDENTIFIER ::=  { sensor1setup 3 }
+sensor13setup                      	OBJECT IDENTIFIER ::=  { sensor1setup 4 }
+
+s11MAXInt OBJECT-TYPE
+    SYNTAX  SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "S11 maximum value x1000 in Integer format"
+    ::= { sensor11setup 1 }
+
+s11MINInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "S11 minimum value x1000 in Integer format"
+    ::= { sensor11setup 2 }
+	
+s11HYSTInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "S11 hysteresis value x1000 in Integer format"
+    ::= { sensor11setup 3 }
+	
+s11MULTInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "S11 multiplier value x1000 in Integer format"
+    ::= { sensor11setup 4 }
+		
+s11OFFSETInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "S11 offset value x1000 in Integer format"
+    ::= { sensor11setup 5 }
+
+s12MAXInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "S12 maximum value x1000 in Integer format"
+    ::= { sensor12setup 1 }
+
+s12MINInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "S12 minimum value x1000 in Integer format"
+    ::= { sensor12setup 2 }
+	
+s12HYSTInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "S12 hysteresis value x1000 in Integer format"
+    ::= { sensor12setup 3 }
+	
+s12MULTInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "S12 multiplier value x1000 in Integer format"
+    ::= { sensor12setup 4 }
+		
+s12OFFSETInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "S12 offset value x1000 in Integer format"
+    ::= { sensor12setup 5 }
+	
+s13MAXInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "S13 maximum value x1000 in Integer format"
+    ::= { sensor13setup 1 }
+
+s13MINInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "S13 minimum value x1000 in Integer format"
+    ::= { sensor13setup 2 }
+	
+s13HYSTInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "S13 hysteresis value x1000 in Integer format"
+    ::= { sensor13setup 3 }
+	
+s2description  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..12))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "sensor2 description"
+    ::= { sensor2setup 1 }
+
+sensor21setup                      	OBJECT IDENTIFIER ::=  { sensor2setup 2 }
+sensor22setup                      	OBJECT IDENTIFIER ::=  { sensor2setup 3 }
+sensor23setup                      	OBJECT IDENTIFIER ::=  { sensor2setup 4 }
+
+s21MAXInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s21 maximum value x1000 in Integer format"
+    ::= { sensor21setup 1 }
+
+s21MINInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s21 minimum value x1000 in Integer format"
+    ::= { sensor21setup 2 }
+	
+s21HYSTInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s21 hysteresis value x1000 in Integer format"
+    ::= { sensor21setup 3 }
+		
+s21MULTInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "S21 multiplier value x1000 in Integer format"
+    ::= { sensor21setup 4 }
+		
+s21OFFSETInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "S21 offset value x1000 in Integer format"
+    ::= { sensor21setup 5 }
+
+s22MAXInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s22 maximum value x1000 in Integer format"
+    ::= { sensor22setup 1 }
+
+s22MINInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s22 minimum value x1000 in Integer format"
+    ::= { sensor22setup 2 }
+	
+s22HYSTInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s22 hysteresis value x1000 in Integer format"
+    ::= { sensor22setup 3 }
+		
+s22MULTInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "S22 multiplier value x1000 in Integer format"
+    ::= { sensor22setup 4 }
+		
+s22OFFSETInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "S22 offset value x1000 in Integer format"
+    ::= { sensor22setup 5 }
+	
+s23MAXInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "S23 maximum value x1000 in Integer format"
+    ::= { sensor23setup 1 }
+
+s23MINInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "S23 minimum value x1000 in Integer format"
+    ::= { sensor23setup 2 }
+	
+s23HYSTInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "S23 hysteresis value x1000 in Integer format"
+    ::= { sensor23setup 3 }
+
+s3description  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..12))
+    MAX-ACCESS read-write
+    STATUS current    DESCRIPTION
+        "sensor3 description"
+    ::= { sensor3setup 1 }
+
+sensor31setup                      	OBJECT IDENTIFIER ::=  { sensor3setup 2 }
+sensor32setup                      	OBJECT IDENTIFIER ::=  { sensor3setup 3 }
+sensor33setup                      	OBJECT IDENTIFIER ::=  { sensor3setup 4 }
+
+s31MAXInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s31 maximum value x1000 in Integer format"
+    ::= { sensor31setup 1 }
+
+s31MINInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s31 minimum value x1000 in Integer format"
+    ::= { sensor31setup 2 }
+	
+s31HYSTInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s31 hysteresis value x1000 in Integer format"
+    ::= { sensor31setup 3 }
+		
+s31MULTInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "S31 multiplier value x1000 in Integer format"
+    ::= { sensor31setup 4 }
+		
+s31OFFSETInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "S31 offset value x1000 in Integer format"
+    ::= { sensor31setup 5 }
+
+s32MAXInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s32 maximum value x1000 in Integer format"
+    ::= { sensor32setup 1 }
+
+s32MINInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s32 minimum value x1000 in Integer format"
+    ::= { sensor32setup 2 }
+	
+s32HYSTInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s32 hysteresis value x1000 in Integer format"
+    ::= { sensor32setup 3 }
+		
+s32MULTInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "S32 multiplier value x1000 in Integer format"
+    ::= { sensor32setup 4 }
+		
+s32OFFSETInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "S32 offset value x1000 in Integer format"
+    ::= { sensor32setup 5 }
+	
+s33MAXInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s33 maximum value x1000 in Integer format"
+    ::= { sensor33setup 1 }
+
+s33MINInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s33 minimum value x1000 in Integer format"
+    ::= { sensor33setup 2 }
+	
+s33HYSTInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s33 hysteresis value x1000 in Integer format"
+    ::= { sensor33setup 3 }
+
+s4description  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..12))
+    MAX-ACCESS read-write
+    STATUS current    DESCRIPTION
+        "sensor4 description"
+    ::= { sensor4setup 1 }
+
+sensor41setup                      	OBJECT IDENTIFIER ::=  { sensor4setup 2 }
+sensor42setup                      	OBJECT IDENTIFIER ::=  { sensor4setup 3 }
+sensor43setup                      	OBJECT IDENTIFIER ::=  { sensor4setup 4 }
+
+s41MAXInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s41 maximum value x1000 in Integer format"
+    ::= { sensor41setup 1 }
+
+s41MINInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s41 minimum value x1000 in Integer format"
+    ::= { sensor41setup 2 }
+	
+s41HYSTInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s41 hysteresis value x1000 in Integer format"
+    ::= { sensor41setup 3 }
+	
+s41MULTInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "S41 multiplier value x1000 in Integer format"
+    ::= { sensor41setup 4 }
+		
+s41OFFSETInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "S41 offset value x1000 in Integer format"
+    ::= { sensor41setup 5 }
+	
+s42MAXInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s42 maximum value x1000 in Integer format"
+    ::= { sensor42setup 1 }
+
+s42MINInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s42 minimum value x1000 in Integer format"
+    ::= { sensor42setup 2 }
+	
+s42HYSTInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s42 hysteresis value x1000 in Integer format"
+    ::= { sensor42setup 3 }
+	
+s42MULTInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "S42 multiplier value x1000 in Integer format"
+    ::= { sensor42setup 4 }
+		
+s42OFFSETInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "S42 offset value x1000 in Integer format"
+    ::= { sensor42setup 5 }
+	
+s43MAXInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s43 maximum value x1000 in Integer format"
+    ::= { sensor43setup 1 }
+
+s43MINInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s43 minimum value x1000 in Integer format"
+    ::= { sensor43setup 2 }
+	
+s43HYSTInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s43 hysteresis value x1000 in Integer format"
+    ::= { sensor43setup 3 }
+
+s5description  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..12))
+    MAX-ACCESS read-write
+    STATUS current    DESCRIPTION
+        "sensor5 description"
+    ::= { sensor5setup 1 }
+
+sensor51setup                      	OBJECT IDENTIFIER ::=  { sensor5setup 2 }
+sensor52setup                      	OBJECT IDENTIFIER ::=  { sensor5setup 3 }
+sensor53setup                      	OBJECT IDENTIFIER ::=  { sensor5setup 4 }
+
+s51MAXInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s51 maximum value x1000 in Integer format"
+    ::= { sensor51setup 1 }
+
+s51MINInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s51 minimum value x1000 in Integer format"
+    ::= { sensor51setup 2 }
+	
+s51HYSTInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s51 hysteresis value x1000 in Integer format"
+    ::= { sensor51setup 3 }
+	
+s51MULTInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "S51 multiplier value x1000 in Integer format"
+    ::= { sensor51setup 4 }
+		
+s51OFFSETInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "S51 offset value x1000 in Integer format"
+    ::= { sensor51setup 5 }
+	
+s52MAXInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s52 maximum value x1000 in Integer format"
+    ::= { sensor52setup 1 }
+
+s52MINInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s52 minimum value x1000 in Integer format"
+    ::= { sensor52setup 2 }
+	
+s52HYSTInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s52 hysteresis value x1000 in Integer format"
+    ::= { sensor52setup 3 }
+	
+s52MULTInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "S52 multiplier value x1000 in Integer format"
+    ::= { sensor52setup 4 }
+		
+s52OFFSETInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "S52 offset value x1000 in Integer format"
+    ::= { sensor52setup 5 }
+	
+s53MAXInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s53 maximum value x1000 in Integer format"
+    ::= { sensor53setup 1 }
+
+s53MINInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s53 minimum value x1000 in Integer format"
+    ::= { sensor53setup 2 }
+	
+s53HYSTInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s53 hysteresis value x1000 in Integer format"
+    ::= { sensor53setup 3 }
+
+s6description  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..12))
+    MAX-ACCESS read-write
+    STATUS current    DESCRIPTION
+        "sensor6 description"
+    ::= { sensor6setup 1 }
+
+sensor61setup                      	OBJECT IDENTIFIER ::=  { sensor6setup 2 }
+sensor62setup                      	OBJECT IDENTIFIER ::=  { sensor6setup 3 }
+sensor63setup                      	OBJECT IDENTIFIER ::=  { sensor6setup 4 }
+
+s61MAXInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s61 maximum value x1000 in Integer format"
+    ::= { sensor61setup 1 }
+
+s61MINInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s61 minimum value x1000 in Integer format"
+    ::= { sensor61setup 2 }
+	
+s61HYSTInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s61 hysteresis value x1000 in Integer format"
+    ::= { sensor61setup 3 }
+	
+s61MULTInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "S61 multiplier value x1000 in Integer format"
+    ::= { sensor61setup 4 }
+		
+s61OFFSETInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "S61 offset value x1000 in Integer format"
+    ::= { sensor61setup 5 }
+	
+s62MAXInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s62 maximum value x1000 in Integer format"
+    ::= { sensor62setup 1 }
+
+s62MINInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s62 minimum value x1000 in Integer format"
+    ::= { sensor62setup 2 }
+	
+s62HYSTInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s62 hysteresis value x1000 in Integer format"
+    ::= { sensor62setup 3 }
+	
+s62MULTInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "S62 multiplier value x1000 in Integer format"
+    ::= { sensor62setup 4 }
+		
+s62OFFSETInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "S62 offset value x1000 in Integer format"
+    ::= { sensor62setup 5 }
+	
+s63MAXInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s63 maximum value x1000 in Integer format"
+    ::= { sensor63setup 1 }
+
+s63MINInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s63 minimum value x1000 in Integer format"
+    ::= { sensor63setup 2 }
+	
+s63HYSTInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s63 hysteresis value x1000 in Integer format"
+    ::= { sensor63setup 3 }
+
+s7description  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..12))
+    MAX-ACCESS read-write
+    STATUS current    DESCRIPTION
+        "sensor7 description"
+    ::= { sensor7setup 1 }
+
+sensor71setup                      	OBJECT IDENTIFIER ::=  { sensor7setup 2 }
+sensor72setup                      	OBJECT IDENTIFIER ::=  { sensor7setup 3 }
+sensor73setup                      	OBJECT IDENTIFIER ::=  { sensor7setup 4 }
+
+s71MAXInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s71 maximum value x1000 in Integer format"
+    ::= { sensor71setup 1 }
+
+s71MINInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s71 minimum value x1000 in Integer format"
+    ::= { sensor71setup 2 }
+	
+s71HYSTInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s71 hysteresis value x1000 in Integer format"
+    ::= { sensor71setup 3 }
+	
+s71MULTInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "S71 multiplier value x1000 in Integer format"
+    ::= { sensor71setup 4 }
+		
+s71OFFSETInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "S71 offset value x1000 in Integer format"
+    ::= { sensor71setup 5 }
+	
+s72MAXInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s72 maximum value x1000 in Integer format"
+    ::= { sensor72setup 1 }
+
+s72MINInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s72 minimum value x1000 in Integer format"
+    ::= { sensor72setup 2 }
+	
+s72HYSTInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s72 hysteresis value x1000 in Integer format"
+    ::= { sensor72setup 3 }
+	
+s72MULTInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "S72 multiplier value x1000 in Integer format"
+    ::= { sensor72setup 4 }
+		
+s72OFFSETInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "S72 offset value x1000 in Integer format"
+    ::= { sensor72setup 5 }
+	
+s73MAXInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s73 maximum value x1000 in Integer format"
+    ::= { sensor73setup 1 }
+
+s73MINInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s73 minimum value x1000 in Integer format"
+    ::= { sensor73setup 2 }
+	
+s73HYSTInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s73 hysteresis value x1000 in Integer format"
+    ::= { sensor73setup 3 }
+
+s8description  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..12))
+    MAX-ACCESS read-write
+    STATUS current    DESCRIPTION
+        "sensor8 description"
+    ::= { sensor8setup 1 }
+
+sensor81setup                      	OBJECT IDENTIFIER ::=  { sensor8setup 2 }
+sensor82setup                      	OBJECT IDENTIFIER ::=  { sensor8setup 3 }
+sensor83setup                      	OBJECT IDENTIFIER ::=  { sensor8setup 4 }
+
+s81MAXInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s81 maximum value x1000 in Integer format"
+    ::= { sensor81setup 1 }
+
+s81MINInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s81 minimum value x1000 in Integer format"
+    ::= { sensor81setup 2 }
+	
+s81HYSTInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s81 hysteresis value x1000 in Integer format"
+    ::= { sensor81setup 3 }
+	
+s81MULTInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "S81 multiplier value x1000 in Integer format"
+    ::= { sensor81setup 4 }
+		
+s81OFFSETInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "S81 offset value x1000 in Integer format"
+    ::= { sensor81setup 5 }
+	
+s82MAXInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s82 maximum value x1000 in Integer format"
+    ::= { sensor82setup 1 }
+
+s82MINInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s82 minimum value x1000 in Integer format"
+    ::= { sensor82setup 2 }
+	
+s82HYSTInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s82 hysteresis value x1000 in Integer format"
+    ::= { sensor82setup 3 }
+	
+s82MULTInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "S82 multiplier value x1000 in Integer format"
+    ::= { sensor82setup 4 }
+		
+s82OFFSETInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "S82 offset value x1000 in Integer format"
+    ::= { sensor82setup 5 }
+	
+s83MAXInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s83 maximum value x1000 in Integer format"
+    ::= { sensor83setup 1 }
+
+s83MINInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s83 minimum value x1000 in Integer format"
+    ::= { sensor83setup 2 }
+	
+s83HYSTInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s83 hysteresis value x1000 in Integer format"
+    ::= { sensor83setup 3 }
+
+	
+sensors	OBJECT IDENTIFIER ::=  { monitorNcontrol 1 }
+sensor1	OBJECT IDENTIFIER ::=  { sensors 1 }
+s1Alarm	OBJECT IDENTIFIER ::=  { sensor1 5 }
+s11Int OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "S11 value x1000 in Integer format"
+    ::= { sensor1 1 }
+	
+s12Int OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "S12 value x1000 in Integer format"
+    ::= { sensor1 2 }
+	
+s13Int OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "S13 dew point value x1000 in Integer format"
+    ::= { sensor1 3 }
+	
+s1ID OBJECT-TYPE
+    SYNTAX  SensorId
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "S1 ID value"
+    ::= { sensor1 4 }
+	
+s11Al OBJECT-TYPE
+    SYNTAX  ALARMSTATUS
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "S11 alarm status"
+    ::= { s1Alarm 1 }
+	
+s12Al OBJECT-TYPE
+    SYNTAX  ALARMSTATUS
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "S12 alarm status"
+    ::= { s1Alarm 2 }
+	
+s13Al OBJECT-TYPE
+    SYNTAX  ALARMSTATUS
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "S13 alarm status"
+    ::= { s1Alarm 3 }
+		
+s11RawInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "S11 raw value x1000 in Integer format"
+    ::= { sensor1 6 }
+		
+s12RawInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "S12 raw value x1000 in Integer format"
+    ::= { sensor1 7 }
+
+sensor2	OBJECT IDENTIFIER ::=  { sensors 2 }
+s2Alarm	OBJECT IDENTIFIER ::=  { sensor2 5 }
+s21Int OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "S21 value x1000 in Integer format"
+    ::= { sensor2 1 }
+	
+s22Int OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "S22 value x1000 in Integer format"
+    ::= { sensor2 2 }
+
+s23Int OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "S23 dew point value x1000 in Integer format"
+    ::= { sensor2 3 }
+	
+s2ID OBJECT-TYPE
+    SYNTAX  SensorId
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "S2 ID value"
+    ::= { sensor2 4 }
+	
+s21Al OBJECT-TYPE
+    SYNTAX  ALARMSTATUS
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "S21 alarm status"
+    ::= { s2Alarm 1 }
+	
+s22Al OBJECT-TYPE
+    SYNTAX  ALARMSTATUS
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "S22 alarm status"
+    ::= { s2Alarm 2 }
+	
+s23Al OBJECT-TYPE
+    SYNTAX  ALARMSTATUS
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "S23 alarm status"
+    ::= { s2Alarm 3 }
+		
+s21RawInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "S21 raw value x1000 in Integer format"
+    ::= { sensor2 6 }
+		
+s22RawInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "S22 raw value x1000 in Integer format"
+    ::= { sensor2 7 }
+
+sensor3	OBJECT IDENTIFIER ::=  { sensors 3 }
+s3Alarm	OBJECT IDENTIFIER ::=  { sensor3 5 }
+s31Int OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "S31 value x1000 in Integer format"
+    ::= { sensor3 1 }
+	
+s32Int OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "S32 value x1000 in Integer format"
+    ::= { sensor3 2 }
+	
+s33Int OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "S33 dew point value x1000 in Integer format"
+    ::= { sensor3 3 }
+	
+s3ID OBJECT-TYPE
+    SYNTAX  SensorId
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "S3 ID value"
+    ::= { sensor3 4 }
+	
+s31Al OBJECT-TYPE
+    SYNTAX  ALARMSTATUS
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "S31 alarm status"
+    ::= { s3Alarm 1 }
+	
+s32Al OBJECT-TYPE
+    SYNTAX  ALARMSTATUS
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "S32 alarm status"
+    ::= { s3Alarm 2 }
+	
+s33Al OBJECT-TYPE
+    SYNTAX  ALARMSTATUS
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "S33 alarm status"
+    ::= { s3Alarm 3 }
+	
+s31RawInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "S31 raw value x1000 in Integer format"
+    ::= { sensor3 6 }
+		
+s32RawInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "S32 raw value x1000 in Integer format"
+    ::= { sensor3 7 }
+
+sensor4	OBJECT IDENTIFIER ::=  { sensors 4 }
+s4Alarm	OBJECT IDENTIFIER ::=  { sensor4 5 }
+s41Int OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "S41 value x1000 in Integer format"
+    ::= { sensor4 1 }
+	
+s42Int OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "S42 value x1000 in Integer format"
+    ::= { sensor4 2 }
+	
+s43Int OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "S43 dew point value x1000 in Integer format"
+    ::= { sensor4 3 }
+	
+s4ID OBJECT-TYPE
+    SYNTAX  SensorId
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "S4 ID value"
+    ::= { sensor4 4 }
+	
+s41Al OBJECT-TYPE
+    SYNTAX  ALARMSTATUS
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "S41 alarm status"
+    ::= { s4Alarm 1 }
+	
+s42Al OBJECT-TYPE
+    SYNTAX  ALARMSTATUS
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "S42 alarm status"
+    ::= { s4Alarm 2 }
+	
+s43Al OBJECT-TYPE
+    SYNTAX  ALARMSTATUS
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "S43 alarm status"
+    ::= { s4Alarm 3 }
+	
+s41RawInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "S41 raw value x1000 in Integer format"
+    ::= { sensor4 6 }
+		
+s42RawInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "S42 raw value x1000 in Integer format"
+    ::= { sensor4 7 }
+
+sensor5	OBJECT IDENTIFIER ::=  { sensors 5 }
+s5Alarm	OBJECT IDENTIFIER ::=  { sensor5 5 }
+s51Int OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "S51 value x1000 in Integer format"
+    ::= { sensor5 1 }
+	
+s52Int OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "S52 value x1000 in Integer format"
+    ::= { sensor5 2 }
+	
+s53Int OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "S53 dew point value x1000 in Integer format"
+    ::= { sensor5 3 }
+	
+s5ID OBJECT-TYPE
+    SYNTAX  SensorId
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "S5 ID value"
+    ::= { sensor5 4 }
+
+s51Al OBJECT-TYPE
+    SYNTAX  ALARMSTATUS
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "S51 alarm status"
+    ::= { s5Alarm 1 }
+	
+s52Al OBJECT-TYPE
+    SYNTAX  ALARMSTATUS
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "S52 alarm status"
+    ::= { s5Alarm 2 }
+	
+s53Al OBJECT-TYPE
+    SYNTAX  ALARMSTATUS
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "S53 alarm status"
+    ::= { s5Alarm 3 }
+		
+s51RawInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "S51 raw value x1000 in Integer format"
+    ::= { sensor5 6 }
+		
+s52RawInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "S52 raw value x1000 in Integer format"
+    ::= { sensor5 7 }
+
+sensor6	OBJECT IDENTIFIER ::=  { sensors 6 }
+s6Alarm	OBJECT IDENTIFIER ::=  { sensor6 5 }
+s61Int OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "S61 value x1000 in Integer format"
+    ::= { sensor6 1 }
+	
+s62Int OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "S62 value x1000 in Integer format"
+    ::= { sensor6 2 }
+	
+s63Int OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "S63 dew point value x1000 in Integer format"
+    ::= { sensor6 3 }
+	
+s6ID OBJECT-TYPE
+    SYNTAX  SensorId
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "S6 ID value"
+    ::= { sensor6 4 }
+
+s61Al OBJECT-TYPE
+    SYNTAX  ALARMSTATUS
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "S61 alarm status"
+    ::= { s6Alarm 1 }
+	
+s62Al OBJECT-TYPE
+    SYNTAX  ALARMSTATUS
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "S62 alarm status"
+    ::= { s6Alarm 2 }
+	
+s63Al OBJECT-TYPE
+    SYNTAX  ALARMSTATUS
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "S63 alarm status"
+    ::= { s6Alarm 3 }
+	
+s61RawInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "S61 raw value x1000 in Integer format"
+    ::= { sensor6 6 }
+		
+s62RawInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "S62 raw value x1000 in Integer format"
+    ::= { sensor6 7 }
+	
+sensor7	OBJECT IDENTIFIER ::=  { sensors 7 }
+s7Alarm	OBJECT IDENTIFIER ::=  { sensor7 5 }
+s71Int OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "S71 value x1000 in Integer format"
+    ::= { sensor7 1 }
+	
+s72Int OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "S72 value x1000 in Integer format"
+    ::= { sensor7 2 }
+		
+s73Int OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "S73 dew point value x1000 in Integer format"
+    ::= { sensor7 3 }
+
+s7ID OBJECT-TYPE
+    SYNTAX  SensorId
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "S7 ID value"
+    ::= { sensor7 4 }
+	
+s71Al OBJECT-TYPE
+    SYNTAX  ALARMSTATUS
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "S71 alarm status"
+    ::= { s7Alarm 1 }
+	
+s72Al OBJECT-TYPE
+    SYNTAX  ALARMSTATUS
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "S72 alarm status"
+    ::= { s7Alarm 2 }
+	
+s73Al OBJECT-TYPE
+    SYNTAX  ALARMSTATUS
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "S73 alarm status"
+    ::= { s7Alarm 3 }
+	
+s71RawInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "S71 raw value x1000 in Integer format"
+    ::= { sensor7 6 }
+		
+s72RawInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "S72 raw value x1000 in Integer format"
+    ::= { sensor7 7 }
+	
+sensor8	OBJECT IDENTIFIER ::=  { sensors 8 }
+s8Alarm	OBJECT IDENTIFIER ::=  { sensor8 5 }
+s81Int OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "S81 value x1000 in Integer format"
+    ::= { sensor8 1 }
+	
+s82Int OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "S82 value x1000 in Integer format"
+    ::= { sensor8 2 }
+	
+s83Int OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "S83 dew point value x1000 in Integer format"
+    ::= { sensor8 3 }
+	
+s8ID OBJECT-TYPE
+    SYNTAX  SensorId
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "S8 ID value"
+    ::= { sensor8 4 }
+
+s81Al OBJECT-TYPE
+    SYNTAX  ALARMSTATUS
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "S81 alarm status"
+    ::= { s8Alarm 1 }
+	
+s82Al OBJECT-TYPE
+    SYNTAX  ALARMSTATUS
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "S82 alarm status"
+    ::= { s8Alarm 2 }
+	
+s83Al OBJECT-TYPE
+    SYNTAX  ALARMSTATUS
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "S83 alarm status"
+    ::= { s8Alarm 3 }
+	
+s81RawInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "S81 raw value x1000 in Integer format"
+    ::= { sensor8 6 }
+		
+s82RawInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "S82 raw value x1000 in Integer format"
+    ::= { sensor8 7 }
+	
+--- configurationSaved
+configurationSaved OBJECT-TYPE
+	SYNTAX INTEGER { unsaved(0), saved(1) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Configuration save status SAVED/UNSAVED"
+	::= { monitorNcontrol 5 }
+
+restartDevice OBJECT-TYPE
+	SYNTAX INTEGER {  cancel(0), restart(1) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Restart Device"
+	::= { monitorNcontrol 6}
+	
+temperatureUnit OBJECT-TYPE
+	SYNTAX INTEGER {  celcius(0), fahrenheit(1) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Unit of the all temperature values"
+	::= { monitorNcontrol 7}
+	
+hardwareErr OBJECT-TYPE
+	SYNTAX INTEGER {  noErr(0), owErr(1), hwErr(2) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Hardware Error"
+	::= { monitorNcontrol 8}
+
+snmp-trap-notification NOTIFICATION-TYPE
+	OBJECTS { s11Int,s12Int,s13Int,s11Al,s12Al,s13Al,
+	s21Int,s22Int,s23Int,s21Al,s22Al,s23Al,
+	s31Int,s32Int,s33Int,s31Al,s32Al,s33Al,
+	s41Int,s42Int,s43Int,s41Al,s42Al,s43Al,
+	s51Int,s52Int,s53Int,s51Al,s52Al,s53Al,
+	s61Int,s62Int,s63Int,s61Al,s62Al,s63Al,
+	s71Int,s72Int,s73Int,s71Al,s72Al,s73Al,
+	s81Int,s82Int,s83Int,s81Al,s82Al,s83Al,
+	restartDevice,
+	deviceIP}
+	STATUS current
+	DESCRIPTION 
+		"SMIV2 Trap notification information for the SNMP Manager."
+	::= {trapNotifications 1}
+	
+tcw210thMIBCompliances1 MODULE-COMPLIANCE
+    STATUS  current
+	DESCRIPTION
+            "This group is for SNMP applications."
+    MODULE  -- this module
+        MANDATORY-GROUPS { tcw210thProductGroup, tcw210thSetupGroup, tcw210thMonitorGroup, tcw210thTrapGroup}
+
+    ::= { tcw210thMIBCompliances 1 }
+	
+tcw210thProductGroup OBJECT-GROUP
+    OBJECTS {name, version, dateTime}
+	STATUS  current
+    DESCRIPTION
+            "A collection of objects providing basic product info."
+    ::= { tcw210thMIBGroups 1 }	
+	
+tcw210thSetupGroup OBJECT-GROUP
+    OBJECTS {	deviceID, hostName, deviceIP,
+				s1description, s11MAXInt, s11MINInt, s11HYSTInt, s11MULTInt, s11OFFSETInt, s12MAXInt, s12MINInt, s12HYSTInt, s12MULTInt, s12OFFSETInt, s13MAXInt, s13MINInt, s13HYSTInt,
+				s2description, s21MAXInt, s21MINInt, s21HYSTInt, s21MULTInt, s21OFFSETInt, s22MAXInt, s22MINInt, s22HYSTInt, s22MULTInt, s22OFFSETInt, s23MAXInt, s23MINInt, s23HYSTInt,
+				s3description, s31MAXInt, s31MINInt, s31HYSTInt, s31MULTInt, s31OFFSETInt, s32MAXInt, s32MINInt, s32HYSTInt, s32MULTInt, s32OFFSETInt, s33MAXInt, s33MINInt, s33HYSTInt,
+				s4description, s41MAXInt, s41MINInt, s41HYSTInt, s41MULTInt, s41OFFSETInt, s42MAXInt, s42MINInt, s42HYSTInt, s42MULTInt, s42OFFSETInt, s43MAXInt, s43MINInt, s43HYSTInt,
+				s5description, s51MAXInt, s51MINInt, s51HYSTInt, s51MULTInt, s51OFFSETInt, s52MAXInt, s52MINInt, s52HYSTInt, s52MULTInt, s52OFFSETInt, s53MAXInt, s53MINInt, s53HYSTInt,
+				s6description, s61MAXInt, s61MINInt, s61HYSTInt, s61MULTInt, s61OFFSETInt, s62MAXInt, s62MINInt, s62HYSTInt, s62MULTInt, s62OFFSETInt, s63MAXInt, s63MINInt, s63HYSTInt,
+				s7description, s71MAXInt, s71MINInt, s71HYSTInt, s71MULTInt, s71OFFSETInt, s72MAXInt, s72MINInt, s72HYSTInt, s72MULTInt, s72OFFSETInt, s73MAXInt, s73MINInt, s73HYSTInt,
+				s8description, s81MAXInt, s81MINInt, s81HYSTInt, s81MULTInt, s81OFFSETInt, s82MAXInt, s82MINInt, s82HYSTInt, s82MULTInt, s82OFFSETInt, s83MAXInt, s83MINInt, s83HYSTInt
+			}
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects providing basic setup."
+    ::= { tcw210thMIBGroups 2 }	
+	
+tcw210thMonitorGroup OBJECT-GROUP
+    OBJECTS {	s11Int, s12Int, s13Int, s1ID, s11Al, s12Al, s13Al, s11RawInt, s12RawInt, 
+				s21Int, s22Int, s23Int, s2ID, s21Al, s22Al, s23Al, s21RawInt, s22RawInt,
+				s31Int, s32Int, s33Int, s3ID, s31Al, s32Al, s33Al, s31RawInt, s32RawInt,
+				s41Int, s42Int, s43Int, s4ID, s41Al, s42Al, s43Al, s41RawInt, s42RawInt,
+				s51Int, s52Int, s53Int, s5ID, s51Al, s52Al, s53Al, s51RawInt, s52RawInt,
+				s61Int, s62Int, s63Int, s6ID, s61Al, s62Al, s63Al, s61RawInt, s62RawInt,
+				s71Int, s72Int, s73Int, s7ID, s71Al, s72Al, s73Al, s71RawInt, s72RawInt,
+				s81Int, s82Int, s83Int, s8ID, s81Al, s82Al, s83Al, s81RawInt, s82RawInt,
+				configurationSaved, restartDevice, temperatureUnit, hardwareErr
+			}
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects providing basic monitoring
+            and control of a product."
+    ::= { tcw210thMIBGroups 3 }	
+	
+tcw210thTrapGroup NOTIFICATION-GROUP
+    NOTIFICATIONS  {snmp-trap-notification}
+    STATUS  current
+    DESCRIPTION
+            "SNMP Trap Notification object."
+    ::= { tcw210thMIBGroups 4 }	
+
+	
+END

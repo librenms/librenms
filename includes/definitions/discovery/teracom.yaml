@@ -1,0 +1,531 @@
+mib: TERACOM-TCW210-TH-MIB:TERACOM-TCW220-MIB:TERACOM-TCW241-MIB:TERACOM-TCW242-MIB:TERACOM-TCW260-MIB
+modules:
+    os:
+        version:
+            - TERACOM-TCW210-TH-MIB::version.0
+            - TERACOM-TCW220-MIB::version.0
+            - TERACOM-TCW241-MIB::version.0
+            - TERACOM-TCW242-MIB::version.0
+            - TERACOM-TCW260-MIB::version.0
+        version_regex: '/(.*)?-(?<version>.+)?/'
+        hardware:
+            - TERACOM-TCW210-TH-MIB::version.0
+            - TERACOM-TCW220-MIB::version.0
+            - TERACOM-TCW241-MIB::version.0
+            - TERACOM-TCW242-MIB::version.0
+            - TERACOM-TCW260-MIB::version.0
+        hardware_regex: '/(?<hardware>.+)-(.*)?/'
+    sensors:
+        pre-cache:
+            data:
+                -
+                    oid:
+                        - voltage1description
+                        - voltage1max
+                        - voltage1min
+                        - voltage2description
+                        - voltage2max
+                        - voltage2min
+                        - voltage3description
+                        - voltage3max
+                        - voltage3min
+                        - voltage4description
+                        - voltage4max
+                        - voltage4min
+                        - digitalInput1description
+                        - digitalInput2description
+                        - digitalInput3description
+                        - digitalInput4description
+                        - relay1description
+                        - relay2description
+                        - relay3description
+                        - relay4description
+                        - voltage1Int
+                        - voltage2Int
+                        - voltage3Int
+                        - voltage4Int
+                        - s1description
+                        - s2description
+                        - s3description
+                        - s4description
+                        - s5description
+                        - s6description
+                        - s7description
+                        - s8description
+                        - s11Int
+                        - s12Int
+                        - s21Int
+                        - s22Int
+                        - s31Int
+                        - s32Int
+                        - s41Int
+                        - s42Int
+                        - s51Int
+                        - s52Int
+                        - s61Int
+                        - s62Int
+                        - s71Int
+                        - s72Int
+                        - s81Int
+                        - s82Int
+        state:
+            data:
+                -
+                    oid: hardwareErr
+                    value: hardwareErr
+                    num_oid: .1.3.6.1.4.1.38783.3.3.8.0
+                    descr: 'Hardware Error'
+                    index: '.hardwareErr0'
+                    state_name: hardwareErr
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: noErr }
+                        - { value: 1, generic: 1, graph: 0, descr: owErr }
+                        - { value: 2, generic: 2, graph: 0, descr: hwErr }
+                -
+                    oid: s11Al
+                    value: s11Al
+                    num_oid: .1.3.6.1.4.1.38783.3.3.1.1.4.1.0
+                    descr: s1description
+                    group: 'Sensor Inputs'
+                    index: 's11Al.0'
+                    state_name: s11Al
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: normal }
+                        - { value: 1, generic: 2, graph: 0, descr: alarm }
+                    skip_values:
+                        -
+                            oid: s11Int
+                            op: '<'
+                            value: 0
+                -
+                    oid: s12Al
+                    value: s12Al
+                    num_oid: .1.3.6.1.4.1.38783.3.3.1.1.4.2.0
+                    descr: s1description
+                    group: 'Sensor Inputs'
+                    index: 's12Al.0'
+                    state_name: s12Al
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: normal }
+                        - { value: 1, generic: 2, graph: 0, descr: alarm }
+                    skip_values:
+                        -
+                            oid: s12Int
+                            op: '<'
+                            value: 0
+                -
+                    oid: s21Al
+                    value: s21Al
+                    num_oid: .1.3.6.1.4.1.38783.3.3.1.2.4.1.0
+                    descr: s2description
+                    group: 'Sensor Inputs'
+                    index: 's21Al.0'
+                    state_name: s21Al
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: normal }
+                        - { value: 1, generic: 2, graph: 0, descr: alarm }
+                    skip_values:
+                        -
+                            oid: s21Int
+                            op: '<'
+                            value: 0
+                -
+                    oid: s22Al
+                    value: s22Al
+                    num_oid: .1.3.6.1.4.1.38783.3.3.1.2.4.2.0
+                    descr: s2description
+                    group: 'Sensor Inputs'
+                    index: 's22Al.0'
+                    state_name: s22Al
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: normal }
+                        - { value: 1, generic: 2, graph: 0, descr: alarm }
+                    skip_values:
+                        -
+                            oid: s22Int
+                            op: '<'
+                            value: 0
+                -
+                    oid: s31Al
+                    value: s31Al
+                    num_oid: .1.3.6.1.4.1.38783.3.3.1.3.4.1.0
+                    descr: s3description
+                    group: 'Sensor Inputs'
+                    index: 's31Al.0'
+                    state_name: s31Al
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: normal }
+                        - { value: 1, generic: 2, graph: 0, descr: alarm }
+                    skip_values:
+                        -
+                            oid: s31Int
+                            op: '<'
+                            value: 0
+                -
+                    oid: s32Al
+                    value: s32Al
+                    num_oid: .1.3.6.1.4.1.38783.3.3.1.3.4.2.0
+                    descr: s3description
+                    group: 'Sensor Inputs'
+                    index: 's32Al.0'
+                    state_name: s32Al
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: normal }
+                        - { value: 1, generic: 2, graph: 0, descr: alarm }
+                    skip_values:
+                        -
+                            oid: s32Int
+                            op: '<'
+                            value: 0 
+                -
+                    oid: s41Al
+                    value: s41Al
+                    num_oid: .1.3.6.1.4.1.38783.3.3.1.4.4.1.0
+                    descr: s4description
+                    group: 'Sensor Inputs'
+                    index: 's41Al.0'
+                    state_name: s41Al
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: normal }
+                        - { value: 1, generic: 2, graph: 0, descr: alarm }
+                    skip_values:
+                        -
+                            oid: s41Int
+                            op: '<'
+                            value: 0 
+                -
+                    oid: s42Al
+                    value: s42Al
+                    num_oid: .1.3.6.1.4.1.38783.3.3.1.4.4.2.0
+                    descr: s4description
+                    group: 'Sensor Inputs'
+                    index: 's42Al.0'
+                    state_name: s42Al
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: normal }
+                        - { value: 1, generic: 2, graph: 0, descr: alarm }
+                    skip_values:
+                        -
+                            oid: s42Int
+                            op: '<'
+                            value: 0
+                -
+                    oid: s51Al
+                    value: s51Al
+                    num_oid: .1.3.6.1.4.1.38783.3.3.1.5.4.1.0
+                    descr: s5description
+                    group: 'Sensor Inputs'
+                    index: 's51Al.0'
+                    state_name: s51Al
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: normal }
+                        - { value: 1, generic: 2, graph: 0, descr: alarm }
+                    skip_values:
+                        -
+                            oid: s51Int
+                            op: '<'
+                            value: 0
+                -
+                    oid: s52Al
+                    value: s52Al
+                    num_oid: .1.3.6.1.4.1.38783.3.3.1.5.4.2.0
+                    descr: s5description
+                    group: 'Sensor Inputs'
+                    index: 's52Al.0'
+                    state_name: s52Al
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: normal }
+                        - { value: 1, generic: 2, graph: 0, descr: alarm }
+                    skip_values:
+                        -
+                            oid: s52Int
+                            op: '<'
+                            value: 0
+                -
+                    oid: s61Al
+                    value: s61Al
+                    num_oid: .1.3.6.1.4.1.38783.3.3.1.6.4.1.0
+                    descr: s6description
+                    group: 'Sensor Inputs'
+                    index: 's61Al.0'
+                    state_name: s61Al
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: normal }
+                        - { value: 1, generic: 2, graph: 0, descr: alarm }
+                    skip_values:
+                        -
+                            oid: s61Int
+                            op: '<'
+                            value: 0
+                -
+                    oid: s62Al
+                    value: s62Al
+                    num_oid: .1.3.6.1.4.1.38783.3.3.1.6.4.2.0
+                    descr: s6description
+                    group: 'Sensor Inputs'
+                    index: 's62Al.0'
+                    state_name: s62Al
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: normal }
+                        - { value: 1, generic: 2, graph: 0, descr: alarm }
+                    skip_values:
+                        -
+                            oid: s62Int
+                            op: '<'
+                            value: 0
+                -
+                    oid: s71Al
+                    value: s71Al
+                    num_oid: .1.3.6.1.4.1.38783.3.3.1.7.4.1.0
+                    descr: s7description
+                    group: 'Sensor Inputs'
+                    index: 's71Al.0'
+                    state_name: s71Al
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: normal }
+                        - { value: 1, generic: 2, graph: 0, descr: alarm }
+                    skip_values:
+                        -
+                            oid: s71Int
+                            op: '<'
+                            value: 0
+                -
+                    oid: s72Al
+                    value: s72Al
+                    num_oid: .1.3.6.1.4.1.38783.3.3.1.7.4.2.0
+                    descr: s7description
+                    group: 'Sensor Inputs'
+                    index: 's72Al.0'
+                    state_name: s72Al
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: normal }
+                        - { value: 1, generic: 2, graph: 0, descr: alarm }
+                    skip_values:
+                        -
+                            oid: s72Int
+                            op: '<'
+                            value: 0
+                -
+                    oid: s81Al
+                    value: s81Al
+                    num_oid: .1.3.6.1.4.1.38783.3.3.1.8.4.1.0
+                    descr: s8description
+                    group: 'Sensor Inputs'
+                    index: 's81Al.0'
+                    state_name: s81Al
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: normal }
+                        - { value: 1, generic: 2, graph: 0, descr: alarm }
+                    skip_values:
+                        -
+                            oid: s81Int
+                            op: '<'
+                            value: 0
+                -
+                    oid: s82Al
+                    value: s82Al
+                    num_oid: .1.3.6.1.4.1.38783.3.3.1.8.4.2.0
+                    descr: s8description
+                    group: 'Sensor Inputs'
+                    index: 's82Al.0'
+                    state_name: s82Al
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: normal }
+                        - { value: 1, generic: 2, graph: 0, descr: alarm }
+                    skip_values:
+                        -
+                            oid: s82Int
+                            op: '<'
+                            value: 0
+                -
+                    oid: volt1Al
+                    value: volt1Al
+                    num_oid: .1.3.6.1.4.1.38783.3.3.2.5.1.0
+                    descr: voltage1description
+                    group: 'Analog Inputs'
+                    index: 'volt1Al.0'
+                    state_name: volt1Al
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: normal }
+                        - { value: 1, generic: 2, graph: 0, descr: alarm }
+                    skip_values:
+                        -
+                            oid: voltage1Int
+                            op: '<='
+                            value: '100'
+                -
+                    oid: volt2Al
+                    value: volt2Al
+                    num_oid: .1.3.6.1.4.1.38783.3.3.2.5.2.0
+                    descr: voltage2description
+                    group: 'Analog Inputs'
+                    index: 'volt2Al.0'
+                    state_name: volt2Al
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: normal }
+                        - { value: 1, generic: 2, graph: 0, descr: alarm }
+                    skip_values:
+                        -
+                            oid: voltage2Int
+                            op: '<='
+                            value: '100'
+                -
+                    oid: volt3Al
+                    value: volt3Al
+                    num_oid: .1.3.6.1.4.1.38783.3.3.2.5.3.0
+                    descr: voltage3description
+                    group: 'Analog Inputs'
+                    index: 'volt3Al.0'
+                    state_name: volt3Al
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: normal }
+                        - { value: 1, generic: 2, graph: 0, descr: alarm }
+                    skip_values:
+                        -
+                            oid: voltage3Int
+                            op: '<='
+                            value: '100'
+                -
+                    oid: volt4Al
+                    value: volt4Al
+                    num_oid: .1.3.6.1.4.1.38783.3.3.2.5.4.0
+                    descr: voltage4description
+                    group: 'Analog Inputs'
+                    index: 'volt4Al.0'
+                    state_name: volt4Al
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: normal }
+                        - { value: 1, generic: 2, graph: 0, descr: alarm }
+                    skip_values:
+                        -
+                            oid: voltage4Int
+                            op: '<='
+                            value: '100'
+                -
+                    oid: digitalInput1State
+                    value: digitalInput1State
+                    num_oid: .1.3.6.1.4.1.38783.3.3.3.1.0
+                    descr: digitalInput1description
+                    group: 'Digital Inputs'
+                    index: 'digitalInput1State.0'
+                    state_name: digitalInput1State
+                    states:
+                        - { value: 0, generic: 1, graph: 0, descr: closed }
+                        - { value: 1, generic: 0, graph: 0, descr: open }
+                -
+                    oid: digitalInput2State
+                    value: digitalInput2State
+                    num_oid: .1.3.6.1.4.1.38783.3.3.3.2.0
+                    descr: digitalInput2description
+                    group: 'Digital Inputs'
+                    index: 'digitalInput2State.0'
+                    state_name: digitalInput2State
+                    states:
+                        - { value: 0, generic: 1, graph: 0, descr: closed }
+                        - { value: 1, generic: 0, graph: 0, descr: open }
+                -
+                    oid: digitalInput3State
+                    value: digitalInput3State
+                    num_oid: .1.3.6.1.4.1.38783.3.3.3.3.0
+                    descr: digitalInput3description
+                    group: 'Digital Inputs'
+                    index: 'digitalInput3State.0'
+                    state_name: digitalInput3State
+                    states:
+                        - { value: 0, generic: 1, graph: 0, descr: closed }
+                        - { value: 1, generic: 0, graph: 0, descr: open }
+                -
+                    oid: digitalInput4State
+                    value: digitalInput4State
+                    num_oid: .1.3.6.1.4.1.38783.3.3.3.4.0
+                    descr: digitalInput4description
+                    group: 'Digital Inputs'
+                    index: 'digitalInput4State.0'
+                    state_name: digitalInput4State
+                    states:
+                        - { value: 0, generic: 1, graph: 0, descr: closed }
+                        - { value: 1, generic: 0, graph: 0, descr: open }
+                -
+                    oid: relay1State
+                    value: relay1State
+                    num_oid: .1.3.6.1.4.1.38783.3.3.4.1.1.0
+                    descr: relay1description
+                    group: 'Relays'
+                    index: 'relay1State.0'
+                    state_name: relay1State
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: off }
+                        - { value: 1, generic: 0, graph: 0, descr: on }
+                -
+                    oid: relay2State
+                    value: relay2State
+                    num_oid: .1.3.6.1.4.1.38783.3.3.4.2.1.0
+                    descr: relay2description
+                    group: 'Relays'
+                    index: 'relay2State.0'
+                    state_name: relay2State
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: off }
+                        - { value: 1, generic: 0, graph: 0, descr: on }
+                -
+                    oid: relay3State
+                    value: relay3State
+                    num_oid: .1.3.6.1.4.1.38783.3.3.4.3.1.0
+                    descr: relay3description
+                    group: 'Relays'
+                    index: 'relay3State.0'
+                    state_name: relay3State
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: off }
+                        - { value: 1, generic: 0, graph: 0, descr: on }
+                -
+                    oid: relay4State
+                    value: relay4State
+                    num_oid: .1.3.6.1.4.1.38783.3.3.4.4.1.0
+                    descr: relay4description
+                    group: 'Relays'
+                    index: 'relay4State.0'
+                    state_name: relay4State
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: off }
+                        - { value: 1, generic: 0, graph: 0, descr: on }
+        voltage:
+            options:
+                skip_value_lt: 100
+            data:
+                -
+                    oid: voltage1Int
+                    value: voltage1Int
+                    num_oid: .1.3.6.1.4.1.38783.3.3.2.1.0
+                    divisor: 1000
+                    descr: voltage1description
+                    index: 'voltage1Int.0'
+                    high_limit: voltage1max
+                    low_limit: voltage1min
+                -
+                    oid: voltage2Int
+                    value: voltage2Int
+                    num_oid: .1.3.6.1.4.1.38783.3.3.2.2.0
+                    divisor: 1000
+                    descr: voltage2description
+                    index: 'voltage2Int.0'
+                    high_limit: voltage2max
+                    low_limit: voltage2min
+                -
+                    oid: voltage3Int
+                    value: voltage3Int
+                    num_oid: .1.3.6.1.4.1.38783.3.3.2.3.0
+                    divisor: 1000
+                    descr: voltage3description
+                    index: 'voltage3Int.0'
+                    high_limit: voltage3max
+                    low_limit: voltage3min
+                -
+                    oid: voltage4Int
+                    value: voltage4Int
+                    num_oid: .1.3.6.1.4.1.38783.3.3.2.4.0
+                    divisor: 1000
+                    descr: voltage4description
+                    index: 'voltage4Int.0'
+                    high_limit: voltage4max
+                    low_limit: voltage4min
