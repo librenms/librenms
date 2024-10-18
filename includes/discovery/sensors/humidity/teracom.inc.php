@@ -54,7 +54,7 @@ if (Arr::exists($teracom_devices, $device['hardware'])) {
         }
     }
 
-    foreach($teracom_data as $t_sensor => $t_data) {
+    foreach ($teracom_data as $t_sensor => $t_data) {
         if (Str::contains($t_data['description'], [':TSH2'])) {
             // This is the only sensor that can be attached. Description doesn't contain them if no sensor attached.
             $divisor = 1000;

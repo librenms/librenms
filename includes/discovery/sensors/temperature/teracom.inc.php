@@ -55,7 +55,7 @@ if (Arr::exists($teracom_devices, $device['hardware'])) {
         }
     }
 
-    foreach($teracom_data as $t_sensor => $t_data) {
+    foreach ($teracom_data as $t_sensor => $t_data) {
         if (Str::contains($t_data['description'], [':TST1', ':TSH2'])) {
             // These are the two sensors that can be attached. Description doesn't contain them if no sensor attached.
             $divisor = 1000;
@@ -64,7 +64,7 @@ if (Arr::exists($teracom_devices, $device['hardware'])) {
             $high_limit = ($teracom_temp_value == 1) ? fahrenheit_to_celsius($t_data[1]['MAXInt']) : $t_data[1]['MAXInt'];
             $low_limit = ($teracom_temp_value == 1) ? fahrenheit_to_celsius($t_data[1]['MINInt']) : $t_data[1]['MINInt'];
             $current = $t_data[1]['Int'];
-            $temp_func = ($teracom_temp_value == 1) ? "fahrenheit_to_celsius" : null;
+            $temp_func = ($teracom_temp_value == 1) ? 'fahrenheit_to_celsius' : null;
 
             discover_sensor(null, 'temperature', $device, $oid, $index, 'teracom', $t_data['description'], $divisor, '1', $low_limit, null, null, $high_limit, $current, 'snmp', null, null, $temp_func);
         }
