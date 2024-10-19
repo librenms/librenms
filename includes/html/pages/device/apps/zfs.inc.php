@@ -30,7 +30,7 @@ foreach ($pools as $index => $pool) {
 }
 
 if (isset($vars['pool']) && isset($status_info[$vars['pool']])) {
-    echo '<hr><tt>' . str_replace(' ', '&nbsp;', str_replace("\n", "<br>", htmlspecialchars($status_info[$vars['pool']]))) . "</tt>\n";
+    echo '<hr><tt>' . str_replace(' ', '&nbsp;', str_replace("\n", '<br>', htmlspecialchars($status_info[$vars['pool']]))) . "</tt>\n";
 }
 
 print_optionbar_end();
@@ -97,7 +97,7 @@ foreach ($graphs as $key => $text) {
     $graph_type = $key;
     $graph_array['height'] = '100';
     $graph_array['width'] = '215';
-    $graph_array['to'] = \LibreNMS\Config::get('time.now');
+    $graph_array['to'] = LibreNMS\Config::get('time.now');
     $graph_array['id'] = $app['app_id'];
     $graph_array['type'] = 'application_' . $key;
 
