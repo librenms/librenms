@@ -25,7 +25,6 @@
 
 namespace App\Http\Controllers\Device\Tabs;
 
-use App\Facades\DeviceCache;
 use App\Models\Device;
 use Illuminate\Http\Request;
 use LibreNMS\Interfaces\UI\DeviceTab;
@@ -35,7 +34,7 @@ class QosController implements DeviceTab
     public function visible(Device $device): bool
     {
         if ($device->os == 'routeros') {
-            return ($device->components->where('type', 'RouterOS-SimpleQueue')->count() > 0);
+            return $device->components->where('type', 'RouterOS-SimpleQueue')->count() > 0;
         } else {
             return false;
         }

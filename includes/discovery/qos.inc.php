@@ -11,7 +11,8 @@
  * the source code distribution for details.
  */
 
-function syncQueues(int $device_id, string $module, array $snmpQueues, string $idPrefName) {
+function syncQueues(int $device_id, string $module, array $snmpQueues, string $idPrefName)
+{
     // Fetch all compunents for this device
     $component = new LibreNMS\Component();
     $dbQueueArray = $component->getComponents($device_id, ['type' => $module]);
@@ -60,7 +61,8 @@ function syncQueues(int $device_id, string $module, array $snmpQueues, string $i
     echo "\n";
 }
 
-function discoverRouterosQueueTree(array $device) {
+function discoverRouterosQueueTree(array $device)
+{
     // Keep track of queues so we can sync at the end
     $snmpQueues = [];
 
@@ -74,6 +76,7 @@ function discoverRouterosQueueTree(array $device) {
      */
     if (is_null($queueNames) || is_null($queueMarks) || is_null($queueParents)) {
         echo "Error fetching RouterOS queue tree data\n";
+
         return;
     }
 
@@ -93,7 +96,8 @@ function discoverRouterosQueueTree(array $device) {
     syncQueues($device['device_id'], 'RouterOS-QueueTree', $snmpQueues, 'qt-name');
 }
 
-function discoverRouterosSimpleQueue(array $device) {
+function discoverRouterosSimpleQueue(array $device)
+{
     // Keep track of queues so we can sync at the end
     $snmpQueues = [];
 

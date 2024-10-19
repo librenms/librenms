@@ -27,7 +27,7 @@ class QosPort extends Component
         public Collection $deviceGraphs,
     ) {
         if ($device['os'] == 'routeros') {
-            $this->graphType = 'port_qos_routeros'; // 
+            $this->graphType = 'port_qos_routeros';
             $this->titlePrefName = 'qt-name';
             $this->graphidPrefName = 'qt-name';
             $this->qosidPrefName = 'qt-id';
