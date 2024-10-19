@@ -18,7 +18,7 @@ function syncQueues(int $device_id, string $module, array $snmpQueues, string $i
     $dbQueues = $dbQueueArray[$device_id];
 
     if (! is_null($dbQueues)) {
-        d_echo(count($dbQueues) . " existing simple queues found:\n");
+        d_echo(count($dbQueues) . " existing queues found in DB\n");
     }
 
     // Add any missing queues to the DB, keeping track of all db positions we used
@@ -61,8 +61,6 @@ function syncQueues(int $device_id, string $module, array $snmpQueues, string $i
 }
 
 function discoverRouterosQueueTree(array $device) {
-    $module = 'RouterOS-QueueTree';
-
     // Keep track of queues so we can sync at the end
     $snmpQueues = [];
 
@@ -87,26 +85,15 @@ function discoverRouterosQueueTree(array $device) {
         $snmpQueues[$qtid]['qt-mark'] = $queueMarks['1.3.6.1.4.1.14988.1.1.2.2.1.3'][$qtid];
         $snmpQueues[$qtid]['qt-parent'] = $queueParents['1.3.6.1.4.1.14988.1.1.2.2.1.4'][$qtid];
 
-        d_echo("\nQueue Tree" . $sqid . " name: " . $sqname . "\n");
-        d_echo("Packet Mark: " . $queueMarks['1.3.6.1.4.1.14988.1.1.2.2.1.3'][$qtid] . "\n");
-        d_echo("Parent     : " . $queueParents['1.3.6.1.4.1.14988.1.1.2.2.1.4'][$qtid] . "\n");
+        d_echo("\nQueue Tree" . $sqid . ' name: ' . $sqname . "\n");
+        d_echo('Packet Mark: ' . $queueMarks['1.3.6.1.4.1.14988.1.1.2.2.1.3'][$qtid] . "\n");
+        d_echo('Parent     : ' . $queueParents['1.3.6.1.4.1.14988.1.1.2.2.1.4'][$qtid] . "\n");
     }
 
-    syncQueues($device['device_id'], $module, $snmpQueues, 'qt-id');
+    syncQueues($device['device_id'], 'RouterOS-QueueTree', $snmpQueues, 'qt-name');
 }
 
 function discoverRouterosSimpleQueue(array $device) {
-    $module = 'RouterOS-SimpleQueue';
-
-    // Fetch all compunents for this device
-    $component = new LibreNMS\Component();
-    $dbQueueArray = $component->getComponents($device['device_id'], ['type' => $module]);
-    $dbQueues = $dbQueueArray[$device['device_id']];
-
-    if (! is_null($dbQueues)) {
-        d_echo(count($dbQueues) . " existing simple queues found:\n");
-    }
-
     // Keep track of queues so we can sync at the end
     $snmpQueues = [];
 
@@ -127,10 +114,10 @@ function discoverRouterosSimpleQueue(array $device) {
         $snmpQueues[$sqid]['sq-id'] = strval($sqid);
         $snmpQueues[$sqid]['sq-name'] = $sqname;
 
-        d_echo("\nSimple Queue " . $sqid . " name: " . $sqname . "\n");
+        d_echo("\nSimple Queue " . $sqid . ' name: ' . $sqname . "\n");
     }
 
-    syncQueues($device['device_id'], $module, $snmpQueues, 'qt-id');
+    syncQueues($device['device_id'], 'RouterOS-SimpleQueue', $snmpQueues, 'sq-name');
 }
 
 if ($device['os'] == 'routeros') {

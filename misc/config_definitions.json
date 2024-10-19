@@ -5227,6 +5227,13 @@
             "default": true,
             "type": "boolean"
         },
+        "poller_modules.qos": {
+            "order": 350,
+            "group": "poller",
+            "section": "poller_modules",
+            "default": true,
+            "type": "boolean"
+        },
         "poller_modules.sensors": {
             "order": 360,
             "group": "poller",
