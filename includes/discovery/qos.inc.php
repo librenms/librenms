@@ -109,6 +109,7 @@ function discoverRouterosSimpleQueue(array $device)
      */
     if (is_null($queueNames)) {
         echo "Error fetching RouterOS simple queue data\n";
+
         return;
     }
 

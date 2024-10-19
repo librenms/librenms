@@ -136,8 +136,8 @@ if (count($components) > 0) {
 if ($device['os'] == 'routeros') {
     $qoscomponents = $component->getComponents($device['device_id'], ['filter' => ['type' => ['=', 'RouterOS-QueueTree']]]);
     $qoscomponents = $qoscomponents[$device['device_id']] ?? [];
-    if (count(array_filter($qoscomponents, function($qos) use ($port) {
-        return ($qos['qt-parent'] == strval($port->ifIndex));
+    if (count(array_filter($qoscomponents, function ($qos) use ($port) {
+        return $qos['qt-parent'] == strval($port->ifIndex);
     })) > 0) {
         $menu_options['qos'] = 'QoS';
     }
