@@ -235,6 +235,7 @@ $rrd_def_gauge = RrdDefinition::make()
 $gauges_to_check_for = [
     'asyncq_read_a',
     'asyncq_read_p',
+    'asyncq_wait_r',
     'asyncq_wait_w',
     'asyncq_write_a',
     'asyncq_write_p',

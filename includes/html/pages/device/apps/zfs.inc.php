@@ -42,10 +42,12 @@ if (isset($vars['pool'])) {
         'zfs_pool_frag' => 'Pool Fragmentation',
     ];
     if ($version >= 2) {
+        $graphs['zfs_pool_errors'] = 'Pool Errors';
         $graphs['zfs_pool_operations'] = 'Pool Operations';
         $graphs['zfs_pool_bandwidth'] = 'Pool Bandwidth';
         $graphs['zfs_pool_total_wait'] = 'Pool Total Wait';
         $graphs['zfs_pool_disk_wait'] = 'Pool Disk Wait';
+        $graphs['zfs_pool_syncq_wait'] = 'Pool SyncQ Wait';
         $graphs['zfs_pool_asyncq_wait'] = 'Pool AsyncQ Wait';
         $graphs['zfs_pool_scrub_wait'] = 'Pool Scrub Wait';
         $graphs['zfs_pool_trim_wait'] = 'Pool Trim Wait';
