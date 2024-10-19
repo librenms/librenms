@@ -688,6 +688,10 @@ return [
                 'description' => 'Processors',
             ],
 
+            'qos' => [
+                'description' => 'QoS',
+            ],
+
             'route' => [
                 'description' => 'Route',
             ],
