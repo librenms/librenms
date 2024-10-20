@@ -599,7 +599,7 @@
                     "app_type": "zfs"
                 },
                 {
-                    "metric": "pool_arc_asyncq_wait_p",
+                    "metric": "pool_arc_asyncq_write_p",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "zfs"
@@ -625,6 +625,18 @@
                 {
                     "metric": "pool_arc_dedup",
                     "value": 1,
+                    "value_prev": null,
+                    "app_type": "zfs"
+                },
+                {
+                    "metric": "pool_arc_disk_wait_r",
+                    "value": 18242723,
+                    "value_prev": null,
+                    "app_type": "zfs"
+                },
+                {
+                    "metric": "pool_arc_disk_wait_w",
+                    "value": 9848678,
                     "value_prev": null,
                     "app_type": "zfs"
                 },
