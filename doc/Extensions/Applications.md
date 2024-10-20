@@ -3614,10 +3614,10 @@ The default for `pubkey_resolvers` is
 1: Install the depends.
 ```
 ### FreeBSD
-pkg install p5-JSON p5-MIME-Base64 p5-Gzip-Faster p5-File-Slurp
+pkg install p5-JSON p5-MIME-Base64 p5-File-Slurp
+
 ### Debian
-apt-get install -y cpanminus zlib1g-dev
-cpanm Mime::Base64 JSON Gzip::Faster
+apt-get install -y libjson-perl libmime-base64-perl libfile-slurp-perl
 ```
 
 2: Fetch the script in question and make it executable.
@@ -3626,7 +3626,8 @@ wget https://github.com/librenms/librenms-agent/raw/master/snmp/zfs -O /etc/snmp
 chmod +x /etc/snmp/zfs
 ```
 
-3: Add the following to snmpd.conf and restart snmpd.
+3: Add the following to snmpd.conf and restart snmpd. If `-s`, passed
+as a arg, status is returned for display.
 ```
-extend zfs /etc/snmp/zfs
+extend zfs /etc/snmp/zfs -b
 ```
