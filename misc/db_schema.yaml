@@ -1936,6 +1936,8 @@ qos:
     - { Field: title, Type: varchar(255), 'Null': false, Extra: '' }
     - { Field: snmp_idx, Type: varchar(255), 'Null': false, Extra: '' }
     - { Field: rrd_id, Type: varchar(255), 'Null': false, Extra: '' }
+    - { Field: ingress, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
+    - { Field: egress, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
     - { Field: disabled, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
     - { Field: ignore, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
     - { Field: last_polled, Type: bigint, 'Null': true, Extra: '' }
