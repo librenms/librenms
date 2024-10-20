@@ -659,6 +659,36 @@
                     "app_type": "zfs"
                 },
                 {
+                    "metric": "pool_arc_operations_r",
+                    "value": 1598220898304,
+                    "value_prev": null,
+                    "app_type": "zfs"
+                },
+                {
+                    "metric": "pool_arc_operations_w",
+                    "value": 6,
+                    "value_prev": null,
+                    "app_type": "zfs"
+                },
+                {
+                    "metric": "pool_arc_scrub_wait",
+                    "value": 10815869,
+                    "value_prev": null,
+                    "app_type": "zfs"
+                },
+                {
+                    "metric": "pool_arc_scrubq_read_a",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "zfs"
+                },
+                {
+                    "metric": "pool_arc_scrubq_read_p",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "zfs"
+                },
+                {
                     "metric": "pool_arc_size",
                     "value": 15942918602752,
                     "value_prev": null,
