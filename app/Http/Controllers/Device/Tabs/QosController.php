@@ -27,7 +27,6 @@ namespace App\Http\Controllers\Device\Tabs;
 
 use App\Models\Device;
 use Illuminate\Http\Request;
-use Illuminate\Routing\Route;
 use LibreNMS\Interfaces\UI\DeviceTab;
 
 class QosController implements DeviceTab
@@ -57,7 +56,9 @@ class QosController implements DeviceTab
         $show = null;
         $vars = $request->vars;
         if ($vars) {
-            $showvars = array_filter(explode('/', $vars), function($v) { return str_starts_with($v, 'show='); });
+            $showvars = array_filter(explode('/', $vars), function($v) {
+                return str_starts_with($v, 'show=');
+            });
             if ($showvars) {
                 $showvar = explode('=', $showvars[0]);
                 $show = array_pop($showvar);
@@ -66,7 +67,7 @@ class QosController implements DeviceTab
                 }
             }
         }
-        
+
         return [
             'show' => $show,
         ];
