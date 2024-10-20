@@ -9,7 +9,7 @@ use Illuminate\View\Component;
 
 class Qos extends Component
 {
-    public App\Models\Qos|null $qosGraph = null;
+    public \App\Models\Qos|null $qosGraph = null;
     public string $typePrefix;
 
     /**
