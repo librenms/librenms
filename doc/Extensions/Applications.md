@@ -1107,7 +1107,7 @@ log that the size will be checked for and reported via the stat
 
 ```JSON
 {
-    auto: 0,
+    "auto": 0,
     "access":{
         "foo":"/var/log/www/foo.log",
         "bar:80":"/var/log/www/bar:80.log"
