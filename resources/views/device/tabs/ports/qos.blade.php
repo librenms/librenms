@@ -1,1 +1,1 @@
-<x-qos_port :device="$device" :parentId="$port_ifindex" :portId="$port_id" />
+<x-qos :qos_items="$port->device->qos" :portId="$port->port_id" :show="$show" />

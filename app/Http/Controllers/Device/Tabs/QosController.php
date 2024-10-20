@@ -27,17 +27,14 @@ namespace App\Http\Controllers\Device\Tabs;
 
 use App\Models\Device;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Route;
 use LibreNMS\Interfaces\UI\DeviceTab;
 
 class QosController implements DeviceTab
 {
     public function visible(Device $device): bool
     {
-        if ($device->os == 'routeros') {
-            return $device->components->where('type', 'RouterOS-SimpleQueue')->count() > 0;
-        } else {
-            return false;
-        }
+        return $device->qos()->count() > 0;
     }
 
     public function slug(): string
@@ -57,6 +54,21 @@ class QosController implements DeviceTab
 
     public function data(Device $device, Request $request): array
     {
-        return [];
+        $show = null;
+        $vars = $request->vars;
+        if ($vars) {
+            $showvars = array_filter(explode('/', $vars), function($v) { return str_starts_with($v, 'show='); });
+            if ($showvars) {
+                $showvar = explode('=', $showvars[0]);
+                $show = array_pop($showvar);
+                if ($show) {
+                    $show = intval($show);
+                }
+            }
+        }
+        
+        return [
+            'show' => $show,
+        ];
     }
 }

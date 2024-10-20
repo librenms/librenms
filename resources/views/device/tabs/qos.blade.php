@@ -1,5 +1,5 @@
 @extends('device.index')
 
 @section('tab')
-<x-qos_device :device="$device" />
+<x-qos :qosItems="$device->qos->whereNull('port_id')" :show="$data['show']" />
 @endsection
