@@ -23,7 +23,7 @@
                     "app_state_prev": "UNKNOWN",
                     "app_status": "",
                     "app_instance": "",
-                    "data": "{\"pools\":[\"arc\"],\"health\":1,\"l2_errors\":0}",
+                    "data": "{\"pools\":[\"arc\"],\"health\":1,\"version\":3,\"l2_errors\":0,\"status_info\":[]}",
                     "deleted_at": null
                 }
             ],
@@ -571,6 +571,48 @@
                 {
                     "metric": "pool_arc_alloc",
                     "value": 14344697704448,
+                    "value_prev": null,
+                    "app_type": "zfs"
+                },
+                {
+                    "metric": "pool_arc_asyncq_read_a",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "zfs"
+                },
+                {
+                    "metric": "pool_arc_asyncq_read_p",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "zfs"
+                },
+                {
+                    "metric": "pool_arc_asyncq_wait_w",
+                    "value": 17281,
+                    "value_prev": null,
+                    "app_type": "zfs"
+                },
+                {
+                    "metric": "pool_arc_asyncq_write_a",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "zfs"
+                },
+                {
+                    "metric": "pool_arc_asyncq_wait_p",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "zfs"
+                },
+                {
+                    "metric": "pool_arc_bandwidth_r",
+                    "value": 2,
+                    "value_prev": null,
+                    "app_type": "zfs"
+                },
+                {
+                    "metric": "pool_arc_bandwidth_w",
+                    "value": 38581,
                     "value_prev": null,
                     "app_type": "zfs"
                 },
