@@ -97,7 +97,7 @@
     var edge_nodes_map = [];
     var node_device_map = {};
     var custom_image_base = "{{ $base_url }}images/custommap/icons/";
-    var network_options = {{ Js::from($map_conf) }}
+    var network_options = {{ Js::from($map_conf) }};
 
     function edgeNodesRemove(nm_id, edgeid) {
         // Remove old item from map if it exists
@@ -525,10 +525,11 @@
         // Re-create the network because network.setSize() blanks out the map
         CreateNetwork();
 
-        editMapCancel();
+        $('#mapModal').modal('hide');
     }
 
     function editMapCancel() {
+        mapSettingsReset();
         $('#mapModal').modal('hide');
     }
 
