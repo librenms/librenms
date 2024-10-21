@@ -1510,6 +1510,13 @@
             "default": true,
             "type": "boolean"
         },
+        "discovery_modules.qos": {
+            "order": 260,
+            "group": "discovery",
+            "section": "discovery_modules",
+            "default": true,
+            "type": "boolean"
+        },
         "discovery_modules.route": {
             "order": 270,
             "group": "discovery",
@@ -5122,6 +5129,13 @@
         },
         "poller_modules.ipmi": {
             "order": 210,
+            "group": "poller",
+            "section": "poller_modules",
+            "default": true,
+            "type": "boolean"
+        },
+        "poller_modules.qos": {
+            "order": 350,
             "group": "poller",
             "section": "poller_modules",
             "default": true,

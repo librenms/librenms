@@ -686,6 +686,10 @@ return [
                 'description' => 'Processors',
             ],
 
+            'qos' => [
+                'description' => 'QoS',
+            ],
+
             'route' => [
                 'description' => 'Route',
             ],
@@ -1268,6 +1272,9 @@ return [
             ],
             'ipmi' => [
                 'description' => 'IPMI',
+            ],
+            'qos' => [
+                'description' => 'QoS',
             ],
             'sensors' => [
                 'description' => 'Sensors',
