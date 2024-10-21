@@ -606,10 +606,10 @@ class Routeros extends OS implements
                     }
                     d_echo('Updating queue tree ' . $thisQos->rrd_id . "\n");
                     $thisQos->last_polled = $poll_time;
-                    $thisQos->last_traffic_in = $treeBytes[$thisQos->snmp_idx]['MIKROTIK-MIB::mtxrQueueTreeHCBytes'];
-                    $thisQos->last_traffic_out = null;
-                    $thisQos->last_drop_in = $treeDrops[$thisQos->snmp_idx]['MIKROTIK-MIB::mtxrQueueTreeDropped'];
-                    $thisQos->last_drop_out = null;
+                    $thisQos->last_traffic_in = null;
+                    $thisQos->last_traffic_out = $treeBytes[$thisQos->snmp_idx]['MIKROTIK-MIB::mtxrQueueTreeHCBytes'];
+                    $thisQos->last_drop_in = null;
+                    $thisQos->last_drop_out = $treeDrops[$thisQos->snmp_idx]['MIKROTIK-MIB::mtxrQueueTreeDropped'];
                     break;
                 case 'routeros_simple':
                     if (! array_key_exists($thisQos->snmp_idx, $simpleNames)) {
