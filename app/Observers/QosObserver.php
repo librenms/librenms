@@ -43,8 +43,6 @@ class QosObserver
             return null;
         }
 
-        echo("calcRate ($val - $lastval) / $interval\n");
-
         return intval(($val - $lastval) / $interval);
     }
 }
