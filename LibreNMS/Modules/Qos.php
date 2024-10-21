@@ -93,15 +93,7 @@ class Qos implements Module
 
                 // Update RRD and set data rates
                 foreach ($qos as $thisQos) {
-                    $poll_interval = $thisQos->getOriginal('last_polled') - $thisQos->last_polled;
-                    if ($poll_interval > 0) {
-                        $thisQos->traffic_out_rate = $this->calcRate($thisQos->last_traffic_out, $thisQos->getOriginal('last_traffic_out'), $poll_interval);
-                        $thisQos->traffic_in_rate = $this->calcRate($thisQos->last_traffic_in, $thisQos->getOriginal('last_traffic_in'), $poll_interval);
-                        $thisQos->drop_out_rate = $this->calcRate($thisQos->last_drop_out, $thisQos->getOriginal('last_drop_out'), $poll_interval);
-                        $thisQos->drop_in_rate = $this->calcRate($thisQos->last_drop_in, $thisQos->getOriginal('last_drop_in'), $poll_interval);
-                    }
-
-                    // TODO: per-type update
+                    // Generate RRD config for each graph type
                     switch ($thisQos->type) {
                         case 'routeros_simple':
                             $rrd_name = ['routeros-simplequeue', $thisQos->rrd_id];
@@ -129,6 +121,8 @@ class Qos implements Module
                             break;
                         default:
                             $rrd_name = null;
+                            $rrd_data = null;
+                            $rrd_def = null;
                             echo 'Queue type |' . $thisQos->type . "| has not been implmeneted in LibreNMS/Modules/Qos.php\n";
                     }
                     if (! is_null($rrd_name)) {
