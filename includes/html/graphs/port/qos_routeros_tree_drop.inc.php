@@ -2,8 +2,8 @@
 
 $rrd_filename = Rrd::name($device['hostname'], ['routeros-queuetree', $vars['rrd_id']]);
 
-$colour_area = '9999cc';
-$colour_line = '0000cc';
+$colour_area = 'FF8888';
+$colour_line = '880000';
 
 $ds = 'dropbytes';
 
