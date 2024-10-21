@@ -18,6 +18,7 @@ class QosTree extends Component
         public Collection $qosItems,
         public int|null $parentPortId = null,
         public int|null $parentQosId = null,
+        public int|null $show = null,
     ) {
         if (! is_null($parentQosId)) {
             $this->listItems = $qosItems->where('parent_id', $parentQosId);

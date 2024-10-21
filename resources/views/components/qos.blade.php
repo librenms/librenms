@@ -4,7 +4,7 @@
 @if($qosIngress->count() == 0)
     <div><i>No Policies</i></div>
 @else
-    <x-qos-tree :qosItems="$qosIngress" :parentPortId="$portId" />
+    <x-qos-tree :qosItems="$qosIngress" :parentPortId="$portId" :show="$show" />
 @endif
     </div>
 </div>
@@ -15,7 +15,7 @@
 @if($qosEgress->count() == 0)
     <div><i>No Policies</i></div>
 @else
-    <x-qos-tree :qosItems="$qosEgress" :parentPortId="$portId" />
+    <x-qos-tree :qosItems="$qosEgress" :parentPortId="$portId" :show="$show" />
 @endif
     </div>
 </div>
