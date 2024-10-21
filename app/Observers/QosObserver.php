@@ -27,6 +27,10 @@ class QosObserver
 
     private function calcRate(int|null $val, int|null $lastval, int $interval): int|null
     {
+        if (is_null($val)) {
+            return null;
+        }
+
         if ($interval <= 0) {
             return null;
         }
