@@ -29,9 +29,9 @@
 @if($qosGraph)
 @php
 if ($qosGraph->type == 'routeros_tree') {
-    $graphs = ['_traffic' => 'Transmitted', '_drop' => 'Dropped'];
+    $graphs = ['_traffic' => __('Traffic'), '_drop' => __('Dropped Packets')];
 } elseif ($qosGraph->type == 'routeros_simple') {
-    $graphs = ['_traffic' => 'Transmitted', '_drop' => 'Dropped'];
+    $graphs = ['_traffic' => __('Traffic'), '_drop' => __('Dropped Packets')];
 } else {
     $graphs = [];
 }

@@ -5,7 +5,7 @@ $rrd_filename = Rrd::name($device['hostname'], ['routeros-queuetree', $vars['rrd
 $colour_area = '90b040';
 $colour_line = '7A9C35';
 
-$ds = 'sentbytes';
+$ds = 'bytes';
 
 $multiplier = 8;
 

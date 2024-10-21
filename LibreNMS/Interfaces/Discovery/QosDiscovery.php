@@ -32,7 +32,7 @@ interface QosDiscovery
     /**
      * Discover QoS queues
      *
-     * @return Collection<int, \App\Models\Qos>
+     * @return Collection
      */
     public function discoverQos(): Collection;
 

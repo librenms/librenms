@@ -19,8 +19,12 @@ class QosObserver
             if ($poll_interval > 0) {
                 $qos->traffic_out_rate = $this->calcRate($qos->last_traffic_out, $qos->getOriginal('last_traffic_out'), $poll_interval);
                 $qos->traffic_in_rate = $this->calcRate($qos->last_traffic_in, $qos->getOriginal('last_traffic_in'), $poll_interval);
-                $qos->drop_out_rate = $this->calcRate($qos->last_drop_out, $qos->getOriginal('last_drop_out'), $poll_interval);
-                $qos->drop_in_rate = $this->calcRate($qos->last_drop_in, $qos->getOriginal('last_drop_in'), $poll_interval);
+                $qos->traffic_drop_out_rate = $this->calcRate($qos->last_traffic_drop_out, $qos->getOriginal('last_traffic_drop_out'), $poll_interval);
+                $qos->traffic_drop_in_rate = $this->calcRate($qos->last_traffic_drop_in, $qos->getOriginal('last_traffic_drop_in'), $poll_interval);
+                $qos->packet_out_rate = $this->calcRate($qos->last_packet_out, $qos->getOriginal('last_packet_out'), $poll_interval);
+                $qos->packet_in_rate = $this->calcRate($qos->last_packet_in, $qos->getOriginal('last_packet_in'), $poll_interval);
+                $qos->packet_drop_out_rate = $this->calcRate($qos->last_packet_drop_out, $qos->getOriginal('last_packet_drop_out'), $poll_interval);
+                $qos->packet_drop_in_rate = $this->calcRate($qos->last_packet_drop_in, $qos->getOriginal('last_packet_drop_in'), $poll_interval);
             }
         }
     }
@@ -38,6 +42,8 @@ class QosObserver
         if ($lastval > $val) {
             return null;
         }
+
+        echo("calcRate ($val - $lastval) / $interval\n");
 
         return intval(($val - $lastval) / $interval);
     }

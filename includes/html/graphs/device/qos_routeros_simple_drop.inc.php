@@ -2,9 +2,14 @@
 
 $rrd_filename = Rrd::name($device['hostname'], ['routeros-simplequeue', $vars['rrd_id']]);
 
-$ds_in = 'dropbytesin';
-$ds_out = 'dropbytesout';
+$colour_area_in = 'FF8888';
+$colour_line_in = '880000';
+$colour_area_out = 'FFE48F';
+$colour_line_out = 'B68A00';
 
-$multiplier = 8;
+$ds_in = 'droppacketsin';
+$ds_out = 'droppacketsout';
 
-require 'includes/html/graphs/generic_data.inc.php';
+$unit_text = 'packets/s';
+
+require 'includes/html/graphs/generic_duplex.inc.php';

@@ -585,11 +585,16 @@ class Routeros extends OS implements
         $poll_time = time();
         $treeNames = \SnmpQuery::walk('MIKROTIK-MIB::mtxrQueueTreeName')->table(1);
         $treeBytes = \SnmpQuery::walk('MIKROTIK-MIB::mtxrQueueTreeHCBytes')->table(1);
+        // Packet counters are not updating
+        //$treePackets = \SnmpQuery::walk('MIKROTIK-MIB::mtxrQueueTreePackets')->table(1);
         $treeDrops = \SnmpQuery::walk('MIKROTIK-MIB::mtxrQueueTreeDropped')->table(1);
 
         $simpleNames = \SnmpQuery::walk('MIKROTIK-MIB::mtxrQueueSimpleName')->table(1);
         $simpleBytesIn = \SnmpQuery::walk('MIKROTIK-MIB::mtxrQueueSimpleBytesIn')->table(1);
         $simpleBytesOut = \SnmpQuery::walk('MIKROTIK-MIB::mtxrQueueSimpleBytesOut')->table(1);
+        // Packet counters are not updating
+        //$simplePacketsIn = \SnmpQuery::walk('MIKROTIK-MIB::mtxrQueueSimplePacketsIn')->table(1);
+        //$simplePacketsOut = \SnmpQuery::walk('MIKROTIK-MIB::mtxrQueueSimplePacketsOut')->table(1);
         $simpleDropsIn = \SnmpQuery::walk('MIKROTIK-MIB::mtxrQueueSimpleDroppedIn')->table(1);
         $simpleDropsOut = \SnmpQuery::walk('MIKROTIK-MIB::mtxrQueueSimpleDroppedOut')->table(1);
 
@@ -608,8 +613,14 @@ class Routeros extends OS implements
                     $thisQos->last_polled = $poll_time;
                     $thisQos->last_traffic_in = null;
                     $thisQos->last_traffic_out = $treeBytes[$thisQos->snmp_idx]['MIKROTIK-MIB::mtxrQueueTreeHCBytes'];
-                    $thisQos->last_drop_in = null;
-                    $thisQos->last_drop_out = $treeDrops[$thisQos->snmp_idx]['MIKROTIK-MIB::mtxrQueueTreeDropped'];
+                    $thisQos->last_traffic_drop_in = null;
+                    $thisQos->last_traffic_drop_out = null;
+                    $thisQos->last_packet_in = null;
+                    // Packet counters are not updating
+                    //$thisQos->last_packet_out = $treePackets[$thisQos->snmp_idx]['MIKROTIK-MIB::mtxrQueueTreePackets'];
+                    $thisQos->last_packet_out = null;
+                    $thisQos->last_packet_drop_in = null;
+                    $thisQos->last_packet_drop_out = $treeDrops[$thisQos->snmp_idx]['MIKROTIK-MIB::mtxrQueueTreeDropped'];
                     break;
                 case 'routeros_simple':
                     if (! array_key_exists($thisQos->snmp_idx, $simpleNames)) {
@@ -624,8 +635,15 @@ class Routeros extends OS implements
                     $thisQos->last_polled = $poll_time;
                     $thisQos->last_traffic_in = $simpleBytesIn[$thisQos->snmp_idx]['MIKROTIK-MIB::mtxrQueueSimpleBytesIn'];
                     $thisQos->last_traffic_out = $simpleBytesOut[$thisQos->snmp_idx]['MIKROTIK-MIB::mtxrQueueSimpleBytesOut'];
-                    $thisQos->last_drop_in = $simpleDropsIn[$thisQos->snmp_idx]['MIKROTIK-MIB::mtxrQueueSimpleDroppedIn'];
-                    $thisQos->last_drop_out = $simpleDropsOut[$thisQos->snmp_idx]['MIKROTIK-MIB::mtxrQueueSimpleDroppedOut'];
+                    $thisQos->last_traffic_drop_in = null;
+                    $thisQos->last_traffic_drop_out = null;
+                    // Packet counters are not updating
+                    //$thisQos->last_packet_in = $simplePacketsIn[$thisQos->snmp_idx]['MIKROTIK-MIB::mtxrQueueSimplePacketsIn'];
+                    //$thisQos->last_packet_out = $simplePacketsOut[$thisQos->snmp_idx]['MIKROTIK-MIB::mtxrQueueSimplePacketsOut'];
+                    $thisQos->last_packet_in = null;
+                    $thisQos->last_packet_out = null;
+                    $thisQos->last_packet_drop_in = $simpleDropsIn[$thisQos->snmp_idx]['MIKROTIK-MIB::mtxrQueueSimpleDroppedIn'];
+                    $thisQos->last_packet_drop_out = $simpleDropsOut[$thisQos->snmp_idx]['MIKROTIK-MIB::mtxrQueueSimpleDroppedOut'];
                     break;
                 default:
                     echo 'Queue type ' . $thisQos->type . " has not been implmeneted in LibreNMS/OS/Routeros.php\n";

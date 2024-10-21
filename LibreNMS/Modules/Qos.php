@@ -98,25 +98,31 @@ class Qos implements Module
                         case 'routeros_simple':
                             $rrd_name = ['routeros-simplequeue', $thisQos->rrd_id];
                             $rrd_def = RrdDefinition::make()
-                                ->addDataset('sentbytesin', 'COUNTER', 0)
-                                ->addDataset('sentbytesout', 'COUNTER', 0)
-                                ->addDataset('dropbytesin', 'COUNTER', 0)
-                                ->addDataset('dropbytesout', 'COUNTER', 0);
+                                ->addDataset('bytesin', 'COUNTER', 0)
+                                ->addDataset('bytesout', 'COUNTER', 0)
+                                ->addDataset('packetsin', 'COUNTER', 0)
+                                ->addDataset('packetsout', 'COUNTER', 0)
+                                ->addDataset('droppacketsin', 'COUNTER', 0)
+                                ->addDataset('droppacketsout', 'COUNTER', 0);
                             $rrd_data = [
-                                'sentbytesin' => $thisQos->last_traffic_in,
-                                'sentbytesout' => $thisQos->last_traffic_out,
-                                'dropbytesin' => $thisQos->last_drop_in,
-                                'dropbytesout' => $thisQos->last_drop_out,
+                                'bytesin' => $thisQos->last_traffic_in,
+                                'bytesout' => $thisQos->last_traffic_out,
+                                'packetsin' => $thisQos->last_packet_in,
+                                'packetsout' => $thisQos->last_packet_out,
+                                'droppacketsin' => $thisQos->last_packet_drop_in,
+                                'droppacketsout' => $thisQos->last_packet_drop_out,
                             ];
                             break;
                         case 'routeros_tree':
                             $rrd_name = ['routeros-queuetree', $thisQos->rrd_id];
                             $rrd_def = RrdDefinition::make()
-                                ->addDataset('sentbytes', 'COUNTER', 0)
-                                ->addDataset('dropbytes', 'COUNTER', 0);
+                                ->addDataset('bytes', 'COUNTER', 0)
+                                ->addDataset('packets', 'COUNTER', 0)
+                                ->addDataset('droppackets', 'COUNTER', 0);
                             $rrd_data = [
-                                'sentbytes' => $thisQos->last_traffic_out,
-                                'dropbytes' => $thisQos->last_drop_out,
+                                'bytes' => $thisQos->last_traffic_out,
+                                'packets' => $thisQos->last_packet_out,
+                                'droppackets' => $thisQos->last_packet_drop_out,
                             ];
                             break;
                         default:

@@ -2,8 +2,8 @@
 
 $rrd_filename = Rrd::name($device['hostname'], ['routeros-simplequeue', $vars['rrd_id']]);
 
-$ds_in = 'sentbytesin';
-$ds_out = 'sentbytesout';
+$ds_in = 'bytesin';
+$ds_out = 'bytesout';
 
 $multiplier = 8;
 
