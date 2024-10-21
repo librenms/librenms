@@ -1,6 +1,8 @@
 <?php
 /**
- * qos.inc.php
+ * QosDiscovery.php
+ *
+ * Discovers QoS Queues on devices
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,12 +17,28 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @link https://www.librenms.org
+ * @link       https://www.librenms.org
+ *
+ * @copyright  2024 Steven Wilton
+ * @author     Steven Wilton <swilton@fluentit.com.au>
  */
 
-use LibreNMS\OS;
+namespace LibreNMS\Interfaces\Discovery;
 
-if (! $os instanceof OS) {
-    $os = OS::make($device);
+use Illuminate\Support\Collection;
+
+interface QosDiscovery
+{
+    /**
+     * Discover QoS queues
+     *
+     * @return Collection<int, \App\Models\Qos>
+     */
+    public function discoverQos(): Collection;
+
+    /**
+     * Set QoS Parents given the output of discoverQos() after saving.
+     * This ensures that all QoS objects have IDs
+     */
+    public function setQosParents(Collection $qos);
 }
-(new \LibreNMS\Modules\Qos())->poll($os);

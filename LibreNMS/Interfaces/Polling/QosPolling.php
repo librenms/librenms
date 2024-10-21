@@ -1,6 +1,8 @@
 <?php
 /**
- * qos.inc.php
+ * QosPolling.php
+ *
+ * Polling Qos data and fill RRD data
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,12 +17,22 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @link https://www.librenms.org
+ * @link       https://www.librenms.org
+ *
+ * @copyright  2024 Steven Wilton
+ * @author     Steven Wilton <swilton@fluentit.com.au>
  */
 
-use LibreNMS\OS;
+namespace LibreNMS\Interfaces\Polling;
 
-if (! $os instanceof OS) {
-    $os = OS::make($device);
+use Illuminate\Database\Eloquent\Collection;
+
+interface QosPolling
+{
+    /**
+     * Poll Qos data
+     *
+     * @param  Collection<int, \App\Models\Qos>  $qos
+     */
+    public function pollQos(Collection $qos);
 }
-(new \LibreNMS\Modules\Qos())->poll($os);
