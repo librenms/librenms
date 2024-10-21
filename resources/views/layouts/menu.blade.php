@@ -245,9 +245,8 @@
                                                 {{ ucfirst($map->name) }}
                                             </a></li>
                                         @endforeach
-                                        @if($map_group)</ul>@endif
+                                        @if($map_group)</ul></li>@endif
                                     @endforeach
-                            </li>
                         @endif
                         @admin
                         <li role="presentation" class="divider"></li>

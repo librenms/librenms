@@ -59,6 +59,9 @@
 @section('scripts')
     @routes
 <script type="text/javascript">
+    var network_options = {{ Js::from($map_conf) }};
+    var legend = {{ Js::from($legend) }};
+
     $('#mapDeleteModal').on('show.bs.modal', () => {
         let $mapDeleteModalLabel = $('#mapDeleteModalLabel');
         $mapDeleteModalLabel.text($mapDeleteModalLabel.data('text').replace(':name', pendingMapToDelete.name));

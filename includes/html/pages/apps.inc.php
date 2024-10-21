@@ -542,6 +542,21 @@ $graphs['ss'] = [
     'vsock',
     'xdp',
 ];
+$graphs['http_access_log_combined'] = [
+    'bytes',
+    'codes_general',
+    'codes_1xx',
+    'codes_2xx',
+    'codes_3xx',
+    'codes_4xx',
+    'codes_5xx',
+    'methods',
+    'version',
+    'refer',
+    'user',
+    'log_size',
+    'error_size',
+];
 $graphs['borgbackup'] = [
     'unique_csize',
     'total_csize',
