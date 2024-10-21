@@ -16,7 +16,7 @@
         @else
         <a href="{{ route('device', $this_page_params) }}/show={{$qosGraph->id}}">{{ $qosGraph->title }}</a>
         @endif
-        <x-qos-tree :qosItems="$qosItems" :parentQosId="$qosGraph->id" />
+        <x-qos-tree :qosItems="$qosItems" :parentQosId="$qosGraph->id" :show="$show" />
     </li>
     @endforeach
     @if($parentQosId)
