@@ -117,7 +117,7 @@ class Qos implements Module
                                 'sentbytesin' => $thisQos->last_traffic_in,
                                 'sentbytesout' => $thisQos->last_traffic_out,
                                 'dropbytesin' => $thisQos->last_drop_in,
-                                'dropbytesin' => $thisQos->last_drop_out,
+                                'dropbytesout' => $thisQos->last_drop_out,
                             ];
                             break;
                         case 'routeros_tree':
