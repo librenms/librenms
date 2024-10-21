@@ -131,7 +131,7 @@ New discovery or poller modules should define database capture parameters in `/t
 
 If the base os (<os>.snmprec) already contains test data for the
 module you are testing or that data conflicts with your new data, you
-must use a variant to store your test data (-v).
+must use a variant to store your test data (-v <variant>).
 
 ### Add initial detection
 
@@ -141,7 +141,7 @@ must use a variant to store your test data (-v).
 1. Run discovery to make sure it detects properly `./discovery.php -h 42`
 1. Add any additional os items like version, hardware, features, or serial.
 1. If there is additional snmp data required, run
-   `./scripts/collect-snmp-data.php -h 42 -v <variant>`
+   `./scripts/collect-snmp-data.php -h 42 -v ''`
 1. Run `./scripts/save-test-data.php -o example-os` to update the
    dumped database data.
 1. Review data. If you modified the snmprec or code (don't modify json
