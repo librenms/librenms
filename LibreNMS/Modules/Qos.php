@@ -59,9 +59,7 @@ class Qos implements Module
      */
     public function discover(OS $os): void
     {
-        echo('discover()');
         if ($os instanceof QosDiscovery) {
-            echo('instanceof');
             $qos = $os->discoverQos();
             ModuleModelObserver::observe(\App\Models\Qos::class);
             $qos = $this->syncModels($os->getDevice(), 'qos', $qos);
@@ -73,7 +71,6 @@ class Qos implements Module
     {
         return $status->isEnabledAndDeviceUp($os->getDevice()) && $os instanceof QosPolling;
     }
-
 
     /**
      * Poll data for this module and update the DB / RRD.
@@ -132,10 +129,10 @@ class Qos implements Module
                             break;
                         default:
                             $rrd_name = null;
-                            echo('Queue type |' . $thisQos->type . "| has not been implmeneted in LibreNMS/Modules/Qos.php\n");
+                            echo 'Queue type |' . $thisQos->type . "| has not been implmeneted in LibreNMS/Modules/Qos.php\n";
                     }
                     if (! is_null($rrd_name)) {
-                        $datastore->put($os->getDeviceArray(), 'qos', [ 'rrd_name' => $rrd_name, 'rrd_def' => $rrd_def ], $rrd_data);
+                        $datastore->put($os->getDeviceArray(), 'qos', ['rrd_name' => $rrd_name, 'rrd_def' => $rrd_def], $rrd_data);
                     }
                 }
             }

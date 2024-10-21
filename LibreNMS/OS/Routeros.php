@@ -556,7 +556,7 @@ class Routeros extends OS implements
     {
         $qos->each(function (Qos $thisQos, int $key) use ($qos) {
             $qosParentMap = $this->qosIdxToParent->get($thisQos->type);
-            if(! $qosParentMap) {
+            if (! $qosParentMap) {
                 // Parent data does not exist
                 return;
             }
@@ -628,11 +628,10 @@ class Routeros extends OS implements
                     $thisQos->last_drop_out = $simpleDropsOut[$thisQos->snmp_idx]['MIKROTIK-MIB::mtxrQueueSimpleDroppedOut'];
                     break;
                 default:
-                    echo('Queue type ' . $thisQos->type . " has not been implmeneted in LibreNMS/OS/Routeros.php\n");
+                    echo 'Queue type ' . $thisQos->type . " has not been implmeneted in LibreNMS/OS/Routeros.php\n";
             }
         });
     }
-
 
     public function discoverTransceivers(): Collection
     {
