@@ -905,6 +905,11 @@ class Device extends BaseModel
         return $this->hasMany(\App\Models\PortStp::class, 'device_id', 'device_id');
     }
 
+    public function portSecurity(): HasManyThrough
+    {
+        return $this->hasManyThrough(\App\Models\PortSecurity::class, \App\Models\Port::class, 'device_id', 'port_id');
+    }
+
     public function portsVdsl(): HasManyThrough
     {
         return $this->hasManyThrough(\App\Models\PortVdsl::class, \App\Models\Port::class, 'device_id', 'port_id');
