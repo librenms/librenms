@@ -1119,6 +1119,27 @@ log that the size will be checked for and reported via the stat
 }
 ```
 
+8. (Optional) If you have SELinux in Enforcing mode, you must add a module so the script can open and read the httpd log files:
+```
+cat << EOF > snmpd_http_access_log_combined.te
+module snmp_http_access_log_combined 1.0;
+
+require {
+        type httpd_log_t;
+        type snmpd_t;
+        class file { open read };
+}
+
+#============= snmpd_t ==============
+
+allow snmpd_t httpd_log_t:file { open read };
+
+EOF
+checkmodule -M -m -o snmpd_http_access_log_combined.mod snmpd_http_access_log_combined.te
+semodule_package -o snmpd_http_access_log_combined.pp -m snmpd_http_access_log_combined.mod
+semodule -i snmpd_http_access_log_combined.pp
+```
+
 ## HV Monitor
 
 HV Monitor provides a generic way to monitor hypervisors. Currently
