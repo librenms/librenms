@@ -316,7 +316,7 @@ function is_port_valid($port, $device)
 
     foreach (Config::getCombined($device['os'], 'bad_ifalias_regexp') as $bar) {
         if (preg_match($bar . 'i', $ifAlias)) {
-            d_echo("ignored by ifName: $ifAlias (matched: $bar)\n");
+            d_echo("ignored by ifAlias: $ifAlias (matched: $bar)\n");
 
             return false;
         }

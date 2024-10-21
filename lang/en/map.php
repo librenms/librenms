@@ -67,6 +67,9 @@ return [
                     'hideinvalid' => 'Hide Invalid',
                     'hideoverspeed' => 'Hide 100%+',
                 ],
+                'zoom' => 'Pan and Zoom',
+                'dragnodes' => 'Move Nodes',
+                'physics' => 'Physics Engine',
             ],
             'node' => [
                 'new' => 'New Node',
@@ -128,6 +131,7 @@ return [
             'edge' => [
                 'new' => 'New Edge',
                 'add' => 'Add Edge',
+                'edit' => 'Edit Edge',
                 'defaults_title' => 'Edge Default Config',
                 'from' => 'From',
                 'to' => 'To',

@@ -1002,6 +1002,123 @@ You may need to configure `$server` or `$port`.
 
 Verify it is working by running `/usr/lib/check_mk_agent/local/gpsd`
 
+## HTTP Access Log Combined
+
+### SNMP Extend
+
+1. Download the script onto the desired host.
+```
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/http_access_log_combined -O /etc/snmp/http_access_log_combined
+```
+
+2. Make the script executable
+```
+chmod +x /etc/snmp/http_access_log_combined
+```
+
+3. Install the depends
+```
+# FreeBSD
+pkg install p5-File-Slurp p5-MIME-Base64 p5-JSON p5-Statistics-Lite p5-File-ReadBackwards
+
+# Debian
+apt-get install libfile-slurp-perl libmime-base64-perl libjson-perl libstatistics-lite-perl libfile-readbackwards-perl
+```
+
+4. Configure it if neeeded. Uses
+   `/usr/local/etc/http_access_log_combined_extend.json`, unless
+   specified via `-c`. See further below for configuration
+   information.
+
+5. If on large setups where it won't complete in a timely manner, run
+   it via cron.
+```
+*/5 * * * * root /etc/snmp/http_access_log_combined -b -q -w
+```
+
+6. Add it to `snmpd.conf`.
+```
+# if not using cron
+extend http_access_log_combined /etc/snmp/http_access_log_combined -b
+
+# if using cron
+extend http_access_log_combined cat /var/cache/http_access_log_combined.json.snmp
+```
+
+7. Either manually enable it for the device, rediscover the device, or
+   wait for it to be rediscovered.
+   
+| Key               | Type         | Description                                                                                                                              |
+|-------------------|--------------|------------------------------------------------------------------------------------------------------------------------------------------|
+| access            | hash         | A hash of access logs to monitor. The key is the reporting name while the value is the path to it.                                       |
+| error             | hash         | A hash of errors logs to monitor. The key is the reporting name while the value is the path to it. Must have a matching entry in access  |
+| auto              | boolean, 0/1 | If auto mode should be used or not. If not defined and .access is not defined, then it will default to 1. Other wise it is undef, false. |
+| auto_dir          | string       | The dir to look for files in. Default: `/var/log/apache/`                                                                                |
+| auto_end_regex    | string       | What to match files ending in. Default: `.log$`                                                                                          |
+| auto_access_regex | string       | What will be prepended to the end regexp for looking for access log files. Default: `-access`                                            |
+| auto_error_regex  | string       | What will be prepended to the end regexp for looking for error log files. Default: `-error`                                              |
+
+Auto will attempt to generate a list of log files to process. Will
+look under the directory specified for files matching the built
+regexp. The regexp is built by joining the access/error regexps to the
+end regexp. so for access it would be come `-access.log$`.
+
+The default auto config would look like below.
+
+```JSON
+{
+    "auto": 1,
+    "auto_dir": "/var/log/apache/",
+    "auto_end_regex": ".log$",
+    "auto_access_regex": "-access",
+    "auto_error_regex": "-error"
+}
+```
+
+So lets say the log dir, `/some/dir` in our case, has the following files.
+
+```
+foo:80-access.log
+foo:80-error.log
+foo:443-access.log
+foo:443-error.log
+bar-access.log
+```
+
+Then the auto generated stuff would be a like below.
+
+```JSON
+{
+    "access":{
+        "foo:80": "/some/dir/foo:80-access.log",
+        "foo:443": "/some/dir/foo:443-access.log",
+        "bar": "/some/dir/bar-access.log",
+    },
+    "error":{
+        "foo:80": "/some/dir/foo:80-error.log",
+        "foo:443": "/some/dir/foo:443-error.log",
+    }
+}
+```
+
+A manual config would be like below. Note that only `foo` has a error
+log that the size will be checked for and reported via the stat
+`error_size`.
+
+```JSON
+{
+    "auto": 0,
+    "access":{
+        "foo":"/var/log/www/foo.log",
+        "bar:80":"/var/log/www/bar:80.log"
+        "bar:443":"/var/log/www/bar:443.log"
+    },
+    "error":{
+        "foo":"/var/log/www/foo-error.log"
+    }
+}
+```
+
 ## HV Monitor
 
 HV Monitor provides a generic way to monitor hypervisors. Currently
@@ -1603,14 +1720,26 @@ wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/nfs -
 chmod +x /etc/snmp/nfs
 ```
 
-3. Add it to snmpd.conf.
+3. Install the requirements.
+```
+# debian
+apt-get install libfile-slurp-perl libjson-perl libmime-base64-perl
+
+# freebsd
+pkg install p5-File-Slurp p5-JSON p5-MIME-Base64
+
+# rhel / alma
+dnf install perl-File-Slurp perl-JSON perl-MIME-Base64
+```
+
+4. Add it to snmpd.conf.
 ```
 extend nfs /usr/bin/env PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin /etc/snmp/nfs
 ```
 
-4. Restart snmpd on your host
+5. Restart snmpd on your host
 
-5. Either wait for it to be rediscovered, rediscover it, or enable it.
+6. Either wait for it to be rediscovered, rediscover it, or enable it.
 
 If using SELinux, the following is needed.
 
@@ -1618,21 +1747,40 @@ If using SELinux, the following is needed.
 
 2. Make a file (snmp_nfs.te) with the following contents and install
    the policy with the command `semodule -i snmp_nfs.te`.
+
 ```
-module snmp_nfs 1.0;
+module local_snmp 1.0;
 
 require {
-        type mountd_port_t;
-        type snmpd_t;
-        type hi_reserved_port_t;
-        class tcp_socket { name_bind name_connect };
-        class udp_socket name_bind;
+    type snmpd_t;
+    type portmap_port_t;
+    type sysctl_rpc_t;
+    type device_t;
+    type mountd_port_t;
+    type hi_reserved_port_t;
+    class tcp_socket { name_bind name_connect };
+    class udp_socket name_bind;
+    class dir search;
+    class file { read getattr open };
+    class chr_file { open ioctl read write };
 }
 
-#============= snmpd_t ==============
+# Allow snmpd_t to connect to tcp_socket of type portmap_port_t
+allow snmpd_t portmap_port_t:tcp_socket name_connect;
 allow snmpd_t hi_reserved_port_t:tcp_socket name_bind;
 allow snmpd_t hi_reserved_port_t:udp_socket name_bind;
 allow snmpd_t mountd_port_t:tcp_socket name_connect;
+
+# Allow snmpd_t to search directories and access files of type sysctl_rpc_t
+allow snmpd_t sysctl_rpc_t:dir search;
+allow snmpd_t sysctl_rpc_t:file { read getattr open };
+
+# Allow snmpd_t to perform open, ioctl, read, and write operations on chr_file of type device_t
+allow snmpd_t device_t:chr_file { open ioctl read write };
+
+# this policy allows : 
+# zfs extension (fixes root needs to run this)
+# nfs extension (fixes file not found error)
 ```
 
 ## Linux NFS Server
@@ -1779,16 +1927,16 @@ chmod +x /etc/snmp/opensearch
 3. Install the required Perl dependencies.
 ```
 # FreeBSD
-pkg install p5-JSON p5-libwww
+pkg install p5-JSON p5-File-Slurp p5-MIME-Base64 p5-LWP-Protocol-https
 # Debian/Ubuntu
-apt-get install libjson-perl libwww-perl
+apt-get install libjson-perl libfile-slurp-perl liblwp-protocol-https-perl libmime-base64-perl
 # cpanm
-cpanm JSON Libwww
+cpanm JSON Libwww File::Slurp LWP::Protocol::HTTPS MIME::Base64
 ```
 
 4. Update your snmpd.conf.
 ```
-extend opensearch /bin/cat /var/cache/opensearch.json
+extend opensearch /bin/cat /var/cache/opensearch.json.snmp
 ```
 
 5. Update root crontab with. This is required as it will this will
@@ -1796,10 +1944,18 @@ likely time out otherwise. Use `*/1` if you want to have the most
 recent stats when polled or to `*/5` if you just want at exactly a 5
 minute interval.
 ```
-*/5 * * * * /etc/snmp/opensearch > /var/cache/opensearch.json
+*/5 * * * * /etc/snmp/opensearch -w -q
 ```
 
 6. Enable it or wait for the device to be re-disocvered.
+
+Alternatively cron can be skipped and the extend can be told to run
+like below, but if under heavy load it time out waiting for Opensearch
+to respond.
+
+```
+extend opensearch /etc/snmp/opensearch
+```
 
 ## Open Grid Scheduler
 
@@ -3575,10 +3731,10 @@ The default for `pubkey_resolvers` is
 1: Install the depends.
 ```
 ### FreeBSD
-pkg install p5-JSON p5-MIME-Base64 p5-Gzip-Faster p5-File-Slurp
+pkg install p5-JSON p5-MIME-Base64 p5-File-Slurp
+
 ### Debian
-apt-get install -y cpanminus zlib1g-dev
-cpanm Mime::Base64 JSON Gzip::Faster
+apt-get install -y libjson-perl libmime-base64-perl libfile-slurp-perl
 ```
 
 2: Fetch the script in question and make it executable.
@@ -3587,7 +3743,8 @@ wget https://github.com/librenms/librenms-agent/raw/master/snmp/zfs -O /etc/snmp
 chmod +x /etc/snmp/zfs
 ```
 
-3: Add the following to snmpd.conf and restart snmpd.
+3: Add the following to snmpd.conf and restart snmpd. If `-s`, passed
+as a arg, status is returned for display.
 ```
-extend zfs /etc/snmp/zfs
+extend zfs /etc/snmp/zfs -b
 ```
