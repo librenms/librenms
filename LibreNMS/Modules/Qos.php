@@ -159,8 +159,8 @@ class Qos implements Module
     public function dump(Device $device, string $type): ?array
     {
         return [
-            'slas' => $device->qos()->orderBy('title')
-                ->get()->map->makeHidden(['device_id', 'id']),
+            'qos' => $device->qos()->orderBy('title')
+                ->get()->map->makeHidden(['id', 'created_at', 'updated_at', 'device_id', 'port_id', 'parent_id', 'last_polled']),
         ];
     }
 }
