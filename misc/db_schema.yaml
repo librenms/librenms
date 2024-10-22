@@ -1964,14 +1964,14 @@ qos:
     - { Field: packets_drop_in_pct, Type: bigint, 'Null': true, Extra: 'STORED GENERATED' }
     - { Field: packets_drop_out_pct, Type: bigint, 'Null': true, Extra: 'STORED GENERATED' }
   Indexes:
-    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
+    PRIMARY: { Name: PRIMARY, Columns: [qos_id], Unique: true, Type: BTREE }
     qos_device_id_index: { Name: qos_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
     qos_parent_id_index: { Name: qos_parent_id_index, Columns: [parent_id], Unique: false, Type: BTREE }
     qos_port_id_index: { Name: qos_port_id_index, Columns: [port_id], Unique: false, Type: BTREE }
     qos_type_index: { Name: qos_type_index, Columns: [type], Unique: false, Type: BTREE }
   Constraints:
     qos_device_id_foreign: { name: qos_device_id_foreign, foreign_key: device_id, table: devices, key: device_id, extra: 'ON DELETE CASCADE' }
-    qos_parent_id_foreign: { name: qos_parent_id_foreign, foreign_key: parent_id, table: qos, key: id, extra: 'ON DELETE SET NULL' }
+    qos_parent_id_foreign: { name: qos_parent_id_foreign, foreign_key: parent_id, table: qos, key: qis_id, extra: 'ON DELETE SET NULL' }
     qos_port_id_foreign: { name: qos_port_id_foreign, foreign_key: port_id, table: ports, key: port_id, extra: 'ON DELETE SET NULL' }
 roles:
   Columns:
