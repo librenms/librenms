@@ -50,7 +50,7 @@ class Scheduler extends BaseValidation
     private function generateCommands(Validator $validator): array
     {
         $commands = [];
-        $systemctl_bin = Config::locateBinary('systemctl');
+        $systemctl_bin = Config::getExecutable('systemctl');
         $base_dir = rtrim($validator->getBaseDir(), '/');
 
         if (is_executable($systemctl_bin)) {
