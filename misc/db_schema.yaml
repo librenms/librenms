@@ -1971,7 +1971,7 @@ qos:
     qos_type_index: { Name: qos_type_index, Columns: [type], Unique: false, Type: BTREE }
   Constraints:
     qos_device_id_foreign: { name: qos_device_id_foreign, foreign_key: device_id, table: devices, key: device_id, extra: 'ON DELETE CASCADE' }
-    qos_parent_id_foreign: { name: qos_parent_id_foreign, foreign_key: parent_id, table: qos, key: qis_id, extra: 'ON DELETE SET NULL' }
+    qos_parent_id_foreign: { name: qos_parent_id_foreign, foreign_key: parent_id, table: qos, key: qos_id, extra: 'ON DELETE SET NULL' }
     qos_port_id_foreign: { name: qos_port_id_foreign, foreign_key: port_id, table: ports, key: port_id, extra: 'ON DELETE SET NULL' }
 roles:
   Columns:
