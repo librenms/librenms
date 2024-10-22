@@ -11,6 +11,7 @@ use LibreNMS\Interfaces\Models\Keyable;
 class Qos extends Model implements Keyable
 {
     use HasFactory;
+    protected $primaryKey = 'qos_id';
     protected $fillable = [
         'device_id',
         'port_id',
@@ -35,11 +36,11 @@ class Qos extends Model implements Keyable
 
     public function parent(): BelongsTo
     {
-        return $this->belongsTo(Qos::class, 'parent_id', 'id');
+        return $this->belongsTo(Qos::class, 'parent_id', 'qos_id');
     }
 
     public function children(): HasMany
     {
-        return $this->hasMany(Qos::class, 'id', 'parent_id');
+        return $this->hasMany(Qos::class, 'qos_id', 'parent_id');
     }
 }

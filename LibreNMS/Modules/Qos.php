@@ -105,12 +105,12 @@ class Qos implements Module
                                 ->addDataset('droppacketsin', 'COUNTER', 0)
                                 ->addDataset('droppacketsout', 'COUNTER', 0);
                             $rrd_data = [
-                                'bytesin' => $thisQos->last_traffic_in,
-                                'bytesout' => $thisQos->last_traffic_out,
-                                'packetsin' => $thisQos->last_packet_in,
-                                'packetsout' => $thisQos->last_packet_out,
-                                'droppacketsin' => $thisQos->last_packet_drop_in,
-                                'droppacketsout' => $thisQos->last_packet_drop_out,
+                                'bytesin' => $thisQos->last_bytes_in,
+                                'bytesout' => $thisQos->last_bytes_out,
+                                'packetsin' => $thisQos->last_packets_in,
+                                'packetsout' => $thisQos->last_packets_out,
+                                'droppacketsin' => $thisQos->last_packets_drop_in,
+                                'droppacketsout' => $thisQos->last_packets_drop_out,
                             ];
                             break;
                         case 'routeros_tree':
@@ -120,9 +120,9 @@ class Qos implements Module
                                 ->addDataset('packets', 'COUNTER', 0)
                                 ->addDataset('droppackets', 'COUNTER', 0);
                             $rrd_data = [
-                                'bytes' => $thisQos->last_traffic_out,
-                                'packets' => $thisQos->last_packet_out,
-                                'droppackets' => $thisQos->last_packet_drop_out,
+                                'bytes' => $thisQos->last_bytes_out,
+                                'packets' => $thisQos->last_packets_out,
+                                'droppackets' => $thisQos->last_packets_drop_out,
                             ];
                             break;
                         default:
@@ -160,7 +160,7 @@ class Qos implements Module
     {
         return [
             'qos' => $device->qos()->orderBy('title')
-                ->get()->map->makeHidden(['id', 'created_at', 'updated_at', 'device_id', 'port_id', 'parent_id', 'last_polled']),
+                ->get()->map->makeHidden(['qos_id', 'created_at', 'updated_at', 'device_id', 'port_id', 'parent_id', 'last_polled']),
         ];
     }
 }

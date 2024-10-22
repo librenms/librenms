@@ -23,7 +23,7 @@ class Qos extends Component
     ) {
         $this->typePrefix = is_null($portId) ? 'device_qos_' : 'port_qos_';
         if (! is_null($show)) {
-            $this->qosGraph = $qosItems->where('id', $show)->first();
+            $this->qosGraph = $qosItems->where('qos_id', $show)->first();
         }
     }
 

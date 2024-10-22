@@ -1926,7 +1926,7 @@ push_subscriptions:
     push_subscriptions_subscribable_type_subscribable_id_index: { Name: push_subscriptions_subscribable_type_subscribable_id_index, Columns: [subscribable_type, subscribable_id], Unique: false, Type: BTREE }
 qos:
   Columns:
-    - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
+    - { Field: qos_id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
     - { Field: created_at, Type: timestamp, 'Null': true, Extra: '' }
     - { Field: updated_at, Type: timestamp, 'Null': true, Extra: '' }
     - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
@@ -1943,26 +1943,26 @@ qos:
     - { Field: last_polled, Type: bigint, 'Null': true, Extra: '' }
     - { Field: max_in, Type: bigint, 'Null': true, Extra: '' }
     - { Field: max_out, Type: bigint, 'Null': true, Extra: '' }
-    - { Field: last_traffic_in, Type: bigint, 'Null': true, Extra: '' }
-    - { Field: last_traffic_out, Type: bigint, 'Null': true, Extra: '' }
-    - { Field: traffic_in_rate, Type: bigint, 'Null': true, Extra: '' }
-    - { Field: traffic_out_rate, Type: bigint, 'Null': true, Extra: '' }
-    - { Field: last_traffic_drop_in, Type: bigint, 'Null': true, Extra: '' }
-    - { Field: last_traffic_drop_out, Type: bigint, 'Null': true, Extra: '' }
-    - { Field: traffic_drop_in_rate, Type: bigint, 'Null': true, Extra: '' }
-    - { Field: traffic_drop_out_rate, Type: bigint, 'Null': true, Extra: '' }
-    - { Field: last_packet_in, Type: bigint, 'Null': true, Extra: '' }
-    - { Field: last_packet_out, Type: bigint, 'Null': true, Extra: '' }
-    - { Field: packet_in_rate, Type: bigint, 'Null': true, Extra: '' }
-    - { Field: packet_out_rate, Type: bigint, 'Null': true, Extra: '' }
-    - { Field: last_packet_drop_in, Type: bigint, 'Null': true, Extra: '' }
-    - { Field: last_packet_drop_out, Type: bigint, 'Null': true, Extra: '' }
-    - { Field: packet_drop_in_rate, Type: bigint, 'Null': true, Extra: '' }
-    - { Field: packet_drop_out_rate, Type: bigint, 'Null': true, Extra: '' }
-    - { Field: traffic_drop_in_pct, Type: bigint, 'Null': true, Extra: 'STORED GENERATED' }
-    - { Field: traffic_drop_out_pct, Type: bigint, 'Null': true, Extra: 'STORED GENERATED' }
-    - { Field: packet_drop_in_pct, Type: bigint, 'Null': true, Extra: 'STORED GENERATED' }
-    - { Field: packet_drop_out_pct, Type: bigint, 'Null': true, Extra: 'STORED GENERATED' }
+    - { Field: last_bytes_in, Type: bigint, 'Null': true, Extra: '' }
+    - { Field: last_bytes_out, Type: bigint, 'Null': true, Extra: '' }
+    - { Field: bytes_in_rate, Type: bigint, 'Null': true, Extra: '' }
+    - { Field: bytes_out_rate, Type: bigint, 'Null': true, Extra: '' }
+    - { Field: last_bytes_drop_in, Type: bigint, 'Null': true, Extra: '' }
+    - { Field: last_bytes_drop_out, Type: bigint, 'Null': true, Extra: '' }
+    - { Field: bytes_drop_in_rate, Type: bigint, 'Null': true, Extra: '' }
+    - { Field: bytes_drop_out_rate, Type: bigint, 'Null': true, Extra: '' }
+    - { Field: last_packets_in, Type: bigint, 'Null': true, Extra: '' }
+    - { Field: last_packets_out, Type: bigint, 'Null': true, Extra: '' }
+    - { Field: packets_in_rate, Type: bigint, 'Null': true, Extra: '' }
+    - { Field: packets_out_rate, Type: bigint, 'Null': true, Extra: '' }
+    - { Field: last_packets_drop_in, Type: bigint, 'Null': true, Extra: '' }
+    - { Field: last_packets_drop_out, Type: bigint, 'Null': true, Extra: '' }
+    - { Field: packets_drop_in_rate, Type: bigint, 'Null': true, Extra: '' }
+    - { Field: packets_drop_out_rate, Type: bigint, 'Null': true, Extra: '' }
+    - { Field: bytes_drop_in_pct, Type: bigint, 'Null': true, Extra: 'STORED GENERATED' }
+    - { Field: bytes_drop_out_pct, Type: bigint, 'Null': true, Extra: 'STORED GENERATED' }
+    - { Field: packets_drop_in_pct, Type: bigint, 'Null': true, Extra: 'STORED GENERATED' }
+    - { Field: packets_drop_out_pct, Type: bigint, 'Null': true, Extra: 'STORED GENERATED' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     qos_device_id_index: { Name: qos_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
