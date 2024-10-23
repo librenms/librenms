@@ -65,7 +65,9 @@ if ($action == 'test') {
         $message = "Invalid data in SNMP reply, value $rawdata received";
     }
 } else {
-    if (is_numeric($id) && $id > 0) {
+    if (strlen($unit) > 10) {
+       $message = "Unit value is too long";
+    } elseif (is_numeric($id) && $id > 0) {
         if (dbUpdate(
             [
                 'customoid_descr' => $name,
