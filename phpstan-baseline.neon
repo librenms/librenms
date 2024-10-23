@@ -101,12 +101,12 @@ parameters:
 			path: LibreNMS/OS/SmOs.php
 
 		-
-			message: "#^Offset 'sonicCurrentConnCac…' does not exist on string\\.$#"
+			message: "#^Offset 'sonicCurrentConnCac…' does not exist on non\\-empty\\-string\\.$#"
 			count: 1
 			path: LibreNMS/OS/Sonicwall.php
 
 		-
-			message: "#^Offset 'sonicMaxConnCacheEn…' does not exist on string\\.$#"
+			message: "#^Offset 'sonicMaxConnCacheEn…' does not exist on non\\-empty\\-string\\.$#"
 			count: 1
 			path: LibreNMS/OS/Sonicwall.php
 
@@ -131,9 +131,24 @@ parameters:
 			path: LibreNMS/OS/Timos.php
 
 		-
-			message: "#^Property LibreNMS\\\\Proc\\:\\:\\$_pipes is never written, only read\\.$#"
+			message: "#^Offset 'build' on array\\{0\\: string, hardware\\: string, 1\\: string, nt\\: non\\-empty\\-string, 2\\: non\\-empty\\-string, 3\\: ''\\|' Number\\:', build\\: non\\-empty\\-string, 4\\: non\\-empty\\-string, \\.\\.\\.\\} on left side of \\?\\? always exists and is not nullable\\.$#"
 			count: 1
-			path: LibreNMS/Proc.php
+			path: LibreNMS/OS/Windows.php
+
+		-
+			message: "#^Offset 'hardware' on array\\{0\\: string, hardware\\: string, 1\\: string, nt\\: non\\-empty\\-string, 2\\: non\\-empty\\-string, 3\\: ''\\|' Number\\:', build\\: non\\-empty\\-string, 4\\: non\\-empty\\-string, \\.\\.\\.\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 1
+			path: LibreNMS/OS/Windows.php
+
+		-
+			message: "#^Offset 'smp' on array\\{0\\: string, hardware\\: string, 1\\: string, nt\\: non\\-empty\\-string, 2\\: non\\-empty\\-string, 3\\: ''\\|' Number\\:', build\\: non\\-empty\\-string, 4\\: non\\-empty\\-string, \\.\\.\\.\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 1
+			path: LibreNMS/OS/Windows.php
+
+		-
+			message: "#^Offset 'version' on array\\{0\\: string, hardware\\: string, 1\\: string, nt\\: non\\-empty\\-string, 2\\: non\\-empty\\-string, 3\\: ''\\|' Number\\:', build\\: non\\-empty\\-string, 4\\: non\\-empty\\-string, \\.\\.\\.\\} on left side of \\?\\? does not exist\\.$#"
+			count: 1
+			path: LibreNMS/OS/Windows.php
 
 		-
 			message: "#^If condition is always false\\.$#"

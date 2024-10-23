@@ -37,8 +37,8 @@
         "fico7489/laravel-pivot": "^3.0",
         "influxdata/influxdb-client-php": "^3.4",
         "influxdb/influxdb-php": "^1.15",
-        "justinrainbow/json-schema": "^5.2",
-        "laravel-notification-channels/webpush": "^7.1",
+        "justinrainbow/json-schema": "^5.3",
+        "laravel-notification-channels/webpush": "^9.0",
         "laravel/framework": "^10.8",
         "laravel/tinker": "^2.8",
         "laravel/ui": "^4.2",
@@ -56,14 +56,14 @@
         "silber/bouncer": "^1.0",
         "socialiteproviders/manager": "^4.3",
         "spatie/laravel-ignition": "^2.0",
-        "symfony/yaml": "^6.2",
+        "symfony/yaml": "^7.1",
         "tecnickcom/tcpdf": "^6.4",
-        "tightenco/ziggy": "^1.6.0"
+        "tightenco/ziggy": "^2.3"
     },
     "require-dev":
     {
         "barryvdh/laravel-debugbar": "^3.8",
-        "barryvdh/laravel-ide-helper": "^2.13",
+        "barryvdh/laravel-ide-helper": "^3.1",
         "composer/composer": "^2.4",
         "fakerphp/faker": "^1.9.1",
         "friendsofphp/php-cs-fixer": "^v3.4",
