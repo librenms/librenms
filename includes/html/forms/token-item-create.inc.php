@@ -18,7 +18,7 @@ if (! Auth::user()->hasGlobalAdmin()) {
     exit('ERROR: You need to be admin');
 }
 
-$token =  bin2hex(openssl_random_pseudo_bytes(16));
+$token = bin2hex(openssl_random_pseudo_bytes(16));
 
 if (! is_numeric($_POST['user_id'])) {
     echo 'ERROR: error with data, please ensure a valid user and token have been specified.';
