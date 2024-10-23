@@ -20,8 +20,9 @@ if (Config::get('enable_vrfs')) {
 
         if (empty($rds)) {
             $rds = snmp_walk($device, 'mplsVpnVrfRouteDistinguisher', '-Osqn', 'MPLS-VPN-MIB', null);
-
-            if (empty($rds) && $device['os_group'] == 'cisco') {
+            
+            # Cisco Catalyst C800 Routers does not correct answer on SNMP OID 'mplsVpnVrfRouteDistinguisher'
+            if ((empty($rds) || (substr($device['hardware'],0,2) == 'C8' && $device['os'] == 'ios')) && $device['os_group'] == 'cisco') {
                 // Use CISCO-VRF-MIB if others don't work
                 $rds = snmp_walk($device, 'cvVrfName', '-Osqn', 'CISCO-VRF-MIB', null);
                 $rds = str_replace('.1.3.6.1.4.1.9.9.711.1.1.1.1.2.', '', $rds);
