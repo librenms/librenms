@@ -39,7 +39,7 @@ echo '<div class="row">
       </div>';
 
 if (! empty($device['overwrite_ip'])) {
-    echo "<div class='row'><div class='col-sm-4'>Assigned IP</div><div class='col-sm-8'>{$device['overwrite_ip']}</div></div>";
+    echo "<div class='row'><div class='col-sm-4'>Assigned IP</div><div class='col-sm-8'>" . htmlentities($device['overwrite_ip']) . "</div></div>";
 } elseif (! empty($device['ip'])) {
     echo "<div class='row'><div class='col-sm-4'>Resolved IP</div><div class='col-sm-8'>{$device['ip']}</div></div>";
 } else {
