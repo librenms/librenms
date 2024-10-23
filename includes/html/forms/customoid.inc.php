@@ -66,7 +66,7 @@ if ($action == 'test') {
     }
 } else {
     if (strlen($unit) > 10) {
-       $message = "Unit value is too long";
+       $message = 'Unit value is too long';
     } elseif (is_numeric($id) && $id > 0) {
         if (dbUpdate(
             [
