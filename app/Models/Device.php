@@ -210,7 +210,7 @@ class Device extends BaseModel
     {
         $hostname_is_ip = IP::isValid($this->hostname);
 
-        return SimpleTemplate::parse($this->display ?: \LibreNMS\Config::get('device_display_default', '{{ $hostname }}'), [
+        return SimpleTemplate::parse(htmlentities($this->display) ?: \LibreNMS\Config::get('device_display_default', '{{ $hostname }}'), [
             'hostname' => $this->hostname,
             'sysName' => $this->sysName ?: $this->hostname,
             'sysName_fallback' => $hostname_is_ip ? $this->sysName : $this->hostname,
