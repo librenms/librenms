@@ -66,7 +66,7 @@ class EditPortsController extends TableController
         $port_group_options = '';
         foreach ($port->groups as $group) {
             /** @var \App\Models\PortGroup $group */
-            $port_group_options .= '<option value="' . $group->id . '" selected>' . $group->name . '</option>';
+            $port_group_options .= '<option value="' . $group->id . '" selected>' . htmlentities($group->name) . '</option>';
         }
 
         return [
