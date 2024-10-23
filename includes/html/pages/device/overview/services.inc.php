@@ -12,7 +12,7 @@ if (ObjectCache::serviceCounts(['total'], $device['device_id'])['total'] > 0) {
             $message = str_replace(' ', '&nbsp;', $service->service_message);
             $color = $colors->get($service->service_status, 'grey');
             $type = strtolower($service->service_type);
-            $name = $service->service_name;
+            $name = htmlentities($service->service_name);
             $name_type = ($name == '' || $name == $type) ? $type : $name . ' (' . $type . ')';
 
             return "<span title='$message' class='$color'>$name_type</span>";
