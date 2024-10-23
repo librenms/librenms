@@ -91,6 +91,7 @@ disable it for one device then you can do this within the WebUI Device
     lnms config:set poller_modules.loadbalancers false
     lnms config:set poller_modules.mef false
     lnms config:set poller_modules.mef false
+    lnms config:set poller_modules.port-security false
     ```
 
 ## OS based Poller config
@@ -182,6 +183,8 @@ configured to be ignored by config options.
 `availability`: Device Availability Calculation.
 
 `cisco-asa-firewall`: Cisco ASA firewall support.
+
+`port-security`: Port security support
 
 ## Running
 
