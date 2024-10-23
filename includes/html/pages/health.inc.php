@@ -64,7 +64,7 @@ $type_text = [
     'percent' => 'Percent',
 ];
 
-$active_metric = basename($vars['metric'] ?? 'processor');
+$active_metric = basename((array_key_exists($vars['metric'], $type_text) ? $vars['metric'] : 'processor'));
 
 $vars['view'] = $vars['view'] ?? 'detail';
 $link_array = ['page' => 'health'];
