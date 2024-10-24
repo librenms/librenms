@@ -87,7 +87,7 @@ foreach (dbFetchRows($full_query, $param) as $oid) {
     echo '<td>' . $oid['customoid_descr'] . '</td>';
     echo '<td>' . $oid['customoid_oid'] . '</td>';
     echo '<td>' . $oid['customoid_current'] . '</td>';
-    echo '<td>' . $oid['customoid_unit'] . '</td>';
+    echo '<td>' . htmlentities($oid['customoid_unit']) . '</td>';
     echo '<td>' . $oid['customoid_limit'] . '</td>';
     echo '<td>' . $oid['customoid_limit_low'] . '</td>';
     echo '<td>' . $oid['customoid_limit_warn'] . '</td>';
