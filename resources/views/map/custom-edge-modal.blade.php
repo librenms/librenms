@@ -81,6 +81,12 @@
                                 </div>
                             </div>
                             <div class="form-group row">
+                                <label for="edgefixedwidth" class="col-sm-3 control-label">{{ __('map.custom.edit.edge.fixed_width') }}</label>
+                                <div class="col-sm-9">
+                                    <input type=number id="edgefixedwidth" class="form-control input-sm" placeholder="{{ __('map.custom.edit.edge.dynamic_width')  }}" step="0.1" />
+                                </div>
+                            </div>
+                            <div class="form-group row">
                                 <label for="edgetextface" class="col-sm-3 control-label">{{ __('map.custom.edit.text_font') }}</label>
                                 <div class="col-sm-9">
                                     <input type=text id="edgetextface" class="form-control input-sm" value="arial" />
@@ -177,6 +183,7 @@
         edgedata.edge1.font.size = edgedata.edge2.font.size = $("#edgetextsize").val();
         edgedata.edge1.font.color = edgedata.edge2.font.color = $("#edgetextcolour").val();
         edgedata.edge1.label = edgedata.edge2.label = edgeLabel($("#edgetextshow").prop('checked'), $("#edgebpsshow").prop('checked'), null);
+        edgedata.edge1.width = edgedata.edge2.width = parseFloat($("#edgefixedwidth").val()) || null;
         edgedata.edge1.title = edgedata.edge2.title = $("#port_id").val();
         let newlabel = $("#edgelabel").val() || '';
         if (newlabel == '' && edgedata.mid.label != '') {
@@ -236,6 +243,7 @@
         $("#edgeModalLabel").text('{{ __('map.custom.edit.edge.defaults_title') }}');
 
         $("#edgestyle").val(newedgeconf.smooth.type);
+        $("#edgefixedwidth").val(newedgeconf.width);
         $("#edgetextface").val(newedgeconf.font.face);
         $("#edgetextsize").val(newedgeconf.font.size);
         $("#edgetextcolour").val(newedgeconf.font.color);
@@ -286,6 +294,7 @@
         $("#edgetextshow").bootstrapSwitch('state', (edgedata.edge1.label != null && edgedata.edge1.label.includes('xx%')));
         $("#edgebpsshow").bootstrapSwitch('state', (edgedata.edge1.label != null && edgedata.edge1.label.includes('bps')));
         $("#edgelabel").val('label' in edgedata.mid ? edgedata.mid.label : '');
+        $("#edgefixedwidth").val(edgedata.edge1.width);
 
         $(".existing-edge").show();
         $(".new-edge").hide();
@@ -334,6 +343,7 @@
         newedgeconf.font.size = $("#edgetextsize").val();
         newedgeconf.font.color = $("#edgetextcolour").val();
         newedgeconf.label = edgeLabel($("#edgetextshow").prop('checked'), $("#edgebpsshow").prop('checked'), '');
+        newedgeconf.width = parseFloat($("#edgefixedwidth").val()) || null;
         $("#map-saveDataButton").show();
     }
 
