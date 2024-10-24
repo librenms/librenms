@@ -133,6 +133,10 @@ if (count($components) > 0) {
     $menu_options['cbqos'] = 'CBQoS';
 }
 
+if ($port->qos()->count() > 0) {
+    $menu_options['qos'] = 'QoS';
+}
+
 $portModel = Port::find($port->port_id);
 
 if (LibreNMS\Plugins::countHooks('port_container') || \PluginManager::hasHooks(PortTabHook::class, ['port' => $portModel])) {
