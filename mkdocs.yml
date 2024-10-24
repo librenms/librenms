@@ -65,6 +65,7 @@ plugins:
         'Extensions/Graphite.md': 'Extensions/metrics/Graphite.md'
         'Extensions/InfluxDB.md': 'Extensions/metrics/InfluxDB.md'
         'Extensions/InfluxDBv2.md': 'Extensions/metrics/InfluxDBv2.md'
+        'Extensions/Kafka.md': 'Extensions/metrics/Kafka.md'
         'Extensions/OpenTSDB.md': 'Extensions/metrics/OpenTSDB.md'
         'Extensions/Poller-Service.md': 'Extensions/Dispatcher-Service.md'
         'Extensions/Port-Description-Parser.md': 'Extensions/Interface-Description-Parsing.md'
@@ -210,6 +211,7 @@ nav:
         - Graphite: Extensions/metrics/Graphite.md
         - InfluxDB: Extensions/metrics/InfluxDB.md
         - InfluxDBv2: Extensions/metrics/InfluxDBv2.md
+        - Kafka: Extensions/metrics/Kafka.md
         - OpenTSDB: Extensions/metrics/OpenTSDB.md
         - Prometheus: Extensions/metrics/Prometheus.md
 
