@@ -458,11 +458,11 @@ function inet6_ntop($ip)
  */
 function format_hostname($device): string
 {
-    $hostname = $device['hostname'] ?? 'invalid hostname';
+    $hostname = htmlentities($device['hostname']) ?? 'invalid hostname';
     $hostname_is_ip = IP::isValid($hostname);
-    $sysName = empty($device['sysName']) ? $hostname : $device['sysName'];
+    $sysName = empty($device['sysName']) ? $hostname : htmlentities($device['sysName']);
 
-    return \App\View\SimpleTemplate::parse(empty($device['display']) ? Config::get('device_display_default', '{{ $hostname }}') : $device['display'], [
+    return \App\View\SimpleTemplate::parse(empty($device['display']) ? Config::get('device_display_default', '{{ $hostname }}') : htmlentities($device['display']), [
         'hostname' => $hostname,
         'sysName' => $sysName,
         'sysName_fallback' => $hostname_is_ip ? $sysName : $hostname,

@@ -79,7 +79,7 @@ class Url
         $url = Url::deviceUrl($device, $vars);
 
         // beginning of overlib box contains large hostname followed by hardware & OS details
-        $contents = '<div><span class="list-large">' . $device->displayName() . '</span>';
+        $contents = '<div><span class="list-large">' . htmlentities($device->displayName()) . '</span>';
         $devinfo = '';
         if ($device->hardware) {
             $devinfo .= htmlentities($device->hardware);
