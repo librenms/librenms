@@ -265,4 +265,7 @@ return [
         'success' => 'Successfully added user: :username',
         'wrong-auth' => 'Warning! You will not be able to log in with this user because you are not using MySQL auth',
     ],
+    'maintenance:database-cleanup' => [
+        'description' => 'Database cleanup of orphaned items.',
+    ],
 ];
