@@ -1,5 +1,6 @@
+mib: OAP-NMU
 modules:
     os:
-        hardware: OAP-C1-OEO::vDeviceType.0
-        serial: OAP-C1-OEO::vSerialNumber.0
-        version: OAP-C1-OEO::vSoftwareVerion.0
+        hardware: OAP-NMU::deviceType.0
+        serial: OAP-NMU::serialNumber.0
+        version: OAP-NMU::softwareVersion.0

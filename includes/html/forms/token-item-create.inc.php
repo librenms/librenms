@@ -18,17 +18,13 @@ if (! Auth::user()->hasGlobalAdmin()) {
     exit('ERROR: You need to be admin');
 }
 
-if (! is_numeric($_POST['user_id']) || ! isset($_POST['token'])) {
+$token = bin2hex(openssl_random_pseudo_bytes(16));
+
+if (! is_numeric($_POST['user_id'])) {
     echo 'ERROR: error with data, please ensure a valid user and token have been specified.';
     exit;
-} elseif (strlen($_POST['token']) > 32) {
-    echo 'ERROR: The token is more than 32 characters';
-    exit;
-} elseif (strlen($_POST['token']) < 16) {
-    echo 'ERROR: The token is less than 16 characters';
-    exit;
 } else {
-    $create = dbInsert(['user_id' => $_POST['user_id'], 'token_hash' => $_POST['token'], 'description' => $_POST['description']], 'api_tokens');
+    $create = dbInsert(['user_id' => $_POST['user_id'], 'token_hash' => $token, 'description' => $_POST['description']], 'api_tokens');
     if ($create > '0') {
         echo 'API token has been created';
         Session::put('api_token', true);

@@ -174,6 +174,7 @@ Route::middleware(['auth'])->group(function () {
         Route::prefix('select')->namespace('Select')->group(function () {
             Route::get('application', 'ApplicationController')->name('ajax.select.application');
             Route::get('bill', 'BillController')->name('ajax.select.bill');
+            Route::get('custom-map', 'CustomMapController')->name('ajax.select.custom-map');
             Route::get('custom-map-menu-group', 'CustomMapMenuGroupController')->name('ajax.select.custom-map-menu-group');
             Route::get('dashboard', 'DashboardController')->name('ajax.select.dashboard');
             Route::get('device', 'DeviceController')->name('ajax.select.device');
@@ -227,6 +228,7 @@ Route::middleware(['auth'])->group(function () {
             Route::post('alertlog', 'AlertlogController');
             Route::post('availability-map', 'AvailabilityMapController');
             Route::post('component-status', 'ComponentStatusController');
+            Route::post('custom-map', 'CustomMapController');
             Route::post('device-summary-horiz', 'DeviceSummaryHorizController');
             Route::post('device-summary-vert', 'DeviceSummaryVertController');
             Route::post('device-types', 'DeviceTypeController');

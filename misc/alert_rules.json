@@ -845,5 +845,10 @@
                                          ],"valid":false},
     "name": "Linux High Memory Usage, >= 95% in use",
     "severity": "critical"
+  },
+  {
+    "rule": "applications.app_type = \"zfs\" && application_metrics.metric like \"pool_%_%_errors\" && application_metrics.value > \"0\"",
+    "name": "ZFS: pool with errors present",
+    "severity": "critical"
   }
 ]
