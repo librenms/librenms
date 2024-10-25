@@ -99,7 +99,7 @@
             node_cfg.borderWidth = node.border_width;
             node_cfg.x = node.x_pos;
             node_cfg.y = node.y_pos;
-            node_cfg.font = {face: node.text_face, size: node.text_size, color: node.text_colour, background: "#FFFFFF"};
+            node_cfg.font = {face: node.text_face, size: node.text_size, color: node.text_colour};
             node_cfg.size = node.size;
             node_cfg.color = {background: node.colour_bg_view, border: node.colour_bdr_view};
             if(node.style == "icon") {
@@ -120,6 +120,9 @@
                 }
             } else {
                 node_cfg.image = {};
+            }
+            if(! ["ellipse", "circle", "database", "box", "text"].includes(node.style)) {
+                node_cfg.font.background = "#FFFFFF";
             }
             return node_cfg;
         },
