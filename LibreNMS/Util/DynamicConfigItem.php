@@ -272,7 +272,7 @@ class DynamicConfigItem implements \ArrayAccess
 
     private function sanitizePath(string $path): string|false
     {
-        if(preg_match('/[`;#$|&\'"><(]/', $path)) {
+        if (preg_match('/[`;#$|&\'"><(]/', $path)) {
             return false;
         }
 
