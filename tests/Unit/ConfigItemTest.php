@@ -7,7 +7,6 @@ use PHPUnit\Framework\TestCase;
 
 class ConfigItemTest extends TestCase
 {
-
     public function testExecutableValidation(): void
     {
         $executableType = new DynamicConfigItem('testExecutable', [
