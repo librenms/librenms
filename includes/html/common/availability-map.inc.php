@@ -287,33 +287,34 @@ if (defined('SHOW_SETTINGS')) {
                     $serviceState = 'down';
                     $service_down_count++;
                 }
-                $service_system_name = htmlentities(format_hostname($service));
+                $device_name = format_hostname($service);
+                $service_descr = " - ${service['service_type']} - ${service['service_desc']}";
 
                 if (Config::get('webui.availability_map_compact') == 0) {
                     if ($directpage == 'yes') {
                         $deviceIcon = getIconTag($service);
                         $temp_output[] = '
-                        <a href="' . \LibreNMS\Util\Url::generate(['page' => 'device', 'device' => $service['device_id'], 'tab' => 'services']) . '" title="' . $service_system_name . ' - ' . $service['service_type'] . ' - ' . $service['service_desc'] . '">
+                        <a href="' . \LibreNMS\Util\Url::generate(['page' => 'device', 'device' => $service['device_id'], 'tab' => 'services']) . '" title="' . htmlentities($device_name . $service_descr) . '">
                             <div class="service-availability ' . $serviceState . '" style="width:' . Config::get('webui.availability_map_box_size') . 'px;">
                                 <span class="service-name-label label ' . $serviceLabel . ' label-font-border">' . $service['service_type'] . '</span>
                                 <span class="availability-label label ' . $serviceLabel . ' label-font-border">' . $serviceState . '</span>
                                 <span class="device-icon">' . $deviceIcon . '</span><br>
-                                <span class="small">' . shorthost($service_system_name) . '</span>
+                                <span class="small">' . htmlentities(shorthost($device_name)) . '</span>
                             </div>
                         </a>';
                     } else {
-                        $serviceText = $service['service_type'] . ' - ' . $serviceState;
+                        $serviceText = htmlentities($service['service_type']) . ' - ' . $serviceState;
                         if ($settings['color_only_select'] == 1) {
                             $serviceText = ' ';
                             $serviceLabel .= ' widget-availability-fixed';
                         }
                         $temp_output[] = '
-                        <a href="' . \LibreNMS\Util\Url::generate(['page' => 'device', 'device' => $service['device_id'], 'tab' => 'services']) . '" title="' . shorthost($service_system_name) . ' - ' . $service['service_type'] . ' - ' . $service['service_desc'] . '">
+                        <a href="' . \LibreNMS\Util\Url::generate(['page' => 'device', 'device' => $service['device_id'], 'tab' => 'services']) . '" title="' . htmlentities(shorthost($device_name) . $service_descr) . '">
                             <span class="label ' . $serviceLabel . ' widget-availability label-font-border">' . $serviceText . '</span>
                         </a>';
                     }
                 } else {
-                    $temp_output[] = "<a href='" . \LibreNMS\Util\Url::generate(['page' => 'device', 'device' => $service['device_id'], 'tab' => 'services']) . "' title='${service_system_name} - ${service['service_type']} - ${service['service_desc']}'><div class='" . $serviceLabelOld . "' style='width:${compact_tile}px;height:${compact_tile}px;'></div></a>";
+                    $temp_output[] = "<a href='" . \LibreNMS\Util\Url::generate(['page' => 'device', 'device' => $service['device_id'], 'tab' => 'services']) . "' title='$device_name$service_descr'><div class='" . $serviceLabelOld . "' style='width:${compact_tile}px;height:${compact_tile}px;'></div></a>";
                 }
             }
         } else {
