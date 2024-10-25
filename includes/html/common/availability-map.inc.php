@@ -231,7 +231,7 @@ if (defined('SHOW_SETTINGS')) {
                 $host_maintenance_count++;
             }
 
-            $device_system_name = format_hostname($device);
+            $device_system_name = htmlentities(format_hostname($device));
 
             if (Config::get('webui.availability_map_compact') == 0) {
                 if ($directpage == 'yes') {
@@ -287,7 +287,7 @@ if (defined('SHOW_SETTINGS')) {
                     $serviceState = 'down';
                     $service_down_count++;
                 }
-                $service_system_name = format_hostname($service);
+                $service_system_name = htmlentities(format_hostname($service));
 
                 if (Config::get('webui.availability_map_compact') == 0) {
                     if ($directpage == 'yes') {
