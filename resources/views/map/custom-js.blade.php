@@ -99,7 +99,7 @@
             node_cfg.borderWidth = node.border_width;
             node_cfg.x = node.x_pos;
             node_cfg.y = node.y_pos;
-            node_cfg.font = {face: node.text_face, size: node.text_size, color: node.text_colour};
+            node_cfg.font = {face: node.text_face, size: node.text_size, color: node.text_colour, background: "#FFFFFF"};
             node_cfg.size = node.size;
             node_cfg.color = {background: node.colour_bg_view, border: node.colour_bdr_view};
             if(node.style == "icon") {
@@ -131,7 +131,7 @@
                 arrows = {to: {enabled: true, scaleFactor: 0.6}, from: {enabled: false}};
             }
 
-            var edge_cfg = {id: edgeid + "_" + fromto, to: edgeid + "_mid", arrows: arrows, font: {face: edge.text_face, size: edge.text_size, color: edge.text_colour}, smooth: {type: edge.style}};
+            var edge_cfg = {id: edgeid + "_" + fromto, to: edgeid + "_mid", arrows: arrows, font: {face: edge.text_face, size: edge.text_size, color: edge.text_colour, background: "#FFFFFF"}, smooth: {type: edge.style}};
             if (fromto == "from") {
                 edge_cfg.from = edge.custom_map_node1_id;
                 var port_pct = Boolean(reverse_arrows) ? edge.port_topct : edge.port_frompct;
