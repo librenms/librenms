@@ -1372,7 +1372,7 @@ extend linux_config_files /etc/snmp/linux_config_files.py
 1: Install the depends, which on a Debian based system would be as below.
 ```
 # Debian
-apt-get install -y cpanminus libfile-slurp-perl libmime-base64-perl libjson-perl
+apt-get install -y libfile-slurp-perl libmime-base64-perl libjson-perl
 # generic cpanm
 cpanm JSON File::Slurp MIME::Base64
 ```
