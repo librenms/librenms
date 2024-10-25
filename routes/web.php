@@ -7,6 +7,7 @@ use App\Http\Controllers\Auth\SocialiteController;
 use App\Http\Controllers\Maps\CustomMapBackgroundController;
 use App\Http\Controllers\Maps\CustomMapController;
 use App\Http\Controllers\Maps\CustomMapDataController;
+use App\Http\Controllers\Maps\CustomMapNodeImageController;
 use App\Http\Controllers\Maps\DeviceDependencyController;
 use App\Http\Controllers\PushNotificationController;
 use App\Http\Controllers\ValidateController;
@@ -91,6 +92,11 @@ Route::middleware(['auth'])->group(function () {
         Route::post('custom/{map}/background', [CustomMapBackgroundController::class, 'save'])->name('maps.custom.background.save');
         Route::get('custom/{map}/data', [CustomMapDataController::class, 'get'])->name('maps.custom.data');
         Route::post('custom/{map}/data', [CustomMapDataController::class, 'save'])->name('maps.custom.data.save');
+        Route::get('nodeimage', [CustomMapNodeImageController::class, 'index'])->name('maps.nodeimage.index');
+        Route::post('nodeimage', [CustomMapNodeImageController::class, 'store'])->name('maps.nodeimage.store');
+        Route::delete('nodeimage/{image}', [CustomMapNodeImageController::class, 'destroy'])->name('maps.nodeimage.destroy');
+        Route::get('nodeimage/{image}', [CustomMapNodeImageController::class, 'show'])->name('maps.nodeimage.show');
+        Route::post('nodeimage/{image}', [CustomMapNodeImageController::class, 'update'])->name('maps.nodeimage.update');
     });
     Route::get('maps/devicedependency', [DeviceDependencyController::class, 'dependencyMap']);
 
