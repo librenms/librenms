@@ -30,7 +30,7 @@ class ConfigItemTest extends TestCase
     public function testDirectoryValidation(): void
     {
         $executableType = new DynamicConfigItem('testDirectory', [
-            'type' => "directory",
+            'type' => 'directory',
         ]);
 
         $this->assertTrue($executableType->checkValue(__DIR__));
