@@ -1,7 +1,6 @@
 mib: FCMGMT-MIB
 modules:
     os:
-        sysDescr: connUnitName
         hardware: connUnitProduct
         serial: connUnitSn
     sensors:
