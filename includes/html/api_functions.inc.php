@@ -1261,8 +1261,7 @@ function update_device_port_notes(Illuminate\Http\Request $request): JsonRespons
 
     $hostname = $request->route('hostname');
     // use hostname as device_id if it's all digits
-    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
-    $device = device_by_id_cache($device_id);
+    $device = \DeviceCache::get($hostname);
 
     $data = json_decode($request->getContent(), true);
     $field = 'notes';
