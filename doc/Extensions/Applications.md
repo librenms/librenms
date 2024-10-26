@@ -3133,8 +3133,7 @@ wget https://github.com/librenms/librenms-agent/raw/master/snmp/smart-v1 -O /etc
 # FreeBSD
 pkg install p5-JSON p5-MIME-Base64 smartmontools
 # Debian
-apt-get install cpanminus smartmontools
-cpanm MIME::Base64 JSON
+apt-get install smartmontools libjson-perl libmime-base64-perl
 # CentOS
 dnf install smartmontools perl-JSON perl-MIME-Base64
 ```
