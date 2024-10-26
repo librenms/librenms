@@ -1270,7 +1270,7 @@ function update_device_port_notes(Illuminate\Http\Request $request): JsonRespons
         return api_error(400, 'Port field to patch has not been supplied.');
     }
 
-    if (set_dev_attrib($device, 'port_id_notes:' . $portid, $content)) {
+    if ($device->setAttrib('port_id_notes:' . $portid, $content)) {
         return api_success_noresult(200, 'Port ' . $field . ' field has been updated');
     } else {
         return api_error(500, 'Port ' . $field . ' field failed to be updated');
