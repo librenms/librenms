@@ -19,8 +19,7 @@ def confirm(question):
             sys.stdout.write("Please respond with 'yes' or 'no'  (or 'y' or 'n').\n")
 
 def clear_cache():
-    call(["php", "artisan", "view:clear"])
-    call(["php", "artisan", "route:clear"])
+    call(["php", "artisan", "optimize:clear"])
 
 librenms_dir = dirname(dirname(abspath(__file__)))
 

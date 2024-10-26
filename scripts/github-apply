@@ -8,7 +8,6 @@ for pr in "$@"
         ''|*[!0-9]*) echo "You must specify a PR number to apply a patch" ;;
         *) curl -s https://patch-diff.githubusercontent.com/raw/librenms/librenms/pull/"${pr}".diff | git apply --exclude=*.png -v ;;
     esac
-    php artisan view:clear
-    php artisan route:clear
+    php artisan optimize:clear
 done
 
