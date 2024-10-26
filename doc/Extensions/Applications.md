@@ -3408,6 +3408,12 @@ one found among all the instances.
 
 1. Install the extend.
 ```
+# FreeBSD
+pkg install p5-JSON p5-File-ReadBackwards p5-File-Slurp p5-MIME-Base64 p5-Time-Piece p5-App-cpanminus
+cpanm Sagan::Monitoring
+
+# Debian
+apt-get install libjson-perl libfile-readbackwards-perl libfile-slurp-perl libmime-base64-perl cpanminus
 cpanm Sagan::Monitoring
 ```
 
