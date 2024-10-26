@@ -15,6 +15,12 @@ if ($device['os'] == 'bintec-beip-plus') {
     $operStatusSnmpFlags = ['-OQUs', '-Cc'];
 }
 
+//Nokia context ihub
+if ($device['os'] == 'nokia-isam') {
+    $device['context_name'] = "ihub";
+}
+
+
 $port_stats = [];
 $port_stats = snmpwalk_cache_oid($device, 'ifDescr', $port_stats, 'IF-MIB', null, $descrSnmpFlags);
 $port_stats = snmpwalk_cache_oid($device, 'ifName', $port_stats, 'IF-MIB');
@@ -66,6 +72,8 @@ if ($device['os'] == 'slms') {
 if ($device['os'] == 'cnmatrix') {
     require base_path('includes/discovery/ports/cnmatrix.inc.php');
 }
+
+
 
 // End Building SNMP Cache Array
 d_echo($port_stats);
@@ -168,6 +176,12 @@ unset(
 );
 
 echo "\n";
+
+//Nokia context ihub
+if ($device['os'] == 'nokia-isam') {
+    $device['context_name'] = "";
+}
+
 
 // Clear Variables Here
 unset($port_stats);
