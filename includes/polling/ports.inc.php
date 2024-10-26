@@ -211,9 +211,9 @@ echo 'Caching Oids: ';
 $port_stats = [];
 
 # Added to change context
-if ($device['os'] === 'nokia-isam') {
-    require 'ports/nokia-isam.inc.php';
-}
+#if ($device['os'] === 'nokia-isam') {
+#   $device['context_name'] = 'ihub';
+#}
 
 if ($device['os'] === 'f5' && (version_compare($device['version'], '11.2.0', '>=') && version_compare($device['version'], '11.7', '<'))) {
     require 'ports/f5.inc.php';
