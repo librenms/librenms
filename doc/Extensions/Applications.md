@@ -1371,8 +1371,10 @@ extend linux_config_files /etc/snmp/linux_config_files.py
 
 1: Install the depends, which on a Debian based system would be as below.
 ```
-apt-get install -y cpanminus zlib1g-dev
-cpanm File::Slurp MIME::Base64 JSON Gzip::Faster
+# Debian
+apt-get install -y libfile-slurp-perl libmime-base64-perl libjson-perl
+# generic cpanm
+cpanm JSON File::Slurp MIME::Base64
 ```
 
 2. Download the script into the desired host.
