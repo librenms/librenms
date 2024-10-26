@@ -3557,6 +3557,11 @@ semodule -i snmpd_ss.pp
 
 1. Install the extend.
 ```
+# FreeBSD
+pkg install p5-JSON p5-File-Path p5-File-Slurp p5-Time-Piece p5-MIME-Base64 p5-Hash-Flatten p5-Carp p5-App-cpanminus
+cpanm Suricata::Monitoring
+# Debian
+apt-get install libjson-perl libfile-path-perl libfile-slurp-perl libmime-base64-perl cpanminus
 cpanm Suricata::Monitoring
 ```
 
