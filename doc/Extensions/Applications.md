@@ -2725,10 +2725,11 @@ chmod +x /etc/snmp/privoxy
 2. Install the depdenencies.
 ```
 # FreeBSD
-pkg install p5-File-ReadBackwards p5-Time-Piece p5-JSON p5-IPC-Run3 p5-Gzip-Faster p5-MIME-Base64
+pkg install p5-JSON p5-MIME-Base64 p5-File-Slurp p5-File-ReadBackwards p5-IPC-Run3 p5-Time-Piece
+
 # Debian
-apt-get install cpanminus zlib1g
-cpanm File::ReadBackwards Time::Piece JSON IPC::Run3 MIME::Base64 Gzip::Faster
+apt-get install libjson-perl libmime-base64-perl libfile-slurp-perl libfile-readbackwards-perl libipc-run3-perl cpanminus
+cpanm Time::Piece
 ```
 
 3. Add the extend to snmpd.conf and restart snmpd.
@@ -2745,6 +2746,19 @@ a `$PATH` set to something that includes it.
 
 Once that is done, just wait for the server to be rediscovered or just
 enable it manually.
+
+If you are having timeouts or there is privelege seperation issues,
+then it can be ran via cron like below. `-w` can be used to write it
+out and `-o` can be used to control where it is written to. See
+`--help` for more information.
+
+```
+# cron
+*/5 * * * * root /etc/snmp/privoxy -w > /dev/null
+
+# snmpd.conf
+extend privoxy /bin/cat /var/cache/privoxy_extend.json.snmp
+```
 
 ## Pwrstatd
 
