@@ -23,6 +23,7 @@
 
 namespace LibreNMS\Alert\Transport;
 
+use Exception;
 use LibreNMS\Alert\AlertUtil;
 use LibreNMS\Alert\Transport;
 use LibreNMS\Config;
