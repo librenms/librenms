@@ -117,22 +117,15 @@ class PortsController extends TableController
                 return $query->where('ifAlias', 'like', "%$ifAlias%");
             })
             ->when($request->get('errors'), function (Builder $query) {
-                $query->where(function (Builder $query) {
-                    return $query->where('ifInErrors_delta', '>', 0)
-                        ->orWhere('ifOutErrors_delta', '>', 0);
-                });
+                return $query->hasErrors();
             })
             ->when($request->get('state'), function (Builder $query, $state) {
-                switch ($state) {
-                    case 'down':
-                        return $query->where('ifAdminStatus', 'up')->where('ifOperStatus', '!=', 'up');
-                    case 'up':
-                        return $query->where('ifAdminStatus', 'up')->where('ifOperStatus', 'up');
-                    case 'admindown':
-                        return $query->where('ifAdminStatus', 'down')->where('ports.ignore', 0);
-                    default:
-                        return $query;
-                }
+                return match ($state) {
+                    'down' => $query->isDown(),
+                    'up' => $query->isUp(),
+                    'admindown' => $query->isShutdown(),
+                    default => $query,
+                };
             });
 
         $select = [
