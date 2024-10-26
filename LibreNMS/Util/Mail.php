@@ -29,7 +29,6 @@ use Exception;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\RrdGraphException;
 use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\SMTP;
 
 class Mail
 {
