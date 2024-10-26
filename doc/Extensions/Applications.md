@@ -1279,8 +1279,8 @@ chmod +x /etc/snmp/logsize
 # FreeBSD
 pkg install p5-File-Find-Rule p5-JSON p5-TOML p5-Time-Piece p5-MIME-Base64 p5-File-Slurp p5-Statistics-Lite
 # Debian
-apt-get install cpanminus
-cpanm File::Find::Rule JSON TOML Time::Piece MIME::Base64 File::Slurp Statistics::Lite
+apt-get install cpanminus libjson-perl libmime-base64-perl libfile-slurp-perl libtoml-perl libfile-find-rule-perl libstatistics-lite-perl
+cpanm Time::Piece
 ```
 
 3. Configure the config at `/usr/local/etc/logsize.conf`. You can find
