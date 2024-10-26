@@ -127,7 +127,7 @@ class Mail
             return $mail->send();
         }
 
-        return 'No contacts found';
+        throw new Exception('No contacts found');
     }
 
     /**
