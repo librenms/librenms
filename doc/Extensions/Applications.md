@@ -3286,10 +3286,10 @@ at [MetaCPAN](https://metacpan.org/dist/Monitoring-Sneck-Boop_Snoot) and
 
 ```
 # FreeBSD
-pkg install p5-JSON p5-File-Slurp p5-MIME-Base64 p5-Gzip-Faster p5-App-cpanminus
+pkg install p5-JSON p5-File-Slurp p5-MIME-Base64 p5-App-cpanminus
 cpanm Monitoring::Sneck
 # Debian based systems
-apt-get install zlib1g-dev cpanminus
+apt-get install cpanminus libjson-perl libfile-slurp-perl libmime-base64-perl
 cpanm Monitoring::Sneck
 ```
 
