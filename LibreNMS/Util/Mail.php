@@ -103,25 +103,25 @@ class Mail
                 $mail->isHTML();
             }
             switch (strtolower(trim(Config::get('email_backend')))) {
-            case 'sendmail':
-                $mail->Mailer = 'sendmail';
-                $mail->Sendmail = Config::get('email_sendmail_path');
-                break;
-            case 'smtp':
-                $mail->isSMTP();
-                $mail->Host = Config::get('email_smtp_host');
-                $mail->Timeout = Config::get('email_smtp_timeout');
-                $mail->SMTPAuth = Config::get('email_smtp_auth');
-                $mail->SMTPSecure = Config::get('email_smtp_secure');
-                $mail->Port = Config::get('email_smtp_port');
-                $mail->Username = Config::get('email_smtp_username');
-                $mail->Password = Config::get('email_smtp_password');
-                $mail->SMTPAutoTLS = Config::get('email_auto_tls');
-                $mail->SMTPDebug = 0;
-                break;
-            default:
-                $mail->Mailer = 'mail';
-                break;
+                case 'sendmail':
+                    $mail->Mailer = 'sendmail';
+                    $mail->Sendmail = Config::get('email_sendmail_path');
+                    break;
+                case 'smtp':
+                    $mail->isSMTP();
+                    $mail->Host = Config::get('email_smtp_host');
+                    $mail->Timeout = Config::get('email_smtp_timeout');
+                    $mail->SMTPAuth = Config::get('email_smtp_auth');
+                    $mail->SMTPSecure = Config::get('email_smtp_secure');
+                    $mail->Port = Config::get('email_smtp_port');
+                    $mail->Username = Config::get('email_smtp_username');
+                    $mail->Password = Config::get('email_smtp_password');
+                    $mail->SMTPAutoTLS = Config::get('email_auto_tls');
+                    $mail->SMTPDebug = 0;
+                    break;
+                default:
+                    $mail->Mailer = 'mail';
+                    break;
             }
 
             return $mail->send();
