@@ -1157,14 +1157,14 @@ or [MetaCPAN](https://metacpan.org/dist/HV-Monitor).
 For Debian based systems this is as below.
 
 ```
-apt-get install zlib1g-dev cpanminus libjson-perl
+apt-get install libjson-perl libmime-base64-perl cpanminus
 cpanm HV::Monitor
 ```
 
 And on FreeBSD as below.
 
 ```
-pkg install p5-App-cpanminus p5-JSON p5-MIME-Base64 p5-Gzip-Faster
+pkg install p5-App-cpanminus p5-JSON p5-MIME-Base64 p5-Module-List
 cpanm HV::Monitor
 ```
 
