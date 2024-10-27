@@ -30,7 +30,7 @@ print_optionbar_end();
 
 if (! isset($vars['source'])) {
     if (isset($vars['source'])) {
-        $vars['source'] =  htmlspecialchars($vars['source']);
+        $vars['source'] = htmlspecialchars($vars['source']);
     }
     $graphs = [
         'chronyd_time' => 'System time',
