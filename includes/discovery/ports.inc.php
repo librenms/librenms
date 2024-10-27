@@ -15,12 +15,6 @@ if ($device['os'] == 'bintec-beip-plus') {
     $operStatusSnmpFlags = ['-OQUs', '-Cc'];
 }
 
-//Nokia context ihub
-#if ($device['os'] == 'nokia-isam') {
-#    $device['context_name'] = "ihub";
-#}
-
-
 $port_stats = [];
 $port_stats = snmpwalk_cache_oid($device, 'ifDescr', $port_stats, 'IF-MIB', null, $descrSnmpFlags);
 $port_stats = snmpwalk_cache_oid($device, 'ifName', $port_stats, 'IF-MIB');
@@ -32,7 +26,6 @@ $port_stats = snmpwalk_cache_oid($device, 'ifOperStatus', $port_stats, 'IF-MIB',
 if ($device['os'] == 'nokia-isam') {
     require base_path('includes/discovery/ports/nokia-isam.inc.php');
 }
-
 
 // Get Trellix NSP ports
 if ($device['os'] == 'mlos-nsp') {
