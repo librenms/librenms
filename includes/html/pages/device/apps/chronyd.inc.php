@@ -14,6 +14,7 @@ echo ' | Sources: ';
 $sources = $app->data['sources'] ?? [];
 sort($sources);
 foreach ($sources as $index => $source) {
+    $source = htmlspecialchars($source);
     $label = $vars['source'] == $source
         ? '<span class="pagemenu-selected">' . $source . '</span>'
         : $source;
@@ -28,6 +29,9 @@ foreach ($sources as $index => $source) {
 print_optionbar_end();
 
 if (! isset($vars['source'])) {
+    if (isset($vars['source'])) {
+        $vars['source'] =  htmlspecialchars($vars['source']);
+    }
     $graphs = [
         'chronyd_time' => 'System time',
         'chronyd_frequency' => 'System clock frequency',
