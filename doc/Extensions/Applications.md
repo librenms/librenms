@@ -1157,14 +1157,14 @@ or [MetaCPAN](https://metacpan.org/dist/HV-Monitor).
 For Debian based systems this is as below.
 
 ```
-apt-get install zlib1g-dev cpanminus libjson-perl
+apt-get install libjson-perl libmime-base64-perl cpanminus
 cpanm HV::Monitor
 ```
 
 And on FreeBSD as below.
 
 ```
-pkg install p5-App-cpanminus p5-JSON p5-MIME-Base64 p5-Gzip-Faster
+pkg install p5-App-cpanminus p5-JSON p5-MIME-Base64 p5-Module-List
 cpanm HV::Monitor
 ```
 
@@ -1279,8 +1279,8 @@ chmod +x /etc/snmp/logsize
 # FreeBSD
 pkg install p5-File-Find-Rule p5-JSON p5-TOML p5-Time-Piece p5-MIME-Base64 p5-File-Slurp p5-Statistics-Lite
 # Debian
-apt-get install cpanminus
-cpanm File::Find::Rule JSON TOML Time::Piece MIME::Base64 File::Slurp Statistics::Lite
+apt-get install cpanminus libjson-perl libmime-base64-perl libfile-slurp-perl libtoml-perl libfile-find-rule-perl libstatistics-lite-perl
+cpanm Time::Piece
 ```
 
 3. Configure the config at `/usr/local/etc/logsize.conf`. You can find
@@ -1371,8 +1371,10 @@ extend linux_config_files /etc/snmp/linux_config_files.py
 
 1: Install the depends, which on a Debian based system would be as below.
 ```
-apt-get install -y cpanminus zlib1g-dev
-cpanm File::Slurp MIME::Base64 JSON Gzip::Faster
+# Debian
+apt-get install -y libfile-slurp-perl libmime-base64-perl libjson-perl
+# generic cpanm
+cpanm JSON File::Slurp MIME::Base64
 ```
 
 2. Download the script into the desired host.
@@ -2725,10 +2727,11 @@ chmod +x /etc/snmp/privoxy
 2. Install the depdenencies.
 ```
 # FreeBSD
-pkg install p5-File-ReadBackwards p5-Time-Piece p5-JSON p5-IPC-Run3 p5-Gzip-Faster p5-MIME-Base64
+pkg install p5-JSON p5-MIME-Base64 p5-File-Slurp p5-File-ReadBackwards p5-IPC-Run3 p5-Time-Piece
+
 # Debian
-apt-get install cpanminus zlib1g
-cpanm File::ReadBackwards Time::Piece JSON IPC::Run3 MIME::Base64 Gzip::Faster
+apt-get install libjson-perl libmime-base64-perl libfile-slurp-perl libfile-readbackwards-perl libipc-run3-perl cpanminus
+cpanm Time::Piece
 ```
 
 3. Add the extend to snmpd.conf and restart snmpd.
@@ -2745,6 +2748,19 @@ a `$PATH` set to something that includes it.
 
 Once that is done, just wait for the server to be rediscovered or just
 enable it manually.
+
+If you are having timeouts or there is privelege seperation issues,
+then it can be ran via cron like below. `-w` can be used to write it
+out and `-o` can be used to control where it is written to. See
+`--help` for more information.
+
+```
+# cron
+*/5 * * * * root /etc/snmp/privoxy -w > /dev/null
+
+# snmpd.conf
+extend privoxy /bin/cat /var/cache/privoxy_extend.json.snmp
+```
 
 ## Pwrstatd
 
@@ -3133,8 +3149,7 @@ wget https://github.com/librenms/librenms-agent/raw/master/snmp/smart-v1 -O /etc
 # FreeBSD
 pkg install p5-JSON p5-MIME-Base64 smartmontools
 # Debian
-apt-get install cpanminus smartmontools
-cpanm MIME::Base64 JSON
+apt-get install smartmontools libjson-perl libmime-base64-perl
 # CentOS
 dnf install smartmontools perl-JSON perl-MIME-Base64
 ```
@@ -3273,10 +3288,10 @@ at [MetaCPAN](https://metacpan.org/dist/Monitoring-Sneck-Boop_Snoot) and
 
 ```
 # FreeBSD
-pkg install p5-JSON p5-File-Slurp p5-MIME-Base64 p5-Gzip-Faster p5-App-cpanminus
+pkg install p5-JSON p5-File-Slurp p5-MIME-Base64 p5-App-cpanminus
 cpanm Monitoring::Sneck
 # Debian based systems
-apt-get install zlib1g-dev cpanminus
+apt-get install cpanminus libjson-perl libfile-slurp-perl libmime-base64-perl
 cpanm Monitoring::Sneck
 ```
 
@@ -3393,6 +3408,12 @@ one found among all the instances.
 
 1. Install the extend.
 ```
+# FreeBSD
+pkg install p5-JSON p5-File-ReadBackwards p5-File-Slurp p5-MIME-Base64 p5-Time-Piece p5-App-cpanminus
+cpanm Sagan::Monitoring
+
+# Debian
+apt-get install libjson-perl libfile-readbackwards-perl libfile-slurp-perl libmime-base64-perl cpanminus
 cpanm Sagan::Monitoring
 ```
 
@@ -3557,6 +3578,11 @@ semodule -i snmpd_ss.pp
 
 1. Install the extend.
 ```
+# FreeBSD
+pkg install p5-JSON p5-File-Path p5-File-Slurp p5-Time-Piece p5-MIME-Base64 p5-Hash-Flatten p5-Carp p5-App-cpanminus
+cpanm Suricata::Monitoring
+# Debian
+apt-get install libjson-perl libfile-path-perl libfile-slurp-perl libmime-base64-perl cpanminus
 cpanm Suricata::Monitoring
 ```
 
