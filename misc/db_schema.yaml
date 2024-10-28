@@ -530,6 +530,7 @@ custom_maps:
     - { Field: legend_font_size, Type: smallint, 'Null': false, Extra: '', Default: '14' }
     - { Field: legend_hide_invalid, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
     - { Field: legend_hide_overspeed, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
+    - { Field: legend_colours, Type: longtext, 'Null': true, Extra: '' }
     - { Field: options, Type: longtext, 'Null': true, Extra: '' }
     - { Field: newnodeconfig, Type: longtext, 'Null': false, Extra: '' }
     - { Field: newedgeconfig, Type: longtext, 'Null': false, Extra: '' }
