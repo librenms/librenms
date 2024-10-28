@@ -139,6 +139,8 @@ return [
                 'add' => 'Add Edge',
                 'edit' => 'Edit Edge',
                 'defaults_title' => 'Edge Default Config',
+                'dynamic_width' => 'Dynamic Width',
+                'fixed_width' => 'Fixed Width',
                 'from' => 'From',
                 'to' => 'To',
                 'port_select' => 'Select Port',

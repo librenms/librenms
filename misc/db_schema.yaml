@@ -565,6 +565,7 @@ custom_map_edges:
     - { Field: showpct, Type: tinyint, 'Null': false, Extra: '' }
     - { Field: showbps, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
     - { Field: label, Type: varchar(255), 'Null': false, Extra: '', Default: '' }
+    - { Field: fixed_width, Type: 'decimal(3,1)', 'Null': true, Extra: '' }
     - { Field: text_face, Type: varchar(50), 'Null': false, Extra: '' }
     - { Field: text_size, Type: int, 'Null': false, Extra: '' }
     - { Field: text_colour, Type: varchar(10), 'Null': false, Extra: '' }
