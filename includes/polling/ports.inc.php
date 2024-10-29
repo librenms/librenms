@@ -210,11 +210,6 @@ foreach ($ports_mapped['maps']['ifIndex'] as $ifIndex => $port_id) {
 echo 'Caching Oids: ';
 $port_stats = [];
 
-# Added to change context
-#if ($device['os'] === 'nokia-isam') {
-#   $device['context_name'] = 'ihub';
-#}
-
 if ($device['os'] === 'f5' && (version_compare($device['version'], '11.2.0', '>=') && version_compare($device['version'], '11.7', '<'))) {
     require 'ports/f5.inc.php';
 } elseif ($device['os'] === 'exalink-fusion') {

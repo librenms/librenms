@@ -25,21 +25,20 @@
 // Use proprietary asamIfExtCustomerId as ifAlias for Nokia ISAM Plattform. The default IF-MIB fields are here quite meaningless
 $isam_port_stats = snmpwalk_cache_oid($device, 'asamIfExtCustomerId', [], 'ITF-MIB-EXT', 'nokia-isam');
 foreach ($isam_port_stats as $index => $value) {
-   $port_stats[$index]['ifAlias'] = $isam_port_stats[$index]['asamIfExtCustomerId'];
+    $port_stats[$index]['ifAlias'] = $isam_port_stats[$index]['asamIfExtCustomerId'];
 }
 // Use the PON Port ID as ifDescr as it makes more sense
-// Use the static translation table 
+// Use the static translation table
 foreach ($port_stats as $index => $port) {
-    if (isset($port['ifType']) && $port['ifType'] == 'gpon'){
+    if (isset($port['ifType']) && $port['ifType'] == 'gpon') {
         $port_stats[$index]['ifDescr'] = 'PON ' . $isam_port_table[$index];
-    }	
+    }
 }
 
 // Now also walk the IHUB context for prots
 // Store the current context and set context to the extra context(s) we want to walk
 $old_context_name = $device['context_name'];
-$device['context_name'] = "ihub";
-
+$device['context_name'] = 'ihub';
 
 // Now do the same as in ports.inc full ports
 $ihub_port_stats = snmpwalk_cache_oid($device, 'ifXEntry', $ihub_port_stats, 'IF-MIB');
