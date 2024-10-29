@@ -43,12 +43,10 @@ $device['context_name'] = 'ihub';
 // Now do the same as in ports.inc full ports
 $ihub_port_stats = snmpwalk_cache_oid($device, 'ifXEntry', $ihub_port_stats, 'IF-MIB');
 $hc_test = array_slice($ihub_port_stats, 0, 1);
+
 // If the device doesn't have ifXentry data, fetch ifEntry instead.
 if (! is_numeric($hc_test[0]['ifHCInOctets'] ?? null) || ! is_numeric($hc_test[0]['ifHighSpeed'] ?? null)) {
     $ifEntrySnmpFlags = ['-OQUst'];
-    if ($device['os'] == 'bintec-beip-plus') {
-        $ifEntrySnmpFlags = ['-OQUst', '-Cc'];
-    }
     $ihub_port_stats = snmpwalk_cache_oid($device, 'ifEntry', $ihub_port_stats, 'IF-MIB', null, $ifEntrySnmpFlags);
 } else {
     // For devices with ifXentry data, only specific ifEntry keys are fetched to reduce SNMP load
