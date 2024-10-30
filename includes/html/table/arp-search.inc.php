@@ -23,15 +23,11 @@ if (isset($current)) {
     $page = 1;
 }
 
-$user = Auth::user();
-$query = Ipv4Mac::with('port', 'device', 'remote_ports_maybe', 'remote_ports_maybe.device')
+$query = Ipv4Mac::hasAccess(Auth::user())
+    ->with('port', 'device', 'remote_ports_maybe', 'remote_ports_maybe.device')
     ->withAggregate('port', 'ifDescr')
     ->withAggregate('device', 'hostname')
     ->orderBy(...$sort_arr);
-
-if (! $user->hasGlobalRead()) {
-    $query->whereIntegerInRaw('device_id', \Permissions::devicesForUser($user));
-}
 
 if (is_numeric($vars['device_id'])) {
     $query->where('device_id', $vars['device_id']);
