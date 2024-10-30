@@ -44,10 +44,10 @@ return new class extends Migration
             $table->bigInteger('last_packets_drop_out')->nullable()->comment('Last polled counter for output dropped packets');
             $table->bigInteger('packets_drop_in_rate')->nullable()->comment('Output rate for dropped packets');
             $table->bigInteger('packets_drop_out_rate')->nullable()->comment('Input rate for dropped packets');
-            $table->bigInteger('bytes_drop_in_pct')->storedAs('CASE WHEN bytes_in_rate = 0 THEN 0 ELSE 100 * bytes_drop_in_rate / bytes_in_rate END')->comment('Percentage of input bytes dropped');
-            $table->bigInteger('bytes_drop_out_pct')->storedAs('CASE WHEN bytes_out_rate = 0 THEN 0 ELSE 100 * bytes_drop_out_rate / bytes_out_rate END')->comment('Percentage of output bytes dropped');
-            $table->bigInteger('packets_drop_in_pct')->storedAs('CASE WHEN packets_in_rate = 0 THEN 0 ELSE 100 * packets_drop_in_rate / packets_in_rate END')->comment('Percentage of input packets dropped');
-            $table->bigInteger('packets_drop_out_pct')->storedAs('CASE WHEN packets_out_rate = 0 THEN 0 ELSE 100 * packets_drop_out_rate / packets_out_rate END')->comment('Percentage of output packets dropped');
+            $table->decimal('bytes_drop_in_pct', 6, 2)->nullable()->comment('Percentage of input bytes dropped');
+            $table->decimal('bytes_drop_out_pct', 6, 2)->nullable()->comment('Percentage of output bytes dropped');
+            $table->decimal('packets_drop_in_pct', 6, 2)->nullable()->comment('Percentage of input packets dropped');
+            $table->decimal('packets_drop_out_pct', 6, 2)->nullable()->comment('Percentage of output packets dropped');
             $table->foreign('device_id')->references('device_id')->on('devices')->onDelete('CASCADE');
             $table->foreign('port_id')->references('port_id')->on('ports')->onDelete('set null');
             $table->foreign('parent_id')->references('qos_id')->on('qos')->onDelete('set null');
