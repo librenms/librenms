@@ -86,7 +86,7 @@ var data = {
 var network = new vis.Network(container, data, options);
 network.on('click', function (properties) {
     if (properties.nodes > 0) {
-       window.location.href = "device/device="+properties.nodes+"/tab=neighbours/selection=map/"
+       window.location.href = "{{ @url('device') }}/device="+properties.nodes+"/tab=neighbours/selection=map/"
     }
 });
 </script>
