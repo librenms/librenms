@@ -11,6 +11,10 @@ $link_array = [
 
 $app_data = $app->data;
 
+if (isset($vars['access_log_page'])) {
+    $vars['access_log_page'] = htmlspecialchars($vars['access_log_page']);
+}
+
 print_optionbar_start();
 
 // print the link to the totals
@@ -80,6 +84,7 @@ echo ') | Sets: ';
 
 $index_int = 0;
 foreach ($app_data['logs'] as $index => $log_name) {
+    $log_name = htmlspecialchars($log_name);
     $label = (isset($vars['access_log_page']) || $vars['log'] != $log_name)
         ? $log_name
         : '<span class="pagemenu-selected">' . $log_name . '</span>';
