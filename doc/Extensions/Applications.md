@@ -2042,14 +2042,19 @@ extend opensips /etc/snmp/opensips-stats.sh
 1. Install the depends...
 
 ```shell
-# FreeBSD
-pkg install p5-JSON p5-Mime-Base64 p5-Clone p5-File-Slurp p5-IO-Interface p5-App-cpanminus
-
 # Debian
 apt-get install libjson-perl libclone-perl libmime-base64-perl libfile-slurp-perl libio-interface-perl cpanminus
 ```
 
-2. Install... `cpanm OSLV::Monitor`
+2. Install...
+
+```
+# FreeBSD
+pkg install p5-OSLV-Monitor
+
+# Debian / Generic
+cpanm OSLV::Monitor
+```
 
 3. Setup cron.
 
