@@ -2273,11 +2273,6 @@ vendor_ouis:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     vendor_ouis_oui_unique: { Name: vendor_ouis_oui_unique, Columns: [oui], Unique: true, Type: BTREE }
-view_port_mac_links:
-  Columns:
-    - { Field: port_id, Type: 'int unsigned', 'Null': false, Extra: '', Default: '0' }
-    - { Field: ipv4_mac_id, Type: 'bigint unsigned', 'Null': false, Extra: '', Default: '0' }
-    - { Field: remote_port_id, Type: 'int unsigned', 'Null': false, Extra: '', Default: '0' }
 vlans:
   Columns:
     - { Field: vlan_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
