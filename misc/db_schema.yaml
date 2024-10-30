@@ -1959,10 +1959,10 @@ qos:
     - { Field: last_packets_drop_out, Type: bigint, 'Null': true, Extra: '' }
     - { Field: packets_drop_in_rate, Type: bigint, 'Null': true, Extra: '' }
     - { Field: packets_drop_out_rate, Type: bigint, 'Null': true, Extra: '' }
-    - { Field: bytes_drop_in_pct, Type: bigint, 'Null': true, Extra: 'STORED GENERATED' }
-    - { Field: bytes_drop_out_pct, Type: bigint, 'Null': true, Extra: 'STORED GENERATED' }
-    - { Field: packets_drop_in_pct, Type: bigint, 'Null': true, Extra: 'STORED GENERATED' }
-    - { Field: packets_drop_out_pct, Type: bigint, 'Null': true, Extra: 'STORED GENERATED' }
+    - { Field: bytes_drop_in_pct, Type: decimal(6,2), 'Null': true, Extra: '' }
+    - { Field: bytes_drop_out_pct, Type: decimal(6,2), 'Null': true, Extra: '' }
+    - { Field: packets_drop_in_pct, Type: decimal(6,2), 'Null': true, Extra: '' }
+    - { Field: packets_drop_out_pct, Type: decimal(6,2), 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [qos_id], Unique: true, Type: BTREE }
     qos_device_id_index: { Name: qos_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
