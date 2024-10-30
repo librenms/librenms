@@ -75,7 +75,6 @@
             }
         });
         var ajax_url = "{{ url('/ajax') }}";
-        var maps_url = "{{ url('/maps') }}";
     </script>
     <script src="{{ asset('js/librenms.js?ver=29092024') }}"></script>
     <script type="text/javascript" src="{{ asset('js/overlib_mini.js') }}"></script>
