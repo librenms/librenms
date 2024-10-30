@@ -72,9 +72,7 @@ html, body, #fullscreen-map {
     window.addEventListener('resize', checkMapSize);
     checkMapSize();
 
-    var device_map = init_map("fullscreen-map", "{{$map_provider}}", "{{$map_api_key}}", {"tile_url": "{{$tile_url}}"});
-    device_map.setView(new L.LatLng({{$init_lat}}, {{$init_lng}}));
-    device_map.setZoom({{$init_zoom}});
+    var device_map = init_map("fullscreen-map", {engine: "{{$map_provider}}", api_key: "{{$map_api_key}}", "tile_url": "{{$tile_url}}", lat: {{$init_lat}}, lng: {{$init_lng}}, zoom: {{$init_zoom}}});
 
     var device_marker_cluster = L.markerClusterGroup({
         maxClusterRadius: {{$group_radius}},

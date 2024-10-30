@@ -27,14 +27,27 @@ namespace App\Http\Controllers\Maps;
 
 use App\Http\Controllers\Controller;
 use App\Models\DeviceGroup;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\View\View;
 use LibreNMS\Config;
 
 class FullscreenMapController extends Controller
 {
-    protected static function fullscreenMap(Request $request): View
+    protected function fullscreenMap(Request $request): View|RedirectResponse
     {
+        $validator = Validator::make($request->all(), [
+            'group' => 'int',
+            'lat' => 'numeric',
+            'lng' => 'numeric',
+            'zoom' => 'numeric',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect('fullscreenmap');
+        }
+
         $group_name = null;
         if ($request->get('group')) {
             $group_name = DeviceGroup::where('id', '=', $request->get('group'))->first('name');
@@ -73,10 +86,6 @@ class FullscreenMapController extends Controller
             'tile_url' => Config::get('leaflet.tile_url', '{s}.tile.openstreetmap.org'),
             'group_id' => $request->get('group'),
             'group_name' => $group_name,
-            'valid_loc' => $request->get('location_valid'),
-            'disabled' => $request->get('disabled'),
-            'ignore' => $request->get('ignore'),
-            'disabled_alerts' => $request->get('disabled_alerts'),
         ];
 
         return view('map.fullscreen', $data);
