@@ -54,10 +54,6 @@ class CustomMapController extends Controller
             'legend' => [
                 'x' => -1,
                 'y' => -1,
-                'steps' => 7,
-                'hide_invalid' => 0,
-                'hide_overspeed' => 0,
-                'font_size' => 14,
             ],
             'background_type' => Config::get('custom_map.background_type', 'none'),
             'background_data' => Config::get('custom_map.background_data'),
@@ -218,6 +214,10 @@ class CustomMapController extends Controller
         ];
         $map->background_type = Config::get('custom_map.background_type', 'none');
         $map->background_data = Config::get('custom_map.background_data');
+        $map->legend_colours = $this->getDefaultLegendColours();
+        if ($map->legend_colours) {
+            $map->legend_steps = count($map->legend_colours) - 2;
+        }
 
         return $this->update($request, $map);
     }
@@ -272,8 +272,49 @@ class CustomMapController extends Controller
             'hide_invalid' => $map->legend_hide_invalid,
             'hide_overspeed' => $map->legend_hide_overspeed,
             'font_size' => $map->legend_font_size,
+            'colours' => $map->legend_colours,
         ];
 
         return $legend;
+    }
+
+    /**
+     * Return the default legend colours
+     */
+    private function getDefaultLegendColours(): array|null
+    {
+        $ret = Config::get('custom_map.legend_colours', null);
+
+        // Return null if there is no config
+        if (! $ret) {
+            return null;
+        }
+
+        foreach (array_keys($ret) as $key) {
+            if (! is_numeric($key)) {
+                // Delete keys that are not numeric
+                unset($ret[$key]);
+            } elseif (! preg_match('/^#[A-Fa-f0-0]{6}$/', $ret[$key])) {
+                // Delete keys that are not a valid hex HTML colour
+                unset($ret[$key]);
+            }
+        }
+
+        // Make sure a value exists for device down
+        if (! array_key_exists('-2', $ret)) {
+            $ret['-2'] = '#8B0000';
+        }
+
+        // Make sure a value exists for invalid
+        if (! array_key_exists('-1', $ret)) {
+            $ret['-1'] = '#000000';
+        }
+
+        // Make sure a value exists for 0
+        if (! array_key_exists('0', $ret)) {
+            $ret['0'] = '#00FF00';
+        }
+
+        return $ret;
     }
 }

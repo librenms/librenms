@@ -433,6 +433,25 @@ $graphs['sagan'] = [
     'uptime',
     'alert',
 ];
+$graphs['oslv_monitor'] = [
+    'cpu_percent',
+    'mem_percent',
+    'time',
+    'procs',
+    'sizes',
+    'rss',
+    'vsz',
+    'faults',
+    'rwd_amount',
+    'ops_rwd',
+    'cows',
+    'sock',
+    'recv_sent_msgs',
+    'etime',
+    'swaps',
+    'signals_taken',
+    'switches',
+];
 $graphs['hv-monitor'] = [
     'status',
     'memory',
@@ -612,9 +631,9 @@ $link_array = [
     'tab' => 'apps',
 ];
 
-$apps = \LibreNMS\Util\ObjectCache::applications()->flatten();
+$apps = LibreNMS\Util\ObjectCache::applications()->flatten();
 foreach ($apps as $app) {
-    $app_state = \LibreNMS\Util\Html::appStateIcon($app->app_state);
+    $app_state = LibreNMS\Util\Html::appStateIcon($app->app_state);
     if (! empty($app_state['icon'])) {
         $app_state_info = '<font color="' . $app_state['color'] . '"><i title="' . $app_state['hover_text'] . '" class="fa ' . $app_state['icon'] . ' fa-fw fa-lg" aria-hidden="true"></i></font>';
     } else {

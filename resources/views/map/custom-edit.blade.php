@@ -8,6 +8,7 @@
 @include('map.custom-node-modal')
 @include('map.custom-edge-modal')
 @include('map.custom-map-modal')
+@include('map.custom-legend-modal')
 @include('map.custom-map-list-modal')
 
 <div class="container-fluid">
@@ -18,6 +19,7 @@
       <button type=button value="mapbg" id="map-bgEndAdjustButton" class="btn btn-primary" onclick="endBackgroundMapAdjust()" style="display:none">{{ __('map.custom.edit.bg.adjust_map_finish') }}</button>
       <button type=button value="editnodedefaults" id="map-nodeDefaultsButton" class="btn btn-primary" onclick="nodeEdit(newnodeconf)">{{ __('map.custom.edit.node.edit_defaults') }}</button>
       <button type=button value="editedgedefaults" id="map-edgeDefaultsButton" class="btn btn-primary" onclick="edgeEditDefaults()">{{ __('map.custom.edit.edge.edit_defaults') }}</button>
+      <button type=button value="togglelegend" id="map-legendToggleButton" class="btn btn-primary" onclick="toggleLegend()">{{ __('map.custom.edit.map.legend_toggle') }}</button>
     </div>
     <div class="col-md-2">
       <center>
@@ -428,6 +430,28 @@
         return '#ff00ff';
     }
 
+    function toggleLegend() {
+        var width = $("#mapwidth").val();
+        var mapwdith = 100;
+        if (!isNaN(width)) {
+            mapwidth = width;
+        } else if (width.includes("px")) {
+            mapwidth = width.replace("px", "");
+        } else if (width.includes("%")) {
+            mapwidth = window.innerWidth * width.replace("%", "") / 100;
+        }
+
+        // Update the x and y coordinates
+        if (legend.x < 0) {
+            legend.x = mapwidth - 50;
+            legend.y = 100;
+        } else {
+            legend.x = -1;
+            legend.y = -1;
+        }
+        redrawLegend();
+    }
+
     function redrawLegend() {
         // Clear out the old legend
         old_nodes = network_nodes.get({filter: function(node) { return node.id.startsWith("legend_") }});
@@ -443,22 +467,40 @@
             y_pos += y_inc;
 
             if (!(Boolean(legend.hide_invalid))) {
-                let legend_invalid = {id: "legend_invalid", label: "???", title: "Link is down or link speed is not defined", shape: "box", borderWidth: 0, x: legend.x, y: y_pos, font: {face: 'courier new', size: legend.font_size, color: "white"}, color: {background: "black"}};
+                let this_colour = 'black';
+                if(legend.colours) {
+                    this_colour = legend.colours['-1'];
+                }
+                let legend_invalid = {id: "legend_invalid", label: "???", title: "Link is down or link speed is not defined", shape: "box", borderWidth: 0, x: legend.x, y: y_pos, font: {face: 'courier new', size: legend.font_size, color: "white"}, color: {background: this_colour}};
                 y_pos += y_inc;
                 network_nodes.add(legend_invalid);
             }
 
-            let pct_step;
-            if (Boolean(legend.hide_overspeed)) {
-                pct_step = 100.0 / (legend.steps - 1);
+            if(legend.colours) {
+                let i = 0;
+                Object.keys(legend.colours).sort((a,b) => parseInt(a) > parseInt(b)).forEach((pct_key) => {
+                    let this_pct = parseFloat(pct_key);
+                    if(!isNaN(this_pct) && this_pct >= 0.0) {
+                        let legend_step = {id: "legend_" + i.toString(), label: this_pct.toString().padStart(3, " ") + "%", shape: "box", borderWidth: 0, x: legend.x, y: y_pos, font: {face: 'courier new', size: legend.font_size, color: "black"}, color: {background: legend.colours[pct_key]}};
+                        network_nodes.add(legend_step);
+                        y_pos += y_inc;
+                        i++;
+                    }
+                });
             } else {
-                pct_step = 150.0 / (legend.steps - 1);
-            }
-            for (let i=0; i < legend.steps; i++) {
-                let this_pct = Math.round(pct_step * i);
-                let legend_step = {id: "legend_" + i.toString(), label: this_pct.toString().padStart(3, " ") + "%", shape: "box", borderWidth: 0, x: legend.x, y: y_pos, font: {face: 'courier new', size: legend.font_size, color: "black"}, color: {background: legendPctColour(this_pct)}};
-                network_nodes.add(legend_step);
-                y_pos += y_inc;
+                let pct_step;
+                if (Boolean(legend.hide_overspeed)) {
+                    pct_step = 100.0 / (legend.steps - 1);
+                } else {
+                    pct_step = 150.0 / (legend.steps - 1);
+                }
+                for (let i=0; i < legend.steps; i++) {
+                    let this_pct = Math.round(pct_step * i);
+                    let legend_step = {id: "legend_" + i.toString(), label: this_pct.toString().padStart(3, " ") + "%", shape: "box", borderWidth: 0, x: legend.x, y: y_pos, font: {face: 'courier new', size:
+ legend.font_size, color: "black"}, color: {background: legendPctColour(this_pct)}};
+                    network_nodes.add(legend_step);
+                    y_pos += y_inc;
+                }
             }
             network_nodes.flush();
         }
@@ -474,7 +516,6 @@
             swapArrows(Boolean(parseInt(data.reverse_arrows)));
         }
         reverse_arrows = parseInt(data.reverse_arrows);
-        redrawLegend();
 
         // update dimensions
         network_options.width = data.width;
@@ -504,7 +545,7 @@
                 edgeid = node.id.split("_")[0];
                 edge1 = network_edges.get(edgeid + "_from");
                 edge2 = network_edges.get(edgeid + "_to");
-                edges[edgeid] = {id: edgeid, text_colour: edge1.font.color, text_size: edge1.font.size, text_face: edge1.font.face, from: edge1.from, to: edge2.from, showpct: (edge1.label != null && edge1.label.includes("xx%")), showbps: (edge1.label != null && edge1.label.includes("bps")), label: (node.label || ''), port_id: edge1.title, style: edge1.smooth.type, mid_x: node.x, mid_y: node.y, reverse: (edgeid in edge_port_map ? edge_port_map[edgeid].reverse : false)};
+                edges[edgeid] = {id: edgeid, text_colour: edge1.font.color, text_size: edge1.font.size, text_face: edge1.font.face, from: edge1.from, to: edge2.from, showpct: (edge1.label != null && edge1.label.includes("xx%")), showbps: (edge1.label != null && edge1.label.includes("bps")), label: (node.label || ''), fixed_width: (edge1.width || null), port_id: edge1.title, style: edge1.smooth.type, mid_x: node.x, mid_y: node.y, reverse: (edgeid in edge_port_map ? edge_port_map[edgeid].reverse : false)};
             } else {
                 if(node.icon.code) {
                     node.icon = node.icon.code.charCodeAt(0).toString(16);
@@ -531,6 +572,11 @@
                 edges: edges,
                 legend_x: legend.x,
                 legend_y: legend.y,
+                legend_steps: legend.steps,
+                legend_font_size: legend.font_size,
+                legend_hide_invalid: legend.hide_invalid,
+                legend_hide_overspeed: legend.hide_overspeed,
+                legend_colours: legend.colours,
             }),
             contentType: "application/json",
             dataType: 'json',
@@ -573,6 +619,7 @@
 
             // Legend nodes cannot be edited
             if (data.id.startsWith("legend_") ) {
+                $('#mapLegendModal').modal({backdrop: 'static', keyboard: false}, 'show');
                 return;
             }
         }
@@ -698,6 +745,9 @@
 
                     var edge1 = {id: edgeid + "_from", from: edge.custom_map_node1_id, to: edgeid + "_mid", arrows: arrows, font: {face: edge.text_face, size: edge.text_size, color: edge.text_colour}, smooth: {type: edge.style}};
                     var edge2 = {id: edgeid + "_to", from: edge.custom_map_node2_id, to: edgeid + "_mid", arrows: arrows, font: {face: edge.text_face, size: edge.text_size, color: edge.text_colour}, smooth: {type: edge.style}};
+                    if(edge.fixed_width) {
+                        edge1.width = edge2.width = parseFloat(edge.fixed_width) || null;
+                    }
 
                     // Special case for curved lines
                     if(edge2.smooth.type == "curvedCW") {

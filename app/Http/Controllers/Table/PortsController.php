@@ -104,7 +104,7 @@ class PortsController extends TableController
     protected function baseQuery($request)
     {
         $query = Port::hasAccess($request->user())
-            ->with('device')
+            ->with(['device', 'device.location'])
             ->leftJoin('devices', 'ports.device_id', 'devices.device_id')
             ->where('deleted', $request->get('deleted', 0)) // always filter deleted
             ->when($request->get('hostname'), function (Builder $query, $hostname) {

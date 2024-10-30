@@ -1119,6 +1119,27 @@ log that the size will be checked for and reported via the stat
 }
 ```
 
+8. (Optional) If you have SELinux in Enforcing mode, you must add a module so the script can open and read the httpd log files:
+```
+cat << EOF > snmpd_http_access_log_combined.te
+module snmp_http_access_log_combined 1.0;
+
+require {
+        type httpd_log_t;
+        type snmpd_t;
+        class file { open read };
+}
+
+#============= snmpd_t ==============
+
+allow snmpd_t httpd_log_t:file { open read };
+
+EOF
+checkmodule -M -m -o snmpd_http_access_log_combined.mod snmpd_http_access_log_combined.te
+semodule_package -o snmpd_http_access_log_combined.pp -m snmpd_http_access_log_combined.mod
+semodule -i snmpd_http_access_log_combined.pp
+```
+
 ## HV Monitor
 
 HV Monitor provides a generic way to monitor hypervisors. Currently
@@ -1136,14 +1157,14 @@ or [MetaCPAN](https://metacpan.org/dist/HV-Monitor).
 For Debian based systems this is as below.
 
 ```
-apt-get install zlib1g-dev cpanminus libjson-perl
+apt-get install libjson-perl libmime-base64-perl cpanminus
 cpanm HV::Monitor
 ```
 
 And on FreeBSD as below.
 
 ```
-pkg install p5-App-cpanminus p5-JSON p5-MIME-Base64 p5-Gzip-Faster
+pkg install p5-App-cpanminus p5-JSON p5-MIME-Base64 p5-Module-List
 cpanm HV::Monitor
 ```
 
@@ -1258,8 +1279,8 @@ chmod +x /etc/snmp/logsize
 # FreeBSD
 pkg install p5-File-Find-Rule p5-JSON p5-TOML p5-Time-Piece p5-MIME-Base64 p5-File-Slurp p5-Statistics-Lite
 # Debian
-apt-get install cpanminus
-cpanm File::Find::Rule JSON TOML Time::Piece MIME::Base64 File::Slurp Statistics::Lite
+apt-get install cpanminus libjson-perl libmime-base64-perl libfile-slurp-perl libtoml-perl libfile-find-rule-perl libstatistics-lite-perl
+cpanm Time::Piece
 ```
 
 3. Configure the config at `/usr/local/etc/logsize.conf`. You can find
@@ -1350,8 +1371,10 @@ extend linux_config_files /etc/snmp/linux_config_files.py
 
 1: Install the depends, which on a Debian based system would be as below.
 ```
-apt-get install -y cpanminus zlib1g-dev
-cpanm File::Slurp MIME::Base64 JSON Gzip::Faster
+# Debian
+apt-get install -y libfile-slurp-perl libmime-base64-perl libjson-perl
+# generic cpanm
+cpanm JSON File::Slurp MIME::Base64
 ```
 
 2. Download the script into the desired host.
@@ -2007,6 +2030,141 @@ chmod +x /etc/snmp/opensips-stats.sh
 extend opensips /etc/snmp/opensips-stats.sh
 ```
 
+## OS Level Virtualization Monitoring
+
+| OS      | Supported                           |
+|---------|-------------------------------------|
+| FreeBSD | jails                               |
+| Linux   | cgroups v2(Docker, Podman included) |
+
+### SNMP Extend
+
+1. Install the depends...
+
+```shell
+# FreeBSD
+pkg install p5-JSON p5-Mime-Base64 p5-Clone p5-File-Slurp p5-IO-Interface p5-App-cpanminus
+
+# Debian
+apt-get install libjson-perl libclone-perl libmime-base64-perl libfile-slurp-perl libio-interface-perl cpanminus
+```
+
+2. Install... `cpanm OSLV::Monitor`
+
+3. Setup cron.
+
+```
+ */5 * * * * /usr/local/bin/oslv_monitor -q > /dev/null 2> /dev/null
+```
+
+4. Setup snmpd.
+
+```
+extend oslv_monitor /bin/cat /var/cache/oslv_monitor/snmp
+```
+
+Wait for it to be rediscovered by LibreNMS.
+
+An optional config file may be specified via -f or placed at
+`/usr/local/etc/oslv_monitor.json`.
+
+The following keys are used in the JSON config file.
+
+    - include :: An array of regular expressions to include.
+        Default :: ["^.*$"]
+
+    - exclude :: An array of regular expressions to exlclude.
+        Default :: undef
+
+    - backend :: Override the backend and automatically choose it.
+
+    - time_divider :: Override the time_divider value. The default value varies
+        per backend and if it is needed.
+
+Time divider notes.
+
+    - cgroups :: While the default for usec to sec conversion should be 1000000,
+              some settings report the value in nanoseconds, requiring 1000000000.
+        Default :: 1000000
+
+    - FreeBSD :: not used
+
+By Defaults the backends are as below.
+
+    FreeBSD: FreeBSD
+    Linux: cgroups
+
+Default would be like this.
+
+```json
+{
+  "include": ["^.*$"]
+}
+```
+
+
+### Metric Notes
+
+| Key                     | Description                                                  |
+|-------------------------|--------------------------------------------------------------|
+| `running_$name`         | 0 or 1 based on if it is running or not.                     |
+| `oslvm___$name___$stat` | The a specific stat for a specific OSLVMs.                   |
+| `totals_$stat`          | A stat representing a total for all stats across all OSLVMs. |
+
+Something is considered not running if it has been seen. How long
+something is considred to have been seen is controlled by
+`apps.oslv_monitor.seen_age`, which is the number of seconds ago it
+would of have to be seen. The default is `604800` which is seven days
+in seconds.
+
+All time values are in seconds.
+
+All counter stats are per second values for that time period.
+
+### Backend Notes
+
+#### FreeBSD
+
+The stats names match those produced by `ps --libxo json`.
+
+#### Linux cgroups v2
+
+The cgroup to name mapping is done like below.
+
+- systemd -> s_$name
+- user -> u_$name
+- docker -> d_$name
+- podman -> p_$name
+- anything else -> $name
+
+The following ps to stats mapping are as below.
+
+- %cpu -> percent-cpu
+- %mem -> percent-memory
+- rss -> rss
+- vsize -> virtual-size
+- trs -> text-size
+- drs -> data-size
+- size -> size
+
+"procs" is a total number of procs in that cgroup.
+
+The rest of the values are pulled from the following files with
+the names kept as is.
+
+- cpu.stat
+- io.stat
+- memory.stat
+
+The following mappings are done though.
+
+- pgfault -> minor-faults
+- pgmajfault -> major-faults
+- usage_usec -> cpu-time
+- system_usec -> system-time
+- user_usec -> user-time
+- throttled_usecs -> throttled-time
+
 ## OS Updates
 
 A small shell script that checks your system package manager for any
@@ -2569,10 +2727,11 @@ chmod +x /etc/snmp/privoxy
 2. Install the depdenencies.
 ```
 # FreeBSD
-pkg install p5-File-ReadBackwards p5-Time-Piece p5-JSON p5-IPC-Run3 p5-Gzip-Faster p5-MIME-Base64
+pkg install p5-JSON p5-MIME-Base64 p5-File-Slurp p5-File-ReadBackwards p5-IPC-Run3 p5-Time-Piece
+
 # Debian
-apt-get install cpanminus zlib1g
-cpanm File::ReadBackwards Time::Piece JSON IPC::Run3 MIME::Base64 Gzip::Faster
+apt-get install libjson-perl libmime-base64-perl libfile-slurp-perl libfile-readbackwards-perl libipc-run3-perl cpanminus
+cpanm Time::Piece
 ```
 
 3. Add the extend to snmpd.conf and restart snmpd.
@@ -2589,6 +2748,19 @@ a `$PATH` set to something that includes it.
 
 Once that is done, just wait for the server to be rediscovered or just
 enable it manually.
+
+If you are having timeouts or there is privelege seperation issues,
+then it can be ran via cron like below. `-w` can be used to write it
+out and `-o` can be used to control where it is written to. See
+`--help` for more information.
+
+```
+# cron
+*/5 * * * * root /etc/snmp/privoxy -w > /dev/null
+
+# snmpd.conf
+extend privoxy /bin/cat /var/cache/privoxy_extend.json.snmp
+```
 
 ## Pwrstatd
 
@@ -2977,8 +3149,7 @@ wget https://github.com/librenms/librenms-agent/raw/master/snmp/smart-v1 -O /etc
 # FreeBSD
 pkg install p5-JSON p5-MIME-Base64 smartmontools
 # Debian
-apt-get install cpanminus smartmontools
-cpanm MIME::Base64 JSON
+apt-get install smartmontools libjson-perl libmime-base64-perl
 # CentOS
 dnf install smartmontools perl-JSON perl-MIME-Base64
 ```
@@ -3117,10 +3288,10 @@ at [MetaCPAN](https://metacpan.org/dist/Monitoring-Sneck-Boop_Snoot) and
 
 ```
 # FreeBSD
-pkg install p5-JSON p5-File-Slurp p5-MIME-Base64 p5-Gzip-Faster p5-App-cpanminus
+pkg install p5-JSON p5-File-Slurp p5-MIME-Base64 p5-App-cpanminus
 cpanm Monitoring::Sneck
 # Debian based systems
-apt-get install zlib1g-dev cpanminus
+apt-get install cpanminus libjson-perl libfile-slurp-perl libmime-base64-perl
 cpanm Monitoring::Sneck
 ```
 
@@ -3237,6 +3408,12 @@ one found among all the instances.
 
 1. Install the extend.
 ```
+# FreeBSD
+pkg install p5-JSON p5-File-ReadBackwards p5-File-Slurp p5-MIME-Base64 p5-Time-Piece p5-App-cpanminus
+cpanm Sagan::Monitoring
+
+# Debian
+apt-get install libjson-perl libfile-readbackwards-perl libfile-slurp-perl libmime-base64-perl cpanminus
 cpanm Sagan::Monitoring
 ```
 
@@ -3401,6 +3578,11 @@ semodule -i snmpd_ss.pp
 
 1. Install the extend.
 ```
+# FreeBSD
+pkg install p5-JSON p5-File-Path p5-File-Slurp p5-Time-Piece p5-MIME-Base64 p5-Hash-Flatten p5-Carp p5-App-cpanminus
+cpanm Suricata::Monitoring
+# Debian
+apt-get install libjson-perl libfile-path-perl libfile-slurp-perl libmime-base64-perl cpanminus
 cpanm Suricata::Monitoring
 ```
 
