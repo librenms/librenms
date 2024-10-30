@@ -76,7 +76,7 @@ html, body, #fullscreen-map {
     function populate_map_markers(map_id, group_radius = 10, status = [0,1], device_group = 0) {
         $.ajax({
             type: "POST",
-            url: '{{url('/maps')}}/getdevices',
+            url: '{{ route('maps.getdevices') }}',
             dataType: "json",
             data: { location_valid: 1, disabled: 0, disabled_alerts: 0, status: status, group: device_group },
             success: function (data) {
