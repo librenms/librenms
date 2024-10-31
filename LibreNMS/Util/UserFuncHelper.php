@@ -48,6 +48,6 @@ class UserFuncHelper
     {
         $channel = Str::afterLast($this->sensor['sensor_index'], '.');
 
-        return Number::cast(explode(',', $this->value_raw)[$channel] ?? '');
+        return Number::cast(explode(',', $this->value_raw)[$channel] ?? '') * $this->sensor['sensor_multiplier'] / $this->sensor['sensor_divisor'];
     }
 }

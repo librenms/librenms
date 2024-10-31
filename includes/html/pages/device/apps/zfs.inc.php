@@ -7,6 +7,10 @@ $link_array = [
     'app' => 'zfs',
 ];
 
+if (isset($vars['pool'])) {
+    $vars['pool'] = htmlspecialchars($vars['pool']);
+}
+
 print_optionbar_start();
 
 echo generate_link('ARC', $link_array);
@@ -18,6 +22,7 @@ $status_info = $app->data['status_info'] ?? [];
 $version = $app->data['version'] ?? 2;
 sort($pools);
 foreach ($pools as $index => $pool) {
+    $pool = htmlspecialchars($pool);
     $label = $vars['pool'] == $pool
         ? '<span class="pagemenu-selected">' . $pool . '</span>'
         : $pool;

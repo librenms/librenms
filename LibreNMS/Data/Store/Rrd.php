@@ -26,6 +26,7 @@
 namespace LibreNMS\Data\Store;
 
 use App\Polling\Measure\Measurement;
+use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Enum\ImageFormat;
 use LibreNMS\Exceptions\FileExistsException;
@@ -372,9 +373,9 @@ class Rrd extends BaseDatastore
      */
     public function dirFromHost($host)
     {
-        $host = str_replace(':', '_', trim($host, '[]'));
+        $host = self::safeName(trim($host, '[]'));
 
-        return implode('/', [$this->rrd_dir, $host]);
+        return Str::finish($this->rrd_dir, '/') . $host;
     }
 
     /**
