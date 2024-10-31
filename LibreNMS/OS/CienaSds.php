@@ -166,7 +166,7 @@ class CienaSds extends OS
 
         foreach ($transceivers as $index => $contents) {
             $portIndex = $interfaceIndexMapping[$index]['IF-MIB::ifIndex'];
-            if (!empty($contents['cienaCesEttpConfigName'])){
+            if (!empty($contents['cienaCesEttpConfigName'])) {
                 $nameArr = explode('/', $contents['cienaCesEttpConfigName']);
                 $slotIndex = isset($nameArr[1]) ? $nameArr[0] : 1;
 
