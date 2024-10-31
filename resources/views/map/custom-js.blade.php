@@ -138,6 +138,9 @@
             } else {
                 node_cfg.image = {};
             }
+            if(! ["ellipse", "circle", "database", "box", "text"].includes(node.style)) {
+                node_cfg.font.background = "#FFFFFF";
+            }
             return node_cfg;
         },
 
@@ -148,7 +151,7 @@
                 arrows = {to: {enabled: true, scaleFactor: 0.6}, from: {enabled: false}};
             }
 
-            var edge_cfg = {id: edgeid + "_" + fromto, to: edgeid + "_mid", arrows: arrows, font: {face: edge.text_face, size: edge.text_size, color: edge.text_colour}, smooth: {type: edge.style}};
+            var edge_cfg = {id: edgeid + "_" + fromto, to: edgeid + "_mid", arrows: arrows, font: {face: edge.text_face, size: edge.text_size, color: edge.text_colour, background: "#FFFFFF"}, smooth: {type: edge.style}};
             if (fromto == "from") {
                 edge_cfg.from = edge.custom_map_node1_id;
                 var port_pct = Boolean(reverse_arrows) ? edge.port_topct : edge.port_frompct;

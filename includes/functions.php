@@ -520,7 +520,7 @@ function delta_to_bits($delta, $period)
 
 function report_this($message)
 {
-    return '<h2>' . $message . ' Please <a href="' . Config::get('project_issues') . '">report this</a> to the ' . Config::get('project_name') . ' developers.</h2>';
+    return '<h2>' . htmlentities($message) . ' Please <a href="' . htmlentities(Config::get('project_issues')) . '">report this</a> to the ' . htmlentities(Config::get('project_name')) . ' developers.</h2>';
 }//end report_this()
 
 function hytera_h2f($number, $nd)
