@@ -30,6 +30,7 @@ use App\Models\Device;
 use App\Models\EntPhysical;
 use App\Models\Mempool;
 use App\Models\PortsNac;
+use App\Models\Qos;
 use App\Models\Sla;
 use App\Models\Transceiver;
 use Illuminate\Support\Arr;
@@ -39,6 +40,7 @@ use LibreNMS\Device\Processor;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
+use LibreNMS\Interfaces\Discovery\QosDiscovery;
 use LibreNMS\Interfaces\Discovery\SlaDiscovery;
 use LibreNMS\Interfaces\Discovery\StpInstanceDiscovery;
 use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
@@ -54,6 +56,7 @@ class Cisco extends OS implements
     SlaDiscovery,
     StpInstanceDiscovery,
     ProcessorDiscovery,
+    QosDiscovery,
     MempoolsDiscovery,
     NacPolling,
     SlaPolling,
@@ -66,6 +69,7 @@ class Cisco extends OS implements
         OS\Traits\EntityMib::discoverEntityPhysical as discoverBaseEntityPhysical;
     }
 
+    private Collection $qosIdxToParent;
     protected ?string $entityVendorTypeMib = 'CISCO-ENTITY-VENDORTYPE-OID-MIB';
 
     public function discoverOS(Device $device): void
@@ -672,5 +676,100 @@ class Cisco extends OS implements
                 'entity_physical_index' => $ifIndex,
             ]);
         });
+    }
+
+    public function discoverQos(): Collection
+    {
+        $this->qosIdxToParent = new Collection();
+        $qos = new Collection();
+
+        // Map QoS index to port
+        $ifIndexToPortId = $this->getDevice()->ports()->pluck('port_id', 'ifIndex');
+
+        // SNMP lookup tables
+        $servicePolicies = \SnmpQuery::hideMib()->walk('CISCO-CLASS-BASED-QOS-MIB::cbQosServicePolicyTable')->table(1);
+        $policyMaps = \SnmpQuery::hideMib()->walk('CISCO-CLASS-BASED-QOS-MIB::cbQosPolicyMapCfgTable')->table(1);
+        $classMaps = \SnmpQuery::hideMib()->walk('CISCO-CLASS-BASED-QOS-MIB::cbQosCMCfgTable')->table(1);
+        $matchStatements = \SnmpQuery::hideMib()->walk('CISCO-CLASS-BASED-QOS-MIB::cbQosMatchStmtCfgTable')->table(1);
+        $qosObjects = \SnmpQuery::hideMib()->walk('CISCO-CLASS-BASED-QOS-MIB::cbQosObjectsTable')->table(2);
+
+       // Iterate over a 2 level table with keys of the policy ID, then the object ID
+        foreach ($qosObjects as $policyId => $spObjects) {
+            // Policy level settings
+            $direction = $servicePolicies[$policyId]['cbQosPolicyDirection'];
+
+            foreach ($spObjects as $objectId => $qosObject) {
+                $qosObjectIndex = $qosObject['cbQosConfigIndex'];
+                $type = $qosObject['cbQosObjectsType'];
+                $parent = $qosObject['cbQosParentObjectsIndex'];
+                $snmpIndex = "$policyId.$objectId";
+
+
+                if ($type == 1) {
+                    // Policy map
+                    $dbtype = 'cisco_cbqos_policymap';
+                    // Type 1 is not polled, but we need to set RRD ID to somethign unique because it's part of the DB key
+                    $rrd_id = 'cbqos-policymap-' . $policyId . '-' . $objectId;
+                    $pm = $policyMaps[$qosObjectIndex];
+                    $title = $pm['cbQosPolicyMapDesc'] ? $pm['cbQosPolicyMapName'] . ' - ' . $pm['cbQosPolicyMapDesc'] : $pm['cbQosPolicyMapName'];
+                } elseif ($type == 2) {
+                    // Class Map
+                    $dbtype = 'cisco_cbqos_classmap';
+                    // RRD name matches the original cbqos module
+                    $rrd_id = 'port-' . $ifIndexToPortId->get($servicePolicies[$policyId]['cbQosIfIndex']) . '-cbqos-' . $policyId . '-' . $objectId;
+                    $cm = $classMaps[$qosObjectIndex];
+                    $title = $cm['cbQosCMDesc'] ? $cm['cbQosCMName'] . ' - ' . $cm['cbQosCMDesc'] : $cm['cbQosCMName'];
+
+                    // Fill in the match type
+                    $title .= ' (';
+                    if ($cm['cbQosCMInfo'] == 2) {
+                        $title .= 'Match-All : ';
+                    } elseif ($cm['cbQosCMInfo'] == 3) {
+                        $title .= 'Match-Any : ';
+                    } else {
+                        $title .= 'None';
+                    }
+
+                    // Then find the match statements
+                    $statements = [];
+                    foreach ($qosObjects[$policyId] as $sqObjectId => $sqObject) {
+                        // Find child objects (we are the parent) that are type 3 (match statements)
+                        if ($sqObject['cbQosParentObjectsIndex'] == $objectId && $sqObject['cbQosObjectsType'] == 3) {
+                            array_push($statements, $matchStatements[$qosObjects[$policyId][$sqObjectId]['cbQosConfigIndex']]['cbQosMatchStmtName']);
+                        }
+                    }
+
+                    $title .= implode(',', $statements);
+                    $title .= ')';
+
+                } else {
+                    // Other types are not relevant
+                    continue;
+                }
+
+                d_echo("\nIndex: " . $qosObjectIndex . "\n");
+                d_echo('  SNMP Index: ' . $snmpIndex . "\n");
+                d_echo('  Title     : ' . $title . "\n");
+                d_echo('  Direction : ' . $direction . "\n");
+                d_echo('  Parent    : ' . $parent . "\n");
+
+                $qos->push(new Qos([
+                    'device_id' => $this->getDeviceId(),
+                    'port_id' => $parent ? null : $ifIndexToPortId->get($servicePolicies[$policyId]['cbQosIfIndex'], null),
+                    'type' => $dbtype,
+                    'title' => $title,
+                    'rrd_id' => $rrd_id,
+                    'snmp_idx' => $snmpIndex,
+                    'ingress' => $direction == 1 ? 1 : 0,
+                    'egress' => $direction == 2 ? 1 : 0,
+                ]));
+            }
+        }
+
+        return $qos;
+    }
+
+    public function setQosParents($qos)
+    {
     }
 }
