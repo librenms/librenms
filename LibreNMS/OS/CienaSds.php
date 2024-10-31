@@ -158,37 +158,40 @@ class CienaSds extends OS
         }));
 
         // Interface stuff
-        $interfaceIndexMapping = SnmpQuery::walk('BRIDGE-MIB::dot1dBasePortIfIndex')->table(1);
+        $interfaceIndexMapping = SnmpQuery::walk('IF-MIB::ifIndex')->table(1);
         $transceivers = SnmpQuery::hideMib()->enumStrings()->walk([
             'CIENA-CES-PORT-MIB::cienaCesEttpConfigTable',
             'CIENA-CES-PORT-XCVR-MIB::cienaCesPortXcvrTable',
         ])->table(1);
 
         foreach ($transceivers as $index => $contents) {
-            $portIndex = $interfaceIndexMapping[$index]['BRIDGE-MIB::dot1dBasePortIfIndex'];
-            $nameArr = explode('/', $contents['cienaCesEttpConfigName']);
-            $slotIndex = isset($nameArr[1]) ? $nameArr[0] : 1;
+            $portIndex = $interfaceIndexMapping[$index]['IF-MIB::ifIndex'];
+            if (!empty($contents['cienaCesEttpConfigName'])){
+                $nameArr = explode('/', $contents['cienaCesEttpConfigName']);
+                $slotIndex = isset($nameArr[1]) ? $nameArr[0] : 1;
 
-            $inventory->push(new EntPhysical([
-                'entPhysicalIndex' => "56$index",
-                'entPhysicalDescr' => $contents['cienaCesEttpConfigEttpType'],
-                'entPhysicalClass' => 'port',
-                'entPhysicalName' => $contents['cienaCesEttpConfigName'],
-                'entPhysicalContainedIn' => '55' . $slotIndex,
-                'entPhysicalParentRelPos' => $index,
-                'ifIndex' => $portIndex,
-            ]));
+                $inventory->push(new EntPhysical([
+                    'entPhysicalIndex' => "56$index",
+                    'entPhysicalDescr' => $contents['cienaCesEttpConfigEttpType'],
+                    'entPhysicalClass' => 'port',
+                    'entPhysicalName' => $contents['cienaCesEttpConfigName'],
+                    'entPhysicalContainedIn' => '55' . $slotIndex,
+                    'entPhysicalParentRelPos' => $index,
+                    'ifIndex' => $portIndex,
+                ]));
+            }
 
             if (isset($contents['cienaCesPortXcvrOperState']) && $contents['cienaCesPortXcvrOperState'] != 'notPresent') {
                 $wavelengthString = ($contents['cienaCesPortXcvrWaveLength'] != 0 ?
                     $contents['cienaCesPortXcvrWaveLength'] . ' nm ' : '');
                 $mfgString = ($contents['cienaCesPortXcvrMfgDate'] != '' ?
                     'manufactured ' . $contents['cienaCesPortXcvrMfgDate'] . ' ' : '');
+                $xcvrIndex = '57' . $contents['cienaCesPortXcvrPortNumber'];
 
                 $inventory->push(new EntPhysical([
-                    'entPhysicalIndex' => $portIndex,
-                    'entPhysicalDescr' => $contents['cienaCesPortXcvrVendorName'] . ' ' . $wavelengthString .
-                        $contents['cienaCesPortXcvrIdentiferType'] . ' transceiver ' . $mfgString,
+                    'entPhysicalIndex' => $xcvrIndex,
+                    'entPhysicalDescr' => 'port ' . $contents['cienaCesPortXcvrPortNumber'] . ' ' . $wavelengthString .
+                        ' transceiver ' . $mfgString,
                     'entPhysicalClass' => 'sensor',
                     'entPhysicalModelName' => $contents['cienaCesPortXcvrVendorPartNum'],
                     'entPhysicalSerialNum' => $contents['cienaCesPortXcvrSerialNum'],
