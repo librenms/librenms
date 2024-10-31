@@ -136,11 +136,11 @@ class RunAlerts
         if ($alert['state'] >= AlertState::ACTIVE) {
             $obj['title'] = $template->title ?: 'Alert for device ' . $obj['display'] . ' - ' . ($alert['name'] ?: $alert['rule']);
             if ($alert['state'] == AlertState::ACKNOWLEDGED) {
-                $obj['title'] .= ' got acknowledged';
+                $obj['title'] .= ' Has Been Acknowledged';
             } elseif ($alert['state'] == AlertState::WORSE) {
-                $obj['title'] .= ' got worse';
+                $obj['title'] .= ' Has Worsened';
             } elseif ($alert['state'] == AlertState::BETTER) {
-                $obj['title'] .= ' got better';
+                $obj['title'] .= ' Has Improved';
             }
 
             foreach ($extra['rule'] as $incident) {
@@ -555,8 +555,8 @@ class RunAlerts
             AlertState::RECOVERED => 'recovery',
             AlertState::ACTIVE => $obj['severity'] . ' alert',
             AlertState::ACKNOWLEDGED => 'acknowledgment',
-            AlertState::WORSE => 'got worse',
-            AlertState::BETTER => 'got better',
+            AlertState::WORSE => 'worsened',
+            AlertState::BETTER => 'improved',
         ];
 
         $severity = match ($obj['state']) {
