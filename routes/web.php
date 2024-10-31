@@ -84,13 +84,21 @@ Route::middleware(['auth'])->group(function () {
         ->name('device')->where('vars', '.*');
 
     // Maps
-    Route::prefix('maps')->group(function () {
+    Route::get('fullscreenmap', 'Maps\FullscreenMapController@fullscreenMap');
+    Route::get('availability-map', 'Maps\AvailabilityMapController@availabilityMap');
+    Route::get('map/{vars?}', 'Maps\NetMapController@netMap');
+    Route::prefix('maps')->namespace('Maps')->group(function () {
         Route::resource('custom', CustomMapController::class, ['as' => 'maps'])
             ->parameters(['custom' => 'map'])->except('create');
         Route::get('custom/{map}/background', [CustomMapBackgroundController::class, 'get'])->name('maps.custom.background');
         Route::post('custom/{map}/background', [CustomMapBackgroundController::class, 'save'])->name('maps.custom.background.save');
         Route::get('custom/{map}/data', [CustomMapDataController::class, 'get'])->name('maps.custom.data');
         Route::post('custom/{map}/data', [CustomMapDataController::class, 'save'])->name('maps.custom.data.save');
+        Route::get('devicedependency', 'DeviceDependencyController@dependencyMap');
+        Route::post('getdevices', 'MapDataController@getDevices')->name('maps.getdevices');
+        Route::post('getdevicelinks', 'MapDataController@getDeviceLinks')->name('maps.getdevicelinks');
+        Route::post('getgeolinks', 'MapDataController@getGeographicLinks')->name('maps.getgeolinks');
+        Route::post('getservices', 'MapDataController@getServices')->name('maps.getservices');
     });
     Route::get('maps/devicedependency', [DeviceDependencyController::class, 'dependencyMap']);
 
@@ -245,7 +253,6 @@ Route::middleware(['auth'])->group(function () {
             Route::post('top-interfaces', 'TopInterfacesController');
             Route::post('top-errors', 'TopErrorsController');
             Route::post('worldmap', 'WorldMapController')->name('widget.worldmap');
-            Route::get('worldmap', 'WorldMapController@getData')->name('widget.worldmap.data');
             Route::post('alertlog-stats', 'AlertlogStatsController');
         });
     });

@@ -173,5 +173,8 @@ return [
                 'height_pixels' => 'Height in pixels must be at least 200',
             ],
         ],
+        'widget' => [
+            'not_found' => 'No map selected.  Edit widget to select map.',
+        ],
     ],
 ];
