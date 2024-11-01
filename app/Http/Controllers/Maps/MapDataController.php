@@ -35,7 +35,6 @@ use App\Models\Service;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Config;
 use LibreNMS\Util\Url;
@@ -462,20 +461,18 @@ class MapDataController extends Controller
     // GET Device
     public function getDevices(Request $request): JsonResponse
     {
-        // Get all devices under maintenance
-        $maintdevices = AlertSchedule::isActive()
-            ->with('devices', 'locations.devices', 'deviceGroups.devices')
-            ->get()
-            ->map->only('devices', 'locations.devices', 'deviceGroups.devices')
-            ->flatten();
-
-        // Create a hash of device IDs covered by maintenance to avoid a DB call per device below
-        $maintdevicesmap = [];
-        foreach ($maintdevices as $device) {
-            if ($device) {
-                $maintdevicesmap[$device->device_id] = true;
-            }
-        }
+        // Get all device ids under maintenance (may contain duplicates, but we don't care for this usage)
+        $deviceIdsUnderMaintenance = AlertSchedule::isActive()
+            ->with([
+                'devices:device_id',
+                'locations.devices:location_id,device_id',
+                'deviceGroups.devices:device_id',
+            ])->get()
+            ->map(function ($schedule) {
+                return $schedule->devices->pluck('device_id')
+                    ->merge($schedule->locations->pluck('devices.*.device_id'))
+                    ->merge($schedule->deviceGroups->pluck('devices.*.device_id'));
+            })->flatten();
 
         // For manual level we need to track some items
         $no_parent_devices = collect();
@@ -510,7 +507,7 @@ class MapDataController extends Controller
                 'lng' => $device->location ? $device->location->lng : null,
                 'parents' => ($request->link_type == 'depends') ? $device->parents->pluck('device_id', 'device_id') : collect(),
                 'children' => ($request->link_type == 'depends') ? $device->children->pluck('device_id', 'device_id') : collect(),
-                'maintenance' => array_key_exists($device->device_id, $maintdevicesmap) ? 1 : 0,
+                'maintenance' => $deviceIdsUnderMaintenance->contains($device->device_id) ? 1 : 0,
             ];
 
             // Only use parent IDs below if it is being returned
