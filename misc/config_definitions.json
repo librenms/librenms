@@ -1519,13 +1519,6 @@
             "default": false,
             "type": "boolean"
         },
-        "discovery_modules.cisco-cbqos": {
-            "order": 40,
-            "group": "discovery",
-            "section": "discovery_modules",
-            "default": false,
-            "type": "boolean"
-        },
         "discovery_modules.cisco-otv": {
             "order": 70,
             "group": "discovery",
@@ -5437,13 +5430,6 @@
         },
         "poller_modules.cisco-asa-firewall": {
             "order": 60,
-            "group": "poller",
-            "section": "poller_modules",
-            "default": false,
-            "type": "boolean"
-        },
-        "poller_modules.cisco-cbqos": {
-            "order": 70,
             "group": "poller",
             "section": "poller_modules",
             "default": false,

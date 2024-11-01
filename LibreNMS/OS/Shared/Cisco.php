@@ -26,6 +26,7 @@
 
 namespace LibreNMS\OS\Shared;
 
+use App\Models\Component;
 use App\Models\Device;
 use App\Models\EntPhysical;
 use App\Models\Mempool;
@@ -769,6 +770,14 @@ class Cisco extends OS implements
                     'ingress' => $direction == 1 ? 1 : 0,
                     'egress' => $direction == 2 ? 1 : 0,
                 ]));
+            }
+        }
+
+        // Clean up legacy component based config
+        $oldConfig = Component::where('type', 'Cisco-CBQOS')->get();
+        if ($oldConfig->count()) {
+            foreach ($oldConfig as $oc) {
+                $oc->delete();
             }
         }
 
