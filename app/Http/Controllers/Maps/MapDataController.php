@@ -468,12 +468,11 @@ class MapDataController extends Controller
                 'locations.devices:location_id,device_id',
                 'deviceGroups.devices:device_id',
             ])->get()
-            ->flatMap(function ($schedule) {
+            ->map(function ($schedule) {
                 return $schedule->devices->pluck('device_id')
                     ->merge($schedule->locations->pluck('devices.*.device_id'))
-                    ->merge($schedule->deviceGroups->pluck('devices.*.device_id'))
-                    ->flatten();
-            });
+                    ->merge($schedule->deviceGroups->pluck('devices.*.device_id'));
+            })->flatten();
 
         // For manual level we need to track some items
         $no_parent_devices = collect();
