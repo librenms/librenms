@@ -42,13 +42,13 @@ if (isset($vars['searchPhrase']) && ! empty($vars['searchPhrase'])) {
     $mac_search = '%' . str_replace([':', ' ', '-', '.', '0x'], '', $vars['searchPhrase']) . '%';
 
     if (isset($vars['searchby']) && $vars['searchby'] == 'ip') {
-        $query->whereLike('ipv4_address', $ip_search);
+        $query->where('ipv4_address', 'like', $ip_search);
     } elseif (isset($vars['searchby']) && $vars['searchby'] == 'mac') {
-        $query->whereLike('mac_address', $mac_search);
+        $query->where('mac_address', 'like', $mac_search);
     } else {
         $query->where(function ($q) use ($ip_search, $mac_search) {
-            $q->whereLike('ipv4_address', $ip_search)
-                ->orWhereLike('mac_address', $mac_search);
+            $q->where('ipv4_address', 'like', $ip_search)
+                ->orWhere('mac_address', 'like', $mac_search);
         });
     }
 }
