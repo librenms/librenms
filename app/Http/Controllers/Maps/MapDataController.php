@@ -463,17 +463,31 @@ class MapDataController extends Controller
     public function getDevices(Request $request): JsonResponse
     {
         // Get all devices under maintenance
-        $maintdevices = AlertSchedule::isActive()
+        $maintschedules = AlertSchedule::isActive()
             ->with('devices', 'locations.devices', 'deviceGroups.devices')
-            ->get()
-            ->map->only('devices', 'locations.devices', 'deviceGroups.devices')
-            ->flatten();
+            ->get();
 
         // Create a hash of device IDs covered by maintenance to avoid a DB call per device below
         $maintdevicesmap = [];
-        foreach ($maintdevices as $device) {
-            if ($device) {
-                $maintdevicesmap[$device->device_id] = true;
+        foreach ($maintschedules as $maint) {
+            foreach ($maint->devices as $device) {
+                if ($device) {
+                    $maintdevicesmap[$device->device_id] = true;
+                }
+            }
+            foreach ($maint->locations as $location) {
+                foreach ($location->devices as $device) {
+                    if ($device) {
+                        $maintdevicesmap[$device->device_id] = true;
+                    }
+                }
+            }
+            foreach ($maint->deviceGroups as $group) {
+                foreach ($group->devices as $device) {
+                    if ($device) {
+                        $maintdevicesmap[$device->device_id] = true;
+                    }
+                }
             }
         }
 
