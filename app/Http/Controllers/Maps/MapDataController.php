@@ -469,26 +469,20 @@ class MapDataController extends Controller
 
         // Create a hash of device IDs covered by maintenance to avoid a DB call per device below
         $maintdevicesmap = [];
-        foreach ($maintschedules as $maint) {
-            foreach ($maint->devices as $device) {
-                if ($device) {
-                    $maintdevicesmap[$device->device_id] = true;
-                }
-            }
-            foreach ($maint->locations as $location) {
-                foreach ($location->devices as $device) {
-                    if ($device) {
-                        $maintdevicesmap[$device->device_id] = true;
-                    }
-                }
-            }
-            foreach ($maint->deviceGroups as $group) {
-                foreach ($group->devices as $device) {
-                    if ($device) {
-                        $maintdevicesmap[$device->device_id] = true;
-                    }
-                }
-            }
+
+        // Set maintenance on devices attached directly to the schedule
+        foreach ($maintschedules->pluck('devices')->flatten() as $device) {
+            $maintdevicesmap[$device->device_id] = true;
+        }
+
+        // Set maintenance on devices attached to the schedule through location
+        foreach ($maintschedules->pluck('locations')->flatten()->pluck('devices')->flatten() as $device) {
+            $maintdevicesmap[$device->device_id] = true;
+        }
+
+        // Set maintenance on devices attached to the schedule through device group
+        foreach ($maintschedules->pluck('deviceGroups')->flatten()->pluck('devices')->flatten() as $device) {
+            $maintdevicesmap[$device->device_id] = true;
         }
 
         // For manual level we need to track some items
