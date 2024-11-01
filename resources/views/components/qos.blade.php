@@ -28,10 +28,14 @@
 
 @if($qosGraph)
 @php
+$graphType = $qosGraph->type;
 if ($qosGraph->type == 'routeros_tree') {
     $graphs = ['_traffic' => __('Traffic'), '_drop' => __('Dropped Packets')];
 } elseif ($qosGraph->type == 'routeros_simple') {
     $graphs = ['_traffic' => __('Traffic'), '_drop' => __('Dropped Packets')];
+} elseif ($qosGraph->type == 'cisco_cbqos_policymap' || $qosGraph->type == 'cisco_cbqos_classmap') {
+    $graphs = ['_prebits' => __('Traffic (pre policy)'), '_postbits' => __('Traffic (post policy)'), '_bufferdrops' => __('Traffic Drops'), '_prepkts' => __('Packets (pre policy)'), '_droppkts' => __('Packet Drops'), '_qosdrops' => __('QoS Drops', )];
+    $graphType = 'cisco_cbqos';
 } else {
     $graphs = [];
 }
@@ -45,7 +49,7 @@ if ($qosGraph->type == 'routeros_tree') {
     Graphs for type {{ $qosGraph->type }} need to be defined in resources/views/components/qos.blade.php
 @endif
 @foreach($graphs as $graphSuffix => $graphTitle)
-    <x-graph-row loading="lazy" :device="$portId ? null : $qosGraph->device_id" :port="$portId" :type="$typePrefix . $qosGraph->type . $graphSuffix" :title="__($graphTitle)" :columns=4 :graphs="[['from' => '-1d'], ['from' => '-1week'], ['from' => '-1month'], ['from' => '-1y']]" :vars="['qos_id' => $qosGraph->qos_id]"></x-graph-row>
+    <x-graph-row loading="lazy" :device="$portId ? null : $qosGraph->device_id" :port="$portId" :type="$typePrefix . $graphType . $graphSuffix" :title="__($graphTitle)" :columns=4 :graphs="[['from' => '-1d'], ['from' => '-1week'], ['from' => '-1month'], ['from' => '-1y']]" :vars="['qos_id' => $qosGraph->qos_id]"></x-graph-row>
 @endforeach
     </div>
 </div>

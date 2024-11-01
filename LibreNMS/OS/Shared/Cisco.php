@@ -716,7 +716,7 @@ class Cisco extends OS implements
                     // Class Map
                     $dbtype = 'cisco_cbqos_classmap';
                     // RRD name matches the original cbqos module
-                    $rrd_id = 'port-' . $ifIndexToPortId->get($servicePolicies[$policyId]['cbQosIfIndex']) . '-cbqos-' . $policyId . '-' . $objectId;
+                    $rrd_id = 'port-' . $servicePolicies[$policyId]['cbQosIfIndex'] . '-cbqos-' . $policyId . '-' . $objectId;
                     $cm = $classMaps[$qosObjectIndex];
                     $title = $cm['cbQosCMDesc'] ? $cm['cbQosCMName'] . ' - ' . $cm['cbQosCMDesc'] : $cm['cbQosCMName'];
 
