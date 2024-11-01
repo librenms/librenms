@@ -45,6 +45,7 @@ use LibreNMS\Interfaces\Discovery\SlaDiscovery;
 use LibreNMS\Interfaces\Discovery\StpInstanceDiscovery;
 use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
 use LibreNMS\Interfaces\Polling\NacPolling;
+use LibreNMS\Interfaces\Polling\QosPolling;
 use LibreNMS\Interfaces\Polling\SlaPolling;
 use LibreNMS\OS;
 use LibreNMS\OS\Traits\YamlOSDiscovery;
@@ -59,6 +60,7 @@ class Cisco extends OS implements
     QosDiscovery,
     MempoolsDiscovery,
     NacPolling,
+    QosPolling,
     SlaPolling,
     TransceiverDiscovery
 {
@@ -793,5 +795,52 @@ class Cisco extends OS implements
             $thisQos->parent_id = $parent_id;
             $thisQos->save();
         });
+    }
+
+    public function pollQos($qos)
+    {
+        $poll_time = time();
+        $preBytes = \SnmpQuery::hideMib()->walk('CISCO-CLASS-BASED-QOS-MIB::cbQosCMPrePolicyByte64')->table(2);
+        $postBytes = \SnmpQuery::hideMib()->walk('CISCO-CLASS-BASED-QOS-MIB::cbQosCMPostPolicyByte64')->table(2);
+        $dropBytes = \SnmpQuery::hideMib()->walk('CISCO-CLASS-BASED-QOS-MIB::cbQosCMDropByte64')->table(2);
+        $bufferDrops = \SnmpQuery::hideMib()->walk('CISCO-CLASS-BASED-QOS-MIB::cbQosCMNoBufDropPkt64')->table(2);
+        $prePackets = \SnmpQuery::hideMib()->walk('CISCO-CLASS-BASED-QOS-MIB::cbQosCMPrePolicyPkt64')->table(2);
+        $prePackets = \SnmpQuery::hideMib()->walk('CISCO-CLASS-BASED-QOS-MIB::cbQosCMPrePolicyPkt64')->table(2);
+        $dropPackets = \SnmpQuery::hideMib()->walk('CISCO-CLASS-BASED-QOS-MIB::cbQosCMDropPkt64')->table(2);
+
+        foreach($qos as $thisQos) {
+            if ($thisQos->type == 'cisco_cbqos_classmap') {
+                $snmp_parts = explode('.', $thisQos->snmp_idx);
+
+                // Values ony saved to RRD
+                $thisQos->poll_data['postbytes'] = $postBytes[$snmp_parts[0]][$snmp_parts[1]]['cbQosCMPostPolicyByte64'];
+                $thisQos->poll_data['bufferdrops'] = $bufferDrops[$snmp_parts[0]][$snmp_parts[1]]['cbQosCMNoBufDropPkt64'];
+
+                // Cisco CBQoS is one directional
+                if ($thisQos->ingress) {
+                    $thisQos->last_polled = $poll_time;
+                    $thisQos->last_bytes_in = $preBytes[$snmp_parts[0]][$snmp_parts[1]]['cbQosCMPrePolicyByte64'];
+                    $thisQos->last_bytes_out = null;
+                    $thisQos->last_bytes_drop_in = $dropBytes[$snmp_parts[0]][$snmp_parts[1]]['cbQosCMDropByte64'];
+                    $thisQos->last_bytes_drop_out = null;
+                    $thisQos->last_packets_in = $prePackets[$snmp_parts[0]][$snmp_parts[1]]['cbQosCMPrePolicyPkt64'];
+                    $thisQos->last_packets_out = null;
+                    $thisQos->last_packets_drop_in = $dropPackets[$snmp_parts[0]][$snmp_parts[1]]['cbQosCMDropPkt64'];
+                    $thisQos->last_packets_drop_out = null;
+                } elseif ($thisQos->egress) {
+                    $thisQos->last_polled = $poll_time;
+                    $thisQos->last_bytes_in = null;
+                    $thisQos->last_bytes_out = $preBytes[$snmp_parts[0]][$snmp_parts[1]]['cbQosCMPrePolicyByte64'];
+                    $thisQos->last_bytes_drop_in = null;
+                    $thisQos->last_bytes_drop_out = $dropBytes[$snmp_parts[0]][$snmp_parts[1]]['cbQosCMDropByte64'];
+                    $thisQos->last_packets_in = null;
+                    $thisQos->last_packets_out = $prePackets[$snmp_parts[0]][$snmp_parts[1]]['cbQosCMPrePolicyPkt64'];
+                    $thisQos->last_packets_drop_in = null;
+                    $thisQos->last_packets_drop_out = $dropPackets[$snmp_parts[0]][$snmp_parts[1]]['cbQosCMDropPkt64'];
+                } else {
+                    d_echo('Cisco CBQoS ' . $qos->title . ' not processed because it it not marked as ingress or egress');
+                }
+            }
+        }
     }
 }

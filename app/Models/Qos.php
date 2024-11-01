@@ -25,6 +25,9 @@ class Qos extends Model implements Keyable
         'egress',
     ];
 
+    // Array to store additional data during polling that is not part of the model
+    public $poll_data = [];
+
     /**
      * Get a string that can identify a unique instance of this model
      *
