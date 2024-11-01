@@ -1934,6 +1934,7 @@ qos:
     - { Field: parent_id, Type: 'bigint unsigned', 'Null': true, Extra: '' }
     - { Field: type, Type: varchar(50), 'Null': false, Extra: '' }
     - { Field: title, Type: varchar(255), 'Null': false, Extra: '' }
+    - { Field: tooltip, Type: longtext, 'Null': true, Extra: '' }
     - { Field: snmp_idx, Type: varchar(255), 'Null': false, Extra: '' }
     - { Field: rrd_id, Type: varchar(255), 'Null': false, Extra: '' }
     - { Field: ingress, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
