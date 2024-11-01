@@ -846,7 +846,7 @@ class Cisco extends OS implements
                     $thisQos->last_packets_drop_in = null;
                     $thisQos->last_packets_drop_out = $dropPackets[$snmp_parts[0]][$snmp_parts[1]]['cbQosCMDropPkt64'];
                 } else {
-                    d_echo('Cisco CBQoS ' . $qos->title . ' not processed because it it not marked as ingress or egress');
+                    d_echo('Cisco CBQoS ' . $thisQos->title . ' not processed because it it not marked as ingress or egress');
                 }
             }
         }

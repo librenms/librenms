@@ -25,7 +25,7 @@ if ($qos->type == 'cisco_cbqos_classmap') {
     $graphs = collect([$qos]);
 } else {
     // We want to show stats for all children
-    $graphs = \App\Models\Qos::where('parent_id', $qos->qos_id)->orderby('title')->get();
+    $graphs = \App\Models\Qos::where('parent_id', $qos->qos_id)->orderBy('title')->get();
 }
 
 // Stack the area on the second and subsequent DS's

@@ -21,11 +21,11 @@ class QosTree extends Component
         public int|null $show = null,
     ) {
         if (! is_null($parentQosId)) {
-            $this->listItems = $qosItems->where('parent_id', $parentQosId)->sortby('title');
+            $this->listItems = $qosItems->where('parent_id', $parentQosId)->sortBy('title');
         } elseif (! is_null($parentPortId)) {
-            $this->listItems = $qosItems->where('port_id', $parentPortId)->sortby('title');
+            $this->listItems = $qosItems->where('port_id', $parentPortId)->sortBy('title');
         } else {
-            $this->listItems = $qosItems->whereNull('parent_id')->sortby('title');
+            $this->listItems = $qosItems->whereNull('parent_id')->sortBy('title');
         }
     }
 
