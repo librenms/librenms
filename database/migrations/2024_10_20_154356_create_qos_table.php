@@ -19,6 +19,7 @@ return new class extends Migration
             $table->bigInteger('parent_id')->unsigned()->nullable()->index();
             $table->string('type', 50)->index()->comment('Type of QoS');
             $table->string('title')->comment('Graph Title');
+            $table->longText('tooltip')->nullable();
             $table->string('snmp_idx')->comment('SNMP Index for polling QoS data');
             $table->string('rrd_id')->comment('Suffix for the RRD file to identify this QoS');
             $table->boolean('ingress')->default(0)->comment('Does this process ingress bytes');

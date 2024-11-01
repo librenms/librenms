@@ -704,7 +704,7 @@ class Cisco extends OS implements
                 $parent = $qosObject['cbQosParentObjectsIndex'];
                 $snmpIndex = "$policyId.$objectId";
 
-
+                $tooltip = null;
                 if ($type == 1) {
                     // Policy map
                     $dbtype = 'cisco_cbqos_policymap';
@@ -721,13 +721,12 @@ class Cisco extends OS implements
                     $title = $cm['cbQosCMDesc'] ? $cm['cbQosCMName'] . ' - ' . $cm['cbQosCMDesc'] : $cm['cbQosCMName'];
 
                     // Fill in the match type
-                    $title .= ' (';
                     if ($cm['cbQosCMInfo'] == 2) {
-                        $title .= 'Match-All : ';
+                        $tooltip = 'Match-All:';
                     } elseif ($cm['cbQosCMInfo'] == 3) {
-                        $title .= 'Match-Any : ';
+                        $tooltip = 'Match-Any:';
                     } else {
-                        $title .= 'None';
+                        $tooltip = 'None';
                     }
 
                     // Then find the match statements
@@ -739,8 +738,9 @@ class Cisco extends OS implements
                         }
                     }
 
-                    $title .= implode(',', $statements);
-                    $title .= ')';
+                    if (count($statements) > 0) {
+                        $tooltip .= "\n - " . implode("\n - ", $statements);
+                    }
 
                 } else {
                     // Other types are not relevant
@@ -751,13 +751,17 @@ class Cisco extends OS implements
                 d_echo('  SNMP Index: ' . $snmpIndex . "\n");
                 d_echo('  Title     : ' . $title . "\n");
                 d_echo('  Direction : ' . $direction . "\n");
-                d_echo('  Parent    : ' . $parent . "\n");
+                d_echo('  Parent    : ' . $policyId . '.' . $parent . "\n");
+
+                // Our parent's SNMP index will share the same policyId
+                $this->qosIdxToParent->put($snmpIndex, "$policyId.$parent");
 
                 $qos->push(new Qos([
                     'device_id' => $this->getDeviceId(),
                     'port_id' => $parent ? null : $ifIndexToPortId->get($servicePolicies[$policyId]['cbQosIfIndex'], null),
                     'type' => $dbtype,
                     'title' => $title,
+                    'tooltip' => $tooltip,
                     'rrd_id' => $rrd_id,
                     'snmp_idx' => $snmpIndex,
                     'ingress' => $direction == 1 ? 1 : 0,
@@ -771,5 +775,23 @@ class Cisco extends OS implements
 
     public function setQosParents($qos)
     {
+        $qos->each(function (Qos $thisQos, int $key) use ($qos) {
+            $parent_idx = $this->qosIdxToParent->get($thisQos->snmp_idx);
+
+            if ($parent_idx) {
+                $parent = $qos->where('snmp_idx', $parent_idx)->first();
+
+                if ($parent) {
+                    $parent_id = $parent->qos_id;
+                } else {
+                    $parent_id = null;
+                }
+            } else {
+                $parent_id = null;
+            }
+
+            $thisQos->parent_id = $parent_id;
+            $thisQos->save();
+        });
     }
 }

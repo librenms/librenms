@@ -18,6 +18,7 @@ class Qos extends Model implements Keyable
         'parent_id',
         'type',
         'title',
+        'tooltip',
         'snmp_idx',
         'rrd_id',
         'ingress',

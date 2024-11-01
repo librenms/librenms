@@ -12,9 +12,9 @@
     @foreach($listItems as $qosGraph)
     <li class='liOpen'>
         @if($qosGraph->qos_id == $show)
-        {{ $qosGraph->title }}
+        <span title="{{ $qosGraph->tooltip }}">{{ $qosGraph->title }}</span>
         @else
-        <a href="{{ route('device', $this_page_params) }}/show={{$qosGraph->qos_id}}">{{ $qosGraph->title }}</a>
+        <a href="{{ route('device', $this_page_params) }}/show={{$qosGraph->qos_id}}" title="{{ $qosGraph->tooltip }}">{{ $qosGraph->title }}</a>
         @endif
         <x-qos-tree :qosItems="$qosItems" :parentQosId="$qosGraph->qos_id" :show="$show" />
     </li>
