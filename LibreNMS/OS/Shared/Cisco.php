@@ -696,7 +696,7 @@ class Cisco extends OS implements
         $matchStatements = \SnmpQuery::hideMib()->walk('CISCO-CLASS-BASED-QOS-MIB::cbQosMatchStmtCfgTable')->table(1);
         $qosObjects = \SnmpQuery::hideMib()->walk('CISCO-CLASS-BASED-QOS-MIB::cbQosObjectsTable')->table(2);
 
-       // Iterate over a 2 level table with keys of the policy ID, then the object ID
+        // Iterate over a 2 level table with keys of the policy ID, then the object ID
         foreach ($qosObjects as $policyId => $spObjects) {
             // Policy level settings
             $direction = $servicePolicies[$policyId]['cbQosPolicyDirection'];
@@ -817,7 +817,7 @@ class Cisco extends OS implements
         $prePackets = \SnmpQuery::hideMib()->walk('CISCO-CLASS-BASED-QOS-MIB::cbQosCMPrePolicyPkt64')->table(2);
         $dropPackets = \SnmpQuery::hideMib()->walk('CISCO-CLASS-BASED-QOS-MIB::cbQosCMDropPkt64')->table(2);
 
-        foreach($qos as $thisQos) {
+        foreach ($qos as $thisQos) {
             if ($thisQos->type == 'cisco_cbqos_classmap') {
                 $snmp_parts = explode('.', $thisQos->snmp_idx);
 

@@ -20,7 +20,7 @@ $colours = array_merge(\LibreNMS\Config::get('graph_colours.mixed'), \LibreNMS\C
 
 $qos = \App\Models\Qos::find($vars['qos_id']);
 
-if ($qos->type == "cisco_cbqos_classmap") {
+if ($qos->type == 'cisco_cbqos_classmap') {
     // We only want to show our stats
     $graphs = collect([$qos]);
 } else {
