@@ -45,7 +45,7 @@ if ($qosGraph->type == 'routeros_tree') {
     Graphs for type {{ $qosGraph->type }} need to be defined in resources/views/components/qos.blade.php
 @endif
 @foreach($graphs as $graphSuffix => $graphTitle)
-    <x-graph-row loading="lazy" :device="$portId ? null : $qosGraph->device_id" :port="$portId" :type="$typePrefix . $qosGraph->type . $graphSuffix" :title="__($graphTitle)" :columns=4 :graphs="[['from' => '-1d'], ['from' => '-1week'], ['from' => '-1month'], ['from' => '-1y']]" :vars="['rrd_id' => $qosGraph->rrd_id]"></x-graph-row>
+    <x-graph-row loading="lazy" :device="$portId ? null : $qosGraph->device_id" :port="$portId" :type="$typePrefix . $qosGraph->type . $graphSuffix" :title="__($graphTitle)" :columns=4 :graphs="[['from' => '-1d'], ['from' => '-1week'], ['from' => '-1month'], ['from' => '-1y']]" :vars="['qos_id' => $qosGraph->qos_id]"></x-graph-row>
 @endforeach
     </div>
 </div>
