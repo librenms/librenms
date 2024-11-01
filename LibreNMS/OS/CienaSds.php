@@ -158,14 +158,12 @@ class CienaSds extends OS
         }));
 
         // Interface stuff
-        $interfaceIndexMapping = SnmpQuery::walk('IF-MIB::ifIndex')->table(1);
         $transceivers = SnmpQuery::hideMib()->enumStrings()->walk([
             'CIENA-CES-PORT-MIB::cienaCesEttpConfigTable',
             'CIENA-CES-PORT-XCVR-MIB::cienaCesPortXcvrTable',
         ])->table(1);
 
         foreach ($transceivers as $index => $contents) {
-            $portIndex = $interfaceIndexMapping[$index]['IF-MIB::ifIndex'];
             if (! empty($contents['cienaCesEttpConfigName'])) {
                 $nameArr = explode('/', $contents['cienaCesEttpConfigName']);
                 $slotIndex = isset($nameArr[1]) ? $nameArr[0] : 1;
@@ -177,7 +175,7 @@ class CienaSds extends OS
                     'entPhysicalName' => $contents['cienaCesEttpConfigName'],
                     'entPhysicalContainedIn' => '55' . $slotIndex,
                     'entPhysicalParentRelPos' => $index,
-                    'ifIndex' => $portIndex,
+                    'ifIndex' => $index,
                 ]));
             }
 
