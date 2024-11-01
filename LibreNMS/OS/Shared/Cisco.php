@@ -744,7 +744,6 @@ class Cisco extends OS implements
                     if (count($statements) > 0) {
                         $tooltip .= "\n - " . implode("\n - ", $statements);
                     }
-
                 } else {
                     // Other types are not relevant
                     continue;
