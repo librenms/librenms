@@ -39,7 +39,7 @@ if (isset($vars['port_id']) && is_numeric($vars['port_id'])) {
 
 if (isset($vars['searchPhrase']) && ! empty($vars['searchPhrase'])) {
     $ip_search = '%' . trim($vars['searchPhrase']) . '%';
-    $mac_search = '%' . str_replace([':', ' ', '-', '.', '0x'], '', $vars['searchPhrase']) . '%';
+    $mac_search = '%' . str_replace([':', ' ', '-', '.', '0x'], '', trim($vars['searchPhrase'])) . '%';
 
     if (isset($vars['searchby']) && $vars['searchby'] == 'ip') {
         $query->where('ipv4_address', 'like', $ip_search);
