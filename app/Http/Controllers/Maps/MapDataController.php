@@ -35,7 +35,6 @@ use App\Models\Service;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Config;
 use LibreNMS\Util\Url;
@@ -466,7 +465,7 @@ class MapDataController extends Controller
         $maintdevices = AlertSchedule::isActive()
             ->with('devices', 'locations.devices', 'deviceGroups.devices')
             ->get()
-            ->map->only('devices', 'locations.devices', 'deviceGroups.devices')
+            ->map->only(['devices', 'locations.devices', 'deviceGroups.devices'])
             ->flatten();
 
         // Create a hash of device IDs covered by maintenance to avoid a DB call per device below
