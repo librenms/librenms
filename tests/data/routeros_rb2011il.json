@@ -5,6 +5,7 @@
                 {
                     "type": "routeros_tree",
                     "title": "ETHER4",
+                    "tooltip": null,
                     "snmp_idx": "16777216",
                     "rrd_id": "ETHER4",
                     "ingress": 0,
@@ -37,6 +38,7 @@
                 {
                     "type": "routeros_tree",
                     "title": "ETHER4-MARK",
+                    "tooltip": null,
                     "snmp_idx": "16777217",
                     "rrd_id": "ETHER4-MARK",
                     "ingress": 0,
@@ -69,6 +71,7 @@
                 {
                     "type": "routeros_tree",
                     "title": "ETHER4-NOMARK",
+                    "tooltip": null,
                     "snmp_idx": "16777218",
                     "rrd_id": "ETHER4-NOMARK",
                     "ingress": 0,
@@ -101,6 +104,7 @@
                 {
                     "type": "routeros_tree",
                     "title": "QUEUE-GLOBAL",
+                    "tooltip": null,
                     "snmp_idx": "16777219",
                     "rrd_id": "QUEUE-GLOBAL",
                     "ingress": 0,
@@ -133,6 +137,7 @@
                 {
                     "type": "routeros_simple",
                     "title": "WAN-QUEUE",
+                    "tooltip": null,
                     "snmp_idx": "1",
                     "rrd_id": "WAN-QUEUE",
                     "ingress": 1,
@@ -165,6 +170,7 @@
                 {
                     "type": "routeros_simple",
                     "title": "WAN-QUEUE-CHILD",
+                    "tooltip": null,
                     "snmp_idx": "2",
                     "rrd_id": "WAN-QUEUE-CHILD",
                     "ingress": 1,
@@ -201,6 +207,7 @@
                 {
                     "type": "routeros_tree",
                     "title": "ETHER4",
+                    "tooltip": null,
                     "snmp_idx": "16777216",
                     "rrd_id": "ETHER4",
                     "ingress": 0,
@@ -233,6 +240,7 @@
                 {
                     "type": "routeros_tree",
                     "title": "ETHER4-MARK",
+                    "tooltip": null,
                     "snmp_idx": "16777217",
                     "rrd_id": "ETHER4-MARK",
                     "ingress": 0,
@@ -265,6 +273,7 @@
                 {
                     "type": "routeros_tree",
                     "title": "ETHER4-NOMARK",
+                    "tooltip": null,
                     "snmp_idx": "16777218",
                     "rrd_id": "ETHER4-NOMARK",
                     "ingress": 0,
@@ -297,6 +306,7 @@
                 {
                     "type": "routeros_tree",
                     "title": "QUEUE-GLOBAL",
+                    "tooltip": null,
                     "snmp_idx": "16777219",
                     "rrd_id": "QUEUE-GLOBAL",
                     "ingress": 0,
@@ -329,6 +339,7 @@
                 {
                     "type": "routeros_simple",
                     "title": "WAN-QUEUE",
+                    "tooltip": null,
                     "snmp_idx": "1",
                     "rrd_id": "WAN-QUEUE",
                     "ingress": 1,
@@ -361,6 +372,7 @@
                 {
                     "type": "routeros_simple",
                     "title": "WAN-QUEUE-CHILD",
+                    "tooltip": null,
                     "snmp_idx": "2",
                     "rrd_id": "WAN-QUEUE-CHILD",
                     "ingress": 1,
