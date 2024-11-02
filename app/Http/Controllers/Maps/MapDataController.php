@@ -662,7 +662,7 @@ class MapDataController extends Controller
                     }
 
                     // Ignore any associations that have already been processed
-                    if (array_key_exists($port_ids, $port_assoc_seen) {
+                    if (array_key_exists($port_ids, $port_assoc_seen)) {
                         continue;
                     }
                     $port_assoc_seen[$port_ids] = true;
