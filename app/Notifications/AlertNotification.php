@@ -41,7 +41,7 @@ class AlertNotification extends Notification
         $this->message = (new WebPushMessage)
             ->title($title)
             ->icon(asset('/images/mstile-144x144.png'))
-            ->body($body)
+            ->body(substr($body, 0, 3500))
             ->action('Acknowledge', 'alert.acknowledge')
             ->action('View', 'alert.view')
             ->options(['TTL' => 2000])
