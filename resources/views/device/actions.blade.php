@@ -1,9 +1,9 @@
-<div class="container-fluid" style="padding-left: 0; padding-right: 0;">
+<table>
     @foreach($actions as $row)
-        <div>
+        <tr>
             @foreach($row as $action)
                 @include('device.action-icon', $action)
             @endforeach
-        </div>
+        </tr>
     @endforeach
-</div>
+</table>
