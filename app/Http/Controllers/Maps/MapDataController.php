@@ -360,20 +360,17 @@ class MapDataController extends Controller
         }
     }
 
-    protected function linkSpeedWidth(int|null $speed): float
+    protected function linkSpeedWidth(int|null $speed): int
     {
-        $speed /= 1000000000;
-        if ($speed > 500000) {
-            return 20;
-        }
+        $speed /= 10000000;
         if (is_nan($speed)) {
             return 1;
         }
-        if ($speed < 10) {
+        if ($speed < 1) {
             return 1;
         }
 
-        return round(0.77 * pow($speed, 0.25));
+        return strlen(round($speed)) * 2;
     }
 
     protected function linkUseColour(float $link_pct): string
@@ -633,7 +630,6 @@ class MapDataController extends Controller
     {
         // List all links
         $link_list = [];
-        $device_assoc_seen = [];
         $link_types = $request->link_types;
 
         foreach ($link_types as $link_type) {
@@ -657,17 +653,6 @@ class MapDataController extends Controller
                     if (! $remote_port->device) {
                         continue;
                     }
-
-                    $device_ids_1 = $port->device_id . '.' . $remote_port->device_id;
-                    $device_ids_2 = $remote_port->device_id . '.' . $port->device_id;
-
-                    // Ignore any associations that have already been processed
-                    if (array_key_exists($device_ids_1, $device_assoc_seen)
-                        || array_key_exists($device_ids_2, $device_assoc_seen)) {
-                        continue;
-                    }
-                    $device_assoc_seen[$device_ids_1] = true;
-                    $device_assoc_seen[$device_ids_2] = true;
 
                     $width = $this->linkSpeedWidth($port->ifSpeed);
 
