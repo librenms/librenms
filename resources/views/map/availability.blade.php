@@ -93,8 +93,9 @@
                         return 0;
 @endif
                     }
-                    var devhtml = '';
                     var keys = Object.keys(data).sort(deviceSort);
+                    var devicelist = document.createElement("div");
+
                     $.each( keys, function( key_idx, device_id ) {
                         var device = data[device_id];
                         var state, fullclass, compactclass;
@@ -122,19 +123,45 @@
                             host_down_count++;
                         }
 
-                        devhtml += '                <a href="' + device["url"] + '" title="' + device["sname"] + ' - ' + device["updowntime"] + '">\n';
-@if($compact)
-                        devhtml += '                    <div class="' + compactclass + '"></div>\n';
-@else
-                        devhtml += '                    <div class="device-availability ' + state + '" style="width:{{$box_size}}px;">\n';
-                        devhtml += '                        <span class="availability-label label ' + fullclass + ' label-font-border">' + state + '</span>\n';
-                        devhtml += '                        <span class="device-icon"><img src="' + device["icon"] + '" title="' + device["icontitle"] + '"/></span><br>\n';
-                        devhtml += '                        <span class="small">' + device["sname"] + '</span>\n';
-                        devhtml += '                    </div>\n';
-@endif
-                        devhtml += '                </a>\n';
+                        // create badge
+                        var devhtml = document.createElement("a");
+                        devhtml.href = device["url"];
+                        devhtml.title = device["sname"] + ' - ' + device["updowntime"];
+                    @if($compact)
+                        var devcompact = document.createElement("div");
+                        devcompact.classList.add(compactclass);
+                        devhtml.appendChild(devcompact);
+                    @else
+                        var devfull = document.createElement("div");
+                        devfull.style.overflow = "hidden";
+                        devfull.classList.add("device-availability", state);
+                        devfull.style.width = "{{ $box_size }}px";
+
+                        var devstatelabel = document.createElement("span");
+                        devstatelabel.classList.add("availability-label", "label", fullclass, "label-font-border");
+                        devstatelabel.textContent = state;
+                        devfull.appendChild(devstatelabel);
+
+                        var devicon = document.createElement("span");
+                        devicon.classList.add("device-icon");
+                        devicon.title = device["icontitle"];
+                        devfull.appendChild(devicon);
+
+                        var deviconimage = document.createElement("img");
+                        deviconimage.src = device["icon"];
+                        devicon.appendChild(deviconimage);
+                        devfull.appendChild(document.createElement("br"));
+
+                        var devname = document.createElement("span");
+                        devname.classList.add("small");
+                        devname.textContent = device["sname"];
+                        devfull.appendChild(devname);
+                        devhtml.appendChild(devfull);
+                    @endif
+                        devicelist.appendChild(devhtml);
                     });
-                    $("#device-list").html(devhtml);
+
+                    document.getElementById("device-list").innerHTML = devicelist.innerHTML;
                     $("#devices-up").text('up: ' + host_up_count);
                     $("#devices-warn").text('warn: ' + host_warn_count);
                     $("#devices-down").text('down: ' + host_down_count);
@@ -162,9 +189,11 @@
 @endif
                     }
 
-                    var svchtml = '';
                     var services = data.sort(serviceSort);
+                    var servicelist = document.createElement("div");
                     $.each( services, function( svc_idx, service ) {
+                        var fullclass,compactclass,state;
+
                         if (service['status'] == 0) {
                             fullclass = 'label-success';
                             compactclass = 'availability-map-oldview-box-up';
@@ -181,20 +210,51 @@
                             state = 'down';
                             service_down_count++;
                         }
-                        svchtml += '                <a href="' + service["url"] + '" title="' + service["device_name"] + ' - ' + service["updowntime"] + '">\n';
-@if($compact)
-                        svchtml += '                    <div class="' + compactclass + '"></div>\n';
-@else
-                        svchtml += '                    <div class="service-availability ' + state + '" style="width:{{$box_size}}px;">\n';
-                        svchtml += '                        <span class="service-name-label label ' + fullclass + ' label-font-border">' + service["type"] +'</span>\n';
-                        svchtml += '                        <span class="availability-label label ' + fullclass + ' label-font-border">' + state + '</span>\n';
-                        svchtml += '                        <span class="device-icon"><img src="' + service["icon"] + '" title="' + service["icontitle"] + '"/></span><br>\n';
-                        svchtml += '                        <span class="small">' + service["device_name"] + '</span>\n';
-                        svchtml += '                    </div>\n';
-@endif
-                        svchtml += '                </a>\n';
+
+                        // create badge
+                        var svchtml = document.createElement("a");
+                        svchtml.href = service["url"];
+                        svchtml.title = service["device_name"] + ' - ' + service["updowntime"];
+                    @if($compact)
+                        var svccompact = document.createElement("div");
+                        svccompact.classList.add(compactclass);
+                        svchtml.appendChild(svccompact);
+                    @else
+                        var svcfull = document.createElement("div");
+                        svcfull.style.overflow = "hidden";
+                        svcfull.classList.add("service-availability", state);
+                        svcfull.style.width = "{{ $box_size }}px";
+
+                        var svctypelabel = document.createElement("span");
+                        svctypelabel.classList.add("service-name-label", "label", fullclass, "label-font-border");
+                        svctypelabel.textContent = service["type"];
+                        svcfull.appendChild(svctypelabel);
+
+                        var svcstatelabel = document.createElement("span");
+                        svcstatelabel.classList.add("availability-label", "label", fullclass, "label-font-border");
+                        svcstatelabel.textContent = state;
+                        svcfull.appendChild(svcstatelabel);
+
+                        var svcicon = document.createElement("span");
+                        svcicon.classList.add("device-icon");
+                        svcfull.appendChild(svcicon);
+
+                        var svciconimage = document.createElement("img");
+                        svciconimage.src = service["icon"];
+                        svciconimage.title = service["icontitle"];
+                        svcicon.appendChild(svciconimage);
+                        svcfull.appendChild(document.createElement("br"));
+
+                        var svcname = document.createElement("span");
+                        svcname.classList.add("small");
+                        svcname.textContent = service["device_name"];
+                        svcfull.appendChild(svcname);
+                        svchtml.appendChild(svcfull);
+                    @endif
+                        servicelist.appendChild(svchtml);
                     });
-                    $("#service-list").html(svchtml);
+                    document.getElementById("service-list").innerHTML = servicelist.innerHTML;
+
                     $("#services-up").text('up: ' + service_up_count);
                     $("#services-warn").text('warn: ' + service_warn_count);
                     $("#services-down").text('down: ' + service_down_count);
