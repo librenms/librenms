@@ -370,7 +370,7 @@ class MapDataController extends Controller
             return 1;
         }
 
-        return strlen(round($speed)) * 2;
+        return strlen(strvla(round($speed))) * 2;
     }
 
     protected function linkUseColour(float $link_pct): string
