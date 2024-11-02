@@ -58,8 +58,13 @@
         var group = null;
 @endif
 
-        $.post( '{{ route('maps.getdevices') }}', {disabled: 0, disabled_alerts: null, url_type: "links", group: group, highlight_node: highlight})
-            .done(function( data ) {
+        var hide_devices = new Map();
+        $.ajax({
+            type: 'POST',
+            url: '{{ route('maps.getdevices') }}',
+            data: {disabled: 0, disabled_alerts: null, url_type: "links", group: group, highlight_node: highlight},
+            dataType: 'json',
+            success: function (data) {
                 function deviceSort(a,b) {
                     return (data[a]["sname"] > data[b]["sname"]) ? 1 : -1;
                 }
@@ -82,6 +87,8 @@
                         highlight_option.textContent = device["sname"];
                         document.getElementById('highlight_node').appendChild(highlight_option);
                     }
+                    // Hide the device until we find a link
+                    hide_devices.set(device_id.toString(), null);
                 })
 
                 // Remove any nodes that have been removed
@@ -104,10 +111,16 @@
                     $("#alert").html("");
                     $("#alert-row").hide();
                 }
-            });
+            },
+            async: false
+        });
 
-        $.post( '{{ route('maps.getdevicelinks') }}', {disabled: 0, disabled_alerts: null, group: group, link_types: @json($link_types)})
-            .done(function( data ) {
+        $.ajax({
+            type: 'POST',
+            url: '{{ route('maps.getdevicelinks') }}',
+            data: {disabled: 0, disabled_alerts: null, group: group, link_types: @json($link_types)},
+            dataType: 'json',
+            success: function (data) {
                 $.each( data, function( link_id, link ) {
                     var this_edge = link['style'];
                     this_edge['from'] = link['ldev'];
@@ -118,6 +131,9 @@
                     if (!network_edges.get(link_id)) {
                         network_edges.add([this_edge]);
                     }
+                    // Unhide any devices we find
+                    hide_devices.delete(link['ldev'].toString());
+                    hide_devices.delete(link['rdev'].toString());
                 })
 
                 // Remove any links that have disappeared
@@ -126,15 +142,25 @@
                         network_edges.remove(link_id);
                     }
                 });
-            });
+            },
+            async: false
+        });
 
+        // Flush the nodes and edges (needed for the forEach() loop below)
+        network_nodes.flush();
+        network_edges.flush();
+
+        // Hide and unhide nodes
+        network_nodes.forEach(function (item) {
+            oldval = item.hidden;
+            item.hidden = hide_devices.has(item.id.toString());
+            if (oldval != item.hidden) {
+                network_nodes.update(item);
+            }
+        });
 
         // Initialise map if we haven't already.  If we do it earlier, the radom seeding doesn not work
         if (! network) {
-            // Flush the nodes and edges so they are rendered immediately
-            network_nodes.flush();
-            network_edges.flush();
-
             var container = document.getElementById('visualization');
             var options = {!! $options !!};
             network = new vis.Network(container, {nodes: network_nodes, edges: network_edges, stabilize: true}, options);
@@ -184,4 +210,3 @@
     });
 </script>
 @endsection
-
