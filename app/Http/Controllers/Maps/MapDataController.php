@@ -630,6 +630,7 @@ class MapDataController extends Controller
     {
         // List all links
         $link_list = [];
+        $port_assoc_seen = [];
         $link_types = $request->link_types;
 
         foreach ($link_types as $link_type) {
@@ -653,6 +654,18 @@ class MapDataController extends Controller
                     if (! $remote_port->device) {
                         continue;
                     }
+
+                    if ($port->port_id < $remote_port->port_id) {
+                        $port_ids = $port->port_id . '.' . $remote_port->port_id;
+                    } else {
+                        $port_ids = $remote_port->port_id . '.' . $port->port_id;
+                    }
+
+                    // Ignore any associations that have already been processed
+                    if (array_key_exists($port_ids, $port_assoc_seen) {
+                        continue;
+                    }
+                    $port_assoc_seen[$port_ids] = true;
 
                     $width = $this->linkSpeedWidth($port->ifSpeed);
 
