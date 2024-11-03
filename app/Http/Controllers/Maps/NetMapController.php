@@ -46,7 +46,7 @@ class NetMapController extends Controller
         }
 
         $data = [
-            'page_refresh' => Config::get('page_refresh', 300),
+            'refresh' => Config::get('page_refresh', 300),
             'group_id' => $group_id,
             'options' => Config::get('network_map_vis_options'),
             'group_name' => $group_name,

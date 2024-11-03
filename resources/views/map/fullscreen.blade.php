@@ -16,22 +16,18 @@ Only leaflet map engine is currently supported
 
 @else
 
+@if($group_name)
 <div class="container-fluid">
 <div class="row" id="controls-row">
 <div class="col-md-12">
 
 &nbsp;
-@if($group_name)
 <big><b>{{ $group_name }}</b></big>
+
+</div>
+</div>
+</div>
 @endif
-
-<div class="pull-right" id="countdown">
-    <span class="countdown_timer" id="countdown_timer"></span><a href="#"><span class="countdown_timer_status" id="countdown_timer_status"></span></a>
-</div>
-
-</div>
-</div>
-</div>
 
 <div class="container" id="fullscreen-map"></div>
 
@@ -249,7 +245,7 @@ html, body, #fullscreen-map {
                     cur.sec -= 1;
                     if (cur.sec <= 0) {
                         refreshMap();
-                        cur.sec = {{$page_refresh}};
+                        cur.sec = {{$refresh}};
                     }
                     $("#countdown_timer").html("<i class=\"fa fa-clock-o fa-fw fa-lg\"></i> Refresh in " + cur.sec);
                 }, 1000);

@@ -155,25 +155,48 @@
     }
 
     $(document).ready(function () {
+        $("#countdown_timer_status").html("<i class=\"fa fa-pause fa-fw fa-lg\"></i> Pause");
         Countdown = {
-            sec: {{$page_refresh}},
+            sec: {{$refresh}},
 
             Start: function () {
+                $("#countdown_timer_status").html("<i class=\"fa fa-pause fa-fw fa-lg\"></i> Pause");
                 var cur = this;
                 this.interval = setInterval(function () {
                     cur.sec -= 1;
                     if (cur.sec <= 0) {
                         refreshMap();
-                        cur.sec = {{$page_refresh}};
+                        cur.sec = {{$refresh}};
                     }
+                    $("#countdown_timer").html("<i class=\"fa fa-clock-o fa-fw fa-lg\"></i> Refresh in " + cur.sec);
                 }, 1000);
             },
-
             Pause: function () {
                 clearInterval(this.interval);
                 delete this.interval;
+                $("#countdown_timer_status").html("<i class=\"fa fa-play fa-fw fa-lg\"></i> Resume");
+                $("#countdown_timer").html("<i class=\"fa fa-clock-o fa-fw fa-lg\"></i> Refresh paused");
+            },
+            Resume: function () {
+                if (!this.interval) this.Start();
+            },
+            Reset: function () {
+                this.sec = {{$refresh}};
             },
         };
+
+        $("#countdown_timer_status").on("click", function (event) {
+            event.preventDefault();
+            if (Countdown.interval) {
+                Countdown.Pause();
+            } else {
+                Countdown.Resume();
+            }
+        });
+
+        $("#countdown_timer").on("click", function (event) {
+            event.preventDefault();
+        });
 
         Countdown.Start();
 
