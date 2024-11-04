@@ -52,8 +52,6 @@ class Mail extends Transport
 
         try {
             return \LibreNMS\Util\Mail::send($emails, $alert_data['title'], $msg, $html, $this->config['bcc'] ?? false, $this->config['attach-graph'] ?? null);
-        } catch (\PHPMailer\PHPMailer\Exception $e) {
-            throw new AlertTransportDeliveryException($alert_data, 0, $e->errorMessage());
         } catch (Exception $e) {
             throw new AlertTransportDeliveryException($alert_data, 0, $e->getMessage());
         }
