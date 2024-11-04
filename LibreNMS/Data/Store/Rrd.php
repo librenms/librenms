@@ -111,7 +111,7 @@ class Rrd extends BaseDatastore
 
         try {
             if (! $this->isSyncRunning()) {
-                    $this->sync_process = new Proc($command, $descriptor_spec, $cwd);
+                $this->sync_process = new Proc($command, $descriptor_spec, $cwd);
             }
 
             if ($dual_process && ! $this->isAsyncRunning()) {
@@ -121,7 +121,7 @@ class Rrd extends BaseDatastore
 
             return $this->isSyncRunning() && ($dual_process ? $this->isAsyncRunning() : true);
         } catch (\Exception $e) {
-            Log::error("Failed to start RRD datastore: " . $e->getMessage());
+            Log::error('Failed to start RRD datastore: ' . $e->getMessage());
 
             return false;
         }
