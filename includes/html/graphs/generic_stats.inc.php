@@ -227,7 +227,7 @@ if ($height > 25) {
         $rrd_optionsb .= ' GPRINT:' . $id . '1hmin:LAST:%5.' . $float_precision . 'lf%s' . $units . ' GPRINT:' . $id . '1hmin:MIN:%5.' . $float_precision . 'lf%s' . $units;
         $rrd_optionsb .= ' GPRINT:' . $id . '1hmin:MAX:%5.' . $float_precision . 'lf%s' . $units . ' GPRINT:' . $id . "1hmin:AVERAGE:'%5." . $float_precision . "lf%s$units\\n'";
         // 1 hour max
-        $rrd_optionsb .= ' COMMENT:"  '.$descr_1h_max.'"';
+        $rrd_optionsb .= ' COMMENT:"  ' . $descr_1h_max.'"';
         $rrd_optionsb .= ' GPRINT:' . $id . '1hmax:LAST:%5.' . $float_precision . 'lf%s' . $units . ' GPRINT:' . $id . '1hmax:MIN:%5.' . $float_precision . 'lf%s' . $units;
         $rrd_optionsb .= ' GPRINT:' . $id . '1hmax:MAX:%5.' . $float_precision . 'lf%s' . $units . ' GPRINT:' . $id . "1hmax:AVERAGE:'%5." . $float_precision . "lf%s$units\\n'";
     }
@@ -239,11 +239,11 @@ if ($height > 25) {
             $rrd_optionsb .= ' GPRINT:' . $id . '1d:LAST:%5.' . $float_precision . 'lf%s' . $units . ' GPRINT:' . $id . '1d:MIN:%5.' . $float_precision . 'lf%s' . $units;
             $rrd_optionsb .= ' GPRINT:' . $id . '1d:MAX:%5.' . $float_precision . 'lf%s' . $units . ' GPRINT:' . $id . "1d:AVERAGE:'%5." . $float_precision . "lf%s$units\\n'";
             // 1 hour min
-            $rrd_optionsb .= ' COMMENT:"  '.$descr_1d_min.'"';
+            $rrd_optionsb .= ' COMMENT:"  ' . $descr_1d_min . '"';
             $rrd_optionsb .= ' GPRINT:' . $id . '1dmin:LAST:%5.' . $float_precision . 'lf%s' . $units . ' GPRINT:' . $id . '1dmin:MIN:%5.' . $float_precision . 'lf%s' . $units;
             $rrd_optionsb .= ' GPRINT:' . $id . '1dmin:MAX:%5.' . $float_precision . 'lf%s' . $units . ' GPRINT:' . $id . "1dmin:AVERAGE:'%5." . $float_precision . "lf%s$units\\n'";
             // 1 hour max
-            $rrd_optionsb .= ' COMMENT:"  '.$descr_1d_max.'"';
+            $rrd_optionsb .= ' COMMENT:"  ' . $descr_1d_max . '"';
             $rrd_optionsb .= ' GPRINT:' . $id . '1dmax:LAST:%5.' . $float_precision . 'lf%s' . $units . ' GPRINT:' . $id . '1dmax:MIN:%5.' . $float_precision . 'lf%s' . $units;
             $rrd_optionsb .= ' GPRINT:' . $id . '1dmax:MAX:%5.' . $float_precision . 'lf%s' . $units . ' GPRINT:' . $id . "1dmax:AVERAGE:'%5." . $float_precision . "lf%s$units\\n'";
         }
@@ -256,11 +256,11 @@ if ($height > 25) {
             $rrd_optionsb .= ' GPRINT:' . $id . '1w:LAST:%5.' . $float_precision . 'lf%s' . $units . ' GPRINT:' . $id . '1w:MIN:%5.' . $float_precision . 'lf%s' . $units;
             $rrd_optionsb .= ' GPRINT:' . $id . '1w:MAX:%5.' . $float_precision . 'lf%s' . $units . ' GPRINT:' . $id . "1w:AVERAGE:'%5." . $float_precision . "lf%s$units\\n'";
             // 1 hour min
-            $rrd_optionsb .= ' COMMENT:"  '.$descr_1w_min.'"';
+            $rrd_optionsb .= ' COMMENT:"  ' . $descr_1w_min . '"';
             $rrd_optionsb .= ' GPRINT:' . $id . '1wmin:LAST:%5.' . $float_precision . 'lf%s' . $units . ' GPRINT:' . $id . '1wmin:MIN:%5.' . $float_precision . 'lf%s' . $units;
             $rrd_optionsb .= ' GPRINT:' . $id . '1wmin:MAX:%5.' . $float_precision . 'lf%s' . $units . ' GPRINT:' . $id . "1wmin:AVERAGE:'%5." . $float_precision . "lf%s$units\\n'";
             // 1 hour max
-            $rrd_optionsb .= ' COMMENT:"  '.$descr_1w_max.'"';
+            $rrd_optionsb .= ' COMMENT:"  ' . $descr_1w_max . '"';
             $rrd_optionsb .= ' GPRINT:' . $id . '1wmax:LAST:%5.' . $float_precision . 'lf%s' . $units . ' GPRINT:' . $id . '1wmax:MIN:%5.' . $float_precision . 'lf%s' . $units;
             $rrd_optionsb .= ' GPRINT:' . $id . '1wmax:MAX:%5.' . $float_precision . 'lf%s' . $units . ' GPRINT:' . $id . "1wmax:AVERAGE:'%5." . $float_precision . "lf%s$units\\n'";
         }
