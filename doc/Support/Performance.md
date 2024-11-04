@@ -65,7 +65,10 @@ hostname and community string:
 /opt/librenms/mibs -m IF-MIB IfEntry`
 
 > NOTE: Do not go blindly setting this value as you can impact polling
-> negatively.
+> negatively. Some devices might require a lower value for Max Repeaters. 
+> For instance, F5 devices may experience issues such as tooBig errors 
+> during polling, and may need the Max Repeaters value set to 5 to prevent
+> these errors.
 
 ## SNMP Max OIDs
 
