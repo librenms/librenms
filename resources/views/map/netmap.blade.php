@@ -181,8 +181,8 @@
         }
     }
 
-    $(document).ready(async function () {
-        await refreshMap();
+    $(document).ready(function () {
+        refreshMap();
     });
 </script>
 <x-refresh-timer :refresh="$page_refresh" callback="refreshMap"></x-refresh-timer>

@@ -231,10 +231,7 @@ html, body, #fullscreen-map {
         $("#fullscreen-map").on("mouseleave", function(event) {
             device_map.scrollWheelZoom.disable();
         });
-    });
-
-    $(document).ready(async function () {
-        await refreshMap();
+        refreshMap();
     });
 </script>
 <x-refresh-timer :refresh="$page_refresh" callback="refreshMap"></x-refresh-timer>
