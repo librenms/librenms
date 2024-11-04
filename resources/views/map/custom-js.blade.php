@@ -19,7 +19,7 @@
             return '#ff00ff';
         },
 
-        redrawDefaultLegend: function (nodes, num_steps, x_pos, y_pos, font_size, hide_invalid, hide_overspeed) {
+        redrawDefaultLegend: function (nodes, num_steps, x_pos, y_pos, font_size, hide_invalid, hide_overspeed, colours) {
             // Clear out the old legend
             old_nodes = nodes.get({filter: function(node) { return node.id.startsWith("legend_") }});
             old_nodes.forEach((node) => {
@@ -36,22 +36,39 @@
                 y_pos += y_inc;
 
                 if (!(Boolean(hide_invalid))) {
-                    let legend_invalid = {id: "legend_invalid", label: "???", title: "Link is down or link speed is not defined", shape: "box", borderWidth: 0, x: x_pos, y: y_pos, font: {face: 'courier new', size: font_size, color: "white"}, color: {background: "black"}};
+                    let this_colour = "black";
+                    if(colours) {
+                        this_colour = colours['-1'];
+                    }
+                    let legend_invalid = {id: "legend_invalid", label: "???", title: "Link is down or link speed is not defined", shape: "box", borderWidth: 0, x: x_pos, y: y_pos, font: {face: 'courier new', size: font_size, color: "white"}, color: {background: this_colour}};
                     y_pos += y_inc;
                     nodes.add(legend_invalid);
                 }
 
-                let pct_step;
-                if (Boolean(hide_overspeed)) {
-                    pct_step = 100.0 / (num_steps - 1);
+                if(colours) {
+                    let i = 0;
+                    Object.keys(colours).sort((a,b) => parseInt(a) > parseInt(b)).forEach((pct_key) => {
+                        let this_pct = parseFloat(pct_key);
+                        if(!isNaN(this_pct) && this_pct >= 0.0) {
+                            let legend_step = {id: "legend_" + i.toString(), label: this_pct.toString().padStart(3, " ") + "%", shape: "box", borderWidth: 0, x: x_pos, y: y_pos, font: {face: 'courier new', size: font_size, color: "black"}, color: {background: colours[pct_key]}};
+                            nodes.add(legend_step);
+                            y_pos += y_inc;
+                            i++;
+                        }
+                    });
                 } else {
-                    pct_step = 150.0 / (num_steps - 1);
-                }
-                for (let i=0; i < num_steps; i++) {
-                    let this_pct = Math.round(pct_step * i);
-                    let legend_step = {id: "legend_" + i.toString(), label: this_pct.toString().padStart(3, " ") + "%", shape: "box", borderWidth: 0, x: x_pos, y: y_pos, font: {face: 'courier new', size: font_size, color: "black"}, color: {background: custommap.legendPctDefaultColour(this_pct)}};
-                    nodes.add(legend_step);
-                    y_pos += y_inc;
+                    let pct_step;
+                    if (Boolean(hide_overspeed)) {
+                        pct_step = 100.0 / (num_steps - 1);
+                    } else {
+                        pct_step = 150.0 / (num_steps - 1);
+                    }
+                    for (let i=0; i < num_steps; i++) {
+                        let this_pct = Math.round(pct_step * i);
+                        let legend_step = {id: "legend_" + i.toString(), label: this_pct.toString().padStart(3, " ") + "%", shape: "box", borderWidth: 0, x: x_pos, y: y_pos, font: {face: 'courier new', size: font_size, color: "black"}, color: {background: custommap.legendPctDefaultColour(this_pct)}};
+                        nodes.add(legend_step);
+                        y_pos += y_inc;
+                    }
                 }
                 nodes.flush();
             }
@@ -121,6 +138,9 @@
             } else {
                 node_cfg.image = {};
             }
+            if(! ["ellipse", "circle", "database", "box", "text"].includes(node.style)) {
+                node_cfg.font.background = "#FFFFFF";
+            }
             return node_cfg;
         },
 
@@ -131,7 +151,7 @@
                 arrows = {to: {enabled: true, scaleFactor: 0.6}, from: {enabled: false}};
             }
 
-            var edge_cfg = {id: edgeid + "_" + fromto, to: edgeid + "_mid", arrows: arrows, font: {face: edge.text_face, size: edge.text_size, color: edge.text_colour}, smooth: {type: edge.style}};
+            var edge_cfg = {id: edgeid + "_" + fromto, to: edgeid + "_mid", arrows: arrows, font: {face: edge.text_face, size: edge.text_size, color: edge.text_colour, background: "#FFFFFF"}, smooth: {type: edge.style}};
             if (fromto == "from") {
                 edge_cfg.from = edge.custom_map_node1_id;
                 var port_pct = Boolean(reverse_arrows) ? edge.port_topct : edge.port_frompct;
@@ -169,7 +189,7 @@
                     edge_cfg.label += port_bps;
                 }
                 edge_cfg.color = {color: port_colour};
-                edge_cfg.width = port_width;
+                edge_cfg.width = parseFloat(edge.fixed_width) || port_width;
             }
             return edge_cfg;
         },
