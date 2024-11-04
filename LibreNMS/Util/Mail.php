@@ -69,11 +69,13 @@ class Mail
      * @param  string  $subject
      * @param  string  $message
      * @param  bool  $html
+     * @param  bool  $bcc
+     * @param  bool|null  $embedGraphs
      * @return bool
      *
-     * @throws Exception if mail delivery fails.
+     * @throws \PHPMailer\PHPMailer\Exception
      */
-    public static function send($emails, $subject, $message, bool $html = false, bool $bcc = false, ?bool $embedGraphs = null)
+    public static function send($emails, $subject, $message, bool $html = false, bool $bcc = false, ?bool $embedGraphs = null): bool
     {
         if (is_array($emails) || ($emails = self::parseEmails($emails))) {
             d_echo("Attempting to email $subject to: " . implode('; ', array_keys($emails)) . PHP_EOL);
