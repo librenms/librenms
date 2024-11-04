@@ -7,14 +7,11 @@
 $old_context_name = $device['context_name'];
 $device['context_name'] = 'ihub';
 
-$isam_port_stats = snmpwalk_cache_oid($device, 'ifDescr', $isam_port_stats, 'IF-MIB', null, $descrSnmpFlags);
-$isam_port_stats = snmpwalk_cache_oid($device, 'ifName', $isam_port_stats, 'IF-MIB');
-$isam_port_stats = snmpwalk_cache_oid($device, 'ifAlias', $isam_port_stats, 'IF-MIB');
-$isam_port_stats = snmpwalk_cache_oid($device, 'ifType', $isam_port_stats, 'IF-MIB', null, $typeSnmpFlags);
-$isam_port_stats = snmpwalk_cache_oid($device, 'ifOperStatus', $isam_port_stats, 'IF-MIB', null, $operStatusSnmpFlags);
-
-$port_stats = array_merge($port_stats, $isam_port_stats);
+$port_stats = snmpwalk_cache_oid($device, 'ifDescr', $port_stats, 'IF-MIB', null, $descrSnmpFlags);
+$port_stats = snmpwalk_cache_oid($device, 'ifName', $port_stats, 'IF-MIB');
+$port_stats = snmpwalk_cache_oid($device, 'ifAlias', $port_stats, 'IF-MIB');
+$port_stats = snmpwalk_cache_oid($device, 'ifType', $port_stats, 'IF-MIB', null, $typeSnmpFlags);
+$port_stats = snmpwalk_cache_oid($device, 'ifOperStatus', $port_stats, 'IF-MIB', null, $operStatusSnmpFlags);
 
 $device['context_name'] = $old_context_name;
 unset($old_context_name);
-unset($isam_ports_stats);
