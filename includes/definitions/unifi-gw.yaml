@@ -1,4 +1,4 @@
-os: unifios
+os: unifi-gw
 text: 'Ubiquiti UniFi'
 type: network
 icon: ubiquiti
