@@ -2148,6 +2148,18 @@
             "order": 7,
             "type": "boolean"
         },
+        "graph_stat_cf": {
+            "default": "AVERAGE",
+            "group": "webui",
+            "section": "graph",
+            "order": 8,
+            "type": "select",
+            "options": {
+                "AVERAGE": "AVERAGE",
+                "MIN": "MIN",
+                "MAX": "MAX"
+            }
+        },
         "graph_colours.blues": {
             "default": [
                 "A9A9F2",
@@ -2158,6 +2170,18 @@
                 "3D3D99"
             ],
             "type": "array"
+        },
+        "graph_stat_cf_app_logsize": {
+            "default": "AVERAGE",
+            "group": "webui",
+            "section": "graph",
+            "order": 9,
+            "type": "select",
+            "options": {
+                "AVERAGE": "AVERAGE",
+                "MIN": "MIN",
+                "MAX": "MAX"
+            }
         },
         "graph_colours.default": {
             "default": [
