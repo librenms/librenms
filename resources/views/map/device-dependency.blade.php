@@ -154,6 +154,6 @@
             });
     }
 </script>
-<x-refresh-timer :refresh="$refresh" callback="refreshMap"></x-refresh-timer>
+<x-refresh-timer :refresh="$page_refresh" callback="refreshMap"></x-refresh-timer>
 @endsection
 

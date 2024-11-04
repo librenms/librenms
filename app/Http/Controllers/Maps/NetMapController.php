@@ -26,7 +26,6 @@
 namespace App\Http\Controllers\Maps;
 
 use App\Http\Controllers\Controller;
-use App\Models\Device;
 use App\Models\DeviceGroup;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -46,7 +45,7 @@ class NetMapController extends Controller
         }
 
         $data = [
-            'refresh' => Config::get('page_refresh', 300),
+            'page_refresh' => Config::get('page_refresh', 300),
             'group_id' => $group_id,
             'options' => Config::get('network_map_vis_options'),
             'group_name' => $group_name,
