@@ -25,7 +25,6 @@
 
 namespace LibreNMS\Util;
 
-use Exception;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\RrdGraphException;
 use PHPMailer\PHPMailer\PHPMailer;
@@ -73,7 +72,7 @@ class Mail
      * @param  bool|null  $embedGraphs
      * @return bool
      *
-     * @throws \PHPMailer\PHPMailer\Exception
+     * @throws \PHPMailer\PHPMailer\Exception if delivery fails
      */
     public static function send($emails, $subject, $message, bool $html = false, bool $bcc = false, ?bool $embedGraphs = null): bool
     {
@@ -128,7 +127,7 @@ class Mail
             return $mail->send();
         }
 
-        throw new Exception('No contacts found');
+        throw new \PHPMailer\PHPMailer\Exception('No contacts found');
     }
 
     /**
