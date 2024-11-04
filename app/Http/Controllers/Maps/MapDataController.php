@@ -35,7 +35,6 @@ use App\Models\Service;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Config;
 use LibreNMS\Util\Url;
@@ -361,20 +360,17 @@ class MapDataController extends Controller
         }
     }
 
-    protected function linkSpeedWidth(int|null $speed): float
+    protected function linkSpeedWidth(int|null $speed): int
     {
-        $speed /= 1000000000;
-        if ($speed > 500000) {
-            return 20;
-        }
+        $speed /= 10000000;
         if (is_nan($speed)) {
             return 1;
         }
-        if ($speed < 10) {
+        if ($speed < 1) {
             return 1;
         }
 
-        return round(0.77 * pow($speed, 0.25));
+        return strlen(strval(round($speed))) * 2;
     }
 
     protected function linkUseColour(float $link_pct): string
@@ -462,20 +458,18 @@ class MapDataController extends Controller
     // GET Device
     public function getDevices(Request $request): JsonResponse
     {
-        // Get all devices under maintenance
-        $maintdevices = AlertSchedule::isActive()
-            ->with('devices', 'locations.devices', 'deviceGroups.devices')
-            ->get()
-            ->map->only('devices', 'locations.devices', 'deviceGroups.devices')
-            ->flatten();
-
-        // Create a hash of device IDs covered by maintenance to avoid a DB call per device below
-        $maintdevicesmap = [];
-        foreach ($maintdevices as $device) {
-            if ($device) {
-                $maintdevicesmap[$device->device_id] = true;
-            }
-        }
+        // Get all device ids under maintenance (may contain duplicates, but we don't care for this usage)
+        $deviceIdsUnderMaintenance = AlertSchedule::isActive()
+            ->with([
+                'devices:device_id',
+                'locations.devices:location_id,device_id',
+                'deviceGroups.devices:device_id',
+            ])->get()
+            ->map(function ($schedule) {
+                return $schedule->devices->pluck('device_id')
+                    ->merge($schedule->locations->pluck('devices.*.device_id'))
+                    ->merge($schedule->deviceGroups->pluck('devices.*.device_id'));
+            })->flatten();
 
         // For manual level we need to track some items
         $no_parent_devices = collect();
@@ -510,7 +504,7 @@ class MapDataController extends Controller
                 'lng' => $device->location ? $device->location->lng : null,
                 'parents' => ($request->link_type == 'depends') ? $device->parents->pluck('device_id', 'device_id') : collect(),
                 'children' => ($request->link_type == 'depends') ? $device->children->pluck('device_id', 'device_id') : collect(),
-                'maintenance' => array_key_exists($device->device_id, $maintdevicesmap) ? 1 : 0,
+                'maintenance' => $deviceIdsUnderMaintenance->contains($device->device_id) ? 1 : 0,
             ];
 
             // Only use parent IDs below if it is being returned
@@ -636,7 +630,7 @@ class MapDataController extends Controller
     {
         // List all links
         $link_list = [];
-        $device_assoc_seen = [];
+        $port_assoc_seen = [];
         $link_types = $request->link_types;
 
         foreach ($link_types as $link_type) {
@@ -661,16 +655,17 @@ class MapDataController extends Controller
                         continue;
                     }
 
-                    $device_ids_1 = $port->device_id . '.' . $remote_port->device_id;
-                    $device_ids_2 = $remote_port->device_id . '.' . $port->device_id;
+                    if ($port->port_id < $remote_port->port_id) {
+                        $port_ids = $port->port_id . '.' . $remote_port->port_id;
+                    } else {
+                        $port_ids = $remote_port->port_id . '.' . $port->port_id;
+                    }
 
                     // Ignore any associations that have already been processed
-                    if (array_key_exists($device_ids_1, $device_assoc_seen)
-                        || array_key_exists($device_ids_2, $device_assoc_seen)) {
+                    if (array_key_exists($port_ids, $port_assoc_seen)) {
                         continue;
                     }
-                    $device_assoc_seen[$device_ids_1] = true;
-                    $device_assoc_seen[$device_ids_2] = true;
+                    $port_assoc_seen[$port_ids] = true;
 
                     $width = $this->linkSpeedWidth($port->ifSpeed);
 
