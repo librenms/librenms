@@ -47,7 +47,8 @@ trait EntityMib
         return $data->mapTable(function ($data, $entityPhysicalIndex) use ($entPhysicalToIfIndexMap) {
             $entityPhysical = new EntPhysical($data);
             $entityPhysical->entPhysicalIndex = $entityPhysicalIndex;
-            $entityPhysical->ifIndex = $entPhysicalToIfIndexMap[$entityPhysicalIndex] ?? null;
+            // get ifIndex. also if parent has an ifIndex, set it too
+            $entityPhysical->ifIndex = $entPhysicalToIfIndexMap[$entityPhysicalIndex] ?? $entPhysicalToIfIndexMap[$entityPhysical->entPhysicalContainedIn] ?? null;
 
             return $entityPhysical;
         });

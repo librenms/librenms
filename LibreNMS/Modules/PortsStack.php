@@ -101,19 +101,28 @@ class PortsStack implements Module
         // no polling
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function cleanup(Device $device): void
+    public function dataExists(Device $device): bool
     {
-        $device->portsStack()->delete();
+        return $device->portsStack()->exists();
     }
 
     /**
      * @inheritDoc
      */
-    public function dump(Device $device)
+    public function cleanup(Device $device): int
     {
+        return $device->portsStack()->delete();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function dump(Device $device, string $type): ?array
+    {
+        if ($type == 'poller') {
+            return null;
+        }
+
         return [
             'ports_stack' => $device->portsStack()
                 ->orderBy('high_ifIndex')->orderBy('low_ifIndex')

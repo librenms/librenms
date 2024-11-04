@@ -28,6 +28,6 @@ foreach ($pre_cache['ciscoepc_docsIfSignalQualityTable'] as $index => $data) {
         $oid = '.1.3.6.1.2.1.10.127.1.1.4.1.5.' . $index;
         $divisor = 10;
         $value = $data['docsIfSigQSignalNoise'];
-        discover_sensor($valid['sensor'], 'snr', $device, $oid, 'docsIfSigQSignalNoise.' . $index, 'ciscoepc', $descr, $divisor, '1', null, null, null, null, $value);
+        discover_sensor(null, 'snr', $device, $oid, 'docsIfSigQSignalNoise.' . $index, 'ciscoepc', $descr, $divisor, '1', null, null, null, null, $value);
     }
 }

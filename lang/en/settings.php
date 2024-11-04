@@ -1103,6 +1103,14 @@ return [
             'description' => 'Display network links on the map',
             'help' => 'Show the networks links between the different location on the worldmap (weathermap-like)',
         ],
+        'network_map_worldmap_show_disabled_alerts' => [
+            'description' => 'Show devices with alerts disabled',
+            'help' => 'Show devices on the network map that have alerts disabled',
+        ],
+        'network_map_worldmap_link_type' => [
+            'description' => 'Network map source',
+            'help' => 'Choose the source of data for the network map links',
+        ],
         'nfsen_enable' => [
             'description' => 'Enable NfSen',
             'help' => 'Enable Integration with NfSen',
@@ -1834,6 +1842,14 @@ return [
         'device_location_map_open' => [
             'description' => 'Location Map open',
             'help' => 'Location Map is shown by default',
+        ],
+        'device_location_map_show_devices' => [
+            'description' => 'Show devices on location map',
+            'help' => 'Show all devices on the location map when it is visible',
+        ],
+        'device_location_map_show_device_dependencies' => [
+            'description' => 'Show devices dependecies on location map',
+            'help' => 'Show links between devices on the location map based on parent dependencies',
         ],
         'whois' => [
             'description' => 'Path to whois',

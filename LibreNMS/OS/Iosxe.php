@@ -33,7 +33,6 @@ use Illuminate\Database\Eloquent\Collection as Eloq_Collection;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use LibreNMS\DB\SyncsModels;
-use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\IsIsDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessCellDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessChannelDiscovery;
@@ -62,11 +61,6 @@ class Iosxe extends Ciscowlc implements
 {
     use SyncsModels;
     use CiscoCellular;
-
-    public function pollOS(DataStorageInterface $datastore): void
-    {
-        // Don't poll Ciscowlc FIXME remove when wireless-controller module exists
-    }
 
     /**
      * Array of shortened ISIS codes

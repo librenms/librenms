@@ -32,6 +32,7 @@
         "dapphp/radius": "^3.0",
         "doctrine/dbal": "^3.5",
         "easybook/geshi": "^1.0.8",
+        "enshrined/svg-sanitize": "^0.20.0",
         "ezyang/htmlpurifier": "^4.8",
         "fico7489/laravel-pivot": "^3.0",
         "influxdata/influxdb-client-php": "^3.4",

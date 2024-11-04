@@ -416,7 +416,8 @@ class RunAlerts
                 }
 
                 if ($alert['state'] == AlertState::ACTIVE && ! empty($rextra['count']) && ($rextra['count'] == -1 || $alert['details']['count']++ < $rextra['count'])) {
-                    if ($alert['details']['count'] < $rextra['count']) {
+                    // We don't want -1 alert rule count alarms to get muted because of the current alert count
+                    if ($alert['details']['count'] < $rextra['count'] || $rextra['count'] == -1) {
                         $noacc = true;
                     }
 
@@ -439,7 +440,8 @@ class RunAlerts
                 }
 
                 if (in_array($alert['state'], [AlertState::ACTIVE, AlertState::WORSE, AlertState::BETTER]) && ! empty($rextra['count']) && ($rextra['count'] == -1 || $alert['details']['count']++ < $rextra['count'])) {
-                    if ($alert['details']['count'] < $rextra['count']) {
+                    // We don't want -1 alert rule count alarms to get muted because of the current alert count
+                    if ($alert['details']['count'] < $rextra['count'] || $rextra['count'] == -1) {
                         $noacc = true;
                     }
 

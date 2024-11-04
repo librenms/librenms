@@ -245,9 +245,8 @@
                                                 {{ ucfirst($map->name) }}
                                             </a></li>
                                         @endforeach
-                                        @if($map_group)</ul>@endif
+                                        @if($map_group)</ul></li>@endif
                                     @endforeach
-                            </li>
                         @endif
                         @admin
                         <li role="presentation" class="divider"></li>
@@ -321,6 +320,9 @@
                                                                            aria-hidden="true"></i> {{ __('Ignored :port_count', ['port_count' => $port_counts['ignored']]) }}
                                 </a></li>
                         @endif
+
+                        <li><a href="{{ route('vlans.index') }}"><i class="fa fa-tasks fa-fw fa-lg"
+                                                            aria-hidden="true"></i> {{ __('VLANs') }}</a></li>
 
                         @config('enable_billing')
                         <li><a href="{{ url('bills') }}"><i class="fa fa-money fa-fw fa-lg"

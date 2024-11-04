@@ -68,7 +68,7 @@
                             <div class="form-group row" id="nodeImageRow">
                                 <label for="nodeimage" class="col-sm-3 control-label">{{ __('map.custom.edit.node.image') }}</label>
                                 <div class="col-sm-6">
-                                    <select id="nodeimage" class="form-control input-sm" onchange="setNodeImage();">
+                                    <select id="nodeimage" class="form-control input-sm" onchange="nodeSetImage();">
                                         <option value="" id="deviceiconimage">{{ __('map.custom.edit.node.style_options.device_image') }}</option>
                                         @foreach($images as $imgfile => $imglabel)
                                             <option value="{{$imgfile}}">{{$imglabel}}</option>
@@ -82,7 +82,7 @@
                             <div class="form-group row" id="nodeIconRow">
                                 <label for="nodeicon" class="col-sm-3 control-label">{{ __('map.custom.edit.node.icon') }}</label>
                                 <div class="col-sm-6">
-                                    <select id="nodeicon" class="form-control input-sm" onchange="setNodeIcon();">
+                                    <select id="nodeicon" class="form-control input-sm" onchange="nodeSetIcon();">
                                         <option value="f233">{{ __('map.custom.edit.node.icon_options.server')  }}</option>
                                         <option value="f390">{{ __('map.custom.edit.node.icon_options.desktop')  }}</option>
                                         <option value="f7c0">{{ __('map.custom.edit.node.icon_options.dish')  }}</option>
@@ -158,11 +158,274 @@
             </div>
             <div class="modal-footer">
                 <center>
-                    <button type=button class="btn btn-primary" value="savedefaults" id="node-saveDefaultsButton" data-dismiss="modal" style="display:none" onclick="editNodeDefaultsSave();">{{ __('map.custom.edit.defaults') }}</button>
+                    <button type=button class="btn btn-primary" value="savedefaults" id="node-saveDefaultsButton" data-dismiss="modal" style="display:none" onclick="nodeDefaultsSave();">{{ __('map.custom.edit.defaults') }}</button>
                     <button type=button class="btn btn-primary" value="save" id="node-saveButton" data-dismiss="modal">{{ __('Save') }}</button>
-                    <button type=button class="btn btn-primary" value="cancel" id="node-cancelButton" data-dismiss="modal" onclick="editNodeCancel();">{{ __('Cancel') }}</button>
+                    <button type=button class="btn btn-primary" value="cancel" id="node-cancelButton" data-dismiss="modal" onclick="nodeCancel();">{{ __('Cancel') }}</button>
                 </center>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+    function nodeCheckColourReset(itemColour, defaultColour, resetControlId) {
+        if(!itemColour || itemColour.toLowerCase() == defaultColour.toLowerCase()) {
+            $("#" + resetControlId).attr('disabled','disabled');
+        } else {
+            $("#" + resetControlId).removeAttr('disabled');
+        }
+    }
+
+    function nodeMapLinkChange() {
+        if($("#maplink").val()) {
+            $("#nodeDeviceSearchRow").hide();
+        } else {
+            $("#nodeDeviceSearchRow").show();
+        }
+    }
+
+    function nodeSetIcon() {
+        var newcode = $("#nodeicon").val();
+        $("#nodeiconpreview").text(String.fromCharCode(parseInt(newcode, 16)));
+    }
+
+    function nodeSetImage() {
+        // If the selected option is not visible, select the top option
+        if($("#nodeimage option:selected").css('display') == 'none') {
+            $("#nodeimage").val($("#nodeimage option:eq(1)").val());
+        }
+        // Set the image preview src
+        if($("#nodeimage").val()) {
+            $("#nodeimagepreview").attr("src", custom_image_base + $("#nodeimage").val());
+        } else {
+            $("#nodeimagepreview").attr("src", $("#device_image").val());
+        }
+    }
+
+    function nodeStyleChange() {
+        var nodestyle = $("#nodestyle").val();
+        if(nodestyle == 'icon') {
+            $("#nodeIconRow").show();
+        } else {
+            $("#nodeIconRow").hide();
+        }
+        if(nodestyle == 'image' || nodestyle == 'circularImage') {
+            $("#nodeImageRow").show();
+        } else {
+            $("#nodeImageRow").hide();
+        }
+    }
+
+    function nodeDeviceSelect(e) {
+        var id = e.params.data.id;
+        var name = e.params.data.text;
+        $("#device_id").val(id);
+        $("#device_name").text(name);
+        $("#nodelabel").val(name.split(".")[0].split(" ")[0]);
+        $("#device_image").val(e.params.data.icon);
+        $("#nodeDeviceSearchRow").hide();
+        $("#nodeMapLinkRow").hide();
+        $("#deviceiconimage").show();
+        $("#nodeDeviceRow").show();
+    }
+
+    function nodeDeviceClear() {
+        $("#devicesearch").val('');
+        $("#devicesearch").trigger('change');
+        $("#device_id").val("");
+        $("#device_name").text("");
+        $("#device_image").val("");
+        $("#nodeDeviceRow").hide();
+        $("#deviceiconimage").hide();
+        $("#nodeDeviceSearchRow").show();
+        $("#nodeMapLinkRow").show();
+
+        // Reset device style if we were using the device image
+        if(($("#nodestyle").val() == "image" || $("#nodestyle").val() == "circularImage") && !$("#nodeimage").val()){
+            $("#nodestyle").val(newnodeconf.shape);
+            $("#nodeImageRow").hide();
+            nodeSetImage();
+        }
+    }
+
+    function nodeCancel(event) {
+        $("#node-saveButton").off("click");
+    }
+
+    function nodeSave(event) {
+        node = event.data.data;
+
+        $("#node-saveButton").off("click");
+
+        if($("#device_id").val()) {
+            node.title = $("#device_id").val();
+        } else if($("#maplink").val()) {
+            node.title = "map:" + $("#maplink").val();
+        } else {
+            node.title = '';
+        }
+        // Update the node with the selected values on success and run the callback
+        node.label = $("#nodelabel").val();
+        node.shape = $("#nodestyle").val();
+        node.font.face = $("#nodetextface").val();
+        node.font.size = parseInt($("#nodetextsize").val());
+        node.font.color = $("#nodetextcolour").val();
+        node.color = {highlight: {}, hover: {}};
+        node.color.background = node.color.highlight.background = node.color.hover.background = $("#nodecolourbg").val();
+        node.color.border = node.color.highlight.border = node.color.hover.border = $("#nodecolourbdr").val();
+        node.size = $("#nodesize").val();
+        if(node.shape == "image" || node.shape == "circularImage") {
+            if($("#nodeimage").val()) {
+                node.image = {unselected: custom_image_base + $("#nodeimage").val()};
+            } else {
+                node.image = {unselected: $("#device_image").val()};
+            }
+        } else {
+            node.image = {};
+        }
+        if(node.shape == "icon") {
+            node.icon = {face: 'FontAwesome', code: String.fromCharCode(parseInt($("#nodeicon").val(), 16)), size: $("#nodesize").val(), color: node.color.border};
+        } else {
+            node.icon = {};
+        }
+        if(node.add) {
+            delete node.add;
+            network_nodes.add(node);
+        } else {
+            network_nodes.update(node);
+        }
+
+        if(node.id) {
+            if($("#device_id").val()) {
+                node_device_map[node.id] = {device_id: $("#device_id").val(), device_name: $("#device_name").text(), device_image: $("#device_image").val()}
+            } else {
+                delete node_device_map[node.id];
+            }
+        }
+
+        $("#map-saveDataButton").show();
+        $("#map-renderButton").show();
+    }
+
+    function nodeEdit(nodeconf) {
+        if (!nodeconf.id) {
+            $("#nodeModalLabel").text('{{ __('map.custom.edit.node.defaults_title') }}');
+            $(".single-node").hide();
+        } else if(nodeconf.add) {
+            $("#nodeModalLabel").text('{{ __('map.custom.edit.node.add') }}');
+            $(".single-node").show();
+        } else {
+            $("#nodeModalLabel").text('{{ __('map.custom.edit.node.edit') }}');
+            $(".single-node").show();
+        }
+
+        $("#devicesearch").val('');
+        $("#devicesearch").trigger('change');
+
+        if(nodeconf.id in node_device_map) {
+            // Nodes is linked to a device
+            $("#device_id").val(node_device_map[nodeconf.id].device_id);
+            $("#device_name").text(node_device_map[nodeconf.id].device_name);
+            // Hide device selection row
+            $("#nodeDeviceSearchRow").hide();
+            $("#nodeMapLinkRow").hide();
+            // Show device image as an option
+            $("#deviceiconimage").show();
+            $("#device_image").val(node_device_map[nodeconf.id].device_image);
+        } else {
+            // Node is not linked to a device
+            $("#device_id").val("");
+            $("#device_name").text("");
+            // Hide the selected device row
+            $("#nodeDeviceRow").hide();
+            // Hide device image as an option
+            $("#deviceiconimage").hide();
+            $("#device_image").val("");
+        }
+        if(nodeconf.title && nodeconf.title.toString().startsWith("map:")) {
+            // Hide device selection row
+            $("#nodeDeviceSearchRow").hide();
+            $("#maplink").val(nodeconf.title.replace("map:",""));
+        } else {
+            $("#maplink").val("");
+        }
+        $("#nodelabel").val(nodeconf.label);
+        $("#nodestyle").val(nodeconf.shape);
+
+        // Show or hide the image selection if the shape is an image type
+        if(nodeconf.shape == "image" || nodeconf.shape == "circularImage") {
+            $("#nodeImageRow").show();
+            if(nodeconf.image.unselected.indexOf(custom_image_base) == 0) {
+                $("#nodeimage").val(nodeconf.image.unselected.replace(custom_image_base, ""));
+            } else {
+                $("#nodeimage").val("");
+            }
+        } else {
+            $("#nodeImageRow").hide();
+            $("#nodeimage").val("");
+        }
+        nodeSetImage();
+
+        // Show or hide the icon selection if the shape is icon
+        if(nodeconf.shape == "icon") {
+            $("#nodeicon").val(nodeconf.icon.code.charCodeAt(0).toString(16));
+            $("#nodeIconRow").show();
+        } else {
+            $("#nodeIconRow").hide();
+        }
+        nodeSetIcon();
+
+        $("#nodesize").val(nodeconf.size);
+        $("#nodetextface").val(nodeconf.font.face);
+        $("#nodetextsize").val(nodeconf.font.size);
+        $("#nodetextcolour").val(nodeconf.font.color);
+        if(nodeconf.color && nodeconf.color.background) {
+            $("#nodecolourbg").val(nodeconf.color.background);
+            $("#nodecolourbdr").val(nodeconf.color.border);
+        } else {
+            // The background colour is blank because a device has been selected - start with defaults
+            $("#nodecolourbg").val(newnodeconf.color.background);
+            $("#nodecolourbdr").val(newnodeconf.color.border);
+        }
+
+        nodeCheckColourReset(nodeconf.font.color, newnodeconf.font.color, "nodecolourtextreset");
+        nodeCheckColourReset(nodeconf.color.background, newnodeconf.color.background, "nodecolourbgreset");
+        nodeCheckColourReset(nodeconf.color.border, newnodeconf.color.border, "nodecolourbdrreset");
+
+        if(nodeconf.id) {
+            $("#node-saveButton").on("click", {data: nodeconf}, nodeSave);
+            $("#node-saveButton").show();
+            $("#node-saveDefaultsButton").hide();
+        } else {
+            $("#node-saveButton").hide();
+            $("#node-saveDefaultsButton").show();
+        }
+        $('#nodeModal').modal({backdrop: 'static', keyboard: false}, 'show');
+    }
+
+    function nodeDefaultsSave() {
+        newnodeconf.shape = $("#nodestyle").val();
+        newnodeconf.size = $("#nodesize").val();
+        newnodeconf.font.face = $("#nodetextface").val();
+        newnodeconf.font.size = $("#nodetextsize").val();
+        newnodeconf.font.color = $("#nodetextcolour").val();
+        newnodeconf.color.background = $("#nodecolourbg").val();
+        newnodeconf.color.border = $("#nodecolourbdr").val();
+        if(newnodeconf.shape == "icon") {
+            newnodeconf.icon = {face: 'FontAwesome', code: String.fromCharCode(parseInt($("#nodeicon").val(), 16)), size: $("#nodesize").val(), color: newnodeconf.color.border};
+        } else {
+            newnodeconf.icon = {};
+        }
+        if(newnodeconf.shape == "image" || newnodeconf.shape == "circularImage") {
+            newnodeconf.image = {unselected: custom_image_base + $("#nodeimage").val()};
+        } else {
+            delete newnodeconf.image;
+        }
+        $("#map-saveDataButton").show();
+    }
+
+    $(document).ready(function () {
+        init_select2('#devicesearch', 'device', {limit: 100}, '', '{{ __('map.custom.edit.node.device_select') }}', {dropdownParent: $('#nodeModal')});
+        $("#devicesearch").on("select2:select", nodeDeviceSelect);
+    });
+</script>

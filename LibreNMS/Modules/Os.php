@@ -109,18 +109,23 @@ class Os implements Module
         $this->handleChanges($os);
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function cleanup(Device $device): void
+    public function dataExists(Device $device): bool
     {
-        // no cleanup needed
+        return false; // data part of device
     }
 
     /**
      * @inheritDoc
      */
-    public function dump(Device $device)
+    public function cleanup(Device $device): int
+    {
+        return 0; // no cleanup needed
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function dump(Device $device, string $type): ?array
     {
         // get data fresh from the database
         return [

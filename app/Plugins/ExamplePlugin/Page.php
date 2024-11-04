@@ -39,7 +39,7 @@ class Page extends PageHook
 
     // The authorize method will determine if the user has access to this page.
     // if you want all users to be able to access this page simple return true
-    public function authorize(\App\Models\User $user): bool
+    public function authorize(\Illuminate\Contracts\Auth\Authenticatable $user): bool
     {
         // you can check user's roles like this:
 //        return $user->can('admin');

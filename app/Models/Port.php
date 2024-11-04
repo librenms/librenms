@@ -105,6 +105,20 @@ class Port extends DeviceRelatedModel
     }
 
     /**
+     * Get a label containing both the ifName and ifAlias if they differ.
+     */
+    public function getFullLabel(): string
+    {
+        $label = $this->getLabel();
+
+        if ($label == $this->ifAlias || empty($this->ifAlias)) {
+            return $label;
+        }
+
+        return "$label - $this->ifAlias";
+    }
+
+    /**
      * Get the description of this port
      */
     public function getDescription(): string
@@ -338,6 +352,16 @@ class Port extends DeviceRelatedModel
         return $this->links->merge($this->remoteLinks);
     }
 
+    public function xdpLinkedPorts(): BelongsToMany
+    {
+        return $this->belongsToMany(Port::class, 'links', 'local_port_id', 'remote_port_id');
+    }
+
+    public function macLinkedPorts(): BelongsToMany
+    {
+        return $this->belongsToMany(Port::class, 'view_port_mac_links', 'port_id', 'remote_port_id');
+    }
+
     public function macAccounting(): HasMany
     {
         return $this->hasMany(MacAccounting::class, 'port_id');
@@ -391,6 +415,11 @@ class Port extends DeviceRelatedModel
     public function stp(): HasMany
     {
         return $this->hasMany(PortStp::class, 'port_id');
+    }
+
+    public function transceivers(): HasMany
+    {
+        return $this->hasMany(Transceiver::class, 'port_id');
     }
 
     public function users(): BelongsToMany

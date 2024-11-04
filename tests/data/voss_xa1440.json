@@ -2299,7 +2299,7 @@
                     "entPhysicalContainedIn": 196,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "FS",
-                    "ifIndex": null
+                    "ifIndex": 196
                 },
                 {
                     "entPhysicalIndex": 19602,
@@ -2318,7 +2318,7 @@
                     "entPhysicalContainedIn": 196,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "FS",
-                    "ifIndex": null
+                    "ifIndex": 196
                 },
                 {
                     "entPhysicalIndex": 19603,
@@ -2337,7 +2337,7 @@
                     "entPhysicalContainedIn": 196,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "FS",
-                    "ifIndex": null
+                    "ifIndex": 196
                 },
                 {
                     "entPhysicalIndex": 19604,
@@ -2356,7 +2356,7 @@
                     "entPhysicalContainedIn": 196,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "FS",
-                    "ifIndex": null
+                    "ifIndex": 196
                 },
                 {
                     "entPhysicalIndex": 19605,
@@ -2375,7 +2375,7 @@
                     "entPhysicalContainedIn": 196,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "FS",
-                    "ifIndex": null
+                    "ifIndex": 196
                 },
                 {
                     "entPhysicalIndex": 19701,
@@ -2394,7 +2394,7 @@
                     "entPhysicalContainedIn": 197,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "FS",
-                    "ifIndex": null
+                    "ifIndex": 197
                 },
                 {
                     "entPhysicalIndex": 19702,
@@ -2413,7 +2413,7 @@
                     "entPhysicalContainedIn": 197,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "FS",
-                    "ifIndex": null
+                    "ifIndex": 197
                 },
                 {
                     "entPhysicalIndex": 19703,
@@ -2432,7 +2432,7 @@
                     "entPhysicalContainedIn": 197,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "FS",
-                    "ifIndex": null
+                    "ifIndex": 197
                 },
                 {
                     "entPhysicalIndex": 19704,
@@ -2451,7 +2451,7 @@
                     "entPhysicalContainedIn": 197,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "FS",
-                    "ifIndex": null
+                    "ifIndex": 197
                 },
                 {
                     "entPhysicalIndex": 19705,
@@ -2470,7 +2470,7 @@
                     "entPhysicalContainedIn": 197,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "FS",
-                    "ifIndex": null
+                    "ifIndex": 197
                 }
             ]
         },

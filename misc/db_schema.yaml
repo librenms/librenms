@@ -530,14 +530,15 @@ custom_maps:
     - { Field: legend_font_size, Type: smallint, 'Null': false, Extra: '', Default: '14' }
     - { Field: legend_hide_invalid, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
     - { Field: legend_hide_overspeed, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
+    - { Field: legend_colours, Type: longtext, 'Null': true, Extra: '' }
     - { Field: options, Type: longtext, 'Null': true, Extra: '' }
     - { Field: newnodeconfig, Type: longtext, 'Null': false, Extra: '' }
     - { Field: newedgeconfig, Type: longtext, 'Null': false, Extra: '' }
     - { Field: created_at, Type: timestamp, 'Null': true, Extra: '' }
     - { Field: updated_at, Type: timestamp, 'Null': true, Extra: '' }
     - { Field: menu_group, Type: varchar(100), 'Null': true, Extra: '' }
-    - { Field: background_type, Type: varchar(16), 'Null': false, Extra: '', Default: 'none' }
-    - { Field: background_data, Type: 'text', 'Null': true, Extra: '' }
+    - { Field: background_type, Type: varchar(16), 'Null': false, Extra: '', Default: none }
+    - { Field: background_data, Type: text, 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [custom_map_id], Unique: true, Type: BTREE }
 custom_map_backgrounds:
@@ -564,6 +565,7 @@ custom_map_edges:
     - { Field: showpct, Type: tinyint, 'Null': false, Extra: '' }
     - { Field: showbps, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
     - { Field: label, Type: varchar(255), 'Null': false, Extra: '', Default: '' }
+    - { Field: fixed_width, Type: 'decimal(3,1)', 'Null': true, Extra: '' }
     - { Field: text_face, Type: varchar(50), 'Null': false, Extra: '' }
     - { Field: text_size, Type: int, 'Null': false, Extra: '' }
     - { Field: text_colour, Type: varchar(10), 'Null': false, Extra: '' }
@@ -1732,39 +1734,39 @@ ports_statistics:
     - { Field: ifInNUcastPkts, Type: 'bigint unsigned', 'Null': true, Extra: '' }
     - { Field: ifInNUcastPkts_prev, Type: 'bigint unsigned', 'Null': true, Extra: '' }
     - { Field: ifInNUcastPkts_delta, Type: bigint, 'Null': true, Extra: '' }
-    - { Field: ifInNUcastPkts_rate, Type: int, 'Null': true, Extra: '' }
+    - { Field: ifInNUcastPkts_rate, Type: bigint, 'Null': true, Extra: '' }
     - { Field: ifOutNUcastPkts, Type: 'bigint unsigned', 'Null': true, Extra: '' }
     - { Field: ifOutNUcastPkts_prev, Type: 'bigint unsigned', 'Null': true, Extra: '' }
     - { Field: ifOutNUcastPkts_delta, Type: bigint, 'Null': true, Extra: '' }
-    - { Field: ifOutNUcastPkts_rate, Type: int, 'Null': true, Extra: '' }
+    - { Field: ifOutNUcastPkts_rate, Type: bigint, 'Null': true, Extra: '' }
     - { Field: ifInDiscards, Type: 'bigint unsigned', 'Null': true, Extra: '' }
     - { Field: ifInDiscards_prev, Type: 'bigint unsigned', 'Null': true, Extra: '' }
     - { Field: ifInDiscards_delta, Type: bigint, 'Null': true, Extra: '' }
-    - { Field: ifInDiscards_rate, Type: int, 'Null': true, Extra: '' }
+    - { Field: ifInDiscards_rate, Type: bigint, 'Null': true, Extra: '' }
     - { Field: ifOutDiscards, Type: 'bigint unsigned', 'Null': true, Extra: '' }
     - { Field: ifOutDiscards_prev, Type: 'bigint unsigned', 'Null': true, Extra: '' }
     - { Field: ifOutDiscards_delta, Type: bigint, 'Null': true, Extra: '' }
-    - { Field: ifOutDiscards_rate, Type: int, 'Null': true, Extra: '' }
+    - { Field: ifOutDiscards_rate, Type: bigint, 'Null': true, Extra: '' }
     - { Field: ifInUnknownProtos, Type: 'bigint unsigned', 'Null': true, Extra: '' }
     - { Field: ifInUnknownProtos_prev, Type: 'bigint unsigned', 'Null': true, Extra: '' }
     - { Field: ifInUnknownProtos_delta, Type: bigint, 'Null': true, Extra: '' }
-    - { Field: ifInUnknownProtos_rate, Type: int, 'Null': true, Extra: '' }
+    - { Field: ifInUnknownProtos_rate, Type: bigint, 'Null': true, Extra: '' }
     - { Field: ifInBroadcastPkts, Type: 'bigint unsigned', 'Null': true, Extra: '' }
     - { Field: ifInBroadcastPkts_prev, Type: 'bigint unsigned', 'Null': true, Extra: '' }
     - { Field: ifInBroadcastPkts_delta, Type: bigint, 'Null': true, Extra: '' }
-    - { Field: ifInBroadcastPkts_rate, Type: int, 'Null': true, Extra: '' }
+    - { Field: ifInBroadcastPkts_rate, Type: bigint, 'Null': true, Extra: '' }
     - { Field: ifOutBroadcastPkts, Type: 'bigint unsigned', 'Null': true, Extra: '' }
     - { Field: ifOutBroadcastPkts_prev, Type: 'bigint unsigned', 'Null': true, Extra: '' }
     - { Field: ifOutBroadcastPkts_delta, Type: bigint, 'Null': true, Extra: '' }
-    - { Field: ifOutBroadcastPkts_rate, Type: int, 'Null': true, Extra: '' }
+    - { Field: ifOutBroadcastPkts_rate, Type: bigint, 'Null': true, Extra: '' }
     - { Field: ifInMulticastPkts, Type: 'bigint unsigned', 'Null': true, Extra: '' }
     - { Field: ifInMulticastPkts_prev, Type: 'bigint unsigned', 'Null': true, Extra: '' }
     - { Field: ifInMulticastPkts_delta, Type: bigint, 'Null': true, Extra: '' }
-    - { Field: ifInMulticastPkts_rate, Type: int, 'Null': true, Extra: '' }
+    - { Field: ifInMulticastPkts_rate, Type: bigint, 'Null': true, Extra: '' }
     - { Field: ifOutMulticastPkts, Type: 'bigint unsigned', 'Null': true, Extra: '' }
     - { Field: ifOutMulticastPkts_prev, Type: 'bigint unsigned', 'Null': true, Extra: '' }
     - { Field: ifOutMulticastPkts_delta, Type: bigint, 'Null': true, Extra: '' }
-    - { Field: ifOutMulticastPkts_rate, Type: int, 'Null': true, Extra: '' }
+    - { Field: ifOutMulticastPkts_rate, Type: bigint, 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [port_id], Unique: true, Type: BTREE }
 ports_stp:
@@ -1812,6 +1814,7 @@ ports_vlans:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [port_vlan_id], Unique: true, Type: BTREE }
     ports_vlans_device_id_port_id_vlan_unique: { Name: ports_vlans_device_id_port_id_vlan_unique, Columns: [device_id, port_id, vlan], Unique: true, Type: BTREE }
+    ports_vlans_port_id_index: { Name: ports_vlans_port_id_index, Columns: [port_id], Unique: false, Type: BTREE }
 port_groups:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -2197,6 +2200,32 @@ tnmsneinfo:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     tnmsneinfo_device_id_index: { Name: tnmsneinfo_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
     tnmsneinfo_neid_index: { Name: tnmsneinfo_neid_index, Columns: [neID], Unique: false, Type: BTREE }
+transceivers:
+  Columns:
+    - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
+    - { Field: created_at, Type: timestamp, 'Null': true, Extra: '' }
+    - { Field: updated_at, Type: timestamp, 'Null': true, Extra: '' }
+    - { Field: device_id, Type: bigint, 'Null': false, Extra: '' }
+    - { Field: port_id, Type: bigint, 'Null': false, Extra: '' }
+    - { Field: index, Type: varchar(255), 'Null': false, Extra: '' }
+    - { Field: entity_physical_index, Type: int, 'Null': true, Extra: '' }
+    - { Field: type, Type: varchar(128), 'Null': true, Extra: '' }
+    - { Field: vendor, Type: varchar(16), 'Null': true, Extra: '' }
+    - { Field: oui, Type: varchar(16), 'Null': true, Extra: '' }
+    - { Field: model, Type: varchar(32), 'Null': true, Extra: '' }
+    - { Field: revision, Type: varchar(16), 'Null': true, Extra: '' }
+    - { Field: serial, Type: varchar(32), 'Null': true, Extra: '' }
+    - { Field: date, Type: date, 'Null': true, Extra: '' }
+    - { Field: ddm, Type: tinyint, 'Null': true, Extra: '' }
+    - { Field: encoding, Type: varchar(16), 'Null': true, Extra: '' }
+    - { Field: cable, Type: varchar(16), 'Null': true, Extra: '' }
+    - { Field: distance, Type: int, 'Null': true, Extra: '' }
+    - { Field: wavelength, Type: int, 'Null': true, Extra: '' }
+    - { Field: connector, Type: varchar(16), 'Null': true, Extra: '' }
+    - { Field: channels, Type: smallint, 'Null': false, Extra: '', Default: '1' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
+    transceivers_device_id_entity_physical_index_index: { Name: transceivers_device_id_entity_physical_index_index, Columns: [device_id, entity_physical_index], Unique: false, Type: BTREE }
 transport_group_transport:
   Columns:
     - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }

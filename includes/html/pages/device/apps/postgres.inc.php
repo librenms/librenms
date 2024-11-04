@@ -7,6 +7,10 @@ $link_array = [
     'app' => 'postgres',
 ];
 
+if (isset($vars['database'])) {
+    $vars['database'] = htmlspecialchars($vars['database']);
+}
+
 print_optionbar_start();
 
 echo generate_link('Total', $link_array);
@@ -14,6 +18,7 @@ echo '| DBs:';
 $databases = $app->data['databases'] ?? [];
 sort($databases);
 foreach ($databases as $index => $db) {
+    $db = htmlspecialchars($db);
     $label = $vars['database'] == $db
         ? '<span class="pagemenu-selected">' . $db . '</span>'
         : $db;
