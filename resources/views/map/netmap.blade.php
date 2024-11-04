@@ -1,6 +1,6 @@
 @extends('layouts.librenmsv1')
 
-@section('title', __('Device Dependency Map'))
+@section('title', __('Network Map'))
 
 @section('content')
 <div class="container-fluid">
@@ -183,7 +183,7 @@
 
     $(document).ready(async function () {
         await refreshMap();
-        Countdown.Start();
-    });</script>
+    });
+</script>
 <x-refresh-timer :refresh="$page_refresh" callback="refreshMap"></x-refresh-timer>
 @endsection
