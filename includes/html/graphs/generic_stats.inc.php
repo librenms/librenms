@@ -188,7 +188,7 @@ if ($height > 25) {
     }
     // displays nan if less than 17 hours
     if (! $no_daily) {
-        if ($time_diff >= 61200) {
+        if ($time_diff >= 129600) {
             $rrd_options .= ' DEF:' . $id . "1d$munge_helper=$filename:$ds:AVERAGE:step=86400";
             $rrd_options .= ' DEF:' . $id . "1dmin$munge_helper=$filename:$ds:MIN:step=86400";
             $rrd_options .= ' DEF:' . $id . "1dmax$munge_helper=$filename:$ds:MAX:step=86400";
@@ -233,7 +233,7 @@ if ($height > 25) {
     }
 
     if (! $no_daily) {
-        if ($time_diff >= 61200) {
+        if ($time_diff >= 129600) {
             # 1 hour average
             $rrd_optionsb .= ' LINE1.25:' . $id . '1d#' . $colour1d . ":'$descr_1d'";
             $rrd_optionsb .= ' GPRINT:' . $id . '1d:LAST:%5.' . $float_precision . 'lf%s' . $units . ' GPRINT:' . $id . '1d:MIN:%5.' . $float_precision . 'lf%s' . $units;
