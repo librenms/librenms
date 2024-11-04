@@ -629,15 +629,14 @@
                         </li>
                         <li role="presentation" class="divider"></li>
                         @endadmin
-                        @if (isset($refresh))
-                        <li class="dropdown-submenu">
-                            <a href="#"><span class="countdown_timer" id="countdown_timer"></span></a>
+                        <li class="dropdown-submenu" id="countdown_timer_menu" style="display: none">
+                            <a href="#"><i class="fa fa-clock-o fa-fw fa-lg"></i> <span id="countdown_timer"></span></a>
                             <ul class="dropdown-menu">
-                                <li><a href="#"><span class="countdown_timer_status" id="countdown_timer_status"></span></a></li>
+                                <li><a href="#" id="countdown_timer_pause"><i class="fa fa-pause fa-fw fa-lg"></i> {{ __('Pause') }}</a></li>
+                                <li><a href="#" id="countdown_timer_refresh"><i class="fa fa-arrows-rotate fa-fw fa-lg"></i> {{ __('Refresh') }}</a></li>
                             </ul>
                         </li>
-                        <li role="presentation" class="divider"></li>
-                        @endif
+                        <li role="presentation" class="divider" id="countdown_timer_divider" style="display: none"></li>
                         <li><a href="{{ url('about') }}"><i class="fa-solid fa-circle-info fa-fw fa-lg"
                                                             aria-hidden="true"></i> {{ __('About :project_name', ['project_name' => \LibreNMS\Config::get('project_name')]) }}
                             </a></li>
