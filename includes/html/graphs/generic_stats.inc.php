@@ -15,7 +15,9 @@
 
 require 'includes/html/graphs/common.inc.php';
 
-$graph_stat_cf = \LibreNMS\Config::get('graph_stat_cf', 'AVERAGE');
+if (! isset($graph_stat_cf)) {
+    $graph_stat_cf = \LibreNMS\Config::get('graph_stat_cf', 'AVERAGE');
+}
 
 $stacked = generate_stacked_graphs();
 
