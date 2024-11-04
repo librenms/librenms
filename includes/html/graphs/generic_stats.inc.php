@@ -15,6 +15,8 @@
 
 require 'includes/html/graphs/common.inc.php';
 
+$graph_stat_cf = \LibreNMS\Config::get('graph_stat_cf', 'AVERAGE');
+
 $stacked = generate_stacked_graphs();
 
 if (! isset($munge)) {
@@ -144,7 +146,7 @@ if ($munge) {
     $id = 'dsm0';
 }
 
-$rrd_options .= ' DEF:ds0' . "=$filename:$ds:AVERAGE";
+$rrd_options .= ' DEF:ds0' . "=$filename:$ds:$graph_stat_cf";
 
 $munge_helper = '';
 if ($munge) {
@@ -160,7 +162,7 @@ $rrd_optionsb .= ' LINE1.25:' . $id . '#' . $colour . ":'$descr'";
 
 if ($height > 25) {
     if (! $no_hourly) {
-        $rrd_options .= ' DEF:' . $id . "1h$munge_helper=$filename:$ds:AVERAGE:step=3600";
+        $rrd_options .= ' DEF:' . $id . "1h$munge_helper=$filename:$ds:$graph_stat_cf:step=3600";
     }
     if ($munge) {
         $rrd_options .= ' CDEF:dsm01h=dsm01hds,' . $munge_opts;
@@ -179,7 +181,7 @@ if ($height > 25) {
     // displays nan if less than 17 hours
     if (! $no_daily) {
         if ($time_diff >= 61200) {
-            $rrd_options .= ' DEF:' . $id . "1d$munge_helper=$filename:$ds:AVERAGE:step=86400";
+            $rrd_options .= ' DEF:' . $id . "1d$munge_helper=$filename:$ds:$graph_stat_cf:step=86400";
             if ($munge) {
                 $rrd_options .= ' CDEF:dsm01d=dsm01dds,' . $munge_opts;
             }
@@ -189,7 +191,7 @@ if ($height > 25) {
     // weekly breaks and causes issues if it is less than 8 days
     if (! $no_weekly) {
         if ($time_diff >= 691200) {
-            $rrd_options .= ' DEF:' . $id . "1w$munge_helper=$filename:$ds:AVERAGE:step=604800";
+            $rrd_options .= ' DEF:' . $id . "1w$munge_helper=$filename:$ds:$graph_stat_cf:step=604800";
             if ($munge) {
                 $rrd_options .= ' CDEF:dsm01w=dsm01wds,' . $munge_opts;
             }
