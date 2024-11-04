@@ -95,7 +95,11 @@
                         network_nodes.update(this_dev);
                     } else {
                         network_nodes.add([this_dev]);
-                        $("#highlight_node").append("<option value='" + device_id + "' id='highlight-device-" + device_id + "'>" + device["sname"] + "</option>")
+                        var highlight_option = document.createElement("option");
+                        highlight_option.value = device_id;
+                        highlight_option.id = "highlight-device-" + device_id;
+                        highlight_option.textContent = device["sname"];
+                        document.getElementById("highlight_node").appendChild(highlight_option);
                     }
                     $.each( device["parents"], function( parent_idx, parent_id ) {
                         link_id = device_id + "." + parent_id;
