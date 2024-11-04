@@ -172,8 +172,8 @@ if ($height > 25) {
     }
     if ($munge) {
         $rrd_options .= ' CDEF:dsm01h=dsm01hds,' . $munge_opts;
-        $rrd_options .= ' CDEF:dsm01h=dsm01hminds,' . $munge_opts;
-        $rrd_options .= ' CDEF:dsm01h=dsm01hmaxds,' . $munge_opts;
+        $rrd_options .= ' CDEF:dsm01hmin=dsm01hminds,' . $munge_opts;
+        $rrd_options .= ' CDEF:dsm01hmax=dsm01hmaxds,' . $munge_opts;
     }
     $rrd_options .= ' VDEF:' . $id . '50th=' . $id . ',50,PERCENTNAN';
     $rrd_options .= ' VDEF:' . $id . '25th=' . $id . ',25,PERCENTNAN';
