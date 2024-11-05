@@ -106,6 +106,6 @@ $pagetitle[] = 'Eventlog';
                 }
             }
         }
-    })<?php echo Request::get('eventtype') ? ".val('" . addcslashes(Request::get('eventtype'), "'") . "').trigger('change');" : ''; ?>;
+    })<?php echo Request::get('eventtype') ? ".val('" . htmlspecialchars(Request::get('eventtype')) . "').trigger('change');" : ''; ?>;
 
 </script>

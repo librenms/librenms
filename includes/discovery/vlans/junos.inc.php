@@ -79,7 +79,7 @@ if ($vlanversion == 'version1' || $vlanversion == '2') {
                 'vlan_domain' => $vtpdomain_id,
                 'vlan_vlan' => $vlan_id,
                 'vlan_name' => $vlan[$tmp_name],
-                'vlan_type' => ['NULL'],
+                'vlan_type' => null,
             ], 'vlans');
             echo '+';
         }

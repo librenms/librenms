@@ -26,13 +26,17 @@
 namespace App\Http\Controllers\Device\Tabs;
 
 use App\Models\Device;
+use App\Models\Link;
+use Illuminate\Http\Request;
+use LibreNMS\Config;
 use LibreNMS\Interfaces\UI\DeviceTab;
+use LibreNMS\Util\Url;
 
 class NeighboursController implements DeviceTab
 {
     public function visible(Device $device): bool
     {
-        return \DB::table('links')->where('local_device_id', $device->device_id)->exists();
+        return Link::where('local_device_id', $device->device_id)->exists();
     }
 
     public function slug(): string
@@ -50,8 +54,52 @@ class NeighboursController implements DeviceTab
         return __('Neighbours');
     }
 
-    public function data(Device $device): array
+    public function data(Device $device, Request $request): array
     {
-        return [];
+        $selection = Url::parseOptions('selection', 'list');
+
+        $links = [];
+
+        $devices[$device->device_id] = [
+            'url' => Url::deviceLink($device, null, [], 0, 0, 0, 1),
+            'hw' => $device->hardware,
+            'name' => $device->shortDisplayName(),
+        ];
+
+        if ($selection == 'list') {
+            $linksQuery = $device->links()->with('port', 'remoteDevice', 'remotePort');
+
+            foreach ($linksQuery->get()->sortBy('port.ifName') as $link) {
+                $links[] = [
+                    'local_url' => Url::portLink($link->port, null, null, true, false),
+                    'ldev_id' => $device->device_id,
+                    'local_portname' => $link->port->ifAlias,
+                    'rport_url' => $link->remotePort ? Url::portLink($link->remotePort, null, null, true, false) : '',
+                    'rdev_url' => $link->remoteDevice ? Url::deviceLink($link->remoteDevice, null, [], 0, 0, 0, 1) : null,
+                    'rdev_name' => $link->remoteDevice ? $link->remoteDevice->shortDisplayName() : $link->remote_hostname,
+                    'rdev_info' => $link->remoteDevice ? $link->remoteDevice->hardware : $link->remote_platform,
+                    'rport_name' => $link->remotePort ? $link->remotePort->ifAlias : $link->remote_port,
+                    'protocol' => strtoupper($link->protocol),
+                ];
+            }
+        }
+
+        return [
+            'selections' => [
+                'list' => [
+                    'text' => 'List',
+                    'link' => Url::deviceUrl($device, ['tab' => 'neighbours', 'selection' => 'list']),
+                ],
+                'map' => [
+                    'text' => 'Map',
+                    'link' => Url::deviceUrl($device, ['tab' => 'neighbours', 'selection' => 'map']),
+                ],
+            ],
+            'selection' => $selection,
+            'device_id' => $device->device_id,
+            'links' => $links,
+            'link_types' => Config::get('network_map_items', ['xdp', 'mac']),
+            'visoptions' => Config::get('network_map_vis_options'),
+        ];
     }
 }

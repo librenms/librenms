@@ -19,6 +19,7 @@ namespace LibreNMS\OS;
 
 use Illuminate\Support\Str;
 use LibreNMS\Device\Processor;
+use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\OS;
@@ -26,7 +27,7 @@ use LibreNMS\RRD\RrdDefinition;
 
 class Sonicwall extends OS implements OSPolling, ProcessorDiscovery
 {
-    public function pollOS(): void
+    public function pollOS(DataStorageInterface $datastore): void
     {
         $data = snmp_get_multi($this->getDeviceArray(), [
             'sonicCurrentConnCacheEntries.0',
@@ -42,7 +43,7 @@ class Sonicwall extends OS implements OSPolling, ProcessorDiscovery
                 'maxsessions' => $data[0]['sonicMaxConnCacheEntries'],
             ];
             $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'sonicwall_sessions', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'sonicwall_sessions', $tags, $fields);
             $this->enableGraph('sonicwall_sessions');
         }
     }

@@ -8,11 +8,62 @@ modules:
                 descr: 'Main Memory'
                 precision: 1024
     os:
-        hardware: HMPRIV-MGMT-SNMP-MIB::hmPNIOOrderID.0
-        version: HMPRIV-MGMT-SNMP-MIB::hmPNIOSoftwareRelease.0
+        hardware:
+            - HMPRIV-MGMT-SNMP-MIB::hmPNIOOrderID.0
+            - HMPRIV-MGMT-SNMP-MIB::hmSysGroupDescription.1
+        version:
+            - HMPRIV-MGMT-SNMP-MIB::hmPNIOSoftwareRelease.0
+            - HMPRIV-MGMT-SNMP-MIB::hmSysVersion.0
         serial: HMPRIV-MGMT-SNMP-MIB::hmSysGroupSerialNum.1
     processors:
         data:
             -
                 oid: hmCpuUtilization
                 num_oid: '.1.3.6.1.4.1.248.14.2.15.2.1.{{ $index }}'
+    sensors:
+        temperature:
+            data:
+                -
+                    oid: hmSFPTable
+                    value: hmSfpTemperature
+                    index: 'hmSfpTemperature{{ $index }}'
+                    group: SFP
+                    num_oid: '.1.3.6.1.4.1.248.14.1.1.13.1.12.{{ $index }}'
+                    descr: 'Temperature {{ $hmSfpInfoPartId }} {{ $subindex0 }}/{{ $subindex1 }}'
+                -
+                    oid: hmTempTable
+                    value: hmTemperature
+                    index: '{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.248.14.2.5.1.{{ $index }}'
+                    descr: 'Temperature {{ $index }}'
+                    low_limit: hmTempLwrLimit
+                    high_limit: hmTempUprLimit
+        dbm:
+            data:
+                -
+                    oid: hmSFPTable
+                    value: hmSfpTxPowerdBm
+                    index: 'hmSfpTxPowerdBm{{ $index }}'
+                    group: 'SFP {{ $subindex0 }}/{{ $subindex1 }}'
+                    descr: 'Power TX {{ $hmSfpInfoPartId }} {{ $subindex0 }}/{{ $subindex1 }}'
+                    num_oid: '.1.3.6.1.4.1.248.14.1.1.13.1.34.{{ $index }}'
+                -
+                    oid: hmSFPTable
+                    value: hmSfpRxPowerdBm
+                    index: 'hmSfpRxPowerdBm{{ $index }}'
+                    group: 'SFP {{ $subindex0 }}/{{ $subindex1 }}'
+                    descr: 'Power RX {{ $hmSfpInfoPartId }} {{ $subindex0 }}/{{ $subindex1 }}'
+                    num_oid: '.1.3.6.1.4.1.248.14.1.1.13.1.35.{{ $index }}'
+        state:
+            data:
+                -
+                    oid: hmRS2OperMode
+                    num_oid: '.1.3.6.1.4.1.248.14.1.10.1.{{ $index }}'
+                    descr: 'Operation Mode {{ $index }}'
+                    state_name: hmRS2OperMode
+                    states:
+                        - { descr: normal, graph: 1, value: 1, generic: 0 }
+                        - { descr: standby-active, graph: 1, value: 2, generic: 0 }
+                        - { descr: standby-inactive, graph: 1, value: 3, generic: 3 }
+                        - { descr: redundancy-manager-active, graph: 1, value: 4, generic: 0 }
+                        - { descr: redundancy-manager-inactive, graph: 1, value: 5, generic: 3 }

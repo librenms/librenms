@@ -23,18 +23,52 @@
 
 namespace LibreNMS\OS;
 
-use LibreNMS\OS;
+use App\Models\EntPhysical;
+use Illuminate\Support\Collection;
+use LibreNMS\OS\Shared\Radlan;
+use LibreNMS\OS\Traits\EntityMib;
+use LibreNMS\Util\StringHelpers;
+use SnmpQuery;
 
-class EltexMes23xx extends OS
+class EltexMes23xx extends Radlan
 {
+    use EntityMib {
+        EntityMib::discoverEntityPhysical as discoverBaseEntityPhysical;
+    }
+
+    public function discoverEntityPhysical(): Collection
+    {
+        $inventory = $this->discoverBaseEntityPhysical();
+
+        // add in transceivers
+        $trans = SnmpQuery::hideMib()->enumStrings()->walk('ELTEX-MES-PHYSICAL-DESCRIPTION-MIB::eltPhdTransceiverInfoTable')->table(1);
+        $ifIndexToEntIndexMap = array_flip($this->getIfIndexEntPhysicalMap());
+
+        foreach ($trans as $ifIndex => $data) {
+            $inventory->push(new EntPhysical([
+                'entPhysicalIndex' => 1000000 + $ifIndex,
+                'entPhysicalDescr' => $data['eltPhdTransceiverInfoType'],
+                'entPhysicalClass' => 'sfp-cage',
+                'entPhysicalName' => strtoupper($data['eltPhdTransceiverInfoConnectorType']),
+                'entPhysicalModelName' => $this->normData($data['eltPhdTransceiverInfoPartNumber']),
+                'entPhysicalSerialNum' => $data['eltPhdTransceiverInfoSerialNumber'],
+                'entPhysicalContainedIn' => $ifIndexToEntIndexMap[$ifIndex] ?? 0,
+                'entPhysicalMfgName' => $data['eltPhdTransceiverInfoVendorName'],
+                'entPhysicalHardwareRev' => $this->normData($data['eltPhdTransceiverInfoVendorRev']),
+                'entPhysicalParentRelPos' => 0,
+                'entPhysicalIsFRU' => 'true',
+                'ifIndex' => $ifIndex,
+            ]));
+        }
+
+        return $inventory;
+    }
+
     /**
      * Specific HexToString for Eltex
      */
-    public function normData(string $par = ''): string
+    protected function normData(string $par = ''): string
     {
-        $tmp = str_replace([':', ' '], '', trim(strtoupper($par)));
-        $ret = preg_match('/^[0-9A-F]+$/', $tmp) ? hex2str($tmp) : $par; //if string is pure hex, convert to ascii
-
-        return $ret;
+        return StringHelpers::isHex($par) ? StringHelpers::hexToAscii($par, ' ') : $par;
     }
 }

@@ -1,7 +1,37 @@
+mib: ENTITY-MIB:ENTITY-SENSOR-MIB
 modules:
     os:
-        sysDescr_regex: 
+        sysDescr_regex:
             - '/ (?<hardware>\d{4,}.*) Swch (?<version>\D{2}\.\d{2}\.\d{2}\.\d{4})/'
             - '/ (?<hardware>\d{4,}) (?<version>\D{2}\.\d{2}\.\d{2}\.\d{4})/'
             - '/(?<version>\D{2}\.\d{2}\.\d{2}\.\d{4})/'
-        serial: ENTITY-MIB::entPhysicalSerialNum.1
+        serial:
+            - ENTITY-MIB::entPhysicalSerialNum.1
+            - ENTITY-MIB::entPhysicalSerialNum.101001
+        version:
+            - ENTITY-MIB::entPhysicalSoftwareRev.1
+            - ENTITY-MIB::entPhysicalSoftwareRev.101001
+        hardware:
+            - ENTITY-MIB::entPhysicalDescr.1
+            - ENTITY-MIB::entPhysicalDescr.101001
+    sensors:
+        pre-cache:
+            data:
+                -
+                    oid:
+                        - entPhysicalName
+        state:
+            data:
+                -
+                    oid: entPhySensorTable
+                    num_oid: '.1.3.6.1.2.1.99.1.1.1.5.{{ $index }}'
+                    descr: entPhysicalName
+                    value: entPhySensorOperStatus
+                    skip_values:
+                        -
+                            oid: entPhySensorType
+                            op: '!='
+                            value: 6
+                    states:
+                        - { value: 1, descr: OK, graph: 1, generic: 0 }
+                        - { value: 3, descr: Not OK, graph: 1, generic: 2 }

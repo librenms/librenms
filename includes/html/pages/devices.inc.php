@@ -13,6 +13,24 @@
  * @author     LibreNMS Contributors
 */
 
+function show_device_group($device_group_id) {
+    $device_group_name = DB::table('device_groups')->where('id', $device_group_id)->value('name');
+    ?>
+    <div class="panel-heading">
+        <span class="devices-font-bold">
+        <?php
+        if ($device_group_id == 'none') {
+            echo "ungrouped Devices";
+        } elseif ($device_group_id) {
+            echo "Device Group: ";
+        }
+        ?>
+        </span>
+        <?php echo htmlentities($device_group_name) ?>
+    </div>
+    <?php
+}
+
 $pagetitle[] = 'Devices';
 
 if (! isset($vars['format'])) {
@@ -46,7 +64,7 @@ $menu_options = ['bits' => 'Bits',
     'storage' => 'Storage',
     'diskio' => 'Disk I/O',
     'poller_perf' => 'Poller',
-    'ping_perf' => 'Ping',
+    'icmp_perf' => 'Ping',
     'temperature' => 'Temperature',
 ];
 $sep = '';
@@ -199,6 +217,7 @@ if ($format == 'graph') {
         $where = substr($where, 0, strlen($where) - 3);
         $where .= ' )';
     }
+    show_device_group($vars['group']);
 
     $query = 'SELECT * FROM `devices` LEFT JOIN `locations` ON `devices`.`location_id` = `locations`.`id` WHERE 1';
 
@@ -289,6 +308,7 @@ if ($format == 'graph') {
         </div>
     </div>
     <div class="table-responsive">
+        <?php show_device_group($vars['group']); ?>
         <table id="devices" class="table table-hover table-condensed table-striped">
             <thead>
                 <tr>

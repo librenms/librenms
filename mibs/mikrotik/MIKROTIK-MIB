@@ -8,11 +8,11 @@ TEXTUAL-CONVENTION, DisplayString, MacAddress, DateAndTime FROM SNMPv2-TC
 OBJECT-GROUP, NOTIFICATION-GROUP FROM SNMPv2-CONF;
 
 mikrotikExperimentalModule MODULE-IDENTITY
-  LAST-UPDATED "202305010000Z"
+  LAST-UPDATED "202404100000Z"
   ORGANIZATION "MikroTik"
   CONTACT-INFO "support@mikrotik.com"
   DESCRIPTION ""
-  REVISION "202305010000Z"
+  REVISION "202404100000Z"
   DESCRIPTION ""
   ::= { mikrotik 1 }
 
@@ -1442,7 +1442,7 @@ mtxrGaugeTableEntry OBJECT-TYPE
 MtxrGaugeTableEntry ::= SEQUENCE {
     mtxrGaugeIndex ObjectIndex,
     mtxrGaugeName DisplayString,
-    mtxrGaugeValue Gauge32,
+    mtxrGaugeValue Integer32,
     mtxrGaugeUnit INTEGER
 }
 
@@ -1461,7 +1461,7 @@ mtxrGaugeName OBJECT-TYPE
     ::= { mtxrGaugeTableEntry 2 }
 
 mtxrGaugeValue OBJECT-TYPE
-    SYNTAX Gauge32
+    SYNTAX Integer32
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION ""
@@ -2895,7 +2895,17 @@ mtxrPOEStatus OBJECT-TYPE
         disabled(1),
         waitingForLoad(2),
         poweredOn(3),
-        overload(4)
+        overload(4),
+        shortCircuit(5),
+        voltageTooLow(6),
+        currentTooLow(7),
+        powerReset(8),
+        voltageTooHigh(9),
+        controllerError(10),
+        controllerUpgrade(11),
+        poeInDetected(12),
+        noValidPsu(13),
+        controllerInit(14)
     }
     MAX-ACCESS read-only
     STATUS current
@@ -3204,7 +3214,9 @@ MtxrOpticalTableEntry ::= SEQUENCE {
         mtxrOpticalTxBiasCurrent Gauge32,
         mtxrOpticalTxPower IDiv1000,
         mtxrOpticalRxPower IDiv1000,
-        mtxrOpticalVendorName DisplayString
+        mtxrOpticalVendorName DisplayString,
+        mtxrOpticalVendorSerial DisplayString
+
 }
 
 mtxrOpticalGroup OBJECT-GROUP OBJECTS {
@@ -3217,7 +3229,8 @@ mtxrOpticalGroup OBJECT-GROUP OBJECTS {
         mtxrOpticalTxBiasCurrent,
         mtxrOpticalTxPower,
         mtxrOpticalRxPower,
-        mtxrOpticalVendorName
+        mtxrOpticalVendorName,
+        mtxrOpticalVendorSerial
     }
     STATUS current
     DESCRIPTION ""
@@ -3305,6 +3318,13 @@ mtxrOpticalVendorName OBJECT-TYPE
     STATUS current
     DESCRIPTION ""
     ::= { mtxrOpticalTableEntry 11 }
+
+mtxrOpticalVendorSerial OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrOpticalTableEntry 12 }
 
 -- IPSec *****************************************************************
 
@@ -3578,3 +3598,4 @@ mtxrTrapGroup NOTIFICATION-GROUP NOTIFICATIONS {
 -- ***************************************************************************
 
 END
+

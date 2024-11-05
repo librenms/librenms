@@ -112,7 +112,7 @@ if ($vars['searchby'] == 'vlan') {
                 "<div class=\"form-group\">"+
                 "<input type=\"text\" name=\"searchPhrase\" id=\"address\" value=\""+
 <?php
-echo '"' . $vars['searchPhrase'] . '"+';
+echo '"' . htmlspecialchars($vars['searchPhrase']) . '"+';
 ?>
 
                 "\" class=\"form-control input-sm\" placeholder=\"Value\" />"+

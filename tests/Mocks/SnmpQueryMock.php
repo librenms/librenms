@@ -33,6 +33,7 @@ use Illuminate\Support\Str;
 use LibreNMS\Data\Source\NetSnmpQuery;
 use LibreNMS\Data\Source\SnmpQueryInterface;
 use LibreNMS\Data\Source\SnmpResponse;
+use LibreNMS\Util\Mac;
 use LibreNMS\Util\Oid;
 use Log;
 
@@ -70,6 +71,11 @@ class SnmpQueryMock implements SnmpQueryInterface
         $this->device = new Device($device);
 
         return $this;
+    }
+
+    public function cache(): SnmpQueryInterface
+    {
+        return $this; // ignore, always cached
     }
 
     public function context(string $context): SnmpQueryInterface
@@ -112,6 +118,14 @@ class SnmpQueryMock implements SnmpQueryInterface
     public function numeric(bool $numeric = true): SnmpQueryInterface
     {
         $this->numeric = $numeric;
+
+        return $this;
+    }
+
+    public function numericIndex(bool $numericIndex = true): SnmpQueryInterface
+    {
+        // TODO: Implement numericIndex() method
+        Log::error('numericIndex not implemented in SnmpQueryMock');
 
         return $this;
     }
@@ -243,7 +257,7 @@ class SnmpQueryMock implements SnmpQueryInterface
                     '1.3.6.1.2.1.17.1.1.0', // BRIDGE-MIB::dot1dBaseBridgeAddress.0
                     '1.3.6.1.4.1.890.1.5.13.13.8.1.1.20', // IES5206-MIB::slotModuleMacAddress
                 ])) {
-                    $data = \LibreNMS\Util\Rewrite::readableMac($data);
+                    $data = Mac::parse($data)->readable();
                 } else {
                     $data = hex2str($data);
                 }

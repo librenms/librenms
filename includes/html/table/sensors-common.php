@@ -116,14 +116,14 @@ foreach (dbFetchRows($sql, $param) as $sensor) {
 
     $sensor_current = $graph_type == 'sensor_state' ? get_state_label($sensor) : get_sensor_label_color($sensor, $translations);
     $response[] = [
-        'hostname'         => generate_device_link($sensor),
-        'sensor_descr'     => \LibreNMS\Util\Url::overlibLink($link, $sensor['sensor_descr'], $overlib_content),
-        'graph'            => \LibreNMS\Util\Url::overlibLink($link_graph, $sensor_minigraph, $overlib_content),
-        'alert'            => $alert,
-        'sensor_current'   => $sensor_current,
+        'hostname' => generate_device_link($sensor),
+        'sensor_descr' => \LibreNMS\Util\Url::overlibLink($link, $sensor['sensor_descr'], $overlib_content),
+        'graph' => \LibreNMS\Util\Url::overlibLink($link_graph, $sensor_minigraph, $overlib_content),
+        'alert' => $alert,
+        'sensor_current' => $sensor_current,
         'sensor_limit_low' => is_null($sensor['sensor_limit_low']) ? '-' :
             '<span class=\'label label-default\'>' . trim(\LibreNMS\Util\Number::formatSi($sensor['sensor_limit_low'], 2, 3, '') . $unit) . '</span>',
-        'sensor_limit'     => is_null($sensor['sensor_limit']) ? '-' :
+        'sensor_limit' => is_null($sensor['sensor_limit']) ? '-' :
             '<span class=\'label label-default\'>' . trim(\LibreNMS\Util\Number::formatSi($sensor['sensor_limit'], 2, 3, '') . $unit) . '</span>',
     ];
 
@@ -141,24 +141,24 @@ foreach (dbFetchRows($sql, $param) as $sensor) {
         $yearly_url = 'graph.php?id=' . $sensor['sensor_id'] . '&amp;type=' . $graph_type . '&amp;from=' . Config::get('time.year') . '&amp;to=' . Config::get('time.now') . '&amp;width=400&amp;height=150';
 
         $response[] = [
-            'hostname'       => "<a onmouseover=\"return overlib('<img src=\'$daily_url\'>', LEFT);\" onmouseout=\"return nd();\">
+            'hostname' => "<a onmouseover=\"return overlib('<img src=\'$daily_url\'>', LEFT);\" onmouseout=\"return nd();\">
             <img src='$daily_graph' border=0></a> ",
-            'sensor_descr'   => "<a onmouseover=\"return overlib('<img src=\'$weekly_url\'>', LEFT);\" onmouseout=\"return nd();\">
+            'sensor_descr' => "<a onmouseover=\"return overlib('<img src=\'$weekly_url\'>', LEFT);\" onmouseout=\"return nd();\">
             <img src='$weekly_graph' border=0></a> ",
-            'graph'          => "<a onmouseover=\"return overlib('<img src=\'$monthly_url\'>', LEFT);\" onmouseout=\"return nd();\">
+            'graph' => "<a onmouseover=\"return overlib('<img src=\'$monthly_url\'>', LEFT);\" onmouseout=\"return nd();\">
             <img src='$monthly_graph' border=0></a>",
-            'alert'          => '',
+            'alert' => '',
             'sensor_current' => "<a onmouseover=\"return overlib('<img src=\'$yearly_url\'>', LEFT);\" onmouseout=\"return nd();\">
             <img src='$yearly_graph' border=0></a>",
-            'sensor_range'   => '',
+            'sensor_range' => '',
         ];
     } //end if
 }//end foreach
 
 $output = [
-    'current'  => $current,
+    'current' => $current,
     'rowCount' => $rowCount,
-    'rows'     => $response,
-    'total'    => $count,
+    'rows' => $response,
+    'total' => $count,
 ];
 echo json_encode($output, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);

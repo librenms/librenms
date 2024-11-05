@@ -5,7 +5,6 @@ use Illuminate\Support\Str;
 use LibreNMS\Exceptions\InvalidModuleException;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\ModuleTestHelper;
-use LibreNMS\Util\Snmpsim;
 
 $install_dir = realpath(__DIR__ . '/..');
 chdir($install_dir);
@@ -23,17 +22,10 @@ $options = getopt(
         'variant:',
         'file:',
         'debug',
-        'snmpsim',
         'full',
         'help',
     ]
 );
-
-if (isset($options['snmpsim'])) {
-    $snmpsim = new Snmpsim();
-    $snmpsim->run();
-    exit;
-}
 
 if (isset($options['v'])) {
     $variant = $options['v'];

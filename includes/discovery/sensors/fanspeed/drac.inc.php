@@ -22,6 +22,6 @@ foreach (explode("\n", $oids) as $data) {
         $current = snmp_get($device, $fan_oid, '-Oqv', 'IDRAC-MIB-SMIv2');
         $low_limit = snmp_get($device, $limit_oid, '-Oqv', 'IDRAC-MIB-SMIv2');
         $divisor = '1';
-        discover_sensor($valid['sensor'], 'fanspeed', $device, $fan_oid, $index, 'drac', $descr, $divisor, '1', $low_limit, null, null, null, $current);
+        discover_sensor(null, 'fanspeed', $device, $fan_oid, $index, 'drac', $descr, $divisor, '1', $low_limit, null, null, null, $current);
     }
 }

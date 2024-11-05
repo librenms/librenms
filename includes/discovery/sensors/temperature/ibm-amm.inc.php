@@ -24,7 +24,7 @@ if (! empty($mmtemp)) {
     $descr = 'Management module temperature';
     $divisor = 1;
     $current = $mmtemp;
-    discover_sensor($valid['sensor'], 'temperature', $device, $oid, $oid, 'ibm-amm', $descr, $divisor, '1', null, null, null, null, $current);
+    discover_sensor(null, 'temperature', $device, $oid, $oid, 'ibm-amm', $descr, $divisor, '1', null, null, null, null, $current);
 }
 
 $oid = '.1.3.6.1.4.1.2.3.51.2.2.1.5.1.0'; // BLADE-MIB::frontPanelTemp.0
@@ -41,5 +41,5 @@ if (! empty($fptemp)) {
     $descr = 'Front panel temperature';
     $divisor = 1;
     $current = $fptemp;
-    discover_sensor($valid['sensor'], 'temperature', $device, $oid, $oid, 'ibm-amm', $descr, $divisor, '1', null, null, null, null, $current);
+    discover_sensor(null, 'temperature', $device, $oid, $oid, 'ibm-amm', $descr, $divisor, '1', null, null, null, null, $current);
 }

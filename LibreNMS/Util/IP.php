@@ -54,6 +54,12 @@ abstract class IP
 
         $hex = str_replace([':', '.'], '', $hex);
 
+        // check if hex was incorrectly converted to ascii
+        $len = strlen($hex);
+        if (($len == 4 || $len == 16) && preg_match('/[^0-9a-fA-F]/', $hex)) {
+            $hex = StringHelpers::asciiToHex($hex);
+        }
+
         try {
             if (strlen($hex) == 8) {
                 return new IPv4(long2ip(hexdec($hex)));

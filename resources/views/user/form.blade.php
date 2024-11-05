@@ -60,9 +60,9 @@
     <div class="form-group @if($errors->hasAny(['old_password', 'new_password', 'new_password_confirmation'])) has-error @endif">
         <label for="password" class="control-label col-sm-3">{{ __('Password') }}</label>
         <div class="col-sm-9">
-            @cannot('admin')
+            @if(auth()->user()->cannot('admin') || auth()->user()->is($user))
                 <input type="password" class="form-control" id="old_password" name="old_password" placeholder="{{ __('Current Password') }}">
-            @endcannot
+            @endif
             <input type="password" autocomplete="off" class="form-control" id="new_password" name="new_password" placeholder="{{ __('New Password') }}">
             <input type="password" autocomplete="off" class="form-control" id="new_password_confirmation" name="new_password_confirmation" placeholder="{{ __('Confirm Password') }}">
             <span class="help-block">

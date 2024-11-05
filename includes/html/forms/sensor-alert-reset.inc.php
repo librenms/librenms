@@ -17,7 +17,7 @@ header('Content-type: application/json');
 
 if (! Auth::user()->hasGlobalAdmin()) {
     $response = [
-        'status'  => 'error',
+        'status' => 'error',
         'message' => 'Need to be admin',
     ];
     echo json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
@@ -36,7 +36,7 @@ $sensor_count = count($sensor_id);
 
 if (is_array($sensor_id)) {
     for ($x = 0; $x < $sensor_count; $x++) {
-        if (dbUpdate(['sensor_limit' => set_null($sensor_limit[$x], ['NULL']), 'sensor_limit_warn' => set_null($sensor_limit_warn[$x], ['NULL']), 'sensor_limit_low_warn' => set_null($sensor_limit_low_warn[$x], ['NULL']), 'sensor_limit_low' => set_null($sensor_limit_low[$x], ['NULL'])], 'sensors', '`sensor_id` = ?', [$sensor_id[$x]]) >= 0) {
+        if (dbUpdate(['sensor_limit' => set_null($sensor_limit[$x]), 'sensor_limit_warn' => set_null($sensor_limit_warn[$x]), 'sensor_limit_low_warn' => set_null($sensor_limit_low_warn[$x]), 'sensor_limit_low' => set_null($sensor_limit_low[$x])], 'sensors', '`sensor_id` = ?', [$sensor_id[$x]]) >= 0) {
             $message = 'Sensor values resetted';
             $status = 'ok';
         } else {
@@ -48,7 +48,7 @@ if (is_array($sensor_id)) {
     $message = 'Invalid sensor id';
 }
 $response = [
-    'status'        => $status,
-    'message'       => $message,
+    'status' => $status,
+    'message' => $message,
 ];
 echo json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);

@@ -18,15 +18,15 @@ if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list = [
         [
             'filename' => $rrd_filename,
-            'descr'    => 'Received',
-            'ds'       => 'bytesr',
-            'colour'   => '582A72',
+            'descr' => 'Received',
+            'ds' => 'bytesr',
+            'colour' => '582A72',
         ],
         [
             'filename' => $rrd_filename,
-            'descr'    => 'Delivered',
-            'ds'       => 'bytesd',
-            'colour'   => '88CC88',
+            'descr' => 'Delivered',
+            'ds' => 'bytesd',
+            'colour' => '88CC88',
         ],
     ];
 } else {

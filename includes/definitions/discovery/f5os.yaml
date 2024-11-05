@@ -124,60 +124,70 @@ modules:
                     num_oid: .1.3.6.1.4.1.12276.1.2.1.2.2.1.4.8.112.108.97.116.102.111.114.109.7.110.118.109.101.48.110.49
                     descr: Total IOPS
                     group: Disk
-                    index: 0
+                    rrd_type: COUNTER
+                    index: diskTotalIops0
                 -
                     oid: F5-PLATFORM-STATS-MIB::diskUtilizationStatsTable
                     value: F5-PLATFORM-STATS-MIB::diskReadIops
                     num_oid: .1.3.6.1.4.1.12276.1.2.1.2.2.1.5.8.112.108.97.116.102.111.114.109.7.110.118.109.101.48.110.49
                     descr: Read IOPS
                     group: Disk
-                    index: 1
+                    rrd_type: COUNTER
+                    index: diskReadIops
                 -
                     oid: F5-PLATFORM-STATS-MIB::diskUtilizationStatsTable
                     value: F5-PLATFORM-STATS-MIB::diskReadMerged
                     num_oid: .1.3.6.1.4.1.12276.1.2.1.2.2.1.6.8.112.108.97.116.102.111.114.109.7.110.118.109.101.48.110.49
                     descr: Read Merged
                     group: Disk
-                    index: 2
+                    rrd_type: COUNTER
+                    index: diskReadMerged
                 -
                     oid: F5-PLATFORM-STATS-MIB::diskUtilizationStatsTable
                     value: F5-PLATFORM-STATS-MIB::diskReadBytes
                     num_oid: .1.3.6.1.4.1.12276.1.2.1.2.2.1.7.8.112.108.97.116.102.111.114.109.7.110.118.109.101.48.110.49
                     descr: Read Bytes
                     group: Disk
-                    index: 3
+                    rrd_type: COUNTER
+                    index: diskReadBytes
                 -
                     oid: F5-PLATFORM-STATS-MIB::diskUtilizationStatsTable
                     value: F5-PLATFORM-STATS-MIB::diskReadLatencyMs
                     num_oid: .1.3.6.1.4.1.12276.1.2.1.2.2.1.8.8.112.108.97.116.102.111.114.109.7.110.118.109.101.48.110.49
                     descr: Read Latency
                     group: Disk
-                    index: 4
+                    rrd_type: COUNTER
+                    index: diskReadLatencyMs
                 -
                     oid: F5-PLATFORM-STATS-MIB::diskUtilizationStatsTable
                     value: F5-PLATFORM-STATS-MIB::diskWriteIops
                     num_oid: .1.3.6.1.4.1.12276.1.2.1.2.2.1.9.8.112.108.97.116.102.111.114.109.7.110.118.109.101.48.110.49
                     descr: Write IOPS
                     group: Disk
-                    index: 5
+                    rrd_type: COUNTER
+                    index: diskWriteIops
                 -
                     oid: F5-PLATFORM-STATS-MIB::diskUtilizationStatsTable
                     value: F5-PLATFORM-STATS-MIB::diskWriteMerged
                     num_oid: .1.3.6.1.4.1.12276.1.2.1.2.2.1.10.8.112.108.97.116.102.111.114.109.7.110.118.109.101.48.110.49
                     descr: Write Merged
                     group: Disk
-                    index: 6
+                    rrd_type: COUNTER
+                    index: diskWriteMerged
                 -
                     oid: F5-PLATFORM-STATS-MIB::diskUtilizationStatsTable
                     value: F5-PLATFORM-STATS-MIB::diskWriteBytes
                     num_oid: .1.3.6.1.4.1.12276.1.2.1.2.2.1.11.8.112.108.97.116.102.111.114.109.7.110.118.109.101.48.110.49
                     descr: Write Bytes
                     group: Disk
-                    index: 7
+                    rrd_type: COUNTER
+                    index: diskWriteBytes
                 -
                     oid: F5-PLATFORM-STATS-MIB::diskUtilizationStatsTable
                     value: F5-PLATFORM-STATS-MIB::diskWriteLatencyMs
                     num_oid: .1.3.6.1.4.1.12276.1.2.1.2.2.1.12.8.112.108.97.116.102.111.114.109.7.110.118.109.101.48.110.49
                     descr: Write Latency
                     group: Disk
-                    index: 8
+                    rrd_type: COUNTER
+                    index: diskWriteLatencyMs
+

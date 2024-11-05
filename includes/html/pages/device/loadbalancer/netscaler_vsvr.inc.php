@@ -6,10 +6,10 @@ if (is_numeric($vars['vsvr'])) {
     // echo('<a href="'.generate_url($vars, array('vsvr' => NULL)).'">All</a>');
     // print_optionbar_end();
     $graph_types = [
-        'bits'    => 'Bits',
-        'pkts'    => 'Packets',
-        'conns'   => 'Connections',
-        'reqs'    => 'Requests',
+        'bits' => 'Bits',
+        'pkts' => 'Packets',
+        'conns' => 'Connections',
+        'reqs' => 'Requests',
         'hitmiss' => 'Hit/Miss',
     ];
 
@@ -96,10 +96,10 @@ if (is_numeric($vars['vsvr'])) {
     unset($sep);
     echo ' Graphs: ';
     $graph_types = [
-        'bits'    => 'Bits',
-        'pkts'    => 'Packets',
-        'conns'   => 'Connections',
-        'reqs'    => 'Requests',
+        'bits' => 'Bits',
+        'pkts' => 'Packets',
+        'conns' => 'Connections',
+        'reqs' => 'Requests',
         'hitmiss' => 'Hit/Miss',
     ];
 
@@ -138,12 +138,12 @@ if (is_numeric($vars['vsvr'])) {
     switch ($sort_key) {
         case 'vsvr_bps_in':
         case 'vsvr_bps_out':
-            $sort_direction = SORT_DESC;
+            $sort_descending = true;
             break;
         default:
-            $sort_direction = SORT_ASC;
+            $sort_descending = false;
     }
-    $vservers = array_sort_by_column($vservers, $sort_key, $sort_direction);
+    $vservers = collect($vservers)->sortBy($sort_key, descending: $sort_descending)->all();
 
     $i = '0';
     foreach ($vservers as $vsvr) {

@@ -1,22 +1,22 @@
 <?php
 
 $link_array = [
-    'page'   => 'device',
+    'page' => 'device',
     'device' => $device['device_id'],
-    'tab'    => 'apps',
-    'app'    => 'sneck',
+    'tab' => 'apps',
+    'app' => 'sneck',
 ];
 
 $link_array = [
-    'page'   => 'device',
+    'page' => 'device',
     'device' => $device['device_id'],
-    'tab'    => 'apps',
-    'app'    => 'sneck',
+    'tab' => 'apps',
+    'app' => 'sneck',
 ];
 
 $graphs = [
-    'sneck_results'=>'Results',
-    'sneck_time'=>'Time Difference',
+    'sneck_results' => 'Results',
+    'sneck_time' => 'Time Difference',
 ];
 
 foreach ($graphs as $key => $text) {
@@ -45,8 +45,8 @@ if (isset($sneck_data)) {
     print_optionbar_start();
     echo 'Last Return...<br>';
     echo "<b>Alert(s):</b><br>\n";
-    echo str_replace("\n", "<br>\n", $app->data['data']['alertString']) . "<br><br>\n";
+    echo str_replace("\n", "<br>\n", htmlspecialchars($app->data['data']['alertString'])) . "<br><br>\n";
     echo "<b>Raw JSON:</b><br>\n";
-    echo "<pre>\n" . json_encode($app->data, JSON_PRETTY_PRINT) . "</pre>\n";
+    echo "<pre>\n" . htmlspecialchars(json_encode($app->data, JSON_PRETTY_PRINT)) . "</pre>\n";
     print_optionbar_end();
 }

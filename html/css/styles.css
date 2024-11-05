@@ -357,7 +357,6 @@ A.purple:visited, a.purple, .purple { color: #740074; }
   max-height:180px;
   text-align: center;
   float: left;
-  background-color: #f5f5f5;
 }
 
 .tablehead {
@@ -793,7 +792,7 @@ p.vspace { padding-top: 3px; padding-bottom: 3px; }
 }
 
 .graphcell, .ifcell, .devicecell, .datacell { margin: 0px 0px 7px 0px; padding: 7px; border: 0px; background: #e8e8e8; float: left; }
-.ifcell { float: left; clear:right; background:none; }
+.iftable td { padding: 0 15px; line-height: 1.42857143; }
 
 .datacell { clear: both; }
 .devicecell { margin: 2px auto; }
@@ -1567,11 +1566,13 @@ tr.search:nth-child(odd) {
 }
 
 .minigraph-image {
+  display: inline;
   margin: 2px;
 }
 
 .minigraph-div {
-  display: block;
+  display: flex;
+  justify-content: center;
   padding: 3px;
   margin: 3px;
   min-width: 183px;
@@ -1580,9 +1581,8 @@ tr.search:nth-child(odd) {
   max-height: 90px;
   text-align: center;
   float: left;
-  background-color: #e9e9e9;
   border: solid 1px;
-  border-color: #e9e9e9;
+  border-color: #b2b6af;
 }
 
 .example-sports .league-name {
@@ -1677,7 +1677,11 @@ tr.search:nth-child(odd) {
      -moz-box-shadow: 0 5px 10px rgba(0,0,0,.2);
           box-shadow: 0 5px 10px rgba(0,0,0,.2);
 }
-
+@media (min-width: 768px)  {
+    .tt-open {
+        left: -400px !important;
+    }
+}
 .tt-open {
   position: absolute;
   top: 95%;
@@ -1685,7 +1689,6 @@ tr.search:nth-child(odd) {
   z-index: 100;
   display: none;
   min-width: 400px;
-  left: -400px !important;
   margin-bottom: 20px;
   overflow: hidden;
   padding: 8px;
@@ -1722,6 +1725,7 @@ tr.search:nth-child(odd) {
 
 .gridster * {
   margin:0;
+  text-align: left;
 }
 
 .grid ul {
@@ -1733,6 +1737,9 @@ tr.search:nth-child(odd) {
     line-height: 100%;
 }
 
+.gridster .awesome-marker {
+  text-align: center;
+}
 
 .gridster {
     margin: 0 auto;
@@ -1772,10 +1779,8 @@ tr.search:nth-child(odd) {
     background-color: #000000;
     color: #ffffff;
     text-align: center;
-    -webkit-border-top-left-radius: 4px;
-     -moz-border-top-right-radius: 4px;
-          border-top-left-radius: 4px;
-          border-top-right-radius: 4px;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
 }
 
 .mapTooltip {
@@ -1962,10 +1967,12 @@ label {
 .edit-widget, .close-widget { cursor: pointer; }
 .widget_body {
     padding: 0.8em;
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
     overflow-y: auto;
     overflow-x: hidden;
     width: 100%;
-    height: calc(100% - 38px);
+    height: calc(100% - 2.6em);
     cursor: auto;
     text-align: center;
 }
@@ -2010,6 +2017,20 @@ label {
 .service-name-label {
   float:left;
   margin:-8px;
+}
+
+.widget_body:has(> .worldmap_widget) {
+    padding: 0;
+}
+.worldmap_widget {
+    width: 100%;
+    height: 100%;
+    text-align: left;
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
+}
+.worldmap_widget a:hover {
+    text-decoration: none;
 }
 
 .report-up {
@@ -2111,6 +2132,13 @@ label {
   background-color: #D9534F;
 }
 
+.availability-map-oldview-box-ignored {
+  height:12px;
+  width:12px;
+  float:left;
+  background-color: #36393D;
+}
+
 .availability-map-widget-header {
   line-height:34px;
 }
@@ -2184,7 +2212,6 @@ label {
     max-height: 170px;
     text-align: center;
     float: left;
-    background-color: #f5f5f5;
 }
 
 .device-table-metrics span {
@@ -2203,11 +2230,10 @@ label {
 }
 
 .device-table-icon {
-  padding-left:7px;
-  display: inline-block;
-  width: 64px;
-  height: 32px;
-  line-height: 32px;
+    display: flex;
+    align-items: center;
+    width: 32px;
+    height: 32px;
 }
 
 .device-table-icon img {

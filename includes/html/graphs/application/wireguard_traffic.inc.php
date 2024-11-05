@@ -1,44 +1,59 @@
 <?php
 
-$name = 'wireguard';
-$polling_type = 'app';
+require 'wireguard-common.inc.php';
 
-if (isset($vars['interface']) && isset($vars['client'])) {
-    $interface = $vars['interface'];
-    $client = $vars['client'];
-    $interface_client = $vars['interface'] . '-' . $vars['client'];
-} else {
-    $interface_client_list = Rrd::getRrdApplicationArrays($device, $app->app_id, $name);
-    $interface_client = $interface_client_list[0] ?? '';
-}
-
-$unit_text = 'Bytes';
-
-$ds_in = 'bytes_rcvd';
-$in_text = 'Rcvd';
-$ds_out = 'bytes_sent';
-$out_text = 'Sent';
-
+$unit_text = 'Bytes/s';
 $format = 'bytes';
 $print_total = true;
-
+$in_text = 'In';
+$out_text = 'Out';
 $colour_area_in = 'FF3300';
 $colour_line_in = 'FF0000';
 $colour_area_out = 'FF6633';
 $colour_line_out = 'CC3300';
-
 $colour_area_in_max = 'FF6633';
 $colour_area_out_max = 'FF9966';
 
-$rrd_filename = Rrd::name($device['hostname'], [
-    $polling_type,
-    $name,
-    $app->app_id,
-    $interface_client,
-]);
+if (! isset($vars['interface']) && ! isset($vars['client'])) {
+    // This section is called if we're being asked to graph
+    // the host's wireguard global metrics.
+    $ds_in = 'bytes_rcvd_total';
+    $ds_out = 'bytes_sent_total';
+} elseif (isset($vars['interface']) && isset($vars['client'])) {
+    // This section is called if we're being asked to graph
+    // a wireguard interface's client metrics.
+    $flattened_name = $vars['interface'] . '-' . $vars['client'];
+    $ds_in = 'bytes_rcvd';
+    $ds_out = 'bytes_sent';
+} elseif (isset($vars['interface'])) {
+    // This section is called if we're being asked to graph
+    // a wireguard interface's metrics.
+    $flattened_name = $vars['interface'];
+    $ds_in = 'bytes_rcvd_total_intf';
+    $ds_out = 'bytes_sent_total_intf';
+}
+
+if (! isset($vars['interface']) && ! isset($vars['client'])) {
+    $rrd_filename = Rrd::name($device['hostname'], [
+        $polling_type,
+        $name,
+        $app->app_id,
+    ]);
+} elseif (isset($vars['interface'])) {
+    $rrd_filename = Rrd::name($device['hostname'], [
+        $polling_type,
+        $name,
+        $app->app_id,
+        $flattened_name,
+    ]);
+}
+
+if (! isset($rrd_filename)) {
+    graph_error('No Data to Display', 'No Data');
+}
 
 if (! Rrd::checkRrdExists($rrd_filename)) {
-    d_echo('RRD ' . $rrd_filename . ' not found');
+    graph_error('No Data file ' . basename($rrd_filename), 'No Data');
 }
 
 require 'includes/html/graphs/generic_duplex.inc.php';

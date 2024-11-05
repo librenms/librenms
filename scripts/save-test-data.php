@@ -20,7 +20,6 @@ $options = getopt(
         'no-save',
         'file:',
         'debug',
-        'snmpsim',
         'help',
     ]
 );
@@ -31,12 +30,6 @@ require $install_dir . '/includes/init.php';
 Debug::setVerbose(
     Debug::set(isset($options['d']) || isset($options['debug']))
 );
-
-if (isset($options['snmpsim'])) {
-    $snmpsim = new Snmpsim();
-    $snmpsim->run();
-    exit;
-}
 
 if (isset($options['h'])
     || isset($options['help'])
@@ -109,6 +102,12 @@ if (isset($os_name) && isset($variant)) {
     $os_list = ModuleTestHelper::findOsWithData($modules);
 }
 
+if (empty($os_list)) {
+    echo "No matching snmprec(s) found.\n";
+
+    exit(1);
+}
+
 if (isset($options['f'])) {
     if (count($os_list) != 1) {
         echo "Failed to create test data, -f/--file option can be used with one os/variant combination.\n";
@@ -120,9 +119,10 @@ if (isset($options['f'])) {
 
 // Now use the saved data to update the saved database data
 $snmpsim = new Snmpsim();
-$snmpsim->fork();
-$snmpsim_ip = $snmpsim->getIp();
-$snmpsim_port = $snmpsim->getPort();
+$snmpsim->setupVenv(true);
+$snmpsim->start();
+echo "Waiting for snmpsim to initialize...\n";
+$snmpsim->waitForStartup();
 
 if (! $snmpsim->isRunning()) {
     echo "Failed to start snmpsim, make sure it is installed, working, and there are no bad snmprec files.\n";
@@ -130,8 +130,6 @@ if (! $snmpsim->isRunning()) {
     exit(1);
 }
 
-echo "Pausing 10 seconds to allow snmpsim to initialize...\n";
-sleep(10);
 echo "\n";
 
 try {

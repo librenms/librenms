@@ -10,4 +10,4 @@ over:
 discovery:
     -
         sysDescr_regex:
-            - '/^(Hive)*AP[\w]+(?:_n)?, HiveOS/'
+            - '/^(Hive)?AP[\w-]+(?:_n)?, HiveOS/'

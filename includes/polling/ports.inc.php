@@ -4,7 +4,9 @@ use LibreNMS\Config;
 use LibreNMS\Enum\PortAssociationMode;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Debug;
+use LibreNMS\Util\Mac;
 use LibreNMS\Util\Number;
+use LibreNMS\Util\StringHelpers;
 
 // Build SNMP Cache Array
 $data_oids = [
@@ -213,7 +215,8 @@ if ($device['os'] === 'f5' && (version_compare($device['version'], '11.2.0', '>=
 } elseif ($device['os'] === 'exalink-fusion') {
     require 'ports/exalink-fusion.inc.php';
 } else {
-    if (Config::getOsSetting($device['os'], 'polling.selected_ports') || (isset($device['attribs']['selected_ports']) && $device['attribs']['selected_ports'] == 'true')) {
+    $selected_attrib = DeviceCache::get($device['device_id'] ?? null)->getAttrib('selected_ports');
+    if ($selected_attrib !== null ? $selected_attrib == 'true' : Config::getOsSetting($device['os'], 'polling.selected_ports')) {
         echo 'Selected ports polling ';
 
         // remove the deleted and disabled ports and mark them skipped
@@ -225,7 +228,7 @@ if ($device['os'] === 'f5' && (version_compare($device['version'], '11.2.0', '>=
 
         // only try to guess if we should walk base oids if selected_ports is set only globally
         $walk_base = false;
-        if (! Config::has("os.{$device['os']}.polling.selected_ports") && ! array_key_exists('selected_ports', $device['attribs'])) {
+        if (! Config::has("os.{$device['os']}.polling.selected_ports") && $selected_attrib === null) {
             // if less than 5 ports or less than 10% of the total ports are skipped, walk the base oids instead of get
             $polled_port_count = count($polled_ports);
             $total_port_count = count($ports);
@@ -402,7 +405,9 @@ if (Config::get('enable_ports_poe')) {
 
         foreach ($port_stats_poe as $p_index => $p_stats) {
             $if_id = $port_ent_to_if[$p_index];
-            $port_stats[$if_id] = array_merge($port_stats[$if_id], $p_stats);
+            if (is_array($port_stats[$if_id])) {
+                $port_stats[$if_id] = array_merge($port_stats[$if_id], $p_stats);
+            }
         }
     }
 }
@@ -435,7 +440,7 @@ if ($device['os'] == 'ios' || $device['os'] == 'iosxe') {
     foreach ($cisco_if_extension_oids as $oid) {
         $port_stats = snmpwalk_cache_oid($device, $oid, $port_stats, 'CISCO-IF-EXTENSION-MIB');
     }
-}
+}//end if
 
 $polled = time();
 
@@ -575,7 +580,7 @@ foreach ($ports as $port) {
             $this_port['ifName'] = $matches[1];
         }
 
-        $polled_period = ($polled - $port['poll_time']);
+        $polled_period = max($polled - $port['poll_time'], 1);
 
         $port['update'] = [];
         $port['update_extended'] = [];
@@ -586,9 +591,8 @@ foreach ($ports as $port) {
         }
 
         // rewrite the ifPhysAddress
-        if (strpos($this_port['ifPhysAddress'] ?? '', ':')) {
-            $mac_split = explode(':', $this_port['ifPhysAddress']);
-            $this_port['ifPhysAddress'] = zeropad($mac_split[0]) . zeropad($mac_split[1]) . zeropad($mac_split[2]) . zeropad($mac_split[3]) . zeropad($mac_split[4] ?? '') . zeropad($mac_split[5] ?? '');
+        if (isset($this_port['ifPhysAddress'])) {
+            $this_port['ifPhysAddress'] = Mac::parse($this_port['ifPhysAddress'])->hex();
         }
 
         // use HC values if they are available
@@ -610,7 +614,8 @@ foreach ($ports as $port) {
 
         if (isset($this_port['ifHighSpeed']) && is_numeric($this_port['ifHighSpeed'])) {
             d_echo("ifHighSpeed ({$this_port['ifHighSpeed']}) ");
-            $this_port['ifSpeed'] = $this_port['ifHighSpeed'] . '000000'; // * 1000000, but handle in sql
+            $this_port['ifSpeed'] = $this_port['ifHighSpeed'] == '0' ? 0
+                : $this_port['ifHighSpeed'] . '000000'; // * 1000000, but handle in sql
         } elseif (isset($this_port['ifSpeed']) && is_numeric($this_port['ifSpeed'])) {
             d_echo("ifSpeed ({$this_port['ifSpeed']}) ");
         } else {
@@ -672,8 +677,9 @@ foreach ($ports as $port) {
                     // handle legacy '1' setting, otherwise use value set by override
                     $current_oid = $ifAlias_override === '1' ? $port['ifAlias'] : $ifAlias_override;
                 } else {
-                    $current_oid = \LibreNMS\Util\StringHelpers::inferEncoding($this_port['ifAlias']);
+                    $current_oid = $this_port['ifAlias'];
                 }
+                $current_oid = StringHelpers::inferEncoding($current_oid); // prevent invalid non-utf8 characters
             }
             if ($oid == 'ifSpeed') {
                 $ifSpeed_override = DeviceCache::getPrimary()->getAttrib('ifSpeed:' . $port['ifName']);
@@ -681,15 +687,15 @@ foreach ($ports as $port) {
             }
 
             if ($port[$oid] != $current_oid && ! isset($current_oid)) {
-                $port['update'][$oid] = ['NULL'];
+                $port['update'][$oid] = null;
                 log_event($oid . ': ' . $port[$oid] . ' -> NULL', $device, 'interface', 4, $port['port_id']);
                 d_echo($oid . ': ' . $port[$oid] . ' -> NULL ', $oid . ' ');
             } elseif ($port[$oid] != $current_oid) {
                 // if the value is different, update it
 
                 // rrdtune if needed
-                $port_tune = $device['attribs']['ifName_tune:' . $port['ifName']] ?? null;
-                $device_tune = $device['attribs']['override_rrdtool_tune'] ?? null;
+                $port_tune = DeviceCache::getPrimary()->getAttrib('ifName_tune:' . $port['ifName']);
+                $device_tune = DeviceCache::getPrimary()->getAttrib('override_rrdtool_tune');
                 if ($port_tune == 'true' ||
                     ($device_tune == 'true' && $port_tune != 'false') ||
                     (Config::get('rrdtool_tune') == 'true' && $port_tune != 'false' && $device_tune != 'false')) {
@@ -747,7 +753,7 @@ foreach ($ports as $port) {
                 $attrib_key = 'port_descr_' . $attrib;
                 if (($port_ifAlias[$attrib] ?? null) != $port[$attrib_key]) {
                     if (! isset($port_ifAlias[$attrib])) {
-                        $port_ifAlias[$attrib] = ['NULL'];
+                        $port_ifAlias[$attrib] = null;
                         $log_port = 'NULL';
                     } else {
                         $log_port = $port_ifAlias[$attrib];
@@ -900,8 +906,8 @@ foreach ($ports as $port) {
                     }
                 }
             }
-
             // End Update PAgP
+
             // Do EtherLike-MIB
             if (Config::get('enable_ports_etherlike')) {
                 include 'ports/port-etherlike.inc.php';
@@ -914,12 +920,6 @@ foreach ($ports as $port) {
 
             if ($device['os'] == 'ios' || $device['os'] == 'iosxe') {
                 include 'ports/cisco-if-extension.inc.php';
-            }
-        }
-
-        foreach ($port['update'] as $key => $val_check) {
-            if (! isset($val_check)) {
-                unset($port['update'][$key]);
             }
         }
 

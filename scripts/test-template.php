@@ -21,7 +21,7 @@ if (isset($options['t']) && isset($options['h']) && isset($options['r'])) {
 
     $where = 'alerts.device_id=' . $device_id . ' && alerts.rule_id=' . $rule_id;
     if (isset($options['s'])) {
-        $where .= ' alerts.state=' . (int) $options['s'];
+        $where .= ' && alerts.state=' . (int) $options['s'];
     }
 
     $alerts = $runAlerts->loadAlerts($where);

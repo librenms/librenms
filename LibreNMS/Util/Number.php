@@ -25,16 +25,18 @@
 
 namespace LibreNMS\Util;
 
+use LibreNMS\Enum\IntegerType;
+
 class Number
 {
-    public static function formatBase($value, $base = 1000, $round = 2, $sf = 3, $suffix = 'B')
+    public static function formatBase($value, $base = 1000, $round = 2, $sf = 3, $suffix = 'B'): string
     {
         return $base == 1000
             ? self::formatSi($value, $round, $sf, $suffix)
             : self::formatBi($value, $round, $sf, $suffix);
     }
 
-    public static function formatSi($value, $round = 2, $sf = 3, $suffix = 'B')
+    public static function formatSi($value, $round = 2, $sf = 3, $suffix = 'B'): string
     {
         $value = (float) $value;
         $neg = $value < 0;
@@ -65,7 +67,7 @@ class Number
         return self::cast(number_format(round($value, $round), $sf, '.', '')) . " $ext$suffix";
     }
 
-    public static function formatBi($value, $round = 2, $sf = 3, $suffix = 'B')
+    public static function formatBi($value, $round = 2, $sf = 3, $suffix = 'B'): string
     {
         $value = (float) $value;
         $neg = $value < 0;
@@ -84,6 +86,23 @@ class Number
         }
 
         return self::cast(number_format(round($value, $round), $sf, '.', '')) . " $ext$suffix";
+    }
+
+    /**
+     * Convert an Si or Bi formatted value to bytes (or bits)
+     * Returns NAN for invalidly formatted strings.
+     */
+    public static function toBytes(string $formatted): int|float
+    {
+        if (preg_match('/^([\d.]+)\s?([kKMGTPEZY]?)(i?)([bB]\w*)?$/', $formatted, $matches)) {
+            [, $number, $magnitude, $baseIndicator] = $matches;
+            $base = $baseIndicator == 'i' ? 1024 : 1000;
+            $exponent = ['k' => 1, 'K' => 1, 'M' => 2, 'G' => 3, 'T' => 4, 'P' => 5, 'E' => 6, 'Z' => 7, 'Y' => 8];
+
+            return self::cast($number) * pow($base, $exponent[$magnitude] ?? 0);
+        }
+
+        return NAN;
     }
 
     /**
@@ -134,32 +153,44 @@ class Number
      */
     public static function calculatePercent($part, $total, int $precision = 2): float
     {
-        if ($total == 0) {
+        // ensure total is strict positive and part is positive
+        if ($total <= 0 || $part < 0) {
             return 0;
         }
 
         return round($part / $total * 100, $precision);
     }
 
-    /**
-     * This converts a memory size containing the unit to bytes. example 1 MiB to 1048576 bytes
-     */
-    public static function convertToBytes(string $from): ?int
+    public static function constrainInteger(int $value, IntegerType $integerSize): int
     {
-        $units = ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB'];
-        $number = floatval(substr($from, 0, -3));
-        $suffix = substr($from, -3);
+        if ($integerSize->isSigned()) {
+            $maxSignedValue = $integerSize->maxValue();
 
-        //B or no suffix
-        if (is_numeric(substr($suffix, 0, 1))) {
-            return (int) $from;
+            if ($value > $maxSignedValue) {
+                $signedValue = $value - $maxSignedValue * 2 - 2;
+
+                // if conversion was successful, the number will still be in the valid range
+                if ($signedValue > $maxSignedValue) {
+                    throw new \InvalidArgumentException('Unsigned value exceeds the maximum representable value of ' . $integerSize->name);
+                }
+
+                return $signedValue;
+            }
+
+            return $value;
         }
 
-        $exponent = array_flip($units)[$suffix] ?? null;
-        if ($exponent === null) {
-            return null;
+        // unsigned check if value is negative
+        if ($value < 0) {
+            $unsignedValue = $value + $integerSize->maxValue() - 1;
+
+            if ($unsignedValue < 0) {
+                throw new \InvalidArgumentException('Unsigned value exceeds the minimum representable value of ' . $integerSize->name);
+            }
+
+            return $unsignedValue;
         }
 
-        return (int) ($number * (1024 ** $exponent));
+        return $value;
     }
 }

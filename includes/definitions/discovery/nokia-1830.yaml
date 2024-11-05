@@ -1,0 +1,240 @@
+mib: TROPIC-SYSTEM-MIB:TROPIC-GLOBAL-REG:TROPIC-SOFTWARE-MIB:TROPIC-TC:TROPIC-CARD-MIB:TROPIC-CONTROLCARD-MIB:TROPIC-ALARMPANEL-MIB:TROPIC-FAN-MIB:TROPIC-OPTICALPORT-MIB:TROPIC-ACCESSPORT-MIB:TROPIC-AMPLIFIER-MIB:TROPIC-OCH-MIB
+modules:
+    os:
+        location: TROPIC-SYSTEM-MIB::tnSysDescr.0
+        version:
+            - TROPIC-SOFTWARE-MIB::tnSwNodeWorkingRelease.0
+    sensors:
+        pre-cache:
+            data:
+                -
+                    oid:
+                        - ifName
+                        - tnCardTable
+                        - tnAmplifierPortInfoTable
+                        - tnIroadmPortInfoTable
+                        - tnUserInterfacePanelTable
+                        - tnAccessPortTable
+        temperature:
+            data:
+                -
+                    oid: tnCardTable
+                    value: tnCardTemperature
+                    group: Cards
+                    num_oid: '.1.3.6.1.4.1.7483.2.2.3.1.2.1.2.1.13.{{ $index }}'
+                    descr: 'Shelf {{ $subindex0 }} Slot {{ $subindex1 }} ({{ $tnCardMnemonic }})'
+                    index: 'tnCardTemperature.{{ $index }}'
+                    high_limit: tnCardHighTemperatureThresh.{{ $index }}
+                    low_limit: tnCardLowTemperatureThresh.{{ $index }}
+                -
+                    oid: tnOscSfpPortConfigTable
+                    value: tnOscSfpTemperature
+                    group: Transceivers
+                    descr: '{{ $ifName }}'
+                    num_oid: '.1.3.6.1.4.1.7483.2.2.4.3.4.76.1.2.{{ $index }}'
+                    index: 'tnOscSfpTemperature.{{ $index }}'
+                    divisor: 100
+        state:
+            data:
+                -
+                    oid: tnOchXcItuTable
+                    value: tnOchXcItuOperState
+                    group: Optical Trails (OCH)
+                    num_oid: '.1.3.6.1.4.1.7483.2.2.4.5.2.1.3.1.14.{{ $index }}'
+                    descr: '{{ $tnOchXcItuName }}'
+                    index: 'tnOchXcItuOperState.{{ $index }}'
+                    state_name: TropicOchXcOperStateType
+                    states:
+                        - { value: 1, generic: 0, graph: 0, descr: up }
+                        - { value: 2, generic: 2, graph: 0, descr: down }
+                        - { value: 3, generic: 3, graph: 0, descr: unknown }
+                -
+                    oid: tnCardTable
+                    value: tnCardStatusLEDColor
+                    group: Cards
+                    num_oid: '.1.3.6.1.4.1.7483.2.2.3.1.2.1.2.1.17.{{ $index }}'
+                    descr: 'Shelf {{ $subindex0 }} Slot {{ $subindex1 }} ({{ $tnCardMnemonic }})'
+                    index: 'tnCardTable.{{ $index }}'
+                    state_name: tnCardStatusLEDColor
+                    states:
+                        - { value: 1, generic: 3, graph: 0, descr: unknown }
+                        - { value: 2, generic: 3, graph: 0, descr: off }
+                        - { value: 3, generic: 2, graph: 0, descr: red }
+                        - { value: 4, generic: 0, graph: 0, descr: green }
+                        - { value: 5, generic: 1, graph: 0, descr: orange }
+                        - { value: 6, generic: 3, graph: 0, descr: blue }
+                -
+                    oid: tnControlCardTable
+                    group: Controllers
+                    value: tnControlCardActivityState
+                    num_oid: '.1.3.6.1.4.1.7483.2.2.3.3.2.2.1.1.{{ $index }}'
+                    descr: 'Shelf {{ $subindex0 }} (Slot {{ $subindex1 }})'
+                    index: 'tnControlCardActivityState.{{ $index }}'
+                    state_name: tnControlCardActivityState
+                    states:
+                        - { value: 1, generic: 3, graph: 0, descr: unknown }
+                        - { value: 2, generic: 0, graph: 0, descr: active }
+                        - { value: 3, generic: 0, graph: 0, descr: inactive }
+                        - { value: 4, generic: 1, graph: 0, descr: unequipped }
+                -
+                    oid: tnFanUnitTable
+                    value: tnFanUnitStatusLEDColor
+                    group: Fans
+                    num_oid: '.1.3.6.1.4.1.7483.2.2.5.1.2.1.2.1.11.{{ $index }}'
+                    descr: 'Shelf {{ $subindex0 }} - Fan (Slot {{ $subindex1 }})'
+                    index: 'tnFanUnitStatusLEDColor.{{ $index }}'
+                    state_name: tnFanUnitStatusLEDColor
+                    states:
+                        - { value: 1, generic: 3, graph: 0, descr: unknown }
+                        - { value: 2, generic: 3, graph: 0, descr: off }
+                        - { value: 3, generic: 2, graph: 0, descr: red }
+                        - { value: 4, generic: 0, graph: 0, descr: green }
+                        - { value: 5, generic: 1, graph: 0, descr: orange }
+                        - { value: 6, generic: 3, graph: 0, descr: blue }
+                -
+                    oid: tnUserInterfacePanelNodeCriticalLEDColor
+                    value: tnUserInterfacePanelNodeCriticalLEDColor
+                    group: Alarms
+                    num_oid: '.1.3.6.1.4.1.7483.2.2.5.3.2.1.3.1.10.1.14'
+                    descr: 'Node Critical'
+                    state_name: tnUserInterfacePanelNodeCriticalLEDColor
+                    states:
+                        - { value: 1, generic: 3, graph: 0, descr: unknown }
+                        - { value: 2, generic: 0, graph: 0, descr: off }
+                        - { value: 3, generic: 2, graph: 0, descr: red }
+                        - { value: 4, generic: 0, graph: 0, descr: green }
+                        - { value: 5, generic: 1, graph: 0, descr: orange }
+                        - { value: 6, generic: 3, graph: 0, descr: blue }
+                -
+                    oid: tnUserInterfacePanelNodeMajorLEDColor
+                    value: tnUserInterfacePanelNodeMajorLEDColor
+                    group: Alarms
+                    num_oid: '.1.3.6.1.4.1.7483.2.2.5.3.2.1.3.1.12.1.14'
+                    descr: 'Node Major'
+                    state_name: tnUserInterfacePanelNodeMajorLEDColor
+                    states:
+                        - { value: 1, generic: 3, graph: 0, descr: unknown }
+                        - { value: 2, generic: 0, graph: 0, descr: off }
+                        - { value: 3, generic: 2, graph: 0, descr: red }
+                        - { value: 4, generic: 0, graph: 0, descr: green }
+                        - { value: 5, generic: 1, graph: 0, descr: orange }
+                        - { value: 6, generic: 3, graph: 0, descr: blue }
+                -
+                    oid: tnUserInterfacePanelNodeMinorLEDColor
+                    value: tnUserInterfacePanelNodeMinorLEDColor
+                    group: Alarms
+                    num_oid: '.1.3.6.1.4.1.7483.2.2.5.3.2.1.3.1.14.1.14'
+                    descr: 'Node Minor'
+                    state_name: tnUserInterfacePanelNodeMinorLEDColor
+                    states:
+                        - { value: 1, generic: 3, graph: 0, descr: unknown }
+                        - { value: 2, generic: 0, graph: 0, descr: off }
+                        - { value: 3, generic: 2, graph: 0, descr: red }
+                        - { value: 4, generic: 0, graph: 0, descr: green }
+                        - { value: 5, generic: 1, graph: 0, descr: orange }
+                        - { value: 6, generic: 3, graph: 0, descr: blue }
+                -
+                    oid: tnUserInterfacePanelNodeWarningLEDColor
+                    value: tnUserInterfacePanelNodeWarningLEDColor
+                    group: Alarms
+                    num_oid: '.1.3.6.1.4.1.7483.2.2.5.3.2.1.3.1.19.1.14'
+                    descr: 'Node Warning'
+                    state_name: tnUserInterfacePanelNodeWarningLEDColor
+                    states:
+                        - { value: 1, generic: 3, graph: 0, descr: unknown }
+                        - { value: 2, generic: 0, graph: 0, descr: off }
+                        - { value: 3, generic: 2, graph: 0, descr: red }
+                        - { value: 4, generic: 0, graph: 0, descr: green }
+                        - { value: 5, generic: 1, graph: 0, descr: orange }
+                        - { value: 6, generic: 3, graph: 0, descr: blue }
+        dbm:
+            data:
+                -
+                    oid: tnAmplifierPortInfoTable
+                    value: tnAmplifierPortPowerIn
+                    num_oid: '.1.3.6.1.4.1.7483.2.2.3.7.5.2.1.2.{{ $index }}'
+                    descr: '{{ ifName }} Power In'
+                    index: 'tnAmplifierPortPowerIn.{{ $index }}'
+                    divisor: 100
+                -
+                    oid: tnAmplifierPortInfoTable
+                    value: tnAmplifierPortPowerOut
+                    num_oid: '.1.3.6.1.4.1.7483.2.2.3.7.5.2.1.3.{{ $index }}'
+                    descr: '{{ $ifName }} Power Out'
+                    index: 'tnAmplifierPortPowerOut.{{ $index }}'
+                    divisor: 100
+                -
+                    oid: tnAmplifierPortInfoTable
+                    value: tnAmplifierPortOSCTxPowerIn
+                    num_oid: '.1.3.6.1.4.1.7483.2.2.3.7.5.2.1.10.{{ $index }}'
+                    descr: '{{ $ifName }} OSC Tx In'
+                    index: 'tnAmplifierPortOSCTxPowerIn.{{ $index }}'
+                    divisor: 100
+                -
+                    oid: tnAmplifierPortInfoTable
+                    value: tnAmplifierPortOSCTxPowerOut
+                    num_oid: '.1.3.6.1.4.1.7483.2.2.3.7.5.2.1.11.{{ $index }}'
+                    descr: '{{ $ifName }} OSC Tx Out'
+                    index: 'tnAmplifierPortOSCTxPowerOut.{{ $index }}'
+                    divisor: 100
+                -
+                    oid: tnAmplifierPortInfoTable
+                    value: tnAmplifierPortOSCTxPowerOut
+                    num_oid: '.1.3.6.1.4.1.7483.2.2.3.7.5.2.1.11.{{ $index }}'
+                    descr: '{{ $ifName }} OSC Tx Out'
+                    index: 'tnAmplifierPortOSCTxPowerOut.{{ $index }}'
+                    divisor: 100
+                -
+                    oid: tnIroadmPortInfoTable
+                    value: tnIroadmPortInfoOSCTxPowerIn
+                    num_oid: '.1.3.6.1.4.1.7483.2.2.4.3.5.308.1.19.{{ $index }}'
+                    descr: '{{ $ifName }} OSC Tx In'
+                    index: 'tnIroadmPortInfoOSCTxPowerIn.{{ $index }}'
+                    divisor: 100
+                -
+                    oid: tnIroadmPortInfoTable
+                    value: tnIroadmPortInfoOSCTxPowerOut
+                    num_oid: '.1.3.6.1.4.1.7483.2.2.4.3.5.308.1.20.{{ $index }}'
+                    descr: '{{ $ifName }} OSC Tx Out'
+                    index: 'tnIroadmPortInfoOSCTxPowerOut.{{ $index }}'
+                    divisor: 100
+                -
+                    oid: tnIroadmPortInfoTable
+                    value: tnIroadmPortInfoOSCRxPowerIn
+                    num_oid: '.1.3.6.1.4.1.7483.2.2.4.3.5.308.1.21.{{ $index }}'
+                    descr: '{{ $ifName }} OSC Rx In'
+                    index: 'tnIroadmPortInfoOSCRxPowerIn.{{ $index }}'
+                    divisor: 100
+                -
+                    oid: tnIroadmPortInfoTable
+                    value: tnIroadmPortInfoOSCSfpTxPowerOut
+                    num_oid: '.1.3.6.1.4.1.7483.2.2.3.7.5.2.1.22.{{ $index }}'
+                    descr: '{{ $ifName }} OSC SFP Tx Out'
+                    index: 'tnIroadmPortInfoOSCSfpTxPowerOut.{{ $index }}'
+                    divisor: 100
+                -
+                    oid: tnIroadmPortInfoTable
+                    value: tnIroadmPortInfoOSCSfpRxPowerIn
+                    num_oid: '.1.3.6.1.4.1.7483.2.2.4.3.5.308.1.23.{{ $index }}'
+                    descr: '{{ $ifName }} OSC SFP Rx In'
+                    index: 'tnIroadmPortInfoOSCSfpRxPowerIn.{{ $index }}'
+                    divisor: 100
+
+        power:
+            data:
+                -
+                    oid: tnCardTable
+                    value: tnCardPower
+                    num_oid: '.1.3.6.1.4.1.7483.2.2.3.1.2.1.2.1.38.{{ $index }}'
+                    descr: '{{ $tnCardName }} - {{ $tnCardMnemonic }}'
+                    index: 'tnCardTable.{{ $index }}'
+                    divisor: 1000
+        current:
+            data:
+                -
+                    oid: tnCardTable
+                    value: tnCardCurrent
+                    num_oid: '.1.3.6.1.4.1.7483.2.2.3.1.2.1.2.1.39.{{ $index }}'
+                    descr: '{{ $tnCardName }} - {{ $tnCardMnemonic }}'
+                    index: 'tnCardTable.{{ $index }}'
+                    divisor: 1000

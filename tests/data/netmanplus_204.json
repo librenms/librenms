@@ -348,7 +348,7 @@
                     "ifMtu": 1500,
                     "ifType": "ethernetCsmacd",
                     "ifAlias": "RPS Wired Network",
-                    "ifPhysAddress": "303a323a3633",
+                    "ifPhysAddress": "0002630665d8",
                     "ifLastChange": 0,
                     "ifVlan": null,
                     "ifTrunk": null,

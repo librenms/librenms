@@ -112,7 +112,7 @@ return [
         'short' => 'Power Consumed',
         'long' => 'Power Consumed',
         'unit' => 'kWh',
-        'unit_long' => 'Killowatt-Hours',
+        'unit_long' => 'Kilowatt-Hours',
     ],
     'power_factor' => [
         'short' => 'Power Factor',

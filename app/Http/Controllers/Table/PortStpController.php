@@ -28,7 +28,7 @@ namespace App\Http\Controllers\Table;
 use App\Facades\DeviceCache;
 use App\Models\PortStp;
 use App\Models\Stp;
-use LibreNMS\Util\Rewrite;
+use LibreNMS\Util\Mac;
 use LibreNMS\Util\Url;
 
 class PortStpController extends TableController
@@ -85,6 +85,9 @@ class PortStpController extends TableController
      */
     public function formatItem($stpPort)
     {
+        $drMac = Mac::parse($stpPort->designatedRoot);
+        $dbMac = Mac::parse($stpPort->designatedBridge);
+
         return [
             'port_id' => Url::portLink($stpPort->port, $stpPort->port->getShortLabel()) . '<br />' . $stpPort->port->getDescription(),
             'vlan' => $stpPort->vlan ?: 1,
@@ -92,12 +95,12 @@ class PortStpController extends TableController
             'state' => $stpPort->state,
             'enable' => $stpPort->enable,
             'pathCost' => $stpPort->pathCost,
-            'designatedRoot' => Rewrite::readableMac($stpPort->designatedRoot),
-            'designatedRoot_vendor' => Rewrite::readableOUI($stpPort->designatedRoot),
+            'designatedRoot' => $drMac->readable(),
+            'designatedRoot_vendor' => $drMac->vendor(),
             'designatedRoot_device' => Url::deviceLink(DeviceCache::get(Stp::where('bridgeAddress', $stpPort->designatedRoot)->value('device_id'))),
             'designatedCost' => $stpPort->designatedCost,
-            'designatedBridge' => Rewrite::readableMac($stpPort->designatedBridge),
-            'designatedBridge_vendor' => Rewrite::readableOUI($stpPort->designatedBridge),
+            'designatedBridge' => $dbMac->readable(),
+            'designatedBridge_vendor' => $dbMac->vendor(),
             'designatedBridge_device' => Url::deviceLink(DeviceCache::get(Stp::where('bridgeAddress', $stpPort->designatedBridge)->value('device_id'))),
             'designatedPort' => $stpPort->designatedPort,
             'forwardTransitions' => $stpPort->forwardTransitions,

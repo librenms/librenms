@@ -81,8 +81,8 @@ class UpdateUserRequest extends FormRequest
             // if not an admin and new_password is set, check old password matches
             $user = $this->route('user');
             if ($user && $this->user()->can('update', $user) && $this->user()->is($user)) {
-                if ($this->has('new_password')) {
-                    if ($this->has('old_password')) {
+                if ($this->get('new_password')) {
+                    if ($this->get('old_password')) {
                         $user = $this->route('user');
                         if ($user && ! Hash::check($this->old_password, $user->password)) {
                             $validator->errors()->add('old_password', __('Existing password did not match'));

@@ -27,12 +27,9 @@ $delay = $_POST['delay'];
 $interval = $_POST['interval'];
 $mute = $_POST['mute'];
 $invert = $_POST['invert'];
-$name = strip_tages($_POST['name']);
-if ($_POST['proc'] != '') {
-    $proc = $_POST['proc'];
-} else {
-    $proc = '';
-}
+$name = strip_tags($_POST['name']);
+$notes = isset($_POST['$notes']) ? strip_tags($_POST['$notes']) : '';
+$proc = isset($_POST['proc']) ? strip_tags($_POST['proc']) : '';
 
 if (empty($rule)) {
     $update_message = 'ERROR: No rule was generated - did you forget to click and / or?';
@@ -57,15 +54,15 @@ if (empty($rule)) {
     }
 
     $extra = [
-        'mute'     => $mute,
-        'count'    => $count,
-        'delay'    => $delay_sec,
-        'invert'   => $invert,
+        'mute' => $mute,
+        'count' => $count,
+        'delay' => $delay_sec,
+        'invert' => $invert,
         'interval' => $interval_sec,
     ];
     $extra_json = json_encode($extra);
     if (is_numeric($alert_id) && $alert_id > 0) {
-        if (dbUpdate(['rule' => $rule, 'severity' => $_POST['severity'], 'extra' => $extra_json, 'name' => $name, 'proc' => $proc, 'query' => $query], 'alert_rules', 'id=?', [$alert_id]) >= 0) {
+        if (dbUpdate(['rule' => $rule, 'severity' => $_POST['severity'], 'extra' => $extra_json, 'name' => $name, 'proc' => $proc, 'notes' => $notes, 'query' => $query], 'alert_rules', 'id=?', [$alert_id]) >= 0) {
             $update_message = "Edited Rule: <i>$name: $rule</i>";
         } else {
             $update_message = 'ERROR: Failed to edit Rule: <i>' . $rule . '</i>';
@@ -74,7 +71,7 @@ if (empty($rule)) {
         if (is_array($_POST['maps'])) {
             $device_id = ':' . $device_id;
         }
-        if (dbInsert(['device_id' => $device_id, 'rule' => $rule, 'severity' => $_POST['severity'], 'extra' => $extra_json, 'disabled' => 0, 'name' => $name, 'proc' => $proc, 'query' => $query], 'alert_rules')) {
+        if (dbInsert(['device_id' => $device_id, 'rule' => $rule, 'severity' => $_POST['severity'], 'extra' => $extra_json, 'disabled' => 0, 'name' => $name, 'proc' => $proc, 'notes' => $notes, 'query' => $query], 'alert_rules')) {
             $update_message = "Added Rule: <i>$name: $rule</i>";
             if (is_array($_POST['maps'])) {
                 foreach ($_POST['maps'] as $target) {

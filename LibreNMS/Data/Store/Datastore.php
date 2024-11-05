@@ -27,9 +27,10 @@ namespace LibreNMS\Data\Store;
 
 use Illuminate\Support\Collection;
 use LibreNMS\Config;
+use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Data\Datastore as DatastoreContract;
 
-class Datastore
+class Datastore implements DataStorageInterface
 {
     protected $stores;
 
@@ -46,6 +47,7 @@ class Datastore
             'f' => 'influxdb.enable',
             'p' => 'prometheus.enable',
             'g' => 'graphite.enable',
+            '2' => 'influxdbv2.enable',
         ];
         foreach ($opts as $opt => $setting) {
             if (isset($options[$opt])) {

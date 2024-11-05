@@ -1,9 +1,9 @@
 --====================================================================
--- Copyright (C) 2018 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2021 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- 
 -- Description: Huawei Device extent MIB File for base device infomation
 -- Reference:
--- Version: V2.02
+-- Version: V2.04
 -- History:
 -- V1.0 2009-01-05, publish
 -- ===================================================================
@@ -23,7 +23,7 @@
     
     
         hwDeviceExt MODULE-IDENTITY 
-            LAST-UPDATED "201612231414Z"
+            LAST-UPDATED "202103151414Z"
             ORGANIZATION 
                   "Huawei Technologies Co.,Ltd."
             CONTACT-INFO 
@@ -34,6 +34,12 @@
                      Website: http://www.huawei.com
                      Email: support@huawei.com
                    "
+            DESCRIPTION 
+                "Change hwProductSerialName to hwProductModel."
+            REVISION "202103151414Z"
+            DESCRIPTION 
+                "Add node hwProductSerialName."
+            REVISION "202103041414Z"
             DESCRIPTION 
                 "The MIB module for collect base device information."
             REVISION "201612231414Z"
@@ -88,6 +94,14 @@
                 "The version of a product."  
             ::= { hwDeviceExtObject 5 }
 
+        hwProductModel OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The model name of a product."  
+            ::= { hwDeviceExtObject 6 }
+
         
         hwDeviceExtConformance OBJECT IDENTIFIER ::= { hwDeviceExt 4 }
         
@@ -109,7 +123,8 @@
                       hwPlatformName, 
                       hwPlatformVersion, 
                       hwProductName, 
-                      hwProductVersion
+                      hwProductVersion,
+                      hwProductModel
                     }
             STATUS current
             DESCRIPTION 

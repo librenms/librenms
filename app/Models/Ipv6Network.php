@@ -28,6 +28,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 class Ipv6Network extends Model
 {
@@ -43,5 +44,10 @@ class Ipv6Network extends Model
     public function ipv6(): HasMany
     {
         return $this->hasMany(\App\Models\Ipv6Address::class, 'ipv6_network_id');
+    }
+
+    public function connectedPorts(): HasManyThrough
+    {
+        return $this->hasManyThrough(Port::class, Ipv6Address::class, 'ipv6_network_id', 'port_id', 'ipv6_network_id', 'port_id');
     }
 }

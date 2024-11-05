@@ -49,4 +49,11 @@ class Application extends DeviceRelatedModel
     {
         return $this->displayName();
     }
+
+    // ---- Define Relationships ----
+
+    public function metrics()
+    {
+        return $this->hasMany(ApplicationMetric::class, 'app_id', 'app_id');
+    }
 }

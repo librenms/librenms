@@ -11,24 +11,39 @@ $smalldescrlen = 20;
 
 $rrd_list = [];
 
+if (! $rrdArray) {
+    graph_error('No Data to Display', 'No Data');
+}
+
+$i = 0;
 foreach (array_keys($rrdArray) as $state_type) {
-    $rrd_filename = Rrd::name($device['hostname'], [
+    $shared_rrd_filename = Rrd::name($device['hostname'], [
         $polling_type,
         $name,
         $app->app_id,
         $state_type,
     ]);
 
-    if (Rrd::checkRrdExists($rrd_filename)) {
-        $i = 0;
-        foreach ($rrdArray[$state_type] as $state_status => $state_status_desc) {
-            $rrd_list[$i]['filename'] = $rrd_filename;
-            $rrd_list[$i]['descr'] = $state_status_desc['descr'];
+    if (Rrd::checkRrdExists($shared_rrd_filename)) {
+        foreach ($rrdArray[$state_type] as $state_status => $state_status_aa) {
+            if ($state_status_aa['rrd_location'] === 'individual') {
+                $individual_rrd_filename = Rrd::name($device['hostname'], [
+                    $polling_type,
+                    $name,
+                    $app->app_id,
+                    $state_type,
+                    $state_status,
+                ]);
+                $rrd_list[$i]['filename'] = $individual_rrd_filename;
+            } else {
+                $rrd_list[$i]['filename'] = $shared_rrd_filename;
+            }
+            $rrd_list[$i]['descr'] = $state_status_aa['descr'];
             $rrd_list[$i]['ds'] = $state_status;
             $i++;
         }
     } else {
-        d_echo('RRD ' . $rrd_filename . ' not found');
+        graph_error('No Data file ' . basename($shared_rrd_filename), 'No Data');
     }
 }
 

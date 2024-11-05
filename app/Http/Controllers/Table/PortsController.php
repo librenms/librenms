@@ -86,6 +86,8 @@ class PortsController extends TableController
             'ifDescr',
             'secondsIfLastChange',
             'ifConnectorPresent',
+            'ifInErrors',
+            'ifOutErrors',
             'ifInErrors_delta',
             'ifOutErrors_delta',
             'ifInOctets_rate',
@@ -102,7 +104,7 @@ class PortsController extends TableController
     protected function baseQuery($request)
     {
         $query = Port::hasAccess($request->user())
-            ->with('device')
+            ->with(['device', 'device.location'])
             ->leftJoin('devices', 'ports.device_id', 'devices.device_id')
             ->where('deleted', $request->get('deleted', 0)) // always filter deleted
             ->when($request->get('hostname'), function (Builder $query, $hostname) {
@@ -168,6 +170,8 @@ class PortsController extends TableController
             'ifOutOctets_rate' => $port->ifOutOctets_rate * 8,
             'ifInUcastPkts_rate' => $port->ifInUcastPkts_rate,
             'ifOutUcastPkts_rate' => $port->ifOutUcastPkts_rate,
+            'ifInErrors' => $port->ifInErrors,
+            'ifOutErrors' => $port->ifOutErrors,
             'ifInErrors_delta' => $port->poll_period ? Number::formatSi($port->ifInErrors_delta / $port->poll_period, 2, 3, 'EPS') : '',
             'ifOutErrors_delta' => $port->poll_period ? Number::formatSi($port->ifOutErrors_delta / $port->poll_period, 2, 3, 'EPS') : '',
             'ifType' => Rewrite::normalizeIfType($port->ifType),

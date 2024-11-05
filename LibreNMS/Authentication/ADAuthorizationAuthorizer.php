@@ -78,6 +78,9 @@ class ADAuthorizationAuthorizer extends MysqlAuthorizer
             $this->userFilter($username),
             ['samaccountname']
         );
+        if ($search === false) {
+            throw new AuthenticationException('User search failed: ' . ldap_error($this->ldap_connection));
+        }
         $entries = ldap_get_entries($this->ldap_connection, $search);
 
         if ($entries['count']) {
@@ -112,7 +115,11 @@ class ADAuthorizationAuthorizer extends MysqlAuthorizer
 
         // collect all roles
         $auth_ad_groups = Config::get('auth_ad_groups');
-        foreach ($entries[0]['memberof'] as $entry) {
+        foreach ($entries[0]['memberof'] as $index => $entry) {
+            if ($index == 'count') {
+                continue; // skip count entry
+            }
+
             $group_cn = $this->getCn($entry);
 
             if (isset($auth_ad_groups[$group_cn]['roles']) && is_array($auth_ad_groups[$group_cn]['roles'])) {
@@ -147,6 +154,9 @@ class ADAuthorizationAuthorizer extends MysqlAuthorizer
             $this->userFilter($username),
             $attributes
         );
+        if ($search === false) {
+            throw new AuthenticationException('Role search failed: ' . ldap_error($this->ldap_connection));
+        }
         $entries = ldap_get_entries($this->ldap_connection, $search);
 
         if ($entries['count']) {

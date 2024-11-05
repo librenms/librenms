@@ -37,15 +37,19 @@ class ArrisC4 extends OS implements OSDiscovery
     {
         $device = $this->getDevice();
 
-        preg_match("/CMTS_V([\d.]+),/", $device->sysDescr, $match);
-        $device->version = $match[1];
+        preg_match("/(CMTS|CER)_V([\d.]+),/", $device->sysDescr, $match);
+        $device->version = $match[2];
 
-        $data = explode('.', $device->sysObjectID);
-        $id = end($data);
-        if ($id == '1') {
-            $device->hardware = 'C4';
-        } elseif ($id == '2') {
-            $device->hardware = 'C4c';
+        switch ($device->sysObjectID) {
+            case '.1.3.6.1.4.1.4998.2.1':
+                $device->hardware = 'C4';
+                break;
+            case '.1.3.6.1.4.1.4998.2.2':
+                $device->hardware = 'C4c';
+                break;
+            case '.1.3.6.1.4.1.4115.1.9.1':
+                $device->hardware = 'E6000';
+                break;
         }
     }
 }

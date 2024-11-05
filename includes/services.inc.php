@@ -247,8 +247,10 @@ function check_service($command)
     // Split out the response and the performance data.
     [$response, $perf] = explode('|', $response_string);
 
-    // Split each performance metric
-    $perf_arr = explode(' ', $perf);
+    // Split performance metrics into an array
+    preg_match_all('/\'[^\']*\'\S*|\S+/', $perf, $perf_arr);
+    // preg_match_all returns a 2D array, we only need the first one
+    $perf_arr = $perf_arr[0];
 
     // Create an array for our metrics.
     $metrics = [];
@@ -259,8 +261,8 @@ function check_service($command)
         [$ds,$values] = explode('=', trim($string));
 
         // Keep the first value, discard the others.
-        [$value] = explode(';', trim($values));
-        $value = trim($value);
+        $value = explode(';', trim($values));
+        $value = trim($value[0] ?? '');
 
         // Set an empty uom
         $uom = '';
@@ -320,7 +322,7 @@ function check_service($command)
             }
             // We have a DS. Add an entry to the array.
             d_echo('Perf Data - DS: ' . $ds . ', Value: ' . $value . ', UOM: ' . $uom . "\n");
-            $metrics[$ds] = ['value'=>$value, 'uom'=>$uom];
+            $metrics[$ds] = ['value' => $value, 'uom' => $uom];
         } else {
             // No DS. Don't add an entry to the array.
             d_echo("Perf Data - None.\n");

@@ -1187,6 +1187,31 @@
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.2.1.33.1.7.3.0",
+                    "sensor_index": "0",
+                    "sensor_type": "upsTestResult",
+                    "sensor_descr": "UPS Test",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 1,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": "0",
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": "upsTestResult"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.534.1.7.1.0",
                     "sensor_index": "xupsAlarms.0",
                     "sensor_type": "xupsAlarms",
@@ -1634,6 +1659,48 @@
                     "state_generic_value": 2
                 },
                 {
+                    "state_name": "upsTestResult",
+                    "state_descr": "OK",
+                    "state_draw_graph": 0,
+                    "state_value": 1,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "upsTestResult",
+                    "state_descr": "Warning",
+                    "state_draw_graph": 0,
+                    "state_value": 2,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "upsTestResult",
+                    "state_descr": "Error",
+                    "state_draw_graph": 0,
+                    "state_value": 3,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "upsTestResult",
+                    "state_descr": "Aborted",
+                    "state_draw_graph": 0,
+                    "state_value": 4,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "upsTestResult",
+                    "state_descr": "inProgress",
+                    "state_draw_graph": 0,
+                    "state_value": 5,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "upsTestResult",
+                    "state_descr": "noTestInitiated",
+                    "state_draw_graph": 0,
+                    "state_value": 6,
+                    "state_generic_value": 3
+                },
+                {
                     "state_name": "xupsAlarms",
                     "state_descr": "No Alarm",
                     "state_draw_graph": 0,
@@ -1671,5 +1738,53 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "route": {
+        "discovery": {
+            "route": [
+                {
+                    "context_name": "",
+                    "inetCidrRouteIfIndex": 2,
+                    "inetCidrRouteType": 4,
+                    "inetCidrRouteProto": 2,
+                    "inetCidrRouteNextHopAS": 0,
+                    "inetCidrRouteMetric1": 1,
+                    "inetCidrRouteDestType": "ipv4",
+                    "inetCidrRouteDest": "0.0.0.0",
+                    "inetCidrRouteNextHopType": "ipv4",
+                    "inetCidrRouteNextHop": "0.0.0.0",
+                    "inetCidrRoutePolicy": "ccitt.0",
+                    "inetCidrRoutePfxLen": 32
+                },
+                {
+                    "context_name": "",
+                    "inetCidrRouteIfIndex": 2,
+                    "inetCidrRouteType": 3,
+                    "inetCidrRouteProto": 2,
+                    "inetCidrRouteNextHopAS": 0,
+                    "inetCidrRouteMetric1": 0,
+                    "inetCidrRouteDestType": "ipv4",
+                    "inetCidrRouteDest": "10.240.15.0",
+                    "inetCidrRouteNextHopType": "ipv4",
+                    "inetCidrRouteNextHop": "0.0.0.0",
+                    "inetCidrRoutePolicy": "ccitt.0",
+                    "inetCidrRoutePfxLen": 32
+                },
+                {
+                    "context_name": "",
+                    "inetCidrRouteIfIndex": 1,
+                    "inetCidrRouteType": 3,
+                    "inetCidrRouteProto": 2,
+                    "inetCidrRouteNextHopAS": 0,
+                    "inetCidrRouteMetric1": 0,
+                    "inetCidrRouteDestType": "ipv4",
+                    "inetCidrRouteDest": "127.0.0.1",
+                    "inetCidrRouteNextHopType": "ipv4",
+                    "inetCidrRouteNextHop": "0.0.0.0",
+                    "inetCidrRoutePolicy": "ccitt.0",
+                    "inetCidrRoutePfxLen": 32
+                }
+            ]
+        }
     }
 }

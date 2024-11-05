@@ -62,7 +62,7 @@ class Irc extends Transport
                     'title' => 'IRC',
                     'name' => 'irc',
                     'descr' => 'Enable IRC alerts',
-                    'type'  => 'checkbox',
+                    'type' => 'checkbox',
                     'default' => true,
                 ],
             ],

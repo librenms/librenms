@@ -28,39 +28,39 @@ $rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Min',
-        'ds'       => 's0malscore',
+        'descr' => 'Min',
+        'ds' => 's0malscore',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Max',
-        'ds'       => 's1malscore',
+        'descr' => 'Max',
+        'ds' => 's1malscore',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Mean',
-        'ds'       => 's3malscore',
+        'descr' => 'Mean',
+        'ds' => 's3malscore',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Median',
-        'ds'       => 's4malscore',
+        'descr' => 'Median',
+        'ds' => 's4malscore',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Mode',
-        'ds'       => 's5malscore',
+        'descr' => 'Mode',
+        'ds' => 's5malscore',
     ];
     if ($vars['stddev'] == 'on') {
         $rrd_list[] = [
             'filename' => $rrd_filename,
-            'descr'    => 'StdDev',
-            'ds'       => 's7malscore',
+            'descr' => 'StdDev',
+            'ds' => 's7malscore',
         ];
         $rrd_list[] = [
             'filename' => $rrd_filename,
-            'descr'    => 'StdDevP',
-            'ds'       => 's9malscore',
+            'descr' => 'StdDevP',
+            'ds' => 's9malscore',
         ];
     }
 } else {

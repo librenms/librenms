@@ -27,7 +27,7 @@ $group = null;
 
 if (! empty($current) && is_numeric($current)) {
     discover_sensor(
-        $valid['sensor'],
+        null,
         $class,
         $device,
         $oid,

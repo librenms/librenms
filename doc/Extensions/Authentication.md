@@ -196,6 +196,13 @@ setsebool -P httpd_can_connect_ldap 1
 Install __php_ldap__ or __php7.0-ldap__, making sure to install the
 same version as PHP.
 
+For the below, keep in mind the auth DN is composed using a string
+join of `auth_ldap_prefix`, the username, and `auth_ldap_suffix`. This
+means it needs to include `=` in the prefix and `,` in the suffix. So
+lets say we have a prefix of `uid=`, the user `derp`, and the suffix of
+`,ou=users,dc=foo,dc=bar`, then the result is
+`uid=derp,ou=users,dc=foo,dc=bar`.
+
 ### Standard config
 
 !!! setting "auth/ldap"
@@ -227,6 +234,8 @@ same version as PHP.
     lnms config:set auth_ldap_userdn true
     lnms config:set auth_ldap_userlist_filter service=informatique
     lnms config:set auth_ldap_wildcard_ou false
+    lnms config:set auth_ldap_cacertfile /opt/librenms/ldap-ca-cert
+    lnms config:set auth_ldap_ignorecert false
     ```
 
 ### LDAP bind user (optional)
@@ -304,10 +313,14 @@ The attribute `Filter-ID` is a standard Radius-Reply-Attribute (string) that
 can be assigned a specially formatted string to assign a single role to the user. 
 
 The string to send in `Filter-ID` reply attribute must start with `librenms_role_` followed by the role name.
-For example to set the admin role send `librenms_role_admin`
+For example to set the admin role send `librenms_role_admin`.
 
-LibreNMS will ignore any other strings sent in `Filter-ID` and revert to default
-role that is set in your config.
+The following strings correspond to the built-in roles, but any defined role can be used:
+- `librenms_role_normal` - Sets the normal user level.
+- `librenms_role_admin` - Sets the administrator level.
+- `librenms_role_global-read` - Sets the global read level
+
+LibreNMS will ignore any other strings sent in `Filter-ID` and revert to default role that is set in your config.
 
 ```php
 $config['radius']['hostname']      = 'localhost';

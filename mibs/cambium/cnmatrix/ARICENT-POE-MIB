@@ -1,0 +1,306 @@
+-- Copyright (C) 2006-2012 Aricent Group . All Rights Reserved
+
+      ARICENT-POE-MIB DEFINITIONS ::= BEGIN
+    
+      IMPORTS
+         MODULE-IDENTITY, OBJECT-TYPE, enterprises, Integer32 
+         FROM SNMPv2-SMI 
+         RowStatus, MacAddress, DisplayString  
+         FROM SNMPv2-TC
+         InterfaceIndex
+         FROM IF-MIB;    
+                                                 
+      fspoe MODULE-IDENTITY
+            LAST-UPDATED "202112200000Z"
+            ORGANIZATION "ARICENT COMMUNICATIONS SOFTWARE"
+            CONTACT-INFO "support@aricent.com"
+            DESCRIPTION
+               " The proprietary MIB module for POE. "
+
+            REVISION "202112200000Z"
+            DESCRIPTION
+               "Added fsPethPsPortPowerPriorityStatic object 
+               supporting the export of static (vs dynamic)
+               port power priority settings."
+
+	    REVISION "201906240000Z"
+            DESCRIPTION
+               "Added fsPowerModeDCinVoltageRange object 
+               which allows user to specify in which input voltage
+               range will the TX1012-P-DC be powered."
+
+	    REVISION "201209050000Z"
+            DESCRIPTION
+               " The proprietary MIB module for POE. "
+      ::=  { enterprises futuresoftware (2076) 103 } 
+   
+-- ------------------------------------------------------------
+-- groups in the MIB 
+-- ------------------------------------------------------------
+
+      fsPoeSystem                OBJECT IDENTIFIER ::= { fspoe 1 }
+
+-- ------------------------------------------------------------------
+-- The Poe System Group
+-- ------------------------------------------------------------------
+      fsPoeGlobalAdminStatus OBJECT-TYPE
+           SYNTAX      INTEGER { start(1), shutdown(2)}
+           MAX-ACCESS  read-write
+           STATUS      current
+           DESCRIPTION
+               "Start or shutdown PoE Module in the system
+
+                When set as 'start' PoE module initializes data structures and
+                gets the power supply status.
+
+                When shutdown, all resources used by PoE module
+                will be released back to the system and also power will
+                be shut on all PoE enabled ports"
+           ::= { fsPoeSystem 1 }
+
+-- Poe Mac Table 
+
+      fsPoeMacTable OBJECT-TYPE
+          SYNTAX      SEQUENCE OF FsPoeMacEntry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+             "This table contains information associated MAC Addresses for which 
+              Power has to be applied."
+          ::= { fsPoeSystem 2 }
+
+
+      fsPoeMacEntry OBJECT-TYPE
+          SYNTAX     FsPoeMacEntry 
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+             "Powered Device(PD)s MAC address, the port through which its 
+              been learnt"
+          INDEX { fsPoePdMacAddress }
+          ::= { fsPoeMacTable 1 }
+
+      FsPoeMacEntry ::=
+          SEQUENCE {
+            fsPoePdMacAddress 
+                 MacAddress,
+            fsPoePdMacPort
+                 InterfaceIndex,
+           fsPoePdMacRowStatus 
+                 RowStatus
+          }
+
+     fsPoePdMacAddress OBJECT-TYPE
+           SYNTAX      MacAddress
+           MAX-ACCESS  not-accessible
+           STATUS      current
+           DESCRIPTION
+               "MAC address of the PD."
+           ::= { fsPoeMacEntry 1 }
+ 
+     fsPoePdMacPort OBJECT-TYPE
+           SYNTAX InterfaceIndex 
+           MAX-ACCESS read-only
+           STATUS current
+           DESCRIPTION
+              "This object stores the port through which the fsPoePdMacAddress
+               has been learnt "
+           ::= { fsPoeMacEntry 2 }
+
+     fsPoePdMacRowStatus OBJECT-TYPE
+          SYNTAX      RowStatus
+          MAX-ACCESS  read-create
+          STATUS      current
+          DESCRIPTION
+              "This object indicates the status of this entry."
+           ::= { fsPoeMacEntry 3 }
+
+-- Fs Poe Port Table
+  fsPethPsePortTable OBJECT-TYPE
+       SYNTAX      SEQUENCE OF FsPethPsePortEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           "A table of objects that display and control non-standard power
+            characteristics of power Ethernet ports on a Power Source
+            Entity (PSE) device.  This group will be implemented in
+            managed power Ethernet switches and mid-span devices.
+            Values of all read-write objects in this table are
+            persistent at restart/reboot."
+       ::= { fsPoeSystem 3 }
+
+   fsPethPsePortEntry OBJECT-TYPE
+       SYNTAX      FsPethPsePortEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+               "A set of objects that display and control non-standard power
+               characteristics of a power Ethernet PSE port."
+       INDEX    { fsPethPsePortGroupIndex , fsPethPsePortIndex  }
+       ::= { fsPethPsePortTable 1 }
+
+   FsPethPsePortEntry ::= SEQUENCE {
+       fsPethPsePortGroupIndex
+          Integer32,
+       fsPethPsePortIndex
+          Integer32,
+       fsPethPsPortPowerMeasurementsAmperage
+          Integer32,
+       fsPethPsPortPowerMeasurementsVoltage
+          Integer32,
+       fsPethPsPortPowerMeasurementsWattage
+          Integer32,
+       fsPethPsPortPowerPriorityStatic
+          INTEGER,
+       fsPethPsPortPowerMode
+          INTEGER,
+       fsPethPsPortPowerModeDynamic
+          INTEGER
+   }
+   
+     fsPethPsePortGroupIndex OBJECT-TYPE
+       SYNTAX      Integer32 (1..2147483647)
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           "This variable uniquely identifies the group
+            containing the port to which a power Ethernet PSE is
+            connected.  Group means box in the stack, module in a
+            rack and the value 1 MUST be used for non-modular devices."
+       ::= { fsPethPsePortEntry 1 }
+
+     fsPethPsePortIndex OBJECT-TYPE
+       SYNTAX      Integer32 (1..2147483647)
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           "This variable uniquely identifies the power Ethernet PSE
+            port within group fsPethPsePortGroupIndex to which the
+            power Ethernet PSE entry is connected."
+       ::= { fsPethPsePortEntry 2 }
+     fsPethPsPortPowerMeasurementsAmperage OBJECT-TYPE
+       SYNTAX      Integer32 (1..2147483647)
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           "This variable contains the amperage value of a power Ethernet PSE port on which a device is connected"
+       ::= { fsPethPsePortEntry 3 }
+     fsPethPsPortPowerMeasurementsVoltage OBJECT-TYPE
+       SYNTAX      Integer32 (1..2147483647)
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           "This variable contains the voltage value of a power Ethernet PSE port on which a device is connected"
+       ::= { fsPethPsePortEntry 4 }   
+     fsPethPsPortPowerMeasurementsWattage OBJECT-TYPE
+       SYNTAX      Integer32 (1..2147483647)
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           "This variable contains the wattage value of a power Ethernet PSE port on which a device is connected"
+       ::= { fsPethPsePortEntry 5 }                                                      
+
+     fsPethPsPortPowerPriorityStatic OBJECT-TYPE
+       SYNTAX      INTEGER {
+                       critical(1),
+                       high(2),
+                       low(3)
+                   }
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           "This object controls the priority of the port from the point
+            of view of a power management algorithm.  The priority that
+            is set by this variable could be used by a control mechanism
+            that prevents over current situations by disconnecting first
+            ports with lower power priority.  Ports that connect devices
+            critical to the operation of the network - like the E911
+            telephones ports - should be set to higher priority.
+   
+            This object represents the static Port Power Priority value. 
+            When the standard pethPsePortPowerPriority value is different 
+            than the value of this object, a dynamic setting is currently
+            applied."
+
+    ::= { fsPethPsePortEntry 6 }
+
+     fsPethPsPortPowerMode OBJECT-TYPE
+       SYNTAX      INTEGER {
+                       std802d3(1),
+                       passive-24v(2),
+                       passive-54v(3),
+                       force-power(4)
+                   }
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+           "This object controls the power mode configured by the user.
+            It is port dependant, based on the capabilities of the port.
+            802d3 is standards based PoE, passive-24v is 24V passive PoE (no detection, no classification),
+            passive-54v is 54V passive PoE (no detection, no classification),
+            force is 54V passive PoE (with detection, no classification)."
+
+    ::= { fsPethPsePortEntry 7 }
+
+     fsPethPsPortPowerModeDynamic OBJECT-TYPE
+       SYNTAX      INTEGER {
+                       nonDynamic(0),
+                       dynamic(1)
+                   }
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           "This objects informs if a power mode has been dynamically changed on a port via the auto-detect mechanism."
+
+    ::= { fsPethPsePortEntry 8 }
+
+  fsPowerModeAutoDetect OBJECT-TYPE
+           SYNTAX      BITS { cnMedusaOn(0), cnMedusaOff(1), cnWaveOn(2), cnWaveOff(3) }
+           MAX-ACCESS  read-write
+           STATUS      current
+           DESCRIPTION
+               "This setting enables auto-detection of certain devices via LLDP and applies a specific power-mode for them.
+                For cnMedusa we will automatically change power-mode to force-power. 
+                This is possible becuase cnMedusa/cnWave boots in 802d3 mode, but then it  requires force-mode to function properly.
+                The 802d3 boot-up mode allows it to transmit the LLDP TLV by which it is recognised as a cnMedusa/cnWave. 
+                Depending on the device, this setting will only apply on corresponding capable ports"
+
+    ::= { fsPoeSystem 4 }
+
+  fsPowerModePassiveSafe OBJECT-TYPE
+           SYNTAX      INTEGER { enable(1), disable(2) }
+           MAX-ACCESS  read-write
+           STATUS      current
+           DESCRIPTION
+               "This setting enables PoE passive-safe mode, which offers a certain degree of protection against accidental insertion
+                of non-compatible devices in ports already configured in a passive PoE mode (passive-low or passive-high). Passive modes
+                can damage certain devices since it automatically puts voltage out on the port, w/o any sort of 802.3 detection."
+
+    ::= { fsPoeSystem 5 }
+
+  fsPowerModeHighTemperature OBJECT-TYPE
+           SYNTAX      INTEGER { enable(1), disable(2) }
+           MAX-ACCESS  read-write
+           STATUS      current
+           DESCRIPTION
+               "This setting enables high temperature mode, which offers the posibility to reduce the PoE budget to a predetermined value
+                when the switch is running in a high temperature environment."
+    ::= { fsPoeSystem 6 }
+
+  fsPowerFirmwareVersion OBJECT-TYPE
+          SYNTAX     DisplayString (SIZE(0..127))
+          MAX-ACCESS read-only
+          STATUS     current
+          DESCRIPTION
+              "Specifies the PoE MCU firmware version"
+          ::= { fsPoeSystem 7 }
+
+  fsPowerModeDCinVoltageRange OBJECT-TYPE
+           SYNTAX      INTEGER { range9-29V(1), range30-60V(2) }
+           MAX-ACCESS  read-write
+           STATUS      current
+           DESCRIPTION
+               "This setting allows the user to specifiy in which range the DC input voltage is located so that the PoE power budget can be
+                accordingly adjusted. Currently, only necessary and available on the TX1012-P-DC"
+    ::= { fsPoeSystem 8 }          
+END

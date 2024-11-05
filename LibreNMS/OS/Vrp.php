@@ -25,16 +25,22 @@
 
 namespace LibreNMS\OS;
 
+use App\Models\AccessPoint;
 use App\Models\Device;
+use App\Models\EntPhysical;
 use App\Models\Mempool;
 use App\Models\PortsNac;
 use App\Models\Sla;
+use App\Observers\ModuleModelObserver;
 use Carbon\Carbon;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use LibreNMS\DB\SyncsModels;
 use LibreNMS\Device\Processor;
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
@@ -45,6 +51,7 @@ use LibreNMS\Interfaces\Polling\NacPolling;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\Interfaces\Polling\SlaPolling;
 use LibreNMS\OS;
+use LibreNMS\OS\Traits\EntityMib;
 use LibreNMS\RRD\RrdDefinition;
 
 class Vrp extends OS implements
@@ -58,6 +65,37 @@ class Vrp extends OS implements
     SlaPolling,
     OSDiscovery
 {
+    use SyncsModels;
+    use EntityMib {
+        EntityMib::discoverEntityPhysical as discoverBaseEntityPhysical;
+    }
+
+    public function discoverEntityPhysical(): Collection
+    {
+        // normal ENTITY-MIB collection
+        $inventory = $this->discoverBaseEntityPhysical();
+
+        // add additional data from Huawei MIBs
+        $extra = \SnmpQuery::walk([
+            'HUAWEI-ENTITY-EXTENT-MIB::hwEntityBoardType',
+            'HUAWEI-ENTITY-EXTENT-MIB::hwEntityBomEnDesc',
+        ])->table(1);
+
+        $inventory->each(function (EntPhysical $entry) use ($extra) {
+            if (isset($entry->entPhysicalIndex)) {
+                if (! empty($extra[$entry->entPhysicalIndex]['HUAWEI-ENTITY-EXTENT-MIB::hwEntityBomEnDesc'])) {
+                    $entry->entPhysicalDescr = $extra[$entry->entPhysicalIndex]['HUAWEI-ENTITY-EXTENT-MIB::hwEntityBomEnDesc'];
+                }
+
+                if (! empty($extra[$entry->entPhysicalIndex]['HUAWEI-ENTITY-EXTENT-MIB::hwEntityBoardType'])) {
+                    $entry->entPhysicalModelName = $extra[$entry->entPhysicalIndex]['HUAWEI-ENTITY-EXTENT-MIB::hwEntityBoardType'];
+                }
+            }
+        });
+
+        return $inventory;
+    }
+
     public function discoverMempools()
     {
         $mempools = new Collection();
@@ -107,7 +145,7 @@ class Vrp extends OS implements
         }
     }
 
-    public function pollOS(): void
+    public function pollOS(DataStorageInterface $datastore): void
     {
         // Polling the Wireless data TODO port to module
         $apTable = snmpwalk_group($this->getDeviceArray(), 'hwWlanApName', 'HUAWEI-WLAN-AP-MIB', 2);
@@ -127,7 +165,7 @@ class Vrp extends OS implements
                 'hwWlanRadioChUtilizationRate',
                 'hwWlanRadioChInterferenceRate',
                 'hwWlanRadioActualEIRP',
-                'hwWlanRadioFreqType',
+                'hwWlanRadioType',
                 'hwWlanRadioWorkingChannel',
             ];
 
@@ -162,30 +200,52 @@ class Vrp extends OS implements
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'vrp', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'vrp', $tags, $fields);
 
-            $ap_db = dbFetchRows('SELECT * FROM `access_points` WHERE `device_id` = ?', [$this->getDeviceArray()['device_id']]);
+            $aps = new Collection;
 
             foreach ($radioTable as $ap_id => $ap) {
                 foreach ($ap as $r_id => $radio) {
-                    $channel = $radio['hwWlanRadioWorkingChannel'] ?? null;
-                    $mac = $radio['hwWlanRadioMac'] ?? null;
+                    $channel = $radio['hwWlanRadioWorkingChannel'] ?? 0;
+                    $mac = $radio['hwWlanRadioMac'] ?? '';
                     $name = ($apTable[$ap_id]['hwWlanApName'] ?? '') . ' Radio ' . $r_id;
                     $radionum = $r_id;
-                    $txpow = $radio['hwWlanRadioActualEIRP'] ?? null;
-                    $interference = $radio['hwWlanRadioChInterferenceRate'] ?? null;
-                    $radioutil = $radio['hwWlanRadioChUtilizationRate'] ?? null;
-                    $numasoclients = $clientPerRadio[$ap_id][$r_id] ?? null;
+                    $txpow = $radio['hwWlanRadioActualEIRP'] ?? 0;
+                    $interference = $radio['hwWlanRadioChInterferenceRate'] ?? 0;
+                    $radioutil = $radio['hwWlanRadioChUtilizationRate'] ?? 0;
+                    $radioutil = ($radioutil > 100 || $radioutil < 0) ? -1 : $radioutil;
+                    $numasoclients = $clientPerRadio[$ap_id][$r_id] ?? 0;
+                    $radio['hwWlanRadioType'] = $radio['hwWlanRadioType'] ?? 0;
 
-                    switch ($radio['hwWlanRadioFreqType'] ?? null) {
-                        case 1:
-                            $type = '2.4Ghz';
-                            break;
-                        case 2:
-                            $type = '5Ghz';
-                            break;
-                        default:
-                            $type = 'unknown (huawei ' . ($radio['hwWlanRadioFreqType'] ?? null) . ')';
+                    if ($txpow > 127) {
+                        // means the radio is disabled for some reason.
+                        $txpow = 0;
+                    }
+
+                    $type = 'dot11';
+
+                    if ($radio['hwWlanRadioType'] & 2) {
+                        $type .= 'a';
+                    }
+
+                    if ($radio['hwWlanRadioType'] & 1) {
+                        $type .= 'b';
+                    }
+
+                    if ($radio['hwWlanRadioType'] & 4) {
+                        $type .= 'g';
+                    }
+
+                    if ($radio['hwWlanRadioType'] & 8) {
+                        $type .= 'n';
+                    }
+
+                    if ($radio['hwWlanRadioType'] & 16) {
+                        $type .= '_ac';
+                    }
+
+                    if ($radio['hwWlanRadioType'] & 32) {
+                        $type .= '_ax';
                     }
 
                     // TODO
@@ -223,65 +283,28 @@ class Vrp extends OS implements
                     ];
 
                     $tags = compact('name', 'radionum', 'rrd_name', 'rrd_def');
-                    data_update($this->getDeviceArray(), 'arubaap', $tags, $fields);
+                    $datastore->put($this->getDeviceArray(), 'arubaap', $tags, $fields);
 
-                    $foundid = 0;
-
-                    for ($z = 0; $z < count($ap_db); $z++) {
-                        if ($ap_db[$z]['name'] == $name && $ap_db[$z]['radio_number'] == $radionum) {
-                            $foundid = $ap_db[$z]['accesspoint_id'];
-                            $ap_db[$z]['seen'] = 1;
-                            continue;
-                        }
-                    }
-
-                    if ($foundid == 0) {
-                        $ap_id = dbInsert(
-                            [
-                                'device_id' => $this->getDeviceArray()['device_id'],
-                                'name' => $name,
-                                'radio_number' => $radionum,
-                                'type' => $type,
-                                'mac_addr' => $mac,
-                                'channel' => $channel,
-                                'txpow' => $txpow,
-                                'radioutil' => $radioutil,
-                                'numasoclients' => $numasoclients,
-                                'nummonclients' => $nummonclients,
-                                'numactbssid' => $numactbssid,
-                                'nummonbssid' => $nummonbssid,
-                                'interference' => $interference,
-                            ],
-                            'access_points'
-                        );
-                    } else {
-                        dbUpdate(
-                            [
-                                'mac_addr' => $mac,
-                                'type' => $type,
-                                'deleted' => 0,
-                                'channel' => $channel,
-                                'txpow' => $txpow,
-                                'radioutil' => $radioutil,
-                                'numasoclients' => $numasoclients,
-                                'nummonclients' => $nummonclients,
-                                'numactbssid' => $numactbssid,
-                                'nummonbssid' => $nummonbssid,
-                                'interference' => $interference,
-                            ],
-                            'access_points',
-                            '`accesspoint_id` = ?',
-                            [$foundid]
-                        );
-                    }
-                }//end foreach 1
-            }//end foreach 2
-
-            for ($z = 0; $z < count($ap_db); $z++) {
-                if (! isset($ap_db[$z]['seen']) && $ap_db[$z]['deleted'] == 0) {
-                    dbUpdate(['deleted' => 1], 'access_points', '`accesspoint_id` = ?', [$ap_db[$z]['accesspoint_id']]);
+                    $aps->push(new AccessPoint([
+                        'device_id' => $this->getDeviceId(),
+                        'name' => $name,
+                        'radio_number' => $radionum,
+                        'type' => $type,
+                        'mac_addr' => $mac,
+                        'channel' => $channel,
+                        'txpow' => $txpow,
+                        'radioutil' => $radioutil,
+                        'numasoclients' => $numasoclients,
+                        'nummonclients' => $nummonclients,
+                        'numactbssid' => $numactbssid,
+                        'nummonbssid' => $nummonbssid,
+                        'interference' => $interference,
+                    ]));
                 }
             }
+
+            ModuleModelObserver::observe(AccessPoint::class);
+            $this->syncModels($this->getDevice(), 'accessPoints', $aps);
         }
     }
 
@@ -364,6 +387,9 @@ class Vrp extends OS implements
 
             // update the DB
             foreach ($portAuthSessionEntry as $authId => $portAuthSessionEntryParameters) {
+                if (! array_key_exists('hwAccessInterface', $portAuthSessionEntryParameters) || ! array_key_exists('hwAccessMACAddress', $portAuthSessionEntryParameters)) {
+                    continue;
+                }
                 $mac_address = strtolower(implode(array_map('zeropad', explode(':', $portAuthSessionEntryParameters['hwAccessMACAddress']))));
                 $port_id = $ifName_map->get($portAuthSessionEntryParameters['hwAccessInterface'], 0);
                 if ($port_id <= 0) {
@@ -373,15 +399,15 @@ class Vrp extends OS implements
                     'port_id' => $ifName_map->get($portAuthSessionEntryParameters['hwAccessInterface'] ?? null, 0),
                     'mac_address' => $mac_address,
                     'auth_id' => $authId,
-                    'domain' => $portAuthSessionEntryParameters['hwAccessDomain'] ?? null,
+                    'domain' => $portAuthSessionEntryParameters['hwAccessDomain'] ?? '',
                     'username' => $portAuthSessionEntryParameters['hwAccessUserName'] ?? '',
-                    'ip_address' => $portAuthSessionEntryParameters['hwAccessIPAddress'] ?? null,
+                    'ip_address' => $portAuthSessionEntryParameters['hwAccessIPAddress'] ?? '',
                     'authz_by' => $portAuthSessionEntryParameters['hwAccessType'] ?? '',
                     'authz_status' => $portAuthSessionEntryParameters['hwAccessAuthorizetype'] ?? '',
                     'host_mode' => $portAuthSessionEntryParameters['hwAccessAuthType'] ?? 'default',
-                    'timeout' => $portAuthSessionEntryParameters['hwAccessSessionTimeout'] ?? null,
+                    'timeout' => $portAuthSessionEntryParameters['hwAccessSessionTimeout'] ?? '',
                     'time_elapsed' => $portAuthSessionEntryParameters['hwAccessOnlineTime'] ?? null,
-                    'authc_status' => $portAuthSessionEntryParameters['hwAccessCurAuthenPlace'] ?? null,
+                    'authc_status' => $portAuthSessionEntryParameters['hwAccessCurAuthenPlace'] ?? '',
                     'method' => $portAuthSessionEntryParameters['hwAccessAuthtype'] ?? '',
                     'vlan' => $portAuthSessionEntryParameters['hwAccessVLANID'] ?? null,
                 ]));
@@ -539,17 +565,9 @@ class Vrp extends OS implements
 
             $sla->rtt = ($data[$owner][$test]['pingResultsAverageRtt'] ?? 0) / $divisor;
             $time = Carbon::parse($data[$owner][$test]['pingResultsLastGoodProbe'] ?? null)->toDateTimeString();
-            echo 'SLA : ' . $rtt_type . ' ' . $owner . ' ' . $test . '... ' . $sla->rtt . 'ms at ' . $time . "\n";
+            Log::info('SLA : ' . $rtt_type . ' ' . $owner . ' ' . $test . '... ' . $sla->rtt . 'ms at ' . $time);
 
-            $fields = [
-                'rtt' => $sla->rtt,
-            ];
-
-            // The base RRD
-            $rrd_name = ['sla', $sla['sla_nr']];
-            $rrd_def = RrdDefinition::make()->addDataset('rtt', 'GAUGE', 0, 300000);
-            $tags = compact('sla_nr', 'rrd_name', 'rrd_def');
-            data_update($device, 'sla', $tags, $fields);
+            $collected = ['rtt' => $sla->rtt];
 
             // Let's gather some per-type fields.
             switch ($rtt_type) {
@@ -567,13 +585,13 @@ class Vrp extends OS implements
                         ->addDataset('ProbeResponses', 'GAUGE', 0, 300000)
                         ->addDataset('ProbeLoss', 'GAUGE', 0, 300000);
                     $tags = compact('rrd_name', 'rrd_def', 'sla_nr', 'rtt_type');
-                    data_update($device, 'sla', $tags, $icmp);
-                    $fields = array_merge($fields, $icmp);
+                    app('Datastore')->put($device, 'sla', $tags, $icmp);
+                    $collected = array_merge($collected, $icmp);
                     break;
             }
 
-            d_echo('The following datasources were collected for #' . $sla['sla_nr'] . ":\n");
-            d_echo($fields);
+            d_echo('The following datasources were collected for #' . $sla->sla_nr . ":\n");
+            d_echo($collected);
         }
     }
 }

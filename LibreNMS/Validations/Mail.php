@@ -71,7 +71,7 @@ class Mail extends BaseValidation
             }//end if
             if ($run_test == 1) {
                 $email = Config::get('alert.default_mail');
-                if ($err = send_mail($email, 'Test email', 'Testing email from NMS')) {
+                if ($err = \LibreNMS\Util\Mail::send($email, 'Test email', 'Testing email from NMS', false)) {
                     $validator->ok('Email has been sent');
                 } else {
                     $validator->fail("Issue sending email to $email with error $err");

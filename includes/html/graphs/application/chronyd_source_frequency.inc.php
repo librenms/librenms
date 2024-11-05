@@ -7,8 +7,8 @@ $nototal = (($width < 224) ? 1 : 0);
 $unit_text = 'Seconds PPM';
 $rrd_filename = Rrd::name($device['hostname'], ['app', 'chronyd', $app->app_id, $vars['source']]);
 $array = [
-    'frequency'             => ['descr' => 'Estimated'],
-    'frequency_skew'        => ['descr' => 'Est. error'],
+    'frequency' => ['descr' => 'Estimated'],
+    'frequency_skew' => ['descr' => 'Est. error'],
 ];
 
 $rrd_list = [];

@@ -14,23 +14,23 @@ $rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Deleted',
-        'ds'       => 'deleted',
+        'descr' => 'Deleted',
+        'ds' => 'deleted',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Recycle Misses',
-        'ds'       => 'recycle_miss',
+        'descr' => 'Recycle Misses',
+        'ds' => 'recycle_miss',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Evict Skip',
-        'ds'       => 'evict_skip',
+        'descr' => 'Evict Skip',
+        'ds' => 'evict_skip',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Mutex Skip',
-        'ds'       => 'mutex_skip',
+        'descr' => 'Mutex Skip',
+        'ds' => 'mutex_skip',
     ];
 } else {
     d_echo('RRD "' . $rrd_filename . '" not found');

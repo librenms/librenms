@@ -1,0 +1,142 @@
+mib: ERICSSON-ROUTER-ENVMON-MIB:ERICSSON-ROUTER-CPU-METER-MIB:ERICSSON-ROUTER-OPTICAL-TRANSCEIVER-MIB:ERICSSON-ROUTER-SYS-RESOURCES-MIB
+modules:
+    os:
+        version: SNMPv2-MIB::sysDescr.0
+        hardware: ENTITY-MIB::entPhysicalDescr.1
+        serial: ENTITY-MIB::entPhysicalDescr.2
+        serial_regex: '/SN:(?<serial>[^ ]+)/'
+    processors:
+        data:
+            -
+                oid: eriRouterCpuMeterMIBObjects
+                value: eriRouterCpuMeterFiveMinuteAvg
+                num_oid: '.1.3.6.1.4.1.193.218.2.6.1.3.{{ $index }}'
+                descr: '5 minute average'
+            -
+                oid: eriRouterCpuMeterMIBObjects
+                value: eriRouterCpuMeterFiveMinutePeak
+                num_oid: '.1.3.6.1.4.1.193.218.2.6.1.6.{{ $index }}'
+                descr: '5 minute peak'
+    sensors:
+        pre-cache:
+            data:
+                -
+                    snmp_flags: '-OQUsbe'
+                    oid:
+                        - eriRouterOpticalTransceiverPortTable
+                        - eriRouterOpticalTransceiverCardSlot
+                        - eriRouterOpticalTransceiverPort
+        state:
+            data:
+                -
+                    oid: eriRouterFanStatusTable
+                    num_oid: '.1.3.6.1.4.1.193.218.2.4.1.1.1.4.{{ $index }}'
+                    descr: eriRouterFanDescr
+                    value: eriRouterFanStatus
+                    states:
+                        - { value: 1, descr: Normal,  graph: 1, generic: 0 }
+                        - { value: 2, descr: Failed,  graph: 1, generic: 2 }
+                        - { value: 3, descr: Absent,  graph: 1, generic: 0 }
+                        - { value: 4, descr: Unknown, graph: 1, generic: 3 }
+                -
+                    oid: eriRouterPowerStatusTable
+                    num_oid: '.1.3.6.1.4.1.193.218.2.4.1.2.1.4.{{ $index }}'
+                    descr: eriRouterPowerDescr
+                    value: eriRouterPowerStatus
+                    states:
+                        - { value: 1, descr: Normal,  graph: 1, generic: 0 }
+                        - { value: 2, descr: Failed,  graph: 1, generic: 2 }
+                        - { value: 3, descr: Absent,  graph: 1, generic: 0 }
+                        - { value: 4, descr: Unknown, graph: 1, generic: 3 }
+        fanspeed:
+            data:
+                -
+                    oid: EriRouterFanSpeed
+                    value: eriRouterFanSpeedCurrent
+                    num_oid: '.1.3.6.1.4.1.193.218.2.4.1.5.1.3.{{ $index }}'
+                    descr: eriRouterFanUnitDescr
+        temperature:
+            data:
+                -
+                    oid: eriRouterEntityTempSensorTable
+                    value: eriRouterEntityTempCurrent
+                    num_oid: '.1.3.6.1.4.1.193.218.2.4.1.6.1.3.{{ $index }}'
+                    descr: eriRouterEntityTempDescr
+                -
+                    oid: eriRouterOpticalTransceiverParamTable
+                    value: eriRouterOpticalTransceiverCurrentValue
+                    high_limit: eriRouterOpticalTransceiverMaxAlarmValue
+                    warn_limit: eriRouterOpticalTransceiverMaxWarningValue
+                    low_limit: eriRouterOpticalTransceiverMinAlarmValue
+                    low_warn_limit: eriRouterOpticalTransceiverMinWarningValue
+                    snmp_flags: '-OQUsbe'
+                    num_oid: '.1.3.6.1.4.1.193.218.2.50.1.2.1.3.{{ $index }}'
+                    index: 'eriRouterOpticalTransceiverTemp.{{ $index }}'
+                    group: 'Optic Temperature'
+                    divisor: 1000
+                    descr: 'Slot {{ $eriRouterOpticalTransceiverCardSlot:0 }} / Port {{ $eriRouterOpticalTransceiverPort:0 }}'
+                    skip_values:
+                        -
+                            oid: eriRouterOpticalTransceiverParamType
+                            op: '!='
+                            value: 3
+        current:
+            data:
+                -
+                    oid: eriRouterOpticalTransceiverParamTable
+                    value: eriRouterOpticalTransceiverCurrentValue
+                    high_limit: eriRouterOpticalTransceiverMaxAlarmValue
+                    warn_limit: eriRouterOpticalTransceiverMaxWarningValue
+                    low_limit: eriRouterOpticalTransceiverMinAlarmValue
+                    low_warn_limit: eriRouterOpticalTransceiverMinWarningValue
+                    snmp_flags: '-OQUsbe'
+                    num_oid: '.1.3.6.1.4.1.193.218.2.50.1.2.1.3.{{ $index }}'
+                    index: 'eriRouterOpticalTransceiverBiasCurrent.{{ $index }}'
+                    group: 'Optic Bias Current'
+                    divisor: 1000000
+                    descr: 'Slot {{ $eriRouterOpticalTransceiverCardSlot:0 }} / Port {{ $eriRouterOpticalTransceiverPort:0 }}'
+                    skip_values:
+                        -
+                            oid: eriRouterOpticalTransceiverParamType
+                            op: '!='
+                            value: 4
+        dbm:
+            data:
+                -
+                    oid: eriRouterOpticalTransceiverParamTable
+                    value: eriRouterOpticalTransceiverCurrentValue
+                    high_limit: eriRouterOpticalTransceiverMaxAlarmValue
+                    warn_limit: eriRouterOpticalTransceiverMaxWarningValue
+                    low_limit: eriRouterOpticalTransceiverMinAlarmValue
+                    low_warn_limit: eriRouterOpticalTransceiverMinWarningValue
+                    snmp_flags: '-OQUsbe'
+                    num_oid: '.1.3.6.1.4.1.193.218.2.50.1.2.1.3.{{ $index }}'
+                    index: 'eriRouterOpticalTransceiverRxPower.{{ $index }}'
+                    group: 'Optic Rx Power'
+                    divisor: 1000
+                    descr: 'Slot {{ $eriRouterOpticalTransceiverCardSlot:0 }} / Port {{ $eriRouterOpticalTransceiverPort:0 }}'
+                    skip_values:
+                        -
+                            oid: eriRouterOpticalTransceiverParamType
+                            op: '!='
+                            value: 2
+        voltage:
+            data:
+                -
+                    oid: eriRouterOpticalTransceiverParamTable
+                    value: eriRouterOpticalTransceiverCurrentValue
+                    high_limit: eriRouterOpticalTransceiverMaxAlarmValue
+                    warn_limit: eriRouterOpticalTransceiverMaxWarningValue
+                    low_limit: eriRouterOpticalTransceiverMinAlarmValue
+                    low_warn_limit: eriRouterOpticalTransceiverMinWarningValue
+                    snmp_flags: '-OQUsbe'
+                    num_oid: '.1.3.6.1.4.1.193.218.2.50.1.2.1.3.{{ $index }}'
+                    index: 'eriRouterOpticalTransceiverVcc.{{ $index }}'
+                    group: 'Optic Vcc'
+                    divisor: 1000
+                    descr: 'Slot {{ $eriRouterOpticalTransceiverCardSlot:0 }} / Port {{ $eriRouterOpticalTransceiverPort:0 }}'
+                    skip_values:
+                        -
+                            oid: eriRouterOpticalTransceiverParamType
+                            op: '!='
+                            value: 6

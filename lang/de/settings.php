@@ -15,7 +15,7 @@ return [
     ],
     'sections' => [
         'alerting' => [
-            'general' => ['name' => 'Generelle Alarm Einstellungen'],
+            'general' => ['name' => 'Generelle Alarmeinstellungen'],
             'email' => ['name' => 'E-Mail Optionen'],
         ],
         'auth' => [
@@ -28,7 +28,7 @@ return [
         ],
         'external' => [
             'binaries' => ['name' => 'Programmpfade'],
-            'location' => ['name' => 'Location Settings'],
+            'location' => ['name' => 'Standorteinstellungen'],
             'graylog' => ['name' => 'Graylog Integration'],
             'oxidized' => ['name' => 'Oxidized Integration'],
             'peeringdb' => ['name' => 'PeeringDB Integration'],
@@ -48,8 +48,8 @@ return [
             'server' => ['name' => 'Server'],
         ],
         'webui' => [
-            'availability-map' => ['name' => 'Availability Map Einstellungen'],
-            'graph' => ['name' => 'Graphen Einstellungen'],
+            'availability-map' => ['name' => 'Verfügbarkeitskarte Einstellungen'],
+            'graph' => ['name' => 'Grafik Einstellungen'],
             'dashboard' => ['name' => 'Dashboard Einstellungen'],
             'search' => ['name' => 'Sucheinstellungen'],
             'style' => ['name' => 'Theme'],
@@ -104,7 +104,7 @@ return [
                 'help' => 'Alarmiere Administratoren welche nur Leserechte haben',
             ],
             'syscontact' => [
-                'description' => 'Benachrictige sysContact über Alarme',
+                'description' => 'Benachrichtige sysContact über Alarme',
                 'help' => 'Sende AlarmierungsE-Mail an den SNMP sysContact',
             ],
             'transports' => [
@@ -138,9 +138,6 @@ return [
             'description' => 'Erlaube diesem Netzwerk Zugriff auf Graphen',
             'help' => 'Erlaube den angegebenen Netzwerken Zugrif auf Graphen ohne eingeloggt zu sein (funktioniert nicht wenn authentifizierte Graphen aktiviert sind)',
         ],
-        'api_demo' => [
-            'description' => 'Dies ist eine Demo',
-        ],
         'apps' => [
             'powerdns-recursor' => [
                 'api-key' => [
@@ -162,7 +159,7 @@ return [
         ],
         'auth_ad_base_dn' => [
             'description' => 'Base DN',
-            'help' => 'Gruppen und Benutzer müssen Teil von  dn sein. Beispiel: dc=example,dc=com',
+            'help' => 'Gruppen und Benutzer müssen Teil von dn sein. Beispiel: dc=example,dc=com',
         ],
         'auth_ad_check_certificates' => [
             'description' => 'Prüfe Zertifikate',
@@ -183,7 +180,7 @@ return [
         'auth_ldap_attr' => [
             'uid' => [
                 'description' => 'Attribute zur Prüfung von Benutzernamen',
-                'help' => 'Attribute welche zur Identifizierung der Benutzer an Hand des Usernamen genutzt werden',
+                'help' => 'Attribute welche zur Identifizierung der Benutzer anhand des Usernamen genutzt werden',
             ],
         ],
         'auth_ldap_binddn' => [
@@ -200,7 +197,7 @@ return [
         ],
         'auth_ad_binddn' => [
             'description' => 'Bind DN (überschreibt Benutzername)',
-            'help' => 'voller DN des Benutzernamen',
+            'help' => 'Voller DN des Benutzernamen',
         ],
         'auth_ad_bindpassword' => [
             'description' => 'Active Directory Passwort',
@@ -212,7 +209,7 @@ return [
         ],
         'auth_ad_starttls' => [
             'description' => 'Benutze STARTTLS',
-            'help' => 'Benutze STARTTLS um Verbindungen abzusichern.  Alternative zu LDAPS.',
+            'help' => 'Benutze STARTTLS um Verbindungen abzusichern. Alternative zu LDAPS.',
             'options' => [
                 'disabled' => 'Deaktiviert',
                 'optional' => 'Optional',
@@ -221,11 +218,11 @@ return [
         ],
         'auth_ldap_cache_ttl' => [
             'description' => 'LDAP Cache Gültigkeit',
-            'help' => 'Speichert temporär LDAP Suchergebnisse.  Erhöht die Geschwindigkeit, aber die Daten können veraltet sein.',
+            'help' => 'Speichert temporär LDAP Suchergebnisse. Erhöht die Geschwindigkeit, aber die Daten können veraltet sein.',
         ],
         'auth_ldap_debug' => [
             'description' => 'Zeige Debugausgaben',
-            'help' => 'Zeige Debug Informationene. Zeigt eventuell private Informationen an, lassen Sie es nicht aktiviert.',
+            'help' => 'Zeige Debug Informationen. Zeigt eventuell private Informationen an, lassen Sie es nicht aktiviert.',
         ],
         'auth_ldap_emailattr' => [
             'description' => 'Mail Einstellungen',
@@ -292,7 +289,7 @@ return [
         ],
         'auth_ldap_version' => [
             'description' => 'LDAP Version',
-            'help' => 'LDAP Version zur Kommunikation mit dem Server.  Gewöhnlich sollte es v3 sein',
+            'help' => 'LDAP Version zur Kommunikation mit dem Server. Gewöhnlich sollte es v3 sein',
             'options' => [
                 '2' => '2',
                 '3' => '3',
@@ -300,7 +297,7 @@ return [
         ],
         'auth_mechanism' => [
             'description' => 'Authentifizierungsmethode (Achtung!)',
-            'help' => "Authentifierungsmethode.  Achtung, Sie könnnten die Möglichkeit verlieren sich einzuloggen. Sie können es überschreiben indem Sie \$config['auth_mechanism'] = 'mysql'; in ihre config.php eintragen",
+            'help' => "Authentifierungsmethode. Achtung, Sie könnnten die Möglichkeit verlieren sich einzuloggen. Sie können es überschreiben indem Sie \$config['auth_mechanism'] = 'mysql'; in ihre config.php eintragen",
             'options' => [
                 'mysql' => 'MySQL (default)',
                 'active_directory' => 'Active Directory',
@@ -324,13 +321,9 @@ return [
             'description' => 'Spezifiziere URL',
             'help' => 'Sollte nur gesetzt werden wenn man den Zugriff nur über einen bestimmten Hostnamen/Port erlauben möchte',
         ],
-        'device_perf_purge' => [
-            'description' => 'Entferne Performanzdaten welche älter sind als',
-            'help' => 'Wird durch daily.sh erledigt',
-        ],
         'distributed_poller' => [
             'description' => 'aktiviere Distributed Polling (benötigt zusätzliche Konfiguration)',
-            'help' => 'aktiviere systemweites Distributed Polling. Dies wird genutzt für Lastverteilung und nicht remote Polling. Lesen Sie hierzu folgende Dokumentation: https://docs.librenms.org/Extensions/Distributed-Poller/',
+            'help' => 'Aktiviere systemweites Distributed Polling. Dies wird genutzt für Lastverteilung und nicht remote Polling. Lesen Sie hierzu folgende Dokumentation: https://docs.librenms.org/Extensions/Distributed-Poller/',
         ],
         'distributed_poller_group' => [
             'description' => 'Standard Poller Gruppe',
@@ -362,7 +355,7 @@ return [
         ],
         'email_from' => [
             'description' => 'From E-Mail Adresses',
-            'help' => 'E-mail Addresse welche für den Versand von E-Mails genutzt wird (from)',
+            'help' => 'E-Mail Addresse welche für den Versand von E-Mails genutzt wird (from)',
         ],
         'email_html' => [
             'description' => 'Nutze HTML E-Mails',
@@ -503,7 +496,7 @@ return [
         ],
         'mydomain' => [
             'description' => 'Primäre Domain',
-            'help' => 'Diese Domaine wird genutzt für Netzwerkautoerkennung und andere Prozesse. LibreNMS wird versuchen diese Hostnamen hinzuzufügen.',
+            'help' => 'Diese Domain wird genutzt für Netzwerkautoerkennung und andere Prozesse. LibreNMS wird versuchen diese Hostnamen hinzuzufügen.',
         ],
         'nfsen_enable' => [
             'description' => 'Aktiviere NfSen',
@@ -548,7 +541,7 @@ return [
         ],
         'nfsen_suffix' => [
             'description' => 'Dateinamensuffix',
-            'help' => 'Dies ist ein sehr wichtig da Gerätename in NfSen auf 21 Zeichen limitiert sind. Dies bedeutet das es problematisch werden kann full domain names zu schrumpfen, daher wird unnützen gewöhnlich entfernt.',
+            'help' => 'Dies ist sehr wichtig da Gerätenamen in NfSen auf 21 Zeichen limitiert sind. Dies bedeutet das es problematisch werden kann full domain names zu kürzen, daher wird unnützes gewöhnlich entfernt.',
         ],
         'nmap' => [
             'description' => 'Pfad zu nmap',
@@ -612,7 +605,7 @@ return [
         ],
         'rrd_dir' => [
             'description' => 'RRD Verzeichnis',
-            'help' => 'Verzeichnis für RRD Dateien.  Standardmässig ist RRD innerhalb des LibreNMS Verzeichnisses.  Eine Änderung verschiebt nicht die vorhandenen RRD Dateien.',
+            'help' => 'Verzeichnis für RRD Dateien. Standardmässig ist RRD innerhalb des LibreNMS Verzeichnisses. Eine Änderung verschiebt nicht die vorhandenen RRD Dateien.',
         ],
         'rrd_purge' => [
             'description' => 'RRD Dateien älter als',
@@ -624,7 +617,7 @@ return [
         ],
         'rrdcached' => [
             'description' => 'Aktiviere rrdcached (socket)',
-            'help' => 'Aktiviert rrdcached mit Angabe des rrdcaced Sockets. Dies kann ein Unix oder ein Netzwerksocket sein(unix:/run/rrdcached.sock oder localhost:42217)',
+            'help' => 'Aktiviert rrdcached mit Angabe des rrdcaced Sockets. Dies kann ein Unix oder ein Netzwerksocket sein (unix:/run/rrdcached.sock oder localhost:42217)',
         ],
         'rrdtool' => [
             'description' => 'Pfad zu rrdtool',
@@ -637,8 +630,8 @@ return [
             'description' => 'Pfad zu sfdp',
         ],
         'shorthost_target_length' => [
-            'description' => 'verkürzt einen Hostnamen auf diese maximale Länge',
-            'help' => 'kürzt einen Hostnamen auf diese maximale Länge, aber beinhaltet immer die maximal mögliche Subdomain',
+            'description' => 'Verkürzt einen Hostnamen auf diese maximale Länge',
+            'help' => 'Kürzt einen Hostnamen auf diese maximale Länge, aber beinhaltet immer die maximal mögliche Subdomain',
         ],
         'site_style' => [
             'description' => 'Definiert den CSS Style der Seite',
@@ -668,7 +661,7 @@ return [
             ],
             'port' => [
                 'description' => 'Port',
-                'help' => 'Definiere den  TCP/UDP Port für SNMP',
+                'help' => 'Definiere den TCP/UDP Port für SNMP',
             ],
             'v3' => [
                 'description' => 'SNMP v3 Authentifizierung (Priorität)',
@@ -717,7 +710,7 @@ return [
             'help' => 'Überschreibt das Standardtitelbild.',
         ],
         'traceroute' => [
-            'description' => 'Pfad zu  traceroute',
+            'description' => 'Pfad zu traceroute',
         ],
         'unix-agent' => [
             'connection-timeout' => [
@@ -763,10 +756,10 @@ return [
             ],
             'default_dashboard_id' => [
                 'description' => 'Standard Dashboard',
-                'help' => 'Globales Standard für alle Nutzer welche kein eigenes haben',
+                'help' => 'Globaler Standard für alle Nutzer welche kein eigenes haben',
             ],
             'dynamic_graphs' => [
-                'description' => 'aktiviert dynamische Graphen',
+                'description' => 'Aktiviert dynamische Graphen',
                 'help' => 'Akiviert dynmaischen Graphen, welche gezoomt und gescrollt werden können',
             ],
             'global_search_result_limit' => [
@@ -786,8 +779,8 @@ return [
                 ],
             ],
             'min_graph_height' => [
-                'description' => 'Definiere die minimale Graph Höhe',
-                'help' => 'Minimale Graph Höhe (Standard: 300)',
+                'description' => 'Definiere die minimale Graphen Höhe',
+                'help' => 'Minimale Graphen Höhe (Standard: 300)',
             ],
         ],
         'whois' => [

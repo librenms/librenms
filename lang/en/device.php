@@ -5,6 +5,7 @@ return [
         'features' => 'OS Features',
         'hardware' => 'Hardware',
         'icon' => 'Icon',
+        'ip' => 'IP',
         'location' => 'Location',
         'os' => 'Device OS',
         'serial' => 'Serial',

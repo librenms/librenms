@@ -1,0 +1,15 @@
+os: cts
+text: 'Connection Technology Systems'
+type: network
+icon: cts
+group: cts
+mib_dir: cts
+ifname: true
+snmp_bulk: false
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.9304.
+discovery_modules:
+    fdb-table: false

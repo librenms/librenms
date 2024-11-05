@@ -93,6 +93,7 @@ class IpTest extends TestCase
         $this->assertEquals('192.168.1.254', IP::fromHexString('c0 a8 01 fe '));
         $this->assertEquals('192.168.1.254', IP::fromHexString('"c0 a8 01 fe"'));
         $this->assertEquals('192.168.1.254', IP::fromHexString('192.168.1.254'));
+        $this->assertEquals('62.40.125.125', IP::fromHexString('>(}}')); // stupid ascii encoded
 
         $this->assertEquals('2001:db8::2:1', IP::fromHexString('2001:db8::2:1'));
         $this->assertEquals('2001:db8::2:1', IP::fromHexString('20 01 0d b8 00 00 00 00 00 00 00 00 00 02 00 01'));
@@ -100,6 +101,7 @@ class IpTest extends TestCase
         $this->assertEquals('2001:db8::2:1', IP::fromHexString('"20:01:0d:b8:00:00:00:00:00:00:00:00:00:02:00:01"'));
         $this->assertEquals('2001:db8::2:1', IP::fromHexString('"20.01.0d.b8.00.00.00.00.00.00.00.00.00.02.00.01"'));
         $this->assertEquals('2001:db8::2:1', IP::fromHexString('20010db8000000000000000000020001'));
+        $this->assertEquals('3e28:7d7d:3e28:7d7d:3e28:7d7d:3e28:7d7d', IP::fromHexString('>(}}>(}}>(}}>(}}')); // stupid ascii encoded
 
         $this->assertEquals('::', IP::fromHexString('00000000000000000000000000000000'));
 

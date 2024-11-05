@@ -24,7 +24,7 @@
  * @subpackage Pages
  */
 
-switch ($vars['order']) {
+switch ($vars['order'] ?? '') {
     case 'vsz':
         $order = '`vsz`';
         break;
@@ -50,18 +50,18 @@ switch ($vars['order']) {
         break;
 }//end switch
 
-if ($vars['by'] == 'desc') {
+if (isset($vars['by']) && $vars['by'] == 'desc') {
     $by = 'desc';
 } else {
     $by = 'asc';
 }
 
 $heads = [
-    'PID'     => '',
-    'VSZ'     => 'Virtual Memory',
-    'RSS'     => 'Resident Memory',
+    'PID' => '',
+    'VSZ' => 'Virtual Memory',
+    'RSS' => 'Resident Memory',
     'cputime' => '',
-    'user'    => '',
+    'user' => '',
     'command' => '',
 ];
 

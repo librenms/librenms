@@ -51,16 +51,6 @@ parameters:
 			path: LibreNMS/Modules/Mpls.php
 
 		-
-			message: "#^Variable \\$sdps might not be defined\\.$#"
-			count: 1
-			path: LibreNMS/Modules/Mpls.php
-
-		-
-			message: "#^Variable \\$svcs might not be defined\\.$#"
-			count: 2
-			path: LibreNMS/Modules/Mpls.php
-
-		-
 			message: "#^Variable \\$features on left side of \\?\\? is never defined\\.$#"
 			count: 1
 			path: LibreNMS/Modules/Os.php
@@ -104,11 +94,6 @@ parameters:
 			message: "#^Parameter \\#16 \\$entPhysicalIndex of class LibreNMS\\\\Device\\\\WirelessSensor constructor expects float\\|int\\|null, string given\\.$#"
 			count: 1
 			path: LibreNMS/OS/Ios.php
-
-		-
-			message: "#^If condition is always false\\.$#"
-			count: 1
-			path: LibreNMS/OS/Shared/Cisco.php
 
 		-
 			message: "#^Variable \\$index might not be defined\\.$#"
@@ -166,16 +151,6 @@ parameters:
 			path: LibreNMS/Util/Graph.php
 
 		-
-			message: "#^Property LibreNMS\\\\Util\\\\Snmpsim\\:\\:\\$proc \\(LibreNMS\\\\Proc\\) in isset\\(\\) is not nullable\\.$#"
-			count: 2
-			path: LibreNMS/Util/Snmpsim.php
-
-		-
-			message: "#^Unreachable statement \\- code above always terminates\\.$#"
-			count: 1
-			path: LibreNMS/Util/Snmpsim.php
-
-		-
 			message: "#^Static method Silber\\\\Bouncer\\\\BouncerFacade\\:\\:role\\(\\) invoked with 0 parameters, 1 required\\.$#"
 			count: 1
 			path: app/Console/Commands/AddUserCommand.php
@@ -192,11 +167,6 @@ parameters:
 
 		-
 			message: "#^Ternary operator condition is always false\\.$#"
-			count: 1
-			path: app/Http/Controllers/LegacyController.php
-
-		-
-			message: "#^Variable \\$vars on left side of \\?\\? is never defined\\.$#"
 			count: 1
 			path: app/Http/Controllers/LegacyController.php
 
@@ -229,6 +199,11 @@ parameters:
 			message: "#^Called 'Model\\:\\:make\\(\\)' which performs unnecessary work, use 'new Model\\(\\)'\\.$#"
 			count: 1
 			path: app/Http/Controllers/ServiceTemplateController.php
+
+		-
+			message: "#^Offset 'image_title' does not exist on null\\.$#"
+			count: 1
+			path: app/Http/Controllers/Widgets/ImageController.php
 
 		-
 			message: "#^Offset 'image_title' on null in empty\\(\\) does not exist\\.$#"
@@ -296,11 +271,6 @@ parameters:
 			path: database/factories/UserFactory.php
 
 		-
-			message: "#^Property 'name' does not exist in Silber\\\\Bouncer\\\\Database\\\\Role model\\.$#"
-			count: 1
-			path: database/factories/UserFactory.php
-
-		-
 			message: "#^Static method Silber\\\\Bouncer\\\\BouncerFacade\\:\\:role\\(\\) invoked with 0 parameters, 1 required\\.$#"
 			count: 1
 			path: database/factories/UserFactory.php
@@ -316,24 +286,9 @@ parameters:
 			path: database/seeders/RolesSeeder.php
 
 		-
-			message: "#^Property 'name' does not exist in Silber\\\\Bouncer\\\\Database\\\\Role model\\.$#"
-			count: 2
-			path: database/seeders/RolesSeeder.php
-
-		-
 			message: "#^Static method Silber\\\\Bouncer\\\\BouncerFacade\\:\\:role\\(\\) invoked with 0 parameters, 1 required\\.$#"
 			count: 2
 			path: database/seeders/RolesSeeder.php
-
-		-
-			message: "#^Parameter \\#4 \\$transport of function addHost expects string, int given\\.$#"
-			count: 1
-			path: tests/AddHostTest.php
-
-		-
-			message: "#^Parameter \\#5 \\$poller_group of function addHost expects string, int given\\.$#"
-			count: 4
-			path: tests/AddHostTest.php
 
 		-
 			message: "#^Parameter \\#1 \\$attr of method LibreNMS\\\\Authentication\\\\SSOAuthorizer\\:\\:authSSOGetAttr\\(\\) expects string, int given\\.$#"

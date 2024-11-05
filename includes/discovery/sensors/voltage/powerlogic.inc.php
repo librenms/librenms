@@ -29,7 +29,7 @@ if (is_numeric($data['vVab'][1])) {
     $index = 'vVab';
     $descr = 'Line A to B';
     $current = $data['vVab'][1];
-    discover_sensor($valid['sensor'], 'voltage', $device, $current_oid, $index, 'powerlogic', $descr, 1, 1, null, null, null, null, $current);
+    discover_sensor(null, 'voltage', $device, $current_oid, $index, 'powerlogic', $descr, 1, 1, null, null, null, null, $current);
 }
 
 if (is_numeric($data['vVbc'][1])) {
@@ -37,7 +37,7 @@ if (is_numeric($data['vVbc'][1])) {
     $index = 'vVbc';
     $descr = 'Line B to C';
     $current = $data['vVbc'][1];
-    discover_sensor($valid['sensor'], 'voltage', $device, $current_oid, $index, 'powerlogic', $descr, 1, 1, null, null, null, null, $current);
+    discover_sensor(null, 'voltage', $device, $current_oid, $index, 'powerlogic', $descr, 1, 1, null, null, null, null, $current);
 }
 
 if (is_numeric($data['vVca'][1])) {
@@ -45,7 +45,7 @@ if (is_numeric($data['vVca'][1])) {
     $index = 'vVca';
     $descr = 'Line C to A';
     $current = $data['vVca'][1];
-    discover_sensor($valid['sensor'], 'voltage', $device, $current_oid, $index, 'powerlogic', $descr, 1, 1, null, null, null, null, $current);
+    discover_sensor(null, 'voltage', $device, $current_oid, $index, 'powerlogic', $descr, 1, 1, null, null, null, null, $current);
 }
 
 if (is_numeric($data['vVan'][1])) {
@@ -53,7 +53,7 @@ if (is_numeric($data['vVan'][1])) {
     $index = 'vVan';
     $descr = 'Line A to neutral';
     $current = $data['vVan'][1];
-    discover_sensor($valid['sensor'], 'voltage', $device, $current_oid, $index, 'powerlogic', $descr, 1, 1, null, null, null, null, $current);
+    discover_sensor(null, 'voltage', $device, $current_oid, $index, 'powerlogic', $descr, 1, 1, null, null, null, null, $current);
 }
 
 if (is_numeric($data['vVbn'][1])) {
@@ -61,7 +61,7 @@ if (is_numeric($data['vVbn'][1])) {
     $index = 'vVbn';
     $descr = 'Line B to neutral';
     $current = $data['vVbn'][1];
-    discover_sensor($valid['sensor'], 'voltage', $device, $current_oid, $index, 'powerlogic', $descr, 1, 1, null, null, null, null, $current);
+    discover_sensor(null, 'voltage', $device, $current_oid, $index, 'powerlogic', $descr, 1, 1, null, null, null, null, $current);
 }
 
 if (is_numeric($data['vVcn'][1])) {
@@ -69,7 +69,7 @@ if (is_numeric($data['vVcn'][1])) {
     $index = 'vVcn';
     $descr = 'Line C to neutral';
     $current = $data['vVcn'][1];
-    discover_sensor($valid['sensor'], 'voltage', $device, $current_oid, $index, 'powerlogic', $descr, 1, 1, null, null, null, null, $current);
+    discover_sensor(null, 'voltage', $device, $current_oid, $index, 'powerlogic', $descr, 1, 1, null, null, null, null, $current);
 }
 
 unset($data);

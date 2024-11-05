@@ -26,10 +26,10 @@ if (isset($attrib_value) && set_dev_attrib(['device_id' => $device_id], $port_id
     $message = 'ERROR: Could not update';
 }
 exit(json_encode([
-    'status'       => $status,
-    'message'      => $message,
-    'attrib_type'  => $port_id_notes,
+    'status' => $status,
+    'message' => $message,
+    'attrib_type' => $port_id_notes,
     'attrib_value' => $attrib_value,
-    'device_id'    => $device_id,
+    'device_id' => $device_id,
 
 ]));

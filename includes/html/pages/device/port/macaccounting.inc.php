@@ -1,6 +1,7 @@
 <?php
 
 use LibreNMS\Config;
+use LibreNMS\Util\Mac;
 
 // FIXME - REWRITE!
 $hostname = $device['hostname'];
@@ -186,7 +187,7 @@ if ($vars['subview'] == 'top10') {
             echo '
       <table>
         <tr>
-          <td class=list-large width=200>' . \LibreNMS\Util\Rewrite::readableMac($acc['mac']) . '</td>
+          <td class=list-large width=200>' . Mac::parse($acc['mac'])->readable() . '</td>
           <td class=list-large width=200>' . $addy['ipv4_address'] . '</td>
           <td class=list-large width=500>' . $name . ' ' . $arp_name . '</td>
           <td class=list-large width=100>' . \LibreNMS\Util\Number::formatSi($acc['cipMacHCSwitchedBytes_input_rate'] / 8, 2, 3, 'bps') . '</td>

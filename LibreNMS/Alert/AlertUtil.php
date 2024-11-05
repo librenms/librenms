@@ -28,8 +28,8 @@ namespace LibreNMS\Alert;
 use App\Models\Device;
 use App\Models\User;
 use DeviceCache;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\DB;
 use LibreNMS\Config;
 use PHPMailer\PHPMailer\PHPMailer;
 
@@ -148,7 +148,7 @@ class AlertUtil
 
     public static function findContactsRoles(array $roles): array
     {
-        return User::whereIs(...$roles)->whereNot('email', '')->dumpRawSql()->pluck('realname', 'email')->toArray();
+        return User::whereIs(...$roles)->whereNot('email', '')->pluck('realname', 'email')->toArray();
     }
 
     public static function findContactsSysContact(array $results): array
@@ -156,7 +156,7 @@ class AlertUtil
         $contacts = [];
 
         foreach ($results as $result) {
-            $device = DeviceCache::get($result);
+            $device = DeviceCache::get($result['device_id']);
             $email = $device->getAttrib('override_sysContact_bool')
                 ? $device->getAttrib('override_sysContact_string')
                 : $device->sysContact;
@@ -168,28 +168,16 @@ class AlertUtil
 
     public static function findContactsOwners(array $results): array
     {
-        return User::whereNot('email', '')->whereIn('user_id', function (\Illuminate\Database\Query\Builder $query) use ($results) {
-            $tables = [
-                'bill_id' => 'bill_perms',
-                'port_id' => 'ports_perms',
-                'device_id' => 'devices_perms',
-            ];
-
-            $first = true;
-            foreach ($tables as $column => $table) {
-                $ids = array_filter(Arr::pluck($results, $column)); // find IDs for this type
-
-                if (! empty($ids)) {
-                    if ($first) {
-                        $query->select('user_id')->from($table)->whereIn($column, $ids);
-                        $first = false;
-                    } else {
-                        $query->union(DB::table($table)->select('user_id')->whereIn($column, $ids));
-                    }
-                }
+        return User::whereNot('email', '')->where(function (Builder $query) use ($results) {
+            if ($device_ids = array_filter(Arr::pluck($results, 'device_id'))) {
+                $query->orWhereHas('devicesOwned', fn ($q) => $q->whereIn('devices_perms.device_id', $device_ids));
             }
-
-            return $query;
+            if ($port_ids = array_filter(Arr::pluck($results, 'port_id'))) {
+                $query->orWhereHas('portsOwned', fn ($q) => $q->whereIn('ports_perms.port_id', $port_ids));
+            }
+            if ($bill_ids = array_filter(Arr::pluck($results, 'bill_id'))) {
+                $query->orWhereHas('bills', fn ($q) => $q->whereIn('bill_perms.bill_id', $bill_ids));
+            }
         })->pluck('realname', 'email')->all();
     }
 

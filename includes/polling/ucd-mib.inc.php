@@ -35,7 +35,10 @@ $ss = snmpwalk_cache_oid($device, 'systemStats', [], 'UCD-SNMP-MIB');
 if (isset($ss[0])) {
     $ss = $ss[0];
 
-    if (is_numeric($ss['ssCpuRawUser']) && is_numeric($ss['ssCpuRawNice']) && is_numeric($ss['ssCpuRawSystem']) && is_numeric($ss['ssCpuRawIdle'])) {
+    if (isset($ss['ssCpuRawUser']) && is_numeric($ss['ssCpuRawUser'])
+        && isset($ss['ssCpuRawNice']) && is_numeric($ss['ssCpuRawNice'])
+        && isset($ss['ssCpuRawSystem']) && is_numeric($ss['ssCpuRawSystem'])
+        && isset($ss['ssCpuRawIdle']) && is_numeric($ss['ssCpuRawIdle'])) {
         $rrd_def = RrdDefinition::make()
             ->addDataset('user', 'COUNTER', 0)
             ->addDataset('system', 'COUNTER', 0)
@@ -92,27 +95,27 @@ if (isset($ss[0])) {
     }
 
     // Set various graphs if we've seen the right OIDs.
-    if (is_numeric($ss['ssRawSwapIn'])) {
+    if (isset($ss['ssRawSwapIn']) && is_numeric($ss['ssRawSwapIn'])) {
         $os->enableGraph('ucd_swap_io');
     }
 
-    if (is_numeric($ss['ssIORawSent'])) {
+    if (isset($ss['ssIORawSent']) && is_numeric($ss['ssIORawSent'])) {
         $os->enableGraph('ucd_io');
     }
 
-    if (is_numeric($ss['ssRawContexts'])) {
+    if (isset($ss['ssRawContexts']) && is_numeric($ss['ssRawContexts'])) {
         $os->enableGraph('ucd_contexts');
     }
 
-    if (is_numeric($ss['ssRawInterrupts'])) {
+    if (isset($ss['ssRawInterrupts']) && is_numeric($ss['ssRawInterrupts'])) {
         $os->enableGraph('ucd_interrupts');
     }
 
-    if (is_numeric($ss['ssCpuRawWait'])) {
+    if (isset($ss['ssCpuRawWait']) && is_numeric($ss['ssCpuRawWait'])) {
         $os->enableGraph('ucd_io_wait');
     }
 
-    if (is_numeric($ss['ssCpuRawSteal'] ?? null)) {
+    if (isset($ss['ssCpuRawSteal']) && is_numeric($ss['ssCpuRawSteal'])) {
         $os->enableGraph('ucd_cpu_steal');
     }
 }
@@ -132,9 +135,9 @@ if (is_numeric($load_raw[2]['laLoadInt'] ?? null)) {
         ->addDataset('15min', 'GAUGE', 0);
 
     $fields = [
-        '1min'   => $load_raw[1]['laLoadInt'],
-        '5min'   => $load_raw[2]['laLoadInt'],
-        '15min'  => $load_raw[3]['laLoadInt'],
+        '1min' => $load_raw[1]['laLoadInt'],
+        '5min' => $load_raw[2]['laLoadInt'],
+        '15min' => $load_raw[3]['laLoadInt'],
     ];
 
     $tags = compact('rrd_def');

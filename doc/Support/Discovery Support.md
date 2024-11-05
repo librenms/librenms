@@ -96,8 +96,7 @@ Modules.
     lnms config:set discovery_modules.junose-atm-vp false
     lnms config:set discovery_modules.bgp-peers true
     lnms config:set discovery_modules.vlans true
-    lnms config:set discovery_modules.vmware-vminfo false
-    lnms config:set discovery_modules.libvirt-vminfo false
+    lnms config:set discovery_modules.vminfo false
     lnms config:set discovery_modules.printer-supplies false
     lnms config:set discovery_modules.ucd-diskio true
     lnms config:set discovery_modules.applications false
@@ -185,9 +184,7 @@ device, with history data.
 
 `slas`: SLA detection and support.
 
-`vmware-vminfo`: Detection of vmware guests on an ESXi host
-
-`libvirt-vminfo`: Detection of libvirt guests.
+`vminfo`: Detection of vm guests for VMware ESXi and libvert
 
 `printer-supplies`: Toner levels support.
 

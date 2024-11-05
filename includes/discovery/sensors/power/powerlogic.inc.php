@@ -30,7 +30,7 @@ if (is_numeric($data['pReal'][1])) {
     $descr = 'Power';
     $multiplier = 1000;
     $current = ($data['pReal'][1] * $multiplier);
-    discover_sensor($valid['sensor'], 'power', $device, $current_oid, $index, 'powerlogic', $descr, 1, $multiplier, null, null, null, null, $current);
+    discover_sensor(null, 'power', $device, $current_oid, $index, 'powerlogic', $descr, 1, $multiplier, null, null, null, null, $current);
 }
 
 unset($data);

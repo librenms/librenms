@@ -14,6 +14,8 @@ if (isset($vars['disk'])) {
     $disks = array_keys($app->data['disks']);
 }
 
+sort($disks);
+
 $smart_enhancements = ['id9', 'maxtemp', 'id232'];
 
 $int = 0;
@@ -30,8 +32,8 @@ while (isset($disks[$int])) {
     if (Rrd::checkRrdExists($rrd_filename)) {
         $rrd_list[] = [
             'filename' => $rrd_filename,
-            'descr'    => $disk,
-            'ds'       => $rrdVar,
+            'descr' => $disk,
+            'ds' => $rrdVar,
         ];
     }
     $int++;

@@ -35,6 +35,7 @@ T = Tune RRD files.
 | <1.5.5  | Yes       | G,U      |
 | >=1.5.5 | No        | G,C,U    |
 | >=1.6.x | No        | G,C,U    |
+| >=1.8.x | No        | G,C,U,T  |
 
 It is recommended that you monitor your LibreNMS server with LibreNMS
 so you can view the disk I/O usage delta.
@@ -244,18 +245,21 @@ require {
         type httpd_t;
         type rrdcached_t;
         type httpd_sys_rw_content_t;
-        class dir { add_name getattr remove_name rmdir search write };
-        class file { create getattr open read rename setattr unlink write };
+        class dir { add_name getattr open read remove_name rmdir search write };
+        class file { create getattr open read rename setattr unlink write map lock };
         class sock_file { create setattr unlink write };
         class capability { fsetid sys_resource };
+        class unix_stream_socket connectto;
 }
  
 #============= rrdcached_t ==============
  
 allow rrdcached_t httpd_sys_rw_content_t:dir { add_name getattr remove_name search write };
-allow rrdcached_t httpd_sys_rw_content_t:file { create getattr open read rename setattr unlink write };
+allow rrdcached_t httpd_sys_rw_content_t:file { create getattr open read rename setattr unlink write map lock };
 allow rrdcached_t self:capability fsetid;
 allow rrdcached_t var_run_t:sock_file { create setattr unlink };
+allow httpd_t var_run_t:sock_file write;
+allow httpd_t rrdcached_t:unix_stream_socket connectto;
 EOF
 
 checkmodule -M -m -o rrdcached_librenms.mod rrdcached_librenms.te
@@ -322,7 +326,7 @@ service rrdcached start
 Check to see if the graphs are being drawn in LibreNMS. This might take a few minutes.
 After at least one poll cycle (5 mins), check the LibreNMS disk I/O performance delta.
 Disk I/O can be found under the menu Devices>All Devices>[localhost
-hostname](../Installation/Installation-CentOS-7-Apache.md)>Health>Disk I/O.
+hostname]>Health>Disk I/O.
 
 Depending on many factors, you should see the Ops/sec drop by ~30-40%.
 

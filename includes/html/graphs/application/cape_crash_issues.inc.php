@@ -28,39 +28,39 @@ $rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Min',
-        'ds'       => 's0crash_issues',
+        'descr' => 'Min',
+        'ds' => 's0crash_issues',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Max',
-        'ds'       => 's1crash_issues',
+        'descr' => 'Max',
+        'ds' => 's1crash_issues',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Mean',
-        'ds'       => 's3crash_issues',
+        'descr' => 'Mean',
+        'ds' => 's3crash_issues',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Median',
-        'ds'       => 's4crash_issues',
+        'descr' => 'Median',
+        'ds' => 's4crash_issues',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Mode',
-        'ds'       => 's5crash_issues',
+        'descr' => 'Mode',
+        'ds' => 's5crash_issues',
     ];
     if ($vars['stddev'] == 'on') {
         $rrd_list[] = [
             'filename' => $rrd_filename,
-            'descr'    => 'StdDev',
-            'ds'       => 's7crash_issues',
+            'descr' => 'StdDev',
+            'ds' => 's7crash_issues',
         ];
         $rrd_list[] = [
             'filename' => $rrd_filename,
-            'descr'    => 'StdDevP',
-            'ds'       => 's9crash_issues',
+            'descr' => 'StdDevP',
+            'ds' => 's9crash_issues',
         ];
     }
 } else {

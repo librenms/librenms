@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\Sensor;
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Log;
@@ -25,21 +26,25 @@ class AppServiceProvider extends ServiceProvider
         $this->registerFacades();
         $this->registerGeocoder();
 
-        $this->app->singleton('permissions', function ($app) {
+        $this->app->singleton('permissions', function () {
             return new PermissionsCache();
         });
-        $this->app->singleton('device-cache', function ($app) {
+        $this->app->singleton('device-cache', function () {
             return new \LibreNMS\Cache\Device();
         });
-        $this->app->singleton('git', function ($app) {
+        $this->app->singleton('git', function () {
             return new \LibreNMS\Util\Git();
         });
 
-        $this->app->bind(\App\Models\Device::class, function () {
+        $this->app->bind(\App\Models\Device::class, function (Application $app) {
             /** @var \LibreNMS\Cache\Device $cache */
-            $cache = $this->app->make('device-cache');
+            $cache = $app->make('device-cache');
 
             return $cache->hasPrimary() ? $cache->getPrimary() : new \App\Models\Device;
+        });
+
+        $this->app->singleton('sensor-discovery', function (Application $app) {
+            return new \App\Discovery\Sensor($app->make('device-cache')->getPrimary());
         });
     }
 
@@ -50,8 +55,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        \Illuminate\Pagination\Paginator::useBootstrap();
-
         $this->bootCustomBladeDirectives();
         $this->bootCustomValidators();
         $this->configureMorphAliases();
@@ -139,9 +142,11 @@ class AppServiceProvider extends ServiceProvider
     {
         \App\Models\Device::observe(\App\Observers\DeviceObserver::class);
         \App\Models\Package::observe(\App\Observers\PackageObserver::class);
+        \App\Models\Sensor::observe(\App\Observers\SensorObserver::class);
         \App\Models\Service::observe(\App\Observers\ServiceObserver::class);
         \App\Models\Stp::observe(\App\Observers\StpObserver::class);
         \App\Models\User::observe(\App\Observers\UserObserver::class);
+        \App\Models\Vminfo::observe(\App\Observers\VminfoObserver::class);
     }
 
     private function bootCustomValidators()

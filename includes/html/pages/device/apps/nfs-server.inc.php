@@ -18,10 +18,10 @@ print_optionbar_start();
 echo "<span style='font-weight: bold;'>" . $app->displayName() . '</span> &#187; ';
 
 $app_sections = [
-    'default'  => 'NFS',
-    'proc2'  => 'NFS v2',
-    'proc3'  => 'NFS v3',
-    'proc4'  => 'NFS v4',
+    'default' => 'NFS',
+    'proc2' => 'NFS v2',
+    'proc3' => 'NFS v3',
+    'proc4' => 'NFS v4',
 ];
 
 unset($sep);

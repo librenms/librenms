@@ -86,7 +86,7 @@ if ($vlanversion == 'version1' || $vlanversion == '2') {
                 'vlan_domain' => $vtpdomain_id,
                 'vlan_vlan' => $jet_vlan_id,
                 'vlan_name' => $jet_vlan_data['dot1qVlanDescription'],
-                'vlan_type' => ['NULL'],
+                'vlan_type' => null,
             ], 'vlans');
 
             log_event('VLAN added: ' . $jet_vlan_data['dot1qVlanDescription'] . ", $jet_vlan_id", $device, 'vlan');

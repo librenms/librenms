@@ -26,7 +26,9 @@
 namespace LibreNMS\Interfaces;
 
 use App\Models\Device;
+use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\OS;
+use LibreNMS\Polling\ModuleStatus;
 
 interface Module
 {
@@ -34,6 +36,16 @@ interface Module
      * An array of all modules this module depends on
      */
     public function dependencies(): array;
+
+    /**
+     * Should this module be run?
+     */
+    public function shouldDiscover(OS $os, ModuleStatus $status): bool;
+
+    /**
+     * Should polling run for this device?
+     */
+    public function shouldPoll(OS $os, ModuleStatus $status): bool;
 
     /**
      * Discover this module. Heavier processes can be run here
@@ -49,8 +61,14 @@ interface Module
      * Run frequently (default every 5 minutes)
      *
      * @param  \LibreNMS\OS  $os
+     * @param  \LibreNMS\Interfaces\Data\DataStorageInterface  $datastore
      */
-    public function poll(OS $os): void;
+    public function poll(OS $os, DataStorageInterface $datastore): void;
+
+    /**
+     * Check if data exists for this module
+     */
+    public function dataExists(Device $device): bool;
 
     /**
      * Remove all DB data for this module.
@@ -58,16 +76,16 @@ interface Module
      *
      * @param  \App\Models\Device  $device
      */
-    public function cleanup(Device $device): void;
+    public function cleanup(Device $device): int;
 
     /**
      * Dump current module data for the given device for tests.
      * Make sure to hide transient fields, such as id and date.
      * You should always order the data by a non-transient column.
      * Some id fields may need to be joined to tie back to non-transient data.
-     * Module may return false if testing is not supported or required.
+     * Module may return null if testing is not supported or required.
      *
-     * @return array|false
+     * @param  string  $type  Type is either discovery or poller
      */
-    public function dump(Device $device);
+    public function dump(Device $device, string $type): ?array;
 }

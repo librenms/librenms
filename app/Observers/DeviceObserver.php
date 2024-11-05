@@ -7,6 +7,7 @@ use App\ApiClients\Oxidized;
 use App\Models\Device;
 use App\Models\Eventlog;
 use File;
+use LibreNMS\Config;
 use LibreNMS\Enum\Severity;
 use Log;
 
@@ -32,16 +33,13 @@ class DeviceObserver
      */
     public function updated(Device $device): void
     {
-        // handle device dependency updates
-        if ($device->isDirty('max_depth')) {
-            $device->children->each->updateMaxDepth();
-        }
-
         // log up/down status changes
         if ($device->isDirty(['status', 'status_reason'])) {
             $type = $device->status ? 'up' : 'down';
             $reason = $device->status ? $device->getOriginal('status_reason') : $device->status_reason;
-            Eventlog::log('Device status changed to ' . ucfirst($type) . " from $reason check.", $device, $type);
+            $polled_by = Config::get('distributed_poller') ? (' by ' . \config('librenms.node_id')) : '';
+
+            Eventlog::log(sprintf('Device status changed to %s from %s check%s.', ucfirst($type), $reason, $polled_by), $device, $type);
         }
 
         // key attribute changes
@@ -139,7 +137,6 @@ class DeviceObserver
         $device->ospfPorts()->delete();
         $device->outages()->delete();
         $device->packages()->delete();
-        $device->perf()->delete();
         $device->portsFdb()->delete();
         $device->portsNac()->delete();
         \DB::table('ports_stack')->where('device_id', $device->device_id)->delete();

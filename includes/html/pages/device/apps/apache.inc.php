@@ -1,9 +1,9 @@
 <?php
 
 $graphs = [
-    'apache_bits'       => 'Traffic',
-    'apache_hits'       => 'Hits',
-    'apache_cpu'        => 'CPU Utilisation',
+    'apache_bits' => 'Traffic',
+    'apache_hits' => 'Hits',
+    'apache_cpu' => 'CPU Utilisation',
     'apache_scoreboard' => 'Scoreboard Statistics',
 ];
 

@@ -1,9 +1,9 @@
 -- ==================================================================
--- Copyright (C) 2017 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2021 by  HUAWEI TECHNOLOGIES. All rights reserved.
 --
 -- Description:  HUAWEI Layer Two mac management MIB
 -- Reference:
--- Version: V2.32
+-- Version: V2.52
 -- History:
 --
 -- ==================================================================
@@ -38,12 +38,14 @@ IMPORTS
     EnableValue
         FROM NQA-MIB
    hwVplsVsiName
-        FROM HUAWEI-VPLS-EXT-MIB;
+        FROM HUAWEI-VPLS-EXT-MIB
+   hwL2Mgmt    
+        FROM HUAWEI-MSTP-MIB;
 
-    hwL2Mgmt OBJECT IDENTIFIER ::= { hwDatacomm 42 }
+    --hwL2Mgmt OBJECT IDENTIFIER ::= { hwDatacomm 42 }
 
     hwL2MAM MODULE-IDENTITY
-            LAST-UPDATED "201708170000Z"
+            LAST-UPDATED "202111050000Z"
             ORGANIZATION 
                     "Huawei Technologies Co.,Ltd."
             CONTACT-INFO
@@ -54,17 +56,94 @@ IMPORTS
                        Website: http://www.huawei.com
                        Email: support@huawei.com
                      "
-
-           DESCRIPTION
+            DESCRIPTION
                     "This is the layer 2 mac-address management. It contains the layer 2
                     mac-address forwarding information currently operating on this device.
                     And also contains the information of mac-limit rule. "
-          
+			
+        REVISION    "202111050000Z"
+            DESCRIPTION
+                    "change hwMacHopAlarmRisingThreshold to hwMacHopAlarmRaisingThreshold."
+
+        REVISION    "202109100000Z"
+            DESCRIPTION
+                    "add  hwPortSecRcvInsecurePktAlarmResume."
+
+        REVISION    "202102200000Z"
+            DESCRIPTION
+                    "modify  hwBdMacLimitMaxMac and hwVxlanTnlMacLimitMaxMac."
+
+        REVISION    "202102060000Z"
+            DESCRIPTION
+                    "modify hwVlanMacLimitOverThreshold and hwVlanMacLimitOverThresholdResume, hwPortMacLimitOverThreshold and hwPortMacLimitOverThresholdResume."
+
+        REVISION    "202101070000Z"
+            DESCRIPTION
+                    "Add hwNotSupportTeOverGre."
+
+        REVISION    "202012090000Z"
+            DESCRIPTION
+                    "Add hwVlanMacLimitOverThreshold and hwVlanMacLimitOverThresholdResume, hwPortMacLimitOverThreshold and hwPortMacLimitOverThresholdResume."
+
+        REVISION    "202007240000Z"        
+            DESCRIPTION
+                    "Modify the description of node hwBdMacLimitOverThresholdAlarm"
+
+        REVISION     "201810240000Z"
+            DESCRIPTION
+                    "modify hwMacHop"
+
+        REVISION     "201806260000Z"
+            DESCRIPTION
+                    "modify hwDiscription to hwDescription"
+
+        REVISION     "201806140000Z"
+            DESCRIPTION
+                    "add hwServiceNotSupportDscpSrte"	
+
+        REVISION     "201805310000Z"
+            DESCRIPTION
+                    "add hwTunnelNotSupportInterface"
+
+        REVISION     "201804020000Z"
+           DESCRIPTION
+                    "Change hwMacAccountStatisticMacAddr MAX-ACCESS."
+        REVISION     "201803160000Z"
+           DESCRIPTION
+                    "Change import hwL2Mgmt." 
+        REVISION     "201802240000Z"
+           DESCRIPTION
+                    "Change hwMacVsiStatisticsVsiName MAX-ACCESS type." 
+        REVISION     "201802070000Z"
+           DESCRIPTION
+                    "Add alarm node hwVxlanTunnelMacLimitOverThresholdAlarm and hwVxlanTunnelMacLimitOverThresholdAlarmResume. " 
+           REVISION     "201801190000Z" 
+           DESCRIPTION       
+                    "Change the description of nodes"
+
+           REVISION     "201711290000Z" 
+           DESCRIPTION       
+                    "add alarm node hwL2DomainMacLimitNumRaisingThreshold and hwL2DomainMacLimitNumFallingThreshold,
+                     add hwL2DomainMacLimitAlarmTable"
+
+           REVISION     "201711130000Z" 
+           DESCRIPTION       
+                    "Modify hwMacIfStatisticsGroup,hwMacSlotStatisticsGroup,hwMacVlanStatisticsGroup,hwMacVsiStatisticsGroup." 
+           REVISION     "201710170000Z" 
+           DESCRIPTION       
+                    "add hwBroadcastDomainElbTable,
+                     add alarm node hwBroadcastDomainElbAlarm and hwBroadcastDomainElbAlarmResume" 
+
+         REVISION     "201708230000Z" 
+           DESCRIPTION       
+                    "add hwVllNotSupportTunnelTable,
+                     add alarm node hwVllVpnQosOverTunnelAlarm and hwVllVpnQosOverTunnelAlarmResume" 
+         
           REVISION     "201708170000Z" 
             DESCRIPTION       
                      "Change the description of nodes"
 
-		  REVISION     "201707210000Z" 
+         REVISION     "201707210000Z" 
             DESCRIPTION       
                      "Change the parameter sequence of hwNotSupportTunnelType"
 
@@ -118,10 +197,10 @@ IMPORTS
                     "add BdId and EvpnId to hwMacLimitNumRaisingThreshold and hwMacLimitNumFallingThreshold"
         REVISION     "201607040000Z"
            DESCRIPTION
-		             "modify compile error"			
-		REVISION     "201602240000Z"
+	"modify compile error"			
+       REVISION     "201602240000Z"
            DESCRIPTION
-		             "Add hwBoardServiceMisMatchGenerate and hwBoardServiceMisMatchCancel"
+	"Add hwBoardServiceMisMatchGenerate and hwBoardServiceMisMatchCancel"
         REVISION     "201601040000Z"
            DESCRIPTION
                     "Add hwPwSourceTunnelCheckAlarm and hwPwSourceTunnelCheckResume,hwPwSourceTunnelNoTeCheckAlarm and hwPwSourceTunnelNoTeCheckResume"		    
@@ -155,15 +234,15 @@ IMPORTS
          REVISION     "201406060945Z"
            DESCRIPTION
                     "Delet alarm node hwVllByPassPWOverGRENotSupportForwardRising. "
-          REVISION     "201401210000Z"
-           DESCRIPTION
-                    "Add hwMacHopPort of hwMacHopAlarmTable . "
-           REVISION     "201405100000Z"
+         REVISION     "201405100000Z"
            DESCRIPTION
                     "Delete hwMacHopMac  and hwMacHopSlotId of hwMacHopAlarmTable . "
            REVISION     "201403130000Z"
             DESCRIPTION
                     "Add hwMacHopAlarmTable and two traps hwMacHopAlarmRisingThreshold and hwMacHopAlarmFallingThreshold for Mac hop alram. "
+         REVISION     "201401210000Z"
+           DESCRIPTION
+                    "Add hwMacHopPort of hwMacHopAlarmTable . "
             REVISION     "201309070000Z"
             DESCRIPTION  "Fix the errors checked by a tool."
             REVISION     "201305240000Z"
@@ -221,7 +300,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
                 MAX-ACCESS not-accessible
                 STATUS current
                 DESCRIPTION
-                        "This table is used to configure a VLAN-based, VSI-based, global blackhole-based MAC addresses, and static MAC addresses table."
+                        "This table is used to configure a VLAN-based, VSI-based, or global blackhole-based MAC address table or static MAC address table."
                 ::= { hwL2MAMObjects 2 }
 
         hwdbCfgFdbEntry OBJECT-TYPE
@@ -262,7 +341,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
                 MAX-ACCESS not-accessible
                 STATUS current
                 DESCRIPTION
-                        "The object indicates the unicast MAC address entry in the static MAC address table."
+                        "This object indicates unicast MAC entries in the static MAC address table."
                 ::= { hwdbCfgFdbEntry 1 }
 
         hwCfgFdbVlanId OBJECT-TYPE
@@ -270,7 +349,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
                 MAX-ACCESS not-accessible
                 STATUS current
                 DESCRIPTION
-                        "The object indicates the VLAN ID related to the static MAC address table. The value ranges from 0 to 4094."
+                        "This object indicates the VLAN ID related to the static MAC address table. The value ranges from 0 to 4094."
                 ::= { hwdbCfgFdbEntry 2 }
 
         hwCfgFdbVsiName OBJECT-TYPE
@@ -278,8 +357,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
                 MAX-ACCESS not-accessible
                 STATUS current
                 DESCRIPTION
-                        "The VSI-ID or other identifier referring to the VSI
-                        which is correlative to the hwFdbMac."
+                        "This object indicates the VSI name related to the static MAC address table."
                 ::= { hwdbCfgFdbEntry 3 }
 
         hwCfgFdbPort OBJECT-TYPE
@@ -287,7 +365,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
                 MAX-ACCESS read-create
                 STATUS current
                 DESCRIPTION
-                        "This object indicates the index of the forwarding interface. The interface must be an Ethernet interface. The interface must belong to a specific VLAN or allows the VLAN to pass through. The value 0 indicates the blackhole MAC address entry."
+                        "This object indicates the port index of the forwarding port. The port must be of the Ethernet type. The port must belong to a VLAN or permits packets with a specific VLAN ID to pass. The value is 0 for blackhole entries."
                 ::= { hwdbCfgFdbEntry 4 }
 
         hwCfgFdbType OBJECT-TYPE
@@ -299,7 +377,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
                 MAX-ACCESS read-create
                 STATUS current
                 DESCRIPTION
-                        "The object indicates the type of a MAC address entry. The object is not created when a MAC address entry is dynamic."
+                        "This object indicates the MAC entry type. This object cannot be created if the MAC entry is dynamic."
                 ::= { hwdbCfgFdbEntry 5 }
 
         hwCfgFdbRowstatus OBJECT-TYPE
@@ -307,7 +385,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
                 MAX-ACCESS read-create
                 STATUS current
                 DESCRIPTION
-                        "The operating state of the row."
+                        "This object indicates the operating status."
                 ::= { hwdbCfgFdbEntry 6 }
 
         hwCfgFdbAtmPort OBJECT-TYPE
@@ -354,7 +432,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
                 MAX-ACCESS not-accessible
                 STATUS current
                 DESCRIPTION
-                        "This table is used to manage a dynamic MAC address table. The device automatically creates and ages the data in the table. The user cannot add, but can delete the data."
+                        "This table is used to manage a device's dynamic MAC address table. Data in this table is generated after the device automatically learns MAC addresses and ages. Data in this table can be deleted instead of being added by users."
                 ::= { hwL2MAMObjects 3 }
 
         hwdbDynFdbEntry OBJECT-TYPE
@@ -393,7 +471,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
                 MAX-ACCESS not-accessible
                 STATUS current
                 DESCRIPTION
-                        "The object indicates the unicast MAC address entry in the dynamic MAC address table."
+                        "This object indicates unicast MAC addresses in the dynamic MAC address table."
                 ::= { hwdbDynFdbEntry 1 }
 
         hwDynFdbVlanId OBJECT-TYPE
@@ -401,8 +479,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
                 MAX-ACCESS not-accessible
                 STATUS current
                 DESCRIPTION
-                        "The VLAN name or other identifier referring to the VLAN
-                        which is correlative to the hwFdbMac."
+                        "This object indicates the VLAN ID related to the dynamic MAC address table."
                 ::= { hwdbDynFdbEntry 2 }
 
         hwDynFdbVsiName OBJECT-TYPE
@@ -410,8 +487,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
                 MAX-ACCESS not-accessible
                 STATUS current
                 DESCRIPTION
-                        "The VSI-ID or other identifier referring to the VSI
-                        which is correlative to the hwFdbMac."
+                        "This object indicates the VSI name related to the dynamic MAC address table."
                 ::= { hwdbDynFdbEntry 3 }
 
         hwDynFdbPort OBJECT-TYPE
@@ -419,7 +495,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
                 MAX-ACCESS read-create
                 STATUS current
                 DESCRIPTION
-                        "This object indicates the index of the forwarding interface. The interface must be an Ethernet interface."
+                        "This object indicates the port index of the forwarding port. The port must be of the Ethernet type."
                 ::= { hwdbDynFdbEntry 4 }
 
         hwDynFdbAtmPort OBJECT-TYPE
@@ -451,7 +527,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
                 MAX-ACCESS read-create
                 STATUS current
                 DESCRIPTION
-                        "The operating state of the row."
+                        "This object indicates the operating status."
                 ::= { hwdbDynFdbEntry 8 }
                 
         hwDynSecurityFdbToStaticEnable  OBJECT-TYPE
@@ -459,8 +535,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
                 MAX-ACCESS      read-create
                 STATUS          current
                 DESCRIPTION
-                    "When this object is set to 'Enable(1)',if port security is enabled ,
-                the dynamic mac will convert to static."
+                    "This object indicates whether dynamic MAC entries are converted into static MAC entries."
                 ::= { hwdbDynFdbEntry 9 }                                                                     
                                               
   -- MacLimit
@@ -634,7 +709,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
                 MAX-ACCESS accessible-for-notify
                 STATUS current
                 DESCRIPTION
-                        "The EVPN name which will be configured mac-limit."
+                        "This object indicates that the number of MAC addresses learned by the interface fell below the upper limit."
                 ::= { hwMacLimitEntry 13 }
         
         hwMacUsageTable OBJECT-TYPE
@@ -642,7 +717,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
                 MAX-ACCESS not-accessible
                 STATUS current
                 DESCRIPTION 
-                "MAC usage table"
+                "This table is used to query Layer 2 information on a board."
                 ::= { hwL2MAMObjects 5 }
 
         hwMacUsageEntry OBJECT-TYPE
@@ -667,7 +742,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
                MAX-ACCESS read-only
                STATUS current
                DESCRIPTION
-               "MAC usage in every IO board"
+               "This object indicates the utilization ratio of the MAC address table on each interface board."
                ::= { hwMacUsageEntry 1 }
 
        hwMacEntityUsageThreshold OBJECT-TYPE
@@ -675,7 +750,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
                MAX-ACCESS read-write
                STATUS current
                DESCRIPTION
-               "MAC usage range"
+               "This object indicates that the MAC address usage fell below the alarm threshold."
         ::= { hwMacUsageEntry 2 }
 
     -- hwMacHopAlarmTable
@@ -715,6 +790,10 @@ VlanIndex ::= TEXTUAL-CONVENTION
                         hwMacHopPWInfo
                                 OCTET STRING,
                         hwMacHopDetectMac
+                                OCTET STRING,
+                        hwMacHopTrustPort
+                                OCTET STRING, 
+                        hwMacHopTrustPeer
                                 OCTET STRING
                        }
 
@@ -739,7 +818,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
                 MAX-ACCESS accessible-for-notify
                 STATUS current
                 DESCRIPTION
-                        "The BD id of mac hop."
+                        "This object indicates that the MAC address flapping alarm is cleared."
                 ::= { hwMacHopAlarmEntry 3 }
                 
         hwMacHopPortName1 OBJECT-TYPE
@@ -787,16 +866,31 @@ VlanIndex ::= TEXTUAL-CONVENTION
                 MAX-ACCESS accessible-for-notify
                 STATUS current
                 DESCRIPTION
-                        "The Mac Address Of Hopping."
+                        "This object indicates the MAC address flapping alarm."
                 ::= { hwMacHopAlarmEntry 9 } 				
-                 
+        hwMacHopTrustPort OBJECT-TYPE
+                SYNTAX OCTET STRING (SIZE (1..31))
+                MAX-ACCESS accessible-for-notify
+                STATUS current
+                DESCRIPTION
+                        "The trust Port name of Mac-hopping."
+                ::= { hwMacHopAlarmEntry 10 }                
+        
+         hwMacHopTrustPeer OBJECT-TYPE
+                SYNTAX OCTET STRING (SIZE (1..512))
+                MAX-ACCESS accessible-for-notify
+                STATUS current
+                DESCRIPTION
+                        "The trust PW info of Mac-hopping."
+                ::= { hwMacHopAlarmEntry 11 }
+				         
   -- hwBoardServiceMisMatchAlarmTable
         hwBoardServiceMisMatchAlarmTable OBJECT-TYPE
                 SYNTAX SEQUENCE OF HwBoardServiceMisMatchAlarmEntry
                 MAX-ACCESS not-accessible
                 STATUS current
                 DESCRIPTION
-                        "The table is used to define variables in traps."
+                        "This table is used to query the information table about the alarm that the interface board does not support this service."
                 ::= { hwL2MAMObjects 44 }
 
         hwBoardServiceMisMatchAlarmEntry OBJECT-TYPE
@@ -819,7 +913,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
               MAX-ACCESS accessible-for-notify
               STATUS current
               DESCRIPTION
-                  "The service name."
+                  "This object indicates the feature name."
               ::= {hwBoardServiceMisMatchAlarmEntry 1} 
               
         hwBoardServiceMisMatchPrecautions OBJECT-TYPE
@@ -827,7 +921,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
               MAX-ACCESS accessible-for-notify
               STATUS current
               DESCRIPTION
-                  "Give precautions to users."
+                  "This object indicates the call information."
               ::= {hwBoardServiceMisMatchAlarmEntry 2}
   
        hwEVPNNotSupportTunnelTable OBJECT-TYPE        
@@ -835,7 +929,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
               MAX-ACCESS not-accessible               
               STATUS current               
               DESCRIPTION               
-                  "A table containing the EVPN information for device."               
+                  "This table is used to manage information about the alarm for tunnel types that the EVPN public network does not support."               
               ::= { hwL2MAMObjects 45 }
 
         hwEVPNNotSupportTunnelEntry OBJECT-TYPE               
@@ -863,7 +957,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
                 MAX-ACCESS accessible-for-notify
                 STATUS current
                 DESCRIPTION
-                        "The remote ip address of the EVPN."
+                        "This object indicates the remote IP address of the EVPN public network."
                 ::= { hwEVPNNotSupportTunnelEntry 1 }   
  
          hwNotSupportTunnelEvpnName OBJECT-TYPE               
@@ -871,7 +965,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
                MAX-ACCESS accessible-for-notify               
                STATUS current               
                DESCRIPTION               
-                  "The EVPN name which can not forward traffic."        
+                  "This object indicates the name of the EVPN public network that does not support traffic forwarding."        
                ::= { hwEVPNNotSupportTunnelEntry 2  }      
 
         hwVPLSNotSupportTunnelTable OBJECT-TYPE        
@@ -879,7 +973,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
               MAX-ACCESS not-accessible               
               STATUS current               
               DESCRIPTION               
-                 "A table containing the VPLS information for device."               
+                 "This table is used to manage tunnels that the VPLS public network does not support."               
               ::= { hwL2MAMObjects 46 }     
 
         hwVPLSNotSupportTunnelEntry OBJECT-TYPE               
@@ -908,7 +1002,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
              MAX-ACCESS accessible-for-notify       
              STATUS current       
              DESCRIPTION       
-	"The PW ID which will be configured."       
+	"This object indicates the PW index."       
              ::= { hwVPLSNotSupportTunnelEntry 1 }     
 
          hwPWPeerRemoteIp OBJECT-TYPE
@@ -916,7 +1010,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
                 MAX-ACCESS accessible-for-notify
                 STATUS current
                 DESCRIPTION
-                        "The remote ip address of the VPLS PW."
+                        "This object indicates the remote IP address."
                 ::= { hwVPLSNotSupportTunnelEntry 2 }    
 	
          hwNotSupportTunnelVSIName OBJECT-TYPE               
@@ -924,7 +1018,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
               MAX-ACCESS accessible-for-notify               
               STATUS current               
               DESCRIPTION               
-	"The VSI name which can not forward traffic."        
+	"This object indicates the VSI name."        
               ::= { hwVPLSNotSupportTunnelEntry 3 }         
 
         hwNotSupportTunnelType OBJECT-TYPE        
@@ -939,7 +1033,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
             MAX-ACCESS accessible-for-notify
             STATUS current
             DESCRIPTION
-                "The forwarding tunnel type which can not be supported."
+                "This object indicates the alarm that the EVPN public network does not support traffic forwarding."
               ::= { hwL2MAMObjects 47 }     
 
         hwNodeSrteLoadBanlanceTable OBJECT-TYPE
@@ -947,7 +1041,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
                 MAX-ACCESS not-accessible
                 STATUS current
                 DESCRIPTION
-                        "The table is used to define variables in traps."
+                        "This table is used to manage parameters of alarms that are generated because load balancing among node SR TE tunnels is not supported."
                 ::= { hwL2MAMObjects 51 }
 
         hwNodeSrteLoadBanlanceEntry OBJECT-TYPE
@@ -970,7 +1064,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
               MAX-ACCESS accessible-for-notify
               STATUS current
               DESCRIPTION
-                  "The tunnel name."
+                  "This object indicates the tunnel name."
               ::= {hwNodeSrteLoadBanlanceEntry 1} 
 
         hwNodeSrteServiceName OBJECT-TYPE
@@ -978,10 +1072,127 @@ VlanIndex ::= TEXTUAL-CONVENTION
               MAX-ACCESS accessible-for-notify
               STATUS current
               DESCRIPTION
-                  "The service Name."
+                  "This object indicates the service name."
               ::= {hwNodeSrteLoadBanlanceEntry 2}
 
+-- service not support  dscp srte
+       hwServiceNotSupportDscpSrteTable OBJECT-TYPE
+                SYNTAX SEQUENCE OF HwServiceNotSupportDscpSrteEntry
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "This table is used to manage parameters of alarms that are generated because DSCP SRTE is not supported for service."
+                ::= { hwL2MAMObjects 58 }
 
+        hwServiceNotSupportDscpSrteEntry OBJECT-TYPE
+                SYNTAX HwServiceNotSupportDscpSrteEntry
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "Entry of Service Not Support DSCP SRTE table."
+                INDEX { hwDscpSrteServiceName }
+                ::= { hwServiceNotSupportDscpSrteTable 1 }
+
+        HwServiceNotSupportDscpSrteEntry ::=
+                SEQUENCE {
+                         hwDscpSrteServiceName OCTET STRING 
+                       }
+
+        hwDscpSrteServiceName OBJECT-TYPE
+              SYNTAX  OCTET STRING(SIZE (0..31)) 
+              MAX-ACCESS accessible-for-notify
+              STATUS current
+              DESCRIPTION
+                  "This object indicates the service name."
+              ::= {hwServiceNotSupportDscpSrteEntry 1}
+
+-- service not support dscp srte 
+
+
+-- tunnel not support inferface 
+
+        hwTunnelNotSupportInterfaceTable OBJECT-TYPE
+                SYNTAX SEQUENCE OF HwTunnelNotSupportInterfaceEntry
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "The table is used to define variables in traps."
+                ::= { hwL2MAMObjects 57 }
+
+        hwTunnelNotSupportInterfaceEntry OBJECT-TYPE
+                SYNTAX HwTunnelNotSupportInterfaceEntry
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "Entry of Tunnel table."
+                INDEX { hwTunnelName ,  hwNotSupIfName, hwDescription }
+                ::= { hwTunnelNotSupportInterfaceTable 1 }
+
+        HwTunnelNotSupportInterfaceEntry ::=
+                SEQUENCE {
+                         hwTunnelName OCTET STRING,
+                         hwNotSupIfName OCTET STRING ,
+                         hwDescription OCTET STRING 
+                       }
+
+        hwTunnelName OBJECT-TYPE
+              SYNTAX  OCTET STRING(SIZE (0..31)) 
+              MAX-ACCESS accessible-for-notify
+              STATUS current
+              DESCRIPTION
+                  "The tunnel name."
+              ::= {hwTunnelNotSupportInterfaceEntry 1} 
+
+        hwNotSupIfName OBJECT-TYPE
+              SYNTAX  OCTET STRING(SIZE (0..31)) 
+              MAX-ACCESS accessible-for-notify
+              STATUS current
+              DESCRIPTION
+                  "The interface Name."
+              ::= {hwTunnelNotSupportInterfaceEntry 2}
+
+        hwDescription OBJECT-TYPE
+              SYNTAX  OCTET STRING(SIZE (0..31)) 
+              MAX-ACCESS accessible-for-notify
+              STATUS current
+              DESCRIPTION
+                  "The interface Name."
+              ::= {hwTunnelNotSupportInterfaceEntry 3}
+
+-- tunnel not support inferface 
+
+-- not support  te over gre
+       hwNotSupportTeOverGreTable OBJECT-TYPE
+                SYNTAX SEQUENCE OF HwNotSupportTeOverGreEntry 
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "This table is used to manage parameters of alarms that are generated because DSCP SRTE is not supported for service."
+                ::= { hwL2MAMObjects 59 }
+
+        hwNotSupportTeOverGreEntry OBJECT-TYPE
+                SYNTAX HwNotSupportTeOverGreEntry
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "Entry of not support te over gre table."
+                INDEX { hwMplsBoardId }
+                ::= { hwNotSupportTeOverGreTable 1 }
+
+        HwNotSupportTeOverGreEntry ::=
+                SEQUENCE {
+                         hwMplsBoardId OCTET STRING 
+                       }
+
+        hwMplsBoardId OBJECT-TYPE
+              SYNTAX  OCTET STRING(SIZE (0..31)) 
+              MAX-ACCESS accessible-for-notify
+              STATUS current
+              DESCRIPTION
+                  "This object indicates the slot id."
+              ::= {hwNotSupportTeOverGreEntry 1}
+
+-- not support  te over gre
 
 --vll vpn qos not support tunnel 
         hwVllVpnQosNotSupportTunnelTable OBJECT-TYPE
@@ -1133,42 +1344,91 @@ VlanIndex ::= TEXTUAL-CONVENTION
                 DESCRIPTION "The bd id which will be configured mac-limit."
                 ::= { hwL2MAMObjects 40 }  
         hwBdMacLimitMaxMac OBJECT-TYPE
-                SYNTAX MacAddress
+                SYNTAX Integer32
                 MAX-ACCESS accessible-for-notify
                 STATUS current
                 DESCRIPTION "The maximum mac address. When the value is '0',
                         the meaning is that there isn't limiting rule to
                         the mac-address number."
                 ::= { hwL2MAMObjects 41 }  
-           
+        hwVxlanTnlMacLimitSourceIp OBJECT-TYPE
+                SYNTAX IpAddress
+                MAX-ACCESS accessible-for-notify
+                STATUS current
+                DESCRIPTION "The vxlan tunnel source ip which will be configured mac-limit."
+                ::= { hwL2MAMObjects 54 }  
+        hwVxlanTnlMacLimitPeerIp OBJECT-TYPE
+                SYNTAX IpAddress
+                MAX-ACCESS accessible-for-notify
+                STATUS current
+                DESCRIPTION "The vxlan tunnel peer ip which will be configured mac-limit."
+                ::= { hwL2MAMObjects 55 }  
+        hwVxlanTnlMacLimitMaxMac OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS accessible-for-notify
+                STATUS current
+                DESCRIPTION "The maximum mac address. When the value is '0',
+                        the meaning is that there isn't limiting rule to
+                        the mac-address number."
+                ::= { hwL2MAMObjects 56 }  
+         hwVlanMacLimitVlanId OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS accessible-for-notify
+                STATUS current
+                DESCRIPTION "The bd id which will be configured mac-limit."
+                ::= { hwL2MAMObjects 61 }  
+        hwVlanMacLimitMaxMac OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS accessible-for-notify
+                STATUS current
+                DESCRIPTION "The maximum mac address. When the value is '0',
+                        the meaning is that there isn't limiting rule to
+                        the mac-address number."
+                ::= { hwL2MAMObjects 62 } 
+        hwPortMacLimitPortName OBJECT-TYPE
+                SYNTAX OCTET STRING (SIZE (1..32))
+                MAX-ACCESS accessible-for-notify
+                STATUS current
+                DESCRIPTION "The maximum mac address. When the value is '0',
+                        the meaning is that there isn't limiting rule to
+                        the mac-address number."
+                ::= { hwL2MAMObjects 63}
+        hwPortMacLimitMaxMac OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS accessible-for-notify
+                STATUS current
+                DESCRIPTION "The maximum mac address. When the value is '0',
+                        the meaning is that there isn't limiting rule to
+                        the mac-address number."
+                ::= { hwL2MAMObjects 64} 
     hwL2MacTraps OBJECT IDENTIFIER ::= { hwL2MAMObjects 7 }
 
     hwMacUsageRaisingThreshold NOTIFICATION-TYPE
             OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, entPhysicalName, hwMacEntityUsage, hwMacEntityUsageThreshold}
             STATUS current
             DESCRIPTION
-                "Beyond the configurated Mac usage"
+                "This object indicates that the MAC address table usage reached the alarm threshold."
             ::= { hwL2MacTraps 1 }
 
     hwMacUsageFallingThreshold NOTIFICATION-TYPE
             OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, entPhysicalName, hwMacEntityUsage, hwMacEntityUsageThreshold}
             STATUS current
             DESCRIPTION
-                "Resume the alarm of Mac usage"
+                "This object indicates that the MAC address usage fell below the alarm threshold."
             ::= { hwL2MacTraps 2 }
 
     hwMacLimitNumRaisingThreshold NOTIFICATION-TYPE
             OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, hwMacDynAddressLearnNum, hwMacLimitMaxMac,hwL2IfPortName,hwMacLimitBdId,hwMacLimitEVPName}
             STATUS current
             DESCRIPTION
-                "Beyond the mac limited learning number "
+                "This object indicates that the number of MAC addresses learned by the interface reached the upper limit."
             ::= { hwL2MacTraps 3 }
 
     hwMacLimitNumFallingThreshold NOTIFICATION-TYPE
             OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, hwMacDynAddressLearnNum, hwMacLimitMaxMac,hwL2IfPortName,hwMacLimitBdId,hwMacLimitEVPName}
             STATUS current
             DESCRIPTION
-                "Resume the alarm of Mac usage"
+                "This object indicates that the number of MAC addresses learned by the interface fell below the upper limit."
             ::= { hwL2MacTraps 4 }
             
     hwUntargetMacNumAlarm NOTIFICATION-TYPE      
@@ -1190,16 +1450,14 @@ VlanIndex ::= TEXTUAL-CONVENTION
             OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, hwPwMacDynAddressLearnNum, hwPwMacLimitMaxMac}
             STATUS current
             DESCRIPTION
-                "The number of MAC addresses that are learnt based on the PW reaches 
-                 the upper limit."
+                "This object indicates that the number of MAC addresses learned by the PW reached the upper limit."
             ::= { hwL2MacTraps 7 }
 
     hwPwMacLimitNumFallingThreshold NOTIFICATION-TYPE
             OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, hwPwMacDynAddressLearnNum, hwPwMacLimitMaxMac}
             STATUS current
             DESCRIPTION
-                "The number of MAC addresses that are learnt based on the PW falls below 
-                 the upper limit."
+                "This object indicates that the PW-based MAC address learning trap was cleared."
             ::= { hwL2MacTraps 8 }
 
     hwPortStickyReachMaxAlarm NOTIFICATION-TYPE
@@ -1219,7 +1477,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
             OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause,  hwBaseTrapEventType, hwMacDynAddressLearnNum, hwMacLimitMaxMac, hwL2IfPortName, hwMacLimitVlanId, hwMacLimitVsiName}
             STATUS current
             DESCRIPTION
-                "Beyond the mac limited learning number ."
+                "Beyond the mac limited learning number."
             ::= { hwL2MacTraps 11 }
             
     hwMacFlappingAlarm NOTIFICATION-TYPE
@@ -1233,8 +1491,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
             OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, hwMacDynAddressLearnNum, hwMacLimitMaxMac, entPhysicalName, entPhysicalName}
             STATUS current
             DESCRIPTION
-                "The number of MAC addresses that are learnt based on the SLOT reaches 
-                 the upper limit."
+                "This object indicates that the number of MAC addresses learned per slot in the upstream direction reached the alarm threshold."
             ::= { hwL2MacTraps 13 }  
             
     hwSlotMacLimitNumFallingThreshold NOTIFICATION-TYPE
@@ -1249,14 +1506,14 @@ VlanIndex ::= TEXTUAL-CONVENTION
             OBJECTS { hwL2ProtocolTunnelTrapPortName, hwL2ProtocolTunnelTrapProtocolName, hwL2ProtocolTunnelTrapDropThreshold}
             STATUS current
             DESCRIPTION
-                "The number of the protocol transmit on the port reach the drop threshold."
+                "This object indicates that the number of L2PDUs that were transparently transmitted reached the drop threshold."
             ::= { hwL2MacTraps 15 }
             
     hwL2ProtocolTunnelDropThresholdFalling NOTIFICATION-TYPE
             OBJECTS { hwL2ProtocolTunnelTrapPortName, hwL2ProtocolTunnelTrapProtocolName, hwL2ProtocolTunnelTrapDropThreshold}
             STATUS current
             DESCRIPTION
-                "The number of the protocol transmit on the port below the drop threshold."
+                "This object indicates that the number of L2PDUs that were transparently transmitted fell below the drop threshold."
             ::= { hwL2MacTraps 16 }           
     hwVsiMacLimitNumRaisingThresholdAlarm NOTIFICATION-TYPE
             OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, hwMacLimitVsiName}
@@ -1294,14 +1551,14 @@ VlanIndex ::= TEXTUAL-CONVENTION
             OBJECTS {entPhysicalName,hwMacRuleDynAddressLearnNum,hwMacLimitRuleMaxMac}
             STATUS current
             DESCRIPTION
-                "Mac address is beyond the threshold of the global mac limit rule "
+                "This object indicates that the number of MAC addresses learned by a board reached the MAC address limit specified in a global rule."
             ::= { hwL2MacTraps 22 }
    
       hwMacLimitRuleNumFallingThreshold NOTIFICATION-TYPE
             OBJECTS {entPhysicalName,hwMacRuleDynAddressLearnNum,hwMacLimitRuleMaxMac}
             STATUS current
             DESCRIPTION
-                "Mac address is fall behind the threshold of  the global mac limit rule. "
+                "This object indicates that the number of MAC addresses learned by a board fell below the MAC address limit specified in a global rule."
             ::= { hwL2MacTraps 23 }
 
       hwVplsOverGRENotSupportForwardRising NOTIFICATION-TYPE
@@ -1322,42 +1579,42 @@ VlanIndex ::= TEXTUAL-CONVENTION
             OBJECTS {hwUNUCPortName,hwUNUCPortAlarmThreshold,hwUNUCPortRealFlow}
             STATUS current
             DESCRIPTION
-                "Unknown unicast flow is beyond the alarm threshold. "
+                "This object indicates that the unknown unicast traffic volume on the inbound interface exceeded the alarm threshold."
             ::= { hwL2MacTraps 28 }
 
       hwIfInputUnucFlowFallingThreshold NOTIFICATION-TYPE
             OBJECTS {hwUNUCPortName,hwUNUCPortAlarmThreshold,hwUNUCPortRealFlow}
             STATUS current
             DESCRIPTION
-                "Unknown unicast flow is fall behind the alarm threshold. "
+                "This object indicates that the unknown unicast traffic volume on the inbound interface fell below the alarm threshold."
             ::= { hwL2MacTraps 29 }
 
-      hwMacHopAlarmRisingThreshold NOTIFICATION-TYPE
-            OBJECTS { hwMacHopVlan, hwMacHopVsiName, hwMacHopBdID, hwMacHopPortName1, hwMacHopPortName2, hwMacHopPortName3, hwMacHopPortName4, hwMacHopPWInfo, hwMacHopDetectMac}
+      hwMacHopAlarmRaisingThreshold NOTIFICATION-TYPE
+            OBJECTS { hwMacHopVlan, hwMacHopVsiName, hwMacHopBdID, hwMacHopPortName1, hwMacHopPortName2, hwMacHopPortName3, hwMacHopPortName4, hwMacHopPWInfo, hwMacHopDetectMac, hwMacHopTrustPort, hwMacHopTrustPeer}
             STATUS current
             DESCRIPTION
-                "Mac hop is beyond the alarm threshold. "
+                "This object indicates the MAC address flapping alarm."
             ::= { hwL2MacTraps 30 }
 
       hwMacHopAlarmFallingThreshold NOTIFICATION-TYPE
             OBJECTS { hwMacHopVlan, hwMacHopVsiName, hwMacHopBdID}
             STATUS current
             DESCRIPTION
-                "Mac hop is fall behind the alarm threshold. "
+                "This object indicates that the MAC address flapping alarm is cleared."
             ::= { hwL2MacTraps 31 }
 
         hwPstBroadcastLostAlarm NOTIFICATION-TYPE
             OBJECTS { entPhysicalIndex, entPhysicalName }
             STATUS current
             DESCRIPTION 
-                "The board cannot receive pst broadcast packet from other boards in one minute."
+                "This object indicates the alarm that a board does not receive PST broadcast packets from other boards within one minute."
             ::= { hwL2MacTraps 32 }
             
         hwPstBroadcastLostResume NOTIFICATION-TYPE
             OBJECTS { entPhysicalIndex, entPhysicalName }
             STATUS current
             DESCRIPTION 
-                "The board can receive pst broadcast packet from other boards in one minute."
+                "This object indicates that the board receives PST broadcast packets from other boards within one minute and the alarm is cleared."
             ::= { hwL2MacTraps 33 }
 
         hwPwMacSpoofingAttackAlarm NOTIFICATION-TYPE
@@ -1406,105 +1663,105 @@ VlanIndex ::= TEXTUAL-CONVENTION
             OBJECTS { hwPwLabel ,hwTeLabel,hwPortName}
             STATUS current
             DESCRIPTION
-                "The packets are discarded due to unmatched PW source tunnel."
+                "This object indicates that packets are dropped because they do not match the PW's source tunnel check."
             ::= { hwL2MacTraps 40 }
 
       hwPwSourceTunnelCheckResume NOTIFICATION-TYPE
             OBJECTS { hwPwLabel ,hwTeLabel,hwPortName}
             STATUS current
             DESCRIPTION
-                "No mismatch packets are found during the PW source tunnel check."
+                "This object indicates that all packets match during the PW's source tunnel check."
             ::= { hwL2MacTraps 41 }
 
       hwPwSourceTunnelNoTeCheckAlarm NOTIFICATION-TYPE
             OBJECTS { hwPwLabel ,hwPortName}
             STATUS current
             DESCRIPTION
-                "The packets are discarded because they do not match the PW source tunnel and contains no public network label."
+                "This object indicates that packets are discarded because they do not match the PW's source tunnel check and the packets do not carry public network labels."
             ::= { hwL2MacTraps 42 }
 
       hwPwSourceTunnelNoTeCheckResume NOTIFICATION-TYPE
             OBJECTS { hwPwLabel ,hwPortName}
             STATUS current
             DESCRIPTION
-                 "No mismatch packets are found during the PW source tunnel check."
+                 "This object indicates that all packets match during the PW's source tunnel check."
             ::= { hwL2MacTraps 43 }	
 			
       hwBoardServiceMisMatchGenerate NOTIFICATION-TYPE
             OBJECTS { entPhysicalIndex, entPhysicalName, hwBoardServiceMisMatchServiceName, hwBoardServiceMisMatchPrecautions}
             STATUS current
             DESCRIPTION
-                "The board does not support the service. "
+                "This object indicates the alarm that the board does not support this service."
             ::= { hwL2MacTraps 44 }
 
       hwBoardServiceMisMatchCancel NOTIFICATION-TYPE
             OBJECTS { entPhysicalIndex, entPhysicalName, hwBoardServiceMisMatchServiceName}
             STATUS current
             DESCRIPTION
-                "The service that the board does not support is undone or the board that the service does not support is removed. "
+                "This object indicates that the unsupported service is removed or the non-supportive board is replaced."
             ::= { hwL2MacTraps 45 }
 
         hwEVPNNotSupportTunnelAlarm NOTIFICATION-TYPE     
              OBJECTS {hwEVPNPeerRemoteIp,hwNotSupportTunnelEvpnName,hwNotSupportTunnelType}              
              STATUS current              
              DESCRIPTION              
-                   "The public network tunnel used to carry the EVPN cannot forward traffic. "              
+                   "This object indicates the alarm that the EVPN public network does not support traffic forwarding."              
              ::= { hwL2MacTraps 46 }              
    
         hwEVPNNotSupportTunnelAlarmResume NOTIFICATION-TYPE              
              OBJECTS {hwEVPNPeerRemoteIp,hwNotSupportTunnelEvpnName,hwNotSupportTunnelType}              
              STATUS current              
              DESCRIPTION              
-                   "The public network tunnel used to carry the EVPN support forwarded traffic successfully. "              
+                   "This object indicates that the EVPN public network supports traffic forwarding and the alarm is cleared."              
              ::= { hwL2MacTraps 47 }  
 
          hwVPLSNotSupportTunnelAlarm NOTIFICATION-TYPE     
               OBJECTS {hwNotSupportTunnelPwId,hwPWPeerRemoteIp,hwNotSupportTunnelVSIName,hwNotSupportTunnelType}              
               STATUS current              
               DESCRIPTION              
-                    "The public network tunnel used to carry the VPLS cannot forward traffic. "              
+                    "This object indicates the alarm that the VPLS public network does not support traffic forwarding."              
               ::= { hwL2MacTraps 48 }              
    
          hwVPLSNotSupportTunnelAlarmResume NOTIFICATION-TYPE              
               OBJECTS {hwNotSupportTunnelPwId,hwPWPeerRemoteIp,hwNotSupportTunnelVSIName,hwNotSupportTunnelType}              
               STATUS current              
               DESCRIPTION              
-                    "The public network tunnel used to carry the VPLS support forwarded traffic successfully. "              
+                    "This object indicates that the VPLS public network supports traffic forwarding and the alarm is cleared."              
               ::= { hwL2MacTraps 49 }  
         
          hwServiceNotSupportNodeSrteLoadBanlance NOTIFICATION-TYPE
             OBJECTS {hwNodeSrteTunnelName, hwNodeSrteServiceName}
             STATUS current
             DESCRIPTION
-                "The service can not support node sr-te tunnel load banlance."
+                "This object indicates the alarm that traffic for the service cannot be balanced over node SR TE tunnels."
             ::= { hwL2MacTraps 50 }
 			
          hwVplsPwHqosNotSupportTunnelAlarm NOTIFICATION-TYPE     
              OBJECTS {hwNotSupportTunnelVSIName,hwPWPeerRemoteIp,hwNotSupportTunnelPwId,hwNotSupportTunnelType}              
              STATUS current              
              DESCRIPTION              
-                   "VPLS PW HQOS services are not supported on the public network tunnel. "              
+                   "This object indicates that the VPLS PW HQoS service does not support the current public network tunnel."              
              ::= { hwL2MacTraps 51 }              
    
         hwVplsPwHqosNotSupportTunnelAlarmResume NOTIFICATION-TYPE              
              OBJECTS {hwNotSupportTunnelVSIName,hwPWPeerRemoteIp,hwNotSupportTunnelPwId,hwNotSupportTunnelType}                  
              STATUS current              
              DESCRIPTION              
-                   "VPLS PW HQOS services are supported on the public network tunnel."              
+                   "This object indicates that the VPLS PW HQoS service supports the current public network tunnel."              
              ::= { hwL2MacTraps 52} 
 
         hwPbbEvpnNotSupportTunnelAlarm NOTIFICATION-TYPE     
              OBJECTS {hwEVPNPeerRemoteIp,hwNotSupportTunnelEvpnName,hwNotSupportTunnelType}              
              STATUS current              
              DESCRIPTION              
-                   "The public network tunnel used to carry the PBB EVPN cannot forward traffic. "              
+                   "This object indicates the alarm that the PBB EVPN public network does not support traffic forwarding."              
              ::= { hwL2MacTraps 53 }              
    
         hwPbbEvpnNotSupportTunnelAlarmResume NOTIFICATION-TYPE              
              OBJECTS {hwEVPNPeerRemoteIp,hwNotSupportTunnelEvpnName,hwNotSupportTunnelType}              
              STATUS current              
              DESCRIPTION              
-                   "The public network tunnel used to carry the PBB EVPN support forwarded traffic successfully. "              
+                   "This object indicates that the PBB EVPN public network supports traffic forwarding and the alarm is cleared."              
              ::= { hwL2MacTraps 54}  
 
 
@@ -1522,7 +1779,115 @@ VlanIndex ::= TEXTUAL-CONVENTION
                    "The public network tunnel used to carry the VLL support forwarded traffic successfully. "              
              ::= { hwL2MacTraps 56 }  
 
+        hwVllVpnQosOverTunnelAlarm NOTIFICATION-TYPE     
+             OBJECTS {hwVLLACIfName, hwVLLPeerRemoteIp,hwNotSupportTunnelType}              
+             STATUS current              
+             DESCRIPTION              
+                   "VLL VPN QoS services are not supported on the public network tunnel. "              
+             ::= { hwL2MacTraps 57 }              
+   
+        hwVllVpnQosOverTunnelAlarmResume NOTIFICATION-TYPE              
+             OBJECTS {hwVLLACIfName, hwVLLPeerRemoteIp,hwNotSupportTunnelType}              
+             STATUS current              
+             DESCRIPTION              
+                   "VLL VPN QoS services are supported on the public network tunnel.  "              
+             ::= { hwL2MacTraps 58 } 
 
+        hwBroadcastDomainElbAlarm	NOTIFICATION-TYPE     
+             OBJECTS {hwMacLimitVlanId, hwMacLimitBdId,hwVplsVsiName,hwMacLimitEVPName}              
+             STATUS current              
+             DESCRIPTION              
+                   "The number of broadcast domain leaves exceeded the limit. "              
+             ::= { hwL2MacTraps 59 }              
+   
+        hwBroadcastDomainElbAlarmResume NOTIFICATION-TYPE              
+             OBJECTS {hwMacLimitVlanId, hwMacLimitBdId,hwVplsVsiName,hwMacLimitEVPName}              
+             STATUS current              
+             DESCRIPTION              
+                   "The number of broadcast domain leaves fell below the limit.  "              
+             ::= { hwL2MacTraps 60 } 
+
+        hwL2DomainMacLimitNumRaisingThreshold NOTIFICATION-TYPE              
+             OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, entPhysicalName, hwMacLimitAlarmDynNum, hwMacLimitAlarmMaxMac, hwMacLimitAlarmUpthreshold, hwMacLimitAlarmDownthreshold}             
+             STATUS current              
+             DESCRIPTION              
+                   "The number of MAC addresses learned reached the upper threshold."              
+             ::= { hwL2MacTraps 61 } 
+        hwL2DomainMacLimitNumFallingThreshold NOTIFICATION-TYPE              
+             OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, entPhysicalName, hwMacLimitAlarmDynNum, hwMacLimitAlarmMaxMac, hwMacLimitAlarmUpthreshold, hwMacLimitAlarmDownthreshold}             
+             STATUS current              
+             DESCRIPTION              
+                   "The MAC address learning trap was cleared."              
+             ::= { hwL2MacTraps 62 } 
+        hwVxlanTunnelMacLimitOverThresholdAlarm NOTIFICATION-TYPE
+            OBJECTS {hwVxlanTnlMacLimitSourceIp, hwVxlanTnlMacLimitPeerIp, hwVxlanTnlMacLimitMaxMac}
+            STATUS current
+            DESCRIPTION
+                "Beyond the mac limited learning number. "
+            ::= { hwL2MacTraps 63 } 
+        
+        hwVxlanTunnelMacLimitOverThresholdAlarmResume NOTIFICATION-TYPE
+            OBJECTS {hwVxlanTnlMacLimitSourceIp, hwVxlanTnlMacLimitPeerIp, hwVxlanTnlMacLimitMaxMac}
+            STATUS current
+            DESCRIPTION
+                "Less than the mac limited learning number. "
+            ::= { hwL2MacTraps 64 } 
+
+         hwTunnelNotSupportInterface NOTIFICATION-TYPE
+            OBJECTS {hwTunnelName, hwNotSupIfName, hwDescription}
+            STATUS current
+            DESCRIPTION
+                "The tunnel can not support the interface."
+            ::= { hwL2MacTraps 65 }
+
+         hwServiceNotSupportDscpSrte NOTIFICATION-TYPE
+            OBJECTS {hwDscpSrteServiceName}
+            STATUS current
+            DESCRIPTION
+                "This object indicates the alarm that the service cannot support srte dscp function."
+            ::= { hwL2MacTraps 66 }
+
+        hwVlanMacLimitOverThreshold NOTIFICATION-TYPE
+            OBJECTS {hwVlanMacLimitVlanId, hwVlanMacLimitMaxMac}
+            STATUS current
+            DESCRIPTION
+                "This object indicates that the number of MAC addresses learned based on a VLAN reaches the upper threshold."
+            ::= { hwL2MacTraps 67 } 
+        
+        hwVlanMacLimitOverThresholdResume NOTIFICATION-TYPE
+            OBJECTS {hwVlanMacLimitVlanId, hwVlanMacLimitMaxMac}
+            STATUS current
+            DESCRIPTION
+                "This object indicates that the number of MAC addresses learned based on a VLAN falls below the upper threshold."
+            ::= { hwL2MacTraps 68 } 
+
+        hwPortMacLimitOverThreshold NOTIFICATION-TYPE
+            OBJECTS {hwPortMacLimitPortName, hwPortMacLimitMaxMac}
+            STATUS current
+            DESCRIPTION
+                "This object indicates that the number of MAC addresses learned by an interface reaches the upper threshold."
+            ::= { hwL2MacTraps 69 } 
+        
+        hwPortMacLimitOverThresholdResume NOTIFICATION-TYPE
+            OBJECTS {hwPortMacLimitPortName, hwPortMacLimitMaxMac}
+            STATUS current
+            DESCRIPTION
+                "This object indicates that the number of MAC addresses learned by an interface falls below the upper threshold."
+            ::= { hwL2MacTraps 70 } 
+
+        hwNotSupportTeOverGre NOTIFICATION-TYPE
+            OBJECTS {hwMplsBoardId}
+            STATUS current
+            DESCRIPTION
+                "This object indicates the board cannot support te over gre."
+            ::= { hwL2MacTraps 71}
+			
+		hwPortSecRcvInsecurePktAlarmResume NOTIFICATION-TYPE
+            OBJECTS {ifDescr}
+            STATUS current
+            DESCRIPTION 
+                "This object indicates port perform of the protect action shutdown or restrict is resumed."
+            ::= { hwL2MacTraps 72 }
 
 -- untarget mac number            
     hwUntargetMacNum  OBJECT-TYPE
@@ -1659,7 +2024,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
                 MAX-ACCESS not-accessible
                 STATUS current
                 DESCRIPTION
-                        "A table containing the global mac-address learning-limit rules information for device."
+                        "This table is used to query restriction rules on global MAC address learning."
                 ::= { hwL2MAMObjects 12 }
 
         hwMacLimitGlobalRuleEntry OBJECT-TYPE
@@ -1694,7 +2059,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
                 MAX-ACCESS not-accessible
                 STATUS current
                 DESCRIPTION
-                        "The global mac-address learning-limit rule name."
+                        "This object indicates the name of the restriction rule on global MAC address learning."
                 ::= { hwMacLimitGlobalRuleEntry 1 }
 
         hwMacLimitRuleMaxMac OBJECT-TYPE
@@ -1702,9 +2067,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
                 MAX-ACCESS read-create
                 STATUS current
                 DESCRIPTION
-                        "The maximum mac address. When the value is '0',
-                        the meaning is that there isn't limiting rule to
-                        the mac-address number."
+                        "This object indicates the maximum number of MAC addresses that can be learned. The value of 0 indicates no restriction rules."
                 ::= { hwMacLimitGlobalRuleEntry 11 }
 
         hwMacLimitRuleMaxRate OBJECT-TYPE
@@ -1712,9 +2075,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
                 MAX-ACCESS read-create
                 STATUS current
                 DESCRIPTION
-                        "The max mac-address learning rate. When the valu
-                        e is '0', the meaning is that there isn't limiting
-                         rule to the learning rate."
+                        "This object indicates the highest rate of MAC address learning. The value ranges from 0 to 1000. The value of 0 indicates that the rate of MAC address learning is not limited."
                 ::= { hwMacLimitGlobalRuleEntry 12 }
 
         hwMacLimitRuleAction OBJECT-TYPE
@@ -1726,10 +2087,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
                 MAX-ACCESS read-create
                 STATUS current
                 DESCRIPTION
-                        "The mac-address limit action of this entry. The
-                        meanings of the values are:
-                         discard(1)- Discard packets
-                         forward(2)- Forward packets."
+                        "This object indicates the action type to be used after the number of learned MAC addresses reaches the upper threshold."
                 ::= { hwMacLimitGlobalRuleEntry 13 }
 
         hwMacLimitRuleAlarm OBJECT-TYPE
@@ -1741,9 +2099,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
                 MAX-ACCESS read-create
                 STATUS current
                 DESCRIPTION
-                        "The mac-limit alarm switch of this entry. The meanings of
-                         the values are:
-                         disable(1), enable(2)"
+                        "This object indicates whether the alarm for MAC address learning restriction is enabled."
                 ::= { hwMacLimitGlobalRuleEntry 14 }
 
         hwMacLimitRuleRowstatus OBJECT-TYPE
@@ -1751,7 +2107,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
                 MAX-ACCESS read-create
                 STATUS current
                 DESCRIPTION
-                        "The operating state of the row."
+                        "This object indicates the row status."
                 ::= { hwMacLimitGlobalRuleEntry 51 }
 		 hwMacRuleDynAddressLearnNum   OBJECT-TYPE
                 SYNTAX Integer32(0..131072)
@@ -1877,7 +2233,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
                 MAX-ACCESS not-accessible
                 STATUS current
                 DESCRIPTION
-                        "A table showing the number of mac-address items by slot ID."
+                        "This table is used to describe MAC capacity statistics on an interface board."
                 ::= { hwL2MAMObjects 16 }
 
         hwMacSlotStatisticsEntry OBJECT-TYPE
@@ -1908,7 +2264,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
                 MAX-ACCESS not-accessible
                 STATUS current
                 DESCRIPTION
-                        "The slot ID which is correlative to the hwMacSlotStatistics table."
+                        "This object indicates the interface board ID."
                 ::= { hwMacSlotStatisticsEntry 1 }               
                 
         hwMacSlotStatistics OBJECT-TYPE
@@ -1916,7 +2272,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
                 MAX-ACCESS read-only
                 STATUS current
                 DESCRIPTION
-                        "The number of the mac-address items by slot ID."
+                        "This object indicates the number of MAC addresses learned based on the interface board ID."
                 ::= { hwMacSlotStatisticsEntry 2 }
 
                hwMacSlotStatisticsSpecify OBJECT-TYPE              
@@ -1924,7 +2280,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
                 MAX-ACCESS read-only
                 STATUS current
                 DESCRIPTION
-                        "The specify max number of the mac-address items by slot ID."
+                        "This object indicates the maximum MAC capacity on the interface board."
                 ::= { hwMacSlotStatisticsEntry 3 }
 
         hwMacSlotUsage OBJECT-TYPE
@@ -1932,7 +2288,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
                MAX-ACCESS read-only
                STATUS current
                DESCRIPTION
-               "MAC usage in every IO board"
+               "This object indicates the MAC address utilization ratio on the interface board."
                ::= { hwMacSlotStatisticsEntry 4 }
 
         hwMacSlotUsageThreshold OBJECT-TYPE
@@ -1940,7 +2296,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
                MAX-ACCESS read-only
                STATUS current
                DESCRIPTION
-               "MAC usage range"
+               "This object indicates the MAC address threshold on the interface board."
                ::= { hwMacSlotStatisticsEntry 5 }
                 
         hwMacVlanStatisticsTable OBJECT-TYPE
@@ -2032,7 +2388,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
                 MAX-ACCESS not-accessible
                 STATUS current
                 DESCRIPTION
-                        "This is a rule table for PW-based MAC learning limit."
+                        "This table is used to query MAC address learning suppression based on a PW."
                 ::= { hwL2MAMObjects 19 }
 
         hwPwMacLimitEntry OBJECT-TYPE
@@ -2071,8 +2427,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
                 MAX-ACCESS not-accessible
                 STATUS current
                 DESCRIPTION
-                        "This object indicates the name of the VSI that is configured with 
-                         PW-based MAC learning limit."
+                        "This object indicates the VSI name of MAC address learning suppression based on a PW."
                 ::= { hwPwMacLimitEntry 1 }
 
         hwPwMacLimitPwName OBJECT-TYPE
@@ -2080,8 +2435,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
                 MAX-ACCESS not-accessible
                 STATUS current
                 DESCRIPTION
-                        "This object indicates the name of the PW that is configured with 
-                         PW-based MAC learning limit."
+                        "This object indicates the PW name of MAC address learning suppression."
                 ::= { hwPwMacLimitEntry 2 }
 
         hwPwMacLimitMaxMac OBJECT-TYPE
@@ -2089,8 +2443,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
                 MAX-ACCESS read-create
                 STATUS current
                 DESCRIPTION
-                        "The value of this object specifies the maximum number of MAC 
-                         addresses that can be learnt. 0 indicates no limit."
+                        "This object indicates the maximum number of MAC addresses that can be learned. The value of 0 indicates no limit on the number of MAC addresses that can be learned."
                 ::= { hwPwMacLimitEntry 3 }
 
         hwPwMacLimitMaxRate OBJECT-TYPE
@@ -2098,8 +2451,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
                 MAX-ACCESS read-create
                 STATUS current
                 DESCRIPTION
-                        "The value of this object specifies the maximum rate for MAC 
-                         address learning. 0 indicates no limit."
+                        "This object indicates the maximum rate of MAC address learning. The value of 0 indicates that the rate of MAC address learning is not limited."
                 ::= { hwPwMacLimitEntry 4 }
 
         hwPwMacLimitAction OBJECT-TYPE
@@ -2111,11 +2463,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
                 MAX-ACCESS read-create
                 STATUS current
                 DESCRIPTION
-                        "The value of this object specifies whether packets are forwarded 
-                         or discarded after the number of MAC addresses that are learnt 
-                         reaches the upper limit:
-                         1: packets are discarded
-                         2: packets are forwarded"
+                        "This object indicates whether packets are forwarded after the number of learned MAC addresses reaches the upper threshold."
                 ::= { hwPwMacLimitEntry 5 }
 
         hwPwMacLimitAlarm OBJECT-TYPE
@@ -2123,11 +2471,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
                 MAX-ACCESS read-create
                 STATUS current
                 DESCRIPTION
-                        "The value of this object specifies whether the alarm is enabled 
-                         or disabled after the number of MAC addresses that are learnt reaches 
-                         the upper limit:
-                         1: alarm is enabled
-                         2: alarm is disabled"
+                        "This object indicates whether the alarm is enabled after the number of learned MAC addresses reaches the upper threshold."
                 ::= { hwPwMacLimitEntry 6 }
 
         hwPwMacLimitRowstatus OBJECT-TYPE
@@ -2135,7 +2479,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
                 MAX-ACCESS read-create
                 STATUS current
                 DESCRIPTION
-                        "This object indicates the RowStatus of hwPwMacLimitTable."
+                        "This object indicates the row status of hwPwMacLimitTable."
                 ::= { hwPwMacLimitEntry 7 }
 
         hwPwMacAddressLearn  OBJECT-TYPE
@@ -2143,7 +2487,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
                 MAX-ACCESS read-create
                 STATUS current
                 DESCRIPTION
-                        "The object indicates whether MAC learning is enabled."
+                        "This object indicates whether MAC address learning is enabled."
                 ::= { hwPwMacLimitEntry 8 }
 
         hwPwMacDynAddressLearnNum   OBJECT-TYPE
@@ -2151,8 +2495,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
                 MAX-ACCESS read-only
                 STATUS current
                 DESCRIPTION
-                        "The value of this object specifies the number of dynamic MAC 
-                         addresses that are learnt."
+                        "This object indicates the number of dynamically learned MAC addresses."
                 ::= { hwPwMacLimitEntry 9 }
 
         hwMacSpoofingDefendTable OBJECT-TYPE
@@ -2359,7 +2702,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
                SYNTAX Integer32 (1..4096)
                MAX-ACCESS accessible-for-notify
                STATUS current
-               DESCRIPTION "The drop rangle of layer 2 protocol tunnel."
+               DESCRIPTION "This object indicates that the number of L2PDUs that were transparently transmitted reached the drop threshold."
                ::= { hwL2ProtocolTunnelTrapObjects 3 }
 
         hwL2ProtclTnlStdTable OBJECT-TYPE
@@ -3676,7 +4019,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
                 MAX-ACCESS accessible-for-notify
                 STATUS current
                 DESCRIPTION
-                        "The port real unuc flow."
+                        "This object indicates that the unknown unicast traffic volume on the inbound interface exceeded the alarm threshold."
                 ::= { hwUnucFlowAlarmEntry 4 }             
 
 				
@@ -3686,7 +4029,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
                 MAX-ACCESS not-accessible
                 STATUS current
                 DESCRIPTION
-                        "A table containing the pw source tunnel check information for device."
+                        "This table is used to manage the check on a PW's source port tunnel."
                 ::= { hwL2MAMObjects 43 }
 
         hwPwSourceTunnelCheckEntry OBJECT-TYPE
@@ -3714,7 +4057,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
                 MAX-ACCESS accessible-for-notify
                 STATUS current
                 DESCRIPTION
-                        "The PW InLabel."
+                        "This object indicates the PW label."
                 ::= { hwPwSourceTunnelCheckEntry 1 }
 
         hwTeLabel OBJECT-TYPE
@@ -3722,7 +4065,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
                 MAX-ACCESS accessible-for-notify
                 STATUS current
                 DESCRIPTION
-                        "The Te InLabel."
+                        "This object indicates the TE tunnel label."
                 ::= { hwPwSourceTunnelCheckEntry 2 }
 
         hwPortName OBJECT-TYPE
@@ -3730,7 +4073,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
                 MAX-ACCESS accessible-for-notify
                 STATUS current
                 DESCRIPTION
-                        "The Port Name."
+                        "This object indicates the port name."
                 ::= { hwPwSourceTunnelCheckEntry 3 }
 
 --
@@ -3741,7 +4084,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
             MAX-ACCESS not-accessible
             STATUS current
             DESCRIPTION
-                "This table contains the PV suppression statistic."
+                "This table contains statistics about suppressed packets and bytes based on a Layer 2 interface and a VLAN."
             ::= { hwL2MAMObjects 48 }  
 
 
@@ -3819,7 +4162,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
             MAX-ACCESS not-accessible
             STATUS current
             DESCRIPTION
-                "This object indicates the interface index."
+                "This object indicates the interface index value."
             ::= { hwPVSuppressionStatisticEntry 1 }
 
 
@@ -3828,7 +4171,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
             MAX-ACCESS not-accessible
             STATUS current
             DESCRIPTION
-                "This object indicates the vlan id."
+                "This object indicates the VLAN ID of the interface."
             ::= { hwPVSuppressionStatisticEntry 2 }
             
         hwPVStatisticTime OBJECT-TYPE
@@ -3836,7 +4179,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Last time of clean out."
+                "This object indicates the date and time when packet statistics were deleted last time."
             ::= { hwPVSuppressionStatisticEntry 3 }
             
                         
@@ -3845,7 +4188,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The inbound pass packets of unknown unicast suppression."
+                "This object indicates the number of passed packets for unknown unicast traffic in the inbound direction."
             ::= { hwPVSuppressionStatisticEntry 4}
             
         hwPVUcInPassByte OBJECT-TYPE
@@ -3853,7 +4196,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The inbound pass bytes of unknown unicast suppression."
+                "This object indicates the number of passed bytes for unknown unicast traffic in the inbound direction."
             ::= { hwPVSuppressionStatisticEntry 5 }
             
         hwPVUcInDropPack OBJECT-TYPE
@@ -3861,7 +4204,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The inbound drop packets of unknown unicast suppression."
+                "This object indicates the number of dropped packets for unknown unicast traffic in the inbound direction."
             ::= { hwPVSuppressionStatisticEntry 6 }
             
             
@@ -3870,7 +4213,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The inbound drop bytes of unknown unicast suppression."
+                "This object indicates the number of dropped bytes for unknown unicast traffic in the inbound direction."
             ::= { hwPVSuppressionStatisticEntry 7 }
             
                                     
@@ -3879,7 +4222,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The outbound pass packets of unknown unicast suppression."
+                "This object indicates the number of passed packets for unknown unicast traffic in the outbound direction."
             ::= { hwPVSuppressionStatisticEntry 8 }
                             
         hwPVUcOutPassByte OBJECT-TYPE
@@ -3887,7 +4230,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The outbound pass bytes of unknown unicast suppression."
+                "This object indicates the number of passed bytes for unknown unicast traffic in the outbound direction."
             ::= { hwPVSuppressionStatisticEntry 9 }        
         
                         
@@ -3896,7 +4239,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The outbound drop packets of unknown unicast suppression."
+                "This object indicates the number of dropped packets for unknown unicast traffic in the outbound direction."
             ::= { hwPVSuppressionStatisticEntry 10 }
                         
         hwPVUcOutDropByte OBJECT-TYPE
@@ -3904,7 +4247,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                 "The outbound drop bytes of unknown unicast suppression."
+                 "This object indicates the number of dropped bytes for unknown unicast traffic in the outbound direction."
             ::= { hwPVSuppressionStatisticEntry 11}            
         
                         
@@ -3913,7 +4256,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                   "The inbound pass packets of multicast suppression."
+                   "This object indicates the number of passed packets for multicast traffic in the inbound direction."
             ::= { hwPVSuppressionStatisticEntry 12 }            
             
         hwPVMulInPassByte OBJECT-TYPE
@@ -3921,7 +4264,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                   "The inbound pass bytes of multicast suppression."
+                   "This object indicates the number of passed bytes for multicast traffic in the inbound direction."
             ::= { hwPVSuppressionStatisticEntry 13 }    
             
         hwPVMulInDropPack OBJECT-TYPE
@@ -3929,7 +4272,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The inbound drop packets of multicast suppression."
+                "This object indicates the number of dropped packets for multicast traffic in the inbound direction."
             ::= { hwPVSuppressionStatisticEntry 14 }    
             
          hwPVMulInDropByte OBJECT-TYPE
@@ -3937,14 +4280,14 @@ VlanIndex ::= TEXTUAL-CONVENTION
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-               "The inbound drop bytes of multicast suppression."
+               "This object indicates the number of dropped bytes for multicast traffic in the inbound direction."
             ::= { hwPVSuppressionStatisticEntry 15 }    
         hwPVMulOutPassPack OBJECT-TYPE
             SYNTAX Counter64
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                 "The outbound pass packets of multicast suppression."
+                 "This object indicates the number of passed packets for multicast traffic in the outbound direction."
             ::= { hwPVSuppressionStatisticEntry 16 }            
             
         hwPVMulOutPassByte OBJECT-TYPE
@@ -3952,7 +4295,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                 "The outbound pass bytes of multicast suppression."
+                 "This object indicates the number of passed bytes for multicast traffic in the outbound direction."
             ::= { hwPVSuppressionStatisticEntry 17 }    
             
         hwPVMulOutDropPack OBJECT-TYPE
@@ -3960,7 +4303,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                 "The outbound drop packets of multicast suppression."
+                 "This object indicates the number of dropped packets for multicast traffic in the outbound direction."
             ::= { hwPVSuppressionStatisticEntry 18}    
             
          hwPVMulOutDropByte OBJECT-TYPE
@@ -3968,7 +4311,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The outbound drop bytes of multicast suppression."
+                "This object indicates the number of dropped bytes for multicast traffic in the outbound direction."
             ::= { hwPVSuppressionStatisticEntry 19 }    
                         
         hwPVBrInPassPack OBJECT-TYPE
@@ -3976,7 +4319,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                  "The inbound pass packets of broadcast suppression."
+                  "This object indicates the number of passed packets for broadcast traffic in the inbound direction."
             ::= { hwPVSuppressionStatisticEntry 20 }            
             
         hwPVBrInPassByte OBJECT-TYPE
@@ -3984,7 +4327,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-              "The inbound pass bytes of broadcast suppression."
+              "This object indicates the number of passed bytes for broadcast traffic in the inbound direction."
             ::= { hwPVSuppressionStatisticEntry 21 }    
             
         hwPVBrInDropPack OBJECT-TYPE
@@ -3992,7 +4335,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-              "The inbound drop packets of broadcast suppression."
+              "This object indicates the number of dropped packets for broadcast traffic in the inbound direction."
             ::= { hwPVSuppressionStatisticEntry 22 }    
             
          hwPVBrInDropByte OBJECT-TYPE
@@ -4000,7 +4343,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The inbound drop bytes of broadcast suppression."
+                "This object indicates the number of dropped bytes for broadcast traffic in the inbound direction."
             ::= { hwPVSuppressionStatisticEntry 23 }    
      
                         
@@ -4009,7 +4352,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The outbound pass packets of broadcast suppression."
+                "This object indicates the number of passed packets for broadcast traffic in the outbound direction."
             ::= { hwPVSuppressionStatisticEntry 24 }            
             
         hwPVBrOutPassByte OBJECT-TYPE
@@ -4017,7 +4360,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The outbound pass bytes of broadcast suppression."
+                "This object indicates the number of passed bytes for broadcast traffic in the outbound direction."
             ::= { hwPVSuppressionStatisticEntry 25 }    
             
         hwPVBrOutDropPack OBJECT-TYPE
@@ -4025,7 +4368,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The outbound drop packets of broadcast suppression."
+                "This object indicates the number of dropped packets for broadcast traffic in the outbound direction."
             ::= { hwPVSuppressionStatisticEntry 26 }    
             
          hwPVBrOutDropByte OBJECT-TYPE
@@ -4033,7 +4376,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The outbound drop bytes of broadcast suppression."
+                "This object indicates the number of dropped bytes for broadcast traffic in the outbound direction."
             ::= { hwPVSuppressionStatisticEntry 27 }                              
 
 --
@@ -4044,7 +4387,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
             MAX-ACCESS not-accessible
             STATUS current
             DESCRIPTION
-                "This table contains the Port suppression statistic."
+                "This table contains statistics about suppressed packets and bytes based on an interface and its sub-interface."
             ::= { hwL2MAMObjects 49 }  
 
 
@@ -4120,7 +4463,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
             MAX-ACCESS not-accessible
             STATUS current
             DESCRIPTION
-                "This object indicates the interface index."
+                "This object indicates the interface index value."
             ::= { hwPortSuppressionStatisticEntry 1 }
             
         hwPortStatisticTime OBJECT-TYPE
@@ -4128,7 +4471,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Last time of clean out."
+                "This object indicates the date and time when packet statistics were deleted last time."
             ::= { hwPortSuppressionStatisticEntry 2 }
             
                         
@@ -4137,7 +4480,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The inbound pass packets of unknown unicast suppression."
+                "This object indicates the number of passed packets for unknown unicast traffic in the inbound direction."
             ::= { hwPortSuppressionStatisticEntry 3 }
             
         hwPortUcInPassByte OBJECT-TYPE
@@ -4145,7 +4488,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The inbound pass bytes of unknown unicast suppression."
+                "This object indicates the number of passed bytes for unknown unicast traffic in the inbound direction."
             ::= { hwPortSuppressionStatisticEntry 4 }
             
         hwPortUcInDropPack OBJECT-TYPE
@@ -4153,7 +4496,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The inbound drop packets of unknown unicast suppression."
+                "This object indicates the number of dropped packets for unknown unicast traffic in the inbound direction."
             ::= { hwPortSuppressionStatisticEntry 5 }
             
             
@@ -4162,7 +4505,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The inbound drop bytes of unknown unicast suppression."
+                "This object indicates the number of dropped bytes for unknown unicast traffic in the inbound direction."
             ::= { hwPortSuppressionStatisticEntry 6 }
             
                                     
@@ -4171,7 +4514,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The outbound pass packets of unknown unicast suppression."
+                "This object indicates the number of passed packets for unknown unicast traffic in the outbound direction."
             ::= { hwPortSuppressionStatisticEntry 7 }
                             
         hwPortUcOutPassByte OBJECT-TYPE
@@ -4179,7 +4522,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The outbound pass bytes of unknown unicast suppression."
+                "This object indicates the number of passed bytes for unknown unicast traffic in the outbound direction."
             ::= { hwPortSuppressionStatisticEntry 8 }        
         
                         
@@ -4188,7 +4531,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The outbound drop packets of unknown unicast suppression."
+                "This object indicates the number of dropped packets for unknown unicast traffic in the outbound direction."
             ::= { hwPortSuppressionStatisticEntry 9 }
                         
         hwPortUcOutDropByte OBJECT-TYPE
@@ -4196,7 +4539,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                 "The outbound drop bytes of unknown unicast suppression."
+                 "This object indicates the number of dropped bytes for unknown unicast traffic in the outbound direction."
             ::= { hwPortSuppressionStatisticEntry 10}            
         
                         
@@ -4205,7 +4548,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                   "The inbound pass packets of multicast suppression."
+                   "This object indicates the number of passed packets for multicast traffic in the inbound direction."
             ::= { hwPortSuppressionStatisticEntry 11}            
             
         hwPortMulInPassByte OBJECT-TYPE
@@ -4213,7 +4556,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                   "The inbound pass bytes of multicast suppression."
+                   "This object indicates the number of passed bytes for multicast traffic in the inbound direction."
             ::= { hwPortSuppressionStatisticEntry 12 }    
             
         hwPortMulInDropPack OBJECT-TYPE
@@ -4221,7 +4564,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The inbound drop packets of multicast suppression."
+                "This object indicates the number of dropped packets for multicast traffic in the inbound direction."
             ::= { hwPortSuppressionStatisticEntry 13 }    
             
          hwPortMulInDropByte OBJECT-TYPE
@@ -4229,14 +4572,14 @@ VlanIndex ::= TEXTUAL-CONVENTION
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-               "The inbound drop bytes of multicast suppression."
+               "This object indicates the number of dropped bytes for multicast traffic in the inbound direction."
             ::= { hwPortSuppressionStatisticEntry 14 }    
         hwPortMulOutPassPack OBJECT-TYPE
             SYNTAX Counter64
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                 "The outbound pass packets of multicast suppression."
+                 "This object indicates the number of passed packets for multicast traffic in the outbound direction."
             ::= { hwPortSuppressionStatisticEntry 15 }            
             
         hwPortMulOutPassByte OBJECT-TYPE
@@ -4244,7 +4587,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                 "The outbound pass bytes of multicast suppression."
+                 "This object indicates the number of passed bytes for multicast traffic in the outbound direction."
             ::= { hwPortSuppressionStatisticEntry 16 }    
             
         hwPortMulOutDropPack OBJECT-TYPE
@@ -4252,7 +4595,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                 "The outbound drop packets of multicast suppression."
+                 "This object indicates the number of dropped packets for multicast traffic in the outbound direction."
             ::= { hwPortSuppressionStatisticEntry 17}    
             
          hwPortMulOutDropByte OBJECT-TYPE
@@ -4260,7 +4603,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The outbound drop bytes of multicast suppression."
+                "This object indicates the number of dropped bytes for multicast traffic in the outbound direction."
             ::= { hwPortSuppressionStatisticEntry 18 }    
                         
         hwPortBrInPassPack OBJECT-TYPE
@@ -4268,7 +4611,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                  "The inbound pass packets of broadcast suppression."
+                  "This object indicates the number of passed packets for broadcast traffic in the inbound direction."
             ::= { hwPortSuppressionStatisticEntry 19 }            
             
         hwPortBrInPassByte OBJECT-TYPE
@@ -4276,7 +4619,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-              "The inbound pass bytes of broadcast suppression."
+              "This object indicates the number of passed bytes for broadcast traffic in the inbound direction."
             ::= { hwPortSuppressionStatisticEntry 20 }    
             
         hwPortBrInDropPack OBJECT-TYPE
@@ -4284,7 +4627,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-              "The inbound drop packets of broadcast suppression."
+              "This object indicates the number of dropped packets for broadcast traffic in the inbound direction."
             ::= { hwPortSuppressionStatisticEntry 21 }    
             
          hwPortBrInDropByte OBJECT-TYPE
@@ -4292,7 +4635,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The inbound drop bytes of broadcast suppression."
+                "This object indicates the number of dropped bytes for broadcast traffic in the inbound direction."
             ::= { hwPortSuppressionStatisticEntry 22 }    
      
                         
@@ -4301,7 +4644,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The outbound pass packets of broadcast suppression."
+                "This object indicates the number of passed packets for broadcast traffic in the outbound direction."
             ::= { hwPortSuppressionStatisticEntry 23 }            
             
         hwPortBrOutPassByte OBJECT-TYPE
@@ -4309,7 +4652,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The outbound pass bytes of broadcast suppression."
+                "This object indicates the number of passed bytes for broadcast traffic in the outbound direction."
             ::= { hwPortSuppressionStatisticEntry 24 }    
             
         hwPortBrOutDropPack OBJECT-TYPE
@@ -4317,7 +4660,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The outbound drop packets of broadcast suppression."
+                "This object indicates the number of dropped packets for broadcast traffic in the outbound direction."
             ::= { hwPortSuppressionStatisticEntry 25 }    
             
          hwPortBrOutDropByte OBJECT-TYPE
@@ -4325,7 +4668,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The outbound drop bytes of broadcast suppression."
+                "This object indicates the number of dropped bytes for broadcast traffic in the outbound direction."
             ::= { hwPortSuppressionStatisticEntry 26 } 
             
 --
@@ -4336,7 +4679,7 @@ VlanIndex ::= TEXTUAL-CONVENTION
             MAX-ACCESS not-accessible
             STATUS current
             DESCRIPTION
-                "Table that contains mac accounting information."
+                "This table is used to manage MAC accounting statistics."
             ::= { hwL2MAMObjects 50 }
 hwMacAccountStatisticEntry OBJECT-TYPE
     SYNTAX HwMacAccountStatisticEntry
@@ -4366,10 +4709,10 @@ hwMacAccountStatisticIfindex OBJECT-TYPE
         
 hwMacAccountStatisticMacAddr OBJECT-TYPE
     SYNTAX MacAddress
-    MAX-ACCESS not-accessible
+    MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-        "This object indicates the MAC Address."
+        "This object indicates the MAC address."
     ::= { hwMacAccountStatisticEntry 2 }
 
 hwMacAccountStatisticIfName OBJECT-TYPE
@@ -4385,7 +4728,7 @@ hwMacAccountStatisticIfInBytes OBJECT-TYPE
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-        "This object indicates the Ingress Bytes."
+        "This object indicates the number of bytes in the inbound direction of an interface."
     ::= { hwMacAccountStatisticEntry 4 }
     
 hwMacAccountStatisticIfInPkts OBJECT-TYPE
@@ -4393,7 +4736,7 @@ hwMacAccountStatisticIfInPkts OBJECT-TYPE
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-        "This object indicates the Ingress Packages."
+        "This object indicates the number of packets in the inbound direction of an interface."
     ::= { hwMacAccountStatisticEntry 5 }
     
 hwMacAccountStatisticIfOutBytes OBJECT-TYPE
@@ -4401,7 +4744,7 @@ hwMacAccountStatisticIfOutBytes OBJECT-TYPE
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-        "This object indicates the Egress Bytes."
+        "This object indicates the number of bytes in the outbound direction of an interface."
     ::= { hwMacAccountStatisticEntry 6 }     
     
 hwMacAccountStatisticIfOutPkts OBJECT-TYPE
@@ -4409,10 +4752,105 @@ hwMacAccountStatisticIfOutPkts OBJECT-TYPE
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-        "This object indicates the Ingress Packages."
+        "This object indicates the number of packets in the outbound direction of an interface."
     ::= { hwMacAccountStatisticEntry 7 }
             
 -- IEEE 802.1Q MIB - Conformance Information
+
+-- hwL2DomainMacLimitAlarmTable begin
+hwL2DomainMacLimitAlarmTable OBJECT-TYPE
+                SYNTAX SEQUENCE OF HwL2DomainMacLimitAlarmEntry
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION 
+                "MAC usage table"
+                ::= { hwL2MAMObjects 53 }
+				
+hwL2DomainMacLimitAlarmEntry OBJECT-TYPE
+               SYNTAX HwL2DomainMacLimitAlarmEntry
+               MAX-ACCESS not-accessible
+               STATUS current
+               DESCRIPTION
+               "MAC usage entry"
+               INDEX {entPhysicalIndex, hwMacLimitAlarmVlan, hwMacLimitAlarmVsi, hwMacLimitAlarmBdID, hwMacLimitAlarmEpnName}
+               ::= { hwL2DomainMacLimitAlarmTable 1 }
+			   
+HwL2DomainMacLimitAlarmEntry::=SEQUENCE {
+                           hwMacLimitAlarmVlan           Integer32,	
+                           hwMacLimitAlarmVsi            OCTET STRING,
+                           hwMacLimitAlarmBdID           Integer32,	
+                           hwMacLimitAlarmEpnName        OCTET STRING,
+                           hwMacLimitAlarmDynNum         Integer32,						   
+                           hwMacLimitAlarmMaxMac         Integer32,
+                           hwMacLimitAlarmUpthreshold    Integer32,
+                           hwMacLimitAlarmDownthreshold  Integer32
+                        }
+
+        hwMacLimitAlarmVlan OBJECT-TYPE
+                SYNTAX Integer32(0..4094)
+                MAX-ACCESS accessible-for-notify
+                STATUS current
+                DESCRIPTION
+                        "The vlan id which will be configured mac-limit."
+                ::= { hwL2DomainMacLimitAlarmEntry 1 }
+				
+        hwMacLimitAlarmVsi   OBJECT-TYPE
+                SYNTAX OCTET STRING (SIZE (1..31))
+                MAX-ACCESS accessible-for-notify
+                STATUS current
+                DESCRIPTION
+                        "The vsi name which will be configured mac-limit."
+                ::= { hwL2DomainMacLimitAlarmEntry 2 } 
+				
+		hwMacLimitAlarmBdID OBJECT-TYPE
+                SYNTAX Integer32(1..32768)
+                MAX-ACCESS accessible-for-notify
+                STATUS current
+                DESCRIPTION
+                        "The bridge domain id which will be configured mac-limit."
+                ::= { hwL2DomainMacLimitAlarmEntry 3 }
+				
+        hwMacLimitAlarmEpnName OBJECT-TYPE
+                SYNTAX OCTET STRING (SIZE (1..31))
+                MAX-ACCESS accessible-for-notify
+                STATUS current
+                DESCRIPTION
+                        "The EVPN name which will be configured mac-limit."
+                ::= { hwL2DomainMacLimitAlarmEntry 4 }
+				
+        hwMacLimitAlarmDynNum   OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS accessible-for-notify
+                STATUS current
+                DESCRIPTION
+                "The number of learned dynamic MAC address ."
+                ::= { hwL2DomainMacLimitAlarmEntry 5 }  
+				
+        hwMacLimitAlarmMaxMac OBJECT-TYPE
+               SYNTAX Integer32 (0..2048000)
+               MAX-ACCESS accessible-for-notify
+               STATUS current
+               DESCRIPTION
+               "The maximum mac address. When the value is '0', the meaning is that there isn't limiting rule to the mac-address number."
+               ::= { hwL2DomainMacLimitAlarmEntry 6 }
+			   
+        hwMacLimitAlarmUpthreshold OBJECT-TYPE
+               SYNTAX Integer32 (0..100)
+               MAX-ACCESS accessible-for-notify
+               STATUS current
+               DESCRIPTION
+               "Upper threshold of MAC address limit"
+               ::= { hwL2DomainMacLimitAlarmEntry 7 }
+			   
+        hwMacLimitAlarmDownthreshold OBJECT-TYPE
+               SYNTAX Integer32 (0..100)
+               MAX-ACCESS accessible-for-notify
+               STATUS current
+               DESCRIPTION
+               "Lower threshold of MAC address limit"
+               ::= { hwL2DomainMacLimitAlarmEntry 8 }
+			   
+-- hwL2DomainMacLimitAlarmTable end
 
 hwL2MAMConformance OBJECT IDENTIFIER ::= { hwL2MAM 2 }
 
@@ -4551,7 +4989,7 @@ hwPortSecurityGroup OBJECT-GROUP
      ::= { hwL2MAMGroups 7 }  
 
 hwMacIfStatisticsGroup OBJECT-GROUP
-    OBJECTS {
+    OBJECTS { 
         hwMacIfStatistics
     }
     STATUS      current
@@ -4572,7 +5010,7 @@ hwMacSlotStatisticsGroup OBJECT-GROUP
     ::= { hwL2MAMGroups 9 } 
     
 hwMacVlanStatisticsGroup OBJECT-GROUP
-    OBJECTS {
+    OBJECTS { 
         hwMacVlanStatistics
     }
     STATUS      current
@@ -4881,7 +5319,7 @@ hwL2MAMCompliance MODULE-COMPLIANCE
             hwVplsOverGRENotSupportForwardRisingResume,
             hwIfInputUnucFlowRisingThreshold,
             hwIfInputUnucFlowFallingThreshold,
-            hwMacHopAlarmRisingThreshold,
+            hwMacHopAlarmRaisingThreshold,
             hwMacHopAlarmFallingThreshold,
             hwPstBroadcastLostAlarm,
             hwPstBroadcastLostResume,
@@ -4905,7 +5343,23 @@ hwL2MAMCompliance MODULE-COMPLIANCE
             hwPbbEvpnNotSupportTunnelAlarm,
             hwPbbEvpnNotSupportTunnelAlarmResume,
             hwVllVpnQosNotSupportTunnelAlarm,
-            hwVllVpnQosNotSupportTunnelAlarmResume}
+            hwVllVpnQosNotSupportTunnelAlarmResume,
+            hwVllVpnQosOverTunnelAlarm,
+            hwVllVpnQosOverTunnelAlarmResume,
+            hwBroadcastDomainElbAlarm,
+            hwBroadcastDomainElbAlarmResume, 
+            hwL2DomainMacLimitNumRaisingThreshold , 
+            hwL2DomainMacLimitNumFallingThreshold,
+            hwVxlanTunnelMacLimitOverThresholdAlarm,
+            hwVxlanTunnelMacLimitOverThresholdAlarmResume, 
+            hwTunnelNotSupportInterface,
+            hwServiceNotSupportDscpSrte,
+            hwVlanMacLimitOverThreshold,
+            hwVlanMacLimitOverThresholdResume, 
+            hwPortMacLimitOverThreshold,
+            hwPortMacLimitOverThresholdResume,
+            hwNotSupportTeOverGre,
+	    hwPortSecRcvInsecurePktAlarmResume}
             STATUS current
             DESCRIPTION
                 "L2 MAC tap group."

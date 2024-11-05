@@ -1,6 +1,6 @@
 <?php
 /*
- * LibreNMS Dantel Webmon generic sensor
+ * LibreNMS FortiGate count sensors
  *
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -14,6 +14,40 @@
  * @copyright  2019 LibreNMS
  * @author     LibreNMS Contributors
  */
+
+// Sensors for license status
+$licenseOids = snmpwalk_cache_multi_oid($device, 'fgSystemInfoAdvanced', [], 'FORTINET-FORTIGATE-MIB');
+
+if (! empty($licenseOids)) {
+    foreach ($licenseOids as $index => $entry) {
+        if (isset($entry['fgLicContractExpiry'])) {
+            $descr = $entry['fgLicContractDesc'];
+
+            discover_sensor(
+                null,
+                'count',
+                $device,
+                '.1.3.6.1.4.1.12356.101.4.6.3.1.2.1.2.' . $index,
+                'fgLicContractExpiry.' . $index,
+                'fortigate',
+                'Days left for ' . $descr,
+                1,
+                1,
+                7,
+                14,
+                null,
+                null,
+                null,
+                'snmp',
+                null,
+                null,
+                null,
+                'License expiration',
+                'gauge'
+            );
+        }
+    }
+}
 
 $session_rate = [
     'Sessions/sec 1m avg' => ['.1.3.6.1.4.1.12356.101.4.1.11', 'fgSysSesRate1'],  //FORTINET-FORTIGATE-MIB::fgSysSesRate1.0
@@ -30,7 +64,7 @@ foreach ($session_rate as $descr => $oid) {
     $result = str_replace(' Sessions Per Second', '', $result);
 
     discover_sensor(
-        $valid['sensor'],
+        null,
         'count',
         $device,
         $oid_num . '.0',
@@ -63,7 +97,7 @@ if ($systemMode == 'activePassive' || $systemMode == 'activeActive') {
 
     // Create a count sensor and set warning to current cluster count
     discover_sensor(
-        $valid['sensor'],
+        null,
         'count',
         $device,
         $fgHaStatsIndex_num,

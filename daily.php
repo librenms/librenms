@@ -111,10 +111,17 @@ if ($options['f'] === 'ports_fdb') {
     $ret = lock_and_purge('ports_fdb', 'updated_at < DATE_SUB(NOW(), INTERVAL ? DAY)');
     exit($ret);
 }
+
+if ($options['f'] === 'ports_nac') {
+    $ret = lock_and_purge('ports_nac', 'updated_at < DATE_SUB(NOW(), INTERVAL ? DAY)');
+    exit($ret);
+}
+
 if ($options['f'] === 'route') {
     $ret = lock_and_purge('route', 'updated_at < DATE_SUB(NOW(), INTERVAL ? DAY)');
     exit($ret);
 }
+
 if ($options['f'] === 'eventlog') {
     $ret = lock_and_purge('eventlog', 'datetime < DATE_SUB(NOW(), INTERVAL ? DAY)');
     exit($ret);
@@ -127,11 +134,6 @@ if ($options['f'] === 'authlog') {
 
 if ($options['f'] === 'callback') {
     \LibreNMS\Util\Stats::submit();
-}
-
-if ($options['f'] === 'device_perf') {
-    $ret = lock_and_purge('device_perf', 'timestamp < DATE_SUB(NOW(),INTERVAL ? DAY)');
-    exit($ret);
 }
 
 if ($options['f'] === 'ports_purge') {
@@ -342,11 +344,7 @@ if ($options['f'] === 'refresh_device_groups') {
 
 if ($options['f'] === 'notify') {
     if (\LibreNMS\Config::has('alert.default_mail')) {
-        send_mail(
-            \LibreNMS\Config::get('alert.default_mail'),
-            '[LibreNMS] Auto update has failed for ' . Config::get('distributed_poller_name'),
-            "We just attempted to update your install but failed. The information below should help you fix this.\r\n\r\n" . $options['o']
-        );
+        \LibreNMS\Util\Mail::send(\LibreNMS\Config::get('alert.default_mail'), '[LibreNMS] Auto update has failed for ' . Config::get('distributed_poller_name'), "We just attempted to update your install but failed. The information below should help you fix this.\r\n\r\n" . $options['o'], false);
     }
 }
 
@@ -373,7 +371,13 @@ if ($options['f'] === 'recalculate_device_dependencies') {
         // update all root nodes and recurse, chunk so we don't blow up
         Device::doesntHave('parents')->with('children')->chunkById(100, function (Collection $devices) {
             // anonymous recursive function
-            $recurse = function (Device $device) use (&$recurse) {
+            $processed = [];
+            $recurse = function (Device $device) use (&$recurse, &$processed) {
+                // Do not process the same device 2 times
+                if (array_key_exists($device->device_id, $processed)) {
+                    return;
+                }
+                $processed[$device->device_id] = true;
                 $device->updateMaxDepth();
 
                 $device->children->each($recurse);

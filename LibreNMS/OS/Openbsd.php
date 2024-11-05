@@ -25,13 +25,14 @@
 
 namespace LibreNMS\OS;
 
+use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\OS\Shared\Unix;
 use LibreNMS\RRD\RrdDefinition;
 
 class Openbsd extends Unix implements OSPolling
 {
-    public function pollOS(): void
+    public function pollOS(DataStorageInterface $datastore): void
     {
         $oids = \SnmpQuery::get([
             'OPENBSD-PF-MIB::pfStateCount.0',
@@ -57,13 +58,13 @@ class Openbsd extends Unix implements OSPolling
             'OPENBSD-PF-MIB::pfCntNoRoute.0',
         ])->values();
 
-        $this->graphOID('states', ['states' => $oids['OPENBSD-PF-MIB::pfStateCount.0']], 'GAUGE');
-        $this->graphOID('searches', ['searches' => $oids['OPENBSD-PF-MIB::pfStateSearches.0']]);
-        $this->graphOID('inserts', ['inserts' => $oids['OPENBSD-PF-MIB::pfStateInserts.0']]);
-        $this->graphOID('removals', ['removals' => $oids['OPENBSD-PF-MIB::pfStateRemovals.0']]);
-        $this->graphOID('matches', ['matches' => $oids['OPENBSD-PF-MIB::pfCntMatch.0']]);
+        $this->graphOID('states', $datastore, ['states' => $oids['OPENBSD-PF-MIB::pfStateCount.0']], 'GAUGE');
+        $this->graphOID('searches', $datastore, ['searches' => $oids['OPENBSD-PF-MIB::pfStateSearches.0']]);
+        $this->graphOID('inserts', $datastore, ['inserts' => $oids['OPENBSD-PF-MIB::pfStateInserts.0']]);
+        $this->graphOID('removals', $datastore, ['removals' => $oids['OPENBSD-PF-MIB::pfStateRemovals.0']]);
+        $this->graphOID('matches', $datastore, ['matches' => $oids['OPENBSD-PF-MIB::pfCntMatch.0']]);
 
-        $this->graphOID('drops', [
+        $this->graphOID('drops', $datastore, [
             'badoffset' => $oids['OPENBSD-PF-MIB::pfCntBadOffset.0'],
             'fragmented' => $oids['OPENBSD-PF-MIB::pfCntFragment.0'],
             'short' => $oids['OPENBSD-PF-MIB::pfCntShort.0'],
@@ -83,7 +84,7 @@ class Openbsd extends Unix implements OSPolling
         ]);
     }
 
-    private function graphOID(string $graphName, array $oids, string $type = 'COUNTER'): void
+    private function graphOID(string $graphName, DataStorageInterface $datastore, array $oids, string $type = 'COUNTER'): void
     {
         $rrd_def = RrdDefinition::make();
         $fields = [];
@@ -94,7 +95,7 @@ class Openbsd extends Unix implements OSPolling
             }
         }
         $tags = compact('rrd_def');
-        data_update($this->getDeviceArray(), "pf_$graphName", $tags, $fields);
+        $datastore->put($this->getDeviceArray(), "pf_$graphName", $tags, $fields);
 
         $this->enableGraph("pf_$graphName");
     }

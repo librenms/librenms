@@ -27,6 +27,7 @@ use App\Models\Service;
 use App\Models\User;
 use LibreNMS\DB\Eloquent;
 use LibreNMS\Enum\AlertState;
+use LibreNMS\Util\Mail;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Time;
 use LibreNMS\Util\Version;
@@ -553,7 +554,7 @@ class IRCBot
         }
 
         if ($this->ssl && $this->config['irc_disable_ssl_check']) {
-            $ssl_context_params = ['ssl'=>['allow_self_signed'=> true, 'verify_peer' => false, 'verify_peer_name' => false]];
+            $ssl_context_params = ['ssl' => ['allow_self_signed' => true, 'verify_peer' => false, 'verify_peer_name' => false]];
             $ssl_context = stream_context_create($ssl_context_params);
             $this->socket['irc'] = stream_socket_client($server . ':' . $this->port, $errno, $errstr, 30, STREAM_CLIENT_CONNECT, $ssl_context);
         } else {
@@ -706,7 +707,7 @@ class IRCBot
                     $this->log("Auth for '" . $params[0] . "', ID: '" . $user->user_id . "', Token: '" . $token . "', Mail: '" . $user->email . "'");
                 }
 
-                if (send_mail($user->email, 'LibreNMS IRC-Bot Authtoken', "Your Authtoken for the IRC-Bot:\r\n\r\n" . $token . "\r\n\r\n") === true) {
+                if (Mail::send($user->email, 'LibreNMS IRC-Bot Authtoken', "Your Authtoken for the IRC-Bot:\r\n\r\n" . $token . "\r\n\r\n", false) === true) {
                     return $this->respond('Token sent!');
                 } else {
                     return $this->respond('Sorry, seems like mail doesnt like us.');
@@ -1057,21 +1058,21 @@ class IRCBot
         $string = preg_replace('#</u>#i', chr(31), $string);
 
         $colors = [
-            'white'     => '00',
-            'black'     => '01',
-            'blue'      => '02',
-            'green'     => '03',
-            'red'       => '04',
-            'brown'     => '05',
-            'purple'    => '06',
-            'orange'    => '07',
-            'yellow'    => '08',
+            'white' => '00',
+            'black' => '01',
+            'blue' => '02',
+            'green' => '03',
+            'red' => '04',
+            'brown' => '05',
+            'purple' => '06',
+            'orange' => '07',
+            'yellow' => '08',
             'lightgreen' => '09',
-            'cyan'      => '10',
+            'cyan' => '10',
             'lightcyan' => '11',
             'lightblue' => '12',
-            'pink'      => '13',
-            'grey'      => '14',
+            'pink' => '13',
+            'grey' => '14',
             'lightgrey' => '15',
         ];
 

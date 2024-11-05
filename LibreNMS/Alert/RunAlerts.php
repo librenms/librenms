@@ -31,6 +31,7 @@
 namespace LibreNMS\Alert;
 
 use App\Facades\DeviceCache;
+use App\Facades\Rrd;
 use App\Models\AlertTransport;
 use App\Models\Eventlog;
 use LibreNMS\Config;
@@ -38,6 +39,7 @@ use LibreNMS\Enum\AlertState;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
 use LibreNMS\Polling\ConnectivityHelper;
+use LibreNMS\Util\Number;
 use LibreNMS\Util\Time;
 
 class RunAlerts
@@ -116,13 +118,15 @@ class RunAlerts
         $obj['status'] = $device->status;
         $obj['status_reason'] = $device->status_reason;
         if ((new ConnectivityHelper($device))->canPing()) {
-            $ping_stats = $device->perf()->latest('timestamp')->first();
-            $obj['ping_timestamp'] = $ping_stats->timestamp;
-            $obj['ping_loss'] = $ping_stats->loss;
-            $obj['ping_min'] = $ping_stats->min;
-            $obj['ping_max'] = $ping_stats->max;
-            $obj['ping_avg'] = $ping_stats->avg;
-            $obj['debug'] = $ping_stats->debug;
+            $last_ping = Rrd::lastUpdate(Rrd::name($device->hostname, 'icmp-perf'));
+            if ($last_ping) {
+                $obj['ping_timestamp'] = $last_ping->timestamp;
+                $obj['ping_loss'] = Number::calculatePercent($last_ping->get('xmt') - $last_ping->get('rcv'), $last_ping->get('xmt'));
+                $obj['ping_min'] = $last_ping->get('min');
+                $obj['ping_max'] = $last_ping->get('max');
+                $obj['ping_avg'] = $last_ping->get('avg');
+                $obj['debug'] = 'unsupported';
+            }
         }
         $extra = $alert['details'];
 
@@ -254,8 +258,9 @@ class RunAlerts
         $obj = $this->describeAlert($alert);
         if (is_array($obj)) {
             echo 'Issuing Alert-UID #' . $alert['id'] . '/' . $alert['state'] . ':' . PHP_EOL;
-            $this->extTransports($obj);
-
+            if ($alert['state'] != AlertState::ACKNOWLEDGED || Config::get('alert.acknowledged') === true) {
+                $this->extTransports($obj);
+            }
             echo "\r\n";
         }
 
@@ -270,8 +275,17 @@ class RunAlerts
     public function runAcks()
     {
         foreach ($this->loadAlerts('alerts.state = ' . AlertState::ACKNOWLEDGED . ' && alerts.open = ' . AlertState::ACTIVE) as $alert) {
-            $this->issueAlert($alert);
-            dbUpdate(['open' => AlertState::CLEAR], 'alerts', 'rule_id = ? && device_id = ?', [$alert['rule_id'], $alert['device_id']]);
+            $rextra = json_decode($alert['extra'], true);
+            if (! isset($rextra['acknowledgement'])) {
+                // backwards compatibility check
+                $rextra['acknowledgement'] = true;
+            }
+
+            if ($rextra['acknowledgement']) {
+                // Rule is set to send an acknowledgement alert
+                $this->issueAlert($alert);
+                dbUpdate(['open' => AlertState::CLEAR], 'alerts', 'rule_id = ? && device_id = ?', [$alert['rule_id'], $alert['device_id']]);
+            }
         }
     }
 
@@ -300,6 +314,7 @@ class RunAlerts
                         $chk[$i]['ip'] = inet6_ntop($chk[$i]['ip']);
                     }
                 }
+                $alert['details']['rule'] ??= []; // if details.rule is missing, set it to an empty array
                 $o = count($alert['details']['rule']);
                 $n = count($chk);
                 $ret = 'Alert #' . $alert['id'];
@@ -377,6 +392,11 @@ class RunAlerts
                 $rextra['recovery'] = true;
             }
 
+            if (! isset($alert['details']['count'])) {
+                // make sure count is set for below code, in legacy code null would get type juggled to 0
+                $alert['details']['count'] = 0;
+            }
+
             $chk = dbFetchRow('SELECT alerts.alerted,devices.ignore,devices.disabled FROM alerts,devices WHERE alerts.device_id = ? && devices.device_id = alerts.device_id && alerts.rule_id = ?', [$alert['device_id'], $alert['rule_id']]);
 
             if ($chk['alerted'] == $alert['state']) {
@@ -396,7 +416,8 @@ class RunAlerts
                 }
 
                 if ($alert['state'] == AlertState::ACTIVE && ! empty($rextra['count']) && ($rextra['count'] == -1 || $alert['details']['count']++ < $rextra['count'])) {
-                    if ($alert['details']['count'] < $rextra['count']) {
+                    // We don't want -1 alert rule count alarms to get muted because of the current alert count
+                    if ($alert['details']['count'] < $rextra['count'] || $rextra['count'] == -1) {
                         $noacc = true;
                     }
 
@@ -419,7 +440,8 @@ class RunAlerts
                 }
 
                 if (in_array($alert['state'], [AlertState::ACTIVE, AlertState::WORSE, AlertState::BETTER]) && ! empty($rextra['count']) && ($rextra['count'] == -1 || $alert['details']['count']++ < $rextra['count'])) {
-                    if ($alert['details']['count'] < $rextra['count']) {
+                    // We don't want -1 alert rule count alarms to get muted because of the current alert count
+                    if ($alert['details']['count'] < $rextra['count'] || $rextra['count'] == -1) {
                         $noacc = true;
                     }
 
@@ -511,7 +533,7 @@ class RunAlerts
                     $tmp = $instance->deliverAlert($obj, $item['opts'] ?? []);
                     $this->alertLog($tmp, $obj, $obj['transport']);
                 } catch (AlertTransportDeliveryException $e) {
-                    Eventlog::log($e->getMessage(), $obj['device_id'], 'alert', Severity::Error);
+                    Eventlog::log($e->getTraceAsString() . PHP_EOL . $e->getMessage(), $obj['device_id'], 'alert', Severity::Error);
                     $this->alertLog($e->getMessage(), $obj, $obj['transport']);
                 } catch (\Exception $e) {
                     $this->alertLog($e, $obj, $obj['transport']);

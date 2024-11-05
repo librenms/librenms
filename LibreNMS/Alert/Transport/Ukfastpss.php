@@ -95,7 +95,7 @@ class Ukfastpss extends Transport
                     'title' => 'Secure',
                     'name' => 'secure',
                     'descr' => 'Specifies whether created request should be secure',
-                    'type'  => 'checkbox',
+                    'type' => 'checkbox',
                     'default' => true,
                 ],
             ],

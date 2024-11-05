@@ -28,14 +28,16 @@ namespace LibreNMS\OS;
 use App\Models\Eventlog;
 use App\Models\TnmsneInfo;
 use App\Observers\ModuleModelObserver;
+use Illuminate\Support\Facades\Log;
 use LibreNMS\Enum\Severity;
+use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Polling\OSPolling;
 
 class Coriant extends \LibreNMS\OS implements OSPolling
 {
-    public function pollOS(): void
+    public function pollOS(DataStorageInterface $datastore): void
     {
-        echo 'TNMS-NBI-MIB: enmsNETable';
+        Log::info('TNMS-NBI-MIB: enmsNETable');
 
         /*
          * Coriant have done some SQL over SNMP, since we have to populate and update all the tables

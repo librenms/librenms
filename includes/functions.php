@@ -8,61 +8,10 @@
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
 
-use App\Models\Device;
+use App\Models\StateTranslation;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
-use LibreNMS\Enum\PortAssociationMode;
 use LibreNMS\Enum\Severity;
-use LibreNMS\Exceptions\HostExistsException;
-use LibreNMS\Exceptions\HostIpExistsException;
-use LibreNMS\Exceptions\HostnameExistsException;
-use LibreNMS\Exceptions\HostSysnameExistsException;
-use LibreNMS\Exceptions\HostUnreachableException;
-use LibreNMS\Exceptions\HostUnreachablePingException;
-use LibreNMS\Exceptions\HostUnreachableSnmpException;
-use LibreNMS\Exceptions\InvalidPortAssocModeException;
-use LibreNMS\Exceptions\SnmpVersionUnsupportedException;
-use LibreNMS\Modules\Core;
-
-function array_sort_by_column($array, $on, $order = SORT_ASC)
-{
-    $new_array = [];
-    $sortable_array = [];
-
-    if (count($array) > 0) {
-        foreach ($array as $k => $v) {
-            if (is_array($v)) {
-                foreach ($v as $k2 => $v2) {
-                    if ($k2 == $on) {
-                        $sortable_array[$k] = $v2;
-                    }
-                }
-            } else {
-                $sortable_array[$k] = $v;
-            }
-        }
-
-        switch ($order) {
-            case SORT_ASC:
-                asort($sortable_array);
-                break;
-            case SORT_DESC:
-                arsort($sortable_array);
-                break;
-        }
-
-        foreach ($sortable_array as $k => $v) {
-            $new_array[$k] = $array[$k];
-        }
-    }
-
-    return $new_array;
-}
-
-function only_alphanumeric($string)
-{
-    return preg_replace('/[^a-zA-Z0-9]/', '', $string);
-}
 
 /**
  * Parse cli discovery or poller modules and set config for this run
@@ -123,10 +72,7 @@ function logfile($string)
 
 function percent_colour($perc)
 {
-    $r = min(255, 5 * ($perc - 25));
-    $b = max(0, 255 - (5 * ($perc + 25)));
-
-    return sprintf('#%02x%02x%02x', $r, $b, $b);
+    return \LibreNMS\Util\Color::percent(percent: $perc);
 }
 
 /**
@@ -160,8 +106,15 @@ function getImageName($device, $use_database = true, $dir = 'images/os/')
 function renamehost($id, $new, $source = 'console')
 {
     $host = gethostbyid($id);
+    $new_rrd_dir = Rrd::dirFromHost($new);
 
-    if (! is_dir(Rrd::dirFromHost($new)) && rename(Rrd::dirFromHost($host), Rrd::dirFromHost($new)) === true) {
+    if (is_dir($new_rrd_dir)) {
+        log_event("Renaming of $host failed due to existing RRD folder for $new", $id, 'system', 5);
+
+        return "Renaming of $host failed due to existing RRD folder for $new\n";
+    }
+
+    if (! is_dir($new_rrd_dir) && rename(Rrd::dirFromHost($host), $new_rrd_dir) === true) {
         dbUpdate(['hostname' => $new, 'ip' => null], 'devices', 'device_id=?', [$id]);
         log_event("Hostname changed -> $new ($source)", $id, 'system', 3);
 
@@ -180,14 +133,14 @@ function device_discovery_trigger($id)
         set_time_limit(0);
     }
 
-    $update = dbUpdate(['last_discovered' => ['NULL']], 'devices', '`device_id` = ?', [$id]);
+    $update = dbUpdate(['last_discovered' => null], 'devices', '`device_id` = ?', [$id]);
     if (! empty($update) || $update == '0') {
         $message = 'Device will be rediscovered';
     } else {
         $message = 'Error rediscovering device';
     }
 
-    return ['status'=> $update, 'message' => $message];
+    return ['status' => $update, 'message' => $message];
 }
 
 function delete_device($id)
@@ -202,248 +155,6 @@ function delete_device($id)
     }
 
     return "Failed to remove device $device->hostname";
-}
-
-/**
- * Add a device to LibreNMS
- *
- * @param  string  $host  dns name or ip address
- * @param  string  $snmp_version  If this is empty, try v2c,v3,v1.  Otherwise, use this specific version.
- * @param  int  $port  the port to connect to for snmp
- * @param  string  $transport  udp or tcp
- * @param  string  $poller_group  the poller group this device will belong to
- * @param  bool  $force_add  add even if the device isn't reachable
- * @param  string  $port_assoc_mode  snmp field to use to determine unique ports
- * @param  array  $additional  an array with additional parameters to take into consideration when adding devices
- * @return int returns the device_id of the added device
- *
- * @throws HostExistsException This hostname already exists
- * @throws HostIpExistsException We already have a host with this IP
- * @throws HostUnreachableException We could not reach this device is some way
- * @throws HostUnreachablePingException We could not ping the device
- * @throws InvalidPortAssocModeException The given port association mode was invalid
- * @throws SnmpVersionUnsupportedException The given snmp version was invalid
- */
-function addHost($host, $snmp_version = '', $port = 161, $transport = 'udp', $poller_group = '0', $force_add = false, $port_assoc_mode = 'ifIndex', $additional = [])
-{
-    // Test Database Exists
-    if (host_exists($host)) {
-        throw new HostnameExistsException($host);
-    }
-
-    // Valid port assoc mode
-    if (! in_array($port_assoc_mode, PortAssociationMode::getModes())) {
-        throw new InvalidPortAssocModeException("Invalid port association_mode '$port_assoc_mode'. Valid modes are: " . join(', ', PortAssociationMode::getModes()));
-    }
-
-    // check if we have the host by IP
-    $overwrite_ip = null;
-    if (! empty($additional['overwrite_ip'])) {
-        $overwrite_ip = $additional['overwrite_ip'];
-        $ip = $overwrite_ip;
-    } elseif (Config::get('addhost_alwayscheckip') === true) {
-        $ip = gethostbyname($host);
-    } else {
-        $ip = $host;
-    }
-    if ($force_add !== true && $existing = device_has_ip($ip)) {
-        throw new HostIpExistsException($host, $existing->hostname, $ip);
-    }
-
-    // Test reachability
-    if (! $force_add) {
-        if (! (new \LibreNMS\Polling\ConnectivityHelper(new Device(['hostname' => $ip])))->isPingable()->success()) {
-            throw new HostUnreachablePingException($host);
-        }
-    }
-
-    // if $snmpver isn't set, try each version of snmp
-    if (empty($snmp_version)) {
-        $snmpvers = Config::get('snmp.version');
-    } else {
-        $snmpvers = [$snmp_version];
-    }
-
-    if (isset($additional['snmp_disable']) && $additional['snmp_disable'] == 1) {
-        return createHost($host, '', $snmp_version, $port, $transport, [], $poller_group, 1, true, $overwrite_ip, $additional);
-    }
-    $host_unreachable_exception = new HostUnreachableSnmpException($host);
-    // try different snmp variables to add the device
-    foreach ($snmpvers as $snmpver) {
-        if ($snmpver === 'v3') {
-            // Try each set of parameters from config
-            foreach (Config::get('snmp.v3') as $v3) {
-                $device = deviceArray($host, null, $snmpver, $port, $transport, $v3, $port_assoc_mode, $overwrite_ip);
-                if ($force_add === true || isSNMPable($device)) {
-                    return createHost($host, null, $snmpver, $port, $transport, $v3, $poller_group, $port_assoc_mode, $force_add, $overwrite_ip);
-                } else {
-                    $host_unreachable_exception->addReason($snmpver, $v3['authname'] . '/' . $v3['authlevel']);
-                }
-            }
-        } elseif ($snmpver === 'v2c' || $snmpver === 'v1') {
-            // try each community from config
-            foreach (Config::get('snmp.community') as $community) {
-                $device = deviceArray($host, $community, $snmpver, $port, $transport, null, $port_assoc_mode, $overwrite_ip);
-
-                if ($force_add === true || isSNMPable($device)) {
-                    return createHost($host, $community, $snmpver, $port, $transport, [], $poller_group, $port_assoc_mode, $force_add, $overwrite_ip);
-                } else {
-                    $host_unreachable_exception->addReason($snmpver, $community);
-                }
-            }
-        } else {
-            throw new SnmpVersionUnsupportedException($snmpver);
-        }
-    }
-    if (isset($additional['ping_fallback']) && $additional['ping_fallback'] == 1) {
-        $additional['snmp_disable'] = 1;
-        $additional['os'] = 'ping';
-
-        return createHost($host, '', $snmp_version, $port, $transport, [], $poller_group, 1, true, $overwrite_ip, $additional);
-    }
-    throw $host_unreachable_exception;
-}
-
-function deviceArray($host, $community, $snmpver, $port = 161, $transport = 'udp', $v3 = [], $port_assoc_mode = 'ifIndex', $overwrite_ip = null)
-{
-    $device = [];
-    $device['hostname'] = $host;
-    $device['overwrite_ip'] = $overwrite_ip;
-    $device['port'] = $port;
-    $device['transport'] = $transport;
-
-    /* Get port_assoc_mode id if neccessary
-     * We can work with names of IDs here */
-    if (! is_int($port_assoc_mode)) {
-        $port_assoc_mode = PortAssociationMode::getId($port_assoc_mode);
-    }
-    $device['port_association_mode'] = $port_assoc_mode;
-
-    $device['snmpver'] = $snmpver;
-    if ($snmpver === 'v2c' or $snmpver === 'v1') {
-        $device['community'] = $community;
-    } elseif ($snmpver === 'v3') {
-        $device['authlevel'] = $v3['authlevel'];
-        $device['authname'] = $v3['authname'];
-        $device['authpass'] = $v3['authpass'];
-        $device['authalgo'] = $v3['authalgo'];
-        $device['cryptopass'] = $v3['cryptopass'];
-        $device['cryptoalgo'] = $v3['cryptoalgo'];
-    }
-
-    return $device;
-}//end deviceArray()
-
-function isSNMPable($device)
-{
-    $pos = snmp_check($device);
-    if ($pos === true) {
-        return true;
-    } else {
-        $pos = snmp_get($device, 'sysObjectID.0', '-Oqv', 'SNMPv2-MIB');
-        if ($pos === '' || $pos === false) {
-            return false;
-        } else {
-            return true;
-        }
-    }
-}
-
-function getpollergroup($poller_group = '0')
-{
-    //Is poller group an integer
-    if (is_int($poller_group) || ctype_digit($poller_group)) {
-        return $poller_group;
-    } else {
-        //Check if it contains a comma
-        if (strpos($poller_group, ',') !== false) {
-            //If it has a comma use the first element as the poller group
-            $poller_group_array = explode(',', $poller_group);
-
-            return getpollergroup($poller_group_array[0]);
-        } else {
-            if (Config::get('distributed_poller_group')) {
-                //If not use the poller's group from the config
-                return getpollergroup(Config::get('distributed_poller_group'));
-            } else {
-                //If all else fails use default
-                return '0';
-            }
-        }
-    }
-}
-
-/**
- * Add a host to the database
- *
- * @param  string  $host  The IP or hostname to add
- * @param  string  $community  The snmp community
- * @param  string  $snmpver  snmp version: v1 | v2c | v3
- * @param  int  $port  SNMP port number
- * @param  string  $transport  SNMP transport: udp | udp6 | udp | tcp6
- * @param  array  $v3  SNMPv3 settings required array keys: authlevel, authname, authpass, authalgo, cryptopass, cryptoalgo
- * @param  int  $poller_group  distributed poller group to assign this host to
- * @param  string  $port_assoc_mode  field to use to identify ports: ifIndex, ifName, ifDescr, ifAlias
- * @param  bool  $force_add  Do not detect the host os
- * @param  array  $additional  an array with additional parameters to take into consideration when adding devices
- * @return int the id of the added host
- *
- * @throws HostExistsException Throws this exception if the host already exists
- * @throws Exception Throws this exception if insertion into the database fails
- */
-function createHost(
-    $host,
-    $community,
-    $snmpver,
-    $port = 161,
-    $transport = 'udp',
-    $v3 = [],
-    $poller_group = 0,
-    $port_assoc_mode = 'ifIndex',
-    $force_add = false,
-    $overwrite_ip = null,
-    $additional = []
-) {
-    $host = trim(strtolower($host));
-
-    $poller_group = getpollergroup($poller_group);
-
-    /* Get port_assoc_mode id if necessary
-     * We can work with names of IDs here */
-    if (! is_int($port_assoc_mode)) {
-        $port_assoc_mode = PortAssociationMode::getId($port_assoc_mode);
-    }
-
-    $device = new Device(array_merge([
-        'hostname' => $host,
-        'overwrite_ip' => $overwrite_ip,
-        'sysName' => $additional['sysName'] ?? $host,
-        'os' => $additional['os'] ?? 'generic',
-        'hardware' => $additional['hardware'] ?? null,
-        'community' => $community,
-        'port' => $port,
-        'transport' => $transport,
-        'status' => '1',
-        'snmpver' => $snmpver,
-        'poller_group' => $poller_group,
-        'status_reason' => '',
-        'port_association_mode' => $port_assoc_mode,
-        'snmp_disable' => $additional['snmp_disable'] ?? 0,
-    ], $v3));
-
-    if ($force_add !== true) {
-        $device->os = Core::detectOS($device);
-
-        $device->sysName = SnmpQuery::device($device)->get('SNMPv2-MIB::sysName.0')->value();
-        if (host_exists($host, $device->sysName)) {
-            throw new HostSysnameExistsException($host, $device->sysName);
-        }
-    }
-    if ($device->save()) {
-        return $device->device_id;
-    }
-
-    throw new \Exception('Failed to add host to the database, please run ./validate.php');
 }
 
 function isDomainResolves($domain)
@@ -506,11 +217,6 @@ function snmp2ipv6($ipv6_snmp)
     return implode(':', $ipv6_2);
 }
 
-function get_astext(string|int|null $asn): string
-{
-    return \LibreNMS\Util\AutonomousSystem::get($asn)->name();
-}
-
 /**
  * Log events to the event table
  *
@@ -530,17 +236,6 @@ function log_event($text, $device = null, $type = null, $severity = 2, $referenc
     \App\Models\Eventlog::log($text, $device, $type, Severity::tryFrom((int) $severity) ?? Severity::Info, $reference);
 }
 
-// Parse string with emails. Return array with email (as key) and name (as value)
-function parse_email($emails)
-{
-    return \LibreNMS\Util\Mail::parseEmails($emails);
-}
-
-function send_mail($emails, $subject, $message, $html = false)
-{
-    return \LibreNMS\Util\Mail::send($emails, $subject, $message, $html);
-}
-
 function hex2str($hex)
 {
     $string = '';
@@ -556,34 +251,6 @@ function hex2str($hex)
 function snmp_hexstring($hex)
 {
     return hex2str(str_replace(' ', '', str_replace(' 00', '', $hex)));
-}
-
-// Check if the supplied string is an SNMP hex string
-function isHexString($str)
-{
-    return (bool) preg_match('/^[a-f0-9][a-f0-9]( [a-f0-9][a-f0-9])*$/is', trim($str));
-}
-
-// Include all .inc.php files in $dir
-function include_dir($dir, $regex = '')
-{
-    global $device, $valid;
-
-    if ($regex == '') {
-        $regex = "/\.inc\.php$/";
-    }
-
-    if ($handle = opendir(Config::get('install_dir') . '/' . $dir)) {
-        while (false !== ($file = readdir($handle))) {
-            if (filetype(Config::get('install_dir') . '/' . $dir . '/' . $file) == 'file' && preg_match($regex, $file)) {
-                d_echo('Including: ' . Config::get('install_dir') . '/' . $dir . '/' . $file . "\n");
-
-                include Config::get('install_dir') . '/' . $dir . '/' . $file;
-            }
-        }
-
-        closedir($handle);
-    }
 }
 
 /**
@@ -649,7 +316,7 @@ function is_port_valid($port, $device)
 
     foreach (Config::getCombined($device['os'], 'bad_ifalias_regexp') as $bar) {
         if (preg_match($bar . 'i', $ifAlias)) {
-            d_echo("ignored by ifName: $ifAlias (matched: $bar)\n");
+            d_echo("ignored by ifAlias: $ifAlias (matched: $bar)\n");
 
             return false;
         }
@@ -693,7 +360,8 @@ function port_fill_missing_and_trim(&$port, $device)
         $port['ifDescr'] = $port['ifName'];
         d_echo(' Using ifName as ifDescr');
     }
-    if (! empty($device['attribs']['ifName:' . $port['ifName']])) {
+    $attrib = DeviceCache::get($device['device_id'] ?? null)->getAttrib('ifName:' . $port['ifName']);
+    if (! empty($attrib)) {
         // ifAlias overridden by user, don't update it
         unset($port['ifAlias']);
         d_echo(' ifAlias overriden by user');
@@ -749,29 +417,6 @@ function normalize_snmp_ip_address($data)
     return preg_replace('/([0-9a-fA-F]{2}):([0-9a-fA-F]{2})/', '\1\2', explode('%', $data, 2)[0]);
 }
 
-function guidv4($data)
-{
-    // http://stackoverflow.com/questions/2040240/php-function-to-generate-v4-uuid#15875555
-    // From: Jack http://stackoverflow.com/users/1338292/ja%CD%A2ck
-    assert(strlen($data) == 16);
-
-    $data[6] = chr(ord($data[6]) & 0x0F | 0x40); // set version to 0100
-    $data[8] = chr(ord($data[8]) & 0x3F | 0x80); // set bits 6-7 to 10
-
-    return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
-}
-
-function target_to_id($target)
-{
-    if ($target[0] . $target[1] == 'g:') {
-        $target = 'g' . dbFetchCell('SELECT id FROM device_groups WHERE name = ?', [substr($target, 2)]);
-    } else {
-        $target = dbFetchCell('SELECT device_id FROM devices WHERE hostname = ?', [$target]);
-    }
-
-    return $target;
-}
-
 function fix_integer_value($value)
 {
     if ($value < 0) {
@@ -781,17 +426,6 @@ function fix_integer_value($value)
     }
 
     return $return;
-}
-
-/**
- * Find a device that has this IP. Checks ipv4_addresses and ipv6_addresses tables.
- *
- * @param  string  $ip
- * @return \App\Models\Device|false
- */
-function device_has_ip($ip)
-{
-    return Device::findByIp($ip);
 }
 
 /**
@@ -860,106 +494,23 @@ function dnslookup($device, $type = false, $return = false)
  *
  * @param  string  $state_name  the unique name for this state translation
  * @param  array  $states  array of states, each must contain keys: descr, graph, value, generic
- * @return int|null
+ * @return void
  */
-function create_state_index($state_name, $states = [])
+function create_state_index($state_name, $states = []): void
 {
-    $state_index_id = dbFetchCell('SELECT `state_index_id` FROM state_indexes WHERE state_name = ? LIMIT 1', [$state_name]);
-    if (! is_numeric($state_index_id)) {
-        $state_index_id = dbInsert(['state_name' => $state_name], 'state_indexes');
-
-        // legacy code, return index so states are created
-        if (empty($states)) {
-            return $state_index_id;
-        }
-    }
-
-    // check or synchronize states
-    if (empty($states)) {
-        $translations = dbFetchRows('SELECT * FROM `state_translations` WHERE `state_index_id` = ?', [$state_index_id]);
-        if (count($translations) == 0) {
-            // If we don't have any translations something has gone wrong so return the state_index_id so they get created.
-            return $state_index_id;
-        }
-    } else {
-        sync_sensor_states($state_index_id, $states);
-    }
-
-    return null;
-}
-
-/**
- * Synchronize the sensor state translations with the database
- *
- * @param  int  $state_index_id  index of the state
- * @param  array  $states  array of states, each must contain keys: descr, graph, value, generic
- */
-function sync_sensor_states($state_index_id, $states)
-{
-    $new_translations = array_reduce($states, function ($array, $state) use ($state_index_id) {
-        $array[$state['value']] = [
-            'state_index_id' => $state_index_id,
+    app('sensor-discovery')->withStateTranslations($state_name, array_map(function ($state) {
+        return new StateTranslation([
             'state_descr' => $state['descr'],
             'state_draw_graph' => $state['graph'],
             'state_value' => $state['value'],
             'state_generic_value' => $state['generic'],
-        ];
-
-        return $array;
-    }, []);
-
-    $existing_translations = dbFetchRows(
-        'SELECT `state_index_id`,`state_descr`,`state_draw_graph`,`state_value`,`state_generic_value` FROM `state_translations` WHERE `state_index_id`=?',
-        [$state_index_id]
-    );
-
-    foreach ($existing_translations as $translation) {
-        $value = $translation['state_value'];
-        if (isset($new_translations[$value])) {
-            if ($new_translations[$value] != $translation) {
-                dbUpdate(
-                    $new_translations[$value],
-                    'state_translations',
-                    '`state_index_id`=? AND `state_value`=?',
-                    [$state_index_id, $value]
-                );
-            }
-
-            // this translation is synchronized, it doesn't need to be inserted
-            unset($new_translations[$value]);
-        } else {
-            dbDelete('state_translations', '`state_index_id`=? AND `state_value`=?', [$state_index_id, $value]);
-        }
-    }
-
-    // insert any new translations
-    dbBulkInsert($new_translations, 'state_translations');
+        ]);
+    }, $states));
 }
 
 function create_sensor_to_state_index($device, $state_name, $index)
 {
-    $sensor_entry = dbFetchRow('SELECT sensor_id FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ? AND `sensor_type` = ? AND `sensor_index` = ?', [
-        'state',
-        $device['device_id'],
-        $state_name,
-        $index,
-    ]);
-    $state_indexes_entry = dbFetchRow('SELECT state_index_id FROM `state_indexes` WHERE `state_name` = ?', [
-        $state_name,
-    ]);
-    if (! empty($sensor_entry['sensor_id']) && ! empty($state_indexes_entry['state_index_id'])) {
-        $insert = [
-            'sensor_id' => $sensor_entry['sensor_id'],
-            'state_index_id' => $state_indexes_entry['state_index_id'],
-        ];
-        foreach ($insert as $key => $val_check) {
-            if (! isset($val_check)) {
-                unset($insert[$key]);
-            }
-        }
-
-        dbInsert($insert, 'sensors_to_state_indexes');
-    }
+    // no op
 }
 
 function delta_to_bits($delta, $period)
@@ -969,20 +520,13 @@ function delta_to_bits($delta, $period)
 
 function report_this($message)
 {
-    return '<h2>' . $message . ' Please <a href="' . Config::get('project_issues') . '">report this</a> to the ' . Config::get('project_name') . ' developers.</h2>';
+    return '<h2>' . htmlentities($message) . ' Please <a href="' . htmlentities(Config::get('project_issues')) . '">report this</a> to the ' . htmlentities(Config::get('project_name')) . ' developers.</h2>';
 }//end report_this()
 
 function hytera_h2f($number, $nd)
 {
     if (strlen(str_replace(' ', '', $number)) == 4) {
-        $hex = '';
-        for ($i = 0; $i < strlen($number); $i++) {
-            $byte = strtoupper(dechex(ord($number[$i])));
-            $byte = str_repeat('0', 2 - strlen($byte)) . $byte;
-            $hex .= $byte . ' ';
-        }
-        $number = $hex;
-        unset($hex);
+        $number = \LibreNMS\Util\StringHelpers::asciiToHex($number, ' ');
     }
     $r = '';
     $y = explode(' ', $number);
@@ -1041,105 +585,6 @@ function hytera_h2f($number, $nd)
     return number_format($floatfinal, $nd, '.', '');
 }
 
-/*
- * Cisco CIMC functions
- */
-// Create an entry in the entPhysical table if it doesnt already exist.
-function setCIMCentPhysical($location, $data, &$entphysical, &$index)
-{
-    // Go get the location, this will create it if it doesnt exist.
-    $entPhysicalIndex = getCIMCentPhysical($location, $entphysical, $index);
-
-    // See if we need to update
-    $update = [];
-    foreach ($data as $key => $value) {
-        // Is the Array(DB) value different to the supplied data
-        if ($entphysical[$location][$key] != $value) {
-            $update[$key] = $value;
-            $entphysical[$location][$key] = $value;
-        } // End if
-    } // end foreach
-
-    // Do we need to update
-    if (count($update) > 0) {
-        dbUpdate($update, 'entPhysical', '`entPhysical_id` = ?', [$entphysical[$location]['entPhysical_id']]);
-    }
-    $entPhysicalId = $entphysical[$location]['entPhysical_id'];
-
-    return [$entPhysicalId, $entPhysicalIndex];
-}
-
-function getCIMCentPhysical($location, &$entphysical, &$index)
-{
-    global $device;
-
-    // Level 1 - Does the location exist
-    if (isset($entphysical[$location])) {
-        // Yes, return the entPhysicalIndex.
-        return $entphysical[$location]['entPhysicalIndex'];
-    } else {
-        /*
-         * No, the entry doesnt exist.
-         * Find its parent so we can create it.
-         */
-
-        // Pull apart the location
-        $parts = explode('/', $location);
-
-        // Level 2 - Are we at the root
-        if (count($parts) == 1) {
-            // Level 2 - Yes. We are the root, there is no parent
-            d_echo('ROOT - ' . $location . "\n");
-            $shortlocation = $location;
-            $parent = 0;
-        } else {
-            // Level 2 - No. Need to go deeper.
-            d_echo('NON-ROOT - ' . $location . "\n");
-            $shortlocation = array_pop($parts);
-            $parentlocation = implode('/', $parts);
-            d_echo('Decend - parent location: ' . $parentlocation . "\n");
-            $parent = getCIMCentPhysical($parentlocation, $entphysical, $index);
-        } // end if - Level 2
-        d_echo('Parent: ' . $parent . "\n");
-
-        // Now we have an ID, create the entry.
-        $index++;
-        $insert = [
-            'device_id'                 => $device['device_id'],
-            'entPhysicalIndex'          => $index,
-            'entPhysicalClass'          => 'container',
-            'entPhysicalVendorType'     => $location,
-            'entPhysicalName'           => $shortlocation,
-            'entPhysicalContainedIn'    => $parent,
-            'entPhysicalParentRelPos'   => '-1',
-        ];
-
-        // Add to the DB and Array.
-        $id = dbInsert($insert, 'entPhysical');
-        $entphysical[$location] = dbFetchRow('SELECT * FROM entPhysical WHERE entPhysical_id=?', [$id]);
-
-        return $index;
-    } // end if - Level 1
-} // end function
-
-/* idea from https://php.net/manual/en/function.hex2bin.php comments */
-function hex2bin_compat($str)
-{
-    if (strlen($str) % 2 !== 0) {
-        trigger_error(__FUNCTION__ . '(): Hexadecimal input string must have an even length', E_USER_WARNING);
-    }
-
-    return pack('H*', $str);
-}
-
-if (! function_exists('hex2bin')) {
-    // This is only a hack
-    function hex2bin($str)
-    {
-        return hex2bin_compat($str);
-    }
-}
-
 function q_bridge_bits2indices($hex_data)
 {
     /* convert hex string to an array of 1-based indices of the nonzero bits
@@ -1182,6 +627,11 @@ function cache_peeringdb()
             sleep($rand);
             $peer_keep = [];
             $ix_keep = [];
+            // Exclude Private and reserved ASN ranges
+            // 64512 - 65534 (Private)
+            // 65535 (Well Known)
+            // 4200000000 - 4294967294 (Private)
+            // 4294967295 (Reserved)
             foreach (dbFetchRows('SELECT `bgpLocalAs` FROM `devices` WHERE `disabled` = 0 AND `ignore` = 0 AND `bgpLocalAs` > 0 AND (`bgpLocalAs` < 64512 OR `bgpLocalAs` > 65535) AND `bgpLocalAs` < 4200000000 GROUP BY `bgpLocalAs`') as $as) {
                 $asn = $as['bgpLocalAs'];
                 $get = \LibreNMS\Util\Http::client()->get($peeringdb_url . '/net?depth=2&asn=' . $asn);
@@ -1210,26 +660,26 @@ function cache_peeringdb()
                     $ix_data = json_decode($ix_json);
                     $peers = $ix_data->{'data'};
                     foreach ($peers ?? [] as $index => $peer) {
-                        $peer_name = get_astext($peer->{'asn'});
+                        $peer_name = \LibreNMS\Util\AutonomousSystem::get($peer->{'asn'})->name();
                         $tmp_peer = dbFetchRow('SELECT * FROM `pdb_ix_peers` WHERE `peer_id` = ? AND `ix_id` = ?', [$peer->{'id'}, $ixid]);
                         if ($tmp_peer) {
                             $peer_keep[] = $tmp_peer['pdb_ix_peers_id'];
                             $update = [
-                                'remote_asn'     => $peer->{'asn'},
-                                'remote_ipaddr4'  => $peer->{'ipaddr4'},
+                                'remote_asn' => $peer->{'asn'},
+                                'remote_ipaddr4' => $peer->{'ipaddr4'},
                                 'remote_ipaddr6' => $peer->{'ipaddr6'},
-                                'name'           => $peer_name,
+                                'name' => $peer_name,
                             ];
                             dbUpdate($update, 'pdb_ix_peers', '`pdb_ix_peers_id` = ?', [$tmp_peer['pdb_ix_peers_id']]);
                         } else {
                             $peer_insert = [
-                                'ix_id'          => $ixid,
-                                'peer_id'        => $peer->{'id'},
-                                'remote_asn'     => $peer->{'asn'},
+                                'ix_id' => $ixid,
+                                'peer_id' => $peer->{'id'},
+                                'remote_asn' => $peer->{'asn'},
                                 'remote_ipaddr4' => $peer->{'ipaddr4'},
                                 'remote_ipaddr6' => $peer->{'ipaddr6'},
-                                'name'           => $peer_name,
-                                'timestamp'      => time(),
+                                'name' => $peer_name,
+                                'timestamp' => time(),
                             ];
                             $peer_keep[] = dbInsert($peer_insert, 'pdb_ix_peers');
                         }
@@ -1263,8 +713,9 @@ function cache_peeringdb()
 function get_device_oid_limit($device)
 {
     // device takes priority
-    if (! empty($device['attribs']['snmp_max_oid'])) {
-        return $device['attribs']['snmp_max_oid'];
+    $attrib = DeviceCache::get($device['device_id'] ?? null)->getAttrib('snmp_max_oid');
+    if ($attrib !== null) {
+        return $attrib;
     }
 
     // then os

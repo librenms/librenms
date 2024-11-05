@@ -85,4 +85,17 @@ class Oid
 
         return $numeric_oid;
     }
+
+    /**
+     * Convert a string to an oid encoded string
+     */
+    public static function ofString(string $string): string
+    {
+        $oid = strlen($string);
+        for ($i = 0; $i != strlen($string); $i++) {
+            $oid .= '.' . ord($string[$i]);
+        }
+
+        return $oid;
+    }
 }

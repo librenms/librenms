@@ -1781,5 +1781,326 @@
                 }
             ]
         }
+    },
+    "vminfo": {
+        "discovery": {
+            "vminfo": [
+                {
+                    "vm_type": "vmware",
+                    "vmwVmVMID": 708,
+                    "vmwVmDisplayName": "<private>",
+                    "vmwVmGuestOS": "",
+                    "vmwVmMemSize": 2048,
+                    "vmwVmCpus": 2,
+                    "vmwVmState": 0
+                },
+                {
+                    "vm_type": "vmware",
+                    "vmwVmVMID": 775,
+                    "vmwVmDisplayName": "<private>",
+                    "vmwVmGuestOS": "",
+                    "vmwVmMemSize": 2048,
+                    "vmwVmCpus": 2,
+                    "vmwVmState": 0
+                },
+                {
+                    "vm_type": "vmware",
+                    "vmwVmVMID": 1644,
+                    "vmwVmDisplayName": "<private>",
+                    "vmwVmGuestOS": "",
+                    "vmwVmMemSize": 6144,
+                    "vmwVmCpus": 4,
+                    "vmwVmState": 0
+                },
+                {
+                    "vm_type": "vmware",
+                    "vmwVmVMID": 7092,
+                    "vmwVmDisplayName": "<private>",
+                    "vmwVmGuestOS": "Linux 4.19.0-10-amd64 Debian GNU/Linux 10 (buster)",
+                    "vmwVmMemSize": 4096,
+                    "vmwVmCpus": 2,
+                    "vmwVmState": 1
+                },
+                {
+                    "vm_type": "vmware",
+                    "vmwVmVMID": 7095,
+                    "vmwVmDisplayName": "<private>",
+                    "vmwVmGuestOS": "Linux 4.19.0-10-amd64 Debian GNU/Linux 10 (buster)",
+                    "vmwVmMemSize": 4096,
+                    "vmwVmCpus": 2,
+                    "vmwVmState": 1
+                },
+                {
+                    "vm_type": "vmware",
+                    "vmwVmVMID": 7310,
+                    "vmwVmDisplayName": "<private>",
+                    "vmwVmGuestOS": "Linux 4.9.0-11-amd64 Debian GNU/Linux 9.13 (stretch)",
+                    "vmwVmMemSize": 4096,
+                    "vmwVmCpus": 2,
+                    "vmwVmState": 1
+                },
+                {
+                    "vm_type": "vmware",
+                    "vmwVmVMID": 7642,
+                    "vmwVmDisplayName": "<private>",
+                    "vmwVmGuestOS": "Linux 4.19.0-10-amd64 Debian GNU/Linux 10 (buster)",
+                    "vmwVmMemSize": 16384,
+                    "vmwVmCpus": 4,
+                    "vmwVmState": 1
+                },
+                {
+                    "vm_type": "vmware",
+                    "vmwVmVMID": 7879,
+                    "vmwVmDisplayName": "<private>",
+                    "vmwVmGuestOS": "",
+                    "vmwVmMemSize": 2048,
+                    "vmwVmCpus": 1,
+                    "vmwVmState": 1
+                },
+                {
+                    "vm_type": "vmware",
+                    "vmwVmVMID": 7880,
+                    "vmwVmDisplayName": "<private>",
+                    "vmwVmGuestOS": "Linux 4.15.0-112-generic Ubuntu 18.04.5 LTS",
+                    "vmwVmMemSize": 4096,
+                    "vmwVmCpus": 2,
+                    "vmwVmState": 1
+                },
+                {
+                    "vm_type": "vmware",
+                    "vmwVmVMID": 7913,
+                    "vmwVmDisplayName": "<private>",
+                    "vmwVmGuestOS": "Linux 3.16.0-10-amd64 Debian GNU/Linux 8.11 (jessie)",
+                    "vmwVmMemSize": 4096,
+                    "vmwVmCpus": 2,
+                    "vmwVmState": 1
+                },
+                {
+                    "vm_type": "vmware",
+                    "vmwVmVMID": 8190,
+                    "vmwVmDisplayName": "<private>",
+                    "vmwVmGuestOS": "Linux 4.9.0-13-amd64 Debian GNU/Linux 9.13 (stretch)",
+                    "vmwVmMemSize": 4096,
+                    "vmwVmCpus": 2,
+                    "vmwVmState": 1
+                },
+                {
+                    "vm_type": "vmware",
+                    "vmwVmVMID": 8348,
+                    "vmwVmDisplayName": "<private>",
+                    "vmwVmGuestOS": "Linux 4.15.0-70-generic Ubuntu 18.04.3 LTS",
+                    "vmwVmMemSize": 4096,
+                    "vmwVmCpus": 4,
+                    "vmwVmState": 1
+                },
+                {
+                    "vm_type": "vmware",
+                    "vmwVmVMID": 8371,
+                    "vmwVmDisplayName": "<private>",
+                    "vmwVmGuestOS": "Linux 3.16.0-11-amd64 Debian GNU/Linux 8.11 (jessie)",
+                    "vmwVmMemSize": 4096,
+                    "vmwVmCpus": 2,
+                    "vmwVmState": 1
+                },
+                {
+                    "vm_type": "vmware",
+                    "vmwVmVMID": 8386,
+                    "vmwVmDisplayName": "<private>",
+                    "vmwVmGuestOS": "Linux 4.15.0-101-generic Ubuntu 18.04.4 LTS",
+                    "vmwVmMemSize": 4096,
+                    "vmwVmCpus": 4,
+                    "vmwVmState": 1
+                },
+                {
+                    "vm_type": "vmware",
+                    "vmwVmVMID": 8431,
+                    "vmwVmDisplayName": "<private>",
+                    "vmwVmGuestOS": "Linux 4.4.0-121-generic Ubuntu 16.04.4 LTS",
+                    "vmwVmMemSize": 2048,
+                    "vmwVmCpus": 1,
+                    "vmwVmState": 1
+                },
+                {
+                    "vm_type": "vmware",
+                    "vmwVmVMID": 8432,
+                    "vmwVmDisplayName": "<private>",
+                    "vmwVmGuestOS": "Linux 4.19.0-9-amd64 Debian GNU/Linux 10 (buster)",
+                    "vmwVmMemSize": 2048,
+                    "vmwVmCpus": 1,
+                    "vmwVmState": 1
+                },
+                {
+                    "vm_type": "vmware",
+                    "vmwVmVMID": 8453,
+                    "vmwVmDisplayName": "<private>",
+                    "vmwVmGuestOS": "Linux 4.19.0-6-amd64 Debian GNU/Linux 10 (buster)",
+                    "vmwVmMemSize": 4096,
+                    "vmwVmCpus": 4,
+                    "vmwVmState": 1
+                },
+                {
+                    "vm_type": "vmware",
+                    "vmwVmVMID": 8464,
+                    "vmwVmDisplayName": "<private>",
+                    "vmwVmGuestOS": "Linux 3.16.0-10-amd64 Debian GNU/Linux 8.11 (jessie)",
+                    "vmwVmMemSize": 4096,
+                    "vmwVmCpus": 2,
+                    "vmwVmState": 1
+                },
+                {
+                    "vm_type": "vmware",
+                    "vmwVmVMID": 8465,
+                    "vmwVmDisplayName": "<private>",
+                    "vmwVmGuestOS": "Linux 4.19.0-12-amd64 Debian GNU/Linux 10 (buster)",
+                    "vmwVmMemSize": 4096,
+                    "vmwVmCpus": 1,
+                    "vmwVmState": 1
+                },
+                {
+                    "vm_type": "vmware",
+                    "vmwVmVMID": 8484,
+                    "vmwVmDisplayName": "<private>",
+                    "vmwVmGuestOS": "",
+                    "vmwVmMemSize": 3072,
+                    "vmwVmCpus": 4,
+                    "vmwVmState": 1
+                },
+                {
+                    "vm_type": "vmware",
+                    "vmwVmVMID": 8487,
+                    "vmwVmDisplayName": "<private>",
+                    "vmwVmGuestOS": "Linux 4.9.0-13-amd64 Debian GNU/Linux 9.13 (stretch)",
+                    "vmwVmMemSize": 4096,
+                    "vmwVmCpus": 2,
+                    "vmwVmState": 1
+                },
+                {
+                    "vm_type": "vmware",
+                    "vmwVmVMID": 8491,
+                    "vmwVmDisplayName": "<private>",
+                    "vmwVmGuestOS": "Linux 4.19.0-9-amd64 Debian GNU/Linux 10 (buster)",
+                    "vmwVmMemSize": 2048,
+                    "vmwVmCpus": 2,
+                    "vmwVmState": 1
+                },
+                {
+                    "vm_type": "vmware",
+                    "vmwVmVMID": 8498,
+                    "vmwVmDisplayName": "<private>",
+                    "vmwVmGuestOS": "FreeBSD 12.1-RELEASE-p7-HBSD",
+                    "vmwVmMemSize": 2048,
+                    "vmwVmCpus": 2,
+                    "vmwVmState": 1
+                },
+                {
+                    "vm_type": "vmware",
+                    "vmwVmVMID": 8499,
+                    "vmwVmDisplayName": "<private>",
+                    "vmwVmGuestOS": "Linux 4.19.0-8-amd64 Debian GNU/Linux 10 (buster)",
+                    "vmwVmMemSize": 1024,
+                    "vmwVmCpus": 1,
+                    "vmwVmState": 1
+                },
+                {
+                    "vm_type": "vmware",
+                    "vmwVmVMID": 8502,
+                    "vmwVmDisplayName": "<private>",
+                    "vmwVmGuestOS": "FreeBSD 11.3-RELEASE-p5",
+                    "vmwVmMemSize": 2048,
+                    "vmwVmCpus": 4,
+                    "vmwVmState": 1
+                },
+                {
+                    "vm_type": "vmware",
+                    "vmwVmVMID": 8504,
+                    "vmwVmDisplayName": "<private>",
+                    "vmwVmGuestOS": "Linux 3.16.0-4-amd64 Debian GNU/Linux 8.11 (jessie)",
+                    "vmwVmMemSize": 4096,
+                    "vmwVmCpus": 2,
+                    "vmwVmState": 1
+                },
+                {
+                    "vm_type": "vmware",
+                    "vmwVmVMID": 8506,
+                    "vmwVmDisplayName": "<private>",
+                    "vmwVmGuestOS": "Linux 2.6.32-74-server Ubuntu 10.04.4 LTS",
+                    "vmwVmMemSize": 2048,
+                    "vmwVmCpus": 2,
+                    "vmwVmState": 1
+                },
+                {
+                    "vm_type": "vmware",
+                    "vmwVmVMID": 8507,
+                    "vmwVmDisplayName": "<private>",
+                    "vmwVmGuestOS": "FreeBSD 12.1-RELEASE-p2",
+                    "vmwVmMemSize": 4096,
+                    "vmwVmCpus": 4,
+                    "vmwVmState": 1
+                },
+                {
+                    "vm_type": "vmware",
+                    "vmwVmVMID": 8508,
+                    "vmwVmDisplayName": "<private>",
+                    "vmwVmGuestOS": "Windows Server 2019, 64-bit  (Build 17763)",
+                    "vmwVmMemSize": 8192,
+                    "vmwVmCpus": 4,
+                    "vmwVmState": 1
+                },
+                {
+                    "vm_type": "vmware",
+                    "vmwVmVMID": 8510,
+                    "vmwVmDisplayName": "<private>",
+                    "vmwVmGuestOS": "Linux 5.4.0-52-generic Ubuntu 20.04.1 LTS",
+                    "vmwVmMemSize": 4096,
+                    "vmwVmCpus": 4,
+                    "vmwVmState": 1
+                },
+                {
+                    "vm_type": "vmware",
+                    "vmwVmVMID": 8511,
+                    "vmwVmDisplayName": "<private>",
+                    "vmwVmGuestOS": "Linux 4.19.4-amd64-vyos Debian GNU/Linux 8.11 (jessie)",
+                    "vmwVmMemSize": 2048,
+                    "vmwVmCpus": 4,
+                    "vmwVmState": 1
+                },
+                {
+                    "vm_type": "vmware",
+                    "vmwVmVMID": 8512,
+                    "vmwVmDisplayName": "<private>",
+                    "vmwVmGuestOS": "Linux 4.4.0-193-generic Ubuntu 16.04.7 LTS",
+                    "vmwVmMemSize": 1024,
+                    "vmwVmCpus": 1,
+                    "vmwVmState": 1
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    },
+    "entity-physical": {
+        "discovery": {
+            "entPhysical": [
+                {
+                    "entPhysicalIndex": 1,
+                    "entPhysicalDescr": "HP ProLiant DL380p Gen8",
+                    "entPhysicalClass": "backplane",
+                    "entPhysicalName": "smbios",
+                    "entPhysicalHardwareRev": "",
+                    "entPhysicalFirmwareRev": "2.8",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "true",
+                    "entPhysicalModelName": "ProLiant DL380p Gen8",
+                    "entPhysicalVendorType": "zeroDotZero",
+                    "entPhysicalSerialNum": "CZ162913BZ",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": -1,
+                    "entPhysicalMfgName": "HP",
+                    "ifIndex": null
+                }
+            ]
+        },
+        "poller": "matches discovery"
     }
 }

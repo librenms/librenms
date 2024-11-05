@@ -93,9 +93,9 @@ class Playsms extends Transport
                 ],
             ],
             'validation' => [
-                'playsms-url'     => 'required|url',
-                'playsms-user'    => 'required|string',
-                'playsms-token'   => 'required|string',
+                'playsms-url' => 'required|url',
+                'playsms-user' => 'required|string',
+                'playsms-token' => 'required|string',
                 'playsms-mobiles' => 'required',
             ],
         ];

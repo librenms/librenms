@@ -1,19 +1,35 @@
 -- =================================================================
--- Copyright (C) 2017 by HUAWEI TECHNOLOGIES. All rights reserved
+-- Copyright (C) 2022 by HUAWEI TECHNOLOGIES. All rights reserved
 -- 
 -- Description:HUAWEI DHCP SNOOPING MIB
 -- Reference:
--- Version: V2.06
+-- Version: V2.23
 -- History:
---    wangcheng 60005987 initial    16/02/2006
---  hexiaoqin 60020960 modified   25/12/2006
---      wangcheng 64651    modified   1/3/2007  
+--      wangcheng initial 16/02/2006
+--      hexiaoqin modified 25/12/2006
+--      wangcheng modified   1/3/2007  
 --      modified by huangjun 2009-12-08
 --      modified by xiazhaolin 2013-06-19
---      modified by huangxiaomin 221241 2014/01/27
---      modified by caojingyun 00273809 2014/07/18
---      modified by liangyun 00353956 2016/10/11
---      modified by liangyun 00353956 2016/10/28 
+--      modified by huangxiaomin 2014/01/27
+--      modified by caojingyun 2014/07/18
+--      modified by liangyun 2016/10/11
+--      modified by liangyun 2016/10/28 
+--      modified by shaomaoran 2017/09/20 
+--      modified by dinglei 2018/10/09 
+--      modified by zhengyang 2019/2/26 
+--      modified by wangwei 2019/07/23
+--      modified by yinjinyan 2021/01/19
+--      modified by yinjinyan 2021/02/18     
+--      modified by zhangquwei 2021/02/19
+--      modified by yinjinyan 2021/03/03
+--      modified by yinjinyan 2021/03/17
+--      modified by yinjinyan 2021/03/23 
+--      modified by zhangquwei 2021/04/12
+--      modified by chenhao 2021/06/05
+--      modified by huanghe 2022/04/22
+--      modified by zhangminghui 2022/05/12
+--      modified by lianzhen 2022/09/15
+--      modified by dinglei 2022/10/21
 -- =================================================================
     
     HUAWEI-DHCP-SNOOPING-MIB DEFINITIONS ::= BEGIN
@@ -82,11 +98,77 @@
 -- Module Identifier                
 --
     hwDhcpSnpMib MODULE-IDENTITY 
-        LAST-UPDATED "201708170000Z"            -- Aug 17th, 2017 at 16:47 GMT
+        LAST-UPDATED "202210210000Z"           
         ORGANIZATION 
              "Huawei Technologies Co.,Ltd."
         CONTACT-INFO 
-"Huawei Industrial Base  Bantian, Longgang   Shenzhen 518129   People's Republic of China   Website: http://www.huawei.com   Email: support@huawei.com "
+"Huawei Industrial Base  Bantian, Longgang   Shenzhen 518129   People's Republic of China   Website: http://www.huawei.com   Email: support@huawei.com "     
+	   DESCRIPTION
+            "Add hwDhcpv6PktRateAlarm."
+       REVISION "202210210000Z"
+
+	   DESCRIPTION
+            "Add hwDhcpDegradation, hwDhcpDegradationResume."
+       REVISION "202209150000Z"
+
+	   DESCRIPTION
+            "Add hwRequestNoTrustPktAlarmBd, hwRequestNoTrustPktNumBd."
+       REVISION "202205120000Z"
+ 	   
+	   DESCRIPTION
+            "Modify History."
+       REVISION "202204220000Z" 
+
+	   DESCRIPTION
+            "Modify hwDhcpSnpChaddrAlarm."
+       REVISION "202106050000Z" 
+
+	   DESCRIPTION
+            "Add hwDHCPv6SnpDetectAlarm."
+       REVISION "202104120000Z" 
+        
+	   DESCRIPTION
+            "Change parameter of hwDhcpv6SnpBindTblThreshold, hwDhcpv6SnpBindTblThresholdResume, hwDhcpv6SnpBindTblExhaust, hwDhcpv6SnpBindTblExhaustResume."
+       REVISION "202103230000Z" 
+
+	   DESCRIPTION
+            "Change type of hwIpv6Nomatchv6SnpBindTblPktNum."
+       REVISION "202103170000Z" 
+	   DESCRIPTION
+            "Add hwDhcpv6SnpBindTblThreshold, hwDhcpv6SnpBindTblThresholdResume, hwDhcpv6SnpBindTblExhaust, hwDhcpv6SnpBindTblExhaustResume, hwIpv6NomatchV6SnpBindTblPktAlarm."
+       REVISION "202103030000Z" 
+
+	   DESCRIPTION
+            "Add hwNomatchSnpBindTblNDPktAlarmBd, hwDhcpSnpChaddrAlarmBd, hwNomatchSnpBindTblDhcpPktAlarmBd, hwUntrustedReplyPktAlarmBd."
+       REVISION "202102190000Z" 
+
+	   DESCRIPTION
+            "Change index of these nodes:hwDhcpSnpBindTblThreshold, hwDhcpSnpBindTblThresholdResume, hwDhcpSnpBindTblExhaust, hwDhcpSnpBindTblExhaustResume."
+       REVISION "202102180000Z" 
+
+	   DESCRIPTION
+            "Add hwDhcpSnpBindTblThreshold, hwDhcpSnpBindTblThresholdResume, hwDhcpSnpBindTblExhaust, hwDhcpSnpBindTblExhaustResume, hwDhcpSnpUsrNum, hwDhcpSnpMaxUsrNum."
+       REVISION "202101190000Z" 
+	   
+	   DESCRIPTION
+            "Add hwRequestNoTrustPktAlarm, hwRequestNoTrustPktNum."
+       REVISION "201907230000Z" 
+
+	   DESCRIPTION
+            "Add hwDhcpSnpTrapRemoteBackupType, hwSnpRemoteBackupAlarm, hwSnpRemoteBackupAlarmResume."
+       REVISION "201907120000Z" 
+
+	   DESCRIPTION
+            "Add hwDhcpSnpTrapRemoteBackupType, hwSnpRemoteBackupAlarm, hwSnpRemoteBackupAlarmResume."
+       REVISION "201902260000Z" 
+
+	   DESCRIPTION
+            "Add hwNomatchSnpBindTblDhcpv6PktAlarm, hwNomatchSnpBindTblNDPktAlarm."
+       REVISION "201809300000Z" 
+
+	   DESCRIPTION
+            "Add hwSnpBindingItemGlobalNum, hwSnpBindingItemResourceSize, hwSnpBindingItemResourceAlarm."
+       REVISION "201709200000Z" 
 
        DESCRIPTION
             "Change the DHCP Snooping Conformance."
@@ -255,8 +337,30 @@
         DESCRIPTION
             "DHCP packets that discarded for the rate limit. "
         ::= { hwDhcpSnpObjects 11 }
-    
-    
+
+    hwDhcpDegradeReason OBJECT-TYPE
+        SYNTAX     DisplayString(SIZE(1..32))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "DHCP degrade reason. "
+        ::= { hwDhcpSnpObjects 26 }
+
+    hwDhcpDegradeLevel OBJECT-TYPE
+        SYNTAX     DisplayString(SIZE(1..32))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "DHCP degrade level. "
+        ::= { hwDhcpSnpObjects 27 }
+
+    hwDhcpDegradeRate OBJECT-TYPE
+        SYNTAX     DisplayString(SIZE(1..32))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "DHCP degrade rate. "
+        ::= { hwDhcpSnpObjects 28 }
             
     hwDhcpSnpCfgTable  OBJECT-TYPE
             SYNTAX SEQUENCE OF HWDhcpSnpCfgEntry
@@ -265,7 +369,6 @@
             DESCRIPTION
                 "The DHCP snooping configuration table. "
             ::= { hwDhcpSnpObjects 13 }
-    
            
     hwDhcpSnpCfgEntry OBJECT-TYPE
             SYNTAX HWDhcpSnpCfgEntry
@@ -938,9 +1041,10 @@
                 hwDhcpSnpStatisticVsiId             Integer32,
                 hwSnpBindingItemNum                 Counter32,
                 hwSnpCfgMaxUserNum                  Counter32,
--- begin add for dhcprateAnddhcpoption82
-                 hwDhcpPktIfRateDiscardNum           Counter32      
--- end add for dhcprateAnddhcpoption82
+                hwDhcpPktIfRateDiscardNum         Counter32,   
+                hwRequestNoTrustPktNum              Counter32,        
+                hwDhcpSnpStatisticBdId          Integer32,
+                hwRequestNoTrustPktNumBd        Counter32
                           }
     
     
@@ -1038,7 +1142,30 @@
         ::= { hwDhcpSnpFalsePktStatisticEntry 11 }      
 -- end add for dhcprateAnddhcpoption82
                     
-               
+     hwRequestNoTrustPktNum OBJECT-TYPE
+               SYNTAX  Counter32
+               MAX-ACCESS read-only
+               STATUS current
+               DESCRIPTION 
+                   "The DHCP request packets count dropped due to no trust port."
+               ::= { hwDhcpSnpFalsePktStatisticEntry 12 }
+          
+     hwDhcpSnpStatisticBdId OBJECT-TYPE
+               SYNTAX  Integer32
+               MAX-ACCESS read-only
+               STATUS current
+               DESCRIPTION 
+                   "The BD Id."
+               ::= { hwDhcpSnpFalsePktStatisticEntry 13 } 
+     
+     hwRequestNoTrustPktNumBd OBJECT-TYPE
+               SYNTAX  Counter32
+               MAX-ACCESS read-only
+               STATUS current
+               DESCRIPTION 
+                   "The DHCP request packets from bd count dropped due to no trust port."
+               ::= { hwDhcpSnpFalsePktStatisticEntry 14 }
+                
      hwDhcpSnpCarCfgTable  OBJECT-TYPE
             SYNTAX SEQUENCE OF HWDhcpSnpCarCfgEntry
             MAX-ACCESS not-accessible
@@ -1078,7 +1205,7 @@
         STATUS current
         DESCRIPTION
             " Whether to apply CAR on the traffic of specific IP and Mac"
-        DEFVAL { disable }
+        DEFVAL { disabled }
         ::= { hwDhcpSnpCarCfgEntry 11 } 
                   
      hwDhcpSnpCarCir OBJECT-TYPE
@@ -1440,7 +1567,88 @@
           "The limitation of the user number of the bridge domain."
           ::= { hwDhcpSnpBdFalsePktEntry 8 }
               
-                          
+    hwSnpBindingItemGlobalNum OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The number of binding items on the device."
+            ::= { hwDhcpSnpObjects 31 }
+
+    hwSnpBindingItemResourceSize OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The resource size of binding items on the device."
+            ::= { hwDhcpSnpObjects 32 }                  
+ 
+   hwDhcpSnpTrapRemoteBackupType OBJECT-TYPE
+            SYNTAX DisplayString(SIZE(1..16))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The tranfer protocol for DHCP snooping user-bind table remote backup."
+            ::= { hwDhcpSnpObjects 33 }  
+
+    hwDhcpSnpTrapObjects OBJECT IDENTIFIER ::= { hwDhcpSnpObjects 34 }    
+
+    hwDhcpSnpUsrNum OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "Number of DHCP snooping entries on the device."
+            ::= { hwDhcpSnpTrapObjects 1 }
+
+    hwDhcpSnpMaxUsrNum OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "Maximum number of DHCP snooping entries on the device."
+            ::= { hwDhcpSnpTrapObjects 2 }
+
+    hwDhcpv6SnpUsrNum OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "Number of DHCPv6 snooping binding entries on the device."
+            ::= { hwDhcpSnpTrapObjects 3 }
+
+    hwDhcpv6SnpMaxUsrNum OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "Maximum number of DHCPv6 snooping binding entries on the device."
+            ::= { hwDhcpSnpTrapObjects 4 }
+
+    hwDhcpv6SnpIfIndex OBJECT-TYPE
+            SYNTAX Integer32 (1..2147483647)
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "Interface index of DHCPv6 snooping binding entry."
+            ::= { hwDhcpSnpTrapObjects 5 }
+
+    hwDhcpv6SnpIfName OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "Interface name of DHCPv6 snooping binding entry."
+            ::= { hwDhcpSnpTrapObjects 6 }
+
+    hwIpv6Nomatchv6SnpBindTblPktNum OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The false IPv6 packets do not match DHCPv6 snooping bind entry count"
+            ::= { hwDhcpSnpTrapObjects 7 }
+
 --
 -- Traps Identifier
 --
@@ -1451,7 +1659,7 @@
             OBJECTS { hwDhcpSnpStatisticIfDescr,hwDhcpSnpStatisticVlanId,hwChaddrNomatchSrcMacDhcpPktNum } 
             STATUS current     
             DESCRIPTION 
-                "This object indicates that the ARP packet does not match the binding table."
+                "The CHADDR field value in the packet is inconsistent with the source MAC address."
             ::= { hwDhcpSnpTraps 1 }
                   
     hwArpNomatchSnpBindTblPktAlarm NOTIFICATION-TYPE
@@ -1627,9 +1835,173 @@
             STATUS current     
             DESCRIPTION 
                 "The number of the binding items descends to the threshold of user-limit on the interface."
-            ::= { hwDhcpSnpTraps 29 } 
-            
+            ::= { hwDhcpSnpTraps 29 }
+	hwSnpBindingItemResourceAlarm NOTIFICATION-TYPE
+            OBJECTS { hwSnpBindingItemGlobalNum,hwSnpBindingItemResourceSize } 
+            STATUS current     
+            DESCRIPTION 
+                "The number of binding items exceeded the resource threshold of the whole device."
+            ::= { hwDhcpSnpTraps 30 }
+    hwNomatchSnpBindTblDhcpv6PktAlarm NOTIFICATION-TYPE
+            OBJECTS { hwDhcpSnpStatisticIfDescr,hwDhcpSnpStatisticVlanId } 
+            STATUS current     
+            DESCRIPTION 
+                "There are Dhcpv6 request packets do not match the snooping bind table."
+            ::= {hwDhcpSnpTraps 31 }  
+    hwNomatchSnpBindTblNDPktAlarm NOTIFICATION-TYPE
+            OBJECTS { hwDhcpSnpStatisticIfDescr,hwDhcpSnpStatisticVlanId } 
+            STATUS current     
+            DESCRIPTION 
+                "There are ND packets do not match the snooping bind table."
+            ::= {hwDhcpSnpTraps 32 }  
     
+   hwSnpRemoteBackupAlarm NOTIFICATION-TYPE
+            OBJECTS { hwDhcpSnpTrapRemoteBackupType } 
+            STATUS current     
+            DESCRIPTION 
+                "DHCP snooping user-bind table failed to be recovered from remote server."
+            ::= {hwDhcpSnpTraps 33 }
+   hwSnpRemoteBackupAlarmResume NOTIFICATION-TYPE
+             OBJECTS { hwDhcpSnpTrapRemoteBackupType }
+             STATUS current
+            DESCRIPTION
+               "DHCP snooping user-bind table is successfully recovered from remote server."
+            ::= { hwDhcpSnpTraps 34 }
+
+     hwRequestNoTrustPktAlarm NOTIFICATION-TYPE
+            OBJECTS { hwDhcpSnpStatisticIfDescr,hwDhcpSnpStatisticVlanId,hwRequestNoTrustPktNum } 
+            STATUS current
+            DESCRIPTION
+                "Drop DHCP request packets because of dhcp snooping trust port is not configured or trust port is down."
+            ::= { hwDhcpSnpTraps 35 }  
+     
+      hwNomatchSnpBindTblNDPktAlarmBd NOTIFICATION-TYPE
+            OBJECTS { hwDhcpSnpStatisticIfDescr,hwDhcpSnpStatisticBdId } 
+            STATUS current     
+            DESCRIPTION 
+                "There are ND packets do not match the snooping bind table."
+            ::= { hwDhcpSnpTraps 36 }
+
+    hwDhcpSnpChaddrAlarmBd NOTIFICATION-TYPE
+            OBJECTS { hwDhcpSnpStatisticIfDescr,hwDhcpSnpStatisticBdId,hwChaddrNomatchSrcMacDhcpPktNum } 
+            STATUS current     
+            DESCRIPTION 
+                "There are Dhcp request packets do not match the snooping bind table."
+            ::= { hwDhcpSnpTraps 37 }
+ 
+     hwNomatchSnpBindTblDhcpPktAlarmBd NOTIFICATION-TYPE
+            OBJECTS { hwDhcpSnpStatisticIfDescr,hwDhcpSnpStatisticBdId,hwNomatchSnpBindTblDhcpPktNum } 
+            STATUS current     
+            DESCRIPTION 
+                "There are Dhcp request packets do not match the snooping bind table."
+            ::= {hwDhcpSnpTraps 38 }     
+            
+    hwUntrustedReplyPktAlarmBd NOTIFICATION-TYPE
+            OBJECTS { hwDhcpSnpStatisticIfDescr,hwDhcpSnpStatisticBdId,hwUntrustedReplyPktNum } 
+            STATUS current     
+            DESCRIPTION 
+                "Untrusted ports have received the Dhcp reply packets."
+            ::= { hwDhcpSnpTraps 39 }    
+     
+    hwDhcpSnpBindTblThreshold  NOTIFICATION-TYPE
+            OBJECTS { hwDhcpSnpUsrNum, hwDhcpSnpMaxUsrNum } 
+            STATUS current
+            DESCRIPTION
+                "This object indicates that an alarm is generated when the number of DHCP snooping entries on the device exceeds 80% of the upper limit."
+            ::= {hwDhcpSnpTraps 40 }
+
+    hwDhcpSnpBindTblThresholdResume NOTIFICATION-TYPE
+            OBJECTS { hwDhcpSnpUsrNum, hwDhcpSnpMaxUsrNum } 
+            STATUS current
+            DESCRIPTION
+                "This object indicates that a clear alarm is generated when the number of DHCP snooping entries on the device falls below 70% of the upper limit."
+            ::= {hwDhcpSnpTraps 41 }        
+
+    hwDhcpSnpBindTblExhaust NOTIFICATION-TYPE
+            OBJECTS { hwDhcpSnpMaxUsrNum }
+            STATUS current
+            DESCRIPTION
+                "This object indicates that an alarm is generated when the number of DHCP snooping entries on the device reaches the upper limit."
+            ::= {hwDhcpSnpTraps 42 }
+
+    hwDhcpSnpBindTblExhaustResume NOTIFICATION-TYPE
+            OBJECTS { hwDhcpSnpMaxUsrNum }
+            STATUS current
+            DESCRIPTION
+                "This object indicates that a clear alarm is generated when the number of DHCP snooping entries on the device falls below 90% of the upper limit."
+            ::= {hwDhcpSnpTraps 43 }
+
+    hwDhcpv6SnpBindTblThreshold  NOTIFICATION-TYPE
+            OBJECTS { hwDhcpv6SnpUsrNum, hwDhcpv6SnpMaxUsrNum} 
+            STATUS current
+            DESCRIPTION
+                "This object indicates that an alarm is generated when the number of DHCPv6 snooping entries on the device exceeds 80% of the upper limit."
+            ::= {hwDhcpSnpTraps 44 }
+
+    hwDhcpv6SnpBindTblThresholdResume NOTIFICATION-TYPE
+            OBJECTS { hwDhcpv6SnpUsrNum, hwDhcpv6SnpMaxUsrNum} 
+            STATUS current
+            DESCRIPTION
+                "This object indicates that a clear alarm is generated when the number of DHCPv6 snooping entries on the device falls below 70% of the upper limit."
+            ::= {hwDhcpSnpTraps 45 }
+
+    hwDhcpv6SnpBindTblExhaust NOTIFICATION-TYPE
+            OBJECTS { hwDhcpv6SnpMaxUsrNum}
+            STATUS current
+            DESCRIPTION
+                "This object indicates that an alarm is generated when the number of DHCPv6 snooping entries on the device reaches the upper limit."
+            ::= {hwDhcpSnpTraps 46 }
+
+    hwDhcpv6SnpBindTblExhaustResume NOTIFICATION-TYPE
+            OBJECTS { hwDhcpv6SnpMaxUsrNum}
+            STATUS current
+            DESCRIPTION
+                "This object indicates that a clear alarm is generated when the number of DHCPv6 snooping entries on the device falls below 90% of the upper limit."
+            ::= {hwDhcpSnpTraps 47 }
+
+    hwIpv6NomatchV6SnpBindTblPktAlarm NOTIFICATION-TYPE
+            OBJECTS { hwDhcpv6SnpIfIndex, hwDhcpv6SnpIfName, hwIpv6Nomatchv6SnpBindTblPktNum}
+            STATUS current
+            DESCRIPTION
+                "The number of the discarded IPv6 packets that do not match the binding table exceeded the threshold on the interface."
+            ::= {hwDhcpSnpTraps 48 }
+  
+    hwDHCPv6SnpDetectAlarm NOTIFICATION-TYPE
+            OBJECTS { hwDhcpSnpBindMac,hwDhcpSnpBindIfDescr,hwDhcpSnpBindPVlanId} 
+            STATUS current     
+            DESCRIPTION 
+                "There are Dhcpv6 request packets do not match the snooping bind table."
+            ::= {hwDhcpSnpTraps 49 }
+
+     hwRequestNoTrustPktAlarmBd NOTIFICATION-TYPE
+            OBJECTS { hwDhcpSnpStatisticIfDescr,hwDhcpSnpStatisticBdId,hwRequestNoTrustPktNumBd } 
+            STATUS current
+            DESCRIPTION
+                "Drop DHCP request packets because of dhcp snooping trust port is not configured or trust port is down."
+            ::= { hwDhcpSnpTraps 50 }
+
+     hwDhcpDegradation NOTIFICATION-TYPE
+            OBJECTS { hwDhcpDegradeReason,hwDhcpDegradeLevel,hwDhcpDegradeRate } 
+            STATUS current     
+            DESCRIPTION 
+                "DHCP degrade information."
+            ::= { hwDhcpSnpTraps 51 }
+
+     hwDhcpDegradationResume NOTIFICATION-TYPE
+            OBJECTS { hwDhcpDegradeReason,hwDhcpDegradeLevel,hwDhcpDegradeRate } 
+            STATUS current     
+            DESCRIPTION 
+                "DHCP degrade information."
+            ::= { hwDhcpSnpTraps 52 }
+
+    hwDhcpv6PktRateAlarm NOTIFICATION-TYPE
+            OBJECTS { hwDhcpSnpStatisticIfDescr,hwDhcpSnpStatisticVlanId } 
+            STATUS current     
+            DESCRIPTION 
+                "The rate of Dhcpv6 packets received is too large."
+            ::= { hwDhcpSnpTraps 53 }
+
+
     hwDhcpSnpCompliance OBJECT IDENTIFIER ::= { hwDhcpSnpMib 3 }
     
     
@@ -1652,7 +2024,7 @@
                     hwDhcpSnpCarEnable,hwDhcpSnpCarCir,hwDhcpSnpCarPir,hwDhcpSnpCaCbs,hwDhcpSnpCarPbs,hwDhcpSnpCarYellow,hwDhcpSnpCarRed,
                     hwDhcpSnpGlobalOption82Format,hwDhcpSnpGlobalOption82PacketFormat,hwDhcpSnpGlobalOption82RemoteId,hwDhcpSnpGlobalOption82RemoteIdSysName,hwDhcpSnpGlobalOption82CircuitId,
                     hwDhcpSnpGlobalOption82PktFormat,hwDhcpSnpGlobalOption82DefString,
-                    hwDhcpSnpCarRowStatus, hwDhcpSnpServerDetectStatus}
+                    hwDhcpSnpCarRowStatus, hwDhcpSnpServerDetectStatus, hwSnpBindingItemGlobalNum, hwSnpBindingItemResourceSize, hwDhcpSnpTrapRemoteBackupType }
 
              STATUS current
             DESCRIPTION 
@@ -1669,11 +2041,8 @@
     
     hwDhcpSnpStatisticGroup OBJECT-GROUP
             OBJECTS { hwDhcpSnpStatisticIfDescr,hwDhcpSnpStatisticVlanId,hwChaddrNomatchSrcMacDhcpPktNum, hwArpNomatchSnpBindTblPktNum, hwIpNomatchSnpBindTblPktNum, 
-            hwNomatchSnpBindTblDhcpPktNum, hwUntrustedReplyPktNum, hwDhcpPktRateDiscardNum,hwDhcpSnpStatisticVsiId,hwSnpBindingItemNum,hwSnpCfgMaxUserNum
--- begin add for dhcprateAnddhcpoption82            
-            ,hwDhcpPktIfRateDiscardNum
--- end add for dhcprateAnddhcpoption82    
-            }
+            hwNomatchSnpBindTblDhcpPktNum, hwUntrustedReplyPktNum, hwDhcpPktRateDiscardNum,hwDhcpSnpStatisticVsiId,hwSnpBindingItemNum,hwSnpCfgMaxUserNum     
+            ,hwDhcpPktIfRateDiscardNum, hwRequestNoTrustPktNum, hwRequestNoTrustPktNumBd}
             STATUS current
             DESCRIPTION 
                 "The DHCPSNP's Statistic group."
@@ -1687,7 +2056,12 @@
             hwNdSnpUserNumberAlarmGlobal, hwNdSnpUserNumberAlarmGlobalResume, hwBdNomatchSnpBindTblDhcpPktAlarm, hwBdDhcpSnpChaddrAlarm,
             hwBdArpNomatchSnpBindTblPktAlarm, hwBdIpNomatchSnpBindTblPktAlarm, hwBdUntrustedReplyPktAlarm, hwBdSnpUserNumberAlarm,
             hwDhcpSnpChaddrAlarmResume, hwArpNomatchSnpBindTblPktAlarmResume, hwIpNomatchSnpBindTblPktAlarmResume,
-            hwUntrustedReplyPktAlarmResume, hwNomatchSnpBindTblDhcpPktAlarmResume, hwSnpUserNumberAlarmResume}
+            hwUntrustedReplyPktAlarmResume, hwNomatchSnpBindTblDhcpPktAlarmResume, hwSnpUserNumberAlarmResume,hwSnpBindingItemResourceAlarm,
+            hwNomatchSnpBindTblDhcpv6PktAlarm, hwNomatchSnpBindTblNDPktAlarm, hwSnpRemoteBackupAlarm, hwSnpRemoteBackupAlarmResume, hwRequestNoTrustPktAlarm,   
+            hwNomatchSnpBindTblNDPktAlarmBd, hwDhcpSnpChaddrAlarmBd, hwNomatchSnpBindTblDhcpPktAlarmBd, hwUntrustedReplyPktAlarmBd,
+            hwDhcpSnpBindTblThreshold, hwDhcpSnpBindTblThresholdResume, hwDhcpSnpBindTblExhaust, hwDhcpSnpBindTblExhaustResume,
+            hwDhcpv6SnpBindTblThreshold, hwDhcpv6SnpBindTblThresholdResume, hwDhcpv6SnpBindTblExhaust, hwDhcpv6SnpBindTblExhaustResume, hwIpv6NomatchV6SnpBindTblPktAlarm,
+            hwDHCPv6SnpDetectAlarm, hwRequestNoTrustPktAlarmBd, hwDhcpDegradation, hwDhcpDegradationResume, hwDhcpv6PktRateAlarm}
             STATUS current
             DESCRIPTION 
                 "The DHCPSNP's Notification group."
@@ -1702,6 +2076,13 @@
                 "The DHCPSNP's Statistic group on the bridge domain ."
             ::= { hwDhcpSnpMibGroups 5 }
 
+    hwDhcpSnpTrapObjectGroup OBJECT-GROUP
+            OBJECTS { hwDhcpSnpUsrNum, hwDhcpSnpMaxUsrNum, hwDhcpv6SnpUsrNum, hwDhcpv6SnpMaxUsrNum, hwDhcpv6SnpIfIndex, hwDhcpv6SnpIfName, hwIpv6Nomatchv6SnpBindTblPktNum}
+            STATUS current
+            DESCRIPTION 
+                "The DHCPSNP's Statistic group on the device."
+            ::= { hwDhcpSnpMibGroups 6 }
+
     hwDhcpSnpCompliances OBJECT IDENTIFIER ::= { hwDhcpSnpCompliance 2 }
 	
         hwDhcpSnpMibCompliance MODULE-COMPLIANCE
@@ -1711,8 +2092,10 @@
                 this module."
 
                MODULE    
-               MANDATORY-GROUPS    { hwDhcpSnpCfgGroup, hwDhcpSnpBindGroup, hwDhcpSnpStatisticGroup, hwDhcpSnpTrapGroup}  
+               MANDATORY-GROUPS    { hwDhcpSnpCfgGroup, hwDhcpSnpBindGroup, hwDhcpSnpStatisticGroup, hwDhcpSnpTrapGroup, hwDhcpSnpTrapObjectGroup}  
                                                
               ::= { hwDhcpSnpCompliances 1 }                                                                           
 
         END
+
+

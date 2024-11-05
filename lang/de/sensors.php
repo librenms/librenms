@@ -37,7 +37,7 @@ return [
     ],
     'cooling' => [
         'short' => 'Kühlung',
-        'long' => '',
+        'long' => 'Kühlung',
         'unit' => 'W',
         'unit_long' => 'Watt',
     ],
@@ -57,7 +57,7 @@ return [
         'short' => 'dBm',
         'long' => 'dBm',
         'unit' => 'dBm',
-        'unit_long' => 'Decibel-Milliwatt',
+        'unit_long' => 'Dezibel Milliwatt',
     ],
     'delay' => [
         'short' => 'Verzögerung',
@@ -102,10 +102,10 @@ return [
         'unit_long' => 'Watt',
     ],
     'power_consumed' => [
-        'short' => 'Verbrauchsleistung',
-        'long' => 'Verbrauchsleistung',
+        'short' => 'Energiemenge',
+        'long' => 'Energiemenge',
         'unit' => 'kWh',
-        'unit_long' => 'Killowatt-Stunden',
+        'unit_long' => 'Kilowattstunden',
     ],
     'power_factor' => [
         'short' => 'Leistungsfaktor',
@@ -127,7 +127,7 @@ return [
     ],
     'runtime' => [
         'short' => 'Laufzeit',
-        'long' => 'Leufzeit',
+        'long' => 'Laufzeit',
         'unit' => 'Min',
         'unit_long' => 'Minuten',
     ],
@@ -135,13 +135,13 @@ return [
         'short' => 'Signalstärke',
         'long' => 'Signalstärke',
         'unit' => 'dBm',
-        'unit_long' => 'Decibel-Milliwatt',
+        'unit_long' => 'Dezibel Milliwatt',
     ],
     'snr' => [
         'short' => 'SNR',
         'long' => 'Signal zu Rausch Verhältnis',
         'unit' => 'dB',
-        'unit_long' => 'Decibel',
+        'unit_long' => 'Dezibel',
     ],
     'state' => [
         'short' => 'Status',
