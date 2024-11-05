@@ -231,6 +231,8 @@ html, body, #fullscreen-map {
         $("#fullscreen-map").on("mouseleave", function(event) {
             device_map.scrollWheelZoom.disable();
         });
+
+        // initial load
         refreshMap();
     });
 </script>

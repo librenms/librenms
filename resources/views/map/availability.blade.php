@@ -262,6 +262,7 @@
         }
     }
 
+    // initial data load
     $(document).ready(function () {
         refreshMap();
     });

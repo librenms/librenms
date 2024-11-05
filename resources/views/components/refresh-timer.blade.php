@@ -58,7 +58,6 @@
         });
 
         $("#countdown_timer_refresh").on("click", function (event) {
-            console.log(event);
             event.preventDefault();
             {{ $callback }}();
             Countdown.Reset();

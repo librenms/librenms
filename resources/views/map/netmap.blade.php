@@ -48,7 +48,7 @@
     var network_edges = new vis.DataSet({queue: {delay: 100}});
     var network;
 
-    function refreshMap() {
+    async function refreshMap() {
         var highlight = $("#highlight_node").val();
 @if($group_id)
         var group = {{$group_id}};
@@ -57,17 +57,26 @@
 @endif
 
         var hide_devices = new Map();
-        $.ajax({
+        await $.ajax({
             type: 'POST',
             url: '{{ route('maps.getdevices') }}',
             data: {disabled: 0, disabled_alerts: null, url_type: "links", group: group, highlight_node: highlight},
             dataType: 'json',
             success: function (data) {
-                function deviceSort(a,b) {
-                    return (data[a]["sname"] > data[b]["sname"]) ? 1 : -1;
+                if (Object.keys(data).length === 0) {
+                    $("#alert").text("No devices found");
+                    $("#alert-row").show();
+                } else if (Object.keys(data).length > 500) {
+                    $("#alert").text("The initial render will be slow due to the number of devices.  Auto refresh has been paused.");
+                    $("#alert-row").show();
+                } else {
+                    $("#alert").text("");
+                    $("#alert-row").hide();
                 }
 
-                var keys = Object.keys(data).sort(deviceSort);
+                var keys = Object.keys(data).sort(function (a, b) {
+                    return (data[a]["sname"] > data[b]["sname"]) ? 1 : -1; // sort by display name
+                });
                 $.each( keys, function( dev_idx, device_id ) {
                     var device = data[device_id];
                     var this_dev = {id: device_id, label: device["sname"], title: device["url"], shape: "box"}
@@ -97,23 +106,10 @@
                         $(option_id).remove();
                     }
                 });
-
-                if (Object.keys(data).length == 0) {
-                    $("#alert").html("No devices found");
-                    $("#alert-row").show();
-                } else if (Object.keys(data).length > 500) {
-                    $("#alert").html("The initial render will be slow due to the number of devices.  Auto refresh has been paused.");
-                    $("#alert-row").show();
-                    Countdown.Pause();
-                } else {
-                    $("#alert").html("");
-                    $("#alert-row").hide();
-                }
-            },
-            async: false
+            }
         });
 
-        $.ajax({
+        await $.ajax({
             type: 'POST',
             url: '{{ route('maps.getdevicelinks') }}',
             data: {disabled: 0, disabled_alerts: null, group: group, link_types: @json($link_types)},
@@ -141,7 +137,6 @@
                     }
                 });
             },
-            async: false
         });
 
         // Flush the nodes and edges (needed for the forEach() loop below)
@@ -181,8 +176,13 @@
         }
     }
 
-    $(document).ready(function () {
-        refreshMap();
+    $(document).ready(async function () {
+        // pause during initial load
+        Countdown.Pause();
+        await refreshMap();
+        Countdown.Resume();
+        $("#alert").text("");
+        $("#alert-row").hide();
     });
 </script>
 <x-refresh-timer :refresh="$page_refresh" callback="refreshMap"></x-refresh-timer>
