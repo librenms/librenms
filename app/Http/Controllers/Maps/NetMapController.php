@@ -26,7 +26,6 @@
 namespace App\Http\Controllers\Maps;
 
 use App\Http\Controllers\Controller;
-use App\Models\Device;
 use App\Models\DeviceGroup;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
