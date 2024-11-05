@@ -16,22 +16,18 @@ Only leaflet map engine is currently supported
 
 @else
 
+@if($group_name)
 <div class="container-fluid">
 <div class="row" id="controls-row">
 <div class="col-md-12">
 
 &nbsp;
-@if($group_name)
 <big><b>{{ $group_name }}</b></big>
+
+</div>
+</div>
+</div>
 @endif
-
-<div class="pull-right" id="countdown">
-    <span class="countdown_timer" id="countdown_timer"></span><a href="#"><span class="countdown_timer_status" id="countdown_timer_status"></span></a>
-</div>
-
-</div>
-</div>
-</div>
 
 <div class="container" id="fullscreen-map"></div>
 
@@ -235,53 +231,11 @@ html, body, #fullscreen-map {
         $("#fullscreen-map").on("mouseleave", function(event) {
             device_map.scrollWheelZoom.disable();
         });
-    });
 
-    $(document).ready(function () {
-        $("#countdown_timer_status").html("<i class=\"fa fa-pause fa-fw fa-lg\"></i> Pause");
-        var Countdown = {
-            sec: 0,
-
-            Start: function () {
-                var cur = this;
-                this.interval = setInterval(function () {
-                    $("#countdown_timer_status").html("<i class=\"fa fa-pause fa-fw fa-lg\"></i> Pause");
-                    cur.sec -= 1;
-                    if (cur.sec <= 0) {
-                        refreshMap();
-                        cur.sec = {{$page_refresh}};
-                    }
-                    $("#countdown_timer").html("<i class=\"fa fa-clock-o fa-fw fa-lg\"></i> Refresh in " + cur.sec);
-                }, 1000);
-            },
-
-            Pause: function () {
-                clearInterval(this.interval);
-                $("#countdown_timer_status").html("<i class=\"fa fa-play fa-fw fa-lg\"></i> Resume");
-                $("#countdown_timer").html("<i class=\"fa fa-clock-o fa-fw fa-lg\"></i> Refresh paused");
-                delete this.interval;
-            },
-
-            Resume: function () {
-                if (!this.interval) this.Start();
-            }
-        };
-
-        Countdown.Start();
-
-        $("#countdown_timer_status").on("click", function (event) {
-            event.preventDefault();
-            if (Countdown.interval) {
-                Countdown.Pause();
-            } else {
-                Countdown.Resume();
-            }
-        });
-
-        $("#countdown_timer").on("click", function (event) {
-            event.preventDefault();
-        });
+        // initial load
+        refreshMap();
     });
 </script>
+<x-refresh-timer :refresh="$page_refresh" callback="refreshMap"></x-refresh-timer>
 @endsection
 
