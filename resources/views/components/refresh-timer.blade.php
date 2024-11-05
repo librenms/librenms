@@ -22,7 +22,9 @@
             $("#countdown_timer").text(" {{ __('Refresh paused') }}");
         },
         Resume: function () {
+        @if($refresh)
             if (!this.interval) this.Start();
+        @endif
         },
         Reset: function () {
             this.sec = {{ max($refresh, 30) }};
