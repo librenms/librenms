@@ -101,9 +101,13 @@ class DynamicConfigItem implements \ArrayAccess
         } elseif (in_array($this->type, ['text', 'password'])) {
             return ! is_array($value);
         } elseif ($this->type === 'executable') {
-            return is_file($value) && is_executable($value);
+            $value == $this->sanitizePath($value);
+
+            return $value !== false && is_file($value) && is_executable($value);
         } elseif ($this->type === 'directory') {
-            return is_dir($value);
+            $value == $this->sanitizePath($value);
+
+            return $value !== false && is_dir($value);
         }
 
         return false;
@@ -264,5 +268,14 @@ class DynamicConfigItem implements \ArrayAccess
     private function buildValidator($value)
     {
         return Validator::make(['value' => $value], $this->validate);
+    }
+
+    private function sanitizePath(string $path): string|false
+    {
+        if (preg_match('/[`;#$|&\'"><(]/', $path)) {
+            return false;
+        }
+
+        return realpath($path); // avoid path redirection shenanigans
     }
 }

@@ -1,3 +1,200 @@
+## 24.10.0
+*(2024-11-05)*
+
+A big thank you to the following 26 contributors this last month:
+
+  - [murrant](https://github.com/murrant) (36)
+  - [VVelox](https://github.com/VVelox) (30)
+  - [eskyuu](https://github.com/eskyuu) (15)
+  - [laf](https://github.com/laf) (13)
+  - [Calvario](https://github.com/Calvario) (5)
+  - [jiannelli](https://github.com/jiannelli) (5)
+  - [dependabot](https://github.com/apps/dependabot) (2)
+  - [alwold](https://github.com/alwold) (2)
+  - [bnerickson](https://github.com/bnerickson) (2)
+  - [TridTech](https://github.com/TridTech) (2)
+  - [lx1ge](https://github.com/lx1ge) (1)
+  - [mengy-yu](https://github.com/mengy-yu) (1)
+  - [vhuk](https://github.com/vhuk) (1)
+  - [jkahk](https://github.com/jkahk) (1)
+  - [netravnen](https://github.com/netravnen) (1)
+  - [robje](https://github.com/robje) (1)
+  - [TheMysteriousX](https://github.com/TheMysteriousX) (1)
+  - [JacobErnst98](https://github.com/JacobErnst98) (1)
+  - [barhom](https://github.com/barhom) (1)
+  - [Jellyfrog](https://github.com/Jellyfrog) (1)
+  - [lukeofthetauri](https://github.com/lukeofthetauri) (1)
+  - [davburns](https://github.com/davburns) (1)
+  - [thundersin](https://github.com/thundersin) (1)
+  - [PipoCanaja](https://github.com/PipoCanaja) (1)
+  - [SaneiSaya](https://github.com/SaneiSaya) (1)
+  - [martinvenes](https://github.com/martinvenes) (1)
+
+Thanks to maintainers and others that helped with pull requests this month:
+
+  - [murrant](https://github.com/murrant) (45)
+  - [laf](https://github.com/laf) (40)
+  - [Jellyfrog](https://github.com/Jellyfrog) (30)
+  - [electrocret](https://github.com/electrocret) (4)
+  - [ottorei](https://github.com/ottorei) (3)
+  - [eskyuu](https://github.com/eskyuu) (2)
+  - [VVelox](https://github.com/VVelox) (1)
+  - [PipoCanaja](https://github.com/PipoCanaja) (1)
+
+#### Security
+* Fix device dependency xss ([#16648](https://github.com/librenms/librenms/pull/16648)) - [murrant](https://github.com/murrant)
+* Fix xss in netmap ([#16640](https://github.com/librenms/librenms/pull/16640)) - [murrant](https://github.com/murrant)
+* Fix availability map xss ([#16632](https://github.com/librenms/librenms/pull/16632)) - [murrant](https://github.com/murrant)
+* Fix XSS in customoid ([#16629](https://github.com/librenms/librenms/pull/16629)) - [murrant](https://github.com/murrant)
+* Fix xss in report_this ([#16613](https://github.com/librenms/librenms/pull/16613)) - [murrant](https://github.com/murrant)
+* App page update for Wireguard to escape stuff ([#16611](https://github.com/librenms/librenms/pull/16611)) - [VVelox](https://github.com/VVelox)
+* Update app page for ZFS to escape stuff ([#16610](https://github.com/librenms/librenms/pull/16610)) - [VVelox](https://github.com/VVelox)
+* App page update for Poudriere to escape stuff ([#16606](https://github.com/librenms/librenms/pull/16606)) - [VVelox](https://github.com/VVelox)
+* Update app page for OSLV Monitor to escape stuff ([#16605](https://github.com/librenms/librenms/pull/16605)) - [VVelox](https://github.com/VVelox)
+* Update app page for Postgres to escape stuff ([#16604](https://github.com/librenms/librenms/pull/16604)) - [VVelox](https://github.com/VVelox)
+* Update app page for Opensearch to escape stuff ([#16603](https://github.com/librenms/librenms/pull/16603)) - [VVelox](https://github.com/VVelox)
+* Update app page for Mojo CAPE Submit to escape stuff ([#16602](https://github.com/librenms/librenms/pull/16602)) - [VVelox](https://github.com/VVelox)
+* App update for HV Monitor to escape stuff ([#16601](https://github.com/librenms/librenms/pull/16601)) - [VVelox](https://github.com/VVelox)
+* Update Fail2ban app page to escape stuff ([#16600](https://github.com/librenms/librenms/pull/16600)) - [VVelox](https://github.com/VVelox)
+* App page update for HTTP access log combined to escape stuff ([#16599](https://github.com/librenms/librenms/pull/16599)) - [VVelox](https://github.com/VVelox)
+* App update for chronyd to escape stuff ([#16598](https://github.com/librenms/librenms/pull/16598)) - [VVelox](https://github.com/VVelox)
+* Update app pages for CAPEv2 and Sneck to escape stuff ([#16597](https://github.com/librenms/librenms/pull/16597)) - [VVelox](https://github.com/VVelox)
+* Fixed xss in services overview for device ([#16587](https://github.com/librenms/librenms/pull/16587)) - [laf](https://github.com/laf)
+* Additional executable configuration item sanitation ([#16583](https://github.com/librenms/librenms/pull/16583)) - [murrant](https://github.com/murrant)
+* Escape rrd hostname more ([#16578](https://github.com/librenms/librenms/pull/16578)) - [murrant](https://github.com/murrant)
+* Block invalid hostnames ([#16577](https://github.com/librenms/librenms/pull/16577)) - [murrant](https://github.com/murrant)
+* Fix services page xss ([#16576](https://github.com/librenms/librenms/pull/16576)) - [murrant](https://github.com/murrant)
+* Fix device display name xss vulnerabilities ([#16575](https://github.com/librenms/librenms/pull/16575)) - [murrant](https://github.com/murrant)
+* Fixed XSS in Wireless and Health pages ([#16569](https://github.com/librenms/librenms/pull/16569)) - [laf](https://github.com/laf)
+* Fixed XSS issue with Device overview page and overwrite_ip ([#16567](https://github.com/librenms/librenms/pull/16567)) - [laf](https://github.com/laf)
+* Fix XSS in port edit secion ([#16566](https://github.com/librenms/librenms/pull/16566)) - [laf](https://github.com/laf)
+* Fixed XSS in device hostname for Capture ([#16565](https://github.com/librenms/librenms/pull/16565)) - [laf](https://github.com/laf)
+* Filter ExamplePlugin output ([#16562](https://github.com/librenms/librenms/pull/16562)) - [murrant](https://github.com/murrant)
+* Resolved XSS issue in bill_name value on user screen ([#16560](https://github.com/librenms/librenms/pull/16560)) - [laf](https://github.com/laf)
+* Moved the API token to be generated server side to resolve XSS ([#16558](https://github.com/librenms/librenms/pull/16558)) - [laf](https://github.com/laf)
+
+#### Device
+* Add Procurve stack monitoring ([#16625](https://github.com/librenms/librenms/pull/16625)) - [lx1ge](https://github.com/lx1ge)
+* Added support for Cisco 1200 series devices ([#16588](https://github.com/librenms/librenms/pull/16588)) - [laf](https://github.com/laf)
+* Update webpower-smart2.yaml ([#16573](https://github.com/librenms/librenms/pull/16573)) - [mengy-yu](https://github.com/mengy-yu)
+* Added build number for Win 11 24H2. ([#16561](https://github.com/librenms/librenms/pull/16561)) - [vhuk](https://github.com/vhuk)
+* Teltonika trb500 added ([#16556](https://github.com/librenms/librenms/pull/16556)) - [jkahk](https://github.com/jkahk)
+* Fs nmu correct properties ([#16550](https://github.com/librenms/librenms/pull/16550)) - [robje](https://github.com/robje)
+* Added Teracom support ([#16549](https://github.com/librenms/librenms/pull/16549)) - [laf](https://github.com/laf)
+* Fix fs-centec transceiver bias ([#16547](https://github.com/librenms/librenms/pull/16547)) - [murrant](https://github.com/murrant)
+* F5 Loadbalancers, use full path for includes ([#16519](https://github.com/librenms/librenms/pull/16519)) - [Calvario](https://github.com/Calvario)
+* Add PoE usage for Procurve switches. ([#16515](https://github.com/librenms/librenms/pull/16515)) - [TridTech](https://github.com/TridTech)
+* Added Support for Cisco 3140 Security Appliance ([#16512](https://github.com/librenms/librenms/pull/16512)) - [lukeofthetauri](https://github.com/lukeofthetauri)
+* Dell sensor fix variable leaking ([#16511](https://github.com/librenms/librenms/pull/16511)) - [TridTech](https://github.com/TridTech)
+* F5 Loadbalancers, use full path for includes ([#16505](https://github.com/librenms/librenms/pull/16505)) - [Calvario](https://github.com/Calvario)
+* Fixed sensor discovery issue for serverscheck os ([#16499](https://github.com/librenms/librenms/pull/16499)) - [laf](https://github.com/laf)
+* Add temperature sensors for RoomAlert3S ([#16496](https://github.com/librenms/librenms/pull/16496)) - [davburns](https://github.com/davburns)
+* Update infinera-groove.inc.php ([#16490](https://github.com/librenms/librenms/pull/16490)) - [thundersin](https://github.com/thundersin)
+* Updated Serverscheck temp sensor discovery ([#16488](https://github.com/librenms/librenms/pull/16488)) - [laf](https://github.com/laf)
+* FS centec switch transceiver temperature not showing ([#16469](https://github.com/librenms/librenms/pull/16469)) - [murrant](https://github.com/murrant)
+* OcNOS transceiver tx not visible ([#16468](https://github.com/librenms/librenms/pull/16468)) - [murrant](https://github.com/murrant)
+* Improve OcNOS port breakout detection ([#16466](https://github.com/librenms/librenms/pull/16466)) - [murrant](https://github.com/murrant)
+* OcNOS transceiver temperature display fix ([#16460](https://github.com/librenms/librenms/pull/16460)) - [murrant](https://github.com/murrant)
+* Update eltek-webpower.yaml ([#16188](https://github.com/librenms/librenms/pull/16188)) - [martinvenes](https://github.com/martinvenes)
+
+#### Webui
+* Add nbsp to fix display of cog icon in device toolbar ([#16634](https://github.com/librenms/librenms/pull/16634)) - [eskyuu](https://github.com/eskyuu)
+* ARP search trim MAC search phrase ([#16626](https://github.com/librenms/librenms/pull/16626)) - [murrant](https://github.com/murrant)
+* Fixed a display issue with the menu ([#16546](https://github.com/librenms/librenms/pull/16546)) - [eskyuu](https://github.com/eskyuu)
+* Popover fixes on transports page ([#16527](https://github.com/librenms/librenms/pull/16527)) - [alwold](https://github.com/alwold)
+* Fix all devices menu when no device types exist ([#16521](https://github.com/librenms/librenms/pull/16521)) - [jiannelli](https://github.com/jiannelli)
+* Eager load relationships (Performance) ([#16503](https://github.com/librenms/librenms/pull/16503)) - [murrant](https://github.com/murrant)
+* Improve device ports loading speed ([#16500](https://github.com/librenms/librenms/pull/16500)) - [murrant](https://github.com/murrant)
+* Dark theme improvements (aesthetics and readability) ([#16486](https://github.com/librenms/librenms/pull/16486)) - [jiannelli](https://github.com/jiannelli)
+* Device overview: direct transceiver link ([#16485](https://github.com/librenms/librenms/pull/16485)) - [murrant](https://github.com/murrant)
+* Fix popup javascript ([#16459](https://github.com/librenms/librenms/pull/16459)) - [murrant](https://github.com/murrant)
+
+#### Alerting
+* Fix browser push alert too large ([#16633](https://github.com/librenms/librenms/pull/16633)) - [murrant](https://github.com/murrant)
+* MS Teams: use AdaptiveCard for JSON tests ([#16630](https://github.com/librenms/librenms/pull/16630)) - [murrant](https://github.com/murrant)
+* Throw exception when mail delivery fails ([#16591](https://github.com/librenms/librenms/pull/16591)) - [alwold](https://github.com/alwold)
+* Add Gotify Implementation ([#16553](https://github.com/librenms/librenms/pull/16553)) - [netravnen](https://github.com/netravnen)
+* Add some more alert rules for checking for smart self test failures ([#16494](https://github.com/librenms/librenms/pull/16494)) - [VVelox](https://github.com/VVelox)
+* Discord Transport Fix: 'Error: Invalid Field' When 'Fields to Embed' Left Empty ([#16439](https://github.com/librenms/librenms/pull/16439)) - [jiannelli](https://github.com/jiannelli)
+* Created IBM On Call Manager Alert Transport ([#16395](https://github.com/librenms/librenms/pull/16395)) - [SaneiSaya](https://github.com/SaneiSaya)
+
+#### Graphs
+* Fix graph row responsive ([#16618](https://github.com/librenms/librenms/pull/16618)) - [murrant](https://github.com/murrant)
+
+#### Maps
+* Fix MapDataController::linkUseColour return ([#16649](https://github.com/librenms/librenms/pull/16649)) - [murrant](https://github.com/murrant)
+* Use the standard menu option for all map page refreshes ([#16644](https://github.com/librenms/librenms/pull/16644)) - [eskyuu](https://github.com/eskyuu)
+* Fix worldmap widget up/down filtering ([#16641](https://github.com/librenms/librenms/pull/16641)) - [murrant](https://github.com/murrant)
+* Fixes for netmaps following the update ([#16638](https://github.com/librenms/librenms/pull/16638)) - [eskyuu](https://github.com/eskyuu)
+* Fix map maintenance missing ([#16627](https://github.com/librenms/librenms/pull/16627)) - [murrant](https://github.com/murrant)
+* Custom Map widget unselected ([#16616](https://github.com/librenms/librenms/pull/16616)) - [murrant](https://github.com/murrant)
+* Added missing form fields from the modal and added JS fix ([#16615](https://github.com/librenms/librenms/pull/16615)) - [eskyuu](https://github.com/eskyuu)
+* Added a white background to custom map labels to make them more readable ([#16574](https://github.com/librenms/librenms/pull/16574)) - [eskyuu](https://github.com/eskyuu)
+* Custom Map vis.js options ([#16535](https://github.com/librenms/librenms/pull/16535)) - [eskyuu](https://github.com/eskyuu)
+* Custom Map legend configuration ([#16534](https://github.com/librenms/librenms/pull/16534)) - [eskyuu](https://github.com/eskyuu)
+* Custom Map line fixed width option ([#16533](https://github.com/librenms/librenms/pull/16533)) - [eskyuu](https://github.com/eskyuu)
+* Indicate when a linked custom map has down devices ([#16518](https://github.com/librenms/librenms/pull/16518)) - [laf](https://github.com/laf)
+* Make device text and links dark red when the connected device is offline ([#16477](https://github.com/librenms/librenms/pull/16477)) - [eskyuu](https://github.com/eskyuu)
+* Added a widget for custom maps ([#16454](https://github.com/librenms/librenms/pull/16454)) - [eskyuu](https://github.com/eskyuu)
+* Refactor javascript in custom maps ([#16450](https://github.com/librenms/librenms/pull/16450)) - [eskyuu](https://github.com/eskyuu)
+* Refactor all map pages to be Laravel pages with AJAX data refresh ([#15567](https://github.com/librenms/librenms/pull/15567)) - [eskyuu](https://github.com/eskyuu)
+
+#### Applications
+* Update app page for Suricata to escape stuff ([#16608](https://github.com/librenms/librenms/pull/16608)) - [VVelox](https://github.com/VVelox)
+* ZFS app update, adding zpool io stats and  error stats ([#16551](https://github.com/librenms/librenms/pull/16551)) - [VVelox](https://github.com/VVelox)
+* Add missing graphs for the poudriere app page ([#16495](https://github.com/librenms/librenms/pull/16495)) - [VVelox](https://github.com/VVelox)
+* OS Level Virtualization Monitor ([#16269](https://github.com/librenms/librenms/pull/16269)) - [VVelox](https://github.com/VVelox)
+* HTTP Access Log Combined monitoring ([#16247](https://github.com/librenms/librenms/pull/16247)) - [VVelox](https://github.com/VVelox)
+
+#### Api
+* Add API endpoint to retrieve port FDB MAC addresses ([#16520](https://github.com/librenms/librenms/pull/16520)) - [barhom](https://github.com/barhom)
+
+#### Discovery
+* Avoid DivisionByZeroError ([#16464](https://github.com/librenms/librenms/pull/16464)) - [Calvario](https://github.com/Calvario)
+
+#### Authentication
+* Avoid a redirect loop if we have a login error ([#16366](https://github.com/librenms/librenms/pull/16366)) - [Calvario](https://github.com/Calvario)
+
+#### Bug
+* Catch RRD Startup Exception ([#16646](https://github.com/librenms/librenms/pull/16646)) - [murrant](https://github.com/murrant)
+* Catch more mail exceptions ([#16645](https://github.com/librenms/librenms/pull/16645)) - [murrant](https://github.com/murrant)
+* Fix arp search where like ([#16622](https://github.com/librenms/librenms/pull/16622)) - [murrant](https://github.com/murrant)
+* Graylog handle empty API response ([#16617](https://github.com/librenms/librenms/pull/16617)) - [murrant](https://github.com/murrant)
+* Corrected the use of the MIB name TRIPPLITE-12X ([#16609](https://github.com/librenms/librenms/pull/16609)) - [laf](https://github.com/laf)
+* Fixing chronyd application log message variable bug/typo. ([#16543](https://github.com/librenms/librenms/pull/16543)) - [bnerickson](https://github.com/bnerickson)
+* Fix IPv6 BGP discovery ([#16542](https://github.com/librenms/librenms/pull/16542)) - [TheMysteriousX](https://github.com/TheMysteriousX)
+* Stop services from being checked when device is offline and service does not have an IP set ([#16497](https://github.com/librenms/librenms/pull/16497)) - [eskyuu](https://github.com/eskyuu)
+* Snmpsim setup: fix python exe name ([#16492](https://github.com/librenms/librenms/pull/16492)) - [murrant](https://github.com/murrant)
+* VLANs global page, missing changes ([#16484](https://github.com/librenms/librenms/pull/16484)) - [murrant](https://github.com/murrant)
+* Webui - fix exception in Oxidized page date handling ([#16475](https://github.com/librenms/librenms/pull/16475)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Add circular loop detection to MaxDepth ([#15579](https://github.com/librenms/librenms/pull/15579)) - [eskyuu](https://github.com/eskyuu)
+
+#### Documentation
+* Update install docs for OSLV::Monitor as it is now in the FreeBSD pkg repo as p5-OSLV-Monitor ([#16612](https://github.com/librenms/librenms/pull/16612)) - [VVelox](https://github.com/VVelox)
+* Update App docs to add generic cpanm instructions for all perl stuff ([#16596](https://github.com/librenms/librenms/pull/16596)) - [VVelox](https://github.com/VVelox)
+* Update App docs for Suricata for installing available depends via pkgs for FreeBSD and Debian ([#16595](https://github.com/librenms/librenms/pull/16595)) - [VVelox](https://github.com/VVelox)
+* Update App docs for SMART for Debian depends ([#16594](https://github.com/librenms/librenms/pull/16594)) - [VVelox](https://github.com/VVelox)
+* Update App docs for log size monitor for Debian, adding depends available via apt ([#16593](https://github.com/librenms/librenms/pull/16593)) - [VVelox](https://github.com/VVelox)
+* Update App docs for HV Monitor depends install ([#16592](https://github.com/librenms/librenms/pull/16592)) - [VVelox](https://github.com/VVelox)
+* Update App docs for Sagan for also installing depends ([#16590](https://github.com/librenms/librenms/pull/16590)) - [VVelox](https://github.com/VVelox)
+* Update App docs for the newest version of the privoxy extend ([#16589](https://github.com/librenms/librenms/pull/16589)) - [VVelox](https://github.com/VVelox)
+* Update App docs for linux_softnet_stat as it no longer needs Gzip::Faster ([#16586](https://github.com/librenms/librenms/pull/16586)) - [VVelox](https://github.com/VVelox)
+* Update App docs for Monitoring::Sneck some ([#16585](https://github.com/librenms/librenms/pull/16585)) - [VVelox](https://github.com/VVelox)
+* Updating http_access_log_combined Application Documentation w/SELinux Instructions ([#16555](https://github.com/librenms/librenms/pull/16555)) - [bnerickson](https://github.com/bnerickson)
+* Add depends install instruction for nfs extend and update selinux info ([#16539](https://github.com/librenms/librenms/pull/16539)) - [VVelox](https://github.com/VVelox)
+* Update Test-Units.md to reflect PR #12531 requiring the -v flag in scripts/collect-snmp-data.php. ([#16528](https://github.com/librenms/librenms/pull/16528)) - [JacobErnst98](https://github.com/JacobErnst98)
+* Sensor state support improvements (state translations with string/numeric values and others) ([#16522](https://github.com/librenms/librenms/pull/16522)) - [jiannelli](https://github.com/jiannelli)
+* Update list of supported OSes ([#16516](https://github.com/librenms/librenms/pull/16516)) - [Jellyfrog](https://github.com/Jellyfrog)
+* Update docs for Opensearch for the newest version of the extend ([#16482](https://github.com/librenms/librenms/pull/16482)) - [VVelox](https://github.com/VVelox)
+
+#### Misc
+* Typo in debug ([#16545](https://github.com/librenms/librenms/pull/16545)) - [Calvario](https://github.com/Calvario)
+
+#### Dependencies
+* Bump elliptic from 6.5.7 to 6.6.0 ([#16619](https://github.com/librenms/librenms/pull/16619)) - [dependabot](https://github.com/apps/dependabot)
+* Bump cookie and express ([#16530](https://github.com/librenms/librenms/pull/16530)) - [dependabot](https://github.com/apps/dependabot)
+
+
 ## 24.9.0
 *(2024-09-29)*
 

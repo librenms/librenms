@@ -1,1 +1,1 @@
-<a href="{{ $link }}" {{ $attributes->filter($filterAttributes) }}>@include('components.graph')</a>
+<a href="{{ $link }}" {{ $attributes->only(['class', 'style']) }}>@include('components.graph')</a>

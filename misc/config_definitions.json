@@ -383,6 +383,10 @@
             "default": 8082,
             "type": "integer"
         },
+        "apps.oslv_monitor.seen_age": {
+            "default": 604800,
+            "type": "integer"
+        },
         "apps.sneck.polling_time_diff": {
             "default": false,
             "type": "boolean"
@@ -1080,6 +1084,14 @@
             "section": "custom-map",
             "order": 2
         },
+        "custom_map.legend_colours": {
+            "default": null,
+            "type": "array",
+            "validate": {
+                 "value": "array",
+                 "value.*": "string"
+             }
+        },
         "custom_map.node_align": {
             "default": 10,
             "type": "integer",
@@ -1221,6 +1233,25 @@
             "section": "device",
             "default": false,
             "type": "boolean"
+        },
+        "device_location_map_show_devices": {
+            "order": 3,
+            "group": "webui",
+            "section": "device",
+            "default": false,
+            "type": "boolean"
+        },
+        "device_location_map_show_device_dependencies": {
+            "order": 4,
+            "group": "webui",
+            "section": "device",
+            "default": false,
+            "type": "boolean",
+            "when": {
+                "setting": "device_location_map_show_devices",
+                "operator": "equals",
+                "value": true
+            }
         },
         "default_port_association_mode": {
             "default": "ifIndex",
@@ -2044,7 +2075,7 @@
             }
         },
         "geoloc.dns": {
-            "order": 3,
+            "order": 5,
             "group": "webui",
             "section": "device",
             "default": true,
@@ -4069,7 +4100,7 @@
         "html.device.primary_link": {
             "group": "webui",
             "section": "device",
-            "order": 3,
+            "order": 6,
             "type": "select",
             "default": "edit",
             "options": {
@@ -4658,6 +4689,29 @@
         "network_map_vis_options": {
             "default": "{\n  layout:{\n      randomSeed:2\n  },\n  \"edges\": {\n    arrows: {\n          to:     {enabled: true, scaleFactor:0.5},\n    },\n    \"smooth\": {\n        enabled: false\n    },\n    font: {\n        size: 14,\n        color: \"red\",\n        face: \"sans\",\n        background: \"white\",\n        strokeWidth:3,\n        align: \"middle\",\n        strokeWidth: 2\n    }\n  },\n  \"physics\": {\n     \"barnesHut\": {\n      \"gravitationalConstant\": -2000,\n      \"centralGravity\": 0.3,\n      \"springLength\": 200,\n      \"springConstant\": 0.04,\n      \"damping\": 0.09,\n      \"avoidOverlap\": 1\n    },\n\n     \"forceAtlas2Based\": {\n      \"gravitationalConstant\": -50,\n      \"centralGravity\": 0.01,\n      \"springLength\": 200,\n      \"springConstant\": 0.08,\n      \"damping\": 0.4,\n      \"avoidOverlap\": 1\n    },\n\n     \"repulsion\": {\n      \"centralGravity\": 0.2,\n      \"springLength\": 250,\n      \"springConstant\": 0.2,\n      \"nodeDistance\": 200,\n      \"damping\": 0.07\n    },\n\n     \"hierarchicalRepulsion\": {\n      \"nodeDistance\": 300,\n      \"centralGravity\": 0.2,\n      \"springLength\": 300,\n      \"springConstant\": 0.2,\n      \"damping\": 0.07\n    },\n\n  \"maxVelocity\": 50,\n  \"minVelocity\": 0.4,\n  \"solver\": \"hierarchicalRepulsion\",\n  \"stabilization\": {\n    \"enabled\": true,\n    \"iterations\": 1000,\n    \"updateInterval\": 100,\n    \"onlyDynamicEdges\": false,\n    \"fit\": true\n  },\n\n  \"timestep\": 0.4,\n }\n}",
             "type": "text"
+        },
+        "network_map_worldmap_link_type": {
+            "default": "xdp",
+            "group": "webui",
+            "section": "worldmap",
+            "order": 3,
+            "type": "select",
+            "options": {
+                "xdp": "CDP/LLDP Neighbours",
+                "depends": "Parent Dependencies"
+            },
+            "when": {
+                "setting": "network_map_show_on_worldmap",
+                "operator": "equals",
+                "value": true
+            }
+        },
+        "network_map_worldmap_show_disabled_alerts": {
+            "default": true,
+            "type": "boolean",
+            "group": "webui",
+            "section": "worldmap",
+            "order": 2
         },
         "nfdump": {
             "default": "/usr/bin/nfdump",

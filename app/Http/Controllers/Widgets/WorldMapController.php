@@ -25,11 +25,8 @@
 
 namespace App\Http\Controllers\Widgets;
 
-use App\Models\Device;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use LibreNMS\Config;
-use LibreNMS\Util\Url;
 
 class WorldMapController extends WidgetController
 {
@@ -65,50 +62,6 @@ class WorldMapController extends WidgetController
         ];
 
         return view('widgets.worldmap', $settings);
-    }
-
-    public function getData(Request $request): JsonResponse
-    {
-        $this->validate($request, [
-            'status' => 'array',
-            'status.*' => 'int',
-            'device_group' => 'int',
-        ]);
-
-        return response()->json($this->getMarkerData($request, $request->status ?? [0, 1], $request->device_group ?? 0));
-    }
-
-    public function getMarkerData(Request $request, array $status, int $device_group_id): array
-    {
-        return Device::hasAccess($request->user())
-            ->with('location')
-            ->isActive()
-            ->whereIn('status', $status)
-            ->when($device_group_id, fn ($q) => $q->inDeviceGroup($device_group_id))
-            ->get()
-            ->filter(function ($device) use ($status) {
-                /** @var Device $device */
-                if (! ($device->location_id && $device->location && $device->location->coordinatesValid())) {
-                    return false;
-                }
-
-                // hide devices under maintenance if only showing down devices
-                if ($status == [0] && $device->isUnderMaintenance()) {
-                    return false;
-                }
-
-                return true;
-            })->map(function (Device $device) {
-                return [
-                    'name' => $device->displayName(),
-                    'lat' => $device->location->lat,
-                    'lng' => $device->location->lng,
-                    'icon' => $device->icon,
-                    'url' => Url::deviceUrl($device),
-                    // status: 0 = down, 1 = up, 3 = down + under maintenance
-                    'status' => (int) ($device->status ?: ($device->isUnderMaintenance() ? 3 : 0)),
-                ];
-            })->values()->all();
     }
 
     public function getSettingsView(Request $request)

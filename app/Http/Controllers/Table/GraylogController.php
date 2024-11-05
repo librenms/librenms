@@ -82,12 +82,13 @@ class GraylogController extends SimpleTableController
 
         try {
             $data = $api->query($query, $range, $limit, $offset, $sort, $filter);
+            $messages = $data['messages'] ?? [];
 
             return $this->formatResponse(
-                array_map([$this, 'formatMessage'], $data['messages']),
+                array_map([$this, 'formatMessage'], $messages),
                 $page,
-                count($data['messages']),
-                $data['total_results']
+                count($messages),
+                $data['total_results'] ?? 0,
             );
         } catch (\Exception $se) {
             $error = $se->getMessage();
