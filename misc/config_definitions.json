@@ -5782,6 +5782,10 @@
             "default": true,
             "type": "boolean"
         },
+        "scheduler.poll.enabled": {
+            "default": false,
+            "type": "boolean"
+        },
         "service_poller_enabled": {
             "default": true,
             "group": "poller",
