@@ -62,7 +62,7 @@
         refreshMap();
     }
 
-    function refreshMap() {
+    function async refreshMap() {
         var highlight = $("#highlight_node").val();
         var showpath = 0;
         if ($("#showparentdevicepath")[0].checked) {
@@ -76,7 +76,7 @@
         var group = null;
 @endif
 
-        $.post( '{{ route('maps.getdevices') }}', {disabled: 0, disabled_alerts: null, link_type: "depends", url_type: "links", group: group, highlight_node: highlight, showpath: showpath})
+        await $.post( '{{ route('maps.getdevices') }}', {disabled: 0, disabled_alerts: null, link_type: "depends", url_type: "links", group: group, highlight_node: highlight, showpath: showpath})
             .done(function( data ) {
                 let device_count = Object.keys(data).length;
                 if (device_count === 0) {
@@ -161,9 +161,9 @@
     }
 
     // initial load pause countdown in case load is long
-    $(document).ready(function () {
+    $(document).ready(async function () {
         Countdown.Pause();
-        refreshMap();
+        await refreshMap();
         Countdown.Resume();
     });
 </script>
