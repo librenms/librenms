@@ -132,6 +132,25 @@
             height = height + "px";
         }
 
+        if (width.endsWith("px") && height.endsWith("px")) {
+            widthInt = parseInt(width);
+            heightInt = parseInt(height);
+
+            var nodeError = false;
+            network_nodes.forEach((node) => {
+                if (node.x > widthInt - {{ $hmargin }} || node.y > heightInt - {{ $vmargin }}) {
+                    nodeError = true;
+                }
+            });
+            if (nodeError) {
+                let alert_content = $("#savemap-alert");
+                alert_content.text('Please move nodes inside the new area before shrinking the map');
+                alert_content.attr("class", "col-sm-12 alert alert-danger");
+                $("#map-saveButton").removeAttr('disabled');
+                return;
+            }
+        }
+
         @if(isset($map_id))
             var url = '{{ route('maps.custom.update', ['map' => $map_id]) }}';
             var method = 'PUT';

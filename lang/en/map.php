@@ -43,6 +43,7 @@ return [
             ],
             'map' => [
                 'settings_title' => 'Map Settings',
+                'selectall' => 'Select All',
                 'name' => 'Name',
                 'menu_group' => 'Menu Group',
                 'no_group' => 'No Group',
