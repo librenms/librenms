@@ -62,7 +62,7 @@
         refreshMap();
     }
 
-    function async refreshMap() {
+    async function refreshMap() {
         var highlight = $("#highlight_node").val();
         var showpath = 0;
         if ($("#showparentdevicepath")[0].checked) {
@@ -85,9 +85,6 @@
                 } else if (device_count > 500) {
                     $("#alert").text("The initial render will be slow due to the number of devices.  Auto refresh has been paused.");
                     $("#alert-row").show();
-                } else {
-                    $("#alert").text("");
-                    $("#alert-row").hide();
                 }
 
                 function deviceSort(a,b) {
@@ -165,6 +162,8 @@
         Countdown.Pause();
         await refreshMap();
         Countdown.Resume();
+        $("#alert").text("");
+        $("#alert-row").hide();
     });
 </script>
 <x-refresh-timer :refresh="$page_refresh" callback="refreshMap"></x-refresh-timer>
