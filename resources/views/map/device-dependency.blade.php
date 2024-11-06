@@ -51,7 +51,6 @@
     var network_nodes = new vis.DataSet({queue: {delay: 100}});
     var network_edges = new vis.DataSet({queue: {delay: 100}});
     var network;
-
     var Countdown;
 
     function updateHighlight(hlcb) {
@@ -72,13 +71,25 @@
             showpath = -1;
         }
 @if($group_id)
-        var group = {{$group_id}};
+        var group = {{ $group_id }};
 @else
         var group = null;
 @endif
 
         $.post( '{{ route('maps.getdevices') }}', {disabled: 0, disabled_alerts: null, link_type: "depends", url_type: "links", group: group, highlight_node: highlight, showpath: showpath})
             .done(function( data ) {
+                let device_count = Object.keys(data).length;
+                if (device_count === 0) {
+                    $("#alert").text("No devices found");
+                    $("#alert-row").show();
+                } else if (device_count > 500) {
+                    $("#alert").text("The initial render will be slow due to the number of devices.  Auto refresh has been paused.");
+                    $("#alert-row").show();
+                } else {
+                    $("#alert").text("");
+                    $("#alert-row").hide();
+                }
+
                 function deviceSort(a,b) {
                     return (data[a]["sname"] > data[b]["sname"]) ? 1 : -1;
                 }
@@ -95,7 +106,11 @@
                         network_nodes.update(this_dev);
                     } else {
                         network_nodes.add([this_dev]);
-                        $("#highlight_node").append("<option value='" + device_id + "' id='highlight-device-" + device_id + "'>" + device["sname"] + "</option>")
+                        var highlight_option = document.createElement("option");
+                        highlight_option.value = device_id;
+                        highlight_option.id = "highlight-device-" + device_id;
+                        highlight_option.textContent = device["sname"];
+                        document.getElementById("highlight_node").appendChild(highlight_option);
                     }
                     $.each( device["parents"], function( parent_idx, parent_id ) {
                         link_id = device_id + "." + parent_id;
@@ -140,45 +155,17 @@
                     });
                 }
 
-                if (Object.keys(data).length == 0) {
-                    $("#alert").html("No devices found");
-                    $("#alert-row").show();
-                } else if (Object.keys(data).length > 500) {
-                    $("#alert").html("The initial render will be slow due to the number of devices.  Auto refresh has been paused.");
-                    $("#alert-row").show();
-                    Countdown.Pause();
-                } else {
-                    $("#alert").html("");
-                    $("#alert-row").hide();
-                }
+                $("#alert").text("");
+                $("#alert-row").hide();
             });
     }
 
+    // initial load pause countdown in case load is long
     $(document).ready(function () {
-        Countdown = {
-            sec: {{$page_refresh}},
-
-            Start: function () {
-                var cur = this;
-                this.interval = setInterval(function () {
-                    cur.sec -= 1;
-                    if (cur.sec <= 0) {
-                        refreshMap();
-                        cur.sec = {{$page_refresh}};
-                    }
-                }, 1000);
-            },
-
-            Pause: function () {
-                clearInterval(this.interval);
-                delete this.interval;
-            },
-        };
-
-        Countdown.Start();
-
+        Countdown.Pause();
         refreshMap();
+        Countdown.Resume();
     });
 </script>
+<x-refresh-timer :refresh="$page_refresh" callback="refreshMap"></x-refresh-timer>
 @endsection
-
