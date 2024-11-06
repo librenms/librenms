@@ -377,13 +377,13 @@ class MapDataController extends Controller
     {
         $link_pct = round(2 * $link_pct, -1) / 2;
         if ($link_pct > 100) {
-            $link_used = 100;
+            $link_pct = 100;
         }
         if (is_nan($link_pct)) {
-            $link_used = 0;
+            $link_pct = 0;
         }
 
-        return Config::get("network_map_legend.$link_pct");
+        return Config::get("network_map_legend.$link_pct", '#000000');
     }
 
     protected function nodeDisabledStyle(): array
