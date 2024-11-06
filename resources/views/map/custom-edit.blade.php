@@ -580,7 +580,7 @@
                 } else {
                     node.icon = null;
                 }
-                if("unselected" in node.image) {
+                if(node.image && "unselected" in node.image) {
                     if(node.image.unselected.indexOf(custom_image_base) == 0) {
                         node.image.unselected = node.image.unselected.replace(custom_image_base, "");
                     } else {
