@@ -61,7 +61,8 @@
 @endsection
 
 @section('javascript')
-    <script src="{{ url('js/vis.min.js') }}"></script>
+    <script src="{{ url('js/vis-network.min.js') }}"></script>
+    <script src="{{ url('js/vis-data.min.js') }}"></script>
 @endsection
 
 @push('scripts')

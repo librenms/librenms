@@ -35,7 +35,8 @@
 @endsection
 
 @section('javascript')
-<script type="text/javascript" src="{{ asset('js/vis.min.js') }}"></script>
+<script type="text/javascript" src="{{ asset('js/vis-network.min.js') }}"></script>
+<script type="text/javascript" src="{{ asset('js/vis-data.min.js') }}"></script>
 @endsection
 
 @section('scripts')

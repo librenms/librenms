@@ -107,6 +107,7 @@ network.on('click', function (properties) {
 
 @section('javascript')
 @if($data['selection'] == 'map')
-    <script src="{{ url('js/vis.min.js') }}"></script>
+    <script src="{{ url('js/vis-network.min.js') }}"></script>
+    <script src="{{ url('js/vis-data.min.js') }}"></script>
 @endif
 @endsection

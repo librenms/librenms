@@ -1,4 +1,5 @@
-<script type="text/javascript" src="{{ asset('js/vis.min.js') }}"></script>
+<script type="text/javascript" src="{{ asset('js/vis-network.min.js') }}"></script>
+<script type="text/javascript" src="{{ asset('js/vis-data.min.js') }}"></script>
 <script type="text/javascript">
     var custommap = {
         legendPctDefaultColour: function (pct) {
@@ -133,10 +134,10 @@
                     // If we do not get a valid image from the database, use defaults
                     node_cfg.shape = newnodeconf.shape;
                     node_cfg.icon = newnodeconf.icon;
-                    node_cfg.image = newnodeconf.image;
+                    node_cfg.image = newnodeconf.image || undefined;
                 }
             } else {
-                node_cfg.image = {};
+                node_cfg.image = undefined;
             }
             if(! ["ellipse", "circle", "database", "box", "text"].includes(node.style)) {
                 node_cfg.font.background = "#FFFFFF";
@@ -151,7 +152,7 @@
                 arrows = {to: {enabled: true, scaleFactor: 0.6}, from: {enabled: false}};
             }
 
-            var edge_cfg = {id: edgeid + "_" + fromto, to: edgeid + "_mid", arrows: arrows, font: {face: edge.text_face, size: edge.text_size, color: edge.text_colour, background: "#FFFFFF", align: edge.text_align || "horizontal"}, smooth: {type: edge.style}};
+            var edge_cfg = {id: edgeid + "_" + fromto, to: edgeid + "_mid", arrows: arrows, font: {face: edge.text_face, size: edge.text_size, color: edge.text_colour, background: "#FFFFFF", align: edge.text_align || "horizontal"}, smooth: {type: edge.style}, , arrowStrikethrough: false};
             if (fromto == "from") {
                 edge_cfg.from = edge.custom_map_node1_id;
                 var port_pct = Boolean(reverse_arrows) ? edge.port_topct : edge.port_frompct;
