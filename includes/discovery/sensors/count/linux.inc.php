@@ -3,7 +3,7 @@ echo 'linuxprocesses ';
 
 $prTable = snmpwalk_cache_oid($device, 'prTable', [], 'UCD-SNMP-MIB');
 foreach ($prTable as $entry) {
-    $descr = "Proc count: {$entry['prNames']}";
+    $descr = "Proc:{$entry['prNames']}";
     $state_name = "prCount";
     $low_limit = $entry['prMin'] - 1;
     $high_limit = $entry['prMax'] + 1;
