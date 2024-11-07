@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('custom_map_edges', function (Blueprint $table) {
-            $table->text('text_align')->after('text_colour')->default('horizontal');
+            $table->string('text_align', 16)->after('text_colour')->default('horizontal');
         });
     }
 
