@@ -138,7 +138,7 @@
 
             var nodeError = false;
             network_nodes.forEach((node) => {
-                if (node.x > widthInt - {{ $hmargin }} || node.y > heightInt - {{ $vmargin }}) {
+                if (node.x > widthInt - {{ isset($hmargin) ? $hmargin : 10 }} || node.y > heightInt - {{ isset($vmargin) ? $vmargin : 10 }}) {
                     nodeError = true;
                 }
             });
