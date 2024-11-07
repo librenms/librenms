@@ -344,7 +344,7 @@
                     if ( nodeid.startsWith("legend_") ) {
                         // Only move the legend once
                         if (legendMoved) {
-                            continue;
+                            return;
                         }
                         legendMoved = true;
 
@@ -368,7 +368,7 @@
                             redrawLegend();
                         }
 
-                        continue;
+                        return;
                     }
                     let move = fixNodePos(nodeid, node);
                     if ( move ) {
