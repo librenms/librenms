@@ -161,6 +161,13 @@ return [
                 ],
                 'show_usage_percent' => 'Show percent usage',
                 'show_usage_bps' => 'Show bps usage',
+                'text_align' => 'Text Alignment',
+                'align_options' => [
+                    'horizontal' => 'Horizontal',
+                    'top' => 'Top',
+                    'middle' => 'Middle',
+                    'bottom' => 'Bottom',
+                ],
                 'label' => 'Label',
                 'recenter' => 'Recenter Line',
             ],
