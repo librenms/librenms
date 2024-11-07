@@ -9336,33 +9336,5 @@
                 }
             ]
         }
-    },
-    "discovery-protocols": {
-        "discovery": {
-            "links": [
-                {
-                    "active": 1,
-                    "protocol": "lldp",
-                    "remote_hostname": "switch-name",
-                    "remote_port": "41",
-                    "remote_platform": null,
-                    "remote_version": "HP J8693A Switch 3500yl-48G, revision K.15.10.0009, ROM K.15.30 (/ws/swbuildm/K_rel_irvine_qaoff/code/build/btm(swbuildm_K_rel_irvine_qaoff_rel_irvine))",
-                    "ifAlias": "23",
-                    "ifDescr": "23",
-                    "ifName": "23"
-                },
-                {
-                    "active": 1,
-                    "protocol": "lldp",
-                    "remote_hostname": "switch-name",
-                    "remote_port": "42",
-                    "remote_platform": null,
-                    "remote_version": "HP J8693A Switch 3500yl-48G, revision K.15.10.0009, ROM K.15.30 (/ws/swbuildm/K_rel_irvine_qaoff/code/build/btm(swbuildm_K_rel_irvine_qaoff_rel_irvine))",
-                    "ifAlias": "24",
-                    "ifDescr": "24",
-                    "ifName": "24"
-                }
-            ]
-        }
     }
 }
