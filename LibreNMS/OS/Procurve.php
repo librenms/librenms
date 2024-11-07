@@ -143,7 +143,6 @@ class Procurve extends \LibreNMS\OS implements OSPolling, NacPolling, Transceive
     {
         $ifIndexToPortId = $this->getDevice()->ports()->pluck('port_id', 'ifIndex');
 
-
         return SnmpQuery::cache()->walk('HP-ICF-TRANSCEIVER-MIB::hpicfXcvrInfoTable')->mapTable(function ($data, $ifIndex) use ($ifIndexToPortId) {
             return new Transceiver([
                 'port_id' => $ifIndexToPortId->get($ifIndex, 0),
