@@ -12,7 +12,7 @@
 @endif
 <div class="pull-right">
     Highlight Node
-    <select name="highlight_node" id="highlight_node" class="input-sm" onChange="refreshMap()";>
+    <select name="highlight_node" id="highlight_node" class="input-sm" onChange="highlightSelectedNode()";>
         <option value="0">None</option>
         <option value="-1">Isolated Devices</option>
     </select>
@@ -47,6 +47,58 @@
     var network_nodes = new vis.DataSet({queue: {delay: 100}});
     var network_edges = new vis.DataSet({queue: {delay: 100}});
     var network;
+    var node_highlight_style = @json($highlight_style);
+
+    var highlightSavedId = null;
+    var highlightSavedWidth = null;
+    var highlightSavedColour = null;
+    function highlightSelectedNode() {
+        let highlightId = parseInt($("#highlight_node").val());
+        let needRefresh = false;
+
+        // If we have a saved IS
+        if (highlightSavedId) {
+            if (highlightSavedId < 0) {
+                // We have multiple highlighted nodes - queue refresh
+                needRefresh = true;
+            } else {
+                // Return the saved node to normal
+                let savedNode = network_nodes.get(highlightSavedId.toString());
+                savedNode.borderWidth = highlightSavedWidth;
+                savedNode.color = highlightSavedColour;
+                network_nodes.update(savedNode);
+            }
+
+            // Reset the saved node variables
+            highlightSavedId = highlightId;
+            highlightSavedWidth = null;
+            highlightSavedColour = null;
+        }
+
+        // Save the new highlight ID
+        highlightSavedId = highlightId;
+        if (highlightId > 0) {
+            // Save the selected node's width and colour
+            let highlightNode = network_nodes.get(highlightId.toString());
+            highlightSavedWidth = highlightNode.borderWidth;
+            highlightSavedColour = highlightNode.color;
+
+            // Update the width and shallow merge the colour
+            highlightNode.borderWidth = node_highlight_style.borderWidth;
+            highlightNode.color = {...highlightNode.color, ...node_highlight_style.color};
+
+            // Update the map
+            network_nodes.update(highlightNode);
+        } else if (highlightId < 0) {
+            // We want to highlight multiple nodes - queue refresh
+            needRefresh = true;
+        }
+
+        // Refresh map if multiple nodes need changing
+        if (needRefresh) {
+            refreshMap();
+        }
+    }
 
     async function refreshMap() {
         var highlight = $("#highlight_node").val();
