@@ -214,7 +214,7 @@
                 if (properties.nodes > 0) {
                     let cur_highlighted = $('#highlight_node').val();
                     if (cur_highlighted == properties.nodes) {
-                        $('#highlight_node').val(-1).trigger('change');
+                        $('#highlight_node').val(0).trigger('change');
                     } else {
                         $('#highlight_node').val(properties.nodes).trigger('change');
                     }
