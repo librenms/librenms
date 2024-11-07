@@ -106,7 +106,8 @@
             node_cfg.id = nodeid;
 
             if(node.device_id) {
-                node_cfg.title = node.device_info;
+                node_cfg.title = document.createElement("div");
+                node_cfg.title.innerHTML = node.device_info;
             } else if(node.linked_map_name) {
                 node_cfg.title = "Go to " + node.linked_map_name;
             } else {
@@ -177,7 +178,8 @@
                 return {};
             }
             if(edge.port_id) {
-                edge_cfg.title = edge.port_info;
+                edge_cfg.title = document.createElement("div");
+                node_cfg.title.innerHTML = edge.port_info;
                 if(edge.showpct) {
                     edge_cfg.label = port_pct + "%";
                 }
