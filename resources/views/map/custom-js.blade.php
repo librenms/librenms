@@ -179,7 +179,7 @@
             }
             if(edge.port_id) {
                 edge_cfg.title = document.createElement("div");
-                node_cfg.title.innerHTML = edge.port_info;
+                edge_cfg.title.innerHTML = edge.port_info;
                 if(edge.showpct) {
                     edge_cfg.label = port_pct + "%";
                 }
