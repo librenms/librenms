@@ -27,6 +27,7 @@
       </center>
     </div>
     <div class="col-md-5 text-right">
+      <button type=button value="mapselectall" id="map-selectallButton" class="btn btn-primary" onclick="network.selectNodes(network_nodes.getIds());" title="{{ __('map.custom.edit.map.multiselect_info') }}">{{ __('map.custom.edit.map.selectall') }}</button>
       <button type=button value="maprender" id="map-renderButton" class="btn btn-primary" style="display: none" onclick="CreateNetwork();">{{ __('map.custom.edit.map.rerender') }}</button>
       <button type=button value="mapsave" id="map-saveDataButton" class="btn btn-primary" style="display: none" onclick="saveMapData();">{{ __('map.custom.edit.map.save') }}</button>
       <button type=button value="maplist" id="map-listButton" class="btn btn-primary" onclick="mapList();">{{ __('map.custom.edit.map.list') }}</button>
@@ -338,10 +339,14 @@
             if(data.edges.length > 0 || data.nodes.length > 0) {
                 // Make sure a node is not dragged outside the canvas
                 nodepos = network.getPositions(data.nodes);
+                legendMoved = false;
                 $.each( nodepos, function( nodeid, node ) {
                     if ( nodeid.startsWith("legend_") ) {
-                        // Make sure the moved node is still on the map
-                        fixNodePos(nodeid, node);
+                        // Only move the legend once
+                        if (legendMoved) {
+                            return;
+                        }
+                        legendMoved = true;
 
                         // Get the current node config
                         cur_node = network_nodes.get(nodeid);
@@ -350,7 +355,19 @@
                         legend.x = legend.x + node.x - cur_node.x;
                         legend.y = legend.y + node.y - cur_node.y;
 
+                        // Make sure the top of the legend is still on the map
+                        fixNodePos("legend", legend);
+
                         redrawLegend();
+
+                        // Make sure the bottom of the legend is still on the map
+                        legendEndNode = network_nodes.get("legend_" + (legend.steps - 1))
+                        moveUp = legendEndNode.y - network_height + {{ $vmargin }};
+                        if (moveUp > 0) {
+                            legend.y -= moveUp;
+                            redrawLegend();
+                        }
+
                         return;
                     }
                     let move = fixNodePos(nodeid, node);
@@ -453,6 +470,9 @@
     }
 
     function redrawLegend() {
+        // Save list of selected nodes because we are going to remove and re-add the legend
+        selectedNodes = network.selectionHandler.getSelectedNodes().map((n) => {return n.id});
+
         // Clear out the old legend
         old_nodes = network_nodes.get({filter: function(node) { return node.id.startsWith("legend_") }});
         old_nodes.forEach((node) => {
@@ -504,6 +524,11 @@
             }
             network_nodes.flush();
         }
+
+        // Re-select nodes if multiple nodes are selected
+        if (selectedNodes.length > 1) {
+            network.selectNodes(selectedNodes);
+        }
     }
 
     function editMapSuccess(data) {
@@ -531,6 +556,8 @@
     function editMapCancel() {
         mapSettingsReset();
         $('#mapModal').modal('hide');
+        $("#savemap-alert").attr("class", "col-sm-12");
+        $("#savemap-alert").text("");
     }
 
     function saveMapData() {
