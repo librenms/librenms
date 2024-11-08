@@ -156,7 +156,7 @@ class CustomMapController extends Controller
         $data['map_conf']['width'] = $map->width;
         $data['map_conf']['height'] = $map->height;
         // Override some settings for the editor
-        $data['map_conf']['interaction'] = ['dragNodes' => true, 'dragView' => false, 'zoomView' => false];
+        $data['map_conf']['interaction'] = ['dragNodes' => true, 'dragView' => false, 'zoomView' => false, 'multiselect' => true];
         $data['map_conf']['manipulation'] = ['enabled' => true, 'initiallyActive' => true];
         $data['map_conf']['physics'] = ['enabled' => false];
 

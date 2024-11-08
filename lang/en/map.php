@@ -43,8 +43,10 @@ return [
             ],
             'map' => [
                 'settings_title' => 'Map Settings',
+                'selectall' => 'Select All',
                 'name' => 'Name',
                 'menu_group' => 'Menu Group',
+                'multiselect_info' => 'Either long-click or hold down ctrl to select multiple nodes',
                 'no_group' => 'No Group',
                 'width' => 'Width',
                 'height' => 'Height',
