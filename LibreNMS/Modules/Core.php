@@ -210,6 +210,7 @@ class Core implements Module
         }
 
         self::setOS($device, 'generic', []);
+        return;
     }
 
     /**
