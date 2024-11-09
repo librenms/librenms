@@ -43,6 +43,9 @@
                     "snmpget": {"$ref": "#/definitions/snmpget"},
                     "snmpget_except": {"$ref": "#/definitions/snmpget"},
                     "snmpwalk": {"$ref": "#/definitions/snmpget"}
+                    "type": {
+                        "type": "string"
+                    },
                 },
                 "minProperties": 1,
                 "additionalProperties": false
