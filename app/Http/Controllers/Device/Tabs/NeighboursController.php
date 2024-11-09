@@ -73,7 +73,7 @@ class NeighboursController implements DeviceTab
                 $links[] = [
                     'local_url' => Url::portLink($link->port, null, null, true, false),
                     'ldev_id' => $device->device_id,
-                    'local_portname' => $link->port->ifAlias,
+                    'local_portname' => $link->port ? $link->port->ifAlias : $link->port,
                     'rport_url' => $link->remotePort ? Url::portLink($link->remotePort, null, null, true, false) : '',
                     'rdev_url' => $link->remoteDevice ? Url::deviceLink($link->remoteDevice, null, [], 0, 0, 0, 1) : null,
                     'rdev_name' => $link->remoteDevice ? $link->remoteDevice->shortDisplayName() : $link->remote_hostname,
