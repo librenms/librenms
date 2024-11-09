@@ -5,15 +5,15 @@
                 {
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.637.61.1",
-                    "sysDescr": "R5.7.02a NFXS-E FANT-F NOKIA ISAM Copyright (c) 2016 Nokia. All rights reserved. All use subject to applicable license agreement. Nokia and Alcatel-Lucent are registered trademarks of Nokia Corporation.",
+                    "sysDescr": "R6.5.02r NFXS-E FANT-H NOKIA ISAM Copyright (c) 2016 Nokia. All rights reserved. All use subject to applicable license agreement. Nokia and Alcatel-Lucent are registered trademarks of Nokia Corporation.",
                     "sysContact": "<private>",
-                    "version": "R5.7.02a",
+                    "version": "R6.5.02r",
                     "hardware": "NFXS-E",
                     "features": null,
                     "location": "<private>",
                     "os": "nokia-isam",
                     "type": "network",
-                    "serial": "FH1819A01A1",
+                    "serial": "FH2027A0E3C",
                     "icon": "nokia.svg"
                 }
             ]
@@ -7236,33 +7236,22 @@
                 {
                     "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
-                    "processor_oid": ".1.3.6.1.4.1.637.61.1.9.29.1.1.4.4353",
-                    "processor_index": "4353",
+                    "processor_oid": ".1.3.6.1.4.1.637.61.1.9.29.1.1.4.4354",
+                    "processor_index": "4354",
                     "processor_type": "nokia-isam",
-                    "processor_usage": 0,
-                    "processor_descr": "CPU 4353",
+                    "processor_usage": 1,
+                    "processor_descr": "CPU 4354",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
                 },
                 {
                     "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
-                    "processor_oid": ".1.3.6.1.4.1.637.61.1.9.29.1.1.4.4356",
-                    "processor_index": "4356",
+                    "processor_oid": ".1.3.6.1.4.1.637.61.1.9.29.1.1.4.4355",
+                    "processor_index": "4355",
                     "processor_type": "nokia-isam",
-                    "processor_usage": 9,
-                    "processor_descr": "CPU 4356",
-                    "processor_precision": 1,
-                    "processor_perc_warn": 75
-                },
-                {
-                    "entPhysicalIndex": 0,
-                    "hrDeviceIndex": 0,
-                    "processor_oid": ".1.3.6.1.4.1.637.61.1.9.29.1.1.4.4359",
-                    "processor_index": "4359",
-                    "processor_type": "nokia-isam",
-                    "processor_usage": 8,
-                    "processor_descr": "CPU 4359",
+                    "processor_usage": 7,
+                    "processor_descr": "CPU 4355",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
                 }
@@ -7274,19 +7263,19 @@
         "discovery": {
             "mempools": [
                 {
-                    "mempool_index": "4353",
+                    "mempool_index": "4354",
                     "entPhysicalIndex": null,
                     "mempool_type": "nokia-isam",
                     "mempool_class": "system",
                     "mempool_precision": 1048576,
-                    "mempool_descr": "FANT-F: 0 Memory (4353)",
-                    "mempool_perc": 88,
+                    "mempool_descr": "FANT-H: 255 Memory (4354)",
+                    "mempool_perc": 75,
                     "mempool_perc_oid": null,
-                    "mempool_used": 1218445312,
-                    "mempool_used_oid": ".1.3.6.1.4.1.637.61.1.9.29.2.1.2.4353",
-                    "mempool_free": 173015040,
+                    "mempool_used": 1158676480,
+                    "mempool_used_oid": ".1.3.6.1.4.1.637.61.1.9.29.2.1.2.4354",
+                    "mempool_free": 377487360,
                     "mempool_free_oid": null,
-                    "mempool_total": 1391460352,
+                    "mempool_total": 1536163840,
                     "mempool_total_oid": null,
                     "mempool_largestfree": null,
                     "mempool_lowestfree": null,
@@ -7294,39 +7283,19 @@
                     "mempool_perc_warn": 98
                 },
                 {
-                    "mempool_index": "4356",
+                    "mempool_index": "4355",
                     "entPhysicalIndex": null,
                     "mempool_type": "nokia-isam",
                     "mempool_class": "system",
                     "mempool_precision": 1048576,
-                    "mempool_descr": "NELT-B: 3 Memory (4356)",
-                    "mempool_perc": 67,
+                    "mempool_descr": "FWLT-C: 2 Memory (4355)",
+                    "mempool_perc": 62,
                     "mempool_perc_oid": null,
-                    "mempool_used": 920649728,
-                    "mempool_used_oid": ".1.3.6.1.4.1.637.61.1.9.29.2.1.2.4356",
-                    "mempool_free": 459276288,
+                    "mempool_used": 1449132032,
+                    "mempool_used_oid": ".1.3.6.1.4.1.637.61.1.9.29.2.1.2.4355",
+                    "mempool_free": 870318080,
                     "mempool_free_oid": null,
-                    "mempool_total": 1379926016,
-                    "mempool_total_oid": null,
-                    "mempool_largestfree": null,
-                    "mempool_lowestfree": null,
-                    "mempool_deleted": 0,
-                    "mempool_perc_warn": 98
-                },
-                {
-                    "mempool_index": "4359",
-                    "entPhysicalIndex": null,
-                    "mempool_type": "nokia-isam",
-                    "mempool_class": "system",
-                    "mempool_precision": 1048576,
-                    "mempool_descr": "NELT-B: 6 Memory (4359)",
-                    "mempool_perc": 67,
-                    "mempool_perc_oid": null,
-                    "mempool_used": 920649728,
-                    "mempool_used_oid": ".1.3.6.1.4.1.637.61.1.9.29.2.1.2.4359",
-                    "mempool_free": 459276288,
-                    "mempool_free_oid": null,
-                    "mempool_total": 1379926016,
+                    "mempool_total": 2319450112,
                     "mempool_total_oid": null,
                     "mempool_largestfree": null,
                     "mempool_lowestfree": null,
@@ -7344,14 +7313,14 @@
                     "sensor_deleted": 0,
                     "sensor_class": "dbm",
                     "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.637.61.1.56.5.1.7.4355.1",
-                    "sensor_index": "lt:1/1/1/1-rx",
+                    "sensor_oid": ".1.3.6.1.4.1.637.61.1.56.5.1.7.4354.257",
+                    "sensor_index": "nt-b:xfp:1-rx",
                     "sensor_type": "nokia-isam",
-                    "sensor_descr": "lt:1/1/1/1 Rx Power",
+                    "sensor_descr": "nt-b:xfp:1 Rx Power",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": -6.07,
+                    "sensor_current": -9.56,
                     "sensor_limit": -3,
                     "sensor_limit_warn": -5,
                     "sensor_limit_low": -22,
@@ -7369,143 +7338,18 @@
                     "sensor_deleted": 0,
                     "sensor_class": "dbm",
                     "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.637.61.1.56.5.1.6.4355.1",
-                    "sensor_index": "lt:1/1/1/1-tx",
+                    "sensor_oid": ".1.3.6.1.4.1.637.61.1.56.5.1.6.4354.257",
+                    "sensor_index": "nt-b:xfp:1-tx",
                     "sensor_type": "nokia-isam",
-                    "sensor_descr": "lt:1/1/1/1 Tx Power",
+                    "sensor_descr": "nt-b:xfp:1 Tx Power",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": -5.29,
+                    "sensor_current": -0.33,
                     "sensor_limit": -3,
                     "sensor_limit_warn": -4,
                     "sensor_limit_low": -9,
                     "sensor_limit_low_warn": -8,
-                    "sensor_alert": 1,
-                    "sensor_custom": "No",
-                    "entPhysicalIndex": null,
-                    "entPhysicalIndex_measured": null,
-                    "sensor_prev": null,
-                    "user_func": null,
-                    "rrd_type": "GAUGE",
-                    "state_name": null
-                },
-                {
-                    "sensor_deleted": 0,
-                    "sensor_class": "dbm",
-                    "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.637.61.1.56.5.1.7.4355.2",
-                    "sensor_index": "lt:1/1/1/2-rx",
-                    "sensor_type": "nokia-isam",
-                    "sensor_descr": "lt:1/1/1/2 Rx Power",
-                    "group": null,
-                    "sensor_divisor": 1,
-                    "sensor_multiplier": 1,
-                    "sensor_current": -5.57,
-                    "sensor_limit": -3,
-                    "sensor_limit_warn": -5,
-                    "sensor_limit_low": -22,
-                    "sensor_limit_low_warn": -20,
-                    "sensor_alert": 1,
-                    "sensor_custom": "No",
-                    "entPhysicalIndex": null,
-                    "entPhysicalIndex_measured": null,
-                    "sensor_prev": null,
-                    "user_func": null,
-                    "rrd_type": "GAUGE",
-                    "state_name": null
-                },
-                {
-                    "sensor_deleted": 0,
-                    "sensor_class": "dbm",
-                    "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.637.61.1.56.5.1.6.4355.2",
-                    "sensor_index": "lt:1/1/1/2-tx",
-                    "sensor_type": "nokia-isam",
-                    "sensor_descr": "lt:1/1/1/2 Tx Power",
-                    "group": null,
-                    "sensor_divisor": 1,
-                    "sensor_multiplier": 1,
-                    "sensor_current": -5.49,
-                    "sensor_limit": -3,
-                    "sensor_limit_warn": -4,
-                    "sensor_limit_low": -9,
-                    "sensor_limit_low_warn": -8,
-                    "sensor_alert": 1,
-                    "sensor_custom": "No",
-                    "entPhysicalIndex": null,
-                    "entPhysicalIndex_measured": null,
-                    "sensor_prev": null,
-                    "user_func": null,
-                    "rrd_type": "GAUGE",
-                    "state_name": null
-                },
-                {
-                    "sensor_deleted": 0,
-                    "sensor_class": "dbm",
-                    "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.637.61.1.56.5.1.6.4356.1",
-                    "sensor_index": "lt:1/1/2/1-tx",
-                    "sensor_type": "nokia-isam",
-                    "sensor_descr": "lt:1/1/2/1 Tx Power",
-                    "group": null,
-                    "sensor_divisor": 1,
-                    "sensor_multiplier": 1,
-                    "sensor_current": 3.66,
-                    "sensor_limit": 7,
-                    "sensor_limit_warn": 6,
-                    "sensor_limit_low": -0.5,
-                    "sensor_limit_low_warn": 0.5,
-                    "sensor_alert": 1,
-                    "sensor_custom": "No",
-                    "entPhysicalIndex": null,
-                    "entPhysicalIndex_measured": null,
-                    "sensor_prev": null,
-                    "user_func": null,
-                    "rrd_type": "GAUGE",
-                    "state_name": null
-                },
-                {
-                    "sensor_deleted": 0,
-                    "sensor_class": "dbm",
-                    "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.637.61.1.56.5.1.7.4353.257",
-                    "sensor_index": "nt-a:xfp:1-rx",
-                    "sensor_type": "nokia-isam",
-                    "sensor_descr": "nt-a:xfp:1 Rx Power",
-                    "group": null,
-                    "sensor_divisor": 1,
-                    "sensor_multiplier": 1,
-                    "sensor_current": -6.09,
-                    "sensor_limit": -3,
-                    "sensor_limit_warn": -5,
-                    "sensor_limit_low": -20,
-                    "sensor_limit_low_warn": -18.01,
-                    "sensor_alert": 1,
-                    "sensor_custom": "No",
-                    "entPhysicalIndex": null,
-                    "entPhysicalIndex_measured": null,
-                    "sensor_prev": null,
-                    "user_func": null,
-                    "rrd_type": "GAUGE",
-                    "state_name": null
-                },
-                {
-                    "sensor_deleted": 0,
-                    "sensor_class": "dbm",
-                    "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.637.61.1.56.5.1.6.4353.257",
-                    "sensor_index": "nt-a:xfp:1-tx",
-                    "sensor_type": "nokia-isam",
-                    "sensor_descr": "nt-a:xfp:1 Tx Power",
-                    "group": null,
-                    "sensor_divisor": 1,
-                    "sensor_multiplier": 1,
-                    "sensor_current": -5.87,
-                    "sensor_limit": -3,
-                    "sensor_limit_warn": -3.9,
-                    "sensor_limit_low": -9,
-                    "sensor_limit_low_warn": -8.11,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
@@ -7547,7 +7391,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.637.61.1.23.3.1.7.4353",
                     "sensor_index": "4353",
                     "sensor_type": "eqptBoardOperError",
-                    "sensor_descr": "nt-a: FANT-F (FANT-F)",
+                    "sensor_descr": "nt-a: FANT-H (FANT-H)",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -7572,7 +7416,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.637.61.1.23.3.1.7.4354",
                     "sensor_index": "4354",
                     "sensor_type": "eqptBoardOperError",
-                    "sensor_descr": "nt-b: EMPTY (NOT_PLANNED)",
+                    "sensor_descr": "nt-b: FANT-H (FANT-H)",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -7597,207 +7441,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.637.61.1.23.3.1.7.4355",
                     "sensor_index": "4355",
                     "sensor_type": "eqptBoardOperError",
-                    "sensor_descr": "lt:1/1/1/ NELT-B (NELT-B)",
-                    "group": null,
-                    "sensor_divisor": 1,
-                    "sensor_multiplier": 1,
-                    "sensor_current": 1,
-                    "sensor_limit": null,
-                    "sensor_limit_warn": null,
-                    "sensor_limit_low": null,
-                    "sensor_limit_low_warn": null,
-                    "sensor_alert": 1,
-                    "sensor_custom": "No",
-                    "entPhysicalIndex": null,
-                    "entPhysicalIndex_measured": null,
-                    "sensor_prev": null,
-                    "user_func": null,
-                    "rrd_type": "GAUGE",
-                    "state_name": "eqptBoardOperError"
-                },
-                {
-                    "sensor_deleted": 0,
-                    "sensor_class": "state",
-                    "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.637.61.1.23.3.1.7.4356",
-                    "sensor_index": "4356",
-                    "sensor_type": "eqptBoardOperError",
-                    "sensor_descr": "lt:1/1/2/ NELT-B (NELT-B)",
-                    "group": null,
-                    "sensor_divisor": 1,
-                    "sensor_multiplier": 1,
-                    "sensor_current": 1,
-                    "sensor_limit": null,
-                    "sensor_limit_warn": null,
-                    "sensor_limit_low": null,
-                    "sensor_limit_low_warn": null,
-                    "sensor_alert": 1,
-                    "sensor_custom": "No",
-                    "entPhysicalIndex": null,
-                    "entPhysicalIndex_measured": null,
-                    "sensor_prev": null,
-                    "user_func": null,
-                    "rrd_type": "GAUGE",
-                    "state_name": "eqptBoardOperError"
-                },
-                {
-                    "sensor_deleted": 0,
-                    "sensor_class": "state",
-                    "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.637.61.1.23.3.1.7.4357",
-                    "sensor_index": "4357",
-                    "sensor_type": "eqptBoardOperError",
-                    "sensor_descr": "lt:1/1/3/ NELT-B (NELT-B)",
-                    "group": null,
-                    "sensor_divisor": 1,
-                    "sensor_multiplier": 1,
-                    "sensor_current": 1,
-                    "sensor_limit": null,
-                    "sensor_limit_warn": null,
-                    "sensor_limit_low": null,
-                    "sensor_limit_low_warn": null,
-                    "sensor_alert": 1,
-                    "sensor_custom": "No",
-                    "entPhysicalIndex": null,
-                    "entPhysicalIndex_measured": null,
-                    "sensor_prev": null,
-                    "user_func": null,
-                    "rrd_type": "GAUGE",
-                    "state_name": "eqptBoardOperError"
-                },
-                {
-                    "sensor_deleted": 0,
-                    "sensor_class": "state",
-                    "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.637.61.1.23.3.1.7.4358",
-                    "sensor_index": "4358",
-                    "sensor_type": "eqptBoardOperError",
-                    "sensor_descr": "lt:1/1/4/ NELT-B (NELT-B)",
-                    "group": null,
-                    "sensor_divisor": 1,
-                    "sensor_multiplier": 1,
-                    "sensor_current": 1,
-                    "sensor_limit": null,
-                    "sensor_limit_warn": null,
-                    "sensor_limit_low": null,
-                    "sensor_limit_low_warn": null,
-                    "sensor_alert": 1,
-                    "sensor_custom": "No",
-                    "entPhysicalIndex": null,
-                    "entPhysicalIndex_measured": null,
-                    "sensor_prev": null,
-                    "user_func": null,
-                    "rrd_type": "GAUGE",
-                    "state_name": "eqptBoardOperError"
-                },
-                {
-                    "sensor_deleted": 0,
-                    "sensor_class": "state",
-                    "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.637.61.1.23.3.1.7.4359",
-                    "sensor_index": "4359",
-                    "sensor_type": "eqptBoardOperError",
-                    "sensor_descr": "lt:1/1/5/ NELT-B (NELT-B)",
-                    "group": null,
-                    "sensor_divisor": 1,
-                    "sensor_multiplier": 1,
-                    "sensor_current": 1,
-                    "sensor_limit": null,
-                    "sensor_limit_warn": null,
-                    "sensor_limit_low": null,
-                    "sensor_limit_low_warn": null,
-                    "sensor_alert": 1,
-                    "sensor_custom": "No",
-                    "entPhysicalIndex": null,
-                    "entPhysicalIndex_measured": null,
-                    "sensor_prev": null,
-                    "user_func": null,
-                    "rrd_type": "GAUGE",
-                    "state_name": "eqptBoardOperError"
-                },
-                {
-                    "sensor_deleted": 0,
-                    "sensor_class": "state",
-                    "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.637.61.1.23.3.1.7.4360",
-                    "sensor_index": "4360",
-                    "sensor_type": "eqptBoardOperError",
-                    "sensor_descr": "lt:1/1/6/ EMPTY (NELT-B)",
-                    "group": null,
-                    "sensor_divisor": 1,
-                    "sensor_multiplier": 1,
-                    "sensor_current": 3,
-                    "sensor_limit": null,
-                    "sensor_limit_warn": null,
-                    "sensor_limit_low": null,
-                    "sensor_limit_low_warn": null,
-                    "sensor_alert": 1,
-                    "sensor_custom": "No",
-                    "entPhysicalIndex": null,
-                    "entPhysicalIndex_measured": null,
-                    "sensor_prev": null,
-                    "user_func": null,
-                    "rrd_type": "GAUGE",
-                    "state_name": "eqptBoardOperError"
-                },
-                {
-                    "sensor_deleted": 0,
-                    "sensor_class": "state",
-                    "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.637.61.1.23.3.1.7.4361",
-                    "sensor_index": "4361",
-                    "sensor_type": "eqptBoardOperError",
-                    "sensor_descr": "lt:1/1/7/ EMPTY (NOT_PLANNED)",
-                    "group": null,
-                    "sensor_divisor": 1,
-                    "sensor_multiplier": 1,
-                    "sensor_current": 1,
-                    "sensor_limit": null,
-                    "sensor_limit_warn": null,
-                    "sensor_limit_low": null,
-                    "sensor_limit_low_warn": null,
-                    "sensor_alert": 1,
-                    "sensor_custom": "No",
-                    "entPhysicalIndex": null,
-                    "entPhysicalIndex_measured": null,
-                    "sensor_prev": null,
-                    "user_func": null,
-                    "rrd_type": "GAUGE",
-                    "state_name": "eqptBoardOperError"
-                },
-                {
-                    "sensor_deleted": 0,
-                    "sensor_class": "state",
-                    "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.637.61.1.23.3.1.7.4362",
-                    "sensor_index": "4362",
-                    "sensor_type": "eqptBoardOperError",
-                    "sensor_descr": "lt:1/1/8/ EMPTY (NOT_PLANNED)",
-                    "group": null,
-                    "sensor_divisor": 1,
-                    "sensor_multiplier": 1,
-                    "sensor_current": 1,
-                    "sensor_limit": null,
-                    "sensor_limit_warn": null,
-                    "sensor_limit_low": null,
-                    "sensor_limit_low_warn": null,
-                    "sensor_alert": 1,
-                    "sensor_custom": "No",
-                    "entPhysicalIndex": null,
-                    "entPhysicalIndex_measured": null,
-                    "sensor_prev": null,
-                    "user_func": null,
-                    "rrd_type": "GAUGE",
-                    "state_name": "eqptBoardOperError"
-                },
-                {
-                    "sensor_deleted": 0,
-                    "sensor_class": "state",
-                    "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.637.61.1.23.3.1.7.4481",
-                    "sensor_index": "4481",
-                    "sensor_type": "eqptBoardOperError",
-                    "sensor_descr": "4481 EMPTY (NOT_PLANNED)",
+                    "sensor_descr": "lt:1/1/1/ FWLT-C (FWLT-C)",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -7844,581 +7488,6 @@
                     "sensor_deleted": 0,
                     "sensor_class": "temperature",
                     "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.637.61.1.23.10.1.2.4355.1",
-                    "sensor_index": "lt:1/1/1/.1-temp",
-                    "sensor_type": "nokia-isam",
-                    "sensor_descr": "lt:1/1/1/ Sensor 1",
-                    "group": null,
-                    "sensor_divisor": 1,
-                    "sensor_multiplier": 1,
-                    "sensor_current": 41,
-                    "sensor_limit": 95,
-                    "sensor_limit_warn": 85,
-                    "sensor_limit_low": -0.5,
-                    "sensor_limit_low_warn": 0.5,
-                    "sensor_alert": 1,
-                    "sensor_custom": "No",
-                    "entPhysicalIndex": null,
-                    "entPhysicalIndex_measured": null,
-                    "sensor_prev": null,
-                    "user_func": null,
-                    "rrd_type": "GAUGE",
-                    "state_name": null
-                },
-                {
-                    "sensor_deleted": 0,
-                    "sensor_class": "temperature",
-                    "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.637.61.1.23.10.1.2.4355.2",
-                    "sensor_index": "lt:1/1/1/.2-temp",
-                    "sensor_type": "nokia-isam",
-                    "sensor_descr": "lt:1/1/1/ Sensor 2",
-                    "group": null,
-                    "sensor_divisor": 1,
-                    "sensor_multiplier": 1,
-                    "sensor_current": 28,
-                    "sensor_limit": 85,
-                    "sensor_limit_warn": 60,
-                    "sensor_limit_low": -0.5,
-                    "sensor_limit_low_warn": 0.5,
-                    "sensor_alert": 1,
-                    "sensor_custom": "No",
-                    "entPhysicalIndex": null,
-                    "entPhysicalIndex_measured": null,
-                    "sensor_prev": null,
-                    "user_func": null,
-                    "rrd_type": "GAUGE",
-                    "state_name": null
-                },
-                {
-                    "sensor_deleted": 0,
-                    "sensor_class": "temperature",
-                    "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.637.61.1.23.10.1.2.4355.3",
-                    "sensor_index": "lt:1/1/1/.3-temp",
-                    "sensor_type": "nokia-isam",
-                    "sensor_descr": "lt:1/1/1/ Sensor 3",
-                    "group": null,
-                    "sensor_divisor": 1,
-                    "sensor_multiplier": 1,
-                    "sensor_current": 38,
-                    "sensor_limit": 130,
-                    "sensor_limit_warn": 125,
-                    "sensor_limit_low": -0.5,
-                    "sensor_limit_low_warn": 0.5,
-                    "sensor_alert": 1,
-                    "sensor_custom": "No",
-                    "entPhysicalIndex": null,
-                    "entPhysicalIndex_measured": null,
-                    "sensor_prev": null,
-                    "user_func": null,
-                    "rrd_type": "GAUGE",
-                    "state_name": null
-                },
-                {
-                    "sensor_deleted": 0,
-                    "sensor_class": "temperature",
-                    "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.637.61.1.23.10.1.2.4356.1",
-                    "sensor_index": "lt:1/1/2/.1-temp",
-                    "sensor_type": "nokia-isam",
-                    "sensor_descr": "lt:1/1/2/ Sensor 1",
-                    "group": null,
-                    "sensor_divisor": 1,
-                    "sensor_multiplier": 1,
-                    "sensor_current": 40,
-                    "sensor_limit": 95,
-                    "sensor_limit_warn": 85,
-                    "sensor_limit_low": -0.5,
-                    "sensor_limit_low_warn": 0.5,
-                    "sensor_alert": 1,
-                    "sensor_custom": "No",
-                    "entPhysicalIndex": null,
-                    "entPhysicalIndex_measured": null,
-                    "sensor_prev": null,
-                    "user_func": null,
-                    "rrd_type": "GAUGE",
-                    "state_name": null
-                },
-                {
-                    "sensor_deleted": 0,
-                    "sensor_class": "temperature",
-                    "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.637.61.1.23.10.1.2.4356.2",
-                    "sensor_index": "lt:1/1/2/.2-temp",
-                    "sensor_type": "nokia-isam",
-                    "sensor_descr": "lt:1/1/2/ Sensor 2",
-                    "group": null,
-                    "sensor_divisor": 1,
-                    "sensor_multiplier": 1,
-                    "sensor_current": 29,
-                    "sensor_limit": 85,
-                    "sensor_limit_warn": 60,
-                    "sensor_limit_low": -0.5,
-                    "sensor_limit_low_warn": 0.5,
-                    "sensor_alert": 1,
-                    "sensor_custom": "No",
-                    "entPhysicalIndex": null,
-                    "entPhysicalIndex_measured": null,
-                    "sensor_prev": null,
-                    "user_func": null,
-                    "rrd_type": "GAUGE",
-                    "state_name": null
-                },
-                {
-                    "sensor_deleted": 0,
-                    "sensor_class": "temperature",
-                    "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.637.61.1.23.10.1.2.4356.3",
-                    "sensor_index": "lt:1/1/2/.3-temp",
-                    "sensor_type": "nokia-isam",
-                    "sensor_descr": "lt:1/1/2/ Sensor 3",
-                    "group": null,
-                    "sensor_divisor": 1,
-                    "sensor_multiplier": 1,
-                    "sensor_current": 36,
-                    "sensor_limit": 130,
-                    "sensor_limit_warn": 125,
-                    "sensor_limit_low": -0.5,
-                    "sensor_limit_low_warn": 0.5,
-                    "sensor_alert": 1,
-                    "sensor_custom": "No",
-                    "entPhysicalIndex": null,
-                    "entPhysicalIndex_measured": null,
-                    "sensor_prev": null,
-                    "user_func": null,
-                    "rrd_type": "GAUGE",
-                    "state_name": null
-                },
-                {
-                    "sensor_deleted": 0,
-                    "sensor_class": "temperature",
-                    "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.637.61.1.23.10.1.2.4356.4",
-                    "sensor_index": "lt:1/1/2/.4-temp",
-                    "sensor_type": "nokia-isam",
-                    "sensor_descr": "lt:1/1/2/ Sensor 4",
-                    "group": null,
-                    "sensor_divisor": 1,
-                    "sensor_multiplier": 1,
-                    "sensor_current": 56,
-                    "sensor_limit": 115,
-                    "sensor_limit_warn": 95,
-                    "sensor_limit_low": -0.5,
-                    "sensor_limit_low_warn": 0.5,
-                    "sensor_alert": 1,
-                    "sensor_custom": "No",
-                    "entPhysicalIndex": null,
-                    "entPhysicalIndex_measured": null,
-                    "sensor_prev": null,
-                    "user_func": null,
-                    "rrd_type": "GAUGE",
-                    "state_name": null
-                },
-                {
-                    "sensor_deleted": 0,
-                    "sensor_class": "temperature",
-                    "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.637.61.1.23.10.1.2.4356.5",
-                    "sensor_index": "lt:1/1/2/.5-temp",
-                    "sensor_type": "nokia-isam",
-                    "sensor_descr": "lt:1/1/2/ Sensor 5",
-                    "group": null,
-                    "sensor_divisor": 1,
-                    "sensor_multiplier": 1,
-                    "sensor_current": 39,
-                    "sensor_limit": 90,
-                    "sensor_limit_warn": 75,
-                    "sensor_limit_low": -0.5,
-                    "sensor_limit_low_warn": 0.5,
-                    "sensor_alert": 1,
-                    "sensor_custom": "No",
-                    "entPhysicalIndex": null,
-                    "entPhysicalIndex_measured": null,
-                    "sensor_prev": null,
-                    "user_func": null,
-                    "rrd_type": "GAUGE",
-                    "state_name": null
-                },
-                {
-                    "sensor_deleted": 0,
-                    "sensor_class": "temperature",
-                    "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.637.61.1.23.10.1.2.4356.6",
-                    "sensor_index": "lt:1/1/2/.6-temp",
-                    "sensor_type": "nokia-isam",
-                    "sensor_descr": "lt:1/1/2/ Sensor 6",
-                    "group": null,
-                    "sensor_divisor": 1,
-                    "sensor_multiplier": 1,
-                    "sensor_current": 58,
-                    "sensor_limit": 110,
-                    "sensor_limit_warn": 95,
-                    "sensor_limit_low": -0.5,
-                    "sensor_limit_low_warn": 0.5,
-                    "sensor_alert": 1,
-                    "sensor_custom": "No",
-                    "entPhysicalIndex": null,
-                    "entPhysicalIndex_measured": null,
-                    "sensor_prev": null,
-                    "user_func": null,
-                    "rrd_type": "GAUGE",
-                    "state_name": null
-                },
-                {
-                    "sensor_deleted": 0,
-                    "sensor_class": "temperature",
-                    "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.637.61.1.23.10.1.2.4356.7",
-                    "sensor_index": "lt:1/1/2/.7-temp",
-                    "sensor_type": "nokia-isam",
-                    "sensor_descr": "lt:1/1/2/ Sensor 7",
-                    "group": null,
-                    "sensor_divisor": 1,
-                    "sensor_multiplier": 1,
-                    "sensor_current": 47,
-                    "sensor_limit": 115,
-                    "sensor_limit_warn": 95,
-                    "sensor_limit_low": -0.5,
-                    "sensor_limit_low_warn": 0.5,
-                    "sensor_alert": 1,
-                    "sensor_custom": "No",
-                    "entPhysicalIndex": null,
-                    "entPhysicalIndex_measured": null,
-                    "sensor_prev": null,
-                    "user_func": null,
-                    "rrd_type": "GAUGE",
-                    "state_name": null
-                },
-                {
-                    "sensor_deleted": 0,
-                    "sensor_class": "temperature",
-                    "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.637.61.1.23.10.1.2.4357.1",
-                    "sensor_index": "lt:1/1/3/.1-temp",
-                    "sensor_type": "nokia-isam",
-                    "sensor_descr": "lt:1/1/3/ Sensor 1",
-                    "group": null,
-                    "sensor_divisor": 1,
-                    "sensor_multiplier": 1,
-                    "sensor_current": 43,
-                    "sensor_limit": 95,
-                    "sensor_limit_warn": 85,
-                    "sensor_limit_low": -0.5,
-                    "sensor_limit_low_warn": 0.5,
-                    "sensor_alert": 1,
-                    "sensor_custom": "No",
-                    "entPhysicalIndex": null,
-                    "entPhysicalIndex_measured": null,
-                    "sensor_prev": null,
-                    "user_func": null,
-                    "rrd_type": "GAUGE",
-                    "state_name": null
-                },
-                {
-                    "sensor_deleted": 0,
-                    "sensor_class": "temperature",
-                    "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.637.61.1.23.10.1.2.4357.2",
-                    "sensor_index": "lt:1/1/3/.2-temp",
-                    "sensor_type": "nokia-isam",
-                    "sensor_descr": "lt:1/1/3/ Sensor 2",
-                    "group": null,
-                    "sensor_divisor": 1,
-                    "sensor_multiplier": 1,
-                    "sensor_current": 27,
-                    "sensor_limit": 85,
-                    "sensor_limit_warn": 60,
-                    "sensor_limit_low": -0.5,
-                    "sensor_limit_low_warn": 0.5,
-                    "sensor_alert": 1,
-                    "sensor_custom": "No",
-                    "entPhysicalIndex": null,
-                    "entPhysicalIndex_measured": null,
-                    "sensor_prev": null,
-                    "user_func": null,
-                    "rrd_type": "GAUGE",
-                    "state_name": null
-                },
-                {
-                    "sensor_deleted": 0,
-                    "sensor_class": "temperature",
-                    "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.637.61.1.23.10.1.2.4357.3",
-                    "sensor_index": "lt:1/1/3/.3-temp",
-                    "sensor_type": "nokia-isam",
-                    "sensor_descr": "lt:1/1/3/ Sensor 3",
-                    "group": null,
-                    "sensor_divisor": 1,
-                    "sensor_multiplier": 1,
-                    "sensor_current": 39,
-                    "sensor_limit": 130,
-                    "sensor_limit_warn": 125,
-                    "sensor_limit_low": -0.5,
-                    "sensor_limit_low_warn": 0.5,
-                    "sensor_alert": 1,
-                    "sensor_custom": "No",
-                    "entPhysicalIndex": null,
-                    "entPhysicalIndex_measured": null,
-                    "sensor_prev": null,
-                    "user_func": null,
-                    "rrd_type": "GAUGE",
-                    "state_name": null
-                },
-                {
-                    "sensor_deleted": 0,
-                    "sensor_class": "temperature",
-                    "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.637.61.1.23.10.1.2.4358.1",
-                    "sensor_index": "lt:1/1/4/.1-temp",
-                    "sensor_type": "nokia-isam",
-                    "sensor_descr": "lt:1/1/4/ Sensor 1",
-                    "group": null,
-                    "sensor_divisor": 1,
-                    "sensor_multiplier": 1,
-                    "sensor_current": 46,
-                    "sensor_limit": 95,
-                    "sensor_limit_warn": 85,
-                    "sensor_limit_low": -0.5,
-                    "sensor_limit_low_warn": 0.5,
-                    "sensor_alert": 1,
-                    "sensor_custom": "No",
-                    "entPhysicalIndex": null,
-                    "entPhysicalIndex_measured": null,
-                    "sensor_prev": null,
-                    "user_func": null,
-                    "rrd_type": "GAUGE",
-                    "state_name": null
-                },
-                {
-                    "sensor_deleted": 0,
-                    "sensor_class": "temperature",
-                    "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.637.61.1.23.10.1.2.4358.2",
-                    "sensor_index": "lt:1/1/4/.2-temp",
-                    "sensor_type": "nokia-isam",
-                    "sensor_descr": "lt:1/1/4/ Sensor 2",
-                    "group": null,
-                    "sensor_divisor": 1,
-                    "sensor_multiplier": 1,
-                    "sensor_current": 27,
-                    "sensor_limit": 85,
-                    "sensor_limit_warn": 60,
-                    "sensor_limit_low": -0.5,
-                    "sensor_limit_low_warn": 0.5,
-                    "sensor_alert": 1,
-                    "sensor_custom": "No",
-                    "entPhysicalIndex": null,
-                    "entPhysicalIndex_measured": null,
-                    "sensor_prev": null,
-                    "user_func": null,
-                    "rrd_type": "GAUGE",
-                    "state_name": null
-                },
-                {
-                    "sensor_deleted": 0,
-                    "sensor_class": "temperature",
-                    "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.637.61.1.23.10.1.2.4358.3",
-                    "sensor_index": "lt:1/1/4/.3-temp",
-                    "sensor_type": "nokia-isam",
-                    "sensor_descr": "lt:1/1/4/ Sensor 3",
-                    "group": null,
-                    "sensor_divisor": 1,
-                    "sensor_multiplier": 1,
-                    "sensor_current": 40,
-                    "sensor_limit": 130,
-                    "sensor_limit_warn": 125,
-                    "sensor_limit_low": -0.5,
-                    "sensor_limit_low_warn": 0.5,
-                    "sensor_alert": 1,
-                    "sensor_custom": "No",
-                    "entPhysicalIndex": null,
-                    "entPhysicalIndex_measured": null,
-                    "sensor_prev": null,
-                    "user_func": null,
-                    "rrd_type": "GAUGE",
-                    "state_name": null
-                },
-                {
-                    "sensor_deleted": 0,
-                    "sensor_class": "temperature",
-                    "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.637.61.1.23.10.1.2.4359.1",
-                    "sensor_index": "lt:1/1/5/.1-temp",
-                    "sensor_type": "nokia-isam",
-                    "sensor_descr": "lt:1/1/5/ Sensor 1",
-                    "group": null,
-                    "sensor_divisor": 1,
-                    "sensor_multiplier": 1,
-                    "sensor_current": 41,
-                    "sensor_limit": 95,
-                    "sensor_limit_warn": 85,
-                    "sensor_limit_low": -0.5,
-                    "sensor_limit_low_warn": 0.5,
-                    "sensor_alert": 1,
-                    "sensor_custom": "No",
-                    "entPhysicalIndex": null,
-                    "entPhysicalIndex_measured": null,
-                    "sensor_prev": null,
-                    "user_func": null,
-                    "rrd_type": "GAUGE",
-                    "state_name": null
-                },
-                {
-                    "sensor_deleted": 0,
-                    "sensor_class": "temperature",
-                    "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.637.61.1.23.10.1.2.4359.2",
-                    "sensor_index": "lt:1/1/5/.2-temp",
-                    "sensor_type": "nokia-isam",
-                    "sensor_descr": "lt:1/1/5/ Sensor 2",
-                    "group": null,
-                    "sensor_divisor": 1,
-                    "sensor_multiplier": 1,
-                    "sensor_current": 26,
-                    "sensor_limit": 85,
-                    "sensor_limit_warn": 60,
-                    "sensor_limit_low": -0.5,
-                    "sensor_limit_low_warn": 0.5,
-                    "sensor_alert": 1,
-                    "sensor_custom": "No",
-                    "entPhysicalIndex": null,
-                    "entPhysicalIndex_measured": null,
-                    "sensor_prev": null,
-                    "user_func": null,
-                    "rrd_type": "GAUGE",
-                    "state_name": null
-                },
-                {
-                    "sensor_deleted": 0,
-                    "sensor_class": "temperature",
-                    "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.637.61.1.23.10.1.2.4359.3",
-                    "sensor_index": "lt:1/1/5/.3-temp",
-                    "sensor_type": "nokia-isam",
-                    "sensor_descr": "lt:1/1/5/ Sensor 3",
-                    "group": null,
-                    "sensor_divisor": 1,
-                    "sensor_multiplier": 1,
-                    "sensor_current": 37,
-                    "sensor_limit": 130,
-                    "sensor_limit_warn": 125,
-                    "sensor_limit_low": -0.5,
-                    "sensor_limit_low_warn": 0.5,
-                    "sensor_alert": 1,
-                    "sensor_custom": "No",
-                    "entPhysicalIndex": null,
-                    "entPhysicalIndex_measured": null,
-                    "sensor_prev": null,
-                    "user_func": null,
-                    "rrd_type": "GAUGE",
-                    "state_name": null
-                },
-                {
-                    "sensor_deleted": 0,
-                    "sensor_class": "temperature",
-                    "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.637.61.1.23.10.1.2.4359.4",
-                    "sensor_index": "lt:1/1/5/.4-temp",
-                    "sensor_type": "nokia-isam",
-                    "sensor_descr": "lt:1/1/5/ Sensor 4",
-                    "group": null,
-                    "sensor_divisor": 1,
-                    "sensor_multiplier": 1,
-                    "sensor_current": 57,
-                    "sensor_limit": 115,
-                    "sensor_limit_warn": 95,
-                    "sensor_limit_low": -0.5,
-                    "sensor_limit_low_warn": 0.5,
-                    "sensor_alert": 1,
-                    "sensor_custom": "No",
-                    "entPhysicalIndex": null,
-                    "entPhysicalIndex_measured": null,
-                    "sensor_prev": null,
-                    "user_func": null,
-                    "rrd_type": "GAUGE",
-                    "state_name": null
-                },
-                {
-                    "sensor_deleted": 0,
-                    "sensor_class": "temperature",
-                    "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.637.61.1.23.10.1.2.4359.5",
-                    "sensor_index": "lt:1/1/5/.5-temp",
-                    "sensor_type": "nokia-isam",
-                    "sensor_descr": "lt:1/1/5/ Sensor 5",
-                    "group": null,
-                    "sensor_divisor": 1,
-                    "sensor_multiplier": 1,
-                    "sensor_current": 39,
-                    "sensor_limit": 90,
-                    "sensor_limit_warn": 75,
-                    "sensor_limit_low": -0.5,
-                    "sensor_limit_low_warn": 0.5,
-                    "sensor_alert": 1,
-                    "sensor_custom": "No",
-                    "entPhysicalIndex": null,
-                    "entPhysicalIndex_measured": null,
-                    "sensor_prev": null,
-                    "user_func": null,
-                    "rrd_type": "GAUGE",
-                    "state_name": null
-                },
-                {
-                    "sensor_deleted": 0,
-                    "sensor_class": "temperature",
-                    "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.637.61.1.23.10.1.2.4359.6",
-                    "sensor_index": "lt:1/1/5/.6-temp",
-                    "sensor_type": "nokia-isam",
-                    "sensor_descr": "lt:1/1/5/ Sensor 6",
-                    "group": null,
-                    "sensor_divisor": 1,
-                    "sensor_multiplier": 1,
-                    "sensor_current": 55,
-                    "sensor_limit": 110,
-                    "sensor_limit_warn": 95,
-                    "sensor_limit_low": -0.5,
-                    "sensor_limit_low_warn": 0.5,
-                    "sensor_alert": 1,
-                    "sensor_custom": "No",
-                    "entPhysicalIndex": null,
-                    "entPhysicalIndex_measured": null,
-                    "sensor_prev": null,
-                    "user_func": null,
-                    "rrd_type": "GAUGE",
-                    "state_name": null
-                },
-                {
-                    "sensor_deleted": 0,
-                    "sensor_class": "temperature",
-                    "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.637.61.1.23.10.1.2.4359.7",
-                    "sensor_index": "lt:1/1/5/.7-temp",
-                    "sensor_type": "nokia-isam",
-                    "sensor_descr": "lt:1/1/5/ Sensor 7",
-                    "group": null,
-                    "sensor_divisor": 1,
-                    "sensor_multiplier": 1,
-                    "sensor_current": 51,
-                    "sensor_limit": 115,
-                    "sensor_limit_warn": 95,
-                    "sensor_limit_low": -0.5,
-                    "sensor_limit_low_warn": 0.5,
-                    "sensor_alert": 1,
-                    "sensor_custom": "No",
-                    "entPhysicalIndex": null,
-                    "entPhysicalIndex_measured": null,
-                    "sensor_prev": null,
-                    "user_func": null,
-                    "rrd_type": "GAUGE",
-                    "state_name": null
-                },
-                {
-                    "sensor_deleted": 0,
-                    "sensor_class": "temperature",
-                    "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.637.61.1.23.10.1.2.4353.1",
                     "sensor_index": "nt-a:.1-temp",
                     "sensor_type": "nokia-isam",
@@ -8426,61 +7495,11 @@
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": 34,
-                    "sensor_limit": 98,
-                    "sensor_limit_warn": 85,
-                    "sensor_limit_low": -0.5,
-                    "sensor_limit_low_warn": 0.5,
-                    "sensor_alert": 1,
-                    "sensor_custom": "No",
-                    "entPhysicalIndex": null,
-                    "entPhysicalIndex_measured": null,
-                    "sensor_prev": null,
-                    "user_func": null,
-                    "rrd_type": "GAUGE",
-                    "state_name": null
-                },
-                {
-                    "sensor_deleted": 0,
-                    "sensor_class": "temperature",
-                    "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.637.61.1.23.10.1.2.4353.2",
-                    "sensor_index": "nt-a:.2-temp",
-                    "sensor_type": "nokia-isam",
-                    "sensor_descr": "nt-a: Sensor 2",
-                    "group": null,
-                    "sensor_divisor": 1,
-                    "sensor_multiplier": 1,
-                    "sensor_current": 30,
-                    "sensor_limit": 78,
-                    "sensor_limit_warn": 73,
-                    "sensor_limit_low": -0.5,
-                    "sensor_limit_low_warn": 0.5,
-                    "sensor_alert": 1,
-                    "sensor_custom": "No",
-                    "entPhysicalIndex": null,
-                    "entPhysicalIndex_measured": null,
-                    "sensor_prev": null,
-                    "user_func": null,
-                    "rrd_type": "GAUGE",
-                    "state_name": null
-                },
-                {
-                    "sensor_deleted": 0,
-                    "sensor_class": "temperature",
-                    "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.637.61.1.23.10.1.2.4353.3",
-                    "sensor_index": "nt-a:.3-temp",
-                    "sensor_type": "nokia-isam",
-                    "sensor_descr": "nt-a: Sensor 3",
-                    "group": null,
-                    "sensor_divisor": 1,
-                    "sensor_multiplier": 1,
-                    "sensor_current": 37,
-                    "sensor_limit": 83,
-                    "sensor_limit_warn": 78,
-                    "sensor_limit_low": -0.5,
-                    "sensor_limit_low_warn": 0.5,
+                    "sensor_current": 43,
+                    "sensor_limit": 0,
+                    "sensor_limit_warn": 0,
+                    "sensor_limit_low": -9,
+                    "sensor_limit_low_warn": -8,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
@@ -8666,6 +7685,1150 @@
                     "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 0
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    },
+    "ports-stack": {
+        "discovery": {
+            "ports_stack": [
+                {
+                    "high_ifIndex": 67109312,
+                    "low_ifIndex": 79692224,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 67109824,
+                    "low_ifIndex": 79692736,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 67111744,
+                    "low_ifIndex": 79694656,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 67112384,
+                    "low_ifIndex": 79695296,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 67112431,
+                    "low_ifIndex": 79695343,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 67113280,
+                    "low_ifIndex": 79696192,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 67113920,
+                    "low_ifIndex": 79696832,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 67113967,
+                    "low_ifIndex": 79696879,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 67114432,
+                    "low_ifIndex": 79697344,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 67114479,
+                    "low_ifIndex": 79697391,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 67114816,
+                    "low_ifIndex": 79697728,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 67305920,
+                    "low_ifIndex": 79888832,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 67305967,
+                    "low_ifIndex": 79888879,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 67306016,
+                    "low_ifIndex": 79888928,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 67306944,
+                    "low_ifIndex": 79889856,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 67307968,
+                    "low_ifIndex": 79890880,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 67308480,
+                    "low_ifIndex": 79891392,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 67308864,
+                    "low_ifIndex": 79891776,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 67309376,
+                    "low_ifIndex": 79892288,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 67309888,
+                    "low_ifIndex": 79892800,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 67311040,
+                    "low_ifIndex": 79893952,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 67311552,
+                    "low_ifIndex": 79894464,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 67312064,
+                    "low_ifIndex": 79894976,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 67312576,
+                    "low_ifIndex": 79895488,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 67313088,
+                    "low_ifIndex": 79896000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 67313472,
+                    "low_ifIndex": 79896384,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 67314112,
+                    "low_ifIndex": 79897024,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 67314208,
+                    "low_ifIndex": 79897120,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 67355072,
+                    "low_ifIndex": 79937984,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 67371456,
+                    "low_ifIndex": 79954368,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 67371503,
+                    "low_ifIndex": 79954415,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 67371968,
+                    "low_ifIndex": 79954880,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 67372992,
+                    "low_ifIndex": 79955904,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 67373504,
+                    "low_ifIndex": 79956416,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 71303168,
+                    "low_ifIndex": 96468992,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 71303168,
+                    "low_ifIndex": 96469504,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 71303168,
+                    "low_ifIndex": 96471552,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 71303168,
+                    "low_ifIndex": 96472064,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 71303168,
+                    "low_ifIndex": 96473088,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 71303168,
+                    "low_ifIndex": 96473600,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 71303168,
+                    "low_ifIndex": 96474112,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 71303168,
+                    "low_ifIndex": 96474624,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 71499776,
+                    "low_ifIndex": 96665600,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 71499776,
+                    "low_ifIndex": 96666112,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 71499776,
+                    "low_ifIndex": 96666624,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 71499776,
+                    "low_ifIndex": 96667648,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 71499776,
+                    "low_ifIndex": 96668160,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 71499776,
+                    "low_ifIndex": 96668672,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 71499776,
+                    "low_ifIndex": 96669184,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 71499776,
+                    "low_ifIndex": 96669696,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 71499776,
+                    "low_ifIndex": 96670208,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 71499776,
+                    "low_ifIndex": 96670720,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 71499776,
+                    "low_ifIndex": 96671232,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 71499776,
+                    "low_ifIndex": 96671744,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 71499776,
+                    "low_ifIndex": 96672256,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 71499776,
+                    "low_ifIndex": 96672768,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 71499776,
+                    "low_ifIndex": 96673280,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 71499776,
+                    "low_ifIndex": 96673792,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 71499776,
+                    "low_ifIndex": 96674304,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 71499776,
+                    "low_ifIndex": 96714752,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 71565312,
+                    "low_ifIndex": 96731136,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 71565312,
+                    "low_ifIndex": 96731648,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 71565312,
+                    "low_ifIndex": 96732672,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 71565312,
+                    "low_ifIndex": 96733184,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 79692224,
+                    "low_ifIndex": 81788955,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 79692224,
+                    "low_ifIndex": 81788957,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 79692224,
+                    "low_ifIndex": 81788960,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 79692224,
+                    "low_ifIndex": 81788969,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 79692736,
+                    "low_ifIndex": 81788928,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 79692736,
+                    "low_ifIndex": 81788933,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 79692736,
+                    "low_ifIndex": 81788939,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 79692736,
+                    "low_ifIndex": 81788948,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 79694656,
+                    "low_ifIndex": 81788980,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 79695296,
+                    "low_ifIndex": 81788958,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 79695343,
+                    "low_ifIndex": 81788953,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 79696192,
+                    "low_ifIndex": 81788942,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 79696192,
+                    "low_ifIndex": 81788949,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 79696832,
+                    "low_ifIndex": 81788952,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 79696832,
+                    "low_ifIndex": 81788973,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 79696832,
+                    "low_ifIndex": 81788978,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 79696832,
+                    "low_ifIndex": 81788981,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 79696879,
+                    "low_ifIndex": 81788986,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 79697344,
+                    "low_ifIndex": 81788989,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 79697344,
+                    "low_ifIndex": 81788990,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 79697344,
+                    "low_ifIndex": 81788991,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 79697391,
+                    "low_ifIndex": 81788992,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 79697728,
+                    "low_ifIndex": 81788993,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 79697728,
+                    "low_ifIndex": 81788994,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 79697728,
+                    "low_ifIndex": 81788995,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 79697728,
+                    "low_ifIndex": 81788996,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 79888832,
+                    "low_ifIndex": 81985538,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 79888832,
+                    "low_ifIndex": 81985539,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 79888832,
+                    "low_ifIndex": 81985540,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 79888879,
+                    "low_ifIndex": 81985544,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 79888928,
+                    "low_ifIndex": 81985537,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 79888928,
+                    "low_ifIndex": 81985548,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 79888928,
+                    "low_ifIndex": 81985549,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 79888928,
+                    "low_ifIndex": 81985555,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 79889856,
+                    "low_ifIndex": 81985553,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 79889856,
+                    "low_ifIndex": 81985554,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 79890880,
+                    "low_ifIndex": 81985545,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 79890880,
+                    "low_ifIndex": 81985546,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 79891776,
+                    "low_ifIndex": 81985551,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 79891776,
+                    "low_ifIndex": 81985558,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 79891776,
+                    "low_ifIndex": 81985559,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 79891776,
+                    "low_ifIndex": 81985567,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 79892800,
+                    "low_ifIndex": 81985542,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 79892800,
+                    "low_ifIndex": 81985543,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 79892800,
+                    "low_ifIndex": 81985590,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 79893952,
+                    "low_ifIndex": 81985572,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 79893952,
+                    "low_ifIndex": 81985612,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 79893952,
+                    "low_ifIndex": 81985613,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 79894464,
+                    "low_ifIndex": 81985552,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 79894464,
+                    "low_ifIndex": 81985574,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 79894976,
+                    "low_ifIndex": 81985578,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 79894976,
+                    "low_ifIndex": 81985579,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 79894976,
+                    "low_ifIndex": 81985580,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 79895488,
+                    "low_ifIndex": 81985585,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 79895488,
+                    "low_ifIndex": 81985587,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 79896000,
+                    "low_ifIndex": 81985575,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 79896000,
+                    "low_ifIndex": 81985576,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 79896000,
+                    "low_ifIndex": 81985614,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 79896384,
+                    "low_ifIndex": 81985564,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 79896384,
+                    "low_ifIndex": 81985583,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 79897024,
+                    "low_ifIndex": 81985595,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 79897024,
+                    "low_ifIndex": 81985596,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 79897120,
+                    "low_ifIndex": 81985591,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 79897120,
+                    "low_ifIndex": 81985592,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 79897120,
+                    "low_ifIndex": 81985593,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 79937984,
+                    "low_ifIndex": 81985570,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 79937984,
+                    "low_ifIndex": 81985571,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 79937984,
+                    "low_ifIndex": 81985584,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 79954368,
+                    "low_ifIndex": 82051098,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 79954368,
+                    "low_ifIndex": 82051105,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 79954415,
+                    "low_ifIndex": 82051118,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 79954880,
+                    "low_ifIndex": 82051141,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 79954880,
+                    "low_ifIndex": 82051142,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 79954880,
+                    "low_ifIndex": 82051143,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 79955904,
+                    "low_ifIndex": 82051109,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 79955904,
+                    "low_ifIndex": 82051144,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 79955904,
+                    "low_ifIndex": 82051147,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 79956416,
+                    "low_ifIndex": 82051145,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 79956416,
+                    "low_ifIndex": 82051146,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 94380032,
+                    "low_ifIndex": 71303168,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 94445568,
+                    "low_ifIndex": 71368704,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 94511104,
+                    "low_ifIndex": 71434240,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 94576640,
+                    "low_ifIndex": 71499776,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 94642176,
+                    "low_ifIndex": 71565312,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 94707712,
+                    "low_ifIndex": 71630848,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 94773248,
+                    "low_ifIndex": 71696384,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 94838784,
+                    "low_ifIndex": 71761920,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 94904320,
+                    "low_ifIndex": 71827456,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 94969856,
+                    "low_ifIndex": 71892992,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 95035392,
+                    "low_ifIndex": 71958528,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 95100928,
+                    "low_ifIndex": 72024064,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 95166464,
+                    "low_ifIndex": 72089600,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 95232000,
+                    "low_ifIndex": 72155136,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 95297536,
+                    "low_ifIndex": 72220672,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 95363072,
+                    "low_ifIndex": 72286208,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 96468992,
+                    "low_ifIndex": 67109312,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 96468992,
+                    "low_ifIndex": 67109359,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 96469504,
+                    "low_ifIndex": 67109824,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 96469504,
+                    "low_ifIndex": 67109871,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 96471552,
+                    "low_ifIndex": 67111744,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 96471552,
+                    "low_ifIndex": 67111919,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 96472064,
+                    "low_ifIndex": 67112384,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 96472064,
+                    "low_ifIndex": 67112431,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 96473088,
+                    "low_ifIndex": 67113280,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 96473088,
+                    "low_ifIndex": 67113455,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 96473600,
+                    "low_ifIndex": 67113920,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 96473600,
+                    "low_ifIndex": 67113967,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 96474112,
+                    "low_ifIndex": 67114432,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 96474112,
+                    "low_ifIndex": 67114479,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 96474624,
+                    "low_ifIndex": 67114816,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 96474624,
+                    "low_ifIndex": 67114991,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 96665600,
+                    "low_ifIndex": 67305920,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 96665600,
+                    "low_ifIndex": 67305967,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 96666112,
+                    "low_ifIndex": 67306016,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 96666624,
+                    "low_ifIndex": 67306944,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 96666624,
+                    "low_ifIndex": 67306991,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 96667648,
+                    "low_ifIndex": 67307968,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 96667648,
+                    "low_ifIndex": 67308015,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 96668160,
+                    "low_ifIndex": 67308480,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 96668672,
+                    "low_ifIndex": 67308864,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 96668672,
+                    "low_ifIndex": 67309039,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 96669184,
+                    "low_ifIndex": 67309376,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 96669184,
+                    "low_ifIndex": 67309551,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 96669696,
+                    "low_ifIndex": 67309888,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 96669696,
+                    "low_ifIndex": 67310063,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 96670720,
+                    "low_ifIndex": 67311040,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 96670720,
+                    "low_ifIndex": 67311087,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 96671232,
+                    "low_ifIndex": 67311552,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 96671232,
+                    "low_ifIndex": 67311599,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 96671744,
+                    "low_ifIndex": 67312064,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 96672256,
+                    "low_ifIndex": 67312576,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 96672256,
+                    "low_ifIndex": 67312623,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 96672768,
+                    "low_ifIndex": 67313088,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 96672768,
+                    "low_ifIndex": 67313135,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 96673280,
+                    "low_ifIndex": 67313472,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 96673280,
+                    "low_ifIndex": 67313647,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 96673792,
+                    "low_ifIndex": 67314112,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 96674304,
+                    "low_ifIndex": 67314208,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 96674304,
+                    "low_ifIndex": 67314496,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 96714752,
+                    "low_ifIndex": 67355072,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 96731136,
+                    "low_ifIndex": 67371456,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 96731136,
+                    "low_ifIndex": 67371503,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 96731648,
+                    "low_ifIndex": 67371968,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 96731648,
+                    "low_ifIndex": 67372015,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 96732672,
+                    "low_ifIndex": 67372992,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 96733184,
+                    "low_ifIndex": 67373504,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 96733184,
+                    "low_ifIndex": 67373551,
+                    "ifStackStatus": "active"
+                }
+            ]
+        }
+    },
+    "entity-physical": {
+        "discovery": {
+            "entPhysical": [
+                {
+                    "entPhysicalIndex": 1,
+                    "entPhysicalDescr": "Power Unit",
+                    "entPhysicalClass": "13",
+                    "entPhysicalName": "NGFC-E",
+                    "entPhysicalHardwareRev": "",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "true",
+                    "entPhysicalModelName": "",
+                    "entPhysicalVendorType": "zeroDotZero",
+                    "entPhysicalSerialNum": "2024A831E",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": -1,
+                    "entPhysicalMfgName": "ALCL",
+                    "ifIndex": null
+                },
+                {
+                    "entPhysicalIndex": 2,
+                    "entPhysicalDescr": "Power Sensor",
+                    "entPhysicalClass": "sensor",
+                    "entPhysicalName": "INA220",
+                    "entPhysicalHardwareRev": "",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "false",
+                    "entPhysicalModelName": "",
+                    "entPhysicalVendorType": "zeroDotZero",
+                    "entPhysicalSerialNum": "",
+                    "entPhysicalContainedIn": 1,
+                    "entPhysicalParentRelPos": 1,
+                    "entPhysicalMfgName": "TI",
+                    "ifIndex": null
+                },
+                {
+                    "entPhysicalIndex": 3,
+                    "entPhysicalDescr": "Power Sensor",
+                    "entPhysicalClass": "sensor",
+                    "entPhysicalName": "INA220",
+                    "entPhysicalHardwareRev": "",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "false",
+                    "entPhysicalModelName": "",
+                    "entPhysicalVendorType": "zeroDotZero",
+                    "entPhysicalSerialNum": "",
+                    "entPhysicalContainedIn": 1,
+                    "entPhysicalParentRelPos": 2,
+                    "entPhysicalMfgName": "TI",
+                    "ifIndex": null
+                },
+                {
+                    "entPhysicalIndex": 19,
+                    "entPhysicalDescr": null,
+                    "entPhysicalClass": null,
+                    "entPhysicalName": null,
+                    "entPhysicalHardwareRev": null,
+                    "entPhysicalFirmwareRev": null,
+                    "entPhysicalSoftwareRev": null,
+                    "entPhysicalAlias": null,
+                    "entPhysicalAssetID": null,
+                    "entPhysicalIsFRU": null,
+                    "entPhysicalModelName": null,
+                    "entPhysicalVendorType": null,
+                    "entPhysicalSerialNum": null,
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": -1,
+                    "entPhysicalMfgName": null,
+                    "ifIndex": null
                 }
             ]
         },
