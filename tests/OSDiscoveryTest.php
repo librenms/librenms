@@ -124,14 +124,15 @@ class OSDiscoveryTest extends TestCase
         Debug::set();
         Debug::setVerbose();
         ob_start();
-        $os = Core::detectOS($this->genDevice($community));
+        $device = $this->genDevice($community);
+        Core::detectOS($device);
         $output = ob_get_contents();
         ob_end_clean();
         Debug::set(false);
         Debug::setVerbose(false);
 
         $this->assertLessThan(10, microtime(true) - $start, "OS $expected_os took longer than 10s to detect");
-        $this->assertEquals($expected_os, $os, "Test file: $community.snmprec\n$output");
+        $this->assertEquals($expected_os, $device->os, "Test file: $community.snmprec\n$output");
     }
 
     /**

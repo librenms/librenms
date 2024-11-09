@@ -96,7 +96,7 @@ class ValidateDeviceAndCreate
                 $this->device->sysName = SnmpQuery::device($this->device)->get('SNMPv2-MIB::sysName.0')->value();
                 $this->exceptIfSysNameExists();
 
-                $this->device->os = Core::detectOS($this->device);
+                Core::detectOS($this->device);
             }
         }
 
