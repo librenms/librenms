@@ -55,9 +55,6 @@
     var node_highlight_style = @json($highlight_style);
 
     var highlightSavedId = null;
-    var highlightSavedWidth = null;
-    var highlightSavedColour = null;
-
     function updateHighlight(hlcb) {
         let needRefresh = false;
         if (hlcb.id == 'highlight_node') {
@@ -66,41 +63,24 @@
             } else {
                 let highlightId = parseInt($("#highlight_node").val());
                 // If we have a saved ID
-                if (highlightSavedId) {
-                    if (highlightSavedId < 0) {
-                        // We have multiple highlighted nodes - queue refresh
-                        needRefresh = true;
-                    } else {
-                        // Return the saved node to normal
-                        let savedNode = network_nodes.get(highlightSavedId.toString());
-                        savedNode.borderWidth = highlightSavedWidth;
-                        savedNode.color = highlightSavedColour;
-                        network_nodes.update(savedNode);
-                    }
-
-                    // Reset the saved node variables
-                    highlightSavedId = highlightId;
-                    highlightSavedWidth = null;
-                    highlightSavedColour = null;
+                if (highlightSavedId && highlightSavedId < 0) {
+                    // We have multiple highlighted nodes - queue refresh
+                    needRefresh = true;
                 }
-
+                // If we have highlighted a node on refresh, we need to undo this
+                if (refreshHighlight) {
+                    refreshHighlight = null;
+                    needRefresh = true;
+                }
                 // Save the new highlight ID
                 highlightSavedId = highlightId;
-                if (highlightId > 0) {
-                    // Save the selected node's width and colour
-                    let highlightNode = network_nodes.get(highlightId.toString());
-                    highlightSavedWidth = highlightNode.borderWidth;
-                    highlightSavedColour = highlightNode.color;
-
-                    // Update the width and shallow merge the colour
-                    highlightNode.borderWidth = node_highlight_style.borderWidth;
-                    highlightNode.color = {...highlightNode.color, ...node_highlight_style.color};
-
-                    // Update the map
-                    network_nodes.update(highlightNode);
-                } else if (highlightId < 0) {
+                if (highlightId < 0) {
                     // We want to highlight multiple nodes - queue refresh
                     needRefresh = true;
+                } else if (highlightId > 0) {
+                    network.selectNodes([highlightId]);
+                } else {
+                    network.selectNodes([]);
                 }
             }
         } else if (hlcb.id == 'showchilddevicepath') {
@@ -115,8 +95,10 @@
         }
     }
 
+    var refreshHighlight = null;
     function refreshMap() {
         var highlight = $("#highlight_node").val();
+        refreshHighlight = parseInt(highlight);
         var showpath = 0;
         if ($("#showparentdevicepath")[0].checked) {
             showpath = 1;
@@ -153,8 +135,25 @@
                     var this_dev = {id: device_id, label: device["sname"], title: device["url"], shape: "box", level: device["level"]}
                     if (device["style"]) {
                         // Merge the style if it has been defined
-                        this_dev = Object.assign(device["style"], this_dev);
+                        this_dev = Object.assign(this_dev, device["style"]);
                     }
+                    if (! this_dev.color) {
+                        this_dev.color = {};
+                    }
+                    // Explicitly set the default colour from the vis.js node docs, otherwise explicit colours set will never revert back to default
+                    if (! this_dev.color.border ) {
+                        this_dev.color.border = '#2B7CE9';
+                    }
+                    if (! this_dev.color.background ) {
+                        this_dev.color.background = '#D2E5FF';
+                    }
+                    // Set the highlighted style
+                    this_dev.borderWidthSelected = ;node_highlight_style.borderWidth;
+                    this_dev.color.highlight = {};
+                    this_dev.color.highlight.background = this_dev.color.background;
+                    this_dev.color.highlight.border = node_highlight_style.color.border;
+
+                    // Add/update the node on the map
                     if (network_nodes.get(device_id)) {
                         network_nodes.update(this_dev);
                     } else {
@@ -184,13 +183,17 @@
                     network = new vis.Network(container, {nodes: network_nodes, edges: network_edges, stabilize: true}, options);
 
                     network.on('click', function (properties) {
+                        // If we selected a node and are currenty highlighting a path to the selected node, select the new node and refresh
+                        let cur_highlighted = $('#highlight_node').val();
                         if (properties.nodes > 0) {
-                            let cur_highlighted = $('#highlight_node').val();
                             if (cur_highlighted == properties.nodes) {
                                 $('#highlight_node').val(0).trigger('change');
                             } else {
                                 $('#highlight_node').val(properties.nodes).trigger('change');
                             }
+                        } else if (! refreshHighlight) {
+                            // If the current highlighted node was not done with a refresh, trigger a change to the selection
+                            $('#highlight_node').val(0).trigger('change');
                         }
                     });
                     network.on('doubleClick', function (properties) {
