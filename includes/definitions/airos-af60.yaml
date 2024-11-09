@@ -18,3 +18,10 @@ discovery:
             oid: UI-AF60-MIB::af60FirmwareVersion.1
             op: '!='
             value: false
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.41112
+        snmpget:
+            oid: UBNT-MIB::ubntORID.1
+            op: '='
+            value: 'UBNT-MIB::uiAF60.1'
