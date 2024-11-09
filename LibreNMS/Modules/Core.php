@@ -150,7 +150,6 @@ class Core implements Module
                 $device->type = Config::get("os.$device->os.type");
             }
         }
-
     }
 
     /**
@@ -214,7 +213,6 @@ class Core implements Module
         }
 
         self::setOS($device, 'generic', []);
-
     }
 
     /**
