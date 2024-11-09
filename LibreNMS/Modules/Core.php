@@ -151,7 +151,6 @@ class Core implements Module
             }
         }
 
-        return;
     }
 
     /**
@@ -195,6 +194,7 @@ class Core implements Module
                 foreach ($def['discovery'] as $item) {
                     if (self::checkDiscovery($device, $item, $def['mib_dir'] ?? null)) {
                         self::setOS($device, $os, $item);
+
                         return;
                     }
                 }
@@ -207,13 +207,14 @@ class Core implements Module
             foreach ($os_defs[$os]['discovery'] as $item) {
                 if (self::checkDiscovery($device, $item, $os_defs[$os]['mib_dir'] ?? null)) {
                     self::setOS($device, $os, $item);
+
                     return;
                 }
             }
         }
 
         self::setOS($device, 'generic', []);
-        return;
+
     }
 
     /**
