@@ -156,9 +156,9 @@ class Core implements Module
     /**
      * Detect the os of the given device.
      *
-     * @param  Device  $device  device to check
+     * @param  Device  $device  device to check and update
      * @param  bool  $fetch  fetch sysDescr and sysObjectID fresh from the device
-     * @return string the name of the os
+     * @return void
      *
      * @throws \Exception
      */
