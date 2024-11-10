@@ -60,11 +60,6 @@
     </x-panel>
 @endsection
 
-@section('javascript')
-    <script src="{{ url('js/vis-network.min.js') }}"></script>
-    <script src="{{ url('js/vis-data.min.js') }}"></script>
-@endsection
-
 @push('scripts')
     <script type="text/javascript">
         $(function () {
