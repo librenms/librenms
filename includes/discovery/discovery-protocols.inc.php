@@ -215,8 +215,11 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
                 continue;
             }
 
-            $local_ifName = $lldp['lldpNeighborPortId'][$IndexId][1];
-            $local_port_id = find_port_id('gigabitEthernet ' . $local_ifName, null, $device['device_id']);
+            $local_port_id = get_port_by_ifIndex($device['device_id'], $IndexId);
+            if (! $local_port_id) {
+                $local_ifName = $lldp['lldpNeighborPortId'][$IndexId][1];
+                $local_port_id = find_port_id('gigabitEthernet ' . $local_ifName, null, $device['device_id']);
+            }
 
             $remote_device_id = find_device_id($lldp['lldpNeighborDeviceName'][$IndexId][1]);
             $remote_device_name = $lldp['lldpNeighborDeviceName'][$IndexId][1];
