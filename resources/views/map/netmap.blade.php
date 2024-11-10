@@ -119,7 +119,7 @@
 
                     // We need to pass a HTML element to title, otherwise it will intepret it as a string and not HTML
                     let title = document.createElement("div");
-                    title.innerHTML = device["url"].replaceAll('img ', 'img loading="lazy" ');
+                    title.innerHTML = device["url"];
 
                     var this_dev = {id: device_id, label: device["sname"], title: title, shape: "box"}
                     if (device["style"]) {
