@@ -14,21 +14,32 @@
         </thead>
         <tbody>
 @foreach($data['links'] as $link)
-@if($link['rdev_url'])
             <tr>
-                <td>{!! $link['local_url'] !!}<br />{{ $link['local_portname'] }}</td>
-                <td>{!! $link['rdev_url'] !!}<br />{{ $link['rdev_info'] }}</td>
-                <td>{!! $link['rport_url'] !!}<br />{{ $link['rport_name'] }}</td>
-                <td>{{ $link['protocol'] }}</td>
+                <td>
+                @if($link->port)
+                    <x-port-link :port="$link->port" />
+                    <br />{{$link->port->ifAlias}}
+                @endif
+                <td>
+                @if($link->remoteDevice)
+                    <x-device-link :device="$link->remoteDevice" />
+                    <br />{{$link->remoteDevice->hardware}}
+                @else
+                    {{$link->remote_hostname}}
+                    <br />{{$link->remote_platform}}
+                @endif
+                </td>
+                <td>
+                @if($link->remotePort)
+                    <x-port-link :port="$link->remotePort" />
+                    <br />{{$link->remotePort->ifAlias}}
+                @else
+                    {{$link->remote_port}}
+                @endif
+                </td>
+                </td>
+                <td>{{ strtoupper($link->protocol) }}</td>
             </tr>
-@else
-            <tr>
-                <td>{!! $link['local_url'] !!}<br />{{ $link['local_portname'] }}</td>
-                <td>{{ $link['rdev_name'] }}<br />{{ $link['rdev_info'] }}</td>
-                <td>{{ $link['rport_name'] }}</td>
-                <td>{{ $link['protocol'] }}</td>
-            </tr>
-@endif
 @endforeach
         </tbody>
     </table>
@@ -40,7 +51,7 @@
 var network_nodes = new vis.DataSet({queue: {delay: 100}});
 var network_edges = new vis.DataSet({queue: {delay: 100}});
 
-$.post( '{{ route('maps.getdevicelinks') }}', {device: {{$data['device_id']}}, link_types: @json($data['link_types'])})
+$.post( '{{ route('maps.getdevicelinks') }}', {device: {{$device->device_id}}, link_types: @json($data['link_types'])})
     .done(function( data ) {
         var devices = [];
         $.each(data, function( link_id, link ) {
