@@ -488,7 +488,7 @@ if (Config::get('autodiscovery.ospf') === true) {
 
 d_echo($link_exists);
 
-$sql = 'SELECT * FROM `links` AS L, `ports` AS I WHERE L.local_port_id = I.port_id AND I.device_id = ?';
+$sql = 'SELECT * FROM `links` AS L LEFT JOIN `ports` AS I ON L.local_port_id = I.port_id WHERE L.local_device_id = ?';
 foreach (dbFetchRows($sql, [$device['device_id']]) as $test) {
     $local_port_id = $test['local_port_id'];
     $remote_hostname = $test['remote_hostname'];
