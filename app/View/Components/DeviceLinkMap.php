@@ -19,7 +19,7 @@ class DeviceLinkMap extends Component
      *
      * @param  int|\App\Models\Device  $device
      */
-    public function __construct($device, ?string $tab = null, ?string $section = null)
+    public function __construct($device)
     {
         $this->device = $device instanceof Device ? $device : DeviceCache::get($device);
     }

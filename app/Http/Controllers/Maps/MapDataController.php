@@ -791,7 +791,7 @@ class MapDataController extends Controller
                 'icon' => $service->device->icon,
                 'icontitle' => $service->device->icon ? str_replace(['.svg', '.png'], '', basename($service->device->icon)) : $service->device->os,
                 'device_name' => $service->device->shortDisplayName(),
-                'url' => \Blade::render('<x-device-link-map :device="$device" />', ['device' => $device]),
+                'url' => \Blade::render('<x-device-link-map :device="$device" />', ['device' => $service->device]),
                 'updowntime' => $updowntime,
                 'compact' => Config::get('webui.availability_map_compact'),
                 'box_size' => Config::get('webui.availability_map_box_size'),
