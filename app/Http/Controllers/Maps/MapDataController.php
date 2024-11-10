@@ -37,7 +37,6 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Config;
-use LibreNMS\Util\Url;
 
 class MapDataController extends Controller
 {

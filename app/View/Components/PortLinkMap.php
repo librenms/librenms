@@ -3,10 +3,7 @@
 namespace App\View\Components;
 
 use App\Models\Port;
-use Illuminate\Support\Arr;
 use Illuminate\View\Component;
-use LibreNMS\Util\Rewrite;
-use LibreNMS\Util\Url;
 
 class PortLinkMap extends Component
 {
