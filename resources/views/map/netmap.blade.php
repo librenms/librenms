@@ -12,9 +12,8 @@
 @endif
 <div class="pull-right">
     Highlight Node
-    <select name="highlight_node" id="highlight_node" class="input-sm" onChange="refreshMap()";>
+    <select name="highlight_node" id="highlight_node" class="input-sm" onChange="highlightSelectedNode()";>
         <option value="0">None</option>
-        <option value="-1">Isolated Devices</option>
     </select>
 </div>
 </div>
@@ -47,9 +46,46 @@
     var network_nodes = new vis.DataSet({queue: {delay: 100}});
     var network_edges = new vis.DataSet({queue: {delay: 100}});
     var network;
+    var node_highlight_style = @json($highlight_style);
 
+    var highlightSavedId = null;
+    function highlightSelectedNode() {
+        let highlightId = parseInt($("#highlight_node").val());
+        let needRefresh = false;
+
+        // If we have a saved ID
+        if (highlightSavedId && highlightSavedId < 0) {
+            // We have multiple highlighted nodes - queue refresh
+            needRefresh = true;
+        }
+        // If we have highlighted a node on refresh, we need to undo this
+        if (refreshHighlight) {
+            refreshHighlight = null;
+            needRefresh = true;
+        }
+
+        // Save the new highlight ID
+        highlightSavedId = highlightId;
+
+        if (highlightId < 0) {
+            // We want to highlight multiple nodes - queue refresh
+            needRefresh = true;
+        } else if (highlightId > 0) {
+            network.selectNodes([highlightId]);
+        } else {
+            network.selectNodes([]);
+        }
+
+        // Refresh map if multiple nodes need changing
+        if (needRefresh) {
+            refreshMap();
+        }
+    }
+
+    var refreshHighlight = null;
     async function refreshMap() {
         var highlight = $("#highlight_node").val();
+        refreshHighlight = parseInt(highlight);
 @if($group_id)
         var group = {{$group_id}};
 @else
@@ -82,8 +118,25 @@
                     var this_dev = {id: device_id, label: device["sname"], title: device["url"], shape: "box"}
                     if (device["style"]) {
                         // Merge the style if it has been defined
-                        this_dev = Object.assign(device["style"], this_dev);
+                        this_dev = Object.assign(this_dev, device["style"]);
                     }
+                    if (! this_dev.color) {
+                        this_dev.color = {};
+                    }
+                    // Explicitly set the default colour from the vis.js node docs, otherwise explicit colours set will never revert back to default
+                    if (! this_dev.color.border ) {
+                        this_dev.color.border = '#2B7CE9';
+                    }
+                    if (! this_dev.color.background ) {
+                        this_dev.color.background = '#D2E5FF';
+                    }
+                    // Set the highlighted style
+                    this_dev.borderWidthSelected = node_highlight_style.borderWidth;
+                    this_dev.color.highlight = {};
+                    this_dev.color.highlight.background = this_dev.color.background;
+                    this_dev.color.highlight.border = node_highlight_style.color.border;
+
+                    // Add/update the node on the map
                     if (network_nodes.get(device_id)) {
                         network_nodes.update(this_dev);
                     } else {
@@ -159,13 +212,16 @@
             network = new vis.Network(container, {nodes: network_nodes, edges: network_edges, stabilize: true}, options);
 
             network.on('click', function (properties) {
+                let cur_highlighted = $('#highlight_node').val();
                 if (properties.nodes > 0) {
-                    let cur_highlighted = $('#highlight_node').val();
                     if (cur_highlighted == properties.nodes) {
-                        $('#highlight_node').val(-1).trigger('change');
+                        $('#highlight_node').val(0).trigger('change');
                     } else {
                         $('#highlight_node').val(properties.nodes).trigger('change');
                     }
+                } else if (! refreshHighlight) {
+                    // If the current highlighted node was not done with a refresh, trigger a change to the selection
+                    $('#highlight_node').val(0).trigger('change');
                 }
             });
             network.on('doubleClick', function (properties) {
