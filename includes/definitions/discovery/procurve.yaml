@@ -109,7 +109,7 @@ modules:
                     descr: 'Stack Topology'
                     state_name: hpStackTopology
                     states:
-                        - { descr: unKnown, graph: 1, value: 0, generic: 1 }
+                        - { descr: unKnown, graph: 1, value: 0, generic: 0 }
                         - { descr: chain, graph: 1, value: 1, generic: 0 }
                         - { descr: ring, graph: 1, value: 2, generic: 0 }
                         - { descr: mesh, graph: 1, value: 3, generic: 0 }
