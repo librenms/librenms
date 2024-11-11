@@ -139,7 +139,7 @@ if ($port_association_mode != 'ifIndex') {
 
             $port_id = get_port_id($ports_mapped, $snmp_data, $port_association_mode);
 
-            if (!$port_id) {
+            if (! $port_id) {
                 // If the SNMP to port_id lookup fails, we need to be aware of conflicts later
                 $ifindex_conflicts[$ifIndex] = $ports_ifindex[$ifIndex];
             } elseif (array_key_exists($ifIndex, $ports_ifindex) && $ports_ifindex[$ifIndex] != $port_id) {
