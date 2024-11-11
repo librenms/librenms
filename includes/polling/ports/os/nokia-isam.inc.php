@@ -17,7 +17,8 @@
  *
  * @link       https://www.librenms.org
  *
- * @copyright  2024 Vitali Kari and Rinse Kloek
+ * @copyright  2019 Vitali Kari
+ * @copyright  2024 Rinse Kloek
  * @author     Vitali Kari <vitali.kari@gmail.com>
  * @author     Rinse Kloek <rinse@kindes.nl>
  */
