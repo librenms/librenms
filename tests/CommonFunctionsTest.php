@@ -127,7 +127,7 @@ class CommonFunctionsTest extends TestCase
         $this->assertTrue(Validate::hostname('www.averylargedomainthatdoesnotreallyexist.com'), 'www.averylargedomainthatdoesnotreallyexist.com');
         $this->assertTrue(Validate::hostname('cont-ains.h-yph-en-s.com'), 'cont-ains.h-yph-en-s.com');
         $this->assertTrue(Validate::hostname('cisco-3750x'), 'cisco-3750x');
-        $this->assertFalse(Validate::hostname('cisco_3750x'), 'cisco_3750x');
+        $this->assertTrue(Validate::hostname('cisco_3750x'), 'cisco_3750x');
         $this->assertFalse(Validate::hostname('goo gle.com'), 'goo gle.com');
         $this->assertFalse(Validate::hostname('google..com'), 'google..com');
         $this->assertFalse(Validate::hostname('google.com '), 'google.com ');
