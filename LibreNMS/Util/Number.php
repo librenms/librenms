@@ -47,7 +47,7 @@ class Number
 
                 if ($sflen >= $sf) {
                     // We have enough significant figures to the left of the decimal point, so we don't need anything to the right
-                    $sf = 0;
+                    $sfround = 0;
                 } else {
                     // We can round one less for every digit to the left of the decimal place
                     $sfround -= $sflen;
