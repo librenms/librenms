@@ -71,6 +71,7 @@ class StringHelpers
             'opengridscheduler' => 'Open Grid Scheduler',
             'opensearch' => 'Elasticsearch\Opensearch',
             'os-updates' => 'OS Updates',
+            'rebootrequired' => 'OS Reboot Required',
             'php-fpm' => 'PHP-FPM',
             'pi-hole' => 'Pi-hole',
             'powerdns' => 'PowerDNS',

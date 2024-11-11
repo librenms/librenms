@@ -130,6 +130,9 @@ $graphs['nfs-server'] = [
 $graphs['os-updates'] = [
     'packages',
 ];
+$graphs['rebootrequired'] = [
+    'state',
+];
 $graphs['opensearch'] = [
     'status',
     'c_nodes',
