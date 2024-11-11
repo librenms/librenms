@@ -68,7 +68,10 @@ $.post( '{{ route('maps.getdevicelinks') }}', {device: {{$device->device_id}}, l
         $.post( '{{ route('maps.getdevices') }}', {devices: Object.keys(devices), url_type: 'links'})
             .done(function( data ) {
                 $.each(data, function( dev_id, dev ) {
-                    var this_dev = {id: dev_id, label: dev["sname"], title: dev["url"], shape: "box"};
+                    let title = document.createElement("div");
+                    title.innerHTML = dev["url"];
+
+                    var this_dev = {id: dev_id, label: dev["sname"], title: title, shape: "box"};
                     if (dev["style"]) {
                         // Merge the style if it has been defined
                         this_dev = Object.assign(dev["style"], this_dev);
@@ -107,6 +110,7 @@ network.on('click', function (properties) {
 
 @section('javascript')
 @if($data['selection'] == 'map')
-    <script src="{{ url('js/vis.min.js') }}"></script>
+    <script src="{{ url('js/vis-network.min.js') }}"></script>
+    <script src="{{ url('js/vis-data.min.js') }}"></script>
 @endif
 @endsection
