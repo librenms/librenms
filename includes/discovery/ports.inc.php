@@ -142,10 +142,9 @@ if ($port_association_mode != 'ifIndex') {
             if (! $port_id) {
                 // If the SNMP to port_id lookup fails, we need to be aware of conflicts later
                 $ifindex_conflicts[$ifIndex] = $ports_ifindex[$ifIndex];
-            } elseif (array_key_exists($ifIndex, $ports_ifindex) && $ports_ifindex[$ifIndex] != $port_id) {
-                // The SNMP data found an existing port that is different from the DB
+            } elseif ($ports_ifindex[$ifIndex] != $port_id) {
+                // The SNMP data found an existing port that is different from the DB row with the same ifIndex
                 d_echo("port_id has changed for interface with index $ifIndex\n");
-                print_r($ports_ifindex);
 
                 // Fetch the data of the keys we want to swap
                 $old_ifIndex = $ports_db[$port_id]['ifIndex'];
