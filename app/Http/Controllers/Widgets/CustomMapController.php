@@ -35,6 +35,7 @@ class CustomMapController extends WidgetController
     protected $defaults = [
         'title' => null,
         'custom_map' => null,
+        'screenshot' => false,
     ];
 
     public function __construct()
