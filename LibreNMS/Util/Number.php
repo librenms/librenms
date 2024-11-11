@@ -59,7 +59,7 @@ class Number
             }
         }
 
-        // Default to returning the round
+        // Default
         return $round;
     }
 
