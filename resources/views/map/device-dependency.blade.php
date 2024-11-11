@@ -40,7 +40,8 @@
 @endsection
 
 @section('javascript')
-<script type="text/javascript" src="{{ asset('js/vis.min.js') }}"></script>
+<script type="text/javascript" src="{{ asset('js/vis-network.min.js') }}"></script>
+<script type="text/javascript" src="{{ asset('js/vis-data.min.js') }}"></script>
 @endsection
 
 @section('scripts')
@@ -132,7 +133,12 @@
                 var keys = Object.keys(data).sort(deviceSort);
                 $.each( keys, function( dev_idx, device_id ) {
                     var device = data[device_id];
-                    var this_dev = {id: device_id, label: device["sname"], title: device["url"], shape: "box", level: device["level"]}
+
+                    // We need to pass a HTML element to title, otherwise it will intepret it as a string and not HTML
+                    let title = document.createElement("div");
+                    title.innerHTML = device["url"];
+
+                    var this_dev = {id: device_id, label: device["sname"], title: title, shape: "box", level: device["level"]}
                     if (device["style"]) {
                         // Merge the style if it has been defined
                         this_dev = Object.assign(this_dev, device["style"]);
