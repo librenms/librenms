@@ -161,6 +161,9 @@ class Qos implements Module
                             break;
                         case 'cisco_cbqos_policymap':
                             // No polling for the above QoS types
+                            $rrd_name = null;
+                            $rrd_data = null;
+                            $rrd_def = null;
                             break;
                         default:
                             $rrd_name = null;
