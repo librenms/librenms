@@ -48,7 +48,7 @@
             .done(function( data ) {
                 // Add/update nodes
                 $.each( data.nodes, function( nodeid, node) {
-                    var node_cfg = custommap.getNodeCfg(nodeid, node, false, custom_image_base);
+                    var node_cfg = custommap.getNodeCfg(nodeid, node, Boolean({{$screenshot}}), custom_image_base);
                     if(node.device_id) {
                         node_device_map[nodeid] = {device_id: node.device_id, device_name: node.device_name};
                     } else if(node.linked_map_name) {
@@ -58,7 +58,7 @@
                 });
 
                 $.each( data.edges, function( edgeid, edge) {
-                    var mid = custommap.getEdgeMidCfg(edgeid, edge, false);
+                    var mid = custommap.getEdgeMidCfg(edgeid, edge, Boolean({{$screenshot}}));
                     var edge1 = custommap.getEdgeCfg(edgeid, edge, "from", reverse_arrows);
                     var edge2 = custommap.getEdgeCfg(edgeid, edge, "to", reverse_arrows);
 
