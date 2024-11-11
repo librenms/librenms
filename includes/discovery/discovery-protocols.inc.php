@@ -216,11 +216,10 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
             }
 
             $interface = get_port_by_ifIndex($device['device_id'], $IndexId);
-            if ($interface && $interface['port_id']) {
-                $local_port_id = $interface['port_id'];
-            } else {
+            if (! $interface['port_id']) {
                 $local_ifName = $lldp['lldpNeighborPortId'][$IndexId][1];
                 $local_port_id = find_port_id('gigabitEthernet ' . $local_ifName, null, $device['device_id']);
+                $interface = get_port_by_id($local_port_id);
             }
 
             $remote_device_id = find_device_id($lldp['lldpNeighborDeviceName'][$IndexId][1]);
@@ -234,20 +233,22 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
                     \LibreNMS\Util\Validate::hostname($remote_device_name) &&
                     ! can_skip_discovery($remote_device_name, $remote_device_ip) &&
                     Config::get('autodiscovery.xdp') === true) {
-                $remote_device_id = discover_new_device($remote_device_name, $device, 'LLDP', $local_ifName);
+                $remote_device_id = discover_new_device($remote_device_name, $device, 'LLDP', $interface);
             }
 
-            discover_link(
-                $local_port_id, //our port id from database
-                'lldp',
-                $remote_port_id, //remote port id from database if applicable
-                $remote_device_name, //remote device name from SNMP walk
-                $remote_port_descr, //remote port description from SNMP walk
-                null,
-                $remote_device_sysDescr, //remote device description from SNMP walk
-                $device['device_id'], //our device id
-                $remote_device_id //remote device id if applicable
-            );
+            if ($interface['port_id'] && $remote_device_name && $remote_port_descr) {
+                discover_link(
+                    $interface['port_id'], //our port id from database
+                    'lldp',
+                    $remote_port_id, //remote port id from database if applicable
+                    $remote_device_name, //remote device name from SNMP walk
+                    $remote_port_descr, //remote port description from SNMP walk
+                    null,
+                    $remote_device_sysDescr, //remote device description from SNMP walk
+                    $device['device_id'], //our device id
+                    $remote_device_id //remote device id if applicable
+                );
+            }
         }
     }
     echo PHP_EOL;
