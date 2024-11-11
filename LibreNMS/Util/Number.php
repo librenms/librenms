@@ -36,6 +36,33 @@ class Number
             : self::formatBi($value, $round, $sf, $suffix);
     }
 
+    private static function calcRound(float $value, int $round, int $sf): int
+    {
+        // If we want to track significat figures
+        if ($sf) {
+            $sfround = $sf;
+            if ($value > 1) {
+                // Get the number of digits to the left of the decimal
+                $sflen = strlen(intval($value));
+
+                if ($sflen >= $sf) {
+                    // We have enough significant figures to the left of the decimal point, so we don't need anything to the right
+                    $sf = 0;
+                } else {
+                    // We can round one less for every digit to the left of the decimal place
+                    $sfround -= $sflen;
+                }
+            }
+            // If significant figures results in rounding to less decimal places, return this value
+            if ($sfround < $round) {
+                return $sfround;
+            }
+        }
+
+        // Default to returning the round
+        return $round;
+    }
+
     public static function formatSi($value, $round = 2, $sf = 3, $suffix = 'B'): string
     {
         $value = (float) $value;
@@ -60,17 +87,14 @@ class Number
             }
         }
 
+        // Re-calculate rounding based on $sf before converting back to a negative value
+        $round = self::calcRound($value, $round, $sf);
+
         if ($neg) {
             $value = $value * -1;
         }
 
-        for ($sf_adj = 0; $sf_adj < $sf; $sf_adj++) {
-            if (pow(10, $sf_adj) > $value) {
-                break;
-            }
-        }
-
-        return self::cast(number_format(round($value, $round), $sf - $sf_adj, '.', '')) . " $ext$suffix";
+        return self::cast(number_format($value, $round, '.', '')) . " $ext$suffix";
     }
 
     public static function formatBi($value, $round = 2, $sf = 3, $suffix = 'B'): string
@@ -87,11 +111,14 @@ class Number
             $ext = $sizes[$i];
         }
 
+        // Re-calculate rounding based on $sf before converting back to a negative value
+        $round = self::calcRound($value, $round, $sf);
+
         if ($neg) {
             $value = $value * -1;
         }
 
-        return self::cast(number_format(round($value, $round), $sf, '.', '')) . " $ext$suffix";
+        return self::cast(number_format($value, $round, '.', '')) . " $ext$suffix";
     }
 
     /**
