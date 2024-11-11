@@ -820,6 +820,12 @@ class Cisco extends OS implements
             if ($thisQos->type == 'cisco_cbqos_classmap') {
                 $snmp_parts = explode('.', $thisQos->snmp_idx);
 
+                // Ignore changes to QoS maps between discovery runs
+                if (! array_key_exists($snmp_parts[0], $preBytes) || ! array_key_exists($snmp_parts[1], $preBytes[$snmp_parts[0]])) {
+                    d_echo('Cisco CBQoS ' . $thisQos->title . ' not processed because SNMP did not return any data');
+                    continue;
+                }
+
                 // Values ony saved to RRD
                 $thisQos->poll_data['postbytes'] = $postBytes[$snmp_parts[0]][$snmp_parts[1]]['cbQosCMPostPolicyByte64'];
                 $thisQos->poll_data['bufferdrops'] = $bufferDrops[$snmp_parts[0]][$snmp_parts[1]]['cbQosCMNoBufDropPkt64'];
