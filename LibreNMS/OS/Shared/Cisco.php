@@ -823,6 +823,20 @@ class Cisco extends OS implements
                 // Ignore changes to QoS maps between discovery runs
                 if (! array_key_exists($snmp_parts[0], $preBytes) || ! array_key_exists($snmp_parts[1], $preBytes[$snmp_parts[0]])) {
                     d_echo('Cisco CBQoS ' . $thisQos->title . ' not processed because SNMP did not return any data');
+
+                    // Null out all values so we get a break in the graph
+                    $thisQos->last_polled = $poll_time;
+                    $thisQos->last_bytes_in = null;
+                    $thisQos->last_bytes_out = null;
+                    $thisQos->last_bytes_drop_in = null;
+                    $thisQos->last_bytes_drop_out = null;
+                    $thisQos->last_packets_in = null;
+                    $thisQos->last_packets_out = null;
+                    $thisQos->last_packets_drop_in = null;
+                    $thisQos->last_packets_drop_out = null;
+                    $thisQos->poll_data['postbytes'] = null;
+                    $thisQos->poll_data['bufferdrops'] = null;
+
                     continue;
                 }
 
