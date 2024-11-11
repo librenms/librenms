@@ -138,8 +138,8 @@ class Qos implements Module
                                 $rrd_data = [
                                     'postbits' => $thisQos->poll_data['postbytes'],
                                     'bufferdrops' => $thisQos->poll_data['bufferdrops'],
-                                    'prebits' => $thisQos->last_bytes_in,
                                     'qosdrops' => $thisQos->last_bytes_drop_in,
+                                    'prebits' => $thisQos->last_bytes_in,
                                     'prepkts' => $thisQos->last_packets_in,
                                     'droppkts' => $thisQos->last_packets_drop_in,
                                 ];
@@ -147,8 +147,8 @@ class Qos implements Module
                                 $rrd_data = [
                                     'postbits' => $thisQos->poll_data['postbytes'],
                                     'bufferdrops' => $thisQos->poll_data['bufferdrops'],
-                                    'prebits' => $thisQos->last_bytes_out,
                                     'qosdrops' => $thisQos->last_bytes_drop_out,
+                                    'prebits' => $thisQos->last_bytes_out,
                                     'prepkts' => $thisQos->last_packets_out,
                                     'droppkts' => $thisQos->last_packets_drop_out,
                                 ];
