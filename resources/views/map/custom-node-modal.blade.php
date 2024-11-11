@@ -281,12 +281,15 @@
                 node.image = {unselected: $("#device_image").val()};
             }
         } else {
-            node.image = {};
+            node.image = undefined;
         }
         if(node.shape == "icon") {
             node.icon = {face: 'FontAwesome', code: String.fromCharCode(parseInt($("#nodeicon").val(), 16)), size: $("#nodesize").val(), color: node.color.border};
         } else {
             node.icon = {};
+        }
+        if(! ["ellipse", "circle", "database", "box", "text"].includes(node.style)) {
+            node.font.background = "#FFFFFF";
         }
         if(node.add) {
             delete node.add;

@@ -60,7 +60,8 @@
 @endsection
 
 @section('javascript')
-<script type="text/javascript" src="{{ asset('js/vis.min.js') }}"></script>
+<script type="text/javascript" src="{{ asset('js/vis-network.min.js') }}"></script>
+<script type="text/javascript" src="{{ asset('js/vis-data.min.js') }}"></script>
 <script type="text/javascript" src="{{ asset('js/leaflet.js') }}"></script>
 <script type="text/javascript" src="{{ asset('js/L.Control.Locate.min.js') }}"></script>
 <script type="text/javascript" src="{{ asset('js/leaflet-image.js') }}"></script>
@@ -572,18 +573,18 @@
                 edgeid = node.id.split("_")[0];
                 edge1 = network_edges.get(edgeid + "_from");
                 edge2 = network_edges.get(edgeid + "_to");
-                edges[edgeid] = {id: edgeid, text_colour: edge1.font.color, text_size: edge1.font.size, text_face: edge1.font.face, from: edge1.from, to: edge2.from, showpct: (edge1.label != null && edge1.label.includes("xx%")), showbps: (edge1.label != null && edge1.label.includes("bps")), label: (node.label || ''), fixed_width: (edge1.width || null), port_id: edge1.title, style: edge1.smooth.type, mid_x: node.x, mid_y: node.y, reverse: (edgeid in edge_port_map ? edge_port_map[edgeid].reverse : false)};
+                edges[edgeid] = {id: edgeid, text_colour: edge1.font.color, text_size: edge1.font.size, text_face: edge1.font.face, text_align: edge1.font.align, from: edge1.from, to: edge2.from, showpct: (edge1.label != null && edge1.label.includes("xx%")), showbps: (edge1.label != null && edge1.label.includes("bps")), label: (node.label || ''), fixed_width: (edge1.width || null), port_id: edge1.title, style: edge1.smooth.type, mid_x: node.x, mid_y: node.y, reverse: (edgeid in edge_port_map ? edge_port_map[edgeid].reverse : false)};
             } else {
                 if(node.icon.code) {
                     node.icon = node.icon.code.charCodeAt(0).toString(16);
                 } else {
                     node.icon = null;
                 }
-                if("unselected" in node.image) {
+                if(node.image && "unselected" in node.image) {
                     if(node.image.unselected.indexOf(custom_image_base) == 0) {
                         node.image.unselected = node.image.unselected.replace(custom_image_base, "");
                     } else {
-                        node.image = {};
+                        node.image = undefined;
                     }
                 }
                 nodes[node.id] = node;
@@ -724,7 +725,7 @@
                     node_cfg.borderWidth = node.border_width;
                     node_cfg.x = node.x_pos;
                     node_cfg.y = node.y_pos;
-                    node_cfg.font = {face: node.text_face, size: node.text_size, color: node.text_colour};
+                    node_cfg.font = {face: node.text_face, size: node.text_size, color: node.text_colour, background: '#FFFFFF'};
                     node_cfg.size = node.size;
                     node_cfg.color = {background: node.colour_bg, border: node.colour_bdr};
                     if(node.style == "icon") {
@@ -741,10 +742,13 @@
                             // If we do not get a valid image from the database, use defaults
                             node_cfg.shape = newnodeconf.shape;
                             node_cfg.icon = newnodeconf.icon;
-                            node_cfg.image = newnodeconf.image;
+                            node_cfg.image = newnodeconf.image || undefined;
                         }
                     } else {
-                        node_cfg.image = {};
+                        node_cfg.image = undefined;
+                    }
+                    if(! ["ellipse", "circle", "database", "box", "text"].includes(node.style)) {
+                        node_cfg.font.background = "#FFFFFF";
                     }
 
                     if (network_nodes.get(nodeid)) {
@@ -770,8 +774,8 @@
                         arrows = {to: {enabled: true, scaleFactor: 0.6}, from: {enabled: false}};
                     }
 
-                    var edge1 = {id: edgeid + "_from", from: edge.custom_map_node1_id, to: edgeid + "_mid", arrows: arrows, font: {face: edge.text_face, size: edge.text_size, color: edge.text_colour}, smooth: {type: edge.style}};
-                    var edge2 = {id: edgeid + "_to", from: edge.custom_map_node2_id, to: edgeid + "_mid", arrows: arrows, font: {face: edge.text_face, size: edge.text_size, color: edge.text_colour}, smooth: {type: edge.style}};
+                    var edge1 = {id: edgeid + "_from", from: edge.custom_map_node1_id, to: edgeid + "_mid", arrows: arrows, font: {face: edge.text_face, size: edge.text_size, color: edge.text_colour, align: edge.text_align, background: '#FFFFFF'}, smooth: {type: edge.style}, arrowStrikethrough: false};
+                    var edge2 = {id: edgeid + "_to", from: edge.custom_map_node2_id, to: edgeid + "_mid", arrows: arrows, font: {face: edge.text_face, size: edge.text_size, color: edge.text_colour, align: edge.text_align, background: '#FFFFFF'}, smooth: {type: edge.style}, arrowStrikethrough: false};
                     if(edge.fixed_width) {
                         edge1.width = edge2.width = parseFloat(edge.fixed_width) || null;
                     }
