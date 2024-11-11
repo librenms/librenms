@@ -174,11 +174,6 @@ unset(
 
 echo "\n";
 
-//Nokia context ihub
-if ($device['os'] == 'nokia-isam') {
-    $device['context_name'] = '';
-}
-
 // Clear Variables Here
 unset($port_stats);
 unset($ports_db);
