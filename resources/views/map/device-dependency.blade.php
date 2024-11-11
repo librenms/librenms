@@ -148,7 +148,7 @@
                         this_dev.color.background = '#D2E5FF';
                     }
                     // Set the highlighted style
-                    this_dev.borderWidthSelected = ;node_highlight_style.borderWidth;
+                    this_dev.borderWidthSelected = node_highlight_style.borderWidth;
                     this_dev.color.highlight = {};
                     this_dev.color.highlight.background = this_dev.color.background;
                     this_dev.color.highlight.border = node_highlight_style.color.border;
