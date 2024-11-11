@@ -56,6 +56,7 @@ class StringHelpers
             'opensearch' => 'Elasticsearch\Opensearch',
             'oslv_monitor' => 'OS Level Virtualization',
             'os-updates' => 'OS Updates',
+            'rebootrequired' => 'OS Reboot Required',
             'php-fpm' => 'PHP-FPM',
             'pi-hole' => 'Pi-hole',
             'powerdns' => 'PowerDNS',
