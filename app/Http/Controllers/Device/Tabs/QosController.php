@@ -33,7 +33,7 @@ class QosController implements DeviceTab
 {
     public function visible(Device $device): bool
     {
-        return $device->qos()->count() > 0;
+        return $device->qos()->whereNull('port_id')->whereNull('parent_id')->count() > 0;
     }
 
     public function slug(): string
