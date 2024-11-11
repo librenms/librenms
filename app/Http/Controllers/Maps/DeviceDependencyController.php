@@ -48,6 +48,15 @@ class DeviceDependencyController extends Controller
             'group_id' => $group_id,
             'options' => Config::get('network_map_vis_options'),
             'group_name' => $group_name,
+            'highlight_style' => [
+                'color' => [
+                    'highlight' => [
+                        'border' => Config::get('network_map_legend.highlight.border'),
+                    ],
+                    'border' => Config::get('network_map_legend.highlight.border'),
+                ],
+                'borderWidth' => Config::get('network_map_legend.highlight.borderWidth'),
+            ],
         ];
 
         return view('map.device-dependency', $data);

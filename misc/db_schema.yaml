@@ -569,6 +569,7 @@ custom_map_edges:
     - { Field: text_face, Type: varchar(50), 'Null': false, Extra: '' }
     - { Field: text_size, Type: int, 'Null': false, Extra: '' }
     - { Field: text_colour, Type: varchar(10), 'Null': false, Extra: '' }
+    - { Field: text_align, Type: varchar(16), 'Null': false, Extra: '', Default: horizontal }
     - { Field: mid_x, Type: int, 'Null': false, Extra: '' }
     - { Field: mid_y, Type: int, 'Null': false, Extra: '' }
     - { Field: created_at, Type: timestamp, 'Null': true, Extra: '' }
