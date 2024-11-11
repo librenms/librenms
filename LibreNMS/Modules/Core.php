@@ -143,12 +143,9 @@ class Core implements Module
     private static function setOS(Device $device, string $os_name, array $os_def): void
     {
         $device->os = $os_name;
+
         if (! $device->getAttrib('override_device_type')) {
-            if (array_key_exists('type', $os_def)) {
-                $device->type = $os_def['type'];
-            } else {
-                $device->type = Config::get("os.$device->os.type");
-            }
+            $device->type = $os_def['type'] ?? Config::get("os.$device->os.type");
         }
     }
 
