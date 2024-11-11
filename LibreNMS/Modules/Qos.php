@@ -143,7 +143,7 @@ class Qos implements Module
                                     'prepkts' => $thisQos->last_packets_in,
                                     'droppkts' => $thisQos->last_packets_drop_in,
                                 ];
-                            } else ($thisQos->egress) {
+                            } elseif ($thisQos->egress) {
                                 $rrd_data = [
                                     'postbits' => $thisQos->poll_data['postbytes'],
                                     'bufferdrops' => $thisQos->poll_data['bufferdrops'],
@@ -152,6 +152,11 @@ class Qos implements Module
                                     'prepkts' => $thisQos->last_packets_out,
                                     'droppkts' => $thisQos->last_packets_drop_out,
                                 ];
+                            } else {
+                                // Do nothing (error was logged in poll module)
+                                $rrd_name = null;
+                                $rrd_data = null;
+                                $rrd_def = null;
                             }
                             break;
                         case 'cisco_cbqos_policymap':
