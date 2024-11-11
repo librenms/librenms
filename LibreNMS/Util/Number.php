@@ -43,7 +43,7 @@ class Number
             $sfround = $sf;
             if ($value > 1) {
                 // Get the number of digits to the left of the decimal
-                $sflen = strlen(intval($value));
+                $sflen = strlen(strval(intval($value)));
 
                 if ($sflen >= $sf) {
                     // We have enough significant figures to the left of the decimal point, so we don't need anything to the right
