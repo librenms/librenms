@@ -2,6 +2,7 @@
 
 // Build SNMP Cache Array
 use App\Models\PortGroup;
+use Illuminate\Support\Facades\DB;
 use LibreNMS\Config;
 use LibreNMS\Enum\PortAssociationMode;
 use LibreNMS\Util\StringHelpers;
@@ -123,6 +124,65 @@ if ($device['os'] == 'ekinops') {
 
 $default_port_group = Config::get('default_port_group');
 
+// If we are not using ifIndex as the port association, handle tricky changes here to avoid unique key constraint violations
+if ($port_association_mode != 'ifIndex') {
+    // Get ifIndex -> port map
+    $ports_ifindex = $ports_mapped['maps']['ifIndex'];
+    $ifindex_conflicts = [];
+
+    // Go through each SNMP entry and figure out if the index has changed
+    foreach ($port_stats as $ifIndex => $snmp_data) {
+        // We only need to consider results that have an entry in the database
+        if (array_key_exists($ifIndex, $ports_ifindex)) {
+            $snmp_data['ifIndex'] = $ifIndex; // Store ifIndex in port entry
+            $snmp_data['ifAlias'] = StringHelpers::inferEncoding($snmp_data['ifAlias'] ?? null);
+
+            $port_id = get_port_id($ports_mapped, $snmp_data, $port_association_mode);
+
+            if (!$port_id) {
+                // If the SNMP to port_id lookup fails, we need to be aware of conflicts later
+                $ifindex_conflicts[$ifIndex] = $ports_ifindex[$ifIndex];
+            } elseif (array_key_exists($ifIndex, $ports_ifindex) && $ports_ifindex[$ifIndex] != $port_id) {
+                // The SNMP data found an existing port that is different from the DB
+                d_echo("port_id has changed for interface with index $ifIndex\n");
+                print_r($ports_ifindex);
+
+                // Fetch the data of the keys we want to swap
+                $old_ifIndex = $ports_db[$port_id]['ifIndex'];
+                $conflicting_port_id = $ports_ifindex[$ifIndex];
+
+                // Use a transaction to swap the indexes.  We use null ifIndex temporarily to avoid duplicate key constraints
+                DB::transaction(function () use ($port_id, $ifIndex, $conflicting_port_id, $old_ifIndex) {
+                    DB::update('UPDATE ports SET ifIndex=NULL WHERE port_id=:port_id', ['port_id' => $conflicting_port_id]);
+                    DB::update('UPDATE ports SET ifIndex=:ifIndex WHERE port_id=:port_id', ['ifIndex' => $ifIndex, 'port_id' => $port_id]);
+                    DB::update('UPDATE ports SET ifIndex=:ifIndex WHERE port_id=:port_id', ['ifIndex' => $old_ifIndex, 'port_id' => $conflicting_port_id]);
+                });
+
+                // Update the maps for both ports
+                $ports_db[$conflicting_port_id]['ifIndex'] = $old_ifIndex;
+                $ports_ifindex[$old_ifIndex] = $conflicting_port_id;
+                $ports_db[$port_id]['ifIndex'] = $ifIndex;
+                $ports_ifindex[$ifIndex] = $port_id;
+            } elseif (array_key_exists($ifIndex, $ifindex_conflicts)) {
+                // We can just update this record because there is no conflict on the ifIndex, and another port wants to use the existing ifIndex
+                DB::update('UPDATE ports SET ifIndex=:ifIndex WHERE port_id=:port_id', ['ifIndex' => $ifIndex, 'port_id' => $port_id]);
+
+                // Update the maps
+                $ports_db[$port_id]['ifIndex'] = $ifIndex;
+                $ports_ifindex[$ifIndex] = $port_id;
+
+                // This is no longer a conflict
+                unset($ifindex_conflicts[$ifIndex]);
+            }
+        }
+    }
+
+    // Go through remaining conflicts and delete any rows marked as deleted
+    foreach ($ifindex_conflicts as $ifIndex => $port_id) {
+        DB::update('DELETE FROM ports WHERE deleted=1 AND port_id=:port_id', ['port_id' => $port_id]);
+    }
+}
+
 // New interface detection
 foreach ($port_stats as $ifIndex => $snmp_data) {
     $snmp_data['ifIndex'] = $ifIndex; // Store ifIndex in port entry
@@ -152,7 +212,8 @@ foreach ($port_stats as $ifIndex => $snmp_data) {
             }
 
             $ports[$port_id] = dbFetchRow('SELECT * FROM `ports` WHERE `device_id` = ? AND `port_id` = ?', [$device['device_id'], $port_id]);
-            echo 'Adding: ' . $snmp_data['ifName'] . '(' . $ifIndex . ')(' . $port_id . ')';
+            d_echo('Adding: ' . $snmp_data['ifName'] . '(' . $ifIndex . ')(' . $port_id . ')');
+            echo '+';
         } elseif ($ports_db[$port_id]['deleted'] == 1) {
             // Port re-discovered after previous deletion?
             $snmp_data['deleted'] = 0;
@@ -172,8 +233,6 @@ foreach ($port_stats as $ifIndex => $snmp_data) {
                 echo '-';
             }
         }
-
-        echo 'X';
     }//end if
 }//end foreach
 
