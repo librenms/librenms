@@ -1049,6 +1049,19 @@
                 "value": "map"
             }
         },
+        "custom_map.edge_font_align": {
+            "default": "horizontal",
+            "type": "select",
+            "options": {
+                "horizontal": "Horizontal",
+                "top": "top",
+                "middle": "Middle",
+                "bottom": "Bottom"
+            },
+            "group": "webui",
+            "section": "custom-map",
+            "order": 54
+        },
         "custom_map.edge_font_color": {
             "default": "#343434",
             "type": "color",
