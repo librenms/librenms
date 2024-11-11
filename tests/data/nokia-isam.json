@@ -1550,25 +1550,6 @@
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "TI",
                     "ifIndex": null
-                },
-                {
-                    "entPhysicalIndex": 19,
-                    "entPhysicalDescr": null,
-                    "entPhysicalClass": null,
-                    "entPhysicalName": null,
-                    "entPhysicalHardwareRev": null,
-                    "entPhysicalFirmwareRev": null,
-                    "entPhysicalSoftwareRev": null,
-                    "entPhysicalAlias": null,
-                    "entPhysicalAssetID": null,
-                    "entPhysicalIsFRU": null,
-                    "entPhysicalModelName": null,
-                    "entPhysicalVendorType": null,
-                    "entPhysicalSerialNum": null,
-                    "entPhysicalContainedIn": 0,
-                    "entPhysicalParentRelPos": -1,
-                    "entPhysicalMfgName": null,
-                    "ifIndex": null
                 }
             ]
         },
