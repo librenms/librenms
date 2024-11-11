@@ -827,30 +827,30 @@ class Cisco extends OS implements
                 }
 
                 // Values ony saved to RRD
-                $thisQos->poll_data['postbytes'] = $postBytes[$snmp_parts[0]][$snmp_parts[1]]['cbQosCMPostPolicyByte64'];
-                $thisQos->poll_data['bufferdrops'] = $bufferDrops[$snmp_parts[0]][$snmp_parts[1]]['cbQosCMNoBufDropPkt64'];
+                $thisQos->poll_data['postbytes'] = $postBytes ? $postBytes[$snmp_parts[0]][$snmp_parts[1]]['cbQosCMPostPolicyByte64'] : null;
+                $thisQos->poll_data['bufferdrops'] = $bufferDrops ? $bufferDrops[$snmp_parts[0]][$snmp_parts[1]]['cbQosCMNoBufDropPkt64'] : null;
 
                 // Cisco CBQoS is one directional
                 if ($thisQos->ingress) {
                     $thisQos->last_polled = $poll_time;
-                    $thisQos->last_bytes_in = $preBytes[$snmp_parts[0]][$snmp_parts[1]]['cbQosCMPrePolicyByte64'];
+                    $thisQos->last_bytes_in = $preBytes ? $preBytes[$snmp_parts[0]][$snmp_parts[1]]['cbQosCMPrePolicyByte64'] : null;
                     $thisQos->last_bytes_out = null;
-                    $thisQos->last_bytes_drop_in = $dropBytes[$snmp_parts[0]][$snmp_parts[1]]['cbQosCMDropByte64'];
+                    $thisQos->last_bytes_drop_in = $dropBytes ? $dropBytes[$snmp_parts[0]][$snmp_parts[1]]['cbQosCMDropByte64'] : null;
                     $thisQos->last_bytes_drop_out = null;
-                    $thisQos->last_packets_in = $prePackets[$snmp_parts[0]][$snmp_parts[1]]['cbQosCMPrePolicyPkt64'];
+                    $thisQos->last_packets_in = $prePackets ? $prePackets[$snmp_parts[0]][$snmp_parts[1]]['cbQosCMPrePolicyPkt64'] : null;
                     $thisQos->last_packets_out = null;
-                    $thisQos->last_packets_drop_in = $dropPackets[$snmp_parts[0]][$snmp_parts[1]]['cbQosCMDropPkt64'];
+                    $thisQos->last_packets_drop_in = $dropPackets ? $dropPackets[$snmp_parts[0]][$snmp_parts[1]]['cbQosCMDropPkt64'] : null;
                     $thisQos->last_packets_drop_out = null;
                 } elseif ($thisQos->egress) {
                     $thisQos->last_polled = $poll_time;
                     $thisQos->last_bytes_in = null;
-                    $thisQos->last_bytes_out = $preBytes[$snmp_parts[0]][$snmp_parts[1]]['cbQosCMPrePolicyByte64'];
+                    $thisQos->last_bytes_out = $preBytes ? $preBytes[$snmp_parts[0]][$snmp_parts[1]]['cbQosCMPrePolicyByte64'] : null;
                     $thisQos->last_bytes_drop_in = null;
-                    $thisQos->last_bytes_drop_out = $dropBytes[$snmp_parts[0]][$snmp_parts[1]]['cbQosCMDropByte64'];
+                    $thisQos->last_bytes_drop_out = $dropBytes ? $dropBytes[$snmp_parts[0]][$snmp_parts[1]]['cbQosCMDropByte64'] : null;
                     $thisQos->last_packets_in = null;
-                    $thisQos->last_packets_out = $prePackets[$snmp_parts[0]][$snmp_parts[1]]['cbQosCMPrePolicyPkt64'];
+                    $thisQos->last_packets_out = $prePackets ? $prePackets[$snmp_parts[0]][$snmp_parts[1]]['cbQosCMPrePolicyPkt64'] : null;
                     $thisQos->last_packets_drop_in = null;
-                    $thisQos->last_packets_drop_out = $dropPackets[$snmp_parts[0]][$snmp_parts[1]]['cbQosCMDropPkt64'];
+                    $thisQos->last_packets_drop_out = $dropPackets ? $dropPackets[$snmp_parts[0]][$snmp_parts[1]]['cbQosCMDropPkt64'] : null;
                 } else {
                     d_echo('Cisco CBQoS ' . $thisQos->title . ' not processed because it it not marked as ingress or egress');
                 }
