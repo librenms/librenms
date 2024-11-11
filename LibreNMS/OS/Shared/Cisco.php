@@ -848,6 +848,10 @@ class Cisco extends OS implements
                 } else {
                     d_echo('Cisco CBQoS ' . $thisQos->title . ' not processed because it it not marked as ingress or egress');
                 }
+            } elseif ($thisQos->type == 'cisco_cbqos_policymap') {
+                // No polling for policymap
+            } else {
+                d_echo('Cisco CBQoS ' . $thisQos->type . ' not implemented in LibreNMS/OS/Shared/Cisco.php');
             }
         }
     }

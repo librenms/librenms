@@ -125,11 +125,43 @@ class Qos implements Module
                                 'droppackets' => $thisQos->last_packets_drop_out,
                             ];
                             break;
+                        case 'cisco_cbqos_classmap':
+                            $rrd_name = [$thisQos->rrd_id];
+                            $rrd_def = RrdDefinition::make()
+                                ->addDataset('postbits', 'COUNTER', 0)
+                                ->addDataset('bufferdrops', 'COUNTER', 0)
+                                ->addDataset('qosdrops', 'COUNTER', 0)
+                                ->addDataset('prebits', 'COUNTER', 0)
+                                ->addDataset('prepkts', 'COUNTER', 0)
+                                ->addDataset('droppkts', 'COUNTER', 0);
+                            if ($thisQos->ingress) {
+                                $rrd_data = [
+                                    'postbits' => $thisQos->poll_data['postbytes'],
+                                    'bufferdrops' => $thisQos->poll_data['bufferdrops'],
+                                    'prebits' => $thisQos->last_bytes_in,
+                                    'qosdrops' => $thisQos->last_bytes_drop_in,
+                                    'prepkts' => $thisQos->last_packets_in,
+                                    'droppkts' => $thisQos->last_packets_drop_in,
+                                ];
+                            } else ($thisQos->egress) {
+                                $rrd_data = [
+                                    'postbits' => $thisQos->poll_data['postbytes'],
+                                    'bufferdrops' => $thisQos->poll_data['bufferdrops'],
+                                    'prebits' => $thisQos->last_bytes_out,
+                                    'qosdrops' => $thisQos->last_bytes_drop_out,
+                                    'prepkts' => $thisQos->last_packets_out,
+                                    'droppkts' => $thisQos->last_packets_drop_out,
+                                ];
+                            }
+                            break;
+                        case 'cisco_cbqos_policymap':
+                            // No polling for the above QoS types
+                            break;
                         default:
                             $rrd_name = null;
                             $rrd_data = null;
                             $rrd_def = null;
-                            echo 'Queue type |' . $thisQos->type . "| has not been implmeneted in LibreNMS/Modules/Qos.php\n";
+                            echo 'Queue type |' . $thisQos->type . "| has not been implemented in LibreNMS/Modules/Qos.php\n";
                     }
                     if (! is_null($rrd_name)) {
                         $datastore->put($os->getDeviceArray(), 'qos', ['rrd_name' => $rrd_name, 'rrd_def' => $rrd_def], $rrd_data);
