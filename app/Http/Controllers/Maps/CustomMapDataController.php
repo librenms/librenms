@@ -69,6 +69,7 @@ class CustomMapDataController extends Controller
                 'text_face' => $edge->text_face,
                 'text_size' => $edge->text_size,
                 'text_colour' => $edge->text_colour,
+                'text_align' => $edge->text_align,
                 'mid_x' => $edge->mid_x,
                 'mid_y' => $edge->mid_y,
             ];
@@ -304,6 +305,7 @@ class CustomMapDataController extends Controller
                 $dbedge->text_face = $edge['text_face'];
                 $dbedge->text_size = $edge['text_size'];
                 $dbedge->text_colour = $edge['text_colour'];
+                $dbedge->text_align = $edge['text_align'];
                 $dbedge->mid_x = intval($edge['mid_x']);
                 $dbedge->mid_y = intval($edge['mid_y']);
 

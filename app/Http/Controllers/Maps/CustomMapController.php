@@ -209,6 +209,7 @@ class CustomMapController extends Controller
                 'color' => Config::get('custom_map.edge_font_color', '#343434'),
                 'size' => Config::get('custom_map.edge_font_size', 12),
                 'face' => Config::get('custom_map.edge_font_face', 'arial'),
+                'align' => Config::get('custom_map.edge_font_align', 'horizontal'),
             ],
             'label' => true,
         ];
