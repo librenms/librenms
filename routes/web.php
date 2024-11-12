@@ -90,6 +90,7 @@ Route::middleware(['auth'])->group(function () {
     Route::prefix('maps')->namespace('Maps')->group(function () {
         Route::resource('custom', CustomMapController::class, ['as' => 'maps'])
             ->parameters(['custom' => 'map'])->except('create');
+        Route::post('custom/{map}/clone', 'CustomMapController@clone')->name('maps.custom.clone');
         Route::get('custom/{map}/background', [CustomMapBackgroundController::class, 'get'])->name('maps.custom.background');
         Route::post('custom/{map}/background', [CustomMapBackgroundController::class, 'save'])->name('maps.custom.background.save');
         Route::get('custom/{map}/data', [CustomMapDataController::class, 'get'])->name('maps.custom.data');
