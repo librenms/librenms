@@ -89,12 +89,12 @@ foreach (dbFetchRows($sql, $param) as $bill) {
         $datefrom = $day_data['0'];
         $dateto = $day_data['1'];
     }
-    $rate_95th = Number::formatSi($bill['rate_95th'], 2, 3, '') . 'bps';
+    $rate_95th = Number::formatSi($bill['rate_95th'], 2, 0, '') . 'bps';
     $dir_95th = $bill['dir_95th'];
     $total_data = Billing::formatBytes($bill['total_data']);
     $rate_average = $bill['rate_average'];
     $url = \LibreNMS\Util\Url::generate(['page' => 'bill', 'bill_id' => $bill['bill_id']]);
-    $used95th = Number::formatSi($bill['rate_95th'], 2, 3, '') . 'bps';
+    $used95th = Number::formatSi($bill['rate_95th'], 2, 0, '') . 'bps';
     $notes = htmlentities($bill['bill_notes']);
 
     if ($prev) {
@@ -105,15 +105,15 @@ foreach (dbFetchRows($sql, $param) as $bill) {
 
     if (strtolower($bill['bill_type']) == 'cdr') {
         $type = 'CDR';
-        $allowed = Number::formatSi($bill['bill_allowed'], 2, 3, '') . 'bps';
-        $in = Number::formatSi($bill['rate_95th_in'], 2, 3, '') . 'bps';
-        $out = Number::formatSi($bill['rate_95th_out'], 2, 3, '') . 'bps';
+        $allowed = Number::formatSi($bill['bill_allowed'], 2, 0, '') . 'bps';
+        $in = Number::formatSi($bill['rate_95th_in'], 2, 0, '') . 'bps';
+        $out = Number::formatSi($bill['rate_95th_out'], 2, 0, '') . 'bps';
         if (! $prev) {
             $percent = Number::calculatePercent($bill['rate_95th'], $bill['bill_allowed']);
             $overuse = ($bill['rate_95th'] - $bill['bill_allowed']);
         }
 
-        $overuse_formatted = Number::formatSi($overuse, 2, 3, '') . 'bps';
+        $overuse_formatted = Number::formatSi($overuse, 2, 0, '') . 'bps';
         $used = $rate_95th;
         $tmp_used = $bill['rate_95th'];
         $rate_95th = "<b>$rate_95th</b>";
@@ -153,7 +153,7 @@ foreach (dbFetchRows($sql, $param) as $bill) {
             "'><i class='fa fa-pencil fa-lg icon-theme' title='Edit' aria-hidden='true'></i> Edit</a> ";
     }
     if (strtolower($bill['bill_type']) == 'cdr') {
-        $predicted = Number::formatSi(Billing::getPredictedUsage($bill['bill_day'], $tmp_used), 2, 3, '') . 'bps';
+        $predicted = Number::formatSi(Billing::getPredictedUsage($bill['bill_day'], $tmp_used), 2, 0, '') . 'bps';
     } elseif (strtolower($bill['bill_type']) == 'quota') {
         $predicted = Billing::formatBytes(Billing::getPredictedUsage($bill['bill_day'], $tmp_used));
     }
