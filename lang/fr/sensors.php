@@ -32,7 +32,7 @@ return [
     'chromatic_dispersion' => [
         'short' => 'Dispersion chromatique',
         'long' => 'Dispersion chromatique',
-        'unit' => 'ps/nm/km',
+        'unit' => 'ps/nm',
         'unit_long' => 'Picosecondes par nanomètre par kilomètre',
     ],
     'cooling' => [

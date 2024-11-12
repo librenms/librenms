@@ -32,7 +32,7 @@ return [
     'chromatic_dispersion' => [
         'short' => 'Hromatična disperzija',
         'long' => 'Hromatična disperzija',
-        'unit' => 'ps/nm/km',
+        'unit' => 'ps/nm',
         'unit_long' => 'Picosekundi po nanometru po kilometru',
     ],
     'cooling' => [
