@@ -46,7 +46,7 @@ class DeviceDependencyController extends Controller
         $data = [
             'page_refresh' => Config::get('page_refresh', 300),
             'group_id' => $group_id,
-            'options' => Config::get('network_map_vis_options'),
+            'options' => Config::get('network_map_dependencymap_vis_options') ?? Config::get('network_map_vis_options'),
             'group_name' => $group_name,
             'highlight_style' => [
                 'color' => [
