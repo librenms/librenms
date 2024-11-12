@@ -179,7 +179,8 @@
                     this_edge['from'] = link['ldev'];
                     this_edge['to'] = link['rdev'];
                     this_edge['label'] = link['ifnames'];
-                    this_edge['title'] = link['url'];
+                    this_edge['title'] = document.createElement("div");
+                    this_edge['title'].innerHTML = link['url'];
 
                     if (!network_edges.get(link_id)) {
                         network_edges.add([this_edge]);
