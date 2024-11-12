@@ -262,11 +262,11 @@ modules:
                     num_oid: '.1.3.6.1.4.1.29462.10.2.1.1.1.2.1.1.1249.{{ $index }}'
                     index: 'waterFlowVolume.{{ $index }}'
                     descr: 'Unit {{ $subindex1 }} Water Flow Volume'
-                    multiplier: 16.6666666667
+                    multiplier: 16
                 -
                     oid: Stulz-WIB8000-MIB::waterFlowVolumeB
                     value: Stulz-WIB8000-MIB::waterFlowVolumeB
                     num_oid: '.1.3.6.1.4.1.29462.10.2.1.1.1.2.1.1.1740.{{ $index }}'
                     index: 'waterFlowVolumeB.{{ $index }}'
                     descr: 'Unit {{ $subindex1 }} Water Flow Volume B'
-                    multiplier: 16.6666666667
+                    multiplier: 16
