@@ -22,6 +22,7 @@
 
 namespace LibreNMS\Util;
 
+use Illuminate\Support\Str;
 use LibreNMS\Exceptions\UserFunctionExistException;
 
 class UserFuncHelper
@@ -41,5 +42,12 @@ class UserFuncHelper
     public function dateToDays(): int
     {
         return \LibreNMS\Util\Time::dateToDays($this->value_raw);
+    }
+
+    public function fsParseChannelValue(): float
+    {
+        $channel = Str::afterLast($this->sensor['sensor_index'], '.');
+
+        return Number::cast(explode(',', $this->value_raw)[$channel] ?? '');
     }
 }

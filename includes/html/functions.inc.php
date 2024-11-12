@@ -16,40 +16,6 @@ use LibreNMS\Enum\ImageFormat;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Rewrite;
 
-/**
- * Compare $t with the value of $vars[$v], if that exists
- *
- * @param  string  $v  Name of the var to test
- * @param  string  $t  Value to compare $vars[$v] to
- * @return bool true, if values are the same, false if $vars[$v]
- *              is unset or values differ
- */
-function var_eq($v, $t)
-{
-    global $vars;
-    if (isset($vars[$v]) && $vars[$v] == $t) {
-        return true;
-    }
-
-    return false;
-}
-
-/**
- * Get the value of $vars[$v], if it exists
- *
- * @param  string  $v  Name of the var to get
- * @return string|bool The value of $vars[$v] if it exists, false if it does not exist
- */
-function var_get($v)
-{
-    global $vars;
-    if (isset($vars[$v])) {
-        return $vars[$v];
-    }
-
-    return false;
-}
-
 function toner2colour($descr, $percent)
 {
     $colour = \LibreNMS\Util\Color::percentage(100 - $percent, null);
@@ -992,13 +958,25 @@ function get_oxidized_nodes_list()
             //user cannot see this device, so let's skip it.
             continue;
         }
+        try {
+            // Convert UTC time string to local timezone set
+            $utc_time = $object['time'];
+            $utc_date = new DateTime($utc_time, new DateTimeZone('UTC'));
+            $local_timezone = new DateTimeZone(date_default_timezone_get());
+            $local_date = $utc_date->setTimezone($local_timezone);
 
+            // Generate local time string
+            $formatted_local_time = $local_date->format('Y-m-d H:i:s T');
+        } catch (Exception $e) {
+            // Just display the current value of $object['time'];
+            $formatted_local_time = $object['time'];
+        }
         echo '<tr>
         <td>' . $device['device_id'] . '</td>
         <td>' . $object['name'] . '</td>
         <td>' . $device['sysName'] . '</td>
         <td>' . $object['status'] . '</td>
-        <td>' . $object['time'] . '</td>
+        <td>' . $formatted_local_time . '</td>
         <td>' . $object['model'] . '</td>
         <td>' . $object['group'] . '</td>
         <td></td>
@@ -1084,16 +1062,16 @@ function get_sensor_label_color($sensor, $type = 'sensors')
     if (is_null($sensor)) {
         return 'label-unknown';
     }
-    if (! is_null($sensor['sensor_limit_warn']) && $sensor['sensor_current'] > $sensor['sensor_limit_warn']) {
+    if (! is_null($sensor['sensor_limit_warn']) && $sensor['sensor_current'] >= $sensor['sensor_limit_warn']) {
         $label_style = 'label-warning';
     }
-    if (! is_null($sensor['sensor_limit_low_warn']) && $sensor['sensor_current'] < $sensor['sensor_limit_low_warn']) {
+    if (! is_null($sensor['sensor_limit_low_warn']) && $sensor['sensor_current'] <= $sensor['sensor_limit_low_warn']) {
         $label_style = 'label-warning';
     }
-    if (! is_null($sensor['sensor_limit']) && $sensor['sensor_current'] > $sensor['sensor_limit']) {
+    if (! is_null($sensor['sensor_limit']) && $sensor['sensor_current'] >= $sensor['sensor_limit']) {
         $label_style = 'label-danger';
     }
-    if (! is_null($sensor['sensor_limit_low']) && $sensor['sensor_current'] < $sensor['sensor_limit_low']) {
+    if (! is_null($sensor['sensor_limit_low']) && $sensor['sensor_current'] <= $sensor['sensor_limit_low']) {
         $label_style = 'label-danger';
     }
     $unit = __("$type.{$sensor['sensor_class']}.unit");

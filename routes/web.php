@@ -46,6 +46,7 @@ Route::middleware(['auth'])->group(function () {
     Route::any('inventory', \App\Http\Controllers\InventoryController::class)->name('inventory');
     Route::get('inventory/purge', [\App\Http\Controllers\InventoryController::class, 'purge'])->name('inventory.purge');
     Route::resource('port', 'PortController')->only('update');
+    Route::get('vlans', [\App\Http\Controllers\VlansController::class, 'index'])->name('vlans.index');
     Route::prefix('poller')->group(function () {
         Route::get('', 'PollerController@pollerTab')->name('poller.index');
         Route::get('log', 'PollerController@logTab')->name('poller.log');
@@ -75,6 +76,8 @@ Route::middleware(['auth'])->group(function () {
     // Device Tabs
     Route::prefix('device/{device}')->namespace('Device\Tabs')->name('device.')->group(function () {
         Route::put('notes', 'NotesController@update')->name('notes.update');
+        Route::put('module/{module}', [\App\Http\Controllers\Device\Tabs\ModuleController::class, 'update'])->name('module.update');
+        Route::delete('module/{module}', [\App\Http\Controllers\Device\Tabs\ModuleController::class, 'delete'])->name('module.delete');
     });
 
     Route::match(['get', 'post'], 'device/{device}/{tab?}/{vars?}', 'DeviceController@index')
@@ -171,6 +174,7 @@ Route::middleware(['auth'])->group(function () {
         Route::prefix('select')->namespace('Select')->group(function () {
             Route::get('application', 'ApplicationController')->name('ajax.select.application');
             Route::get('bill', 'BillController')->name('ajax.select.bill');
+            Route::get('custom-map', 'CustomMapController')->name('ajax.select.custom-map');
             Route::get('custom-map-menu-group', 'CustomMapMenuGroupController')->name('ajax.select.custom-map-menu-group');
             Route::get('dashboard', 'DashboardController')->name('ajax.select.dashboard');
             Route::get('device', 'DeviceController')->name('ajax.select.device');
@@ -213,6 +217,8 @@ Route::middleware(['auth'])->group(function () {
             Route::post('routes', 'RoutesTablesController');
             Route::post('syslog', 'SyslogController');
             Route::post('tnmsne', 'TnmsneController')->name('table.tnmsne');
+            Route::post('vlan-ports', 'VlanPortsController')->name('table.vlan-ports');
+            Route::post('vlan-devices', 'VlanDevicesController')->name('table.vlan-devices');
             Route::post('vminfo', 'VminfoController');
         });
 
@@ -222,6 +228,7 @@ Route::middleware(['auth'])->group(function () {
             Route::post('alertlog', 'AlertlogController');
             Route::post('availability-map', 'AvailabilityMapController');
             Route::post('component-status', 'ComponentStatusController');
+            Route::post('custom-map', 'CustomMapController');
             Route::post('device-summary-horiz', 'DeviceSummaryHorizController');
             Route::post('device-summary-vert', 'DeviceSummaryVertController');
             Route::post('device-types', 'DeviceTypeController');

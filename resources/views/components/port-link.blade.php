@@ -1,4 +1,4 @@
-<x-popup>
+<x-popup {{ $attributes }}>
     @include('components.port-link_basic')
     <x-slot name="title">
         <div class="tw-text-xl tw-font-bold">{{ $port->device?->displayName() }} - {{ $label }}</div>

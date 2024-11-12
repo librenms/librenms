@@ -243,30 +243,51 @@ class Ospf implements Module
         }
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function cleanup(Device $device): void
+    public function dataExists(Device $device): bool
     {
-        $device->ospfPorts()->delete();
-        $device->ospfNbrs()->delete();
-        $device->ospfAreas()->delete();
-        $device->ospfInstances()->delete();
+        return $device->ospfPorts()->exists()
+            || $device->ospfNbrs()->exists()
+            || $device->ospfAreas()->exists()
+            || $device->ospfInstances()->exists();
     }
 
     /**
      * @inheritDoc
      */
-    public function dump(Device $device)
+    public function cleanup(Device $device): int
     {
+        $deleted = $device->ospfPorts()->delete();
+        $deleted += $device->ospfNbrs()->delete();
+        $deleted += $device->ospfAreas()->delete();
+        $deleted += $device->ospfInstances()->delete();
+
+        return $deleted;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function dump(Device $device, string $type): ?array
+    {
+        if ($type == 'discovery') {
+            return null;
+        }
+
         return [
             'ospf_ports' => $device->ospfPorts()
                 ->leftJoin('ports', 'ospf_ports.port_id', 'ports.port_id')
                 ->select(['ospf_ports.*', 'ifIndex'])
+                ->orderBy('ospf_port_id')->orderBy('context_name')
                 ->get()->map->makeHidden(['id', 'device_id', 'port_id']),
-            'ospf_instances' => $device->ospfInstances->map->makeHidden(['id', 'device_id']),
-            'ospf_areas' => $device->ospfAreas->map->makeHidden(['id', 'device_id']),
-            'ospf_nbrs' => $device->ospfNbrs->map->makeHidden(['id', 'device_id']),
+            'ospf_instances' => $device->ospfInstances()
+                ->orderBy('ospf_instance_id')->orderBy('context_name')
+                ->get()->map->makeHidden(['id', 'device_id']),
+            'ospf_areas' => $device->ospfAreas()
+                ->orderBy('ospfAreaId')->orderBy('context_name')
+                ->get()->map->makeHidden(['id', 'device_id']),
+            'ospf_nbrs' => $device->ospfNbrs()
+                ->orderBy('ospf_nbr_id')->orderBy('context_name')
+                ->get()->map->makeHidden(['id', 'device_id']),
         ];
     }
 }

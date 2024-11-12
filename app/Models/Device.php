@@ -406,9 +406,9 @@ class Device extends BaseModel
         $this->save();
     }
 
-    public function getAttrib($name)
+    public function getAttrib($name, $default = null)
     {
-        return $this->attribs->pluck('attrib_value', 'attrib_type')->get($name);
+        return $this->attribs->pluck('attrib_value', 'attrib_type')->get($name, $default);
     }
 
     public function setAttrib($name, $value)
@@ -1043,6 +1043,11 @@ class Device extends BaseModel
     public function tnmsNeInfo(): HasMany
     {
         return $this->hasMany(TnmsneInfo::class, 'device_id');
+    }
+
+    public function transceivers(): HasMany
+    {
+        return $this->hasMany(Transceiver::class, 'device_id');
     }
 
     public function users(): BelongsToMany
