@@ -10,6 +10,11 @@
                     <button type=button value="cancel" id="image-deleteCancelButton" class="btn btn-primary" onclick="$('#imageDeleteModal').modal('hide');">{{ __('Cancel') }}</button>
                 </center>
             </div>
+            <div>
+              <center>
+                <div class="tw-text-red-600" id="imagedeleteerror"></div>
+              </center>
+            </div>
         </div>
     </div>
 </div>
@@ -27,6 +32,7 @@
             name: $target.data('image-name'),
         };
         $('#imageDeleteModal').modal('show');
+        $('#imageDeleteModal').modal('show');
     }
 
     function deleteImage() {
@@ -37,6 +43,9 @@
             $('#image-' + pendingImageToDelete.id).remove();
             pendingMapToDelete = null;
             $('#imageDeleteModal').modal('hide');
+            $('#imagedeleteerror').text('');
+        }).fail((jqXHR, textStatus, errorThrown) => {
+            $('#imagedeleteerror').text('Error deleting: ' + jqXHR.responseText);
         });
     }
 </script>

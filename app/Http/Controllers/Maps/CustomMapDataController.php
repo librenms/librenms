@@ -173,6 +173,7 @@ class CustomMapDataController extends Controller
                 'style' => $node->style,
                 'icon' => $node->icon,
                 'image' => $node->image,
+                'nodeimage' => $node->node_image_id,
                 'size' => $node->size,
                 'border_width' => $node->border_width,
                 'text_face' => $node->text_face,
@@ -268,6 +269,7 @@ class CustomMapDataController extends Controller
                 $dbnode->style = $node['shape'];
                 $dbnode->icon = $node['icon'];
                 $dbnode->image = $node['image']['unselected'] ?? '';
+                $dbnode->node_image_id = $node['nodeimage'] ?? null;
                 $dbnode->size = $node['size'];
                 $dbnode->text_face = $node['font']['face'];
                 $dbnode->text_size = $node['font']['size'];

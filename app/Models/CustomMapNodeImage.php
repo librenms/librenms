@@ -26,7 +26,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class CustomMapNodeImage extends BaseModel
 {
@@ -34,8 +34,8 @@ class CustomMapNodeImage extends BaseModel
 
     protected $primaryKey = 'custom_map_node_image_id';
 
-    public function nodes(): BelongsToMany
+    public function nodes(): HasMany
     {
-        return $this->belongsTo(CustomMapNode::class, 'node_image_id');
+        return $this->hasMany(CustomMapNode::class, 'node_image_id');
     }
 }
