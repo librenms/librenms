@@ -29,7 +29,7 @@ use LibreNMS\Enum\IntegerType;
 
 class Number
 {
-    public static function formatBase($value, $base = 1000, $round = 2, $sf = 3, $suffix = 'B'): string
+    public static function formatBase($value, $base = 1000, $round = 2, $sf = 0, $suffix = 'B'): string
     {
         return $base == 1000
             ? self::formatSi($value, $round, $sf, $suffix)
@@ -63,7 +63,7 @@ class Number
         return $round;
     }
 
-    public static function formatSi($value, $round = 2, $sf = 3, $suffix = 'B'): string
+    public static function formatSi($value, $round = 2, $sf = 0, $suffix = 'B'): string
     {
         $value = (float) $value;
         $neg = $value < 0;
@@ -97,7 +97,7 @@ class Number
         return self::cast(number_format($value, $round, '.', '')) . " $ext$suffix";
     }
 
-    public static function formatBi($value, $round = 2, $sf = 3, $suffix = 'B'): string
+    public static function formatBi($value, $round = 2, $sf = 0, $suffix = 'B'): string
     {
         $value = (float) $value;
         $neg = $value < 0;
