@@ -8,7 +8,7 @@ if ($device['os'] == 'truenas') {
 
     if (is_array($datasetTable_array)) {
         foreach ($datasetTable_array as $index => $dataset) {
-            if (isset($dataset['datasetDescr'])) {
+            if (isset($dataset['datasetAvailable'])) {
                 if (!in_array($dataset['datasetDescr'], $tmp_storage)) {
                     $dataset['datasetIndex'] = $index;
                     $dataset['datasetTotal'] = $dataset['datasetSize'] * $dataset['datasetAllocationUnits'];
