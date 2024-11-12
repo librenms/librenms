@@ -245,7 +245,7 @@ class CustomMapController extends Controller
     public function clone(CustomMap $map): JsonResponse
     {
         $newmap = $map->replicate();
-        $newmap->name .= " - Clone";
+        $newmap->name .= ' - Clone';
 
         if ($map->background) {
             $newbackground = $map->background->replicate();
@@ -256,7 +256,7 @@ class CustomMapController extends Controller
         $nodes = $map->nodes()->get();
         $edges = $map->edges()->get();
 
-        DB::transaction(function() use ($newmap, $newbackground, $nodes, $edges) {
+        DB::transaction(function () use ($newmap, $newbackground, $nodes, $edges) {
             $newmap->save();
 
             if ($newbackground) {
