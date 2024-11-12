@@ -39,7 +39,7 @@ return new class extends Migration
         // Get the list of all tables
         $tableNames = DB::table('information_schema.tables')
             ->where('table_schema', $databaseName)
-            ->where('TABLE_TYPE', 'BASE TABLE')            
+            ->where('TABLE_TYPE', 'BASE TABLE')
             ->pluck('TABLE_NAME');
 
         // Iterate through the list and alter each table
