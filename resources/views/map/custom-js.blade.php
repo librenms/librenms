@@ -132,10 +132,10 @@
                 } else if (node.device_image) {
                     node_cfg.image = {unselected: node.device_image};
                 } else {
-                    // If we do not get a valid image from the database, use defaults
-                    node_cfg.shape = newnodeconf.shape;
-                    node_cfg.icon = newnodeconf.icon;
-                    node_cfg.image = newnodeconf.image || undefined;
+                    // Default to box if we do not get a valid image from the database 
+                    node.style = 'box';
+                    node_cfg.shape = 'box';
+                    node_cfg.image = undefined;
                 }
             } else {
                 node_cfg.image = undefined;
