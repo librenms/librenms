@@ -67,12 +67,14 @@ return [
             'prometheus' => ['name' => 'Datastore: Prometheus'],
             'rrdtool' => ['name' => 'Datastore: RRDTool'],
             'snmp' => ['name' => 'SNMP'],
+            'dispatcherservice' => ['name' => 'Dispatcher Service'],
             'poller_modules' => ['name' => 'Poller Modules'],
         ],
         'system' => [
             'cleanup' => ['name' => 'Cleanup'],
             'proxy' => ['name' => 'Proxy'],
             'updates' => ['name' => 'Updates'],
+            'scheduledtasks' => ['name' => 'Scheduled Tasks'],
             'server' => ['name' => 'Server'],
             'reporting' => ['name' => 'Reporting'],
         ],
@@ -1536,9 +1538,62 @@ return [
             'description' => 'Sets the version of rrdtool on your server',
             'help' => 'Anything over 1.5.5 supports all features LibreNMS uses, do not set higher than your installed version',
         ],
-        'service_poller_enabled' => [
-            'description' => 'Enable Polling',
-            'help' => 'Enable poller workers. Sets the default value for all nodes.',
+        'schedule_type' => [
+            'alerting' => [
+                'description' => 'Alerting',
+                'help' => 'Alerting task scheduling method. Legacy will use cron if the crontab entry exists and the dispatcher service if the legacy config option service_billing_enabled is set to true.',
+                'options' => [
+                    'legacy' => 'Legacy (Unrestricted)',
+                    'cron' => 'Cron (alerts.php)',
+                    'dispatcher' => 'Dispatcher Service',
+                ],
+            ],
+            'billing' => [
+                'description' => 'Billing',
+                'help' => 'Billing task scheduling method. Legacy will use cron if the crontab entry exists and the dispatcher service if the legacy config option service_billing_enabled is set to true.',
+                'options' => [
+                    'legacy' => 'Legacy (Unrestricted)',
+                    'cron' => 'Cron (poll-billing.php and billing-calculate.php)',
+                    'dispatcher' => 'Dispatcher Service',
+                ],
+            ],
+            'discovery' => [
+                'description' => 'Discovery',
+                'help' => 'Discovery task scheduling method. Legacy will use cron if the crontab entry exists and the dispatcher service if the legacy config option service_discovery_enabled is set to true.',
+                'options' => [
+                    'legacy' => 'Legacy (Unrestricted)',
+                    'cron' => 'Cron (discovery.php)',
+                    'dispatcher' => 'Dispatcher Service',
+                ],
+            ],
+            'ping' => [
+                'description' => 'Fast Ping',
+                'help' => 'Fast ping task scheduling method. Legacy will use cron if the crontab entry exists and use the dispatcher service if the legacy config option service_ping_enabled is set to true.',
+                'options' => [
+                    'legacy' => 'Legacy (Unrestricted)',
+                    'disabled' => 'Disabled (pings only during polling)',
+                    'cron' => 'Cron (ping.php)',
+                    'dispatcher' => 'Dispatcher Service',
+                ],
+            ],
+            'poller' => [
+                'description' => 'Poller',
+                'help' => 'Poller task scheduling method. Legacy will use cron if the crontab entry exists and the dispatcher service if the legacy config option service_poller_enabled is set to true.',
+                'options' => [
+                    'legacy' => 'Legacy (Unrestricted)',
+                    'cron' => 'Cron (poller.php)',
+                    'dispatcher' => 'Dispatcher Service',
+                ],
+            ],
+            'services' => [
+                'description' => 'Services',
+                'help' => 'Services task scheduling method. Legacy will use cron if the crontab entry exists and the dispatcher service if the legacy config option service_services_enabled is set to true.',
+                'options' => [
+                    'legacy' => 'Legacy (Unrestricted)',
+                    'cron' => 'Cron (check-services.php)',
+                    'dispatcher' => 'Dispatcher Service',
+                ],
+            ],
         ],
         'service_master_timeout' => [
             'description' => 'Master Dispatcher Timeout',
@@ -1556,10 +1611,6 @@ return [
             'description' => 'Device Down Retry',
             'help' => 'If a device is down when polling is attempted. This is the amount of time to wait before retrying. Sets the default value for all nodes.',
         ],
-        'service_discovery_enabled' => [
-            'description' => 'Discovery Enabled',
-            'help' => 'Enable discovery workers. Sets the default value for all nodes.',
-        ],
         'service_discovery_workers' => [
             'description' => 'Discovery Workers',
             'help' => 'Amount of discovery workers to run. Setting too high can cause overload. Sets the default value for all nodes.',
@@ -1567,10 +1618,6 @@ return [
         'service_discovery_frequency' => [
             'description' => 'Discovery Frequency',
             'help' => 'How often to run device discovery. Sets the default value for all nodes. Default is 4 times a day.',
-        ],
-        'service_services_enabled' => [
-            'description' => 'Services Enabled',
-            'help' => 'Enable services workers. Sets the default value for all nodes.',
         ],
         'service_services_workers' => [
             'description' => 'Services Workers',
@@ -1580,10 +1627,6 @@ return [
             'description' => 'Services Frequency',
             'help' => 'How often to run services. This should match poller frequency. Sets the default value for all nodes.',
         ],
-        'service_billing_enabled' => [
-            'description' => 'Billing Enabled',
-            'help' => 'Enable billing workers. Sets the default value for all nodes.',
-        ],
         'service_billing_frequency' => [
             'description' => 'Billing Frequency',
             'help' => 'How often to collect billing data. Sets the default value for all nodes.',
@@ -1592,17 +1635,9 @@ return [
             'description' => 'Billing Calculate Frequency',
             'help' => 'How often to calculate bill usage. Sets the default value for all nodes.',
         ],
-        'service_alerting_enabled' => [
-            'description' => 'Alerting Enabled',
-            'help' => 'Enable the alerting worker. Sets the default value for all nodes.',
-        ],
         'service_alerting_frequency' => [
             'description' => 'Alerting Frequency',
             'help' => 'How often alert rules are checked. Note that data is only updated based on poller frequency. Sets the default value for all nodes.',
-        ],
-        'service_ping_enabled' => [
-            'description' => 'Fast Ping Enabled',
-            'help' => 'Fast Ping just pings devices to check if they are up or down. Sets the default value for all nodes.',
         ],
         'service_update_enabled' => [
             'description' => 'Daily Maintenance Enabled',
