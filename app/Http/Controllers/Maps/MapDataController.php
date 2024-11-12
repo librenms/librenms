@@ -713,7 +713,7 @@ class MapDataController extends Controller
                         'ldev' => $port->device_id,
                         'rdev' => $remote_port->device_id,
                         'ifnames' => $port->ifName . ' <> ' . $remote_port->ifName,
-                        'url' => \Blade::render('<x-port-link :port="$port" />', ['port' => $port]),
+                        'url' => \Blade::render('<x-port-link-map :port="$port" />', ['port' => $port]),
                         'style' => $link_style,
                     ];
                 }
