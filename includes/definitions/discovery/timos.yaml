@@ -455,3 +455,76 @@ modules:
                     descr: 'RFU Frequency Band {{ $aluMwRadioName }}'
                     multiplier: 1000000
                     index: 'aluMwRadioPortID.{{ $index }}'
+                -
+                    oid: tmnxCohOptPortStatsTable
+                    value: tmnxCohOptPortRxFreqOffset
+                    num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.12.8.1.18.{{ $index }}'
+                    descr: 'Interface {{ ifName:1 }}'
+                    group: 'Rx Frequency Offset'
+                    index: 'tmnxCohOptPortRxFreqOffset.{{ $index }}'
+                    divisor: 1000000
+        ber:
+            data:
+                -
+                    oid: tmnxCohOptPortStatsTable
+                    value: tmnxCohOptPortRxBER
+                    num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.12.8.1.2.{{ $index }}'
+                    descr:  'Interface {{ ifName:1 }}'
+                    group: 'Rx Pre-FEC Bit Error Rate'
+                    index: 'tmnxCohOptPortRxBER.{{ $index }}'
+                    user_func: 'ieee754_to_decimal'
+        snr:
+            data:
+                -
+                    oid: tmnxCohOptPortStatsTable
+                    value: tmnxCohOptPortRxSNR
+                    num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.12.8.1.6.{{ $index }}'
+                    descr:  'Interface {{ ifName:1 }}'
+                    group: 'Rx Signal-to-Noise Ratio'
+                    index: 'tmnxCohOptPortRxSNR.{{ $index }}'
+                    divisor: 10
+                -
+                    oid: tmnxCohOptPortStatsTable
+                    value: tmnxCohOptPortRxOSNR
+                    num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.12.8.1.34.{{ $index }}'
+                    descr:  'Interface {{ ifName:1 }}'
+                    group: 'Rx Optical Signal-to-Noise Ratio'
+                    index: 'tmnxCohOptPortRxOSNR.{{ $index }}'
+                    divisor: 10
+        chromatic_dispersion:
+            data:
+                -
+                    oid: tmnxCohOptPortStatsTable
+                    value: tmnxCohOptPortRxChromaticDisp
+                    num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.12.8.1.10.{{ $index }}'
+                    descr: 'Interface {{ ifName:1 }}'
+                    group: 'Rx Chromatic Dispersion'
+                    index: 'tmnxCohOptPortRxChromaticDisp.{{ $index }}'
+        delay:
+            data:
+                -
+                    oid: tmnxCohOptPortStatsTable
+                    value: tmnxCohOptPortRxDiffGrpDly
+                    num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.12.8.1.14.{{ $index }}'
+                    descr: 'Interface {{ ifName:1 }}'
+                    group: 'Rx Differential Group Delay'
+                    index: 'tmnxCohOptPortRxDiffGrpDly.{{ $index }}'
+                    divisor: 1000000000000
+        quality_factor:
+            data:
+                -
+                    oid: tmnxCohOptPortStatsTable
+                    value: tmnxCohOptPortRxQ
+                    num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.12.8.1.22.{{ $index }}'
+                    descr: 'Interface {{ ifName:1 }} Q-Factor'
+                    group: 'Rx Quality Factor'
+                    index: 'tmnxCohOptPortRxQ.{{ $index }}'
+                    divisor: 10
+                -
+                    oid: tmnxCohOptPortOperTable
+                    value: tmnxCohOptPortRxQMargin
+                    num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.4.73.1.9.{{ $index }}'
+                    descr: 'Interface {{ ifName:1 }} Q-Margin'
+                    group: 'Rx Quality Margin'
+                    index: 'tmnxCohOptPortRxQMargin.{{ $index }}'
+                    divisor: 10
