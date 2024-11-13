@@ -89,7 +89,7 @@ modules:
                     states:
                         - { descr: off, graph: 0, value: 1, generic: 3 }
                         - { descr: green, graph: 0, value: 2, generic: 0 }
-                        - { descr: yelllow, graph: 0, value: 3, generic: 1 }
+                        - { descr: yellow, graph: 0, value: 3, generic: 1 }
                         - { descr: red, graph: 0, value: 4, generic: 2 }
                 -
                     oid: hmLEDRStandby
@@ -101,7 +101,7 @@ modules:
                     states:
                         - { descr: off, graph: 0, value: 1, generic: 3 }
                         - { descr: green, graph: 0, value: 2, generic: 0 }
-                        - { descr: yelllow, graph: 0, value: 3, generic: 1 }
+                        - { descr: yellow, graph: 0, value: 3, generic: 1 }
                         - { descr: red, graph: 0, value: 4, generic: 2 }
                 -
                     oid: hmLEDRSRedundancyManager
@@ -113,7 +113,7 @@ modules:
                     states:
                         - { descr: off, graph: 0, value: 1, generic: 3 }
                         - { descr: green, graph: 0, value: 2, generic: 0 }
-                        - { descr: yelllow, graph: 0, value: 3, generic: 1 }
+                        - { descr: yellow, graph: 0, value: 3, generic: 1 }
                         - { descr: red, graph: 0, value: 4, generic: 2 }
                 -
                     oid: hmLEDRSFault
@@ -125,6 +125,6 @@ modules:
                     states:
                         - { descr: off, graph: 0, value: 1, generic: 3 }
                         - { descr: green, graph: 0, value: 2, generic: 0 }
-                        - { descr: yelllow, graph: 0, value: 3, generic: 1 }
+                        - { descr: yellow, graph: 0, value: 3, generic: 1 }
                         - { descr: red, graph: 0, value: 4, generic: 2 }
 
