@@ -31,7 +31,7 @@ use App\Polling\Measure\Measurement;
 use InfluxDB2\Client;
 use InfluxDB2\Model\WritePrecision;
 use InfluxDB2\Point;
-use InfluxDB2\WriteType as WriteType;
+use InfluxDB2\WriteType;
 use LibreNMS\Config;
 use Log;
 
@@ -164,11 +164,11 @@ class InfluxDBv2 extends BaseDatastore
                 'timeout' => $timeout,
                 'verify' => $verify,
                 'headers' => [
-                    'Connection' => 'close'
+                    'Connection' => 'close',
                 ],
             ];
             $guzzleClient = new \GuzzleHttp\Client($guzzleOptions);
-            
+
             $client = new Client([
                 'url' => $transport . '://' . $host . ':' . $port,
                 'token' => $token,
@@ -179,7 +179,7 @@ class InfluxDBv2 extends BaseDatastore
                 'debug' => $debug,
                 'httpClient' => $guzzleClient,
             ]);
-    
+
             return $client->createWriteApi([
                 'writeType' => WriteType::BATCHING,
                 'batchSize' => $batch_size,
