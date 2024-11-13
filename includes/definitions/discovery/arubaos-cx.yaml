@@ -66,8 +66,8 @@ modules:
                         - { value: 5, descr: Fault POE, graph: 1, generic: 2 }
                         - { value: 6, descr: Fault No Recovery, graph: 1, generic: 2 }
                         - { value: 7, descr: alert, graph: 1, generic: 2 }
-                        - { value: 8, descr: unknown, graph: 1, generic: 2 }
-                        - { value: 9, descr: unsuppored, graph: 1, generic: 2 }
+                        - { value: 8, descr: unknown, graph: 1, generic: 3 }
+                        - { value: 9, descr: unsuppored, graph: 1, generic: 3 }
                         - { value: 10, descr: warning, graph: 1, generic: 1 }
                         - { value: 11, descr: init, graph: 1, generic: 3 }
                 -
