@@ -138,8 +138,6 @@ class InfluxDBv2 extends BaseDatastore
             $this->recordStatistic($stat->end());
         } catch (\InfluxDB2\ApiException $e) {
             Log::error('InfluxDBv2 (put) API Exception: ' . $e->getMessage());
-        } catch (Exception|Throwable $e) {
-            Log::error('InfluxDBv2 (put) General Exception: ' . $e->getMessage());
         }
     }
 
@@ -187,8 +185,6 @@ class InfluxDBv2 extends BaseDatastore
             ]);
         } catch (\InfluxDB2\ApiException $e) {
             Log::error('InfluxDBv2 (createFromConfig) API Exception: ' . $e->getMessage());
-        } catch (Exception|Throwable $e) {
-            Log::error('InfluxDBv2 (createFromConfig) General Exception: ' . $e->getMessage());
         }
     }
 
@@ -199,8 +195,6 @@ class InfluxDBv2 extends BaseDatastore
             $writeApi->close();
         } catch (\InfluxDB2\ApiException $e) {
             Log::error('InfluxDBv2 (closeClient) API Exception: ' . $e->getMessage());
-        } catch (Exception|Throwable $e) {
-            Log::error('InfluxDBv2 (closeClient) General Exception: ' . $e->getMessage());
         }
     }
 
