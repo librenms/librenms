@@ -40,7 +40,7 @@ class Windows extends \LibreNMS\OS
 
             $build = $matches['build'];
             if ($device->sysObjectID == '.1.3.6.1.4.1.311.1.1.3.1.1') {
-                $device->version = $this->getClientVersion($build, $matches['version']);
+                $device->version = $this->getClientVersion($build, $matches['nt']);
             } elseif ($device->sysObjectID == '.1.3.6.1.4.1.311.1.1.3.1.2') {
                 $device->version = $this->getServerVersion($build);
             } elseif ($device->sysObjectID == '.1.3.6.1.4.1.311.1.1.3.1.3') {
