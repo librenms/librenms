@@ -83,7 +83,7 @@ modules:
                     oid: fuelGaugeInformation
                     value: fuelGaugePowerConsumptionMemory
                     num_oid: '.1.3.6.1.4.1.19046.11.1.1.10.1.12.{{ $index }}'
-                    indey: 'fuelGaugePowerConsumptionMemory.{{ $index }}'
+                    index: 'fuelGaugePowerConsumptionMemory.{{ $index }}'
                     descr: 'Memory'
                 -
                     oid: fuelGaugeInformation
