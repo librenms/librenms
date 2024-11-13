@@ -1077,6 +1077,22 @@ return [
                 'description' => 'Excluded device groups',
                 'help' => 'Device groups excluded from sending data to InfluxDBv2',
             ],
+            'timeout' => [
+                'description' => 'Timeout',
+                'help' => 'Timeout in seconds',
+            ],
+            'verify' => [
+                'description' => 'Verify',
+                'help' => 'Verify the certificate',
+            ],
+            'batch_size' => [
+                'description' => 'Batch size',
+                'help' => 'How many metrics should be bundled before sending',
+            ],
+            'max_retry' => [
+                'description' => 'Max retry',
+                'help' => 'How many reties we should try',
+            ],
         ],
         'ipmitool' => [
             'description' => 'Path to ipmtool',
