@@ -4392,6 +4392,34 @@
             "default": [
             ]
         },
+        "influxdbv2.timeout": {
+            "default": 5,
+            "type": "integer",
+            "group": "poller",
+            "section": "influxdbv2",
+            "order": 10
+        },
+        "influxdbv2.verify": {
+            "default": false,
+            "type": "boolean",
+            "group": "poller",
+            "section": "influxdbv2",
+            "order": 11
+        },
+        "influxdbv2.batch_size": {
+            "default": 1000,
+            "type": "integer",
+            "group": "poller",
+            "section": "influxdbv2",
+            "order": 12
+        },
+        "influxdbv2.max_retry": {
+            "default": 2,
+            "type": "integer",
+            "group": "poller",
+            "section": "influxdbv2",
+            "order": 13
+        },
         "install_dir": {
             "type": "directory"
         },
