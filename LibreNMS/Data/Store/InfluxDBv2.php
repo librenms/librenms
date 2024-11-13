@@ -31,6 +31,7 @@ use App\Polling\Measure\Measurement;
 use InfluxDB2\Client;
 use InfluxDB2\Model\WritePrecision;
 use InfluxDB2\Point;
+use InfluxDB2\WriteType as WriteType;
 use LibreNMS\Config;
 use Log;
 
@@ -112,8 +113,7 @@ class InfluxDBv2 extends BaseDatastore
         }
 
         // Get a WriteApi instance from the client
-        $client = self::createFromConfig();
-        $writeApi = $client->createWriteApi();
+        $writeApi = app('InfluxDBv2\Database');
         try {
             // Construct data points using the InfluxDB2\Point class
             $point = Point::measurement($measurement)
@@ -125,6 +125,9 @@ class InfluxDBv2 extends BaseDatastore
                 $point->addField($field, $value);
             }
 
+            // Sort tags alphabetically for performance
+            ksort($tmp_tags, SORT_STRING);
+
             // Adding tags from $tmpTags array
             foreach ($tmp_tags as $tag => $value) {
                 $point->addTag($tag, $value);
@@ -134,35 +137,71 @@ class InfluxDBv2 extends BaseDatastore
 
             $this->recordStatistic($stat->end());
         } catch (\InfluxDB2\ApiException $e) {
-            print_r($e);
-            // Handle exceptions
-        } finally {
-            // Close the WriteApi to free resources
-            $writeApi->close();
+            Log::error('InfluxDBv2 (put) API Exception: ' . $e->getMessage());
+        } catch (Exception|Throwable $e) {
+            Log::error('InfluxDBv2 (put) General Exception: ' . $e->getMessage());
         }
     }
 
     public static function createFromConfig()
     {
-        $host = Config::get('influxdbv2.host', 'localhost');
-        $transport = Config::get('influxdbv2.transport', 'http');
-        $port = Config::get('influxdbv2.port', 8086);
-        $bucket = Config::get('influxdbv2.bucket', 'librenms');
-        $organization = Config::get('influxdbv2.organization', '');
-        $allow_redirects = Config::get('influxdbv2.allow_redirects', true);
-        $token = Config::get('influxdbv2.token', '');
-        $debug = Config::get('influxdbv2.debug', false);
-        $client = new Client([
-            'url' => $transport . '://' . $host . ':' . $port,
-            'token' => $token,
-            'bucket' => $bucket,
-            'org' => $organization,
-            'precision' => WritePrecision::S,
-            'allow_redirects' => $allow_redirects,
-            'debug' => $debug,
-        ]);
+        try {
+            $host = Config::get('influxdbv2.host', 'localhost');
+            $transport = Config::get('influxdbv2.transport', 'http');
+            $port = Config::get('influxdbv2.port', 8086);
+            $bucket = Config::get('influxdbv2.bucket', 'librenms');
+            $organization = Config::get('influxdbv2.organization', '');
+            $allow_redirects = Config::get('influxdbv2.allow_redirects', true);
+            $token = Config::get('influxdbv2.token', '');
+            $debug = Config::get('influxdbv2.debug', false);
+            $timeout = Config::get('influxdbv2.timeout', 5);
+            $verify = Config::get('influxdbv2.verify', false);
+            $batch_size = Config::get('influxdbv2.batch_size', 1000);
+            $max_retry = Config::get('influxdbv2.max_retry', 2);
 
-        return $client;
+            // The "connection: close" is to avoid a high quantity of TIME_WAIT
+            $guzzleOptions = [
+                'timeout' => $timeout,
+                'verify' => $verify,
+                'headers' => [
+                    'Connection' => 'close'
+                ],
+            ];
+            $guzzleClient = new \GuzzleHttp\Client($guzzleOptions);
+            
+            $client = new Client([
+                'url' => $transport . '://' . $host . ':' . $port,
+                'token' => $token,
+                'bucket' => $bucket,
+                'org' => $organization,
+                'precision' => WritePrecision::S,
+                'allow_redirects' => $allow_redirects,
+                'debug' => $debug,
+                'httpClient' => $guzzleClient,
+            ]);
+    
+            return $client->createWriteApi([
+                'writeType' => WriteType::BATCHING,
+                'batchSize' => $batch_size,
+                'maxRetries' => $max_retry,
+            ]);
+        } catch (\InfluxDB2\ApiException $e) {
+            Log::error('InfluxDBv2 (createFromConfig) API Exception: ' . $e->getMessage());
+        } catch (Exception|Throwable $e) {
+            Log::error('InfluxDBv2 (createFromConfig) General Exception: ' . $e->getMessage());
+        }
+    }
+
+    public static function closeClient()
+    {
+        try {
+            $writeApi = app('InfluxDBv2\Database');
+            $writeApi->close();
+        } catch (\InfluxDB2\ApiException $e) {
+            Log::error('InfluxDBv2 (closeClient) API Exception: ' . $e->getMessage());
+        } catch (Exception|Throwable $e) {
+            Log::error('InfluxDBv2 (closeClient) General Exception: ' . $e->getMessage());
+        }
     }
 
     private function forceType($data)
