@@ -216,7 +216,10 @@
         var name = e.params.data.text;
         $("#device_id").val(id);
         $("#device_name").text(name);
-        $("#nodelabel").val(name.split(".")[0].split(" ")[0]);
+        if (! $("#maplink").val()) {
+            // Update the node label if we are not linked to a map
+            $("#nodelabel").val(name.split(".")[0].split(" ")[0]);
+        }
         $("#device_image").val(e.params.data.icon);
         $("#nodeDeviceSearchRow").hide();
         $("#deviceiconimage").show();
