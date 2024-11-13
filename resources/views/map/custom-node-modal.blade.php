@@ -34,7 +34,7 @@
                             <div class="form-group row single-node" id="nodeMapLinkRow">
                                 <label for="maplink" class="col-sm-3 control-label">{{ __('map.custom.edit.node.map_link') }}</label>
                                 <div class="col-sm-9">
-                                    <select name="maplink" id="maplink" class="form-control" onchange="nodeMapLinkChange();">
+                                    <select name="maplink" id="maplink" class="form-control">
                                         <option value="" style="color:#999;">{{ __('map.custom.edit.node.map_select') }}</option>
                                         @foreach($maps as $map)
                                             <option value="{{$map->custom_map_id}}">{{$map->name}}</option>
@@ -176,14 +176,6 @@
         }
     }
 
-    function nodeMapLinkChange() {
-        if($("#maplink").val()) {
-            $("#nodeDeviceSearchRow").hide();
-        } else {
-            $("#nodeDeviceSearchRow").show();
-        }
-    }
-
     function nodeSetIcon() {
         var newcode = $("#nodeicon").val();
         $("#nodeiconpreview").text(String.fromCharCode(parseInt(newcode, 16)));
@@ -227,7 +219,6 @@
         $("#nodelabel").val(name.split(".")[0].split(" ")[0]);
         $("#device_image").val(e.params.data.icon);
         $("#nodeDeviceSearchRow").hide();
-        $("#nodeMapLinkRow").hide();
         $("#deviceiconimage").show();
         $("#nodeDeviceRow").show();
     }
@@ -241,7 +232,6 @@
         $("#nodeDeviceRow").hide();
         $("#deviceiconimage").hide();
         $("#nodeDeviceSearchRow").show();
-        $("#nodeMapLinkRow").show();
 
         // Reset device style if we were using the device image
         if(($("#nodestyle").val() == "image" || $("#nodestyle").val() == "circularImage") && !$("#nodeimage").val()){
@@ -260,14 +250,16 @@
 
         $("#node-saveButton").off("click");
 
-        if($("#device_id").val()) {
-            node.title = $("#device_id").val();
-        } else if($("#maplink").val()) {
-            node.title = "map:" + $("#maplink").val();
+        if($("#maplink").val()) {
+            node.title = "Link to map " + $("#maplink").val();
+        } else if($("#device_id").val()) {
+            node.title = "Device " + $("#device_id").val();
         } else {
             node.title = '';
         }
         // Update the node with the selected values on success and run the callback
+        node.device_id = $("#device_id").val();
+        node.linked_map_id = $("#maplink").val();
         node.label = $("#nodelabel").val();
         node.shape = $("#nodestyle").val();
         node.font.face = $("#nodetextface").val();
@@ -331,19 +323,17 @@
         $("#devicesearch").val('');
         $("#devicesearch").trigger('change');
 
-        if(nodeconf.id in node_device_map) {
+        $("#device_id").val(nodeconf.device_id || '');
+        if(nodeconf.device_id) {
             // Nodes is linked to a device
-            $("#device_id").val(node_device_map[nodeconf.id].device_id);
             $("#device_name").text(node_device_map[nodeconf.id].device_name);
             // Hide device selection row
             $("#nodeDeviceSearchRow").hide();
-            $("#nodeMapLinkRow").hide();
             // Show device image as an option
             $("#deviceiconimage").show();
             $("#device_image").val(node_device_map[nodeconf.id].device_image);
         } else {
             // Node is not linked to a device
-            $("#device_id").val("");
             $("#device_name").text("");
             // Hide the selected device row
             $("#nodeDeviceRow").hide();
@@ -351,10 +341,9 @@
             $("#deviceiconimage").hide();
             $("#device_image").val("");
         }
-        if(nodeconf.title && nodeconf.title.toString().startsWith("map:")) {
+        if(nodeconf.linked_map_id) {
             // Hide device selection row
-            $("#nodeDeviceSearchRow").hide();
-            $("#maplink").val(nodeconf.title.replace("map:",""));
+            $("#maplink").val(nodeconf.linked_map_id);
         } else {
             $("#maplink").val("");
         }
