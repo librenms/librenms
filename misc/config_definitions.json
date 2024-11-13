@@ -4645,6 +4645,10 @@
             "section": "networks",
             "order": 1
         },
+        "network_map_dependencymap_vis_options": {
+            "default": null,
+            "type": "text"
+        },
         "network_map_items": {
             "default": [
                 "xdp",
