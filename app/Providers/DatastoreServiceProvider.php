@@ -73,6 +73,7 @@ class DatastoreServiceProvider extends ServiceProvider
             return \LibreNMS\Data\Store\InfluxDB::createFromConfig();
         });
     }
+
     public function registerInfluxv2()
     {
         $this->app->singleton('InfluxDBv2\Database', function ($app) {
