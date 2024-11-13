@@ -34,7 +34,7 @@ return [
         'short' => '色散',
         'long' => '色散',
         'unit' => 'ps/nm',
-        'unit_long' => '皮秒/纳米/千米',
+        'unit_long' => '皮秒/纳米',
     ],
     'cooling' => [
         'short' => '冷却',

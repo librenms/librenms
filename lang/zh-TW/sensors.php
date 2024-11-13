@@ -33,7 +33,7 @@ return [
         'short' => '色散',
         'long' => '色散',
         'unit' => 'ps/nm',
-        'unit_long' => 'Picoseconds per Nanometer per Kilometer',
+        'unit_long' => 'Picoseconds per Nanometer',
     ],
     'cooling' => [
         'short' => 'Cooling',
