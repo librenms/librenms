@@ -921,6 +921,9 @@ foreach ($ports as $port) {
             if ($device['os'] == 'ios' || $device['os'] == 'iosxe') {
                 include 'ports/cisco-if-extension.inc.php';
             }
+
+            // Do ifOperStatus
+            include 'ports/status.inc.php';
         }
 
         // Update Database if $port['update'] is not empty

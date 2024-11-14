@@ -42,6 +42,17 @@ if (Rrd::checkRrdExists(get_port_rrdfile_path($device['hostname'], $port['port_i
     include 'includes/html/print-interface-graphs.inc.php';
     echo '</div></div>';
 
+    echo '<div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Interface Status</h3>
+            </div>';
+
+    $graph_type = 'port_status';
+
+    echo '<div class="panel-body">';
+    include 'includes/html/print-interface-graphs.inc.php';
+    echo '</div></div>';
+
     if (Rrd::checkRrdExists(get_port_rrdfile_path($device['hostname'], $port['port_id'], 'poe'))) {
         echo '<div class="panel panel-default">
             <div class="panel-heading">
