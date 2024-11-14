@@ -923,7 +923,7 @@ foreach ($ports as $port) {
             }
 
             // Do ifOperStatus
-            include 'ports/status.inc.php';
+            include 'ports/port-status.inc.php';
         }
 
         // Update Database if $port['update'] is not empty
