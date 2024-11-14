@@ -1,8 +1,8 @@
 <?php
 /**
- * procurve.inc.php
+ * CustomMapNodeImage.php
  *
- * LibreNMS sensors pre-cache discovery module for HP Procurve
+ * -Description-
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,11 +19,23 @@
  *
  * @link       https://www.librenms.org
  *
- * @copyright  2017 Neil Lathwood
- * @author     Neil Lathwood <gh+n@laf.io>
+ * @copyright  2024 Steven Wilton
+ * @author     Steven Wilton <swilton@fluentit.com.au>
  */
-echo 'hpicfSensorTable ';
-$pre_cache['procurve_hpicfSensorTable'] = snmpwalk_cache_oid($device, 'hpicfSensorTable', [], 'HP-ICF-CHASSIS', null, '-OeQUs');
 
-echo 'hpicfXcvrInfoTable ';
-$pre_cache['procurve_hpicfXcvrInfoTable'] = snmpwalk_cache_oid($device, 'hpicfXcvrInfoTable', [], 'HP-ICF-TRANSCEIVER-MIB', null, '-OeQUs');
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
+class CustomMapNodeImage extends BaseModel
+{
+    use HasFactory;
+
+    protected $primaryKey = 'custom_map_node_image_id';
+
+    public function nodes(): HasMany
+    {
+        return $this->hasMany(CustomMapNode::class, 'node_image_id');
+    }
+}

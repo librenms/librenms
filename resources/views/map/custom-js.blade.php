@@ -1,4 +1,5 @@
-<script type="text/javascript" src="{{ asset('js/vis.min.js') }}"></script>
+<script type="text/javascript" src="{{ asset('js/vis-network.min.js') }}"></script>
+<script type="text/javascript" src="{{ asset('js/vis-data.min.js') }}"></script>
 <script type="text/javascript">
     var custommap = {
         legendPctDefaultColour: function (pct) {
@@ -101,11 +102,13 @@
         },
 
         getNodeCfg: function (nodeid, node, screenshot, custom_image_base) {
+            let nodeimage_base = '{{ route('maps.nodeimage.show', ['image' => '?' ]) }}'.replace("?", "");
             var node_cfg = {};
             node_cfg.id = nodeid;
 
             if(node.device_id) {
-                node_cfg.title = node.device_info;
+                node_cfg.title = document.createElement("div");
+                node_cfg.title.innerHTML = node.device_info;
             } else if(node.linked_map_name) {
                 node_cfg.title = "Go to " + node.linked_map_name;
             } else {
@@ -127,16 +130,18 @@
             if(node.style == "image" || node.style == "circularImage") {
                 if(node.image) {
                     node_cfg.image = {unselected: custom_image_base + node.image};
+                } else if(node.nodeimage) {
+                    node_cfg.image = {unselected: nodeimage_base + node.nodeimage};
                 } else if (node.device_image) {
                     node_cfg.image = {unselected: node.device_image};
                 } else {
-                    // If we do not get a valid image from the database, use defaults
-                    node_cfg.shape = newnodeconf.shape;
-                    node_cfg.icon = newnodeconf.icon;
-                    node_cfg.image = newnodeconf.image;
+                    // Default to box if we do not get a valid image from the database
+                    node.style = 'box';
+                    node_cfg.shape = 'box';
+                    node_cfg.image = undefined;
                 }
             } else {
-                node_cfg.image = {};
+                node_cfg.image = undefined;
             }
             if(! ["ellipse", "circle", "database", "box", "text"].includes(node.style)) {
                 node_cfg.font.background = "#FFFFFF";
@@ -151,7 +156,7 @@
                 arrows = {to: {enabled: true, scaleFactor: 0.6}, from: {enabled: false}};
             }
 
-            var edge_cfg = {id: edgeid + "_" + fromto, to: edgeid + "_mid", arrows: arrows, font: {face: edge.text_face, size: edge.text_size, color: edge.text_colour, background: "#FFFFFF"}, smooth: {type: edge.style}};
+            var edge_cfg = {id: edgeid + "_" + fromto, to: edgeid + "_mid", arrows: arrows, font: {face: edge.text_face, size: edge.text_size, color: edge.text_colour, background: "#FFFFFF", align: edge.text_align || "horizontal"}, smooth: {type: edge.style}, arrowStrikethrough: false};
             if (fromto == "from") {
                 edge_cfg.from = edge.custom_map_node1_id;
                 var port_pct = Boolean(reverse_arrows) ? edge.port_topct : edge.port_frompct;
@@ -176,7 +181,8 @@
                 return {};
             }
             if(edge.port_id) {
-                edge_cfg.title = edge.port_info;
+                edge_cfg.title = document.createElement("div");
+                edge_cfg.title.innerHTML = edge.port_info;
                 if(edge.showpct) {
                     edge_cfg.label = port_pct + "%";
                 }
