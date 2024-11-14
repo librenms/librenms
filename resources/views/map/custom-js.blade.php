@@ -102,6 +102,7 @@
         },
 
         getNodeCfg: function (nodeid, node, screenshot, custom_image_base) {
+            let nodeimage_base = '{{ route('maps.nodeimage.show', ['image' => '?' ]) }}'.replace("?", "");
             var node_cfg = {};
             node_cfg.id = nodeid;
 
@@ -129,6 +130,8 @@
             if(node.style == "image" || node.style == "circularImage") {
                 if(node.image) {
                     node_cfg.image = {unselected: custom_image_base + node.image};
+                } else if(node.nodeimage) {
+                    node_cfg.image = {unselected: nodeimage_base + node.nodeimage};
                 } else if (node.device_image) {
                     node_cfg.image = {unselected: node.device_image};
                 } else {
