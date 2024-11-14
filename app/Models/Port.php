@@ -165,7 +165,7 @@ class Port extends DeviceRelatedModel
     public function scopeIsDeleted($query)
     {
         return $query->where([
-            ['deleted', 1],
+            [$this->qualifyColumn('deleted'), 1],
         ]);
     }
 
@@ -176,7 +176,7 @@ class Port extends DeviceRelatedModel
     public function scopeIsNotDeleted($query)
     {
         return $query->where([
-            ['deleted', 0],
+            [$this->qualifyColumn('deleted'), 0],
         ]);
     }
 
@@ -187,10 +187,10 @@ class Port extends DeviceRelatedModel
     public function scopeIsUp($query)
     {
         return $query->where([
-            ['deleted', '=', 0],
-            ['ignore', '=', 0],
-            ['disabled', '=', 0],
-            ['ifOperStatus', '=', 'up'],
+            [$this->qualifyColumn('deleted'), '=', 0],
+            [$this->qualifyColumn('ignore'), '=', 0],
+            [$this->qualifyColumn('disabled'), '=', 0],
+            [$this->qualifyColumn('ifOperStatus'), '=', 'up'],
         ]);
     }
 
@@ -201,11 +201,11 @@ class Port extends DeviceRelatedModel
     public function scopeIsDown($query)
     {
         return $query->where([
-            ['deleted', '=', 0],
-            ['ignore', '=', 0],
-            ['disabled', '=', 0],
-            ['ifOperStatus', '!=', 'up'],
-            ['ifAdminStatus', '=', 'up'],
+            [$this->qualifyColumn('deleted'), '=', 0],
+            [$this->qualifyColumn('ignore'), '=', 0],
+            [$this->qualifyColumn('disabled'), '=', 0],
+            [$this->qualifyColumn('ifOperStatus'), '!=', 'up'],
+            [$this->qualifyColumn('ifAdminStatus'), '=', 'up'],
         ]);
     }
 
@@ -216,10 +216,10 @@ class Port extends DeviceRelatedModel
     public function scopeIsShutdown($query)
     {
         return $query->where([
-            ['deleted', '=', 0],
-            ['ignore', '=', 0],
-            ['disabled', '=', 0],
-            ['ifAdminStatus', '=', 'down'],
+            [$this->qualifyColumn('deleted'), '=', 0],
+            [$this->qualifyColumn('ignore'), '=', 0],
+            [$this->qualifyColumn('disabled'), '=', 0],
+            [$this->qualifyColumn('ifAdminStatus'), '=', 'down'],
         ]);
     }
 
@@ -230,8 +230,8 @@ class Port extends DeviceRelatedModel
     public function scopeIsIgnored($query)
     {
         return $query->where([
-            ['deleted', '=', 0],
-            ['ignore', '=', 1],
+            [$this->qualifyColumn('deleted'), '=', 0],
+            [$this->qualifyColumn('ignore'), '=', 1],
         ]);
     }
 
@@ -242,8 +242,8 @@ class Port extends DeviceRelatedModel
     public function scopeIsDisabled($query)
     {
         return $query->where([
-            ['deleted', '=', 0],
-            ['disabled', '=', 1],
+            [$this->qualifyColumn('deleted'), '=', 0],
+            [$this->qualifyColumn('disabled'), '=', 1],
         ]);
     }
 
@@ -254,13 +254,13 @@ class Port extends DeviceRelatedModel
     public function scopeHasErrors($query)
     {
         return $query->where([
-            ['deleted', '=', 0],
-            ['ignore', '=', 0],
-            ['disabled', '=', 0],
+            [$this->qualifyColumn('deleted'), '=', 0],
+            [$this->qualifyColumn('ignore'), '=', 0],
+            [$this->qualifyColumn('disabled'), '=', 0],
         ])->where(function ($query) {
             /** @var Builder $query */
-            $query->where('ifInErrors_delta', '>', 0)
-                ->orWhere('ifOutErrors_delta', '>', 0);
+            $query->where($this->qualifyColumn('ifInErrors_delta'), '>', 0)
+                ->orWhere($this->qualifyColumn('ifOutErrors_delta'), '>', 0);
         });
     }
 
@@ -271,8 +271,8 @@ class Port extends DeviceRelatedModel
     public function scopeIsValid($query)
     {
         return $query->where([
-            ['deleted', '=', 0],
-            ['disabled', '=', 0],
+            [$this->qualifyColumn('deleted'), '=', 0],
+            [$this->qualifyColumn('disabled'), '=', 0],
         ]);
     }
 
@@ -286,7 +286,7 @@ class Port extends DeviceRelatedModel
         return $query->whereIn($query->qualifyColumn('port_id'), function ($query) use ($portGroup) {
             $query->select('port_id')
                 ->from('port_group_port')
-                ->where('port_group_id', $portGroup);
+                ->where($this->qualifyColumn('port_group_id'), $portGroup);
         });
     }
 
