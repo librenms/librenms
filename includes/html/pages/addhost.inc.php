@@ -81,7 +81,7 @@ if (! empty($_POST['hostname'])) {
             } catch (HostUnreachableException $e) {
                 print_error($e->getMessage());
                 foreach ($e->getReasons() as $reason) {
-                    print_error($reason);
+                    print_error(htmlentities($reason));
                 }
             } catch (Exception $e) {
                 print_error($e->getMessage());
