@@ -28,6 +28,7 @@ namespace App\Http\Controllers\Maps;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CustomMapSettingsRequest;
 use App\Models\CustomMap;
+use App\Models\CustomMapNodeImage;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -257,6 +258,12 @@ class CustomMapController extends Controller
                 $images[$file] = $image_translations[$filename] ?? ucwords(str_replace(['-', '_'], [' - ', ' '], $filename));
             }
         }
+
+        foreach (CustomMapNodeImage::all() as $image) {
+            $images[$image->custom_map_node_image_id] = $image->name;
+        }
+
+        asort($images);
 
         return $images;
     }
