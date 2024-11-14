@@ -8,12 +8,12 @@
                     "sysDescr": "Linux localhost.localdomain 2.6.37.6-lsp-3.2.5_stm24_0012-spear3xx #105 Mon Dec 24 14:49:28 CST 2018 armv5tejl",
                     "sysContact": "<private>",
                     "version": "7.20",
-                    "hardware": null,
+                    "hardware": "MODULYS GP 2.0",
                     "features": null,
                     "location": "<private>",
                     "os": "netvision-rfc",
                     "type": "power",
-                    "serial": null,
+                    "serial": "PD04405001",
                     "icon": "netvision.png"
                 }
             ]

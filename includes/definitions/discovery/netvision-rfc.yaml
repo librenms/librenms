@@ -1,4 +1,15 @@
+mib: SOCOMECUPS-MIB
 modules:
     os:
-        version: UPS-MIB::upsIdentAgentSoftwareVersion.0
+        hardware:
+            - SOCOMECPDU-MIB::dpduIdentModel.0
+            - SOCOMECUPS-MIB::upsIdentModel.0
+        serial:
+            - SOCOMECPDU-MIB::dpduIdentSerialNumber.0
+            - SOCOMECUPS-MIB::upsIdentSerialNumber.0
+        version:
+            - SOCOMECPDU-MIB::dpduIdentPDUFirmwareVersion.0
+            - SOCOMECPDU-MIB::dpduIdentAgentSoftwareVersion.0
+            - SOCOMECUPS-MIB::upsIdentAgentSoftwareVersion.0
+            - UPS-MIB::upsIdentAgentSoftwareVersion.0
         version_regex: '/v(?<version>[\d.]+)/'
