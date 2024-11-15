@@ -1,4 +1,4 @@
-[![Test Status](https://github.com/librenms/librenms/actions/workflows/test.yml/badge.svg?branch=master&event=push)](https://github.com/librenms/librenms/actions/workflows/test.yml?query=event%3Apush+branch%3Amaster) [![Gurubase](https://img.shields.io/badge/Gurubase-Ask%20LibreNMS%20Guru-006BFF)](https://gurubase.io/g/librenms)
+[![Test Status](https://github.com/librenms/librenms/actions/workflows/test.yml/badge.svg?branch=master&event=push)](https://github.com/librenms/librenms/actions/workflows/test.yml?query=event%3Apush+branch%3Amaster)
 
 Introduction
 ------------
@@ -22,6 +22,7 @@ Documentation
 
 Documentation can be found in the [doc directory][5] or [docs.librenms.org][16], including instructions
 for installing and contributing.
+You can also [Ask LibreNMS Guru](https://gurubase.io/g/librenms), it is LibreNMS-focused AI to answer your questions.
 
 
 Participating
