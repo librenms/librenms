@@ -103,11 +103,7 @@ class Vrp extends OS implements
         $ifIndexToPortId = $this->getDevice()->ports()->pluck('port_id', 'ifIndex');
 
         // EntityPhysicalIndex to ifIndex
-        $entityToIfIndex = \SnmpQuery::walk('ENTITY-MIB::entAliasMappingIdentifier')->mapTable(function ($data, $entPhysicalIndex) {
-            preg_match('/\d+/', $data['ENTITY-MIB::entAliasMappingIdentifier'], $matches);
-            if (empty($matches[0])) {
-                return null;
-            }
+        $entityToIfIndex = $this->getIfIndexEntPhysicalMap();
 
             return ['entIndex' => $entPhysicalIndex, 'ifIndex' => $matches[0]];
         })->pluck('ifIndex', 'entIndex');
