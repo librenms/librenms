@@ -118,7 +118,7 @@ class Vrp extends OS implements
 
             // Handle cases where required data might not be available (fallback to null)
             $cable = $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalConnectType'] ?? null;
-            $distance = $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalDistance'] ?? null;
+            $distance = $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalDistance'] ?? $data['hwEntityOpticalTransferDistance'] ?? null;
             $wavelength = $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalWaveLengthExact'] ?? null;
             $ifIndex = $entityToIfIndex[$entIndex];
             $port_id = $ifIndexToPortId->get($ifIndex) ?? null;
