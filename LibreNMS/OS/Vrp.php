@@ -144,7 +144,7 @@ class Vrp extends OS implements
                 'model' => $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalVenderPn'] ?? null,
                 'serial' => $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalVendorSn'] ?? null,
                 'cable' => $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalMode'] ?? null,
-              //  'distance' => $data['HUAWEI-ENTITY-EXTENT-MIB:hwEntityOpticalTransferDistance'] ?? null,
+                //'distance' => $data['HUAWEI-ENTITY-EXTENT-MIB:hwEntityOpticalTransferDistance'] ?? null,
                 'wavelength' => $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalWaveLengthExact'] ?? null,
                 'entity_physical_index' => $entIndex,
             ]);
