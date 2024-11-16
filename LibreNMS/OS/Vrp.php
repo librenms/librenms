@@ -105,9 +105,6 @@ class Vrp extends OS implements
         // EntityPhysicalIndex to ifIndex
         $entityToIfIndex = $this->getIfIndexEntPhysicalMap();
 
-            return ['entIndex' => $entPhysicalIndex, 'ifIndex' => $matches[0]];
-        })->pluck('ifIndex', 'entIndex');
-
         // Walk through the MIB table for transceiver information
         return \SnmpQuery::walk('HUAWEI-ENTITY-EXTENT-MIB::hwOpticalModuleInfoTable')->mapTable(function ($data, $entIndex) use ($entityToIfIndex, $ifIndexToPortId) {
             // Skip inactive transceivers
