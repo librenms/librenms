@@ -121,7 +121,7 @@ class Vrp extends OS implements
             $distance = $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalDistance'] ?? null;
             $wavelength = $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalWaveLengthExact'] ?? null;
             //$description = $data['IF-MIB::ifDescr'] ?? null;
-            $ifIndex = $entityToIfIndex->get($entIndex);
+            $ifIndex = $entityToIfIndex[$entIndex];
             $port_id = $ifIndexToPortId->get($ifIndex) ?? null;
             if (is_null($port_id)) {
                 // Invalid
