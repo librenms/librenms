@@ -117,7 +117,7 @@ class Vrp extends OS implements
             }
 
             // Handle cases where required data might not be available (fallback to null)
-            $cable = $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalCableType'] ?? null;
+            $cable = $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalConnectType'] ?? null;
             $distance = $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalDistance'] ?? null;
             $wavelength = $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalWaveLengthExact'] ?? null;
             $ifIndex = $entityToIfIndex[$entIndex];
@@ -129,10 +129,10 @@ class Vrp extends OS implements
 
             // Create a new Transceiver object with the retrieved data
             return new Transceiver([
-                'port_id' => $ifIndexToPortId->get($ifIndex),  // Map ifIndex to port_id
+                'port_id' => $port_id,
                 'index' => $entIndex,
                 'vendor' => $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalVenderName'] ?? null,
-                'type' => $data['HUAWEI-ENTITY-EXTENT-MIB::transceiveType'] ?? null,
+                'type' => $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalTransType'] ?? $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityPortType'] ?? null,
                 'model' => $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalVenderPn'] ?? null,
                 'serial' => $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalVendorSn'] ?? null,
                 'cable' => $cable,
