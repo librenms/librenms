@@ -120,7 +120,6 @@ class Vrp extends OS implements
             $cable = $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalCableType'] ?? null;
             $distance = $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalDistance'] ?? null;
             $wavelength = $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalWaveLengthExact'] ?? null;
-            //$description = $data['IF-MIB::ifDescr'] ?? null;
             $ifIndex = $entityToIfIndex[$entIndex];
             $port_id = $ifIndexToPortId->get($ifIndex) ?? null;
             if (is_null($port_id)) {
@@ -136,9 +135,9 @@ class Vrp extends OS implements
                 'type' => $data['HUAWEI-ENTITY-EXTENT-MIB::transceiveType'] ?? null,
                 'model' => $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalVenderPn'] ?? null,
                 'serial' => $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalVendorSn'] ?? null,
-                'cable' => $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalMode'] ?? null,
-                //'distance' => $data['HUAWEI-ENTITY-EXTENT-MIB:hwEntityOpticalTransferDistance'] ?? null,
-                'wavelength' => $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalWaveLengthExact'] ?? null,
+                'cable' => $cable;
+                'distance' => $distance;
+                'wavelength' => $wavelength;
                 'entity_physical_index' => $entIndex,
             ]);
         })->filter();  // Filter out null values
