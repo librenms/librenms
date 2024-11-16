@@ -120,7 +120,7 @@ class Vrp extends OS implements
             $cable = $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalConnectType'] ?? null;
             $distance = $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalTransferDistance'] ?? null;
             if (preg_match_all("/(([0-9]+)\([^\)]+\))+/i", $distance ?? '', $matches)) {
-                $distance = max($matches[2]) ?? null;
+                $distance = intval(max($matches[2])) ?? null;
             }
             $wavelength = $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalWaveLengthExact'] ?? null;
             $ifIndex = $entityToIfIndex[$entIndex];
