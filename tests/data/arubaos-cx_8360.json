@@ -16084,34 +16084,6 @@
             ]
         }
     },
-    "discovery-protocols": {
-        "discovery": {
-            "links": [
-                {
-                    "active": 1,
-                    "protocol": "lldp",
-                    "remote_hostname": "<private>",
-                    "remote_port": "1/1/1 (ec6794504d00)",
-                    "remote_platform": null,
-                    "remote_version": "Aruba JL721C  LL.10.13.1040",
-                    "ifAlias": "ISL-lag1-1",
-                    "ifDescr": "1/1/1",
-                    "ifName": "1/1/1"
-                },
-                {
-                    "active": 1,
-                    "protocol": "lldp",
-                    "remote_hostname": "<private>",
-                    "remote_port": "1/1/2 (ec6794504d00)",
-                    "remote_platform": null,
-                    "remote_version": "Aruba JL721C  LL.10.13.1040",
-                    "ifAlias": "ISL-lag1-2",
-                    "ifDescr": "1/1/2",
-                    "ifName": "1/1/2"
-                }
-            ]
-        }
-    },
     "vlans": {
         "discovery": {
             "vlans": [
