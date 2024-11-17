@@ -147,6 +147,13 @@ class Vrp extends OS implements
             $type = $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalType'] ?? null;
             $typeToDesc = ['unknown', 'sc', 'gbic', 'sfp', 'esfp', 'rj45', 'xfp', 'xenpak', 'transponder', 'cfp', 'smb', 'sfpplus', 'cxp', 'qsfp', 'qsfpplus', 'cfp2', 'dwdmsfp', 'msa100glh', 'gps', 'csfp', 'cfp4', 'qsfp28', 'sfpsfpplus', 'gponsfp', 'cfp8', 'sfp28', 'qsfpdd', 'cfp2dco', 'sfp56', 'qsfp56', 'oa'];
 
+            $mode = $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalMode'] ?? '';
+            $modeToText[1] = 'singleMode';
+            $modeToText[2] = 'multiMode5';
+            $modeToText[3] = 'multiMode6';
+            if (isset($modeToText[$mode])) {
+                $mode = " " . $modeToText[$mode];
+            }
             if (! is_null($type) && isset($typeToDesc[$type])) {
                 $type = $typeToDesc[$type];
             }
@@ -155,6 +162,9 @@ class Vrp extends OS implements
                 $type .= " ($entityType)";
             } else {
                 $type = $type ?? $entityType;
+            }
+            if (! is_null($type)) {
+                $type .= $mode;
             }
 
             // Create a new Transceiver object with the retrieved data
