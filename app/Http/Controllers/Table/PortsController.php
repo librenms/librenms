@@ -168,7 +168,7 @@ class PortsController extends TableController
             'ifInErrors_delta' => $port->poll_period ? Number::formatSi($port->ifInErrors_delta / $port->poll_period, 2, 3, 'EPS') : '',
             'ifOutErrors_delta' => $port->poll_period ? Number::formatSi($port->ifOutErrors_delta / $port->poll_period, 2, 3, 'EPS') : '',
             'ifType' => Rewrite::normalizeIfType($port->ifType),
-            'ifAlias' => $port->ifAlias,
+            'ifAlias' => htmlentities($port->ifAlias),
             'actions' => (string) view('port.actions', ['port' => $port]),
         ];
     }
