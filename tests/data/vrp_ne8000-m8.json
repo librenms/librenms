@@ -14097,7 +14097,7 @@
                     "encoding": null,
                     "cable": null,
                     "distance": 10,
-                    "wavelength": null,
+                    "wavelength": 1200,
                     "connector": null,
                     "channels": 1,
                     "ifIndex": 16
@@ -14116,7 +14116,7 @@
                     "encoding": null,
                     "cable": null,
                     "distance": 10,
-                    "wavelength": null,
+                    "wavelength": 1200,
                     "connector": null,
                     "channels": 1,
                     "ifIndex": 17
@@ -14135,7 +14135,7 @@
                     "encoding": null,
                     "cable": null,
                     "distance": 10,
-                    "wavelength": null,
+                    "wavelength": 1200,
                     "connector": null,
                     "channels": 1,
                     "ifIndex": 23
@@ -14154,7 +14154,7 @@
                     "encoding": null,
                     "cable": null,
                     "distance": 10,
-                    "wavelength": null,
+                    "wavelength": 1200,
                     "connector": null,
                     "channels": 1,
                     "ifIndex": 25

@@ -3813,7 +3813,7 @@
                     "encoding": null,
                     "cable": null,
                     "distance": 20000,
-                    "wavelength": null,
+                    "wavelength": 1310,
                     "connector": null,
                     "channels": 1,
                     "ifIndex": 7
