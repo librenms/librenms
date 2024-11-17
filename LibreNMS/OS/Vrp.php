@@ -125,9 +125,18 @@ class Vrp extends OS implements
                 $distance = intval($distance);
             }
             if ($distance <= 0) {
+                $distance = $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalTransDistance'] ?? 0;
+            }
+            if ($distance <= 0) {
                 $distance = null;
             }
-            $wavelength = $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalWaveLengthExact'] ?? null;
+            $wavelength = $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalWaveLengthExact'] ?? 0;
+            if ($wavelength <= 0) {
+                $wavelength = $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalWaveLength'] ?? 0;
+            }
+            if ($wavelength <= 0) {
+                $wavelength = null;
+            }
             $ifIndex = $entityToIfIndex[$entIndex];
             $port_id = $ifIndexToPortId->get($ifIndex) ?? null;
             if (is_null($port_id)) {
@@ -135,12 +144,35 @@ class Vrp extends OS implements
                 return null;
             }
 
+            $type = $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalType'] ?? null;
+            $typeToDesc = ['unknown', 'sc', 'gbic', 'sfp', 'esfp', 'rj45', 'xfp', 'xenpak', 'transponder', 'cfp', 'smb', 'sfpplus', 'cxp', 'qsfp', 'qsfpplus', 'cfp2', 'dwdmsfp', 'msa100glh', 'gps', 'csfp', 'cfp4', 'qsfp28', 'sfpsfpplus', 'gponsfp', 'cfp8', 'sfp28', 'qsfpdd', 'cfp2dco', 'sfp56', 'qsfp56', 'oa'];
+
+            $mode = $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalMode'] ?? '';
+            $modeToText[1] = 'singleMode';
+            $modeToText[2] = 'multiMode5';
+            $modeToText[3] = 'multiMode6';
+            if (isset($modeToText[$mode])) {
+                $mode = ' ' . $modeToText[$mode];
+            }
+            if (! is_null($type) && isset($typeToDesc[$type])) {
+                $type = $typeToDesc[$type];
+            }
+            $entityType = $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalTransType'] ?? null;
+            if (! is_null($type) && ! is_null($entityType)) {
+                $type .= " ($entityType)";
+            } else {
+                $type = $type ?? $entityType;
+            }
+            if (! is_null($type)) {
+                $type .= $mode;
+            }
+
             // Create a new Transceiver object with the retrieved data
             return new Transceiver([
                 'port_id' => $port_id,
                 'index' => $entIndex,
                 'vendor' => $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalVenderName'] ?? null,
-                'type' => $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalTransType'] ?? $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityPortType'] ?? null,
+                'type' => $type,
                 'model' => $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalVenderPn'] ?? null,
                 'serial' => $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalVendorSn'] ?? null,
                 'cable' => $cable,

@@ -3812,8 +3812,8 @@
                     "ddm": null,
                     "encoding": null,
                     "cable": null,
-                    "distance": null,
-                    "wavelength": null,
+                    "distance": 20000,
+                    "wavelength": 1310,
                     "connector": null,
                     "channels": 1,
                     "ifIndex": 7

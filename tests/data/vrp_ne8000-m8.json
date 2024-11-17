@@ -14086,7 +14086,7 @@
                 {
                     "index": "17305857",
                     "entity_physical_index": 17305857,
-                    "type": null,
+                    "type": "sfpplus multiMode6",
                     "vendor": "OEM",
                     "oui": null,
                     "model": "CAB-AOC-10GSFP-P",
@@ -14096,8 +14096,8 @@
                     "ddm": null,
                     "encoding": null,
                     "cable": null,
-                    "distance": null,
-                    "wavelength": null,
+                    "distance": 10,
+                    "wavelength": 1200,
                     "connector": null,
                     "channels": 1,
                     "ifIndex": 16
@@ -14105,7 +14105,7 @@
                 {
                     "index": "17305858",
                     "entity_physical_index": 17305858,
-                    "type": null,
+                    "type": "sfpplus multiMode6",
                     "vendor": "OEM",
                     "oui": null,
                     "model": "CAB-AOC-10GSFP-P",
@@ -14115,8 +14115,8 @@
                     "ddm": null,
                     "encoding": null,
                     "cable": null,
-                    "distance": null,
-                    "wavelength": null,
+                    "distance": 10,
+                    "wavelength": 1200,
                     "connector": null,
                     "channels": 1,
                     "ifIndex": 17
@@ -14124,7 +14124,7 @@
                 {
                     "index": "17305864",
                     "entity_physical_index": 17305864,
-                    "type": null,
+                    "type": "sfpplus multiMode6",
                     "vendor": "OEM",
                     "oui": null,
                     "model": "CAB-AOC-10GSFP-P",
@@ -14134,8 +14134,8 @@
                     "ddm": null,
                     "encoding": null,
                     "cable": null,
-                    "distance": null,
-                    "wavelength": null,
+                    "distance": 10,
+                    "wavelength": 1200,
                     "connector": null,
                     "channels": 1,
                     "ifIndex": 23
@@ -14143,7 +14143,7 @@
                 {
                     "index": "17305866",
                     "entity_physical_index": 17305866,
-                    "type": null,
+                    "type": "sfpplus multiMode6",
                     "vendor": "OEM",
                     "oui": null,
                     "model": "CAB-AOC-10GSFP-P",
@@ -14153,8 +14153,8 @@
                     "ddm": null,
                     "encoding": null,
                     "cable": null,
-                    "distance": null,
-                    "wavelength": null,
+                    "distance": 10,
+                    "wavelength": 1200,
                     "connector": null,
                     "channels": 1,
                     "ifIndex": 25
