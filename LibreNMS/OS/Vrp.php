@@ -152,7 +152,7 @@ class Vrp extends OS implements
             $modeToText[2] = 'multiMode5';
             $modeToText[3] = 'multiMode6';
             if (isset($modeToText[$mode])) {
-                $mode = " " . $modeToText[$mode];
+                $mode = ' ' . $modeToText[$mode];
             }
             if (! is_null($type) && isset($typeToDesc[$type])) {
                 $type = $typeToDesc[$type];
