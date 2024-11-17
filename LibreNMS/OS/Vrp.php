@@ -135,12 +135,25 @@ class Vrp extends OS implements
                 return null;
             }
 
+            $type = $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalType'] ?? null;
+            $typeToDesc = ['unknown', 'sc', 'gbic', 'sfp', 'esfp', 'rj45', 'xfp', 'xenpak', 'transponder', 'cfp', 'smb', 'sfpplus', 'cxp', 'qsfp', 'qsfpplus', 'cfp2', 'dwdmsfp', 'msa100glh', 'gps', 'csfp', 'cfp4', 'qsfp28', 'sfpsfpplus', 'gponsfp', 'cfp8', 'sfp28', 'qsfpdd', 'cfp2dco', 'sfp56', 'qsfp56', 'oa'];
+
+            if (! is_null($type) && isset($typeToDesc[$type])) {
+                $type = $typeToDesc[$type];
+            }
+            $entityType = $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalTransType'] ?? null;
+            if (! is_null($type) && ! is_null($entityType)) {
+                $type .= " ($entityType)";
+            } else {
+                $type = $type ?? $entityType;
+            }
+
             // Create a new Transceiver object with the retrieved data
             return new Transceiver([
                 'port_id' => $port_id,
                 'index' => $entIndex,
                 'vendor' => $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalVenderName'] ?? null,
-                'type' => $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalTransType'] ?? $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityPortType'] ?? null,
+                'type' => $type,
                 'model' => $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalVenderPn'] ?? null,
                 'serial' => $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalVendorSn'] ?? null,
                 'cable' => $cable,
