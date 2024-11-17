@@ -3812,7 +3812,7 @@
                     "ddm": null,
                     "encoding": null,
                     "cable": null,
-                    "distance": null,
+                    "distance": 20000,
                     "wavelength": null,
                     "connector": null,
                     "channels": 1,

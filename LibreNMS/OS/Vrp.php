@@ -125,6 +125,9 @@ class Vrp extends OS implements
                 $distance = intval($distance);
             }
             if ($distance <= 0) {
+                $distance = $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalTransDistance'] ?? 0;
+            }
+            if ($distance <= 0) {
                 $distance = null;
             }
             $wavelength = $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalWaveLengthExact'] ?? null;
