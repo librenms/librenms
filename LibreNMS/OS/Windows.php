@@ -35,12 +35,12 @@ class Windows extends \LibreNMS\OS
     public function discoverOS(Device $device): void
     {
         if (preg_match('/Hardware: (?<hardware>.*) +- Software: .* Version (?<nt>\S+) +\(Build( Number:)? (?<build>\S+) (?<smp>\S+)/', $device->sysDescr, $matches)) {
-            $device->hardware = $this->parseHardware($matches['hardware'] ?? null);
-            $device->features = $matches['smp'] ?? null;
+            $device->hardware = $this->parseHardware($matches['hardware']);
+            $device->features = $matches['smp'] ?: null;
 
-            $build = $matches['build'] ?? null;
+            $build = $matches['build'];
             if ($device->sysObjectID == '.1.3.6.1.4.1.311.1.1.3.1.1') {
-                $device->version = $this->getClientVersion($build, $matches['version'] ?? null);
+                $device->version = $this->getClientVersion($build, $matches['nt']);
             } elseif ($device->sysObjectID == '.1.3.6.1.4.1.311.1.1.3.1.2') {
                 $device->version = $this->getServerVersion($build);
             } elseif ($device->sysObjectID == '.1.3.6.1.4.1.311.1.1.3.1.3') {
@@ -51,7 +51,7 @@ class Windows extends \LibreNMS\OS
         $this->discoverServerHardware();
     }
 
-    private function parseHardware($processor)
+    private function parseHardware(string $processor): ?string
     {
         preg_match('/(?<generic>\S+) Family (?<family>\d+) Model (?<model>\d+) Stepping (?<stepping>\d+)/', $processor, $matches);
 
@@ -66,10 +66,10 @@ class Windows extends \LibreNMS\OS
         return $generic[$matches['generic']] ?? null;
     }
 
-    private function getClientVersion($build, $version)
+    private function getClientVersion(string $build, string $version): ?string
     {
         $default = $build > 10000 ? '10 (NT 6.3)' : null;
-        $default = $build > 22000 ? '11 Insider (NT 6.3)' : null;
+        $default = $build > 22000 ? '11 Insider (NT 6.3)' : $default;
 
         $builds = [
             '26100' => '11 (24H2)',
@@ -107,7 +107,7 @@ class Windows extends \LibreNMS\OS
         return $builds[$build] ?? $default;
     }
 
-    private function getServerVersion($build)
+    private function getServerVersion(string $build): ?string
     {
         $builds = [
             '20348' => 'Server 2022 (21H2)',
@@ -130,7 +130,7 @@ class Windows extends \LibreNMS\OS
         return $builds[$build] ?? null;
     }
 
-    private function getDatacenterVersion($build)
+    private function getDatacenterVersion(string $build): ?string
     {
         $builds = [
             '20348' => 'Server 2022 Datacenter (21H2)',

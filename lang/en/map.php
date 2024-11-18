@@ -14,6 +14,17 @@ return [
             'loading' => 'Loading data',
             'no_devices' => 'No devices found',
         ],
+        'nodeimage' => [
+            'delete' => 'Delete Image',
+            'upload' => 'Upload Image',
+            'name' => 'Image Name',
+            'new' => 'New Image',
+            'title' => [
+                'edit' => 'Edit Node Image',
+                'manage' => 'Manage Node Images',
+                'new' => 'New Node Image',
+            ],
+        ],
         'edit' => [
             'text_font' => 'Text Font',
             'text_size' => 'Text Size',
