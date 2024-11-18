@@ -49,6 +49,8 @@ class TranslationGenerateCommand extends LnmsCommand
             $this->updateManifest();
         }
 
+        \Artisan::call('lang:generate', ['--type' => 'json', '--append' => true]);
+
         return 0;
     }
 

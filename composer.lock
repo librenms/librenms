@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "fee5d24447dced4397e26066f8c9ee59",
+    "content-hash": "b4632255bdaf373b61f8d12bf856a264",
     "packages": [
         {
             "name": "amenadiel/jpgraph",
@@ -1472,6 +1472,62 @@
                 }
             ],
             "time": "2023-10-12T05:21:21+00:00"
+        },
+        {
+            "name": "glebsky/laravel-lang-generator",
+            "version": "1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Glebsky/laravel-lang-generator.git",
+                "reference": "91d6a9e0e8045c999a4496649e9670425f637f38"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Glebsky/laravel-lang-generator/zipball/91d6a9e0e8045c999a4496649e9670425f637f38",
+                "reference": "91d6a9e0e8045c999a4496649e9670425f637f38",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/collections": ">=8.0.0",
+                "illuminate/console": ">=5.1",
+                "php": "^7.3|^8.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Glebsky\\LaravelLangGenerator\\LaravelLangGeneratorServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Glebsky\\LaravelLangGenerator\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "glebsky",
+                    "email": "laosdeveloper@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Searches for multilingual phrases in Laravel project and automatically generates language files for you.",
+            "keywords": [
+                "automatic translation",
+                "language",
+                "laravel",
+                "translation"
+            ],
+            "support": {
+                "issues": "https://github.com/Glebsky/laravel-lang-generator/issues",
+                "source": "https://github.com/Glebsky/laravel-lang-generator/tree/1.0.1"
+            },
+            "time": "2021-12-20T00:00:00+00:00"
         },
         {
             "name": "graham-campbell/result-type",
@@ -14749,6 +14805,6 @@
         "ext-xml": "*",
         "ext-zlib": "*"
     },
-    "platform-dev": [],
+    "platform-dev": {},
     "plugin-api-version": "2.6.0"
 }

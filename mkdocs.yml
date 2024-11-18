@@ -266,6 +266,7 @@ nav:
       - Code Structure: Developing/Code-Structure.md
       - Creating Documentation: Developing/Creating-Documentation.md
       - Component: Extensions/Component.md
+      - Translations: Developing/Translations.md
     - Support for a new OS:
       - Intro: Developing/Support-New-OS.md
       - Initial Detection: Developing/os/Initial-Detection.md

@@ -1074,3 +1074,25 @@ lnms config:set api.cors.allowheaders '["Origin", "X-Requested-With", "Content-T
 lnms config:set api.cors.exposeheaders '["Cache-Control", "Content-Language", "Content-Type", "Expires", "Last-Modified", "Pragma"]'
 lnms config:set api.cors.allowcredentials false
 ```
+
+## Translations / Languages
+
+LibreNMS currently supports the following translations:
+
+- Brazilian Portuguese (pt-BR)
+- Chinese (zh-CN)
+- English (en)
+- French (fr)
+- German (de)
+- Italian (it)
+- Russian (ru)
+- Serbian (sr)
+- Traditional Chinese (zh-TW)
+- Ukrainian (uk)
+
+To configure an alternative translation for your install, please add the following to your `.env` file on your 
+web server:
+
+APP_LOCALE=en
+
+If you are able to add other translations then please take a look at [Translations](../Developing/Translations.md)
