@@ -1,23 +1,35 @@
 <?php
-
+use LibreNMS\Data\Store\Rrd;
 require 'includes/html/graphs/common.inc.php';
 
-$rrd_options .= " COMMENT:'                      Min    Last    Max\\n'";
+$sensor['sensor_descr_fixed'] = Rrd::fixedSafeDescr($sensor['sensor_descr'], 25);
 
-$sensor['sensor_descr_fixed'] = \LibreNMS\Data\Store\Rrd::fixedSafeDescr($sensor['sensor_descr'], 15);
-
-$rrd_options .= " DEF:sensor=$rrd_filename:sensor:AVERAGE";
-$rrd_options .= " DEF:sensor_max=$rrd_filename:sensor:MAX";
-$rrd_options .= " DEF:sensor_min=$rrd_filename:sensor:MIN";
-$rrd_options .= " LINE1.5:sensor#cc0000:'" . $sensor['sensor_descr_fixed'] . "'";
-$rrd_options .= " GPRINT:sensor_min$current_id:MIN:%4.1lf";
-$rrd_options .= ' GPRINT:sensor:LAST:%4.1lf';
-$rrd_options .= ' GPRINT:sensor_max:MAX:%4.1lf\\l';
-
-if (is_numeric($sensor['sensor_limit'])) {
-    $rrd_options .= ' HRULE:' . $sensor['sensor_limit'] . '#999999::dashes';
-}
-
+$rrd_options .= ' --vertical-label "'.ucfirst($sensor['sensor_class']).'"';
+$rrd_options .= ' --left-axis-format "%5.1lf%%"';
+$rrd_options .= ' DEF:sensor='.$rrd_filename.':sensor:AVERAGE';
+$rrd_options .= ' DEF:sensor_max='.$rrd_filename.':sensor:MAX';
+$rrd_options .= ' DEF:sensor_min='.$rrd_filename.':sensor:MIN';
+$rrd_options .= ' AREA:sensor_max#c5c5c5';
+$rrd_options .= ' AREA:sensor_min#ffffffff';
+$rrd_options .= ' COMMENT:"Alert tresholds\:"';
 if (is_numeric($sensor['sensor_limit_low'])) {
-    $rrd_options .= ' HRULE:' . $sensor['sensor_limit_low'] . '#999999::dashes';
+    $rrd_options .= ' LINE1.5:'.$sensor['sensor_limit_low'].'#00008b:"low = '.$sensor['sensor_limit_low'].'%":dashes';
 }
+if (is_numeric($sensor['sensor_limit_low_warn'])) {
+    $rrd_options .= ' LINE1.5:'.$sensor['sensor_limit_low_warn'].'#005bdf:"warn low = '.$sensor['sensor_limit_low_warn'].'%":dashes';
+}
+if (is_numeric($sensor['sensor_limit_warn'])) {
+    $rrd_options .= ' LINE1.5:'.$sensor['sensor_limit_warn'].'#ffa420:"warn high = '.$sensor['sensor_limit_warn'].'%":dashes';
+}
+if (is_numeric($sensor['sensor_limit'])) {
+	$rrd_options .= ' LINE1.5:'.$sensor['sensor_limit'].'#ff0000:"high = '.$sensor['sensor_limit'].'%":dashes';
+}
+
+$rrd_options .= ' COMMENT:"\n"';
+
+$rrd_options .= ' COMMENT:"'.Rrd::fixedSafeDescr('', 25).'     Now      Avg     Min     Max\n"';
+$rrd_options .= ' LINE2:sensor#000000:"' . $sensor['sensor_descr_fixed'] . '"';
+$rrd_options .= ' GPRINT:sensor:LAST:%5.1lf%%';
+$rrd_options .= ' GPRINT:sensor:AVERAGE:%5.1lf%%';
+$rrd_options .= ' GPRINT:sensor:MIN:%5.1lf%%';
+$rrd_options .= ' GPRINT:sensor:MAX:%5.1lf%%\\l';
