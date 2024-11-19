@@ -4,7 +4,7 @@
 
 This is currently well documented within the doc folder of the installation files.
 
-Please see the following [doc](/Installation/Install-LibreNMS.md)
+Please see the following [doc](../Installation/Install-LibreNMS.md)
 
 ### <a name="faq2"> How do I add a device?</a>
 
