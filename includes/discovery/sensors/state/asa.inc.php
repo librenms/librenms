@@ -33,15 +33,9 @@ if (is_array($temp)) {
 
         foreach ($temp as $index => $entry) {
             $descr = ucwords(trim(preg_replace('/\s*\([^\s)]*\)/', '', $temp[$index]['cfwHardwareInformation'])));
-            if ($index == 'netInterface') {
-                $index = 4;
-            } elseif ($index == 'primaryUnit') {
-                $index = 6;
-            } elseif ($index == 'secondaryUnit') {
-                $index = 7;
-            }
+
             //Discover Sensors
-            discover_sensor(null, 'state', $device, $cur_oid . $index, $index, $state_name, $descr, 1, 1, null, null, null, null, $temp[$index][' cfwHardwareStatusValue'], 'snmp', $index);
+            discover_sensor(null, 'state', $device, $cur_oid . $index, $index, $state_name, $descr, 1, 1, null, null, null, null, $temp[$index]['cfwHardwareStatusValue'], 'snmp', $index);
 
             //Create Sensor To State Index
             create_sensor_to_state_index($device, $state_name, $index);
