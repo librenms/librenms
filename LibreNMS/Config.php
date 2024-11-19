@@ -601,8 +601,8 @@ class Config
     /**
      * Recursively merge config sections.
      *
-     * @param  mixed $config
-     * @param  mixed $overrides
+     * @param  mixed  $config
+     * @param  mixed  $overrides
      */
     private static function configMerge($config, $overrides)
     {
@@ -612,7 +612,7 @@ class Config
             }
 
             // Loop over overrides and recurse or set values as needed
-            foreach($overrides as $cfgKey => $overrideVal) {
+            foreach ($overrides as $cfgKey => $overrideVal) {
                 if (array_key_exists($cfgKey, $config) && Arr::accessible($overrideVal) && Arr::accessible($config[$cfgKey])) {
                     $config[$cfgKey] = self::configMerge($config[$cfgKey], $overrideVal);
                 } else {
@@ -620,6 +620,7 @@ class Config
                 }
             }
         }
+
         return $config;
     }
 }
