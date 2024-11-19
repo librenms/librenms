@@ -63,11 +63,6 @@ class Datastore implements DataStorageInterface
         \Rrd::close();
     }
 
-    public function __destruct()
-    {
-        \LibreNMS\Data\Store\InfluxDBv2::closeClient();
-    }
-
     /**
      * Datastore constructor.
      *
