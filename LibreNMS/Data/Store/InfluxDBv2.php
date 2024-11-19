@@ -76,7 +76,7 @@ class InfluxDBv2 extends BaseDatastore
                 'precision' => WritePrecision::S,
                 'allow_redirects' => $allow_redirects,
                 'debug' => $debug,
-                'logFile' => '/opt/librenms/logs/librenms.log',
+                'logFile' => $log_file,
                 'httpClient' => $guzzleClient,
             ]);
 
