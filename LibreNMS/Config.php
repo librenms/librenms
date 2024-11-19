@@ -592,12 +592,12 @@ class Config
     {
         $install_dir = \LibreNMS\Config::get('install_dir');
         $cache_file = $install_dir . '/cache/os_defs.cache';
-        if(Config::get('os_def_cache_time')) {
+        if (Config::get('os_def_cache_time')) {
             self::updateOsCache();
             $os_defs = unserialize(file_get_contents($cache_file));
 
             if ($os_defs) {
-                self::set("os", self::configMerge($os_defs, Arr::get(self::$config, "os")));
+                self::set('os', self::configMerge($os_defs, Arr::get(self::$config, 'os')));
                 foreach ($os_defs as $os => $os_conf) {
                     Arr::set(self::$osLoaded, $os, true);
                 }
@@ -664,7 +664,7 @@ class Config
         self::loadOsAllYaml();
 
         // Write cache file
-        file_put_contents($cache_file, serialize(Arr::get(self::$config, "os")));
+        file_put_contents($cache_file, serialize(Arr::get(self::$config, 'os')));
     }
 
     /**
