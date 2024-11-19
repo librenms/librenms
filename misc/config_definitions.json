@@ -4384,7 +4384,7 @@
             "section": "influxdbv2",
             "order": 8
         },
-        "log_file": {
+        "influxdbv2.log_file": {
             "type": "text"
             "group": "poller",
             "section": "influxdbv2",
