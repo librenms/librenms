@@ -26,7 +26,7 @@ if (is_numeric($sensor['sensor_limit_warn'])) {
     $rrd_options .= ' LINE1.5:' . $sensor['sensor_limit_warn'] . '#ffa420:"warn high = ' . $sensor['sensor_limit_warn'] . 'rpm":dashes';
 }
 if (is_numeric($sensor['sensor_limit'])) {
-	$rrd_options .= ' LINE1.5:' . $sensor['sensor_limit'] . '#ff0000:"high = ' . $sensor['sensor_limit'] . 'rpm":dashes';
+    $rrd_options .= ' LINE1.5:' . $sensor['sensor_limit'] . '#ff0000:"high = ' . $sensor['sensor_limit'] . 'rpm":dashes';
 }
 
 $rrd_options .= ' COMMENT:"\n"';
