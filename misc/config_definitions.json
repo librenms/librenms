@@ -4384,10 +4384,16 @@
             "section": "influxdbv2",
             "order": 8
         },
+        "log_file": {
+            "type": "text"
+            "group": "poller",
+            "section": "influxdbv2",
+            "order": 9
+        },
         "influxdbv2.groups-exclude": {
             "group": "poller",
             "section": "influxdbv2",
-            "order": 9,
+            "order": 10,
             "type": "array",
             "default": [
             ]
@@ -4397,28 +4403,28 @@
             "type": "integer",
             "group": "poller",
             "section": "influxdbv2",
-            "order": 10
+            "order": 11
         },
         "influxdbv2.verify": {
             "default": false,
             "type": "boolean",
             "group": "poller",
             "section": "influxdbv2",
-            "order": 11
+            "order": 12
         },
         "influxdbv2.batch_size": {
             "default": 1000,
             "type": "integer",
             "group": "poller",
             "section": "influxdbv2",
-            "order": 12
+            "order": 13
         },
         "influxdbv2.max_retry": {
             "default": 2,
             "type": "integer",
             "group": "poller",
             "section": "influxdbv2",
-            "order": 13
+            "order": 14
         },
         "install_dir": {
             "type": "directory"
