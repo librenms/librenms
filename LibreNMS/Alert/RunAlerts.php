@@ -512,7 +512,6 @@ class RunAlerts
             $transport_maps[] = [
                 'transport_id' => null,
                 'transport_type' => 'mail',
-                'opts' => $obj,
             ];
         }
 
@@ -530,7 +529,7 @@ class RunAlerts
                 c_echo(" :: $transport_title => ");
                 try {
                     $instance = new $class(AlertTransport::find($item['transport_id']));
-                    $tmp = $instance->deliverAlert($obj, $item['opts'] ?? []);
+                    $tmp = $instance->deliverAlert($obj);
                     $this->alertLog($tmp, $obj, $obj['transport']);
                 } catch (AlertTransportDeliveryException $e) {
                     Eventlog::log($e->getTraceAsString() . PHP_EOL . $e->getMessage(), $obj['device_id'], 'alert', Severity::Error);

@@ -64,7 +64,7 @@ class Mail
     /**
      * Send email with PHPMailer
      *
-     * @param  string  $emails
+     * @param  array|string  $emails
      * @param  string  $subject
      * @param  string  $message
      * @param  bool  $html

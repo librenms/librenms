@@ -37,7 +37,7 @@ class Mail extends Transport
             'sysContact' => AlertUtil::findContactsSysContact($alert_data['faults']),
             'owners' => AlertUtil::findContactsOwners($alert_data['faults']),
             'role' => AlertUtil::findContactsRoles([$this->config['role']]),
-            default => $this->config['email'],
+            default => $this->config['email'] ?? $alert_data['contacts'] ?? [], // contacts is only used by legacy synthetic transport
         };
 
         $html = Config::get('email_html');
