@@ -40,6 +40,7 @@ lnms config:set influxdbv2.token 'admin'
 lnms config:set influxdbv2.allow_redirect true
 lmns config:set influxdbv2.organization 'librenms'
 lmns config:set influxdbv2.debug false
+lmns config:set influxdbv2.log_file '/opt/librenms/logs/influxdbv2.log'
 lmns config:set influxdbv2.groups-exclude ["group_name_1","group_name_2"]
 lmns config:set influxdbv2.timeout 5
 lmns config:set influxdbv2.verify false
