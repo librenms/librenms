@@ -53,10 +53,10 @@ class InfluxDBv2 extends BaseDatastore
             $token = Config::get('influxdbv2.token', '');
             $debug = Config::get('influxdbv2.debug', false);
             $log_file = Config::get('influxdbv2.log_file', Config::get('log_file'));
-            $timeout = Config::get('influxdbv2.timeout', 5);
+            $timeout = Config::get('influxdbv2.timeout', 1);
             $verify = Config::get('influxdbv2.verify', false);
-            $batch_size = Config::get('influxdbv2.batch_size', 10);
-            $max_retry = Config::get('influxdbv2.max_retry', 2);
+            $batch_size = Config::get('influxdbv2.batch_size', 1000);
+            $max_retry = Config::get('influxdbv2.max_retry', 3);
 
             // The "connection: close" is to avoid a high quantity of TIME_WAIT
             $guzzleOptions = [
