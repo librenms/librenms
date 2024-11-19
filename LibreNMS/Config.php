@@ -77,6 +77,7 @@ class Config
     public static function reload()
     {
         self::$config = null;
+        self::$osLoaded = [];
 
         return self::load();
     }
