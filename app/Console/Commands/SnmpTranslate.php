@@ -37,8 +37,8 @@ class SnmpTranslate extends SnmpFetch
         }
 
         // check if the "device" is an valid os, if it is, use that for the dummy device
-        \LibreNMS\Util\OS::loadDefinition($this->deviceSpec);
         if (Config::has('os.' . $this->deviceSpec)) {
+            echo "Here\n";
             return new Collection([new Device(['os' => $this->deviceSpec])]);
         }
 

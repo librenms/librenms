@@ -35,10 +35,12 @@ use LibreNMS\Data\Store\Rrd;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Version;
 use Log;
+use Symfony\Component\Yaml\Yaml;
 
 class Config
 {
     private static $config;
+    private static $osLoaded = [];
 
     /**
      * Load the config, if the database connected, pull in database settings.
@@ -129,12 +131,21 @@ class Config
      */
     public static function get($key, $default = null)
     {
+        if ($key == 'os') {
+            self::loadOsAllYaml();
+        }
+
         if (isset(self::$config[$key])) {
             return self::$config[$key];
         }
 
         if (! Str::contains($key, '.')) {
             return $default;
+        }
+
+        // Check if we need to load the OS YAML file
+        if (preg_match('/^os\.(?<os>[^.]+)/', $key, $matches)) {
+            self::loadOsYaml($matches['os']);
         }
 
         return Arr::get(self::$config, $key, $default);
@@ -152,6 +163,8 @@ class Config
     }
 
     /**
+     * Used for unit testing
+     *
      * Get a setting from a device, if that is not set,
      * fall back to the global config setting prefixed by $global_prefix
      * The key must be the same for the global setting and the device setting.
@@ -185,20 +198,9 @@ class Config
      */
     public static function getOsSetting($os, $key, $default = null)
     {
-        if ($os) {
-            \LibreNMS\Util\OS::loadDefinition($os);
+        $os_key = "os.$os.$key";
 
-            if (isset(self::$config['os'][$os][$key])) {
-                return self::$config['os'][$os][$key];
-            }
-
-            $os_key = "os.$os.$key";
-            if (self::has($os_key)) {
-                return self::get($os_key);
-            }
-        }
-
-        return $default;
+        return self::get($os_key, $default);
     }
 
     /**
@@ -216,23 +218,14 @@ class Config
     {
         $global_key = $global_prefix . $key;
 
-        if (! isset(self::$config['os'][$os][$key])) {
-            if (! Str::contains($global_key, '.')) {
-                return (array) self::get($global_key, $default);
-            }
-            if (! self::has("os.$os.$key")) {
-                return (array) self::get($global_key, $default);
-            }
+        $globalVal = (array) self::get($global_key, []);
+        $osVal = (array) self::get("os.$os.$key", []);
+
+        if ($globalVal || $osVal) {
+            return array_unique(array_merge($globalVal, $osVal));
         }
 
-        if (! self::has("os.$os.$key")) {
-            return (array) self::get($global_key, $default);
-        }
-
-        return array_unique(array_merge(
-            (array) self::get($global_key),
-            (array) self::getOsSetting($os, $key)
-        ));
+        return $default;
     }
 
     /**
@@ -309,6 +302,11 @@ class Config
 
         if (! Str::contains($key, '.')) {
             return false;
+        }
+
+        // Check if we need to load the OS YAML file
+        if (preg_match('/^os\.(?<os>[^.]+)/', $key, $matches)) {
+            self::loadOsYaml($matches['os']);
         }
 
         return Arr::has(self::$config, $key);
@@ -566,5 +564,62 @@ class Config
     public static function isLoaded(): bool
     {
         return ! is_null(self::$config);
+    }
+
+    /**
+     * Load OS settings from yaml into config if not already loaded, preserving user OS config
+     *
+     * @param  string  $os
+     */
+    private static function loadOsYaml($os)
+    {
+        if (! Arr::has(self::$osLoaded, $os)) {
+            $yaml_file = base_path("/includes/definitions/$os.yaml");
+            if (file_exists($yaml_file)) {
+                $os_def = Yaml::parse(file_get_contents($yaml_file));
+
+                self::set("os.$os", self::configMerge($os_def, Arr::get(self::$config, "os.$os", null)));
+                Arr::set(self::$osLoaded, $os, true);
+            }
+        }
+    }
+
+    /**
+     * Load all OS settings from yaml
+     */
+    private static function loadOsAllYaml()
+    {
+        $install_dir = \LibreNMS\Config::get('install_dir');
+        // load from yaml
+        $os_list = glob($install_dir . '/includes/definitions/*.yaml');
+        foreach ($os_list as $file) {
+            $os = basename($file, '.yaml');
+            self::loadOsYaml($os);
+        }
+    }
+
+    /**
+     * Recursively merge config sections.
+     *
+     * @param  mixed $config
+     * @param  mixed $overrides
+     */
+    private static function configMerge($config, $overrides)
+    {
+        if (Arr::accessible($overrides)) {
+            if (! Arr::isAssoc($overrides)) {
+                return $overrides;
+            }
+
+            // Loop over overrides and recurse or set values as needed
+            foreach($overrides as $cfgKey => $overrideVal) {
+                if (array_key_exists($cfgKey, $config) && Arr::accessible($overrideVal) && Arr::accessible($config[$cfgKey])) {
+                    $config[$cfgKey] = self::configMerge($config[$cfgKey], $overrideVal);
+                } else {
+                    $config[$cfgKey] = $overrideVal;
+                }
+            }
+        }
+        return $config;
     }
 }

@@ -85,6 +85,5 @@ if (getenv('DBTEST')) {
 }
 
 Config::reload(); // reload the config including database config
-\LibreNMS\Util\OS::updateCache(true); // Force update of OS Cache
 
 app()->terminate(); // destroy the bootstrap Laravel application
