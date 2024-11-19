@@ -4399,7 +4399,7 @@
             ]
         },
         "influxdbv2.timeout": {
-            "default": 5,
+            "default": 1,
             "type": "integer",
             "group": "poller",
             "section": "influxdbv2",
@@ -4420,7 +4420,7 @@
             "order": 13
         },
         "influxdbv2.max_retry": {
-            "default": 2,
+            "default": 3,
             "type": "integer",
             "group": "poller",
             "section": "influxdbv2",
