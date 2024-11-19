@@ -21,6 +21,11 @@ To add support for a new translation (let's call it Librenese - ln), you would c
 folder called `lang/ln`. Please then copy all of the files from `lang/en` and edit each
 one to reflect the written language you would like to add.
 
+Please also update `config/lang-generator.php` and the new language to the `languages => []` array.
+
+You will also need to update `doc/Developing/Translations.md` and `doc/Support/Configuration.md` to 
+add the new supported translation.
+
 ## Generating the json language file
 For use in the WebUI javascript and Blade templates we need to generate some additional 
 files, to do that you can simply run `lnms translation:generate`
