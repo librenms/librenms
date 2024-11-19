@@ -1073,6 +1073,10 @@ return [
                 'description' => 'Debug',
                 'help' => 'To enable or disable verbose output to CLI',
             ],
+            'log_file' => [
+                'description' => 'Log file',
+                'help' => 'Define another log file if wanted for the debug',
+            ],
             'groups-exclude' => [
                 'description' => 'Excluded device groups',
                 'help' => 'Device groups excluded from sending data to InfluxDBv2',
