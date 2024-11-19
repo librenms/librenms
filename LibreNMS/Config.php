@@ -133,7 +133,7 @@ class Config
     public static function get($key, $default = null)
     {
         if ($key == 'os') {
-            self::loadOsAllYaml();
+            self::loadOsAll();
         }
 
         if (isset(self::$config[$key])) {
@@ -586,6 +586,31 @@ class Config
     }
 
     /**
+     * Load all OS settings from yaml or cache
+     */
+    private static function loadOsAll()
+    {
+        $install_dir = \LibreNMS\Config::get('install_dir');
+        $cache_file = $install_dir . '/cache/os_defs.cache';
+        if(Config::get('os_def_cache_time')) {
+            self::updateOsCache();
+            $os_defs = unserialize(file_get_contents($cache_file));
+
+            if ($os_defs) {
+                self::set("os", self::configMerge($os_defs, Arr::get(self::$config, "os")));
+                foreach ($os_defs as $os => $os_conf) {
+                    Arr::set(self::$osLoaded, $os, true);
+                }
+
+                return;
+            }
+        }
+
+        // Cache time is false, or something went wrong
+        self::loadOsAllYaml();
+    }
+
+    /**
      * Load all OS settings from yaml
      */
     private static function loadOsAllYaml()
@@ -597,6 +622,49 @@ class Config
             $os = basename($file, '.yaml');
             self::loadOsYaml($os);
         }
+    }
+
+    /**
+     * Clear the OS cache file cache/os_defs.cache
+     */
+    public static function clearOsCache()
+    {
+        $install_dir = self::get('install_dir');
+        $cache_file = "$install_dir/cache/os_defs.cache";
+
+        if (is_file($cache_file)) {
+            unlink($cache_file);
+        }
+    }
+
+    /**
+     * Update the OS cache file cache/os_defs.cache
+     */
+    private static function updateOsCache()
+    {
+        $install_dir = self::get('install_dir');
+        $cache_file = "$install_dir/cache/os_defs.cache";
+        $cache_keep_time = Config::get('os_def_cache_time', 86400);
+
+        if (is_file($cache_file)) {
+            $timediff = time() - filemtime($cache_file);
+            if ($timediff > 0 && $timediff < $cache_keep_time) {
+                Log::debug('os_def.cache is current');
+
+                return;
+            }
+        }
+
+        Log::debug('Updating os_def.cache');
+
+        // Reload config to re-read all config.php and db fields
+        self::reload();
+
+        // Load all Os from Yaml
+        self::loadOsAllYaml();
+
+        // Write cache file
+        file_put_contents($cache_file, serialize(Arr::get(self::$config, "os")));
     }
 
     /**
