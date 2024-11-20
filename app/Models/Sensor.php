@@ -77,19 +77,19 @@ class Sensor extends DeviceRelatedModel implements Keyable
         return __('sensors.' . $this->sensor_class . '.unit');
     }
 
-    public function unitShort(): string
+    public function unitLong(): string
     {
-        return __('sensors.' . $this->sensor_class . '.unit_short');
+        return __('sensors.' . $this->sensor_class . '.unit_long');
     }
 
     public function classDescr(): string
     {
-        return __('sensors.' . $this->sensor_class . '.long');
+        return __('sensors.' . $this->sensor_class . '.short');
     }
 
-    public function classDescrShort(): string
+    public function classDescrLong(): string
     {
-        return __('sensors.' . $this->sensor_class . '.short');
+        return __('sensors.' . $this->sensor_class . '.long');
     }
 
     public function icon()
