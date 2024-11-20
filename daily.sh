@@ -130,7 +130,7 @@ set_notifiable_result() {
 #   Exit-Code: 0 >= min ver, 1 < min ver
 #######################################
 check_dependencies() {
-    local branch ver_71 ver_72 ver_73 ver_81 ver_83 python3 python_deps phpver pythonver old_branches msg
+    local branch ver_71 ver_72 ver_73 ver_81 ver_82 python3 python_deps phpver pythonver old_branches msg
 
     branch=$(git rev-parse --abbrev-ref HEAD)
     scripts/check_requirements.py > /dev/null 2>&1 || pip3 install -r requirements.txt > /dev/null 2>&1
@@ -146,7 +146,7 @@ check_dependencies() {
     pythonver="master"
 
     old_branches="^(php53|php56|php71-python2|php72|php73|php81)$"
-    if [[ $branch =~ $old_branches ]] && [[ "$ver_83" == "0" && "$python3" == "0" && "$python_deps" == "0" ]]; then
+    if [[ $branch =~ $old_branches ]] && [[ "$ver_82" == "0" && "$python3" == "0" && "$python_deps" == "0" ]]; then
         status_run "Supported PHP and Python version, switched back to master branch." 'git checkout master'
     elif [[ "$ver_71" != "0" ]]; then
         phpver="php56"
