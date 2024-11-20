@@ -139,7 +139,7 @@ check_dependencies() {
     ver_72=$(php -r "echo (int)version_compare(PHP_VERSION, '7.2.5', '<');")
     ver_73=$(php -r "echo (int)version_compare(PHP_VERSION, '7.3', '<');")
     ver_81=$(php -r "echo (int)version_compare(PHP_VERSION, '8.1', '<');")
-    ver_83=$(php -r "echo (int)version_compare(PHP_VERSION, '8.3', '<');")
+    ver_82=$(php -r "echo (int)version_compare(PHP_VERSION, '8.2', '<');")
     python3=$(python3 -c "import sys;print(int(sys.version_info < (3, 4)))" 2> /dev/null)
     python_deps=$("${LIBRENMS_DIR}/scripts/check_requirements.py" > /dev/null 2>&1; echo $?)
     phpver="master"
@@ -180,10 +180,10 @@ check_dependencies() {
         if [[ "$branch" != "php73" ]]; then
             status_run "Unsupported PHP version, switched to php73 branch." 'git checkout php73'
         fi
-    elif [[ "$ver_83" != "0" ]]; then
-        phpver="php82"
-        if [[ "$branch" != "php82" ]]; then
-            status_run "Unsupported PHP version, switched to php82 branch." 'git checkout php81'
+    elif [[ "$ver_82" != "0" ]]; then
+        phpver="php81"
+        if [[ "$branch" != "php81" ]]; then
+            status_run "Unsupported PHP version, switched to php81 branch." 'git checkout php81'
         fi
     fi
 
