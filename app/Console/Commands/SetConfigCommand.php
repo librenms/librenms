@@ -2,9 +2,9 @@
 
 namespace App\Console\Commands;
 
-use App\Facades\LibrenmsConfig;
 use App\Console\Commands\Traits\CompletesConfigArgument;
 use App\Console\LnmsCommand;
+use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use JsonSchema\Constraints\Constraint;
