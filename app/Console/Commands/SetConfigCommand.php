@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Facades\LibrenmsConfig;
 use App\Console\Commands\Traits\CompletesConfigArgument;
 use App\Console\LnmsCommand;
 use Illuminate\Support\Arr;
@@ -12,7 +13,6 @@ use JsonSchema\Validator;
 use LibreNMS\Config;
 use LibreNMS\DB\Eloquent;
 use LibreNMS\Util\DynamicConfig;
-use LibreNMS\Util\OS;
 use Symfony\Component\Console\Input\InputArgument;
 
 class SetConfigCommand extends LnmsCommand
@@ -59,6 +59,8 @@ class SetConfigCommand extends LnmsCommand
 
                 return 2;
             }
+            // Clear the OS cache so it gets rebuilt next time it's needed
+            LibrenmsConfig::clearOsCache();
         } elseif (! $definition->isValidSetting($setting)) {
             $parent = $this->findParentSetting($definition, $setting);
             if (! $force && ! $parent) {
@@ -215,7 +217,6 @@ class SetConfigCommand extends LnmsCommand
     private function validateOsSetting(string $os, string $setting, $value)
     {
         // prep data to be validated
-        OS::loadDefinition($os);
         $os_data = \LibreNMS\Config::get("os.$os");
         if ($os_data === null) {
             throw new ValidationException(trans('commands.config:set.errors.invalid_os', ['os' => $os]));

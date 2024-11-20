@@ -126,7 +126,6 @@ try {
     $full = isset($options['full']);
 
     echo 'Capturing Data: ';
-    \LibreNMS\Util\OS::updateCache(true); // Force update of OS Cache
     LibrenmsConfig::invalidateAndReload();
     $capture->captureFromDevice($device['device_id'], $prefer_new_snmprec, $full);
     echo "\nVerify these file(s) do not contain any private data before sharing!\n";

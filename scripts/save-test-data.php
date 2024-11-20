@@ -143,7 +143,6 @@ try {
         }
         echo PHP_EOL;
 
-        \LibreNMS\Util\OS::updateCache(true); // Force update of OS Cache
         LibrenmsConfig::invalidateAndReload();
         $tester = new ModuleTestHelper($modules, $target_os, $target_variant);
         if (! $no_save && ! empty($output_file)) {
