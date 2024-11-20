@@ -1,3 +1,3 @@
 <?php
 
-require 'includes/html/graphs/sensor/percent.inc.php';
+require 'includes/html/graphs/sensor/generic.inc.php';

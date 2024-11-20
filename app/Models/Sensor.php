@@ -130,17 +130,20 @@ class Sensor extends DeviceRelatedModel implements Keyable
         }
     }
 
+    public function getUnitAttribute(): string
+    {
+    	return __('sensors.' . $this->sensor_class . '.unit');
+    }
+
     /**
      * Format current value for user display including units.
      */
     public function formatValue(): string
     {
-        $units = __('sensors.' . $this->sensor_class . '.unit');
-
         return match ($this->sensor_class) {
-            'current', 'power' => Number::formatSi($this->sensor_current, 3, 3, $units),
-            'dbm' => round($this->sensor_current, 3) . " $units",
-            default => "$this->sensor_current $units",
+            'current', 'power' => Number::formatSi($this->sensor_current, 3, 3, $this->unit),
+            'dbm' => round($this->sensor_current, 3) . " $this->units",
+            default => "$this->sensor_current $this->units",
         };
     }
 
