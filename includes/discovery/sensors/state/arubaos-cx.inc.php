@@ -44,7 +44,6 @@ $vsfMemberTableStates = [
     ['value' => 15, 'generic' => 2, 'graph' => 0, 'descr' => 'In Other Fragment'],
 ];
 
-#
 $stateLookupTable = [
     // arubaWiredVsfv2OperStatus
     'no_split' => 0,
@@ -60,8 +59,6 @@ $stateLookupTable = [
     'in_other_fragment' => 15,
 ];
 
-#
-
 $temp = snmpwalk_cache_multi_oid($device, 'arubaWiredVsfv2OperStatus', [], 'ARUBAWIRED-VSFv2-MIB');
 if (is_array($temp)) {
     echo 'ArubaOS-CX VSF Operational Status: ';
@@ -70,7 +67,7 @@ if (is_array($temp)) {
     create_state_index($state_name, $vsfOpStatusStates);
 
     foreach ($temp as $index => $data) {
-        $sensor_value = $stateLookupTable[$data["arubaWiredVsfv2OperStatus"]];
+        $sensor_value = $stateLookupTable[$data['arubaWiredVsfv2OperStatus']];
 
         $descr = 'VSF Status';
         $oid = '.1.3.6.1.4.1.47196.4.1.1.3.15.1.1.1.' . $index;
@@ -88,7 +85,7 @@ if (is_array($temp)) {
     $state_name = 'arubaWiredVsfv2MemberTable';
     create_state_index($state_name, $vsfMemberTableStates);
     foreach ($temp as $index => $data) {
-        $sensor_value = $stateLookupTable[$data["arubaWiredVsfv2MemberStatus"]];
+        $sensor_value = $stateLookupTable[$data['arubaWiredVsfv2MemberStatus']];
 
         $descr = 'Member ' . $data['arubaWiredVsfv2MemberSerialNum'] . ' Status';
         $oid = '.1.3.6.1.4.1.47196.4.1.1.3.15.1.2.1.3.' . $index;
