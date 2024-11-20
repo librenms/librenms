@@ -132,7 +132,7 @@ class Sensor extends DeviceRelatedModel implements Keyable
 
     public function getUnitAttribute(): string
     {
-    	return __('sensors.' . $this->sensor_class . '.unit');
+        return __('sensors.' . $this->sensor_class . '.unit');
     }
 
     /**
