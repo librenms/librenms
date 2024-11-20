@@ -138,7 +138,6 @@ class Sensor extends DeviceRelatedModel implements Keyable
         }
     }
 
-
     /**
      * Format current value for user display including units.
      */
