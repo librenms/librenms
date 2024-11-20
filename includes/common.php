@@ -814,6 +814,27 @@ function get_vm_parent_id($device)
 }
 
 /**
+ * Converts ieee754 32-bit floating point decimal represenation to decimal
+ */
+function ieee754_to_decimal($value)
+{
+    $hex = dechex($value);
+    $binary = str_pad(base_convert($hex, 16, 2), 32, '0', STR_PAD_LEFT);
+    $sign = (int) $binary[0];
+    $exponent = bindec(substr($binary, 1, 8)) - 127;
+    $mantissa = substr($binary, 9);
+    $mantissa_value = 1;
+    for ($i = 0; $i < strlen($mantissa); $i++) {
+        if ($mantissa[$i] == '1') {
+            $mantissa_value += pow(2, -($i + 1));
+        }
+    }
+    $value = pow(-1, $sign) * $mantissa_value * pow(2, $exponent);
+
+    return $value;
+}
+
+/**
  * Index an array by a column
  *
  * @param  array  $array

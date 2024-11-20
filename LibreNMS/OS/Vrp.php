@@ -31,6 +31,7 @@ use App\Models\EntPhysical;
 use App\Models\Mempool;
 use App\Models\PortsNac;
 use App\Models\Sla;
+use App\Models\Transceiver;
 use App\Observers\ModuleModelObserver;
 use Carbon\Carbon;
 use Illuminate\Support\Arr;
@@ -47,6 +48,7 @@ use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessApCountDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\Interfaces\Discovery\SlaDiscovery;
+use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
 use LibreNMS\Interfaces\Polling\NacPolling;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\Interfaces\Polling\SlaPolling;
@@ -63,12 +65,11 @@ class Vrp extends OS implements
     WirelessClientsDiscovery,
     SlaDiscovery,
     SlaPolling,
+    TransceiverDiscovery,
     OSDiscovery
 {
     use SyncsModels;
-    use EntityMib {
-        EntityMib::discoverEntityPhysical as discoverBaseEntityPhysical;
-    }
+    use EntityMib {EntityMib::discoverEntityPhysical as discoverBaseEntityPhysical; }
 
     public function discoverEntityPhysical(): Collection
     {
@@ -94,6 +95,92 @@ class Vrp extends OS implements
         });
 
         return $inventory;
+    }
+
+    public function discoverTransceivers(): Collection
+    {
+        // Get a map of ifIndex to port_id for proper association with ports
+        $ifIndexToPortId = $this->getDevice()->ports()->pluck('port_id', 'ifIndex');
+
+        // EntityPhysicalIndex to ifIndex
+        $entityToIfIndex = $this->getIfIndexEntPhysicalMap();
+
+        // Walk through the MIB table for transceiver information
+        return \SnmpQuery::walk('HUAWEI-ENTITY-EXTENT-MIB::hwOpticalModuleInfoTable')->mapTable(function ($data, $entIndex) use ($entityToIfIndex, $ifIndexToPortId) {
+            // Skip inactive transceivers
+            if ($data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalType'] === 'inactive') {
+                return null;
+            }
+            // Skip when it is not a plugable optic
+            if ($data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalType'] === '0') {
+                return null;
+            }
+
+            // Handle cases where required data might not be available (fallback to null)
+            $cable = $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalConnectType'] ?? null;
+            $distance = $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalTransferDistance'] ?? '';
+            if (preg_match_all("/(([0-9]+)\([^\)]+\))+/i", $distance, $matches)) {
+                $distance = intval(max($matches[2]));
+            } else {
+                $distance = intval($distance);
+            }
+            if ($distance <= 0) {
+                $distance = $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalTransDistance'] ?? 0;
+            }
+            if ($distance <= 0) {
+                $distance = null;
+            }
+            $wavelength = $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalWaveLengthExact'] ?? 0;
+            if ($wavelength <= 0) {
+                $wavelength = $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalWaveLength'] ?? 0;
+            }
+            if ($wavelength <= 0) {
+                $wavelength = null;
+            }
+            $ifIndex = $entityToIfIndex[$entIndex];
+            $port_id = $ifIndexToPortId->get($ifIndex) ?? null;
+            if (is_null($port_id)) {
+                // Invalid
+                return null;
+            }
+
+            $type = $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalType'] ?? null;
+            $typeToDesc = ['unknown', 'sc', 'gbic', 'sfp', 'esfp', 'rj45', 'xfp', 'xenpak', 'transponder', 'cfp', 'smb', 'sfpplus', 'cxp', 'qsfp', 'qsfpplus', 'cfp2', 'dwdmsfp', 'msa100glh', 'gps', 'csfp', 'cfp4', 'qsfp28', 'sfpsfpplus', 'gponsfp', 'cfp8', 'sfp28', 'qsfpdd', 'cfp2dco', 'sfp56', 'qsfp56', 'oa'];
+
+            $mode = $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalMode'] ?? '';
+            $modeToText[1] = 'singleMode';
+            $modeToText[2] = 'multiMode5';
+            $modeToText[3] = 'multiMode6';
+            if (isset($modeToText[$mode])) {
+                $mode = ' ' . $modeToText[$mode];
+            }
+            if (! is_null($type) && isset($typeToDesc[$type])) {
+                $type = $typeToDesc[$type];
+            }
+            $entityType = $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalTransType'] ?? null;
+            if (! is_null($type) && ! is_null($entityType)) {
+                $type .= " ($entityType)";
+            } else {
+                $type = $type ?? $entityType;
+            }
+            if (! is_null($type)) {
+                $type .= $mode;
+            }
+
+            // Create a new Transceiver object with the retrieved data
+            return new Transceiver([
+                'port_id' => $port_id,
+                'index' => $entIndex,
+                'vendor' => $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalVenderName'] ?? null,
+                'type' => $type,
+                'model' => $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalVenderPn'] ?? null,
+                'serial' => $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalVendorSn'] ?? null,
+                'cable' => $cable,
+                'distance' => $distance,
+                'wavelength' => $wavelength,
+                'entity_physical_index' => $entIndex,
+            ]);
+        })->filter();  // Filter out null values
     }
 
     public function discoverMempools()
