@@ -12,6 +12,10 @@
  * the source code distribution for details.
  */
 
+use App\Models\Alert;
+use App\Models\AlertLog;
+use App\Models\AlertTemplateMap;
+
 header('Content-type: text/plain');
 
 if (! Auth::user()->hasGlobalAdmin()) {
