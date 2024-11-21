@@ -46,6 +46,7 @@ $query = "SELECT DATE_FORMAT(time_logged, '" . \LibreNMS\Config::get('alert_grap
 
 <script src="js/vis-network.min.js"></script>
 <script src="js/vis-data.min.js"></script>
+<script src="js/vis-timeline-graph2d.min.js"></script>
 <div id="visualization" style="margin-bottom: -120px;"></div>
 <script type="text/javascript">
 
