@@ -3,7 +3,7 @@ body {
   margin: 0px;
   padding: 0px;
   padding-bottom: 50px;
-  padding-top: 50px;
+  padding-top: 0px;
   background: rgb(255,255,255); /* Old browsers */
   color: #555;
   font-size: 10pt;
@@ -1631,6 +1631,13 @@ tr.search:nth-child(odd) {
 
 .navbar-debug {
   min-height: 25px;
+}
+
+nav.navbar-sticky-top {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  border-width: 2px;
 }
 
 .navbar-brand {

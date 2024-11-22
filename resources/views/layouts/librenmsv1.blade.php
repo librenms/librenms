@@ -112,8 +112,6 @@
     @include('layouts.menu')
 @endif
 
-<br />
-
 @yield('content')
 
 @yield('scripts')
