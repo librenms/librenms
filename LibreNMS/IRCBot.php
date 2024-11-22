@@ -20,6 +20,7 @@
 
 namespace LibreNMS;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Eventlog;
 use App\Models\Port;
@@ -730,9 +731,9 @@ class IRCBot
 
                 return $this->loadExternal();
             }
-            $new_config = Config::load();
+            LibrenmsConfig::reload();
             $this->respond('Reloading configuration & defaults');
-            if ($new_config != $this->config) {
+            if (LibrenmsConfig::getAll() != $this->config) {
                 $this->__construct();
 
                 return;
