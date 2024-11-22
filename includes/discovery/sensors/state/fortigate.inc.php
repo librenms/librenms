@@ -69,6 +69,9 @@ if ($systemMode == 'activePassive' || $systemMode == 'activeActive') {
 
     // Per-node loop
     foreach ($haStatsEntries as $index => $entry) {
+        // Get current value (for issue #16544)
+        $sensor_value = snmp_get($device, $fgHaStatsSyncStatus_txt . '.' . $index, '-OeQv', 'FORTINET-FORTIGATE-MIB');
+
         // Get name of cluster member
         $fgHaStatsHostname_txt = 'fgHaStatsHostname.' . $index;
         $cluster_member_name = snmp_get($device, $fgHaStatsHostname_txt, '-Ovq', 'FORTINET-FORTIGATE-MIB');
@@ -91,7 +94,7 @@ if ($systemMode == 'activePassive' || $systemMode == 'activeActive') {
             null,
             null,
             null,
-            -1,
+            $sensor_value,
             'snmp',
             $index,
             null,
