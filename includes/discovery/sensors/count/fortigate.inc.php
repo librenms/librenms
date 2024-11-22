@@ -1,5 +1,7 @@
 <?php
 /*
+ * fortigate.inc.php
+ *
  * LibreNMS FortiGate count sensors
  *
  * This program is free software: you can redistribute it and/or modify it
@@ -9,10 +11,12 @@
  * the source code distribution for details.
  *
  * @package    LibreNMS
- * @subpackage webui
  * @link       https://www.librenms.org
  * @copyright  2019 LibreNMS
  * @author     LibreNMS Contributors
+ *
+ * @copyright  2024 CTNET BV
+ * @author     Rudy Broersma <r.broersma@ctnet.nl>
  */
 
 // Sensors for license status
@@ -21,6 +25,11 @@ $licenseOids = snmpwalk_cache_multi_oid($device, 'fgSystemInfoAdvanced', [], 'FO
 if (! empty($licenseOids)) {
     foreach ($licenseOids as $index => $entry) {
         if (isset($entry['fgLicContractExpiry'])) {
+            // Get current value (for issue #16544)
+            $expirationRaw = snmp_get($device, '.1.3.6.1.4.1.12356.101.4.6.3.1.2.1.2.' . $index, '-OUqnv', 'FORTINET-FORTIGATE-MIB');
+            $expirationDate = strtotime($expirationRaw);
+            $sensor_value = round((strtotime($expirationRaw) - strtotime('now')) / 86400, 0);
+
             $descr = $entry['fgLicContractDesc'];
 
             discover_sensor(
@@ -37,7 +46,7 @@ if (! empty($licenseOids)) {
                 14,
                 null,
                 null,
-                null,
+                $sensor_value,
                 'snmp',
                 null,
                 null,
