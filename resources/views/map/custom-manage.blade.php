@@ -6,6 +6,7 @@
 <div class="tw-px-3 sm:tw-px-6 tw-mx-auto">
     @include('map.custom-map-modal')
     @include('map.custom-map-delete-modal')
+    @include('map.custom-map-clone-modal')
 
     <x-panel id="manage-custom-maps" body-class="!tw-pb-0" class="tw-mx-auto tw-max-w-screen-lg">
         <x-slot name="title">
@@ -34,6 +35,13 @@
                                 <a href="{{ route('maps.custom.show', $map->custom_map_id) }}">{{ $map->name }}</a>
                             </div>
                             <div class="tw-whitespace-nowrap">
+                                <button class="btn btn-info"
+                                        onclick="startMapClone(this)"
+                                        data-map-name="{{ $map->name }}"
+                                        data-map-id="{{ $map->custom_map_id }}"
+                                ><i class="fa fa-copy" aria-hidden="true"></i>
+                                    <span class="tw-hidden sm:tw-inline" aria-hidden="false">{{ __('Clone') }}</span>
+                                </button>
                                 <a class="btn btn-default" href="{{ route('maps.custom.edit', $map->custom_map_id) }}">
                                     <i class="fa fa-pencil" aria-hidden="true"></i>
                                     <span class="tw-hidden sm:tw-inline" aria-hidden="false">{{ __('Edit') }}</span>

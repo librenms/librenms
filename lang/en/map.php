@@ -67,6 +67,7 @@ return [
                 'saving' => 'Saving...',
                 'save_errors' => 'Save failed due to the following errors:',
                 'save_error' => 'Save failed.  Server returned error response code: :code',
+                'clone' => 'Clone :name?',
                 'delete' => 'Delete :name?',
                 'list' => 'Return to map list',
                 'unsavedchanges' => 'You have unsaved changes.  Press confirm to discard changes and return to the map list, or cancel to return to the editor.',
