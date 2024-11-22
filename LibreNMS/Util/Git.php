@@ -25,10 +25,10 @@
 
 namespace LibreNMS\Util;
 
+use App\Facades\LibrenmsConfig;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Str;
-use LibreNMS\Config;
 use LibreNMS\Traits\RuntimeClassCache;
 use Symfony\Component\Process\Process;
 
@@ -42,7 +42,7 @@ class Git
     public function __construct(int $cache = 0)
     {
         $this->runtimeCacheExternalTTL = $cache;
-        $this->install_dir = Config::get('install_dir', realpath(__DIR__ . '/../..'));
+        $this->install_dir = realpath(__DIR__ . '/../..');
     }
 
     public static function make(int $cache = 0): Git
@@ -196,7 +196,7 @@ class Git
         return $this->cacheGet('remoteCommit', function () {
             if ($this->isAvailable()) {
                 try {
-                    return (array) Http::client()->get(Config::get('github_api') . 'commits/master')->json();
+                    return (array) Http::client()->get(LibrenmsConfig::get('github_api') . 'commits/master')->json();
                 } catch (ConnectionException $e) {
                 }
             }
