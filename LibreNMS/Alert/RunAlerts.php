@@ -136,11 +136,11 @@ class RunAlerts
         if ($alert['state'] >= AlertState::ACTIVE) {
             $obj['title'] = $template->title ?: 'Alert for device ' . $obj['display'] . ' - ' . ($alert['name'] ?: $alert['rule']);
             if ($alert['state'] == AlertState::ACKNOWLEDGED) {
-                $obj['title'] .= ' Has Been Acknowledged';
+                $obj['title'] .= ' Has been acknowledged';
             } elseif ($alert['state'] == AlertState::WORSE) {
-                $obj['title'] .= ' Has Worsened';
+                $obj['title'] .= ' Has worsened';
             } elseif ($alert['state'] == AlertState::BETTER) {
-                $obj['title'] .= ' Has Improved';
+                $obj['title'] .= ' Has improved';
             }
 
             foreach ($extra['rule'] as $incident) {
