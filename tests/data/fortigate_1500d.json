@@ -37568,7 +37568,7 @@
                     "group": "HA",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": -1,
+                    "sensor_current": 1,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
@@ -37593,7 +37593,7 @@
                     "group": "HA",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": -1,
+                    "sensor_current": 1,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
@@ -39675,7 +39675,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": "1",
                     "entPhysicalIndex_measured": null,
-                    "sensor_prev": -1,
+                    "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
                     "state_name": "fgHaStatsSyncStatus"
@@ -39700,7 +39700,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": "2",
                     "entPhysicalIndex_measured": null,
-                    "sensor_prev": -1,
+                    "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
                     "state_name": "fgHaStatsSyncStatus"
@@ -42196,5 +42196,661 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "ports-stack": {
+        "discovery": {
+            "ports_stack": [
+                {
+                    "high_ifIndex": 35,
+                    "low_ifIndex": 49,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 36,
+                    "low_ifIndex": 49,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 45,
+                    "low_ifIndex": 85,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 46,
+                    "low_ifIndex": 86,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 46,
+                    "low_ifIndex": 154,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 47,
+                    "low_ifIndex": 177,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 48,
+                    "low_ifIndex": 145,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 48,
+                    "low_ifIndex": 152,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 48,
+                    "low_ifIndex": 178,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 50,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 51,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 52,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 53,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 54,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 55,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 57,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 58,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 59,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 61,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 62,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 63,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 64,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 65,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 66,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 67,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 68,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 69,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 70,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 71,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 72,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 73,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 74,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 75,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 76,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 77,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 78,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 79,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 81,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 82,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 84,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 87,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 88,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 89,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 90,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 91,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 92,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 93,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 94,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 95,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 96,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 97,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 98,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 100,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 101,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 102,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 103,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 106,
+                    "ifStackStatus": "notInService"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 108,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 109,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 110,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 111,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 112,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 113,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 115,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 116,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 118,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 119,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 120,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 121,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 122,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 123,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 124,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 125,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 126,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 127,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 128,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 129,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 130,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 131,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 132,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 133,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 134,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 135,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 136,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 137,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 141,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 142,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 143,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 146,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 147,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 148,
+                    "ifStackStatus": "notInService"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 149,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 150,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 151,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 153,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 155,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 156,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 157,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 158,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 160,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 161,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 162,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 163,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 164,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 165,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 166,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 167,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 168,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 169,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 170,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 172,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 173,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 174,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 175,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 180,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 181,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 182,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 183,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 184,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 185,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 186,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 187,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 188,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 189,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 61,
+                    "low_ifIndex": 105,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 114,
+                    "low_ifIndex": 60,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 114,
+                    "low_ifIndex": 99,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 114,
+                    "low_ifIndex": 144,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 117,
+                    "low_ifIndex": 80,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 117,
+                    "low_ifIndex": 176,
+                    "ifStackStatus": "active"
+                }
+            ]
+        }
     }
 }
