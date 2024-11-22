@@ -35,10 +35,8 @@ use App\Models\Service;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Config;
-use LibreNMS\Util\Url;
 
 class MapDataController extends Controller
 {
@@ -361,33 +359,30 @@ class MapDataController extends Controller
         }
     }
 
-    protected function linkSpeedWidth(int|null $speed): float
+    protected function linkSpeedWidth(int|null $speed): int
     {
-        $speed /= 1000000000;
-        if ($speed > 500000) {
-            return 20;
-        }
+        $speed /= 10000000;
         if (is_nan($speed)) {
             return 1;
         }
-        if ($speed < 10) {
+        if ($speed < 1) {
             return 1;
         }
 
-        return round(0.77 * pow($speed, 0.25));
+        return strlen(strval(round($speed))) * 2;
     }
 
     protected function linkUseColour(float $link_pct): string
     {
         $link_pct = round(2 * $link_pct, -1) / 2;
         if ($link_pct > 100) {
-            $link_used = 100;
+            $link_pct = 100;
         }
         if (is_nan($link_pct)) {
-            $link_used = 0;
+            $link_pct = 0;
         }
 
-        return Config::get("network_map_legend.$link_pct");
+        return Config::get("network_map_legend.$link_pct", '#000000');
     }
 
     protected function nodeDisabledStyle(): array
@@ -462,20 +457,18 @@ class MapDataController extends Controller
     // GET Device
     public function getDevices(Request $request): JsonResponse
     {
-        // Get all devices under maintenance
-        $maintdevices = AlertSchedule::isActive()
-            ->with('devices', 'locations.devices', 'deviceGroups.devices')
-            ->get()
-            ->map->only('devices', 'locations.devices', 'deviceGroups.devices')
-            ->flatten();
-
-        // Create a hash of device IDs covered by maintenance to avoid a DB call per device below
-        $maintdevicesmap = [];
-        foreach ($maintdevices as $device) {
-            if ($device) {
-                $maintdevicesmap[$device->device_id] = true;
-            }
-        }
+        // Get all device ids under maintenance (may contain duplicates, but we don't care for this usage)
+        $deviceIdsUnderMaintenance = AlertSchedule::isActive()
+            ->with([
+                'devices:device_id',
+                'locations.devices:location_id,device_id',
+                'deviceGroups.devices:device_id',
+            ])->get()
+            ->map(function ($schedule) {
+                return $schedule->devices->pluck('device_id')
+                    ->merge($schedule->locations->pluck('devices.*.device_id'))
+                    ->merge($schedule->deviceGroups->pluck('devices.*.device_id'));
+            })->flatten();
 
         // For manual level we need to track some items
         $no_parent_devices = collect();
@@ -504,13 +497,13 @@ class MapDataController extends Controller
                 'last_polled' => $device->last_polled,
                 'disabled' => $device->disabled,
                 'no_alerts' => $device->disable_notify,
-                'url' => $request->url_type == 'links' ? Url::deviceLink($device, null, [], 0, 0, 0, 0) : Url::deviceUrl($device->device_id),
+                'url' => $request->url_type == 'links' ? \Blade::render('<x-device-link-map :device="$device" />', ['device' => $device]) : route('device', ['device' => $device->device_id]),
                 'style' => self::deviceStyle($device, $request->highlight_node),
                 'lat' => $device->location ? $device->location->lat : null,
                 'lng' => $device->location ? $device->location->lng : null,
                 'parents' => ($request->link_type == 'depends') ? $device->parents->pluck('device_id', 'device_id') : collect(),
                 'children' => ($request->link_type == 'depends') ? $device->children->pluck('device_id', 'device_id') : collect(),
-                'maintenance' => array_key_exists($device->device_id, $maintdevicesmap) ? 1 : 0,
+                'maintenance' => $deviceIdsUnderMaintenance->contains($device->device_id) ? 1 : 0,
             ];
 
             // Only use parent IDs below if it is being returned
@@ -636,7 +629,7 @@ class MapDataController extends Controller
     {
         // List all links
         $link_list = [];
-        $device_assoc_seen = [];
+        $port_assoc_seen = [];
         $link_types = $request->link_types;
 
         foreach ($link_types as $link_type) {
@@ -661,16 +654,17 @@ class MapDataController extends Controller
                         continue;
                     }
 
-                    $device_ids_1 = $port->device_id . '.' . $remote_port->device_id;
-                    $device_ids_2 = $remote_port->device_id . '.' . $port->device_id;
+                    if ($port->port_id < $remote_port->port_id) {
+                        $port_ids = $port->port_id . '.' . $remote_port->port_id;
+                    } else {
+                        $port_ids = $remote_port->port_id . '.' . $port->port_id;
+                    }
 
                     // Ignore any associations that have already been processed
-                    if (array_key_exists($device_ids_1, $device_assoc_seen)
-                        || array_key_exists($device_ids_2, $device_assoc_seen)) {
+                    if (array_key_exists($port_ids, $port_assoc_seen)) {
                         continue;
                     }
-                    $device_assoc_seen[$device_ids_1] = true;
-                    $device_assoc_seen[$device_ids_2] = true;
+                    $port_assoc_seen[$port_ids] = true;
 
                     $width = $this->linkSpeedWidth($port->ifSpeed);
 
@@ -719,7 +713,7 @@ class MapDataController extends Controller
                         'ldev' => $port->device_id,
                         'rdev' => $remote_port->device_id,
                         'ifnames' => $port->ifName . ' <> ' . $remote_port->ifName,
-                        'url' => Url::portLink($port, null, null, false, true),
+                        'url' => \Blade::render('<x-port-link-map :port="$port" />', ['port' => $port]),
                         'style' => $link_style,
                     ];
                 }
@@ -797,7 +791,7 @@ class MapDataController extends Controller
                 'icon' => $service->device->icon,
                 'icontitle' => $service->device->icon ? str_replace(['.svg', '.png'], '', basename($service->device->icon)) : $service->device->os,
                 'device_name' => $service->device->shortDisplayName(),
-                'url' => Url::deviceUrl($service->device_id),
+                'url' => \Blade::render('<x-device-link-map :device="$device" />', ['device' => $service->device]),
                 'updowntime' => $updowntime,
                 'compact' => Config::get('webui.availability_map_compact'),
                 'box_size' => Config::get('webui.availability_map_box_size'),

@@ -25,7 +25,7 @@
                    @if(isset($primary_device_link['onclick']))onclick="{{ $primary_device_link['onclick'] }}" @endif
                    @if($primary_device_link['external'])target="_blank" rel="noopener" @endif
                    title="{{ $primary_device_link['title'] }}"
-                > <i class="fa {{ $primary_device_link['icon'] }} fa-lg icon-theme"></i>
+                >&nbsp;<i class="fa {{ $primary_device_link['icon'] }} fa-lg icon-theme"></i>
                 </a>
                 <div class="btn-group" role="group">
                     <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

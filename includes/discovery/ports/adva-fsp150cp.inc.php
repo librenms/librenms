@@ -1,8 +1,8 @@
 <?php
 /**
- * procurve.inc.php
+ * adva-fsp150cp.inc.php
  *
- * LibreNMS sensors pre-cache discovery module for HP Procurve
+ * LibreNMS ADVA port discovery
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,14 +16,17 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- *
- * @link       https://www.librenms.org
- *
- * @copyright  2017 Neil Lathwood
- * @author     Neil Lathwood <gh+n@laf.io>
  */
-echo 'hpicfSensorTable ';
-$pre_cache['procurve_hpicfSensorTable'] = snmpwalk_cache_oid($device, 'hpicfSensorTable', [], 'HP-ICF-CHASSIS', null, '-OeQUs');
+$advaports = snmpwalk_cache_oid($device, 'fsp150IfConfigUserString', [], 'FSP150-MIB');
+$advaports = snmpwalk_cache_oid($device, 'entPhysicalName', $advaports, 'ENTITY-MIB');
 
-echo 'hpicfXcvrInfoTable ';
-$pre_cache['procurve_hpicfXcvrInfoTable'] = snmpwalk_cache_oid($device, 'hpicfXcvrInfoTable', [], 'HP-ICF-TRANSCEIVER-MIB', null, '-OeQUs');
+d_echo($advaports);
+
+foreach ($advaports as $index => $entry) {
+    // Indexes are the same as IfIndex and EntPhysicalIndex
+
+    if (isset($port_stats[$index])) {
+        $port_stats[$index]['ifAlias'] = $entry['fsp150IfConfigUserString'];
+        $port_stats[$index]['ifName'] = $entry['entPhysicalName'];
+    }
+}
