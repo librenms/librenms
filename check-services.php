@@ -13,6 +13,7 @@
  * the source code distribution for details.
  */
 
+use LibreNMS\Config;
 use LibreNMS\Data\Store\Datastore;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Util\Debug;
