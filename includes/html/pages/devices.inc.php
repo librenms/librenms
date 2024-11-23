@@ -184,7 +184,6 @@ if ($format == 'graph') {
         $where .= ' AND status= ?';
         $sql_param[] = $state;
         $where .= " AND disabled='0' AND `disable_notify`='0'";
-        $sql_param[] = '';
     }
     if (! empty($vars['disabled'])) {
         $where .= ' AND disabled= ?';
