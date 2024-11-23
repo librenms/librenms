@@ -5,8 +5,6 @@ use LibreNMS\Data\Store\Rrd;
 use LibreNMS\Util\Number;
 
 require 'includes/html/graphs/common.inc.php';
-// WOr
-$sensor = Sensor::find($sensor['sensor_id']);
 
 $sensor['sensor_descr_fixed'] = Rrd::fixedSafeDescr($sensor->sensor_descr, 25);
 
