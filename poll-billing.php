@@ -65,7 +65,7 @@ foreach ($query->get(['bill_id', 'bill_name']) as $bill) {
         $host = $port_data['hostname'];
         $port = $port_data['port'];
 
-        echo "  Polling ${port_data['ifName']} (${port_data['ifDescr']}) on ${port_data['hostname']}\n";
+        echo "  Polling {$port_data['ifName']} ({$port_data['ifDescr']}) on {$port_data['hostname']}\n";
 
         $port_data['in_measurement'] = Billing::getValue($port_data['hostname'], $port_data['port'], $port_data['ifIndex'], 'In');
         $port_data['out_measurement'] = Billing::getValue($port_data['hostname'], $port_data['port'], $port_data['ifIndex'], 'Out');
