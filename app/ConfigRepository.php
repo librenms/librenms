@@ -114,8 +114,9 @@ class ConfigRepository
         }
 
         // Check if we need to load the OS YAML file
-        if (preg_match('/^os\.(?<os>[^.]+)/', $key, $matches)) {
-            $this->loadOsYaml($matches['os']);
+        if (str_starts_with($key, 'os.')) {
+            $os = explode('.', $key)[1];
+            $this->loadOsYaml($os);
         }
 
         return Arr::get($this->config, $key, $default);
@@ -292,8 +293,9 @@ class ConfigRepository
         }
 
         // Check if we need to load the OS YAML file
-        if (preg_match('/^os\.(?<os>[^.]+)/', $key, $matches)) {
-            $this->loadOsYaml($matches['os']);
+        if (str_starts_with($key, 'os.')) {
+            $os = explode('.', $key)[1];
+            $this->loadOsYaml($os);
         }
 
         return Arr::has($this->config, $key);
