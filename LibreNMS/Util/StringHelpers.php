@@ -70,6 +70,7 @@ class StringHelpers
             'ntp-server' => 'NTP Server',
             'opengridscheduler' => 'Open Grid Scheduler',
             'opensearch' => 'Elasticsearch\Opensearch',
+            'oslv_monitor' => 'OS Level Virtualization',
             'os-updates' => 'OS Updates',
             'php-fpm' => 'PHP-FPM',
             'pi-hole' => 'Pi-hole',
