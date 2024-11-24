@@ -8,7 +8,7 @@
                     "sysDescr": "Dell Out-of-band SNMP Agent for Remote Access Controller",
                     "sysContact": "<private>",
                     "version": "6.20.200.201810113973",
-                    "hardware": "PowerEdge M1000e",
+                    "hardware": null,
                     "features": null,
                     "location": "<private>",
                     "os": "drac",
