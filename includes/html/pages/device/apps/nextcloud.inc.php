@@ -46,10 +46,11 @@ print_optionbar_end();
 $graphs = [];
 if (isset($vars['nextcloud_user'])) {
     $graphs['nextcloud_used'] = 'Used Storage Space, bytes';
-    $graphs['nextcloud_storage'] = 'Storage Space, bytes';
-    $graphs['nextcloud_calendars'] = 'Last Seen Ago, seconds';
-    $graphs['nextcloud_user_storage'] = 'Storage';
+    $graphs['nextcloud_storage'] = 'User Storage Space, bytes';
+    $graphs['nextcloud_last_seen'] = 'Last Seen Ago, seconds';
     $graphs['nextcloud_calendars'] = 'Calendars';
+    $graphs['nextcloud_quota'] = 'Storage Quota, bytes';
+    $graphs['nextcloud_relative'] = 'Storage Relative, pecent';
 } else {
     $graphs['nextcloud_used'] = 'Used Storage Space, bytes';
     if (!$multimount) {
