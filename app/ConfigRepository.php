@@ -115,7 +115,7 @@ class ConfigRepository
 
         // Check if we need to load the OS YAML file
         if (str_starts_with($key, 'os.')) {
-            $os = explode('.', $key)[1];
+            $os = substr($key, 3, (strpos($key, '.', 3) ?: strlen($key)) - 3);
             $this->loadOsYaml($os);
         }
 
@@ -294,7 +294,7 @@ class ConfigRepository
 
         // Check if we need to load the OS YAML file
         if (str_starts_with($key, 'os.')) {
-            $os = explode('.', $key)[1];
+            $os = substr($key, 3, (strpos($key, '.', 3) ?: strlen($key)) - 3);
             $this->loadOsYaml($os);
         }
 
