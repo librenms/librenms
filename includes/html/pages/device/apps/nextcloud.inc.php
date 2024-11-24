@@ -46,7 +46,7 @@ print_optionbar_end();
 $graphs = [];
 if (isset($vars['nextcloud_user'])) {
     $graphs['nextcloud_used'] = 'Used Storage Space, bytes';
-    $graphs['nextcloud_storage'] = 'User Storage Space, bytes';
+    $graphs['nextcloud_user_storage'] = 'User Storage Space, bytes';
     $graphs['nextcloud_last_seen'] = 'Last Seen Ago, seconds';
     $graphs['nextcloud_calendars'] = 'Calendars';
     $graphs['nextcloud_quota'] = 'Storage Quota, bytes';
