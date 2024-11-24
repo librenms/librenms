@@ -22,7 +22,7 @@ $metrics = [];
 $old_app_data = $app->data;
 $app_data = [
     'users' => [],
-    'user_last' => [],
+    'user_last_seen' => [],
     'multimount' => 0,
 ];
 
@@ -35,9 +35,13 @@ $top_level_stats = [
     'disabled_apps',
     'enabled_apps',
     'encryption_enabled',
-    'total',
     'used',
     'user_count',
+];
+
+$multimount_stats = [
+    'total',
+    'free',
 ];
 
 $user_stats = [
@@ -64,13 +68,15 @@ foreach ($top_level_stats as $stat) {
     }
 }
 
-if (isset($data['free']) && is_numeric($data['free'])) {
-    $rrd_name = $rrd_name = ['app', $name, $app->app_id, 'free'];
-    $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-    data_update($device, 'app', $tags, ['data' => $data['free']]);
-    $metrics['free'] = $data['free'];
-} else {
-    $metrics['free'] = null;
+foreach ($multimount_stats as $stat) {
+    if (isset($data[$stat]) && is_numeric($data[$stat])) {
+        $rrd_name = $rrd_name = ['app', $name, $app->app_id, $stat];
+        $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
+        data_update($device, 'app', $tags, ['data' => $data[$stat]]);
+        $metrics[$stat] = $data[$stat];
+    } else {
+        $metrics[$stat] = null;
+    }
 }
 
 foreach ($data['users'] as $user => $user_hash) {
@@ -86,8 +92,9 @@ foreach ($data['users'] as $user => $user_hash) {
                 $metrics[$stat] = null;
             }
         }
-        if (isset($user_hash['last_seen_string']) && is_string($user_hash['last_seen_string']) && strlen($user_hash['last_seen_string']) < 32) {
-            $app_data['user_last'] = $user_hash['last_seen_string'];
+        if (isset($user_hash['last_seen_string']) && is_string($user_hash['last_seen_string']) && strlen($user_hash['last_seen_string']) < 128) {
+            $app_data['user_last_seen'][$user] = $user_hash['last_seen_string'];
+            echo 'last seen '.$user_hash['last_seen_string']."\n";
         }
     }
 }
