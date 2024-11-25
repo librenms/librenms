@@ -83,7 +83,7 @@
                     "app_type": "nextcloud"
                 },
                 {
-                    "metric": "users_foo_calendars",
+                    "metric": "users___foo___calendars",
                     "value": 2,
                     "value_prev": null,
                     "app_type": "nextcloud"

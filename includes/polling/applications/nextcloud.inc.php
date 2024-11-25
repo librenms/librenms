@@ -88,7 +88,7 @@ foreach ($data['users'] as $user => $user_hash) {
                 $rrd_name = $rrd_name = ['app', $name, $app->app_id, 'users___' . $user . '___' . $stat];
                 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
                 data_update($device, 'app', $tags, ['data' => $user_hash[$stat]]);
-                $metrics['users___' . $user . '___' . $stat] = $data[$stat];
+                $metrics['users___' . $user . '___' . $stat] = $user_hash[$stat];
             } else {
                 $metrics['users___' . $user . '___' . $stat] = null;
             }
