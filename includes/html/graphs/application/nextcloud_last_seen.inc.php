@@ -3,7 +3,7 @@
 $munge = true;
 $name = 'nextcloud';
 $unit_text = 'days ago';
-$descr='last seen';
+$descr = 'last seen';
 
 if (isset($vars['nextcloud_user'])) {
     $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'users___' . $vars['nextcloud_user'] . '___last_seen']);

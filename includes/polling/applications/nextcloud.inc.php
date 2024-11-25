@@ -42,6 +42,7 @@ $top_level_stats = [
 $multimount_stats = [
     'total',
     'free',
+    'quota',
 ];
 
 $user_stats = [
@@ -94,7 +95,7 @@ foreach ($data['users'] as $user => $user_hash) {
         }
         if (isset($user_hash['last_seen_string']) && is_string($user_hash['last_seen_string']) && strlen($user_hash['last_seen_string']) < 128) {
             $app_data['user_last_seen'][$user] = $user_hash['last_seen_string'];
-            echo 'last seen '.$user_hash['last_seen_string']."\n";
+            echo 'last seen ' . $user_hash['last_seen_string'] . "\n";
         }
     }
 }

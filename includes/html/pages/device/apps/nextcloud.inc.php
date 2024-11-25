@@ -16,7 +16,10 @@ if (isset($vars['nextcloud_user'])) {
 
 print_optionbar_start();
 
-echo generate_link('Basics', $link_array);
+$label = ! isset($vars['nextcloud_user'])
+    ? '<span class="pagemenu-selected">Basics</span>'
+    : 'Basics';
+echo generate_link($label, $link_array);
 echo ' | Users: ';
 $nextcloud_users = $app->data['users'] ?? [];
 sort($nextcloud_users);
@@ -53,8 +56,9 @@ if (isset($vars['nextcloud_user'])) {
     $graphs['nextcloud_relative'] = 'Storage Relative, pecent';
 } else {
     $graphs['nextcloud_used'] = 'Used Storage Space, bytes';
-    if (!$multimount) {
+    if (! $multimount) {
         $graphs['nextcloud_storage'] = 'Storage Space, bytes';
+        $graphs['nextcloud_storage_with_quota'] = 'Storage Space And Quota, bytes';
     }
     $graphs['nextcloud_calendars'] = 'Calendars';
     $graphs['nextcloud_disabled_apps'] = 'Disabled Apps';
@@ -67,7 +71,7 @@ foreach ($graphs as $key => $text) {
     $graph_type = $key;
     $graph_array['height'] = '100';
     $graph_array['width'] = '215';
-    $graph_array['to'] = \LibreNMS\Config::get('time.now');
+    $graph_array['to'] = LibreNMS\Config::get('time.now');
     $graph_array['id'] = $app['app_id'];
     $graph_array['type'] = 'application_' . $key;
 
