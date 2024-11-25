@@ -88,9 +88,9 @@ foreach ($data['users'] as $user => $user_hash) {
                 $rrd_name = $rrd_name = ['app', $name, $app->app_id, 'users___' . $user . '___' . $stat];
                 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
                 data_update($device, 'app', $tags, ['data' => $user_hash[$stat]]);
-                $metrics[$stat] = $data[$stat];
+                $metrics['users___' . $user . '___' . $stat] = $data[$stat];
             } else {
-                $metrics[$stat] = null;
+                $metrics['users___' . $user . '___' . $stat] = null;
             }
         }
         if (isset($user_hash['last_seen_string']) && is_string($user_hash['last_seen_string']) && strlen($user_hash['last_seen_string']) < 128) {

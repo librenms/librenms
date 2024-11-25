@@ -89,37 +89,37 @@
                     "app_type": "nextcloud"
                 },
                 {
-                    "metric": "users_foo_free",
+                    "metric": "users___foo___free",
                     "value": 2447894299136,
                     "value_prev": null,
                     "app_type": "nextcloud"
                 },
                 {
-                    "metric": "users_foo_last_seen",
+                    "metric": "users___foo___last_seen",
                     "value": 263,
                     "value_prev": null,
                     "app_type": "nextcloud"
                 },
                 {
-                    "metric": "users_foo_quota",
+                    "metric": "users___foo____quota",
                     "value": -3,
                     "value_prev": null,
                     "app_type": "nextcloud"
                 },
                 {
-                    "metric": "users_foo_relative",
+                    "metric": "users___foo___relative",
                     "value": 0.36,
                     "value_prev": null,
                     "app_type": "nextcloud"
                 },
                 {
-                    "metric": "users_foo_total",
+                    "metric": "users___foo___total",
                     "value": 2456634098342,
                     "value_prev": null,
                     "app_type": "nextcloud"
                 },
                 {
-                    "metric": "users_foo_used",
+                    "metric": "users___foo___used",
                     "value": 8739799206,
                     "value_prev": null,
                     "app_type": "nextcloud"
