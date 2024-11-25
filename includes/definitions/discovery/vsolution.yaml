@@ -46,6 +46,12 @@ modules:
                     num_oid: '.1.3.6.1.4.1.37950.1.1.6.1.1.3.1.3.{{ $index }}'
                     descr: "{{ $gOnuDetailInfoOnuDesc }}"
                     group: "ONU"
+                    skip_values:
+                        -
+                            oid: V1600G::gOnuOpticalInfoTemp
+                            num_oid: '.1.3.6.1.4.1.37950.1.1.6.1.1.3.1.3.{{ $index }}'
+                            op: '='
+                            value: '0.00'
         voltage:
             data:
                 -
@@ -58,6 +64,12 @@ modules:
                     num_oid: '.1.3.6.1.4.1.37950.1.1.6.1.1.3.1.4.{{ $index }}'
                     descr: "{{ $gOnuDetailInfoOnuDesc }} Voltage"
                     group: "ONU"
+                    skip_values:
+                        -
+                            oid: V1600G::gOnuOpticalInfoVolt
+                            num_oid: '.1.3.6.1.4.1.37950.1.1.6.1.1.3.1.4.{{ $index }}'
+                            op: '='
+                            value: '0.00'
         current:
             data:
                 -
@@ -68,10 +80,15 @@ modules:
                     divisor: 1000
                 -
                     oid: V1600G::gOnuOpticalInfoBias
-                    value: V1600D::biasCurrent
                     num_oid: '.1.3.6.1.4.1.37950.1.1.6.1.1.3.1.5.{{ $index }}'
                     descr: "{{ $gOnuDetailInfoOnuDesc }} Bias"
                     group: "ONU"
+                    skip_values:
+                        -
+                            oid: V1600G::gOnuOpticalInfoBias
+                            num_oid: '.1.3.6.1.4.1.37950.1.1.6.1.1.3.1.5.{{ $index }}'
+                            op: '='
+                            value: '0.00'
         dbm:
             data:
                 -
@@ -90,8 +107,20 @@ modules:
                     num_oid: '.1.3.6.1.4.1.37950.1.1.6.1.1.3.1.6.{{ $index }}'
                     descr: "{{ $gOnuDetailInfoOnuDesc }} TX-Power"
                     group: "ONU"
+                    skip_values:
+                        -
+                            oid: V1600G::gOnuOpticalInfoTxPwr
+                            num_oid: '.1.3.6.1.4.1.37950.1.1.6.1.1.3.1.6.{{ $index }}'
+                            op: '='
+                            value: '0.00'
                 -
                     oid: V1600G::gOnuOpticalInfoRxPwr
                     num_oid: '.1.3.6.1.4.1.37950.1.1.6.1.1.3.1.7.{{ $index }}'
                     descr: "{{ $gOnuDetailInfoOnuDesc }} RX-Power"
                     group: "ONU"
+                    skip_values:
+                        -
+                            oid: V1600G::gOnuOpticalInfoRxPwr
+                            num_oid: '.1.3.6.1.4.1.37950.1.1.6.1.1.3.1.7.{{ $index }}'
+                            op: '='
+                            value: '0.00'
