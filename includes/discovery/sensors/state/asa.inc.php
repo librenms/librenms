@@ -10,12 +10,12 @@
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
  *
- * @link       https://www.librenms.org
+ * @link        https://www.librenms.org
  *
- * @copyright 2016 Søren Friis Rosiak <sorenrosiak@gmail.com>
- * @author Søren Friis Rosiak <sorenrosiak@gmail.com>
- * @copyright  2024 CTNET BV
- * @author     Rudy Broersma <r.broersma@ctnet.nl>
+ * @copyright   2016 Søren Friis Rosiak <sorenrosiak@gmail.com>
+ * @author      Søren Friis Rosiak <sorenrosiak@gmail.com>
+ * @copyright   2024 CTNET BV
+ * @author      Rudy Broersma <r.broersma@ctnet.nl>
  */
 
 $temp = snmpwalk_cache_multi_oid($device, 'cfwHardwareStatusTable', [], 'CISCO-FIREWALL-MIB');
@@ -66,7 +66,7 @@ if (is_array($temp)) {
             $sensor_value = $stateLookupTable[$temp[$index]['cfwHardwareStatusValue']];
 
             //Discover Sensors
-            discover_sensor(null, 'state', $device, $cur_oid . $oid_index, $oid_index, $state_name, $descr, 1, 1, null, null, null, null, $temp[$index]['cfwHardwareStatusValue'], 'snmp', $oid_index);
+            discover_sensor(null, 'state', $device, $cur_oid . $oid_index, $oid_index, $state_name, $descr, 1, 1, null, null, null, null, $sensor_value, 'snmp', $oid_index);
 
             //Create Sensor To State Index
             create_sensor_to_state_index($device, $state_name, $oid_index);
