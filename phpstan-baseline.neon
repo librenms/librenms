@@ -121,11 +121,6 @@ parameters:
 			path: LibreNMS/OS/Timos.php
 
 		-
-			message: "#^Property LibreNMS\\\\Proc\\:\\:\\$_pipes is never written, only read\\.$#"
-			count: 1
-			path: LibreNMS/Proc.php
-
-		-
 			message: "#^If condition is always false\\.$#"
 			count: 2
 			path: LibreNMS/Util/CiHelper.php
