@@ -101,7 +101,7 @@
                     "app_type": "nextcloud"
                 },
                 {
-                    "metric": "users___foo____quota",
+                    "metric": "users___foo___quota",
                     "value": -3,
                     "value_prev": null,
                     "app_type": "nextcloud"
