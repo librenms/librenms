@@ -239,6 +239,19 @@ modules:
                     num_oid: '.1.3.6.1.4.1.674.10892.2.3.1.12.{{ $index }}'
                     index: 'drsCMCProcessorTemperature.{{ $index }}'
                     descr: 'CMC Processor Temperature'
+                -
+                    oid: temperatureProbeTable
+                    value: temperatureProbeReading
+                    num_oid: '.1.3.6.1.4.1.674.10892.5.4.700.20.1.6.{{ $index }}'
+                    index: '{{ $index }}'
+                        # Better but break graphs
+                        #index: 'temperatureProbeReading.{{ $index }}'
+                    descr: temperatureProbeLocationName
+                    divisor: 10
+                    high_limit: temperatureProbeUpperCriticalThreshold
+                    warn_limit: temperatureProbeUpperNonCriticalThreshold
+                    low_warn_limit: temperatureProbeLowerNonCriticalThreshold
+                    low_limit: temperatureProbeLowerCriticalThreshold
         voltage:
             data:
                 -
