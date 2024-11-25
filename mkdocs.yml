@@ -30,6 +30,7 @@ theme:
     - navigation.top
     - navigation.path
     - content.tabs.link
+    - content.action.edit
 site_dir: out
 site_url: https://docs.librenms.org
 markdown_extensions:
