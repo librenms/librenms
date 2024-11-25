@@ -23,7 +23,7 @@
                     "app_state_prev": "UNKNOWN",
                     "app_status": "",
                     "app_instance": "",
-                    "data": null,
+                    "data": "{\"users\":[\"foo\"],\"user_last_seen\":{\"foo\":\"2024-11-25T10:25:42+00:00\"},\"multimount\":0}",
                     "deleted_at": null
                 }
             ],
@@ -55,12 +55,6 @@
                 {
                     "metric": "free",
                     "value": 2447894299136,
-                    "value_prev": null,
-                    "app_type": "nextcloud"
-                },
-                {
-                    "metric": "multimount",
-                    "value": 0,
                     "value_prev": null,
                     "app_type": "nextcloud"
                 },
