@@ -1,0 +1,47 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.8072.3.2.10",
+                    "sysDescr": "SONiC Software Version: SONiC.Edgecore-SONiC_20230706_055328_ec202111_453 - HwSku: Accton-AS7326-56X - Distribution: Debian 11.7 - Kernel: 5.10.0-8-2-amd64",
+                    "sysContact": "<private>",
+                    "version": null,
+                    "hardware": null,
+                    "features": null,
+                    "location": "<private>",
+                    "os": "edgecos",
+                    "type": "network",
+                    "serial": null,
+                    "icon": "edge-core.png"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    },
+    "ospf": {
+        "poller": {
+            "ospf_instances": [
+                {
+                    "ospf_instance_id": 0,
+                    "ospfRouterId": "0.0.0.0",
+                    "ospfAdminStat": "disabled",
+                    "ospfVersionNumber": "version2",
+                    "ospfAreaBdrRtrStatus": "false",
+                    "ospfASBdrRtrStatus": "false",
+                    "ospfExternLsaCount": 0,
+                    "ospfExternLsaCksumSum": 0,
+                    "ospfTOSSupport": "false",
+                    "ospfOriginateNewLsas": 0,
+                    "ospfRxNewLsas": 0,
+                    "ospfExtLsdbLimit": -1,
+                    "ospfMulticastExtensions": 0,
+                    "ospfExitOverflowInterval": 0,
+                    "ospfDemandExtensions": "false",
+                    "context_name": ""
+                }
+            ]
+        }
+    }
+}
