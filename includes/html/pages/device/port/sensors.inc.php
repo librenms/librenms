@@ -4,7 +4,7 @@ use App\Models\Sensor;
 use LibreNMS\Util\Number;
 
 $sensors = Sensor::where('device_id', $device['device_id'])
-    ->where('entPhysicalIndex',$port['ifIndex'])
+    ->where('entPhysicalIndex', $port['ifIndex'])
     ->where('entPhysicalIndex_measured', 'ports')
     ->orderBy('sensor_type', 'ASC');
 
