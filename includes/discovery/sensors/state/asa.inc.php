@@ -19,11 +19,11 @@
  */
 
 $cur_oid = '.1.3.6.1.4.1.9.9.147.1.2.1.1.1.3.';
-$temp = snmpwalk_cache_multi_oid($device, 'cfwHardwareStatusTable', [], 'CISCO-FIREWALL-MIB', null, '-OQUse');
+$temp = SnmpQuery::cache()->walk('CISCO-FIREWALL-MIB::cfwHardwareStatusTable')->table(1);
 
 if (is_array($temp)) {
     //Create State Index
-    if (strstr($temp['netInterface']['cfwHardwareStatusDetail'], 'not Configured') == false) {
+    if (strstr($temp['netInterface']['CISCO-FIREWALL-MIB::cfwHardwareStatusDetail'], 'not Configured') == false) {
         $state_name = 'cfwHardwareStatus';
         $states = [
             ['value' => 1, 'generic' => 2, 'graph' => 0, 'descr' => 'other'],
@@ -40,7 +40,7 @@ if (is_array($temp)) {
         create_state_index($state_name, $states);
 
         foreach ($temp as $index => $entry) {
-            $descr = ucwords(trim(preg_replace('/\s*\([^\s)]*\)/', '', $temp[$index]['cfwHardwareInformation'])));
+            $descr = ucwords(trim(preg_replace('/\s*\([^\s)]*\)/', '', $temp[$index]['CISCO-FIREWALL-MIB::cfwHardwareInformation'])));
 
             if ($index == 'netInterface') {
                 $oid_index = 4;
@@ -50,7 +50,7 @@ if (is_array($temp)) {
                 $oid_index = 7;
             }
 
-            $sensor_value = $temp[$index]['cfwHardwareStatusValue'];
+            $sensor_value = $temp[$index]['CISCO-FIREWALL-MIB::cfwHardwareStatusValue'];
 
             //Discover Sensors
             discover_sensor(null, 'state', $device, $cur_oid . $oid_index, $oid_index, $state_name, $descr, 1, 1, null, null, null, null, $sensor_value, 'snmp', $oid_index);
