@@ -144,6 +144,8 @@ try {
         echo PHP_EOL;
 
         \LibreNMS\Util\OS::updateCache(true); // Force update of OS Cache
+        LibrenmsConfig::invalidateCache();
+        LibrenmsConfig::reload();
         $tester = new ModuleTestHelper($modules, $target_os, $target_variant);
         if (! $no_save && ! empty($output_file)) {
             $tester->setJsonSavePath($output_file);

@@ -239,6 +239,8 @@ class ConfigRepository
             // delete any children (there should not be any unless it is legacy)
             \App\Models\Config::query()->where('config_name', 'like', "$key.%")->delete();
 
+            $this->invalidateCache(); // config has been changed, it will need to be reloaded
+
             return true;
         } catch (Exception $e) {
             if (class_exists(Log::class)) {
@@ -314,6 +316,16 @@ class ConfigRepository
     public function getAll(): array
     {
         return $this->config;
+    }
+
+    /**
+     * Invalidate config cache (but don't reload)
+     * Next time the config is loaded, it will loaded fresh
+     * Because this is currently hardcoded to file cache, it will only clear the cache on this node
+     */
+    public function invalidateCache(): void
+    {
+        Cache::driver('file')->forget('librenms-config');
     }
 
     /**
@@ -456,8 +468,8 @@ class ConfigRepository
         if (! $this->has('snmp.unescape')) {
             $this->persist('snmp.unescape', version_compare((new Version($this))->netSnmp(), '5.8.0', '<'));
         }
-        if (! self::has('reporting.usage')) {
-            self::persist('reporting.usage', (bool) Callback::get('enabled'));
+        if (! $this->has('reporting.usage')) {
+            $this->persist('reporting.usage', (bool) Callback::get('enabled'));
         }
 
         // populate legacy DB credentials, just in case something external uses them.  Maybe remove this later
