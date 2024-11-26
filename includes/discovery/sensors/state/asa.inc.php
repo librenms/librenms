@@ -18,8 +18,8 @@
  * @author      Rudy Broersma <r.broersma@ctnet.nl>
  */
 
-$temp = snmpwalk_cache_multi_oid($device, 'cfwHardwareStatusTable', [], 'CISCO-FIREWALL-MIB');
 $cur_oid = '.1.3.6.1.4.1.9.9.147.1.2.1.1.1.3.';
+$temp = snmpwalk_cache_multi_oid($device, 'cfwHardwareStatusTable', [], 'CISCO-FIREWALL-MIB', null, '-OQUse');
 
 if (is_array($temp)) {
     //Create State Index
@@ -39,19 +39,6 @@ if (is_array($temp)) {
         ];
         create_state_index($state_name, $states);
 
-        $stateLookupTable = [
-            'other' => 1,
-            'up' => 2,
-            'down' => 3,
-            'error' => 4,
-            'overTemp' => 5,
-            'busy' => 6,
-            'noMedia' => 7,
-            'backup' => 8,
-            'active' => 9,
-            'standby' => 10,
-        ];
-
         foreach ($temp as $index => $entry) {
             $descr = ucwords(trim(preg_replace('/\s*\([^\s)]*\)/', '', $temp[$index]['cfwHardwareInformation'])));
 
@@ -63,7 +50,7 @@ if (is_array($temp)) {
                 $oid_index = 7;
             }
 
-            $sensor_value = $stateLookupTable[$temp[$index]['cfwHardwareStatusValue']];
+            $sensor_value = $temp[$index]['cfwHardwareStatusValue'];
 
             //Discover Sensors
             discover_sensor(null, 'state', $device, $cur_oid . $oid_index, $oid_index, $state_name, $descr, 1, 1, null, null, null, null, $sensor_value, 'snmp', $oid_index);
