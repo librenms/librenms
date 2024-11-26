@@ -41,7 +41,7 @@ use Symfony\Component\Yaml\Yaml;
 class ConfigRepository
 {
     private array $config;
-    private array $osLoaded;
+    private bool $osLoaded = false;
 
     /**
      * Load the config, if the database connected, pull in database settings.
@@ -62,7 +62,6 @@ class ConfigRepository
 
             return $this->config;
         });
-        $this->osLoaded = [];
 
         // set config settings that must change every run
         $this->loadRuntimeSettings();
@@ -101,10 +100,6 @@ class ConfigRepository
      */
     public function get($key, $default = null): mixed
     {
-        if ($key == 'os') {
-            $this->loadOsAll();
-        }
-
         if (isset($this->config[$key])) {
             return $this->config[$key];
         }
@@ -114,9 +109,8 @@ class ConfigRepository
         }
 
         // Check if we need to load the OS YAML file
-        if (str_starts_with($key, 'os.')) {
-            $os = substr($key, 3, (strpos($key, '.', 3) ?: strlen($key)) - 3);
-            $this->loadOsYaml($os);
+        if (! $this->osLoaded && str_starts_with($key, 'os.')) {
+            $this->loadAllOsDefinitions();
         }
 
         return Arr::get($this->config, $key, $default);
@@ -298,9 +292,8 @@ class ConfigRepository
         }
 
         // Check if we need to load the OS YAML file
-        if (str_starts_with($key, 'os.')) {
-            $os = substr($key, 3, (strpos($key, '.', 3) ?: strlen($key)) - 3);
-            $this->loadOsYaml($os);
+        if (! $this->osLoaded && str_starts_with($key, 'os.')) {
+            $this->loadAllOsDefinitions();
         }
 
         return Arr::has($this->config, $key);
@@ -595,103 +588,36 @@ class ConfigRepository
     }
 
     /**
-     * Load OS settings from yaml into config if not already loaded, preserving user OS config
-     *
-     * @param  string  $os
-     */
-    private function loadOsYaml($os)
-    {
-        if (! Arr::has($this->osLoaded, $os)) {
-            $yaml_file = base_path("/includes/definitions/$os.yaml");
-            if (file_exists($yaml_file)) {
-                $os_def = Yaml::parse(file_get_contents($yaml_file));
-
-                $this->set("os.$os", $this->configMerge($os_def, Arr::get($this->config, "os.$os", null)));
-                Arr::set($this->osLoaded, $os, true);
-            }
-        }
-    }
-
-    /**
-     * Load all OS settings from yaml
-     */
-    private function loadOsAllYaml()
-    {
-        $install_dir = $this->get('install_dir');
-        // load from yaml
-        $os_list = glob($install_dir . '/includes/definitions/*.yaml');
-        foreach ($os_list as $file) {
-            $os = basename($file, '.yaml');
-            $this->loadOsYaml($os);
-        }
-    }
-
-    /**
      * Load all OS settings from yaml or cache
      */
-    private function loadOsAll()
+    private function loadAllOsDefinitions(): void
     {
-        $install_dir = $this->get('install_dir');
-        $cache_file = $install_dir . '/cache/os_defs.cache';
-        if ($this->get('os_def_cache_time')) {
-            $this->updateOsCache();
-            $os_defs = unserialize(file_get_contents($cache_file));
+        if (! $this->osLoaded) {
+            $os_yaml = Cache::remember('os_definitions', 86400, function () {
+                $os_defs1 = [];
+                $install_dir = $this->get('install_dir');
+                $os_list = glob($install_dir . '/includes/definitions/*.yaml');
 
-            if ($os_defs) {
-                $this->set('os', $this->configMerge($os_defs, Arr::get($this->config, 'os')));
-                foreach ($os_defs as $os => $os_conf) {
-                    Arr::set($this->osLoaded, $os, true);
+                foreach ($os_list as $yaml_file) {
+                    $os = basename($yaml_file, '.yaml');
+                    $os_defs1[$os] = Yaml::parse(file_get_contents($yaml_file));
                 }
 
-                return;
-            }
-        }
+                return $os_defs1;
+            });
 
-        // Cache time is false, or something went wrong
-        $this->loadOsAllYaml();
+            $os_defs = $this->configMerge($os_yaml, Arr::get($this->config, 'os'));
+            $this->set('os', $os_defs);
+            $this->osLoaded = true;
+        }
     }
 
     /**
      * Clear the OS cache file cache/os_defs.cache
      */
-    public function clearOsCache()
+    public function clearOsCache(): void
     {
-        $install_dir = $this->get('install_dir');
-        $cache_file = "$install_dir/cache/os_defs.cache";
-
-        if (is_file($cache_file)) {
-            unlink($cache_file);
-        }
-    }
-
-    /**
-     * Update the OS cache file cache/os_defs.cache
-     */
-    private function updateOsCache()
-    {
-        $install_dir = $this->get('install_dir');
-        $cache_file = "$install_dir/cache/os_defs.cache";
-        $cache_keep_time = $this->get('os_def_cache_time', 86400);
-
-        if (is_file($cache_file)) {
-            $timediff = time() - filemtime($cache_file);
-            if ($timediff > 0 && $timediff < $cache_keep_time) {
-                Log::debug('os_def.cache is current');
-
-                return;
-            }
-        }
-
-        Log::debug('Updating os_def.cache');
-
-        // Reload config to re-read all config.php and db fields
-        $this->__construct();
-
-        // Load all Os from Yaml
-        $this->loadOsAllYaml();
-
-        // Write cache file
-        file_put_contents($cache_file, serialize(Arr::get($this->config, 'os')));
+        Cache::forget('os_definitions');
     }
 
     /**
@@ -700,17 +626,17 @@ class ConfigRepository
      * @param  mixed  $config
      * @param  mixed  $overrides
      */
-    private function configMerge($config, $overrides)
+    private function configMerge($config, $overrides): array
     {
-        if (Arr::accessible($overrides)) {
-            if (! Arr::isAssoc($overrides)) {
+        if (is_array($overrides)) {
+            if (array_is_list($overrides)) {
                 return $overrides;
             }
 
             // Loop over overrides and recurse or set values as needed
             foreach ($overrides as $cfgKey => $overrideVal) {
-                if (array_key_exists($cfgKey, $config) && Arr::accessible($overrideVal) && Arr::accessible($config[$cfgKey])) {
-                    $config[$cfgKey] = self::configMerge($config[$cfgKey], $overrideVal);
+                if (array_key_exists($cfgKey, $config) && is_array($overrideVal) && is_array($config[$cfgKey])) {
+                    $config[$cfgKey] = $this->configMerge($config[$cfgKey], $overrideVal);
                 } else {
                     $config[$cfgKey] = $overrideVal;
                 }
