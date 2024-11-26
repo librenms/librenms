@@ -100,17 +100,17 @@ class ConfigRepository
      */
     public function get($key, $default = null): mixed
     {
+        // Check if we need to load the OS YAML file
+        if (! $this->osLoaded && ($key === 'os' || str_starts_with($key, 'os.'))) {
+            $this->loadAllOsDefinitions();
+        }
+
         if (isset($this->config[$key])) {
             return $this->config[$key];
         }
 
         if (! Str::contains($key, '.')) {
             return $default;
-        }
-
-        // Check if we need to load the OS YAML file
-        if (! $this->osLoaded && str_starts_with($key, 'os.')) {
-            $this->loadAllOsDefinitions();
         }
 
         return Arr::get($this->config, $key, $default);
@@ -162,9 +162,7 @@ class ConfigRepository
     public function getOsSetting($os, $key, $default = null): mixed
     {
         if ($os) {
-            $os_key = "os.$os.$key";
-
-            return $this->get($os_key, $default);
+            return $this->get("os.$os.$key", $default);
         }
 
         return $default;
@@ -283,17 +281,17 @@ class ConfigRepository
      */
     public function has($key): bool
     {
+        // Check if we need to load the OS YAML file
+        if (! $this->osLoaded && ($key === 'os' || str_starts_with($key, 'os.'))) {
+            $this->loadAllOsDefinitions();
+        }
+
         if (isset($this->config[$key])) {
             return true;
         }
 
         if (! Str::contains($key, '.')) {
             return false;
-        }
-
-        // Check if we need to load the OS YAML file
-        if (! $this->osLoaded && str_starts_with($key, 'os.')) {
-            $this->loadAllOsDefinitions();
         }
 
         return Arr::has($this->config, $key);
@@ -613,7 +611,7 @@ class ConfigRepository
     }
 
     /**
-     * Clear the OS cache file cache/os_defs.cache
+     * Clear the OS cache, does not reset runtime os data if it was previously loaded
      */
     public function clearOsCache(): void
     {
