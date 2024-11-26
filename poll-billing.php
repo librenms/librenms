@@ -12,6 +12,7 @@
  */
 
 use LibreNMS\Billing;
+use LibreNMS\Config;
 use LibreNMS\Data\Store\Datastore;
 use LibreNMS\Util\Debug;
 
@@ -22,11 +23,19 @@ if (isset($argv[1]) && is_numeric($argv[1])) {
     // allow old cli style
     $options = ['b' => $argv[1]];
 } else {
-    $options = getopt('db:');
+    $options = getopt('fdb:');
 }
 
 Debug::set(isset($options['d']));
 Datastore::init();
+
+$scheduler = Config::get('schedule_type.billing');
+if (! isset($options['f']) && $scheduler != 'legacy' && $scheduler != 'cron') {
+    if (Debug::isEnabled()) {
+        echo "Billing is not enabled for cron scheduling. Add the -f command argument if you want to force this command to run.\n";
+    }
+    exit(0);
+}
 
 $poller_start = microtime(true);
 echo "Starting Polling Session ... \n\n";
@@ -56,7 +65,7 @@ foreach ($query->get(['bill_id', 'bill_name']) as $bill) {
         $host = $port_data['hostname'];
         $port = $port_data['port'];
 
-        echo "  Polling ${port_data['ifName']} (${port_data['ifDescr']}) on ${port_data['hostname']}\n";
+        echo "  Polling {$port_data['ifName']} ({$port_data['ifDescr']}) on {$port_data['hostname']}\n";
 
         $port_data['in_measurement'] = Billing::getValue($port_data['hostname'], $port_data['port'], $port_data['ifIndex'], 'In');
         $port_data['out_measurement'] = Billing::getValue($port_data['hostname'], $port_data['port'], $port_data['ifIndex'], 'Out');

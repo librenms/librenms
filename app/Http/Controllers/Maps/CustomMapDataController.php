@@ -31,11 +31,11 @@ use App\Models\CustomMapEdge;
 use App\Models\CustomMapNode;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Config;
 use LibreNMS\Util\Number;
-use LibreNMS\Util\Url;
 
 class CustomMapDataController extends Controller
 {
@@ -76,7 +76,7 @@ class CustomMapDataController extends Controller
             if ($edge->port) {
                 $edges[$edgeid]['device_id'] = $edge->port->device_id;
                 $edges[$edgeid]['port_name'] = $edge->port->device->displayName() . ' - ' . $edge->port->getLabel();
-                $edges[$edgeid]['port_info'] = Url::portLink($edge->port, null, null, false, true);
+                $edges[$edgeid]['port_info'] = Blade::render('<x-port-link-map :port="$port" />', ['port' => $edge->port]);
 
                 // Work out speed to and from
                 $speedto = 0;
@@ -173,6 +173,7 @@ class CustomMapDataController extends Controller
                 'style' => $node->style,
                 'icon' => $node->icon,
                 'image' => $node->image,
+                'nodeimage' => $node->nodeimage ? $node->nodeimage->custom_map_node_image_id : null,
                 'size' => $node->size,
                 'border_width' => $node->border_width,
                 'text_face' => $node->text_face,
@@ -195,7 +196,7 @@ class CustomMapDataController extends Controller
             if ($node->device) {
                 $nodes[$nodeid]['device_name'] = $node->device->hostname . '(' . $node->device->sysName . ')';
                 $nodes[$nodeid]['device_image'] = $node->device->icon;
-                $nodes[$nodeid]['device_info'] = Url::deviceLink($node->device, null, [], 0, 0, 0, 0);
+                $nodes[$nodeid]['device_info'] = Blade::render('<x-device-link-map :device="$device" />', ['device' => $node->device]);
 
                 if ($node->device->disabled) {
                     $this->setNodeDisabledStyle($nodes[$nodeid]);
@@ -268,6 +269,7 @@ class CustomMapDataController extends Controller
                 $dbnode->style = $node['shape'];
                 $dbnode->icon = $node['icon'];
                 $dbnode->image = $node['image']['unselected'] ?? '';
+                $dbnode->node_image_id = $node['nodeimage'] ?? null;
                 $dbnode->size = $node['size'];
                 $dbnode->text_face = $node['font']['face'];
                 $dbnode->text_size = $node['font']['size'];

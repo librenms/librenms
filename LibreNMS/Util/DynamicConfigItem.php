@@ -25,7 +25,7 @@
 
 namespace LibreNMS\Util;
 
-use LibreNMS\Config;
+use App\Facades\LibrenmsConfig;
 use Validator;
 
 #[\AllowDynamicProperties]
@@ -50,7 +50,7 @@ class DynamicConfigItem implements \ArrayAccess
     public function __construct($name, $settings = [])
     {
         $this->name = $name;
-        $this->value = Config::get($this->name, $this->default);
+        $this->value = LibrenmsConfig::get($this->name, $this->default);
 
         foreach ($settings as $key => $value) {
             $this->$key = $value;

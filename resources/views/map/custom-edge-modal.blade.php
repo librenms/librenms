@@ -194,9 +194,11 @@
         edgedata.edge1.font.size = edgedata.edge2.font.size = $("#edgetextsize").val();
         edgedata.edge1.font.color = edgedata.edge2.font.color = $("#edgetextcolour").val();
         edgedata.edge1.font.align = edgedata.edge2.font.align = $("#edgetextalign").val();
+        edgedata.edge1.font.background = edgedata.edge2.font.background = '#FFFFFF';
         edgedata.edge1.label = edgedata.edge2.label = edgeLabel($("#edgetextshow").prop('checked'), $("#edgebpsshow").prop('checked'), null);
         edgedata.edge1.width = edgedata.edge2.width = parseFloat($("#edgefixedwidth").val()) || null;
         edgedata.edge1.title = edgedata.edge2.title = $("#port_id").val();
+        edgedata.edge1.arrowStrikethrough = edgedata.edge2.arrowStrikethrough = false;
         let newlabel = $("#edgelabel").val() || '';
         if (newlabel == '' && edgedata.mid.label != '') {
             $("#map-renderButton").show();

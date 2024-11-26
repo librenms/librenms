@@ -648,7 +648,7 @@ foreach ($apps as $app) {
         echo "<span class='pagemenu-selected'>";
     }
     echo $app_state_info;
-    echo generate_link($app->displayName(), ['page' => 'apps', 'app' => $app->app_type]);
+    echo generate_link(htmlentities($app->displayName()), ['page' => 'apps', 'app' => $app->app_type]);
     if ($vars['app'] == $app->app_type) {
         echo '</span>';
     }
