@@ -592,7 +592,7 @@ class ConfigRepository
     {
         if (! $this->osLoaded) {
             $cache_ttl = $this->get('os_def_cache_time');
-            $os_yaml = Cache::driver($cache_ttl == 0 ? 'null' : 'file')->remember('os_definitions', $cache_ttl, function () {
+            $os_yaml = Cache::driver($cache_ttl == 0 ? 'null' : 'database')->remember('os_definitions', $cache_ttl, function () {
                 $os_defs1 = [];
                 $install_dir = $this->get('install_dir');
                 $os_list = glob($install_dir . '/includes/definitions/*.yaml');
@@ -616,7 +616,7 @@ class ConfigRepository
      */
     public function clearOsCache(): void
     {
-        Cache::forget('os_definitions');
+        Cache::driver('database')->forget('os_definitions');
     }
 
     /**
