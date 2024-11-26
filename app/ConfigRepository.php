@@ -190,15 +190,20 @@ class ConfigRepository
     public function getCombined(?string $os, string $key, string $global_prefix = '', array $default = []): array
     {
         $global_key = $global_prefix . $key;
+        $os_key = "os.$os.$key";
 
-        $globalVal = (array) $this->get($global_key, []);
-        $osVal = (array) $this->get("os.$os.$key", []);
-
-        if ($globalVal || $osVal) {
-            return array_unique(array_merge($globalVal, $osVal));
+        if (! $this->has($os_key)) {
+            return (array) $this->get($global_key, $default);
         }
 
-        return $default;
+        if (! $this->has($global_key)) {
+            return (array) $this->getOsSetting($os, $key, $default);
+        }
+
+        return array_unique(array_merge(
+            (array) $this->get($global_key),
+            (array) $this->get($os_key)
+        ));
     }
 
     /**
