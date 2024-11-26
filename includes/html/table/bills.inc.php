@@ -141,7 +141,7 @@ foreach (dbFetchRows($sql, $param) as $bill) {
     $background = \LibreNMS\Util\Color::percentage($percent, null);
     $right_background = $background['right'];
     $left_background = $background['left'];
-    $overuse_formatted = (($overuse <= 0) ? '-' : "<span style='color: #${background['left']}; font-weight: bold;'>$overuse_formatted</span>");
+    $overuse_formatted = (($overuse <= 0) ? '-' : "<span style='color: #{$background['left']}; font-weight: bold;'>$overuse_formatted</span>");
 
     $bill_name = "<a href='$url'><span style='font-weight: bold;' class='interface'>" . htmlentities($bill['bill_name']) . '</span></a><br />' .
                     date('Y-m-d', strtotime($datefrom)) . ' to ' . date('Y-m-d', strtotime($dateto));
