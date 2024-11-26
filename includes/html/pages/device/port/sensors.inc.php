@@ -35,7 +35,7 @@ foreach ($sensors as $sensor) {
     }
     if ($sensor->sensor_limit) {
         $sensor_limit = trim(Number::formatSi($sensor['sensor_limit'], 2, 3, $sensor->unit()));
-        echo '<span class="label label-default">high: ' . $sensor_limit . '</span>'';
+        echo '<span class="label label-default">high: ' . $sensor_limit . '</span>';
     }
 
     echo '        </div></h3>' .
