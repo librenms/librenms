@@ -27,7 +27,8 @@
 @endsection
 
 @section('javascript')
-<script type="text/javascript" src="{{ asset('js/vis.min.js') }}"></script>
+<script type="text/javascript" src="{{ asset('js/vis-network.min.js') }}"></script>
+<script type="text/javascript" src="{{ asset('js/vis-data.min.js') }}"></script>
 <script type="text/javascript" src="{{ asset('js/leaflet.js') }}"></script>
 <script type="text/javascript" src="{{ asset('js/L.Control.Locate.min.js') }}"></script>
 @endsection
@@ -130,7 +131,7 @@
                 });
 
                 // Re-draw the legend
-                custommap.redrawDefaultLegend(network_nodes, legend.steps, legend.x, legend.y, legend.font_size, legend.hide_invalid, legend.hide_overspeed);
+                custommap.redrawDefaultLegend(network_nodes, legend.steps, legend.x, legend.y, legend.font_size, legend.hide_invalid, legend.hide_overspeed, legend.colours);
 
                 // Flush in order to make sure nodes exist for edges to connect to
                 network_nodes.flush();

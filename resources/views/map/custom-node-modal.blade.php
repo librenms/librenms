@@ -194,11 +194,14 @@
         if($("#nodeimage option:selected").css('display') == 'none') {
             $("#nodeimage").val($("#nodeimage option:eq(1)").val());
         }
+        let imgsrc = $("#nodeimage").val();
         // Set the image preview src
-        if($("#nodeimage").val()) {
-            $("#nodeimagepreview").attr("src", custom_image_base + $("#nodeimage").val());
-        } else {
+        if(! imgsrc) {
             $("#nodeimagepreview").attr("src", $("#device_image").val());
+        } else if (isNaN(imgsrc)) {
+            $("#nodeimagepreview").attr("src", custom_image_base + imgsrc);
+        } else {
+            $("#nodeimagepreview").attr("src", '{{ route('maps.nodeimage.show', ['image' => '?' ]) }}'.replace("?", imgsrc));
         }
     }
 
@@ -275,18 +278,24 @@
         node.color.border = node.color.highlight.border = node.color.hover.border = $("#nodecolourbdr").val();
         node.size = $("#nodesize").val();
         if(node.shape == "image" || node.shape == "circularImage") {
-            if($("#nodeimage").val()) {
-                node.image = {unselected: custom_image_base + $("#nodeimage").val()};
-            } else {
+            let imgsrc = $("#nodeimage").val();
+            if(! imgsrc) {
                 node.image = {unselected: $("#device_image").val()};
+            } else if(isNaN(imgsrc)) {
+                node.image = {unselected: custom_image_base + imgsrc};
+            } else {
+                node.image = {unselected: '{{ route('maps.nodeimage.show', ['image' => '?' ]) }}'.replace("?", imgsrc)};
             }
         } else {
-            node.image = {};
+            node.image = undefined;
         }
         if(node.shape == "icon") {
             node.icon = {face: 'FontAwesome', code: String.fromCharCode(parseInt($("#nodeicon").val(), 16)), size: $("#nodesize").val(), color: node.color.border};
         } else {
             node.icon = {};
+        }
+        if(! ["ellipse", "circle", "database", "box", "text"].includes(node.style)) {
+            node.font.background = "#FFFFFF";
         }
         if(node.add) {
             delete node.add;
@@ -357,6 +366,8 @@
             $("#nodeImageRow").show();
             if(nodeconf.image.unselected.indexOf(custom_image_base) == 0) {
                 $("#nodeimage").val(nodeconf.image.unselected.replace(custom_image_base, ""));
+            } else if(nodeconf.image.unselected.indexOf(nodeimage_base) == 0) {
+                $("#nodeimage").val(nodeconf.image.unselected.replace(nodeimage_base, ""));
             } else {
                 $("#nodeimage").val("");
             }
@@ -417,7 +428,12 @@
             newnodeconf.icon = {};
         }
         if(newnodeconf.shape == "image" || newnodeconf.shape == "circularImage") {
-            newnodeconf.image = {unselected: custom_image_base + $("#nodeimage").val()};
+            let imgsrc = $("#nodeimage").val();
+            if(isNaN(imgsrc)) {
+                newnodeconf.image = {unselected: custom_image_base + imgsrc};
+            } else {
+                newnodeconf.image = {unselected: '{{ route('maps.nodeimage.show', ['image' => '?' ]) }}'.replace("?", imgsrc)};
+            }
         } else {
             delete newnodeconf.image;
         }

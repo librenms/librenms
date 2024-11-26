@@ -52,36 +52,6 @@
                                 </div>
                             </div>
                             <div class="form-group row">
-                                <label for="maplegend" class="col-sm-3 control-label">{{ __('map.custom.edit.map.enable_legend') }}</label>
-                                <div class="col-sm-9">
-                                    <input class="form-check-input" type="checkbox" role="switch" id="maplegend" onChange="toggleMapLegend()">
-                                </div>
-                            </div>
-                            <div class="form-group row maplegend">
-                                <label for="maplegendfontsize" class="col-sm-4 control-label">{{ __('map.custom.edit.map.legend.font_size') }}</label>
-                                <div class="col-sm-8">
-                                    <input type=number id="maplegendfontsize" class="form-control input-sm" />
-                                </div>
-                            </div>
-                            <div class="form-group row maplegend">
-                                <label for="maplegendsteps" class="col-sm-4 control-label">{{ __('map.custom.edit.map.legend.steps') }}</label>
-                                <div class="col-sm-8">
-                                    <input type=number id="maplegendsteps" class="form-control input-sm" />
-                                </div>
-                            </div>
-                            <div class="form-group row maplegend">
-                                <label for="maplegendhideinvalid" class="col-sm-4 control-label">{{ __('map.custom.edit.map.legend.hideinvalid') }}</label>
-                                <div class="col-sm-8">
-                                    <input class="form-check-input" type="checkbox" role="switch" id="maplegendhideinvalid">
-                                </div>
-                            </div>
-                            <div class="form-group row maplegend">
-                                <label for="maplegendhideoverspeed" class="col-sm-4 control-label">{{ __('map.custom.edit.map.legend.hideoverspeed') }}</label>
-                                <div class="col-sm-8">
-                                    <input class="form-check-input" type="checkbox" role="switch" id="maplegendhideoverspeed">
-                                </div>
-                            </div>
-                            <div class="form-group row">
                                 <label for="mapopt-zoom" class="col-sm-3 control-label">{{ __('map.custom.edit.map.zoom') }}</label>
                                 <div class="col-sm-9">
                                     <input class="form-check-input" type="checkbox" role="switch" id="mapopt-zoom">
@@ -139,34 +109,18 @@
         var height = $("#mapheight").val();
         var node_align = $("#mapnodealign").val();
         var post_options = structuredClone(map_options);
+
+        // Fixes for known issues if the data in the DB is corrupt
+        if (Array.isArray(post_options.physics)) {
+            post_options.physics = {};
+        }
+        if (Array.isArray(post_options.interaction)) {
+            post_options.interaction = {};
+        }
+
         post_options.interaction.zoomView = post_options.interaction.dragView = $("#mapopt-zoom").prop('checked');
         post_options.interaction.dragNodes = $("#mapopt-dragnodes").prop('checked');
         post_options.physics.enabled = $("#mapopt-physics").prop('checked');
-
-        var mapwdith = 100;
-        if (!isNaN(width)) {
-            mapwidth = width;
-        } else if (width.includes("px")) {
-            mapwidth = width.replace("px", "");
-        } else if (width.includes("%")) {
-            mapwidth = window.innerWidth * width.replace("%", "") / 100;
-        }
-
-        // Update the x and y coordinates
-        if ($("#maplegend").prop('checked')) {
-            if (legend.x < 0) {
-                legend.x = mapwidth - 50;
-                legend.y = 100;
-            }
-        } else {
-            legend.x = -1;
-            legend.y = -1;
-        }
-
-        legend.font_size = parseInt($("#maplegendfontsize").val());
-        legend.steps = parseInt($("#maplegendsteps").val());
-        legend.hide_invalid = $("#maplegendhideinvalid").prop('checked') ? 1 : 0;
-        legend.hide_overspeed = $("#maplegendhideoverspeed").prop('checked') ? 1 : 0;
 
         var map_reverse_arrows = $("#mapreversearrows").prop('checked') ? 1 : 0;
         var map_edge_sep = $("#mapedgesep").val();
@@ -179,6 +133,25 @@
         }
 
         @if(isset($map_id))
+            if (width.endsWith("px") && height.endsWith("px")) {
+                widthInt = parseInt(width);
+                heightInt = parseInt(height);
+
+                var nodeError = false;
+                network_nodes.forEach((node) => {
+                    if (node.x > widthInt - {{ isset($hmargin) ? $hmargin : 10 }} || node.y > heightInt - {{ isset($vmargin) ? $vmargin : 10 }}) {
+                        nodeError = true;
+                    }
+                });
+                if (nodeError) {
+                    let alert_content = $("#savemap-alert");
+                    alert_content.text('Please move nodes inside the new area before shrinking the map');
+                    alert_content.attr("class", "col-sm-12 alert alert-danger");
+                    $("#map-saveButton").removeAttr('disabled');
+                    return;
+                }
+            }
+
             var url = '{{ route('maps.custom.update', ['map' => $map_id]) }}';
             var method = 'PUT';
         @else
@@ -196,12 +169,6 @@
                 node_align: node_align,
                 reverse_arrows: map_reverse_arrows,
                 edge_separation: map_edge_sep,
-                legend_x: legend.x,
-                legend_y: legend.y,
-                legend_steps: legend.steps,
-                legend_font_size: legend.font_size,
-                legend_hide_invalid: legend.hide_invalid,
-                legend_hide_overspeed: legend.hide_overspeed,
                 options: JSON.stringify(post_options),
             },
             dataType: 'json',
@@ -224,34 +191,16 @@
         });
     }
 
-    function toggleMapLegend() {
-        if($("#maplegend").prop('checked')) {
-            $(".maplegend").show();
-        } else {
-            $(".maplegend").hide();
-        }
-    }
-
     function mapSettingsReset() {
         $("#mapreversearrows").bootstrapSwitch('state', Boolean(reverse_arrows));
-        $("#maplegend").bootstrapSwitch('state', (legend.x >= 0 && legend.y >= 0));
-        $("#maplegendhideinvalid").bootstrapSwitch('state', Boolean(legend.hide_invalid));
-        $("#maplegendhideoverspeed").bootstrapSwitch('state', Boolean(legend.hide_overspeed));
         $("#mapopt-zoom").bootstrapSwitch('state', Boolean(map_options.interaction.zoomView));
         $("#mapopt-dragnodes").bootstrapSwitch('state', Boolean(map_options.interaction.dragNodes));
         $("#mapopt-physics").bootstrapSwitch('state', Boolean(map_options.physics.enabled));
-        if(legend.x < 0 || legend.y < 0) {
-            $(".maplegend").hide();
-        } else {
-            $(".maplegend").show();
-        }
         $("#mapname").val(map_name);
         $("#mapwidth").val(network_options.width);
         $("#mapheight").val(network_options.height);
         $("#mapnodealign").val(map_node_align);
         $("#mapedgesep").val(map_edge_separation);
-        $("#maplegendfontsize").val(legend.font_size);
-        $("#maplegendsteps").val(legend.steps);
     }
 
     $(document).ready(function () {

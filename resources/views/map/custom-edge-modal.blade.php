@@ -81,6 +81,12 @@
                                 </div>
                             </div>
                             <div class="form-group row">
+                                <label for="edgefixedwidth" class="col-sm-3 control-label">{{ __('map.custom.edit.edge.fixed_width') }}</label>
+                                <div class="col-sm-9">
+                                    <input type=number id="edgefixedwidth" class="form-control input-sm" placeholder="{{ __('map.custom.edit.edge.dynamic_width')  }}" step="0.1" />
+                                </div>
+                            </div>
+                            <div class="form-group row">
                                 <label for="edgetextface" class="col-sm-3 control-label">{{ __('map.custom.edit.text_font') }}</label>
                                 <div class="col-sm-9">
                                     <input type=text id="edgetextface" class="form-control input-sm" value="arial" />
@@ -101,6 +107,17 @@
                                 </div>
                                 <div class="col-sm-2">
                                     <button type=button class="btn btn-primary" value="reset" id="edgecolourtextreset" onclick="$('#edgetextcolour').val(newedgeconf.font.color); $(this).attr('disabled','disabled');">{{ __('Reset') }}</button>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="edgetextalign" class="col-sm-3 control-label">{{ __('map.custom.edit.edge.text_align') }}</label>
+                                <div class="col-sm-9">
+                                    <select id="edgetextalign" class="form-control input-sm">
+                                        <option value="horizontal">{{ __('map.custom.edit.edge.align_options.horizontal') }}</option>
+                                        <option value="top">{{ __('map.custom.edit.edge.align_options.top') }}</option>
+                                        <option value="middle">{{ __('map.custom.edit.edge.align_options.middle') }}</option>
+                                        <option value="bottom">{{ __('map.custom.edit.edge.align_options.bottom') }}</option>
+                                    </select>
                                 </div>
                             </div>
                             <div class="form-group row existing-edge" id="edgeRecenterRow">
@@ -176,8 +193,12 @@
         edgedata.edge1.font.face = edgedata.edge2.font.face = $("#edgetextface").val();
         edgedata.edge1.font.size = edgedata.edge2.font.size = $("#edgetextsize").val();
         edgedata.edge1.font.color = edgedata.edge2.font.color = $("#edgetextcolour").val();
+        edgedata.edge1.font.align = edgedata.edge2.font.align = $("#edgetextalign").val();
+        edgedata.edge1.font.background = edgedata.edge2.font.background = '#FFFFFF';
         edgedata.edge1.label = edgedata.edge2.label = edgeLabel($("#edgetextshow").prop('checked'), $("#edgebpsshow").prop('checked'), null);
+        edgedata.edge1.width = edgedata.edge2.width = parseFloat($("#edgefixedwidth").val()) || null;
         edgedata.edge1.title = edgedata.edge2.title = $("#port_id").val();
+        edgedata.edge1.arrowStrikethrough = edgedata.edge2.arrowStrikethrough = false;
         let newlabel = $("#edgelabel").val() || '';
         if (newlabel == '' && edgedata.mid.label != '') {
             $("#map-renderButton").show();
@@ -236,9 +257,11 @@
         $("#edgeModalLabel").text('{{ __('map.custom.edit.edge.defaults_title') }}');
 
         $("#edgestyle").val(newedgeconf.smooth.type);
+        $("#edgefixedwidth").val(newedgeconf.width);
         $("#edgetextface").val(newedgeconf.font.face);
         $("#edgetextsize").val(newedgeconf.font.size);
         $("#edgetextcolour").val(newedgeconf.font.color);
+        $("#edgetextalign").val(newedgeconf.font.align || "horizontal");
         $("#edgetextshow").bootstrapSwitch('state', (newedgeconf.label.includes('xx%') || newedgeconf.label.includes('true')));
         $("#edgebpsshow").bootstrapSwitch('state', (newedgeconf.label.includes('bps')));
         $('#edgecolourtextreset').attr('disabled', 'disabled');
@@ -283,9 +306,11 @@
         $("#edgetextface").val(edgedata.edge1.font.face);
         $("#edgetextsize").val(edgedata.edge1.font.size);
         $("#edgetextcolour").val(edgedata.edge1.font.color);
+        $("#edgetextalign").val(edgedata.edge1.font.align || "horizontal");
         $("#edgetextshow").bootstrapSwitch('state', (edgedata.edge1.label != null && edgedata.edge1.label.includes('xx%')));
         $("#edgebpsshow").bootstrapSwitch('state', (edgedata.edge1.label != null && edgedata.edge1.label.includes('bps')));
         $("#edgelabel").val('label' in edgedata.mid ? edgedata.mid.label : '');
+        $("#edgefixedwidth").val(edgedata.edge1.width);
 
         $(".existing-edge").show();
         $(".new-edge").hide();
@@ -333,7 +358,9 @@
         newedgeconf.font.face = $("#edgetextface").val();
         newedgeconf.font.size = $("#edgetextsize").val();
         newedgeconf.font.color = $("#edgetextcolour").val();
+        newedgeconf.font.align = $("#edgetextalign").val();
         newedgeconf.label = edgeLabel($("#edgetextshow").prop('checked'), $("#edgebpsshow").prop('checked'), '');
+        newedgeconf.width = parseFloat($("#edgefixedwidth").val()) || null;
         $("#map-saveDataButton").show();
     }
 
