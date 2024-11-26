@@ -104,7 +104,7 @@ extra_javascript:
 extra:
   analytics:
     provider: google
-    property: UA-79149977-2
+    property: G-K0B7KB9765
   article_nav_top: false
   article_nav_bottom: true
   php:
