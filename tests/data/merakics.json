@@ -3,14 +3,14 @@
         "discovery": {
             "devices": [
                 {
-                    "sysName": "my sysname",
+                    "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.29671.2.388",
                     "sysDescr": "C9300 - 48 Cisco UPOE, Modular Uplinks",
                     "sysContact": null,
                     "version": null,
                     "hardware": "C9300 - 48 Cisco UPOE",
                     "features": null,
-                    "location": "Unknown",
+                    "location": "<private>",
                     "os": "merakics",
                     "type": "network",
                     "serial": "A1BC-D2EF-34GH",
