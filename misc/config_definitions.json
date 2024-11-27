@@ -4926,10 +4926,6 @@
             ],
             "type": "array"
         },
-        "os_def_cache_time": {
-            "default": 86400,
-            "type": "integer"
-        },
         "os_group.unix.over": {
             "default": [
                 {

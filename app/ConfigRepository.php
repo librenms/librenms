@@ -41,7 +41,6 @@ use Symfony\Component\Yaml\Yaml;
 class ConfigRepository
 {
     private array $config;
-    private bool $osLoaded = false;
 
     /**
      * Load the config, if the database connected, pull in database settings.
@@ -55,6 +54,7 @@ class ConfigRepository
         $this->config = Cache::driver($cache_ttl == 0 ? 'null' : 'file')->remember('librenms-config', $cache_ttl, function () {
             $this->config = [];
             // merge all config sources together config_definitions.json > db config > config.php
+            $this->loadAllOsDefinitions();
             $this->loadPreUserConfigDefaults();
             $this->loadDB();
             $this->loadUserConfigFile($this->config);
@@ -100,11 +100,6 @@ class ConfigRepository
      */
     public function get($key, $default = null): mixed
     {
-        // Check if we need to load the OS YAML file
-        if (! $this->osLoaded && ($key === 'os' || str_starts_with($key, 'os.'))) {
-            $this->loadAllOsDefinitions();
-        }
-
         if (isset($this->config[$key])) {
             return $this->config[$key];
         }
@@ -281,11 +276,6 @@ class ConfigRepository
      */
     public function has($key): bool
     {
-        // Check if we need to load the OS YAML file
-        if (! $this->osLoaded && ($key === 'os' || str_starts_with($key, 'os.'))) {
-            $this->loadAllOsDefinitions();
-        }
-
         if (isset($this->config[$key])) {
             return true;
         }
@@ -590,58 +580,11 @@ class ConfigRepository
      */
     private function loadAllOsDefinitions(): void
     {
-        if (! $this->osLoaded) {
-            $cache_ttl = $this->get('os_def_cache_time');
-            $os_yaml = Cache::driver($cache_ttl == 0 ? 'null' : 'database')->remember('os_definitions', $cache_ttl, function () {
-                $os_defs1 = [];
-                $install_dir = $this->get('install_dir');
-                $os_list = glob($install_dir . '/includes/definitions/*.yaml');
+        $os_list = glob($this->get('install_dir') . '/includes/definitions/*.yaml');
 
-                foreach ($os_list as $yaml_file) {
-                    $os = basename($yaml_file, '.yaml');
-                    $os_defs1[$os] = Yaml::parse(file_get_contents($yaml_file));
-                }
-
-                return $os_defs1;
-            });
-
-            $os_defs = $this->configMerge($os_yaml, Arr::get($this->config, 'os'));
-            $this->set('os', $os_defs);
-            $this->osLoaded = true;
+        foreach ($os_list as $yaml_file) {
+            $os = basename($yaml_file, '.yaml');
+            $this->set("os.$os", Yaml::parse(file_get_contents($yaml_file)));
         }
-    }
-
-    /**
-     * Clear the OS cache, does not reset runtime os data if it was previously loaded
-     */
-    public function clearOsCache(): void
-    {
-        Cache::driver('database')->forget('os_definitions');
-    }
-
-    /**
-     * Recursively merge config sections.
-     *
-     * @param  mixed  $config
-     * @param  mixed  $overrides
-     */
-    private function configMerge($config, $overrides): array
-    {
-        if (is_array($overrides)) {
-            if (array_is_list($overrides)) {
-                return $overrides;
-            }
-
-            // Loop over overrides and recurse or set values as needed
-            foreach ($overrides as $cfgKey => $overrideVal) {
-                if (array_key_exists($cfgKey, $config) && is_array($overrideVal) && is_array($config[$cfgKey])) {
-                    $config[$cfgKey] = $this->configMerge($config[$cfgKey], $overrideVal);
-                } else {
-                    $config[$cfgKey] = $overrideVal;
-                }
-            }
-        }
-
-        return $config;
-    }
+     }
 }

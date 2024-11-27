@@ -4,7 +4,6 @@ namespace App\Console\Commands;
 
 use App\Console\Commands\Traits\CompletesConfigArgument;
 use App\Console\LnmsCommand;
-use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use JsonSchema\Constraints\Constraint;
@@ -59,8 +58,6 @@ class SetConfigCommand extends LnmsCommand
 
                 return 2;
             }
-            // Clear the OS cache so it gets rebuilt next time it's needed
-            LibrenmsConfig::clearOsCache();
         } elseif (! $definition->isValidSetting($setting)) {
             $parent = $this->findParentSetting($definition, $setting);
             if (! $force && ! $parent) {
