@@ -54,8 +54,8 @@ class ConfigRepository
         $this->config = Cache::driver($cache_ttl == 0 ? 'null' : 'file')->remember('librenms-config', $cache_ttl, function () {
             $this->config = [];
             // merge all config sources together config_definitions.json > db config > config.php
-            $this->loadAllOsDefinitions();
             $this->loadPreUserConfigDefaults();
+            $this->loadAllOsDefinitions();
             $this->loadDB();
             $this->loadUserConfigFile($this->config);
             $this->loadPostUserConfigDefaults();
@@ -584,7 +584,9 @@ class ConfigRepository
 
         foreach ($os_list as $yaml_file) {
             $os = basename($yaml_file, '.yaml');
-            $this->set("os.$os", Yaml::parse(file_get_contents($yaml_file)));
+            $os_def = Yaml::parse(file_get_contents($yaml_file));
+
+            $this->set("os.$os", $os_def);
         }
     }
 }

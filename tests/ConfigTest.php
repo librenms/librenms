@@ -103,7 +103,6 @@ class ConfigTest extends TestCase
 
         // load yaml
         $this->assertSame('ios', Config::getOsSetting('ios', 'os'));
-        $this->app->make('config')->set('cache.default', 'array'); // mock cache
         $this->assertGreaterThan(500, count(Config::get('os')), 'Not all OS were loaded from yaml');
     }
 
