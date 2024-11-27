@@ -561,6 +561,7 @@ Feel free to tune the performance settings in librenms.conf to meet your needs.
     semanage fcontext -a -t httpd_log_t "/opt/librenms/logs(/.*)?"
     semanage fcontext -a -t httpd_cache_t '/opt/librenms/cache(/.*)?'
     semanage fcontext -a -t bin_t '/opt/librenms/librenms-service.py'
+    semanage fcontext -a -t httpd_cache_t '/opt/librenms/cache(/.*)?'
     restorecon -RFvv /opt/librenms
     setsebool -P httpd_can_sendmail=1
     setsebool -P httpd_execmem 1
