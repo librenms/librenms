@@ -27,3 +27,11 @@ $rrd_options .= ' GPRINT:sensor:LAST:%7.1lf%S' . str_replace('%', '%%', $sensor-
 $rrd_options .= ' GPRINT:sensor:AVERAGE:%7.1lf%S' . str_replace('%', '%%', $sensor->unit());
 $rrd_options .= ' GPRINT:sensor:MIN:%7.1lf%S' . str_replace('%', '%%', $sensor->unit());
 $rrd_options .= ' GPRINT:sensor:MAX:%7.1lf%S' . str_replace('%', '%%', $sensor->unit()) . '\\l';
+
+// Linear prediction of trend
+if ($to > time()) {
+    $rrd_options .= ' VDEF:islope=sensor_max,LSLSLOPE';
+    $rrd_options .= ' VDEF:icons=sensor_max,LSLINT';
+    $rrd_options .= ' CDEF:ilsl=sensor_max,POP,islope,COUNT,*,icons,+ ';
+    $rrd_options .= " LINE2:ilsl#44aa55:'Linear Prediction\\n':dashes=8";
+}
