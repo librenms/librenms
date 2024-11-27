@@ -33,7 +33,7 @@ class DevicePoll extends LnmsCommand
         $this->addArgument('device spec', InputArgument::REQUIRED);
         $this->addOption('modules', 'm', InputOption::VALUE_REQUIRED);
         $this->addOption('no-data', 'x', InputOption::VALUE_NONE);
-        $this->addOption('dispatch', 'd', InputOption::VALUE_NONE);
+        $this->addOption('dispatch', null, InputOption::VALUE_NONE);
     }
 
     public function handle(MeasurementManager $measurements): int
