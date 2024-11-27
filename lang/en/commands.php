@@ -1,6 +1,9 @@
 <?php
 
 return [
+    'config:clear' => [
+        'description' => 'Clear config cache.  This will allow any changes that have been made since the last full config load to be reflected in the current config.',
+    ],
     'config:get' => [
         'description' => 'Get configuration value',
         'arguments' => [
