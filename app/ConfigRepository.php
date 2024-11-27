@@ -53,7 +53,7 @@ class ConfigRepository
         $cache_ttl = config('librenms.config_cache_ttl');
         $this->config = Cache::driver($cache_ttl == 0 ? 'null' : 'file')->remember('librenms-config', $cache_ttl, function () {
             $this->config = [];
-            // merge all config sources together config_definitions.json > db config > config.php
+            // merge all config sources together config_definitions.json & os defs > db config > config.php
             $this->loadPreUserConfigDefaults();
             $this->loadAllOsDefinitions();
             $this->loadDB();
