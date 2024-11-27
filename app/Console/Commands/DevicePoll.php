@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Console\LnmsCommand;
 use App\Events\DevicePolled;
+use App\Facades\LibrenmsConfig;
 use App\Jobs\PollDevice;
 use App\Models\Device;
 use App\Polling\Measure\MeasurementManager;
