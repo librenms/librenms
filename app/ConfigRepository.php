@@ -586,5 +586,5 @@ class ConfigRepository
             $os = basename($yaml_file, '.yaml');
             $this->set("os.$os", Yaml::parse(file_get_contents($yaml_file)));
         }
-     }
+    }
 }
