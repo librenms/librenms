@@ -22,7 +22,13 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="form-group row existing-edge" id="edgePortSearchRow" style="display:none">
+                            <div class="form-group row" id="edgeDeviceSearchRow">
+                                <label for="devicesearch" class="col-sm-3 control-label">{{ __('map.custom.edit.node.device_select') }}</label>
+                                <div class="col-sm-9">
+                                    <select name="edgedevicesearch" id="edgedevicesearch" class="form-control"></select>
+                                </div>
+                            </div>
+                            <div class="form-group row existing-edge" id="edgePortSearchRow">
                                 <label for="portsearch" class="col-sm-3 control-label">{{ __('map.custom.edit.edge.port_select') }}</label>
                                 <div class="col-sm-9">
                                     <select name="portsearch" id="portsearch" class="form-control"></select>
@@ -138,7 +144,7 @@
                 <center>
                     <button type=button class="btn btn-primary new-edge" value="savedefaults" id="edge-saveDefaultsButton" data-dismiss="modal" style="display:none" onclick="edgeDefaultsSave();">{{ __('map.custom.edit.defaults') }}</button>
                     <button type=button class="btn btn-primary existing-edge" value="save" id="edge-saveButton" data-dismiss="modal">{{ __('Save') }}</button>
-                    <button type=button class="btn btn-primary" value="cancel" id="edge-cancelButton" data-dismiss="modal" onclick="edgeCancel();">{{ __('Cancel') }}</button>
+                    <button type=button class="btn btn-primary" value="cancel" id="edge-cancelButton" data-dismiss="modal">{{ __('Cancel') }}</button>
                 </center>
             </div>
         </div>
@@ -178,6 +184,16 @@
         $("#edgePortSearchRow").hide();
         $("#edgePortRow").show();
         $("#edgePortReverseRow").show();
+    }
+
+    function edgeDeviceSelect(e) {
+        port_search_device_id_1 = $("#edgedevicesearch").val();
+        if (port_search_device_id_1) {
+            edgePortClear();
+            $("#edgePortSearchRow").show();
+        } else {
+            $("#edgePortSearchRow").hide();
+        }
     }
 
     function edgeSave(event) {
@@ -273,12 +289,18 @@
     }
 
     function edgeEdit(edgedata) {
+        // Hide and show buttons based on class
+        $(".existing-edge").show();
+        $(".new-edge").hide();
+
         if(edgedata.add) {
             $("#edgeModalLabel").text('{{ __('map.custom.edit.edge.add') }}');
         } else {
             $("#edgeModalLabel").text('{{ __('map.custom.edit.edge.edit') }}');
         }
 
+        $("#edgedevicesearch").val('');
+        $("#edgedevicesearch").trigger('change');
         $("#portsearch").val('');
         $("#portsearch").trigger('change');
         var nodes = network_nodes.get({
@@ -312,9 +334,8 @@
         $("#edgelabel").val('label' in edgedata.mid ? edgedata.mid.label : '');
         $("#edgefixedwidth").val(edgedata.edge1.width);
 
-        $(".existing-edge").show();
-        $(".new-edge").hide();
         $("#edge-saveButton").on("click", {data: edgedata}, edgeSave);
+        $("#edge-cancelButton").on("click", {data: edgedata}, edgeCancel);
 
         $('#edgeModal').modal({backdrop: 'static', keyboard: false}, 'show');
     }
@@ -323,14 +344,16 @@
         node1 = network_nodes.get(node1_id);
         node2 = network_nodes.get(node2_id);
 
-        if(isNaN(node1.title) && isNaN(node2.title)) {
+        if(! node1.device_id && ! node2.device_id) {
             // Neither node has a device - clear port config
             $("#port_id").val("");
             $("#edgePortRow").hide();
             $("#edgePortReverseRow").hide();
             $("#edgePortSearchRow").hide();
+            $("#edgeDeviceSearchRow").show();
             return;
         }
+        $("#edgeDeviceSearchRow").hide();
         if(edge_id in edge_port_map) {
             $("#port_id").val(edge_port_map[edge_id].port_id);
             $("#port_name").text(edge_port_map[edge_id].port_name);
@@ -350,6 +373,12 @@
     }
 
     function edgeCancel(event) {
+        edgedata = event.data.data;
+        node1_id = edgedata.edge1.from;
+        node2_id = edgedata.edge2.from;
+        nm_id = node1_id < node2_id ? node1_id + '.' + node2_id : node2_id + '.' + node1_id;
+        edgeNodesRemove(nm_id, edgedata.id);
+
         $("#edge-saveButton").off("click");
     }
 
@@ -374,5 +403,8 @@
             }
         }, '', '{{ __('map.custom.edit.edge.port_select') }}', {dropdownParent: $('#edgeModal')});
         $("#portsearch").on("select2:select", edgePortSelect);
+
+        init_select2('#edgedevicesearch', 'device', {limit: 100}, '', '{{ __('map.custom.edit.node.device_select') }}', {dropdownParent: $('#edgeModal')});
+        $("#edgedevicesearch").on("select2:select", edgeDeviceSelect).on("select2:clear", edgeDeviceSelect);
    });
 </script>

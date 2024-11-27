@@ -65,8 +65,6 @@
     var network_nodes = new vis.DataSet({queue: {delay: 100}});
     var network_edges = new vis.DataSet({queue: {delay: 100}});
     var edge_port_map = {};
-    var node_device_map = {};
-    var node_link_map = {};
     var custom_image_base = "{{ $base_url }}images/custommap/icons/";
     var network_options = {{ Js::from($map_conf) }};
 
@@ -77,17 +75,6 @@
                 // Add/update nodes
                 $.each( data.nodes, function( nodeid, node) {
                     var node_cfg = custommap.getNodeCfg(nodeid, node, screenshot, custom_image_base);
-                    if(node.device_id) {
-                        node_device_map[nodeid] = {device_id: node.device_id, device_name: node.device_name};
-                        delete node_link_map[nodeid];
-                    } else if(node.linked_map_name) {
-                        delete node_device_map[nodeid];
-                        node_link_map[nodeid] = node.linked_map_id;
-                    } else {
-                        delete node_device_map[nodeid];
-                        delete node_link_map[nodeid];
-                    }
-
                     if (network_nodes.get(nodeid)) {
                         network_nodes.update(node_cfg);
                     } else {
@@ -152,12 +139,14 @@
             network.on('doubleClick', function (properties) {
                 edge_id = null;
                 if (properties.nodes.length > 0) {
-                    if(properties.nodes[0] in node_device_map) {
-                        window.location.href = "device/"+node_device_map[properties.nodes[0]].device_id;
-                    } else if (properties.nodes[0] in node_link_map) {
-                        window.location.href = '{{ route('maps.custom.show', ['map' => '?']) }}'.replace('?', node_link_map[properties.nodes[0]]);
-                    } else if (properties.nodes[0].endsWith('_mid')) {
-                        edge_id = properties.nodes[0].split("_")[0];
+                    node_id = properties.nodes[0];
+                    node = network_nodes.get(node_id);
+                    if(node.linked_map_id) {
+                        window.location.href = '{{ route('maps.custom.show', ['map' => '?']) }}'.replace('?', node.linked_map_id);
+                    } else if (node.device_id) {
+                        window.location.href = "device/"+node.device_id;
+                    } else if (node_id.endsWith('_mid')) {
+                        edge_id = node_id.split("_")[0];
                     }
                 } else if (properties.edges.length > 0) {
                     edge_id = properties.edges[0].split("_")[0];

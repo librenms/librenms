@@ -106,14 +106,16 @@
             var node_cfg = {};
             node_cfg.id = nodeid;
 
-            if(node.device_id) {
+            if(node.linked_map_name) {
+                node_cfg.title = "Go to " + node.linked_map_name;
+            } else if(node.device_id) {
                 node_cfg.title = document.createElement("div");
                 node_cfg.title.innerHTML = node.device_info;
-            } else if(node.linked_map_name) {
-                node_cfg.title = "Go to " + node.linked_map_name;
             } else {
                 node_cfg.title = null;
             }
+            node_cfg.device_id = node.device_id;
+            node_cfg.linked_map_id = node.linked_map_id;
             node_cfg.label = screenshot ? node.label.replace(/./g, ' ') : node.label;
             node_cfg.shape = node.style;
             node_cfg.borderWidth = node.border_width;
