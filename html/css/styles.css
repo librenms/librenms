@@ -1637,7 +1637,11 @@ nav.navbar-sticky-top {
   position: sticky;
   top: 0;
   z-index: 100;
-  border-width: 2px;
+  border-bottom-width: 2px;
+  border-left-width: 0;
+  border-top-width: 0;
+  border-right-width: 0;
+  border-radius: 0;
 }
 
 .navbar-brand {
