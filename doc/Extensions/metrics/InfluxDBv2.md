@@ -30,23 +30,23 @@ continue to function as normal.
 ## Configuration
 
 !!! setting "poller/influxdbv2"
-```bash
-lnms config:set influxdbv2.enable true
-lnms config:set influxdbv2.transport http
-lnms config:set influxdbv2.host '127.0.0.1'
-lnms config:set influxdbv2.port 8086
-lnms config:set influxdbv2.bucket 'librenms'
-lnms config:set influxdbv2.token 'admin'
-lnms config:set influxdbv2.allow_redirect true
-lmns config:set influxdbv2.organization 'librenms'
-lmns config:set influxdbv2.debug false
-lmns config:set influxdbv2.log_file '/opt/librenms/logs/influxdbv2.log'
-lmns config:set influxdbv2.groups-exclude ["group_name_1","group_name_2"]
-lmns config:set influxdbv2.timeout 5
-lmns config:set influxdbv2.verify false
-lmns config:set influxdbv2.batch_size 1000
-lmns config:set influxdbv2.max_retry 2
-```
+    ```bash
+    lnms config:set influxdbv2.enable true
+    lnms config:set influxdbv2.transport http
+    lnms config:set influxdbv2.host '127.0.0.1'
+    lnms config:set influxdbv2.port 8086
+    lnms config:set influxdbv2.bucket 'librenms'
+    lnms config:set influxdbv2.token 'admin'
+    lnms config:set influxdbv2.allow_redirect true
+    lmns config:set influxdbv2.organization 'librenms'
+    lmns config:set influxdbv2.debug false
+    lmns config:set influxdbv2.log_file '/opt/librenms/logs/influxdbv2.log'
+    lmns config:set influxdbv2.groups-exclude ["group_name_1","group_name_2"]
+    lmns config:set influxdbv2.timeout 5
+    lmns config:set influxdbv2.verify false
+    lmns config:set influxdbv2.batch_size 1000
+    lmns config:set influxdbv2.max_retry 2
+    ```
 
 The same data stored within rrd will be sent to InfluxDB and
 recorded. You can then create graphs within Grafana or InfluxDB to display the
