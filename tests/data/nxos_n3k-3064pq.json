@@ -15217,7 +15217,7 @@
                     "active": 1,
                     "protocol": "lldp",
                     "remote_hostname": "<private>",
-                    "remote_port": "Ethernet1/49 (18e728922878)",
+                    "remote_port": "Ethernet1/49",
                     "remote_platform": null,
                     "remote_version": "Cisco Nexus Operating System (NX-OS) Software 7.0(3)I7(8)\nTAC support: http://www.cisco.com/tac\nCopyright (c) 2002-2020, Cisco Systems, Inc. All rights reserved.",
                     "ifAlias": "Ethernet1/49",
