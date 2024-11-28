@@ -1,4 +1,4 @@
-<nav class="navbar navbar-default {{ $navbar }} navbar-fixed-top" role="navigation">
+<nav class="navbar navbar-default {{ $navbar }} navbar-sticky-top" role="navigation">
     <div class="container-fluid">
         <div class="navbar-header">
             <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navHeaderCollapse">
