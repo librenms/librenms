@@ -51,7 +51,7 @@ if (! empty($gpio_mon_data)) {
                 create_state_index($sensor_data['name'], $sensor_data['state_data']);
             }
 
-            discover_sensor(null, $sensor_data['type'], $device, $sensor_data['oid'], $sensor_id, $sensor_data['name'], $sensor_data['descr'], 1, 1, $sensor_data['low_limit'], $sensor_data['low_warn_limit'], $sensor_data['warn_limit'], $sensor_data['high_limit'], $sensor_data['value'],null,null,null,null,$sensor_data['group']);
+            discover_sensor(null, $sensor_data['type'], $device, $sensor_data['oid'], $sensor_id, $sensor_data['name'], $sensor_data['descr'], 1, 1, $sensor_data['low_limit'], $sensor_data['low_warn_limit'], $sensor_data['warn_limit'], $sensor_data['high_limit'], $sensor_data['value'],'snmp',null,null,null,$sensor_data['group']);
 
             if (isset($sensor_data['state_data'])) {
                 create_sensor_to_state_index($device, $sensor_data['name'], $sensor_id);
