@@ -1,4 +1,5 @@
 <?php
+
 $gpio_mon_data = snmpwalk_cache_oid($device, 'nsExtendOutLine."custom"', [], 'NET-SNMP-EXTEND-MIB', null, '-OteQUsb');
 
 if (! empty($gpio_mon_data)) {
