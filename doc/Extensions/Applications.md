@@ -632,7 +632,7 @@ the page. If it is not, please follow the steps set out under `SNMP
 Extend` heading top of page.
 
 ## Add Custom Linux Sensors
-Custom SNMP Extension: Adding Unsupported Sensors and states
+Adding unsupported sensors and states as extend SNMP attribute.
 
 You can extend SNMP to LNMS custom sensors using your own scripts.
 This guide will walk you through the process of creating, configuring,
