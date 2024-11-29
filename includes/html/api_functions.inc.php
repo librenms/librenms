@@ -1160,7 +1160,10 @@ function get_port_info(Illuminate\Http\Request $request)
     $port_id = $request->route('portid');
 
     return check_port_permission($port_id, null, function ($port_id) {
-        $port = Port::with('vlans')->where('port_id', $port_id)->get();
+        $with = request()->input('with');
+        $port = Port::where('port_id',$port_id)
+                    ->when($with, fn($q) => $q->with($with))
+                    ->get();
 
         return api_success($port, 'port');
     });
