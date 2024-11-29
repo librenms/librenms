@@ -631,6 +631,82 @@ The application should be auto-discovered as described at the top of
 the page. If it is not, please follow the steps set out under `SNMP
 Extend` heading top of page.
 
+## Add Custom Linux Sensors
+Custom SNMP Extension: Adding Unsupported Sensors and states
+
+You can extend SNMP to LNMS custom sensors using your own scripts.
+This guide will walk you through the process of creating, configuring,
+and using a custom SNMP extension.
+
+1. Create Your Custom Script
+
+Write a script in your preferred programming language (e.g., Python, Bash)
+to fetch sensor data. Save the script in a directory like /etc/snmp/.
+
+The script should output sensor data in the following format:
+
+[unique_name1],[sensor_type],[description1],[low_limit],[low_warn_limit],[high_warn_limit],[high_limit],[group];
+[current_value1]
+[unique_name2],[sensor_type],[description2],[low_limit],[low_warn_limit],[high_warn_limit],[high_limit];
+[current_value2]
+
+    unique_name: A unique identifier for the sensor.
+    sensor_type: The type of the sensor (e.g., signal, count, temperature).
+    description: A human-readable description of the sensor.
+    low_limit: Minimum acceptable value (leave blank if not applicable).
+    low_warn_limit: Value triggering a low warning (leave blank if not applicable).
+    high_warn_limit: Value triggering a high warning (leave blank if not applicable).
+    high_limit: Maximum acceptable value (leave blank if not applicable).
+    group: Groups Sensors in the device overview.
+    current_value: The current reading from the sensor.
+
+2. Example Script
+
+Here’s an example script (/etc/snmp/smsmonitor) to monitor SMS-related metrics that you get an idea:
+```
+#!/bin/bash
+# Custom SNMP script for SMS monitoring
+
+echo "isms1_signal,signal,SMS Signal,,,,;"
+echo "-51"
+echo "isms1_sms_sent,count,SMS Sent,,,,;"
+echo "1342"
+echo "isms1_sms_received,count,SMS Received,,,,;"
+echo "0"
+echo "isms1_sms_failed,count,SMS Failed,,,,;"
+echo "0"
+```
+3. Make the Script Executable
+
+Set execute permissions for your script:
+```
+chmod +x /etc/snmp/smsmonitor
+```
+
+4. Update SNMP Configuration
+
+Edit the snmpd.conf file (commonly located at `/etc/snmp/snmpd.conf`) to include the custom script:
+```
+extend custom /etc/snmp/smsmonitor
+```
+
+The extend directive tells SNMP to execute your script and make its output available via SNMP.
+
+5. Restart SNMP Service
+```
+sudo systemctl restart snmpd
+```
+This output can be parsed and integrated into your system for alerts and analytics.
+
+Tips for a Robust Implementation
+- Error Handling: Ensure your script handles errors gracefully and outputs meaningful logs for debugging.
+- Script Efficiency: Optimize the script to minimize execution time and system resource usage.
+- Testing: Test the script manually to verify correct output before integrating it with SNMP.
+- Documentation: Comment your script for maintainability and include descriptions for each metric.
+
+With this approach, you can easily monitor custom metrics and expand your SNMP capabilities.
+
+
 ## Docker Stats
 
 It gathers metrics about the docker containers, including:
