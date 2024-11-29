@@ -665,16 +665,16 @@ The script should output sensor data in the following format:
 Here’s an example script (/etc/snmp/smsmonitor) to monitor SMS-related metrics that you get an idea:
 ```
 #!/bin/bash
-# Custom SNMP script for SMS monitoring
+read -e -a status <<<  $( grep -E "^GSM1:" /run/smstools/smsd_stats/status)
 
-echo "isms1_signal,signal,SMS Signal,,,,;"
-echo "-51"
-echo "isms1_sms_sent,count,SMS Sent,,,,;"
-echo "1342"
-echo "isms1_sms_received,count,SMS Received,,,,;"
-echo "0"
-echo "isms1_sms_failed,count,SMS Failed,,,,;"
-echo "0"
+echo "isms1_signal,signal,Signal,,,,;"
+echo "${status[8]}"
+echo "isms1_sms_sent,count,Sent,,,,,SMS;"
+echo "${status[4]:0:-1}"
+echo "isms1_sms_received,count,Received,,,,,SMS;"
+echo "${status[6]:0:-1}"
+echo "isms1_sms_failed,count,Failed,,,,,SMS;"
+echo "${status[5]:0:-1}"
 ```
 3. Make the Script Executable
 
