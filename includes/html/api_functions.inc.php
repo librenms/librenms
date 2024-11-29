@@ -1161,8 +1161,8 @@ function get_port_info(Illuminate\Http\Request $request)
 
     return check_port_permission($port_id, null, function ($port_id) {
         $with = request()->input('with');
-        $port = Port::where('port_id',$port_id)
-                    ->when($with, fn($q) => $q->with($with))
+        $port = Port::where('port_id', $port_id)
+                    ->when($with, fn ($q) => $q->with($with))
                     ->get();
 
         return api_success($port, 'port');
