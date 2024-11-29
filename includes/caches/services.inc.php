@@ -11,27 +11,27 @@ if (Auth::user()->hasGlobalRead()) {
     $perms_sql = '`S`.`device_id` IN ' . dbGenPlaceholders(count($device_ids));
 
     $data['count'] = [
-        'query'  => 'SELECT COUNT(*) FROM services AS S WHERE $perms_sql',
+        'query' => 'SELECT COUNT(*) FROM services AS S WHERE $perms_sql',
         'params' => $device_ids,
     ];
 
     $data['up'] = [
-        'query'  => "SELECT COUNT(*) FROM services AS S WHERE $perms_sql AND S.`service_ignore` = '0' AND S.`service_disabled` = '0' AND S.`service_status` = '0'",
+        'query' => "SELECT COUNT(*) FROM services AS S WHERE $perms_sql AND S.`service_ignore` = '0' AND S.`service_disabled` = '0' AND S.`service_status` = '0'",
         'params' => $device_ids,
     ];
 
     $data['down'] = [
-        'query'  => "SELECT COUNT(*) FROM services AS S WHERE $perms_sql AND S.`service_ignore` = '0' AND S.`service_disabled` = '0' AND S.`service_status` = '2'",
+        'query' => "SELECT COUNT(*) FROM services AS S WHERE $perms_sql AND S.`service_ignore` = '0' AND S.`service_disabled` = '0' AND S.`service_status` = '2'",
         'params' => $device_ids,
     ];
 
     $data['ignored'] = [
-        'query'  => "SELECT COUNT(*) FROM services AS S WHERE $perms_sql AND S.`service_ignore` = '1' AND S.`service_disabled` = '0'",
+        'query' => "SELECT COUNT(*) FROM services AS S WHERE $perms_sql AND S.`service_ignore` = '1' AND S.`service_disabled` = '0'",
         'params' => $device_ids,
     ];
 
     $data['disabled'] = [
-        'query'  => "SELECT COUNT(*) FROM services AS S WHERE $perms_sql AND S.`service_disabled` = '1'",
+        'query' => "SELECT COUNT(*) FROM services AS S WHERE $perms_sql AND S.`service_disabled` = '1'",
         'params' => $device_ids,
     ];
 }//end if

@@ -26,6 +26,11 @@ $alert_states = [
 
 $show_recovered = false;
 
+if (is_numeric($vars['rule_id']) && $vars['rule_id'] > 0) {
+    $where .= ' AND `alerts`.`rule_id` = ?';
+    $param[] = $vars['rule_id'];
+}
+
 if (is_numeric($vars['alert_id']) && $vars['alert_id'] > 0) {
     $where .= ' AND `alerts`.`id` = ?';
     $param[] = $vars['alert_id'];
@@ -113,7 +118,12 @@ if ($rowCount != -1) {
     $sql .= " LIMIT $limit_low,$limit_high";
 }
 
-$sql = "SELECT `alerts`.*, `devices`.`hostname`, `devices`.`sysName`, `devices`.`display`, `devices`.`os`, `devices`.`hardware`, `locations`.`location`, `alert_rules`.`rule`, `alert_rules`.`name`, `alert_rules`.`severity` $sql";
+if (session('preferences.timezone')) {
+    $sql = "SELECT `alerts`.*, IFNULL(CONVERT_TZ(`alerts`.`timestamp`, @@global.time_zone, ?),`alerts`.`timestamp`) AS timestamp_display, `devices`.`hostname`, `devices`.`sysName`, `devices`.`display`, `devices`.`os`, `devices`.`hardware`, `locations`.`location`, `alert_rules`.`rule`, `alert_rules`.`name`, `alert_rules`.`severity` $sql";
+    $param = array_merge([session('preferences.timezone')], $param);
+} else {
+    $sql = "SELECT `alerts`.*, `alerts`.`timestamp` AS timestamp_display, `devices`.`hostname`, `devices`.`sysName`, `devices`.`display`, `devices`.`os`, `devices`.`hardware`, `locations`.`location`, `alert_rules`.`rule`, `alert_rules`.`name`, `alert_rules`.`severity` $sql";
+}
 
 $rulei = 0;
 $format = $vars['format'];
@@ -189,8 +199,8 @@ foreach (dbFetchRows($sql, $param) as $alert) {
         'details' => '<a class="fa-solid fa-plus incident-toggle" style="display:none" data-toggle="collapse" data-target="#incident' . $alert['id'] . '" data-parent="#alerts"></a>',
         'verbose_details' => "<button type='button' class='btn btn-alert-details command-alert-details' aria-label='Details' id='alert-details' data-alert_log_id='{$alert_log_id}'><i class='fa-solid fa-circle-info'></i></button>",
         'hostname' => $hostname,
-        'location' => generate_link($alert['location'], ['page' => 'devices', 'location' => $alert['location']]),
-        'timestamp' => ($alert['timestamp'] ? $alert['timestamp'] : 'N/A'),
+        'location' => generate_link(htmlspecialchars($alert['location']), ['page' => 'devices', 'location' => $alert['location']]),
+        'timestamp' => ($alert['timestamp_display'] ? $alert['timestamp_display'] : 'N/A'),
         'severity' => $severity_ico,
         'state' => $alert['state'],
         'alert_id' => $alert['id'],

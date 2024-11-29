@@ -26,9 +26,15 @@
 namespace LibreNMS\Modules;
 
 use App\Models\Device;
+use App\Models\Eventlog;
 use App\Models\Location;
+use App\Observers\DeviceObserver;
+use Illuminate\Support\Facades\Log;
+use LibreNMS\Enum\Severity;
+use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\Polling\OSPolling;
+use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\Util\Url;
 
 class Os implements Module
@@ -39,6 +45,11 @@ class Os implements Module
     public function dependencies(): array
     {
         return [];
+    }
+
+    public function shouldDiscover(\LibreNMS\OS $os, ModuleStatus $status): bool
+    {
+        return $status->isEnabledAndDeviceUp($os->getDevice());
     }
 
     public function discover(\LibreNMS\OS $os): void
@@ -59,29 +70,28 @@ class Os implements Module
         $this->handleChanges($os);
     }
 
-    public function poll(\LibreNMS\OS $os): void
+    public function shouldPoll(\LibreNMS\OS $os, ModuleStatus $status): bool
+    {
+        return $status->isEnabledAndDeviceUp($os->getDevice());
+    }
+
+    public function poll(\LibreNMS\OS $os, DataStorageInterface $datastore): void
     {
         $deviceModel = $os->getDevice(); /** @var \App\Models\Device $deviceModel */
         if ($os instanceof OSPolling) {
-            $os->pollOS();
+            $os->pollOS($datastore);
         } else {
-            // legacy poller files
-            global $graphs, $device;
-
-            if (empty($device)) {
-                $device = $os->getDeviceArray();
-            }
-
+            $device = $os->getDeviceArray();
             $location = null;
 
             if (is_file(base_path('/includes/polling/os/' . $device['os'] . '.inc.php'))) {
                 // OS Specific
+                Eventlog::log("Warning: OS {$device['os']} using deprecated polling method", $deviceModel, 'poller', Severity::Error);
                 include base_path('/includes/polling/os/' . $device['os'] . '.inc.php');
             } elseif (! empty($device['os_group']) && is_file(base_path('/includes/polling/os/' . $device['os_group'] . '.inc.php'))) {
                 // OS Group Specific
+                Eventlog::log("Warning: OS {$device['os']} using deprecated polling method", $deviceModel, 'poller', Severity::Error);
                 include base_path('/includes/polling/os/' . $device['os_group'] . '.inc.php');
-            } else {
-                echo "Generic :(\n";
             }
 
             // handle legacy variables, sometimes they are false
@@ -92,25 +102,30 @@ class Os implements Module
 
             if (! empty($location)) { // legacy support, remove when no longer needed
                 $deviceModel->setLocation($location);
-                optional($deviceModel->location)->save();
+                $deviceModel->location?->save();
             }
         }
 
         $this->handleChanges($os);
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function cleanup(Device $device): void
+    public function dataExists(Device $device): bool
     {
-        // no cleanup needed
+        return false; // data part of device
     }
 
     /**
      * @inheritDoc
      */
-    public function dump(Device $device)
+    public function cleanup(Device $device): int
+    {
+        return 0; // no cleanup needed
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function dump(Device $device, string $type): ?array
     {
         // get data fresh from the database
         return [
@@ -127,12 +142,12 @@ class Os implements Module
 
         $device->icon = basename(Url::findOsImage($device->os, $device->features, null, 'images/os/'));
 
-        echo trans('device.attributes.location') . ': ' . optional($device->location)->display() . PHP_EOL;
+        Log::info(trans('device.attributes.location') . ': ' . $device->location?->display());
         foreach (['hardware', 'version', 'features', 'serial'] as $attribute) {
             if (isset($device->$attribute)) {
                 $device->$attribute = trim($device->$attribute);
             }
-            echo \App\Observers\DeviceObserver::attributeChangedMessage($attribute, $device->$attribute, $device->getOriginal($attribute)) . PHP_EOL;
+            Log::info(DeviceObserver::attributeChangedMessage($attribute, $device->$attribute, $device->getOriginal($attribute)));
         }
 
         $device->save();
@@ -143,7 +158,7 @@ class Os implements Module
         $device = $os->getDevice();
         $new_location = $device->override_sysLocation ? new Location() : $os->fetchLocation(); // fetch location data from device
         $device->setLocation($new_location, true); // set location and lookup coordinates if needed
-        optional($device->location)->save();
+        $device->location?->save();
     }
 
     private function sysContact(\LibreNMS\OS $os): void

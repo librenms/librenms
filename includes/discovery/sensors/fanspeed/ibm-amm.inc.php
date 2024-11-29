@@ -24,6 +24,6 @@ foreach ($oids as $index => $oid) {
 
     if (is_numeric($value)) {
         $descr = $descr_prefix . ($index + 1);
-        discover_sensor($valid['sensor'], 'fanspeed', $device, $oid, $index, 'snmp', $descr, 1, 1, null, null, null, null, $value);
+        discover_sensor(null, 'fanspeed', $device, $oid, $index, 'snmp', $descr, 1, 1, null, null, null, null, $value);
     }
 }

@@ -1,0 +1,13 @@
+F5-COMMON-SMI-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    enterprises
+        FROM SNMPv2-SMI;
+
+f5networks           OBJECT IDENTIFIER ::= { enterprises 12276}
+
+platform             OBJECT IDENTIFIER ::= { f5networks 1 }
+
+f5Compliance         OBJECT IDENTIFIER ::= { f5networks 2 }
+
+END

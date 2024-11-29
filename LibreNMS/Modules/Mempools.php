@@ -29,13 +29,15 @@ use App\Models\Device;
 use App\Models\Mempool;
 use App\Observers\MempoolObserver;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 use LibreNMS\DB\SyncsModels;
+use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\Polling\MempoolsPolling;
 use LibreNMS\OS;
+use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Number;
-use Log;
 
 class Mempools implements Module
 {
@@ -47,6 +49,11 @@ class Mempools implements Module
     public function dependencies(): array
     {
         return [];
+    }
+
+    public function shouldDiscover(OS $os, ModuleStatus $status): bool
+    {
+        return $status->isEnabledAndDeviceUp($os->getDevice());
     }
 
     public function discover(OS $os): void
@@ -64,13 +71,17 @@ class Mempools implements Module
         MempoolObserver::observe(\App\Models\Mempool::class);
         $this->syncModels($os->getDevice(), 'mempools', $mempools);
 
-        echo PHP_EOL;
         $mempools->each(function ($mempool) {
             $this->printMempool($mempool);
         });
     }
 
-    public function poll(OS $os): void
+    public function shouldPoll(OS $os, ModuleStatus $status): bool
+    {
+        return $status->isEnabledAndDeviceUp($os->getDevice());
+    }
+
+    public function poll(OS $os, DataStorageInterface $datastore): void
     {
         $mempools = $os->getDevice()->mempools;
 
@@ -82,7 +93,7 @@ class Mempools implements Module
             ? $os->pollMempools($mempools)
             : $this->defaultPolling($os, $mempools);
 
-        $this->calculateAvailable($mempools)->each(function (Mempool $mempool) use ($os) {
+        $this->calculateAvailable($mempools)->each(function (Mempool $mempool) use ($os, $datastore) {
             $this->printMempool($mempool);
 
             if (empty($mempool->mempool_class)) {
@@ -109,7 +120,7 @@ class Mempools implements Module
                 'free' => $mempool->mempool_free,
             ];
 
-            data_update($os->getDeviceArray(), 'mempool', $tags, $fields);
+            $datastore->put($os->getDeviceArray(), 'mempool', $tags, $fields);
         });
     }
 
@@ -137,15 +148,20 @@ class Mempools implements Module
         return $mempools;
     }
 
-    public function cleanup(Device $device): void
+    public function dataExists(Device $device): bool
     {
-        $device->mempools()->delete();
+        return $device->mempools()->exists();
+    }
+
+    public function cleanup(Device $device): int
+    {
+        return $device->mempools()->delete();
     }
 
     /**
      * @inheritDoc
      */
-    public function dump(Device $device)
+    public function dump(Device $device, string $type): ?array
     {
         return [
             'mempools' => $device->mempools()->orderBy('mempool_type')->orderBy('mempool_id')
@@ -205,12 +221,12 @@ class Mempools implements Module
 
     private function printMempool(Mempool $mempool): void
     {
-        echo "$mempool->mempool_type [$mempool->mempool_class]: $mempool->mempool_descr: $mempool->mempool_perc%";
+        $status = "$mempool->mempool_type [$mempool->mempool_class]: $mempool->mempool_descr: $mempool->mempool_perc%";
         if ($mempool->mempool_total != 100) {
             $used = Number::formatBi($mempool->mempool_used);
             $total = Number::formatBi($mempool->mempool_total);
-            echo "  {$used} / {$total}";
+            $status .= "  {$used} / {$total}";
         }
-        echo PHP_EOL;
+        Log::info($status);
     }
 }

@@ -20,7 +20,6 @@ foreach ($lines as $line) {
     $freeswitch[$var] = $value;
 }
 // Freeswitch stats
-$rrd_name = ['app', $name, 'stats', $app->app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('calls', 'GAUGE', 0, 10000)
     ->addDataset('channels', 'GAUGE', 0, 10000)
@@ -38,8 +37,13 @@ $fields = [
     'out_failed' => $freeswitch['OutFailed'],
     'out_okay' => $freeswitch['OutTotal'] - $freeswitch['OutFailed'],
 ];
-$tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
+$tags = [
+    'name' => $name,
+    'app_id' => $app->app_id,
+    'rrd_name' => ['app', $name, 'stats', $app->app_id],
+    'rrd_def' => $rrd_def,
+];
 data_update($device, 'app', $tags, $fields);
 update_application($app, $rawdata, $fields);
 
-unset($lines, $freeswitch, $rrd_name, $rrd_def, $fields, $tags);
+unset($lines, $freeswitch, $rrd_def, $fields, $tags);

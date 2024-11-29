@@ -1,0 +1,370 @@
+--  =======================================================================
+--  File		: FIBROLAN-SFP-MIB.mib
+--  Description		: Private MIB file for Fibrolan SFP modules
+--  Author		: Shamir Stein
+--
+--  Copyright Fibrolan, 2014. All rights reserved.
+--
+--  Reproduction of this document is authorized on condition that this
+--  copyright notice is included.
+--  =======================================================================
+
+FIBROLAN-SFP-MIB	DEFINITIONS ::= BEGIN
+
+IMPORTS
+	ifIndex				FROM IF-MIB
+
+	OBJECT-TYPE, 
+	MODULE-IDENTITY,
+	Integer32,
+	NOTIFICATION-TYPE		FROM SNMPv2-SMI
+
+	MODULE-COMPLIANCE,
+	OBJECT-GROUP,
+	NOTIFICATION-GROUP		FROM SNMPv2-CONF
+
+	TimeStamp,
+	DisplayString			FROM SNMPv2-TC
+
+	flDeviceNotifications		FROM FIBROLAN-DEVICE-MIB
+	fibrolanGeneric			FROM FIBROLAN-COMMON-MIB;
+
+flSfp	MODULE-IDENTITY
+	LAST-UPDATED	"201404010000Z"  
+	ORGANIZATION	"Fibrolan Ltd"
+	CONTACT-INFO	"http://www.fibrolan.com
+			 support@fibrolan.com"
+	DESCRIPTION	"The MIB module to describe Fibrolan SFP devices.
+			 Copyright (C) Fibrolan Ltd (2014)."
+	REVISION        "201404010000Z"
+	DESCRIPTION	"Initial version (version 1)."
+	::= { fibrolanGeneric 50 }
+
+
+-- conformance information
+
+	flSfpMIBObjects			OBJECT IDENTIFIER ::= { flSfp 1 }
+	flSfpMIBConformance		OBJECT IDENTIFIER ::= { flSfp 2 }
+	flSfpTraps			OBJECT IDENTIFIER ::= { flSfp 10 }
+
+	flSfpMIBCompliances		OBJECT IDENTIFIER ::= { flSfpMIBConformance 1 }
+	flSfpMIBGroups			OBJECT IDENTIFIER ::= { flSfpMIBConformance 2 }
+
+
+-- compliance statements
+	flSfpMIBCompliance	MODULE-COMPLIANCE
+		STATUS		current
+		DESCRIPTION	"The compliance statement for flSfp entities"
+		MODULE		-- this module
+		MANDATORY-GROUPS {	flSfpDeviceGroup, 
+					flSfpMonitoringGroup,
+					flSfpNotificationsGroup	}
+	::= { flSfpMIBCompliances 1 }
+
+	flSfpDeviceGroup	OBJECT-GROUP
+		OBJECTS	{	flSfpVendor,   
+				flSfpPartNumber,
+				flSfpSerialNumber,
+				flSfpType,
+				flSfpMaxRate,
+				flSfpRange,
+				flSfpTxWl,
+				flSfpTxWlFraction,
+				flSfpRxWl,
+				flSfpRxWlFraction,
+				flSfpDdmSupport	}
+		STATUS		current
+		DESCRIPTION	"SFP standard status objects."
+	::= { flSfpMIBGroups 1 }
+
+	flSfpMonitoringGroup	OBJECT-GROUP
+		OBJECTS	{	flSfpRxPower,
+				flSfpTxPower,
+				flSfpTemperature,
+				flSfpBiasCurrent,
+				flSfpSupplyVoltage,
+				flSfpAlarmStatus,
+				flSfpStatusLastChange }
+		STATUS		current
+		DESCRIPTION	"SFP monitoring (digital diagnostics) group."
+	::= { flSfpMIBGroups 2 }
+
+	flSfpNotificationsGroup		NOTIFICATION-GROUP
+		NOTIFICATIONS { flSfpAlarmStatusChange }
+		STATUS		current
+		DESCRIPTION	"A collection of notifications that may be
+				 implemented on SFP modules."
+	::= { flSfpMIBGroups 3 }
+
+
+-- ************************************************************
+-- SFP device info (inventory) table 
+-- ************************************************************
+flSfpInfoTable          OBJECT-TYPE
+	SYNTAX		SEQUENCE OF FlSfpInfoEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	"Table for SFP inventory data"
+::= { flSfpMIBObjects 1 }
+
+flSfpInfoEntry		OBJECT-TYPE
+	SYNTAX		FlSfpInfoEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	"The entries of the table."
+	INDEX { ifIndex }
+::= { flSfpInfoTable 1 }
+
+FlSfpInfoEntry ::= SEQUENCE
+{
+	flSfpVendor		DisplayString,
+	flSfpPartNumber		DisplayString,
+	flSfpSerialNumber	DisplayString,
+	flSfpType		DisplayString,
+	flSfpMaxRate		Integer32,
+	flSfpRange		Integer32,
+	flSfpTxWl		Integer32,
+	flSfpTxWlFraction	Integer32,
+	flSfpRxWl		Integer32,
+	flSfpRxWlFraction	Integer32,
+	flSfpDdmSupport		INTEGER
+}
+
+flSfpVendor		OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"SFP's vendor" 
+::= { flSfpInfoEntry 1 }
+
+flSfpPartNumber		OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"SFP's part number" 
+::= { flSfpInfoEntry 2 }
+
+flSfpSerialNumber	OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"SFP's serial number" 
+::= { flSfpInfoEntry 3 }
+
+flSfpType		OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"SFP module type (textual description)"
+::= { flSfpInfoEntry 4 }
+
+flSfpMaxRate		OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"SFP's nominal bit rate in Mbps."
+::= { flSfpInfoEntry 5 }
+
+flSfpRange		OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"SFP's nominal range in meters."
+::= { flSfpInfoEntry 6 }
+
+flSfpTxWl		OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"SFP's transmit wave-length in nano-meters (integer part).
+			The complete wavelength can be calculated with the flSfpTxWlFraction.
+			In DWDM SFPs, the integer part of the WL is used here.
+			for example: 1572.89nm (ch6/100GHz) will be provided as 1572."
+::= { flSfpInfoEntry 7 }
+
+flSfpTxWlFraction	OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"SFP's transmit wave-length in pico-meters (fraction part).
+			The complete wavelength can be calculated with the flSfpTxWl.
+			In DWDM SFPs, the fraction part of the WL is used here.
+			for example: 1572.89nm (ch6/100GHz) will be provided as 890"
+::= { flSfpInfoEntry 8 }
+
+flSfpRxWl		OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"SFP's receive wave-length in nano-meters (integer part).
+			The complete wavelength can be calculated with the flSfpRxWlFraction.
+			In DWDM SFPs, the integer part of the WL is used here.
+			for example: 1572.89nm (ch6/100GHz) will be provided as 1572."
+::= { flSfpInfoEntry 9 }
+
+flSfpRxWlFraction	OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"SFP's receive wave-length in pico-meters (fraction part).
+			The complete wavelength can be calculated with the flSfpTxWl.
+			In DWDM SFPs, the fraction part of the WL is used here.
+			for example: 1572.89nm (ch6/100GHz) will be provided as 890"
+::= { flSfpInfoEntry 10 }
+
+flSfpDdmSupport		OBJECT-TYPE
+	SYNTAX		INTEGER {	
+				ddmSupported	(1),
+				ddmNotSupported	(2)	}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Indicates if this SFP supports DDM (as per SFF-8472)."
+::= { flSfpInfoEntry 11 }
+
+
+-- ************************************************************
+-- ************************************************************
+-- Monitoring table (DDM)
+-- ************************************************************
+-- ************************************************************
+
+flSfpMonitoringTable	OBJECT-TYPE
+	SYNTAX		SEQUENCE OF FlSfpMonitoringEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION    "Table for SFP monitoring (digital diagnostics) data"
+::= { flSfpMIBObjects 2 }
+
+flSfpMonitoringEntry	OBJECT-TYPE
+	SYNTAX		FlSfpMonitoringEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	"The entries of the table."
+	INDEX { ifIndex }
+::= { flSfpMonitoringTable 1 }
+
+FlSfpMonitoringEntry ::= SEQUENCE
+{
+	flSfpRxPower		Integer32,
+	flSfpTxPower		Integer32,
+	flSfpTemperature	Integer32,
+	flSfpBiasCurrent	Integer32,
+	flSfpSupplyVoltage	Integer32,	
+	flSfpAlarmStatus	Integer32,
+	flSfpStatusLastChange	TimeStamp
+}
+
+flSfpRxPower		OBJECT-TYPE
+	SYNTAX		Integer32
+	UNITS		"micro Watts"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Received average optical power in [uW]" 
+::= { flSfpMonitoringEntry 1 }
+
+flSfpTxPower		OBJECT-TYPE
+	SYNTAX		Integer32
+	UNITS		"micro Watts"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Transmitted average optical power in [uW]" 
+::= { flSfpMonitoringEntry 2 }
+
+flSfpTemperature	OBJECT-TYPE
+	SYNTAX		Integer32
+	UNITS		"Degrees Celsius (oC)"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Device temperature in [oC]" 
+::= { flSfpMonitoringEntry 3 }
+
+flSfpBiasCurrent	OBJECT-TYPE
+	SYNTAX		Integer32
+	UNITS		"milliampere"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Transmitter bias current in [mA]" 
+::= { flSfpMonitoringEntry 4 }
+
+flSfpSupplyVoltage	OBJECT-TYPE
+	SYNTAX		Integer32
+	UNITS		"millivolt"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Internal supply voltage in [mV]" 
+::= { flSfpMonitoringEntry 5 }
+
+flSfpAlarmStatus	OBJECT-TYPE
+	SYNTAX		Integer32 (1..255)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"This variable indicates the SFP alarm status. The 
+			flSfpAlarmStatus is a bitmap represented as a sum; 
+			therefore, it can represent multiple status (alarms)
+			simultaneously.
+			flSfpNoAlarm must be set if and only if no other flag is set.
+			The various bit positions are as follows:
+			0	flSfpNoAlarm		No alarm present
+			1	flSfpUnplugged		SFP module unplugged
+			2	flSfpTxPowerLowError	Optical Tx power below error threshold
+			3	flSfpTxPowerLowWarning	Optical Tx power below warning threshold
+			4	flSfpRxPowerLowError	Optical Rx power below error threshold
+			5	flSfpRxPowerLowWarning	Optical Rx power below warning threshold
+			6	flSfpTxPowerHighError	Optical Tx power above error threshold
+			7	flSfpTxPowerHighWarning	Optical Tx power above warning threshold
+			8	flSfpRxPowerHighError	Optical Rx power above error threshold
+			9	flSfpRxPowerHighWarning	Optical Rx power above warning threshold
+			10	flSfpTempHighError	Module temp. above error threshold
+			11	flSfpTempHighWarning	Module temp. above warning threshold
+			12	flSfpTempLowError	Module temp. below error threshold
+			13	flSfpTempLowWarning	Module temp. below warning threshold"
+::= { flSfpMonitoringEntry 6 }
+
+flSfpStatusLastChange	OBJECT-TYPE
+	SYNTAX		TimeStamp
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The value of MIB II's sysUpTime object at the
+			time this SFP entered its current alarm status state."
+::= { flSfpMonitoringEntry 7 }
+
+
+-- ************************************************************
+-- ************************************************************
+-- Trap (notifications) definitions 
+-- ************************************************************
+-- ************************************************************
+
+flSfpAlarmStatusChange	NOTIFICATION-TYPE
+	OBJECTS		{	flSfpAlarmStatus ,
+				flSfpStatusLastChange }
+	STATUS		current
+	DESCRIPTION	"A flSfpAlarmStatusChange trap is sent when the
+			value of an instance flSfpAlarmStatus changes. It
+			can be utilized by an Network Management Station
+			(NMS) to trigger polls."
+::= { flSfpTraps 0 1 }
+
+flSfpPluggedIn	NOTIFICATION-TYPE
+--	OBJECTS		{	ifIndex }
+	STATUS		current
+	DESCRIPTION	"This trap is sent when an SFP module is plugged 
+	             in the device.
+	             This trap is left here for backward compatibility
+	             reasons. In newer SW versions the flSfpAlarmStatusChange
+	             trap should be used instead."
+::= { flDeviceNotifications 17 }
+
+flSfpUnplugged	NOTIFICATION-TYPE
+--	OBJECTS		{	ifIndex }
+	STATUS		current
+	DESCRIPTION	"This trap is sent when an SFP module is unplugged 
+	             from the device.
+	             This trap is left here for backward compatibility
+	             reasons. In newer SW versions the flSfpAlarmStatusChange
+	             trap should be used instead."
+::= { flDeviceNotifications 18 }
+
+
+
+END

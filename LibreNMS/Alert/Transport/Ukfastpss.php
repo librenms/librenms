@@ -24,18 +24,14 @@
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
-use LibreNMS\Util\Proxy;
+use LibreNMS\Exceptions\AlertTransportDeliveryException;
+use LibreNMS\Util\Http;
 
 class Ukfastpss extends Transport
 {
-    protected $name = 'UKFast PSS';
+    protected string $name = 'UKFast PSS';
 
-    public function deliverAlert($obj, $opts)
-    {
-        return $this->contactUkfastpss($obj, $opts);
-    }
-
-    public function contactUkfastpss($obj, $opts)
+    public function deliverAlert(array $alert_data): bool
     {
         $apiKey = $this->config['api-key'];
         $author = $this->config['author'];
@@ -47,34 +43,27 @@ class Ukfastpss extends Transport
                 'id' => $author,
             ],
             'secure' => ($secure == 'on'),
-            'subject' => $obj['title'],
-            'details' => $obj['msg'],
+            'subject' => $alert_data['title'],
+            'details' => $alert_data['msg'],
             'priority' => $priority,
         ];
 
-        $request_opts = [];
-        $request_headers = [];
+        $res = Http::client()
+            ->withHeaders([
+                'Authorization' => $apiKey,
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+            ])
+            ->post('https://api.ukfast.io/pss/v1/requests', $body);
 
-        $request_headers['Authorization'] = $apiKey;
-        $request_headers['Content-Type'] = 'application/json';
-        $request_headers['Accept'] = 'application/json';
-
-        $client = new \GuzzleHttp\Client();
-        $request_opts['proxy'] = Proxy::forGuzzle();
-        $request_opts['headers'] = $request_headers;
-        $request_opts['body'] = json_encode($body);
-
-        $res = $client->request('POST', 'https://api.ukfast.io/pss/v1/requests', $request_opts);
-
-        $code = $res->getStatusCode();
-        if ($code != 200) {
-            return 'HTTP Status code ' . $code;
+        if ($res->successful()) {
+            return true;
         }
 
-        return true;
+        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $alert_data['msg'], $body);
     }
 
-    public static function configTemplate()
+    public static function configTemplate(): array
     {
         return [
             'config' => [
@@ -82,7 +71,7 @@ class Ukfastpss extends Transport
                     'title' => 'API Key',
                     'name' => 'api-key',
                     'descr' => 'API key to use for authentication',
-                    'type' => 'text',
+                    'type' => 'password',
                 ],
                 [
                     'title' => 'Author',
@@ -106,7 +95,7 @@ class Ukfastpss extends Transport
                     'title' => 'Secure',
                     'name' => 'secure',
                     'descr' => 'Specifies whether created request should be secure',
-                    'type'  => 'checkbox',
+                    'type' => 'checkbox',
                     'default' => true,
                 ],
             ],

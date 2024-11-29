@@ -289,8 +289,8 @@ extend backupninja /etc/snmp/backupninja.py
 
 1. Create stats file with appropriate permissions:
 ```bash
-~$ touch /var/cache/bind/stats
-~$ chown bind:bind /var/cache/bind/stats
+touch /var/cache/bind/stats
+chown bind:bind /var/cache/bind/stats
 ```
 Change `user:group` to the user and group that's running bind/named.
 
@@ -388,6 +388,52 @@ chmod +x /usr/lib/check_mk_agent/local/bind
 
 3. Set the variable 'agent' to '1' in the config.
 
+## BIRD2
+
+The BIRD Internet Routing Daemon (BGP) 
+
+Due to the lack of SNMP support in the BIRD daemon, this application extracts all configured BGP protocols and parses it into LibreNMS.
+This application supports both IPv4 and IPv6 Peer processing.
+
+### SNMP Extend
+
+1. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
+
+```
+extend bird2 '/usr/bin/sudo /usr/sbin/birdc -r show protocols all'
+```
+
+2.  Edit your sudo users (usually `visudo`) and add at the bottom:
+
+```
+Debian-snmp ALL=(ALL) NOPASSWD: /usr/sbin/birdc
+```
+
+_If your snmp daemon is running on a user that isnt `Debian-snmp` make sure that user has the correct permission to execute `birdc`_
+
+3. Verify the time format for bird2 is defined. Otherwise `iso short
+   ms` (hh:mm:ss) is the default value that will be used. Which is not
+   compatible with the datetime parsing logic used to parse the output
+   from the bird show command. `timeformat protocol` is the one
+   important to be defibned for the bird2 app parsing logic to work.
+
+Example starting point using Bird2 shorthand `iso long` (YYYY-MM-DD hh:mm:ss):
+
+```
+timeformat base iso long;
+timeformat log iso long;
+timeformat protocol iso long;
+timeformat route iso long;
+```
+
+*Timezone can be manually specified, example "%F %T %z" (YYYY-MM-DD
+hh:mm:ss +11:45). See the [Bird
+2 docs](https://bird.network.cz/?get_doc&v=20&f=bird-3.html) for more information*
+
+4. Restart snmpd on your host
+
+The application should be auto-discovered as described at the top of the page. If it is not, please follow the steps set out under `SNMP Extend` heading top of page.
+
 ## Certificate
 
 A small python3 script that checks age and remaining validity of certificates
@@ -431,6 +477,105 @@ extend certificate /etc/snmp/certificate.py
 4. Restart snmpd on your host
 
 The application should be auto-discovered as described at the top of the page. If it is not, please follow the steps set out under `SNMP Extend` heading top of page.
+
+## BorgBackup
+
+### SNMP Extend
+
+1. Copy the shell script to the desired host.
+```
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/borgbackup -O /etc/snmp/borgbackup
+```
+
+2. Make the script executable
+```
+chmod +x /etc/snmp/borgbackup
+```
+
+3. Install depends.
+```
+# FreeBSD
+pkg p5-Config-Tiny p5-JSON p5-File-Slurp p5-MIME-Base64 p5-String-ShellQuote
+# Debian
+apt-get install libconfig-tiny-perl libjson-perl libfile-slurp-perl libmime-base64-perl libstring-shellquote-perl
+# generic cpanm
+cpanm Config::Tiny File::Slurp JSON MIME::Base64 String::ShellQuote
+```
+
+4. Set it up in cron.
+```
+*/5 * * * /etc/snmp/borgbackup 2> /dev/null > /dev/null
+```
+
+5. Configure it. See further down below or `/etc/snmp/borgbackup
+   --help`.
+
+6. Add the following to the SNMPD config.
+```
+extend borgbackup /bin/cat /var/cache/borgbackup_extend/extend_return
+```
+
+7. Restart SNMPD and wait for the device to rediscover or tell it to
+   manually.
+
+#### Config
+
+The config file is a ini file and handled by
+[Config::Tiny](https://metacpan.org/pod/Config::Tiny).
+
+    - mode :: single or multi, for if this is a single repo or for
+            multiple repos.
+        - Default :: single
+
+    - repo :: Directory for the borg backup repo.
+        - Default :: undef
+
+    - passphrase :: Passphrase for the borg backup repo.
+        - Default :: undef
+
+    - passcommand :: Passcommand for the borg backup repo.
+        - Default :: undef
+
+For single repos all those variables are in the root section of the config,
+so lets the repo is at '/backup/borg' with a passphrase of '1234abc'.
+
+    repo=/backup/borg
+    repo=1234abc
+
+For multi, each section outside of the root represents a repo. So if
+there is '/backup/borg1' with a passphrase of 'foobar' and
+'/backup/derp' with a passcommand of 'pass show backup' it would be
+like below.
+
+    mode=multi
+
+    [borg1]
+    repo=/backup/borg1
+    passphrase=foobar
+
+    [derp]
+    repo=/backup/derp
+    passcommand=pass show backup
+
+If 'passphrase' and 'passcommand' are both specified, then passcommand
+is used.
+
+#### Metrics
+
+The metrics are all from `.data.totals` in the extend return.
+
+| Value                    | Type    | Description                                               |
+|--------------------------|---------|-----------------------------------------------------------|
+| errored                  | repos   | Total number of repos that info could not be fetched for. |
+| locked                   | repos   | Total number of locked repos                              |
+| locked_for               | seconds | Longest time any repo has been locked.                    |
+| time_since_last_modified | seconds | Largest time - mtime for the repo nonce                   |
+| total_chunks             | chunks  | Total number of chunks                                    |
+| total_csize              | bytes   | Total compressed size of all archives in all repos.       |
+| total_size               | byes    | Total uncompressed size of all archives in all repos.     |
+| total_unique_chunks      | chunks  | Total number of unique chuckes in all repos.              |
+| unique_csize             | bytes   | Total deduplicated size of all archives in all repos.     |
+| unique_size              | chunks  | Total number of chunks in all repos.                      |
 
 ## CAPEv2
 
@@ -645,6 +790,8 @@ script it self at the top.
 
 ## FreeBSD NFS Client
 
+Superseded by the generalized NFS support.
+
 ### SNMP Extend
 
 1. Copy the shell script, fbsdnfsserver, to the desired host
@@ -669,6 +816,8 @@ the page. If it is not, please follow the steps set out under `SNMP
 Extend` heading top of page.
 
 ## FreeBSD NFS Server
+
+Superseded by the generalized NFS support.
 
 ### SNMP Extend
 
@@ -853,6 +1002,144 @@ You may need to configure `$server` or `$port`.
 
 Verify it is working by running `/usr/lib/check_mk_agent/local/gpsd`
 
+## HTTP Access Log Combined
+
+### SNMP Extend
+
+1. Download the script onto the desired host.
+```
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/http_access_log_combined -O /etc/snmp/http_access_log_combined
+```
+
+2. Make the script executable
+```
+chmod +x /etc/snmp/http_access_log_combined
+```
+
+3. Install the depends
+```
+# FreeBSD
+pkg install p5-File-Slurp p5-MIME-Base64 p5-JSON p5-Statistics-Lite p5-File-ReadBackwards
+
+# Debian
+apt-get install libfile-slurp-perl libmime-base64-perl libjson-perl libstatistics-lite-perl libfile-readbackwards-perl
+```
+
+4. Configure it if neeeded. Uses
+   `/usr/local/etc/http_access_log_combined_extend.json`, unless
+   specified via `-c`. See further below for configuration
+   information.
+
+5. If on large setups where it won't complete in a timely manner, run
+   it via cron.
+```
+*/5 * * * * root /etc/snmp/http_access_log_combined -b -q -w
+```
+
+6. Add it to `snmpd.conf`.
+```
+# if not using cron
+extend http_access_log_combined /etc/snmp/http_access_log_combined -b
+
+# if using cron
+extend http_access_log_combined cat /var/cache/http_access_log_combined.json.snmp
+```
+
+7. Either manually enable it for the device, rediscover the device, or
+   wait for it to be rediscovered.
+   
+| Key               | Type         | Description                                                                                                                              |
+|-------------------|--------------|------------------------------------------------------------------------------------------------------------------------------------------|
+| access            | hash         | A hash of access logs to monitor. The key is the reporting name while the value is the path to it.                                       |
+| error             | hash         | A hash of errors logs to monitor. The key is the reporting name while the value is the path to it. Must have a matching entry in access  |
+| auto              | boolean, 0/1 | If auto mode should be used or not. If not defined and .access is not defined, then it will default to 1. Other wise it is undef, false. |
+| auto_dir          | string       | The dir to look for files in. Default: `/var/log/apache/`                                                                                |
+| auto_end_regex    | string       | What to match files ending in. Default: `.log$`                                                                                          |
+| auto_access_regex | string       | What will be prepended to the end regexp for looking for access log files. Default: `-access`                                            |
+| auto_error_regex  | string       | What will be prepended to the end regexp for looking for error log files. Default: `-error`                                              |
+
+Auto will attempt to generate a list of log files to process. Will
+look under the directory specified for files matching the built
+regexp. The regexp is built by joining the access/error regexps to the
+end regexp. so for access it would be come `-access.log$`.
+
+The default auto config would look like below.
+
+```JSON
+{
+    "auto": 1,
+    "auto_dir": "/var/log/apache/",
+    "auto_end_regex": ".log$",
+    "auto_access_regex": "-access",
+    "auto_error_regex": "-error"
+}
+```
+
+So lets say the log dir, `/some/dir` in our case, has the following files.
+
+```
+foo:80-access.log
+foo:80-error.log
+foo:443-access.log
+foo:443-error.log
+bar-access.log
+```
+
+Then the auto generated stuff would be a like below.
+
+```JSON
+{
+    "access":{
+        "foo:80": "/some/dir/foo:80-access.log",
+        "foo:443": "/some/dir/foo:443-access.log",
+        "bar": "/some/dir/bar-access.log",
+    },
+    "error":{
+        "foo:80": "/some/dir/foo:80-error.log",
+        "foo:443": "/some/dir/foo:443-error.log",
+    }
+}
+```
+
+A manual config would be like below. Note that only `foo` has a error
+log that the size will be checked for and reported via the stat
+`error_size`.
+
+```JSON
+{
+    "auto": 0,
+    "access":{
+        "foo":"/var/log/www/foo.log",
+        "bar:80":"/var/log/www/bar:80.log"
+        "bar:443":"/var/log/www/bar:443.log"
+    },
+    "error":{
+        "foo":"/var/log/www/foo-error.log"
+    }
+}
+```
+
+8. (Optional) If you have SELinux in Enforcing mode, you must add a module so the script can open and read the httpd log files:
+```
+cat << EOF > snmpd_http_access_log_combined.te
+module snmp_http_access_log_combined 1.0;
+
+require {
+        type httpd_log_t;
+        type snmpd_t;
+        class file { open read };
+}
+
+#============= snmpd_t ==============
+
+allow snmpd_t httpd_log_t:file { open read };
+
+EOF
+checkmodule -M -m -o snmpd_http_access_log_combined.mod snmpd_http_access_log_combined.te
+semodule_package -o snmpd_http_access_log_combined.pp -m snmpd_http_access_log_combined.mod
+semodule -i snmpd_http_access_log_combined.pp
+```
+
 ## HV Monitor
 
 HV Monitor provides a generic way to monitor hypervisors. Currently
@@ -870,15 +1157,16 @@ or [MetaCPAN](https://metacpan.org/dist/HV-Monitor).
 For Debian based systems this is as below.
 
 ```
-apt-get install zlib1g-dev cpanminus libjson-perl
+# Debian
+apt-get install libjson-perl libmime-base64-perl cpanminus
 cpanm HV::Monitor
-```
 
-And on FreeBSD as below.
-
-```
-pkg install p5-App-cpanminus p5-JSON p5-MIME-Base64 p5-Gzip-Faster
+# FreeBSD
+pkg install p5-App-cpanminus p5-JSON p5-MIME-Base64 p5-Module-List
 cpanm HV::Monitor
+
+# Generic
+cpanm JSON MIME::Base64 Module::List
 ```
 
 2. Set it up to be be ran by cron by root. Yes, you can directly call
@@ -929,37 +1217,199 @@ extend icecast /etc/snmp/icecast-stats.sh
 
 A small python3 script that reports current DHCP leases stats and pool usage of ISC DHCP Server.
 
-Also you have to install the dhcpd-pools Package.
-Under Ubuntu/Debian just run `apt install dhcpd-pools`
+Also you have to install the dhcpd-pools and the required Perl
+modules.
+
+```
+# Debian
+apt install cpanminus libmime-base64-perl libfile-slurp-perl
+cpanm Net::ISC::DHCPd::Leases
+
+# FreeBSD
+pkg install p5-JSON p5-MIME-Base64 p5-App-cpanminus p5-File-Slurp
+cpanm Net::ISC::DHCPd::Leases
+
+# Generic
+cpanm Net::ISC::DHCPd::Leases MIME::Base64 File::Slurp
+```
 
 ### SNMP Extend
 
 1. Copy the shell script to the desired host.
 ```
-wget https://github.com/librenms/librenms-agent/raw/master/snmp/dhcp.py -O /etc/snmp/dhcp.py
+wget https://github.com/librenms/librenms-agent/raw/master/snmp/dhcp -O /etc/snmp/dhcp
 ```
 
 2. Make the script executable
 ```
-chmod +x /etc/snmp/dhcp.py
+chmod +x /etc/snmp/dhcp
 ```
 
-3. Edit your config file, Content of an example /etc/snmp/dhcp.json
+3. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
 ```
-{"leasefile": "/var/lib/dhcp/dhcpd.leases" }
+# without using cron
+extend dhcpstats /etc/snmp/dhcp -Z
+# using cron
+extend dhcpstats /bin/cat /var/cache/dhcp_extend
 ```
-Key 'leasefile' specifies the path to your lease file.
 
-4. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
+4. If on a slow system running it via cron may be needed.
 ```
-extend dhcpstats /etc/snmp/dhcp.py
+*/5 * * * * /etc/snmp/dhcp -Z -w /var/cache/dhcp_extend
 ```
+
+The following options are also supported.
+
+| Option     | Description                     |
+|------------|---------------------------------|
+| `-c $file` | Path to dhcpd.conf.             |
+| `-l $file` | Path to lease file.             |
+| `-Z`       | Enable GZip+Base64 compression. |
+| `-d`       | Do not de-dup.                  |
+| `-w $file` | File to write it out to.        |
 
 5. Restart snmpd on your host
 
 The application should be auto-discovered as described at the top of
 the page. If it is not, please follow the steps set out under `SNMP
 Extend` heading top of page.
+
+## Logsize
+
+### SNMP Extend
+
+1. Download the script and make it executable.
+
+```
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/logsize -O /etc/snmp/logsize
+chmod +x /etc/snmp/logsize
+```
+
+2. Install the requirements.
+
+```
+# FreeBSD
+pkg install p5-File-Find-Rule p5-JSON p5-TOML p5-Time-Piece p5-MIME-Base64 p5-File-Slurp p5-Statistics-Lite
+
+# Debian
+apt-get install cpanminus libjson-perl libmime-base64-perl libfile-slurp-perl libtoml-perl libfile-find-rule-perl libstatistics-lite-perl
+cpanm Time::Piece
+
+# Generic
+cpanm File::Find::Rule JSON TOML Time::Piece MIME::Base64 File::Slurp Statistics::Lite Time::Piece
+```
+
+3. Configure the config at `/usr/local/etc/logsize.conf`. You can find
+   the documentation for the config file in the extend. Below is a
+   small example.
+
+```
+# monitor log sizes of logs directly udner /var/log
+[sets.var_log]
+dir="/var/log/"
+
+# monitor remote logs from network devices
+[sets.remote_network]
+dir="/var/log/remote/network/"
+
+# monitor remote logs from windows sources
+[sets.remote_windows]
+dir="/var/log/remote/windows/"
+
+# monitor suricata flows logs sizes
+[sets.suricata_flows]
+dir="/var/log/suricata/flows/current"
+```
+
+4. If the directories all readable via SNMPD, this script can be ran
+   via snmpd. Otherwise it needs setup in cron. Similarly is
+   processing a large number of files, it may also need setup in cron
+   if it takes the script awhile to run.
+
+```
+*/5 * * * * /etc/snmp/logsize -b 2> /dev/null > /dev/null
+```
+
+5. Make sure that `/var/cache/logsize_extend` exists and is writable
+   by the user running the extend.
+
+```
+mkdir -p /var/cache/logsize_extend
+```
+
+6. Configure it in the SNMPD config.
+
+```
+# if not using cron
+extend logsize  /etc/snmp/logsize -b
+# if using cron
+extend logsize /bin/cat /var/cache/logsize_extend/extend_return
+```
+
+## linux_config_files
+
+linux_config_files is an application intended to monitor a Linux distribution's configuration files via that distribution's configuration management tool/system.  At this time, ONLY RPM-based (Fedora/RHEL) SYSTEMS ARE SUPPORTED utilizing the rpmconf tool.  The linux_config_files application collects and graphs the total count of configuration files that are out of sync and graphs that number.
+
+Fedora/RHEL: Rpmconf is a utility that analyzes rpm configuration files using the RPM Package Manager.  Rpmconf reports when a new configuration file standard has been issued for an upgraded/downgraded piece of software.  Typically, rpmconf is used to provide a diff of the current configuration file versus the new, standard configuration file.  The administrator can then choose to install the new configuration file or keep the old one.
+
+### SNMP Extend
+
+1. Copy the python script, linux_config_files.py, to the desired host
+```
+wget https://github.com/librenms/librenms-agent/raw/master/snmp/linux_config_files.py -O /etc/snmp/linux_config_files.py
+```
+
+2. Make the script executable
+```
+chmod +x /etc/snmp/linux_config_files.py
+```
+
+3. Edit your snmpd.conf file and add:
+```
+extend linux_config_files /etc/snmp/linux_config_files.py
+```
+
+4. (Optional on an RPM-based distribution) Create a /etc/snmp/linux_config_files.json file and specify the following:
+    1. "pkg_system" - String designating the distribution name of the system.  At the moment only "rpm" is supported ["rpm"]
+    2. "pkg_tool_cmd" - String path to the package tool binary ["/sbin/rpmconf"]
+```
+{
+    "pkg_system": "rpm",
+    "pkg_tool_cmd": "/bin/rpmconf",
+}
+```
+
+5. Restart snmpd.
+
+## Linux Softnet Stat
+
+### SNMP Extend
+
+1: Install the depends, which on a Debian based system would be as below.
+```
+# Debian
+apt-get install -y libfile-slurp-perl libmime-base64-perl libjson-perl
+
+# Generic
+cpanm JSON File::Slurp MIME::Base64
+```
+
+2. Download the script into the desired host.
+```
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/linux_softnet_stat -O /etc/snmp/linux_softnet_stat
+```
+
+3. Make the script executable
+```
+chmod +x /etc/snmp/linux_softnet_stat
+```
+
+4. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
+```
+extend linux_softnet_stat /etc/snmp/linux_softnet_stat -b
+```
+
+Then either enable the application Linux Softnet Stat or wait for it to be re-discovered.
 
 ## mailcow-dockerized postfix
 
@@ -1096,6 +1546,20 @@ The application should be auto-discovered as described at the top of
 the page. If it is not, please follow the steps set out under `SNMP
 Extend` heading top of page.
 
+## Mojo CAPE Submit
+
+### SNMP
+
+This assumes you've already configured mojo_cape_submit from CAPE::Utils.
+
+1. Add the following to `snmpd.conf` and restarted SNMPD
+```
+extend mojo_cape_submit /usr/local/bin/mojo_cape_submit_extend
+```
+
+Then just wait for the machine in question to be rediscovered or
+enabled it in the device settings app page.
+
 ## Munin
 
 ### Agent
@@ -1210,6 +1674,56 @@ The application should be auto-discovered as described at the top of
 the page. If it is not, please follow the steps set out under `SNMP
 Extend` heading top of page.
 
+## Nextcloud
+
+### SNMP
+
+1. Copy the shell script to the desired host.
+```
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/nextcloud -O /etc/snmp/nextcloud
+```
+
+2. Make the script executable
+```
+chmod +x /etc/snmp/nextcloud
+```
+
+3. Install depends.
+```
+# FreeBSD
+pkg install p5-JSON p5-File-Slurp p5-MIME-Base64 p5-Time-Piece
+
+# Debian
+apt-get install libjson-perl libfile-slurp-perl libmime-base64-perl cpanminus
+cpanm Time::Piece
+
+# generic cpanm
+cpanm JSON File::Slurp Mime::Base64 Time::Piece
+
+# CentOS / RHEL
+dnf install perl-JSON perl-File-Slurp perl-MIME-Base64 perl-String-ShellQuote perl-Time-Piece
+```
+
+4. Create the cache dir and chown it to the user Nextcloud is running
+   as.
+```
+mkdir /var/cache/nextcloud_extend
+chown -R $nextcloud_user /var/cache/nextcloud_extend
+```
+
+5. Set it up in the crontab for the Nextcloud user using `-i` to point
+   it to the Nextcloud install dir.
+```
+*/5 * * * * /etc/snmpd/nextcloud -q -i $install_dir
+```
+
+6. Add it to snmpd.conf
+```
+extend nextcloud /bin/cat /var/cache/nextcloud_extend/snmp
+```
+
+Then just wait for it to be rediscovered.
+
 ## NGINX
 
 NGINX is a free, open-source, high-performance HTTP server: <https://www.nginx.org/>
@@ -1275,7 +1789,93 @@ Extend` heading top of page.
 [Install the agent](Agent-Setup.md) on this device if it isn't already
 and copy the `nginx` script to `/usr/lib/check_mk_agent/local/`
 
-## NFS Server
+## NFS
+
+Provides both NFS client and server support.
+
+Currently supported OSes are as below.
+
+- FreeBSD
+- Linux
+
+### SNMPd extend
+
+1. Download the extend.
+```
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/nfs -O /etc/snmp/nfs
+```
+
+2. Make it executable.
+```
+chmod +x /etc/snmp/nfs
+```
+
+3. Install the requirements.
+```
+# debian
+apt-get install libfile-slurp-perl libjson-perl libmime-base64-perl
+
+# freebsd
+pkg install p5-File-Slurp p5-JSON p5-MIME-Base64
+
+# rhel / alma
+dnf install perl-File-Slurp perl-JSON perl-MIME-Base64
+```
+
+4. Add it to snmpd.conf.
+```
+extend nfs /usr/bin/env PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin /etc/snmp/nfs
+```
+
+5. Restart snmpd on your host
+
+6. Either wait for it to be rediscovered, rediscover it, or enable it.
+
+If using SELinux, the following is needed.
+
+1. `setsebool -P nis_enabled 1`
+
+2. Make a file (snmp_nfs.te) with the following contents and install
+   the policy with the command `semodule -i snmp_nfs.te`.
+
+```
+module local_snmp 1.0;
+
+require {
+    type snmpd_t;
+    type portmap_port_t;
+    type sysctl_rpc_t;
+    type device_t;
+    type mountd_port_t;
+    type hi_reserved_port_t;
+    class tcp_socket { name_bind name_connect };
+    class udp_socket name_bind;
+    class dir search;
+    class file { read getattr open };
+    class chr_file { open ioctl read write };
+}
+
+# Allow snmpd_t to connect to tcp_socket of type portmap_port_t
+allow snmpd_t portmap_port_t:tcp_socket name_connect;
+allow snmpd_t hi_reserved_port_t:tcp_socket name_bind;
+allow snmpd_t hi_reserved_port_t:udp_socket name_bind;
+allow snmpd_t mountd_port_t:tcp_socket name_connect;
+
+# Allow snmpd_t to search directories and access files of type sysctl_rpc_t
+allow snmpd_t sysctl_rpc_t:dir search;
+allow snmpd_t sysctl_rpc_t:file { read getattr open };
+
+# Allow snmpd_t to perform open, ioctl, read, and write operations on chr_file of type device_t
+allow snmpd_t device_t:chr_file { open ioctl read write };
+
+# this policy allows : 
+# zfs extension (fixes root needs to run this)
+# nfs extension (fixes file not found error)
+```
+
+## Linux NFS Server
+
+Superseded by the generalized NFS support.
 
 Export the NFS stats from as server.
 
@@ -1417,16 +2017,18 @@ chmod +x /etc/snmp/opensearch
 3. Install the required Perl dependencies.
 ```
 # FreeBSD
-pkg install p5-JSON p5-libwww
+pkg install p5-JSON p5-File-Slurp p5-MIME-Base64 p5-LWP-Protocol-https
+
 # Debian/Ubuntu
-apt-get install libjson-perl libwww-perl
-# cpanm
-cpanm JSON Libwww
+apt-get install libjson-perl libfile-slurp-perl liblwp-protocol-https-perl libmime-base64-perl
+
+# Generic
+cpanm JSON Libwww File::Slurp LWP::Protocol::HTTPS MIME::Base64
 ```
 
 4. Update your snmpd.conf.
 ```
-extend opensearch /bin/cat /var/cache/opensearch.json
+extend opensearch /bin/cat /var/cache/opensearch.json.snmp
 ```
 
 5. Update root crontab with. This is required as it will this will
@@ -1434,10 +2036,18 @@ likely time out otherwise. Use `*/1` if you want to have the most
 recent stats when polled or to `*/5` if you just want at exactly a 5
 minute interval.
 ```
-*/5 * * * * /etc/snmp/opensearch > /var/cache/opensearch.json
+*/5 * * * * /etc/snmp/opensearch -w -q
 ```
 
 6. Enable it or wait for the device to be re-disocvered.
+
+Alternatively cron can be skipped and the extend can be told to run
+like below, but if under heavy load it time out waiting for Opensearch
+to respond.
+
+```
+extend opensearch /etc/snmp/opensearch
+```
 
 ## Open Grid Scheduler
 
@@ -1489,6 +2099,149 @@ chmod +x /etc/snmp/opensips-stats.sh
 extend opensips /etc/snmp/opensips-stats.sh
 ```
 
+## OS Level Virtualization Monitoring
+
+| OS      | Supported                           |
+|---------|-------------------------------------|
+| FreeBSD | jails                               |
+| Linux   | cgroups v2(Docker, Podman included) |
+
+### SNMP Extend
+
+1. Install the depends...
+
+```shell
+# Debian
+apt-get install libjson-perl libclone-perl libmime-base64-perl libfile-slurp-perl libio-interface-perl cpanminus
+
+# Generic
+cpanm JSON Clone Mime::Base64 File::Slurp IO::Interface
+```
+
+2. Install...
+
+```
+# FreeBSD
+pkg install p5-OSLV-Monitor
+
+# Debian / Generic
+cpanm OSLV::Monitor
+```
+
+3. Setup cron.
+
+```
+ */5 * * * * /usr/local/bin/oslv_monitor -q > /dev/null 2> /dev/null
+```
+
+4. Setup snmpd.
+
+```
+extend oslv_monitor /bin/cat /var/cache/oslv_monitor/snmp
+```
+
+Wait for it to be rediscovered by LibreNMS.
+
+An optional config file may be specified via -f or placed at
+`/usr/local/etc/oslv_monitor.json`.
+
+The following keys are used in the JSON config file.
+
+    - include :: An array of regular expressions to include.
+        Default :: ["^.*$"]
+
+    - exclude :: An array of regular expressions to exlclude.
+        Default :: undef
+
+    - backend :: Override the backend and automatically choose it.
+
+    - time_divider :: Override the time_divider value. The default value varies
+        per backend and if it is needed.
+
+Time divider notes.
+
+    - cgroups :: While the default for usec to sec conversion should be 1000000,
+              some settings report the value in nanoseconds, requiring 1000000000.
+        Default :: 1000000
+
+    - FreeBSD :: not used
+
+By Defaults the backends are as below.
+
+    FreeBSD: FreeBSD
+    Linux: cgroups
+
+Default would be like this.
+
+```json
+{
+  "include": ["^.*$"]
+}
+```
+
+
+### Metric Notes
+
+| Key                     | Description                                                  |
+|-------------------------|--------------------------------------------------------------|
+| `running_$name`         | 0 or 1 based on if it is running or not.                     |
+| `oslvm___$name___$stat` | The a specific stat for a specific OSLVMs.                   |
+| `totals_$stat`          | A stat representing a total for all stats across all OSLVMs. |
+
+Something is considered not running if it has been seen. How long
+something is considred to have been seen is controlled by
+`apps.oslv_monitor.seen_age`, which is the number of seconds ago it
+would of have to be seen. The default is `604800` which is seven days
+in seconds.
+
+All time values are in seconds.
+
+All counter stats are per second values for that time period.
+
+### Backend Notes
+
+#### FreeBSD
+
+The stats names match those produced by `ps --libxo json`.
+
+#### Linux cgroups v2
+
+The cgroup to name mapping is done like below.
+
+- systemd -> s_$name
+- user -> u_$name
+- docker -> d_$name
+- podman -> p_$name
+- anything else -> $name
+
+The following ps to stats mapping are as below.
+
+- %cpu -> percent-cpu
+- %mem -> percent-memory
+- rss -> rss
+- vsize -> virtual-size
+- trs -> text-size
+- drs -> data-size
+- size -> size
+
+"procs" is a total number of procs in that cgroup.
+
+The rest of the values are pulled from the following files with
+the names kept as is.
+
+- cpu.stat
+- io.stat
+- memory.stat
+
+The following mappings are done though.
+
+- pgfault -> minor-faults
+- pgmajfault -> major-faults
+- usage_usec -> cpu-time
+- system_usec -> system-time
+- user_usec -> user-time
+- throttled_usecs -> throttled-time
+
 ## OS Updates
 
 A small shell script that checks your system package manager for any
@@ -1529,32 +2282,55 @@ The application should be auto-discovered as described at the top of
 the page. If it is not, please follow the steps set out under `SNMP
 Extend` heading top of page.
 
+### Agent
+
+[Install the agent](Agent-Setup.md) on this device if it isn't already
+and copy the `osupdate` script to `/usr/lib/check_mk_agent/local/`
+
+Then uncomment the line towards the top marked to be uncommented if
+using it as a agent.
+
 ## PHP-FPM
 
 ### SNMP Extend
 
 1. Copy the shell script, phpfpmsp, to the desired host
 ```
-wget https://github.com/librenms/librenms-agent/raw/master/snmp/phpfpmsp -O /etc/snmp/phpfpmsp
+wget https://github.com/librenms/librenms-agent/raw/master/snmp/php-fpm -O /etc/snmp/php-fpm
 ```
 
 2. Make the script executable
 ```
-chmod +x /etc/snmp/phpfpmsp
+chmod +x /etc/snmp/php-fpm
+```
+
+3. Install the depends.
+```shell
+# FreeBSD
+pkg install p5-File-Slurp p5-JSON p5-String-ShellQuote p5-MIME-Base64
+# Debian
+apt-get install libfile-slurp-perl libjson-perl libstring-shellquote-perl libmime-base64-perl
 ```
 
 3. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
 ```
-extend phpfpmsp /etc/snmp/phpfpmsp
+extend phpfpmsp /etc/snmp/php-fpm
 ```
 
-4. Edit /etc/snmp/phpfpmsp to include the status URL for the PHP-FPM
-   pool you are monitoring.
+5. Create the config file
+   `/usr/local/etc/php-fpm_extend.json`. Alternate locations may be
+   specified using the the `-f` switch. Akin to like below. For more
+   information, see `/etc/snmp/php-fpm --help`.
+```json
+{
+"pools":{
+         "thefrog": "https://thefrog/fpm-status",
+         "foobar": "https://foo.bar/fpm-status"
+    }
+}
+```
 
-5. Restart snmpd on your host
-
-It is worth noting that this only monitors a single pool. If you want
-to monitor multiple pools, this won't do it.
+6. Restart snmpd on the host
 
 The application should be auto-discovered as described at the top of
 the page. If it is not, please follow the steps set out under `SNMP
@@ -1720,6 +2496,36 @@ moderate usage.
 The application should be auto-discovered as described at the top of
 the page. If it is not, please follow the steps set out under `SNMP
 Extend` heading top of page.
+
+## Poudriere
+
+### SNMP Extend
+
+1. Copy the extend into place
+```
+wget https://github.com/librenms/librenms-agent/raw/master/snmp/poudriere -O /usr/local/etc/snmp/poudriere
+```
+
+2. Make it executable.
+```
+chmod +x /usr/local/etc/snmp/poudriere
+```
+
+3. Install the depends
+```
+pkg install p5-Data-Dumper p5-JSON p5-MIME-Base64 p5-File-Slurp
+```
+
+4. Setup the cronjob. The extend needs to be ran as root. See
+`poudriere --help` for option info.
+```
+4/5 * * * * root /usr/local/etc/snmp/poudriere -q -a -w -z
+```
+
+5. Add the extend to snmpd.conf and restart snmpd
+```
+extend poudriere cat /var/cache/poudriere.json.snmp
+```
 
 ## PowerDNS
 
@@ -1974,6 +2780,67 @@ systemctl reload snmpd
 
 7. You're now ready to enable the application in LibreNMS.
 
+
+## Privoxy
+
+For this to work, the following log items need enabled for Privoxy.
+
+```
+debug     2 # show each connection status
+debug   512 # Common Log Format
+debug  1024 # Log the destination for requests Privoxy didn't let through, and the reason why.
+debug  4096 # Startup banner and warnings
+debug  8192 # Non-fatal errors
+```
+
+### SNMP Extend
+
+1. Download the extend and make sure it is executable.
+```
+wget https://github.com/librenms/librenms-agent/raw/master/snmp/privoxy -O /etc/snmp/privoxy
+chmod +x /etc/snmp/privoxy
+```
+
+2. Install the depdenencies.
+```
+# FreeBSD
+pkg install p5-JSON p5-MIME-Base64 p5-File-Slurp p5-File-ReadBackwards p5-IPC-Run3 p5-Time-Piece
+
+# Debian
+apt-get install libjson-perl libmime-base64-perl libfile-slurp-perl libfile-readbackwards-perl libipc-run3-perl cpanminus
+cpanm Time::Piece
+
+# Generic
+cpanm Time::Piece JSON MIME::Base64 File::Slurp File::ReadBackwards IPC::Run3
+```
+
+3. Add the extend to snmpd.conf and restart snmpd.
+```
+extend privoxy /etc/snmp/privoxy
+```
+
+If your logfile is not at `/var/log/privoxy/logfile`, that may be
+changed via the `-f` option.
+
+If `privoxy-log-parser.pl` is not found in your standard `$PATH`
+setting, you may will need up call the extend via `/usr/bin/env` with
+a `$PATH` set to something that includes it.
+
+Once that is done, just wait for the server to be rediscovered or just
+enable it manually.
+
+If you are having timeouts or there is privelege seperation issues,
+then it can be ran via cron like below. `-w` can be used to write it
+out and `-o` can be used to control where it is written to. See
+`--help` for more information.
+
+```
+# cron
+*/5 * * * * root /etc/snmp/privoxy -w > /dev/null
+
+# snmpd.conf
+extend privoxy /bin/cat /var/cache/privoxy_extend.json.snmp
+```
 
 ## Pwrstatd
 
@@ -2354,20 +3221,37 @@ hide_monitoring_account = With this Boolean you can hide the Account which you
 
 1. Copy the Perl script, smart, to the desired host.
 ```
-wget https://github.com/librenms/librenms-agent/raw/master/snmp/smart -O /etc/snmp/smart
+wget https://github.com/librenms/librenms-agent/raw/master/snmp/smart-v1 -O /etc/snmp/smart
 ```
 
-2. Make the script executable
+2. Install the depends.
+```
+# FreeBSD
+pkg install p5-JSON p5-MIME-Base64 smartmontools
+# Debian
+apt-get install smartmontools libjson-perl libmime-base64-perl
+# CentOS
+dnf install smartmontools perl-JSON perl-MIME-Base64
+```
+
+3. Make the script executable
 ```
 chmod +x /etc/snmp/smart
 ```
 
-3. Edit your snmpd.conf file and add:
+4. Setup a cronjob to run it. This ensures slow to poll disks won't
+   result in errors.
+
 ```
-extend smart /etc/snmp/smart
+ */5 * * * * /etc/snmp/smart -u -Z
 ```
 
-4. You will also need to create the config file, which defaults to the same path as the script,
+5. Edit your snmpd.conf file and add:
+```
+extend smart /bin/cat /var/cache/smart
+```
+
+6. You will also need to create the config file, which defaults to the same path as the script,
 but with .config appended. So if the script is located at /etc/snmp/smart, the config file
 will be `/etc/snmp/smart.config`. Alternatively you can also specific a config via `-c`.
 
@@ -2405,41 +3289,118 @@ used for reporting and everything after that is used as the argument to be passe
 If you want to guess at the configuration, call it with -g and it will print out what it thinks
 it should be.
 
-5. Restart snmpd on your host
-
-If you have a large number of more than one or two disks on a system,
-you should consider adding this to cron. Also make sure the cache file
-is some place it can be written to.
-
-```
- */3 * * * * /etc/snmp/smart -u
-```
-
-6. If your snmp agent runs as user "snmp", edit your sudo users
-   (usually `visudo`) and add at the bottom:
-```
-snmp ALL=(ALL) NOPASSWD: /etc/snmp/smart, /usr/bin/env smartctl
-```
-
-and modify your snmpd.conf file accordingly:
-
-```
-extend smart /usr/bin/sudo /etc/snmp/smart
-```
+6. Restart snmpd on your host
 
 The application should be auto-discovered as described at the top of
 the page. If it is not, please follow the steps set out under `SNMP
 Extend` heading top of page.
 
-If you set useSN to 1, it is worth noting that you will loose
-history(not able to access it from the web interface) for that device
-each time you change it. You will also need to run camcontrol or the
-like on said server to figure out what device actually corresponds
-with that serial number.
+7. Optionally setup nightly self tests for the disks. The exend will
+   run the specified test on all configured disks if called with the
+   -t flag and the name of the SMART test to run.
 
-Also if the system you are using uses non-static device naming based
-on bus information, it may be worthwhile just using the SN as the
-device ID is going to be irrelevant in that case.
+```
+ 0 0 * * * /etc/snmp/smart -t long
+```
+
+## Sneck
+
+This is for replacing Nagios/Icinga or the LibreNMS service
+integration in regards to NRPE. This allows LibreNMS to query what
+checks were ran on the server and keep track of totals of OK, WARNING,
+CRITICAL, and UNKNOWN statuses.
+
+The big advantage over this compared to a NRPE are as below.
+
+- It does not need to know what checks are configured on it.
+- Also does not need to wait for the tests to run as sneck is meant to
+  be ran via cron and the then return the cache when queried via SNMP,
+  meaning a lot faster response time, especially if slow checks are
+  being performed.
+- Works over proxied SNMP connections.
+
+Included are alert examples. Although for setting up custom ones, the
+metrics below are provided.
+
+| Metric              | Description                                                                                                           |
+|---------------------|-----------------------------------------------------------------------------------------------------------------------|
+| ok                  | Total OK checks                                                                                                       |
+| warning             | Total WARNING checks                                                                                                  |
+| critical            | Total CRITICAL checks                                                                                                 |
+| unknown             | Total UNKNOWN checks                                                                                                  |
+| errored             | Total checks that errored                                                                                             |
+| time_to_polling     | Differnce in seconds between when polling data was generated and when polled                                          |
+| time_to_polling_abs | The absolute value of time_to_polling.                                                                                |
+| check_$CHECK        | Exit status of a specific check `$CHECK` is equal to the name of the check in question. So `foo` would be `check_foo` |
+
+The standard Nagios/Icinga style exit codes are used and those are as
+below.
+
+| Exit | Meaning  |
+|------|----------|
+| 0    | okay     |
+| 1    | warning  |
+| 2    | critical |
+| 3+   | unknown  |
+
+To use `time_to_polling`, it will need to enabled via setting the
+config item below. The default is false. Unless set to true, this
+value will default to 0. If enabling this, one will want to make sure
+that NTP is in use every were or it will alert if it goes over a
+difference of 540s.
+
+```
+lnms config:set app.sneck.polling_time_diff true
+```
+
+For more information on Sneck, check it out at
+[MetaCPAN](https://metacpan.org/dist/Monitoring-Sneck) or
+[Github](https://github.com/VVelox/Monitoring-Sneck).
+
+For poking systems using Sneck, also check out boop_snoot
+if one wants to query those systems via the CLI. Docs on it
+at [MetaCPAN](https://metacpan.org/dist/Monitoring-Sneck-Boop_Snoot) and
+[Github](https://github.com/VVelox/Monitoring-Sneck-Boop_Snoot).
+
+### SNMP Extend
+
+1. Install the extend.
+
+```
+# FreeBSD
+pkg install p5-JSON p5-File-Slurp p5-MIME-Base64 p5-App-cpanminus
+cpanm Monitoring::Sneck
+
+# Debian based systems
+apt-get install cpanminus libjson-perl libfile-slurp-perl libmime-base64-perl
+cpanm Monitoring::Sneck
+
+# Generic
+cpanm Monitoring::Sneck
+```
+
+2. Configure any of the checks you want to run in
+   `/usr/local/etc/sneck.conf`. You con find it documented
+   [here](https://metacpan.org/pod/Monitoring::Sneck#CONFIG-FORMAT).
+
+3. Set it up in cron. This will mean you don't need to wait for all
+   the checks to complete when polled via SNMP, which for like SMART
+   or other long running checks will mean it timing out. Also means it
+   does not need called via sudo as well.
+
+```
+*/5 * * * * /usr/bin/env PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin /usr/local/bin/sneck -u 2> /dev/null > /dev/null
+```
+
+4. Set it up in the snmpd config and restart snmpd. The `-c` flag will
+   tell read it to read from cache instead of rerunning the checks.
+
+```
+extend sneck /usr/bin/env PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin /usr/local/bin/sneck -c
+```
+
+5. In LibreNMS, enable the application for the server in question or wait for auto
+   discovery to find it.
 
 ## Squid
 
@@ -2531,6 +3492,15 @@ one found among all the instances.
 
 1. Install the extend.
 ```
+# FreeBSD
+pkg install p5-JSON p5-File-ReadBackwards p5-File-Slurp p5-MIME-Base64 p5-Time-Piece p5-App-cpanminus
+cpanm Sagan::Monitoring
+
+# Debian
+apt-get install libjson-perl libfile-readbackwards-perl libfile-slurp-perl libmime-base64-perl cpanminus
+cpanm Sagan::Monitoring
+
+# Generic
 cpanm Sagan::Monitoring
 ```
 
@@ -2562,12 +3532,148 @@ setup. If the default does not work, check the docs for it at
 sagan_stat_check](https://metacpan.org/dist/Sagan-Monitoring/view/bin/sagan_stat_check)
 
 
+## Socket Statistics (ss)
+
+The Socket Statistics application polls ss and scrapes socket statuses.  Individual sockets and address-families may be filtered out within the script's optional configuration JSON file.
+
+1. The following socket types are polled directly.  Filtering a socket type will disable direct polling as-well-as indirect polling within any address-families that list the socket type as their child:
+```
+dccp (also exists within address-families "inet" and "inet6")
+mptcp (also exists within address-families "inet" and "inet6")
+raw (also exists within address-families "inet" and "inet6")
+sctp (also exists within address-families "inet" and "inet6")
+tcp (also exists within address-families "inet" and "inet6")
+udp (also exists within address-families "inet" and "inet6")
+xdp
+```
+
+2. The following socket types are polled within an address-family only:
+```
+inet6 (within address-family "inet6")
+p_dgr (within address-family "link")
+p_raw (within address-family "link")
+ti_dg (within address-family "tipc")
+ti_rd (within address-family "tipc")
+ti_sq (within address-family "tipc")
+ti_st (within address-family "tipc")
+v_dgr (within address-family "vsock")
+v_str (within address-family "vsock")
+unknown (within address-families "inet", "inet6", "link", "tipc", and "vsock")
+```
+
+3. The following address-families are polled directly and have their child socket types tab-indented below them.  Filtering a socket type (see "1" above) will filter it from the address-family.  Filtering an address-family will filter out all of its child socket types.  However, if those socket types are not DIRECTLY filtered out (see "1" above), then they will continue to be monitored either directly or within other address-families in which they exist:
+```
+inet
+    dccp
+    mptcp
+    raw
+    sctp
+    tcp
+    udp
+    unknown
+inet6
+    dccp
+    icmp6
+    mptcp
+    raw
+    sctp
+    tcp
+    udp
+    unknown
+link
+    p_dgr
+    p_raw
+    unknown
+netlink
+tipc
+    ti_dg
+    ti_rd
+    ti_sq
+    ti_st
+    unknown
+unix
+    u_dgr
+    u_seq
+    u_str
+vsock
+    v_dgr
+    v_str
+    unknown
+```
+
+### SNMP Extend
+
+1. Copy the python script, ss.py, to the desired host
+```
+wget https://github.com/librenms/librenms-agent/raw/master/snmp/ss.py -O /etc/snmp/ss.py
+```
+
+2. Make the script executable
+```
+chmod +x /etc/snmp/ss.py
+```
+
+3. Edit your snmpd.conf file and add:
+```
+extend ss /etc/snmp/ss.py
+```
+
+4. (Optional) Create a /etc/snmp/ss.json file and specify:
+    1. "ss_cmd" - String path to the ss binary: ["/sbin/ss"]
+    2. "socket_types" - A comma-delimited list of socket types to include.  The following socket types are valid: dccp, icmp6, mptcp, p_dgr, p_raw, raw, sctp, tcp, ti_dg, ti_rd, ti_sq, ti_st, u_dgr, u_seq, u_str, udp, unknown, v_dgr, v_dgr, xdp.  Please note that the "unknown" socket type is represented in /sbin/ss output with the netid "???".  Please also note that the p_dgr and p_raw socket types are specific to the "link" address family; the ti_dg, ti_rd, ti_sq, and ti_st socket types are specific to the "tipc" address family; the u_dgr, u_seq, and u_str socket types are specific to the "unix" address family; and the v_dgr and v_str socket types are specific to the "vsock" address family.  Filtering out the parent address families for the aforementioned will also filter out their specific socket types.  Specifying "all" includes all of the socket types.  For example: to include only tcp, udp, icmp6 sockets, you would specify "tcp,udp,icmp6": ["all"]
+    3. "addr_families" - A comma-delimited list of address families to include.  The following families are valid: inet, inet6, link, netlink, tipc, unix, vsock.  As mentioned above under (b), filtering out the link, tipc, unix, or vsock address families will also filter out their respective socket types.  Specifying "all" includes all of the families.  For example: to include only inet and inet6 families, you would specify "inet,inet6": ["all"]
+```
+{
+    "ss_cmd": "/sbin/ss",
+    "socket_types": "all"
+    "addr_families": "all"
+}
+```
+In order to filter out uncommon/unused socket types, the following JSON configuration is recommended:
+```
+{
+    "ss_cmd": "/sbin/ss",
+    "socket_types": "icmp6,p_dgr,p_raw,raw,tcp,u_dgr,u_seq,u_str,udp",
+    "addr_families": "inet,inet6,link,netlink,unix"
+}
+```
+
+5. (Optional) If SELinux is in Enforcing mode, you must add a module so the script can poll sockets:
+```
+cat << EOF > snmpd_ss.te
+module snmp_ss 1.0;
+
+require {
+	type snmpd_t;
+	class netlink_tcpdiag_socket { bind create getattr nlmsg_read read setopt write };
+}
+
+#============= snmpd_t ==============
+
+allow snmpd_t self:netlink_tcpdiag_socket { bind create getattr nlmsg_read read setopt write };
+EOF
+checkmodule -M -m -o snmpd_ss.mod snmpd_ss.te
+semodule_package -o snmpd_ss.pp -m snmpd_ss.mod
+semodule -i snmpd_ss.pp
+```
+
+6. Restart snmpd.
+
 ## Suricata
 
 ### SNMP Extend
 
 1. Install the extend.
 ```
+# FreeBSD
+pkg install p5-JSON p5-File-Path p5-File-Slurp p5-Time-Piece p5-MIME-Base64 p5-Hash-Flatten p5-Carp p5-App-cpanminus
+cpanm Suricata::Monitoring
+
+# Debian
+apt-get install libjson-perl libfile-path-perl libfile-slurp-perl libmime-base64-perl cpanminus
+cpanm Suricata::Monitoring
+
+# Generic
 cpanm Suricata::Monitoring
 ```
 
@@ -2600,6 +3706,20 @@ setup. If the default does not work, check the docs for it at
 suricata_stat_check](https://metacpan.org/dist/Suricata-Monitoring/view/bin/suricata_stat_check)
 
 
+## Suricata Extract
+
+### SNMP
+
+1. Add the following to your snmpd config and restart. Path may have
+to be adjusted depending on where `suricata_extract_submit_extend` is
+installed to.
+```
+extend suricata_extract /usr/local/bin/suricata_extract_submit_extend
+```
+
+Then just wait for the system to be rediscovered or enable it manually
+for the server in question.
+
 ## Systemd
 
 The systemd application polls systemd and scrapes systemd units' load, activation, and sub states.
@@ -2622,8 +3742,8 @@ extend systemd /etc/snmp/systemd.py
 ```
 
 4. (Optional) Create a /etc/snmp/systemd.json file and specify:
-    a.) "systemctl_cmd" - String path to the systemctl binary [Default: "/usr/bin/systemctl"]
-    b.) "include_inactive_units" - True/False string to include inactive units in results [Default: "False"]
+    1. "systemctl_cmd" - String path to the systemctl binary [Default: "/usr/bin/systemctl"]
+    2. "include_inactive_units" - True/False string to include inactive units in results [Default: "False"]
 ```
 {
     "systemctl_cmd": "/bin/systemctl",
@@ -2656,7 +3776,6 @@ semodule -i snmpd_systemctl.pp
 ```
 
 6. Restart snmpd.
-
 
 ## TinyDNS aka djbdns
 
@@ -2825,72 +3944,87 @@ extend voipmon /etc/snmp/voipmon-stats.sh
 
 ## Wireguard
 
-The wireguard application polls the Wireguard service and scrapes all client statistics for all interfaces configured as Wireguard interfaces.
+The Wireguard application polls the Wireguard service and scrapes all client statistics for all interfaces configured as Wireguard interfaces.
 
 ### SNMP Extend
 
 1. Copy the python script, wireguard.py, to the desired host
 ```
-wget https://github.com/librenms/librenms-agent/raw/master/snmp/wireguard.py -O /etc/snmp/wireguard.py
+wget https://github.com/librenms/librenms-agent/raw/master/snmp/wireguard.pl -O /etc/snmp/wireguard.pl
 ```
 
-2. Make the script executable
+2. Install the depends.
 ```
-chmod +x /etc/snmp/wireguard.py
+# FreeBSD
+pkg install p5-JSON p5-File-Slurp p5-MIME-Base64
+
+# Debian
+apt-get install libjson-perl libmime-base64-perl libfile-slurp-perl
+
+# Generic
+cpanm JSON MIME::Base64 File::Slurp
 ```
 
-3. Edit your snmpd.conf file and add:
+3. Make the script executable
 ```
-extend wireguard /etc/snmp/wireguard.py
-```
-
-4. Create a /etc/snmp/wireguard.json file and specify:
-a.) (optional) "wg_cmd" - String path to the wg binary ["/usr/bin/wg"]
-b.) "public_key_to_arbitrary_name" - A dictionary to convert between the publickey assigned to the client (specified in the wireguard interface conf file) to an arbitrary, friendly name.  The friendly names MUST be unique within each interface.  Also note that the interface name and friendly names are used in the RRD filename, so using special characters is highly discouraged.
-```
-{
-    "wg_cmd": "/bin/wg",
-    "public_key_to_arbitrary_name": {
-        "wg0": {
-            "z1iSIymFEFi/PS8rR19AFBle7O4tWowMWuFzHO7oRlE=": "client1",
-            "XqWJRE21Fw1ke47mH1yPg/lyWqCCfjkIXiS6JobuhTI=": "server.domain.com"
-        }
-    }
-}
+chmod +x /etc/snmp/wireguard.pl
 ```
 
-5. Restart snmpd.
+4. Edit your snmpd.conf file and add:
+```
+extend wireguard /etc/snmp/wireguard.pl
+```
+
+5. Create the optional config file,
+   `/usr/local/etc/wireguard_extend.json`.
+
+| key                          | default     | description                                                 |
+|------------------------------|-------------|-------------------------------------------------------------|
+| include_pubkey               | 0           | Include the pubkey with the return.                         |
+| use_short_hostname           | 1           | If the hostname should be shortened to just the first part. |
+| public_key_to_arbitrary_name | {}          | A hash of pubkeys to name mappings.                         |
+| pubkey_resolvers             | <see below> | Resolvers to use for the pubkeys.                           |
+
+The default for `pubkey_resolvers` is
+`config,endpoint_if_first_allowed_is_subnet_use_hosts,endpoint_if_first_allowed_is_subnet_use_ip,first_allowed_use_hosts,first_allowed_use_ip`.
+
+| resolver                                       | description                                                                                          |
+|------------------------------------------------|------------------------------------------------------------------------------------------------------|
+| config                                         | Use the mappings from `.public_key_to_arbitrary_name` .                                              |
+| endpoint_if_first_allowed_is_subnet_use_hosts  | If the first allowed IP is a subnet, see if a matching IP can be found in hosts for the endpoint.    |
+| endpoint_if_first_allowed_is_subnet_use_getent | If the first allowed IP is a subnet, see if a hit can be found for the endpoint IP via getent hosts. |
+| endpoint_if_first_allowed_is_subnet_use_ip     | If the first allowed IP is a subnet, use the endpoint IP for the name.                               |
+| first_allowed_use_hosts                        | See if a match can be found in hosts for the first allowed IP.                                       |
+| first_allowed_use_getent                       | Use getent hosts to see try to fetch a match for the first allowed IP.                               |
+| first_allowed_use_ip                           | Use the first allowed IP as the name.                                                                |
+
+
+6. Restart snmpd.
 
 ## ZFS
 
 ### SNMP Extend
 
-`zfs-linux` requires python3 >=python3.5.
-
-The installation steps are:
-
-1. Copy the polling script to the desired host (the host must be added
-   to LibreNMS devices)
-2. Make the script executable
-3. Edit snmpd.conf to include ZFS stats
-
-#### FreeBSD
+1: Install the depends.
 ```
-wget https://github.com/librenms/librenms-agent/raw/master/snmp/zfs-freebsd -O /etc/snmp/zfs-freebsd
-chmod +x /etc/snmp/zfs-freebsd
-echo "extend zfs /etc/snmp/zfs-freebsd" >> /etc/snmp/snmpd.conf
+# FreeBSD
+pkg install p5-JSON p5-MIME-Base64 p5-File-Slurp
+
+# Debian
+apt-get install -y libjson-perl libmime-base64-perl libfile-slurp-perl
+
+# Generic
+cpanm JSON MIME::Base64 File::Slurp
 ```
 
-#### Linux
+2: Fetch the script in question and make it executable.
 ```
-wget https://github.com/librenms/librenms-agent/raw/master/snmp/zfs-linux -O /etc/snmp/zfs-linux
-chmod +x /etc/snmp/zfs-linux
-echo "extend zfs /usr/bin/sudo /etc/snmp/zfs-linux" >> /etc/snmp/snmpd.conf
-```
-
-Edit your sudo users (usually `visudo`) and add at the bottom:
-```
-snmp ALL=(ALL) NOPASSWD: /etc/snmp/zfs-linux
+wget https://github.com/librenms/librenms-agent/raw/master/snmp/zfs -O /etc/snmp/zfs
+chmod +x /etc/snmp/zfs
 ```
 
-Now restart snmpd and you're all set.
+3: Add the following to snmpd.conf and restart snmpd. If `-s`, passed
+as a arg, status is returned for display.
+```
+extend zfs /etc/snmp/zfs -b
+```

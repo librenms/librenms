@@ -1,0 +1,69 @@
+CONEL-XCCNT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+			enterprises, Gauge
+				FROM RFC1155-SMI
+			OBJECT-TYPE
+				FROM RFC-1212;
+
+conel			OBJECT IDENTIFIER ::= { enterprises 30140 }
+
+protocols		OBJECT IDENTIFIER ::= { conel 2 }
+
+xccnt			OBJECT IDENTIFIER ::= { protocols 1 }
+
+xccntAn1		OBJECT-TYPE
+			SYNTAX	INTEGER
+			ACCESS	read-only
+			STATUS	current
+			::= { xccnt 1 }
+
+xccntAn2		OBJECT-TYPE
+			SYNTAX	INTEGER
+			ACCESS	read-only
+			STATUS	current
+			::= { xccnt 2 }
+
+xccntCnt1		OBJECT-TYPE
+			SYNTAX	Counter
+			ACCESS	read-only
+			STATUS	current
+			::= { xccnt 3 }
+
+xccntCnt2		OBJECT-TYPE
+			SYNTAX	Counter
+			ACCESS	read-only
+			STATUS	current
+			::= { xccnt 4 }
+
+xccntBin1		OBJECT-TYPE
+			SYNTAX	Gauge
+			ACCESS	read-only
+			STATUS	current
+			::= { xccnt 5 }
+
+xccntBin2		OBJECT-TYPE
+			SYNTAX	Gauge
+			ACCESS	read-only
+			STATUS	current
+			::= { xccnt 6 }
+
+xccntBin3		OBJECT-TYPE
+			SYNTAX	Gauge
+			ACCESS	read-only
+			STATUS	current
+			::= { xccnt 7 }
+
+xccntBin4		OBJECT-TYPE
+			SYNTAX	Gauge
+			ACCESS	read-only
+			STATUS	current
+			::= { xccnt 8 }
+
+xccntOut1		OBJECT-TYPE
+			SYNTAX	Gauge
+			ACCESS	read-write
+			STATUS	current
+			::= { xccnt 9 }
+
+END

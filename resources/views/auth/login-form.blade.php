@@ -1,10 +1,10 @@
-<x-panel footer-class="text-center">
+<x-panel>
     <x-slot name="title">
         <img class="logon-logo img-responsive" src="{{ asset(\LibreNMS\Config::get('title_image', 'images/librenms_logo_light.svg')) }}">
     </x-slot>
 
     @config('login_message')
-    <x-slot name="footer">
+    <x-slot name="footer" class="text-center">
         <div class="logon-message">{{ \LibreNMS\Config::get('login_message') }}</div>
     </x-slot>
     @endconfig
@@ -46,18 +46,17 @@
                     <button type="submit" id="login" class="btn btn-primary btn-block" name="submit">
                         <i class="fa fa-btn fa-sign-in"></i> {{ __('Login') }}
                     </button>
-        </form>
-
-                    @foreach (\LibreNMS\Config::get('auth.socialite.configs', []) as $provider => $config)
-                    <br>
-                    <form role="form" action="{{ route('socialite.redirect', $provider) }}" method="post">
-                        {{ csrf_field() }}
-                        <button type="submit" id="login" class="btn btn-success btn-block">
-                            <i class="fab fa-btn fa-{{ $provider }}"></i> {{ __('Login with') }} {{ ucfirst($provider) }}
-                        </button>
-                    </form>
-                    @endforeach
                 </div>
             </div>
+        </form>
+
+        @foreach (\LibreNMS\Config::get('auth.socialite.configs', []) as $provider => $config)
+        <form role="form" action="{{ route('socialite.redirect', $provider) }}" method="post" class="tw-mt-5">
+            {{ csrf_field() }}
+            <button type="submit" id="login" class="btn btn-success btn-block">
+                <i class="fab fa-btn fa-{{ $provider }}"></i> {{ __('Login with') }} {{ ucfirst($provider) }}
+            </button>
+        </form>
+        @endforeach
     </div>
 </x-panel>

@@ -27,17 +27,21 @@
 namespace LibreNMS\OS\Shared;
 
 use App\Models\Device;
+use App\Models\EntPhysical;
 use App\Models\Mempool;
 use App\Models\PortsNac;
 use App\Models\Sla;
+use App\Models\Transceiver;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 use LibreNMS\Device\Processor;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Discovery\SlaDiscovery;
 use LibreNMS\Interfaces\Discovery\StpInstanceDiscovery;
+use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
 use LibreNMS\Interfaces\Polling\NacPolling;
 use LibreNMS\Interfaces\Polling\SlaPolling;
 use LibreNMS\OS;
@@ -52,11 +56,17 @@ class Cisco extends OS implements
     ProcessorDiscovery,
     MempoolsDiscovery,
     NacPolling,
-    SlaPolling
+    SlaPolling,
+    TransceiverDiscovery
 {
     use YamlOSDiscovery {
         YamlOSDiscovery::discoverOS as discoverYamlOS;
     }
+    use OS\Traits\EntityMib {
+        OS\Traits\EntityMib::discoverEntityPhysical as discoverBaseEntityPhysical;
+    }
+
+    protected ?string $entityVendorTypeMib = 'CISCO-ENTITY-VENDORTYPE-OID-MIB';
 
     public function discoverOS(Device $device): void
     {
@@ -213,6 +223,65 @@ class Cisco extends OS implements
         return $mempools;
     }
 
+    public function discoverEntityPhysical(): Collection
+    {
+        $inventory = $this->discoverBaseEntityPhysical();
+
+        $os = $this->getDevice()->os;
+
+        // discover cellular device info
+        if ($os == 'ios' or $os == 'iosxe') {
+            $cellData = \SnmpQuery::hideMib()->walk('CISCO-WAN-3G-MIB::c3gGsmIdentityTable');
+            $baseIndex = $inventory->max('entPhysicalIndex'); // maintain compatability with buggy old code
+
+            foreach ($cellData->table(1) as $index => $entry) {
+                if (isset($entry['c3gImsi'])) {
+                    $inventory->push(new EntPhysical([
+                        'entPhysicalIndex' => ++$baseIndex,
+                        'entPhysicalDescr' => $entry['c3gImsi'],
+                        'entPhysicalVendorType' => 'sim',
+                        'entPhysicalContainedIn' => $index,
+                        'entPhysicalClass' => 'module',
+                        'entPhysicalParentRelPos' => '-1',
+                        'entPhysicalName' => 'sim',
+                        'entPhysicalModelName' => 'IMSI',
+                        'entPhysicalIsFRU' => 'true',
+                    ]));
+                }
+
+                if (isset($entry['c3gImei'])) {
+                    $inventory->push(new EntPhysical([
+                        'entPhysicalIndex' => ++$baseIndex,
+                        'entPhysicalDescr' => $entry['c3gImei'],
+                        'entPhysicalVendorType' => 'modem',
+                        'entPhysicalContainedIn' => $index,
+                        'entPhysicalClass' => 'module',
+                        'entPhysicalParentRelPos' => '-1',
+                        'entPhysicalName' => 'modem',
+                        'entPhysicalModelName' => 'IMEI',
+                        'entPhysicalIsFRU' => 'false',
+                    ]));
+                }
+
+                if (isset($entry['c3gIccId'])) {
+                    $inventory->push(new EntPhysical([
+                        'entPhysicalIndex' => ++$baseIndex,
+                        'entPhysicalDescr' => $entry['c3gIccId'],
+                        'entPhysicalVendorType' => 'sim',
+                        'entPhysicalContainedIn' => $index,
+                        'entPhysicalClass' => 'module',
+                        'entPhysicalParentRelPos' => '-1',
+                        'entPhysicalName' => 'sim',
+                        'entPhysicalModelName' => 'ICCID',
+                        'entPhysicalIsFRU' => 'true',
+                    ]));
+                }
+            }
+        }
+
+        return $inventory;
+    }
+
     /**
      * Discover processors.
      * Returns an array of LibreNMS\Device\Processor objects that have been discovered
@@ -316,7 +385,7 @@ class Cisco extends OS implements
         return $processors;
     }
 
-    public function discoverSlas()
+    public function discoverSlas(): Collection
     {
         $slas = new Collection();
 
@@ -396,15 +465,15 @@ class Cisco extends OS implements
                     'port_id' => $ifIndex_map->get($ifIndex, 0),
                     'mac_address' => $mac_address,
                     'auth_id' => $auth_id,
-                    'domain' => $portAuthSessionEntryParameters['cafSessionDomain'],
-                    'username' => $portAuthSessionEntryParameters['cafSessionAuthUserName'],
-                    'ip_address' => (string) IP::fromHexString($portAuthSessionEntryParameters['cafSessionClientAddress'], true),
-                    'host_mode' => $portAuthSessionEntryParameters['cafSessionAuthHostMode'],
-                    'authz_status' => $portAuthSessionEntryParameters['cafSessionStatus'],
-                    'authz_by' => $portAuthSessionEntryParameters['cafSessionAuthorizedBy'],
-                    'timeout' => $portAuthSessionEntryParameters['cafSessionTimeout'],
-                    'time_left' => $portAuthSessionEntryParameters['cafSessionTimeLeft'],
-                    'vlan' => $portAuthSessionEntryParameters['cafSessionAuthVlan'],
+                    'domain' => $portAuthSessionEntryParameters['cafSessionDomain'] ?? '',
+                    'username' => $portAuthSessionEntryParameters['cafSessionAuthUserName'] ?? '',
+                    'ip_address' => (string) IP::fromHexString($portAuthSessionEntryParameters['cafSessionClientAddress'] ?? '', true),
+                    'host_mode' => $portAuthSessionEntryParameters['cafSessionAuthHostMode'] ?? '',
+                    'authz_status' => $portAuthSessionEntryParameters['cafSessionStatus'] ?? '',
+                    'authz_by' => $portAuthSessionEntryParameters['cafSessionAuthorizedBy'] ?? '',
+                    'timeout' => $portAuthSessionEntryParameters['cafSessionTimeout'] ?? '',
+                    'time_left' => $portAuthSessionEntryParameters['cafSessionTimeLeft'] ?? null,
+                    'vlan' => $portAuthSessionEntryParameters['cafSessionAuthVlan'] ?? null,
                     'authc_status' => $session_info['authc_status'] ?? '',
                     'method' => $session_info['method'] ?? '',
                 ]));
@@ -414,13 +483,14 @@ class Cisco extends OS implements
         return $nac;
     }
 
-    public function pollSlas($slas)
+    public function pollSlas($slas): void
     {
         $device = $this->getDeviceArray();
 
         $data = snmpwalk_group($device, 'rttMonLatestRttOperTable', 'CISCO-RTTMON-MIB');
         $data = snmpwalk_group($device, 'rttMonLatestOper', 'CISCO-RTTMON-MIB', 1, $data);
         $data = snmpwalk_group($device, 'rttMonEchoAdminNumPackets', 'CISCO-RTTMON-MIB', 1, $data);
+        $data = snmpwalk_group($device, 'rttMonLatestIcmpJitterOperTable', 'CISCO-RTTMON-ICMP-MIB', 1, $data);
 
         $time_offset = time() - $this->getDevice()->uptime;
 
@@ -438,17 +508,9 @@ class Cisco extends OS implements
             // Use Nagios Status codes. 0: Good, 2: Critical
             $sla->opstatus = $data[$sla_nr]['rttMonLatestRttOperSense'] == 1 ? 0 : 2;
 
-            echo 'SLA ' . $sla_nr . ': ' . $rtt_type . ' ' . $sla['owner'] . ' ' . $sla['tag'] . '... ' . $sla->rtt . 'ms at ' . $time . "\n";
+            Log::info('SLA ' . $sla_nr . ': ' . $rtt_type . ' ' . $sla['owner'] . ' ' . $sla['tag'] . '... ' . $sla->rtt . 'ms at ' . $time);
 
-            $fields = [
-                'rtt' => $sla->rtt,
-            ];
-
-            // The base RRD
-            $rrd_name = ['sla', $sla['sla_nr']];
-            $rrd_def = RrdDefinition::make()->addDataset('rtt', 'GAUGE', 0, 300000);
-            $tags = compact('sla_nr', 'rrd_name', 'rrd_def');
-            data_update($device, 'sla', $tags, $fields);
+            $collected = ['rtt' => $sla->rtt];
 
             // Let's gather some per-type fields.
             switch ($rtt_type) {
@@ -456,8 +518,8 @@ class Cisco extends OS implements
                     $jitter = [
                         'PacketLossSD' => $data[$sla_nr]['rttMonLatestJitterOperPacketLossSD'],
                         'PacketLossDS' => $data[$sla_nr]['rttMonLatestJitterOperPacketLossDS'],
-                        'PacketOutOfSequence' => $data[$sla_nr]['rttMonLatestJitterOperPacketOutOfSequence'],
-                        'PacketMIA' => $data[$sla_nr]['rttMonLatestJitterOperPacketMIA'],
+                        'PacketOutOfSequence' => $data[$sla_nr]['rttMonLatestJitterOperPacketOutOfSequence'] ?? null,
+                        'PacketMIA' => $data[$sla_nr]['rttMonLatestJitterOperPacketMIA'] ?? null,
                         'PacketLateArrival' => $data[$sla_nr]['rttMonLatestJitterOperPacketLateArrival'],
                         'MOS' => isset($data[$sla_nr]['rttMonLatestJitterOperMOS']) ? intval($data[$sla_nr]['rttMonLatestJitterOperMOS']) / 100 : null,
                         'ICPIF' => $data[$sla_nr]['rttMonLatestJitterOperICPIF'] ?? null,
@@ -480,8 +542,8 @@ class Cisco extends OS implements
                         ->addDataset('AvgSDJ', 'GAUGE', 0)
                         ->addDataset('AvgDSJ', 'GAUGE', 0);
                     $tags = compact('rrd_name', 'rrd_def', 'sla_nr', 'rtt_type');
-                    data_update($device, 'sla', $tags, $jitter);
-                    $fields = array_merge($fields, $jitter);
+                    app('Datastore')->put($device, 'sla', $tags, $jitter);
+                    $collected = array_merge($collected, $jitter);
                     // Additional rrd for total number packet in sla
                     $numPackets = [
                         'NumPackets' => $data[$sla_nr]['rttMonEchoAdminNumPackets'],
@@ -490,21 +552,26 @@ class Cisco extends OS implements
                     $rrd_def = RrdDefinition::make()
                         ->addDataset('NumPackets', 'GAUGE', 0);
                     $tags = compact('rrd_name', 'rrd_def', 'sla_nr', 'rtt_type');
-                    data_update($device, 'sla', $tags, $numPackets);
-                    $fields = array_merge($fields, $numPackets);
+                    app('Datastore')->put($device, 'sla', $tags, $numPackets);
+                    $collected = array_merge($collected, $numPackets);
                     break;
                 case 'icmpjitter':
+                    // icmpJitter data is placed at different locations in MIB tree, possibly based on IOS version
+                    // First look for values as originally implemented in lnms (from CISCO-RTTMON-MIB), then look for OIDs defined in CISCO-RTTMON-ICMP-MIB
+                    // This MIGHT mix values if a device presents some data from one and some from the other
+
                     $icmpjitter = [
-                        'PacketLoss' => $data[$sla_nr]['rttMonLatestJitterOperPacketLossSD'],
-                        'PacketOosSD' => $data[$sla_nr]['rttMonLatestJitterOperPacketOutOfSequence'],
-                        'PacketOosDS' => $data[$sla_nr]['rttMonLatestJitterOperPacketMIA'],
-                        'PacketLateArrival' => $data[$sla_nr]['rttMonLatestJitterOperPacketLateArrival'],
-                        'JitterAvgSD' => $data[$sla_nr]['rttMonLatestJitterOperAvgSDJ'],
-                        'JitterAvgDS' => $data[$sla_nr]['rttMonLatestJitterOperAvgDSJ'],
-                        'LatencyOWAvgSD' => $data[$sla_nr]['rttMonLatestJitterOperOWAvgSD'],
-                        'LatencyOWAvgDS' => $data[$sla_nr]['rttMonLatestJitterOperOWAvgDS'],
-                        'JitterIAJOut' => $data[$sla_nr]['rttMonLatestJitterOperIAJOut'],
-                        'JitterIAJIn' => $data[$sla_nr]['rttMonLatestJitterOperIAJIn'],
+                        'PacketLoss' => $data[$sla_nr]['rttMonLatestJitterOperPacketLossSD'] ?? $data[$sla_nr]['rttMonLatestIcmpJitterPktLoss'],
+                        'PacketOosSD' => $data[$sla_nr]['rttMonLatestJitterOperPacketOutOfSequence'] ?? $data[$sla_nr]['rttMonLatestIcmpJPktOutSeqBoth'],
+                        // No equivalent found in CISCO-RTTMON-ICMP-MIB, return null
+                        'PacketOosDS' => $data[$sla_nr]['rttMonLatestJitterOperPacketMIA'] ?? null,
+                        'PacketLateArrival' => $data[$sla_nr]['rttMonLatestJitterOperPacketLateArrival'] ?? $data[$sla_nr]['rttMonLatestIcmpJitterPktLateA'],
+                        'JitterAvgSD' => $data[$sla_nr]['rttMonLatestJitterOperAvgSDJ'] ?? $data[$sla_nr]['rttMonLatestIcmpJitterAvgSDJ'],
+                        'JitterAvgDS' => $data[$sla_nr]['rttMonLatestJitterOperAvgDSJ'] ?? $data[$sla_nr]['rttMonLatestIcmpJitterAvgDSJ'],
+                        'LatencyOWAvgSD' => $data[$sla_nr]['rttMonLatestJitterOperOWAvgSD'] ?? $data[$sla_nr]['rttMonLatestIcmpJitterOWAvgSD'],
+                        'LatencyOWAvgDS' => $data[$sla_nr]['rttMonLatestJitterOperOWAvgDS'] ?? $data[$sla_nr]['rttMonLatestIcmpJitterOWAvgDS'],
+                        'JitterIAJOut' => $data[$sla_nr]['rttMonLatestJitterOperIAJOut'] ?? $data[$sla_nr]['rttMonLatestIcmpJitterIAJOut'],
+                        'JitterIAJIn' => $data[$sla_nr]['rttMonLatestJitterOperIAJIn'] ?? $data[$sla_nr]['rttMonLatestIcmpJitterIAJIn'],
                     ];
                     $rrd_name = ['sla', $sla_nr, $rtt_type];
                     $rrd_def = RrdDefinition::make()
@@ -519,13 +586,13 @@ class Cisco extends OS implements
                         ->addDataset('JitterIAJOut', 'GAUGE', 0)
                         ->addDataset('JitterIAJIn', 'GAUGE', 0);
                     $tags = compact('rrd_name', 'rrd_def', 'sla_nr', 'rtt_type');
-                    data_update($device, 'sla', $tags, $icmpjitter);
-                    $fields = array_merge($fields, $icmpjitter);
+                    app('Datastore')->put($device, 'sla', $tags, $icmpjitter);
+                    $collected = array_merge($collected, $icmpjitter);
                     break;
             }
 
             d_echo('The following datasources were collected for #' . $sla['sla_nr'] . ":\n");
-            d_echo($fields);
+            d_echo($collected);
         }
     }
 
@@ -557,5 +624,53 @@ class Cisco extends OS implements
         }
 
         return null;
+    }
+
+    public function discoverTransceivers(): Collection
+    {
+        // use data collected by entPhysical module if available
+        $dbSfpCages = $this->getDevice()->entityPhysical()->whereIn('entPhysicalVendorType', ['cevContainerSFP', 'cevContainerGbic', 'cevContainer10GigBasePort', 'cevContainerTransceiver', 'cevContainerXFP', 'cevContainer40GigBasePort', 'cevContainerCFP', 'cevContainerCXP', 'cevContainerCPAK', 'cevContainerNCS4KSFP', 'cevContainerQSFP28SR', 'cevContainerQSFP28LR', 'cevContainerQSFP28CR', 'cevContainerQSFP28AOC', 'cevContainerQSFP28CWDM', 'cevContainerNonCiscoQSFP28SR', 'cevContainerNonCiscoQSFP28LR', 'cevContainerNonCiscoQSFP28CR', 'cevContainerNonCiscoQSFP28AOC', 'cevContainerNonCiscoQSFP28CWDM'])->pluck('ifIndex', 'entPhysicalIndex');
+        if ($dbSfpCages->isNotEmpty()) {
+            $data = $this->getDevice()->entityPhysical()->whereIn('entPhysicalContainedIn', $dbSfpCages->keys())->get()->map(function ($ent) use ($dbSfpCages) {
+                if (empty($ent->ifIndex) && $dbSfpCages->has($ent->entPhysicalContainedIn)) {
+                    $ent->ifIndex = $dbSfpCages->get($ent->entPhysicalContainedIn);
+                }
+
+                return $ent;
+            })->keyBy('entPhysicalIndex');
+        } else {
+            // fetch data via snmp
+            $snmpData = \SnmpQuery::cache()->hideMib()->mibs(['CISCO-ENTITY-VENDORTYPE-OID-MIB'])->walk('ENTITY-MIB::entPhysicalTable')->table(1);
+            if (empty($snmpData)) {
+                return new Collection;
+            }
+
+            $snmpData = collect(\SnmpQuery::hideMib()->mibs(['IF-MIB'])->walk('ENTITY-MIB::entAliasMappingIdentifier')->table(1, $snmpData));
+
+            $sfpCages = $snmpData->filter(fn ($ent) => isset($ent['entPhysicalVendorType']) && $ent['entPhysicalVendorType'] == 'cevContainerSFP');
+            $data = $snmpData->filter(fn ($ent) => $sfpCages->has($ent['entPhysicalContainedIn'] ?? null))->map(function ($e) {
+                if (isset($e['entAliasMappingIdentifier'][0])) {
+                    $e['ifIndex'] = preg_replace('/^.*ifIndex[.[](\d+).*$/', '$1', $e['entAliasMappingIdentifier'][0]);
+                }
+
+                return $e;
+            });
+        }
+        $ifIndexToPortId = $this->getDevice()->ports()->pluck('port_id', 'ifIndex');
+
+        return $data->map(function ($ent, $index) use ($ifIndexToPortId) {
+            $ifIndex = $ent['ifIndex'] ?? null;
+
+            return new Transceiver([
+                'port_id' => $ifIndexToPortId->get($ifIndex, 0),
+                'index' => $index,
+                'type' => $ent['entPhysicalDescr'] ?? null,
+                'vendor' => $ent['entPhysicalMfgName'] ?? null,
+                'revision' => $ent['entPhysicalHardwareRev'] ?? null,
+                'model' => $ent['entPhysicalModelName'] ?? null,
+                'serial' => $ent['entPhysicalSerialNum'] ?? null,
+                'entity_physical_index' => $ifIndex,
+            ]);
+        });
     }
 }

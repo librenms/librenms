@@ -4,19 +4,9 @@ on:
   push:
     branches:
       - 'master'
-    paths-ignore:
-      - '**.md'
-      - '.github/workflows/doc.yml'
-      - 'doc/**'
-      - 'mkdocs.yml'
   pull_request:
     branches:
       - 'master'
-    paths-ignore:
-      - '**.md'
-      - '.github/workflows/doc.yml'
-      - 'doc/**'
-      - 'mkdocs.yml'
 
 permissions:
   contents: read # to fetch code (actions/checkout)
@@ -29,20 +19,20 @@ jobs:
       matrix:
         include:
           -
-            php-version: 8.1
+            php-version: 8.3
             name: Unit
             skip-web-check: 1
             database: mariadb:10.5
           -
-            php-version: 8.1
+            php-version: 8.2
             name: Unit
             skip-web-check: 1
             database: mysql:8.0
           -
-            php-version: 8.1
+            php-version: 8.2
             name: Web
             skip-unit-check: 1
-            database: mariadb:10.9
+            database: mariadb:10.11
     services:
       database:
         image: ${{ matrix.database }}
@@ -56,7 +46,7 @@ jobs:
     steps:
       -
         name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
       -
@@ -83,10 +73,10 @@ jobs:
         name: Get composer cache directory
         id: composer-cache
         run: |
-          echo "::set-output name=dir::$(composer config cache-files-dir)"
+          echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
       -
         name: Cache composer
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ secrets.CACHE_VERSION }}-${{ hashFiles('**/composer.lock') }}
@@ -94,7 +84,7 @@ jobs:
             ${{ runner.os }}-composer-${{ secrets.CACHE_VERSION }}-
       -
         name: Cache pip
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ secrets.CACHE_VERSION }}-${{ hashFiles('**/requirements.txt') }}
@@ -109,7 +99,7 @@ jobs:
         name: Pip install
         run: |
           python3 -m pip install --upgrade pip
-          python3 -m pip install --upgrade --user snmpsim pylint python-memcached mysqlclient
+          python3 -m pip install --upgrade --user pylint python-memcached mysqlclient
       -
         name: Composer validate
         run: |
@@ -139,10 +129,14 @@ jobs:
         run: |
           composer install --prefer-dist --no-interaction --no-progress
       -
-        name: Artisan dusk:update
+        name: Snmpsim setup
+        run: |
+          php lnms dev:simulate --setup-venv
+      -
+        name: Start ChromeDriver
         if: matrix.skip-web-check != '1'
         run: |
-          php artisan dusk:update --detect
+          $CHROMEWEBDRIVER/chromedriver --port=9515 &
       -
         name: Copy seeded config
         run: cp "${GITHUB_WORKSPACE}/tests/testing_config.yaml" "${GITHUB_WORKSPACE}/database/seeders/config/"
@@ -167,7 +161,7 @@ jobs:
           mysql -h"127.0.0.1" -P"$PORT" --user=librenms --password=librenms -e 'ALTER DATABASE librenms_phpunit_78hunjuybybh CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;'
       -
         name: Setup SQLite
-        run: sqlite3 storage/testing.sqlite ""
+        run: sqlite3 database/testing.sqlite ""
       -
         name: Artisan serve
         if: matrix.skip-web-check != '1'
@@ -178,7 +172,7 @@ jobs:
         name: Start SNMP
         if: matrix.skip-unit-check != '1'
         run: |
-          ~/.local/bin/snmpsimd.py --data-dir=tests/snmpsim --agent-udpv4-endpoint=127.1.6.2:1162 --logging-method=file:/tmp/snmpsimd.log &
+          .python_venvs/snmpsim/bin/snmpsim-command-responder-lite --data-dir=tests/snmpsim --agent-udpv4-endpoint=127.1.6.2:1162 --log-level=error --logging-method=file:/tmp/snmpsimd.log &
       -
         name: lnms dev:check ci
         run: |
@@ -197,7 +191,7 @@ jobs:
           cat /tmp/artisan-serve.log || true
       -
         name: Dump snmp logs
-        if: always() && matrix.skip-unit-check != '1'
+        if: failure() && matrix.skip-unit-check != '1'
         run: |
           cat /tmp/snmpsimd.log || true
       -

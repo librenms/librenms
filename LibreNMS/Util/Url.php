@@ -39,8 +39,8 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 class Url
 {
     /**
-     * @param  Device  $device
-     * @param  string  $text
+     * @param  Device|null  $device
+     * @param  string|null  $text
      * @param  array  $vars
      * @param  int  $start
      * @param  int  $end
@@ -48,14 +48,14 @@ class Url
      * @param  int  $overlib
      * @return string
      */
-    public static function deviceLink($device, $text = null, $vars = [], $start = 0, $end = 0, $escape_text = 1, $overlib = 1)
+    public static function deviceLink($device, $text = '', $vars = [], $start = 0, $end = 0, $escape_text = 1, $overlib = 1)
     {
         if (! $device instanceof Device || ! $device->hostname) {
-            return '';
+            return $escape_text ? htmlentities($text) : (string) $text;
         }
 
         if (! $device->canAccess(Auth::user())) {
-            return $device->displayName();
+            return $escape_text ? htmlentities($device->displayName()) : $device->displayName();
         }
 
         if (! $start) {
@@ -79,28 +79,34 @@ class Url
         $url = Url::deviceUrl($device, $vars);
 
         // beginning of overlib box contains large hostname followed by hardware & OS details
-        $contents = '<div><span class="list-large">' . $device->displayName() . '</span>';
+        // because we are injecting this into javascript htmlentities alone won't work, so strip_tags too
+        $contents = '<div><span class="list-large">' . htmlentities(strip_tags($device->displayName())) . '</span>';
+        $devinfo = '';
         if ($device->hardware) {
-            $contents .= ' - ' . htmlentities($device->hardware);
+            $devinfo .= $device->hardware;
         }
 
         if ($device->os) {
-            $contents .= ' - ' . htmlentities(Config::getOsSetting($device->os, 'text'));
+            $devinfo .= ($devinfo ? ' - ' : '') . Config::getOsSetting($device->os, 'text');
         }
 
         if ($device->version) {
-            $contents .= ' ' . htmlentities($device->version);
+            $devinfo .= ($devinfo ? ' - ' : '') . $device->version;
         }
 
         if ($device->features) {
-            $contents .= ' (' . htmlentities($device->features) . ')';
+            $devinfo .= ' (' . $device->features . ')';
+        }
+
+        if ($devinfo) {
+            $contents .= '<br />' . htmlentities(strip_tags($devinfo));
         }
 
         if ($device->location_id) {
-            $contents .= ' - ' . htmlentities($device->location ?? '');
+            $contents .= '<br />' . htmlentities(strip_tags($device->location ?? ''));
         }
 
-        $contents .= '</div>';
+        $contents .= '</div><br />';
 
         foreach ((array) $graphs as $entry) {
             $graph = isset($entry['graph']) ? $entry['graph'] : 'unknown';
@@ -141,9 +147,10 @@ class Url
             $text = $label;
         }
 
-        $content = '<div class=list-large>' . addslashes(htmlentities(optional($port->device)->displayName() . ' - ' . $label)) . '</div>';
+        // strip tags due to complexity of sanitizing here
+        $content = '<div class=list-large>' . addslashes(htmlentities(strip_tags($port->device?->displayName() . ' - ' . $label))) . '</div>';
         if ($description = $port->getDescription()) {
-            $content .= addslashes(htmlentities($description)) . '<br />';
+            $content .= addslashes(htmlentities(strip_tags($description))) . '<br />';
         }
 
         $content .= "<div style=\'width: 850px\'>";
@@ -630,7 +637,7 @@ class Url
                 $vars['page'] = $segment;
             } else {
                 [$name, $value] = array_pad(explode('=', $segment), 2, null);
-                if (! $value) {
+                if ($value === null) {
                     if ($vars['page'] == 'device' && $pos < 3) {
                         // translate laravel device routes properly
                         $vars[$pos === 1 ? 'device' : 'tab'] = $name;

@@ -24,49 +24,29 @@
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
-use LibreNMS\Util\Proxy;
+use LibreNMS\Exceptions\AlertTransportDeliveryException;
+use LibreNMS\Util\Http;
 
 class Pushbullet extends Transport
 {
-    public function deliverAlert($obj, $opts)
-    {
-        if (! empty($this->config)) {
-            $opts = $this->config['pushbullet-token'];
-        }
-
-        return $this->contactPushbullet($obj, $opts);
-    }
-
-    public function contactPushbullet($obj, $opts)
+    public function deliverAlert(array $alert_data): bool
     {
         // Note: At this point it might be useful to iterate through $obj['contacts'] and send each of them a note ?
+        $url = 'https://api.pushbullet.com/v2/pushes';
+        $data = ['type' => 'note', 'title' => $alert_data['title'], 'body' => $alert_data['msg']];
 
-        $data = ['type' => 'note', 'title' => $obj['title'], 'body' => $obj['msg']];
-        $data = json_encode($data);
+        $res = Http::client()
+            ->withToken($this->config['pushbullet-token'])
+            ->post($url, $data);
 
-        $curl = curl_init('https://api.pushbullet.com/v2/pushes');
-        Proxy::applyToCurl($curl);
-        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'POST');
-        curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curl, CURLOPT_HTTPHEADER, [
-            'Content-Type: application/json',
-            'Content-Length: ' . strlen($data),
-            'Authorization: Bearer ' . $opts,
-        ]);
-
-        $ret = curl_exec($curl);
-        $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-        if ($code > 201) {
-            var_dump($ret);
-
-            return 'HTTP Status code ' . $code;
+        if ($res->successful()) {
+            return true;
         }
 
-        return true;
+        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $alert_data['msg'], $data);
     }
 
-    public static function configTemplate()
+    public static function configTemplate(): array
     {
         return [
             'config' => [
@@ -74,7 +54,7 @@ class Pushbullet extends Transport
                     'title' => 'Access Token',
                     'name' => 'pushbullet-token',
                     'descr' => 'Pushbullet Access Token',
-                    'type' => 'text',
+                    'type' => 'password',
                 ],
             ],
             'validation' => [

@@ -16,16 +16,16 @@ like Grafana for graphing.
 RRD will continue to function normally so LibreNMS itself should
 continue to function normally.
 
-You can add the following to `config.php`.
+You can add the following to your config:
 
 ## Configuration
 
-```php
-// OpenTSDB default configuration
-$config['opentsdb']['enable'] = true;
-$config['opentsdb']['host'] = '127.0.0.1';  // your OpenTSDB server
-$config['opentsdb']['port'] = 4242;
-```
+!!! setting "poller/opentsdb"
+    ```bash
+    lnms config:set opentsdb.enable true
+    lnms config:set opentsdb.host '127.0.0.1'
+    lnms config:set opentsdb.port 4242
+    ```
 
 The same data than the one stored within rrd will be sent to OpenTSDB
 and recorded. You can then create graphs within Grafana to display the

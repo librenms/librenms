@@ -25,7 +25,7 @@
 
 namespace LibreNMS\Validations\Database;
 
-use DB;
+use Illuminate\Support\Facades\DB;
 use LibreNMS\DB\Eloquent;
 use LibreNMS\Interfaces\Validation;
 use LibreNMS\ValidationResult;

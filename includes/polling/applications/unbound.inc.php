@@ -20,26 +20,25 @@ foreach ($lines as $line) {
     $unbound[strtolower($var)] = $value;
 }
 //Unbound Queries
-$rrd_name = ['app', $name, 'queries', $app->app_id];
 $rrd_def = RrdDefinition::make()
-    ->addDataset('type0', 'DERIVE', 0, 125000000000)
-    ->addDataset('A', 'DERIVE', 0, 125000000000)
-    ->addDataset('NS', 'DERIVE', 0, 125000000000)
-    ->addDataset('CNAME', 'DERIVE', 0, 125000000000)
-    ->addDataset('SOA', 'DERIVE', 0, 125000000000)
-    ->addDataset('NULL', 'DERIVE', 0, 125000000000)
-    ->addDataset('WKS', 'DERIVE', 0, 125000000000)
-    ->addDataset('PTR', 'DERIVE', 0, 125000000000)
-    ->addDataset('MX', 'DERIVE', 0, 125000000000)
-    ->addDataset('TXT', 'DERIVE', 0, 125000000000)
-    ->addDataset('AAAA', 'DERIVE', 0, 125000000000)
-    ->addDataset('SRV', 'DERIVE', 0, 125000000000)
-    ->addDataset('NAPTR', 'DERIVE', 0, 125000000000)
-    ->addDataset('DS', 'DERIVE', 0, 125000000000)
-    ->addDataset('DNSKEY', 'DERIVE', 0, 125000000000)
-    ->addDataset('SPF', 'DERIVE', 0, 125000000000)
-    ->addDataset('ANY', 'DERIVE', 0, 125000000000)
-    ->addDataset('other', 'DERIVE', 0, 125000000000);
+    ->addDataset('type0', 'GAUGE', 0, 125000000000)
+    ->addDataset('A', 'GAUGE', 0, 125000000000)
+    ->addDataset('NS', 'GAUGE', 0, 125000000000)
+    ->addDataset('CNAME', 'GAUGE', 0, 125000000000)
+    ->addDataset('SOA', 'GAUGE', 0, 125000000000)
+    ->addDataset('NULL', 'GAUGE', 0, 125000000000)
+    ->addDataset('WKS', 'GAUGE', 0, 125000000000)
+    ->addDataset('PTR', 'GAUGE', 0, 125000000000)
+    ->addDataset('MX', 'GAUGE', 0, 125000000000)
+    ->addDataset('TXT', 'GAUGE', 0, 125000000000)
+    ->addDataset('AAAA', 'GAUGE', 0, 125000000000)
+    ->addDataset('SRV', 'GAUGE', 0, 125000000000)
+    ->addDataset('NAPTR', 'GAUGE', 0, 125000000000)
+    ->addDataset('DS', 'GAUGE', 0, 125000000000)
+    ->addDataset('DNSKEY', 'GAUGE', 0, 125000000000)
+    ->addDataset('SPF', 'GAUGE', 0, 125000000000)
+    ->addDataset('ANY', 'GAUGE', 0, 125000000000)
+    ->addDataset('other', 'GAUGE', 0, 125000000000);
 $fields = [
     'type0' => $unbound['num.query.type.type0'],
     'A' => $unbound['num.query.type.a'],
@@ -61,29 +60,39 @@ $fields = [
     'other' => $unbound['num.query.type.other'],
 ];
 $metrics['queries'] = $fields;
-$tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
+$tags = [
+    'name' => $name,
+    'app_id' => $app->app_id,
+    'type' => 'queries',
+    'rrd_name' => ['app', $name, 'queries', $app->app_id],
+    'rrd_def' => $rrd_def,
+];
 data_update($device, 'app', $tags, $fields);
 //Unbound Cache
-$rrd_name = ['app', $name, 'cache', $app->app_id];
 $rrd_def = RrdDefinition::make()
-    ->addDataset('queries', 'DERIVE', 0, 125000000000)
-    ->addDataset('hits', 'DERIVE', 0, 125000000000)
-    ->addDataset('misses', 'DERIVE', 0, 125000000000);
+    ->addDataset('queries', 'GAUGE', 0, 125000000000)
+    ->addDataset('hits', 'GAUGE', 0, 125000000000)
+    ->addDataset('misses', 'GAUGE', 0, 125000000000);
 $fields = [
     'queries' => $unbound['total.num.queries'],
     'hits' => $unbound['total.num.cachehits'],
     'misses' => $unbound['total.num.cachemiss'],
 ];
 $metrics['cache'] = $fields;
-$tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
+$tags = [
+    'name' => $name,
+    'app_id' => $app->app_id,
+    'type' => 'cache',
+    'rrd_name' => ['app', $name, 'cache', $app->app_id],
+    'rrd_def' => $rrd_def,
+];
 data_update($device, 'app', $tags, $fields);
 //Unbound Operations - Total opcodes and three valuable return codes
-$rrd_name = ['app', $name, 'operations', $app->app_id];
 $rrd_def = RrdDefinition::make()
-    ->addDataset('opcodeQuery', 'DERIVE', 0, 125000000000)
-    ->addDataset('rcodeNOERROR', 'DERIVE', 0, 125000000000)
-    ->addDataset('rcodeNXDOMAIN', 'DERIVE', 0, 125000000000)
-    ->addDataset('rcodeNodata', 'DERIVE', 0, 125000000000);
+    ->addDataset('opcodeQuery', 'GAUGE', 0, 125000000000)
+    ->addDataset('rcodeNOERROR', 'GAUGE', 0, 125000000000)
+    ->addDataset('rcodeNXDOMAIN', 'GAUGE', 0, 125000000000)
+    ->addDataset('rcodeNodata', 'GAUGE', 0, 125000000000);
 $fields = [
     'opcodeQuery' => $unbound['num.query.opcode.query'],
     'rcodeNOERROR' => $unbound['num.answer.rcode.noerror'],
@@ -91,26 +100,36 @@ $fields = [
     'rcodeNodata' => $unbound['num.answer.rcode.nodata'],
 ];
 $metrics['operations'] = $fields;
-$tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
+$tags = [
+    'name' => $name,
+    'app_id' => $app->app_id,
+    'type' => 'operations',
+    'rrd_name' => ['app', $name, 'operations', $app->app_id],
+    'rrd_def' => $rrd_def,
+];
 data_update($device, 'app', $tags, $fields);
 
 //Unbound requestlist
-$rrd_name = ['app', $name, 'requestlist', $app->app_id];
 $rrd_def = RrdDefinition::make()
-    ->addDataset('max', 'DERIVE', 0, 125000000000)
-    ->addDataset('overwritten', 'DERIVE', 0, 125000000000)
-    ->addDataset('exceeded', 'DERIVE', 0, 125000000000);
+    ->addDataset('max', 'GAUGE', 0, 125000000000)
+    ->addDataset('overwritten', 'GAUGE', 0, 125000000000)
+    ->addDataset('exceeded', 'GAUGE', 0, 125000000000);
 $fields = [
     'max' => $unbound['total.requestlist.max'],
     'overwritten' => $unbound['total.requestlist.overwritten'],
     'exceeded' => $unbound['total.requestlist.exceeded'],
 ];
 $metrics['requestlist'] = $fields;
-$tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
+$tags = [
+    'name' => $name,
+    'app_id' => $app->app_id,
+    'type' => 'requestlist',
+    'rrd_name' => ['app', $name, 'requestlist', $app->app_id],
+    'rrd_def' => $rrd_def,
+];
 data_update($device, 'app', $tags, $fields);
 
 //Unbound recursiontime
-$rrd_name = ['app', $name, 'recursiontime', $app->app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('avg', 'GAUGE', 0, 125000000000)
     ->addDataset('median', 'GAUGE', 0, 125000000000);
@@ -119,9 +138,15 @@ $fields = [
     'median' => $unbound['total.recursion.time.median'],
 ];
 $metrics['recursiontime'] = $fields;
-$tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
+$tags = [
+    'name' => $name,
+    'app_id' => $app->app_id,
+    'type' => 'recursiontime',
+    'rrd_name' => ['app', $name, 'recursiontime', $app->app_id],
+    'rrd_def' => $rrd_def,
+];
 data_update($device, 'app', $tags, $fields);
 
 update_application($app, $rawdata, $metrics);
 
-unset($lines, $unbound, $rrd_name, $rrd_def, $fields, $tags);
+unset($lines, $unbound, $rrd_def, $fields, $tags);

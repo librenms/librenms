@@ -16,7 +16,7 @@ if (! (Auth::user()->hasGlobalAdmin())) {
             <div class="modal-body">
                 <form method="post" role="form" id="coids" class="form-horizontal coid_form">
                     <input type="hidden" name="device_id" id="device_id" value="<?php echo isset($device['device_id']) ? $device['device_id'] : -1; ?>">
-                    <input type="hidden" name="device_name" id="device_name" value="<?php echo format_hostname($device); ?>">
+                    <input type="hidden" name="device_name" id="device_name" value="<?php echo htmlentities(format_hostname($device)); ?>">
                     <input type="hidden" name="ccustomoid_id" id="ccustomoid_id" value="">
                     <input type="hidden" name="type" id="type" value="customoid">
                     <input type="hidden" name="action" id="action" value="">
@@ -67,6 +67,7 @@ if (! (Auth::user()->hasGlobalAdmin())) {
                                 <option value=""></option>
                                 <option value="celsius_to_fahrenheit">C to F</option>
                                 <option value="fahrenheit_to_celsius">F to C</option>
+                                <option value="kelvin_to_celsius">K to C</option>
                                 <option value="uw_to_dbm">uW to dBm</option>
                             </select>
                         </div>

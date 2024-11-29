@@ -1,0 +1,49 @@
+DMOS-TC-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, Gauge32, Integer32     FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION      FROM SNMPv2-TC
+    datacomDevicesMIBs      FROM DATACOM-SMI;
+
+dmosTcMIB MODULE-IDENTITY
+    LAST-UPDATED "201612120000Z"
+    ORGANIZATION "DATACOM"
+    CONTACT-INFO
+                 "DATACOM
+
+                 Postal: DATACOM
+                     Rua America, 1000
+                     Eldorado do Sul, RS
+                     CEP 92990-000
+                             BRAZIL
+
+                 Tel:+55(51)3933 3000
+                 Fax:+55(51)3933 3003
+
+                 E-mail: datacom@datacom.ind.br "
+    DESCRIPTION "This module contains DmOS Textual Conventions"
+    REVISION    "201612120000Z"
+    DESCRIPTION "Initial revision"
+    ::= { datacomDevicesMIBs 5 }
+
+Unsigned8 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION
+        "Represents an 8-bit unsigned integer."
+    SYNTAX      Gauge32 (0..255)
+
+UnsignedPercent ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS       current
+    DESCRIPTION
+        "An integer in the range 0..100 representing a percent value"
+    SYNTAX       Gauge32(0..100)
+
+FixedPoint2Dec ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-2"
+    STATUS       current
+    DESCRIPTION  "Fixed point, two decimal places"
+    SYNTAX       Integer32
+
+END

@@ -8,11 +8,123 @@ modules:
                 descr: 'Main Memory'
                 precision: 1024
     os:
-        hardware: HMPRIV-MGMT-SNMP-MIB::hmPNIOOrderID.0
-        version: HMPRIV-MGMT-SNMP-MIB::hmPNIOSoftwareRelease.0
+        hardware:
+            - HMPRIV-MGMT-SNMP-MIB::hmPNIOOrderID.0
+            - HMPRIV-MGMT-SNMP-MIB::hmSysGroupDescription.1
+        version:
+            - HMPRIV-MGMT-SNMP-MIB::hmPNIOSoftwareRelease.0
+            - HMPRIV-MGMT-SNMP-MIB::hmSysVersion.0
         serial: HMPRIV-MGMT-SNMP-MIB::hmSysGroupSerialNum.1
     processors:
         data:
             -
                 oid: hmCpuUtilization
                 num_oid: '.1.3.6.1.4.1.248.14.2.15.2.1.{{ $index }}'
+    sensors:
+        temperature:
+            data:
+                -
+                    oid: hmSFPTable
+                    value: hmSfpTemperature
+                    index: 'hmSfpTemperature{{ $index }}'
+                    group: SFP
+                    num_oid: '.1.3.6.1.4.1.248.14.1.1.13.1.12.{{ $index }}'
+                    descr: 'Temperature {{ $hmSfpInfoPartId }} {{ $subindex0 }}/{{ $subindex1 }}'
+                -
+                    oid: hmTempTable
+                    value: hmTemperature
+                    index: '{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.248.14.2.5.1.{{ $index }}'
+                    descr: 'Temperature {{ $index }}'
+                    low_limit: hmTempLwrLimit
+                    high_limit: hmTempUprLimit
+        dbm:
+            data:
+                -
+                    oid: hmSFPTable
+                    value: hmSfpTxPowerdBm
+                    index: 'hmSfpTxPowerdBm{{ $index }}'
+                    group: 'SFP {{ $subindex0 }}/{{ $subindex1 }}'
+                    descr: 'Power TX {{ $hmSfpInfoPartId }} {{ $subindex0 }}/{{ $subindex1 }}'
+                    num_oid: '.1.3.6.1.4.1.248.14.1.1.13.1.34.{{ $index }}'
+                -
+                    oid: hmSFPTable
+                    value: hmSfpRxPowerdBm
+                    index: 'hmSfpRxPowerdBm{{ $index }}'
+                    group: 'SFP {{ $subindex0 }}/{{ $subindex1 }}'
+                    descr: 'Power RX {{ $hmSfpInfoPartId }} {{ $subindex0 }}/{{ $subindex1 }}'
+                    num_oid: '.1.3.6.1.4.1.248.14.1.1.13.1.35.{{ $index }}'
+        state:
+            data:
+                -
+                    oid: hmRS2OperMode
+                    num_oid: '.1.3.6.1.4.1.248.14.1.10.1.{{ $index }}'
+                    descr: 'Operation Mode {{ $index }}'
+                    state_name: hmRS2OperMode
+                    states:
+                        - { descr: normal, graph: 1, value: 1, generic: 0 }
+                        - { descr: standby-active, graph: 1, value: 2, generic: 0 }
+                        - { descr: standby-inactive, graph: 1, value: 3, generic: 3 }
+                        - { descr: redundancy-manager-active, graph: 1, value: 4, generic: 0 }
+                        - { descr: redundancy-manager-inactive, graph: 1, value: 5, generic: 3 }
+                -
+                    oid: hmPSTable
+                    value: hmPSState
+                    num_oid: '.1.3.6.1.4.1.248.14.1.2.1.3.{{ $index }}'
+                    descr: 'Power Supply {{ $hmPSID }}'
+                    index: 'hmPowerSupplyStatus{{ $index }}'
+                    state_name: hmPowerSupplyStatus
+                    states:
+                        - { descr: ok, graph: 0, value: 1, generic: 0 }
+                        - { descr: failed, graph: 0, value: 2, generic: 2 }
+                        - { descr: notInstalled, graph: 0, value: 3, generic: 1 }
+                        - { descr: unknown, graph: 0, value: 4, generic: 3 }
+                -
+                    oid: hmLEDRSPowerSupply
+                    value: hmLEDRSPowerSupply
+                    num_oid: '.1.3.6.1.4.1.248.14.1.1.35.1.1.{{ $index }}'
+                    descr: 'LED Status Power Supply'
+                    index: 'hmLEDRSPowerSupply.{{ $index }}'
+                    state_name: hmLEDRSPowerSupply
+                    states:
+                        - { descr: off, graph: 0, value: 1, generic: 3 }
+                        - { descr: green, graph: 0, value: 2, generic: 0 }
+                        - { descr: yellow, graph: 0, value: 3, generic: 1 }
+                        - { descr: red, graph: 0, value: 4, generic: 2 }
+                -
+                    oid: hmLEDRStandby
+                    value: hmLEDRStandby
+                    num_oid: '.1.3.6.1.4.1.248.14.1.1.35.1.2.{{ $index }}'
+                    descr: 'LED Status Standby'
+                    index: 'hmLEDRStandby.{{ $index }}'
+                    state_name: hmLEDRStandby
+                    states:
+                        - { descr: off, graph: 0, value: 1, generic: 3 }
+                        - { descr: green, graph: 0, value: 2, generic: 0 }
+                        - { descr: yellow, graph: 0, value: 3, generic: 1 }
+                        - { descr: red, graph: 0, value: 4, generic: 2 }
+                -
+                    oid: hmLEDRSRedundancyManager
+                    value: hmLEDRSRedundancyManager
+                    num_oid: '.1.3.6.1.4.1.248.14.1.1.35.1.3.{{ $index }}'
+                    descr: 'LED Status Redundancy Manager'
+                    index: 'hmLEDRSRedundancyManager.{{ $index }}'
+                    state_name: hmLEDRSRedundancyManager
+                    states:
+                        - { descr: off, graph: 0, value: 1, generic: 3 }
+                        - { descr: green, graph: 0, value: 2, generic: 0 }
+                        - { descr: yellow, graph: 0, value: 3, generic: 1 }
+                        - { descr: red, graph: 0, value: 4, generic: 2 }
+                -
+                    oid: hmLEDRSFault
+                    value: hmLEDRSFault
+                    num_oid: '.1.3.6.1.4.1.248.14.1.1.35.1.4.{{ $index }}'
+                    descr: 'LED Status Fault'
+                    index: 'hmLEDRSFault.{{ $index }}'
+                    state_name: hmLEDRSFault
+                    states:
+                        - { descr: off, graph: 0, value: 1, generic: 3 }
+                        - { descr: green, graph: 0, value: 2, generic: 0 }
+                        - { descr: yellow, graph: 0, value: 3, generic: 1 }
+                        - { descr: red, graph: 0, value: 4, generic: 2 }
+

@@ -27,6 +27,7 @@ namespace LibreNMS\Tests;
 
 use DeviceCache;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Arr;
 use LibreNMS\Config;
 use LibreNMS\Data\Source\Fping;
 use LibreNMS\Data\Source\FpingResponse;
@@ -34,6 +35,8 @@ use LibreNMS\Exceptions\FileNotFoundException;
 use LibreNMS\Exceptions\InvalidModuleException;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\ModuleTestHelper;
+use LibreNMS\Util\Number;
+use PHPUnit\Util\Color;
 
 class OSModulesTest extends DBTestCase
 {
@@ -67,7 +70,7 @@ class OSModulesTest extends DBTestCase
      *
      * @dataProvider dumpedDataProvider
      */
-    public function testDataIsValid($os, $variant, $modules)
+    public function testDataIsValid($os, $variant, $modules): void
     {
         // special case if data provider throws exception
         if ($os === false) {
@@ -88,7 +91,7 @@ class OSModulesTest extends DBTestCase
      * @param  string  $variant  optional variant
      * @param  array  $modules  modules to test for this os
      */
-    public function testOS($os, $variant, $modules)
+    public function testOS($os, $variant, $modules): void
     {
         // Lock testing time
         $this->travelTo(new \DateTime('2022-01-01 00:00:00'));
@@ -115,38 +118,24 @@ class OSModulesTest extends DBTestCase
         // output all discovery and poller output if debug mode is enabled for phpunit
         $phpunit_debug = in_array('--debug', $_SERVER['argv'], true);
 
-        foreach ($modules as $module) {
-            $expected = $expected_data[$module]['discovery'] ?? [];
-            $actual = $results[$module]['discovery'] ?? [];
-            $this->assertEquals(
-                $expected,
-                $actual,
-                "OS $os: Discovered $module data does not match that found in $filename\n"
-                . print_r(array_diff($expected, $actual), true)
-                . $helper->getDiscoveryOutput($phpunit_debug ? null : $module)
-                . "\nOS $os: Discovered $module data does not match that found in $filename"
-            );
+        foreach ($modules as $module => $module_status) {
+            $expected = $expected_data[$module]['discovery'] ?? null;
+            $actual = $results[$module]['discovery'] ?? null;
+            $this->checkTestData($expected, $actual, 'Discovered', $os, $module, $filename, $helper, $phpunit_debug);
 
-            if ($module === 'route') {
-                // no route poller module
+            // modules without polling
+            if (in_array($module, ['route', 'vlans'])) {
                 continue;
             }
 
-            if ($expected_data[$module]['poller'] == 'matches discovery') {
-                $expected = $expected_data[$module]['discovery'];
-            } else {
-                $expected = $expected_data[$module]['poller'] ?? [];
+            if ($expected_data[$module]['poller'] !== 'matches discovery') {
+                $expected = $expected_data[$module]['poller'] ?? null;
             }
-            $actual = $results[$module]['poller'] ?? [];
-            $this->assertEquals(
-                $expected,
-                $actual,
-                "OS $os: Polled $module data does not match that found in $filename\n"
-                . print_r(array_diff($expected, $actual), true)
-                . $helper->getPollerOutput($phpunit_debug ? null : $module)
-                . "\nOS $os: Polled $module data does not match that found in $filename"
-            );
+            $actual = $results[$module]['poller'] ?? null;
+            $this->checkTestData($expected, $actual, 'Polled', $os, $module, $filename, $helper, $phpunit_debug);
         }
+
+        $this->assertTrue(true, "Tested $os successfully"); // avoid no asserts error
 
         DeviceCache::flush(); // clear cached devices
         $this->travelBack();
@@ -183,5 +172,33 @@ class OSModulesTest extends DBTestCase
 
             return $mock;
         });
+    }
+
+    private function checkTestData(?array $expected, ?array $actual, string $type, string $os, mixed $module, string $filename, ModuleTestHelper $helper, bool $phpunit_debug): void
+    {
+        // try simple and fast comparison first, if that fails, do a costly/well formatted comparison
+        if ($expected != $actual) {
+            $this->assertNotNull($actual, "OS $os: $type $module no data generated when it is expected");
+            $this->assertNotNull($expected, "OS $os: $type $module generates data when none is expected");
+
+            $message = Color::colorize('bg-red', "OS $os: $type $module data does not match that found in $filename");
+            $message .= PHP_EOL;
+            $message .= ($type == 'Discovered'
+                ? $helper->getDiscoveryOutput($phpunit_debug ? null : $module)
+                : $helper->getPollerOutput($phpunit_debug ? null : $module));
+
+            // convert to dot notation so the array is flat and easier to compare visually
+            $expected = Arr::dot($expected);
+            $actual = Arr::dot($actual);
+
+            // json will store 43.0 as 43, Number::cast will change those to integers too
+            foreach ($actual as $index => $value) {
+                if (is_float($value)) {
+                    $actual[$index] = Number::cast($value);
+                }
+            }
+
+            $this->assertSame($expected, $actual, $message);
+        }
     }
 }

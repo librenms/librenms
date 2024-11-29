@@ -49,7 +49,7 @@ class MapquestApi extends BaseApi implements Geocoder
     }
 
     /**
-     * Build Guzzle request option array
+     * Build request option array
      *
      * @throws \Exception you may throw an Exception if validation fails
      */

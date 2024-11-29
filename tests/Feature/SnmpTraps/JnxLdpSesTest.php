@@ -30,6 +30,7 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 use App\Models\Device;
 use App\Models\Port;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Tests\Traits\RequiresDatabase;
 
 class JnxLdpSesTest extends SnmpTrapTestCase
@@ -56,7 +57,7 @@ JUNIPER-LDP-MIB::jnxLdpSesDownIf.0 $port->ifIndex
 SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameMX480",
             "LDP session on interface $port->ifDescr is nonexistent due to allAdjacenciesDown",
             'Could not handle JnxLdpSesDown trap',
-            [4],
+            [Severity::Warning],
             $device,
         );
     }
@@ -81,7 +82,7 @@ JUNIPER-LDP-MIB::jnxLdpSesUpIf.0 $port->ifIndex
 SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameMX960",
             "LDP session on interface $port->ifDescr is operational",
             'Could not handle JnxLdpSesUp trap',
-            [1],
+            [Severity::Ok],
             $device,
         );
     }

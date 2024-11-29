@@ -8,20 +8,22 @@
  * the source code distribution for details.
  */
 
-$aix_filesystem = snmpwalk_cache_oid($device, 'aixFsTableEntry', [], 'IBM-AIX-MIB');
+if ($device['os'] == 'aix') {
+    $aix_filesystem = snmpwalk_cache_oid($device, 'aixFsTableEntry', [], 'IBM-AIX-MIB');
 
-if (is_array($aix_filesystem)) {
-    echo 'aix_filesystem : ';
-    foreach ($aix_filesystem as $aix_fs) {
-        if (isset($aix_fs['aixFsMountPoint'])) {
-            if ($aix_fs['aixFsType'] == 'jfs' || $aix_fs['aixFsType'] == 'jfs2') { // Only JFS or JFS2
-                $aix_fs['aixFsSize'] = $aix_fs['aixFsSize'] * 1024 * 1024;
-                $aix_fs['aixFsFree'] = $aix_fs['aixFsFree'] * 1024 * 1024;
-                $aix_fs['aixFsUsed'] = $aix_fs['aixFsSize'] - $aix_fs['aixFsFree'];
+    if (is_array($aix_filesystem)) {
+        echo 'aix_filesystem : ';
+        foreach ($aix_filesystem as $aix_fs) {
+            if (isset($aix_fs['aixFsMountPoint'])) {
+                if ($aix_fs['aixFsType'] == 'jfs' || $aix_fs['aixFsType'] == 'jfs2') { // Only JFS or JFS2
+                    $aix_fs['aixFsSize'] = $aix_fs['aixFsSize'] * 1024 * 1024;
+                    $aix_fs['aixFsFree'] = $aix_fs['aixFsFree'] * 1024 * 1024;
+                    $aix_fs['aixFsUsed'] = $aix_fs['aixFsSize'] - $aix_fs['aixFsFree'];
 
-                discover_storage($valid_storage, $device, $aix_fs['aixFsIndex'], 'aixFileSystem', 'aix', $aix_fs['aixFsMountPoint'], $aix_fs['aixFsSize'], 1024 * 1024, $aix_fs['aixFsUsed']);
+                    discover_storage($valid_storage, $device, $aix_fs['aixFsIndex'], 'aixFileSystem', 'aix', $aix_fs['aixFsMountPoint'], $aix_fs['aixFsSize'], 1024 * 1024, $aix_fs['aixFsUsed']);
+                }
             }
-        }
-    } // end foreach
-} // endif
-unset($aix_fs);
+        } // end foreach
+    } // endif
+    unset($aix_fs);
+}

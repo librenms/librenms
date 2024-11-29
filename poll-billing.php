@@ -11,6 +11,8 @@
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
 
+use LibreNMS\Billing;
+use LibreNMS\Config;
 use LibreNMS\Data\Store\Datastore;
 use LibreNMS\Util\Debug;
 
@@ -21,11 +23,19 @@ if (isset($argv[1]) && is_numeric($argv[1])) {
     // allow old cli style
     $options = ['b' => $argv[1]];
 } else {
-    $options = getopt('db:');
+    $options = getopt('fdb:');
 }
 
 Debug::set(isset($options['d']));
 Datastore::init();
+
+$scheduler = Config::get('schedule_type.billing');
+if (! isset($options['f']) && $scheduler != 'legacy' && $scheduler != 'cron') {
+    if (Debug::isEnabled()) {
+        echo "Billing is not enabled for cron scheduling. Add the -f command argument if you want to force this command to run.\n";
+    }
+    exit(0);
+}
 
 $poller_start = microtime(true);
 echo "Starting Polling Session ... \n\n";
@@ -40,7 +50,11 @@ foreach ($query->get(['bill_id', 'bill_name']) as $bill) {
     echo 'Bill : ' . $bill->bill_name . "\n";
     $bill_id = $bill->bill_id;
 
-    $port_list = dbFetchRows('SELECT * FROM `bill_ports` as P, `ports` as I, `devices` as D WHERE P.bill_id=? AND I.port_id = P.port_id AND D.device_id = I.device_id', [$bill_id]);
+    if ($config['distributed_poller'] && $config['distributed_billing']) {
+        $port_list = dbFetchRows('SELECT * FROM `bill_ports` as P, `ports` as I, `devices` as D WHERE P.bill_id=? AND I.port_id = P.port_id AND I.ifOperStatus="up" AND D.device_id = I.device_id AND D.status=1 AND D.poller_group IN (' . $config['distributed_poller_group'] . ')', [$bill_id]);
+    } else {
+        $port_list = dbFetchRows('SELECT * FROM `bill_ports` as P, `ports` as I, `devices` as D WHERE P.bill_id=? AND I.port_id = P.port_id AND I.ifOperStatus="up" AND D.device_id = I.device_id AND D.status=1', [$bill_id]);
+    }
 
     $now = dbFetchCell('SELECT NOW()');
     $delta = 0;
@@ -51,12 +65,12 @@ foreach ($query->get(['bill_id', 'bill_name']) as $bill) {
         $host = $port_data['hostname'];
         $port = $port_data['port'];
 
-        echo "  Polling ${port_data['ifName']} (${port_data['ifDescr']}) on ${port_data['hostname']}\n";
+        echo "  Polling {$port_data['ifName']} ({$port_data['ifDescr']}) on {$port_data['hostname']}\n";
 
-        $port_data['in_measurement'] = getValue($port_data['hostname'], $port_data['port'], $port_data['ifIndex'], 'In');
-        $port_data['out_measurement'] = getValue($port_data['hostname'], $port_data['port'], $port_data['ifIndex'], 'Out');
+        $port_data['in_measurement'] = Billing::getValue($port_data['hostname'], $port_data['port'], $port_data['ifIndex'], 'In');
+        $port_data['out_measurement'] = Billing::getValue($port_data['hostname'], $port_data['port'], $port_data['ifIndex'], 'Out');
 
-        $last_counters = getLastPortCounter($port_id, $bill_id);
+        $last_counters = Billing::getLastPortCounter($port_id, $bill_id);
         if ($last_counters['state'] == 'ok') {
             $port_data['last_in_measurement'] = $last_counters['in_counter'];
             $port_data['last_in_delta'] = $last_counters['in_delta'];
@@ -113,7 +127,7 @@ foreach ($query->get(['bill_id', 'bill_name']) as $bill) {
         $out_delta = ($out_delta + $port_data['out_delta']);
     }//end foreach
 
-    $last_data = getLastMeasurement($bill_id);
+    $last_data = Billing::getLastMeasurement($bill_id);
 
     if ($last_data['state'] == 'ok') {
         $prev_delta = $last_data['delta'];
@@ -138,7 +152,15 @@ foreach ($query->get(['bill_id', 'bill_name']) as $bill) {
         logfile("BILLING: negative period! id:$bill_id period:$period delta:$delta in_delta:$in_delta out_delta:$out_delta");
     } else {
         // NOTE: casting to string for mysqli bug (fixed by mysqlnd)
-        dbInsert(['bill_id' => $bill_id, 'timestamp' => $now, 'period' => $period, 'delta' => (string) $delta, 'in_delta' => (string) $in_delta, 'out_delta' => (string) $out_delta], 'bill_data');
+        if ($config['distributed_poller'] && $config['distributed_billing']) {
+            $port_count = dbFetchCell('SELECT COUNT(*) FROM `bill_ports` as P, `ports` as I, `devices` as D WHERE P.bill_id=? AND I.port_id = P.port_id AND D.device_id = I.device_id AND D.poller_group IN (' . $config['distributed_poller_group'] . ')', [$bill_id]);
+        } else {
+            $port_count = dbFetchCell('SELECT COUNT(*) FROM `bill_ports` as P, `ports` as I, `devices` as D WHERE P.bill_id=? AND I.port_id = P.port_id AND D.device_id = I.device_id', [$bill_id]);
+        }
+        if ($port_count > 0) {
+            // If no ports are part of this bill then don't insert a zero value entry
+            dbInsert(['bill_id' => $bill_id, 'timestamp' => $now, 'period' => $period, 'delta' => (string) $delta, 'in_delta' => (string) $in_delta, 'out_delta' => (string) $out_delta], 'bill_data');
+        }
     }
 }//end CollectData()
 

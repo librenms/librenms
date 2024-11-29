@@ -1,0 +1,770 @@
+-- **********************************************************
+-- Copyright 2018-2022 VMware, Inc.  All rights reserved.
+-- **********************************************************
+
+VMWARE-TUNNEL-SERVER-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+
+    OBJECT-TYPE, Unsigned32, Gauge32, Counter64, MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    TEXTUAL-CONVENTION, DateAndTime, TruthValue
+        FROM SNMPv2-TC
+    vmwPerAppTunnel
+        FROM VMWARE-ROOT-MIB
+    VmwLongDisplayString
+        FROM VMWARE-TC-MIB;
+
+
+vmwTunnelServerMIB MODULE-IDENTITY
+    LAST-UPDATED "202210280000Z"
+    ORGANIZATION "VMware, Inc."
+    CONTACT-INFO
+        "VMware, Inc.
+        3401 Hillview Ave
+        Palo Alto, CA 94304
+        Tel: 1-877-486-9273 or 650-427-5000
+        Fax: 650-427-5001
+        Web: https://kb.vmware.com/s/article/1013445
+        "
+    DESCRIPTION
+        "This MIB file contains the definition of the SNMP
+        interface of VMware Workspace ONE Tunnel Server.
+
+        Workspace ONE Tunnel is part of Workspace ONE by VMware:
+        https://www.vmware.com/products/workspace-one.html
+
+        For more information about Workspace ONE Tunnel, please see
+        the latest documentation of VMware Workspace ONE UEM:
+        https://docs.vmware.com/en/VMware-Workspace-ONE-UEM/
+        "
+
+    REVISION     "202210280000Z"
+    DESCRIPTION
+        "Added counters vmwTunnelNumDevicesBlockedByZTNA,
+        vmwTunnelNumDevicesBlockedByAdm,
+        vmwTunnelNumConnBlockedByZTNA, vmwTunnelTLSPortSharing,
+        vmwTunnelZTNADTR, vmwTunnelZTNAPDTR, vmwTunnelNumZTNADTR,
+        vmwTunnelNumZTNAPDTR, vmwTunnelIsAppliance,
+        vmwTunnelIsContainer,vmwTunnelGeneveMetadata"
+    REVISION     "202008210000Z"
+    DESCRIPTION
+        "Renamed whitelist counters to allowlist counters"
+    REVISION     "202007210000Z"
+    DESCRIPTION
+        "Adding counters vmwTunnelLogLevel,
+        vmwTunnelNumDDoSRejected,
+        vmwTunnelNumConnSuccessful,
+        vmwTunnelNumConnFailed,
+        vmwTunnelNumBackEnds, vmwTunnelNumBackEndsDown,
+        vmwTunnelMemoryVirtual, vmwTunnelMemoryResident,
+        vmwTunnelMemoryShared, vmwTunnelProcessUpTime,
+        vmwTunnelServerStatus"
+    REVISION     "201910300000Z"
+    DESCRIPTION
+        "Adding whitelist check failure counters"
+    REVISION     "201808300000Z"
+    DESCRIPTION
+        "Initial revision"
+
+    ::= { vmwPerAppTunnel 1 }
+
+
+vmwTunnelServerStat OBJECT IDENTIFIER ::= { vmwTunnelServerMIB 1 }
+vmwTunnelServerInfo OBJECT IDENTIFIER ::= { vmwTunnelServerMIB 2 }
+
+
+--
+-- Textual-Conventions
+--
+
+
+VmwTunnelUpDownState ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Can hold one of the following values: 1 = up or 2 = down."
+    SYNTAX  INTEGER { up(1), down(2) }
+
+VmwTunnelCascadeModeState ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Can hold one of the following values:
+         1 = off, 2 = frontend or 3 = backend."
+    SYNTAX  INTEGER { off(1), frontend(2), backend(3) }
+
+VmwTunnelLogState ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Can hold one of the following values:
+         0 = off, 1 = error, 2 = warning, 3 = info or 4 = debug."
+    SYNTAX  INTEGER { off(0), error(1), warning(2), info(3), debug(4) }
+
+
+--
+-- Statistic Objects
+--
+
+
+vmwTunnelNumDevices OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of devices currently connected."
+    DEFVAL { 0 }
+    ::= { vmwTunnelServerStat 1 }
+
+vmwTunnelNumDevicesPeak OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "High watermark of number of devices connected.
+         The is the greatest number of devices connected
+         since Tunnel Server process restarted."
+    DEFVAL { 0 }
+    ::= { vmwTunnelServerStat 2 }
+
+vmwTunnelNumConnections OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of connections currently connected to hosts."
+    DEFVAL { 0 }
+    ::= { vmwTunnelServerStat 3 }
+
+vmwTunnelNumConnectionsPeak OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "High watermark of number of connections to hosts.
+         This is the greatest number of outbound connections
+         to hosts since Tunnel Server process restarted."
+    DEFVAL { 0 }
+    ::= { vmwTunnelServerStat 4 }
+
+vmwTunnelDownstreamBitRate OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "kB/s"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Downstream bitrate of all traffic."
+    ::= { vmwTunnelServerStat 20 }
+
+vmwTunnelUpstreamBitRate OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "kB/s"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Upstream bitrate of all traffic."
+    ::= { vmwTunnelServerStat 21 }
+
+vmwTunnelNumProxies OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of proxies defined in traffic rules."
+    DEFVAL { 0 }
+    ::= { vmwTunnelServerStat 40 }
+
+vmwTunnelNumProxiesDown OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of proxies defined in traffic rules but
+         currently unreachable."
+    DEFVAL { 0 }
+    ::= { vmwTunnelServerStat 41 }
+
+vmwTunnelNumTrafficRules OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of traffic rules defined."
+    DEFVAL { 0 }
+    ::= { vmwTunnelServerStat 50 }
+
+vmwTunnelNumAllowListedDevices OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of devices in the allowlist."
+    DEFVAL { 0 }
+    ::= { vmwTunnelServerStat 60 }
+
+vmwTunnelNumClosedHandshakes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of TLS handshakes closed before authenticated.
+
+         Discontinuities in the value of this counter can occur at
+         re-initialization of the Tunnel Server process."
+    ::= { vmwTunnelServerStat 70 }
+
+vmwTunnelNumFailedHandshakes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of TLS handshakes failed authentication.
+
+         Discontinuities in the value of this counter can occur at
+         re-initialization of the Tunnel Server process."
+    ::= { vmwTunnelServerStat 71 }
+
+vmwTunnelNumNotInAllowlist OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of devices failed to connect due to not in allowlist.
+
+         Discontinuities in the value of this counter can occur at
+         re-initialization of the Tunnel Server process."
+    ::= { vmwTunnelServerStat 72 }
+
+vmwTunnelNumNonCompliant OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of devices failed to connect due to non-compliant
+         status.
+
+         Discontinuities in the value of this counter can occur at
+         re-initialization of the Tunnel Server process."
+    ::= { vmwTunnelServerStat 73 }
+
+vmwTunnelNumNonManaged OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of devices failed to connect due to non-managed
+         status.
+
+         Discontinuities in the value of this counter can occur at
+         re-initialization of the Tunnel Server process."
+    ::= { vmwTunnelServerStat 74 }
+
+vmwTunnelNumDDoSRejected OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of devices rejected due to DDoS protection.
+
+         Discontinuities in the value of this counter can occur at
+         re-initialization of the Tunnel Server process."
+    ::= { vmwTunnelServerStat 75 }
+
+vmwTunnelNumDevicesBlockedByZTNA OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of devices rejected due to ZTNA policy.
+
+         Discontinuities in the value of this counter can occur at
+         re-initialization of the Tunnel Server process."
+    ::= { vmwTunnelServerStat 76 }
+
+vmwTunnelNumDevicesBlockedByAdm OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of devices blocked by admin in UEM Console.
+
+         Discontinuities in the value of this counter can occur at
+         re-initialization of the Tunnel Server process."
+    ::= { vmwTunnelServerStat 77 }
+
+vmwTunnelNumDevicesSinceStart OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of device connections since process restart.
+
+         Discontinuities in the value of this counter can occur at
+         re-initialization of the Tunnel Server process."
+    ::= { vmwTunnelServerStat 80 }
+
+vmwTunnelNumConnSuccessful OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of outbound connections successfully established.
+
+         Discontinuities in the value of this counter can occur at
+         re-initialization of the Tunnel Server process."
+    ::= { vmwTunnelServerStat 90 }
+
+vmwTunnelNumConnFailed OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of outbound connections failed.
+
+         Discontinuities in the value of this counter can occur at
+         re-initialization of the Tunnel Server process."
+    ::= { vmwTunnelServerStat 91 }
+
+vmwTunnelNumConnBlockedByZTNA OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of outbound connections blocked by ZTNA policy.
+
+         Discontinuities in the value of this counter can occur at
+         re-initialization of the Tunnel Server process."
+    ::= { vmwTunnelServerStat 92 }
+
+
+vmwTunnelNumBackEnds OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "In Cascade Mode, the number of IP addresses
+         resolved from back-end hostname.
+
+         (Available on Cascade Mode front-ends only)"
+    DEFVAL { 0 }
+    ::= { vmwTunnelServerStat 100 }
+
+vmwTunnelNumBackEndsDown OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "In Cascade Mode, the number of back-ends that are
+         unresponsive to health check pinging.
+
+         (Available on Cascade Mode front-ends only)"
+    DEFVAL { 0 }
+    ::= { vmwTunnelServerStat 101 }
+
+vmwTunnelMemoryVirtual OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Tunnel service virtual memory size."
+
+    DEFVAL { 0 }
+    ::= { vmwTunnelServerStat 110 }
+
+vmwTunnelMemoryResident OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Tunnel service resident memory size."
+
+    DEFVAL { 0 }
+    ::= { vmwTunnelServerStat 111 }
+
+vmwTunnelMemoryShared OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Tunnel service shared memory size."
+
+    DEFVAL { 0 }
+    ::= { vmwTunnelServerStat 112 }
+
+
+--
+-- Information Objects
+--
+
+
+vmwTunnelServerVersion OBJECT-TYPE
+    SYNTAX      VmwLongDisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Tunnel server version."
+    ::= { vmwTunnelServerInfo 1 }
+
+vmwTunnelConsoleVersion OBJECT-TYPE
+    SYNTAX      VmwLongDisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Console server version."
+    ::= { vmwTunnelServerInfo 2 }
+
+vmwTunnelOperatingSystem OBJECT-TYPE
+    SYNTAX      VmwLongDisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Tunnel server machine operating system."
+    ::= { vmwTunnelServerInfo 3 }
+
+vmwTunnelAPIConnectivity OBJECT-TYPE
+    SYNTAX      VmwTunnelUpDownState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Tunnel server to Console API connectivity."
+    ::= { vmwTunnelServerInfo 10 }
+
+vmwTunnelAWCMConnectivity OBJECT-TYPE
+    SYNTAX      VmwTunnelUpDownState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Tunnel server to AWCM server connectivity."
+    ::= { vmwTunnelServerInfo 11 }
+
+vmwTunnelAPILastResponse OBJECT-TYPE
+    SYNTAX      VmwLongDisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Last HTTP response from Console API.
+         Value can be any HTTP response codes such as
+         '200 OK', '401 Unauthorized' etc."
+    ::= { vmwTunnelServerInfo 12 }
+
+vmwTunnelAWCMLastResponse OBJECT-TYPE
+    SYNTAX      VmwLongDisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Last HTTP response from AWCM server.
+         Value can be any HTTP response codes such as
+         '200 OK', '401 Unauthorized' etc."
+    ::= { vmwTunnelServerInfo 13 }
+
+vmwTunnelAPILastSyncTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The date and time the last Console API configuration
+         was downloaded."
+    ::= { vmwTunnelServerInfo 14 }
+
+vmwTunnelAWCMLastSyncTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The date and time the last AWCM message was received."
+    ::= { vmwTunnelServerInfo 15 }
+
+vmwTunnelProcessStartTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The date and time the vpnserv process restarted."
+    ::= { vmwTunnelServerInfo 20 }
+
+ vmwTunnelProcessUpTime OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of seconds passed since the vpnserv process
+         restarted"
+    ::= { vmwTunnelServerInfo 21 }
+
+vmwTunnelCascadeMode OBJECT-TYPE
+    SYNTAX      VmwTunnelCascadeModeState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Tunnel Server cascade mode."
+    ::= { vmwTunnelServerInfo 30 }
+
+vmwTunnelDeploymentMode OBJECT-TYPE
+    SYNTAX      VmwLongDisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Tunnel Server deployment mode."
+    ::= { vmwTunnelServerInfo 40 }
+
+vmwTunnelTrafficRulesEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Tunnel Server traffic rules mode."
+    ::= { vmwTunnelServerInfo 50 }
+
+vmwTunnelFIPSEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Tunnel Server FIPS mode."
+    ::= { vmwTunnelServerInfo 60 }
+
+vmwTunnelNSXEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Tunnel Server to NSX integration.
+
+         See here for more details:
+         https://techzone.vmware.com/sites/default/files/
+         vmware-tunnel-NSX-micro-segmentation-Integration.pdf"
+    ::= { vmwTunnelServerInfo 70 }
+
+vmwTunnelLogLevel OBJECT-TYPE
+    SYNTAX      VmwTunnelLogState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Tunnel Server log level."
+    ::= { vmwTunnelServerInfo 80 }
+
+
+vmwTunnelServerStatus OBJECT-TYPE
+    SYNTAX      VmwTunnelUpDownState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Tunnel Server up/down status."
+    ::= { vmwTunnelServerInfo 90 }
+
+vmwTunnelTLSPortSharing OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "UAG TLS port sharing status."
+    ::= { vmwTunnelServerInfo 100 }
+
+vmwTunnelZTNADTR OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "ZTNA Device Traffic Rules validation enabled."
+    ::= { vmwTunnelServerInfo 110 }
+
+vmwTunnelZTNAPDTR OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "ZTNA Per Device Traffic Rules validation enabled."
+    ::= { vmwTunnelServerInfo 111 }
+
+vmwTunnelNumZTNADTR OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of ZTNA Device Traffic Rules in cache."
+    ::= { vmwTunnelServerInfo 112 }
+
+vmwTunnelNumZTNAPDTR OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of ZTNA Per Device Traffic Rules in cache."
+    ::= { vmwTunnelServerInfo 113 }
+
+vmwTunnelIsAppliance OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Tunnel Server is running in appliance mode."
+    ::= { vmwTunnelServerInfo 120 }
+
+vmwTunnelIsContainer OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Tunnel Server is running in container mode."
+    ::= { vmwTunnelServerInfo 130 }
+
+vmwTunnelGeneveMetadata OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Metadata is provided in Geneve Tunnel Options."
+    ::= { vmwTunnelServerInfo 140 }
+--
+-- Groups
+--
+
+
+vmwTunnelServerMIBConformance OBJECT IDENTIFIER
+    ::= { vmwTunnelServerMIB 3 }
+vmwTunnelServerMIBCompliances OBJECT IDENTIFIER
+    ::= { vmwTunnelServerMIBConformance 1 }
+vmwTunnelServerMIBGroups      OBJECT IDENTIFIER
+    ::= { vmwTunnelServerMIBConformance 2 }
+
+
+vmwTunnelServerStatGroup OBJECT-GROUP
+    OBJECTS {
+        vmwTunnelNumDevices,
+        vmwTunnelNumDevicesPeak,
+        vmwTunnelNumConnections,
+        vmwTunnelNumConnectionsPeak,
+        vmwTunnelDownstreamBitRate,
+        vmwTunnelUpstreamBitRate,
+        vmwTunnelNumProxies,
+        vmwTunnelNumProxiesDown,
+        vmwTunnelNumTrafficRules,
+        vmwTunnelNumAllowListedDevices,
+        vmwTunnelNumClosedHandshakes,
+        vmwTunnelNumFailedHandshakes,
+        vmwTunnelNumDevicesSinceStart
+    }
+    STATUS current
+    DESCRIPTION
+        "A collection of VMware Tunnel Server runtime values."
+    ::= { vmwTunnelServerMIBGroups 1 }
+
+
+
+vmwTunnelServerInfoGroup OBJECT-GROUP
+    OBJECTS {
+        vmwTunnelServerVersion,
+        vmwTunnelConsoleVersion,
+        vmwTunnelOperatingSystem,
+        vmwTunnelAPIConnectivity,
+        vmwTunnelAWCMConnectivity,
+        vmwTunnelAPILastResponse,
+        vmwTunnelAWCMLastResponse,
+        vmwTunnelAPILastSyncTime,
+        vmwTunnelAWCMLastSyncTime,
+        vmwTunnelProcessStartTime,
+        vmwTunnelCascadeMode,
+        vmwTunnelDeploymentMode,
+        vmwTunnelTrafficRulesEnabled,
+        vmwTunnelFIPSEnabled,
+        vmwTunnelNSXEnabled
+    }
+    STATUS current
+    DESCRIPTION
+        "A collection of VMware Tunnel Server runtime information."
+    ::= { vmwTunnelServerMIBGroups 2 }
+
+
+vmwTunnelServerStatGroup2 OBJECT-GROUP
+    OBJECTS {
+        vmwTunnelNumNotInAllowlist,
+        vmwTunnelNumNonCompliant,
+        vmwTunnelNumNonManaged
+    }
+    STATUS current
+    DESCRIPTION
+        "A collection of VMware Tunnel Server runtime values."
+    ::= { vmwTunnelServerMIBGroups 3 }
+
+vmwTunnelServerInfoGroup2 OBJECT-GROUP
+    OBJECTS {
+        vmwTunnelLogLevel,
+        vmwTunnelProcessUpTime,
+        vmwTunnelServerStatus
+    }
+    STATUS current
+    DESCRIPTION
+        "A collection of VMware Tunnel Server runtime information."
+    ::= { vmwTunnelServerMIBGroups 4 }
+
+
+vmwTunnelServerStatGroup3 OBJECT-GROUP
+    OBJECTS {
+        vmwTunnelNumDDoSRejected,
+        vmwTunnelNumConnSuccessful,
+        vmwTunnelNumConnFailed,
+        vmwTunnelNumBackEnds,
+        vmwTunnelNumBackEndsDown,
+        vmwTunnelMemoryVirtual,
+        vmwTunnelMemoryResident,
+        vmwTunnelMemoryShared
+    }
+    STATUS current
+    DESCRIPTION
+        "A collection of VMware Tunnel Server runtime values."
+    ::= { vmwTunnelServerMIBGroups 5 }
+
+
+vmwTunnelServerInfoGroup3 OBJECT-GROUP
+    OBJECTS {
+        vmwTunnelTLSPortSharing,
+        vmwTunnelZTNADTR,
+        vmwTunnelZTNAPDTR,
+        vmwTunnelNumZTNADTR,
+        vmwTunnelNumZTNAPDTR,
+        vmwTunnelIsAppliance,
+        vmwTunnelIsContainer,
+        vmwTunnelGeneveMetadata
+    }
+    STATUS current
+    DESCRIPTION
+        "A collection of VMware Tunnel Server runtime information."
+    ::= { vmwTunnelServerMIBGroups 6 }
+
+
+vmwTunnelServerStatGroup4 OBJECT-GROUP
+    OBJECTS {
+        vmwTunnelNumDevicesBlockedByZTNA,
+        vmwTunnelNumDevicesBlockedByAdm,
+        vmwTunnelNumConnBlockedByZTNA
+    }
+    STATUS current
+    DESCRIPTION
+        "A collection of VMware Tunnel Server runtime values."
+    ::= { vmwTunnelServerMIBGroups 7 }
+
+
+--
+-- Compliance
+--
+
+
+vmwTunnelServerMIBCompliance MODULE-COMPLIANCE
+    STATUS     current
+    DESCRIPTION
+        "The compliance statement for VMware Tunnel Server SNMP
+         interface."
+    MODULE
+        MANDATORY-GROUPS {
+        vmwTunnelServerInfoGroup,
+        vmwTunnelServerInfoGroup2,
+        vmwTunnelServerInfoGroup3,
+        vmwTunnelServerStatGroup,
+        vmwTunnelServerStatGroup2,
+        vmwTunnelServerStatGroup3,
+        vmwTunnelServerStatGroup4 }
+
+    ::= { vmwTunnelServerMIBCompliances 1 }
+
+
+END

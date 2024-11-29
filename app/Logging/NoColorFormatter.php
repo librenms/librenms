@@ -25,27 +25,7 @@
 
 namespace App\Logging;
 
-class NoColorFormatter extends \Monolog\Formatter\LineFormatter
+class NoColorFormatter extends CliColorFormatter
 {
-    /**
-     * @var \Console_Color2
-     */
-    private $console_color;
-
-    public function __construct()
-    {
-        parent::__construct(null, null, true, true);
-        $this->console_color = new \Console_Color2();
-    }
-
-    public function format(array $record): string
-    {
-        // only strip messages where color is enabled
-        if (isset($record['context']['color']) && $record['context']['color']) {
-            $record['message'] = $this->console_color->convert($record['message'], false);
-            unset($record['context']['color']);
-        }
-
-        return parent::format($record);
-    }
+    protected bool $console = false;
 }

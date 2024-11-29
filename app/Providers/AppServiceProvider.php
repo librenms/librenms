@@ -2,13 +2,14 @@
 
 namespace App\Providers;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Sensor;
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
 use LibreNMS\Cache\PermissionsCache;
-use LibreNMS\Config;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Validate;
 use Validator;
@@ -20,26 +21,30 @@ class AppServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function register()
+    public function register(): void
     {
         $this->registerFacades();
         $this->registerGeocoder();
 
-        $this->app->singleton('permissions', function ($app) {
+        $this->app->singleton('permissions', function () {
             return new PermissionsCache();
         });
-        $this->app->singleton('device-cache', function ($app) {
+        $this->app->singleton('device-cache', function () {
             return new \LibreNMS\Cache\Device();
         });
-        $this->app->singleton('git', function ($app) {
+        $this->app->singleton('git', function () {
             return new \LibreNMS\Util\Git();
         });
 
-        $this->app->bind(\App\Models\Device::class, function () {
+        $this->app->bind(\App\Models\Device::class, function (Application $app) {
             /** @var \LibreNMS\Cache\Device $cache */
-            $cache = $this->app->make('device-cache');
+            $cache = $app->make('device-cache');
 
             return $cache->hasPrimary() ? $cache->getPrimary() : new \App\Models\Device;
+        });
+
+        $this->app->singleton('sensor-discovery', function (Application $app) {
+            return new \App\Discovery\Sensor($app->make('device-cache')->getPrimary());
         });
     }
 
@@ -48,23 +53,21 @@ class AppServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function boot()
+    public function boot(): void
     {
-        \Illuminate\Pagination\Paginator::useBootstrap();
-
         $this->bootCustomBladeDirectives();
         $this->bootCustomValidators();
         $this->configureMorphAliases();
         $this->bootObservers();
     }
 
-    private function bootCustomBladeDirectives()
+    private function bootCustomBladeDirectives(): void
     {
         Blade::if('config', function ($key, $value = true) {
-            return \LibreNMS\Config::get($key) == $value;
+            return LibrenmsConfig::get($key) == $value;
         });
         Blade::if('notconfig', function ($key) {
-            return ! \LibreNMS\Config::get($key);
+            return ! LibrenmsConfig::get($key);
         });
         Blade::if('admin', function () {
             return auth()->check() && auth()->user()->isAdmin();
@@ -111,7 +114,7 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->alias(\LibreNMS\Interfaces\Geocoder::class, 'geocoder');
         $this->app->bind(\LibreNMS\Interfaces\Geocoder::class, function ($app) {
-            $engine = Config::get('geoloc.engine');
+            $engine = LibrenmsConfig::get('geoloc.engine');
 
             switch ($engine) {
                 case 'mapquest':
@@ -139,9 +142,11 @@ class AppServiceProvider extends ServiceProvider
     {
         \App\Models\Device::observe(\App\Observers\DeviceObserver::class);
         \App\Models\Package::observe(\App\Observers\PackageObserver::class);
+        \App\Models\Sensor::observe(\App\Observers\SensorObserver::class);
         \App\Models\Service::observe(\App\Observers\ServiceObserver::class);
         \App\Models\Stp::observe(\App\Observers\StpObserver::class);
         \App\Models\User::observe(\App\Observers\UserObserver::class);
+        \App\Models\Vminfo::observe(\App\Observers\VminfoObserver::class);
     }
 
     private function bootCustomValidators()

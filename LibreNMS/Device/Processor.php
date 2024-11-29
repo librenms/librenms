@@ -62,10 +62,10 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
      * @param  int|string  $index
      * @param  string  $description
      * @param  int  $precision  The returned value will be divided by this number (should be factor of 10) If negative this oid returns idle cpu
-     * @param  int  $current_usage
-     * @param  int  $warn_percent
-     * @param  int  $entPhysicalIndex
-     * @param  int  $hrDeviceIndex
+     * @param  int|null  $current_usage
+     * @param  int|null  $warn_percent
+     * @param  int|null  $entPhysicalIndex
+     * @param  int|null  $hrDeviceIndex
      * @return static
      */
     public static function discover(
@@ -93,7 +93,7 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
         // handle string indexes
         if (Str::contains($oid, '"')) {
             $oid = preg_replace_callback('/"([^"]+)"/', function ($matches) {
-                return string_to_oid($matches[1]);
+                return \LibreNMS\Util\Oid::ofString($matches[1]);
             }, $oid);
         }
         $proc->processor_oid = '.' . ltrim($oid, '.');
@@ -119,19 +119,19 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
 
     public static function fromYaml(OS $os, $index, array $data)
     {
-        $precision = $data['precision'] ?: 1;
+        $precision = empty($data['precision']) ? 1 : $data['precision'];
 
         return static::discover(
-            $data['type'] ?: $os->getName(),
+            empty($data['type']) ? $os->getName() : $data['type'],
             $os->getDeviceId(),
             $data['num_oid'],
             isset($data['index']) ? $data['index'] : $index,
-            $data['descr'] ? trim($data['descr']) : 'Processor',
+            empty($data['descr']) ? 'Processor' : trim($data['descr']),
             $precision,
             static::processData($data['value'], $precision),
-            $data['warn_percent'],
-            $data['entPhysicalIndex'],
-            $data['hrDeviceIndex']
+            $data['warn_percent'] ?? null,
+            $data['entPhysicalIndex'] ?? null,
+            $data['hrDeviceIndex'] ?? null
         );
     }
 
@@ -147,7 +147,7 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
 
         foreach ($processors as $processor) {
             $processor->processor_descr = substr($processor->processor_descr, 0, 64);
-            $processors[] = $processor;
+            $processor->processor_type = substr($processor->processor_type, 0, 16);
         }
 
         if (isset($processors) && is_array($processors)) {
@@ -236,7 +236,7 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
     private static function processData($data, $precision)
     {
         preg_match('/([0-9]{1,5}(\.[0-9]+)?)/', $data, $matches);
-        $value = $matches[1];
+        $value = (float) $matches[1];
 
         if ($precision < 0) {
             // idle value, subtract from 100
@@ -258,7 +258,7 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
             return [];
         }
 
-        return YamlDiscovery::discover($os, get_class(), $discovery);
+        return YamlDiscovery::discover($os, get_called_class(), $discovery);
     }
 
     /**

@@ -18,8 +18,8 @@ if (! Rrd::checkRrdExists($rrd_filename)) {
 while (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'GPU ' . $int,
-        'ds'       => $rrdVar,
+        'descr' => 'GPU ' . $int,
+        'ds' => $rrdVar,
     ];
 
     $int++;

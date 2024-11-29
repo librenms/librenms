@@ -13,6 +13,24 @@
  * @author     LibreNMS Contributors
 */
 
+function show_device_group($device_group_id) {
+    $device_group_name = DB::table('device_groups')->where('id', $device_group_id)->value('name');
+    ?>
+    <div class="panel-heading">
+        <span class="devices-font-bold">
+        <?php
+        if ($device_group_id == 'none') {
+            echo "ungrouped Devices";
+        } elseif ($device_group_id) {
+            echo "Device Group: ";
+        }
+        ?>
+        </span>
+        <?php echo htmlentities($device_group_name) ?>
+    </div>
+    <?php
+}
+
 $pagetitle[] = 'Devices';
 
 if (! isset($vars['format'])) {
@@ -46,7 +64,7 @@ $menu_options = ['bits' => 'Bits',
     'storage' => 'Storage',
     'diskio' => 'Disk I/O',
     'poller_perf' => 'Poller',
-    'ping_perf' => 'Ping',
+    'icmp_perf' => 'Ping',
     'temperature' => 'Temperature',
 ];
 $sep = '';
@@ -166,7 +184,6 @@ if ($format == 'graph') {
         $where .= ' AND status= ?';
         $sql_param[] = $state;
         $where .= " AND disabled='0' AND `disable_notify`='0'";
-        $sql_param[] = '';
     }
     if (! empty($vars['disabled'])) {
         $where .= ' AND disabled= ?';
@@ -199,6 +216,7 @@ if ($format == 'graph') {
         $where = substr($where, 0, strlen($where) - 3);
         $where .= ' )';
     }
+    show_device_group($vars['group']);
 
     $query = 'SELECT * FROM `devices` LEFT JOIN `locations` ON `devices`.`location_id` = `locations`.`id` WHERE 1';
 
@@ -289,6 +307,7 @@ if ($format == 'graph') {
         </div>
     </div>
     <div class="table-responsive">
+        <?php show_device_group($vars['group']); ?>
         <table id="devices" class="table table-hover table-condensed table-striped">
             <thead>
                 <tr>
@@ -344,21 +363,21 @@ if ($format == 'graph') {
             },
             post: function () {
                 return {
-                    format: '<?php echo $vars['format']; ?>',
+                    format: '<?php echo htmlspecialchars($vars['format']); ?>',
                     searchPhrase: '<?php echo htmlspecialchars($vars['searchquery'] ?? ''); ?>',
-                    os: '<?php echo $vars['os'] ?? ''; ?>',
-                    version: '<?php echo $vars['version'] ?? ''; ?>',
-                    hardware: '<?php echo $vars['hardware'] ?? ''; ?>',
-                    features: '<?php echo $vars['features'] ?? ''; ?>',
-                    location: '<?php echo $vars['location'] ?? ''; ?>',
-                    type: '<?php echo $vars['type'] ?? ''; ?>',
-                    state: '<?php echo $vars['state'] ?? ''; ?>',
-                    disabled: '<?php echo $vars['disabled'] ?? ''; ?>',
-                    ignore: '<?php echo $vars['ignore'] ?? ''; ?>',
-                    disable_notify: '<?php echo $vars['disable_notify'] ?? ''; ?>',
-                    group: '<?php echo $vars['group'] ?? ''; ?>',
-                    poller_group: '<?php echo $vars['poller_group'] ?? ''; ?>',
-                    device_id: '<?php echo $vars['device_id'] ?? ''; ?>',
+                    os: '<?php echo htmlspecialchars($vars['os'] ?? ''); ?>',
+                    version: '<?php echo htmlspecialchars($vars['version'] ?? ''); ?>',
+                    hardware: '<?php echo htmlspecialchars($vars['hardware'] ?? ''); ?>',
+                    features: '<?php echo htmlspecialchars($vars['features'] ?? ''); ?>',
+                    location: '<?php echo htmlspecialchars($vars['location'] ?? ''); ?>',
+                    type: '<?php echo htmlspecialchars($vars['type'] ?? ''); ?>',
+                    state: '<?php echo htmlspecialchars($vars['state'] ?? ''); ?>',
+                    disabled: '<?php echo htmlspecialchars($vars['disabled'] ?? ''); ?>',
+                    ignore: '<?php echo htmlspecialchars($vars['ignore'] ?? ''); ?>',
+                    disable_notify: '<?php echo htmlspecialchars($vars['disable_notify'] ?? ''); ?>',
+                    group: '<?php echo htmlspecialchars($vars['group'] ?? ''); ?>',
+                    poller_group: '<?php echo htmlspecialchars($vars['poller_group'] ?? ''); ?>',
+                    device_id: '<?php echo htmlspecialchars($vars['device_id'] ?? ''); ?>',
                 };
             },
             url: "<?php echo url('/ajax/table/device') ?>"
@@ -372,7 +391,7 @@ if ($format == 'graph') {
             "<form method='post' action='' class='form-inline devices-search-header' role='form'>" +
             "<?php echo addslashes(csrf_field()) ?>"+
             "<div class='form-group'>" +
-            "<input type='text' name='searchquery' id='searchquery' value='<?php echo $vars['searchquery'] ?? ''; ?>' class='form-control' placeholder='Search'>" +
+            "<input type='text' name='searchquery' id='searchquery' value='<?php echo htmlspecialchars($vars['searchquery'] ?? ''); ?>' class='form-control' placeholder='Search'>" +
             "</div>" +
             "<div class='form-group'><?php echo $state_selection ?></div>" +
             "<div class='form-group'><select name='os' id='os' class='form-control'></select></div>" +

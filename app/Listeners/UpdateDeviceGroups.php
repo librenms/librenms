@@ -25,7 +25,7 @@ class UpdateDeviceGroups
      * @param  DevicePolled  $event
      * @return void
      */
-    public function handle(DevicePolled $event)
+    public function handle(DevicePolled $event): void
     {
         Log::info('### Start Device Groups ###');
         $dg_start = microtime(true);

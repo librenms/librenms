@@ -31,6 +31,7 @@ use DeviceCache;
 use Illuminate\Support\Str;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Device\YamlDiscovery;
+use LibreNMS\Interfaces\Discovery\EntityPhysicalDiscovery;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
@@ -46,6 +47,7 @@ use LibreNMS\Interfaces\Polling\StpInstancePolling;
 use LibreNMS\Interfaces\Polling\StpPortPolling;
 use LibreNMS\OS\Generic;
 use LibreNMS\OS\Traits\BridgeMib;
+use LibreNMS\OS\Traits\EntityMib;
 use LibreNMS\OS\Traits\HostResources;
 use LibreNMS\OS\Traits\NetstatsPolling;
 use LibreNMS\OS\Traits\ResolvesPortIds;
@@ -60,6 +62,7 @@ class OS implements
     MempoolsDiscovery,
     StpInstanceDiscovery,
     StpPortDiscovery,
+    EntityPhysicalDiscovery,
     IcmpNetstatsPolling,
     IpNetstatsPolling,
     IpForwardNetstatsPolling,
@@ -82,6 +85,7 @@ class OS implements
     use NetstatsPolling;
     use ResolvesPortIds;
     use BridgeMib;
+    use EntityMib;
 
     /**
      * @var float|null
@@ -92,12 +96,12 @@ class OS implements
     private $cache; // data cache
     private $pre_cache; // pre-fetch data cache
 
+    protected ?string $entityVendorTypeMib = null;
+
     /**
      * OS constructor. Not allowed to be created directly.  Use OS::make()
-     *
-     * @param  array  $device
      */
-    protected function __construct(&$device)
+    protected function __construct(array &$device)
     {
         $this->device = &$device;
         $this->graphs = [];
@@ -143,13 +147,16 @@ class OS implements
         $this->graphs[$name] = true;
     }
 
-    public function persistGraphs(): void
+    public function persistGraphs(bool $cleanup = true): void
     {
         $device = $this->getDevice();
         $graphs = collect(array_keys($this->graphs));
 
-        // delete extra graphs
-        $device->graphs->keyBy('graph')->collect()->except($graphs)->each->delete();
+        if ($cleanup) {
+            // delete extra graphs
+            $device->graphs->keyBy('graph')->collect()->except($graphs)->each->delete();
+        }
+
         // create missing graphs
         $device->graphs()->saveMany($graphs->diff($device->graphs->pluck('graph'))->map(function ($graph) {
             return new DeviceGraph(['graph' => $graph]);
@@ -231,11 +238,8 @@ class OS implements
      * OS Factory, returns an instance of the OS for this device
      * If no specific OS is found, Try the OS group.
      * Otherwise, returns Generic
-     *
-     * @param  array  $device  device array, must have os set
-     * @return OS
      */
-    public static function make(&$device)
+    public static function make(array &$device): OS
     {
         if (isset($device['os'])) {
             // load os definition and populate os_group
@@ -262,7 +266,7 @@ class OS implements
             }
         }
 
-        d_echo("OS initialized as Generic\n");
+        d_echo("OS initialized as Generic ({$device['os']})\n");
 
         return new Generic($device);
     }

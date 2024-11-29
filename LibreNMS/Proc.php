@@ -55,7 +55,7 @@ class Proc
      *
      * @param  string  $cmd  the command to execute
      * @param  array  $descriptorspec  the definition of pipes to initialize
-     * @param  null  $cwd  working directory to change to
+     * @param  string|null  $cwd  working directory to change to
      * @param  array|null  $env  array of environment variables to set
      * @param  bool  $blocking  set the output pipes to blocking (default: false)
      *
@@ -260,7 +260,6 @@ class Proc
      */
     public function isRunning()
     {
-        /* @phpstan-ignore-next-line */
         if (! is_resource($this->_process)) {
             return false;
         }

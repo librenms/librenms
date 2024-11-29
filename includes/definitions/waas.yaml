@@ -33,7 +33,6 @@ discovery_modules:
     slas: false
     cisco-vrf-lite: false
     vrf: false
-    libvirt-vminfo: false
     ntp: false
     stp: false
     printer-supplies:   false

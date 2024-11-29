@@ -30,6 +30,7 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 use App\Models\BgpPeer;
 use App\Models\Device;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Tests\Traits\RequiresDatabase;
 
 class JnxBgpM2Test extends SnmpTrapTestCase
@@ -88,7 +89,7 @@ SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameSRX2
 TRAP,
             'BGP Peer 2001:d88:1::2 is now in the idle state',
             'Could not handle JnxBgpM2BackwardsTransition trap',
-            [5],
+            [Severity::Error],
             $device,
         );
     }
@@ -117,7 +118,7 @@ BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerState.0.2.32.1.13.136.0.1.0.0.0.0.0.0.0.0.0.1.2
 SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameSRX240',
             'BGP Peer 2001:d88:1::2 is now in the established state',
             'Could not handle JnxBgpM2Established trap',
-            [1],
+            [Severity::Ok],
             $device,
         );
     }

@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\Bill;
+use LibreNMS\Billing;
 use LibreNMS\Util\Number;
 
 $bill_id = $vars['bill_id'];
@@ -8,7 +10,9 @@ if (Auth::user()->hasGlobalAdmin()) {
     include 'includes/html/pages/bill/actions.inc.php';
 }
 
-if (bill_permitted($bill_id)) {
+if (!Bill::where('bill_id', $bill_id)->exists()) {
+    abort(404);
+} elseif (bill_permitted($bill_id)) {
     $bill_data = dbFetchRow('SELECT * FROM bills WHERE bill_id = ?', [$bill_id]);
 
     $bill_name = $bill_data['bill_name'];
@@ -25,7 +29,7 @@ if (bill_permitted($bill_id)) {
     $bill_name = $bill_data['bill_name'];
     $dayofmonth = $bill_data['bill_day'];
 
-    $day_data = getDates($dayofmonth);
+    $day_data = Billing::getDates($dayofmonth, 0);
 
     $datefrom = $day_data['0'];
     $dateto = $day_data['1'];
@@ -166,7 +170,7 @@ if (bill_permitted($bill_id)) {
             $background = \LibreNMS\Util\Color::percentage($percent, null);
             $type = '&amp;ave=yes'; ?>
         <td>
-            <?php echo format_bytes_billing($total_data) ?> of <?php echo format_bytes_billing($bill_data['bill_quota']) . ' (' . $percent . '%)' ?>
+            <?php echo Billing::formatBytes($total_data) ?> of <?php echo Billing::formatBytes($bill_data['bill_quota']) . ' (' . $percent . '%)' ?>
             - Average rate <?php echo Number::formatSi($rate_average, 2, 3, 'bps') ?>
         </td>
         <td style="width: 210px;"><?php echo print_percentage_bar(200, 20, $percent, null, 'ffffff', $background['left'], $percent . '%', 'ffffff', $background['right']) ?></td>
@@ -174,7 +178,7 @@ if (bill_permitted($bill_id)) {
         <tr>
             <td colspan="2">
             <?php
-            echo 'Predicted usage: ' . format_bytes_billing(getPredictedUsage($bill_data['bill_day'], $bill_data['total_data'])); ?>
+            echo 'Predicted usage: ' . Billing::formatBytes(Billing::getPredictedUsage($bill_data['bill_day'], $bill_data['total_data'])); ?>
             </td>
             <?php
         } elseif ($bill_data['bill_type'] == 'cdr') {
@@ -195,7 +199,7 @@ if (bill_permitted($bill_id)) {
         <tr>
             <td colspan="2">
             <?php
-                echo 'Predicted usage: ' . Number::formatSi(getPredictedUsage($bill_data['bill_day'], $bill_data['rate_95th']), 2, 3, '') . 'bps'; ?>
+                echo 'Predicted usage: ' . Number::formatSi(Billing::getPredictedUsage($bill_data['bill_day'], $bill_data['rate_95th']), 2, 3, '') . 'bps'; ?>
             </td>
 
         <?php

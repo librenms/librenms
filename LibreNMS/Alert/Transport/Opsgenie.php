@@ -24,45 +24,25 @@
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
-use LibreNMS\Util\Proxy;
+use LibreNMS\Exceptions\AlertTransportDeliveryException;
+use LibreNMS\Util\Http;
 
 class Opsgenie extends Transport
 {
-    public function deliverAlert($obj, $opts)
+    public function deliverAlert(array $alert_data): bool
     {
-        if (! empty($this->config)) {
-            $opts['url'] = $this->config['genie-url'];
+        $url = $this->config['genie-url'];
+
+        $res = Http::client()->post($url, $alert_data);
+
+        if ($res->successful()) {
+            return true;
         }
 
-        return $this->contactOpsgenie($obj, $opts);
+        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), '', $alert_data);
     }
 
-    public function contactOpsgenie($obj, $opts)
-    {
-        $url = $opts['url'];
-
-        $curl = curl_init();
-
-        Proxy::applyToCurl($curl);
-        curl_setopt($curl, CURLOPT_URL, $url);
-        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'POST');
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($curl, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
-        curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($obj));
-
-        $ret = curl_exec($curl);
-        $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-
-        if ($code != 200) {
-            var_dump('Error when sending post request to OpsGenie. Response code: ' . $code . ' Response body: ' . $ret); //FIXME: proper debugging
-
-            return false;
-        }
-
-        return true;
-    }
-
-    public static function configTemplate()
+    public static function configTemplate(): array
     {
         return [
             'config' => [

@@ -1,0 +1,1106 @@
+--**MOD+**********************************************************************
+--* Module:    ARUBAWIRED-LLDP-MIB :LLDP MIB file
+--*
+--* (c) Copyright 2019-2020 Hewlett Packard Enterprise Development LP
+--* All Rights Reserved.
+--*
+--* The contents of this software are proprietary and confidential
+--* to the Hewlett-Packard Development Company, L.P.  No part of this
+--* program may be photocopied, reproduced, or translated into another
+--* programming language without prior written consent of the
+--* Hewlett-Packard Development Company, L.P.
+--*
+--* Purpose: This file contains MIB definition of ARUBAWIRED-LLDP-MIB
+--*
+--**MOD-**********************************************************************
+
+ARUBAWIRED-LLDP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32
+            FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, TruthValue
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    wndFeatures
+            FROM ARUBAWIRED-NETWORKING-OID
+    lldpLocPortNum,
+    lldpRemTimeMark, lldpRemLocalPortNum, lldpRemIndex
+        FROM LLDP-MIB
+    entPhysicalIndex
+        FROM ENTITY-MIB;
+
+arubaWiredLldpMIB MODULE-IDENTITY
+    LAST-UPDATED "202010220000Z" -- October 22, 2020
+    ORGANIZATION "HPE/Aruba Networking Division"
+
+    CONTACT-INFO "Hewlett Packard Company
+                  8000 Foothills Blvd.
+                  Roseville, CA 95747"
+
+    DESCRIPTION
+        "This MIB module describes management objects
+         that manage LLDP information related to Power
+         Source Equipment (PSE). This is the MIB module
+         related to HPE Aruba LLDP"
+
+    REVISION "202010220000Z" -- October 22, 2020
+    DESCRIPTION "Updated arubaWiredLldpXdot3RemPowerTable
+                information"
+
+    REVISION "201904150000Z"  -- April 15, 2019
+    DESCRIPTION  "Initial revision."
+        ::= { wndFeatures 9 }
+
+-- ***************************************************************************
+-- LLDP 803.2bt Objects extension
+-- ***************************************************************************
+arubaWiredLldpXdot3Objects    OBJECT IDENTIFIER
+                                ::= { arubaWiredLldpMIB 1 }
+
+-- LLDP IEEE 802.3bt extension MIB groups
+arubaWiredLldpXdot3LocalData  OBJECT IDENTIFIER
+                                ::= { arubaWiredLldpXdot3Objects 1 }
+arubaWiredLldpXdot3RemoteData OBJECT IDENTIFIER
+                                ::= { arubaWiredLldpXdot3Objects 2 }
+
+-- ***************************************************************************
+-- arubaWiredLldpXdot3LocPowerTable: LLDP 803.2bt Objects extension
+-- ***************************************************************************
+arubaWiredLldpXdot3LocPowerTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF ArubaWiredLldpXdot3LocPowerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This table contains one row per port of power ethernet
+            information (as a part of the LLDP 802.3bt organizational
+            extension) on the local system known to this agent."
+    ::= { arubaWiredLldpXdot3LocalData 1 }
+
+arubaWiredLldpXdot3LocPowerEntry OBJECT-TYPE
+    SYNTAX      ArubaWiredLldpXdot3LocPowerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Information about a particular port component."
+    INDEX   { lldpLocPortNum }
+    ::= { arubaWiredLldpXdot3LocPowerTable 1 }
+
+ArubaWiredLldpXdot3LocPowerEntry ::=
+    SEQUENCE {
+        arubaWiredLldpXdot3LocPowerPortClass               INTEGER,
+        arubaWiredLldpXdot3LocPowerMDISupported            TruthValue,
+        arubaWiredLldpXdot3LocPowerMDIEnabled              TruthValue,
+        arubaWiredLldpXdot3LocPowerPairControlable         TruthValue,
+        arubaWiredLldpXdot3LocPowerPairs                   INTEGER,
+        arubaWiredLldpXdot3LocPowerClass                   INTEGER,
+        arubaWiredLldpXdot3LocPowerType                    INTEGER,
+        arubaWiredLldpXdot3LocPowerSource                  INTEGER,
+        arubaWiredLldpXdot3LocPowerPriority                INTEGER,
+        arubaWiredLldpXdot3LocPDRequestedPowerValue        Integer32,
+        arubaWiredLldpXdot3LocPDRequestedPowerValueA       Integer32,
+        arubaWiredLldpXdot3LocPDRequestedPowerValueB       Integer32,
+        arubaWiredLldpXdot3LocPSEAllocatedPowerValue       Integer32,
+        arubaWiredLldpXdot3LocPSEAllocatedPowerValueA      Integer32,
+        arubaWiredLldpXdot3LocPSEAllocatedPowerValueB      Integer32,
+        arubaWiredLldpXdot3LocPSEPoweringStatus            INTEGER,
+        arubaWiredLldpXdot3LocPowerPairsExt                INTEGER,
+        arubaWiredLldpXdot3LocPowerClassExtA               INTEGER,
+        arubaWiredLldpXdot3LocPowerClassExtB               INTEGER,
+        arubaWiredLldpXdot3LocPowerClassExt                INTEGER,
+        arubaWiredLldpXdot3LocPowerTypeExt                 INTEGER,
+        arubaWiredLldpXdot3LocPDLoad                       INTEGER,
+        arubaWiredLldpXdot3LocPSEMaxAvailPower             Integer32,
+        arubaWiredLldpXdot3LocPSEAutoclassSupport          TruthValue,
+        arubaWiredLldpXdot3LocAutoclassCompleted           TruthValue,
+        arubaWiredLldpLocPseTlvSentType                    INTEGER,
+        arubaWiredLldpLocPdTlvSentType                     INTEGER
+    }
+
+arubaWiredLldpXdot3LocPowerPortClass OBJECT-TYPE
+    SYNTAX      INTEGER {
+                  pClassPSE(1),
+                  pClassPD(2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The value that identifies the port Class of the given port
+                 associated with the local system."
+    ::= { arubaWiredLldpXdot3LocPowerEntry 1 }
+
+arubaWiredLldpXdot3LocPowerMDISupported OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The truth value used to indicate whether the MDI power is
+            supported on the given port associated with the local system."
+    REFERENCE
+            "IEEE P802.3bt/D3.4 Section 30.12.2.1.6
+            aLldpXdot3LocPowerMDISupported"
+    ::= { arubaWiredLldpXdot3LocPowerEntry 2 }
+
+arubaWiredLldpXdot3LocPowerMDIEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The truth value used to indicate whether the MDI power is
+            enabled on given port associated with the local system."
+    REFERENCE
+            "IEEE P802.3bt/D3.4 Section 30.12.2.1.7
+            aLldpXdot3LocPowerMDIEnabled"
+    ::= { arubaWiredLldpXdot3LocPowerEntry 3 }
+
+arubaWiredLldpXdot3LocPowerPairControlable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The truth value used to indicate the ability to control which
+            PSE Pinout Alternative is used for PD detection and power."
+    REFERENCE
+            "IEEE P802.3bt/D3.4 Section 30.12.2.1.8
+            aLldpXdot3LocPowerPairControllable"
+    ::= { arubaWiredLldpXdot3LocPowerEntry 4 }
+
+arubaWiredLldpXdot3LocPowerPairs OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    pairSignal(1),
+                    pairSpare(2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The truth value that identifies the PSE Pinout Alternative in
+            use for detecting and supplying power to the PD."
+    REFERENCE
+            "IEEE P802.3bt/D3.4 Section 30.12.2.1.9
+            aLldpXdot3LocPowerPairs"
+    ::= { arubaWiredLldpXdot3LocPowerEntry 5 }
+
+arubaWiredLldpXdot3LocPowerClass OBJECT-TYPE
+    SYNTAX      INTEGER   {
+                    class0(1),
+                    class1(2),
+                    class2(3),
+                    class3(4),
+                    class4(5)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The truth value that indicates the requested Class of the PD."
+    REFERENCE
+            "IEEE P802.3bt/D3.4 Section 30.12.2.1.10
+            aLldpXdot3LocPowerClass"
+    ::= { arubaWiredLldpXdot3LocPowerEntry 6 }
+
+arubaWiredLldpXdot3LocPowerType  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    type2PSE(1),
+                    type2PD(2),
+                    type1PSE(3),
+                    type1PD(4)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This field reflects the actual local power type."
+    REFERENCE
+            "IEEE P802.3bt/D3.4 Section 30.12.2.1.14
+            aLldpXdot3LocPowerType"
+    ::= { arubaWiredLldpXdot3LocPowerEntry 7 }
+
+arubaWiredLldpXdot3LocPowerSource OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    unknown(1),
+                    primary(2),
+                    backup(3),
+                    reserved(4)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This field reflects the requested local device power
+            source. When the power type is PSE, this field shall
+            be set to primary(2) when the PSE is sourcing its power
+            through the PI from its primary supply; to backup(3)
+            when the PSE is sourcing its power through the PI from
+            a backup source; and to unknown(1) when this information
+            is not available."
+    REFERENCE
+            "IEEE P802.3at/D3.0 33.7.2.1.2"
+    ::= { arubaWiredLldpXdot3LocPowerEntry 8 }
+
+arubaWiredLldpXdot3LocPowerPriority OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    unknown(1),
+                    critical(2),
+                    high(3),
+                    low(4)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "This field reflects the requested local device power
+            priority. When the power type is PD, this field shall
+            be set to the power priority configured for the device.
+            If a PD is unable to determine its power priority or
+            it has not been configured, then this field shall be
+            set to unknown(1). When the power type is PSE, this
+            field shall be set to unknown(1)."
+    REFERENCE
+            "IEEE P802.3at/D3.0 33.7.2.1.3"
+    ::= { arubaWiredLldpXdot3LocPowerEntry 9 }
+
+arubaWiredLldpXdot3LocPDRequestedPowerValue  OBJECT-TYPE
+    SYNTAX      Integer32 (0..999)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "It indicates the maximum input average power the PD is
+            requesting in units of 0.1 W."
+    REFERENCE
+            "IEEE P802.3bt/D3.4 Section 30.12.2.1.17
+            aLldpXdot3LocPDRequestedPowerValue"
+    ::= { arubaWiredLldpXdot3LocPowerEntry 10 }
+
+arubaWiredLldpXdot3LocPDRequestedPowerValueA  OBJECT-TYPE
+    SYNTAX      Integer32 (0..499)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "It indicates the PD requested power value for the Mode A
+            pairset in units of 0.1 W."
+    REFERENCE
+            "IEEE P802.3bt/D3.4 Section 30.12.2.1.17a
+            aLldpXdot3LocPDRequestedPowerValueA"
+    ::= { arubaWiredLldpXdot3LocPowerEntry 11 }
+
+arubaWiredLldpXdot3LocPDRequestedPowerValueB  OBJECT-TYPE
+    SYNTAX      Integer32 (0..499)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "It indicates the PD requested power value for the Mode B
+            pairset in units of 0.1 W."
+    REFERENCE
+            "IEEE P802.3bt/D3.4 Section 30.12.2.1.17b
+            aLldpXdot3LocPDRequestedPowerValueB"
+    ::= { arubaWiredLldpXdot3LocPowerEntry 12 }
+
+arubaWiredLldpXdot3LocPSEAllocatedPowerValue  OBJECT-TYPE
+    SYNTAX      Integer32 (0..999)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "It indicates the maximum input average power the
+            PSE expects the PD to draw in units of 0.1 W."
+    REFERENCE
+            "IEEE P802.3bt/D3.4 Section 30.12.2.1.18
+            aLldpXdot3LocPSEAllocatedPowerValue"
+    ::= { arubaWiredLldpXdot3LocPowerEntry 13 }
+
+arubaWiredLldpXdot3LocPSEAllocatedPowerValueA  OBJECT-TYPE
+    SYNTAX      Integer32 (0..499)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "It indicates the maximum input average power levels the PSE
+            expects the dual-signature PD to draw, in units of 0.1 W, on
+            Alternative A, when the PSE provides power over 4-pair."
+    REFERENCE
+            "IEEE P802.3bt/D3.4 Section 30.12.2.1.18a
+            aLldpXdot3LocPSEAllocatedPowerValueA"
+    ::= { arubaWiredLldpXdot3LocPowerEntry 14 }
+
+arubaWiredLldpXdot3LocPSEAllocatedPowerValueB  OBJECT-TYPE
+    SYNTAX      Integer32 (0..499)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "It indicates the maximum input average power levels the PSE
+            expects the dual-signature PD to draw, in units of 0.1 W, on
+            Alternative B, when the PSE provides power over 4-pair."
+    REFERENCE
+            "IEEE P802.3bt/D3.4 Section 30.12.2.1.18b
+            aLldpXdot3LocPSEAllocatedPowerValueB"
+    ::= { arubaWiredLldpXdot3LocPowerEntry 15 }
+
+arubaWiredLldpXdot3LocPSEPoweringStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    twoPair(1),
+                    fourPsinglesigPD(2),
+                    fourPdualsigPD(3)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "This field reflects the existing powering configuration
+            of the PSE and thus indicates that the PSE is using the
+            'PSE allocated power value' field or is using the 'PSE
+            allocated power value Alternative A' field and 'PSE
+            allocated power value Alternative B' field. For a PD the
+            contents of this attribute are undefined."
+    REFERENCE
+            "IEEE P802.3bt/D3.4 Section 30.12.2.1.18c
+            aLldpXdot3LocPSEPoweringStatus."
+    ::= { arubaWiredLldpXdot3LocPowerEntry 16 }
+
+arubaWiredLldpXdot3LocPowerPairsExt OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    altA(1),
+                    altB(2),
+                    both(3)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "This field indicates the supported PSE Pinout Alternative.
+            For a PD the contents of this attribute are undefined"
+    REFERENCE
+            "IEEE P802.3bt/D3.4 Section 30.12.2.1.18e
+            aLldpXdot3LocPowerPairsExt."
+    ::= { arubaWiredLldpXdot3LocPowerEntry 17 }
+
+arubaWiredLldpXdot3LocPowerClassExtA OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    singlesig(1),
+                    class1(2),
+                    class2(3),
+                    class3(4),
+                    class4(5),
+                    class5(6)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "For a dual-signature PD, it indicates the requested Class for
+            Mode A during Physical Layer Classification. For a single-signature
+            PD, a read-only value set to 'singlesig'. For a PSE connected to a
+            dual-signature PD, a read-only value that indicates the currently
+            assigned Class for Mode A. For a PSE connected to a single-signature
+            PD, or a PSE that operates only in 2-pair mode, the value is
+            set to 'singlesig'"
+    REFERENCE
+            "IEEE P802.3bt/D3.4 Section 30.12.2.1.18f
+            aLldpXdot3LocPowerClassExtA."
+    ::= { arubaWiredLldpXdot3LocPowerEntry 18 }
+
+arubaWiredLldpXdot3LocPowerClassExtB OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    singlesig(1),
+                    class1(2),
+                    class2(3),
+                    class3(4),
+                    class4(5),
+                    class5(6)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "For a dual-signature PD, it indicates the requested Class for
+            Mode B during Physical Layer Classification. For a single-signature
+            PD, a read-only value set to 'singlesig'. For a PSE connected to a
+            dual-signature PD, a read-only value that indicates the currently
+            assigned Class for Mode B. For a PSE connected to a single-signature
+            PD, or a PSE that operates only in 2-pair mode, the value is
+            set to 'singlesig'"
+    REFERENCE
+            "IEEE P802.3bt/D3.4 Section 30.12.2.1.18g
+            aLldpXdot3LocPowerClassExtB."
+    ::= { arubaWiredLldpXdot3LocPowerEntry 19 }
+
+arubaWiredLldpXdot3LocPowerClassExt OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    dualsig(1),
+                    class1(2),
+                    class2(3),
+                    class3(4),
+                    class4(5),
+                    class5(6),
+                    class6(7),
+                    class7(8),
+                    class8(9)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "For a single-signature PD, it indicates the requested Class
+            during Physical Layer Classification. For a dual-signature PD,
+            the value is set to 'dualsig'. For a PSE connected to a
+            single-signature PD or a PSE that operates only in 2-pair mode,
+            a readonly value that indicates the currently assigned Class.
+            For a PSE connected to a dualsignature PD, a read-only value
+            set to 'dualsig'."
+    REFERENCE
+            "IEEE P802.3bt/D3.4 Section 30.12.2.1.18h
+            aLldpXdot3LocPowerClassExt."
+    ::= { arubaWiredLldpXdot3LocPowerEntry 20 }
+
+arubaWiredLldpXdot3LocPowerTypeExt  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    type3PSE(1),
+                    type4PSE(2),
+                    type3singlesigPD(3),
+                    type3dualsigPD(4),
+                    type4singlesigPD(5),
+                    type4dualsigPD(6)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This field indicates if the local system is a Type 3 or Type 4
+            PSE or PD, and in the case of a Type 3 or Type 4 PD, if it is a
+            single-signature PD or a dual-signature PD"
+    REFERENCE
+            "IEEE P802.3bt/D3.4 Section 30.12.2.1.18i
+            aLldpXdot3LocPowerTypeExt"
+    ::= { arubaWiredLldpXdot3LocPowerEntry 21 }
+
+arubaWiredLldpXdot3LocPDLoad OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The truth value used to indicate whether the load of a dual-
+            signature PD is electrically isolated. For a single-signature
+            PD, or a PSE, the value of this attribute is FALSE."
+    REFERENCE
+            "IEEE P802.3bt/D3.4 Section 30.12.2.1.18j
+            aLldpXdot3LocPDLoad"
+    ::= { arubaWiredLldpXdot3LocPowerEntry 22 }
+
+arubaWiredLldpXdot3LocPSEMaxAvailPower  OBJECT-TYPE
+    SYNTAX      Integer32 (0..999)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "It indicates the local PSE maximum available power value
+            in units of 0.1 W."
+    REFERENCE
+            "IEEE P802.3bt/D3.4 Section 30.12.2.1.18l
+            aLldpXdot3LocPSEMaxAvailPower"
+    ::= { arubaWiredLldpXdot3LocPowerEntry 23 }
+
+arubaWiredLldpXdot3LocPSEAutoclassSupport OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "It indicates whether the local PSE system supports Autoclass"
+    REFERENCE
+            "IEEE P802.3bt/D3.4 Section 30.12.2.1.18m
+            aLldpXdot3LocPSEAutoclassSupport"
+    ::= { arubaWiredLldpXdot3LocPowerEntry 24 }
+
+arubaWiredLldpXdot3LocAutoclassCompleted OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "It indicates whether the local PSE system has completed
+             the Autoclass measurement"
+    REFERENCE
+            "IEEE P802.3bt/D3.4 Section 30.12.2.1.18n
+            aLldpXdot3LocAutoclassCompleted"
+    ::= { arubaWiredLldpXdot3LocPowerEntry 25 }
+
+arubaWiredLldpLocPseTlvSentType  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    med(1),
+                    dot3(2),
+                    dot3-ext(3)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This field specifies the set of TLVs that are actually
+             sent by the PSE"
+
+    ::= { arubaWiredLldpXdot3LocPowerEntry 26 }
+
+arubaWiredLldpLocPdTlvSentType  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    med(1),
+                    dot3(2),
+                    dot3-ext(3),
+                    medanddot3(4),
+                    medanddot3-ext(5)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This field specifies the set of TLVs that are actually
+            sent by the PD"
+
+    ::= { arubaWiredLldpXdot3LocPowerEntry 27 }
+
+-- ***************************************************************************
+-- arubaWiredLldpXdot3RemPowerTable: LLDP 803.2bt extension Remote Objects
+-- ***************************************************************************
+arubaWiredLldpXdot3RemPowerTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF ArubaWiredLldpXdot3RemPowerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This table contains one row per port of power ethernet
+            information (as a part of the LLDP 802.3bt organizational
+            extension) on the remote system known to this agent.
+            The MIB objects of this table are only supported for 4 pair PDs"
+    ::= { arubaWiredLldpXdot3RemoteData 1 }
+
+arubaWiredLldpXdot3RemPowerEntry OBJECT-TYPE
+    SYNTAX      ArubaWiredLldpXdot3RemPowerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Information about a particular port component."
+    INDEX   { lldpRemTimeMark,
+              lldpRemLocalPortNum,
+              lldpRemIndex }
+    ::= { arubaWiredLldpXdot3RemPowerTable 1 }
+
+ArubaWiredLldpXdot3RemPowerEntry ::=
+    SEQUENCE {
+        arubaWiredLldpXdot3RemPowerPortClass               INTEGER,
+        arubaWiredLldpXdot3RemPowerMDISupported            TruthValue,
+        arubaWiredLldpXdot3RemPowerMDIEnabled              TruthValue,
+        arubaWiredLldpXdot3RemPowerPairControlable         TruthValue,
+        arubaWiredLldpXdot3RemPowerPairs                   INTEGER,
+        arubaWiredLldpXdot3RemPowerClass                   INTEGER,
+        arubaWiredLldpXdot3RemPowerType                    INTEGER,
+        arubaWiredLldpXdot3RemPowerSource                  INTEGER,
+        arubaWiredLldpXdot3RemPowerPriority                INTEGER,
+        arubaWiredLldpXdot3RemPDRequestedPowerValue        Integer32,
+        arubaWiredLldpXdot3RemPDRequestedPowerValueA       Integer32,
+        arubaWiredLldpXdot3RemPDRequestedPowerValueB       Integer32,
+        arubaWiredLldpXdot3RemPSEAllocatedPowerValue       Integer32,
+        arubaWiredLldpXdot3RemPSEAllocatedPowerValueA      Integer32,
+        arubaWiredLldpXdot3RemPSEAllocatedPowerValueB      Integer32,
+        arubaWiredLldpXdot3RemPDPoweredStatus              INTEGER,
+        arubaWiredLldpXdot3RemPowerClassExtA               INTEGER,
+        arubaWiredLldpXdot3RemPowerClassExtB               INTEGER,
+        arubaWiredLldpXdot3RemPowerClassExt                INTEGER,
+        arubaWiredLldpXdot3RemPowerTypeExt                 INTEGER,
+        arubaWiredLldpXdot3RemPDLoad                       TruthValue,
+        arubaWiredLldpXdot3RemPD4PID                       TruthValue,
+        arubaWiredLldpXdot3RemPSEMaxAvailPower             Integer32,
+        arubaWiredLldpXdot3RemAutoclassRequest             TruthValue,
+        arubaWiredLldpXdot3RemPowerDownRequest             INTEGER,
+        arubaWiredLldpXdot3RemPowerDownTime                INTEGER
+    }
+
+arubaWiredLldpXdot3RemPowerPortClass OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    pClassPSE(1),
+                    pClassPD(2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The value that identifies the port Class of the given port
+                associated with the remote system."
+    ::= { arubaWiredLldpXdot3RemPowerEntry 1 }
+
+arubaWiredLldpXdot3RemPowerMDISupported OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The truth value used to indicate whether the MDI power is
+            supported on the given port associated with the remote system."
+    REFERENCE
+            "IEEE P802.3bt/D3.4 Section 30.12.3.1.6
+            aLldpXdot3RemPowerMDISupported"
+    ::= { arubaWiredLldpXdot3RemPowerEntry 2 }
+
+arubaWiredLldpXdot3RemPowerMDIEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The truth value used to indicate whether the MDI power is
+            enabled on given port associated with the remote system."
+    REFERENCE
+            "IEEE P802.3bt/D3.4 Section 30.12.3.1.7
+            aLldpXdot3RemPowerMDIEnabled"
+    ::= { arubaWiredLldpXdot3RemPowerEntry 3 }
+
+arubaWiredLldpXdot3RemPowerPairControlable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The truth value used to indicate the ability to control which
+            PSE Pinout Alternative is used for PD detection and power."
+    REFERENCE
+            "IEEE P802.3bt/D3.4 Section 30.12.3.1.8
+            aLldpXdot3RemPowerPairControllable"
+    ::= { arubaWiredLldpXdot3RemPowerEntry 4 }
+
+arubaWiredLldpXdot3RemPowerPairs OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    pairSignal(1),
+                    pairSpare(2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The truth value that identifies the PSE Pinout Alternative in
+            use for detecting and supplying power to the PD."
+    REFERENCE
+            "IEEE P802.3bt/D3.4 Section 30.12.3.1.9
+            aLldpXdot3RemPowerPairs"
+    ::= { arubaWiredLldpXdot3RemPowerEntry 5 }
+
+arubaWiredLldpXdot3RemPowerClass OBJECT-TYPE
+    SYNTAX      INTEGER   {
+                    class0(1),
+                    class1(2),
+                    class2(3),
+                    class3(4),
+                    class4(5)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The truth value that indicates the requested Class of the PD."
+    REFERENCE
+            "IEEE P802.3bt/D3.4 Section 30.12.3.1.10
+            aLldpXdot3RemPowerClass"
+    ::= { arubaWiredLldpXdot3RemPowerEntry 6 }
+
+arubaWiredLldpXdot3RemPowerType  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    type2PSE(1),
+                    type2PD(2),
+                    type1PSE(3),
+                    type1PD(4)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This field reflects the actual remote power type."
+    REFERENCE
+            "IEEE P802.3bt/D3.4 Section 30.12.3.1.14
+            aLldpXdot3RemPowerType"
+    ::= { arubaWiredLldpXdot3RemPowerEntry 7 }
+
+arubaWiredLldpXdot3RemPowerSource OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    unknown(1),
+                    pse(2),
+                    local(3),
+                    pseAndLocal(4)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This field reflects the remote device (PD) requested
+            power source. This field is encoded as
+            pseAndLocal(4) when a PD being powered both
+            locally and by a PSE, to local(3) when the PD being
+            powered locally only, and to pse(2) when the PD  is
+            being powered by a PSE"
+    ::= { arubaWiredLldpXdot3RemPowerEntry 8 }
+
+arubaWiredLldpXdot3RemPowerPriority OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    unknown(1),
+                    critical(2),
+                    high(3),
+                    low(4)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "This field reflects the requested remote device power
+            priority. When the power type is PD, this field shall
+            be set to the power priority configured for the device.
+            If a PD is unable to determine its power priority or
+            it has not been configured, then this field shall be
+            set to unknown(1). When the power type is PSE, this
+            field shall be set to unknown(1)."
+    ::= { arubaWiredLldpXdot3RemPowerEntry 9 }
+
+arubaWiredLldpXdot3RemPDRequestedPowerValue  OBJECT-TYPE
+    SYNTAX      Integer32 (0..999)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "It indicates the maximum input average power the PD is
+            requesting in units of 0.1 W."
+    REFERENCE
+            "IEEE P802.3bt/D3.4 Section 30.12.3.1.17
+            aLldpXdot3RemPDRequestedPowerValue"
+    ::= { arubaWiredLldpXdot3RemPowerEntry 10 }
+
+arubaWiredLldpXdot3RemPDRequestedPowerValueA  OBJECT-TYPE
+    SYNTAX      Integer32 (0..499)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "It indicates the PD requested power value for the Mode A
+            pairset in units of 0.1 W."
+    REFERENCE
+            "IEEE P802.3bt/D3.4 Section 30.12.3.1.17a
+            aLldpXdot3RemPDRequestedPowerValueA"
+    ::= { arubaWiredLldpXdot3RemPowerEntry 11 }
+
+arubaWiredLldpXdot3RemPDRequestedPowerValueB  OBJECT-TYPE
+    SYNTAX      Integer32 (0..499)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "It indicates the PD requested power value for the Mode B
+            pairset in units of 0.1 W."
+    REFERENCE
+            "IEEE P802.3bt/D3.4 Section 30.12.3.1.17b
+            aLldpXdot3RemPDRequestedPowerValueB"
+    ::= { arubaWiredLldpXdot3RemPowerEntry 12 }
+
+arubaWiredLldpXdot3RemPSEAllocatedPowerValue  OBJECT-TYPE
+    SYNTAX      Integer32 (0..999)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "It indicates the PSE allocated power value received from
+            the remote system. For a PSE, it is the PSE allocated power
+            value that was echoed back by the remote PD, in units of
+            0.1 W."
+    REFERENCE
+            "IEEE P802.3bt/D3.4 Section 30.12.3.1.18
+            aLldpXdot3RemPSEAllocatedPowerValue"
+    ::= { arubaWiredLldpXdot3RemPowerEntry 13 }
+
+arubaWiredLldpXdot3RemPSEAllocatedPowerValueA  OBJECT-TYPE
+    SYNTAX      Integer32 (0..499)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "It indicates the PSE allocated power value for the Alternative
+            A pairset received from the remote system. For a PSE, it is the
+            PSE allocated power value for the Alternative A pairset that
+            was echoed back by the remote PD, in units of 0.1 W."
+    REFERENCE
+            "IEEE P802.3bt/D3.4 Section 30.12.3.1.18a
+            aLldpXdot3RemPSEAllocatedPowerValueA"
+    ::= { arubaWiredLldpXdot3RemPowerEntry 14 }
+
+arubaWiredLldpXdot3RemPSEAllocatedPowerValueB  OBJECT-TYPE
+    SYNTAX      Integer32 (0..499)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "It indicates the PSE allocated power value for the Alternative
+            B pairset received from the remote system. For a PSE, it is the
+            PSE allocated power value for the Alternative A pairset that
+            was echoed back by the remote PD, in units of 0.1 W."
+    REFERENCE
+            "IEEE P802.3bt/D3.4 Section 30.12.3.1.18b
+            aLldpXdot3RemPSEAllocatedPowerValueB"
+    ::= { arubaWiredLldpXdot3RemPowerEntry 15 }
+
+arubaWiredLldpXdot3RemPDPoweredStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    singlesigPD(1),
+                    twoPdualsigPD(2),
+                    fourPdualsigPD(3)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "This field indicates the existing powered configuration
+            of the PD and thus indicate that the PD is using the 'PD
+            requested power value' field or is using the 'PD requested
+            power value Mode A' field and the 'PD requested power value
+            Mode B' field. For a PSE the contents of this attribute are
+            undefined."
+    REFERENCE
+            "IEEE P802.3bt/D3.4 Section 30.12.3.1.18d
+            aLldpXdot3RemPDPoweredStatus."
+    ::= { arubaWiredLldpXdot3RemPowerEntry 16 }
+
+arubaWiredLldpXdot3RemPowerClassExtA OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    singlesig(1),
+                    class1(2),
+                    class2(3),
+                    class3(4),
+                    class4(5),
+                    class5(6)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "For a dual-signature PD, a read-only value that indicates
+            the currently assigned Class for Mode A by the remote 4-pair
+            PSE. For a single-signature PD, or a dual-signature PD
+            connected to a 2-pair only PSE, a read-only value set to
+            'singlesig' by the remote PSE. For a PSE connected to a
+            dualsignature PD, a read-only value that indicates the
+            requested Class for Mode A during Physical Layer classification
+            by the remote PD. For a PSE connected to a single-signature PD,
+            a read-only value set to 'singlesig' by the remote PD"
+    REFERENCE
+            "IEEE P802.3bt/D3.4 Section 30.12.3.1.18f
+            aLldpXdot3RemPowerClassExtA."
+    ::= { arubaWiredLldpXdot3RemPowerEntry 17 }
+
+arubaWiredLldpXdot3RemPowerClassExtB OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    singlesig(1),
+                    class1(2),
+                    class2(3),
+                    class3(4),
+                    class4(5),
+                    class5(6)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "For a dual-signature PD, a read-only value that indicates
+            the currently assigned Class for Mode A by the remote 4-pair
+            PSE. For a single-signature PD, or a dual-signature PD connected
+            to a 2-pair only PSE, a read-only value set to 'singlesig'
+             by the remote PSE. For a PSE connected to a dualsignature PD,
+            a read-only value that indicates the requested Class for Mode B
+            during Physical Layer classification by the remote PD. For a
+            PSE connected to a single-signature PD, a read-only value set
+            to 'singlesig' by the remote PD."
+    REFERENCE
+            "IEEE P802.3bt/D3.4 Section 30.12.3.1.18g
+            aLldpXdot3RemPowerClassExtB."
+    ::= { arubaWiredLldpXdot3RemPowerEntry 18 }
+
+arubaWiredLldpXdot3RemPowerClassExt OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    dualsig(1),
+                    class1(2),
+                    class2(3),
+                    class3(4),
+                    class4(5),
+                    class5(6),
+                    class6(7),
+                    class7(8),
+                    class8(9)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "For a single-signature PD or a dual-signature PD connected
+            to a 2-pair only PSE, a read-only value that indicates the
+            currently assigned Class by the remote PSE. For a dual-
+            signature PD connected to a 4-pair capable PSE, a read-only
+            value set to 'dualsig' by the remote PSE. For a PSE connected
+            to a single-signature PD, a read-only value that indicates the
+            requested Class during Physical Layer classification by the
+            remote PD. For a PSE connected to a dual-signature PD, a readonly
+            value set to 'dualsig' by the remote PD."
+    REFERENCE
+            "IEEE P802.3bt/D3.4 Section 30.12.3.1.18h
+            aLldpXdot3RemPowerClassExt."
+    ::= { arubaWiredLldpXdot3RemPowerEntry 19 }
+
+arubaWiredLldpXdot3RemPowerTypeExt  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    type3PSE(1),
+                    type4PSE(2),
+                    type3singlesigPD(3),
+                    type3dualsigPD(4),
+                    type4singlesigPD(5),
+                    type4dualsigPD(6)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This field indicates if the remote system is a Type 3 or
+            Type 4 PSE or PD, and in the case of a Type 3 or Type 4 PD,
+            if it is a single-signature PD or dual-signature PD"
+    REFERENCE
+            "IEEE P802.3bt/D3.4 Section 30.12.3.1.18i
+            aLldpXdot3RemPowerTypeExt"
+    ::= { arubaWiredLldpXdot3RemPowerEntry 20 }
+
+arubaWiredLldpXdot3RemPDLoad OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The truth value used to indicate whether the load of the
+            remote dual-signature PD is electrically isolated. For a PD
+            this attribute is set to FALSE"
+    REFERENCE
+            "IEEE P802.3bt/D3.4 Section 30.12.3.1.18j
+            aLldpXdot3RemPDLoad"
+    ::= { arubaWiredLldpXdot3RemPowerEntry 21 }
+
+arubaWiredLldpXdot3RemPD4PID OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The truth value used to indicate whether the remote PD
+            system supports powering of both PD Modes"
+    REFERENCE
+            "IEEE P802.3bt/D3.4 Section 30.12.3.1.18k
+            aLldpXdot3RemPD4PID"
+    ::= { arubaWiredLldpXdot3RemPowerEntry 22 }
+
+arubaWiredLldpXdot3RemPSEMaxAvailPower  OBJECT-TYPE
+    SYNTAX      Integer32 (0..999)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "It indicates the remote PSE maximum available power value
+            in units of 0.1 W."
+    REFERENCE
+            "IEEE P802.3bt/D3.4 Section 30.12.3.1.18l
+            aLldpXdot3RemPSEMaxAvailPower"
+    ::= { arubaWiredLldpXdot3RemPowerEntry 23 }
+
+arubaWiredLldpXdot3RemAutoclassRequest OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "It indicates whether the remote PD system is requesting
+            an Autoclass measurement"
+    REFERENCE
+            "IEEE P802.3bt/D3.4 Section 30.12.3.1.18o
+            aLldpXdot3RemAutoclassRequest"
+    ::= { arubaWiredLldpXdot3RemPowerEntry 24 }
+
+arubaWiredLldpXdot3RemPowerDownRequest OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "It indicates that the remote PD system is requesting
+            a power down when the value is 0x1D"
+    REFERENCE
+            "IEEE P802.3bt/D3.4 Section 30.12.3.1.18p
+            aLldpXdot3RemPowerDownRequest"
+    ::= { arubaWiredLldpXdot3RemPowerEntry 25 }
+
+arubaWiredLldpXdot3RemPowerDownTime OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "It indicates the number of seconds the remote PD
+            requests to stay powered off. A value of zero
+            indicates an indefinite amount of time."
+    REFERENCE
+            "IEEE P802.3bt/D3.4 Section 30.12.3.1.18q
+            aLldpXdot3RemPowerDownTime"
+    ::= { arubaWiredLldpXdot3RemPowerEntry 26 }
+
+-- ------------------------------------------------------------
+-- Conformance information
+-- ------------------------------------------------------------
+
+arubaWiredLldpConformance OBJECT IDENTIFIER ::= { arubaWiredLldpMIB  2 }
+arubaWiredLldpCompliances OBJECT IDENTIFIER ::= { arubaWiredLldpConformance 1 }
+arubaWiredLldpGroups      OBJECT IDENTIFIER ::= { arubaWiredLldpConformance 2 }
+
+-- ------------------------------------------------------------
+-- compliance statements
+-- ------------------------------------------------------------
+
+arubaWiredLldpXdot3Compliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "The compliance statement for LLDP implementation."
+    MODULE  -- this module
+        MANDATORY-GROUPS { arubaWiredLldpXdot3LocSysGroup,
+                           arubaWiredLldpXdot3RemSysGroup
+        }
+    GROUP       arubaWiredLldpXdot3LocSysGroup
+    DESCRIPTION "A Collection of Object(s) that display
+                 the local lldp 802.3 poe information."
+
+    GROUP       arubaWiredLldpXdot3RemSysGroup
+    DESCRIPTION "A Collection of Object(s) that display
+                 the remote device lldp 802.3 poe information."
+
+    ::= { arubaWiredLldpCompliances 1 }
+
+-- MIB groupings
+arubaWiredLldpXdot3LocSysGroup OBJECT-GROUP
+        OBJECTS {
+                arubaWiredLldpXdot3LocPowerPortClass,
+                arubaWiredLldpXdot3LocPowerMDISupported,
+                arubaWiredLldpXdot3LocPowerMDIEnabled,
+                arubaWiredLldpXdot3LocPowerPairControlable,
+                arubaWiredLldpXdot3LocPowerPairs,
+                arubaWiredLldpXdot3LocPowerClass,
+                arubaWiredLldpXdot3LocPowerType,
+                arubaWiredLldpXdot3LocPowerSource,
+                arubaWiredLldpXdot3LocPowerPriority,
+                arubaWiredLldpXdot3LocPDRequestedPowerValue,
+                arubaWiredLldpXdot3LocPDRequestedPowerValueA,
+                arubaWiredLldpXdot3LocPDRequestedPowerValueB,
+                arubaWiredLldpXdot3LocPSEAllocatedPowerValue,
+                arubaWiredLldpXdot3LocPSEAllocatedPowerValueA,
+                arubaWiredLldpXdot3LocPSEAllocatedPowerValueB,
+                arubaWiredLldpXdot3LocPSEPoweringStatus,
+                arubaWiredLldpXdot3LocPowerPairsExt,
+                arubaWiredLldpXdot3LocPowerClassExtA,
+                arubaWiredLldpXdot3LocPowerClassExtB,
+                arubaWiredLldpXdot3LocPowerClassExt,
+                arubaWiredLldpXdot3LocPowerTypeExt,
+                arubaWiredLldpXdot3LocPDLoad,
+                arubaWiredLldpXdot3LocPSEMaxAvailPower,
+                arubaWiredLldpXdot3LocPSEAutoclassSupport,
+                arubaWiredLldpXdot3LocAutoclassCompleted,
+                arubaWiredLldpLocPseTlvSentType,
+                arubaWiredLldpLocPdTlvSentType
+        }
+        STATUS      current
+        DESCRIPTION
+            "The collection of objects which are used to represent LLDP
+            802.3 organizational extension for POEP Local Device Information.
+            This group is mandatory for agents which implement the
+            LLDP 802.3 organizational extension for POEP."
+
+        ::= { arubaWiredLldpGroups 1 }
+
+arubaWiredLldpXdot3RemSysGroup OBJECT-GROUP
+        OBJECTS {
+        arubaWiredLldpXdot3RemPowerPortClass,
+        arubaWiredLldpXdot3RemPowerMDISupported,
+        arubaWiredLldpXdot3RemPowerMDIEnabled,
+        arubaWiredLldpXdot3RemPowerPairControlable,
+        arubaWiredLldpXdot3RemPowerPairs,
+        arubaWiredLldpXdot3RemPowerClass,
+        arubaWiredLldpXdot3RemPowerType,
+        arubaWiredLldpXdot3RemPowerSource,
+        arubaWiredLldpXdot3RemPowerPriority,
+        arubaWiredLldpXdot3RemPDRequestedPowerValue,
+        arubaWiredLldpXdot3RemPDRequestedPowerValueA,
+        arubaWiredLldpXdot3RemPDRequestedPowerValueB,
+        arubaWiredLldpXdot3RemPSEAllocatedPowerValue,
+        arubaWiredLldpXdot3RemPSEAllocatedPowerValueA,
+        arubaWiredLldpXdot3RemPSEAllocatedPowerValueB,
+        arubaWiredLldpXdot3RemPDPoweredStatus,
+        arubaWiredLldpXdot3RemPowerClassExtA,
+        arubaWiredLldpXdot3RemPowerClassExtB,
+        arubaWiredLldpXdot3RemPowerClassExt,
+        arubaWiredLldpXdot3RemPowerTypeExt,
+        arubaWiredLldpXdot3RemPDLoad,
+        arubaWiredLldpXdot3RemPD4PID,
+        arubaWiredLldpXdot3RemPSEMaxAvailPower,
+        arubaWiredLldpXdot3RemAutoclassRequest,
+        arubaWiredLldpXdot3RemPowerDownRequest,
+        arubaWiredLldpXdot3RemPowerDownTime
+        }
+        STATUS      current
+        DESCRIPTION
+            "The collection of objects which are used to represent LLDP
+            802.3 organizational extension for POEP Remote Device Information.
+            This group is mandatory for agents which implement the
+            LLDP 802.3 organizational extension for POEP."
+
+        ::= { arubaWiredLldpGroups 2 }
+END

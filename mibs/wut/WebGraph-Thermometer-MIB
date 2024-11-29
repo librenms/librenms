@@ -1,0 +1,2143 @@
+WebGraph-Thermometer-MIB DEFINITIONS ::= BEGIN
+----------------------------------------------------------------
+-- Revison: 1.26
+----------------------------------------------------------------
+-- 28.06.2006  New: Community String Trap
+--  
+----------------------------------------------------------------
+-- Revison: 1.25
+----------------------------------------------------------------
+-- 22.05.2006  Table Entry Namen korrigiert
+--  
+----------------------------------------------------------------
+-- Revison: 1.24
+----------------------------------------------------------------
+-- 26.07.2005  #57605, WebGraph Thermometer
+--  CRON Zeitfunktion
+----------------------------------------------------------------
+-- Revison: 1.23
+----------------------------------------------------------------
+-- 14.07.2005  #57605, WebGraph Thermometer
+--  FTP Funktionen
+----------------------------------------------------------------
+-- Revison: 1.22
+----------------------------------------------------------------
+-- 02.06.2005  #57605, WebGraph Thermometer
+--  Trap NMS annotations
+----------------------------------------------------------------
+-- Revison: 1.21
+----------------------------------------------------------------
+-- 19.04.2005  #57605, WebGraph Themometer
+--  Mail Authentication
+----------------------------------------------------------------
+-- Revison: 1.20
+----------------------------------------------------------------
+-- 05.11.2004  #57605, WebGraph Themometer
+--  Neu: Syslog
+--       
+----------------------------------------------------------------
+-- Revison: 1.19
+----------------------------------------------------------------
+-- 27.09.2004  #57601/3/4, Webio Digital
+--  Neu: 
+--       Eintrag AlarmHysteresis korigiert
+----------------------------------------------------------------
+-- Revison: 1.18
+----------------------------------------------------------------
+-- 21.07.2004  #57601/3/4, Webio Digital
+--  Neu: 
+--       Diagnosis
+----------------------------------------------------------------
+-- Revison: 1.17
+----------------------------------------------------------------
+-- 28.06.2004  #57630/1/2, Webio Digital
+--  Neu: Puls Mode
+----------------------------------------------------------------
+-- Revison: 1.16
+----------------------------------------------------------------
+-- 16.04.2004  neu: #57632, Webio Digital EA24x24
+--
+--  #57630/1, Webio Digital EA12x12
+--  Neu:
+--   wtWebioAn1GraphInputCounterClear
+----------------------------------------------------------------
+-- Revison: 1.15
+----------------------------------------------------------------
+-- 27.02.2004  #57630/1, Webio Digital EA12x12
+--  Neu:
+--  Länge erweitert auf 32 Bit:
+--   wtWebioEA12x12InputValue
+--   wtWebioEA12x12OutputValue
+--   wtWebioEA12x12LoadControlView
+--   wtWebioEA12x12LCShutDownView
+--   wtWebioEA12x12SetOutput
+--   wtWebioEA12x12AlarmInputTrigger
+--   wtWebioEA12x12AlarmOutputTrigger
+--   wtWebioEA12x12PortOutputSafetyState
+----------------------------------------------------------------
+-- Revison: 1.14
+----------------------------------------------------------------
+-- 16.02.2004  #57630/1, Webio Digital EA12x12
+--  Neu:
+--  Texte: Location, Contact
+--  SNMP:  ColdStart, WarmStart, ComunityString Read/RW
+--  Alarm: ColdStart / WarmStart trigger
+--
+--    #57601, 1xWebThermometer
+--  #57603, 2xWebThermometer  
+--  #57604, 8xWebThermometer
+--  Neu:
+--  Alarm Hysterese 
+--  Alarm Clear Traps und Mails
+----------------------------------------------------------------
+-- Revison: 1.13
+----------------------------------------------------------------
+-- 05.02.2004  #57601, 1xWebThermometer
+--  #57603, 2xWebThermometer  
+--  #57604, 8xWebThermometer
+--  Neu:
+--  Texte: Location, Contact
+--  SNMP:  ColdStart, WarmStart, ComunityString Read/RW
+--  Alarm: ColdStart / WarmStart trigger
+----------------------------------------------------------------
+-- Revison: 1.12
+----------------------------------------------------------------
+-- 05.11.2003  #57601, 1xWebThermometer
+--  #57603, 2xWebThermometer  
+--  #57604, 8xWebThermometer
+--  Neu:
+--  Mail Option: CSV attachment
+--  Offsetkalibrierung
+--  Alarm: Tcp Client mode
+----------------------------------------------------------------
+-- Revison: 1.11
+----------------------------------------------------------------
+-- 28.10.2003  #57630/1, Webio Digital EA12x12
+--  Neue Feature:
+--  Alarm : TCP Client mode  
+--  INPUTS: Pulsfilter
+----------------------------------------------------------------
+-- Revison: 1.10
+----------------------------------------------------------------
+-- 04.07.2003  #57630, Webio Digital EA12x12
+--  Neuer Menübaum, neue Binärmodi  
+--
+----------------------------------------------------------------
+-- Revison: 1.09
+----------------------------------------------------------------
+-- 24.03.2003  Trap Enterprise (Type 1, 2) korrigiert 
+--  
+----------------------------------------------------------------
+-- Revison: 1.08
+----------------------------------------------------------------
+-- 04.03.2003  Abgleich der Sprachversionen DE/US 
+--  
+----------------------------------------------------------------
+-- Revison: 1.07
+----------------------------------------------------------------
+-- 25.02.2003  Korrektur US: wtWebioEA12x12LoadControl
+----------------------------------------------------------------
+-- Revison: 1.06
+----------------------------------------------------------------
+-- 24.02.2003  Neu:
+--  #57630, Webio EA12x12, LoadControl Group
+--  Korrektur: Trap variable Namen
+----------------------------------------------------------------
+-- Revison: 1.05
+----------------------------------------------------------------
+-- 21.01.2003  Neu:
+--  #57630, Webio EA12x12
+----------------------------------------------------------------
+-- Revison: 1.04
+----------------------------------------------------------------
+-- 02.01.2003  Neu:
+--  #57601, 1xWebThermometer
+--  #57603, 2xWebThermometer, 8 Alarme
+----------------------------------------------------------------
+-- Revison: 1.03
+----------------------------------------------------------------
+-- 21.11.2002  Neu:
+--  #57604, 2xWebThermometer, BOOTP, StartupSite
+--  #57603, 8xWebThermometer, BOOTP, StartupSite
+----------------------------------------------------------------
+-- Revison: 1.02
+----------------------------------------------------------------
+-- 26.07.2002  Neu:
+--  #57604, 2xWebThermometer
+--  #57603, 8xWebThermometer
+--   
+
+    IMPORTS
+
+    OBJECT-TYPE                                        FROM RFC-1212
+    TRAP-TYPE                                          FROM RFC-1215
+    DisplayString, PhysAddress                         FROM RFC1213-MIB
+    enterprises, TimeTicks, IpAddress, NetworkAddress  FROM RFC1155-SMI;
+
+ 
+--    IpAddress ::=
+--        [APPLICATION 0]
+--            IMPLICIT OCTET STRING (SIZE (4))
+--    Counter ::=
+--        [APPLICATION 1]
+--            IMPLICIT INTEGER (0..4294967295)
+--    Gauge ::=
+--        [APPLICATION 2]
+--            IMPLICIT INTEGER (0..4294967295)
+--    TimeTicks ::=
+--        [APPLICATION 3]
+--            IMPLICIT INTEGER (0..4294967295)
+
+
+--    DisplayString ::= OCTET STRING
+--    PhysAddress   ::= OCTET STRING
+
+--    internet         OBJECT IDENTIFIER ::= { iso org(3) dod(6) 1 }
+--    privat           OBJECT IDENTIFIER ::= { internet 4 }
+--    enterprises      OBJECT IDENTIFIER ::= { privat 1 }
+
+
+
+--  Wiesemann & Theis Com-Server MIB
+
+    wut                  OBJECT IDENTIFIER ::= { enterprises 5040 }
+    wtComServer          OBJECT IDENTIFIER ::= { wut 1 }
+    wtWebio              OBJECT IDENTIFIER ::= { wtComServer 2 }
+
+
+--  wtWebio Tree
+
+    wtWebioAn1Graph      OBJECT IDENTIFIER ::= { wtWebio 8 }
+    
+--  wtWebioAn1Graph Tree
+
+    wtWebioAn1GraphTemp       OBJECT IDENTIFIER ::= { wtWebioAn1Graph 1 }
+    wtWebioAn1GraphSessCntrl  OBJECT IDENTIFIER ::= { wtWebioAn1Graph 2 }
+    wtWebioAn1GraphConfig     OBJECT IDENTIFIER ::= { wtWebioAn1Graph 3 }
+    wtWebioAn1GraphDiag     OBJECT IDENTIFIER ::= { wtWebioAn1Graph 4 }
+    
+--  wtWebioAn1GraphConfig Tree
+
+    wtWebioAn1GraphDevice     OBJECT IDENTIFIER ::= { wtWebioAn1GraphConfig 1 }
+    wtWebioAn1GraphPorts      OBJECT IDENTIFIER ::= { wtWebioAn1GraphConfig 2 } 
+    wtWebioAn1GraphManufact   OBJECT IDENTIFIER ::= { wtWebioAn1GraphConfig 3 } 
+
+--  wtWebioAn1GraphDevice Tree
+
+    wtWebioAn1GraphText  OBJECT IDENTIFIER ::= { wtWebioAn1GraphDevice 1 } 
+    wtWebioAn1GraphTimeDate  OBJECT IDENTIFIER ::= { wtWebioAn1GraphDevice 2 }
+    wtWebioAn1GraphBasic OBJECT IDENTIFIER ::= { wtWebioAn1GraphDevice 3 } 
+    wtWebioAn1GraphDatalogger OBJECT IDENTIFIER ::= { wtWebioAn1GraphDevice 4 } 
+    wtWebioAn1GraphAlarm OBJECT IDENTIFIER ::= { wtWebioAn1GraphDevice 5 }
+    
+--  wtWebioAn1GraphTimeDate Tree
+
+    wtWebioAn1GraphTimeZone OBJECT IDENTIFIER ::= { wtWebioAn1GraphTimeDate 1 }
+    wtWebioAn1GraphTimeServer OBJECT IDENTIFIER ::= { wtWebioAn1GraphTimeDate 2 } 
+    wtWebioAn1GraphDeviceClock OBJECT IDENTIFIER ::= { wtWebioAn1GraphTimeDate 3 }
+
+--  wtWebioAn1GraphBasic Tree
+    
+    wtWebioAn1GraphNetwork OBJECT IDENTIFIER ::= { wtWebioAn1GraphBasic 1 }
+    wtWebioAn1GraphHTTP  OBJECT IDENTIFIER ::= { wtWebioAn1GraphBasic 2 }
+    wtWebioAn1GraphMail  OBJECT IDENTIFIER ::= { wtWebioAn1GraphBasic 3 } 
+    wtWebioAn1GraphSNMP  OBJECT IDENTIFIER ::= { wtWebioAn1GraphBasic 4 }
+    wtWebioAn1GraphUDP  OBJECT IDENTIFIER ::= { wtWebioAn1GraphBasic 5 }
+    wtWebioAn1GraphSyslog OBJECT IDENTIFIER ::= { wtWebioAn1GraphBasic 6 }
+    wtWebioAn1GraphFTP  OBJECT IDENTIFIER ::= { wtWebioAn1GraphBasic 7 }
+    
+
+
+-- wtWebioAn1GraphTemp Group
+------------------------
+
+wtWebioAn1GraphSensors OBJECT-TYPE
+    SYNTAX INTEGER (1)
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Anzahl der Temperatursensoren"
+    ::= { wtWebioAn1GraphTemp 1 }
+
+-- Interface Table
+
+wtWebioAn1GraphSensorTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF WtWebioAn1GraphSensorEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Liste der Sensoren."
+    ::= { wtWebioAn1GraphTemp 2 }
+
+wtWebioAn1GraphSensorEntry OBJECT-TYPE
+    SYNTAX WtWebioAn1GraphSensorEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Nummern der Temperatursensoren."
+    INDEX  { wtWebioAn1GraphSensorNo }
+    ::= { wtWebioAn1GraphSensorTable 1 }
+
+WtWebioAn1GraphSensorEntry ::= SEQUENCE {
+    wtWebioAn1GraphSensorNo INTEGER
+}
+
+wtWebioAn1GraphSensorNo OBJECT-TYPE
+    SYNTAX INTEGER (1)
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Nummer des Temperatursensors."
+    ::= { wtWebioAn1GraphSensorEntry 1 }
+
+
+-- wtWebioAn1GraphTempValue Table
+
+wtWebioAn1GraphTempValueTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF WtWebioAn1GraphTempValueEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Liste Temperaturwerte korrespondiernd zu den Kanalnummern."
+    ::= { wtWebioAn1GraphTemp 3 }
+
+wtWebioAn1GraphTempValueEntry OBJECT-TYPE
+    SYNTAX WtWebioAn1GraphTempValueEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Temperaturen der Sensoren."
+    INDEX  { wtWebioAn1GraphSensorNo }
+    ::= { wtWebioAn1GraphTempValueTable 1 }
+
+WtWebioAn1GraphTempValueEntry ::= SEQUENCE{
+    wtWebioAn1GraphTempValue OCTET STRING
+}
+
+wtWebioAn1GraphTempValue OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (5))
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Temperaturwert des Sensors, ASCII, 5 Zeichen lang."
+    ::= { wtWebioAn1GraphTempValueEntry 1 }
+
+-- wtWebioAn1GraphBinaryTempValue Table
+
+wtWebioAn1GraphBinaryTempValueTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF WtWebioAn1GraphBinaryTempValueEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Liste binärer Temperaturwerte korrespondiernd zu den Kanalnummern."
+    ::= { wtWebioAn1GraphTemp 4 }
+
+wtWebioAn1GraphBinaryTempValueEntry OBJECT-TYPE
+    SYNTAX WtWebioAn1GraphBinaryTempValueEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Binäre Temperaturen der Sensoren."
+    INDEX  { wtWebioAn1GraphSensorNo }
+    ::= { wtWebioAn1GraphBinaryTempValueTable 1 }
+
+WtWebioAn1GraphBinaryTempValueEntry ::= SEQUENCE{
+    wtWebioAn1GraphBinaryTempValue INTEGER
+}    
+
+wtWebioAn1GraphBinaryTempValue OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Binärer Temperaturwert des Sensors in 1/10 Grad Celcius,
+        vorzeichenbehaftete Zahl, der Wert 0x7FFF zeigt einen 
+        ungültigen Messwert an."
+    ::= { wtWebioAn1GraphBinaryTempValueEntry 1 }
+
+-- wtWebioAn1GraphSessCntrl Group
+--------------------------------
+
+wtWebioAn1GraphSessCntrlPassword OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Durch Eintrag diese Passworts wird eine Session eröffnet, die durch Schreiben einer 1 
+        in wtWebioAn1GraphSessCntrlLogout beendet wird. Gelesen liefert diese Variable einen String der
+        Länge Null."
+    ::= { wtWebioAn1GraphSessCntrl 1 }
+
+wtWebioAn1GraphSessCntrlConfigMode OBJECT-TYPE
+    SYNTAX INTEGER {
+    wtWebioAn1GraphSessCntrl-NoSession(0),
+    wtWebioAn1GraphSessCntrl-Session(1)
+    }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Wenn sich das Gerät im SNMP-Konfigurationsmodus befindet, wird der Wert
+        1 zurückgeliefert, ansonsten 0. Ist der ausgelesene Wert 0
+        obwohl das Passwort geschrieben wurde, befindet sich das Gerät bereits
+        im Configmodus und die Variablen können nur gelesen werden."
+    ::= { wtWebioAn1GraphSessCntrl 2 }
+
+wtWebioAn1GraphSessCntrlLogout OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Wenn sich das Gerät im Konfigurationsmodus befindet und die Session wurde
+        von diesem SNMP Manager eröffnet, kann durch Schreiben einer 1 in diese 
+        Variable die Session beendet werden und alle Parameter werden gespeichert.
+        Durch Schreiben einer 2 werden alle Eingaben wieder verworfen.
+        Gelesen liefert diese Variable den Wert 0."
+    ::= { wtWebioAn1GraphSessCntrl 3 }
+
+wtWebioAn1GraphSessCntrlAdminPassword OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Dieses Passwort schützt den Zugang der Variablen mit Administratorrechten. Es kann nur vom
+        Administrator verändert werden. Wurde kein Passwort vergeben so ist public das gültige Passwort.
+        Gelesen liefert diese Variable einen Null-Pointer."
+    ::= { wtWebioAn1GraphSessCntrl 4 }
+
+wtWebioAn1GraphSessCntrlConfigPassword OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Dieses Passwort schützt den Zugang der Variablen mit Configuratorrechten. Es kann vom
+        Administrator und vom Configurator verändert werden. Wurde kein Passwort vergeben so ist 
+        public das gültige Passwort.Gelesen liefert diese Variable einen Null-Pointer."
+    ::= { wtWebioAn1GraphSessCntrl 5 }
+    
+
+-- wtWebioAn1GraphText Group
+------------------------
+
+wtWebioAn1GraphDeviceName OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Name des Webio's, der userdefinierbar ist."
+    ::= { wtWebioAn1GraphText 1 }
+
+wtWebioAn1GraphDeviceText OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Beschreibung des Webio's, die userdefinierbar ist."
+    ::= { wtWebioAn1GraphText 2 }
+
+wtWebioAn1GraphDeviceLocation OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Aufstellort des Webio's, die userdefinierbar ist."
+    ::= { wtWebioAn1GraphText 3 }
+
+wtWebioAn1GraphDeviceContact OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Kontactadresse im Servicefall des Webio's, die userdefinierbar ist."
+    ::= { wtWebioAn1GraphText 4 }
+
+-- wtWebioAn1GraphTimeZone Group
+----------------------------
+
+wtWebioAn1GraphTzOffsetHrs OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Offset Stunden der Zeitzone (Winterzeit) in Bezug auf UTC."
+    ::= { wtWebioAn1GraphTimeZone 1 }
+
+wtWebioAn1GraphTzOffsetMin OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Offset Minuten der Zeitzone (Winterzeit) in Bezug auf UTC."
+    ::= { wtWebioAn1GraphTimeZone 2 }
+    
+wtWebioAn1GraphTzEnable OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(4))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Binär kodierte Bedingung:
+        Octet 1: ungenutzt
+        Octet 2: ungenutzt
+        Octet 3: ungenutzt
+        Octet 4:
+         Bit 1-7: ungenutzt
+         Bit 0  : Apply Timezone"
+    ::= { wtWebioAn1GraphTimeZone 3 }    
+
+wtWebioAn1GraphStTzOffsetHrs OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Offset Stunden der Zeitzone (Sommerzeit) in Bezug auf UTC."
+    ::= { wtWebioAn1GraphTimeZone 4 }
+
+wtWebioAn1GraphStTzOffsetMin OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Offset Minuten der Zeitzone (Sommerzeit) in Bezug auf UTC."
+    ::= { wtWebioAn1GraphTimeZone 5 }
+
+wtWebioAn1GraphStTzEnable OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(4))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Binär kodierte Bedingung:
+        Octet 1: ungenutzt
+        Octet 2: ungenutzt
+        Octet 3: ungenutzt
+        Octet 4:
+         Bit 1-7: ungenutzt
+         Bit 0  : Apply Summertime"
+    ::= { wtWebioAn1GraphTimeZone 6 }   
+    
+wtWebioAn1GraphStTzStartMonth OBJECT-TYPE
+    SYNTAX INTEGER {
+     wtWebioAn1GraphStartMonth-January(1),
+     wtWebioAn1GraphStartMonth-February(2),
+     wtWebioAn1GraphStartMonth-March(3),
+     wtWebioAn1GraphStartMonth-April(4),
+     wtWebioAn1GraphStartMonth-May(5),
+     wtWebioAn1GraphStartMonth-June(6),
+     wtWebioAn1GraphStartMonth-July(7),
+     wtWebioAn1GraphStartMonth-August(8),
+     wtWebioAn1GraphStartMonth-September(9),
+     wtWebioAn1GraphStartMonth-October(10),
+     wtWebioAn1GraphStartMonth-November(11),
+     wtWebioAn1GraphStartMonth-December(12)
+     }
+     
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Monat, in dem von Winterzeit auf Sommerzeit umgestellt wird."
+    ::= { wtWebioAn1GraphTimeZone 7 }
+
+wtWebioAn1GraphStTzStartMode OBJECT-TYPE
+    SYNTAX INTEGER {
+     wtWebioAn1GraphStartMode-first(1),
+     wtWebioAn1GraphStartMode-second(2),
+     wtWebioAn1GraphStartMode-third(3),
+     wtWebioAn1GraphStartMode-fourth(4),
+     wtWebioAn1GraphStartMode-last(5)
+     }
+     
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Modus des Wochentages, bei dem von Winterzeit auf Sommerzeit umgestellt wird."
+    ::= { wtWebioAn1GraphTimeZone 8 }
+
+wtWebioAn1GraphStTzStartWday OBJECT-TYPE
+    SYNTAX INTEGER {
+     wtWebioAn1GraphStartWday-Sunday(1),
+     wtWebioAn1GraphStartWday-Monday(2),
+     wtWebioAn1GraphStartWday-Tuesday(3),
+     wtWebioAn1GraphStartWday-Thursday(4),
+     wtWebioAn1GraphStartWday-Wednesday(5),
+     wtWebioAn1GraphStartWday-Friday(6),
+     wtWebioAn1GraphStartWday-Saturday(7)
+     }
+     
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Wochentag, bei dem von Winterzeit auf Sommerzeit umgestellt wird"
+    ::= { wtWebioAn1GraphTimeZone 9 }
+    
+wtWebioAn1GraphStTzStartHrs OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Stunde, in der die Zeitzone von Winter auf Sommerzeit in Bezug auf UTC
+        umgestellt wird."
+    ::= { wtWebioAn1GraphTimeZone 10 }
+
+wtWebioAn1GraphStTzStartMin OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Minute, in der die Zeitzone von Winter auf Sommerzeit in Bezug auf UTC
+        umgestellt wird."
+    ::= { wtWebioAn1GraphTimeZone 11 }
+ 
+wtWebioAn1GraphStTzStopMonth OBJECT-TYPE
+    SYNTAX INTEGER {
+     wtWebioAn1GraphStopMonth-January(1),
+     wtWebioAn1GraphStopMonth-February(2),
+     wtWebioAn1GraphStopMonth-March(3),
+     wtWebioAn1GraphStopMonth-April(4),
+     wtWebioAn1GraphStopMonth-May(5),
+     wtWebioAn1GraphStopMonth-June(6),
+     wtWebioAn1GraphStopMonth-July(7),
+     wtWebioAn1GraphStopMonth-August(8),
+     wtWebioAn1GraphStopMonth-September(9),
+     wtWebioAn1GraphStopMonth-October(10),
+     wtWebioAn1GraphStopMonth-November(11),
+     wtWebioAn1GraphStopMonth-December(12)
+     }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Monat, bei dem von Sommerzeit auf Winterzeit umgestellt wird."
+   ::= { wtWebioAn1GraphTimeZone 12 }
+
+wtWebioAn1GraphStTzStopMode OBJECT-TYPE
+    SYNTAX INTEGER {
+     wtWebioAn1GraphStopMode-first(1),
+     wtWebioAn1GraphStopMode-second(2),
+     wtWebioAn1GraphStopMode-third(3),
+     wtWebioAn1GraphStopMode-fourth(4),
+     wtWebioAn1GraphStopMode-last(5)
+     }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Modus des Wochentages, bei dem von Sommerzeit auf Winterzeit umgestellt wird."
+    ::= { wtWebioAn1GraphTimeZone 13 }
+
+wtWebioAn1GraphStTzStopWday OBJECT-TYPE
+    SYNTAX INTEGER {
+     wtWebioAn1GraphStopWday-Sunday(1),
+     wtWebioAn1GraphStopWday-Monday(2),
+     wtWebioAn1GraphStopWday-Tuesday(3),
+     wtWebioAn1GraphStopWday-Thursday(4),
+     wtWebioAn1GraphStopWday-Wednesday(5),
+     wtWebioAn1GraphStopWday-Friday(6),
+     wtWebioAn1GraphStopWday-Saturday(7)
+     }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Wochentage, bei dem von Sommerzeit auf Winterzeit umgestellt wird."
+    ::= { wtWebioAn1GraphTimeZone 14 }
+    
+wtWebioAn1GraphStTzStopHrs OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Stunde, in der die Zeitzone von Sommer auf Winterzeit in Bezug auf UTC
+        umgestellt wird."
+    ::= { wtWebioAn1GraphTimeZone 15 }
+
+wtWebioAn1GraphStTzStopMin OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Minute, in der die Zeitzone von Sommer auf Winterzeit in Bezug auf UTC
+        umgestellt wird."
+    ::= { wtWebioAn1GraphTimeZone 16 }
+
+-- wtWebioAn1GraphTimeServer Group
+----------------------------
+
+wtWebioAn1GraphTimeServer1 OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "IP-Adresse oder Name des 1. Time Servers in ASCII"
+    ::= { wtWebioAn1GraphTimeServer 1 }
+
+wtWebioAn1GraphTimeServer2 OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "IP-Adresse oder Name des 2. Time Servers in ASCII"
+    ::= { wtWebioAn1GraphTimeServer 2 }
+    
+wtWebioAn1GraphTsEnable OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(4))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Binär kodierte Bedingung:
+        Octet 1: ungenutzt
+        Octet 2: ungenutzt
+        Octet 3: ungenutzt
+        Octet 4:
+         Bit 1-7: ungenutzt
+         Bit 0  : Apply Time Server"
+    ::= { wtWebioAn1GraphTimeServer 3 }
+    
+wtWebioAn1GraphTsSyncTime OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Die Abfrage der Timeserver erfolgt zu dieser vollen Stunde (0-23)."
+    ::= { wtWebioAn1GraphTimeServer 4 }    
+    
+-- wtWebioAn1GraphDeviceClock Group
+----------------------------
+
+wtWebioAn1GraphClockHrs OBJECT-TYPE
+    SYNTAX INTEGER (0..23)
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Uhrzeit Stunde, unter Berücksichtigung der Zeitzoneneinstellungen."
+    ::= { wtWebioAn1GraphDeviceClock 1 }
+
+wtWebioAn1GraphClockMin OBJECT-TYPE
+    SYNTAX INTEGER (0..59)
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Uhrzeit Minute, unter Berücksichtigung der Zeitzoneneinstellungen."
+    ::= { wtWebioAn1GraphDeviceClock 2 }
+
+wtWebioAn1GraphClockDay OBJECT-TYPE
+    SYNTAX INTEGER (1..31)
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Datum: Tag des Monats, unter Berücksichtigung der Zeitzoneneinstellungen."
+    ::= { wtWebioAn1GraphDeviceClock 3 }
+
+wtWebioAn1GraphClockMonth OBJECT-TYPE
+   SYNTAX INTEGER {
+     wtWebioAn1GraphClockMonth-January(1),
+     wtWebioAn1GraphClockMonth-February(2),
+     wtWebioAn1GraphClockMonth-March(3),
+     wtWebioAn1GraphClockMonth-April(4),
+     wtWebioAn1GraphClockMonth-May(5),
+     wtWebioAn1GraphClockMonth-June(6),
+     wtWebioAn1GraphClockMonth-July(7),
+     wtWebioAn1GraphClockMonth-August(8),
+     wtWebioAn1GraphClockMonth-September(9),
+     wtWebioAn1GraphClockMonth-October(10),
+     wtWebioAn1GraphClockMonth-November(11),
+     wtWebioAn1GraphClockMonth-December(12)
+     }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Datum: Monat, unter Berücksichtigung der Zeitzoneneinstellungen."
+    ::= { wtWebioAn1GraphDeviceClock 4 }
+
+wtWebioAn1GraphClockYear OBJECT-TYPE
+    SYNTAX INTEGER (0..65535)
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Datum: Jahr, unter Berücksichtigung der Zeitzoneneinstellungen."
+    ::= { wtWebioAn1GraphDeviceClock 5 }
+    
+
+-- wtWebioAn1GraphNetwork Group
+------------------------
+
+wtWebioAn1GraphIpAddress OBJECT-TYPE
+    SYNTAX IpAddress
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "IP-Adresse des Webio's"
+    ::= { wtWebioAn1GraphNetwork 1 }
+
+wtWebioAn1GraphSubnetMask OBJECT-TYPE
+    SYNTAX IpAddress
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Subnetmask des Webio's"
+    ::= { wtWebioAn1GraphNetwork 2 }
+
+wtWebioAn1GraphGateway OBJECT-TYPE
+    SYNTAX IpAddress
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Gateway des Webio's"
+    ::= { wtWebioAn1GraphNetwork 3 }
+
+wtWebioAn1GraphDnsServer1 OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "IP-Adresse des 1. DNS Servers in ASCII"
+    ::= { wtWebioAn1GraphNetwork 4 }
+
+wtWebioAn1GraphDnsServer2 OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "IP-Adresse des 2. DNS Servers in ASCII"
+    ::= { wtWebioAn1GraphNetwork 5 }
+
+wtWebioAn1GraphAddConfig OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Zusatzkonfiguration (1=EIN):
+        Octet 1: ungenutzt
+        Octet 2: ungenutzt
+        Octet 3: ungenutzt
+        Octet 4:
+         Bit 0: BOOTP disable
+         "
+    ::= { wtWebioAn1GraphNetwork 6 }
+    
+--  wtWebioAn1GraphHTTP Group
+--------------------------------
+
+wtWebioAn1GraphStartup OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Legt die Startseite fest, nur eine Auswahl zulässig:
+        Octet 1: ungenutzt
+        Octet 2: ungenutzt
+        Octet 3: ungenutzt
+        Octet 4:
+         Bit 2: user.htm
+         Bit 1: home.htm
+         Bit 0: index.htm"
+    ::= { wtWebioAn1GraphHTTP 1 }
+
+wtWebioAn1GraphGetHeaderEnable OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Wenn freigeschaltet, wird eine Erkennungssequenz nach 
+        jeder GET-Anfrage der Antwort vorangestellt:
+        Octet 1: ungenutzt
+        Octet 2: ungenutzt
+        Octet 3: ungenutzt
+        Octet 4:
+         Bit 1-7: ungenutzt
+                Bit 0  : GET Header enable"
+    ::= { wtWebioAn1GraphHTTP 2 }  
+    
+wtWebioAn1GraphHttpPort OBJECT-TYPE
+    SYNTAX INTEGER (1..65535)
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "HTTP Port, an den die TCP-Anfragen gesendet werden können (Default: 80)."
+    ::= { wtWebioAn1GraphHTTP 3 }    
+
+-- wtWebioAn1GraphMail Group
+--------------------------------
+
+wtWebioAn1GraphMailAdName OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Gerätename für die Mail-Administration."
+    ::= { wtWebioAn1GraphMail 1 }
+    
+wtWebioAn1GraphMailReply OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Reply-Adresse für den Mailserver."
+    ::= { wtWebioAn1GraphMail 2 }
+    
+wtWebioAn1GraphMailServer OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Name oder Ip-Adresse des Mailservers."
+    ::= { wtWebioAn1GraphMail 3 }
+    
+wtWebioAn1GraphMailEnable OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Erlaubt das versenden von Mails:
+        Octet 1: ungenutzt
+        Octet 2: ungenutzt
+        Octet 3: ungenutzt
+        Octet 4:
+         Bit 1-7: ungenutzt
+                Bit 0  : Mail enable"
+    ::= { wtWebioAn1GraphMail 4 }
+    
+wtWebioAn1GraphMailAuthentication OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (4))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Auswahl des Authenticationmodi:
+        die OCTETS werden bitweise interpretiert, es darf nur ein Bit gesetzt sein.
+        Bit 0 entspricht dem LSB.
+        OCTET 1: ungenutzt
+        OCTET 2: ungenutzt
+        OCTET 3: ungenutzt
+        OCTET 4: Bit 3-7: ungenutzt
+          Bit 2  : POP3 vor SMTP
+          Bit 1  : ESMTP, Authentifizierung
+          Bit 0  : SMTP, keine Authentifizierung"
+    ::= { wtWebioAn1GraphMail 5 }
+    
+wtWebioAn1GraphMailAuthUser OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Name des Postfaches / Postfachusers."
+    ::= { wtWebioAn1GraphMail 6 }    
+    
+wtWebioAn1GraphMailAuthPassword OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Passwort zur Identifizierung des Users."
+    ::= { wtWebioAn1GraphMail 7 }    
+    
+wtWebioAn1GraphMailPop3Server OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Name oder Ip-Adresse des POP3 Servers."
+    ::= { wtWebioAn1GraphMail 8 }        
+
+-- wtWebioAn1GraphSNMP Group
+--------------------------------
+
+wtWebioAn1GraphSnmpCommunityStringRead OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Community string read only"
+    ::= { wtWebioAn1GraphSNMP 1 }
+
+wtWebioAn1GraphSnmpCommunityStringReadWrite OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Community string read / write"
+    ::= { wtWebioAn1GraphSNMP 2 }
+
+wtWebioAn1GraphSystemTrapManagerIP OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Name oder IP-Adresse des SNMP-Managers, der den System Trap entgegen nimmt."
+    ::= { wtWebioAn1GraphSNMP 3 }
+    
+wtWebioAn1GraphSystemTrapEnable OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(4))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Binär kodierte Triggerbedingungen:
+        Octet 1: ungenutzt
+        Octet 2: ungenutzt
+        Octet 3: ungenutzt
+        Octet 4:
+         Bit 0:   ColdStart
+         Bit 1:   WarmStart
+         Bit 2-7: ungenutzt"
+    ::= { wtWebioAn1GraphSNMP 4 }
+    
+wtWebioAn1GraphSnmpEnable OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Bit 0 schaltet SNMP frei:
+        Octet 1: ungenutzt
+        Octet 2: ungenutzt
+        Octet 3: ungenutzt
+        Octet 4:
+         Bit 1-7: ungenutzt
+                Bit 0  : SNMP enable"
+    ::= { wtWebioAn1GraphSNMP 5 }
+
+wtWebioAn1GraphSnmpCommunityStringTrap OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Community string der Traps."
+    ::= { wtWebioAn1GraphSNMP 6 }    
+    
+-- wtWebioAn1GraphUDP Group
+--------------------------------
+    
+wtWebioAn1GraphUdpPort OBJECT-TYPE
+    SYNTAX INTEGER (1..65535)
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Udp Port, an den die Udp-Anfragen GET Single gesendet werden können"
+    ::= { wtWebioAn1GraphUDP 1 }
+    
+wtWebioAn1GraphUdpEnable OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Schaltet UDP frei:
+        Octet 1: ungenutzt
+        Octet 2: ungenutzt
+        Octet 3: ungenutzt
+        Octet 4:
+         Bit 1-7: ungenutzt
+                Bit 0  : UDP enable"
+    ::= { wtWebioAn1GraphUDP 2 }
+
+--  wtWebioAn1GraphSyslog Group
+--------------------------------
+    
+wtWebioAn1GraphSyslogServerIP OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Name oder IP-Adresse des Syslog-Servers, der die Syslog-Nachricht entgegen nimmt."
+    ::= { wtWebioAn1GraphSyslog 1 }
+    
+wtWebioAn1GraphSyslogServerPort OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Portnummer des Syslog-Servers, default ist 514."
+    ::= { wtWebioAn1GraphSyslog 2 }
+
+wtWebioAn1GraphSyslogSystemMessagesEnable OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(4))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Binär kodierte Triggerbedingungen:
+        Octet 1: ungenutzt
+        Octet 2: ungenutzt
+        Octet 3: ungenutzt
+        Octet 4:
+         Bit 0:   ColdStart
+         Bit 1:   WarmStart
+         Bit 2:   Diag Messages
+         Bit 3-7: ungenutzt"
+    ::= { wtWebioAn1GraphSyslog 3 }    
+
+wtWebioAn1GraphSyslogEnable OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Bit 0 schaltet Syslog frei:
+        Octet 1: ungenutzt
+        Octet 2: ungenutzt
+        Octet 3: ungenutzt
+        Octet 4:
+         Bit 1-7: ungenutzt
+                Bit 0  : Syslog enable"
+    ::= { wtWebioAn1GraphSyslog 4 }
+
+--  wtWebioAn1GraphFTP Group
+--------------------------------
+
+wtWebioAn1GraphFTPServerIP OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Name oder IP-Adresse des FTP-Servers, der die FTP-Nachricht entgegen nimmt."
+    ::= { wtWebioAn1GraphFTP 1 }
+    
+wtWebioAn1GraphFTPServerControlPort OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Portnummer des Kontrollports des FTP-Servers, default ist 21."
+    ::= { wtWebioAn1GraphFTP 2 }
+
+wtWebioAn1GraphFTPUserName OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "FTP Loggin: Name des Anwenders."
+    ::= { wtWebioAn1GraphFTP 3 }
+    
+wtWebioAn1GraphFTPPassword OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "FTP Loggin: Passwort des Anwenders."
+    ::= { wtWebioAn1GraphFTP 4 }
+
+wtWebioAn1GraphFTPAccount OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "FTP Loggin: Account-Name des Anwenderkontos."
+    ::= { wtWebioAn1GraphFTP 5 }
+
+wtWebioAn1GraphFTPOption OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Bit 0 schaltet den FTP Server in den Passiv-Modus,
+        der Client kontrolliert die Datenverbindung allein:
+        Octet 1: ungenutzt
+        Octet 2: ungenutzt
+        Octet 3: ungenutzt
+        Octet 4:
+         Bit 1-7: ungenutzt
+                Bit 0  : PASV enable"
+    ::= { wtWebioAn1GraphFTP 6 }
+    
+wtWebioAn1GraphFTPEnable OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Bit 0 schaltet FTP frei:
+        Octet 1: ungenutzt
+        Octet 2: ungenutzt
+        Octet 3: ungenutzt
+        Octet 4:
+         Bit 1-7: ungenutzt
+                Bit 0  : FTP enable"
+    ::= { wtWebioAn1GraphFTP 7 }
+
+-- wtWebioAn1GraphDatalogger Group
+--------------------------------
+
+wtWebioAn1GraphLoggerTimebase OBJECT-TYPE
+    SYNTAX INTEGER {
+    wtWebioAn1GraphDatalogger-1Min(1),
+    wtWebioAn1GraphDatalogger-5Min(2),
+    wtWebioAn1GraphDatalogger-15Min(3),
+    wtWebioAn1GraphDatalogger-60Min(4)
+    }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Zeitbasis des Dataloggers"
+    ::= { wtWebioAn1GraphDatalogger 1 }
+
+wtWebioAn1GraphLoggerSensorSel OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(4))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Binär kodierte Triggerbedingungen:
+        Octet 1: ungenutzt
+        Octet 2: ungenutzt
+        Octet 3: ungenutzt
+        Octet 4:
+         Bit 0: Sensor 1
+         Bit 1: Sensor 2
+         Bit 2: Sensor 3
+         Bit 3: Sensor 4
+         Bit 4: Sensor 5
+         Bit 5: Sensor 6
+         Bit 6: Sensor 7
+         Bit 7: Sensor 8"
+    ::= { wtWebioAn1GraphDatalogger 2 }
+    
+wtWebioAn1GraphDisplaySensorSel OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(4))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Die hier ausgewählten Sensoren werden grafisch angezeigt:
+        Octet 1: ungenutzt
+        Octet 2: ungenutzt
+        Octet 3: ungenutzt
+        Octet 4:
+         Bit 0: Sensor 1
+         Bit 1: Sensor 2
+         Bit 2: Sensor 3
+         Bit 3: Sensor 4
+         Bit 4: Sensor 5
+         Bit 5: Sensor 6
+         Bit 6: Sensor 7
+         Bit 7: Sensor 8"
+    ::= { wtWebioAn1GraphDatalogger 3 }    
+    
+-- Graph Sensor Color Table
+
+wtWebioAn1GraphSensorColorTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF WtWebioAn1GraphSensorColorEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Liste der Sensorfarben in der grafischen Darstellung."
+    ::= { wtWebioAn1GraphDatalogger 4 }
+
+wtWebioAn1GraphSensorColorEntry OBJECT-TYPE
+    SYNTAX WtWebioAn1GraphSensorColorEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Nummern der Sensoren."
+    INDEX  { wtWebioAn1GraphSensorNo }
+    ::= { wtWebioAn1GraphSensorColorTable 1 }
+
+WtWebioAn1GraphSensorColorEntry ::= SEQUENCE {
+    wtWebioAn1GraphSensorColor OCTET STRING
+}
+
+wtWebioAn1GraphSensorColor OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(3))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Farbe des Sensors in der grafischen Darstellung."
+    ::= { wtWebioAn1GraphSensorColorEntry 1 }
+    
+wtWebioAn1GraphAutoScaleEnable OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Bit 0 schaltet Vertical Auto Scale frei:
+        Octet 1: ungenutzt
+        Octet 2: ungenutzt
+        Octet 3: ungenutzt
+        Octet 4:
+         Bit 1-7: ungenutzt
+                Bit 0  : Auto Scale enable"
+    ::= { wtWebioAn1GraphDatalogger 5 }
+    
+wtWebioAn1GraphVerticalUpperLimit OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Definiert die maximal sichtbare Temperatur für die grafische Darstellung.
+        Temperatur in Grad mit maximal 2 Nachkommastellen."
+    ::= { wtWebioAn1GraphDatalogger 6 }
+
+wtWebioAn1GraphVerticalLowerLimit OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Definiert die Minal sichtbare Temperatur für die grafische Darstellung.
+        Temperatur in Grad mit maximal 2 Nachkommastellen."
+    ::= { wtWebioAn1GraphDatalogger 7 }
+    
+wtWebioAn1GraphHorizontalZoom OBJECT-TYPE
+    SYNTAX INTEGER {
+    wtWebioAn1GraphZoom-25Min(1),
+    wtWebioAn1GraphZoom-75Min(2),
+    wtWebioAn1GraphZoom-5Std(3),
+    wtWebioAn1GraphZoom-30Std(4),
+    wtWebioAn1GraphZoom-5Tage(5),
+    wtWebioAn1GraphZoom-25Tage(6)
+    }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Definiert den default Zoom."
+    ::= { wtWebioAn1GraphDatalogger 8 }
+    
+-- wtWebioAn1GraphAlarm Group
+----------------------------
+
+wtWebioAn1GraphAlarmCount OBJECT-TYPE
+    SYNTAX INTEGER (1..8)
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Anzahl der unabhängigen Alarme."
+    ::= { wtWebioAn1GraphAlarm 1 }
+    
+-- Alarm Interface Table
+
+wtWebioAn1GraphAlarmIfTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF WtWebioAn1GraphAlarmIfEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Liste der Alarmindizes."
+    ::= { wtWebioAn1GraphAlarm 2 }
+
+wtWebioAn1GraphAlarmIfEntry OBJECT-TYPE
+    SYNTAX WtWebioAn1GraphAlarmIfEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Nummern der Alarme."
+    INDEX  { wtWebioAn1GraphAlarmNo }
+    ::= { wtWebioAn1GraphAlarmIfTable 1 }
+
+WtWebioAn1GraphAlarmIfEntry ::= SEQUENCE {
+    wtWebioAn1GraphAlarmNo INTEGER
+}
+
+wtWebioAn1GraphAlarmNo OBJECT-TYPE
+    SYNTAX INTEGER (1..8)
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Nummer des Alarms."
+    ::= { wtWebioAn1GraphAlarmIfEntry 1 }
+
+-- Alarm Table
+
+wtWebioAn1GraphAlarmTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF WtWebioAn1GraphAlarmEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Liste der Einstellungen abhängig von der Alarmnummer."
+    ::= { wtWebioAn1GraphAlarm 3 }
+
+wtWebioAn1GraphAlarmEntry OBJECT-TYPE
+    SYNTAX WtWebioAn1GraphAlarmEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Alarm-Parameter der einzelnen Alarme."
+    INDEX  { wtWebioAn1GraphAlarmNo }
+    ::= { wtWebioAn1GraphAlarmTable 1 }
+
+WtWebioAn1GraphAlarmEntry ::= SEQUENCE {
+    wtWebioAn1GraphAlarmTrigger   OCTET STRING,
+    wtWebioAn1GraphAlarmMin   OCTET STRING,
+    wtWebioAn1GraphAlarmMax   OCTET STRING,
+    wtWebioAn1GraphAlarmHysteresis  OCTET STRING,
+    wtWebioAn1GraphAlarmDelay   OCTET STRING,
+    wtWebioAn1GraphAlarmInterval  OCTET STRING,
+    wtWebioAn1GraphAlarmEnable   OCTET STRING,
+    wtWebioAn1GraphAlarmEMailAddr  OCTET STRING,
+    wtWebioAn1GraphAlarmMailSubject  OCTET STRING,
+    wtWebioAn1GraphAlarmMailText  OCTET STRING,
+    wtWebioAn1GraphAlarmManagerIP  OCTET STRING,
+    wtWebioAn1GraphAlarmTrapText  OCTET STRING,
+    wtWebioAn1GraphAlarmMailOptions  OCTET STRING,
+    wtWebioAn1GraphAlarmTcpIpAddr  OCTET STRING,
+    wtWebioAn1GraphAlarmTcpPort   INTEGER,
+    wtWebioAn1GraphAlarmTcpText   OCTET STRING,
+    wtWebioAn1GraphAlarmClearMailSubject OCTET STRING,
+    wtWebioAn1GraphAlarmClearMailText  OCTET STRING,
+    wtWebioAn1GraphAlarmClearTrapText  OCTET STRING,
+    wtWebioAn1GraphAlarmClearTcpText  OCTET STRING,    
+    wtWebioAn1GraphAlarmSyslogIpAddr  OCTET STRING,
+    wtWebioAn1GraphAlarmSyslogPort  INTEGER,
+    wtWebioAn1GraphAlarmSyslogText  OCTET STRING,
+    wtWebioAn1GraphAlarmSyslogClearText  OCTET STRING,
+    wtWebioAn1GraphAlarmFtpDataPort  OCTET STRING,
+    wtWebioAn1GraphAlarmFtpFileName  OCTET STRING,
+    wtWebioAn1GraphAlarmFtpText   OCTET STRING,
+    wtWebioAn1GraphAlarmFtpClearText  OCTET STRING,
+    wtWebioAn1GraphAlarmFtpOption  OCTET STRING,
+    wtWebioAn1GraphAlarmTimerCron  OCTET STRING
+    
+    
+}
+
+wtWebioAn1GraphAlarmTrigger OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(4))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Binär kodierte Triggerbedingungen:
+        Octet 1: ungenutzt
+        Octet 2: ungenutzt
+        Octet 3:
+         Bit 0: Timer
+         Bit 1: ColdStart
+         Bit 2: WarmStart
+         Bit 3: Sensor lost
+         Bit 4-7 ungenutzt
+        Octet 4:
+         Bit 0: Sensor 1
+         Bit 1: Sensor 2
+         Bit 2: Sensor 3
+         Bit 3: Sensor 4
+         Bit 4: Sensor 5
+         Bit 5: Sensor 6
+         Bit 6: Sensor 7
+         Bit 7: Sensor 8"
+    ::= { wtWebioAn1GraphAlarmEntry 1 }
+
+wtWebioAn1GraphAlarmMin OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Minimum Temperatur in Grad mit maximal 2 Nachkommastellen."
+    ::= { wtWebioAn1GraphAlarmEntry 2 }
+
+wtWebioAn1GraphAlarmMax OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Maximum Temperatur in Grad mit maximal 2 Nachkommastellen."
+    ::= { wtWebioAn1GraphAlarmEntry 3 }
+
+wtWebioAn1GraphAlarmHysteresis OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Bei Überschreiten der Temperatur Min+Hyst. und Unterschreiten der Temperatur Max-Hyst.
+        wird der Alarm gelöscht: pos. Temperaturdifferenz in Grad mit maximal 2 Nachkommastellen."
+    ::= { wtWebioAn1GraphAlarmEntry 4 }
+
+wtWebioAn1GraphAlarmDelay OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Der Alarm wird erst ausgelöst, wenn für die Dauer dieser Zeit
+        die Alarmbedingungen erfüllt sind (Zeit in Minuten)."
+    ::= { wtWebioAn1GraphAlarmEntry 5 }
+    
+wtWebioAn1GraphAlarmInterval OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Sendeintervall von Alarmmeldungen."
+    ::= { wtWebioAn1GraphAlarmEntry 6 }
+
+wtWebioAn1GraphAlarmEnable OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(4))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Binär kodierte Alarmfreischaltung:
+        Octet 1: ungenutzt
+        Octet 2: ungenutzt
+        Octet 3: ungenutzt
+        Octet 4:
+  Bit 0: Mail Enable
+         Bit 1: SNMP Trap enable
+         Bit 2:  TCP Client enable"
+    ::= { wtWebioAn1GraphAlarmEntry 7 }
+
+wtWebioAn1GraphAlarmEMailAddr OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "E-Mail Adresse, an die die Alarmmail gesendet werden soll."
+    ::= { wtWebioAn1GraphAlarmEntry 8 }
+
+wtWebioAn1GraphAlarmMailSubject OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Betreffzeile der Alarmmail."
+    ::= { wtWebioAn1GraphAlarmEntry 9 }
+
+wtWebioAn1GraphAlarmMailText OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Text der Alarmmail: <Tn> liefert die aktuelle Temperatur; n = 1..8.
+        <Z> liefert die aktuelle Zeit."
+    ::= { wtWebioAn1GraphAlarmEntry 10 }
+
+wtWebioAn1GraphAlarmManagerIP OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Name oder IP-Adresse des SNMP-Managers, der den Trap entgegen nimmt."
+    ::= { wtWebioAn1GraphAlarmEntry 11 }
+
+wtWebioAn1GraphAlarmTrapText OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Dieser Text wird im Trapbody gesendet."
+    ::= { wtWebioAn1GraphAlarmEntry 12 }
+    
+wtWebioAn1GraphAlarmMailOptions OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(4))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Binär kodierte Optionen:
+        Octet 1: ungenutzt
+        Octet 2: ungenutzt
+        Octet 3: ungenutzt
+        Octet 4:
+  Bit 0  : Attach Thermo.csv Enable
+  Bit 1  : CSV-Data_since_last_report
+         Bit 2-7: ungenutzt"
+    ::= { wtWebioAn1GraphAlarmEntry 13 }    
+
+wtWebioAn1GraphAlarmTcpIpAddr OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "IP-Adresse des Gerätes, dass eine TCP-Nachricht empfangen soll."
+    ::= { wtWebioAn1GraphAlarmEntry 14 }    
+
+wtWebioAn1GraphAlarmTcpPort OBJECT-TYPE
+    SYNTAX INTEGER (1..65535) 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Portnummer des Gerätes, dass eine TCP-Nachricht empfangen soll."
+    ::= { wtWebioAn1GraphAlarmEntry 15 }    
+
+wtWebioAn1GraphAlarmTcpText OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Dieser Text wird im TCP Trapbody gesendet."
+    ::= { wtWebioAn1GraphAlarmEntry 16 }
+    
+wtWebioAn1GraphAlarmClearMailSubject OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Betreffzeile der Alarm Clear Mail."
+    ::= { wtWebioAn1GraphAlarmEntry 17 }
+
+wtWebioAn1GraphAlarmClearMailText OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Text der Alarm Clear Mail: <Tn> liefert die aktuelle Temperatur; n = 1..8.
+        <Z> liefert die aktuelle Zeit."
+    ::= { wtWebioAn1GraphAlarmEntry 18 }
+
+wtWebioAn1GraphAlarmClearTrapText OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Dieser Text wird im Trapbody gesendet."
+    ::= { wtWebioAn1GraphAlarmEntry 19 }
+
+wtWebioAn1GraphAlarmClearTcpText OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Dieser Text wird im TCP Trapbody gesendet."
+    ::= { wtWebioAn1GraphAlarmEntry 20 }
+    
+wtWebioAn1GraphAlarmSyslogIpAddr OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "IP-Adresse des Gerätes, dass eine Syslog-Nachricht empfangen soll."
+    ::= { wtWebioAn1GraphAlarmEntry 21 }    
+
+wtWebioAn1GraphAlarmSyslogPort OBJECT-TYPE
+    SYNTAX INTEGER (1..65535) 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Portnummer des Gerätes, dass eine Syslog-Nachricht empfangen soll, default Port ist 514."
+    ::= { wtWebioAn1GraphAlarmEntry 22 }    
+
+wtWebioAn1GraphAlarmSyslogText OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Jede Syslog-Nachricht beginnt mit einem Prioritätsschlüssel, einem Zeitstempel und der Host Ip-Nummer gemäß RFC3164.
+        Dieser Text wird im darauf folgenden Syslog-Nachrichtenteil gesendet."
+    ::= { wtWebioAn1GraphAlarmEntry 23 }
+
+wtWebioAn1GraphAlarmSyslogClearText OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Jede Syslog-Nachricht beginnt mit einem Prioritätsschlüssel, einem Zeitstempel und der Host Ip-Nummer gemäß RFC3164.
+        Dieser Text wird im darauf folgenden Syslog-Nachrichtenteil gesendet."
+    ::= { wtWebioAn1GraphAlarmEntry 24 }
+
+wtWebioAn1GraphAlarmFtpDataPort OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Lokaler Datenport: 1..65535 oder AUTO: der nächste ungenutzte Port wird automatisch zugewiesen."
+    ::= { wtWebioAn1GraphAlarmEntry 25 }
+    
+wtWebioAn1GraphAlarmFtpFileName OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Der File Name kann auch Pfadinformationen enthalten."
+    ::= { wtWebioAn1GraphAlarmEntry 26 }
+    
+wtWebioAn1GraphAlarmFtpText OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Dieser Text wird in die angegebene Datei geschrieben."
+    ::= { wtWebioAn1GraphAlarmEntry 27 }
+
+wtWebioAn1GraphAlarmFtpClearText OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Dieser Text wird in die angegebene Datei geschrieben."
+    ::= { wtWebioAn1GraphAlarmEntry 28 }
+    
+wtWebioAn1GraphAlarmFtpOptions OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(4))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Binär kodierte Optionen, nur eine Option darf eingeschaltet sein:
+        STORE  = Datei ersetzen
+        APPEND = Nachrichten ans Dateiende anhängen
+        
+        Octet 1: ungenutzt
+        Octet 2: ungenutzt
+        Octet 3: ungenutzt
+        Octet 4:
+  Bit 0  : STORE
+  Bit 1  : APPEND
+         Bit 2-7: ungenutzt"
+    ::= { wtWebioAn1GraphAlarmEntry 29 }
+
+wtWebioAn1GraphAlarmTimerCron OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Diser Eintrag enthält 5 Leerzeichen- oder Tab-getrente Felder zur Definition von zeitgesteuerten
+        Ausgabe von Alarmnachrichten. Jedes der 5 Felder muss mit der aktuelle Zeit übereinstimmen, um
+        das Senden einer Nachricht auszulösen, Wochentag und Monatstag werden getrennt ausgewertet.
+        Feld  möglicher Zahlenbereich
+        1: Minuten 0-59
+        2. Stunden 0-23, 0 ist Mitternacht
+        3: Monatstag 1-31
+        4: Monat 1-12
+        5: Wochentag 0-6, 0 ist Sonntag
+        
+        Für jedes Feld kann nun angegeben werden:
+        - eine ganze Zahl aus dem angegebenen Zahlenbereich
+ - ein Teil-Zahlenbereich (wie z.B. 1-5) innerhalb des angegebenen Zahlenbereichs
+ - eine mit Komma getrennte Liste von ganzen Zahlen oder Tei-Zahlenbereichen (wie z.B. 2,4-6,8,10)
+ - ein Stern * (deckt den gesamten erlaubten Bereich ab)
+ - ein / gibt die Schrittweite bei Teil-Zahlenbereichen an (z.B. 0-59/2 jede zweite Minute)."
+    ::= { wtWebioAn1GraphAlarmEntry 30 }     
+
+-- wtWebioAn1GraphPorts Group
+----------------------------
+
+-- Table
+
+wtWebioAn1GraphPortTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF WtWebioAn1GraphPortEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Liste der Einstellungen abhängig von der Sensornummer."
+    ::= { wtWebioAn1GraphPorts 1 }
+
+wtWebioAn1GraphPortEntry OBJECT-TYPE
+    SYNTAX WtWebioAn1GraphPortEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Sensor-Parameter der einzelnen Sensoren."
+    INDEX  { wtWebioAn1GraphSensorNo }
+    ::= { wtWebioAn1GraphPortTable 1 }
+
+WtWebioAn1GraphPortEntry ::= SEQUENCE {
+    wtWebioAn1GraphPortName  OCTET STRING,
+    wtWebioAn1GraphPortText  OCTET STRING,
+    wtWebioAn1GraphPortOffset1  OCTET STRING,
+    wtWebioAn1GraphPortTemperature1 OCTET STRING,
+    wtWebioAn1GraphPortOffset2  OCTET STRING,
+    wtWebioAn1GraphPortTemperature2 OCTET STRING,
+    wtWebioAn1GraphPortComment  OCTET STRING
+}
+
+wtWebioAn1GraphPortName OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Name des Sensors."
+    ::= { wtWebioAn1GraphPortEntry 1 }
+
+wtWebioAn1GraphPortText OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Beschreibung des Sensors."
+    ::= { wtWebioAn1GraphPortEntry 2 }
+
+wtWebioAn1GraphPortOffset1 OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Offset-Kalibrierung: Offset in Grad mit max. 2 Nachkommastellen bei Temperatur 1."
+    ::= { wtWebioAn1GraphPortEntry 3 }
+
+wtWebioAn1GraphPortTemperature1 OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Offset-Kalibrierung: Referenztemperatur 1 in Grad mit max. 2 Nachkommastellen."
+    ::= { wtWebioAn1GraphPortEntry 4 }
+
+wtWebioAn1GraphPortOffset2 OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Offset-Kalibrierung: Offset in Grad mit max. 2 Nachkommastellen bei Temperatur 2."
+    ::= { wtWebioAn1GraphPortEntry 5 }
+
+wtWebioAn1GraphPortTemperature2 OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Offset-Kalibrierung: Referenztemperatur 2 in Grad mit max. 2 Nachkommastellen."
+    ::= { wtWebioAn1GraphPortEntry 6 }
+
+wtWebioAn1GraphPortComment OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Offset-Kalibrierung: Angaben zu Datum, Referenzgerät, Operator."
+    ::= { wtWebioAn1GraphPortEntry 7 }
+    
+-- wtWebioAn1GraphManufact Group
+----------------------------
+
+wtWebioAn1GraphMfName OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Hersteller Firmenname"
+    ::= { wtWebioAn1GraphManufact 1 }
+
+wtWebioAn1GraphMfAddr OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Adresse des Herstellers."
+    ::= { wtWebioAn1GraphManufact 2 }
+
+wtWebioAn1GraphMfHotline OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Hotline des Herstellers."
+    ::= { wtWebioAn1GraphManufact 3 }
+
+wtWebioAn1GraphMfInternet OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Internet-Adresse des Herstellers."
+    ::= { wtWebioAn1GraphManufact 4 }
+
+wtWebioAn1GraphMfDeviceTyp OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Gerätebezeichnung (Typ) des Herstellers."
+    ::= { wtWebioAn1GraphManufact 5 }
+
+wtWebioAn1GraphMfOrderNo OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Bestellnummer des Gerätes des Herstellers."
+    ::= { wtWebioAn1GraphManufact 6 }
+
+-- wtWebioAn1GraphDiag Group
+----------------------------
+
+wtWebioAn1GraphDiagErrorCount OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Anzahl der Einträge im Fehlerspeicher."
+    ::= { wtWebioAn1GraphDiag 1 }
+
+wtWebioAn1GraphDiagBinaryError OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Bitweise kodierte Fehlerursachen."
+    ::= { wtWebioAn1GraphDiag 2 }
+
+wtWebioAn1GraphDiagErrorIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Der Wert dieser Variable wird als Index für die Ausgabe
+        eines Fehlertextes (wtWebioAn1GraphDiagErrorMessage) verwendet.
+        Die Fehler im Speicher sind von 1 bis wtWebioAn1GraphDiagErrorCount durchnummeriert.
+        Nach dem Schreiben einens gültigen Wertes in diese Variable kann der dazugehörige Text
+        in wtWebioAn1GraphDiagErrorMessage ausgelesen werden."
+    ::= { wtWebioAn1GraphDiag 3 }
+
+wtWebioAn1GraphDiagErrorMessage OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Abhängig vom Wert wtWebioAn1GraphDiagErrorIndex wird ein Fehlertext angezeigt."
+    ::= { wtWebioAn1GraphDiag 4 }
+    
+wtWebioAn1GraphDiagErrorClear OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS write-only
+    STATUS mandatory
+    DESCRIPTION
+        "Durch Schreiben eine 1 in diese Variable, wird der Fehlerspeicher gelöscht."
+    ::= { wtWebioAn1GraphDiag 5 }
+
+-- TRAP DEFINITIONS
+
+-- Diese SNMP-Traps werden gesendet, wenn die Alarmtriggerbedingungen zutreffen 
+
+wtWebioAn1GraphAlert1 TRAP-TYPE
+    ENTERPRISE  wtWebioAn1Graph
+    VARIABLES   { wtWebioAn1GraphAlarmTrapText }
+    DESCRIPTION
+        "Dieser SNMP-Trap wird generiert, wenn der Alarm 1 ausgelöst wurde,
+        das SNMP-Trap-Enable gesetzt ist und
+        SNMP in Enable freigegeben ist."
+    -- NMS trap annotation
+    --#TYPE "Web-Thermograph Alarm 1"
+    --#SUMMARY "Alarm 1: %s"
+    --#ARGUMENTS {0}
+    --#SEVERITY INFORMATIONAL
+    --#TIMEINDEX 99
+    --#STATE OPERATIONAL    
+    ::= 31
+
+wtWebioAn1GraphAlert2 TRAP-TYPE
+    ENTERPRISE  wtWebioAn1Graph
+    VARIABLES   { wtWebioAn1GraphAlarmTrapText }
+    DESCRIPTION
+        "Dieser SNMP-Trap wird generiert, wenn der Alarm 2 ausgelöst wurde,
+        das SNMP-Trap-Enable gesetzt ist und
+        SNMP in Enable freigegeben ist."
+    -- NMS trap annotation
+    --#TYPE "Web-Thermograph Alarm 2"
+    --#SUMMARY "Alarm 2: %s"
+    --#ARGUMENTS {0}
+    --#SEVERITY INFORMATIONAL
+    --#TIMEINDEX 99
+    --#STATE OPERATIONAL    
+    ::= 32
+
+wtWebioAn1GraphAlert3 TRAP-TYPE
+    ENTERPRISE  wtWebioAn1Graph
+    VARIABLES   { wtWebioAn1GraphAlarmTrapText }
+    DESCRIPTION
+        "Dieser SNMP-Trap wird generiert, wenn der Alarm 3 ausgelöst wurde,
+        das SNMP-Trap-Enable gesetzt ist und
+        SNMP in Enable freigegeben ist."
+    -- NMS trap annotation
+    --#TYPE "Web-Thermograph Alarm 3"
+    --#SUMMARY "Alarm 3: %s"
+    --#ARGUMENTS {0}
+    --#SEVERITY INFORMATIONAL
+    --#TIMEINDEX 99
+    --#STATE OPERATIONAL    
+    ::= 33
+
+wtWebioAn1GraphAlert4 TRAP-TYPE
+    ENTERPRISE  wtWebioAn1Graph
+    VARIABLES   { wtWebioAn1GraphAlarmTrapText }
+    DESCRIPTION
+        "Dieser SNMP-Trap wird generiert, wenn der Alarm 4 ausgelöst wurde,
+        das SNMP-Trap-Enable gesetzt ist und
+        SNMP in Enable freigegeben ist."
+    -- NMS trap annotation
+    --#TYPE "Web-Thermograph Alarm 4"
+    --#SUMMARY "Alarm 4: %s"
+    --#ARGUMENTS {0}
+    --#SEVERITY INFORMATIONAL
+    --#TIMEINDEX 99
+    --#STATE OPERATIONAL    
+    ::= 34
+
+wtWebioAn1GraphAlert5 TRAP-TYPE
+    ENTERPRISE  wtWebioAn1Graph
+    VARIABLES   { wtWebioAn1GraphAlarmTrapText }
+    DESCRIPTION
+        "Dieser SNMP-Trap wird generiert, wenn der Alarm 5 ausgelöst wurde,
+        das SNMP-Trap-Enable gesetzt ist und
+        SNMP in Enable freigegeben ist."
+    -- NMS trap annotation
+    --#TYPE "Web-Thermograph Alarm 5"
+    --#SUMMARY "Alarm 5: %s"
+    --#ARGUMENTS {0}
+    --#SEVERITY INFORMATIONAL
+    --#TIMEINDEX 99
+    --#STATE OPERATIONAL    
+    ::= 35
+
+wtWebioAn1GraphAlert6 TRAP-TYPE
+    ENTERPRISE  wtWebioAn1Graph
+    VARIABLES   { wtWebioAn1GraphAlarmTrapText }
+    DESCRIPTION
+        "Dieser SNMP-Trap wird generiert, wenn der Alarm 6 ausgelöst wurde,
+        das SNMP-Trap-Enable gesetzt ist und
+        SNMP in Enable freigegeben ist."
+    -- NMS trap annotation
+    --#TYPE "Web-Thermograph Alarm 6"
+    --#SUMMARY "Alarm 6: %s"
+    --#ARGUMENTS {0}
+    --#SEVERITY INFORMATIONAL
+    --#TIMEINDEX 99
+    --#STATE OPERATIONAL    
+    ::= 36
+
+wtWebioAn1GraphAlert7 TRAP-TYPE
+    ENTERPRISE  wtWebioAn1Graph
+    VARIABLES   { wtWebioAn1GraphAlarmTrapText }
+    DESCRIPTION
+        "Dieser SNMP-Trap wird generiert, wenn der Alarm 7 ausgelöst wurde,
+        das SNMP-Trap-Enable gesetzt ist und
+        SNMP in Enable freigegeben ist."
+    -- NMS trap annotation
+    --#TYPE "Web-Thermograph Alarm 7"
+    --#SUMMARY "Alarm 7: %s"
+    --#ARGUMENTS {0}
+    --#SEVERITY INFORMATIONAL
+    --#TIMEINDEX 99
+    --#STATE OPERATIONAL    
+    ::= 37
+
+wtWebioAn1GraphAlert8 TRAP-TYPE
+    ENTERPRISE  wtWebioAn1Graph
+    VARIABLES   { wtWebioAn1GraphAlarmTrapText }
+    DESCRIPTION
+        "Dieser SNMP-Trap wird generiert, wenn der Alarm 8 ausgelöst wurde,
+        das SNMP-Trap-Enable gesetzt ist und
+        SNMP in Enable freigegeben ist."
+    -- NMS trap annotation
+    --#TYPE "Web-Thermograph Alarm 8"
+    --#SUMMARY "Alarm 8: %s"
+    --#ARGUMENTS {0}
+    --#SEVERITY INFORMATIONAL
+    --#TIMEINDEX 99
+    --#STATE OPERATIONAL    
+    ::= 38
+
+wtWebioAn1GraphAlert9 TRAP-TYPE
+    ENTERPRISE  wtWebioAn1Graph
+    VARIABLES   { wtWebioAn1GraphAlarmClearTrapText }
+    DESCRIPTION
+        "Dieser SNMP-Trap wird generiert, wenn der Alarm 1 gelöscht wurde,
+        das SNMP-Trap-Enable gesetzt ist und
+        SNMP in Enable freigegeben ist."
+    -- NMS trap annotation
+    --#TYPE "Web-Thermograph Release Alarm 1"
+    --#SUMMARY "Release Alarm 1: %s"
+    --#ARGUMENTS {0}
+    --#SEVERITY INFORMATIONAL
+    --#TIMEINDEX 99
+    --#STATE OPERATIONAL    
+    ::= 91
+
+wtWebioAn1GraphAlert10 TRAP-TYPE
+    ENTERPRISE  wtWebioAn1Graph
+    VARIABLES   { wtWebioAn1GraphAlarmClearTrapText }
+    DESCRIPTION
+        "Dieser SNMP-Trap wird generiert, wenn der Alarm 2 gelöscht wurde,
+        das SNMP-Trap-Enable gesetzt ist und
+        SNMP in Enable freigegeben ist."
+    -- NMS trap annotation
+    --#TYPE "Web-Thermograph Release Alarm 2"
+    --#SUMMARY "Release Alarm 2: %s"
+    --#ARGUMENTS {0}
+    --#SEVERITY INFORMATIONAL
+    --#TIMEINDEX 99
+    --#STATE OPERATIONAL    
+    ::= 92
+
+wtWebioAn1GraphAlert11 TRAP-TYPE
+    ENTERPRISE  wtWebioAn1Graph
+    VARIABLES   { wtWebioAn1GraphAlarmClearTrapText }
+    DESCRIPTION
+        "Dieser SNMP-Trap wird generiert, wenn der Alarm 3 gelöscht wurde,
+        das SNMP-Trap-Enable gesetzt ist und
+        SNMP in Enable freigegeben ist."
+    -- NMS trap annotation
+    --#TYPE "Web-Thermograph Release Alarm 3"
+    --#SUMMARY "Release Alarm 3: %s"
+    --#ARGUMENTS {0}
+    --#SEVERITY INFORMATIONAL
+    --#TIMEINDEX 99
+    --#STATE OPERATIONAL    
+    ::= 93
+
+wtWebioAn1GraphAlert12 TRAP-TYPE
+    ENTERPRISE  wtWebioAn1Graph
+    VARIABLES   { wtWebioAn1GraphAlarmClearTrapText }
+    DESCRIPTION
+        "Dieser SNMP-Trap wird generiert, wenn der Alarm 4 gelöscht wurde,
+        das SNMP-Trap-Enable gesetzt ist und
+        SNMP in Enable freigegeben ist."
+    -- NMS trap annotation
+    --#TYPE "Web-Thermograph Release Alarm 4"
+    --#SUMMARY "Release Alarm 4: %s"
+    --#ARGUMENTS {0}
+    --#SEVERITY INFORMATIONAL
+    --#TIMEINDEX 99
+    --#STATE OPERATIONAL    
+    ::= 94
+
+wtWebioAn1GraphAlert13 TRAP-TYPE
+    ENTERPRISE  wtWebioAn1Graph
+    VARIABLES   { wtWebioAn1GraphAlarmClearTrapText }
+    DESCRIPTION
+        "Dieser SNMP-Trap wird generiert, wenn der Alarm 5 gelöscht wurde,
+        das SNMP-Trap-Enable gesetzt ist und
+        SNMP in Enable freigegeben ist."
+    -- NMS trap annotation
+    --#TYPE "Web-Thermograph Release Alarm 5"
+    --#SUMMARY "Release Alarm 5: %s"
+    --#ARGUMENTS {0}
+    --#SEVERITY INFORMATIONAL
+    --#TIMEINDEX 99
+    --#STATE OPERATIONAL    
+    ::= 95
+
+wtWebioAn1GraphAlert14 TRAP-TYPE
+    ENTERPRISE  wtWebioAn1Graph
+    VARIABLES   { wtWebioAn1GraphAlarmClearTrapText }
+    DESCRIPTION
+        "Dieser SNMP-Trap wird generiert, wenn der Alarm 6 gelöscht wurde,
+        das SNMP-Trap-Enable gesetzt ist und
+        SNMP in Enable freigegeben ist."
+    -- NMS trap annotation
+    --#TYPE "Web-Thermograph Release Alarm 6"
+    --#SUMMARY "Release Alarm 6: %s"
+    --#ARGUMENTS {0}
+    --#SEVERITY INFORMATIONAL
+    --#TIMEINDEX 99
+    --#STATE OPERATIONAL    
+    ::= 96
+
+wtWebioAn1GraphAlert15 TRAP-TYPE
+    ENTERPRISE  wtWebioAn1Graph
+    VARIABLES   { wtWebioAn1GraphAlarmClearTrapText }
+    DESCRIPTION
+        "Dieser SNMP-Trap wird generiert, wenn der Alarm 7 gelöscht wurde,
+        das SNMP-Trap-Enable gesetzt ist und
+        SNMP in Enable freigegeben ist."
+    -- NMS trap annotation
+    --#TYPE "Web-Thermograph Release Alarm 7"
+    --#SUMMARY "Release Alarm 7: %s"
+    --#ARGUMENTS {0}
+    --#SEVERITY INFORMATIONAL
+    --#TIMEINDEX 99
+    --#STATE OPERATIONAL    
+    ::= 97
+
+wtWebioAn1GraphAlert16 TRAP-TYPE
+    ENTERPRISE  wtWebioAn1Graph
+    VARIABLES   { wtWebioAn1GraphAlarmClearTrapText }
+    DESCRIPTION
+        "Dieser SNMP-Trap wird generiert, wenn der Alarm 8 gelöscht wurde,
+        das SNMP-Trap-Enable gesetzt ist und
+        SNMP in Enable freigegeben ist."
+    -- NMS trap annotation
+    --#TYPE "Web-Thermograph Release Alarm 8"
+    --#SUMMARY "Release Alarm 8: %s"
+    --#ARGUMENTS {0}
+    --#SEVERITY INFORMATIONAL
+    --#TIMEINDEX 99
+    --#STATE OPERATIONAL    
+    ::= 98
+
+wtWebioAn1GraphAlertDiag TRAP-TYPE
+    ENTERPRISE  wtWebioAn1Graph
+    VARIABLES   {  
+      wtWebioAn1GraphDiagErrorIndex,
+        wtWebioAn1GraphDiagErrorMessage
+      }
+    DESCRIPTION
+        "Dieser SNMP-Trap wird generiert, wenn eine Diagnose/Error-Message ausgelöst wurde,
+        das SNMP-Trap-Enable gesetzt ist und
+        SNMP in Enable freigegeben ist."
+    -- NMS trap annotation
+    --#TYPE "Web-Thermograph Diagnose Error"
+    --#SUMMARY "Diagnose error index: %d, Message: %s."
+    --#ARGUMENTS {0,1}
+    --#SEVERITY MAJOR
+    --#TIMEINDEX 99
+    --#STATE DEGRADED    
+    ::= 110
+    
+    
+END

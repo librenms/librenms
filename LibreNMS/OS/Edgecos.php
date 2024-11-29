@@ -117,7 +117,7 @@ class Edgecos extends OS implements MempoolsDiscovery, ProcessorDiscovery
             ];
         }
 
-        return [];
+        return parent::discoverProcessors();
     }
 
     /**

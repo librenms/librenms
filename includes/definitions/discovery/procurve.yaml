@@ -1,4 +1,4 @@
-mib: POWERSUPPLY-MIB:FAN-MIB:STATISTICS-MIB
+mib: POWERSUPPLY-MIB:FAN-MIB:STATISTICS-MIB:HP-ICF-POE-MIB:HP-STACK-MIB
 modules:
     mempools:
         data:
@@ -26,9 +26,9 @@ modules:
             - HP-SN-AGENT-MIB::snAgImgVer.0
         serial: SEMI-MIB::hpHttpMgSerialNumber.0
         hardware_replace:
-            - ['  ', ' ']
-            - ' Switch'
-            - ' Stack'
+            - ['/  /', ' ']
+            - '/ Switch/'
+            - '/ Stack/'
     processors:
         data:
             -
@@ -53,6 +53,18 @@ modules:
                     index: 'hpicfPsWattageCur.{{ $index }}'
                     high_limit: hpicfPsWattageMax
                     descr: 'Power Supply #{{ $index }}'
+                -
+                    oid: hpicfPseFeaturesTable
+                    value: hpicfPseUsedPower
+                    num_oid: '.1.3.6.1.4.1.11.2.14.11.1.9.1.6.1.5.{{ $index }}'
+                    index: 'hpicfPseAvailablePower.{{ $index }}'
+                    skip_values:
+                        - 
+                          oid: hpicfPseAvailablePower 
+                          op: '==' 
+                          value: 0                     
+                    high_limit: hpicfPseAvailablePower
+                    descr: 'PoE Power Used'
         state:
             data:
                 -
@@ -83,3 +95,52 @@ modules:
                         - { descr: psFailed, graph: 1, value: 4, generic: 2 }
                         - { descr: psPermFailure, graph: 1, value: 5, generic: 2 }
                         - { descr: psMax, graph: 1, value: 6, generic: 3 }
+                -
+                    oid:  hpStackConfig
+                    value: hpStackOperStatus
+                    num_oid: '.1.3.6.1.4.1.11.2.14.11.5.1.69.1.1.2.0'
+                    descr: 'Stack State'
+                    state_name: hpStackOperStatus
+                    states:
+                        - { descr: disabled, graph: 1, value: 1, generic: 0 }
+                        - { descr: active, graph: 1, value: 2, generic: 0 }
+                        - { descr: fragmentInactive, graph: 1, value: 3, generic: 2 }
+                        - { descr: unAvailable, graph: 1, value: 0, generic: 0 }
+                        - { descr: fragmentActive, graph: 1, value: 4, generic: 2 }
+                -
+                    oid:  hpStackConfig
+                    value: hpStackTopology
+                    num_oid: '.1.3.6.1.4.1.11.2.14.11.5.1.69.1.1.4.0'
+                    descr: 'Stack Topology'
+                    state_name: hpStackTopology
+                    skip_values:
+                        - 
+                          oid: hpStackOperStatus 
+                          op: '==' 
+                          value: 1 
+                    states:
+                        - { descr: unKnown, graph: 1, value: 0, generic: 0 }
+                        - { descr: chain, graph: 1, value: 1, generic: 0 }
+                        - { descr: ring, graph: 1, value: 2, generic: 0 }
+                        - { descr: mesh, graph: 1, value: 3, generic: 0 }
+                        - { descr: partialMesh, graph: 1, value: 4, generic: 1 }
+                -
+                    oid: hpStackMemberTable
+                    value: hpStackMemberState
+                    num_oid: '.1.3.6.1.4.1.11.2.14.11.5.1.69.1.3.1.9.{{ $index }}'
+                    descr: 'Stack Member State {{ $index }}'
+                    index: 'hpStackMemberState.{{ $index }}'
+                    state_name: hpStackMemberState
+                    states:
+                        - { descr: unusedID, graph: 1, value: 0, generic: 0 }
+                        - { descr: missing, graph: 1, value: 1, generic: 3 }
+                        - { descr: provision, graph: 1, value: 2, generic: 0 }
+                        - { descr: commander, graph: 1, value: 3, generic: 0 }
+                        - { descr: standby, graph: 1, value: 4, generic: 0 }
+                        - { descr: member, graph: 1, value: 5, generic: 0 }
+                        - { descr: shutdown, graph: 1, value: 6, generic: 3 }
+                        - { descr: booting, graph: 1, value: 7, generic: 3 }
+                        - { descr: communicationFailure, graph: 1, value: 8, generic: 3 }
+                        - { descr: incompatibleOs , graph: 1, value: 9, generic: 3 }
+                        - { descr: unknownState , graph: 1, value: 10, generic: 3 }
+                        - { descr: standbyBooting , graph: 1, value: 11, generic: 3 }

@@ -4,7 +4,7 @@
 
 This is currently well documented within the doc folder of the installation files.
 
-Please see the following [doc](/Installation/Install-LibreNMS.md)
+Please see the following [doc](../Installation/Install-LibreNMS.md)
 
 ### <a name="faq2"> How do I add a device?</a>
 
@@ -490,7 +490,7 @@ COMMUNITY. Use `snmpwalk` instead of `snmpbulkwalk` for v1 devices.
 
 ```bash
 ./discovery.php -h HOSTNAME -d | ./pbin.sh
-./poller.php -h HOSTNAME -r -f -d | ./pbin.sh
+lnms device:poll HOSTNAME -vv | ./pbin.sh
 snmpbulkwalk -OUneb -v2c -c COMMUNITY HOSTNAME .  | ./pbin.sh
 ```
 

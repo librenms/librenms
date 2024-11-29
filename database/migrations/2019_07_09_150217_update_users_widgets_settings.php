@@ -3,14 +3,14 @@
 use App\Models\UserWidget;
 use Illuminate\Database\Migrations\Migration;
 
-class UpdateUsersWidgetsSettings extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         $widgets = UserWidget::where('widget_id', 1)->get();
         foreach ($widgets as $widget) {
@@ -29,7 +29,7 @@ class UpdateUsersWidgetsSettings extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         $widgets = UserWidget::where('widget_id', 1)->get();
         foreach ($widgets as $widget) {
@@ -42,4 +42,4 @@ class UpdateUsersWidgetsSettings extends Migration
             $widget->save();
         }
     }
-}
+};

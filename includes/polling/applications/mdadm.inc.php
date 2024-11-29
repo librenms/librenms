@@ -46,12 +46,12 @@ foreach ($mdadm_data as $data) {
     $array_level = str_replace('raid', '', $level);
 
     $fields = [
-        'level'          => $array_level,
-        'size'           => $size,
-        'disc_count'     => $disc_count,
+        'level' => $array_level,
+        'size' => $size,
+        'disc_count' => $disc_count,
         'hotspare_count' => $hotspare_count,
-        'degraded'       => $degraded,
-        'sync_speed'     => $sync_speed,
+        'degraded' => $degraded,
+        'sync_speed' => $sync_speed,
         'sync_completed' => $sync_completed,
     ];
 

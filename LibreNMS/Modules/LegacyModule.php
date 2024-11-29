@@ -28,9 +28,12 @@ namespace LibreNMS\Modules;
 use App\Models\Device;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use LibreNMS\Component;
+use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
+use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\Util\Debug;
 use Symfony\Component\Yaml\Yaml;
 
@@ -39,7 +42,7 @@ class LegacyModule implements Module
     /** @var array */
     private $module_deps = [
         'arp-table' => ['ports'],
-        'bgp-peers' => ['ports', 'vrf'],
+        'bgp-peers' => ['ports', 'vrf', 'ipv4-addresses', 'ipv6-addresses'],
         'cisco-mac-accounting' => ['ports'],
         'fdb-table' => ['ports', 'vlans'],
         'vlans' => ['ports'],
@@ -64,43 +67,82 @@ class LegacyModule implements Module
         $this->name = $name;
     }
 
-    public function discover(OS $os): void
+    public function shouldDiscover(OS $os, ModuleStatus $status): bool
     {
-        // TODO: Implement discover() method.
+        return $this->shouldPoll($os, $status);
     }
 
-    public function poll(OS $os): void
+    public function discover(OS $os): void
     {
-        if (! is_file(base_path("includes/polling/$this->name.inc.php"))) {
-            echo "Module $this->name does not exist, please remove it from your configuration";
+        if (! \LibreNMS\Util\Module::legacyDiscoveryExists($this->name)) {
+            Log::error("Module $this->name does not exist, please remove it from your configuration");
 
             return;
         }
 
         $device = &$os->getDeviceArray();
-        $device['attribs'] = $os->getDevice()->attribs->toArray();
         Debug::disableErrorReporting(); // ignore errors in legacy code
 
+        include_once base_path('includes/datastore.inc.php');
         include_once base_path('includes/dbFacile.php');
+        include_once base_path('includes/rewrites.php');
+        include base_path("includes/discovery/$this->name.inc.php");
+
+        Debug::enableErrorReporting(); // and back to normal
+    }
+
+    public function shouldPoll(OS $os, ModuleStatus $status): bool
+    {
+        // all legacy modules require snmp except ipmi and unix-agent
+        return $status->isEnabledAndDeviceUp($os->getDevice(), check_snmp: ! in_array($this->name, ['ipmi', 'unix-agent']));
+    }
+
+    public function poll(OS $os, DataStorageInterface $datastore): void
+    {
+        if (! \LibreNMS\Util\Module::legacyPollingExists($this->name)) {
+            Log::error("Module $this->name does not exist, please remove it from your configuration");
+
+            return;
+        }
+
+        $device = &$os->getDeviceArray();
+        Debug::disableErrorReporting(); // ignore errors in legacy code
+        global $agent_data;
+
+        include_once base_path('includes/datastore.inc.php');
+        include_once base_path('includes/dbFacile.php');
+        include_once base_path('includes/rewrites.php');
         include base_path("includes/polling/$this->name.inc.php");
 
         Debug::enableErrorReporting(); // and back to normal
     }
 
-    public function cleanup(Device $device): void
+    public function dataExists(Device $device): bool
     {
-        // TODO: Implement cleanup() method.
+        return false; // impossible to determine for legacy modules
+    }
+
+    public function cleanup(Device $device): int
+    {
+        return 0; // Not possible to cleanup legacy modules
     }
 
     /**
      * @inheritDoc
      */
-    public function dump(Device $device)
+    public function dump(Device $device, string $type): ?array
     {
+        if ($type == 'discovery' && ! \LibreNMS\Util\Module::legacyDiscoveryExists($this->name)) {
+            return null;
+        }
+        if ($type == 'poller' && ! \LibreNMS\Util\Module::legacyPollingExists($this->name)) {
+            return null;
+        }
+
         $data = [];
         $dump_rules = $this->moduleDumpDefinition();
         if (empty($dump_rules)) {
-            return false; // not supported for this legacy module
+            return null; // not supported for this legacy module
         }
 
         foreach ($dump_rules as $table => $info) {

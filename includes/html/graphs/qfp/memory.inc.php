@@ -33,7 +33,7 @@ if ($width > '500') {
 
 $descr = \LibreNMS\Data\Store\Rrd::fixedSafeDescr(short_hrDeviceDescr($components['name']), $descr_len);
 
-$perc = $components['memory_used'] * 100 / $components['memory_total'];
+$perc = \LibreNMS\Util\Number::calculatePercent((int) $components['memory_used'], (int) $tmp_component['memory_total']);
 
 $background = \LibreNMS\Util\Color::percentage($perc, 75);
 

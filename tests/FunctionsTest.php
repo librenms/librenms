@@ -26,36 +26,33 @@
 namespace LibreNMS\Tests;
 
 use LibreNMS\Device\YamlDiscovery;
-use LibreNMS\Util\Rewrite;
+use LibreNMS\Enum\IntegerType;
+use LibreNMS\Util\Number;
+use LibreNMS\Util\StringHelpers;
 use LibreNMS\Util\Time;
 
 class FunctionsTest extends TestCase
 {
-    public function testMacCleanToReadable()
-    {
-        $this->assertEquals('de:ad:be:ef:a0:c3', Rewrite::readableMac('deadbeefa0c3'));
-    }
-
-    public function testHex2Str()
+    public function testHex2Str(): void
     {
         $this->assertEquals('Big 10 UP', hex2str('426967203130205550'));
     }
 
-    public function testSnmpHexstring()
+    public function testSnmpHexstring(): void
     {
         $input = '4c 61 72 70 69 6e 67 20 34 20 55 00 0a';
         $this->assertEquals("Larping 4 U\n", snmp_hexstring($input));
     }
 
-    public function testIsHexString()
+    public function testIsHexString(): void
     {
-        $this->assertTrue(isHexString('af 28 02'));
-        $this->assertTrue(isHexString('aF 28 02 CE'));
-        $this->assertFalse(isHexString('a5 fj 53'));
-        $this->assertFalse(isHexString('a5fe53'));
+        $this->assertTrue(StringHelpers::isHex('af 28 02'));
+        $this->assertTrue(StringHelpers::isHex('aF 28 02 CE'));
+        $this->assertFalse(StringHelpers::isHex('a5 fj 53'));
+        $this->assertFalse(StringHelpers::isHex('a5fe53'));
     }
 
-    public function testDynamicDiscoveryGetValue()
+    public function testDynamicDiscoveryGetValue(): void
     {
         $pre_cache = [
             'firstdata' => [
@@ -101,7 +98,7 @@ class FunctionsTest extends TestCase
         $this->assertSame('BBQ', YamlDiscovery::getValueFromData('doubletable', 13, $data, $pre_cache));
     }
 
-    public function testParseAtTime()
+    public function testParseAtTime(): void
     {
         $this->assertEquals(time(), Time::parseAt('now'), 'now did not match');
         $this->assertEquals(time() + 180, Time::parseAt('+3m'), '+3m did not match');
@@ -118,5 +115,42 @@ class FunctionsTest extends TestCase
         $this->assertEquals(0, Time::parseAt('invalid'));
         $this->assertEquals(606614400, Time::parseAt('March 23 1989 UTC'));
         $this->assertEquals(time() + 86400, Time::parseAt('+1 day'));
+    }
+
+    public function testNumberCast()
+    {
+        $this->assertSame(-14.3, Number::cast(-14.3));
+        $this->assertSame(0, Number::cast('b -35')); // cast must start with the number as old style php cast did
+        $this->assertSame(0, Number::cast('0 43 51'));
+        $this->assertSame(14.35, Number::cast('14.35 a'));
+        $this->assertSame(-43.332, Number::cast('-43.332 a'));
+        $this->assertSame(-12325234523.43, Number::cast('-12325234523.43asdf'));
+        $this->assertSame(1, Number::cast(1.0));
+        $this->assertSame(2, Number::cast('2.000'));
+    }
+
+    public function testNumberAsUnsigned()
+    {
+        $this->assertSame(42, Number::constrainInteger('42', IntegerType::int32));  /** @phpstan-ignore-line */
+        $this->assertSame(2147483647, Number::constrainInteger(2147483647, IntegerType::int32));
+        $this->assertSame(-2147483648, Number::constrainInteger(2147483648, IntegerType::int32));
+        $this->assertSame(-2147483647, Number::constrainInteger(2147483649, IntegerType::int32));
+        $this->assertSame(-1, Number::constrainInteger(4294967295, IntegerType::int32));
+        $this->assertSame(-3757, Number::constrainInteger(61779, IntegerType::int16));
+        $this->assertSame(0, Number::constrainInteger(0, IntegerType::uint32));
+        $this->assertSame(42, Number::constrainInteger(42, IntegerType::uint32));
+        $this->assertSame(4294967252, Number::constrainInteger(-42, IntegerType::uint32));
+        $this->assertSame(2147483648, Number::constrainInteger(-2147483646, IntegerType::uint32));
+        $this->assertSame(2147483647, Number::constrainInteger(-2147483647, IntegerType::uint32));
+        $this->assertSame(2147483646, Number::constrainInteger(-2147483648, IntegerType::uint32));
+        $this->assertSame(2147483645, Number::constrainInteger(-2147483649, IntegerType::uint32));
+    }
+
+    public function testNumberAsUnsignedValueExceedsMaxUnsignedValue()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        // Exceeds the maximum representable value for a 16-bit unsigned integer
+        Number::constrainInteger(4294967296, IntegerType::int16);
     }
 }

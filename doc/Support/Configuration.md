@@ -181,23 +181,29 @@ be linked to rather than having the config provided.
 >
 > Settings -> External Settings -> RRDTool Setup
 
-```bash
-lnms config:set rrdtool /usr/bin/rrdtool
-```
+!!! setting "external/binaries"
+    ```bash
+    lnms config:set rrdtool /usr/bin/rrdtool
+    ```
 
 Please see [1 Minute polling](1-Minute-Polling.md) for information on
 configuring your install to record data more frequently.
 
 #### fping
 
-```bash
-lnms config:set fping /usr/bin/fping
-lnms config:set fping6 fping6
-lnms config:set fping_options.timeout 500
-lnms config:set fping_options.count 3
-lnms config:set fping_options.interval 500
-lnms config:set fping_options.tos 184
-```
+!!! setting "external/binaries"
+    ```bash
+    lnms config:set fping /usr/bin/fping
+    lnms config:set fping6 fping6
+    ```
+
+!!! setting "poller/ping"
+    ```bash
+    lnms config:set fping_options.timeout 500
+    lnms config:set fping_options.count 3
+    lnms config:set fping_options.interval 500
+    lnms config:set fping_options.tos 184
+    ```
 
 `fping` configuration options:
 
@@ -240,26 +246,21 @@ lnms config:set icmp_check false
 If you would like to do this on a per device basis then you can do so
 under Device -> Edit -> Misc -> Disable ICMP Test? On
 
-#### traceroute
-
-LibreNMS uses traceroute to record debug information
-when a device is down due to icmp AND you have
-`lnms config:set debug.run_trace true` set.
-
-```bash
-lnms config:set traceroute /usr/bin/traceroute
-```
-
 #### SNMP
-
-```bash
-lnms config:set snmpwalk /usr/bin/snmpwalk
-lnms config:set snmpget /usr/bin/snmpget
-lnms config:set snmpbulkwalk /usr/bin/snmpbulkwalk
-```
 
 SNMP program locations.
 
+!!! setting "external/binaries"
+    ```bash
+    lnms config:set snmpwalk /usr/bin/snmpwalk
+    lnms config:set snmpget /usr/bin/snmpget
+    lnms config:set snmpbulkwalk /usr/bin/snmpbulkwalk
+    lnms config:set snmpgetnext /usr/bin/snmpgetnext
+    lnms config:set snmptranslate /usr/bin/snmptranslate
+    ```
+
+#### Misc binaries
+!!! setting "external/binaries"
 ```bash
 lnms config:set whois /usr/bin/whois
 lnms config:set ping /bin/ping
@@ -287,10 +288,11 @@ lnms config:set password.min_length 8
 For alerting and the callback functionality, we support the use of a
 http proxy setting. These can be any one of the following:
 
-```bash
-lnms config:set callback_proxy proxy.domain.com
-lnms config:set http_proxy proxy.domain.com
-```
+!!! setting "system/proxy"
+    ```bash
+    lnms config:set callback_proxy proxy.domain.com
+    lnms config:set http_proxy proxy.domain.com
+    ```
 
 We can also make use of one of these environment variables which can be set in `/etc/environment`:
 
@@ -311,9 +313,10 @@ lnms config:set base_url http://demo.librenms.org
 
 LibreNMS will attempt to detect the URL you are using but you can override that here.
 
-```bash
-lnms config:set site_style light
-```
+!!! setting "webui/style"
+    ```bash
+    lnms config:set site_style light
+    ```
 
 Currently we have a number of styles which can be set which will alter
 the navigation bar look. dark, light and mono with light being the default.
@@ -328,9 +331,10 @@ into  `html/css/custom` so they will be ignored by auto updates. You
 can specify as many css files as you like, the order they are within
 your config will be the order they are loaded in the browser.
 
-```bash
-lnms config:set title_image images/custom/yourlogo.png
-```
+!!! setting "webui/style"
+    ```bash
+    lnms config:set title_image images/custom/yourlogo.png
+    ```
 
 You can override the default logo with yours, place any custom images
 files into `html/images/custom` so they will be ignored by auto updates.
@@ -350,10 +354,10 @@ You can create your own front page by adding a blade file in `resources/views/ov
 and setting `front_page` to it's name.
 For example, if you create `resources/views/overview/custom/foobar.blade.php`, set `front_page` to `foobar`.
 
-```bash
-// This option exists in the web UI, edit it under Global Settings -> webui
-lnms config:set webui.default_dashboard_id 0
-```
+!!! setting "webui/dashboard"
+    ```bash
+    lnms config:set webui.default_dashboard_id 0
+    ```
 
 Allows the specification of a global default dashboard page for any user who
 has not set one in their user preferences.  Should be set to dashboard_id of an
@@ -452,9 +456,10 @@ lnms config:set overview_show_sysDescr true
 
 Enable or disable the sysDescr output for a device.
 
-```bash
-lnms config:set device_display_default '{{ $hostname }}'
-```
+!!! setting "webui/device"
+    ```bash
+    lnms config:set device_display_default '{{ $hostname }}'
+    ```
 
 This is a simple template to control the display of device names by default.
 You can override this setting per-device.
@@ -503,9 +508,10 @@ lnms config:set percentile_value 90
 
 Show the `X`th percentile in the graph instead of the default 95th percentile.
 
-```bash
-lnms config:set shorthost_target_length 15
-```
+!!! setting "webui/graph"
+    ```bash
+    lnms config:set shorthost_target_length 15
+    ```
 
 The target maximum hostname length when applying the shorthost() function.
 You can increase this if you want to try and fit more of the hostname in graph titles.
@@ -541,6 +547,7 @@ lnms config:set addhost_alwayscheckip false # true - check for duplicate ips eve
 By default we allow hosts to be added with duplicate sysName's, you
 can disable this with the following config:
 
+!!! setting "discovery/general"
 ```bash
 lnms config:set allow_duplicate_sysName false
 ```
@@ -576,14 +583,15 @@ lnms config:set os.ios.poller_modules.entity-state true
 Default SNMP options including retry and timeout settings and also
 default version and port.
 
-```bash
-lnms config:set snmp.timeout 1                         # timeout in seconds
-lnms config:set snmp.retries 5                         # how many times to retry the query
-lnms config:set snmp.transports '["udp", "udp6", "tcp", "tcp6"]'    # Transports to use
-lnms config:set snmp.version '["v2c", "v3", "v1"]'       # Default versions to use
-lnms config:set snmp.port 161                          # Default port
-lnms config:set snmp.exec_timeout 1200                 # execution time limit in seconds
-```
+!!! setting "poller/snmp"
+    ```bash
+    lnms config:set snmp.timeout 1                         # timeout in seconds
+    lnms config:set snmp.retries 5                         # how many times to retry the query
+    lnms config:set snmp.transports '["udp", "udp6", "tcp", "tcp6"]'    # Transports to use
+    lnms config:set snmp.version '["v2c", "v3", "v1"]'       # Default versions to use
+    lnms config:set snmp.port 161                          # Default port
+    lnms config:set snmp.exec_timeout 1200                 # execution time limit in seconds
+    ```
 
 > NOTE: `timeout` is the time to wait for an answer and `exec_timeout`
 > is the max time to run a query.
@@ -591,24 +599,27 @@ lnms config:set snmp.exec_timeout 1200                 # execution time limit in
 The default v1/v2c snmp community to use, you can expand this array
 with `[1]`, `[2]`, `[3]`, etc.
 
-```bash
-lnms config:set snmp.community.0 public
-```
+!!! setting "poller/snmp"
+    ```bash
+    lnms config:set snmp.community.0 public
+    ```
+
 >NOTE: This list of SNMP communities is used for auto discovery, and as a default set for any manually added device.
 
 The default v3 snmp details to use, you can expand this array with
 `[1]`, `[2]`, `[3]`, etc.
 
-```bash
-lnms config:set snmp.v3.0 '{
-    authlevel: "noAuthNoPriv",
-    authname: "root",
-    authpass: "",
-    authalgo: "MD5",
-    cryptopass: "",
-    cryptoalgo: "AES"
-}'
-```
+!!! setting "poller/snmp"
+    ```bash
+    lnms config:set snmp.v3.0 '{
+        authlevel: "noAuthNoPriv",
+        authname: "root",
+        authpass: "",
+        authalgo: "MD5",
+        cryptopass: "",
+        cryptoalgo: "AES"
+    }'
+    ```
 
 ```
 authlevel   noAuthNoPriv | authNoPriv | authPriv
@@ -628,19 +639,20 @@ Please refer to [Auto-Discovery](../Extensions/Auto-Discovery.md)
 > You can configure these options within the WebUI now, please avoid
 > setting these options within config.php
 
-```bash
-lnms config:set email_backend mail
-lnms config:set email_from librenms@yourdomain.local
-lnms config:set email_user `lnms config:get project_id`
-lnms config:set email_sendmail_path /usr/sbin/sendmail
-lnms config:set email_smtp_host localhost
-lnms config:set email_smtp_port 25
-lnms config:set email_smtp_timeout 10
-lnms config:set email_smtp_secure tls
-lnms config:set email_smtp_auth false
-lnms config:set email_smtp_username NULL
-lnms config:set email_smtp_password NULL
-```
+!!! setting "alerting/email"
+    ```bash
+    lnms config:set email_backend mail
+    lnms config:set email_from librenms@yourdomain.local
+    lnms config:set email_user `lnms config:get project_id`
+    lnms config:set email_sendmail_path /usr/sbin/sendmail
+    lnms config:set email_smtp_host localhost
+    lnms config:set email_smtp_port 25
+    lnms config:set email_smtp_timeout 10
+    lnms config:set email_smtp_secure tls
+    lnms config:set email_smtp_auth false
+    lnms config:set email_smtp_username NULL
+    lnms config:set email_smtp_password NULL
+    ```
 
 What type of mail transport to use for delivering emails. Valid
 options for `email_backend` are mail, sendmail or smtp. The varying
@@ -680,9 +692,10 @@ Enable / disable additional port statistics.
 Assign a new discovered Port automatically to Port Group with this Port Group ID
 (0 means no Port Group assignment)
 
-```php
-lnms config:set default_port_group 0
-```
+!!! setting "discovery/networks"
+    ```bash
+    lnms config:set default_port_group 0
+    ```
 
 ## External integration
 
@@ -939,6 +952,8 @@ lnms config:set os.iosxe.disabled_sensors_regex '/PEM Iout/'
 ## Storage configuration
 
 Mounted storage / mount points to ignore in discovery and polling.
+
+!!! setting "discovery/storage"
 
 ```bash
 lnms config:set ignore_mount_removable true

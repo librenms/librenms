@@ -7,12 +7,12 @@ $rrd_filename = Rrd::name($device['hostname'], ['app', 'mysql', $app->app_id]);
 
 $array = [
     'IBILog' => 'AIO Log',
-    'IBISc'  => 'AIO Sync',
+    'IBISc' => 'AIO Sync',
     'IBIFLg' => 'Buf Pool Flush',
-    'IBFBl'  => 'Log Flushes',
+    'IBFBl' => 'Log Flushes',
     'IBIIAo' => 'Insert Buf AIO Read',
-    'IBIAd'  => 'Normal AIO Read',
-    'IBIAe'  => 'Normal AIO Writes',
+    'IBIAd' => 'Normal AIO Read',
+    'IBIAe' => 'Normal AIO Writes',
 ];
 
 $i = 0;

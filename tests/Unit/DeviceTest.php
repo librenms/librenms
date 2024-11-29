@@ -35,7 +35,7 @@ class DeviceTest extends DBTestCase
 {
     use DatabaseTransactions;
 
-    public function testFindByHostname()
+    public function testFindByHostname(): void
     {
         $device = Device::factory()->create(); /** @var Device $device */
         $found = Device::findByHostname($device->hostname);
@@ -43,25 +43,25 @@ class DeviceTest extends DBTestCase
         $this->assertEquals($device->device_id, $found->device_id, 'Did not find the correct device');
     }
 
-    public function testFindByIpFail()
+    public function testFindByIpFail(): void
     {
         $found = Device::findByIp('this is not an ip');
         $this->assertNull($found);
     }
 
-    public function testFindByIpv4Fail()
+    public function testFindByIpv4Fail(): void
     {
         $found = Device::findByIp('182.43.219.43');
         $this->assertNull($found);
     }
 
-    public function testFindByIpv6Fail()
+    public function testFindByIpv6Fail(): void
     {
         $found = Device::findByIp('341a:234d:3429:9845:909f:fd32:1930:32dc');
         $this->assertNull($found);
     }
 
-    public function testFindIpButNoPort()
+    public function testFindIpButNoPort(): void
     {
         $ipv4 = Ipv4Address::factory()->create(); /** @var Ipv4Address $ipv4 */
         Port::destroy($ipv4->port_id);
@@ -70,7 +70,7 @@ class DeviceTest extends DBTestCase
         $this->assertNull($found);
     }
 
-    public function testFindByIp()
+    public function testFindByIp(): void
     {
         $device = Device::factory()->create(); /** @var Device $device */
         $found = Device::findByIp($device->ip);
@@ -78,7 +78,7 @@ class DeviceTest extends DBTestCase
         $this->assertEquals($device->device_id, $found->device_id, 'Did not find the correct device');
     }
 
-    public function testFindByIpHostname()
+    public function testFindByIpHostname(): void
     {
         $ip = '192.168.234.32';
         $device = Device::factory()->create(['hostname' => $ip]); /** @var Device $device */
@@ -87,7 +87,7 @@ class DeviceTest extends DBTestCase
         $this->assertEquals($device->device_id, $found->device_id, 'Did not find the correct device');
     }
 
-    public function testFindByIpThroughPort()
+    public function testFindByIpThroughPort(): void
     {
         $device = Device::factory()->create(); /** @var Device $device */
         $port = Port::factory()->make(); /** @var Port $port */

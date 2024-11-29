@@ -29,14 +29,23 @@ foreach ((array) $temp as $index => $entry) {
     $descr = $entry['voltageProbeLocationName'];
     if ($entry['voltageProbeType'] != 'voltageProbeTypeIsDiscrete') {
         $divisor = 1000;
-        $value = $entry['voltageProbeReading'];
-        $lowlimit = $entry['voltageProbeLowerCriticalThreshold'] / $divisor;
-        $low_warn_limit = $entry['voltageProbeLowerCriticalThreshold'] / $divisor;
-        $warnlimit = $entry['voltageProbeUpperNonCriticalThreshold'] / $divisor;
-        $limit = $entry['voltageProbeUpperCriticalThreshold'] / $divisor;
+        (isset($entry['voltageProbeReading'])) ? $value = $entry['voltageProbeReading'] : $value = null;
+        (isset($entry['voltageProbeLowerCriticalThreshold'])) ? $lowlimit = $entry['voltageProbeLowerCriticalThreshold'] / $divisor : $lowlimit = null;
+        (isset($entry['voltageProbeLowerCriticalThreshold'])) ? $low_warn_limit = $entry['voltageProbeLowerCriticalThreshold'] / $divisor : $low_warn_limit = null;
+        (isset($entry['voltageProbeUpperNonCriticalThreshold'])) ? $warnlimit = $entry['voltageProbeUpperNonCriticalThreshold'] / $divisor : $warnlimit = null;
+        (isset($entry['voltageProbeUpperCriticalThreshold'])) ? $limit = $entry['voltageProbeUpperCriticalThreshold'] / $divisor : $limit = null;
 
-        discover_sensor($valid['sensor'], 'voltage', $device, $cur_oid . $index, $index, 'dell', $descr, $divisor, '1', $lowlimit, $low_warn_limit, $warnlimit, $limit, $value, 'snmp', $index);
+        discover_sensor(null, 'voltage', $device, $cur_oid . $index, $index, 'dell', $descr, $divisor, '1', $lowlimit, $low_warn_limit, $warnlimit, $limit, $value, 'snmp', $index);
     }
+
+    unset(
+        $descr,
+        $value,
+        $lowlimit,
+        $low_warn_limit,
+        $warnlimit,
+        $limit
+    );
 }
 
 unset(

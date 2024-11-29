@@ -1,10 +1,9 @@
 import logging
 import os
+import pymysql  # pylint: disable=import-error
 import sys
 import threading
 import time
-
-import pymysql  # pylint: disable=import-error
 
 import LibreNMS
 from LibreNMS.config import DBConfig
@@ -91,11 +90,17 @@ class ServiceConfig(DBConfig):
     redis_host = "localhost"
     redis_port = 6379
     redis_db = 0
+    redis_user = None
     redis_pass = None
     redis_socket = None
     redis_sentinel = None
+    redis_sentinel_user = None
+    redis_sentinel_pass = None
     redis_sentinel_service = None
     redis_timeout = 60
+
+    log_output = False
+    logdir = "logs"
 
     watchdog_enabled = False
     watchdog_logfile = "logs/librenms.log"
@@ -112,6 +117,9 @@ class ServiceConfig(DBConfig):
         )
 
         # backward compatible options
+        self.master_timeout = config.get(
+            "service_master_timeout", ServiceConfig.master_timeout
+        )
         self.poller.workers = config.get(
             "poller_service_workers", ServiceConfig.poller.workers
         )
@@ -127,39 +135,63 @@ class ServiceConfig(DBConfig):
         self.log_level = config.get("poller_service_loglevel", ServiceConfig.log_level)
 
         # new options
-        self.poller.enabled = config.get("service_poller_enabled", True)  # unused
+        self.poller.enabled = (
+            config.get("service_poller_enabled", True)
+            if config.get("schedule_type").get("poller", "legacy") == "legacy"
+            else config.get("schedule_type").get("poller", "legacy") == "dispatcher"
+        )
         self.poller.workers = config.get(
             "service_poller_workers", ServiceConfig.poller.workers
         )
         self.poller.frequency = config.get(
             "service_poller_frequency", ServiceConfig.poller.frequency
         )
-        self.discovery.enabled = config.get("service_discovery_enabled", True)  # unused
+        self.discovery.enabled = (
+            config.get("service_discovery_enabled", True)
+            if config.get("schedule_type").get("discovery", "legacy") == "legacy"
+            else config.get("schedule_type").get("discovery", "legacy") == "dispatcher"
+        )
         self.discovery.workers = config.get(
             "service_discovery_workers", ServiceConfig.discovery.workers
         )
         self.discovery.frequency = config.get(
             "service_discovery_frequency", ServiceConfig.discovery.frequency
         )
-        self.services.enabled = config.get("service_services_enabled", True)
+        self.services.enabled = (
+            config.get("service_services_enabled", True)
+            if config.get("schedule_type").get("services", "legacy") == "legacy"
+            else config.get("schedule_type").get("services", "legacy") == "dispatcher"
+        )
         self.services.workers = config.get(
             "service_services_workers", ServiceConfig.services.workers
         )
         self.services.frequency = config.get(
             "service_services_frequency", ServiceConfig.services.frequency
         )
-        self.billing.enabled = config.get("service_billing_enabled", True)
+        self.billing.enabled = (
+            config.get("service_billing_enabled", True)
+            if config.get("schedule_type").get("billing", "legacy") == "legacy"
+            else config.get("schedule_type").get("billing", "legacy") == "dispatcher"
+        )
         self.billing.frequency = config.get(
             "service_billing_frequency", ServiceConfig.billing.frequency
         )
         self.billing.calculate = config.get(
             "service_billing_calculate_frequency", ServiceConfig.billing.calculate
         )
-        self.alerting.enabled = config.get("service_alerting_enabled", True)
+        self.alerting.enabled = (
+            config.get("service_alerting_enabled", True)
+            if config.get("schedule_type").get("alerting", "legacy") == "legacy"
+            else config.get("schedule_type").get("alerting", "legacy") == "dispatcher"
+        )
         self.alerting.frequency = config.get(
             "service_alerting_frequency", ServiceConfig.alerting.frequency
         )
-        self.ping.enabled = config.get("service_ping_enabled", False)
+        self.ping.enabled = (
+            config.get("service_ping_enabled", False)
+            if config.get("schedule_type").get("ping", "legacy") == "legacy"
+            else config.get("schedule_type").get("ping", "legacy") == "dispatcher"
+        )
         self.ping.frequency = config.get("ping_rrd_step", ServiceConfig.ping.frequency)
         self.down_retry = config.get(
             "service_poller_down_retry", ServiceConfig.down_retry
@@ -178,6 +210,9 @@ class ServiceConfig(DBConfig):
         self.redis_db = os.getenv(
             "REDIS_DB", config.get("redis_db", ServiceConfig.redis_db)
         )
+        self.redis_user = os.getenv(
+            "REDIS_USERNAME", config.get("redis_user", ServiceConfig.redis_user)
+        )
         self.redis_pass = os.getenv(
             "REDIS_PASSWORD", config.get("redis_pass", ServiceConfig.redis_pass)
         )
@@ -189,6 +224,14 @@ class ServiceConfig(DBConfig):
         )
         self.redis_sentinel = os.getenv(
             "REDIS_SENTINEL", config.get("redis_sentinel", ServiceConfig.redis_sentinel)
+        )
+        self.redis_sentinel_user = os.getenv(
+            "REDIS_SENTINEL_USERNAME",
+            config.get("redis_sentinel_user", ServiceConfig.redis_sentinel_user),
+        )
+        self.redis_sentinel_pass = os.getenv(
+            "REDIS_SENTINEL_PASSWORD",
+            config.get("redis_sentinel_pass", ServiceConfig.redis_sentinel_pass),
         )
         self.redis_sentinel_service = os.getenv(
             "REDIS_SENTINEL_SERVICE",
@@ -231,7 +274,8 @@ class ServiceConfig(DBConfig):
         self.watchdog_enabled = config.get(
             "service_watchdog_enabled", ServiceConfig.watchdog_enabled
         )
-        self.watchdog_logfile = config.get("log_file", ServiceConfig.watchdog_logfile)
+        self.logdir = config.get("log_dir", ServiceConfig.BASE_DIR + "/logs")
+        self.watchdog_logfile = config.get("log_file", self.logdir + "/librenms.log")
 
         # set convenient debug variable
         self.debug = logging.getLogger().isEnabledFor(logging.DEBUG)
@@ -572,7 +616,7 @@ class Service:
                 """SELECT `device_id`,
                   `poller_group`,
                   COALESCE(`last_polled` <= DATE_ADD(DATE_ADD(NOW(), INTERVAL -%s SECOND), INTERVAL COALESCE(`last_polled_timetaken`, 0) SECOND), 1) AS `poll`,
-                  IF(snmp_disable=1 OR status=0, 0, IF (%s < `last_discovered_timetaken` * 1.25, 0, COALESCE(`last_discovered` <= DATE_ADD(DATE_ADD(NOW(), INTERVAL -%s SECOND), INTERVAL COALESCE(`last_discovered_timetaken`, 0) SECOND), 1))) AS `discover`
+                  IF(status=0, 0, IF (%s < `last_discovered_timetaken` * 1.25, 0, COALESCE(`last_discovered` <= DATE_ADD(DATE_ADD(NOW(), INTERVAL -%s SECOND), INTERVAL COALESCE(`last_discovered_timetaken`, 0) SECOND), 1))) AS `discover`
                 FROM `devices`
                 WHERE `disabled` = 0 AND (
                     `last_polled` IS NULL OR
@@ -644,10 +688,17 @@ class Service:
         """
         try:
             return LibreNMS.RedisLock(
+                sentinel_kwargs={
+                    "username": self.config.redis_sentinel_user,
+                    "password": self.config.redis_sentinel_pass,
+                    "socket_timeout": self.config.redis_timeout,
+                    "unix_socket_path": self.config.redis_socket,
+                },
                 namespace="librenms.lock",
                 host=self.config.redis_host,
                 port=self.config.redis_port,
                 db=self.config.redis_db,
+                username=self.config.redis_user,
                 password=self.config.redis_pass,
                 unix_socket_path=self.config.redis_socket,
                 sentinel=self.config.redis_sentinel,
@@ -668,7 +719,11 @@ class Service:
                 logger.critical(
                     "ERROR: Redis connection required for distributed polling"
                 )
-                logger.critical("Could not connect to Redis. {}".format(e))
+                logger.critical(
+                    "Lock manager could not connect to Redis. {}: {}".format(
+                        type(e).__name__, e
+                    )
+                )
                 self.exit(2)
 
         return LibreNMS.ThreadingLock()

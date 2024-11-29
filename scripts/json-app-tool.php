@@ -1,6 +1,8 @@
 #!/usr/bin/env php
 <?php
 
+require realpath(__DIR__ . '/..') . '/includes/init.php';
+
 // Pulled from includes/polling/functions.inc.php
 function data_flatten($array, $prefix = '', $joiner = '_')
 {
@@ -34,7 +36,7 @@ function string_to_oid($string)
 }//end string_to_oid()
 
 // Options!
-$short_opts = 'S:sktmlhj:a:';
+$short_opts = 'S:sktmlhj:a:d:';
 $options = getopt($short_opts);
 
 // print the help
@@ -48,6 +50,7 @@ if (isset($options['h'])) {
   -k      If m is specified, just print the keys in tested order.
   -a      The application name for use with -s and -t.
   -S      SNMP extend name. Defaults to the same as -a.
+  -d      JSON file to use for app data.
   -h      Show this help text.
 
 -j must always be specified.
@@ -146,7 +149,7 @@ if (! isset($options['S'])) {
 
 // Output snmprec data for snmpsim for use with testing.
 if (isset($options['s'])) {
-    $oid = string_to_oid($options['S']);
+    $oid = \LibreNMS\Util\Oid::ofString($options['S']);
     echo "1.3.6.1.2.1.1.1.0|4|Linux server 3.10.0-693.5.2.el7.x86_64 #1 SMP Fri Oct 20 20:32:50 UTC 2017 x86_64\n" .
         "1.3.6.1.2.1.1.2.0|6|1.3.6.1.4.1.8072.3.2.10\n" .
         "1.3.6.1.2.1.1.3.0|67|77550514\n" .
@@ -196,6 +199,20 @@ if (isset($options['t'])) {
             'value_prev' => null,
             'app_type' => $options['a'],
         ];
+    }
+    // if d is specified, try to read it in and add it
+    if (isset($options['d'])) {
+        $raw_app_data = file_get_contents($options['d']);
+        if ($raw_json === false) {
+            exit(2);
+        }
+        $app_data = json_decode(stripslashes($raw_app_data), true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            echo "Parsing '" . $options['d'] . "' failed. Running jsonlint...\n\n";
+            system('jsonlint ' . escapeshellarg($options['j']));
+            exit(3);
+        }
+        $test_data['applications']['poller']['applications']['0']['data'] = json_encode($app_data);
     }
     echo json_encode($test_data, JSON_PRETTY_PRINT) . "\n";
     exit(0);

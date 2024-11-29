@@ -13,75 +13,51 @@
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
-use LibreNMS\Util\Proxy;
+use LibreNMS\Exceptions\AlertTransportDeliveryException;
+use LibreNMS\Util\Http;
 
 class Ciscospark extends Transport
 {
-    protected $name = 'Cisco Spark';
+    protected string $name = 'Cisco Webex Teams';
+    // This is the total length minus 4 bytes for ellipses.
+    private static int $MAX_MSG_SIZE = 7435;
 
-    public function deliverAlert($obj, $opts)
+    public function deliverAlert(array $alert_data): bool
     {
-        if (empty($this->config)) {
-            $room_id = $opts['roomid'];
-            $token = $opts['token'];
-        } else {
-            $room_id = $this->config['room-id'];
-            $token = $this->config['api-token'];
-        }
-
-        return $this->contactCiscospark($obj, $room_id, $token);
-    }
-
-    public function contactCiscospark($obj, $room_id, $token)
-    {
-        $text = null;
+        $room_id = $this->config['room-id'];
+        $token = $this->config['api-token'];
+        $url = 'https://webexapis.com/v1/messages';
         $data = [
             'roomId' => $room_id,
         ];
 
-        $akey = 'text';
         if ($this->config['use-markdown'] === 'on') {
-            $lines = explode("\n", $obj['msg']);
-            $mlines = [];
-            /* Remove blank lines as they create weird markdown
-             * behaviors.
-             */
-            foreach ($lines as $line) {
-                $line = trim($line);
-                if ($line != '') {
-                    array_push($mlines, $line);
-                }
-            }
-            $text = implode("\n", $mlines);
-            $akey = 'markdown';
+            // Remove blank lines as they create weird markdown behaviors.
+            $msg = preg_replace('/^\s+/m', '', $alert_data['msg']);
+            $mtype = 'markdown';
         } else {
-            $text = strip_tags($obj['msg']);
-        }
-        $data[$akey] = $text;
-
-        $curl = curl_init();
-        Proxy::applyToCurl($curl);
-        curl_setopt($curl, CURLOPT_URL, 'https://api.ciscospark.com/v1/messages');
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($curl, CURLOPT_HTTPHEADER, [
-            'Content-type' => 'application/json',
-            'Expect:',
-            'Authorization: Bearer ' . $token,
-        ]);
-        curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
-        $ret = curl_exec($curl);
-        $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-
-        if ($code != 200) {
-            echo "Cisco Spark returned Error, retry later\r\n";
-
-            return false;
+            $msg = strip_tags($alert_data['msg']);
+            $mtype = 'text';
         }
 
-        return true;
+        if (strlen($msg) > Ciscospark::$MAX_MSG_SIZE) {
+            $msg = substr($msg, 0, Ciscospark::$MAX_MSG_SIZE) . '...';
+        }
+
+        $data[$mtype] = $msg;
+
+        $res = Http::client()
+            ->withToken($token)
+            ->post($url, $data);
+
+        if ($res->successful()) {
+            return true;
+        }
+
+        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $data['text'] ?? $data['markdown'], $data);
     }
 
-    public static function configTemplate()
+    public static function configTemplate(): array
     {
         return [
             'config' => [
@@ -89,7 +65,7 @@ class Ciscospark extends Transport
                     'title' => 'API Token',
                     'name' => 'api-token',
                     'descr' => 'CiscoSpark API Token',
-                    'type' => 'text',
+                    'type' => 'password',
                 ],
                 [
                     'title' => 'RoomID',

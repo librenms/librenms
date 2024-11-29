@@ -173,6 +173,26 @@ class SnmpResponse
         return $this->values;
     }
 
+    /**
+     * Create a key to value pair for an OID
+     * Only works for single indexed tables
+     * You may omit $oid if there is only one $oid in the walk
+     */
+    public function pluck(?string $oid = null): array
+    {
+        $output = [];
+        $oid = $oid ?? '[a-zA-Z0-9:.-]+';
+        $regex = "/^{$oid}[[.](\d+)]?$/";
+
+        foreach ($this->values() as $key => $value) {
+            if (preg_match($regex, $key, $matches)) {
+                $output[$matches[1]] = $value;
+            }
+        }
+
+        return $output;
+    }
+
     public function valuesByIndex(array &$array = []): array
     {
         foreach ($this->values() as $oid => $value) {
@@ -216,23 +236,19 @@ class SnmpResponse
             return new Collection;
         }
 
-        return collect($this->values())
-            ->map(function ($value, $oid) {
-                $parts = $this->getOidParts($oid);
-                $key = array_shift($parts);
+        $data = [];
+        foreach ($this->values() as $key => $value) {
+            $parts = $this->getOidParts($key);
+            $oid = array_shift($parts);
+            $data[implode('][', $parts)][$oid] = $value;
+        }
 
-                return [
-                    '_index' => implode('][', $parts),
-                    $key => $value,
-                ];
-            })
-            ->groupBy('_index')
-            ->map(function ($values, $index) use ($callback) {
-                $values = array_merge(...$values);
-                unset($values['_index']);
+        $return = new Collection;
+        foreach ($data as $index => $values) {
+            $return->push(call_user_func($callback, $values, ...explode('][', (string) $index)));
+        }
 
-                return call_user_func($callback, $values, ...explode('][', (string) $index));
-            });
+        return $return;
     }
 
     /**
@@ -252,7 +268,7 @@ class SnmpResponse
     {
         return (string) preg_replace([
             '/^.*No Such Instance currently exists.*$/m',
-            '/\n[^\r\n]+No more variables left[^\r\n]+$/s',
+            '/(\n[^\r\n]+No more variables left[^\r\n]+)+$/',
         ], '', $this->raw);
     }
 
@@ -285,5 +301,10 @@ class SnmpResponse
 
         // regular oid
         return explode('.', $key);
+    }
+
+    public function __sleep()
+    {
+        return ['raw', 'exitCode', 'stderr'];
     }
 }

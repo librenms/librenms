@@ -26,7 +26,7 @@ if (! empty($ifName) && is_numeric($port_id)) {
         $descr = 'repoll';
         // Set to repoll so we avoid using ifDescr on port poll
     }
-    if (dbUpdate(['ifAlias'=>$descr], 'ports', '`port_id`=?', [$port_id]) > 0) {
+    if (dbUpdate(['ifAlias' => $descr], 'ports', '`port_id`=?', [$port_id]) > 0) {
         $device = device_by_id_cache($device_id);
         if ($descr === 'repoll') {
             del_dev_attrib($device, 'ifName:' . $ifName);
@@ -42,6 +42,6 @@ if (! empty($ifName) && is_numeric($port_id)) {
 }
 
 $response = [
-    'status'        => $status,
+    'status' => $status,
 ];
 echo json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);

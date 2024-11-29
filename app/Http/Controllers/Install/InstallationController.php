@@ -126,7 +126,7 @@ class InstallationController extends Controller
                 $db['port'] ?? 3306,
                 $db['socket'] ?? null
             );
-            config(['database.default', $this->connection]);
+            config('database.default', $this->connection);
         }
     }
 

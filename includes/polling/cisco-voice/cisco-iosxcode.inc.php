@@ -15,13 +15,11 @@ use LibreNMS\RRD\RrdDefinition;
 
 if ($device['os_group'] == 'cisco') {
     // Total
-    $total = snmpwalk_cache_oid_num($device, '1.3.6.1.4.1.9.9.86.1.7.1.0', null);
-    $total = $total['1.3.6.1.4.1.9.9.86.1.7.1.0'][''];
+    $total = SnmpQuery::get('1.3.6.1.4.1.9.9.86.1.7.1.0')->value();
 
-    if (isset($total) && $total > 0) {
+    if (is_numeric($total) && $total > 0) {
         // Available
-        $available = snmpwalk_cache_oid_num($device, '1.3.6.1.4.1.9.9.86.1.7.2.0', null);
-        $available = $available['1.3.6.1.4.1.9.9.86.1.7.2.0'][''];
+        $available = SnmpQuery::get('1.3.6.1.4.1.9.9.86.1.7.2.0')->value();
 
         // Active
         $active = $total - $available;
@@ -31,7 +29,7 @@ if ($device['os_group'] == 'cisco') {
             ->addDataset('active', 'GAUGE', 0);
 
         $fields = [
-            'total'  => $total,
+            'total' => $total,
             'active' => $active,
         ];
 

@@ -1,0 +1,1326 @@
+DNOS-AUTHENTICATION-MANAGER-MIB DEFINITIONS ::= BEGIN
+
+-- Broadcom FastPath Authentication Manager MIB
+-- Copyright 2016-2020 Broadcom.
+-- This SNMP Management Information Specification
+-- embodies Broadcom's confidential and proprietary
+-- intellectual property. Broadcom retains all title
+-- and ownership in the Specification including any revisions.
+
+-- This Specification is supplied "AS IS", Broadcom
+-- makes no warranty, either expressed or implied,
+-- as to the use, operation, condition, or performance of the
+-- Specification.
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+        TimeTicks, Unsigned32
+                                            FROM SNMPv2-SMI
+        MacAddress, TEXTUAL-CONVENTION, DateAndTime, RowStatus, TruthValue
+                                            FROM SNMPv2-TC
+        DisplayString                       FROM RFC1213-MIB
+        ifIndex                             FROM IF-MIB
+        InterfaceIndex                      FROM IF-MIB
+        dnOS                            FROM DELL-REF-MIB;
+
+    fastPathAuthMgr MODULE-IDENTITY
+
+        LAST-UPDATED "202010080000Z" -- 08 October 2020 12:00:00 GMT
+        ORGANIZATION "Dell EMC"
+        CONTACT-INFO ""
+        DESCRIPTION
+          "The Dell Networking Private MIB for Authentication Manager"
+
+        -- Revision history.
+        REVISION
+         "202010080000Z" -- 08 October 2020 12:00:00 GMT
+        DESCRIPTION
+          "Added new objects agentAuthMgrClientLinkSecPolicy and agentAuthMgrPortLinkSecPolicy.
+           Added new object agentAuthMgrClientSessionTimeLeft in the agentAuthMgrClientStatusTable."
+        REVISION
+         "202008250000Z" -- 25 August 2020 12:00:00 GMT
+        DESCRIPTION
+          "Added new object agentAuthMgrPortAuthControlDirection in
+          agentAuthMgrInterfaceConfigAuthenticationTable."
+
+        REVISION
+         "201812260000Z" -- 26 December 2018 12:00:00 GMT
+        DESCRIPTION
+          "Added new object agentAuthMgrPortAuthenticationOpen and enum value open-success.
+           Added new objects agentAuthMgrClientRedirectACL and agentAuthMgrClientRedirectURL."
+        REVISION
+         "201809240000Z" -- 24 September 2018 12:00:00 GMT
+        DESCRIPTION
+          "Added new object agentAuthMgrPortUnauthDHCPAllow."
+        REVISION
+         "201805150000Z" -- 15 May 2018 12:00:00 GMT
+        DESCRIPTION
+          "Added new objects. Most have relocated here from dot1xAdvanced MIB due to
+           Dot1x/AuthManager code re-architecture."
+        REVISION
+         "201709050000Z" -- 05 September 2017 12:00:00 GMT
+        DESCRIPTION
+          "Corrected the SYNTAX for agentAuthMgrAuthHistoryResultAuthMethod."
+        REVISION
+         "201212280000Z" -- 28 December 2012 12:00:00 GMT
+        DESCRIPTION
+          "Initial version."
+
+    ::= { dnOS 61 }
+
+
+    AuthMgrPortControlMode ::= TEXTUAL-CONVENTION
+        STATUS       current
+        DESCRIPTION
+                     "The control values of the Authenticator PAE controlled
+                      Port."
+        SYNTAX      INTEGER {
+                        forceUnauthorized(1),
+                        auto(2),
+                        forceAuthorized(3)
+                    }
+
+    AuthMgrPortHostMode ::= TEXTUAL-CONVENTION
+        STATUS       current
+        DESCRIPTION
+                     "The host mode values of the Authenticator PAE controlled
+                      Port."
+        SYNTAX      INTEGER {
+                        singleHost(1),
+                        multiHost(2),
+                        multiAuth(3),
+                        multiDomain(4),
+                        multiDomainMultiHost(5)
+                    }
+
+    AuthMgrSessionTerminationAction ::= TEXTUAL-CONVENTION
+        STATUS       current
+        DESCRIPTION
+                     "The action to be taken on session termination ."
+        SYNTAX      INTEGER {
+                        default(1),
+                        reauthenticate(2)
+                     }
+
+    --**************************************************************************************
+    --    agentAuthMgrGlobalConfigGroup
+    --**************************************************************************************
+
+    agentAuthMgrGlobalConfigGroup                      OBJECT IDENTIFIER ::= { fastPathAuthMgr 1 }
+
+    agentAuthMgrAdminMode OBJECT-TYPE
+         SYNTAX      INTEGER {
+                       enable(1),
+                       disable(2)
+                  }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Enable or disable the authentication manager feature on the system."
+         ::= { agentAuthMgrGlobalConfigGroup 1 }
+
+    agentAuthMgrRadiusVlanAssignment OBJECT-TYPE
+         SYNTAX      INTEGER {
+                       enable(1),
+                       disable(2)
+                     }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Enable/Disable authentication manager VLAN assignment support on the switch."
+         ::= { agentAuthMgrGlobalConfigGroup 2 }
+
+     agentAuthMgrDynamicVlanCreationMode OBJECT-TYPE
+         SYNTAX      INTEGER {
+                       enable(1),
+                       disable(2)
+                     }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Enable/Disable authentication manager dynamic VLAN creation Support on the switch."
+         ::= { agentAuthMgrGlobalConfigGroup 3 }
+
+     agentAuthMgrCriticalRecoveryMaxReauth OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Specifies the maximum number of client reauthentications that can be triggered
+                      per second when the the Dead or Alive server actions are configured to
+                      'reinitialze' and a RADIUS server state change happens, i.e. all servers are
+                      marked dead or one server comes back alive after all were marked dead."
+         ::= {  agentAuthMgrGlobalConfigGroup 4}
+
+
+    --**************************************************************************************
+    --    agentAuthMgrInterfaceConfigGroup
+    --**************************************************************************************
+
+    agentAuthMgrInterfaceConfigGroup                 OBJECT IDENTIFIER ::= { fastPathAuthMgr 2 }
+
+    agentAuthMgrInterfaceConfigMethodTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF AgentAuthMgrInterfaceConfigMethodEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The interface configuration for authentication manager"
+         ::= { agentAuthMgrInterfaceConfigGroup 1 }
+
+    agentAuthMgrInterfaceConfigMethodEntry OBJECT-TYPE
+         SYNTAX     AgentAuthMgrInterfaceConfigMethodEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The authentication manager interface config entry."
+         INDEX       { agentAuthMgrIfIndex, methodIndex}
+         ::= { agentAuthMgrInterfaceConfigMethodTable 1 }
+
+    AgentAuthMgrInterfaceConfigMethodEntry ::= SEQUENCE {
+                         agentAuthMgrIfIndex
+                           InterfaceIndex,
+                          methodIndex
+                           Unsigned32,
+                         agentAuthMgrMethodOrder
+                            INTEGER,
+                         agentAuthMgrMethodPriority
+                            INTEGER
+           }
+
+    agentAuthMgrIfIndex   OBJECT-TYPE
+         SYNTAX      InterfaceIndex
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The interface index for which the authentication manager config is required."
+         ::= { agentAuthMgrInterfaceConfigMethodEntry 1 }
+
+    methodIndex OBJECT-TYPE
+         SYNTAX     Unsigned32
+         MAX-ACCESS not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The index of the configuration method."
+
+         ::= { agentAuthMgrInterfaceConfigMethodEntry 2 }
+
+    agentAuthMgrMethodOrder OBJECT-TYPE
+         SYNTAX      INTEGER {
+                       undefined(0),
+                       dot1x(1),
+                       mab(2)
+                       ,captivePortal(3)
+                     }
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The authentication methods allowed for order configuration."
+         DEFVAL { undefined }
+
+         ::= { agentAuthMgrInterfaceConfigMethodEntry 3 }
+
+    agentAuthMgrMethodPriority OBJECT-TYPE
+         SYNTAX      INTEGER {
+                       undefined(0),
+                       dot1x(1),
+                       mab(2)
+                       ,captivePortal(3)
+                     }
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The authentication methods allowed for priority configuration."
+         DEFVAL { undefined }
+
+         ::= { agentAuthMgrInterfaceConfigMethodEntry 4 }
+
+
+    agentAuthMgrInterfaceConfigTimerTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF AgentAuthMgrInterfaceConfigTimerEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The interface configuration for authentication manager"
+         ::= { agentAuthMgrInterfaceConfigGroup 2 }
+
+
+    agentAuthMgrInterfaceConfigTimerEntry OBJECT-TYPE
+         SYNTAX     AgentAuthMgrInterfaceConfigTimerEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The Authentication Manager Interface config entry."
+         INDEX       { agentAuthMgrTimerIfIndex}
+         ::= { agentAuthMgrInterfaceConfigTimerTable 1 }
+
+    AgentAuthMgrInterfaceConfigTimerEntry ::= SEQUENCE {
+                         agentAuthMgrTimerIfIndex
+                           InterfaceIndex,
+                         agentAuthMgrRestart
+                           Unsigned32
+           }
+    agentAuthMgrTimerIfIndex   OBJECT-TYPE
+         SYNTAX      InterfaceIndex
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The interface ifIndex for which the authentication manager config is required."
+         ::= { agentAuthMgrInterfaceConfigTimerEntry 1 }
+
+    agentAuthMgrRestart  OBJECT-TYPE
+         SYNTAX      Unsigned32  (10..65535)
+         UNITS       "seconds"
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "The authentication restart timer value."
+         DEFVAL { 30 }
+         ::= { agentAuthMgrInterfaceConfigTimerEntry 2 }
+
+    agentAuthMgrInterfaceConfigAuthenticationTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF AgentAuthMgrInterfaceConfigAuthenticationEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The interface authentication configuration for authentication manager"
+         ::= { agentAuthMgrInterfaceConfigGroup 3 }
+
+    agentAuthMgrInterfaceConfigAuthenticationEntry OBJECT-TYPE
+         SYNTAX     AgentAuthMgrInterfaceConfigAuthenticationEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The authentication manager interface authentication config entry."
+         INDEX       { agentAuthMgrIfIndex}
+         ::= { agentAuthMgrInterfaceConfigAuthenticationTable 1 }
+
+    AgentAuthMgrInterfaceConfigAuthenticationEntry ::= SEQUENCE {
+                         agentAuthMgrPortControlMode
+                           AuthMgrPortControlMode,
+                         agentAuthMgrPortHostMode
+                           AuthMgrPortHostMode,
+                         agentAuthMgrPortNoResponseVlanId
+                           Unsigned32,
+                         agentAuthMgrPortAuthFailVlanId
+                           Unsigned32,
+                         agentAuthMgrPortMaxUsers
+                           Unsigned32,
+                         agentAuthMgrPortAuthViolationMode
+                           INTEGER,
+                         agentAuthMgrPortCriticalVlanId
+                           Unsigned32,
+                         agentAuthMgrPortAuthServerDeadAction
+                           INTEGER,
+                         agentAuthMgrPortAuthServerAliveAction
+                           INTEGER
+                        ,agentAuthMgrPortAuthServerDeadVoiceAction
+                           INTEGER
+                        ,agentAuthMgrPortInitialize
+                           TruthValue
+                        ,agentAuthMgrPortUnauthDHCPAllow
+                           INTEGER
+                        ,agentAuthMgrPortAuthenticationOpen
+                           INTEGER
+                        ,agentAuthMgrPortAuthControlDirection
+                           INTEGER
+                        ,agentAuthMgrPortLinkSecPolicy
+                           INTEGER
+           }
+
+   agentAuthMgrPortControlMode  OBJECT-TYPE
+        SYNTAX      AuthMgrPortControlMode
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+                    "Port Control mode of this port.
+                     The port control mode for this interface can take the following values:
+                     forceUnauthorized(1) - the port is in unauthorized mode,
+                     auto(2) - Authentication is enforced on the port. If a client authenticates
+                               successfully, then the interface is authorized. Otherwise, the port is
+                               in unauthorized mode.
+                     forceAuthorized(3) - The port is placed in authorized mode"
+        DEFVAL {auto}
+        ::= {  agentAuthMgrInterfaceConfigAuthenticationEntry 1}
+
+   agentAuthMgrPortHostMode  OBJECT-TYPE
+        SYNTAX      AuthMgrPortHostMode
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+                    "Port Host mode of this port.
+                     The port Host mode for this interface can take the following values:
+                     singleHost(1) - only one client can be authenticated on this port.
+                     multiHost(2)  - only on client authenticates on this port. Once authenticated,
+                                     the port is authorized for all clients on this port.
+                     multiAuth(3)  - multiple clients can be authenticated on this port.
+                     multiDomain(4)- only one data and one voice client can be authenticated on this port.
+                     multiDomainMultiHost(5) - only one data and one voice client can be authenticated on
+                                               this port. Once a data client is authenticated, the port is
+                                               authorized for all data clients on this port."
+        DEFVAL {multiHost}
+        ::= {  agentAuthMgrInterfaceConfigAuthenticationEntry 2}
+
+
+    agentAuthMgrPortNoResponseVlanId  OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+                    "Specifies the no response VLAN of the port.
+
+                     For multiHost and multiDomainMultiHost the port will
+                     be moved to this VLAN if no client sucessfully
+                     authenticates on that port for the no-response period.
+
+                     no-response period is the time period in which the client does
+                     not respond to 802.1X EAP Request Identity frames for a configured
+                     number of times.
+
+                     For the rest of the host modes, 802.1x un-aware clients will
+                     be moved to this VLAN if they fail authentication.
+
+                     A value of zero indicates no response VLAN is configured
+                     for the interface."
+        DEFVAL {0}
+        ::= { agentAuthMgrInterfaceConfigAuthenticationEntry 3}
+
+    agentAuthMgrPortAuthFailVlanId  OBJECT-TYPE
+        SYNTAX       Unsigned32
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION
+                     "Specifies the authentication failure VLAN of the port. A port will
+                      be moved to this VLAN if a 802.1x client authenticates unsucessfully
+                      on that port.
+                      A value of zero indicates authentication failure VLAN is not configured for the port."
+        DEFVAL {0}
+        ::= {  agentAuthMgrInterfaceConfigAuthenticationEntry 4}
+
+    agentAuthMgrPortMaxUsers OBJECT-TYPE
+        SYNTAX       Unsigned32
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION
+                     "Specifies the maximum users or clients that can authenticate on this port
+                      when the port control mode is in multi-auth host mode.  "
+        ::= {  agentAuthMgrInterfaceConfigAuthenticationEntry 5}
+
+    agentAuthMgrPortAuthViolationMode OBJECT-TYPE
+        SYNTAX       INTEGER {
+                       protect(1),
+                       restrict(2),
+                       shutdown(3)
+                }
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION
+                     "Sets the authentication violation mode that occur when
+                      a new device connects to a port after the maximum number
+                      of devices are connected to that port."
+        DEFVAL {restrict}
+        ::= {  agentAuthMgrInterfaceConfigAuthenticationEntry 6}
+
+    agentAuthMgrPortCriticalVlanId OBJECT-TYPE
+        SYNTAX       Unsigned32
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION
+                     "Specifies the critical VLAN of the port. A port will be moved to its critical
+                      VLAN if all RADIUS authentication servers are found to be Dead. A value of
+                      zero indicates no critical VLAN is configured for the port and the port pvid
+                      is used as the critical VLAN."
+        DEFVAL {0}
+        ::= {  agentAuthMgrInterfaceConfigAuthenticationEntry 7}
+
+    agentAuthMgrPortAuthServerDeadAction OBJECT-TYPE
+        SYNTAX       INTEGER {
+                       reinitialize(1),
+                       authorize(2),
+                       none(3)
+                     }
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION
+                     "Specifies the action to take on authenticating supplicants when all RADIUS
+                      servers are found dead."
+        DEFVAL {none}
+        ::= {  agentAuthMgrInterfaceConfigAuthenticationEntry 8}
+
+    agentAuthMgrPortAuthServerAliveAction OBJECT-TYPE
+        SYNTAX       INTEGER {
+                       reinitialize(1),
+                       none(2)
+                     }
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION
+                     "Specifies the action to take on authenticating supplicants when one RADIUS
+                      server comes back Alive after all of them were found dead earlier."
+        DEFVAL {none}
+        ::= {  agentAuthMgrInterfaceConfigAuthenticationEntry 9}
+
+    agentAuthMgrPortAuthServerDeadVoiceAction OBJECT-TYPE
+        SYNTAX       INTEGER {
+                       authorize(1),
+                       none(2)
+                     }
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION
+                     "Specifies the action to take on authenticating VoIP supplicants when all
+                      RADIUS servers are found dead."
+        DEFVAL {none}
+        ::= {  agentAuthMgrInterfaceConfigAuthenticationEntry 10}
+
+    agentAuthMgrPortInitialize OBJECT-TYPE
+        SYNTAX       TruthValue
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION
+                     "The initialization control for this Port. Setting this object 'true' causes
+                      the Port to be reinitialized, terminating (and potentially restarting) authentication
+                      exchanges. The object value reverts to 'false' once initialization has completed."
+        ::= {  agentAuthMgrInterfaceConfigAuthenticationEntry 11}
+
+    agentAuthMgrPortUnauthDHCPAllow OBJECT-TYPE
+        SYNTAX       INTEGER {
+                       enable(1),
+                       disable(2)
+                     }
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION
+                     "Specifies whether to allow DHCP packets on the port even if it is unauthorized."
+        DEFVAL {none}
+        ::= {  agentAuthMgrInterfaceConfigAuthenticationEntry 12}
+
+    agentAuthMgrPortAuthenticationOpen OBJECT-TYPE
+        SYNTAX       INTEGER {
+                       enable(1),
+                       disable(2)
+                     }
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION
+                     "Specifies whether Open Authentication is enabled on the port."
+        DEFVAL {none}
+        ::= {  agentAuthMgrInterfaceConfigAuthenticationEntry 13}
+
+    agentAuthMgrPortAuthControlDirection OBJECT-TYPE
+        SYNTAX       INTEGER {
+                       both(1),
+                       in(2)
+                     }
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION
+                     "Sets the authentication control direction for the
+                      traffic flow of the interface."
+        DEFVAL {both}
+        ::= {  agentAuthMgrInterfaceConfigAuthenticationEntry 14}
+
+
+    agentAuthMgrPortLinkSecPolicy OBJECT-TYPE
+        SYNTAX       INTEGER {
+                       shouldSecure(1),
+                       mustSecure(2),
+                       mustNotSecure(3)
+                     }
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION
+                     "Specifies LinkSec policy on the port."
+        DEFVAL {shouldSecure}
+        ::= {  agentAuthMgrInterfaceConfigAuthenticationEntry 15}
+
+    --**************************************************************************************
+    --    agentAuthMgrInterfaceStatusGroup
+    --**************************************************************************************
+
+    agentAuthMgrInterfaceStatusGroup                 OBJECT IDENTIFIER ::= { fastPathAuthMgr 3 }
+
+    agentAuthMgrInterfaceStatusTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF AgentAuthMgrInterfaceStatusMethodEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The interface configuration for authentication manager"
+         ::= { agentAuthMgrInterfaceStatusGroup 1 }
+
+    agentAuthMgrInterfaceStatusEntry OBJECT-TYPE
+         SYNTAX     AgentAuthMgrInterfaceStatusMethodEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The authentication manager interface config entry."
+         INDEX       { agentAuthMgrIfIndex, methodIndex}
+         ::= { agentAuthMgrInterfaceStatusTable 1 }
+
+    AgentAuthMgrInterfaceStatusMethodEntry ::= SEQUENCE {
+                         agentAuthMgrStatusMethodOrder
+                            INTEGER,
+                         agentAuthMgrStatusMethodPriority
+                            INTEGER
+                  }
+
+    agentAuthMgrStatusMethodOrder OBJECT-TYPE
+         SYNTAX      INTEGER {
+                       undefined(0),
+                       dot1x(1),
+                       mab(2)
+                       ,captivePortal(3)
+                  }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The authentication methods allowed for order configuration."
+         DEFVAL { undefined }
+
+         ::= { agentAuthMgrInterfaceStatusEntry 1 }
+
+    agentAuthMgrStatusMethodPriority OBJECT-TYPE
+         SYNTAX      INTEGER {
+                       undefined(0),
+                       dot1x(1),
+                       mab(2)
+                       ,captivePortal(3)
+                  }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The authentication methods allowed for priority configuration."
+         DEFVAL { undefined }
+
+         ::= { agentAuthMgrInterfaceStatusEntry 2 }
+
+
+--**************************************************************************************
+-- agentAuthMgrClientStatusGroup -> Contains MIB objects displaying Authentication
+-- Manager Client details and associated Functionality
+--
+--**************************************************************************************
+
+        agentAuthMgrClientStatusGroup OBJECT IDENTIFIER ::= { fastPathAuthMgr 4 }
+
+        agentAuthMgrClientStatusTable OBJECT-TYPE
+                SYNTAX      SEQUENCE OF AgentAuthMgrClientStatusEntry
+                MAX-ACCESS  not-accessible
+                STATUS      current
+                DESCRIPTION "A table for auth mgr client details and associated functionality."
+                ::= { agentAuthMgrClientStatusGroup 1 }
+
+
+        agentAuthMgrClientStatusEntry OBJECT-TYPE
+                SYNTAX      AgentAuthMgrClientStatusEntry
+                MAX-ACCESS  not-accessible
+                STATUS      current
+                DESCRIPTION "Represents entry for port config table."
+                INDEX       { agentAuthMgrClientMacAddress}
+                ::= {agentAuthMgrClientStatusTable 1 }
+
+        AgentAuthMgrClientStatusEntry ::= SEQUENCE {
+                agentAuthMgrClientMacAddress
+                        MacAddress,
+                agentAuthMgrLogicalPort
+                        Unsigned32,
+                agentAuthMgrInterface
+                        Unsigned32,
+                agentAuthMgrClientAuthstatus
+                        INTEGER,
+                agentAuthMgrClientAuthMethod
+                        INTEGER,
+                agentAuthMgrClientAuthState
+                        INTEGER,
+                agentAuthMgrClientUserName
+                        DisplayString,
+                agentAuthMgrClientVlanAssigned
+                        Unsigned32,
+                agentAuthMgrClientAuthVlanAssignedReason
+                        INTEGER,
+                agentAuthMgrClientSessionTime
+                        Unsigned32,
+                agentAuthMgrClientFilterID
+                        DisplayString,
+                agentAuthMgrClientDACL
+                        DisplayString,
+                agentAuthMgrClientSessionTimeout
+                        Unsigned32,
+                agentAuthMgrClientTerminationAction
+                        AuthMgrSessionTerminationAction,
+                agentAuthMgrClientAcctSessionId
+                        DisplayString,
+                agentAuthMgrClientRedirectACL
+                        DisplayString,
+                agentAuthMgrClientRedirectURL
+                        DisplayString
+                ,agentAuthMgrClientLinkSecPolicy
+                        INTEGER
+                ,agentAuthMgrClientSessionTimeLeft
+                        Unsigned32
+         }
+
+
+     agentAuthMgrClientMacAddress  OBJECT-TYPE
+                SYNTAX             MacAddress
+                MAX-ACCESS         read-only
+                STATUS             current
+                DESCRIPTION
+                                   "Specifies the MAC address of the client."
+                ::= { agentAuthMgrClientStatusEntry 1}
+
+      agentAuthMgrLogicalPort      OBJECT-TYPE
+                SYNTAX             Unsigned32
+                MAX-ACCESS         read-only
+                STATUS             current
+                DESCRIPTION
+                                   "Specifies the logical port number of the client connection."
+                ::= { agentAuthMgrClientStatusEntry 2}
+
+        agentAuthMgrInterface      OBJECT-TYPE
+                SYNTAX             Unsigned32
+                MAX-ACCESS         read-only
+                STATUS             current
+                DESCRIPTION
+                                   "Specifies the physical interface to which the client is attached."
+                ::= { agentAuthMgrClientStatusEntry 3}
+
+        agentAuthMgrClientAuthstatus OBJECT-TYPE
+                 SYNTAX             INTEGER {
+                                      authorized(1),
+                                      unauthorized(2)
+                                    }
+                MAX-ACCESS          read-only
+                STATUS              current
+                DESCRIPTION
+                                    "The  authentication status of the client."
+                ::={ agentAuthMgrClientStatusEntry 4}
+
+
+        agentAuthMgrClientAuthMethod OBJECT-TYPE
+                SYNTAX              INTEGER {
+                                      undefined(0),
+                                      dot1x(1),
+                                      mab(2)
+                                      ,captivePortal(3)
+                                    }
+                MAX-ACCESS          read-only
+                STATUS              current
+                DESCRIPTION
+                                    "The method using which the client is authenticated."
+                ::={ agentAuthMgrClientStatusEntry 5}
+
+        agentAuthMgrClientAuthState OBJECT-TYPE
+                 SYNTAX             INTEGER {
+                                      success(1),
+                                      failed(2),
+                                      running(3)
+                                    }
+                MAX-ACCESS          read-only
+                STATUS              current
+                DESCRIPTION
+                                    "The authentication state of the client."
+                ::={ agentAuthMgrClientStatusEntry 6}
+
+        agentAuthMgrClientUserName   OBJECT-TYPE
+                SYNTAX               DisplayString
+                MAX-ACCESS           read-only
+                STATUS               current
+                DESCRIPTION
+                                     "Specifies the username with which the client is authenticated
+                                      to the Radius server. This value is only valid when the client
+                                      is in authenticated state.  "
+                ::= { agentAuthMgrClientStatusEntry 7}
+
+        agentAuthMgrClientVlanAssigned OBJECT-TYPE
+                SYNTAX                Unsigned32
+                MAX-ACCESS            read-only
+                STATUS                current
+                DESCRIPTION
+                                      "Specifies the VLAN the client is associated with by Auth Mgr.
+                                       This value is only valid when the client is in authenticated
+                                        state."
+                ::= { agentAuthMgrClientStatusEntry 8}
+
+        agentAuthMgrClientAuthVlanAssignedReason OBJECT-TYPE
+                SYNTAX      INTEGER {
+                              radius(1),
+                              authFailVlan(2),
+                              noResponseVlan(3),
+                              voiceVlan(4),
+                              monitorVlan(5),
+                              criticalVlan(6),
+                              none(7)
+                            }
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                            "The VLAN assigned reason for the authenticated client."
+                ::={ agentAuthMgrClientStatusEntry 9}
+
+        agentAuthMgrClientSessionTime OBJECT-TYPE
+                SYNTAX              Unsigned32
+                MAX-ACCESS          read-only
+                STATUS              current
+                DESCRIPTION
+                                    "Specifies the time elapsed in seconds since the client was
+                                     authenticated in this session.This value is only valid when
+                                     the client is in authenticated state. "
+                ::= { agentAuthMgrClientStatusEntry 10}
+
+        agentAuthMgrClientFilterID OBJECT-TYPE
+                SYNTAX             DisplayString
+                MAX-ACCESS         read-only
+                STATUS             current
+                DESCRIPTION
+                                   "Specifies the Filter ID or Diffserv Policy name to be applied
+                                    to the session. This value is populated only if it has been
+                                    assigned by the RADIUS server. This value is only valid when
+                                    the client is in authenticated state."
+                ::= { agentAuthMgrClientStatusEntry 11}
+
+        agentAuthMgrClientDACL OBJECT-TYPE
+                SYNTAX             DisplayString
+                MAX-ACCESS         read-only
+                STATUS             current
+                DESCRIPTION
+                                   "Specifies the Downloadble ACL to be applied to the session.
+                                    This value is populated only if it has been assigned by the
+                                    RADIUS server. This value is only valid when the client is in
+                                    authenticated state."
+                ::= { agentAuthMgrClientStatusEntry 12}
+
+        agentAuthMgrClientSessionTimeout OBJECT-TYPE
+                SYNTAX              Unsigned32
+                MAX-ACCESS          read-only
+                STATUS              current
+                DESCRIPTION
+                                    "Specifies the session time out value if assigned
+                                     by the Radius server. A value of 0 indicates that no session
+                                     timeout was assigned by the RADIUS server. This value is only
+                                     valid when the client is in authenticated state. "
+                ::= { agentAuthMgrClientStatusEntry 13}
+
+         agentAuthMgrClientTerminationAction OBJECT-TYPE
+                SYNTAX              AuthMgrSessionTerminationAction
+                MAX-ACCESS          read-only
+                STATUS              current
+                DESCRIPTION
+                                    "Specifies the session termination action assigned by the Radius
+                                    Server.This is the action taken when the session times out.
+                                    This value is only valid when the client is in authenticated
+                                    state. "
+                ::= { agentAuthMgrClientStatusEntry 14}
+
+        agentAuthMgrClientAcctSessionId OBJECT-TYPE
+                SYNTAX              DisplayString
+                MAX-ACCESS          read-only
+                STATUS              current
+                DESCRIPTION
+                                    "Specifies the Accounting Session Id used by the session."
+                ::= { agentAuthMgrClientStatusEntry 15}
+
+        agentAuthMgrClientRedirectACL OBJECT-TYPE
+                SYNTAX             DisplayString
+                MAX-ACCESS         read-only
+                STATUS             current
+                DESCRIPTION
+                                   "Specifies the Redirect ACL to be applied to the session.
+                                    This value is populated only if it has been assigned by the
+                                    RADIUS server. This value is only valid when the client is in
+                                    authenticated state."
+                ::= { agentAuthMgrClientStatusEntry 16}
+
+        agentAuthMgrClientRedirectURL OBJECT-TYPE
+                SYNTAX             DisplayString
+                MAX-ACCESS         read-only
+                STATUS             current
+                DESCRIPTION
+                                   "Specifies the Redirect URL applicable to the session.
+                                    This value is populated only if it has been assigned by the
+                                    RADIUS server. This value is only valid when the client is in
+                                    authenticated state."
+                ::= { agentAuthMgrClientStatusEntry 17}
+
+        agentAuthMgrClientLinkSecPolicy OBJECT-TYPE
+                SYNTAX             INTEGER {
+                                     shouldSecure(1),
+                                     mustSecure(2),
+                                     mustNotSecure(3)
+                                   }
+                MAX-ACCESS         read-only
+                STATUS             current
+                DESCRIPTION
+                                   "Specifies the LinkSec policy for the client.
+                                    This value is populated only if it has been assigned by the
+                                    RADIUS server. This value is only valid when the client is in
+                                    authenticated state."
+                DEFVAL {shouldSecure}
+                ::= { agentAuthMgrClientStatusEntry 18}
+
+        agentAuthMgrClientSessionTimeLeft OBJECT-TYPE
+                SYNTAX              Unsigned32
+                MAX-ACCESS          read-only
+                STATUS              current
+                DESCRIPTION
+                                    "Specifies the time left for the session termination
+                                     action to occur. This value is only
+                                     valid when the client is in authenticated state. "
+                ::= { agentAuthMgrClientStatusEntry 19}
+
+    agentAuthMgrAuthHistoryResultsGroup OBJECT IDENTIFIER ::= { fastPathAuthMgr 5 }
+
+    agentAuthMgrPortAuthHistoryResultTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF AgentAuthMgrPortAuthHistoryResultEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION "A table to display history of the authentication manager."
+         ::= { agentAuthMgrAuthHistoryResultsGroup 1 }
+
+    agentAuthMgrPortAuthHistoryResultEntry OBJECT-TYPE
+         SYNTAX      AgentAuthMgrPortAuthHistoryResultEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION "Represents authentication manager results in history table."
+         INDEX       { agentAuthMgrAuthHistoryResultIfaceIndex,
+                       agentAuthMgrAuthHistoryResultIndex}
+         ::= {agentAuthMgrPortAuthHistoryResultTable 1 }
+
+    AgentAuthMgrPortAuthHistoryResultEntry ::= SEQUENCE {
+         agentAuthMgrAuthHistoryResultIfaceIndex        Unsigned32,
+         agentAuthMgrAuthHistoryResultIndex             Unsigned32,
+         agentAuthMgrAuthHistoryResultTimeStamp         DateAndTime,
+         agentAuthMgrAuthHistoryResultMacAddress        MacAddress,
+         agentAuthMgrAuthHistoryResultAuthMethod        INTEGER,
+         agentAuthMgrAuthHistoryResultAuthStatus        INTEGER,
+         agentAuthMgrAuthHistoryResultAge               TimeTicks,
+         agentAuthMgrAuthHistoryResultVlanId            Unsigned32,
+         agentAuthMgrAuthHistoryResultAccessStatus      INTEGER,
+         agentAuthMgrAuthHistoryResultFilterID          DisplayString,
+         agentAuthMgrAuthHistoryResultDACL              DisplayString,
+         agentAuthMgrAuthHistoryResultVlanAssignedType  INTEGER,
+         agentAuthMgrAuthHistoryResultReasonCode        INTEGER
+    }
+
+    agentAuthMgrAuthHistoryResultIfaceIndex     OBJECT-TYPE
+        SYNTAX           Unsigned32
+        MAX-ACCESS       read-only
+        STATUS           current
+        DESCRIPTION
+                         "This object represents the physical bridge port on which
+                          authentication event might be received."
+        ::= { agentAuthMgrPortAuthHistoryResultEntry 1 }
+
+    agentAuthMgrAuthHistoryResultIndex     OBJECT-TYPE
+        SYNTAX           Unsigned32
+        MAX-ACCESS       read-only
+        STATUS           current
+        DESCRIPTION
+                         "Reference to the authentication manager authentication
+                          history table maintained."
+        ::= { agentAuthMgrPortAuthHistoryResultEntry 2 }
+
+    agentAuthMgrAuthHistoryResultTimeStamp     OBJECT-TYPE
+        SYNTAX           DateAndTime
+        MAX-ACCESS       read-only
+        STATUS           current
+        DESCRIPTION
+                         "Specifies the exact time of authentication manager authentication
+                          event information occurred maintained in the
+                          history table."
+        ::= { agentAuthMgrPortAuthHistoryResultEntry 3 }
+
+    agentAuthMgrAuthHistoryResultMacAddress     OBJECT-TYPE
+        SYNTAX           MacAddress
+        MAX-ACCESS       read-only
+        STATUS           current
+        DESCRIPTION
+                         "Specifies the client MAC address maintained in
+                          the authentication history table."
+        ::= { agentAuthMgrPortAuthHistoryResultEntry 4 }
+
+    agentAuthMgrAuthHistoryResultAuthMethod    OBJECT-TYPE
+        SYNTAX           INTEGER {
+                           undefined(0),
+                           dot1x(1),
+                           mab(2)
+                           ,captivePortal(3)
+                         }
+        MAX-ACCESS       read-only
+        STATUS           current
+        DESCRIPTION
+                         "The method using which the client is authenticated."
+        ::= { agentAuthMgrPortAuthHistoryResultEntry 5 }
+
+    agentAuthMgrAuthHistoryResultAuthStatus     OBJECT-TYPE
+        SYNTAX           INTEGER {
+                           success(1),
+                           failure(2)
+                         }
+        MAX-ACCESS       read-only
+        STATUS           current
+        DESCRIPTION
+                         "Specifies the authentication manager authentication status
+                          (Success or Failure) for the authentication manager
+                          authentication event takes place. "
+        ::= { agentAuthMgrPortAuthHistoryResultEntry 6 }
+
+    agentAuthMgrAuthHistoryResultAge OBJECT-TYPE
+        SYNTAX           TimeTicks
+        MAX-ACCESS       read-only
+        STATUS           current
+        DESCRIPTION
+                         "Time since the authentication entry was added to the history table.
+                          It is displayed in days, hours, minutes, and seconds."
+        ::= { agentAuthMgrPortAuthHistoryResultEntry 7 }
+
+    agentAuthMgrAuthHistoryResultVlanId     OBJECT-TYPE
+        SYNTAX           Unsigned32
+        MAX-ACCESS       read-only
+        STATUS           current
+        DESCRIPTION
+                         "Specifies the VLANID associated with the client if authenticated successfully."
+        ::= { agentAuthMgrPortAuthHistoryResultEntry 8 }
+
+    agentAuthMgrAuthHistoryResultAccessStatus     OBJECT-TYPE
+        SYNTAX           INTEGER {
+                           granted(1),
+                           denied(2)
+                         }
+        MAX-ACCESS       read-only
+        STATUS           current
+        DESCRIPTION
+                         "Authentication access status indicates the exact status of the
+                          dot1x client. Granted means the client is allowed access to the
+                          network using dot1x or monitor mode. Denied means the client is
+                          not allowed access to the network."
+        ::= { agentAuthMgrPortAuthHistoryResultEntry 9 }
+
+    agentAuthMgrAuthHistoryResultFilterID OBJECT-TYPE
+        SYNTAX           DisplayString
+        MAX-ACCESS       read-only
+        STATUS           current
+        DESCRIPTION
+                         "Specifies the Filter ID or Diffserv Policy name assigned by
+                          the RADIUS server. This value is only valid when the client
+                          is in authenticated state."
+        ::= { agentAuthMgrPortAuthHistoryResultEntry 10 }
+
+    agentAuthMgrAuthHistoryResultDACL OBJECT-TYPE
+        SYNTAX           DisplayString
+        MAX-ACCESS       read-only
+        STATUS           current
+        DESCRIPTION
+                         "Specifies the Downloadable Access Control List name assigned by
+                          the RADIUS server. This value is only valid when the client
+                          is in authenticated state."
+        ::= { agentAuthMgrPortAuthHistoryResultEntry 11 }
+
+    agentAuthMgrAuthHistoryResultVlanAssignedType     OBJECT-TYPE
+        SYNTAX           INTEGER {
+                           default(1),
+                           radius(2),
+                           unauthenticatedVlan(3),
+                           guestVlan(4),
+                           voiceVlan(5),
+                           monitorVlan(6),
+                           notAssigned(7)
+                         }
+        MAX-ACCESS       read-only
+        STATUS           current
+        DESCRIPTION
+                         "Specifies the VLAN Assigned Reason maintained in the history
+                          table."
+        ::= { agentAuthMgrPortAuthHistoryResultEntry 12 }
+
+
+    agentAuthMgrAuthHistoryResultReasonCode OBJECT-TYPE
+        SYNTAX           INTEGER {
+                           none(0),
+                           supplicant-timeout(1),
+                           eapol-timeout(2),
+                           radius-request-timeout(3),
+                           radius-auth-failure(4),
+                           radius-auth-comm-failure(5),
+                           radius-challenge-process-invalid-nas-port(6), -- current, radius-challenge-process-invalid-nas-port no longer supported
+                           radius-challenge-process-wrong-eap-msg(7),
+                           radius-request-send-msg-error(8),
+                           radius-accept-process-invalid-nas-port(9),   -- current, radius-accept-process-invalid-nas-port no longer supported
+                           radius-accept-process-wrong-eap-msg(10),
+                           radius-accept-filter-assignment-failure(11),
+                           radius-accept-diffserv-not-present(12),
+                           radius-accept-vlan-assignment-failure(13),
+                           vlan-assignment-feature-not-enabled(14),
+                           radius-success(15),
+                           local-auth-user-not-found(16),
+                           local-auth-user-no-access(17),
+                           local-auth-md5-validation-failure(18),
+                           local-auth-invalid-eap-type(19),
+                           local-failure(20),
+                           local-success(21),
+                           radius-invalid-radius-status(22),
+                           guest-vlan-timer-expiry(23),
+                           undefined-auth-method(24),
+                           reject-auth-method(25),
+                           invalid-auth-method(26),
+                           auth-method-not-configured(27),
+                           unauth-vlan-not-created(28),
+                           guest-vlan-not-created(29),
+                           radius-accept-invalid-vlan-failure(30),
+                           eapol-request-id-timeout(31),
+                           all-radius-servers-dead(32),
+                           client-disconnected(33),
+                           guest-vlan-success(34),
+                           unauth-vlan-success(35),
+                           critical-vlan-success(36),
+                           monitor-success(37),
+                           dacl-apply-failure(38),
+                           open-success(39)
+                         }
+        MAX-ACCESS       read-only
+        STATUS           current
+        DESCRIPTION
+                         "Specifies the authentication reason refered by the result index on a port."
+        ::= { agentAuthMgrPortAuthHistoryResultEntry 13 }
+
+--    agentAuthMgrAuthHistoryResultsClear OBJECT-TYPE
+--         SYNTAX      INTEGER {
+--                       enable(1),
+--                       disable(2)
+--                     }
+--         MAX-ACCESS  read-write
+--         STATUS      current
+--         DESCRIPTION
+--                     "When set to enable(1), all Authentication Manager Authentication
+--                      History information will be reset."
+--         DEFVAL { disable }
+--         ::= { agentAuthMgrAuthHistoryResultsGroup 2 }
+
+    --**************************************************************************************
+    -- agentAuthMgrPortAuthHistoryResultClearTable
+    --
+    --**************************************************************************************
+
+    agentAuthMgrPortAuthHistoryResultClearTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF AgentAuthMgrPortAuthHistoryResultClearEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION "A table to clear the authentication manager authentication history
+                      per interface."
+         ::= { agentAuthMgrAuthHistoryResultsGroup 3 }
+
+    agentAuthMgrPortAuthHistoryResultClearEntry OBJECT-TYPE
+         SYNTAX      AgentAuthMgrPortAuthHistoryResultClearEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION "Represents to clear the authentication manager authentication results for an
+                      authentication manager authentication history table."
+         INDEX       { agentAuthMgrAuthHistoryResultIfIndex }
+         ::= {agentAuthMgrPortAuthHistoryResultClearTable 1 }
+
+    AgentAuthMgrPortAuthHistoryResultClearEntry ::= SEQUENCE {
+         agentAuthMgrAuthHistoryResultIfIndex    Unsigned32,
+         agentAuthMgrPortAuthHistoryResultsClear    INTEGER
+    }
+    agentAuthMgrAuthHistoryResultIfIndex     OBJECT-TYPE
+                SYNTAX           Unsigned32
+                MAX-ACCESS       read-only
+                STATUS           current
+                DESCRIPTION
+                   "This object represents the  physical Bridge Port on which authentication event
+                    might be received."
+                ::= { agentAuthMgrPortAuthHistoryResultClearEntry 1 }
+
+
+    agentAuthMgrPortAuthHistoryResultsClear OBJECT-TYPE
+         SYNTAX      INTEGER {
+                       enable(1),
+                       disable(2)
+                     }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "When set to enable(1), all authentication manager authentication history
+                      information for the given port will be reset. The value is write-only.
+                      Attempt to read will return disable(2)."
+         DEFVAL { disable }
+         ::= { agentAuthMgrPortAuthHistoryResultClearEntry 2 }
+
+
+--**************************************************************************************
+-- agentAuthMgrAuthStatsGroup -> Contains MIB objects displaying Authentication Manager
+--                               statistics per interface
+--**************************************************************************************
+    agentAuthMgrAuthStatsGroup OBJECT IDENTIFIER ::= { fastPathAuthMgr 6 }
+
+    agentAuthMgrPortStatsTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF AgentAuthMgrPortStatsEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION "A table to display the authentication manager statistics."
+         ::= { agentAuthMgrAuthStatsGroup 1 }
+
+    agentAuthMgrPortStatsEntry OBJECT-TYPE
+         SYNTAX      AgentAuthMgrPortStatsEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION "Represents authentication manager statistics per port."
+         INDEX       { agentAuthMgrPortIfaceIndex, agentAuthMgrPortMethodIndex }
+         ::= {agentAuthMgrPortStatsTable 1 }
+
+    AgentAuthMgrPortStatsEntry ::= SEQUENCE {
+         agentAuthMgrPortIfaceIndex                   Unsigned32,
+         agentAuthMgrPortMethodIndex                  INTEGER,
+         agentAuthMgrPortStatsAttempts                Unsigned32,
+         agentAuthMgrPortStatsFailedAttempts          Unsigned32
+    }
+
+    agentAuthMgrPortIfaceIndex     OBJECT-TYPE
+                SYNTAX           Unsigned32
+                MAX-ACCESS       not-accessible
+                STATUS           current
+                DESCRIPTION
+                                 "This object represents the physical bridge port on which
+                                  statistics are retrieved."
+                ::= { agentAuthMgrPortStatsEntry 1 }
+
+    agentAuthMgrPortMethodIndex   OBJECT-TYPE
+          SYNTAX     INTEGER {
+                       dot1x(1),
+                       mab(2)
+                       ,captivePortal(3)
+                     }
+         MAX-ACCESS     not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The index of the authentication method for which statistics are reviewed."
+
+         ::= { agentAuthMgrPortStatsEntry 2 }
+
+    agentAuthMgrPortStatsAttempts     OBJECT-TYPE
+                SYNTAX           Unsigned32
+                MAX-ACCESS       read-only
+                STATUS           current
+                DESCRIPTION
+                                 "Specifies the number of successful authentications events
+                                  of specified method on specified port."
+                ::= { agentAuthMgrPortStatsEntry 3 }
+
+    agentAuthMgrPortStatsFailedAttempts     OBJECT-TYPE
+                SYNTAX           Unsigned32
+                MAX-ACCESS       read-only
+                STATUS           current
+                DESCRIPTION
+                                 "Specifies the number of unsuccessful authentications attempts
+                                  of specified method on specified port."
+                ::= { agentAuthMgrPortStatsEntry 4 }
+
+
+-- Clear statistics ----
+     agentAuthMgrPortStatsClearTable  OBJECT-TYPE
+         SYNTAX      SEQUENCE OF AgentAuthMgrPortStatsClearEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION "A table to clear the authentication manager statistics."
+         ::= { agentAuthMgrAuthStatsGroup 2 }
+
+    agentAuthMgrPortStatsClearEntry OBJECT-TYPE
+         SYNTAX      AgentAuthMgrPortStatsClearEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION "Represents to clear the authentication manager statistics per interface."
+         INDEX       { agentAuthMgrPortIfaceIndex }
+         ::= {agentAuthMgrPortStatsClearTable 1 }
+
+    AgentAuthMgrPortStatsClearEntry ::= SEQUENCE {
+         agentAuthMgrPortIfaceIndex    Unsigned32,
+         agentAuthMgrPortStatsClear    INTEGER
+    }
+
+    agentAuthMgrPortStatsClear OBJECT-TYPE
+         SYNTAX      INTEGER {
+                       enable(1),
+                       disable(2)
+                     }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "When set to enable(1), all authentication manager statistics for
+                      the given port will be reset. The value is write-only. Attempt to read
+                      will return disable(2)."
+         DEFVAL { disable }
+         ::= { agentAuthMgrPortStatsClearEntry 2 }
+
+--**************************************************************************************
+-- Auth Mgr Traps Config
+--**************************************************************************************
+
+    agentAuthMgrTrapsConfigGroup OBJECT IDENTIFIER ::= { fastPathAuthMgr 7 }
+
+    authMgrTrapMode    OBJECT-TYPE
+         SYNTAX      INTEGER {
+                       enable(1),
+                       disable(2)
+                     }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "This object enables/disables the user manager trap mode."
+         DEFVAL      { disable }
+         ::= { agentAuthMgrTrapsConfigGroup 1 }
+
+--**************************************************************************************
+-- agentAuthMgrMonitorModeConfigGroup -> Contains MIB objects configuring/displaying
+-- Authentication Manager Monitor Mode details and associated Functionality
+--
+--**************************************************************************************
+    agentAuthMgrMonitorModeConfigGroup OBJECT IDENTIFIER ::= { fastPathAuthMgr 8 }
+
+    agentAuthMgrMonitorModeEnabled OBJECT-TYPE
+                   SYNTAX        INTEGER {
+                                   enable(1),
+                                   disable(2)
+                                 }
+                   MAX-ACCESS    read-write
+                   STATUS        current
+                   DESCRIPTION   "Enable/Disable Authentication Manager Monitor mode
+                                  Support on the switch."
+                   DEFVAL        { disable }
+                   ::= { agentAuthMgrMonitorModeConfigGroup 1 }
+
+    agentAuthMgrMonitorModeClients OBJECT-TYPE
+           SYNTAX        Unsigned32
+           MAX-ACCESS    read-only
+           STATUS        current
+           DESCRIPTION   "Retrieves the number of clients that got
+                          authenticated by Monitor mode globally."
+           ::= { agentAuthMgrMonitorModeConfigGroup 2 }
+
+    agentAuthMgrNonMonitorModeClients OBJECT-TYPE
+           SYNTAX        Unsigned32
+           MAX-ACCESS    read-only
+           STATUS        current
+           DESCRIPTION   "Retrieves the number of clients that are granted access by
+                          Authentication Manager with no monitor mode enabled."
+           ::= { agentAuthMgrMonitorModeConfigGroup 3 }
+
+
+
+--**************************************************************************************
+-- Auth Mgr Traps
+--
+--**************************************************************************************
+    fastpathAuthMgrTraps OBJECT IDENTIFIER ::= { fastPathAuthMgr 0 }
+
+    agentAuthMgrClientAuthStatusTrap NOTIFICATION-TYPE
+        OBJECTS {
+                    agentAuthMgrInterface,
+                    agentAuthMgrClientMacAddress,
+                    agentAuthMgrClientAuthMethod,
+                    agentAuthMgrClientAuthstatus
+                }
+        STATUS      current
+        DESCRIPTION
+                    "Trap is sent from Auth Mgr when client is authorised/un-authorised."
+        ::= { fastpathAuthMgrTraps 1 }
+
+END

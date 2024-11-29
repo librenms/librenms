@@ -1,0 +1,211 @@
+mib: SAMLEXAMERICA-MIB
+modules:
+    os:
+        hardware: SAMLEXAMERICA-MIB::model.0
+        version: SAMLEXAMERICA-MIB::version.0
+    sensors:
+        temperature:
+            data:
+                -
+                    oid: tempDD
+                    num_oid: .1.3.6.1.4.1.49075.1.3.3.8.{{ $index }}
+                    index: tempDD.{{ $index }}
+                    descr: DC-to-DC
+                -
+                    oid: tempDA
+                    num_oid: .1.3.6.1.4.1.49075.1.3.3.9.{{ $index }}
+                    index: tempDA.{{ $index }}
+                    descr: DC-to-AC
+        state:
+            data:
+                -
+                    oid: fan
+                    num_oid: '.1.3.6.1.4.1.49075.1.3.3.1.{{ $index }}'
+                    descr: Fan
+                    index: 'fan.{{ $index }}'
+                    state_name: fanStatus
+                    states:
+                        - { descr: off, graph: 0, value: 0, generic: 0 }
+                        - { descr: on, graph: 0, value: 1, generic: 0 }
+                -
+                    oid: inverterMode
+                    num_oid: '.1.3.6.1.4.1.49075.1.3.3.2.{{ $index }}'
+                    descr: Inverter Mode
+                    index: 'inverterMode.{{ $index }}'
+                    state_name: inverterMode
+                    states:
+                        - { descr: offline, graph: 0, value: 0, generic: 0 }
+                        - { descr: online, graph: 0, value: 1, generic: 0 }
+                -
+                    oid: transferType
+                    num_oid: '.1.3.6.1.4.1.49075.1.3.3.3.{{ $index }}'
+                    descr: Transfer Type
+                    index: 'transferType.{{ $index }}'
+                    state_name: transferTypes
+                    states:
+                        - { descr: synchronized, graph: 0, value: 0, generic: 0 }
+                        - { descr: unsynchronized, graph: 0, value: 1, generic: 0 }
+                -
+                    oid: byPassRelay
+                    num_oid: '.1.3.6.1.4.1.49075.1.3.3.4.{{ $index }}'
+                    descr: Bypass Relay
+                    index: 'byPassRelay.{{ $index }}'
+                    state_name: transferTypes
+                    states:
+                        - { descr: grid, graph: 0, value: 0, generic: 0 }
+                        - { descr: inverter, graph: 0, value: 1, generic: 0 }
+                -
+                    oid: gridAC
+                    num_oid: '.1.3.6.1.4.1.49075.1.3.3.5.{{ $index }}'
+                    descr: Grid AC
+                    index: 'gridAC.{{ $index }}'
+                    state_name: gridACStatus
+                    states:
+                        - { descr: non-existent, graph: 0, value: 0, generic: 3 }
+                        - { descr: detect, graph: 0, value: 1, generic: 1 }
+                        - { descr: present, graph: 0, value: 2, generic: 1 }
+                        - { descr: sync, graph: 0, value: 3, generic: 0 }
+                        - { descr: wont-sync, graph: 0, value: 4, generic: 2 }
+                -
+                    oid: warningFanFault
+                    num_oid: '.1.3.6.1.4.1.49075.1.3.6.1.{{ $index }}'
+                    descr: Fan Fault
+                    index: 'warningFanFault.{{ $index }}'
+                    state_name: warningFanFaultStatus
+                    states:
+                        - { descr: normal, graph: 0, value: 0, generic: 0 }
+                        - { descr: warning, graph: 0, value: 1, generic: 1 }
+                -
+                    oid: warningOverVoltageAlarm
+                    num_oid: '.1.3.6.1.4.1.49075.1.3.6.2.{{ $index }}'
+                    descr: Over Voltage Alarm
+                    index: 'warningOverVoltageAlarm.{{ $index }}'
+                    state_name: warningOverVoltageAlarmStatus
+                    states:
+                        - { descr: normal, graph: 0, value: 0, generic: 0 }
+                        - { descr: warning, graph: 0, value: 1, generic: 1 }
+                -
+                    oid: warningUnderVoltageAlarm
+                    num_oid: '.1.3.6.1.4.1.49075.1.3.6.3.{{ $index }}'
+                    descr: Under Voltage Alarm
+                    index: 'warningUnderVoltageAlarm.{{ $index }}'
+                    state_name: warningUnderVoltageAlarmStatus
+                    states:
+                        - { descr: normal, graph: 0, value: 0, generic: 0 }
+                        - { descr: warning, graph: 0, value: 1, generic: 1 }
+                -
+                    oid: warningOverload
+                    num_oid: '.1.3.6.1.4.1.49075.1.3.6.4.{{ $index }}'
+                    descr: Overload
+                    index: 'warningOverload.{{ $index }}'
+                    state_name: warningOverloadStatus
+                    states:
+                        - { descr: normal, graph: 0, value: 0, generic: 0 }
+                        - { descr: warning, graph: 0, value: 1, generic: 1 }
+                -
+                    oid: warningOverTemperature
+                    num_oid: '.1.3.6.1.4.1.49075.1.3.6.5.{{ $index }}'
+                    descr: Temperature
+                    index: 'warningOverTemperature.{{ $index }}'
+                    state_name: warningOverTemperatureStatus
+                    states:
+                        - { descr: normal, graph: 0, value: 0, generic: 0 }
+                        - { descr: warning, graph: 0, value: 1, generic: 1 }
+                -
+                    oid: warningShortCircuit
+                    num_oid: '.1.3.6.1.4.1.49075.1.3.6.6.{{ $index }}'
+                    descr: Short Circuit
+                    index: 'warningShortCircuit.{{ $index }}'
+                    state_name: warningShortCircuitStatus
+                    states:
+                        - { descr: normal, graph: 0, value: 0, generic: 0 }
+                        - { descr: warning, graph: 0, value: 1, generic: 1 }
+                -
+                    oid: warningOverVoltageProtection
+                    num_oid: '.1.3.6.1.4.1.49075.1.3.6.7.{{ $index }}'
+                    descr: Overvoltage Protection
+                    index: 'warningOverVoltageProtection.{{ $index }}'
+                    state_name: warningOverVoltageProtectionStatus
+                    states:
+                        - { descr: normal, graph: 0, value: 0, generic: 0 }
+                        - { descr: warning, graph: 0, value: 1, generic: 1 }
+                -
+                    oid: warningUnderVoltageProtection
+                    num_oid: '.1.3.6.1.4.1.49075.1.3.6.8.{{ $index }}'
+                    descr: Undervoltage Protection
+                    index: 'warningUnderVoltageProtection.{{ $index }}'
+                    state_name: warningUnderVoltageProtectionStatus
+                    states:
+                        - { descr: normal, graph: 0, value: 0, generic: 0 }
+                        - { descr: warning, graph: 0, value: 1, generic: 1 }
+
+        power:
+            data:
+                -
+                    oid: power
+                    num_oid: '.1.3.6.1.4.1.49075.1.3.1.4.{{ $index }}'
+                    descr: 'Inverter Power'
+                    index: 'power.{{ $index }}'
+                    divisor: 10
+        frequency:
+            data:
+                -
+                    oid: cfgFrequency
+                    num_oid: '.1.3.6.1.4.1.49075.1.3.1.5.{{ $index }}'
+                    descr: 'Inverter Frequency Config'
+                    index: 'power.{{ $index }}'
+                    divisor: 10
+                -
+                    oid: frequency
+                    num_oid: '.1.3.6.1.4.1.49075.1.3.1.6.{{ $index }}'
+                    descr: 'Inverter Output Frequency'
+                    index: 'frequency.{{ $index }}'
+                    divisor: 10
+                -
+                    oid: gridfrequency
+                    num_oid: '.1.3.6.1.4.1.49075.1.3.1.10.{{ $index }}'
+                    descr: 'Grid Frequency'
+                    index: 'gridfrequency.{{ $index }}'
+                    divisor: 10
+
+        current:
+            data:
+                -
+                    oid: iout
+                    num_oid: '.1.3.6.1.4.1.49075.1.3.1.3.{{ $index }}'
+                    descr: 'Inverter Current'
+                    index: 'iout.{{ $index }}'
+                    divisor: 10
+                -
+                    oid: gridiout
+                    num_oid: '.1.3.6.1.4.1.49075.1.3.1.8.{{ $index }}'
+                    descr: 'Grid Current'
+                    index: 'vin.{{ $index }}'
+                    divisor: 10
+
+        voltage:
+            data:
+                -
+                    oid: cfgVout
+                    num_oid: '.1.3.6.1.4.1.49075.1.3.1.1.{{ $index }}'
+                    descr: 'Inverter Vout Config'
+                    index: 'cfgVout.{{ $index }}'
+                    divisor: 10
+                -
+                    oid: vout  
+                    num_oid: '.1.3.6.1.4.1.49075.1.3.1.2.{{ $index }}'
+                    descr: 'Inverter Output Volts'
+                    index: 'vout.{{ $index }}'
+                    divisor: 10
+                -
+                    oid: vin
+                    num_oid: '.1.3.6.1.4.1.49075.1.3.2.1.{{ $index }}'
+                    descr: 'DC Input Volts'
+                    index: 'vin.{{ $index }}'
+                    divisor: 10
+                -
+                    oid: gridvout
+                    num_oid: '.1.3.6.1.4.1.49075.1.3.1.7.{{ $index }}'
+                    descr: 'Grid Input Volts'
+                    index: 'gridvout.{{ $index }}'
+                    divisor: 10

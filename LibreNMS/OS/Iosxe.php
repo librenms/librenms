@@ -29,6 +29,7 @@ namespace LibreNMS\OS;
 use App\Models\IsisAdjacency;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 use LibreNMS\DB\SyncsModels;
 use LibreNMS\Interfaces\Discovery\IsIsDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessCellDiscovery;
@@ -56,11 +57,6 @@ class Iosxe extends Ciscowlc implements
 {
     use SyncsModels;
     use CiscoCellular;
-
-    public function pollOS(): void
-    {
-        // Don't poll Ciscowlc FIXME remove when wireless-controller module exists
-    }
 
     /**
      * Array of shortened ISIS codes
@@ -123,14 +119,14 @@ class Iosxe extends Ciscowlc implements
         $up_count = array_count_values($states)['up'] ?? 0;
 
         if ($up_count !== $adjacencies->count()) {
-            echo 'New Adjacencies, running discovery';
+            Log::info('New Adjacencies, running discovery');
 
             return $this->fillNew($adjacencies, $this->discoverIsIs());
         }
 
         $uptime = SnmpQuery::walk('CISCO-IETF-ISIS-MIB::ciiISAdjLastUpTime')->values();
 
-        return $adjacencies->each(function (IsisAdjacency $adjacency) use ($states, $uptime) {
+        return $adjacencies->each(function ($adjacency) use ($states, $uptime) {
             $adjacency->isisISAdjState = $states['CISCO-IETF-ISIS-MIB::ciiISAdjState' . $adjacency->index] ?? $adjacency->isisISAdjState;
             $adjacency->isisISAdjLastUpTime = $this->parseAdjacencyTime($uptime['CISCO-IETF-ISIS-MIB::ciiISAdjLastUpTime' . $adjacency->index] ?? 0);
         });

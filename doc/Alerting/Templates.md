@@ -65,10 +65,6 @@ been up for 30344 seconds`.
 - ping max (if icmp enabled): `$alert->ping_max`
 - ping avg (if icmp enabled): `$alert->ping_avg`
 - debug (array) 
-  - poller_name - name of poller (for distributed setups)
-  - If `$config['debug']['run_trace] = true;` is set then this will contain:
-   - traceroute (if enabled you will receive traceroute output): `$alert->debug['traceroute']`
-   - traceroute_output (if the traceroute fails this will contain why): `$alert->debug['output']`
 - Title for the Alert: `$alert->title`
 - Time Elapsed, Only available on recovery (`$alert->state == 0`): `$alert->elapsed`
 - Rule Builder (the actual rule) (use `{!! $alert->builder !!}`): `$alert->builder`
@@ -411,8 +407,8 @@ Rule: @if ($alert->name) {{ $alert->name }} @else {{ $alert->rule }} @endif <br>
 @endforeach
 @if ($alert->faults) <b>Faults:</b><br>
 @foreach ($alert->faults as $key => $value)
-@signedGraphTag(['device_id' => $value['device_id'], 'type' => 'device_processor', 'width' => 459, 'height' => 213, 'from' => time() - 259200])<br>
-https://server/graphs/id={{ $value['device_id'] }}/type=device_processor/<br>
+@signedGraphTag(['device' => $value['device_id'], 'type' => 'device_processor', 'width' => 459, 'height' => 213, 'from' => time() - 259200])<br>
+https://server/graphs/device={{ $value['device_id'] }}/type=device_processor/<br>
 @endforeach
 Template: CPU alert <br>
 @endif

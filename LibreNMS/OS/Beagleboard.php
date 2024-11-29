@@ -25,10 +25,8 @@ namespace LibreNMS\OS;
 
 use App\Models\Device;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
-use LibreNMS\OS;
 
-class Beagleboard extends OS implements
-    OSDiscovery
+class Beagleboard extends Linux implements OSDiscovery
 {
     /**
      * Retrieve basic information about the OS / device

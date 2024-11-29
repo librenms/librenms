@@ -26,9 +26,9 @@
 namespace App\Http\Controllers\Table;
 
 use App\Models\Port;
-use DB;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Url;
@@ -86,6 +86,8 @@ class PortsController extends TableController
             'ifDescr',
             'secondsIfLastChange',
             'ifConnectorPresent',
+            'ifInErrors',
+            'ifOutErrors',
             'ifInErrors_delta',
             'ifOutErrors_delta',
             'ifInOctets_rate',
@@ -102,35 +104,28 @@ class PortsController extends TableController
     protected function baseQuery($request)
     {
         $query = Port::hasAccess($request->user())
-            ->with('device')
+            ->with(['device', 'device.location'])
             ->leftJoin('devices', 'ports.device_id', 'devices.device_id')
             ->where('deleted', $request->get('deleted', 0)) // always filter deleted
             ->when($request->get('hostname'), function (Builder $query, $hostname) {
                 $query->where(function (Builder $query) use ($hostname) {
-                    $query->where('hostname', 'like', "%$hostname%")
-                        ->orWhere('sysName', 'like', "%$hostname%");
+                    $query->where('devices.hostname', 'like', "%$hostname%")
+                        ->orWhere('devices.sysName', 'like', "%$hostname%");
                 });
             })
             ->when($request->get('ifAlias'), function (Builder $query, $ifAlias) {
                 return $query->where('ifAlias', 'like', "%$ifAlias%");
             })
             ->when($request->get('errors'), function (Builder $query) {
-                $query->where(function (Builder $query) {
-                    return $query->where('ifInErrors_delta', '>', 0)
-                        ->orWhere('ifOutErrors_delta', '>', 0);
-                });
+                return $query->hasErrors();
             })
             ->when($request->get('state'), function (Builder $query, $state) {
-                switch ($state) {
-                    case 'down':
-                        return $query->where('ifAdminStatus', 'up')->where('ifOperStatus', 'down');
-                    case 'up':
-                        return $query->where('ifAdminStatus', 'up')->where('ifOperStatus', 'up');
-                    case 'admindown':
-                        return $query->where('ifAdminStatus', 'down')->where('ports.ignore', 0);
-                    default:
-                        return $query;
-                }
+                return match ($state) {
+                    'down' => $query->isDown(),
+                    'up' => $query->isUp(),
+                    'admindown' => $query->isShutdown(),
+                    default => $query,
+                };
             });
 
         $select = [
@@ -160,7 +155,7 @@ class PortsController extends TableController
             'status' => $status,
             'device' => Url::deviceLink($port->device),
             'port' => Url::portLink($port),
-            'secondsIfLastChange' => ceil(optional($port->device)->uptime - ($port->ifLastChange / 100)),
+            'secondsIfLastChange' => ceil($port->device?->uptime - ($port->ifLastChange / 100)),
             'ifConnectorPresent' => ($port->ifConnectorPresent == 'true') ? 'yes' : 'no',
             'ifSpeed' => $port->ifSpeed,
             'ifMtu' => $port->ifMtu,
@@ -168,10 +163,12 @@ class PortsController extends TableController
             'ifOutOctets_rate' => $port->ifOutOctets_rate * 8,
             'ifInUcastPkts_rate' => $port->ifInUcastPkts_rate,
             'ifOutUcastPkts_rate' => $port->ifOutUcastPkts_rate,
+            'ifInErrors' => $port->ifInErrors,
+            'ifOutErrors' => $port->ifOutErrors,
             'ifInErrors_delta' => $port->poll_period ? Number::formatSi($port->ifInErrors_delta / $port->poll_period, 2, 3, 'EPS') : '',
             'ifOutErrors_delta' => $port->poll_period ? Number::formatSi($port->ifOutErrors_delta / $port->poll_period, 2, 3, 'EPS') : '',
             'ifType' => Rewrite::normalizeIfType($port->ifType),
-            'ifAlias' => $port->ifAlias,
+            'ifAlias' => htmlentities($port->ifAlias),
             'actions' => (string) view('port.actions', ['port' => $port]),
         ];
     }

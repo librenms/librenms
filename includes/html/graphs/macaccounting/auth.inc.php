@@ -1,6 +1,7 @@
 <?php
 
 use LibreNMS\Exceptions\RrdGraphException;
+use LibreNMS\Util\Mac;
 
 if (is_numeric($vars['id'])) {
     $acc = dbFetchRow('SELECT * FROM `mac_accounting` AS M, `ports` AS I, `devices` AS D WHERE M.ma_id = ? AND I.port_id = M.port_id AND I.device_id = D.device_id', [$vars['id']]);
@@ -24,7 +25,7 @@ if (is_numeric($vars['id'])) {
                 $device = device_by_id_cache($port['device_id']);
                 $title = generate_device_link($device);
                 $title .= ' :: Port  ' . generate_port_link($port);
-                $title .= ' :: ' . \LibreNMS\Util\Rewrite::readableMac($acc['mac']);
+                $title .= ' :: ' . Mac::parse($acc['mac'])->readable();
                 $auth = true;
             } else {
                 throw new RrdGraphException('file not found');

@@ -48,7 +48,7 @@ foreach ($prefixes as $prefix => $numOidPrefix) {
                 $highLimit = fahrenheit_to_celsius($highLimit);
                 $highWarnLimit = fahrenheit_to_celsius($highWarnLimit);
             }
-            discover_sensor($valid['sensor'], 'temperature', $device, $num_oid, $prefix . 'LiveRaw.' . $index, 'webmon', $descr, '1', '1', $lowLimit, $lowWarnLimit, $highWarnLimit, $highLimit, $value, 'snmp', null, null, $user_function, $group);
+            discover_sensor(null, 'temperature', $device, $num_oid, $prefix . 'LiveRaw.' . $index, 'webmon', $descr, '1', '1', $lowLimit, $lowWarnLimit, $highWarnLimit, $highLimit, $value, 'snmp', null, null, $user_function, $group);
         }
     }
 }

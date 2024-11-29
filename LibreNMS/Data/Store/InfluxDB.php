@@ -28,6 +28,7 @@ namespace LibreNMS\Data\Store;
 
 use App\Polling\Measure\Measurement;
 use InfluxDB\Client;
+use InfluxDB\Database;
 use InfluxDB\Driver\UDP;
 use LibreNMS\Config;
 use Log;
@@ -37,7 +38,7 @@ class InfluxDB extends BaseDatastore
     /** @var \InfluxDB\Database */
     private $connection;
 
-    public function __construct(\InfluxDB\Database $influx)
+    public function __construct(Database $influx)
     {
         parent::__construct();
         $this->connection = $influx;

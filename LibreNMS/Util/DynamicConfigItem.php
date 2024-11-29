@@ -25,9 +25,10 @@
 
 namespace LibreNMS\Util;
 
-use LibreNMS\Config;
+use App\Facades\LibrenmsConfig;
 use Validator;
 
+#[\AllowDynamicProperties]
 class DynamicConfigItem implements \ArrayAccess
 {
     public $name;
@@ -49,7 +50,7 @@ class DynamicConfigItem implements \ArrayAccess
     public function __construct($name, $settings = [])
     {
         $this->name = $name;
-        $this->value = Config::get($this->name, $this->default);
+        $this->value = LibrenmsConfig::get($this->name, $this->default);
 
         foreach ($settings as $key => $value) {
             $this->$key = $value;
@@ -100,9 +101,13 @@ class DynamicConfigItem implements \ArrayAccess
         } elseif (in_array($this->type, ['text', 'password'])) {
             return ! is_array($value);
         } elseif ($this->type === 'executable') {
-            return is_file($value) && is_executable($value);
+            $value == $this->sanitizePath($value);
+
+            return $value !== false && is_file($value) && is_executable($value);
         } elseif ($this->type === 'directory') {
-            return is_dir($value);
+            $value == $this->sanitizePath($value);
+
+            return $value !== false && is_dir($value);
         }
 
         return false;
@@ -225,7 +230,7 @@ class DynamicConfigItem implements \ArrayAccess
     }
 
     #[\ReturnTypeWillChange]
-    public function offsetGet($offset)
+    public function offsetGet($offset): mixed
     {
         return isset($this->$offset) ? $this->$offset : null;
     }
@@ -263,5 +268,14 @@ class DynamicConfigItem implements \ArrayAccess
     private function buildValidator($value)
     {
         return Validator::make(['value' => $value], $this->validate);
+    }
+
+    private function sanitizePath(string $path): string|false
+    {
+        if (preg_match('/[`;#$|&\'"><(]/', $path)) {
+            return false;
+        }
+
+        return realpath($path); // avoid path redirection shenanigans
     }
 }

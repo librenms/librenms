@@ -42,7 +42,7 @@ class DynamicInputOption extends InputOption
         parent::__construct($name, $shortcut, $mode, $description, $default);
     }
 
-    public function getDescription()
+    public function getDescription(): string
     {
         $description = parent::getDescription();
 
@@ -53,7 +53,7 @@ class DynamicInputOption extends InputOption
         return $description;
     }
 
-    public function getDefault()
+    public function getDefault(): array|string|int|float|bool|null
     {
         if (is_callable($this->defaultCallable)) {
             return call_user_func($this->defaultCallable);

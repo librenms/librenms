@@ -45,13 +45,13 @@ if ($oids) {
             $limit = trim($sensor['limit_high'], ' "');
             $temperature = $sensor['temp_intval'];
 
-            discover_sensor($valid['sensor'], 'temperature', $device, $temperature_oid, $temperature_id, 'cometsystem-p85xx', $descr, '10', '1', $lowlimit, null, null, $limit, $temperature);
+            discover_sensor(null, 'temperature', $device, $temperature_oid, $temperature_id, 'cometsystem-p85xx', $descr, '10', '1', $lowlimit, null, null, $limit, $temperature);
         }
     }
 }
 
 $temp_unit = snmp_get($device, 'tempUnit.0', '-OevTQUs', 'T3610-MIB');
-$user_func = '';
+$user_func = null;
 
 if (Str::contains($temp_unit, 'F')) {
     $user_func = 'fahrenheit_to_celsius';
@@ -64,5 +64,5 @@ if (is_numeric($pre_cache['websensor_valuesInt']['tempInt.0'])) {
     $temperature = $pre_cache['websensor_valuesInt']['tempInt.0'] / 10;
     $high_limit = $pre_cache['websensor_settings']['tempHighInt.0'] / 10;
     $low_limit = $pre_cache['websensor_settings']['tempLowInt.0'] / 10;
-    discover_sensor($valid['sensor'], 'temperature', $device, $temperature_oid, $temperature_index, 'websensor', $descr, '10', '1', $low_limit, null, null, $high_limit, $temperature, 'snmp', null, null, $user_func);
+    discover_sensor(null, 'temperature', $device, $temperature_oid, $temperature_index, 'websensor', $descr, '10', '1', $low_limit, null, null, $high_limit, $temperature, 'snmp', null, null, $user_func);
 }

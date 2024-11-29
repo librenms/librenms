@@ -5,6 +5,7 @@
  * Free Software Foundation, either version 3 of the License, or (at your
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details. */
+
 /**
  * API Transport
  *
@@ -16,76 +17,53 @@
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
-use LibreNMS\Config;
 use LibreNMS\Enum\AlertState;
-use LibreNMS\Util\Proxy;
+use LibreNMS\Exceptions\AlertTransportDeliveryException;
+use LibreNMS\Util\Http;
+use LibreNMS\Util\Url;
 
 class Alerta extends Transport
 {
-    public function deliverAlert($obj, $opts)
+    public function deliverAlert(array $alert_data): bool
     {
-        $opts['url'] = $this->config['alerta-url'];
-        $opts['environment'] = $this->config['environment'];
-        $opts['apikey'] = $this->config['apikey'];
-        $opts['alertstate'] = $this->config['alertstate'];
-        $opts['recoverstate'] = $this->config['recoverstate'];
-
-        return $this->contactAlerta($obj, $opts);
-    }
-
-    public function contactAlerta($obj, $opts)
-    {
-        $host = $opts['url'];
-        $curl = curl_init();
-        $text = strip_tags($obj['msg']);
-        $severity = ($obj['state'] == AlertState::RECOVERED ? $opts['recoverstate'] : $opts['alertstate']);
-        $deviceurl = (Config::get('base_url') . 'device/device=' . $obj['device_id']);
-        $devicehostname = $obj['hostname'];
+        $severity = ($alert_data['state'] == AlertState::RECOVERED ? $this->config['recoverstate'] : $this->config['alertstate']);
         $data = [
-            'resource' => $devicehostname,
-            'event' => $obj['name'],
-            'environment' => $opts['environment'],
+            'resource' => $alert_data['display'],
+            'event' => $alert_data['name'],
+            'environment' => $this->config['environment'],
             'severity' => $severity,
-            'service' => [$obj['title']],
-            'group' => $obj['name'],
-            'value' => $obj['state'],
-            'text' => $text,
-            'tags' => [$obj['title']],
+            'service' => [$alert_data['title']],
+            'group' => $alert_data['name'],
+            'value' => $alert_data['state'],
+            'text' => strip_tags($alert_data['msg']),
+            'tags' => [$alert_data['title']],
             'attributes' => [
-                'sysName' => $obj['sysName'],
-                'sysDescr' => $obj['sysDescr'],
-                'os' => $obj['os'],
-                'type' => $obj['type'],
-                'ip' => $obj['ip'],
-                'uptime' => $obj['uptime_long'],
-                'moreInfo' => '<a href=' . $deviceurl . '>' . $devicehostname . '</a>',
+                'sysName' => $alert_data['sysName'],
+                'sysDescr' => $alert_data['sysDescr'],
+                'os' => $alert_data['os'],
+                'type' => $alert_data['type'],
+                'ip' => $alert_data['ip'],
+                'uptime' => $alert_data['uptime_long'],
+                'moreInfo' => '<a href=' . Url::deviceUrl($alert_data['device_id']) . '>' . $alert_data['display'] . '</a>',
             ],
-            'origin' => $obj['rule'],
-            'type' => $obj['title'],
+            'origin' => $alert_data['rule'],
+            'type' => $alert_data['title'],
         ];
-        $alert_message = json_encode($data);
-        Proxy::applyToCurl($curl);
-        $headers = ['Content-Type: application/json', 'Authorization: Key ' . $opts['apikey']];
-        curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($curl, CURLOPT_URL, $host);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($curl, CURLOPT_POST, true);
-        curl_setopt($curl, CURLOPT_POSTFIELDS, $alert_message);
-        $ret = curl_exec($curl);
-        $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-        if ($code != 201) {
-            var_dump("API '$host' returned Error");
-            var_dump('Params: ' . $alert_message);
-            var_dump('Return: ' . $ret);
-            var_dump('Headers: ', $headers);
 
-            return 'HTTP Status code ' . $code;
+        $res = Http::client()
+            ->withHeaders([
+                'Authorization' => 'Key ' . $this->config['apikey'],
+            ])
+            ->post($this->config['alerta-url'], $data);
+
+        if ($res->successful()) {
+            return true;
         }
 
-        return true;
+        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $data['text'], $data);
     }
 
-    public static function configTemplate()
+    public static function configTemplate(): array
     {
         return [
             'config' => [
@@ -105,7 +83,7 @@ class Alerta extends Transport
                     'title' => 'Api Key',
                     'name' => 'apikey',
                     'descr' => 'Your alerta api key with minimally write:alert permissions.',
-                    'type' => 'text',
+                    'type' => 'password',
                 ],
                 [
                     'title' => 'Alert State',

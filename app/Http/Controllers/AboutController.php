@@ -54,6 +54,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use LibreNMS\Config;
 use LibreNMS\Data\Store\Rrd;
+use LibreNMS\Util\Http;
 use LibreNMS\Util\Version;
 
 class AboutController extends Controller
@@ -65,7 +66,7 @@ class AboutController extends Controller
         return view('about.index', [
             'usage_reporting_status' => Config::get('reporting.usage'),
             'error_reporting_status' => Config::get('reporting.error'),
-            'reporting_clearable'   => Callback::whereIn('name', ['uuid', 'error_reporting_uuid'])->exists(),
+            'reporting_clearable' => Callback::whereIn('name', ['uuid', 'error_reporting_uuid'])->exists(),
 
             'db_schema' => $version->database(),
             'git_log' => $version->git->log(),
@@ -89,21 +90,21 @@ class AboutController extends Controller
             'stat_hrdev' => HrDevice::count(),
             'stat_ipv4_addy' => Ipv4Address::count(),
             'stat_ipv4_nets' => Ipv4Network::count(),
-            'stat_ipv6_addy'  => Ipv6Address::count(),
-            'stat_ipv6_nets'  => Ipv6Network::count(),
-            'stat_memory'     => Mempool::count(),
-            'stat_ports'      => Port::count(),
+            'stat_ipv6_addy' => Ipv6Address::count(),
+            'stat_ipv6_nets' => Ipv6Network::count(),
+            'stat_memory' => Mempool::count(),
+            'stat_ports' => Port::count(),
             'stat_processors' => Processor::count(),
-            'stat_pw'         => Pseudowire::count(),
-            'stat_sensors'    => Sensor::count(),
-            'stat_services'   => Service::count(),
-            'stat_slas'       => Sla::count(),
-            'stat_storage'    => Storage::count(),
-            'stat_syslog'     => Syslog::count(),
-            'stat_toner'      => PrinterSupply::count(),
-            'stat_vlans'      => Vlan::count(),
-            'stat_vrf'        => Vrf::count(),
-            'stat_wireless'   => WirelessSensor::count(),
+            'stat_pw' => Pseudowire::count(),
+            'stat_sensors' => Sensor::count(),
+            'stat_services' => Service::count(),
+            'stat_slas' => Sla::count(),
+            'stat_storage' => Storage::count(),
+            'stat_syslog' => Syslog::count(),
+            'stat_toner' => PrinterSupply::count(),
+            'stat_vlans' => Vlan::count(),
+            'stat_vrf' => Vrf::count(),
+            'stat_wireless' => WirelessSensor::count(),
         ]);
     }
 
@@ -113,7 +114,7 @@ class AboutController extends Controller
 
         // try to clear usage data if we have a uuid
         if ($usage_uuid) {
-            if (! \Http::post(Config::get('callback_clear'), ['uuid' => $usage_uuid])->successful()) {
+            if (! Http::client()->post(Config::get('callback_clear'), ['uuid' => $usage_uuid])->successful()) {
                 return response()->json([], 500); // don't clear if this fails to delete upstream data
             }
         }

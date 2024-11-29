@@ -1,0 +1,438 @@
+-- ****************************************************************
+-- *  Moxa Switching - PORT PRIVATE MIB
+-- *
+-- *  Copyright (c) 2019 by Moxa Inc.
+-- *  All rights reserved.
+-- *****************************************************************
+
+MOXA-PORT-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+        MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-TYPE, IpAddress, Unsigned32,
+        Integer32
+            FROM SNMPv2-SMI
+        TEXTUAL-CONVENTION, DisplayString, TruthValue
+          FROM SNMPv2-TC
+        portInterface
+          FROM MOXA-SWITCHING-MIB;
+
+    mxPort   MODULE-IDENTITY
+	    LAST-UPDATED "202203090000Z"
+	    ORGANIZATION "Moxa Inc."
+	    CONTACT-INFO
+                "
+                Postal: Moxa Inc.
+                13F., No. 3, Sec. 4, New Taipei Blvd.
+                Xinzhuang Dist., New Taipei City 242032, Taiwan, R.O.C.
+
+
+                Tel: +866-2-89191230
+                Web: http://www.moxa.com/
+                "
+
+	    DESCRIPTION
+	            "The MIB module defines Moxa port setting"
+
+        REVISION    "202203090000Z"
+        DESCRIPTION    "Update CONTACT-INFO and add OID portStatFunction"
+
+    	REVISION    "201906300000Z"
+        DESCRIPTION    "Initial Revision"
+	    ::= { portInterface 1 }
+
+-- -------------------------------------------------------------
+-- Textual Conventions
+-- -------------------------------------------------------------
+
+    PortFuncMap ::= TEXTUAL-CONVENTION
+        STATUS      current
+        DESCRIPTION
+            "Port function bitmap."
+        SYNTAX      BITS {
+                        poe(0),
+                        ptp(1)
+                    }
+
+-- -------------------------------------------------------------
+-- groups in the MOXA-PORT-MIB MIB
+-- -------------------------------------------------------------
+
+  -- portNotification		 OBJECT IDENTIFIER ::= { mxPort 0 }
+  portConfiguration		 OBJECT IDENTIFIER ::= { mxPort 1 }
+  portStatus		   OBJECT IDENTIFIER ::= { mxPort 2 }
+  -- portExtensions		 OBJECT IDENTIFIER ::= { mxPort 3 }
+
+-- -------------------------------------------------------------
+-- configuration group
+-- -------------------------------------------------------------
+
+-- -------------------------------------------------------------
+-- port
+-- -------------------------------------------------------------
+
+  portConfigTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF PortConfigEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+          "A table to control the port specific parameters of the device like speed,
+           duplex mode, etc."
+      ::= { portConfiguration 1 }
+
+  portConfigEntry OBJECT-TYPE
+      SYNTAX PortConfigEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+          "An entry appears in this table for each interface in the system.
+           Index to the table is the interface index of the port."
+      INDEX { portConfigIndex }
+      ::= { portConfigTable 1 }
+
+  PortConfigEntry ::=
+      SEQUENCE {
+         portConfigIndex
+            Integer32,
+         portConfigDescription
+            DisplayString,
+         portConfigMode
+            INTEGER,
+         portConfigDuplex
+            INTEGER,
+         portConfigSpeed
+            INTEGER,
+         portConfigMdiOrMdixCap
+            INTEGER
+      }
+
+  portConfigIndex OBJECT-TYPE
+     SYNTAX      Integer32 (1..65535)
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "Interface index of the port for which the configuration
+        in this entry applies."
+
+     ::= { portConfigEntry 1 }
+
+  portConfigDescription OBJECT-TYPE
+      SYNTAX      DisplayString
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+              "A textual string containing information about the interface"
+      ::= { portConfigEntry 2 }
+
+  portConfigMode OBJECT-TYPE
+     SYNTAX      INTEGER {
+                   auto(1),
+                   noNegotiation(2)
+                }
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        "Speficies the mode in which the speed and duplex modes of the interface
+         is determined.
+
+         If set as 'auto', the hardware senses speed and negotiates with the port
+         on the other end of the link for data transfer operation as
+         'full-duplex' or 'half-duplex' and about flow contol.
+
+         If set as 'nonegotiation', the configured values for interface
+         speed and duplex mode will be effective."
+
+   ::= { portConfigEntry 3 }
+
+  portConfigDuplex OBJECT-TYPE
+     SYNTAX      INTEGER {
+                   full(1),
+                   half(2)
+                }
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        "Configures interface data transfer mode as full-duplex or half-duplex.
+
+        This object can be configured only if the 'portConfigMode' is 'nonegotiation'.
+        If the 'portConfigMode' is 'auto', it obtains the value from Hardware
+        after negotiating  with its peer"
+
+     ::= { portConfigEntry 4 }
+
+  portConfigSpeed OBJECT-TYPE
+     SYNTAX      INTEGER {
+                   tenMBPS(1),
+                   hundredMBPS(2),
+                   oneGB(3),
+                   tenGB(4),
+                   fortyGB(5),
+                   fiftysixGB(6),
+                   twothousandfivehundredMBPS(7)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Configures interface speed.
+
+       This object can be configured only if the 'portConfigMode' is 'nonegotiation'.
+       If the 'portConfigMode' is 'auto', it obtains the value from Hardware
+       after negotiating  with its peer"
+
+     ::= { portConfigEntry 5 }
+
+  portConfigMdiOrMdixCap OBJECT-TYPE
+     SYNTAX       INTEGER {
+                     auto(1),
+                     mdi(2),
+                     mdix(3)
+                  }
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        "Specifies the port should be in Auto-Mdix mode or Mdi/Mdix.
+
+         Setting the value to `auto` enables the Auto MDIX in the port -
+         portConfigIndex. This will be effective only when the speed of the
+         particular port is auto negotiable.
+
+         Setting the value to `mdi` disables the Auto MDIX in the port and the
+         port will be in mdi mode.
+
+         Setting the value to `mdix` disables the Auto MDIX in the port and the
+         port will be in mdix mode."
+     ::= { portConfigEntry 6 }
+
+-- -------------------------------------------------------------
+-- Link up delay
+-- -------------------------------------------------------------
+  portConfigSystemLinkUpDelayEnable OBJECT-TYPE
+      SYNTAX     TruthValue
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+          "This enables or disables Link Up Delay functionality in the System.
+           'true' indicates that, operational status of the link is suspended
+           for a configured delay time 'portConfigLinkUpDelayTimer'.
+           'false' indicates  that  the operational status of the link is
+           not delayed and indicated to the higher layers immediately."
+
+      ::= { portConfiguration 2 }
+
+  portConfigLinkUpDelayTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF PortConfigLinkUpDelayEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+          "This table is to configure link up delay functionality."
+      ::= { portConfiguration 3 }
+
+  portConfigLinkUpDelayEntry OBJECT-TYPE
+      SYNTAX PortConfigLinkUpDelayEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+          "An entry containing linkup delay management information to a
+           particular interface."
+      INDEX { portConfigLinkUpDelayIndex }
+      ::= { portConfigLinkUpDelayTable 1 }
+
+  PortConfigLinkUpDelayEntry ::=
+      SEQUENCE {
+          portConfigLinkUpDelayIndex
+              INTEGER,
+          portConfigLinkUpDelayEnable
+              INTEGER,
+          portConfigLinkUpDelayTimer
+              Unsigned32
+      }
+
+  portConfigLinkUpDelayIndex OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS  read-only
+      STATUS current
+      DESCRIPTION
+          "The portConfig index is the same to IF-MIB ifIndex."
+      ::= { portConfigLinkUpDelayEntry 1 }
+
+  portConfigLinkUpDelayEnable OBJECT-TYPE
+      SYNTAX     TruthValue
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+          "This enables or disables Link Up Delay functionality in this port.
+           'true' indicates  that, operational status of the link is suspended
+           for a configured delay time 'portLinkUpDelayTimer'.
+           'false' indicates  that  the operational status of the link is not
+           delayed and indicated to the higher layers immediately."
+
+      ::= { portConfigLinkUpDelayEntry 2 }
+
+  portConfigLinkUpDelayTimer OBJECT-TYPE
+      SYNTAX Unsigned32 (1..1000)
+      UNITS "seconds"
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+          "This configures the delay timer for the link up enabled interface.
+           It takes the timer value (in seconds) minimum value as 1 and
+           maximum value as 1000."
+
+      ::= { portConfigLinkUpDelayEntry 3 }
+
+-- -------------------------------------------------------------
+-- Status group
+-- -------------------------------------------------------------
+
+-- -------------------------------------------------------------
+-- port
+-- -------------------------------------------------------------
+
+
+
+    portStatTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF PortStatEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table to control the port specific parameters of the device like speed,
+             duplex mode, etc."
+        ::= { portStatus 1 }
+
+    portStatEntry OBJECT-TYPE
+        SYNTAX PortStatEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry appears in this table for each interface in the system.
+             Index to the table is the interface index of the port."
+        INDEX { portStatIndex }
+        ::= { portStatTable 1 }
+
+    PortStatEntry ::=
+        SEQUENCE {
+           portStatIndex
+              Integer32,
+           portStatMediaType
+              DisplayString,
+           portStatState
+              INTEGER,
+           portStatMdiOrMdixCap
+              INTEGER,
+           portStatFunction
+              PortFuncMap
+        }
+
+  portStatIndex OBJECT-TYPE
+     SYNTAX      Integer32 (1..65535)
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "Interface index of the port for which the configuration
+        in this entry applies."
+
+     ::= { portStatEntry 1 }
+
+  portStatMediaType OBJECT-TYPE
+     SYNTAX          DisplayString
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+         "The port's current media type, as defined by MOXA."
+
+     ::= { portStatEntry 2 }
+
+  portStatState OBJECT-TYPE
+     SYNTAX      INTEGER {
+                   disabled(1),
+                   blocking(2),
+                   listening(3),
+                   learning(4),
+                   forwarding(5),
+                   broken(6)
+                }
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+         "The port's current state, as defined by application of
+         the redundant Protocols.  This state controls what
+         action a port takes on reception of a frame.  If the
+         bridge has detected a port that is malfunctioning, it
+         will place that port into the broken(6) state.  For
+         ports that are disabled (see portStatMode), this
+         object will have a value of disabled(1)."
+
+     ::= { portStatEntry 3 }
+
+  portStatMdiOrMdixCap OBJECT-TYPE
+     SYNTAX      INTEGER {
+                   mdi(1),
+                   mdix(2),
+                   invalid(3)
+                }
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+         "The port's current mdi/mdix status. If the port medium is operating on
+         fiber, the status shall return invalid(3). If the port is not valid,
+         the status shall also return invalid(3)."
+
+     ::= { portStatEntry 4 }
+
+  portStatFunction OBJECT-TYPE
+     SYNTAX      PortFuncMap
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+         "This function is used by PoE and PTP. The return value is a bitmap
+         in which bit(0) represents PoE and bit(1) represents PTP."
+
+     ::= { portStatEntry 5 }
+
+-- -------------------------------------------------------------
+-- Link up delay
+-- -------------------------------------------------------------
+
+  portStatLinkUpDelayTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF PortStatLinkUpDelayEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+          "This table is to configure link up delay functionality."
+      ::= { portStatus 2 }
+
+  portStatLinkUpDelayEntry OBJECT-TYPE
+      SYNTAX PortStatLinkUpDelayEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+          "An entry containing linkup delay management information to a
+           particular interface."
+      INDEX { portStatLinkUpDelayIndex }
+      ::= { portStatLinkUpDelayTable 1 }
+
+  PortStatLinkUpDelayEntry ::=
+      SEQUENCE {
+          portStatLinkUpDelayIndex
+              INTEGER,
+          portStatLinkUpDelayRemainingTime
+              Unsigned32
+      }
+
+  portStatLinkUpDelayIndex OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS  read-only
+      STATUS current
+      DESCRIPTION
+          "The port index is the same to IF-MIB ifIndex."
+      ::= { portStatLinkUpDelayEntry 1 }
+
+  portStatLinkUpDelayRemainingTime OBJECT-TYPE
+      SYNTAX Unsigned32
+      UNITS       "seconds"
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+          "This object is for displaying the pending time left
+           for the link Operation Status to be made UP."
+
+      ::= { portStatLinkUpDelayEntry 2 }
+END

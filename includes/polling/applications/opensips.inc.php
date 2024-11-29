@@ -26,8 +26,6 @@ foreach ($lines as $line) {
 
 unset($lines);
 
-$rrd_name = ['app', $name, $app->app_id];
-
 $rrd_def = RrdDefinition::make()
     ->addDataset('load', 'GAUGE', 0, 100)
     ->addDataset('total_memory', 'GAUGE', 0, 125000000000)
@@ -43,7 +41,12 @@ $fields = [
     'openfiles' => (int) $opensips['Open files'],
 ];
 
-$tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
+$tags = [
+    'name' => $name,
+    'app_id' => $app->app_id,
+    'rrd_name' => ['app', $name, $app->app_id],
+    'rrd_def' => $rrd_def,
+];
 
 data_update($device, 'app', $tags, $fields);
 

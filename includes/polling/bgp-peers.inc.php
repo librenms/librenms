@@ -8,6 +8,19 @@ use LibreNMS\Util\IP;
 $peers = dbFetchRows('SELECT * FROM `bgpPeers` AS B LEFT JOIN `vrfs` AS V ON `B`.`vrf_id` = `V`.`vrf_id` WHERE `B`.`device_id` = ?', [$device['device_id']]);
 
 if (! empty($peers)) {
+    $intFields = [
+        'bgpPeerRemoteAs',
+        'bgpPeerLastErrorCode',
+        'bgpPeerLastErrorSubCode',
+        'bgpPeerIface',
+        'bgpPeerInUpdates',
+        'bgpPeerOutUpdates',
+        'bgpPeerInTotalMessages',
+        'bgpPeerOutTotalMessages',
+        'bgpPeerOutFsmEstablishedTime',
+        'bgpPeerInUpdateElapsedTime',
+    ];
+
     $generic = false;
     if ($device['os'] == 'junos') {
         $peer_data_check = snmpwalk_cache_long_oid($device, 'jnxBgpM2PeerIndex', '.1.3.6.1.4.1.2636.5.1.1.2.1.1.1.14', [], 'BGP4-V2-MIB-JUNIPER', 'junos');
@@ -30,7 +43,18 @@ if (! empty($peers)) {
     } else {
         $peer_data_check = snmpwalk_cache_oid($device, 'bgpPeerRemoteAs', [], 'BGP4-MIB');
     }
-    if (empty($peer_data_check)) {
+    // If a Cisco device has BGP peers in VRF(s), but no BGP peers in
+    // the default VRF: don't fall back to the default MIB, to avoid
+    // skipping IPv6 peers (CISCO-BGP4-MIB is required.)
+    // count(getVrfContexts) returns VRF's with a configured SNMP context
+    // e.g. snmp-server context context_name vrf vrf_name
+    // "> 0" because the default VRF is only included in the count,
+    // if it has a switch configured SNMP context.
+    // The issues occured on NX-OS (Nexus) and IOS-XR (ASR) devices.
+    // Using os_group 'cisco' breaks the 3560g snmpsim tests.
+    $vrf_contexts = DeviceCache::getPrimary()->getVrfContexts();
+    $cisco_with_vrf = (($device['os'] == 'iosxr' || $device['os'] == 'nxos') && ! empty($vrf_contexts[0]));
+    if (empty($peer_data_check) && ! $cisco_with_vrf) {
         $peer_data_check = snmpwalk_cache_oid($device, 'bgpPeerRemoteAs', [], 'BGP4-MIB');
         $generic = true;
     }
@@ -53,7 +77,7 @@ if (! empty($peers)) {
             // cbgpPeer2RemoteAs, resulting in empty $peer_data_check.
             // Without the or clause, we won't see the VRF BGP peers.
             // ($peer_data_check isn't used in the Cisco code path,)
-            if (count($peer_data_check) > 0 || ($device['os_group'] == 'cisco' && count(DeviceCache::getPrimary()->getVrfContexts()) > 1)) {
+            if (count($peer_data_check) > 0 || $cisco_with_vrf) {
                 if ($generic) {
                     echo "\nfallback to default mib";
 
@@ -227,8 +251,8 @@ if (! empty($peers)) {
                     } else {
                         $peer_data['bgpPeerAdminStatus'] = $bgpPeers[$vrfOid][$address]['tBgpPeerNgOperLastEvent'];
                     }
-                    $peer_data['bgpPeerInTotalMessages'] = $bgpPeers[$vrfOid][$address]['tBgpPeerNgOperMsgOctetsRcvd'];  // That are actually only octets available,
-                    $peer_data['bgpPeerOutTotalMessages'] = $bgpPeers[$vrfOid][$address]['tBgpPeerNgOperMsgOctetsSent']; // not messages
+                    $peer_data['bgpPeerInTotalMessages'] = $bgpPeers[$vrfOid][$address]['tBgpPeerNgOperMsgOctetsRcvd'] % (2 ** 32);  // That are actually only octets available,
+                    $peer_data['bgpPeerOutTotalMessages'] = $bgpPeers[$vrfOid][$address]['tBgpPeerNgOperMsgOctetsSent'] % (2 ** 32); // not messages
                     $peer_data['bgpPeerFsmEstablishedTime'] = $establishedTime;
                 } elseif ($device['os'] == 'firebrick') {
                     // ToDo, It seems that bgpPeer(In|Out)Updates and bgpPeerInUpdateElapsedTime are actually not available over SNMP
@@ -410,7 +434,7 @@ if (! empty($peers)) {
                 $peer_data = [];
 
                 foreach ($oid_map as $source => $target) {
-                    $v = isset($peer_data_raw[$source]) ? $peer_data_raw[$source] : '';
+                    $v = isset($peer_data_raw[$source]) ? $peer_data_raw[$source] : (in_array($target, $intFields) ? 0 : '');
 
                     if (Str::contains($source, 'LocalAddr')) {
                         try {
@@ -447,10 +471,16 @@ if (! empty($peers)) {
                     $peer_data['bgpPeerIface'] = null;
                 }
             }
-            d_echo($peer_data);
         } catch (InvalidIpException $e) {
             // ignore
         }
+
+        if (empty($peer_data)) {
+            continue; // no data, try next peer
+        }
+
+        d_echo($peer_data);
+
         // --- Send event log notices ---
         if ($peer_data['bgpPeerFsmEstablishedTime']) {
             if (! (is_array(\LibreNMS\Config::get('alerts.bgp.whitelist'))
@@ -482,6 +512,7 @@ if (! empty($peers)) {
         $peer_data['bgpPeerOutUpdates'] = set_numeric($peer_data['bgpPeerOutUpdates']);
         $peer_data['bgpPeerInTotalMessages'] = set_numeric($peer_data['bgpPeerInTotalMessages']);
         $peer_data['bgpPeerOutTotalMessages'] = set_numeric($peer_data['bgpPeerOutTotalMessages']);
+        $peer_data['bgpPeerInUpdateElapsedTime'] = set_numeric($peer_data['bgpPeerInUpdateElapsedTime']);
 
         $fields = [
             'bgpPeerOutUpdates' => $peer_data['bgpPeerOutUpdates'],
@@ -589,9 +620,10 @@ if (! empty($peers)) {
                     $cbgpPeerPrefixAdminLimit = $cbgp_data['cbgpPeerPrefixAdminLimit'];
                     $cbgpPeerPrefixThreshold = $cbgp_data['cbgpPeerPrefixThreshold'];
                     $cbgpPeerPrefixClearThreshold = $cbgp_data['cbgpPeerPrefixClearThreshold'];
-                    $cbgpPeerAdvertisedPrefixes = $cbgp_data['cbgpPeerAdvertisedPrefixes'];
+                    $cbgpPeerAdvertisedPrefixes = max(0, $cbgp_data['cbgpPeerAdvertisedPrefixes'] - $cbgp_data['cbgpPeerWithdrawnPrefixes']);
+                    $cbgpPeerWithdrawnPrefixes = 0; // no use, it is a gauge32 value, only the difference between cbgpPeerAdvertisedPrefixes  and cbgpPeerWithdrawnPrefixes makes sense.
+                    // CF CISCO-BGP4-MIB definition for both
                     $cbgpPeerSuppressedPrefixes = $cbgp_data['cbgpPeerSuppressedPrefixes'];
-                    $cbgpPeerWithdrawnPrefixes = $cbgp_data['cbgpPeerWithdrawnPrefixes'];
                     unset($cbgp_data);
                 } //end if
 
@@ -712,14 +744,14 @@ if (! empty($peers)) {
                 $cbgpPeerWithdrawnPrefixes = set_numeric($cbgpPeerWithdrawnPrefixes);
 
                 $cbgpPeers_cbgp_fields = [
-                    'AcceptedPrefixes'     => $cbgpPeerAcceptedPrefixes,
-                    'DeniedPrefixes'       => $cbgpPeerDeniedPrefixes,
-                    'PrefixAdminLimit'     => $cbgpPeerPrefixAdminLimit,
-                    'PrefixThreshold'      => $cbgpPeerPrefixThreshold,
+                    'AcceptedPrefixes' => $cbgpPeerAcceptedPrefixes,
+                    'DeniedPrefixes' => $cbgpPeerDeniedPrefixes,
+                    'PrefixAdminLimit' => $cbgpPeerPrefixAdminLimit,
+                    'PrefixThreshold' => $cbgpPeerPrefixThreshold,
                     'PrefixClearThreshold' => $cbgpPeerPrefixClearThreshold,
-                    'AdvertisedPrefixes'   => $cbgpPeerAdvertisedPrefixes,
-                    'SuppressedPrefixes'   => $cbgpPeerSuppressedPrefixes,
-                    'WithdrawnPrefixes'    => $cbgpPeerWithdrawnPrefixes,
+                    'AdvertisedPrefixes' => $cbgpPeerAdvertisedPrefixes,
+                    'SuppressedPrefixes' => $cbgpPeerSuppressedPrefixes,
+                    'WithdrawnPrefixes' => $cbgpPeerWithdrawnPrefixes,
                 ];
 
                 foreach ($cbgpPeers_cbgp_fields as $field => $value) {
@@ -764,11 +796,11 @@ if (! empty($peers)) {
                     ->addDataset('SuppressedPrefixes', 'GAUGE', null, 100000000000)
                     ->addDataset('WithdrawnPrefixes', 'GAUGE', null, 100000000000);
                 $fields = [
-                    'AcceptedPrefixes'    => $cbgpPeerAcceptedPrefixes,
-                    'DeniedPrefixes'      => $cbgpPeerDeniedPrefixes,
-                    'AdvertisedPrefixes'  => $cbgpPeerAdvertisedPrefixes,
-                    'SuppressedPrefixes'  => $cbgpPeerSuppressedPrefixes,
-                    'WithdrawnPrefixes'   => $cbgpPeerWithdrawnPrefixes,
+                    'AcceptedPrefixes' => $cbgpPeerAcceptedPrefixes,
+                    'DeniedPrefixes' => $cbgpPeerDeniedPrefixes,
+                    'AdvertisedPrefixes' => $cbgpPeerAdvertisedPrefixes,
+                    'SuppressedPrefixes' => $cbgpPeerSuppressedPrefixes,
+                    'WithdrawnPrefixes' => $cbgpPeerWithdrawnPrefixes,
                 ];
 
                 $tags = [

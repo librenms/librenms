@@ -14,43 +14,43 @@ $rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Successful',
-        'ds'       => 'qrisa',
+        'descr' => 'Successful',
+        'ds' => 'qrisa',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Authoritative',
-        'ds'       => 'qriaa',
+        'descr' => 'Authoritative',
+        'ds' => 'qriaa',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Non Authoritative',
-        'ds'       => 'qrinaa',
+        'descr' => 'Non Authoritative',
+        'ds' => 'qrinaa',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'NX RR Set',
-        'ds'       => 'qrin',
+        'descr' => 'NX RR Set',
+        'ds' => 'qrin',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'SERVFAIL',
-        'ds'       => 'qris',
+        'descr' => 'SERVFAIL',
+        'ds' => 'qris',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'NXDOMAIN',
-        'ds'       => 'qrind',
+        'descr' => 'NXDOMAIN',
+        'ds' => 'qrind',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'With EDNS(0)',
-        'ds'       => 'rwes',
+        'descr' => 'With EDNS(0)',
+        'ds' => 'rwes',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Caused Rec',
-        'ds'       => 'qcr',
+        'descr' => 'Caused Rec',
+        'ds' => 'qcr',
     ];
 } else {
     d_echo('RRD "' . $rrd_filename . '" not found');

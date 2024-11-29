@@ -9,7 +9,8 @@
                     "app_state_prev": null,
                     "app_status": "",
                     "app_instance": "",
-                    "data": null
+                    "data": null,
+                    "deleted_at": null
                 }
             ]
         },
@@ -22,7 +23,8 @@
                     "app_state_prev": "UNKNOWN",
                     "app_status": "",
                     "app_instance": "",
-                    "data": "{\"containers\":[\"foobar_laravel.test_1\",\"foobar_dashboard_1\",\"foobar_meilisearch_1\",\"foobar_mysql_1\",\"foobar_redis_1\"]}"
+                    "data": "{\"containers\":[\"foobar_laravel.test_1\",\"foobar_dashboard_1\",\"foobar_meilisearch_1\",\"foobar_mysql_1\",\"foobar_redis_1\"]}",
+                    "deleted_at": null
                 }
             ],
             "application_metrics": [

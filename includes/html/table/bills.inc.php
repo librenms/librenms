@@ -1,6 +1,7 @@
 <?php
 
 // Calculate filters
+use LibreNMS\Billing;
 use LibreNMS\Util\Number;
 
 $prev = ! empty($vars['period']) && ($vars['period'] == 'prev');
@@ -84,13 +85,13 @@ foreach (dbFetchRows($sql, $param) as $bill) {
         $datefrom = $bill['bill_datefrom'];
         $dateto = $bill['bill_dateto'];
     } else {
-        $day_data = getDates($bill['bill_day']);
+        $day_data = Billing::getDates($bill['bill_day'], 0);
         $datefrom = $day_data['0'];
         $dateto = $day_data['1'];
     }
     $rate_95th = Number::formatSi($bill['rate_95th'], 2, 3, '') . 'bps';
     $dir_95th = $bill['dir_95th'];
-    $total_data = format_bytes_billing($bill['total_data']);
+    $total_data = Billing::formatBytes($bill['total_data']);
     $rate_average = $bill['rate_average'];
     $url = \LibreNMS\Util\Url::generate(['page' => 'bill', 'bill_id' => $bill['bill_id']]);
     $used95th = Number::formatSi($bill['rate_95th'], 2, 3, '') . 'bps';
@@ -118,20 +119,20 @@ foreach (dbFetchRows($sql, $param) as $bill) {
         $rate_95th = "<b>$rate_95th</b>";
     } elseif (strtolower($bill['bill_type']) == 'quota') {
         $type = 'Quota';
-        $allowed = format_bytes_billing($bill['bill_allowed']);
+        $allowed = Billing::formatBytes($bill['bill_allowed']);
         if (! empty($prev)) {
-            $in = format_bytes_billing($bill['traf_in']);
-            $out = format_bytes_billing($bill['traf_out']);
+            $in = Billing::formatBytes($bill['traf_in']);
+            $out = Billing::formatBytes($bill['traf_out']);
         } else {
-            $in = format_bytes_billing($bill['total_data_in']);
-            $out = format_bytes_billing($bill['total_data_out']);
+            $in = Billing::formatBytes($bill['total_data_in']);
+            $out = Billing::formatBytes($bill['total_data_out']);
         }
         if (! $prev) {
             $percent = Number::calculatePercent($bill['total_data'], $bill['bill_allowed']);
             $overuse = ($bill['total_data'] - $bill['bill_allowed']);
         }
 
-        $overuse_formatted = format_bytes_billing($overuse);
+        $overuse_formatted = Billing::formatBytes($overuse);
         $used = $total_data;
         $tmp_used = $bill['total_data'];
         $total_data = "<b>$total_data</b>";
@@ -140,7 +141,7 @@ foreach (dbFetchRows($sql, $param) as $bill) {
     $background = \LibreNMS\Util\Color::percentage($percent, null);
     $right_background = $background['right'];
     $left_background = $background['left'];
-    $overuse_formatted = (($overuse <= 0) ? '-' : "<span style='color: #${background['left']}; font-weight: bold;'>$overuse_formatted</span>");
+    $overuse_formatted = (($overuse <= 0) ? '-' : "<span style='color: #{$background['left']}; font-weight: bold;'>$overuse_formatted</span>");
 
     $bill_name = "<a href='$url'><span style='font-weight: bold;' class='interface'>" . htmlentities($bill['bill_name']) . '</span></a><br />' .
                     date('Y-m-d', strtotime($datefrom)) . ' to ' . date('Y-m-d', strtotime($dateto));
@@ -152,25 +153,25 @@ foreach (dbFetchRows($sql, $param) as $bill) {
             "'><i class='fa fa-pencil fa-lg icon-theme' title='Edit' aria-hidden='true'></i> Edit</a> ";
     }
     if (strtolower($bill['bill_type']) == 'cdr') {
-        $predicted = Number::formatSi(getPredictedUsage($bill['bill_day'], $tmp_used), 2, 3, '') . 'bps';
+        $predicted = Number::formatSi(Billing::getPredictedUsage($bill['bill_day'], $tmp_used), 2, 3, '') . 'bps';
     } elseif (strtolower($bill['bill_type']) == 'quota') {
-        $predicted = format_bytes_billing(getPredictedUsage($bill['bill_day'], $tmp_used));
+        $predicted = Billing::formatBytes(Billing::getPredictedUsage($bill['bill_day'], $tmp_used));
     }
 
     $response[] = [
-        'bill_name'     => $bill_name,
-        'notes'         => $notes,
-        'bill_type'     => $type,
-        'bill_allowed'    => $allowed,
+        'bill_name' => $bill_name,
+        'notes' => $notes,
+        'bill_type' => $type,
+        'bill_allowed' => $allowed,
         'total_data_in' => $in,
-        'total_data_out'=> $out,
-        'total_data'    => $total_data,
-        'rate_95th'     => $rate_95th,
-        'used'          => $used,
-        'overusage'     => $overuse_formatted,
-        'predicted'     => $predicted,
-        'graph'         => $bar,
-        'actions'       => $actions,
+        'total_data_out' => $out,
+        'total_data' => $total_data,
+        'rate_95th' => $rate_95th,
+        'used' => $used,
+        'overusage' => $overuse_formatted,
+        'predicted' => $predicted,
+        'graph' => $bar,
+        'actions' => $actions,
     ];
 }
 

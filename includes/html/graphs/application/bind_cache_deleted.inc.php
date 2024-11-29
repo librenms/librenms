@@ -14,13 +14,13 @@ $rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Mem Exhaustion',
-        'ds'       => 'crddtme',
+        'descr' => 'Mem Exhaustion',
+        'ds' => 'crddtme',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'TTL Expiration',
-        'ds'       => 'crddtte',
+        'descr' => 'TTL Expiration',
+        'ds' => 'crddtte',
     ];
 } else {
     d_echo('RRD "' . $rrd_filename . '" not found');

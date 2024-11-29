@@ -87,7 +87,7 @@ class Graph
                 throw $e;
             }
 
-            return new GraphImage(ImageFormat::forGraph(), 'Error', $e->generateErrorImage());
+            return new GraphImage(ImageFormat::forGraph($vars['graph_type'] ?? null), 'Error', $e->generateErrorImage());
         }
     }
 
@@ -101,7 +101,10 @@ class Graph
      */
     public static function get($vars): GraphImage
     {
-        define('IGNORE_ERRORS', true);
+        if (! defined('IGNORE_ERRORS')) {
+            define('IGNORE_ERRORS', true);
+        }
+
         chdir(base_path());
 
         include_once base_path('includes/dbFacile.php');

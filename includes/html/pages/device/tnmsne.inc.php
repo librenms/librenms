@@ -27,11 +27,10 @@ $pagetitle[] = 'Hardware';
         post: function()
         {
             return {
-                id: "tnmsneinfo",
                 device_id: '<?php echo htmlspecialchars($device['device_id']); ?>',
             };
         },
-        url: "ajax_table.php",
+        url: "<?php echo route('table.tnmsne') ?>",
         formatters: {
         },
         templates: {

@@ -4,14 +4,14 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class ImprovePortsSearchIndex extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::table('ports', function (Blueprint $table) {
             $table->index(['ifAlias', 'port_descr_descr', 'portName']);
@@ -25,7 +25,7 @@ class ImprovePortsSearchIndex extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::table('ports', function (Blueprint $table) {
             $table->index('ifDescr');
@@ -33,4 +33,4 @@ class ImprovePortsSearchIndex extends Migration
             $table->dropIndex('ports_ifdescr_ifname_index');
         });
     }
-}
+};

@@ -24,7 +24,7 @@ class CheckAlerts
      * @param  DevicePolled  $event
      * @return void
      */
-    public function handle(DevicePolled $event)
+    public function handle(DevicePolled $event): void
     {
         Log::info('#### Start Alerts ####');
         $start = microtime(true);

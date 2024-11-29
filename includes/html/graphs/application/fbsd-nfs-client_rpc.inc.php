@@ -18,33 +18,33 @@ if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list = [
         [
             'filename' => $rrd_filename,
-            'descr'    => 'timed out',
-            'ds'       => 'timedout',
-            'colour'   => '582a72',
+            'descr' => 'timed out',
+            'ds' => 'timedout',
+            'colour' => '582a72',
         ],
         [
             'filename' => $rrd_filename,
-            'descr'    => 'invalid',
-            'ds'       => 'invalid',
-            'colour'   => 'ffd1aa',
+            'descr' => 'invalid',
+            'ds' => 'invalid',
+            'colour' => 'ffd1aa',
         ],
         [
             'filename' => $rrd_filename,
-            'descr'    => 'x replies',
-            'ds'       => 'xreplies',
-            'colour'   => 'aa6c39',
+            'descr' => 'x replies',
+            'ds' => 'xreplies',
+            'colour' => 'aa6c39',
         ],
         [
             'filename' => $rrd_filename,
-            'descr'    => 'retries',
-            'ds'       => 'retries',
-            'colour'   => '28536c',
+            'descr' => 'retries',
+            'ds' => 'retries',
+            'colour' => '28536c',
         ],
         [
             'filename' => $rrd_filename,
-            'descr'    => 'requests',
-            'ds'       => 'requests',
-            'colour'   => 'ff11bb',
+            'descr' => 'requests',
+            'ds' => 'requests',
+            'colour' => 'ff11bb',
         ],
     ];
 } else {

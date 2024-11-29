@@ -8,13 +8,14 @@ $ipmi_rows = dbFetchRows("SELECT * FROM sensors WHERE device_id = ? AND poller_t
 if (is_array($ipmi_rows)) {
     d_echo($ipmi_rows);
 
-    if (isset($device['attribs']['ipmi_hostname'])) {
-        $ipmi['host'] = $device['attribs']['ipmi_hostname'];
-        $ipmi['port'] = filter_var($device['attribs']['ipmi_port'], FILTER_VALIDATE_INT) ? $device['attribs']['ipmi_port'] : '623';
-        $ipmi['user'] = $device['attribs']['ipmi_username'];
-        $ipmi['password'] = $device['attribs']['ipmi_password'];
-        $ipmi['kg_key'] = $device['attribs']['ipmi_kg_key'];
-        $ipmi['type'] = $device['attribs']['ipmi_type'];
+    if ($ipmi_hostname = DeviceCache::getPrimary()->getAttrib('ipmi_hostname')) {
+        $ipmi['host'] = $ipmi_hostname;
+        $ipmi_port = DeviceCache::getPrimary()->getAttrib('ipmi_port');
+        $ipmi['port'] = filter_var($ipmi_port, FILTER_VALIDATE_INT) ? $ipmi_port : '623';
+        $ipmi['user'] = DeviceCache::getPrimary()->getAttrib('ipmi_username');
+        $ipmi['password'] = DeviceCache::getPrimary()->getAttrib('ipmi_password');
+        $ipmi['kg_key'] = DeviceCache::getPrimary()->getAttrib('ipmi_kg_key');
+        $ipmi['type'] = DeviceCache::getPrimary()->getAttrib('ipmi_type');
 
         echo 'Fetching IPMI sensor data...';
 

@@ -14,10 +14,10 @@
                 <tr>
                     <td>{{ trans('stp.bridge_address') }}</td>
                     <td>
-                        {{ \LibreNMS\Util\Rewrite::readableMac($instance['bridgeAddress']) }}
+                        {{ \LibreNMS\Util\Mac::parse($instance['bridgeAddress'])->readable() }}
                         @if($url = \LibreNMS\Util\Url::deviceLink(\App\Facades\DeviceCache::get(\App\Models\Stp::where('bridgeAddress', $instance['bridgeAddress'])->value('device_id'))))
-                           ({!! $url !!})
-                        @elseif($brVendor = \LibreNMS\Util\Rewrite::readableOUI($instance['bridgeAddress']))
+                            ({!! $url !!})
+                        @elseif($brVendor = \LibreNMS\Util\Mac::parse($instance['bridgeAddress'])->vendor())
                             ({{ $brVendor }})
                         @endif
                     </td>
@@ -41,10 +41,10 @@
                 <tr>
                     <td>{{ trans('stp.designated_root') }}</td>
                     <td>
-                        {{ \LibreNMS\Util\Rewrite::readableMac($instance['designatedRoot']) }}
+                        {{ \LibreNMS\Util\Mac::parse($instance['designatedRoot'])->readable() }}
                         @if($url = \LibreNMS\Util\Url::deviceLink(\App\Facades\DeviceCache::get(\App\Models\Stp::where('bridgeAddress', $instance['designatedRoot'])->value('device_id'))))
-                           ({!! $url !!})
-                        @elseif($drVendor = \LibreNMS\Util\Rewrite::readableOUI($instance['designatedRoot']))
+                            ({!! $url !!})
+                        @elseif($drVendor = \LibreNMS\Util\Mac::parse($instance['designatedRoot'])->vendor())
                             ({{ $drVendor }})
                         @endif
                     </td>
@@ -117,7 +117,7 @@
 
 @push('scripts')
     <script>
-        var grid = $("#stp-ports").bootgrid( {
+        var grid = $("#stp-ports").bootgrid({
             ajax: true,
             templates: {search: ""},
             formatters: {
@@ -130,8 +130,7 @@
                     return html;
                 }
             },
-            post: function ()
-            {
+            post: function () {
                 return {
                     device_id: '{{ $data['device_id'] }}',
                     vlan: '{{ $data['vlan'] }}',

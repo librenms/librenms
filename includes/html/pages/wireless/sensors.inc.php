@@ -51,10 +51,10 @@
         {
             return {
                 id:         'wireless-sensors',
-                view:       '<?php echo $vars['view']; ?>',
-                graph_type: '<?php echo $graph_type; ?>',
-                unit:       '<?php echo $unit; ?>',
-                class:      '<?php echo $class; ?>'
+                view:       '<?php echo htmlspecialchars($vars['view']); ?>',
+                graph_type: '<?php echo htmlspecialchars($graph_type); ?>',
+                unit:       '<?php echo htmlspecialchars($unit); ?>',
+                class:      '<?php echo htmlspecialchars($class); ?>'
             };
         },
         url: "ajax_table.php"

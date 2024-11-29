@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\View\SimpleTemplate;
+use Carbon\Carbon;
 use Fico7489\Laravel\Pivot\Traits\PivotEventTrait;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -47,11 +48,14 @@ class Device extends BaseModel
         'cryptoalgo',
         'cryptopass',
         'disable_notify',
+        'disabled',
         'features',
         'hardware',
         'hostname',
         'display',
         'icon',
+        'ignore',
+        'ignore_status',
         'ip',
         'location_id',
         'notes',
@@ -74,12 +78,16 @@ class Device extends BaseModel
         'sysObjectID',
         'timeout',
         'transport',
+        'type',
         'version',
         'uptime',
     ];
 
     protected $casts = [
+        'inserted' => 'datetime',
+        'last_discovered' => 'datetime',
         'last_polled' => 'datetime',
+        'last_ping' => 'datetime',
         'status' => 'boolean',
     ];
 
@@ -157,6 +165,30 @@ class Device extends BaseModel
         }
 
         return null;
+    }
+
+    public function hasSnmpInfo(): bool
+    {
+        if ($this->snmpver == 'v3') {
+            if ($this->authlevel == 'authNoPriv') {
+                return ! empty($this->authname) && ! empty($this->authpass);
+            }
+
+            if ($this->authlevel == 'authPriv') {
+                return ! empty($this->authname)
+                    && ! empty($this->authpass)
+                    && ! empty($this->cryptoalgo)
+                    && ! empty($this->cryptopass);
+            }
+
+            return $this->authlevel !== 'noAuthNoPriv'; // reject if not noAuthNoPriv
+        }
+
+        if ($this->snmpver == 'v2c' || $this->snmpver == 'v1') {
+            return ! empty($this->community);
+        }
+
+        return false; // no known snmpver
     }
 
     /**
@@ -257,6 +289,30 @@ class Device extends BaseModel
     }
 
     /**
+     * Get the current DeviceOutage if there is one (if device is down)
+     */
+    public function getCurrentOutage(): ?DeviceOutage
+    {
+        return $this->relationLoaded('outages')
+            ? $this->outages->whereNull('up_again')->sortBy('going_down', descending: true)->first()
+            : $this->outages()->whereNull('up_again')->orderBy('going_down', 'desc')->first();
+    }
+
+    /**
+     * Get the time this device went down
+     */
+    public function downSince(): Carbon
+    {
+        $deviceOutage = $this->getCurrentOutage();
+
+        if ($deviceOutage) {
+            return Carbon::createFromTimestamp((int) $deviceOutage->going_down);
+        }
+
+        return $this->last_polled ?? Carbon::now();
+    }
+
+    /**
      * Check if user can access this device.
      *
      * @param  User  $user
@@ -275,9 +331,9 @@ class Device extends BaseModel
         return Permissions::canAccessDevice($this->device_id, $user->user_id);
     }
 
-    public function formatDownUptime($short = false)
+    public function formatDownUptime($short = false): string
     {
-        $time = ($this->status == 1) ? $this->uptime : time() - strtotime($this->last_polled);
+        $time = ($this->status == 1) ? $this->uptime : $this->last_polled?->diffInSeconds();
 
         return Time::formatInterval($time, $short);
     }
@@ -350,9 +406,9 @@ class Device extends BaseModel
         $this->save();
     }
 
-    public function getAttrib($name)
+    public function getAttrib($name, $default = null)
     {
-        return $this->attribs->pluck('attrib_value', 'attrib_type')->get($name);
+        return $this->attribs->pluck('attrib_value', 'attrib_type')->get($name, $default);
     }
 
     public function setAttrib($name, $value)
@@ -413,7 +469,7 @@ class Device extends BaseModel
                 return;
             }
 
-            if (! $this->relationLoaded('location') || optional($this->location)->location !== $new_location->location) {
+            if (! $this->relationLoaded('location') || $this->location?->location !== $new_location->location) {
                 if (! $new_location->exists) { // don't fetch if new location persisted to the DB, just use it
                     $new_location = Location::firstOrCreate(['location' => $new_location->location], $coord);
                 }
@@ -442,13 +498,14 @@ class Device extends BaseModel
         if (empty($ip)) {
             return null;
         }
+
         // @ suppresses warning, inet_ntop() returns false if it fails
         return @inet_ntop($ip) ?: null;
     }
 
     public function setIpAttribute($ip): void
     {
-        $this->attributes['ip'] = inet_pton($ip);
+        $this->attributes['ip'] = $ip ? inet_pton($ip) : null;
     }
 
     public function setStatusAttribute($status): void
@@ -490,7 +547,6 @@ class Device extends BaseModel
     {
         return $query->where([
             ['status', '=', 0],
-            ['disable_notify', '=', 0],
             ['ignore', '=', 0],
             ['disabled', '=', 0],
         ]);
@@ -604,6 +660,25 @@ class Device extends BaseModel
                 ->where('service_template_id', $serviceTemplate);
             }
         );
+    }
+
+    public function scopeWhereDeviceSpec(Builder $query, ?string $deviceSpec): Builder
+    {
+        if (empty($deviceSpec)) {
+            return $query;
+        } elseif ($deviceSpec == 'all') {
+            return $query;
+        } elseif ($deviceSpec == 'even') {
+            return $query->whereRaw('device_id % 2 = 0');
+        } elseif ($deviceSpec == 'odd') {
+            return $query->whereRaw('device_id % 2 = 1');
+        } elseif (is_numeric($deviceSpec)) {
+            return $query->where('device_id', $deviceSpec);
+        } elseif (str_contains($deviceSpec, '*')) {
+            return $query->where('hostname', 'like', str_replace('*', '%', $deviceSpec));
+        }
+
+        return $query->where('hostname', $deviceSpec);
     }
 
     // ---- Define Relationships ----
@@ -723,6 +798,21 @@ class Device extends BaseModel
         return $this->hasMany(\App\Models\IsisAdjacency::class, 'device_id', 'device_id');
     }
 
+    public function links(): HasMany
+    {
+        return $this->hasMany(\App\Models\Link::class, 'local_device_id');
+    }
+
+    public function remoteLinks(): HasMany
+    {
+        return $this->hasMany(\App\Models\Link::class, 'remote_device_id');
+    }
+
+    public function allLinks(): \Illuminate\Support\Collection
+    {
+        return $this->links->merge($this->remoteLinks);
+    }
+
     public function location(): BelongsTo
     {
         return $this->belongsTo(\App\Models\Location::class, 'location_id', 'id');
@@ -731,6 +821,12 @@ class Device extends BaseModel
     public function macs(): HasMany
     {
         return $this->hasMany(Ipv4Mac::class, 'device_id');
+    }
+
+    public function maps(): HasManyThrough
+    {
+        return $this->hasManyThrough(CustomMap::class, CustomMapNode::class, 'device_id', 'custom_map_id', 'device_id', 'custom_map_id')
+            ->distinct();
     }
 
     public function mefInfo(): HasMany
@@ -778,11 +874,6 @@ class Device extends BaseModel
         return $this->belongsToMany(self::class, 'device_relationships', 'child_device_id', 'parent_device_id');
     }
 
-    public function perf(): HasMany
-    {
-        return $this->hasMany(\App\Models\DevicePerf::class, 'device_id');
-    }
-
     public function ports(): HasMany
     {
         return $this->hasMany(\App\Models\Port::class, 'device_id', 'device_id');
@@ -801,6 +892,11 @@ class Device extends BaseModel
     public function portsNac(): HasMany
     {
         return $this->hasMany(\App\Models\PortsNac::class, 'device_id', 'device_id');
+    }
+
+    public function portsStack(): HasMany
+    {
+        return $this->hasMany(\App\Models\PortStack::class, 'device_id', 'device_id');
     }
 
     public function portsStp(): HasMany
@@ -946,6 +1042,11 @@ class Device extends BaseModel
     public function tnmsNeInfo(): HasMany
     {
         return $this->hasMany(TnmsneInfo::class, 'device_id');
+    }
+
+    public function transceivers(): HasMany
+    {
+        return $this->hasMany(Transceiver::class, 'device_id');
     }
 
     public function users(): BelongsToMany

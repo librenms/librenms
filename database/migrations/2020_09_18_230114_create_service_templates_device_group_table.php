@@ -3,14 +3,14 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 
-class CreateServiceTemplatesDeviceGroupTable extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::create('service_templates_device_group', function (Blueprint $table) {
             $table->unsignedInteger('service_template_id')->unsigned()->index();
@@ -25,8 +25,8 @@ class CreateServiceTemplatesDeviceGroupTable extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::drop('service_templates_device_group');
     }
-}
+};

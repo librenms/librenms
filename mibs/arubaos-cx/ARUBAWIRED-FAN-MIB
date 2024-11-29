@@ -1,0 +1,234 @@
+--**MOD+************************************************************************
+--* Module:    ARUBAWIRED-FAN-MIB :FAN MIB file
+--*
+--* (c) Copyright 2020,2023 Hewlett Packard Enterprise Development LP
+--* All Rights Reserved.
+--*
+--* The contents of this software are proprietary and confidential
+--* to the Hewlett-Packard Development Company, L.P.  No part of this
+--* program may be photocopied, reproduced, or translated into another
+--* programming language without prior written consent of the
+--* Hewlett-Packard Development Company, L.P.
+--*
+--* Purpose: This file contains MIB definition of ARUBAWIRED-FAN-MIB
+--*
+--**MOD-************************************************************************
+
+ARUBAWIRED-FAN-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    DisplayString
+        FROM SNMPv2-TC
+    arubaWiredChassisMIB
+        FROM ARUBAWIRED-CHASSIS-MIB;
+
+arubaWiredFan MODULE-IDENTITY
+    LAST-UPDATED "202303310000Z" -- March 31, 2023
+    ORGANIZATION "HPE/Aruba Networking Division"
+    CONTACT-INFO "Hewlett Packard Company
+                  8000 Foothills Blvd.
+                  Roseville, CA 95747"
+    DESCRIPTION
+        "This MIB module describes management objects that manage Fans."
+
+    REVISION     "202303310000Z" -- March 31, 2023
+    DESCRIPTION  "Added arubaWiredFanStateEnum"
+
+    REVISION     "202002130000Z" -- February 13, 2020
+    DESCRIPTION  "Initial revision."
+    ::= { arubaWiredChassisMIB 5 }
+
+-- **********************************************************************
+-- Fan notifications
+-- **********************************************************************
+
+arubaWiredFanNotifications OBJECT IDENTIFIER
+      ::= { arubaWiredFan 0 }
+
+arubaWiredFanStateNotification NOTIFICATION-TYPE
+      OBJECTS {
+                arubaWiredFanName,
+                arubaWiredFanState
+              }
+      STATUS current
+      DESCRIPTION
+               "A notification generated when a fan state change occurs.  This
+                can happen if a fan is inserted, removed, or experiences a
+                fault."
+      ::= { arubaWiredFanNotifications 1 }
+
+-- **********************************************************************
+-- Fan Objects
+-- **********************************************************************
+
+arubaWiredFanTable OBJECT-TYPE
+      SYNTAX      SEQUENCE OF ArubaWiredFanEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION "This table contains one row per switch fan entity."
+      ::= { arubaWiredFan 1 }
+
+arubaWiredFanEntry OBJECT-TYPE
+      SYNTAX      ArubaWiredFanEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION "Information about the fan physical entity table."
+      INDEX       {
+                    arubaWiredFanGroupIndex,
+                    arubaWiredFanTrayIndex,
+                    arubaWiredFanSlotIndex
+                  }
+      ::= { arubaWiredFanTable 1 }
+
+ArubaWiredFanEntry ::=
+    SEQUENCE {
+        arubaWiredFanGroupIndex       Integer32,
+        arubaWiredFanTrayIndex        Integer32,
+        arubaWiredFanSlotIndex        Integer32,
+        arubaWiredFanName             DisplayString,
+        arubaWiredFanState            DisplayString,
+        arubaWiredFanProductName      DisplayString,
+        arubaWiredFanSerialNumber     DisplayString,
+        arubaWiredFanRPM              Integer32,
+        arubaWiredFanAirflowDirection DisplayString,
+        arubaWiredFanStateEnum        INTEGER
+    }
+
+arubaWiredFanGroupIndex OBJECT-TYPE
+      SYNTAX      Integer32 (1..2147483647)
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION "This variable uniquely identifies the group containing the
+                   fan. Group means chassis in the stack and the value 1 MUST be
+                   used for non-modular devices."
+
+      ::= { arubaWiredFanEntry 1 }
+
+arubaWiredFanTrayIndex OBJECT-TYPE
+      SYNTAX      Integer32 (1..2147483647)
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION "This variable uniquely identifies the fan tray instance in a
+                   chassis that contains the fan.  A value 1 must be used for
+                   non-modular devices."
+
+      ::= { arubaWiredFanEntry 2 }
+
+arubaWiredFanSlotIndex OBJECT-TYPE
+      SYNTAX      Integer32 (1..2147483647)
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION "This variable uniquely identifies the fan instance in a
+                   fan tray and value 1 must be used for non-modular devices."
+
+      ::= { arubaWiredFanEntry 3 }
+
+arubaWiredFanName OBJECT-TYPE
+      SYNTAX      DisplayString (SIZE(0..20))
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "Identification of the fan for the system."
+      ::= { arubaWiredFanEntry 4 }
+
+arubaWiredFanState OBJECT-TYPE
+      SYNTAX      DisplayString (SIZE(0..20))
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "Current status for the fan."
+      ::= { arubaWiredFanEntry 5 }
+
+arubaWiredFanProductName OBJECT-TYPE
+      SYNTAX      DisplayString (SIZE(0..20))
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "Fan  product name identification."
+      ::= { arubaWiredFanEntry 6 }
+
+arubaWiredFanSerialNumber OBJECT-TYPE
+      SYNTAX      DisplayString (SIZE(0..20))
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "Fan serial number to uniquely identify the fan."
+      ::= { arubaWiredFanEntry 7 }
+
+arubaWiredFanRPM OBJECT-TYPE
+      SYNTAX      Integer32
+      UNITS       "RPM"
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "Current RPM read for the fan."
+      ::= { arubaWiredFanEntry 8 }
+
+arubaWiredFanAirflowDirection OBJECT-TYPE
+      SYNTAX      DisplayString (SIZE(0..20))
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "Air flow direction for the fan."
+      ::= { arubaWiredFanEntry 9 }
+
+arubaWiredFanStateEnum OBJECT-TYPE
+      SYNTAX      INTEGER {
+                    unknown       (1),
+                    empty         (2),
+                    uninitialized (3),
+                    ok            (4),
+                    fault         (5)
+                  }
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "Current status for the fan expressed as an enumerated value."
+      ::= { arubaWiredFanEntry 10 }
+
+-- **********************************************************************
+-- compliance statements
+-- **********************************************************************
+
+arubaWiredFanConformance OBJECT IDENTIFIER
+      ::= { arubaWiredFan 99 }
+
+arubaWiredFanCompliances OBJECT IDENTIFIER
+      ::= { arubaWiredFanConformance 1 }
+
+arubaWiredFanGroups      OBJECT IDENTIFIER
+      ::= { arubaWiredFanConformance 2 }
+
+arubaWiredFanCompliance MODULE-COMPLIANCE
+      STATUS      current
+      DESCRIPTION "A compliance statement for Aruba switch chassis."
+      MODULE
+      MANDATORY-GROUPS
+      {
+         arubaWiredFanTable,
+         arubaWiredFanNotificationsGroup
+      }
+      GROUP       arubaWiredFanTableGroup
+      DESCRIPTION "A Collection of Object(s) that display the current fan
+                   parameters information."
+
+      ::= { arubaWiredFanCompliances 1 }
+
+arubaWiredFanTableGroup OBJECT-GROUP
+      OBJECTS     {
+                    arubaWiredFanName,
+                    arubaWiredFanState,
+                    arubaWiredFanProductName,
+                    arubaWiredFanSerialNumber,
+                    arubaWiredFanRPM,
+                    arubaWiredFanAirflowDirection,
+                    arubaWiredFanStateEnum
+                  }
+      STATUS      current
+      DESCRIPTION "A collection of objects display configuration, status,
+                   and measurements of Fan table."
+      ::= { arubaWiredFanGroups 1 }
+
+arubaWiredFanNotificationsGroup NOTIFICATION-GROUP
+     NOTIFICATIONS { arubaWiredFanStateNotification }
+     STATUS current
+     DESCRIPTION "Notifications sent by fan management."
+     ::= { arubaWiredFanGroups 2 }
+END

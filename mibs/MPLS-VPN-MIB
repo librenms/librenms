@@ -1,43 +1,12 @@
--- *****************************************************************
--- MPLS-VPN-MIB.my:  MPLS Virtual Private Networks MIB
---
--- Oct 2001, Michael T Piecuch
---
--- Copyright (c) 2001 by cisco Systems, Inc.
--- All rights reserved.
--- 
--- *****************************************************************
---
--- This MIB is based of version 03 the IETF draft 
--- draft-ietf-ppvpn-mpls-vpn-mib-03.txt
---
--- (mpiecuch, 04/30/2002)
--- This IETF draft version does not compile cleanly with SMIC.  The
--- latest draft fixes the compiler issues, but the MIB described in this
--- file represents the old version and has been modified so that it will 
--- compile.
---
--- The following changes were made:
--- o mplsVpnVrfName (an INDEX object) was set to MAX-ACCESS
---   'not-accessible'
--- o mplsVpnInterfaceConfIndex (an INDEX object) was set to MAX-ACCESS
---   'not-accessible'
--- o INDEX objects (mplsVpnVrfName and mplsVpnInterfaceConfIndex)
---   were removed from the notifications.
--- o INDEX objects in mplsVpnVrfBgpNbrPrefixEntry modified
--- o Removed unused IMPORT objects
--- o Added dummy BITS value for mplsVpnInterfaceVpnRouteDistProtocol
---   so that it would start at position 0
+-- extracted from draft-ietf-ppvpn-mpls-vpn-mib-05.txt
+-- at Fri May 14 06:21:04 2004
 
 MPLS-VPN-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
    experimental, Integer32, Counter32, Unsigned32
---   TimeTicks
--- Removed so that MIB would complile (mpiecuch, 04/20/2002)
       FROM SNMPv2-SMI
-
 
    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
       FROM SNMPv2-CONF
@@ -46,23 +15,24 @@ IMPORTS
    TimeStamp, DisplayString
       FROM SNMPv2-TC
 
-   InterfaceIndex
+   InterfaceIndex, InterfaceIndexOrZero
       FROM IF-MIB
+
+   VPNId
+     FROM PPVPN-TC-MIB
 
    SnmpAdminString
       FROM SNMP-FRAMEWORK-MIB
 
    InetAddress, InetAddressType
-      FROM INET-ADDRESS-MIB;
+      FROM INET-ADDRESS-MIB
 
---   bgp4PathAttrIpAddrPrefix, bgp4PathAttrIpAddrPrefixLen, 
---   bgp4PathAttrPeer
---      FROM BGP4-MIB;
---
---   Commented out so MIB would compile (mpiecuch, 04/30/2002)
+   bgp4PathAttrIpAddrPrefix, bgp4PathAttrIpAddrPrefixLen,
+   bgp4PathAttrPeer
+      FROM BGP4-MIB;
 
 mplsVpnMIB MODULE-IDENTITY
-   LAST-UPDATED "200110151200Z"  -- 15 October 2001 12:00:00 GMT
+   LAST-UPDATED "200210311200Z"  -- 31 October 2002 12:00:00 GMT
    ORGANIZATION "Provider Provisioned Virtual Private
                  Networks Working Group."
    CONTACT-INFO
@@ -91,28 +61,62 @@ mplsVpnMIB MODULE-IDENTITY
    DESCRIPTION
         "This MIB contains managed object definitions for the
          Multiprotocol Label Switching (MPLS)/Border Gateway
-
-
          Protocol (BGP) Virtual Private Networks (VPNs) as
          defined in : Rosen, E., Viswanathan, A., and R.
          Callon, Multiprotocol Label Switching Architecture,
          RFC3031, January 2001."
 
   -- Revision history.
+   REVISION "200210311200Z"  -- 31 October 2002 12:00:00 GMT
+   DESCRIPTION
+        "Added Intellectual Property Considerations section.
+
+         Added new mplsNumVrfRouteMaxThreshCleared notification.
+        "
+
+   REVISION "200102281200Z"  -- 28 February 2002 12:00:00 GMT
+   DESCRIPTION
+        "mplsVpnVrfRouteIfIndex changed to InterfaceIndexOrZero.
+
+	mplsVpnIfVpnRouteDistProtocol BITS changed to start at 0.
+
+	Changed notifications to not include indexes. Those indexes'
+        MAX-ACESS changed to not-accessible.
+
+	Fixed description of mplsVpnIfLabelEdgeType and
+        mplsVpnVrfConfLastChanged.
+        "
+
+   REVISION "200201261200Z"  -- 26 January 2002 12:00:00 GMT
+   DESCRIPTION
+        "Removed indexes from notifications.
+
+	 Changed mplsVpnVrfRouteTos to not-accessible as it is
+         used as an index."
+
+   REVISION "200111131200Z"  -- 13 November 2001 12:00:00 GMT
+   DESCRIPTION
+        "MPLS PPVPN MIB now assigned IANA experimental 118.
+
+	 Changed mplsVpnVrfRouteTarget from not-accessible
+         to read-create.
+        "
+
    REVISION "200110151200Z"  -- 15 October 2001 12:00:00 GMT
    DESCRIPTION
-        "Fixed compilation errors from last version. 
+        "Fixed compilation errors from last version.
 
-         Changed mplsVpnInterfaceVpnRouteDistProtocol to be a BITS
+         Changed mplsVpnIfVpnRouteDistProtocol to be a BITS
          structure to allow more than one to be selected.
 
          Changed mplsIfDown -> mplsVrfIfDown
          Changed mplsIfUp -> mplsVrfIfUp
          "
-   REVISION 
+
+   REVISION
         "200110051200Z"  -- 05 October 2001 12:00:00 GMT
    DESCRIPTION
-        "Added integer index and removed route distinguisher index 
+        "Added integer index and removed route distinguisher index
          from mplsVpnVrfRouteTargetTable.
 
          Removed mplsVpn ifType; simply use mpls(166) ifType for
@@ -121,7 +125,7 @@ mplsVpnMIB MODULE-IDENTITY
          Removed interface and protocol-related objects from
          mplsVpnVrfTable.
 
-         Moved mplsVpnVrfConfMaxPossibleRoutes from 
+         Moved mplsVpnVrfConfMaxPossibleRoutes from
          mplsVpnVrfTable to scalar object.
 
          Removed mplsVpnActiveVrfInterfaces scalar object.
@@ -130,19 +134,18 @@ mplsVpnMIB MODULE-IDENTITY
          Added MplsVpnVrfBgpNbrPrefixTable providing a linkage with
          the bgp4PathAttrTable of the BGPv4 MIB."
 
-   REVISION 
+   REVISION
         "200107171200Z"  -- 17 July 2001 12:00:00 GMT
    DESCRIPTION
         "Removed mplsVpnVrfRouteTargetImport/Export from route target
          table, and modified indexing to better reflect N <> R
          distribution policy. Also added new object called
          mplsVpnVrfRouteTargetType which denotes import/export
-         policy for the specified route target. 
+         policy for the specified route target.
 
-         Added mplsVpnInterfaceConfRowStatus which allows for
+         Added mplsVpnIfConfRowStatus which allows for
          an interface to be associated with a VPN through SNMP
          configuration.
-
 
          Added VrfName to index of VrfInterfaceConfEntry which allows
          interfaces to be associated with the appropriate VRF.
@@ -157,17 +160,16 @@ mplsVpnMIB MODULE-IDENTITY
    REVISION
          "200107101200Z"  -- 10 July 2001 12:00:00 GMT
    DESCRIPTION
-        "Renamed mplsNumVrfSecViolationThreshExceeded to 
-         mplsNumVrfSecIllegalLabelThreshExceeded, and removed
-         mplsVpnInterfaceConfIndex from varbind.
-
+        "Renamed mplsNumVrfSecViolationThreshExceeded to
+         mplsNumVrfSecIllglLblThrshExcd, and removed
+         mplsVpnIfConfIndex from varbind.
          Changed MplsVpnId TC from SnmpAdminString to OCTET STRING.
 
-         Added mplsVpnVrfSecIllegalLabelRcvThresh to 
+         Added mplsVpnVrfSecIllegalLblRcvThrsh to
          mplsVpnVrfSecEntry.
 
-         Changed duplicate mplsVpnVrfRouteTargetImport in 
-         mplsVpnVrfRouteTargetEntry INDEX to 
+         Changed duplicate mplsVpnVrfRouteTargetImport in
+         mplsVpnVrfRouteTargetEntry INDEX to
          mplsVpnVrfRouteTargetExport."
 
   REVISION
@@ -184,25 +186,24 @@ mplsVpnMIB MODULE-IDENTITY
        "200009301200Z"  -- 30 September 2000 12:00:00 EST
    DESCRIPTION
       "Initial draft version."
-   ::= { experimental 118 } 
+   ::= { experimental 118 } -- assigned by IANA
 
 -- Textual Conventions.
 
-MplsVpnId ::= TEXTUAL-CONVENTION
+MplsVpnName ::= TEXTUAL-CONVENTION
    STATUS        current
    DESCRIPTION
        "An identifier that is assigned to each MPLS/BGP VPN and
         is used to uniquely identify it. This is assigned by the
         system operator or NMS and SHOULD be unique throughout
-
-
         the MPLS domain. If this is the case, then this identifier
         can then be used at any LSR within a specific MPLS domain
         to identify this MPLS/BGP VPN. It may also be possible to
         preserve the uniqueness of this identifier across MPLS
         domain boundaries, in which case this identifier can then
         be used to uniquely identify MPLS/BGP VPNs on a more global
-        basis."
+        basis.  This object MAY be set to the VPN ID as defined in
+        RFC 2685."
    REFERENCE
         "RFC 2685 [VPN-RFC2685] Fox B., et al, 'Virtual Private
          Networks Identifier', September 1999."
@@ -213,6 +214,7 @@ MplsVpnRouteDistinguisher ::= TEXTUAL-CONVENTION
    DESCRIPTION
        "Syntax for a route distinguisher and route target."
    SYNTAX  OCTET STRING(SIZE (0..256))
+
 
 -- Top level components of this MIB.
 mplsVpnNotifications OBJECT IDENTIFIER ::= { mplsVpnMIB 0 }
@@ -241,10 +243,9 @@ mplsVpnActiveVrfs OBJECT-TYPE
    STATUS        current
    DESCRIPTION
        "The number of VRFs which are active on this node.
-        That is, those VRFs whose corresponding mplsVpnVrfOperStatus 
+        That is, those VRFs whose corresponding mplsVpnVrfOperStatus
         object value is equal to operational (1)."
    ::= { mplsVpnScalars 2 }
-
 
 mplsVpnConnectedInterfaces OBJECT-TYPE
    SYNTAX        Unsigned32
@@ -260,7 +261,7 @@ mplsVpnNotificationEnable OBJECT-TYPE
    STATUS        current
    DESCRIPTION
         "If this object is true, then it enables the
-         generation of all notifications defined in 
+         generation of all notifications defined in
          this MIB."
    DEFVAL { false }
    ::= { mplsVpnScalars 4 }
@@ -272,16 +273,36 @@ mplsVpnVrfConfMaxPossibleRoutes  OBJECT-TYPE
    DESCRIPTION
      "Denotes maximum number of routes which the device
       will allow all VRFs jointly to hold. If this value is
-      set to 0, this indicates that the device is 
+      set to 0, this indicates that the device is
       unable to determine the absolute maximum. In this
       case, the configured maximum MAY not actually
       be allowed by the device."
    ::= { mplsVpnScalars 5 }
 
+mplsVpnVrfConfRouteMaxThreshTime  OBJECT-TYPE
+   SYNTAX        Unsigned32
+   UNITS         "seconds"
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+     "Denotes the interval in seconds, at which the route max threshold
+      notification will be re-issued after the maximum value has been exceeded
+      (or has been reached if mplsVpnVrfConfMaxRoutes and
+      mplsVpnVrfConfHighRouteThreshold are equal) and the initial
+      notification has been issued. This value is intended to prevent continuous
+      generation of notifications by an agent in the event that routes are
+      continually added to a VRF after it has reached its maximum value. The
+      default value is 10 minutes (600 seconds). If this value is set to 0, the agent
+      should only issue a single notification at the time that the maxium threshold
+      has been reached, and should not issue any more notifications until the value
+      of routes has fallen below the configured threshold value."
+   DEFVAL { 600 }
+   ::= { mplsVpnScalars 6 }
+
 -- VPN Interface Configuration Table
 
-mplsVpnInterfaceConfTable  OBJECT-TYPE
-   SYNTAX        SEQUENCE OF MplsVpnInterfaceConfEntry
+mplsVpnIfConfTable  OBJECT-TYPE
+   SYNTAX        SEQUENCE OF MplsVpnIfConfEntry
    MAX-ACCESS    not-accessible
    STATUS        current
    DESCRIPTION
@@ -289,39 +310,30 @@ mplsVpnInterfaceConfTable  OBJECT-TYPE
         and associated information."
    ::= { mplsVpnConf 1 }
 
-mplsVpnInterfaceConfEntry OBJECT-TYPE
-   SYNTAX        MplsVpnInterfaceConfEntry
+mplsVpnIfConfEntry OBJECT-TYPE
+   SYNTAX        MplsVpnIfConfEntry
    MAX-ACCESS    not-accessible
    STATUS        current
    DESCRIPTION
        "An entry in this table is created by an LSR for
         every interface capable of supporting MPLS/BGP VPN.
-
-
         Each entry in this table is meant to correspond to
         an entry in the Interfaces Table."
-   INDEX       { mplsVpnVrfName, mplsVpnInterfaceConfIndex }
-   ::= { mplsVpnInterfaceConfTable 1 }
+   INDEX       { mplsVpnVrfName, mplsVpnIfConfIndex }
+   ::= { mplsVpnIfConfTable 1 }
 
-MplsVpnInterfaceConfEntry ::= SEQUENCE {
-  mplsVpnInterfaceConfIndex             InterfaceIndex,
-  mplsVpnInterfaceLabelEdgeType         INTEGER,
-  mplsVpnInterfaceVpnClassification     INTEGER,
-  mplsVpnInterfaceVpnRouteDistProtocol  BITS,
-  mplsVpnInterfaceConfStorageType       StorageType,
-  mplsVpnInterfaceConfRowStatus         RowStatus
+MplsVpnIfConfEntry ::= SEQUENCE {
+  mplsVpnIfConfIndex             InterfaceIndex,
+  mplsVpnIfLabelEdgeType         INTEGER,
+  mplsVpnIfVpnClassification     INTEGER,
+  mplsVpnIfVpnRouteDistProtocol  BITS,
+  mplsVpnIfConfStorageType       StorageType,
+  mplsVpnIfConfRowStatus         RowStatus
 }
 
-mplsVpnInterfaceConfIndex OBJECT-TYPE
+mplsVpnIfConfIndex OBJECT-TYPE
    SYNTAX        InterfaceIndex
    MAX-ACCESS    not-accessible
---
--- MAX-ACCESS    accessible-for-notify
---     
--- The MAX-ACCESS for an auxiliary (INDEX) object must be
--- 'not-accessible'.  This was changed from the IETF draft
--- version so that this MIB would compile. (mpiecuch, 04/30/2002)
--- 
    STATUS        current
    DESCRIPTION
        "This is a unique index for an entry in the
@@ -335,9 +347,9 @@ mplsVpnInterfaceConfIndex OBJECT-TYPE
    REFERENCE
        "RFC 2233 - The Interfaces Group MIB using SMIv2,
         McCloghrie, K., and F. Kastenholtz, Nov. 1997"
-   ::= { mplsVpnInterfaceConfEntry 1 }
+   ::= { mplsVpnIfConfEntry 1 }
 
-mplsVpnInterfaceLabelEdgeType OBJECT-TYPE
+mplsVpnIfLabelEdgeType OBJECT-TYPE
    SYNTAX  INTEGER { providerEdge (1),
                      customerEdge (2)
                    }
@@ -346,32 +358,28 @@ mplsVpnInterfaceLabelEdgeType OBJECT-TYPE
    DESCRIPTION
        "Either the providerEdge(0) (PE) or customerEdge(1)
        (CE) bit MUST be set."
-   ::= { mplsVpnInterfaceConfEntry 2 }
+   ::= { mplsVpnIfConfEntry 2 }
 
-mplsVpnInterfaceVpnClassification OBJECT-TYPE
+mplsVpnIfVpnClassification OBJECT-TYPE
    SYNTAX        INTEGER { carrierOfCarrier (1),
                            enterprise (2),
                            interProvider (3)
    }
    MAX-ACCESS    read-create
    STATUS        current
-
-
    DESCRIPTION
        "Denotes whether this link participates in a
         carrier-of-carrier's, enterprise, or inter-provider
         scenario."
-   ::= { mplsVpnInterfaceConfEntry 3 }
+   ::= { mplsVpnIfConfEntry 3 }
 
-mplsVpnInterfaceVpnRouteDistProtocol OBJECT-TYPE
-   SYNTAX        BITS { dummy(0), -- So that MIB will 
---                                   compile (mpiecuch, 04/30/2002)
-			none (1),
-                        bgp (2),
-                        ospf (3),
-                        rip(4),
-                        isis(5),
-                        other (6)
+mplsVpnIfVpnRouteDistProtocol OBJECT-TYPE
+   SYNTAX        BITS { none (0),
+                        bgp (1),
+                        ospf (2),
+                        rip(3),
+                        isis(4),
+                        other (5)
    }
    MAX-ACCESS    read-create
    STATUS        current
@@ -379,17 +387,17 @@ mplsVpnInterfaceVpnRouteDistProtocol OBJECT-TYPE
        "Denotes the route distribution protocol across the
         PE-CE link. Note that more than one routing protocol
         may be enabled at the same time."
-   ::= { mplsVpnInterfaceConfEntry 4 }
+   ::= { mplsVpnIfConfEntry 4 }
 
-mplsVpnInterfaceConfStorageType  OBJECT-TYPE
+mplsVpnIfConfStorageType  OBJECT-TYPE
    SYNTAX      StorageType
    MAX-ACCESS  read-create
    STATUS      current
    DESCRIPTION
        "The storage type for this entry."
-   ::= { mplsVpnInterfaceConfEntry 5 }
+   ::= { mplsVpnIfConfEntry 5 }
 
-mplsVpnInterfaceConfRowStatus  OBJECT-TYPE
+mplsVpnIfConfRowStatus  OBJECT-TYPE
    SYNTAX      RowStatus
    MAX-ACCESS  read-create
    STATUS      current
@@ -399,18 +407,16 @@ mplsVpnInterfaceConfRowStatus  OBJECT-TYPE
         that the specified interface is to be associated
         with the specified interface. If this operation
         succeeds, the interface will have been associated,
-        otherwise the agent would not allow the association. 
+        otherwise the agent would not allow the association.
         If the agent only allows read-only operations on
         this table, it will create entries in this table
         as they are created."
-   ::= { mplsVpnInterfaceConfEntry 6 }
+   ::= { mplsVpnIfConfEntry 6 }
 
 -- VRF Configuration Table
 
 mplsVpnVrfTable  OBJECT-TYPE
    SYNTAX        SEQUENCE OF MplsVpnVrfEntry
-
-
    MAX-ACCESS    not-accessible
    STATUS        current
    DESCRIPTION
@@ -436,7 +442,8 @@ mplsVpnVrfEntry OBJECT-TYPE
    ::= { mplsVpnVrfTable 1 }
 
 MplsVpnVrfEntry ::= SEQUENCE {
-  mplsVpnVrfName                      MplsVpnId,
+  mplsVpnVrfName                      MplsVpnName,
+  mplsVpnVrfVpnId                     VPNId,
   mplsVpnVrfDescription               SnmpAdminString,
   mplsVpnVrfRouteDistinguisher        MplsVpnRouteDistinguisher,
   mplsVpnVrfCreationTime              TimeStamp,
@@ -452,26 +459,33 @@ MplsVpnVrfEntry ::= SEQUENCE {
 }
 
 mplsVpnVrfName OBJECT-TYPE
-   SYNTAX        MplsVpnId
+   SYNTAX        MplsVpnName
    MAX-ACCESS    not-accessible
---
--- MAX-ACCESS    accessible-for-notify
---     
--- The MAX-ACCESS for an auxiliary (INDEX) object must be
--- 'not-accessible'.  This was changed from the IETF draft
--- version so that this MIB would compile. (mpiecuch, 04/30/2002)
--- 
    STATUS        current
    DESCRIPTION
        "The human-readable name of this VPN. This MAY
-        be equivalent to the RFC2685 VPN-ID."
+        be equivalent to the RFC2685 VPN-ID, but may
+        also vary. If it is set to the VPN ID, it MUST
+        be equivalent to the value of mplsVpnVrfVpnId.
+        It is strongly recommended that all sites supporting
+        VRFs that are part of the same VPN use the same
+        naming convention for VRFs as well as the same VPN
+        ID."
 
    REFERENCE
        "RFC 2685 [VPN-RFC2685] Fox B., et al, `Virtual
-
-
         Private Networks Identifier`, September 1999."
    ::= { mplsVpnVrfEntry 1 }
+
+mplsVpnVrfVpnId OBJECT-TYPE
+   SYNTAX        VPNId
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+       "The VPN ID as specified in RFC 2685. If a VPN ID
+        as not been specified for this VRF, then this variable
+        SHOULD be set to an empty string."
+   ::= { mplsVpnVrfEntry 2 }
 
 mplsVpnVrfDescription OBJECT-TYPE
    SYNTAX        SnmpAdminString
@@ -479,7 +493,7 @@ mplsVpnVrfDescription OBJECT-TYPE
    STATUS        current
    DESCRIPTION
        "The human-readable description of this VRF."
-   ::= { mplsVpnVrfEntry 2 }
+   ::= { mplsVpnVrfEntry 3 }
 
 mplsVpnVrfRouteDistinguisher OBJECT-TYPE
    SYNTAX        MplsVpnRouteDistinguisher
@@ -487,7 +501,7 @@ mplsVpnVrfRouteDistinguisher OBJECT-TYPE
    STATUS        current
    DESCRIPTION
        "The route distinguisher for this VRF."
-   ::= { mplsVpnVrfEntry 3 }
+   ::= { mplsVpnVrfEntry 4 }
 
 mplsVpnVrfCreationTime OBJECT-TYPE
    SYNTAX        TimeStamp
@@ -495,7 +509,7 @@ mplsVpnVrfCreationTime OBJECT-TYPE
    STATUS        current
    DESCRIPTION
        "The time at which this VRF entry was created."
-   ::= { mplsVpnVrfEntry 4 }
+   ::= { mplsVpnVrfEntry 5 }
 
 mplsVpnVrfOperStatus OBJECT-TYPE
    SYNTAX        INTEGER { up (1),
@@ -504,7 +518,7 @@ mplsVpnVrfOperStatus OBJECT-TYPE
    MAX-ACCESS    read-only
    STATUS        current
    DESCRIPTION
-       "Denotes whether a VRF is operational or not. A VRF is 
+       "Denotes whether a VRF is operational or not. A VRF is
         up(1) when at least one interface associated with the
         VRF, which ifOperStatus is up(1). A VRF is down(2) when:
 
@@ -512,21 +526,19 @@ mplsVpnVrfOperStatus OBJECT-TYPE
            ifOperStatus is up(1).
 
         b. There are no interfaces associated with the VRF."
-   ::= { mplsVpnVrfEntry 5 }
+   ::= { mplsVpnVrfEntry 6 }
 
 mplsVpnVrfActiveInterfaces OBJECT-TYPE
    SYNTAX        Unsigned32
    MAX-ACCESS    read-only
    STATUS        current
    DESCRIPTION
-       "Total number of interfaces connected to this VRF with 
-
-
-        ifOperStatus = up(1). 
+       "Total number of interfaces connected to this VRF with
+        ifOperStatus = up(1).
 
         This counter should be incremented when:
 
-        a. When the ifOperStatus of one of the connected interfaces 
+        a. When the ifOperStatus of one of the connected interfaces
            changes from down(2) to up(1).
 
         b. When an interface with ifOperStatus = up(1) is connected
@@ -534,21 +546,21 @@ mplsVpnVrfActiveInterfaces OBJECT-TYPE
 
         This counter should be decremented when:
 
-        a. When the ifOperStatus of one of the connected interfaces 
+        a. When the ifOperStatus of one of the connected interfaces
            changes from up(1) to down(2).
 
-        b. When one of the connected interfaces with 
+        b. When one of the connected interfaces with
            ifOperStatus = up(1) gets disconnected from this VRF."
-   ::= { mplsVpnVrfEntry 6 }
+   ::= { mplsVpnVrfEntry 7 }
 
 mplsVpnVrfAssociatedInterfaces OBJECT-TYPE
    SYNTAX        Unsigned32
    MAX-ACCESS    read-only
    STATUS        current
    DESCRIPTION
-       "Total number of interfaces connected to this VRF 
+       "Total number of interfaces connected to this VRF
         (independent of ifOperStatus type)."
-   ::= { mplsVpnVrfEntry 7 }
+   ::= { mplsVpnVrfEntry 8 }
 
 mplsVpnVrfConfMidRouteThreshold     OBJECT-TYPE
    SYNTAX        Unsigned32
@@ -557,7 +569,7 @@ mplsVpnVrfConfMidRouteThreshold     OBJECT-TYPE
    DESCRIPTION
      "Denotes mid-level water marker for the number
       of routes which  this VRF may hold."
-  ::= { mplsVpnVrfEntry 8 }
+  ::= { mplsVpnVrfEntry 9 }
 
 mplsVpnVrfConfHighRouteThreshold  OBJECT-TYPE
    SYNTAX        Unsigned32
@@ -566,20 +578,18 @@ mplsVpnVrfConfHighRouteThreshold  OBJECT-TYPE
    DESCRIPTION
      "Denotes high-level water marker for the number of
       routes which  this VRF may hold."
-  ::= { mplsVpnVrfEntry 9 }
+  ::= { mplsVpnVrfEntry 10 }
 
 mplsVpnVrfConfMaxRoutes  OBJECT-TYPE
    SYNTAX        Unsigned32
    MAX-ACCESS    read-create
    STATUS        current
-
-
    DESCRIPTION
      "Denotes maximum number of routes which this VRF is
       configured to hold. This value MUST be less than or
       equal to mplsVrfMaxPossibleRoutes unless it is set
       to 0."
-  ::= { mplsVpnVrfEntry 10 }
+  ::= { mplsVpnVrfEntry 11 }
 
 mplsVpnVrfConfLastChanged  OBJECT-TYPE
    SYNTAX        TimeStamp
@@ -590,7 +600,7 @@ mplsVpnVrfConfLastChanged  OBJECT-TYPE
       change of this table entry, which includes changes of
       VRF parameters defined in this table or addition or
       deletion of interfaces associated with this VRF."
-  ::= { mplsVpnVrfEntry 11 }
+  ::= { mplsVpnVrfEntry 12 }
 
 mplsVpnVrfConfRowStatus OBJECT-TYPE
    SYNTAX        RowStatus
@@ -599,7 +609,7 @@ mplsVpnVrfConfRowStatus OBJECT-TYPE
    DESCRIPTION
        "This variable is used to create, modify, and/or
         delete a row in this table."
-  ::= { mplsVpnVrfEntry 12 }
+  ::= { mplsVpnVrfEntry 13 }
 
 mplsVpnVrfConfStorageType  OBJECT-TYPE
    SYNTAX      StorageType
@@ -607,7 +617,7 @@ mplsVpnVrfConfStorageType  OBJECT-TYPE
    STATUS      current
    DESCRIPTION
        "The storage type for this entry."
-   ::= { mplsVpnVrfEntry 13 }
+   ::= { mplsVpnVrfEntry 14 }
 
 -- MplsVpnRouteTargetTable
 
@@ -624,20 +634,18 @@ mplsVpnVrfRouteTargetTable OBJECT-TYPE
 mplsVpnVrfRouteTargetEntry OBJECT-TYPE
       SYNTAX        MplsVpnVrfRouteTargetEntry
       MAX-ACCESS    not-accessible
-
-
       STATUS        current
       DESCRIPTION
           " An entry in this table is created by an LSR for
            each route target configured for a VRF supporting
            a MPLS/BGP VPN instance. The indexing provides an
            ordering per-VRF instance."
-      INDEX  { mplsVpnVrfName, mplsVpnVrfRouteTargetIndex, 
+      INDEX  { mplsVpnVrfName, mplsVpnVrfRouteTargetIndex,
                mplsVpnVrfRouteTargetType }
    ::= { mplsVpnVrfRouteTargetTable 1 }
 
 MplsVpnVrfRouteTargetEntry ::= SEQUENCE {
-     mplsVpnVrfRouteTargetIndex      Unsigned32,  
+     mplsVpnVrfRouteTargetIndex      Unsigned32,
      mplsVpnVrfRouteTargetType       INTEGER,
      mplsVpnVrfRouteTarget           MplsVpnRouteDistinguisher,
      mplsVpnVrfRouteTargetDescr      DisplayString,
@@ -649,7 +657,7 @@ mplsVpnVrfRouteTargetIndex OBJECT-TYPE
       MAX-ACCESS    not-accessible
       STATUS        current
       DESCRIPTION
-          "Auxiliary index for route-targets configured for a 
+          "Auxiliary index for route-targets configured for a
            particular VRF."
    ::= { mplsVpnVrfRouteTargetEntry 2 }
 
@@ -677,7 +685,6 @@ mplsVpnVrfRouteTargetDescr OBJECT-TYPE
        "Description of the route target."
    ::= { mplsVpnVrfRouteTargetEntry 5 }
 
-
 mplsVpnVrfRouteTargetRowStatus OBJECT-TYPE
    SYNTAX        RowStatus
    MAX-ACCESS    read-create
@@ -693,7 +700,7 @@ mplsVpnVrfBgpNbrAddrTable OBJECT-TYPE
    MAX-ACCESS    not-accessible
    STATUS        current
    DESCRIPTION
-       "Each entry in this table specifies a per-interface 
+       "Each entry in this table specifies a per-interface
         MPLS/EBGP neighbor."
    ::= { mplsVpnConf 4 }
 
@@ -706,7 +713,7 @@ mplsVpnVrfBgpNbrAddrEntry OBJECT-TYPE
           every VRF capable of supporting MPLS/BGP VPN. The
           indexing provides an ordering of VRFs per-VPN
           interface."
-    INDEX  { mplsVpnVrfName, mplsVpnInterfaceConfIndex,
+    INDEX  { mplsVpnVrfName, mplsVpnIfConfIndex,
              mplsVpnVrfBgpNbrIndex }
    ::= { mplsVpnVrfBgpNbrAddrTable 1 }
 
@@ -727,7 +734,6 @@ mplsVpnVrfBgpNbrIndex OBJECT-TYPE
          "This is a unique tertiary index for an entry in the
           MplsVpnVrfBgpNbrAddrEntry Table."
     ::= { mplsVpnVrfBgpNbrAddrEntry 1 }
-
 
 mplsVpnVrfBgpNbrRole  OBJECT-TYPE
    SYNTAX        INTEGER { ce(1), pe(2) }
@@ -778,8 +784,6 @@ mplsVpnVrfBgpNbrStorageType OBJECT-TYPE
 --          is updated.
 --
 mplsVpnVrfBgpNbrPrefixTable OBJECT-TYPE
-
-
    SYNTAX        SEQUENCE OF MplsVpnVrfBgpNbrPrefixEntry
    MAX-ACCESS    not-accessible
    STATUS        current
@@ -794,57 +798,71 @@ mplsVpnVrfBgpNbrPrefixEntry OBJECT-TYPE
    STATUS        current
    DESCRIPTION
        "An entry in this table is created by an LSR for
-        every BGP prefix associated with a VRF supporting a 
-        MPLS/BGP VPN. The indexing provides an ordering of 
+        every BGP prefix associated with a VRF supporting a
+        MPLS/BGP VPN. The indexing provides an ordering of
         BGP prefixes per VRF."
-   INDEX  { mplsVpnVrfName, mplsVpnVrfBgpPathAttrIpAddrPrefix,
-            mplsVpnVrfBgpPathAttrIpAddrPrefixLen, 
-	    mplsVpnVrfBgpPathAttrPeer }
---   INDEX  { mplsVpnVrfName, bgp4PathAttrIpAddrPrefix,
---            bgp4PathAttrIpAddrPrefixLen, bgp4PathAttrPeer }
---
--- Changed indexing for this table so that it would compile 
--- (mpiecuch, 04/30/2002)
-
+   INDEX  { mplsVpnVrfName, bgp4PathAttrIpAddrPrefix,
+            bgp4PathAttrIpAddrPrefixLen, bgp4PathAttrPeer }
    ::= { mplsVpnVrfBgpNbrPrefixTable 1 }
 
 MplsVpnVrfBgpNbrPrefixEntry ::= SEQUENCE {
-     mplsVpnVrfBgpPathAttrPeer             InetAddress,
-     mplsVpnVrfBgpPathAttrIpAddrPrefixLen  INTEGER,
-     mplsVpnVrfBgpPathAttrIpAddrPrefix     InetAddress,
-     mplsVpnVrfBgpPathAttrOrigin           INTEGER,
-     mplsVpnVrfBgpPathAttrASPathSegment    OCTET STRING,
-     mplsVpnVrfBgpPathAttrNextHop          InetAddress,
-     mplsVpnVrfBgpPathAttrMultiExitDisc    INTEGER,
-     mplsVpnVrfBgpPathAttrLocalPref        INTEGER,
-     mplsVpnVrfBgpPathAttrAtomicAggregate  INTEGER,
-     mplsVpnVrfBgpPathAttrAggregatorAS     INTEGER,
-     mplsVpnVrfBgpPathAttrAggregatorAddr   InetAddress,
-     mplsVpnVrfBgpPathAttrCalcLocalPref    INTEGER,
-     mplsVpnVrfBgpPathAttrBest             INTEGER,
-     mplsVpnVrfBgpPathAttrUnknown          OCTET STRING
+     mplsVpnVrfBgpPAtrPeerType           InetAddressType,
+     mplsVpnVrfBgpPAtrPeer               InetAddress,
+     mplsVpnVrfBgpPAtrIpAddrPrefixLen    Integer32,
+     mplsVpnVrfBgpPAtrIpAddrPfxType      InetAddressType,
+     mplsVpnVrfBgpPAtrIpAddrPrefix       InetAddress,
+     mplsVpnVrfBgpPAtrOrigin             INTEGER,
+     mplsVpnVrfBgpPAtrASPathSegment      OCTET STRING,
+     mplsVpnVrfBgpPAtrNextHopType        InetAddressType,
+     mplsVpnVrfBgpPAtrNextHop            InetAddress,
+     mplsVpnVrfBgpPAtrMultiExitDisc      Integer32,
+     mplsVpnVrfBgpPAtrLocalPref          Integer32,
+     mplsVpnVrfBgpPAtrAtomicAggregate    INTEGER,
+     mplsVpnVrfBgpPAtrAggregatorAS       Integer32,
+     mplsVpnVrfBgpPAtrAggrAddrType       InetAddressType,
+     mplsVpnVrfBgpPAtrAggregatorAddr     InetAddress,
+     mplsVpnVrfBgpPAtrCalcLocalPref      INTEGER,
+     mplsVpnVrfBgpPAtrBest               INTEGER,
+     mplsVpnVrfBgpPAtrUnknown            OCTET STRING
 }
 
-mplsVpnVrfBgpPathAttrPeer OBJECT-TYPE
+mplsVpnVrfBgpPAtrPeerType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Address type of the mplsVpnVrfBgpPAtrPeer object."
+    ::= { mplsVpnVrfBgpNbrPrefixEntry 1 }
+
+mplsVpnVrfBgpPAtrPeer OBJECT-TYPE
    SYNTAX     InetAddress
    MAX-ACCESS not-accessible
    STATUS     current
    DESCRIPTION
        "The IP address of the peer where the path
         information was learned."
-   ::= { mplsVpnVrfBgpNbrPrefixEntry 1 }
+   ::= { mplsVpnVrfBgpNbrPrefixEntry 2 }
 
-mplsVpnVrfBgpPathAttrIpAddrPrefixLen OBJECT-TYPE
-   SYNTAX     INTEGER (0..32)
+mplsVpnVrfBgpPAtrIpAddrPrefixLen OBJECT-TYPE
+   SYNTAX     Integer32
    MAX-ACCESS not-accessible
    STATUS     current
    DESCRIPTION
        "Length in bits of the IP address prefix
         in the Network Layer Reachability
         Information field."
-   ::= { mplsVpnVrfBgpNbrPrefixEntry 2 }
+   ::= { mplsVpnVrfBgpNbrPrefixEntry 3 }
 
-mplsVpnVrfBgpPathAttrIpAddrPrefix OBJECT-TYPE
+mplsVpnVrfBgpPAtrIpAddrPfxType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Address type of the mplsVpnVrfBgpPAtrIpAddrPrefix
+         object."
+    ::= { mplsVpnVrfBgpNbrPrefixEntry 4 }
+
+mplsVpnVrfBgpPAtrIpAddrPrefix OBJECT-TYPE
    SYNTAX     InetAddress
    MAX-ACCESS not-accessible
    STATUS     current
@@ -852,12 +870,12 @@ mplsVpnVrfBgpPathAttrIpAddrPrefix OBJECT-TYPE
        "An IP address prefix in the Network Layer
         Reachability Information field.  This object
         is an IP address containing the prefix with
-        length specified by mplsVpnVrfBgpPathAttrIpAddrPrefixLen.
+        length specified by mplsVpnVrfBgpPAtrIpAddrPrefixLen.
         Any bits beyond the length specified by
-        mplsVpnVrfBgpPathAttrIpAddrPrefixLen are zeroed."
-   ::= { mplsVpnVrfBgpNbrPrefixEntry 3 }
+        mplsVpnVrfBgpPAtrIpAddrPrefixLen are zeroed."
+   ::= { mplsVpnVrfBgpNbrPrefixEntry 5 }
 
-mplsVpnVrfBgpPathAttrOrigin OBJECT-TYPE
+mplsVpnVrfBgpPAtrOrigin OBJECT-TYPE
    SYNTAX     INTEGER { igp(1),-- networks are interior
                         egp(2),-- networks learned via EGP
                         incomplete(3) -- undetermined
@@ -867,9 +885,9 @@ mplsVpnVrfBgpPathAttrOrigin OBJECT-TYPE
    DESCRIPTION
        "The ultimate origin of the path
         information."
-   ::= { mplsVpnVrfBgpNbrPrefixEntry 4 }
+   ::= { mplsVpnVrfBgpNbrPrefixEntry 6 }
 
-mplsVpnVrfBgpPathAttrASPathSegment OBJECT-TYPE
+mplsVpnVrfBgpPAtrASPathSegment OBJECT-TYPE
     SYNTAX     OCTET STRING (SIZE (2..255))
     MAX-ACCESS read-only
     STATUS     current
@@ -887,20 +905,25 @@ mplsVpnVrfBgpPathAttrASPathSegment OBJECT-TYPE
                      a route in the UPDATE
                      message has traversed.
                      The length is a 1-octet field containing the
-
-
                      number of ASs in the value field.
 
                      The value field contains one or more AS
                      numbers, each AS is represented in the octet
                      string as a pair of octets according to the
                      following algorithm:
-
                      first-byte-of-pair = ASNumber / 256;
                      second-byte-of-pair = ASNumber & 255;"
-    ::= { mplsVpnVrfBgpNbrPrefixEntry 5 }
+    ::= { mplsVpnVrfBgpNbrPrefixEntry 7 }
 
-mplsVpnVrfBgpPathAttrNextHop OBJECT-TYPE
+mplsVpnVrfBgpPAtrNextHopType OBJECT-TYPE
+   SYNTAX     InetAddressType
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+       "Address type of the mplsVpnVrfBgpPAtrNextHop object."
+   ::= { mplsVpnVrfBgpNbrPrefixEntry 8 }
+
+mplsVpnVrfBgpPAtrNextHop OBJECT-TYPE
    SYNTAX     InetAddress
    MAX-ACCESS read-only
    STATUS     current
@@ -908,10 +931,10 @@ mplsVpnVrfBgpPathAttrNextHop OBJECT-TYPE
         "The address of the border router that
          should be used for the destination
          network."
-   ::= { mplsVpnVrfBgpNbrPrefixEntry 6 }
+   ::= { mplsVpnVrfBgpNbrPrefixEntry 9 }
 
-mplsVpnVrfBgpPathAttrMultiExitDisc OBJECT-TYPE
-    SYNTAX     INTEGER (-1..2147483647)
+mplsVpnVrfBgpPAtrMultiExitDisc OBJECT-TYPE
+    SYNTAX     Integer32 (-1..2147483647)
     MAX-ACCESS read-only
     STATUS     current
     DESCRIPTION
@@ -919,91 +942,96 @@ mplsVpnVrfBgpPathAttrMultiExitDisc OBJECT-TYPE
          between multiple exit points to an
          adjacent autonomous system.  A value of -1
          indicates the absence of this attribute."
-    ::= { mplsVpnVrfBgpNbrPrefixEntry 7 }
+    ::= { mplsVpnVrfBgpNbrPrefixEntry 10 }
 
-   mplsVpnVrfBgpPathAttrLocalPref OBJECT-TYPE
-        SYNTAX     INTEGER (-1..2147483647)
-        MAX-ACCESS read-only
-        STATUS     current
-        DESCRIPTION
-           "The originating BGP4 speaker's degree of
-            preference for an advertised route.  A
-            value of -1 indicates the absence of this
-            attribute."
-        ::= { mplsVpnVrfBgpNbrPrefixEntry 8 }
+mplsVpnVrfBgpPAtrLocalPref OBJECT-TYPE
+     SYNTAX     Integer32 (-1..2147483647)
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+        "The originating BGP4 speaker's degree of
+         preference for an advertised route.  A
+         value of -1 indicates the absence of this
+         attribute."
+     ::= { mplsVpnVrfBgpNbrPrefixEntry 11 }
 
-   mplsVpnVrfBgpPathAttrAtomicAggregate OBJECT-TYPE
-        SYNTAX INTEGER { lessSpecificRrouteNotSelected(1),
-                         lessSpecificRouteSelected(2)
-                       }
-        MAX-ACCESS read-only
-        STATUS     current
-        DESCRIPTION
+mplsVpnVrfBgpPAtrAtomicAggregate OBJECT-TYPE
+     SYNTAX INTEGER { lessSpecificRrouteNotSelected(1),
+                      lessSpecificRouteSelected(2)
+                    }
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+          "Whether or not the local system has
+           selected a less specific route without
+           selecting a more specific route."
+     ::= { mplsVpnVrfBgpNbrPrefixEntry 12 }
 
+mplsVpnVrfBgpPAtrAggregatorAS OBJECT-TYPE
+     SYNTAX     Integer32 (0..65535)
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+          "The AS number of the last BGP4 speaker that
+           performed route aggregation.  A value of
+           zero (0) indicates the absence of this
+           attribute."
+     ::= { mplsVpnVrfBgpNbrPrefixEntry 13 }
 
-             "Whether or not the local system has
-              selected a less specific route without
-              selecting a more specific route."
-        ::= { mplsVpnVrfBgpNbrPrefixEntry 9 }
+mplsVpnVrfBgpPAtrAggrAddrType OBJECT-TYPE
+     SYNTAX     InetAddressType
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Address type of the mplsVpnVrfBgpPAtrAggrAddr
+          object."
+     ::= { mplsVpnVrfBgpNbrPrefixEntry 14 }
 
-   mplsVpnVrfBgpPathAttrAggregatorAS OBJECT-TYPE
-        SYNTAX     INTEGER (0..65535)
-        MAX-ACCESS read-only
-        STATUS     current
-        DESCRIPTION
-             "The AS number of the last BGP4 speaker that
-              performed route aggregation.  A value of
-              zero (0) indicates the absence of this
-              attribute."
-        ::= { mplsVpnVrfBgpNbrPrefixEntry 10 }
+mplsVpnVrfBgpPAtrAggregatorAddr OBJECT-TYPE
+     SYNTAX     InetAddress
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The IP address of the last BGP4 speaker
+          that performed route aggregation.  A value
+          of 0.0.0.0 indicates the absence of this
+          attribute."
+     ::= { mplsVpnVrfBgpNbrPrefixEntry 15 }
 
-   mplsVpnVrfBgpPathAttrAggregatorAddr OBJECT-TYPE
-        SYNTAX     InetAddress
-        MAX-ACCESS read-only
-        STATUS     current
-        DESCRIPTION
-            "The IP address of the last BGP4 speaker
-             that performed route aggregation.  A value
-             of 0.0.0.0 indicates the absence of this
-             attribute."
-        ::= { mplsVpnVrfBgpNbrPrefixEntry 11 }
+mplsVpnVrfBgpPAtrCalcLocalPref OBJECT-TYPE
+     SYNTAX     Integer32 (-1..2147483647)
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The degree of preference calculated by the
+          receiving BGP4 speaker for an advertised
+          route.  A value of -1 indicates the
+          absence of this attribute."
+     ::= { mplsVpnVrfBgpNbrPrefixEntry 16 }
 
-   mplsVpnVrfBgpPathAttrCalcLocalPref OBJECT-TYPE
-        SYNTAX     INTEGER (-1..2147483647)
-        MAX-ACCESS read-only
-        STATUS     current
-        DESCRIPTION
-            "The degree of preference calculated by the
-             receiving BGP4 speaker for an advertised
-             route.  A value of -1 indicates the
-             absence of this attribute."
-        ::= { mplsVpnVrfBgpNbrPrefixEntry 12 }
+mplsVpnVrfBgpPAtrBest OBJECT-TYPE
+     SYNTAX INTEGER { false(1),-- not chosen as best route
+                      true(2)  -- chosen as best route
+                    }
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "An indication of whether or not this route
+          was chosen as the best BGP4 route."
+     ::= { mplsVpnVrfBgpNbrPrefixEntry 17 }
 
-   mplsVpnVrfBgpPathAttrBest OBJECT-TYPE
-        SYNTAX INTEGER { false(1),-- not chosen as best route
-                         true(2)  -- chosen as best route
-                       }
-        MAX-ACCESS read-only
-        STATUS     current
-        DESCRIPTION
-            "An indication of whether or not this route
-             was chosen as the best BGP4 route."
-        ::= { mplsVpnVrfBgpNbrPrefixEntry 13 }
-
-   mplsVpnVrfBgpPathAttrUnknown OBJECT-TYPE
-
-
-        SYNTAX     OCTET STRING (SIZE(0..255))
-        MAX-ACCESS read-only
-        STATUS     current
-        DESCRIPTION
-            "One or more path attributes not understood
-             by this BGP4 speaker.  Size zero (0)
-             indicates the absence of such
-             attribute(s).  Octets beyond the maximum
-             size, if any, are not recorded by this
-             object."
-        ::= { mplsVpnVrfBgpNbrPrefixEntry 14 }
+mplsVpnVrfBgpPAtrUnknown OBJECT-TYPE
+     SYNTAX     OCTET STRING (SIZE(0..255))
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "One or more path attributes not understood
+          by this BGP4 speaker.  Size zero (0)
+          indicates the absence of such
+          attribute(s).  Octets beyond the maximum
+          size, if any, are not recorded by this
+          object."
+     ::= { mplsVpnVrfBgpNbrPrefixEntry 18 }
 
 -- VRF Security Table
 
@@ -1029,11 +1057,10 @@ mplsVpnVrfSecEntry OBJECT-TYPE
       ::= { mplsVpnVrfSecTable 1 }
 
 MplsVpnVrfSecEntry ::= SEQUENCE {
-  mplsVpnVrfSecIllegalLabelViolations     Counter32,
-  mplsVpnVrfSecIllegalLabelRcvThresh      Unsigned32
+  mplsVpnVrfSecIllegalLblVltns     Counter32,
+  mplsVpnVrfSecIllegalLblRcvThrsh      Unsigned32
 }
-
-mplsVpnVrfSecIllegalLabelViolations OBJECT-TYPE
+mplsVpnVrfSecIllegalLblVltns OBJECT-TYPE
    SYNTAX        Counter32
    MAX-ACCESS    read-only
    STATUS        current
@@ -1041,14 +1068,12 @@ mplsVpnVrfSecIllegalLabelViolations OBJECT-TYPE
        "Indicates the number of illegally received labels on this VPN/VRF."
    ::= { mplsVpnVrfSecEntry 1 }
 
-mplsVpnVrfSecIllegalLabelRcvThresh OBJECT-TYPE
+mplsVpnVrfSecIllegalLblRcvThrsh OBJECT-TYPE
    SYNTAX        Unsigned32
-
-
    MAX-ACCESS    read-create
    STATUS        current
    DESCRIPTION
-       "The number of illegally received labels above which this 
+       "The number of illegally received labels above which this
         notification is issued."
    ::= { mplsVpnVrfSecEntry 2 }
 
@@ -1096,7 +1121,6 @@ mplsVpnVrfPerfRoutesDeleted OBJECT-TYPE
        "Indicates the number of routes removed from this VPN/VRF."
    ::= { mplsVpnVrfPerfEntry 2 }
 
-
 mplsVpnVrfPerfCurrNumRoutes     OBJECT-TYPE
    SYNTAX        Unsigned32
    MAX-ACCESS    read-only
@@ -1138,16 +1162,14 @@ mplsVpnVrfRouteEntry OBJECT-TYPE
       ::= { mplsVpnVrfRouteTable 1 }
 
 MplsVpnVrfRouteEntry ::= SEQUENCE {
-       mplsVpnVrfRouteDest               InetAddress,
        mplsVpnVrfRouteDestAddrType       InetAddressType,
-       mplsVpnVrfRouteMask               InetAddress,
+       mplsVpnVrfRouteDest               InetAddress,
        mplsVpnVrfRouteMaskAddrType       InetAddressType,
+       mplsVpnVrfRouteMask               InetAddress,
        mplsVpnVrfRouteTos                Unsigned32,
-       mplsVpnVrfRouteNextHop            InetAddress,
        mplsVpnVrfRouteNextHopAddrType    InetAddressType,
-       mplsVpnVrfRouteIfIndex            InterfaceIndex,
-
-
+       mplsVpnVrfRouteNextHop            InetAddress,
+       mplsVpnVrfRouteIfIndex            InterfaceIndexOrZero,
        mplsVpnVrfRouteType               INTEGER,
        mplsVpnVrfRouteProto              INTEGER,
        mplsVpnVrfRouteAge                Unsigned32,
@@ -1161,6 +1183,15 @@ MplsVpnVrfRouteEntry ::= SEQUENCE {
        mplsVpnVrfRouteRowStatus          RowStatus,
        mplsVpnVrfRouteStorageType        StorageType
    }
+
+mplsVpnVrfRouteDestAddrType  OBJECT-TYPE
+      SYNTAX        InetAddressType
+      MAX-ACCESS    read-create
+      STATUS        current
+      DESCRIPTION
+          "The address type of the mplsVpnVrfRouteDest
+           entry."
+      ::= { mplsVpnVrfRouteEntry 1 }
 
 mplsVpnVrfRouteDest  OBJECT-TYPE
       SYNTAX        InetAddress
@@ -1176,16 +1207,15 @@ mplsVpnVrfRouteDest  OBJECT-TYPE
            rejected if the bit-wise logical-AND of x with
            the value of the corresponding instance of the
            mplsVpnVrfRouteMask object is not equal to x."
-      ::= { mplsVpnVrfRouteEntry 1 }
+      ::= { mplsVpnVrfRouteEntry 2 }
 
-mplsVpnVrfRouteDestAddrType  OBJECT-TYPE
+mplsVpnVrfRouteMaskAddrType  OBJECT-TYPE
       SYNTAX        InetAddressType
       MAX-ACCESS    read-create
       STATUS        current
       DESCRIPTION
-          "The address type of the mplsVpnVrfRouteDest
-           entry."
-      ::= { mplsVpnVrfRouteEntry 2 }
+          "The address type of mplsVpnVrfRouteMask."
+      ::= { mplsVpnVrfRouteEntry 3 }
 
 mplsVpnVrfRouteMask  OBJECT-TYPE
       SYNTAX        InetAddress
@@ -1198,8 +1228,6 @@ mplsVpnVrfRouteMask  OBJECT-TYPE
            For those  systems  that  do  not support
            arbitrary subnet masks, an agent constructs the
            value of the mplsVpnVrfRouteMask by reference
-
-
            to the IP Address Class.
 
            Any assignment (implicit or otherwise) of an
@@ -1208,14 +1236,6 @@ mplsVpnVrfRouteMask  OBJECT-TYPE
            the value of the corresponding instance of the
            mplsVpnVrfRouteDest object is not equal to
            mplsVpnVrfRouteDest."
-      ::= { mplsVpnVrfRouteEntry 3 }
-
-mplsVpnVrfRouteMaskAddrType  OBJECT-TYPE
-      SYNTAX        InetAddressType
-      MAX-ACCESS    read-create
-      STATUS        current
-      DESCRIPTION
-          "The address type of mplsVpnVrfRouteMask."
       ::= { mplsVpnVrfRouteEntry 4 }
 
 mplsVpnVrfRouteTos  OBJECT-TYPE
@@ -1248,15 +1268,6 @@ mplsVpnVrfRouteTos  OBJECT-TYPE
                 1 1 1 0  ==>  28      1 1 1 1  ==>  30."
       ::= { mplsVpnVrfRouteEntry 5 }
 
-mplsVpnVrfRouteNextHop  OBJECT-TYPE
-      SYNTAX        InetAddress
-      MAX-ACCESS    not-accessible
-      STATUS        current
-      DESCRIPTION
-          "On remote routes, the address of the next
-           system en route; Otherwise, 0.0.0.0. ."
-      ::= { mplsVpnVrfRouteEntry 6 }
-
 mplsVpnVrfRouteNextHopAddrType  OBJECT-TYPE
       SYNTAX        InetAddressType
       MAX-ACCESS    read-create
@@ -1264,16 +1275,27 @@ mplsVpnVrfRouteNextHopAddrType  OBJECT-TYPE
       DESCRIPTION
           "The address type of the mplsVpnVrfRouteNextHopAddrType
            object."
+      ::= { mplsVpnVrfRouteEntry 6 }
+
+mplsVpnVrfRouteNextHop  OBJECT-TYPE
+      SYNTAX        InetAddress
+      MAX-ACCESS    read-create
+      STATUS        current
+      DESCRIPTION
+          "On remote routes, the address of the next
+           system en route; Otherwise, 0.0.0.0. ."
       ::= { mplsVpnVrfRouteEntry 7 }
 
 mplsVpnVrfRouteIfIndex  OBJECT-TYPE
-      SYNTAX        InterfaceIndex
+      SYNTAX        InterfaceIndexOrZero
       MAX-ACCESS    read-create
       STATUS        current
       DESCRIPTION
           "The ifIndex value that identifies the local
            interface  through  which  the next hop of this
-           route should be reached."
+           route should be reached. If this value is set to 0,
+           this indicates that no interface is associated with
+           this route."
       ::= { mplsVpnVrfRouteEntry 8 }
 
 mplsVpnVrfRouteType  OBJECT-TYPE
@@ -1300,8 +1322,6 @@ mplsVpnVrfRouteType  OBJECT-TYPE
       ::= { mplsVpnVrfRouteEntry 9 }
 
 mplsVpnVrfRouteProto  OBJECT-TYPE
-
-
       SYNTAX INTEGER { other     (1),  -- not specified
                        local     (2),  -- local interface
                        netmgmt   (3),  -- static route
@@ -1352,8 +1372,6 @@ mplsVpnVrfRouteInfo               OBJECT-TYPE
       DESCRIPTION
           "A reference to MIB definitions specific to the
            particular routing protocol which is responsi-
-
-
            ble for this route, as determined by the  value
            specified  in the route's mplsVpnVrfRouteProto
            value. If this information is not present, its
@@ -1404,8 +1422,6 @@ mplsVpnVrfRouteMetric2  OBJECT-TYPE
 mplsVpnVrfRouteMetric3  OBJECT-TYPE
       SYNTAX        Integer32
       MAX-ACCESS    read-create
-
-
       STATUS        current
       DESCRIPTION
           "An alternate routing metric for this route.
@@ -1456,113 +1472,125 @@ mplsVpnVrfRouteStorageType  OBJECT-TYPE
           "Storage type value."
       ::= { mplsVpnVrfRouteEntry 20 }
 
-
 -- MPLS/BGP VPN Notifications
 
 mplsVrfIfUp NOTIFICATION-TYPE
---   OBJECTS     { 
---
---	mplsVpnInterfaceConfIndex,
---      mplsVpnVrfName
---
--- These objects are auxiliary (INDEX) objects and have MAX-ACCESS
--- of 'not-accessible'.  They are not allowed to be included within
--- a notification.  This change to the IETF draft was necessary for
--- the MIB to compile.  (mpiecuch, 04/30/2002)
---
---               }
+   OBJECTS     { mplsVpnIfConfRowStatus,
+                 mplsVpnVrfOperStatus
+               }
    STATUS      current
    DESCRIPTION
        "This notification is generated when:
-        a. The ifOperStatus of an interface associated with a VRF 
+        a. The ifOperStatus of an interface associated with a VRF
            changes to the up(1) state.
-        b. When an interface with ifOperStatus = up(1) is 
+        b. When an interface with ifOperStatus = up(1) is
            associated with a VRF."
    ::= { mplsVpnNotifications 1 }
 
 mplsVrfIfDown NOTIFICATION-TYPE
---   OBJECTS     {
---
---	mplsVpnInterfaceConfIndex,
---      mplsVpnVrfName
---
--- These objects are auxiliary (INDEX) objects and have MAX-ACCESS
--- of 'not-accessible'.  They are not allowed to be included within
--- a notification.  This change to the IETF draft was necessary for
--- the MIB to compile.  (mpiecuch, 04/30/2002)
---
---               }
+   OBJECTS     { mplsVpnIfConfRowStatus,
+                 mplsVpnVrfOperStatus
+               }
    STATUS      current
    DESCRIPTION
        "This notification is generated when:
-        a. The ifOperStatus of an interface associated with a VRF 
+        a. The ifOperStatus of an interface associated with a VRF
            changes to the down(1) state.
-        b. When an interface with ifOperStatus = up(1) state is 
+        b. When an interface with ifOperStatus = up(1) state is
            disassociated with a VRF."
    ::= { mplsVpnNotifications 2 }
 
 mplsNumVrfRouteMidThreshExceeded NOTIFICATION-TYPE
---   OBJECTS     {
---
---      mplsVpnVrfName,
---      mplsVpnVrfPerfCurrNumRoutes
---
--- These objects are auxiliary (INDEX) objects and have MAX-ACCESS
--- of 'not-accessible'.  They are not allowed to be included within
--- a notification.  This change to the IETF draft was necessary for
--- the MIB to compile.  (mpiecuch, 04/30/2002)
---
---               }
+   OBJECTS     { mplsVpnVrfPerfCurrNumRoutes,
+                 mplsVpnVrfConfMidRouteThreshold
+               }
    STATUS      current
    DESCRIPTION
        "This notification is generated when the number of routes
         contained by the specified VRF exceeds the value indicated by
-        mplsVrfMidRouteThreshold."
+        mplsVrfMidRouteThreshold. A single notification MUST be generated
+        when this threshold is exceeded, and no other notifications of
+        this type should be issued until the value of
+        mplsVpnVrfPerfCurrNumRoutes has fallen below that of
+        mplsVpnVrfConfMidRouteThreshold."
    ::= { mplsVpnNotifications 3 }
 
 mplsNumVrfRouteMaxThreshExceeded NOTIFICATION-TYPE
---   OBJECTS     {
---
---      mplsVpnVrfName,
---      mplsVpnVrfPerfCurrNumRoutes
---
--- These objects are auxiliary (INDEX) objects and have MAX-ACCESS
--- of 'not-accessible'.  They are not allowed to be included within
--- a notification.  This change to the IETF draft was necessary for
--- the MIB to compile.  (mpiecuch, 04/30/2002)
---
---               }
+   OBJECTS     { mplsVpnVrfPerfCurrNumRoutes,
+                 mplsVpnVrfConfHighRouteThreshold
+               }
    STATUS      current
    DESCRIPTION
        "This notification is generated when the number of routes
         contained by the specified VRF reaches or attempts to exceed
         the maximum allowed value as indicated by
-        mplsVrfMaxRouteThreshold."
+        mplsVrfMaxRouteThreshold. In cases where
+        mplsVpnVrfConfHighRouteThreshold is set to the same value
+        as mplsVpnVrfConfMaxRoutes, mplsVpnVrfConfHighRouteThreshold
+        need not be exceeded; rather, just reached for this notification
+        to be issued.
+
+        Note that mplsVpnVrfConfRouteMaxThreshTime denotes the interval at
+        which the this notification will be re-issued after the maximum value
+        has been exceeded (or reached if mplsVpnVrfConfMaxRoutes and
+        mplsVpnVrfConfHighRouteThreshold are equal) and the initial
+        notification has been issued. This value is intended to prevent continuous
+        generation of notifications by an agent in the event that routes are
+        continually added to a VRF after it has reached its maximum value. The
+        default value is 10 minutes. If this value is set to 0, the agent should
+        only issue a single notification at the time that the maximum threshold has
+        been reached, and should not issue any more notifications until the value
+        of routes has fallen below the configured threshold value."
    ::= { mplsVpnNotifications 4 }
 
-
-mplsNumVrfSecIllegalLabelThreshExceeded NOTIFICATION-TYPE
---   OBJECTS     { 
---
---       mplsVpnVrfName,
---       mplsVpnVrfSecIllegalLabelViolations
---
--- These objects are auxiliary (INDEX) objects and have MAX-ACCESS
--- of 'not-accessible'.  They are not allowed to be included within
--- a notification.  This change to the IETF draft was necessary for
--- the MIB to compile.  (mpiecuch, 04/30/2002)
---
---               }
+mplsNumVrfSecIllglLblThrshExcd NOTIFICATION-TYPE
+   OBJECTS     { mplsVpnVrfSecIllegalLblVltns }
    STATUS      current
    DESCRIPTION
        "This notification is generated when the number of illegal
-        label violations on a VRF as indicated by 
-        mplsVpnVrfSecIllegalLabelViolations has exceeded 
-        mplsVpnVrfSecIllegalLabelRcvThresh. The threshold is not 
-        included in the varbind here because the value of 
-        mplsVpnVrfSecIllegalLabelViolations should be one greater than 
+        label violations on a VRF as indicated by
+        mplsVpnVrfSecIllegalLblVltns has exceeded
+        mplsVpnVrfSecIllegalLblRcvThrsh. The threshold is not
+        included in the varbind here because the value of
+        mplsVpnVrfSecIllegalLblVltns should be one greater than
         the threshold at the time this notification is issued."
    ::= { mplsVpnNotifications 5 }
+
+mplsNumVrfRouteMaxThreshCleared NOTIFICATION-TYPE
+   OBJECTS     { mplsVpnVrfPerfCurrNumRoutes,
+                 mplsVpnVrfConfHighRouteThreshold
+               }
+
+   STATUS      current
+   DESCRIPTION
+       "This notification is generated only after the number of routes
+        contained by the specified VRF reaches or attempts to exceed
+        the maximum allowed value as indicated by
+        mplsVrfMaxRouteThreshold, and then falls below this value. The
+        emission of this notification informs the operator that the
+        error condition has been cleared without the operator having to
+        query the device.
+
+        Note that mplsVpnVrfConfRouteMaxThreshTime denotes the interval at
+        which the the mplsNumVrfRouteMaxThreshExceeded notification will
+        be re-issued after the maximum value has been exceeded (or reached
+        if mplsVpnVrfConfMaxRoutes and mplsVpnVrfConfHighRouteThreshold
+        are equal) and the initial notification has been issued. Therefore,
+        the generation of this notification should also be emitted with this
+        same frequency (assuming that the error condition is cleared).
+        Specifically, if the error condition is reached and cleared several
+        times during the period of time specified in
+        mplsVpnVrfConfRouteMaxThreshTime, only a single notification will be
+        issued to indicate the first instance of the error condition as well
+        as the first time the error condition is cleared.
+
+        This behavior is intended to prevent continuous generation of notifications
+        by an agent in the event that routes are continually added and removed
+        to/from a VRF after it has reached its maximum value. The
+        default value is 10 minutes. If this value is set to 0, the agent should
+        issue a notification whenever the maximum threshold has
+        been cleared."
+   ::= { mplsVpnNotifications 6 }
 
 -- Conformance Statement
 mplsVpnGroups
@@ -1588,24 +1616,27 @@ mplsVpnModuleCompliance MODULE-COMPLIANCE
 
          MANDATORY-GROUPS    { mplsVpnScalarGroup,
                                mplsVpnVrfGroup,
-                               mplsVpnInterfaceGroup,
+                               mplsVpnIfGroup,
                                mplsVpnPerfGroup,
                                mplsVpnVrfRouteGroup,
                                mplsVpnVrfBgpNbrGroup,
-                               mplsVpnVrfRouteTargetGroup
+                               mplsVpnVrfRouteTargetGroup,
+                               mplsVpnVrfBgpPrefixGroup,
+                               mplsVpnSecGroup,
+                               mplsVpnNotificationGroup
                              }
 
    ::= { mplsVpnCompliances 1 }
 
    -- Units of conformance.
 
-
    mplsVpnScalarGroup OBJECT-GROUP
       OBJECTS { mplsVpnConfiguredVrfs,
                 mplsVpnActiveVrfs,
                 mplsVpnConnectedInterfaces,
                 mplsVpnNotificationEnable,
-                mplsVpnVrfConfMaxPossibleRoutes
+                mplsVpnVrfConfMaxPossibleRoutes,
+                mplsVpnVrfConfRouteMaxThreshTime
              }
       STATUS  current
       DESCRIPTION
@@ -1614,9 +1645,8 @@ mplsVpnModuleCompliance MODULE-COMPLIANCE
       ::= { mplsVpnGroups 1 }
 
    mplsVpnVrfGroup OBJECT-GROUP
-      OBJECTS { mplsVpnVrfDescription,
---              mplsVpnVrfName,
--- Commented out so that MIB would compile (mpiecuch, 04/30/2002)
+      OBJECTS { mplsVpnVrfVpnId,
+                mplsVpnVrfDescription,
                 mplsVpnVrfRouteDistinguisher,
                 mplsVpnVrfCreationTime,
                 mplsVpnVrfOperStatus,
@@ -1636,14 +1666,12 @@ mplsVpnModuleCompliance MODULE-COMPLIANCE
               management."
       ::= { mplsVpnGroups 2 }
 
-   mplsVpnInterfaceGroup OBJECT-GROUP
-        OBJECTS { mplsVpnInterfaceLabelEdgeType,
---                mplsVpnInterfaceConfIndex,
--- Commented out so that MIB would compile (mpiecuch, 04/30/2002)
-                  mplsVpnInterfaceVpnClassification,
-                  mplsVpnInterfaceVpnRouteDistProtocol,
-                  mplsVpnInterfaceConfStorageType,
-                  mplsVpnInterfaceConfRowStatus
+   mplsVpnIfGroup OBJECT-GROUP
+        OBJECTS { mplsVpnIfLabelEdgeType,
+                  mplsVpnIfVpnClassification,
+                  mplsVpnIfVpnRouteDistProtocol,
+                  mplsVpnIfConfStorageType,
+                  mplsVpnIfConfRowStatus
            }
 
       STATUS  current
@@ -1651,7 +1679,6 @@ mplsVpnModuleCompliance MODULE-COMPLIANCE
              "Collection of objects needed for MPLS VPN interface
               management."
       ::= { mplsVpnGroups 3 }
-
 
    mplsVpnPerfGroup OBJECT-GROUP
       OBJECTS { mplsVpnVrfPerfRoutesAdded,
@@ -1679,18 +1706,22 @@ mplsVpnModuleCompliance MODULE-COMPLIANCE
       ::= { mplsVpnGroups 5 }
 
   mplsVpnVrfBgpPrefixGroup OBJECT-GROUP
-      OBJECTS { 
-     mplsVpnVrfBgpPathAttrOrigin,
-     mplsVpnVrfBgpPathAttrASPathSegment,
-     mplsVpnVrfBgpPathAttrNextHop,
-     mplsVpnVrfBgpPathAttrMultiExitDisc,
-     mplsVpnVrfBgpPathAttrLocalPref,
-     mplsVpnVrfBgpPathAttrAtomicAggregate,
-     mplsVpnVrfBgpPathAttrAggregatorAS,
-     mplsVpnVrfBgpPathAttrAggregatorAddr,
-     mplsVpnVrfBgpPathAttrCalcLocalPref,
-     mplsVpnVrfBgpPathAttrBest,
-     mplsVpnVrfBgpPathAttrUnknown
+      OBJECTS {
+     mplsVpnVrfBgpPAtrOrigin,
+     mplsVpnVrfBgpPAtrASPathSegment,
+     mplsVpnVrfBgpPAtrNextHop,
+     mplsVpnVrfBgpPAtrMultiExitDisc,
+     mplsVpnVrfBgpPAtrLocalPref,
+     mplsVpnVrfBgpPAtrAtomicAggregate,
+     mplsVpnVrfBgpPAtrAggregatorAS,
+     mplsVpnVrfBgpPAtrAggregatorAddr,
+     mplsVpnVrfBgpPAtrCalcLocalPref,
+     mplsVpnVrfBgpPAtrBest,
+     mplsVpnVrfBgpPAtrUnknown,
+     mplsVpnVrfBgpPAtrPeerType,
+     mplsVpnVrfBgpPAtrIpAddrPfxType,
+     mplsVpnVrfBgpPAtrNextHopType,
+     mplsVpnVrfBgpPAtrAggrAddrType
 }
       STATUS  current
       DESCRIPTION
@@ -1699,9 +1730,8 @@ mplsVpnModuleCompliance MODULE-COMPLIANCE
       ::= { mplsVpnGroups 6 }
 
    mplsVpnSecGroup OBJECT-GROUP
-      OBJECTS { mplsVpnVrfSecIllegalLabelViolations,
-                mplsVpnVrfSecIllegalLabelRcvThresh }
-
+      OBJECTS { mplsVpnVrfSecIllegalLblVltns,
+                mplsVpnVrfSecIllegalLblRcvThrsh }
 
       STATUS  current
       DESCRIPTION
@@ -1712,9 +1742,7 @@ mplsVpnModuleCompliance MODULE-COMPLIANCE
    mplsVpnVrfRouteGroup OBJECT-GROUP
       OBJECTS { mplsVpnVrfRouteDestAddrType,
                 mplsVpnVrfRouteMaskAddrType,
---                mplsVpnVrfRouteTos,
---                mplsVpnVrfRouteNextHop,
--- Commented out so MIB will compile (mpiecuch, 04/30/2002)
+                mplsVpnVrfRouteNextHop,
                 mplsVpnVrfRouteNextHopAddrType,
                 mplsVpnVrfRouteIfIndex,
                 mplsVpnVrfRouteType,
@@ -1736,8 +1764,8 @@ mplsVpnModuleCompliance MODULE-COMPLIANCE
    ::= { mplsVpnGroups 8 }
 
    mplsVpnVrfRouteTargetGroup OBJECT-GROUP
-      OBJECTS { mplsVpnVrfRouteTarget,
-	        mplsVpnVrfRouteTargetDescr,
+      OBJECTS { mplsVpnVrfRouteTargetDescr,
+                mplsVpnVrfRouteTarget,
                 mplsVpnVrfRouteTargetRowStatus
               }
       STATUS  current
@@ -1750,14 +1778,37 @@ mplsVpnModuleCompliance MODULE-COMPLIANCE
                        mplsVrfIfDown,
                        mplsNumVrfRouteMidThreshExceeded,
                        mplsNumVrfRouteMaxThreshExceeded,
-                       mplsNumVrfSecIllegalLabelThreshExceeded
+                       mplsNumVrfSecIllglLblThrshExcd,
+                       mplsNumVrfRouteMaxThreshCleared
                      }
       STATUS  current
       DESCRIPTION
              "Objects required for MPLS VPN notifications."
-
-
    ::= { mplsVpnGroups 10 }
 
 -- End of MPLS-VPN-MIB
 END
+
+--
+-- Copyright (C) The Internet Society (2000).  All Rights Reserved.
+-- This document and translations of it may be copied and furnished to
+-- others, and derivative works that comment on or otherwise explain it or
+-- assist in its implementation may be prepared, copied, published and
+-- distributed, in whole or in part, without restriction of any kind,
+-- provided that the above copyright notice and this paragraph are included
+-- on all such copies and derivative works. However, this document itself
+-- may not be modified in any way, such as by removing the copyright notice
+-- or references to the Internet Society or other Internet organizations,
+-- except as needed for the  purpose of developing Internet standards in
+-- which case the procedures for copyrights defined in the Internet
+-- Standards process must be followed, or as required to translate it into
+-- languages other than English.
+--
+-- The limited permissions granted above are perpetual and will not be
+-- revoked by the Internet Society or its successors or assigns. This
+-- document and the information contained herein is provided on an "AS IS"
+-- basis and THE INTERNET SOCIETY AND THE INTERNET ENGINEERING TASK FORCE
+-- DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+-- TO ANY WARRANTY THAT THE USE OF THE INFORMATION HEREIN WILL NOT INFRINGE
+-- ANY RIGHTS OR ANY IMPLIED WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A
+-- PARTICULAR PURPOSE.

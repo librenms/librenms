@@ -91,7 +91,7 @@ if ((isset($vars['searchbar']) && $vars['searchbar'] != 'hide') || ! isset($vars
     $output .= "<div class='form-group'>";
     $output .= "<select name='device_id' id='device_id' class='form-control input-sm'></select>&nbsp;";
 
-    $hasvalue = ! empty($vars['hostname']) ? "value='" . $vars['hostname'] . "'" : '';
+    $hasvalue = ! empty($vars['hostname']) ? "value='" . htmlspecialchars($vars['hostname']) . "'" : '';
 
     $output .= "<input type='text' name='hostname' id='hostname' title='Hostname' class='form-control input-sm' " . $hasvalue . " placeholder='Hostname'>";
 
@@ -193,7 +193,7 @@ if ((isset($vars['searchbar']) && $vars['searchbar'] != 'hide') || ! isset($vars
     $output .= '</div>';
     $output .= "<div class='form-group'>";
 
-    $ifaliasvalue = isset($vars['ifAlias']) ? "value='" . $vars['ifAlias'] . "'" : '';
+    $ifaliasvalue = isset($vars['ifAlias']) ? "value='" . htmlspecialchars($vars['ifAlias']) . "'" : '';
 
     $output .= '</div>';
 
@@ -236,7 +236,7 @@ if (isset($vars['purge'])) {
     if ($vars['purge'] === 'all') {
         Port::hasAccess(Auth::user())->with(['device' => function ($query) {
             $query->select('device_id', 'hostname');
-        }])->isDeleted()->chunk(100, function ($ports) {
+        }])->isDeleted()->chunkById(100, function ($ports) {
             foreach ($ports as $port) {
                 $port->delete();
             }
@@ -245,7 +245,7 @@ if (isset($vars['purge'])) {
         try {
             Port::hasAccess(Auth::user())->where('port_id', $vars['purge'])->firstOrFail()->delete();
         } catch (ModelNotFoundException $e) {
-            echo "<div class='alert alert-danger'>Port ID {$vars['purge']} not found! Could not purge port.</div>";
+            echo "<div class='alert alert-danger'>Port ID " . htmlspecialchars($vars['purge']) . ' not found! Could not purge port.</div>';
         }
     }
 }

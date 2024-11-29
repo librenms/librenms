@@ -14,8 +14,8 @@ $rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Delayed Shards',
-        'ds'       => 'c_delayed_shards',
+        'descr' => 'Delayed Shards',
+        'ds' => 'c_delayed_shards',
     ];
 } else {
     d_echo('RRD "' . $rrd_filename . '" not found');

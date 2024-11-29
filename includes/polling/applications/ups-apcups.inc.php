@@ -52,7 +52,6 @@ try {
     return;
 }
 
-$rrd_name = ['app', $name, $app->app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('charge', 'GAUGE', 0, 100)
     ->addDataset('time_remaining', 'GAUGE', 0)
@@ -72,6 +71,11 @@ $fields = [
     'load' => $json_return['data']['load'],
 ];
 
-$tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
+$tags = [
+    'name' => $name,
+    'app_id' => $app->app_id,
+    'rrd_name' => ['app', $name, $app->app_id],
+    'rrd_def' => $rrd_def,
+];
 data_update($device, 'app', $tags, $fields);
 update_application($app, 'OK', $fields);

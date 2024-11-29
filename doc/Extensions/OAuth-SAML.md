@@ -271,6 +271,55 @@ If it doesn't work, please double check your configuration values by using the `
     lnms config:get auth.socialite
     ```
 
+### Default Role
+
+Since most Socialite Providers don't provide Authorization only Authentication it is possible to set
+the default User Role for Authorized users.   Appropriate care should be taken.
+
+- none: **No Access**: User has no access
+
+- normal: **Normal User**: You will need to assign device / port
+      permissions for users at this level.
+
+- global-read: **Global Read**: Read only Administrator.
+
+- admin: **Administrator**: This is a global read/write admin account.
+
+!!! setting "settings/auth/socialite"
+    ```bash
+    lnms config:set auth.socialite.default_role global-read
+    ```
+
+###  Claims / Access Scopes
+
+Socialite can specifiy scopes that should be included with in the authentication request.
+(see [Larvel docs](https://laravel.com/docs/10.x/socialite#access-scopes) )
+
+For example, if Okta is configured to expose group information it is possible to use these group
+names to configure User Roles.
+
+This requires configuration in Okta.  You can set the 'Groups claim type' to 'Filter' and supply
+a regex of which groups should be returned which can be mapped below.
+
+![socialite-okta-1](/img/socialite-okta-4.png)
+
+First enable sending the 'groups' claim (along with the normal openid, profile, and email claims).
+Be aware that the scope name must match the claim name. For identity providers where the scope does
+not match (e.g. Keycloak: roles -> groups) you need to configure a custom scope.
+
+!!! setting "settings/auth/socialite"
+    ```bash
+    lnms config:set auth.socialite.scopes.+ groups
+    ```
+
+Then setup mappings from the returned claim arrays to the User levels you want
+!!! setting "settings/auth/socialite"
+    ```bash
+    lnms config:set auth.socialite.claims.RETURN_FROM_CLAIM.roles '["admin"]'
+    lnms config:set auth.socialite.claims.OTHER_RETURN_FROM_CLAIM.roles '["global-read","cleaner"]'
+    ```
+
+
 ## SAML2 Example
 
 ### Install plugin
@@ -333,6 +382,7 @@ It is up the IdP to provide the relevant details that you will need for configur
 === "Azure"
 
     ![LibreNMS-SAML-Azure](https://user-images.githubusercontent.com/8980985/222431219-af2369dc-1abd-4943-8dfb-5a21d8b9976c.png)
+    ```bash
     echo "SESSION_SAME_SITE_COOKIE=none" >> .env
     lnms plugin:add socialiteproviders/saml2
     lnms config:set auth.socialite.redirect true
@@ -344,6 +394,7 @@ It is up the IdP to provide the relevant details that you will need for configur
     lnms config:set auth.socialite.configs.saml2.metadata https://nexus.microsoftonline-p.com/federationmetadata/saml20/federationmetadata.xml
     lnms config:set auth.socialite.configs.saml2.sp_default_binding_method urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST
     lnms config:clear
+    ```
 
 #### Using an Identity Provider metadata URL
 
@@ -392,6 +443,7 @@ Now we just need to define the listener service within LibreNMS:
 ### SESSION_SAME_SITE_COOKIE
 
 You most likely will need to set `SESSION_SAME_SITE_COOKIE=none` in `.env` if you use SAML2!
+If you get an error with http code 419, you should try to remove `SESSION_SAME_SITE_COOKIE=none` from your `.env`.
 
 !!! note
     Don't forget to run `lnms config:clear` after you modify `.env` to flush the config cache

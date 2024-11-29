@@ -23,4 +23,4 @@ use LibreNMS\OS;
 if (! $os instanceof OS) {
     $os = OS::make($device);
 }
-(new \LibreNMS\Modules\PrinterSupplies())->poll($os);
+(new \LibreNMS\Modules\PrinterSupplies())->poll($os, app('Datastore'));

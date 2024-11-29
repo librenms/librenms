@@ -1,0 +1,92 @@
+-- *****************************************************************
+-- FS-SMI.mib: FS-SMI
+--                FS Enterprise Structure of Management Information
+--
+-- March 2002, Wuzg
+-- 
+-- Copyright (c) 2002 by FS.COM Inc..
+-- All rights reserved.
+-- 
+-- *****************************************************************
+--
+
+FS-SMI DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-IDENTITY,
+        enterprises
+                FROM SNMPv2-SMI;
+
+-- FS Snmpagent Enterprise Specific Objects
+   fs          OBJECT IDENTIFIER ::= { enterprises 52642 }
+
+   products        OBJECT IDENTIFIER ::= { fs 1 }
+
+   switch          OBJECT IDENTIFIER ::= { products 1 }
+   
+switchMib MODULE-IDENTITY
+        LAST-UPDATED "200203190000Z"
+        ORGANIZATION "FS.COM Inc.."
+        CONTACT-INFO
+                " 
+                Tel: 400-865-2852 
+
+                E-mail: https://www.fs.com/live_chat_service_mail.html"
+        DESCRIPTION
+                "The Structure of Management Information for the
+                 FS enterprise."
+        REVISION      "200203190000Z"
+        DESCRIPTION
+                "Initial version of this MIB module."
+        ::= { switch 10 }        
+
+fsSwitchProducts OBJECT-IDENTITY
+        STATUS  current
+        DESCRIPTION
+                "fsSwitchProducts is the root OBJECT IDENTIFIER from
+                which sysObjectID values are assigned for switch.  Actual
+                values are defined in FS-PRODUCTS-MIB."
+        ::= { switchMib 1 }
+
+fsMgmt OBJECT-IDENTITY
+        STATUS  current
+        DESCRIPTION
+                "fsMgmt is the main subtree for those functional mib."
+        ::= { switchMib 2 }
+
+fsAgentCapability OBJECT-IDENTITY
+        STATUS  current
+        DESCRIPTION
+                "fsAgentCapability provides a root object identifier
+                from which AGENT-CAPABILITIES values may be assigned."
+        ::= { switchMib 3 }
+
+fsModules OBJECT-IDENTITY
+        STATUS  current
+        DESCRIPTION
+                "fsModules provides a root object identifier
+                from which MODULE-IDENTITY values may be assigned."
+        ::= { switchMib 4 }
+        
+fsExperiment OBJECT-IDENTITY
+        STATUS  current
+        DESCRIPTION
+                "fsExperiment provides a root object identifier
+                from which experimental mibs may be temporarily
+                based.  mibs are typicially based here if they
+                fall in one of two categories
+                1) are IETF work-in-process mibs which have not
+                been assigned a permanent object identifier by
+                the IANA.
+                2) are fs work-in-process which has not been
+                assigned a permanent object identifier by the
+                fs assigned number authority, typicially because
+                the mib is not ready for deployment.
+
+                NOTE WELL:  support for mibs in the fsExperiment
+                subtree will be deleted when a permanent object
+                identifier assignment is made."
+        ::= { switchMib 5 }
+ 
+END

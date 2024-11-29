@@ -3,14 +3,14 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 
-class CreateDeviceMibsTable extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::create('device_mibs', function (Blueprint $table) {
             $table->unsignedInteger('device_id');
@@ -31,8 +31,8 @@ class CreateDeviceMibsTable extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::drop('device_mibs');
     }
-}
+};

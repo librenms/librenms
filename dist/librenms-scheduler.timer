@@ -1,0 +1,9 @@
+[Unit]
+Description=LibreNMS Scheduler
+
+[Timer]
+OnCalendar=minutely
+AccuracySec=1second
+
+[Install]
+WantedBy=timers.target

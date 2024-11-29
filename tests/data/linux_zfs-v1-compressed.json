@@ -9,7 +9,8 @@
                     "app_state_prev": null,
                     "app_status": "",
                     "app_instance": "",
-                    "data": null
+                    "data": null,
+                    "deleted_at": null
                 }
             ]
         },
@@ -22,7 +23,8 @@
                     "app_state_prev": "UNKNOWN",
                     "app_status": "",
                     "app_instance": "",
-                    "data": "{\"pools\":[\"arc\"]}"
+                    "data": "{\"pools\":[\"arc\"],\"health\":1,\"version\":1,\"l2_errors\":null,\"status_info\":[]}",
+                    "deleted_at": null
                 }
             ],
             "application_metrics": [
@@ -400,11 +402,11 @@
                     "version": "3.10.0-693.5.2.el7.x86_64",
                     "hardware": "Generic x86 64-bit",
                     "features": null,
+                    "location": "<private>",
                     "os": "linux",
                     "type": "server",
                     "serial": null,
-                    "icon": "linux.svg",
-                    "location": "<private>"
+                    "icon": "linux.svg"
                 }
             ]
         },

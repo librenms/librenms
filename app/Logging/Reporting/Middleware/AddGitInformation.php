@@ -25,17 +25,15 @@
 
 namespace App\Logging\Reporting\Middleware;
 
-use Facade\FlareClient\Report;
 use LibreNMS\Util\Git;
+use Spatie\FlareClient\Report;
 
-class AddGitInformation
+class AddGitInformation implements \Spatie\FlareClient\FlareMiddleware\FlareMiddleware
 {
     /**
-     * @param  \Facade\FlareClient\Report  $report
-     * @param  callable  $next  next in the pipeline
      * @return mixed
      */
-    public function handle(Report $report, $next)
+    public function handle(Report $report, \Closure $next)
     {
         $git = Git::make(180);
 

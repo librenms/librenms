@@ -43,7 +43,7 @@ if ($device['os_group'] == 'cisco') {
      * Get module's components for a device
      */
     $component = new LibreNMS\Component();
-    $components = $component->getComponents($device['device_id'], ['type'=>$module]);
+    $components = $component->getComponents($device['device_id'], ['type' => $module]);
     $components = $components[$device['device_id']];
 
     /*

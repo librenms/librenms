@@ -25,7 +25,10 @@
 
 namespace LibreNMS\Device;
 
+use App\Models\Device;
 use App\Models\DeviceOutage;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 use LibreNMS\Util\Number;
 
 class Availability
@@ -37,28 +40,28 @@ class Availability
      * 1 year  365 * 24 * 60 * 60 = 31536000
      */
 
-    public static function day($device, $precision = 3)
+    public static function day(Device $device, int $precision = 3): float
     {
         $duration = 86400;
 
         return self::availability($device, $duration, $precision);
     }
 
-    public static function week($device, $precision = 3)
+    public static function week(Device $device, int $precision = 3): float
     {
         $duration = 604800;
 
         return self::availability($device, $duration, $precision);
     }
 
-    public static function month($device, $precision = 3)
+    public static function month(Device $device, int $precision = 3): float
     {
         $duration = 2592000;
 
         return self::availability($device, $duration, $precision);
     }
 
-    public static function year($device, $precision = 3)
+    public static function year(Device $device, int $precision = 3): float
     {
         $duration = 31536000;
 
@@ -68,17 +71,13 @@ class Availability
     /**
      * addition of all recorded outages in seconds
      *
-     * @param  object  $found_outages  filtered database object with all recorded outages
+     * @param  Collection<DeviceOutage>  $found_outages  filtered database object with all recorded outages
      * @param  int  $duration  time period to calculate for
      * @param  int  $now  timestamp for 'now'
      * @return int sum of all matching outages in seconds
      */
-    protected static function outageSummary($found_outages, $duration, $now = null)
+    protected static function outageSummary(Collection $found_outages, int $duration, int $now): int
     {
-        if (! is_numeric($now)) {
-            $now = time();
-        }
-
         // sum up time period of all outages
         $outage_sum = 0;
         foreach ($found_outages as $outage) {
@@ -103,30 +102,40 @@ class Availability
      * means, starting with 100% as default
      * substracts recorded outages
      *
-     * @param  array  $device  device to be looked at
+     * @param  Device  $device  device to be looked at
      * @param  int  $duration  time period to calculate for
      * @param  int  $precision  float precision for calculated availability
      * @return float calculated availability
      */
-    public static function availability($device, $duration, $precision = 3, $now = null)
+    public static function availability(Device $device, int $duration, int $precision = 3): float
     {
-        if (! is_numeric($now)) {
-            $now = time();
+        $now = time();
+
+        $found_outages = $device->outages()->where('up_again', '>=', $now - $duration)
+            ->orderBy('going_down')->get();
+
+        // no recorded outages found, so use current status
+        if ($found_outages->isEmpty()) {
+            return $device->status ? 100 : 0;
         }
 
-        $query = DeviceOutage::where('device_id', '=', $device['device_id'])
-            ->where('up_again', '>=', $now - $duration)
-            ->orderBy('going_down');
-
-        $found_outages = $query->get();
-
-        // no recorded outages found, so use current uptime
-        if (! count($found_outages)) {
-            return 100 * 1;
+        // don't calculate for time when the device didn't exist
+        if ($device->inserted) {
+            $duration = min($duration, $device->inserted->diffInSeconds());
         }
 
         $outage_summary = self::outageSummary($found_outages, $duration, $now);
 
-        return Number::calculatePercent($duration - $outage_summary, $duration, $precision);
+        $percent = Number::calculatePercent($duration - $outage_summary, $duration, $precision);
+        if ($percent < 0) {
+            Log::debug("Invalid availability calculation ($percent), normalizing to 0");
+            $percent = 0;
+        }
+        if ($percent > 100) {
+            Log::debug("Invalid availability calculation ($percent), normalizing to 100");
+            $percent = 100;
+        }
+
+        return $percent;
     }
 }

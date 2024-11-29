@@ -70,7 +70,7 @@ foreach ($files as $file) {
     $random = $tmp_path . '/' . mt_rand() . '.xml';
     $rrd_file = basename($file, '.rrd');
 
-    if ($rrd_file == 'ping-perf') {
+    if ($rrd_file == 'icmp-perf') {
         $step = $icmp_step;
         $heartbeat = $icmp_step * 2;
     } else {

@@ -16,58 +16,33 @@
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
-use LibreNMS\Util\Proxy;
+use LibreNMS\Exceptions\AlertTransportDeliveryException;
+use LibreNMS\Util\Http;
 
 class Twilio extends Transport
 {
-    public function deliverAlert($obj, $opts)
+    public function deliverAlert(array $alert_data): bool
     {
-        $twilio_opts['sid'] = $this->config['twilio-sid'];
-        $twilio_opts['token'] = $this->config['twilio-token'];
-        $twilio_opts['sender'] = $this->config['twilio-sender'];
-        $twilio_opts['to'] = $this->config['twilio-to'];
-
-        return $this->contactTwilio($obj, $twilio_opts);
-    }
-
-    public static function contactTwilio($obj, $opts)
-    {
-        $params = [
-            'sid' => $opts['sid'],
-            'token' => $opts['token'],
-            'phone' => $opts['to'],
-            'text' => $obj['msg'],
-            'sender' => $opts['sender'],
-        ];
-
-        $url = 'https://api.twilio.com/2010-04-01/Accounts/' . $params['sid'] . '/Messages.json';
+        $url = 'https://api.twilio.com/2010-04-01/Accounts/' . $this->config['twilio-sid'] . '/Messages.json';
 
         $data = [
-            'From' => $params['sender'],
-            'Body' => $params['text'],
-            'To' => $params['phone'],
+            'From' => $this->config['twilio-sender'],
+            'Body' => $alert_data['msg'],
+            'To' => $this->config['twilio-to'],
         ];
-        $post = http_build_query($data);
 
-        $curl = curl_init($url);
+        $res = Http::client()->asForm()
+            ->withBasicAuth($this->config['twilio-sid'], $this->config['twilio-token'])
+            ->post($url, $data);
 
-        Proxy::applyToCurl($curl);
-
-        curl_setopt($curl, CURLOPT_POST, true);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-        curl_setopt($curl, CURLOPT_USERPWD, $params['sid'] . ':' . $params['token']);
-        curl_setopt($curl, CURLOPT_POSTFIELDS, $post);
-
-        curl_exec($curl);
-
-        if (curl_getinfo($curl, CURLINFO_RESPONSE_CODE)) {
+        if ($res->successful()) {
             return true;
         }
+
+        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $alert_data['msg'], $data);
     }
 
-    public static function configTemplate()
+    public static function configTemplate(): array
     {
         return [
             'config' => [
@@ -81,7 +56,7 @@ class Twilio extends Transport
                     'title' => 'Token',
                     'name' => 'twilio-token',
                     'descr' => 'Twilio Account Token',
-                    'type' => 'text',
+                    'type' => 'password',
                 ],
                 [
                     'title' => 'Mobile Number',
@@ -97,8 +72,8 @@ class Twilio extends Transport
                 ],
             ],
             'validation' => [
-                'twilio-sid'    => 'required|string',
-                'twilio-token'    => 'required|string',
+                'twilio-sid' => 'required|string',
+                'twilio-token' => 'required|string',
                 'twilio-to' => 'required',
                 'twilio-sender' => 'required',
             ],

@@ -14,8 +14,8 @@ $rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Merges Size',
-        'ds'       => 'tm_size',
+        'descr' => 'Merges Size',
+        'ds' => 'tm_size',
     ];
 } else {
     d_echo('RRD "' . $rrd_filename . '" not found');

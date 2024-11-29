@@ -1,9 +1,9 @@
 -- ==================================================================
--- Copyright (C) 2017 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2022 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- 
 -- Description: HUAWEI-ISIS-CONF-MIB provides information about ISIS
 -- Reference:
--- Version: V2.26
+-- Version: V2.40
 -- History:
 -- <author>,   <date>,  <contents>
 --  HUAWEI   2009-08-03  ISIS private MIB
@@ -23,7 +23,7 @@
                 FROM SNMPv2-CONF            
             Integer32, Unsigned32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE            
                 FROM SNMPv2-SMI            
-            ifName
+            ifName, ifIndex
                 FROM IF-MIB
             isisSysInstance, isisSysLevelIndex, isisCircIfIndex, isisPduLspId, isisAdjState
                 FROM ISIS-MIB 
@@ -33,7 +33,7 @@
     
         -- 1.3.6.1.4.1.2011.5.25.24
         hwISIS MODULE-IDENTITY 
-            LAST-UPDATED "201708172029Z"        -- Aug 17, 2017 at 20:29 GMT
+            LAST-UPDATED "202210291540Z"
             ORGANIZATION 
                 "Huawei Technologies Co.,Ltd."
             CONTACT-INFO 
@@ -50,6 +50,48 @@
                 It defines the model used to represent data that exists elsewhere in the system and on peripheral devices. 
                 There are no constraints on this MIB."
 
+            REVISION "202210291540Z"
+            DESCRIPTION "revision 2.3.8 Modify the type of hwisisIpv6PrefixAddressMask."
+
+            REVISION "202210281228Z"
+            DESCRIPTION "revision 2.3.9 added hwisisIpv6PrefixAddress, hwisisIpv6PrefixAddressMask, hwisisLocalFlexAlgorithm, hwisisRemoteFlexAlgorithm, hwisisLocatorPrefixConflict, hwisisLocatorPrefixConflictClear."
+
+            REVISION "202111031017Z"
+            DESCRIPTION "revision 2.3.8 Modify the type of hwisisCostAdjustReason."
+
+            REVISION "202110211528Z"
+            DESCRIPTION "revision 2.3.7 added hwisisMtId, hwisisCostAdjustReason, hwisisOriginalCost, hwisisAdjustedCost, hwIsisLinkCostAdjustment, hwIsisLinkCostAdjustmentClear."
+
+            REVISION "202106091906Z"
+            DESCRIPTION "Modify the MAX-ACCESS of hwIsisRemainingLifetime, hwIsisPurgeLspNum, hwIsisAffectedNodeNum, hwIsisTotalNodeNum, hwIsisInterval, hwIsisRuledOutDeviceNum."
+
+            REVISION "202010291709Z"
+            DESCRIPTION "revision 2.3.5 added hwIsisImportRouteReachMax, hwIsisImportRouteReachMaxClear."
+
+            REVISION "202008112031Z"
+            DESCRIPTION "Modify the type of hwLoopDetectType, hwLoopDetectProtocol and hwLoopDetectProtocolAttr."
+
+            REVISION "202007272036Z"
+            DESCRIPTION "Modify hwIsisProcDynamicName, hwIsisAdjSysName, hwIsisConflictSystemID, hwIsisAutoSysId description format."
+
+            REVISION "202007141534Z"
+            DESCRIPTION "Added 		            
+	        hwRouteLoopDetected,
+			hwRouteLoopDetectedClear"
+		
+            REVISION "202001060950Z"
+            DESCRIPTION "Added 		            
+	                   hwIsisAuthModeInsecure,
+		hwIsisAuthModeInsecureClear " 
+
+            REVISION "201801241710Z"
+            DESCRIPTION  "revision 2.3.0 import ifIndex "
+             REVISION "201712201030Z"
+            DESCRIPTION  "revision 2.2.9 modify DEFVAL { three-way } to DEFVAL { threeWay }, and DEFVAL { none } to DEFVAL { disable } "
+            REVISION "201711142049Z"
+            DESCRIPTION  "revision 2.2.8"
+            REVISION "201710211821Z"
+            DESCRIPTION  "revision 2.2.7"
             REVISION "201708172029Z"
             DESCRIPTION  "modify hwIsisAdjChangeReason,hwisisSysInstance,hwisisSysLevelIndex,hwIsisOwnSysID,hwIsisAdjSysID,hwIsisPeerFlappingSuppressStatus,hwIsisSystemID,hwIsisSystemID1,hwIsisSystemID2,hwIsisSystemID3,hwIsisSystemIdConflict discription"
 
@@ -419,7 +461,7 @@
                 keychain (3): The key chain table that changes with time is sent after being encrypted through MD5.
                 By default, area authentication is not configured.
                 "
-            DEFVAL { 0 }
+            DEFVAL { null }
             ::= { hwIsisProcBaseEntry 4 }
 
         
@@ -502,7 +544,7 @@
                 keychain (3): The key chain table that changes with time is sent after being encrypted through MD5.
                 By default, IS-IS route domain authentication is disabled.
                 "
-            DEFVAL { 0 }
+            DEFVAL { null }
             ::= { hwIsisProcBaseEntry 8 }
 
         
@@ -847,8 +889,7 @@
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
-                "Configures the name of the IS-IS dynamic host. The value is a string of 1 to 64 characters.
-                When the length is 0, the configured IS-IS dynamic host name is deleted."
+               "Configures the name of the IS-IS dynamic host. The value is a string of 1 to 64 characters. When the length is 0, the configured IS-IS dynamic host name is deleted."
             DEFVAL { "" }
             ::= { hwIsisProcBaseEntry 30 }
 
@@ -1007,7 +1048,7 @@
                 compatibleenablemtspf(4): indicates that SPF calculation is performed in the IPv6 topology in compatible mode.
                 By default, the IPv6 topology is not enabled for the IS-IS process.
                 "
-            DEFVAL { none }
+            DEFVAL { disable }
             ::= { hwIsisProcBaseEntry 40 }
 
         
@@ -1925,7 +1966,7 @@
                 level1(1): indicates Level-1.
                 level2(2): indicates Level-2.
                 level12(3): indicates Level-1-2."
-            DEFVAL { 2 }
+            DEFVAL { level2 }
             ::= { hwIsisSummaryEntry 5 }
 
         
@@ -2597,7 +2638,7 @@
                 keychain(3): indicates that the key-chain that varies with the time is encrypted through MD5 and then sent.
                 By default, area-based authentication is not configured.
                 "
-            DEFVAL { 0 }
+            DEFVAL { null }
             ::= { hwIsisIntfBaseEntry 10 }
 
         
@@ -2671,7 +2712,7 @@
                 keychain(3): indicates that the key-chain that varies with the time is encrypted through MD5 and then sent.
                 By default, area-based authentication is not configured.
                 "
-            DEFVAL { 0 }
+            DEFVAL { null }
             ::= { hwIsisIntfBaseEntry 14 }
 
         
@@ -2997,7 +3038,7 @@
                 threeWay(2): indicates that a neighbor relationship is set up through negotiations in three-way handshake mode.
                 threeWayOnly(3): indicates that a neighbor relationship is set up through negotiations in three-way handshake mode and the backward compatibility is not supported.
                 By default, a neighbor relationship is set up through negotiations in three-way handshake mode."
-            DEFVAL { three-way }
+            DEFVAL { threeWay }
             ::= { hwIsisIntfBaseEntry 36 }
 
         
@@ -3391,8 +3432,7 @@
             MAX-ACCESS accessible-for-notify
             STATUS current
             DESCRIPTION
-                "Configures the name of the IS-IS dynamic host. The value is a string of 1 to 64 characters.
-                When the length is 0, the configured IS-IS dynamic host name is deleted."
+                "Configures the name of the IS-IS dynamic host. The value is a string of 1 to 64 characters. When the length is 0, the configured IS-IS dynamic host name is deleted."
             ::= { hwIsisTrapsObjects 6 }
 
         -- 1.3.6.1.4.1.2011.5.25.24.2.2.7
@@ -3401,14 +3441,7 @@
             MAX-ACCESS accessible-for-notify
             STATUS current
             DESCRIPTION
-                "The ID for this instance of the Integrated IS-IS
-             protocol. This value is appended to each of the
-             area addresses to form the Network Entity Titles.
-             The derivation of a value for this object is
-             implementation-specific.  Some implementations may
-             automatically assign values and not permit an
-             SNMP write, while others may require the value
-             to be set manually."
+                "The ID for this instance of the Integrated IS-IS protocol. This value is appended to each of the area addresses to form the Network Entity Titles. The derivation of a value for this object is implementation-specific.  Some implementations may automatically assign values and not permit an SNMP write, while others may require the value to be set manually."
             ::= { hwIsisTrapsObjects 7 }
         
         -- 1.3.6.1.4.1.2011.5.25.24.2.2.8
@@ -3417,14 +3450,7 @@
             MAX-ACCESS accessible-for-notify
             STATUS current
             DESCRIPTION
-                "The ID for this instance of the Integrated IS-IS
-             protocol. This value is appended to each of the
-             area addresses to form the Network Entity Titles.
-             The derivation of a value for this object is
-             implementation-specific.  Some implementations may
-             automatically assign values and not permit an
-             SNMP write, while others may require the value
-             to be set manually."
+                "The ID for this instance of the Integrated IS-IS protocol. This value is appended to each of the area addresses to form the Network Entity Titles. The derivation of a value for this object is implementation-specific.  Some implementations may automatically assign values and not permit an SNMP write, while others may require the value to be set manually."
             ::= { hwIsisTrapsObjects 8 }
         
         -- 1.3.6.1.4.1.2011.5.25.24.2.2.9
@@ -3475,7 +3501,7 @@ holdmaxcost(3): IS-IS neighbor relationship flapping suppression works in Hold-m
 		hwIsisRemainingLifetime OBJECT-TYPE
 			SYNTAX Unsigned32
 			UNITS "seconds"
-			MAX-ACCESS read-write
+			MAX-ACCESS accessible-for-notify
 			STATUS current
 			DESCRIPTION
                 "The remaining-lifetime of LSP."
@@ -3503,7 +3529,7 @@ holdmaxcost(3): IS-IS neighbor relationship flapping suppression works in Hold-m
 		-- 1.3.6.1.4.1.2011.5.25.24.2.2.16				
 		hwIsisPurgeLspNum OBJECT-TYPE
 			SYNTAX Unsigned32
-			MAX-ACCESS read-write
+			MAX-ACCESS accessible-for-notify
 			STATUS current
 			DESCRIPTION
 				"The IS-IS device purge the lsp number."
@@ -3512,7 +3538,7 @@ holdmaxcost(3): IS-IS neighbor relationship flapping suppression works in Hold-m
 		-- 1.3.6.1.4.1.2011.5.25.24.2.2.17		
 		hwIsisAffectedNodeNum OBJECT-TYPE
 			SYNTAX Unsigned32
-			MAX-ACCESS read-write
+			MAX-ACCESS accessible-for-notify
 			STATUS current
 			DESCRIPTION
 				"The IS-IS device affect the lsp number."
@@ -3521,7 +3547,7 @@ holdmaxcost(3): IS-IS neighbor relationship flapping suppression works in Hold-m
 		-- 1.3.6.1.4.1.2011.5.25.24.2.2.18		
 		hwIsisTotalNodeNum OBJECT-TYPE
 			SYNTAX Unsigned32
-			MAX-ACCESS read-write
+			MAX-ACCESS accessible-for-notify
 			STATUS current
 			DESCRIPTION
 				"The IS-IS total node number."
@@ -3530,7 +3556,7 @@ holdmaxcost(3): IS-IS neighbor relationship flapping suppression works in Hold-m
 		-- 1.3.6.1.4.1.2011.5.25.24.2.2.19		
 		hwIsisInterval OBJECT-TYPE
 			SYNTAX Unsigned32
-			MAX-ACCESS read-write
+			MAX-ACCESS accessible-for-notify
 			STATUS current
 			DESCRIPTION
 				"The statistic interval."
@@ -3539,14 +3565,14 @@ holdmaxcost(3): IS-IS neighbor relationship flapping suppression works in Hold-m
 	    -- 1.3.6.1.4.1.2011.5.25.24.2.2.20		
 		hwIsisRuledOutDeviceNum OBJECT-TYPE
 			SYNTAX Unsigned32
-			MAX-ACCESS read-write
+			MAX-ACCESS accessible-for-notify
 			STATUS current
 			DESCRIPTION
 				"The rule out device number."
 			::= { hwIsisTrapsObjects 20 }
 	-- 1.3.6.1.4.1.2011.5.25.24.2.2.21		
 		hwIsisSystemID OBJECT-TYPE
-			SYNTAX OCTET STRING (SIZE (0..8))
+			SYNTAX SystemID
                                                        MAX-ACCESS accessible-for-notify
 			STATUS current
 			DESCRIPTION
@@ -3632,7 +3658,142 @@ holdmaxcost(3): IS-IS neighbor relationship flapping suppression works in Hold-m
             DESCRIPTION
                 "This object indicates a system ID which is used to uniquely identify a host or router in an area."
 			::= { hwIsisTrapsObjects 30 }
+
+        -- 1.3.6.1.4.1.2011.5.25.24.2.2.31
+        hwIsisInsecureAuthMode OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..32))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the name of the insecure authentication mode configured for IS-IS."
+            ::= { hwIsisTrapsObjects 31 }
+			
+		-- 1.3.6.1.4.1.2011.5.25.24.2.2.32
+        hwLoopDetectType OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..16))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the protocol type of loop detection."
+            ::= { hwIsisTrapsObjects 32 }
 		
+		-- 1.3.6.1.4.1.2011.5.25.24.2.2.33
+        hwLoopDetectProtocol OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..16))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the protocol of the routing loop detection."
+            ::= { hwIsisTrapsObjects 33 }
+			
+		-- 1.3.6.1.4.1.2011.5.25.24.2.2.34
+        hwLoopDetectProtocolAttr OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..64))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the protocol attribution of the routing loop detection."
+            ::= { hwIsisTrapsObjects 34 }
+			
+		-- 1.3.6.1.4.1.2011.5.25.24.2.2.35
+        hwLoopDetectRedistributeID1 OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..32))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the first redistribute ID of the detected routing loop."
+            ::= { hwIsisTrapsObjects 35 }
+			
+		-- 1.3.6.1.4.1.2011.5.25.24.2.2.36
+        hwLoopDetectRedistributeID2 OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..32))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the second redistribute ID of the detected routing loop."
+            ::= { hwIsisTrapsObjects 36 }
+
+        -- 1.3.6.1.4.1.2011.5.25.24.2.2.37
+        hwisisImportRouteMax OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "Maximum number of routes that can be advertised in an IS-IS process."
+            ::= { hwIsisTrapsObjects 37 }
+
+        -- 1.3.6.1.4.1.2011.5.25.24.2.2.38
+        hwisisMtId OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "IS-IS multi-topology ID."
+            ::= { hwIsisTrapsObjects 38 }
+
+        -- 1.3.6.1.4.1.2011.5.25.24.2.2.39
+        hwisisCostAdjustReason OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..64))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The reason for the IS-IS link cost adjustment."
+            ::= { hwIsisTrapsObjects 39 }
+
+        -- 1.3.6.1.4.1.2011.5.25.24.2.2.40
+        hwisisOriginalCost OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "Original IS-IS link cost."
+            ::= { hwIsisTrapsObjects 40 }
+
+        -- 1.3.6.1.4.1.2011.5.25.24.2.2.41
+        hwisisAdjustedCost OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "Adjusted IS-IS link cost triggered by the current event."
+            ::= { hwIsisTrapsObjects 41 }
+
+        -- 1.3.6.1.4.1.2011.5.25.24.2.2.42
+        hwisisIpv6PrefixAddress OBJECT-TYPE
+            SYNTAX InetAddress
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "IPv6 prefix address."
+            ::= { hwIsisTrapsObjects 42 }
+
+        -- 1.3.6.1.4.1.2011.5.25.24.2.2.43
+        hwisisIpv6PrefixAddressMask OBJECT-TYPE
+            SYNTAX Unsigned32 (1..128)
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "IPv6 prefix address mask."
+            ::= { hwIsisTrapsObjects 43 }
+
+        -- 1.3.6.1.4.1.2011.5.25.24.2.2.44
+        hwisisLocalFlexAlgorithm OBJECT-TYPE
+            SYNTAX Unsigned32 (128..255)
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "Local Flexible Algorithm."
+            ::= { hwIsisTrapsObjects 44 }
+
+        -- 1.3.6.1.4.1.2011.5.25.24.2.2.45
+        hwisisRemoteFlexAlgorithm OBJECT-TYPE
+            SYNTAX Unsigned32 (128..255)
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "Remote Flexible Algorithm."
+            ::= { hwIsisTrapsObjects 45 }
+
         -- 1.3.6.1.4.1.2011.5.25.24.2.3
         hwIsisConfConformance OBJECT IDENTIFIER ::= { hwIsisConf 3 }
         
@@ -3786,7 +3947,7 @@ hwIsisProcL2LowerRedistThreshold, hwIsisProcL1TotalRedist, hwIsisProcL2TotalRedi
         -- 1.3.6.1.4.1.2011.5.25.24.2.3.2.24
         hwIsisTrapsObjectsGroup OBJECT-GROUP
             OBJECTS { hwIsisAdjChangeReason, hwisisSysInstance, hwisisSysLevelIndex, hwIsisOwnSysID, hwIsisAdjSysID, hwIsisAdjSysName, 
-                                hwIsisConflictSystemID, hwIsisAutoSysId, hwIsisLocalIP, hwIsisAdjIP, hwIsisRemoteIP }
+                                hwIsisConflictSystemID, hwIsisAutoSysId, hwIsisLocalIP, hwIsisAdjIP, hwIsisRemoteIP , hwIsisPeerFlappingSuppressStatus }
             STATUS current
             DESCRIPTION 
                 "The group of adj change reason."
@@ -3824,7 +3985,17 @@ hwIsisProcL2LowerRedistThreshold, hwIsisProcL1TotalRedist, hwIsisProcL2TotalRedi
 		 hwIsisThirdPartRouteBeDeletedByPurgeInexact,
 		 hwIsisThirdPartRouteBeDeletedByPurgeInexactClear,
 		 hwIsisThirdPartRouteBeDeletedByPurge,
-                 hwIsisThirdPartRouteBeDeletedByPurgeClear
+                 hwIsisThirdPartRouteBeDeletedByPurgeClear,
+                                       hwIsisAuthModeInsecure,		 
+		 hwIsisAuthModeInsecureClear,
+		 hwRouteLoopDetected,
+		 hwRouteLoopDetectedClear,
+		 hwIsisImportRouteReachMax,
+		 hwIsisImportRouteReachMaxClear,
+		 hwIsisLinkCostAdjustment,
+		 hwIsisLinkCostAdjustmentClear,
+		 hwisisLocatorPrefixConflict,
+		 hwisisLocatorPrefixConflictClear
 				 
             }
         STATUS current
@@ -4143,6 +4314,86 @@ hwIsisProcL2LowerRedistThreshold, hwIsisProcL1TotalRedist, hwIsisProcL2TotalRedi
 			DESCRIPTION 
 				"IS-IS routes advertised by another device were not deleted."
 			::= { hwIsisTraps 32 }
+
+		-- 1.3.6.1.4.1.2011.5.25.24.2.4.33
+		hwIsisAuthModeInsecure NOTIFICATION-TYPE
+			OBJECTS { hwIsisInsecureAuthMode } 
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that an insecure authentication mode is configured for IS-IS."
+			::= { hwIsisTraps 33 }	
+			
+		-- 1.3.6.1.4.1.2011.5.25.24.2.4.34
+		hwIsisAuthModeInsecureClear NOTIFICATION-TYPE
+			OBJECTS { hwIsisInsecureAuthMode } 
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that the insecure authentication mode configured for IS-IS is deleted."
+			::= { hwIsisTraps 34 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.24.2.4.35
+		hwRouteLoopDetected NOTIFICATION-TYPE
+			OBJECTS { hwLoopDetectType, hwLoopDetectProtocol, hwLoopDetectProtocolAttr, hwLoopDetectRedistributeID1, hwLoopDetectRedistributeID2 } 
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that a routing loop has been detected on the local device."
+			::= { hwIsisTraps 35 }
+			
+		-- 1.3.6.1.4.1.2011.5.25.24.2.4.36
+		hwRouteLoopDetectedClear NOTIFICATION-TYPE
+			OBJECTS { hwLoopDetectType, hwLoopDetectProtocol, hwLoopDetectProtocolAttr, hwLoopDetectRedistributeID1, hwLoopDetectRedistributeID2 } 
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that the routing loop is cleared."
+			::= { hwIsisTraps 36 }
+
+		-- 1.3.6.1.4.1.2011.5.25.24.2.4.37
+		hwIsisImportRouteReachMax NOTIFICATION-TYPE
+			OBJECTS { hwisisSysInstance, hwisisImportRouteMax }
+			STATUS current
+			DESCRIPTION 
+				"The number of import routes in this IS-IS process reached or exceeded the maximum."
+			::= { hwIsisTraps 37 }
+			
+		-- 1.3.6.1.4.1.2011.5.25.24.2.4.38
+		hwIsisImportRouteReachMaxClear NOTIFICATION-TYPE
+			OBJECTS { hwisisSysInstance, hwisisImportRouteMax }
+			STATUS current
+			DESCRIPTION 
+				"The number of import routes in this IS-IS process has been less than the maximum."
+			::= { hwIsisTraps 38 }
+
+		-- 1.3.6.1.4.1.2011.5.25.24.2.4.39
+		hwIsisLinkCostAdjustment NOTIFICATION-TYPE
+			OBJECTS { hwisisSysInstance, hwisisMtId, ifName, hwisisSysLevelIndex, hwisisCostAdjustReason, hwisisOriginalCost, hwisisAdjustedCost }
+			STATUS current
+			DESCRIPTION 
+				"An IS-IS link cost adjustment event occurs."
+			::= { hwIsisTraps 39 }
+
+		-- 1.3.6.1.4.1.2011.5.25.24.2.4.40
+		hwIsisLinkCostAdjustmentClear NOTIFICATION-TYPE
+			OBJECTS { hwisisSysInstance, hwisisMtId, ifName, hwisisSysLevelIndex, hwisisCostAdjustReason, hwisisOriginalCost, hwisisAdjustedCost }
+			STATUS current
+			DESCRIPTION 
+				"An IS-IS link cost adjustment event is cleared."
+			::= { hwIsisTraps 40 }
+
+		-- 1.3.6.1.4.1.2011.5.25.24.2.4.41
+		hwisisLocatorPrefixConflict NOTIFICATION-TYPE
+			OBJECTS { hwisisSysInstance, hwisisMtId, hwisisSysLevelIndex, hwisisIpv6PrefixAddress, hwisisIpv6PrefixAddressMask, hwIsisConflictSystemID, hwisisLocalFlexAlgorithm, hwisisRemoteFlexAlgorithm }
+			STATUS current
+			DESCRIPTION 
+				"Locator or interface IPv6 prefix conflict with locator prefix between local and another device is detected."
+			::= { hwIsisTraps 41 }
+
+		-- 1.3.6.1.4.1.2011.5.25.24.2.4.42
+		hwisisLocatorPrefixConflictClear NOTIFICATION-TYPE
+			OBJECTS { hwisisSysInstance, hwisisMtId, hwisisSysLevelIndex, hwisisIpv6PrefixAddress, hwisisIpv6PrefixAddressMask, hwIsisConflictSystemID, hwisisLocalFlexAlgorithm, hwisisRemoteFlexAlgorithm }
+			STATUS current
+			DESCRIPTION 
+				"Locator or interface IPv6 prefix conflict with locator prefix between local and another device is cleared."
+			::= { hwIsisTraps 42 }
     END
 --   
 

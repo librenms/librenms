@@ -12,6 +12,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Blade;
 use LibreNMS\Config;
+use LibreNMS\Interfaces\UI\DeviceTab;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Graph;
 use LibreNMS\Util\Url;
@@ -83,11 +84,14 @@ class DeviceController extends Controller
         $parent_id = Vminfo::guessFromDevice($device)->value('device_id');
         $overview_graphs = $this->buildDeviceGraphArrays($device);
 
+        /** @var DeviceTab[] $tabs */
         $tabs = array_map(function ($class) {
             return app()->make($class);
         }, array_filter($this->tabs, 'class_exists')); // TODO remove filter
-        $title = $tabs[$current_tab]->name();
-        $data = $tabs[$current_tab]->data($device);
+        $tab_controller = $tabs[$current_tab];
+        $title = $tab_controller->name();
+        $data = $tab_controller->data($device, $request);
+        $page_links = $data['page_links'] ?? [];
 
         // Device Link Menu, select the primary link
         $device_links = $this->deviceLinkMenu($device, $current_tab);
@@ -159,18 +163,21 @@ class DeviceController extends Controller
             $title = __('Edit');
 
             // check if metric has more specific edit page
-            if (preg_match('#health/metric=(\w+)#', \Request::path(), $matches)) {
+            $path = \Request::path();
+            if (preg_match('#health/metric=(\w+)#', $path, $matches)) {
                 if ($this->editTabExists($matches[1])) {
                     $current_tab = $matches[1];
                 } elseif ($this->editTabExists($matches[1] . 's')) {
                     $current_tab = $matches[1] . 's';
                 }
+            } elseif (preg_match('#device/\d+/ports/transceivers#', $path)) {
+                $current_tab = 'transceivers';
             }
 
             // check if edit page exists
             if ($this->editTabExists($current_tab)) {
                 $suffix .= "/section=$current_tab";
-                $title .= ' ' . ucfirst($current_tab);
+                $title .= ' ' . __(ucfirst($current_tab));
             }
 
             $device_links['edit'] = [
@@ -192,9 +199,10 @@ class DeviceController extends Controller
         }
 
         // Web
+        $http_port = $device->attribs->firstWhere('attrib_type', 'override_device_http_port') ? ':' . $device->attribs->firstWhere('attrib_type', 'override_device_http_port')->attrib_value : '';
         $device_links['web'] = [
             'icon' => 'fa-globe',
-            'url' => 'https://' . $device->hostname,
+            'url' => 'https://' . $device->hostname . $http_port,
             'title' => __('Web'),
             'external' => true,
             'onclick' => 'http_fallback(this); return false;',
@@ -212,9 +220,10 @@ class DeviceController extends Controller
         }
 
         // SSH
+        $ssh_port = $device->attribs->firstWhere('attrib_type', 'override_device_ssh_port') ? ':' . $device->attribs->firstWhere('attrib_type', 'override_device_ssh_port')->attrib_value : '';
         $ssh_url = Config::has('gateone.server')
             ? Config::get('gateone.server') . '?ssh=ssh://' . (Config::get('gateone.use_librenms_user') ? Auth::user()->username . '@' : '') . $device['hostname'] . '&location=' . $device['hostname']
-            : 'ssh://' . $device->hostname;
+            : 'ssh://' . $device->hostname . $ssh_port;
         $device_links['ssh'] = [
             'icon' => 'fa-lock',
             'url' => $ssh_url,
@@ -223,9 +232,10 @@ class DeviceController extends Controller
         ];
 
         // Telnet
+        $telnet_port = $device->attribs->firstWhere('attrib_type', 'override_device_telnet_port') ? ':' . $device->attribs->firstWhere('attrib_type', 'override_device_telnet_port')->attrib_value : '';
         $device_links['telnet'] = [
             'icon' => 'fa-terminal',
-            'url' => 'telnet://' . $device->hostname,
+            'url' => 'telnet://' . $device->hostname . $telnet_port,
             'title' => __('Telnet'),
             'external' => true,
         ];

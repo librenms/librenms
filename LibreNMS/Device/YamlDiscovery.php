@@ -32,6 +32,7 @@ use LibreNMS\Config;
 use LibreNMS\Interfaces\Discovery\DiscoveryItem;
 use LibreNMS\OS;
 use LibreNMS\Util\Compare;
+use LibreNMS\Util\IP;
 use LibreNMS\Util\Oid;
 
 class YamlDiscovery
@@ -97,14 +98,10 @@ class YamlDiscovery
                     }
 
                     foreach ($data as $name => $value) {
-                        if (in_array($name, ['oid', 'skip_values', 'snmp_flags', 'rrd_type'])) {
-                            $current_data[$name] = $value;
-                        } elseif (Str::contains($value, '{{')) {
-                            // replace embedded values
-                            $current_data[$name] = static::replaceValues($name, $index, $count, $data, $pre_cache);
+                        if (! in_array($name, ['oid', 'skip_values', 'snmp_flags', 'rrd_type'])) {
+                            $current_data[$name] = self::fillValues($name, $index, $data, $count, $pre_cache, $value);
                         } else {
-                            // replace references to data
-                            $current_data[$name] = static::getValueFromData($name, $index, $data, $pre_cache, $value);
+                            $current_data[$name] = $value;
                         }
                     }
 
@@ -122,6 +119,28 @@ class YamlDiscovery
         }
 
         return $items;
+    }
+
+    /**
+     * @param  string  $name  The oid of the value we are searching for
+     * @param  int|string  $index  The index of the current entity we are searching from
+     * @param  array  $discovery_data  The yaml discovery data
+     * @param  int  $count  The count of where we are in the discovery data
+     * @param  array  $pre_cache  Data that has been previously fetched (should contain all snmp data)
+     * @param  int|string|null  $value  The current value of the data that we might need to transform (or return as is)
+     * @return mixed
+     */
+    public static function fillValues($name, $index, $discovery_data, $count, $pre_cache, $value): mixed
+    {
+        if (str_contains($value, '{{')) {
+            // replace embedded values
+            return static::replaceValues($name, $index, $count, $discovery_data, $pre_cache);
+        } elseif (! str_contains($value, ' ')) {
+            // replace references to data
+            return static::getValueFromData($name, $index, $discovery_data, $pre_cache, $value);
+        }
+
+        return $value;
     }
 
     /**
@@ -169,6 +188,11 @@ class YamlDiscovery
             $variables = [
                 'index' => $index,
                 'count' => $count,
+                // we compute a numOid compatible version of index
+                // string length followed by ASCII of each char.
+                'str_index_as_numeric' => implode('.', array_map(function ($index) {
+                    return strlen($index) . '.' . implode('.', unpack('c*', $index));
+                }, explode('.', $index))),
             ];
             foreach (explode('.', $index) as $pos => $subindex) {
                 $variables['subindex' . $pos] = $subindex;
@@ -180,7 +204,18 @@ class YamlDiscovery
             $template->replaceWith(function ($matches) use ($index, $def, $pre_cache) {
                 $replace = static::getValueFromData($matches[1], $index, $def, $pre_cache);
                 if (is_null($replace)) {
-                    \Log::warning('YamlDiscovery: No variable available to replace ' . $matches[1]);
+                    // allow parsing of InetAddress hex data representing ipv4 or ipv6
+                    // using {{ $InetAddress_varNameContainingHexIpAddrOfTypeInetAddress }}
+                    // -Ih flag screew up HEX string that contain only printable chars, use at minimum -Ox, and remove -Ih use for exemple:
+                    // snmp_flags: '-OteQUsax'
+                    // snmp_no_Ih_flag: ''
+                    if (str_starts_with($matches[1], 'InetAddress_')) {
+                        $inetaddr = explode('_', $matches[1]);
+                        if (count($inetaddr) == 2) {
+                            return IP::fromHexString(static::getValueFromData($inetaddr[1], $index, $def, $pre_cache), true);
+                        }
+                    }
+                    \Log::warning('YamlDiscovery: No variable available to replace ' . $matches[1] . ' index: ' . $index);
 
                     return ''; // remove the unavailable variable
                 }
@@ -217,17 +252,21 @@ class YamlDiscovery
             return $pre_cache[$index][$name];
         }
 
-        //create the sub-index values in order to try to match them with precache
-        $sub_indexes = explode('.', $index);
         // parse sub_index options name with trailing colon and index
-        $sub_index = 0;
-        $sub_index_end = null;
         if (preg_match('/^(.+):(\d+)(?:-(\d+))?$/', $name, $matches)) {
-            $name = $matches[1] ?? null;
-            $sub_index = $matches[2] ?? null;
-            $sub_index_end = $matches[3] ?? null;
+            // subindex found
+            $name = $matches[1];
+
+            //create the sub-index values in order to try to match them with precache
+            $sub_indexes = explode('.', $index);
+
+            // if subindex is a range, get them all, otherwise just get the first
+            $index = isset($matches[3])
+                ? implode('.', array_slice($sub_indexes, (int) $matches[2], (int) $matches[3]))
+                : $sub_indexes[(int) $matches[2]];
         }
 
+        // look for the data in pre_cache
         if (isset($pre_cache[$name]) && ! is_numeric($name)) {
             if (is_array($pre_cache[$name])) {
                 if (isset($pre_cache[$name][$index][$name])) {
@@ -236,20 +275,18 @@ class YamlDiscovery
                     return $pre_cache[$name][$index];
                 } elseif (count($pre_cache[$name]) === 1 && ! is_array(current($pre_cache[$name]))) {
                     return current($pre_cache[$name]);
-                } elseif (isset($sub_indexes[$sub_index])) {
-                    if ($sub_index_end) {
-                        $multi_sub_index = implode('.', array_slice($sub_indexes, $sub_index, $sub_index_end));
-                        if (isset($pre_cache[$name][$multi_sub_index][$name])) {
-                            return $pre_cache[$name][$multi_sub_index][$name];
-                        }
-                    }
-
-                    if (isset($pre_cache[$name][$sub_indexes[$sub_index]][$name])) {
-                        return $pre_cache[$name][$sub_indexes[$sub_index]][$name];
-                    }
                 }
             } else {
                 return $pre_cache[$name];
+            }
+        }
+
+        // search for name inside walked tables if oid is fully qualified
+        if (str_contains($name, '::')) {
+            foreach ($pre_cache as $table_name => $table) {
+                if (is_array($table) && isset($table[$index][$name])) {
+                    return $table[$index][$name];
+                }
             }
         }
 
@@ -294,12 +331,15 @@ class YamlDiscovery
                             if (! array_key_exists($oid, $pre_cache)) {
                                 if (isset($data['snmp_flags'])) {
                                     $snmp_flag = Arr::wrap($data['snmp_flags']);
-                                } elseif (Str::contains($oid, '::')) {
+                                } elseif (str_contains($oid, '::')) {
                                     $snmp_flag = ['-OteQUSa'];
                                 } else {
                                     $snmp_flag = ['-OteQUsa'];
                                 }
-                                $snmp_flag[] = '-Ih';
+
+                                if (! isset($data['snmp_no_Ih_flag'])) {
+                                    $snmp_flag[] = '-Ih';
+                                }
 
                                 // disable bulk request for specific data
                                 if (isset($data['snmp_bulk'])) {
@@ -343,10 +383,12 @@ class YamlDiscovery
                 if (isset($skip_value['device'])) {
                     // field from device model
                     $tmp_value = \DeviceCache::getPrimary()[$skip_value['device']] ?? null;
+                } elseif ($skip_value['oid'] == 'index') {
+                    $tmp_value = $index;
                 } else {
                     // oid previously fetched from the device
                     $tmp_value = static::getValueFromData($skip_value['oid'], $index, $yaml_item_data, $pre_cache);
-                    if (Str::contains($skip_value['oid'], '.')) {
+                    if (str_contains($skip_value['oid'], '.')) {
                         [$skip_value['oid'], $targeted_index] = explode('.', $skip_value['oid'], 2);
                         $tmp_value = static::getValueFromData($skip_value['oid'], $targeted_index, $yaml_item_data, $pre_cache);
                     }

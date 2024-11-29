@@ -1,5 +1,19 @@
 mib: FIREBRICK-CPU-MIB:FIREBRICK-MONITORING:FIREBRICK-L2TP-MIB:FIREBRICK-VOIP-MIB
 modules:
+    processors:
+        data:
+            -
+                oid: fbCpuAll.5
+                num_oid: '.1.3.6.1.4.1.24693.100.2.1.1.2.{{ $index }}'
+                index: '5.{{ $index }}'
+                value: "fbCpuAll"
+                precision: 100
+    mempools:
+        data:
+            -
+                free: .1.3.6.1.4.1.24693.100.4.1.2
+                total: .1.3.6.1.4.1.24693.100.4.1.1
+                precision: 1024
     os:
         sysDescr_regex: '/^(?<hardware>FB[0-9]{4}).*\((?<version>[^ ]+)/m'
     sensors:
@@ -40,7 +54,45 @@ modules:
                         -
                             oid: fbMonReadingName
                             op: not_in_array
+                            value: ['Main PCB front centre', 'Main PCB rear centre', 'Fan Controller', 'RTC', 'PCB']
+                -
+                    oid: fbMonitoringMib
+                    value: fbMonReadingValue
+                    num_oid: '.1.3.6.1.4.1.24693.100.1.1.1.4.{{ $index }}'
+                    divisor: 1000
+                    descr: fbMonReadingName
+                    low_limit: 10
+                    low_warn_limit: 20
+                    warn_limit: 45
+                    high_limit: 65
+                    skip_values:
+                        -
+                            oid: fbMonReadingType
+                            op: '!='
+                            value: 'Temperature (milliDegC)'
+                        -
+                            oid: fbMonReadingName
+                            op: not_in_array
                             value: ['Fan Controller', 'RTC', 'PCB']
+                -
+                    oid: fbMonitoringMib
+                    value: fbMonReadingValue
+                    num_oid: '.1.3.6.1.4.1.24693.100.1.1.1.4.{{ $index }}'
+                    divisor: 1000
+                    descr: fbMonReadingName
+                    low_limit: 10
+                    low_warn_limit: 20
+                    warn_limit: 35
+                    high_limit: 40
+                    skip_values:
+                        -
+                            oid: fbMonReadingType
+                            op: '!='
+                            value: 'Temperature (milliDegC)'
+                        -
+                            oid: fbMonReadingName
+                            op: not_in_array
+                            value: ['Main PCB front centre', 'Main PCB rear centre', 'Fan Controller', 'RTC', 'PCB']
                 -
                     oid: fbMonitoringMib
                     value: fbMonReadingValue
@@ -58,8 +110,8 @@ modules:
                             value: 'Temperature (milliDegC)'
                         -
                             oid: fbMonReadingName
-                            op: '!='
-                            value: 'CPU'
+                            op: 'not_in_array'
+                            value: ['Main PCB front centre', 'Main PCB rear centre', 'PSU A', 'PSU B', 'CPU NorthWest', 'CPU SouthEast', 'CPU']
                 -
                     oid: fbMonitoringMib
                     value: fbMonReadingValue
@@ -78,7 +130,7 @@ modules:
                         -
                             oid: fbMonReadingName
                             op: in_array
-                            value: ['CPU', 'Fan Controller', 'RTC', 'PCB']
+                            value: ['Main PCB front centre', 'Main PCB rear centre', 'PSU A', 'PSU B', 'CPU NorthWest', 'CPU SouthEast', 'CPU', 'Fan Controller', 'RTC', 'PCB']
         voltage:
             data:
                 -
@@ -356,6 +408,320 @@ modules:
                             oid: fbMonReadingName
                             op: '!='
                             value: '1.2V(Fan)'
+                -
+                    oid: fbMonitoringMib
+                    value: fbMonReadingValue
+                    num_oid: '.1.3.6.1.4.1.24693.100.1.1.1.4.{{ $index }}'
+                    divisor: 1000
+                    descr: fbMonReadingName
+                    group: Power Supply
+                    low_limit: 11.8
+                    low_warn_limit: 11.9
+                    warn_limit: 12.1
+                    high_limit: 12.2
+                    skip_values:
+                        -
+                            oid: fbMonReadingType
+                            op: '!='
+                            value: 'Voltage (mV)'
+                        -
+                            oid: fbMonReadingName
+                            op: '!='
+                            value: '12V PSU A'
+                -
+                    oid: fbMonitoringMib
+                    value: fbMonReadingValue
+                    num_oid: '.1.3.6.1.4.1.24693.100.1.1.1.4.{{ $index }}'
+                    divisor: 1000
+                    descr: fbMonReadingName
+                    group: Power Supply
+                    low_limit: 11.8
+                    low_warn_limit: 11.9
+                    warn_limit: 12.1
+                    high_limit: 12.2
+                    skip_values:
+                        -
+                            oid: fbMonReadingType
+                            op: '!='
+                            value: 'Voltage (mV)'
+                        -
+                            oid: fbMonReadingName
+                            op: '!='
+                            value: '12V PSU B'
+                -
+                    oid: fbMonitoringMib
+                    value: fbMonReadingValue
+                    num_oid: '.1.3.6.1.4.1.24693.100.1.1.1.4.{{ $index }}'
+                    divisor: 1000
+                    descr: fbMonReadingName
+                    group: Internal Power
+                    low_limit: 11.8
+                    low_warn_limit: 11.9
+                    warn_limit: 12.1
+                    high_limit: 12.2
+                    skip_values:
+                        -
+                            oid: fbMonReadingType
+                            op: '!='
+                            value: 'Voltage (mV)'
+                        -
+                            oid: fbMonReadingName
+                            op: '!='
+                            value: '12V internal'
+                -
+                    oid: fbMonitoringMib
+                    value: fbMonReadingValue
+                    num_oid: '.1.3.6.1.4.1.24693.100.1.1.1.4.{{ $index }}'
+                    divisor: 1000
+                    descr: fbMonReadingName
+                    group: Processor
+                    skip_values:
+                        -
+                            oid: fbMonReadingType
+                            op: '!='
+                            value: 'Voltage (mV)'
+                        -
+                            oid: fbMonReadingName
+                            op: '!='
+                            value: 'Vcore'
+                -
+                    oid: fbMonitoringMib
+                    value: fbMonReadingValue
+                    num_oid: '.1.3.6.1.4.1.24693.100.1.1.1.4.{{ $index }}'
+                    divisor: 1000
+                    descr: fbMonReadingName
+                    group: Processor
+                    low_limit: 0.912
+                    low_warn_limit: 0.9215
+                    warn_limit: 0.9785
+                    high_limit: 0.988
+                    skip_values:
+                        -
+                            oid: fbMonReadingType
+                            op: '!='
+                            value: 'Voltage (mV)'
+                        -
+                            oid: fbMonReadingName
+                            op: '!='
+                            value: '0.95V'
+                -
+                    oid: fbMonitoringMib
+                    value: fbMonReadingValue
+                    num_oid: '.1.3.6.1.4.1.24693.100.1.1.1.4.{{ $index }}'
+                    divisor: 1000
+                    descr: fbMonReadingName
+                    group: Processor
+                    low_limit: 0.72
+                    low_warn_limit: 0.7275
+                    warn_limit: 0.7725
+                    high_limit: 0.78
+                    skip_values:
+                        -
+                            oid: fbMonReadingType
+                            op: '!='
+                            value: 'Voltage (mV)'
+                        -
+                            oid: fbMonReadingName
+                            op: '!='
+                            value: 'DDRVTT'
+                -
+                    oid: fbMonitoringMib
+                    value: fbMonReadingValue
+                    num_oid: '.1.3.6.1.4.1.24693.100.1.1.1.4.{{ $index }}'
+                    divisor: 1000
+                    descr: fbMonReadingName
+                    group: Processor
+                    low_limit: 0.8245
+                    low_warn_limit: 0.833
+                    warn_limit: 0.867
+                    high_limit: 0.8755
+                    skip_values:
+                        -
+                            oid: fbMonReadingType
+                            op: '!='
+                            value: 'Voltage (mV)'
+                        -
+                            oid: fbMonReadingName
+                            op: '!='
+                            value: '0.85V'
+                -
+                    oid: fbMonitoringMib
+                    value: fbMonReadingValue
+                    num_oid: '.1.3.6.1.4.1.24693.100.1.1.1.4.{{ $index }}'
+                    divisor: 1000
+                    descr: fbMonReadingName
+                    group: Processor
+                    low_limit: 1.44
+                    low_warn_limit: 1.455
+                    warn_limit: 1.545
+                    high_limit: 1.56
+                    skip_values:
+                        -
+                            oid: fbMonReadingType
+                            op: '!='
+                            value: 'Voltage (mV)'
+                        -
+                            oid: fbMonReadingName
+                            op: '!='
+                            value: '1.5V'
+                -
+                    oid: fbMonitoringMib
+                    value: fbMonReadingValue
+                    num_oid: '.1.3.6.1.4.1.24693.100.1.1.1.4.{{ $index }}'
+                    divisor: 1000
+                    descr: fbMonReadingName
+                    group: Internal Power
+                    low_limit: 3.201
+                    low_warn_limit: 3.234
+                    warn_limit: 3.366
+                    high_limit: 3.399
+                    skip_values:
+                        -
+                            oid: fbMonReadingType
+                            op: '!='
+                            value: 'Voltage (mV)'
+                        -
+                            oid: fbMonReadingName
+                            op: '!='
+                            value: '3.3V system'
+                -
+                    oid: fbMonitoringMib
+                    value: fbMonReadingValue
+                    num_oid: '.1.3.6.1.4.1.24693.100.1.1.1.4.{{ $index }}'
+                    divisor: 1000
+                    descr: fbMonReadingName
+                    group: Internal Power
+                    low_limit: 3.168
+                    low_warn_limit: 3.201
+                    warn_limit: 3.399
+                    high_limit: 3.432
+                    skip_values:
+                        -
+                            oid: fbMonReadingType
+                            op: '!='
+                            value: 'Voltage (mV)'
+                        -
+                            oid: fbMonReadingName
+                            op: '!='
+                            value: '3.3V SFP'
+                -
+                    oid: fbMonitoringMib
+                    value: fbMonReadingValue
+                    num_oid: '.1.3.6.1.4.1.24693.100.1.1.1.4.{{ $index }}'
+                    divisor: 1000
+                    descr: fbMonReadingName
+                    group: Internal Power
+                    low_limit: 3.168
+                    low_warn_limit: 3.201
+                    warn_limit: 3.399
+                    high_limit: 3.432
+                    skip_values:
+                        -
+                            oid: fbMonReadingType
+                            op: '!='
+                            value: 'Voltage (mV)'
+                        -
+                            oid: fbMonReadingName
+                            op: '!='
+                            value: '3.3V M.2 SSD'
+                -
+                    oid: fbMonitoringMib
+                    value: fbMonReadingValue
+                    num_oid: '.1.3.6.1.4.1.24693.100.1.1.1.4.{{ $index }}'
+                    divisor: 1000
+                    descr: fbMonReadingName
+                    group: Processor
+                    low_limit: 3.168
+                    low_warn_limit: 3.201
+                    warn_limit: 3.399
+                    high_limit: 3.432
+                    skip_values:
+                        -
+                            oid: fbMonReadingType
+                            op: '!='
+                            value: 'Voltage (mV)'
+                        -
+                            oid: fbMonReadingName
+                            op: '!='
+                            value: '3.3V main CPU'
+                -
+                    oid: fbMonitoringMib
+                    value: fbMonReadingValue
+                    num_oid: '.1.3.6.1.4.1.24693.100.1.1.1.4.{{ $index }}'
+                    divisor: 1000
+                    descr: fbMonReadingName
+                    group: Processor
+                    low_limit: 2.4
+                    low_warn_limit: 2.425
+                    warn_limit: 2.575
+                    high_limit: 2.6
+                    skip_values:
+                        -
+                            oid: fbMonReadingType
+                            op: '!='
+                            value: 'Voltage (mV)'
+                        -
+                            oid: fbMonReadingName
+                            op: '!='
+                            value: '2.5V'
+                -
+                    oid: fbMonitoringMib
+                    value: fbMonReadingValue
+                    num_oid: '.1.3.6.1.4.1.24693.100.1.1.1.4.{{ $index }}'
+                    divisor: 1000
+                    descr: fbMonReadingName
+                    group: Processor
+                    low_limit: 4.8
+                    low_warn_limit: 4.85
+                    warn_limit: 5.15
+                    high_limit: 5.2
+                    skip_values:
+                        -
+                            oid: fbMonReadingType
+                            op: '!='
+                            value: 'Voltage (mV)'
+                        -
+                            oid: fbMonReadingName
+                            op: '!='
+                            value: '5V'
+                -
+                    oid: fbMonitoringMib
+                    value: fbMonReadingValue
+                    num_oid: '.1.3.6.1.4.1.24693.100.1.1.1.4.{{ $index }}'
+                    divisor: 1000
+                    descr: fbMonReadingName
+                    group: Processor
+                    low_limit: 0.8
+                    low_warn_limit: 0.9
+                    warn_limit: 1.8
+                    high_limit: 1.9
+                    skip_values:
+                        -
+                            oid: fbMonReadingType
+                            op: '!='
+                            value: 'Voltage (mV)'
+                        -
+                            oid: fbMonReadingName
+                            op: '!='
+                            value: 'VRTC'
+                -
+                    oid: fbMonitoringMib
+                    value: fbMonReadingValue
+                    num_oid: '.1.3.6.1.4.1.24693.100.1.1.1.4.{{ $index }}'
+                    divisor: 1000
+                    descr: fbMonReadingName
+                    group: Processor
+                    warn_limit: 5.15
+                    high_limit: 5.2
+                    skip_values:
+                        -
+                            oid: fbMonReadingType
+                            op: '!='
+                            value: 'Voltage (mV)'
+                        -
+                            oid: fbMonReadingName
+                            op: '!='
+                            value: 'USB Bus'
         count:
             data:
                 -

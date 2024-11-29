@@ -2,25 +2,16 @@
 
 namespace Database\Factories;
 
-use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Silber\Bouncer\BouncerFacade as Bouncer;
 
-/** @extends Factory<User> */
+/** @extends Factory<\App\Models\User> */
 class UserFactory extends Factory
 {
     /**
-     * The name of the factory's corresponding model.
-     *
-     * @var string
-     */
-    protected $model = User::class;
-
-    /**
      * Define the model's default state.
-     *
-     * @return array
      */
-    public function definition()
+    public function definition(): array
     {
         return [
             'auth_type' => 'mysql',
@@ -28,25 +19,23 @@ class UserFactory extends Factory
             'realname' => $this->faker->name(),
             'email' => $this->faker->safeEmail(),
             'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
-            'level' => 1,
         ];
     }
 
     public function admin()
     {
-        return $this->state(function () {
-            return [
-                'level' => '10',
-            ];
+        return $this->afterCreating(function ($user) {
+            Bouncer::allow('admin')->everything();
+            $user->assign('admin');
         });
     }
 
     public function read()
     {
-        return $this->state(function () {
-            return [
-                'level' => '5',
-            ];
+        return $this->afterCreating(function ($user) {
+            Bouncer::allow(Bouncer::role()->firstOrCreate(['name' => 'global-read'], ['title' => 'Global Read']))
+                ->to('viewAny', '*', []);
+            $user->assign('global-read');
         });
     }
 }

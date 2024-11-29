@@ -99,10 +99,10 @@
                 "entity-state": {
                     "type": "boolean"
                 },
-                "wifi": {
+                "ipmi": {
                     "type": "boolean"
                 },
-                "ipmi": {
+                "isis": {
                     "type": "boolean"
                 },
                 "entity-physical": {
@@ -180,10 +180,7 @@
                 "cisco-vpdn": {
                     "type": "boolean"
                 },
-                "libvirt-vminfo": {
-                    "type": "boolean"
-                },
-                "vmware-vminfo": {
+                "vminfo": {
                     "type": "boolean"
                 },
                 "vlans": {
@@ -270,6 +267,9 @@
                 "hr-device": {
                     "type": "boolean"
                 },
+                "isis": {
+                    "type": "boolean"
+                },
                 "discovery-protocols": {
                     "type": "boolean"
                 },
@@ -345,10 +345,7 @@
                 "junose-atm-vp": {
                     "type": "boolean"
                 },
-                "vmware-vminfo": {
-                    "type": "boolean"
-                },
-                "libvirt-vminfo": {
+                "vminfo": {
                     "type": "boolean"
                 },
                 "mpls": {
@@ -393,6 +390,22 @@
         "snmp_max_oid": {
             "type": "integer",
             "minimum": 1
+        },
+        "syslog_hook": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "regex": {
+                        "type": "string"
+                    },
+                    "script": {
+                        "type": "string"
+                    }
+                },
+                "required": ["regex", "script"],
+                "additionalProperties": false
+            }
         },
         "ifXmcbc": {
             "type": "boolean"

@@ -1,5 +1,0 @@
-DROP TABLE IF EXISTS `cmpMemPool`;
-DROP TABLE IF EXISTS `current`;
-DROP TABLE IF EXISTS `fanspeed`;
-DROP TABLE IF EXISTS `frequency`;
-DROP TABLE IF EXISTS `voltage`;

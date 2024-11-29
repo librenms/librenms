@@ -23,7 +23,6 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-use LibreNMS\Config;
 use LibreNMS\Util\Snmpsim;
 
 $install_dir = realpath(__DIR__ . '/..');
@@ -36,9 +35,12 @@ chdir($install_dir);
 ini_set('display_errors', '1');
 //error_reporting(E_ALL & ~E_WARNING);
 
-$snmpsim = new Snmpsim('127.1.6.2', 1162, null);
+$snmpsim = new Snmpsim('127.1.6.2', 1162);
 if (getenv('SNMPSIM')) {
-    $snmpsim->fork(6);
+    if (! getenv('GITHUB_ACTIONS')) {
+        $snmpsim->setupVenv();
+        $snmpsim->start();
+    }
 
     // make PHP hold on a reference to $snmpsim so it doesn't get destructed
     register_shutdown_function(function (Snmpsim $ss) {
@@ -81,7 +83,7 @@ if (getenv('DBTEST')) {
     unset($db_config);
 }
 
-Config::reload(); // reload the config including database config
 \LibreNMS\Util\OS::updateCache(true); // Force update of OS Cache
+LibrenmsConfig::invalidateAndReload();
 
 app()->terminate(); // destroy the bootstrap Laravel application

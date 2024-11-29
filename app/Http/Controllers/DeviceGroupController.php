@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Interfaces\ToastInterface;
 use App\Models\DeviceGroup;
-use Flasher\Prime\FlasherInterface;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use LibreNMS\Alerting\QueryBuilderFilter;
@@ -49,7 +49,7 @@ class DeviceGroupController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function store(Request $request, FlasherInterface $flasher)
+    public function store(Request $request, ToastInterface $toast)
     {
         $this->validate($request, [
             'name' => 'required|string|unique:device_groups',
@@ -67,7 +67,7 @@ class DeviceGroupController extends Controller
             $deviceGroup->devices()->sync($request->devices);
         }
 
-        $flasher->addSuccess(__('Device Group :name created', ['name' => $deviceGroup->name]));
+        $toast->success(__('Device Group :name created', ['name' => htmlentities($deviceGroup->name)]));
 
         return redirect()->route('device-groups.index');
     }
@@ -110,7 +110,7 @@ class DeviceGroupController extends Controller
      * @param  \App\Models\DeviceGroup  $deviceGroup
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function update(Request $request, DeviceGroup $deviceGroup, FlasherInterface $flasher)
+    public function update(Request $request, DeviceGroup $deviceGroup, ToastInterface $toast)
     {
         $this->validate($request, [
             'name' => [
@@ -143,9 +143,9 @@ class DeviceGroupController extends Controller
         if ($deviceGroup->isDirty() || $devices_updated) {
             try {
                 if ($deviceGroup->save() || $devices_updated) {
-                    $flasher->addSuccess(__('Device Group :name updated', ['name' => $deviceGroup->name]));
+                    $toast->success(__('Device Group :name updated', ['name' => htmlentities($deviceGroup->name)]));
                 } else {
-                    $flasher->addError(__('Failed to save'));
+                    $toast->error(__('Failed to save'));
 
                     return redirect()->back()->withInput();
                 }
@@ -155,7 +155,7 @@ class DeviceGroupController extends Controller
                 ]);
             }
         } else {
-            $flasher->addInfo(__('No changes made'));
+            $toast->info(__('No changes made'));
         }
 
         return redirect()->route('device-groups.index');
@@ -170,7 +170,7 @@ class DeviceGroupController extends Controller
     public function destroy(DeviceGroup $deviceGroup)
     {
         if ($deviceGroup->serviceTemplates()->exists()) {
-            $msg = __('Device Group :name still has Service Templates associated with it. Please remove or update the Service Template accordingly', ['name' => $deviceGroup->name]);
+            $msg = __('Device Group :name still has Service Templates associated with it. Please remove or update the Service Template accordingly', ['name' => htmlentities($deviceGroup->name)]);
 
             return response($msg, 200);
         }

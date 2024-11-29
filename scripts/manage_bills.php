@@ -42,7 +42,7 @@ function create_bill($bill_name, $bill_type, $bill_cdr, $bill_day)
     $insert = [
         'bill_name' => $bill_name,
         'bill_type' => $bill_type,
-        'bill_cdr' =>  $bill_cdr,
+        'bill_cdr' => $bill_cdr,
         'bill_day' => '1',
     ];
     $create_bill = dbInsert($insert, 'bills');

@@ -564,6 +564,38 @@ Output:
 
 Output is an image.
 
+### `get_graph_by_service`
+
+Get the graph for a service
+
+Route: `/api/v0/devices/:hostname/services/:service_id/graphs/:datasource`
+
+- hostname can be either the device hostname or id
+- service id
+- datasource is the name of the service datasource
+
+Input:
+
+- from: This is the date you would like the graph to start - See
+  [http://oss.oetiker.ch/rrdtool/doc/rrdgraph.en.html](http://oss.oetiker.ch/rrdtool/doc/rrdgraph.en.html)
+  for more information.
+- to: This is the date you would like the graph to end - See
+  [http://oss.oetiker.ch/rrdtool/doc/rrdgraph.en.html](http://oss.oetiker.ch/rrdtool/doc/rrdgraph.en.html)
+  for more information.
+- width: The graph width, defaults to 1075.
+- height: The graph height, defaults to 300.
+
+  Example:
+
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/services/localhost/35/graphs/loss
+```
+
+Output:
+
+Output is an image.
+
+
 ### `get_port_graphs`
 
 Get a list of ports for a particular device.
@@ -710,6 +742,75 @@ Output:
   ]
 }
 ```
+
+### `get_device_transceivers`
+
+Get a list of FDB entries associated with a device.
+
+Route: `/api/v0/devices/:hostname/transceivers`
+
+- hostname can be either the device hostname or id
+
+Example:
+
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/transceivers
+```
+
+Output:
+
+```json
+{
+    "status": "ok",
+    "transceivers": [
+        {
+            "id": 12,
+            "created_at": "2024-06-26T23:46:06.000000Z",
+            "updated_at": "2024-06-26T23:46:57.000000Z",
+            "device_id": 3138,
+            "port_id": 50735,
+            "index": "50",
+            "type": "10G_BASE_LR_SFP",
+            "vendor": "FS",
+            "oui": "00 00 00",
+            "model": null,
+            "revision": "",
+            "serial": "G000999AA",
+            "date": null,
+            "ddm": true,
+            "encoding": null,
+            "cable": "SM",
+            "distance": 20000,
+            "wavelength": 1330,
+            "connector": "LC",
+            "channels": 1
+        },
+        {
+            "id": 13,
+            "created_at": "2024-06-26T23:46:06.000000Z",
+            "updated_at": "2024-06-27T00:00:07.000000Z",
+            "device_id": 3138,
+            "port_id": 50736,
+            "index": "51",
+            "type": "10G_BASE_SR_SFP",
+            "vendor": "HPE",
+            "oui": "64 9D 99",
+            "model": null,
+            "revision": "1",
+            "serial": "AAAA0000AAA",
+            "date": null,
+            "ddm": true,
+            "encoding": null,
+            "cable": "SM",
+            "distance": 300,
+            "wavelength": 850,
+            "connector": "LC",
+            "channels": 1
+        }
+    ]
+}
+```
+
 
 ### `get_components`
 
@@ -1014,7 +1115,7 @@ Input:
   - ipv4: search by IPv4 address
   - ipv6: search by IPv6 address (compressed or uncompressed)
   - location: search by location
-  - location_id: serach by locaiton_id
+  - location_id: search by location_id
   - hostname: search by hostname
   - sysName: search by sysName
   - display: search by display name
@@ -1067,6 +1168,31 @@ Output:
    "icon": null
   }
  ]
+}
+```
+
+### `device_under_maintenance`
+
+Get the current maintenance status of a device.
+
+Route: `/api/v0/devices/:hostname/maintenance`
+
+Input:
+
+ -
+
+Example:
+
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/maintenance
+```
+
+Output:
+
+```json
+{
+    "status": "ok",
+    "is_under_maintenance": true
 }
 ```
 
@@ -1146,25 +1272,30 @@ Route: `/api/v0/devices`
 
 Input (JSON):
 
+Fields:
+
 - hostname (required): device hostname or IP
 - display: A string to display as the name of this device, defaults to 
   hostname (or device_display_default setting). May be a simple
   template using replacements: {{ $hostname }}, {{ $sysName }},
   {{ $sysName_fallback }}, {{ $ip }}
+- snmpver: SNMP version to use, v1, v2c or v3. During checks detection order is v2c,v3,v1
 - port: SNMP port (defaults to port defined in config).
-- transport: SNMP protocol (defaults to transport defined in config).
-- snmpver: SNMP version to use, v1, v2c or v3. Defaults to v2c.
+- transport: SNMP protocol (udp,tcp,udp6,tcp6) Defaults to transport defined in config.
 - port_association_mode: method to identify ports: ifIndex (default), ifName, ifDescr, ifAlias
-- poller_group: This is the poller_group id used for distributed
-  poller setup. Defaults to 0.
-- force_add: Set to true to force the device to be added regardless of it being able
-  to respond to snmp or icmp.
+- poller_group: This is the poller_group id used for distributed poller setup. Defaults to 0.
+- location or location_id: set the location by text or location id
 
-For SNMP v1 or v2c
+Options:
+
+- force_add: Skip all checks and attempts to detect credentials. Add the device as given directly to the database.
+- ping_fallback: if snmp checks fail, add the device as ping only instead of failing
+
+SNMP v1 or v2c credentials:
 
 - community: Required for SNMP v1 or v2c.
 
-For SNMP v3
+SNMP v3 credentials:
 
 - authlevel: SNMP authlevel (noAuthNoPriv, authNoPriv, authPriv).
 - authname: SNMP Auth username
@@ -1173,9 +1304,9 @@ For SNMP v3
 - cryptopass: SNMP Crypto Password
 - cryptoalgo: SNMP Crypto algorithm (AES, DES)
 
-For ICMP only
+For ICMP only:
 
-- snmp_disable: Boolean, set to true for ICMP only.
+- snmp_disable: set to true for ICMP only. Disables SNMP checks and polling.
 - os: OS short name for the device (defaults to ping).
 - sysName: sysName for the device.
 - hardware: Device hardware.

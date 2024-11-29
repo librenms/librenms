@@ -4,14 +4,14 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddVrfIdAndBgpLocalAs extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::table('bgpPeers', function (Blueprint $table) {
             $table->unsignedInteger('vrf_id')->nullable()->after('device_id');
@@ -26,7 +26,7 @@ class AddVrfIdAndBgpLocalAs extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::table('bgpPeers', function (Blueprint $table) {
             $table->dropColumn('vrf_id');
@@ -35,4 +35,4 @@ class AddVrfIdAndBgpLocalAs extends Migration
             $table->dropColumn('bgpLocalAs');
         });
     }
-}
+};

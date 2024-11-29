@@ -21,6 +21,12 @@ discovery:
             - 'IOS-XE'
             - 'IOSXE'
             - 'CAT3K_CAA'
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.9.1.2330 # ciscoIE10004TLM
+            - .1.3.6.1.4.1.9.1.2331 # ciscoIE10006TLM
+            - .1.3.6.1.4.1.9.1.2332 # ciscoIE10004PTSLM
+            - .1.3.6.1.4.1.9.1.2333 # ciscoIE10008PTSLM
 bad_ifXEntry:
     - cisco1941
     - cisco886Va

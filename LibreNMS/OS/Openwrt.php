@@ -46,8 +46,8 @@ class Openwrt extends OS implements
      */
     public function discoverOS(Device $device): void
     {
-        $device->version = explode(' ', trim(snmp_get($this->getDeviceArray(), '.1.3.6.1.4.1.2021.7890.1.101.1', '-Osqnv'), '"'))[1];
-        $device->hardware = trim(snmp_get($this->getDeviceArray(), '.1.3.6.1.4.1.2021.7890.2.101.1', '-Osqnv'), '"');
+        [, $device->version] = explode(' ', snmp_get($this->getDeviceArray(), 'NET-SNMP-EXTEND-MIB::nsExtendOutput1Line."distro"', '-Osqnv'));
+        $device->hardware = snmp_get($this->getDeviceArray(), 'NET-SNMP-EXTEND-MIB::nsExtendOutput1Line."hardware"', '-Osqnv');
     }
 
     /**

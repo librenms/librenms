@@ -27,7 +27,7 @@ class LoginTest extends DuskTestCase
     /**
      * @throws \Throwable
      */
-    public function testUserCanLogin()
+    public function testUserCanLogin(): void
     {
         $this->browse(function (Browser $browser) {
             $password = 'some_password';
@@ -52,7 +52,7 @@ class LoginTest extends DuskTestCase
     /**
      * @throws \Throwable
      */
-    public function test2faLogin()
+    public function test2faLogin(): void
     {
         $this->browse(function (Browser $browser) {
             $password = 'another_password';

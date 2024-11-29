@@ -96,6 +96,10 @@ $graphs['powerdns'] = [
     'queries',
     'queries_udp',
 ];
+$graphs['sneck'] = [
+    'results',
+    'time',
+];
 $graphs['ntp-client'] = [
     'stats',
     'freq',
@@ -180,7 +184,10 @@ $graphs['exim-stats'] = [
     'queue',
 ];
 $graphs['php-fpm'] = [
-    'stats',
+    'overview_combined',
+    'overview_slow_requests',
+    'overview_max_childen_reached',
+    'v1_last_request_cpu',
 ];
 $graphs['nvidia'] = [
     'sm',
@@ -270,6 +277,7 @@ $graphs['smart'] = [
     'id184',
     'id187',
     'id188',
+    'maxtemp',
     'id190',
     'id194',
     'id196',
@@ -321,16 +329,16 @@ $graphs['freeradius'] = [
     'queue',
 ];
 $graphs['suricata'] = [
-    'alert',
-    'packets',
-    'nasty_delta',
-    'nasty_percent',
-    'dec_proto',
-    'flow_proto',
-    'app_flows',
-    'app_tx',
-    'bytes',
-    'mem_use',
+    'packets_overview',
+    'nasty_delta_overview',
+    'nasty_percent_overview',
+    'dec_proto_overview',
+    'flow_proto_overview',
+    'app_flows_overview',
+    'app_tx_overview',
+    'bytes_overview',
+    'mem_use_overview',
+    'uptime_overview',
 ];
 $graphs['zfs'] = [
     'arc_misc',
@@ -425,6 +433,25 @@ $graphs['sagan'] = [
     'uptime',
     'alert',
 ];
+$graphs['oslv_monitor'] = [
+    'cpu_percent',
+    'mem_percent',
+    'time',
+    'procs',
+    'sizes',
+    'rss',
+    'vsz',
+    'faults',
+    'rwd_amount',
+    'ops_rwd',
+    'cows',
+    'sock',
+    'recv_sent_msgs',
+    'etime',
+    'swaps',
+    'signals_taken',
+    'switches',
+];
 $graphs['hv-monitor'] = [
     'status',
     'memory',
@@ -445,6 +472,7 @@ $graphs['pwrstatd'] = [
     'minutes',
 ];
 $graphs['systemd'] = [
+    'all',
     'sub',
     'active',
     'load',
@@ -453,20 +481,159 @@ $graphs['wireguard'] = [
     'traffic',
     'time',
 ];
+$graphs['logsize'] = [
+    'size',
+    'set_sizes',
+    'max_size',
+    'mean_size',
+    'median_size',
+    'mode_size',
+    'min_size',
+];
+$graphs['linux_config_files'] = [
+    'number_of_confs',
+];
+$graphs['suricata_extract'] = [
+    'errors',
+    'ignored_host',
+    'ignored_ip',
+    'ignored_ip_dest',
+    'ignored_ip_src',
+    'sub',
+    'sub_2xx',
+    'sub_3xx',
+    'sub_4xx',
+    'sub_5xx',
+    'sub_codes',
+    'sub_fail',
+    'truncated',
+    'zero_sized',
+    'sub_size',
+];
+$graphs['mojo_cape_submit'] = [
+    'subs',
+    'subs_top12',
+    'hash_changed',
+    'app_protos',
+    'size_sum',
+    'size_stats',
+    'size_max',
+    'size_mean',
+    'size_median',
+    'size_mode',
+    'size_min',
+    'size_stddev',
+];
+$graphs['linux_softnet_stat'] = [
+    'packets',
+    'time_squeeze',
+    'backlog_length',
+    'packet_dropped',
+    'cpu_collision',
+    'flow_limit',
+    'received_rps',
+    'budget',
+];
+$graphs['privoxy'] = [
+    'client_requests',
+    'blocks',
+    'crunches',
+    'unique_bdomains',
+    'bytes_to_client',
+    'req',
+    'resp_xxx',
+    'ver',
+];
+$graphs['ss'] = [
+    'sockets',
+    'dccp',
+    'inet',
+    'inet6',
+    'link',
+    'mptcp',
+    'netlink',
+    'raw',
+    'sctp',
+    'tcp',
+    'tipc',
+    'udp',
+    'unix',
+    'vsock',
+    'xdp',
+];
+$graphs['http_access_log_combined'] = [
+    'bytes',
+    'codes_general',
+    'codes_1xx',
+    'codes_2xx',
+    'codes_3xx',
+    'codes_4xx',
+    'codes_5xx',
+    'methods',
+    'version',
+    'refer',
+    'user',
+    'log_size',
+    'error_size',
+];
+$graphs['borgbackup'] = [
+    'unique_csize',
+    'total_csize',
+    'total_size',
+    'total_chunks',
+    'total_unique_chunks',
+    'unique_size',
+    'time_since_last_modified',
+    'errored',
+    'locked',
+    'locked_for',
+];
+$graphs['nfs'] = [
+    'server_rpc',
+    'server_cache',
+    'client_rpc',
+    'client_cache',
+];
+$graphs['poudriere'] = [
+    'status',
+    'phase',
+    'time',
+    'log_size',
+    'package_size',
+    'cpu_perc',
+    'mem_perc',
+    'time_comparison',
+    'user_time',
+    'system_time',
+    'rss',
+    'threads',
+    'major_faults',
+    'minor_faults',
+    'swaps',
+    'size_comparison',
+    'stack_size',
+    'data_size',
+    'text_size',
+    'read_blocks',
+    'copy_on_write_faults',
+    'context_switches_comparison',
+    'voluntary_context_switches',
+    'involuntary_context_switches',
+];
 
 echo '<div class="panel panel-default">';
 echo '<div class="panel-heading">';
 echo "<span style='font-weight: bold;'>Apps</span> &#187; ";
 unset($sep);
 $link_array = [
-    'page'   => 'device',
+    'page' => 'device',
     'device' => $device['device_id'],
-    'tab'    => 'apps',
+    'tab' => 'apps',
 ];
 
-$apps = \LibreNMS\Util\ObjectCache::applications()->flatten();
+$apps = LibreNMS\Util\ObjectCache::applications()->flatten();
 foreach ($apps as $app) {
-    $app_state = \LibreNMS\Util\Html::appStateIcon($app->app_state);
+    $app_state = LibreNMS\Util\Html::appStateIcon($app->app_state);
     if (! empty($app_state['icon'])) {
         $app_state_info = '<font color="' . $app_state['color'] . '"><i title="' . $app_state['hover_text'] . '" class="fa ' . $app_state['icon'] . ' fa-fw fa-lg" aria-hidden="true"></i></font>';
     } else {
@@ -478,7 +645,7 @@ foreach ($apps as $app) {
         echo "<span class='pagemenu-selected'>";
     }
     echo $app_state_info;
-    echo generate_link($app->displayName(), ['page' => 'apps', 'app' => $app->app_type]);
+    echo generate_link(htmlentities($app->displayName()), ['page' => 'apps', 'app' => $app->app_type]);
     if ($vars['app'] == $app->app_type) {
         echo '</span>';
     }

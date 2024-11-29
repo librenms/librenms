@@ -8,16 +8,16 @@ $nototal = (($width < 224) ? 1 : 0);
 $unit_text = 'Packets/sec';
 $rrd_filename = Rrd::name($device['hostname'], ['app', 'powerdns', $app->app_id]);
 $array = [
-    'corruptPackets'  => [
-        'descr'  => 'Corrupt',
+    'corruptPackets' => [
+        'descr' => 'Corrupt',
         'colour' => 'FF8800FF',
     ],
     'servfailPackets' => [
-        'descr'  => 'Failed',
+        'descr' => 'Failed',
         'colour' => 'FF0000FF',
     ],
-    'q_timedout'      => [
-        'descr'  => 'Timedout',
+    'q_timedout' => [
+        'descr' => 'Timedout',
         'colour' => 'FFFF00FF',
     ],
 ];

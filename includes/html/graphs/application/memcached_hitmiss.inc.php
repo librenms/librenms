@@ -8,12 +8,12 @@ $colours = 'mixed';
 $nototal = 0;
 $unit_text = 'Hits/Misses';
 $array = [
-    'get_hits'   => [
-        'descr'  => 'Hits',
+    'get_hits' => [
+        'descr' => 'Hits',
         'colour' => '555555',
     ],
     'get_misses' => [
-        'descr'  => 'Misses',
+        'descr' => 'Misses',
         'colour' => 'cc0000',
     ],
 ];
