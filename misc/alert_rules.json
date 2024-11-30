@@ -829,9 +829,8 @@
   {
     "builder": {"condition":"AND","rules":[
                                            {"id":"mempools.mempool_class","field":"mempools.mempool_class","type":"string","input":"text","operator":"equal","value":"system"},
-                                           {"id":"mempools.mempool_descr","field":"mempools.mempool_descr","type":"string","input":"text","operator":"equal","value":"Physical memory"},
                                            {"id":"mempools.mempool_perc","field":"mempools.mempool_perc","type":"string","input":"number","operator":"greater_or_equal","value":"90"},
-                                           {"id":"devices.sysDescr","field":"devices.sysDescr","type":"string","input":"number","operator":"begins_with","value":"Linux "}
+                                           {"id":"devices.sysDescr","field":"devices.os","type":"string","input":"number","operator":"equal","value":"linux"}
                                          ],"valid":false},
     "name": "Linux High Memory Usage, >= 90% in use",
     "severity": "warning"
@@ -839,9 +838,8 @@
   {
     "builder": {"condition":"AND","rules":[
                                            {"id":"mempools.mempool_class","field":"mempools.mempool_class","type":"string","input":"text","operator":"equal","value":"system"},
-                                           {"id":"mempools.mempool_descr","field":"mempools.mempool_descr","type":"string","input":"text","operator":"equal","value":"Physical memory"},
                                            {"id":"mempools.mempool_perc","field":"mempools.mempool_perc","type":"string","input":"number","operator":"greater_or_equal","value":"95"},
-                                           {"id":"devices.sysDescr","field":"devices.sysDescr","type":"string","input":"number","operator":"begins_with","value":"Linux "}
+                                           {"id":"devices.sysDescr","field":"devices.os","type":"string","input":"number","operator":"equal","value":"linux"}
                                          ],"valid":false},
     "name": "Linux High Memory Usage, >= 95% in use",
     "severity": "critical"
