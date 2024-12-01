@@ -2,6 +2,7 @@ os: merakics
 text: 'Meraki CS'
 type: network
 icon: meraki
+ifalias: true
 over:
     - { graph: device_bits, text: 'Device Traffic' }
 discovery:
