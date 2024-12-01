@@ -1,61 +1,60 @@
 <?php
 
-$gpio_mon_data = snmpwalk_cache_oid($device, 'nsExtendOutLine."custom"', [], 'NET-SNMP-EXTEND-MIB', null, '-OteQUsb');
+$snmp_data = snmpwalk_cache_oid($device, 'nsExtendOutLine."custom"', [], 'NET-SNMP-EXTEND-MIB', null, '-OteQUsb');
 
-if (! empty($gpio_mon_data)) {
-    $sensor_index = 0;
+if (! empty($snmp_data)) {
+    $sensor_id = 0;
     $sensors = [];
 
-    foreach ($gpio_mon_data as $index => $entry) {
+    foreach ($snmp_data as $index => $entry) {
         if (Str::contains($entry['nsExtendOutLine'], ';')) {
-            $splitted_data_array = explode(';', $entry['nsExtendOutLine']);
-            $sensor_data = [];
-            foreach ($splitted_data_array as $splitted_data_index => $splitted_data) {
-                $sensor_data_parts = explode(',', $splitted_data);
+            $sensor = [];
+            foreach (explode(';', $entry['nsExtendOutLine']) as $splitted_data_index => $splitted_data) {
+                $parts = explode(',', $splitted_data);
 
                 if ($splitted_data_index == 0) {
-                    if (isset($sensor_data_parts[0]) && isset($sensor_data_parts[1]) && isset($sensor_data_parts[2])) {
-                        $sensor_data['name'] = $sensor_data_parts[0];
-                        $sensor_data['type'] = $sensor_data_parts[1];
-                        $sensor_data['descr'] = $sensor_data_parts[2];
-                        $sensor_data['low_limit'] = $sensor_data_parts[3];
-                        $sensor_data['low_warn_limit'] = $sensor_data_parts[4];
-                        $sensor_data['warn_limit'] = $sensor_data_parts[5];
-                        $sensor_data['high_limit'] = $sensor_data_parts[6];
-                        $sensor_data['group'] = $sensor_data_parts[7];
+                    if (isset($parts[0]) && isset($parts[1]) && isset($parts[2])) {
+                        $sensor['name'] = $parts[0];
+                        $sensor['type'] = $parts[1];
+                        $sensor['descr'] = $parts[2];
+                        $sensor['low_limit'] = $parts[3];
+                        $sensor['low_warn_limit'] = $parts[4];
+                        $sensor['warn_limit'] = $parts[5];
+                        $sensor['high_limit'] = $parts[6];
+                        $sensor['group'] = $parts[7];
                     }
                 } else {
-                    if (isset($sensor_data_parts[0]) && isset($sensor_data_parts[1]) && isset($sensor_data_parts[2])) {
-                        if (! isset($sensor_data['state_data'])) {
-                            $sensor_data['state_data'] = [];
+                    if (isset($parts[0]) && isset($parts[1]) && isset($parts[2])) {
+                        if (! isset($sensor['state_data'])) {
+                            $sensor['state_data'] = [];
                         }
 
-                        $state_data['value'] = intval($sensor_data_parts[0]);
-                        $state_data['generic'] = intval($sensor_data_parts[1]);
-                        $state_data['graph'] = 1;
-                        $state_data['descr'] = $sensor_data_parts[2];
-                        array_push($sensor_data['state_data'], $state_data);
+                        $state['value'] = intval($parts[0]);
+                        $state['generic'] = intval($parts[1]);
+                        $state['graph'] = 1;
+                        $state['descr'] = $parts[2];
+                        array_push($sensor['state_data'], $state);
                     }
                 }
-                $sensors[$sensor_index] = $sensor_data;
+                $sensors[$sensor_id] = $sensor;
             }
         } else {
-            $sensors[$sensor_index]['value'] = intval($entry['nsExtendOutLine']);
-            $sensors[$sensor_index]['oid'] = '.1.3.6.1.4.1.8072.1.3.2.4.1.2.' . $index;
-            $sensor_index++;
+            $sensors[$sensor_id]['value'] = intval($entry['nsExtendOutLine']);
+            $sensors[$sensor_id]['oid'] = '.1.3.6.1.4.1.8072.1.3.2.4.1.2.' . $index;
+            $sensor_id++;
         }
     }
 
-    foreach ($sensors as $sensor_id => $sensor_data) {
-        if (isset($sensor_data['name']) && isset($sensor_data['type']) && isset($sensor_data['descr'])) {
-            if (isset($sensor_data['state_data'])) {
-                create_state_index($sensor_data['name'], $sensor_data['state_data']);
+    foreach ($sensors as $id => $sensor) {
+        if (isset($sensor['name']) && isset($sensor['type']) && isset($sensor['descr'])) {
+            if (isset($sensor['state_data'])) {
+                create_state_index($sensor['name'], $sensor['state_data']);
             }
 
-            discover_sensor(null, $sensor_data['type'], $device, $sensor_data['oid'], $sensor_id, $sensor_data['name'], $sensor_data['descr'], 1, 1, $sensor_data['low_limit'], $sensor_data['low_warn_limit'], $sensor_data['warn_limit'], $sensor_data['high_limit'], $sensor_data['value'], 'snmp', null, null, null, $sensor_data['group']);
+            discover_sensor(null, $sensor['type'], $device, $sensor['oid'], $id, $sensor['name'], $sensor['descr'], 1, 1, $sensor['low_limit'], $sensor['low_warn_limit'], $sensor['warn_limit'], $sensor['high_limit'], $sensor['value'], 'snmp', null, null, null, $sensor['group']);
 
-            if (isset($sensor_data['state_data'])) {
-                create_sensor_to_state_index($device, $sensor_data['name'], $sensor_id);
+            if (isset($sensor['state_data'])) {
+                create_sensor_to_state_index($device, $sensor['name'], $id);
             }
         } else {
             echo "[custom] An error occurred while reading a sensor! Please run your custom script on the target device to verify the configuration.\n";
