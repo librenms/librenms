@@ -25,6 +25,6 @@ foreach ($pre_cache as $index => $port) {
      * It helps to have clearer graphs as $SHELF/$CARD/$IFNAME is more usable
      * than node $SHELF interface  $SHELF/$CARD/$IFNAME
      */
-    $newDescr = preg_replace('/^node [0-9]+ interface (.+)/', '$1' , $port['ifDescr']);
+    $newDescr = preg_replace('/^node [0-9]+ interface (.+)/', '$1', $port['ifDescr']);
     $pre_cache[$index]['ifDescr'] = $newDescr;
 }
