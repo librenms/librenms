@@ -16,7 +16,7 @@ use LibreNMS\RRD\RrdDefinition;
 if ($device['os_group'] == 'cisco') {
     $output = snmpwalk_cache_oid($device, 'cvCallVolConnActiveConnection', [], 'CISCO-VOICE-DIAL-CONTROL-MIB');
     d_echo($output);
-    if (is_array($output)) {
+    if (is_array($output) && ! empty($output)) {
         $rrd_def = RrdDefinition::make()
             ->addDataset('h323', 'GAUGE', 0)
             ->addDataset('sip', 'GAUGE', 0)

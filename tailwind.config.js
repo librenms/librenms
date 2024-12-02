@@ -25,6 +25,9 @@ module.exports = {
       },
       borderWidth: {
         '0.5': '0.5px',
+      },
+      boxShadow: {
+        'inner-glow': 'inset 0 0 11px rgba(0, 0, 0, 0.1)',
       }
     },
     screens: {

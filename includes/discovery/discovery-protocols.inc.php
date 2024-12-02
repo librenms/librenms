@@ -2,6 +2,7 @@
 
 use LibreNMS\Config;
 use LibreNMS\Util\IP;
+use LibreNMS\Util\StringHelpers;
 
 global $link_exists;
 
@@ -205,43 +206,50 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
 } elseif ($device['os'] == 'jetstream') {
     echo ' JETSTREAM-LLDP MIB: ';
 
-    $lldp_array = SnmpQuery::hideMib()->walk('TPLINK-LLDPINFO-MIB::lldpNeighborInfoEntry')->table();
+    $lldp = SnmpQuery::hideMib()->walk('TPLINK-LLDPINFO-MIB::lldpNeighborInfoEntry')->table();
 
-    foreach ($lldp_array as $key => $lldp) {
-        if (! is_array($lldp['lldpNeighborPortIndexId'])) {
-            // code below will fail so no need to finish this loop occurence.
-            continue;
+    if (is_array($lldp['lldpNeighborPortIndexId'])) {
+        foreach ($lldp['lldpNeighborPortIndexId'] as $IndexId => $lldp_data) {
+            if (! is_array($lldp_data)) {
+                // code below will fail so no need to finish this loop occurence.
+                continue;
+            }
+
+            $interface = get_port_by_ifIndex($device['device_id'], $IndexId);
+            if (! $interface['port_id']) {
+                $local_ifName = $lldp['lldpNeighborPortId'][$IndexId][1];
+                $local_port_id = find_port_id('gigabitEthernet ' . $local_ifName, null, $device['device_id']);
+                $interface = get_port_by_id($local_port_id);
+            }
+
+            $remote_device_id = find_device_id($lldp['lldpNeighborDeviceName'][$IndexId][1]);
+            $remote_device_name = $lldp['lldpNeighborDeviceName'][$IndexId][1];
+            $remote_device_sysDescr = $lldp['lldpNeighborDeviceDescr'][$IndexId][1];
+            $remote_device_ip = $lldp['lldpNeighborManageIpAddr'][$IndexId][1];
+            $remote_port_descr = $lldp['lldpNeighborPortIdDescr'][$IndexId][1];
+            $remote_port_id = find_port_id($remote_port_descr, null, $remote_device_id);
+
+            if (! $remote_device_id &&
+                    \LibreNMS\Util\Validate::hostname($remote_device_name) &&
+                    ! can_skip_discovery($remote_device_name, $remote_device_ip) &&
+                    Config::get('autodiscovery.xdp') === true) {
+                $remote_device_id = discover_new_device($remote_device_name, $device, 'LLDP', $interface);
+            }
+
+            if ($interface['port_id'] && $remote_device_name && $remote_port_descr) {
+                discover_link(
+                    $interface['port_id'], //our port id from database
+                    'lldp',
+                    $remote_port_id, //remote port id from database if applicable
+                    $remote_device_name, //remote device name from SNMP walk
+                    $remote_port_descr, //remote port description from SNMP walk
+                    null,
+                    $remote_device_sysDescr, //remote device description from SNMP walk
+                    $device['device_id'], //our device id
+                    $remote_device_id //remote device id if applicable
+                );
+            }
         }
-        $IndexId = key($lldp['lldpNeighborPortIndexId']);
-
-        $local_ifName = $lldp['lldpNeighborPortId'][$IndexId];
-        $local_port_id = find_port_id('gigabitEthernet ' . $local_ifName, null, $device['device_id']);
-
-        $remote_device_id = find_device_id($lldp['lldpNeighborDeviceName'][$IndexId]);
-        $remote_device_name = $lldp['lldpNeighborDeviceName'][$IndexId];
-        $remote_device_sysDescr = $lldp['lldpNeighborDeviceDescr'][$IndexId];
-        $remote_device_ip = $lldp['lldpNeighborManageIpAddr'][$IndexId];
-        $remote_port_descr = $lldp['lldpNeighborPortIdDescr'][$IndexId];
-        $remote_port_id = find_port_id($remote_port_descr, null, $remote_device_id);
-
-        if (! $remote_device_id &&
-                \LibreNMS\Util\Validate::hostname($remote_device_name) &&
-                ! can_skip_discovery($remote_device_name, $remote_device_ip) &&
-                Config::get('autodiscovery.xdp') === true) {
-            $remote_device_id = discover_new_device($remote_device_name, $device, 'LLDP', $local_ifName);
-        }
-
-        discover_link(
-            $local_port_id, //our port id from database
-            'lldp',
-            $remote_port_id, //remote port id from database if applicable
-            $remote_device_name, //remote device name from SNMP walk
-            $remote_port_descr, //remote port description from SNMP walk
-            null,
-            $remote_device_sysDescr, //remote device description from SNMP walk
-            $device['device_id'], //our device id
-            $remote_device_id //remote device id if applicable
-        );
     }
     echo PHP_EOL;
 } else {
@@ -339,6 +347,10 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
             d_echo($lldp_instance);
 
             foreach ($lldp_instance as $entry_instance => $lldp) {
+                // If lldpRemPortIdSubtype is 5 and lldpRemPortId is hex, convert it to ASCII.
+                if ($lldp['lldpRemPortIdSubtype'] == 5 && ctype_xdigit(str_replace([' ', ':', '-'], '', strtolower($lldp['lldpRemPortId'])))) {
+                    $lldp['lldpRemPortId'] = StringHelpers::hexToAscii($lldp['lldpRemPortId'], ':');
+                }
                 // normalize MAC address if present
                 $remote_port_mac = '';
                 $remote_port_name = $lldp['lldpRemPortId'];
@@ -477,7 +489,7 @@ if (Config::get('autodiscovery.ospf') === true) {
 
 d_echo($link_exists);
 
-$sql = 'SELECT * FROM `links` AS L, `ports` AS I WHERE L.local_port_id = I.port_id AND I.device_id = ?';
+$sql = 'SELECT * FROM `links` AS L LEFT JOIN `ports` AS I ON L.local_port_id = I.port_id WHERE L.local_device_id = ?';
 foreach (dbFetchRows($sql, [$device['device_id']]) as $test) {
     $local_port_id = $test['local_port_id'];
     $remote_hostname = $test['remote_hostname'];

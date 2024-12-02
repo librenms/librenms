@@ -44,7 +44,7 @@
                 },
                 {
                     "entPhysicalIndex": 16842752,
-                    "entPhysicalDescr": "",
+                    "entPhysicalDescr": "LPU slot 1/1",
                     "entPhysicalClass": "container",
                     "entPhysicalName": "LPU slot 1/1",
                     "entPhysicalHardwareRev": "",
@@ -538,7 +538,7 @@
                 },
                 {
                     "entPhysicalIndex": 16908288,
-                    "entPhysicalDescr": "",
+                    "entPhysicalDescr": "LPU slot 1/2",
                     "entPhysicalClass": "container",
                     "entPhysicalName": "LPU slot 1/2",
                     "entPhysicalHardwareRev": "",
@@ -557,7 +557,7 @@
                 },
                 {
                     "entPhysicalIndex": 16973824,
-                    "entPhysicalDescr": "",
+                    "entPhysicalDescr": "LPU slot 1/3",
                     "entPhysicalClass": "container",
                     "entPhysicalName": "LPU slot 1/3",
                     "entPhysicalHardwareRev": "",
@@ -576,7 +576,7 @@
                 },
                 {
                     "entPhysicalIndex": 17039360,
-                    "entPhysicalDescr": "",
+                    "entPhysicalDescr": "LPU slot 1/4",
                     "entPhysicalClass": "container",
                     "entPhysicalName": "LPU slot 1/4",
                     "entPhysicalHardwareRev": "",
@@ -1070,7 +1070,7 @@
                 },
                 {
                     "entPhysicalIndex": 17104896,
-                    "entPhysicalDescr": "",
+                    "entPhysicalDescr": "MPU slot 1/5",
                     "entPhysicalClass": "container",
                     "entPhysicalName": "MPU slot 1/5",
                     "entPhysicalHardwareRev": "",
@@ -1146,7 +1146,7 @@
                 },
                 {
                     "entPhysicalIndex": 17113345,
-                    "entPhysicalDescr": "",
+                    "entPhysicalDescr": "MEth1/5/0/0",
                     "entPhysicalClass": "port",
                     "entPhysicalName": "MEth1/5/0/0",
                     "entPhysicalHardwareRev": "",
@@ -1165,7 +1165,7 @@
                 },
                 {
                     "entPhysicalIndex": 17170432,
-                    "entPhysicalDescr": "",
+                    "entPhysicalDescr": "MPU slot 1/6",
                     "entPhysicalClass": "container",
                     "entPhysicalName": "MPU slot 1/6",
                     "entPhysicalHardwareRev": "",
@@ -1241,7 +1241,7 @@
                 },
                 {
                     "entPhysicalIndex": 17178881,
-                    "entPhysicalDescr": "",
+                    "entPhysicalDescr": "MEth1/6/0/0",
                     "entPhysicalClass": "port",
                     "entPhysicalName": "MEth1/6/0/0",
                     "entPhysicalHardwareRev": "",
@@ -1279,7 +1279,7 @@
                 },
                 {
                     "entPhysicalIndex": 17235970,
-                    "entPhysicalDescr": "",
+                    "entPhysicalDescr": "CMU slot 1/7",
                     "entPhysicalClass": "container",
                     "entPhysicalName": "CMU slot 1/7",
                     "entPhysicalHardwareRev": "",
@@ -1317,7 +1317,7 @@
                 },
                 {
                     "entPhysicalIndex": 17301506,
-                    "entPhysicalDescr": "",
+                    "entPhysicalDescr": "CMU slot 1/8",
                     "entPhysicalClass": "container",
                     "entPhysicalName": "CMU slot 1/8",
                     "entPhysicalHardwareRev": "",
@@ -1336,7 +1336,7 @@
                 },
                 {
                     "entPhysicalIndex": 17367040,
-                    "entPhysicalDescr": "",
+                    "entPhysicalDescr": "SFU slot 1/9",
                     "entPhysicalClass": "container",
                     "entPhysicalName": "SFU slot 1/9",
                     "entPhysicalHardwareRev": "",
@@ -1374,7 +1374,7 @@
                 },
                 {
                     "entPhysicalIndex": 17432576,
-                    "entPhysicalDescr": "",
+                    "entPhysicalDescr": "SFU slot 1/10",
                     "entPhysicalClass": "container",
                     "entPhysicalName": "SFU slot 1/10",
                     "entPhysicalHardwareRev": "",
@@ -1412,7 +1412,7 @@
                 },
                 {
                     "entPhysicalIndex": 17498112,
-                    "entPhysicalDescr": "",
+                    "entPhysicalDescr": "SFU slot 1/11",
                     "entPhysicalClass": "container",
                     "entPhysicalName": "SFU slot 1/11",
                     "entPhysicalHardwareRev": "",
@@ -1450,7 +1450,7 @@
                 },
                 {
                     "entPhysicalIndex": 17563648,
-                    "entPhysicalDescr": "",
+                    "entPhysicalDescr": "SFU slot 1/12",
                     "entPhysicalClass": "container",
                     "entPhysicalName": "SFU slot 1/12",
                     "entPhysicalHardwareRev": "",
@@ -1488,7 +1488,7 @@
                 },
                 {
                     "entPhysicalIndex": 17629184,
-                    "entPhysicalDescr": "",
+                    "entPhysicalDescr": "SFU slot 1/13",
                     "entPhysicalClass": "container",
                     "entPhysicalName": "SFU slot 1/13",
                     "entPhysicalHardwareRev": "",
@@ -1526,7 +1526,7 @@
                 },
                 {
                     "entPhysicalIndex": 17694720,
-                    "entPhysicalDescr": "",
+                    "entPhysicalDescr": "SFU slot 1/14",
                     "entPhysicalClass": "container",
                     "entPhysicalName": "SFU slot 1/14",
                     "entPhysicalHardwareRev": "",
@@ -1545,7 +1545,7 @@
                 },
                 {
                     "entPhysicalIndex": 17760256,
-                    "entPhysicalDescr": "",
+                    "entPhysicalDescr": "FAN slot 1/1",
                     "entPhysicalClass": "container",
                     "entPhysicalName": "FAN slot 1/1",
                     "entPhysicalHardwareRev": "",
@@ -1583,7 +1583,7 @@
                 },
                 {
                     "entPhysicalIndex": 17825792,
-                    "entPhysicalDescr": "",
+                    "entPhysicalDescr": "FAN slot 1/2",
                     "entPhysicalClass": "container",
                     "entPhysicalName": "FAN slot 1/2",
                     "entPhysicalHardwareRev": "",
@@ -1621,7 +1621,7 @@
                 },
                 {
                     "entPhysicalIndex": 17891328,
-                    "entPhysicalDescr": "",
+                    "entPhysicalDescr": "FAN slot 1/3",
                     "entPhysicalClass": "container",
                     "entPhysicalName": "FAN slot 1/3",
                     "entPhysicalHardwareRev": "",
@@ -1659,7 +1659,7 @@
                 },
                 {
                     "entPhysicalIndex": 17956864,
-                    "entPhysicalDescr": "",
+                    "entPhysicalDescr": "FAN slot 1/4",
                     "entPhysicalClass": "container",
                     "entPhysicalName": "FAN slot 1/4",
                     "entPhysicalHardwareRev": "",
@@ -1697,7 +1697,7 @@
                 },
                 {
                     "entPhysicalIndex": 18022400,
-                    "entPhysicalDescr": "",
+                    "entPhysicalDescr": "FAN slot 1/5",
                     "entPhysicalClass": "container",
                     "entPhysicalName": "FAN slot 1/5",
                     "entPhysicalHardwareRev": "",
@@ -1735,7 +1735,7 @@
                 },
                 {
                     "entPhysicalIndex": 18087936,
-                    "entPhysicalDescr": "",
+                    "entPhysicalDescr": "FAN slot 1/6",
                     "entPhysicalClass": "container",
                     "entPhysicalName": "FAN slot 1/6",
                     "entPhysicalHardwareRev": "",
@@ -1773,7 +1773,7 @@
                 },
                 {
                     "entPhysicalIndex": 18153472,
-                    "entPhysicalDescr": "",
+                    "entPhysicalDescr": "FAN slot 1/7",
                     "entPhysicalClass": "container",
                     "entPhysicalName": "FAN slot 1/7",
                     "entPhysicalHardwareRev": "",
@@ -1811,7 +1811,7 @@
                 },
                 {
                     "entPhysicalIndex": 18219008,
-                    "entPhysicalDescr": "",
+                    "entPhysicalDescr": "FAN slot 1/8",
                     "entPhysicalClass": "container",
                     "entPhysicalName": "FAN slot 1/8",
                     "entPhysicalHardwareRev": "",
@@ -1849,7 +1849,7 @@
                 },
                 {
                     "entPhysicalIndex": 18284544,
-                    "entPhysicalDescr": "",
+                    "entPhysicalDescr": "FAN slot 1/9",
                     "entPhysicalClass": "container",
                     "entPhysicalName": "FAN slot 1/9",
                     "entPhysicalHardwareRev": "",
@@ -1887,7 +1887,7 @@
                 },
                 {
                     "entPhysicalIndex": 18350080,
-                    "entPhysicalDescr": "",
+                    "entPhysicalDescr": "POWER slot 1/1",
                     "entPhysicalClass": "container",
                     "entPhysicalName": "POWER slot 1/1",
                     "entPhysicalHardwareRev": "",
@@ -1925,7 +1925,7 @@
                 },
                 {
                     "entPhysicalIndex": 18415616,
-                    "entPhysicalDescr": "",
+                    "entPhysicalDescr": "POWER slot 1/2",
                     "entPhysicalClass": "container",
                     "entPhysicalName": "POWER slot 1/2",
                     "entPhysicalHardwareRev": "",
@@ -1963,7 +1963,7 @@
                 },
                 {
                     "entPhysicalIndex": 18481152,
-                    "entPhysicalDescr": "",
+                    "entPhysicalDescr": "POWER slot 1/3",
                     "entPhysicalClass": "container",
                     "entPhysicalName": "POWER slot 1/3",
                     "entPhysicalHardwareRev": "",
@@ -1982,7 +1982,7 @@
                 },
                 {
                     "entPhysicalIndex": 18546688,
-                    "entPhysicalDescr": "",
+                    "entPhysicalDescr": "POWER slot 1/4",
                     "entPhysicalClass": "container",
                     "entPhysicalName": "POWER slot 1/4",
                     "entPhysicalHardwareRev": "",
@@ -2020,7 +2020,7 @@
                 },
                 {
                     "entPhysicalIndex": 33619968,
-                    "entPhysicalDescr": "",
+                    "entPhysicalDescr": "LPU slot 2/1",
                     "entPhysicalClass": "container",
                     "entPhysicalName": "LPU slot 2/1",
                     "entPhysicalHardwareRev": "",
@@ -2514,7 +2514,7 @@
                 },
                 {
                     "entPhysicalIndex": 33685504,
-                    "entPhysicalDescr": "",
+                    "entPhysicalDescr": "LPU slot 2/2",
                     "entPhysicalClass": "container",
                     "entPhysicalName": "LPU slot 2/2",
                     "entPhysicalHardwareRev": "",
@@ -2533,7 +2533,7 @@
                 },
                 {
                     "entPhysicalIndex": 33751040,
-                    "entPhysicalDescr": "",
+                    "entPhysicalDescr": "LPU slot 2/3",
                     "entPhysicalClass": "container",
                     "entPhysicalName": "LPU slot 2/3",
                     "entPhysicalHardwareRev": "",
@@ -2552,7 +2552,7 @@
                 },
                 {
                     "entPhysicalIndex": 33816576,
-                    "entPhysicalDescr": "",
+                    "entPhysicalDescr": "LPU slot 2/4",
                     "entPhysicalClass": "container",
                     "entPhysicalName": "LPU slot 2/4",
                     "entPhysicalHardwareRev": "",
@@ -3046,7 +3046,7 @@
                 },
                 {
                     "entPhysicalIndex": 33882112,
-                    "entPhysicalDescr": "",
+                    "entPhysicalDescr": "MPU slot 2/5",
                     "entPhysicalClass": "container",
                     "entPhysicalName": "MPU slot 2/5",
                     "entPhysicalHardwareRev": "",
@@ -3122,7 +3122,7 @@
                 },
                 {
                     "entPhysicalIndex": 33890561,
-                    "entPhysicalDescr": "",
+                    "entPhysicalDescr": "MEth2/5/0/0",
                     "entPhysicalClass": "port",
                     "entPhysicalName": "MEth2/5/0/0",
                     "entPhysicalHardwareRev": "",
@@ -3141,7 +3141,7 @@
                 },
                 {
                     "entPhysicalIndex": 33947648,
-                    "entPhysicalDescr": "",
+                    "entPhysicalDescr": "MPU slot 2/6",
                     "entPhysicalClass": "container",
                     "entPhysicalName": "MPU slot 2/6",
                     "entPhysicalHardwareRev": "",
@@ -3217,7 +3217,7 @@
                 },
                 {
                     "entPhysicalIndex": 33956097,
-                    "entPhysicalDescr": "",
+                    "entPhysicalDescr": "MEth0/0/0/0",
                     "entPhysicalClass": "port",
                     "entPhysicalName": "MEth0/0/0/0",
                     "entPhysicalHardwareRev": "",
@@ -3255,7 +3255,7 @@
                 },
                 {
                     "entPhysicalIndex": 34013186,
-                    "entPhysicalDescr": "",
+                    "entPhysicalDescr": "CMU slot 2/7",
                     "entPhysicalClass": "container",
                     "entPhysicalName": "CMU slot 2/7",
                     "entPhysicalHardwareRev": "",
@@ -3293,7 +3293,7 @@
                 },
                 {
                     "entPhysicalIndex": 34078722,
-                    "entPhysicalDescr": "",
+                    "entPhysicalDescr": "CMU slot 2/8",
                     "entPhysicalClass": "container",
                     "entPhysicalName": "CMU slot 2/8",
                     "entPhysicalHardwareRev": "",
@@ -3312,7 +3312,7 @@
                 },
                 {
                     "entPhysicalIndex": 34144256,
-                    "entPhysicalDescr": "",
+                    "entPhysicalDescr": "SFU slot 2/9",
                     "entPhysicalClass": "container",
                     "entPhysicalName": "SFU slot 2/9",
                     "entPhysicalHardwareRev": "",
@@ -3350,7 +3350,7 @@
                 },
                 {
                     "entPhysicalIndex": 34209792,
-                    "entPhysicalDescr": "",
+                    "entPhysicalDescr": "SFU slot 2/10",
                     "entPhysicalClass": "container",
                     "entPhysicalName": "SFU slot 2/10",
                     "entPhysicalHardwareRev": "",
@@ -3388,7 +3388,7 @@
                 },
                 {
                     "entPhysicalIndex": 34275328,
-                    "entPhysicalDescr": "",
+                    "entPhysicalDescr": "SFU slot 2/11",
                     "entPhysicalClass": "container",
                     "entPhysicalName": "SFU slot 2/11",
                     "entPhysicalHardwareRev": "",
@@ -3426,7 +3426,7 @@
                 },
                 {
                     "entPhysicalIndex": 34340864,
-                    "entPhysicalDescr": "",
+                    "entPhysicalDescr": "SFU slot 2/12",
                     "entPhysicalClass": "container",
                     "entPhysicalName": "SFU slot 2/12",
                     "entPhysicalHardwareRev": "",
@@ -3464,7 +3464,7 @@
                 },
                 {
                     "entPhysicalIndex": 34406400,
-                    "entPhysicalDescr": "",
+                    "entPhysicalDescr": "SFU slot 2/13",
                     "entPhysicalClass": "container",
                     "entPhysicalName": "SFU slot 2/13",
                     "entPhysicalHardwareRev": "",
@@ -3502,7 +3502,7 @@
                 },
                 {
                     "entPhysicalIndex": 34471936,
-                    "entPhysicalDescr": "",
+                    "entPhysicalDescr": "SFU slot 2/14",
                     "entPhysicalClass": "container",
                     "entPhysicalName": "SFU slot 2/14",
                     "entPhysicalHardwareRev": "",
@@ -3521,7 +3521,7 @@
                 },
                 {
                     "entPhysicalIndex": 34537472,
-                    "entPhysicalDescr": "",
+                    "entPhysicalDescr": "FAN slot 2/1",
                     "entPhysicalClass": "container",
                     "entPhysicalName": "FAN slot 2/1",
                     "entPhysicalHardwareRev": "",
@@ -3559,7 +3559,7 @@
                 },
                 {
                     "entPhysicalIndex": 34603008,
-                    "entPhysicalDescr": "",
+                    "entPhysicalDescr": "FAN slot 2/2",
                     "entPhysicalClass": "container",
                     "entPhysicalName": "FAN slot 2/2",
                     "entPhysicalHardwareRev": "",
@@ -3597,7 +3597,7 @@
                 },
                 {
                     "entPhysicalIndex": 34668544,
-                    "entPhysicalDescr": "",
+                    "entPhysicalDescr": "FAN slot 2/3",
                     "entPhysicalClass": "container",
                     "entPhysicalName": "FAN slot 2/3",
                     "entPhysicalHardwareRev": "",
@@ -3635,7 +3635,7 @@
                 },
                 {
                     "entPhysicalIndex": 34734080,
-                    "entPhysicalDescr": "",
+                    "entPhysicalDescr": "FAN slot 2/4",
                     "entPhysicalClass": "container",
                     "entPhysicalName": "FAN slot 2/4",
                     "entPhysicalHardwareRev": "",
@@ -3673,7 +3673,7 @@
                 },
                 {
                     "entPhysicalIndex": 34799616,
-                    "entPhysicalDescr": "",
+                    "entPhysicalDescr": "FAN slot 2/5",
                     "entPhysicalClass": "container",
                     "entPhysicalName": "FAN slot 2/5",
                     "entPhysicalHardwareRev": "",
@@ -3711,7 +3711,7 @@
                 },
                 {
                     "entPhysicalIndex": 34865152,
-                    "entPhysicalDescr": "",
+                    "entPhysicalDescr": "FAN slot 2/6",
                     "entPhysicalClass": "container",
                     "entPhysicalName": "FAN slot 2/6",
                     "entPhysicalHardwareRev": "",
@@ -3749,7 +3749,7 @@
                 },
                 {
                     "entPhysicalIndex": 34930688,
-                    "entPhysicalDescr": "",
+                    "entPhysicalDescr": "FAN slot 2/7",
                     "entPhysicalClass": "container",
                     "entPhysicalName": "FAN slot 2/7",
                     "entPhysicalHardwareRev": "",
@@ -3787,7 +3787,7 @@
                 },
                 {
                     "entPhysicalIndex": 34996224,
-                    "entPhysicalDescr": "",
+                    "entPhysicalDescr": "FAN slot 2/8",
                     "entPhysicalClass": "container",
                     "entPhysicalName": "FAN slot 2/8",
                     "entPhysicalHardwareRev": "",
@@ -3825,7 +3825,7 @@
                 },
                 {
                     "entPhysicalIndex": 35061760,
-                    "entPhysicalDescr": "",
+                    "entPhysicalDescr": "FAN slot 2/9",
                     "entPhysicalClass": "container",
                     "entPhysicalName": "FAN slot 2/9",
                     "entPhysicalHardwareRev": "",
@@ -3863,7 +3863,7 @@
                 },
                 {
                     "entPhysicalIndex": 35127296,
-                    "entPhysicalDescr": "",
+                    "entPhysicalDescr": "POWER slot 2/1",
                     "entPhysicalClass": "container",
                     "entPhysicalName": "POWER slot 2/1",
                     "entPhysicalHardwareRev": "",
@@ -3901,7 +3901,7 @@
                 },
                 {
                     "entPhysicalIndex": 35192832,
-                    "entPhysicalDescr": "",
+                    "entPhysicalDescr": "POWER slot 2/2",
                     "entPhysicalClass": "container",
                     "entPhysicalName": "POWER slot 2/2",
                     "entPhysicalHardwareRev": "",
@@ -3939,7 +3939,7 @@
                 },
                 {
                     "entPhysicalIndex": 35258368,
-                    "entPhysicalDescr": "",
+                    "entPhysicalDescr": "POWER slot 2/3",
                     "entPhysicalClass": "container",
                     "entPhysicalName": "POWER slot 2/3",
                     "entPhysicalHardwareRev": "",
@@ -3958,7 +3958,7 @@
                 },
                 {
                     "entPhysicalIndex": 35323904,
-                    "entPhysicalDescr": "",
+                    "entPhysicalDescr": "POWER slot 2/4",
                     "entPhysicalClass": "container",
                     "entPhysicalName": "POWER slot 2/4",
                     "entPhysicalHardwareRev": "",

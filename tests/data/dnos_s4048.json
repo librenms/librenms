@@ -37701,39 +37701,39 @@
                 {
                     "entPhysicalIndex": 54,
                     "entPhysicalDescr": "Unit: 0 Port 47 10G Level",
-                    "entPhysicalClass": "",
+                    "entPhysicalClass": null,
                     "entPhysicalName": "Te 0/47",
-                    "entPhysicalHardwareRev": "",
-                    "entPhysicalFirmwareRev": "",
-                    "entPhysicalSoftwareRev": "",
-                    "entPhysicalAlias": "",
-                    "entPhysicalAssetID": "",
-                    "entPhysicalIsFRU": "",
-                    "entPhysicalModelName": "",
-                    "entPhysicalVendorType": "",
-                    "entPhysicalSerialNum": "",
+                    "entPhysicalHardwareRev": null,
+                    "entPhysicalFirmwareRev": null,
+                    "entPhysicalSoftwareRev": null,
+                    "entPhysicalAlias": null,
+                    "entPhysicalAssetID": null,
+                    "entPhysicalIsFRU": null,
+                    "entPhysicalModelName": null,
+                    "entPhysicalVendorType": null,
+                    "entPhysicalSerialNum": null,
                     "entPhysicalContainedIn": 0,
-                    "entPhysicalParentRelPos": 0,
-                    "entPhysicalMfgName": "",
+                    "entPhysicalParentRelPos": -1,
+                    "entPhysicalMfgName": null,
                     "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 55,
                     "entPhysicalDescr": "Unit: 0 Port 48 10G Level",
-                    "entPhysicalClass": "",
+                    "entPhysicalClass": null,
                     "entPhysicalName": "Te 0/48",
-                    "entPhysicalHardwareRev": "",
-                    "entPhysicalFirmwareRev": "",
-                    "entPhysicalSoftwareRev": "",
-                    "entPhysicalAlias": "",
-                    "entPhysicalAssetID": "",
-                    "entPhysicalIsFRU": "",
-                    "entPhysicalModelName": "",
-                    "entPhysicalVendorType": "",
-                    "entPhysicalSerialNum": "",
+                    "entPhysicalHardwareRev": null,
+                    "entPhysicalFirmwareRev": null,
+                    "entPhysicalSoftwareRev": null,
+                    "entPhysicalAlias": null,
+                    "entPhysicalAssetID": null,
+                    "entPhysicalIsFRU": null,
+                    "entPhysicalModelName": null,
+                    "entPhysicalVendorType": null,
+                    "entPhysicalSerialNum": null,
                     "entPhysicalContainedIn": 0,
-                    "entPhysicalParentRelPos": 0,
-                    "entPhysicalMfgName": "",
+                    "entPhysicalParentRelPos": -1,
+                    "entPhysicalMfgName": null,
                     "ifIndex": null
                 },
                 {
@@ -37943,7 +37943,7 @@
                     "entPhysicalContainedIn": 77,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
-                    "ifIndex": null
+                    "ifIndex": 2106382
                 },
                 {
                     "entPhysicalIndex": 79,
@@ -37962,7 +37962,7 @@
                     "entPhysicalContainedIn": 77,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "",
-                    "ifIndex": null
+                    "ifIndex": 2106382
                 },
                 {
                     "entPhysicalIndex": 80,
@@ -38171,7 +38171,7 @@
                     "entPhysicalContainedIn": 89,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
-                    "ifIndex": null
+                    "ifIndex": 2107918
                 },
                 {
                     "entPhysicalIndex": 91,

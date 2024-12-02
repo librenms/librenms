@@ -20,6 +20,7 @@
 
 namespace LibreNMS;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Eventlog;
 use App\Models\Port;
@@ -707,10 +708,12 @@ class IRCBot
                     $this->log("Auth for '" . $params[0] . "', ID: '" . $user->user_id . "', Token: '" . $token . "', Mail: '" . $user->email . "'");
                 }
 
-                if (Mail::send($user->email, 'LibreNMS IRC-Bot Authtoken', "Your Authtoken for the IRC-Bot:\r\n\r\n" . $token . "\r\n\r\n", false) === true) {
+                try {
+                    Mail::send($user->email, 'LibreNMS IRC-Bot Authtoken', "Your Authtoken for the IRC-Bot:\r\n\r\n" . $token . "\r\n\r\n");
+
                     return $this->respond('Token sent!');
-                } else {
-                    return $this->respond('Sorry, seems like mail doesnt like us.');
+                } catch (\Exception $e) {
+                    return $this->respond('Sorry, seems like mail doesnt like us. ' . $e->getMessage());
                 }
             } else {
                 return $this->respond('Who are you again?');
@@ -728,9 +731,9 @@ class IRCBot
 
                 return $this->loadExternal();
             }
-            $new_config = Config::load();
+            LibrenmsConfig::reload();
             $this->respond('Reloading configuration & defaults');
-            if ($new_config != $this->config) {
+            if (LibrenmsConfig::getAll() != $this->config) {
                 $this->__construct();
 
                 return;

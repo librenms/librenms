@@ -32,6 +32,6 @@ foreach ($pre_cache['emu2_temp'] as $id => $temp) {
         $high_limit = fahrenheit_to_celsius($temp['emsProbeStatusProbeMaxTempThresh'], $pre_cache['emu2_temp_scale']);
         $high_warn_limit = fahrenheit_to_celsius($temp['emsProbeStatusProbeHighTempThresh'], $pre_cache['emu2_temp_scale']);
         $current = fahrenheit_to_celsius($temp['emsProbeStatusProbeTemperature'], $pre_cache['emu2_temp_scale']);
-        discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, 'aos-emu2', $descr, '1', '1', $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current);
+        discover_sensor(null, 'temperature', $device, $oid, $index, 'aos-emu2', $descr, '1', '1', $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current);
     }
 }

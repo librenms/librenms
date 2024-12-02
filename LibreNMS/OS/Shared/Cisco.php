@@ -27,17 +27,21 @@
 namespace LibreNMS\OS\Shared;
 
 use App\Models\Device;
+use App\Models\EntPhysical;
 use App\Models\Mempool;
 use App\Models\PortsNac;
 use App\Models\Sla;
+use App\Models\Transceiver;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 use LibreNMS\Device\Processor;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Discovery\SlaDiscovery;
 use LibreNMS\Interfaces\Discovery\StpInstanceDiscovery;
+use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
 use LibreNMS\Interfaces\Polling\NacPolling;
 use LibreNMS\Interfaces\Polling\SlaPolling;
 use LibreNMS\OS;
@@ -52,11 +56,17 @@ class Cisco extends OS implements
     ProcessorDiscovery,
     MempoolsDiscovery,
     NacPolling,
-    SlaPolling
+    SlaPolling,
+    TransceiverDiscovery
 {
     use YamlOSDiscovery {
         YamlOSDiscovery::discoverOS as discoverYamlOS;
     }
+    use OS\Traits\EntityMib {
+        OS\Traits\EntityMib::discoverEntityPhysical as discoverBaseEntityPhysical;
+    }
+
+    protected ?string $entityVendorTypeMib = 'CISCO-ENTITY-VENDORTYPE-OID-MIB';
 
     public function discoverOS(Device $device): void
     {
@@ -211,6 +221,65 @@ class Cisco extends OS implements
         }
 
         return $mempools;
+    }
+
+    public function discoverEntityPhysical(): Collection
+    {
+        $inventory = $this->discoverBaseEntityPhysical();
+
+        $os = $this->getDevice()->os;
+
+        // discover cellular device info
+        if ($os == 'ios' or $os == 'iosxe') {
+            $cellData = \SnmpQuery::hideMib()->walk('CISCO-WAN-3G-MIB::c3gGsmIdentityTable');
+            $baseIndex = $inventory->max('entPhysicalIndex'); // maintain compatability with buggy old code
+
+            foreach ($cellData->table(1) as $index => $entry) {
+                if (isset($entry['c3gImsi'])) {
+                    $inventory->push(new EntPhysical([
+                        'entPhysicalIndex' => ++$baseIndex,
+                        'entPhysicalDescr' => $entry['c3gImsi'],
+                        'entPhysicalVendorType' => 'sim',
+                        'entPhysicalContainedIn' => $index,
+                        'entPhysicalClass' => 'module',
+                        'entPhysicalParentRelPos' => '-1',
+                        'entPhysicalName' => 'sim',
+                        'entPhysicalModelName' => 'IMSI',
+                        'entPhysicalIsFRU' => 'true',
+                    ]));
+                }
+
+                if (isset($entry['c3gImei'])) {
+                    $inventory->push(new EntPhysical([
+                        'entPhysicalIndex' => ++$baseIndex,
+                        'entPhysicalDescr' => $entry['c3gImei'],
+                        'entPhysicalVendorType' => 'modem',
+                        'entPhysicalContainedIn' => $index,
+                        'entPhysicalClass' => 'module',
+                        'entPhysicalParentRelPos' => '-1',
+                        'entPhysicalName' => 'modem',
+                        'entPhysicalModelName' => 'IMEI',
+                        'entPhysicalIsFRU' => 'false',
+                    ]));
+                }
+
+                if (isset($entry['c3gIccId'])) {
+                    $inventory->push(new EntPhysical([
+                        'entPhysicalIndex' => ++$baseIndex,
+                        'entPhysicalDescr' => $entry['c3gIccId'],
+                        'entPhysicalVendorType' => 'sim',
+                        'entPhysicalContainedIn' => $index,
+                        'entPhysicalClass' => 'module',
+                        'entPhysicalParentRelPos' => '-1',
+                        'entPhysicalName' => 'sim',
+                        'entPhysicalModelName' => 'ICCID',
+                        'entPhysicalIsFRU' => 'true',
+                    ]));
+                }
+            }
+        }
+
+        return $inventory;
     }
 
     /**
@@ -439,7 +508,7 @@ class Cisco extends OS implements
             // Use Nagios Status codes. 0: Good, 2: Critical
             $sla->opstatus = $data[$sla_nr]['rttMonLatestRttOperSense'] == 1 ? 0 : 2;
 
-            echo 'SLA ' . $sla_nr . ': ' . $rtt_type . ' ' . $sla['owner'] . ' ' . $sla['tag'] . '... ' . $sla->rtt . 'ms at ' . $time . "\n";
+            Log::info('SLA ' . $sla_nr . ': ' . $rtt_type . ' ' . $sla['owner'] . ' ' . $sla['tag'] . '... ' . $sla->rtt . 'ms at ' . $time);
 
             $collected = ['rtt' => $sla->rtt];
 
@@ -555,5 +624,53 @@ class Cisco extends OS implements
         }
 
         return null;
+    }
+
+    public function discoverTransceivers(): Collection
+    {
+        // use data collected by entPhysical module if available
+        $dbSfpCages = $this->getDevice()->entityPhysical()->whereIn('entPhysicalVendorType', ['cevContainerSFP', 'cevContainerGbic', 'cevContainer10GigBasePort', 'cevContainerTransceiver', 'cevContainerXFP', 'cevContainer40GigBasePort', 'cevContainerCFP', 'cevContainerCXP', 'cevContainerCPAK', 'cevContainerNCS4KSFP', 'cevContainerQSFP28SR', 'cevContainerQSFP28LR', 'cevContainerQSFP28CR', 'cevContainerQSFP28AOC', 'cevContainerQSFP28CWDM', 'cevContainerNonCiscoQSFP28SR', 'cevContainerNonCiscoQSFP28LR', 'cevContainerNonCiscoQSFP28CR', 'cevContainerNonCiscoQSFP28AOC', 'cevContainerNonCiscoQSFP28CWDM'])->pluck('ifIndex', 'entPhysicalIndex');
+        if ($dbSfpCages->isNotEmpty()) {
+            $data = $this->getDevice()->entityPhysical()->whereIn('entPhysicalContainedIn', $dbSfpCages->keys())->get()->map(function ($ent) use ($dbSfpCages) {
+                if (empty($ent->ifIndex) && $dbSfpCages->has($ent->entPhysicalContainedIn)) {
+                    $ent->ifIndex = $dbSfpCages->get($ent->entPhysicalContainedIn);
+                }
+
+                return $ent;
+            })->keyBy('entPhysicalIndex');
+        } else {
+            // fetch data via snmp
+            $snmpData = \SnmpQuery::cache()->hideMib()->mibs(['CISCO-ENTITY-VENDORTYPE-OID-MIB'])->walk('ENTITY-MIB::entPhysicalTable')->table(1);
+            if (empty($snmpData)) {
+                return new Collection;
+            }
+
+            $snmpData = collect(\SnmpQuery::hideMib()->mibs(['IF-MIB'])->walk('ENTITY-MIB::entAliasMappingIdentifier')->table(1, $snmpData));
+
+            $sfpCages = $snmpData->filter(fn ($ent) => isset($ent['entPhysicalVendorType']) && $ent['entPhysicalVendorType'] == 'cevContainerSFP');
+            $data = $snmpData->filter(fn ($ent) => $sfpCages->has($ent['entPhysicalContainedIn'] ?? null))->map(function ($e) {
+                if (isset($e['entAliasMappingIdentifier'][0])) {
+                    $e['ifIndex'] = preg_replace('/^.*ifIndex[.[](\d+).*$/', '$1', $e['entAliasMappingIdentifier'][0]);
+                }
+
+                return $e;
+            });
+        }
+        $ifIndexToPortId = $this->getDevice()->ports()->pluck('port_id', 'ifIndex');
+
+        return $data->map(function ($ent, $index) use ($ifIndexToPortId) {
+            $ifIndex = $ent['ifIndex'] ?? null;
+
+            return new Transceiver([
+                'port_id' => $ifIndexToPortId->get($ifIndex, 0),
+                'index' => $index,
+                'type' => $ent['entPhysicalDescr'] ?? null,
+                'vendor' => $ent['entPhysicalMfgName'] ?? null,
+                'revision' => $ent['entPhysicalHardwareRev'] ?? null,
+                'model' => $ent['entPhysicalModelName'] ?? null,
+                'serial' => $ent['entPhysicalSerialNum'] ?? null,
+                'entity_physical_index' => $ifIndex,
+            ]);
+        });
     }
 }

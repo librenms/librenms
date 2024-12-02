@@ -23,9 +23,11 @@
 
 namespace LibreNMS\Alert\Transport;
 
+use Exception;
 use LibreNMS\Alert\AlertUtil;
 use LibreNMS\Alert\Transport;
 use LibreNMS\Config;
+use LibreNMS\Exceptions\AlertTransportDeliveryException;
 
 class Mail extends Transport
 {
@@ -35,7 +37,7 @@ class Mail extends Transport
             'sysContact' => AlertUtil::findContactsSysContact($alert_data['faults']),
             'owners' => AlertUtil::findContactsOwners($alert_data['faults']),
             'role' => AlertUtil::findContactsRoles([$this->config['role']]),
-            default => $this->config['email'],
+            default => $this->config['email'] ?? $alert_data['contacts'] ?? [], // contacts is only used by legacy synthetic transport
         };
 
         $html = Config::get('email_html');
@@ -48,7 +50,11 @@ class Mail extends Transport
             $msg = preg_replace("/(?<!\r)\n/", "\r\n", $alert_data['msg']);
         }
 
-        return \LibreNMS\Util\Mail::send($emails, $alert_data['title'], $msg, $html, $this->config['bcc'] ?? false, $this->config['attach-graph'] ?? null);
+        try {
+            return \LibreNMS\Util\Mail::send($emails, $alert_data['title'], $msg, $html, $this->config['bcc'] ?? false, $this->config['attach-graph'] ?? null);
+        } catch (Exception $e) {
+            throw new AlertTransportDeliveryException($alert_data, 0, $e->getMessage());
+        }
     }
 
     public static function configTemplate(): array

@@ -16,7 +16,7 @@ use LibreNMS\RRD\RrdDefinition;
 if ($device['os_group'] == 'cisco') {
     // Total
     $total = 0;
-    $output = snmpwalk_cache_oid_num($device, '1.3.6.1.4.1.9.9.86.1.2.1.1.6', null);
+    $output = snmpwalk_cache_oid_num($device, '1.3.6.1.4.1.9.9.86.1.2.1.1.6');
     if (is_array($output)) {
         foreach ($output as $key => $value) {
             $total += $value[''];
@@ -25,7 +25,7 @@ if ($device['os_group'] == 'cisco') {
         if (isset($total) && $total > 0) {
             // Active
             $active = 0;
-            foreach (snmpwalk_cache_oid_num($device, '1.3.6.1.4.1.9.9.86.1.2.1.1.7', null) as $key => $value) {
+            foreach (snmpwalk_cache_oid_num($device, '1.3.6.1.4.1.9.9.86.1.2.1.1.7') as $key => $value) {
                 $active += $value[''];
             }
 

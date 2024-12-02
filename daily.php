@@ -344,7 +344,11 @@ if ($options['f'] === 'refresh_device_groups') {
 
 if ($options['f'] === 'notify') {
     if (\LibreNMS\Config::has('alert.default_mail')) {
-        \LibreNMS\Util\Mail::send(\LibreNMS\Config::get('alert.default_mail'), '[LibreNMS] Auto update has failed for ' . Config::get('distributed_poller_name'), "We just attempted to update your install but failed. The information below should help you fix this.\r\n\r\n" . $options['o'], false);
+        try {
+            \LibreNMS\Util\Mail::send(\LibreNMS\Config::get('alert.default_mail'), '[LibreNMS] Auto update has failed for ' . Config::get('distributed_poller_name'), "We just attempted to update your install but failed. The information below should help you fix this.\r\n\r\n" . $options['o'], false);
+        } catch (Exception $e) {
+            echo 'Failed to send update failed email. ' . $e->getMessage();
+        }
     }
 }
 
@@ -371,7 +375,13 @@ if ($options['f'] === 'recalculate_device_dependencies') {
         // update all root nodes and recurse, chunk so we don't blow up
         Device::doesntHave('parents')->with('children')->chunkById(100, function (Collection $devices) {
             // anonymous recursive function
-            $recurse = function (Device $device) use (&$recurse) {
+            $processed = [];
+            $recurse = function (Device $device) use (&$recurse, &$processed) {
+                // Do not process the same device 2 times
+                if (array_key_exists($device->device_id, $processed)) {
+                    return;
+                }
+                $processed[$device->device_id] = true;
                 $device->updateMaxDepth();
 
                 $device->children->each($recurse);

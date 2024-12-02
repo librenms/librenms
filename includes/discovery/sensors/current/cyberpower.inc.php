@@ -11,5 +11,5 @@ if ($oids) {
     $type = 'cyberpower';
     $descr = 'Input';
     $current = $current / 10;
-    discover_sensor($valid['sensor'], 'current', $device, $oid, '0', $type, $descr, $divisor, '1', null, null, null, null, $current);
+    discover_sensor(null, 'current', $device, $oid, '0', $type, $descr, $divisor, '1', null, null, null, null, $current);
 }

@@ -136,11 +136,11 @@ class RunAlerts
         if ($alert['state'] >= AlertState::ACTIVE) {
             $obj['title'] = $template->title ?: 'Alert for device ' . $obj['display'] . ' - ' . ($alert['name'] ?: $alert['rule']);
             if ($alert['state'] == AlertState::ACKNOWLEDGED) {
-                $obj['title'] .= ' got acknowledged';
+                $obj['title'] .= ' Has been acknowledged';
             } elseif ($alert['state'] == AlertState::WORSE) {
-                $obj['title'] .= ' got worse';
+                $obj['title'] .= ' Has worsened';
             } elseif ($alert['state'] == AlertState::BETTER) {
-                $obj['title'] .= ' got better';
+                $obj['title'] .= ' Has improved';
             }
 
             foreach ($extra['rule'] as $incident) {
@@ -314,6 +314,7 @@ class RunAlerts
                         $chk[$i]['ip'] = inet6_ntop($chk[$i]['ip']);
                     }
                 }
+                $alert['details']['rule'] ??= []; // if details.rule is missing, set it to an empty array
                 $o = count($alert['details']['rule']);
                 $n = count($chk);
                 $ret = 'Alert #' . $alert['id'];
@@ -391,6 +392,11 @@ class RunAlerts
                 $rextra['recovery'] = true;
             }
 
+            if (! isset($alert['details']['count'])) {
+                // make sure count is set for below code, in legacy code null would get type juggled to 0
+                $alert['details']['count'] = 0;
+            }
+
             $chk = dbFetchRow('SELECT alerts.alerted,devices.ignore,devices.disabled FROM alerts,devices WHERE alerts.device_id = ? && devices.device_id = alerts.device_id && alerts.rule_id = ?', [$alert['device_id'], $alert['rule_id']]);
 
             if ($chk['alerted'] == $alert['state']) {
@@ -410,7 +416,8 @@ class RunAlerts
                 }
 
                 if ($alert['state'] == AlertState::ACTIVE && ! empty($rextra['count']) && ($rextra['count'] == -1 || $alert['details']['count']++ < $rextra['count'])) {
-                    if ($alert['details']['count'] < $rextra['count']) {
+                    // We don't want -1 alert rule count alarms to get muted because of the current alert count
+                    if ($alert['details']['count'] < $rextra['count'] || $rextra['count'] == -1) {
                         $noacc = true;
                     }
 
@@ -433,7 +440,8 @@ class RunAlerts
                 }
 
                 if (in_array($alert['state'], [AlertState::ACTIVE, AlertState::WORSE, AlertState::BETTER]) && ! empty($rextra['count']) && ($rextra['count'] == -1 || $alert['details']['count']++ < $rextra['count'])) {
-                    if ($alert['details']['count'] < $rextra['count']) {
+                    // We don't want -1 alert rule count alarms to get muted because of the current alert count
+                    if ($alert['details']['count'] < $rextra['count'] || $rextra['count'] == -1) {
                         $noacc = true;
                     }
 
@@ -504,7 +512,6 @@ class RunAlerts
             $transport_maps[] = [
                 'transport_id' => null,
                 'transport_type' => 'mail',
-                'opts' => $obj,
             ];
         }
 
@@ -522,7 +529,7 @@ class RunAlerts
                 c_echo(" :: $transport_title => ");
                 try {
                     $instance = new $class(AlertTransport::find($item['transport_id']));
-                    $tmp = $instance->deliverAlert($obj, $item['opts'] ?? []);
+                    $tmp = $instance->deliverAlert($obj);
                     $this->alertLog($tmp, $obj, $obj['transport']);
                 } catch (AlertTransportDeliveryException $e) {
                     Eventlog::log($e->getTraceAsString() . PHP_EOL . $e->getMessage(), $obj['device_id'], 'alert', Severity::Error);
@@ -547,8 +554,8 @@ class RunAlerts
             AlertState::RECOVERED => 'recovery',
             AlertState::ACTIVE => $obj['severity'] . ' alert',
             AlertState::ACKNOWLEDGED => 'acknowledgment',
-            AlertState::WORSE => 'got worse',
-            AlertState::BETTER => 'got better',
+            AlertState::WORSE => 'worsened',
+            AlertState::BETTER => 'improved',
         ];
 
         $severity = match ($obj['state']) {

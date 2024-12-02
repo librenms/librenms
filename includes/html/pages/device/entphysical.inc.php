@@ -55,6 +55,8 @@ function printEntPhysical($device, $ent, $level, $class)
             echo '<strong>' . $display_entPhysicalName . '</strong>';
         } elseif ($ent['entPhysicalDescr']) {
             echo '<strong>' . $ent['entPhysicalDescr'] . '</strong>';
+        } elseif ($ent['entPhysicalClass']) {
+            echo '<strong>' . $ent['entPhysicalClass'] . '</strong>';
         }
 
         // Display matching sensor value (without descr, as we have only one)
