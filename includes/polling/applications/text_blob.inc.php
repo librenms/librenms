@@ -27,7 +27,7 @@ $app_data = [
     'warns' => [],
 ];
 
-if (isset($data['warns']) && is_array($data['warns']) && empty($data['warns'])) {
+if (isset($data['warns']) && is_array($data['warns']) && ! empty($data['warns'])) {
     $app_data['warns'] = $data['warns'];
     $metrics['has_warns'] = 1;
 }
@@ -35,10 +35,12 @@ if (isset($data['warns']) && is_array($data['warns']) && empty($data['warns'])) 
 $rrd_def = RrdDefinition::make()
     ->addDataset('data', 'GAUGE');
 
+$total_blob_size = 0;
+
 if (isset($data['blobs']) && is_array($data['blobs']) && !array_is_list($data['blobs'])) {
     foreach ($data['blobs'] as $blob_name => $blob) {
         if (is_scalar($data['blobs'][$blob_name])) {
-            $app_data=$data['blobs'][$blob_name];
+            $app_data['blobs'][$blob_name]=$data['blobs'][$blob_name];
 
             // save size info
             $stat_name = 'blobs___' . $blob_name . '___size';
@@ -47,6 +49,7 @@ if (isset($data['blobs']) && is_array($data['blobs']) && !array_is_list($data['b
             $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
             data_update($device, 'app', $tags, ['data' => $stat_value]);
             $metrics[$stat_name] = $stat_value;
+            $total_blob_size = $total_blob_size + $stat_value;
 
             // if we exit signal if we have it
             if (isset($data['blob_exit_signal']) &&
@@ -89,6 +92,13 @@ if (isset($data['blobs']) && is_array($data['blobs']) && !array_is_list($data['b
         }
     }
 }
+
+// save size info
+$stat_name = 'total_size';
+$rrd_name = $rrd_name = ['app', $name, $app->app_id, $stat_name];
+$tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
+data_update($device, 'app', $tags, ['data' => $total_size]);
+$metrics[$stat_name] = $total_size;
 
 $app->data = $app_data;
 update_application($app, 'OK', $metrics);
