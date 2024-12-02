@@ -1,4 +1,6 @@
 modules:
     os:
-        sysDescr_regex: '/(?<hardware>.*),(.*)/'
+        sysDescr_regex:
+            - '/(?<hardware>.*),(.*)/'
+            - '/(?<hardware>.*)/'
         serial: ENTITY-MIB::entPhysicalSerialNum.1
