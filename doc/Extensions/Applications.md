@@ -1750,6 +1750,56 @@ The application should be auto-discovered as described at the top of
 the page. If it is not, please follow the steps set out under `SNMP
 Extend` heading top of page.
 
+## Nextcloud
+
+### SNMP
+
+1. Copy the shell script to the desired host.
+```
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/nextcloud -O /etc/snmp/nextcloud
+```
+
+2. Make the script executable
+```
+chmod +x /etc/snmp/nextcloud
+```
+
+3. Install depends.
+```
+# FreeBSD
+pkg install p5-JSON p5-File-Slurp p5-MIME-Base64 p5-Time-Piece
+
+# Debian
+apt-get install libjson-perl libfile-slurp-perl libmime-base64-perl cpanminus
+cpanm Time::Piece
+
+# generic cpanm
+cpanm JSON File::Slurp Mime::Base64 Time::Piece
+
+# CentOS / RHEL
+dnf install perl-JSON perl-File-Slurp perl-MIME-Base64 perl-String-ShellQuote perl-Time-Piece
+```
+
+4. Create the cache dir and chown it to the user Nextcloud is running
+   as.
+```
+mkdir /var/cache/nextcloud_extend
+chown -R $nextcloud_user /var/cache/nextcloud_extend
+```
+
+5. Set it up in the crontab for the Nextcloud user using `-i` to point
+   it to the Nextcloud install dir.
+```
+*/5 * * * * /etc/snmpd/nextcloud -q -i $install_dir
+```
+
+6. Add it to snmpd.conf
+```
+extend nextcloud /bin/cat /var/cache/nextcloud_extend/snmp
+```
+
+Then just wait for it to be rediscovered.
+
 ## NGINX
 
 NGINX is a free, open-source, high-performance HTTP server: <https://www.nginx.org/>
