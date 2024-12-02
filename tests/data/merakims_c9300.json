@@ -11,7 +11,7 @@
                     "hardware": "C9300 - 48 Cisco UPOE",
                     "features": null,
                     "location": "<private>",
-                    "os": "merakics",
+                    "os": "merakims",
                     "type": "network",
                     "serial": "A1BC-D2EF-34GH",
                     "icon": "meraki.png"
