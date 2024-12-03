@@ -594,6 +594,9 @@ $graphs['nfs'] = [
     'client_rpc',
     'client_cache',
 ];
+$graphs['text_blob'] = [
+    "total_size",
+]
 $graphs['nextcloud'] = [
     'used',
     'calendars',
