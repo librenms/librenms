@@ -23,7 +23,7 @@
                     "app_state_prev": "UNKNOWN",
                     "app_status": "",
                     "app_instance": "",
-                    "data": null,
+                    "data": "{\"blobs\":{\"bar\":\"1\",\"foo\":\" 2\"},\"warns\":[]}",
                     "deleted_at": null
                 }
             ],
@@ -42,7 +42,7 @@
                 },
                 {
                     "metric": "blobs___bar___has_coredump",
-                    "value": 1,
+                    "value": 0,
                     "value_prev": null,
                     "app_type": "text_blob"
                 },
@@ -66,7 +66,7 @@
                 },
                 {
                     "metric": "blobs___foo___has_coredump",
-                    "value": 1,
+                    "value": 0,
                     "value_prev": null,
                     "app_type": "text_blob"
                 },
@@ -76,6 +76,12 @@
                     "value_prev": null,
                     "app_type": "text_blob"
                 },
+                {
+                    "metric": "has_warns",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "text_blob"
+                }
                 {
                     "metric": "total_size",
                     "value": 3,
