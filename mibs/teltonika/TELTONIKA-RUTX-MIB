@@ -3,10 +3,10 @@ TELTONIKA-RUTX-MIB DEFINITIONS ::= BEGIN
 IMPORTS
     OBJECT-TYPE, NOTIFICATION-TYPE, MODULE-IDENTITY,
     Integer32, Opaque, enterprises, Counter64,
-    IpAddress											FROM SNMPv2-SMI
+    IpAddress                                                                                   FROM SNMPv2-SMI
     TEXTUAL-CONVENTION, DisplayString, TruthValue,
-	PhysAddress											FROM SNMPv2-TC
-	NetworkAddress                                      FROM RFC1155-SMI;
+        PhysAddress                                                                                     FROM SNMPv2-TC
+        NetworkAddress                                      FROM RFC1155-SMI;
 
 teltonika MODULE-IDENTITY
     LAST-UPDATED "201905150000Z"
@@ -20,12 +20,11 @@ teltonika MODULE-IDENTITY
             "Initial version"
     ::= { enterprises 48690 }
 
-
 device                  OBJECT IDENTIFIER ::= { teltonika 1 }
 mobile                  OBJECT IDENTIFIER ::= { teltonika 2 }
 gps                     OBJECT IDENTIFIER ::= { teltonika 3 }
 notifications           OBJECT IDENTIFIER ::= { teltonika 4 }
-hotspot					OBJECT IDENTIFIER ::= { teltonika 5 }
+hotspot                                 OBJECT IDENTIFIER ::= { teltonika 5 }
 io                      OBJECT IDENTIFIER ::= { teltonika 6 }
 mobileNotifications     OBJECT IDENTIFIER ::= { notifications 1 }
 ioNotifications         OBJECT IDENTIFIER ::= { notifications 2 }
@@ -72,12 +71,20 @@ hardwareRevision OBJECT-TYPE
     ::= { device 5 }
 
 fwVersion OBJECT-TYPE
-	SYNTAX      DisplayString (SIZE (0..255))
-	MAX-ACCESS  read-only
-	STATUS      current
-	DESCRIPTION
-			"Router firmware version"
-	::= { device 6 }
+        SYNTAX      DisplayString (SIZE (0..255))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                        "Router firmware version"
+        ::= { device 6 }
+
+connectionUptime OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Connection Uptime"
+    ::= { mobile 3 }
 
 --
 --GSM
@@ -390,11 +397,11 @@ datetime OBJECT-TYPE
     ::= { gps 4 }
 
 numSatellites OBJECT-TYPE
-    SYNTAX 	Integer32
+    SYNTAX      Integer32
     MAX-ACCESS  read-only
-    STATUS	current
+    STATUS      current
     DESCRIPTION
-	"Number of satellites"
+        "Number of satellites"
     ::= { gps 5 }
 
 --
@@ -403,7 +410,7 @@ numSatellites OBJECT-TYPE
 
 hsState  OBJECT-TYPE
     SYNTAX     INTEGER {
-    						enabled(1),  -- Hotspot service enabled
+                                                enabled(1),  -- Hotspot service enabled
                             disabled(0)    -- Hotspot service disabled
                        }
     MAX-ACCESS  read-only
@@ -437,12 +444,12 @@ hsAuth  OBJECT-TYPE
     ::= { hotspot 4 }
 
 hsSessionCount  OBJECT-TYPE
-	SYNTAX      Counter64
-	MAX-ACCESS  read-only
-	STATUS      current
-	DESCRIPTION
-			"Number of sessions"
-	::= { hotspot 5 }
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                        "Number of sessions"
+        ::= { hotspot 5 }
 
 hsSessionTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF HsSessionEntry
@@ -464,19 +471,19 @@ hsSessionEntry OBJECT-TYPE
 
 HsSessionEntry ::=
     SEQUENCE {
-        hssIndex			INTEGER,
-        hssMAC				PhysAddress,
-        hssIP				IpAddress,
-        hssID				DisplayString,
-        hssUsername			DisplayString,
-        hssState			TruthValue,
-        hssDwLimit			Counter64,
-        hssUpLimit			Counter64,
-        hssTimeLimit		Counter64,
-        hssIdleTimeout		Integer32,
-        hssDwBandwidth		Counter64,
-        hssUpBandwidth		Counter64,
-        hssURL				DisplayString
+        hssIndex                        INTEGER,
+        hssMAC                          PhysAddress,
+        hssIP                           IpAddress,
+        hssID                           DisplayString,
+        hssUsername                     DisplayString,
+        hssState                        TruthValue,
+        hssDwLimit                      Counter64,
+        hssUpLimit                      Counter64,
+        hssTimeLimit            Counter64,
+        hssIdleTimeout          Integer32,
+        hssDwBandwidth          Counter64,
+        hssUpBandwidth          Counter64,
+        hssURL                          DisplayString
     }
 
 hssIndex OBJECT-TYPE
@@ -488,115 +495,115 @@ hssIndex OBJECT-TYPE
     ::= { hsSessionEntry 1 }
 
 hssMAC OBJECT-TYPE
-	SYNTAX      PhysAddress
-	MAX-ACCESS  read-only
-	STATUS      current
-	DESCRIPTION
-			"Clients MAC address"
-	::= { hsSessionEntry 2 }
+        SYNTAX      PhysAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                        "Clients MAC address"
+        ::= { hsSessionEntry 2 }
 
 hssIP OBJECT-TYPE
-	SYNTAX      IpAddress
-	MAX-ACCESS  read-only
-	STATUS      current
-	DESCRIPTION
-			"Clients IP address"
-	::= { hsSessionEntry 3 }
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                        "Clients IP address"
+        ::= { hsSessionEntry 3 }
 
 hssID OBJECT-TYPE
-	SYNTAX      DisplayString
-	MAX-ACCESS  read-only
-	STATUS      current
-	DESCRIPTION
-			"Session ID"
-	::= { hsSessionEntry 4 }
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                        "Session ID"
+        ::= { hsSessionEntry 4 }
 
 hssUsername OBJECT-TYPE
-	SYNTAX      DisplayString (SIZE (0..255))
-	MAX-ACCESS  read-only
-	STATUS      current
-	DESCRIPTION
-			"Username"
-	::= { hsSessionEntry 5 }
+        SYNTAX      DisplayString (SIZE (0..255))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                        "Username"
+        ::= { hsSessionEntry 5 }
 
 hssState OBJECT-TYPE
-	SYNTAX     INTEGER {
-						notAuthorized(0),  -- user is authorized
+        SYNTAX     INTEGER {
+                                                notAuthorized(0),  -- user is authorized
                         authorized(1)    -- user is not authorized
                    }
-	MAX-ACCESS  read-only
-	STATUS      current
-	DESCRIPTION
-			"Session state"
-	::= { hsSessionEntry 6 }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                        "Session state"
+        ::= { hsSessionEntry 6 }
 
 hssDwLimit OBJECT-TYPE
-	SYNTAX      Counter64
-	MAX-ACCESS  read-only
-	STATUS      current
-	DESCRIPTION
-			"Download limit in bytes. Cannot be accessed using SNMPv1."
-	::= { hsSessionEntry 7 }
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                        "Download limit in bytes. Cannot be accessed using SNMPv1."
+        ::= { hsSessionEntry 7 }
 
 hssUpLimit OBJECT-TYPE
-	SYNTAX      Counter64
-	MAX-ACCESS  read-only
-	STATUS      current
-	DESCRIPTION
-			"Upload limit in bytes. Cannot be accessed using SNMPv1."
-	::= { hsSessionEntry 8 }
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                        "Upload limit in bytes. Cannot be accessed using SNMPv1."
+        ::= { hsSessionEntry 8 }
 
 hssTimeLimit OBJECT-TYPE
-	SYNTAX      Counter64
-	MAX-ACCESS  read-only
-	STATUS      current
-	DESCRIPTION
-			"Time limit in sec. Cannot be accessed using SNMPv1."
-	::= { hsSessionEntry 9 }
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                        "Time limit in sec. Cannot be accessed using SNMPv1."
+        ::= { hsSessionEntry 9 }
 
 hssIdleTimeout OBJECT-TYPE
-	SYNTAX      Integer32
-	MAX-ACCESS  read-only
-	STATUS      current
-	DESCRIPTION
-			"Idle timeout in sec."
-	::= { hsSessionEntry 10 }
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                        "Idle timeout in sec."
+        ::= { hsSessionEntry 10 }
 
 hssDwBandwidth OBJECT-TYPE
-	SYNTAX      Counter64
-	MAX-ACCESS  read-only
-	STATUS      current
-	DESCRIPTION
-			"Max download bandwidth in b/s. Cannot be accessed using SNMPv1."
-	::= { hsSessionEntry 11 }
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                        "Max download bandwidth in b/s. Cannot be accessed using SNMPv1."
+        ::= { hsSessionEntry 11 }
 
 hssUpBandwidth OBJECT-TYPE
-	SYNTAX      Counter64
-	MAX-ACCESS  read-only
-	STATUS      current
-	DESCRIPTION
-			"Max upwnload bandwidth in b/s. Cannot be accessed using SNMPv1."
-	::= { hsSessionEntry 12 }
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                        "Max upwnload bandwidth in b/s. Cannot be accessed using SNMPv1."
+        ::= { hsSessionEntry 12 }
 
 hssURL OBJECT-TYPE
-	SYNTAX      DisplayString
-	MAX-ACCESS  read-only
-	STATUS      current
-	DESCRIPTION
-			"Original URL"
-	::= { hsSessionEntry 13 }
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                        "Original URL"
+        ::= { hsSessionEntry 13 }
 
 --
 -- I/O
 --
 
 ioCount  OBJECT-TYPE
-	SYNTAX      INTEGER
-	MAX-ACCESS  read-only
-	STATUS      current
-	DESCRIPTION
-			"Count of I/O"
-	::= { io 1 }
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                        "Count of I/O"
+        ::= { io 1 }
 
 ioTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF IOEntry
@@ -635,7 +642,7 @@ ioIndex OBJECT-TYPE
     STATUS      current
     DESCRIPTION
             "A unique value, greater than zero, for each session."
-    ::= { ioEntry 1 } 
+    ::= { ioEntry 1 }
 
 ioSystemName OBJECT-TYPE
     SYNTAX      DisplayString
@@ -643,7 +650,7 @@ ioSystemName OBJECT-TYPE
     STATUS      current
     DESCRIPTION
             "The name of the I/O."
-    ::= { ioEntry 2 } 
+    ::= { ioEntry 2 }
 
 ioName OBJECT-TYPE
     SYNTAX      DisplayString
@@ -651,7 +658,7 @@ ioName OBJECT-TYPE
     STATUS      current
     DESCRIPTION
             "The name of the I/O, as displayed in WebUI."
-    ::= { ioEntry 3 } 
+    ::= { ioEntry 3 }
 
 ioType OBJECT-TYPE
     SYNTAX      DisplayString
@@ -659,7 +666,7 @@ ioType OBJECT-TYPE
     STATUS      current
     DESCRIPTION
             "A description of I/O type."
-    ::= { ioEntry 4 } 
+    ::= { ioEntry 4 }
 
 ioBidirectional OBJECT-TYPE
     SYNTAX      INTEGER
@@ -667,7 +674,7 @@ ioBidirectional OBJECT-TYPE
     STATUS      current
     DESCRIPTION
             "Is I/O bidirectional?"
-    ::= { ioEntry 5 } 
+    ::= { ioEntry 5 }
 
 ioState OBJECT-TYPE
     SYNTAX      DisplayString
@@ -675,7 +682,7 @@ ioState OBJECT-TYPE
     STATUS      current
     DESCRIPTION
             "State of I/O."
-    ::= { ioEntry 6 } 
+    ::= { ioEntry 6 }
 
 ioInput OBJECT-TYPE
     SYNTAX      INTEGER
@@ -683,7 +690,7 @@ ioInput OBJECT-TYPE
     STATUS      current
     DESCRIPTION
             "Is I/O an input?"
-    ::= { ioEntry 7 } 
+    ::= { ioEntry 7 }
 
 ioInverted OBJECT-TYPE
     SYNTAX      INTEGER
@@ -691,7 +698,7 @@ ioInverted OBJECT-TYPE
     STATUS      current
     DESCRIPTION
             "Is value of I/O inverted?"
-    ::= { ioEntry 8 } 
+    ::= { ioEntry 8 }
 
 ioCurrent OBJECT-TYPE
     SYNTAX      DisplayString
@@ -699,7 +706,7 @@ ioCurrent OBJECT-TYPE
     STATUS      current
     DESCRIPTION
             "Current amount flowing though ACL."
-    ::= { ioEntry 9 } 
+    ::= { ioEntry 9 }
 
 ioPercentage OBJECT-TYPE
     SYNTAX      DisplayString
@@ -707,7 +714,7 @@ ioPercentage OBJECT-TYPE
     STATUS      current
     DESCRIPTION
             "Percentage of ACL."
-    ::= { ioEntry 10 } 
+    ::= { ioEntry 10 }
 
 --
 -- Traps
@@ -752,6 +759,5 @@ dinState OBJECT-TYPE
     DESCRIPTION
             "Digital input state"
     ::= { ioNotificationsObs 1 }
-
 
 END
