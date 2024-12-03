@@ -70,6 +70,7 @@ if (Debug::set(isset($options['d']), false) || isset($options['v'])) {
     echo "DEBUG!\n";
     Debug::setVerbose(isset($options['v']));
     \LibreNMS\Util\OS::updateCache(true); // Force update of OS Cache
+    LibrenmsConfig::invalidateAndReload();
 }
 
 if (! $where) {

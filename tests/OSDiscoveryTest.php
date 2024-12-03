@@ -42,7 +42,7 @@ class OSDiscoveryTest extends TestCase
     {
         parent::setUpBeforeClass();
 
-        $glob = Config::get('install_dir') . '/tests/snmpsim/*.snmprec';
+        $glob = realpath(__DIR__ . '/..') . '/tests/snmpsim/*.snmprec';
 
         self::$unchecked_files = array_flip(array_filter(array_map(function ($file) {
             return basename($file, '.snmprec');
