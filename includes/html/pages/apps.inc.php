@@ -596,7 +596,7 @@ $graphs['nfs'] = [
 ];
 $graphs['text_blob'] = [
     "total_size",
-]
+];
 $graphs['nextcloud'] = [
     'used',
     'calendars',
