@@ -37,10 +37,10 @@ $rrd_def = RrdDefinition::make()
 
 $total_blob_size = 0;
 
-if (isset($data['blobs']) && is_array($data['blobs']) && !array_is_list($data['blobs'])) {
+if (isset($data['blobs']) && is_array($data['blobs']) && ! array_is_list($data['blobs'])) {
     foreach ($data['blobs'] as $blob_name => $blob) {
         if (is_scalar($data['blobs'][$blob_name])) {
-            $app_data['blobs'][$blob_name]=$data['blobs'][$blob_name];
+            $app_data['blobs'][$blob_name] = $data['blobs'][$blob_name];
 
             // save size info
             $stat_name = 'blobs___' . $blob_name . '___size';

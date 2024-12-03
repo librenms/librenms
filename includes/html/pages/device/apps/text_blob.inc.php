@@ -10,7 +10,7 @@ $link_array = [
 $blobs = $app->data['blobs'] ?? [];
 $warns = $app->data['warns'] ?? [];
 
-if (!is_array($blobs)) {
+if (! is_array($blobs)) {
     $blobs = [];
 }
 
@@ -40,12 +40,12 @@ foreach ($blob_names as $index => $blob_name) {
     }
 }
 
-if (isset($warns) && is_array($warns) && !empty($warns)) {
+if (isset($warns) && is_array($warns) && ! empty($warns)) {
     echo '<br>Config Warnings: <pre>' . str_replace("\n", "<br>\n", htmlspecialchars(implode("\n", $warns))) . '<pre>';
 }
 
 if (isset($vars['blob_name']) && isset($blobs[$vars['blob_name']]) && is_scalar($blobs[$vars['blob_name']])) {
-    echo '<hr><pre>' . str_replace("\n", "<br>", htmlspecialchars($blobs[$vars['blob_name']])) . '</pre>';
+    echo '<hr><pre>' . str_replace("\n", '<br>', htmlspecialchars($blobs[$vars['blob_name']])) . '</pre>';
 }
 
 print_optionbar_end();
