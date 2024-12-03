@@ -1,0 +1,88 @@
+{
+    "applications": {
+        "discovery": {
+            "applications": [
+                {
+                    "app_type": "text_blob",
+                    "app_state": "UNKNOWN",
+                    "discovered": 1,
+                    "app_state_prev": null,
+                    "app_status": "",
+                    "app_instance": "",
+                    "data": null,
+                    "deleted_at": null
+                }
+            ]
+        },
+        "poller": {
+            "applications": [
+                {
+                    "app_type": "text_blob",
+                    "app_state": "OK",
+                    "discovered": 1,
+                    "app_state_prev": "UNKNOWN",
+                    "app_status": "",
+                    "app_instance": "",
+                    "data": null,
+                    "deleted_at": null
+                }
+            ],
+            "application_metrics": [
+                {
+                    "metric": "blobs___bar___exit",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "text_blob"
+                },
+                {
+                    "metric": "blobs___bar___exit_signal",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "text_blob"
+                },
+                {
+                    "metric": "blobs___bar___has_coredump",
+                    "value": 1,
+                    "value_prev": null,
+                    "app_type": "text_blob"
+                },
+                {
+                    "metric": "blobs___bar___size",
+                    "value": 1,
+                    "value_prev": null,
+                    "app_type": "text_blob"
+                },
+                {
+                    "metric": "blobs___foo___exit",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "text_blob"
+                },
+                {
+                    "metric": "blobs___foo___exit_signal",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "text_blob"
+                },
+                {
+                    "metric": "blobs___foo___has_coredump",
+                    "value": 1,
+                    "value_prev": null,
+                    "app_type": "text_blob"
+                },
+                {
+                    "metric": "blobs___foo___size",
+                    "value": 2,
+                    "value_prev": null,
+                    "app_type": "text_blob"
+                },
+                {
+                    "metric": "total_size",
+                    "value": 3,
+                    "value_prev": null,
+                    "app_type": "text_blob"
+                }
+            ]
+        }
+    }
+}
