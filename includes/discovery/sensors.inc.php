@@ -25,6 +25,9 @@ if ($device['os'] == 'openbsd') {
 
 if ($device['os'] == 'linux') {
     include 'includes/discovery/sensors/rpigpiomonitor.inc.php';
+}
+
+if ($device['os_group'] == 'unix') {
     include 'includes/discovery/sensors/custom.inc.php';
 }
 
