@@ -81,7 +81,7 @@
                     "value": 0,
                     "value_prev": null,
                     "app_type": "text_blob"
-                }
+                },
                 {
                     "metric": "total_size",
                     "value": 3,
