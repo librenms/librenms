@@ -14,7 +14,6 @@ modules:
                 -
                     oid:
                         - ifDescr
-                        - ifAlias
         ber:
             data:
                 -
