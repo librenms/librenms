@@ -597,6 +597,14 @@ $graphs['nfs'] = [
     'client_rpc',
     'client_cache',
 ];
+$graphs['nextcloud'] = [
+    'used',
+    'calendars',
+    'disabled_apps',
+    'enabled_apps',
+    'encryption_enabled',
+    'user_count',
+];
 $graphs['poudriere'] = [
     'status',
     'phase',
