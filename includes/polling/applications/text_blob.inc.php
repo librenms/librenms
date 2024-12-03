@@ -48,7 +48,7 @@ if (isset($data['blobs']) && is_array($data['blobs']) && ! array_is_list($data['
             $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
             data_update($device, 'app', $tags, ['data' => $stat_value]);
             $metrics[$stat_name] = $stat_value;
-            $metrics['total_size'] = metrics['total_size'] + $stat_value;
+            $metrics['total_size'] = $metrics['total_size'] + $stat_value;
 
             // if we exit signal if we have it
             if (isset($data['blob_exit_signal']) &&
