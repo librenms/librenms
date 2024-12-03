@@ -3,7 +3,10 @@ text: Positron Access Solutions GAM
 icon: positron-access
 over:
     - { graph: device_bits, text: Traffic }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_temperature, text: 'Temperatures' }
 type: network
+mib_dir: positron
 discovery:
     -
         sysObjectID:
