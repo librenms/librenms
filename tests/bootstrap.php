@@ -83,7 +83,6 @@ if (getenv('DBTEST')) {
     unset($db_config);
 }
 
-\LibreNMS\Util\OS::updateCache(true); // Force update of OS Cache
 LibrenmsConfig::invalidateAndReload();
 
 app()->terminate(); // destroy the bootstrap Laravel application
