@@ -32,7 +32,6 @@ use LibreNMS\Data\Source\NetSnmpQuery;
 use LibreNMS\Modules\Core;
 use LibreNMS\Tests\Mocks\SnmpQueryMock;
 use LibreNMS\Util\Debug;
-use LibreNMS\Util\OS;
 
 class OSDiscoveryTest extends TestCase
 {
@@ -164,7 +163,6 @@ class OSDiscoveryTest extends TestCase
         // make sure all OS are loaded
         $config_os = array_keys(Config::get('os'));
         if (count($config_os) < count(glob(Config::get('install_dir') . '/includes/definitions/*.yaml'))) {
-            OS::loadAllDefinitions(false, true);
             $config_os = array_keys(Config::get('os'));
         }
 

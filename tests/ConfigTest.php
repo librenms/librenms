@@ -100,6 +100,10 @@ class ConfigTest extends TestCase
         $this->assertFalse(Config::getOsSetting('nullos', 'unset', false), 'Non-existing settings should return $default');
         $this->assertTrue(Config::getOsSetting('nullos', 'fancy'), 'Failed to get setting');
         $this->assertNull(Config::getOsSetting('nullos', 'fallback'), 'Incorrectly loaded global setting');
+
+        // load yaml
+        $this->assertSame('ios', Config::getOsSetting('ios', 'os'));
+        $this->assertGreaterThan(500, count(Config::get('os')), 'Not all OS were loaded from yaml');
     }
 
     public function testGetCombined(): void

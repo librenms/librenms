@@ -1,6 +1,7 @@
 #!/usr/bin/env php
 <?php
 
+use App\Facades\LibrenmsConfig;
 use LibreNMS\Exceptions\InvalidModuleException;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\ModuleTestHelper;
@@ -143,7 +144,6 @@ try {
         }
         echo PHP_EOL;
 
-        \LibreNMS\Util\OS::updateCache(true); // Force update of OS Cache
         LibrenmsConfig::invalidateAndReload();
         $tester = new ModuleTestHelper($modules, $target_os, $target_variant);
         if (! $no_save && ! empty($output_file)) {
