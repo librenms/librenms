@@ -644,21 +644,22 @@ Write a script in your preferred programming language (e.g., Python, Bash)
 to fetch sensor data. Save the script in a directory like /etc/snmp/.
 
 The script should output sensor data in the following format:
-
+```
 [unique_name1],[sensor_type],[description1],[low_limit],[low_warn_limit],[high_warn_limit],[high_limit],[group];
 [current_value1]
 [unique_name2],[sensor_type],[description2],[low_limit],[low_warn_limit],[high_warn_limit],[high_limit];
 [current_value2]
+```
 
-    unique_name: A unique identifier for the sensor.
-    sensor_type: The type of the sensor (e.g., signal, count, temperature).
-    description: A human-readable description of the sensor.
-    low_limit: Minimum acceptable value (leave blank if not applicable).
-    low_warn_limit: Value triggering a low warning (leave blank if not applicable).
-    high_warn_limit: Value triggering a high warning (leave blank if not applicable).
-    high_limit: Maximum acceptable value (leave blank if not applicable).
-    group: Groups Sensors in the device overview.
-    current_value: The current reading from the sensor.
+| unique_name      | A unique identifier for the sensor.                              |
+| sensor_type      | The type of the sensor (e.g., signal, count, temperature).       |
+| description      | A human-readable description of the sensor.                      |
+| low_limit        | Minimum acceptable value (leave blank if not applicable).        |
+| low_warn_limit   | Value triggering a low warning (leave blank if not applicable).  |
+| high_warn_limit  | Value triggering a high warning (leave blank if not applicable). |
+| high_limit       | Maximum acceptable value (leave blank if not applicable).        |
+| group            | Groups Sensors in the device overview.                           |
+| current_value    | The current reading from the sensor.                             |
 
 2. Example Script
 
