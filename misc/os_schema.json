@@ -366,6 +366,9 @@
         "ifname": {
             "type": "boolean"
         },
+        "ifalias": {
+            "type": "boolean"
+        },
         "mib_dir": {
             "type":  "string"
         },
