@@ -3,10 +3,7 @@ modules:
   os:
     hardware: DigiPower-PDU-MIB::pdu01ModelNo.0
     version: DigiPower-PDU-MIB::devVersion.0
-    # this device seems to only support 2 OIDs per request,
-    # so we can't query for mac address as the serial
-    # as part of discovery
-    #serial: DigiPower-PDU-MIB::devMAC.0
+    serial: DigiPower-PDU-MIB::devMAC.0
   sensors:
     current:
       options:
