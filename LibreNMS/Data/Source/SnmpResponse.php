@@ -201,7 +201,7 @@ class SnmpResponse
     public function groupByIndex(int $index_count = 1, array &$array = []): array
     {
         foreach ($this->values() as $oid => $value) {
-            $parts = $this->getOidParts($oid);
+            $parts = $this->getOidParts(ltrim($oid, '.')); // trim leftmost . so negative counts work as expected
             $suffix = array_slice($parts, -$index_count);
             $index = implode('.', $suffix);
 
