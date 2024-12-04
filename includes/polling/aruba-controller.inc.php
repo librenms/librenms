@@ -8,8 +8,6 @@ use LibreNMS\Util\Mac;
 if ($device['type'] == 'wireless' && $device['os'] == 'arubaos') {
     // get data about the controller
     $aruba_stats = SnmpQuery::get([
-//        'WLSX-SWITCH-MIB::wlsxSwitchRole.0',
-//        'WLSX-SWITCH-MIB::wlsxSwitchMasterIp.0',
         'WLSX-SWITCH-MIB::wlsxSwitchTotalNumAccessPoints.0',
         'WLSX-SWITCH-MIB::wlsxSwitchTotalNumStationsAssociated.0',
     ])->values();
