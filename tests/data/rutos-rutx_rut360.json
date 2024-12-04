@@ -638,34 +638,6 @@
                     "state_generic_value": 0
                 },
                 {
-                    "state_name": "TELTONIKA-RUTX-MIB::ioInput",
-                    "state_descr": "Digital Output",
-                    "state_draw_graph": 1,
-                    "state_value": 0,
-                    "state_generic_value": 0
-                },
-                {
-                    "state_name": "TELTONIKA-RUTX-MIB::ioInput",
-                    "state_descr": "Digital Input",
-                    "state_draw_graph": 1,
-                    "state_value": 1,
-                    "state_generic_value": 0
-                },
-                {
-                    "state_name": "TELTONIKA-RUTX-MIB::ioState",
-                    "state_descr": "Low",
-                    "state_draw_graph": 1,
-                    "state_value": 0,
-                    "state_generic_value": 0
-                },
-                {
-                    "state_name": "TELTONIKA-RUTX-MIB::ioState",
-                    "state_descr": "High",
-                    "state_draw_graph": 1,
-                    "state_value": 1,
-                    "state_generic_value": 2
-                },
-                {
                     "state_name": "TELTONIKA-RUTX-MIB::NetState",
                     "state_descr": "searching",
                     "state_draw_graph": 1,
@@ -864,7 +836,7 @@
             ]
         },
         "poller": "matches discovery"
-    },    
+    },
     "wireless": {
         "discovery": {
             "wireless_sensors": [
