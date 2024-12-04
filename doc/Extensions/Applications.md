@@ -650,7 +650,8 @@ The script should output sensor data in the following format:
 [unique_name2],[sensor_type],[description2],[low_limit],[low_warn_limit],[high_warn_limit],[high_limit];
 [current_value2]
 ```
-
+| Value            | Description                                                      |
+|------------------|------------------------------------------------------------------|
 | unique_name      | A unique identifier for the sensor.                              |
 | sensor_type      | The type of the sensor (e.g., signal, count, temperature).       |
 | description      | A human-readable description of the sensor.                      |
