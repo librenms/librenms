@@ -72,9 +72,6 @@
                 "cisco-mac-accounting": {
                     "type": "boolean"
                 },
-                "cisco-voice": {
-                    "type": "boolean"
-                },
                 "cisco-remote-access-monitor": {
                     "type": "boolean"
                 },

@@ -2805,14 +2805,6 @@
             },
             "type": "graph"
         },
-        "graph_types.device.cisco-voice-ip": {
-            "default": {
-                "section": "voice",
-                "order": 0,
-                "descr": "IP Real Time Calls"
-            },
-            "type": "graph"
-        },
         "graph_types.device.cisco_wwan_mnc": {
             "default": {
                 "section": "wireless",
@@ -5431,13 +5423,6 @@
         },
         "poller_modules.cisco-asa-firewall": {
             "order": 60,
-            "group": "poller",
-            "section": "poller_modules",
-            "default": false,
-            "type": "boolean"
-        },
-        "poller_modules.cisco-voice": {
-            "order": 150,
             "group": "poller",
             "section": "poller_modules",
             "default": false,

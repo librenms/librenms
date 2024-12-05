@@ -18,7 +18,6 @@ poller_modules:
     cisco-otv: false
     cisco-remote-access-monitor: false
     slas: false
-    cisco-voice: false
     ipmi: false
     ospf: false
     printer-supplies:   false

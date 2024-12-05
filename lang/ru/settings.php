@@ -1347,9 +1347,6 @@ return [
             'cisco-asa-firewall' => [
                 'description' => 'Firewall Cisco ASA',
             ],
-            'cisco-voice' => [
-                'description' => 'Голос Cisco',
-            ],
             'cisco-cbqos' => [
                 'description' => 'Cisco CBQOS',
             ],
