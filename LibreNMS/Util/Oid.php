@@ -33,7 +33,8 @@ class Oid
 {
     public function __construct(
         public readonly string $oid
-    ) {}
+    ) {
+    }
 
     public static function of(string $oid): static
     {
@@ -93,6 +94,7 @@ class Oid
 
     /**
      * Convert this OID to an IP
+     *
      * @throws InvalidIpException
      */
     public function toIp(): IP
