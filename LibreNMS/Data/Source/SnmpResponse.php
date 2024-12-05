@@ -193,6 +193,28 @@ class SnmpResponse
         return $output;
     }
 
+    /**
+     * Group values by index as specified by $index_count
+     * Useful when dealing with numeric oids
+     * (By default this counts from right to left, using a negative index count will count from left to right)
+     */
+    public function groupByIndex(int $index_count = 1, array &$array = []): array
+    {
+        foreach ($this->values() as $oid => $value) {
+            $parts = $this->getOidParts(ltrim($oid, '.')); // trim leftmost . so negative counts work as expected
+            $suffix = array_slice($parts, -$index_count);
+            $index = implode('.', $suffix);
+
+            $array[$index][$oid] = $value;
+        }
+
+        return $array;
+    }
+
+    /**
+     * Separate the index from the OID name
+     * Insert into array as index => oidName
+     */
     public function valuesByIndex(array &$array = []): array
     {
         foreach ($this->values() as $oid => $value) {
