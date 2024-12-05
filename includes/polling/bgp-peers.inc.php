@@ -137,7 +137,7 @@ if (! empty($peers)) {
                     $peer_data['bgpPeerLastErrorSubCode'] = intval($error_data[1]);
 
                     try {
-                        $peer_data['bgpLocalAddr'] = IP::fromHexString($junos[$address]['BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerLocalAddr'])->compressed();
+                        $peer_data['bgpLocalAddr'] = IP::fromHexString($junos[$address]['BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerLocalAddr'])->uncompressed();
                     } catch (InvalidIpException $e) {
                         $peer_data['bgpLocalAddr'] = '';
                     }
