@@ -6,8 +6,6 @@
  * @author     peca.nesovanovic <peca.nesovanovic@sattrakt.com>
  */
 
-use LibreNMS\Util\Oid;
-
 echo 'RFC1628 ';
 
 // Battery Status (Value : 1 unknown, 2 batteryNormal, 3 batteryLow, 4 batteryDepleted)
@@ -109,12 +107,11 @@ if (is_numeric($state)) {
     );
 
     $sensor_index = 0;
-    $oid = oid::toNumeric('UPS-MIB::upsTestResultsSummary.0');
     discover_sensor(
         null,
         'state',
         $device,
-        $oid,
+        '.1.3.6.1.2.1.33.1.7.3.0',
         $sensor_index,
         $state_name,
         'UPS Test',

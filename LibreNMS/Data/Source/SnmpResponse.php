@@ -108,7 +108,7 @@ class SnmpResponse
         foreach ($oids as $oid) {
             if ($forceNumeric) {
                 // translate all to numeric to make it easier to match
-                $oid = Oid::toNumeric($oid);
+                $oid = Oid::of($oid)->toNumeric();
             }
 
             if (isset($values[$oid]) && $values[$oid] !== '') {

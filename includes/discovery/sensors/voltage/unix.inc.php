@@ -21,6 +21,7 @@
  *
  * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  */
+
 use LibreNMS\Util\Oid;
 
 $snmpData = SnmpQuery::cache()->hideMib()->walk('LM-SENSORS-MIB::lmSensors')->table(1);
@@ -33,7 +34,7 @@ if (! empty($snmpData)) {
         $descr = $lmData[$type . 'Device'];
         $value = intval($lmData[$type . 'Value']) / $divisor;
         if (! empty($descr)) {
-            $oid = Oid::toNumeric('LM-SENSORS-MIB::' . $type . 'Value.' . $index);
+            $oid = Oid::of('LM-SENSORS-MIB::' . $type . 'Value.' . $index)->toNumeric();
             discover_sensor(null, 'voltage', $device, $oid, $index, 'lmsensors', $descr, $divisor, 1, null, null, null, null, $value, 'snmp', null, null, null, 'lmsensors');
         }
     }
@@ -53,7 +54,7 @@ if (! empty($snmpData)) {
         if ($upsnut[$index]) {
             $value = $upsData['nsExtendOutLine'];
             if (is_numeric($value)) {
-                $oid = Oid::toNumeric('NET-SNMP-EXTEND-MIB::nsExtendOutLine."ups-nut".' . $index);
+                $oid = Oid::of('NET-SNMP-EXTEND-MIB::nsExtendOutLine."ups-nut".' . $index)->toNumeric();
                 discover_sensor(
                     null,
                     'voltage',
