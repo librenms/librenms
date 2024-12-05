@@ -173,7 +173,7 @@
                     $.each( device["parents"], function( parent_idx, parent_id ) {
                         link_id = device_id + "." + parent_id;
                         if (!network_edges.get(link_id)) {
-                            network_edges.add([{from: device_id, to: parent_id, width: 2}]);
+                            network_edges.add([{id: link_id, from: device_id, to: parent_id, width: 2}]);
                         }
                     })
                 })
