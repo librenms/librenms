@@ -4,6 +4,7 @@ use Illuminate\Support\Str;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\IP;
+use LibreNMS\Util\Oid;
 
 $peers = dbFetchRows('SELECT * FROM `bgpPeers` AS B LEFT JOIN `vrfs` AS V ON `B`.`vrf_id` = `V`.`vrf_id` WHERE `B`.`device_id` = ?', [$device['device_id']]);
 
@@ -23,7 +24,19 @@ if (! empty($peers)) {
 
     $generic = false;
     if ($device['os'] == 'junos') {
-        $peer_data_check = snmpwalk_cache_long_oid($device, 'jnxBgpM2PeerIndex', '.1.3.6.1.4.1.2636.5.1.1.2.1.1.1.14', [], 'BGP4-V2-MIB-JUNIPER', 'junos');
+        $peer_data_check = SnmpQuery::mibDir('junos')->enumStrings()->abortOnFailure()->walk([
+            'BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerState',
+            'BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerStatus',
+            'BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerInUpdates',
+            'BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerOutUpdates',
+            'BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerInTotalMessages',
+            'BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerOutTotalMessages',
+            'BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerFsmEstablishedTime',
+            'BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerLocalAddr',
+            'BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerRemoteAddrType',
+            'BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerLastErrorReceived',
+            'BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerLastErrorReceivedText',
+        ])->valuesByIndex();
     } elseif ($device['os_group'] === 'arista') {
         $peer_data_check = snmpwalk_cache_oid($device, 'aristaBgp4V2PeerRemoteAs', [], 'ARISTA-BGP4V2-MIB');
     } elseif ($device['os'] === 'dell-os10') {
@@ -97,56 +110,34 @@ if (! empty($peers)) {
                     ];
                 } elseif ($device['os'] == 'junos') {
                     if (! isset($junos)) {
-                        echo "\nCaching Oids...";
-
-                        foreach ($peer_data_check as $hash => $index) {
-                            $peer_ip_snmp = ltrim($index['orig'], '.');
-                            $exploded_ip = explode('.', $peer_ip_snmp);
-                            if (count($exploded_ip) > 11) {
-                                // ipv6
-                                $tmp_peer_ip = (string) IP::parse(snmp2ipv6($peer_ip_snmp), true);
-                            } else {
-                                // ipv4
-                                $tmp_peer_ip = implode('.', array_slice($exploded_ip, -4));
-                            }
-                            $junos[$tmp_peer_ip]['hash'] = $hash;
-                            $junos[$tmp_peer_ip]['index'] = $index['jnxBgpM2PeerIndex'];
+                        // parse peer IP
+                        $junos = [];
+                        foreach ($peer_data_check as $peers => $jnx_peer_data) {
+                            $exploded_ip = explode('.', $peers);
+                            $ip_offset = count($exploded_ip) > 30 ? -16 : -4;
+                            $tmp_peer_ip = Oid::of(implode('.', array_slice($exploded_ip, $ip_offset)))->toIp()->compressed();
+                            $junos[$tmp_peer_ip] = $jnx_peer_data;
                         }
                     }
 
-                    if (! isset($peer_data_tmp)) {
-                        $peer_data_tmp = snmpwalk_cache_long_oid($device, 'jnxBgpM2PeerState', '.1.3.6.1.4.1.2636.5.1.1.2.1.1.1.2', $peer_data_tmp, 'BGP4-V2-MIB-JUNIPER', 'junos');
-                        $peer_data_tmp = snmpwalk_cache_long_oid($device, 'jnxBgpM2PeerStatus', '.1.3.6.1.4.1.2636.5.1.1.2.1.1.1.3', $peer_data_tmp, 'BGP4-V2-MIB-JUNIPER', 'junos');
-                        $peer_data_tmp = snmpwalk_cache_long_oid($device, 'jnxBgpM2PeerInUpdates', '.1.3.6.1.4.1.2636.5.1.1.2.6.1.1.1', $peer_data_tmp, 'BGP4-V2-MIB-JUNIPER', 'junos');
-                        $peer_data_tmp = snmpwalk_cache_long_oid($device, 'jnxBgpM2PeerOutUpdates', '.1.3.6.1.4.1.2636.5.1.1.2.6.1.1.2', $peer_data_tmp, 'BGP4-V2-MIB-JUNIPER', 'junos');
-                        $peer_data_tmp = snmpwalk_cache_long_oid($device, 'jnxBgpM2PeerInTotalMessages', '.1.3.6.1.4.1.2636.5.1.1.2.6.1.1.3', $peer_data_tmp, 'BGP4-V2-MIB-JUNIPER', 'junos');
-                        $peer_data_tmp = snmpwalk_cache_long_oid($device, 'jnxBgpM2PeerOutTotalMessages', '.1.3.6.1.4.1.2636.5.1.1.2.6.1.1.4', $peer_data_tmp, 'BGP4-V2-MIB-JUNIPER', 'junos');
-                        $peer_data_tmp = snmpwalk_cache_long_oid($device, 'jnxBgpM2PeerFsmEstablishedTime', '.1.3.6.1.4.1.2636.5.1.1.2.4.1.1.1', $peer_data_tmp, 'BGP4-V2-MIB-JUNIPER', 'junos');
-                        $peer_data_tmp = snmpwalk_cache_long_oid($device, 'jnxBgpM2PeerInUpdatesElapsedTime', '.1.3.6.1.4.1.2636.5.1.1.2.4.1.1.2', $peer_data_tmp, 'BGP4-V2-MIB-JUNIPER', 'junos');
-                        $peer_data_tmp = snmpwalk_cache_long_oid($device, 'jnxBgpM2PeerLocalAddr', '.1.3.6.1.4.1.2636.5.1.1.2.1.1.1.7', $peer_data_tmp, 'BGP4-V2-MIB-JUNIPER', 'junos');
-                        $peer_data_tmp = snmpwalk_cache_long_oid($device, 'jnxBgpM2PeerRemoteAddrType', '.1.3.6.1.4.1.2636.5.1.1.2.1.1.1.10', $peer_data_tmp, 'BGP4-V2-MIB-JUNIPER', 'junos');
-                        $peer_data_tmp = snmpwalk_cache_long_oid($device, 'jnxBgpM2PeerLastErrorReceived', '.1.3.6.1.4.1.2636.5.1.1.2.2.1.1.1', $peer_data_tmp, 'BGP4-V2-MIB-JUNIPER', 'junos');
-                        $peer_data_tmp = snmpwalk_cache_long_oid($device, 'jnxBgpM2PeerLastErrorReceivedText', '.1.3.6.1.4.1.2636.5.1.1.2.2.1.1.5', $peer_data_tmp, 'BGP4-V2-MIB-JUNIPER', 'junos');
-                        d_echo($peer_data_tmp);
-                    }
+                    $address = $peer_ip->compressed();
+                    $peer_data = [
+                        'bgpPeerState' => $junos[$address]['BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerState'] ?? null,
+                        'bgpPeerAdminStatus' => $junos[$address]['BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerStatus'] ?? null,
+                        'bgpPeerInUpdates' => $junos[$address]['BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerInUpdates'] ?? null,
+                        'bgpPeerOutUpdates' => $junos[$address]['BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerOutUpdates'] ?? null,
+                        'bgpPeerInTotalMessages' => $junos[$address]['BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerInTotalMessages'] ?? null,
+                        'bgpPeerOutTotalMessages' => $junos[$address]['BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerOutTotalMessages'] ?? null,
+                        'bgpPeerFsmEstablishedTime' => $junos[$address]['BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerFsmEstablishedTime'] ?? null,
+                        'bgpPeerLastErrorText' => $junos[$address]['BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerLastErrorReceivedText'] ?? null,
+                    ];
 
-                    $peer_hash = $junos[(string) $peer_ip]['hash'];
-                    $peer_data = [];
-                    $peer_data['bgpPeerState'] = $peer_data_tmp[$peer_hash]['jnxBgpM2PeerState'];
-                    $peer_data['bgpPeerAdminStatus'] = $peer_data_tmp[$peer_hash]['jnxBgpM2PeerStatus'];
-                    $peer_data['bgpPeerInUpdates'] = $peer_data_tmp[$peer_hash]['jnxBgpM2PeerInUpdates'];
-                    $peer_data['bgpPeerOutUpdates'] = $peer_data_tmp[$peer_hash]['jnxBgpM2PeerOutUpdates'];
-                    $peer_data['bgpPeerInTotalMessages'] = $peer_data_tmp[$peer_hash]['jnxBgpM2PeerInTotalMessages'];
-                    $peer_data['bgpPeerOutTotalMessages'] = $peer_data_tmp[$peer_hash]['jnxBgpM2PeerOutTotalMessages'];
-                    $peer_data['bgpPeerFsmEstablishedTime'] = $peer_data_tmp[$peer_hash]['jnxBgpM2PeerFsmEstablishedTime'];
-                    $peer_data['bgpPeerLastErrorText'] = $peer_data_tmp[$peer_hash]['jnxBgpM2PeerLastErrorReceivedText'];
-
-                    $error_data = explode(' ', $peer_data_tmp[$peer_hash]['jnxBgpM2PeerLastErrorReceived']);
+                    $error_data = explode(' ', $junos[$address]['BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerLastErrorReceived']);
                     $peer_data['bgpPeerLastErrorCode'] = intval($error_data[0]);
                     $peer_data['bgpPeerLastErrorSubCode'] = intval($error_data[1]);
 
                     try {
-                        $peer_data['bgpLocalAddr'] = IP::fromHexString($peer_data_tmp[$peer_hash]['jnxBgpM2PeerLocalAddr'])->uncompressed();
+                        $peer_data['bgpLocalAddr'] = IP::fromHexString($junos[$address]['BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerLocalAddr'])->compressed();
                     } catch (InvalidIpException $e) {
                         $peer_data['bgpLocalAddr'] = '';
                     }

@@ -449,31 +449,6 @@ function snmpwalk_cache_numerical_oid($device, $oid, $array = [], $mib = null, $
     return $array;
 }//end snmpwalk_cache_oid()
 
-function snmpwalk_cache_long_oid($device, $oid, $noid, $array = [], $mib = null, $mibdir = null, $snmpflags = '-OQnU')
-{
-    $data = snmp_walk($device, $oid, $snmpflags, $mib, $mibdir);
-
-    if (empty($data)) {
-        return $array;
-    }
-
-    foreach (explode("\n", $data) as $entry) {
-        [$tmp_oid,$value] = explode('=', $entry, 2);
-        $tmp_oid = trim($tmp_oid);
-        $value = trim($value);
-        $tmp_index = str_replace($noid, '', $tmp_oid);
-        $index = md5($tmp_index);
-        if (! empty($index) && ! empty($oid)) {
-            $array[$index][$oid] = $value;
-            if (empty($array[$index]['orig'])) {
-                $array[$index]['orig'] = $tmp_index;
-            }
-        }
-    }
-
-    return $array;
-}//end snmpwalk_cache_oid()
-
 /**
  * Just like snmpwalk_cache_oid except that it returns the numerical oid as the index
  * this is useful when the oid is indexed by the mac address and snmpwalk would
