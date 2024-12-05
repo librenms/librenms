@@ -150,7 +150,8 @@ if (Auth::user()->hasGlobalAdmin()) {
         // Try with hostname as set in librenms first
         $oxidized_hostname = $device['hostname'];
         // fetch info about the node and then a list of versions for that node
-        $node_info = json_decode((new \App\ApiClients\Oxidized())->getContent('/node/show/' . $oxidized_hostname . '?format=json'), true);
+        $response = (new \App\ApiClients\Oxidized())->getContent('/node/show/' . $oxidized_hostname . '?format=json');
+        $node_info = json_decode($response, true);
         if (! empty($node_info['last']['start'])) {
             $node_info['last']['start'] = date(Config::get('dateformat.long'), strtotime($node_info['last']['start']));
         }
@@ -169,7 +170,8 @@ if (Auth::user()->hasGlobalAdmin()) {
 
             // Try Oxidized again with new hostname, if it has changed
             if ($oxidized_hostname != $device['hostname']) {
-                $node_info = json_decode((new \App\ApiClients\Oxidized())->getContent('/node/show/' . $oxidized_hostname . '?format=json'), true);
+                $response = (new \App\ApiClients\Oxidized())->getContent('/node/show/' . $oxidized_hostname . '?format=json');
+                $node_info = json_decode($response, true);
             }
         }
 
@@ -301,6 +303,9 @@ if (Auth::user()->hasGlobalAdmin()) {
         } else {
             echo '<br />';
             print_error("We couldn't retrieve the device information from Oxidized");
+            if (isset($response) && preg_match('#<title>(.*)</title>#', $response, $error_matches)) {
+                print_error(htmlentities($error_matches[1]));
+            }
             $text = '';
         }
     }//end if
