@@ -133,7 +133,7 @@ modules:
                     group: Conditions
                     states:
                         - { value:     0, graph: 0, generic: 3, descr: unknown }
-                        - { value:     1, graph: 0, generic: 3, descr: volt-anr }
+                        - { value:     1, graph: 0, generic: 1, descr: volt-anr }
                         - { value:     2, graph: 0, generic: 1, descr: removed }
                         - { value:     3, graph: 0, generic: 2, descr: fault }
                         - { value:     4, graph: 0, generic: 3, descr: mea }
@@ -239,8 +239,8 @@ modules:
                         - { value:   105, graph: 0, generic: 1, descr: tca-snr-low }
                         - { value:   106, graph: 0, generic: 1, descr: tca-cdc-low }
                         - { value:   107, graph: 0, generic: 1, descr: tca-carrier-freq-offset-low }
-                        - { value:   108, graph: 0, generic: 2, descr: link-failed }
-                        - { value:   109, graph: 0, generic: 2, descr: link-cable-fault }
+                        - { value:   108, graph: 0, generic: 1, descr: link-failed }
+                        - { value:   109, graph: 0, generic: 1, descr: link-cable-fault }
                         - { value:   110, graph: 0, generic: 2, descr: link-cbl-rmv }
                         - { value:   111, graph: 0, generic: 2, descr: link-autoneg-fail }
                         - { value:   112, graph: 0, generic: 3, descr: link-no-root-cause }
@@ -256,10 +256,10 @@ modules:
                         - { value:   122, graph: 0, generic: 2, descr: loss-of-lane-algn-mark-lane }
                         - { value:   123, graph: 0, generic: 3, descr: lnk-down-deact }
                         - { value:   124, graph: 0, generic: 3, descr: neg-bw-exceed }
-                        - { value:   125, graph: 0, generic: 2, descr: rx-ssf }
-                        - { value:   126, graph: 0, generic: 1, descr: tx-ssf }
-                        - { value:   127, graph: 0, generic: 1, descr: output-overcurrent }
-                        - { value:   128, graph: 0, generic: 2, descr: tca-output-power-high }
+                        - { value:   125, graph: 0, generic: 1, descr: rx-server-signal-fail }
+                        - { value:   126, graph: 0, generic: 3, descr: tx-server-signal-fail }
+                        - { value:   127, graph: 0, generic: 2, descr: output-overcurrent }
+                        - { value:   128, graph: 0, generic: 1, descr: tca-output-power-high }
                         - { value:   129, graph: 0, generic: 2, descr: loss-of-alignment }
                         - { value:   130, graph: 0, generic: 1, descr: ntp-server-unavailable }
                         - { value:   133, graph: 0, generic: 1, descr: temperature-high }
@@ -270,7 +270,7 @@ modules:
                         - { value:   138, graph: 0, generic: 3, descr: loss-of-traffic-after-firmware-activation }
                         - { value:   139, graph: 0, generic: 1, descr: software-version-mismatch }
                         - { value:   140, graph: 0, generic: 2, descr: fan-fault }
-                        - { value:   141, graph: 0, generic: 1, descr: port-config-mismatch }
+                        - { value:   141, graph: 0, generic: 2, descr: port-config-mismatch }
                         - { value:   142, graph: 0, generic: 1, descr: license-server-disconnect }
                         - { value:   143, graph: 0, generic: 2, descr: hw-resource-unavailable-recoverable }
                         - { value:   144, graph: 0, generic: 1, descr: license-invalid }
@@ -434,8 +434,8 @@ modules:
                         - { value:  5114, graph: 0, generic: 2, descr: raman-characterization-fault }
                         - { value:  5115, graph: 0, generic: 3, descr: raman-characterization-support }
                         - { value:  5121, graph: 0, generic: 3, descr: protection-command-applied }
-                        - { value:  5123, graph: 0, generic: 1, descr: component-temperature-high }
-                        - { value:  5141, graph: 0, generic: 1, descr: wss-fault }
+                        - { value:  5123, graph: 0, generic: 2, descr: component-temperature-high }
+                        - { value:  5141, graph: 0, generic: 2, descr: wss-fault }
                         - { value:  5167, graph: 0, generic: 1, descr: group-identification-mismatch }
                         - { value:  5169, graph: 0, generic: 3, descr: sf-working-pds }
                         - { value:  5170, graph: 0, generic: 2, descr: signal-fail-protection-pds }

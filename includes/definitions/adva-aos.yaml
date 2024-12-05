@@ -1,5 +1,5 @@
-os: adva_fsp3000c
-text: 'ADVA FSP3000C'
+os: adva-aos
+text: 'ADVA AOS'
 type: network
 icon: adva
 group: ADVA
@@ -8,5 +8,5 @@ over:
 discovery:
     -
         sysObjectID:
-            - .1.3.6.1.4.1.2544.1.20.2.1
+            - .1.3.6.1.4.1.2544.1.20.2.
 mib_dir: adva

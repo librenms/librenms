@@ -1,6 +1,6 @@
 <?php
 /**
- * LibreNMS - ADVA FSP3000C device support - Pre-Cache for Sensors
+ * LibreNMS - ADVA AOS device support - Pre-Cache for Sensors
  *
  * @category   Network_Monitoring
  *
@@ -16,7 +16,7 @@
  * the source code distribution for details.
  **/
 
-// Get ifDescr from FSP3000CC Series
+// Get ifDescr from ADVA AOS
 $pre_cache = snmpwalk_cache_multi_oid($device, 'ifDescr', [], 'IF-MIB', null, '-OQUbs');
 
 foreach ($pre_cache as $index => $port) {
