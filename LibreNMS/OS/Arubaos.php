@@ -36,6 +36,7 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessUtilizationDiscovery;
 use LibreNMS\Interfaces\Polling\Sensors\WirelessFrequencyPolling;
 use LibreNMS\OS;
+use SnmpQuery;
 
 class Arubaos extends OS implements
     OsDiscovery,
@@ -50,7 +51,7 @@ class Arubaos extends OS implements
     public function discoverOS(Device $device): void
     {
         parent::discoverOS($device); // yaml
-        $aruba_info = \SnmpQuery::get([
+        $aruba_info = SnmpQuery::get([
             'WLSX-SWITCH-MIB::wlsxSwitchRole.0',
             'WLSX-SWITCH-MIB::wlsxSwitchMasterIp.0',
             'WLSX-SWITCH-MIB::wlsxSwitchLicenseSerialNumber.0',
@@ -166,7 +167,7 @@ class Arubaos extends OS implements
 
     private function discoverInstantRadio($type, $oid, $desc = 'Radio %s')
     {
-        $data = snmpwalk_cache_numerical_oid($this->getDeviceArray(), $oid, [], 'AI-AP-MIB');
+        $data = SnmpQuery::numeric()->walk("AI-AP-MIB::$oid")->groupByIndex(1); // group by radio index
 
         $sensors = [];
         foreach ($data as $index => $entry) {
