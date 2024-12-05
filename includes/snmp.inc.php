@@ -510,27 +510,6 @@ function snmpwalk_cache_multi_oid($device, $oid, $array = [], $mib = null, $mibd
     return $cache['snmp'][$device['device_id']][$oid];
 }//end snmpwalk_cache_multi_oid()
 
-function snmpwalk_cache_index($device, $oid, $array = [], $mib = null, $mibdir = null)
-{
-    $data = snmp_walk($device, $oid, '-OQUs', $mib, $mibdir);
-
-    if (empty($data)) {
-        return $array;
-    }
-
-    foreach (explode("\n", $data) as $entry) {
-        [$oid,$value] = explode('=', $entry, 2);
-        $oid = trim($oid);
-        $value = trim($value);
-        [$oid, $first] = explode('.', $oid);
-        if (! strstr($value, 'at this OID') && isset($oid) && isset($first)) {
-            $array[$oid][$first] = $value;
-        }
-    }
-
-    return $array;
-}//end snmpwalk_cache_double_oid()
-
 /**
  * Walk an snmp mib oid and group items together based on the index.
  * This is intended to be used with a string based oid.
