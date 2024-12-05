@@ -428,27 +428,6 @@ function snmpwalk_cache_oid($device, $oid, $array = [], $mib = null, $mibdir = n
     return $array;
 }//end snmpwalk_cache_oid()
 
-function snmpwalk_cache_numerical_oid($device, $oid, $array = [], $mib = null, $mibdir = null, $snmpflags = '-OQUsn')
-{
-    $data = snmp_walk($device, $oid, $snmpflags, $mib, $mibdir);
-
-    if (empty($data)) {
-        return $array;
-    }
-
-    foreach (explode("\n", $data) as $entry) {
-        [$oid,$value] = explode('=', $entry, 2);
-        $oid = trim($oid);
-        $value = trim($value);
-        [$index] = explode('.', strrev($oid), 2);
-        if (! strstr($value, 'at this OID') && isset($oid) && isset($index)) {
-            $array[$index][$oid] = $value;
-        }
-    }
-
-    return $array;
-}//end snmpwalk_cache_oid()
-
 /**
  * Just like snmpwalk_cache_oid except that it returns the numerical oid as the index
  * this is useful when the oid is indexed by the mac address and snmpwalk would
@@ -505,27 +484,6 @@ function snmpwalk_cache_multi_oid($device, $oid, $array = [], $mib = null, $mibd
 
     return $cache['snmp'][$device['device_id']][$oid];
 }//end snmpwalk_cache_multi_oid()
-
-function snmpwalk_cache_index($device, $oid, $array = [], $mib = null, $mibdir = null)
-{
-    $data = snmp_walk($device, $oid, '-OQUs', $mib, $mibdir);
-
-    if (empty($data)) {
-        return $array;
-    }
-
-    foreach (explode("\n", $data) as $entry) {
-        [$oid,$value] = explode('=', $entry, 2);
-        $oid = trim($oid);
-        $value = trim($value);
-        [$oid, $first] = explode('.', $oid);
-        if (! strstr($value, 'at this OID') && isset($oid) && isset($first)) {
-            $array[$oid][$first] = $value;
-        }
-    }
-
-    return $array;
-}//end snmpwalk_cache_double_oid()
 
 /**
  * Walk an snmp mib oid and group items together based on the index.
@@ -682,17 +640,18 @@ function snmp_translate($oid, $mib = 'ALL', $mibdir = null, $options = null, $de
     $measure = Measurement::start('snmptranslate');
     $cmd = [Config::get('snmptranslate', 'snmptranslate'), '-M', mibdir($mibdir, $device), '-m', $mib];
 
-    if (Oid::isNumeric($oid)) {
+    $oid = Oid::of($oid);
+    if ($oid->isNumeric()) {
         $default_options = ['-Os', '-Pu'];
     } else {
-        if ($mib != 'ALL' && ! Str::contains($oid, '::')) {
+        if ($mib != 'ALL' && ! $oid->hasMib()) {
             $oid = "$mib::$oid";
         }
         $default_options = ['-On', '-Pu'];
     }
     $options = is_null($options) ? $default_options : $options;
     $cmd = array_merge($cmd, (array) $options);
-    $cmd[] = $oid;
+    $cmd[] = $oid->oid;
 
     $result = trim(external_exec($cmd));
 

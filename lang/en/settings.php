@@ -1073,9 +1073,29 @@ return [
                 'description' => 'Debug',
                 'help' => 'To enable or disable verbose output to CLI',
             ],
+            'log_file' => [
+                'description' => 'Log file',
+                'help' => 'Define another log file if wanted for the debug',
+            ],
             'groups-exclude' => [
                 'description' => 'Excluded device groups',
                 'help' => 'Device groups excluded from sending data to InfluxDBv2',
+            ],
+            'timeout' => [
+                'description' => 'Timeout',
+                'help' => 'Timeout in seconds',
+            ],
+            'verify' => [
+                'description' => 'Verify',
+                'help' => 'Verify the certificate',
+            ],
+            'batch_size' => [
+                'description' => 'Batch size',
+                'help' => 'How many metrics should be bundled before sending',
+            ],
+            'max_retry' => [
+                'description' => 'Max retry',
+                'help' => 'How many reties we should try',
             ],
         ],
         'ipmitool' => [
@@ -1350,9 +1370,6 @@ return [
             ],
             'cisco-asa-firewall' => [
                 'description' => 'Cisco ASA Firewall',
-            ],
-            'cisco-voice' => [
-                'description' => 'Cisco Voice',
             ],
             'cisco-cbqos' => [
                 'description' => 'Cisco CBQOS',
