@@ -1255,9 +1255,6 @@ return [
             'cisco-asa-firewall' => [
                 'description' => 'Firewall Cisco ASA',
             ],
-            'cisco-voice' => [
-                'description' => 'Cisco Voice',
-            ],
             'cisco-cbqos' => [
                 'description' => 'Cisco CBQOS',
             ],
@@ -1439,10 +1436,6 @@ return [
             'description' => 'Define a versão do rrdtool no seu servidor',
             'help' => 'Qualquer coisa acima de 1.5.5 suporta todos os recursos que o LibreNMS usa, não defina um valor maior do que a versão instalada',
         ],
-        'service_poller_enabled' => [
-            'description' => 'Habilitar Polling',
-            'help' => 'Habilitar workers de polling. Define o valor padrão para todos os nós.',
-        ],
         'service_master_timeout' => [
             'description' => 'Tempo de Expiração do Dispatcher Mestre',
             'help' => 'O tempo antes que o bloqueio mestre expire. Se o mestre desaparecer, levará esse tempo para outro nó assumir. No entanto, se demorar mais do que o tempo limite para despachar o trabalho, você terá múltiplos mestres',
@@ -1459,10 +1452,6 @@ return [
             'description' => 'Repetir Dispositivo Inativo',
             'help' => 'Se um dispositivo estiver inativo quando a polling for tentada, este é o tempo de espera antes de tentar novamente. Define o valor padrão para todos os nós.',
         ],
-        'service_discovery_enabled' => [
-            'description' => 'Descoberta Habilitada',
-            'help' => 'Habilitar workers de descoberta. Define o valor padrão para todos os nós.',
-        ],
         'service_discovery_workers' => [
             'description' => 'Workers de Descoberta',
             'help' => 'Quantidade de workers de descoberta a serem executados. Configurar muito alto pode causar sobrecarga. Define o valor padrão para todos os nós.',
@@ -1470,10 +1459,6 @@ return [
         'service_discovery_frequency' => [
             'description' => 'Frequência de Descoberta',
             'help' => 'Com que frequência executar a descoberta de dispositivos. Define o valor padrão para todos os nós. O padrão é 4 vezes ao dia.',
-        ],
-        'service_services_enabled' => [
-            'description' => 'Serviços Habilitados',
-            'help' => 'Habilitar workers de serviços. Define o valor padrão para todos os nós.',
         ],
         'service_services_workers' => [
             'description' => 'Workers de Serviços',
@@ -1483,10 +1468,6 @@ return [
             'description' => 'Frequência de Serviços',
             'help' => 'Com que frequência executar serviços. Isso deve coincidir com a frequência de polling. Define o valor padrão para todos os nós.',
         ],
-        'service_billing_enabled' => [
-            'description' => 'Tarifação Habilitada',
-            'help' => 'Habilitar workers de tarifação. Define o valor padrão para todos os nós.',
-        ],
         'service_billing_frequency' => [
             'description' => 'Frequência de Tarifação',
             'help' => 'Com que frequência coletar dados de tarifação. Define o valor padrão para todos os nós.',
@@ -1495,17 +1476,9 @@ return [
             'description' => 'Frequência de Cálculo de Tarifação',
             'help' => 'Com que frequência calcular a tarifação. Define o valor padrão para todos os nós.',
         ],
-        'service_alerting_enabled' => [
-            'description' => 'Alertas Habilitados',
-            'help' => 'Habilitar o worker de alertas. Define o valor padrão para todos os nós.',
-        ],
         'service_alerting_frequency' => [
             'description' => 'Frequência de Alertas',
             'help' => 'Com que frequência as regras de alerta são verificadas. Note que os dados são atualizados apenas com base na frequência de polling. Define o valor padrão para todos os nós.',
-        ],
-        'service_ping_enabled' => [
-            'description' => 'Fast Ping Habilitado',
-            'help' => 'O Fast Ping apenas pinga dispositivos para verificar se estão ativos ou inativos. Define o valor padrão para todos os nós.',
         ],
         'service_update_enabled' => [
             'description' => 'Manutenção Diária Habilitada',
