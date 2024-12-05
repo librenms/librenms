@@ -176,6 +176,7 @@
             success: function (data) {
                 $.each( data, function( link_id, link ) {
                     var this_edge = link['style'];
+                    this_edge['id'] = link_id;
                     this_edge['from'] = link['ldev'];
                     this_edge['to'] = link['rdev'];
                     this_edge['label'] = link['ifnames'];
