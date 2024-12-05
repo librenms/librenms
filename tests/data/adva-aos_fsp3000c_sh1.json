@@ -11,7 +11,7 @@
                     "hardware": "sh1 rev2.01",
                     "features": null,
                     "location": "<private>",
-                    "os": "adva_aos",
+                    "os": "adva-aos",
                     "type": "network",
                     "serial": "LBADVA11240201737",
                     "icon": "adva.svg"
