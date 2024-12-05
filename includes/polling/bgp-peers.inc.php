@@ -25,6 +25,7 @@ if (! empty($peers)) {
     $generic = false;
     if ($device['os'] == 'junos') {
         $peer_data_check = SnmpQuery::mibDir('junos')->enumStrings()->abortOnFailure()->walk([
+            'BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerIndex',
             'BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerState',
             'BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerStatus',
             'BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerInUpdates',
@@ -115,12 +116,12 @@ if (! empty($peers)) {
                         foreach ($peer_data_check as $peers => $jnx_peer_data) {
                             $exploded_ip = explode('.', $peers);
                             $ip_offset = count($exploded_ip) > 30 ? -16 : -4;
-                            $tmp_peer_ip = Oid::of(implode('.', array_slice($exploded_ip, $ip_offset)))->toIp()->compressed();
+                            $tmp_peer_ip = Oid::of(implode('.', array_slice($exploded_ip, $ip_offset)))->toIp()->uncompressed();
                             $junos[$tmp_peer_ip] = $jnx_peer_data;
                         }
                     }
 
-                    $address = $peer_ip->compressed();
+                    $address = $peer_ip->uncompressed();
                     $peer_data = [
                         'bgpPeerState' => $junos[$address]['BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerState'] ?? null,
                         'bgpPeerAdminStatus' => $junos[$address]['BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerStatus'] ?? null,
@@ -640,7 +641,8 @@ if (! empty($peers)) {
                         ])->table(3);
                     }
 
-                    $current_peer_data = $j_prefixes[$junos[(string) $peer_ip]['index']][$afi][$safis[$safi]];
+                    $jnxPeerIndex = $junos[$peer_ip->uncompressed()]['BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerIndex'];
+                    $current_peer_data = $j_prefixes[$jnxPeerIndex][$afi][$safis[$safi]];
                     $cbgpPeerAcceptedPrefixes = $current_peer_data['BGP4-V2-MIB-JUNIPER::jnxBgpM2PrefixInPrefixesAccepted'];
                     $cbgpPeerDeniedPrefixes = $current_peer_data['BGP4-V2-MIB-JUNIPER::jnxBgpM2PrefixInPrefixesRejected'];
                     $cbgpPeerAdvertisedPrefixes = $current_peer_data['BGP4-V2-MIB-JUNIPER::jnxBgpM2PrefixOutPrefixes'];
