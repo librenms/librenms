@@ -9,7 +9,9 @@
             </button>
             <a class="hidden-md hidden-sm navbar-brand" href>
             @if($title_image)
-                <img src="{{ asset($title_image) }}" alt="{{ $project_name }}">
+           <span style="font-size: 25px">TeleQuill</span>
+
+                {{-- <img src="{{ asset($title_image) }}" alt="{{ $project_name }}"> --}}
             @else
                 {{ $project_name }}
             @endif

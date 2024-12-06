@@ -24,10 +24,14 @@
     <div class="row">
         <div class="col-md-6">
 
-            <h3>{{ __('LibreNMS is an autodiscovering PHP/MySQL-based network monitoring system') }}</h3>
+            <h3>{{ __('TeleQuill is an autodiscovering PHP/MySQL-based network monitoring system based on librenms opensource code') }}</h3>
             <table class='table table-condensed table-hover'>
                 <tr>
-                    <td><b>{{ __('Version') }}</b></td>
+                    <td><b>Alpha Bridge TeleQuill Version:</b></td>
+                    <td>1.0.0 dated 04-12-2024</td>
+                </tr>
+                <tr> 
+                    <td><b>Based on{{ __('Version') }}</b></td>
                     <td><a target="_blank" href='https://www.librenms.org/changelog.html'>{{ $version_local }}<span id='version_date' style="display: none;">{{ $git_date }}</span></a></td>
                 </tr>
                 <tr>
@@ -180,7 +184,8 @@
 
         <h3>{{ __('License') }}</h3>
         <pre>
-Copyright (C) 2013-{{ date('Y') }} {{ $project_name }} Contributors
+Copyright (C) 2023-{{ date('Y') }} Alpha Bridge Contributors
+Copyright (C) 2013-{{ date('Y') }} Librenms Contributors
 Copyright (C) 2006-2012 Adam Armstrong
 
 This program is free software: you can redistribute it and/or modify

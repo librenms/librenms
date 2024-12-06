@@ -5583,7 +5583,7 @@
             "type": "text"
         },
         "project_name": {
-            "default": "LibreNMS",
+            "default": "TeleQuill",
             "type": "text"
         },
         "prometheus.enable": {

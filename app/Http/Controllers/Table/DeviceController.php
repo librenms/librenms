@@ -342,7 +342,7 @@ class DeviceController extends TableController
 
         $actions[$row][] = [
             'title' => 'Launch browser to ' . $device->hostname,
-            'href' => 'https://' . $device->hostname,
+            'href' => 'http://' . $device->hostname,
             'onclick' => 'http_fallback(this); return false;',
             'icon' => 'fa-globe',
         ];
