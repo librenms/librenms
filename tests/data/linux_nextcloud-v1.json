@@ -1,0 +1,130 @@
+{
+    "applications": {
+        "discovery": {
+            "applications": [
+                {
+                    "app_type": "nextcloud",
+                    "app_state": "UNKNOWN",
+                    "discovered": 1,
+                    "app_state_prev": null,
+                    "app_status": "",
+                    "app_instance": "",
+                    "data": null,
+                    "deleted_at": null
+                }
+            ]
+        },
+        "poller": {
+            "applications": [
+                {
+                    "app_type": "nextcloud",
+                    "app_state": "OK",
+                    "discovered": 1,
+                    "app_state_prev": "UNKNOWN",
+                    "app_status": "",
+                    "app_instance": "",
+                    "data": "{\"users\":[\"foo\"],\"user_last_seen\":{\"foo\":\"2024-11-25T10:25:42+00:00\"},\"multimount\":0}",
+                    "deleted_at": null
+                }
+            ],
+            "application_metrics": [
+                {
+                    "metric": "calendars",
+                    "value": 7,
+                    "value_prev": null,
+                    "app_type": "nextcloud"
+                },
+                {
+                    "metric": "disabled_apps",
+                    "value": 10,
+                    "value_prev": null,
+                    "app_type": "nextcloud"
+                },
+                {
+                    "metric": "enabled_apps",
+                    "value": 50,
+                    "value_prev": null,
+                    "app_type": "nextcloud"
+                },
+                {
+                    "metric": "encryption_enabled",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "nextcloud"
+                },
+                {
+                    "metric": "free",
+                    "value": 2447894299136,
+                    "value_prev": null,
+                    "app_type": "nextcloud"
+                },
+                {
+                    "metric": "quota",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "nextcloud"
+                },
+                {
+                    "metric": "total",
+                    "value": 2447894579498,
+                    "value_prev": null,
+                    "app_type": "nextcloud"
+                },
+                {
+                    "metric": "used",
+                    "value": 82190311840,
+                    "value_prev": null,
+                    "app_type": "nextcloud"
+                },
+                {
+                    "metric": "user_count",
+                    "value": 8,
+                    "value_prev": null,
+                    "app_type": "nextcloud"
+                },
+                {
+                    "metric": "users___foo___calendars",
+                    "value": 2,
+                    "value_prev": null,
+                    "app_type": "nextcloud"
+                },
+                {
+                    "metric": "users___foo___free",
+                    "value": 2447894299136,
+                    "value_prev": null,
+                    "app_type": "nextcloud"
+                },
+                {
+                    "metric": "users___foo___last_seen",
+                    "value": 263,
+                    "value_prev": null,
+                    "app_type": "nextcloud"
+                },
+                {
+                    "metric": "users___foo___quota",
+                    "value": -3,
+                    "value_prev": null,
+                    "app_type": "nextcloud"
+                },
+                {
+                    "metric": "users___foo___relative",
+                    "value": 0.36,
+                    "value_prev": null,
+                    "app_type": "nextcloud"
+                },
+                {
+                    "metric": "users___foo___total",
+                    "value": 2456634098342,
+                    "value_prev": null,
+                    "app_type": "nextcloud"
+                },
+                {
+                    "metric": "users___foo___used",
+                    "value": 8739799206,
+                    "value_prev": null,
+                    "app_type": "nextcloud"
+                }
+            ]
+        }
+    }
+}
