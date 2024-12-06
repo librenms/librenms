@@ -1285,6 +1285,7 @@ Fields:
 - port_association_mode: method to identify ports: ifIndex (default), ifName, ifDescr, ifAlias
 - poller_group: This is the poller_group id used for distributed poller setup. Defaults to 0.
 - location or location_id: set the location by text or location id
+- override_sysLocation: force use of the location/location_id: and not the value returned by sysLocation
 
 Options:
 
