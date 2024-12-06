@@ -5043,7 +5043,7 @@
                     "ifIndex": null
                 },
                 {
-                    "entPhysicalIndex": 13,
+                    "entPhysicalIndex": 12,
                     "entPhysicalDescr": null,
                     "entPhysicalClass": null,
                     "entPhysicalName": "Mgmt Slot",
@@ -5062,7 +5062,7 @@
                     "ifIndex": null
                 },
                 {
-                    "entPhysicalIndex": 14,
+                    "entPhysicalIndex": 13,
                     "entPhysicalDescr": null,
                     "entPhysicalClass": null,
                     "entPhysicalName": "Mgmt Slot",
@@ -5081,7 +5081,7 @@
                     "ifIndex": null
                 },
                 {
-                    "entPhysicalIndex": 15,
+                    "entPhysicalIndex": 14,
                     "entPhysicalDescr": null,
                     "entPhysicalClass": null,
                     "entPhysicalName": "EXT Slot",
@@ -5100,7 +5100,7 @@
                     "ifIndex": null
                 },
                 {
-                    "entPhysicalIndex": 16,
+                    "entPhysicalIndex": 15,
                     "entPhysicalDescr": null,
                     "entPhysicalClass": null,
                     "entPhysicalName": "Alien Slot",
@@ -5119,7 +5119,7 @@
                     "ifIndex": null
                 },
                 {
-                    "entPhysicalIndex": 17,
+                    "entPhysicalIndex": 16,
                     "entPhysicalDescr": "Common Equip Module, 1HU",
                     "entPhysicalClass": null,
                     "entPhysicalName": null,
@@ -5132,13 +5132,13 @@
                     "entPhysicalModelName": "1063801084-01",
                     "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": "LBADVA71241500105",
-                    "entPhysicalContainedIn": 12,
+                    "entPhysicalContainedIn": 11,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "UN344269584",
                     "ifIndex": null
                 },
                 {
-                    "entPhysicalIndex": 18,
+                    "entPhysicalIndex": 17,
                     "entPhysicalDescr": null,
                     "entPhysicalClass": null,
                     "entPhysicalName": "plgnone",
@@ -5151,13 +5151,13 @@
                     "entPhysicalModelName": null,
                     "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": null,
-                    "entPhysicalContainedIn": 17,
+                    "entPhysicalContainedIn": 16,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
                     "ifIndex": null
                 },
                 {
-                    "entPhysicalIndex": 19,
+                    "entPhysicalIndex": 18,
                     "entPhysicalDescr": null,
                     "entPhysicalClass": null,
                     "entPhysicalName": "plgnone",
@@ -5170,13 +5170,13 @@
                     "entPhysicalModelName": null,
                     "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": null,
-                    "entPhysicalContainedIn": 17,
+                    "entPhysicalContainedIn": 16,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
                     "ifIndex": null
                 },
                 {
-                    "entPhysicalIndex": 28,
+                    "entPhysicalIndex": 19,
                     "entPhysicalDescr": "PSM AC Card, 1HU, 480W",
                     "entPhysicalClass": null,
                     "entPhysicalName": "psmac3",
@@ -5195,7 +5195,7 @@
                     "ifIndex": null
                 },
                 {
-                    "entPhysicalIndex": 29,
+                    "entPhysicalIndex": 20,
                     "entPhysicalDescr": "Amp, 23dBm",
                     "entPhysicalClass": null,
                     "entPhysicalName": "ams23l",
@@ -5214,7 +5214,7 @@
                     "ifIndex": null
                 },
                 {
-                    "entPhysicalIndex": 30,
+                    "entPhysicalIndex": 21,
                     "entPhysicalDescr": null,
                     "entPhysicalClass": null,
                     "entPhysicalName": "plgnone",
@@ -5227,13 +5227,13 @@
                     "entPhysicalModelName": null,
                     "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": null,
-                    "entPhysicalContainedIn": 29,
+                    "entPhysicalContainedIn": 20,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
                     "ifIndex": null
                 },
                 {
-                    "entPhysicalIndex": 39,
+                    "entPhysicalIndex": 22,
                     "entPhysicalDescr": "ECM Controller, Mgmt RJ-45",
                     "entPhysicalClass": null,
                     "entPhysicalName": null,
@@ -5252,7 +5252,7 @@
                     "ifIndex": null
                 },
                 {
-                    "entPhysicalIndex": 48,
+                    "entPhysicalIndex": 23,
                     "entPhysicalDescr": "PSM AC Card, 1HU, 480W",
                     "entPhysicalClass": null,
                     "entPhysicalName": "psmac3",
