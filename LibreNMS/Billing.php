@@ -15,7 +15,7 @@ class Billing
 
     public static function formatBytesShort($value): string
     {
-        return Number::formatBase($value, Config::get('billing.base'), 2, 3, '');
+        return Number::formatBase($value, Config::get('billing.base'), 2, 0, '');
     }
 
     public static function getDates($dayofmonth, $months = 0): array

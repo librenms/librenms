@@ -10,9 +10,9 @@ foreach (dbFetchRows('SELECT * FROM `customoids` WHERE `device_id` = ? ORDER BY 
     }
     $customoid_descr = $customoid['customoid_descr'];
     $customoid_unit = $customoid['customoid_unit'];
-    $customoid_current = \LibreNMS\Util\Number::formatSi($customoid['customoid_current'], 2, 3, '') . $customoid_unit;
-    $customoid_limit = \LibreNMS\Util\Number::formatSi($customoid['customoid_limit'], 2, 3, '') . $customoid_unit;
-    $customoid_limit_low = \LibreNMS\Util\Number::formatSi($customoid['$customoid_limit_low'], 2, 3, '') . $customoid_unit;
+    $customoid_current = \LibreNMS\Util\Number::formatSi($customoid['customoid_current'], 2, 0, '') . $customoid_unit;
+    $customoid_limit = \LibreNMS\Util\Number::formatSi($customoid['customoid_limit'], 2, 0, '') . $customoid_unit;
+    $customoid_limit_low = \LibreNMS\Util\Number::formatSi($customoid['$customoid_limit_low'], 2, 0, '') . $customoid_unit;
     echo "<div class='panel panel-default'>
             <div class='panel-heading'>
                 <h3 class='panel-title'>$customoid_descr <div class='pull-right'>$customoid_current | $customoid_limit_low <> $customoid_limit</div></h3>

@@ -165,13 +165,13 @@ class Xdsl implements Module
 
             if ($portAdsl->port_id == 0) {
                 // failure of ifIndexToId(), port_id is invalid, and syncModels will crash
-                Log::warning(' ADSL( Failed to discover this port, ifIndex invalid : ' . $portAdsl->adslLineCoding . '/' . Number::formatSi($portAdsl->adslAtucChanCurrTxRate, 2, 3, 'bps') . '/' . Number::formatSi($portAdsl->adslAturChanCurrTxRate, 2, 3, 'bps') . ') ');
+                Log::warning(' ADSL( Failed to discover this port, ifIndex invalid : ' . $portAdsl->adslLineCoding . '/' . Number::formatSi($portAdsl->adslAtucChanCurrTxRate, 2, 0, 'bps') . '/' . Number::formatSi($portAdsl->adslAturChanCurrTxRate, 2, 3, 'bps') . ') ');
                 continue;
             }
 
             if ($datastore) {
                 $this->storeAdsl($portAdsl, $data, (int) $ifIndex, $os, $datastore);
-                Log::info(' ADSL(' . $portAdsl->adslLineCoding . '/' . Number::formatSi($portAdsl->adslAtucChanCurrTxRate, 2, 3, 'bps') . '/' . Number::formatSi($portAdsl->adslAturChanCurrTxRate, 2, 3, 'bps') . ') ');
+                Log::info(' ADSL(' . $portAdsl->adslLineCoding . '/' . Number::formatSi($portAdsl->adslAtucChanCurrTxRate, 2, 3, 'bps') . '/' . Number::formatSi($portAdsl->adslAturChanCurrTxRate, 2, 0, 'bps') . ') ');
             }
 
             $adslPorts->push($portAdsl);
@@ -209,7 +209,7 @@ class Xdsl implements Module
 
             if ($datastore) {
                 $this->storeVdsl($portVdsl, $data, (int) $ifIndex, $os, $datastore);
-                Log::info(' VDSL(' . $os->ifIndexToName($ifIndex) . '/' . Number::formatSi($portVdsl->xdsl2LineStatusAttainableRateDs, 2, 3, 'bps') . '/' . Number::formatSi($portVdsl->xdsl2LineStatusAttainableRateUs, 2, 3, 'bps') . ') ');
+                Log::info(' VDSL(' . $os->ifIndexToName($ifIndex) . '/' . Number::formatSi($portVdsl->xdsl2LineStatusAttainableRateDs, 2, 0, 'bps') . '/' . Number::formatSi($portVdsl->xdsl2LineStatusAttainableRateUs, 2, 0, 'bps') . ') ');
             }
 
             $vdslPorts->push($portVdsl);
