@@ -134,7 +134,7 @@ modules:
                     states:
                         - { value:     0, graph: 0, generic: 3, descr: unknown }
                         - { value:     1, graph: 0, generic: 1, descr: volt-anr }
-                        - { value:     2, graph: 0, generic: 1, descr: removed }
+                        - { value:     2, graph: 0, generic: 1, descr: remove }
                         - { value:     3, graph: 0, generic: 2, descr: fault }
                         - { value:     4, graph: 0, generic: 3, descr: mea }
                         - { value:     5, graph: 0, generic: 2, descr: incompatible-hardware }
@@ -162,88 +162,88 @@ modules:
                         - { value:    27, graph: 0, generic: 3, descr: force-laser-on }
                         - { value:    28, graph: 0, generic: 3, descr: force-transmit-shutdown }
                         - { value:    29, graph: 0, generic: 2, descr: loss-of-clock }
-                        - { value:    30, graph: 0, generic: 2, descr: loss-of-overhead }
-                        - { value:    31, graph: 0, generic: 2, descr: loss-of-prbs-pattern }
-                        - { value:    32, graph: 0, generic: 1, descr: laser-on-delay }
+                        - { value:    30, graph: 0, generic: 3, descr: loss-of-overhead }
+                        - { value:    31, graph: 0, generic: 3, descr: loss-of-prbs-pattern }
+                        - { value:    32, graph: 0, generic: 3, descr: laser-on-delay }
                         - { value:    33, graph: 0, generic: 1, descr: auto-power-reduction }
-                        - { value:    35, graph: 0, generic: 2, descr: supporting-eqpt-failure }
-                        - { value:    36, graph: 0, generic: 2, descr: payload-missing-indication }
+                        - { value:    35, graph: 0, generic: 3, descr: supporting-equipment-failure }
+                        - { value:    36, graph: 0, generic: 1, descr: payload-missing-indication }
                         - { value:    37, graph: 0, generic: 2, descr: loss-of-signal-payload }
-                        - { value:    38, graph: 0, generic: 1, descr: tca-opt-rcv-power-high }
-                        - { value:    39, graph: 0, generic: 1, descr: tca-opt-trmt-powe-high }
+                        - { value:    38, graph: 0, generic: 1, descr: tca-opt-rcv-pwr-hi }
+                        - { value:    39, graph: 0, generic: 1, descr: tca-opt-trmt-pwr-hi }
                         - { value:    40, graph: 0, generic: 1, descr: tca-opt-laser-bias-curr-high }
-                        - { value:    41, graph: 0, generic: 1, descr: laser-temp-high }
-                        - { value:    42, graph: 0, generic: 1, descr: tca-opt-rcv-power-low }
-                        - { value:    43, graph: 0, generic: 1, descr: tca-opt-trmt-power-low }
-                        - { value:    44, graph: 0, generic: 1, descr: laser-temp-low }
+                        - { value:    41, graph: 0, generic: 2, descr: laser-temperature-hi }
+                        - { value:    42, graph: 0, generic: 1, descr: tca-opt-rcv-pwr-lo }
+                        - { value:    43, graph: 0, generic: 1, descr: tca-opt-trmt-pwr-lo }
+                        - { value:    44, graph: 0, generic: 1, descr: laser-temperature-lo }
                         - { value:    45, graph: 0, generic: 2, descr: alarm-indicator-sig-defect }
-                        - { value:    46, graph: 0, generic: 2, descr: backward-defect-indicator }
-                        - { value:    47, graph: 0, generic: 2, descr: backward-defect-indicator-payload }
-                        - { value:    48, graph: 0, generic: 2, descr: backward-defect-indicator-overhead }
-                        - { value:    49, graph: 0, generic: 2, descr: client-sig-fail }
-                        - { value:    50, graph: 0, generic: 1, descr: degraded-sig }
-                        - { value:    51, graph: 0, generic: 2, descr: forward-defect-indicator-payload }
-                        - { value:    52, graph: 0, generic: 2, descr: forward-defect-indicator-overhead }
-                        - { value:    53, graph: 0, generic: 2, descr: incoming-align-errors }
-                        - { value:    54, graph: 0, generic: 2, descr: backward-incoming-align-error }
+                        - { value:    46, graph: 0, generic: 3, descr: backward-defect-indicator }
+                        - { value:    47, graph: 0, generic: 3, descr: backward-defect-indicator-payload }
+                        - { value:    48, graph: 0, generic: 3, descr: backward-defect-indicator-overhead }
+                        - { value:    49, graph: 0, generic: 3, descr: client-signal-fail }
+                        - { value:    50, graph: 0, generic: 1, descr: degraded-signal }
+                        - { value:    51, graph: 0, generic: 3, descr: forward-defect-indicator-payload }
+                        - { value:    52, graph: 0, generic: 3, descr: forward-defect-indicator-overhead }
+                        - { value:    53, graph: 0, generic: 1, descr: incoming-align-errors }
+                        - { value:    54, graph: 0, generic: 1, descr: backward-incoming-align-error }
                         - { value:    55, graph: 0, generic: 2, descr: loss-of-frame }
                         - { value:    56, graph: 0, generic: 2, descr: loss-of-multi-frame }
                         - { value:    57, graph: 0, generic: 2, descr: loss-of-frame-and-multi-frame }
-                        - { value:    58, graph: 0, generic: 1, descr: locked-condition }
-                        - { value:    59, graph: 0, generic: 2, descr: loss-of-tandem-conn }
-                        - { value:    60, graph: 0, generic: 2, descr: multiplex-struc-identifier-mismatch }
-                        - { value:    61, graph: 0, generic: 3, descr: open-conn-indication }
+                        - { value:    58, graph: 0, generic: 3, descr: locked-condition }
+                        - { value:    59, graph: 0, generic: 1, descr: loss-of-tandem-conn }
+                        - { value:    60, graph: 0, generic: 2, descr: multiplex-structure-identifier-mismatch }
+                        - { value:    61, graph: 0, generic: 1, descr: open-conn-indication }
                         - { value:    62, graph: 0, generic: 2, descr: payload-mismatch }
-                        - { value:    63, graph: 0, generic: 2, descr: server-sig-fail }
-                        - { value:    64, graph: 0, generic: 2, descr: server-sig-fail-payload }
-                        - { value:    65, graph: 0, generic: 2, descr: server-sig-fail-overhead }
-                        - { value:    66, graph: 0, generic: 2, descr: trace-sig-fail }
-                        - { value:    67, graph: 0, generic: 2, descr: trace-sig-fail-payload }
-                        - { value:    68, graph: 0, generic: 2, descr: trace-sig-fail-overhead }
-                        - { value:    69, graph: 0, generic: 2, descr: trace-trace-identifier-mismatch }
+                        - { value:    63, graph: 0, generic: 3, descr: server-signal-fail }
+                        - { value:    64, graph: 0, generic: 3, descr: server-signal-fail-payload }
+                        - { value:    65, graph: 0, generic: 3, descr: server-signal-fail-overhead }
+                        - { value:    66, graph: 0, generic: 3, descr: trace-signal-fail }
+                        - { value:    67, graph: 0, generic: 3, descr: trace-signal-fail-payload }
+                        - { value:    68, graph: 0, generic: 3, descr: trace-signal-fail-overhead }
+                        - { value:    69, graph: 0, generic: 3, descr: trail-trace-identifier-mismatch }
                         - { value:    70, graph: 0, generic: 2, descr: loss-of-signal-overhead }
-                        - { value:    71, graph: 0, generic: 2, descr: pump-end-of-life }
-                        - { value:    72, graph: 0, generic: 2, descr: midstage-loss-high }
-                        - { value:    73, graph: 0, generic: 2, descr: amp-control-abnormal }
+                        - { value:    71, graph: 0, generic: 1, descr: pump-end-of-life }
+                        - { value:    72, graph: 0, generic: 3, descr: midstage-loss-high }
+                        - { value:    73, graph: 0, generic: 1, descr: amp-ctrl-abnormal }
                         - { value:    74, graph: 0, generic: 3, descr: auto-power-shutdown }
-                        - { value:    75, graph: 0, generic: 3, descr: voa-control-fail }
+                        - { value:    75, graph: 0, generic: 2, descr: voa-control-fail }
                         - { value:    76, graph: 0, generic: 2, descr: gain-control-fail }
                         - { value:    77, graph: 0, generic: 2, descr: tilt-control-fail }
-                        - { value:    78, graph: 0, generic: 2, descr: opt-limit-ht }
-                        - { value:    79, graph: 0, generic: 2, descr: opt-limit-ht-ex }
+                        - { value:    78, graph: 0, generic: 1, descr: opt-limit-ht }
+                        - { value:    79, graph: 0, generic: 1, descr: opt-limit-ht-ex }
                         - { value:    80, graph: 0, generic: 2, descr: osc-laser-fail }
-                        - { value:    81, graph: 0, generic: 2, descr: osc-power }
-                        - { value:    82, graph: 0, generic: 2, descr: lossof-sig-midstage }
-                        - { value:    83, graph: 0, generic: 2, descr: lossof-opu-multiframe-id }
-                        - { value:    84, graph: 0, generic: 2, descr: tca-unavailable-seconds-high }
-                        - { value:    85, graph: 0, generic: 1, descr: tca-errored-second-high }
-                        - { value:    86, graph: 0, generic: 2, descr: tca-severly-errored-second-high }
-                        - { value:    87, graph: 0, generic: 1, descr: tca-background-block-errors-high }
-                        - { value:    88, graph: 0, generic: 1, descr: tca-osc-opt-laser-bias-curr-high }
-                        - { value:    89, graph: 0, generic: 1, descr: tca-osc-laser-temp-high }
-                        - { value:    90, graph: 0, generic: 1, descr: tca-osc-opt-rcv-power-high }
-                        - { value:    91, graph: 0, generic: 1, descr: tca-osc-opt-trmt-power-high }
-                        - { value:    92, graph: 0, generic: 2, descr: tca-ses-payload-high }
-                        - { value:    93, graph: 0, generic: 2, descr: tca-ses-overhead-high }
-                        - { value:    94, graph: 0, generic: 2, descr: tca-uas-payload-high }
-                        - { value:    95, graph: 0, generic: 2, descr: tca-uas-overhead-high }
-                        - { value:    96, graph: 0, generic: 1, descr: tca-osc-laser-temp-low }
-                        - { value:    97, graph: 0, generic: 1, descr: tca-osc-opt-rcv-power-low }
-                        - { value:    98, graph: 0, generic: 1, descr: tca-osc-opt-trmt-power-low }
+                        - { value:    81, graph: 0, generic: 3, descr: osc-power }
+                        - { value:    82, graph: 0, generic: 2, descr: loss-of-signal-midstage }
+                        - { value:    83, graph: 0, generic: 2, descr: loss-of-opu-multiframe-id }
+                        - { value:    84, graph: 0, generic: 1, descr: tca-unavailable-seconds-hi }
+                        - { value:    85, graph: 0, generic: 1, descr: tca-errored-second-hi }
+                        - { value:    86, graph: 0, generic: 2, descr: tca-severly-errored-second-hi }
+                        - { value:    87, graph: 0, generic: 1, descr: tca-background-block-errors-hi }
+                        - { value:    88, graph: 0, generic: 1, descr: tca-osc-opt-laser-bias-cur-hi }
+                        - { value:    89, graph: 0, generic: 1, descr: tca-osc-laser-temperature-hi }
+                        - { value:    90, graph: 0, generic: 1, descr: tca-osc-opt-rcv-pwr-hi }
+                        - { value:    91, graph: 0, generic: 1, descr: tca-osc-opt-tmt-pwr-hi }
+                        - { value:    92, graph: 0, generic: 1, descr: tca-ses-payload-hi }
+                        - { value:    93, graph: 0, generic: 1, descr: tca-ses-overhead-hi }
+                        - { value:    94, graph: 0, generic: 1, descr: tca-uas-payload-hi }
+                        - { value:    95, graph: 0, generic: 1, descr: tca-uas-overhead-hi }
+                        - { value:    96, graph: 0, generic: 1, descr: tca-osc-laser-temperature-lo }
+                        - { value:    97, graph: 0, generic: 1, descr: tca-osc-opt-rcv-pwr-lo }
+                        - { value:    98, graph: 0, generic: 1, descr: tca-osc-opt-tmt-pwr-lo }
                         - { value:    99, graph: 0, generic: 2, descr: loss-of-modem-sync }
                         - { value:   100, graph: 0, generic: 2, descr: loss-of-coupling-alignment }
-                        - { value:   101, graph: 0, generic: 2, descr: auto-cdc-fail }
-                        - { value:   102, graph: 0, generic: 1, descr: tca-diff-group-delay-high }
-                        - { value:   103, graph: 0, generic: 1, descr: tca-cdc-high }
-                        - { value:   104, graph: 0, generic: 1, descr: tca-carrier-freq-offset-high }
-                        - { value:   105, graph: 0, generic: 1, descr: tca-snr-low }
-                        - { value:   106, graph: 0, generic: 1, descr: tca-cdc-low }
-                        - { value:   107, graph: 0, generic: 1, descr: tca-carrier-freq-offset-low }
+                        - { value:   101, graph: 0, generic: 1, descr: auto-chromatic-dispersion-compensation-failure }
+                        - { value:   102, graph: 0, generic: 1, descr: tca-differential-group-delay-hi }
+                        - { value:   103, graph: 0, generic: 1, descr: tca-chromatic-dispersion-compensation-hi }
+                        - { value:   104, graph: 0, generic: 1, descr: tca-carrier-frequency-offset-hi }
+                        - { value:   105, graph: 0, generic: 1, descr: tca-signal-to-noise-ratio-lo }
+                        - { value:   106, graph: 0, generic: 1, descr: tca-chromatic-dispersion-compensation-lo }
+                        - { value:   107, graph: 0, generic: 1, descr: tca-carrier-frequency-offset-lo }
                         - { value:   108, graph: 0, generic: 1, descr: link-failed }
                         - { value:   109, graph: 0, generic: 1, descr: link-cable-fault }
-                        - { value:   110, graph: 0, generic: 2, descr: link-cbl-rmv }
-                        - { value:   111, graph: 0, generic: 2, descr: link-autoneg-fail }
-                        - { value:   112, graph: 0, generic: 3, descr: link-no-root-cause }
+                        - { value:   110, graph: 0, generic: 1, descr: link-cable-remove }
+                        - { value:   111, graph: 0, generic: 1, descr: link-autoneg-fail }
+                        - { value:   112, graph: 0, generic: 1, descr: link-no-root-cause }
                         - { value:   113, graph: 0, generic: 3, descr: fend-dup-mode-unknown }
                         - { value:   114, graph: 0, generic: 2, descr: jab-th-id-exceed }
                         - { value:   115, graph: 0, generic: 2, descr: loss-of-sync }
@@ -251,30 +251,30 @@ modules:
                         - { value:   117, graph: 0, generic: 1, descr: tx-local-fault }
                         - { value:   118, graph: 0, generic: 2, descr: loss-of-block-lock }
                         - { value:   119, graph: 0, generic: 1, descr: hi-ber }
-                        - { value:   120, graph: 0, generic: 1, descr: auto-cdc-in-progress }
+                        - { value:   120, graph: 0, generic: 3, descr: auto-cdc-in-progress }
                         - { value:   121, graph: 0, generic: 2, descr: loss-of-block-lock-lane }
-                        - { value:   122, graph: 0, generic: 2, descr: loss-of-lane-algn-mark-lane }
-                        - { value:   123, graph: 0, generic: 3, descr: lnk-down-deact }
+                        - { value:   122, graph: 0, generic: 2, descr: loss-of-lane-align-mark-lane }
+                        - { value:   123, graph: 0, generic: 3, descr: link-down-deact }
                         - { value:   124, graph: 0, generic: 3, descr: neg-bw-exceed }
                         - { value:   125, graph: 0, generic: 1, descr: rx-server-signal-fail }
                         - { value:   126, graph: 0, generic: 3, descr: tx-server-signal-fail }
                         - { value:   127, graph: 0, generic: 2, descr: output-overcurrent }
-                        - { value:   128, graph: 0, generic: 1, descr: tca-output-power-high }
+                        - { value:   128, graph: 0, generic: 1, descr: tca-output-power-hi }
                         - { value:   129, graph: 0, generic: 2, descr: loss-of-alignment }
                         - { value:   130, graph: 0, generic: 1, descr: ntp-server-unavailable }
                         - { value:   133, graph: 0, generic: 1, descr: temperature-high }
                         - { value:   134, graph: 0, generic: 1, descr: temperature-low }
                         - { value:   135, graph: 0, generic: 1, descr: manifest-mismatch }
                         - { value:   136, graph: 0, generic: 1, descr: manifest-incomplete }
-                        - { value:   137, graph: 0, generic: 2, descr: laser-bias-current-abnormal }
+                        - { value:   137, graph: 0, generic: 2, descr: laser-bias-cur-abnormal }
                         - { value:   138, graph: 0, generic: 3, descr: loss-of-traffic-after-firmware-activation }
                         - { value:   139, graph: 0, generic: 1, descr: software-version-mismatch }
                         - { value:   140, graph: 0, generic: 2, descr: fan-fault }
                         - { value:   141, graph: 0, generic: 2, descr: port-config-mismatch }
                         - { value:   142, graph: 0, generic: 1, descr: license-server-disconnect }
                         - { value:   143, graph: 0, generic: 2, descr: hw-resource-unavailable-recoverable }
-                        - { value:   144, graph: 0, generic: 1, descr: license-invalid }
-                        - { value:   145, graph: 0, generic: 1, descr: ssd-wearout-level-warning }
+                        - { value:   144, graph: 0, generic: 1, descr: invalid-license }
+                        - { value:   145, graph: 0, generic: 3, descr: ssd-wearout-level-warning }
                         - { value:   146, graph: 0, generic: 1, descr: license-expire }
                         - { value:   147, graph: 0, generic: 2, descr: database-mismatch }
                         - { value:   148, graph: 0, generic: 1, descr: license-missing }
@@ -293,51 +293,51 @@ modules:
                         - { value:   161, graph: 0, generic: 2, descr: internal-encryption-failed }
                         - { value:   162, graph: 0, generic: 1, descr: key-exchange-in-progress }
                         - { value:   163, graph: 0, generic: 2, descr: key-exchange-channel-fail }
-                        - { value:   164, graph: 0, generic: 1, descr: terminal-loopback-in-progress }
-                        - { value:   165, graph: 0, generic: 2, descr: local-osc-biar-cur-abnormal }
+                        - { value:   164, graph: 0, generic: 3, descr: terminal-loopback-inprogress }
+                        - { value:   165, graph: 0, generic: 3, descr: local-oscillator-bias-cur-abnormal }
                         - { value:   166, graph: 0, generic: 1, descr: license-file-missing }
                         - { value:   167, graph: 0, generic: 1, descr: license-server-config-missing }
-                        - { value:   168, graph: 0, generic: 3, descr: hardware-busy }
-                        - { value:   169, graph: 0, generic: 1, descr: fan-filter-replace }
-                        - { value:   170, graph: 0, generic: 1, descr: reboot-in-progress }
-                        - { value:   171, graph: 0, generic: 3, descr: prbs-detection-in-progress }
-                        - { value:   172, graph: 0, generic: 1, descr: tca-out-of-frame-second-high }
-                        - { value:   173, graph: 0, generic: 2, descr: ms-line-ais }
-                        - { value:   174, graph: 0, generic: 1, descr: local-osc-temperature-low }
-                        - { value:   175, graph: 0, generic: 1, descr: local-osc-temperature-high }
-                        - { value:   176, graph: 0, generic: 1, descr: facility-loopback-in-progress }
-                        - { value:   177, graph: 0, generic: 1, descr: prbs-generation-in-progress }
-                        - { value:   178, graph: 0, generic: 2, descr: transmit-signal-fail }
-                        - { value:   179, graph: 0, generic: 1, descr: loopback-active }
-                        - { value:   180, graph: 0, generic: 1, descr: mea-phy-changed }
-                        - { value:   181, graph: 0, generic: 1, descr: license-backup-server-disconnect }
-                        - { value:   182, graph: 0, generic: 1, descr: call-home-server-unreachable }
-                        - { value:   183, graph: 0, generic: 1, descr: timinglicensemissing }
-                        - { value:   184, graph: 0, generic: 1, descr: eomplslicensemissing }
-                        - { value:   185, graph: 0, generic: 1, descr: fullcapacitylicensemissing }
-                        - { value:   186, graph: 0, generic: 1, descr: elephantflowlicensemissing }
+                        - { value:   168, graph: 0, generic: 1, descr: hardware-busy }
+                        - { value:   169, graph: 0, generic: 2, descr: fan-filter-replace }
+                        - { value:   170, graph: 0, generic: 3, descr: reboot-inprogress }
+                        - { value:   171, graph: 0, generic: 3, descr: prbs-detection-inprogress }
+                        - { value:   172, graph: 0, generic: 1, descr: tca-out-of-frame-second-hi }
+                        - { value:   173, graph: 0, generic: 3, descr: ms-line-ais }
+                        - { value:   174, graph: 0, generic: 1, descr: local-oscillator-temperature-lo }
+                        - { value:   175, graph: 0, generic: 2, descr: local-oscillator-temperature-hi }
+                        - { value:   176, graph: 0, generic: 3, descr: facility-loopback-in-progress }
+                        - { value:   177, graph: 0, generic: 3, descr: prbs-generation-inprogress }
+                        - { value:   178, graph: 0, generic: 2, descr: optical-power-transmit-signal-fail }
+                        - { value:   179, graph: 0, generic: 3, descr: loopback-active }
+                        - { value:   180, graph: 0, generic: 3, descr: mea-phy-changed }
+                        - { value:   181, graph: 0, generic: 1, descr: backup-license-server-disconnect }
+                        - { value:   182, graph: 0, generic: 1, descr: callhome-server-unreachable }
+                        - { value:   183, graph: 0, generic: 3, descr: timinglicensemissing }
+                        - { value:   184, graph: 0, generic: 3, descr: eomplslicensemissing }
+                        - { value:   185, graph: 0, generic: 3, descr: fullcapacitylicensemissing }
+                        - { value:   186, graph: 0, generic: 3, descr: elephantflowlicensemissing }
                         - { value:   187, graph: 0, generic: 3, descr: snmpdyinggasp }
                         - { value:   188, graph: 0, generic: 3, descr: snmpdyinggasphostresourcesbusy }
                         - { value:   189, graph: 0, generic: 3, descr: snmpdyinggasphostunreachable }
-                        - { value:   190, graph: 0, generic: 1, descr: controlplanelicensemissing }
-                        - { value:   191, graph: 0, generic: 1, descr: l3licensemissing }
-                        - { value:   192, graph: 0, generic: 2, descr: coldrebootrequired }
-                        - { value:   197, graph: 0, generic: 1, descr: tca-drop-event }
-                        - { value:   227, graph: 0, generic: 1, descr: efm-remote-dying-gasp }
-                        - { value:   228, graph: 0, generic: 2, descr: efm-fail }
-                        - { value:   229, graph: 0, generic: 2, descr: efm-remote-critical-event }
+                        - { value:   190, graph: 0, generic: 3, descr: controlplanelicensemissing }
+                        - { value:   191, graph: 0, generic: 3, descr: l3licensemissing }
+                        - { value:   192, graph: 0, generic: 1, descr: coldrebootrequired }
+                        - { value:   197, graph: 0, generic: 3, descr: tca-drop-event }
+                        - { value:   227, graph: 0, generic: 3, descr: efm-remote-dying-gasp }
+                        - { value:   228, graph: 0, generic: 3, descr: efm-fail }
+                        - { value:   229, graph: 0, generic: 3, descr: efm-remote-critical-event }
                         - { value:   230, graph: 0, generic: 1, descr: efm-remote-link-down }
                         - { value:   231, graph: 0, generic: 1, descr: efm-remote-loopback-fail }
                         - { value:   232, graph: 0, generic: 1, descr: efm-remote-loopback-request }
-                        - { value:   233, graph: 0, generic: 1, descr: tca-q-factor-low }
-                        - { value:   234, graph: 0, generic: 1, descr: tca-polarization-dependent-l-high }
-                        - { value:   235, graph: 0, generic: 1, descr: tca-state-of-polarization-change-rate-high }
-                        - { value:   236, graph: 0, generic: 2, descr: tca-optical-snr-low }
-                        - { value:   248, graph: 0, generic: 2, descr: optical-input-power-too-high }
-                        - { value:   250, graph: 0, generic: 2, descr: optical-amplifier-pump-bias-hi }
-                        - { value:   252, graph: 0, generic: 1, descr: oa-pump-bias-cur-abn-warning }
+                        - { value:   233, graph: 0, generic: 1, descr: tca-q-factor-lo }
+                        - { value:   234, graph: 0, generic: 1, descr: tca-polarization-dependent-l-hi }
+                        - { value:   235, graph: 0, generic: 1, descr: tca-state-of-polarization-change-rate-hi }
+                        - { value:   236, graph: 0, generic: 1, descr: tca-optical-snr-lo }
+                        - { value:   248, graph: 0, generic: 2, descr: optical-input-power-too-hi }
+                        - { value:   250, graph: 0, generic: 1, descr: optical-amplifier-pump-bias-hi }
+                        - { value:   252, graph: 0, generic: 2, descr: oa-pump-bias-cur-abn-warning }
                         - { value:   255, graph: 0, generic: 1, descr: ne-els-time-out-of-sync }
-                        - { value:   300, graph: 0, generic: 1, descr: srv-discarded }
+                        - { value:   300, graph: 0, generic: 3, descr: srv-discarded }
                         - { value:   301, graph: 0, generic: 1, descr: bw-exceed-port-speed }
                         - { value:   302, graph: 0, generic: 1, descr: mea-portal-address }
                         - { value:   303, graph: 0, generic: 1, descr: mea-portal-pri }
@@ -346,7 +346,7 @@ modules:
                         - { value:   306, graph: 0, generic: 1, descr: mea-actor-adminKey }
                         - { value:   307, graph: 0, generic: 1, descr: mea-port-digest }
                         - { value:   308, graph: 0, generic: 1, descr: mea-gateway-digest }
-                        - { value:   400, graph: 0, generic: 0, descr: ztp-in-progress }
+                        - { value:   400, graph: 0, generic: 3, descr: ztp-in-progress }
                         - { value:   401, graph: 0, generic: 2, descr: ztp-failed }
                         - { value:   410, graph: 0, generic: 1, descr: crypto-config-mismatch }
                         - { value:   411, graph: 0, generic: 1, descr: key-exchange-config-mismatch }
@@ -416,29 +416,29 @@ modules:
                         - { value:   901, graph: 0, generic: 2, descr: link-down }
                         - { value:  1000, graph: 0, generic: 2, descr: eompls-dst-unresovled }
                         - { value:  1020, graph: 0, generic: 2, descr: traffic-arp-table-full }
-                        - { value:  1021, graph: 0, generic: 2, descr: no-route-resources }
-                        - { value:  1022, graph: 0, generic: 2, descr: ip-address-conflict }
+                        - { value:  1021, graph: 0, generic: 1, descr: no-route-resources }
+                        - { value:  1022, graph: 0, generic: 1, descr: ip-address-conflict }
                         - { value:  1050, graph: 0, generic: 2, descr: elmi-not-operational }
                         - { value:  1051, graph: 0, generic: 2, descr: elmi-sequence-number-mismatch }
-                        - { value:  1201, graph: 0, generic: 1, descr: failure-of-protocol-provision-mismatch }
+                        - { value:  1201, graph: 0, generic: 3, descr: failure-of-protocol-provision-mismatch }
                         - { value:  1500, graph: 0, generic: 1, descr: ntp-loss-of-server }
                         - { value:  1501, graph: 0, generic: 1, descr: remote-server-unreachable }
-                        - { value:  1502, graph: 0, generic: 1, descr: sys-log-server-unreachable }
+                        - { value:  1502, graph: 0, generic: 1, descr: syslog-server-unreachable }
                         - { value:  1503, graph: 0, generic: 1, descr: target-address-unreachable }
                         - { value:  1504, graph: 0, generic: 1, descr: door-open }
-                        - { value:  5103, graph: 0, generic: 1, descr: db-mirror-incompatible-sw }
+                        - { value:  5103, graph: 0, generic: 2, descr: db-mirror-incompatible-sw }
                         - { value:  5107, graph: 0, generic: 2, descr: failure-of-protocol-no-response }
                         - { value:  5111, graph: 0, generic: 1, descr: failure-of-protocol-dirn-mismatch }
                         - { value:  5112, graph: 0, generic: 1, descr: failure-of-protocol-bridge-type-mismatch }
                         - { value:  5113, graph: 0, generic: 1, descr: failure-off-protocol-switch-revertive-mismatch }
-                        - { value:  5114, graph: 0, generic: 2, descr: raman-characterization-fault }
+                        - { value:  5114, graph: 0, generic: 1, descr: raman-characterization-fault }
                         - { value:  5115, graph: 0, generic: 3, descr: raman-characterization-support }
                         - { value:  5121, graph: 0, generic: 3, descr: protection-command-applied }
                         - { value:  5123, graph: 0, generic: 2, descr: component-temperature-high }
                         - { value:  5141, graph: 0, generic: 2, descr: wss-fault }
-                        - { value:  5167, graph: 0, generic: 1, descr: group-identification-mismatch }
-                        - { value:  5169, graph: 0, generic: 3, descr: sf-working-pds }
-                        - { value:  5170, graph: 0, generic: 2, descr: signal-fail-protection-pds }
+                        - { value:  5167, graph: 0, generic: 2, descr: group-identification-mismatch }
+                        - { value:  5169, graph: 0, generic: 1, descr: sf-working-pds }
+                        - { value:  5170, graph: 0, generic: 1, descr: signal-fail-protection-pds }
                         - { value:  5171, graph: 0, generic: 1, descr: signal-decrade-working-pds }
                         - { value:  5173, graph: 0, generic: 1, descr: oppm-aid-mismatch }
                         - { value:  5185, graph: 0, generic: 1, descr: spaneq-agates-incomplete }
@@ -447,16 +447,16 @@ modules:
                         - { value:  5218, graph: 0, generic: 1, descr: tca-span-loss-rcv-hi }
                         - { value:  5219, graph: 0, generic: 1, descr: tca-span-loss-rcv-lo }
                         - { value:  5246, graph: 0, generic: 1, descr: port-fenced }
-                        - { value:  5247, graph: 0, generic: 1, descr: tx-not-operational-sequence }
+                        - { value:  5247, graph: 0, generic: 3, descr: tx-not-operational-sequence }
                         - { value:  5249, graph: 0, generic: 1, descr: dual-trigger-mismatch }
                         - { value:  5252, graph: 0, generic: 2, descr: epte-to-peer-comm-fail }
-                        - { value:  5257, graph: 0, generic: 1, descr: all-lanes-summary-outage }
-                        - { value:  5263, graph: 0, generic: 2, descr: rx-link-fault }
-                        - { value:  5264, graph: 0, generic: 2, descr: tx-link-fault }
-                        - { value:  5265, graph: 0, generic: 1, descr: transmit-oci }
+                        - { value:  5257, graph: 0, generic: 3, descr: all-lanes-summary-outage }
+                        - { value:  5263, graph: 0, generic: 3, descr: rx-link-fault }
+                        - { value:  5264, graph: 0, generic: 3, descr: tx-link-fault }
+                        - { value:  5265, graph: 0, generic: 3, descr: transmit-oci }
                         - { value:  5272, graph: 0, generic: 1, descr: tca-fiber-loss-tmt-high }
                         - { value:  5279, graph: 0, generic: 1, descr: certificate-expired }
-                        - { value:  5293, graph: 0, generic: 2, descr: port1m-hazard-shutdown }
+                        - { value:  5293, graph: 0, generic: 2, descr: port-1m-hazard-shutdown }
                         - { value:  5318, graph: 0, generic: 2, descr: gcc-unavailable-recoverable }
                         - { value:  5319, graph: 0, generic: 1, descr: pump-force-remain-on }
-                        - { value: 18681, graph: 0, generic: 1, descr: server-signal-adjustment }
+                        - { value: 18681, graph: 0, generic: 3, descr: server-signal-adjustment }
