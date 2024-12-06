@@ -2,6 +2,7 @@
 <script>
     var no_refresh = false;
     var Countdown = {
+        refreshNum: 0,
         sec: {{ max($refresh, 30) }},
 
         Start: function () {
@@ -28,6 +29,7 @@
         },
         Reset: function () {
             this.sec = {{ max($refresh, 30) }};
+            this.refreshNum++;
         },
     };
 
