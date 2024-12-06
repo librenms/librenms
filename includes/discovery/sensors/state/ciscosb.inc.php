@@ -40,7 +40,6 @@ if (is_array($temp)) {
 
         $descr = trim(($port_data['ifDescr'] ?? '') . ' Suspended Status');
         if (Str::contains($descr, ['ethernet', 'Ethernet']) && $port_data['ifOperStatus'] !== 'notPresent') {
-
             //Discover Sensors
             discover_sensor(null, 'state', $device, $cur_oid . $index, $index, $state_name, $descr, 1, 1, null, null, null, null, $value, 'snmp', $index);
 
