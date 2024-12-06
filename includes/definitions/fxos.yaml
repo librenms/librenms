@@ -8,7 +8,6 @@ over:
     - { graph: device_mempool, text: 'Memory Usage' }
 icon: cisco
 poller_modules:
-    cisco-cbqos: true
     cisco-cef: true
     cisco-mac-accounting: true
     cisco-remote-access-monitor: true

@@ -2,8 +2,6 @@
 /*
  * LibreNMS module to display Cisco Class-Based QoS Details
  *
- * Copyright (c) 2015 Aaron Daniels <aaron@daniels.id.au>
- *
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
  * Free Software Foundation, either version 3 of the License, or (at your
@@ -11,7 +9,7 @@
  * the source code distribution for details.
  */
 
-$cbqos_parameter_name = 'qosdrops';
+$cbqos_parameter_name = 'prebits';
 $cbqos_operator = '*';
 $cbqos_operator_param = '8';
-include 'includes/html/graphs/port/cbqos_generic.inc.php';
+include 'includes/html/graphs/port/qos_cisco_cbqos_generic.inc.php';

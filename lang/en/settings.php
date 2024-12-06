@@ -606,9 +606,6 @@ return [
             'bgp-peers' => [
                 'description' => 'BGP Peers',
             ],
-            'cisco-cbqos' => [
-                'description' => 'Cisco CBQOS',
-            ],
             'cisco-cef' => [
                 'description' => 'Cisco CEF',
             ],
@@ -686,6 +683,10 @@ return [
             ],
             'processors' => [
                 'description' => 'Processors',
+            ],
+
+            'qos' => [
+                'description' => 'QoS',
             ],
 
             'route' => [
@@ -1299,6 +1300,9 @@ return [
             'ipmi' => [
                 'description' => 'IPMI',
             ],
+            'qos' => [
+                'description' => 'QoS',
+            ],
             'sensors' => [
                 'description' => 'Sensors',
             ],
@@ -1370,9 +1374,6 @@ return [
             ],
             'cisco-asa-firewall' => [
                 'description' => 'Cisco ASA Firewall',
-            ],
-            'cisco-cbqos' => [
-                'description' => 'Cisco CBQOS',
             ],
             'cisco-otv' => [
                 'description' => 'Cisco OTV',
