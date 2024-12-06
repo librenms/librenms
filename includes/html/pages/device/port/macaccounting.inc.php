@@ -8,7 +8,7 @@ $hostname = $device['hostname'];
 $hostid = $device['port_id'];
 $ifname = $port['ifDescr'];
 $ifIndex = $port['ifIndex'];
-$speed = \LibreNMS\Util\Number::formatSi($port['ifSpeed'], 2, 3, 'bps');
+$speed = \LibreNMS\Util\Number::formatSi($port['ifSpeed'], 2, 0, 'bps');
 
 $ifalias = $port['name'];
 
