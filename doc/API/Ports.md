@@ -447,6 +447,49 @@ Output:
 }
 ```
 
+### `get_port_macs`
+
+Get all port MAC Addresses (`ifPhysAddress`) for all devices.
+
+Route: `/api/v0/resources/ports/macs`
+
+Example:
+
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/resources/port/macs
+```
+
+Output:
+```json
+{
+    "status": "ok",
+    "get_port_macs": [
+        {
+            "hostname": "localhost",
+            "sysName": "switch01",
+            "ifIndex": 1,
+            "ifPhysAddress": "84bf20853e00",
+            "ifType": "ethernetCsmacd"
+        },
+        {
+            "hostname": "localhost",
+            "sysName": "switch01",
+            "ifIndex": 2,
+            "ifPhysAddress": "84bf20853e01",
+            "ifType": "ethernetCsmacd"
+        },
+        {
+            "hostname": "localhost",
+            "sysName": "switch01",
+            "ifIndex": 3,
+            "ifPhysAddress": "84bf20853e02",
+            "ifType": "other"
+        }
+    ],
+    "count": 3
+}
+```
+
 ### `update_port_description`
 
 Change the description (`ifAlias`) for a given port id.

@@ -44,7 +44,7 @@ Route::prefix('v0')->namespace('\App\Api\Controllers')->group(function () {
             Route::get('ip/arp/{query}/{cidr?}', 'LegacyApiController@list_arp')->name('list_arp');
             Route::get('ip/networks', 'LegacyApiController@list_ip_networks')->name('list_ip_networks');
             Route::get('ip/networks/{id}/ip', 'LegacyApiController@get_network_ip_addresses')->name('get_network_ip_addresses');
-            Route::get('ports/macs', 'LegacyApiController@list_ports_and_macs')->name('list_ports_and_macs');
+            Route::get('port/macs', 'LegacyApiController@get_port_macs')->name('get_port_macs');
         });
 
         Route::prefix('logs')->group(function () {
