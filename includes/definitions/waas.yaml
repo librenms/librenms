@@ -11,7 +11,6 @@ poller_modules:
     applications: false
     bgp-peers: false
     cipsec-tunnels: false
-    cisco-cbqos: false
     cisco-cef: false
     cisco-ipsec-flow-monitor: false
     cisco-mac-accounting: false

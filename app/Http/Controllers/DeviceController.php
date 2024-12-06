@@ -50,6 +50,7 @@ class DeviceController extends Controller
         'alert-stats' => \App\Http\Controllers\Device\Tabs\AlertStatsController::class,
         'showconfig' => \App\Http\Controllers\Device\Tabs\ShowConfigController::class,
         'netflow' => \App\Http\Controllers\Device\Tabs\NetflowController::class,
+        'qos' => \App\Http\Controllers\Device\Tabs\QosController::class,
         'latency' => \App\Http\Controllers\Device\Tabs\LatencyController::class,
         'nac' => \App\Http\Controllers\Device\Tabs\NacController::class,
         'notes' => \App\Http\Controllers\Device\Tabs\NotesController::class,

@@ -82,7 +82,6 @@ Modules.
     lnms config:set discovery_modules.vrf false
     lnms config:set discovery_modules.cisco-cef false
     lnms config:set discovery_modules.slas false
-    lnms config:set discovery_modules.cisco-cbqos false
     lnms config:set discovery_modules.cisco-otv false
     lnms config:set discovery_modules.ipv4-addresses true
     lnms config:set discovery_modules.ipv6-addresses true

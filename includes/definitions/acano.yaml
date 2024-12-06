@@ -9,7 +9,6 @@ icon: cisco
 discovery:
     - { sysObjectID: .1.3.6.1.4.1.8072.3.2.10, sysDescr: Acano }
 poller_modules:
-    cisco-cbqos: true
     cisco-cef: true
     cisco-mac-accounting: true
     cisco-remote-access-monitor: true

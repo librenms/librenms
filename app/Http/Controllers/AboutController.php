@@ -42,6 +42,7 @@ use App\Models\Port;
 use App\Models\PrinterSupply;
 use App\Models\Processor;
 use App\Models\Pseudowire;
+use App\Models\Qos;
 use App\Models\Sensor;
 use App\Models\Service;
 use App\Models\Sla;
@@ -93,6 +94,7 @@ class AboutController extends Controller
             'stat_ipv6_addy' => Ipv6Address::count(),
             'stat_ipv6_nets' => Ipv6Network::count(),
             'stat_memory' => Mempool::count(),
+            'stat_qos' => Qos::count(),
             'stat_ports' => Port::count(),
             'stat_processors' => Processor::count(),
             'stat_pw' => Pseudowire::count(),

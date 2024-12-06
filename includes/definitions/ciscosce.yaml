@@ -10,7 +10,6 @@ over:
 icon: cisco
 poller_modules:
     bgp-peers: false
-    cisco-cbqos: false
     cisco-cef: false
     cisco-mac-accounting: false
     cisco-remote-access-monitor: false

@@ -310,10 +310,6 @@ The data that is written to each alert when it is raised is in the following for
 To see an example of how the component module can used, please see the
 following modules:
 
-- Cisco CBQoS
-  - `includes/discovery/cisco-cbqos.inc.php`
-  - `includes/polling/cisco-cbqos.inc.php`
-  - `html/includes/graphs/device/cbqos_traffic.inc.php`
 - Cisco OTV
   - `includes/discovery/cisco-otv.inc.php`
   - `includes/polling/cisco-otv.inc.php`

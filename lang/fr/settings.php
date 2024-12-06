@@ -373,9 +373,6 @@ return [
             'bgp-peers' => [
                 'description' => 'Adjacences BGP',
             ],
-            'cisco-cbqos' => [
-                'description' => 'Cisco CBQOS',
-            ],
             'cisco-cef' => [
                 'description' => 'Cisco CEF',
             ],
@@ -847,9 +844,6 @@ return [
             ],
             'cisco-asa-firewall' => [
                 'description' => 'Cisco ASA Firewall',
-            ],
-            'cisco-cbqos' => [
-                'description' => 'Cisco CBQOS',
             ],
             'cisco-otv' => [
                 'description' => 'Cisco OTV',
