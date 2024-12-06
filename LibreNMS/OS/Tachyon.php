@@ -72,7 +72,7 @@ class Tachyon extends OS implements
         $data = $this->getCacheTable('TACHYON-MIB::wirelessRadioTable');
 
         foreach ($data as $index => $entry) {
-            if (!empty($entry['wirelessRadioFrequency'])) {
+            if (! empty($entry['wirelessRadioFrequency'])) {
                 $mac = $entry['wirelessPeerMac'];
                 $sensors[] = new WirelessSensor(
                     'frequency',
@@ -103,7 +103,7 @@ class Tachyon extends OS implements
         $data = $this->getCacheTable('TACHYON-MIB::wirelessRadioTable');
 
         foreach ($data as $index => $entry) {
-            if (!empty($entry['wirelessRadioTxPower'])) {
+            if (! empty($entry['wirelessRadioTxPower'])) {
                 $mac = $entry['wirelessPeerMac'];
                 $sensors[] = new WirelessSensor(
                     'power',
@@ -134,7 +134,7 @@ class Tachyon extends OS implements
         $data = $this->getCacheTable('TACHYON-MIB::wirelessPeersTable');
 
         foreach ($data as $index => $entry) {
-            if (!empty($entry['wirelessPeerRxPower'])) {
+            if (! empty($entry['wirelessPeerRxPower'])) {
                 $mac = $entry['wirelessPeerMac'];
                 $sensors[] = new WirelessSensor(
                     'rssi',
@@ -165,7 +165,7 @@ class Tachyon extends OS implements
         $data = $this->getCacheTable('TACHYON-MIB::wirelessPeersTable');
 
         foreach ($data as $index => $entry) {
-            if (!empty($entry['wirelessPeerTxRate'])) {
+            if (! empty($entry['wirelessPeerTxRate'])) {
                 $mac = $entry['wirelessPeerMac'];
                 $sensors[] = new WirelessSensor(
                     'rate',
@@ -179,7 +179,7 @@ class Tachyon extends OS implements
                     1
                 );
             }
-            if (!empty($entry['wirelessPeerRxRate'])) {
+            if (! empty($entry['wirelessPeerRxRate'])) {
                 $mac = $entry['wirelessPeerMac'];
                 $sensors[] = new WirelessSensor(
                     'rate',
@@ -210,7 +210,7 @@ class Tachyon extends OS implements
         $data = $this->getCacheTable('TACHYON-MIB::wirelessPeersTable');
 
         foreach ($data as $index => $entry) {
-            if (!empty($entry['wirelessPeerLinkDistance'])) {
+            if (! empty($entry['wirelessPeerLinkDistance'])) {
                 $mac = $entry['wirelessPeerMac'];
                 $sensors[] = new WirelessSensor(
                     'distance',
@@ -241,7 +241,7 @@ class Tachyon extends OS implements
         $data = $this->getCacheTable('TACHYON-MIB::wirelessPeersTable');
 
         foreach ($data as $index => $entry) {
-            if (!empty($entry['wirelessPeerSnr'])) {
+            if (! empty($entry['wirelessPeerSnr'])) {
                 $mac = $entry['wirelessPeerMac'];
                 $sensors[] = new WirelessSensor(
                     'snr',
