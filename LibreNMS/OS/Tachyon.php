@@ -23,12 +23,12 @@ namespace LibreNMS\OS;
 
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessDistanceDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessRateDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
-use LibreNMS\Interfaces\Discovery\Sensors\WirelessRateDiscovery;
-use LibreNMS\Interfaces\Discovery\Sensors\WirelessDistanceDiscovery;
 use LibreNMS\OS;
 
 class Tachyon extends OS implements
@@ -62,6 +62,7 @@ class Tachyon extends OS implements
 
         return $sensors;
     }
+
     /**
      * Discover wireless frequency.
      */
@@ -71,7 +72,7 @@ class Tachyon extends OS implements
         $data = $this->getCacheTable('TACHYON-MIB::wirelessRadioTable');
 
         foreach ($data as $index => $entry) {
-            if (!empty($entry['wirelessRadioFrequency'])) {
+            if (! empty($entry['wirelessRadioFrequency'])) {
                 $mac = $entry['wirelessPeerMac'];
                 $sensors[] = new WirelessSensor(
                     'frequency',
@@ -96,14 +97,13 @@ class Tachyon extends OS implements
      *
      * @return array
      */
-
     public function discoverWirelessPower()
     {
         $sensors = [];
         $data = $this->getCacheTable('TACHYON-MIB::wirelessRadioTable');
 
         foreach ($data as $index => $entry) {
-            if (!empty($entry['wirelessRadioTxPower'])) {
+            if (! empty($entry['wirelessRadioTxPower'])) {
                 $mac = $entry['wirelessPeerMac'];
                 $sensors[] = new WirelessSensor(
                     'power',
@@ -111,7 +111,7 @@ class Tachyon extends OS implements
                     ".1.3.6.1.4.1.57344.1.2.2.1.3.$index",
                     'tachyon-tx-power',
                     $index,
-                    "TX Power",
+                    'TX Power',
                     null,
                     1,
                     1
@@ -134,7 +134,7 @@ class Tachyon extends OS implements
         $data = $this->getCacheTable('TACHYON-MIB::wirelessPeersTable');
 
         foreach ($data as $index => $entry) {
-            if (!empty($entry['wirelessPeerRxPower'])) {
+            if (! empty($entry['wirelessPeerRxPower'])) {
                 $mac = $entry['wirelessPeerMac'];
                 $sensors[] = new WirelessSensor(
                     'rssi',
@@ -165,7 +165,7 @@ class Tachyon extends OS implements
         $data = $this->getCacheTable('TACHYON-MIB::wirelessPeersTable');
 
         foreach ($data as $index => $entry) {
-            if (!empty($entry['wirelessPeerTxRate'])) {
+            if (! empty($entry['wirelessPeerTxRate'])) {
                 $mac = $entry['wirelessPeerMac'];
                 $sensors[] = new WirelessSensor(
                     'rate',
@@ -179,7 +179,7 @@ class Tachyon extends OS implements
                     1
                 );
             }
-            if (!empty($entry['wirelessPeerRxRate'])) {
+            if (! empty($entry['wirelessPeerRxRate'])) {
                 $mac = $entry['wirelessPeerMac'];
                 $sensors[] = new WirelessSensor(
                     'rate',
@@ -210,7 +210,7 @@ class Tachyon extends OS implements
         $data = $this->getCacheTable('TACHYON-MIB::wirelessPeersTable');
 
         foreach ($data as $index => $entry) {
-            if (!empty($entry['wirelessPeerLinkDistance'])) {
+            if (! empty($entry['wirelessPeerLinkDistance'])) {
                 $mac = $entry['wirelessPeerMac'];
                 $sensors[] = new WirelessSensor(
                     'distance',
@@ -241,7 +241,7 @@ class Tachyon extends OS implements
         $data = $this->getCacheTable('TACHYON-MIB::wirelessPeersTable');
 
         foreach ($data as $index => $entry) {
-            if (!empty($entry['wirelessPeerSnr'])) {
+            if (! empty($entry['wirelessPeerSnr'])) {
                 $mac = $entry['wirelessPeerMac'];
                 $sensors[] = new WirelessSensor(
                     'snr',
