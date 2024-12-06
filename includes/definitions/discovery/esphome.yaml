@@ -1,0 +1,76 @@
+modules:
+    os:
+        hardware:
+            - .1.3.9999.2.3.0 # Chip model of ESP32 or core version for ESP8266
+            - .1.3.9999.2.5.0 # ESP32 chip revision or 0 for ESP8266
+            - .1.3.9999.2.4.0 # Number of CPU cores
+        hardware_template: 'Model: {{ $.1.3.9999.2.3.0 }} Revision: {{ $.1.3.9999.2.5.0 }}'
+        version: .1.3.6.1.2.1.1.1.0
+        version_regex: '/(?<version>version [0-9]+\.[0-9]+\.[0-9]+)/'
+    mempools:
+        data:
+            - # Heap ESP32
+                total: .1.3.9999.32.1.0
+                free: .1.3.9999.32.2.0
+                precision: 1.0223521767381416504223521767381
+                descr: 'ESP32 Heap'
+                class: Heap
+            - # Heap ESP8266
+                total: .1.3.9999.8266.3.0
+                free: .1.3.9999.8266.1.0
+                precision: 1.0223521767381416504223521767381
+                descr: 'ESP8266 Heap'
+                class: Heap
+            - # SPI RAM For ESP8266 it shows 0 as size and usage. For ESP32 0 if no SPI RAM is attached
+                total: .1.3.6.1.2.1.25.2.3.1.5.2
+                used: .1.3.6.1.2.1.25.2.3.1.6.2
+                precision: 1.0223521767381416504223521767381
+                descr: 'SPI RAM'
+                class: 'SPI RAM'
+    sensors:
+        dbm:
+            data:
+                - # RSSI
+                    oid: .1.3.9999.4.1.0
+                    descr: 'BSSID: {{ $.1.3.9999.4.2.0 }} with IP: {{ $.1.3.9999.4.4.0 }}'
+                    group: 'RSSI of SSID: {{ $.1.3.9999.4.3.0 }}'
+                    num_oid: .1.3.9999.4.1.0
+        state:
+            data:
+                - # Chip Type
+                    oid: .1.3.9999.2.1.0
+                    descr: 'Chip Type'
+                    num_oid: .1.3.9999.2.1.0
+                    group: 'Chip'
+                    states:
+                        - { value: 32, generic: 0, graph: 0, descr: 'ESP32' }
+                        - { value: 8266, generic: 0, graph: 0, descr: 'ESP8266' }
+        frequency:
+            data:
+                - # Chip Frequency
+                    oid: .1.3.9999.2.2.0
+                    descr: 'Chip Frequency'
+                    num_oid: .1.3.9999.2.2.0
+                    group: 'Chip'
+                    multiplier: 1000000
+        count:
+            data:
+                - # Total RAM
+                    oid: .1.3.6.1.2.1.25.2.2
+                    descr: 'Total RAM'
+                    num_oid: .1.3.6.1.2.1.25.2.2
+                    index: 25.2.2
+                    multiplier: 1000
+                - # Core Count
+                    oid: .1.3.9999.2.4.0
+                    descr: 'Core Count'
+                    num_oid: .1.3.9999.2.4.0
+                    index: 2.4
+        percent:
+            data:
+                - # ESP8266 only Heap Fragmentation In percents
+                    oid: .1.3.9999.8266.2.0
+                    descr: 'Heap Fragmentation In percents'
+                    num_oid: .1.3.9999.8266.2.0
+                    index: 8266.2
+
