@@ -11248,7 +11248,7 @@
                     "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": "LBADVA71213704350",
                     "entPhysicalContainedIn": 0,
-                    "entPhysicalParentRelPos": 0,
+                    "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "UN344269584",
                     "ifIndex": null
                 },
@@ -11267,7 +11267,7 @@
                     "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": "LBADVA72214306100",
                     "entPhysicalContainedIn": 1,
-                    "entPhysicalParentRelPos": 0,
+                    "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "UN344269584",
                     "ifIndex": null
                 },
@@ -11286,7 +11286,7 @@
                     "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": null,
                     "entPhysicalContainedIn": 1,
-                    "entPhysicalParentRelPos": 0,
+                    "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
                     "ifIndex": null
                 },
@@ -11305,7 +11305,7 @@
                     "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": null,
                     "entPhysicalContainedIn": 1,
-                    "entPhysicalParentRelPos": 0,
+                    "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
                     "ifIndex": null
                 },
@@ -11324,7 +11324,7 @@
                     "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": "LBADVA71213704833",
                     "entPhysicalContainedIn": 1,
-                    "entPhysicalParentRelPos": 0,
+                    "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "UN344269584",
                     "ifIndex": null
                 },
@@ -11332,7 +11332,7 @@
                     "entPhysicalIndex": 6,
                     "entPhysicalDescr": "T-Fan Var Speed 1HU",
                     "entPhysicalClass": null,
-                    "entPhysicalName": null,
+                    "entPhysicalName": "",
                     "entPhysicalHardwareRev": "1.01",
                     "entPhysicalFirmwareRev": null,
                     "entPhysicalSoftwareRev": null,
@@ -11343,7 +11343,7 @@
                     "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": "LBADVA71213704833",
                     "entPhysicalContainedIn": 5,
-                    "entPhysicalParentRelPos": 0,
+                    "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "UN344269584",
                     "ifIndex": null
                 },
@@ -11362,7 +11362,7 @@
                     "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": "LBADVA71213704803",
                     "entPhysicalContainedIn": 1,
-                    "entPhysicalParentRelPos": 0,
+                    "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "UN344269584",
                     "ifIndex": null
                 },
@@ -11381,7 +11381,7 @@
                     "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": "LBADVA71213704803",
                     "entPhysicalContainedIn": 7,
-                    "entPhysicalParentRelPos": 0,
+                    "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "UN344269584",
                     "ifIndex": null
                 },
@@ -11400,7 +11400,7 @@
                     "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": "LBADVA71213704811",
                     "entPhysicalContainedIn": 1,
-                    "entPhysicalParentRelPos": 0,
+                    "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "UN344269584",
                     "ifIndex": null
                 },
@@ -11419,7 +11419,7 @@
                     "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": "LBADVA71213704811",
                     "entPhysicalContainedIn": 9,
-                    "entPhysicalParentRelPos": 0,
+                    "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "UN344269584",
                     "ifIndex": null
                 },
@@ -11438,7 +11438,7 @@
                     "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": "LBADVA59212802032",
                     "entPhysicalContainedIn": 1,
-                    "entPhysicalParentRelPos": 0,
+                    "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "UN344269584",
                     "ifIndex": null
                 },
@@ -11457,7 +11457,26 @@
                     "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": "LBADVA59212802069",
                     "entPhysicalContainedIn": 1,
-                    "entPhysicalParentRelPos": 0,
+                    "entPhysicalParentRelPos": -1,
+                    "entPhysicalMfgName": "UN344269584",
+                    "ifIndex": null
+                },
+                {
+                    "entPhysicalIndex": 13,
+                    "entPhysicalDescr": null,
+                    "entPhysicalClass": null,
+                    "entPhysicalName": "",
+                    "entPhysicalHardwareRev": "1",
+                    "entPhysicalFirmwareRev": null,
+                    "entPhysicalSoftwareRev": null,
+                    "entPhysicalAlias": "node 1 slot 1/cem",
+                    "entPhysicalAssetID": null,
+                    "entPhysicalIsFRU": null,
+                    "entPhysicalModelName": "1078800086-01",
+                    "entPhysicalVendorType": null,
+                    "entPhysicalSerialNum": "LBADVA71213704350",
+                    "entPhysicalContainedIn": 1,
+                    "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "UN344269584",
                     "ifIndex": null
                 },
@@ -11476,7 +11495,7 @@
                     "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": "LBADVA72212604587",
                     "entPhysicalContainedIn": 1,
-                    "entPhysicalParentRelPos": 0,
+                    "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "UN344269584",
                     "ifIndex": null
                 },
@@ -11495,7 +11514,7 @@
                     "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": "FPM65CH         1.01:00",
                     "entPhysicalContainedIn": 24,
-                    "entPhysicalParentRelPos": 0,
+                    "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "FLEXOPTIX",
                     "ifIndex": null
                 },
@@ -11514,7 +11533,7 @@
                     "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": "LBADVA59212802032",
                     "entPhysicalContainedIn": 11,
-                    "entPhysicalParentRelPos": 0,
+                    "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "UN344269584",
                     "ifIndex": null
                 },
@@ -11533,7 +11552,7 @@
                     "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": "LBADVA59212802069",
                     "entPhysicalContainedIn": 12,
-                    "entPhysicalParentRelPos": 0,
+                    "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "UN344269584",
                     "ifIndex": null
                 },
@@ -11552,7 +11571,7 @@
                     "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": "LBADVA72214306100",
                     "entPhysicalContainedIn": 2,
-                    "entPhysicalParentRelPos": 0,
+                    "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "UN344269584",
                     "ifIndex": null
                 },
@@ -11571,7 +11590,7 @@
                     "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": "FPM65CH         1.01:00",
                     "entPhysicalContainedIn": 23,
-                    "entPhysicalParentRelPos": 0,
+                    "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "FLEXOPTIX",
                     "ifIndex": null
                 },
@@ -11590,7 +11609,7 @@
                     "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": "FPM65T7         1.01:00",
                     "entPhysicalContainedIn": 23,
-                    "entPhysicalParentRelPos": 0,
+                    "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "FLEXOPTIX",
                     "ifIndex": null
                 },
@@ -11609,7 +11628,7 @@
                     "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": "FPM65CK         1.01:00",
                     "entPhysicalContainedIn": 23,
-                    "entPhysicalParentRelPos": 0,
+                    "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "FLEXOPTIX",
                     "ifIndex": null
                 },
@@ -11628,7 +11647,7 @@
                     "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": "FPM65T8         1.01:00",
                     "entPhysicalContainedIn": 23,
-                    "entPhysicalParentRelPos": 0,
+                    "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "FLEXOPTIX",
                     "ifIndex": null
                 },
@@ -11647,7 +11666,7 @@
                     "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": "FPM65TA         1.01:00",
                     "entPhysicalContainedIn": 23,
-                    "entPhysicalParentRelPos": 0,
+                    "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "FLEXOPTIX",
                     "ifIndex": null
                 },
@@ -11666,7 +11685,7 @@
                     "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": "FPM65CL         1.01:00",
                     "entPhysicalContainedIn": 23,
-                    "entPhysicalParentRelPos": 0,
+                    "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "FLEXOPTIX",
                     "ifIndex": null
                 },
@@ -11685,7 +11704,7 @@
                     "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": "FPM65T9         1.01:00",
                     "entPhysicalContainedIn": 23,
-                    "entPhysicalParentRelPos": 0,
+                    "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "FLEXOPTIX",
                     "ifIndex": null
                 },
@@ -11704,7 +11723,7 @@
                     "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": "FPM65CJ         1.01:00",
                     "entPhysicalContainedIn": 23,
-                    "entPhysicalParentRelPos": 0,
+                    "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "FLEXOPTIX",
                     "ifIndex": null
                 },
@@ -11723,7 +11742,7 @@
                     "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": "LBADVA72212604587",
                     "entPhysicalContainedIn": 14,
-                    "entPhysicalParentRelPos": 0,
+                    "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "UN344269584",
                     "ifIndex": null
                 },
@@ -11742,7 +11761,7 @@
                     "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": "FPM65T7         1.01:00",
                     "entPhysicalContainedIn": 25,
-                    "entPhysicalParentRelPos": 0,
+                    "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "FLEXOPTIX",
                     "ifIndex": null
                 },
@@ -11761,7 +11780,7 @@
                     "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": "FPM65CK         1.01:00",
                     "entPhysicalContainedIn": 26,
-                    "entPhysicalParentRelPos": 0,
+                    "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "FLEXOPTIX",
                     "ifIndex": null
                 },
@@ -11780,7 +11799,7 @@
                     "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": "FPM65T8         1.01:00",
                     "entPhysicalContainedIn": 27,
-                    "entPhysicalParentRelPos": 0,
+                    "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "FLEXOPTIX",
                     "ifIndex": null
                 },
@@ -11799,7 +11818,7 @@
                     "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": "FPM65TA         1.01:00",
                     "entPhysicalContainedIn": 28,
-                    "entPhysicalParentRelPos": 0,
+                    "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "FLEXOPTIX",
                     "ifIndex": null
                 },
@@ -11818,7 +11837,7 @@
                     "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": "FPM65CL         1.01:00",
                     "entPhysicalContainedIn": 29,
-                    "entPhysicalParentRelPos": 0,
+                    "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "FLEXOPTIX",
                     "ifIndex": null
                 },
@@ -11837,7 +11856,7 @@
                     "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": "FPM65T9         1.01:00",
                     "entPhysicalContainedIn": 30,
-                    "entPhysicalParentRelPos": 0,
+                    "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "FLEXOPTIX",
                     "ifIndex": null
                 },
@@ -11856,7 +11875,7 @@
                     "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": "FPM65CJ         1.01:00",
                     "entPhysicalContainedIn": 31,
-                    "entPhysicalParentRelPos": 0,
+                    "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "FLEXOPTIX",
                     "ifIndex": null
                 }
