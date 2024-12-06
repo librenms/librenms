@@ -4848,7 +4848,7 @@
                     "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": "LBADVA71240201737",
                     "entPhysicalContainedIn": 0,
-                    "entPhysicalParentRelPos": 0,
+                    "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "UN344269584",
                     "ifIndex": null
                 },
@@ -4867,7 +4867,7 @@
                     "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": "LBADVA73212230041",
                     "entPhysicalContainedIn": 1,
-                    "entPhysicalParentRelPos": 0,
+                    "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "UN344269584",
                     "ifIndex": null
                 },
@@ -4886,7 +4886,7 @@
                     "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": null,
                     "entPhysicalContainedIn": 1,
-                    "entPhysicalParentRelPos": 0,
+                    "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
                     "ifIndex": null
                 },
@@ -4905,7 +4905,7 @@
                     "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": "LBADVA71240500761",
                     "entPhysicalContainedIn": 1,
-                    "entPhysicalParentRelPos": 0,
+                    "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "UN344269584",
                     "ifIndex": null
                 },
@@ -4924,7 +4924,7 @@
                     "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": "LBADVA71240500761",
                     "entPhysicalContainedIn": 4,
-                    "entPhysicalParentRelPos": 0,
+                    "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "UN344269584",
                     "ifIndex": null
                 },
@@ -4943,7 +4943,7 @@
                     "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": "LBADVA71240500764",
                     "entPhysicalContainedIn": 1,
-                    "entPhysicalParentRelPos": 0,
+                    "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "UN344269584",
                     "ifIndex": null
                 },
@@ -4962,7 +4962,7 @@
                     "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": "LBADVA71240500764",
                     "entPhysicalContainedIn": 6,
-                    "entPhysicalParentRelPos": 0,
+                    "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "UN344269584",
                     "ifIndex": null
                 },
@@ -4981,7 +4981,7 @@
                     "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": "LBADVA71240500762",
                     "entPhysicalContainedIn": 1,
-                    "entPhysicalParentRelPos": 0,
+                    "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "UN344269584",
                     "ifIndex": null
                 },
@@ -5000,7 +5000,7 @@
                     "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": "LBADVA71240500762",
                     "entPhysicalContainedIn": 8,
-                    "entPhysicalParentRelPos": 0,
+                    "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "UN344269584",
                     "ifIndex": null
                 },
@@ -5019,7 +5019,7 @@
                     "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": "LBADVA59240205257",
                     "entPhysicalContainedIn": 1,
-                    "entPhysicalParentRelPos": 0,
+                    "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "UN344269584",
                     "ifIndex": null
                 },
@@ -5038,7 +5038,7 @@
                     "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": "LBADVA59221101029",
                     "entPhysicalContainedIn": 1,
-                    "entPhysicalParentRelPos": 0,
+                    "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "UN344269584",
                     "ifIndex": null
                 },
@@ -5057,7 +5057,7 @@
                     "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": "LBADVA72242101275",
                     "entPhysicalContainedIn": 1,
-                    "entPhysicalParentRelPos": 0,
+                    "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "UN344269584",
                     "ifIndex": null
                 },
@@ -5076,7 +5076,7 @@
                     "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": null,
                     "entPhysicalContainedIn": 1,
-                    "entPhysicalParentRelPos": 0,
+                    "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
                     "ifIndex": null
                 },
@@ -5095,7 +5095,7 @@
                     "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": null,
                     "entPhysicalContainedIn": 1,
-                    "entPhysicalParentRelPos": 0,
+                    "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
                     "ifIndex": null
                 },
@@ -5114,7 +5114,7 @@
                     "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": null,
                     "entPhysicalContainedIn": 1,
-                    "entPhysicalParentRelPos": 0,
+                    "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
                     "ifIndex": null
                 },
@@ -5133,7 +5133,7 @@
                     "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": "LBADVA71241500105",
                     "entPhysicalContainedIn": 12,
-                    "entPhysicalParentRelPos": 0,
+                    "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "UN344269584",
                     "ifIndex": null
                 },
@@ -5152,7 +5152,7 @@
                     "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": null,
                     "entPhysicalContainedIn": 17,
-                    "entPhysicalParentRelPos": 0,
+                    "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
                     "ifIndex": null
                 },
@@ -5171,7 +5171,7 @@
                     "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": null,
                     "entPhysicalContainedIn": 17,
-                    "entPhysicalParentRelPos": 0,
+                    "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
                     "ifIndex": null
                 },
@@ -5190,7 +5190,7 @@
                     "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": "LBADVA59221101029",
                     "entPhysicalContainedIn": 11,
-                    "entPhysicalParentRelPos": 0,
+                    "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "UN344269584",
                     "ifIndex": null
                 },
@@ -5209,7 +5209,7 @@
                     "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": "LBADVA73212230041",
                     "entPhysicalContainedIn": 2,
-                    "entPhysicalParentRelPos": 0,
+                    "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "UN344269584",
                     "ifIndex": null
                 },
@@ -5228,7 +5228,7 @@
                     "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": null,
                     "entPhysicalContainedIn": 29,
-                    "entPhysicalParentRelPos": 0,
+                    "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
                     "ifIndex": null
                 },
@@ -5247,7 +5247,7 @@
                     "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": "LBADVA72242101275",
                     "entPhysicalContainedIn": 13,
-                    "entPhysicalParentRelPos": 0,
+                    "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "UN344269584",
                     "ifIndex": null
                 },
@@ -5266,7 +5266,7 @@
                     "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": "LBADVA59240205257",
                     "entPhysicalContainedIn": 10,
-                    "entPhysicalParentRelPos": 0,
+                    "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "UN344269584",
                     "ifIndex": null
                 }
