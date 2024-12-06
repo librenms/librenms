@@ -28,8 +28,6 @@ modules:
                     descr: arubaWiredTempSensorName
                     divisor: 1000
                     value: arubaWiredTempSensorTemperature
-                    low_limit: arubaWiredTempSensorMinTemp
-                    high_limit: arubaWiredTempSensorMaxTemp
         power:
             data:
                 -
