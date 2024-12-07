@@ -138,7 +138,7 @@ Output:
 
 Get all port MAC Addresses (`ifPhysAddress`) for all ports where a MAC Address exists.
 
-Route: `/api/v0/resources/ports/macs`
+Route: `/api/v0/resources/port/macs`
 
 Example:
 
