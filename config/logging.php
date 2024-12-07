@@ -60,6 +60,36 @@ return [
 
     'channels' => [
 
+        'event' => [
+            'driver' => 'stack',
+            'channels' => ['event_db'],
+        ],
+
+        'auth' => [
+            'driver' => 'stack',
+            'channels' => ['auth_db'],
+        ],
+
+        'auth_db' => [
+            'driver' => 'monolog',
+            'handler' => \App\Logging\AuthLogDbHandler::class,
+        ],
+
+        'event_db' => [
+            'driver' => 'monolog',
+            'handler' => \App\Logging\EventLogDbHandler::class,
+        ],
+
+        'stdout_debug' => [
+            'driver' => 'monolog',
+            'handler' => StreamHandler::class,
+            'formatter' => App\Logging\CliColorFormatter::class,
+            'with' => [
+                'stream' => 'php://output',
+            ],
+            'level' => 'debug',
+        ],
+
         'stack' => [
             'driver' => 'stack',
             'channels' => ['log_file'],

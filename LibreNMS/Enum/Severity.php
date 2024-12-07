@@ -40,4 +40,15 @@ enum Severity: int
 
         throw new \Exception("Severity $this->name is not supported for state sensors");
     }
+
+    public function toLogLevel(): string
+    {
+        return match($this->value) {
+            1,2 => 'info',
+            3 => 'notice',
+            4 => 'warning',
+            5 => 'error',
+           default => 'debug',
+        };
+    }
 }
