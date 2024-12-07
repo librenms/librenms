@@ -8,7 +8,6 @@ use Monolog\LogRecord;
 
 class AuthLogDbHandler extends AbstractProcessingHandler
 {
-
     /**
      * @inheritDoc
      */
