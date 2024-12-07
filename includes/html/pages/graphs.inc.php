@@ -166,10 +166,6 @@ if (! $auth) {
         echo ' | To show trend, set to future date';
     }
 
-    if (str_contains($vars['type'], 'sensor_')) {
-        echo ' | To show trend, set to future date';
-    }
-
     echo '</center>';
 
     echo generate_graph_js_state($graph_array);
