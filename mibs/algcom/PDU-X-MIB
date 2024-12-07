@@ -1,0 +1,93 @@
+PDU-X-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+
+DisplayString FROM RFC1213-MIB
+OBJECT-TYPE FROM RFC-1212
+enterprises FROM RFC1155-SMI;
+algcom OBJECT IDENTIFIER ::= { enterprises 49136 }
+pdu OBJECT IDENTIFIER ::= { algcom 200 }
+
+system OBJECT IDENTIFIER ::=  { pdu 1 }
+portName OBJECT IDENTIFIER ::= { pdu 2 }
+portDescription OBJECT IDENTIFIER ::= { pdu 3 }
+portStateTextual OBJECT IDENTIFIER ::= { pdu 4 }
+portStateNumeric OBJECT IDENTIFIER ::= { pdu 5 }
+portVoltage OBJECT IDENTIFIER ::= { pdu 6 }
+portCurrent OBJECT IDENTIFIER ::= { pdu 7 }
+portPower OBJECT IDENTIFIER ::=  { pdu 8 }
+portUnderVoltageAlarm OBJECT IDENTIFIER ::= { pdu 9 }
+portOverVoltageAlarm OBJECT IDENTIFIER ::= { pdu 10 }
+portUnderVoltageShutdown OBJECT IDENTIFIER ::= { pdu 11 }
+portOverVoltageShutdown OBJECT IDENTIFIER ::= { pdu 12 }
+portOverCurrentAlarm OBJECT IDENTIFIER ::= { pdu 13 }
+portFailAlarm OBJECT IDENTIFIER ::= { pdu 14 }
+busAlarm OBJECT IDENTIFIER ::=   { pdu 15 }
+portOverCurrentShutdown OBJECT IDENTIFIER ::= { pdu 16 }
+
+
+
+model OBJECT-TYPE
+        SYNTAX DisplayString
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "PDU Model"
+        ::= { system 1 }
+
+busVoltage OBJECT-TYPE
+        SYNTAX GAUGE
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "PDU bus voltage [mV]"
+        ::= { system 2 }
+
+busCurrent OBJECT-TYPE
+        SYNTAX GAUGE
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "PDU bus current [mA]"
+        ::= { system 3 }
+
+busPower OBJECT-TYPE
+        SYNTAX GAUGE
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "PDU bus power [mW]"
+        ::= { system 4 }
+
+clock OBJECT-TYPE
+        SYNTAX DisplayString
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Internal date/time"
+        ::= { system 5 }
+busUnderVoltage OBJECT-TYPE
+        SYNTAX GAUGE
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Bus under voltage alarm"
+        ::= { busAlarm 1 }
+
+busOverVoltage OBJECT-TYPE
+        SYNTAX GAUGE
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Bus over voltage alarm"
+        ::= { busAlarm 2 }
+
+busOverCurrent OBJECT-TYPE
+        SYNTAX GAUGE
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Bus over current alarm"
+        ::= { busAlarm 3 }
+
+
+END
