@@ -6830,371 +6830,421 @@
             ]
         }
     },
-    "ports-stack": {
+    "vlans": {
         "discovery": {
-            "ports_stack": [
-                {
-                    "high_ifIndex": 1,
-                    "low_ifIndex": 100000,
-                    "ifStackStatus": "active"
-                },
-                {
-                    "high_ifIndex": 1,
-                    "low_ifIndex": 100009,
-                    "ifStackStatus": "active"
-                },
-                {
-                    "high_ifIndex": 2,
-                    "low_ifIndex": 100000,
-                    "ifStackStatus": "active"
-                },
-                {
-                    "high_ifIndex": 2,
-                    "low_ifIndex": 100009,
-                    "ifStackStatus": "active"
-                },
-                {
-                    "high_ifIndex": 3,
-                    "low_ifIndex": 100000,
-                    "ifStackStatus": "active"
-                },
-                {
-                    "high_ifIndex": 3,
-                    "low_ifIndex": 100009,
-                    "ifStackStatus": "active"
-                },
-                {
-                    "high_ifIndex": 4,
-                    "low_ifIndex": 100000,
-                    "ifStackStatus": "active"
-                },
-                {
-                    "high_ifIndex": 4,
-                    "low_ifIndex": 100009,
-                    "ifStackStatus": "active"
-                },
-                {
-                    "high_ifIndex": 5,
-                    "low_ifIndex": 100000,
-                    "ifStackStatus": "active"
-                },
-                {
-                    "high_ifIndex": 5,
-                    "low_ifIndex": 100009,
-                    "ifStackStatus": "active"
-                },
-                {
-                    "high_ifIndex": 6,
-                    "low_ifIndex": 100000,
-                    "ifStackStatus": "active"
-                },
-                {
-                    "high_ifIndex": 6,
-                    "low_ifIndex": 100009,
-                    "ifStackStatus": "active"
-                },
-                {
-                    "high_ifIndex": 7,
-                    "low_ifIndex": 100000,
-                    "ifStackStatus": "active"
-                },
-                {
-                    "high_ifIndex": 7,
-                    "low_ifIndex": 100009,
-                    "ifStackStatus": "active"
-                },
-                {
-                    "high_ifIndex": 8,
-                    "low_ifIndex": 100000,
-                    "ifStackStatus": "active"
-                },
-                {
-                    "high_ifIndex": 8,
-                    "low_ifIndex": 100009,
-                    "ifStackStatus": "active"
-                },
-                {
-                    "high_ifIndex": 9,
-                    "low_ifIndex": 100000,
-                    "ifStackStatus": "active"
-                },
-                {
-                    "high_ifIndex": 9,
-                    "low_ifIndex": 100009,
-                    "ifStackStatus": "active"
-                },
-                {
-                    "high_ifIndex": 10,
-                    "low_ifIndex": 100000,
-                    "ifStackStatus": "active"
-                },
-                {
-                    "high_ifIndex": 10,
-                    "low_ifIndex": 100009,
-                    "ifStackStatus": "active"
-                },
-                {
-                    "high_ifIndex": 11,
-                    "low_ifIndex": 100000,
-                    "ifStackStatus": "active"
-                },
-                {
-                    "high_ifIndex": 11,
-                    "low_ifIndex": 100009,
-                    "ifStackStatus": "active"
-                },
-                {
-                    "high_ifIndex": 12,
-                    "low_ifIndex": 100000,
-                    "ifStackStatus": "active"
-                },
-                {
-                    "high_ifIndex": 12,
-                    "low_ifIndex": 100009,
-                    "ifStackStatus": "active"
-                },
-                {
-                    "high_ifIndex": 13,
-                    "low_ifIndex": 100000,
-                    "ifStackStatus": "active"
-                },
-                {
-                    "high_ifIndex": 13,
-                    "low_ifIndex": 100009,
-                    "ifStackStatus": "active"
-                },
-                {
-                    "high_ifIndex": 14,
-                    "low_ifIndex": 100000,
-                    "ifStackStatus": "active"
-                },
-                {
-                    "high_ifIndex": 14,
-                    "low_ifIndex": 100009,
-                    "ifStackStatus": "active"
-                },
-                {
-                    "high_ifIndex": 15,
-                    "low_ifIndex": 100000,
-                    "ifStackStatus": "active"
-                },
-                {
-                    "high_ifIndex": 15,
-                    "low_ifIndex": 100009,
-                    "ifStackStatus": "active"
-                },
-                {
-                    "high_ifIndex": 16,
-                    "low_ifIndex": 100000,
-                    "ifStackStatus": "active"
-                },
-                {
-                    "high_ifIndex": 16,
-                    "low_ifIndex": 100009,
-                    "ifStackStatus": "active"
-                },
-                {
-                    "high_ifIndex": 17,
-                    "low_ifIndex": 100000,
-                    "ifStackStatus": "active"
-                },
-                {
-                    "high_ifIndex": 17,
-                    "low_ifIndex": 100009,
-                    "ifStackStatus": "active"
-                },
-                {
-                    "high_ifIndex": 18,
-                    "low_ifIndex": 100000,
-                    "ifStackStatus": "active"
-                },
-                {
-                    "high_ifIndex": 18,
-                    "low_ifIndex": 100009,
-                    "ifStackStatus": "active"
-                },
-                {
-                    "high_ifIndex": 19,
-                    "low_ifIndex": 100000,
-                    "ifStackStatus": "active"
-                },
-                {
-                    "high_ifIndex": 19,
-                    "low_ifIndex": 100009,
-                    "ifStackStatus": "active"
-                },
-                {
-                    "high_ifIndex": 20,
-                    "low_ifIndex": 100000,
-                    "ifStackStatus": "active"
-                },
-                {
-                    "high_ifIndex": 20,
-                    "low_ifIndex": 100009,
-                    "ifStackStatus": "active"
-                },
-                {
-                    "high_ifIndex": 21,
-                    "low_ifIndex": 100000,
-                    "ifStackStatus": "active"
-                },
-                {
-                    "high_ifIndex": 21,
-                    "low_ifIndex": 100009,
-                    "ifStackStatus": "active"
-                },
-                {
-                    "high_ifIndex": 22,
-                    "low_ifIndex": 100000,
-                    "ifStackStatus": "active"
-                },
-                {
-                    "high_ifIndex": 22,
-                    "low_ifIndex": 100009,
-                    "ifStackStatus": "active"
-                },
-                {
-                    "high_ifIndex": 23,
-                    "low_ifIndex": 100000,
-                    "ifStackStatus": "active"
-                },
-                {
-                    "high_ifIndex": 23,
-                    "low_ifIndex": 100009,
-                    "ifStackStatus": "active"
-                },
-                {
-                    "high_ifIndex": 24,
-                    "low_ifIndex": 100000,
-                    "ifStackStatus": "active"
-                },
-                {
-                    "high_ifIndex": 24,
-                    "low_ifIndex": 100009,
-                    "ifStackStatus": "active"
-                },
-                {
-                    "high_ifIndex": 25,
-                    "low_ifIndex": 100000,
-                    "ifStackStatus": "active"
-                },
-                {
-                    "high_ifIndex": 25,
-                    "low_ifIndex": 100009,
-                    "ifStackStatus": "active"
-                },
-                {
-                    "high_ifIndex": 26,
-                    "low_ifIndex": 100000,
-                    "ifStackStatus": "active"
-                },
-                {
-                    "high_ifIndex": 26,
-                    "low_ifIndex": 100009,
-                    "ifStackStatus": "active"
-                },
-                {
-                    "high_ifIndex": 27,
-                    "low_ifIndex": 100000,
-                    "ifStackStatus": "active"
-                },
-                {
-                    "high_ifIndex": 27,
-                    "low_ifIndex": 100009,
-                    "ifStackStatus": "active"
-                },
-                {
-                    "high_ifIndex": 28,
-                    "low_ifIndex": 100000,
-                    "ifStackStatus": "active"
-                },
-                {
-                    "high_ifIndex": 28,
-                    "low_ifIndex": 100009,
-                    "ifStackStatus": "active"
-                },
-                {
-                    "high_ifIndex": 1000,
-                    "low_ifIndex": 100000,
-                    "ifStackStatus": "active"
-                },
-                {
-                    "high_ifIndex": 1000,
-                    "low_ifIndex": 100009,
-                    "ifStackStatus": "active"
-                },
-                {
-                    "high_ifIndex": 1001,
-                    "low_ifIndex": 100000,
-                    "ifStackStatus": "active"
-                },
-                {
-                    "high_ifIndex": 1001,
-                    "low_ifIndex": 100009,
-                    "ifStackStatus": "active"
+            "vlans": [
+                {
+                    "vlan_vlan": 1,
+                    "vlan_domain": 1,
+                    "vlan_name": "VLAN 1",
+                    "vlan_type": null,
+                    "vlan_mtu": null
+                },
+                {
+                    "vlan_vlan": 10,
+                    "vlan_domain": 1,
+                    "vlan_name": "LAN",
+                    "vlan_type": null,
+                    "vlan_mtu": null
+                }
+            ],
+            "ports_vlans": [
+                {
+                    "vlan": 1,
+                    "baseport": 24,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 1,
+                    "baseport": 25,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 1,
+                    "baseport": 26,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 1,
+                    "baseport": 27,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 1,
+                    "baseport": 28,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 1,
+                    "baseport": 1003,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 10,
+                    "baseport": 1,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 10,
+                    "baseport": 2,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 10,
+                    "baseport": 3,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 10,
+                    "baseport": 4,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 10,
+                    "baseport": 5,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
                 },
-                {
-                    "high_ifIndex": 1002,
-                    "low_ifIndex": 100000,
-                    "ifStackStatus": "active"
-                },
-                {
-                    "high_ifIndex": 1002,
-                    "low_ifIndex": 100009,
-                    "ifStackStatus": "active"
-                },
-                {
-                    "high_ifIndex": 1003,
-                    "low_ifIndex": 100000,
-                    "ifStackStatus": "active"
-                },
-                {
-                    "high_ifIndex": 1003,
-                    "low_ifIndex": 100009,
-                    "ifStackStatus": "active"
-                },
-                {
-                    "high_ifIndex": 1004,
-                    "low_ifIndex": 100000,
-                    "ifStackStatus": "active"
-                },
-                {
-                    "high_ifIndex": 1004,
-                    "low_ifIndex": 100009,
-                    "ifStackStatus": "active"
+                {
+                    "vlan": 10,
+                    "baseport": 6,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
                 },
-                {
-                    "high_ifIndex": 1005,
-                    "low_ifIndex": 100000,
-                    "ifStackStatus": "active"
+                {
+                    "vlan": 10,
+                    "baseport": 7,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
                 },
-                {
-                    "high_ifIndex": 1005,
-                    "low_ifIndex": 100009,
-                    "ifStackStatus": "active"
+                {
+                    "vlan": 10,
+                    "baseport": 8,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
                 },
-                {
-                    "high_ifIndex": 1006,
-                    "low_ifIndex": 100000,
-                    "ifStackStatus": "active"
+                {
+                    "vlan": 10,
+                    "baseport": 9,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
                 },
-                {
-                    "high_ifIndex": 1006,
-                    "low_ifIndex": 100009,
-                    "ifStackStatus": "active"
+                {
+                    "vlan": 10,
+                    "baseport": 10,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
                 },
-                {
-                    "high_ifIndex": 1007,
-                    "low_ifIndex": 100000,
-                    "ifStackStatus": "active"
+                {
+                    "vlan": 10,
+                    "baseport": 11,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
                 },
-                {
-                    "high_ifIndex": 1007,
-                    "low_ifIndex": 100009,
-                    "ifStackStatus": "active"
+                {
+                    "vlan": 10,
+                    "baseport": 12,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 10,
+                    "baseport": 13,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 10,
+                    "baseport": 14,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 10,
+                    "baseport": 15,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 10,
+                    "baseport": 16,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 10,
+                    "baseport": 17,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 10,
+                    "baseport": 18,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 10,
+                    "baseport": 19,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 10,
+                    "baseport": 20,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 10,
+                    "baseport": 21,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 10,
+                    "baseport": 22,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 10,
+                    "baseport": 23,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 10,
+                    "baseport": 1003,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
                 }
             ]
         }
+    },
+    "stp": {
+        "discovery": {
+            "stp": [
+                {
+                    "vlan": null,
+                    "rootBridge": 1,
+                    "bridgeAddress": "a4b239e4d9d1",
+                    "protocolSpecification": "ieee8021d",
+                    "priority": 32768,
+                    "timeSinceTopologyChange": "0",
+                    "topChanges": 0,
+                    "designatedRoot": "a4b239e4d9d1",
+                    "rootCost": 0,
+                    "rootPort": 0,
+                    "maxAge": 20,
+                    "helloTime": 2,
+                    "holdTime": 1,
+                    "forwardDelay": 15,
+                    "bridgeMaxAge": 20,
+                    "bridgeHelloTime": 2,
+                    "bridgeForwardDelay": 15
+                }
+            ],
+            "ports_stp": [
+                {
+                    "vlan": null,
+                    "port_index": 1,
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 200000,
+                    "designatedRoot": "a4b239e4d9d1",
+                    "designatedCost": 0,
+                    "designatedBridge": "a4b239e4d9d1",
+                    "designatedPort": 1,
+                    "forwardTransitions": 1,
+                    "ifIndex": 1
+                },
+                {
+                    "vlan": null,
+                    "port_index": 5,
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 200000,
+                    "designatedRoot": "a4b239e4d9d1",
+                    "designatedCost": 0,
+                    "designatedBridge": "a4b239e4d9d1",
+                    "designatedPort": 5,
+                    "forwardTransitions": 1,
+                    "ifIndex": 5
+                },
+                {
+                    "vlan": null,
+                    "port_index": 17,
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 200000,
+                    "designatedRoot": "a4b239e4d9d1",
+                    "designatedCost": 0,
+                    "designatedBridge": "a4b239e4d9d1",
+                    "designatedPort": 17,
+                    "forwardTransitions": 1,
+                    "ifIndex": 17
+                },
+                {
+                    "vlan": null,
+                    "port_index": 19,
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 200000,
+                    "designatedRoot": "a4b239e4d9d1",
+                    "designatedCost": 0,
+                    "designatedBridge": "a4b239e4d9d1",
+                    "designatedPort": 19,
+                    "forwardTransitions": 1,
+                    "ifIndex": 19
+                },
+                {
+                    "vlan": null,
+                    "port_index": 20,
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 200000,
+                    "designatedRoot": "a4b239e4d9d1",
+                    "designatedCost": 0,
+                    "designatedBridge": "a4b239e4d9d1",
+                    "designatedPort": 20,
+                    "forwardTransitions": 1,
+                    "ifIndex": 20
+                },
+                {
+                    "vlan": null,
+                    "port_index": 21,
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 200000,
+                    "designatedRoot": "a4b239e4d9d1",
+                    "designatedCost": 0,
+                    "designatedBridge": "a4b239e4d9d1",
+                    "designatedPort": 21,
+                    "forwardTransitions": 1,
+                    "ifIndex": 21
+                },
+                {
+                    "vlan": null,
+                    "port_index": 22,
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 200000,
+                    "designatedRoot": "a4b239e4d9d1",
+                    "designatedCost": 0,
+                    "designatedBridge": "a4b239e4d9d1",
+                    "designatedPort": 22,
+                    "forwardTransitions": 1,
+                    "ifIndex": 22
+                },
+                {
+                    "vlan": null,
+                    "port_index": 23,
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 2000000,
+                    "designatedRoot": "a4b239e4d9d1",
+                    "designatedCost": 0,
+                    "designatedBridge": "a4b239e4d9d1",
+                    "designatedPort": 23,
+                    "forwardTransitions": 1,
+                    "ifIndex": 23
+                },
+                {
+                    "vlan": null,
+                    "port_index": 24,
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 200000,
+                    "designatedRoot": "a4b239e4d9d1",
+                    "designatedCost": 0,
+                    "designatedBridge": "a4b239e4d9d1",
+                    "designatedPort": 24,
+                    "forwardTransitions": 1,
+                    "ifIndex": 24
+                }
+            ]
+        },
+        "poller": "matches discovery"
     },
     "entity-physical": {
         "discovery": {
@@ -7906,420 +7956,370 @@
         },
         "poller": "matches discovery"
     },
-    "vlans": {
+    "ports-stack": {
         "discovery": {
-            "vlans": [
+            "ports_stack": [
                 {
-                    "vlan_vlan": 1,
-                    "vlan_domain": 1,
-                    "vlan_name": "VLAN 1",
-                    "vlan_type": null,
-                    "vlan_mtu": null
+                    "high_ifIndex": 1,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
                 },
                 {
-                    "vlan_vlan": 10,
-                    "vlan_domain": 1,
-                    "vlan_name": "LAN",
-                    "vlan_type": null,
-                    "vlan_mtu": null
-                }
-            ],
-            "ports_vlans": [
-                {
-                    "vlan": 1,
-                    "baseport": 24,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
+                    "high_ifIndex": 1,
+                    "low_ifIndex": 100009,
+                    "ifStackStatus": "active"
                 },
                 {
-                    "vlan": 1,
-                    "baseport": 25,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
+                    "high_ifIndex": 2,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
                 },
                 {
-                    "vlan": 1,
-                    "baseport": 26,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
+                    "high_ifIndex": 2,
+                    "low_ifIndex": 100009,
+                    "ifStackStatus": "active"
                 },
                 {
-                    "vlan": 1,
-                    "baseport": 27,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
+                    "high_ifIndex": 3,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
                 },
                 {
-                    "vlan": 1,
-                    "baseport": 28,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
+                    "high_ifIndex": 3,
+                    "low_ifIndex": 100009,
+                    "ifStackStatus": "active"
                 },
                 {
-                    "vlan": 1,
-                    "baseport": 1003,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
+                    "high_ifIndex": 4,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
                 },
                 {
-                    "vlan": 10,
-                    "baseport": 1,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
+                    "high_ifIndex": 4,
+                    "low_ifIndex": 100009,
+                    "ifStackStatus": "active"
                 },
                 {
-                    "vlan": 10,
-                    "baseport": 2,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
+                    "high_ifIndex": 5,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
                 },
                 {
-                    "vlan": 10,
-                    "baseport": 3,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
+                    "high_ifIndex": 5,
+                    "low_ifIndex": 100009,
+                    "ifStackStatus": "active"
                 },
                 {
-                    "vlan": 10,
-                    "baseport": 4,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
+                    "high_ifIndex": 6,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
                 },
                 {
-                    "vlan": 10,
-                    "baseport": 5,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
+                    "high_ifIndex": 6,
+                    "low_ifIndex": 100009,
+                    "ifStackStatus": "active"
                 },
                 {
-                    "vlan": 10,
-                    "baseport": 6,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
+                    "high_ifIndex": 7,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
                 },
                 {
-                    "vlan": 10,
-                    "baseport": 7,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
+                    "high_ifIndex": 7,
+                    "low_ifIndex": 100009,
+                    "ifStackStatus": "active"
                 },
                 {
-                    "vlan": 10,
-                    "baseport": 8,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
+                    "high_ifIndex": 8,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
                 },
                 {
-                    "vlan": 10,
-                    "baseport": 9,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
+                    "high_ifIndex": 8,
+                    "low_ifIndex": 100009,
+                    "ifStackStatus": "active"
                 },
                 {
-                    "vlan": 10,
-                    "baseport": 10,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
+                    "high_ifIndex": 9,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
                 },
                 {
-                    "vlan": 10,
-                    "baseport": 11,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
+                    "high_ifIndex": 9,
+                    "low_ifIndex": 100009,
+                    "ifStackStatus": "active"
                 },
                 {
-                    "vlan": 10,
-                    "baseport": 12,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
+                    "high_ifIndex": 10,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
                 },
                 {
-                    "vlan": 10,
-                    "baseport": 13,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
+                    "high_ifIndex": 10,
+                    "low_ifIndex": 100009,
+                    "ifStackStatus": "active"
                 },
                 {
-                    "vlan": 10,
-                    "baseport": 14,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
+                    "high_ifIndex": 11,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
                 },
                 {
-                    "vlan": 10,
-                    "baseport": 15,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
+                    "high_ifIndex": 11,
+                    "low_ifIndex": 100009,
+                    "ifStackStatus": "active"
                 },
                 {
-                    "vlan": 10,
-                    "baseport": 16,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
+                    "high_ifIndex": 12,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
                 },
                 {
-                    "vlan": 10,
-                    "baseport": 17,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
+                    "high_ifIndex": 12,
+                    "low_ifIndex": 100009,
+                    "ifStackStatus": "active"
                 },
                 {
-                    "vlan": 10,
-                    "baseport": 18,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
+                    "high_ifIndex": 13,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
                 },
                 {
-                    "vlan": 10,
-                    "baseport": 19,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
+                    "high_ifIndex": 13,
+                    "low_ifIndex": 100009,
+                    "ifStackStatus": "active"
                 },
                 {
-                    "vlan": 10,
-                    "baseport": 20,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
+                    "high_ifIndex": 14,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
                 },
                 {
-                    "vlan": 10,
-                    "baseport": 21,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
+                    "high_ifIndex": 14,
+                    "low_ifIndex": 100009,
+                    "ifStackStatus": "active"
                 },
                 {
-                    "vlan": 10,
-                    "baseport": 22,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
+                    "high_ifIndex": 15,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
                 },
                 {
-                    "vlan": 10,
-                    "baseport": 23,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
+                    "high_ifIndex": 15,
+                    "low_ifIndex": 100009,
+                    "ifStackStatus": "active"
                 },
                 {
-                    "vlan": 10,
-                    "baseport": 1003,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
+                    "high_ifIndex": 16,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 16,
+                    "low_ifIndex": 100009,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 17,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 17,
+                    "low_ifIndex": 100009,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 18,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 18,
+                    "low_ifIndex": 100009,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 19,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 19,
+                    "low_ifIndex": 100009,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 20,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 20,
+                    "low_ifIndex": 100009,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 21,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 21,
+                    "low_ifIndex": 100009,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 22,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 22,
+                    "low_ifIndex": 100009,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 23,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 23,
+                    "low_ifIndex": 100009,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 24,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 24,
+                    "low_ifIndex": 100009,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 25,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 25,
+                    "low_ifIndex": 100009,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 26,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 26,
+                    "low_ifIndex": 100009,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 27,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 27,
+                    "low_ifIndex": 100009,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 28,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 28,
+                    "low_ifIndex": 100009,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1000,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1000,
+                    "low_ifIndex": 100009,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1001,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1001,
+                    "low_ifIndex": 100009,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1002,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1002,
+                    "low_ifIndex": 100009,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1003,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1003,
+                    "low_ifIndex": 100009,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1004,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1004,
+                    "low_ifIndex": 100009,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1005,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1005,
+                    "low_ifIndex": 100009,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1006,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1006,
+                    "low_ifIndex": 100009,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1007,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1007,
+                    "low_ifIndex": 100009,
+                    "ifStackStatus": "active"
                 }
             ]
         }
-    },
-    "stp": {
-        "discovery": {
-            "stp": [
-                {
-                    "vlan": null,
-                    "rootBridge": 1,
-                    "bridgeAddress": "a4b239e4d9d1",
-                    "protocolSpecification": "ieee8021d",
-                    "priority": 32768,
-                    "timeSinceTopologyChange": "0",
-                    "topChanges": 0,
-                    "designatedRoot": "a4b239e4d9d1",
-                    "rootCost": 0,
-                    "rootPort": 0,
-                    "maxAge": 20,
-                    "helloTime": 2,
-                    "holdTime": 1,
-                    "forwardDelay": 15,
-                    "bridgeMaxAge": 20,
-                    "bridgeHelloTime": 2,
-                    "bridgeForwardDelay": 15
-                }
-            ],
-            "ports_stp": [
-                {
-                    "vlan": null,
-                    "port_index": 1,
-                    "priority": 128,
-                    "state": "forwarding",
-                    "enable": "enabled",
-                    "pathCost": 200000,
-                    "designatedRoot": "a4b239e4d9d1",
-                    "designatedCost": 0,
-                    "designatedBridge": "a4b239e4d9d1",
-                    "designatedPort": 1,
-                    "forwardTransitions": 1,
-                    "ifIndex": 1
-                },
-                {
-                    "vlan": null,
-                    "port_index": 5,
-                    "priority": 128,
-                    "state": "forwarding",
-                    "enable": "enabled",
-                    "pathCost": 200000,
-                    "designatedRoot": "a4b239e4d9d1",
-                    "designatedCost": 0,
-                    "designatedBridge": "a4b239e4d9d1",
-                    "designatedPort": 5,
-                    "forwardTransitions": 1,
-                    "ifIndex": 5
-                },
-                {
-                    "vlan": null,
-                    "port_index": 17,
-                    "priority": 128,
-                    "state": "forwarding",
-                    "enable": "enabled",
-                    "pathCost": 200000,
-                    "designatedRoot": "a4b239e4d9d1",
-                    "designatedCost": 0,
-                    "designatedBridge": "a4b239e4d9d1",
-                    "designatedPort": 17,
-                    "forwardTransitions": 1,
-                    "ifIndex": 17
-                },
-                {
-                    "vlan": null,
-                    "port_index": 19,
-                    "priority": 128,
-                    "state": "forwarding",
-                    "enable": "enabled",
-                    "pathCost": 200000,
-                    "designatedRoot": "a4b239e4d9d1",
-                    "designatedCost": 0,
-                    "designatedBridge": "a4b239e4d9d1",
-                    "designatedPort": 19,
-                    "forwardTransitions": 1,
-                    "ifIndex": 19
-                },
-                {
-                    "vlan": null,
-                    "port_index": 20,
-                    "priority": 128,
-                    "state": "forwarding",
-                    "enable": "enabled",
-                    "pathCost": 200000,
-                    "designatedRoot": "a4b239e4d9d1",
-                    "designatedCost": 0,
-                    "designatedBridge": "a4b239e4d9d1",
-                    "designatedPort": 20,
-                    "forwardTransitions": 1,
-                    "ifIndex": 20
-                },
-                {
-                    "vlan": null,
-                    "port_index": 21,
-                    "priority": 128,
-                    "state": "forwarding",
-                    "enable": "enabled",
-                    "pathCost": 200000,
-                    "designatedRoot": "a4b239e4d9d1",
-                    "designatedCost": 0,
-                    "designatedBridge": "a4b239e4d9d1",
-                    "designatedPort": 21,
-                    "forwardTransitions": 1,
-                    "ifIndex": 21
-                },
-                {
-                    "vlan": null,
-                    "port_index": 22,
-                    "priority": 128,
-                    "state": "forwarding",
-                    "enable": "enabled",
-                    "pathCost": 200000,
-                    "designatedRoot": "a4b239e4d9d1",
-                    "designatedCost": 0,
-                    "designatedBridge": "a4b239e4d9d1",
-                    "designatedPort": 22,
-                    "forwardTransitions": 1,
-                    "ifIndex": 22
-                },
-                {
-                    "vlan": null,
-                    "port_index": 23,
-                    "priority": 128,
-                    "state": "forwarding",
-                    "enable": "enabled",
-                    "pathCost": 2000000,
-                    "designatedRoot": "a4b239e4d9d1",
-                    "designatedCost": 0,
-                    "designatedBridge": "a4b239e4d9d1",
-                    "designatedPort": 23,
-                    "forwardTransitions": 1,
-                    "ifIndex": 23
-                },
-                {
-                    "vlan": null,
-                    "port_index": 24,
-                    "priority": 128,
-                    "state": "forwarding",
-                    "enable": "enabled",
-                    "pathCost": 200000,
-                    "designatedRoot": "a4b239e4d9d1",
-                    "designatedCost": 0,
-                    "designatedBridge": "a4b239e4d9d1",
-                    "designatedPort": 24,
-                    "forwardTransitions": 1,
-                    "ifIndex": 24
-                }
-            ]
-        },
-        "poller": "matches discovery"
     }
 }
