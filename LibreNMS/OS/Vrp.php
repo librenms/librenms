@@ -173,7 +173,7 @@ class Vrp extends OS implements
                 $type .= $mode;
             }
 
-            if (empty($data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalVenderName'] ?? '') && empty($data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalVenderPn'] ?? '') && empty($data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalVendorSn'] ?? '')) {
+            if (empty($data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalVenderName']) && empty($data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalVenderPn']) && empty($data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalVendorSn'])) {
                 return null; //Probably no transceiver around here
             }
 
