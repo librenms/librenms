@@ -47,6 +47,8 @@ try {
         include Config::get('install_dir') . '/includes/html/graphs/customoid/customoid.inc.php';
     } elseif ($auth && is_file(Config::get('install_dir') . "/includes/html/graphs/$type/$subtype.inc.php")) {
         include Config::get('install_dir') . "/includes/html/graphs/$type/$subtype.inc.php";
+    } elseif ($auth && is_file(Config::get('install_dir') . "/includes/html/graphs/$type/generic.inc.php")) {
+        include Config::get('install_dir') . "/includes/html/graphs/$type/generic.inc.php";
     } else {
         graph_error("$type*$subtype Graph Template Missing", "$type*$subtype");
     }
