@@ -8,11 +8,11 @@
     <meta http-equiv="content-type" content="text/html; charset=utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     @if(!LibreNMS\Config::get('favicon', false))
-        <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('images/apple-touch-icon.png') }}">
-        <link rel="icon" type="image/png" href="{{ asset('images/favicon-32x32.png') }}" sizes="32x32">
-        <link rel="icon" type="image/png" href="{{ asset('images/favicon-16x16.png') }}" sizes="16x16">
-        <link rel="mask-icon" href="{{ asset('images/safari-pinned-tab.svg') }}" color="#5bbad5">
-        <link rel="shortcut icon" href="{{ asset('images/favicon.ico') }}">
+        <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('images/ab_icon.png') }}">
+        <link rel="icon" type="image/png" href="{{ asset('images/ab_icon.png') }}" sizes="32x32">
+        <link rel="icon" type="image/png" href="{{ asset('images/ab_icon.png') }}" sizes="16x16">
+        <link rel="mask-icon" href="{{ asset('images/ab_icon.png') }}" color="#5bbad5">
+        <link rel="shortcut icon" href="{{ asset('images/ab_icon.png') }}">
     @else
         <link rel="shortcut icon" href="{{ LibreNMS\Config::get('favicon') }}">
     @endif

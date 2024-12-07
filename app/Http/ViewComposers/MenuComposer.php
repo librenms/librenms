@@ -73,7 +73,7 @@ class MenuComposer
         $vars['navbar'] = in_array($site_style, ['mono']) ? 'navbar-inverse' : '';
 
         $vars['project_name'] = Config::get('project_name', 'LibreNMS');
-        $vars['title_image'] = Config::get('title_image', "images/librenms_logo_$site_style.svg");
+        $vars['title_image'] = Config::get('title_image', "images/telequill_logo_$site_style.svg");
 
         //Dashboards
         $vars['dashboards'] = Dashboard::select('dashboard_id', 'dashboard_name')->allAvailable($user)->orderBy('dashboard_name')->get();

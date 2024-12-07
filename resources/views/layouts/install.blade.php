@@ -95,7 +95,7 @@
 <div class="container">
     <div class="card col-lg-8 offset-lg-2 col-md-10 offset-md-1 col-12 primary-panel">
         <div class="card-img-top">
-            <img class="card-img-top p-4" src="{{ asset(\LibreNMS\Config::get('title_image', "images/librenms_logo_light.svg")) }}" alt="LibreNMS">
+            <img class="card-img-top p-4" src="{{ asset(\LibreNMS\Config::get('title_image', "images/telequill_navbar.svg")) }}" alt="LibreNMS">
             <div id="progress-icons" class="d-flex flex-row justify-content-around">
                 <div class="install-progress complete"></div>
                 @foreach($steps as $name => $controller)

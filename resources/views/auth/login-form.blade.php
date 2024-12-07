@@ -1,6 +1,6 @@
 <x-panel>
     <x-slot name="title">
-        <img class="logon-logo img-responsive" src="{{ asset(\LibreNMS\Config::get('title_image', 'images/librenms_logo_light.svg')) }}">
+        <img class="logon-logo img-responsive" src="{{ asset(\LibreNMS\Config::get('title_image', 'images/telequill_loginpage.svg')) }}">
     </x-slot>
 
     @config('login_message')
