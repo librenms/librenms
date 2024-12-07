@@ -13,12 +13,12 @@ enum Severity: int
 
     public function toLogLevel(): string
     {
-        return match($this->value) {
+        return match ($this->value) {
             1,2 => 'info',
             3 => 'notice',
             4 => 'warning',
             5 => 'error',
-           default => 'debug',
+            default => 'debug',
         };
     }
 }
