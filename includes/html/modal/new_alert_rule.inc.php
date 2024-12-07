@@ -182,6 +182,7 @@ if (Auth::user()->hasGlobalAdmin()) {
 
     <script src="js/sql-parser.min.js"></script>
     <script src="js/query-builder.standalone.min.js"></script>
+    <script src="js/interact.min.js"></script>
     <script>
         $('#builder').on('afterApplyRuleFlags.queryBuilder afterCreateRuleFilters.queryBuilder', function () {
             $("[name$='_filter']").each(function () {
@@ -197,7 +198,8 @@ if (Auth::user()->hasGlobalAdmin()) {
             }
         }).queryBuilder({
             plugins: [
-                'bt-tooltip-errors'
+                'bt-tooltip-errors',
+                'sortable'
                 // 'not-group'
             ],
 
