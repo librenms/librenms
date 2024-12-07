@@ -39,7 +39,7 @@ modules:
                     skip_values:
                     -
                         oid: dcpInterfaceStatus
-                        op: '!='
+                        op: '='
                         value: 1
                 -
                     oid: dcpInterfaceTable
@@ -51,7 +51,7 @@ modules:
                     skip_values:
                     -
                         oid: dcpInterfaceStatus
-                        op: '!='
+                        op: '='
                         value: 1
                 -
                     oid: dcpLinkviewTable
