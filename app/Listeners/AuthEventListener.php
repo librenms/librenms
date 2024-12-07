@@ -21,8 +21,6 @@ class AuthEventListener
         //
     }
 
-
-
     /**
      * Handle the failed auth event.
      *

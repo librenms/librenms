@@ -10,7 +10,6 @@ use Monolog\LogRecord;
 
 class EventLogDbHandler extends AbstractProcessingHandler
 {
-
     /**
      * @inheritDoc
      */
