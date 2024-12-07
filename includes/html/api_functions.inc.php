@@ -3366,3 +3366,14 @@ function server_info()
         $versions,
     ], 'system');
 }
+
+function get_port_macs()
+{
+    $data = dbFetchRows('SELECT `D`.`hostname`, `D`.`sysName`,`P`.`ifIndex`,`P`.`ifPhysAddress`, `P`.`ifType` FROM `ports` AS `P` LEFT JOIN `devices` `D` ON `D`.`device_id` = `P`.`device_id` WHERE `P`.`ifPhysAddress` IS NOT NULL');
+
+    if (empty($data)) {
+        return api_error(404, 'No ports with a MAC address found');
+    }
+
+    return api_success($data, 'get_port_macs');
+}
