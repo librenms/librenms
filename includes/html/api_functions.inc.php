@@ -3377,3 +3377,4 @@ function get_port_macs()
 
     return api_success($data, 'get_port_macs');
 }
+
