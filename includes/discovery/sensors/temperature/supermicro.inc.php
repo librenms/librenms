@@ -24,7 +24,7 @@ if ($oids) {
                 $monitor = snmp_get($device, $monitor_oid, '-Oqv', 'SUPERMICRO-HEALTH-MIB', 'supermicro');
                 if ($monitor == 'true') {
                     $descr = trim(str_ireplace('temperature', '', $descr));
-                    discover_sensor($valid['sensor'], 'temperature', $device, $temperature_oid, trim($index, '.'), 'supermicro', $descr, (int) $divisor, '1', null, null, null, $limit, $temperature);
+                    discover_sensor(null, 'temperature', $device, $temperature_oid, trim($index, '.'), 'supermicro', $descr, (int) $divisor, '1', null, null, null, $limit, $temperature);
                 }
             }
         }

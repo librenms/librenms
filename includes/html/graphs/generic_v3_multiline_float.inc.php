@@ -25,7 +25,7 @@ if ($width > '500') {
     $rrd_options .= " COMMENT:'" . substr(str_pad($unit_text, $descr_len + 10), 0, $descr_len + 10) . "Now         Min         Max        Avg\l'";
 }
 
-foreach ($rrd_list as $rrd) {
+foreach ($rrd_list as $i => $rrd) {
     if ($rrd['colour']) {
         $colour = $rrd['colour'];
     } else {

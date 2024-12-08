@@ -28,6 +28,7 @@
 namespace LibreNMS\OS;
 
 use App\Models\Device;
+use App\Models\EntPhysical;
 use App\Models\MplsLsp;
 use App\Models\MplsLspPath;
 use App\Models\MplsSap;
@@ -968,5 +969,49 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
 
         return $sensors;
     }
-    // End Class Timos
+
+    public function discoverEntityPhysical(): Collection
+    {
+        $inventory = new Collection;
+
+        $chassis = \SnmpQuery::walk('TIMETRA-CHASSIS-MIB::tmnxChassisType')->pluck();
+        $chassisTypes = \SnmpQuery::walk('TIMETRA-CHASSIS-MIB::tmnxChassisTypeTable')->table(1);
+        $hardware = \SnmpQuery::enumStrings()->walk('TIMETRA-CHASSIS-MIB::tmnxHwTable');
+
+        foreach ($hardware->table(2) as $tmnxChassisIndex => $chassisContents) {
+            $type = $chassis[$tmnxChassisIndex];
+
+            if (isset($chassisTypes[$type])) {
+                $inventory->push(new EntPhysical([
+                    'entPhysicalIndex' => $tmnxChassisIndex,
+                    'entPhysicalDescr' => $chassisTypes[$type]['TIMETRA-CHASSIS-MIB::tmnxChassisTypeDescription'] ?? null,
+                    'entPhysicalClass' => 'chassis',
+                    'entPhysicalContainedIn' => 0,
+                    'entPhysicalName' => $chassisTypes[$type]['TIMETRA-CHASSIS-MIB::tmnxChassisTypeName'] ?? null,
+                ]));
+            }
+
+            foreach ($chassisContents as $tmnxHwIndex => $entry) {
+                $inventory->push(new EntPhysical([
+                    'entPhysicalIndex' => $tmnxHwIndex,
+                    'entPhysicalClass' => $entry['TIMETRA-CHASSIS-MIB::tmnxHwClass'],
+                    //                    'entPhysicalDescr' => $entry['TIMETRA-CHASSIS-MIB::tmnxHwID'],
+                    'entPhysicalName' => $entry['TIMETRA-CHASSIS-MIB::tmnxHwName'],
+                    'entPhysicalModelName' => $entry['TIMETRA-CHASSIS-MIB::tmnxHwMfgBoardNumber'],
+                    'entPhysicalSerialNum' => $entry['TIMETRA-CHASSIS-MIB::tmnxHwSerialNumber'],
+                    'entPhysicalContainedIn' => $entry['TIMETRA-CHASSIS-MIB::tmnxHwContainedIn'],
+                    'entPhysicalMfgName' => $entry['TIMETRA-CHASSIS-MIB::tmnxHwMfgBoardNumber'],
+                    'entPhysicalParentRelPos' => $entry['TIMETRA-CHASSIS-MIB::tmnxHwParentRelPos'],
+                    'entPhysicalHardwareRev' => '1.0',
+                    'entPhysicalFirmwareRev' => $entry['TIMETRA-CHASSIS-MIB::tmnxHwBootCodeVersion'],
+                    'entPhysicalSoftwareRev' => $entry['TIMETRA-CHASSIS-MIB::tmnxHwBootCodeVersion'],
+                    'entPhysicalIsFRU' => $entry['TIMETRA-CHASSIS-MIB::tmnxHwIsFRU'],
+                    'entPhysicalAlias' => $entry['TIMETRA-CHASSIS-MIB::tmnxHwAlias'],
+                    'entPhysicalAssetID' => $entry['TIMETRA-CHASSIS-MIB::tmnxHwAssetID'],
+                ]));
+            }
+        }
+
+        return $inventory;
+    }
 }

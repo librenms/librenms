@@ -26,6 +26,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Interfaces\ToastInterface;
 use App\Models\User;
 use App\Models\UserPref;
 use Illuminate\Http\Request;
@@ -37,14 +38,14 @@ use Session;
 
 class TwoFactorController extends Controller
 {
-    public function verifyTwoFactor(Request $request)
+    public function verifyTwoFactor(Request $request, ToastInterface $toast)
     {
         $this->validate($request, [
             'twofactor' => 'required|numeric',
         ]);
 
         try {
-            $this->checkToken($request->user(), $request->input('twofactor'));
+            $this->checkToken($request->user(), $request->input('twofactor'), $toast);
         } catch (AuthenticationException $e) {
             return redirect()->route('2fa.form')->withErrors($e->getMessage());
         }
@@ -54,7 +55,7 @@ class TwoFactorController extends Controller
             UserPref::forgetPref(auth()->user(), 'twofactor');
             $request->session()->forget(['twofactor', 'twofactorremove']);
 
-            flash()->addInfo(__('TwoFactor auth removed.'));
+            $toast->info(__('TwoFactor auth removed.'));
 
             return redirect('preferences');
         }
@@ -153,7 +154,7 @@ class TwoFactorController extends Controller
      *
      * @throws AuthenticationException
      */
-    private function checkToken($user, $token)
+    private function checkToken($user, $token, ToastInterface $toast)
     {
         if (! $token) {
             throw new AuthenticationException(__('No Two-Factor Token entered.'));
@@ -192,7 +193,7 @@ class TwoFactorController extends Controller
 
         // notify if added
         if (Session::has('twofactoradd')) {
-            flash()->addSuccess(__('TwoFactor auth added.'));
+            $toast->success(__('TwoFactor auth added.'));
             Session::forget('twofactoradd');
         }
 

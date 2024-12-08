@@ -51,7 +51,7 @@ $tpdin_oids = [
 
 foreach ($tpdin_oids as $data) {
     if ($data['current'] > 0) {
-        discover_sensor($valid['sensor'], 'current', $device, $data['oid'], $data['index'], $device['os'], $data['descr'], 10, '1', null, null, null, null, $data['current']);
+        discover_sensor(null, 'current', $device, $data['oid'], $data['index'], $device['os'], $data['descr'], 10, '1', null, null, null, null, $data['current']);
     }
 }
 

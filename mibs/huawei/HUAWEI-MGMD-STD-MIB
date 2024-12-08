@@ -1,25 +1,24 @@
 -- ============================================================================
--- Copyright (C) by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2022 by HUAWEI TECHNOLOGIES. All rights reserved.
 -- 
--- Description: HUAWEI-MGMD-STD-MIB.my , this Mib module for MGMD Management.
+-- Description: HUAWEI-MGMD-STD-MIB.my, this MIB module for MGMD Management.
 --            A New version of MGMD combining RFC 2933 and RFC 3019.
 --            Includes IGMPv3 and MLDv2 source filtering changes.
 --            Copyright (C) The Internet Society (date).  This version
---            of this Mib module is part of RFC 3376;  see the RFC
+--            of this MIB module is part of RFC 3376; see the RFC
 --            itself for full legal notices. 
 -- Reference:  
--- Version: V1.0
+-- Version: V2.22
 -- History:
---    created by liusuoqian 61136 2007-4-12
 --    
 -- ============================================================================
 HUAWEI-MGMD-STD-MIB DEFINITIONS ::= BEGIN
 IMPORTS
     MODULE-IDENTITY, OBJECT-TYPE, Counter32, Gauge32,
-    Unsigned32, TimeTicks, IpAddress FROM SNMPv2-SMI
+    Unsigned32, TimeTicks, IpAddress, NOTIFICATION-TYPE FROM SNMPv2-SMI
     InetAddress, InetAddressType     FROM INET-ADDRESS-MIB
-    RowStatus, DisplayString         FROM SNMPv2-TC
-    MODULE-COMPLIANCE, OBJECT-GROUP  FROM SNMPv2-CONF
+    RowStatus, TruthValue, DisplayString, TEXTUAL-CONVENTION  FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP  FROM SNMPv2-CONF
     InterfaceIndexOrZero,
     InterfaceIndex                   FROM IF-MIB
     hwDatacomm                       FROM HUAWEI-MIB;  
@@ -28,26 +27,112 @@ hwMcast      OBJECT IDENTIFIER      ::= { hwDatacomm 149 }
                                      
                                      
 hwMgmdStdMib MODULE-IDENTITY
-    LAST-UPDATED "200704160000Z" -- 16 April 2007
-    ORGANIZATION "Huawei Technologies co.,Ltd."
+    LAST-UPDATED "202202110000Z" -- 11 Feb 2022
+    ORGANIZATION 
+            "Huawei Technologies Co.,Ltd."
     CONTACT-INFO 
-            " R&D BeiJing, Huawei Technologies co.,Ltd.
-            Huawei Bld.,NO.3 Xinxi Rd., 
-            Shang-Di Information Industry Base,
-            Hai-Dian District Beijing P.R. China
-            Zip:100085 
-            Http://www.huawei.com                                       
-            E-mail:support@huawei.com "
+            "Huawei Industrial Base
+              Bantian, Longgang
+               Shenzhen 518129
+               People's Republic of China
+               Website: http://www.huawei.com
+               Email: support@huawei.com
+             "
     DESCRIPTION
-            "The Mib module for management of IP Multicast, including
-            multicast routing, data forwarding, and data reception.
-            Huawei Technologies co.,Ltd . Supplementary information may
+            "The MIB module for MGMD Management.
+            Huawei Technologies Co.,Ltd . Supplementary information may
             be available at:
-            http://www.huawei.com" 
+            http://www.huawei.com"
+
+    REVISION "202202110000Z" -- 11 Feb 2022
+    DESCRIPTION
+            "Modify the History."
+
+
+    REVISION "202110270000Z" -- 27 Oct 2021
+    DESCRIPTION
+            "Modify the range of hwMgmdGmpBoardLimitCount."
+
+    REVISION "202110190000Z" -- 19 Oct 2021
+    DESCRIPTION
+            "Delete SrcAddr and GrpAddr of hwMgmdGMPBoardLimit/hwMgmdGMPBoardLimitClear."
+
+    REVISION "202110160000Z" -- 16 Oct 2021
+    DESCRIPTION
+            "1.Add hwMgmdBoardLimitThresholdExceed.
+             2.Add hwMgmdBoardLimitThresholdExceedClear.
+             3.Add hwMgmdGMPBoardLimit.
+             4.Add hwMgmdGMPBoardLimitClear.
+            "
+
+    REVISION "202104190000Z" -- 19 Apr 2021
+    DESCRIPTION 
+            "Modify comment."
+
+    REVISION "201809110000Z" -- 11 Sep 2018
+    DESCRIPTION 
+            "1.Add hwMgmdIfThresholdExceed.
+             2.Add hwMgmdIfThresholdExceedClear.
+            "
+
+    REVISION "201610130000Z" -- 13 Oct 2016
+    DESCRIPTION 
+            "1.Add hwMgmdRouterInterfaceTtlCheck.
+             2.Add hwMgmdHostInterfaceTtlCheck.
+             3.Add hwMgmdTtlCheck.
+            "
+            
+    REVISION "201607090000Z" -- 9 July 2016
+    DESCRIPTION 
+            "1.Add hwMgmdHostInterfaceTable.
+             2.Add hwMgmdHostRerouteDelayPeriod.  
+             3.Add hwMgmdHostRerouteImmediate.
+            "
+    REVISION "201407090000Z" -- 9 July 2014
+    DESCRIPTION 
+            "1.Add hwMgmdHostStarGThresholdExceed trap.
+             2.Add hwMgmdHostStarGThresholdExceedClear trap.
+             3.Add hwMgmdHostStarGExceed trap.
+             4.Add hwMgmdHostStarGExceedClear trap.
+             5.Add hwMgmdHostSGThreshodExceed trap.
+             6.Add hwMgmdHostSGThreshodExceedClear trap.
+             7.Add hwMgmdHostSGExceed trap.
+             8.Add hwMgmdHostSGExceedClear trap.
+            "
+    REVISION "201407010000Z" -- 1 July 2014
+    DESCRIPTION 
+            "1.Correct trap name hwMgmdTotalLimitThreshodExceed to hwMgmdTotalLimitThresholdExceed and modify the description.
+             2.Correct trap name hwMgmdTotalLimitThreshodExceedClear to hwMgmdTotalLimitThresholdExceedClear and modify the description.
+             "
+    REVISION "201406200000Z" -- 20 Jun 2014
+    DESCRIPTION 
+            "1.Add hwMgmdTotalLimitThreshodExceed trap.
+             2.Add hwMgmdTotalLimitThreshodExceedClear trap.
+            "
+    REVISION "201308280000Z" -- 28 Aug 2007
+    DESCRIPTION 
+            "Modify import mibs"
     REVISION "200704160000Z" -- 16 April 2007
     DESCRIPTION 
-            "The initial revision of this Mib module."
+            "The initial revision of this MIB module."
     ::= { hwMcast 3 }
+
+HWMgmdCtlMsgState ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+            "The PIM control message state.
+
+            valid(1)     The valid IGMP/MLD control message has been received.            
+
+            invalid(2)   The invalid IGMP/MLD control message has been received.
+
+            ignore(3)    The IGMP/MLD control message has been ignored."
+
+    SYNTAX     INTEGER {
+                  valid(1),                  
+                  invalid(2),
+                  ignore(3)
+               }
 
 hwMgmdMibObjects     OBJECT IDENTIFIER ::= { hwMgmdStdMib 1 }
 hwMgmdMibGeneralObjects     OBJECT IDENTIFIER ::= { hwMgmdStdMib 2 }
@@ -69,10 +154,7 @@ hwMgmdRouterInterfaceEntry OBJECT-TYPE
     STATUS     current
     DESCRIPTION
             "An entry (conceptual row) representing an interface on
-            which IGMP or MLD is enabled. Dynamically created row
-            state is non-volatile, and upon agent reboot should be
-            reinstantiated as a conceptual row. Any change in read-create
-            objects should therefore be backed up by stable storage."
+            which IGMP or MLD is enabled."
     INDEX      { hwMgmdRouterInterfaceIfIndex, 
                  hwMgmdRouterInterfaceQuerierType }
     ::= { hwMgmdRouterInterfaceTable 1 }
@@ -95,7 +177,8 @@ HwMgmdRouterInterfaceEntry ::= SEQUENCE {
     hwMgmdRouterInterfaceLastMembQueryIntvl    Unsigned32,
     hwMgmdRouterInterfaceLastMembQueryCount    Unsigned32,
     hwMgmdRouterInterfaceStartupQueryCount     Unsigned32,
-    hwMgmdRouterInterfaceStartupQueryInterval  Unsigned32
+    hwMgmdRouterInterfaceStartupQueryInterval  Unsigned32,
+    hwMgmdRouterInterfaceTtlCheck              TruthValue
 }
 
 hwMgmdRouterInterfaceIfIndex OBJECT-TYPE
@@ -104,33 +187,33 @@ hwMgmdRouterInterfaceIfIndex OBJECT-TYPE
     STATUS     current
     DESCRIPTION
             "The ifIndex value of the interface for which IGMP or MLD
-            is enabled. The table is indexed by the ifIndex value and
-            the InetAddressType to allow for interfaces which may be
+            is enabled.  The table is indexed by the ifIndex value and
+            the InetAddressType to allow for interfaces that may be
             configured in both IPv4 and IPv6 modes."
     ::= { hwMgmdRouterInterfaceEntry 1 }
 
 hwMgmdRouterInterfaceQuerierType OBJECT-TYPE
-    SYNTAX     InetAddressType
+    SYNTAX     InetAddressType 
     MAX-ACCESS not-accessible
     STATUS     current
     DESCRIPTION
-            "The address type of this interface. This entry along with
-             the ifIndex value acts as the index to the 
-             hwMgmdRouterInterface table. A physical interface may be 
-             configured in multiple modes concurrently, e.g. in IPv4 
-             and IPv6 modes connected to the same interface, however 
-             the traffic is considered to be logically separate."
+            "The address type of this interface.  This entry along with
+            the ifIndex value acts as the index to the
+            hwMgmdRouterInterface table.  A physical interface may be
+            configured in multiple modes concurrently, e.g., in IPv4
+            and IPv6 modes connected to the same interface; however,
+            the traffic is considered to be logically separate."
     ::= { hwMgmdRouterInterfaceEntry 2 }
 
 hwMgmdRouterInterfaceQuerier OBJECT-TYPE
-    SYNTAX     InetAddress
+    SYNTAX     InetAddress (SIZE(4|16))
     MAX-ACCESS read-only
     STATUS     current
     DESCRIPTION
             "The address of the IGMP or MLD Querier on the IP subnet to
-            which this interface is attached. The InetAddressType, e.g.
-            IPv4 or IPv6, is identified by the 
-            hwMgmdRouterInterfaceQuerierType variable in the 
+            which this interface is attached.  The InetAddressType,
+            e.g., IPv4 or IPv6, is identified by the
+            hwMgmdRouterInterfaceQuerierType variable in the
             hwMgmdRouterInterface table."
     ::= { hwMgmdRouterInterfaceEntry 3 }
 
@@ -141,8 +224,7 @@ hwMgmdRouterInterfaceQueryInterval OBJECT-TYPE
     STATUS     current
     DESCRIPTION
             "The frequency at which IGMP or MLD Host-Query packets are
-            transmitted on this interface. This object MAY be
-            modified under any rowstatus condition."
+            transmitted on this interface."
     DEFVAL     { 125 }
     ::= { hwMgmdRouterInterfaceEntry 4 }
 
@@ -152,12 +234,9 @@ hwMgmdRouterInterfaceStatus OBJECT-TYPE
     STATUS     current
     DESCRIPTION
             "The activation of a row enables the router side of IGMP or
-            MLD on the interface.  The destruction of a row disables the
-            router side of IGMP or MLD on the interface. Creation of a row
-            is not dependent upon any other read-create object values 
-            being set in advance. Unless objects have already been 
-            created, all row values MUST be set to their corresponding 
-            default entry upon activation of a row."
+            MLD on the interface.  The destruction of a row disables
+            the router side of IGMP or MLD on the interface."
+
     ::= { hwMgmdRouterInterfaceEntry 5 }
 
 hwMgmdRouterInterfaceVersion OBJECT-TYPE
@@ -165,15 +244,15 @@ hwMgmdRouterInterfaceVersion OBJECT-TYPE
     MAX-ACCESS read-create
     STATUS     current
     DESCRIPTION
-            "The version of MGMD which is running on this interface.
-            Value 1 applies to IGMPv1 routers only. Value 2 applies
-            To IGMPv2 and MLDv1 routers, and value 3 applies to IGMPv3
+            "The version of MGMD that is running on this interface.
+            Value 1 applies to IGMPv1 routers only.  Value 2 applies
+            to IGMPv2 and MLDv1 routers, and value 3 applies to IGMPv3
             and MLDv2 routers.
+
             This object can be used to configure a router capable of
             running either version.  For IGMP and MLD to function
             correctly, all routers on a LAN must be configured to run
-            the same version on that LAN. This object MAY be
-            modified under any rowstatus condition."
+            the same version on that LAN."
     DEFVAL     { 3 }
     ::= { hwMgmdRouterInterfaceEntry 6 }
 
@@ -183,9 +262,9 @@ hwMgmdRouterInterfaceQueryMaxResponseTime OBJECT-TYPE
     MAX-ACCESS read-create
     STATUS     current
     DESCRIPTION
-            "The maximum query response time advertised in MGMDv2 or v3
-            queries on this interface. This object MAY be
-            modified under any rowstatus condition."
+            "The maximum query response interval advertised in MGMDv2
+            or IGMPv3 queries on this interface."
+    REFERENCE "RFC 3810, Section 9.3"
     DEFVAL     { 100 }
     ::= { hwMgmdRouterInterfaceEntry 7 }
 
@@ -196,7 +275,7 @@ hwMgmdRouterInterfaceQuerierUpTime OBJECT-TYPE
     DESCRIPTION
             "The time since hwMgmdRouterInterfaceQuerier was last 
             changed."
-    DEFVAL     { 0 }
+
     ::= { hwMgmdRouterInterfaceEntry 8 }
 
 hwMgmdRouterInterfaceQuerierExpiryTime OBJECT-TYPE
@@ -207,7 +286,7 @@ hwMgmdRouterInterfaceQuerierExpiryTime OBJECT-TYPE
             "The amount of time remaining before the Other Querier
             Present Timer expires.  If the local system is the querier,
             the value of this object is zero."
-    DEFVAL     { 0 }
+
     ::= { hwMgmdRouterInterfaceEntry 9 }
 
 hwMgmdRouterInterfaceWrongVersionQueries OBJECT-TYPE
@@ -215,13 +294,14 @@ hwMgmdRouterInterfaceWrongVersionQueries OBJECT-TYPE
     MAX-ACCESS read-only
     STATUS     current
     DESCRIPTION
-             "The number of general queries received whose IGMP or MLD
-             version does not match the equivalent 
-             hwMgmdRouterInterfaceVersion, over the lifetime of the row 
-             entry.  Both IGMP and MLD require that all
-            routers on a LAN be configured to run the same version.
-            Thus, if any general queries are received with the wrong 
-            version, this indicates a configuration error."
+            "The number of general queries received whose IGMP or MLD
+            version does not match the equivalent
+            hwMgmdRouterInterfaceVersion, over the lifetime of the row
+            entry.  Both IGMP and MLD require that all routers on a LAN
+            be configured to run the same version.  Thus, if any general
+            queries are received with the wrong version, this indicates
+            a configuration error."
+
     ::= { hwMgmdRouterInterfaceEntry 10 }
 
 hwMgmdRouterInterfaceJoins OBJECT-TYPE
@@ -231,10 +311,11 @@ hwMgmdRouterInterfaceJoins OBJECT-TYPE
     STATUS     current
     DESCRIPTION
             "The number of times a group membership has been added on
-            this interface; that is, the number of times an entry for
+            this interface, that is, the number of times an entry for
             this interface has been added to the Cache Table.  This
-            object gives an indication of the amount of IGMP or MLD
-            activity over the lifetime of the row entry."
+            object can give an indication of the amount of activity
+            between samples over time."
+
     ::= { hwMgmdRouterInterfaceEntry 11 }
 
 hwMgmdRouterInterfaceProxyIfIndex OBJECT-TYPE
@@ -244,14 +325,13 @@ hwMgmdRouterInterfaceProxyIfIndex OBJECT-TYPE
     DESCRIPTION
             "Some devices implement a form of IGMP or MLD proxying
             whereby memberships learned on the interface represented by
-            this row, cause Host Membership Reports to be sent on the
+            this row cause Host Membership Reports to be sent on the
             interface whose ifIndex value is given by this object.
-            Such a device would implement the hwMgmdV2RouterBaseMibGroup
-            only on its router interfaces (those interfaces with 
-            non-zero hwMgmdRouterInterfaceProxyIfIndex).  Typically, the 
-            value of this object is 0, indicating that no proxying is 
-            being done. This object MAY be
-            modified under any rowstatus condition."
+            Such a device would implement the hwMgmdV2RouterBaseMIBGroup
+            only on its router interfaces (those interfaces with
+            non-zero hwMgmdRouterInterfaceProxyIfIndex).  Typically, the
+            value of this object is 0, indicating that no proxying is
+            being done."
     DEFVAL     { 0 }
     ::= { hwMgmdRouterInterfaceEntry 12 }
 
@@ -262,7 +342,7 @@ hwMgmdRouterInterfaceGroups OBJECT-TYPE
     DESCRIPTION
             "The current number of entries for this interface in the
             RouterCache Table."
-    DEFVAL     { 0 }
+
     ::= { hwMgmdRouterInterfaceEntry 13 }
 
 hwMgmdRouterInterfaceRobustness OBJECT-TYPE
@@ -273,8 +353,7 @@ hwMgmdRouterInterfaceRobustness OBJECT-TYPE
             "The Robustness Variable allows tuning for the expected
             packet loss on a subnet.  If a subnet is expected to be
             lossy, the Robustness Variable may be increased.  IGMP and
-            MLD is robust to (Robustness Variable-1) packet losses.
-            This object MAY be modified under any rowstatus condition."
+            MLD are robust to (Robustness Variable-1) packet losses."
     DEFVAL     { 2 }
     ::= { hwMgmdRouterInterfaceEntry 14 }
 
@@ -284,15 +363,14 @@ hwMgmdRouterInterfaceLastMembQueryIntvl OBJECT-TYPE
     MAX-ACCESS read-create
     STATUS     current
     DESCRIPTION
-            "The Last Member Query Interval is the Max Response Time
-            inserted into Group-Specific Queries sent in response to
-            Leave Group messages, and is also the amount of time
-            Between Group-Specific Query messages.  This value may be
-            tuned to modify the leave latency of the network.  A
+            "The Last Member Query Interval is the Max Query Response
+            Interval inserted into group-specific queries sent in
+            response to leave group messages, and is also the amount
+            of time between group-specific query messages.  This value
+            may be tuned to modify the leave latency of the network.  A
             reduced value results in reduced time to detect the loss of
             the last member of a group.  The value of this object is
-            irrelevant if hwMgmdRouterInterfaceVersion is 1. This object 
-            MAY be modified under any rowstatus condition."
+            irrelevant if hwMgmdRouterInterfaceVersion is 1."
     DEFVAL     { 10 }
     ::= { hwMgmdRouterInterfaceEntry 15 }
 
@@ -301,10 +379,10 @@ hwMgmdRouterInterfaceLastMembQueryCount OBJECT-TYPE
     MAX-ACCESS read-only
     STATUS     current
     DESCRIPTION
-            "Represents the number of Group-specific and 
-            Group-and-Source-specific queries sent by the router before
-            it assumes there are no local members."
-    DEFVAL     { 2 }
+            "Represents the number of group-specific and group-and-
+            source-specific queries sent by the router before it assumes
+            there are no local members."
+
     ::= { hwMgmdRouterInterfaceEntry 16 }
 
 hwMgmdRouterInterfaceStartupQueryCount OBJECT-TYPE
@@ -312,22 +390,30 @@ hwMgmdRouterInterfaceStartupQueryCount OBJECT-TYPE
     MAX-ACCESS read-only
     STATUS     current
     DESCRIPTION
-            "Represents the number of Queries sent out on startup
+            "Represents the number of Queries sent out on startup,
             separated by the Startup Query Interval."
-    DEFVAL     { 2 }
+
     ::= { hwMgmdRouterInterfaceEntry 17 }
     
 hwMgmdRouterInterfaceStartupQueryInterval OBJECT-TYPE
-    SYNTAX     Unsigned32 (1..31744)
+    SYNTAX     Unsigned32 (0..31744)
     UNITS      "seconds"
     MAX-ACCESS read-only
     STATUS     current
     DESCRIPTION
             "This variable represents the interval between General 
             Queries sent by a Querier on startup."
-    DEFVAL     { 31 } -- 0.25 * hwMgmdRouterInterfaceQueryInterval
+
     ::= { hwMgmdRouterInterfaceEntry 18 }
  
+hwMgmdRouterInterfaceTtlCheck OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "The status of IGMP or MLD ttl-check is enabled or not on this interface."
+
+    ::= { hwMgmdRouterInterfaceEntry 19 }
 
 hwMgmdRouterCacheTable OBJECT-TYPE
     SYNTAX     SEQUENCE OF HwMgmdRouterCacheEntry
@@ -379,10 +465,10 @@ hwMgmdRouterCacheAddress OBJECT-TYPE
     STATUS     current
     DESCRIPTION
             "The IP multicast group address for which this entry
-            contains information. The InetAddressType, e.g.
-            IPv4 or IPv6, is identified by the 
-            hwMgmdRouterCacheAddressType variable in the hwMgmdRouterCache 
-            table."
+            contains information.  The InetAddressType, e.g., IPv4 or
+            IPv6, is identified by the hwMgmdRouterCacheAddressType
+            variable in the hwMgmdRouterCache table."
+
     ::= { hwMgmdRouterCacheEntry 2 }
 
 hwMgmdRouterCacheIfIndex OBJECT-TYPE
@@ -400,12 +486,11 @@ hwMgmdRouterCacheLastReporter OBJECT-TYPE
     STATUS     current
     DESCRIPTION
             "The IP address of the source of the last membership report
-            received for this IP Multicast group address on this
+            received for this IP multicast group address on this
             interface.  If no membership report has been received, this
-            object has the value 0::0. The InetAddressType, e.g.
-            IPv4 or IPv6, is identified by the 
-            hwMgmdRouterCacheAddressType variable in the hwMgmdRouterCache 
-            table."
+            object has the value 0.  The InetAddressType, e.g., IPv4 or
+            IPv6, is identified by the hwMgmdRouterCacheAddressType
+            variable in the hwMgmdRouterCache table."
     ::= { hwMgmdRouterCacheEntry 4 }
 
 hwMgmdRouterCacheUpTime OBJECT-TYPE
@@ -421,9 +506,10 @@ hwMgmdRouterCacheExpiryTime OBJECT-TYPE
     MAX-ACCESS read-only
     STATUS     current
     DESCRIPTION
-            "This value represents the time remaining
-            before the Group Membership Interval state expires. The 
-            value must always be greater than 0."
+            "This value represents the time remaining before the Group
+            Membership Interval state expires.  The value must always be
+            greater than or equal to 1."
+
     ::= { hwMgmdRouterCacheEntry 6 }
     
 hwMgmdRouterCacheExcludeModeExpiryTimer OBJECT-TYPE
@@ -431,11 +517,11 @@ hwMgmdRouterCacheExcludeModeExpiryTimer OBJECT-TYPE
     MAX-ACCESS read-only
     STATUS     current
     DESCRIPTION
-            "This value is applicable only to MGMDv3 compatible
-            routers, and represents the time remaining before the
-            interface EXCLUDE state expires and the interface state
-            transitions to INCLUDE mode. This value can never be
-            greater than hwMgmdRouterCacheExpiryTime."
+            "This value is applicable only to MGMDv3-compatible nodes
+            and represents the time remaining before the interface
+            EXCLUDE state expires and the interface state transitions
+            to INCLUDE mode.  This value can never be greater than
+            hwMgmdRouterCacheExpiryTime."
     ::= { hwMgmdRouterCacheEntry 7 }        
 
 hwMgmdRouterCacheVersion1HostTimer OBJECT-TYPE
@@ -446,7 +532,7 @@ hwMgmdRouterCacheVersion1HostTimer OBJECT-TYPE
             "The time remaining until the local router will assume that
             there are no longer any MGMD version 1 members on the IP
             subnet attached to this interface.  This entry only applies
-            to IGMPv1 hosts, and is not implemented for MLD. Upon
+            to IGMPv1 hosts, and is not implemented for MLD.  Upon
             hearing any MGMDv1 Membership Report (IGMPv1 only), this
             value is reset to the group membership timer.  While this
             time remaining is non-zero, the local router ignores any
@@ -462,12 +548,12 @@ hwMgmdRouterCacheVersion2HostTimer OBJECT-TYPE
             "The time remaining until the local router will assume that
             there are no longer any MGMD version 2 members on the IP
             subnet attached to this interface.  This entry applies to
-            both IGMP and MLD hosts. Upon hearing any MGMDv2
-            Membership Report, this value is reset to the group
-            membership timer.  Assuming no MGMDv1 hosts have been
-            detected, the local router does not ignore any MGMDv2 Leave
-            messages for this group that it receives on this
-            interface."
+            both IGMP and MLD hosts.  Upon hearing any MGMDv2 Membership
+            Report, this value is reset to the group membership timer.
+            Assuming no MGMDv1 hosts have been detected, the local
+            router does not ignore any MGMDv2 Leave messages for this
+            group that it receives on this interface."
+
     ::= { hwMgmdRouterCacheEntry 9 }
 
 hwMgmdRouterCacheSourceFilterMode OBJECT-TYPE
@@ -487,8 +573,8 @@ hwMgmdInverseRouterCacheTable OBJECT-TYPE
     MAX-ACCESS not-accessible
     STATUS     current
     DESCRIPTION
-            "The (conceptual) table listing the interfaces which
-              are members of a particular group. This is a reverse
+            "The (conceptual) table listing the interfaces that
+            are members of a particular group.  This is an inverse
             lookup table for entries in the hwMgmdRouterCacheTable."
     ::= { hwMgmdMibObjects 8 }
 
@@ -520,7 +606,7 @@ hwMgmdInverseRouterCacheIfIndex OBJECT-TYPE
     ::= { hwMgmdInverseRouterCacheEntry 1 }
 
 hwMgmdInverseRouterCacheAddressType OBJECT-TYPE
-    SYNTAX     InetAddressType
+    SYNTAX     InetAddressType 
     MAX-ACCESS not-accessible
     STATUS     current
     DESCRIPTION
@@ -533,10 +619,10 @@ hwMgmdInverseRouterCacheAddress OBJECT-TYPE
     STATUS     current
     DESCRIPTION
             "The IP multicast group address for which this entry
-            contains information about an interface. The 
-            InetAddressType, e.g.IPv4 or IPv6, is identified by the 
-            hwMgmdInverseRouterCacheAddressType variable in the 
-            hwMgmdInverseRouterCache table."
+            contains information.  The InetAddressType, e.g., IPv4 or
+            IPv6, is identified by the hwMgmdInverseRouterCacheAddressType
+            variable in the hwMgmdInverseRouterCache table."
+
     ::= { hwMgmdInverseRouterCacheEntry 3 }
 
 
@@ -604,10 +690,10 @@ hwMgmdRouterSrcListHostAddress OBJECT-TYPE
     MAX-ACCESS read-only
     STATUS     current
     DESCRIPTION
-            "The host address to which this entry
-            corresponds. The hwMgmdRouterCacheSourceFilterMode value for 
-            this Group address and interface indicates whether this 
-            host address is included or excluded."
+            "The host address to which this entry corresponds.  The
+            hwMgmdRouterCacheSourceFilterMode value for this group address
+            and interface indicates whether this host address is
+            included or excluded."
     ::= { hwMgmdRouterSrcListEntry 4 }
 
 hwMgmdRouterSrcListExpire OBJECT-TYPE
@@ -615,28 +701,409 @@ hwMgmdRouterSrcListExpire OBJECT-TYPE
     MAX-ACCESS read-only
     STATUS     current
     DESCRIPTION
-          "This value (when non-zero) indicates the time left prior to
-            the expiration of the SrcList entry.  A zero value indicates
-            a state of EXCLUDE mode and a non-zero value indicates the
-            entry being in INCLUDE mode."
+            "This value indicates the relevance of the SrcList entry,
+            whereby a non-zero value indicates this is an INCLUDE state
+            value, and a zero value indicates this to be an EXCLUDE
+            state value."
     ::= { hwMgmdRouterSrcListEntry 5 }
+
+hwMgmdCtlMsgCountTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF HwMgmdCtlMsgCountEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The (conceptual) table used to list the control message counter
+            on all the interfaces on which IGMP or MLD is enabled."
+    ::= { hwMgmdMibObjects 11 }
+
+hwMgmdCtlMsgCountEntry OBJECT-TYPE
+    SYNTAX     HwMgmdCtlMsgCountEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry (conceptual row) representing an interface on
+            which IGMP or MLD is enabled. Dynamically created row
+            state is non-volatile, and upon agent reboot should be
+            reinstantiated as a conceptual row. Any change in read-create
+            objects should therefore be backed up by stable storage."
+    INDEX      { hwMgmdCtlMsgCountIfIndex, 
+                 hwMgmdCtlMsgCountQuerierType,
+                 hwMgmdCtlMsgCountState }
+    ::= { hwMgmdCtlMsgCountTable 1 }
+
+HwMgmdCtlMsgCountEntry ::= SEQUENCE {
+    hwMgmdCtlMsgCountIfIndex               InterfaceIndex,
+    hwMgmdCtlMsgCountQuerierType           InetAddressType,
+    hwMgmdCtlMsgCountState                 HWMgmdCtlMsgState,
+    hwMgmdCtlMsgCountQuery                 Unsigned32,
+    hwMgmdCtlMsgCountReportASM             Unsigned32,
+    hwMgmdCtlMsgCountReportSSM             Unsigned32,
+    hwMgmdCtlMsgCountLeaveASM              Unsigned32,
+    hwMgmdCtlMsgCountLeaveSSM              Unsigned32,
+    hwMgmdCtlMsgCountISIN                  Unsigned32,
+    hwMgmdCtlMsgCountISEX                  Unsigned32,
+    hwMgmdCtlMsgCountTOIN                  Unsigned32,
+    hwMgmdCtlMsgCountTOEX                  Unsigned32,
+    hwMgmdCtlMsgCountALLOW                 Unsigned32,
+    hwMgmdCtlMsgCountBLOCK                 Unsigned32,
+    hwMgmdCtlMsgCountSrcRecTotal           Unsigned32,
+    hwMgmdCtlMsgCountOthers                Unsigned32
+}
+
+hwMgmdCtlMsgCountIfIndex OBJECT-TYPE
+    SYNTAX     InterfaceIndex
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The ifIndex value of the interface for which IGMP or MLD
+            is enabled. The table is indexed by the ifIndex value and
+            the InetAddressType to allow for interfaces which may be
+            configured in both IPv4 and IPv6 modes."
+    ::= { hwMgmdCtlMsgCountEntry 1 }
+
+hwMgmdCtlMsgCountQuerierType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The address type of this interface. This entry along with
+             the ifIndex value acts as the index to the 
+             hwMgmdRouterInterface table. A physical interface may be 
+             configured in multiple modes concurrently, e.g. in IPv4 
+             and IPv6 modes connected to the same interface, however 
+             the traffic is considered to be logically separate."
+    ::= { hwMgmdCtlMsgCountEntry 2 }
+    
+hwMgmdCtlMsgCountState OBJECT-TYPE
+    SYNTAX     HWMgmdCtlMsgState
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The IGMP/MLD control message state."
+    ::= { hwMgmdCtlMsgCountEntry 3 }
+
+hwMgmdCtlMsgCountQuery OBJECT-TYPE
+    SYNTAX     Unsigned32 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of IGMP/MLD Query on this interface."
+    ::= { hwMgmdCtlMsgCountEntry 4 }  
+
+hwMgmdCtlMsgCountReportASM OBJECT-TYPE
+    SYNTAX     Unsigned32 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of IGMP/MLD report with ASM group on this interface."
+    ::= { hwMgmdCtlMsgCountEntry 5 }
+    
+hwMgmdCtlMsgCountReportSSM OBJECT-TYPE
+    SYNTAX     Unsigned32 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of IGMP/MLD report with SSM group on this interface."
+    ::= { hwMgmdCtlMsgCountEntry 6 }
+    
+hwMgmdCtlMsgCountLeaveASM OBJECT-TYPE
+    SYNTAX     Unsigned32 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of IGMP/MLD leave with ASM group on this interface."
+    ::= { hwMgmdCtlMsgCountEntry 7 }
+    
+hwMgmdCtlMsgCountLeaveSSM OBJECT-TYPE
+    SYNTAX     Unsigned32 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of IGMP/MLD leave with ASM group on this interface."
+    ::= { hwMgmdCtlMsgCountEntry 8 }
+    
+hwMgmdCtlMsgCountISIN OBJECT-TYPE
+    SYNTAX     Unsigned32 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of IGMP/MLD is_in on this interface."
+    ::= { hwMgmdCtlMsgCountEntry 9 }
+    
+hwMgmdCtlMsgCountISEX OBJECT-TYPE
+    SYNTAX     Unsigned32 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of IGMP/MLD is_ex on this interface."
+    ::= { hwMgmdCtlMsgCountEntry 10 }
+    
+hwMgmdCtlMsgCountTOIN OBJECT-TYPE
+    SYNTAX     Unsigned32 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of IGMP/MLD to_in on this interface."
+    ::= { hwMgmdCtlMsgCountEntry 11 }
+    
+hwMgmdCtlMsgCountTOEX OBJECT-TYPE
+    SYNTAX     Unsigned32 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of IGMP/MLD to_ex on this interface."
+    ::= { hwMgmdCtlMsgCountEntry 12 }
+    
+hwMgmdCtlMsgCountALLOW OBJECT-TYPE
+    SYNTAX     Unsigned32 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of IGMP/MLD allow on this interface."
+    ::= { hwMgmdCtlMsgCountEntry 13 }
+    
+hwMgmdCtlMsgCountBLOCK OBJECT-TYPE
+    SYNTAX     Unsigned32 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of IGMP/MLD block on this interface."
+    ::= { hwMgmdCtlMsgCountEntry 14 }
+    
+hwMgmdCtlMsgCountSrcRecTotal OBJECT-TYPE
+    SYNTAX     Unsigned32 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of total IGMP/MLD source record on this interface."
+    ::= { hwMgmdCtlMsgCountEntry 15 }
+    
+hwMgmdCtlMsgCountOthers OBJECT-TYPE
+    SYNTAX     Unsigned32 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of total IGMP/MLD others packet on this interface."
+    ::= { hwMgmdCtlMsgCountEntry 16 }
+   
+    
+-- End Added
+--
+--  The hwMgmd Host Interface Table
+--
+
+hwMgmdHostInterfaceTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF HwMgmdHostInterfaceEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The (conceptual) table listing the interfaces on which
+             IGMP or MLD is enabled."
+
+    ::= { hwMgmdMibObjects 12 }
+
+hwMgmdHostInterfaceEntry OBJECT-TYPE
+    SYNTAX     HwMgmdHostInterfaceEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry (conceptual row) representing an interface on
+            which IGMP or MLD is enabled."
+    INDEX      { hwMgmdHostInterfaceIfIndex,
+                 hwMgmdHostInterfaceQuerierType }
+
+    ::= { hwMgmdHostInterfaceTable 1 }
+
+HwMgmdHostInterfaceEntry ::= SEQUENCE {
+    hwMgmdHostInterfaceIfIndex               InterfaceIndex,
+    hwMgmdHostInterfaceQuerierType           InetAddressType,
+    hwMgmdHostInterfaceQuerier               InetAddress,
+    hwMgmdHostInterfaceStatus                RowStatus,
+    hwMgmdHostInterfaceVersion               Unsigned32,
+    hwMgmdHostInterfaceVersion1QuerierTimer  TimeTicks,
+    hwMgmdHostInterfaceVersion2QuerierTimer  TimeTicks,
+    hwMgmdHostInterfaceVersion3Robustness    Unsigned32,
+    hwMgmdHostInterfaceBackupInterface       TruthValue,
+    hwMgmdHostInterfaceRerouteDelayPeriod    Unsigned32,
+    hwMgmdHostInterfaceRerouteImmediate      TruthValue,
+    hwMgmdHostInterfaceTtlCheck              TruthValue
+    
+}
+
+hwMgmdHostInterfaceIfIndex OBJECT-TYPE
+    SYNTAX     InterfaceIndex
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The ifIndex value of the interface for which IGMP or MLD is
+             enabled.  The table is indexed by the ifIndex value and the
+             InetAddressType to allow for interfaces that may be
+             configured in both IPv4 and IPv6 modes."
+    ::= { hwMgmdHostInterfaceEntry 1 }
+
+hwMgmdHostInterfaceQuerierType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The address type of this interface.  This entry along with
+             the ifIndex value acts as an index to the hwMgmdHostInterface
+             table.  A physical interface may be configured in multiple
+             modes concurrently, e.g., in IPv4 and IPv6 modes connected
+             to the same interface; however, the traffic is considered
+             to be logically separate."
+
+    ::= { hwMgmdHostInterfaceEntry 2 }
+
+hwMgmdHostInterfaceQuerier OBJECT-TYPE
+    SYNTAX     InetAddress (SIZE(4|16))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The address of the IGMP or MLD Querier on the IP subnet to
+             which this interface is attached.  The InetAddressType,
+             e.g., IPv4 or IPv6, is identified by the
+             hwMgmdHostInterfaceQuerierType variable in the
+             hwMgmdHostInterface table."
+
+    ::= { hwMgmdHostInterfaceEntry 3 }
+
+hwMgmdHostInterfaceStatus OBJECT-TYPE
+    SYNTAX     RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The activation of a row enables the host side of IGMP or
+            MLD on the interface.  The destruction of a row disables
+            the host side of IGMP or MLD on the interface."
+
+    ::= { hwMgmdHostInterfaceEntry 4 }
+
+hwMgmdHostInterfaceVersion OBJECT-TYPE
+    SYNTAX     Unsigned32 (1..3)
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The maximum version of hwMgmd that the host can run on
+            this interface.  A value of 1 is only applicable for IPv4,
+            and indicates that the host only supports IGMPv1 on the
+            interface.  A value of 2 indicates that the host also
+            supports IGMPv2 (for IPv4) or MLDv1 (for IPv6).  A value of
+            3 indicates that the host also supports IGMPv3 (for IPv4)
+            or MLDv2 (for IPv6)."
+    DEFVAL     { 3 }
+
+    ::= { hwMgmdHostInterfaceEntry 5 }
+
+hwMgmdHostInterfaceVersion1QuerierTimer OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The time remaining until the host assumes that there are
+            no IGMPv1 routers present on the interface.  While this is
+            non-zero, the host will reply to all queries with version 1
+            membership reports.  This variable applies to IGMPv2 or 3
+            hosts that are forced to run in v1 for compatibility with
+            v1 routers present on the interface.  This object may only
+            be present when the corresponding value of
+            hwMgmdHostInterfaceQuerierType is ipv4."
+    REFERENCE "RFC 2236, Section 4 and RFC 3376, Section 7.2.1"
+    DEFVAL     { 0 }
+
+    ::= { hwMgmdHostInterfaceEntry 6 }
+
+hwMgmdHostInterfaceVersion2QuerierTimer OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The time remaining until the host assumes that there are
+            no hwMgmdv2 routers present on the interface.  While this is
+            non-zero, the host will reply to all queries with version 1
+            or 2 membership reports.  This variable applies to hwMgmdv3
+            hosts that are forced to run in v2 for compatibility with
+            v2 hosts or routers present on the interface."
+    REFERENCE "RFC 3376, Section 7.2.1 and RFC 3810, Section 8.2.1"
+    DEFVAL     { 0 }
+
+    ::= { hwMgmdHostInterfaceEntry 7 }
+
+hwMgmdHostInterfaceVersion3Robustness OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The robustness variable utilised by an hwMgmdv3 host in
+            sending state-change reports for multicast routers.  To
+            ensure the state-change report is not missed, the host
+            retransmits the state-change report
+            [hwMgmdHostInterfaceVersion3Robustness - 1] times.  The
+            variable must be a non-zero value."
+    REFERENCE "RFC 3376, Section 8.1 and RFC 3810, Section 9.14.1"
+    DEFVAL     { 2 }
+
+    ::= { hwMgmdHostInterfaceEntry 8 }
+hwMgmdHostInterfaceBackupInterface OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "The enabled backup status of IGMP or MLD host function on this
+            interface."
+
+    ::= { hwMgmdHostInterfaceEntry 9 }
+hwMgmdHostInterfaceRerouteDelayPeriod OBJECT-TYPE
+    SYNTAX     Unsigned32 (10..4294967295)
+    UNITS      "seconds"
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "The minimum time that must elapse between hostinterface down to up originated by this router.
+            The value of 65535 represents an 'infinite' time, in
+            which case, IGMP or MLD host interface is never up.
+
+            The non-zero minimum allowed value provides resilience
+            against propagation of denial-of-service attacks from the
+            data and control planes to the network management plane."
+    DEFVAL     { 0 }
+
+    ::= { hwMgmdHostInterfaceEntry 10 } 
+hwMgmdHostInterfaceRerouteImmediate OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "The status of IGMP or MLD host reroute is immidiatly or not on this interface."
+
+    ::= { hwMgmdHostInterfaceEntry 11 }	
+--End Added    
+
+hwMgmdHostInterfaceTtlCheck OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "The status of IGMP or MLD ttl-check is enabled or not on this interface."
+
+    ::= { hwMgmdHostInterfaceEntry 12 }
 
 -- MGMD LIMIT TRAP
                                                                                                                                                         
 hwMgmdGroup OBJECT-TYPE                                                                
-    SYNTAX     InetAddress (SIZE (0|4|8|16|20))
+    SYNTAX     IpAddress
     MAX-ACCESS read-only
-    STATUS     current                                                                    
+    STATUS     obsolete                                                                    
     DESCRIPTION                                                                           
-             " Group address of the entry."                                                
+             "Group address of the entry."                                                
     ::= { hwMgmdMibGeneralObjects 1 }                                                                     
                                                                                           
 hwMgmdSource OBJECT-TYPE                                                               
-    SYNTAX     InetAddress (SIZE (0|4|8|16|20))
+    SYNTAX     IpAddress
     MAX-ACCESS read-only
-    STATUS     current                                                                    
+    STATUS     obsolete                                                                    
     DESCRIPTION                                                                           
-             " Source address of the entry."                                               
+             "Source address of the entry."                                               
     ::= { hwMgmdMibGeneralObjects 2 }
     
 hwMgmdLimitInterfaceIfIndex OBJECT-TYPE
@@ -644,7 +1111,9 @@ hwMgmdLimitInterfaceIfIndex OBJECT-TYPE
     MAX-ACCESS read-only
     STATUS     current
     DESCRIPTION
-            " The interface on which this router most recently sent or received an igmp limit trap, or zero if this router has not sent or received an igmp limit trap."
+            "The interface from which an IGMP or a MLD limit trap is
+             most recently sent. If this router has not sent a limit
+             trap, this object is set to 0."
     ::= { hwMgmdMibGeneralObjects 3 }
     
 hwMgmdGlobalEntries  OBJECT-TYPE
@@ -652,7 +1121,7 @@ hwMgmdGlobalEntries  OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION                                                                
-             " The total number of entries of this instance." 
+             "The total number of IGMP or MLD entries of this instance." 
     ::= { hwMgmdMibGeneralObjects 4 }     
     
 hwMgmdInterfaceEntries  OBJECT-TYPE                                                                    
@@ -660,7 +1129,7 @@ hwMgmdInterfaceEntries  OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current                                                                                   
     DESCRIPTION                                                                                           
-             " The total number of entries on the interface."                                                                                                                
+             "The total number of IGMP or MLD entries on the interface."                                                                                                                
     ::= { hwMgmdMibGeneralObjects 5 }                       
  
 hwMgmdTotalEntries  OBJECT-TYPE
@@ -668,7 +1137,7 @@ hwMgmdTotalEntries  OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION                                                                
-             " The total number of entries of all instances." 
+             "The total number of IGMP or MLD entries of all instances." 
     ::= { hwMgmdMibGeneralObjects 6 }  
 
 hwMgmdGmpJoinGrpAddr OBJECT-TYPE
@@ -708,8 +1177,8 @@ hwMgmdGmpJoinVersion OBJECT-TYPE
             running either version.  For IGMP and MLD to function
             correctly, all routers on a LAN must be configured to run
             the same version on that LAN. This object MAY be
-            modified under any rowstatus condition."
-    DEFVAL     { 2 }
+            modified under any rowstatus condition.
+    DEFVAL     { 2 }"
     ::= { hwMgmdMibGeneralObjects 10 }
 
 hwMgmdGmpInterfaceIfIndex OBJECT-TYPE
@@ -730,59 +1199,265 @@ hwMgmdGmpInterfaceName OBJECT-TYPE
     DESCRIPTION
             "The interface name of the interface for which IGMP or MLD
             is enabled."
-    ::= { hwMgmdMibGeneralObjects 12 }     
+    ::= { hwMgmdMibGeneralObjects 12 }  
+    
 
-hwMgmdGmpAddressType OBJECT-TYPE
+hwMgmdGmpLimitGroupAddressType OBJECT-TYPE
     SYNTAX     InetAddressType
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+            "The address type of the multicast group address in the most
+             recently sent IGMP or MLD limit trap. If this router has not
+             sent a limit trap, this object is set to 0."
+    ::= { hwMgmdMibGeneralObjects 13 }      
+    
+hwMgmdGmpLimitGroup OBJECT-TYPE
+    SYNTAX     InetAddress (SIZE (0|4|8|16|20))
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+            "The multicast group address in the most recently sent IGMP 
+             or MLD limit trap. The InetAddressType is defined by the   hwMgmdGmpLimitGroupAddressType object."
+    ::= { hwMgmdMibGeneralObjects 14 }   
+   
+    
+hwMgmdGmpLimitSource OBJECT-TYPE
+    SYNTAX     InetAddress (SIZE (0|4|8|16|20))
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+            "The source address in the most recently sent IGMP or MLD limit trap. The InetAddressType is defined by the hwMgmdGmpLimitGroupAddressType object."  
+    ::= { hwMgmdMibGeneralObjects 15 }     
+
+
+hwMgmdInstanceName OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+            "The instance name of the trap."
+    ::= { hwMgmdMibGeneralObjects 16 }
+    
+hwMgmdNotificationAddressType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+            "The address type of the multicast group address in the most
+             recently sent IGMP or MLD limit trap."
+    ::= { hwMgmdMibGeneralObjects 17 }   
+    
+hwMgmdTotalLimitCurrentCount  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..65535)   
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION                                                                
+             "The current number of IGMP or MLD entries of all instances." 
+    ::= { hwMgmdMibGeneralObjects 18 } 
+
+hwMgmdTotalLimitThreshold  OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..100)   
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION                                                                
+             "The threshold value of IGMP or MLD entries uppper limit(%) of all instances." 
+    ::= { hwMgmdMibGeneralObjects 19 } 
+
+hwMgmdHostStarGCurrentCount  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..65535)   
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION                                                                
+             "The current number of IGMP or MLD proxy (*, G) entries of all instances." 
+    ::= { hwMgmdMibGeneralObjects 20 } 
+
+hwMgmdHostStarGThreshold  OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..100)   
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION                                                                
+             "The threshold value of IGMP or MLD proxy (*, G) entries uppper limit(%) of all instances." 
+    ::= { hwMgmdMibGeneralObjects 21 } 	    
+
+hwMgmdHostStarGTotalCount  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..65535)   
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION                                                                
+             "The total number of IGMP or MLD proxy (*, G) entries of all instances." 
+    ::= { hwMgmdMibGeneralObjects 22 }   
+    
+hwMgmdHostNotificationSrcAddr OBJECT-TYPE
+    SYNTAX     InetAddress (SIZE (0|4|8|16|20))
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+            "The source address in the most recently sent IGMP or MLD proxy limit trap."  
+    ::= { hwMgmdMibGeneralObjects 23 }  
+    
+hwMgmdHostNotificationGrpAddr OBJECT-TYPE
+    SYNTAX     InetAddress (SIZE (0|4|8|16|20))
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+            "The multicast group address in the most recently sent IGMP or MLD proxy limit trap."
+    ::= { hwMgmdMibGeneralObjects 24 }    
+
+hwMgmdHostSGCurrentCount  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..65535)   
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION                                                                
+             "The current number of IGMP or MLD proxy (S, G) entries of all instances." 
+    ::= { hwMgmdMibGeneralObjects 25 } 
+
+hwMgmdHostSGThreshold  OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..100)   
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION                                                                
+             "The threshold value of IGMP or MLD proxy (S, G)entries uppper limit(%) of all instances." 
+    ::= { hwMgmdMibGeneralObjects 26 }
+
+hwMgmdHostSGTotalCount  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..65535)   
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION                                                                
+             "The total number of IGMP or MLD proxy (S, G) entries of all instances." 
+    ::= { hwMgmdMibGeneralObjects 27 }
+
+-- MGMD LIMIT TRAP
+
+hwMgmdHostRerouteDelayPeriod  OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..4294967295)
+    UNITS      "seconds"
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "The minimum time that must elapse between hostinterface down to up originated by this router.
+            The value of 4294967295 represents an 'infinite' time, in
+            which case, IGMP or MLD host interface is never up.
+
+            The non-zero minimum allowed value provides resilience
+            against propagation of denial-of-service attacks from the
+            data and control planes to the network management plane."
+    DEFVAL     { 0 }
+    ::= { hwMgmdMibGeneralObjects 28 } 
+hwMgmdHostRerouteImmediate OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "The status of IGMP or MLD host reroute is immidiatly or not on this router."	
+    ::= { hwMgmdMibGeneralObjects 29 } 
+--End Added         
+
+hwMgmdTtlCheck OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "The status of IGMP or MLD ttl-check is enabled or not on this router."	
+    ::= { hwMgmdMibGeneralObjects 30 } 
+
+hwMgmdGmpIfCurrentCount  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..65535)   
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION                                                                
+             "The current number of IGMP or MLD entries on the interface." 
+    ::= { hwMgmdMibGeneralObjects 31 }
+
+hwMgmdGmpIfThreshold  OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..100)   
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION                                                                
+             "The threshold value of IGMP or MLD entries uppper limit(%) on the interface." 
+    ::= { hwMgmdMibGeneralObjects 32 }
+
+hwMgmdThresholdInterfaceIfIndex OBJECT-TYPE
+    SYNTAX     InterfaceIndexOrZero
     MAX-ACCESS read-only
     STATUS     current
     DESCRIPTION
-            "The address type of the group or source address."
-    ::= { hwMgmdMibGeneralObjects 13 }    
-     
--- MGMD LIMIT TRAP
+            "The interface from which an IGMP or a MLD Threshold trap is
+             most recently sent. If this router has not sent a Threshold
+             trap, this object is set to 0."
+    ::= { hwMgmdMibGeneralObjects 33 }
+
+hwMgmdNotificationSlot OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..64))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "The name of slot."
+    ::= { hwMgmdMibGeneralObjects 34 }
+
+hwMgmdGmpBoardCurrentCount OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..262144)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The current number of IGMP or MLD entries on the board."
+    ::= { hwMgmdMibGeneralObjects 35 }
+
+hwMgmdGmpBoardLimitCount OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..262144)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The limit number of IGMP or MLD entries on the board."
+    ::= { hwMgmdMibGeneralObjects 36 }
+
+hwMgmdGmpBoardThreshold  OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..100)   
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION                                                                
+             "The threshold value of IGMP or MLD entries uppper/lower limit(%) on the board." 
+    ::= { hwMgmdMibGeneralObjects 37 }
 
 hwMgmdGlobalLimit  NOTIFICATION-TYPE
-    OBJECTS   { hwMgmdGmpAddressType,
-    ????       hwMgmdSource,
+    OBJECTS   { hwMgmdSource,
                 hwMgmdGroup,
                 hwMgmdGlobalEntries }
-    STATUS    current
+    STATUS    obsolete
     DESCRIPTION
-              " A hwMgmdGlobalLimit notification signifies that a igmp report has been limited for
-              up to maximum entries of igmp global routing-table.
+              "A hwMgmdGlobalLimit notification signifies that an IGMP report has been limited for
+              up to maximum entries of IGMP global routing-table.
               
-              This notification is generated whenever an igmp report failed to create membership
-              as igmp global routing-table limit."
+              This notification is generated whenever an IGMP report failed to create membership
+              as IGMP global routing-table limit."
     ::= { hwMgmdMibNotifications 1 } 
     
 hwMgmdInterfaceLimit NOTIFICATION-TYPE
-    OBJECTS  { hwMgmdGmpAddressType,
-    ????      hwMgmdSource,
+    OBJECTS  { hwMgmdSource,
                hwMgmdGroup, 
                hwMgmdLimitInterfaceIfIndex,
                hwMgmdInterfaceEntries }
-    STATUS   current
+    STATUS   obsolete
     DESCRIPTION
-            " A hwMgmdInterfaceLimit notification signifies that a igmp report has been limited for                
-            up to maximum entries of igmp interface routing-table.                                
+            "A hwMgmdInterfaceLimit notification signifies that an IGMP report has been limited for                
+            up to maximum entries of IGMP interface routing-table.                                
                                                                                                
-            This notification is generated whenever an igmp report failed to create membership                                                                                                                                                                                       
-            as igmp interface routing-table limit."  
+            This notification is generated whenever an IGMP report failed to create membership                                                                                                                                                                                       
+            as IGMP interface routing-table limit."  
     ::= { hwMgmdMibNotifications 2 }              
 
 hwMgmdTotalLimit  NOTIFICATION-TYPE
-    OBJECTS   { hwMgmdGmpAddressType,
-    ????       hwMgmdSource,
+    OBJECTS   { hwMgmdSource,
                 hwMgmdGroup,
                 hwMgmdTotalEntries }
-    STATUS    current
+    STATUS    obsolete
     DESCRIPTION
-              " A hwMgmdTotalLimit notification signifies that a igmp report has been limited for
-              up to maximum entries of igmp total routing-table.
+              "A hwMgmdTotalLimit notification signifies that an IGMP report has been limited for
+              up to maximum entries of IGMP total routing-table.
               
-              This notification is generated whenever an igmp report failed to create membership
-              as igmp total routing-table limit."
+              This notification is generated whenever an IGMP report failed to create membership
+              as IGMP total routing-table limit."
     ::= { hwMgmdMibNotifications 3 }             
 
 -- MGMD Join-Leave Trap
@@ -793,7 +1468,8 @@ hwMgmdGmpJoin NOTIFICATION-TYPE
               hwMgmdGmpJoinVersion,
               hwMgmdGmpJoinSrcAddr,
               hwMgmdGmpJoinGrpAddr,
-              hwMgmdGmpJoinSenderIp
+              hwMgmdGmpJoinSenderIp,
+              hwMgmdInstanceName
             }
     STATUS     current
     DESCRIPTION
@@ -801,16 +1477,284 @@ hwMgmdGmpJoin NOTIFICATION-TYPE
     ::= { hwMgmdMibNotifications 4 } 
        
 hwMgmdGmpLeave NOTIFICATION-TYPE
-    OBJECTS { 
-              hwMgmdGmpInterfaceName,
+    OBJECTS { hwMgmdGmpInterfaceName,
               hwMgmdGmpInterfaceIfIndex,
               hwMgmdGmpJoinSrcAddr,
-              hwMgmdGmpJoinGrpAddr
+              hwMgmdGmpJoinGrpAddr,
+              hwMgmdInstanceName
             }
     STATUS     current
     DESCRIPTION
             "A hwMgmdGmpLeave notification signifies the IGMP or MLD group leaved."
-    ::= { hwMgmdMibNotifications 5 }        
+    ::= { hwMgmdMibNotifications 5 }   
+    
+-- MGMD limit Trap for IGMP and MLD
+
+    hwMgmdGMPGlobalLimit  NOTIFICATION-TYPE
+    OBJECTS   { hwMgmdGmpLimitGroupAddressType,
+                hwMgmdGmpLimitSource,
+                hwMgmdGmpLimitGroup,
+                hwMgmdGlobalEntries,
+                hwMgmdInstanceName 
+              }
+    STATUS    current
+    DESCRIPTION
+              "This object indicates that the number of global IGMP or MLD entries of the instance reaches the upper limit.
+              
+              This trap message is generated when IGMP or MLD fails to create membership because the number of global IGMP or MLD entries of the instance reaches the upper limit."
+    ::= { hwMgmdMibNotifications 6 } 
+    
+    
+hwMgmdGMPInterfaceLimit NOTIFICATION-TYPE
+    OBJECTS  { hwMgmdGmpLimitGroupAddressType,
+               hwMgmdGmpLimitSource,
+               hwMgmdGmpLimitGroup, 
+               hwMgmdLimitInterfaceIfIndex,
+               hwMgmdInterfaceEntries,
+               hwMgmdGmpInterfaceName,
+               hwMgmdInstanceName }
+    STATUS   current
+    DESCRIPTION
+            "This object indicates that the number of IGMP or MLD entries on the interface reaches the upper limit.                                
+                                                                                               
+            This trap message is generated when IGMP or MLD fails to create membership because the number of IGMP or MLD entries on the interface reaches the upper limit."  
+    ::= { hwMgmdMibNotifications 7 }              
+
+hwMgmdGMPTotalLimit  NOTIFICATION-TYPE
+    OBJECTS   { hwMgmdGmpLimitGroupAddressType,
+                hwMgmdGmpLimitSource,
+                hwMgmdGmpLimitGroup,
+                hwMgmdTotalEntries }
+    STATUS    current
+    DESCRIPTION
+              "This object indicates that the number of IGMP or MLD entries of all instances reaches the upper limit.
+              
+              This trap message is generated when IGMP or MLD fails to create membership because the number of IGMP or MLD entries of all instances reaches the upper limit."
+    ::= { hwMgmdMibNotifications 8 }             
+
+
+hwMgmdGMPInterfaceLimitClear NOTIFICATION-TYPE
+    OBJECTS  { hwMgmdGmpLimitGroupAddressType,
+               hwMgmdGmpLimitSource,
+               hwMgmdGmpLimitGroup, 
+               hwMgmdLimitInterfaceIfIndex,
+               hwMgmdInterfaceEntries,
+               hwMgmdGmpInterfaceName,
+               hwMgmdInstanceName }
+    STATUS   current
+    DESCRIPTION
+            "This object indicates that the number of IGMP or MLD entries on the interface falls below the upper limit.                                
+                                                                                               
+            This trap message is generated when IGMP or MLD delete an entry resulting in the number of IGMP or MLD entries on the interface falls below the upper limit."  
+    ::= { hwMgmdMibNotifications 9 }  
+
+hwMgmdGMPGlobalLimitClear  NOTIFICATION-TYPE
+    OBJECTS   { hwMgmdGmpLimitGroupAddressType,
+                hwMgmdGmpLimitSource,
+                hwMgmdGmpLimitGroup,
+                hwMgmdGlobalEntries,
+                hwMgmdInstanceName 
+              }
+    STATUS    current
+    DESCRIPTION
+              "This object indicates that the number of global IGMP or MLD entries of the instance falls blow the upper limit.
+              
+              This trap message is generated when IGMP or MLD delete an entry resulting in the number of global IGMP or MLD entries of the instance falls below the upper limit."
+    ::= { hwMgmdMibNotifications 10 } 
+
+hwMgmdGMPTotalLimitClear  NOTIFICATION-TYPE
+    OBJECTS   { hwMgmdGmpLimitGroupAddressType,
+                hwMgmdGmpLimitSource,
+                hwMgmdGmpLimitGroup,
+                hwMgmdTotalEntries }
+    STATUS    current
+    DESCRIPTION
+              "This object indicates that the number of IGMP or MLD entries of all instances falls below the upper limit.
+              
+              This trap message is generated when IGMP or MLD delete an entry resulting in the number of IGMP or MLD entries of all instances falls below the upper limit."
+    ::= { hwMgmdMibNotifications 11 } 
+
+hwMgmdTotalLimitThresholdExceed NOTIFICATION-TYPE
+    OBJECTS { hwMgmdNotificationAddressType,
+              hwMgmdTotalLimitCurrentCount,
+              hwMgmdTotalLimitThreshold,
+              hwMgmdTotalEntries
+            }
+    STATUS      current
+    DESCRIPTION
+            "A hwMgmdTotalLimitThresholdExceed notification signifies that IGMP or MLD entries count of all instances reached the upper threshold."
+      ::= { hwMgmdMibNotifications 12 }
+      
+hwMgmdTotalLimitThresholdExceedClear NOTIFICATION-TYPE
+    OBJECTS { hwMgmdNotificationAddressType,
+              hwMgmdTotalLimitCurrentCount,
+              hwMgmdTotalLimitThreshold,
+              hwMgmdTotalEntries
+            }
+    STATUS      current
+    DESCRIPTION
+            "A hwMgmdTotalLimitThresholdExceedClear notification signifies that IGMP or MLD entries count of all instances fell below the lower threshold."
+      ::= { hwMgmdMibNotifications 13 }
+
+hwMgmdHostStarGThresholdExceed NOTIFICATION-TYPE
+    OBJECTS { hwMgmdNotificationAddressType,
+              hwMgmdHostStarGCurrentCount,
+              hwMgmdHostStarGThreshold,
+              hwMgmdHostStarGTotalCount
+            }
+    STATUS      current
+    DESCRIPTION
+            "A hwMgmdHostStarGThresholdExceed notification signifies that IGMP or MLD proxy (*, G) entries count of all instances reached the upper threshold."
+      ::= { hwMgmdMibNotifications 14 }
+
+hwMgmdHostStarGThresholdExceedClear NOTIFICATION-TYPE
+    OBJECTS { hwMgmdNotificationAddressType,
+              hwMgmdHostStarGCurrentCount,
+              hwMgmdHostStarGThreshold,
+              hwMgmdHostStarGTotalCount
+            }
+    STATUS      current
+    DESCRIPTION
+            "A hwMgmdHostStarGThresholdExceedClear notification signifies that IGMP or MLD proxy (*, G) entries count of all instances fell below the lower threshold."
+      ::= { hwMgmdMibNotifications 15 }
+
+hwMgmdHostStarGExceed NOTIFICATION-TYPE
+    OBJECTS { hwMgmdNotificationAddressType,
+              hwMgmdHostNotificationSrcAddr,
+              hwMgmdHostNotificationGrpAddr,
+              hwMgmdHostStarGTotalCount,
+              hwMgmdInstanceName 
+            }
+    STATUS      current
+    DESCRIPTION
+            "A hwMgmdHostStarGExceed notification signifies that IGMP or MLD proxy (*, G) entries can not be created because the limit is reached."
+      ::= { hwMgmdMibNotifications 16 }
+
+hwMgmdHostStarGExceedClear NOTIFICATION-TYPE
+    OBJECTS { hwMgmdNotificationAddressType,
+              hwMgmdHostStarGTotalCount             
+            }
+    STATUS      current
+    DESCRIPTION
+            "A hwMgmdHostStarGExceedClear notification signifies that IGMP or MLD proxy (*, G) entries can be created because can be created because the number of IGMP or MLD (*, G) entries fell below the limit."
+      ::= { hwMgmdMibNotifications 17 }
+
+hwMgmdHostSGThresholdExceed NOTIFICATION-TYPE
+    OBJECTS { hwMgmdNotificationAddressType,
+              hwMgmdHostSGCurrentCount,
+              hwMgmdHostSGThreshold,
+              hwMgmdHostSGTotalCount
+            }
+    STATUS      current
+    DESCRIPTION
+            "A hwMgmdHostSGThresholdExceed notification signifies that IGMP or MLD proxy (S, G) entries count of all instances reached the upper threshold."
+      ::= { hwMgmdMibNotifications 18 }
+
+hwMgmdHostSGThresholdExceedClear NOTIFICATION-TYPE
+    OBJECTS { hwMgmdNotificationAddressType,
+              hwMgmdHostSGCurrentCount,
+              hwMgmdHostSGThreshold,
+              hwMgmdHostSGTotalCount
+            }
+    STATUS      current
+    DESCRIPTION
+            "A hwMgmdHostSGThresholdExceedClear notification signifies that IGMP or MLD proxy (S, G) entries count of all instances fell below the lower threshold."
+      ::= { hwMgmdMibNotifications 19 }
+
+hwMgmdHostSGExceed NOTIFICATION-TYPE
+    OBJECTS { hwMgmdNotificationAddressType,
+              hwMgmdHostNotificationSrcAddr,
+              hwMgmdHostNotificationGrpAddr,
+              hwMgmdHostSGTotalCount,
+              hwMgmdInstanceName 
+            }
+    STATUS      current
+    DESCRIPTION
+            "A hwMgmdHostSGExceed notification signifies that IGMP or MLD proxy (S, G) entries can not be created because the limit of all instances is reached."
+      ::= { hwMgmdMibNotifications 20 }
+
+hwMgmdHostSGExceedClear NOTIFICATION-TYPE
+    OBJECTS { hwMgmdNotificationAddressType,
+              hwMgmdHostSGTotalCount
+            }
+    STATUS      current
+    DESCRIPTION
+            "A hwMgmdHostSGExceedClear notification signifies that IGMP or MLD proxy (S, G) entries can be created because can be created because the number of IGMP or MLD (S, G) entries of all instances fell below the limit."
+      ::= { hwMgmdMibNotifications 21 }
+
+hwMgmdIfThresholdExceed NOTIFICATION-TYPE
+    OBJECTS { hwMgmdNotificationAddressType,
+              hwMgmdThresholdInterfaceIfIndex,
+              hwMgmdGmpIfCurrentCount,
+              hwMgmdGmpIfThreshold,
+              hwMgmdGmpInterfaceName,
+              hwMgmdInstanceName
+            }
+    STATUS      current
+    DESCRIPTION
+            "A hwMgmdIfThresholdExceed notification signifies that IGMP or MLD entries on the interface reached the upper threshold."
+      ::= { hwMgmdMibNotifications 22 }
+      
+hwMgmdIfThresholdExceedClear NOTIFICATION-TYPE
+    OBJECTS { hwMgmdNotificationAddressType,
+              hwMgmdThresholdInterfaceIfIndex,
+              hwMgmdGmpIfCurrentCount,
+              hwMgmdGmpIfThreshold,
+              hwMgmdGmpInterfaceName,
+              hwMgmdInstanceName
+            }
+    STATUS      current
+    DESCRIPTION
+            "A hwMgmdIfThresholdExceedClear notification signifies that IGMP or MLD entries on the interface fell below the lower threshold."
+      ::= { hwMgmdMibNotifications 23 }
+
+hwMgmdBoardLimitThresholdExceed NOTIFICATION-TYPE
+    OBJECTS { hwMgmdNotificationAddressType,
+              hwMgmdNotificationSlot,
+              hwMgmdGmpBoardCurrentCount,
+              hwMgmdGmpBoardLimitCount,
+              hwMgmdGmpBoardThreshold
+            }
+    STATUS      current
+    DESCRIPTION
+            "A hwMgmdBoardLimitThresholdExceed notification signifies that IGMP or MLD entries on the board reached the upper threshold."
+      ::= { hwMgmdMibNotifications 24 }
+
+hwMgmdBoardLimitThresholdExceedClear NOTIFICATION-TYPE
+    OBJECTS { hwMgmdNotificationAddressType,
+              hwMgmdNotificationSlot,
+              hwMgmdGmpBoardCurrentCount,
+              hwMgmdGmpBoardLimitCount,
+              hwMgmdGmpBoardThreshold
+            }
+    STATUS      current
+    DESCRIPTION
+            "A hwMgmdBoardLimitThresholdExceedClear notification signifies that IGMP or MLD entries on the board fell below the lower threshold."
+      ::= { hwMgmdMibNotifications 25 }
+
+hwMgmdGMPBoardLimit NOTIFICATION-TYPE
+    OBJECTS { hwMgmdGmpLimitGroupAddressType,
+              hwMgmdNotificationSlot,
+              hwMgmdGmpBoardLimitCount
+            }
+    STATUS   current
+    DESCRIPTION
+            "A hwMgmdGMPBoardLimit notification signifies that IGMP or MLD entries on the board reaches the upper limit.
+
+            This trap message is generated when IGMP or MLD fails to create membership because the number of IGMP or MLD entries on the board reaches the upper limit."  
+    ::= { hwMgmdMibNotifications 26 }
+
+hwMgmdGMPBoardLimitClear NOTIFICATION-TYPE
+    OBJECTS { hwMgmdGmpLimitGroupAddressType,
+              hwMgmdNotificationSlot,
+              hwMgmdGmpBoardLimitCount
+            }
+    STATUS   current
+    DESCRIPTION
+            "A hwMgmdGMPBoardLimitClear notification signifies that the IGMP or MLD entries on the board falls below the upper limit.
+
+            This trap message is generated when IGMP or MLD delete an entry resulting in the number of IGMP or MLD entries on the board falls below the upper limit."  
+    ::= { hwMgmdMibNotifications 27 }
 
 hwMgmdMibConformance              OBJECT IDENTIFIER ::= { hwMgmdStdMib 4 }
 hwMgmdMibCompliance               OBJECT IDENTIFIER ::= { hwMgmdMibConformance 3 }
@@ -971,7 +1915,17 @@ hwMgmdMldV2RouterMibCompliance MODULE-COMPLIANCE
 
 
 -- units of conformance
+hwMgmdHostBaseMIBGroup OBJECT-GROUP
+    OBJECTS { hwMgmdHostInterfaceStatus,
+              hwMgmdHostInterfaceVersion
+            }
+    STATUS  current
+    DESCRIPTION
+            "The basic collection of objects providing management of
+            MGMD version 1, 2, or 3 for hosts."
 
+    ::= { hwMgmdMibGroups 1 } 
+    
 hwMgmdRouterBaseMibGroup OBJECT-GROUP
     OBJECTS { hwMgmdRouterInterfaceStatus,
               hwMgmdRouterCacheUpTime, hwMgmdRouterCacheExpiryTime,
@@ -985,8 +1939,41 @@ hwMgmdRouterBaseMibGroup OBJECT-GROUP
     DESCRIPTION
             "The basic collection of objects providing management of
             MGMD version 1, 2 or 3 for Routers."
-    ::= { hwMgmdMibGroups 2 }
+    ::= { hwMgmdMibGroups 2 }   
+    
+hwMgmdV2HostMIBGroup OBJECT-GROUP
+    OBJECTS { hwMgmdHostInterfaceVersion1QuerierTimer
+            }
+    STATUS  current
+    DESCRIPTION
+            "A collection of additional read-only objects for management
+            of IGMP version 2 in hosts for MGMD version 2 compliance."
 
+    ::= { hwMgmdMibGroups 3 }       
+    
+hwMgmdV3HostMIBGroup OBJECT-GROUP
+    OBJECTS { hwMgmdHostInterfaceVersion2QuerierTimer,
+              hwMgmdHostInterfaceVersion3Robustness
+            }
+    STATUS  current
+    DESCRIPTION
+            "A collection of additional objects for
+            management of MGMD version 3 in hosts."
+
+    ::= { hwMgmdMibGroups 4 }   
+     
+hwMgmdHostExtendedMIBGroup OBJECT-GROUP
+    OBJECTS { hwMgmdHostInterfaceBackupInterface, hwMgmdHostInterfaceRerouteDelayPeriod,
+              hwMgmdHostInterfaceRerouteImmediate, hwMgmdHostInterfaceQuerier,
+              hwMgmdHostRerouteDelayPeriod, hwMgmdHostRerouteImmediate,
+              hwMgmdHostInterfaceTtlCheck,
+              hwMgmdTtlCheck}
+    STATUS  current
+    DESCRIPTION
+            "A collection of optional objects for MGMD hosts."
+
+    ::= { hwMgmdMibGroups 5 }
+        
 hwMgmdV2RouterBaseMibGroup OBJECT-GROUP
     OBJECTS { hwMgmdRouterInterfaceVersion, hwMgmdRouterInterfaceQuerier,
               hwMgmdRouterInterfaceQueryMaxResponseTime,
@@ -995,7 +1982,9 @@ hwMgmdV2RouterBaseMibGroup OBJECT-GROUP
               hwMgmdRouterInterfaceLastMembQueryIntvl,
               hwMgmdRouterInterfaceLastMembQueryCount,
               hwMgmdRouterInterfaceStartupQueryCount,
-              hwMgmdRouterInterfaceStartupQueryInterval
+              hwMgmdRouterInterfaceStartupQueryInterval,
+			  hwMgmdRouterInterfaceTtlCheck,
+			  hwMgmdTtlCheck
             }
     STATUS  current
     DESCRIPTION
@@ -1025,8 +2014,28 @@ hwMgmdV2RouterOptMibGroup OBJECT-GROUP
     DESCRIPTION
             "An additional optional object for management of MGMD
             version 2 in routers."
-    ::= { hwMgmdMibGroups 9 }
-    
+    ::= { hwMgmdMibGroups 9 }     
+         
+hwMgmdCtlMsgCountMibGroup OBJECT-GROUP
+    OBJECTS { hwMgmdCtlMsgCountQuery,
+              hwMgmdCtlMsgCountReportASM,
+              hwMgmdCtlMsgCountReportSSM,
+              hwMgmdCtlMsgCountLeaveASM,
+              hwMgmdCtlMsgCountLeaveSSM,
+              hwMgmdCtlMsgCountISIN,
+              hwMgmdCtlMsgCountISEX,
+              hwMgmdCtlMsgCountTOIN,
+              hwMgmdCtlMsgCountTOEX,
+              hwMgmdCtlMsgCountALLOW,
+              hwMgmdCtlMsgCountBLOCK,
+              hwMgmdCtlMsgCountSrcRecTotal,
+              hwMgmdCtlMsgCountOthers 
+            }
+    STATUS  current
+    DESCRIPTION
+            "An additional optional object for management of MGMD routers."
+    ::= { hwMgmdMibGroups 10 } 
+        
 hwMgmdV3RouterMibGroup OBJECT-GROUP
     OBJECTS { hwMgmdRouterCacheSourceFilterMode,
               hwMgmdRouterCacheVersion2HostTimer,
@@ -1038,11 +2047,10 @@ hwMgmdV3RouterMibGroup OBJECT-GROUP
     DESCRIPTION
             "A collection of additional objects for management of MGMD
             version 3 in routers."
-    ::= { hwMgmdMibGroups 11 } 
-
+    ::= { hwMgmdMibGroups 11 }     
+    
 hwMgmdMibNotificationObjects OBJECT-GROUP
-    OBJECTS { hwMgmdGmpAddressType,
-              hwMgmdGroup,
+    OBJECTS { hwMgmdGroup,
               hwMgmdSource,
               hwMgmdLimitInterfaceIfIndex,
               hwMgmdGlobalEntries,
@@ -1053,7 +2061,29 @@ hwMgmdMibNotificationObjects OBJECT-GROUP
               hwMgmdGmpJoinSenderIp,
               hwMgmdGmpJoinVersion,
               hwMgmdGmpInterfaceIfIndex,
-              hwMgmdGmpInterfaceName
+              hwMgmdGmpInterfaceName,
+              hwMgmdGmpLimitGroupAddressType,
+              hwMgmdGmpLimitGroup,
+              hwMgmdGmpLimitSource,
+              hwMgmdInstanceName,
+              hwMgmdNotificationAddressType,
+              hwMgmdTotalLimitCurrentCount,
+              hwMgmdTotalLimitThreshold,
+              hwMgmdHostStarGCurrentCount,
+              hwMgmdHostStarGThreshold,
+              hwMgmdHostStarGTotalCount,
+              hwMgmdHostNotificationSrcAddr,
+              hwMgmdHostNotificationGrpAddr,
+              hwMgmdHostSGCurrentCount,
+              hwMgmdHostSGThreshold,
+              hwMgmdHostSGTotalCount,
+              hwMgmdThresholdInterfaceIfIndex,
+              hwMgmdGmpIfCurrentCount,
+              hwMgmdGmpIfThreshold,
+              hwMgmdNotificationSlot,
+              hwMgmdGmpBoardCurrentCount,
+              hwMgmdGmpBoardLimitCount,
+              hwMgmdGmpBoardThreshold
             }
     STATUS  current
     DESCRIPTION
@@ -1066,7 +2096,29 @@ hwMgmdMibNotificationGroup NOTIFICATION-GROUP
                     hwMgmdInterfaceLimit,
                     hwMgmdTotalLimit,
                     hwMgmdGmpJoin,
-                    hwMgmdGmpLeave
+                    hwMgmdGmpLeave,
+                    hwMgmdGMPGlobalLimit,
+                    hwMgmdGMPInterfaceLimit,
+                    hwMgmdGMPTotalLimit,
+                    hwMgmdGMPInterfaceLimitClear,
+                    hwMgmdGMPGlobalLimitClear,
+                    hwMgmdGMPTotalLimitClear,
+                    hwMgmdTotalLimitThresholdExceed,
+                    hwMgmdTotalLimitThresholdExceedClear,
+                    hwMgmdHostStarGThresholdExceed, 
+                    hwMgmdHostStarGThresholdExceedClear, 
+                    hwMgmdHostStarGExceed, 
+                    hwMgmdHostStarGExceedClear, 
+                    hwMgmdHostSGThresholdExceed, 
+                    hwMgmdHostSGThresholdExceedClear,
+                    hwMgmdHostSGExceed, 
+                    hwMgmdHostSGExceedClear,
+                    hwMgmdIfThresholdExceed,
+                    hwMgmdIfThresholdExceedClear,
+                    hwMgmdBoardLimitThresholdExceed,
+                    hwMgmdBoardLimitThresholdExceedClear,
+                    hwMgmdGMPBoardLimit,
+                    hwMgmdGMPBoardLimitClear
                   }
     STATUS  current
     DESCRIPTION

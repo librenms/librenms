@@ -1,9 +1,9 @@
 -- ==================================================================
--- Copyright (C) 2017 by HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2019 by HUAWEI TECHNOLOGIES. All rights reserved.
 -- 
 -- Description: HUAWEI SMARTLINK MIB
 -- Reference:
--- Version: V3.05
+-- Version: V3.06
 -- History:
 -- ==================================================================
 
@@ -29,7 +29,7 @@
                         
         hwSmartLinkMib MODULE-IDENTITY 
 
-			      LAST-UPDATED "201707141055Z"		-- Jul 14, 2017 at 10:55 GMT
+			      LAST-UPDATED "201903142040Z"		-- Mar 14, 2019 at 20:40 GMT
 			      ORGANIZATION 
 				        "Huawei Technologies Co.,Ltd."
 			      CONTACT-INFO 
@@ -43,6 +43,9 @@
             DESCRIPTION 
                 "This module includes the information about smart link.
                 The information can be read and some of them can be set."  
+
+            REVISION  "201903142040Z"
+            DESCRIPTION  "Update the max index of hwMonitorLinkDlArrayIndex from 48 to 512."     
 
             REVISION  "201707141055Z"
             DESCRIPTION  "Update index of hwMonitorLinkDlArrayIndex."                
@@ -721,7 +724,7 @@
             ::= { hwMonitorLinkDownLinkPortEntry 1 }
         
         hwMonitorLinkDlArrayIndex OBJECT-TYPE
-            SYNTAX Integer32 (1..48)
+            SYNTAX Integer32 (1..512)
             MAX-ACCESS not-accessible
             STATUS current
             DESCRIPTION

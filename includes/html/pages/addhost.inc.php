@@ -26,69 +26,69 @@ if (! empty($_POST['hostname'])) {
     $hostname = strip_tags($_POST['hostname']);
     if (! \LibreNMS\Util\Validate::hostname($hostname) && ! IP::isValid($hostname)) {
         print_error("Invalid hostname or IP: $hostname");
-    }
-
-    $new_device = new \App\Models\Device(['hostname' => $hostname]);
-
-    if (Auth::user()->hasGlobalRead()) {
-        // Settings common to SNMPv2 & v3
-        if ($_POST['port']) {
-            $new_device->port = strip_tags($_POST['port']);
-        }
-
-        if ($_POST['transport']) {
-            $new_device->transport = strip_tags($_POST['transport']);
-        }
-
-        $additional = [];
-        if (! $snmp_enabled) {
-            $new_device->snmp_disable = 1;
-            $new_device->os = $_POST['os'] ? strip_tags($_POST['os_id']) : 'ping';
-            $new_device->hardware = strip_tags($_POST['hardware']);
-            $new_device->sysName = strip_tags($_POST['sysName']);
-        } elseif ($_POST['snmpver'] === 'v2c' || $_POST['snmpver'] === 'v1') {
-            $new_device->snmpver = strip_tags($_POST['snmpver']);
-            $communities = Config::get('snmp.community');
-            if ($_POST['community']) {
-                $new_device->community = $_POST['community'];
-                $communities = [$_POST['community']];
-            }
-            print_message("Adding host $hostname communit" . (count($communities) == 1 ? 'y' : 'ies') . ' ' . implode(', ', array_map('htmlspecialchars', $communities)) . " port $new_device->port using $new_device->transport");
-        } elseif ($_POST['snmpver'] === 'v3') {
-            $new_device->snmpver = 'v3';
-            $new_device->authlevel = strip_tags($_POST['authlevel']);
-            $new_device->authname = $_POST['authname'];
-            $new_device->authpass = $_POST['authpass'];
-            $new_device->authalgo = strip_tags($_POST['authalgo']);
-            $new_device->cryptopass = $_POST['cryptopass'];
-            $new_device->cryptoalgo = $_POST['cryptoalgo'];
-
-            print_message("Adding SNMPv3 host: $hostname port: $port");
-        } else {
-            print_error('Unsupported SNMP Version. There was a dropdown menu, how did you reach this error ?');
-        }//end if
-
-        try {
-            $new_device->poller_group = strip_tags($_POST['poller_group'] ?? '');
-            $new_device->port_association_mode = PortAssociationMode::getId($_POST['port_assoc_mode']);
-
-            $force_add = (isset($_POST['force_add']) && $_POST['force_add'] == 'on');
-            $result = (new ValidateDeviceAndCreate($new_device, $force_add))->execute();
-
-            if ($result) {
-                $link = \LibreNMS\Util\Url::deviceUrl($new_device->device_id);
-                print_message("Device added <a href='$link'>$hostname ($new_device->device_id)</a>");
-            }
-        } catch (HostUnreachableException $e) {
-            print_error($e->getMessage());
-            foreach ($e->getReasons() as $reason) {
-                print_error($reason);
-            }
-        } catch (Exception $e) {
-            print_error($e->getMessage());
-        }
     } else {
-        print_error("You don't have the necessary privileges to add hosts.");
+        $new_device = new \App\Models\Device(['hostname' => $hostname]);
+
+        if (Auth::user()->hasGlobalRead()) {
+            // Settings common to SNMPv2 & v3
+            if ($_POST['port']) {
+                $new_device->port = strip_tags($_POST['port']);
+            }
+
+            if ($_POST['transport']) {
+                $new_device->transport = strip_tags($_POST['transport']);
+            }
+
+            $additional = [];
+            if (! $snmp_enabled) {
+                $new_device->snmp_disable = 1;
+                $new_device->os = $_POST['os'] ? strip_tags($_POST['os_id']) : 'ping';
+                $new_device->hardware = strip_tags($_POST['hardware']);
+                $new_device->sysName = strip_tags($_POST['sysName']);
+            } elseif ($_POST['snmpver'] === 'v2c' || $_POST['snmpver'] === 'v1') {
+                $new_device->snmpver = strip_tags($_POST['snmpver']);
+                $communities = Config::get('snmp.community');
+                if ($_POST['community']) {
+                    $new_device->community = $_POST['community'];
+                    $communities = [$_POST['community']];
+                }
+                print_message("Adding host $hostname communit" . (count($communities) == 1 ? 'y' : 'ies') . ' ' . implode(', ', array_map('htmlspecialchars', $communities)) . " port $new_device->port using $new_device->transport");
+            } elseif ($_POST['snmpver'] === 'v3') {
+                $new_device->snmpver = 'v3';
+                $new_device->authlevel = strip_tags($_POST['authlevel']);
+                $new_device->authname = $_POST['authname'];
+                $new_device->authpass = $_POST['authpass'];
+                $new_device->authalgo = strip_tags($_POST['authalgo']);
+                $new_device->cryptopass = $_POST['cryptopass'];
+                $new_device->cryptoalgo = $_POST['cryptoalgo'];
+
+                print_message("Adding SNMPv3 host: $hostname port: $port");
+            } else {
+                print_error('Unsupported SNMP Version. There was a dropdown menu, how did you reach this error ?');
+            }//end if
+
+            try {
+                $new_device->poller_group = strip_tags($_POST['poller_group'] ?? '');
+                $new_device->port_association_mode = PortAssociationMode::getId($_POST['port_assoc_mode']);
+
+                $force_add = (isset($_POST['force_add']) && $_POST['force_add'] == 'on');
+                $result = (new ValidateDeviceAndCreate($new_device, $force_add))->execute();
+
+                if ($result) {
+                    $link = \LibreNMS\Util\Url::deviceUrl($new_device->device_id);
+                    print_message("Device added <a href='$link'>$hostname ($new_device->device_id)</a>");
+                }
+            } catch (HostUnreachableException $e) {
+                print_error($e->getMessage());
+                foreach ($e->getReasons() as $reason) {
+                    print_error(htmlentities($reason));
+                }
+            } catch (Exception $e) {
+                print_error($e->getMessage());
+            }
+        } else {
+            print_error("You don't have the necessary privileges to add hosts.");
+        }
     }
 }
 echo '    </div>

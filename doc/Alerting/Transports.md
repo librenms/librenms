@@ -49,6 +49,23 @@ alerts from many other monitoring tools on a single screen.
 | Alert state | critical |
 | Recover state | cleared |
 
+## AlertOps
+
+Using AlertOps integration with LibreNMS, you can seamlessly forward alerts to AlertOps with detailed information. AlertOps acts as a dispatcher for LibreNMS alerts, allowing you to determine the right individuals or teams to notify based on on-call schedules. Notifications can be sent via various channels including email, text messages (SMS), phone calls, and mobile push notifications for iOS & Android devices. Additionally, AlertOps provides escalation policies to ensure alerts are appropriately managed until they are assigned or closed. You can also filter out/aggregate alerts based on different values.
+
+To set up the integration:
+
+- Create a LibreNMS Integration: Sign up for an AlertOps account and create a LibreNMS integration from the integrations page. This will generate an Inbound Integration Endpoint URL that you'll need to copy to LibreNMS.
+
+- Configure LibreNMS Integration: In LibreNMS, navigate to the integration settings and paste the inbound integration URL obtained from AlertOps.
+
+**Example:**
+
+| Config | Example |
+| ------ | ------- |
+| WebHook URL | <https://url/path/to/webhook> |
+
+
 ## Alertmanager
 
 Alertmanager is an alert handling software, initially developed for
@@ -252,20 +269,23 @@ Here an example using 3 numbers, any amount of numbers is supported:
 ## Discord
 
 The Discord transport will POST the alert message to your Discord
-Incoming WebHook. Simple html tags are stripped from  the message.
+Incoming WebHook. The only required value is Discord URL, without this no call to Discord will be made. 
 
-The only required value is for url, without this no call to Discord
-will be made. The Options field supports the JSON/Form Params listed
-in the Discord Docs below.
+Graphs can be included in the template using: ```<img class="librenms-graph" src=""/>```. The rest of the html tags are stripped from the message.
 
-[Discord Docs](https://discordapp.com/developers/docs/resources/webhook#execute-webhook)
+
+ The Options field supports JSON/Form Params listed
+in the 
+[Discord Docs](https://discordapp.com/developers/docs/resources/webhook#execute-webhook). Fields to embed is a comma separated list from the [Alert Data](https://github.com/librenms/librenms/blob/master/LibreNMS/Alert/AlertData.php)).
+
 
 **Example:**
 
 | Config | Example |
 | ------ | ------- |
 | Discord URL | <https://discordapp.com/api/webhooks/4515489001665127664/82-sf4385ysuhfn34u2fhfsdePGLrg8K7cP9wl553Fg6OlZuuxJGaa1d54fe> |
-| Options | username=myname |
+| Options | username=myname</br>content=Some content</br>tts=false |
+| Fields to embed | hostname,name,timestamp,severity |
 
 ## Elasticsearch
 
@@ -339,6 +359,50 @@ Configuration of the LibreNMS IRC-Bot is described [here](https://github.com/lib
 | Config | Example |
 | ------ | ------- |
 | IRC | enabled |
+
+## IBM On Call Manager
+
+## IBM On Call Manager (OCM)
+
+LibreNMS can integrate with IBM On Call Manager by using a webhook URL you create by adding the LibreNMS integration.
+
+The webhook URL (referred to as `ocm-url`) can be found under 'Integrations' in the IBM On Call Manager portal after selecting LibreNMS as the integration.
+
+IBM On Call Manager uses the webhook to send the name of the alert rule, along with other relevant details. It will include the name or IP address of the system sending the alert, the name of the alert, the severity, timestamp, OS, location, and a unique ID. 
+
+**Example:**
+
+| Config  | Example                                  |
+| ------- | ---------------------------------------- |
+| ocm-url | https://ibm-ocm-webhook.example.com/api |
+
+**Payload Example**:
+
+```json
+{
+  "eventSource": {
+    "name": "{{ $alert->sysName }}",
+    "description": "{{ $alert->sysDescr }}",
+    "displayName": "LibreNMS Alerts - DBAoC",
+    "type": "server",
+    "sourceID": "LibreNMS-DBAoC"
+  },
+  "resourceAffected": {
+    "hostname": "{{ $alert->hostname }}",
+    "ipAddress": "{{ $alert->ip }}",
+    "os": "{{ $alert->os }}",
+    "location": "{{ $alert->location }}",
+    "component": "{{ $alert->sysName }}"
+  },
+  "eventInfo": {
+    "summary": "{{ $alert->title }}",
+    "msg": "{{ $alert->msg }}",
+    "severity": "{{ $alert->severity }}",
+    "timestamp": "{{ $alert->timestamp }}",
+    "uniqueID": "{{ $alert->uid }}"
+  }
+}
+```
 
 ## JIRA
 
@@ -764,6 +828,22 @@ Sensu to LibreNMS alerts, they'll be lost on the next event (silences will work)
 | Check Prefix    | lnms                  |
 | Source Key      | hostname              |
 
+## SIGNL4
+
+SIGNL4 offers critical alerting, incident response and service dispatching for operating critical infrastructure. It alerts you persistently via app push, SMS text, voice calls, and email including tracking, escalation, on-call duty scheduling and collaboration.
+
+Integrating SIGNL4 with LibreNMS to forward critical alerts with detailed information to responsible people or on-call teams. The integration supports triggering as well as closing alerts.
+
+In the configuration for your SIGNL4 alert transport you just need to enter your SIGNL4 webhook URL including team or integration secret.
+
+**Example:**
+
+| Config | Example |
+| ------ | ------- |
+| Webhook URL | https://connect.signl4.com/webhook/{team-secret} |
+
+You can find more information about the integration [here](https://docs.signl4.com/integrations/librenms/librenms.html).
+
 ## Slack
 
 The Slack transport will POST the alert message to your Slack Incoming
@@ -774,16 +854,36 @@ only required value is for url, without this  then no call to Slack will be made
 
 We currently support the following attachment options:
 
-`author_name`
+- `author_name`
+
+We currently support the following global message options:
+
+- `channel_name` : Slack channel name (without the leading '#') to which the alert will go
+- `icon_emoji` : Emoji name in colon format to use as the author icon
 
 [Slack docs](https://api.slack.com/docs/message-attachments)
+
+The alert template can make use of
+[Slack markdown](https://api.slack.com/reference/surfaces/formatting#basic-formatting).
+In the Slack markdown dialect, custom links are denoted with HTML angled
+brackets, but LibreNMS strips these out. To support embedding custom links in alerts,
+use the bracket/parentheses markdown syntax for links.  For example if you would
+typically use this for a Slack link:
+
+`<https://www.example.com|My Link>`
+
+Use this in your alert template:
+
+`[My Link](https://www.example.com)`
 
 **Example:**
 
 | Config | Example |
 | ------ | ------- |
 | Webhook URL | <https://slack.com/url/somehook> |
-| Slack Options | author_name=Me |
+| Channel | network-alerts |
+| Author Name | LibreNMS Bot |
+| Icon | `:scream:` |
 
 ## SMSEagle
 

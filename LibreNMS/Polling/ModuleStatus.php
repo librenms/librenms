@@ -30,7 +30,7 @@ use App\Models\Device;
 class ModuleStatus
 {
     public function __construct(
-        public bool $global,
+        public ?bool $global,
         public ?bool $os = null,
         public ?bool $device = null,
         public ?bool $manual = null,
@@ -39,6 +39,10 @@ class ModuleStatus
 
     public function isEnabled(): bool
     {
+        if ($this->global === null) {
+            return false; // this module does not have polling
+        }
+
         if ($this->manual !== null) {
             return $this->manual;
         }
@@ -57,7 +61,7 @@ class ModuleStatus
     public function reason(): string
     {
         if ($this->manual !== null) {
-            return 'mannually';
+            return 'manually';
         }
 
         if ($this->device !== null) {

@@ -1,5 +1,5 @@
 -- ============================================================================
--- Copyright (C) 2011 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2020 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- Description:  The mib is used for configuring time range. 
 --               When configuring the ACL rule, if you need to specify the time 
 --               for the ACL rule to take effect, you need to run this command 
@@ -7,7 +7,7 @@
 --               you can specify the time for an ACL to take effect by referring
 --               the time range name when configuring the ACL rule.
 -- Reference:  
--- Version: V1.01
+-- Version: V1.04
 -- ============================================================================
 
   HUAWEI-TRNG-MIB DEFINITIONS ::= BEGIN
@@ -24,7 +24,7 @@
             FROM HUAWEI-MIB;
         
         hwTRNG MODULE-IDENTITY 
-        LAST-UPDATED "201103220000Z"    
+        LAST-UPDATED "202008180000Z"    
         ORGANIZATION 
             "Huawei Technologies Co.,Ltd."
         CONTACT-INFO                                        
@@ -44,6 +44,16 @@
             the time range name when configuring the ACL rule."  
           
         -- Revision history
+        REVISION     "202008180000Z"  
+        DESCRIPTION  "V1.04, modified the format of description."
+
+        REVISION     "202004260000Z"  
+        DESCRIPTION  "V1.03, modified the rangeof hwTrngPeriodicTable."
+
+        REVISION     "201711220000Z"  
+        DESCRIPTION  "V1.02, modified the description of hwTrngCreateTimerangeTable,
+                                                hwTrngAbsoluteTable and hwTrngPeriodicTable."
+
         REVISION     "201103220000Z"  
         DESCRIPTION  "V1.01, modified the description of hwTimerangePeriodicEndTimes.
 		              modified the description of hwTrngCreateTimerangeTable, 
@@ -67,11 +77,10 @@
         STATUS current
         DESCRIPTION
             "Describes a time range. 
-             When configuring an ACL rule, set its effective time. To do so, configurate a time range first. 
+             When configuring an ACL rule, set its effective time. To do so, configure a time range first. 
              After the configuration, the effective time is specified by referencing the time range 
              when an ACL rule is being configured.
              An ACL time range can be a relative time range and an absolute time range. 
-             The index of this table is hwTrngIndex.
             "
         ::= { hwTRNGMibObjects 1 }
 
@@ -83,7 +92,7 @@
         STATUS current
         DESCRIPTION
             "Describes a time range. 
-             When configuring an ACL rule, set its effective time. To do so, configurate a time range first. 
+             When configuring an ACL rule, set its effective time. To do so, configure a time range first. 
              After the configuration, the effective time is specified by referencing the time range 
              when an ACL rule is being configured.
              An ACL time range can be a relative time range and an absolute time range. 
@@ -173,7 +182,6 @@
              An absolute time range refers to the time range without a period. 
              The time range is active from the specified start time and date to the end time and date. 
              Otherwise, the time range is inactive.
-             The indexes of this table are hwTrngAbsoluteNameIndex and hwTrngAbsoluteSubIndex. 
             "
         ::= { hwTRNGMibObjects 2 }
     
@@ -237,12 +245,8 @@
         STATUS current
         DESCRIPTION
             "Indicates the start time of an absolute time range.
-             It is an 8-byte hexadecimal numeral, where, the first two bytes indicate the year, 
-             the third byte indicates the month, the fourth byte indicates the day, 
-             the fifth byte indicates the hour, the six byte indicates the minute, 
-             and the seventh and eighth digits are reserved, which are filled in 0.
-             For example, if the start time is 2010-1-10,8:10, 
-             the value is presented as 0x07 0xDA 0x01 0x0A 0x08 0x0A 0x00 0x00. 
+             It is an 8-byte hexadecimal numeral, where, the first two bytes indicate the year, the third byte indicates the month, the fourth byte indicates the day, the fifth byte indicates the hour, the six byte indicates the minute, and the seventh and eighth digits are reserved, which are filled in 0.
+             For example, if the start time is 2010-1-10,8:10, the value is presented as 0x07 0xDA 0x01 0x0A 0x08 0x0A 0x00 0x00. 
              The time range that the device can identify is 1970/01/01 00:00-2099/12/31 23:59. 
              Therefore, the time value must be within the time range. 
             "
@@ -293,7 +297,6 @@
              but the date is set to a day from Monday to Sunday. 
              The time range is active at the specified time and date. 
              Otherwise, the time range is inactive. 
-             The indexes of this table are hwTrngPeriodicNameIndex and hwTrngPeriodicSubIndex. 
             "
         ::= { hwTRNGMibObjects 3 }
     
@@ -389,7 +392,7 @@
              Other bytes are reserved and are filled in 0.
              For example, if the start time is 08:30, 
              the value is presented as 0x00 0x00 0x00 0x00 0x08 0x1E 0x00 0x00. 
-             The time must be from 00:00 to 24:00. 
+             The time must be from 00:00 to 23:59. 
             "       
         ::= { hwTrngPeriodicEntry 4 }
     
@@ -402,7 +405,7 @@
             "Indicates the end time of a periodic time range. 
              The format is the same as that of hwTrngPeriodicStartTime. 
              The value of the end time must be larger than that of the start time. 
-             The value must be from 00:00 to 24:00. 
+             The value must be from 00:00 to 23:59. 
              The 7th byte is used only in the case of 23: 59: 60 to indicate the time 24: 00.
             "
         ::= { hwTrngPeriodicEntry 5 }

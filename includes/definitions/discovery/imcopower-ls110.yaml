@@ -1,5 +1,9 @@
-mib: IMCO-LS110-MIB
+mib: IMCO-LSPS-MIB
 modules:
+    os:
+        hardware: IMCO-LSPS-MIB::sdsModel.0
+        serial: IMCO-LSPS-MIB::sdsSerialNumber.0
+        version: IMCO-LSPS-MIB::sdsSoftware.0
     sensors:
         temperature:
             data:

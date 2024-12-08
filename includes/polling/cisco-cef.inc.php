@@ -15,7 +15,7 @@ if ($device['os_group'] == 'cisco') {
     d_echo($cefs);
 
     if (is_array($cefs)) {
-        if (! is_array($entity_array)) {
+        if (! isset($entity_array) || ! is_array($entity_array)) {
             echo 'Caching OIDs: ';
             $entity_array = [];
             echo ' entPhysicalDescr';
@@ -93,11 +93,13 @@ if ($device['os_group'] == 'cisco') {
     }//end if
 
     // FIXME - need to delete old ones. FIXME REALLY.
-    print_r($cefs_db);
+    if (! empty($cefs_db)) {
+        print_r($cefs_db);
 
-    foreach ((array) $cefs_db as $cef_switching_id) {
-        dbDelete('cef_switching', '`cef_switching_id` =  ?', [$cef_switching_id]);
-        echo '-';
+        foreach ((array) $cefs_db as $cef_switching_id) {
+            dbDelete('cef_switching', '`cef_switching_id` =  ?', [$cef_switching_id]);
+            echo '-';
+        }
     }
 
     echo "\n";

@@ -18,5 +18,5 @@ $descr = 'Internal Temp';
 $divisor = 10;
 $temperature = (snmp_get($device, $oid, '-Oqv') / $divisor);
 if (is_numeric($temperature)) {
-    discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, $sensor_type, $descr, $divisor, '1', '0', null, null, '65', $temperature);
+    discover_sensor(null, 'temperature', $device, $oid, $index, $sensor_type, $descr, $divisor, '1', '0', null, null, '65', $temperature);
 }

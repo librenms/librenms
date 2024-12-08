@@ -19,7 +19,7 @@ use Illuminate\Support\Str;
 
 if (Str::startsWith($device['sysObjectID'], '.1.3.6.1.4.1.1248.4.1')) {
     discover_sensor(
-        $valid['sensor'],
+        null,
         'count',
         $device,
         '.1.3.6.1.4.1.1248.4.1.1.1.1.0',

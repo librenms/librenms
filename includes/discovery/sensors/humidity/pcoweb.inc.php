@@ -43,6 +43,6 @@ foreach ($humidities as $humidity) {
 
     if (is_numeric($current) && $current != 0) {
         $index = implode('.', array_slice(explode('.', $humidity['oid']), -5));
-        discover_sensor($valid['sensor'], 'humidity', $device, $humidity['oid'], $index, 'pcoweb', $humidity['descr'], $humidity['precision'], '1', $low_limit, null, null, $high_limit, $current);
+        discover_sensor(null, 'humidity', $device, $humidity['oid'], $index, 'pcoweb', $humidity['descr'], $humidity['precision'], '1', $low_limit, null, null, $high_limit, $current);
     }
 }

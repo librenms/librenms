@@ -18,7 +18,7 @@ By default, both are are included but you can enable / disable either
 one using the following config option:
 
 ```bash
-lnms config:set 'network_map_items' "('mac','xdp')"
+lnms config:set network_map_items '["mac","xdp"]'
 ```
 
 Either remove mac or xdp depending on which you want.
@@ -30,4 +30,4 @@ device neighbour page, or building device groups and using the device
 group maps will be more usable on large networks.
 
 ## Settings
-The map display can be configured by altering the [VisJS-Config.md](Vis JS Options)
+The map display can be configured by altering the [Vis JS Options](VisJS-Config.md)

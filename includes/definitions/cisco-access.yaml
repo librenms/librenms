@@ -1,0 +1,54 @@
+os: cisco-access
+text: 'Catalyst 1200-1300 Series Managed Switch'
+type: network
+icon: cisco
+group: cisco
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.9.1.3210 # { ciscoProducts 3210 } -- Cisco Catalyst 1200 (8TD)
+        - .1.3.6.1.4.1.9.1.3211 # { ciscoProducts 3211 } -- Cisco Catalyst 1200 (8TE2G)
+        - .1.3.6.1.4.1.9.1.3212 # { ciscoProducts 3212 } -- Cisco Catalyst 1200 (8PE2G)
+        - .1.3.6.1.4.1.9.1.3213 # { ciscoProducts 3213 } -- Cisco Catalyst 1200 (8FP2G)
+        - .1.3.6.1.4.1.9.1.3214 # { ciscoProducts 3214 } -- Cisco Catalyst 1200 (16T2G)
+        - .1.3.6.1.4.1.9.1.3215 # { ciscoProducts 3215 } -- Cisco Catalyst 1200 (16P2G)
+        - .1.3.6.1.4.1.9.1.3216 # { ciscoProducts 3216 } -- Cisco Catalyst 1200 (24T4G)
+        - .1.3.6.1.4.1.9.1.3217 # { ciscoProducts 3217 } -- Cisco Catalyst 1200 (24P4G)
+        - .1.3.6.1.4.1.9.1.3218 # { ciscoProducts 3218 } -- Cisco Catalyst 1200 (24FP4G)
+        - .1.3.6.1.4.1.9.1.3219 # { ciscoProducts 3219 } -- Cisco Catalyst 1200 (48T4G)
+        - .1.3.6.1.4.1.9.1.3220 # { ciscoProducts 3220 } -- Cisco Catalyst 1200 (48P4G)
+        - .1.3.6.1.4.1.9.1.3221 # { ciscoProducts 3221 } -- Cisco Catalyst 1200 (24T4X)
+        - .1.3.6.1.4.1.9.1.3222 # { ciscoProducts 3222 } -- Cisco Catalyst 1200 (24P4X)
+        - .1.3.6.1.4.1.9.1.3223 # { ciscoProducts 3223 } -- Cisco Catalyst 1200 (24FP4X)
+        - .1.3.6.1.4.1.9.1.3224 # { ciscoProducts 3224 } -- Cisco Catalyst 1200 (48T4X)
+        - .1.3.6.1.4.1.9.1.3225 # { ciscoProducts 3225 } -- Cisco Catalyst 1200 (48P4X)
+        - .1.3.6.1.4.1.9.1.3226 # { ciscoProducts 3226 } -- Cisco Catalyst 1300 (8TE2G)
+        - .1.3.6.1.4.1.9.1.3227 # { ciscoProducts 3227 } -- Cisco Catalyst 1300 (8PE2G)
+        - .1.3.6.1.4.1.9.1.3228 # { ciscoProducts 3228 } -- Cisco Catalyst 1300 (8FP2G)
+        - .1.3.6.1.4.1.9.1.3229 # { ciscoProducts 3229 } -- Cisco Catalyst 1300 (16T2G)
+        - .1.3.6.1.4.1.9.1.3230 # { ciscoProducts 3230 } -- Cisco Catalyst 1300 (16P2G)
+        - .1.3.6.1.4.1.9.1.3231 # { ciscoProducts 3231 } -- Cisco Catalyst 1300 (16FP2G)
+        - .1.3.6.1.4.1.9.1.3232 # { ciscoProducts 3232 } -- Cisco Catalyst 1300 (24T4G)
+        - .1.3.6.1.4.1.9.1.3233 # { ciscoProducts 3233 } -- Cisco Catalyst 1300 (24P4G)
+        - .1.3.6.1.4.1.9.1.3234 # { ciscoProducts 3234 } -- Cisco Catalyst 1300 (24FP4G)
+        - .1.3.6.1.4.1.9.1.3235 # { ciscoProducts 3235 } -- Cisco Catalyst 1300 (48T4G)
+        - .1.3.6.1.4.1.9.1.3236 # { ciscoProducts 3236 } -- Cisco Catalyst 1300 (48P4G)
+        - .1.3.6.1.4.1.9.1.3237 # { ciscoProducts 3237 } -- Cisco Catalyst 1300 (48FP4G)
+        - .1.3.6.1.4.1.9.1.3238 # { ciscoProducts 3238 } -- Cisco Catalyst 1300 (16P4X)
+        - .1.3.6.1.4.1.9.1.3239 # { ciscoProducts 3239 } -- Cisco Catalyst 1300 (24T4X)
+        - .1.3.6.1.4.1.9.1.3240 # { ciscoProducts 3240 } -- Cisco Catalyst 1300 (24P4X)
+        - .1.3.6.1.4.1.9.1.3241 # { ciscoProducts 3241 } -- Cisco Catalyst 1300 (24FP4X)
+        - .1.3.6.1.4.1.9.1.3242 # { ciscoProducts 3242 } -- Cisco Catalyst 1300 (48T4X)
+        - .1.3.6.1.4.1.9.1.3243 # { ciscoProducts 3243 } -- Cisco Catalyst 1300 (48P4X)
+        - .1.3.6.1.4.1.9.1.3244 # { ciscoProducts 3244 } -- Cisco Catalyst 1300 (48FP4X)
+        - .1.3.6.1.4.1.9.1.3245 # { ciscoProducts 3245 } -- Cisco Catalyst 1300 (8MGP2X)
+        - .1.3.6.1.4.1.9.1.3246 # { ciscoProducts 3246 } -- Cisco Catalyst 1300 (24MGP4X)
+        - .1.3.6.1.4.1.9.1.3247 # { ciscoProducts 3247 } -- Cisco Catalyst 1300 (48MGP4X)
+        - .1.3.6.1.4.1.9.1.3248 # { ciscoProducts 3248 } -- Cisco Catalyst 1300 (12XT2X)
+        - .1.3.6.1.4.1.9.1.3249 # { ciscoProducts 3249 } -- Cisco Catalyst 1300 (12XS)
+        - .1.3.6.1.4.1.9.1.3250 # { ciscoProducts 3250 } -- Cisco Catalyst 1300 (24XT)
+        - .1.3.6.1.4.1.9.1.3251 # { ciscoProducts 3251 } -- Cisco Catalyst 1300 (24XS)
+        - .1.3.6.1.4.1.9.1.3252 # { ciscoProducts 3252 } -- Cisco Catalyst 1300 (16XTS)
+        - .1.3.6.1.4.1.9.1.3253 # { ciscoProducts 3253 } -- Cisco Catalyst 1300 (24XTS)

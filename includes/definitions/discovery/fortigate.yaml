@@ -100,6 +100,17 @@ modules:
                     states:
                         - { value: 0, descr: Alive, graph: 1, generic: 0 }
                         - { value: 1, descr: Dead, graph: 1, generic: 2 }
+                -
+                    oid: fgVdTable
+                    value: fgVdEntHaState
+                    num_oid: '.1.3.6.1.4.1.12356.101.3.2.1.1.4.{{ $index }}'
+                    descr: '{{ $fgVdEntName }} vDom HA state'
+                    group: HA
+                    index: 'fgVdEntIndex.{{ $index }}'
+                    states:
+                        - { value: 1, descr: Primary, graph: 1, generic: 0 }
+                        - { value: 2, descr: Secondary, graph: 1, generic: 0 }
+                        - { value: 3, descr: Standalone, graph: 1, generic: 0 }
         count:
             data:
                 -
@@ -168,13 +179,13 @@ modules:
                     oid: fgVpnSslStatsLoginUsers
                     num_oid: '.1.3.6.1.4.1.12356.101.12.2.3.1.2.{{ $index }}'
                     index: 'fgVpnSslStatsLoginUsers.{{ $index }}'
-                    descr: SSL VPN Logged users
+                    descr: '{{ $fgVdEntName }} SSL VPN Logged users'
                     group: VPN
                 -
                     oid: fgVpnSslStatsActiveTunnels
                     num_oid: '.1.3.6.1.4.1.12356.101.12.2.3.1.6.{{ $index }}'
                     index: 'fgVpnSslStatsActiveTunnels.{{ $index }}'
-                    descr: SSL VPN Active tunnels
+                    descr: '{{ $fgVdEntName }} SSL VPN Active tunnels'
                     group: VPN
                 -
                     oid: fgVWLHealthCheckLinkTable
@@ -322,11 +333,11 @@ modules:
                     descr: fgHwSensorEntName
                     value:  fgHwSensorEntValue
                     skip_values:
-                        -   
+                        -
                             oid: fgHwSensorEntName
                             op: 'regex'
                             value: '/^((?!Temp).)*$/'
-                        -   
+                        -
                             oid: fgHwSensorEntValue
                             op: '='
                             value: -1
@@ -347,7 +358,7 @@ modules:
                             oid: fgHwSensorEntName
                             op: 'regex'
                             value: '/.*Temp.*/'
-                        -   
+                        -
                             oid: fgHwSensorEntValue
                             op: '='
                             value: -1

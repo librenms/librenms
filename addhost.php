@@ -18,6 +18,8 @@ use LibreNMS\Exceptions\HostUnreachableException;
 $init_modules = [];
 require __DIR__ . '/includes/init.php';
 
+c_echo('%RWarning: addhost.php is deprecated!%n Use %9lnms device:add%n instead.' . PHP_EOL . PHP_EOL);
+
 $options = getopt('Pbg:p:f::');
 
 $device = new Device;

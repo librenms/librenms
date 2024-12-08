@@ -26,8 +26,8 @@
     <script src="<?php echo asset('js/RrdGraphJS/moment-timezone-with-data.js'); ?>"></script>
     <script type="text/javascript">
         $(function () {
-            var ds_datefrom = new Date(<?php echo $graph_array['from']; ?>*1000);
-            var ds_dateto = new Date(<?php echo $graph_array['to']; ?>*1000);
+            var ds_datefrom = new Date(<?php echo \LibreNMS\Util\Time::parseAt($graph_array['from']); ?>*1000);
+            var ds_dateto = new Date(<?php echo \LibreNMS\Util\Time::parseAt($graph_array['to']); ?>*1000);
             var ds_tz = '<?php echo session('preferences.timezone'); ?>';
             if (ds_tz) {
                 ds_datefrom = moment.tz(ds_datefrom, ds_tz);

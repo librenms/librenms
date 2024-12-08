@@ -157,7 +157,8 @@
                                     },
                                     "value": {"$ref": "#/definitions/oid"},
                                     "type": {
-                                        "type": "string"
+                                        "type": "string",
+                                        "maxLength": 16
                                     },
                                     "skip_values": {
                                         "$ref": "#/definitions/skip_values"
@@ -229,7 +230,7 @@
                                             },
                                             "num_oid": {
                                                 "type": "string",
-                                                "pattern": "^(\\.\\d+)+(\\.?\\{\\{ \\$index \\}\\})?(\\.\\d+)*$"
+                                                "pattern": "^(\\.\\d+)+(\\.?\\{\\{ \\$(index|str_index_as_numeric|subindex\\d) \\}\\})?(\\.\\d+)*$"
                                             },
                                             "descr": {
                                                 "type": "string"
@@ -289,7 +290,8 @@
                                                 "type": ["integer", "string"]
                                             },
                                             "entPhysicalIndex_measured": {
-                                                "type": "string"
+                                                "type": [ "string", "null" ],
+                                                "enum": [ "ports", null ]
                                             },
                                             "snmp_no_Ih_flag": {
                                                 "type": "string"
@@ -413,7 +415,7 @@
                             },
                             "num_oid": {
                                 "type": "string",
-                                "pattern": "^(\\.\\d+)+\\.?\\{\\{ \\$index \\}\\}(\\.\\d+)*$"
+                                "pattern": "^(\\.\\d+)+(\\.?\\{\\{ \\$(index|str_index_as_numeric) \\}\\})?(\\.\\d+)*$"
                             },
                             "index": {
                                 "type": ["integer", "string"]
@@ -469,7 +471,8 @@
                                 "type": ["integer", "string"]
                             },
                             "entPhysicalIndex_measured": {
-                                "type": "string"
+                                "type": [ "string", "null" ],
+                                "enum": [ "ports", null ]
                             },
                             "user_func": {
                                 "type": "string"
