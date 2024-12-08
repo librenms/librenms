@@ -402,7 +402,7 @@ IBM On Call Manager uses the webhook to send the name of the alert rule, along w
     "uniqueID": "{{ $alert->uid }}"
   }
 }
-
+```
 
 ## JIRA
 

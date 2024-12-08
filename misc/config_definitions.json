@@ -1519,13 +1519,6 @@
             "default": false,
             "type": "boolean"
         },
-        "discovery_modules.cisco-cbqos": {
-            "order": 40,
-            "group": "discovery",
-            "section": "discovery_modules",
-            "default": false,
-            "type": "boolean"
-        },
         "discovery_modules.cisco-otv": {
             "order": 70,
             "group": "discovery",
@@ -1549,6 +1542,13 @@
         },
         "discovery_modules.ipv6-addresses": {
             "order": 160,
+            "group": "discovery",
+            "section": "discovery_modules",
+            "default": true,
+            "type": "boolean"
+        },
+        "discovery_modules.qos": {
+            "order": 260,
             "group": "discovery",
             "section": "discovery_modules",
             "default": true,
@@ -2802,14 +2802,6 @@
                 "section": "voice",
                 "order": 0,
                 "descr": "Transcoder Utilisation"
-            },
-            "type": "graph"
-        },
-        "graph_types.device.cisco-voice-ip": {
-            "default": {
-                "section": "voice",
-                "order": 0,
-                "descr": "IP Real Time Calls"
             },
             "type": "graph"
         },
@@ -4384,13 +4376,47 @@
             "section": "influxdbv2",
             "order": 8
         },
+        "influxdbv2.log_file": {
+            "type": "text",
+            "group": "poller",
+            "section": "influxdbv2",
+            "order": 9
+        },
         "influxdbv2.groups-exclude": {
             "group": "poller",
             "section": "influxdbv2",
-            "order": 9,
+            "order": 10,
             "type": "array",
             "default": [
             ]
+        },
+        "influxdbv2.timeout": {
+            "default": 1,
+            "type": "integer",
+            "group": "poller",
+            "section": "influxdbv2",
+            "order": 11
+        },
+        "influxdbv2.verify": {
+            "default": false,
+            "type": "boolean",
+            "group": "poller",
+            "section": "influxdbv2",
+            "order": 12
+        },
+        "influxdbv2.batch_size": {
+            "default": 1000,
+            "type": "integer",
+            "group": "poller",
+            "section": "influxdbv2",
+            "order": 13
+        },
+        "influxdbv2.max_retry": {
+            "default": 3,
+            "type": "integer",
+            "group": "poller",
+            "section": "influxdbv2",
+            "order": 14
         },
         "install_dir": {
             "type": "directory"
@@ -4926,10 +4952,6 @@
             ],
             "type": "array"
         },
-        "os_def_cache_time": {
-            "default": 86400,
-            "type": "integer"
-        },
         "os_group.unix.over": {
             "default": [
                 {
@@ -5198,6 +5220,13 @@
             "default": true,
             "type": "boolean"
         },
+        "poller_modules.qos": {
+            "order": 350,
+            "group": "poller",
+            "section": "poller_modules",
+            "default": true,
+            "type": "boolean"
+        },
         "poller_modules.sensors": {
             "order": 360,
             "group": "poller",
@@ -5401,20 +5430,6 @@
         },
         "poller_modules.cisco-asa-firewall": {
             "order": 60,
-            "group": "poller",
-            "section": "poller_modules",
-            "default": false,
-            "type": "boolean"
-        },
-        "poller_modules.cisco-voice": {
-            "order": 150,
-            "group": "poller",
-            "section": "poller_modules",
-            "default": false,
-            "type": "boolean"
-        },
-        "poller_modules.cisco-cbqos": {
-            "order": 70,
             "group": "poller",
             "section": "poller_modules",
             "default": false,
