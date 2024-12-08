@@ -17,7 +17,5 @@ discovery:
           value: 'UFiber'
     -
         sysObjectID: .1.3.6.1.4.1.4413
-        snmpget:
-          oid: .1.3.6.1.4.1.4413.1.1.1.1.1.2.0
-          op: 'contains'
-          value: 'UISP Fiber OLT XGS'
+	sysDescr_regex:
+            - '/UISP Fiber OLT XGS/'
