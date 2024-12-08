@@ -50,6 +50,7 @@ class DeviceController extends Controller
         'alert-stats' => \App\Http\Controllers\Device\Tabs\AlertStatsController::class,
         'showconfig' => \App\Http\Controllers\Device\Tabs\ShowConfigController::class,
         'netflow' => \App\Http\Controllers\Device\Tabs\NetflowController::class,
+        'qos' => \App\Http\Controllers\Device\Tabs\QosController::class,
         'latency' => \App\Http\Controllers\Device\Tabs\LatencyController::class,
         'nac' => \App\Http\Controllers\Device\Tabs\NacController::class,
         'notes' => \App\Http\Controllers\Device\Tabs\NotesController::class,
@@ -163,18 +164,21 @@ class DeviceController extends Controller
             $title = __('Edit');
 
             // check if metric has more specific edit page
-            if (preg_match('#health/metric=(\w+)#', \Request::path(), $matches)) {
+            $path = \Request::path();
+            if (preg_match('#health/metric=(\w+)#', $path, $matches)) {
                 if ($this->editTabExists($matches[1])) {
                     $current_tab = $matches[1];
                 } elseif ($this->editTabExists($matches[1] . 's')) {
                     $current_tab = $matches[1] . 's';
                 }
+            } elseif (preg_match('#device/\d+/ports/transceivers#', $path)) {
+                $current_tab = 'transceivers';
             }
 
             // check if edit page exists
             if ($this->editTabExists($current_tab)) {
                 $suffix .= "/section=$current_tab";
-                $title .= ' ' . ucfirst($current_tab);
+                $title .= ' ' . __(ucfirst($current_tab));
             }
 
             $device_links['edit'] = [

@@ -2047,5 +2047,49 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "transceivers": {
+        "discovery": {
+            "transceivers": [
+                {
+                    "index": "49",
+                    "entity_physical_index": 49,
+                    "type": "10G_BASE_SR_SFP",
+                    "vendor": "UVUUU ** *******",
+                    "oui": "00 00 7F",
+                    "model": null,
+                    "revision": "U***",
+                    "serial": "UU**U4U**Q******",
+                    "date": null,
+                    "ddm": 1,
+                    "encoding": null,
+                    "cable": "MM",
+                    "distance": 300,
+                    "wavelength": 0,
+                    "connector": null,
+                    "channels": 1,
+                    "ifIndex": null
+                },
+                {
+                    "index": "50",
+                    "entity_physical_index": 50,
+                    "type": "10G_BASE_SR_SFP",
+                    "vendor": "AVAGO",
+                    "oui": "00 17 6A",
+                    "model": null,
+                    "revision": "G2.3",
+                    "serial": "CN292K3425",
+                    "date": null,
+                    "ddm": 1,
+                    "encoding": null,
+                    "cable": "MM",
+                    "distance": 300,
+                    "wavelength": 850,
+                    "connector": null,
+                    "channels": 1,
+                    "ifIndex": null
+                }
+            ]
+        }
     }
 }

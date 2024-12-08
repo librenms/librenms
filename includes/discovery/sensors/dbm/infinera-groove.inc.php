@@ -29,4 +29,10 @@ foreach ($pre_cache['infineragroove_portTable'] as $index => $data) {
         $value = $data['portRxOpticalPower'];
         discover_sensor(null, 'dbm', $device, $oid, 'portRxOpticalPower.' . $index, 'infinera-groove', $descr, null, '1', null, null, null, null, $value);
     }
+    if (is_numeric($data['portTxOpticalPower']) && $data['portTxOpticalPower'] != -99) {
+        $descr = $data['portAlias'] . ' Transmit Power';
+        $oid = '.1.3.6.1.4.1.42229.1.2.3.6.1.1.5.' . $index;
+        $value = $data['portTxOpticalPower'];
+        discover_sensor(null, 'dbm', $device, $oid, 'portTxOpticalPower.' . $index, 'infinera-groove', $descr, null, '1', null, null, null, null, $value);
+    }
 }

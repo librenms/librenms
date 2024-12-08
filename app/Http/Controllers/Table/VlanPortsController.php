@@ -10,6 +10,15 @@ use LibreNMS\Util\Url;
 
 class VlanPortsController extends TableController
 {
+    protected function searchFields(Request $request): array
+    {
+        return [
+            'ifName',
+            'ifDescr',
+            'ifAlias',
+        ];
+    }
+
     protected function sortFields($request): array
     {
         return [
@@ -28,10 +37,10 @@ class VlanPortsController extends TableController
         $this->validate($request, ['vlan' => 'integer']);
         $this->vlanId = $request->get('vlan', 1);
 
-        return Port::with('device')
+        return Port::with(['device', 'device.location'])
             ->leftJoin('ports_vlans', 'ports.port_id', 'ports_vlans.port_id')
             ->where(function ($query) {
-                $query->where('ifVlan', $this->vlanId)
+                $query->where(fn ($q) => $q->where('ifVlan', $this->vlanId)->whereNull('ports_vlans.vlan'))
                     ->orWhere('ports_vlans.vlan', $this->vlanId);
             })
             ->select([
@@ -58,7 +67,7 @@ class VlanPortsController extends TableController
     {
         return [
             'device' => Url::deviceLink($model->device),
-            'port' => Url::portLink($model),
+            'port' => Url::portLink($model, $model->getFullLabel()),
             // left joined columns
             'untagged' => $model['untagged'],
             'state' => $model['state'],
