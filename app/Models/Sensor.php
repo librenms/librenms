@@ -89,6 +89,11 @@ class Sensor extends DeviceRelatedModel implements Keyable
         return collect(self::$icons)->get($this->sensor_class, 'delicius');
     }
 
+    public function unit()
+    {
+        return $this->attributes['unit'];
+    }
+
     public static function getTypes()
     {
         return array_keys(self::$icons);
