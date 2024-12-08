@@ -24,70 +24,27 @@
 
 <template>
     <div>
-        <select class="form-control"
-                :name="name"
+        <librenms-select class="form-control"
                 :value="value"
+                :route-name="'ajax.select.' + this.options.target"
+                :placeholder="this.options.placeholder"
+                :allow-clear="this.options.allowClear"
                 :required="required"
                 :disabled="disabled"
+                @change="$emit('change', $event)"
         >
-        </select>
+        </librenms-select>
     </div>
 </template>
 
 <script>
 import BaseSetting from "./BaseSetting";
+import LibrenmsSelect from "./LibrenmsSelect.vue";
 
 export default {
     name: "SettingSelectDynamic",
-    mixins: [BaseSetting],
-    data() {
-        return {
-            select2: null
-        };
-    },
-    watch: {
-        value(value) {
-            this.select2.val(value).trigger('change');
-        }
-    },
-    computed: {
-        settings() {
-            return {
-                theme: "bootstrap",
-                dropdownAutoWidth : true,
-                width: "auto",
-                allowClear: Boolean(this.options.allowClear),
-                placeholder: this.options.placeholder,
-                ajax: {
-                    url: route('ajax.select.' + this.options.target).toString(),
-                    delay: 250,
-                    data: this.options.callback
-                }
-            }
-        }
-    },
-    mounted() {
-        // load initial data
-        axios.get(route('ajax.select.' + this.options.target), {params: {id: this.value}}).then((response) => {
-            response.data.results.forEach((item) => {
-                if (item.id == this.value) {
-                    this.select2.append(new Option(item.text, item.id, true, true))
-                        .trigger('change');
-                }
-            })
-        });
-
-        this.select2 = $(this.$el)
-            .find('select')
-            .select2(this.settings)
-            .on('select2:select select2:unselect', ev => {
-                this.$emit('change', this.select2.val());
-                this.$emit('select', ev['params']['data']);
-            });
-    },
-    beforeDestroy() {
-        this.select2.select2('destroy');
-    }
+    components: {LibrenmsSelect},
+    mixins: [BaseSetting]
 }
 </script>
 

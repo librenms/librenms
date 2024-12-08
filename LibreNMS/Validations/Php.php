@@ -30,9 +30,9 @@ use LibreNMS\Validator;
 
 class Php extends BaseValidation
 {
-    const PHP_MIN_VERSION = '8.1';
-    const PHP_MIN_VERSION_DATE = 'September, 2022';
-    const PHP_RECOMMENDED_VERSION = '8.1';
+    const PHP_MIN_VERSION = '8.2';
+    const PHP_MIN_VERSION_DATE = 'October, 2024';
+    const PHP_RECOMMENDED_VERSION = '8.3';
 
     /**
      * Validate this module.
@@ -66,7 +66,7 @@ class Php extends BaseValidation
     {
         $required_modules = ['mysqlnd', 'mbstring', 'pcre', 'curl', 'xml', 'gd', 'sockets', 'dom'];
 
-        if (Config::get('distributed_poller')) {
+        if (Config::get('distributed_poller') && env('CACHE_DRIVER') == 'memcached') {
             $required_modules[] = 'memcached';
         }
 

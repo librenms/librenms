@@ -10,7 +10,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::table('devices', function (Blueprint $table) {
             $table->boolean('disable_notify')->default(0);
@@ -27,7 +27,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         // revert migrate disable_notify data into devices table
         $attribs = DB::table('devices')->where('disable_notify', 1)->pluck('device_id')->map(function ($device_id) {

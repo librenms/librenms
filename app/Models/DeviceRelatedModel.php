@@ -39,11 +39,14 @@ class DeviceRelatedModel extends BaseModel
 
     public function scopeInDeviceGroup($query, $deviceGroup)
     {
-        return $query->whereIn($query->qualifyColumn('device_id'), function ($query) use ($deviceGroup) {
-            $query->select('device_id')
-                ->from('device_group_device')
-                ->where('device_group_id', $deviceGroup);
-        });
+        // Build the list of device IDs in SQL
+        $deviceIdsSubquery = \DB::table('device_group_device')
+        ->where('device_group_id', $deviceGroup)
+        ->pluck('device_id');
+
+        // Use the result in the whereIn clause to avoid unoptimized subqueries
+        // use whereIntegerInRaw to avoid a the defautl limit of 1000 for whereIn
+        return $query->whereIntegerInRaw($query->qualifyColumn('device_id'), $deviceIdsSubquery);
     }
 
     // ---- Define Relationships ----

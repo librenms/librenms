@@ -27,6 +27,7 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 use App\Models\Device;
 use App\Models\Sensor;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Tests\Traits\RequiresDatabase;
 
 class UpsTrapOnBatteryTest extends SnmpTrapTestCase
@@ -57,7 +58,7 @@ UPS-MIB::upsSecondsOnBattery 120 seconds
 UPS-MIB::upsConfigLowBattTime 1 minutes",
             'UPS running on battery for 120 seconds. Estimated 100 minutes remaining',
             'Could not handle UPS-MIB::upsTrapOnBattery trap',
-            [5],
+            [Severity::Error],
             $device,
         );
 

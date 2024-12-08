@@ -39,43 +39,55 @@ class SmokepingCliTest extends DBTestCase
         'Le23HKVMvN' => [
             'Cl09bZU4sn' => [
                 'transport' => 'udp',
+                'displayname' => 'Cl09bZU4sn',
             ],
             'c559TvthzY' => [
                 'transport' => 'udp6',
+                'displayname' => 'c559TvthzY',
             ],
             'sNtzSdxdw8' => [
                 'transport' => 'udp6',
+                'displayname' => 'sNtzSdxdw8',
             ],
             '10.0.0.3' => [
                 'transport' => 'udp',
+                'displayname' => '10.0.0.3',
             ],
             '2600::' => [
                 'transport' => 'udp',
+                'displayname' => '2600::',
             ],
         ],
         'Psv9oZcxdC' => [
             'oHiPfLzrmU' => [
                 'transport' => 'udp',
+                'displayname' => 'oHiPfLzrmU',
             ],
             'kEn7hZ7N37' => [
                 'transport' => 'udp6',
+                'displayname' => 'kEn7hZ7N37',
             ],
             'PcbZ5FKtS3' => [
                 'transport' => 'udp6',
+                'displayname' => 'PcbZ5FKtS3',
             ],
             '192.168.1.1' => [
                 'transport' => 'udp',
+                'displayname' => '192.168.1.1',
             ],
             'fe80::' => [
                 'transport' => 'udp',
+                'displayname' => 'fe80::',
             ],
         ],
         '4diY0pWFik' => [
             'example.org' => [
                 'transport' => 'udp',
+                'displayname' => 'example.org',
             ],
             'host_with_under_score.example.org' => [
                 'transport' => 'udp6',
+                'displayname' => 'host_with_under_score.example.org',
             ],
         ],
     ];
@@ -92,7 +104,7 @@ class SmokepingCliTest extends DBTestCase
         parent::setUp();
     }
 
-    public function testNonsense()
+    public function testNonsense(): void
     {
         $this->assertNotEquals(0, \Artisan::call('smokeping:generate --probes --targets --no-header'));
         $this->assertNotEquals(0, \Artisan::call('smokeping:generate --probes --targets --single-process'));
@@ -105,7 +117,7 @@ class SmokepingCliTest extends DBTestCase
         \Artisan::call('smokeping:generate --foobar');
     }
 
-    public function testBuildHeader()
+    public function testBuildHeader(): void
     {
         $warnings = ['rpPvjwdI0M0hlg6ZgZA', '2aUjOMql6ZWN7H0DthWDOyCvkXs0kVShhnASnc', 'HYMWbDplSW9PLNK9o9tySeJF4Ac61uTRHUUxxBXHiCl'];
 
@@ -125,7 +137,7 @@ class SmokepingCliTest extends DBTestCase
         $this->assertEquals($this->instance->buildHeader(true, false), []);
     }
 
-    public function testAssembleProbes()
+    public function testAssembleProbes(): void
     {
         $tests = [0, -1];
 
@@ -134,7 +146,7 @@ class SmokepingCliTest extends DBTestCase
         }
     }
 
-    public function testBuildProbe()
+    public function testBuildProbe(): void
     {
         $saved = ['+ Pl0JnP2vfE',
             '  binary = /usr/bin/G28F3fFeew',
@@ -151,7 +163,7 @@ class SmokepingCliTest extends DBTestCase
         $this->assertEquals(implode(PHP_EOL, $saved), implode(PHP_EOL, $output));
     }
 
-    public function testBuildTargets()
+    public function testBuildTargets(): void
     {
         $saved = [
             '+ Le23HKVMvN',
@@ -245,7 +257,7 @@ class SmokepingCliTest extends DBTestCase
         $this->assertEquals(implode(PHP_EOL, $saved), implode(PHP_EOL, $output));
     }
 
-    public function testSingleProccess()
+    public function testSingleProccess(): void
     {
         $saved = [
             '+ Le23HKVMvN',
@@ -327,7 +339,7 @@ class SmokepingCliTest extends DBTestCase
         $this->assertEquals(implode(PHP_EOL, $saved), implode(PHP_EOL, $output));
     }
 
-    public function testCompareLegacy()
+    public function testCompareLegacy(): void
     {
         $data = [];
 

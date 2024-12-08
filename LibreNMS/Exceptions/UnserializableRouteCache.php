@@ -72,9 +72,9 @@ class UnserializableRouteCache extends \Exception implements UpgradeableExceptio
         return $request->wantsJson() ? response()->json([
             'status' => 'error',
             'message' => "$title: $message",
-        ]) : response()->view('errors.generic', [
+        ], 500) : response()->view('errors.generic', [
             'title' => $title,
             'content' => $message,
-        ]);
+        ], 500);
     }
 }

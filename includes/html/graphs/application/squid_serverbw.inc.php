@@ -17,15 +17,15 @@ if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list = [
         [
             'filename' => $rrd_filename,
-            'descr'    => 'server in',
-            'ds'       => 'serverinkb',
-            'colour'   => 'd46a6a',
+            'descr' => 'server in',
+            'ds' => 'serverinkb',
+            'colour' => 'd46a6a',
         ],
         [
             'filename' => $rrd_filename,
-            'descr'    => 'server out',
-            'ds'       => 'serveroutkb',
-            'colour'   => '28774f',
+            'descr' => 'server out',
+            'ds' => 'serveroutkb',
+            'colour' => '28774f',
         ],
     ];
 } else {

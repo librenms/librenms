@@ -1,19 +1,9 @@
 parameters:
 	ignoreErrors:
 		-
-			message: "#^Static property LibreNMS\\\\Alert\\\\Transport\\\\Sensu\\:\\:\\$severity is never read, only written\\.$#"
+			message: "#^Static method Silber\\\\Bouncer\\\\BouncerFacade\\:\\:role\\(\\) invoked with 0 parameters, 1 required\\.$#"
 			count: 1
-			path: LibreNMS/Alert/Transport/Sensu.php
-
-		-
-			message: "#^If condition is always false\\.$#"
-			count: 1
-			path: LibreNMS/Authentication/MysqlAuthorizer.php
-
-		-
-			message: "#^Parameter \\#2 \\$password of method LibreNMS\\\\Authentication\\\\MysqlAuthorizer\\:\\:addUser\\(\\) expects string, null given\\.$#"
-			count: 1
-			path: LibreNMS/Authentication/SSOAuthorizer.php
+			path: LibreNMS/Alert/Transport/Mail.php
 
 		-
 			message: "#^Property LibreNMS\\\\Data\\\\Store\\\\Rrd\\:\\:\\$async_process \\(LibreNMS\\\\Proc\\) in isset\\(\\) is not nullable\\.$#"
@@ -61,16 +51,6 @@ parameters:
 			path: LibreNMS/Modules/Mpls.php
 
 		-
-			message: "#^Variable \\$sdps might not be defined\\.$#"
-			count: 1
-			path: LibreNMS/Modules/Mpls.php
-
-		-
-			message: "#^Variable \\$svcs might not be defined\\.$#"
-			count: 2
-			path: LibreNMS/Modules/Mpls.php
-
-		-
 			message: "#^Variable \\$features on left side of \\?\\? is never defined\\.$#"
 			count: 1
 			path: LibreNMS/Modules/Os.php
@@ -101,11 +81,6 @@ parameters:
 			path: LibreNMS/Modules/Ospf.php
 
 		-
-			message: "#^Parameter \\#8 \\$multiplier of class LibreNMS\\\\Device\\\\WirelessSensor constructor expects int, null given\\.$#"
-			count: 2
-			path: LibreNMS/OS/ArrisDsr4410md.php
-
-		-
 			message: "#^Variable \\$sensors in empty\\(\\) always exists and is not falsy\\.$#"
 			count: 1
 			path: LibreNMS/OS/ArubaInstant.php
@@ -116,44 +91,14 @@ parameters:
 			path: LibreNMS/OS/Ceraos.php
 
 		-
-			message: "#^Parameter \\#8 \\$warn_percent of static method LibreNMS\\\\Device\\\\Processor\\:\\:discover\\(\\) expects int, null given\\.$#"
-			count: 1
-			path: LibreNMS/OS/Comware.php
-
-		-
-			message: "#^Parameter \\#8 \\$multiplier of class LibreNMS\\\\Device\\\\WirelessSensor constructor expects int, null given\\.$#"
-			count: 3
-			path: LibreNMS/OS/HarmonyEnhanced.php
-
-		-
 			message: "#^Parameter \\#16 \\$entPhysicalIndex of class LibreNMS\\\\Device\\\\WirelessSensor constructor expects float\\|int\\|null, string given\\.$#"
 			count: 1
 			path: LibreNMS/OS/Ios.php
 
 		-
-			message: "#^If condition is always false\\.$#"
-			count: 1
-			path: LibreNMS/OS/Shared/Cisco.php
-
-		-
-			message: "#^Parameter \\#8 \\$warn_percent of static method LibreNMS\\\\Device\\\\Processor\\:\\:discover\\(\\) expects int, null given\\.$#"
-			count: 3
-			path: LibreNMS/OS/Shared/Cisco.php
-
-		-
 			message: "#^Variable \\$index might not be defined\\.$#"
 			count: 2
 			path: LibreNMS/OS/SmOs.php
-
-		-
-			message: "#^Offset 'sonicCurrentConnCac…' does not exist on string\\.$#"
-			count: 1
-			path: LibreNMS/OS/Sonicwall.php
-
-		-
-			message: "#^Offset 'sonicMaxConnCacheEn…' does not exist on string\\.$#"
-			count: 1
-			path: LibreNMS/OS/Sonicwall.php
 
 		-
 			message: "#^Variable \\$mplsTunnelARHopIndex in isset\\(\\) always exists and is not nullable\\.$#"
@@ -176,11 +121,6 @@ parameters:
 			path: LibreNMS/OS/Timos.php
 
 		-
-			message: "#^Property LibreNMS\\\\Proc\\:\\:\\$_pipes is never written, only read\\.$#"
-			count: 1
-			path: LibreNMS/Proc.php
-
-		-
 			message: "#^If condition is always false\\.$#"
 			count: 2
 			path: LibreNMS/Util/CiHelper.php
@@ -196,14 +136,9 @@ parameters:
 			path: LibreNMS/Util/Graph.php
 
 		-
-			message: "#^Property LibreNMS\\\\Util\\\\Snmpsim\\:\\:\\$proc \\(LibreNMS\\\\Proc\\) in isset\\(\\) is not nullable\\.$#"
-			count: 2
-			path: LibreNMS/Util/Snmpsim.php
-
-		-
-			message: "#^Unreachable statement \\- code above always terminates\\.$#"
+			message: "#^Static method Silber\\\\Bouncer\\\\BouncerFacade\\:\\:role\\(\\) invoked with 0 parameters, 1 required\\.$#"
 			count: 1
-			path: LibreNMS/Util/Snmpsim.php
+			path: app/Console/Commands/AddUserCommand.php
 
 		-
 			message: "#^Property App\\\\Console\\\\Commands\\\\InternalHttpRequest\\:\\:\\$app is never read, only written\\.$#"
@@ -221,14 +156,14 @@ parameters:
 			path: app/Http/Controllers/LegacyController.php
 
 		-
-			message: "#^Variable \\$vars on left side of \\?\\? is never defined\\.$#"
-			count: 1
-			path: app/Http/Controllers/LegacyController.php
-
-		-
 			message: "#^Called 'Model\\:\\:make\\(\\)' which performs unnecessary work, use 'new Model\\(\\)'\\.$#"
 			count: 1
 			path: app/Http/Controllers/PortGroupController.php
+
+		-
+			message: "#^Static method Silber\\\\Bouncer\\\\BouncerFacade\\:\\:role\\(\\) invoked with 0 parameters, 1 required\\.$#"
+			count: 2
+			path: app/Http/Controllers/Select/RoleController.php
 
 		-
 			message: "#^Call to an undefined static method App\\\\Models\\\\ServiceTemplate\\:\\:hasAccess\\(\\)\\.$#"
@@ -251,6 +186,11 @@ parameters:
 			path: app/Http/Controllers/ServiceTemplateController.php
 
 		-
+			message: "#^Offset 'image_title' does not exist on null\\.$#"
+			count: 1
+			path: app/Http/Controllers/Widgets/ImageController.php
+
+		-
 			message: "#^Offset 'image_title' on null in empty\\(\\) does not exist\\.$#"
 			count: 1
 			path: app/Http/Controllers/Widgets/ImageController.php
@@ -261,39 +201,19 @@ parameters:
 			path: app/Http/Kernel.php
 
 		-
+			message: "#^Static method Silber\\\\Bouncer\\\\BouncerFacade\\:\\:role\\(\\) invoked with 0 parameters, 1 required\\.$#"
+			count: 2
+			path: app/Http/Requests/StoreUserRequest.php
+
+		-
 			message: "#^Cannot access property \\$password on object\\|string\\.$#"
 			count: 1
 			path: app/Http/Requests/UpdateUserRequest.php
 
 		-
-			message: "#^Property App\\\\Jobs\\\\PingCheck\\:\\:\\$deferred is never written, only read\\.$#"
-			count: 1
-			path: app/Jobs/PingCheck.php
-
-		-
-			message: "#^Property App\\\\Jobs\\\\PingCheck\\:\\:\\$devices \\(Illuminate\\\\Database\\\\Eloquent\\\\Collection\\) in isset\\(\\) is not nullable\\.$#"
-			count: 1
-			path: app/Jobs/PingCheck.php
-
-		-
-			message: "#^Property App\\\\Jobs\\\\PingCheck\\:\\:\\$devices is never written, only read\\.$#"
-			count: 1
-			path: app/Jobs/PingCheck.php
-
-		-
-			message: "#^Property App\\\\Jobs\\\\PingCheck\\:\\:\\$groups is never read, only written\\.$#"
-			count: 1
-			path: app/Jobs/PingCheck.php
-
-		-
-			message: "#^Property App\\\\Jobs\\\\PingCheck\\:\\:\\$tiered is never written, only read\\.$#"
-			count: 1
-			path: app/Jobs/PingCheck.php
-
-		-
-			message: "#^Unreachable statement \\- code above always terminates\\.$#"
-			count: 1
-			path: app/Jobs/PingCheck.php
+			message: "#^Static method Silber\\\\Bouncer\\\\BouncerFacade\\:\\:role\\(\\) invoked with 0 parameters, 1 required\\.$#"
+			count: 2
+			path: app/Http/Requests/UpdateUserRequest.php
 
 		-
 			message: "#^Access to an undefined property App\\\\Models\\\\DeviceRelatedModel\\:\\:\\$device_id\\.$#"
@@ -304,6 +224,11 @@ parameters:
 			message: "#^PHPDoc type array of property App\\\\Models\\\\UserPref\\:\\:\\$primaryKey is not covariant with PHPDoc type string of overridden property Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:\\$primaryKey\\.$#"
 			count: 1
 			path: app/Models/UserPref.php
+
+		-
+			message: "#^Static method Silber\\\\Bouncer\\\\BouncerFacade\\:\\:cache\\(\\) invoked with 0 parameters, 1 required\\.$#"
+			count: 1
+			path: app/Providers/AuthServiceProvider.php
 
 		-
 			message: "#^Result of && is always false\\.$#"
@@ -326,14 +251,29 @@ parameters:
 			path: app/View/SimpleTemplate.php
 
 		-
-			message: "#^Parameter \\#4 \\$transport of function addHost expects string, int given\\.$#"
+			message: "#^Parameter \\#1 \\$abilities of method Silber\\\\Bouncer\\\\Conductors\\\\GivesAbilities\\:\\:to\\(\\) expects array\\|Illuminate\\\\Database\\\\Eloquent\\\\Model\\|int, string given\\.$#"
 			count: 1
-			path: tests/AddHostTest.php
+			path: database/factories/UserFactory.php
 
 		-
-			message: "#^Parameter \\#5 \\$poller_group of function addHost expects string, int given\\.$#"
-			count: 4
-			path: tests/AddHostTest.php
+			message: "#^Static method Silber\\\\Bouncer\\\\BouncerFacade\\:\\:role\\(\\) invoked with 0 parameters, 1 required\\.$#"
+			count: 1
+			path: database/factories/UserFactory.php
+
+		-
+			message: "#^Static method Silber\\\\Bouncer\\\\BouncerFacade\\:\\:refresh\\(\\) invoked with 0 parameters, 1 required\\.$#"
+			count: 2
+			path: database/migrations/2023_06_18_201914_migrate_level_to_roles.php
+
+		-
+			message: "#^Parameter \\#1 \\$abilities of method Silber\\\\Bouncer\\\\Conductors\\\\GivesAbilities\\:\\:to\\(\\) expects array\\|Illuminate\\\\Database\\\\Eloquent\\\\Model\\|int, string given\\.$#"
+			count: 1
+			path: database/seeders/RolesSeeder.php
+
+		-
+			message: "#^Static method Silber\\\\Bouncer\\\\BouncerFacade\\:\\:role\\(\\) invoked with 0 parameters, 1 required\\.$#"
+			count: 2
+			path: database/seeders/RolesSeeder.php
 
 		-
 			message: "#^Parameter \\#1 \\$attr of method LibreNMS\\\\Authentication\\\\SSOAuthorizer\\:\\:authSSOGetAttr\\(\\) expects string, int given\\.$#"

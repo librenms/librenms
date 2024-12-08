@@ -1,0 +1,405 @@
+--
+-- Network node MIB for generic resources in any network node (host, gateway,
+-- server etc.)
+--
+
+STONESOFT-NETNODE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	Unsigned32, Integer32, MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE
+		FROM SNMPv2-SMI
+	DisplayString, TimeStamp, DateAndTime
+		FROM SNMPv2-TC
+	OBJECT-GROUP, NOTIFICATION-GROUP, MODULE-COMPLIANCE
+		FROM SNMPv2-CONF
+	stonesoftModules, stonesoftNetworkNode
+		FROM STONESOFT-SMI-MIB;
+
+stonesoftNetworkNodeMibModule MODULE-IDENTITY
+        LAST-UPDATED    "201605060000Z"
+        ORGANIZATION    "Forcepoint LLC"
+        CONTACT-INFO    "email: mib.stonesoft@forcepoint.com"
+        DESCRIPTION     "MIB for generic network nodes"
+
+        REVISION        "201605060000Z"
+        DESCRIPTION     "Company information update"
+
+        REVISION        "201510290000Z"
+        DESCRIPTION     "Policy upload date added to nodePolicyApplyTime"
+
+        REVISION        "201510150000Z"
+        DESCRIPTION     "Added last login date to nodeLoginTime"
+
+        REVISION        "201403100000Z"
+        DESCRIPTION     "Added appliance identification objects"
+
+        REVISION        "200802040000Z"
+        DESCRIPTION     "Added hardware monitoring objects"
+
+
+        REVISION        "200406160000Z"
+        DESCRIPTION     "First public revision"
+        ::= { stonesoftModules 4 }
+
+netNodeObjects  OBJECT IDENTIFIER ::= { stonesoftNetworkNode 1 }
+netNodeEvents   OBJECT IDENTIFIER ::= { stonesoftNetworkNode 2 }
+netNodeEventsV2 OBJECT IDENTIFIER ::= { netNodeEvents 0 }
+netNodeConformance OBJECT IDENTIFIER ::= {stonesoftNetworkNode 3 }
+
+--
+-- Network node objects, e.g. identifications, state, load
+
+nodeClusterId	OBJECT-TYPE
+		SYNTAX		Integer32 (0..65535)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"The identification number of the cluster
+			 this node belongs to"
+		::= { netNodeObjects 1 }
+
+
+nodeMemberId	OBJECT-TYPE
+		SYNTAX		Integer32 (1..16)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"Node's member identification within the cluster"
+		::= { netNodeObjects 2 }
+
+nodeOperState	OBJECT-TYPE
+		SYNTAX		INTEGER {
+						unknown(0),
+						online(1),
+						goingOnline(2),
+						lockedOnline(3),
+						goingLockedOnline(4),
+						offline(5),
+						goingOffline(6),
+						lockedOffline(7),
+						goingLockedOffline(8),
+						standby(9),
+						goingStandby(10)
+					}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"The operative (clustering) state of the node"
+		::= { netNodeObjects 3 }
+
+nodeCPULoad	OBJECT-TYPE
+		SYNTAX		Integer32 (0..100)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"The CPU load percentage on the node"
+		::= { netNodeObjects 4 }
+
+nodeLastLogin	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"The most recent login event on the node"
+		::= { netNodeObjects 5 }
+
+nodeLastLoginTime	OBJECT-TYPE
+		SYNTAX		TimeStamp
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"Timestamp of the most recent login event on the node"
+		::= { netNodeObjects 6 }
+
+nodeHwmonEvent	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"Reason for the hardware monitoring event"
+		::= { netNodeObjects 8 }
+
+nodeApplianceModel	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"Appliance model name"
+		::= { netNodeObjects 9 }
+
+nodeSerialNumber	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"Appliance serial number"
+		::= { netNodeObjects 10 }
+
+nodePosCode			OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"Appliance POS code"
+		::= { netNodeObjects 11 }
+
+nodeLoginTime	OBJECT-TYPE
+		SYNTAX		DateAndTime
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"The most recent login event on the node"
+		::= { netNodeObjects 12 }
+
+nodePolicyApplyTime	OBJECT-TYPE
+		SYNTAX		DateAndTime
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"The time when the security policy was installed to the node"
+		::= { netNodeObjects 13 }
+
+--
+-- Tester objects
+
+nodeTestTable	        OBJECT-TYPE
+			SYNTAX		SEQUENCE OF NodeTestEntry
+			MAX-ACCESS	not-accessible
+			STATUS		current
+			DESCRIPTION
+				"This table contains an entry for each
+				 test instance that was
+				 configured to send a trap on test failure"
+
+			::= { netNodeObjects 7 }
+
+
+nodeTestEntry    	OBJECT-TYPE
+			SYNTAX 		NodeTestEntry
+			MAX-ACCESS	not-accessible
+			STATUS		current
+			DESCRIPTION	"Row for a test instance"
+			INDEX		{ nodeTestIndex }
+			::= { nodeTestTable 1 }
+
+
+NodeTestEntry		::= SEQUENCE {
+			nodeTestIndex		Unsigned32,
+			nodeTestIdentity	DisplayString,
+			nodeTestResult		INTEGER,
+			nodeTestResultTime 	TimeStamp
+			}
+
+nodeTestIndex		OBJECT-TYPE
+			SYNTAX 		Unsigned32(1..65535)
+			MAX-ACCESS	not-accessible
+			STATUS		current
+			DESCRIPTION	"Unique positive integer index
+					 of the nodeTest instance"
+			::= { nodeTestEntry 1 }
+
+nodeTestIdentity	OBJECT-TYPE
+			SYNTAX 		DisplayString
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION	"Identification string of a nodeTest"
+			::= { nodeTestEntry 2 }
+
+
+nodeTestResult		OBJECT-TYPE
+			SYNTAX 		INTEGER {success(1), failure(2)}
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION	"The most recent result of the
+					 nodeTest"
+			::= { nodeTestEntry 3 }
+
+nodeTestResultTime	OBJECT-TYPE
+			SYNTAX 		TimeStamp
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION	"The timestamp of the most recent
+					 result of the nodeTest"
+			::= { nodeTestEntry 4 }
+
+--
+-- Network node events
+
+nodeOnline		NOTIFICATION-TYPE
+		        OBJECTS		{ nodeOperState }
+		        STATUS		current
+		        DESCRIPTION	"A node has gone to an online state"
+		        ::= { netNodeEventsV2 1 }
+
+
+nodeOffline		NOTIFICATION-TYPE
+			OBJECTS		{ nodeOperState }
+			STATUS		current
+			DESCRIPTION	"A node has gone to an offline
+					 or standby state"
+			::= {  netNodeEventsV2 2 }
+
+nodeBoot 		NOTIFICATION-TYPE
+			STATUS		current
+			DESCRIPTION	"A node has booted up"
+			::= {  netNodeEventsV2 3 }
+
+nodeShutdown		NOTIFICATION-TYPE
+			STATUS		current
+			DESCRIPTION	"A node is shutting down"
+			::= {  netNodeEventsV2 4 }
+
+nodeUserLogin		NOTIFICATION-TYPE
+			OBJECTS		{ nodeLastLogin }
+			STATUS 		current
+			DESCRIPTION	"A user has started a login session"
+			::= { netNodeEventsV2 5 }
+
+nodeFailedUserLogin	NOTIFICATION-TYPE
+			STATUS 		current
+			DESCRIPTION	"Failed user login"
+			::= { netNodeEventsV2 8 }
+
+nodeUserLogout		NOTIFICATION-TYPE
+			STATUS 		current
+			DESCRIPTION	"A user has finished session"
+			::= { netNodeEventsV2 9 }
+
+nodeTestFailure		NOTIFICATION-TYPE
+			OBJECTS 	{ nodeTestIdentity }
+			STATUS 		current
+			DESCRIPTION	"NodeTest has failed"
+			::= { netNodeEventsV2 6 }
+
+
+nodeHwmon		NOTIFICATION-TYPE
+			OBJECTS		{ nodeHwmonEvent }
+			STATUS 		current
+			DESCRIPTION	"Hardware monitoring system has detected problems"
+			::= { netNodeEventsV2 7 }
+
+
+-- Conformance information
+
+netNodeGroups		OBJECT IDENTIFIER ::= { netNodeConformance 1 }
+netNodeCompliances	OBJECT IDENTIFIER ::= { netNodeConformance 2 }
+
+nodeCompliance1 MODULE-COMPLIANCE
+	STATUS current
+	DESCRIPTION
+		"The compliance statement for network nodes"
+	MODULE  -- this module --
+		MANDATORY-GROUPS { nodeStatusGroup,
+				   nodeStatusNotificationsGroup }
+
+	GROUP nodeIdentificationGroup
+	DESCRIPTION
+		"This group is mandatory for nodes that are part of a cluster"
+
+	GROUP nodeLoginGroup
+	DESCRIPTION
+		"This group should be implemented by the nodes that
+		 allow user logins"
+
+	GROUP nodeLoginNotificationsGroup
+	DESCRIPTION
+		"This group should be implemented by the nodes that
+		 allow user logins"
+
+	GROUP nodeTesterGroup
+	DESCRIPTION
+		"This group should be implemented by the nodes that
+		 have a tester subsystem"
+
+	GROUP nodeTesterNotificationsGroup
+	DESCRIPTION
+		"This group should be implemented by the nodes that
+		 have a tester subsystem"
+
+	GROUP nodeHwmonGroup
+	DESCRIPTION
+		"This group should be implemented by the nodes that
+		 have a hardware monitoring subsystem"
+
+
+	GROUP nodeHwmonNotificationsGroup
+	DESCRIPTION
+		"This group should be implemented by the nodes that
+		 have a hardware monitoring subsystem"
+
+	::= { netNodeCompliances 1 }
+
+
+
+nodeIdentificationGroup	OBJECT-GROUP
+	OBJECTS	{ nodeClusterId, nodeMemberId, nodeApplianceModel, nodeSerialNumber, nodePosCode }
+	STATUS	current
+	DESCRIPTION
+		"A collection of objects identifying the node in a cluster"
+	::= { netNodeGroups 1 }
+
+nodeStatusGroup		OBJECT-GROUP
+	OBJECTS	{ nodeOperState, nodeCPULoad, nodePolicyApplyTime }
+	STATUS	current
+	DESCRIPTION
+		"A collection of objects giving information about
+		 the status of the node"
+	::= { netNodeGroups 2 }
+
+nodeLoginGroup		OBJECT-GROUP
+	OBJECTS	{ nodeLastLogin, nodeLastLoginTime, nodeLoginTime }
+	STATUS	current
+	DESCRIPTION
+		"A collection of objects giving information about logins
+		 into the node"
+	::= { netNodeGroups 3 }
+
+nodeTesterGroup		OBJECT-GROUP
+	OBJECTS { nodeTestIdentity, nodeTestResult, nodeTestResultTime }
+	STATUS current
+	DESCRIPTION
+		"A collection of objects giving information about the tests
+		 in the test subsystem of the node"
+	::= { netNodeGroups 4 }
+
+nodeHwmonGroup		OBJECT-GROUP
+	OBJECTS { nodeHwmonEvent }
+	STATUS current
+	DESCRIPTION
+		"A collection of objects giving information about
+		 hardware monitoring events in the node"
+	::= { netNodeGroups 8 }
+
+nodeStatusNotificationsGroup NOTIFICATION-GROUP
+	NOTIFICATIONS { nodeOnline, nodeOffline, nodeBoot, nodeShutdown }
+	STATUS current
+	DESCRIPTION
+		"A collection of notifications informing about changes
+		 in a node's status"
+	::= { netNodeGroups 5 }
+
+nodeLoginNotificationsGroup NOTIFICATION-GROUP
+	NOTIFICATIONS { nodeUserLogin, nodeFailedUserLogin, nodeUserLogout }
+	STATUS current
+	DESCRIPTION
+		"A collection of notifications informing about user logins"
+	::= { netNodeGroups 6 }
+
+nodeTesterNotificationsGroup NOTIFICATION-GROUP
+	NOTIFICATIONS { nodeTestFailure }
+	STATUS current
+	DESCRIPTION
+		"A collection of notifications informing about test failures"
+	::= { netNodeGroups 7 }
+
+
+nodeHwmonNotificationsGroup NOTIFICATION-GROUP
+	NOTIFICATIONS { nodeHwmon }
+	STATUS current
+	DESCRIPTION
+		"A collection of notifications informing about
+                 hardware monitoring issues"
+	::= { netNodeGroups 9 }
+
+END
+

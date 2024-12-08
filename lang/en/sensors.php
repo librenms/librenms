@@ -33,8 +33,8 @@ return [
     'chromatic_dispersion' => [
         'short' => 'Chromatic Dispersion',
         'long' => 'Chromatic Dispersion',
-        'unit' => 'ps/nm/km',
-        'unit_long' => 'Picoseconds per Nanometer per Kilometer',
+        'unit' => 'ps/nm',
+        'unit_long' => 'Picoseconds per Nanometer',
     ],
     'cooling' => [
         'short' => 'Cooling',
@@ -112,7 +112,7 @@ return [
         'short' => 'Power Consumed',
         'long' => 'Power Consumed',
         'unit' => 'kWh',
-        'unit_long' => 'Killowatt-Hours',
+        'unit_long' => 'Kilowatt-Hours',
     ],
     'power_factor' => [
         'short' => 'Power Factor',

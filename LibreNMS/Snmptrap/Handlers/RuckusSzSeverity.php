@@ -28,15 +28,17 @@
 
 namespace LibreNMS\Snmptrap\Handlers;
 
+use LibreNMS\Enum\Severity;
+
 class RuckusSzSeverity
 {
-    public static function getSeverity(string $severity): int
+    public static function getSeverity(string $severity): Severity
     {
         return match ($severity) {
-            'Critical' => 5,
-            'Major', 'Minor' => 4,
-            'Warning' => 3,
-            default => 2 // Informational
+            'Critical' => Severity::Error,
+            'Major', 'Minor' => Severity::Warning,
+            'Warning' => Severity::Notice,
+            default => Severity::Info,
         };
     }
 }

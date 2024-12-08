@@ -107,12 +107,17 @@ axosCardProvType OBJECT-TYPE
                     ge24r2(9),
                     epon(10),
                     gpon(11),
-                    eponmacsec(12),
-                    e32ngpon(13),
+                    epon_macsec(12),
+                    e3_2_ngpon(13),
                     asm3001(14),
                     gp1612(15),
                     xg801(16),
-                    ce201(17)
+                    ce201(17),
+                    e3_2_xgs(18),
+                    frwy(19),
+                    xg3201(21),
+                    asm5001(22),
+                    xg1601(23)
                 }
     MAX-ACCESS  read-only
     STATUS      current
@@ -133,12 +138,17 @@ axosCardActualType OBJECT-TYPE
                     ge24r2(9),
                     epon(10),
                     gpon(11),
-                    eponmacsec(12),
-                    e32ngpon(13),
+                    epon_macsec(12),
+                    e3_2_ngpon(13),
                     asm3001(14),
                     gp1612(15),
                     xg801(16),
-                    ce201(17)
+                    ce201(17),
+                    e3_2_xgs(18),
+                    frwy(19),
+                    xg3201(21),
+                    asm5001(22),
+                    xg1601(23)
                 }
     MAX-ACCESS  read-only
     STATUS      current

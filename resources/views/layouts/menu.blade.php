@@ -1,4 +1,4 @@
-<nav class="navbar navbar-default {{ $navbar }} navbar-fixed-top" role="navigation">
+<nav class="navbar navbar-default {{ $navbar }} navbar-sticky-top" role="navigation">
     <div class="container-fluid">
         <div class="navbar-header">
             <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navHeaderCollapse">
@@ -16,7 +16,7 @@
             </a>
         </div>
 
-        <div class="collapse navbar-collapse" id="navHeaderCollapse">
+        <div class="collapse navbar-collapse" id="navHeaderCollapse" style="max-height: calc(100vh - 50px)">
             <ul class="nav navbar-nav">
 {{-- Overview --}}
                 <li class="dropdown">
@@ -41,46 +41,6 @@
                             </ul>
                         </li>
                         <li role="presentation" class="divider"></li>
-                        <li class="dropdown-submenu">
-                            <a><i class="fa fa-map fa-fw fa-lg"
-                                                               aria-hidden="true"></i> {{ __('Maps') }}</a>
-                            <ul class="dropdown-menu">
-                                <li><a href="{{ url('availability-map') }}"><i class="fa fa-arrow-circle-up fa-fw fa-lg"
-                                                                               aria-hidden="true"></i> {{ __('Availability') }}
-                                    </a></li>
-                                <li><a href="{{ url('maps/devicedependency') }}"><i class="fa fa-chain fa-fw fa-lg"
-                                                                  aria-hidden="true"></i> {{ __('Device Dependency') }}</a></li>
-                                @if($device_groups->isNotEmpty())
-                                    <li class="dropdown-submenu"><a><i class="fa fa-chain fa-fw fa-lg"
-                                                                                aria-hidden="true"></i> {{ __('Device Groups Dependencies') }}
-                                        </a>
-                                        <ul class="dropdown-menu scrollable-menu">
-                                        @foreach($device_groups as $group)
-                                            <li><a href="{{ url("maps/devicedependency?group=$group->id") }}" title="{{ $group->desc }}"><i class="fa fa-chain fa-fw fa-lg" aria-hidden="true"></i>
-                                                {{ ucfirst($group->name) }}
-                                            </a></li>
-                                        @endforeach
-                                    </ul></li>
-                                @endif
-                                <li><a href="{{ url('map') }}"><i class="fa fa-sitemap fa-fw fa-lg"
-                                                                  aria-hidden="true"></i> {{ __('Network') }}</a></li>
-                                @if($device_groups->isNotEmpty())
-                                    <li class="dropdown-submenu"><a><i class="fa fa-th fa-fw fa-lg"
-                                                                                aria-hidden="true"></i> {{ __('Device Groups Maps') }}
-                                        </a>
-                                        <ul class="dropdown-menu scrollable-menu">
-                                        @foreach($device_groups as $group)
-                                            <li><a href="{{ url("map/group=$group->id") }}" title="{{ $group->desc }}"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i>
-                                                {{ ucfirst($group->name) }}
-                                            </a></li>
-                                        @endforeach
-                                    </ul></li>
-                                @endif
-                                <li><a href="{{ url('fullscreenmap') }}"><i class="fa fa-expand fa-fw fa-lg"
-                                                                            aria-hidden="true"></i> {{ __('Geographical') }}
-                                    </a></li>
-                            </ul>
-                        </li>
                         @if(auth()->user()->isAdmin() || $has_v1_plugins || $has_v2_plugins)
                         <li class="dropdown-submenu">
                             <a><i class="fa fa-plug fa-fw fa-lg" aria-hidden="true"></i> {{ __('Plugins') }}</a>
@@ -167,17 +127,18 @@
                        data-toggle="dropdown"><i class="fa fa-server fa-fw fa-lg fa-nav-icons hidden-md"
                                                  aria-hidden="true"></i> <span class="hidden-sm">{{ __('Devices') }}</span></a>
                     <ul class="dropdown-menu">
-                    @if($device_types->isNotEmpty())
-                        <li class="dropdown-submenu">
-                            <a href="{{ url('devices') }}"><i class="fa fa-server fa-fw fa-lg"
-                                                              aria-hidden="true"></i> {{ __('All Devices') }}</a>
-                            <ul class="dropdown-menu scrollable-menu">
-                            @foreach($device_types as $type)
-                                <li><a href="{{ url("devices/type=$type") }}"><i class="fa fa-angle-double-right fa-fw fa-lg" aria-hidden="true"></i> {{ ucfirst($type) }}</a></li>
-                            @endforeach
-                        </ul></li>
+                    @if($no_devices_added)
+                    <li><a href="#"><i class="fa fa-server fa-fw fa-lg" aria-hidden="true"></i> {{ __('No Devices') }}</a>
                     @else
-                            <li class="dropdown-submenu"><a href="#">{{ __('No devices') }}</a></li>
+                    <li @class(['dropdown-submenu' => $device_types->isNotEmpty()])><a href="{{ url('devices') }}"><i class="fa fa-server fa-fw fa-lg" aria-hidden="true"></i> {{ __('All Devices') }}</a>
+                        @if($device_types->isNotEmpty())
+                        <ul class="dropdown-menu scrollable-menu">
+                        @foreach($device_types as $type)
+                            <li><a href="{{ url("devices/type=$type") }}"><i class="fa fa-angle-double-right fa-fw fa-lg" aria-hidden="true"></i> {{ ucfirst($type) }}</a></li>
+                        @endforeach
+                        </ul>
+                        @endif
+                    </li>
                     @endif
 
                     @if($device_groups->isNotEmpty())
@@ -222,6 +183,86 @@
                         <li><a href="{{ url('delhost') }}"><i class="fa fa-trash fa-fw fa-lg"
                                                               aria-hidden="true"></i> {{ __('Delete Device') }}</a></li>
                     @endadmin
+
+                    </ul>
+                </li>
+{{-- Maps --}}
+                <li class="dropdown">
+                    <a href="{{ url('services') }}" class="dropdown-toggle" data-hover="dropdown"
+                       data-toggle="dropdown"><i class="fa fa-map fa-fw fa-lg fa-nav-icons hidden-md"
+                                                 aria-hidden="true"></i> <span
+                            class="hidden-sm">{{ __('Maps') }}</span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="{{ url('availability-map') }}"><i class="fa fa-arrow-circle-up fa-fw fa-lg"
+                                                                       aria-hidden="true"></i> {{ __('Availability') }}
+                            </a></li>
+                        @if($device_dependencies)
+                        <li><a href="{{ url('maps/devicedependency') }}"><i class="fa fa-chain fa-fw fa-lg"
+                                                                            aria-hidden="true"></i> {{ __('Device Dependency') }}</a></li>
+                        @endif
+                        @if($device_group_dependencies)
+                            <li class="dropdown-submenu"><a><i class="fa fa-chain fa-fw fa-lg"
+                                                               aria-hidden="true"></i> {{ __('Device Groups Dependencies') }}
+                                </a>
+                                <ul class="dropdown-menu scrollable-menu">
+                                    @foreach($device_groups as $group)
+                                        <li><a href="{{ url("maps/devicedependency?group=$group->id") }}" title="{{ $group->desc }}"><i class="fa fa-chain fa-fw fa-lg" aria-hidden="true"></i>
+                                                {{ ucfirst($group->name) }}
+                                            </a></li>
+                                    @endforeach
+                                </ul></li>
+                        @endif
+                        @if($links)
+                        <li><a href="{{ url('map') }}"><i class="fa fa-sitemap fa-fw fa-lg"
+                                                          aria-hidden="true"></i> {{ __('Network') }}</a></li>
+                        @endif
+                        <li><a href="{{ url('fullscreenmap') }}"><i class="fa fa-expand fa-fw fa-lg"
+                                                                    aria-hidden="true"></i> {{ __('Geographical') }}
+                            </a></li>
+                        @if($device_groups->isNotEmpty())
+                            <li class="dropdown-submenu"><a><i class="fa fa-th fa-fw fa-lg"
+                                                               aria-hidden="true"></i> {{ __('Device Groups Maps') }}
+                                </a>
+                                <ul class="dropdown-menu scrollable-menu">
+                                    @foreach($device_groups as $group)
+                                        <li><a href="{{ url("map/group=$group->id") }}" title="{{ $group->desc }}"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i>
+                                                {{ ucfirst($group->name) }}
+                                            </a></li>
+                                    @endforeach
+                                </ul></li>
+                        @endif
+
+                        @if($custommaps->isNotEmpty())
+                            <li role="presentation" class="divider"></li>
+                                    @foreach($custommaps as $map_group => $group_maps)
+                                        @if($map_group)
+                                        <li class="dropdown-submenu">
+                                        <a><i class="fa fa-map-marked fa-fw fa-lg"aria-hidden="true"></i> {{ $map_group  }}
+                                        </a>
+                                            <ul class="dropdown-menu scrollable-menu">
+                                        @endif
+                                        @foreach($group_maps as $map)
+                                        <li><a href="{{ route('maps.custom.show', ['map' => $map->custom_map_id]) }}"><i class="fa fa-map-marked fa-fw fa-lg" aria-hidden="true"></i>
+                                                {{ ucfirst($map->name) }}
+                                            </a></li>
+                                        @endforeach
+                                        @if($map_group)</ul></li>@endif
+                                    @endforeach
+                        @endif
+                        @admin
+                        <li role="presentation" class="divider"></li>
+                        <li><a href="{{ route('maps.custom.index') }}">
+                            <i class="fa fa-pen fa-fw fa-lg" aria-hidden="true"></i> {{ __('Custom Map Editor') }}
+                        </a></li>
+                        @if(Route::is('maps.custom.show'))
+                        <li><a href="{{ route('maps.custom.edit', ['map' => Route::current()->parameter('map')]) }}">
+                            <i class="fa fa-pen-to-square fa-fw fa-lg" aria-hidden="true"></i> {{ __('Edit Current Map') }}
+                        </a></li>
+                        @endif
+                        <li><a href="{{ route('maps.nodeimage.index') }}">
+                            <i class="fa fa-image fa-fw fa-lg" aria-hidden="true"></i> {{ __('Custom Node Image Manager') }}
+                        </a></li>
+                        @endadmin
 
                     </ul>
                 </li>
@@ -284,6 +325,9 @@
                                 </a></li>
                         @endif
 
+                        <li><a href="{{ route('vlans.index') }}"><i class="fa fa-tasks fa-fw fa-lg"
+                                                            aria-hidden="true"></i> {{ __('VLANs') }}</a></li>
+
                         @config('enable_billing')
                         <li><a href="{{ url('bills') }}"><i class="fa fa-money fa-fw fa-lg"
                                                             aria-hidden="true"></i> {{ __('Traffic Bills') }}</a></li>
@@ -295,6 +339,12 @@
                             </li>
                         @endif
 
+
+                        @if($port_nac)
+                            <li role="presentation" class="divider"></li>
+                            <li><a href="{{ url('nac') }}"><i class="fa fa-lock fa-fw fa-lg"
+                                                              aria-hidden="true"></i> NAC</a></li>
+                        @endif
                         @if(auth()->user()->hasGlobalRead())
                             @if($port_groups_exist)
                                 <li role="presentation" class="divider"></li>
@@ -583,15 +633,14 @@
                         </li>
                         <li role="presentation" class="divider"></li>
                         @endadmin
-                        @if (isset($refresh))
-                        <li class="dropdown-submenu">
-                            <a href="#"><span class="countdown_timer" id="countdown_timer"></span></a>
+                        <li class="dropdown-submenu" id="countdown_timer_menu" style="display: none">
+                            <a href="#"><i class="fa fa-clock-o fa-fw fa-lg"></i> <span id="countdown_timer"></span></a>
                             <ul class="dropdown-menu">
-                                <li><a href="#"><span class="countdown_timer_status" id="countdown_timer_status"></span></a></li>
+                                <li><a href="#" id="countdown_timer_pause"><i class="fa fa-pause fa-fw fa-lg"></i> {{ __('Pause') }}</a></li>
+                                <li><a href="#" id="countdown_timer_refresh"><i class="fa fa-arrows-rotate fa-fw fa-lg"></i> {{ __('Refresh') }}</a></li>
                             </ul>
                         </li>
-                        <li role="presentation" class="divider"></li>
-                        @endif
+                        <li role="presentation" class="divider" id="countdown_timer_divider" style="display: none"></li>
                         <li><a href="{{ url('about') }}"><i class="fa-solid fa-circle-info fa-fw fa-lg"
                                                             aria-hidden="true"></i> {{ __('About :project_name', ['project_name' => \LibreNMS\Config::get('project_name')]) }}
                             </a></li>
@@ -761,21 +810,22 @@
         }
     @endif
 
-    $(document).ready(function(){
-    // Function to focus Global Search on Ctrl-F
-    window.addEventListener("keydown",function (e) {
-        if (e.keyCode === 114 || (e.ctrlKey && e.keyCode === 70)){
-            if($('#gsearch').is(":focus")) {
-                //allow normal Ctrl-F on a 2nd Hit
-                return true;
-            } else {
-                //set Focus on Global Search and ignore Browsers defaults
-                e.preventDefault();
-                $('#gsearch').focus();
-            }
-        }
+    @if($global_search_ctrlf_focus)
+        $(document).ready(function(){
+            // Function to focus Global Search on Ctrl-F
+            window.addEventListener("keydown",function (e) {
+                if (e.keyCode === 114 || (e.ctrlKey && e.keyCode === 70)){
+                    if($('#gsearch').is(":focus")) {
+                        //allow normal Ctrl-F on a 2nd Hit
+                        return true;
+                    } else {
+                        //set Focus on Global Search and ignore Browsers defaults
+                        e.preventDefault();
+                        $('#gsearch').focus();
+                    }
+                }
+            })
         })
+    @endif
 
-
-    })
 </script>

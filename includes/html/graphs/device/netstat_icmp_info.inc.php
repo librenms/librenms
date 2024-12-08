@@ -3,13 +3,13 @@
 $rrd_filename = Rrd::name($device['hostname'], 'netstats-icmp');
 
 $stats = [
-    'icmpInSrcQuenchs'    => [],
-    'icmpOutSrcQuenchs'   => [],
-    'icmpInRedirects'     => [],
-    'icmpOutRedirects'    => [],
-    'icmpInAddrMasks'     => [],
-    'icmpOutAddrMasks'    => [],
-    'icmpInAddrMaskReps'  => [],
+    'icmpInSrcQuenchs' => [],
+    'icmpOutSrcQuenchs' => [],
+    'icmpInRedirects' => [],
+    'icmpOutRedirects' => [],
+    'icmpInAddrMasks' => [],
+    'icmpOutAddrMasks' => [],
+    'icmpInAddrMaskReps' => [],
     'icmpOutAddrMaskReps' => [],
 ];
 

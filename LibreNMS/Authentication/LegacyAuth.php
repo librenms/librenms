@@ -2,7 +2,6 @@
 
 namespace LibreNMS\Authentication;
 
-use Illuminate\Support\Facades\Auth;
 use LibreNMS\Config;
 use LibreNMS\Interfaces\Authentication\Authorizer;
 

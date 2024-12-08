@@ -1,0 +1,1639 @@
+
+MEINBERG-OS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, Integer32, Unsigned32 FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP FROM SNMPv2-CONF
+    mbgSnmpRoot FROM MBG-SNMP-ROOT-MIB
+    DisplayString FROM SNMPv2-TC
+    TEXTUAL-CONVENTION FROM SNMPv2-TC;
+
+meinbergOS MODULE-IDENTITY
+    LAST-UPDATED "202003101100Z"
+    ORGANIZATION "Meinberg Radio Clocks GmbH & Co. KG"
+    CONTACT-INFO
+         "postal:   Meinberg Funkuhren
+                    Lange Wand 9
+                    31812 Bad Pyrmont
+                    Germany
+
+          email:    info@meinberg.de
+            web:    http://www.meinberg.de
+            tel:    +49 (0) 52 81 / 93 09 - 0
+            fax:    +49 (0) 52 81 / 93 09 - 30"
+    DESCRIPTION
+        " meinbergOS Management Information Base "
+
+    REVISION    "202003101100Z"
+    DESCRIPTION
+        " Rev 1.1.0  10 Mar 2020 11:00 UTC Philipp Rahns
+          Added object mbgOsSysrefGlbStateSysSync"
+
+    REVISION    "201908131000Z"
+    DESCRIPTION
+        " Rev 1.0.0  13 Aug 2019 10:00 UTC Philipp Rahns
+          Initial revision"
+
+    ::= { mbgSnmpRoot 7 }
+
+
+-- Textual conventions
+
+
+NtpTimestamp ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "255a"
+    STATUS current
+    DESCRIPTION
+        "Representing a NTP timestamp in format 'yyyy-mm-dd, hh:mm:ss.us'."
+    SYNTAX OCTET STRING (SIZE (27))
+
+YesNo ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Simple boolean representation of an integer."
+    SYNTAX INTEGER { no(0), yes(1) }
+
+NtpReach ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "o"
+    STATUS current
+    DESCRIPTION
+        "NTP's reach value as octal representation."
+    SYNTAX Integer32
+
+Nanoseconds32 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS current
+    DESCRIPTION
+        "A signed 64 bit nanoseconds value that is broken down to a 32 bit
+         value due to SNMP's data type limitations because SNMP does not
+         support signed 64 bit values."
+    SYNTAX Integer32
+
+PtpClockAccuracy ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "PTP clock accuracy classes."
+    SYNTAX INTEGER {
+        unknown(-2),
+        accurateTo25ns(32),
+        accurateTo100ns(33),
+        accurateTo250ns(34),
+        accurateTo1us(35),
+        accurateTo2Point5us(36),
+        accurateTo10us(37),
+        accurateTo25us(38),
+        accurateTo100us(39),
+        accurateTo250us(40),
+        accurateTo1ms(41),
+        accurateTo2to5ms(42),
+        accurateTo10ms(43),
+        accurateTo25ms(44),
+        accurateTo100ms(45),
+        accurateTo250ms(46),
+        accurateTo1s(47),
+        accurateTo10s(48),
+        accurateToGT10s(49)
+    }
+
+
+-- Useful non system specific (payload) objects
+
+
+mbgOsHelper              OBJECT IDENTIFIER    ::= { meinbergOS 1 }
+
+mbgOsPayload OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "Context and format specific data payload."
+    ::= { mbgOsHelper 1 }
+
+
+-- System wide objects
+
+
+mbgOsObjects              OBJECT IDENTIFIER    ::= { meinbergOS 2 }
+
+
+-- NTP
+
+
+mbgOsNtp OBJECT IDENTIFIER ::= { mbgOsObjects 1 }
+
+mbgOsNtpConfig OBJECT IDENTIFIER ::= { mbgOsNtp 1 }
+
+mbgOsNtpState OBJECT IDENTIFIER ::= { mbgOsNtp 2 }
+
+mbgOsNtpSysState OBJECT IDENTIFIER ::= { mbgOsNtpState 1 }
+
+mbgOsNtpSysStateMain OBJECT-TYPE
+    SYNTAX INTEGER {
+        init(0),
+        sync(1),
+        notSync(2),
+        stopped(3)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "Current NTP major daemon state."
+    ::= { mbgOsNtpSysState 1 }
+
+mbgOsNtpSysStateRefId OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "Current NTP daemon's reference ID."
+    ::= { mbgOsNtpSysState 2 }
+
+mbgOsNtpSysStateStratum OBJECT-TYPE
+    SYNTAX Integer32 (1..16)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "Current NTP daemon's stratum level."
+    ::= { mbgOsNtpSysState 3 }
+
+mbgOsNtpSysStateLeapIndicator OBJECT-TYPE
+    SYNTAX INTEGER {
+        none(0),
+        addSecond(1),
+        deleteSecond(2),
+        alarm(3)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "Current NTP daemon's leap indicator."
+    ::= { mbgOsNtpSysState 4 }
+
+mbgOsNtpSysStateAssocId OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "Current NTP daemon's selected association ID for synchronization."
+    ::= { mbgOsNtpSysState 5 }
+
+mbgOsNtpSysStateTime OBJECT-TYPE
+    SYNTAX NtpTimestamp
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "See textual convention NtpTimestamp."
+    ::= { mbgOsNtpSysState 6 }
+
+mbgOsNtpSysStateRootDelay OBJECT-TYPE
+    SYNTAX Integer32
+    UNITS "us"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Total roundtrip delay to the system peer."
+    ::= { mbgOsNtpSysState 7 }
+
+mbgOsNtpSysStateRootDispersion OBJECT-TYPE
+    SYNTAX Integer32
+    UNITS "us"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Total dispersion to the system peer."
+    ::= { mbgOsNtpSysState 8 }
+
+mbgOsNtpRefclkStates OBJECT IDENTIFIER ::= { mbgOsNtpState 2 }
+
+mbgOsNtpRefclkStateTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF MbgOsNtpRefclkStateTableEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+         "NTP refclock state table."
+    ::= { mbgOsNtpRefclkStates 1 }
+
+mbgOsNtpRefclkStateTableEntry OBJECT-TYPE
+    SYNTAX MbgOsNtpRefclkStateTableEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+         "List of NTP refclock state table entries."
+    INDEX { mbgOsNtpRefclkStateIndex }
+    ::= { mbgOsNtpRefclkStateTable 1 }
+
+MbgOsNtpRefclkStateTableEntry ::=
+    SEQUENCE {
+        mbgOsNtpRefclkStateIndex Unsigned32,
+        mbgOsNtpRefclkStateValid YesNo,
+        mbgOsNtpRefclkStateRefId DisplayString,
+        mbgOsNtpRefclkStateStratum Integer32,
+        mbgOsNtpRefclkStateReach NtpReach,
+        mbgOsNtpRefclkStateAssocId Integer32,
+        mbgOsNtpRefclkStateTime NtpTimestamp,
+        mbgOsNtpRefclkOffset Integer32,
+        mbgOsNtpRefclkDelay Integer32,
+        mbgOsNtpRefclkDispersion Integer32,
+        mbgOsNtpRefclkJitter Integer32
+    }
+
+mbgOsNtpRefclkStateIndex OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+       "Row index."
+    ::= { mbgOsNtpRefclkStateTableEntry 1 }
+
+mbgOsNtpRefclkStateValid OBJECT-TYPE
+    SYNTAX YesNo
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "Always check this value first to determine whether row data is valid
+       and can be interpreted or not."
+    ::= { mbgOsNtpRefclkStateTableEntry 2 }
+
+mbgOsNtpRefclkStateRefId OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "NTP refclock's reference ID."
+    ::= { mbgOsNtpRefclkStateTableEntry 3 }
+
+mbgOsNtpRefclkStateStratum OBJECT-TYPE
+    SYNTAX Integer32 (0..16)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "NTP refclock's stratum value. Please note that a, for example,
+        GPS synchronized refclock has got a stratum value of 0."
+    ::= { mbgOsNtpRefclkStateTableEntry 4 }
+
+mbgOsNtpRefclkStateReach OBJECT-TYPE
+    SYNTAX NtpReach
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "NTP refclock's reach value."
+    ::= { mbgOsNtpRefclkStateTableEntry 5 }
+
+mbgOsNtpRefclkStateAssocId OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "NTP refclock's association ID given by NTP."
+    ::= { mbgOsNtpRefclkStateTableEntry 6 }
+
+mbgOsNtpRefclkStateTime OBJECT-TYPE
+    SYNTAX NtpTimestamp
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "NTP refclock's internal time."
+    ::= { mbgOsNtpRefclkStateTableEntry 7 }
+
+mbgOsNtpRefclkOffset OBJECT-TYPE
+    SYNTAX Integer32
+    UNITS "ns"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "NTP refclock's offset."
+    ::= { mbgOsNtpRefclkStateTableEntry 8 }
+
+mbgOsNtpRefclkDelay OBJECT-TYPE
+    SYNTAX Integer32
+    UNITS "ns"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "NTP refclock's delay."
+    ::= { mbgOsNtpRefclkStateTableEntry 9 }
+
+mbgOsNtpRefclkDispersion OBJECT-TYPE
+    SYNTAX Integer32
+    UNITS "us"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "NTP refclock's dispersion."
+    ::= { mbgOsNtpRefclkStateTableEntry 10 }
+
+mbgOsNtpRefclkJitter OBJECT-TYPE
+    SYNTAX Integer32
+    UNITS "us"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "NTP refclock's jitter."
+    ::= { mbgOsNtpRefclkStateTableEntry 11 }
+
+mbgOsNtpPeerStates OBJECT IDENTIFIER ::= { mbgOsNtpState 3 }
+
+mbgOsNtpPeerStateTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF MbgOsNtpPeerStateTableEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+         "NTP peer state table."
+    ::= { mbgOsNtpPeerStates 1 }
+
+mbgOsNtpPeerStateTableEntry OBJECT-TYPE
+    SYNTAX MbgOsNtpPeerStateTableEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+         "List of NTP peer state table entries."
+    INDEX { mbgOsNtpPeerStateIndex }
+    ::= { mbgOsNtpPeerStateTable 1 }
+
+MbgOsNtpPeerStateTableEntry ::=
+    SEQUENCE {
+        mbgOsNtpPeerStateIndex Unsigned32,
+        mbgOsNtpPeerStateValid YesNo,
+        mbgOsNtpPeerStateRefId DisplayString,
+        mbgOsNtpPeerStateStratum Integer32,
+        mbgOsNtpPeerStateReach NtpReach,
+        mbgOsNtpPeerStateAssocId Integer32,
+        mbgOsNtpPeerStateTime NtpTimestamp,
+        mbgOsNtpPeerOffset Integer32,
+        mbgOsNtpPeerDelay Integer32,
+        mbgOsNtpPeerDispersion Integer32,
+        mbgOsNtpPeerJitter Integer32
+      }
+
+mbgOsNtpPeerStateIndex OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+       "Row index."
+    ::= { mbgOsNtpPeerStateTableEntry 1 }
+
+mbgOsNtpPeerStateValid OBJECT-TYPE
+    SYNTAX YesNo
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "Always check this value first to determine whether row data is valid
+       and can be interpreted or not."
+    ::= { mbgOsNtpPeerStateTableEntry 2 }
+
+mbgOsNtpPeerStateRefId OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "NTP peer's reference ID."
+    ::= { mbgOsNtpPeerStateTableEntry 3 }
+
+mbgOsNtpPeerStateStratum OBJECT-TYPE
+    SYNTAX Integer32 (0..16)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "NTP peer's stratum value."
+    ::= { mbgOsNtpPeerStateTableEntry 4 }
+
+mbgOsNtpPeerStateReach OBJECT-TYPE
+    SYNTAX NtpReach
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "NTP peer's reach value."
+    ::= { mbgOsNtpPeerStateTableEntry 5 }
+
+mbgOsNtpPeerStateAssocId OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "NTP peer's association ID given by NTP."
+    ::= { mbgOsNtpPeerStateTableEntry 6 }
+
+mbgOsNtpPeerStateTime OBJECT-TYPE
+    SYNTAX NtpTimestamp
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "NTP peers's internal time."
+    ::= { mbgOsNtpPeerStateTableEntry 7 }
+
+mbgOsNtpPeerOffset OBJECT-TYPE
+    SYNTAX Integer32
+    UNITS "ns"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "NTP peer's offset."
+    ::= { mbgOsNtpPeerStateTableEntry 8 }
+
+mbgOsNtpPeerDelay OBJECT-TYPE
+    SYNTAX Integer32
+    UNITS "ns"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "NTP peers's delay."
+    ::= { mbgOsNtpPeerStateTableEntry 9 }
+
+mbgOsNtpPeerDispersion OBJECT-TYPE
+    SYNTAX Integer32
+    UNITS "us"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "NTP peer's dispersion."
+    ::= { mbgOsNtpPeerStateTableEntry 10 }
+
+mbgOsNtpPeerJitter OBJECT-TYPE
+    SYNTAX Integer32
+    UNITS "us"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "NTP peer's jitter."
+    ::= { mbgOsNtpPeerStateTableEntry 11 }
+
+
+-- Slots
+
+
+mbgOsSlot OBJECT IDENTIFIER ::= { mbgOsObjects 2 }
+
+mbgOsSlotTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF MbgOsSlotTableEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+         "Slot table."
+    ::= { mbgOsSlot 1 }
+
+mbgOsSlotTableEntry OBJECT-TYPE
+    SYNTAX MbgOsSlotTableEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+         "List of slot info table entries."
+    INDEX { mbgOsSlotIndex }
+    ::= { mbgOsSlotTable 1 }
+
+MbgOsSlotTableEntry ::=
+    SEQUENCE {
+        mbgOsSlotIndex Unsigned32,
+        mbgOsSlotState INTEGER,
+        mbgOsSlotName DisplayString,
+        mbgOsSlotCard DisplayString
+      }
+
+mbgOsSlotIndex OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+       "Row index."
+    ::= { mbgOsSlotTableEntry 1 }
+
+mbgOsSlotState OBJECT-TYPE
+    SYNTAX INTEGER {
+        unknown(0),
+        notAvailable(1),
+        initializing(2),
+        available(3),
+        disconnected(4)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "Current slot state."
+    ::= { mbgOsSlotTableEntry 2 }
+
+mbgOsSlotName OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "Current slot name."
+    ::= { mbgOsSlotTableEntry 3 }
+
+mbgOsSlotCard OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "Current card within slot."
+    ::= { mbgOsSlotTableEntry 4 }
+
+
+-- Receiver(s)
+
+
+mbgOsReceiver OBJECT IDENTIFIER ::= { mbgOsObjects 3 }
+
+mbgOsReceiverTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF MbgOsReceiverTableEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+         "Receiver (CLK1 and CLK2) table."
+    ::= { mbgOsReceiver 1 }
+
+mbgOsReceiverTableEntry OBJECT-TYPE
+    SYNTAX MbgOsReceiverTableEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+         "List of receiver table entries."
+    INDEX { mbgOsReceiverIndex }
+    ::= { mbgOsReceiverTable 1 }
+
+MbgOsReceiverTableEntry ::=
+    SEQUENCE {
+        mbgOsReceiverIndex Unsigned32,
+        mbgOsReceiverSlot DisplayString,
+        mbgOsReceiverState INTEGER,
+        mbgOsReceiverIsGnss YesNo,
+        mbgOsReceiverPosition DisplayString,
+        mbgOsReceiverGoodSv Integer32,
+        mbgOsReceiverSv Integer32,
+        mbgOsReceiverUtcTime DisplayString,
+        mbgOsReceiverLeapAnn INTEGER
+      }
+
+mbgOsReceiverIndex OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+       "Row index."
+    ::= { mbgOsReceiverTableEntry 1 }
+
+mbgOsReceiverSlot OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "Slot name."
+    ::= { mbgOsReceiverTableEntry 2 }
+
+mbgOsReceiverState OBJECT-TYPE
+    SYNTAX INTEGER {
+        noData(0),
+        waitingForData(1),
+        antennaShortCircuit(2),
+        antennaDisconnected(3),
+        coldBoot(4),
+        warmBoot(5),
+        synchronized(6)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "Current state."
+    ::= { mbgOsReceiverTableEntry 3 }
+
+mbgOsReceiverIsGnss OBJECT-TYPE
+    SYNTAX YesNo
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "Receiver is a global navigation satellite system like
+        GPS, GNSS, Galileo, etc..."
+    ::= { mbgOsReceiverTableEntry 4 }
+
+mbgOsReceiverPosition OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "Latitude, longitude, altitude.
+        Only valid if object mbgOsReceiverIsGnss returns 'yes'."
+    DEFVAL { "n/a" }
+    ::= { mbgOsReceiverTableEntry 5 }
+
+mbgOsReceiverGoodSv OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "Current number of good/usable satellites which are visible.
+        Only valid if object mbgOsReceiverIsGnss returns 'yes'."
+    DEFVAL { -1 }
+    ::= { mbgOsReceiverTableEntry 6 }
+
+
+mbgOsReceiverSv OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "Current number of satellites that should be visible.
+        Only valid if object mbgOsReceiverIsGnss returns 'yes'."
+    DEFVAL { -1 }
+    ::= { mbgOsReceiverTableEntry 7 }
+
+mbgOsReceiverUtcTime OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "Receiver's current internal UTC time according to ISO 8601.
+        Only valid if object mbgOsReceiverIsGnss returns 'yes'."
+    DEFVAL { "n/a" }
+    ::= { mbgOsReceiverTableEntry 8 }
+
+mbgOsReceiverLeapAnn OBJECT-TYPE
+    SYNTAX INTEGER {
+        noData(0),
+        no(1),
+        yes(2)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "Leap second has been announced."
+    ::= { mbgOsReceiverTableEntry 9 }
+
+
+-- Sysref
+
+
+mbgOsSysref OBJECT IDENTIFIER ::= { mbgOsObjects 4 }
+
+mbgOsSysrefConfig OBJECT IDENTIFIER ::= { mbgOsSysref 1 }
+
+mbgOsSysrefState OBJECT IDENTIFIER ::= { mbgOsSysref 2 }
+
+mbgOsSysrefGlbState OBJECT IDENTIFIER ::= { mbgOsSysrefState 1 }
+
+mbgOsSysrefGlbStateMasterRef OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "Current system synchronization master reference source."
+   DEFVAL { "n/a" }
+    ::= { mbgOsSysrefGlbState 1 }
+
+mbgOsSysrefGlbStateMasterRefBits OBJECT-TYPE
+    SYNTAX BITS {
+        dstChange(0),
+        dstEnabled(1),
+        leapSecondAnnounced(2),
+        secondIsLeapSecond(3),
+        leapSecondIsNegative(4),
+        invalidTime(5),
+        externalSync(6),
+        inHoldoverAfterSync(7),
+        antennaShortCircuit(8),
+        oscillatorWarmedUp(9),
+        antennaConnected(10),
+        clockSynchronized(11),
+        timeSyncVerified(12),
+        positionVerified(13)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "Current system synchronization master reference source status bits.
+        Only valid if mbgOsSysrefGlbStateMasterRef is avail."
+    ::= { mbgOsSysrefGlbState 2 }
+
+mbgOsSysrefGlbStateMasterRefAccuracy OBJECT-TYPE
+    SYNTAX Unsigned32
+    UNITS "ns"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Master reference accuracy.
+         Only valid if mbgOsSysrefGlbStateMasterRef is avail."
+    ::= { mbgOsSysrefGlbState 3 }
+
+mbgOsSysrefGlbStateMasterRefVariance OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Master reference variance depending on oscillator type.
+         Only valid if mbgOsSysrefGlbStateMasterRef is avail."
+    ::= { mbgOsSysrefGlbState 4 }
+
+mbgOsSysrefGlbStateSysSync OBJECT-TYPE
+    SYNTAX INTEGER {
+        notSynchronized(0),
+        synchronized(1)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "System's global sync state."
+    ::= { mbgOsSysrefGlbState 5 }
+
+mbgOsSysrefSrcState OBJECT IDENTIFIER ::= { mbgOsSysrefState 2 }
+
+mbgOsSysrefSrcStateTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF MbgOsSysrefSrcStateTableEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+         "Sysref sources state table"
+    ::= { mbgOsSysrefSrcState 1 }
+
+mbgOsSysrefSrcStateTableEntry OBJECT-TYPE
+    SYNTAX MbgOsSysrefSrcStateTableEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+         "List of sysref sources state table entries."
+    INDEX { mbgOsSysrefSrcStateIndex }
+    ::= { mbgOsSysrefSrcStateTable 1 }
+
+MbgOsSysrefSrcStateTableEntry ::=
+    SEQUENCE {
+        mbgOsSysrefSrcStateIndex      Unsigned32,
+        mbgOsSysrefSrcStateId         DisplayString,
+        mbgOsSysrefSrcStatePriority   Unsigned32,
+        mbgOsSysrefSrcStateBits       BITS,
+        mbgOsSysrefSrcStateOffset     Integer32
+    }
+
+mbgOsSysrefSrcStateIndex OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+       "Row index."
+    ::= { mbgOsSysrefSrcStateTableEntry 1 }
+
+mbgOsSysrefSrcStateId OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "Sysref source's identification string."
+    ::= { mbgOsSysrefSrcStateTableEntry 2 }
+
+mbgOsSysrefSrcStatePriority OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "Sysref source's synchronization priority."
+    ::= { mbgOsSysrefSrcStateTableEntry 3 }
+
+mbgOsSysrefSrcStateBits OBJECT-TYPE
+    SYNTAX BITS {
+        notSupported(0),
+        noConnection(1),
+        noSignal(2),
+        isMaster(3),
+        isLocked(4),
+        isAccurate(5),
+        notSettled(6),
+        notPhaseLocked(7),
+        numberOfSourcesExceeded(8),
+        isExternal(9),
+        lowJitter(10),
+        ituLimitViolated(11),
+        trsLimitViolated(12)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "Sysref source's state bits."
+    ::= { mbgOsSysrefSrcStateTableEntry 4 }
+
+mbgOsSysrefSrcStateOffset OBJECT-TYPE
+    SYNTAX Integer32
+    UNITS "ns"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Sysref source's offset to internal time base."
+    ::= { mbgOsSysrefSrcStateTableEntry 5 }
+
+
+-- PTP
+
+
+mbgOsPtp OBJECT IDENTIFIER ::= { mbgOsObjects 5 }
+
+mbgOsPtpConfig OBJECT IDENTIFIER ::= { mbgOsPtp 1 }
+
+mbgOsPtpState OBJECT IDENTIFIER ::= { mbgOsPtp 2 }
+
+mbgOsPtpMiscTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF MbgOsPtpMiscTableEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+         "Misc PTP information."
+    ::= { mbgOsPtpState 1 }
+
+mbgOsPtpMiscTableEntry OBJECT-TYPE
+    SYNTAX MbgOsPtpMiscTableEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+         "List of misc PTP related information."
+    INDEX { mbgOsPtpMiscIndex }
+    ::= { mbgOsPtpMiscTable 1 }
+
+MbgOsPtpMiscTableEntry ::=
+    SEQUENCE {
+        mbgOsPtpMiscIndex               Unsigned32,
+        mbgOsPtpMiscRunning             YesNo,
+        mbgOsPtpMiscNetworkIntfLabel    DisplayString,
+        mbgOsPtpMiscUnicastSlaves       Unsigned32,
+        mbgOsPtpMiscUtilization         Unsigned32,
+        mbgOsPtpMiscTotalRxPkts         Unsigned32,
+        mbgOsPtpMiscRxPktsPerSec        Unsigned32,
+        mbgOsPtpMiscTotalTxPkts         Unsigned32,
+        mbgOsPtpMiscTxPktsPerSec        Unsigned32,
+        mbgOsPtpMiscStackAlias          DisplayString
+    }
+
+mbgOsPtpMiscIndex OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+       "Row index."
+    ::= { mbgOsPtpMiscTableEntry 1 }
+
+mbgOsPtpMiscRunning OBJECT-TYPE
+    SYNTAX YesNo
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "When PTP instance is not running all other values should be ignored
+        and are NOT valid!!"
+    ::= { mbgOsPtpMiscTableEntry 2 }
+
+mbgOsPtpMiscNetworkIntfLabel OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "Network interface name/label."
+    ::= { mbgOsPtpMiscTableEntry 3 }
+
+mbgOsPtpMiscUnicastSlaves OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "Number of unicast slaves in unicast master mode."
+    ::= { mbgOsPtpMiscTableEntry 4 }
+
+mbgOsPtpMiscUtilization OBJECT-TYPE
+    SYNTAX Unsigned32(0..100)
+    UNITS "%"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "Resource utilization (msg/sec) in percent."
+    ::= { mbgOsPtpMiscTableEntry 5 }
+
+mbgOsPtpMiscTotalRxPkts OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "Overall total received packets."
+    ::= { mbgOsPtpMiscTableEntry 6 }
+
+mbgOsPtpMiscRxPktsPerSec OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "Overall received packets per second."
+    ::= { mbgOsPtpMiscTableEntry 7 }
+
+mbgOsPtpMiscTotalTxPkts OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "Overall total transmitted packets."
+    ::= { mbgOsPtpMiscTableEntry 8 }
+
+mbgOsPtpMiscTxPktsPerSec OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "Overall transmitted packets per second."
+    ::= { mbgOsPtpMiscTableEntry 9 }
+
+mbgOsPtpMiscStackAlias OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "Descriptive custom string for stack instance."
+    ::= { mbgOsPtpMiscTableEntry 10 }
+
+
+
+mbgOsPtpCurrentDsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF MbgOsPtpCurrentDsTableEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+         "PTP instances' current dataset state table."
+    ::= { mbgOsPtpState 2 }
+
+mbgOsPtpCurrentDsTableEntry OBJECT-TYPE
+    SYNTAX MbgOsPtpCurrentDsTableEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+         "List of PTP instances' current dataset table entries."
+    INDEX { mbgOsPtpCurrentDsIndex }
+    ::= { mbgOsPtpCurrentDsTable 1 }
+
+MbgOsPtpCurrentDsTableEntry ::=
+    SEQUENCE {
+        mbgOsPtpCurrentDsIndex                  Unsigned32,
+        mbgOsPtpCurrentDsStepsRemoved           Unsigned32,
+        mbgOsPtpCurrentDsOffsetFromMaster       Nanoseconds32,
+        mbgOsPtpCurrentDsOffsetFromMasterStr    DisplayString,
+        mbgOsPtpCurrentDsMeanPathDelay          Nanoseconds32,
+        mbgOsPtpCurrentDsMeanPathDelayStr       DisplayString
+    }
+
+mbgOsPtpCurrentDsIndex OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+       "Row index."
+    ::= { mbgOsPtpCurrentDsTableEntry 1 }
+
+mbgOsPtpCurrentDsStepsRemoved OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "Number of communication paths between local clock and grandmaster."
+    ::= { mbgOsPtpCurrentDsTableEntry 2 }
+
+mbgOsPtpCurrentDsOffsetFromMaster OBJECT-TYPE
+    SYNTAX Nanoseconds32
+    UNITS "ns"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "Current time difference between master and slave."
+    ::= { mbgOsPtpCurrentDsTableEntry 3 }
+
+mbgOsPtpCurrentDsOffsetFromMasterStr OBJECT-TYPE
+    SYNTAX DisplayString
+    UNITS "ns"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "Current time difference between master and slave as string."
+    ::= { mbgOsPtpCurrentDsTableEntry 4 }
+
+mbgOsPtpCurrentDsMeanPathDelay OBJECT-TYPE
+    SYNTAX Nanoseconds32
+    UNITS "ns"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "Current mean propagation time between master and slave."
+    ::= { mbgOsPtpCurrentDsTableEntry 5 }
+
+mbgOsPtpCurrentDsMeanPathDelayStr OBJECT-TYPE
+    SYNTAX DisplayString
+    UNITS "ns"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "Current mean propagation time between master and slave as string."
+    ::= { mbgOsPtpCurrentDsTableEntry 6 }
+
+mbgOsPtpParentDsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF MbgOsPtpParentDsTableEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+         "PTP instances' parent dataset state table."
+    ::= { mbgOsPtpState 3 }
+
+mbgOsPtpParentDsTableEntry OBJECT-TYPE
+    SYNTAX MbgOsPtpParentDsTableEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+         "List of PTP instances' parent dataset table entries."
+    INDEX { mbgOsPtpCurrentDsIndex }
+    ::= { mbgOsPtpParentDsTable 1 }
+
+MbgOsPtpParentDsTableEntry ::=
+    SEQUENCE {
+        mbgOsPtpParentDsIndex           Unsigned32,
+        mbgOsPtpParentDsPortIdentity    DisplayString,
+        mbgOsPtpParentDsGmClockId       DisplayString,
+        mbgOsPtpParentDsGmPrio1         Unsigned32,
+        mbgOsPtpParentDsGmPrio2         Unsigned32,
+        mbgOsPtpParentDsGmClockClass    Unsigned32,
+        mbgOsPtpParentDsGmClockAccuracy PtpClockAccuracy,
+        mbgOsPtpParentDsGmClockVariance Unsigned32
+    }
+
+mbgOsPtpParentDsIndex OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+       "Row index."
+    ::= { mbgOsPtpParentDsTableEntry 1 }
+
+mbgOsPtpParentDsPortIdentity OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "Parent (boundary clock or grandmaster) port identity."
+    ::= { mbgOsPtpParentDsTableEntry 2 }
+
+mbgOsPtpParentDsGmClockId OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "Grandmaster clock identity."
+    ::= { mbgOsPtpParentDsTableEntry 3 }
+
+mbgOsPtpParentDsGmPrio1 OBJECT-TYPE
+    SYNTAX Unsigned32(0..255)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "Priority 1 attribute of the grandmaster clock."
+    ::= { mbgOsPtpParentDsTableEntry 4 }
+
+mbgOsPtpParentDsGmPrio2 OBJECT-TYPE
+    SYNTAX Unsigned32(0..255)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "Priority 2 attribute of the grandmaster clock."
+    ::= { mbgOsPtpParentDsTableEntry 5 }
+
+mbgOsPtpParentDsGmClockClass OBJECT-TYPE
+    SYNTAX Unsigned32(0..255)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "Grandmaster's clock class."
+    ::= { mbgOsPtpParentDsTableEntry 6 }
+
+mbgOsPtpParentDsGmClockAccuracy OBJECT-TYPE
+    SYNTAX PtpClockAccuracy
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "Grandmaster's clock accuracy."
+    ::= { mbgOsPtpParentDsTableEntry 7 }
+
+mbgOsPtpParentDsGmClockVariance OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "Grandmaster's offset scaled log variance
+        representing the time stability."
+    ::= { mbgOsPtpParentDsTableEntry 8 }
+
+mbgOsPtpDefaultDsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF MbgOsPtpDefaultDsTableEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+         "PTP instances' default dataset state table."
+    ::= { mbgOsPtpState 4 }
+
+mbgOsPtpDefaultDsTableEntry OBJECT-TYPE
+    SYNTAX MbgOsPtpDefaultDsTableEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+         "List of PTP instances' default dataset table entries."
+    INDEX { mbgOsPtpDefaultDsIndex }
+    ::= { mbgOsPtpDefaultDsTable 1 }
+
+MbgOsPtpDefaultDsTableEntry ::=
+    SEQUENCE {
+        mbgOsPtpDefaultDsIndex              Unsigned32,
+        mbgOsPtpDefaultDsNumberOfPorts      Unsigned32,
+        mbgOsPtpDefaultDsTwoStep            YesNo,
+        mbgOsPtpDefaultDsSlaveOnly          YesNo,
+        mbgOsPtpDefaultDsPrio1              Unsigned32,
+        mbgOsPtpDefaultDsPrio2              Unsigned32,
+        mbgOsPtpDefaultDsClockClass         Unsigned32,
+        mbgOsPtpDefaultDsClockAccuracy      PtpClockAccuracy,
+        mbgOsPtpDefaultDsClockVariance      Unsigned32,
+        mbgOsPtpDefaultDsClockIdentity      DisplayString,
+        mbgOsPtpDefaultDsDomainNumber       Unsigned32
+    }
+
+mbgOsPtpDefaultDsIndex OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+       "Row index."
+    ::= { mbgOsPtpDefaultDsTableEntry 1 }
+
+mbgOsPtpDefaultDsNumberOfPorts OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "Number of PTP ports on this device."
+    ::= { mbgOsPtpDefaultDsTableEntry 2 }
+
+mbgOsPtpDefaultDsTwoStep OBJECT-TYPE
+    SYNTAX YesNo
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "Two step mode."
+    ::= { mbgOsPtpDefaultDsTableEntry 3 }
+
+mbgOsPtpDefaultDsSlaveOnly OBJECT-TYPE
+    SYNTAX YesNo
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "Slave only mode."
+    ::= { mbgOsPtpDefaultDsTableEntry 4 }
+
+mbgOsPtpDefaultDsPrio1 OBJECT-TYPE
+    SYNTAX Unsigned32(0..255)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "Local clock attribute."
+    ::= { mbgOsPtpDefaultDsTableEntry 5 }
+
+mbgOsPtpDefaultDsPrio2 OBJECT-TYPE
+    SYNTAX Unsigned32(0..255)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "Local clock attribute."
+    ::= { mbgOsPtpDefaultDsTableEntry 6 }
+
+mbgOsPtpDefaultDsClockClass OBJECT-TYPE
+    SYNTAX Unsigned32(0..255)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "Local clock class."
+    ::= { mbgOsPtpDefaultDsTableEntry 7 }
+
+mbgOsPtpDefaultDsClockAccuracy OBJECT-TYPE
+    SYNTAX PtpClockAccuracy
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "Local clock accuracy."
+    ::= { mbgOsPtpDefaultDsTableEntry 8 }
+
+mbgOsPtpDefaultDsClockVariance OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "Local clock offset scaled log variance
+        representing the time stability."
+    ::= { mbgOsPtpDefaultDsTableEntry 9 }
+
+mbgOsPtpDefaultDsClockIdentity OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "Local clock identity."
+    ::= { mbgOsPtpDefaultDsTableEntry 10 }
+
+mbgOsPtpDefaultDsDomainNumber OBJECT-TYPE
+    SYNTAX Unsigned32(0..255)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "Local domain attribute."
+    ::= { mbgOsPtpDefaultDsTableEntry 11 }
+
+mbgOsPtpTimePropDsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF MbgOsPtpTimePropDsTableEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+         "PTP instances' time properties dataset state table."
+    ::= { mbgOsPtpState 5 }
+
+mbgOsPtpTimePropDsTableEntry OBJECT-TYPE
+    SYNTAX MbgOsPtpTimePropDsTableEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+         "List of PTP instances' time properties dataset table entries."
+    INDEX { mbgOsPtpTimePropDsIndex }
+    ::= { mbgOsPtpTimePropDsTable 1 }
+
+MbgOsPtpTimePropDsTableEntry ::=
+    SEQUENCE {
+        mbgOsPtpTimePropDsIndex                 Unsigned32,
+        mbgOsPtpTimePropDsUTCOffset             Unsigned32,
+        mbgOsPtpTimePropDsLeap61                YesNo,
+        mbgOsPtpTimePropDsLeap59                YesNo,
+        mbgOsPtpTimePropDsUTCOffsetValid        YesNo,
+        mbgOsPtpTimePropDsPTPTimescale          YesNo,
+        mbgOsPtpTimePropDsTimeTraceable         YesNo,
+        mbgOsPtpTimePropDsFrequencyTraceable    YesNo,
+        mbgOsPtpTimePropDsTimeSource            INTEGER
+    }
+
+mbgOsPtpTimePropDsIndex OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+       "Row index."
+    ::= { mbgOsPtpTimePropDsTableEntry 1 }
+
+mbgOsPtpTimePropDsUTCOffset OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "Offset between TAI and UTC in seconds."
+    ::= { mbgOsPtpTimePropDsTableEntry 2 }
+
+mbgOsPtpTimePropDsLeap61 OBJECT-TYPE
+    SYNTAX YesNo
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "The last minute of the current UTC day has 61 seconds."
+    ::= { mbgOsPtpTimePropDsTableEntry 3 }
+
+mbgOsPtpTimePropDsLeap59 OBJECT-TYPE
+    SYNTAX YesNo
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "The last minute of the current UTC day has 49 seconds."
+    ::= { mbgOsPtpTimePropDsTableEntry 4 }
+
+mbgOsPtpTimePropDsUTCOffsetValid OBJECT-TYPE
+    SYNTAX YesNo
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "The current UTC offset is known to be correct."
+    ::= { mbgOsPtpTimePropDsTableEntry 5 }
+
+mbgOsPtpTimePropDsPTPTimescale OBJECT-TYPE
+    SYNTAX YesNo
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "The timescale of the grandmaster clock is PTP."
+    ::= { mbgOsPtpTimePropDsTableEntry 6 }
+
+mbgOsPtpTimePropDsTimeTraceable OBJECT-TYPE
+    SYNTAX YesNo
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "Timescale and UTC offset are traceable to a primary reference."
+    ::= { mbgOsPtpTimePropDsTableEntry 7 }
+
+mbgOsPtpTimePropDsFrequencyTraceable OBJECT-TYPE
+    SYNTAX YesNo
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "The frequency determining the timescale is traceable
+        to a primary reference."
+    ::= { mbgOsPtpTimePropDsTableEntry 8 }
+
+mbgOsPtpTimePropDsTimeSource OBJECT-TYPE
+    SYNTAX INTEGER {
+        atomicClock(16),
+        gps(32),
+        terrestrialRadio(48),
+        ptp(64),
+        ntp(80),
+        handSet(96),
+        other(144),
+        internalOscillator(160)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "Time source used by the grandmaster clock."
+    ::= { mbgOsPtpTimePropDsTableEntry 9 }
+
+mbgOsPtpPortDsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF MbgOsPtpPortDsTableEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+         "PTP instances' port dataset state table."
+    ::= { mbgOsPtpState 6 }
+
+mbgOsPtpPortDsTableEntry OBJECT-TYPE
+    SYNTAX MbgOsPtpPortDsTableEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+         "List of PTP instances' port dataset table entries."
+    INDEX { mbgOsPtpPortDsIndex }
+    ::= { mbgOsPtpPortDsTable 1 }
+
+MbgOsPtpPortDsTableEntry ::=
+    SEQUENCE {
+        mbgOsPtpPortDsIndex                 Unsigned32,
+        mbgOsPtpPortDsPortIdentity          DisplayString,
+        mbgOsPtpPortDsPortState             INTEGER,
+        mbgOsPtpPortDsMinDlyReqIntv         Integer32,
+        mbgOsPtpPortDsPeerMeanPathDly       Integer32,
+        mbgOsPtpPortDsAnnIntv               Integer32,
+        mbgOsPtpPortDsAnnReceiptTimeout     Unsigned32,
+        mbgOsPtpPortDsSyncIntv              Integer32,
+        mbgOsPtpPortDsDlyMech               INTEGER,
+        mbgOsPtpPortDsMinPeerDlyReqIntv     Integer32,
+        mbgOsPtpPortDsVersionNumber         Unsigned32
+    }
+
+mbgOsPtpPortDsIndex OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+       "Row index."
+    ::= { mbgOsPtpPortDsTableEntry 1 }
+
+mbgOsPtpPortDsPortIdentity OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "Local port identity."
+    ::= { mbgOsPtpPortDsTableEntry 2 }
+
+mbgOsPtpPortDsPortState OBJECT-TYPE
+    SYNTAX INTEGER {
+        uninitialized(0),
+        initializing(1),
+        faulty(2),
+        disabled(3),
+        listening(4),
+        preMaster(5),
+        master(6),
+        passive(7),
+        uncalibrated(8),
+        slave(9)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "Local port state."
+    ::= { mbgOsPtpPortDsTableEntry 3 }
+
+mbgOsPtpPortDsMinDlyReqIntv OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "Minimum delay request interval."
+    ::= { mbgOsPtpPortDsTableEntry 4 }
+
+mbgOsPtpPortDsPeerMeanPathDly OBJECT-TYPE
+    SYNTAX Integer32
+    UNITS "ns"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "Peer mean path delay."
+    ::= { mbgOsPtpPortDsTableEntry 5 }
+
+mbgOsPtpPortDsAnnIntv OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "Announce interval."
+    ::= { mbgOsPtpPortDsTableEntry 6 }
+
+mbgOsPtpPortDsAnnReceiptTimeout OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "Announce receipt interval."
+    ::= { mbgOsPtpPortDsTableEntry 7 }
+
+mbgOsPtpPortDsSyncIntv OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "Sync interval."
+    ::= { mbgOsPtpPortDsTableEntry 8 }
+
+mbgOsPtpPortDsDlyMech OBJECT-TYPE
+    SYNTAX INTEGER {
+        end2end(0),
+        peer2peer(1)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "Delay mechanism."
+    ::= { mbgOsPtpPortDsTableEntry 9 }
+
+mbgOsPtpPortDsMinPeerDlyReqIntv OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "Minimum peer delay request interval."
+    ::= { mbgOsPtpPortDsTableEntry 10 }
+
+mbgOsPtpPortDsVersionNumber OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "Version number."
+    ::= { mbgOsPtpPortDsTableEntry 11 }
+
+
+-- Notifications
+
+
+mbgOsNotifications OBJECT IDENTIFIER ::= { meinbergOS 3 }
+
+mbgOsTraps OBJECT IDENTIFIER ::= { mbgOsNotifications 0 }
+
+mbgOsTrap NOTIFICATION-TYPE
+    OBJECTS {
+        mbgOsPayload
+    }
+    STATUS current
+    DESCRIPTION
+        "Single trap OID containing event, format and data specific payload."
+    ::= { mbgOsTraps 1 }
+
+
+-- Conformance and compliance
+
+
+mbgOsConformance  OBJECT IDENTIFIER ::= { meinbergOS 1024 }
+mbgOsCompliances  OBJECT IDENTIFIER ::= { mbgOsConformance 1 }
+mbgOsGroups       OBJECT IDENTIFIER ::= { mbgOsConformance 2 }
+
+mbgOsCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+        "The compliance statement for SNMP entities"
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+            mbgOsObjectsGroup,
+            mbgOsNotificationGroup
+        }
+    ::= { mbgOsCompliances 1 }
+
+
+mbgOsObjectsGroup OBJECT-GROUP
+    OBJECTS {
+        mbgOsPayload,
+        mbgOsNtpSysStateMain,
+        mbgOsNtpSysStateRefId,
+        mbgOsNtpSysStateStratum,
+        mbgOsNtpSysStateLeapIndicator,
+        mbgOsNtpSysStateAssocId,
+        mbgOsNtpSysStateTime,
+        mbgOsNtpSysStateRootDelay,
+        mbgOsNtpSysStateRootDispersion,
+        mbgOsNtpRefclkStateValid,
+        mbgOsNtpRefclkStateRefId,
+        mbgOsNtpRefclkStateStratum,
+        mbgOsNtpRefclkStateReach,
+        mbgOsNtpRefclkStateAssocId,
+        mbgOsNtpRefclkStateTime,
+        mbgOsNtpRefclkOffset,
+        mbgOsNtpRefclkDelay,
+        mbgOsNtpRefclkDispersion,
+        mbgOsNtpRefclkJitter,
+        mbgOsNtpPeerStateValid,
+        mbgOsNtpPeerStateRefId,
+        mbgOsNtpPeerStateStratum,
+        mbgOsNtpPeerStateReach,
+        mbgOsNtpPeerStateAssocId,
+        mbgOsNtpPeerStateTime,
+        mbgOsNtpPeerOffset,
+        mbgOsNtpPeerDelay,
+        mbgOsNtpPeerDispersion,
+        mbgOsNtpPeerJitter,
+        mbgOsSlotState,
+        mbgOsSlotName,
+        mbgOsSlotCard,
+        mbgOsReceiverSlot,
+        mbgOsReceiverState,
+        mbgOsReceiverIsGnss,
+        mbgOsReceiverPosition,
+        mbgOsReceiverGoodSv,
+        mbgOsReceiverSv,
+        mbgOsReceiverUtcTime,
+        mbgOsReceiverLeapAnn,
+        mbgOsSysrefGlbStateMasterRef,
+        mbgOsSysrefGlbStateMasterRefBits,
+        mbgOsSysrefGlbStateMasterRefAccuracy,
+        mbgOsSysrefGlbStateMasterRefVariance,
+        mbgOsSysrefGlbStateSysSync,
+        mbgOsSysrefSrcStateId,
+        mbgOsSysrefSrcStatePriority,
+        mbgOsSysrefSrcStateBits,
+        mbgOsSysrefSrcStateOffset,
+        mbgOsPtpMiscRunning,
+        mbgOsPtpMiscNetworkIntfLabel,
+        mbgOsPtpMiscUnicastSlaves,
+        mbgOsPtpMiscUtilization,
+        mbgOsPtpMiscTotalRxPkts,
+        mbgOsPtpMiscRxPktsPerSec,
+        mbgOsPtpMiscTotalTxPkts,
+        mbgOsPtpMiscTxPktsPerSec,
+        mbgOsPtpMiscStackAlias,
+        mbgOsPtpCurrentDsStepsRemoved,
+        mbgOsPtpCurrentDsOffsetFromMaster,
+        mbgOsPtpCurrentDsOffsetFromMasterStr,
+        mbgOsPtpCurrentDsMeanPathDelay,
+        mbgOsPtpCurrentDsMeanPathDelayStr,
+        mbgOsPtpParentDsPortIdentity,
+        mbgOsPtpParentDsGmClockId,
+        mbgOsPtpParentDsGmPrio1,
+        mbgOsPtpParentDsGmPrio2,
+        mbgOsPtpParentDsGmClockClass,
+        mbgOsPtpParentDsGmClockAccuracy,
+        mbgOsPtpParentDsGmClockVariance,
+        mbgOsPtpDefaultDsNumberOfPorts,
+        mbgOsPtpDefaultDsTwoStep,
+        mbgOsPtpDefaultDsSlaveOnly,
+        mbgOsPtpDefaultDsPrio1,
+        mbgOsPtpDefaultDsPrio2,
+        mbgOsPtpDefaultDsClockClass,
+        mbgOsPtpDefaultDsClockAccuracy,
+        mbgOsPtpDefaultDsClockVariance,
+        mbgOsPtpDefaultDsClockIdentity,
+        mbgOsPtpDefaultDsDomainNumber,
+        mbgOsPtpTimePropDsUTCOffset,
+        mbgOsPtpTimePropDsLeap61,
+        mbgOsPtpTimePropDsLeap59,
+        mbgOsPtpTimePropDsUTCOffsetValid,
+        mbgOsPtpTimePropDsPTPTimescale,
+        mbgOsPtpTimePropDsTimeTraceable,
+        mbgOsPtpTimePropDsFrequencyTraceable,
+        mbgOsPtpTimePropDsTimeSource,
+        mbgOsPtpPortDsPortIdentity,
+        mbgOsPtpPortDsPortState,
+        mbgOsPtpPortDsMinDlyReqIntv,
+        mbgOsPtpPortDsPeerMeanPathDly,
+        mbgOsPtpPortDsAnnIntv,
+        mbgOsPtpPortDsAnnReceiptTimeout,
+        mbgOsPtpPortDsSyncIntv,
+        mbgOsPtpPortDsDlyMech,
+        mbgOsPtpPortDsMinPeerDlyReqIntv,
+        mbgOsPtpPortDsVersionNumber
+    }
+    STATUS current
+    DESCRIPTION
+        "The collection of objects for Meinberg's management MIB."
+    ::= { mbgOsGroups 1 }
+
+
+mbgOsNotificationGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        mbgOsTrap
+    }
+    STATUS current
+    DESCRIPTION
+        "The collection of notifications for Meinberg's management MIB."
+    ::= { mbgOsGroups 2 }
+
+END
+
+

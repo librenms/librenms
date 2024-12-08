@@ -314,7 +314,7 @@ parameters:
 
 		-
 			message: """
-				#^Call to deprecated function dbFetch\\(\\)\\:
+				#^Call to deprecated function dbFetchRows\\(\\)\\:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
 			"""
 			count: 1
@@ -322,7 +322,7 @@ parameters:
 
 		-
 			message: """
-				#^Call to deprecated function dbFetch\\(\\)\\:
+				#^Call to deprecated function dbFetchRows\\(\\)\\:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
 			"""
 			count: 2
@@ -346,7 +346,7 @@ parameters:
 
 		-
 			message: """
-				#^Call to deprecated function dbFetch\\(\\)\\:
+				#^Call to deprecated function dbFetchRows\\(\\)\\:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
 			"""
 			count: 3
@@ -1063,46 +1063,6 @@ parameters:
 			"""
 			count: 1
 			path: includes/discovery/junose-atm-vp.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function dbDelete\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
-			"""
-			count: 1
-			path: includes/discovery/libvirt-vminfo.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function dbFetchRow\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 1
-			path: includes/discovery/libvirt-vminfo.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function dbFetchRows\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 1
-			path: includes/discovery/libvirt-vminfo.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function dbInsert\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
-			"""
-			count: 1
-			path: includes/discovery/libvirt-vminfo.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function dbUpdate\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
-			"""
-			count: 1
-			path: includes/discovery/libvirt-vminfo.inc.php
 
 		-
 			message: """
@@ -2502,14 +2462,6 @@ parameters:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
 			"""
 			count: 1
-			path: includes/html/graphs/c6kxbar/auth.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function dbFetchRow\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 1
 			path: includes/html/graphs/cefswitching/auth.inc.php
 
 		-
@@ -3034,7 +2986,7 @@ parameters:
 
 		-
 			message: """
-				#^Call to deprecated function dbFetch\\(\\)\\:
+				#^Call to deprecated function dbFetchRows\\(\\)\\:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
 			"""
 			count: 1
@@ -3383,14 +3335,6 @@ parameters:
 			"""
 			count: 1
 			path: includes/html/pages/device/munin.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function dbFetchRows\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 1
-			path: includes/html/pages/device/neighbours/list.inc.php
 
 		-
 			message: """
@@ -4111,14 +4055,6 @@ parameters:
 			"""
 			count: 1
 			path: includes/html/print-graph-alerts.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function dbFetchRows\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 2
-			path: includes/html/print-interface-adsl.inc.php
 
 		-
 			message: """
@@ -4898,7 +4834,7 @@ parameters:
 
 		-
 			message: """
-				#^Call to deprecated function dbFetch\\(\\)\\:
+				#^Call to deprecated function dbFetchRows\\(\\)\\:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
 			"""
 			count: 1

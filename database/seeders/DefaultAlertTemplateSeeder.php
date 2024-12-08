@@ -12,7 +12,7 @@ class DefaultAlertTemplateSeeder extends Seeder
      *
      * @return void
      */
-    public function run()
+    public function run(): void
     {
         $templates = [
             [
@@ -48,7 +48,7 @@ class DefaultAlertTemplateSeeder extends Seeder
                     @if ($alert->faults)
                     Faults:
                     @foreach ($alert->faults as $key => $value)
-                    @php($unit = __("sensors.${value["sensor_class"]}.unit"))
+                    @php($unit = __("sensors.{$value["sensor_class"]}.unit"))
                     #{{ $key }}: {{ $value['sensor_descr'] ?? 'Sensor' }}
 
                     Current: {{ $value['sensor_current'].$unit }}

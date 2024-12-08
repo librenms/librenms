@@ -1,9 +1,9 @@
 -- ==================================================================
--- Copyright (C) 2017 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2020 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- 
 -- Description: HUAWEI VPLS Management Extended MIB
 -- Reference:
--- Version:     V2.46
+-- Version:     V2.57
 -- History:
 --              V1.0 PanJun, 2006-05-08, publish
 -- ==================================================================
@@ -28,13 +28,13 @@
                 FROM VRRP-MIB
             EnabledStatus
                 FROM P-BRIDGE-MIB
-            hwL2VpnVcLimitClass, hwL2VpnVsiVcNumber, hwVplsVcNumberUpperThreshold,
+            hwL2Vpn, hwL2VpnVcLimitClass, hwL2VpnVsiVcNumber, hwVplsVcNumberUpperThreshold,
             hwVplsVcNumberMaxNum    
                 FROM HUAWEI-L2VPN-MIB;
 
 
-        hwL2VpnVplsExt MODULE-IDENTITY 
-            LAST-UPDATED "201708171644Z"           --Aug 17, 2017 at 16:44 GMT"
+         hwL2VpnVplsExt MODULE-IDENTITY 
+            LAST-UPDATED "202007221110Z"           --July 22, 2020 at 11:10 GMT  
             ORGANIZATION 
                 "Huawei Technologies Co.,Ltd."
             CONTACT-INFO 
@@ -48,6 +48,43 @@
             DESCRIPTION 
                 "The HUAWEI-VPLS-EXT-MIB contains objects to
                 manage VPLS."
+
+             REVISION "202007221110Z"           --July 22, 2020 at 11:10 GMT 
+             DESCRIPTION "modified the descriptions of hwVplsQosStatDiscardByteRate, hwVplsLdpQosStatPassByteRate, hwVplsLdpQosStatDiscardByteRate"
+
+             REVISION "202007201110Z"           --July 20, 2020 at 11:10 GMT 
+             DESCRIPTION "modified the descriptions of hwVplsQosStatDiscardByteRate, hwVplsQosStatPassByteRate, hwVplsLdpQosStatDiscardByteRate, hwVplsLdpQosStatPassByteRate"
+             
+             REVISION "202003031920Z"           --Mac 3, 2020 at 19:20 GMT 
+             DESCRIPTION "modified the syntax value of hwVplsDiffServDSName"
+
+             REVISION "201909161520Z"           --Sep 16, 2019 at 15:20 GMT 
+             DESCRIPTION "modified the syntax value of hwVplsDiffServDSName"
+
+             REVISION "201810081020Z"           --Oct 8, 2018 at 10:20 GMT 
+             DESCRIPTION "add change reason
+                Add hwVplsAdPwSuppStatisticsTable"
+
+             REVISION "201803141000Z"              -- Mac 14, 2018 at 10:00 GMT
+             DESCRIPTION  "modified hwVplsVCDown."
+
+             REVISION "201803091000Z"              -- Mac 8, 2018 at 10:00 GMT
+             DESCRIPTION  "Add hwVplsIngDiffServMode, hwVplsEgDiffServMode, hwVplsDiffServTrustType."
+
+             REVISION "201802261000Z"              -- Feb 26, 2018 at 10:00 GMT
+             DESCRIPTION  "modified the value of hwVplsSignal for new single types."
+
+             REVISION "201801311723Z"           --Jan 31, 2018 at 17:23 GMT 
+             DESCRIPTION "add change reason
+                Add hwVplsLdpPwSuppStatisticsTable, hwVplsBgpPwSuppStatisticsTable, hwVplsBgpMHPwSuppStatisticsTable"
+				
+             REVISION "201712201032Z"           --Dec 20, 2017 at 10:32 GMT 
+             DESCRIPTION "modify hwL2Vpn from definition to import for solving duplicate definition"  
+		
+	     REVISION "201709051644Z"           --Sep 05, 2017 at 16:44 GMT 
+             DESCRIPTION "add change reason
+                Add Leaf Node to HWVplsPwSuppStatisticsEntry, HWVplsAcSuppStatisticsEntry"
+
              REVISION "201708171644Z"           --Aug 17, 2017 at 16:44 GMT 
              DESCRIPTION "add change reason
                 Add Leaf Node to HWVplsPwSuppStatisticsEntry, HWVplsAcSuppStatisticsEntry"
@@ -116,6 +153,10 @@
              REVISION "201410271600Z"           --Oct 27, 2014 at 16:00 GMT 
              DESCRIPTION               
              "Add VPLS MIB Trap(hwVplsPwRedundancyDegradedClear)." 
+           
+           REVISION "201406181000Z"              -- June 18, 2014 at 10:00 GMT
+           DESCRIPTION
+                "Add trap nodes about VPLS VC limit alarm."
 
              REVISION "201402111600Z"           -- Feb 11, 2014 at 16:00 GMT 
              DESCRIPTION  
@@ -135,10 +176,7 @@
 
            REVISION  "200704122100Z"
            DESCRIPTION "20130126 "  
-           
-           REVISION "201406181000Z"              -- June 18, 2014 at 10:00 GMT
-           DESCRIPTION
-                "Add trap nodes about VPLS VC limit alarm."
+
                                 
             ::= { hwL2Vpn 1 }
 
@@ -423,7 +461,7 @@
 -- Node definitions
 --
 
-        hwL2Vpn OBJECT IDENTIFIER ::= { hwDatacomm 119 }
+        -- hwL2Vpn OBJECT IDENTIFIER ::= { hwDatacomm 119 }
 
         
 --           
@@ -540,7 +578,13 @@
                 hwVplsServiceName
                     OCTET STRING,                                          
                 hwVplsRowStatus
-                    RowStatus
+                    RowStatus,
+               hwVplsIngDiffServMode
+                    INTEGER,
+               hwVplsEgDiffServMode
+                    INTEGER,
+               hwVplsDiffServTrustType
+                    INTEGER
              }
 
         hwVplsVsiName OBJECT-TYPE
@@ -557,6 +601,10 @@
                 {
                 ldp(1),
                 bgp(2),
+                bgpAd(3),
+                bgpMh(4),
+                ldpBgpMixed(5),
+                ldpBgpAdMixed(6),
                 unknown(255)
                 }
             MAX-ACCESS read-create
@@ -808,7 +856,7 @@
 
         
         hwVplsDiffServDSName OBJECT-TYPE
-            SYNTAX OCTET STRING (SIZE (0..8))
+            SYNTAX OCTET STRING (SIZE (0..48))
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
@@ -990,6 +1038,47 @@
                   the configuration can not be modify or delete."
             ::= { hwVplsEntry 51 }
 
+        hwVplsIngDiffServMode OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                pipe(1),
+                shortpipe(2),
+                uniform(3)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Ingress different service mode of the interface binding of vsi , 
+                default is uniform."
+            ::= { hwVplsEntry 52 }
+		
+         hwVplsEgDiffServMode OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                pipe(1),
+                shortpipe(2),
+                uniform(3)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Egress different service mode of the interface binding of vsi , 
+                default is uniform."
+            ::= { hwVplsEntry 53 }
+
+         hwVplsDiffServTrustType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                outpri(0),
+                inpri(1),
+                ipdscp(2)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Different service trust type of the interface binding of vsi , 
+                default is outpri."
+            ::= { hwVplsEntry 54 }
         
 --           
 -- The VPLS's RT Table
@@ -2502,7 +2591,7 @@
             STATUS current
             DESCRIPTION
                 "Rate of passed packets for the last 30 seconds, 
-                based on LDP peer and QoS. Unit: pps"
+                based on LDP peer and QoS."
             ::= { hwVplsLdpQosStatisticEntry 8 }
 
 
@@ -2512,7 +2601,7 @@
             STATUS current
             DESCRIPTION
                 "Rate of passed bytes for the last 30 seconds, 
-                based on LDP peer and QoS. Unit: bps"
+                based on LDP peer and QoS."
             ::= { hwVplsLdpQosStatisticEntry 9 }
 
 
@@ -2522,7 +2611,7 @@
             STATUS current
             DESCRIPTION
                 "Rate of discarded packets for the last 30 seconds, 
-                based on LDP peer and QoS. Unit: pps"
+                based on LDP peer and QoS."
             ::= { hwVplsLdpQosStatisticEntry 10 }
 
 
@@ -2532,7 +2621,7 @@
             STATUS current
             DESCRIPTION
                 "Rate of discarded bytes for the last 30 seconds, 
-                based on LDP peer and QoS. Unit: bps"
+                based on LDP peer and QoS."
             ::= { hwVplsLdpQosStatisticEntry 11 }
 
 
@@ -2750,7 +2839,7 @@
             STATUS current
             DESCRIPTION
                 "Rate of passed packets for the last 30 seconds, 
-                based on VSI and QoS. Unit: pps"
+                based on VSI and QoS."
             ::= { hwVplsQosStatisticEntry 6 }
 
 
@@ -2760,7 +2849,7 @@
             STATUS current
             DESCRIPTION
                 "Rate of passed bytes for the last 30 seconds, 
-                based on VSI and QoS. Unit: bps"
+                based on VSI and QoS."
             ::= { hwVplsQosStatisticEntry 7 }
 
 
@@ -2770,7 +2859,7 @@
             STATUS current
             DESCRIPTION
                 "Rate of discarded packets for the last 30 seconds, 
-                based on VSI and QoS. Unit: pps"
+                based on VSI and QoS."
             ::= { hwVplsQosStatisticEntry 8 }
 
 
@@ -2780,7 +2869,7 @@
             STATUS current
             DESCRIPTION
                 "Rate of discarded bytes for the last 30 seconds, 
-                based on VSI and QoS. Unit: bps"
+                based on VSI and QoS."
             ::= { hwVplsQosStatisticEntry 9 }
 
 --           
@@ -3041,182 +3130,6 @@
                 "Reset traffic statistics of VSI's LDP peer."
             ::= { hwVplsHardPipeStatisticsEntry 13 }
 
---          
--- The VPLS PW Suppression's Statistic Table
--- 
-        hwVplsPwSuppStatisticsTable OBJECT-TYPE
-            SYNTAX SEQUENCE OF HWVplsPwSuppStatisticsEntry
-            MAX-ACCESS not-accessible
-            STATUS current
-            DESCRIPTION
-                "This table contains the VPLS-PW's suppresssion Traffic Statistic."
-            ::= { hwVplsMIBObjects 19 }
-
-        
-        hwVplsPwSuppStatisticsEntry OBJECT-TYPE
-            SYNTAX HWVplsPwSuppStatisticsEntry
-            MAX-ACCESS not-accessible
-            STATUS current
-            DESCRIPTION
-                "Provides the information of the VPLS-PW's suppresssion Traffic Statistic."
-            INDEX { hwVplsVsiName}
-            ::= { hwVplsPwSuppStatisticsTable 1 }
-
-        
-        HWVplsPwSuppStatisticsEntry::=
-            SEQUENCE { 
-                hwVplsPwSuppStatCir
-                    Counter64,
-                hwVplsPwSuppStatPir
-                    Counter64,
-                hwVplsPwSuppStatCbs
-                    Counter64,
-                hwVplsPwSuppStatPbs
-                    Counter64,  
-                hwVplsPwSuppStatPassFrames
-                    Counter64,
-                hwVplsPwSuppStatPassBytes
-                    Counter64,
-                hwVplsPwSuppStatDropFrames
-                    Counter64,
-                hwVplsPwSuppStatDropBytes
-                    Counter64, 	
-                hwVplsPwSuppStatPassBbsRate
-                    Counter64,
-                hwVplsPwSuppStatPassPbsRate
-                    Counter64,
-                hwVplsPwSuppStatDropBbsRate
-                    Counter64,
-                hwVplsPwSuppStatDropPbsRate
-                    Counter64, 				
-                hwVplsPwSuppStatResetTime
-                    DateAndTime,
-                hwVplsPwSuppStatResetStatistic
-                    INTEGER				
-             }
-	     
-        hwVplsPwSuppStatCir OBJECT-TYPE
-            SYNTAX Counter64
-            MAX-ACCESS read-only
-            STATUS current
-            DESCRIPTION
-                "This object indicates the committed information rate, based on VSI."
-            ::= { hwVplsPwSuppStatisticsEntry 1 }
-
-        
-        hwVplsPwSuppStatPir OBJECT-TYPE
-            SYNTAX Counter64
-            MAX-ACCESS read-only
-            STATUS current
-            DESCRIPTION
-                "This object indicates the peak information rate, based on VSI."
-            ::= { hwVplsPwSuppStatisticsEntry 2 }
-
-        
-        hwVplsPwSuppStatCbs OBJECT-TYPE
-            SYNTAX Counter64
-            MAX-ACCESS read-only
-            STATUS current
-            DESCRIPTION
-                "This object indicates the CBS limitation, based on VSI."
-            ::= { hwVplsPwSuppStatisticsEntry 3 }
-
-        hwVplsPwSuppStatPbs OBJECT-TYPE
-            SYNTAX Counter64
-            MAX-ACCESS read-only
-            STATUS current
-            DESCRIPTION
-                "This object indicates the PBS limitation, based on VSI."
-            ::= { hwVplsPwSuppStatisticsEntry 4 } 
-        
-        hwVplsPwSuppStatPassFrames OBJECT-TYPE
-            SYNTAX Counter64
-            MAX-ACCESS read-only
-            STATUS current
-            DESCRIPTION
-                "The total number of frames passed from PW."
-            ::= { hwVplsPwSuppStatisticsEntry 5 }
-        
-        hwVplsPwSuppStatPassBytes OBJECT-TYPE
-            SYNTAX Counter64
-            MAX-ACCESS read-only
-            STATUS current
-            DESCRIPTION
-                "The bytes passed from PW."
-            ::= { hwVplsPwSuppStatisticsEntry 6 }
-
-        
-        hwVplsPwSuppStatDropFrames OBJECT-TYPE
-            SYNTAX Counter64
-            MAX-ACCESS read-only
-            STATUS current
-            DESCRIPTION
-                "The total number of frames dropped from PW."
-            ::= { hwVplsPwSuppStatisticsEntry 7 }
-
-        
-        hwVplsPwSuppStatDropBytes OBJECT-TYPE
-            SYNTAX Counter64
-            MAX-ACCESS read-only
-            STATUS current
-            DESCRIPTION
-                "The bytes dropped from PW."
-            ::= { hwVplsPwSuppStatisticsEntry 8 }
-
-        
-        hwVplsPwSuppStatPassBbsRate OBJECT-TYPE
-            SYNTAX Counter64
-            MAX-ACCESS read-only
-            STATUS current
-            DESCRIPTION
-                "The rate of bps passed from PW."
-            ::= { hwVplsPwSuppStatisticsEntry 9 }
-
-        
-        hwVplsPwSuppStatPassPbsRate OBJECT-TYPE
-            SYNTAX Counter64
-            MAX-ACCESS read-only
-            STATUS current
-            DESCRIPTION
-                "The rate of pbs passed from PW."
-            ::= { hwVplsPwSuppStatisticsEntry 10 }
-
-        
-        hwVplsPwSuppStatDropBbsRate OBJECT-TYPE
-            SYNTAX Counter64
-            MAX-ACCESS read-only
-            STATUS current
-            DESCRIPTION
-                "The rate of bps dropped from PW."
-            ::= { hwVplsPwSuppStatisticsEntry 11 }
-
-        
-        hwVplsPwSuppStatDropPbsRate OBJECT-TYPE
-            SYNTAX Counter64
-            MAX-ACCESS read-only
-            STATUS current
-            DESCRIPTION
-                "The rate of pbs dropped from PW."
-            ::= { hwVplsPwSuppStatisticsEntry 12 }						
-        
-        hwVplsPwSuppStatResetTime OBJECT-TYPE
-            SYNTAX DateAndTime
-            MAX-ACCESS read-only
-            STATUS current
-            DESCRIPTION
-                "Last time of clean out."
-            ::= { hwVplsPwSuppStatisticsEntry 13 }
-			
-        hwVplsPwSuppStatResetStatistic OBJECT-TYPE
-            SYNTAX INTEGER
-                {
-                resetStatistic(1)                           
-                }
-            MAX-ACCESS read-write
-            STATUS current
-            DESCRIPTION
-                "Reset suppression traffic statistics of VSI."
-            ::= { hwVplsPwSuppStatisticsEntry 14 }
 
 --          
 -- The VPLS AC Suppression's Statistic Table
@@ -3227,7 +3140,7 @@
             STATUS current
             DESCRIPTION
                 "This table contains the VPLS-AC's suppresssion Traffic Statistic."
-            ::= { hwVplsMIBObjects 20 }
+            ::= { hwVplsMIBObjects 19 }
 
         
         hwVplsAcSuppStatisticsEntry OBJECT-TYPE
@@ -3239,170 +3152,2461 @@
             INDEX { hwVplsVsiName}
             ::= { hwVplsAcSuppStatisticsTable 1 }
 
-        
         HWVplsAcSuppStatisticsEntry::=
             SEQUENCE { 
-                hwVplsAcSuppStatCir
+                hwVplsAcSuppStatInBroCir
+                    Unsigned32,
+                hwVplsAcSuppStatInBroPir
+                    Unsigned32,
+                hwVplsAcSuppStatInBroCbs
+                    Unsigned32,
+                hwVplsAcSuppStatInBroPbs
+                    Unsigned32,  
+                hwVplsAcSuppStatInBroPassFrames
                     Counter64,
-                hwVplsAcSuppStatPir
+                hwVplsAcSuppStatInBroPassBytes
                     Counter64,
-                hwVplsAcSuppStatCbs
+                hwVplsAcSuppStatInBroDropFrame
                     Counter64,
-                hwVplsAcSuppStatPbs
-                    Counter64,  
-                hwVplsAcSuppStatPassFrames
-                    Counter64,
-                hwVplsAcSuppStatPassBytes
-                    Counter64,
-                hwVplsAcSuppStatDropFrame
-                    Counter64,
-                hwVplsAcSuppStatDropBytes
+                hwVplsAcSuppStatInBroDropBytes
                     Counter64, 	
-                hwVplsAcSuppStatPassBbsRate
+                hwVplsAcSuppStatInBroPassBbsRate
                     Counter64,
-                hwVplsAcSuppStatPassPbsRate
+                hwVplsAcSuppStatInBroPassPbsRate
                     Counter64,
-                hwVplsAcSuppStatDropBbsRate
+                hwVplsAcSuppStatInBroDropBbsRate
                     Counter64,
-                hwVplsAcSuppStatDropPbsRate
+                hwVplsAcSuppStatInBroDropPbsRate
                     Counter64, 				
-                hwVplsAcSuppStatResetTime 
-                    DateAndTime,
-                hwVplsAcSuppStatResetStatistic
-                    INTEGER				
+               hwVplsAcSuppStatOutBroCir
+                    Unsigned32,
+                hwVplsAcSuppStatOutBroPir
+                    Unsigned32,
+                hwVplsAcSuppStatOutBroCbs
+                    Unsigned32,
+                hwVplsAcSuppStatOutBroPbs
+                    Unsigned32,  
+                hwVplsAcSuppStatOutBroPassFrames
+                    Counter64,
+                hwVplsAcSuppStatOutBroPassBytes
+                    Counter64,
+                hwVplsAcSuppStatOutBroDropFrame
+                    Counter64,
+                hwVplsAcSuppStatOutBroDropBytes
+                    Counter64, 	
+                hwVplsAcSuppStatOutBroPassBbsRate
+                    Counter64,
+                hwVplsAcSuppStatOutBroPassPbsRate
+                    Counter64,
+                hwVplsAcSuppStatOutBroDropBbsRate
+                    Counter64,
+                hwVplsAcSuppStatOutBroDropPbsRate
+                    Counter64, 	
+                hwVplsAcSuppStatInMulCir
+                    Unsigned32,
+                hwVplsAcSuppStatInMulPir
+                    Unsigned32,
+                hwVplsAcSuppStatInMulCbs
+                    Unsigned32,
+                hwVplsAcSuppStatInMulPbs
+                    Unsigned32,  
+                hwVplsAcSuppStatInMulPassFrames
+                    Counter64,
+                hwVplsAcSuppStatInMulPassBytes
+                    Counter64,
+                hwVplsAcSuppStatInMulDropFrame
+                    Counter64,
+                hwVplsAcSuppStatInMulDropBytes
+                    Counter64, 	
+                hwVplsAcSuppStatInMulPassBbsRate
+                    Counter64,
+                hwVplsAcSuppStatInMulPassPbsRate
+                    Counter64,
+                hwVplsAcSuppStatInMulDropBbsRate
+                    Counter64,
+                hwVplsAcSuppStatInMulDropPbsRate
+                    Counter64, 				
+                hwVplsAcSuppStatOutMulCir
+                    Unsigned32,
+                hwVplsAcSuppStatOutMulPir
+                    Unsigned32,
+                hwVplsAcSuppStatOutMulCbs
+                    Unsigned32,
+                hwVplsAcSuppStatOutMulPbs
+                    Unsigned32,  
+                hwVplsAcSuppStatOutMulPassFrames
+                    Counter64,
+                hwVplsAcSuppStatOutMulPassBytes
+                    Counter64,
+                hwVplsAcSuppStatOutMulDropFrame
+                    Counter64,
+                hwVplsAcSuppStatOutMulDropBytes
+                    Counter64, 	
+                hwVplsAcSuppStatOutMulPassBbsRate
+                    Counter64,
+                hwVplsAcSuppStatOutMulPassPbsRate
+                    Counter64,
+                hwVplsAcSuppStatOutMulDropBbsRate
+                    Counter64,
+                hwVplsAcSuppStatOutMulDropPbsRate
+                    Counter64, 	
+                hwVplsAcSuppStatInUnkCir
+                    Unsigned32,
+                hwVplsAcSuppStatInUnkPir
+                    Unsigned32,
+                hwVplsAcSuppStatInUnkCbs
+                    Unsigned32,
+                hwVplsAcSuppStatInUnkPbs
+                    Unsigned32,  
+                hwVplsAcSuppStatInUnkPassFrames
+                    Counter64,
+                hwVplsAcSuppStatInUnkPassBytes
+                    Counter64,
+                hwVplsAcSuppStatInUnkDropFrame
+                    Counter64,
+                hwVplsAcSuppStatInUnkDropBytes
+                    Counter64, 	
+                hwVplsAcSuppStatInUnkPassBbsRate
+                    Counter64,
+                hwVplsAcSuppStatInUnkPassPbsRate
+                    Counter64,
+                hwVplsAcSuppStatInUnkDropBbsRate
+                    Counter64,
+                hwVplsAcSuppStatInUnkDropPbsRate
+                    Counter64, 				
+                hwVplsAcSuppStatOutUnkCir
+                    Unsigned32,
+                hwVplsAcSuppStatOutUnkPir
+                    Unsigned32,
+                hwVplsAcSuppStatOutUnkCbs
+                    Unsigned32,
+                hwVplsAcSuppStatOutUnkPbs
+                    Unsigned32,  
+                hwVplsAcSuppStatOutUnkPassFrames
+                    Counter64,
+                hwVplsAcSuppStatOutUnkPassBytes
+                    Counter64,
+                hwVplsAcSuppStatOutUnkDropFrame
+                    Counter64,
+                hwVplsAcSuppStatOutUnkDropBytes
+                    Counter64, 	
+                hwVplsAcSuppStatOutUnkPassBbsRate
+                    Counter64,
+                hwVplsAcSuppStatOutUnkPassPbsRate
+                    Counter64,
+                hwVplsAcSuppStatOutUnkDropBbsRate
+                    Counter64,
+                hwVplsAcSuppStatOutUnkDropPbsRate
+                    Counter64
              }
 	     
-        hwVplsAcSuppStatCir OBJECT-TYPE
-            SYNTAX Counter64
+        hwVplsAcSuppStatInBroCir OBJECT-TYPE
+            SYNTAX Unsigned32
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "This object indicates the committed information rate, based on VSI."
+                "This object indicates the broadcast in-bound committed information rate, based on VSI."
             ::= { hwVplsAcSuppStatisticsEntry 1 }
 
         
-        hwVplsAcSuppStatPir OBJECT-TYPE
-            SYNTAX Counter64
+        hwVplsAcSuppStatInBroPir OBJECT-TYPE
+            SYNTAX Unsigned32
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "This object indicates the peak information rate, based on VSI."
+                "This object indicates the broadcast in-bound peak information rate, based on VSI."
             ::= { hwVplsAcSuppStatisticsEntry 2 }
 
         
-        hwVplsAcSuppStatCbs OBJECT-TYPE
-            SYNTAX Counter64
+        hwVplsAcSuppStatInBroCbs OBJECT-TYPE
+            SYNTAX Unsigned32
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "This object indicates the CBS limitation, based on VSI."
+                "This object indicates the broadcast in-bound CBS limitation, based on VSI."
             ::= { hwVplsAcSuppStatisticsEntry 3 }
 
-        hwVplsAcSuppStatPbs OBJECT-TYPE
-            SYNTAX Counter64
+        hwVplsAcSuppStatInBroPbs OBJECT-TYPE
+            SYNTAX Unsigned32
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "This object indicates the PBS limitation, based on VSI."
+                "This object indicates the broadcast in-bound PBS limitation, based on VSI."
             ::= { hwVplsAcSuppStatisticsEntry 4 } 
         
-        hwVplsAcSuppStatPassFrames OBJECT-TYPE
+        hwVplsAcSuppStatInBroPassFrames OBJECT-TYPE
             SYNTAX Counter64
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The total number of frames passed from AC."
+                "The total number of broadcast in-bound frames passed from AC."
             ::= { hwVplsAcSuppStatisticsEntry 5 }
         
-        hwVplsAcSuppStatPassBytes OBJECT-TYPE
+        hwVplsAcSuppStatInBroPassBytes OBJECT-TYPE
             SYNTAX Counter64
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The bytes passed from PW."
+                "The broadcast in-bound bytes passed from AC."
             ::= { hwVplsAcSuppStatisticsEntry 6 }
 
         
-        hwVplsAcSuppStatDropFrame OBJECT-TYPE
+        hwVplsAcSuppStatInBroDropFrame OBJECT-TYPE
             SYNTAX Counter64
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The total number of frames dropped from AC."
+                "The total number of broadcast in-bound frames dropped from AC."
             ::= { hwVplsAcSuppStatisticsEntry 7 }
 
         
-        hwVplsAcSuppStatDropBytes OBJECT-TYPE
+        hwVplsAcSuppStatInBroDropBytes OBJECT-TYPE
             SYNTAX Counter64
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The bytes dropped from AC."
+                "The broadcast in-bound bytes dropped from AC."
             ::= { hwVplsAcSuppStatisticsEntry 8 }
 
         
-        hwVplsAcSuppStatPassBbsRate OBJECT-TYPE
+        hwVplsAcSuppStatInBroPassBbsRate OBJECT-TYPE
             SYNTAX Counter64
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The rate of bps passed from AC."
+                "The broadcast in-bound rate of bps passed from AC."
             ::= { hwVplsAcSuppStatisticsEntry 9 }
 
         
-        hwVplsAcSuppStatPassPbsRate OBJECT-TYPE
+        hwVplsAcSuppStatInBroPassPbsRate OBJECT-TYPE
             SYNTAX Counter64
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The rate of pbs passed from AC."
+                "The broadcast in-bound rate of pbs passed from AC."
             ::= { hwVplsAcSuppStatisticsEntry 10 }
 
         
-        hwVplsAcSuppStatDropBbsRate OBJECT-TYPE
+        hwVplsAcSuppStatInBroDropBbsRate OBJECT-TYPE
             SYNTAX Counter64
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The rate of bps dropped from AC."
+                "The broadcast in-bound rate of bps dropped from AC."
             ::= { hwVplsAcSuppStatisticsEntry 11 }
 
         
-        hwVplsAcSuppStatDropPbsRate OBJECT-TYPE
+        hwVplsAcSuppStatInBroDropPbsRate OBJECT-TYPE
             SYNTAX Counter64
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The rate of pbs dropped from AC."
-            ::= { hwVplsAcSuppStatisticsEntry 12 }						
-        
-        hwVplsAcSuppStatResetTime OBJECT-TYPE
-            SYNTAX DateAndTime
+                "The broadcast in-bound rate of pbs dropped from AC."
+            ::= { hwVplsAcSuppStatisticsEntry 12 }	
+
+
+        hwVplsAcSuppStatOutBroCir OBJECT-TYPE
+            SYNTAX Unsigned32
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Last time of clean out."
+                "This object indicates the broadcast out-bound committed information rate, based on VSI."
             ::= { hwVplsAcSuppStatisticsEntry 13 }
-			
-        hwVplsAcSuppStatResetStatistic OBJECT-TYPE
-            SYNTAX INTEGER
-                {
-                resetStatistic(1)                           
-                }
-            MAX-ACCESS read-write
+
+        
+        hwVplsAcSuppStatOutBroPir OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Reset suppression traffic statistics of VSI."
+                "This object indicates the broadcast out-bound peak information rate, based on VSI."
             ::= { hwVplsAcSuppStatisticsEntry 14 }
 
+        
+        hwVplsAcSuppStatOutBroCbs OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the broadcast out-bound CBS limitation, based on VSI."
+            ::= { hwVplsAcSuppStatisticsEntry 15 }
+
+        hwVplsAcSuppStatOutBroPbs OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the broadcast out-bound PBS limitation, based on VSI."
+            ::= { hwVplsAcSuppStatisticsEntry 16 } 
+        
+        hwVplsAcSuppStatOutBroPassFrames OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of broadcast out-bound frames passed from AC."
+            ::= { hwVplsAcSuppStatisticsEntry 17 }
+        
+        hwVplsAcSuppStatOutBroPassBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The broadcast out-bound bytes passed from AC."
+            ::= { hwVplsAcSuppStatisticsEntry 18 }
+
+        
+        hwVplsAcSuppStatOutBroDropFrame OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of broadcast out-bound frames dropped from AC."
+            ::= { hwVplsAcSuppStatisticsEntry 19 }
+
+        
+        hwVplsAcSuppStatOutBroDropBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The broadcast out-bound bytes dropped from AC."
+            ::= { hwVplsAcSuppStatisticsEntry 20 }
+
+        
+        hwVplsAcSuppStatOutBroPassBbsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The broadcast out-bound rate of bps passed from AC."
+            ::= { hwVplsAcSuppStatisticsEntry 21 }
+
+        
+        hwVplsAcSuppStatOutBroPassPbsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The broadcast out-bound rate of pbs passed from AC."
+            ::= { hwVplsAcSuppStatisticsEntry 22 }
+
+        
+        hwVplsAcSuppStatOutBroDropBbsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The broadcast out-bound rate of bps dropped from AC."
+            ::= { hwVplsAcSuppStatisticsEntry 23 }
+
+        
+        hwVplsAcSuppStatOutBroDropPbsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The broadcast out-bound rate of pbs dropped from AC."
+            ::= { hwVplsAcSuppStatisticsEntry 24 }	
+
+
+       hwVplsAcSuppStatInMulCir OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the multicast in-bound committed information rate, based on VSI."
+            ::= { hwVplsAcSuppStatisticsEntry 25 }
+
+        
+        hwVplsAcSuppStatInMulPir OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the multicast in-bound peak information rate, based on VSI."
+            ::= { hwVplsAcSuppStatisticsEntry 26 }
+
+     
+        hwVplsAcSuppStatInMulCbs OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the multicast in-bound CBS limitation, based on VSI."
+            ::= { hwVplsAcSuppStatisticsEntry 27 }
+
+        hwVplsAcSuppStatInMulPbs OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the multicast in-bound PBS limitation, based on VSI."
+            ::= { hwVplsAcSuppStatisticsEntry 28 } 
+        
+        hwVplsAcSuppStatInMulPassFrames OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of multicast in-bound frames passed from AC."
+            ::= { hwVplsAcSuppStatisticsEntry 29 }
+        
+        hwVplsAcSuppStatInMulPassBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The multicast in-bound bytes passed from AC."
+            ::= { hwVplsAcSuppStatisticsEntry  30 }
+
+        
+        hwVplsAcSuppStatInMulDropFrame OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of multicast in-bound frames dropped from AC."
+            ::= { hwVplsAcSuppStatisticsEntry 31 }
+
+        
+        hwVplsAcSuppStatInMulDropBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The multicast in-bound bytes dropped from AC."
+            ::= { hwVplsAcSuppStatisticsEntry 32 }
+
+        
+        hwVplsAcSuppStatInMulPassBbsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The multicast in-bound rate of bps passed from AC."
+            ::= { hwVplsAcSuppStatisticsEntry 33 }
+
+        
+        hwVplsAcSuppStatInMulPassPbsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The multicast in-bound rate of pbs passed from AC."
+            ::= { hwVplsAcSuppStatisticsEntry 34 }
+
+        
+        hwVplsAcSuppStatInMulDropBbsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The multicast in-bound rate of bps dropped from AC."
+            ::= { hwVplsAcSuppStatisticsEntry 35 }
+
+        
+        hwVplsAcSuppStatInMulDropPbsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The multicast in-bound rate of pbs dropped from AC."
+            ::= { hwVplsAcSuppStatisticsEntry 36 }		
+
+
+        hwVplsAcSuppStatOutMulCir OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the multicast out-bound committed information rate, based on VSI."
+            ::= { hwVplsAcSuppStatisticsEntry 37 }
+
+        
+        hwVplsAcSuppStatOutMulPir OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the multicast out-bound peak information rate, based on VSI."
+            ::= { hwVplsAcSuppStatisticsEntry 38 }
+
+     
+        hwVplsAcSuppStatOutMulCbs OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the multicast out-bound CBS limitation, based on VSI."
+            ::= { hwVplsAcSuppStatisticsEntry 39 }
+
+        hwVplsAcSuppStatOutMulPbs OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the multicast out-bound PBS limitation, based on VSI."
+            ::= { hwVplsAcSuppStatisticsEntry 40 } 
+        
+        hwVplsAcSuppStatOutMulPassFrames OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of multicast out-bound frames passed from AC."
+            ::= { hwVplsAcSuppStatisticsEntry 41 }
+        
+        hwVplsAcSuppStatOutMulPassBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The multicast out-bound bytes passed from AC."
+            ::= { hwVplsAcSuppStatisticsEntry  42 }
+
+        
+        hwVplsAcSuppStatOutMulDropFrame OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of multicast out-bound frames dropped from AC."
+            ::= { hwVplsAcSuppStatisticsEntry 43 }
+
+        
+        hwVplsAcSuppStatOutMulDropBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The multicast out-bound bytes dropped from AC."
+            ::= { hwVplsAcSuppStatisticsEntry 44 }
+
+        
+        hwVplsAcSuppStatOutMulPassBbsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The multicast out-bound rate of bps passed from AC."
+            ::= { hwVplsAcSuppStatisticsEntry 45 }
+
+        
+        hwVplsAcSuppStatOutMulPassPbsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The multicast out-bound rate of pbs passed from AC."
+            ::= { hwVplsAcSuppStatisticsEntry 46 }
+
+        
+        hwVplsAcSuppStatOutMulDropBbsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The multicast out-bound rate of bps dropped from AC."
+            ::= { hwVplsAcSuppStatisticsEntry 47 }
+
+        
+        hwVplsAcSuppStatOutMulDropPbsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The multicast out-bound rate of pbs dropped from AC."
+            ::= { hwVplsAcSuppStatisticsEntry 48 }	
+
+
+        hwVplsAcSuppStatInUnkCir OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the unicast in-bound committed information rate, based on VSI."
+            ::= { hwVplsAcSuppStatisticsEntry 49 }
+
+        
+        hwVplsAcSuppStatInUnkPir OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the unicast in-bound peak information rate, based on VSI."
+            ::= { hwVplsAcSuppStatisticsEntry 50 }
+
+     
+        hwVplsAcSuppStatInUnkCbs OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the unicast in-bound CBS limitation, based on VSI."
+            ::= { hwVplsAcSuppStatisticsEntry 51 }
+
+        hwVplsAcSuppStatInUnkPbs OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the unicast in-bound PBS limitation, based on VSI."
+            ::= { hwVplsAcSuppStatisticsEntry 52 } 
+        
+        hwVplsAcSuppStatInUnkPassFrames OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of unicast in-bound frames passed from AC."
+            ::= { hwVplsAcSuppStatisticsEntry 53 }
+        
+        hwVplsAcSuppStatInUnkPassBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The unicast in-bound bytes passed from AC."
+            ::= { hwVplsAcSuppStatisticsEntry 54 }
+
+        
+        hwVplsAcSuppStatInUnkDropFrame OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of unicast in-bound frames dropped from AC."
+            ::= { hwVplsAcSuppStatisticsEntry 55 }
+
+        
+        hwVplsAcSuppStatInUnkDropBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The unicast in-bound bytes dropped from AC."
+            ::= { hwVplsAcSuppStatisticsEntry 56 }
+
+        
+        hwVplsAcSuppStatInUnkPassBbsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The unicast in-bound rate of bps passed from AC."
+            ::= { hwVplsAcSuppStatisticsEntry 57 }
+
+        
+        hwVplsAcSuppStatInUnkPassPbsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The unicast in-bound rate of pbs passed from AC."
+            ::= { hwVplsAcSuppStatisticsEntry 58 }
+
+        
+        hwVplsAcSuppStatInUnkDropBbsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The unicast in-bound rate of bps dropped from AC."
+            ::= { hwVplsAcSuppStatisticsEntry 59 }
+
+        
+        hwVplsAcSuppStatInUnkDropPbsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The unicast in-bound rate of pbs dropped from AC."
+            ::= { hwVplsAcSuppStatisticsEntry 60 }						
+
+
+        hwVplsAcSuppStatOutUnkCir OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the unicast out-bound committed information rate, based on VSI."
+            ::= { hwVplsAcSuppStatisticsEntry 61 }
+
+        
+        hwVplsAcSuppStatOutUnkPir OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the unicast out-bound peak information rate, based on VSI."
+            ::= { hwVplsAcSuppStatisticsEntry 62 }
+
+     
+        hwVplsAcSuppStatOutUnkCbs OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the unicast out-bound CBS limitation, based on VSI."
+            ::= { hwVplsAcSuppStatisticsEntry 63 }
+
+        hwVplsAcSuppStatOutUnkPbs OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the unicast out-bound PBS limitation, based on VSI."
+            ::= { hwVplsAcSuppStatisticsEntry 64 } 
+        
+        hwVplsAcSuppStatOutUnkPassFrames OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of unicast out-bound frames passed from AC."
+            ::= { hwVplsAcSuppStatisticsEntry 65 }
+        
+        hwVplsAcSuppStatOutUnkPassBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The unicast bytes passed from AC."
+            ::= { hwVplsAcSuppStatisticsEntry 66 }
+
+        
+        hwVplsAcSuppStatOutUnkDropFrame OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of unicast out-bound frames dropped from AC."
+            ::= { hwVplsAcSuppStatisticsEntry 67 }
+
+        
+        hwVplsAcSuppStatOutUnkDropBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The unicast out-bound bytes dropped from AC."
+            ::= { hwVplsAcSuppStatisticsEntry 68 }
+
+        
+        hwVplsAcSuppStatOutUnkPassBbsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The unicast out-bound rate of bps passed from AC."
+            ::= { hwVplsAcSuppStatisticsEntry 69 }
+
+        
+        hwVplsAcSuppStatOutUnkPassPbsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The unicast out-bound rate of pbs passed from AC."
+            ::= { hwVplsAcSuppStatisticsEntry 70 }
+
+        
+        hwVplsAcSuppStatOutUnkDropBbsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The unicast out-bound rate of bps dropped from AC."
+            ::= { hwVplsAcSuppStatisticsEntry 71 }
+
+        
+        hwVplsAcSuppStatOutUnkDropPbsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The unicast out-bound rate of pbs dropped from AC."
+            ::= { hwVplsAcSuppStatisticsEntry 72 }
+			
+--          
+-- The VPLS LDP PW Suppression's Statistic Table
+-- 
+        hwVplsLdpPwSuppStatisticsTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HWVplsLdpPwSuppStatisticsEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table contains the VPLS-LDP-PW's suppresssion Traffic Statistic."
+            ::= { hwVplsMIBObjects 20 }
+
+        
+        hwVplsLdpPwSuppStatisticsEntry OBJECT-TYPE
+            SYNTAX HWVplsLdpPwSuppStatisticsEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Provides the information of the VPLS-LDP-PW's suppresssion Traffic Statistic."
+            INDEX { hwVplsVsiName, hwVplsLdpPwSuppStatPwID, hwVplsLdpPwSuppStatRemoteIpAddr}
+            ::= { hwVplsLdpPwSuppStatisticsTable 1 }	
+     
+        HWVplsLdpPwSuppStatisticsEntry::=
+            SEQUENCE { 
+                hwVplsLdpPwSuppStatPwID
+                    Unsigned32,
+                hwVplsLdpPwSuppStatRemoteIpAddr
+                    IpAddress,
+                hwVplsLdpPwSuppStatBroCir
+                    Unsigned32,
+                hwVplsLdpPwSuppStatBroPir
+                    Unsigned32,
+                hwVplsLdpPwSuppStatBroCbs
+                    Unsigned32,
+                hwVplsLdpPwSuppStatBroPbs
+                    Unsigned32,  
+                hwVplsLdpPwSuppStatBroPassFrames
+                    Counter64,
+                hwVplsLdpPwSuppStatBroPassBytes
+                    Counter64,
+                hwVplsLdpPwSuppStatBroDropFrames
+                    Counter64,
+                hwVplsLdpPwSuppStatBroDropBytes
+                    Counter64, 	
+                hwVplsLdpPwSuppStatBroPassBpsRate
+                    Counter64,
+                hwVplsLdpPwSuppStatBroPassPpsRate
+                    Counter64,
+                hwVplsLdpPwSuppStatBroDropBpsRate
+                    Counter64,
+                hwVplsLdpPwSuppStatBroDropPpsRate
+                    Counter64,	
+                hwVplsLdpPwSuppStatMulCir
+                    Unsigned32,
+                hwVplsLdpPwSuppStatMulPir
+                    Unsigned32,
+                hwVplsLdpPwSuppStatMulCbs
+                    Unsigned32,
+                hwVplsLdpPwSuppStatMulPbs
+                    Unsigned32,  
+                hwVplsLdpPwSuppStatMulPassFrames
+                    Counter64,
+                hwVplsLdpPwSuppStatMulPassBytes
+                    Counter64,
+                hwVplsLdpPwSuppStatMulDropFrames
+                    Counter64,
+                hwVplsLdpPwSuppStatMulDropBytes
+                    Counter64, 	
+                hwVplsLdpPwSuppStatMulPassBpsRate
+                    Counter64,
+                hwVplsLdpPwSuppStatMulPassPpsRate
+                    Counter64,
+                hwVplsLdpPwSuppStatMulDropBpsRate
+                    Counter64,
+                hwVplsLdpPwSuppStatMulDropPpsRate
+                    Counter64,	
+                hwVplsLdpPwSuppStatUnkCir
+                    Unsigned32,
+                hwVplsLdpPwSuppStatUnkPir
+                    Unsigned32,
+                hwVplsLdpPwSuppStatUnkCbs
+                    Unsigned32,
+                hwVplsLdpPwSuppStatUnkPbs
+                    Unsigned32,  
+                hwVplsLdpPwSuppStatUnkPassFrames
+                    Counter64,
+                hwVplsLdpPwSuppStatUnkPassBytes
+                    Counter64,
+                hwVplsLdpPwSuppStatUnkDropFrames
+                    Counter64,
+                hwVplsLdpPwSuppStatUnkDropBytes
+                    Counter64, 	
+                hwVplsLdpPwSuppStatUnkPassBpsRate
+                    Counter64,
+                hwVplsLdpPwSuppStatUnkPassPpsRate
+                    Counter64,
+                hwVplsLdpPwSuppStatUnkDropBpsRate
+                    Counter64,
+                hwVplsLdpPwSuppStatUnkDropPpsRate
+                    Counter64
+             }
+        hwVplsLdpPwSuppStatPwID OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates the PW ID."
+            ::= { hwVplsLdpPwSuppStatisticsEntry 1 }
+			
+        hwVplsLdpPwSuppStatRemoteIpAddr OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates the IP address of the remote end."
+            ::= { hwVplsLdpPwSuppStatisticsEntry 2 }
+		
+        hwVplsLdpPwSuppStatBroCir OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the broadcast committed information rate, based on VSI LDP PW."
+            ::= { hwVplsLdpPwSuppStatisticsEntry 3 }
+
+        
+        hwVplsLdpPwSuppStatBroPir OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the broadcast peak information rate, based on VSI LDP PW."
+            ::= { hwVplsLdpPwSuppStatisticsEntry 4 }
+
+        
+        hwVplsLdpPwSuppStatBroCbs OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the broadcast CBS limitation, based on VSI LDP PW."
+            ::= { hwVplsLdpPwSuppStatisticsEntry 5}
+
+        hwVplsLdpPwSuppStatBroPbs OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the broadcast PBS limitation, based on VSI LDP PW."
+            ::= { hwVplsLdpPwSuppStatisticsEntry 6 } 
+        
+        hwVplsLdpPwSuppStatBroPassFrames OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of broadcast frames passed from PW."
+            ::= { hwVplsLdpPwSuppStatisticsEntry 7 }
+        
+        hwVplsLdpPwSuppStatBroPassBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The broadcast bytes passed from PW."
+            ::= { hwVplsLdpPwSuppStatisticsEntry 8 }
+
+        
+        hwVplsLdpPwSuppStatBroDropFrames OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of broadcast frames dropped from PW."
+            ::= { hwVplsLdpPwSuppStatisticsEntry 9 }
+
+        
+        hwVplsLdpPwSuppStatBroDropBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The broadcast bytes dropped from PW."
+            ::= { hwVplsLdpPwSuppStatisticsEntry 10 }
+
+        
+        hwVplsLdpPwSuppStatBroPassBpsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The broadcast rate of bps passed from PW."
+            ::= { hwVplsLdpPwSuppStatisticsEntry 11 }
+
+        
+        hwVplsLdpPwSuppStatBroPassPpsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The broadcast rate of pps passed from PW."
+            ::= { hwVplsLdpPwSuppStatisticsEntry 12 }
+
+        
+        hwVplsLdpPwSuppStatBroDropBpsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The broadcast rate of bps dropped from PW."
+            ::= { hwVplsLdpPwSuppStatisticsEntry 13 }
+
+        
+        hwVplsLdpPwSuppStatBroDropPpsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The broadcast rate of pps dropped from PW."
+            ::= { hwVplsLdpPwSuppStatisticsEntry 14 }
+			
+		hwVplsLdpPwSuppStatMulCir OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the multicast committed information rate, based on VSI LDP PW."
+            ::= { hwVplsLdpPwSuppStatisticsEntry 15 }
+
+        
+        hwVplsLdpPwSuppStatMulPir OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the multicast peak information rate, based on VSI LDP PW."
+            ::= { hwVplsLdpPwSuppStatisticsEntry 16 }
+
+        
+        hwVplsLdpPwSuppStatMulCbs OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the multicast CBS limitation, based on VSI LDP PW."
+            ::= { hwVplsLdpPwSuppStatisticsEntry 17}
+
+        hwVplsLdpPwSuppStatMulPbs OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the multicast PBS limitation, based on VSI LDP PW."
+            ::= { hwVplsLdpPwSuppStatisticsEntry 18 } 
+        
+        hwVplsLdpPwSuppStatMulPassFrames OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of multicast frames passed from PW."
+            ::= { hwVplsLdpPwSuppStatisticsEntry 19 }
+        
+        hwVplsLdpPwSuppStatMulPassBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The multicast bytes passed from PW."
+            ::= { hwVplsLdpPwSuppStatisticsEntry 20 }
+
+        
+        hwVplsLdpPwSuppStatMulDropFrames OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of multicast frames dropped from PW."
+            ::= { hwVplsLdpPwSuppStatisticsEntry 21 }
+
+        
+        hwVplsLdpPwSuppStatMulDropBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The multicast bytes dropped from PW."
+            ::= { hwVplsLdpPwSuppStatisticsEntry 22 }
+
+        
+        hwVplsLdpPwSuppStatMulPassBpsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The multicast rate of bps passed from PW."
+            ::= { hwVplsLdpPwSuppStatisticsEntry 23 }
+
+        
+        hwVplsLdpPwSuppStatMulPassPpsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The multicast rate of pps passed from PW."
+            ::= { hwVplsLdpPwSuppStatisticsEntry 24 }
+
+        
+        hwVplsLdpPwSuppStatMulDropBpsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The multicast rate of bps dropped from PW."
+            ::= { hwVplsLdpPwSuppStatisticsEntry 25 }
+
+        
+        hwVplsLdpPwSuppStatMulDropPpsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The multicast rate of pps dropped from PW."
+            ::= { hwVplsLdpPwSuppStatisticsEntry 26 }
+			
+		hwVplsLdpPwSuppStatUnkCir OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the unknown-unicast committed information rate, based on VSI LDP PW."
+            ::= { hwVplsLdpPwSuppStatisticsEntry 27 }
+
+        
+        hwVplsLdpPwSuppStatUnkPir OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the unknown-unicast peak information rate, based on VSI LDP PW."
+            ::= { hwVplsLdpPwSuppStatisticsEntry 28 }
+
+        
+        hwVplsLdpPwSuppStatUnkCbs OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the unknown-unicast CBS limitation, based on VSI LDP PW."
+            ::= { hwVplsLdpPwSuppStatisticsEntry 29 }
+
+        hwVplsLdpPwSuppStatUnkPbs OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the unknown-unicast PBS limitation, based on VSI LDP PW."
+            ::= { hwVplsLdpPwSuppStatisticsEntry 30 } 
+        
+        hwVplsLdpPwSuppStatUnkPassFrames OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of unknown-unicast frames passed from PW."
+            ::= { hwVplsLdpPwSuppStatisticsEntry 31 }
+        
+        hwVplsLdpPwSuppStatUnkPassBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The unknown-unicast bytes passed from PW."
+            ::= { hwVplsLdpPwSuppStatisticsEntry 32 }
+
+        
+        hwVplsLdpPwSuppStatUnkDropFrames OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of unknown-unicast frames dropped from PW."
+            ::= { hwVplsLdpPwSuppStatisticsEntry 33 }
+
+        
+        hwVplsLdpPwSuppStatUnkDropBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The unknown-unicast bytes dropped from PW."
+            ::= { hwVplsLdpPwSuppStatisticsEntry 34 }
+
+        
+        hwVplsLdpPwSuppStatUnkPassBpsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The unknown-unicast rate of bps passed from PW."
+            ::= { hwVplsLdpPwSuppStatisticsEntry 35 }
+
+        
+        hwVplsLdpPwSuppStatUnkPassPpsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The unknown-unicast rate of pps passed from PW."
+            ::= { hwVplsLdpPwSuppStatisticsEntry 36 }
+
+        
+        hwVplsLdpPwSuppStatUnkDropBpsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The unknown-unicast rate of bps dropped from PW."
+            ::= { hwVplsLdpPwSuppStatisticsEntry 37 }
+
+        
+        hwVplsLdpPwSuppStatUnkDropPpsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The unknown-unicast rate of pps dropped from PW."
+            ::= { hwVplsLdpPwSuppStatisticsEntry 38 }
+
+--          
+-- The VPLS BGP PW Suppression's Statistic Table
+-- 
+        hwVplsBgpPwSuppStatisticsTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HWVplsBgpPwSuppStatisticsEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table contains the VPLS-BGP-PW's suppresssion Traffic Statistic."
+            ::= { hwVplsMIBObjects 21 }
+
+        
+        hwVplsBgpPwSuppStatisticsEntry OBJECT-TYPE
+            SYNTAX HWVplsBgpPwSuppStatisticsEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Provides the information of the VPLS-BGP-PW's suppresssion Traffic Statistic."
+            INDEX { hwVplsVsiName, hwVplsBgpPwSuppStatSiteID, hwVplsBgpPwSuppStatRemoteIpAddr}
+            ::= { hwVplsBgpPwSuppStatisticsTable 1 }	
+     
+        HWVplsBgpPwSuppStatisticsEntry::=
+            SEQUENCE { 
+                hwVplsBgpPwSuppStatSiteID
+                    Unsigned32,
+                hwVplsBgpPwSuppStatRemoteIpAddr
+                    IpAddress,
+                hwVplsBgpPwSuppStatBroCir
+                    Unsigned32,
+                hwVplsBgpPwSuppStatBroPir
+                    Unsigned32,
+                hwVplsBgpPwSuppStatBroCbs
+                    Unsigned32,
+                hwVplsBgpPwSuppStatBroPbs
+                    Unsigned32,  
+                hwVplsBgpPwSuppStatBroPassFrames
+                    Counter64,
+                hwVplsBgpPwSuppStatBroPassBytes
+                    Counter64,
+                hwVplsBgpPwSuppStatBroDropFrames
+                    Counter64,
+                hwVplsBgpPwSuppStatBroDropBytes
+                    Counter64, 	
+                hwVplsBgpPwSuppStatBroPassBpsRate
+                    Counter64,
+                hwVplsBgpPwSuppStatBroPassPpsRate
+                    Counter64,
+                hwVplsBgpPwSuppStatBroDropBpsRate
+                    Counter64,
+                hwVplsBgpPwSuppStatBroDropPpsRate
+                    Counter64,	
+                hwVplsBgpPwSuppStatMulCir
+                    Unsigned32,
+                hwVplsBgpPwSuppStatMulPir
+                    Unsigned32,
+                hwVplsBgpPwSuppStatMulCbs
+                    Unsigned32,
+                hwVplsBgpPwSuppStatMulPbs
+                    Unsigned32,  
+                hwVplsBgpPwSuppStatMulPassFrames
+                    Counter64,
+                hwVplsBgpPwSuppStatMulPassBytes
+                    Counter64,
+                hwVplsBgpPwSuppStatMulDropFrames
+                    Counter64,
+                hwVplsBgpPwSuppStatMulDropBytes
+                    Counter64, 	
+                hwVplsBgpPwSuppStatMulPassBpsRate
+                    Counter64,
+                hwVplsBgpPwSuppStatMulPassPpsRate
+                    Counter64,
+                hwVplsBgpPwSuppStatMulDropBpsRate
+                    Counter64,
+                hwVplsBgpPwSuppStatMulDropPpsRate
+                    Counter64,	
+                hwVplsBgpPwSuppStatUnkCir
+                    Unsigned32,
+                hwVplsBgpPwSuppStatUnkPir
+                    Unsigned32,
+                hwVplsBgpPwSuppStatUnkCbs
+                    Unsigned32,
+                hwVplsBgpPwSuppStatUnkPbs
+                    Unsigned32,  
+                hwVplsBgpPwSuppStatUnkPassFrames
+                    Counter64,
+                hwVplsBgpPwSuppStatUnkPassBytes
+                    Counter64,
+                hwVplsBgpPwSuppStatUnkDropFrames
+                    Counter64,
+                hwVplsBgpPwSuppStatUnkDropBytes
+                    Counter64, 	
+                hwVplsBgpPwSuppStatUnkPassBpsRate
+                    Counter64,
+                hwVplsBgpPwSuppStatUnkPassPpsRate
+                    Counter64,
+                hwVplsBgpPwSuppStatUnkDropBpsRate
+                    Counter64,
+                hwVplsBgpPwSuppStatUnkDropPpsRate
+                    Counter64
+             }
+        hwVplsBgpPwSuppStatSiteID OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates the PW ID."
+            ::= { hwVplsBgpPwSuppStatisticsEntry 1 }
+			
+        hwVplsBgpPwSuppStatRemoteIpAddr OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates the IP address of the remote end."
+            ::= { hwVplsBgpPwSuppStatisticsEntry 2 }
+		
+        hwVplsBgpPwSuppStatBroCir OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the broadcast committed information rate, based on VSI BGP PW."
+            ::= { hwVplsBgpPwSuppStatisticsEntry 3 }
+
+        
+        hwVplsBgpPwSuppStatBroPir OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the broadcast peak information rate, based on VSI BGP PW."
+            ::= { hwVplsBgpPwSuppStatisticsEntry 4 }
+
+        
+        hwVplsBgpPwSuppStatBroCbs OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the broadcast CBS limitation, based on VSI BGP PW."
+            ::= { hwVplsBgpPwSuppStatisticsEntry 5}
+
+        hwVplsBgpPwSuppStatBroPbs OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the broadcast PBS limitation, based on VSI BGP PW."
+            ::= { hwVplsBgpPwSuppStatisticsEntry 6 } 
+        
+        hwVplsBgpPwSuppStatBroPassFrames OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of broadcast frames passed from PW."
+            ::= { hwVplsBgpPwSuppStatisticsEntry 7 }
+        
+        hwVplsBgpPwSuppStatBroPassBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The broadcast bytes passed from PW."
+            ::= { hwVplsBgpPwSuppStatisticsEntry 8 }
+
+        
+        hwVplsBgpPwSuppStatBroDropFrames OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of broadcast frames dropped from PW."
+            ::= { hwVplsBgpPwSuppStatisticsEntry 9 }
+
+        
+        hwVplsBgpPwSuppStatBroDropBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The broadcast bytes dropped from PW."
+            ::= { hwVplsBgpPwSuppStatisticsEntry 10 }
+
+        
+        hwVplsBgpPwSuppStatBroPassBpsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The broadcast rate of bps passed from PW."
+            ::= { hwVplsBgpPwSuppStatisticsEntry 11 }
+
+        
+        hwVplsBgpPwSuppStatBroPassPpsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The broadcast rate of pps passed from PW."
+            ::= { hwVplsBgpPwSuppStatisticsEntry 12 }
+
+        
+        hwVplsBgpPwSuppStatBroDropBpsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The broadcast rate of bps dropped from PW."
+            ::= { hwVplsBgpPwSuppStatisticsEntry 13 }
+
+        
+        hwVplsBgpPwSuppStatBroDropPpsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The broadcast rate of pps dropped from PW."
+            ::= { hwVplsBgpPwSuppStatisticsEntry 14 }
+			
+        hwVplsBgpPwSuppStatMulCir OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the multicast committed information rate, based on VSI BGP PW."
+            ::= { hwVplsBgpPwSuppStatisticsEntry 15 }
+
+        
+        hwVplsBgpPwSuppStatMulPir OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the multicast peak information rate, based on VSI BGP PW."
+            ::= { hwVplsBgpPwSuppStatisticsEntry 16 }
+
+        
+        hwVplsBgpPwSuppStatMulCbs OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the multicast CBS limitation, based on VSI BGP PW."
+            ::= { hwVplsBgpPwSuppStatisticsEntry 17 }
+
+        hwVplsBgpPwSuppStatMulPbs OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the multicast PBS limitation, based on VSI BGP PW."
+            ::= { hwVplsBgpPwSuppStatisticsEntry 18 } 
+        
+        hwVplsBgpPwSuppStatMulPassFrames OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of multicast frames passed from PW."
+            ::= { hwVplsBgpPwSuppStatisticsEntry 19 }
+        
+        hwVplsBgpPwSuppStatMulPassBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The multicast bytes passed from PW."
+            ::= { hwVplsBgpPwSuppStatisticsEntry 20 }
+
+        
+        hwVplsBgpPwSuppStatMulDropFrames OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of multicast frames dropped from PW."
+            ::= { hwVplsBgpPwSuppStatisticsEntry 21 }
+
+        
+        hwVplsBgpPwSuppStatMulDropBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The multicast bytes dropped from PW."
+            ::= { hwVplsBgpPwSuppStatisticsEntry 22 }
+
+        
+        hwVplsBgpPwSuppStatMulPassBpsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The multicast rate of bps passed from PW."
+            ::= { hwVplsBgpPwSuppStatisticsEntry 23 }
+
+        
+        hwVplsBgpPwSuppStatMulPassPpsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The multicast rate of pps passed from PW."
+            ::= { hwVplsBgpPwSuppStatisticsEntry 24 }
+
+        
+        hwVplsBgpPwSuppStatMulDropBpsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The multicast rate of bps dropped from PW."
+            ::= { hwVplsBgpPwSuppStatisticsEntry 25 }
+
+        
+        hwVplsBgpPwSuppStatMulDropPpsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The multicast rate of pps dropped from PW."
+            ::= { hwVplsBgpPwSuppStatisticsEntry 26 }
+			
+        hwVplsBgpPwSuppStatUnkCir OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the unknown-unicast committed information rate, based on VSI BGP PW."
+            ::= { hwVplsBgpPwSuppStatisticsEntry 27 }
+
+        
+        hwVplsBgpPwSuppStatUnkPir OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the unknown-unicast peak information rate, based on VSI BGP PW."
+            ::= { hwVplsBgpPwSuppStatisticsEntry 28 }
+
+        
+        hwVplsBgpPwSuppStatUnkCbs OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the unknown-unicast CBS limitation, based on VSI BGP PW."
+            ::= { hwVplsBgpPwSuppStatisticsEntry 29 }
+
+        hwVplsBgpPwSuppStatUnkPbs OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the unknown-unicast PBS limitation, based on VSI BGP PW."
+            ::= { hwVplsBgpPwSuppStatisticsEntry 30 } 
+        
+        hwVplsBgpPwSuppStatUnkPassFrames OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of unknown-unicast frames passed from PW."
+            ::= { hwVplsBgpPwSuppStatisticsEntry 31 }
+        
+        hwVplsBgpPwSuppStatUnkPassBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The unknown-unicast bytes passed from PW."
+            ::= { hwVplsBgpPwSuppStatisticsEntry 32 }
+
+        
+        hwVplsBgpPwSuppStatUnkDropFrames OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of unknown-unicast frames dropped from PW."
+            ::= { hwVplsBgpPwSuppStatisticsEntry 33 }
+
+        
+        hwVplsBgpPwSuppStatUnkDropBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The unknown-unicast bytes dropped from PW."
+            ::= { hwVplsBgpPwSuppStatisticsEntry 34 }
+
+        
+        hwVplsBgpPwSuppStatUnkPassBpsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The unknown-unicast rate of bps passed from PW."
+            ::= { hwVplsBgpPwSuppStatisticsEntry 35 }
+
+        
+        hwVplsBgpPwSuppStatUnkPassPpsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The unknown-unicast rate of pps passed from PW."
+            ::= { hwVplsBgpPwSuppStatisticsEntry 36 }
+
+        
+        hwVplsBgpPwSuppStatUnkDropBpsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The unknown-unicast rate of bps dropped from PW."
+            ::= { hwVplsBgpPwSuppStatisticsEntry 37 }
+
+        
+        hwVplsBgpPwSuppStatUnkDropPpsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The unknown-unicast rate of pps dropped from PW."
+            ::= { hwVplsBgpPwSuppStatisticsEntry 38 }
+			
+			
+--          
+-- The VPLS BGP MH PW Suppression's Statistic Table
+-- 
+        hwVplsBgpMHPwSuppStatisticsTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HWVplsBgpMHPwSuppStatisticsEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table contains the VPLS-BGP-MH-PW's suppresssion Traffic Statistic."
+            ::= { hwVplsMIBObjects 22 }
+
+        
+        hwVplsBgpMHPwSuppStatisticsEntry OBJECT-TYPE
+            SYNTAX HWVplsBgpMHPwSuppStatisticsEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Provides the information of the VPLS-BGP-MH-PW's suppresssion Traffic Statistic."
+            INDEX { hwVplsVsiName, hwVplsBgpMHPwSuppStatRemoteIpAddr}
+            ::= { hwVplsBgpMHPwSuppStatisticsTable 1 }	
+     
+        HWVplsBgpMHPwSuppStatisticsEntry::=
+            SEQUENCE { 
+                hwVplsBgpMHPwSuppStatRemoteIpAddr
+                    IpAddress,
+                hwVplsBgpMHPwSuppStatBroCir
+                    Unsigned32,
+                hwVplsBgpMHPwSuppStatBroPir
+                    Unsigned32,
+                hwVplsBgpMHPwSuppStatBroCbs
+                    Unsigned32,
+                hwVplsBgpMHPwSuppStatBroPbs
+                    Unsigned32,  
+                hwVplsBgpMHPwSuppStatBroPassFrames
+                    Counter64,
+                hwVplsBgpMHPwSuppStatBroPassBytes
+                    Counter64,
+                hwVplsBgpMHPwSuppStatBroDropFrames
+                    Counter64,
+                hwVplsBgpMHPwSuppStatBroDropBytes
+                    Counter64, 	
+                hwVplsBgpMHPwSuppStatBroPassBpsRate
+                    Counter64,
+                hwVplsBgpMHPwSuppStatBroPassPpsRate
+                    Counter64,
+                hwVplsBgpMHPwSuppStatBroDropBpsRate
+                    Counter64,
+                hwVplsBgpMHPwSuppStatBroDropPpsRate
+                    Counter64,	
+                hwVplsBgpMHPwSuppStatMulCir
+                    Unsigned32,
+                hwVplsBgpMHPwSuppStatMulPir
+                    Unsigned32,
+                hwVplsBgpMHPwSuppStatMulCbs
+                    Unsigned32,
+                hwVplsBgpMHPwSuppStatMulPbs
+                    Unsigned32,  
+                hwVplsBgpMHPwSuppStatMulPassFrames
+                    Counter64,
+                hwVplsBgpMHPwSuppStatMulPassBytes
+                    Counter64,
+                hwVplsBgpMHPwSuppStatMulDropFrames
+                    Counter64,
+                hwVplsBgpMHPwSuppStatMulDropBytes
+                    Counter64, 	
+                hwVplsBgpMHPwSuppStatMulPassBpsRate
+                    Counter64,
+                hwVplsBgpMHPwSuppStatMulPassPpsRate
+                    Counter64,
+                hwVplsBgpMHPwSuppStatMulDropBpsRate
+                    Counter64,
+                hwVplsBgpMHPwSuppStatMulDropPpsRate
+                    Counter64,	
+                hwVplsBgpMHPwSuppStatUnkCir
+                    Unsigned32,
+                hwVplsBgpMHPwSuppStatUnkPir
+                    Unsigned32,
+                hwVplsBgpMHPwSuppStatUnkCbs
+                    Unsigned32,
+                hwVplsBgpMHPwSuppStatUnkPbs
+                    Unsigned32,  
+                hwVplsBgpMHPwSuppStatUnkPassFrames
+                    Counter64,
+                hwVplsBgpMHPwSuppStatUnkPassBytes
+                    Counter64,
+                hwVplsBgpMHPwSuppStatUnkDropFrames
+                    Counter64,
+                hwVplsBgpMHPwSuppStatUnkDropBytes
+                    Counter64, 	
+                hwVplsBgpMHPwSuppStatUnkPassBpsRate
+                    Counter64,
+                hwVplsBgpMHPwSuppStatUnkPassPpsRate
+                    Counter64,
+                hwVplsBgpMHPwSuppStatUnkDropBpsRate
+                    Counter64,
+                hwVplsBgpMHPwSuppStatUnkDropPpsRate
+                    Counter64
+             }
+			
+        hwVplsBgpMHPwSuppStatRemoteIpAddr OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates the IP address of the remote end."
+            ::= { hwVplsBgpMHPwSuppStatisticsEntry 1 }
+		
+        hwVplsBgpMHPwSuppStatBroCir OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the broadcast committed information rate, based on VSI BGP Multi-homing PW."
+            ::= { hwVplsBgpMHPwSuppStatisticsEntry 2 }
+
+        
+        hwVplsBgpMHPwSuppStatBroPir OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the broadcast peak information rate, based on VSI BGP Multi-homing PW."
+            ::= { hwVplsBgpMHPwSuppStatisticsEntry 3 }
+
+        
+        hwVplsBgpMHPwSuppStatBroCbs OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the broadcast CBS limitation, based on VSI BGP Multi-homing PW."
+            ::= { hwVplsBgpMHPwSuppStatisticsEntry 4}
+
+        hwVplsBgpMHPwSuppStatBroPbs OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the broadcast PBS limitation, based on VSI BGP Multi-homing PW."
+            ::= { hwVplsBgpMHPwSuppStatisticsEntry 5 } 
+        
+        hwVplsBgpMHPwSuppStatBroPassFrames OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of broadcast frames passed from PW."
+            ::= { hwVplsBgpMHPwSuppStatisticsEntry 6 }
+        
+        hwVplsBgpMHPwSuppStatBroPassBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The broadcast bytes passed from PW."
+            ::= { hwVplsBgpMHPwSuppStatisticsEntry 7 }
+
+        
+        hwVplsBgpMHPwSuppStatBroDropFrames OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of broadcast frames dropped from PW."
+            ::= { hwVplsBgpMHPwSuppStatisticsEntry 8 }
+
+        
+        hwVplsBgpMHPwSuppStatBroDropBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The broadcast bytes dropped from PW."
+            ::= { hwVplsBgpMHPwSuppStatisticsEntry 9 }
+
+        
+        hwVplsBgpMHPwSuppStatBroPassBpsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The broadcast rate of bps passed from PW."
+            ::= { hwVplsBgpMHPwSuppStatisticsEntry 10}
+
+        
+        hwVplsBgpMHPwSuppStatBroPassPpsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The broadcast rate of pps passed from PW."
+            ::= { hwVplsBgpMHPwSuppStatisticsEntry 11 }
+
+        
+        hwVplsBgpMHPwSuppStatBroDropBpsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The broadcast rate of bps dropped from PW."
+            ::= { hwVplsBgpMHPwSuppStatisticsEntry 12 }
+
+        
+        hwVplsBgpMHPwSuppStatBroDropPpsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The broadcast rate of pps dropped from PW."
+            ::= { hwVplsBgpMHPwSuppStatisticsEntry 13 }
+			
+        hwVplsBgpMHPwSuppStatMulCir OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the multicast committed information rate, based on VSI BGP Multi-homing PW."
+            ::= { hwVplsBgpMHPwSuppStatisticsEntry 14 }
+
+        
+        hwVplsBgpMHPwSuppStatMulPir OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the multicast peak information rate, based on VSI BGP Multi-homing PW."
+            ::= { hwVplsBgpMHPwSuppStatisticsEntry 15 }
+
+        
+        hwVplsBgpMHPwSuppStatMulCbs OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the multicast CBS limitation, based on VSI BGP Multi-homing PW."
+            ::= { hwVplsBgpMHPwSuppStatisticsEntry 16 }
+
+        hwVplsBgpMHPwSuppStatMulPbs OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the multicast PBS limitation, based on VSI BGP Multi-homing PW."
+            ::= { hwVplsBgpMHPwSuppStatisticsEntry 17 } 
+        
+        hwVplsBgpMHPwSuppStatMulPassFrames OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of multicast frames passed from PW."
+            ::= { hwVplsBgpMHPwSuppStatisticsEntry 18 }
+        
+        hwVplsBgpMHPwSuppStatMulPassBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The multicast bytes passed from PW."
+            ::= { hwVplsBgpMHPwSuppStatisticsEntry 19 }
+
+        
+        hwVplsBgpMHPwSuppStatMulDropFrames OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of multicast frames dropped from PW."
+            ::= { hwVplsBgpMHPwSuppStatisticsEntry 20 }
+
+        
+        hwVplsBgpMHPwSuppStatMulDropBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The multicast bytes dropped from PW."
+            ::= { hwVplsBgpMHPwSuppStatisticsEntry 21 }
+
+        
+        hwVplsBgpMHPwSuppStatMulPassBpsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The multicast rate of bps passed from PW."
+            ::= { hwVplsBgpMHPwSuppStatisticsEntry 22 }
+
+        
+        hwVplsBgpMHPwSuppStatMulPassPpsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The multicast rate of pps passed from PW."
+            ::= { hwVplsBgpMHPwSuppStatisticsEntry 23 }
+
+        
+        hwVplsBgpMHPwSuppStatMulDropBpsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The multicast rate of bps dropped from PW."
+            ::= { hwVplsBgpMHPwSuppStatisticsEntry 24 }
+
+        
+        hwVplsBgpMHPwSuppStatMulDropPpsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The multicast rate of pps dropped from PW."
+            ::= { hwVplsBgpMHPwSuppStatisticsEntry 25 }
+			
+        hwVplsBgpMHPwSuppStatUnkCir OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the unknown-unicast committed information rate, based on VSI BGP Multi-homing PW."
+            ::= { hwVplsBgpMHPwSuppStatisticsEntry 26 }
+
+        
+        hwVplsBgpMHPwSuppStatUnkPir OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the unknown-unicast peak information rate, based on VSI BGP Multi-homing PW."
+            ::= { hwVplsBgpMHPwSuppStatisticsEntry 27 }
+
+        
+        hwVplsBgpMHPwSuppStatUnkCbs OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the unknown-unicast CBS limitation, based on VSI BGP Multi-homing PW."
+            ::= { hwVplsBgpMHPwSuppStatisticsEntry 28 }
+
+        hwVplsBgpMHPwSuppStatUnkPbs OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the unknown-unicast PBS limitation, based on VSI BGP Multi-homing PW."
+            ::= { hwVplsBgpMHPwSuppStatisticsEntry 29 } 
+        
+        hwVplsBgpMHPwSuppStatUnkPassFrames OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of unknown-unicast frames passed from PW."
+            ::= { hwVplsBgpMHPwSuppStatisticsEntry 30 }
+        
+        hwVplsBgpMHPwSuppStatUnkPassBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The unknown-unicast bytes passed from PW."
+            ::= { hwVplsBgpMHPwSuppStatisticsEntry 31 }
+
+        
+        hwVplsBgpMHPwSuppStatUnkDropFrames OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of unknown-unicast frames dropped from PW."
+            ::= { hwVplsBgpMHPwSuppStatisticsEntry 32 }
+
+        
+        hwVplsBgpMHPwSuppStatUnkDropBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The unknown-unicast bytes dropped from PW."
+            ::= { hwVplsBgpMHPwSuppStatisticsEntry 33 }
+
+        
+        hwVplsBgpMHPwSuppStatUnkPassBpsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The unknown-unicast rate of bps passed from PW."
+            ::= { hwVplsBgpMHPwSuppStatisticsEntry 34 }
+
+        
+        hwVplsBgpMHPwSuppStatUnkPassPpsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The unknown-unicast rate of pps passed from PW."
+            ::= { hwVplsBgpMHPwSuppStatisticsEntry 35 }
+
+        
+        hwVplsBgpMHPwSuppStatUnkDropBpsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The unknown-unicast rate of bps dropped from PW."
+            ::= { hwVplsBgpMHPwSuppStatisticsEntry 36 }
+
+        
+        hwVplsBgpMHPwSuppStatUnkDropPpsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The unknown-unicast rate of pps dropped from PW."
+            ::= { hwVplsBgpMHPwSuppStatisticsEntry 37 }
+			
 --           
+-- The VPLS AD PW Suppression's Statistic Table
+-- 
+        hwVplsAdPwSuppStatisticsTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HWVplsAdPwSuppStatisticsEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table contains the VPLS-AD-PW's suppresssion Traffic Statistic."
+            ::= { hwVplsMIBObjects 23 }
+
+        hwVplsAdPwSuppStatisticsEntry OBJECT-TYPE
+            SYNTAX HWVplsAdPwSuppStatisticsEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Provides the information of the VPLS-AD-PW's suppresssion Traffic Statistic."
+            INDEX { hwVplsVsiName, hwVplsAdPwSuppStatRemoteIpAddr}
+            ::= { hwVplsAdPwSuppStatisticsTable 1 }
+
+        HWVplsAdPwSuppStatisticsEntry::=
+            SEQUENCE { 
+                hwVplsAdPwSuppStatRemoteIpAddr
+                    IpAddress,
+                hwVplsAdPwSuppStatBroCir
+                    Unsigned32,
+                hwVplsAdPwSuppStatBroPir
+                    Unsigned32,
+                hwVplsAdPwSuppStatBroCbs
+                    Unsigned32,
+                hwVplsAdPwSuppStatBroPbs
+                    Unsigned32,  
+                hwVplsAdPwSuppStatBroPassFrames
+                    Counter64,
+                hwVplsAdPwSuppStatBroPassBytes
+                    Counter64,
+                hwVplsAdPwSuppStatBroDropFrames
+                    Counter64,
+                hwVplsAdPwSuppStatBroDropBytes
+                    Counter64, 	
+                hwVplsAdPwSuppStatBroPassBpsRate
+                    Counter64,
+                hwVplsAdPwSuppStatBroPassPpsRate
+                    Counter64,
+                hwVplsAdPwSuppStatBroDropBpsRate
+                    Counter64,
+                hwVplsAdPwSuppStatBroDropPpsRate
+                    Counter64,	
+                hwVplsAdPwSuppStatMulCir
+                    Unsigned32,
+                hwVplsAdPwSuppStatMulPir
+                    Unsigned32,
+                hwVplsAdPwSuppStatMulCbs
+                    Unsigned32,
+                hwVplsAdPwSuppStatMulPbs
+                    Unsigned32,  
+                hwVplsAdPwSuppStatMulPassFrames
+                    Counter64,
+                hwVplsAdPwSuppStatMulPassBytes
+                    Counter64,
+                hwVplsAdPwSuppStatMulDropFrames
+                    Counter64,
+                hwVplsAdPwSuppStatMulDropBytes
+                    Counter64, 	
+                hwVplsAdPwSuppStatMulPassBpsRate
+                    Counter64,
+                hwVplsAdPwSuppStatMulPassPpsRate
+                    Counter64,
+                hwVplsAdPwSuppStatMulDropBpsRate
+                    Counter64,
+                hwVplsAdPwSuppStatMulDropPpsRate
+                    Counter64,	
+                hwVplsAdPwSuppStatUnkCir
+                    Unsigned32,
+                hwVplsAdPwSuppStatUnkPir
+                    Unsigned32,
+                hwVplsAdPwSuppStatUnkCbs
+                    Unsigned32,
+                hwVplsAdPwSuppStatUnkPbs
+                    Unsigned32,  
+                hwVplsAdPwSuppStatUnkPassFrames
+                    Counter64,
+                hwVplsAdPwSuppStatUnkPassBytes
+                    Counter64,
+                hwVplsAdPwSuppStatUnkDropFrames
+                    Counter64,
+                hwVplsAdPwSuppStatUnkDropBytes
+                    Counter64, 	
+                hwVplsAdPwSuppStatUnkPassBpsRate
+                    Counter64,
+                hwVplsAdPwSuppStatUnkPassPpsRate
+                    Counter64,
+                hwVplsAdPwSuppStatUnkDropBpsRate
+                    Counter64,
+                hwVplsAdPwSuppStatUnkDropPpsRate
+                    Counter64
+             }
+
+        hwVplsAdPwSuppStatRemoteIpAddr OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates the IP address of the remote end."
+            ::= { hwVplsAdPwSuppStatisticsEntry 1 }
+
+        hwVplsAdPwSuppStatBroCir OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the broadcast committed information rate, based on VSI AD PW."
+            ::= { hwVplsAdPwSuppStatisticsEntry 2 }
+
+        hwVplsAdPwSuppStatBroPir OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the broadcast peak information rate, based on VSI AD PW."
+            ::= { hwVplsAdPwSuppStatisticsEntry 3 }
+
+        hwVplsAdPwSuppStatBroCbs OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the broadcast CBS limitation, based on VSI AD PW."
+            ::= { hwVplsAdPwSuppStatisticsEntry 4}
+
+        hwVplsAdPwSuppStatBroPbs OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the broadcast PBS limitation, based on VSI AD PW."
+            ::= { hwVplsAdPwSuppStatisticsEntry 5 } 
+
+        hwVplsAdPwSuppStatBroPassFrames OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of broadcast frames passed from PW."
+            ::= { hwVplsAdPwSuppStatisticsEntry 6 }
+
+        hwVplsAdPwSuppStatBroPassBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The broadcast bytes passed from PW."
+            ::= { hwVplsAdPwSuppStatisticsEntry 7 }
+
+        hwVplsAdPwSuppStatBroDropFrames OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of broadcast frames dropped from PW."
+            ::= { hwVplsAdPwSuppStatisticsEntry 8 }
+
+        
+        hwVplsAdPwSuppStatBroDropBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The broadcast bytes dropped from PW."
+            ::= { hwVplsAdPwSuppStatisticsEntry 9 }
+
+        hwVplsAdPwSuppStatBroPassBpsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The broadcast rate of bps passed from PW."
+            ::= { hwVplsAdPwSuppStatisticsEntry 10 }
+
+        hwVplsAdPwSuppStatBroPassPpsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The broadcast rate of pps passed from PW."
+            ::= { hwVplsAdPwSuppStatisticsEntry 11 }
+
+        hwVplsAdPwSuppStatBroDropBpsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The broadcast rate of bps dropped from PW."
+            ::= { hwVplsAdPwSuppStatisticsEntry 12 }
+
+        hwVplsAdPwSuppStatBroDropPpsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The broadcast rate of pps dropped from PW."
+            ::= { hwVplsAdPwSuppStatisticsEntry 13 }
+
+        hwVplsAdPwSuppStatMulCir OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the multicast committed information rate, based on VSI AD PW."
+            ::= { hwVplsAdPwSuppStatisticsEntry 14 }
+
+        hwVplsAdPwSuppStatMulPir OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the multicast peak information rate, based on VSI AD PW."
+            ::= { hwVplsAdPwSuppStatisticsEntry 15 }
+
+        hwVplsAdPwSuppStatMulCbs OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the multicast CBS limitation, based on VSI AD PW."
+            ::= { hwVplsAdPwSuppStatisticsEntry 16 }
+
+        hwVplsAdPwSuppStatMulPbs OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the multicast PBS limitation, based on VSI AD PW."
+            ::= { hwVplsAdPwSuppStatisticsEntry 17 } 
+
+        hwVplsAdPwSuppStatMulPassFrames OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of multicast frames passed from PW."
+            ::= { hwVplsAdPwSuppStatisticsEntry 18 }
+
+        hwVplsAdPwSuppStatMulPassBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The multicast bytes passed from PW."
+            ::= { hwVplsAdPwSuppStatisticsEntry 19 }
+
+        hwVplsAdPwSuppStatMulDropFrames OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of multicast frames dropped from PW."
+            ::= { hwVplsAdPwSuppStatisticsEntry 20 }
+
+        hwVplsAdPwSuppStatMulDropBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The multicast bytes dropped from PW."
+            ::= { hwVplsAdPwSuppStatisticsEntry 21 }
+
+        hwVplsAdPwSuppStatMulPassBpsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The multicast rate of bps passed from PW."
+            ::= { hwVplsAdPwSuppStatisticsEntry 22 }
+
+        hwVplsAdPwSuppStatMulPassPpsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The multicast rate of pps passed from PW."
+            ::= { hwVplsAdPwSuppStatisticsEntry 23 }
+
+        hwVplsAdPwSuppStatMulDropBpsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The multicast rate of bps dropped from PW."
+            ::= { hwVplsAdPwSuppStatisticsEntry 24 }
+
+        hwVplsAdPwSuppStatMulDropPpsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The multicast rate of pps dropped from PW."
+            ::= { hwVplsAdPwSuppStatisticsEntry 25 }
+
+        hwVplsAdPwSuppStatUnkCir OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the unknown-unicast committed information rate, based on VSI AD PW."
+            ::= { hwVplsAdPwSuppStatisticsEntry 26 }
+
+        hwVplsAdPwSuppStatUnkPir OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the unknown-unicast peak information rate, based on VSI AD PW."
+            ::= { hwVplsAdPwSuppStatisticsEntry 27 }
+
+        hwVplsAdPwSuppStatUnkCbs OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the unknown-unicast CBS limitation, based on VSI AD PW."
+            ::= { hwVplsAdPwSuppStatisticsEntry 28 }
+
+        hwVplsAdPwSuppStatUnkPbs OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the unknown-unicast PBS limitation, based on VSI AD PW."
+            ::= { hwVplsAdPwSuppStatisticsEntry 29 } 
+
+        hwVplsAdPwSuppStatUnkPassFrames OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of unknown-unicast frames passed from PW."
+            ::= { hwVplsAdPwSuppStatisticsEntry 30 }
+
+        hwVplsAdPwSuppStatUnkPassBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The unknown-unicast bytes passed from PW."
+            ::= { hwVplsAdPwSuppStatisticsEntry 31 }
+
+        hwVplsAdPwSuppStatUnkDropFrames OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of unknown-unicast frames dropped from PW."
+            ::= { hwVplsAdPwSuppStatisticsEntry 32 }
+
+        hwVplsAdPwSuppStatUnkDropBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The unknown-unicast bytes dropped from PW."
+            ::= { hwVplsAdPwSuppStatisticsEntry 33 }
+
+        hwVplsAdPwSuppStatUnkPassBpsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The unknown-unicast rate of bps passed from PW."
+            ::= { hwVplsAdPwSuppStatisticsEntry 34 }
+
+        hwVplsAdPwSuppStatUnkPassPpsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The unknown-unicast rate of pps passed from PW."
+            ::= { hwVplsAdPwSuppStatisticsEntry 35 }
+
+        hwVplsAdPwSuppStatUnkDropBpsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The unknown-unicast rate of bps dropped from PW."
+            ::= { hwVplsAdPwSuppStatisticsEntry 36 }
+
+        hwVplsAdPwSuppStatUnkDropPpsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The unknown-unicast rate of pps dropped from PW."
+            ::= { hwVplsAdPwSuppStatisticsEntry 37 }
+-- 
 -- VPLS MIB Trap Definitions
 -- 
         hwVplsMIBTraps OBJECT IDENTIFIER ::= { hwL2VpnVplsExt 2 }
 
         
         hwVplsVcDown NOTIFICATION-TYPE
-            OBJECTS { hwVplsPwType, hwVplsStateChangeReason, sysUpTime, hwVplsPwTnlPolicy, hwL2vpnTnlType, hwL2vpnTunnelIndex }
+            OBJECTS { hwVplsPwType, hwVplsStateChangeReason, sysUpTime, hwVplsPwTnlPolicy }
             STATUS current
             DESCRIPTION 
                 "This notification indicates the VC's state changes to down."
@@ -3558,7 +5762,7 @@
                 hwVplsDiffServColor, hwVplsDiffServDSName,hwVplsInterfaceWithdraw,hwVplsUpe2NpeWithdraw,hwVplsUpe2UpeWithdraw,
                 hwVplsNpe2UpeWithdraw, hwVplsDiscovery, hwVplsMacWithdrawEnable, hwVplsVsiCir, hwVplsVsiPir, hwVplsVsiQosProfileName, 
                 hwVplsAdminStatus, hwVplsIgnoreAcState, hwVplsEnableStatistic, hwVplsResetStatistic, hwVplsResetStatisticTime,hwVplsAgingTime, hwVplsUnknowUnicastMacLearning, hwVplsFlowLabel, 
-                hwVplsServiceName, hwVplsRowStatus
+                hwVplsServiceName, hwVplsRowStatus, hwVplsIngDiffServMode, hwVplsEgDiffServMode, hwVplsDiffServTrustType
                  }
             STATUS current
             DESCRIPTION 

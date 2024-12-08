@@ -1,13 +1,13 @@
 <?php
 
 $graphs = [
-    'ntp-server_stats'   => 'NTPD Server - Statistics',
-    'ntp-server_freq'    => 'NTPD Server - Frequency',
+    'ntp-server_stats' => 'NTPD Server - Statistics',
+    'ntp-server_freq' => 'NTPD Server - Frequency',
     'ntp-server_stratum' => 'NTPD Server - Stratum',
-    'ntp-server_buffer'  => 'NTPD Server - Buffer',
-    'ntp-server_bits'    => 'NTPD Server - Packets Sent/Received',
+    'ntp-server_buffer' => 'NTPD Server - Buffer',
+    'ntp-server_bits' => 'NTPD Server - Packets Sent/Received',
     'ntp-server_packets' => 'NTPD Server - Packets Dropped/Ignored',
-    'ntp-server_uptime'  => 'NTPD Server - Uptime',
+    'ntp-server_uptime' => 'NTPD Server - Uptime',
 ];
 
 foreach ($graphs as $key => $text) {

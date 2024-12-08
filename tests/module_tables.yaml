@@ -2,7 +2,7 @@ applications:
     applications:
         excluded_fields: [device_id, app_id, timestamp]
     application_metrics:
-        excluded_fields: [app_id]
+        excluded_fields: [id, app_id]
         joins:
             - { custom: 'INNER JOIN (SELECT app_id, app_type FROM applications WHERE `device_id`=?) I USING (app_id)', select: ['app_type'] }
         custom_where: ''
@@ -91,3 +91,10 @@ cisco-mac-accounting:
             - { left: mac_accounting.port_id, right: ports.port_id, select: [ifIndex] }
         custom_where: WHERE ports.device_id=?
         order_by: ports.ifIndex, mac
+discovery-protocols:
+    links:
+        joins: 
+            - { left: links.local_port_id, right: ports.port_id, select: [ports.ifAlias, ports.ifDescr, ports.ifName] }
+        custom_where: WHERE links.local_device_id=?
+        excluded_fields: [local_device_id, local_port_id, remote_port_id, remote_device_id, id]
+        order_by: ports.ifAlias,ports.ifDescr,ports.ifName,remote_hostname,remote_version,remote_port

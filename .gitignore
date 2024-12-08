@@ -20,6 +20,7 @@ Thumbs.db
 config.php
 html/css/custom/*
 html/images/custom/*
+html/images/custommap/*
 includes/custom/*
 junk
 nbproject

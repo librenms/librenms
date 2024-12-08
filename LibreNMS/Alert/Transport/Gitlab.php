@@ -25,67 +25,40 @@ namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
 use LibreNMS\Enum\AlertState;
-use LibreNMS\Util\Proxy;
+use LibreNMS\Exceptions\AlertTransportDeliveryException;
+use LibreNMS\Util\Http;
 
 class Gitlab extends Transport
 {
-    public function deliverAlert($obj, $opts)
-    {
-        if (! empty($this->config)) {
-            $opts['project-id'] = $this->config['gitlab-id'];
-            $opts['key'] = $this->config['gitlab-key'];
-            $opts['host'] = $this->config['gitlab-host'];
-        }
-
-        return $this->contactGitlab($obj, $opts);
-    }
-
-    public function contactGitlab($obj, $opts)
+    public function deliverAlert(array $alert_data): bool
     {
         // Don't create tickets for resolutions
-        if ($obj['state'] != AlertState::CLEAR) {
-            $project_id = $opts['project-id'];
-            $project_key = $opts['key'];
-            $details = 'Librenms alert for: ' . $obj['hostname'];
-            $description = $obj['msg'];
-            $title = urlencode($details);
-            $desc = urlencode($description);
-            $url = $opts['host'] . "/api/v4/projects/$project_id/issues?title=$title&description=$desc";
-            $curl = curl_init();
-
-            $data = ['title' => $details,
-                'description' => $description,
-            ];
-            $postdata = ['fields' => $data];
-            $datastring = json_encode($postdata);
-
-            Proxy::applyToCurl($curl);
-
-            $headers = ['Accept: application/json', 'Content-Type: application/json', 'PRIVATE-TOKEN: ' . $project_key];
-
-            curl_setopt($curl, CURLOPT_URL, $url);
-            curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
-            curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'POST');
-            curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($curl, CURLOPT_VERBOSE, 1);
-            curl_setopt($curl, CURLOPT_POSTFIELDS, $datastring);
-
-            $ret = curl_exec($curl);
-            $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-            if ($code == 200) {
-                $gitlabout = json_decode($ret, true);
-                d_echo('Created GitLab issue ' . $gitlabout['key'] . ' for ' . $obj['hostname']);
-
-                return true;
-            } else {
-                d_echo('GitLab connection error: ' . serialize($ret));
-
-                return false;
-            }
+        if ($alert_data['state'] == AlertState::RECOVERED) {
+            return true;
         }
+
+        $project_id = $this->config['gitlab-id'];
+        $url = $this->config['gitlab-host'] . "/api/v4/projects/$project_id/issues";
+        $data = [
+            'title' => 'Librenms alert for: ' . $alert_data['hostname'],
+            'description' => $alert_data['msg'],
+        ];
+
+        $res = Http::client()
+            ->withHeaders([
+                'PRIVATE-TOKEN' => $this->config['gitlab-key'],
+            ])
+            ->acceptJson()
+            ->post($url, $data);
+
+        if ($res->successful()) {
+            return true;
+        }
+
+        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $data['description'], $data);
     }
 
-    public static function configTemplate()
+    public static function configTemplate(): array
     {
         return [
             'config' => [
@@ -99,13 +72,13 @@ class Gitlab extends Transport
                     'title' => 'Project ID',
                     'name' => 'gitlab-id',
                     'descr' => 'GitLab Project ID',
-                    'type'=> 'text',
+                    'type' => 'text',
                 ],
                 [
                     'title' => 'Personal Access Token',
                     'name' => 'gitlab-key',
                     'descr' => 'Personal Access Token',
-                    'type' => 'text',
+                    'type' => 'password',
                 ],
             ],
             'validation' => [

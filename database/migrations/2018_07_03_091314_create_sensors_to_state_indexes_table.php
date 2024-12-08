@@ -10,7 +10,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::create('sensors_to_state_indexes', function (Blueprint $table) {
             $table->increments('sensors_to_state_translations_id');
@@ -25,7 +25,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::drop('sensors_to_state_indexes');
     }

@@ -65,7 +65,6 @@ return [
             'rrdtool' => ['name' => 'Сховище даних: RRDTool'],
             'snmp' => ['name' => 'SNMP'],
             'poller_modules' => ['name' => 'Модулі опитувача'],
-            'interface_types' => ['name' => 'Типи інтерфейсів за RFC 7224'],
         ],
         'system' => [
             'cleanup' => ['name' => 'Очистка'],
@@ -236,9 +235,6 @@ return [
                     'help' => 'Співпадає з джерелом запиту. Можуть бути використані вільні символи, наприклад *.mydomain.com',
                 ],
             ],
-        ],
-        'api_demo' => [
-            'description' => 'Це демо',
         ],
         'apps' => [
             'powerdns-recursor' => [
@@ -456,10 +452,6 @@ return [
             'description' => 'Чітко вказаний URL',
             'help' => 'Це налаштування має бути вказане *лише* якщо необхідно *примусити* до використання певного імені хоста та порта. У цьому разі веб інтерфейс буде недоступний з будь-якого іншого імені',
         ],
-        'device_perf_purge' => [
-            'description' => 'Дані про поведінку пристроїв старші за',
-            'help' => 'Очистка що виконується daily.sh',
-        ],
         'discovery_modules' => [
             'arp-table' => [
                 'description' => 'Таблиця ARP',
@@ -469,9 +461,6 @@ return [
             ],
             'bgp-peers' => [
                 'description' => 'BGP Peers',
-            ],
-            'cisco-cbqos' => [
-                'description' => 'Cisco CBQOS',
             ],
             'cisco-cef' => [
                 'description' => 'Cisco CEF',
@@ -523,9 +512,6 @@ return [
             ],
             'junose-atm-vp' => [
                 'description' => 'Junose ATM VP',
-            ],
-            'libvirt-vminfo' => [
-                'description' => 'Libvirt VMInfo',
             ],
             'loadbalancers' => [
                 'description' => 'Loadbalancers',
@@ -582,8 +568,8 @@ return [
             'vlans' => [
                 'description' => 'VLans',
             ],
-            'vmware-vminfo' => [
-                'description' => 'VMWare VMInfo',
+            'vminfo' => [
+                'description' => 'Hypervisor VM Info',
             ],
             'vrf' => [
                 'description' => 'VRF',
@@ -1080,9 +1066,6 @@ return [
             'ucd-diskio' => [
                 'description' => 'UCD DiskIO',
             ],
-            'wifi' => [
-                'description' => 'Wifi',
-            ],
             'wireless' => [
                 'description' => 'Бездротові',
             ],
@@ -1119,12 +1102,6 @@ return [
             'cisco-asa-firewall' => [
                 'description' => 'Cisco ASA Firewall',
             ],
-            'cisco-voice' => [
-                'description' => 'Cisco Voice',
-            ],
-            'cisco-cbqos' => [
-                'description' => 'Cisco CBQOS',
-            ],
             'cisco-otv' => [
                 'description' => 'Cisco OTV',
             ],
@@ -1157,6 +1134,9 @@ return [
             ],
             'stp' => [
                 'description' => 'STP',
+            ],
+            'vminfo' => [
+                'description' => 'Hypervisor VM Info',
             ],
             'ntp' => [
                 'description' => 'NTP',
@@ -1262,10 +1242,6 @@ return [
             'description' => 'Визначає версію rrdtool на вашому сервері',
             'help' => 'Версії вищі за 1.5.5 підтримують всі функції що використовує LibreNMS, не встановлюйте значення вищі за наявну версію',
         ],
-        'service_poller_enabled' => [
-            'description' => 'Увімкнути опитування',
-            'help' => 'Вмикає процеси опитування. Визначає значення за замовчуванням для всіх вузлів.',
-        ],
         'service_poller_workers' => [
             'description' => 'Процеси опитування',
             'help' => 'Кількість процесів опитування які буде створено. Визначає значення за замовчуванням для всіх вузлів.',
@@ -1278,10 +1254,6 @@ return [
             'description' => 'Повторна спроба для недоступних пристроїв',
             'help' => 'Якщо пристрій недоступний при опитуванні. Визначає час який необхідно зачекати перед повторною спробою. Визначає значення за замовчуванням для всіх вузлів.',
         ],
-        'service_discovery_enabled' => [
-            'description' => 'Увімкнути віднайдення',
-            'help' => 'Увімкнути процеси віднайдення. Визначає значення за замовчуванням для всіх вузлів.',
-        ],
         'service_discovery_workers' => [
             'description' => 'Кількість процесів віднайдення',
             'help' => 'Кількість запущених процесів віднайдення. Занадто велике значення може викликати перевантаження. Визначає значення за замовчуванням для всіх вузлів.',
@@ -1289,10 +1261,6 @@ return [
         'service_discovery_frequency' => [
             'description' => 'Частота віднайдення',
             'help' => 'Як часто виконувати віднайдення пристроїв. Визначає значення за замовчуванням для всіх вузлів. За замовчуванням 4 рази в день.',
-        ],
-        'service_services_enabled' => [
-            'description' => 'Увімкнути перевірки сервісів',
-            'help' => 'Увімкнути процеси перевірки сервісів. Визначає значення за замовчуванням для всіх вузлів.',
         ],
         'service_services_workers' => [
             'description' => 'Кількість процесів перевірки сервісів',
@@ -1302,10 +1270,6 @@ return [
             'description' => 'Частота перевірки сервісів',
             'help' => 'Як часто запускати перевірки сервісів. Має відповідати частоті опитування. Визначає значення за замовчуванням для всіх вузлів.',
         ],
-        'service_billing_enabled' => [
-            'description' => 'Білінг увімкнено',
-            'help' => 'Увімкнути процеси білінгу. Визначає значення за замовчуванням для всіх вузлів.',
-        ],
         'service_billing_frequency' => [
             'description' => 'Частота білінгу',
             'help' => 'Як часто необхідно збирати інформацію білінгу. Визначає значення за замовчуванням для всіх вузлів.',
@@ -1314,17 +1278,9 @@ return [
             'description' => 'Частота обчислень білінгу',
             'help' => 'Як часто обчислювати використання ресурсів. Визначає значення за замовчуванням для всіх вузлів.',
         ],
-        'service_alerting_enabled' => [
-            'description' => 'Сповіщення увімкнено',
-            'help' => 'Увімкнути процес сповіщення. Визначає значення за замовчуванням для всіх вузлів.',
-        ],
         'service_alerting_frequency' => [
             'description' => 'Частота перевірки сповіщень',
             'help' => 'Як часто перевіряються правила сповіщень. Дані оновлюються відповідно до частоти опитування. Визначає значення за замовчуванням для всіх вузлів.',
-        ],
-        'service_ping_enabled' => [
-            'description' => 'Fast Ping Увімкнено',
-            'help' => 'Fast Ping просто перевіряє пристрої на доступність. Визначає значення за замовчуванням для всіх вузлів.',
         ],
         'service_update_enabled' => [
             'description' => 'Щоденне обслуговування увімкнено',

@@ -112,7 +112,7 @@ trait YamlOSDiscovery
     {
         foreach (Arr::wrap($oids) as $oid) {
             // translate all to numeric to make it easier to match
-            $oid = ($numeric && ! Oid::isNumeric($oid)) ? snmp_translate($oid, 'ALL', null, null, $this->getDeviceArray()) : $oid;
+            $oid = ($numeric && ! Oid::of($oid)->isNumeric()) ? snmp_translate($oid, 'ALL', null, null, $this->getDeviceArray()) : $oid;
             if (! empty($data[$oid])) {
                 return $data[$oid];
             }
@@ -164,11 +164,8 @@ trait YamlOSDiscovery
                     $replacement = $replacements[1];
                 }
 
-                // check for regex
-                if (preg_match($search, $device->$field)) {
+                if (isset($device->$field)) {
                     $device->$field = preg_replace($search, $replacement, $device->$field);
-                } else {
-                    $device->$field = str_replace($search, $replacement, $device->$field);
                 }
             }
         }

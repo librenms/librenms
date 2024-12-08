@@ -27,12 +27,11 @@ namespace LibreNMS\Tests;
 
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
-use RecursiveRegexIterator;
 use RegexIterator;
 
 class AlertingTest extends TestCase
 {
-    public function testJsonAlertCollection()
+    public function testJsonAlertCollection(): void
     {
         $rules = get_rules_from_json();
         $this->assertIsArray($rules);
@@ -41,7 +40,7 @@ class AlertingTest extends TestCase
         }
     }
 
-    public function testTransports()
+    public function testTransports(): void
     {
         foreach ($this->getTransportFiles() as $file => $_unused) {
             $parts = explode('/', $file);
@@ -52,10 +51,10 @@ class AlertingTest extends TestCase
         }
     }
 
-    private function getTransportFiles()
+    private function getTransportFiles(): RegexIterator
     {
         $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator('LibreNMS/Alert/Transport'));
 
-        return new RegexIterator($iterator, '/^.+\.php$/i', RecursiveRegexIterator::GET_MATCH);
+        return new RegexIterator($iterator, '/^.+\.php$/i', RegexIterator::GET_MATCH);
     }
 }

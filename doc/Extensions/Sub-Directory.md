@@ -24,5 +24,4 @@ reference the subdirectory name. Assuming LibreNMS is running at
 <http://example.com/librenms/>, you will need to change `RewriteBase /`
 to `RewriteBase /librenms`.
 
-Finally, set `APP_URL=/librenms/` in .env and `$config["base_url"] =
-'/librenms/';` in config.php.
+Finally, set `APP_URL=/librenms/` in .env and `lnms config:set base_url '/librenms/'`.

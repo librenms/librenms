@@ -44,7 +44,7 @@ return [
         ],
         'system' => [
             'cleanup' => ['name' => '清理'],
-            'proxy' => ['name' => 'Proxy'],
+            'proxy' => ['name' => '代理'],
             'updates' => ['name' => '更新'],
             'server' => ['name' => '服务器'],
         ],
@@ -64,7 +64,7 @@ return [
             ],
         ],
         'addhost_alwayscheckip' => [
-            'description' => '新增装置时检察是否 IP 重复',
+            'description' => '新增设备时检察是否 IP 重复',
             'help' => '以 IP 加入主机时，会先检查此 IP 是否已存在于系统上，若有则不予加入。若是以主机名称方式加入时，则不会做此检查。若设定为 True 时，则以主机名称方式加入时亦做此检查，以避免加入重复主机的意外发生。',
         ],
         'alert' => [
@@ -97,8 +97,8 @@ return [
                 'help' => '停止产生警报',
             ],
             'fixed-contacts' => [
-                'description' => 'Updates to contact email addresses not honored',
-                'help' => 'If TRUE any changes to sysContact or users emails will not be honoured whilst alert is active',
+                'description' => '更新联系电子邮件地址未得到认可',
+                'help' => '如果设为TRUE，任何对sysContact或用户电子邮件的更改在警报激活期间将不被采纳。',
             ],
             'globals' => [
                 'description' => '只发送警报给只读使用者',
@@ -129,7 +129,7 @@ return [
         ],
         'allow_duplicate_sysName' => [
             'description' => '允许重复 sysName',
-            'help' => 'By default duplicate sysNames are disabled from being added to prevent a device with multiple interfaces from being added multiple times',
+            'help' => '默认情况下，禁止添加重复的sysName，以防止具有多个接口的设备被多次添加',
         ],
         'allow_unauth_graphs' => [
             'description' => '允许未登入存取图表',
@@ -139,39 +139,36 @@ return [
             'description' => '允许指定网络存取图表',
             'help' => '允许指定网络可以在未登入授权查看图表 (若未启用 允许未登入存取图表 则忽略此设定)',
         ],
-        'api_demo' => [
-            'description' => '这是展示',
-        ],
         'apps' => [
             'powerdns-recursor' => [
                 'api-key' => [
-                    'description' => 'API key for PowerDNS Recursor',
-                    'help' => 'API key for the PowerDNS Recursor app when connecting directly',
+                    'description' => 'PowerDNS 解析器的 API 密钥',
+                    'help' => '直接连接时，PowerDNS 解析器应用的 API 密钥',
                 ],
                 'https' => [
-                    'description' => 'PowerDNS Recursor use HTTPS?',
-                    'help' => 'Use HTTPS instead of HTTP for the PowerDNS Recursor app when connecting directly',
+                    'description' => 'PowerDNS 解析器是否使用 HTTPS？',
+                    'help' => '直接连接时，对于 PowerDNS 解析器应用，是否使用 HTTPS 而非 HTTP',
                 ],
                 'port' => [
-                    'description' => 'PowerDNS Recursor port',
-                    'help' => 'TCP port to use for the PowerDNS Recursor app when connecting directly',
+                    'description' => 'PowerDNS 解析器端口',
+                    'help' => '直接连接时，用于 PowerDNS 解析器应用的 TCP 端口',
                 ],
             ],
         ],
         'astext' => [
-            'description' => 'Key to hold cache of autonomous systems descriptions',
+            'description' => '用于存储自治系统描述的缓存的密钥',
         ],
         'auth_ad_base_dn' => [
             'description' => '基础 DN',
-            'help' => 'groups and users must be under this dn. Example: dc=example,dc=com',
+            'help' => '组和用户必须位于此 DN 下。例如：dc=example,dc=com',
         ],
         'auth_ad_check_certificates' => [
             'description' => '检查凭证',
-            'help' => 'Check certificates for validity. Some servers use self signed certificates, disabling this allows those.',
+            'help' => '检查证书的有效性。一些服务器使用自签名证书，禁用此选项可允许此类证书。',
         ],
         'auth_ad_group_filter' => [
             'description' => 'LDAP 群组筛选器',
-            'help' => 'Active Directory LDAP filter for selecting groups',
+            'help' => '用于选择组的 Active Directory LDAP 过滤器',
         ],
         'auth_ad_groups' => [
             'description' => '群组存取权限',
@@ -179,41 +176,41 @@ return [
         ],
         'auth_ad_user_filter' => [
             'description' => 'LDAP 使用者筛选',
-            'help' => 'Active Directory LDAP filter for selecting users',
+            'help' => '用于选择用户的 Active Directory LDAP 过滤器',
         ],
         'auth_ldap_attr' => [
             'uid' => [
-                'description' => 'Attribute to check username against',
-                'help' => 'Attribute used to identify users by username',
+                'description' => '用于核对用户名的属性',
+                'help' => '用于通过用户名标识用户的属性',
             ],
         ],
         'auth_ldap_binddn' => [
             'description' => '系结 DN (覆写系结使用者名称)',
-            'help' => 'Full DN of bind user',
+            'help' => '绑定用户的完整 DN',
         ],
         'auth_ldap_bindpassword' => [
             'description' => '系结密码',
-            'help' => 'Password for bind user',
+            'help' => '绑定用户的密码',
         ],
         'auth_ldap_binduser' => [
             'description' => '系结使用者',
-            'help' => 'Used to query the LDAP server when no user is logged in (alerts, API, etc)',
+            'help' => '当没有用户登录时（如警报、API等），用于查询LDAP服务器',
         ],
         'auth_ad_binddn' => [
             'description' => '系结 DN (覆写系结使用者名称)',
-            'help' => 'Full DN of bind user',
+            'help' => '绑定用户的完整DN',
         ],
         'auth_ad_bindpassword' => [
             'description' => '系结密码',
-            'help' => 'Password for bind user',
+            'help' => '绑定用户的密码',
         ],
         'auth_ad_binduser' => [
             'description' => '系结使用者名称',
-            'help' => 'Used to query the AD server when no user is logged in (alerts, API, etc)',
+            'help' => '当没有用户登录时（例如，警报、API等），用于查询AD服务器',
         ],
         'auth_ad_starttls' => [
             'description' => '使用 STARTTLS',
-            'help' => 'Use STARTTLS to secure the connection.  Alternative to LDAPS.',
+            'help' => '使用STARTTLS来加密连接。这是LDAPS的替代方案。',
             'options' => [
                 'disabled' => '停用',
                 'optional' => '选用',
@@ -222,53 +219,53 @@ return [
         ],
         'auth_ldap_cache_ttl' => [
             'description' => 'LDAP 快取有效期',
-            'help' => 'Temporarily stores LDAP query results.  Improves speeds, but the data may be stale.',
+            'help' => '临时存储LDAP查询结果。可以提高速度，但数据可能不是最新的。',
         ],
         'auth_ldap_debug' => [
             'description' => '显示侦错信息',
-            'help' => 'Shows debug information.  May expose private information, do not leave enabled.',
+            'help' => '显示调试信息。可能会暴露私人信息，不要保持启用状态。',
         ],
         'auth_ldap_emailattr' => [
             'description' => '邮件属性',
         ],
         'auth_ldap_group' => [
             'description' => '存取群组 DN',
-            'help' => 'Distinguished name for a group to give normal level access. Example: cn=groupname,ou=groups,dc=example,dc=com',
+            'help' => '授予普通级别访问权限的组的专有名称。示例：cn=groupname,ou=groups,dc=example,dc=com',
         ],
         'auth_ldap_groupbase' => [
             'description' => '群组基础 DN',
-            'help' => 'Distinguished name to search for groups Example: ou=group,dc=example,dc=com',
+            'help' => '搜索组的专有名称 示例：ou=group,dc=example,dc=com',
         ],
         'auth_ldap_groupmemberattr' => [
-            'description' => 'Group member attribute',
+            'description' => '组成员属性',
         ],
         'auth_ldap_groupmembertype' => [
             'description' => '以下列方式寻找群组成员',
             'options' => [
                 'username' => '使用者名称',
-                'fulldn' => 'Full DN (using prefix and suffix)',
+                'fulldn' => 'Full DN (使用前缀和后缀)',
                 'puredn' => 'DN 搜寻 (使用 uid 属性搜寻)',
             ],
         ],
         'auth_ldap_groups' => [
-            'description' => 'Group access',
-            'help' => 'Define groups that have access and level',
+            'description' => '群体访问',
+            'help' => '定义具有访问权限和级别的群体',
         ],
         'auth_ldap_port' => [
-            'description' => 'LDAP 连接埠',
-            'help' => 'Port to connect to servers on. For LDAP it should be 389, for LDAPS it should be 636',
+            'description' => 'LDAP 连接端口',
+            'help' => '用于连接服务器的端口。对于LDAP，端口应为389，对于LDAPS，端口应为636。',
         ],
         'auth_ldap_prefix' => [
             'description' => '使用者前缀',
-            'help' => 'Used to turn a username into a distinguished name',
+            'help' => '用于将用户名转换为可分辨名称（Distinguished Name）',
         ],
         'auth_ldap_server' => [
             'description' => 'LDAP 服务器',
-            'help' => 'Set server(s), space separated. Prefix with ldaps:// for ssl',
+            'help' => '设置服务器（如果有多个，用空格分隔）。若使用SSL，请在服务器地址前加上ldaps://前缀。',
         ],
         'auth_ldap_starttls' => [
             'description' => '使用 STARTTLS',
-            'help' => 'Use STARTTLS to secure the connection.  Alternative to LDAPS.',
+            'help' => '使用STARTTLS来加密连接。这是LDAPS的替代方案。',
             'options' => [
                 'disabled' => '停用',
                 'optional' => '选用',
@@ -277,19 +274,19 @@ return [
         ],
         'auth_ldap_suffix' => [
             'description' => '使用者后缀',
-            'help' => 'Used to turn a username into a distinguished name',
+            'help' => '用于将用户名转换为可分辨名称（Distinguished Name）',
         ],
         'auth_ldap_timeout' => [
-            'description' => '联机逾时',
-            'help' => 'If one or more servers are unresponsive, higher timeouts will cause slow access. To low may cause connection failures in some cases',
+            'description' => '联机超时',
+            'help' => '如果一个或多个服务器无响应，较高的超时时间会导致访问速度变慢。而设置得太低，在某些情况下可能导致连接失败。',
         ],
         'auth_ldap_uid_attribute' => [
             'description' => '唯一 ID 属性',
-            'help' => 'LDAP attribute to use to identify users, must be numeric',
+            'help' => '用于标识用户的LDAP属性，必须是数字类型。',
         ],
         'auth_ldap_userdn' => [
             'description' => '使用全名 DN',
-            'help' => "Uses a user's full DN as the value of the member attribute in a group instead of member: username using the prefix and suffix. (it’s member: uid=username,ou=groups,dc=domain,dc=com)",
+            'help' => '使用用户的完整DN作为群组中成员属性的值，而非采用前缀和后缀的方式（如member: uid=username,ou=groups,dc=domain,dc=com）。',
         ],
         'auth_ldap_version' => [
             'description' => 'LDAP 版本',
@@ -315,35 +312,31 @@ return [
         ],
         'auth_remember' => [
             'description' => '记住我的期限',
-            'help' => 'Number of days to keep a user logged in when checking the remember me checkbox at log in.',
+            'help' => '当用户登录时勾选“记住我”复选框后，保持用户登录状态的天数。',
         ],
         'authlog_purge' => [
             'description' => '验证记录项目大于',
-            'help' => 'Cleanup done by daily.sh',
+            'help' => '由daily.sh脚本执行的清理任务',
         ],
         'base_url' => [
             'description' => '指定 URL',
-            'help' => 'This should *only* be set if you want to *force* a particular hostname/port. It will prevent the web interface being usable form any other hostname',
-        ],
-        'device_perf_purge' => [
-            'description' => '装置效能项目大于',
-            'help' => 'Cleanup done by daily.sh',
+            'help' => '此设置仅在您需要*强制*使用特定主机名/端口时才应设置。它将阻止从任何其他主机名访问Web界面。',
         ],
         'distributed_poller' => [
             'description' => '启用分布式轮询 (需要额外设定)',
-            'help' => 'Enable distributed polling system wide. This is intended for load sharing, not remote polling. You must read the documentation for steps to enable: https://docs.librenms.org/Extensions/Distributed-Poller/',
+            'help' => '启用全系统分布式轮询功能。此功能旨在实现负载分担，而非远程轮询。您必须阅读以下文档以获取启用步骤：https://docs.librenms.org/Extensions/Distributed-Poller/',
         ],
         'distributed_poller_group' => [
             'description' => '预设轮询器群组',
-            'help' => 'The default poller group all pollers should poll if none is set in config.php',
+            'help' => '如果在config.php文件中没有设置，默认的轮询器组应所有轮询器进行轮询。',
         ],
         'distributed_poller_memcached_host' => [
             'description' => 'Memcached 主机',
-            'help' => 'The hostname or ip for the memcached server. This is required for poller_wrapper.py and daily.sh locking.',
+            'help' => 'Memcached服务器的主机名或IP地址。这是poller_wrapper.py和daily.sh锁定所需的。',
         ],
         'distributed_poller_memcached_port' => [
-            'description' => 'Memcached 连接埠',
-            'help' => 'The port for the memcached server. Default is 11211',
+            'description' => 'Memcached 连接端口',
+            'help' => 'Memcached服务器的端口。默认是11211',
         ],
         'email_auto_tls' => [
             'description' => '启用 / 停用自动 TLS 支持',
@@ -354,7 +347,7 @@ return [
         ],
         'email_backend' => [
             'description' => '寄送邮件方式',
-            'help' => 'The backend to use for sending email, can be mail, sendmail or SMTP',
+            'help' => '用于发送邮件的后端，可以是mail、sendmail或SMTP。',
             'options' => [
                 'mail' => 'mail',
                 'sendmail' => 'sendmail',
@@ -363,7 +356,7 @@ return [
         ],
         'email_from' => [
             'description' => '寄件者信箱地址',
-            'help' => 'Email address used for sending emails (from)',
+            'help' => '用于发送电子邮件的电子邮件地址（发件人）',
         ],
         'email_html' => [
             'description' => '使用 HTML 格式',
@@ -382,7 +375,7 @@ return [
             'description' => 'SMTP 验证密码',
         ],
         'email_smtp_port' => [
-            'description' => 'SMTP 连接埠设定',
+            'description' => 'SMTP 连接端口设定',
         ],
         'email_smtp_secure' => [
             'description' => '启用 / 停用加密 (使用 TLS 或 SSL)',
@@ -393,14 +386,14 @@ return [
             ],
         ],
         'email_smtp_timeout' => [
-            'description' => 'SMTP 逾时设定',
+            'description' => 'SMTP 超时设定',
         ],
         'email_smtp_username' => [
             'description' => 'SMTP 验证使用者名称',
         ],
         'email_user' => [
             'description' => '寄件者名称',
-            'help' => 'Name used as part of the from address',
+            'help' => '作为发件人地址一部分使用的名称',
         ],
         'eventlog_purge' => [
             'description' => '事件记录大于',
@@ -419,75 +412,75 @@ return [
         'fping_options' => [
             'count' => [
                 'description' => 'fping 次数',
-                'help' => 'The number of pings to send when checking if a host is up or down via icmp',
+                'help' => '当通过icmp检查主机是否在线或离线时发送的ping次数',
             ],
             'interval' => [
                 'description' => 'fping 间隔',
-                'help' => 'The amount of milliseconds to wait between pings',
+                'help' => '每次ping之间等待的毫秒数',
             ],
             'timeout' => [
-                'description' => 'fping 逾时',
-                'help' => 'The amount of milliseconds to wait for an echo response before giving up',
+                'description' => 'fping 超时',
+                'help' => '在放弃之前等待回显响应的毫秒数',
             ],
         ],
         'geoloc' => [
             'api_key' => [
-                'description' => '地理编码 API 金钥',
-                'help' => 'Geocoding API Key (Required to function)',
+                'description' => '地理编码 API 密钥',
+                'help' => '地理编码API密钥（功能所需）',
             ],
             'engine' => [
                 'description' => '地理编码引擎',
                 'options' => [
-                    'google' => 'Google Maps',
-                    'openstreetmap' => 'OpenStreetMap',
-                    'mapquest' => 'MapQuest',
-                    'bing' => 'Bing Maps',
+                    'google' => '谷歌地图',
+                    'openstreetmap' => '开放式街图（OpenStreetMap）',
+                    'mapquest' => 'MapQuest地图',
+                    'bing' => '必应地图',
                 ],
             ],
         ],
         'graylog' => [
             'base_uri' => [
                 'description' => 'Base URI',
-                'help' => 'Override the base uri in the case you have modified the Graylog default.',
+                'help' => '如果您已修改了Graylog的默认设置，此选项可覆盖基本URI。',
             ],
             'device-page' => [
                 'loglevel' => [
-                    'description' => '装置概观记录等级',
-                    'help' => 'Sets the maximum log level shown on the device overview page.',
+                    'description' => '设备概观记录等级',
+                    'help' => '设置设备概览页面上显示的最大日志级别。',
                 ],
                 'rowCount' => [
-                    'description' => '装置概观数据笔数',
-                    'help' => 'Sets the number of rows show on the device overview page.',
+                    'description' => '设备概观数据笔数',
+                    'help' => '设置设备概览页面上显示的行数。',
                 ],
             ],
             'password' => [
                 'description' => '密码',
-                'help' => 'Password for accessing Graylog API.',
+                'help' => '访问Graylog API的密码。',
             ],
             'port' => [
-                'description' => '连接埠',
-                'help' => 'The port used to access the Graylog API. If none give, it will be 80 for http and 443 for https.',
+                'description' => '连接端口',
+                'help' => '用于访问Graylog API的端口。如果不指定，默认情况下http使用80端口，https使用443端口。',
             ],
             'server' => [
                 'description' => '服务器',
-                'help' => 'The ip or hostname of the Graylog server API endpoint.',
+                'help' => 'Graylog服务器API端点的IP或主机名。',
             ],
             'timezone' => [
                 'description' => '显示时区',
-                'help' => 'Graylog times are stored in GMT, this setting will change the displayed timezone. The value must be a valid PHP timezone.',
+                'help' => 'Graylog中的时间以GMT存储，此设置将更改显示的时区。值必须为有效的PHP时区。',
             ],
             'username' => [
                 'description' => '使用者名称',
-                'help' => 'Username for accessing the Graylog API.',
+                'help' => '用户名，用于访问Graylog API。',
             ],
             'version' => [
                 'description' => '版本',
-                'help' => 'This is used to automatically create the base_uri for the Graylog API. If you have modified the API uri from the default, set this to other and specify your base_uri.',
+                'help' => '此设置用于自动生成Graylog API的基本URI。如果您已从默认设置修改了API URI，请将其设置为“其他”并指定您的基本URI。',
             ],
         ],
         'http_proxy' => [
             'description' => 'HTTP(S) 代理',
-            'help' => 'Set this as a fallback if http_proxy or https_proxy environment variable is not available.',
+            'help' => '如果环境变量http_proxy或https_proxy不可用，可将此设置作为回退。',
         ],
         'ipmitool' => [
             'description' => 'ipmtool 路径',
@@ -504,7 +497,7 @@ return [
         ],
         'mydomain' => [
             'description' => '主要网域',
-            'help' => 'This domain is used for network auto-discovery and other processes. LibreNMS will attempt to append it to unqualified hostnames.',
+            'help' => '此域名用于网络自动发现和其他进程。LibreNMS将尝试将其附加到未完全限定的主机名上。',
         ],
         'nfsen_enable' => [
             'description' => '启用 NfSen',
@@ -512,55 +505,55 @@ return [
         ],
         'nfsen_rrds' => [
             'description' => 'NfSen RRD 目录',
-            'help' => 'This value specifies where your NFSen RRD files are located.',
+            'help' => '此值指定您的NFSen RRD文件存放的位置。',
         ],
         'nfsen_subdirlayout' => [
             'description' => '设定 NfSen 子目录配置',
-            'help' => 'This must match the subdir layout you have set in NfSen. 1 is the default.',
+            'help' => '这必须与您在NfSen中设置的子目录结构相匹配。默认值为1。',
         ],
         'nfsen_last_max' => [
             'description' => 'Last Max',
         ],
         'nfsen_top_max' => [
             'description' => 'Top Max',
-            'help' => 'Max topN value for stats',
+            'help' => '最大统计数据的TopN值',
         ],
         'nfsen_top_N' => [
             'description' => 'Top N',
         ],
         'nfsen_top_default' => [
-            'description' => 'Default Top N',
+            'description' => '默认 Top N',
         ],
         'nfsen_stat_default' => [
-            'description' => 'Default Stat',
+            'description' => '默认统计',
         ],
         'nfsen_order_default' => [
-            'description' => 'Default Order',
+            'description' => '默认排序方式',
         ],
         'nfsen_last_default' => [
-            'description' => 'Default Last',
+            'description' => '默认最后一个',
         ],
         'nfsen_lasts' => [
-            'description' => 'Default Last Options',
+            'description' => '默认最后选项',
         ],
         'nfsen_split_char' => [
             'description' => '分隔字符',
-            'help' => 'This value tells us what to replace the full stops `.` in the devices hostname with. Usually: `_`',
+            'help' => '此值告诉我们用什么来替换设备主机名中的句点`.`。通常使用：`_`',
         ],
         'nfsen_suffix' => [
             'description' => '文件名称前缀',
-            'help' => 'This is a very important bit as device names in NfSen are limited to 21 characters. This means full domain names for devices can be very problematic to squeeze in, so therefor this chunk is usually removed.',
+            'help' => '这是非常关键的一点，因为在NfSen中，设备名称被限制为21个字符。这意味着设备的完整域名可能很难压缩进去，因此通常会移除这一部分。',
         ],
         'nmap' => [
             'description' => 'nmap 路径',
         ],
         'own_hostname' => [
             'description' => 'LibreNMS 主机名称',
-            'help' => 'Should be set to the hostname/ip the librenms server is added as',
+            'help' => '应设置为librenms服务器添加时使用的主机名/IP地址',
         ],
         'oxidized' => [
             'default_group' => [
-                'description' => 'Set the default group returned',
+                'description' => '设置返回的默认分组',
             ],
             'enabled' => [
                 'description' => '启用 Oxidized 支援',
@@ -568,24 +561,24 @@ return [
             'features' => [
                 'versioning' => [
                     'description' => '启用组态版本存取',
-                    'help' => 'Enable Oxidized config versioning (requires git backend)',
+                    'help' => '启用Oxidized配置版本控制（需要git后端支持）',
                 ],
             ],
             'group_support' => [
-                'description' => 'Enable the return of groups to Oxidized',
+                'description' => '启用向 Oxidized 返回分组的功能',
             ],
             'reload_nodes' => [
-                'description' => '在每次新增装置后，重新加载 Oxidized 节点清单',
+                'description' => '在每次新增设备后，重新加载 Oxidized 节点清单',
             ],
             'url' => [
                 'description' => '您的 Oxidized API URL',
-                'help' => 'Oxidized API url (For example: http://127.0.0.1:8888)',
+                'help' => 'Oxidized API 的网址（例如：http://127.0.0.1:8888）',
             ],
         ],
         'password' => [
             'min_length' => [
                 'description' => '密码最小长度',
-                'help' => 'Passwords shorter than the given length will be rejected',
+                'help' => '低于指定长度的密码将会被拒绝',
             ],
         ],
         'peeringdb' => [
@@ -599,23 +592,23 @@ return [
         ],
         'ports_fdb_purge' => [
             'description' => '连接端口 FDB 项目大于',
-            'help' => 'Cleanup done by daily.sh',
+            'help' => '由 daily.sh 脚本完成的日常清理工作',
         ],
         'ports_purge' => [
             'description' => '清除端口已删除',
-            'help' => 'Cleanup done by daily.sh',
+            'help' => '由 daily.sh 脚本执行的日常清理操作',
         ],
         'public_status' => [
             'description' => '公开状态显示',
-            'help' => '允许不登入的情况下，显示装置的状态信息。',
+            'help' => '允许不登入的情况下，显示设备的状态信息。',
         ],
         'routes_max_number' => [
             'description' => '允许探索路由的最大路由数',
-            'help' => 'No route will be discovered if the size of the routing table is bigger than this number',
+            'help' => '如果路由表的大小超过此数值，将不会发现任何路由信息',
         ],
         'route_purge' => [
             'description' => '路由记录大于',
-            'help' => 'Cleanup done by daily.sh',
+            'help' => '由 daily.sh 脚本执行的日常清理任务',
         ],
         'rrd' => [
             'heartbeat' => [
@@ -627,67 +620,67 @@ return [
         ],
         'rrd_dir' => [
             'description' => 'RRD 位置',
-            'help' => 'Location of rrd files.  Default is rrd inside the LibreNMS directory.  Changing this setting does not move the rrd files.',
+            'help' => 'RRD 文件的存储位置。默认位置是 LibreNMS 目录内的 rrd 文件夹。更改此设置不会移动现有的 RRD 文件。',
         ],
         'rrd_purge' => [
             'description' => 'RRD 档案项目大于',
-            'help' => 'Cleanup done by daily.sh',
+            'help' => '由 daily.sh 脚本完成的日常清理任务',
         ],
         'rrd_rra' => [
             'description' => 'RRD 格式设定',
-            'help' => 'These cannot be changed without deleting your existing RRD files. Though one could conceivably increase or decrease the size of each RRA if one had performance problems or if one had a very fast I/O subsystem with no performance worries.',
+            'help' => '这些设置无法在不删除现有 RRD 文件的情况下更改。但是，如果遇到性能问题，或者拥有非常快速的 I/O 系统且无需担心性能，理论上可以通过增加或减少每个 RRA 的大小来进行调整。',
         ],
         'rrdcached' => [
             'description' => '启用 rrdcached (socket)',
-            'help' => 'Enables rrdcached by setting the location of the rrdcached socket. Can be unix or network socket (unix:/run/rrdcached.sock or localhost:42217)',
+            'help' => '通过设置 rrdcached 套接字的位置来启用 rrdcached。可以是 unix 套接字或网络套接字（unix:/run/rrdcached.sock 或 localhost:42217）',
         ],
         'rrdtool' => [
             'description' => 'rrdtool 路径',
         ],
         'rrdtool_tune' => [
-            'description' => '调整所有 rrd 连接埠档案使用最大值',
-            'help' => '自动调整 rrd 连接埠档案的最大值',
+            'description' => '调整所有 rrd 连接端口档案使用最大值',
+            'help' => '自动调整 rrd 连接端口档案的最大值',
         ],
         'sfdp' => [
             'description' => 'sfdp 路径',
         ],
         'shorthost_target_length' => [
-            'description' => 'Shortened hostname maximum length',
-            'help' => 'Shrinks hostname to maximum length, but always complete subdomain parts',
+            'description' => '缩短后的主机名最大长度',
+            'help' => '缩短主机名至最大长度，但始终保留完整的子域名部分',
         ],
         'site_style' => [
-            'description' => '设定站台 css 样式',
+            'description' => '设定站点 css 样式',
             'options' => [
-                'blue' => 'Blue',
-                'dark' => 'Dark',
-                'light' => 'Light',
-                'mono' => 'Mono',
+                'blue' => '蓝色',
+                'dark' => '深色',
+                'light' => '浅色',
+                'mono' => '单色',
             ],
         ],
         'snmp' => [
             'transports' => [
                 'description' => '传输 (优先级)',
-                'help' => 'Select enabled transports and order them as you want them to be tried.',
+                'help' => '选择启用的传输方式，并按您希望尝试的顺序排列它们。',
             ],
             'version' => [
                 'description' => '版本 (优先级)',
-                'help' => 'Select enabled versions and order them as you want them to be tried.',
+                'help' => '选择启用的版本，并按您希望尝试的顺序排列它们。',
             ],
             'community' => [
                 'description' => '社群 (优先级)',
-                'help' => 'Enter community strings for v1 and v2c and order them as you want them to be tried',
+                'help' => '输入 v1 和 v2c 的团体字符串，并按您希望尝试的顺序排列它们',
             ],
             'max_repeaters' => [
                 'description' => '重复撷取最多次数',
-                'help' => 'Set repeaters to use for SNMP bulk requests',
+                'help' => '设置用于 SNMP 批量请求的中继器',
             ],
             'port' => [
-                'description' => '连接埠',
-                'help' => 'Set the tcp/udp port to be used for SNMP',
+                'description' => '连接端口',
+                'help' => '设置用于 SNMP 的 TCP/UDP 端口',
             ],
             'v3' => [
                 'description' => 'SNMP v3 验证 (优先级)',
-                'help' => 'Set up v3 authentication variables and order them as you want them to be tried',
+                'help' => '设置 v3 认证变量，并按您希望尝试的顺序排列它们',
                 'auth' => '验证',
                 'crypto' => '加密',
                 'fields' => [
@@ -699,9 +692,9 @@ return [
                     'cryptopass' => '算法密码',
                 ],
                 'level' => [
-                    'noAuthNoPriv' => 'No Authentication, No Privacy',
-                    'authNoPriv' => 'Authentication, No Privacy',
-                    'authPriv' => 'Authentication and Privacy',
+                    'noAuthNoPriv' => '无认证，无隐私保护',
+                    'authNoPriv' => '认证，无隐私保护',
+                    'authPriv' => '认证与隐私',
                 ],
             ],
         ],
@@ -721,29 +714,29 @@ return [
             'description' => 'snmpwalk 路径',
         ],
         'syslog_filter' => [
-            'description' => 'Filter syslog messages containing',
+            'description' => '过滤包含在内的 syslog 消息',
         ],
         'syslog_purge' => [
             'description' => 'Syslog 项目大于',
-            'help' => 'Cleanup done by daily.sh',
+            'help' => '由 daily.sh 完成的清理工作',
         ],
         'title_image' => [
             'description' => '标题图片',
-            'help' => 'Overrides the default Title Image.',
+            'help' => '覆盖默认的标题图像。',
         ],
         'traceroute' => [
             'description' => 'traceroute 路径',
         ],
         'unix-agent' => [
             'connection-timeout' => [
-                'description' => 'Unix-agent 联机逾时',
+                'description' => 'Unix-agent 联机超时',
             ],
             'port' => [
-                'description' => '预设 unix-agent 连接埠',
+                'description' => '预设 unix-agent 连接端口',
                 'help' => 'unix-agent (check_mk) 预设连接端口号码',
             ],
             'read-timeout' => [
-                'description' => 'Unix-agent 读取逾时',
+                'description' => 'Unix-agent 读取超时',
             ],
         ],
         'update' => [
@@ -752,8 +745,8 @@ return [
         'update_channel' => [
             'description' => '设定更新频道',
             'options' => [
-                'master' => 'Daily',
-                'release' => 'Monthly',
+                'master' => '每日',
+                'release' => '每月',
             ],
         ],
         'virsh' => [
@@ -762,19 +755,19 @@ return [
         'webui' => [
             'availability_map_box_size' => [
                 'description' => '可用性区块宽度',
-                'help' => 'Input desired tile width in pixels for box size in full view',
+                'help' => '输入全视图中盒子大小所需的瓦片宽度（像素）',
             ],
             'availability_map_compact' => [
                 'description' => '可用性地图精简模式',
-                'help' => 'Availability map view with small indicators',
+                'help' => '带有小指示符的可用性地图视图',
             ],
             'availability_map_sort_status' => [
                 'description' => '依状态排序',
-                'help' => '以状态做为装置与服务的排序',
+                'help' => '以状态做为设备与服务的排序',
             ],
             'availability_map_use_device_groups' => [
-                'description' => '使用装置群组筛选器',
-                'help' => '启用装置群组筛选器',
+                'description' => '使用设备群组筛选器',
+                'help' => '启用设备群组筛选器',
             ],
             'default_dashboard_id' => [
                 'description' => '预设信息广告牌',
@@ -782,7 +775,7 @@ return [
             ],
             'dynamic_graphs' => [
                 'description' => '启用动态群组',
-                'help' => 'Enable dynamic graphs, enables zooming and panning on graphs',
+                'help' => '启用动态图表，允许在图表上进行缩放和平移',
             ],
             'global_search_result_limit' => [
                 'description' => '设定搜寻结果笔数上限',
@@ -790,7 +783,7 @@ return [
             ],
             'graph_stacked' => [
                 'description' => '使用堆栈图表',
-                'help' => 'Display stacked graphs instead of inverted graphs',
+                'help' => '显示堆叠图而不是倒置图',
             ],
             'graph_type' => [
                 'description' => '设定图表类型',
@@ -811,7 +804,7 @@ return [
     ],
     'twofactor' => [
         'description' => '启用双因素验证',
-        'help' => 'Enables the built in Two-Factor authentication. You must set up each account to make it active.',
+        'help' => '启用内置的双因素认证。您必须为每个帐户设置以使其激活。',
     ],
     'units' => [
         'days' => '日',
@@ -819,12 +812,12 @@ return [
         'seconds' => '秒',
     ],
     'validate' => [
-        'boolean' => ':value is not a valid boolean',
-        'email' => ':value is not a valid email',
-        'integer' => ':value is not an integer',
-        'password' => 'The password is incorrect',
-        'select' => ':value is not an allowed value',
-        'text' => ':value is not allowed',
-        'array' => 'Invalid format',
+        'boolean' => ':值不是一个有效的布尔值',
+        'email' => ':值不是一个有效的电子邮件地址',
+        'integer' => ':值不是一个整数',
+        'password' => '密码不正确',
+        'select' => ':值不是允许的值',
+        'text' => ':值不允许',
+        'array' => '格式无效',
     ],
 ];

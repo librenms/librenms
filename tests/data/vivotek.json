@@ -327,7 +327,7 @@
                     "ifMtu": 1500,
                     "ifType": "ethernetCsmacd",
                     "ifAlias": "eth0",
-                    "ifPhysAddress": "303a323a6431",
+                    "ifPhysAddress": "0002d143a526",
                     "ifLastChange": 0,
                     "ifVlan": null,
                     "ifTrunk": null,

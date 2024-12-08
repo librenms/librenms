@@ -26,7 +26,8 @@
 namespace App\Http\Controllers\Device\Tabs;
 
 use App\Models\Device;
-use DB;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use LibreNMS\Interfaces\UI\DeviceTab;
 
 class ProcessesController implements DeviceTab
@@ -51,7 +52,7 @@ class ProcessesController implements DeviceTab
         return __('Processes');
     }
 
-    public function data(Device $device): array
+    public function data(Device $device, Request $request): array
     {
         return [];
     }

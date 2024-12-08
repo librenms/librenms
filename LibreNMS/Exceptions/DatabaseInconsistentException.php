@@ -79,8 +79,8 @@ class DatabaseInconsistentException extends \Exception implements UpgradeableExc
         return $request->wantsJson() ? response()->json([
             'status' => 'error',
             'message' => $message,
-        ]) : response()->view('errors.db_inconsistent', [
+        ], 500) : response()->view('errors.db_inconsistent', [
             'results' => $this->validationResults,
-        ]);
+        ], 500);
     }
 }

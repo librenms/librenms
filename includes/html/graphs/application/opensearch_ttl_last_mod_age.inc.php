@@ -14,8 +14,8 @@ $rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Last Mod Age',
-        'ds'       => 'ttl_last_mod_age',
+        'descr' => 'Last Mod Age',
+        'ds' => 'ttl_last_mod_age',
     ];
 } else {
     d_echo('RRD "' . $rrd_filename . '" not found');

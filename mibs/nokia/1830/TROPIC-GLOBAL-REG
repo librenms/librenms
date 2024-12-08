@@ -1,0 +1,4996 @@
+TROPIC-GLOBAL-REG DEFINITIONS ::= BEGIN
+
+-- (c) Copyright 2023 Nokia Networks.  All rights reserved.
+-- This software is the confidential and proprietary property of
+-- Nokia and may only be used in accordance with the terms of the
+-- license agreement provided with this software.
+
+IMPORTS
+      MODULE-IDENTITY,
+      OBJECT-IDENTITY,
+      enterprises                             FROM SNMPv2-SMI;
+
+    tropicGlobalRegModule MODULE-IDENTITY
+        LAST-UPDATED    "202211181200Z"
+        ORGANIZATION    "Nokia"
+        CONTACT-INFO    "Nokia
+                         Attn: Jeff Donnelly
+                         600 Mountain Avenue
+                         New Providence, NJ 07974
+
+                         Phone: +1 732 221 6408
+                         Email: jeff.donnelly@nokia.com"
+
+        DESCRIPTION "The Nokia registration module."
+
+        REVISION    "202211181200Z"
+        DESCRIPTION "Added the following nodes:
+                     tnDhpMIBModules
+                     tnDhpMIB
+                     tnDhpObjs."
+
+        REVISION    "202207151200Z"
+        DESCRIPTION "Added the following card:
+                     Opsuml."
+
+        REVISION    "202204291200Z"
+        DESCRIPTION "Added the following cards:
+                     Ir32AW
+                     OpenIr32AW
+                     EilaAW
+                     OpenEilaAW
+                     18ce300."
+
+        REVISION    "202203251200Z"
+        DESCRIPTION "Added the following card:
+                     nokiaEquipmentController3Card."
+
+        REVISION    "202203041200Z"
+        DESCRIPTION "Added the following shelves and cards:
+                     Sfd48
+                     Sfd64."
+
+        REVISION    "202112241200Z"
+        DESCRIPTION "Added the following card:
+                     Asc2."
+
+        REVISION    "202112171200Z"
+        DESCRIPTION "Added the following card:
+                     Ir4."
+
+        REVISION    "202112031200Z"
+        DESCRIPTION "Added the following node:
+                     nokia1830SAS."
+
+        REVISION    "202110221200Z"
+        DESCRIPTION "Added the following card:
+                     Mxn1624."
+
+        REVISION    "202106041200Z"
+        DESCRIPTION "1) Added the following shelf:
+                        nokiaMsh8aShelf.
+                     2) Added the following card:
+                        Msh8a."
+
+        REVISION    "202105141200Z"
+        DESCRIPTION "Added the following card:
+                     Opsum."
+
+        REVISION    "202105071200Z"
+        DESCRIPTION "Added the following cards:
+                     Tic48TCard
+                     Switching48TCard."
+
+        REVISION    "202104301200Z"
+        DESCRIPTION "1) Added the following shelf:
+                        nokiaSAS24Shelf
+                     2) Added the following cards:
+                        nokiaSAS24EquipmentControllerCard
+                        nokiaS24PS1Card
+                        nokiaS24PS2Card
+                        nokiaS24PFCard
+                        nokiaS24FUCard."
+
+        REVISION    "202103051200Z"
+        DESCRIPTION "Marked the following as obsolete:
+                     aluWdmXticCard
+                     aluWdmPSS12xPacketClockEquipmentController2Card
+                     aluWdmSwitchingXSP9T6Card
+                     aluWdm40cx800Card
+                     aluWdm8cx800Card
+                     aluWdm6px800Card."
+
+        REVISION    "202012181200Z"
+        DESCRIPTION "1) Added the following shelves:
+                        nokiaSfd5ADShelf
+                        nokiaSfd5BDShelf
+                        nokiaSfd5CDShelf
+                        nokiaSfd5DDShelf
+                        nokiaSfd5AUShelf
+                        nokiaSfd5BUShelf
+                        nokiaSfd5CUShelf
+                        nokiaSfd5DUShelf
+                        nokiaDcm2pShelf.
+                     2) Added the following cards:
+                        nokiaSfd5ADCard
+                        nokiaSfd5BDCard
+                        nokiaSfd5CDCard
+                        nokiaSfd5DDCard
+                        nokiaSfd5AUCard
+                        nokiaSfd5BUCard
+                        nokiaSfd5CUCard
+                        nokiaSfd5DUCard
+                        nokiaDcm2pCard."
+
+        REVISION    "202010021200Z"
+        DESCRIPTION "Added the following cards:
+                     SwitchingXST4T
+                     SwitchingXST12T
+                     Mxn824
+                     Asc4
+                     5mx500
+                     2ux500."
+
+        REVISION    "202009181200Z"
+        DESCRIPTION "Added the following cards:
+                     16p200
+                     Ir9."
+
+        REVISION    "202008211200Z"
+        DESCRIPTION "Marked the following card as obsolete:
+                     D1ad400q."
+
+        REVISION    "202008071200Z"
+        DESCRIPTION "Marked the following as deprecated:
+                     aluWdmXticCard
+                     aluWdmPSS12xPacketClockEquipmentController2Card
+                     aluWdmSwitchingXSP9T6Card
+                     aluWdm40cx800Card
+                     aluWdm8cx800Card
+                     aluWdm6px800Card."
+
+        REVISION    "202004031200Z"
+        DESCRIPTION "Added the following card:
+                     12p120s."
+
+        REVISION    "202003201200Z"
+        DESCRIPTION "1) Added the following cards:
+                        4uc1t
+                        Asg.
+                     2) Added the following shelves:
+                        nokiaSfd5AShelf
+                        nokiaSfd5BShelf
+                        nokiaSfd5CShelf
+                        nokiaSfd5DShelf."
+
+        REVISION    "202002281200Z"
+        DESCRIPTION "Added the following card:
+                     18P400."
+
+        REVISION    "202001101200Z"
+        DESCRIPTION "1) Added the following shelf:
+                        aluWdmMlfsbShelf.
+                     2) Added the following card:
+                        Mlfsb."
+
+        REVISION    "201911151200Z"
+        DESCRIPTION "Added the following cards:
+                     Mcs16x15L
+                     EilaL
+                     OpenEilaL
+                     Ra5pb
+                     Xtic."
+
+        REVISION    "201911011200Z"
+        DESCRIPTION "Added the following cards:
+                     Omdcl
+                     OpenOmdcl."
+
+        REVISION    "201910041200Z"
+        DESCRIPTION "Added the following card:
+                     D1ad400qCard."
+
+        REVISION    "201909271200Z"
+        DESCRIPTION "Added the following node:
+                     nokia1830TPS."
+
+        REVISION    "201908021200Z"
+        DESCRIPTION "Added the following cards:
+                     GenericOtCard
+                     1ety100Card."
+
+        REVISION    "201907191200Z"
+        DESCRIPTION "1) Added the following shelf:
+                        aluWdmPSIMXUniversalShelf.
+                     2) Added the following card:
+                        aluWdmMultiFunctionPSIMXCard."
+
+        REVISION    "201905311200Z"
+        DESCRIPTION "Added the following card:
+                     Esre."
+
+        REVISION    "201904121200Z"
+        DESCRIPTION "1) Added the following shelves:
+                        nokiaDmCt05LmShelf
+                        nokiaDmCt10LmShelf
+                        nokiaDmIt05LmShelf
+                        nokiaDmIt10LmShelf.
+                     2) Added the following cards:
+                        nokiaDmCt05LmCard
+                        nokiaDmCt10LmCard
+                        nokiaDmIt05LmCard
+                        nokiaDmIt10LmCard."
+
+        REVISION    "201903081200Z"
+        DESCRIPTION "Added the following card:
+                     nokiaVwmMsFanIICard."
+
+        REVISION    "201902221200Z"
+        DESCRIPTION "Added the following card:
+                     nokiaT24PS2Card."
+
+        REVISION    "201902081200Z"
+        DESCRIPTION "1) Added following attributes:
+                        nokiaTPS24Shelf
+                        nokiaTPS12Shelf
+                        nokiaTPS24EquipmentControllerCard
+                        nokiaTPS12EquipmentControllerCard
+                        nokiaT24PS1Card
+                        nokiaT12PSCard
+                        nokiaT24PFCard
+                        nokiaT12PFCard
+                        nokiaT24FUCard.
+                     2) Added the following to tnEquipmentModules:
+                        tnIEEE8023brMIB
+                        tnRoeMib."
+
+        REVISION    "201901251200Z"
+        DESCRIPTION "Added the following cards:
+                     OpenIrdm32L
+                     OpenEila."
+
+        REVISION    "201901181200Z"
+        DESCRIPTION "Added the following card:
+                     S4x400."
+
+        REVISION    "201812281200Z"
+        DESCRIPTION "Added the following card:
+                     Irdm32l."
+
+        REVISION    "201810261200Z"
+        DESCRIPTION "Added the following card:
+                     Dfc12."
+
+        REVISION    "201810191200Z"
+        DESCRIPTION "Added the following card:
+                     Switching24TCard."
+
+        REVISION    "201809281200Z"
+        DESCRIPTION "Added the following cards:
+                     OpenIrdm32
+                     10an1t
+                     8uc1t."
+
+        REVISION    "201808101200Z"
+        DESCRIPTION "Added the following card:
+                     Mcs16x15."
+
+        REVISION    "201807061200Z"
+        DESCRIPTION "Added the following cards:
+                     PSS12xPacketClockEquipmentController2
+                     6px800."
+
+        REVISION    "201806291200Z"
+        DESCRIPTION "Added the following cards:
+                     Irdm32
+                     Ra4p
+                     Eila
+                     8cx800."
+
+        REVISION    "201806151200Z"
+        DESCRIPTION "Added the following card:
+                     SwitchingXSP9T6Card."
+
+        REVISION    "201806081200Z"
+        DESCRIPTION "1) Added the following shelves:
+                        nokiaSfd*Shelf
+                        nokiaSfc*Shelf
+                        nokiaSARO*BShelf
+                        nokiaLR4BOCShelf.
+                     2) Added the following cards:
+                        nokiaSfd*Card
+                        nokiaSfc*Card
+                        nokiaSARO*Card
+                        nokiaLR4BOCCard
+                        nokiaSfd10*Card."
+
+        REVISION    "201805251200Z"
+        DESCRIPTION "1) Added the following node:
+                        aluWdm1830OLS.
+                     2) Added the following shelf:
+                        aluWdmPSIL3uUniversalShelf
+                        aluWdmPSIL5uUniversalShelf
+                     3) Added the following cards:
+                        aluWdmMini32GEquipmentController2Card
+                        aluWdmMultiFunctionPSILCard
+                        40cx800."
+
+        REVISION    "201803231200Z"
+        DESCRIPTION "Added the following card:
+                     Ipreamp."
+
+        REVISION    "201803091200Z"
+        DESCRIPTION "1) Added the following shelves:
+                        nokiaVwmMsTlu200Shelf
+                        nokiaVwmMsADVGIShelf.
+                     2) Added the following cards:
+                        nokiaVwmMsTlu200Card
+                        nokiaVwmMsADVGICard
+                        nokiaVwmMsFanDECard."
+
+        REVISION    "201802231200Z"
+        DESCRIPTION "Updated the contact info."
+
+        REVISION    "201801261200Z"
+        DESCRIPTION "Added the following card:
+                     Aswgl."
+
+        REVISION    "201801121200Z"
+        DESCRIPTION "Added the following card:
+                     Opsb5."
+
+        REVISION    "201711101200Z"
+        DESCRIPTION "Added the following cards:
+                     2ux200
+                     4mx200."
+
+        REVISION    "201711031200Z"
+        DESCRIPTION "1) Added the following shelf:
+                        aluWdmMsh4fsbShelf.
+                     2) Added the following card:
+                        Msh4fsb."
+
+        REVISION    "201710271200Z"
+        DESCRIPTION "Added the following card:
+                     aluWdmMultiFunctionPSIMCard."
+
+        REVISION    "201710131200Z"
+        DESCRIPTION "Added the following card:
+                     S2ad200."
+
+        REVISION    "201709221200Z"
+        DESCRIPTION "1) Added the following card:
+                        Iroadm20.
+                     2) Added the following shelves for Hermes:
+                        nokiaVwmMsPmuD21AShelf
+                        nokiaVwmMsPmuD21BShelf
+                        nokiaVwmMsPmuD21CShelf
+                        nokiaVwmMsPmuD21DShelf
+                        aluWdmSfd96Shelf
+                        aluWdmBmuPShelf
+                        aluWdmSplit2Shelf
+                        aluWdmOscCplrShelf
+                        aluWdmOAUnidirShelf.
+                     3) Added the following cards for Hermes:
+                        nokiaVwmMsPmuD21ACard
+                        nokiaVwmMsPmuD21BCard
+                        nokiaVwmMsPmuD21CCard
+                        nokiaVwmMsPmuD21DCard
+                        nokiaVwmMsOpsOsmDsvCard
+                        aluWdmSfd96Card
+                        aluWdmBmuPCard
+                        aluWdmSplit2Card
+                        aluWdmOscCplrCard
+                        aluWdmOAUnidirCard."
+
+        REVISION    "201709151200Z"
+        DESCRIPTION "1) Added the following shelf:
+                        PSS12xUniversalShelf.
+                     2) Added the following cards:
+                        PSS12xPowerFilterCard
+                        SwitchingXST4T8Card
+                        PSS12xClockEquipmentController2Card."
+
+        REVISION    "201709011200Z"
+        DESCRIPTION "Added the following cards:
+                     130sla1
+                     130slx10."
+
+        REVISION    "201708181200Z"
+        DESCRIPTION "Added the following card:
+                     Da2c4."
+
+        REVISION    "201707141200Z"
+        DESCRIPTION "Added the following node:
+                     aluWdm1830PSIM."
+
+        REVISION    "201707071200Z"
+        DESCRIPTION "Added the following card:
+                     18p40."
+
+        REVISION    "201706301200Z"
+        DESCRIPTION "Added the following card:
+                     D5x500q."
+
+        REVISION    "201706231200Z"
+        DESCRIPTION "1) Added the following controller card:
+                        aluWdmMiniEquipmentController2Card.
+                     2) Added the following shelf:
+                        aluWdmPSIMUniversalShelf.
+                     3) Added the following card:
+                        aluWdmOpsflexCard."
+
+        REVISION    "201706091200Z"
+        DESCRIPTION "Added the following cards:
+                     20an80
+                     10an400
+                     8p20
+                     Switching4T8Card."
+
+        REVISION    "201705261200Z"
+        DESCRIPTION "Marked the following card as obsolete:
+                     PSS16IIEquipmentController2."
+
+        REVISION    "201704071200Z"
+        DESCRIPTION "Added the following card:
+                     Otdrm."
+
+        REVISION    "201703241200Z"
+        DESCRIPTION "Added the following card:
+                     Ra2p96."
+
+        REVISION    "201703101200Z"
+        DESCRIPTION "1) Added the following node:
+                        aluWdm1830PSI.
+                     2) Added the following card:
+                        Iroadm9r."
+
+        REVISION    "201702241200Z"
+        DESCRIPTION "1) Marked the following as obsolete:
+                        aluWdmPSIUniversalShelf.
+                     2) Added the following shelves:
+                        aluWdmPSI1TUniversalShelf
+                        aluWdmPSI2TUniversalShelf
+                        aluWdmPSI2TLUniversalShelf."
+
+        REVISION    "201701271200Z"
+        DESCRIPTION "Added the following cards:
+                     D5x500l
+                     LcI2000l."
+
+        REVISION    "201701201200Z"
+        DESCRIPTION "Added the following cards:
+                     8dc30t
+                     16dc65t."
+
+        REVISION    "201612211200Z"
+        DESCRIPTION "Added the following to tnSystem:
+                     tnGenericNotificationMIB
+                     tnGenericLogMIB."
+
+        REVISION    "201612191200Z"
+        DESCRIPTION "Added the following card:
+                     Otdrwb."
+
+        REVISION    "201612091200Z"
+        DESCRIPTION "Added the following cards:
+                     30se300
+                     6se300."
+
+        REVISION    "201611181200Z"
+        DESCRIPTION "1) Added the following shelf:
+                        nokiaVwmMsTlu9mShelf.
+                     2) Added the following card:
+                        nokiaVwmMsTlu9mCard."
+
+        REVISION    "201611161200Z"
+        DESCRIPTION "Updated the contact info."
+
+        REVISION    "201611111200Z"
+        DESCRIPTION "1) Added the following shelf:
+                        nokiaPsdShelf,
+                     2) Added the following card:
+                        nokiaPsdCard,
+                     3) Added the following node:
+                        nokia1830Psd.
+                     4) Added the following to tnEquipmentModules:
+                        tnPsdModules.
+                     5) Added the following to Equipment:
+                        tnPsdMIB."
+
+        REVISION    "201611011200Z"
+        DESCRIPTION "Added the following card:
+                     LcI2000."
+
+        REVISION    "201610251200Z"
+        DESCRIPTION "1) Added the following shelves:
+                        nokiaVwmMsOsu20Shelf,
+                        nokiaVwmMsTlu9Shelf,
+                        nokiaVwmMsPmu9UcShelf,
+                        nokiaVwmMsPmu9LcShelf,
+                        nokiaVwmMsPmu9UcmShelf,
+                        nokiaVwmMsPmu9LcmShelf.
+                     2) Added the following cards:
+                        nokiaVwmMsOsu20Card,
+                        nokiaVwmMsTlu9Card,
+                        nokiaVwmMsPmu9UcCard,
+                        nokiaVwmMsPmu9LcCard,
+                        nokiaVwmMsPmu9UcmCard,
+                        nokiaVwmMsPmu9LcmCard,
+                        nokiaVwmMsFanTOCard.
+                     3) Added the following to nodes:
+                        nokia1830VwmMs.
+                     4) Added the following to tnEquipmentModules:
+                        tnVwmMsModules.
+                     5) Added the following to Equipment:
+                        tnVwmMsMIB.
+                     6) Added the following shelves:
+                        nokiaVwmMsItp4UcaShelf,
+                        nokiaVwmMsItp4UcbShelf,
+                        nokiaVwmMsItp4LcaShelf,
+                        nokiaVwmMsItp4LcbShelf,
+                        nokiaVwmMsSmmAoShelf,
+                        nokiaVwmMsSmmAiShelf,
+                        nokiaVwmMsOpsShelf.
+                     7) Added the following cards:
+                        nokiaVwmMsItp4UcaCard,
+                        nokiaVwmMsItp4UcbCard,
+                        nokiaVwmMsItp4LcaCard,
+                        nokiaVwmMsItp4LcbCard,
+                        nokiaVwmMsSmmAoCard,
+                        nokiaVwmMsSmmAiCard,
+                        nokiaVwmMsOpsEmuCard,
+                        nokiaVwmMsOpsOsmCard,
+                        nokiaVwmMsOpsPsuCard."
+
+        REVISION    "201609131200Z"
+        DESCRIPTION "Added the following cards:
+                     PSS8xMultiFunction
+                     PSS8xPowerFilter
+                     Wtocmfl
+                     Aar2x8al
+                     Wr20tfml
+                     Mcs8x16l."
+
+        REVISION    "201608301200Z"
+        DESCRIPTION "Added the following cards:
+                     PSS8xClockEquipmentController2Card
+                     Switching1T6Card."
+
+        REVISION    "201608291200Z"
+        DESCRIPTION "Added the following card:
+                     S13x100e."
+
+        REVISION    "201608221200Z"
+        DESCRIPTION "Added the following card:
+                     Aar2x8a."
+
+        REVISION    "201608111200Z"
+        DESCRIPTION "1) Added the following shelves:
+                        PSS8xUniversalShelf
+                        PSIUniversalShelf.
+                     2) Added the following cards:
+                        1ux100
+                        20ax200
+                        20mx80
+                        PSIEquipmentController2Card.
+                     3) Removed the following shelves:
+                        PSI1TUniversalShelf.
+                        PSI2TUniversalShelf.
+                     4) Removed the following cards:
+                        PSI1TEquipmentControllerCard
+                        PSI2TEquipmentControllerCard
+                        PSI1TFanUnitCard
+                        PSI2TFanUnitCard
+                        PSI1TPowerFilterCard
+                        PSI2TPowerFilterCard."
+
+        REVISION    "201607271200Z"
+        DESCRIPTION "Added the following cards:
+                     Sfdc8[a-e]
+                     Aa2donwb
+                     Osctapr
+                     11qpa4b."
+
+        REVISION    "201606011200Z"
+        DESCRIPTION "Added the following card:
+                     Ptpioctl."
+
+        REVISION    "201605251200Z"
+        DESCRIPTION "Added the following cards:
+                     S13x100
+                     12ce121."
+
+        REVISION    "201605201200Z"
+        DESCRIPTION "Added the following card:
+                     Iroadm9m."
+
+        REVISION    "201605101200Z"
+        DESCRIPTION "Added the following card:
+                     Ra5p."
+
+        REVISION    "201605041200Z"
+        DESCRIPTION "Added the following card:
+                     Awbila."
+
+        REVISION    "201604131200Z"
+        DESCRIPTION "Added the following cards:
+                     PSS8EquipmentController2Encryption
+                     PSS32EquipmentController2Encryption."
+
+        REVISION    "201604071200Z"
+        DESCRIPTION "Added the following cards:
+                     Awbing
+                     Awbegr."
+
+        REVISION    "201603181200Z"
+        DESCRIPTION "Added the following nodes:
+                     tnAbsNodeMIBModules
+                     tnAbsNodeMIB
+                     tnAbsNodeObjs."
+
+        REVISION    "201512241200Z"
+        DESCRIPTION "Added the following cards:
+                     PSI1TEquipmentControllerCard,
+                     PSI2TEquipmentControllerCard,
+                     PSI1TFanUnitCard,
+                     PSI2TFanUnitCard,
+                     PSI1TPowerFilterCard,
+                     PSI2TPowerFilterCard."
+
+        REVISION    "201512071200Z"
+        DESCRIPTION "1) Added the following shelves:
+                        PSI1TUniversal,
+                        PSIT2Universal.
+                     2) Added the following card:
+                        LcI1000."
+
+        REVISION    "201510281200Z"
+        DESCRIPTION "Added the following cards:
+                     12ce120
+                     1ce100."
+
+        REVISION    "201510051200Z"
+        DESCRIPTION "Added the following card:
+                     PSS96PowerFilterCard."
+
+        REVISION    "201508061200Z"
+        DESCRIPTION "Added the Mon-Otdr card."
+
+        REVISION    "201506221200Z"
+        DESCRIPTION "Added the S11M100 card."
+
+        REVISION    "201506121200Z"
+        DESCRIPTION "Added the following card:
+                     D5x500."
+
+        REVISION    "201502201200Z"
+        DESCRIPTION "Added the following cards:
+                     Ul2uc400
+                     Ul4uc400
+                     Ul20uc200."
+
+        REVISION    "201501161200Z"
+        DESCRIPTION "Added the following card:
+                     MonOcm."
+
+        REVISION    "201409251200Z"
+        DESCRIPTION "Added the following cards:
+                     Iroadmv
+                     Iroadmf."
+
+        REVISION    "201409181200Z"
+        DESCRIPTION "Added the following card:
+                     Ot130snq10."
+
+        REVISION    "201408081200Z"
+        DESCRIPTION "Added the following cards:
+                     12p120
+                     20p200
+                     1ud200."
+
+        REVISION    "201407071200Z"
+        DESCRIPTION "Added the following card:
+                     Io4an400."
+
+        REVISION    "201406201200Z"
+        DESCRIPTION "Added the following card:
+                     Io30an300."
+
+        REVISION    "201405181200Z"
+        DESCRIPTION "1) Added the following shelves:
+                        VwmCwUniversal
+                        VwmDwUniversal.
+                     2) Added the following cards:
+                        VwmCwEquipmentController
+                        VwmDwEquipmentController
+                        Sfd2[a-i,l-r]
+                        VwmSfd8[a-d]
+                        VwmSfc8
+                        PSS8PowerFilterAcCard."
+
+        REVISION    "201405091200Z"
+        DESCRIPTION "Added the following cards:
+                     PSS8ShelfPanel
+                     PSS8UserInterfacePanel
+                     MultiFunction
+                     Switching."
+
+        REVISION    "201405061200Z"
+        DESCRIPTION "Added the following cards:
+                     Io4an100g
+                     Io30an10g."
+
+        REVISION    "201404081200Z"
+        DESCRIPTION "1) Added the following shelves:
+                        PSS8Universal
+                        PSS16IIUniversal
+                        PSS48Universal
+                        PSS96Universal.
+                     2) Added the following cards:
+                        PSS8EquipmentController2
+                        PSS16IIEquipmentController2
+                        PSS32EquipmentController2
+                        ClockControllerCard96."
+
+        REVISION    "201402191200Z"
+        DESCRIPTION "Added the following cards:
+                     Msh8fsm
+                     Aswg
+                     A4pswg
+                     Mcs8x16
+                     Wr20tfm
+                     Otdr
+                     Aar8a."
+
+        REVISION    "201401221200Z"
+        DESCRIPTION "Added the A4pswg and Aswg cards."
+
+        REVISION    "201312171200Z"
+        DESCRIPTION "Marked the following as obsolete:
+                     tnCommonMIB
+                     tnTCMIBModule."
+
+        REVISION    "201311251200Z"
+        DESCRIPTION "Added the Wtocmf card."
+
+        REVISION    "201310101200Z"
+        DESCRIPTION "Added the Wr20tf card."
+
+        REVISION    "201310071200Z"
+        DESCRIPTION "1) Added the Psc1x6 shelf and card.
+                     2) Added the Gmre card.
+                     3) Marked tropic shelves and cards as obsolete."
+
+        REVISION    "201309041200Z"
+        DESCRIPTION "Added the Io10an10gb and Io10et10gb cards."
+
+        REVISION    "201308121200Z"
+        DESCRIPTION "Added the Ot130sca1 card."
+
+        REVISION    "201306271200Z"
+        DESCRIPTION "Added the following nodes:
+                     tnGmplsMIBModules
+                     tnGmplsMIB
+                     tnGmplsObjs."
+
+        REVISION    "201306241200Z"
+        DESCRIPTION "Added the Aa2donw card."
+
+        REVISION    "201305241200Z"
+        DESCRIPTION "Added the Ul130scupb and Ot112sdx11 cards."
+
+        REVISION    "201305151200Z"
+        DESCRIPTION "Moved MODULE-IDENTITY immediately after IMPORTS."
+
+        REVISION    "201304191200Z"
+        DESCRIPTION "Added the Ot11dpm8, Ot11dpm4m, and Ot11dpm4e cards."
+
+        REVISION    "201304111200Z"
+        DESCRIPTION "Added the Ot130snx10 and Io24anmb cards."
+
+        REVISION    "201303161200Z"
+        DESCRIPTION "Added the Am2625a, Am2032a, and Ot260scx2 cards."
+
+        REVISION    "201303071200Z"
+        DESCRIPTION "Added the 11ope8 and 11qce12x cards."
+
+        REVISION    "201301241200Z"
+        DESCRIPTION "Marked the Matrix1T9 as current."
+
+        REVISION    "201211061200Z"
+        DESCRIPTION "Added the Virtual card."
+
+        REVISION    "201210121200Z"
+        DESCRIPTION "Marked the following card as obsolete:
+                     EndOfShelfUpperLower."
+
+        REVISION    "201208281200Z"
+        DESCRIPTION "1) Added the Io4an10g, Io8et1gb, Io10et10g, Ul11qcupc,
+                        and Ot520scx4 cards.
+                     2) Marked the following cards as obsolete:
+                        UniversalMatrixSecondLevelController
+                        Matrix1T9."
+
+        REVISION    "201207241200Z"
+        DESCRIPTION "1) Added the Io24et1gb card.
+                     2) Marked the following as obsolete:
+                        11qta4."
+
+        REVISION    "201206181200Z"
+        DESCRIPTION "Added the A2p2125, 4qpa8, Ot112pdm11, Wtocma, Ptpctl,
+                     and Ptpio cards."
+
+        REVISION    "201205011200Z"
+        DESCRIPTION "1) Added the UniversalMatrixFirstLevelController1P2T
+                        and UniversalMatrixSecondLevelController1P2T cards.
+                     2) Added the PSS32Switch1P2TUniversal shelf."
+
+        REVISION    "201204271200Z"
+        DESCRIPTION "Added the 130scx10 card."
+
+        REVISION    "201204241200Z"
+        DESCRIPTION "Added the ul130scup card."
+
+        REVISION    "201204061200Z"
+        DESCRIPTION "Added tnPtpMIB."
+
+        REVISION    "201203291200Z"
+        DESCRIPTION "Added the 11dpe12a card."
+
+        REVISION    "201203181200Z"
+        DESCRIPTION "Added the Opsb card."
+
+        REVISION    "201203151200Z"
+        DESCRIPTION "Added tnOthMIB."
+
+        REVISION    "201202161200Z"
+        DESCRIPTION "1) Added the following top level object identifier structures:
+                        tnReg
+                        tnProducts
+                        tnSASProducts.
+                     2) Added the following SROS MIB modules:
+                        tnModules
+                        tnTCMIBModule
+                        tnSRMIBModules
+                        tnSRMIB
+                        tnSRObjs
+                        tnSRNotifyPrefix
+                        tnCommonMIB
+                        tnServiceAccessSwitches
+                        tnSASRegistry
+                        tnSASModules
+                        tnSASMIBModules
+                        tnSASMIB
+                        tnSASObjs."
+
+        REVISION    "201201191200Z"
+        DESCRIPTION "Added the cl10an10g and cl24anm cards."
+
+        REVISION    "201201181200Z"
+        DESCRIPTION "Added the Wr8c88af card."
+
+        REVISION    "201201101200Z"
+        DESCRIPTION "Added the 11star1a and MVAC8B cards."
+
+        REVISION    "201111211200Z"
+        DESCRIPTION "Added the 11qpe24 card."
+
+        REVISION    "201111141200Z"
+        DESCRIPTION "Added the 43scge1 card."
+
+        REVISION    "201109161200Z"
+        DESCRIPTION "Added the 43scx4e card."
+
+        REVISION    "201109061200Z"
+        DESCRIPTION "Added the 11qpen4 card."
+
+        REVISION    "201108311200Z"
+        DESCRIPTION "Added the ul43scup and ul11qcup cards."
+
+        REVISION    "201107191200Z"
+        DESCRIPTION "Added the 1dpp24m card."
+
+        REVISION    "201107071200Z"
+        DESCRIPTION "Added the 11qta4 card."
+
+        REVISION    "201106301200Z"
+        DESCRIPTION "Added the 112snx10 and 112sna1 cards."
+
+        REVISION    "201106131200Z"
+        DESCRIPTION "1) Added the UniversalMatrixSecondLevelController,
+                        EndOfShelfMiddle, and EndOfShelfUpperLower cards.
+                     2) Added the PSS32SwitchUniversalShelf shelf."
+
+        REVISION    "201106071200Z"
+        DESCRIPTION "Added the UniversalMatrixFirstLevelController card."
+
+        REVISION    "201105171200Z"
+        DESCRIPTION "Added the 43scx4l and Am2125b cards."
+
+        REVISION    "201105041200Z"
+        DESCRIPTION "Added the 43sca1 card."
+
+        REVISION    "201011221200Z"
+        DESCRIPTION "Added tnSyncEMIB."
+
+        REVISION    "201011141200Z"
+        DESCRIPTION "Added tnOtuOduMIB."
+
+        REVISION    "201011101200Z"
+        DESCRIPTION "Added the Mesh4 card."
+
+        REVISION    "201010191200Z"
+        DESCRIPTION "Added the 11dpm12 card."
+
+        REVISION    "201010171200Z"
+        DESCRIPTION "Added the 112sx10l and 112sa1l cards."
+
+        REVISION    "201010121200Z"
+        DESCRIPTION "Added tnAsonMIB."
+
+        REVISION    "201009281200Z"
+        DESCRIPTION "Added the 11dpe12e card."
+
+        REVISION    "201009241200Z"
+        DESCRIPTION "Added the BusTerminationOnly card."
+
+        REVISION    "201009201200Z"
+        DESCRIPTION "1) Marked TSSHCUniversalShelf and
+                        Matrix0Card as obsolete.
+                     2) Added the Itlu shelf.
+                     3) Added the Ra2p, Am2318a, Am2125a, Itlu, and
+                        Wr8c88a cards."
+
+        REVISION    "201009101200Z"
+        DESCRIPTION "1) Added the PSS64 shelf to replace the TSSHC shelf.
+                     2) Added the Matrix0Compact card to replace the
+                        Matrix0 card.
+                     3) Added the 43scx4 card."
+
+        REVISION    "201008021200Z"
+        DESCRIPTION "Added the BusTermination card."
+
+        REVISION    "201007201200Z"
+        DESCRIPTION "Added the MVAC card."
+
+        REVISION    "201006281200Z"
+        DESCRIPTION "Added the Sfd4[a-h] cards."
+
+        REVISION    "201006231200Z"
+        DESCRIPTION "Added the 1830PSS1MSAH product."
+
+        REVISION    "201006041200Z"
+        DESCRIPTION "1) Added the Am2017b, Am2325b, and 1dpp21 cards.
+                     2) Added the 1830PSS4 product."
+
+        REVISION    "201005111200Z"
+        DESCRIPTION "Added the TSSHC and PSS36 shelves."
+
+        REVISION    "201005101200Z"
+        DESCRIPTION "1) Added the Wtocm and Wr2-88 cards.
+                     2) Added the PSS4 Equipment Controller card.
+                     3) Added the PSS4UniversalShelf shelf."
+
+        REVISION    "201005071200Z"
+        DESCRIPTION "Added the FirstLevelController, Matrix0, Matrix3T8,
+                     and Matrix1T9 Equipment Controller cards."
+
+        REVISION    "201002171200Z"
+        DESCRIPTION "Added the Alpfgt and Osct cards."
+
+        REVISION    "201001241200Z"
+        DESCRIPTION "Deleted the PowerFilterA card."
+
+        REVISION    "201001041200Z"
+        DESCRIPTION "Added the 112scx10 and 112sca1 cards."
+
+        REVISION    "200912291200Z"
+        DESCRIPTION "Added the Sfd40Shelf and Sfd40bShelf shelves."
+
+        REVISION    "200912101200Z"
+        DESCRIPTION "Added the PowerFilterA, 11qpa4, Sfd40, Sfd40b, and
+                     A2325a cards."
+
+        REVISION    "200911011200Z"
+        DESCRIPTION "Added the 43sta1p and 43stx4p cards."
+
+        REVISION    "200909251200Z"
+        DESCRIPTION "1) Added the 1830PSS product.
+                     2) Added the PSS32UniversalShelf and
+                        PSS16UniversalShelf shelves.
+                     3) Added the Alpfgk, Osc, 4dpa2, and Sfd8[a-d] cards."
+
+        REVISION    "200905141200Z"
+        DESCRIPTION "Added 1830PSS1MD4H and 1830PSS1GBEH."
+
+        REVISION    "200904231200Z"
+        DESCRIPTION "Added tnVtsConnMIB."
+
+        REVISION    "200903311200Z"
+        DESCRIPTION "Added the 43stx4 card."
+
+        REVISION    "200903181200Z"
+        DESCRIPTION "Added the Ahplg card."
+
+        REVISION    "200903151200Z"
+        DESCRIPTION "1) Added the Sfd44b and Itlb shelves.
+                     2) Added the Cwr8-88, Sfd44b, and Itlb cards."
+
+        REVISION    "200903021200Z"
+        DESCRIPTION "Added the 4DPA4 card."
+
+        REVISION    "200902131200Z"
+        DESCRIPTION "Added tnPhMNotificationMIB."
+
+        REVISION    "200807241200Z"
+        DESCRIPTION "Added the SFC1 cards."
+
+        REVISION    "200805291200Z"
+        DESCRIPTION "1) Changed 1830 to 1830PSS32.
+                     2) Added 1830PSS1.
+                     3) Added the SVAC, SFD and SFC cards."
+
+        REVISION    "200803201200Z"
+        DESCRIPTION "1) Renamed Fan Unit 1 to Fan Unit.
+                     2) Renamed Equipment Controller 1 to Equipment Controller.
+                     3) Renamed OMD44 to SFD44.
+                     4) Renamed 11GBART to 11STAR1.
+                     5) Renamed 12XGBET to 11STGE12.
+                     6) Renamed 12XGBEP2 to 11DPGE12.
+                     7) Renamed 10XANYT to 11STMM10.
+                     8) Renamed OPS to OPSA.
+                     9) Removed 11GUART."
+
+        ::= { tropicModules 1 }
+
+-------------------------------------------------------------------------------
+--- Global Registry - Modules
+-------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+-- Enterprise Global Registration
+--------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+-- Top Level Object Identifiers Structure
+--------------------------------------------------------------------------------
+    tropic OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "The root of the OID tree assigned to
+                        Nokia by the Internet Assigned Numbers
+                        Authority (IANA)."
+        ::= { enterprises 7483 }
+
+    tropicRegistry OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropic 1 }
+
+    tropicGeneric OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropic 2 }
+
+    tropicProducts OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropic 3 }
+
+    tropicExpr OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropic 4 }
+
+-- Transplant from SROS
+
+    tnReg OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropic 5 }
+
+    tnProducts OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropic 6 }
+
+    tnSASProducts OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropic 7 }
+
+--------------------------------------------------------------------------------
+-- Registry
+--------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+-- Registry - Modules
+--------------------------------------------------------------------------------
+    tropicModules OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicRegistry 1 }
+
+    tnGenericModules OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicModules 2 }
+
+    tnTypeDefinitionModules OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicModules 3 }
+
+    tnSystemModules OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnGenericModules 1 }
+
+    tnEquipmentModules OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnGenericModules 2 }
+
+    tnServiceModules OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnGenericModules 3 }
+
+    tnProtocolModules OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnGenericModules 4 }
+
+    tropicExprModules OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnGenericModules 5 }
+
+    tnGmplsMIBModules OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnGenericModules 6 }
+
+    tnAbsNodeMIBModules OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnGenericModules 7 }
+
+    tnDhpMIBModules OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnGenericModules 8 }
+
+-------------------------------------------------------------------------------
+--- Equipment Registry - Modules
+-------------------------------------------------------------------------------
+    tnShelfModules OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnEquipmentModules 1 }
+
+    tnSlotModules OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnEquipmentModules 2 }
+
+    tnCardModules OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnEquipmentModules 3 }
+
+    tnPortModules OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnEquipmentModules 4 }
+
+    tnMiscModules OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnEquipmentModules 5 }
+
+    tnVwmMsModules OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnEquipmentModules 6 }
+
+    tnPsdModules OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnEquipmentModules 7 }
+
+--------------------------------------------------------------------------------
+-- Registry - Products
+--------------------------------------------------------------------------------
+--    obsolete
+--    tropicServiceReg OBJECT-IDENTITY ::= { tropicRegistry 2 }
+--    tropicL1Service  OBJECT-IDENTITY ::= { tropicServiceReg 1 }
+
+    tropicMetroReg OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicRegistry 3 }
+
+    tropicMetroNodeReg OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicMetroReg 1 }
+
+    tropicTRX24000 OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicMetroNodeReg 1 }
+
+    aluWdm1830PSS32 OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicMetroNodeReg 2 }
+
+    aluWdm1830PSS1 OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicMetroNodeReg 3 }
+
+    aluWdm1830PSS1MD4H OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicMetroNodeReg 4 }
+
+    aluWdm1830PSS1GBEH OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicMetroNodeReg 5 }
+
+    aluWdm1830PSS OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicMetroNodeReg 6 }
+
+    aluWdm1830PSS4 OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicMetroNodeReg 8 }
+
+    aluWdm1830PSS1MSAH OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicMetroNodeReg 9 }
+
+    nokia1830VwmMs OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicMetroNodeReg 11 }
+
+    nokia1830Psd OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicMetroNodeReg 12 }
+
+    aluWdm1830PSI OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicMetroNodeReg 13 }
+
+    aluWdm1830PSIM OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicMetroNodeReg 14 }
+
+    aluWdm1830OLS OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicMetroNodeReg 15 }
+
+    nokia1830TPS OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicMetroNodeReg 16 }
+
+    nokia1830SAS OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicMetroNodeReg 17 }
+
+--------------------------------------------------------------------------------
+-- Shelf Registry
+--------------------------------------------------------------------------------
+    tropicShelfReg OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicRegistry 4 }
+
+    tropicEmptyShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Empty Shelf."
+        ::= { tropicShelfReg 1 }
+
+    tropicUnknownShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Unknown Shelf."
+        ::= { tropicShelfReg 2 }
+
+--    obsolete
+--    tropicMasterShelf      OBJECT-IDENTITY ::= { tropicShelfReg 3 }
+--    tropicSubtendingShelf  OBJECT-IDENTITY ::= { tropicShelfReg 4 }
+--    tropicCmd42Shelf       OBJECT-IDENTITY ::= { tropicShelfReg 5 }
+--    tropicExternalDcuShelf OBJECT-IDENTITY ::= { tropicShelfReg 6 }
+
+    aluWdmSfd44Shelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 44 Channel Shelf."
+        ::= { tropicShelfReg 7 }
+
+    aluWdmDcmShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "DCM Shelf."
+        ::= { tropicShelfReg 8 }
+
+    aluWdmUniversalShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Universal Shelf."
+        ::= { tropicShelfReg 9 }
+
+    aluWdmSfd44bShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 44 Odd Channel Shelf."
+        ::= { tropicShelfReg 10 }
+
+    aluWdmItlbShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Bi-Directional Interleaver Shelf."
+        ::= { tropicShelfReg 11 }
+
+    aluWdmPSS32UniversalShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "PSS32 Universal Shelf."
+        ::= { tropicShelfReg 12 }
+
+    aluWdmPSS16UniversalShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "PSS16 Universal Shelf."
+        ::= { tropicShelfReg 13 }
+
+    aluWdmSfd40Shelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 40 Channel Shelf."
+        ::= { tropicShelfReg 14 }
+
+    aluWdmSfd40bShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 40 Odd Channel Shelf."
+        ::= { tropicShelfReg 15 }
+
+    aluWdmPSS4UniversalShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "PSS4 Universal Shelf."
+        ::= { tropicShelfReg 16 }
+
+--    obsolete
+--    aluWdmTSSHCUniversalShelf OBJECT-IDENTITY ::= { tropicShelfReg 17 }
+
+    aluWdmPSS36UniversalShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "PSS36 Universal Shelf."
+        ::= { tropicShelfReg 18 }
+
+    aluWdmPSS64UniversalShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "PSS64 Universal Shelf."
+        ::= { tropicShelfReg 23 }
+
+    aluWdmItluShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Uni-Directional Interleaver Shelf."
+        ::= { tropicShelfReg 24 }
+
+    aluWdmPSS32SwitchUniversalShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "PSS32 Switch 1.6T Universal Shelf."
+        ::= { tropicShelfReg 25 }
+
+    aluWdmPSS32Switch1P2TUniversalShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "PSS32 Switch 1.2T Universal Shelf."
+        ::= { tropicShelfReg 26 }
+
+    aluWdmPsc1x6Shelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "30 Channel DWDM Splitter Combiner Shelf."
+        ::= { tropicShelfReg 27 }
+
+    aluWdmPSS8UniversalShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "PSS8 Universal Shelf."
+        ::= { tropicShelfReg 28 }
+
+    aluWdmPSS16IIUniversalShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "PSS16II Universal Shelf."
+        ::= { tropicShelfReg 29 }
+
+    aluWdmPSS48UniversalShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "PSS48 Universal Shelf."
+        ::= { tropicShelfReg 30 }
+
+    aluWdmPSS96UniversalShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "PSS-24x Universal Shelf."
+        ::= { tropicShelfReg 31 }
+
+    aluWdmMsh8fsmShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Fiber Shuffle Shelf."
+        ::= { tropicShelfReg 32 }
+
+    aluWdmVwmCwUniversalShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "VWM_CW Universal Shelf."
+        ::= { tropicShelfReg 33 }
+
+    aluWdmVwmDwUniversalShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "VWM_DW Universal Shelf."
+        ::= { tropicShelfReg 34 }
+
+--    obsolete
+--    aluWdmPSIUniversalShelf   OBJECT-IDENTITY ::= { tropicShelfReg 35 }
+--    aluWdmPSI2TUniversalShelf OBJECT-IDENTITY ::= { tropicShelfReg 36 }
+
+    nokiaVwmMsOsu20Shelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "OSU20 Shelf."
+        ::= { tropicShelfReg 37 }
+
+    nokiaVwmMsTlu9Shelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "TLU9 Shelf."
+        ::= { tropicShelfReg 38 }
+
+    nokiaVwmMsPmu9UcShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "PMU9UC Shelf."
+        ::= { tropicShelfReg 39 }
+
+    nokiaVwmMsPmu9LcShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "PMU9LC Shelf."
+        ::= { tropicShelfReg 40 }
+
+    nokiaVwmMsPmu9UcmShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "PMU9UCM Shelf."
+        ::= { tropicShelfReg 41 }
+
+    nokiaVwmMsPmu9LcmShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "PMU9LCM Shelf."
+        ::= { tropicShelfReg 42 }
+
+    nokiaVwmMsItp4UcaShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "ITP-4UCA Shelf."
+        ::= { tropicShelfReg 43 }
+
+    nokiaVwmMsItp4UcbShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "ITP-4UCB Shelf."
+        ::= { tropicShelfReg 44 }
+
+    nokiaVwmMsItp4LcaShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "ITP-4LCA Shelf."
+        ::= { tropicShelfReg 45 }
+
+    nokiaVwmMsItp4LcbShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "ITP-4LCB Shelf."
+        ::= { tropicShelfReg 46 }
+
+    nokiaVwmMsSmmAoShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "SMM-A Outdoor Shelf."
+        ::= { tropicShelfReg 47 }
+
+    nokiaVwmMsSmmAiShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "SMM-A Indoor Shelf."
+        ::= { tropicShelfReg 48 }
+
+    nokiaVwmMsOpsShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "OPS (Optical Protection Switch) Shelf."
+        ::= { tropicShelfReg 49 }
+
+    aluWdmPSS8xUniversalShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "PSS-8x Universal Shelf."
+        ::= { tropicShelfReg 50 }
+
+    nokiaPsdShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "PSD Shelf."
+        ::= { tropicShelfReg 51 }
+
+    nokiaVwmMsTlu9mShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "TLU-9M Shelf."
+        ::= { tropicShelfReg 52 }
+
+    aluWdmPSI1TUniversalShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "PSI1T Universal Shelf."
+        ::= { tropicShelfReg 53 }
+
+    aluWdmPSI2TUniversalShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "PSI2T Universal Shelf."
+        ::= { tropicShelfReg 54 }
+
+    aluWdmPSI2TLUniversalShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "PSI2TL Universal Shelf."
+        ::= { tropicShelfReg 55 }
+
+    aluWdmPSIMUniversalShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "PSI-M Universal Shelf."
+        ::= { tropicShelfReg 56 }
+
+    aluWdmPSS12xUniversalShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "PSS-12x Universal Shelf."
+        ::= { tropicShelfReg 57 }
+
+    nokiaVwmMsPmuD21AShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "PMUD21A Shelf."
+        ::= { tropicShelfReg 58 }
+
+    nokiaVwmMsPmuD21BShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "PMUD21B Shelf."
+        ::= { tropicShelfReg 59 }
+
+    nokiaVwmMsPmuD21CShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "PMUD21C Shelf."
+        ::= { tropicShelfReg 60 }
+
+    nokiaVwmMsPmuD21DShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "PMUD21D Shelf."
+        ::= { tropicShelfReg 61 }
+
+    aluWdmSfd96Shelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 96 Channel Shelf."
+        ::= { tropicShelfReg 62 }
+
+    aluWdmBmuPShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Band Multiplexer Unit Passive Shelf."
+        ::= { tropicShelfReg 63 }
+
+    aluWdmSplit2Shelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Splitter-Merger Shelf."
+        ::= { tropicShelfReg 64 }
+
+    aluWdmOscCplrShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "OSC Coupler Shelf."
+        ::= { tropicShelfReg 65 }
+
+    aluWdmOAUnidirShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Optical Amplifier Unidirectional Shelf."
+        ::= { tropicShelfReg 66 }
+
+    aluWdmMsh4fsbShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Fiber Shuffle Shelf."
+        ::= { tropicShelfReg 67 }
+
+    nokiaVwmMsTlu200Shelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "TLU-200 Shelf."
+        ::= { tropicShelfReg 68 }
+
+    nokiaVwmMsADVGIShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "ADVGI (Amplifier Dual Variable Gain Industrial) Shelf."
+        ::= { tropicShelfReg 69 }
+
+    aluWdmPSIL3uUniversalShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "PSI-L 3U Universal Shelf."
+        ::= { tropicShelfReg 70 }
+
+    aluWdmPSIL5uUniversalShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "PSI-L 5U Universal Shelf."
+        ::= { tropicShelfReg 71 }
+
+    nokiaSfd10ALmShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 10 Channel Shelf - Type A,
+                        Latency Matched."
+        ::= { tropicShelfReg 72 }
+
+    nokiaSfd10BLmShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 10 Channel Shelf - Type B,
+                        Latency Matched."
+        ::= { tropicShelfReg 73 }
+
+    nokiaSfd10CLmShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 10 Channel Shelf - Type C,
+                        Latency Matched."
+        ::= { tropicShelfReg 74 }
+
+    nokiaSfd10DLmShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 10 Channel Shelf - Type D,
+                        Latency Matched."
+        ::= { tropicShelfReg 75 }
+
+    nokiaSfd2AShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 2 Channel Shelf - Type A."
+        ::= { tropicShelfReg 76 }
+
+    nokiaSfd2BShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 2 Channel Shelf - Type B."
+        ::= { tropicShelfReg 77 }
+
+    nokiaSfd2CShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 2 Channel Shelf - Type C."
+        ::= { tropicShelfReg 78 }
+
+    nokiaSfd2DShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 2 Channel Shelf - Type D."
+        ::= { tropicShelfReg 79 }
+
+    nokiaSfd2EShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 2 Channel Shelf - Type E."
+        ::= { tropicShelfReg 80 }
+
+    nokiaSfd2FShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 2 Channel Shelf - Type F."
+        ::= { tropicShelfReg 81 }
+
+    nokiaSfd2GShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 2 Channel Shelf - Type G."
+        ::= { tropicShelfReg 82 }
+
+    nokiaSfd2HShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 2 Channel Shelf - Type H."
+        ::= { tropicShelfReg 83 }
+
+    nokiaSfd2IShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 2 Channel Shelf - Type I."
+        ::= { tropicShelfReg 84 }
+
+    nokiaSfd2LShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 2 Channel Shelf - Type L."
+        ::= { tropicShelfReg 85 }
+
+    nokiaSfd2MShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 2 Channel Shelf - Type M."
+        ::= { tropicShelfReg 86 }
+
+    nokiaSfd2NShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 2 Channel Shelf - Type N."
+        ::= { tropicShelfReg 87 }
+
+    nokiaSfd2OShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 2 Channel Shelf - Type O."
+        ::= { tropicShelfReg 88 }
+
+    nokiaSfd2PShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 2 Channel Shelf - Type P."
+        ::= { tropicShelfReg 89 }
+
+    nokiaSfd2QShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 2 Channel Shelf - Type Q."
+        ::= { tropicShelfReg 90 }
+
+    nokiaSfd2RShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 2 Channel Shelf - Type R."
+        ::= { tropicShelfReg 91 }
+
+    nokiaSfd4AShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 4 Channel Shelf - Type A."
+        ::= { tropicShelfReg 92 }
+
+    nokiaSfd4BShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 4 Channel Shelf - Type B."
+        ::= { tropicShelfReg 93 }
+
+    nokiaSfd4CShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 4 Channel Shelf - Type C."
+        ::= { tropicShelfReg 94 }
+
+    nokiaSfd4DShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 4 Channel Shelf - Type D."
+        ::= { tropicShelfReg 95 }
+
+    nokiaSfd4EShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 4 Channel Shelf - Type E."
+        ::= { tropicShelfReg 96 }
+
+    nokiaSfd4FShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 4 Channel Shelf - Type F."
+        ::= { tropicShelfReg 97 }
+
+    nokiaSfd4GShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 4 Channel Shelf - Type G."
+        ::= { tropicShelfReg 98 }
+
+    nokiaSfd4HShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 4 Channel Shelf - Type H."
+        ::= { tropicShelfReg 99 }
+
+    nokiaSfd8AShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 8 Channel Shelf - Type A."
+        ::= { tropicShelfReg 100 }
+
+    nokiaSfd8BShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 8 Channel Shelf - Type B."
+        ::= { tropicShelfReg 101 }
+
+    nokiaSfd8CShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 8 Channel Shelf - Type C."
+        ::= { tropicShelfReg 102 }
+
+    nokiaSfd8DShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 8 Channel Shelf - Type D."
+        ::= { tropicShelfReg 103 }
+
+    nokiaSfc1AShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter CWDM 1 Channel Shelf - Type A."
+        ::= { tropicShelfReg 104 }
+
+    nokiaSfc1BShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter CWDM 1 Channel Shelf - Type B."
+        ::= { tropicShelfReg 105 }
+
+    nokiaSfc1CShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter CWDM 1 Channel Shelf - Type C."
+        ::= { tropicShelfReg 106 }
+
+    nokiaSfc1DShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter CWDM 1 Channel Shelf - Type D."
+        ::= { tropicShelfReg 107 }
+
+    nokiaSfc1EShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter CWDM 1 Channel Shelf - Type E."
+        ::= { tropicShelfReg 108 }
+
+    nokiaSfc1FShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter CWDM 1 Channel Shelf - Type F."
+        ::= { tropicShelfReg 109 }
+
+    nokiaSfc1GShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter CWDM 1 Channel Shelf - Type G."
+        ::= { tropicShelfReg 110 }
+
+    nokiaSfc1HShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter CWDM 1 Channel Shelf - Type H."
+        ::= { tropicShelfReg 111 }
+
+    nokiaSfc2ABShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter CWDM 2 Channel Shelf - Type AB."
+        ::= { tropicShelfReg 112 }
+
+    nokiaSfc2CDShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter CWDM 2 Channel Shelf - Type CD."
+        ::= { tropicShelfReg 113 }
+
+    nokiaSfc2EFShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter CWDM 2 Channel Shelf - Type EF."
+        ::= { tropicShelfReg 114 }
+
+    nokiaSfc2GHShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter CWDM 2 Channel Shelf - Type GH."
+        ::= { tropicShelfReg 115 }
+
+    nokiaSfc4ADShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter CWDM 4 Channel Shelf - Type AD."
+        ::= { tropicShelfReg 116 }
+
+    nokiaSfc4EHShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter CWDM 4 Channel Shelf - Type EH."
+        ::= { tropicShelfReg 117 }
+
+    nokiaSfc8UShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter CWDM 8 Upper Channel Shelf."
+        ::= { tropicShelfReg 118 }
+
+    nokiaSfc8LShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter CWDM 8 Lower Channel Shelf."
+        ::= { tropicShelfReg 119 }
+
+    nokiaSARO2AShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "SAR-O 2 Channel Shelf - Type A."
+        ::= { tropicShelfReg 120 }
+
+    nokiaSARO2BShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "SAR-O 2 Channel Shelf - Type B."
+        ::= { tropicShelfReg 121 }
+
+    nokiaSARO2CShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "SAR-O 2 Channel Shelf - Type C."
+        ::= { tropicShelfReg 122 }
+
+    nokiaSARO2DShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "SAR-O 2 Channel Shelf - Type D."
+        ::= { tropicShelfReg 123 }
+
+    nokiaSARO2EShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "SAR-O 2 Channel Shelf - Type E."
+        ::= { tropicShelfReg 124 }
+
+    nokiaSARO2FShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "SAR-O 2 Channel Shelf - Type F."
+        ::= { tropicShelfReg 125 }
+
+    nokiaSARO2GShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "SAR-O 2 Channel Shelf - Type G."
+        ::= { tropicShelfReg 126 }
+
+    nokiaSARO2HShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "SAR-O 2 Channel Shelf - Type H."
+        ::= { tropicShelfReg 127 }
+
+    nokiaSARO4AShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "SAR-O 4 Channel Shelf - Type A."
+        ::= { tropicShelfReg 128 }
+
+    nokiaSARO4BShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "SAR-O 4 Channel Shelf - Type B."
+        ::= { tropicShelfReg 129 }
+
+    nokiaSARO4CShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "SAR-O 4 Channel Shelf - Type C."
+        ::= { tropicShelfReg 130 }
+
+    nokiaSARO4DShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "SAR-O 4 Channel Shelf - Type D."
+        ::= { tropicShelfReg 131 }
+
+    nokiaSARO8AShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "SAR-O 8 Channel Shelf - Type A."
+        ::= { tropicShelfReg 132 }
+
+    nokiaSARO8BShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "SAR-O 8 Channel Shelf - Type B."
+        ::= { tropicShelfReg 133 }
+
+    nokiaLR4BOCShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "LR-4 BreakOut Cable Shelf."
+        ::= { tropicShelfReg 134 }
+
+    nokiaTPS24Shelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "TPS-24 Shelf."
+        ::= { tropicShelfReg 135 }
+
+    nokiaTPS12Shelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "TPS-12 Shelf."
+        ::= { tropicShelfReg 136 }
+
+    nokiaDmCt05LmShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Dispersion Compensation Module Commercial Temperature
+                        5km LM Shelf."
+        ::= { tropicShelfReg 137 }
+
+    nokiaDmCt10LmShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Dispersion Compensation Module Commercial Temperature
+                        10km LM Shelf."
+        ::= { tropicShelfReg 138 }
+
+    nokiaDmIt05LmShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Dispersion Compensation Module Industrial Temperature
+                        5km LM Shelf."
+        ::= { tropicShelfReg 139 }
+
+    nokiaDmIt10LmShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Dispersion Compensation Module Industrial Temperature
+                        10km LM Shelf."
+        ::= { tropicShelfReg 140 }
+
+    aluWdmPSIMXUniversalShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "PSI-MX Universal Shelf."
+        ::= { tropicShelfReg 141 }
+
+    aluWdmMlfsbShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicShelfReg 142 }
+
+    nokiaSfd5AShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 5 Channel Shelf - Type A."
+        ::= { tropicShelfReg 143 }
+
+    nokiaSfd5BShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 5 Channel Shelf - Type B."
+        ::= { tropicShelfReg 144 }
+
+    nokiaSfd5CShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 5 Channel Shelf - Type C."
+        ::= { tropicShelfReg 145 }
+
+    nokiaSfd5DShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 5 Channel Shelf - Type D."
+        ::= { tropicShelfReg 146 }
+
+   nokiaSfd5ADShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 5 Channel Shelf - Type ABID."
+        ::= { tropicShelfReg 147 }
+
+    nokiaSfd5BDShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 5 Channel Shelf - Type BBID."
+        ::= { tropicShelfReg 148 }
+
+    nokiaSfd5CDShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 5 Channel Shelf - Type CBID."
+        ::= { tropicShelfReg 149 }
+
+    nokiaSfd5DDShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 5 Channel Shelf - Type DBID."
+        ::= { tropicShelfReg 150 }
+
+    nokiaSfd5AUShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 5 Channel Shelf - Type ABIU."
+        ::= { tropicShelfReg 151 }
+
+    nokiaSfd5BUShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 5 Channel Shelf - Type BBIU."
+        ::= { tropicShelfReg 152 }
+
+    nokiaSfd5CUShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 5 Channel Shelf - Type CBIU."
+        ::= { tropicShelfReg 153 }
+
+    nokiaSfd5DUShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 5 Channel Shelf - Type DBIU."
+        ::= { tropicShelfReg 154 }
+
+    nokiaDcm2pShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "DCM Shelf - Type DCM2P."
+        ::= { tropicShelfReg 155 }
+
+    nokiaSAS24Shelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "SAS-24 Shelf."
+        ::= { tropicShelfReg 156 }
+
+    nokiaMsh8aShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Fiber Shuffle Shelf."
+        ::= { tropicShelfReg 157 }
+
+    nokiaSfd48Shelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 48 Channel Shelf."
+        ::= { tropicShelfReg 158 }
+
+    nokiaSfd64Shelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 64 Channel Shelf."
+        ::= { tropicShelfReg 159 }
+
+--------------------------------------------------------------------------------
+-- Card Registry
+--------------------------------------------------------------------------------
+    tropicCardReg OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicRegistry 5 }
+
+-- MISCELLANEOUS
+
+    tropicMiscCardReg OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicCardReg 1 }
+
+    tropicEmptyCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicMiscCardReg 1 }
+
+    tropicUnknownCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicMiscCardReg 2 }
+
+    tropicInvalidCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicMiscCardReg 3 }
+
+    tropicReservedCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicMiscCardReg 4 }
+
+    tropicHalfHeightCarrierCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicMiscCardReg 5 }
+
+    aluWdmVirtualCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicMiscCardReg 6 }
+
+    aluWdmGmreCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicMiscCardReg 7 }
+
+    aluWdmMsh8fsmCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Fiber Shuffle Card."
+        ::= { tropicMiscCardReg 8 }
+
+    aluWdmIroadmvCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Integrated Re-configurable Optical Add Drop
+                        Multiplexer with Variable gain receive
+                        amplifier and fixed gain transmit amplifier."
+        ::= { tropicMiscCardReg 9 }
+
+    aluWdmIroadmfCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Integrated Re-configurable Optical Add Drop
+                        Multiplexer with Fixed gain receive amplifier
+                        and fixed gain transmit amplifier."
+        ::= { tropicMiscCardReg 10 }
+
+    aluWdmIroadm9mCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Integrated Re-configurable Optical Add Drop
+                        Multiplexer with Fixed gain receive amplifier
+                        and fixed gain transmit amplifier."
+        ::= { tropicMiscCardReg 11 }
+
+    aluWdmIroadm9rCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Integrated Re-configurable Optical Add Drop
+                        Multiplexer with Fixed gain receive amplifier
+                        and fixed gain transmit amplifier."
+        ::= { tropicMiscCardReg 12 }
+
+    aluWdmIroadm20Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Integrated Re-configurable Optical Add Drop
+                        Multiplexer with Fixed gain receive amplifier
+                        and fixed gain transmit amplifier."
+        ::= { tropicMiscCardReg 13 }
+
+    aluWdmSplit2Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Splitter-Merger Card."
+        ::= { tropicMiscCardReg 14 }
+
+    aluWdmOscCplrCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "OSC Coupler Card."
+        ::= { tropicMiscCardReg 15 }
+
+    aluWdmMsh4fsbCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Fiber Shuffle Card."
+        ::= { tropicMiscCardReg 16 }
+
+    aluWdmIpreampCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicMiscCardReg 17 }
+
+    nokiaSfd2ACard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 2 Channel Card - Type A."
+        ::= { tropicMiscCardReg 18 }
+
+    nokiaSfd2BCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 2 Channel Card - Type B."
+        ::= { tropicMiscCardReg 19 }
+
+    nokiaSfd2CCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 2 Channel Card - Type C."
+        ::= { tropicMiscCardReg 20 }
+
+    nokiaSfd2DCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 2 Channel Card - Type D."
+        ::= { tropicMiscCardReg 21 }
+
+    nokiaSfd2ECard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 2 Channel Card - Type E."
+        ::= { tropicMiscCardReg 22 }
+
+    nokiaSfd2FCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 2 Channel Card - Type F."
+        ::= { tropicMiscCardReg 23 }
+
+    nokiaSfd2GCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 2 Channel Card - Type G."
+        ::= { tropicMiscCardReg 24 }
+
+    nokiaSfd2HCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 2 Channel Card - Type H."
+        ::= { tropicMiscCardReg 25 }
+
+    nokiaSfd2ICard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 2 Channel Card - Type I."
+        ::= { tropicMiscCardReg 26 }
+
+    nokiaSfd2LCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 2 Channel Card - Type L."
+        ::= { tropicMiscCardReg 27 }
+
+    nokiaSfd2MCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 2 Channel Card - Type M."
+        ::= { tropicMiscCardReg 28 }
+
+    nokiaSfd2NCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 2 Channel Card - Type N."
+        ::= { tropicMiscCardReg 29 }
+
+    nokiaSfd2OCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 2 Channel Card - Type O."
+        ::= { tropicMiscCardReg 30 }
+
+    nokiaSfd2PCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 2 Channel Card - Type P."
+        ::= { tropicMiscCardReg 31 }
+
+    nokiaSfd2QCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 2 Channel Card - Type Q."
+        ::= { tropicMiscCardReg 32 }
+
+    nokiaSfd2RCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 2 Channel Card - Type R."
+        ::= { tropicMiscCardReg 33 }
+
+    nokiaSfd4ACard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 4 Channel Card - Type A."
+        ::= { tropicMiscCardReg 34 }
+
+    nokiaSfd4BCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 4 Channel Card - Type B."
+        ::= { tropicMiscCardReg 35 }
+
+    nokiaSfd4CCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 4 Channel Card - Type C."
+        ::= { tropicMiscCardReg 36 }
+
+    nokiaSfd4DCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 4 Channel Card - Type D."
+        ::= { tropicMiscCardReg 37 }
+
+    nokiaSfd4ECard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 4 Channel Card - Type E."
+        ::= { tropicMiscCardReg 38 }
+
+    nokiaSfd4FCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 4 Channel Card - Type F."
+        ::= { tropicMiscCardReg 39 }
+
+    nokiaSfd4GCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 4 Channel Card - Type G."
+        ::= { tropicMiscCardReg 40 }
+
+    nokiaSfd4HCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 4 Channel Card - Type H."
+        ::= { tropicMiscCardReg 41 }
+
+    nokiaSfd8ACard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 4 Channel Card - Type A."
+        ::= { tropicMiscCardReg 42 }
+
+    nokiaSfd8BCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 4 Channel Card - Type B."
+        ::= { tropicMiscCardReg 43 }
+
+    nokiaSfd8CCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 4 Channel Card - Type C."
+        ::= { tropicMiscCardReg 44 }
+
+    nokiaSfd8DCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 4 Channel Card - Type D."
+        ::= { tropicMiscCardReg 45 }
+
+    nokiaSfc1ACard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter CWDM 1 Channel Card - Type A."
+        ::= { tropicMiscCardReg 46 }
+
+    nokiaSfc1BCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter CWDM 1 Channel Card - Type B."
+        ::= { tropicMiscCardReg 47 }
+
+    nokiaSfc1CCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter CWDM 1 Channel Card - Type C."
+        ::= { tropicMiscCardReg 48 }
+
+    nokiaSfc1DCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter CWDM 1 Channel Card - Type D."
+        ::= { tropicMiscCardReg 49 }
+
+    nokiaSfc1ECard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter CWDM 1 Channel Card - Type E."
+        ::= { tropicMiscCardReg 50 }
+
+    nokiaSfc1FCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter CWDM 1 Channel Card - Type F."
+        ::= { tropicMiscCardReg 51 }
+
+    nokiaSfc1GCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter CWDM 1 Channel Card - Type G."
+        ::= { tropicMiscCardReg 52 }
+
+    nokiaSfc1HCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter CWDM 1 Channel Card - Type H."
+        ::= { tropicMiscCardReg 53 }
+
+    nokiaSfc2ABCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter CWDM 2 Channel Card - Type AB."
+        ::= { tropicMiscCardReg 54 }
+
+    nokiaSfc2CDCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter CWDM 2 Channel Card - Type CD."
+        ::= { tropicMiscCardReg 55 }
+
+    nokiaSfc2EFCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter CWDM 2 Channel Card - Type EF."
+        ::= { tropicMiscCardReg 56 }
+
+    nokiaSfc2GHCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter CWDM 2 Channel Card - Type GH."
+        ::= { tropicMiscCardReg 57 }
+
+    nokiaSfc4ADCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter CWDM 4 Channel Card - Type AD."
+        ::= { tropicMiscCardReg 58 }
+
+    nokiaSfc4EHCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter CWDM 4 Channel Card - Type EH."
+        ::= { tropicMiscCardReg 59 }
+
+    nokiaSfc8UCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter CWDM 8 Upper Channel Card."
+        ::= { tropicMiscCardReg 60 }
+
+    nokiaSfc8LCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter CWDM 8 Lower Channel Card."
+        ::= { tropicMiscCardReg 61 }
+
+    nokiaSARO2ACard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "SAR-O 2 Channel Card - Type A."
+        ::= { tropicMiscCardReg 62 }
+
+    nokiaSARO2BCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "SAR-O 2 Channel Card - Type B."
+        ::= { tropicMiscCardReg 63 }
+
+    nokiaSARO2CCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "SAR-O 2 Channel Card - Type C."
+        ::= { tropicMiscCardReg 64 }
+
+    nokiaSARO2DCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "SAR-O 2 Channel Card - Type D."
+        ::= { tropicMiscCardReg 65 }
+
+    nokiaSARO2ECard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "SAR-O 2 Channel Card - Type E."
+        ::= { tropicMiscCardReg 66 }
+
+    nokiaSARO2FCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "SAR-O 2 Channel Card - Type F."
+        ::= { tropicMiscCardReg 67 }
+
+    nokiaSARO2GCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "SAR-O 2 Channel Card - Type G."
+        ::= { tropicMiscCardReg 68 }
+
+    nokiaSARO2HCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "SAR-O 2 Channel Card - Type H."
+        ::= { tropicMiscCardReg 69 }
+
+    nokiaSARO4ACard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "SAR-O 4 Channel Card - Type A."
+        ::= { tropicMiscCardReg 70 }
+
+    nokiaSARO4BCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "SAR-O 4 Channel Card - Type B."
+        ::= { tropicMiscCardReg 71 }
+
+    nokiaSARO4CCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "SAR-O 4 Channel Card - Type C."
+        ::= { tropicMiscCardReg 72 }
+
+    nokiaSARO4DCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "SAR-O 4 Channel Card - Type D."
+        ::= { tropicMiscCardReg 73 }
+
+    nokiaSARO8ACard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "SAR-O 8 Channel Card - Type A."
+        ::= { tropicMiscCardReg 74 }
+
+    nokiaSARO8BCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "SAR-O 8 Channel Card - Type B."
+        ::= { tropicMiscCardReg 75 }
+
+    nokiaLR4BOCCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "LR-4 BreakOut Cable Card."
+        ::= { tropicMiscCardReg 76 }
+
+    aluWdmIrdm32Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicMiscCardReg 77 }
+
+    aluWdmOpenIrdm32Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicMiscCardReg 78 }
+
+    aluWdmIrdm32lCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicMiscCardReg 79 }
+
+    aluWdmOpenIrdm32LCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicMiscCardReg 80 }
+
+    aluWdmOpenEilaCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicMiscCardReg 81 }
+
+    aluWdmEsreCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicMiscCardReg 82 }
+
+    aluWdmOmdclCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicMiscCardReg 83 }
+
+    aluWdmOpenOmdclCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicMiscCardReg 84 }
+
+    aluWdmEilaLCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicMiscCardReg 85 }
+
+    aluWdmOpenEilaLCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicMiscCardReg 86 }
+
+--    obsolete
+--    aluWdmXticCard OBJECT-IDENTITY ::= { tropicMiscCardReg 87 }
+
+    aluWdmMlfsbCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicMiscCardReg 88 }
+
+    nokiaIr9Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicMiscCardReg 89 }
+
+    nokiaTic48TCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicMiscCardReg 90 }
+
+    nokiaMsh8aCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Fiber Shuffle Card."
+        ::= { tropicMiscCardReg 91 }
+
+    nokiaIr4Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicMiscCardReg 92 }
+
+    nokiaIr32AWCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicMiscCardReg 93 }
+
+    nokiaOpenIr32AWCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicMiscCardReg 94 }
+
+    nokiaEilaAWCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicMiscCardReg 95 }
+
+    nokiaOpenEilaAWCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicMiscCardReg 96 }
+
+-- CONTROL CARD
+
+    tropicControlCardReg OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicCardReg 2 }
+
+    tropicMasterControlCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicControlCardReg 1 }
+
+--    obsolete
+--    tropicShelfControlCard OBJECT-IDENTITY ::= { tropicControlCardReg 2 }
+
+    aluWdmEquipmentControllerCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Equipment Controller Card."
+        ::= { tropicControlCardReg 3 }
+
+    aluWdmFirstLevelControllerCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "First Level Controller Card."
+        ::= { tropicControlCardReg 4 }
+
+--    obsolete
+--    aluWdmMatrix0Card OBJECT-IDENTITY ::= { tropicControlCardReg 5 }
+
+    aluWdmMatrix3T8Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Matrix 3T8 Card."
+        ::= { tropicControlCardReg 6 }
+
+    aluWdmMatrix1T9Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Matrix 1T9 Card."
+        ::= { tropicControlCardReg 7 }
+
+    aluWdmPSS4EquipmentControllerCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "PSS4 Equipment Controller Card."
+        ::= { tropicControlCardReg 8 }
+
+    aluWdmMatrix0CompactCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Matrix T0 Compact Card."
+        ::= { tropicControlCardReg 9 }
+
+    aluWdmUniversalMatrixFirstLevelControllerCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Universal Matrix First Level Controller 1.6T Card."
+        ::= { tropicControlCardReg 10 }
+
+--    obsolete
+--    aluWdmUniversalMatrixSecondLevelControllerCard OBJECT-IDENTITY ::= { tropicControlCardReg 11 }
+
+    aluWdmEndOfShelfMiddleCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "End Of Shelf Middle Card."
+        ::= { tropicControlCardReg 12 }
+
+--    obsolete
+--    aluWdmEndOfShelfUpperLowerCard OBJECT-IDENTITY ::= { tropicControlCardReg 13 }
+
+    aluWdmUniversalMatrixFirstLevelController1p2TCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Universal Matrix First Level Controller 1.2T Card."
+        ::= { tropicControlCardReg 14 }
+
+    aluWdmPSS8EquipmentController2Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "PSS8 Equipment Controller 2 Card."
+        ::= { tropicControlCardReg 15 }
+
+--    obsolete
+--    aluWdmPSS16IIEquipmentController2Card OBJECT-IDENTITY ::= { tropicControlCardReg 16 }
+
+    aluWdmPSS32EquipmentController2Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "PSS32 Equipment Controller 2 Card."
+        ::= { tropicControlCardReg 17 }
+
+    aluWdmClockControllerCard96Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "PSS48/96 Clock and Controller 96 Card."
+        ::= { tropicControlCardReg 18 }
+
+    aluWdmVwmCwEquipmentControllerCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "VWM_CW Equipment Controller Card."
+        ::= { tropicControlCardReg 19 }
+
+    aluWdmVwmDwEquipmentControllerCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "VWM_DW Equipment Controller Card."
+        ::= { tropicControlCardReg 20 }
+
+    aluWdmPSS8EquipmentController2EncryptionCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "PSS8 Equipment Controller 2 Encryption Card."
+        ::= { tropicControlCardReg 21 }
+
+    aluWdmPSS32EquipmentController2EncryptionCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "PSS32 Equipment Controller 2 Encryption Card."
+        ::= { tropicControlCardReg 22 }
+
+    aluWdmPSIEquipmentController2Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "PSI Equipment Controller 2 Card."
+        ::= { tropicControlCardReg 23 }
+
+    aluWdmPSS8xClockEquipmentController2Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "PSS8x Clock Equipment Controller 2 Card."
+        ::= { tropicControlCardReg 24 }
+
+    nokiaVwmMsOsu20Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "OSU20 Equipment Controller Card."
+        ::= { tropicControlCardReg 25 }
+
+    nokiaVwmMsTlu9Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "TLU9 Equipment Controller Card."
+        ::= { tropicControlCardReg 26 }
+
+    nokiaVwmMsPmu9UcCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "PMU9UC Equipment Controller Card."
+        ::= { tropicControlCardReg 27 }
+
+    nokiaVwmMsPmu9LcCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "PMU9LC Equipment Controller Card."
+        ::= { tropicControlCardReg 28 }
+
+    nokiaVwmMsPmu9UcmCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "PMU9UCM Equipment Controller Card."
+        ::= { tropicControlCardReg 29 }
+
+    nokiaVwmMsPmu9LcmCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "PMU9LCM Equipment Controller Card."
+        ::= { tropicControlCardReg 30 }
+
+    nokiaVwmMsItp4UcaCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "ITP-4UCA Equipment Controller Card."
+        ::= { tropicControlCardReg 31 }
+
+    nokiaVwmMsItp4UcbCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "ITP-4UCB Equipment Controller Card."
+        ::= { tropicControlCardReg 32 }
+
+    nokiaVwmMsItp4LcaCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "ITP-4LCA Equipment Controller Card."
+        ::= { tropicControlCardReg 33 }
+
+    nokiaVwmMsItp4LcbCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "ITP-4LCB Equipment Controller Card."
+        ::= { tropicControlCardReg 34 }
+
+    nokiaVwmMsSmmAoCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "SMM-A Outdoor Equipment Controller Card."
+        ::= { tropicControlCardReg 35 }
+
+    nokiaVwmMsSmmAiCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "SMM-A Indoor Equipment Controller Card."
+        ::= { tropicControlCardReg 36 }
+
+    nokiaVwmMsOpsEmuCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "OPS EMU Card."
+        ::= { tropicControlCardReg 37 }
+
+    nokiaPsdCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "PSD Equipment Controller Card."
+        ::= { tropicControlCardReg 38 }
+
+    nokiaVwmMsTlu9mCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "TLU-9M Equipment Controller Card."
+        ::= { tropicControlCardReg 39 }
+
+    aluWdmMiniEquipmentController2Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Mini Equipment Controller 2 Card."
+        ::= { tropicControlCardReg 40 }
+
+    aluWdmPSS12xClockEquipmentController2Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "PSS12x Clock and Equipment Controller 2."
+        ::= { tropicControlCardReg 41 }
+
+    nokiaVwmMsPmuD21ACard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "PMUD21A Equipment Controller Card."
+        ::= { tropicControlCardReg 42 }
+
+    nokiaVwmMsPmuD21BCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "PMUD21B Equipment Controller Card."
+        ::= { tropicControlCardReg 43 }
+
+    nokiaVwmMsPmuD21CCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "PMUD21C Equipment Controller Card."
+        ::= { tropicControlCardReg 44 }
+
+    nokiaVwmMsPmuD21DCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "PMUD21D Equipment Controller Card."
+        ::= { tropicControlCardReg 45 }
+
+    nokiaVwmMsTlu200Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "TLU-200 Equipment Controller Card."
+        ::= { tropicControlCardReg 46 }
+
+    nokiaVwmMsADVGICard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "ADVGI (Amplifier Dual Variable Gain Industrial)
+                        Equipment Controller Card."
+        ::= { tropicControlCardReg 47 }
+
+    aluWdmMini32GEquipmentController2Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Mini32 Equipment Controller 2 Card."
+        ::= { tropicControlCardReg 48 }
+
+--    obsolete
+--    aluWdmPSS12xPacketClockEquipmentController2Card OBJECT-IDENTITY ::= { tropicControlCardReg 49 }
+
+    nokiaTPS24EquipmentControllerCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    " TPS-24 Equipment Controller + FPGA + PTP/SyncE  (virtual)."
+        ::= { tropicControlCardReg 50 }
+
+    nokiaTPS12EquipmentControllerCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "TPS-12 Equipment Controller + FPGA + PTP/SyncE  (virtual)."
+        ::= { tropicControlCardReg 51 }
+
+    nokiaSAS24EquipmentControllerCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "SAS-24 Equipment Controller + FPGA + PTP/SyncE  (virtual)."
+        ::= { tropicControlCardReg 52 }
+
+    nokiaEquipmentController3Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Equipment Controller Card 3."
+        ::= { tropicControlCardReg 53 }
+
+-- OPTICAL SWITCH
+
+    tropicOpticalSwitchCardReg OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicCardReg 3 }
+
+    tropicPhotonicProtectionSwitchCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicOpticalSwitchCardReg 1 }
+
+    aluWdmOpsaCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Enhanced Optical Protection Switch Card."
+        ::= { tropicOpticalSwitchCardReg 2 }
+
+    aluWdmOpsbCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Enhanced Optical Protection Switch Card."
+        ::= { tropicOpticalSwitchCardReg 3 }
+
+    aluWdmMcs8x16Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Multi-cast switch 8x16 Card."
+        ::= { tropicOpticalSwitchCardReg 4 }
+
+    aluWdmSwitchingCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "PSS48/96 Switching Card."
+        ::= { tropicOpticalSwitchCardReg 5 }
+
+    aluWdm12p120Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "12P120/11HPA6 Switch Card."
+        ::= { tropicOpticalSwitchCardReg 6 }
+
+    aluWdm20p200Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "20P200/20AN10GF Switch Card."
+        ::= { tropicOpticalSwitchCardReg 7 }
+
+    aluWdm1ud200Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "1UD200/260SCUPF Switch Card."
+        ::= { tropicOpticalSwitchCardReg 8 }
+
+    aluWdmSwitching1T6Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "PSS8x Switching Card."
+        ::= { tropicOpticalSwitchCardReg 9 }
+
+    aluWdmMcs8x16lCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Multi-cast switch 8x16 L Card."
+        ::= { tropicOpticalSwitchCardReg 10 }
+
+    nokiaVwmMsOpsOsmCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "OPS OSM Card."
+        ::= { tropicOpticalSwitchCardReg 11 }
+
+    aluWdmSwitching4T8Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "4.8T Switching Fabric Card."
+        ::= { tropicOpticalSwitchCardReg 12 }
+
+    aluWdmOpsflexCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Optical Protection Switch Card to support coherent-
+                        optimized ROADM architecture."
+        ::= { tropicOpticalSwitchCardReg 13 }
+
+    aluWdmSwitchingXST4T8Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Switching XST4T8 Card."
+        ::= { tropicOpticalSwitchCardReg 14 }
+
+    nokiaVwmMsOpsOsmDsvCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "OPS OSM-DSV Card."
+        ::= { tropicOpticalSwitchCardReg 15 }
+
+    aluWdmOpsb5Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicOpticalSwitchCardReg 16 }
+
+--    obsolete
+--    aluWdmSwitchingXSP9T6Card OBJECT-IDENTITY ::= { tropicOpticalSwitchCardReg 17 }
+
+    aluWdmMcs16x15Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Multi-cast switch 16x15 Card."
+        ::= { tropicOpticalSwitchCardReg 18 }
+
+    aluWdmSwitching24TCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Switching SC24T Card."
+        ::= { tropicOpticalSwitchCardReg 19 }
+
+    aluWdmMcs16x15LCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Multi-cast switch 16x15 L Card."
+        ::= { tropicOpticalSwitchCardReg 20 }
+
+    aluWdm12p120sCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicOpticalSwitchCardReg 21 }
+
+    nokia16p200Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicOpticalSwitchCardReg 22 }
+
+    nokiaSwitchingXST4TCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Switching XST4T Card."
+        ::= { tropicOpticalSwitchCardReg 23 }
+
+    nokiaSwitchingXST12TCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Switching XST12T Card."
+        ::= { tropicOpticalSwitchCardReg 24 }
+
+    nokiaMxn824Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicOpticalSwitchCardReg 25 }
+
+    nokiaSwitching48TCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Switching Card."
+        ::= { tropicOpticalSwitchCardReg 26 }
+
+    nokiaOpsumCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Optical Protection Switch Universal Multi-carrier Card."
+        ::= { tropicOpticalSwitchCardReg 27 }
+
+    nokiaMxn1624Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicOpticalSwitchCardReg 28 }
+
+    nokiaOpsumlCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Optical Protection Switch Universal Multi-carrier L Card."
+        ::= { tropicOpticalSwitchCardReg 29 }
+
+--    obsolete
+--    tropicOC48CardReg          OBJECT-IDENTITY ::= { tropicCardReg 4 }
+--    tropicOC48STM16WSCard      OBJECT-IDENTITY ::= { tropicOC48CardReg 1 }
+--    tropic2x1GEoSWSCard        OBJECT-IDENTITY ::= { tropicOC48CardReg 2 }
+--    tropicOC192CardReg         OBJECT-IDENTITY ::= { tropicCardReg 5 }
+--    tropicOC192STM64WSCard     OBJECT-IDENTITY ::= { tropicOC192CardReg 1 }
+--    tropic10GELANCard          OBJECT-IDENTITY ::= { tropicOC192CardReg 2 }
+--    tropicQuadOC48STM16MuxCard OBJECT-IDENTITY ::= { tropicOC192CardReg 3 }
+--    tropicDodecaGigEMuxCard    OBJECT-IDENTITY ::= { tropicOC192CardReg 4 }
+--    tropicDecaGigEMuxCard      OBJECT-IDENTITY ::= { tropicOC192CardReg 5 }
+
+-- FILTER
+
+    tropicDWDMFilterCardReg OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicCardReg 6 }
+
+--    obsolete
+--    tropicOscBandFilterCard  OBJECT-IDENTITY ::= { tropicDWDMFilterCardReg 1 }
+--    tropicBandFilterCard     OBJECT-IDENTITY ::= { tropicDWDMFilterCardReg 2 }
+--    tropicChannelFilterCard  OBJECT-IDENTITY ::= { tropicDWDMFilterCardReg 3 }
+--    tropicROADMCard          OBJECT-IDENTITY ::= { tropicDWDMFilterCardReg 4 }
+--    tropicChannelAddDropCard OBJECT-IDENTITY ::= { tropicDWDMFilterCardReg 5 }
+--    tropicUdmCard            OBJECT-IDENTITY ::= { tropicDWDMFilterCardReg 6 }
+--    tropicCmd42              OBJECT-IDENTITY ::= { tropicDWDMFilterCardReg 7 }
+--    tropicWssX9Card          OBJECT-IDENTITY ::= { tropicDWDMFilterCardReg 8 }
+
+    aluWdmCwr8Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "8 Degree 44 Channel Colorless Wavelength Router Card."
+        ::= { tropicDWDMFilterCardReg 9 }
+
+    aluWdmSfd44Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 44 Channel Card."
+        ::= { tropicDWDMFilterCardReg 10 }
+
+    aluWdmSVACCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Single Variable Attenuator Card."
+        ::= { tropicDWDMFilterCardReg 11 }
+
+    aluWdmCwr8c88Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "8 Degree 88 Channel Colorless Wavelength Router Card."
+        ::= { tropicDWDMFilterCardReg 12 }
+
+    aluWdmSfd44bCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 44 Odd Channel Card."
+        ::= { tropicDWDMFilterCardReg 13 }
+
+    aluWdmItlbCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Bi-directional Interleaver Card."
+        ::= { tropicDWDMFilterCardReg 14 }
+
+    aluWdmSfd40Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 40 Channel Card."
+        ::= { tropicDWDMFilterCardReg 19 }
+    aluWdmSfd40bCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 40 Odd Channel Card."
+        ::= { tropicDWDMFilterCardReg 20 }
+
+    aluWdmWr2c88Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "2 Degree 88 Channel Wavelength Router Card."
+        ::= { tropicDWDMFilterCardReg 21 }
+
+    aluWdmMVACCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Multiple Variable Attenuator Card."
+        ::= { tropicDWDMFilterCardReg 22 }
+
+    aluWdmItluCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Uni-directional Interleaver Card."
+        ::= { tropicDWDMFilterCardReg 23 }
+
+    aluWdmWr8c88aCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "8 Degree 88 Channel Wavelength Router Card."
+        ::= { tropicDWDMFilterCardReg 24 }
+
+    aluWdmMesh4Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Extension Amplifier Card."
+        ::= { tropicDWDMFilterCardReg 25 }
+
+    aluWdmMVAC8BCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Multiple Variable Attenuator Card."
+        ::= { tropicDWDMFilterCardReg 26 }
+
+    aluWdmWr8c88afCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "8 Degree 88 Channel Wavelength Router with
+                        FlexGrid Card."
+        ::= { tropicDWDMFilterCardReg 27 }
+
+    aluWdmPsc1x6Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "30 Channel DWDM Splitter Combiner Card."
+        ::= { tropicDWDMFilterCardReg 28 }
+
+    aluWdmWr20tfCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "20 AddDrop or Thru Ports Twin Wavelength Router
+                        with FlexGrid Card."
+        ::= { tropicDWDMFilterCardReg 29 }
+
+    aluWdmWr20tfmCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "WR20 Twin Pack with MPO Connectors for Add/Drop Card."
+        ::= { tropicDWDMFilterCardReg 30 }
+
+    aluWdmWr20tfmlCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "WR20 Twin Pack with MPO Connectors for Add/Drop L Card."
+        ::= { tropicDWDMFilterCardReg 31 }
+
+    aluWdmSfd96Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 96 Channel Card."
+        ::= { tropicDWDMFilterCardReg 32 }
+
+    nokiaSfd10ALmCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 10 Channel Card - Type A,
+                        Latency Matched."
+        ::= { tropicDWDMFilterCardReg 33 }
+
+    nokiaSfd10BLmCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 10 Channel Card - Type B,
+                        Latency Matched."
+        ::= { tropicDWDMFilterCardReg 34 }
+
+    nokiaSfd10CLmCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 10 Channel Card - Type C,
+                        Latency Matched."
+        ::= { tropicDWDMFilterCardReg 35 }
+
+    nokiaSfd10DLmCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 10 Channel Card - Type D,
+                        Latency Matched."
+        ::= { tropicDWDMFilterCardReg 36 }
+
+    nokiaSfd48Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 48 Channel Card."
+        ::= { tropicDWDMFilterCardReg 37 }
+
+    nokiaSfd64Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 64 Channel Card."
+        ::= { tropicDWDMFilterCardReg 38 }
+
+-- AMPLIFIER
+
+    tropicAmplifierCardReg OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicCardReg 7 }
+
+--    obsolete
+--    tropicBroadBandAmplifierLine    OBJECT-IDENTITY ::= { tropicAmplifierCardReg 1 }
+--    tropicBroadBandAmplifierLowGain OBJECT-IDENTITY ::= { tropicAmplifierCardReg 2 }
+--    tropicMsaHg                     OBJECT-IDENTITY ::= { tropicAmplifierCardReg 3 }
+
+    aluWdmAhphgCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Amplifier High Power High Gain Card."
+        ::= { tropicAmplifierCardReg 4 }
+
+    aluWdmAlphgCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Amplifier Low Power High Gain Card."
+        ::= { tropicAmplifierCardReg 5 }
+
+    aluWdmAhplgCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Amplifier High Power Low Gain Card."
+        ::= { tropicAmplifierCardReg 6 }
+
+    aluWdmAlpfgkCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Amplifier Low Power Fixed Gain Card, Managed version."
+        ::= { tropicAmplifierCardReg 7 }
+
+    aluWdmOscCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Optical Supervisory Channel Card."
+        ::= { tropicAmplifierCardReg 8 }
+
+    aluWdmA2325aCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Amplifier with 23 dBm Power, 25 dB Gain, and 0
+                        dB Gain Tilt Card."
+        ::= { tropicAmplifierCardReg 10 }
+
+    aluWdmAlpfgtCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Low Power Fixed Gain Amplifier Total Power."
+        ::= { tropicAmplifierCardReg 11 }
+
+    aluWdmOsctCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Optical Supervisory Channel, Unkeyed, Total
+                        Power Monitoring Card."
+        ::= { tropicAmplifierCardReg 12 }
+
+    aluWdmWtocmCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "WaveTracker Optical Channel Monitor Card."
+        ::= { tropicAmplifierCardReg 13 }
+
+    aluWdmAm2017bCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "High Power Low Gain Amplifier, DCM Removed Card."
+        ::= { tropicAmplifierCardReg 14 }
+
+    aluWdmAm2325bCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Amplifier, 23 dBm Power, Variable Gain, C-band,
+                        DCM removed Card."
+        ::= { tropicAmplifierCardReg 15 }
+
+    aluWdmRa2pCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Uni-directional Raman Amplifier with 2 Pumps Card."
+        ::= { tropicAmplifierCardReg 16 }
+
+    aluWdmAm2318aCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Amplifier, 23 dBm Power, 18 dB Gain with No
+                        Mid-stage Access Card."
+        ::= { tropicAmplifierCardReg 17 }
+
+    aluWdmAm2125aCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Uni-directional Amplifier, 21 dBm Power, 25 dB
+                        Gain with Mid-stage Access Card."
+        ::= { tropicAmplifierCardReg 18 }
+
+    aluWdmAm2125bCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Uni-directional Amplifier, 21 dBm Power, 25 dB
+                        Gain without Mid-stage Access Card."
+        ::= { tropicAmplifierCardReg 19 }
+
+    aluWdmWtocmaCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "WaveTracker Optical Channel Monitor A Card."
+        ::= { tropicAmplifierCardReg 20 }
+
+    aluWdmA2p2125Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Uni-directional Hybrid Raman + EDFA Amplifier,
+                        21 dBm Power, 25 dB Gain with Mid-stage Access Card."
+        ::= { tropicAmplifierCardReg 21 }
+
+    aluWdmAm2625aCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Uni-directional Amplifier, 26 dBm Power, 25 dB
+                        Gain with Mid-stage Access Card."
+        ::= { tropicAmplifierCardReg 22 }
+
+    aluWdmAm2032aCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Uni-directional Amplifier, 20 dBm Power, 32 dB
+                        Gain with Mid-stage Access Card."
+        ::= { tropicAmplifierCardReg 23 }
+
+    aluWdmAa2donwCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Optical Amplifier, dedicated to Access Application,
+                        with 2 Degree Amplification Capability, One Direction
+                        OSC Add/Drop and No WaveTracker Decoding Card."
+        ::= { tropicAmplifierCardReg 24 }
+
+    aluWdmWtocmfCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "WaveTracker Optical Channel Monitor Flex Card."
+        ::= { tropicAmplifierCardReg 25 }
+
+    aluWdmAswgCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Switched Gain OA Card."
+        ::= { tropicAmplifierCardReg 26 }
+
+    aluWdmA4pswgCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "4 Pump Switched Gain Hybrid Card."
+        ::= { tropicAmplifierCardReg 27 }
+
+    aluWdmOtdrCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Optical Time Domain Reflectometer Card."
+        ::= { tropicAmplifierCardReg 28 }
+
+    aluWdmAar8aCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "8x Amp Array Card."
+        ::= { tropicAmplifierCardReg 29 }
+
+    aluWdmMonOtdrCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "MON-Optical Time Domain Reflectometer Card."
+        ::= { tropicAmplifierCardReg 30 }
+
+    aluWdmAwbegrCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Switched Gain OA Card."
+        ::= { tropicAmplifierCardReg 31 }
+
+    aluWdmAwbingCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Switched Gain OA Card."
+        ::= { tropicAmplifierCardReg 32 }
+
+    aluWdmAwbilaCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Switched Gain OA Card."
+        ::= { tropicAmplifierCardReg 33 }
+
+    aluWdmRa5pCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Uni-directional Raman Amplifier with 5 Pumps Card."
+        ::= { tropicAmplifierCardReg 34 }
+
+    aluWdmAa2donwBCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Optical Amplifier, dedicated to Access Application,
+                        with 2 Degree Amplification Capability, One Direction
+                        OSC Add/Drop and No WaveTracker Decoding Card B."
+        ::= { tropicAmplifierCardReg 35 }
+
+    aluWdmOsctaprCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Optical Supervisory Channel, Unkeyed, Total Power
+                        Monitoring APR Card."
+        ::= { tropicAmplifierCardReg 36 }
+
+    aluWdmAar2x8aCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "2X8 Amp Array Card."
+        ::= { tropicAmplifierCardReg 37 }
+
+    aluWdmAar2x8alCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "2X8 Amp Array L Card."
+        ::= { tropicAmplifierCardReg 38 }
+
+    aluWdmWtocmflCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "WaveTracker Optical Channel Monitor Flex L Card."
+        ::= { tropicAmplifierCardReg 39 }
+
+    aluWdmOtdrwbCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Optical Time Domain Reflectometer Card."
+        ::= { tropicAmplifierCardReg 40 }
+
+    aluWdmRa2p96Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Uni-directional two-pump Raman Amplifier
+                        with 96-channel support Card."
+        ::= { tropicAmplifierCardReg 41 }
+
+    aluWdmOtdrmCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Optical Time Domain Reflectometer Card."
+        ::= { tropicAmplifierCardReg 42 }
+
+    aluWdmOAUnidirCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Optical Amplifier Unidirectional Card."
+        ::= { tropicAmplifierCardReg 43 }
+
+    aluWdmAswglCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Switched Gain OA Card."
+        ::= { tropicAmplifierCardReg 44 }
+
+    aluWdmRa4pCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicAmplifierCardReg 45 }
+
+    aluWdmEilaCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicAmplifierCardReg 46 }
+
+    aluWdmRa5pbCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicAmplifierCardReg 47 }
+
+    aluWdmAsgCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicAmplifierCardReg 48 }
+
+    nokiaAsc4Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicAmplifierCardReg 49 }
+
+    nokiaAsc2Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicAmplifierCardReg 50 }
+
+-- DISPERSION COMPENSATOR
+
+    tropicDispersionCompCardReg OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicCardReg 8 }
+
+--    obsolete
+--    tropicDispersionCompensatorCard OBJECT-IDENTITY ::= { tropicDispersionCompCardReg 1 }
+--    tropicExternalDCU               OBJECT-IDENTITY ::= { tropicDispersionCompCardReg 2 }
+
+    aluWdmDcmCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Dispersion Compensation Module Card."
+        ::= { tropicDispersionCompCardReg 3 }
+
+    nokiaDmCt05LmCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Dispersion Compensation Module Commercial Temperature
+                        5km LM Card."
+        ::= { tropicDispersionCompCardReg 4 }
+
+    nokiaDmCt10LmCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Dispersion Compensation Module Commercial Temperature
+                        10km LM Card."
+        ::= { tropicDispersionCompCardReg 5 }
+
+    nokiaDmIt05LmCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Dispersion Compensation Module Industrial Temperature
+                        5km LM Card."
+        ::= { tropicDispersionCompCardReg 6 }
+
+    nokiaDmIt10LmCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Dispersion Compensation Module Industrial Temperature
+                        10km LM Card."
+        ::= { tropicDispersionCompCardReg 7 }
+
+-- OC3/12
+
+--    obsolete
+--    tropicOC3or12CardReg            OBJECT-IDENTITY ::= { tropicCardReg 9 }
+--    tropicQuadOC3or12STM1or4MuxCard OBJECT-IDENTITY ::= { tropicOC3or12CardReg 1 }
+
+-- Multi Rate Transponders
+
+--    obsolete
+--    tropicMRCardReg      OBJECT-IDENTITY ::= { tropicCardReg 10 }
+--    tropic1xMR2dot5GCard OBJECT-IDENTITY ::= { tropicMRCardReg 1 }
+
+-- Optical Transponders
+
+    aluWdmOpticalTransponderCardReg OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicCardReg 11 }
+
+    aluWdm11star1Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "11G Single Port Tunable AnyRate (1 Client) Card."
+        ::= { aluWdmOpticalTransponderCardReg 1 }
+
+    aluWdm11stge12Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "11G Single Port Tunable GBE Mux (12 Clients) Card."
+        ::= { aluWdmOpticalTransponderCardReg 2 }
+
+    aluWdm11dpge12Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "11G Dual Port Pluggable GBE Mux (12 Clients) Card."
+        ::= { aluWdmOpticalTransponderCardReg 3 }
+
+    aluWdm11stmm10Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "11G Single Port Tunable Multirate Mux (10 Universal
+                        Clients) Card."
+        ::= { aluWdmOpticalTransponderCardReg 4 }
+
+    aluWdm4dpa4Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "4G Dual Port Pluggable AnyRate (4 Clients, 2 VOAs) Card."
+        ::= { aluWdmOpticalTransponderCardReg 5 }
+
+    aluWdm43stx4Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "40G Single Port Tunable Multirate Mux (4 Universal
+                        Clients) Card."
+        ::= { aluWdmOpticalTransponderCardReg 6 }
+
+    aluWdm4dpa2Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "4G Dual Port Pluggable AnyRate (2 Clients) Card."
+        ::= { aluWdmOpticalTransponderCardReg 7 }
+
+    aluWdm43sta1pCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "40G Single Port Tunable Anyrate (1 Client) Card."
+        ::= { aluWdmOpticalTransponderCardReg 8 }
+
+    aluWdm43stx4pCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "40G Single Port Tunable Multirate Mux (4 Universal
+                        Clients) P-DPSK Card."
+        ::= { aluWdmOpticalTransponderCardReg 9 }
+
+    aluWdm11qpa4Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "11G 4 Port AnyRate (4 Universal Clients) Card."
+        ::= { aluWdmOpticalTransponderCardReg 12 }
+
+    aluWdm112scx10Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "100G Single Port Tunable Multirate Mux C-band (10
+                        Universal Clients) Card."
+        ::= { aluWdmOpticalTransponderCardReg 13 }
+
+    aluWdm112sca1Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "100G Single Port Tunable Anyrate C-band (1 Client) Card."
+        ::= { aluWdmOpticalTransponderCardReg 14 }
+
+    aluWdm1dpp21Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "21 E1 Ports on Client Side and 2 STM-1 Ports on Line
+                        Side Card."
+        ::= { aluWdmOpticalTransponderCardReg 15 }
+
+    aluWdm43scx4Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "40G Single Port Tunable Coherent Multirate Mux (4
+                        Universal Clients) Card."
+        ::= { aluWdmOpticalTransponderCardReg 16 }
+
+    aluWdm11dpe12eCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "11G Dual Port Pluggable GBE Mux (12 Clients) Enhanced Card."
+        ::= { aluWdmOpticalTransponderCardReg 17 }
+
+    aluWdm112sx10lCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "100G Single Port Tunable Multirate Mux XL-band (10
+                        Universal Clients) Card."
+        ::= { aluWdmOpticalTransponderCardReg 18 }
+
+    aluWdm112sa1lCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "100G Single Port Tunable Anyrate XL-band (1 Client) Card."
+        ::= { aluWdmOpticalTransponderCardReg 19 }
+
+    aluWdm11dpm12Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "11G Dual Port Pluggable Mux (12 Clients) Card."
+        ::= { aluWdmOpticalTransponderCardReg 20 }
+
+    aluWdm43sca1Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "40G Single Port Tunable Coherent Anyrate (1 Client) Card."
+        ::= { aluWdmOpticalTransponderCardReg 21 }
+
+    aluWdm43scx4lCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "40G Single Port Tunable Coherent Multirate Mux
+                        XL-band (4 Universal Clients) Card."
+        ::= { aluWdmOpticalTransponderCardReg 22 }
+
+    aluWdm112snx10Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "100G Single Port Tunable Coherent with Enhanced OSNR
+                        Multirate Mux C-band (10 Universal Clients) Card."
+        ::= { aluWdmOpticalTransponderCardReg 23 }
+
+    aluWdm112sna1Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "100G Single Port Tunable Coherent with Enhanced OSNR
+                        Anyrate C-band (1 Client) Card."
+        ::= { aluWdmOpticalTransponderCardReg 24 }
+
+--    obsolete
+--    aluWdm11qta4Card OBJECT-IDENTITY ::= { aluWdmOpticalTransponderCardReg 25 }
+
+    aluWdm1dpp24mCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "21 E1 or 24 DS1 Ports on Client Side and 2 STM-1 or
+                        OC32 Ports on Line Side Card."
+        ::= { aluWdmOpticalTransponderCardReg 26 }
+
+    aluWdmul43scupCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "43G Single Port Tunable Coherent Uplink Card."
+        ::= { aluWdmOpticalTransponderCardReg 27 }
+
+    aluWdmul11qcupCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "11G 4 Port Tunable Uplink Card."
+        ::= { aluWdmOpticalTransponderCardReg 28 }
+
+    aluWdm11qpen4Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "11G 4 Port AnyRate (4 Universal Clients) with
+                        Line Port Encryption Card."
+        ::= { aluWdmOpticalTransponderCardReg 29 }
+
+    aluWdm43scx4eCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "40G Single Port Tunable Coherent AnyRate Mux (4
+                        Universal Clients) Cost Enhanced Card."
+        ::= { aluWdmOpticalTransponderCardReg 30 }
+
+    aluWdm43scge1Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "40G Single Port Tunable Coherent Gigabit Ethernet
+                        (1 Universal Client) Card."
+        ::= { aluWdmOpticalTransponderCardReg 31 }
+
+    aluWdm11qpe24Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "11G Quad Port Pluggable Gigabit Ethernet Mux
+                        (24 Clients) Card."
+        ::= { aluWdmOpticalTransponderCardReg 32 }
+
+    aluWdm11star1aCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "11G Single Port Tunable AnyRate (1 Client) Card."
+        ::= { aluWdmOpticalTransponderCardReg 33 }
+
+    aluWdmcl10an10gCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "OTN Client Card And/Or Uplink Card, 10 Anyrate XFP
+                        Ports, Max 10G Each (Dumb Card)."
+        ::= { aluWdmOpticalTransponderCardReg 34 }
+
+    aluWdmcl24anmCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "OTN Client Card, 24 Anyrate SFP Ports, Max 2.5G
+                        Each (Dumb Card)."
+        ::= { aluWdmOpticalTransponderCardReg 35 }
+
+    aluWdm11dpe12aCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "11G Dual Port Pluggable GBE Mux (12 Clients)
+                        advanced Card."
+        ::= { aluWdmOpticalTransponderCardReg 36 }
+
+    aluWdmul130scupCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "130G Single Port Tunable Coherent Uplink Card."
+        ::= { aluWdmOpticalTransponderCardReg 37 }
+
+    aluWdm130scx10Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "130G Single Port Tunable Coherent Multirate Mux (10
+                        Universal Clients) Card."
+        ::= { aluWdmOpticalTransponderCardReg 38 }
+
+    aluWdm4qpa8Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "8 AnyRate Client Ports and 4 OTU1 Line Ports Card."
+        ::= { aluWdmOpticalTransponderCardReg 39 }
+
+    aluWdmOt112pdm11Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "100G Pluggable Dimension Mux (11 Clients) Card."
+        ::= { aluWdmOpticalTransponderCardReg 40 }
+
+    aluWdmPtpctlCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Precise Time Protocol Control Card."
+        ::= { aluWdmOpticalTransponderCardReg 41 }
+
+    aluWdmPtpioCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Precise Time Protocol Input/Output Card."
+        ::= { aluWdmOpticalTransponderCardReg 42 }
+
+    aluWdmIo24et1gbCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "OTN Client Card, 24 1GbE SFP Ports."
+        ::= { aluWdmOpticalTransponderCardReg 43 }
+
+    aluWdmIo4an10gCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "OTN Client Card And/Or Uplink Card, 10 Anyrate XFP
+                        Ports, Max 4G Each (Dumb Card)."
+        ::= { aluWdmOpticalTransponderCardReg 44 }
+
+    aluWdmIo8et1gbCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "OTN Client Card, 8 1G Ethernet Ports."
+        ::= { aluWdmOpticalTransponderCardReg 45 }
+
+    aluWdmIo10et10gCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "OTN Client Card, 10 10G Ethernet Ports."
+        ::= { aluWdmOpticalTransponderCardReg 46 }
+
+    aluWdmUl11qcupcCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "11G Quad Port Tunable Coherent Uplink Card."
+        ::= { aluWdmOpticalTransponderCardReg 47 }
+
+    aluWdmOt520scx4Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "520G Single Port Tunable Coherent Multirate Mux (4
+                        Universal Clients) Card."
+        ::= { aluWdmOpticalTransponderCardReg 48 }
+
+    aluWdm11ope8Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "11G 8x10G Layer-2 MuxOT Card."
+        ::= { aluWdmOpticalTransponderCardReg 49 }
+
+    aluWdm11qce12xCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "11G Improved version of 11QPE24: Layer-2 switching Card."
+        ::= { aluWdmOpticalTransponderCardReg 50 }
+
+    aluWdmOt260scx2Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "260G Single Port Tunable Coherent Multirate Mux (2
+                        Universal Clients) Card."
+        ::= { aluWdmOpticalTransponderCardReg 51 }
+
+    aluWdmOt130snx10Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "130G Single Port Tunable Coherent with Enhanced
+                        OSNR Multirate Mux (10 Universal Clients) Card."
+        ::= { aluWdmOpticalTransponderCardReg 52 }
+
+    aluWdmIo24anmbCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "OTN Client Card, 24 Anyrate SFP Ports, Max 2.5G
+                        Each (Dumb Card, B Version)."
+        ::= { aluWdmOpticalTransponderCardReg 53 }
+
+    aluWdmOt11dpm8Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "11G Dual Port Pluggable Mux (8 Clients) Card."
+        ::= { aluWdmOpticalTransponderCardReg 54 }
+
+    aluWdmOt11dpm4mCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "11G Dual Port Pluggable Mux (4 Clients) Main Card."
+        ::= { aluWdmOpticalTransponderCardReg 55 }
+
+    aluWdmOt11dpm4eCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "11G Dual Port Pluggable Mux (4 Clients) Extension Card."
+        ::= { aluWdmOpticalTransponderCardReg 56 }
+
+    aluWdmUl130scupbCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "130G Single Port Tunable Coherent Uplink Card, B Version."
+        ::= { aluWdmOpticalTransponderCardReg 57 }
+
+    aluWdmOt112sdx11Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "100G Signalline Datacenter Mux (11 Clients) Card."
+        ::= { aluWdmOpticalTransponderCardReg 58 }
+
+    aluWdmOt130sca1Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "130G Single Port Tunable Anyrate C-band (1 Client) Card."
+        ::= { aluWdmOpticalTransponderCardReg 59 }
+
+    aluWdmIo10an10gbCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "OTN Client Card And/Or Uplink Card, 10 Anyrate XFP
+                        Ports, Max 10G Each (Dumb Card)- (B Version)."
+        ::= { aluWdmOpticalTransponderCardReg 60 }
+
+    aluWdmIo10et10gbCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "OTN Client Card, 10 10G Ethernet Ports - (B Version)."
+        ::= { aluWdmOpticalTransponderCardReg 61 }
+
+    aluWdmIo4an100gCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Any Rate Module with Pluggable Optics Client Card
+                        for 1830 PSS-96 Configurable for 100GE and OTU4."
+        ::= { aluWdmOpticalTransponderCardReg 62 }
+
+    aluWdmIo30an10gCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Any Rate Module with Pluggable Optics Client Card
+                        for 1830 PSS-96 Configurable for 10GE and OTU2/2e
+                        and STM-64/OC-192 and FC1200."
+        ::= { aluWdmOpticalTransponderCardReg 63 }
+
+    aluWdmIo30an300Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "30 Universal (ANY) Ports Card with
+                        300G Payload Capacity."
+        ::= { aluWdmOpticalTransponderCardReg 64 }
+
+    aluWdmIo4an400Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "4 Universal (ANY) Ports Card with
+                        400G Payload Capacity."
+        ::= { aluWdmOpticalTransponderCardReg 65 }
+
+    aluWdmOt130snq10Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "130G Single Port Tunable Coherent with Enhanced
+                        OSNR and QSFP client interface Multirate
+                        Mux (10 Universal Clients) Card."
+        ::= { aluWdmOpticalTransponderCardReg 66 }
+
+    aluWdmUl2uc400Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { aluWdmOpticalTransponderCardReg 67 }
+
+    aluWdmUl4uc400Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { aluWdmOpticalTransponderCardReg 68 }
+
+    aluWdmUl20uc200Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { aluWdmOpticalTransponderCardReg 69 }
+
+    aluWdmD5x500Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { aluWdmOpticalTransponderCardReg 70 }
+
+    aluWdmOtS11M100Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Single Slot 100G Coherent Data Center Muxponder Card."
+        ::= { aluWdmOpticalTransponderCardReg 71 }
+
+    aluWdm12ce120Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "12x10GbE Carrier Ethernet Card."
+        ::= { aluWdmOpticalTransponderCardReg 72 }
+
+    aluWdm1ce100Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "100GbE Carrier Ethernet Card."
+        ::= { aluWdmOpticalTransponderCardReg 73 }
+
+    aluWdmLcI1000Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { aluWdmOpticalTransponderCardReg 74 }
+
+    aluWdmS13x100Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { aluWdmOpticalTransponderCardReg 75 }
+
+    aluWdm12ce121Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "12x1GbE_or_10GbE Carrier Ethernet Card."
+        ::= { aluWdmOpticalTransponderCardReg 76 }
+
+    aluWdmPtpioctlCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { aluWdmOpticalTransponderCardReg 77 }
+
+    aluWdm11qpa4BCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "11G 4 Port AnyRate (4 Universal Clients) B Card."
+        ::= { aluWdmOpticalTransponderCardReg 78 }
+
+    aluWdm1ux100Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "100G 1 port OTN uplink Card."
+        ::= { aluWdmOpticalTransponderCardReg 79 }
+
+    aluWdm20ax200Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "80G 20 port 10G or sub 10G client Card."
+        ::= { aluWdmOpticalTransponderCardReg 80 }
+
+    aluWdm20mx80Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "200G 20 port mixed OTN uplink or client 10G Card."
+        ::= { aluWdmOpticalTransponderCardReg 81 }
+
+    aluWdmS13x100eCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { aluWdmOpticalTransponderCardReg 82 }
+
+    aluWdmLcI2000Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { aluWdmOpticalTransponderCardReg 83 }
+
+    aluWdm30se300Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { aluWdmOpticalTransponderCardReg 84 }
+
+    aluWdm6se300Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { aluWdmOpticalTransponderCardReg 85 }
+
+    aluWdmD5x500lCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { aluWdmOpticalTransponderCardReg 86 }
+
+    aluWdmLcI2000lCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { aluWdmOpticalTransponderCardReg 87 }
+
+    aluWdm20an80Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "20x 10G/Sub10G Multi-Rate Card."
+        ::= { aluWdmOpticalTransponderCardReg 88 }
+
+    aluWdm10an400Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "100G client card with QSFP28."
+        ::= { aluWdmOpticalTransponderCardReg 89 }
+
+    aluWdm8p20Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "8xAny 10G Tributary/6xAny Muxponder Card."
+        ::= { aluWdmOpticalTransponderCardReg 90 }
+
+    aluWdmD5x500qCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { aluWdmOpticalTransponderCardReg 91 }
+
+    aluWdm18p40Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Sub-10G I/O Card."
+        ::= { aluWdmOpticalTransponderCardReg 92 }
+
+    aluWdmDa2c4Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Transport Blade for PSI-M."
+        ::= { aluWdmOpticalTransponderCardReg 93 }
+
+    aluWdm130sla1Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "130G Single Port Tunable Anyrate L-band (1 Client) Card."
+        ::= { aluWdmOpticalTransponderCardReg 94 }
+
+    aluWdm130slx10Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "130G L-band (10 Universal Clients) Card."
+        ::= { aluWdmOpticalTransponderCardReg 95 }
+
+    aluWdmBmuPCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Band Multiplexer Unit Passive Card."
+        ::= { aluWdmOpticalTransponderCardReg 96 }
+
+    aluWdmS2ad200Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { aluWdmOpticalTransponderCardReg 97 }
+
+    aluWdm2ux200Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { aluWdmOpticalTransponderCardReg 98 }
+
+    aluWdm4mx200Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { aluWdmOpticalTransponderCardReg 99 }
+
+--    obsolete
+--    aluWdm40cx800Card OBJECT-IDENTITY ::= { aluWdmOpticalTransponderCardReg 100 }
+--    aluWdm8cx800Card  OBJECT-IDENTITY ::= { aluWdmOpticalTransponderCardReg 101 }
+--    aluWdm6px800Card  OBJECT-IDENTITY ::= { aluWdmOpticalTransponderCardReg 102 }
+
+    aluWdm10an1tCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { aluWdmOpticalTransponderCardReg 103 }
+
+    aluWdm8uc1tCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { aluWdmOpticalTransponderCardReg 104 }
+
+    aluWdmDfc12Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { aluWdmOpticalTransponderCardReg 105 }
+
+    nokiaT24PS1Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    " TPS-24 Packet Switch #1. (virtual)."
+        ::= { aluWdmOpticalTransponderCardReg 106 }
+
+    nokiaT12PSCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    " TPS-12 Packet Switch (virtual)."
+        ::= { aluWdmOpticalTransponderCardReg 107 }
+
+    aluWdmS4x400Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { aluWdmOpticalTransponderCardReg 108 }
+
+    nokiaT24PS2Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "TPS-24 Packet Switch #2 (virtual)."
+        ::= { aluWdmOpticalTransponderCardReg 109 }
+
+    aluWdmGenericOtCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Generic OT."
+        ::= { aluWdmOpticalTransponderCardReg 110 }
+
+    aluWdm1ety100Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Falcon 100 GbE PHY Line/Uplink Card."
+        ::= { aluWdmOpticalTransponderCardReg 111 }
+
+--    obsolete
+--    aluWdmD1ad400qCard OBJECT-IDENTITY ::= { aluWdmOpticalTransponderCardReg 112 }
+
+    aluWdm18P400Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { aluWdmOpticalTransponderCardReg 113 }
+
+    aluWdm4uc1tCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { aluWdmOpticalTransponderCardReg 114 }
+
+    nokia5mx500Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { aluWdmOpticalTransponderCardReg 115 }
+
+    nokia2ux500Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { aluWdmOpticalTransponderCardReg 116 }
+
+    nokiaS24PS1Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "SAS-24 Packet Switch #1. (virtual)."
+        ::= { aluWdmOpticalTransponderCardReg 117 }
+
+    nokiaS24PS2Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "SAS-24 Packet Switch #2 (virtual)."
+        ::= { aluWdmOpticalTransponderCardReg 118 }
+
+    nokia18ce300Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "300GbE Carrier Ethernet Card."
+        ::= { aluWdmOpticalTransponderCardReg 119 }
+
+-- Static Filters
+
+    aluWdmStaticFilterCardReg OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicCardReg 12 }
+
+    aluWdmSFD5ACard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 5 Channel (A Variant)."
+        ::= { aluWdmStaticFilterCardReg 1 }
+
+    aluWdmSFD5BCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 5 Channel (B Variant)."
+        ::= { aluWdmStaticFilterCardReg 2 }
+
+    aluWdmSFD5CCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 5 Channel (C Variant)."
+        ::= { aluWdmStaticFilterCardReg 3 }
+
+    aluWdmSFD5DCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 5 Channel (D Variant)."
+        ::= { aluWdmStaticFilterCardReg 4 }
+
+    aluWdmSFD5ECard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 5 Channel (E Variant)."
+        ::= { aluWdmStaticFilterCardReg 5 }
+
+    aluWdmSFD5FCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 5 Channel (F Variant)."
+        ::= { aluWdmStaticFilterCardReg 6 }
+
+    aluWdmSFD5GCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 5 Channel (G Variant)."
+        ::= { aluWdmStaticFilterCardReg 7 }
+
+    aluWdmSFD5HCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 5 Channel (H Variant)."
+        ::= { aluWdmStaticFilterCardReg 8 }
+
+    aluWdmSFD10ACard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 10 Channel (A Variant)."
+        ::= { aluWdmStaticFilterCardReg 9 }
+
+    aluWdmSFD10BCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 10 Channel (B Variant)."
+        ::= { aluWdmStaticFilterCardReg 10 }
+
+    aluWdmSFD10CCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 10 Channel (C Variant)."
+        ::= { aluWdmStaticFilterCardReg 11 }
+
+    aluWdmSFD10DCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 10 Channel (D Variant)."
+        ::= { aluWdmStaticFilterCardReg 12 }
+
+    aluWdmSFC2ACard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter CWDM 2 Channel (A Variant)."
+        ::= { aluWdmStaticFilterCardReg 13 }
+
+    aluWdmSFC2BCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter CWDM 2 Channel (B Variant)."
+        ::= { aluWdmStaticFilterCardReg 14 }
+
+    aluWdmSFC2CCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter CWDM 2 Channel (C Variant)."
+        ::= { aluWdmStaticFilterCardReg 15 }
+
+    aluWdmSFC2DCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter CWDM 2 Channel (D Variant)."
+        ::= { aluWdmStaticFilterCardReg 16 }
+
+    aluWdmSFC4ACard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter CWDM 4 Channel (A Variant)."
+        ::= { aluWdmStaticFilterCardReg 17 }
+
+    aluWdmSFC4BCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter CWDM 4 Channel (B Variant)."
+        ::= { aluWdmStaticFilterCardReg 18 }
+
+    aluWdmSFC8Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter CWDM 8 Channel."
+        ::= { aluWdmStaticFilterCardReg 19 }
+
+    aluWdmSFC1ACard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter CWDM 1 Channel (A Variant)."
+        ::= { aluWdmStaticFilterCardReg 20 }
+
+    aluWdmSFC1BCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter CWDM 1 Channel (B Variant)."
+        ::= { aluWdmStaticFilterCardReg 21 }
+
+    aluWdmSFC1CCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter CWDM 1 Channel (C Variant)."
+        ::= { aluWdmStaticFilterCardReg 22 }
+
+    aluWdmSFC1DCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter CWDM 1 Channel (D Variant)."
+        ::= { aluWdmStaticFilterCardReg 23 }
+
+    aluWdmSFC1ECard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter CWDM 1 Channel (E Variant)."
+        ::= { aluWdmStaticFilterCardReg 24 }
+
+    aluWdmSFC1FCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter CWDM 1 Channel (F Variant)."
+        ::= { aluWdmStaticFilterCardReg 25 }
+
+    aluWdmSFC1GCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter CWDM 1 Channel (G Variant)."
+        ::= { aluWdmStaticFilterCardReg 26 }
+
+    aluWdmSFC1HCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter CWDM 1 Channel (H Variant)."
+        ::= { aluWdmStaticFilterCardReg 27 }
+
+    aluWdmSFD8ACard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 8 Channel (A Variant)."
+        ::= { aluWdmStaticFilterCardReg 28 }
+
+    aluWdmSFD8BCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 8 Channel (B Variant)."
+        ::= { aluWdmStaticFilterCardReg 29 }
+
+    aluWdmSFD8CCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 8 Channel (C Variant)."
+        ::= { aluWdmStaticFilterCardReg 30 }
+
+    aluWdmSFD8DCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 8 Channel (D Variant)."
+        ::= { aluWdmStaticFilterCardReg 31 }
+
+    aluWdmSFD4ACard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 4 Channel (A Variant)."
+        ::= { aluWdmStaticFilterCardReg 32 }
+
+    aluWdmSFD4BCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 4 Channel (B Variant)."
+        ::= { aluWdmStaticFilterCardReg 33 }
+
+    aluWdmSFD4CCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 4 Channel (C Variant)."
+        ::= { aluWdmStaticFilterCardReg 34 }
+
+    aluWdmSFD4DCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 4 Channel (D Variant)."
+        ::= { aluWdmStaticFilterCardReg 35 }
+
+    aluWdmSFD4ECard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 4 Channel (E Variant)."
+        ::= { aluWdmStaticFilterCardReg 36 }
+
+    aluWdmSFD4FCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 4 Channel (F Variant)."
+        ::= { aluWdmStaticFilterCardReg 37 }
+
+    aluWdmSFD4GCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 4 Channel (G Variant)."
+        ::= { aluWdmStaticFilterCardReg 38 }
+
+    aluWdmSFD4HCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 4 Channel (H Variant)."
+        ::= { aluWdmStaticFilterCardReg 39 }
+
+    aluWdmSFD2ACard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 2 Channel (A Variant)."
+        ::= { aluWdmStaticFilterCardReg 40 }
+
+    aluWdmSFD2BCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 2 Channel (B Variant)."
+        ::= { aluWdmStaticFilterCardReg 41 }
+
+    aluWdmSFD2CCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 2 Channel (C Variant)."
+        ::= { aluWdmStaticFilterCardReg 42 }
+
+    aluWdmSFD2DCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 2 Channel (D Variant)."
+        ::= { aluWdmStaticFilterCardReg 43 }
+
+    aluWdmSFD2ECard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 2 Channel (E Variant)."
+        ::= { aluWdmStaticFilterCardReg 44 }
+
+    aluWdmSFD2FCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 2 Channel (F Variant)."
+        ::= { aluWdmStaticFilterCardReg 45 }
+
+    aluWdmSFD2GCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 2 Channel (G Variant)."
+        ::= { aluWdmStaticFilterCardReg 46 }
+
+    aluWdmSFD2HCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 2 Channel (H Variant)."
+        ::= { aluWdmStaticFilterCardReg 47 }
+
+    aluWdmSFD2ICard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 2 Channel (I Variant)."
+        ::= { aluWdmStaticFilterCardReg 48 }
+
+    aluWdmSFD2LCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 2 Channel (L Variant)."
+        ::= { aluWdmStaticFilterCardReg 49 }
+
+    aluWdmSFD2MCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 2 Channel (M Variant)."
+        ::= { aluWdmStaticFilterCardReg 50 }
+
+    aluWdmSFD2NCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 2 Channel (N Variant)."
+        ::= { aluWdmStaticFilterCardReg 51 }
+
+    aluWdmSFD2OCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 2 Channel (O Variant)."
+        ::= { aluWdmStaticFilterCardReg 52 }
+
+    aluWdmSFD2PCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 2 Channel (P Variant)."
+        ::= { aluWdmStaticFilterCardReg 53 }
+
+    aluWdmSFD2QCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 2 Channel (Q Variant)."
+        ::= { aluWdmStaticFilterCardReg 54 }
+
+    aluWdmSFD2RCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 2 Channel (R Variant)."
+        ::= { aluWdmStaticFilterCardReg 55 }
+
+    aluWdmVwmSFD8ACard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "VWM Static Filter DWDM  8 Channel (A Variant)."
+        ::= { aluWdmStaticFilterCardReg 56 }
+
+    aluWdmVwmSFD8BCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "VWM Static Filter DWDM 8 Channel (B Variant)."
+        ::= { aluWdmStaticFilterCardReg 57 }
+
+    aluWdmVwmSFD8CCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "VWM Static Filter DWDM 8 Channel (C Variant)."
+        ::= { aluWdmStaticFilterCardReg 58 }
+
+    aluWdmVwmSFD8DCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "VWM Static Filter DWDM 8 Channel (D Variant)."
+        ::= { aluWdmStaticFilterCardReg 59 }
+
+    aluWdmVwmSFC8Card OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "VWM Static Filter CWDM 8 Channel."
+        ::= { aluWdmStaticFilterCardReg 60 }
+
+    aluWdmMonOcmCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { aluWdmStaticFilterCardReg 61 }
+
+    aluWdmSfdc8ACard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM CWDM 8 Channel (A Variant)."
+        ::= { aluWdmStaticFilterCardReg 62 }
+
+    aluWdmSfdc8BCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM CWDM 8 Channel (B Variant)."
+        ::= { aluWdmStaticFilterCardReg 63 }
+
+    aluWdmSfdc8CCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM CWDM 8 Channel (C Variant)."
+        ::= { aluWdmStaticFilterCardReg 64 }
+
+    aluWdmSfdc8DCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM CWDM 8 Channel (D Variant)."
+        ::= { aluWdmStaticFilterCardReg 65 }
+
+    aluWdmSfdc8ECard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM CWDM 8 Channel (E Variant)."
+        ::= { aluWdmStaticFilterCardReg 66 }
+
+    nokiaSfd5ADCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 5 Channel Card - Type ABID."
+        ::= { aluWdmStaticFilterCardReg 67 }
+
+    nokiaSfd5BDCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 5 Channel Card - Type BBID."
+        ::= { aluWdmStaticFilterCardReg 68 }
+
+    nokiaSfd5CDCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 5 Channel Card - Type CBID."
+        ::= { aluWdmStaticFilterCardReg 69 }
+
+     nokiaSfd5DDCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 5 Channel Card - Type DBID."
+        ::= { aluWdmStaticFilterCardReg 70 }
+
+    nokiaSfd5AUCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 5 Channel Card - Type ABIU."
+        ::= { aluWdmStaticFilterCardReg 71 }
+
+    nokiaSfd5BUCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 5 Channel Card - Type BBIU."
+        ::= { aluWdmStaticFilterCardReg 72 }
+
+    nokiaSfd5CUCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 5 Channel Card - Type CBIU."
+        ::= { aluWdmStaticFilterCardReg 73 }
+
+    nokiaSfd5DUCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Static Filter DWDM 5 Channel Card - Type DBIU."
+        ::= { aluWdmStaticFilterCardReg 74 }
+
+    nokiaDcm2pCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "DCM Card - DCM2P."
+        ::= { aluWdmStaticFilterCardReg 75 }
+
+--------------------------------------------------------------------------------
+-- Common Equipment Registry
+--------------------------------------------------------------------------------
+    tropicCommonEquipmentReg OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicRegistry 6 }
+
+--    obsolete
+--    tropicBreakerAssemblyCard OBJECT-IDENTITY ::= { tropicCommonEquipmentReg 1 }
+--    tropicShelfAlarmPanelCard OBJECT-IDENTITY ::= { tropicCommonEquipmentReg 2 }
+--    tropicFanControllerCard   OBJECT-IDENTITY ::= { tropicCommonEquipmentReg 3 }
+
+    aluWdmPowerFilterCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicCommonEquipmentReg 4 }
+
+    aluWdmFanUnitCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "Fan Unit."
+        ::= { tropicCommonEquipmentReg 5 }
+
+    aluWdmUserInterfacePanelCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicCommonEquipmentReg 6 }
+
+    aluWdmBusTerminationCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicCommonEquipmentReg 7 }
+
+    aluWdmBusTerminationOnlyCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicCommonEquipmentReg 8 }
+
+    aluWdmPSS8ShelfPanelCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "PSS8 Shelf Panel Card."
+        ::= { tropicCommonEquipmentReg 9 }
+
+    aluWdmPSS8UserInterfacePanelCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "PSS8 User Interface Panel Card."
+        ::= { tropicCommonEquipmentReg 10 }
+
+    aluWdmMultiFunctionCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "PSS48/96 Multi Function Card."
+        ::= { tropicCommonEquipmentReg 11 }
+
+    aluWdmPSS8PowerFilterAcCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicCommonEquipmentReg 12 }
+
+    aluWdmPSS96PowerFilterCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicCommonEquipmentReg 13 }
+
+    aluWdmPSS8xMultiFunctionCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "PSS8x Multi Function Card."
+        ::= { tropicCommonEquipmentReg 14 }
+
+    aluWdmPSS8xPowerFilterCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicCommonEquipmentReg 15 }
+
+    nokiaVwmMsFanTOCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "VWMMS FAN Card."
+        ::= { tropicCommonEquipmentReg 18 }
+
+    nokiaVwmMsOpsPsuCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "OPS PSU Card."
+        ::= { tropicCommonEquipmentReg 19 }
+
+    aluWdmPSS8PowerFilterWithFCRUCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicCommonEquipmentReg 20 }
+
+    aluWdmPSS16IIPowerFilterWithFCRUCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicCommonEquipmentReg 21 }
+
+    aluWdmPSS12xPowerFilterCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicCommonEquipmentReg 22 }
+
+    aluWdmMultiFunctionPSIMCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "PSIM Multi Function Card."
+        ::= { tropicCommonEquipmentReg 23 }
+
+    nokiaVwmMsFanDECard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "VWMMS FAN-DE (FAN Depth Extended) Card."
+        ::= { tropicCommonEquipmentReg 24 }
+
+    aluWdmMultiFunctionPSILCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "PSIL Multi Function Card."
+        ::= { tropicCommonEquipmentReg 25 }
+
+    nokiaT24PFCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "TPS-24 Power Filter Card(virtual)."
+        ::= { tropicCommonEquipmentReg 26 }
+
+    nokiaT12PFCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "TPS-12 Power Filter Card(virtual)."
+        ::= { tropicCommonEquipmentReg 27 }
+
+    nokiaT24FUCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "TPS-24 Fan Filter Card."
+        ::= { tropicCommonEquipmentReg 28 }
+
+    nokiaVwmMsFanIICard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "VWMMS FAN-II Card."
+        ::= { tropicCommonEquipmentReg 29 }
+
+    aluWdmMultiFunctionPSIMXCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "PSIMX Multi Function Card."
+        ::= { tropicCommonEquipmentReg 30 }
+
+    nokiaS24PFCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "SAS-24 Power Filter Card(virtual)."
+        ::= { tropicCommonEquipmentReg 31 }
+
+    nokiaS24FUCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "TPS-24 Fan Filter Card."
+        ::= { tropicCommonEquipmentReg 32 }
+
+--------------------------------------------------------------------------------
+-- Generic
+--------------------------------------------------------------------------------
+    tnSystem OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicGeneric 1 }
+
+    tnEquipment OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicGeneric 2 }
+
+    tnServices OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicGeneric 3 }
+
+    tnStatistics OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicGeneric 4 }
+
+    tnProtocols OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicGeneric 5 }
+
+--------------------------------------------------------------------------------
+-- System - MIBs
+--------------------------------------------------------------------------------
+    tnSystemMIB OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSystem 1 }
+
+    tnNotificationMIB OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSystem 2 }
+
+    tnLogMIB OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSystem 3 }
+
+    tnDiagnosticMIB OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSystem 4 }
+
+    tnSoftwareMIB OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSystem 5 }
+
+    tnPowerMgmtMIB OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSystem 6 }
+
+    tnUserMgmtMIB OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSystem 7 }
+
+    tnPhMNotificationMIB OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSystem 8 }
+
+    tnAsonMIB OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSystem 9 }
+
+    tnGmplsMIB OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSystem 10 }
+
+    tnGmplsObjs OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnGmplsMIB 1 }
+
+    tnAbsNodeMIB OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSystem 11 }
+
+    tnAbsNodeObjs OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnAbsNodeMIB 1 }
+
+    tnGenericNotificationMIB OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSystem 12 }
+
+    tnGenericLogMIB OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSystem 13 }
+
+    tnDhpMIB OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSystem 14 }
+
+    tnDhpObjs OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnDhpMIB 1 }
+--------------------------------------------------------------------------------
+-- Equipment Groups
+--------------------------------------------------------------------------------
+    tnShelf OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnEquipment 1 }
+
+    tnSlot OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnEquipment 2 }
+
+    tnCard OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnEquipment 3 }
+
+    tnPort OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnEquipment 4 }
+
+    tnMiscEquipment OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnEquipment 5 }
+
+    tnVwmMsMIB OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnEquipment 6 }
+
+    tnPsdMIB OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnEquipment 7 }
+
+--------------------------------------------------------------------------------
+-- Equipment - MIBs
+--------------------------------------------------------------------------------
+    tnShelfMIB OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnShelf 1 }
+
+    tnSlotMIB OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSlot 1 }
+
+    tnCardMIB OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnCard 1 }
+
+    tnWaveKeyMIB OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnCard 2 }
+
+    tnControlCardMIB OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnCard 3 }
+
+    tnEthernetCardMIB OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnCard 4 }
+
+    tnOpticalCardMIB OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnCard 5 }
+
+    tnSwitchCardMIB OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnCard 6 }
+
+    tnAmplifierMIB OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnCard 7 }
+
+    tnAccessPortMIB OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnPort 1 }
+
+    tnEthernetPortMIB OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnPort 2 }
+
+    tnOpticalPortMIB OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnPort 3 }
+
+    tnSwitchPortMIB OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnPort 4 }
+
+    tnOchMIB OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnPort 5 }
+
+    tnVtsConnMIB OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnPort 6 }
+
+    tnOtuOduMIB OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnPort 7 }
+
+    tnSyncEMIB OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnPort 8 }
+
+    tnPtpMIB OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnPort 9 }
+
+    tnOthMIB OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnPort 10 }
+
+    tnIEEE8023brMIB OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnPort 11 }
+
+   tnRoeMib OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnPort 12 }
+
+--------------------------------------------------------------------------------
+-- Miscellaneous Equipment - MIBs
+--------------------------------------------------------------------------------
+    tnFanMIB OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnMiscEquipment 1 }
+
+    tnBreakerMIB OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnMiscEquipment 2 }
+
+    tnAlarmPanelMIB OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnMiscEquipment 3 }
+
+--------------------------------------------------------------------------------
+-- Services - MIBs
+--------------------------------------------------------------------------------
+    tnL1ServiceMIB OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnServices 1 }
+
+    tnL2ServiceMIB OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnServices 2 }
+
+--------------------------------------------------------------------------------
+-- Protocols - MIBs
+--------------------------------------------------------------------------------
+    tnOspfMIB OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnProtocols 1 }
+
+--------------------------------------------------------------------------------
+-- Statistics - MIBs
+--------------------------------------------------------------------------------
+    tnStatisticsMIB OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnStatistics 1 }
+
+--------------------------------------------------------------------------------
+-- Experimental - MIBs
+--------------------------------------------------------------------------------
+    tnExprOpticalCardMIB OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicExpr 1 }
+
+    tnExprOpticalPortMIB OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicExpr 2 }
+
+    tnExprScalarsMIB OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tropicExpr 3 }
+
+--------------------------------------------------------------------------------
+--
+-- Transplant from SROS
+--
+    tnModules OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnReg 1 }
+
+--    obsolete
+--    tnTCMIBModule OBJECT-IDENTITY ::= { tnModules 2 }
+
+    tnSRMIBModules OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnModules 3 }
+
+    tnRmdMIBModules OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnModules 4 }
+
+    tnSRMIB OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnProducts 1 }
+
+    tnSRObjs OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSRMIB 2 }
+
+    tnSRNotifyPrefix OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSRMIB 3 }
+
+--    obsolete
+--    tnCommonMIB OBJECT-IDENTITY ::= { tnProducts 3 }
+
+    tnServiceAccessSwitches OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSASProducts 2 }
+
+    tnSASRegistry OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnServiceAccessSwitches 1 }
+
+    tnSASModules OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSASRegistry 1 }
+
+    tnSASMIBModules OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSASModules 3 }
+
+    tnSASMIB OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnServiceAccessSwitches 2 }
+
+    tnSASObjs OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSASMIB 2 }
+
+    tnRmdMIB OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnProducts 4 }
+
+    tnRmdObjs OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnRmdMIB 1 }
+
+END  -- TROPIC-GLOBAL-REG

@@ -26,6 +26,7 @@
 namespace LibreNMS\OS;
 
 use Illuminate\Support\Str;
+use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\RRD\RrdDefinition;
 
@@ -36,7 +37,7 @@ class Panos extends \LibreNMS\OS implements OSPolling
         'Packet Buffers',
     ];
 
-    public function pollOS(): void
+    public function pollOS(DataStorageInterface $datastore): void
     {
         $data = snmp_get_multi($this->getDeviceArray(), [
             'panSessionActive.0',
@@ -76,7 +77,7 @@ class Panos extends \LibreNMS\OS implements OSPolling
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'panos-sessions', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'panos-sessions', $tags, $fields);
 
             $this->enableGraph('panos_sessions');
         }
@@ -89,7 +90,7 @@ class Panos extends \LibreNMS\OS implements OSPolling
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'panos-sessions-tcp', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'panos-sessions-tcp', $tags, $fields);
 
             $this->enableGraph('panos_sessions_tcp');
         }
@@ -102,7 +103,7 @@ class Panos extends \LibreNMS\OS implements OSPolling
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'panos-sessions-udp', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'panos-sessions-udp', $tags, $fields);
 
             $this->enableGraph('panos_sessions_udp');
         }
@@ -115,7 +116,7 @@ class Panos extends \LibreNMS\OS implements OSPolling
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'panos-sessions-icmp', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'panos-sessions-icmp', $tags, $fields);
 
             $this->enableGraph('panos_sessions_icmp');
         }
@@ -128,12 +129,12 @@ class Panos extends \LibreNMS\OS implements OSPolling
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'panos-sessions-ssl', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'panos-sessions-ssl', $tags, $fields);
 
             $this->enableGraph('panos_sessions_ssl');
         }
 
-        if (is_numeric($data[0]['panSessionSslProxyUtilization'])) {
+        if (is_numeric($data[0]['panSessionSslProxyUtilization'] ?? null)) {
             $rrd_def = RrdDefinition::make()->addDataset('sessions_sslutil', 'GAUGE', 0, 3000000);
 
             $fields = [
@@ -141,12 +142,12 @@ class Panos extends \LibreNMS\OS implements OSPolling
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'panos-sessions-sslutil', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'panos-sessions-sslutil', $tags, $fields);
 
             $this->enableGraph('panos_sessions_sslutil');
         }
 
-        if (is_numeric($data[0]['panGPGWUtilizationActiveTunnels'])) {
+        if (is_numeric($data[0]['panGPGWUtilizationActiveTunnels'] ?? null)) {
             $rrd_def = RrdDefinition::make()->addDataset('activetunnels', 'GAUGE', 0, 3000000);
 
             $fields = [
@@ -154,11 +155,11 @@ class Panos extends \LibreNMS\OS implements OSPolling
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'panos-activetunnels', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'panos-activetunnels', $tags, $fields);
 
             $this->enableGraph('panos_activetunnels');
         }
-        if (is_numeric($data[0]['panFlowDosBlkNumEntries'])) {
+        if (is_numeric($data[0]['panFlowDosBlkNumEntries'] ?? null)) {
             $rrd_def = RrdDefinition::make()->addDataset('panFlowDosBlkNumEntries', 'GAUGE', 0);
 
             $fields = [
@@ -166,11 +167,11 @@ class Panos extends \LibreNMS\OS implements OSPolling
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'panos-panFlowDosBlkNumEntries', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'panos-panFlowDosBlkNumEntries', $tags, $fields);
 
             $this->enableGraph('panos_panFlowDosBlkNumEntries');
         }
-        if (is_numeric($data[0]['panFlowMeterVsysThrottle'])) {
+        if (is_numeric($data[0]['panFlowMeterVsysThrottle'] ?? null)) {
             $rrd_def = RrdDefinition::make()->addDataset('panFlowMeterVsysThrottle', 'COUNTER', 0);
 
             $fields = [
@@ -178,11 +179,11 @@ class Panos extends \LibreNMS\OS implements OSPolling
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'panos-panFlowMeterVsysThrottle', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'panos-panFlowMeterVsysThrottle', $tags, $fields);
 
             $this->enableGraph('panos_panFlowMeterVsysThrottle');
         }
-        if (is_numeric($data[0]['panFlowPolicyDeny'])) {
+        if (is_numeric($data[0]['panFlowPolicyDeny'] ?? null)) {
             $rrd_def = RrdDefinition::make()->addDataset('panFlowPolicyDeny', 'COUNTER', 0);
 
             $fields = [
@@ -190,11 +191,11 @@ class Panos extends \LibreNMS\OS implements OSPolling
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'panos-panFlowPolicyDeny', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'panos-panFlowPolicyDeny', $tags, $fields);
 
             $this->enableGraph('panos_panFlowPolicyDeny');
         }
-        if (is_numeric($data[0]['panFlowPolicyNat'])) {
+        if (is_numeric($data[0]['panFlowPolicyNat'] ?? null)) {
             $rrd_def = RrdDefinition::make()->addDataset('panFlowPolicyNat', 'COUNTER', 0);
 
             $fields = [
@@ -202,11 +203,11 @@ class Panos extends \LibreNMS\OS implements OSPolling
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'panos-panFlowPolicyNat', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'panos-panFlowPolicyNat', $tags, $fields);
 
             $this->enableGraph('panos_panFlowPolicyNat');
         }
-        if (is_numeric($data[0]['panFlowScanDrop'])) {
+        if (is_numeric($data[0]['panFlowScanDrop'] ?? null)) {
             $rrd_def = RrdDefinition::make()->addDataset('panFlowScanDrop', 'COUNTER', 0);
 
             $fields = [
@@ -214,11 +215,11 @@ class Panos extends \LibreNMS\OS implements OSPolling
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'panos-panFlowScanDrop', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'panos-panFlowScanDrop', $tags, $fields);
 
             $this->enableGraph('panos_panFlowScanDrop');
         }
-        if (is_numeric($data[0]['panFlowDosDropIpBlocked'])) {
+        if (is_numeric($data[0]['panFlowDosDropIpBlocked'] ?? null)) {
             $rrd_def = RrdDefinition::make()->addDataset('panFlowDosDropIpBlocked', 'COUNTER', 0);
 
             $fields = [
@@ -226,11 +227,11 @@ class Panos extends \LibreNMS\OS implements OSPolling
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'panos-panFlowDosDropIpBlocked', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'panos-panFlowDosDropIpBlocked', $tags, $fields);
 
             $this->enableGraph('panos_panFlowDosDropIpBlocked');
         }
-        if (is_numeric($data[0]['panFlowDosRedIcmp'])) {
+        if (is_numeric($data[0]['panFlowDosRedIcmp'] ?? null)) {
             $rrd_def = RrdDefinition::make()->addDataset('panFlowDosRedIcmp', 'COUNTER', 0);
 
             $fields = [
@@ -238,11 +239,11 @@ class Panos extends \LibreNMS\OS implements OSPolling
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'panos-panFlowDosRedIcmp', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'panos-panFlowDosRedIcmp', $tags, $fields);
 
             $this->enableGraph('panos_panFlowDosRedIcmp');
         }
-        if (is_numeric($data[0]['panFlowDosRedIcmp6'])) {
+        if (is_numeric($data[0]['panFlowDosRedIcmp6'] ?? null)) {
             $rrd_def = RrdDefinition::make()->addDataset('panFlowDosRedIcmp6', 'COUNTER', 0);
 
             $fields = [
@@ -250,11 +251,11 @@ class Panos extends \LibreNMS\OS implements OSPolling
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'panos-panFlowDosRedIcmp6', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'panos-panFlowDosRedIcmp6', $tags, $fields);
 
             $this->enableGraph('panos_panFlowDosRedIcmp6');
         }
-        if (is_numeric($data[0]['panFlowDosRedIp'])) {
+        if (is_numeric($data[0]['panFlowDosRedIp'] ?? null)) {
             $rrd_def = RrdDefinition::make()->addDataset('panFlowDosRedIp', 'COUNTER', 0);
 
             $fields = [
@@ -262,11 +263,11 @@ class Panos extends \LibreNMS\OS implements OSPolling
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'panos-panFlowDosRedIp', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'panos-panFlowDosRedIp', $tags, $fields);
 
             $this->enableGraph('panos_panFlowDosRedIp');
         }
-        if (is_numeric($data[0]['panFlowDosRedTcp'])) {
+        if (is_numeric($data[0]['panFlowDosRedTcp'] ?? null)) {
             $rrd_def = RrdDefinition::make()->addDataset('panFlowDosRedTcp', 'COUNTER', 0);
 
             $fields = [
@@ -274,11 +275,11 @@ class Panos extends \LibreNMS\OS implements OSPolling
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'panos-panFlowDosRedTcp', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'panos-panFlowDosRedTcp', $tags, $fields);
 
             $this->enableGraph('panos_panFlowDosRedTcp');
         }
-        if (is_numeric($data[0]['panFlowDosRedUdp'])) {
+        if (is_numeric($data[0]['panFlowDosRedUdp'] ?? null)) {
             $rrd_def = RrdDefinition::make()->addDataset('panFlowDosRedUdp', 'COUNTER', 0);
 
             $fields = [
@@ -286,11 +287,11 @@ class Panos extends \LibreNMS\OS implements OSPolling
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'panos-panFlowDosRedUdp', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'panos-panFlowDosRedUdp', $tags, $fields);
 
             $this->enableGraph('panos_panFlowDosRedUdp');
         }
-        if (is_numeric($data[0]['panFlowDosPbpDrop'])) {
+        if (is_numeric($data[0]['panFlowDosPbpDrop'] ?? null)) {
             $rrd_def = RrdDefinition::make()->addDataset('panFlowDosPbpDrop', 'COUNTER', 0);
 
             $fields = [
@@ -298,11 +299,11 @@ class Panos extends \LibreNMS\OS implements OSPolling
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'panos-panFlowDosPbpDrop', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'panos-panFlowDosPbpDrop', $tags, $fields);
 
             $this->enableGraph('panos_panFlowDosPbpDrop');
         }
-        if (is_numeric($data[0]['panFlowDosRuleDeny'])) {
+        if (is_numeric($data[0]['panFlowDosRuleDeny'] ?? null)) {
             $rrd_def = RrdDefinition::make()->addDataset('panFlowDosRuleDeny', 'COUNTER', 0);
 
             $fields = [
@@ -310,11 +311,11 @@ class Panos extends \LibreNMS\OS implements OSPolling
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'panos-panFlowDosRuleDeny', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'panos-panFlowDosRuleDeny', $tags, $fields);
 
             $this->enableGraph('panos_panFlowDosRuleDeny');
         }
-        if (is_numeric($data[0]['panFlowDosRuleDrop'])) {
+        if (is_numeric($data[0]['panFlowDosRuleDrop'] ?? null)) {
             $rrd_def = RrdDefinition::make()->addDataset('panFlowDosRuleDrop', 'COUNTER', 0);
 
             $fields = [
@@ -322,11 +323,11 @@ class Panos extends \LibreNMS\OS implements OSPolling
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'panos-panFlowDosRuleDrop', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'panos-panFlowDosRuleDrop', $tags, $fields);
 
             $this->enableGraph('panos_panFlowDosRuleDrop');
         }
-        if (is_numeric($data[0]['panFlowDosZoneRedAct'])) {
+        if (is_numeric($data[0]['panFlowDosZoneRedAct'] ?? null)) {
             $rrd_def = RrdDefinition::make()->addDataset('panFlowDosZoneRedAct', 'COUNTER', 0);
 
             $fields = [
@@ -334,11 +335,11 @@ class Panos extends \LibreNMS\OS implements OSPolling
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'panos-panFlowDosZoneRedAct', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'panos-panFlowDosZoneRedAct', $tags, $fields);
 
             $this->enableGraph('panos_panFlowDosZoneRedAct');
         }
-        if (is_numeric($data[0]['panFlowDosZoneRedMax'])) {
+        if (is_numeric($data[0]['panFlowDosZoneRedMax'] ?? null)) {
             $rrd_def = RrdDefinition::make()->addDataset('panFlowDosZoneRedMax', 'COUNTER', 0);
 
             $fields = [
@@ -346,11 +347,11 @@ class Panos extends \LibreNMS\OS implements OSPolling
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'panos-panFlowDosZoneRedMax', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'panos-panFlowDosZoneRedMax', $tags, $fields);
 
             $this->enableGraph('panos_panFlowDosZoneRedMax');
         }
-        if (is_numeric($data[0]['panFlowDosSyncookieNotTcpSyn'])) {
+        if (is_numeric($data[0]['panFlowDosSyncookieNotTcpSyn'] ?? null)) {
             $rrd_def = RrdDefinition::make()->addDataset('panFlowDosSyncookieNotTcpSyn', 'COUNTER', 0);
 
             $fields = [
@@ -358,11 +359,11 @@ class Panos extends \LibreNMS\OS implements OSPolling
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'panos-panFlowDosSyncookieNotTcpSyn', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'panos-panFlowDosSyncookieNotTcpSyn', $tags, $fields);
 
             $this->enableGraph('panos_panFlowDosSyncookieNotTcpSyn');
         }
-        if (is_numeric($data[0]['panFlowDosSyncookieNotTcpSynAck'])) {
+        if (is_numeric($data[0]['panFlowDosSyncookieNotTcpSynAck'] ?? null)) {
             $rrd_def = RrdDefinition::make()->addDataset('panFlowDosSyncookieNotTcpSynAck', 'COUNTER', 0);
 
             $fields = [
@@ -370,11 +371,11 @@ class Panos extends \LibreNMS\OS implements OSPolling
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'panos-panFlowDosSyncookieNotTcpSynAck', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'panos-panFlowDosSyncookieNotTcpSynAck', $tags, $fields);
 
             $this->enableGraph('panos_panFlowDosSyncookieNotTcpSynAck');
         }
-        if (is_numeric($data[0]['panFlowDosBlkSwEntries'])) {
+        if (is_numeric($data[0]['panFlowDosBlkSwEntries'] ?? null)) {
             $rrd_def = RrdDefinition::make()->addDataset('panFlowDosBlkSwEntries', 'GAUGE', 0);
 
             $fields = [
@@ -382,11 +383,11 @@ class Panos extends \LibreNMS\OS implements OSPolling
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'panos-panFlowDosBlkSwEntries', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'panos-panFlowDosBlkSwEntries', $tags, $fields);
 
             $this->enableGraph('panos_panFlowDosBlkSwEntries');
         }
-        if (is_numeric($data[0]['panFlowDosBlkHwEntries'])) {
+        if (is_numeric($data[0]['panFlowDosBlkHwEntries'] ?? null)) {
             $rrd_def = RrdDefinition::make()->addDataset('panFlowDosBlkHwEntries', 'GAUGE', 0);
 
             $fields = [
@@ -394,7 +395,7 @@ class Panos extends \LibreNMS\OS implements OSPolling
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'panos-panFlowDosBlkHwEntries', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'panos-panFlowDosBlkHwEntries', $tags, $fields);
 
             $this->enableGraph('panos_panFlowDosBlkHwEntries');
         }

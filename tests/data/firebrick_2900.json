@@ -1995,8 +1995,8 @@
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
                     "sensor_current": 35.5,
-                    "sensor_limit": 70,
-                    "sensor_limit_warn": 50,
+                    "sensor_limit": 40,
+                    "sensor_limit_warn": 35,
                     "sensor_limit_low": 10,
                     "sensor_limit_low_warn": 20,
                     "sensor_alert": 1,
@@ -2209,6 +2209,24 @@
                     "mempool_lowestfree": null,
                     "mempool_deleted": 0,
                     "mempool_perc_warn": 90
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    },
+    "processors": {
+        "discovery": {
+            "processors": [
+                {
+                    "entPhysicalIndex": 0,
+                    "hrDeviceIndex": 0,
+                    "processor_oid": ".1.3.6.1.4.1.24693.100.2.1.1.2.5.1",
+                    "processor_index": "5.5.1",
+                    "processor_type": "firebrick",
+                    "processor_usage": 1,
+                    "processor_descr": "Processor",
+                    "processor_precision": 100,
+                    "processor_perc_warn": 75
                 }
             ]
         },

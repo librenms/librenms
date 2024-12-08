@@ -29,7 +29,7 @@ use LibreNMS\Device\WirelessSensor;
 $sensors = dbFetchColumn('SELECT `sensor_class` FROM `wireless_sensors` GROUP BY `sensor_class`');
 $valid_wireless_types = array_intersect_key(WirelessSensor::getTypes(), array_flip($sensors));
 
-$class = basename($vars['metric'] ?? key($valid_wireless_types));
+$class = basename(array_key_exists($vars['metric'], $valid_wireless_types) ? $vars['metric'] : key($valid_wireless_types));
 $vars['view'] = basename($vars['view'] ?? 'nographs');
 
 $link_array = ['page' => 'wireless'];
@@ -42,7 +42,7 @@ foreach ($valid_wireless_types as $type => $details) {
         $linkoptions .= '<span class="pagemenu-selected">';
     }
 
-    $linkoptions .= generate_link(__("wireless.$type.short"), $link_array, ['metric'=> $type, 'view' => $vars['view']]);
+    $linkoptions .= generate_link(__("wireless.$type.short"), $link_array, ['metric' => $type, 'view' => $vars['view']]);
 
     if ($class == $type) {
         $linkoptions .= '</span>';
@@ -56,7 +56,7 @@ $displayoptions = '';
 if ($vars['view'] == 'graphs') {
     $displayoptions .= '<span class="pagemenu-selected">';
 }
-$displayoptions .= generate_link('Graphs', $link_array, ['metric'=> $class, 'view' => 'graphs']);
+$displayoptions .= generate_link('Graphs', $link_array, ['metric' => $class, 'view' => 'graphs']);
 if ($vars['view'] == 'graphs') {
     $displayoptions .= '</span>';
 }
@@ -67,7 +67,7 @@ if ($vars['view'] != 'graphs') {
     $displayoptions .= '<span class="pagemenu-selected">';
 }
 
-$displayoptions .= generate_link('No Graphs', $link_array, ['metric'=> $class, 'view' => 'nographs']);
+$displayoptions .= generate_link('No Graphs', $link_array, ['metric' => $class, 'view' => 'nographs']);
 
 if ($vars['view'] != 'graphs') {
     $displayoptions .= '</span>';

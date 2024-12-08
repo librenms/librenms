@@ -93,9 +93,26 @@
                 </div>
             </div>
             <div class="form-group">
+                <label for="timezone" class="col-sm-4 control-label">{{ __('Timezone') }}</label>
+                <div class="col-sm-4">
+                    <select class="form-control ajax-select" name="timezone" data-pref="timezone" data-previous="{{ $timezone }}">
+                        <option value="default">Browser Timezone</option>
+                        @foreach(timezone_identifiers_list() as $tz)
+                            <option value="{{ $tz }}" @if($timezone == $tz) selected @endif>{{ $tz }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
                 <label for="notetodevice" class="col-sm-4 control-label">{{ __('Add schedule notes to devices notes') }}</label>
                 <div class="col-sm-4">
                     <input id="notetodevice" type="checkbox" name="notetodevice" @if($note_to_device) checked @endif>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="global_search_ctrlf_focus" class="col-sm-4 control-label">{{ __('Ctrl-F to focus the global search bar') }}</label>
+                <div class="col-sm-4">
+                    <input id="global_search_ctrlf_focus" type="checkbox" name="global_search_ctrlf_focus" @if($global_search_ctrlf_focus) checked @endif>
                 </div>
             </div>
         </form>
@@ -169,6 +186,14 @@
     </x-panel>
     @endconfig
 
+    <x-panel title="{{ __('Roles') }}">
+        @forelse(auth()->user()->roles->pluck('title') as $role)
+            <span class="label label-info tw-mr-1">{{ $role }}</span>
+        @empty
+            <strong class="red">{{ __('No roles!') }}</strong>
+        @endforelse
+    </x-panel>
+
     <x-panel title="{{ __('Device Permissions') }}">
         @if(auth()->user()->hasGlobalAdmin())
             <strong class="blue">{{ __('Global Administrative Access') }}</strong>
@@ -219,6 +244,34 @@
                 });
             });
 
+        $("[name='global_search_ctrlf_focus']")
+            .bootstrapSwitch('offColor', 'danger')
+            .on('switchChange.bootstrapSwitch', function (e, state) {
+                var $this = $(this);
+                $.ajax({
+                    url: '{{ route('preferences.store') }}',
+                    dataType: 'json',
+                    type: 'POST',
+                    data: {
+                        pref: 'global_search_ctrlf_focus',
+                        value: state ? 1 : 0
+                    },
+                    success: function () {
+                        $this.closest('.form-group').addClass('has-success');
+                        setTimeout(function () {
+                            $this.closest('.form-group').removeClass('has-success');
+                        }, 2000);
+                    },
+                    error: function () {
+                        $this.bootstrapSwitch('toggleState', true);
+                        $this.closest('.form-group').addClass('has-error');
+                        setTimeout(function(){
+                            $this.closest('.form-group').removeClass('has-error');
+                        }, 2000);
+                    }
+                });
+            });
+
         $('.ajax-select').on("change", function () {
             var $this = $(this);
             var value = $this.val();
@@ -237,6 +290,14 @@
                     }
                     if (pref === 'site_style') {
                         location.reload();
+                    }
+                    if (pref === 'timezone') {
+                        if(value === 'default') {
+                            var tz = window.Intl.DateTimeFormat().resolvedOptions().timeZone;
+                            updateTimezone(tz, false);
+                        } else {
+                            updateTimezone(value, true);
+                        }
                     }
 
                     $this.data('previous', value);

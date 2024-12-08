@@ -2,7 +2,7 @@
 /**
  * ConfigTest.php
  *
- * Tests for LibreNMS\Config
+ * Tests for App\Facades\Config
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,32 +25,33 @@
 
 namespace LibreNMS\Tests;
 
+use App\ConfigRepository;
 use LibreNMS\Config;
 
 class ConfigTest extends TestCase
 {
-    private $config;
+    private \ReflectionProperty $config;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->config = new \ReflectionProperty(Config::class, 'config');
-        $this->config->setAccessible(true);
+        $this->config = new \ReflectionProperty(ConfigRepository::class, 'config');
     }
 
-    public function testGetBasic()
+    public function testGetBasic(): void
     {
         $dir = realpath(__DIR__ . '/..');
         $this->assertEquals($dir, Config::get('install_dir'));
     }
 
-    public function testSetBasic()
+    public function testSetBasic(): void
     {
+        $instance = $this->app->make('librenms-config');
         Config::set('basics', 'first');
-        $this->assertEquals('first', $this->config->getValue()['basics']);
+        $this->assertEquals('first', $this->config->getValue($instance)['basics']);
     }
 
-    public function testGet()
+    public function testGet(): void
     {
         $this->setConfig(function (&$config) {
             $config['one']['two']['three'] = 'easy';
@@ -59,7 +60,7 @@ class ConfigTest extends TestCase
         $this->assertEquals('easy', Config::get('one.two.three'));
     }
 
-    public function testGetDeviceSetting()
+    public function testGetDeviceSetting(): void
     {
         $device = ['set' => true, 'null' => null];
         $this->setConfig(function (&$config) {
@@ -87,7 +88,7 @@ class ConfigTest extends TestCase
         );
     }
 
-    public function testGetOsSetting()
+    public function testGetOsSetting(): void
     {
         $this->setConfig(function (&$config) {
             $config['os']['nullos']['fancy'] = true;
@@ -99,6 +100,10 @@ class ConfigTest extends TestCase
         $this->assertFalse(Config::getOsSetting('nullos', 'unset', false), 'Non-existing settings should return $default');
         $this->assertTrue(Config::getOsSetting('nullos', 'fancy'), 'Failed to get setting');
         $this->assertNull(Config::getOsSetting('nullos', 'fallback'), 'Incorrectly loaded global setting');
+
+        // load yaml
+        $this->assertSame('ios', Config::getOsSetting('ios', 'os'));
+        $this->assertGreaterThan(500, count(Config::get('os')), 'Not all OS were loaded from yaml');
     }
 
     public function testGetCombined(): void
@@ -135,14 +140,15 @@ class ConfigTest extends TestCase
         $this->assertSame(['a' => 'prefix_same', 'b' => 'different', 'c' => 'still same'], Config::getCombined('nullos', 'assoc', 'withprefix.'));
     }
 
-    public function testSet()
+    public function testSet(): void
     {
+        $instance = $this->app->make('librenms-config');
         Config::set('you.and.me', "I'll be there");
 
-        $this->assertEquals("I'll be there", $this->config->getValue()['you']['and']['me']);
+        $this->assertEquals("I'll be there", $this->config->getValue($instance)['you']['and']['me']);
     }
 
-    public function testSetPersist()
+    public function testSetPersist(): void
     {
         $this->dbSetUp();
 
@@ -160,7 +166,7 @@ class ConfigTest extends TestCase
         $this->dbTearDown();
     }
 
-    public function testHas()
+    public function testHas(): void
     {
         Config::set('long.key.setting', 'no one cares');
         Config::set('null', null);
@@ -174,18 +180,18 @@ class ConfigTest extends TestCase
         $this->assertFalse(Config::has('off.the'), 'Config:has() should not modify the config');
     }
 
-    public function testGetNonExistent()
+    public function testGetNonExistent(): void
     {
         $this->assertNull(Config::get('There.is.no.way.this.is.a.key'));
         $this->assertFalse(Config::has('There.is.no'));  // should not add kes when getting
     }
 
-    public function testGetNonExistentNested()
+    public function testGetNonExistentNested(): void
     {
         $this->assertNull(Config::get('cheese.and.bologna'));
     }
 
-    public function testGetSubtree()
+    public function testGetSubtree(): void
     {
         Config::set('words.top', 'August');
         Config::set('words.mid', 'And Everything');
@@ -206,12 +212,13 @@ class ConfigTest extends TestCase
      */
     private function setConfig($function)
     {
-        $config = $this->config->getValue();
+        $instance = $this->app->make('librenms-config');
+        $config = $this->config->getValue($instance);
         $function($config);
-        $this->config->setValue($config);
+        $this->config->setValue($instance, $config);
     }
 
-    public function testForget()
+    public function testForget(): void
     {
         Config::set('forget.me', 'now');
         $this->assertTrue(Config::has('forget.me'));
@@ -220,7 +227,7 @@ class ConfigTest extends TestCase
         $this->assertFalse(Config::has('forget.me'));
     }
 
-    public function testForgetSubtree()
+    public function testForgetSubtree(): void
     {
         Config::set('forget.me.sub', 'yep');
         $this->assertTrue(Config::has('forget.me.sub'));

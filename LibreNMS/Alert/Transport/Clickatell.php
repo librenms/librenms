@@ -24,57 +24,48 @@
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
-use LibreNMS\Util\Proxy;
+use LibreNMS\Exceptions\AlertTransportDeliveryException;
+use LibreNMS\Util\Http;
 
 class Clickatell extends Transport
 {
-    public function deliverAlert($obj, $opts)
+    public function deliverAlert(array $alert_data): bool
     {
-        $clickatell_opts['token'] = $this->config['clickatell-token'];
-        $clickatell_opts['to'] = preg_split('/([,\r\n]+)/', $this->config['clickatell-numbers']);
+        $url = 'https://platform.clickatell.com/messages/http/send';
+        $params = [
+            'apiKey' => $this->config['clickatell-token'],
+            'to' => implode(',', preg_split('/([,\r\n]+)/', $this->config['clickatell-numbers'])),
+            'content' => $alert_data['title'],
+        ];
 
-        return $this->contactClickatell($obj, $clickatell_opts);
-    }
+        $res = Http::client()->get($url, $params);
 
-    public static function contactClickatell($obj, $opts)
-    {
-        $url = 'https://platform.clickatell.com/messages/http/send?apiKey=' . $opts['token'] . '&to=' . implode(',', $opts['to']) . '&content=' . urlencode($obj['title']);
-
-        $curl = curl_init($url);
-        Proxy::applyToCurl($curl);
-        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'GET');
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-
-        $ret = curl_exec($curl);
-        $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-        if ($code > 200) {
-            var_dump($ret);
-
-            return;
+        if ($res->successful()) {
+            return true;
         }
 
-        return true;
+        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $alert_data['title'], $params);
     }
 
-    public static function configTemplate()
+    public static function configTemplate(): array
     {
         return [
             'config' => [
                 [
                     'title' => 'Token',
-                    'name'  => 'clickatell-token',
+                    'name' => 'clickatell-token',
                     'descr' => 'Clickatell Token',
-                    'type'  => 'text',
+                    'type' => 'password',
                 ],
                 [
                     'title' => 'Mobile Numbers',
-                    'name'  => 'clickatell-numbers',
+                    'name' => 'clickatell-numbers',
                     'descr' => 'Enter mobile numbers, can be new line or comma separated',
-                    'type'  => 'textarea',
+                    'type' => 'textarea',
                 ],
             ],
             'validation' => [
-                'clickatell-token'   => 'required|string',
+                'clickatell-token' => 'required|string',
                 'clickatell-numbers' => 'required|string',
             ],
         ];

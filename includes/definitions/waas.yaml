@@ -11,14 +11,12 @@ poller_modules:
     applications: false
     bgp-peers: false
     cipsec-tunnels: false
-    cisco-cbqos: false
     cisco-cef: false
     cisco-ipsec-flow-monitor: false
     cisco-mac-accounting: false
     cisco-otv: false
     cisco-remote-access-monitor: false
     slas: false
-    cisco-voice: false
     ipmi: false
     ospf: false
     printer-supplies:   false
@@ -33,7 +31,6 @@ discovery_modules:
     slas: false
     cisco-vrf-lite: false
     vrf: false
-    libvirt-vminfo: false
     ntp: false
     stp: false
     printer-supplies:   false

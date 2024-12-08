@@ -11,6 +11,7 @@
 use Monolog\Handler\NullHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\SyslogUdpHandler;
+use Monolog\Processor\PsrLogMessageProcessor;
 
 return [
 
@@ -28,15 +29,15 @@ return [
     'default' => env('LOG_CHANNEL', 'stack'),
 
     /*
-   |--------------------------------------------------------------------------
-   | Deprecations Log Channel
-   |--------------------------------------------------------------------------
-   |
-   | This option controls the log channel that should be used to log warnings
-   | regarding deprecated PHP and library features. This allows you to get
-   | your application ready for upcoming major versions of dependencies.
-   |
-   */
+    |--------------------------------------------------------------------------
+    | Deprecations Log Channel
+    |--------------------------------------------------------------------------
+    |
+    | This option controls the log channel that should be used to log warnings
+    | regarding deprecated PHP and library features. This allows you to get
+    | your application ready for upcoming major versions of dependencies.
+    |
+    */
 
     'deprecations' => [
         'channel' => env('LOG_DEPRECATIONS_CHANNEL', 'null'),
@@ -44,19 +45,19 @@ return [
     ],
 
     /*
-   |--------------------------------------------------------------------------
-   | Log Channels
-   |--------------------------------------------------------------------------
-   |
-   | Here you may configure the log channels for your application. Out of
-   | the box, Laravel uses the Monolog PHP logging library. This gives
-   | you a variety of powerful log handlers / formatters to utilize.
-   |
-   | Available Drivers: "single", "daily", "slack", "syslog",
-   |                    "errorlog", "monolog",
-   |                    "custom", "stack"
-   |
-   */
+    |--------------------------------------------------------------------------
+    | Log Channels
+    |--------------------------------------------------------------------------
+    |
+    | Here you may configure the log channels for your application. Out of
+    | the box, Laravel uses the Monolog PHP logging library. This gives
+    | you a variety of powerful log handlers / formatters to utilize.
+    |
+    | Available Drivers: "single", "daily", "slack", "syslog",
+    |                    "errorlog", "monolog",
+    |                    "custom", "stack"
+    |
+    */
 
     'channels' => [
         'stack' => [
@@ -79,17 +80,19 @@ return [
 
         'single' => [
             'driver' => 'single',
-            'path' => env('APP_LOG', \LibreNMS\Config::get('log_file', base_path('logs/librenms.log'))),
+            'path' => env('APP_LOG', base_path('logs/librenms.log')),
             'formatter' => \App\Logging\NoColorFormatter::class,
             'level' => env('LOG_LEVEL', 'error'),
+            'replace_placeholders' => true,
         ],
 
         'daily' => [
             'driver' => 'daily',
-            'path' => env('APP_LOG', \LibreNMS\Config::get('log_file', base_path('logs/librenms.log'))),
+            'path' => env('APP_LOG', base_path('logs/librenms.log')),
             'formatter' => \App\Logging\NoColorFormatter::class,
             'level' => env('LOG_LEVEL', 'error'),
             'days' => 14,
+            'replace_placeholders' => true,
         ],
 
         'slack' => [
@@ -98,6 +101,7 @@ return [
             'username' => 'Laravel Log',
             'emoji' => ':boom:',
             'level' => env('LOG_LEVEL', 'critical'),
+            'replace_placeholders' => true,
         ],
 
         'papertrail' => [
@@ -109,6 +113,7 @@ return [
                 'port' => env('PAPERTRAIL_PORT'),
                 'connectionString' => 'tls://' . env('PAPERTRAIL_URL') . ':' . env('PAPERTRAIL_PORT'),
             ],
+            'processors' => [PsrLogMessageProcessor::class],
         ],
 
         'stderr' => [
@@ -119,6 +124,7 @@ return [
             'with' => [
                 'stream' => 'php://stderr',
             ],
+            'processors' => [PsrLogMessageProcessor::class],
         ],
 
         'stdout_debug' => [
@@ -144,11 +150,14 @@ return [
         'syslog' => [
             'driver' => 'syslog',
             'level' => env('LOG_LEVEL', 'debug'),
+            'facility' => LOG_USER,
+            'replace_placeholders' => true,
         ],
 
         'errorlog' => [
             'driver' => 'errorlog',
             'level' => env('LOG_LEVEL', 'debug'),
+            'replace_placeholders' => true,
         ],
 
         'null' => [

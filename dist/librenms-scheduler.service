@@ -6,6 +6,6 @@ Type=oneshot
 StandardOutput=null
 StandardError=null
 WorkingDirectory=/opt/librenms/
-ExecStart=/usr/bin/env php artisan schedule:run
+ExecStart=/usr/bin/env php artisan schedule:run --no-ansi --no-interaction
 User=librenms
 Group=librenms

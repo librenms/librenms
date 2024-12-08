@@ -11,10 +11,12 @@ $scale_min = 0;
 if (isset($vars['disk'])) {
     $disks = [$vars['disk']];
 } else {
-    $disks = Rrd::getRrdApplicationArrays($device, $app->app_id, $name);
+    $disks = array_keys($app->data['disks']);
 }
 
-$smart_enhancements = ['id9'];
+sort($disks);
+
+$smart_enhancements = ['id9', 'maxtemp', 'id232'];
 
 $int = 0;
 $rrd_list = [];
@@ -30,8 +32,8 @@ while (isset($disks[$int])) {
     if (Rrd::checkRrdExists($rrd_filename)) {
         $rrd_list[] = [
             'filename' => $rrd_filename,
-            'descr'    => $disk,
-            'ds'       => $rrdVar,
+            'descr' => $disk,
+            'ds' => $rrdVar,
         ];
     }
     $int++;

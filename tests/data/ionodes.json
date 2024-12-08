@@ -148,7 +148,7 @@
                     "ifMtu": 1512,
                     "ifType": "ethernetCsmacd",
                     "ifAlias": "Local Area Connection - eth0",
-                    "ifPhysAddress": "30302d32322d",
+                    "ifPhysAddress": "0022cb008b86",
                     "ifLastChange": 0,
                     "ifVlan": null,
                     "ifTrunk": null,

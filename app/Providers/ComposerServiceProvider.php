@@ -35,7 +35,7 @@ class ComposerServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function boot()
+    public function boot(): void
     {
         View::composer('layouts.librenmsv1', \App\Http\ViewComposers\LayoutComposer::class);
         View::composer('layouts.menu', \App\Http\ViewComposers\MenuComposer::class);
@@ -46,7 +46,7 @@ class ComposerServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function register()
+    public function register(): void
     {
         //
     }

@@ -1,0 +1,537 @@
+-- SNMP SMIV2 MIB
+--
+
+SAMLEXAMERICA-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+   MODULE-IDENTITY,enterprises, 
+   IpAddress ,Integer32		   				FROM SNMPv2-SMI
+   -- Gauge, TimeTicks     						FROM RFC1155-SMI
+   DisplayString                                FROM SNMPv2-TC
+   OBJECT-TYPE                                  FROM RFC-1212
+   NOTIFICATION-TYPE                        	FROM SNMPv2-SMI
+   -- TRAP-TYPE                                 FROM RFC-1215
+   TEXTUAL-CONVENTION							FROM SNMPv2-TC
+   MODULE-COMPLIANCE, OBJECT-GROUP , 
+   NOTIFICATION-GROUP      						FROM SNMPv2-CONF;
+
+samlexamericaInfo MODULE-IDENTITY
+    LAST-UPDATED "201612240000Z"
+    ORGANIZATION "SAMLEX AMERICA"
+    CONTACT-INFO
+                  "www.samlexamerica.com"
+    DESCRIPTION
+        "Samlex America Inc"
+
+	REVISION 	"201612240000Z"
+	DESCRIPTION
+        "SMIv2."
+    ::= { samlexamerica 1 }   
+
+samlexamerica                   OBJECT IDENTIFIER ::=  { enterprises 49075 }
+
+trapNotifications 			OBJECT IDENTIFIER ::=  { samlexamericaInfo 0 }
+product                     OBJECT IDENTIFIER ::=  { samlexamericaInfo 1 }
+setup                       OBJECT IDENTIFIER ::=  { samlexamericaInfo 2 }
+telecom                     OBJECT IDENTIFIER ::=  { samlexamericaInfo 3 }
+
+output					OBJECT IDENTIFIER ::= { telecom 1 }
+input					OBJECT IDENTIFIER ::= { telecom 2 }
+status					OBJECT IDENTIFIER ::= { telecom 3 }
+ui					OBJECT IDENTIFIER ::= { telecom 4 }
+warningconfig		OBJECT IDENTIFIER ::= { telecom 5 }
+warning					OBJECT IDENTIFIER ::= { telecom 6 }
+
+
+model OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+      "Product Name"
+   ::= { product 1 }
+
+version    OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+      "Version string. e.g. 1.0"
+   ::= { product 2 }
+   
+date    OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+      "Date of version"
+   ::= { product 3 }
+   
+cfgVout OBJECT-TYPE
+    SYNTAX INTEGER (0..65535)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "Config Vout, eg. 1200 = 120.0V"
+    ::= { output 1 }
+    
+vout OBJECT-TYPE
+    SYNTAX INTEGER (0..65535)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Inverter Output Voltage RMS eg. 1200 = 120.0V"
+    ::= { output 2 }
+
+iout    OBJECT-TYPE
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+      "Inverter Output Current RMS eg. 48 = 4.8A"
+   ::= { output 3 }
+
+
+power    OBJECT-TYPE
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+      "Inverter Output Real Power eg. 9002 = 900.2W"
+   ::= { output 4 }
+   
+cfgFrequency    OBJECT-TYPE
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+      "Config Output Frequency eg. 500 = 50.0Hz"
+   ::= { output 5 }
+   
+frequency    OBJECT-TYPE
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+      "Inverter Output Frequency eg. 500 = 50.0Hz"
+   ::= { output 6 }
+
+gridvout OBJECT-TYPE
+    SYNTAX INTEGER (0..65535)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Grid AC Output Voltage RMS eg. 1200 = 120.0V"
+    ::= { output 7 }
+
+gridiout    OBJECT-TYPE
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+      "Grid AC Output Current RMS eg. 48 = 4.8A"
+   ::= { output 8 }
+
+
+gridpower    OBJECT-TYPE
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+      "Grid AC Output Real Power eg. 9002 = 900.2W"
+   ::= { output 9 }
+   
+gridfrequency    OBJECT-TYPE
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+      "Grid AC Output Frequency eg. 500 = 50.0Hz"
+   ::= { output 10 }
+ 
+   
+vin  OBJECT-TYPE
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "DC Voltage In eg. 245 = 24.5V"
+    ::= { input 1 }        
+
+ovp  OBJECT-TYPE
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Over Voltage Protection eg. 245 = 24.5V"
+    ::= { input 2 }        
+
+ovpRecovery  OBJECT-TYPE
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Over Voltage Protection Recovery eg. 245 = 24.5V"
+    ::= { input 3 }
+
+uvp  OBJECT-TYPE
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Under Voltage Protection eg. 245 = 24.5V"
+    ::= { input 4 }        
+
+uvpRecovery  OBJECT-TYPE
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Under Voltage Protection Recovery eg. 245 = 24.5V"
+    ::= { input 5 }
+
+ovAlarm  OBJECT-TYPE
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Over Voltage Alarm eg. 245 = 24.5V"
+    ::= { input 6 }
+
+uvAlarm  OBJECT-TYPE
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Under Voltage Alarm eg. 245 = 24.5V"
+    ::= { input 7 }
+	
+fan  OBJECT-TYPE
+   SYNTAX INTEGER { off(0), on(1) }
+   MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "0 = off, 1 = on"
+    ::= { status 1 }
+	
+inverterMode OBJECT-TYPE
+   SYNTAX INTEGER { off-Line(0), on-Line(1) }
+   MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "0 = Off-Line, 1 = On-Line"
+    ::= { status 2 }
+
+transferType OBJECT-TYPE
+   SYNTAX INTEGER { synchronized(0), unsynchronized(1) }
+   MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "0 = Synchronized, 1 = UnSynchronized"
+    ::= { status 3 }
+
+byPassRelay  OBJECT-TYPE
+   SYNTAX INTEGER { grid(0), inverter(1) }
+   MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "0 = Grid, 1 = Inverter"
+    ::= { status 4 }
+	
+gridAC  OBJECT-TYPE
+   SYNTAX INTEGER { not-exists(0), detect(1), present(2), sync(3), wont-sync(4) }
+   MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "not-exists(0), detect(1), present(2), sync(3), wont-sync(4)"
+    ::= { status 5 }
+		
+olProtection OBJECT-TYPE
+   SYNTAX INTEGER (0..255)
+   MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Overload Protection Percentage eg. 110 = 110%"
+    ::= { status 6 }
+	
+syncFreq OBJECT-TYPE
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Overload Protection Percentage eg. 50 = 5.0Hz"
+    ::= { status 7 }
+	
+tempDD OBJECT-TYPE
+	SYNTAX INTEGER (-128..127)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"DC to DC temperature eg. 25 = 25 C"
+	::= { status 8 }
+	
+tempDA OBJECT-TYPE
+	SYNTAX INTEGER (-128..127)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"DC to AC temperature eg. 25 = 25 C"
+	::= { status 9 }
+	
+lcdContrast OBJECT-TYPE
+   SYNTAX INTEGER (0..255)
+   MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "LCD Contrast eg. 50 = 50%"
+    ::= { ui 1 }
+	
+lcdAutoOff OBJECT-TYPE
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "LCD Auto Off eg. 0 = Disabled, 120 = 120 seconds"
+    ::= { ui 2 }
+	
+rs232Speed OBJECT-TYPE
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "RS-232 Speed eg. 19200 = 19200bps"
+    ::= { ui 3 }
+
+usbVCOMSpeed OBJECT-TYPE
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "USB VCOM Speed eg. 19200 = 19200bps"
+    ::= { ui 4 }
+	
+wcTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF WcEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Warning Config Table"
+    ::= { warningconfig 1 }        
+    
+wcEntry OBJECT-TYPE
+    SYNTAX WcEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Single warning config entry containing info."
+    INDEX { wcIndex }
+     ::= { wcTable 1 }
+     
+WcEntry ::=
+    SEQUENCE {
+        wcIndex
+            INTEGER,
+        wcFanFaultEnabled
+            INTEGER,
+        wcOVAEnabled
+            INTEGER,
+        wcUVAEnabled
+            INTEGER,
+        wcOverLoadEnabled
+            INTEGER,
+        wcOverTemperatureEnabled
+            INTEGER,
+        wcShortCircuitEnabled
+            INTEGER
+    }            
+
+wcIndex OBJECT-TYPE
+    SYNTAX INTEGER { buzzer(0), drycontact(1) }
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Index of warning config"
+    ::= { wcEntry 1 }
+    
+wcFanFaultEnabled OBJECT-TYPE
+    SYNTAX INTEGER { off(0), on(1) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Fan Fault Enabled"
+    ::= { wcEntry 2 }
+    
+wcOVAEnabled OBJECT-TYPE
+    SYNTAX INTEGER { off(0), on(1) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Over Alarm Enabled"
+    ::= { wcEntry 3 }
+	
+wcUVAEnabled OBJECT-TYPE
+    SYNTAX INTEGER { off(0), on(1) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Under Voltage Alarm Enabled"
+    ::= { wcEntry 4 }
+	
+wcOverLoadEnabled OBJECT-TYPE
+    SYNTAX INTEGER { off(0), on(1) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Overload Enabled"
+    ::= { wcEntry 5 }
+	
+wcOverTemperatureEnabled OBJECT-TYPE
+    SYNTAX INTEGER { off(0), on(1) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Over Temperature Enabled"
+    ::= { wcEntry 6 }
+
+wcShortCircuitEnabled OBJECT-TYPE
+    SYNTAX INTEGER { off(0), on(1) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Short Circuit Enabled"
+    ::= { wcEntry 7 }
+
+warningFanFault  OBJECT-TYPE
+   SYNTAX INTEGER { normal(0), warning(1) }
+   MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Fan Fault Warning"
+    ::= { warning 1 }
+
+warningOverVoltageAlarm  OBJECT-TYPE
+   SYNTAX INTEGER { normal(0), warning(1) }
+   MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Over Voltage Alarm Warning"
+    ::= { warning 2 }
+
+warningUnderVoltageAlarm  OBJECT-TYPE
+   SYNTAX INTEGER { normal(0), warning(1) }
+   MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Under Voltage Alarm Warning"
+    ::= { warning 3 }
+
+warningOverload  OBJECT-TYPE
+   SYNTAX INTEGER { normal(0), warning(1) }
+   MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Overload Warning"
+    ::= { warning 4 }
+
+warningOverTemperature  OBJECT-TYPE
+   SYNTAX INTEGER { normal(0), warning(1) }
+   MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Over Temperature Warning"
+    ::= { warning 5 }
+
+warningShortCircuit  OBJECT-TYPE
+   SYNTAX INTEGER { normal(0), warning(1) }
+   MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Short Circuit Warning"
+    ::= { warning 6 }
+
+warningOverVoltageProtection  OBJECT-TYPE
+   SYNTAX INTEGER { normal(0), warning(1) }
+   MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Over Voltage Protection Warning"
+    ::= { warning 7 }
+
+warningUnderVoltageProtection  OBJECT-TYPE
+   SYNTAX INTEGER { normal(0), warning(1) }
+   MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Under Voltage Protection Warning"
+    ::= { warning 8 }
+
+	
+trapTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF TrapEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Trap table"
+    ::= { setup 1 }        
+    
+trapEntry OBJECT-TYPE
+    SYNTAX TrapEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Single trap entry containing trap receiver info."
+    INDEX { trapReceiverNumber }
+     ::= { trapTable 1 }
+     
+TrapEntry ::=
+    SEQUENCE {
+        trapReceiverNumber
+            Integer32,
+        trapEnabled
+            Integer32,
+        trapReceiverIPAddress
+            IpAddress,
+        trapCommunity
+            DisplayString
+    }            
+    
+trapReceiverNumber  OBJECT-TYPE
+    SYNTAX Integer32(0.. 4)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Index of trap receiver"
+    ::= { trapEntry 1 }
+    
+trapEnabled OBJECT-TYPE
+    SYNTAX INTEGER { no(0),yes(1) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Indicates if this trap entry is enabled or not."
+    ::= { trapEntry 2 }
+
+trapReceiverIPAddress OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS  read-write
+    STATUS current
+    DESCRIPTION
+        "Trap receiver IP address"
+    ::= { trapEntry 3 }
+
+trapCommunity OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..7))
+    MAX-ACCESS  read-write
+    STATUS current
+    DESCRIPTION
+        "Trap community to be used by agent to send trap"
+    ::= { trapEntry 4 }
+
+snmpTrap NOTIFICATION-TYPE
+	OBJECTS { warningFanFault, warningOverVoltageAlarm, warningUnderVoltageAlarm, warningOverload, warningOverTemperature, warningShortCircuit, warningOverVoltageProtection, warningUnderVoltageProtection }
+	STATUS current
+	DESCRIPTION 
+		"SMIV2 Trap notification information for the SNMP Manager."
+	::= {trapNotifications 1}
+	
+END   

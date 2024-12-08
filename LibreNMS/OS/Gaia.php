@@ -2,12 +2,13 @@
 
 namespace LibreNMS\OS;
 
+use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\RRD\RrdDefinition;
 
 class Gaia extends \LibreNMS\OS implements OSPolling
 {
-    public function pollOS(): void
+    public function pollOS(DataStorageInterface $datastore): void
     {
         $oids = ['fwLoggingHandlingRate.0', 'mgLSLogReceiveRate.0', 'fwNumConn.0', 'fwAccepted.0', 'fwRejected.0', 'fwDropped.0', 'fwLogged.0'];
 
@@ -24,7 +25,7 @@ class Gaia extends \LibreNMS\OS implements OSPolling
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'gaia_firewall_lograte', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'gaia_firewall_lograte', $tags, $fields);
             $this->enableGraph('gaia_firewall_lograte');
         }
 
@@ -39,7 +40,7 @@ class Gaia extends \LibreNMS\OS implements OSPolling
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'gaia_logserver_lograte', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'gaia_logserver_lograte', $tags, $fields);
             $this->enableGraph('gaia_logserver_lograte');
         }
 
@@ -54,7 +55,7 @@ class Gaia extends \LibreNMS\OS implements OSPolling
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'gaia_connections', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'gaia_connections', $tags, $fields);
             $this->enableGraph('gaia_connections');
         }
 
@@ -76,7 +77,7 @@ class Gaia extends \LibreNMS\OS implements OSPolling
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'gaia_firewall_packets', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'gaia_firewall_packets', $tags, $fields);
             $this->enableGraph('gaia_firewall_packets');
         }
     }

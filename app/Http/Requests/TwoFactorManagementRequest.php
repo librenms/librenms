@@ -29,12 +29,12 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class TwoFactorManagementRequest extends FormRequest
 {
-    public function rules()
+    public function rules(): array
     {
         return [];
     }
 
-    public function authorize()
+    public function authorize(): bool
     {
         $user = $this->route()->parameter('user');
         $auth_user = auth()->user();

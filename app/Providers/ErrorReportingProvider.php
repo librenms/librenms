@@ -25,15 +25,16 @@
 
 namespace App\Providers;
 
+use App\Facades\LibrenmsConfig;
 use App\Logging\Reporting\Middleware\AddGitInformation;
 use App\Logging\Reporting\Middleware\CleanContext;
 use App\Logging\Reporting\Middleware\SetGroups;
 use App\Logging\Reporting\Middleware\SetInstanceId;
 use App\Models\Callback;
 use ErrorException;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
-use LibreNMS\Config;
 use LibreNMS\Util\Git;
 use Spatie\FlareClient\Report;
 use Spatie\LaravelIgnition\Facades\Flare;
@@ -49,6 +50,8 @@ class ErrorReportingProvider extends \Spatie\LaravelIgnition\IgnitionServiceProv
     /** @var string|null */
     private static $instanceId;
 
+    private ?int $throttle = null;
+
     public function boot(): void
     {
         /* @phpstan-ignore-next-line */
@@ -59,11 +62,12 @@ class ErrorReportingProvider extends \Spatie\LaravelIgnition\IgnitionServiceProv
         }
 
         Flare::filterExceptionsUsing(function (\Exception $e) {
-            if (Config::get('reporting.dump_errors')) {
-                dump('Exception: ' . $e->getMessage(), $e->getFile() . ':' . $e->getLine());
+            if (LibrenmsConfig::get('reporting.dump_errors')) {
+                \Log::critical('%RException: ' . get_class($e) . ' ' . $e->getMessage() . '%n @ %G' . $e->getFile() . ':' . $e->getLine() . '%n' . PHP_EOL . $e->getTraceAsString(), ['color' => true]);
             }
 
-            return $this->isReportingEnabled();
+            // check if reporting is enabled and not throttled
+            return $this->isReportingEnabled() && ! $this->isThrottled();
         });
 
         Flare::filterReportsUsing(function (Report $report) {
@@ -102,14 +106,14 @@ class ErrorReportingProvider extends \Spatie\LaravelIgnition\IgnitionServiceProv
         }
 
         // safety check so we don't leak early reports (but reporting should not be loaded before the config is)
-        if (! Config::isLoaded()) {
+        if (! app()->bound('librenms-config')) {
             return false;
         }
 
         $this->reportingEnabled = false; // don't cache before config is loaded
 
         // check the user setting
-        if (Config::get('reporting.error') !== true) {
+        if (LibrenmsConfig::get('reporting.error') !== true) {
             \Log::debug('Reporting disabled by user setting');
 
             return false;
@@ -147,6 +151,28 @@ class ErrorReportingProvider extends \Spatie\LaravelIgnition\IgnitionServiceProv
         $this->reportingEnabled = true;
 
         return true;
+    }
+
+    private function isThrottled(): bool
+    {
+        $this->throttle ??= LibrenmsConfig::get('reporting.throttle', 300);
+
+        if ($this->throttle) {
+            $this->reportingEnabled = false; // disable future reporting (to avoid this cache check)
+
+            try {
+                if (Cache::get('recently_reported_error')) {
+                    return true; // reporting is currently throttled
+                }
+
+                // let this report go and disable reporting for the next error
+                Cache::put('recently_reported_error', true, $this->throttle);
+            } catch (\Exception $e) {
+                // ignore throttling exception (Such as database or redis not running for cache)
+            }
+        }
+
+        return false;
     }
 
     /**

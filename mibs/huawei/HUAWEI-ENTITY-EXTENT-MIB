@@ -1,8 +1,8 @@
 -- ============================================================================
--- Copyright (C) 2019 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2022 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- Description: 
 -- Reference: None
--- Version:   V3.28
+-- Version:   V3.82
 -- ============================================================================
 --
 -- HUAWEI-ENTITY-EXTENT-MIB.mib
@@ -33,7 +33,7 @@
 
         -- 1.3.6.1.4.1.2011.5.25.31
         hwEntityExtentMIB MODULE-IDENTITY 
-            LAST-UPDATED "201901070000Z"
+            LAST-UPDATED "202209130000Z"
             ORGANIZATION 
                 "Huawei Technologies Co.,Ltd."
             CONTACT-INFO 
@@ -43,10 +43,176 @@
    People's Republic of China
    Website: http://www.huawei.com
    Email: support@huawei.com
- "            
-            DESCRIPTION 
-                "The private mib file includes the general extent 
-                information of the device."
+ "          
+             DESCRIPTION 
+                "The private mib file includes the general extent information of the device."
+            
+            REVISION     "202209130000Z"                                                                                   
+            DESCRIPTION  "V3.82 modify the description of hwEntityOpticalVoltage, hwEntityOpticalRxPower, hwEntityOpticalTxPower, hwEntityOpticalTemperature."
+            
+            REVISION     "202205230000Z"                                                                                   
+            DESCRIPTION  "V3.81 Add hwIntegratedPowerResetOutput"
+            
+            REVISION     "202112170000Z"
+            DESCRIPTION  "V3.80, modify hwEntityFanName."
+            
+            REVISION     "202112160000Z" 
+            DESCRIPTION  "V3.79, add hwEntityFanName."
+            
+            REVISION     "202111260000Z" 
+            DESCRIPTION  "V3.78, modify DESCRIPTION of hwSystemPowerTable, hwSystemPowerEntry, hwSystemPowerDeviceID, hwSystemPowerTotalPower, hwSystemPowerUsedPower, hwSystemPowerRemainPower, hwSystemPowerReservedPower"
+
+            REVISION     "202111010000Z" 
+            DESCRIPTION  "V3.77, modify hwEntityPortType."
+
+            REVISION     "202108070000Z" 
+            DESCRIPTION  "V3.76, dd the invalid value description of hwEntityOpticalTemperature, hwEntityOpticalVoltage, hwEntityOpticalBiasCurrent."
+
+            REVISION     "202108070000Z" 
+            DESCRIPTION  "V3.75, modify hwEntityOpticalType"
+
+            REVISION     "202107030000Z"
+	    DESCRIPTION  "V3.74, add hwBatteryGroupInstallTimeYear, hwBatteryGroupInstallTimeMonth, hwBatteryGroupInstallTimeDay"
+            REVISION     "202106290000Z"
+	    DESCRIPTION  "V3.73, add hwIntegratedPowerACCurrent, hwIntegratedPower53VDCOutCurrent, hwIntegratedPwrChip1UpgrageStatus,
+			hwIntegratedPwrChip2UpgrageStatus, hwIntegratedPwrChip3UpgrageStatus, hwIntegratedPwrChip4UpgrageStatus, hwBatteryChipTable, hwBatteryChipEntry, hwBatteryChipVolt, hwBatteryChipTemp, hwLithiumBatteryVersion"
+            REVISION     "202106040000Z" 
+            DESCRIPTION  "V3.72, modify hwEntityPortType"
+
+            REVISION     "202105070000Z"
+            DESCRIPTION  "V3.71, add hwEntityOpticalFiberType enum value"
+
+            REVISION     "202101130000Z"
+            DESCRIPTION  "V3.70, modify hwApInfoTable"
+
+            REVISION     "202012100000Z"
+            DESCRIPTION  "V3.69, modify hwCpuUsageTrapSlot"
+
+            REVISION     "202012090000Z"
+            DESCRIPTION  "V3.68, add hwIntegratedPowerSoftwareVersionASCII, hwIntegratedPowerCurrentMode, hwIntegratedPowerBusbarVolt, hwIntegratedPowerACVolt, hwIntegratedPowerSolarInputVolt, hwIntegratedPowerSolarInputCurrent, hwIntegratedPower53VDCOutVolt, 
+                                       hwIntegratedPowerTotalLoadPower, hwIntegratedPowerDCOverVoltThreshold, hwIntegratedPowerDCUnderVoltThreshold, hwIntegratedPowerLowLoadVoltPowerOffThreshold, hwIntegratedPower53VDCOutVoltLowerThreshold, hwLithiumBatteryGroupTable, 
+                                       hwLithiumBatteryGroupEntry, hwBatteryGroupBatteryStatus, hwBatteryGroupBatteryVolt, hwBatteryGroupBatteryCurrent, hwBatteryGroupTotalBatteryCapacity, hwBatteryGroupAvailableBatteryCapacity, hwBatteryGroupBatteryTemperature, hwBatteryGroupBatteryRunTime,
+                                       hwBatteryGroupNumberOfConnectedESMU, hwBatteryGroupChargeCurrentLimitCoefficient, hwBatteryGroupFloatChargingVolt, hwBatteryGroupEqualizedChargingVolt, hwLithiumBatteryTable, hwLithiumBatteryEntry, hwLithiumBatteryIndex, hwLithiumBatteryVolt,
+                                       hwLithiumBatteryCurrent, hwLithiumBatteryDeviceAddr, hwLithiumBatteryStatus, hwLithiumBatterySOH, hwLithiumBatteryCapacity, hwLithiumBatteryCellPackageVolt, hwLithiumBatteryMaxLimitCoefficient, and modify hwIntegratedPowerEnergyWorkmode"
+
+            REVISION     "202012080000Z"
+            DESCRIPTION  "V3.67, modify hwCpuUsageTrapSlot"
+
+            REVISION     "202011280000Z"
+            DESCRIPTION  "V3.66, add hwEntityOpticalDifferentialGroupDelay, hwEntityOpticalChromaticDispersion"
+
+            REVISION     "202011140000Z"
+            DESCRIPTION  "V3.65, add hwEntitySafeId"
+			
+            REVISION     "202011060000Z" 
+            DESCRIPTION  "V3.64, add hwEntityHigCrcErrorAlarm, hwEntityHigCrcErrorAlarmResume, hwEntityHigDown, hwEntityHigDownResume"
+
+            REVISION     "202009190000Z"
+            DESCRIPTION  "V3.63 modify hwApInfoTable, hwApInfoEntry"
+
+            REVISION     "202009110000Z"
+            DESCRIPTION  "V3.62 modify the description of hwEntityExtBootPasswordAlarm"
+
+            REVISION     "202009080000Z"
+            DESCRIPTION  "V3.61 modify the description of hwEntityPwrPower"
+
+            REVISION     "202007270000Z"
+            DESCRIPTION  "V3.60 modify hwEntitySplitAttribute"
+
+            REVISION     "202007220000Z"
+            DESCRIPTION  "V3.59 modify hwEntityOpticalHuaweiCertified"
+
+            REVISION     "202007210000Z"
+            DESCRIPTION  "V3.58 modify hwEntityOpticalType"
+
+            REVISION     "202007160000Z"
+            DESCRIPTION  "V3.57 modify threashold to threshold"
+
+            REVISION     "202007140000Z"
+            DESCRIPTION  "V3.56 modify hwEntityTemperature, hwEntityTemperatureThreshold, hwEntityVoltage, hwEntityVoltageLowThreshold, hwEntityVoltageHighThreshold, hwEntityTemperatureLowThreshold, 
+hwEntityOpticalWaveLength, hwEntityOpticalBiasCurrent, hwEntityOpticalRxLowThreshold, hwEntityOpticalRxHighThreshold, hwEntityOpticalTxLowThreshold, hwEntityOpticalTxHighThreshold"
+
+            REVISION     "202007020000Z"
+            DESCRIPTION  "V3.55 modify hwEntityOpticalBandWidth"
+
+            REVISION     "202006110000Z"
+            DESCRIPTION  "V3.54 modify hwEntityExtBootPasswordAlarm"
+
+            REVISION     "202006110000Z" 
+            DESCRIPTION  "V3.53 modify hwEntityPortType"
+
+            REVISION     "202005200000Z" 
+            DESCRIPTION  "V3.52 add hwEntityExtCpuUsageNotfication, hwEntityExtCpuUsageNotficationClear"
+
+			REVISION     "202005180000Z" 
+            DESCRIPTION  "V3.51 modify hwApInfoTable, hwApInfoEntry"
+			REVISION     "202005140000Z" 
+            DESCRIPTION  "V3.50 modify hwEntityOpticalHuaweiCertified"
+			
+			REVISION     "202005140000Z"                                                                                         
+            DESCRIPTION  "V3.49 modify hwBoardAcOutputState"
+			
+			REVISION     "202004080000Z"                                                                                   
+            DESCRIPTION  "V3.48 modify hwBoardAcOutputState"  
+				
+			REVISION     "202004070000Z"                                                                                   
+            DESCRIPTION  "V3.47 Add hwIntegratedPowerRebootPower and modify hwBoardAcOutputState"  
+			
+            REVISION     "202003280000Z"                                                                                   
+            DESCRIPTION  "V3.46 Add hwIntegratedPower53VDCOutVoltStatus, hwIntegratedPowerACInputVoltStatus and delete hwIntegratedPowerSoftwareVersionASCII"  
+
+            REVISION     "202003270000Z"                                                                                   
+            DESCRIPTION  "V3.45, Add hwIntegratedPowerSystemTable, hwIntegratedPowerSystemEntry, hwIntegratedPowerSoftwareVersion, hwIntegratedPowerHardwareVersion, hwIntegratedPowerSoftwareVersionASCII, hwIntegratedPowerTable, hwIntegratedPowerEntry, hwIntegratedPowerEnergyWorkmode, hwIntegratedPowerTotalInputPower, hwIntegratedPower12VDCOutVoltStatus, hwIntegratedPower24VACOutVolt, hwIntegratedPower24VACOutCurrent"     
+
+            REVISION     "202002190000Z"                                                                                   
+            DESCRIPTION  "V3.44, Add denoise(11) to the list of hwEntityFanSpdAdjMode values"     
+            
+            REVISION     "202001020000Z" 
+            DESCRIPTION  "V3.43, Add the hwEntityMemCacheUsage"
+
+            REVISION     "201912260000Z" 
+            DESCRIPTION  "V3.42, Updated the hwEntityHigStateChangeNotify, hwEntityHigStateDownNotify"
+
+            REVISION     "201912120001Z" 
+            DESCRIPTION  "V3.40, Add hwEntityTemperatureMinorThreshold,
+                hwEntityVoltageFatalHighThreshold, hwEntityVoltageFatalLowThreshold"
+
+            REVISION     "201912120000Z"                                                                                   
+            DESCRIPTION  "V3.40, Add hwEntityTemperatureMinorThreshold,
+                hwEntityVoltageFatalHighThreshold, hwEntityVoltageFatalLowThreshold"
+
+            REVISION     "201909120000Z"                                                                                   
+            DESCRIPTION  "V3.39, Updated the hwEntitySupportFlexCard"
+
+            REVISION     "201908290000Z"                                                                                   
+            DESCRIPTION  "V3.38, Updated the hwEntitySerdesChangeNotify, hwEntitySerdesDownNotify"
+
+            REVISION     "201908260000Z"                                                                                   
+            DESCRIPTION  "V3.37, Updated the hwBoardDcOutputState"
+
+            REVISION     "201907130000Z"                                                                                   
+            DESCRIPTION  "V3.36, Add hwEntityExtBootPasswordAlarm, hwEntityExtSmallBootPasswordAlarm"
+
+            REVISION     "201906280000Z"                                                                                   
+            DESCRIPTION  "V3.35, Add abnormal(0) to the list of hwEntityVolStatus values"
+            
+            REVISION     "201906150000Z"                                                                                   
+            DESCRIPTION  "V3.34, Add hwApInfoTable, hwApInfoEntry, hwEntityApid, hwEntityApIndex, hwEntityApName, hwEntityApMemUsage, hwEntityApCpuUsage"
+
+			REVISION     "201905220000Z"                                                                                   
+            DESCRIPTION  "V3.33, Add hwEntityOpticalPortName"
+			
+            REVISION     "201903280000Z"                                                                                   
+            DESCRIPTION  "V3.32, Add hwEntityExtSDCardFsErrorAlarm, hwEntityExtSDCardFsErrorResume, hwEntityExtSDCardUsageOver, hwEntityExtSDCardUsageBelow, hwEntityExtCFCardFaultAlarm, hwEntityExtCFCardFaultResume"
+
+            REVISION     "201903070000Z"                                                                                   
+            DESCRIPTION  "V3.31, Add hwEntityHigDiscardPacketNotify"
+
+            REVISION     "201903010000Z"                                                                                   
+            DESCRIPTION  "V3.30, Updated the hwEntityOpticalType"
+
+            REVISION     "201901280000Z"
+            DESCRIPTION  "V3.29, Add hwEntityOpticalSupportDDM and hwAlarmConfigTable"
 
             REVISION     "201901070000Z"
             DESCRIPTION  "V3.28, Add hwEntityNVRAMFaultAlarmNotification and hwEntityNVRAMFaultResumeNotification"
@@ -345,7 +511,7 @@
             DESCRIPTION  "V2.32, Add hwEntityOpticalTunableType and hwEntityOpticalWaveLengthDecimal "
 
            REVISION     "201201250000Z"
-            DESCRIPTION  "V2.20, Updated the hwSystemGlobalObjects  hwEntitySystemServiceType "
+            DESCRIPTION  "V2.20, Updated the hwSystemGlobalObjects  hwEntitySystemServiceType "  
            
             ::= { hwDatacomm 31 }
 
@@ -562,7 +728,13 @@
                     Integer32,
                 hwEntityVoltageHighThreshold
                     Integer32,
+                hwEntityVoltageFatalLowThreshold
+                    Integer32,
+                hwEntityVoltageFatalHighThreshold
+                    Integer32,
                 hwEntityTemperatureLowThreshold
+                    Integer32,
+                hwEntityTemperatureMinorThreshold
                     Integer32,
                 hwEntityOpticalPower
                     Integer32,
@@ -661,7 +833,19 @@
                 hwEntityMPUType
                     OCTET STRING,
                 hwEntityMemSizeExt
-                    Unsigned32
+                    Unsigned32,
+                hwEntityMemCacheUsage
+                    Integer32,
+                hwCpuUsageTrapType
+                    Integer32,
+                hwCpuUsageTrapSlot
+                    OCTET STRING,
+                hwCpuUsageTrapCpu
+                    Integer32,
+                hwCpuUsageCurrentUsage
+                    Integer32,
+                hwCpuUsageThreashold
+                    Integer32
              }
 
         -- 1.3.6.1.4.1.2011.5.25.31.1.1.1.1.1
@@ -772,7 +956,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "This object indicates the entity temperature."
+                "This object indicates the entity temperature. Unit: centigrade"
             ::= { hwEntityStateEntry 11 }
 
 
@@ -782,7 +966,7 @@
             MAX-ACCESS read-write
             STATUS current
             DESCRIPTION
-                "This object indicates the upper threshold of the entity temperature."
+                "This object indicates the upper threshold of the entity temperature. Unit: centigrade"
             ::= { hwEntityStateEntry 12 }
 
 
@@ -792,7 +976,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "This object indicates the entity voltage."
+                "This object indicates the entity voltage. Unit: mV"
             ::= { hwEntityStateEntry 13 }
 
 
@@ -802,7 +986,7 @@
             MAX-ACCESS read-write
             STATUS current
             DESCRIPTION
-                "This object indicates the minimum entity voltage threshold."
+                "This object indicates the minimum entity voltage threshold. Unit: mV"
             ::= { hwEntityStateEntry 14 }
 
 
@@ -812,7 +996,7 @@
             MAX-ACCESS read-write
             STATUS current
             DESCRIPTION
-                "This object indicates the maximum entity voltage threshold."
+                "This object indicates the maximum entity voltage threshold. Unit: mV"
             ::= { hwEntityStateEntry 15 }
 
 
@@ -822,7 +1006,7 @@
             MAX-ACCESS read-write
             STATUS current
             DESCRIPTION
-                "This object indicates the lower entity temperature threshold."
+                "This object indicates the lower entity temperature threshold. Unit: centigrade"
             ::= { hwEntityStateEntry 16 }
 
 
@@ -868,7 +1052,14 @@
                 fiber1000(4),
                 fiber10000(5),
                 opticalnotExist(6),
-                optical(7)
+                optical(7),
+                fiber25000(8),
+                fiber50000(9),
+                fiber100000(10),
+                fiber200000(11),
+                fiber400000(12),
+                fiber40000(13),
+                cellular(14)
                 }
             MAX-ACCESS read-only
             STATUS current
@@ -945,7 +1136,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "This object indicates whether flexible plug-in cards are supported."
+                "It describes whether the whole board supports flexible cards."
             ::= { hwEntityStateEntry 26 }
 
 
@@ -1170,7 +1361,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The attribute for the split port."
+                "Number of the split port."
             ::= { hwEntityStateEntry 47 }
 
         -- 1.3.6.1.4.1.2011.5.25.31.1.1.1.1.48
@@ -1347,7 +1538,94 @@
             DESCRIPTION
                 "This object indicates the memory size."
             ::= { hwEntityStateEntry 65 }
-		   
+
+        -- 1.3.6.1.4.1.2011.5.25.31.1.1.1.1.66
+        hwEntityTemperatureMinorThreshold OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The minor threshold of the temperature. If the device temperature is 
+                higher than the threshold, a notification is sent.
+                "
+            ::= { hwEntityStateEntry 66 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.31.1.1.1.1.67
+        hwEntityVoltageFatalHighThreshold OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                " The fatal high threshold of the voltage. Generally, the voltage should 
+                be greater than the fatal low threshold and lower than the fatal high threshold. 
+                If the voltage is greater than the fatal high threshold, a notification is sent. "
+            ::= { hwEntityStateEntry 67 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.31.1.1.1.1.68
+        hwEntityVoltageFatalLowThreshold OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                " The fatal low threshold of the voltage. Generally, the voltage should 
+                be greater than the fatal low threshold and lower than the fatal high threshold. 
+                If the voltage is lower than the fatal low threshold, a notification is sent. "
+            ::= { hwEntityStateEntry 68 }
+
+        -- 1.3.6.1.4.1.2011.5.25.31.1.1.1.1.69
+        hwEntityMemCacheUsage OBJECT-TYPE
+            SYNTAX Integer32 (0..100)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                " This object indicates the memory cache usage of an entity, that is, the percentage of the memory cache that has been used."
+            ::= { hwEntityStateEntry 69}	
+
+        -- 1.3.6.1.4.1.2011.5.25.31.1.1.1.1.70
+        hwCpuUsageTrapType OBJECT-TYPE
+            SYNTAX Integer32 (0..2)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                " This object indicates the forwarding type of an entity."
+            ::= { hwEntityStateEntry 70}	
+
+        -- 1.3.6.1.4.1.2011.5.25.31.1.1.1.1.71
+        hwCpuUsageTrapSlot OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                " This object indicates the slot id of an entity."
+            ::= { hwEntityStateEntry 71}	
+
+        -- 1.3.6.1.4.1.2011.5.25.31.1.1.1.1.72
+        hwCpuUsageTrapCpu OBJECT-TYPE
+            SYNTAX Integer32 (0..100)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                " This object indicates the CPU id of an entity."
+            ::= { hwEntityStateEntry 72}	
+
+        -- 1.3.6.1.4.1.2011.5.25.31.1.1.1.1.73
+        hwCpuUsageCurrentUsage OBJECT-TYPE
+            SYNTAX Integer32 (0..100)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                " This object indicates the cpu usage of an entity, that is, the percentage of the cpu resource that has been used."
+            ::= { hwEntityStateEntry 73}		   
+		
+        -- 1.3.6.1.4.1.2011.5.25.31.1.1.1.1.74
+        hwCpuUsageThreashold OBJECT-TYPE
+            SYNTAX Integer32 (0..100)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                " This object indicates the cpu usage threshold of an entity."
+            ::= { hwEntityStateEntry 74}	
+
         -- 1.3.6.1.4.1.2011.5.25.31.1.1.2
         hwRUModuleInfoTable OBJECT-TYPE
             SYNTAX SEQUENCE OF HwRUModuleInfoEntry
@@ -1401,6 +1679,8 @@
                 hwEntityModel
                     SnmpAdminString,
                 hwEntityElabelVersion
+                    SnmpAdminString,
+				hwEntitySafeId
                     SnmpAdminString
              }
 
@@ -1541,6 +1821,15 @@
             DESCRIPTION
                 "Electronic label version."
             ::= { hwRUModuleInfoEntry 14 }
+			
+        -- 1.3.6.1.4.1.2011.5.25.31.1.1.2.1.15
+        hwEntitySafeId OBJECT-TYPE
+            SYNTAX SnmpAdminString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Main board safecard ID."
+            ::= { hwRUModuleInfoEntry 15 }	
 
         -- 1.3.6.1.4.1.2011.5.25.31.1.1.3
         hwOpticalModuleInfoTable OBJECT-TYPE
@@ -1682,7 +1971,15 @@
                 hwEntityOpticalBiasHighThreshold 
                     Integer32,
                 hwEntityOpticalHuaweiCertified
-                   Integer32					
+	Integer32,
+                hwEntityOpticalSupportDDM
+	INTEGER,
+                hwEntityOpticalPortName
+                    DisplayString,
+	         hwEntityOpticalDifferentialGroupDelay
+                    Unsigned32,
+                hwEntityOpticalChromaticDispersion
+                    Integer32
      }
 
         -- 1.3.6.1.4.1.2011.5.25.31.1.1.3.1.1
@@ -1712,7 +2009,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "This object indicates the wavelength of an optical module."
+                "This object indicates the wavelength of an optical module. Unit: nm"
             ::= { hwOpticalModuleInfoEntry 2 }
 
 
@@ -1742,7 +2039,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "This object indicates the temperature of an optical module."
+                "This object indicates the temperature of an optical module. 2147483647 is an invalid value. Unit: C."
             ::= { hwOpticalModuleInfoEntry 5 }
 
 
@@ -1752,7 +2049,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "This object indicates the voltage of an optical module."
+                "This object indicates the voltage of an optical module. 2147483647 is an invalid value. Unit: mV."
             ::= { hwOpticalModuleInfoEntry 6 }
 
 
@@ -1762,7 +2059,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "This object indicates the bias current of an optical module."
+                "This object indicates the bias current of an optical module. 2147483647 is an invalid value. Unit: uA"
             ::= { hwOpticalModuleInfoEntry 7 }
 
 
@@ -1772,7 +2069,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "This object indicates the receive optical power of an optical module."
+                "This object indicates the receive optical power of an optical module. Unit: dBm. the value is expanded 100 times, so the real value should be reduced 100 times."
             ::= { hwOpticalModuleInfoEntry 8 }
 
 
@@ -1782,7 +2079,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "This object indicates the transmit optical power of an optical module."
+                "This object indicates the transmit optical power of an optical module. Unit: dBm. the value is expanded 100 times, so the real value should be reduced 100 times."
             ::= { hwOpticalModuleInfoEntry 9 }
 
 
@@ -1815,7 +2112,12 @@
                 sfpsfpplus(22),
                 gponsfp(23),
                 cfp8(24),
-                sfp28(25)
+                sfp28(25),
+                qsfpdd(26),
+                cfp2dco(27),
+                sfp56(28),
+                qsfp56(29),
+                oa(30)
                 }
             MAX-ACCESS read-only
             STATUS current
@@ -1850,9 +2152,19 @@
                 mu(9),
                 sg(10),
                 opticalPigtail(11),
-                hssdcII(20),
                 mpo(12),
-                copperPigtail(21)
+                mpo1x12(13),
+                mpo2x16(14),
+                rj45(15),
+                noSeparable(16),
+                mxc2x16(17),
+                csOptical(18),
+                snOptical(19),
+                hssdcII(20),
+                copperPigtail(21),
+                mpo2x12(22),
+                mpo1x16(23),
+                angledLc(24)
                 }
             MAX-ACCESS read-only
             STATUS current
@@ -1867,7 +2179,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "This object indicates the lower threshold of the receive power of an optical module."
+                "This object indicates the lower threshold of the receive power of an optical module. Unit: dBm. the value is expanded 100 times, so the real value should be reduced 100 times."
             ::= { hwOpticalModuleInfoEntry 13 }
 
 
@@ -1877,7 +2189,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "This object indicates the upper threshold of the receive power of an optical module."
+                "This object indicates the upper threshold of the receive power of an optical module. Unit: dBm. the value is expanded 100 times, so the real value should be reduced 100 times."
             ::= { hwOpticalModuleInfoEntry 14 }
 
 
@@ -1887,7 +2199,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "This object indicates the lower threshold of the transmit power of an optical module."
+                "This object indicates the lower threshold of the transmit power of an optical module. Unit: dBm. the value is expanded 100 times, so the real value should be reduced 100 times."
             ::= { hwOpticalModuleInfoEntry 15 }
 
 
@@ -1897,7 +2209,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "This object indicates the upper threshold of the transmit power of an optical module."
+                "This object indicates the upper threshold of the transmit power of an optical module. Unit: dBm. the value is expanded 100 times, so the real value should be reduced 100 times."
             ::= { hwOpticalModuleInfoEntry 16 }
 
 
@@ -2086,7 +2398,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "This object indicates the receive power of a QSFP or CFP optical module."
+                "This object indicates the receive power of a QSFP or CFP optical module. Unit: dBm"
             ::= { hwOpticalModuleInfoEntry 32 }
 			
 			
@@ -2096,7 +2408,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "This object indicates the transmission power of a QSFP or CFP optical module."
+                "This object indicates the transmission power of a QSFP or CFP optical module. Unit: dBm"
             ::= { hwOpticalModuleInfoEntry 33 }
 
         -- 1.3.6.1.4.1.2011.5.25.31.1.1.3.1.34
@@ -2209,7 +2521,7 @@
 			
         -- 1.3.6.1.4.1.2011.5.25.31.1.1.3.1.46
         hwEntityOpticalBandWidth OBJECT-TYPE
-            SYNTAX Integer32 (0..100000)
+            SYNTAX Integer32 (0..400000)
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
@@ -2303,10 +2615,50 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The Huawei Certification of the optical module. 0 represents yes and 1 represents no."
+                "The Huawei Certification of the optical module. 0 represents yes and 1 represents no.
+                 After disabling non-Huawei-certified alarm. This node can not get information about non-Huawei-certified optical module."
             ::= { hwOpticalModuleInfoEntry 56 }
+
+        -- 1.3.6.1.4.1.2011.5.25.31.1.1.3.1.57
+        hwEntityOpticalSupportDDM OBJECT-TYPE
+            SYNTAX INTEGER
+                 {
+                     support(0),
+                     notSupport(1)
+                 }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Judge Optical Support DDM or not."
+            ::= { hwOpticalModuleInfoEntry 57 }			
+
+		-- 1.3.6.1.4.1.2011.5.25.31.1.1.3.1.58
+        hwEntityOpticalPortName OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The ShowName of the port."
+            ::= { hwOpticalModuleInfoEntry 58 }
+
+		-- 1.3.6.1.4.1.2011.5.25.31.1.1.3.1.59
+        hwEntityOpticalDifferentialGroupDelay OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Indicates the optical module differential group delay. Unit: ps."
+            ::= { hwOpticalModuleInfoEntry 59 }
+
+		-- 1.3.6.1.4.1.2011.5.25.31.1.1.3.1.60
+        hwEntityOpticalChromaticDispersion OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Indicates the optical module chromatic dispersion. Unit: ps/nm."
+            ::= { hwOpticalModuleInfoEntry 60 }
 			
-	    
         -- 1.3.6.1.4.1.2011.5.25.31.1.1.4
         hwMonitorInputTable OBJECT-TYPE
             SYNTAX SEQUENCE OF HwMonitorInputEntry
@@ -3055,6 +3407,7 @@
         hwEntityVolStatus OBJECT-TYPE
             SYNTAX INTEGER
                 {
+                abnormal(0),
                 normal(1),
                 major(2),
                 fatal(3)
@@ -3174,7 +3527,9 @@
                 hwEntityFanState
                     INTEGER,
                 hwEntityFanDesc
-                    OCTET STRING
+                    OCTET STRING,
+                hwEntityFanName
+                    INTEGER     
              }
 
         -- 1.3.6.1.4.1.2011.5.25.31.1.1.10.1.1
@@ -3218,7 +3573,8 @@
                 auto(1),
                 manual(2),
                 unknown(3),
-                silent(4)
+                silent(4),
+                denoise(11)
                 }
             MAX-ACCESS read-only
             STATUS current
@@ -3270,6 +3626,22 @@
             DESCRIPTION
                 "This object indicates the description of the fan."
             ::= { hwFanStatusEntry 8 }
+            
+            -- 1.3.6.1.4.1.2011.5.25.31.1.1.10.1.9
+			hwEntityFanName OBJECT-TYPE
+            SYNTAX INTEGER 
+            {
+                fan023ab(1),
+                fan031ab(2),
+                fan031af(3),
+                internalFan(4),
+                none(5)
+            }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the fan name."
+            ::= { hwFanStatusEntry 9 }
 			
         -- 1.3.6.1.4.1.2011.5.25.31.1.1.11
         hwEntityGlobalPara OBJECT IDENTIFIER ::= { hwEntityState 11 }
@@ -3487,7 +3859,7 @@
 	MAX-ACCESS not-accessible
 	STATUS current
 	DESCRIPTION
-	"System power infomation table."
+	"System power information table."
 	::= { hwEntityState 14 }
 
 		
@@ -3497,7 +3869,7 @@
 			MAX-ACCESS not-accessible
 			STATUS current
 			DESCRIPTION
-				"System power infomation entry."
+				"System power information entry."
 			INDEX { hwSystemPowerDeviceID }
 			::= { hwSystemPowerTable 1 }
 
@@ -3522,7 +3894,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
-				"System power infomation device ID."
+				"System power information device ID."
 			::= { hwSystemPowerEntry 1 }
 
 		
@@ -3532,7 +3904,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
-				"System power infomation total power."
+				"System power information total power."
 			::= { hwSystemPowerEntry 2 }
 
 		
@@ -3542,7 +3914,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
-				"System power infomation used power."
+				"System power information used power."
 			::= { hwSystemPowerEntry 3 }
 
 		
@@ -3552,7 +3924,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
-				"System power infomation remain power."
+				"System power information remain power."
 			::= { hwSystemPowerEntry 4 }
 
 		
@@ -3562,7 +3934,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
-				"System power infomation reserved power."
+				"System power information reserved power."
 			::= { hwSystemPowerEntry 5 }
 
 		
@@ -3908,7 +4280,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "This object indicates the current of the power."
+                "This object indicates the rated power of the power. Unit: W"
             ::= { hwPwrStatusEntry 10 }
         
         -- 1.3.6.1.4.1.2011.5.25.31.1.1.19     
@@ -4140,7 +4512,11 @@
                 hwHardDiskUsage
                     Integer32,
                 hwHardDiskUsageThreshold
-                    Integer32
+                    Integer32,
+                hwEntitySDCardUsage
+                    Integer32, 
+                hwEntitySDCardUsageThreshold
+                    Integer32                
              }
 
         -- 1.3.6.1.4.1.2011.5.25.31.1.1.24.1.1
@@ -4203,7 +4579,23 @@
                 "This object indicates the usage threshold of the hard disk with a specified index."
             ::= { hwHardDiskStateEntry 6 } 
 		
-	
+	     -- 1.3.6.1.4.1.2011.5.25.31.1.1.24.1.7
+        hwEntitySDCardUsage OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the usage of the SDCard with a specified index."
+            ::= { hwHardDiskStateEntry 7 } 
+         -- 1.3.6.1.4.1.2011.5.25.31.1.1.24.1.8
+        hwEntitySDCardUsageThreshold OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the usage threshold of the SDCard with a specified index."
+            ::= { hwHardDiskStateEntry 8 } 
+            
         -- 1.3.6.1.4.1.2011.5.25.31.1.2
         hwEntityPhysicalSpecTable OBJECT IDENTIFIER ::= { hwEntityExtObjects 2 }
 
@@ -4687,8 +5079,64 @@
 	    DESCRIPTION 
 	        " The hwEntityExtHotPatchReservedFifth indicates
 		  the fifth reserved information of hot patch."
-	    ::= { hwEntityExtTrapsPrefix 37 }
-
+	    ::= { hwEntityExtTrapsPrefix 37 } 
+	
+	-- 1.3.6.1.4.1.2011.5.25.31.2.0.38
+	    hwEntityExtSDCardFsErrorAlarm NOTIFICATION-TYPE 	   
+	    STATUS current
+	    DESCRIPTION 
+	        " The hwEntityExtSDCardFsErrorAlarm indicates
+		  the SDCard was damaged."
+	    ::= { hwEntityExtTrapsPrefix 38 }
+	    
+	    
+	-- 1.3.6.1.4.1.2011.5.25.31.2.0.39 
+	    hwEntityExtSDCardFsErrorResume NOTIFICATION-TYPE   
+	    STATUS current
+	    DESCRIPTION 
+	        " The hwEntityExtSDCardFsErrorResume indicates
+		  the SDCard was restored."
+	    ::= { hwEntityExtTrapsPrefix 39 }
+	    
+	    
+	-- 1.3.6.1.4.1.2011.5.25.31.2.0.40 
+	    hwEntityExtSDCardUsageOver NOTIFICATION-TYPE
+	    OBJECTS {hwEntitySDCardUsage,hwEntitySDCardUsageThreshold} 
+	    STATUS current
+	    DESCRIPTION 
+	        " The hwEntityExtSDCardUsageOver indicates
+		  the SDCard usage is overload."
+	    ::= { hwEntityExtTrapsPrefix 40 }
+	    
+	    
+	-- 1.3.6.1.4.1.2011.5.25.31.2.0.41 
+	    hwEntityExtSDCardUsageBelow NOTIFICATION-TYPE
+	    OBJECTS {hwEntitySDCardUsage,hwEntitySDCardUsageThreshold} 
+	    STATUS current
+	    DESCRIPTION 
+	        " The hwEntityExtSDCardUsageBelow indicates
+		  the SDCard usage fell below the resume threshold."
+	    ::= { hwEntityExtTrapsPrefix 41 }
+	    
+	     
+	-- 1.3.6.1.4.1.2011.5.25.31.2.0.42 
+	    hwEntityExtCFCardFaultAlarm NOTIFICATION-TYPE  	      
+	    STATUS current
+	    DESCRIPTION 
+	        " The hwEntityExtCFCardFaultAlarm indicates
+		  the CFCard was damaged."
+	    ::= { hwEntityExtTrapsPrefix 42 }
+	    
+	    
+	-- 1.3.6.1.4.1.2011.5.25.31.2.0.43  
+	    hwEntityExtCFCardFaultResume NOTIFICATION-TYPE     
+	    STATUS current
+	    DESCRIPTION 
+	        " The hwEntityExtCFCardFaultResume indicates
+		  the CFCard was restored."
+	    ::= { hwEntityExtTrapsPrefix 43 }
+	    
+	    
 	-- 1.3.6.1.4.1.2011.5.25.31.2.0.44
 	   hwEntityNVRAMFaultAlarmNotification NOTIFICATION-TYPE
                        OBJECTS { hwProcessName}
@@ -4706,6 +5154,38 @@
 	        " The hwEntityNVRAMFaultResumeNotification indicates
 		  that it was successful to switch main NVRAM to backup NVRAM ."
 	    ::= { hwEntityExtTrapsPrefix 45 }
+
+	-- 1.3.6.1.4.1.2011.5.25.31.2.0.46
+	    hwEntityExtBootPasswordAlarm NOTIFICATION-TYPE
+	    STATUS current
+	    DESCRIPTION 
+	        " The hwEntityNVRAMFaultResume indicates
+		  that the BootLoader password is not set, which poses security risks. You are advised to change the password."
+	    ::= { hwEntityExtTrapsPrefix 46 }      
+
+	-- 1.3.6.1.4.1.2011.5.25.31.2.0.47
+	    hwEntityExtSmallBootPasswordAlarm NOTIFICATION-TYPE
+	    STATUS current
+	    DESCRIPTION 
+	        " The hwEntityExtSmallBootPasswordAlarm indicates
+		  that the small boot password was initial password and needed to change."
+	    ::= { hwEntityExtTrapsPrefix 47 }
+
+        -- 1.3.6.1.4.1.2011.5.25.31.2.0.48
+        hwEntityExtCpuUsageNotfication NOTIFICATION-TYPE
+            OBJECTS { hwCpuUsageTrapType, hwCpuUsageTrapSlot, hwCpuUsageTrapCpu, hwCpuUsageCurrentUsage, hwCpuUsageThreashold }
+            STATUS current
+            DESCRIPTION 
+                " The hwEntityExtCpuUsageNotfication indicates the entity is overload, and the service running in the entity will not get the performance it should because of CPU's performance. Anyway, the threshold should lower than the value that most service work fine. "
+            ::= { hwEntityExtTrapsPrefix 48 }
+        
+         -- 1.3.6.1.4.1.2011.5.25.31.2.0.49
+        hwEntityExtCpuUsageNotficationClear NOTIFICATION-TYPE
+            OBJECTS { hwCpuUsageTrapType, hwCpuUsageTrapSlot, hwCpuUsageTrapCpu, hwCpuUsageCurrentUsage, hwCpuUsageThreashold }
+            STATUS current
+            DESCRIPTION 
+                " The hwEntityExtCpuUsageNotficationClear indicates the entity CPU usage fell below the threshold. "
+            ::= { hwEntityExtTrapsPrefix 49 }
 		
 		-- 1.3.6.1.4.1.2011.5.25.31.2.1
         hwEntityExtTrapObject OBJECT IDENTIFIER ::= { hwEntityExtTraps 1 }
@@ -4850,6 +5330,34 @@
 			DESCRIPTION
 				"The time interval."
 			::= { hwEntityExtTrapObject 15 }
+
+		-- 1.3.6.1.4.1.2011.5.25.31.2.1.16
+		hwEntityExtTrapDiscardNumber OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The statistics of drop."
+			::= { hwEntityExtTrapObject 16 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.31.2.1.17
+		hwEntityExtTrapThreshold OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The threshold of drop."
+			::= { hwEntityExtTrapObject 17 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.31.2.1.18
+		hwEntityExtTrapInterval OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The time interval."
+			::= { hwEntityExtTrapObject 18 }
+
 		-- 1.3.6.1.4.1.2011.5.25.31.2.2
         hwEntityExtTrap OBJECT IDENTIFIER ::= { hwEntityExtTraps 2 }		
 				
@@ -4914,14 +5422,14 @@
           OBJECTS { hwEntityExtTrapBoardSlotID, hwEntityExtTrapUnitID, hwEntityExtTrapHigPortID, hwEntityExtTrapPeerBoardSlotID, hwEntityExtTrapHigStateChangeTimes }
           STATUS current
           DESCRIPTION 
-	        "When the CRC errors of HIG port are more than the threshold, send a SNMP trap to network manager."
+	        "When the CRC errors of Serdes channel are more than the threshold, send a SNMP trap to network manager."
 					::= { hwEntityExtTrap 9 }
 
 	    hwEntityHigStateDownNotify NOTIFICATION-TYPE
           OBJECTS { hwEntityExtTrapBoardSlotID, hwEntityExtTrapUnitID, hwEntityExtTrapHigPortID, hwEntityExtTrapPeerBoardSlotID, hwEntityExtTrapMonitorInterval }
           STATUS current
           DESCRIPTION 
-	        "When the state of HIG port is always down, send a SNMP trap to network manager."
+	        "When the state of Serdes channel is always down, send a SNMP trap to network manager."
 					::= { hwEntityExtTrap 10 }
 
       hwEntityPositionMismatchNotify NOTIFICATION-TYPE
@@ -4938,6 +5446,34 @@
 	        "When the statistics of runt packets is more than the threshold, send a SNMP trap to network manager."
 					::= { hwEntityExtTrap 12 }
 
+	    hwEntityHigCrcErrorAlarm NOTIFICATION-TYPE
+          OBJECTS { hwEntityExtTrapBoardSlotID, hwEntityExtTrapUnitID, hwEntityExtTrapHigPortID, hwEntityExtTrapPeerBoardSlotID, hwEntityExtTrapErrorPacketStatistics, hwEntityExtTrapErrorPacketThreshold, hwEntityExtTrapMonitorInterval }
+          STATUS current
+          DESCRIPTION 
+	        "When the CRC errors of HIG port are more than the threshold, send a SNMP alarm trap to network manager."
+					::= { hwEntityExtTrap 17}
+
+	    hwEntityHigCrcErrorAlarmResume NOTIFICATION-TYPE
+          OBJECTS { hwEntityExtTrapBoardSlotID, hwEntityExtTrapUnitID, hwEntityExtTrapHigPortID, hwEntityExtTrapPeerBoardSlotID, hwEntityExtTrapErrorPacketStatistics, hwEntityExtTrapErrorPacketThreshold, hwEntityExtTrapMonitorInterval }
+          STATUS current
+          DESCRIPTION 
+	        "When the number of CRC errors on the HIG port falls below the threshold, an SNMP trap is sent to the network manager."
+					::= { hwEntityExtTrap 18}
+
+	    hwEntityHigDown NOTIFICATION-TYPE
+          OBJECTS { hwEntityExtTrapBoardSlotID, hwEntityExtTrapUnitID, hwEntityExtTrapHigPortID, hwEntityExtTrapPeerBoardSlotID, hwEntityExtTrapMonitorInterval }
+          STATUS current
+          DESCRIPTION 
+	        "When the state of Serdes channel is always down, send a SNMP trap to network manager."
+					::= { hwEntityExtTrap 19}
+
+	    hwEntityHigDownResume NOTIFICATION-TYPE
+          OBJECTS { hwEntityExtTrapBoardSlotID, hwEntityExtTrapUnitID, hwEntityExtTrapHigPortID, hwEntityExtTrapPeerBoardSlotID, hwEntityExtTrapMonitorInterval }
+          STATUS current
+          DESCRIPTION 
+	        "When the Serdes channel goes Up, an SNMP trap is sent to the network manager."
+					::= { hwEntityExtTrap 20}
+
 	  -- 1.3.6.1.4.1.2011.5.25.31.2.2.13
 	  hwBoardDropRuntPacketNotify NOTIFICATION-TYPE
 	  	OBJECTS { entPhysicalName, hwEntityExtTrapBoardDropRuntPktStatistics, hwEntityExtTrapBoardDropRuntPktTimeInterval }
@@ -4945,6 +5481,32 @@
 	  	DESCRIPTION 
 	  	"When the statistics of dropped runt packets on the board is more than the threshold, send a SNMP trap to network manager."
 	  	::= { hwEntityExtTrap 13 }
+
+	  -- 1.3.6.1.4.1.2011.5.25.31.2.2.14
+	  hwEntityHigDiscardPacketNotify NOTIFICATION-TYPE
+	  	OBJECTS { hwEntityExtTrapBoardSlotID, hwEntityExtTrapUnitID, hwEntityExtTrapHigPortID, hwEntityExtTrapPeerBoardSlotID, hwEntityExtTrapDiscardNumber, hwEntityExtTrapThreshold, hwEntityExtTrapInterval }
+	  	STATUS current
+	  	DESCRIPTION 
+	  	"When the congistion drop packets of HIG port are more than the threshold, send a SNMP trap to network manager."
+	  	::= { hwEntityExtTrap 14 }
+
+	-- 1.3.6.1.4.1.2011.5.25.31.2.2.15
+		hwEntitySerdesChangeNotify NOTIFICATION-TYPE
+			OBJECTS { hwEntityExtTrapBoardSlotID, hwEntityExtTrapUnitID, hwEntityExtTrapHigPortID, hwEntityExtTrapPeerBoardSlotID, hwEntityExtTrapHigStateChangeTimes
+				 }
+			STATUS current
+			DESCRIPTION 
+				"When the CRC errors of Fic port are more than the threshold, send a SNMP trap to network manager."
+			::= { hwEntityExtTrap 15 }
+		
+	-- 1.3.6.1.4.1.2011.5.25.31.2.2.16
+		hwEntitySerdesDownNotify NOTIFICATION-TYPE
+			OBJECTS { hwEntityExtTrapBoardSlotID, hwEntityExtTrapUnitID, hwEntityExtTrapHigPortID, hwEntityExtTrapPeerBoardSlotID, hwEntityExtTrapMonitorInterval
+				 }
+			STATUS current
+			DESCRIPTION 
+				"When the state of Fic port is always down, send a SNMP trap to network manager."
+			::= { hwEntityExtTrap 16 }
 
         -- 1.3.6.1.4.1.2011.5.25.31.3
         hwDevicePowerInfoObjects OBJECT IDENTIFIER ::= { hwEntityExtentMIB 3 }
@@ -5034,7 +5596,8 @@
 				hwEntitySlotID, hwEntityCpuID, hwEntityPreviousValue, hwEntityCurrentValue, hwEntityChangeValue, hwEntityChangeValueThreshold,hwDownloadDiagnosticsStatus, hwDownloadDiagnosticsRowStatus,
 				hwDownloadDiagnosticsSpeed, hwDownloadDiagnosticsDSCP, hwDownloadDiagnosticsTransports, hwDownloadDiagnosticsURL, hwDownloadDiagnosticsProgress,
 				hwUploadDiagnosticsProgress, hwUploadDiagnosticsStatus, hwUploadDiagnosticsRowStatus,hwUploadDiagnosticsSpeed,  hwUploadDiagnosticsTestFileSize, hwUploadDiagnosticsDSCP, 
-				hwUploadDiagnosticsTransports, hwUploadDiagnosticsURL, hwEntityDeviceStatus, hwEntityPicStatus}
+				hwUploadDiagnosticsTransports, hwUploadDiagnosticsURL, hwEntityDeviceStatus, hwEntityPicStatus, hwEntityTemperatureMinorThreshold,
+                hwEntityVoltageFatalHighThreshold, hwEntityVoltageFatalLowThreshold}
             STATUS current
             DESCRIPTION 
                 "Standard HUAWEI Entity Extent group."
@@ -5047,9 +5610,11 @@
                 hwEntityExtOperEnabled, hwEntityExtOperDisabled, hwEntityExtMonitorBoardAbnormalNotification, hwEntityExtMonitorBoardNormalNotification, hwEntityExtMonitorPortAbnormalNotification, 
                 hwEntityExtMonitorPortNormalNotification, hwEntityExtCpuUsageLowThresholdNotfication,hwInsertDiffFromPreDisposed,hwPreDisposedChangeNotification,hwEntityHeartbeatTrap,
                 hwHardwareCapaChangeNotification, hwEntityExtProcessErrorNotification, hwAlarmPnPChangeNotification, hwBoardSoftwareVersionIncompatible, hwBoardSplitPorts,
-                hwEntityInputRateThresholdAlarm, hwEntityInputRateThresholdAlarmResume, hwEntityOutputRateThresholdAlarm, hwEntityOutputRateThresholdAlarmResume, hwEntityStatusChange,
+                hwEntityInputRateThresholdAlarm, hwEntityInputRateThresholdAlarmResume, hwEntityOutputRateThresholdAlarm, hwEntityOutputRateThresholdAlarmResume, hwEntityStatusChange, hwEntityHigCrcErrorAlarm, hwEntityHigCrcErrorAlarmResume, hwEntityHigDown, hwEntityHigDownResume,
                 hwEntityHigErrorPacketThresholdAlarm, hwEntityHigStateChangeNotify, hwEntityHigStateDownNotify,hwEntityPositionMismatchNotify,hwEntityRuntPacketCheckNotify,hwHda1Error,hwEntityExtCpuUsageSuddenChangeNotification,
-                hwEntityExtMemoryUsageSuddenChangeNotification,hwEntityExtCPUOverInterfaceDown }
+                hwEntityExtMemoryUsageSuddenChangeNotification,hwEntityExtCPUOverInterfaceDown,hwEntityExtDevConfigurationRecovered,hwEntityExtHotPatchReservedFirst,hwEntityExtHotPatchReservedSecond,hwEntityExtHotPatchReservedThird,
+                hwEntityExtHotPatchReservedFourth,hwEntityExtHotPatchReservedFifth,hwEntityExtSDCardFsErrorAlarm,hwEntityExtSDCardFsErrorResume,hwEntityExtSDCardUsageOver,hwEntityExtSDCardUsageBelow,hwEntityExtCFCardFaultAlarm,
+                hwEntityExtCFCardFaultResume,hwEntityNVRAMFaultAlarmNotification,hwEntityNVRAMFaultResumeNotification,hwEntityExtBootPasswordAlarm,hwEntityExtSmallBootPasswordAlarm}
             STATUS current
             DESCRIPTION 
                 "Standard HUAWEI Entity Extent Notification group."
@@ -5059,7 +5624,7 @@
         -- 1.3.6.1.4.1.2011.5.25.31.4.2.3
         hwRUModuleInfoGroup OBJECT-GROUP
             OBJECTS { hwEntityBomId, hwEntityBomEnDesc, hwEntityManufacturedDate, hwEntityCLEICode, hwEntityArchivesInfoVersion, 
-                hwEntityOpenBomId, hwEntityIssueNum, hwEntityBoardType, hwEntityExInfo, hwEntityModel, hwEntityElabelVersion }
+                hwEntityOpenBomId, hwEntityIssueNum, hwEntityBoardType, hwEntityExInfo, hwEntityModel, hwEntityElabelVersion, hwEntitySafeId }
             STATUS current
             DESCRIPTION 
                 "Standard HUAWEI Entity Extent group."
@@ -5083,7 +5648,8 @@
                 hwEntityOpticalTxHighThreshold, hwEntityOpticalPlug, hwEntityOpticalDirectionType, hwEntityOpticalUserEeprom, hwEntityOpticalLaneBiasCurrent, 
 				hwEntityOpticalLaneRxPower, hwEntityOpticalLaneTxPower, hwEntityOpticalVendorOUI, hwEntityOpticalVendorRev, hwEntityOpticalGponSN,
                 hwEntityOpticalTransType,hwEntityOpticalConnectType,hwEntityOpticalOrderingName,hwEntityOpticalTransferDistance,hwEntityOpticalBandWidth,
-				hwEntityOpticalWaveLengthExact,hwEntityOpticalModel,hwEntityOpticalManufacturedDate,hwEntityOpticalBiasLowThreshold,hwEntityOpticalBiasHighThreshold,hwEntityOpticalHuaweiCertified}
+				hwEntityOpticalWaveLengthExact,hwEntityOpticalModel,hwEntityOpticalManufacturedDate,hwEntityOpticalBiasLowThreshold,hwEntityOpticalBiasHighThreshold,hwEntityOpticalHuaweiCertified,
+				hwEntityOpticalPortName,hwEntityOpticalDifferentialGroupDelay,hwEntityOpticalChromaticDispersion}
             STATUS current
             DESCRIPTION 
                 "Collection of objects that display the fiber module working information."
@@ -5160,7 +5726,7 @@
 
         -- 1.3.6.1.4.1.2011.5.25.31.4.2.13
         hwFanStatusGroup OBJECT-GROUP
-            OBJECTS { hwEntityFanSlot, hwEntityFanSn, hwEntityFanReg, hwEntityFanSpdAdjMode, hwEntityFanSpeed,hwEntityFanPresent,hwEntityFanState,hwEntityFanDesc
+            OBJECTS { hwEntityFanSlot, hwEntityFanSn, hwEntityFanReg, hwEntityFanSpdAdjMode, hwEntityFanSpeed,hwEntityFanPresent,hwEntityFanState,hwEntityFanDesc,hwEntityFanName
                  }
             STATUS current
             DESCRIPTION 
@@ -6180,7 +6746,7 @@
 				hwBoardDcOutputLineIndex
 					Integer32,
 				hwBoardDcOutputState
-					OCTET STRING
+					EnabledStatus
 			 }
 
 --  1.3.6.1.4.1.2011.5.25.31.1.1.33.1.1
@@ -6199,8 +6765,8 @@
 --  1.3.6.1.4.1.2011.5.25.31.1.1.33.1.2
 		-- 1.3.6.1.4.1.2011.5.25.31.1.1.33.1.2
 		hwBoardDcOutputState OBJECT-TYPE
-			SYNTAX OCTET STRING
-			MAX-ACCESS read-only
+			SYNTAX EnabledStatus
+			MAX-ACCESS read-write
 			STATUS current
 			DESCRIPTION
 				"This object indicates the device dc-output line state."
@@ -6322,12 +6888,887 @@
 		-- 1.3.6.1.4.1.2011.5.25.31.1.1.35.1.2
 		hwBoardAcOutputState OBJECT-TYPE
 			SYNTAX OCTET STRING
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This object indicates the device ac-output line state. 
+				1 indicates ac-output 24V enable.
+				2 indicates ac-output 24V disable."
+			::= { hwBoardAcOutputStateEntry 2 }
+			
+-- 1.3.6.1.4.1.2011.5.25.31.1.1.36
+		hwAlarmConfigTable OBJECT IDENTIFIER ::= { hwEntityState 36 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.31.1.1.36.1
+		hwAlarmResendInterval OBJECT-TYPE
+			SYNTAX Integer32 (0..65535)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				" set alarm  resend interval,the defult is 10 minutes."
+			::= { hwAlarmConfigTable 1 }
+
+    -- 1.3.6.1.4.1.2011.5.25.31.1.1.37
+        hwApInfoTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwApInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table describes virtual-access AP device information."
+            ::= { hwEntityState 37 }
+    
+        -- 1.3.6.1.4.1.2011.5.25.31.1.1.37.1
+        hwApInfoEntry OBJECT-TYPE
+            SYNTAX HwApInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Information about an AP device. Each entry provides objects of an AP device to help an NMS identify and characterize the entry in this table."
+            INDEX { hwEntityApid, hwEntityApIndex }
+            ::= { hwApInfoTable 1 }
+            
+        HwApInfoEntry ::=
+            SEQUENCE { 
+                hwEntityApid
+                    Integer32,
+                hwEntityApIndex
+                    PhysicalIndex,
+                hwEntityApName
+                    SnmpAdminString,
+                hwEntityApMemUsage
+                    Integer32,
+                hwEntityApCpuUsage
+                    Integer32
+             }
+
+        --  1.3.6.1.4.1.2011.5.25.31.1.1.37.1.1
+        hwEntityApid OBJECT-TYPE
+                SYNTAX Integer32 (1024..8191)
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Ap-id of the virtual-access AP."
+                ::= { hwApInfoEntry 1 }
+                
+        --  1.3.6.1.4.1.2011.5.25.31.1.1.37.1.2
+        hwEntityApIndex OBJECT-TYPE
+                SYNTAX PhysicalIndex
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "The index for this entry."
+                ::= { hwApInfoEntry 2 }
+                
+        --  1.3.6.1.4.1.2011.5.25.31.1.1.37.1.3
+        hwEntityApName OBJECT-TYPE
+                SYNTAX SnmpAdminString
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "The textual name of the physical entity."
+                ::= { hwApInfoEntry 3 }
+                
+        --  1.3.6.1.4.1.2011.5.25.31.1.1.37.1.4
+        hwEntityApMemUsage OBJECT-TYPE
+                SYNTAX Integer32 (0..100)
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "This object indicates the memory usage of an entity, that is, the percentage of the memory that has been used."
+                ::= { hwApInfoEntry 4 }
+
+        --  1.3.6.1.4.1.2011.5.25.31.1.1.37.1.5
+        hwEntityApCpuUsage OBJECT-TYPE
+                SYNTAX Integer32 (0..100)
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "This object indicates the CPU usage of an entity. Generally, the overall CPU usage of the entity is calculated, without considering the number of CPUs on the entity."
+                ::= { hwApInfoEntry 5 }
+
+-- 1.3.6.1.4.1.2011.5.25.31.1.1.38
+        hwIntegratedPowerSystemTable OBJECT-TYPE
+                SYNTAX SEQUENCE OF HwIntegratedPowerSystemEntry
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                    "This table describes information about the integrated power supply system."
+                ::= { hwEntityState 38 }
+		
+-- 1.3.6.1.4.1.2011.5.25.31.1.1.38.1
+        hwIntegratedPowerSystemEntry OBJECT-TYPE
+                SYNTAX HwIntegratedPowerSystemEntry
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+	"This entry describes information about the integrated power supply system."
+                INDEX { entPhysicalIndex }
+                ::= { hwIntegratedPowerSystemTable 1 }
+		
+                HwIntegratedPowerSystemEntry ::=
+                SEQUENCE { 
+                    hwIntegratedPowerSoftwareVersion
+	     OCTET STRING,
+	 hwIntegratedPowerHardwareVersion
+	     OCTET STRING,
+         hwIntegratedPowerSoftwareVersionASCII
+		OCTET STRING
+	 }
+
+-- 1.3.6.1.4.1.2011.5.25.31.1.1.38.1.1
+        hwIntegratedPowerSoftwareVersion OBJECT-TYPE
+                SYNTAX OCTET STRING
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "This object indicates the software version."
+                ::= { hwIntegratedPowerSystemEntry 1 }
+		
+-- 1.3.6.1.4.1.2011.5.25.31.1.1.38.1.2
+        hwIntegratedPowerHardwareVersion OBJECT-TYPE
+                SYNTAX OCTET STRING
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "This object indicates the hardware version."
+                ::= { hwIntegratedPowerSystemEntry 2 }
+
+-- 1.3.6.1.4.1.2011.5.25.31.1.1.38.1.3
+		hwIntegratedPowerSoftwareVersionASCII OBJECT-TYPE
+			SYNTAX OCTET STRING
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
-				"Description."
-			::= { hwBoardAcOutputStateEntry 2 }
+				"This object indicates the software version (ASCII)."
+			::= { hwIntegratedPowerSystemEntry 3 }
+		
+-- 1.3.6.1.4.1.2011.5.25.31.1.1.39
+        hwIntegratedPowerTable OBJECT-TYPE
+                SYNTAX SEQUENCE OF HwIntegratedPowerEntry
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                    "This table describes information about the integrated power supply."
+                ::= { hwEntityState 39 }
+		
+-- 1.3.6.1.4.1.2011.5.25.31.1.1.39.1
+        hwIntegratedPowerEntry OBJECT-TYPE
+                SYNTAX HwIntegratedPowerEntry
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                    "This entry describes information about the integrated power supply."
+                INDEX { entPhysicalIndex }
+                ::= { hwIntegratedPowerTable 1 }
+		
+                HwIntegratedPowerEntry ::=
+                        SEQUENCE { 
+	         hwIntegratedPowerEnergyWorkmode
+                                    INTEGER,
+	         hwIntegratedPowerTotalInputPower
+	                 Integer32,
+	         hwIntegratedPower12VDCOutVoltStatus
+	                 INTEGER,
+	         hwIntegratedPower24VACOutVolt
+	                 Integer32,
+	         hwIntegratedPower24VACOutCurrent
+	                 Integer32,
+	         hwIntegratedPower53VDCOutVoltStatus
+	                 INTEGER,
+	         hwIntegratedPowerACInputVoltStatus
+	                 INTEGER,
+			 hwIntegratedPowerRebootPower
+	                 INTEGER,
+                hwIntegratedPowerCurrentMode
+			INTEGER,
+		hwIntegratedPowerBusbarVolt
+			Integer32,
+		hwIntegratedPowerACVolt
+			Integer32,
+		hwIntegratedPowerSolarInputVolt
+			Integer32,
+		hwIntegratedPowerSolarInputCurrent
+			Integer32,
+		hwIntegratedPower53VDCOutVolt
+			Integer32,
+		hwIntegratedPowerTotalLoadPower
+			Integer32,
+		hwIntegratedPowerDCOverVoltThreshold
+			Integer32,
+		hwIntegratedPowerDCUnderVoltThreshold
+			Integer32,
+		hwIntegratedPowerLowLoadVoltPowerOffThreshold
+			Integer32,
+		hwIntegratedPower53VDCOutVoltLowerThreshold
+			Integer32,
+		hwIntegratedPowerACCurrent
+			Integer32,
+		hwIntegratedPower53VDCOutCurrent
+	        Integer32,
+		hwIntegratedPwrChip1UpgrageStatus
+	        INTEGER,
+		hwIntegratedPwrChip2UpgrageStatus
+	        INTEGER,
+		hwIntegratedPwrChip3UpgrageStatus
+	        INTEGER,
+		hwIntegratedPwrChip4UpgrageStatus
+	        INTEGER,
+	    hwIntegratedPowerResetOutput
+	        INTEGER
+                        }
+
+-- 1.3.6.1.4.1.2011.5.25.31.1.1.39.1.1
+        hwIntegratedPowerEnergyWorkmode OBJECT-TYPE
+                SYNTAX INTEGER
+                {
+                    hybridPower500(0),
+	            mainsPower500(1),
+                    hybridPower500B(2)
+                }
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "This object indicates the power supply mode."
+                ::= { hwIntegratedPowerEntry 1 }
+		
+-- 1.3.6.1.4.1.2011.5.25.31.1.1.39.1.2
+        hwIntegratedPowerTotalInputPower OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "This object indicates the total input power, in mW."
+                ::= { hwIntegratedPowerEntry 2 }
+		
+-- 1.3.6.1.4.1.2011.5.25.31.1.1.39.1.3
+        hwIntegratedPower12VDCOutVoltStatus OBJECT-TYPE
+                SYNTAX INTEGER
+                {
+                    normal(0),
+	 abnormal(1)
+                }
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "This object indicates the 12 V DC output voltage status."
+                ::= { hwIntegratedPowerEntry 3 }
+		
+-- 1.3.6.1.4.1.2011.5.25.31.1.1.39.1.4
+        hwIntegratedPower24VACOutVolt OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "This object indicates the 24 V AC output voltage, in mV."
+                ::= { hwIntegratedPowerEntry 4 }
+		
+-- 1.3.6.1.4.1.2011.5.25.31.1.1.39.1.5
+        hwIntegratedPower24VACOutCurrent OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "This object indicates the 24 V AC output current, in mA."
+                ::= { hwIntegratedPowerEntry 5 }
+
+-- 1.3.6.1.4.1.2011.5.25.31.1.1.39.1.6
+        hwIntegratedPower53VDCOutVoltStatus OBJECT-TYPE
+                SYNTAX INTEGER
+                {
+                    normal(0),
+	 abnormal(1)
+                }
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "This object indicates the 53 V DC output voltage status."
+                ::= { hwIntegratedPowerEntry 6 }
+
+-- 1.3.6.1.4.1.2011.5.25.31.1.1.39.1.7
+        hwIntegratedPowerACInputVoltStatus OBJECT-TYPE
+                SYNTAX INTEGER
+                {
+                    normal(0),
+	 abnormal(1)
+                }
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "This object indicates the AC input voltage status."
+                ::= { hwIntegratedPowerEntry 7 }
+
+-- 1.3.6.1.4.1.2011.5.25.31.1.1.39.1.8
+        hwIntegratedPowerRebootPower OBJECT-TYPE
+                SYNTAX INTEGER
+                {
+                    reset(1)
+                }
+                MAX-ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                    "This object is used to reset a switch remotely."
+                ::= { hwIntegratedPowerEntry 8 }
+
+-- 1.3.6.1.4.1.2011.5.25.31.1.1.39.1.9
+		hwIntegratedPowerCurrentMode OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				solar(0),
+				solarAndMains(1),
+				solarAndBattery(2),
+				mains(3),
+				battery(4)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the current power supply mode."
+			::= { hwIntegratedPowerEntry 9 }
+		
+-- 1.3.6.1.4.1.2011.5.25.31.1.1.39.1.10
+		hwIntegratedPowerBusbarVolt OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the busbar voltage, in mV."
+			::= { hwIntegratedPowerEntry 10 }
+		
+-- 1.3.6.1.4.1.2011.5.25.31.1.1.39.1.11
+		hwIntegratedPowerACVolt OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the AC voltage, in mV."
+			::= { hwIntegratedPowerEntry 11 }
+		
+-- 1.3.6.1.4.1.2011.5.25.31.1.1.39.1.12
+		hwIntegratedPowerSolarInputVolt OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the input voltage of solar power, in mV."
+			::= { hwIntegratedPowerEntry 12 }
+		
+-- 1.3.6.1.4.1.2011.5.25.31.1.1.39.1.13
+		hwIntegratedPowerSolarInputCurrent OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the input current of solar power, in mA."
+			::= { hwIntegratedPowerEntry 13 }
+		
+-- 1.3.6.1.4.1.2011.5.25.31.1.1.39.1.14
+		hwIntegratedPower53VDCOutVolt OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the 53 V DC output voltage, in mV."
+			::= { hwIntegratedPowerEntry 14 }
+		
+-- 1.3.6.1.4.1.2011.5.25.31.1.1.39.1.15
+		hwIntegratedPowerTotalLoadPower OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the total load power, in mW."
+			::= { hwIntegratedPowerEntry 15 }
+		
+-- 1.3.6.1.4.1.2011.5.25.31.1.1.39.1.16
+		hwIntegratedPowerDCOverVoltThreshold OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This object indicates the DC overvoltage alarm threshold, in mV."
+			::= { hwIntegratedPowerEntry 16 }
+		
+-- 1.3.6.1.4.1.2011.5.25.31.1.1.39.1.17
+		hwIntegratedPowerDCUnderVoltThreshold OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This object indicates the DC undervoltage alarm threshold, in mV."
+			::= { hwIntegratedPowerEntry 17 }
+		
+-- 1.3.6.1.4.1.2011.5.25.31.1.1.39.1.18
+		hwIntegratedPowerLowLoadVoltPowerOffThreshold OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This object indicates the voltage lower than which the device is powered off, in mV."
+			::= { hwIntegratedPowerEntry 18 }
+		
+-- 1.3.6.1.4.1.2011.5.25.31.1.1.39.1.19
+		hwIntegratedPower53VDCOutVoltLowerThreshold OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This object indicates the lower voltage threshold for the 53 V DC output, in mV."
+			::= { hwIntegratedPowerEntry 19 }
 			
+-- 1.3.6.1.4.1.2011.5.25.31.1.1.39.1.20
+		hwIntegratedPowerACCurrent OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the AC current, in mA."
+			::= { hwIntegratedPowerEntry 20 }
+			
+-- 1.3.6.1.4.1.2011.5.25.31.1.1.39.1.21
+		hwIntegratedPower53VDCOutCurrent OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the lower current threshold for the 53 V DC output, in mA."
+			::= { hwIntegratedPowerEntry 21 }
+			
+-- 1.3.6.1.4.1.2011.5.25.31.1.1.39.1.22
+        hwIntegratedPwrChip1UpgrageStatus OBJECT-TYPE
+                SYNTAX INTEGER
+                {
+                    normal(0),
+	 abnormal(1)
+                }
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "This object indicates the power chip 1 upgrage status."
+                ::= { hwIntegratedPowerEntry 22 }
+
+-- 1.3.6.1.4.1.2011.5.25.31.1.1.39.1.23
+        hwIntegratedPwrChip2UpgrageStatus OBJECT-TYPE
+                SYNTAX INTEGER
+                {
+                    normal(0),
+	 abnormalpsu(1),
+	 abnormalcur(2)
+                }
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "This object indicates the power chip 2 upgrage status."
+                ::= { hwIntegratedPowerEntry 23 }
+
+-- 1.3.6.1.4.1.2011.5.25.31.1.1.39.1.24
+        hwIntegratedPwrChip3UpgrageStatus OBJECT-TYPE
+                SYNTAX INTEGER
+                {
+                    normal(0),
+	 abnormal(1)
+                }
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "This object indicates the power chip 3 upgrage status."
+                ::= { hwIntegratedPowerEntry 24 }
+
+-- 1.3.6.1.4.1.2011.5.25.31.1.1.39.1.25
+        hwIntegratedPwrChip4UpgrageStatus OBJECT-TYPE
+                SYNTAX INTEGER
+                {
+                    normal(0),
+	 abnormal(1)
+                }
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "This object indicates the power chip 4 upgrage status."
+                ::= { hwIntegratedPowerEntry 25 }
+
+-- 1.3.6.1.4.1.2011.5.25.31.1.1.39.1.26
+        hwIntegratedPowerResetOutput OBJECT-TYPE
+                SYNTAX INTEGER
+                {
+                    normal(0),
+                    reset(1)
+                }
+                MAX-ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                    "This object is used to reset power output."
+                ::= { hwIntegratedPowerEntry 26 }
+				
+-- 1.3.6.1.4.1.2011.5.25.31.1.1.40
+		hwLithiumBatteryGroupTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwLithiumBatteryGroupEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This table describes information about lithium battery groups."
+			::= { hwEntityState 40 }
+		
+-- 1.3.6.1.4.1.2011.5.25.31.1.1.40.1
+		hwLithiumBatteryGroupEntry OBJECT-TYPE
+			SYNTAX HwLithiumBatteryGroupEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This entry describes information about lithium battery groups."
+			INDEX { entPhysicalIndex }
+			::= { hwLithiumBatteryGroupTable 1 }
+		
+		HwLithiumBatteryGroupEntry ::=
+			SEQUENCE { 
+				hwBatteryGroupBatteryStatus
+					INTEGER,
+				hwBatteryGroupBatteryVolt
+					Integer32,
+				hwBatteryGroupBatteryCurrent
+					Integer32,
+				hwBatteryGroupTotalBatteryCapacity
+					Integer32,
+				hwBatteryGroupAvailableBatteryCapacity
+					OCTET STRING,
+				hwBatteryGroupBatteryTemperature
+					OCTET STRING,
+				hwBatteryGroupBatteryRunTime
+					OCTET STRING,
+				hwBatteryGroupNumberOfConnectedESMU 
+					Integer32,
+				hwBatteryGroupChargeCurrentLimitCoefficient
+					OCTET STRING,
+				hwBatteryGroupFloatChargingVolt
+					Integer32,
+				hwBatteryGroupEqualizedChargingVolt
+	                                Integer32,
+				hwBatteryGroupInstallTimeYear
+					Integer32,
+				hwBatteryGroupInstallTimeMonth
+					Integer32,
+				hwBatteryGroupInstallTimeDay
+					Integer32
+			 }
+
+-- 1.3.6.1.4.1.2011.5.25.31.1.1.40.1.1
+		hwBatteryGroupBatteryStatus OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				firstPowerOn(0),
+				powerOff(1),
+				floatCharging(2),
+				equalizedCharging(3),
+				discharging(4)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the battery status."
+			::= { hwLithiumBatteryGroupEntry 1 }
+		
+-- 1.3.6.1.4.1.2011.5.25.31.1.1.40.1.2
+		hwBatteryGroupBatteryVolt OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the battery voltage, in mV."
+			::= { hwLithiumBatteryGroupEntry 2 }
+		
+-- 1.3.6.1.4.1.2011.5.25.31.1.1.40.1.3
+		hwBatteryGroupBatteryCurrent OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the battery current, in mA."
+			::= { hwLithiumBatteryGroupEntry 3 }
+		
+-- 1.3.6.1.4.1.2011.5.25.31.1.1.40.1.4
+		hwBatteryGroupTotalBatteryCapacity OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the total battery capacity, in Ah."
+			::= { hwLithiumBatteryGroupEntry 4 }
+		
+-- 1.3.6.1.4.1.2011.5.25.31.1.1.40.1.5
+		hwBatteryGroupAvailableBatteryCapacity OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the available battery capacity, in percentage."
+			::= { hwLithiumBatteryGroupEntry 5 }
+		
+-- 1.3.6.1.4.1.2011.5.25.31.1.1.40.1.6
+		hwBatteryGroupBatteryTemperature OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the battery temperature, in degC."
+			::= { hwLithiumBatteryGroupEntry 6 }
+		
+-- 1.3.6.1.4.1.2011.5.25.31.1.1.40.1.7
+		hwBatteryGroupBatteryRunTime OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the battery run time, in hours."
+			::= { hwLithiumBatteryGroupEntry 7 }
+		
+-- 1.3.6.1.4.1.2011.5.25.31.1.1.40.1.8
+		hwBatteryGroupNumberOfConnectedESMU  OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the number of connected ESMUs."
+			::= { hwLithiumBatteryGroupEntry 8 }
+		
+-- 1.3.6.1.4.1.2011.5.25.31.1.1.40.1.9
+		hwBatteryGroupChargeCurrentLimitCoefficient OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This object indicates the charge current limit coefficient, in C10."
+			::= { hwLithiumBatteryGroupEntry 9 }
+		
+-- 1.3.6.1.4.1.2011.5.25.31.1.1.40.1.10
+		hwBatteryGroupFloatChargingVolt OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This object indicates the float charging voltage, in mV."
+			::= { hwLithiumBatteryGroupEntry 10 }
+		
+-- 1.3.6.1.4.1.2011.5.25.31.1.1.40.1.11
+		hwBatteryGroupEqualizedChargingVolt OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This object indicates the equalized charging voltage, in mV."
+			::= { hwLithiumBatteryGroupEntry 11 }
+
+-- 1.3.6.1.4.1.2011.5.25.31.1.1.40.1.12
+		hwBatteryGroupInstallTimeYear OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This object indicates the battery install time year."
+			::= { hwLithiumBatteryGroupEntry 12 }
+			
+-- 1.3.6.1.4.1.2011.5.25.31.1.1.40.1.13
+		hwBatteryGroupInstallTimeMonth OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This object indicates the battery install time month."
+			::= { hwLithiumBatteryGroupEntry 13 }
+			
+-- 1.3.6.1.4.1.2011.5.25.31.1.1.40.1.14
+		hwBatteryGroupInstallTimeDay OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This object indicates the battery install time day."
+			::= { hwLithiumBatteryGroupEntry 14 }
+		
+-- 1.3.6.1.4.1.2011.5.25.31.1.1.41
+		hwLithiumBatteryTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwLithiumBatteryEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This table describes information about a single lithium battery."
+			::= { hwEntityState 41 }
+		
+-- 1.3.6.1.4.1.2011.5.25.31.1.1.41.1
+		hwLithiumBatteryEntry OBJECT-TYPE
+			SYNTAX HwLithiumBatteryEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This entry describes information about a single lithium battery."
+			INDEX { entPhysicalIndex }
+			::= { hwLithiumBatteryTable 1 }
+		
+		HwLithiumBatteryEntry ::=
+			SEQUENCE { 
+				hwLithiumBatteryIndex
+					Integer32,
+				hwLithiumBatteryVolt
+					Integer32,
+				hwLithiumBatteryCurrent
+					Integer32,
+				hwLithiumBatteryDeviceAddr
+					Integer32,
+				hwLithiumBatteryStatus
+					INTEGER,
+				hwLithiumBatterySOH
+					OCTET STRING,
+				hwLithiumBatteryCapacity
+					Integer32,
+				hwLithiumBatteryCellPackageVolt
+					Integer32,
+				hwLithiumBatteryMaxLimitCoefficient
+					OCTET STRING,
+				hwLithiumBatteryVersion
+					OCTET STRING
+			 }
+
+-- 1.3.6.1.4.1.2011.5.25.31.1.1.41.1.1
+		hwLithiumBatteryIndex OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the battery index."
+			::= { hwLithiumBatteryEntry 1 }
+		
+-- 1.3.6.1.4.1.2011.5.25.31.1.1.41.1.2
+		hwLithiumBatteryVolt OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the battery voltage, in mV."
+			::= { hwLithiumBatteryEntry 2 }
+		
+-- 1.3.6.1.4.1.2011.5.25.31.1.1.41.1.3
+		hwLithiumBatteryCurrent OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the battery current, in mA."
+			::= { hwLithiumBatteryEntry 3 }
+		
+-- 1.3.6.1.4.1.2011.5.25.31.1.1.41.1.4
+		hwLithiumBatteryDeviceAddr OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the device address."
+			::= { hwLithiumBatteryEntry 4 }
+		
+-- 1.3.6.1.4.1.2011.5.25.31.1.1.41.1.5
+		hwLithiumBatteryStatus OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				offline(0),
+				online(1),
+				hibernation(2),
+				disconnected(3),
+				charge(4),
+				discharging(5)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the battery status."
+			::= { hwLithiumBatteryEntry 5 }
+		
+-- 1.3.6.1.4.1.2011.5.25.31.1.1.41.1.6
+		hwLithiumBatterySOH OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the battery SOH, in percentage."
+			::= { hwLithiumBatteryEntry 6 }
+		
+-- 1.3.6.1.4.1.2011.5.25.31.1.1.41.1.7
+		hwLithiumBatteryCapacity OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the battery capacity, in Ah."
+			::= { hwLithiumBatteryEntry 7 }
+		
+-- 1.3.6.1.4.1.2011.5.25.31.1.1.41.1.8
+		hwLithiumBatteryCellPackageVolt OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the electrochemical cell package voltage, in mV."
+			::= { hwLithiumBatteryEntry 8 }
+		
+-- 1.3.6.1.4.1.2011.5.25.31.1.1.41.1.9
+		hwLithiumBatteryMaxLimitCoefficient OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the maximum allowable current limiting coefficient, in C10."
+			::= { hwLithiumBatteryEntry 9 }
+
+-- 1.3.6.1.4.1.2011.5.25.31.1.1.41.1.10
+		hwLithiumBatteryVersion OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the battery version."
+			::= { hwLithiumBatteryEntry 10}
+			
+-- 1.3.6.1.4.1.2011.5.25.31.1.1.42
+		hwBatteryChipTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwBatteryChipEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This table describes information about a single battery chip."
+			::= { hwEntityState 42 }
+		
+-- 1.3.6.1.4.1.2011.5.25.31.1.1.42.1
+		hwBatteryChipEntry OBJECT-TYPE
+			SYNTAX HwBatteryChipEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This entry describes information about a single battery chip."
+			INDEX { entPhysicalIndex }
+			::= { hwBatteryChipTable 1 }
+		
+		HwBatteryChipEntry ::=
+			SEQUENCE { 
+				hwBatteryChipVolt
+					Integer32,
+				hwBatteryChipTemp
+					OCTET STRING
+			 }
+
+-- 1.3.6.1.4.1.2011.5.25.31.1.1.42.1.1
+		hwBatteryChipVolt OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the battery chip voltage, in mv."
+			::= { hwBatteryChipEntry 1 }
+		
+-- 1.3.6.1.4.1.2011.5.25.31.1.1.42.1.2
+		hwBatteryChipTemp OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the battery chip temperature, in degC."
+			::= { hwBatteryChipEntry 2 }
+	
         -- 1.3.6.1.4.1.2011.5.25.31.8
 
         hwPreDisposeObjects OBJECT IDENTIFIER ::= { hwEntityExtentMIB 8 }
@@ -6587,3 +8028,17 @@
 --
 -- HUAWEI-ENTITY-EXTENT-MIB.mib
 --
+
+
+
+
+
+
+
+
+
+
+
+
+
+

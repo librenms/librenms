@@ -64,6 +64,9 @@
                                             "integer",
                                             "string"
                                         ]
+                                    },
+                                    "snmp_no_Ih_flag": {
+                                        "type": "string"
                                     }
                                 },
                                 "additionalProperties": false
@@ -154,7 +157,8 @@
                                     },
                                     "value": {"$ref": "#/definitions/oid"},
                                     "type": {
-                                        "type": "string"
+                                        "type": "string",
+                                        "maxLength": 16
                                     },
                                     "skip_values": {
                                         "$ref": "#/definitions/skip_values"
@@ -170,6 +174,9 @@
                                             "string",
                                             "array"
                                         ]
+                                    },
+                                    "snmp_no_Ih_flag": {
+                                        "type": "string"
                                     }
                                 },
                                 "additionalProperties": false,
@@ -223,7 +230,7 @@
                                             },
                                             "num_oid": {
                                                 "type": "string",
-                                                "pattern": "^(\\.\\d+)+(\\.?\\{\\{ \\$index \\}\\})?(\\.\\d+)*$"
+                                                "pattern": "^(\\.\\d+)+(\\.?\\{\\{ \\$(index|str_index_as_numeric|subindex\\d) \\}\\})?(\\.\\d+)*$"
                                             },
                                             "descr": {
                                                 "type": "string"
@@ -283,6 +290,10 @@
                                                 "type": ["integer", "string"]
                                             },
                                             "entPhysicalIndex_measured": {
+                                                "type": [ "string", "null" ],
+                                                "enum": [ "ports", null ]
+                                            },
+                                            "snmp_no_Ih_flag": {
                                                 "type": "string"
                                             }
                                         },
@@ -318,6 +329,9 @@
                                                     "string",
                                                     "array"
                                                 ]
+                                            },
+                                            "snmp_no_Ih_flag": {
+                                                "type": "string"
                                             }
                                         },
                                         "additionalProperties": false,
@@ -378,6 +392,9 @@
                         "string",
                         "array"
                     ]
+                },
+                "snmp_no_Ih_flag": {
+                    "type": "string"
                 }
             },
             "additionalProperties": false,
@@ -398,7 +415,7 @@
                             },
                             "num_oid": {
                                 "type": "string",
-                                "pattern": "^(\\.\\d+)+\\.?\\{\\{ \\$index \\}\\}(\\.\\d+)*$"
+                                "pattern": "^(\\.\\d+)+(\\.?\\{\\{ \\$(index|str_index_as_numeric) \\}\\})?(\\.\\d+)*$"
                             },
                             "index": {
                                 "type": ["integer", "string"]
@@ -454,9 +471,13 @@
                                 "type": ["integer", "string"]
                             },
                             "entPhysicalIndex_measured": {
-                                "type": "string"
+                                "type": [ "string", "null" ],
+                                "enum": [ "ports", null ]
                             },
                             "user_func": {
+                                "type": "string"
+                            },
+                            "snmp_no_Ih_flag": {
                                 "type": "string"
                             }
                         },

@@ -478,70 +478,6 @@
                     "mempool_class": "buffers",
                     "mempool_precision": 1024,
                     "mempool_descr": "Memory buffers",
-                    "mempool_perc": 92,
-                    "mempool_perc_oid": null,
-                    "mempool_used": 13979648,
-                    "mempool_used_oid": ".1.3.6.1.4.1.2021.4.14.0",
-                    "mempool_free": 1236992,
-                    "mempool_free_oid": null,
-                    "mempool_total": 15216640,
-                    "mempool_total_oid": null,
-                    "mempool_largestfree": null,
-                    "mempool_lowestfree": null,
-                    "mempool_deleted": 0,
-                    "mempool_perc_warn": null
-                },
-                {
-                    "mempool_index": "4",
-                    "entPhysicalIndex": null,
-                    "mempool_type": "ucd",
-                    "mempool_class": "cached",
-                    "mempool_precision": 1024,
-                    "mempool_descr": "Cached memory",
-                    "mempool_perc": 60,
-                    "mempool_perc_oid": null,
-                    "mempool_used": 9084928,
-                    "mempool_used_oid": ".1.3.6.1.4.1.2021.4.15.0",
-                    "mempool_free": 6131712,
-                    "mempool_free_oid": null,
-                    "mempool_total": 15216640,
-                    "mempool_total_oid": null,
-                    "mempool_largestfree": null,
-                    "mempool_lowestfree": null,
-                    "mempool_deleted": 0,
-                    "mempool_perc_warn": null
-                }
-            ]
-        },
-        "poller": {
-            "mempools": [
-                {
-                    "mempool_index": "1",
-                    "entPhysicalIndex": null,
-                    "mempool_type": "ucd",
-                    "mempool_class": "system",
-                    "mempool_precision": 1024,
-                    "mempool_descr": "Physical memory",
-                    "mempool_perc": 44,
-                    "mempool_perc_oid": null,
-                    "mempool_used": 6680576,
-                    "mempool_used_oid": null,
-                    "mempool_free": 8536064,
-                    "mempool_free_oid": ".1.3.6.1.4.1.2021.4.6.0",
-                    "mempool_total": 15216640,
-                    "mempool_total_oid": null,
-                    "mempool_largestfree": null,
-                    "mempool_lowestfree": null,
-                    "mempool_deleted": 0,
-                    "mempool_perc_warn": null
-                },
-                {
-                    "mempool_index": "3",
-                    "entPhysicalIndex": null,
-                    "mempool_type": "ucd",
-                    "mempool_class": "buffers",
-                    "mempool_precision": 1024,
-                    "mempool_descr": "Memory buffers",
                     "mempool_perc": 8,
                     "mempool_perc_oid": null,
                     "mempool_used": 1236992,
@@ -576,7 +512,8 @@
                     "mempool_perc_warn": null
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "sensors": {
         "discovery": {

@@ -14,23 +14,23 @@ $rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Demand',
-        'ds'       => 'demand_misses_per',
+        'descr' => 'Demand',
+        'ds' => 'demand_misses_per',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Prefetch',
-        'ds'       => 'pre_misses_per',
+        'descr' => 'Prefetch',
+        'ds' => 'pre_misses_per',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Demand Meta',
-        'ds'       => 'meta_misses_per',
+        'descr' => 'Demand Meta',
+        'ds' => 'meta_misses_per',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Prefetch Meta',
-        'ds'       => 'pre_meta_misses_per',
+        'descr' => 'Prefetch Meta',
+        'ds' => 'pre_meta_misses_per',
     ];
 } else {
     d_echo('RRD "' . $rrd_filename . '" not found');

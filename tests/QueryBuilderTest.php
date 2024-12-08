@@ -33,7 +33,7 @@ class QueryBuilderTest extends TestCase
 {
     private $data_file = 'tests/data/misc/querybuilder.json';
 
-    public function testHasQueryData()
+    public function testHasQueryData(): void
     {
         $this->assertNotEmpty(
             $this->loadQueryData(),
@@ -49,7 +49,7 @@ class QueryBuilderTest extends TestCase
      * @param  string  $display
      * @param  string  $sql
      */
-    public function testQueryConversion($legacy, $builder, $display, $sql, $query)
+    public function testQueryConversion($legacy, $builder, $display, $sql, $query): void
     {
         if (! empty($legacy)) {
             // some rules don't have a legacy representation

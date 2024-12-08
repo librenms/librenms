@@ -39,6 +39,7 @@ Create a new class in `LibreNMS\Snmptrap\Handlers` that implements the
 namespace LibreNMS\Snmptrap\Handlers;
 
 use App\Models\Device;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
 
@@ -54,7 +55,7 @@ class ColdBoot implements SnmptrapHandler
      */
     public function handle(Device $device, Trap $trap)
     {
-        $trap->log('SNMP Trap: Device ' . $device->displayName() . ' cold booted', $device->device_id, 'reboot', 4);
+        $trap->log('SNMP Trap: Device ' . $device->displayName() . ' cold booted', $device->device_id, 'reboot', Severity::Warning);
     }
 }
 
@@ -63,11 +64,11 @@ class ColdBoot implements SnmptrapHandler
 where number on the end means color of the eventlog:
 
 ```
-1 green
-2 cyan
-3 blue
-4 yellow
-5 red
+Severity::Ok = green
+Severity::Info = cyan
+Severity::Notice = blue
+Severity::Warning = yellow
+Severity::Error = red
 ```
 
 Register the mapping in the `config/snmptraps.php` file. Make sure to

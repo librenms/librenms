@@ -23,10 +23,17 @@ $transparency = $transparency ?? false;
 $stack = $stack ?? '';
 
 $rrd_optionsb = '';
+$in_thing = '';
+$out_thing = '';
 $in_thingX = '';
 $out_thingX = '';
+$plus = '';
+$pluses = '';
 $plusesX = '';
 $rrddescr_len = 14; // length of the padded rrd_descr in legend
+$seperator = '';
+$descr = '';
+$descr_out = '';
 
 if ($width > '1500') {
     $rrddescr_len = 30;
@@ -40,7 +47,7 @@ if ($width > '1500') {
 
 $stacked = generate_stacked_graphs();
 
-$units_descr = \LibreNMS\Data\Store\Rrd::fixedSafeDescr($units_descr, $rrddescr_len + 5);
+$units_descr = \LibreNMS\Data\Store\Rrd::fixedSafeDescr($units_descr ?? '', $rrddescr_len + 5);
 
 if ($format == 'octets' || $format == 'bytes') {
     $units = 'Bps';
@@ -89,16 +96,8 @@ foreach ($rrd_list ?? [] as $rrd) {
         $iter = 0;
     }
 
-    $colour_in = Config::get("graph_colours.$colours_in.$iter");
-    $colour_out = Config::get("graph_colours.$colours_out.$iter");
-
-    if ($rrd['colour_area_in']) {
-        $colour_in = $rrd['colour_area_in'];
-    }
-
-    if ($rrd['colour_area_out']) {
-        $colour_out = $rrd['colour_area_out'];
-    }
+    $colour_in = $rrd['colour_area_in'] ?? Config::get("graph_colours.$colours_in.$iter");
+    $colour_out = $rrd['colour_area_out'] ?? Config::get("graph_colours.$colours_out.$iter");
 
     $rrd_options .= ' DEF:inB' . $i . '=' . $rrd['filename'] . ':' . $rrd['ds_in'] . ':AVERAGE ';
     $rrd_options .= ' DEF:outB' . $i . '=' . $rrd['filename'] . ':' . $rrd['ds_out'] . ':AVERAGE ';

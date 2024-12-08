@@ -57,6 +57,7 @@ This means you can use:
 - `#` Can be used for main headings which translates to a `<h1>` tag,
   increasing the `#`'s will increase the hX tags.
 - `###` Can be used for sub-headings which will appear in the TOC to the left.
+- Settings should be prefixed with `!!! setting "<webui setting path>"`
 
 [Markdown CheatSheet Link](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet)
 

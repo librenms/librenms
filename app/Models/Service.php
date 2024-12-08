@@ -31,6 +31,18 @@ class Service extends DeviceRelatedModel
      * @param  Builder  $query
      * @return Builder
      */
+    public function scopeIsActive($query)
+    {
+        return $query->where([
+            ['service_ignore', '=', 0],
+            ['service_disabled', '=', 0],
+        ]);
+    }
+
+    /**
+     * @param  Builder  $query
+     * @return Builder
+     */
     public function scopeIsOk($query)
     {
         return $query->where([

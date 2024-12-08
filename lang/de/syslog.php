@@ -12,7 +12,7 @@ return [
         '7' => 'Debug',
     ],
     'facility' => [
-        '0' => 'kernel Meldung',
+        '0' => 'Kernel Meldung',
         '1' => 'user-level Meldung',
         '2' => 'mail-system',
         '3' => 'system daemons',

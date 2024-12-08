@@ -28,9 +28,9 @@ foreach ($rrd_filenames as $file) {
     [$host, $port] = explode('_', $hostname, 2);
     $rrd_list[] = [
         'filename' => $file,
-        'descr'    => $host . ':' . $port,
-        'ds_in'    => $ds_in,
-        'ds_out'   => $ds_out,
+        'descr' => $host . ':' . $port,
+        'ds_in' => $ds_in,
+        'ds_out' => $ds_out,
     ];
 }
 

@@ -14,29 +14,20 @@ namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
 use LibreNMS\Config;
-use LibreNMS\Util\Proxy;
+use LibreNMS\Exceptions\AlertTransportDeliveryException;
+use LibreNMS\Util\Http;
 
 class Osticket extends Transport
 {
-    protected $name = 'osTicket';
+    protected string $name = 'osTicket';
 
-    public function deliverAlert($obj, $opts)
+    public function deliverAlert(array $alert_data): bool
     {
-        if (! empty($this->config)) {
-            $opts['url'] = $this->config['os-url'];
-            $opts['token'] = $this->config['os-token'];
-        }
-
-        return $this->contactOsticket($obj, $opts);
-    }
-
-    public function contactOsticket($obj, $opts)
-    {
-        $url = $opts['url'];
-        $token = $opts['token'];
+        $url = $this->config['os-url'];
+        $token = $this->config['os-token'];
         $email = '';
 
-        foreach (parse_email(Config::get('email_from')) as $from => $from_name) {
+        foreach (\LibreNMS\Util\Mail::parseEmails(Config::get('email_from')) as $from => $from_name) {
             $email = $from_name . ' <' . $from . '>';
             break;
         }
@@ -44,34 +35,24 @@ class Osticket extends Transport
         $protocol = [
             'name' => 'LibreNMS',
             'email' => $email,
-            'subject' => ($obj['name'] ? $obj['name'] . ' on ' . $obj['hostname'] : $obj['title']),
-            'message' => strip_tags($obj['msg']),
+            'subject' => ($alert_data['name'] ? $alert_data['name'] . ' on ' . $alert_data['hostname'] : $alert_data['title']),
+            'message' => strip_tags($alert_data['msg']),
             'ip' => $_SERVER['REMOTE_ADDR'],
             'attachments' => [],
         ];
-        $curl = curl_init();
-        Proxy::applyToCurl($curl);
-        curl_setopt($curl, CURLOPT_URL, $url);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($curl, CURLOPT_HTTPHEADER, [
-            'Content-type' => 'application/json',
-            'Expect:',
-            'X-API-Key: ' . $token,
-        ]);
-        curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($protocol));
-        $ret = curl_exec($curl);
-        $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 
-        if ($code != 201) {
-            var_dump('osTicket returned Error, retry later');
+        $res = Http::client()->withHeaders([
+            'X-API-Key' => $token,
+        ])->post($url, $protocol);
 
-            return false;
+        if ($res->successful()) {
+            return true;
         }
 
-        return true;
+        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $alert_data['msg'], $protocol);
     }
 
-    public static function configTemplate()
+    public static function configTemplate(): array
     {
         return [
             'config' => [
@@ -85,7 +66,7 @@ class Osticket extends Transport
                     'title' => 'API Token',
                     'name' => 'os-token',
                     'descr' => 'osTicket API Token',
-                    'type' => 'text',
+                    'type' => 'password',
                 ],
             ],
             'validation' => [

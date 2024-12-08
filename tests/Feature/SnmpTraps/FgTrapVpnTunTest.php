@@ -28,6 +28,7 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 use App\Models\Device;
 use App\Models\Ipv4Address;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Tests\Traits\RequiresDatabase;
 
 class FgTrapVpnTunTest extends SnmpTrapTestCase
@@ -50,7 +51,7 @@ FORTINET-FORTIGATE-MIB::fgVpnTrapRemoteGateway.0 $ipv4->ipv4_address
 FORTINET-FORTIGATE-MIB::fgVpnTrapPhase1Name.0 test_tunnel_down",
             "VPN tunnel test_tunnel_down to $ipv4->ipv4_address is down",
             'Could not handle fgTrapVpnTunDown',
-            [3],
+            [Severity::Notice],
             $device,
         );
     }
@@ -69,7 +70,7 @@ FORTINET-FORTIGATE-MIB::fgVpnTrapRemoteGateway.0 $ipv4->ipv4_address
 FORTINET-FORTIGATE-MIB::fgVpnTrapPhase1Name.0 test_tunnel_up",
             "VPN tunnel test_tunnel_up to $ipv4->ipv4_address is up",
             'Could not handle fgTrapVpnTunUp',
-            [1],
+            [Severity::Ok],
             $device,
         );
     }

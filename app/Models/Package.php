@@ -50,4 +50,9 @@ class Package extends DeviceRelatedModel implements Keyable
     {
         return $this->name . ' (' . $this->arch . ') version ' . $this->version . ($this->build ? "-$this->build" : '');
     }
+
+    public function isValid(): bool
+    {
+        return $this->name && $this->manager && $this->arch && $this->version;
+    }
 }

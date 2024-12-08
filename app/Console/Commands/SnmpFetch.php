@@ -5,7 +5,6 @@ namespace App\Console\Commands;
 use App\Console\LnmsCommand;
 use App\Models\Device;
 use DeviceCache;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Arr;
 use Illuminate\Validation\Rule;
 use LibreNMS\Data\Source\SnmpResponse;
@@ -32,7 +31,7 @@ abstract class SnmpFetch extends LnmsCommand
         parent::__construct();
         $this->addArgument('device spec', InputArgument::REQUIRED, trans('commands.snmp:fetch.arguments.device spec'));
         $this->addArgument('oid(s)', InputArgument::OPTIONAL | InputArgument::IS_ARRAY, trans('commands.snmp:fetch.arguments.oid(s)'));
-        $this->addOption('output', 'o', InputOption::VALUE_REQUIRED, trans('commands.snmp:fetch.options.output', ['formats' => '[value, values, table]']));
+        $this->addOption('output', 'o', InputOption::VALUE_REQUIRED, trans('commands.snmp:fetch.options.output', ['formats' => '[value, values, table, index-table]']));
         $this->addOption('depth', 'd', InputOption::VALUE_REQUIRED, trans('commands.snmp:fetch.options.depth'), 1);
         $this->addOption('numeric', 'i', InputOption::VALUE_NONE, trans('commands.snmp:fetch.options.numeric'));
     }
@@ -49,9 +48,13 @@ abstract class SnmpFetch extends LnmsCommand
         $this->type = substr($this->name, 5); // 'snmp:<type>'
         $this->deviceSpec = $this->argument('device spec');
         $this->oids = $this->argument('oid(s)') ?: [];
-        $this->numeric = $this->option('numeric');
-        $this->outputFormat = $this->option('output') ?: ($this->type == 'walk' ? 'table' : 'value');
+        $this->numeric = $this->hasOption('numeric') ? $this->option('numeric') : null;  // // @phpstan-ignore-line larastan.console.undefinedOption
         $this->depth = (int) $this->option('depth');
+        $this->outputFormat = $this->option('output') ?: match ($this->type) {
+            'walk' => 'table',
+            'translate' => 'values',
+            default => 'value',
+        };
 
         $devices = $this->getDevices();
 
@@ -64,15 +67,12 @@ abstract class SnmpFetch extends LnmsCommand
         $return = 0;
 
         foreach ($devices as $device) {
-            if ($device->exists) {
-                DeviceCache::setPrimary($device->device_id);
-            }
             $device_name = $device->displayName();
             if ($device_name) {
                 $this->info($device_name . ':');
             }
 
-            $res = $this->fetchData();
+            $res = $this->fetchData($device);
 
             if (! $res->isValid()) {
                 $this->warn(trans('commands.snmp:fetch.failed'));
@@ -89,14 +89,19 @@ abstract class SnmpFetch extends LnmsCommand
 
                     continue 2;
                 case 'values':
-                    $values = [];
-                    foreach ($res->values() as $oid => $value) {
-                        $values[] = ["<fg=bright-blue>$oid</>", $value];
+                    $values = array_map(fn ($value, $oid) => ["<fg=bright-blue>$oid</>", $value], $res->values(), array_keys($res->values()));
+
+                    if (count($values) === 1) {
+                        [$oid, $value] = array_pop($values);
+                        $this->line("$oid = $value");
+
+                        continue 2;
                     }
-                    $this->table(
-                        [trans('commands.snmp:fetch.oid'), trans('commands.snmp:fetch.value')],
-                        $values
-                    );
+
+                    $headers = $this->type == 'translate'
+                        ? [__('commands.snmp:fetch.textual'), __('commands.snmp:fetch.numeric')]
+                        : [__('commands.snmp:fetch.oid'), __('commands.snmp:fetch.value')];
+                    $this->table($headers, $values);
 
                     continue 2;
                 case 'table':
@@ -149,20 +154,18 @@ abstract class SnmpFetch extends LnmsCommand
 
     protected function getDevices(): \Illuminate\Support\Collection
     {
-        return Device::query()->when($this->deviceSpec !== 'all', function (Builder $query) {
-            return $query->where('device_id', $this->deviceSpec)
-                ->orWhere('hostname', 'regexp', "^$this->deviceSpec$");
-        })->pluck('device_id')->map(function ($device_id) {
-            return DeviceCache::get($device_id);
-        });
+        return Device::whereDeviceSpec($this->deviceSpec)->pluck('device_id')
+            ->map(fn ($device_id) => DeviceCache::get($device_id));
     }
 
-    protected function fetchData(): SnmpResponse
+    protected function fetchData(Device $device): SnmpResponse
     {
         $type = $this->type;
 
         return SnmpQuery::make()
+            ->enumStrings()
             ->numeric($this->numeric)
+            ->device($device)
             ->$type($this->oids);
     }
 

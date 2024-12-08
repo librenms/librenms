@@ -16,13 +16,13 @@ $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, $var
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Temperature_Celsius',
-        'ds'       => 'id194',
+        'descr' => 'Temperature_Celsius',
+        'ds' => 'id194',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Airflow_Temperature_Cel',
-        'ds'       => 'id190',
+        'descr' => 'Airflow_Temperature_Cel',
+        'ds' => 'id190',
     ];
 }
 

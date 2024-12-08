@@ -1,8 +1,6 @@
 <?php
 
-$perf = \DeviceCache::getPrimary()->perf;
-
-if ($perf->isNotEmpty()) {
+if (Rrd::checkRrdExists(Rrd::name(DeviceCache::getPrimary()->hostname, 'icmp-perf'))) {
     $perf_url = Url('device') . '/device=' . DeviceCache::getPrimary()->device_id . '/tab=graphs/group=poller/';
     echo '
         <div class="row">
@@ -18,7 +16,7 @@ if ($perf->isNotEmpty()) {
 
     $graph = \App\Http\Controllers\Device\Tabs\OverviewController::setGraphWidth([
         'device' => DeviceCache::getPrimary()->device_id,
-        'type' => 'device_ping_perf',
+        'type' => 'device_icmp_perf',
         'from' => \LibreNMS\Config::get('time.day'),
         'legend' => 'yes',
         'popup_title' => DeviceCache::getPrimary()->hostname . ' - Ping Response',

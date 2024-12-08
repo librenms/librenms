@@ -26,6 +26,7 @@
 namespace LibreNMS\Snmptrap\Handlers;
 
 use App\Models\Device;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
 use Log;
@@ -50,6 +51,6 @@ class UpsmgUtilityFailure implements SnmptrapHandler
         }
         $sensor->sensor_current = 1;
         $sensor->save();
-        $trap->log('UPS power failed, state sensor ' . $sensor->sensor_descr . ' has changed to ' . $sensor->sensor_current . '.', 5, 'Power');
+        $trap->log('UPS power failed, state sensor ' . $sensor->sensor_descr . ' has changed to ' . $sensor->sensor_current . '.', Severity::Error, 'Power');
     }
 }

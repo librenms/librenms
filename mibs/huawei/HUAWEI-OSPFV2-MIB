@@ -1,9 +1,9 @@
 -- ==================================================================
--- Copyright (C) 2017 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2022 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- 
 -- Description: HUAWEI-OSPFV2-MIB provides information about OSPFv2
 -- Reference:
--- Version: V2.16
+-- Version: V2.27
 -- History:
 -- <author>,   <date>,  <contents>
 --  HUAWEI   2008-1-05  OSPF private MIB
@@ -32,7 +32,7 @@
     
 
         hwOspfv2MIB MODULE-IDENTITY 
-            LAST-UPDATED "201708172002Z"      
+            LAST-UPDATED "202208151236Z"      
             ORGANIZATION 
                 "Huawei Technologies Co.,Ltd."
             CONTACT-INFO 
@@ -48,6 +48,44 @@
                 It defines the model used to represent configuration data that exists elsewhere 
                 in the system and on peripheral devices. The MIB is proper for system configuration.
                 There are no constraints on this MIB."
+
+            REVISION "202208151236Z"
+            DESCRIPTION "Added object hwOspfv2NbrThresholdUpper, hwOspfv2NbrExceedThreshold, hwOspfv2NbrExceedThresholdClear"
+
+            REVISION "202204202030Z"
+            DESCRIPTION "Modify hwOspfPrefixSidConflict, hwOspfPrefixSidConflictClear"         
+
+            REVISION "202204061538Z"
+            DESCRIPTION "Added hwOspfPrefixSidConflict, hwOspfPrefixSidConflictClear"
+
+	    REVISION "202203091538Z"
+            DESCRIPTION "Added hwOspfv2LinkCostAdjustment, hwOspfv2LinkCostAdjustmentClear, hwOspfCostAdjustReason, hwOspfOriginalCost, hwOspfAdjustedCost"
+
+	    REVISION "202203031538Z"
+            DESCRIPTION "Added hwOspfv2LinkCostAdjustment, hwOspfv2LinkCostAdjustmentClear, hwOspfCostAdjustReason, hwOspfOriginalCost, hwOspfAdjustedCost"
+        
+        REVISION "202105071018Z"
+	    DESCRIPTION "Added hwOspfv2IntfAuthModeType, hwOspfv2VLinkTable"
+	    
+	    REVISION "202101051447Z"
+            DESCRIPTION "Added hwOspfv2RouteLoopDetected, hwOspfv2RouteLoopDetectedClear, hwOspfv2LoopDetectType, hwOspfv2LoopDetectProtocolAttr, hwOspfv2LoopDetectRedistributeID1, hwOspfv2LoopDetectRedistributeID2"
+	    
+	    REVISION "202007272045Z"
+            DESCRIPTION "Modify hwOspfv2MIBBinding, hwOspfv2ActualRouterId, hwOspfv2LsaOrigIntvl, hwOspfv2AreaI, hwOspfv2AreaNssaNoImportRoute, hwOspfv2AreaAuthModeType, hwOspfv2SelfRouterId, hwOspfv2AreaId, hwOspfv2NewRouterId, hwOspfv2LsaId description format" 
+            
+            REVISION "202007201750Z"
+            DESCRIPTION "change hwOspfv2SelfIfnetIndex type" 
+	    
+            REVISION "202001031750Z"
+            DESCRIPTION "Added 		            
+	                hwOspfv2AuthModeInsecure,
+		            hwOspfv2AuthModeInsecureClear " 
+
+            REVISION "201807241502Z"
+            DESCRIPTION "Change the max length of hwOspfv2AreaFilterExpPolicy from 40 to 200
+                                       Change the max length of hwOspfv2AreaFilterImpPolicy from 40 to 200
+                                       Change the max length of hwOspfv2AreaFilterExpAclName from 32 to 64
+                                       Change the max length of hwOspfv2AreaFilterImpAclName from 32 to 64"
 
             REVISION "201708172002Z"
             DESCRIPTION "modify hwospfv2ProcessFullPeerNumber,hwospfv2ProcessPeerUpCount,hwospfv2ProcessPeerDownCount,hwospfv2InterfacePeerUpCount,hwospfv2InterfacePeerDownCount,hwOspfv2ImportNssaRouteExceed,hwOspfv2ImportNssaRouteExceedClear,hwOspfv2LsdbApproachingOverflow,hwOspfv2LsdbApproachingOverflowClear,hwOspfv2LsdbOverflow,hwOspfv2LsdbOverflowClear discription.	"	
@@ -162,9 +200,7 @@
             MAX-ACCESS read-write
             STATUS current
             DESCRIPTION
-                "The ID of OSPF process that is bound to OSPF public MIB and the process will respond to
-                SNMP requests from OSPF public MIB. The default value 0 means that no process is bound
-                to OSPF public MIB."
+                "The ID of OSPF process that is bound to OSPF public MIB and the process will respond to SNMP requests from OSPF public MIB. The default value 0 means that no process is bound to OSPF public MIB."
             ::= { hwOspfv2MIBObjects 1 }
         
         hwOspfv2ChangeTable OBJECT IDENTIFIER ::= { hwOspfv2MIB 2 }
@@ -323,10 +359,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "This node is used to get actual router ID of process and it is a read-only
-                node. If the node hwOspfv2ConfigRouterId is not set, the actual router ID should
-                default to the value of one of the router's IP interface addresses. By default, 
-                the value is '00000000'H."
+                "This node is used to get actual router ID of process and it is a read-only node. If the node hwOspfv2ConfigRouterId is not set, the actual router ID should default to the value of one of the router's IP interface addresses. By default, the value is '00000000'H."
             ::= { hwOspfv2ProcessEntry 4 }
         
         hwOspfv2BandwidthReference OBJECT-TYPE
@@ -428,7 +461,7 @@
             DESCRIPTION
                 "To avoid wasting network source due to network changes, OSPF defines that the
                 interval for updating LSAs is 5 seconds.
-                In a stable network, if the speed of route convergence is required to be fast,
+                In a stable network, if the speed of route convergence is required to be fast, 
                 you can cancel the interval for updating LSAs by setting it to 0 seconds.
                 So, routers can detect changes of topology and route in time. This speeds up 
                 route convergence. By default, this object is -1, indicating that an intelligent
@@ -803,11 +836,10 @@
 
         hwOspfv2AreaIdIndex OBJECT-TYPE
             SYNTAX IpAddress
-            MAX-ACCESS not-accessible
+            MAX-ACCESS accessible-for-notify
             STATUS current
             DESCRIPTION
-                "A 32-bit integer uniquely identifies an area.
-                Area ID 0.0.0.0 is used for the OSPF backbone."
+                "A 32-bit integer uniquely identifies an area. Area ID 0.0.0.0 is used for the OSPF backbone."
             ::= { hwOspfv2AreaEntry 1 }
         
         hwOspfv2AreaType OBJECT-TYPE
@@ -869,7 +901,7 @@
             STATUS current
             DESCRIPTION
                 "This node is used to decide whether the external route is imported to NSSA area. On ASBR,
-                if this node is set to true, the external route can not be advertised to the NSSA area."
+                if this node is set to true, the external route cannot be advertised to the NSSA area."
             DEFVAL { false }
             ::= { hwOspfv2AreaEntry 6 }
         
@@ -978,12 +1010,12 @@
             ::= { hwOspfv2AreaEntry 15 }
         
         hwOspfv2AreaFilterExpPolicy OBJECT-TYPE
-            SYNTAX DisplayString (SIZE (0..40))
+            SYNTAX DisplayString (SIZE (0..200))
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
                 "This object indicates the name of the routing policy. 
-                The name is a string of 1 to 40 characters.
+                The name is a string of 1 to 200 characters.
                 The object is used to filter the Summary LSAs that leave the area.
                 It is incompatible with hwOspfv2AreaFilterExpAcl, hwOspfv2AreaFilterExpAclName, and
                 hwOspfv2AreaFilterExpPrefix. Only one object can be configured each time."
@@ -1017,12 +1049,12 @@
             ::= { hwOspfv2AreaEntry 18 }
         
         hwOspfv2AreaFilterImpPolicy OBJECT-TYPE
-            SYNTAX DisplayString (SIZE (0..40))
+            SYNTAX DisplayString (SIZE (0..200))
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
                 "This object indicates the name of the routing policy. 
-                The name is a string of 1 to 40 characters.
+                The name is a string of 1 to 200 characters.
                 The object is used to filter the Summary LSAs that enter the area.
                 It is incompatible with hwOspfv2AreaFilterImpAcl, hwOspfv2AreaFilterImpAclName and 
                 hwOspfv2AreaFilterImpPrefix. Only one node can be configured each time."
@@ -1058,7 +1090,7 @@
                 If this value is set to md5(3) or hmd5(4) or hsha256(6), you can specify hwOspfv2AreaAuthKeyId
                 or not. Once you specify hwOspfv2AreaAuthKeyId, you should specify hwOspfv2AreaAuthPasswordType
                 and hwOspfv2AreaAuthText at the same time.
-                If this value is set to keychain(5), you should specify it and hwOspfv2AreaAuthText together, or specify it and hwOspfv2AreaAuthKeychName together,
+                If this value is set to keychain(5), you should specify it and hwOspfv2AreaAuthText together, or specify it and hwOspfv2AreaAuthKeychName together, 
                 but should not specify hwOspfv2AreaAuthKeyId and hwOspfv2AreaAuthPasswordType, and should not specify hwOspfv2AreaAuthText and hwOspfv2AreaAuthKeychName at the same time."
             DEFVAL { none }
             ::= { hwOspfv2AreaEntry 20 }
@@ -1141,7 +1173,7 @@
             ::= { hwOspfv2AreaEntry 25 }
         
         hwOspfv2AreaFilterExpAclName OBJECT-TYPE
-            SYNTAX DisplayString (SIZE (0..32))
+            SYNTAX DisplayString (SIZE (0..64))
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
@@ -1153,7 +1185,7 @@
             ::= { hwOspfv2AreaEntry 26 }
         
         hwOspfv2AreaFilterImpAclName OBJECT-TYPE
-            SYNTAX DisplayString (SIZE (0..32))
+            SYNTAX DisplayString (SIZE (0..64))
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
@@ -1249,7 +1281,7 @@
         HwOspfv2NeighborEntry ::=
             SEQUENCE { 
                 hwOspfv2SelfIfnetIndex
-                    Integer32,
+                    Unsigned32,
                 hwOspfv2NbrIpAddrIndex
                     IpAddress,
                 hwOspfv2SelfRouterId
@@ -1283,7 +1315,7 @@
              }
 
         hwOspfv2SelfIfnetIndex OBJECT-TYPE
-            SYNTAX Integer32 (1..2147483647)
+            SYNTAX Unsigned32 (1..2147483647)
             MAX-ACCESS not-accessible
             STATUS current
             DESCRIPTION
@@ -1303,8 +1335,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "This object indicates the 32-bit integer that uniquely identifies the router in the Autonomous System.
-                It is the router ID of itself."
+                "This object indicates the 32-bit integer that uniquely identifies the router in the Autonomous System. It is the router ID of itself."
             ::= { hwOspfv2NeighborEntry 3 }
         
         hwOspfv2SelfIfIpAddress OBJECT-TYPE
@@ -1461,12 +1492,14 @@
                 hwOspfv2InterfaceIndex
                     Integer32,
                 hwOspfv2InterfaceName
-                    DisplayString
+                    DisplayString,
+                hwOspfv2IntfAuthModeType
+                    INTEGER
              }
 
         hwOspfv2InterfaceIndex OBJECT-TYPE
             SYNTAX Integer32
-            MAX-ACCESS not-accessible
+            MAX-ACCESS accessible-for-notify
             STATUS current
             DESCRIPTION
                 "A unique value for each interface."
@@ -1479,7 +1512,90 @@
             DESCRIPTION
                 "The name of the OSPF interface."
             ::= { hwOspfv2InterfaceEntry 2 }
-                
+        
+        hwOspfv2IntfAuthModeType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                none(1),
+                simple(2),
+                md5(3),
+                hmd5(4),
+                keychain(5),
+                hmacSha256(6),
+                null(7)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The type of the OSPF interface authentication mode.
+                none(1): not configured.
+                simple(2): indicates the simple authentication mode.
+                md5(3): indicates the md5 cipher mode.
+                hmd5(4): indicates the hmac-md5 cipher mode.
+                keychain(5): indicates the keychain authentication mode.
+                hmacSha256(6): indicates the hmac-Sha256 cipher mode.
+		null(7): indicates the null authentication mode."
+            DEFVAL { none }
+            ::= { hwOspfv2InterfaceEntry 3 }
+            
+        hwOspfv2VLinkTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwOspfv2VLinkEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Information describes the configured parameters of the router's attached OSPF area vlink."
+            ::= { hwOspfv2MIB 8 }
+        
+        hwOspfv2VLinkEntry OBJECT-TYPE
+            SYNTAX HwOspfv2VLinkEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                " Information describes the configured parameters of the router's attached OSPF areas."
+            INDEX { hwOspfv2ProcessIdIndex, hwOspfv2AreaIdIndex, hwOspfv2NbrIdIndex }
+            ::= { hwOspfv2VLinkTable 1 }
+        
+        HwOspfv2VLinkEntry ::=
+            SEQUENCE { 
+                hwOspfv2NbrIdIndex
+                    IpAddress,
+                hwOspfv2VLinkAuthModeType
+                    INTEGER
+             }
+
+        hwOspfv2NbrIdIndex OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A 32-bit integer uniquely identifies an virtual link peer."
+            ::= { hwOspfv2VLinkEntry 1 }
+        
+        hwOspfv2VLinkAuthModeType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                none(1),
+                simple(2),
+                md5(3),
+                hmd5(4),
+                keychain(5),
+                hmacSha256(6),
+                null(7)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The type of the OSPF area authentication mode.
+                none(1): not configured.
+                simple(2): indicates the simple authentication mode.
+                md5(3): indicates the md5 cipher mode.
+                hmd5(4): indicates the hmac-md5 cipher mode.
+                keychain(5): indicates the keychain authentication mode.
+                hmacSha256(6): indicates the hmac-Sha256 cipher mode.
+                null(7): indicates the null authentication mode."
+            DEFVAL { none }
+            ::= { hwOspfv2VLinkEntry 2 }
+        
         hwOspfv2TrapsObjects OBJECT IDENTIFIER ::= { hwOspfv2MIB 30 }
         
         hwOspfv2NbrChgReason OBJECT-TYPE
@@ -1518,8 +1634,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                  "A 32-bit integer uniquely identifies an area.
-                Area ID 0.0.0.0 is used for the OSPF backbone."
+                  "A 32-bit integer uniquely identifies an area. Area ID 0.0.0.0 is used for the OSPF backbone."
             ::= { hwOspfv2TrapsObjects 3 }
                                 
         hwOspfv2NewRouterId OBJECT-TYPE
@@ -1527,8 +1642,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "This object indicates the 32-bit integer that uniquely identifies the router in the Autonomous System.
-                It is the new router ID."
+                "This object indicates the 32-bit integer that uniquely identifies the router in the Autonomous System. It is the new router ID."
             ::= { hwOspfv2TrapsObjects 4 }
                           
         hwOspfv2PeerFlappingSuppressStatus OBJECT-TYPE
@@ -1564,8 +1678,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                  "A 32-bit integer uniquely identifies an area.
-                LSA-ID 0.0.0.0 is used for the OSPF LSA."
+                  "A 32-bit integer uniquely identifies an area. LSA-ID 0.0.0.0 is used for the OSPF LSA."
             ::= { hwOspfv2TrapsObjects 7 } 
 
         hwOspfv2LsaAge OBJECT-TYPE
@@ -1712,6 +1825,120 @@
                   "This object indicates the 32-bit integer that uniquely identifies the router in the Autonomous System."
             ::= { hwOspfv2TrapsObjects 25 }
 
+        hwOspfv2InsecureAuthMode OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (0..32))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "This object indicates the name of the insecure authentication mode configured for OSPF."
+            ::= { hwOspfv2TrapsObjects 26 }
+	    
+	hwOspfv2LoopDetectType OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (0..16))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "This object indicates the type of the OSPFv2 import route loop detect."
+            ::= { hwOspfv2TrapsObjects 27 }
+             
+        hwOspfv2LoopDetectProtocolAttr OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (0..64))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "This object indicates the protocol attribute of the OSPFv2 import route loop detect."
+            ::= { hwOspfv2TrapsObjects 28 }
+             
+        hwOspfv2LoopDetectRedistributeID1 OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (0..32))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "This object indicates the redis-list router id and process id of the OSPFv2 import route loop detect."
+            ::= { hwOspfv2TrapsObjects 29 }
+             
+        hwOspfv2LoopDetectRedistributeID2 OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (0..32))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "This object indicates the redis-list router id and process id of the OSPFv2 import route loop detect."
+            ::= { hwOspfv2TrapsObjects 30 }
+            
+        hwOspfCostAdjustReason OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (0..64))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "This object indicates the reason why OSPF adjusts the link cost."
+            ::= { hwOspfv2TrapsObjects 31 }
+            
+        hwOspfOriginalCost OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "This object indicates the original cost."
+            ::= { hwOspfv2TrapsObjects 32 }
+            
+        hwOspfAdjustedCost OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "This object indicates Link cost of the current event that triggers OSPF adjustment. "
+            ::= { hwOspfv2TrapsObjects 33 }
+
+        hwOspfPrefixSid OBJECT-TYPE
+            SYNTAX Unsigned32 (1..2147483647)
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "Conflicted Prefix sid Index. The value ranges from  0 to 65534."
+            ::= { hwOspfv2TrapsObjects 34 }
+
+        hwOspfPrefixAddress OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "The Prefix Address configured in the Loopback Interface."
+            ::= { hwOspfv2TrapsObjects 35 }
+
+        hwOspfPrefixAddressMask OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "Prefix Ip Address Mask."
+            ::= { hwOspfv2TrapsObjects 36 }
+
+        hwOspfAlgorithm OBJECT-TYPE
+            SYNTAX Unsigned32 (128..255)
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "Flexible Algorithm."
+            ::= { hwOspfv2TrapsObjects 37 }
+
+        hwOspfConflictType OBJECT-TYPE
+            SYNTAX INTEGER { sidConflict (1),
+                                prefixConflict (2)
+                            }
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "Conflict type can be Prefix Sid conflict or Prefix conflict."
+            ::= { hwOspfv2TrapsObjects 38 }
+
+        hwOspfv2NbrThresholdUpper OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "This object indicates the upper alarm threshold for the number of neighbors. "
+            ::= { hwOspfv2TrapsObjects 39 }
+
         hwOspfv2Traps OBJECT IDENTIFIER ::= { hwOspfv2MIB 31 }
         
         hwOspfV2NeighborUnavailable NOTIFICATION-TYPE
@@ -1852,7 +2079,7 @@
             OBJECTS { hwOspfv2ProcessIdIndex, hwOspfv2NbrRouterId, hwOspfv2SelfIfName, hwOspfv2LsaId ,hwOspfv2LsaAge}
             STATUS current
             DESCRIPTION
-                "The object is used to monitor the router recive a greater age lsa in ospfv2."
+                "The object is used to monitor the router receive a greater age lsa in ospfv2."
             ::= { hwOspfv2Traps 19 }
             
         hwOspfv2DeleteRouteByPurge NOTIFICATION-TYPE
@@ -1976,6 +2203,76 @@
             DESCRIPTION
                 "This object indicates that OSPF routes advertised by another device were not deleted."
             ::= { hwOspfv2Traps  33}
+
+        hwOspfv2AuthModeInsecure NOTIFICATION-TYPE
+            OBJECTS { hwOspfv2InsecureAuthMode }
+            STATUS current
+            DESCRIPTION
+                "This object indicates that an insecure authentication mode is configured for OSPF."
+            ::= { hwOspfv2Traps  34}
+
+        hwOspfv2AuthModeInsecureClear NOTIFICATION-TYPE
+            OBJECTS { hwOspfv2InsecureAuthMode }
+            STATUS current
+            DESCRIPTION
+                "This object indicates that the insecure authentication mode configured for OSPF is deleted."
+            ::= { hwOspfv2Traps  35}
+	    
+	    hwOspfv2RouteLoopDetected NOTIFICATION-TYPE
+            OBJECTS { hwOspfv2LoopDetectType, hwOspfv2LoopDetectProtocolAttr, hwOspfv2LoopDetectRedistributeID1, hwOspfv2LoopDetectRedistributeID2 }
+            STATUS current
+            DESCRIPTION
+                "This object indicates that a routing loop has been detected on the local device."
+            ::= { hwOspfv2Traps  36}
+            
+        hwOspfv2RouteLoopDetectedClear NOTIFICATION-TYPE
+            OBJECTS { hwOspfv2LoopDetectType, hwOspfv2LoopDetectProtocolAttr, hwOspfv2LoopDetectRedistributeID1, hwOspfv2LoopDetectRedistributeID2 }
+            STATUS current
+            DESCRIPTION
+                "This object indicates that the routing loop is cleared."
+            ::= { hwOspfv2Traps  37}
+            
+        hwOspfv2LinkCostAdjustment NOTIFICATION-TYPE
+            OBJECTS { hwOspfv2ProcessIdIndex, hwOspfv2AreaIdIndex, hwOspfv2InterfaceIndex, hwOspfv2InterfaceName, hwOspfCostAdjustReason, hwOspfOriginalCost, hwOspfAdjustedCost }
+            STATUS current
+            DESCRIPTION
+                "This object indicates that An OSPF link cost adjustment event occurs."
+            ::= { hwOspfv2Traps  38}
+            
+        hwOspfv2LinkCostAdjustmentClear NOTIFICATION-TYPE
+            OBJECTS { hwOspfv2ProcessIdIndex, hwOspfv2AreaIdIndex, hwOspfv2InterfaceIndex, hwOspfv2InterfaceName, hwOspfCostAdjustReason, hwOspfOriginalCost, hwOspfAdjustedCost }
+            STATUS current
+            DESCRIPTION
+                "This object indicates that An OSPF link cost adjustment event is cleared."
+            ::= { hwOspfv2Traps  39}
+
+        hwOspfPrefixSidConflict NOTIFICATION-TYPE
+            OBJECTS { hwOspfv2ProcessIdIndex, hwOspfPrefixSid, hwOspfPrefixAddress, hwOspfPrefixAddressMask, hwOspfAlgorithm, hwOspfConflictType }
+            STATUS current
+            DESCRIPTION
+                "This object indicates that An OSPF link cost adjustment event occurs."
+            ::= { hwOspfv2Traps  40}
+            
+        hwOspfPrefixSidConflictClear NOTIFICATION-TYPE
+            OBJECTS { hwOspfv2ProcessIdIndex, hwOspfPrefixSid, hwOspfPrefixAddress, hwOspfPrefixAddressMask, hwOspfAlgorithm, hwOspfConflictType }
+            STATUS current
+            DESCRIPTION
+                "This object indicates that An OSPF link cost adjustment event is cleared."
+            ::= { hwOspfv2Traps  41}
+
+        hwOspfv2NbrExceedThreshold NOTIFICATION-TYPE
+            OBJECTS { hwOspfv2NbrThresholdUpper }
+            STATUS current
+            DESCRIPTION
+                "This object indicates that the number of ospfv2 exceeds the configed threshold."
+            ::= { hwOspfv2Traps  42}
+            
+        hwOspfv2NbrExceedThresholdClear NOTIFICATION-TYPE
+            OBJECTS { hwOspfv2NbrThresholdUpper }
+            STATUS current
+            DESCRIPTION
+                "This object indicates that the number of ospfv2 has been less than the the configed threshold."
+            ::= { hwOspfv2Traps  43}
 
         hwOspfv2Conformance OBJECT IDENTIFIER ::= { hwOspfv2MIB 32 }
         
@@ -2244,7 +2541,17 @@
 		            hwOspfv2ThirdPartRouteBeDeletedByPurgeInexact,
 		            hwOspfv2ThirdPartRouteBeDeletedByPurgeInexactClear,
 		            hwOspfv2ThirdPartRouteBeDeletedByPurge,
-		            hwOspfv2ThirdPartRouteBeDeletedByPurgeClear
+		            hwOspfv2ThirdPartRouteBeDeletedByPurgeClear,
+                            hwOspfv2AuthModeInsecure,
+                            hwOspfv2AuthModeInsecureClear,
+		            hwOspfv2RouteLoopDetected,
+		            hwOspfv2RouteLoopDetectedClear,
+		            hwOspfv2LinkCostAdjustment,
+		            hwOspfv2LinkCostAdjustmentClear,
+		            hwOspfPrefixSidConflict,
+		            hwOspfPrefixSidConflictClear,
+		            hwOspfv2NbrExceedThreshold,
+		            hwOspfv2NbrExceedThresholdClear
 		           }
             STATUS current
             DESCRIPTION 
@@ -2252,7 +2559,7 @@
             ::= { hwOspfv2Groups 8 }
         
         hwOspfv2TrapsObjectsGroup OBJECT-GROUP
-            OBJECTS { hwOspfv2NbrChgReason, hwOspfv2IfChgReason, hwOspfv2AreaId, hwOspfv2NewRouterId, hwOspfv2ProcessIdIndex}
+            OBJECTS { hwOspfv2NbrChgReason, hwOspfv2IfChgReason, hwOspfv2AreaId, hwOspfv2NewRouterId, hwOspfv2ProcessIdIndex, hwOspfv2PeerFlappingSuppressStatus, hwOspfv2PeerFlappingSuppressReason, hwOspfv2LsaId, hwOspfv2LsaAge, hwOspfv2PurgeHostName, hwOspfv2PurgeIpAddress, hwOspfv2PurgeRouterId, hwOspfv2FlushLsaNum, hwOspfv2AffectedNodeNum, hwOspfv2TotalNodeNum, hwOspfv2PurgeStatPeriod, hwOspfv2RuledOutDeviceNum, hwOspfv2PurgeHostName1, hwOspfv2PurgeHostName2, hwOspfv2PurgeHostName3, hwOspfv2PurgeIpAddress1, hwOspfv2PurgeIpAddress2, hwOspfv2PurgeIpAddress3, hwOspfv2PurgeRouterId1, hwOspfv2PurgeRouterId2, hwOspfv2PurgeRouterId3, hwOspfv2InsecureAuthMode, hwOspfv2LoopDetectType, hwOspfv2LoopDetectProtocolAttr, hwOspfv2LoopDetectRedistributeID1, hwOspfv2LoopDetectRedistributeID2, hwOspfCostAdjustReason, hwOspfOriginalCost, hwOspfAdjustedCost, hwOspfPrefixSid, hwOspfPrefixAddress, hwOspfPrefixAddressMask, hwOspfAlgorithm, hwOspfConflictType, hwOspfv2NbrThresholdUpper}
             STATUS current
             DESCRIPTION 
                 "The objects are used to monitor/manage the neighbor state change from full to others."

@@ -17,7 +17,7 @@ if (PHP_VERSION_ID < 80100) {
 }
 
 // If we loaded any extra config
-if (sizeof($config) > 0) {
+if (count($config) > 0) {
     $config['parameters']['reportUnmatchedIgnoredErrors'] = false;
 }
 

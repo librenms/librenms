@@ -23,6 +23,7 @@ if (! isset($options['q'])) {
     echo \LibreNMS\Config::get('project_name') . " Discovery\n";
 }
 
+$where = '';
 if (isset($options['h'])) {
     if ($options['h'] == 'odd') {
         $options['n'] = '1';
@@ -68,7 +69,7 @@ if (Debug::set(isset($options['d']), false) || isset($options['v'])) {
 
     echo "DEBUG!\n";
     Debug::setVerbose(isset($options['v']));
-    \LibreNMS\Util\OS::updateCache(true); // Force update of OS Cache
+    LibrenmsConfig::invalidateAndReload();
 }
 
 if (! $where) {
@@ -101,9 +102,20 @@ if (! empty(\LibreNMS\Config::get('distributed_poller_group'))) {
 }
 
 global $device;
-foreach (dbFetch("SELECT * FROM `devices` WHERE disabled = 0 $where ORDER BY device_id DESC", $sqlparams) as $device) {
-    DeviceCache::setPrimary($device['device_id']);
-    $discovered_devices += (int) discover_device($device, $module_override);
+foreach (dbFetchRows("SELECT * FROM `devices` WHERE disabled = 0 $where ORDER BY device_id DESC", $sqlparams) as $device) {
+    $device_start = microtime(true);
+
+    if (discover_device($device, $module_override)) {
+        $discovered_devices++;
+
+        $device_time = round(microtime(true) - $device_start, 3);
+        DB::table('devices')->where('device_id', $device['device_id'])->update([
+            'last_discovered_timetaken' => $device_time,
+            'last_discovered' => DB::raw('NOW()'),
+        ]);
+
+        echo "Discovered in $device_time seconds\n\n";
+    }
 }
 
 $end = microtime(true);

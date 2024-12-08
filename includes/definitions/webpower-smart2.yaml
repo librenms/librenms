@@ -1,0 +1,15 @@
+os: webpower-smart2
+text: WebPower-smart2
+group: ups
+icon: generic
+type: power
+mib_dir: ingrasys
+snmp_bulk: false
+over:
+    - { graph: device_voltage, text: Voltage }
+    - { graph: device_load, text: Load }
+    - { graph: device_frequency, text: Frequency }
+discovery:
+    -
+        sysDescr_regex:
+            - '/WebPower Smart II Card/'

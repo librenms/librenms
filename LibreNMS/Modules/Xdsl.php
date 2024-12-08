@@ -31,9 +31,13 @@ use App\Models\PortAdsl;
 use App\Models\PortVdsl;
 use App\Observers\ModuleModelObserver;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 use LibreNMS\DB\SyncsModels;
+use LibreNMS\Enum\IntegerType;
+use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
+use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Number;
 
@@ -58,14 +62,24 @@ class Xdsl implements Module
         return ['ports'];
     }
 
+    public function shouldDiscover(OS $os, ModuleStatus $status): bool
+    {
+        return $status->isEnabledAndDeviceUp($os->getDevice());
+    }
+
     /**
      * @inheritDoc
      */
     public function discover(OS $os): void
     {
-        //discover if any port has dsl data. We use the pollXdsl functions, with the store parameter set to false
-        $this->pollAdsl($os, false);
-        $this->pollVdsl($os, false);
+        //discover if any port has dsl data. We use the pollXdsl functions, with the datastore parameter ommitted
+        $this->pollAdsl($os);
+        $this->pollVdsl($os);
+    }
+
+    public function shouldPoll(OS $os, ModuleStatus $status): bool
+    {
+        return $status->isEnabledAndDeviceUp($os->getDevice());
     }
 
     /**
@@ -75,31 +89,38 @@ class Xdsl implements Module
      *
      * @param  \LibreNMS\OS  $os
      */
-    public function poll(OS $os): void
+    public function poll(OS $os, DataStorageInterface $datastore): void
     {
         //only do polling if at least one portAdsl was discovered
         if ($os->getDevice()->portsAdsl()->exists()) {
-            $this->pollAdsl($os);
+            $this->pollAdsl($os, $datastore);
         }
 
         if ($os->getDevice()->portsVdsl()->exists()) {
-            $this->pollVdsl($os);
+            $this->pollVdsl($os, $datastore);
         }
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function cleanup(Device $device): void
+    public function dataExists(Device $device): bool
     {
-        $device->portsAdsl()->delete();
-        $device->portsVdsl()->delete();
+        return $device->portsAdsl()->exists() || $device->portsVdsl()->exists();
     }
 
     /**
      * @inheritDoc
      */
-    public function dump(Device $device)
+    public function cleanup(Device $device): int
+    {
+        $deleted = $device->portsAdsl()->delete();
+        $deleted += $device->portsVdsl()->delete();
+
+        return $deleted;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function dump(Device $device, string $type): ?array
     {
         return [
             'ports_adsl' => $device->portsAdsl()->orderBy('ifIndex')
@@ -115,11 +136,8 @@ class Xdsl implements Module
      * Poll data for this module and update the DB / RRD.
      * Try to keep this efficient and only run if discovery has indicated there is a reason to run.
      * Run frequently (default every 5 minutes)
-     *
-     * @param  \LibreNMS\OS  $os
-     * @param  bool  $store
      */
-    private function pollAdsl(OS $os, $store = true): Collection
+    private function pollAdsl(OS $os, ?DataStorageInterface $datastore = null): Collection
     {
         $adsl = \SnmpQuery::hideMib()->walk('ADSL-LINE-MIB::adslMibObjects')->table(1);
         $adslPorts = new Collection;
@@ -128,6 +146,10 @@ class Xdsl implements Module
             // Values are 1/10
             foreach ($this->adslTenthValues as $oid) {
                 if (isset($data[$oid])) {
+                    if ($oid == 'adslAtucCurrOutputPwr') {
+                        // workaround Cisco Bug CSCvj53634
+                        $data[$oid] = Number::constrainInteger($data[$oid], IntegerType::int32);
+                    }
                     $data[$oid] = $data[$oid] / 10;
                 }
             }
@@ -141,9 +163,15 @@ class Xdsl implements Module
 
             $portAdsl->port_id = $os->ifIndexToId($ifIndex);
 
-            if ($store) {
-                $this->storeAdsl($portAdsl, $data, (int) $ifIndex, $os);
-                echo ' ADSL(' . $portAdsl->adslLineCoding . '/' . Number::formatSi($portAdsl->adslAtucChanCurrTxRate, 2, 3, 'bps') . '/' . Number::formatSi($portAdsl->adslAturChanCurrTxRate, 2, 3, 'bps') . ') ';
+            if ($portAdsl->port_id == 0) {
+                // failure of ifIndexToId(), port_id is invalid, and syncModels will crash
+                Log::warning(' ADSL( Failed to discover this port, ifIndex invalid : ' . $portAdsl->adslLineCoding . '/' . Number::formatSi($portAdsl->adslAtucChanCurrTxRate, 2, 0, 'bps') . '/' . Number::formatSi($portAdsl->adslAturChanCurrTxRate, 2, 3, 'bps') . ') ');
+                continue;
+            }
+
+            if ($datastore) {
+                $this->storeAdsl($portAdsl, $data, (int) $ifIndex, $os, $datastore);
+                Log::info(' ADSL(' . $portAdsl->adslLineCoding . '/' . Number::formatSi($portAdsl->adslAtucChanCurrTxRate, 2, 3, 'bps') . '/' . Number::formatSi($portAdsl->adslAturChanCurrTxRate, 2, 0, 'bps') . ') ');
             }
 
             $adslPorts->push($portAdsl);
@@ -158,11 +186,8 @@ class Xdsl implements Module
      * Poll data for this module and update the DB / RRD.
      * Try to keep this efficient and only run if discovery has indicated there is a reason to run.
      * Run frequently (default every 5 minutes)
-     *
-     * @param  \LibreNMS\OS  $os
-     * @param  bool  $store
      */
-    private function pollVdsl(OS $os, $store = true): Collection
+    private function pollVdsl(OS $os, ?DataStorageInterface $datastore = null): Collection
     {
         $vdsl = \SnmpQuery::hideMib()->walk(['VDSL2-LINE-MIB::xdsl2ChannelStatusTable', 'VDSL2-LINE-MIB::xdsl2LineTable'])->table(1);
         $vdslPorts = new Collection;
@@ -182,9 +207,9 @@ class Xdsl implements Module
 
             $portVdsl->fill($data); // fill oids that are one to one
 
-            if ($store) {
-                $this->storeVdsl($portVdsl, $data, (int) $ifIndex, $os);
-                echo ' VDSL(' . $os->ifIndexToName($ifIndex) . '/' . Number::formatSi($portVdsl->xdsl2LineStatusAttainableRateDs, 2, 3, 'bps') . '/' . Number::formatSi($portVdsl->xdsl2LineStatusAttainableRateUs, 2, 3, 'bps') . ') ';
+            if ($datastore) {
+                $this->storeVdsl($portVdsl, $data, (int) $ifIndex, $os, $datastore);
+                Log::info(' VDSL(' . $os->ifIndexToName($ifIndex) . '/' . Number::formatSi($portVdsl->xdsl2LineStatusAttainableRateDs, 2, 0, 'bps') . '/' . Number::formatSi($portVdsl->xdsl2LineStatusAttainableRateUs, 2, 0, 'bps') . ') ');
             }
 
             $vdslPorts->push($portVdsl);
@@ -195,17 +220,17 @@ class Xdsl implements Module
         return $this->syncModels($os->getDevice(), 'portsVdsl', $vdslPorts);
     }
 
-    private function storeAdsl(PortAdsl $port, array $data, int $ifIndex, OS $os): void
+    private function storeAdsl(PortAdsl $port, array $data, int $ifIndex, OS $os, DataStorageInterface $datastore): void
     {
         $rrd_def = RrdDefinition::make()
             ->addDataset('AtucCurrSnrMgn', 'GAUGE', 0, 635)
             ->addDataset('AtucCurrAtn', 'GAUGE', 0, 635)
-            ->addDataset('AtucCurrOutputPwr', 'GAUGE', 0, 635)
+            ->addDataset('AtucCurrOutputPwr', 'GAUGE', -100, 635)
             ->addDataset('AtucCurrAttainableR', 'GAUGE', 0)
             ->addDataset('AtucChanCurrTxRate', 'GAUGE', 0)
             ->addDataset('AturCurrSnrMgn', 'GAUGE', 0, 635)
             ->addDataset('AturCurrAtn', 'GAUGE', 0, 635)
-            ->addDataset('AturCurrOutputPwr', 'GAUGE', 0, 635)
+            ->addDataset('AturCurrOutputPwr', 'GAUGE', -100, 635)
             ->addDataset('AturCurrAttainableR', 'GAUGE', 0)
             ->addDataset('AturChanCurrTxRate', 'GAUGE', 0)
             ->addDataset('AtucPerfLofs', 'COUNTER', null, 100000000000)
@@ -248,17 +273,17 @@ class Xdsl implements Module
             'AturChanUncorrectBlks' => $data['adslAturChanUncorrectBlks'] ?? null,
         ];
 
-        data_update($os->getDeviceArray(), 'adsl', [
+        $datastore->put($os->getDeviceArray(), 'adsl', [
             'ifName' => $os->ifIndexToName($ifIndex),
             'rrd_name' => Rrd::portName($port->port_id, 'adsl'),
             'rrd_def' => $rrd_def,
         ], $fields);
     }
 
-    private function storeVdsl(PortVdsl $port, array $data, int $ifIndex, OS $os): void
+    private function storeVdsl(PortVdsl $port, array $data, int $ifIndex, OS $os, DataStorageInterface $datastore): void
     {
         // Attainable
-        data_update($os->getDeviceArray(), 'xdsl2LineStatusAttainableRate', [
+        $datastore->put($os->getDeviceArray(), 'xdsl2LineStatusAttainableRate', [
             'ifName' => $os->ifIndexToName($ifIndex),
             'rrd_name' => Rrd::portName($port->port_id, 'xdsl2LineStatusAttainableRate'),
             'rrd_def' => RrdDefinition::make()
@@ -270,7 +295,7 @@ class Xdsl implements Module
         ]);
 
         // actual data rates
-        data_update($os->getDeviceArray(), 'xdsl2ChStatusActDataRate', [
+        $datastore->put($os->getDeviceArray(), 'xdsl2ChStatusActDataRate', [
             'ifName' => $os->ifIndexToName($ifIndex),
             'rrd_name' => Rrd::portName($port->port_id, 'xdsl2ChStatusActDataRate'),
             'rrd_def' => RrdDefinition::make()
@@ -282,12 +307,12 @@ class Xdsl implements Module
         ]);
 
         // power levels
-        data_update($os->getDeviceArray(), 'xdsl2LineStatusActAtp', [
+        $datastore->put($os->getDeviceArray(), 'xdsl2LineStatusActAtp', [
             'ifName' => $os->ifIndexToName($ifIndex),
             'rrd_name' => Rrd::portName($port->port_id, 'xdsl2LineStatusActAtp'),
             'rrd_def' => RrdDefinition::make()
-                ->addDataset('ds', 'GAUGE', 0)
-                ->addDataset('us', 'GAUGE', 0),
+                ->addDataset('ds', 'GAUGE', -100)
+                ->addDataset('us', 'GAUGE', -100),
         ], [
             'ds' => $data['xdsl2LineStatusActAtpDs'] ?? null,
             'us' => $data['xdsl2LineStatusActAtpUs'] ?? null,

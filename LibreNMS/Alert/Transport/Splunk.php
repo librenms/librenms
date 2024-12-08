@@ -19,51 +19,18 @@ namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
 use LibreNMS\Enum\AlertState;
+use LibreNMS\Exceptions\AlertTransportDeliveryException;
 
 class Splunk extends Transport
 {
-    public function deliverAlert($obj, $opts)
+    public function deliverAlert(array $alert_data): bool
     {
-        if (! empty($this->config)) {
-            $opts['splunk_host'] = $this->config['Splunk-host'];
-            $opts['splunk_port'] = $this->config['Splunk-port'];
-        }
-
-        return $this->contactSplunk($obj, $opts);
-    }
-
-    public function contactSplunk($obj, $opts)
-    {
-        $splunk_host = '127.0.0.1';
-        $splunk_port = 514;
+        $splunk_host = empty($this->config['Splunk-host']) ? '127.0.0.1' : $this->config['Splunk-host'];
+        $splunk_port = empty($this->config['Splunk-port']) ? 514 : $this->config['Splunk-port'];
         $severity = 6; // Default severity is 6 (Informational)
-        $device = device_by_id_cache($obj['device_id']); // for event logging
+        $device = device_by_id_cache($alert_data['device_id']); // for event logging
 
-        if (! empty($opts['splunk_host'])) {
-            if (preg_match('/[a-zA-Z]/', $opts['splunk_host'])) {
-                $splunk_host = gethostbyname($opts['splunk_host']);
-                if ($splunk_host === $opts['splunk_host']) {
-                    log_event('Alphanumeric hostname found but does not resolve to an IP.', $device, 'poller', 5);
-
-                    return false;
-                }
-            } elseif (filter_var($opts['splunk_host'], FILTER_VALIDATE_IP)) {
-                $splunk_host = $opts['splunk_host'];
-            } else {
-                log_event('Splunk host is not a valid IP: ' . $opts['splunk_host'], $device, 'poller', 5);
-
-                return false;
-            }
-        } else {
-            log_event('Splunk host is empty.', $device, 'poller');
-        }
-        if (! empty($opts['splunk_port']) && preg_match("/^\d+$/", $opts['splunk_port'])) {
-            $splunk_port = $opts['splunk_port'];
-        } else {
-            log_event('Splunk port is not an integer.', $device, 'poller', 5);
-        }
-
-        switch ($obj['severity']) {
+        switch ($alert_data['severity']) {
             case 'critical':
                 $severity = 2;
                 break;
@@ -72,7 +39,7 @@ class Splunk extends Transport
                 break;
         }
 
-        switch ($obj['state']) {
+        switch ($alert_data['state']) {
             case AlertState::RECOVERED:
                 $severity = 6;
                 break;
@@ -83,7 +50,7 @@ class Splunk extends Transport
 
         $ignore = ['template', 'contacts', 'rule', 'string', 'debug', 'faults', 'builder', 'transport', 'alert', 'msg', 'transport_name'];
         $splunk_prefix = '<' . $severity . '> ';
-        foreach ($obj as $key => $val) {
+        foreach ($alert_data as $key => $val) {
             if (in_array($key, $ignore)) {
                 continue;
             }
@@ -102,26 +69,24 @@ class Splunk extends Transport
         $splunk_prefix = substr($splunk_prefix, 0, -1);
 
         if (($socket = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP)) === false) {
-            log_event('socket_create() failed: reason: ' . socket_strerror(socket_last_error()), $device, 'poller', 5);
+            throw new AlertTransportDeliveryException($alert_data, 0, 'socket_create() failed: reason: ' . socket_strerror(socket_last_error()));
+        }
 
-            return false;
-        } else {
-            if (! empty($obj['faults'])) {
-                foreach ($obj['faults'] as $k => $v) {
-                    $splunk_msg = $splunk_prefix . ' - ' . $v['string'];
-                    socket_sendto($socket, $splunk_msg, strlen($splunk_msg), 0, $splunk_host, $splunk_port);
-                }
-            } else {
-                $splunk_msg = $splunk_prefix;
+        if (! empty($alert_data['faults'])) {
+            foreach ($alert_data['faults'] as $fault) {
+                $splunk_msg = $splunk_prefix . ' - ' . $fault['string'];
                 socket_sendto($socket, $splunk_msg, strlen($splunk_msg), 0, $splunk_host, $splunk_port);
             }
-            socket_close($socket);
+        } else {
+            $splunk_msg = $splunk_prefix;
+            socket_sendto($socket, $splunk_msg, strlen($splunk_msg), 0, $splunk_host, $splunk_port);
         }
+        socket_close($socket);
 
         return true;
     }
 
-    public static function configTemplate()
+    public static function configTemplate(): array
     {
         return [
             'config' => [
@@ -130,17 +95,19 @@ class Splunk extends Transport
                     'name' => 'Splunk-host',
                     'descr' => 'Splunk Host',
                     'type' => 'text',
+                    'default' => '127.0.0.1',
                 ],
                 [
                     'title' => 'UDP Port',
                     'name' => 'Splunk-port',
                     'descr' => 'Splunk Port',
                     'type' => 'text',
+                    'default' => 514,
                 ],
             ],
             'validation' => [
-                'Splunk-host' => 'required|string',
-                'Splunk-port' => 'required|numeric',
+                'Splunk-host' => 'required|ip_or_hostname',
+                'Splunk-port' => 'integer|between:1,65536',
             ],
         ];
     }

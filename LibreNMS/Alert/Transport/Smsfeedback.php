@@ -24,45 +24,34 @@
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
-use LibreNMS\Util\Proxy;
+use LibreNMS\Exceptions\AlertTransportDeliveryException;
+use LibreNMS\Util\Http;
 
 class Smsfeedback extends Transport
 {
-    protected $name = 'SMSfeedback';
+    protected string $name = 'SMSfeedback';
 
-    public function deliverAlert($obj, $opts)
+    public function deliverAlert(array $alert_data): bool
     {
-        $smsfeedback_opts['user'] = $this->config['smsfeedback-user'];
-        $smsfeedback_opts['token'] = $this->config['smsfeedback-pass'];
-        $smsfeedback_opts['sender'] = $this->config['smsfeedback-sender'];
-        $smsfeedback_opts['to'] = $this->config['smsfeedback-mobiles'];
-
-        return $this->contactsmsfeedback($obj, $smsfeedback_opts);
-    }
-
-    public static function contactsmsfeedback($obj, $opts)
-    {
+        $url = 'http://api.smsfeedback.ru/messages/v2/send/';
         $params = [
-            'login' => $opts['user'],
-            'pass' => md5($opts['token']),
-            'phone' => $opts['to'],
-            'text' => $obj['title'],
-            'sender' => $opts['sender'],
+            'phone' => $this->config['smsfeedback-mobiles'],
+            'text' => $alert_data['title'],
+            'sender' => $this->config['smsfeedback-sender'],
         ];
-        $url = 'http://' . $opts['user'] . ':' . $opts['token'] . '@' . 'api.smsfeedback.ru/messages/v2/send/?' . http_build_query($params);
-        $curl = curl_init($url);
 
-        Proxy::applyToCurl($curl);
-        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'GET');
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        $res = Http::client()
+            ->withBasicAuth($this->config['smsfeedback-user'], $this->config['smsfeedback-pass'])
+            ->get($url, $params);
 
-        $ret = curl_exec($curl);
-        if (substr($ret, 0, 8) == 'accepted') {
+        if ($res->successful() && str_starts_with($res->body(), 'accepted')) {
             return true;
         }
+
+        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $alert_data['title'], $params);
     }
 
-    public static function configTemplate()
+    public static function configTemplate(): array
     {
         return [
             'config' => [
@@ -76,7 +65,7 @@ class Smsfeedback extends Transport
                     'title' => 'Password',
                     'name' => 'smsfeedback-pass',
                     'descr' => 'smsfeedback Password',
-                    'type' => 'text',
+                    'type' => 'password',
                 ],
                 [
                     'title' => 'Mobiles',
@@ -92,8 +81,8 @@ class Smsfeedback extends Transport
                 ],
             ],
             'validation' => [
-                'smsfeedback-user'    => 'required|string',
-                'smsfeedback-pass'    => 'required|string',
+                'smsfeedback-user' => 'required|string',
+                'smsfeedback-pass' => 'required|string',
                 'smsfeedback-mobiles' => 'required',
                 'smsfeedback-sender' => 'required|string',
             ],

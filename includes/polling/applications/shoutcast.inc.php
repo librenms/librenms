@@ -20,7 +20,6 @@ foreach ($servers as $item => $server) {
         $data = explode(';', $server);
         [$host, $port] = explode(':', $data['0'], 2);
 
-        $rrd_name = ['app', $name, $app->app_id, $host . '_' . $port];
         $rrd_def = RrdDefinition::make()
             ->addDataset('bitrate', 'GAUGE', 0, 125000000000)
             ->addDataset('traf_in', 'GAUGE', 0, 125000000000)
@@ -32,18 +31,25 @@ foreach ($servers as $item => $server) {
             ->addDataset('unique', 'GAUGE', 0, 125000000000);
 
         $fields = [
-            'bitrate'  => $data['1'],
-            'traf_in'  => $data['2'],
+            'bitrate' => $data['1'],
+            'traf_in' => $data['2'],
             'traf_out' => $data['3'],
-            'current'  => $data['4'],
-            'status'   => $data['5'],
-            'peak'     => $data['6'],
-            'max'      => $data['7'],
-            'unique'   => $data['8'],
+            'current' => $data['4'],
+            'status' => $data['5'],
+            'peak' => $data['6'],
+            'max' => $data['7'],
+            'unique' => $data['8'],
         ];
         $metrics[$server] = $fields;
 
-        $tags = compact('name', 'app_id', 'host', 'port', 'rrd_name', 'rrd_def');
+        $tags = [
+            'name' => $name,
+            'app_id' => $app->app_id,
+            'host' => $host,
+            'port' => $port,
+            'rrd_name' => ['app', $name, $app->app_id, $host . '_' . $port],
+            'rrd_def' => $rrd_def,
+        ];
         data_update($device, 'app', $tags, $fields);
     }//end if
 }//end foreach

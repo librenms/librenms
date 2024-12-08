@@ -27,7 +27,6 @@
 namespace LibreNMS\Traits;
 
 use Illuminate\Support\Facades\Cache;
-use LibreNMS\Util\Laravel;
 
 trait RuntimeClassCache
 {
@@ -45,9 +44,18 @@ trait RuntimeClassCache
     protected function cacheGet(string $name, callable $actual)
     {
         if (! array_key_exists($name, $this->runtimeCache)) {
-            $this->runtimeCache[$name] = $this->runtimeCacheExternalTTL && Laravel::isBooted()
-                ? Cache::remember('runtimeCache' . __CLASS__ . $name, $this->runtimeCacheExternalTTL, $actual)
-                : $actual();
+            if ($this->runtimeCacheExternalTTL) {
+                try {
+                    $this->runtimeCache[$name] = Cache::remember('runtimeCache' . __CLASS__ . $name, $this->runtimeCacheExternalTTL, $actual);
+
+                    return $this->runtimeCache[$name]; // system cache success, don't use local cache
+                } catch (\Exception $e) {
+                    // go to fallback code
+                }
+            }
+
+            // non-persistent cache
+            $this->runtimeCache[$name] = $actual();
         }
 
         return $this->runtimeCache[$name];

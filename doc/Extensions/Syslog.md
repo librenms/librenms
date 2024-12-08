@@ -37,7 +37,7 @@ destination d_librenms {
 
 log {
         source(s_net);
-        source(s_sys);
+        source(s_src);
         destination(d_librenms);
 };
 ```

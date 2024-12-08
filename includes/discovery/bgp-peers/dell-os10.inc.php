@@ -47,7 +47,7 @@ if ($device['os'] == 'dell-os10') {
 
         foreach ($peer as $address => $value) {
             // resolve AS number by DNS_TXT record
-            $astext = get_astext($value['os10bgp4V2PeerRemoteAs']);
+            $astext = \LibreNMS\Util\AutonomousSystem::get($value['os10bgp4V2PeerRemoteAs'])->name();
 
             // FIXME - the `devices` table gets updated in the main bgp-peers.inc.php
             // Setting it here avoids the code that resets it to null if not found in BGP4-MIB.
@@ -78,7 +78,7 @@ if ($device['os'] == 'dell-os10') {
                 }
                 echo '+';
             } else {
-                BgpPeer::where('bgpPeerRemoteAs', $value['os10bgp4V2PeerRemoteAs'])->where('astext', $astext)->update(['bgpPeerIdentifier' => $address, 'device_id' => $device['device_id'], 'vrf_id' => $vrfId]);
+                BgpPeer::where('device_id', $device['device_id'])->where('bgpPeerIdentifier', $address)->where('vrf_id', $vrfId)->update(['bgpPeerRemoteAs' => $value['os10bgp4V2PeerRemoteAs'], 'astext' => $astext]);
                 echo '.';
             }
         }

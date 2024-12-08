@@ -21,7 +21,7 @@ $param = [];
 $device_id = (int) $vars['device'];
 
 if (isset($vars['action']) && $vars['action'] == 'expunge' && \Auth::user()->hasGlobalAdmin()) {
-    dbQuery('TRUNCATE TABLE `syslog`');
+    \App\Models\Syslog::truncate();
     print_message('syslog truncated');
 }
 
@@ -50,7 +50,7 @@ $pagetitle[] = 'Syslog';
         '<option value="">All Devices&nbsp;&nbsp;</option>' +
             <?php
             if ($device_id) {
-                echo "'<option value=$device_id>" . format_hostname(device_by_id_cache($device_id)) . "</option>' +";
+                echo "'<option value=$device_id>" . str_replace(['"', '\''], '', htmlentities(format_hostname(device_by_id_cache($device_id)))) . "</option>' +";
             } ?>
         '</select>' +
             <?php
@@ -82,10 +82,10 @@ $pagetitle[] = 'Syslog';
         '</select>' +
         '</div>' +
         '&nbsp;&nbsp;<div class="form-group">' +
-        '<input name="from" type="text" class="form-control" id="dtpickerfrom" maxlength="16" value="<?php echo $vars['from'] ?? ''; ?>" placeholder="From" data-date-format="YYYY-MM-DD HH:mm">' +
+        '<input name="from" type="text" class="form-control" id="dtpickerfrom" maxlength="16" value="<?php echo htmlspecialchars($vars['from'] ?? ''); ?>" placeholder="From" data-date-format="YYYY-MM-DD HH:mm">' +
         '</div>' +
         '<div class="form-group">' +
-        '&nbsp;&nbsp;<input name="to" type="text" class="form-control" id="dtpickerto" maxlength="16" value="<?php echo $vars['to'] ?? ''; ?>" placeholder="To" data-date-format="YYYY-MM-DD HH:mm">' +
+        '&nbsp;&nbsp;<input name="to" type="text" class="form-control" id="dtpickerto" maxlength="16" value="<?php echo htmlspecialchars($vars['to'] ?? ''); ?>" placeholder="To" data-date-format="YYYY-MM-DD HH:mm">' +
         '</div>' +
         '&nbsp;&nbsp;<button type="submit" class="btn btn-default">Filter</button>' +
         '</form>' +
@@ -171,7 +171,7 @@ $pagetitle[] = 'Syslog';
                 }
             }
         }
-    })<?php echo isset($vars['program']) ? ".val('" . addcslashes($vars['program'], "'") . "').trigger('change');" : ''; ?>;
+    })<?php echo isset($vars['program']) ? ".val('" . htmlspecialchars($vars['program']) . "').trigger('change');" : ''; ?>;
 
     $("#priority").select2({
         theme: "bootstrap",
@@ -191,6 +191,6 @@ $pagetitle[] = 'Syslog';
                 }
             }
         }
-    })<?php echo isset($vars['priority']) ? ".val('" . addcslashes($vars['priority'], "'") . "').trigger('change');" : ''; ?>;
+    })<?php echo isset($vars['priority']) ? ".val('" . htmlspecialchars($vars['priority']) . "').trigger('change');" : ''; ?>;
 </script>
 

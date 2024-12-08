@@ -26,6 +26,7 @@
 namespace LibreNMS\OS;
 
 use App\Models\Device;
+use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Polling\OSPolling;
 
 class Poweralert extends \LibreNMS\OS implements OSPolling
@@ -37,7 +38,7 @@ class Poweralert extends \LibreNMS\OS implements OSPolling
         $this->customSysName($device);
     }
 
-    public function pollOs(): void
+    public function pollOS(DataStorageInterface $datastore): void
     {
         $this->customSysName($this->getDevice());
     }

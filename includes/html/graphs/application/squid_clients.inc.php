@@ -17,9 +17,9 @@ if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list = [
         [
             'filename' => $rrd_filename,
-            'descr'    => 'clients',
-            'ds'       => 'clients',
-            'colour'   => '582a72',
+            'descr' => 'clients',
+            'ds' => 'clients',
+            'colour' => '582a72',
         ],
     ];
 } else {

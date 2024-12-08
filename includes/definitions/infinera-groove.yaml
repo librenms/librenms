@@ -36,8 +36,6 @@ poller_modules:
     ipmi: false
     bgp-peers: false
     services: false
-    libvirt-vminfo: false
-    vmware-vminfo: false
     vlans: false
     arp-table: false
     mef: false

@@ -1,0 +1,273 @@
+TROPIC-CONTROLCARD-MIB DEFINITIONS ::= BEGIN
+
+-- (c) Copyright 2023 Nokia Networks.  All rights reserved.
+-- This software is the confidential and proprietary property of
+-- Nokia and may only be used in accordance with the terms of the
+-- license agreement provided with this software.
+
+IMPORTS
+      SnmpAdminString                         FROM SNMP-FRAMEWORK-MIB
+      OBJECT-TYPE, MODULE-IDENTITY,
+      Unsigned32, Integer32                   FROM SNMPv2-SMI
+      MODULE-COMPLIANCE, OBJECT-GROUP         FROM SNMPv2-CONF
+      TruthValue                              FROM SNMPv2-TC
+      InterfaceIndexOrZero                    FROM IF-MIB
+      tnShelfIndex                            FROM TROPIC-SHELF-MIB
+      tnSlotIndex                             FROM TROPIC-SLOT-MIB
+      tnCardModules, tnControlCardMIB         FROM TROPIC-GLOBAL-REG;
+
+  tnControlCardMibModule MODULE-IDENTITY
+      LAST-UPDATED    "201802231200Z"
+      ORGANIZATION    "Nokia"
+      CONTACT-INFO    "Nokia
+                       Attn: Jeff Donnelly
+                       600 Mountain Avenue
+                       New Providence, NJ 07974
+
+                       Phone: +1 732 221 6408
+                       Email: jeff.donnelly@nokia.com"
+
+      DESCRIPTION "."
+
+      REVISION    "201802231200Z"
+      DESCRIPTION "Updated the contact info."
+
+      REVISION    "201707071200Z"
+      DESCRIPTION "Fixed MIB compile issues."
+
+      REVISION    "201611161200Z"
+      DESCRIPTION "Updated the contact info."
+
+      REVISION    "201409041200Z"
+      DESCRIPTION "Added the following table:
+                   tnVwmEcCardTable."
+
+      REVISION    "201305211200Z"
+      DESCRIPTION "Marked the following as obsolete:
+                   tnControlCardEvents."
+
+      ::= { tnCardModules 3 }
+
+  tnControlCardConf        OBJECT IDENTIFIER ::= { tnControlCardMIB 1 }
+  tnControlCardGroups      OBJECT IDENTIFIER ::= { tnControlCardConf 1 }
+  tnControlCardCompliances OBJECT IDENTIFIER ::= { tnControlCardConf 2 }
+  tnControlCardObjs        OBJECT IDENTIFIER ::= { tnControlCardMIB 2 }
+--  obsolete
+--  tnControlCardEvents      OBJECT IDENTIFIER ::= { tnControlCardMIB 3 }
+
+--------------------------------------------------------------------------------
+-- Control Card Scalars
+--------------------------------------------------------------------------------
+    tnControlCardTotal OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The total number of control card records
+                        allocated on a 1696R/1830 NE."
+        ::= { tnControlCardObjs 1 }
+
+--------------------------------------------------------------------------------
+-- Control Card Table
+--------------------------------------------------------------------------------
+    tnControlCardTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnControlCardEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnControlCardObjs 2 }
+
+    tnControlCardEntry OBJECT-TYPE
+        SYNTAX         TnControlCardEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnShelfIndex,
+                tnSlotIndex }
+        ::= { tnControlCardTable 1 }
+
+    TnControlCardEntry ::= SEQUENCE {
+        tnControlCardActivityState INTEGER
+    }
+
+    tnControlCardActivityState OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         unknown(1),
+                         active(2),
+                         inactive(3),
+                         unequipped(4)
+                       }
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "This attribute indicates whether or not this
+                        control card is active."
+        ::= { tnControlCardEntry 1 }
+
+--------------------------------------------------------------------------------
+-- Redundancy Demerit Table
+--------------------------------------------------------------------------------
+    tnRedundancyDemeritTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnRedundancyDemeritEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnControlCardObjs 3 }
+
+    tnRedundancyDemeritEntry OBJECT-TYPE
+        SYNTAX         TnRedundancyDemeritEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnShelfIndex,
+                tnSlotIndex,
+                tnRedundancyDemeritId }
+        ::= { tnRedundancyDemeritTable 1 }
+
+    TnRedundancyDemeritEntry ::= SEQUENCE {
+        tnRedundancyDemeritId     Unsigned32,
+        tnRedundancyDemeritName   SnmpAdminString,
+        tnRedundancyDemeritRaised TruthValue,
+        tnRedundancyDemeritValue  Unsigned32
+    }
+
+    tnRedundancyDemeritId OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnRedundancyDemeritEntry 1 }
+
+    tnRedundancyDemeritName OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..255))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnRedundancyDemeritEntry 2 }
+
+    tnRedundancyDemeritRaised OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnRedundancyDemeritEntry 3 }
+
+    tnRedundancyDemeritValue OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnRedundancyDemeritEntry 4 }
+
+--------------------------------------------------------------------------------
+-- VWM EC Card Scalars
+--------------------------------------------------------------------------------
+    tnVwmEcCardAttributeTotal OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnControlCardObjs 4 }
+
+--------------------------------------------------------------------------------
+-- VWM EC Card Table
+--------------------------------------------------------------------------------
+    tnVwmEcCardTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnVwmEcCardEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "A table of VWM EC card specific attributes."
+        ::= { tnControlCardObjs 5 }
+
+    tnVwmEcCardEntry OBJECT-TYPE
+        SYNTAX         TnVwmEcCardEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnShelfIndex,
+                tnSlotIndex }
+        ::= { tnVwmEcCardTable 1 }
+
+    TnVwmEcCardEntry ::= SEQUENCE {
+        tnVwmEcCardConnectTo InterfaceIndexOrZero,
+        tnVwmEcCardClipOnId  Unsigned32
+    }
+
+    tnVwmEcCardConnectTo OBJECT-TYPE
+        SYNTAX         InterfaceIndexOrZero
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "VWM EC connected interface index."
+        DEFVAL         { 0 }
+        ::= { tnVwmEcCardEntry 1 }
+
+    tnVwmEcCardClipOnId OBJECT-TYPE
+        SYNTAX         Unsigned32 (0..255)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "VWM EC rotary ID."
+        DEFVAL         { 255 }
+        ::= { tnVwmEcCardEntry 2 }
+
+--------------------------------------------------------------------------------
+-- Conformance Group Definitions
+--------------------------------------------------------------------------------
+    tnControlCardScalarsGroup OBJECT-GROUP
+        OBJECTS {
+            tnControlCardTotal
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnControlCardGroups 1 }
+
+    tnControlCardTableGroup OBJECT-GROUP
+        OBJECTS {
+            tnControlCardActivityState
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnControlCardGroups 2 }
+
+    tnRedundancyDemeritTableGroup OBJECT-GROUP
+        OBJECTS {
+            tnRedundancyDemeritName,
+            tnRedundancyDemeritRaised,
+            tnRedundancyDemeritValue
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnControlCardGroups 3 }
+
+    tnVwmEcCardTableGroup OBJECT-GROUP
+        OBJECTS {
+            tnVwmEcCardConnectTo,
+            tnVwmEcCardClipOnId
+
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnControlCardGroups 4 }
+
+    tnVwmEcCardScalarsGroup OBJECT-GROUP
+        OBJECTS {
+            tnVwmEcCardAttributeTotal
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnControlCardGroups 5 }
+
+--------------------------------------------------------------------------------
+-- Compliance Statements (mandatory)
+--------------------------------------------------------------------------------
+    tnControlCardCompliance MODULE-COMPLIANCE
+        STATUS         current
+        DESCRIPTION    "."
+        MODULE
+        MANDATORY-GROUPS  {
+            tnControlCardScalarsGroup,
+            tnControlCardTableGroup,
+            tnRedundancyDemeritTableGroup,
+            tnVwmEcCardTableGroup,
+            tnVwmEcCardScalarsGroup
+        }
+        ::= { tnControlCardCompliances 1 }
+
+END -- DEFINITION OF TROPIC-CONTROLCARD-MIB

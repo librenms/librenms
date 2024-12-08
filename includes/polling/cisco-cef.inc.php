@@ -3,8 +3,7 @@
 use LibreNMS\RRD\RrdDefinition;
 
 if ($device['os_group'] == 'cisco') {
-    $cefs = [];
-    $cefs = snmpwalk_cache_threepart_oid($device, 'CISCO-CEF-MIB::cefSwitchingStatsEntry', $cefs, 'CISCO-CEF-MIB');
+    $cefs = SnmpQuery::hideMib()->walk('CISCO-CEF-MIB::cefSwitchingStatsTable')->table(3);
     $polled = time();
 
     $cefs_query = dbFetchRows('SELECT * FROM `cef_switching` WHERE `device_id` = ?', [$device['device_id']]);
@@ -16,7 +15,7 @@ if ($device['os_group'] == 'cisco') {
     d_echo($cefs);
 
     if (is_array($cefs)) {
-        if (! is_array($entity_array)) {
+        if (! isset($entity_array) || ! is_array($entity_array)) {
             echo 'Caching OIDs: ';
             $entity_array = [];
             echo ' entPhysicalDescr';
@@ -79,9 +78,9 @@ if ($device['os_group'] == 'cisco') {
                     dbUpdate($cef_stat['update'], 'cef_switching', '`device_id` = ? AND `entPhysicalIndex` = ? AND `afi` = ? AND `cef_index` = ?', [$device['device_id'], $entity, $afi, $index]);
 
                     $fields = [
-                        'drop'      => $cef_stat['cefSwitchingDrop'],
-                        'punt'      => $cef_stat['cefSwitchingPunt'],
-                        'hostpunt'  => $cef_stat['cefSwitchingPunt2Host'],
+                        'drop' => $cef_stat['cefSwitchingDrop'],
+                        'punt' => $cef_stat['cefSwitchingPunt'],
+                        'hostpunt' => $cef_stat['cefSwitchingPunt2Host'],
                     ];
 
                     $tags = compact('entity', 'afi', 'index', 'rrd_name', 'rrd_def');
@@ -94,11 +93,13 @@ if ($device['os_group'] == 'cisco') {
     }//end if
 
     // FIXME - need to delete old ones. FIXME REALLY.
-    print_r($cefs_db);
+    if (! empty($cefs_db)) {
+        print_r($cefs_db);
 
-    foreach ((array) $cefs_db as $cef_switching_id) {
-        dbDelete('cef_switching', '`cef_switching_id` =  ?', [$cef_switching_id]);
-        echo '-';
+        foreach ((array) $cefs_db as $cef_switching_id) {
+            dbDelete('cef_switching', '`cef_switching_id` =  ?', [$cef_switching_id]);
+            echo '-';
+        }
     }
 
     echo "\n";

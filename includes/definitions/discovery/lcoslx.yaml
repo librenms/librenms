@@ -1,0 +1,13 @@
+mib: LCOS-LX-MIB
+modules:
+    mempools:
+        data:
+            -
+                total: LCOS-LX-MIB::lcosLXStatusHardwareInfoTotalMemoryKbytes
+                free: LCOS-LX-MIB::lcosLXStatusHardwareInfoFreeMemoryKbytes
+                precision: 1024
+    os:
+        version:
+            - LCOS-LX-MIB::lcosLXStatusHardwareInfoSWVersion.0
+        serial:
+            - LCOS-LX-MIB::lcosLXStatusHardwareInfoSerialNumber.0

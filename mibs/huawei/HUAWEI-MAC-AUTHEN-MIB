@@ -1,9 +1,9 @@
 -- =================================================================
--- Copyright (C) 2016 by HUAWEI TECHNOLOGIES. All rights reserved
+-- Copyright (C) 2017 by HUAWEI TECHNOLOGIES. All rights reserved
 -- 
 -- Description:HUAWEI MAC AUTHEN MIB
 -- Reference:
--- Version: V1.05
+-- Version: V1.06
 -- History:
 --    v1.01
 --    modified by z00196108  2013-8-7
@@ -41,7 +41,7 @@
 -- Module Identifier                
 --
     hwMacAuthenMIB MODULE-IDENTITY 
-        LAST-UPDATED "201603181536Z"           
+        LAST-UPDATED "201709192248Z"           
         ORGANIZATION 
             "Huawei Technologies Co.,Ltd."
         CONTACT-INFO 
@@ -52,7 +52,11 @@
 			Website: http://www.huawei.com
 			Email: support@huawei.com
 			"
-        DESCRIPTION 
+         DESCRIPTION 
+            "This MIB describes objects used for mac-authentication,including
+            configuring mac-authentication."
+         REVISION    "201709192248Z"   
+         DESCRIPTION 
             "This MIB describes objects used for mac-authentication,including
             configuring mac-authentication."
          REVISION    "201603181536Z"         
@@ -106,7 +110,12 @@
          macAddressWithHyphenNormal(5),
          macAddressWithoutHyphenUpper(6),
          macAddressWithHyphenUpper(7),
-         macAddressWithHyphenNormalUpper(8)
+         macAddressWithHyphenNormalUpper(8),
+         fixedUpper(9),
+         macAddressWithHyphenColon(10),
+         macAddressWithHyphenNormalColon(11),
+         macAddressWithHyphenColonUpper(12),
+         macAddressWithHyphenNormalColonUpper(13)
         }
         MAX-ACCESS read-write
         STATUS current
@@ -267,7 +276,12 @@
          macAddressWithHyphenNormal(6),
          macAddressWithoutHyphenUpper(7),
          macAddressWithHyphenUpper(8),
-         macAddressWithHyphenNormalUpper(9)
+         macAddressWithHyphenNormalUpper(9),
+         fixedUpper(10),
+         macAddressWithHyphenColon(11),
+         macAddressWithHyphenNormalColon(12),
+         macAddressWithHyphenColonUpper(13),
+         macAddressWithHyphenNormalColonUpper(14)
         }
         MAX-ACCESS read-write
         STATUS current

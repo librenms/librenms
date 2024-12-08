@@ -65,7 +65,6 @@ return [
             'rrdtool' => ['name' => 'Datastore: RRDTool'],
             'snmp' => ['name' => 'SNMP'],
             'poller_modules' => ['name' => 'Poller Modules'],
-            'interface_types' => ['name' => 'Interface Type by RFC 7224'],
         ],
         'system' => [
             'cleanup' => ['name' => 'Cleanup'],
@@ -236,9 +235,6 @@ return [
                     'help' => 'Matches the request origin. Wildcards can be used, eg. *.mydomain.com',
                 ],
             ],
-        ],
-        'api_demo' => [
-            'description' => 'This is the demo',
         ],
         'apps' => [
             'powerdns-recursor' => [
@@ -465,10 +461,6 @@ return [
             'description' => 'Specific URL',
             'help' => 'This should *only* be set if you want to *force* a particular hostname/port. It will prevent the web interface being usable form any other hostname',
         ],
-        'device_perf_purge' => [
-            'description' => 'Device performance entries older than',
-            'help' => 'Cleanup done by daily.sh',
-        ],
         'discovery_modules' => [
             'arp-table' => [
                 'description' => 'ARP Table',
@@ -478,9 +470,6 @@ return [
             ],
             'bgp-peers' => [
                 'description' => 'BGP Peers',
-            ],
-            'cisco-cbqos' => [
-                'description' => 'Cisco CBQOS',
             ],
             'cisco-cef' => [
                 'description' => 'Cisco CEF',
@@ -532,9 +521,6 @@ return [
             ],
             'junose-atm-vp' => [
                 'description' => 'Junose ATM VP',
-            ],
-            'libvirt-vminfo' => [
-                'description' => 'Libvirt VMInfo',
             ],
             'loadbalancers' => [
                 'description' => 'Loadbalancers',
@@ -591,8 +577,8 @@ return [
             'vlans' => [
                 'description' => 'VLans',
             ],
-            'vmware-vminfo' => [
-                'description' => 'VMWare VMInfo',
+            'vminfo' => [
+                'description' => 'Hypervisor VM Info',
             ],
             'vrf' => [
                 'description' => 'VRF',
@@ -1089,9 +1075,6 @@ return [
             'ucd-diskio' => [
                 'description' => 'UCD DiskIO',
             ],
-            'wifi' => [
-                'description' => 'Wifi',
-            ],
             'wireless' => [
                 'description' => 'Wireless',
             ],
@@ -1128,12 +1111,6 @@ return [
             'cisco-asa-firewall' => [
                 'description' => 'Cisco ASA Firewall',
             ],
-            'cisco-voice' => [
-                'description' => 'Cisco Voice',
-            ],
-            'cisco-cbqos' => [
-                'description' => 'Cisco CBQOS',
-            ],
             'cisco-otv' => [
                 'description' => 'Cisco OTV',
             ],
@@ -1167,6 +1144,9 @@ return [
             'stp' => [
                 'description' => 'STP',
             ],
+            'vminfo' => [
+                'description' => 'Hypervisor VM Info',
+            ],
             'ntp' => [
                 'description' => 'NTP',
             ],
@@ -1182,6 +1162,10 @@ return [
         ],
         'ports_fdb_purge' => [
             'description' => 'Port FDB entries older than',
+            'help' => 'Cleanup done by daily.sh',
+        ],
+        'ports_nac_purge' => [
+            'description' => 'Port NAC entries older than',
             'help' => 'Cleanup done by daily.sh',
         ],
         'ports_purge' => [
@@ -1271,10 +1255,6 @@ return [
             'description' => 'Sets the version of rrdtool on your server',
             'help' => 'Anything over 1.5.5 supports all features LibreNMS uses, do not set higher than your installed version',
         ],
-        'service_poller_enabled' => [
-            'description' => 'Enable Polling',
-            'help' => 'Enable poller workers. Sets the default value for all nodes.',
-        ],
         'service_poller_workers' => [
             'description' => 'Poller Workers',
             'help' => 'Amount of poller workers to spawn. Sets the default value for all nodes.',
@@ -1287,10 +1267,6 @@ return [
             'description' => 'Device Down Retry',
             'help' => 'If a device is down when polling is attempted. This is the amount of time to wait before retrying. Sets the default value for all nodes.',
         ],
-        'service_discovery_enabled' => [
-            'description' => 'Discovery Enabled',
-            'help' => 'Enable discovery workers. Sets the default value for all nodes.',
-        ],
         'service_discovery_workers' => [
             'description' => 'Discovery Workers',
             'help' => 'Amount of discovery workers to run. Setting too high can cause overload. Sets the default value for all nodes.',
@@ -1298,10 +1274,6 @@ return [
         'service_discovery_frequency' => [
             'description' => 'Discovery Frequency',
             'help' => 'How often to run device discovery. Sets the default value for all nodes. Default is 4 times a day.',
-        ],
-        'service_services_enabled' => [
-            'description' => 'Services Enabled',
-            'help' => 'Enable services workers. Sets the default value for all nodes.',
         ],
         'service_services_workers' => [
             'description' => 'Services Workers',
@@ -1311,10 +1283,6 @@ return [
             'description' => 'Services Frequency',
             'help' => 'How often to run services. This should match poller frequency. Sets the default value for all nodes.',
         ],
-        'service_billing_enabled' => [
-            'description' => 'Billing Enabled',
-            'help' => 'Enable billing workers. Sets the default value for all nodes.',
-        ],
         'service_billing_frequency' => [
             'description' => 'Billing Frequency',
             'help' => 'How often to collect billing data. Sets the default value for all nodes.',
@@ -1323,17 +1291,9 @@ return [
             'description' => 'Billing Calculate Frequency',
             'help' => 'How often to calculate bill usage. Sets the default value for all nodes.',
         ],
-        'service_alerting_enabled' => [
-            'description' => 'Alerting Enabled',
-            'help' => 'Enable the alerting worker. Sets the default value for all nodes.',
-        ],
         'service_alerting_frequency' => [
             'description' => 'Alerting Frequency',
             'help' => 'How often alert rules are checked. Note that data is only updated based on poller frequency. Sets the default value for all nodes.',
-        ],
-        'service_ping_enabled' => [
-            'description' => 'Fast Ping Enabled',
-            'help' => 'Fast Ping just pings devices to check if they are up or down. Sets the default value for all nodes.',
         ],
         'service_update_enabled' => [
             'description' => 'Daily Maintenance Enabled',

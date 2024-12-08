@@ -41,6 +41,29 @@ modules:
                         - { descr: chargerSpotmode, graph: 0, value: 21, generic: 0 }
                         - { descr: inverterSpotmode, graph: 0, value: 22, generic: 0 }
                 -
+                    oid: memInputsConfigTable
+                    state_name: memInputNormalState
+                    value: memInputNormalState
+                    num_oid: '.1.3.6.1.4.1.318.1.1.10.4.3.4.1.7.{{ $index }}'
+                    index: 'memInputNormalState.{{ $index }}'
+                    descr: 'Normal state: {{ $memInputName }}'
+                    states:
+                        - { descr: Closed, graph: 1, value: 1, generic: 0 }
+                        - { descr: Open, graph: 1, value: 2, generic: 0 }
+                        - { descr: Disabled, graph: 1, value: 3, generic: 0 }
+                        - { descr: No State, graph: 1, value: 4, generic: 0 }
+                -
+                    oid: memInputsStatusTable
+                    state_name: memInputsStatusAlarmStatus
+                    value: memInputsStatusAlarmStatus
+                    num_oid: '.1.3.6.1.4.1.318.1.1.10.4.3.2.1.7.{{ $index }}'
+                    index: 'memInputStatusAlarmState.{{ $index }}'
+                    descr: memInputsStatusInputName
+                    states:
+                        - { descr: Ok, graph: 1, value: 1, generic: 0 }
+                        - { descr: Alarm, graph: 1, value: 2, generic: 1 }
+                        - { descr: Critical, graph: 1, value: 3, generic: 2 }
+                -
                     oid: airIRRP100UnitStatusOperateMode
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.1.{{ $index }}'
                     descr: Unit Status
@@ -229,7 +252,7 @@ modules:
                     oid: sPDUOutletControlTable
                     value: sPDUOutletCtl
                     num_oid: '.1.3.6.1.4.1.318.1.1.4.4.2.1.3.{{ $index }}'
-                    descr: 'Outlet {{ $subindex0 }} State'
+                    descr: '#{{ $subindex0 }} : {{ sPDUOutletCtlName }}'
                     index: 'sPDUOutletCtl.{{ $index }}'
                     state_name: sPDUOutletCtl
                     states:
@@ -563,6 +586,33 @@ modules:
                         - { descr: noCoolingFansPresent, graph: 0, value: 3, generic: 0 }
                         - { descr: unknown, graph: 0, value: 4, generic: 3 }
                     skip_values: 3
+                -
+                    oid: upsAdvInputLineFailCause
+                    value: upsAdvInputLineFailCause
+                    num_oid: '.1.3.6.1.4.1.318.1.1.1.3.2.5.{{ $index }}'
+                    descr: 'Last failure cause'
+                    index: 'upsAdvInputLineFailCause.{{ $index }}'
+                    state_name: upsAdvInputLineFailCause
+                    states:
+                        - { descr: noTransfer, graph: 0, value: 1, generic: 0 }
+                        - { descr: highLineVoltage, graph: 0, value: 2, generic: 0 }
+                        - { descr: brownout, graph: 0, value: 3, generic: 0 }
+                        - { descr: blackout, graph: 0, value: 4, generic: 0 }
+                        - { descr: smallMomentarySag, graph: 0, value: 5, generic: 0 }
+                        - { descr: deepMomentarySag, graph: 0, value: 6, generic: 0 }
+                        - { descr: smallMomentarySag, graph: 0, value: 7, generic: 0 }
+                        - { descr: largeMomentarySpike, graph: 0, value: 8, generic: 0 }
+                        - { descr: selfTest, graph: 0, value: 9, generic: 0 }
+                        - { descr: rateOfVoltageChange, graph: 0, value: 10, generic: 0 }
+                -
+                    oid: upsAdvTestDiagnosticsResults
+                    num_oid: '.1.3.6.1.4.1.318.1.1.1.7.2.3.0'
+                    descr: UPS diagnostics status
+                    states:
+                        - { descr: ok, graph: 0, value: 1, generic: 0 }
+                        - { descr: failed, graph: 0, value: 2, generic: 3 }
+                        - { descr: invalidTest, graph: 0, value: 3, generic: 1 }
+                        - { descr: testInProgress, graph: 0, value: 4, generic: 1 }
 
         temperature:
             data:
@@ -801,6 +851,7 @@ modules:
                     descr: Air Flow
         voltage:
             data:
+                # rPDUIdentDeviceLinetoLineVoltage is done in includes/discovery/sensors/voltage/apc.inc.php:141
                 -
                     oid: airIRRP100UnitStatusCompressorDriveVoltage
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.37.{{ $index }}'
@@ -919,6 +970,7 @@ modules:
                     skip_values: -1
         current:
             data:
+                # rPDULoadStatusLoad and rPDU2PhaseStatusCurrent at OID .1.3.6.1.4.1.318.1.1.26.6.3.1.5 is done in the includes/discovery/sensors/current/apc.inc.php:19 file
                 -
                     oid: airIRRP100UnitStatusHumidifierCurrent
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.33.{{ $index }}'
@@ -1022,6 +1074,11 @@ modules:
         power:
             data:
                 -
+                    oid: upsAdvOutputActivePower
+                    num_oid: '.1.3.6.1.4.1.318.1.1.1.4.2.8.{{ $index }}'
+                    index: 'PowerNet-MIB::upsAdvOutputActivePower.{{ $index }}'
+                    descr: 'Active Power'
+                -
                     oid: airIRRP100UnitStatusCompressorDrivePower
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.35.{{ $index }}'
                     index: 'airIRRP100UnitStatusCompressorDrivePower.{{ $index }}'
@@ -1058,6 +1115,7 @@ modules:
                     multiplier: 10
                     index: 'rPDU2DeviceStatusPower.{{ $index }}'
                     descr: 'Power, Total'
+                    skip_value_lt: 0
                 -
                     oid: xPDUSystemOutput
                     value: xPDUSystemOutputTotalPower
@@ -1092,6 +1150,26 @@ modules:
                     descr: 'Apparent Power - Phase {{ $index }}'
                     multiplier: 100
                     skip_values: -1
+                -
+                    oid: rPDUIdentDevicePowerWatts
+                    num_oid: '.1.3.6.1.4.1.318.1.1.12.1.16.{{ $index }}'
+                    index: 'rPDUIdentDevicePowerWatts.{{ $index }}'
+                    descr: 'Total power'
+                    skip_values:
+                        -
+                            device: hardware
+                            op: 'not_starts'
+                            value: 'AP7'
+        power_consumed:
+            data:
+                -
+                    oid: rPDU2DeviceStatusTable
+                    value: rPDU2DeviceStatusEnergy
+                    num_oid: '.1.3.6.1.4.1.318.1.1.26.4.3.1.9.{{ $index }}'
+                    divisor: 10
+                    index: 'rPDU2DeviceStatusEnergy.{{ $index }}'
+                    descr: 'Energy since {{ rPDU2DeviceStatusEnergyStartTime }}'
+                    skip_value_lt: 0
         pressure:
             data:
                 -
@@ -1250,3 +1328,15 @@ modules:
                     user_func: dateToDays
                     low_warn_limit: 30
                     low_limit: 0
+                -
+                    oid: upsAdvBatteryNumOfBattPacks
+                    num_oid: '.1.3.6.1.4.1.318.1.1.1.2.2.5.{{ $index }}'
+                    index: 'upsAdvBatteryNumOfBattPacks.{{ $index }}'
+                    descr: 'Installed batteries'
+                    low_limit: 0
+                -
+                    oid: upsAdvBatteryNumOfBadBattPacks
+                    num_oid: '.1.3.6.1.4.1.318.1.1.1.2.2.6.{{ $index }}'
+                    index: 'upsAdvBatteryNumOfBadBattPacks.{{ $index }}'
+                    descr: 'Bad batteries'
+                    high_limit: 1

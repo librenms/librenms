@@ -71,21 +71,21 @@ if (count($services) > '0') {
     foreach ($services as $service) {
         $service['service_ds'] = htmlspecialchars_decode($service['service_ds']);
         if ($service['service_status'] == '2') {
-            $status = '<span class="alert-status label-danger"><span class="device-services-page">' . $service['service_type'] . '</span></span>';
+            $status = '<span class="alert-status label-danger"><span class="device-services-page">' . htmlentities($service['service_type']) . '</span></span>';
         } elseif ($service['service_status'] == '1') {
-            $status = '<span class="alert-status label-warning"><span class="device-services-page">' . $service['service_type'] . '</span></span>';
+            $status = '<span class="alert-status label-warning"><span class="device-services-page">' . htmlentities($service['service_type']) . '</span></span>';
         } elseif ($service['service_status'] == '0') {
-            $status = '<span class="alert-status label-success"><span class="device-services-page">' . $service['service_type'] . '</span></span>';
+            $status = '<span class="alert-status label-success"><span class="device-services-page">' . htmlentities($service['service_type']) . '</span></span>';
         } else {
-            $status = '<span class="alert-status label-info"><span class="device-services-page">' . $service['service_type'] . '</span></span>';
+            $status = '<span class="alert-status label-info"><span class="device-services-page">' . htmlentities($service['service_type']) . '</span></span>';
         }
 
         echo '<tr id="row_' . $service['service_id'] . '">';
         echo '<td class="col-sm-12">';
         echo '<div class="col-sm-1">' . $status . '</div>';
         echo '<div class="col-sm-2 text-muted">' . \LibreNMS\Util\Time::formatInterval(time() - $service['service_changed']) . '</div>';
-        echo '<div class="col-sm-2 text-muted">' . $service['service_desc'] . '</div>';
-        echo '<div class="col-sm-5">' . nl2br(trim($service['service_message'])) . '</div>';
+        echo '<div class="col-sm-2 text-muted">' . htmlentities($service['service_desc']) . '</div>';
+        echo '<div class="col-sm-5">' . nl2br(htmlentities(trim($service['service_message']))) . '</div>';
         echo '<div class="col-sm-2">';
         echo '<div class="pull-right">';
         if (Auth::user()->hasGlobalAdmin()) {

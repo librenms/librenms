@@ -12,8 +12,19 @@ query).
 
 1: Install the scripts:
 
-Copy the scripts from librenms-agent/snmp/Openwrt - preferably inside /etc/librenms on Openwrt (and add this
-directory to /etc/sysupgrade.conf, to survive firmware updates).
+Copy the scripts from librenms-agent repository - preferably inside /etc/librenms on Openwrt (and add this
+directory to /etc/sysupgrade.conf, to survive firmware updates):
+```
+wget -O /etc/librenms/wlClients.sh https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/Openwrt/wlClients.sh
+wget -O /etc/librenms/wlFrequency.sh https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/Openwrt/wlFrequency.sh
+wget -O /etc/librenms/wlInterfaces.txt https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/Openwrt/wlInterfaces.txt
+wget -O /etc/librenms/wlNoiseFloor.sh https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/Openwrt/wlNoiseFloor.sh
+wget -O /etc/librenms/wlRate.sh https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/Openwrt/wlRate.sh
+wget -O /etc/librenms/wlSNR.sh https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/Openwrt/wlSNR.sh
+wget -O /etc/librenms/distro https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/distro
+chmod +x /etc/librenms/*.sh
+chmod +x /etc/librenms/distro
+```
 
 The only file that needs to be edited is wlInterfaces.txt, which is a mapping from the wireless interfaces, to
 the desired display name in LibreNMS. For example,
@@ -22,12 +33,19 @@ wlan0,wl-2.4G
 wlan1,wl-5.0G
 ```
 
-2: Update the Openwrt SNMP configuration, adding extend support for the Wireless Sensor queries:
+2: Update the Openwrt SNMP configuration, adding extend support for the OS detection and the Wireless Sensor queries:
 
 `vi /etc/config/snmpd`, adding the following entries (assuming the scripts are installed in /etc/librenms, and are executable),
 and update the network interfaces as needed to match the hardware,
 
 ```
+config extend
+        option name	distro
+        option prog	'/etc/librenms/distro'
+config extend
+        option name	hardware
+        option prog	'/bin/cat'
+        option args	'/sys/firmware/devicetree/base/model'
 config extend
         option name     interfaces
         option prog     "/bin/cat /etc/librenms/wlInterfaces.txt"

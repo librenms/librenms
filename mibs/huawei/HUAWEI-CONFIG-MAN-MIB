@@ -1,9 +1,9 @@
 -- =================================================================
--- Copyright (C) 2017 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2022 by  HUAWEI TECHNOLOGIES. All rights reserved.
 --
 -- Description: configuration mangement mib
 -- Reference:   huawei enterprise mib
--- Version:     V2.17
+-- Version:     V2.36
 -- History:
 --                initial version 2002-12-20
 -- =================================================================
@@ -25,8 +25,8 @@ HUAWEI-CONFIG-MAN-MIB DEFINITIONS ::= BEGIN
 
 
     -- 1.3.6.1.4.1.2011.6.10
-    hwConfig MODULE-IDENTITY 
-        LAST-UPDATED"201708021727Z"         -- August 02, 2017 at 17:27GMT
+    hwConfig MODULE-IDENTITY
+        LAST-UPDATED"202210151000Z"        -- October 15 2022 at 10:00GMT
         ORGANIZATION
               "Huawei Technologies Co.,Ltd."
         CONTACT-INFO
@@ -37,12 +37,80 @@ HUAWEI-CONFIG-MAN-MIB DEFINITIONS ::= BEGIN
                  Website: http://www.huawei.com
                  Email: support@huawei.com
                "
+
+           DESCRIPTION 
+            "The description of some nodes was changed."
+        REVISION "202210151000Z"         -- October 15 2022 at 10:00GMT
+           DESCRIPTION
+            "Modiffy trap node hwcfgStartupFileIntegrityFailFileType."
+        REVISION "202206251000Z"         -- June 25 2022 at 10:00GMT
+           DESCRIPTION
+            "Modiffy trap node hwCfgMinisystemConfigRecovery and hwCfgMinisystemConfigRecoveryClear."
+        REVISION "202206131000Z"         -- June 13 2022 at 10:00GMT
+           DESCRIPTION
+            "Add new trap node hwCfgMinisystemConfigRecovery and hwCfgMinisystemConfigRecoveryClear."
+        REVISION "202202101000Z"         -- February 10 2022 at 10:00GMT
+           DESCRIPTION 
+            "Modify the OBJECTS of the hwcfgStartupFileIntegrityFailResume node."
+        REVISION "202110271000Z"         -- October 27 2021 at 10:00GMT
+           DESCRIPTION 
+            "The value range of the hwCfgOperateState object was changed."
+        REVISION "202108121000Z"         -- August 12 2021 at 10:00GMT
+           DESCRIPTION
+            "Add new trap node hwCfgNextStartupFileIntegrityFail , hwCfgStartupFileIntegrityFail and hwCfgStartupFileIntegrityFailResume."
+        REVISION "202103101000Z"         -- March 10 2021 at 10:00GMT
+           DESCRIPTION 
+            "Modify the datatype of hwCfgBackupServerIp, and new MIB node hwCfgBackupServerAddrType."
+        REVISION "202101201910Z"         -- January 20 2021 at 19:10GMT
+         DESCRIPTION 
+            "Add new mib node hwCfgBackupServerPort of table HwCfgBackup2ServerEntry."
+        REVISION  "202012291910Z"
         DESCRIPTION 
             "The HUAWEI-CONFIG-MAN-MIB contains objects to manage the system configuration. 
             It defines the model used to represent configuration data that exists elsewhere 
             in the system and in peripheral devices. The MIB is proper for system configuration.
             NMS can query configuration change log information and operate configuration.
             There are no constraints on this MIB."
+
+        REVISION "202012291910Z"         -- December 29 2020 at 19:10GMT
+           DESCRIPTION 
+            "The value range of the hwCfgOperateProtocol object was changed."
+
+        REVISION "202012211910Z"         -- December 21 2020 at 19:10GMT
+           DESCRIPTION 
+            "The value range of the hwCfgOperateState object was changed."
+
+        REVISION "202012151010Z"         -- December 15 2020 at 10:10GMT
+           DESCRIPTION 
+            "The value range of the hwCfgOperateServerPort object was changed."
+
+        REVISION "202008181610Z"         -- August 18 2020 at 16:10GMT
+           DESCRIPTION 
+            "The description of hwCfgRestoreErrCode was changed. Add trap node hwCfgMemoryInsufficient and hwCfgMemoryInsufficientResume"
+
+        REVISION "201807181610Z"         -- July 18 2018 at 16:10GMT
+           DESCRIPTION 
+            "The type of the hwCfgConfigChangeSrcAddress object was changed."
+
+        REVISION "201807021610Z"         -- July 02 2018 at 16:10GMT
+           DESCRIPTION 
+            "The value range of the hwCfgSaveAutoCpuLimit object was changed."
+         
+          REVISION "201805281610Z"         -- May 28 2018 at 16:10GMT
+           DESCRIPTION 
+            "Add new trap node hwCfgConfigChangeLog of hwConfigManNotifications."
+
+          REVISION "201802271610Z"         -- February 27, 2018 at 16:10GMT
+           DESCRIPTION 
+            "Add new trap node hwCfgLockConfiguration and hwCfgunLockConfiguration of hwConfigManNotifications."
+
+          REVISION "201801271610Z"         -- January 27, 2018 at 16:10GMT
+           DESCRIPTION 
+            "add trap node hwNextStartupFileInconsistent and hwNextStartupFileInconsistentResume."
+
+        REVISION "201712271610Z"         -- December 27, 2017 at 16:10GMT
+           DESCRIPTION 
+            "modified trap node value hwCfgRestoreSuccess."
 
          REVISION "201708021727Z"         -- August 02, 2017 at 17:27GMT
            DESCRIPTION 
@@ -108,6 +176,7 @@ HUAWEI-CONFIG-MAN-MIB DEFINITIONS ::= BEGIN
         DESCRIPTION 
             "The initial revision of this MIB module ."
         ::= { huaweiUtility 10 }
+
 
     --
     -- Textual conventions
@@ -564,12 +633,7 @@ HUAWEI-CONFIG-MAN-MIB DEFINITIONS ::= BEGIN
         STATUS current
         DESCRIPTION
             "This value indicates the primary reference time of the hwCfgOperateEntry 
-            saved in the hwCfgOperateTable.This value is not valid if there is extra 
-            space in the hwCfgOperateTable, that is, the hwCfgOperateEntry is not deleted
-            periodically. 
-            If there is no space in the hwCfgOperateTable to save a new hwCfgOperateEntry,
-            the expired hwCfgOperateEntry that is unactivated or the hwCfgOperateEntry 
-            that is processed may be deleted. Default value is 5."
+            saved in the hwCfgOperateTable. Default value is 5."
         ::= { hwCfgOperate 2 }
 
     
@@ -580,8 +644,7 @@ HUAWEI-CONFIG-MAN-MIB DEFINITIONS ::= BEGIN
         STATUS current
         DESCRIPTION
             "The maximum number of copy entries that may be held
-            in hwCfgOperateResultTable.  A particular setting does not guarantee 
-            that much data can be held. Default value is 5.
+            in hwCfgOperateResultTable. Default value is 5.
             "
         ::= { hwCfgOperate 3 }
 
@@ -671,6 +734,7 @@ HUAWEI-CONFIG-MAN-MIB DEFINITIONS ::= BEGIN
     hwCfgOperateProtocol OBJECT-TYPE
         SYNTAX INTEGER
             {
+            none(0),
             ftp(1),
             tftp(2),
             sftp(3)
@@ -691,7 +755,7 @@ HUAWEI-CONFIG-MAN-MIB DEFINITIONS ::= BEGIN
     
     -- 1.3.6.1.4.1.2011.6.10.1.2.4.1.4
     hwCfgOperateFileName OBJECT-TYPE
-        SYNTAX DisplayString (SIZE (1..128))
+        SYNTAX DisplayString (SIZE (0..128))
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
@@ -725,7 +789,7 @@ HUAWEI-CONFIG-MAN-MIB DEFINITIONS ::= BEGIN
     
     -- 1.3.6.1.4.1.2011.6.10.1.2.4.1.6
     hwCfgOperateUserName OBJECT-TYPE
-        SYNTAX DisplayString (SIZE (1..40))
+        SYNTAX DisplayString (SIZE (0..40))
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
@@ -783,7 +847,7 @@ HUAWEI-CONFIG-MAN-MIB DEFINITIONS ::= BEGIN
         
     -- 1.3.6.1.4.1.2011.6.10.1.2.4.1.10
     hwCfgOperateServerPort OBJECT-TYPE
-        SYNTAX Integer32(1..65535)
+        SYNTAX Integer32(0..65535)
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
@@ -963,7 +1027,11 @@ HUAWEI-CONFIG-MAN-MIB DEFINITIONS ::= BEGIN
             opAbort(20),  
             opInvalidSourceAddress(21),
             opInvalidSourceInterface(22),
-            opCmdExecuteFail(23)
+            opCmdExecuteFail(23),
+            opWaitFileTrans(24),
+            opLockStartUp(25),
+            opSetStartupFileFail(26),
+            opGetStartupFileFailInMiniSystem(27)
             }
         MAX-ACCESS read-only
         STATUS current
@@ -1043,7 +1111,19 @@ HUAWEI-CONFIG-MAN-MIB DEFINITIONS ::= BEGIN
                 invalid source interface specified.   
             
             opCmdExecuteFail :
-                execute command return error.          
+                execute command return error.    
+
+            opWaitFileTrans :
+                device is ready, wait nms file transfer. 
+
+            opLockStartUp :
+                the next startup file is locked by another user.  
+
+            opSetStartupFileFail :
+                set startup file fail. 
+
+            opGetStartupFileFailInMiniSystem :
+                get next startup file fail in mini-system mode. 
                 "
         ::= { hwCfgOperateResultEntry 4 }
 
@@ -1157,7 +1237,7 @@ HUAWEI-CONFIG-MAN-MIB DEFINITIONS ::= BEGIN
             MAX-ACCESS accessible-for-notify
             STATUS current
             DESCRIPTION
-                "ErrorCode: cause of an alarm.(1:Failed to restore some configurations. 2:Failed to restore all configurations because of a failure to open the configuration file. 3:Failed to restore all configurations because of the nonexistent configuration file. 4:Failed to restore all configurations because of the nonexistent configuration file. 5: Failed to restore all configurations because of other reasons.)"
+                "ErrorCode: cause of an alarm. (1: Failed to restore some configurations. 2: Failed to restore all configurations because of a failure to open the configuration file. 3: Failed to restore all configurations because of the nonexistent configuration file. 4: Failed to restore all configurations because of the nonexistent configuration file. 5: Failed to restore all configurations because of other reasons.)"
             ::= { hwCfgOperate 8 }
 
     -- ==========================================================================
@@ -1198,12 +1278,12 @@ the function of saving configuration automatically is disable when the interval 
 
       -- 1.3.6.1.4.1.2011.6.10.1.3.4
     hwCfgSaveAutoCpuLimit OBJECT-TYPE
-        SYNTAX Integer32(1..60)  --metric: %
+        SYNTAX Integer32(1..100)  --metric: %
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION
             "This object indicates the upper limit of the CPU usage when configurations are  
-             automatically saved.If the function of saving configuration automatically is not 
+             automatically saved. If the function of saving configuration automatically is not 
              enabled, the value is insignificant. Default value is 50."
         ::= { hwCfgSave 4 } 
 
@@ -1225,7 +1305,7 @@ the function of saving configuration automatically is disable when the interval 
         STATUS current
         DESCRIPTION
             "This object indicates the delay minute after some configurations change happens 
-            then configurations are automatically saved.If the function of saving configuration 
+            then configurations are automatically saved. If the function of saving configuration 
             automatically is not enabled, the value is insignificant. Default value is 5."
         ::= { hwCfgSave 6 }  
                  
@@ -1256,7 +1336,7 @@ the function of saving configuration automatically is disable when the interval 
             hwCfgBackupIndex
                 Integer32,
             hwCfgBackupServerIp
-                IpAddress,
+                InetAddress,
             hwCfgBackupProtocol
                 INTEGER,
             hwCfgBackupUser
@@ -1270,7 +1350,11 @@ the function of saving configuration automatically is disable when the interval 
             hwCfgBackupResult
                 DisplayString,
             hwCfgBackupVpnInstance
-                DisplayString
+                DisplayString,
+           hwCfgBackupServerPort
+                Integer32,
+            hwCfgBackupServerAddrType
+                InetAddressType
          }
 
     -- 1.3.6.1.4.1.2011.6.10.1.3.7.1.1
@@ -1285,7 +1369,7 @@ the function of saving configuration automatically is disable when the interval 
     
     -- 1.3.6.1.4.1.2011.6.10.1.3.7.1.2
     hwCfgBackupServerIp OBJECT-TYPE
-        SYNTAX IpAddress
+        SYNTAX InetAddress
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
@@ -1369,7 +1453,22 @@ the function of saving configuration automatically is disable when the interval 
         DESCRIPTION
             "The VPN instance name that through which to transfer the file."
         ::= { hwCfgBackup2ServerEntry 9 }  
-   
+      -- 1.3.6.1.4.1.2011.6.10.1.3.7.1.10
+    hwCfgBackupServerPort OBJECT-TYPE
+        SYNTAX Integer32 (1..65535)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The port number of the server  to which to the device backup configuration automatically. "
+        ::= { hwCfgBackup2ServerEntry 10 }
+    -- 1.3.6.1.4.1.2011.6.10.1.3.7.1.11
+    hwCfgBackupServerAddrType OBJECT-TYPE
+        SYNTAX     InetAddressType { unknown(0), ipv4(1), ipv6(2) }
+        MAX-ACCESS read-create
+        STATUS     current
+        DESCRIPTION
+                "The address type of the hwCfgBackupServerIp entry."
+        ::= { hwCfgBackup2ServerEntry 11 }
         
     -- ==========================================================================
     -- configuration lock group
@@ -1493,7 +1592,148 @@ the function of saving configuration automatically is disable when the interval 
     -- ==========================================================================
     -- configuration save group
     -- ==========================================================================
+  
+    -- ==========================================================================
+    -- trap object group
+    -- ==========================================================================
+    -- 1.3.6.1.4.1.2011.6.10.1.5 
+    hwCfgTrapObject OBJECT IDENTIFIER ::= { hwConfigManObjects 5 }
+    -- 1.3.6.1.4.1.2011.6.10.1.5.1
+    hwCfgOperateLockByUserUserName OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "Name of a user who locks the configuration."
+        ::= { hwCfgTrapObject 1 }		
+		
+    -- 1.3.6.1.4.1.2011.6.10.1.5.2
+    hwCfgOperateUnlockByUserUserName OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "Name of a user who unlocks the configuration."
+        ::= { hwCfgTrapObject 2 }		
+	
+    -- 1.3.6.1.4.1.2011.6.10.1.5.3
+    hwCfgOperateLockByUserLockId OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "Unique ID of a configuration lock."
+        ::= { hwCfgTrapObject 3 }	
+	
+    -- 1.3.6.1.4.1.2011.6.10.1.5.4
+    hwCfgOperateLockByUserLockedTime OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "Time when the configuration is locked."
+        ::= { hwCfgTrapObject 4 }	
+				
+    -- 1.3.6.1.4.1.2011.6.10.1.5.5
+    hwCfgOperateUnlockByUserUnlockedTime OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "Time when the configuration is unlocked."
+        ::= { hwCfgTrapObject 5 }
+
+    -- 1.3.6.1.4.1.2011.6.10.1.5.6
+    hwCfgConfigChangeIsInner OBJECT-TYPE
+        SYNTAX Integer32(0..1)
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "Whether an internal change."
+        ::= { hwCfgTrapObject 6 }  
         
+    -- 1.3.6.1.4.1.2011.6.10.1.5.7
+    hwCfgConfigChangeUserName OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "Name of the user who triggers the configuration change."
+        ::= { hwCfgTrapObject 7 }
+
+    -- 1.3.6.1.4.1.2011.6.10.1.5.8
+    hwCfgConfigChangeSessionId OBJECT-TYPE
+        SYNTAX Integer32(0..65535)
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "ID of the session that initiates the configuration change."
+        ::= { hwCfgTrapObject 8 }
+
+    -- 1.3.6.1.4.1.2011.6.10.1.5.9
+    hwCfgConfigChangeSrcAddress OBJECT-TYPE
+        SYNTAX InetAddress
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "Source address that initiates the configuration change."
+        ::= { hwCfgTrapObject 9 }
+
+    -- 1.3.6.1.4.1.2011.6.10.1.5.10
+    hwCfgConfigChangeStorageType OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+	running(0),
+	candidate(1),
+	startup(2)
+       }
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "Type of the storage warehouse where the configuration change occurs."
+        ::= { hwCfgTrapObject 10 }
+
+    -- 1.3.6.1.4.1.2011.6.10.1.5.11
+    hwCfgConfigChangeTerminalType OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+           cli(0),
+           netconf(1),
+           snmp(2),
+           rollback(3),
+           y2(4),
+           restore(5),
+           system(6),
+           mml(7),
+           innerRollback(8),
+           invalid(9),
+           innerConfig(65535)
+        }
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "Type of the terminal that initiates the configuration change"
+        ::= { hwCfgTrapObject 11 }
+
+    -- 1.3.6.1.4.1.2011.6.10.1.5.12
+    hwcfgStartupFileIntegrityFailFileType OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+           default(0),
+           startup(1),
+           nextCfgFile(2),
+           nextPafFile(3)
+        }
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "Type of the startup configuration file whose integrity check fails."
+        ::= { hwCfgTrapObject 12 }
+
+      -- ==========================================================================
+    -- trap object group
+    -- ==========================================================================
+    
     -- 1.3.6.1.4.1.2011.6.10.2
     hwConfigManNotifications OBJECT IDENTIFIER ::= { hwConfig 2 }
 
@@ -1564,6 +1804,13 @@ the function of saving configuration automatically is disable when the interval 
             "When configuration restoration fails, this trap is generated."
         ::= { hwConfigManNotifications 7 }
 
+    -- 1.3.6.1.4.1.2011.6.10.2.8
+    hwCfgRestoreSuccess  NOTIFICATION-TYPE
+        STATUS current
+        DESCRIPTION 
+            "When configuration restoration succeeds, this trap is generated."
+        ::= { hwConfigManNotifications 8}
+
     -- 1.3.6.1.4.1.2011.6.10.2.9
     hwConfigInconsistent  NOTIFICATION-TYPE    		
         STATUS current
@@ -1596,7 +1843,95 @@ the function of saving configuration automatically is disable when the interval 
             from inconsistent to consistent, 
             the trap is generated."
         ::= { hwConfigManNotifications 12 }
-        
+
+    -- 1.3.6.1.4.1.2011.6.10.2.13
+    hwNextStartupFileInconsistent   NOTIFICATION-TYPE    		
+        STATUS current
+        DESCRIPTION 
+            "When the system automatically detects that the next startup files of the master and slave main control boards are inconsistent, this trap is generated."
+        ::= { hwConfigManNotifications 13 }
+
+    -- 1.3.6.1.4.1.2011.6.10.2.14
+    hwNextStartupFileInconsistentResume NOTIFICATION-TYPE    		
+        STATUS current
+        DESCRIPTION 
+            "When the system automatically detects that the next startup files of the master and slave main control boards become consistent, this trap is generated."
+        ::= { hwConfigManNotifications 14 }    
+    -- 1.3.6.1.4.1.2011.6.10.2.15
+    hwCfgLockConfigurationByUser  NOTIFICATION-TYPE    
+        OBJECTS { hwCfgOperateLockByUserUserName, hwCfgOperateLockByUserLockId, hwCfgOperateLockByUserLockedTime }	
+        STATUS current
+        DESCRIPTION 
+            "The trap is generated when a user locks system configurations."
+        ::= { hwConfigManNotifications 15 }
+
+    -- 1.3.6.1.4.1.2011.6.10.2.16
+    hwCfgUnlockConfigurationByUser  NOTIFICATION-TYPE    		
+        OBJECTS { hwCfgOperateUnlockByUserUserName, hwCfgOperateUnlockByUserUnlockedTime }	
+        STATUS current
+        DESCRIPTION 
+            "The trap is generated when a user unlocks system configurations."
+        ::= { hwConfigManNotifications 16 }
+
+    -- 1.3.6.1.4.1.2011.6.10.2.17
+    hwCfgConfigChangeLog  NOTIFICATION-TYPE    		
+        OBJECTS { hwCfgConfigChangeIsInner, hwCfgConfigChangeUserName, hwCfgConfigChangeSessionId, hwCfgConfigChangeSrcAddress, hwCfgConfigChangeStorageType, hwCfgConfigChangeTerminalType }	
+        STATUS current
+        DESCRIPTION 
+            "The trap is generated when a configuration changes."
+        ::= { hwConfigManNotifications 17 }
+
+    -- 1.3.6.1.4.1.2011.6.10.2.18
+    hwCfgMemoryInsufficient  NOTIFICATION-TYPE    
+        STATUS current
+        DESCRIPTION 
+            "The trap is generated when system memory is not enough to complete configuration editing."
+        ::= { hwConfigManNotifications 18 }
+
+    -- 1.3.6.1.4.1.2011.6.10.2.19
+    hwCfgMemoryInsufficientResume  NOTIFICATION-TYPE    
+        STATUS current
+        DESCRIPTION 
+            "The trap is generated when the hwCfgMemoryInsufficient trap is manually cleared by user."
+        ::= { hwConfigManNotifications 19 }
+
+    -- 1.3.6.1.4.1.2011.6.10.2.20
+    hwCfgNextStartupFileIntegrityFail NOTIFICATION-TYPE
+    STATUS current
+    DESCRIPTION
+    "The trap is generated when the integrity check of the the next startup configuration file fails."
+    ::= { hwConfigManNotifications 20 }
+
+    -- 1.3.6.1.4.1.2011.6.10.2.21
+    hwcfgStartupFileIntegrityFail NOTIFICATION-TYPE
+    OBJECTS { hwcfgStartupFileIntegrityFailFileType }
+    STATUS current
+    DESCRIPTION
+    "The trap is generated when the integrity check of the startup configuration file fails."
+    ::= { hwConfigManNotifications 21 }
+
+    -- 1.3.6.1.4.1.2011.6.10.2.22
+    hwcfgStartupFileIntegrityFailResume NOTIFICATION-TYPE
+    OBJECTS { hwcfgStartupFileIntegrityFailFileType }
+    STATUS current
+    DESCRIPTION
+    "The trap is generated when the hwcfgStartupFileIntegrityFail trap is manually cleared by user."
+    ::= { hwConfigManNotifications 22 }
+
+    -- 1.3.6.1.4.1.2011.6.10.2.23
+    hwCfgMinisystemConfigRecovery NOTIFICATION-TYPE
+    STATUS current
+    DESCRIPTION
+    "The trap is generated when the system restores to the minimum system configuration."
+    ::= { hwConfigManNotifications 23 }
+
+    -- 1.3.6.1.4.1.2011.6.10.2.24
+    hwCfgMinisystemConfigRecoveryClear NOTIFICATION-TYPE
+    STATUS current
+    DESCRIPTION
+    "The trap is generated when the system does not restore the system to the minimum system configuration."
+    ::= { hwConfigManNotifications 24 }
+
     -- 1.3.6.1.4.1.2011.6.10.3
     hwConfigManConformance OBJECT IDENTIFIER ::= { hwConfig 3 }
 
@@ -1663,7 +1998,7 @@ the function of saving configuration automatically is disable when the interval 
     
     -- 1.3.6.1.4.1.2011.6.10.3.2.3
     hwCfgManNotificationGroup NOTIFICATION-GROUP
-        NOTIFICATIONS { hwCfgManEventlog, hwCfgOperateCompletion ,hwCfgInconsistent, hwCfgInconsistentResume, hwCfgB2STransferFail, hwCfgB2SOperate, hwCfgRestoreFail, hwConfigInconsistent, hwConfigInconsistentResume, hwCfgAppDataInconsistent, hwCfgAppDataInconsistentResume}
+        NOTIFICATIONS { hwCfgManEventlog, hwCfgOperateCompletion ,hwCfgInconsistent, hwCfgInconsistentResume, hwCfgB2STransferFail, hwCfgB2SOperate, hwCfgRestoreFail, hwCfgRestoreSuccess, hwConfigInconsistent, hwConfigInconsistentResume, hwCfgAppDataInconsistent, hwCfgAppDataInconsistentResume, hwNextStartupFileInconsistent, hwNextStartupFileInconsistentResume, hwCfgLockConfigurationByUser, hwCfgUnlockConfigurationByUser, hwCfgConfigChangeLog, hwCfgMemoryInsufficient, hwCfgMemoryInsufficientResume}
         STATUS current
         DESCRIPTION 
             "Collection of notification objects."

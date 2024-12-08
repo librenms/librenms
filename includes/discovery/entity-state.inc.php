@@ -60,7 +60,7 @@ if (! empty($entPhysical)) {
 
                 if (! empty($update)) {
                     if (array_key_exists('entStateLastChanged', $update) && is_null($update['entStateLastChanged'])) {
-                        $update['entStateLastChanged'] = ['NULL'];
+                        $update['entStateLastChanged'] = null;
                     }
 
                     dbUpdate($update, 'entityState', 'entity_state_id=?', [$db_state['entity_state_id']]);

@@ -2,18 +2,15 @@
 
 namespace Database\Factories;
 
-use App\Models\Device;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-/** @extends Factory<Device> */
+/** @extends Factory<\App\Models\Device> */
 class DeviceFactory extends Factory
 {
     /**
      * Define the model's default state.
-     *
-     * @return array
      */
-    public function definition()
+    public function definition(): array
     {
         return [
             'hostname' => $this->faker->domainWord() . '-' . $this->faker->domainWord() . '-' . $this->faker->domainWord() . '.' . $this->faker->domainName(),

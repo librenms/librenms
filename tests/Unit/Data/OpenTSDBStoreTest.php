@@ -52,7 +52,7 @@ class OpenTSDBStoreTest extends TestCase
         parent::tearDown();
     }
 
-    public function testSocketConnectError()
+    public function testSocketConnectError(): void
     {
         $mockFactory = \Mockery::mock(\Socket\Raw\Factory::class);
 
@@ -62,7 +62,7 @@ class OpenTSDBStoreTest extends TestCase
         new OpenTSDB($mockFactory);
     }
 
-    public function testSocketWriteError()
+    public function testSocketWriteError(): void
     {
         $mockSocket = \Mockery::mock(\Socket\Raw\Socket::class);
         $opentsdb = $this->mockOpenTSDB($mockSocket);
@@ -73,7 +73,7 @@ class OpenTSDBStoreTest extends TestCase
         $opentsdb->put(['hostname' => 'test'], 'fake', [], ['one' => 1]);
     }
 
-    public function testSimpleWrite()
+    public function testSimpleWrite(): void
     {
         $mockSocket = \Mockery::mock(\Socket\Raw\Socket::class);
         $opentsdb = $this->mockOpenTSDB($mockSocket);
@@ -90,7 +90,7 @@ class OpenTSDBStoreTest extends TestCase
         $opentsdb->put($device, $measurement, $tags, $fields);
     }
 
-    public function testPortWrite()
+    public function testPortWrite(): void
     {
         $mockSocket = \Mockery::mock(\Socket\Raw\Socket::class);
         $opentsdb = $this->mockOpenTSDB($mockSocket);

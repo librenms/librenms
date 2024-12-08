@@ -31,7 +31,7 @@ class PortsNac extends PortRelatedModel
 {
     protected $table = 'ports_nac';
     protected $primaryKey = 'ports_nac_id';
-    public $timestamps = false;
+    public $timestamps = true;
     protected $fillable = [
         'auth_id',
         'device_id',

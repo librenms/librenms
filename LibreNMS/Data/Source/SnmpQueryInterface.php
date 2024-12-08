@@ -47,6 +47,11 @@ interface SnmpQueryInterface
     public function deviceArray(array $device): SnmpQueryInterface;
 
     /**
+     * Cache the data for the rest of the runtime (or retrieve from cache if available)
+     */
+    public function cache(): SnmpQueryInterface;
+
+    /**
      * Set a context for the snmp query
      * This is most commonly used to fetch alternate sets of data, such as different VRFs
      */
@@ -57,6 +62,12 @@ interface SnmpQueryInterface
      * You do not need to specify the base and os directories, they are already included.
      */
     public function mibDir(?string $dir): SnmpQueryInterface;
+
+    /**
+     * Set MIBs to use for this query. Base mibs are included by default.
+     * They will be appended to existing mibs unless $append is set to false.
+     */
+    public function mibs(array $mibs, bool $append = true): SnmpQueryInterface;
 
     /**
      * When walking multiple OIDs, stop if one fails. Used when the first OID indicates if the rest are supported.
@@ -74,6 +85,11 @@ interface SnmpQueryInterface
      * Output all OIDs numerically
      */
     public function numeric(bool $numeric = true): SnmpQueryInterface;
+
+    /**
+     * Output indexes only as numeric
+     */
+    public function numericIndex(bool $numericIndex = true): SnmpQueryInterface;
 
     /**
      * Hide MIB in output
@@ -127,5 +143,5 @@ interface SnmpQueryInterface
      * Translate an OID.
      * Call numeric method prior output numeric OID.
      */
-    public function translate(string $oid, ?string $mib = null): string;
+    public function translate(string $oid): string;
 }

@@ -25,7 +25,10 @@
 
 namespace LibreNMS\Authentication;
 
+use App\Models\User;
+use Illuminate\Support\Arr;
 use LibreNMS\Config;
+use LibreNMS\Enum\LegacyAuthLevel;
 use LibreNMS\Exceptions\AuthenticationException;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IP;
@@ -46,19 +49,21 @@ class SSOAuthorizer extends MysqlAuthorizer
             throw new AuthenticationException('\'sso.user_attr\' config setting was not found or was empty');
         }
 
-        // Build the user's details from attributes
-        $email = $this->authSSOGetAttr(Config::get('sso.email_attr'));
-        $realname = $this->authSSOGetAttr(Config::get('sso.realname_attr'));
-        $description = $this->authSSOGetAttr(Config::get('sso.descr_attr'));
-        $can_modify_passwd = 0;
+        // User has already been approved by the authenticator so if automatic user create/update is enabled, do it
+        if (Config::get('sso.create_users') || Config::get('sso.update_users')) {
+            $user = User::thisAuth()->firstOrNew(['username' => $credentials['username']]);
 
-        $level = $this->authSSOCalculateLevel();
+            $create = ! $user->exists && Config::get('sso.create_users');
+            $update = $user->exists && Config::get('sso.update_users');
 
-        // User has already been approved by the authenicator so if automatic user create/update is enabled, do it
-        if (Config::get('sso.create_users') && ! $this->userExists($credentials['username'])) {
-            $this->addUser($credentials['username'], null, $level, $email, $realname, $can_modify_passwd, $description ? $description : 'SSO User');
-        } elseif (Config::get('sso.update_users') && $this->userExists($credentials['username'])) {
-            $this->updateUser($this->getUserid($credentials['username']), $realname, $level, $can_modify_passwd, $email);
+            if ($create || $update) {
+                $user->auth_type = LegacyAuth::getType();
+                $user->can_modify_passwd = 0;
+                $user->realname = $this->authSSOGetAttr(Config::get('sso.realname_attr'));
+                $user->email = $this->authSSOGetAttr(Config::get('sso.email_attr'));
+                $user->descr = $this->authSSOGetAttr(Config::get('sso.descr_attr')) ?: 'SSO User';
+                $user->save();
+            }
         }
 
         return true;
@@ -133,6 +138,7 @@ class SSOAuthorizer extends MysqlAuthorizer
                         }
                     }
                 }
+
                 // No match, proxy is untrusted
                 return false;
             } catch (InvalidIpException $e) {
@@ -140,6 +146,7 @@ class SSOAuthorizer extends MysqlAuthorizer
                 return false;
             }
         }
+
         // Not enabled, trust everything
         return true;
     }
@@ -147,15 +154,16 @@ class SSOAuthorizer extends MysqlAuthorizer
     /**
      * Calculate the privilege level to assign to a user based on the configuration and attributes supplied by the external authenticator.
      * Returns an integer if the permission is found, or raises an AuthenticationException if the configuration is not valid.
+     * Converts the legacy level into a role
      *
-     * @return int
+     * @throws AuthenticationException
      */
-    public function authSSOCalculateLevel()
+    public function getRoles(string $username): array|false
     {
         if (Config::get('sso.group_strategy') === 'attribute') {
             if (Config::get('sso.level_attr')) {
                 if (is_numeric($this->authSSOGetAttr(Config::get('sso.level_attr')))) {
-                    return (int) $this->authSSOGetAttr(Config::get('sso.level_attr'));
+                    return Arr::wrap(LegacyAuthLevel::tryFrom((int) $this->authSSOGetAttr(Config::get('sso.level_attr')))?->getName());
                 } else {
                     throw new AuthenticationException('group assignment by attribute requested, but httpd is not setting the attribute to a number');
                 }
@@ -164,13 +172,13 @@ class SSOAuthorizer extends MysqlAuthorizer
             }
         } elseif (Config::get('sso.group_strategy') === 'map') {
             if (Config::get('sso.group_level_map') && is_array(Config::get('sso.group_level_map')) && Config::get('sso.group_delimiter') && Config::get('sso.group_attr')) {
-                return (int) $this->authSSOParseGroups();
+                return Arr::wrap(LegacyAuthLevel::tryFrom((int) $this->authSSOParseGroups())?->getName());
             } else {
                 throw new AuthenticationException('group assignment by level map requested, but \'sso.group_level_map\', \'sso.group_attr\', or \'sso.group_delimiter\' are not set in your config');
             }
         } elseif (Config::get('sso.group_strategy') === 'static') {
             if (Config::get('sso.static_level')) {
-                return (int) Config::get('sso.static_level');
+                return Arr::wrap(LegacyAuthLevel::tryFrom((int) Config::get('sso.static_level'))?->getName());
             } else {
                 throw new AuthenticationException('group assignment by static level was requested, but \'sso.group_level_map\' was not set in your config');
             }
@@ -211,7 +219,7 @@ class SSOAuthorizer extends MysqlAuthorizer
             if (isset($config_map[$value])) {
                 $map = $config_map[$value];
 
-                if (is_integer($map) && $level < $map) {
+                if (is_int($map) && $level < $map) {
                     $level = $map;
                 }
             }

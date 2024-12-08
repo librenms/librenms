@@ -11,7 +11,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::table('device_perf', function (Blueprint $table) {
             $table->index(['device_id', 'timestamp']);
@@ -23,7 +23,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::table('device_perf', function (Blueprint $table) {
             $table->dropIndex(['device_id', 'timestamp']);

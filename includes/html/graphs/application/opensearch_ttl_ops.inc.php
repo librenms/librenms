@@ -14,8 +14,8 @@ $rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Translog Ops',
-        'ds'       => 'ttl_ops',
+        'descr' => 'Translog Ops',
+        'ds' => 'ttl_ops',
     ];
 } else {
     d_echo('RRD "' . $rrd_filename . '" not found');

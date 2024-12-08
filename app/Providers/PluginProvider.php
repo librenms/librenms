@@ -26,28 +26,28 @@
 namespace App\Providers;
 
 use App\Exceptions\PluginDoesNotImplementHookException;
-use App\Plugins\PluginManager;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
+use LibreNMS\Interfaces\Plugins\PluginManagerInterface;
 
 class PluginProvider extends ServiceProvider
 {
-    public function register()
+    public function register(): void
     {
-        $this->app->singleton(PluginManager::class, function ($app) {
-            return new PluginManager;
+        $this->app->singleton(PluginManagerInterface::class, function ($app) {
+            return new \App\Plugins\PluginManager;
         });
     }
 
     public function boot(): void
     {
-        $this->loadLocalPlugins($this->app->make(PluginManager::class));
+        $this->loadLocalPlugins($this->app->make(PluginManagerInterface::class));
     }
 
     /**
      * Load any local plugins these plugins must implement only one hook.
      */
-    protected function loadLocalPlugins(PluginManager $manager): void
+    protected function loadLocalPlugins(PluginManagerInterface $manager): void
     {
         $plugin_view_location_registered = [];
 
@@ -83,8 +83,8 @@ class PluginProvider extends ServiceProvider
      */
     protected function hookType(string $class): string
     {
-        foreach (class_parents($class) as $parent) {
-            if (Str::startsWith($parent, 'App\Plugins\Hooks\\')) {
+        foreach (class_implements($class) as $parent) {
+            if (Str::startsWith($parent, 'LibreNMS\Interfaces\Plugins\Hooks\\')) {
                 return $parent;
             }
         }

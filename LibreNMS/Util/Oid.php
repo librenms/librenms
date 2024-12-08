@@ -26,24 +26,65 @@
 namespace LibreNMS\Util;
 
 use Cache;
+use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Exceptions\InvalidOidException;
 
 class Oid
 {
-    public static function isNumeric(string $oid): bool
-    {
-        return (bool) preg_match('/^[.\d]+$/', $oid);
+    public function __construct(
+        public readonly string $oid
+    ) {
     }
 
-    public static function hasNumericRoot(string $oid): bool
+    public static function of(string $oid): static
     {
-        return (bool) preg_match('/^\.?1/', $oid);
+        return new static($oid);
+    }
+
+    /**
+     * Convert a string to an oid encoded string
+     */
+    public static function encodeString(string $string): static
+    {
+        $oid = strlen($string);
+        for ($i = 0; $i != strlen($string); $i++) {
+            $oid .= '.' . ord($string[$i]);
+        }
+
+        return new static($oid);
+    }
+
+    public function isNumeric(): bool
+    {
+        return (bool) preg_match('/^[.\d]+$/', $this->oid);
+    }
+
+    public function hasMib(): bool
+    {
+        return str_contains($this->oid, '::');
+    }
+
+    /**
+     * Get the MIB of this OID (if it has one)
+     */
+    public function getMib(): string
+    {
+        if ($this->hasMib()) {
+            return explode('::', $this->oid, 2)[0];
+        }
+
+        return '';
+    }
+
+    public function hasNumericRoot(): bool
+    {
+        return (bool) preg_match('/^\.?1/', $this->oid);
     }
 
     public static function hasNumeric(array $oids): bool
     {
         foreach ($oids as $oid) {
-            if (self::isNumeric($oid)) {
+            if (self::of($oid)->isNumeric()) {
                 return true;
             }
         }
@@ -52,31 +93,52 @@ class Oid
     }
 
     /**
+     * Convert this OID to an IP
+     *
+     * @throws InvalidIpException
+     */
+    public function toIp(): IP
+    {
+        return IP::fromSnmpString($this->oid);
+    }
+
+    /**
      * Converts an oid to numeric and caches the result
      *
      * @throws \LibreNMS\Exceptions\InvalidOidException
      */
-    public static function toNumeric(string $oid, string $mib = 'ALL', int $cache = 1800): string
+    public function toNumeric(string $mib = 'ALL', int $cache = 1800): string
     {
-        if (Oid::isNumeric($oid)) {
-            return $oid;
+        if ($this->isNumeric()) {
+            return $this->oid;
         }
 
         // we already have a specific mib, don't add a bunch of others
-        if (str_contains($oid, '::')) {
+        if ($this->hasMib()) {
             $mib = null;
         }
 
-        $key = 'Oid:toNumeric:' . $oid . '/' . $mib;
+        $key = 'Oid:toNumeric:' . $this->oid . '/' . $mib;
 
-        $numeric_oid = Cache::remember($key, $cache, function () use ($oid, $mib) {
-            return \SnmpQuery::numeric()->translate($oid, $mib);
+        $numeric_oid = Cache::remember($key, $cache, function () use ($mib) {
+            $snmpQuery = \SnmpQuery::numeric();
+
+            if ($mib) {
+                $snmpQuery->mibs([$mib], append: $mib !== 'ALL'); // append to base mibs unless using ALL
+            }
+
+            return $snmpQuery->translate($this->oid);
         });
 
         if (empty($numeric_oid)) {
-            throw new InvalidOidException("Unable to translate oid $oid");
+            throw new InvalidOidException("Unable to translate oid $this->oid");
         }
 
         return $numeric_oid;
+    }
+
+    public function __toString(): string
+    {
+        return $this->oid;
     }
 }

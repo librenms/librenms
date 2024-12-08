@@ -1,5 +1,6 @@
 <?php
 
+use App\Jobs\PingCheck;
 use Illuminate\Support\Facades\Artisan;
 use Symfony\Component\Process\Process;
 
@@ -43,19 +44,7 @@ Artisan::command('update', function () {
 Artisan::command('poller:ping
     {groups?* : ' . __('Optional List of distributed poller groups to poll') . '}
 ', function () {
-//    PingCheck::dispatch(new PingCheck($this->argument('groups')));
-    $command = [base_path('ping.php')];
-    if ($this->argument('groups')) {
-        $command[] = '-g';
-        $command[] = implode(',', $this->argument('groups'));
-    }
-    if (($verbosity = $this->getOutput()->getVerbosity()) >= 128) {
-        $command[] = '-d';
-        if ($verbosity >= 256) {
-            $command[] = '-v';
-        }
-    }
-    (new Process($command))->setTimeout(null)->setIdleTimeout(null)->setTty(true)->run();
+    PingCheck::dispatch($this->argument('groups', []));
 })->purpose(__('Check if devices are up or down via icmp'));
 
 Artisan::command('poller:discovery
@@ -85,28 +74,6 @@ Artisan::command('poller:discovery
     }
     (new Process($command))->setTimeout(null)->setIdleTimeout(null)->setTty(true)->run();
 })->purpose(__('Discover information about existing devices, defines what will be polled'));
-
-Artisan::command('poller:poll
-    {device spec : ' . __('Device spec to poll: device_id, hostname, wildcard, odd, even, all') . '}
-    {--m|modules= : ' . __('Specify single module to be run. Comma separate modules, submodules may be added with /') . '}
-    {--x|no-data : ' . __('Do not update datastores (RRD, InfluxDB, etc)') . '}
-', function () {
-    $command = [base_path('poller.php'), '-h', $this->argument('device spec')];
-    if ($this->option('no-data')) {
-        array_push($command, '-r', '-f', '-p');
-    }
-    if ($this->option('modules')) {
-        $command[] = '-m';
-        $command[] = $this->option('modules');
-    }
-    if (($verbosity = $this->getOutput()->getVerbosity()) >= 128) {
-        $command[] = '-d';
-        if ($verbosity >= 256) {
-            $command[] = '-v';
-        }
-    }
-    (new Process($command))->setTimeout(null)->setIdleTimeout(null)->setTty(true)->run();
-})->purpose(__('Poll data from devices as defined by discovery'));
 
 Artisan::command('poller:alerts', function () {
     $command = [base_path('alerts.php')];

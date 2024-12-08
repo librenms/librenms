@@ -25,13 +25,14 @@
 
 namespace LibreNMS\OS;
 
+use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
 
 class F5 extends OS implements OSPolling
 {
-    public function pollOS(): void
+    public function pollOS(DataStorageInterface $datastore): void
     {
         $metadata = [
             'F5-BIGIP-APM-MIB::apmAccessStatCurrentActiveSessions.0' => [
@@ -75,7 +76,7 @@ class F5 extends OS implements OSPolling
                     $info['dataset'] => $data[$key],
                 ];
                 $tags = compact('rrd_def');
-                data_update($this->getDeviceArray(), $info['name'], $tags, $fields);
+                $datastore->put($this->getDeviceArray(), $info['name'], $tags, $fields);
                 $this->enableGraph($info['name']);
             }
         }
@@ -90,7 +91,7 @@ class F5 extends OS implements OSPolling
                 'TotCompatConns' => $data['F5-BIGIP-SYSTEM-MIB::sysClientsslStatTotCompatConns.0'],
             ];
             $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'bigip_system_tps', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'bigip_system_tps', $tags, $fields);
             $this->enableGraph('bigip_system_tps');
         }
     }

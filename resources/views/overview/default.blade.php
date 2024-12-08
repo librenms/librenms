@@ -172,6 +172,7 @@
 @endsection
 
 @push('scripts')
+@include('map.custom-js')
 <script type="text/javascript">
     var gridster;
 
@@ -322,7 +323,7 @@
         } else {
             obj.data('settings','1');
         }
-        widget_reload(obj.attr('id'),obj.data('type'));
+        widget_reload(obj.attr('id'), obj.data('type'), true);
     });
 
 
@@ -582,18 +583,14 @@
     return false;
     }
 
-    function widget_reload(id, data_type, forceDomInject) {
+    function widget_reload(id, data_type, forceDomInject = false) {
         const $widget_body = $('#widget_body_' + id);
-        const $widget_bootgrid = $('#widget_body_' + id + ' .bootgrid-table');
-        const settings = $widget_body.parent().data('settings') == 1 ? 1 : 0;
+        const $widget = $widget_body.children().first();
 
-        if (settings === 1 || forceDomInject) {
-            $widget_bootgrid.bootgrid('destroy');
-            $('#widget_body_' + id + ' *').off();
-        } else if ($widget_bootgrid[0] && $widget_bootgrid.data('ajax') === true) {
-            // Check to see if a bootgrid already exists and has ajax reloading enabled.
-            // If so, use bootgrid to refresh the data instead of injecting the DOM in request.
-            return $widget_bootgrid.bootgrid('reload');
+        // skip html reload and sned refresh event instead
+        if (!forceDomInject && $widget.data('reload') === false) {
+            $widget.trigger('refresh', $widget); // send refresh event
+            return; // skip html reload
         }
 
         $.ajax({
@@ -602,11 +599,14 @@
             data: {
                 id: id,
                 dimensions: {x: $widget_body.width(), y: $widget_body.height()},
-                settings: settings
+                settings: $widget_body.parent().data('settings') == 1 ? 1 : 0
             },
             dataType: 'json',
             success: function (data) {
                 if (data.status === 'ok') {
+                    $widget.trigger('destroy', $widget); // send destroy event
+                    $widget_body.children().unbind().html("").remove(); // clear old contents and unbind events
+
                     $('#widget_title_' + id).html(data.title);
                     $widget_body.html(data.html);
                     $widget_body.parent().data('settings', data.show_settings).data('refresh', data.settings.refresh);
@@ -621,19 +621,25 @@
     }
 
     function grab_data(id, data_type) {
-        const $parent = $('#widget_body_' + id).parent();
-
-        if($parent.data('settings') == 0) {
-            widget_reload(id, data_type);
-        }
+        const refresh = $('#widget_body_' + id).parent().data('refresh');
+        widget_reload(id, data_type);
 
         setTimeout(function () {
             grab_data(id, data_type);
-        }, ($parent.data('refresh') > 0 ? $parent.data('refresh') : 60) * 1000);
+        }, (refresh > 0 ? refresh : 60) * 1000);
     }
 
     // make sure gridster stays disabled when the window is resized
+    var resizeTrigger = null;
     addEvent(window, "resize", function(event) {
+        // emit resize event, but only once every 100ms
+        if (resizeTrigger === null) {
+            resizeTrigger = setTimeout(() => {
+                resizeTrigger = null;
+                $('.widget_body').children().first().trigger('resize');
+            }, 100);
+        }
+
         setTimeout(function(){
             if(!gridster_state) {
                 gridster.disable();

@@ -1,7 +1,7 @@
 mib: CPQPOWER-MIB
 modules:
     os:
-            serial: 
+            serial:
                 - CPQPOWER-MIB::deviceSerialNumber.0
             version:
                 - CPQPOWER-MIB::deviceFirmwareVersion.0
@@ -17,7 +17,7 @@ modules:
                         - pdu2InputPhaseIndex
                         - pdu3OutletName
                         - pdu3OutletControlStatus
-                        - pdu3InputPhaseIndex                        
+                        - pdu3InputPhaseIndex
         state:
             data:
                 -
@@ -111,7 +111,7 @@ modules:
                     warn_limit: pdu3InputPhaseVoltageThUpperWarning
                     high_limit: pdu3InputPhaseVoltageThUpperCritical
                     skip_values: 0
-        current:       
+        current:
             data:
                 -
                     oid: pdu2InputPhaseCurrent
@@ -181,14 +181,14 @@ modules:
                     descr: 'Input Phase {{ $pdu2InputPhaseIndex }} Power'
                     skip_values:
                     -
-                        oid: 'pdu2InputType'
+                        oid: 'pdu2InputType:0'
                         op: '!='
                         value: '1'
                 -
                     oid: pdu2OutletWatts
                     value: pdu2OutletWatts
                     index: 'Pdu2OutletIndex.{{ $index }}'
-                    num_oid: '.1.3.6.1.4.1.232.165.7.5.1.1.14.{{ $index }}'                    
+                    num_oid: '.1.3.6.1.4.1.232.165.7.5.1.1.14.{{ $index }}'
                     descr: '{{ $pdu2OutletName }} Power'
                     group: 'Outlets'
                     skip_values:
@@ -211,7 +211,7 @@ modules:
                     descr: 'Input Phase {{ $pdu3InputPhaseIndex }} Power'
                     skip_values:
                     -
-                        oid: 'pdu3InputType'
+                        oid: 'pdu3InputType:0'
                         op: '!='
                         value: '1'
                 -
@@ -239,10 +239,10 @@ modules:
                     index: 'Pdu2InputIndex.{{ $index }}'
                     num_oid: '.1.3.6.1.4.1.232.165.7.2.1.1.8.{{ $index }}'
                     descr: 'Input Phase {{ $pdu2InputPhaseIndex }} Power Factor'
-                    divisor: 1000  
+                    divisor: 1000
                     skip_values:
                     -
-                        oid: 'pdu2InputType'
+                        oid: 'pdu2InputType:0'
                         op: '!='
                         value: '1'
                     -

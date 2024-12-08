@@ -23,8 +23,8 @@ while (isset($arrays[$int])) {
     if (Rrd::checkRrdExists($rrd_filename)) {
         $rrd_list[] = [
             'filename' => $rrd_filename,
-            'descr'    => $array,
-            'ds'       => $rrdVar,
+            'descr' => $array,
+            'ds' => $rrdVar,
         ];
     }
     $int++;

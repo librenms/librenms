@@ -14,8 +14,8 @@ $rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'M.Throt.Size',
-        'ds'       => 'tm_throttled_size',
+        'descr' => 'M.Throt.Size',
+        'ds' => 'tm_throttled_size',
     ];
 } else {
     d_echo('RRD "' . $rrd_filename . '" not found');

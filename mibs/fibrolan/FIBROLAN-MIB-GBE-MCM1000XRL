@@ -1,0 +1,521 @@
+--  ===============================================================================
+--  File              : FIBROLAN-MIB-GBE-MCM1000XRL.mib
+--  Description       : Private MIB file for FIBROLAN MetroStar I system - MCM1000XRL
+--  By                : Tal Katz-Touaf
+--  MIB Version       : 1.1
+--  MetroStar Version : 1.6.2/build 12
+--  Date              : March 27, 2008
+--  ===============================================================================
+--
+--
+-- Copyright Fibrolan, 2008. All rights reserved.
+--
+-- Reproduction of this document is authorized on condition that this
+-- copyright notice is included.
+
+
+FIBROLAN-MIB-GBE-MCM1000XRL     DEFINITIONS ::= BEGIN
+
+	 IMPORTS
+		enterprises, OBJECT-TYPE, MODULE-IDENTITY	FROM SNMPv2-SMI 
+		DisplayString					FROM SNMPv2-TC
+		MODULE-COMPLIANCE, OBJECT-GROUP			FROM SNMPv2-CONF
+		flMsChassisMvIndex, flMsChassisModuleMvIndex	FROM FIBROLAN-MIB-METRO-STAR-MV
+		flMsModuleMvChannelEntry			FROM FIBROLAN-MIB-MSMODULE;
+
+   flMcm1000xrl  MODULE-IDENTITY
+       LAST-UPDATED "0803270000Z"  
+       ORGANIZATION "Fibrolan ltd"
+       CONTACT-INFO
+         "http://www.fibrolan.com"
+       DESCRIPTION
+         "The MIB module to describe MCM1000XRL interface objects.
+          Copyright (C) Fibrolan Ltd (2008)."
+	::= { enterprises 4467 100 500 10 30 170}
+
+			
+    -- conformance information
+     flMcm1000xrlMIBConformance
+                   OBJECT IDENTIFIER ::= { flMcm1000xrl  1 }
+
+     flMcm1000xrlMIBCompliances  OBJECT IDENTIFIER ::= { flMcm1000xrlMIBConformance 1 }
+     flMcm1000xrlMIBGroups       OBJECT IDENTIFIER ::= { flMcm1000xrlMIBConformance 2 }
+
+
+	-- compliance statements
+     flMcm1000xrlMIBCompliance MODULE-COMPLIANCE
+              STATUS  current
+              DESCRIPTION
+                      "The compliance statement for flMetroStar entities
+                      which implement the flMcm1000xrl MIB."
+			  MODULE FIBROLAN-MIB-MSMODULE
+				  MANDATORY-GROUPS{ flMsModuleMvChannelsGroup}
+              MODULE  -- this module
+                  MANDATORY-GROUPS{ flMcm1000xrlModuleGroup,
+				    flMcm1000xrlChannelsGroup,
+				    flMcm1000xrlPortsGroup}
+              ::= { flMcm1000xrlMIBCompliances 1 }
+
+
+
+     flMcm1000xrlModuleGroup	OBJECT-GROUP
+	        OBJECTS		{ flMcm1000xrlModuleRedundantMode,
+				flMcm1000xrlModuleBckp2MainTimeLocal,
+				flMcm1000xrlModuleBckp2MainTimeRemote,
+				flMcm1000xrlModuleForceBckpLocal,
+				flMcm1000xrlModuleForceBckpRemote,
+				flMcm1000xrlModuleBckpUnusedLocal,
+				flMcm1000xrlModuleBckpUnusedRemote,
+				flMcm1000xrlModuleRedundancySle
+				}
+            STATUS  current
+            DESCRIPTION
+                    "A collection of objects providing basic
+                    instrumentation of the Mcm1000xrl module entity."
+            ::= { flMcm1000xrlMIBGroups 1 }
+
+     flMcm1000xrlChannelsGroup	OBJECT-GROUP
+	        OBJECTS		{ flMcm1000xrlChannelType,
+				flMcm1000xrlChannelDescription,
+				flMcm1000xrlChannelUpSle,
+			        flMcm1000xrlChannelDownSle,
+				flMcm1000xrlChannelUpstreamBw,
+				flMcm1000xrlChannelDownstreamBw,
+				flMcm1000xrlChannelP2-P1Fp,
+				flMcm1000xrlChannelP1-P2Fp
+				}
+            STATUS  current
+            DESCRIPTION
+                    "A collection of objects providing basic
+                    instrumentation of the Mcm1000xrl channel entity."
+            ::= { flMcm1000xrlMIBGroups 2 }
+
+     flMcm1000xrlPortsGroup	OBJECT-GROUP
+	        OBJECTS		{ flMcm1000xrlPortIndex,
+				flMcm1000xrlPortType,
+				flMcm1000xrlPortLink,
+				flMcm1000xrlPortSignalDetect,
+				flMcm1000xrlPortState,
+				flMcm1000xrlPortEnable,
+				flMcm1000xrlPortAutoNego,
+				flMcm1000xrlPortPause,
+				flMcm1000xrlPortLb}
+            STATUS  current
+            DESCRIPTION
+                    "A collection of objects providing basic
+                    instrumentation of the Mcm1000xrl port entity."
+            ::= { flMcm1000xrlMIBGroups 3 }
+	
+-- ************************************************************
+-- ************************************************************
+-- FibroLan Object Identifier Definition
+-- ************************************************************
+-- ************************************************************
+
+fibrolan            OBJECT IDENTIFIER ::= { enterprises       4467 }
+
+fibrolanSNMP        OBJECT IDENTIFIER ::= { fibrolan           100 }
+
+flMetroStarMv 		OBJECT IDENTIFIER ::=  { fibrolanSNMP      500 }
+
+flMsChassisMv		OBJECT IDENTIFIER ::=  { flMetroStarMv	    10 }
+
+flMsModuleMv		OBJECT IDENTIFIER ::=  { flMsChassisMv	    30 }
+
+--flMcm1000xrl			OBJECT IDENTIFIER ::=  { flMsModuleMv      170 }
+
+
+flMcm1000xrlModule		    OBJECT IDENTIFIER ::= { flMcm1000xrl    10 }
+flMcm1000xrlChannels		    OBJECT IDENTIFIER ::= { flMcm1000xrl    20 }
+flMcm1000xrlPorts		    OBJECT IDENTIFIER ::= { flMcm1000xrl    30 }
+
+
+-- ************************************************************
+-- ************************************************************
+--   Module table 
+-- ************************************************************
+-- ************************************************************
+     flMcm1000xrlModuleTable	OBJECT-TYPE
+         SYNTAX  SEQUENCE OF FlMcm1000xrlModuleEntry
+         MAX-ACCESS  not-accessible
+         STATUS  current
+         DESCRIPTION
+         "This table shows the Mcm1000x-rl general module and redundancy status"
+     ::= { flMcm1000xrlModule  1 }
+
+     flMcm1000xrlModuleEntry	OBJECT-TYPE
+         SYNTAX  FlMcm1000xrlModuleEntry
+         MAX-ACCESS  not-accessible
+         STATUS  current
+         DESCRIPTION
+         "The entries of the table."
+         INDEX { flMsChassisMvIndex,
+		 flMsChassisModuleMvIndex}
+     ::= { flMcm1000xrlModuleTable   1 }
+
+		FlMcm1000xrlModuleEntry ::= SEQUENCE
+		{
+			flMcm1000xrlModuleRedundantMode			INTEGER,
+			flMcm1000xrlModuleBckp2MainTimeLocal		INTEGER,
+			flMcm1000xrlModuleBckp2MainTimeRemote		INTEGER,
+			flMcm1000xrlModuleForceBckpLocal		INTEGER,
+			flMcm1000xrlModuleForceBckpRemote		INTEGER,
+			flMcm1000xrlModuleBckpUnusedLocal		INTEGER,
+			flMcm1000xrlModuleBckpUnusedRemote		INTEGER,
+			flMcm1000xrlModuleRedundancySle			INTEGER
+		}
+
+	flMcm1000xrlModuleRedundantMode		OBJECT-TYPE
+		SYNTAX	  INTEGER {
+					off	(1),
+					on	(2)
+				  }
+		MAX-ACCESS    read-write
+		STATUS    current
+		DESCRIPTION
+		"MCM1000X-RL redundant mode status" 
+		::= { flMcm1000xrlModuleEntry  1 }
+
+	flMcm1000xrlModuleBckp2MainTimeLocal	OBJECT-TYPE
+		SYNTAX	  INTEGER {
+					sec0	(1),
+					sec1	(2),
+					sec5	(3),
+					sec10	(4),
+					sec20	(5),
+					never	(7)
+				  }
+		MAX-ACCESS    read-write
+		STATUS    current
+		DESCRIPTION
+		"Local ports Bckp 2 Main time"
+		::= { flMcm1000xrlModuleEntry  2 }
+
+	flMcm1000xrlModuleBckp2MainTimeRemote	OBJECT-TYPE
+		SYNTAX	  INTEGER {
+					sec0	(1),
+					sec1	(2),
+					sec5	(3),
+					sec10	(4),
+					sec20	(5),
+					never	(7)
+				  }
+		MAX-ACCESS    read-write
+		STATUS    current
+		DESCRIPTION
+		"Remote ports Bckp 2 Main time"
+		::= { flMcm1000xrlModuleEntry  3 }
+
+	flMcm1000xrlModuleForceBckpLocal	OBJECT-TYPE
+		SYNTAX    INTEGER {
+					off	 (1),
+					on	 (2)
+				  }
+		MAX-ACCESS    read-write
+		STATUS    current
+		DESCRIPTION
+		"Force backup local port"
+		 ::= { flMcm1000xrlModuleEntry  4 }
+
+	flMcm1000xrlModuleForceBckpRemote	OBJECT-TYPE
+		SYNTAX    INTEGER {
+					off	 (1),
+					on	 (2)
+				  }
+		MAX-ACCESS    read-write
+		STATUS    current
+		DESCRIPTION
+		"Force backup remote port"
+		 ::= { flMcm1000xrlModuleEntry  5 }
+
+	flMcm1000xrlModuleBckpUnusedLocal	OBJECT-TYPE
+		SYNTAX	  INTEGER {
+					off	(1),
+					on	(2)
+				  }
+		MAX-ACCESS    read-write
+		STATUS    current
+		DESCRIPTION
+		"Backup local port unused"
+		::= { flMcm1000xrlModuleEntry  6 }
+
+	flMcm1000xrlModuleBckpUnusedRemote	OBJECT-TYPE
+		SYNTAX	  INTEGER {
+					off	(1),
+					on	(2)
+				  }
+		MAX-ACCESS    read-write
+		STATUS    current
+		DESCRIPTION
+		"Backup remote port unused"
+		::= { flMcm1000xrlModuleEntry  7 }
+
+	flMcm1000xrlModuleRedundancySle		OBJECT-TYPE
+		SYNTAX    INTEGER {
+					off	 (1),
+					on	 (2)
+				  }
+		MAX-ACCESS    read-write
+		STATUS    current
+		DESCRIPTION
+		"Redundanvy SLE"
+		::= { flMcm1000xrlModuleEntry  8 }
+    
+    
+-- ************************************************************
+-- ************************************************************
+--   Channel table 
+-- ************************************************************
+-- ************************************************************
+     flMcm1000xrlChannelTable	OBJECT-TYPE
+         SYNTAX  SEQUENCE OF FlMcm1000xrlChannelEntry
+         MAX-ACCESS  not-accessible
+         STATUS  current
+         DESCRIPTION
+         "This table shows the Mcm1000x-rl channel status"
+     ::= { flMcm1000xrlChannels  1 }
+
+     flMcm1000xrlChannelEntry	OBJECT-TYPE
+         SYNTAX  FlMcm1000xrlChannelEntry
+         MAX-ACCESS  not-accessible
+         STATUS  current
+         DESCRIPTION
+         "The entries of the table."
+         INDEX { flMsChassisMvIndex,
+		 flMsChassisModuleMvIndex,
+		 flMcm1000xrlChannelType }
+     ::= { flMcm1000xrlChannelTable   1 }
+
+		FlMcm1000xrlChannelEntry ::= SEQUENCE
+		{
+			flMcm1000xrlChannelType			INTEGER,
+			flMcm1000xrlChannelDescription		DisplayString,
+		 	flMcm1000xrlChannelUpSle		INTEGER,
+			flMcm1000xrlChannelDownSle		INTEGER,
+			flMcm1000xrlChannelUpstreamBw		INTEGER,
+			flMcm1000xrlChannelDownstreamBw		INTEGER,
+			flMcm1000xrlChannelP2-P1Fp		INTEGER,
+			flMcm1000xrlChannelP1-P2Fp		INTEGER
+		}
+
+	flMcm1000xrlChannelType		OBJECT-TYPE
+		SYNTAX	  INTEGER {
+					main	(1),
+					backup	(2)
+				  }
+		MAX-ACCESS    read-only
+		STATUS    current
+		DESCRIPTION
+		"Channel's type"
+		 ::= { flMcm1000xrlChannelEntry  1 }
+
+	flMcm1000xrlChannelDescription		OBJECT-TYPE
+		SYNTAX    DisplayString
+		MAX-ACCESS    read-write
+		STATUS    current
+		DESCRIPTION
+		"Channel's textual description - up to 40 characters" 
+		::= { flMcm1000xrlChannelEntry  2 }
+
+	flMcm1000xrlChannelUpSle	OBJECT-TYPE
+		SYNTAX    INTEGER {
+					off	 (1),
+					on	 (2)
+				  }
+		MAX-ACCESS    read-write
+		STATUS    current
+		DESCRIPTION
+		"Channel's upstream SLE"
+		::= { flMcm1000xrlChannelEntry  3 }
+
+	flMcm1000xrlChannelDownSle	OBJECT-TYPE
+		SYNTAX    INTEGER {
+					off	 (1),
+					on	 (2)
+				  }
+		MAX-ACCESS    read-write
+		STATUS    current
+		DESCRIPTION
+		"Channel's downstream SLE"
+		::= { flMcm1000xrlChannelEntry  4 }
+
+	flMcm1000xrlChannelUpstreamBw	OBJECT-TYPE
+		SYNTAX	  INTEGER (0..1000)
+		MAX-ACCESS    read-write
+		STATUS    current
+		DESCRIPTION
+		"Upstream Bandwidth, from 0 to 1000M in 10M steps"
+		::= { flMcm1000xrlChannelEntry  5 }
+
+	flMcm1000xrlChannelDownstreamBw		OBJECT-TYPE
+		SYNTAX	  INTEGER (0..1000)
+		MAX-ACCESS    read-write
+		STATUS    current
+		DESCRIPTION
+		"Downstream Bandwidth, from 0 to 1000M in 10M steps"
+		::= { flMcm1000xrlChannelEntry  6 }
+
+	flMcm1000xrlChannelP2-P1Fp	OBJECT-TYPE
+		SYNTAX    INTEGER {
+					off	 (1),
+					on	 (2)
+				  }
+		MAX-ACCESS    read-write
+		STATUS    current
+		DESCRIPTION
+		"Port2->Port1 Fault Propagation mode"
+		::= { flMcm1000xrlChannelEntry  7 }
+
+	flMcm1000xrlChannelP1-P2Fp	OBJECT-TYPE
+		SYNTAX    INTEGER {
+					off	 (1),
+					on	 (2)
+				  }
+		MAX-ACCESS    read-write
+		STATUS    current
+		DESCRIPTION
+		"Port1->Port2 Fault Propagation mode"
+		 ::= { flMcm1000xrlChannelEntry  8 }
+
+		
+-- ************************************************************
+-- ************************************************************
+--   Port table 
+-- ************************************************************
+-- ************************************************************
+     flMcm1000xrlPortTable	OBJECT-TYPE
+         SYNTAX  SEQUENCE OF FlMcm1000xrlPortEntry
+         MAX-ACCESS  not-accessible
+         STATUS  current
+         DESCRIPTION
+         "This table shows the Mcm1000x-rl port status"
+     ::= { flMcm1000xrlPorts  1 }
+
+     flMcm1000xrlPortEntry       OBJECT-TYPE
+         SYNTAX  FlMcm1000xrlPortEntry
+         MAX-ACCESS  not-accessible
+         STATUS  current
+         DESCRIPTION
+         "The entries of the table."
+         INDEX { flMsChassisMvIndex,
+		 flMsChassisModuleMvIndex,
+		 flMcm1000xrlChannelType,
+		 flMcm1000xrlPortIndex }
+     ::= { flMcm1000xrlPortTable   1 }
+
+		FlMcm1000xrlPortEntry ::= SEQUENCE
+		{
+			flMcm1000xrlPortIndex			INTEGER,
+			flMcm1000xrlPortType			INTEGER,
+			flMcm1000xrlPortLink			INTEGER,
+			flMcm1000xrlPortSignalDetect		INTEGER,
+			flMcm1000xrlPortState			INTEGER,
+			flMcm1000xrlPortEnable			INTEGER,
+			flMcm1000xrlPortAutoNego		INTEGER,
+			flMcm1000xrlPortPause			INTEGER,
+			flMcm1000xrlPortLb			INTEGER
+		}
+
+	flMcm1000xrlPortIndex	OBJECT-TYPE
+		SYNTAX	  INTEGER (1..2)
+		MAX-ACCESS    read-only
+		STATUS    current
+		DESCRIPTION
+		"Port's index"
+		::= { flMcm1000xrlPortEntry  1 }
+		
+	flMcm1000xrlPortType	OBJECT-TYPE
+		SYNTAX	  INTEGER {
+					tp	(1),
+					fo	(2),
+					n-a	(3)
+				  }
+		MAX-ACCESS    read-only
+		STATUS    current
+		DESCRIPTION
+		"Port's SFP type"
+		::= { flMcm1000xrlPortEntry  2 }
+
+	flMcm1000xrlPortLink	OBJECT-TYPE
+		SYNTAX	  INTEGER {
+         				off     (1),
+					on      (2),
+					kld	(3)
+				  }
+		MAX-ACCESS    read-only
+		STATUS    current
+		DESCRIPTION
+		"Port's link status"
+		::= { flMcm1000xrlPortEntry  3 }
+
+	flMcm1000xrlPortSignalDetect	OBJECT-TYPE
+		SYNTAX    INTEGER {
+					off	 (1),
+					on	 (2)
+				  }
+		MAX-ACCESS    read-only
+		STATUS    current
+		DESCRIPTION
+		"Port's signal detect status"
+		::= { flMcm1000xrlPortEntry  4 }
+
+	flMcm1000xrlPortState	OBJECT-TYPE
+		SYNTAX    INTEGER {
+					active		(1),
+					standby		(2),
+					unused		(3),
+					down		(4),
+					not-applicable	(5)
+				  }
+		MAX-ACCESS    read-only
+		STATUS    current
+		DESCRIPTION
+		"Port's state"
+		::= { flMcm1000xrlPortEntry  5 }
+
+	flMcm1000xrlPortEnable		OBJECT-TYPE
+		SYNTAX	  INTEGER {
+					disable (1),
+					enable  (2)
+				  }
+		MAX-ACCESS    read-write
+		STATUS    current
+		DESCRIPTION
+		"Port's enable mode"
+		::= { flMcm1000xrlPortEntry  6 }
+
+	flMcm1000xrlPortAutoNego	OBJECT-TYPE
+		SYNTAX    INTEGER {
+					off	 (1),
+					on	 (2)
+				  }
+		MAX-ACCESS    read-write
+		STATUS    current
+		DESCRIPTION
+		"Port's auto negotiation"
+		::= { flMcm1000xrlPortEntry  7 }
+
+	flMcm1000xrlPortPause		OBJECT-TYPE
+		SYNTAX	  INTEGER {
+					off	(1),
+					on	(2)
+				  }
+		MAX-ACCESS    read-write
+		STATUS    current
+		DESCRIPTION
+		"Port's pause"
+		::= { flMcm1000xrlPortEntry  8 }	
+
+	flMcm1000xrlPortLb	OBJECT-TYPE
+		SYNTAX    INTEGER {
+					off	 (1),
+					on	 (2)
+				  }
+		MAX-ACCESS    read-write
+		STATUS    current
+		DESCRIPTION
+		"Port's loop back"
+		::= { flMcm1000xrlPortEntry  9 }
+
+
+END

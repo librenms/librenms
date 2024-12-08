@@ -24,62 +24,43 @@
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
-use LibreNMS\Util\Proxy;
+use LibreNMS\Exceptions\AlertTransportDeliveryException;
+use LibreNMS\Util\Http;
 
 class Rocket extends Transport
 {
-    protected $name = 'Rocket Chat';
+    protected string $name = 'Rocket Chat';
 
-    public function deliverAlert($obj, $opts)
+    public function deliverAlert(array $alert_data): bool
     {
         $rocket_opts = $this->parseUserOptions($this->config['rocket-options']);
-        $rocket_opts['url'] = $this->config['rocket-url'];
 
-        return $this->contactRocket($obj, $rocket_opts);
-    }
-
-    public static function contactRocket($obj, $api)
-    {
-        $host = $api['url'];
-        $curl = curl_init();
-        $rocket_msg = strip_tags($obj['msg']);
-        $color = self::getColorForState($obj['state']);
+        $rocket_msg = strip_tags($alert_data['msg']);
         $data = [
             'attachments' => [
                 0 => [
                     'fallback' => $rocket_msg,
-                    'color' => $color,
-                    'title' => $obj['title'],
+                    'color' => self::getColorForState($alert_data['state']),
+                    'title' => $alert_data['title'],
                     'text' => $rocket_msg,
                 ],
             ],
-            'channel' => $api['channel'] ?? null,
-            'username' => $api['username'] ?? null,
-            'icon_url' => $api['icon_url'] ?? null,
-            'icon_emoji' => $api['icon_emoji'] ?? null,
+            'channel' => $rocket_opts['channel'] ?? null,
+            'username' => $rocket_opts['username'] ?? null,
+            'icon_url' => $rocket_opts['icon_url'] ?? null,
+            'icon_emoji' => $rocket_opts['icon_emoji'] ?? null,
         ];
-        $alert_message = json_encode($data);
-        curl_setopt($curl, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
-        Proxy::applyToCurl($curl);
-        curl_setopt($curl, CURLOPT_URL, $host);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($curl, CURLOPT_POST, true);
-        curl_setopt($curl, CURLOPT_POSTFIELDS, $alert_message);
 
-        $ret = curl_exec($curl);
-        $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-        if ($code != 200) {
-            var_dump("API '$host' returned Error"); //FIXME: propper debuging
-            var_dump('Params: ' . $alert_message); //FIXME: propper debuging
-            var_dump('Return: ' . $ret); //FIXME: propper debuging
+        $res = Http::client()->post($this->config['rocket-url'], $data);
 
-            return 'HTTP Status code ' . $code;
+        if ($res->successful()) {
+            return true;
         }
 
-        return true;
+        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $rocket_msg, $data);
     }
 
-    public static function configTemplate()
+    public static function configTemplate(): array
     {
         return [
             'config' => [

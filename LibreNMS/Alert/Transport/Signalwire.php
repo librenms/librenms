@@ -18,62 +18,35 @@
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
-use LibreNMS\Util\Proxy;
+use LibreNMS\Exceptions\AlertTransportDeliveryException;
+use LibreNMS\Util\Http;
 
 class Signalwire extends Transport
 {
-    protected $name = 'SignalWire';
+    protected string $name = 'SignalWire';
 
-    public function deliverAlert($obj, $opts)
+    public function deliverAlert(array $alert_data): bool
     {
-        $signalwire_opts['spaceUrl'] = $this->config['signalwire-spaceUrl'];
-        $signalwire_opts['sid'] = $this->config['signalwire-project-id'];
-        $signalwire_opts['token'] = $this->config['signalwire-token'];
-        $signalwire_opts['sender'] = $this->config['signalwire-sender'];
-        $signalwire_opts['to'] = $this->config['signalwire-to'];
-
-        return $this->contactSignalwire($obj, $signalwire_opts);
-    }
-
-    public static function contactSignalwire($obj, $opts)
-    {
-        $params = [
-            'spaceUrl' => $opts['spaceUrl'],
-            'sid' => $opts['sid'],
-            'token' => $opts['token'],
-            'phone' => $opts['to'],
-            'text' => $obj['title'],
-            'sender' => $opts['sender'],
-        ];
-
-        $url = 'https://' . $params['spaceUrl'] . '.signalwire.com/api/laml/2010-04-01/Accounts/' . $params['sid'] . '/Messages.json';
+        $url = 'https://' . $this->config['signalwire-spaceUrl'] . '.signalwire.com/api/laml/2010-04-01/Accounts/' . $this->config['signalwire-project-id'] . '/Messages.json';
 
         $data = [
-            'From' => $params['sender'],
-            'Body' => $params['text'],
-            'To' => $params['phone'],
+            'From' => $this->config['signalwire-sender'],
+            'To' => $this->config['signalwire-to'],
+            'Body' => $alert_data['title'],
         ];
-        $post = http_build_query($data);
 
-        $curl = curl_init($url);
+        $res = Http::client()->asForm()
+            ->withBasicAuth($this->config['signalwire-project-id'], $this->config['signalwire-token'])
+            ->post($url, $data);
 
-        Proxy::applyToCurl($curl);
-
-        curl_setopt($curl, CURLOPT_POST, true);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-        curl_setopt($curl, CURLOPT_USERPWD, $params['sid'] . ':' . $params['token']);
-        curl_setopt($curl, CURLOPT_POSTFIELDS, $post);
-
-        curl_exec($curl);
-
-        if (curl_getinfo($curl, CURLINFO_RESPONSE_CODE)) {
+        if ($res->successful()) {
             return true;
         }
+
+        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $alert_data['title'], $data);
     }
 
-    public static function configTemplate()
+    public static function configTemplate(): array
     {
         return [
             'config' => [
@@ -93,7 +66,7 @@ class Signalwire extends Transport
                     'title' => 'Token',
                     'name' => 'signalwire-token',
                     'descr' => 'SignalWire Account Token ',
-                    'type' => 'text',
+                    'type' => 'password',
                 ],
                 [
                     'title' => 'Mobile Number',

@@ -44,6 +44,7 @@
 import logging
 import os
 import queue
+import re
 import sys
 import threading
 import time
@@ -53,7 +54,6 @@ from argparse import ArgumentParser
 import LibreNMS
 from LibreNMS.command_runner import command_runner
 from LibreNMS.config import DBConfig
-
 
 logger = logging.getLogger(__name__)
 
@@ -85,6 +85,7 @@ All time related variables are in seconds
 wrappers = {
     "service": {
         "executable": "check-services.php",
+        "option": "-h",
         "table_name": "services",
         "memc_touch_time": 10,
         "stepping": 300,
@@ -93,6 +94,7 @@ wrappers = {
     },
     "discovery": {
         "executable": "discovery.php",
+        "option": "-h",
         "table_name": "devices",
         "memc_touch_time": 30,
         "stepping": 300,
@@ -100,7 +102,8 @@ wrappers = {
         "total_exec_time": 21600,
     },
     "poller": {
-        "executable": "poller.php",
+        "executable": "lnms",
+        "option": "device:poll",
         "table_name": "devices",
         "memc_touch_time": 10,
         "stepping": 300,
@@ -229,6 +232,7 @@ def poll_worker(
     log_dir,  # Type: str
     wrapper_type,  # Type: str
     debug,  # Type: bool
+    modules="",  # Type: string
 ):
     """
     This function will fork off single instances of the php process, record
@@ -278,9 +282,19 @@ def poll_worker(
                     os.path.dirname(os.path.dirname(os.path.realpath(__file__))),
                     wrappers[wrapper_type]["executable"],
                 )
-                command = "/usr/bin/env php {} -h {}".format(executable, device_id)
-                if debug:
+                command = "/usr/bin/env php {} {} {}".format(
+                    executable, wrappers[wrapper_type]["option"], device_id
+                )
+                if modules is not None and len(str(modules).strip()):
+                    module_str = re.sub("\s", "", str(modules).strip())
+                    command = command + " -m {}".format(module_str)
+
+                # enable debug output otherwise, set -q for lnms commands
+                if wrappers[wrapper_type]["executable"] == "lnms":
+                    command = command + (" -vv" if debug else " -q")
+                elif debug:
                     command = command + " -d"
+
                 exit_code, output = command_runner(
                     command,
                     shell=True,
@@ -327,6 +341,7 @@ def wrapper(
     config,  # Type: dict
     log_dir,  # Type: str
     _debug=False,  # Type: bool
+    **kwargs,  # Type: dict, may contain modules
 ):  # -> None
     """
     Actual code that runs various php scripts, in single node mode or distributed poller mode
@@ -446,6 +461,8 @@ def wrapper(
         logger.critical("Bogus wrapper type called")
         sys.exit(3)
 
+    maxlocks = 0
+    minlocks = 0
     sconfig = DBConfig()
     sconfig.populate(config)
     db_connection = LibreNMS.DB(sconfig)
@@ -495,6 +512,7 @@ def wrapper(
                 "log_dir": log_dir,
                 "wrapper_type": wrapper_type,
                 "debug": _debug,
+                "modules": kwargs.get("modules", ""),
             },
         )
         worker.setDaemon(True)
@@ -615,6 +633,12 @@ if __name__ == "__main__":
         default=False,
         help="Enable debug output. WARNING: Leaving this enabled will consume a lot of disk space.",
     )
+    parser.add_argument(
+        "-m",
+        "--modules",
+        default="",
+        help="Enable passing of a module string, modules are separated by comma",
+    )
 
     parser.add_argument(
         dest="wrapper",
@@ -628,6 +652,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     debug = args.debug
+    modules = args.modules or ""
     wrapper_type = args.wrapper
     amount_of_workers = args.threads
 
@@ -654,4 +679,16 @@ if __name__ == "__main__":
             )
         )
 
-    wrapper(wrapper_type, amount_of_workers, config, log_dir, _debug=debug)
+    if wrapper_type in ["discovery", "poller"]:
+        modules_validated = modules
+    else:
+        modules_validated = ""  # ignore module parameter
+
+    wrapper(
+        wrapper_type,
+        amount_of_workers,
+        config,
+        log_dir,
+        _debug=debug,
+        modules=modules_validated,
+    )

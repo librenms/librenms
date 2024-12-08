@@ -10,16 +10,16 @@ return new class extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::create('bill_data', function (Blueprint $table) {
+            $table->id();
             $table->unsignedInteger('bill_id')->index();
             $table->dateTime('timestamp');
             $table->integer('period');
             $table->bigInteger('delta');
             $table->bigInteger('in_delta');
             $table->bigInteger('out_delta');
-            $table->primary(['bill_id', 'timestamp']);
         });
     }
 
@@ -28,7 +28,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::drop('bill_data');
     }

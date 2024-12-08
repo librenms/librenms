@@ -1,0 +1,124 @@
+{
+    "applications": {
+        "discovery": {
+            "applications": [
+                {
+                    "app_type": "sneck",
+                    "app_state": "UNKNOWN",
+                    "discovered": 1,
+                    "app_state_prev": null,
+                    "app_status": "",
+                    "app_instance": "",
+                    "data": null,
+                    "deleted_at": null
+                }
+            ]
+        },
+        "poller": {
+            "applications": [
+                {
+                    "app_type": "sneck",
+                    "app_state": "OK",
+                    "discovered": 1,
+                    "app_state_prev": "UNKNOWN",
+                    "app_status": "",
+                    "app_instance": "",
+                    "data": "{\"data\":{\"alert\":0,\"alertString\":\"\",\"checks\":{\"clamav\":{\"check\":\"\\/usr\\/lib\\/nagios\\/plugins\\/check_clamav -w 2 -c 3\",\"exit\":0,\"output\":\"ClamAV OK: daily.cvd 26579 (Tue Jun 21 08:15:30 2022) is up to date\",\"ran\":\"\\/usr\\/lib\\/nagios\\/plugins\\/check_clamav -w 2 -c 3\"},\"entropy\":{\"check\":\"\\/usr\\/lib\\/nagios\\/plugins\\/check_entropy\",\"exit\":0,\"output\":\"OK: 3649 bytes in the pool.|entropy=3649 bytes\",\"ran\":\"\\/usr\\/lib\\/nagios\\/plugins\\/check_entropy\"},\"http\":{\"check\":\"\\/usr\\/lib\\/nagios\\/plugins\\/check_http -H 127.0.0.1:8000\",\"exit\":0,\"output\":\"HTTP OK: HTTP\\/1.1 200 OK - 6249 bytes in 0.057 second response time |time=0.057237s;;;0.000000;10.000000 size=6249B;;;0\",\"ran\":\"\\/usr\\/lib\\/nagios\\/plugins\\/check_http -H 127.0.0.1:8000\"},\"ipmi_sensor\":{\"check\":\"\\/usr\\/lib\\/nagios\\/plugins\\/check_ipmi_sensor --nosel\",\"exit\":0,\"output\":\"IPMI Status: OK | 'CPU Temp'=50.00;0.00:97.00;0.00:102.00 'System Temp'=37.00;0.00:80.00;-5.00:85.00 'Peripheral Temp'=47.00;0.00:80.00;-5.00:85.00 'DIMMB1 Temp'=36.00;5.00:80.00;0.00:85.00 'DIMMB2 Temp'=38.00;5.00:80.00;0.00:85.00 'FAN1'=4100.00;700.00:25300.00;500.00:25400.00 'FAN2'=3400.00;700.00:25300.00;500.00:25400.00 'FAN3'=4300.00;700.00:25300.00;500.00:25400.00 'VCCP'=1.86;1.57:2.02;1.46:2.13 'VDIMM'=1.20;1.05:1.34;0.97:1.43 '12V'=12.13;10.78:12.96;10.27:13.28 '5VCC'=5.03;4.48:5.39;4.30:5.55 '3.3VCC'=3.40;2.96:3.55;2.82:3.66 'VBAT'=3.14;2.59:3.49;2.47:3.57 '5V Dual'=5.00;4.49:5.38;4.30:5.54 '3.3V AUX'=3.32;2.96:3.55;2.82:3.66\",\"ran\":\"\\/usr\\/lib\\/nagios\\/plugins\\/check_ipmi_sensor --nosel\"},\"mongodb\":{\"check\":\"\\/usr\\/lib\\/nagios\\/plugins\\/check_mongodb.py\",\"exit\":0,\"output\":\"OK - Connection took 0.011 seconds\",\"ran\":\"\\/usr\\/lib\\/nagios\\/plugins\\/check_mongodb.py\"},\"raid\":{\"check\":\"\\/usr\\/lib\\/nagios\\/plugins\\/check_raid\",\"exit\":0,\"output\":\"OK: mdstat:[md0(2.73 TiB raid1):UU]\",\"ran\":\"\\/usr\\/lib\\/nagios\\/plugins\\/check_raid\"},\"virtqemud_procs\":{\"check\":\"\\/usr\\/lib\\/nagios\\/plugins\\/check_procs --ereg-argument-array '^\\/usr\\/sbin\\/virtqemud' 1:2\",\"exit\":0,\"output\":\"PROCS OK: 1 process with regex args '^\\/usr\\/sbin\\/virtqemud' | procs=1;1:2;;0;\",\"ran\":\"\\/usr\\/lib\\/nagios\\/plugins\\/check_procs --ereg-argument-array '^\\/usr\\/sbin\\/virtqemud' 1:2\"}},\"critical\":0,\"errored\":0,\"hostname\":\"nagi\",\"ok\":7,\"time\":1655835901,\"unknown\":0,\"vars\":[],\"warning\":0},\"error\":0,\"errorString\":\"\",\"version\":1}",
+                    "deleted_at": null
+               }
+            ],
+            "application_metrics": [
+                {
+                    "metric": "check_clamav",
+                    "value": 0.0,
+                    "value_prev": null,
+                    "app_type": "sneck"
+                },
+                {
+                    "metric": "check_entropy",
+                    "value": 0.0,
+                    "value_prev": null,
+                    "app_type": "sneck"
+                },
+                {
+                    "metric": "check_http",
+                    "value": 0.0,
+                    "value_prev": null,
+                    "app_type": "sneck"
+                },
+                {
+                    "metric": "check_ipmi_sensor",
+                    "value": 0.0,
+                    "value_prev": null,
+                    "app_type": "sneck"
+                },
+                {
+                    "metric": "check_mongodb",
+                    "value": 0.0,
+                    "value_prev": null,
+                    "app_type": "sneck"
+                },
+                {
+                    "metric": "check_raid",
+                    "value": 0.0,
+                    "value_prev": null,
+                    "app_type": "sneck"
+                },
+                {
+                    "metric": "check_virtqemud_procs",
+                    "value": 0.0,
+                    "value_prev": null,
+                    "app_type": "sneck"
+                },
+                {
+                    "metric": "critical",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "sneck"
+                },
+                {
+                    "metric": "errored",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "sneck"
+                },
+                {
+                    "metric": "ok",
+                    "value": 7,
+                    "value_prev": null,
+                    "app_type": "sneck"
+                },
+                {
+                    "metric": "time",
+                    "value": 1655835901,
+                    "value_prev": null,
+                    "app_type": "sneck"
+                },
+                {
+                    "metric": "time_to_polling",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "sneck"
+                },
+                {
+                    "metric": "time_to_polling_abs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "sneck"
+                },
+                {
+                    "metric": "unknown",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "sneck"
+                },
+                {
+                    "metric": "warning",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "sneck"
+                }
+            ]
+        }
+    }
+}

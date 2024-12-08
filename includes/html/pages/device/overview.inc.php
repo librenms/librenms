@@ -1,6 +1,6 @@
 <?php
 
-use App\Plugins\Hooks\DeviceOverviewHook;
+use LibreNMS\Interfaces\Plugins\Hooks\DeviceOverviewHook;
 
 $overview = 1;
 
@@ -15,20 +15,17 @@ echo '
     <div class="col-md-6">
 ';
 require 'includes/html/dev-overview-data.inc.php';
+require 'overview/maps.inc.php';
 require 'includes/html/dev-groups-overview-data.inc.php';
 require 'overview/puppet_agent.inc.php';
-require 'overview/tracepath.inc.php';
 
 echo LibreNMS\Plugins::call('device_overview_container', [$device]);
-PluginManager::call(DeviceOverviewHook::class, ['device' => DeviceCache::getPrimary()])->each(function ($view) {
+foreach (PluginManager::call(DeviceOverviewHook::class, ['device' => DeviceCache::getPrimary()]) as $view) {
     echo $view;
-});
+}
 
 require 'overview/ports.inc.php';
-
-if ($device['os'] == 'cimc') {
-    require 'overview/cimc.inc.php';
-}
+require 'overview/transceivers.inc.php';
 
 if ($device['os'] == 'ping') {
     require 'overview/ping.inc.php';
@@ -42,14 +39,6 @@ echo '
 require 'overview/processors.inc.php';
 require 'overview/mempools.inc.php';
 require 'overview/storage.inc.php';
-
-if (! isset($entity_state)) {
-    $entity_state = get_dev_entity_state($device['device_id']);
-}
-if (! empty($entity_state['group']['c6kxbar'])) {
-    require 'overview/c6kxbar.inc.php';
-}
-
 require 'overview/toner.inc.php';
 require 'overview/sensors/charge.inc.php';
 require 'overview/sensors/temperature.inc.php';

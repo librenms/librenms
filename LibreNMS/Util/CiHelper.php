@@ -241,7 +241,7 @@ class CiHelper
         if ($this->canCheck('web')) {
             echo "Preparing for web checks\n";
             $this->execute('config:clear', ['php', 'artisan', 'config:clear'], true);
-            $this->execute('dusk:update', ['php', 'artisan', 'dusk:update', '--detect'], true);
+            $this->execute('dusk:chrome-driver', ['php', 'artisan', 'dusk:chrome-driver', '--detect'], true);
 
             // check if web server is running
             $server = new Process(['php', '-S', '127.0.0.1:8000', base_path('server.php')], public_path(), ['APP_ENV' => 'dusk.testing']);
@@ -295,7 +295,7 @@ class CiHelper
             $py_lint_cmd = [$this->checkPythonExec('pylint'), '-E', '-j', '0'];
 
             $files = $this->flags['full']
-                ? explode(PHP_EOL, rtrim(shell_exec("find . -name '*.py' -not -path './vendor/*' -not -path './tests/*'")))
+                ? explode(PHP_EOL, rtrim(shell_exec("find . -name '*.py' -not -path './vendor/*' -not -path './tests/*' -not -path './.python_venvs/*'")))
                 : $this->changed['python'];
 
             $py_lint_cmd = array_merge($py_lint_cmd, $files);
