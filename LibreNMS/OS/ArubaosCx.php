@@ -30,13 +30,15 @@ use SnmpQuery;
 
 class ArubaosCx extends \LibreNMS\OS implements NacPolling
 {
+    protected ?string $entityVendorTypeMib = 'ARUBAWIRED-NETWORKING-OID';
+
     public function pollNac()
     {
         $nac = new Collection();
 
         $rowSet = [];
         $ifIndex_map = $this->getDevice()->ports()->pluck('port_id', 'ifName');
-        $table = SnmpQuery::mibDir('arubaos-cx')->mibs(['ARUBAWIRED-PORT-ACCESS-MIB'])->hideMib()->enumStrings()->walk('arubaWiredPortAccessClientTable')->table(2);
+        $table = SnmpQuery::hideMib()->enumStrings()->walk('ARUBAWIRED-PORT-ACCESS-MIB::arubaWiredPortAccessClientTable')->table(2);
 
         foreach ($table as $ifIndex => $entry) {
             foreach ($entry as $macKey => $macEntry) {
@@ -61,7 +63,6 @@ class ArubaosCx extends \LibreNMS\OS implements NacPolling
         }
 
         foreach ($rowSet as $row) {
-            var_dump($row);
             $nac->put($row['mac_address'], new PortsNac($row));
         }
 

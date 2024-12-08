@@ -45,7 +45,7 @@ if ($ipmi['host'] = get_dev_attrib($device, 'ipmi_hostname')) {
         $index++;
         if ($current != 'na' && Config::has("ipmi_unit.$unit")) {
             discover_sensor(
-                $valid['sensor'],
+                null,
                 Config::get("ipmi_unit.$unit"),
                 $device,
                 $desc,
@@ -67,7 +67,8 @@ if ($ipmi['host'] = get_dev_attrib($device, 'ipmi_hostname')) {
     echo "\n";
 }
 
-check_valid_sensors($device, 'voltage', $valid['sensor'], 'ipmi');
-check_valid_sensors($device, 'temperature', $valid['sensor'], 'ipmi');
-check_valid_sensors($device, 'fanspeed', $valid['sensor'], 'ipmi');
-check_valid_sensors($device, 'power', $valid['sensor'], 'ipmi');
+$sensorDiscovery = app('sensor-discovery');
+$sensorDiscovery->sync(sensor_class: 'voltage', poller_type: 'ipmi');
+$sensorDiscovery->sync(sensor_class: 'temperature', poller_type: 'ipmi');
+$sensorDiscovery->sync(sensor_class: 'fanspeed', poller_type: 'ipmi');
+$sensorDiscovery->sync(sensor_class: 'power', poller_type: 'ipmi');

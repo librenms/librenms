@@ -35,7 +35,7 @@ if (! empty($charge)) {
     $descr = 'Battery Charge';
 
     discover_sensor(
-        $valid['sensor'],
+        null,
         'charge',
         $device,
         $charge_oid,

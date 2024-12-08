@@ -26,9 +26,16 @@
 namespace LibreNMS\OS;
 
 use App\Models\Device;
+use App\Models\EntPhysical;
+use LibreNMS\OS\Traits\EntityMib;
+use LibreNMS\Util\StringHelpers;
 
 class Edgeos extends \LibreNMS\OS
 {
+    use EntityMib {
+        EntityMib::discoverEntityPhysical as discoverBaseEntityPhysical;
+    }
+
     public function discoverOS(Device $device): void
     {
         parent::discoverOS($device); // yaml
@@ -40,5 +47,15 @@ class Edgeos extends \LibreNMS\OS
                 break;
             }
         }
+    }
+
+    public function discoverEntityPhysical(): \Illuminate\Support\Collection
+    {
+        return $this->discoverBaseEntityPhysical()->each(function (EntPhysical $entity) {
+            // clean garbage in fields "...............\n00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00"
+            $entity->entPhysicalDescr = StringHelpers::trimHexGarbage($entity->entPhysicalDescr);
+            $entity->entPhysicalName = StringHelpers::trimHexGarbage($entity->entPhysicalName);
+            $entity->entPhysicalVendorType = StringHelpers::trimHexGarbage($entity->entPhysicalVendorType);
+        });
     }
 }

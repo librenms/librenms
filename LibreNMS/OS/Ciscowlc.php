@@ -33,6 +33,7 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\OS\Shared\Cisco;
 use LibreNMS\RRD\RrdDefinition;
+use SnmpQuery;
 
 class Ciscowlc extends Cisco implements
     OSPolling,
@@ -41,6 +42,10 @@ class Ciscowlc extends Cisco implements
 {
     public function pollOS(DataStorageInterface $datastore): void
     {
+        if (! $this->getDevice()->wirelessSensors()->where('sensor_class', 'ap-count')->exists()) {
+            return; // if ap count doesn't exist, skip this polling TODO replace with wireless controller module
+        }
+
         $device = $this->getDeviceArray();
         $apNames = \SnmpQuery::enumStrings()->walk('AIRESPACE-WIRELESS-MIB::bsnAPName')->table(1);
         $radios = \SnmpQuery::enumStrings()->walk('AIRESPACE-WIRELESS-MIB::bsnAPIfTable')->table(2);
@@ -192,15 +197,36 @@ class Ciscowlc extends Cisco implements
      *
      * @return array Sensors
      */
-    public function discoverWirelessApCount()
+    public function discoverWirelessApCount(): array
     {
-        $oids = [
+        $data = SnmpQuery::get([
             'CISCO-LWAPP-SYS-MIB::clsSysApConnectCount.0',
             'AIRESPACE-SWITCHING-MIB::agentInventoryMaxNumberOfAPsSupported.0',
-        ];
-        $data = snmp_get_multi($this->getDeviceArray(), $oids);
+            'CISCO-LWAPP-AP-MIB::cLApGlobalAPConnectCount.0',
+            'CISCO-LWAPP-AP-MIB::cLApGlobalMaxApsSupported.0',
+        ])->values();
 
-        if (isset($data[0]['clsSysApConnectCount'])) {
+        if (isset($data['CISCO-LWAPP-AP-MIB::cLApGlobalAPConnectCount.0'])) {
+            return [
+                new WirelessSensor(
+                    'ap-count',
+                    $this->getDeviceId(),
+                    '.1.3.6.1.4.1.9.9.513.1.3.35.0',
+                    'ciscowlc',
+                    0,
+                    'Connected APs',
+                    $data['CISCO-LWAPP-AP-MIB::cLApGlobalAPConnectCount.0'],
+                    1,
+                    1,
+                    'sum',
+                    null,
+                    $data['CISCO-LWAPP-AP-MIB::cLApGlobalMaxApsSupported.0'],
+                    0
+                ),
+            ];
+        }
+
+        if (isset($data['CISCO-LWAPP-SYS-MIB::clsSysApConnectCount.0'])) {
             return [
                 new WirelessSensor(
                     'ap-count',
@@ -209,12 +235,12 @@ class Ciscowlc extends Cisco implements
                     'ciscowlc',
                     0,
                     'Connected APs',
-                    $data[0]['clsSysApConnectCount'],
+                    $data['CISCO-LWAPP-SYS-MIB::clsSysApConnectCount.0'],
                     1,
                     1,
                     'sum',
                     null,
-                    $data[0]['agentInventoryMaxNumberOfAPsSupported'],
+                    $data['AIRESPACE-SWITCHING-MIB::agentInventoryMaxNumberOfAPsSupported.0'],
                     0
                 ),
             ];

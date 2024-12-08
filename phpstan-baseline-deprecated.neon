@@ -2462,14 +2462,6 @@ parameters:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
 			"""
 			count: 1
-			path: includes/html/graphs/c6kxbar/auth.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function dbFetchRow\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 1
 			path: includes/html/graphs/cefswitching/auth.inc.php
 
 		-

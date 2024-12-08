@@ -30,10 +30,11 @@ use App\Models\Plugin;
 use Exception;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Collection;
+use LibreNMS\Interfaces\Plugins\PluginManagerInterface;
 use LibreNMS\Util\Notifications;
 use Log;
 
-class PluginManager
+class PluginManager implements PluginManagerInterface
 {
     /** @var Collection */
     private $hooks;
@@ -104,9 +105,9 @@ class PluginManager
      * @param  string  $hookType
      * @param  array  $args
      * @param  string|null  $plugin  only for this plugin if set
-     * @return \Illuminate\Support\Collection
+     * @return array
      */
-    public function call(string $hookType, array $args = [], ?string $plugin = null): Collection
+    public function call(string $hookType, array $args = [], ?string $plugin = null): array
     {
         return $this->hooksFor($hookType, $args, $plugin)
             ->map(function ($hook) use ($args, $hookType) {
@@ -127,7 +128,7 @@ class PluginManager
                 }
             })->filter(function ($hook) {
                 return $hook !== 'HOOK FAILED';
-            });
+            })->values()->all();
     }
 
     /**

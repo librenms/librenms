@@ -29,7 +29,7 @@ use LibreNMS\Device\WirelessSensor;
 $sensors = dbFetchColumn('SELECT `sensor_class` FROM `wireless_sensors` GROUP BY `sensor_class`');
 $valid_wireless_types = array_intersect_key(WirelessSensor::getTypes(), array_flip($sensors));
 
-$class = basename($vars['metric'] ?? key($valid_wireless_types));
+$class = basename(array_key_exists($vars['metric'], $valid_wireless_types) ? $vars['metric'] : key($valid_wireless_types));
 $vars['view'] = basename($vars['view'] ?? 'nographs');
 
 $link_array = ['page' => 'wireless'];

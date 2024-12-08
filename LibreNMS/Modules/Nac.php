@@ -113,20 +113,29 @@ class Nac implements Module
         }
     }
 
+    public function dataExists(Device $device): bool
+    {
+        return $device->portsNac()->exists();
+    }
+
     /**
      * Remove all DB data for this module.
      * This will be run when the module is disabled.
      */
-    public function cleanup(Device $device): void
+    public function cleanup(Device $device): int
     {
-        $device->portsNac()->delete();
+        return $device->portsNac()->delete();
     }
 
     /**
      * @inheritDoc
      */
-    public function dump(Device $device)
+    public function dump(Device $device, string $type): ?array
     {
+        if ($type == 'discovery') {
+            return null;
+        }
+
         return [
             'ports_nac' => $device->portsNac()->orderBy('ports.ifIndex')->orderBy('mac_address')
                 ->leftJoin('ports', 'ports_nac.port_id', 'ports.port_id')

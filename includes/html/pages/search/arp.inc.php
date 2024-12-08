@@ -49,7 +49,7 @@ foreach (dbFetchRows($sql, $param) as $data) {
         echo '" selected "+';
     }
 
-    echo '">' . format_hostname($data) . '</option>"+';
+    echo '">' . str_replace(['"', '\''], '', htmlentities(format_hostname($data))) . '</option>"+';
 }
 ?>
                 "</select>"+

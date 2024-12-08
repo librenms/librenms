@@ -34,7 +34,11 @@ class Module
 {
     public static function exists(string $module_name): bool
     {
-        return class_exists(StringHelpers::toClass($module_name, '\\LibreNMS\\Modules\\'));
+        if (class_exists(StringHelpers::toClass($module_name, '\\LibreNMS\\Modules\\'))) {
+            return true;
+        }
+
+        return Config::has('discovery_modules.' . $module_name) || Config::has('poller_modules.' . $module_name);
     }
 
     public static function fromName(string $module_name): \LibreNMS\Interfaces\Module
@@ -62,5 +66,22 @@ class Module
             $device->getAttrib("poll_$module_name"),
             $manual,
         );
+    }
+
+    public static function parseUserOverrides(array $overrides): array
+    {
+        $modules = [];
+
+        foreach ($overrides as $index => $module) {
+            // parse submodules (only supported by some modules)
+            if (str_contains($module, '/')) {
+                [$module, $submodule] = explode('/', $module, 2);
+                $modules[$module][] = $submodule;
+            } elseif (self::exists($module)) {
+                $modules[$module] = true;
+            }
+        }
+
+        return $modules;
     }
 }

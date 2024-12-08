@@ -1,6 +1,7 @@
 #!/usr/bin/env php
 <?php
 
+use App\Facades\LibrenmsConfig;
 use LibreNMS\Exceptions\InvalidModuleException;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\ModuleTestHelper;
@@ -102,6 +103,12 @@ if (isset($os_name) && isset($variant)) {
     $os_list = ModuleTestHelper::findOsWithData($modules);
 }
 
+if (empty($os_list)) {
+    echo "No matching snmprec(s) found.\n";
+
+    exit(1);
+}
+
 if (isset($options['f'])) {
     if (count($os_list) != 1) {
         echo "Failed to create test data, -f/--file option can be used with one os/variant combination.\n";
@@ -113,7 +120,7 @@ if (isset($options['f'])) {
 
 // Now use the saved data to update the saved database data
 $snmpsim = new Snmpsim();
-$snmpsim->setupVenv();
+$snmpsim->setupVenv(true);
 $snmpsim->start();
 echo "Waiting for snmpsim to initialize...\n";
 $snmpsim->waitForStartup();
@@ -137,7 +144,7 @@ try {
         }
         echo PHP_EOL;
 
-        \LibreNMS\Util\OS::updateCache(true); // Force update of OS Cache
+        LibrenmsConfig::invalidateAndReload();
         $tester = new ModuleTestHelper($modules, $target_os, $target_variant);
         if (! $no_save && ! empty($output_file)) {
             $tester->setJsonSavePath($output_file);

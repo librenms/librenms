@@ -30,6 +30,6 @@ foreach ($pre_cache['infineragroove_portTable'] as $index => $data) {
         $oid = '.1.3.6.1.4.1.42229.1.2.4.1.19.1.1.26.' . $index;
         $value = $data['ochOsPreFecBer'];
         $divisor = 1;
-        discover_sensor($valid['sensor'], 'ber', $device, $oid, 'ochOsPreFecBer.' . $index, 'infinera-groove', $descr, $divisor, '1', null, null, null, null, $value);
+        discover_sensor(null, 'ber', $device, $oid, 'ochOsPreFecBer.' . $index, 'infinera-groove', $descr, $divisor, '1', null, null, null, null, $value);
     }
 }

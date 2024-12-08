@@ -7,7 +7,7 @@ $value = snmp_get($device, 'upsEstimatedChargeRemaining.0', '-OvqU', 'UPS-MIB');
 
 if (is_numeric($value)) {
     discover_sensor(
-        $valid['sensor'],
+        null,
         'charge',
         $device,
         '.1.3.6.1.2.1.33.1.2.4.0',

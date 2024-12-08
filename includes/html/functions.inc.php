@@ -16,40 +16,6 @@ use LibreNMS\Enum\ImageFormat;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Rewrite;
 
-/**
- * Compare $t with the value of $vars[$v], if that exists
- *
- * @param  string  $v  Name of the var to test
- * @param  string  $t  Value to compare $vars[$v] to
- * @return bool true, if values are the same, false if $vars[$v]
- *              is unset or values differ
- */
-function var_eq($v, $t)
-{
-    global $vars;
-    if (isset($vars[$v]) && $vars[$v] == $t) {
-        return true;
-    }
-
-    return false;
-}
-
-/**
- * Get the value of $vars[$v], if it exists
- *
- * @param  string  $v  Name of the var to get
- * @return string|bool The value of $vars[$v] if it exists, false if it does not exist
- */
-function var_get($v)
-{
-    global $vars;
-    if (isset($vars[$v])) {
-        return $vars[$v];
-    }
-
-    return false;
-}
-
 function toner2colour($descr, $percent)
 {
     $colour = \LibreNMS\Util\Color::percentage(100 - $percent, null);
@@ -94,7 +60,7 @@ function escape_quotes($text)
 
 function generate_overlib_content($graph_array, $text)
 {
-    $overlib_content = '<div class=overlib><span class=overlib-text>' . $text . '</span><br />';
+    $overlib_content = '<div class=overlib><span class=overlib-text>' . htmlspecialchars($text) . '</span><br />';
     foreach (['day', 'week', 'month', 'year'] as $period) {
         $graph_array['from'] = Config::get("time.$period");
         $overlib_content .= escape_quotes(\LibreNMS\Util\Url::graphTag($graph_array));
@@ -258,34 +224,6 @@ function print_percentage_bar($width, $height, $percent, $left_text, $left_colou
         'right_text' => $right_colour,
     ]);
 }
-
-function generate_entity_link($type, $entity, $text = null, $graph_type = null)
-{
-    global $entity_cache;
-
-    if (is_numeric($entity)) {
-        $entity = get_entity_by_id_cache($type, $entity);
-    }
-
-    switch ($type) {
-        case 'port':
-            $link = generate_port_link($entity, $text, $graph_type);
-            break;
-
-        case 'storage':
-            if (empty($text)) {
-                $text = $entity['storage_descr'];
-            }
-
-            $link = generate_link($text, ['page' => 'device', 'device' => $entity['device_id'], 'tab' => 'health', 'metric' => 'storage']);
-            break;
-
-        default:
-            $link = $entity[$type . '_id'];
-    }
-
-    return $link;
-}//end generate_entity_link()
 
 /**
  * Extract type and subtype from a complex graph type, also makes sure variables are file name safe.
@@ -742,11 +680,13 @@ function alert_details($details)
                     'page' => 'device',
                     'device' => $tmp_alerts['device_id'],
                     'tab' => 'services',
+                    'view' => 'detail',
                 ]) .
-                "'>" . $tmp_alerts['service_name'] . '</a>';
-            $fault_detail .= ',<br>Type: ' . $tmp_alerts['service_type'];
-            $fault_detail .= ',<br>Param: ' . $tmp_alerts['service_param'];
-            $fault_detail .= ',<br>Msg: ' . $tmp_alerts['service_message'];
+                "'>" . ($tmp_alerts['service_name'] ?? '') . ' (' . $tmp_alerts['service_type'] . ')' . '</a>';
+            $fault_detail .= 'Service Host: ' . ($tmp_alerts['service_ip'] != '' ? $tmp_alerts['service_ip'] : format_hostname(DeviceCache::get($tmp_alerts['device_id']))) . ',<br>';
+            $fault_detail .= ($tmp_alerts['service_desc'] != '') ? ('Description: ' . $tmp_alerts['service_desc'] . ',<br>') : '';
+            $fault_detail .= ($tmp_alerts['service_param'] != '') ? ('Param: ' . $tmp_alerts['service_param'] . ',<br>') : '';
+            $fault_detail .= 'Msg: ' . $tmp_alerts['service_message'];
             $fallback = false;
         }
 
@@ -763,6 +703,19 @@ function alert_details($details)
             $fault_detail .= ', Desc ' . $tmp_alerts['bgpPeerDescr'] ?? '';
             $fault_detail .= ', AS' . $tmp_alerts['bgpPeerRemoteAs'];
             $fault_detail .= ', State ' . $tmp_alerts['bgpPeerState'];
+            $fallback = false;
+        }
+
+        if (isset($tmp_alerts['mempool_id'])) {
+            // If we have a mempool_id, we format the data accordingly
+            $fault_detail .= "MemoryPool <a href='" .
+                \LibreNMS\Util\Url::generate([
+                    'page' => 'graphs',
+                    'id' => $tmp_alerts['mempool_id'],
+                    'type' => 'mempool_usage',
+                ]) .
+                "'>" . ($tmp_alerts['mempool_descr'] ?? 'link') . '</a>';
+            $fault_detail .= '<br> &nbsp; &nbsp; &nbsp; Usage ' . $tmp_alerts['mempool_perc'] . '%, &nbsp; Free ' . \LibreNMS\Util\Number::formatSi($tmp_alerts['mempool_free']) . ',&nbsp; Size ' . \LibreNMS\Util\Number::formatSi($tmp_alerts['mempool_total']);
             $fallback = false;
         }
 
@@ -829,9 +782,9 @@ function dynamic_override_config($type, $name, $device)
         $checked = '';
     }
     if ($type == 'checkbox') {
-        return '<input type="checkbox" id="override_config" name="override_config" data-attrib="' . $name . '" data-device_id="' . $device['device_id'] . '" data-size="small" ' . $checked . '>';
+        return '<input type="checkbox" id="override_config" name="override_config" data-attrib="' . htmlentities($name) . '" data-device_id="' . $device['device_id'] . '" data-size="small" ' . $checked . '>';
     } elseif ($type == 'text') {
-        return '<input type="text" id="override_config_text" name="override_config_text" data-attrib="' . $name . '" data-device_id="' . $device['device_id'] . '" value="' . $attrib_val . '">';
+        return '<input type="text" id="override_config_text" name="override_config_text" data-attrib="' . htmlentities($name) . '" data-device_id="' . $device['device_id'] . '" value="' . htmlentities($attrib_val) . '">';
     }
 }//end dynamic_override_config()
 
@@ -1005,13 +958,25 @@ function get_oxidized_nodes_list()
             //user cannot see this device, so let's skip it.
             continue;
         }
+        try {
+            // Convert UTC time string to local timezone set
+            $utc_time = $object['time'];
+            $utc_date = new DateTime($utc_time, new DateTimeZone('UTC'));
+            $local_timezone = new DateTimeZone(date_default_timezone_get());
+            $local_date = $utc_date->setTimezone($local_timezone);
 
+            // Generate local time string
+            $formatted_local_time = $local_date->format('Y-m-d H:i:s T');
+        } catch (Exception $e) {
+            // Just display the current value of $object['time'];
+            $formatted_local_time = $object['time'];
+        }
         echo '<tr>
         <td>' . $device['device_id'] . '</td>
         <td>' . $object['name'] . '</td>
         <td>' . $device['sysName'] . '</td>
         <td>' . $object['status'] . '</td>
-        <td>' . $object['time'] . '</td>
+        <td>' . $formatted_local_time . '</td>
         <td>' . $object['model'] . '</td>
         <td>' . $object['group'] . '</td>
         <td></td>
@@ -1097,16 +1062,16 @@ function get_sensor_label_color($sensor, $type = 'sensors')
     if (is_null($sensor)) {
         return 'label-unknown';
     }
-    if (! is_null($sensor['sensor_limit_warn']) && $sensor['sensor_current'] > $sensor['sensor_limit_warn']) {
+    if (! is_null($sensor['sensor_limit_warn']) && $sensor['sensor_current'] >= $sensor['sensor_limit_warn']) {
         $label_style = 'label-warning';
     }
-    if (! is_null($sensor['sensor_limit_low_warn']) && $sensor['sensor_current'] < $sensor['sensor_limit_low_warn']) {
+    if (! is_null($sensor['sensor_limit_low_warn']) && $sensor['sensor_current'] <= $sensor['sensor_limit_low_warn']) {
         $label_style = 'label-warning';
     }
-    if (! is_null($sensor['sensor_limit']) && $sensor['sensor_current'] > $sensor['sensor_limit']) {
+    if (! is_null($sensor['sensor_limit']) && $sensor['sensor_current'] >= $sensor['sensor_limit']) {
         $label_style = 'label-danger';
     }
-    if (! is_null($sensor['sensor_limit_low']) && $sensor['sensor_current'] < $sensor['sensor_limit_low']) {
+    if (! is_null($sensor['sensor_limit_low']) && $sensor['sensor_current'] <= $sensor['sensor_limit_low']) {
         $label_style = 'label-danger';
     }
     $unit = __("$type.{$sensor['sensor_class']}.unit");
