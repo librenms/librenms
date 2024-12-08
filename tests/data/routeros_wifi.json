@@ -637,8 +637,8 @@
                     "ifName": "bridge",
                     "portName": null,
                     "ifIndex": 3,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -1330,5 +1330,69 @@
                 }
             ]
         }
+    },
+    "entity-physical": {
+        "discovery": {
+            "entPhysical": [
+                {
+                    "entPhysicalIndex": 65536,
+                    "entPhysicalDescr": "RouterOS 6.44 (stable) on RBLHGG-60ad",
+                    "entPhysicalClass": "chassis",
+                    "entPhysicalName": "ARMv7",
+                    "entPhysicalHardwareRev": "",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "false",
+                    "entPhysicalModelName": "",
+                    "entPhysicalVendorType": "zeroDotZero",
+                    "entPhysicalSerialNum": "",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": -1,
+                    "entPhysicalMfgName": "",
+                    "ifIndex": null
+                },
+                {
+                    "entPhysicalIndex": 131073,
+                    "entPhysicalDescr": "unknown unknown (rev: 2)",
+                    "entPhysicalClass": "unknown",
+                    "entPhysicalName": "01:00.0",
+                    "entPhysicalHardwareRev": "",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "false",
+                    "entPhysicalModelName": "0x0310",
+                    "entPhysicalVendorType": "zeroDotZero",
+                    "entPhysicalSerialNum": "",
+                    "entPhysicalContainedIn": 65536,
+                    "entPhysicalParentRelPos": -1,
+                    "entPhysicalMfgName": "0x1ae9",
+                    "ifIndex": null
+                },
+                {
+                    "entPhysicalIndex": 131074,
+                    "entPhysicalDescr": "Airgo Networks Inc unknown device (rev: 0)",
+                    "entPhysicalClass": "unknown",
+                    "entPhysicalName": "00:00.0",
+                    "entPhysicalHardwareRev": "",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "false",
+                    "entPhysicalModelName": "0x1001",
+                    "entPhysicalVendorType": "zeroDotZero",
+                    "entPhysicalSerialNum": "",
+                    "entPhysicalContainedIn": 65536,
+                    "entPhysicalParentRelPos": -1,
+                    "entPhysicalMfgName": "0x17cb",
+                    "ifIndex": null
+                }
+            ]
+        },
+        "poller": "matches discovery"
     }
 }

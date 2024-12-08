@@ -105,9 +105,9 @@ if ($device['os'] == 'netscaler') {
                 'vsvr_port' => $vsvr['vsvrPort'],
                 'vsvr_state' => $vsvr['vsvrState'],
                 'vsvr_type' => $vsvr['vsvrType'],
-                'vsvr_req_rate' => $vsvr['RequestRate'],
-                'vsvr_bps_in' => $vsvr['vsvrRxBytesRate'],
-                'vsvr_bps_out' => $vsvr['vsvrTxBytesRate'],
+                'vsvr_req_rate' => $vsvr['vsvrRequestRate'] ?? 0,
+                'vsvr_bps_in' => $vsvr['vsvrRxBytesRate'] ?? 0,
+                'vsvr_bps_out' => $vsvr['vsvrTxBytesRate'] ?? 0,
             ];
 
             if (! is_array($vsvrs[$vsvr['vsvrFullName']])) {

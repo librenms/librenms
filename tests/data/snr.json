@@ -11981,5 +11981,31 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "entity-physical": {
+        "discovery": {
+            "entPhysical": [
+                {
+                    "entPhysicalIndex": 1,
+                    "entPhysicalDescr": "NAG LLC chassis model SNR-S2990X-24FQ",
+                    "entPhysicalClass": "chassis",
+                    "entPhysicalName": "Pirog17-as2",
+                    "entPhysicalHardwareRev": "1.0.1",
+                    "entPhysicalFirmwareRev": "7.5.6",
+                    "entPhysicalSoftwareRev": "7.5.3.2(R0010.0044)",
+                    "entPhysicalAlias": "NULL",
+                    "entPhysicalAssetID": "N/A",
+                    "entPhysicalIsFRU": "true",
+                    "entPhysicalModelName": "SNR-S2990X-24FQ",
+                    "entPhysicalVendorType": "enterprises.40418.7.53",
+                    "entPhysicalSerialNum": "SW080710J513000055",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": 0,
+                    "entPhysicalMfgName": "NAG LLC",
+                    "ifIndex": null
+                }
+            ]
+        },
+        "poller": "matches discovery"
     }
 }

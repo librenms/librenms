@@ -1,0 +1,4812 @@
+--
+-- Eltex Enterprise Specific MIB: Structure of Management Information
+--
+-- Copyright (c) 2007-2016, Eltex Co
+--
+-- The contents of this document are subject to change without notice.
+--
+
+ELTEX-SMI-ACTUAL DEFINITIONS ::= BEGIN
+
+IMPORTS
+        enterprises,
+        MODULE-IDENTITY,
+        OBJECT-IDENTITY,
+        OBJECT-TYPE,
+        NOTIFICATION-TYPE,
+        Integer32,
+	IpAddress,
+	Counter64
+                FROM SNMPv2-SMI
+        DisplayString,
+        TimeStamp
+                FROM SNMPv2-TC
+        OBJECT-GROUP,
+        NOTIFICATION-GROUP
+                FROM SNMPv2-CONF;
+
+eltexLtd MODULE-IDENTITY
+        LAST-UPDATED "201205290000Z"
+        ORGANIZATION "Eltex Enterprise, Ltd."
+        CONTACT-INFO
+                "www.eltex.nsk.ru"
+        DESCRIPTION
+                "The Structure of Management Information for Eltex Networks."
+        REVISION     "201205290000Z"
+		DESCRIPTION  "Severity level: 4. http://snmp.cs.utwente.nl/ietf/mibs/validate/"
+        ::= { enterprises 35265 }
+
+--
+-- Eltex MIB tree structure
+--
+
+elHardware OBJECT-IDENTITY
+        STATUS  current
+        DESCRIPTION
+                "The root of eltex hardware OIDs."
+        ::= { eltexLtd 1 }
+
+elSoftware OBJECT-IDENTITY
+        STATUS  current
+        DESCRIPTION
+                "The root of eltex software OIDs."
+        ::= { eltexLtd 2 }
+
+
+
+
+eltrapGroup OBJECT-IDENTITY
+        STATUS  current
+        DESCRIPTION
+                "The root of eltex traps objects."
+        ::= { eltexLtd 3 }
+
+--
+-- eltexOMS "The MIB for eltex devices, that support OMS" { eltexLtd 4 } defined in ELTEX-OMS
+--
+-- eltexFile "The MIB for file operations" { eltexLtd 5 } defined in ELTEX-FILE-MANAGER-MIB
+--
+
+
+
+-- Trap types for MC240 and other devices --
+
+                mc240TrapTypes OBJECT IDENTIFIER        ::= { eltrapGroup 5 }
+
+                mcTrapExState OBJECT-TYPE
+                        SYNTAX  Integer32
+                        MAX-ACCESS read-only
+                        STATUS  current
+                        DESCRIPTION
+                                "state (additional state)"
+                        ::= { mc240TrapTypes 1 }
+
+                mcTrapLParam1 OBJECT-TYPE
+                        SYNTAX  Integer32
+                        MAX-ACCESS read-only
+                        STATUS  current
+                        DESCRIPTION
+                                "param-1 (slot or index)"
+                        ::= { mc240TrapTypes 2 }
+
+                mcTrapLParam2 OBJECT-TYPE
+                        SYNTAX  Integer32
+                        MAX-ACCESS read-only
+                        STATUS  current
+                        DESCRIPTION
+                                "param-2 (port or index)"
+                        ::= { mc240TrapTypes 3 }
+
+                mcTrapLParam3 OBJECT-TYPE
+                        SYNTAX  Integer32
+                        MAX-ACCESS read-only
+                        STATUS  current
+                        DESCRIPTION
+                                "param-3 (other index)"
+                        ::= { mc240TrapTypes 4 }
+
+
+                mcTrapID OBJECT-TYPE
+                        SYNTAX  Integer32
+                        MAX-ACCESS read-only
+                        STATUS  current
+                        DESCRIPTION
+                                "ID (pbx trap id)"
+                        ::= { mc240TrapTypes 5 }
+
+
+                mcTrapDescr OBJECT-TYPE
+                        SYNTAX  DisplayString (SIZE (0..255))
+                        MAX-ACCESS read-only
+                        STATUS  current
+                        DESCRIPTION
+                                "Alarm description"
+                        ::= { mc240TrapTypes 6 }
+
+
+                mcTrapRestoredAlarmID OBJECT-TYPE
+                        SYNTAX  Integer32
+                        MAX-ACCESS read-only
+                        STATUS  current
+                        DESCRIPTION
+                                "If this restore event then here writed Alarm ID. If this alarm event then mcTrapRestoredAlarmID=0."
+                        ::= { mc240TrapTypes 7 }
+
+
+                mcTrapSyncType OBJECT-TYPE
+                        SYNTAX  Integer32
+                        MAX-ACCESS read-only
+                        STATUS  current
+                        DESCRIPTION
+                                "Type of trap: 0 - Normal; 1 - Journal alarms; 2 - Active alarms"
+                        ::= { mc240TrapTypes 8 }
+
+                mcReservedFlag OBJECT-TYPE
+                        SYNTAX  Integer32
+                        MAX-ACCESS read-only
+                        STATUS  current
+                        DESCRIPTION
+                                "Reserved flag"
+                        ::= { mc240TrapTypes 9 }
+
+                radiusSeqNum OBJECT-TYPE
+                        SYNTAX  Integer32
+                        MAX-ACCESS read-only
+                        STATUS  current
+                        DESCRIPTION "Sequence number of the request"
+                        ::= { mc240TrapTypes 10 }
+
+                radiusStatus OBJECT-TYPE
+                        SYNTAX  Integer32
+                        MAX-ACCESS read-only
+                        STATUS  current
+                        DESCRIPTION "Completion status of the request"
+                        ::= { mc240TrapTypes 11 }
+
+                radiusTimeout OBJECT-TYPE
+                        SYNTAX  Integer32
+                        MAX-ACCESS read-only
+                        STATUS  current
+                        DESCRIPTION "General timeout (in MS) to complete processing of the request
+                                     (before receiving the server response or the completion of all attempts)"
+                        ::= { mc240TrapTypes 12 }
+
+                radiusSwitchSrv OBJECT-TYPE
+                        SYNTAX  Integer32
+                        MAX-ACCESS read-only
+                        STATUS  current
+                        DESCRIPTION "Quantity indicator switch to the backup server"
+                        ::= { mc240TrapTypes 13 }
+
+                radiusTypeResp OBJECT-TYPE
+                        SYNTAX  Integer32
+                        MAX-ACCESS read-only
+                        STATUS  current
+                        DESCRIPTION "The type of the server response"
+                        ::= { mc240TrapTypes 14 }
+
+                radiusDescr OBJECT-TYPE
+                        SYNTAX  DisplayString (SIZE (0..255))
+                        MAX-ACCESS read-only
+                        STATUS  current
+                        DESCRIPTION "Notification description"
+                        ::= { mc240TrapTypes 15 }
+
+ponTeknovusAlarmTraps OBJECT IDENTIFIER         ::= { eltrapGroup 10 }
+
+-- ---- ---- ---- ---- ---- ---- ----  GePON ALARMS ---- ---- ---- ---- ---- ---- ---- ----
+                -- GePON ONU Authorization Alarm  --
+                ponTeknovusONTAuthAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Bad registration ONT Event (mcTrapLParam1=Optical Interface Number, mcTrapDescr='description with MAC addr ONT')"
+                        ::= { ponTeknovusAlarmTraps 1 }
+
+
+                -- GePON Eth link Down  --
+                ponTeknovusUplinkAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Uplink Down, mcTrapLParam1=Link Number, Description='GePON: Eth Link N down'"
+                        ::= { ponTeknovusAlarmTraps 2 }
+
+
+                -- GePON Optical link Event  --
+                ponTeknovusOpticalAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "The optical link N (mcTrapLParam1) has no active devices"
+                        ::= { ponTeknovusAlarmTraps 3 }
+
+                ponTeknovusFanAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "fan stopped. param1 = fan number"
+                        ::= { ponTeknovusAlarmTraps 4 }
+
+                ponTeknovusONTConfAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "ONT is not configured. Param1 = optical interface number, Descr = mac-address of ONT."
+                        ::= { ponTeknovusAlarmTraps 5 }
+
+                ponTeknovusFlappingAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Period between OpticalAlarmTrap events is less than 30 seconds. Param 1 - link number"
+                        ::= { ponTeknovusAlarmTraps 6 }
+
+                ponTeknovusEponAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  deprecated
+                        DESCRIPTION
+                                "EPON port failed. Param 1 - link number"
+                        ::= { ponTeknovusAlarmTraps 7 }
+
+                ponTeknovusConfigSavedAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Configuration save error."
+                        ::= { ponTeknovusAlarmTraps 8 }
+
+                ponTeknovusFirmwareUpdateAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Firmware update error."
+                        ::= { ponTeknovusAlarmTraps 9 }
+
+                ponTeknovusUserLoginAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  deprecated
+                        DESCRIPTION
+                                "User login error
+                                 **This entry is deprecated**"
+                        ::= { ponTeknovusAlarmTraps 10 }
+
+                ponTeknovusRAMAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Ammount of free memory is < 5Mb"
+                        ::= { ponTeknovusAlarmTraps 11 }
+
+                ponTeknovusLoginAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Login unsuccessful.
+                                 Param1 = protocol (0 - serial, 1 - SSH, 2 - telnet, 3 - http, 4 - https)
+                                 Descr = login, ip:port"
+                        ::= { ponTeknovusAlarmTraps 12 }
+
+                ponTeknovusDuplicateMacAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Duplicate mac detected. Param1 = VID, Descr = mac."
+                        ::= { ponTeknovusAlarmTraps 14 }
+
+                ponTeknovusLoadAverageAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Load average exceeded limits. Param1 = 0 - 1 min, 1 - 5 min, 2 - 15 min"
+                        ::= { ponTeknovusAlarmTraps 15 }
+
+                ponTeknovusTemperatureAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Temperature is higher than 65 deg. Param1 = temperature value"
+                        ::= { ponTeknovusAlarmTraps 16 }
+
+                ponTeknovusONTPortBlockedAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "ONT's UNI port blocked. Param1 = port number, Descr = mac-address of ONT"
+                        ::= { ponTeknovusAlarmTraps 17 }
+
+                ponTeknovusConfigMigrateAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Config migrate error. Param1 = config type (0 - all, 1 - pon)"
+                        ::= { ponTeknovusAlarmTraps 18 }
+
+                ponTeknovusOkTraps OBJECT IDENTIFIER    ::= { eltrapGroup 11 }
+
+                ponTeknovusONTAuthOkTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Normal registration ONT Event (mcTrapLParam1=Optical Interface Number, mcTrapDescr='description with MAC addr ONT')"
+                        ::= { ponTeknovusOkTraps 1 }
+
+
+                ponTeknovusUplinkOkTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Eth Link Up, mcTrapLParam1=Link Number, Description='GePON: Eth Link N up'"
+                        ::= { ponTeknovusOkTraps 2 }
+
+
+                ponTeknovusOpticalOkTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "The optical link N (mcTrapLParam1) has M (mcTrapLParam2) active devices"
+                        ::= { ponTeknovusOkTraps 3 }
+
+                ponTeknovusFanOkTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "param1 = fan number"
+                        ::= { ponTeknovusOkTraps 4 }
+
+                ponTeknovusONTConfOKTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "ONT is configured. Param1 = optical interface number, Descr = macaddress of ont"
+                        ::= { ponTeknovusOkTraps 5 }
+
+                ponTeknovusFlappingOkTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "1 minute passed after last OpticalAlarmTrap. Param 1 - link number"
+                        ::= { ponTeknovusOkTraps 6 }
+
+                ponTeknovusEponOkTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  deprecated
+                        DESCRIPTION
+                                "EPON port ok. Param 1 - link number"
+                        ::= { ponTeknovusOkTraps 7 }
+
+                ponTeknovusConfigSavedOkTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Configuration saved. Descr = Configuration saved to flash"
+                        ::= { ponTeknovusOkTraps 8 }
+
+                ponTeknovusFirmwareUpdateOkTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Firmware updated. Descr = Firmware updated"
+                        ::= { ponTeknovusOkTraps 9 }
+
+                ponTeknovusUserLoginOkTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  deprecated
+                        DESCRIPTION
+                                "User logged in from CLI. Param1 = privileged/nonprivileged (1/0), Descr = ${username} logged in
+                                 ** This entry is deprecated."
+                        ::= { ponTeknovusOkTraps 10 }
+
+                ponTeknovusRAMOkTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Ammount of free memory is > 7Mb"
+                        ::= { ponTeknovusOkTraps 11 }
+
+                ponTeknovusLoginOkTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Login successful. Param1 = privileged/nonprivileged(1/0)
+                                 Param1 = protocol (0 - serial, 1 - SSH, 2 - telnet, 3 - http, 4 - https)
+                                 Descr = login, ip:port"
+                        ::= { ponTeknovusOkTraps 12 }
+
+                ponTeknovusLogoutOkTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "User logged out. Param1 = privileged/nonprivileged(1/0)
+                                 Param1 = protocol (0 - serial, 1 - SSH, 2 - telnet, 3 - http, 4 - https)
+                                 Descr = login, ip:port"
+                        ::= { ponTeknovusOkTraps 13 }
+
+                ponTeknovusSwitchConfigChangeTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Switch configuration has been changed"
+                        ::= { ponTeknovusOkTraps 14 }
+
+                ponTeknovusLoadAverageOkTrap  NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS current
+                        DESCRIPTION
+                                "Load average is back to normal. Param1 = 0 - 1 min, 1 - 5 min, 2 - 15 min"
+                        ::= { ponTeknovusOkTraps 15 }
+
+                ponTeknovusTemperatureOkTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Temperature is lower than 60 deg. Param1 = temperature value"
+                        ::= { ponTeknovusOkTraps 16 }
+
+                ponTeknovusONTPortBlockedOkTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "ONT's UNI port not blocked. Param1 = port number, Descr = mac-address of ONT"
+                        ::= { ponTeknovusOkTraps 17 }
+
+                ponTeknovusConfigMigrateOkTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Config migrate success. Param1 = config type (0 - all, 1 - pon)"
+                        ::= { ponTeknovusOkTraps 18 }
+
+                ponTeknovusBoardRebootTrap  NOTIFICATION-TYPE
+						OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Board is being rebooted. Descr = <username/Snmp> <ip-address> initiated reboot"
+                        ::= { ponTeknovusOkTraps 20 }
+
+               ponTeknovusONTDeconfigureTrap  NOTIFICATION-TYPE
+						OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "ONT is being deconfigured (before disconnect). Param1 = pon-channel, Description = mac-address"
+                        ::= { ponTeknovusOkTraps 21 }
+
+               ponTeknovusONTStateChangedTrap  NOTIFICATION-TYPE
+						OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "ONT's state changed. Param1 = pon channel, Param2 = ID ONT, Descr = ELTXhhhhhhhh pon_channel id state"
+                        ::= { ponTeknovusOkTraps 22 }
+
+               ponTeknovusONTConfigChangedTrap  NOTIFICATION-TYPE
+						OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "ONT config changed.  Param1 = pon channel, Param2 = ID ONT, Descr = ADD|DEL|EDIT ELTXhhhhhhhh pon_channel id description"
+                        ::= { ponTeknovusOkTraps 23 }
+
+               ponTeknovusConfigRereadTrap  NOTIFICATION-TYPE
+						OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Config was reread from flash."
+                        ::= { ponTeknovusOkTraps 24 }
+
+
+------ fxs72 Alarm Traps begins here
+
+
+fxs72AlarmTraps OBJECT IDENTIFIER       ::= { eltrapGroup 6 }
+
+                fxs72VbatAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Vbat is out of limits (Vbat<38V or Vbat>72V). LParam1 = Vbat voltage. Actual for TAU36/72 HW versions 1.0-4.0"
+                        ::= { fxs72AlarmTraps 1 }
+
+                fxs72VringAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Vring1 or Vring2 is out of limits (Vring<100V or Vring>120V). LParam1 = Vring voltage. LParam2 = 1 or 2"
+                        ::= { fxs72AlarmTraps 2 }
+
+                fxs72TemperatureAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Temperature is too high. (Temp>90 deg). LParam1 = temperature value. LParam2 = sensor number"
+                        ::= { fxs72AlarmTraps 3 }
+
+                fxs72FanAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Fans are on, but not rotating. LParam1 = fan number"
+                        ::= { fxs72AlarmTraps 4 }
+
+                fxs72SSwAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Softswitch became disconnected
+                                TAU-MEGACO p1=status (undefined=0, connect=1, disconnect=2)"
+                        ::= { fxs72AlarmTraps 5 }
+
+                fxs72PortAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS current
+                        DESCRIPTION
+                                "Port Blocked.
+                                TAU-SIP
+									Param1 = port number,
+									p2=block cause, Descr = Block cause
+										0x00 - unknown cause (0x00)
+										0x01 - leakage current has exceeded the permissible parameters
+										0x02 - temperature has exceeded the permissible parameters
+										0x03 - power dissipation has exceeded the permissible parameters
+										0x04 - reinitialization by changing the input voltage
+										0x05 - hardware reset
+										0x06 - low Vbat level
+										0x07 - FXS port is out of order
+										0x08 - FXO line is not connected
+										0x09 - low FXO line current
+										0x0A - receiver offhook
+                                TAU-MEGACO
+									p1=port,
+									p2=cause
+										1-leakage_current
+										2-overheating
+										3-dissipated_power"
+                        ::= { fxs72AlarmTraps 6 }
+
+                 fxs72VInputAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS current
+                        DESCRIPTION
+                                "Vinput out of limits (V<8V or V>16V). LParam1 = Vbat voltage. Actual for TAU16/24/32m/36revB/72revB"
+                        ::= { fxs72AlarmTraps 7 }
+                 fxs72BpuAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS current
+                        DESCRIPTION
+                                "BPU is NOT available"
+                        ::= { fxs72AlarmTraps 12 }
+
+                  fxs72TempmeasurementAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Temperature measurement failed. TAU-SIP 2.9"
+                        ::= { fxs72AlarmTraps 13 }
+
+                  fxs72LicenseAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "TAU-MEGACO 1.2
+									mcTrapExState: 1 - alarm, no license, 0 - ok license"
+                        ::= { fxs72AlarmTraps 14 }
+
+--	COM_COPY_ERR_NONE = 0,
+--	COM_COPY_ERR_UNKNOWN = 1,
+--	COM_COPY_ERR_INVALID_SRC = 2,  invalid source file argument
+--	COM_COPY_ERR_INVALID_DST = 3,  invalid destination file argument
+--	COM_COPY_ERR_UNSUPPORTED_SRC_URL = 4,  unsupported source URL type
+--	COM_COPY_ERR_UNSUPPORTED_DST_URL = 5,  unsupported destination URL type
+--	COM_COPY_ERR_CANNOT_STAT = 6,  cannot stat
+--	COM_COPY_ERR_PATH_INVALID_FOR_UNIT = 7,  path is not valid for unit
+--	COM_COPY_ERR_COPY_FROM_SLOT = 8,  copying from slot not supported
+--	COM_COPY_ERR_TFTP_GET = 9,  tftp get copying file failed
+--	COM_COPY_ERR_TFTP_PUT = 10,  tftp put copying file failed
+--	COM_COPY_ERR_DEST_IS_DIR = 11,  destination is a directory
+--	COM_COPY_ERR_TOOLONG_FILENAME = 12, filename too long
+--	COM_COPY_ERR_INSTALL_FAIL = 13,  switchd return on install is not ok
+
+                 fxs72updateFwFail NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS current
+                        DESCRIPTION
+                                "par1 = error type. descr = file + addr + FAIL"
+                        ::= { fxs72AlarmTraps 20 }
+
+                fxs72PowerUnitTermAlarm NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS current
+                        DESCRIPTION
+                                "Power supply unit temperature is out of limit (more than 95 C)"
+                        ::= { fxs72AlarmTraps 21 }
+
+                fxs72FanLowSpeedAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS current
+                        DESCRIPTION
+                                "Fan rotation speed lower than 1000 rpm"
+                        ::= { fxs72AlarmTraps 22 }
+
+------ fxs72 Alarm Traps ends here
+
+------ fxs72 Ok Traps begins here
+
+fxs72OkTraps OBJECT IDENTIFIER  ::= { eltrapGroup 7 }
+
+                fxs72VbatOkTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Vbat is back to normal."
+                        ::= { fxs72OkTraps 1 }
+
+                fxs72VringOkTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Vring1 or Vring2 is back to normal. LParam2 = 1 or 2"
+                        ::= { fxs72OkTraps 2 }
+
+                fxs72TemperatureOkTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Temperature is back to normal. LParam2 = sensor number"
+                        ::= { fxs72OkTraps 3 }
+
+                fxs72FanOkTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Fans are rotating. LParam1 = fan number"
+                        ::= { fxs72OkTraps 4 }
+
+                fxs72SSwOkTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Softswitch status ok.
+                                TAU-MEGACO p1=status (undefined=0, connect=1, disconnect=2)"
+                        ::= { fxs72OkTraps 5 }
+
+                fxs72PortOkTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS current
+                        DESCRIPTION
+                                "Port unblocked. Param1 = port number, p2=state
+                                TAU-MEGACO p1=port, p2=state(ELTEX-FXS72::PortMegacoState)"
+                        ::= { fxs72OkTraps 6 }
+
+                fxs72VInputOkTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Vinput is normal."
+                        ::= { fxs72OkTraps 7 }
+
+                fxs72VmodeSwitchTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Voltage mode has been switched. LParam1 = new mode (1- 60V, 2 - 48V)."
+                        ::= { fxs72OkTraps 10 }
+
+                fxs72FansSwitchTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Fans has been switched on or off. LParam1 = 0 - off, 1 - on."
+                        ::= { fxs72OkTraps 11 }
+
+                 fxs72BpuOkTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "BPU is available"
+                        ::= { fxs72OkTraps 12 }
+
+                 fxs72TempmeasurementOkTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Temperature measurement is OK. TAU-SIP 2.9"
+                        ::= { fxs72OkTraps 13 }
+
+                 fxs72LicenseOkTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "TAU-MEGACO 1.2
+									mcTrapExState: 1 - alarm, no license, 0 - ok license"
+                        ::= { fxs72OkTraps 14 }
+
+                 fxs72updateFwOk NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS current
+                        DESCRIPTION
+                                "descr = file + addr + OK"
+                        ::= { fxs72OkTraps 20 }
+
+                fxs72PowerUnitTermOk NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS current
+                        DESCRIPTION
+                                "Power supply unit temperature is normal (lower than 95 C)"
+                        ::= { fxs72OkTraps 21 }
+
+                fxs72FanLowSpeedOkTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS current
+                        DESCRIPTION
+                                "Fan rotation speed is normal (more than 1000 rpm)."
+                        ::= { fxs72OkTraps 22 }
+------ fxs72OkTraps ends here
+
+
+
+-- PP4G traps
+
+pp4AlarmTraps OBJECT IDENTIFIER         ::= { eltrapGroup 12 }
+
+                pp4LinkAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Link is down (Param1 = link number)"
+                        ::= { pp4AlarmTraps 1 }
+
+                pp4AutoNegotiationAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Autonegotiation failed (Param1 = link number)"
+                        ::= { pp4AlarmTraps 2 }
+
+                pp4MemoryAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Running out of free memory (Param1 = current ammount of free memory)"
+                        ::= { pp4AlarmTraps 3 }
+
+                pp4LoadAvgAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Load avg > 95% (Param1 = 1-1min, 2-5 min, 3-15 min, all LAs in description"
+                        ::= { pp4AlarmTraps 4 }
+
+                pp4LoginAlarmTrap NOTIFICATION-TYPE
+						OBJECTS {
+								mcTrapExState,
+								mcTrapLParam1,
+								mcTrapLParam2,
+								mcTrapLParam3,
+								mcTrapID,
+								mcTrapDescr}
+						STATUS  current
+						DESCRIPTION
+							"Login failed"
+						::= { pp4AlarmTraps 5 }
+
+                pp4LogoutAlarmTrap NOTIFICATION-TYPE
+						OBJECTS {
+								mcTrapExState,
+								mcTrapLParam1,
+								mcTrapLParam2,
+								mcTrapLParam3,
+								mcTrapID,
+								mcTrapDescr}
+						STATUS  current
+						DESCRIPTION
+							"Logout failed"
+						::= { pp4AlarmTraps 6 }
+
+				-- there is pp4OkTraps 7 - Commit Ok
+
+				pp4SaveAlarmTrap NOTIFICATION-TYPE
+						OBJECTS {
+								mcTrapExState,
+								mcTrapLParam1,
+								mcTrapLParam2,
+								mcTrapLParam3,
+								mcTrapID,
+								mcTrapDescr}
+						STATUS  current
+						DESCRIPTION
+							"Save FAIL"
+						::= { pp4AlarmTraps 8 }
+
+                pp4LoadCpuAlarmTrap NOTIFICATION-TYPE
+						OBJECTS {
+								mcTrapExState,
+								mcTrapLParam1,
+								mcTrapLParam2,
+								mcTrapLParam3,
+								mcTrapID,
+								mcTrapDescr}
+						STATUS  current
+						DESCRIPTION
+							"Load CPU Alarm"
+						::= { pp4AlarmTraps 9 }
+
+                pp4DuplicationMacAlarmTrap NOTIFICATION-TYPE
+						OBJECTS {
+								mcTrapExState,
+								mcTrapLParam1,
+								mcTrapLParam2,
+								mcTrapLParam3,
+								mcTrapID,
+								mcTrapDescr}
+						STATUS  current
+						DESCRIPTION
+							"Duplication of MAC address on PP4"
+						::= { pp4AlarmTraps 10 }
+
+                pp4LinkFlapAlarmTrap NOTIFICATION-TYPE
+						OBJECTS {
+								mcTrapExState,
+								mcTrapLParam1,
+								mcTrapLParam2,
+								mcTrapLParam3,
+								mcTrapID,
+								mcTrapDescr}
+						STATUS  current
+						DESCRIPTION
+							"linkflap on ifindex=param1"
+						::= { pp4AlarmTraps 11 }
+
+				pp4BoardRemoveAlarmTrap NOTIFICATION-TYPE
+						OBJECTS {
+								mcTrapExState,
+								mcTrapLParam1,
+								mcTrapLParam2,
+								mcTrapLParam3,
+								mcTrapID,
+								mcTrapDescr}
+						STATUS  current
+						DESCRIPTION
+							"Board removed from slot #par1. board type #par2"
+						::= { pp4AlarmTraps 13 }
+
+                pp4UnitRemoveAlarmTrap NOTIFICATION-TYPE
+						OBJECTS {
+								mcTrapExState,
+								mcTrapLParam1,
+								mcTrapLParam2,
+								mcTrapLParam3,
+								mcTrapID,
+								mcTrapDescr}
+						STATUS  current
+						DESCRIPTION
+							"UNIT number par[1] vas removed from position left(par[2]=1) or right(par[2]=0)"
+						::= { pp4AlarmTraps 14 }
+
+                -- there is pp4OkTraps 15 - Role changed
+
+                pp4PortCounterErrorFoundAlarmTrap NOTIFICATION-TYPE
+						OBJECTS {
+								mcTrapExState,
+								mcTrapLParam1,
+								mcTrapLParam2,
+								mcTrapLParam3,
+								mcTrapID,
+								mcTrapDescr}
+						STATUS  current
+						DESCRIPTION
+							"Founded errors for this port-counter"
+						::= { pp4AlarmTraps 16 }
+
+				pp4SyncDisallowedAlarmTrap NOTIFICATION-TYPE
+						OBJECTS {
+								mcTrapExState,
+								mcTrapLParam1,
+								mcTrapLParam2,
+								mcTrapLParam3,
+								mcTrapID,
+								mcTrapDescr}
+						STATUS  current
+						DESCRIPTION
+							"User didn't set command to allow unit-synchronization"
+						::= { pp4AlarmTraps 17 }
+
+                -- there is pp4ConfigRestoredOkTrap ::= { pp4OkTraps 18 }
+
+				pp4RebootUnitAlarmTrap NOTIFICATION-TYPE
+						OBJECTS {
+								mcTrapExState,
+								mcTrapLParam1,
+								mcTrapLParam2,
+								mcTrapLParam3,
+								mcTrapID,
+								mcTrapDescr}
+						STATUS  current
+						DESCRIPTION
+							" "
+						::= { pp4AlarmTraps 19 }
+
+				pp4RebootStackAlarmTrap NOTIFICATION-TYPE
+						OBJECTS {
+								mcTrapExState,
+								mcTrapLParam1,
+								mcTrapLParam2,
+								mcTrapLParam3,
+								mcTrapID,
+								mcTrapDescr}
+						STATUS  current
+						DESCRIPTION
+							" "
+						::= { pp4AlarmTraps 20 }
+
+				pp4RebootFwTimerAlarmTrap NOTIFICATION-TYPE
+						OBJECTS {
+								mcTrapExState,
+								mcTrapLParam1,
+								mcTrapLParam2,
+								mcTrapLParam3,
+								mcTrapID,
+								mcTrapDescr}
+						STATUS  current
+						DESCRIPTION
+							" "
+						::= { pp4AlarmTraps 21 }
+
+				pp4FwUpdateAlarmTrap NOTIFICATION-TYPE
+						OBJECTS {
+								mcTrapExState,
+								mcTrapLParam1,
+								mcTrapLParam2,
+								mcTrapLParam3,
+								mcTrapID,
+								mcTrapDescr}
+						STATUS  current
+						DESCRIPTION
+							" "
+						::= { pp4AlarmTraps 22 }
+
+				pp4FwConfirmNeededAlarmTrap NOTIFICATION-TYPE
+						OBJECTS {
+								mcTrapExState,
+								mcTrapLParam1,
+								mcTrapLParam2,
+								mcTrapLParam3,
+								mcTrapID,
+								mcTrapDescr}
+						STATUS  current
+						DESCRIPTION
+							" "
+						::= { pp4AlarmTraps 23 }
+
+			pp4OkTraps OBJECT IDENTIFIER    ::= { eltrapGroup 13 }
+
+                pp4LinkOkTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Link is up (Param1 = link number)"
+                        ::= { pp4OkTraps 1 }
+
+                pp4AutoNegotiationOkTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Autonegotiation successful (Param1 = link number)"
+                        ::= { pp4OkTraps 2 }
+
+                pp4MemoryOkTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Ammount of free memory is back to normal"
+                        ::= { pp4OkTraps 3 }
+
+                pp4LoadAvgOkTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Load avg is back to normal (Param1 = 1-1min, 2-5 min, 3-15 min, all LAs in description"
+                        ::= { pp4OkTraps 4 }
+
+                pp4LoginOkTrap NOTIFICATION-TYPE
+						OBJECTS {
+								mcTrapExState,
+								mcTrapLParam1,
+								mcTrapLParam2,
+								mcTrapLParam3,
+								mcTrapID,
+								mcTrapDescr}
+						STATUS  current
+						DESCRIPTION
+							"Login OK"
+						::= { pp4OkTraps 5 }
+
+                pp4LogoutOkTrap NOTIFICATION-TYPE
+						OBJECTS {
+								mcTrapExState,
+								mcTrapLParam1,
+								mcTrapLParam2,
+								mcTrapLParam3,
+								mcTrapID,
+								mcTrapDescr}
+						STATUS  current
+						DESCRIPTION
+							"Logout OK"
+						::= { pp4OkTraps 6 }
+
+                pp4CommitOkTrap NOTIFICATION-TYPE
+						OBJECTS {
+								mcTrapExState,
+								mcTrapLParam1,
+								mcTrapLParam2,
+								mcTrapLParam3,
+								mcTrapID,
+								mcTrapDescr}
+						STATUS  current
+						DESCRIPTION
+							"Commit OK"
+						::= { pp4OkTraps 7 }
+
+                pp4SaveOkTrap NOTIFICATION-TYPE
+						OBJECTS {
+								mcTrapExState,
+								mcTrapLParam1,
+								mcTrapLParam2,
+								mcTrapLParam3,
+								mcTrapID,
+								mcTrapDescr}
+						STATUS  current
+						DESCRIPTION
+							"Save OK"
+						::= { pp4OkTraps 8 }
+
+				pp4LinkFlapEndOkTrap NOTIFICATION-TYPE
+						OBJECTS {
+								mcTrapExState,
+								mcTrapLParam1,
+								mcTrapLParam2,
+								mcTrapLParam3,
+								mcTrapID,
+								mcTrapDescr}
+						STATUS  current
+						DESCRIPTION
+							"linkflap End on ifindex=param1"
+						::= { pp4OkTraps 11 }
+
+				pp4ConfigChangedOkTrap NOTIFICATION-TYPE
+						OBJECTS {
+								mcTrapExState,
+								mcTrapLParam1,
+								mcTrapLParam2,
+								mcTrapLParam3,
+								mcTrapID,
+								mcTrapDescr}
+						STATUS  current
+						DESCRIPTION
+							"Config pp4x Changed"
+						::= { pp4OkTraps 12 }
+
+				pp4BoardAddOkTrap NOTIFICATION-TYPE
+						OBJECTS {
+								mcTrapExState,
+								mcTrapLParam1,
+								mcTrapLParam2,
+								mcTrapLParam3,
+								mcTrapID,
+								mcTrapDescr}
+						STATUS  current
+						DESCRIPTION
+							"New board added to slot #par1. board type #par2"
+						::= { pp4OkTraps 13 }
+
+				pp4UnitAddOkTrap NOTIFICATION-TYPE
+						OBJECTS {
+								mcTrapExState,
+								mcTrapLParam1,
+								mcTrapLParam2,
+								mcTrapLParam3,
+								mcTrapID,
+								mcTrapDescr}
+						STATUS  current
+						DESCRIPTION
+							"UNIT number par[1] vas added to position left(par[2]=1) or right(par[2]=0)"
+						::= { pp4OkTraps 14 }
+
+				pp4RoleChangedOkTrap NOTIFICATION-TYPE
+						OBJECTS {
+								mcTrapExState,
+								mcTrapLParam1,
+								mcTrapLParam2,
+								mcTrapLParam3,
+								mcTrapID,
+								mcTrapDescr}
+						STATUS  current
+						DESCRIPTION
+							"Now unit number par[1] with position par[2] is Master"
+						::= { pp4OkTraps 15 }
+
+				pp4PortCounterErrorFreeOkTrap NOTIFICATION-TYPE
+						OBJECTS {
+								mcTrapExState,
+								mcTrapLParam1,
+								mcTrapLParam2,
+								mcTrapLParam3,
+								mcTrapID,
+								mcTrapDescr}
+						STATUS  current
+						DESCRIPTION
+							"No errors for this port-counter"
+						::= { pp4OkTraps 16 }
+
+				pp4SyncDisallowedOkTrap NOTIFICATION-TYPE
+						OBJECTS {
+								mcTrapExState,
+								mcTrapLParam1,
+								mcTrapLParam2,
+								mcTrapLParam3,
+								mcTrapID,
+								mcTrapDescr}
+						STATUS  current
+						DESCRIPTION
+							"User set command to allow unit-synchronization"
+						::= { pp4OkTraps 17 }
+
+				pp4ConfigRestoredOkTrap NOTIFICATION-TYPE
+						OBJECTS {
+								mcTrapExState,
+								mcTrapLParam1,
+								mcTrapLParam2,
+								mcTrapLParam3,
+								mcTrapID,
+								mcTrapDescr}
+						STATUS  current
+						DESCRIPTION
+							"timeout for confirm. Config Restored Now"
+						::= { pp4OkTraps 18 }
+
+				pp4RebootUnitOkTrap NOTIFICATION-TYPE
+						OBJECTS {
+								mcTrapExState,
+								mcTrapLParam1,
+								mcTrapLParam2,
+								mcTrapLParam3,
+								mcTrapID,
+								mcTrapDescr}
+						STATUS  current
+						DESCRIPTION
+							" "
+						::= { pp4OkTraps 19 }
+
+				-- pp4RebootStackAlarmTrap is 20
+				-- pp4RebootFwTimerAlarmTrap is 21
+
+				pp4FwUpdateOkTrap NOTIFICATION-TYPE
+						OBJECTS {
+								mcTrapExState,
+								mcTrapLParam1,
+								mcTrapLParam2,
+								mcTrapLParam3,
+								mcTrapID,
+								mcTrapDescr}
+						STATUS  current
+						DESCRIPTION
+							" "
+						::= { pp4OkTraps 22 }
+
+-- MXA32 traps
+
+mxa32AlarmTraps  OBJECT IDENTIFIER      ::= { eltrapGroup 14 }
+mxa32OkTraps     OBJECT IDENTIFIER      ::= { eltrapGroup 15 }
+
+                mxa32DslLinkAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapSyncType}
+                        STATUS  current
+                        DESCRIPTION
+                                "Adsl port in down state.
+                                LParam1 - port number"
+                        ::= { mxa32AlarmTraps 1 }
+
+                mxa32EthLinkAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapSyncType,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Uplink port in down state.
+                                LParam1 - port number"
+                        ::= { mxa32AlarmTraps 2 }
+
+                mxa32TempAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr,
+                                mcTrapSyncType}
+                        STATUS  current
+                        DESCRIPTION
+                                "Temperature is too high.
+                                LParam1 - sensor index: 0(sensor0), 1(sensor1)
+                                LParam3 - actual temperature value ['C]"
+                        ::= { mxa32AlarmTraps 3 }
+
+                mxa32VoltAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr,
+                                mcTrapSyncType}
+                        STATUS  current
+                        DESCRIPTION
+                                "Device voltage is out of range.
+                                LParam1 - voltage index: 2(1V), 3(12V), 4(-12V), 5(3.3V), 6(2.5V), 7(1.8V), 8(0.9V), 9(1.5V)
+                                LParam3 - actual voltage value [mV/10]"
+                        ::= { mxa32AlarmTraps 4 }
+
+			mxa32UserLoginTrap NOTIFICATION-TYPE
+				OBJECTS {
+					mcTrapExState,
+					mcTrapLParam1,
+					mcTrapLParam2,
+					mcTrapLParam3,
+					mcTrapID,
+					mcTrapDescr,
+					mcTrapSyncType}
+				STATUS  current
+				DESCRIPTION
+                                "User logIN.
+                                LParam1 - the process pid
+                                LParam2 - interface number: 1(console), 2(telnet), 3..6(web)"
+				::= { mxa32AlarmTraps 5 }
+
+                mxa32DslLinkOkTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr,
+                                mcTrapSyncType}
+                        STATUS  current
+                        DESCRIPTION
+                                "Adsl port is up.
+                                LParam1 - port number"
+                        ::= { mxa32OkTraps 1 }
+
+                mxa32EthLinkOkTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr,
+                                mcTrapSyncType}
+                        STATUS  current
+                        DESCRIPTION
+                                "Uplink port is up.
+                                LParam1 - port number"
+                        ::= { mxa32OkTraps 2 }
+
+                mxa32TempOkTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr,
+                                mcTrapSyncType}
+                        STATUS  current
+                        DESCRIPTION
+                                "Temperature normalization.
+                                LParam1 - sensor index: 0(sensor0), 1(sensor1)
+                                LParam3 - actual temperature value ['C]"
+                        ::= { mxa32OkTraps 3 }
+
+                mxa32VoltOkTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr,
+                                mcTrapSyncType}
+                        STATUS  current
+                        DESCRIPTION
+                                "Device voltage is in acceptable range.
+                                LParam1 - voltage index: 2(1V), 3(12V), 4(-12V), 5(3.3V), 6(2.5V), 7(1.8V), 8(0.9V), 9(1.5V)
+                                LParam3 - actual voltage value [mV/10]"
+                        ::= { mxa32OkTraps 4 }
+
+		mxa32UserLogoutTrap NOTIFICATION-TYPE
+			OBJECTS {
+				mcTrapExState,
+				mcTrapLParam1,
+				mcTrapLParam2,
+				mcTrapLParam3,
+				mcTrapID,
+				mcTrapDescr,
+				mcTrapSyncType}
+			STATUS  current
+			DESCRIPTION
+                                "User logOUT.
+                                LParam1 - the process pid
+                                LParam2 - interface number: 1(console), 2(telnet), 3..6(web)"
+			::= { mxa32OkTraps 5 }
+
+-- MXA64 traps
+
+mxa64AlarmTraps  OBJECT IDENTIFIER 	::= { eltrapGroup 16 }
+mxa64OkTraps     OBJECT IDENTIFIER 	::= { eltrapGroup 17 }
+
+		mxa64DslLinkAlarmTrap NOTIFICATION-TYPE
+			OBJECTS {
+				mcTrapExState,
+				mcTrapLParam1,
+				mcTrapLParam2,
+				mcTrapLParam3,
+				mcTrapID,
+				mcTrapSyncType}
+			STATUS  current
+			DESCRIPTION
+                                "Adsl port in down state.
+                                LParam1 - port number"
+			::= { mxa64AlarmTraps 1 }
+
+		mxa64EthLinkAlarmTrap NOTIFICATION-TYPE
+			OBJECTS {
+				mcTrapExState,
+				mcTrapLParam1,
+				mcTrapLParam2,
+				mcTrapLParam3,
+				mcTrapID,
+				mcTrapSyncType}
+			STATUS  current
+			DESCRIPTION
+                                "Uplink port in down state.
+                                LParam1 - port number"
+			::= { mxa64AlarmTraps 2 }
+
+		mxa64TempAlarmTrap NOTIFICATION-TYPE
+			OBJECTS {
+				mcTrapExState,
+				mcTrapLParam1,
+				mcTrapLParam2,
+				mcTrapLParam3,
+				mcTrapID,
+				mcTrapDescr,
+				mcTrapSyncType}
+			STATUS  current
+			DESCRIPTION
+                                "Temperature is too high.
+                                LParam1 - sensor index: 0(sensor0), 1(sensor1), 2(sensor2), 3(sensor3)
+                                LParam3 - actual temperature value ['C]"
+			::= { mxa64AlarmTraps 3 }
+
+		mxa64VoltAlarmTrap NOTIFICATION-TYPE
+			OBJECTS {
+				mcTrapExState,
+				mcTrapLParam1,
+				mcTrapLParam2,
+				mcTrapLParam3,
+				mcTrapID,
+				mcTrapDescr,
+				mcTrapSyncType}
+			STATUS  current
+			DESCRIPTION
+                                "Device voltage is out of range.
+                                LParam1 - voltage index: 4(1V), 5(12V), 6(-12V), 7(3.3V), 8(2.5V), 9(1.8V), 10(0.9V), 11(1.5V)
+                                LParam3 - actual voltage value [mV/10]"
+			::= { mxa64AlarmTraps 4 }
+
+		mxa64UserLoginTrap NOTIFICATION-TYPE
+			OBJECTS {
+				mcTrapExState,
+				mcTrapLParam1,
+				mcTrapLParam2,
+				mcTrapLParam3,
+				mcTrapID,
+				mcTrapDescr,
+				mcTrapSyncType}
+			STATUS  current
+			DESCRIPTION
+                                "User login.
+                                LParam1 - the process pid
+                                LParam2 - interface number: 1(console), 2(telnet), 3..6(web)"
+			::= { mxa64AlarmTraps 5 }
+
+		mxa64DslLinkOkTrap NOTIFICATION-TYPE
+			OBJECTS {
+				mcTrapExState,
+				mcTrapLParam1,
+				mcTrapLParam2,
+				mcTrapLParam3,
+				mcTrapID,
+				mcTrapDescr,
+				mcTrapSyncType}
+			STATUS  current
+			DESCRIPTION
+                                "Adsl port is up.
+                                LParam1 - port number"
+			::= { mxa64OkTraps 1 }
+
+		mxa64EthLinkOkTrap NOTIFICATION-TYPE
+			OBJECTS {
+				mcTrapExState,
+				mcTrapLParam1,
+				mcTrapLParam2,
+				mcTrapLParam3,
+				mcTrapID,
+				mcTrapDescr,
+				mcTrapSyncType}
+			STATUS  current
+			DESCRIPTION
+                                "Uplink port is up.
+                                LParam1 - port number"
+			::= { mxa64OkTraps 2 }
+
+		mxa64TempOkTrap NOTIFICATION-TYPE
+			OBJECTS {
+				mcTrapExState,
+				mcTrapLParam1,
+				mcTrapLParam2,
+				mcTrapLParam3,
+				mcTrapID,
+				mcTrapDescr,
+				mcTrapSyncType}
+			STATUS  current
+			DESCRIPTION
+                                "Temperature normalization.
+                                LParam1 - sensor index: 0(sensor0), 1(sensor1), 2(sensor2), 3(sensor3)
+                                LParam3 - actual temperature value ['C]"
+			::= { mxa64OkTraps 3 }
+
+		mxa64VoltOkTrap NOTIFICATION-TYPE
+			OBJECTS {
+				mcTrapExState,
+				mcTrapLParam1,
+				mcTrapLParam2,
+				mcTrapLParam3,
+				mcTrapID,
+				mcTrapDescr,
+				mcTrapSyncType}
+			STATUS  current
+			DESCRIPTION
+                                "Device voltage is in acceptable range.
+                                LParam1 - voltage index: 4(1V), 5(12V), 6(-12V), 7(3.3V), 8(2.5V), 9(1.8V), 10(0.9V), 11(1.5V)
+                                LParam3 - actual voltage value [mV/10]"
+			::= { mxa64OkTraps 4 }
+
+		mxa64UserLogoutTrap NOTIFICATION-TYPE
+			OBJECTS {
+				mcTrapExState,
+				mcTrapLParam1,
+				mcTrapLParam2,
+				mcTrapLParam3,
+				mcTrapID,
+				mcTrapDescr,
+				mcTrapSyncType}
+			STATUS  current
+			DESCRIPTION
+                                "User logout.
+                                LParam1 - the process pid
+                                LParam2 - interface number: 1(console), 2(telnet), 3..6(web)"
+			::= { mxa64OkTraps 5 }
+
+-- MXA24 traps
+
+mxa24AlarmTraps  OBJECT IDENTIFIER 	::= { eltrapGroup 18 }
+mxa24OkTraps     OBJECT IDENTIFIER 	::= { eltrapGroup 19 }
+
+		mxa24DslLinkAlarmTrap NOTIFICATION-TYPE
+			OBJECTS {
+				mcTrapExState,
+				mcTrapLParam1,
+				mcTrapLParam2,
+				mcTrapLParam3,
+				mcTrapID,
+				mcTrapSyncType}
+			STATUS  current
+			DESCRIPTION
+                                "Adsl port in down state.
+                                LParam1 - port number"
+			::= { mxa24AlarmTraps 1 }
+
+		mxa24EthLinkAlarmTrap NOTIFICATION-TYPE
+			OBJECTS {
+				mcTrapExState,
+				mcTrapLParam1,
+				mcTrapLParam2,
+				mcTrapLParam3,
+				mcTrapID,
+				mcTrapSyncType}
+			STATUS  current
+			DESCRIPTION
+                                "Uplink port in down state.
+                                LParam1 - port number"
+			::= { mxa24AlarmTraps 2 }
+
+		mxa24TempAlarmTrap NOTIFICATION-TYPE
+			OBJECTS {
+				mcTrapExState,
+				mcTrapLParam1,
+				mcTrapLParam2,
+				mcTrapLParam3,
+				mcTrapID,
+				mcTrapDescr,
+				mcTrapSyncType}
+			STATUS  current
+			DESCRIPTION
+                                "Temperature is too high.
+                                LParam1 - sensor index: 0(sensor0), 1(sensor1)
+                                LParam3 - actual temperature value ['C]"
+			::= { mxa24AlarmTraps 3 }
+
+		mxa24VoltAlarmTrap NOTIFICATION-TYPE
+			OBJECTS {
+				mcTrapExState,
+				mcTrapLParam1,
+				mcTrapLParam2,
+				mcTrapLParam3,
+				mcTrapID,
+				mcTrapDescr,
+				mcTrapSyncType}
+			STATUS  current
+			DESCRIPTION
+                                "Device voltage is out of range.
+                                LParam1 - voltage index: 2(1V), 3(12V), 4(-12V), 5(3.3V), 6(2.5V), 7(1.8V), 8(0.9V), 9(1.5V)
+                                LParam3 - actual voltage value [mV/10]"
+			::= { mxa24AlarmTraps 4 }
+
+		mxa24UserLoginTrap NOTIFICATION-TYPE
+			OBJECTS {
+				mcTrapExState,
+				mcTrapLParam1,
+				mcTrapLParam2,
+				mcTrapLParam3,
+				mcTrapID,
+				mcTrapDescr,
+				mcTrapSyncType}
+			STATUS  current
+			DESCRIPTION
+                                "Device voltage is out of range.
+                                LParam1 - the process pid
+                                LParam2 - interface number: 1(console), 2(telnet), 3..6(web)"
+			::= { mxa24AlarmTraps 5 }
+
+		mxa24DslLinkOkTrap NOTIFICATION-TYPE
+			OBJECTS {
+				mcTrapExState,
+				mcTrapLParam1,
+				mcTrapLParam2,
+				mcTrapLParam3,
+				mcTrapID,
+				mcTrapDescr,
+				mcTrapSyncType}
+			STATUS  current
+			DESCRIPTION
+                                "Adsl port is up.
+                                LParam1 - port number"
+			::= { mxa24OkTraps 1 }
+
+		mxa24EthLinkOkTrap NOTIFICATION-TYPE
+			OBJECTS {
+				mcTrapExState,
+				mcTrapLParam1,
+				mcTrapLParam2,
+				mcTrapLParam3,
+				mcTrapID,
+				mcTrapDescr,
+				mcTrapSyncType}
+			STATUS  current
+			DESCRIPTION
+                                "Uplink port is up.
+                                LParam1 - port number"
+			::= { mxa24OkTraps 2 }
+
+		mxa24TempOkTrap NOTIFICATION-TYPE
+			OBJECTS {
+				mcTrapExState,
+				mcTrapLParam1,
+				mcTrapLParam2,
+				mcTrapLParam3,
+				mcTrapID,
+				mcTrapDescr,
+				mcTrapSyncType}
+			STATUS  current
+			DESCRIPTION
+                                "Temperature normalization.
+                                LParam1 - sensor index: 0(sensor0), 1(sensor1)
+                                LParam3 - actual temperature value ['C]"
+			::= { mxa24OkTraps 3 }
+
+		mxa24VoltOkTrap NOTIFICATION-TYPE
+			OBJECTS {
+				mcTrapExState,
+				mcTrapLParam1,
+				mcTrapLParam2,
+				mcTrapLParam3,
+				mcTrapID,
+				mcTrapDescr,
+				mcTrapSyncType}
+			STATUS  current
+			DESCRIPTION
+                                "Device voltage is in acceptable range.
+                                LParam1 - voltage index: 2(1V), 3(12V), 4(-12V), 5(3.3V), 6(2.5V), 7(1.8V), 8(0.9V), 9(1.5V)
+                                LParam3 - actual voltage value [mV/10]"
+			::= { mxa24OkTraps 4 }
+
+		mxa24UserLogoutTrap NOTIFICATION-TYPE
+			OBJECTS {
+				mcTrapExState,
+				mcTrapLParam1,
+				mcTrapLParam2,
+				mcTrapLParam3,
+				mcTrapID,
+				mcTrapDescr,
+				mcTrapSyncType}
+			STATUS  current
+			DESCRIPTION
+                                "User logout.
+                                LParam1 - the process pid
+                                LParam2 - interface number: 1(console), 2(telnet), 3..6(web)"
+			::= { mxa24OkTraps 5 }
+
+-- OMS operation status traps --
+
+omsOperationAlarmTraps OBJECT IDENTIFIER        ::= { eltrapGroup 20 }
+omsOperationOkTraps OBJECT IDENTIFIER   ::= { eltrapGroup 21 }
+
+
+omsOperationCommandAlarm NOTIFICATION-TYPE
+        OBJECTS {
+                mcTrapExState,
+                mcTrapLParam1,
+                mcTrapLParam2,
+                mcTrapLParam3,
+                mcTrapID,
+                mcTrapDescr}
+        STATUS  current
+        DESCRIPTION
+                "   mcTrapLParam1 = command <upload=1, download=2, apply=3, confirm=4, save=5, reboot=6, test=7>;
+                    mcTrapLParam2 = filetype <pattern=1, private=2, binary=3>
+                    mcTrapDescr = Description of operarion:
+                        DeviceName,
+                        command <apply, download, save, upload, reboot, confirm, test>,
+                        tftp host,
+                        config filename,
+                        status=Error,
+                        cause of error
+
+                    for 'sigtran' par3 = cause integer code,
+                    in description text - system(...) ret code if needed"
+        ::= { omsOperationAlarmTraps 1 }
+
+omsOperationCommandOk NOTIFICATION-TYPE
+        OBJECTS {
+                mcTrapExState,
+                mcTrapLParam1,
+                mcTrapLParam2,
+                mcTrapLParam3,
+                mcTrapID,
+                mcTrapDescr}
+        STATUS  current
+        DESCRIPTION
+                "   mcTrapLParam1 = command <upload=1, download=2, apply=3, confirm=4, save=5, reboot=6, test=7>;
+                    mcTrapLParam2 = filetype <pattern=1, private=2, binary=3>
+                    mcTrapDescr = Description of operarion:
+                        DeviceName,
+                        command <apply, download, save, upload, reboot, confirm, test>,
+                        tftp host,
+                        config filename,
+                        status=Ok"
+        ::= { omsOperationOkTraps 1 }
+
+-- end of OMS traps
+
+
+
+elcAlarmTraps OBJECT IDENTIFIER         ::= { eltrapGroup 22 }
+
+-- ---- ---- ---- ---- ---- ---- ----  GePON ALARMS ---- ---- ---- ---- ---- ---- ---- ----
+                -- GePON ONU Authorization Alarm  --
+                elcONTAuthAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Bad registration ONT Event (mcTrapLParam1=Optical Interface Number, mcTrapDescr='description with MAC addr ONT')"
+                        ::= { elcAlarmTraps 1 }
+
+
+                -- GePON Eth link Down  --
+                elcUplinkAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Uplink Down, mcTrapLParam1=Link Number, Description='GePON: Eth Link N down'"
+                        ::= { elcAlarmTraps 2 }
+
+
+                -- GePON Optical link Event  --
+                elcOpticalAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "The optical link N (mcTrapLParam1) has no active devices"
+                        ::= { elcAlarmTraps 3 }
+
+                elcFanAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "fan stopped. param1 = fan number"
+                        ::= { elcAlarmTraps 4 }
+
+                elcONTConfAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "ONT is not configured. Param1 = optical interface number, Descr = mac-address of ONT."
+                        ::= { elcAlarmTraps 5 }
+
+                elcFlappingAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Period between OpticalAlarmTrap events is less than 30 seconds. Param 1 - link number"
+                        ::= { elcAlarmTraps 6 }
+
+                elcEponAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  deprecated
+                        DESCRIPTION
+                                "EPON port failed. Param 1 - link number"
+                        ::= { elcAlarmTraps 7 }
+
+                elcConfigSavedAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Configuration save error."
+                        ::= { elcAlarmTraps 8 }
+
+                elcFirmwareUpdateAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Firmware update error."
+                        ::= { elcAlarmTraps 9 }
+
+                elcUserLoginAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  deprecated
+                        DESCRIPTION
+                                "User login error
+                                 **This entry is deprecated**"
+                        ::= { elcAlarmTraps 10 }
+
+                elcRAMAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Ammount of free memory is < 5Mb"
+                        ::= { elcAlarmTraps 11 }
+
+                elcLoginAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Login unsuccessful.
+                                 Param1 = protocol (0 - serial, 1 - SSH, 2 - telnet, 3 - http, 4 - https)
+                                 Descr = login, ip:port"
+                        ::= { elcAlarmTraps 12 }
+
+                elcDuplicateMacAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Duplicate mac detected. Param1 = VID, Descr = mac."
+                        ::= { elcAlarmTraps 14 }
+
+                elcLoadAverageAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Load average exceeded limits. Param1 = 0 - 1 min, 1 - 5 min, 2 - 15 min"
+                        ::= { elcAlarmTraps 15 }
+
+                elcTemperatureAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Temperature is higher than 65 deg. Param1 = temperature value"
+                        ::= { elcAlarmTraps 16 }
+
+                elcOkTraps OBJECT IDENTIFIER    ::= { eltrapGroup 23 }
+
+                elcONTAuthOkTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Normal registration ONT Event (mcTrapLParam1=Optical Interface Number, mcTrapDescr='description with MAC addr ONT')"
+                        ::= { elcOkTraps 1 }
+
+
+                elcUplinkOkTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Eth Link Up, mcTrapLParam1=Link Number, Description='GePON: Eth Link N up'"
+                        ::= { elcOkTraps 2 }
+
+
+                elcOpticalOkTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "The optical link N (mcTrapLParam1) has M (mcTrapLParam2) active devices"
+                        ::= { elcOkTraps 3 }
+
+                elcFanOkTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "param1 = fan number"
+                        ::= { elcOkTraps 4 }
+
+                elcONTConfOKTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "ONT is configured. Param1 = optical interface number, Descr = macaddress of ont"
+                        ::= { elcOkTraps 5 }
+
+                elcFlappingOkTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "1 minute passed after last OpticalAlarmTrap. Param 1 - link number"
+                        ::= { elcOkTraps 6 }
+
+                elcEponOkTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  deprecated
+                        DESCRIPTION
+                                "EPON port ok. Param 1 - link number"
+                        ::= { elcOkTraps 7 }
+
+                elcConfigSavedOkTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Configuration saved. Descr = Configuration saved to flash"
+                        ::= { elcOkTraps 8 }
+
+                elcFirmwareUpdateOkTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Firmware updated. Descr = Firmware updated"
+                        ::= { elcOkTraps 9 }
+
+                elcUserLoginOkTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  deprecated
+                        DESCRIPTION
+                                "User logged in from CLI. Param1 = privileged/nonprivileged (1/0), Descr = ${username} logged in
+                                 ** This entry is deprecated."
+                        ::= { elcOkTraps 10 }
+
+                elcRAMOkTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Ammount of free memory is > 7Mb"
+                        ::= { elcOkTraps 11 }
+
+                elcLoginOkTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Login successful. Param1 = privileged/nonprivileged(1/0)
+                                 Param1 = protocol (0 - serial, 1 - SSH, 2 - telnet, 3 - http, 4 - https)
+                                 Descr = login, ip:port"
+                        ::= { elcOkTraps 12 }
+
+                elcLogoutOkTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "User logged out. Param1 = privileged/nonprivileged(1/0)
+                                 Param1 = protocol (0 - serial, 1 - SSH, 2 - telnet, 3 - http, 4 - https)
+                                 Descr = login, ip:port"
+                        ::= { elcOkTraps 13 }
+
+                elcSwitchConfigChangeTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Switch configuration has been changed"
+                        ::= { elcOkTraps 14 }
+
+                elcLoadAverageOkTrap  NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS current
+                        DESCRIPTION
+                                "Load average is back to normal. Param1 = 0 - 1 min, 1 - 5 min, 2 - 15 min"
+                        ::= { elcOkTraps 15 }
+
+                elcTemperatureOkTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Temperature is lower than 60 deg. Param1 = temperature value"
+                        ::= { elcOkTraps 16 }
+
+
+
+
+
+
+
+
+-- smg traps
+
+smgTraps OBJECT IDENTIFIER      ::= { eltrapGroup 29 }
+
+        smgAlarm OBJECT IDENTIFIER      ::= { smgTraps 1 }
+
+                smgAlarmConfigTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Configuration failure (exState 0-ok 3-critical)"
+                        ::= { smgAlarm 1 }
+
+                smgAlarmSiptNodeTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "SIPT-module alarm (exState 0-ok 3-critical)"
+                        ::= { smgAlarm 2 }
+
+                smgAlarmMspDevTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "SM-VP module alarm  (exState 0-ok 1-alarm)
+                                Param1 - module number"
+                        ::= { smgAlarm 3 }
+
+                smgAlarmLinkSetTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "LinkSet alarm (exState 0-ok 3-critical)
+                                Param1 = LinkSet number"
+                        ::= { smgAlarm 4 }
+
+                smgAlarmStreamTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Stream alarm (exState 0-ok 2-warning 3-critical)
+                                Param1 - stream number
+                                Param2=1 - signal loss
+                                Param2=2 - remote alarm"
+                        ::= { smgAlarm 5 }
+
+                smgAlarmSS7LinkTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "SS7-Link alarm (exState 0-ok 1-alarm)
+                                Param1 - E1Stream number
+                                Param2 - LinkSet number"
+                        ::= { smgAlarm 6 }
+
+                smgAlarmSyncTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Synchronization alarm (freerun mode - work with local source)
+                                (exState 0-ok 1-alarm 2-warning),
+                                param1=1 - local
+                                param1=2 - less priority"
+                        ::= { smgAlarm 7 }
+
+                smgAlarmCdrFtpTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "No connection with FTP server
+                                Param1 0 No alarm,
+                                2 - warning (minor alarm. The record was wrong, local CDR-data is less than 5 Mb),
+                                1 - common (major alarm. The record was wrong, local CDR-data is more than 5 Mb and less than 15 Mb),
+                                3 - critical (critical alarm. The record was wrong, local CDR-data is more than 15 Mb)
+                                  (exState 0-ok 1-alarm 2-warning 3-critical)"
+                        ::= { smgAlarm 12 }
+
+                 smgAlarmMemoryLimitTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Param2 - free space, Param3 - summary space
+                                exState 0-ok, 2-warning (75% busy), 1-alarm (90%), 3-critical (95%)"
+                        ::= { smgAlarm 13 }
+
+                 smgAlarmPowerModuleStateTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "exState 0 - ok, 2 - warning
+                                Param1 - PSU number
+                                Param2 - PSU state: 0 - OK, 1 - no power supply, 2 - missing"
+                        ::= { smgAlarm 14 }
+
+                 smgAlarmH323NodeTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "No link to H323 adapter alarm (exState 0-ok 1-alarm)"
+                        ::= { smgAlarm 16 }
+
+                 smgAlarmTemperatureTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Tenperature alarm
+                                exState:
+                                    0 - ok,
+                                    2 - warning (more than 70 deg. Celsius),
+                                    1 - alarm (more than 85),
+                                    3 - critical-alarm (more than 100)
+                                param2 - temp #0 (CPU temp, generates alarm),
+                                param3 - temp #1 (RAM temp, for info only)"
+                        ::= { smgAlarm 17 }
+
+                 smgAlarmMaintenanceTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Maintenance alarm
+                                param1:
+                                   1 - COT test failed
+                                   2 - RLC-packet waiting error
+                                   3 - BLA-packet waiting error
+                                   4 - UBA-packet waiting error
+                                   5 - CGBA-packet waiting error
+                                   6 - CGUA-packet waiting error
+                                   7 - GRA-packet waiting error
+                                   8 - Error while blocking channels (CGBA) - not all of the requested channles were blocked
+                                   9 - Error while blocking channels (CGBA) -  one of requested channels didn't blocked
+                                   10 - Error while blocking channels (CGUA) - not all of the requested channles were blocked
+                                   11 - Error while blocking channels (CGUA) -  one of requested channels didn't blocked
+                                   12 - Error while get power voltage
+                                   13 - No free DVO blocks (param2 - subscriber group ID)
+                                param2 - E1 stream number,
+                                param3 - E1 channel number"
+                        ::= { smgAlarm 18 }
+
+                 smgAlarmSipAccessTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "SIP interface access alarm
+                                param1 - SIP interface number"
+                        ::= { smgAlarm 19 }
+
+                    smgUpdateFwFail NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS current
+                        DESCRIPTION
+                                "descr = file + addr + FAIL"
+                        ::= { smgAlarm 20 }
+
+                smgAlarmProcOverloadTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Processor overload
+                                exState 0-ok, 2-warning (load 90%), 1-alarm (95%)
+                                Par3 - CPU mask"
+                        ::= { smgAlarm 21 }
+
+                smgAlarmFansIdleTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Fans idle alarm
+                                Par1 - fans operational bit-list
+                                Par2 - total fans operated
+                                Par3 - total fans on board"
+                        ::= { smgAlarm 23 }
+
+                smgAlarmDriveLimitTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Drive limit alarm
+                                param1: drive_id
+                                param2: (percent&0xFF << 8) | (exists & 0xFF)
+                                param3: free_size_kB
+                                Drive name at description text"
+                        ::= { smgAlarm 24 }
+
+                smgAlarmSipOptionsQueueOverload NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "SIP OPTIONS queue overload"
+                        ::= { smgAlarm 25 }
+
+                smgAlarmCDRFileTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Error while creating CDR-file
+                                state
+                                0 - OK,
+                                1 - commom alarm (can't create CDR file on disk),
+                                3 - critical alarm (can't create CDR file)"
+                        ::= { smgAlarm 26 }
+
+                smgAlarmMegacoNodeTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "MEGACO-module alarm (exState 0-ok 3-critical)"
+                        ::= { smgAlarm 27 }
+
+                 smgFail2banBlockTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Fail2ban address block info"
+                        ::= { smgAlarm 28 }
+
+                 smgTrunkGroupCPSTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "TrunkGroup reached CPS warning threshold
+                                param1 - TrunkGroup index
+                                param2 - CPS-warn threshold value
+                                param3 - Detected CPS value"
+                        ::= { smgAlarm 29 }
+
+                 smgDemoLicenseTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "DEMO license status info
+                                param1 - Status
+                                    1 - inactive (ntp-off)
+                                    2 - inactive (ntp-nok)
+                                    3 - will expire in less than 72h
+                                    4 - will expire in less than 36h
+                                    5 - inactive (expired)
+                                    6 - inactive (error)"
+                        ::= { smgAlarm 30 }
+
+                smgAlarmSipDuplicateTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "No SIP interface access alarm
+                                param1 - SIP interface number
+                                param2 - Destination IP-addr
+                                param3 - Destination port"
+                        ::= { smgAlarm 31 }
+
+                smgAlarmIpnetNodeTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "IP-Net module alarm (exState 0-ok 3-critical)"
+                        ::= { smgAlarm 32 }
+
+                smgPctlModuleTrap  NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Packet control module info"
+                        ::= { smgAlarm 58 }
+
+                smgPortScanDetectorTrap  NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Port scan detector info"
+                        ::= { smgAlarm 59 }
+
+                smgFirewallTrap  NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Firewall info"
+                        ::= { smgAlarm 60 }
+
+                smgV52Intf  NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "V52 interface info"
+                        ::= { smgAlarm 61 }
+
+                smgV52IntfSlot  NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "V52 interface slot info"
+                        ::= { smgAlarm 62 }
+
+
+        smgOK OBJECT IDENTIFIER         ::= { smgTraps 2 }
+
+                smgOkConfigTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "NO Configuration failure"
+                        ::= { smgOK 1 }
+
+                smgOkSiptNodeTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "NO SIPT-module alarm"
+                        ::= { smgOK 2 }
+
+                smgOkMspDevTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "NO SM-VP module alarm
+                                Param1 = module number"
+                        ::= { smgOK 3 }
+
+                smgOkLinkSetTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "NO LinkSet alarm
+                                Param1 = LinkSet number"
+                        ::= { smgOK 4 }
+
+                smgOkStreamTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "NO Stream alarm
+                                Param1 - stream number"
+                        ::= { smgOK 5 }
+
+                smgOkSS7LinkTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "NO SS7-Link alarm: par1 - e1line, par2 - linkset"
+                        ::= { smgOK 6 }
+
+                smgOkSyncTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "NO Synchronization alarm (freerun mode - work with local source)"
+                        ::= { smgOK 7 }
+
+                smgOkCdrFtpTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "FTP server connection in norm"
+                        ::= { smgOK 12 }
+
+                 smgOkMemoryLimitTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "No memory alarm
+                                Param2 - free space
+                                Param3 - summary space"
+                        ::= { smgOK 13 }
+
+                 smgOkPowerModuleStateTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "PSU ok
+                                Param1 - PSU number
+                                Param2 - PSU state: 0 - OK, 1 - no power supply, 2 - missing"
+                        ::= { smgOK 14 }
+
+                 smgOkH323NodeTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Link to H323 adapter is OK"
+                        ::= { smgOK 16 }
+
+                 smgOkTemperatureTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "No Temperature alarm
+                                Param2 - temp #0 CPU
+                                Param3 - temp #1 RAM"
+                        ::= { smgOK 17 }
+
+                 smgOkMaintenanceTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "No maintenance alarm
+                                param1:
+                                    MAINTENANCE_ALARM_SS7_COT_FAIL = 1
+                                param2 - E1 stream number,
+                                param3 - E1 channel number"
+                        ::= { smgOK 18 }
+
+                 smgOkSipAccessTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "No SIP interface access alarm
+                                param1 - SIP interface number"
+                        ::= { smgOK 19 }
+
+                 smgUpdateFwOk NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS current
+                        DESCRIPTION
+                                "descr = file + addr + OK"
+                        ::= { smgOK 20 }
+
+                smgOkProcOverloadTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "No proc overload"
+                        ::= { smgOK 21 }
+
+                smgOkRebootTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Software started
+                                param1 = (version_major&0xFF) | ((version_minor&0xFF)<<8) | ((version_sub&0xFF)<<16)
+                                param2 = version_build
+                                param3 = reboot_cause (for SMG2016 only)
+                                    0 - power, 1 - software command, 2 - watchdog"
+                        ::= { smgOK 22 }
+
+                smgOkFansIdleTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Fans idle OK
+                                Par1 - fans operational bit-list
+                                Par2 - total fans operated
+                                Par3 - total fans on board"
+                        ::= { smgOK 23 }
+
+                smgOkDriveLimitTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Drive limit OK
+                                Par1 - drive index
+                                Par2 - 1 - drive exist; 0 - removed
+                                Par3 - filling percentage
+                                Drive name at description text"
+                        ::= { smgOK 24 }
+
+                smgAlarmSipOptionsQueueOk NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "SIP OPTIONS queue is OK"
+                        ::= { smgOK 25 }
+
+                smgOkCDRFileTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "No Error while creating CDR-file
+                                state
+                                0 - OK,
+                                1 - commom alarm (can't create CDR file on disk),
+                                3 - critical alarm (can't create CDR file)"
+                        ::= { smgOK 26 }
+
+                 smgOkTrunkGroupCPSTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "No CPS warning for the TrunkGroup
+                                param1 - TrunkGroup index
+                                param2 - CPS-warn threshold value
+                                param3 - Detected CPS value"
+                        ::= { smgOK 29 }
+
+                 smgOkDemoLicenseTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "DEMO license status info
+                                param1 - Status
+                                    0 - active"
+                        ::= { smgOK 30 }
+
+                smgOkSipDuplicateTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "SIP interface Duplicate alarm
+                                param1 - SIP interface number"
+                        ::= { smgOK 31 }
+
+                smgOkIpnetNodeTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "NO IP-Net module alarm"
+                        ::= { smgOK 32 }
+
+                smgOkPctlModuleTrap  NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Packet control module info"
+                        ::= { smgOK 58 }
+
+                smgOkPortScanDetectorTrap  NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Port scan detector info"
+                        ::= { smgOK 59 }
+
+                smgOkFirewallTrap  NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Firewall info"
+                        ::= { smgOK 60 }
+
+                smgOkV52Intf  NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "V52 interface info"
+                        ::= { smgOK 61 }
+
+                smgOkV52IntfSlot  NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "V52 interface slot info"
+                        ::= { smgOK 62 }
+
+-- end of smg traps
+
+
+
+-- sbc traps
+
+sbcTraps OBJECT IDENTIFIER      ::= { eltrapGroup 49 }
+
+        sbcAlarm OBJECT IDENTIFIER      ::= { sbcTraps 1 }
+
+                sbcAlarmConfigTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Configuration failure (exState 0-ok 3-critical)"
+                        ::= { sbcAlarm 1 }
+
+
+                sbcAlarmCdrFtpTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "No connection with FTP server
+                                Param1 0 No alarm,
+                                2 - warning (minor alarm. The record was wrong, local CDR-data is less than 5 Mb),
+                                1 - common (major alarm. The record was wrong, local CDR-data is more than 5 Mb and less than 15 Mb),
+                                3 - critical (critical alarm. The record was wrong, local CDR-data is more than 15 Mb)
+                                  (exState 0-ok 1-alarm 2-warning 3-critical)"
+                        ::= { sbcAlarm 12 }
+
+                 sbcAlarmMemoryLimitTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Param2 - free space, Param3 - summary space
+                                exState 0-ok, 2-warning (75% busy), 1-alarm (90%), 3-critical (95%)"
+                        ::= { sbcAlarm 13 }
+
+                 sbcAlarmPowerModuleStateTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "exState 0 - ok, 2 - warning
+                                Param1 - PSU number
+                                Param2 - PSU state: 0 - OK, 1 - no power supply, 2 - missing"
+                        ::= { sbcAlarm 14 }
+
+                 sbcAlarmTemperatureTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Tenperature alarm
+                                exState:
+                                    0 - ok,
+                                    2 - warning (more than 70 deg. Celsius),
+                                    1 - alarm (more than 85),
+                                    3 - critical-alarm (more than 100)
+                                param2 - temp #0 (CPU temp, generates alarm),
+                                param3 - temp #1 (RAM temp, for info only)"
+                        ::= { sbcAlarm 17 }
+
+                sbcUpdateFwFail NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS current
+                        DESCRIPTION
+                                "descr = file + addr + FAIL"
+                        ::= { sbcAlarm 20 }
+
+                sbcAlarmProcOverloadTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Processor overload
+                                exState 0-ok, 2-warning (load 90%), 1-alarm (95%)
+                                Par3 - CPU mask"
+                        ::= { sbcAlarm 21 }
+
+                sbcAlarmFansIdleTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Fans idle alarm
+                                Par1 - fans operational bit-list
+                                Par2 - total fans operated
+                                Par3 - total fans on board"
+                        ::= { sbcAlarm 23 }
+
+                sbcAlarmDriveLimitTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Drive limit alarm
+                                param1: drive_id
+                                param2: (percent&0xFF << 8) | (exists & 0xFF)
+                                param3: free_size_kB
+                                Drive name at description text"
+                        ::= { sbcAlarm 24 }
+
+                sbcFail2banBlockTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Fail2ban address block info"
+                        ::= { sbcAlarm 28 }
+
+                sbcDemoLicenseTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "DEMO license status info
+                                param1 - Status
+                                    1 - inactive (ntp-off)
+                                    2 - inactive (ntp-nok)
+                                    3 - will expire in less than 72h
+                                    4 - will expire in less than 36h
+                                    5 - inactive (expired)
+                                    6 - inactive (error)"
+                        ::= { sbcAlarm 30 }
+
+                 sbcAlarmSbcRegistrationExpiredTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "sbc registration expired alarm. (no ok trap). abonent number in description"
+                        ::= { sbcAlarm 50 }
+
+                 sbcAlarmIpcOverloadTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "IPC overload (exState 0-ok 1-alarm)"
+                        ::= { sbcAlarm 51 }
+
+                sbcCallForbiddenTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Call forbidden info"
+                        ::= { sbcAlarm 52 }
+
+                sbcRegForbiddenTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Registration forbidden info"
+                        ::= { sbcAlarm 53 }
+
+                sbcSIPinterfaceTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "SIP interface info"
+                        ::= { sbcAlarm 54 }
+
+                sbcReserveSlaveLinkChangedTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Reserve slave link info
+                                param2 = lan status
+                                param3 = wan status
+                                    0 - unlink, 1 - link"
+                        ::= { sbcAlarm 55 }
+
+                sbcReserveSlaveSoftVersionTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Reserve soft version info"
+                        ::= { sbcAlarm 56 }
+
+                sbcSipAttackedTrap  NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "SIP attacked info"
+                        ::= { sbcAlarm 57 }
+
+                sbcPctlModuleTrap  NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Packet control module info"
+                        ::= { sbcAlarm 58 }
+
+                sbcPortScanDetectorTrap  NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Port scan detector info"
+                        ::= { sbcAlarm 59 }
+
+                sbcFirewallTrap  NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Firewall info"
+                        ::= { sbcAlarm 60 }
+
+                sbcRtpAttacked  NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "RTP attacked info"
+                        ::= { sbcAlarm 63 }
+
+                sbcProhibitedUaDetected  NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Prohibited user agent detected info"
+                        ::= { sbcAlarm 64 }
+
+
+        sbcOK OBJECT IDENTIFIER         ::= { sbcTraps 2 }
+
+                sbcOKConfigTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "NO Configuration failure"
+                        ::= { sbcOK 1 }
+
+                sbcOKCdrFtpTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "FTP server connection in norm"
+                        ::= { sbcOK 12 }
+
+                 sbcOKMemoryLimitTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "No memory alarm
+                                Param2 - free space
+                                Param3 - summary space"
+                        ::= { sbcOK 13 }
+
+                 sbcOKPowerModuleStateTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "PSU ok
+                                Param1 - PSU number
+                                Param2 - PSU state: 0 - OK, 1 - no power supply, 2 - missing"
+                        ::= { sbcOK 14 }
+
+                 sbcOKTemperatureTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "No Temperature alarm
+                                Param2 - temp #0 CPU
+                                Param3 - temp #1 RAM"
+                        ::= { sbcOK 17 }
+
+                 sbcUpdateFwOk NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS current
+                        DESCRIPTION
+                                "descr = file + addr + OK"
+                        ::= { sbcOK 20 }
+
+                sbcOKProcOverloadTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "No proc overload"
+                        ::= { sbcOK 21 }
+
+                sbcOKRebootTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Software started
+                                param1 = (version_major&0xFF) | ((version_minor&0xFF)<<8) | ((version_sub&0xFF)<<16)
+                                param2 = version_build
+                                param3 = reboot_cause (for SMG2016 only)
+                                    0 - power, 1 - software command, 2 - watchdog"
+                        ::= { sbcOK 22 }
+
+                sbcOKFansIdleTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Fans idle OK
+                                Par1 - fans operational bit-list
+                                Par2 - total fans operated
+                                Par3 - total fans on board"
+                        ::= { sbcOK 23 }
+
+                sbcOKDriveLimitTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Drive limit OK
+                                Par1 - drive index
+                                Par2 - 1 - drive exist; 0 - removed
+                                Par3 - filling percentage
+                                Drive name at description text"
+                        ::= { sbcOK 24 }
+
+                 sbcOKDemoLicenseTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "DEMO license status info
+                                param1 - Status
+                                    0 - active"
+                        ::= { sbcOK 30 }
+
+                 sbcOKIpcOverloadTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "No IPC overload"
+                        ::= { sbcOK 51 }
+
+                sbcOKCallForbiddenTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Call forbidden info"
+                        ::= { sbcOK 52 }
+
+                sbcOKRegForbiddenTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Registration forbidden info"
+                        ::= { sbcOK 53 }
+
+                sbcOKSIPinterfaceTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "SIP interface info"
+                        ::= { sbcOK 54 }
+
+                sbcOKReserveSlaveLinkChangedTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Reserve slave link info
+                                param2 = lan status
+                                param3 = wan status
+                                    0 - unlink, 1 - link"
+                        ::= { sbcOK 55 }
+
+                sbcOKReserveSlaveSoftVersionTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Reserve soft version info"
+                        ::= { sbcOK 56 }
+
+                sbcOKSipAttackedTrap  NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "SIP attacked info"
+                        ::= { sbcOK 57 }
+
+                sbcOKPctlModuleTrap  NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Packet control module info"
+                        ::= { sbcOK 58 }
+
+                sbcOKPortScanDetectorTrap  NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Port scan detector info"
+                        ::= { sbcOK 59 }
+
+                sbcOKFirewallTrap  NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Firewall info"
+                        ::= { sbcOK 60 }
+
+                sbcOKRtpAttacked  NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "RTP attacked info"
+                        ::= { sbcOK 63 }
+
+                sbcOKProhibitedUaDetected  NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Prohibited user agent detected info"
+                        ::= { sbcOK 64 }
+
+-- end of sbc traps
+
+
+
+-- CKP traps
+
+mccpAlarmTraps OBJECT IDENTIFIER		::= { eltrapGroup 30 }
+
+mccpConfigAlarmTrap NOTIFICATION-TYPE
+	OBJECTS {
+		mcTrapExState,
+		mcTrapLParam1,
+		mcTrapLParam2,
+		mcTrapLParam3,
+		mcTrapID,
+		mcTrapDescr }
+	STATUS current
+	DESCRIPTION
+		" config file alarm "
+	::= { mccpAlarmTraps 1 }
+
+mccpSlotAlarmTrap NOTIFICATION-TYPE
+	OBJECTS {
+		mcTrapExState,
+		mcTrapLParam1,
+		mcTrapLParam2,
+		mcTrapLParam3,
+		mcTrapID,
+		mcTrapDescr }
+	STATUS current
+	DESCRIPTION
+		" slot [param1] alarm "
+	::= { mccpAlarmTraps 2 }
+
+mccpLinksetAlarmTrap NOTIFICATION-TYPE
+	OBJECTS {
+		mcTrapExState,
+		mcTrapLParam1,
+		mcTrapLParam2,
+		mcTrapLParam3,
+		mcTrapID,
+		mcTrapDescr }
+	STATUS current
+	DESCRIPTION
+		" SS7 Linkset alarm [param1] "
+	::= { mccpAlarmTraps 3 }
+
+mccpStreamAlarmTrap NOTIFICATION-TYPE
+	OBJECTS {
+		mcTrapExState,
+		mcTrapLParam1,
+		mcTrapLParam2,
+		mcTrapLParam3,
+		mcTrapID,
+		mcTrapDescr }
+	STATUS current
+	DESCRIPTION
+		" Stream alarm at [param1:param2] state=%s [state] "
+	::= { mccpAlarmTraps 4 }
+
+mccpSS7LinkAlarmTrap NOTIFICATION-TYPE
+	OBJECTS {
+		mcTrapExState,
+		mcTrapLParam1,
+		mcTrapLParam2,
+		mcTrapLParam3,
+		mcTrapID,
+		mcTrapDescr }
+	STATUS current
+	DESCRIPTION
+		" SS7 Link alarm at [param1:param2] "
+	::= { mccpAlarmTraps 5 }
+
+mccpSyncAlarmTrap NOTIFICATION-TYPE
+	OBJECTS {
+		mcTrapExState,
+		mcTrapLParam1,
+		mcTrapLParam2,
+		mcTrapLParam3,
+		mcTrapID,
+		mcTrapDescr }
+	STATUS current
+	DESCRIPTION
+		" Low priority sync state or no sync "
+	::= { mccpAlarmTraps 6 }
+
+mccpIntfAlarmTrap NOTIFICATION-TYPE
+	OBJECTS {
+		mcTrapExState,
+		mcTrapLParam1,
+		mcTrapLParam2,
+		mcTrapLParam3,
+		mcTrapID,
+		mcTrapDescr }
+	STATUS current
+	DESCRIPTION
+		" V52-Interface number [param1] Alarm "
+	::= { mccpAlarmTraps 7 }
+
+mccpIntfSlotAlarmTrap NOTIFICATION-TYPE
+	OBJECTS {
+		mcTrapExState,
+		mcTrapLParam1,
+		mcTrapLParam2,
+		mcTrapLParam3,
+		mcTrapID,
+		mcTrapDescr }
+	STATUS current
+	DESCRIPTION
+		" 24AK slot [param2] on V52-Interface number [param1] Alarm "
+	::= { mccpAlarmTraps 8 }
+
+mccpSutdownSnmpdAlarmTrap NOTIFICATION-TYPE
+	OBJECTS {
+		mcTrapExState,
+		mcTrapLParam1,
+		mcTrapLParam2,
+		mcTrapLParam3,
+		mcTrapID,
+		mcTrapDescr }
+	STATUS current
+	DESCRIPTION
+		" shutdown snmpd "
+	::= { mccpAlarmTraps 17 }
+
+mccpOkTraps OBJECT IDENTIFIER		::= { eltrapGroup 31 }
+
+mccpConfigOkTrap NOTIFICATION-TYPE
+	OBJECTS {
+		mcTrapExState,
+		mcTrapLParam1,
+		mcTrapLParam2,
+		mcTrapLParam3,
+		mcTrapID,
+		mcTrapDescr }
+	STATUS current
+	DESCRIPTION
+		" config file is normal "
+	::= { mccpOkTraps 1 }
+
+mccpSlotOkTrap NOTIFICATION-TYPE
+	OBJECTS {
+		mcTrapExState,
+		mcTrapLParam1,
+		mcTrapLParam2,
+		mcTrapLParam3,
+		mcTrapID,
+		mcTrapDescr }
+	STATUS current
+	DESCRIPTION
+		" slot [param1] in work "
+	::= { mccpOkTraps 2 }
+
+mccpLinksetOkTrap NOTIFICATION-TYPE
+	OBJECTS {
+		mcTrapExState,
+		mcTrapLParam1,
+		mcTrapLParam2,
+		mcTrapLParam3,
+		mcTrapID,
+		mcTrapDescr }
+	STATUS current
+	DESCRIPTION
+		" SS7 Linkset in work [param1] "
+	::= { mccpOkTraps 3 }
+
+mccpStreamOkTrap NOTIFICATION-TYPE
+	OBJECTS {
+		mcTrapExState,
+		mcTrapLParam1,
+		mcTrapLParam2,
+		mcTrapLParam3,
+		mcTrapID,
+		mcTrapDescr }
+	STATUS current
+	DESCRIPTION
+		" Stream alarm at [param1:param2] in work "
+	::= { mccpOkTraps 4 }
+
+mccpSS7LinkOkTrap NOTIFICATION-TYPE
+	OBJECTS {
+		mcTrapExState,
+		mcTrapLParam1,
+		mcTrapLParam2,
+		mcTrapLParam3,
+		mcTrapID,
+		mcTrapDescr }
+	STATUS current
+	DESCRIPTION
+		" SS7 Link at [param1:param2] in work "
+	::= { mccpOkTraps 5 }
+
+mccpSyncOkTrap NOTIFICATION-TYPE
+	OBJECTS {
+		mcTrapExState,
+		mcTrapLParam1,
+		mcTrapLParam2,
+		mcTrapLParam3,
+		mcTrapID,
+		mcTrapDescr }
+	STATUS current
+	DESCRIPTION
+		" Normal sync state "
+	::= { mccpOkTraps 6 }
+
+mccpIntfOkTrap NOTIFICATION-TYPE
+	OBJECTS {
+		mcTrapExState,
+		mcTrapLParam1,
+		mcTrapLParam2,
+		mcTrapLParam3,
+		mcTrapID,
+		mcTrapDescr }
+	STATUS current
+	DESCRIPTION
+		" V52-Interface number [param1] is Normal "
+	::= { mccpOkTraps 7 }
+
+mccpIntfSlotOkTrap NOTIFICATION-TYPE
+	OBJECTS {
+		mcTrapExState,
+		mcTrapLParam1,
+		mcTrapLParam2,
+		mcTrapLParam3,
+		mcTrapID,
+		mcTrapDescr }
+	STATUS current
+	DESCRIPTION
+		" 24AK slot [param2] on V52-Interface number [param1] is Normal "
+	::= { mccpOkTraps 8 }
+
+mccpStartOkTrap NOTIFICATION-TYPE
+	OBJECTS {
+		mcTrapExState,
+		mcTrapLParam1,
+		mcTrapLParam2,
+		mcTrapLParam3,
+		mcTrapID,
+		mcTrapDescr }
+	STATUS current
+	DESCRIPTION
+		" MCCP started "
+	::= { mccpOkTraps 16 }
+
+-- end of CKP traps
+
+-- radius trap
+
+radiusTraps OBJECT IDENTIFIER ::= { eltrapGroup 32 }
+
+        radiusNotification OBJECT IDENTIFIER ::= { radiusTraps 1 }
+
+                radiusRequestNotification NOTIFICATION-TYPE
+                        OBJECTS {
+                                radiusSeqNum,
+                                radiusStatus,
+                                radiusTimeout,
+                                radiusSwitchSrv,
+                                radiusTypeResp,
+                                radiusDescr
+                        }
+                        STATUS  current
+                        DESCRIPTION "Notification about request to server"
+                        ::= { radiusNotification 1 }
+
+-- end of radius trap
+
+eltexShutdownTrap NOTIFICATION-TYPE
+        OBJECTS {
+                mcTrapExState,
+                mcTrapLParam1,
+                mcTrapLParam2,
+                mcTrapLParam3,
+                mcTrapID,
+                mcTrapDescr}
+        STATUS  current
+        DESCRIPTION
+                "Agent is being normally shutdown."
+        ::= { eltrapGroup 99 }
+
+eltrapNotificationGroup NOTIFICATION-GROUP
+        NOTIFICATIONS {
+                ponTeknovusONTAuthAlarmTrap,
+                ponTeknovusUplinkAlarmTrap,
+                ponTeknovusOpticalAlarmTrap,
+                ponTeknovusFanAlarmTrap,
+                ponTeknovusONTConfAlarmTrap,
+                ponTeknovusFlappingAlarmTrap,
+                ponTeknovusConfigSavedAlarmTrap,
+                ponTeknovusFirmwareUpdateAlarmTrap,
+                ponTeknovusRAMAlarmTrap,
+                ponTeknovusLoginAlarmTrap,
+                ponTeknovusDuplicateMacAlarmTrap,
+                ponTeknovusLoadAverageAlarmTrap,
+                ponTeknovusTemperatureAlarmTrap,
+                ponTeknovusONTPortBlockedAlarmTrap,
+                ponTeknovusONTAuthOkTrap,
+                ponTeknovusUplinkOkTrap,
+                ponTeknovusOpticalOkTrap,
+                ponTeknovusFanOkTrap,
+                ponTeknovusONTConfOKTrap,
+                ponTeknovusFlappingOkTrap,
+                ponTeknovusConfigSavedOkTrap,
+                ponTeknovusFirmwareUpdateOkTrap,
+                ponTeknovusRAMOkTrap,
+                ponTeknovusLoginOkTrap,
+                ponTeknovusLogoutOkTrap,
+                ponTeknovusSwitchConfigChangeTrap,
+                ponTeknovusLoadAverageOkTrap,
+                ponTeknovusTemperatureOkTrap,
+                ponTeknovusONTPortBlockedOkTrap,
+                ponTeknovusBoardRebootTrap,
+                ponTeknovusConfigMigrateAlarmTrap,
+				ponTeknovusConfigMigrateOkTrap,
+				ponTeknovusONTDeconfigureTrap,
+				ponTeknovusONTStateChangedTrap,
+				ponTeknovusONTConfigChangedTrap,
+                ponTeknovusConfigRereadTrap,
+
+                fxs72VbatAlarmTrap,
+                fxs72VringAlarmTrap,
+                fxs72TemperatureAlarmTrap,
+                fxs72FanAlarmTrap,
+                fxs72SSwAlarmTrap,
+                fxs72PortAlarmTrap,
+                fxs72VInputAlarmTrap,
+                fxs72VbatOkTrap,
+                fxs72VringOkTrap,
+                fxs72TemperatureOkTrap,
+                fxs72FanOkTrap,
+                fxs72SSwOkTrap,
+                fxs72PortOkTrap,
+                fxs72VInputOkTrap,
+                fxs72VmodeSwitchTrap,
+                fxs72FansSwitchTrap,
+                fxs72BpuAlarmTrap,
+				fxs72updateFwFail,
+				fxs72BpuOkTrap,
+				fxs72updateFwOk,
+				fxs72TempmeasurementAlarmTrap,
+				fxs72TempmeasurementOkTrap,
+                fxs72PowerUnitTermAlarm,
+                fxs72PowerUnitTermOk,
+                fxs72FanLowSpeedAlarmTrap,
+                fxs72FanLowSpeedOkTrap,
+
+				pp4LinkAlarmTrap,
+				pp4AutoNegotiationAlarmTrap,
+                pp4MemoryAlarmTrap,
+                pp4LoadAvgAlarmTrap,
+                pp4LoginAlarmTrap,
+                pp4LogoutAlarmTrap,
+                pp4LoadCpuAlarmTrap,
+                pp4DuplicationMacAlarmTrap,
+                pp4LinkFlapAlarmTrap,
+
+                pp4LinkOkTrap,
+                pp4AutoNegotiationOkTrap,
+                pp4MemoryOkTrap,
+                pp4LoadAvgOkTrap,
+                pp4LoginOkTrap,
+                pp4LogoutOkTrap,
+                pp4CommitOkTrap,
+                pp4SaveOkTrap,
+				pp4LinkFlapEndOkTrap,
+				pp4ConfigChangedOkTrap,
+
+				pp4SaveAlarmTrap,
+				pp4BoardRemoveAlarmTrap,
+				pp4UnitRemoveAlarmTrap,
+				pp4PortCounterErrorFoundAlarmTrap,
+				pp4SyncDisallowedAlarmTrap,
+				pp4RebootUnitAlarmTrap,
+				pp4RebootStackAlarmTrap,
+				pp4RebootFwTimerAlarmTrap,
+				pp4FwUpdateAlarmTrap,
+				pp4FwConfirmNeededAlarmTrap,
+				pp4BoardAddOkTrap,
+				pp4UnitAddOkTrap,
+				pp4RoleChangedOkTrap,
+				pp4PortCounterErrorFreeOkTrap,
+				pp4SyncDisallowedOkTrap,
+				pp4ConfigRestoredOkTrap,
+				pp4RebootUnitOkTrap,
+				pp4FwUpdateOkTrap,
+
+		mxa32DslLinkAlarmTrap,
+		mxa32EthLinkAlarmTrap,
+		mxa32TempAlarmTrap,
+		mxa32VoltAlarmTrap,
+		mxa32UserLoginTrap,
+		mxa32DslLinkOkTrap,
+		mxa32EthLinkOkTrap,
+		mxa32TempOkTrap,
+		mxa32VoltOkTrap,
+		mxa32UserLogoutTrap,
+
+		mxa64DslLinkAlarmTrap,
+		mxa64EthLinkAlarmTrap,
+		mxa64TempAlarmTrap,
+		mxa64VoltAlarmTrap,
+		mxa64UserLoginTrap,
+		mxa64DslLinkOkTrap,
+		mxa64EthLinkOkTrap,
+		mxa64TempOkTrap,
+		mxa64VoltOkTrap,
+		mxa64UserLogoutTrap,
+
+
+		mxa24DslLinkAlarmTrap,
+		mxa24EthLinkAlarmTrap,
+		mxa24TempAlarmTrap,
+		mxa24VoltAlarmTrap,
+		mxa24UserLoginTrap,
+		mxa24DslLinkOkTrap,
+		mxa24EthLinkOkTrap,
+		mxa24TempOkTrap,
+		mxa24VoltOkTrap,
+		mxa24UserLogoutTrap,
+
+                omsOperationCommandAlarm,
+                omsOperationCommandOk,
+
+                elcONTAuthAlarmTrap,
+                elcUplinkAlarmTrap,
+                elcOpticalAlarmTrap,
+                elcFanAlarmTrap,
+                elcONTConfAlarmTrap,
+                elcFlappingAlarmTrap,
+                elcConfigSavedAlarmTrap,
+                elcFirmwareUpdateAlarmTrap,
+                elcRAMAlarmTrap,
+                elcLoginAlarmTrap,
+                elcDuplicateMacAlarmTrap,
+                elcLoadAverageAlarmTrap,
+                elcTemperatureAlarmTrap,
+                elcONTAuthOkTrap,
+                elcUplinkOkTrap,
+                elcOpticalOkTrap,
+                elcFanOkTrap,
+                elcONTConfOKTrap,
+                elcFlappingOkTrap,
+                elcConfigSavedOkTrap,
+                elcFirmwareUpdateOkTrap,
+                elcRAMOkTrap,
+                elcLoginOkTrap,
+                elcLogoutOkTrap,
+                elcSwitchConfigChangeTrap,
+                elcLoadAverageOkTrap,
+                elcTemperatureOkTrap,
+
+                smgAlarmConfigTrap,
+                smgAlarmSiptNodeTrap,
+                smgAlarmMspDevTrap,
+                smgAlarmLinkSetTrap,
+                smgAlarmStreamTrap,
+                smgAlarmSS7LinkTrap,
+                smgAlarmSyncTrap,
+                --smgAlarmStreamRemoteTrap,
+                --smgAlarmSyncPrioTrap,
+                smgOkConfigTrap,
+                smgOkSiptNodeTrap,
+                smgOkMspDevTrap,
+                smgOkLinkSetTrap,
+                smgOkStreamTrap,
+                smgOkSS7LinkTrap,
+                smgOkSyncTrap,
+                --smgOkStreamRemoteTrap,
+                --smgOkSyncPrioTrap,
+                smgAlarmCdrFtpTrap,
+				smgOkCdrFtpTrap,
+				smgUpdateFwFail,
+				smgUpdateFwOk,
+				smgAlarmMemoryLimitTrap,
+				smgOkMemoryLimitTrap,
+				smgAlarmProcOverloadTrap,
+				smgOkProcOverloadTrap,
+				smgOkRebootTrap,
+				smgOkFansIdleTrap,
+				smgOkDriveLimitTrap,
+				smgAlarmFansIdleTrap,
+				smgAlarmDriveLimitTrap,
+				smgAlarmSipOptionsQueueOverload,
+				smgAlarmSipOptionsQueueOk,
+                smgAlarmCDRFileTrap,
+                smgOkCDRFileTrap,
+                smgAlarmSipDuplicateTrap,
+                smgOkSipDuplicateTrap,
+                smgPctlModuleTrap,
+                smgOkPctlModuleTrap,
+                smgPortScanDetectorTrap,
+                smgOkPortScanDetectorTrap,
+                smgFirewallTrap,
+                smgOkFirewallTrap,
+                smgV52Intf,
+                smgOkV52Intf,
+                smgV52IntfSlot,
+                smgOkV52IntfSlot,
+
+		mccpConfigAlarmTrap,
+		mccpSlotAlarmTrap,
+		mccpLinksetAlarmTrap,
+		mccpStreamAlarmTrap,
+		mccpSS7LinkAlarmTrap,
+		mccpSyncAlarmTrap,
+		mccpIntfAlarmTrap,
+		mccpIntfSlotAlarmTrap,
+		mccpSutdownSnmpdAlarmTrap,
+		mccpConfigOkTrap,
+		mccpSlotOkTrap,
+		mccpLinksetOkTrap,
+		mccpStreamOkTrap,
+		mccpSS7LinkOkTrap,
+		mccpSyncOkTrap,
+		mccpIntfOkTrap,
+		mccpIntfSlotOkTrap,
+		mccpStartOkTrap,
+
+                radiusRequestNotification,
+
+                eltexShutdownTrap,
+
+                sbcAlarmConfigTrap,
+                sbcAlarmCdrFtpTrap,
+                sbcAlarmMemoryLimitTrap,
+                sbcAlarmPowerModuleStateTrap,
+                sbcAlarmTemperatureTrap,
+                sbcUpdateFwFail,
+                sbcAlarmProcOverloadTrap,
+                sbcAlarmFansIdleTrap,
+                sbcAlarmDriveLimitTrap,
+                sbcFail2banBlockTrap,
+                sbcDemoLicenseTrap,
+                sbcAlarmSbcRegistrationExpiredTrap,
+                sbcAlarmIpcOverloadTrap,
+                sbcCallForbiddenTrap,
+                sbcRegForbiddenTrap,
+                sbcSIPinterfaceTrap,
+                sbcReserveSlaveLinkChangedTrap,
+                sbcReserveSlaveSoftVersionTrap,
+                sbcSipAttackedTrap,
+                sbcPctlModuleTrap,
+                sbcPortScanDetectorTrap,
+                sbcFirewallTrap,
+                sbcRtpAttacked,
+                sbcProhibitedUaDetected,
+
+                sbcOKConfigTrap,
+                sbcOKCdrFtpTrap,
+                sbcOKMemoryLimitTrap,
+                sbcOKPowerModuleStateTrap,
+                sbcOKTemperatureTrap,
+                sbcUpdateFwOk,
+                sbcOKProcOverloadTrap,
+                sbcOKRebootTrap,
+                sbcOKFansIdleTrap,
+                sbcOKDriveLimitTrap,
+                sbcOKDemoLicenseTrap,
+                sbcOKIpcOverloadTrap,
+                sbcOKCallForbiddenTrap,
+                sbcOKRegForbiddenTrap,
+                sbcOKSIPinterfaceTrap,
+                sbcOKReserveSlaveLinkChangedTrap,
+                sbcOKReserveSlaveSoftVersionTrap,
+                sbcOKSipAttackedTrap,
+                sbcOKPctlModuleTrap,
+                sbcOKPortScanDetectorTrap,
+                sbcOKFirewallTrap,
+                sbcOKRtpAttacked,
+                sbcOKProhibitedUaDetected
+
+                 }
+        STATUS  current
+        DESCRIPTION
+                ""
+        ::= { eltrapGroup 100 }
+
+eltrapObjectGroup OBJECT-GROUP
+        OBJECTS {
+                mcTrapExState,
+                mcTrapLParam1,
+                mcTrapLParam2,
+                mcTrapLParam3,
+                mcTrapID,
+                mcTrapDescr,
+                mcTrapRestoredAlarmID,
+                mcTrapSyncType,
+                mcReservedFlag,
+                radiusSeqNum,
+                radiusStatus,
+                radiusTimeout,
+                radiusSwitchSrv,
+                radiusTypeResp,
+                radiusDescr }
+        STATUS  current
+        DESCRIPTION
+                ""
+        ::= { eltrapGroup 101 }
+
+eltrapDepNotificationGroup NOTIFICATION-GROUP
+        NOTIFICATIONS {
+			ponTeknovusEponAlarmTrap,
+             ponTeknovusUserLoginAlarmTrap,
+             ponTeknovusUserLoginOkTrap,
+             ponTeknovusEponOkTrap,
+             elcEponAlarmTrap,
+             elcUserLoginAlarmTrap,
+             elcUserLoginOkTrap,
+             elcEponOkTrap
+        }
+        STATUS  deprecated
+        DESCRIPTION
+                ""
+        ::= { eltrapGroup 103 }
+
+END

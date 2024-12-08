@@ -31,6 +31,7 @@ use DeviceCache;
 use Illuminate\Support\Str;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Device\YamlDiscovery;
+use LibreNMS\Interfaces\Discovery\EntityPhysicalDiscovery;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
@@ -46,6 +47,7 @@ use LibreNMS\Interfaces\Polling\StpInstancePolling;
 use LibreNMS\Interfaces\Polling\StpPortPolling;
 use LibreNMS\OS\Generic;
 use LibreNMS\OS\Traits\BridgeMib;
+use LibreNMS\OS\Traits\EntityMib;
 use LibreNMS\OS\Traits\HostResources;
 use LibreNMS\OS\Traits\NetstatsPolling;
 use LibreNMS\OS\Traits\ResolvesPortIds;
@@ -60,6 +62,7 @@ class OS implements
     MempoolsDiscovery,
     StpInstanceDiscovery,
     StpPortDiscovery,
+    EntityPhysicalDiscovery,
     IcmpNetstatsPolling,
     IpNetstatsPolling,
     IpForwardNetstatsPolling,
@@ -82,6 +85,7 @@ class OS implements
     use NetstatsPolling;
     use ResolvesPortIds;
     use BridgeMib;
+    use EntityMib;
 
     /**
      * @var float|null
@@ -91,6 +95,8 @@ class OS implements
     private $graphs; // stores device graphs
     private $cache; // data cache
     private $pre_cache; // pre-fetch data cache
+
+    protected ?string $entityVendorTypeMib = null;
 
     /**
      * OS constructor. Not allowed to be created directly.  Use OS::make()
@@ -236,8 +242,7 @@ class OS implements
     public static function make(array &$device): OS
     {
         if (isset($device['os'])) {
-            // load os definition and populate os_group
-            \LibreNMS\Util\OS::loadDefinition($device['os']);
+            // Populate os_group
             $device['os_group'] = Config::get("os.{$device['os']}.group");
 
             $class = StringHelpers::toClass($device['os'], 'LibreNMS\\OS\\');

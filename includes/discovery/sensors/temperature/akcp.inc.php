@@ -17,7 +17,7 @@ foreach ($oids as $index => $entry) {
         }
 
         discover_sensor(
-            $valid['sensor'],
+            null,
             'temperature',
             $device,
             $oid,

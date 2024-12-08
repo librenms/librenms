@@ -15,6 +15,8 @@ discovery:
         sysDescr_regex:
             - '/^UAP/'
             - '/^U6/'
+            - '/^U7/'
+            - '/^U-LTE/'
     -
         sysObjectID: .1.3.6.1.4.1.10002.1
         sysDescr: Linux

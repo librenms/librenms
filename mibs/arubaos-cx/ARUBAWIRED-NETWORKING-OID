@@ -1,0 +1,1661 @@
+--**MOD+***********************************************************************
+--* Module:    ARUBAWIRED-NETWORKING-OID.mib
+--*
+--* (c) Copyright 2017-2022 Hewlett Packard Enterprise Development LP
+--* All Rights Reserved.
+--*
+--* The contents of this software are proprietary and confidential
+--* to the Hewlett-Packard Development Company, L.P.  No part of this
+--* program may be photocopied, reproduced, or translated into another
+--* programming language without prior written consent of the
+--* Hewlett-Packard Development Company, L.P.
+--*
+--* Purpose: This file contains MIB definition of ARUBAWIRED-NETWORKING-OID
+--*
+--**MOD-***********************************************************************
+
+ARUBAWIRED-NETWORKING-OID DEFINITIONS ::= BEGIN
+
+IMPORTS
+        enterprises, MODULE-IDENTITY, OBJECT-IDENTITY
+            FROM SNMPv2-SMI;
+
+hpeNetworking MODULE-IDENTITY
+         LAST-UPDATED "202211100000Z"  -- November 10, 2022
+
+         ORGANIZATION "HPE/Aruba Networking Division"
+         CONTACT-INFO "Hewlett Packard Company
+                       8000 Foothills Blvd.
+                       Roseville, CA 95747"
+
+         DESCRIPTION  "This MIB module defines HPE Networking
+                       product hardware MIBs and proprietary MIBs. "
+
+         REVISION     "202211100000Z"  -- November 10, 2022
+         DESCRIPTION  "Updated description text for R8Q71A and R8Q72A"
+
+         REVISION     "202206290000Z"  -- June 29, 2022
+         DESCRIPTION  "Updated with new R9W94A-R8W97A SKUs belonging
+                       to the 8100"
+
+         REVISION     "202206270000Z"  -- June 27, 2022
+         DESCRIPTION  "Updated with new R9Y04A and R9Y03A SKU's belonging
+                       to 6100 and 6000 platforms respectively. Also updated
+                       with new PSU used by R9Y03A and R9Y04A"
+
+         REVISION     "202205260000Z"  -- May 26, 2022
+         DESCRIPTION  "Updated with 6200M switch information"
+
+         REVISION     "202201310000Z"  -- Jan 31, 2022
+         DESCRIPTION  "Added new Distributed Services Module MIB"
+
+         REVISION     "202111230000Z"  -- Nov 23, 2021
+         DESCRIPTION  "Added new INTERFACE-MIB module"
+
+         REVISION     "202111170000Z"  -- Nov 17, 2021
+         DESCRIPTION  "Updated with 9300 SKU information"
+
+         REVISION     "202111120000Z"  -- Nov 12, 2021
+         DESCRIPTION  "Added new ProviderBridge-MIB info"
+
+         REVISION     "202110220000Z"  -- Oct 22, 2021
+         DESCRIPTION  "Updated with new 8325 PSU information"
+
+         REVISION     "202108270000Z"  -- Aug 27, 2021
+         DESCRIPTION  "Updated with 10000 SKU information"
+
+         REVISION     "202108260000Z"  -- Aug 26, 2021
+         DESCRIPTION  "Added 6400 Rev C chassis OID information."
+
+         REVISION     "202106160000Z"  -- Jun 16, 2021"
+         DESCRIPTION  "Updated with new SKU OIDs for Indy program"
+
+         REVISION     "202105260000Z"  -- Mar 24, 2021
+         DESCRIPTION  "Added MAC-NOTIFY MIB module."
+
+         REVISION     "202104280000Z"  -- Apr 28, 2021
+         DESCRIPTION  "Updated with 6000 switch information."
+
+         REVISION     "202102240000Z"  -- Feb 24, 2021
+         DESCRIPTION  "Updated with 6300M DC PSU OID information."
+
+         REVISION     "202011200000Z"  -- Nov 20, 2020
+         DESCRIPTION  "Added PORTVLAN MIB module."
+
+         REVISION     "202011030000Z"  -- Nov 03, 2020
+         DESCRIPTION  "Updated with 4100i PSU  OID information."
+
+         REVISION     "202009210000Z"  -- Sep 21, 2020
+         DESCRIPTION  "Updated with 6100 PSU  OID information."
+
+         REVISION     "202008140000Z"  -- August 14, 2020
+         DESCRIPTION  "Updated with fixed 8360 OID information."
+
+         REVISION     "202006120000Z"  -- June 12, 2020
+         DESCRIPTION  "Updated with fixed PSU OID information."
+
+         REVISION     "202004130000Z"  -- Apr 13, 2020
+         DESCRIPTION  "Updated with JL762A new Product OID information."
+
+         REVISION     "202003170000Z"  -- Mar 17, 2020
+         DESCRIPTION  "Added 8360 Product SKUs OID information."
+
+         REVISION     "202001300000Z"  -- Jan 30, 2020
+         DESCRIPTION  "Updated with JL687A new Product OID information."
+
+         REVISION     "202001140000Z"  -- Jan 14, 2020
+         DESCRIPTION  "Updated with 6200 switch information."
+
+         REVISION     "202001060000Z"  -- Jan 06, 2020
+         DESCRIPTION  "Updated with 6400 switch information."
+
+         REVISION     "201911210000Z"  -- Nov 21, 2019
+         DESCRIPTION  "Updated with 6100 switch information."
+
+         REVISION     "201909260000Z"  -- Sep 26, 2019
+         DESCRIPTION  "Updated with 6200 switch information."
+
+         REVISION     "201908260000Z"  -- Aug 26, 2019
+         DESCRIPTION  "Updated with 6400 switch information."
+
+         REVISION     "201905140000Z"  -- May 14, 2019
+         DESCRIPTION  "Updated with 6400 switch information."
+
+         REVISION     "201904160000Z"  -- Apr 16, 2019
+         DESCRIPTION  "Updated port vendor types."
+
+         REVISION     "201904150000Z"  -- Apr 15, 2019
+         DESCRIPTION  "Added LLDP MIB module."
+
+         REVISION     "201812190000Z"  -- Dec 19, 2018
+         DESCRIPTION  "Updated with 6300 switch information."
+
+         REVISION     "201810100000Z"  -- Oct 10, 2018
+         DESCRIPTION  "Added new 8325 switches and updated description
+                       text for all 8325 switches"
+
+         REVISION     "201804120000Z"  -- Apr 12, 2018
+         DESCRIPTION  "Made changes to move VSX MIB under new OID tree."
+
+         REVISION     "201804090000Z"  -- Apr 09, 2018
+         DESCRIPTION  "Added new 8320 switches and updated description
+                       text for all 8320 switches"
+
+         REVISION     "201711280000Z"  -- Nov 28, 2017
+         DESCRIPTION  "Added port vendor types"
+
+         REVISION     "201711140000Z"  -- Nov 14, 2017
+         DESCRIPTION  "Added RPM and Power sensors"
+
+         REVISION     "201711020000Z"  -- Nov 2, 2017
+         DESCRIPTION  "Added 8400 Rear Display Module"
+
+         REVISION     "201710240000Z"  -- Oct 24, 2017
+         DESCRIPTION  "Updated Aruba Wired MIB Object Names with a
+                       standard convention"
+
+         REVISION     "201708300000Z"  -- Aug 30, 2017
+         DESCRIPTION  "Updated with 8320 switch information"
+
+         REVISION     "201704110000Z"  -- Apr 11, 2017
+         DESCRIPTION  "Updated with 8400 SKU information"
+
+         ::= { hpe 4 }
+
+hpe    OBJECT IDENTIFIER ::= { enterprises  47196 }
+
+-- definition of HPENetworking Objects
+-- reserving object with zero
+reservedhpeNetworking OBJECT IDENTIFIER ::=  { hpeNetworking 0 }
+
+-- grouping all wired devices under a separate group
+wiredNetworkingDevices OBJECT IDENTIFIER ::= { hpeNetworking 1 }
+
+-- categorization of MIB portions
+arubaOS-CX OBJECT IDENTIFIER ::= { wiredNetworkingDevices 1 }
+
+wndDeviceIds OBJECT IDENTIFIER ::= { arubaOS-CX 1 }
+
+wndComponentIds OBJECT IDENTIFIER ::= { arubaOS-CX 2 }
+
+wndFeatures OBJECT IDENTIFIER ::= { arubaOS-CX 3 }
+
+-- detailing of products
+
+arubaWiredSwitchJL375A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     JL375A Aruba 8400 8-slot chassis switch."
+        ::= { wndDeviceIds 1 }
+
+arubaWiredSwitchJL479A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     JL479A Aruba 8320 48p 10G SFP/SFP+ and 6p 40G QSFP+ chassis switch."
+        ::= { wndDeviceIds 2 }
+
+arubaWiredSwitchJL579A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     JL579A Aruba 8320 32p QSFP+ chassis switch."
+        ::= { wndDeviceIds 3 }
+
+arubaWiredSwitchJL581A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     JL581A Aruba 8320 48p 1G/10GBASE-T and 6p 40G QSFP+ chassis switch."
+        ::= { wndDeviceIds 5 }
+
+arubaWiredSwitchJL635A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     JL635A Aruba 8325 8325-48Y8C chassis switch."
+        ::= { wndDeviceIds 50 }
+
+arubaWiredSwitchJL636A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     JL636A Aruba 8325 8325-32C chassis switch."
+        ::= { wndDeviceIds 70 }
+
+arubaWiredSwitchJL658A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     Aruba 6300M 24SFP+/4SFP56 Swch."
+        ::= { wndDeviceIds 100 }
+
+arubaWiredSwitchJL659A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     Aruba 6300M 48SR PoE CLS6 /4SFP56 Swch."
+        ::= { wndDeviceIds 101 }
+
+arubaWiredSwitchJL660A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     Aruba 6300M 24SR PoECLS 6 /4SFP56 Swch."
+       ::= { wndDeviceIds 102 }
+
+arubaWiredSwitchJL661A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     Aruba 6300M 48G PoE CLS 4 /4SFP56 Swch."
+       ::= { wndDeviceIds 103 }
+
+arubaWiredSwitchJL662A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     Aruba 6300M 24G PoE CLS 4 /4SFP56 Swch."
+       ::= { wndDeviceIds 104 }
+
+arubaWiredSwitchJL663A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     Aruba 6300M 248G /4SFP56 Swch."
+       ::= { wndDeviceIds 105 }
+
+arubaWiredSwitchJL664A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     Aruba 6300M 24G /4SFP56 Swch."
+       ::= { wndDeviceIds 106 }
+
+arubaWiredSwitchJL665A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     Aruba 6300F 48G PoE CLS 4 /4SFP56 Swch."
+       ::= { wndDeviceIds 107 }
+
+arubaWiredSwitchJL666A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     Aruba 6300F 24G PoE CLS 4 /4SFP56 Swch."
+       ::= { wndDeviceIds 108 }
+
+arubaWiredSwitchJL667A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     Aruba 6300F 48G /4SFP56 Swch."
+       ::= { wndDeviceIds 109 }
+
+arubaWiredSwitchJL668A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     Aruba 6300F 24G /4SFP56 Swch."
+       ::= { wndDeviceIds 110 }
+
+arubaWiredSwitchJL762A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     Aruba 6300M 48G /4SFP56 BF Swch."
+       ::= { wndDeviceIds 111 }
+
+arubaWiredSwitchR8S89A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     Aruba 6300M 24SR CL6 PoE 2p50G 2p25G Sw."
+       ::= { wndDeviceIds 116 }
+
+arubaWiredSwitchR8S90A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     Aruba 6300M 48SR5 CL8 PoE 2p50G 2p25G Sw."
+       ::= { wndDeviceIds 117 }
+
+arubaWiredSwitchR8S91A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     Aruba 6300M 48SR5 CL6/CL8 2p50G 2p10G Sw."
+       ::= { wndDeviceIds 118 }
+
+arubaWiredSwitchR8S92A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     Aruba 6300M 24p SFP+ LRM 2p50G 2p25G Sw."
+       ::= { wndDeviceIds 119 }
+
+arubaWiredSwitchR0X24A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     Aruba 6405 Chassis."
+        ::= { wndDeviceIds 150 }
+
+arubaWiredSwitchR0X25A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     Aruba 6410 Chassis."
+        ::= { wndDeviceIds 151 }
+
+arubaWiredSwitchR0X24C OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     Aruba 6405 Chassis."
+        ::= { wndDeviceIds 160 }
+
+arubaWiredSwitchR0X25C OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     Aruba 6410 Chassis."
+        ::= { wndDeviceIds 161 }
+
+arubaWiredSwitchJL675A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     Aruba 6100 48G CLS4 4SFP+ 370W."
+       ::= { wndDeviceIds 250 }
+
+arubaWiredSwitchJL676A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     Aruba 6100 48G 4SFP+."
+       ::= { wndDeviceIds 251 }
+
+arubaWiredSwitchJL677A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     Aruba 6100 24G CLS4 4SFP+ 370W."
+       ::= { wndDeviceIds 252 }
+
+arubaWiredSwitchJL678A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     Aruba 6100 24G 4SFP+."
+       ::= { wndDeviceIds 253 }
+
+arubaWiredSwitchJL679A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     Aruba 6100 12G CLS4 2G/2SFP+ 139W."
+       ::= { wndDeviceIds 254 }
+
+arubaWiredSwitchR9Y04A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     Aruba 6100 48G Class4 PoE 4SFP+ 740W Switch."
+       ::= { wndDeviceIds 260 }
+
+arubaWiredSwitchR8N85A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     Aruba 6000 48G CLS4 4SFP 370W."
+       ::= { wndDeviceIds 270 }
+
+arubaWiredSwitchR8N86A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     Aruba 6000 48G 4SFP."
+       ::= { wndDeviceIds 271 }
+
+arubaWiredSwitchR8N87A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     Aruba 6000 24G CLS4 4SFP 370W."
+       ::= { wndDeviceIds 272 }
+
+arubaWiredSwitchR8N88A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     Aruba 6000 24G 4SFP."
+       ::= { wndDeviceIds 273 }
+
+arubaWiredSwitchR8N89A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     Aruba 6000 12G CLS4 2G/2SFP 139W."
+       ::= { wndDeviceIds 274 }
+
+arubaWiredSwitchR9Y03A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     Aruba 6000 48G Class4 PoE 4SFP 740W Switch."
+       ::= { wndDeviceIds 280 }
+
+arubaWiredSwitchJL724A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     Aruba 6200F 24G 4SFP+ Swch."
+       ::= { wndDeviceIds 300 }
+
+arubaWiredSwitchJL725A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     Aruba 6200F 24G CL4 4SFP+370W Swch."
+       ::= { wndDeviceIds 301 }
+
+arubaWiredSwitchJL726A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     Aruba 6200F 48G 4SFP+ Swch."
+       ::= { wndDeviceIds 302 }
+
+arubaWiredSwitchJL727A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     Aruba 6200F 48G CL4 4SFP+370W Swch."
+       ::= { wndDeviceIds 303 }
+
+arubaWiredSwitchJL728A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     Aruba 6200F 48G CL4 4SFP+740W Swch."
+       ::= { wndDeviceIds 304 }
+
+arubaWiredSwitchR8Q67A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     Aruba 6200M 24G 4SFP+ Sw."
+       ::= { wndDeviceIds 321 }
+
+arubaWiredSwitchR8Q68A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     Aruba 6200M 24G CL4 PoE 4SFP+ Sw."
+       ::= { wndDeviceIds 322 }
+
+arubaWiredSwitchR8Q69A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     Aruba 6200M 48G 4SFP+ Sw."
+       ::= { wndDeviceIds 323 }
+
+arubaWiredSwitchR8Q70A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     Aruba 6200M 48G CL4 PoE 4SFP+ Sw."
+       ::= { wndDeviceIds 324 }
+
+arubaWiredSwitchR8Q71A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     Aruba 6200M 36G 12SR5 CL6 PoE 4SFP+ Sw."
+       ::= { wndDeviceIds 325 }
+
+arubaWiredSwitchR8Q72A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     Aruba 6200F 12G CL4 2G/2SFP+ 139W."
+       ::= { wndDeviceIds 326 }
+
+arubaWiredSwitchR8V08A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     Aruba 6200M 24G 4SFP+ TAA Sw."
+       ::= { wndDeviceIds 327 }
+
+arubaWiredSwitchR8V09A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     Aruba 6200M 24G CL4 PoE 4SFP+ TAA Sw."
+       ::= { wndDeviceIds 328 }
+
+arubaWiredSwitchR8V10A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     Aruba 6200M 48G 4SFP+ TAA Sw."
+       ::= { wndDeviceIds 329 }
+
+arubaWiredSwitchR8V11A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     Aruba 6200M 48G CL4 PoE 4SFP+ TAA Sw."
+       ::= { wndDeviceIds 330 }
+
+arubaWiredSwitchR8V12A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     Aruba 6200M 36G 12SR5 CL6 4SFP+ TAA Sw."
+       ::= { wndDeviceIds 331 }
+
+arubaWiredSwitchR8V13A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     Aruba 6200F 12G CL4 2G/2SFP+TAA Sw."
+       ::= { wndDeviceIds 332 }
+
+arubaWiredSwitchJL717A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the Aruba 8360
+        32p 1/10/25G SFP/SFP+/SFP28 and 4p 40/100G QSFP+/QSFP28 switch."
+       ::= { wndDeviceIds 400 }
+
+arubaWiredSwitchJL718A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the Aruba 8360
+        16p 1/10/25G SFP/SFP+/SFP28 and 2p 40/100G QSFP+/QSFP28 switch."
+       ::= { wndDeviceIds 401 }
+
+arubaWiredSwitchJL719A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the Aruba 8360
+        48p 1/10/25G SFP/SFP+/SFP28 and 6p 40/100G QSFP+/QSFP28 switch."
+        ::= { wndDeviceIds 402 }
+
+arubaWiredSwitchJL720A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the Aruba 8360
+        48p 10GBASE-T and 4p 40/100G QSFP+/QSFP28 switch."
+       ::= { wndDeviceIds 403 }
+
+arubaWiredSwitchJL721A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the Aruba 8360
+        12p 40/100G QSFP+/QSFP28 switch."
+       ::= { wndDeviceIds 404 }
+
+arubaWiredSwitchJL722A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the Aruba 8360
+        24p 10G SFP/SFP+ and 2p 40/100G QSFP+/QSFP28 switch."
+       ::= { wndDeviceIds 405 }
+
+arubaWiredSwitchJL717C OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the Aruba 8360
+        32p 1/10/25G SFP/SFP+/SFP28 and 4p 40/100G QSFP+/QSFP28 switch."
+       ::= { wndDeviceIds 420 }
+
+arubaWiredSwitchJL718C OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the Aruba 8360
+        16p 1/10/25G SFP/SFP+/SFP28 and 2p 40/100G QSFP+/QSFP28 switch."
+       ::= { wndDeviceIds 421 }
+
+arubaWiredSwitchJL719C OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the Aruba 8360
+        48p 1/10/25G SFP/SFP+/SFP28 and 6p 40/100G QSFP+/QSFP28 switch."
+        ::= { wndDeviceIds 422 }
+
+arubaWiredSwitchJL720C OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the Aruba 8360
+        48p 10GBASE-T and 4p 40/100G QSFP+/QSFP28 switch."
+       ::= { wndDeviceIds 423 }
+
+arubaWiredSwitchJL721C OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the Aruba 8360
+        12p 40/100G QSFP+/QSFP28 switch."
+       ::= { wndDeviceIds 424 }
+
+arubaWiredSwitchJL722C OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the Aruba 8360
+        24p 10G SFP/SFP+ and 2p 40/100G QSFP+/QSFP28 switch."
+       ::= { wndDeviceIds 425 }
+
+arubaWiredSwitchJL817A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the Aruba 4100i
+        12-port 1GbE (8-port Class 4 POE and 4-port Class 6 POE)
+        2-port SFP+ DIN Mount Switch."
+       ::= { wndDeviceIds 450 }
+
+arubaWiredSwitchJL818A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the Aruba 4100i
+        24-port 1GbE (20-port Class 4 POE and 4-port Class 6 POE)
+        4-port SFP+ Switch."
+       ::= { wndDeviceIds 451 }
+
+arubaWiredSwitchR8S96A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the Aruba CX
+        10000-48Y6C Distributed Services Switch"
+       ::= { wndDeviceIds 600 }
+
+arubaWiredSwitchR8Z96A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the Aruba
+        9300-32D 32p 400G 2p 10g Switch"
+       ::= { wndDeviceIds 700 }
+
+arubaWiredSwitchR9W94A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the Aruba
+        8100 24x10G SFP+ 4x40/100G QSFP28 Switch"
+       ::= { wndDeviceIds 800 }
+
+arubaWiredSwitchR9W95A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the Aruba
+        8100 24x10G Base-T 4x10G SFP+ 4x40/100G QSFP28 Switch"
+       ::= { wndDeviceIds 801 }
+
+arubaWiredSwitchR9W96A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the Aruba
+        8100 48x10G SFP+ 4x40/100G QSFP28 Switch"
+       ::= { wndDeviceIds 802 }
+
+arubaWiredSwitchR9W97A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the Aruba
+        8100 40x10G Base-T 8x10G SFP+ 4x40/100G QSFP28 Switch"
+       ::= { wndDeviceIds 803 }
+
+-- sensors are sub type of parts
+
+wndSensors  OBJECT IDENTIFIER ::= { wndComponentIds 1 }
+
+arubaWiredTemperatureSensor OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "Identifier for a temperature sensor type."
+        ::= { wndSensors 1 }
+
+arubaWiredRPMSensor OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "Identifier for a fan RPM sensor type."
+        ::= { wndSensors 2 }
+
+arubaWiredPowerSensor OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "Identifier for a PSU power sensor type."
+        ::= { wndSensors 3 }
+
+-- slots are sub-type of parts
+
+wndSlots  OBJECT IDENTIFIER ::= { wndComponentIds 2 }
+
+arubaWiredSwitch8400FanTraySlot OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "Represents slot for Aruba X731 Fan Tray. "
+        ::= { wndSlots 1 }
+
+arubaWiredSwitch8400PowerSupplySlot OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for a
+                    power supply bay in an Aruba 8400 switch
+                    chassis. "
+        ::= { wndSlots 2 }
+
+arubaWiredSwitch8400ManagementModuleSlot OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for a
+                    Management Module bay in a Aruba 8400 switch. "
+        ::= { wndSlots 3 }
+
+arubaWiredSwitch8400LineCardSlot OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for a line card
+                    module slot in an Aruba 8400 switch chassis. "
+        ::= { wndSlots 4 }
+
+arubaWiredSwitch8400FabricCardSlot OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for a fabric
+                    module slot in an Aruba 8400 switch chassis. "
+        ::= { wndSlots 5 }
+
+arubaWiredSwitch8400RearDisplayCardSlot OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for a fabric
+                    module slot in an Aruba 8400 switch chassis. "
+        ::= { wndSlots 6 }
+
+arubaWiredSwitch8320FanTraySlot OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "Represents slot for Aruba F2B Fan Tray. "
+        ::= { wndSlots 7 }
+
+arubaWiredSwitch8320PowerSupplySlot OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for a
+                    power supply bay in an Aruba 8320 switch
+                    chassis. "
+        ::= { wndSlots 8 }
+
+arubaWiredSwitch8325FanTraySlot OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "Represents slot for Aruba Fan Tray. "
+        ::= { wndSlots 9 }
+
+arubaWiredSwitch8325PowerSupplySlot OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for a
+                    power supply bay in an Aruba 8325 switch
+                    chassis. "
+        ::= { wndSlots 10 }
+
+arubaWiredSwitch6300FanTraySlot OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "Represents slot for Aruba 6300M Switch Fan Tray. "
+        ::= { wndSlots 11 }
+
+arubaWiredSwitch6300PowerSupplySlot OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for a
+                    power supply bay in an Aruba 6300M switch.  "
+        ::= { wndSlots 12 }
+
+arubaWiredSwitch6400ManagementModuleSlot OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for a
+                    Management Module slot in a Aruba 6400 switch. "
+        ::= { wndSlots 13 }
+
+arubaWiredSwitch6400LineCardSlot OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for a line card
+                    module slot in an Aruba 6400 switch chassis. "
+        ::= { wndSlots 14 }
+
+arubaWiredSwitch6400FanTraySlot OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "Represents slot for Aruba 6400 Fan Tray. "
+        ::= { wndSlots 15 }
+
+arubaWiredSwitch6400PowerSupplySlot OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for a
+                    power supply slot in an Aruba 6400 switch
+                    chassis. "
+        ::= { wndSlots 16 }
+
+arubaWiredSwitch8360FanTraySlot OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "Represents slot for Aruba 8360 Fan Tray. "
+        ::= { wndSlots 17 }
+
+arubaWiredSwitch8360PowerSupplySlot OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for a
+                    power supply slot in an Aruba 8360 switch. "
+        ::= { wndSlots 18 }
+
+arubaWiredSwitch10000FanTraySlot OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "Represents slot for Aruba CX 10000 Fan Tray. "
+        ::= { wndSlots 19 }
+
+arubaWiredSwitch10000PowerSupplySlot OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for a
+                    power supply slot in an Aruba CX 10000 switch. "
+        ::= { wndSlots 20 }
+
+arubaWiredSwitch9300FanTraySlot OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "Represents slot for Aruba 9300 Fan Tray. "
+        ::= { wndSlots 21 }
+
+arubaWiredSwitch9300PowerSupplySlot OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for a
+                    power supply slot in an Aruba 9300 switch. "
+        ::= { wndSlots 22 }
+
+arubaWiredSwitch6200FanTraySlot OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "Represents slot for Aruba 6200M Switch Fan Tray. "
+        ::= { wndSlots 23 }
+
+arubaWiredSwitch6200PowerSupplySlot OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for a
+                    power supply bay in an Aruba 6200M switch.  "
+        ::= { wndSlots 24 }
+
+-- modules are sub types of parts
+
+wndModules  OBJECT IDENTIFIER ::= { wndComponentIds 3 }
+
+arubaWiredSwitchManagementModuleJL368A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for Aruba 8400 Management Module. "
+        ::= { wndModules 1 }
+
+arubaWiredSwitchModuleJL363A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for Aruba 8400X 32-port 10GbE SFP/SFP+ with MACsec Advanced Module. "
+        ::= { wndModules 2 }
+
+arubaWiredSwitchModuleJL365A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for Aruba 8400X 8-port 40GbE QSFP+ Advanced Module."
+        ::= { wndModules 3 }
+
+arubaWiredSwitchModuleJL366A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for Aruba 8400X 6-port 40GbE/100GbE QSFP28 Advanced Module. "
+        ::= { wndModules 4 }
+
+arubaWiredSwitchFabricModuleJL367A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for Aruba 8400X 7.2Tbps Fabric Module. "
+        ::= { wndModules 5 }
+
+arubaWiredSwitchFanModuleJL370A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for Aruba 8400 Fan for X731 Fan Tray. "
+        ::= { wndModules 6 }
+
+arubaWiredSwitchPowerSupplyUnitJL372A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for Aruba X382 54VDC 2700W AC Power Supply. "
+        ::= { wndModules 7 }
+
+arubaWiredSwitchJL369AFanTray OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for Aruba X731 Fan Tray. "
+        ::= { wndModules 8 }
+
+arubaWiredSwitchModuleJL479A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for Aruba 8320 48p 10G SFP/SFP+ and 6p 40G QSFP+ Advanced Module."
+        ::= { wndModules 9 }
+
+arubaWiredSwitchPowerSupplyUnitJL480A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for Aruba 8320 400W AC Power Supply. "
+        ::= { wndModules 10 }
+
+arubaWiredSwitchJL481AFanTray OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for Aruba 8320 Fan Tray. "
+        ::= { wndModules 11 }
+
+arubaWiredSwitchRearDisplayModule8400 OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for Aruba 8400 Rear Display Module. "
+        ::= { wndModules 12 }
+
+arubaWiredSwitch1GbMaxPort OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for a 1Gb maximum speed port."
+        ::= { wndModules 13 }
+
+arubaWiredSwitch10GbMaxPort OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for a 10Gb maximum speed port."
+        ::= { wndModules 14 }
+
+arubaWiredSwitch25GbMaxPort OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for a 25Gb maximum speed port."
+        ::= { wndModules 15 }
+
+arubaWiredSwitch40GbMaxPort OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for a 40Gb maximum speed port."
+        ::= { wndModules 16 }
+
+arubaWiredSwitch100GbMaxPort OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for a 100Gb maximum speed port."
+        ::= { wndModules 17 }
+
+arubaWiredSwitchSmartRatePort OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for a Smart Rate multi-gigabit port."
+        ::= { wndModules 18 }
+
+arubaWiredSwitchModuleJL579A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for Aruba 8320 32p 40GbE QSFP+ Advanced Module."
+        ::= { wndModules 19 }
+
+arubaWiredSwitchModuleJL581A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for Aruba 8320 48p 1G/10GBASE-T and 6p 40G QSFP+ Advanced Module."
+        ::= { wndModules 20 }
+
+arubaWiredSwitchModuleJL635A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for Aruba 8325-48Y8C Module."
+        ::= { wndModules 21 }
+
+arubaWiredSwitchModuleJL624A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for Aruba 8325-48Y8C FB Module."
+        ::= { wndModules 22 }
+
+arubaWiredSwitchModuleJL625A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for Aruba 8325-48Y8C BF Module."
+        ::= { wndModules 23 }
+
+arubaWiredSwitchModuleJL636A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for Aruba 8325-32C Module."
+        ::= { wndModules 24 }
+
+arubaWiredSwitchModuleJL626A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for Aruba 8325-32C FB Module."
+        ::= { wndModules 25 }
+
+arubaWiredSwitchModuleJL627A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for Aruba 8325-32C BF Module."
+        ::= { wndModules 26 }
+
+arubaWiredSwitchPowerSupplyUnitJL632A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for Aruba 8325 650W 100-240V FB AC Power Supply. "
+        ::= { wndModules 27 }
+
+arubaWiredSwitchPowerSupplyUnitJL633A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for Aruba 8325 650W 100-240V BF AC Power Supply. "
+        ::= { wndModules 28 }
+
+arubaWiredSwitchFanTrayJL628A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for Aruba 8325-48Y8C F2B Fan Tray. "
+        ::= { wndModules 29 }
+
+arubaWiredSwitchFanTrayJL629A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for Aruba 8325-48Y8C B2F Fan Tray. "
+        ::= { wndModules 30 }
+
+arubaWiredSwitchFanTrayJL630A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for Aruba 8325-32C F2B Fan Tray. "
+        ::= { wndModules 31 }
+
+arubaWiredSwitchFanTrayJL631A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for Aruba 8325-32C B2F Fan Tray. "
+        ::= { wndModules 32 }
+
+arubaWiredSwitchModuleJL658A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for Aruba 6300M 24SFP+ 4SFP56 Advanced Module."
+        ::= { wndModules 33 }
+
+arubaWiredSwitchModuleJL659A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for Aruba 6300M 48SR5 CL6 PoE 4SFP56 Advanced Module."
+        ::= { wndModules 34 }
+
+arubaWiredSwitchModuleJL660A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for Aruba 6300M 24SR5 CL6 PoE 4SFP56 Advanced Module."
+       ::= { wndModules 35 }
+
+arubaWiredSwitchModuleJL661A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for Aruba 6300M 48G CL4 PoE 4SFP56 Advanced Module."
+       ::= { wndModules 36 }
+
+arubaWiredSwitchModuleJL662A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for Aruba 6300M 24G CL4 PoE 4SFP56 Advanced Module."
+       ::= { wndModules 37 }
+
+arubaWiredSwitchModuleJL663A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for Aruba 6300M 48G 4SFP56 Advanced Module."
+       ::= { wndModules 38 }
+
+arubaWiredSwitchModuleJL664A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for Aruba 6300M 24G 4SFP56 Advanced Module."
+       ::= { wndModules 39 }
+
+arubaWiredSwitchModuleJL665A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for Aruba 6300F 48G CL4 PoE 4SFP56 Advanced Module."
+       ::= { wndModules 40 }
+
+arubaWiredSwitchModuleJL666A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for Aruba 6300F 24G CL4 PoE 4SFP56 Advanced Module."
+       ::= { wndModules 41 }
+
+arubaWiredSwitchModuleJL667A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for Aruba 6300F 48G 4SFP56 Advanced Module."
+       ::= { wndModules 42 }
+
+arubaWiredSwitchModuleJL668A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for Aruba 6300F 24G 4SFP56 Advanced Module."
+       ::= { wndModules 43 }
+
+arubaWiredSwitchFanTrayJL669A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for Aruba X751 Front to Back Fan Tray."
+        ::= { wndModules 44 }
+
+arubaWiredSwitchPowerSupplyUnitJL085A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for Aruba X371 12VDC 250W100-240VAC Power Supply. "
+        ::= { wndModules 45 }
+
+arubaWiredSwitchPowerSupplyUnitJL086A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for Aruba X372 54VDC 680W 100-240VAC Power Supply. "
+        ::= { wndModules 46 }
+
+arubaWiredSwitchPowerSupplyUnitJL087A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for Aruba X372 54VDC 1050W 110-240VAC Power Supply. "
+        ::= { wndModules 47 }
+
+arubaWiredSwitchPowerSupplyUnitJL670A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for Aruba X372 54VDC 1600W 110-240VAC Power Supply. "
+        ::= { wndModules 48 }
+
+arubaWiredSwitchModuleJL687A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for Aruba 8400X-32Y 32p 1/10/25G SFP/SFP+/SFP28 Module. "
+        ::= { wndModules 350 }
+
+arubaWiredSwitch50GbMaxPort OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for a 50Gb maximum speed port."
+        ::= { wndModules 50 }
+
+arubaWiredSwitchR0X31A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     Aruba 6400 Management Module."
+        ::= { wndModules 51 }
+
+arubaWiredSwitchR0X32A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     Aruba 6400 Fan Tray."
+        ::= { wndModules 52 }
+
+arubaWiredSwitchR0X33A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     Aruba 6400 C16 Inlet Adapter."
+        ::= { wndModules 53 }
+
+arubaWiredSwitchR0X34A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     Aruba 6400 C20 Inlet Adapter."
+        ::= { wndModules 54 }
+
+arubaWiredSwitchR0X35A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     Aruba 6400 1800W Power Supply with C16 Inlet Adapter."
+        ::= { wndModules 55 }
+
+arubaWiredSwitchR0X36A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     Aruba 6400 3000W Power Supply with C20 Inlet Adapter."
+        ::= { wndModules 56 }
+
+arubaWiredSwitchR0X37A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     Aruba 6400 4-post Rack Mount Kit."
+        ::= { wndModules 57 }
+
+arubaWiredSwitchR0X38A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     Aruba 6400 48-port 1GbE PoE Class 4 Module."
+        ::= { wndModules 58 }
+
+arubaWiredSwitchR0X39A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     Aruba 6400 48-port 1GbE PoE Class 4 and 4-port SFP56 Module."
+        ::= { wndModules 59 }
+
+arubaWiredSwitchR0X40A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     Aruba 6400 48-port 1GbE PoE Class 6 and 4-port SFP56 Module."
+        ::= { wndModules 60 }
+
+arubaWiredSwitchR0X41A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     Aruba 6400 48-port HPE Smart Rate PoE Class 6 and 4-port SFP56 Module."
+        ::= { wndModules 61 }
+
+arubaWiredSwitchR0X42A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     Aruba 6400 24-port HPE Smart Rate and 4-port SFP56 Module."
+        ::= { wndModules 62 }
+
+arubaWiredSwitchR0X43A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     Aruba 6400 24-port SFP+ and 4-port SFP56 Module."
+        ::= { wndModules 63 }
+
+arubaWiredSwitchR0X44A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     Aruba 6400 48-port 10/25GbE SFP28 Module."
+        ::= { wndModules 64 }
+
+arubaWiredSwitchR0X45A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     Aruba 6400 12-Port 40/100GbE QSFP28 Module."
+        ::= { wndModules 65 }
+
+arubaWiredSwitchModuleJL762A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for Aruba 6300M 48G 4SFP56 BF Advanced Module."
+       ::= { wndModules 70 }
+
+arubaWiredSwitchFanTrayJL761A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for Aruba X752 Back to Front Fan Tray."
+        ::= { wndModules 71 }
+
+arubaWiredSwitchPowerSupplyUnitJL760A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for Aruba X371 12VDC 250W Back to Front Power Supply."
+        ::= { wndModules 72 }
+
+arubaWiredSwitchModuleR8S89A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for Aruba 6300M 24SR CL6 PoE 2p50G 2p25G Advanced Module."
+       ::= { wndModules 73 }
+
+arubaWiredSwitchModuleR8S90A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for Aruba 6300M 48SR5 CL8 PoE 2p50G 2p25G Advanced Module."
+       ::= { wndModules 74 }
+
+arubaWiredSwitchModuleR8S91A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for Aruba 6300M 48SR5 CL6/CL8 2p50G 2p25G Advanced Module."
+       ::= { wndModules 75 }
+
+arubaWiredSwitchModuleR8S92A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for Aruba 6300M 24p SFP+ LRM 2p50G 2p25G Advanced Module."
+       ::= { wndModules 76 }
+
+arubaWiredSwitchModuleJL724A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for Aruba 6200F 24G 4SFP+ Module."
+       ::= { wndModules 90 }
+
+arubaWiredSwitchModuleJL725A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for Aruba 6200F 24G CL4 4SFP+370W Module."
+       ::= { wndModules 91 }
+
+arubaWiredSwitchModuleJL726A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for Aruba 6200F 48G 4SFP+ Module."
+       ::= { wndModules 92 }
+
+arubaWiredSwitchModuleJL727A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for Aruba 6200F 48G CL4 4SFP+370W Module."
+       ::= { wndModules 93 }
+
+arubaWiredSwitchModuleJL728A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for Aruba 6200F 48G CL4 4SFP+740W Module."
+       ::= { wndModules 94 }
+
+arubaWiredSwitchModuleR8N85A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the Aruba 6000 48G CLS4 4SFP 370W Module."
+       ::= { wndModules 98 }
+
+arubaWiredSwitchModuleR8N86A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the Aruba 6000 48G 4SFP Module."
+       ::= { wndModules 99 }
+
+arubaWiredSwitchModuleR8N87A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the Aruba 6000 24G CLS4 4SFP 370W Module."
+       ::= { wndModules 100 }
+
+arubaWiredSwitchModuleR8N88A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the Aruba 6000 24G 4SFP Module."
+       ::= { wndModules 101 }
+
+arubaWiredSwitchModuleR8N89A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the Aruba 6000 12G CLS4 2G/2SFP 139W Module."
+       ::= { wndModules 102 }
+
+arubaWiredSwitchR0X38B OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     Aruba 6400 48-port 1GbE PoE Class 4 Module."
+        ::= { wndModules 103 }
+
+arubaWiredSwitchR0X39B OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     Aruba 6400 48-port 1GbE PoE Class 4 and 4-port SFP56 Module."
+        ::= { wndModules 104 }
+
+arubaWiredSwitchR0X40B OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     Aruba 6400 48-port 1GbE PoE Class 6 and 4-port SFP56 Module."
+        ::= { wndModules 105 }
+
+arubaWiredSwitchModuleJL675A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the Aruba 6100 48G CLS4 4SFP+ 370W Module."
+       ::= { wndModules 106 }
+
+arubaWiredSwitchModuleJL676A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the Aruba 6100 48G 4SFP+ Module."
+       ::= { wndModules 107 }
+
+arubaWiredSwitchModuleJL677A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the Aruba 6100 24G CLS4 4SFP+ 370W Module."
+       ::= { wndModules 108 }
+
+arubaWiredSwitchModuleJL678A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the Aruba 6100 24G 4SFP+ Module."
+       ::= { wndModules 109 }
+
+arubaWiredSwitchModuleJL679A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the Aruba 6100 12G CLS4 2G/2SFP+ 139W Module."
+       ::= { wndModules 110 }
+
+arubaWiredSwitchNonPoEPowerSupplyUnit OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for Aruba 12VDC and 200W Power Supply. "
+        ::= { wndModules 111 }
+
+arubaWiredSwitchPoEPowerSupplyUnit OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for Aruba 12VDC and 54VDC 950W Power Supply. "
+        ::= { wndModules 112 }
+
+arubaWiredSwitchModuleJL717A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the Aruba 8360
+        32p 1/10/25G SFP/SFP+/SFP28 and 4p 40/100G QSFP+/QSFP28 advanced module."
+        ::= { wndModules 113 }
+
+arubaWiredSwitchModuleJL718A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the Aruba 8360
+        16p 1/10/25G SFP/SFP+/SFP28 and 2p 40/100G QSFP+/QSFP28 advanced module."
+        ::= { wndModules 114 }
+
+arubaWiredSwitchModuleJL719A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the Aruba 8360
+        48p 1/10/25G SFP/SFP+/SFP28 and 6p 40/100G QSFP+/QSFP28 advanced module."
+        ::= { wndModules 115 }
+
+arubaWiredSwitchModuleJL720A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the Aruba 8360
+        48p 1/10G BASE-T and 4p 40/100G QSFP+/QSFP28 advanced module."
+        ::= { wndModules 116 }
+
+arubaWiredSwitchModuleJL721A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the Aruba 8360
+        12p 40/100G QSFP+/QSFP28 advanced module."
+        ::= { wndModules 117 }
+
+arubaWiredSwitchModuleJL722A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the Aruba 8360
+        48p 1/10G SFP/SFP+ and 2p 40/100G QSFP+/QSFP28 advanced module."
+        ::= { wndModules 118 }
+
+arubaWiredSwitchPowerSupplyUnitJL600A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the Aruba 550W 12V F2B Power Supply. "
+        ::= { wndModules 119 }
+
+arubaWiredSwitchPowerSupplyUnitJL601A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the Aruba 850W 12V F2B Power Supply. "
+        ::= { wndModules 120 }
+
+arubaWiredSwitchPowerSupplyUnitJL712A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the Aruba 550W 12V B2F Power Supply. "
+        ::= { wndModules 121 }
+
+arubaWiredSwitchPowerSupplyUnitJL713A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the Aruba 850W 12V B2F Power Supply. "
+        ::= { wndModules 122 }
+
+arubaWiredSwitchFanTrayJL714A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for Aruba 8360 F2B Fan Tray. "
+        ::= { wndModules 123 }
+
+arubaWiredSwitchFanTrayJL715A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for Aruba 8360 B2F Fan Tray. "
+        ::= { wndModules 124 }
+
+arubaWiredSwitch36WPowerSupplyUnit OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for Aruba 12VDC and 36W Power Supply. "
+        ::= { wndModules 125 }
+
+arubaWiredSwitch65WPowerSupplyUnit OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for Aruba 12VDC and 65W Power Supply. "
+        ::= { wndModules 126 }
+
+arubaWiredSwitch165WPowerSupplyUnit OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for Aruba 12VDC and 165W Power Supply. "
+        ::= { wndModules 127 }
+
+arubaWiredSwitch500WPowerSupplyUnit OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for Aruba 12VDC and 500W Power Supply. "
+        ::= { wndModules 128 }
+
+arubaWiredSwitchModuleJL817A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the Aruba 4100i
+        12-port 1GbE (8-port Class 4 POE and 4-port Class 6 POE)
+        2-port SFP+ DIN Mount Switch."
+        ::= { wndModules 129 }
+
+arubaWiredSwitchModuleJL818A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the Aruba 4100i
+        24-port 1GbE (20-port Class 4 POE and 4-port Class 6 POE)
+        4-port SFP+ Switch."
+        ::= { wndModules 130 }
+
+arubaWiredSwitch300WPowerSupplyUnit OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for Aruba 54VDC 300W Power Supply. "
+        ::= { wndModules 131 }
+
+arubaWiredSwitchExternalPowerSupplyUnit OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for generic External Power Supply. "
+        ::= { wndModules 132 }
+
+arubaWiredSwitchPowerSupplyUnitJL757A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for Aruba 6300M 250W 36-72VDC Power Supply. "
+        ::= { wndModules 133 }
+
+arubaWiredSwitchPowerSupplyUnitJL758A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for Aruba 6300M 1050W 36-72VDC Power Supply."
+        ::= { wndModules 134 }
+
+arubaWiredSwitchPowerSupplyUnitR8R51A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for Aruba CX
+        10000-48Y6C Port to Power (FB) AC Power Supply Unit"
+        ::= { wndModules 135 }
+
+arubaWiredSwitchPowerSupplyUnitR8R52A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for Aruba CX
+        10000-48Y6C Power to Port (BF) AC Power Supply Unit"
+        ::= { wndModules 136 }
+
+arubaWiredSwitchFanTrayR8R53A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the Aruba CX
+        10000-48Y6C Port to Power (FB) Fan Tray"
+        ::= { wndModules 137 }
+
+arubaWiredSwitchFanTrayR8R54A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the Aruba CX
+        10000-48Y6C Power to Port (BF) Fan Tray"
+        ::= { wndModules 138 }
+
+arubaWiredSwitchModuleR8S96A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the Aruba CX
+        10000-48Y6C Distributed Services Switch."
+        ::= { wndModules 139 }
+
+arubaWiredSwitchPowerSupplyUnitJL861A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for Aruba 8325
+        850W 48VDC Front-to-Back Power Supply"
+        ::= { wndModules 140 }
+
+arubaWiredSwitchPowerSupplyUnitJL862A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for Aruba 8325
+        850W 48VDC Back-to-Front Power Supply"
+        ::= { wndModules 141 }
+
+arubaWiredSwitchModuleJL717C OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the Aruba 8360
+        32p 1/10/25G SFP/SFP+/SFP28 and 4p 40/100G QSFP+/QSFP28 advanced module."
+        ::= { wndModules 142 }
+
+arubaWiredSwitchModuleJL718C OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the Aruba 8360
+        16p 1/10/25G SFP/SFP+/SFP28 and 2p 40/100G QSFP+/QSFP28 advanced module."
+        ::= { wndModules 143 }
+
+arubaWiredSwitchModuleJL719C OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the Aruba 8360
+        48p 1/10/25G SFP/SFP+/SFP28 and 6p 40/100G QSFP+/QSFP28 advanced module."
+        ::= { wndModules 144 }
+
+arubaWiredSwitchModuleJL720C OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the Aruba 8360
+        48p 1/10G BASE-T and 4p 40/100G QSFP+/QSFP28 advanced module."
+        ::= { wndModules 145 }
+
+arubaWiredSwitchModuleJL721C OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the Aruba 8360
+        12p 40/100G QSFP+/QSFP28 advanced module."
+        ::= { wndModules 146 }
+
+arubaWiredSwitchModuleJL722C OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the Aruba 8360
+        48p 1/10G SFP/SFP+ and 2p 40/100G QSFP+/QSFP28 advanced module."
+        ::= { wndModules 147 }
+
+arubaWiredSwitchModuleR8Z96A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+        Aruba 9300-32D 32p 400G 2p 10G Switch."
+        ::= { wndModules 148 }
+
+arubaWiredSwitchPowerSupplyUnitR8Z97A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the Aruba 9300
+        1500W F2B AC PS"
+        ::= { wndModules 149 }
+
+arubaWiredSwitchPowerSupplyUnitR8Z98A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the Aruba 9300
+        1500W B2F AC PS"
+        ::= { wndModules 150 }
+
+arubaWiredSwitchFanTrayR8Z99A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the Aruba 9300
+        F2B Fan"
+        ::= { wndModules 151 }
+
+arubaWiredSwitchFanTrayR9A00A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the Aruba 9300
+        B2F Fan"
+        ::= { wndModules 152 }
+
+arubaWiredSwitch400GbMaxPort OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for a 400Gb maximum speed port."
+        ::= { wndModules 155 }
+
+arubaWiredSwitchModuleR8Q67A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for Aruba 6200M 24G 4SFP+ Module."
+       ::= { wndModules 156 }
+
+arubaWiredSwitchModuleR8Q68A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for Aruba 6200M 24G CL4 PoE 4SFP+ Module."
+       ::= { wndModules 157 }
+
+arubaWiredSwitchModuleR8Q69A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for Aruba 6200M 48G 4SFP+ Module."
+       ::= { wndModules 158 }
+
+arubaWiredSwitchModuleR8Q70A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for Aruba 6200M 48G CL4 PoE 4SFP+ Module."
+       ::= { wndModules 159 }
+
+arubaWiredSwitchModuleR8Q71A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for Aruba 6200M 36G 12SR5 CL6 PoE 4SFP+ Module."
+       ::= { wndModules 160 }
+
+arubaWiredSwitchModuleR8Q72A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for Aruba 6200F 12G CL4 2G/2SFP+ 139W Module."
+       ::= { wndModules 161 }
+
+arubaWiredSwitchModuleR8V08A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for Aruba 6200M 24G 4SFP+ TAA Module."
+       ::= { wndModules 162 }
+
+arubaWiredSwitchModuleR8V09A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for Aruba 6200M 24G CL4 PoE 4SFP+ TAA Module."
+       ::= { wndModules 163 }
+
+arubaWiredSwitchModuleR8V10A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for Aruba 6200M 48G 4SFP+ TAA Module."
+       ::= { wndModules 164 }
+
+arubaWiredSwitchModuleR8V11A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for Aruba 6200M 48G CL4 PoE 4SFP+ TAA Module."
+       ::= { wndModules 165 }
+
+arubaWiredSwitchModuleR8V12A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for Aruba 6200M 36G 12SR5 CL6 4SFP+ TAA Module."
+       ::= { wndModules 166 }
+
+arubaWiredSwitchModuleR8V13A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for Aruba Aruba 6200F 12G CL4 2G/2SFP+TAA Module."
+       ::= { wndModules 167 }
+
+arubaWiredSwitchModuleR9Y04A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the Aruba 6100 48G CLS4 4SFP+ 740W Module."
+       ::= { wndModules 168 }
+
+arubaWiredSwitchModuleR9Y03A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the Aruba 6000 48G CLS4 4SFP 740W Module."
+       ::= { wndModules 169 }
+
+arubaWiredSwitch740WPowerSupplyUnit OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the Aruba PoE 740W 100-240VAC Power Supply."
+       ::= { wndModules 170 }
+
+arubaWiredSwitchModuleR9W94A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the Aruba 8100 24x10G SFP+ 4x40/100G QSFP28 Module"
+       ::= { wndModules 171 }
+
+arubaWiredSwitchModuleR9W95A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the Aruba 8100 24x10G Base-T 4x10G SFP+ 4x40/100G QSFP28 Modulej"
+       ::= { wndModules 172 }
+
+arubaWiredSwitchModuleR9W96A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the Aruba 8100 48x10G SFP+ 4x40/100G QSFP28 Module"
+       ::= { wndModules 173 }
+
+arubaWiredSwitchModuleR9W97A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the Aruba 8100 40x10G Base-T 8x10G SFP+ 4x40/100G QSFP28 Module"
+       ::= { wndModules 174 }
+
+-- Feature Sub-tree where we allocate OID for Proprietary MIBs
+
+arubaWiredLoopProtectMIB     OBJECT IDENTIFIER ::= { wndFeatures 1 }
+
+arubaWiredMclagMIB           OBJECT IDENTIFIER ::= { wndFeatures 2 }
+
+arubaWiredMgmdSnoopingMIB    OBJECT IDENTIFIER ::= { wndFeatures 3 }
+
+arubaWiredMgmdRmonTrapMIB    OBJECT IDENTIFIER ::= { wndFeatures 4 }
+
+arubaWiredRpvstMIB           OBJECT IDENTIFIER ::= { wndFeatures 5 }
+
+arubaWiredMvrpMIB            OBJECT IDENTIFIER ::= { wndFeatures 6 }
+
+arubaWiredVsxMIB             OBJECT IDENTIFIER ::= { wndFeatures 7 }
+
+arubaWiredPoeMIB             OBJECT IDENTIFIER ::= { wndFeatures 8 }
+
+arubaWiredLldpMIB            OBJECT IDENTIFIER ::= { wndFeatures 9 }
+
+arubaWiredVsfMIB             OBJECT IDENTIFIER ::= { wndFeatures 10 }
+
+arubaWiredChassisMIB         OBJECT IDENTIFIER ::= { wndFeatures 11 }
+
+arubaWiredCiptMIB            OBJECT IDENTIFIER ::= { wndFeatures 12 }
+
+arubaWiredMstpMIB            OBJECT IDENTIFIER ::= { wndFeatures 13 }
+
+arubaWiredMdnsMIB            OBJECT IDENTIFIER ::= { wndFeatures 14 }
+
+arubaWiredVsfv2MIB           OBJECT IDENTIFIER ::= { wndFeatures 15 }
+
+arubaWiredAAAMIB             OBJECT IDENTIFIER ::= { wndFeatures 16 }
+
+arubaWiredPortAccessMIB      OBJECT IDENTIFIER ::= { wndFeatures 17 }
+
+arubaWiredPortVlanMIB        OBJECT IDENTIFIER ::= { wndFeatures 18 }
+
+arubaWiredMacNotifyMIB       OBJECT IDENTIFIER ::= { wndFeatures 19 }
+
+arubaWiredConfigMIB          OBJECT IDENTIFIER ::= { wndFeatures 20 }
+
+arubaWiredPortSecurityMIB    OBJECT IDENTIFIER ::= { wndFeatures 21 }
+
+arubaWiredSystemInfoMIB      OBJECT IDENTIFIER ::= { wndFeatures 22 }
+
+arubawiredProviderBridgeMIB  OBJECT IDENTIFIER ::= { wndFeatures 23 }
+
+arubaWiredInterfaceMIB       OBJECT IDENTIFIER ::= { wndFeatures 24 }
+
+arubaWiredDistServicesMIB    OBJECT IDENTIFIER ::= { wndFeatures 25 }
+
+END

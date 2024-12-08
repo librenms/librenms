@@ -14,6 +14,8 @@ if (isset($vars['disk'])) {
     $disks = array_keys($app->data['disks']);
 }
 
+sort($disks);
+
 $smart_enhancements = ['id9', 'maxtemp', 'id232'];
 
 $int = 0;

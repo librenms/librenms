@@ -12,10 +12,10 @@
  * the source code distribution for details.
  */
 
-$filename = Rrd::name($device['hostname'], 'ping-perf');
+$filename = Rrd::name($device['hostname'], 'icmp-perf');
 
 $descr = 'Milliseconds';
-$ds = 'ping';
+$ds = 'avg';
 $scale_min = 0;
 
 require 'includes/html/graphs/generic_stats.inc.php';

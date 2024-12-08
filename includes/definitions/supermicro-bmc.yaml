@@ -1,0 +1,15 @@
+os: supermicro-bmc
+text: 'Supermicro BMC'
+type: appliance
+icon: supermicro
+snmp_bulk: false
+mib_dir: supermicro
+group: supermicro
+over:
+    - { graph: device_temperature, text: 'Temperatures' }
+    - { graph: device_fanspeed, text: 'Fan Speed' }
+discovery:
+    - snmpget:
+          oid: ATEN-IPMI-MIB::bmcMajorVesion.0
+          op: '!='
+          value: false

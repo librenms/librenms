@@ -1,11 +1,11 @@
 -- =================================================================
--- Copyright (C) 2017 by HUAWEI TECHNOLOGIES. All rights reserved
+-- Copyright (C) 2021 by HUAWEI TECHNOLOGIES. All rights reserved
 --
 -- Description:HUAWEI ERRORDOWN MIB
 -- Reference:
--- Version: V2.01
+-- Version: V2.02
 -- History:
---          V1.00 W55319, 2011-08-08, publish
+--          V1.00, 2011-08-08, publish
 -- ===========================================================
 
     HUAWEI-ERRORDOWN-MIB DEFINITIONS ::= BEGIN
@@ -28,7 +28,7 @@
 -- Module Identifier
 --
     hwErrordownMIB MODULE-IDENTITY
-        LAST-UPDATED "201108081000Z"            -- Aug 8, 2011 at 10:00 GMT
+        LAST-UPDATED "202106281000Z"
         ORGANIZATION
            "Huawei Technologies Co.,Ltd."
         CONTACT-INFO
@@ -40,10 +40,13 @@
                Email: support@huawei.com
              "
         DESCRIPTION
+            "Modify History."
+        REVISION "202106281000Z"
+        DESCRIPTION
             "The HUAWEI-ERRORDOWN-MIB contains objects to
             Manage configuration and Monitor running state
             for ERROR-DOWN feature."
-        REVISION "201108081000Z"            -- Aug 8, 2011 at 10:00 GMT
+        REVISION "201108081000Z"
         DESCRIPTION
             "The initial revision of this MIB module."
         ::= { hwDatacomm 257 }

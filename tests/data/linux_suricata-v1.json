@@ -23,7 +23,7 @@
                     "app_state_prev": "UNKNOWN",
                     "app_status": "",
                     "app_instance": "",
-                    "data": "{\"instances\":[\"ids\"]}",
+                    "data": "{\"version\":1,\"instances\":[\"ids\"]}",
                     "deleted_at": null
                 }
             ],

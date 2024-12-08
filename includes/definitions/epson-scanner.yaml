@@ -1,0 +1,11 @@
+os: epson-scanner
+text: 'Epson Scanner'
+type: printer
+icon: epson
+group: epson
+snmp_bulk: false
+bad_iftype:
+    - softwareLoopback
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.1248.1.1.2.1.3.22.78.101.116.119.111.114.107.32.73.110.116.101.114.102.97.99.101.32.85.110.105.116

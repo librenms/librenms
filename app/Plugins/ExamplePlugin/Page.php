@@ -33,13 +33,13 @@ class Page extends PageHook
 {
     // point to the view for your plugin's settings
     // this is the default name so you can create the blade file as in this plugin
-    // by ommitting the variable, or point to another one
+    // by omitting the variable, or point to another one
 
 //    public string $view = 'resources.views.page';
 
     // The authorize method will determine if the user has access to this page.
     // if you want all users to be able to access this page simple return true
-    public function authorize(\App\Models\User $user): bool
+    public function authorize(\Illuminate\Contracts\Auth\Authenticatable $user): bool
     {
         // you can check user's roles like this:
 //        return $user->can('admin');

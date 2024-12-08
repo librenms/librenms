@@ -103,7 +103,7 @@
     <div class="form-group">
       <label class="col-sm-4 control-label" for="bill_notes">Notes</label>
       <div class="col-sm-8">
-        <input class="form-control input-sm" type="textarea" name="bill_notes" value="<?php echo htmlentities($bill_data['bill_notes']); ?>">
+        <textarea class="form-control input-sm" name="bill_notes"><?php echo htmlentities($bill_data['bill_notes']); ?></textarea>
       </div>
     </div>
 </fieldset>

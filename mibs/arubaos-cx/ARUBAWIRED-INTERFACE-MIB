@@ -1,0 +1,162 @@
+--**MOD+************************************************************************
+--* Module:    ARUBAWIRED-INTERFACE-MIB :INTERFACE MIB file
+--*
+--* (c) Copyright 2020-2022 Hewlett Packard Enterprise Development LP
+--* All Rights Reserved.
+--*
+--* The contents of this software are proprietary and confidential
+--* to the Hewlett-Packard Development Company, L.P.  No part of this
+--* program may be photocopied, reproduced, or translated into another
+--* programming language without prior written consent of the
+--* Hewlett-Packard Development Company, L.P.
+--*
+--* Purpose: This file contains MIB definition of ARUBAWIRED-INTERFACE-MIB
+--*
+--**MOD-************************************************************************
+
+ARUBAWIRED-INTERFACE-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        OBJECT-TYPE, MODULE-IDENTITY
+            FROM SNMPv2-SMI
+        MODULE-COMPLIANCE, OBJECT-GROUP
+            FROM SNMPv2-CONF
+        InterfaceIndex
+            FROM IF-MIB
+        wndFeatures
+            FROM ARUBAWIRED-NETWORKING-OID;
+
+    arubaWiredInterfaceMIB MODULE-IDENTITY
+        LAST-UPDATED "202111230000Z" -- November 23, 2021
+        ORGANIZATION "HPE/Aruba Networking Division"
+        CONTACT-INFO "Hewlett Packard Enterprise Company
+                      8000 Foothills Blvd,
+                      Roseville, CA 95747"
+        DESCRIPTION
+            "This MIB module describes settings and properties that are
+            applicable to interfaces"
+
+        REVISION     "202111230000Z" -- November 23, 2021
+        DESCRIPTION  "Initial revision."
+        ::= { wndFeatures 24 }
+
+arubaWiredInterfaceSettings OBJECT IDENTIFIER ::= { arubaWiredInterfaceMIB 1 }
+
+    arubaWiredInterfaceTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF ArubaWiredInterfaceEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Table of interface entries"
+        ::= { arubaWiredInterfaceSettings 1 }
+
+    arubaWiredInterfaceEntry OBJECT-TYPE
+        SYNTAX      ArubaWiredInterfaceEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry containing information applicable to a
+                    particular interface."
+        INDEX       { arubaWiredInterfaceIndex }
+        ::= { arubaWiredInterfaceTable 1 }
+
+    ArubaWiredInterfaceEntry ::= SEQUENCE {
+            arubaWiredInterfaceIndex         InterfaceIndex,
+            arubaWiredInterfaceAutoneg       INTEGER,
+            arubaWiredInterfaceDuplex        INTEGER,
+            arubaWiredInterfaceSpeeds        BITS
+        }
+
+    arubaWiredInterfaceIndex OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The index value that uniquely identifies the port on
+                    which the client IP tracker entry is enabled.
+                    The interface identified by a particular value of this
+                    index is the same interface as identified by the same
+                    value of the IF-MIB's ifIndex."
+       ::= { arubaWiredInterfaceEntry 1 }
+
+    arubaWiredInterfaceAutoneg OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        on(1),
+                        off(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The desired auto-negotiation setting for the interface.
+                    Note that the configured setting may be ignored if the
+                    interface is not capable of auto-negotiation."
+        ::= { arubaWiredInterfaceEntry 2 }
+
+    arubaWiredInterfaceDuplex OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        full(1),
+                        half(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The desired duplex setting for the interface. This setting
+                    may be ignored or set to default when auto-negotiation is
+                    on."
+        ::= { arubaWiredInterfaceEntry 3 }
+
+    arubaWiredInterfaceSpeeds OBJECT-TYPE
+        SYNTAX      BITS {
+                        speed10M(0),
+                        speed100M(1),
+                        speed1G(2),
+                        speed2p5G(3),
+                        speed5G(4),
+                        speed10G(5),
+                        speed25G(6),
+                        speed40G(7),
+                        speed50G(8),
+                        speed100G(9),
+                        speed200G(10),
+                        speed400G(11),
+                        speed800G(12)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The desired list of operating speeds for the interface.
+                    When the interface auto-negotiates speed, this is the set
+                    of speeds to offer. When the interface does not auto-negotiate,
+                    this is the speed to use. Note that the configured speeds
+                    may be ignored if they are not compatible with the interface
+                    hardware or installed transceiver."
+        ::= { arubaWiredInterfaceEntry 4 }
+
+-- **********************************************************************
+-- Conformance information
+-- **********************************************************************
+
+    arubaWiredInterfaceConformance OBJECT IDENTIFIER
+                               ::= { arubaWiredInterfaceMIB 2 }
+
+    arubaWiredInterfaceGroups      OBJECT IDENTIFIER
+                               ::= { arubaWiredInterfaceConformance 1 }
+
+    arubaWiredInterfaceCompliances OBJECT IDENTIFIER
+                               ::= { arubaWiredInterfaceConformance 2 }
+
+    arubaWiredInterfaceConfig OBJECT-GROUP
+        OBJECTS     {
+                      arubaWiredInterfaceAutoneg,
+                      arubaWiredInterfaceDuplex,
+                      arubaWiredInterfaceSpeeds
+                    }
+        STATUS      current
+        DESCRIPTION "A collection of objects providing interface config"
+
+        ::= { arubaWiredInterfaceGroups 1 }
+
+    arubaWiredInterfaceCompliance MODULE-COMPLIANCE
+        STATUS      current
+        DESCRIPTION "The compliance statement for HP Switches with
+                     support for arubaWired client IP tracker objects."
+
+        MODULE
+            MANDATORY-GROUPS { arubaWiredInterfaceConfig }
+
+        ::= { arubaWiredInterfaceCompliances 1 }
+END

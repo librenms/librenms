@@ -11,6 +11,11 @@ $smalldescrlen = 20;
 
 $rrd_list = [];
 
+if (! $rrdArray) {
+    graph_error('No Data to Display', 'No Data');
+}
+
+$i = 0;
 foreach (array_keys($rrdArray) as $socket_type) {
     $rrd_filename = Rrd::name($device['hostname'], [
         $polling_type,
@@ -20,7 +25,6 @@ foreach (array_keys($rrdArray) as $socket_type) {
     ]);
 
     if (Rrd::checkRrdExists($rrd_filename)) {
-        $i = 0;
         foreach ($rrdArray[$socket_type] as $socket_status => $socket_status_desc) {
             $rrd_list[$i]['filename'] = $rrd_filename;
             $rrd_list[$i]['descr'] = $socket_status_desc['descr'];
@@ -28,7 +32,7 @@ foreach (array_keys($rrdArray) as $socket_type) {
             $i++;
         }
     } else {
-        d_echo('RRD ' . $rrd_filename . ' not found');
+        graph_error('No Data file ' . basename($rrd_filename), 'No Data');
     }
 }
 

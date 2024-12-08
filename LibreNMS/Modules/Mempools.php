@@ -29,6 +29,7 @@ use App\Models\Device;
 use App\Models\Mempool;
 use App\Observers\MempoolObserver;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 use LibreNMS\DB\SyncsModels;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
@@ -37,7 +38,6 @@ use LibreNMS\OS;
 use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Number;
-use Log;
 
 class Mempools implements Module
 {
@@ -71,7 +71,6 @@ class Mempools implements Module
         MempoolObserver::observe(\App\Models\Mempool::class);
         $this->syncModels($os->getDevice(), 'mempools', $mempools);
 
-        echo PHP_EOL;
         $mempools->each(function ($mempool) {
             $this->printMempool($mempool);
         });
@@ -149,15 +148,20 @@ class Mempools implements Module
         return $mempools;
     }
 
-    public function cleanup(Device $device): void
+    public function dataExists(Device $device): bool
     {
-        $device->mempools()->delete();
+        return $device->mempools()->exists();
+    }
+
+    public function cleanup(Device $device): int
+    {
+        return $device->mempools()->delete();
     }
 
     /**
      * @inheritDoc
      */
-    public function dump(Device $device)
+    public function dump(Device $device, string $type): ?array
     {
         return [
             'mempools' => $device->mempools()->orderBy('mempool_type')->orderBy('mempool_id')
@@ -217,12 +221,12 @@ class Mempools implements Module
 
     private function printMempool(Mempool $mempool): void
     {
-        echo "$mempool->mempool_type [$mempool->mempool_class]: $mempool->mempool_descr: $mempool->mempool_perc%";
+        $status = "$mempool->mempool_type [$mempool->mempool_class]: $mempool->mempool_descr: $mempool->mempool_perc%";
         if ($mempool->mempool_total != 100) {
             $used = Number::formatBi($mempool->mempool_used);
             $total = Number::formatBi($mempool->mempool_total);
-            echo "  {$used} / {$total}";
+            $status .= "  {$used} / {$total}";
         }
-        echo PHP_EOL;
+        Log::info($status);
     }
 }

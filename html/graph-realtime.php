@@ -19,7 +19,7 @@ if (is_numeric($_GET['id']) && (Config::get('allow_unauth_graphs') || port_permi
     $title .= ' :: Port  ' . generate_port_link($port);
     $auth = true;
 } else {
-    echo 'Unauthenticad';
+    echo 'Unauthenticated';
     exit;
 }
 

@@ -25,6 +25,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
@@ -51,6 +52,27 @@ class Component extends DeviceRelatedModel
     public function setIgnoreAttribute($ignore)
     {
         $this->attributes['ignore'] = (int) $ignore;
+    }
+
+    public function error(): Attribute
+    {
+        return Attribute::make(
+            set: fn (?string $value) => is_null($value) ? null : substr($value, 0, 255),
+        );
+    }
+
+    public function label(): Attribute
+    {
+        return Attribute::make(
+            set: fn (?string $value) => is_null($value) ? null : substr($value, 0, 255),
+        );
+    }
+
+    public function type(): Attribute
+    {
+        return Attribute::make(
+            set: fn (?string $value) => is_null($value) ? null : substr($value, 0, 50),
+        );
     }
 
     // ---- Define Relationships ----

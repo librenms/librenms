@@ -375,10 +375,6 @@ return [
             'description' => '指定 URL',
             'help' => 'This should *only* be set if you want to *force* a particular hostname/port. It will prevent the web interface being usable form any other hostname',
         ],
-        'device_perf_purge' => [
-            'description' => '裝置效能項目大於',
-            'help' => 'Cleanup done by daily.sh',
-        ],
         'distributed_poller' => [
             'description' => '啟用分散式輪詢 (需要額外設定)',
             'help' => 'Enable distributed polling system wide. This is intended for load sharing, not remote polling. You must read the documentation for steps to enable: https://docs.librenms.org/Extensions/Distributed-Poller/',
@@ -725,7 +721,7 @@ return [
             'help' => 'Cleanup done by daily.sh',
         ],
         'ports_purge' => [
-            'description' => '清除端口已刪除',
+            'description' => '清除已刪除的連接埠',
             'help' => 'Cleanup done by daily.sh',
         ],
         'prometheus' => [

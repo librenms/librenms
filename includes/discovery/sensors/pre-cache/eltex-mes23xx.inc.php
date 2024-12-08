@@ -22,24 +22,6 @@
  *
  * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  */
-echo 'eltPhdTransceiverThresholdTable ';
-$oide = snmp_walk($device, 'eltPhdTransceiverThresholdTable', '-OsQ', 'ELTEX-MES-PHYSICAL-DESCRIPTION-MIB');
-echo 'rlPhyTestGetResult ';
-$oidr = snmp_walk($device, 'rlPhyTestGetResult', '-OsQ', 'RADLAN-PHY-MIB');
-$oids = trim($oide . "\n" . $oidr);
-
-if ($oids) {
-    foreach (explode("\n", $oids) as $data) {
-        if ($data) {
-            $split = explode('=', $data);
-            $value = trim($split[1]);
-            $name = trim(explode('.', $split[0])[0]);
-            $index = trim(explode('.', $split[0])[1]);
-            $type = trim(explode('.', $split[0])[2]);
-            $pre_cache['eltex-mes23xx-sfp'][$index][$type][$name] = $value;
-        }
-    }
-}
 
 echo 'rlPethPsePortPowerLimit ';
 $oidpl = snmpwalk_cache_multi_oid($device, 'MARVELL-POE-MIB::rlPethPsePortPowerLimit', [], 'MARVELL-POE-MIB');

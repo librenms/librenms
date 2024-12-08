@@ -34,7 +34,7 @@ class Msteams extends Transport
         // template will contain raw json
         if ($this->config['use-json'] === 'on') {
             $msg = $alert_data['uid'] === '000'
-                ? $this->messageCard() // use pre-made MessageCard for tests
+                ? $this->testJsonMessage() // use pre-made JSON for tests
                 : $alert_data['msg'];
 
             $client->withBody($msg, 'application/json');
@@ -73,47 +73,40 @@ class Msteams extends Transport
         ];
     }
 
-    private function messageCard(): string
+    private function testJsonMessage(): string
     {
         return '{
-    "@context": "https://schema.org/extensions",
-    "@type": "MessageCard",
-    "potentialAction": [
+    "type": "message",
+    "attachments": [
         {
-            "@type": "OpenUri",
-            "name": "View MessageCard Reference",
-            "targets": [
-                {
-                    "os": "default",
-                    "uri": "https://learn.microsoft.com/en-us/outlook/actionable-messages/message-card-reference"
-                }
-            ]
-        },
-        {
-            "@type": "OpenUri",
-            "name": "View LibreNMS Website",
-            "targets": [
-                {
-                    "os": "default",
-                    "uri": "https://www.librenms.org/"
-                }
-            ]
+            "contentType": "application/vnd.microsoft.card.adaptive",
+            "contentUrl": null,
+            "content": {
+                "type": "AdaptiveCard",
+                "body": [
+                    {
+                        "type": "TextBlock",
+                        "size": "Medium",
+                        "weight": "Bolder",
+                        "text": "LibreNMS Test Adaptive Card"
+                    },
+                    {
+                        "type": "TextBlock",
+                        "text": "You have successfully sent a pre-formatted AdaptiveCard message to Teams.",
+                        "wrap": true
+                    },
+                    {
+                        "type": "TextBlock",
+                        "text": "This does not test if your alert template is valid AdaptiveCard JSON.",
+                        "isSubtle": true,
+                        "wrap": true
+                    }
+                ],
+                "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+                "version": "1.4"
+            }
         }
-    ],
-    "sections": [
-        {
-            "facts": [
-                {
-                    "name": "Next Action:",
-                    "value": "Make your alert template emit valid MessageCard Json"
-                }
-            ],
-            "text": "You have successfully sent a pre-formatted MessageCard message to teams."
-        }
-    ],
-    "summary": "Test Successful",
-    "themeColor": "0072C6",
-    "title": "Test MessageCard"
+    ]
 }';
     }
 }

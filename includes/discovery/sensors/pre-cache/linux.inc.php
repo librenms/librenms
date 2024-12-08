@@ -24,5 +24,3 @@
  */
 echo 'RaspberryPi ';
 $pre_cache['raspberry_pi_sensors'] = snmpwalk_cache_oid($device, '.1.3.6.1.4.1.8072.1.3.2.4.1.2.9.114.97.115.112.98.101.114.114.121', [], 'NET-SNMP-EXTEND-MIB');
-echo 'ups-nut ';
-$pre_cache['ups_nut_sensors'] = snmpwalk_cache_oid($device, '.1.3.6.1.4.1.8072.1.3.2.4.1.2.7.117.112.115.45.110.117.116', [], 'NET-SNMP-EXTEND-MIB');

@@ -42,100 +42,26 @@
                             <div class="form-group">
                                 <label for="dtpickerfrom">{{ __('From') }}</label>
                                 <input type="text" class="form-control" id="dtpickerfrom" name="dtpickerfrom" maxlength="16"
-                                       value="{{ $data['dtpickerfrom'] }}" data-date-format="YYYY-MM-DD HH:mm">
+                                       value="{{ $data['from'] }}" data-date-format="YYYY-MM-DD HH:mm">
                             </div>
                             <div class="form-group">
                                 <label for="dtpickerto">{{ __('To') }}</label>
                                 <input type="text" class="form-control" id="dtpickerto" name="dtpickerto" maxlength=16
-                                       value="{{ $data['dtpickerto'] }} " data-date-format="YYYY-MM-DD HH:mm">
+                                       value="{{ $data['to'] }} " data-date-format="YYYY-MM-DD HH:mm">
                             </div>
                             <input type="submit" class="btn btn-default" id="submit" value="Update">
                     </form>
                 </span>
         </x-slot>
 
-        <div id="performance"></div>
+        <div id="performance">
+            <x-graph type="device_icmp_perf" legend="yes" :device="$device" width="600" height="240" :from="$data['from']" :to="$data['to']"></x-graph>
+        </div>
     </x-panel>
-@endsection
-
-@section('javascript')
-    <script src="{{ url('js/vis.min.js') }}"></script>
 @endsection
 
 @push('scripts')
     <script type="text/javascript">
-        var container = document.getElementById('performance');
-        var names = ['Loss', 'Min latency', 'Max latency', 'Avg latency'];
-        var groups = new vis.DataSet();
-        groups.add({
-            id: 0,
-            content: names[0],
-            options: {
-                drawPoints: {
-                    style: 'circle'
-                },
-                shaded: {
-                    orientation: 'bottom'
-                }
-            }
-        });
-
-        groups.add({
-            id: 1,
-            content: names[1],
-            options: {
-                drawPoints: {
-                    style: 'circle'
-                },
-                shaded: {
-                    orientation: 'bottom'
-                }
-            }
-        });
-
-        groups.add({
-            id: 2,
-            content: names[2],
-            options: {
-                drawPoints: {
-                    style: 'circle'
-                },
-                shaded: {
-                    orientation: 'bottom'
-                }
-            }
-        });
-
-        groups.add({
-            id: 3,
-            content: names[3],
-            options: {
-                drawPoints: {
-                    style: 'circle'
-                },
-                shaded: {
-                    orientation: 'bottom'
-                }
-            }
-        });
-
-        var items = @json($data['perfdata']);
-        var dataset = new vis.DataSet(items);
-        var options = {
-            barChart: {width: 50, align: 'right'}, // align: left, center, right
-            drawPoints: false,
-            legend: {left: {position: "bottom-left"}},
-            dataAxis: {
-                icons: true,
-                showMajorLabels: true,
-                showMinorLabels: true,
-            },
-            zoomMin: 86400, //24hrs
-            zoomMax: {{ $data['duration'] }},
-            orientation: 'top'
-        };
-        var graph2d = new vis.Graph2d(container, dataset, groups, options);
-
         $(function () {
             $("#dtpickerfrom").datetimepicker({
                 useCurrent: true,

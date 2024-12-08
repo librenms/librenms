@@ -30,7 +30,7 @@ foreach (explode("\n", $oids) as $data) {
             $descr = str_replace(' Fan Speed', '', $descr);
             $descr = str_replace(' Speed', '', $descr);
             if ($monitor == 'true') {
-                discover_sensor($valid['sensor'], 'fanspeed', $device, $fan_oid, $index, 'supermicro', $descr, $divisor, '1', $low_limit, null, null, null, $current);
+                discover_sensor(null, 'fanspeed', $device, $fan_oid, $index, 'supermicro', $descr, $divisor, '1', $low_limit, null, null, null, $current);
             }
         }
     }//end if

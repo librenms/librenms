@@ -28,4 +28,17 @@ class PortTab extends PortTabHook
             'total' => $total_delta,
         ];
     }
+
+    // The authorize method will determine if the user will see this tab or not
+    // if you want all users to see it, simple return true
+    public function authorize(\Illuminate\Contracts\Auth\Authenticatable $user, \App\Models\Port $port): bool
+    {
+        // you can check user's roles like this:
+//        return $user->can('admin');
+
+        // or use whatever you like. Including conditions on the \App\Models\Port $port of course
+//        return \Carbon\Carbon::now()->dayOfWeek == Carbon::THURSDAY; // only allowed access on Thursdays!
+
+        return true; // allow every logged in user to access
+    }
 }

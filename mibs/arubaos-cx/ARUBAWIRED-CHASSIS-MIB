@@ -1,0 +1,55 @@
+--**MOD+************************************************************************
+--* Module:    ARUBAWIRED-CHASSIS-MIB :CHASSIS MIB file
+--*
+--* (c) Copyright 2020-2021 Hewlett Packard Enterprise Development LP
+--* All Rights Reserved.
+--*
+--* The contents of this software are proprietary and confidential
+--* to the Hewlett-Packard Development Company, L.P.  No part of this
+--* program may be photocopied, reproduced, or translated into another
+--* programming language without prior written consent of the
+--* Hewlett-Packard Development Company, L.P.
+--*
+--* Purpose: This file contains MIB definition of ARUBAWIRED-CHASSIS-MIB
+--*
+--**MOD-************************************************************************
+
+ARUBAWIRED-CHASSIS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    wndFeatures
+        FROM ARUBAWIRED-NETWORKING-OID;
+
+arubaWiredChassisMIB MODULE-IDENTITY
+    LAST-UPDATED "202101110000Z" -- January 11, 2021
+    ORGANIZATION "HPE/Aruba Networking Division"
+    CONTACT-INFO "Hewlett Packard Company
+                  8000 Foothills Blvd.
+                  Roseville, CA 95747"
+    DESCRIPTION
+        "This MIB module describes management objects that manage Chassis
+         components."
+
+    REVISION     "202101110000Z" -- January 11, 2021
+    DESCRIPTION  "Added module entry."
+
+    REVISION     "202002130000Z" -- February 13, 2020
+    DESCRIPTION  "Added temperature sensor, fan tray, and fan entries."
+
+    REVISION     "202001070000Z" -- January 7, 2020
+    DESCRIPTION  "Initial revision."
+    ::= { wndFeatures 11 }
+
+-- **********************************************************************
+-- subtrees in the MIB
+-- **********************************************************************
+
+arubaWiredPowerSupply OBJECT IDENTIFIER ::= { arubaWiredChassisMIB 2 }
+arubaWiredTempSensor  OBJECT IDENTIFIER ::= { arubaWiredChassisMIB 3 }
+arubaWiredFanTray     OBJECT IDENTIFIER ::= { arubaWiredChassisMIB 4 }
+arubaWiredFan         OBJECT IDENTIFIER ::= { arubaWiredChassisMIB 5 }
+arubaWiredModule      OBJECT IDENTIFIER ::= { arubaWiredChassisMIB 6 }
+
+END
