@@ -204,12 +204,12 @@ function get_port_stats_by_port_hostname(Illuminate\Http\Request $request)
     return check_port_permission($port['port_id'], $device_id, function () use ($request, $port) {
         $in_rate = $port['ifInOctets_rate'] * 8;
         $out_rate = $port['ifOutOctets_rate'] * 8;
-        $port['in_rate'] = Number::formatSi($in_rate, 2, 3, 'bps');
-        $port['out_rate'] = Number::formatSi($out_rate, 2, 3, 'bps');
+        $port['in_rate'] = Number::formatSi($in_rate, 2, 0, 'bps');
+        $port['out_rate'] = Number::formatSi($out_rate, 2, 0, 'bps');
         $port['in_perc'] = Number::calculatePercent($in_rate, $port['ifSpeed']);
         $port['out_perc'] = Number::calculatePercent($out_rate, $port['ifSpeed']);
-        $port['in_pps'] = Number::formatBi($port['ifInUcastPkts_rate'], 2, 3, '');
-        $port['out_pps'] = Number::formatBi($port['ifOutUcastPkts_rate'], 2, 3, '');
+        $port['in_pps'] = Number::formatBi($port['ifInUcastPkts_rate'], 2, 0, '');
+        $port['out_pps'] = Number::formatBi($port['ifOutUcastPkts_rate'], 2, 0, '');
 
         //only return requested columns
         if ($request->has('columns')) {
@@ -437,14 +437,18 @@ function add_device(Illuminate\Http\Request $request)
             $device->snmpver = $data['version'];
         }
 
+        $force_add = ! empty($data['force_add']);
+
         if (! empty($data['snmp_disable'])) {
             $device->os = $data['os'] ?? 'ping';
             $device->sysName = $data['sysName'] ?? '';
             $device->hardware = $data['hardware'] ?? '';
             $device->snmp_disable = 1;
+        } elseif ($force_add && ! $device->hasSnmpInfo()) {
+            return api_error(400, 'SNMP information is required when force adding a device');
         }
 
-        (new ValidateDeviceAndCreate($device, ! empty($data['force_add']), ! empty($data['ping_fallback'])))->execute();
+        (new ValidateDeviceAndCreate($device, $force_add, ! empty($data['ping_fallback'])))->execute();
     } catch (Exception $e) {
         return api_error(500, $e->getMessage());
     }
@@ -1112,6 +1116,21 @@ function get_port_ip_addresses(Illuminate\Http\Request $request)
     });
 }
 
+function get_port_fdb(Illuminate\Http\Request $request)
+{
+    $port_id = $request->route('portid');
+
+    return check_port_permission($port_id, null, function ($port_id) {
+        $fdb = PortsFdb::where('port_id', $port_id)->get();
+
+        if ($fdb->isEmpty()) {
+            return api_error(404, "Port {$port_id} does not have any MAC addresses in fdb");
+        }
+
+        return api_success($fdb, 'macs');
+    });
+}
+
 function get_network_ip_addresses(Illuminate\Http\Request $request)
 {
     $network_id = $request->route('id');
@@ -1123,6 +1142,17 @@ function get_network_ip_addresses(Illuminate\Http\Request $request)
     }
 
     return api_success(array_merge($ipv4, $ipv6), 'addresses');
+}
+
+function get_port_transceiver(Illuminate\Http\Request $request)
+{
+    $port_id = $request->route('portid');
+
+    return check_port_permission($port_id, null, function ($port_id) {
+        $transceivers = Port::find($port_id)->transceivers()->get();
+
+        return api_success($transceivers, 'transceivers');
+    });
 }
 
 function get_port_info(Illuminate\Http\Request $request)
@@ -1244,17 +1274,10 @@ function get_all_ports(Illuminate\Http\Request $request): JsonResponse
 function get_port_stack(Illuminate\Http\Request $request)
 {
     $hostname = $request->route('hostname');
-    // use hostname as device_id if it's all digits
-    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $device = DeviceCache::get($hostname);
 
-    return check_device_permission($device_id, function ($device_id) use ($request) {
-        if ($request->get('valid_mappings')) {
-            $mappings = dbFetchRows("SELECT * FROM `ports_stack` WHERE (`device_id` = ? AND `ifStackStatus` = 'active' AND (`port_id_high` != '0' AND `port_id_low` != '0')) ORDER BY `port_id_high`", [$device_id]);
-        } else {
-            $mappings = dbFetchRows("SELECT * FROM `ports_stack` WHERE `device_id` = ? AND `ifStackStatus` = 'active' ORDER BY `port_id_high`", [$device_id]);
-        }
-
-        return api_success($mappings, 'mappings');
+    return check_device_permission($device->device_id, function () use ($device) {
+        return api_success($device->portsStack, 'mappings');
     });
 }
 
@@ -1264,7 +1287,7 @@ function update_device_port_notes(Illuminate\Http\Request $request): JsonRespons
 
     $hostname = $request->route('hostname');
     // use hostname as device_id if it's all digits
-    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $device = \DeviceCache::get($hostname);
 
     $data = json_decode($request->getContent(), true);
     $field = 'notes';
@@ -1273,7 +1296,7 @@ function update_device_port_notes(Illuminate\Http\Request $request): JsonRespons
         return api_error(400, 'Port field to patch has not been supplied.');
     }
 
-    if (set_dev_attrib($device_id, 'port_id_notes:' . $portid, $content)) {
+    if ($device->setAttrib('port_id_notes:' . $portid, $content)) {
         return api_success_noresult(200, 'Port ' . $field . ' field has been updated');
     } else {
         return api_error(500, 'Port ' . $field . ' field failed to be updated');
@@ -1717,15 +1740,15 @@ function list_bills(Illuminate\Http\Request $request)
         $overuse = '';
 
         if (strtolower($bill['bill_type']) == 'cdr') {
-            $allowed = Number::formatSi($bill['bill_cdr'], 2, 3, '') . 'bps';
-            $used = Number::formatSi($rate_data['rate_95th'], 2, 3, '') . 'bps';
+            $allowed = Number::formatSi($bill['bill_cdr'], 2, 0, '') . 'bps';
+            $used = Number::formatSi($rate_data['rate_95th'], 2, 0, '') . 'bps';
             if ($bill['bill_cdr'] > 0) {
                 $percent = Number::calculatePercent($rate_data['rate_95th'], $bill['bill_cdr']);
             } else {
                 $percent = '-';
             }
             $overuse = $rate_data['rate_95th'] - $bill['bill_cdr'];
-            $overuse = (($overuse <= 0) ? '-' : Number::formatSi($overuse, 2, 3, ''));
+            $overuse = (($overuse <= 0) ? '-' : Number::formatSi($overuse, 2, 0, ''));
         } elseif (strtolower($bill['bill_type']) == 'quota') {
             $allowed = Billing::formatBytes($bill['bill_quota']);
             $used = Billing::formatBytes($rate_data['total_data']);
@@ -2713,6 +2736,23 @@ function get_fdb(Illuminate\Http\Request $request)
     });
 }
 
+function get_transceivers(Illuminate\Http\Request $request)
+{
+    $hostname = $request->route('hostname');
+
+    if (empty($hostname)) {
+        return api_error(500, 'No hostname has been provided');
+    }
+
+    $device = DeviceCache::get($hostname);
+
+    if (! $device) {
+        return api_error(404, "Device $hostname not found");
+    }
+
+    return api_success($device->transceivers()->hasAccess($request->user())->get(), 'transceivers');
+}
+
 function list_fdb(Illuminate\Http\Request $request)
 {
     $mac = $request->route('mac');
@@ -2805,8 +2845,6 @@ function list_arp(Illuminate\Http\Request $request)
 
     if (empty($query)) {
         return api_error(400, 'No valid IP/MAC provided');
-    } elseif ($query === 'all' && empty($hostname)) {
-        return api_error(400, 'Device argument is required when requesting all entries');
     }
 
     if ($query === 'all') {
@@ -2822,9 +2860,9 @@ function list_arp(Illuminate\Http\Request $request)
         }
     } elseif (filter_var($query, FILTER_VALIDATE_MAC)) {
         $mac = Mac::parse($query)->hex();
-        $arp = Ipv4Mac::where('mac_address', $mac);
+        $arp = Ipv4Mac::where('mac_address', $mac)->get();
     } else {
-        $arp = Ipv4Mac::where('ipv4_address', $query);
+        $arp = Ipv4Mac::where('ipv4_address', $query)->get();
     }
 
     return api_success($arp, 'arp');

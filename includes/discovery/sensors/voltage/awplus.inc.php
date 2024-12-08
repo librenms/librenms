@@ -15,7 +15,7 @@ if ($pre_cache['awplus-sfpddm']) {
             $descr = $tmp['ifName'];
             $oid = '.1.3.6.1.4.1.207.8.4.4.3.28.1.2.1.3.' . $index;
             discover_sensor(
-                $valid['sensor'],
+                null,
                 'voltage',
                 $device,
                 $oid,
@@ -23,12 +23,12 @@ if ($pre_cache['awplus-sfpddm']) {
                 'atPluggableDiagVccStatusReading',
                 'SFP:' . $descr,
                 $divisor,
-                null, // $multiplier,
+                1,
                 $low_limit,
                 $low_warn_limit,
                 $high_warn_limit,
                 $high_limit,
-                $value,
+                $data['atPluggableDiagVccStatusReading'] / $divisor,
                 'snmp',
                 $ifIndex,
                 null,

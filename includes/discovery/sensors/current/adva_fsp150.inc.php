@@ -40,7 +40,7 @@ foreach (array_keys($pre_cache['adva_fsp150']) as $index) {
             $current = $pre_cache['adva_fsp150'][$index][$entry['sensor_name']] / $divisor;
 
             discover_sensor(
-                $valid['sensor'],
+                null,
                 'current',
                 $device,
                 $oid,
@@ -73,7 +73,7 @@ foreach ($pre_cache['adva_fsp150_ports'] as $index => $entry) {
             $descr = ($pre_cache['adva_fsp150_ifName'][$entry['cmEthernetNetPortIfIndex']]['ifName'] ?? 'ifIndex ' . $entry['cmEthernetNetPortIfIndex']) . ' BIAS';
 
             discover_sensor(
-                $valid['sensor'],
+                null,
                 'current',
                 $device,
                 $oid,
@@ -102,7 +102,7 @@ foreach ($pre_cache['adva_fsp150_ports'] as $index => $entry) {
             $entPhysicalIndex_measured = 'ports';
             $descr = ($pre_cache['adva_fsp150_ifName'][$entry['cmEthernetAccPortIfIndex']]['ifName'] ?? 'ifIndex ' . $entry['cmEthernetAccPortIfIndex']) . ' BIAS';
             discover_sensor(
-                $valid['sensor'],
+                null,
                 'current',
                 $device,
                 $oid,
@@ -132,7 +132,7 @@ foreach ($pre_cache['adva_fsp150_ports'] as $index => $entry) {
             $descr = ($pre_cache['adva_fsp150_ifName'][$entry['cmEthernetTrafficPortIfIndex']]['ifName'] ?? 'ifIndex ' . $entry['cmEthernetTrafficPortIfIndex']) . ' BIAS';
 
             discover_sensor(
-                $valid['sensor'],
+                null,
                 'current',
                 $device,
                 $oid,

@@ -41,11 +41,11 @@ use App\Models\User;
 use App\Models\UserPref;
 use App\Models\Vminfo;
 use App\Models\WirelessSensor;
-use App\Plugins\Hooks\MenuEntryHook;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 use LibreNMS\Config;
+use LibreNMS\Interfaces\Plugins\Hooks\MenuEntryHook;
 use LibreNMS\Plugins;
 use LibreNMS\Util\ObjectCache;
 use PluginManager;
@@ -83,6 +83,7 @@ class MenuComposer
         $vars['package_count'] = Package::hasAccess($user)->count();
 
         $vars['device_types'] = Device::hasAccess($user)->select('type')->distinct()->where('type', '!=', '')->orderBy('type')->pluck('type');
+        $vars['no_devices_added'] = ! Device::hasAccess($user)->exists();
 
         $vars['locations'] = (Config::get('show_locations') && Config::get('show_locations_dropdown')) ?
             Location::hasAccess($user)->where('location', '!=', '')->orderBy('location')->get(['location', 'id']) :

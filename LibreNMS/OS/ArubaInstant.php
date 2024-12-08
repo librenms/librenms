@@ -27,6 +27,8 @@
 namespace LibreNMS\OS;
 
 use App\Models\Device;
+use App\Models\EntPhysical;
+use Illuminate\Support\Collection;
 use LibreNMS\Device\Processor;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
@@ -354,5 +356,44 @@ class ArubaInstant extends OS implements
         }
 
         return $data;
+    }
+
+    public function discoverEntityPhysical(): Collection
+    {
+        $inventory = new Collection;
+
+        $ai_ig_data = \SnmpQuery::walk('AI-AP-MIB::aiInfoGroup')->table(1);
+        $master_ip = $ai_ig_data[0]['AI-AP-MIB::aiMasterIPAddress'] ?? null;
+        if ($master_ip) {
+            $inventory->push(new EntPhysical([
+                'entPhysicalIndex' => 1,
+                'entPhysicalDescr' => $ai_ig_data[0]['AI-AP-MIB::aiVirtualControllerIPAddress'],
+                'entPhysicalClass' => 'chassis',
+                'entPhysicalName' => $ai_ig_data[0]['AI-AP-MIB::aiVirtualControllerName'],
+                'entPhysicalModelName' => 'Instant Virtual Controller Cluster',
+                'entPhysicalSerialNum' => $ai_ig_data[0]['AI-AP-MIB::aiVirtualControllerKey'],
+                'entPhysicalMfgName' => 'Aruba',
+            ]));
+        }
+
+        $index = 2;
+        $ap_data = \SnmpQuery::hideMib()->walk('AI-AP-MIB:aiAccessPointTable')->table(1);
+        foreach ($ap_data as $mac => $entry) {
+            $type = $master_ip == $entry['aiAPIPAddress'] ? 'Master' : 'Member';
+            $inventory->push(new EntPhysical([
+                'entPhysicalIndex' => $index++,
+                'entPhysicalDescr' => $entry['aiAPMACAddress'],
+                'entPhysicalName' => sprintf('%s %s Cluster %s', $entry['aiAPName'], $entry['aiAPIPAddress'], $type),
+                'entPhysicalClass' => 'other',
+                'entPhysicalContainedIn' => 1,
+                'entPhysicalSerialNum' => $entry['aiAPSerialNum'],
+                'entPhysicalModelName' => $entry['aiAPModel'],
+                'entPhysicalMfgName' => 'Aruba',
+                'entPhysicalVendorType' => 'accessPoint',
+                'entPhysicalSoftwareRev' => $this->getDevice()->version,
+            ]));
+        }
+
+        return $inventory;
     }
 }

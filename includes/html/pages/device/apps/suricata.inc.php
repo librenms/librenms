@@ -9,6 +9,10 @@ $link_array = [
     'app' => 'suricata',
 ];
 
+if (isset($vars['sinstance'])) {
+    $vars['sinstance'] = htmlspecialchars($vars['sinstance']);
+}
+
 $app_data = $app->data;
 
 print_optionbar_start();
@@ -33,6 +37,7 @@ echo ' | Instances: ';
 $suricata_instances = $app->data['instances'] ?? [];
 sort($suricata_instances);
 foreach ($suricata_instances as $index => $sinstance) {
+    $sinstance = htmlspecialchars($sinstance);
     $label = $vars['sinstance'] == $sinstance
         ? '<span class="pagemenu-selected">' . $sinstance . '</span>'
         : $sinstance;

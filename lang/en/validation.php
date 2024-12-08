@@ -267,7 +267,7 @@ return [
         ],
         'poller' => [
             'CheckActivePoller' => [
-                'fail' => 'No active polling method detected',
+                'fail' => 'Poller is not running.  No poller has run within the last :interval seconds.',
                 'both_fail' => 'Both Dispatcher Service and Python Wrapper were active recently, this could cause double polling',
                 'ok' => 'Active pollers found',
             ],

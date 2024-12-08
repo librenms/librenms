@@ -29,6 +29,7 @@ use App\Models\Mempool;
 use Closure;
 use Exception;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use LibreNMS\Device\Processor;
 use Rrd;
@@ -70,7 +71,7 @@ trait HostResources
      */
     public function discoverProcessors()
     {
-        echo 'Host Resources: ';
+        Log::info('Host Resources: ');
         $processors = [];
 
         try {

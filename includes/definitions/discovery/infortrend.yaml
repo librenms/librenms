@@ -1,0 +1,36 @@
+mib: IFT-SNMP-MIB
+modules:
+   os:
+        serial: 
+            - IFT-SNMP-MIB::serialNum.0
+        hardware:
+            - IFT-SNMP-MIB::privateLogoModel.0
+   sensors:
+       temperature:
+            data:
+                -
+                    oid: luDevTable
+                    value: luDevValue
+                    num_oid: '.1.3.6.1.4.1.1714.1.1.9.1.9.{{ $index }}'
+                    divisor: 10
+                    index: 'temp{{ $index }}'
+                    descr: luDevDescription
+                    skip_values:                
+                        -
+                            oid: luDevTypeCode
+                            op: '!='
+                            value: 3
+       voltage:
+            data:
+                - 
+                    oid: luDevTable
+                    value: luDevValue
+                    num_oid: '.1.3.6.1.4.1.1714.1.1.9.1.9.{{ $index }}'
+                    divisor: 1000
+                    index: 'voltage{{ $index }}'
+                    descr: luDevDescription
+                    skip_values:                
+                        -
+                            oid: luDevTypeCode
+                            op: '!='
+                            value: 5
