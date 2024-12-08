@@ -40,6 +40,7 @@ class DatastoreTest extends TestCase
         Config::forget([
             'graphite',
             'influxdb',
+            'influxdbv2',
             'opentsdb',
             'prometheus',
             'rrd',
@@ -60,18 +61,20 @@ class DatastoreTest extends TestCase
         Config::set('rrd.enable', false);
         Config::set('graphite.enable', true);
         Config::set('influxdb.enable', true);
+        Config::set('influxdbv2.enable', true);
         Config::set('opentsdb.enable', true);
         Config::set('prometheus.enable', true);
 
         $ds = $this->app->make('Datastore');
         $stores = $ds->getStores();
-        $this->assertCount(4, $stores, 'Incorrect number of default stores enabled');
+        $this->assertCount(5, $stores, 'Incorrect number of default stores enabled');
 
         $enabled = array_map('get_class', $stores);
 
         $expected_enabled = [
             'LibreNMS\Data\Store\Graphite',
             'LibreNMS\Data\Store\InfluxDB',
+            'LibreNMS\Data\Store\InfluxDBv2',
             'LibreNMS\Data\Store\OpenTSDB',
             'LibreNMS\Data\Store\Prometheus',
         ];

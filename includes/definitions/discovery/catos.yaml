@@ -1,3 +1,4 @@
 modules:
   os:
-    sysDescr_regex: '/(?<hardware>WS-[\w-]+).*Version (?<version>[\w.()]+)/'
+    sysDescr_regex: '/(?<hardware>WS-[\w-]+).*Version (?<version>[\w.()]+)/s'
+    serial: ENTITY-MIB::entPhysicalSerialNum.1

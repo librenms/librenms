@@ -51,6 +51,12 @@ class Prometheus extends BaseDatastore
 
         $this->client = Http::client()->baseUrl($this->base_uri);
 
+        $user = Config::get('prometheus.user', '');
+        $passwd = Config::get('prometheus.password', '');
+        if ($user && $passwd) {
+            $this->client = $this->client->withBasicAuth($user, $passwd);
+        }
+
         $this->prefix = Config::get('prometheus.prefix', '');
         if ($this->prefix) {
             $this->prefix = "$this->prefix" . '_';

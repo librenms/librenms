@@ -12,6 +12,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Blade;
 use LibreNMS\Config;
+use LibreNMS\Interfaces\UI\DeviceTab;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Graph;
 use LibreNMS\Util\Url;
@@ -49,6 +50,7 @@ class DeviceController extends Controller
         'alert-stats' => \App\Http\Controllers\Device\Tabs\AlertStatsController::class,
         'showconfig' => \App\Http\Controllers\Device\Tabs\ShowConfigController::class,
         'netflow' => \App\Http\Controllers\Device\Tabs\NetflowController::class,
+        'qos' => \App\Http\Controllers\Device\Tabs\QosController::class,
         'latency' => \App\Http\Controllers\Device\Tabs\LatencyController::class,
         'nac' => \App\Http\Controllers\Device\Tabs\NacController::class,
         'notes' => \App\Http\Controllers\Device\Tabs\NotesController::class,
@@ -83,11 +85,14 @@ class DeviceController extends Controller
         $parent_id = Vminfo::guessFromDevice($device)->value('device_id');
         $overview_graphs = $this->buildDeviceGraphArrays($device);
 
+        /** @var DeviceTab[] $tabs */
         $tabs = array_map(function ($class) {
             return app()->make($class);
         }, array_filter($this->tabs, 'class_exists')); // TODO remove filter
-        $title = $tabs[$current_tab]->name();
-        $data = $tabs[$current_tab]->data($device);
+        $tab_controller = $tabs[$current_tab];
+        $title = $tab_controller->name();
+        $data = $tab_controller->data($device, $request);
+        $page_links = $data['page_links'] ?? [];
 
         // Device Link Menu, select the primary link
         $device_links = $this->deviceLinkMenu($device, $current_tab);
@@ -159,18 +164,21 @@ class DeviceController extends Controller
             $title = __('Edit');
 
             // check if metric has more specific edit page
-            if (preg_match('#health/metric=(\w+)#', \Request::path(), $matches)) {
+            $path = \Request::path();
+            if (preg_match('#health/metric=(\w+)#', $path, $matches)) {
                 if ($this->editTabExists($matches[1])) {
                     $current_tab = $matches[1];
                 } elseif ($this->editTabExists($matches[1] . 's')) {
                     $current_tab = $matches[1] . 's';
                 }
+            } elseif (preg_match('#device/\d+/ports/transceivers#', $path)) {
+                $current_tab = 'transceivers';
             }
 
             // check if edit page exists
             if ($this->editTabExists($current_tab)) {
                 $suffix .= "/section=$current_tab";
-                $title .= ' ' . ucfirst($current_tab);
+                $title .= ' ' . __(ucfirst($current_tab));
             }
 
             $device_links['edit'] = [

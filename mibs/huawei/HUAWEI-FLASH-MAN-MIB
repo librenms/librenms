@@ -1,9 +1,9 @@
 -- =================================================================
--- Copyright (C) 2019 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2021 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- 
 -- Description: flash mangement mib
 -- Reference:   huawei enterprise mib
--- Version:     V2.05
+-- Version:     V2.07
 -- History:
 --             initial version 2002-12-20
 -- =================================================================
@@ -26,7 +26,7 @@
     
 --  1.3.6.1.4.1.2011.6.9
         hwFlash MODULE-IDENTITY 
-            LAST-UPDATED "201909260001Z"        -- Sep 26, 2019 at 00:00 GMT
+            LAST-UPDATED "202112170001Z"        -- Jan 06, 2021 at 00:00 GMT
             ORGANIZATION 
                   "Huawei Technologies Co.,Ltd."
             CONTACT-INFO 
@@ -37,6 +37,14 @@
                      Website: http://www.huawei.com
                      Email: support@huawei.com
                    "
+               DESCRIPTION 
+                "opFileTransferError description"
+               REVISION "202112170001Z"
+
+               DESCRIPTION 
+                " Delete 'of the mainboard' from the description of hwFlhSyncSourceFile"
+               REVISION "202101060001Z"
+
 		DESCRIPTION 
                 "Add trap node hwFlhStorageFullTrap "
         REVISION "201909260001Z"
@@ -1169,7 +1177,7 @@
                 
                 opFileOpenError(13) :invalid file name; file not found in partition
                 
-                opFileTransferError(14) :file transfer was unsuccessfull
+                opFileTransferError(14) :file transfer was unsuccessful
                 
                 opFileChecksumError(15) :file checksum in Flash si invalid
                 
@@ -1405,7 +1413,7 @@
             STATUS current
             DESCRIPTION
                 "The source file name to be transferred . 
-                It is located on the flash of the mainboard of a chassis.
+                It is located on the flash of a chassis.
                 It is combine with the hwFlhSyncSourcePath to specify the absolute file name.
                 It must be specified."
             ::= { hwFlhSyncEntry 5 }
@@ -1458,7 +1466,9 @@
             DESCRIPTION 
                 "A hwFlhSyncFailNotification is sent when the file copy operation failed."
             ::= { huaweiFlashNotification 3 }
-        
+
+
+
         huaweiStorageDevice OBJECT IDENTIFIER ::= { huaweiFlashManMIBObjects 4 }
         hwStorageTable OBJECT-TYPE
             SYNTAX SEQUENCE OF HwStorageEntry
@@ -1546,6 +1556,7 @@
                 "Description of the purpose of the storage devices on the system.
                 "
             ::= { hwStorageEntry 6 }
+
 --  1.3.6.1.4.1.2011.6.9.2
         huaweiFlashMIBConformance OBJECT IDENTIFIER ::= { hwFlash 2 }
         

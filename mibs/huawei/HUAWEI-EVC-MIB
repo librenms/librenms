@@ -1,9 +1,9 @@
 --  ==================================================================
--- Copyright (C) 2016 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2017 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- 
 -- Description: HUAWEI-EVC-MIB provides information about EVC
 -- Reference:
--- Version: V1.01
+-- Version: V1.02
 -- History:
 -- <author>,   <date>,  <contents>
 --  HUAWEI   2014-09-011  EVC private MIB
@@ -26,7 +26,7 @@
 
 -- September 11, 2014 at 16:55 GMT
 		hwEVC MODULE-IDENTITY 
-			LAST-UPDATED "201606170918Z"		-- September 11, 2014 at 16:55 GMT
+			LAST-UPDATED "201711100000Z"		
 			ORGANIZATION 
 				"Huawei Technologies Co.,Ltd."
 			CONTACT-INFO 
@@ -37,6 +37,9 @@
 				 Website: http://www.huawei.com
 				 Email: support@huawei.com
 				"
+			DESCRIPTION 
+				"Modify hwBDStatBDID."
+			REVISION "201711100000Z"		
 			DESCRIPTION 
 				"The EVC MIB module is defined to manage the EVC configuration under system or bride-domain view."
 			REVISION "201606170918Z"		-- September 11, 2014 at 16:55 GMT
@@ -84,7 +87,7 @@
 
 		hwBDStatBDID OBJECT-TYPE
 			SYNTAX Unsigned32 (1..16777215)
-			MAX-ACCESS not-accessible
+			MAX-ACCESS accessible-for-notify
 			STATUS current
 			DESCRIPTION
 				"Bridge-domain id."
@@ -137,7 +140,7 @@
 		hwEVCGroups OBJECT IDENTIFIER ::= { hwEVCConformance 2 }
 		
 		hwBDStatGroup OBJECT-GROUP
-			OBJECTS { hwBDStatInboundPackets, hwBDStatOutboundPackets, hwBDStatInboundBytes, hwBDStatOutboundBytes}
+			OBJECTS { hwBDStatBDID, hwBDStatInboundPackets, hwBDStatOutboundPackets, hwBDStatInboundBytes, hwBDStatOutboundBytes}
 			STATUS current
 			DESCRIPTION 
 				"This is the bridge-domain statistics group."

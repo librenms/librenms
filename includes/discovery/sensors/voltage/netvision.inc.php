@@ -10,7 +10,7 @@ $index = 200;
 $lowlimit = 0;
 $limit = null;
 
-discover_sensor($valid['sensor'], 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $volt);
+discover_sensor(null, 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $volt);
 
 for ($i = 1; $i <= 3; $i++) {
     $volt_oid = ".1.3.6.1.4.1.4555.1.1.1.1.3.3.1.2.$i";
@@ -22,7 +22,7 @@ for ($i = 1; $i <= 3; $i++) {
     $lowlimit = 0;
     $limit = null;
 
-    discover_sensor($valid['sensor'], 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $volt);
+    discover_sensor(null, 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $volt);
 }
 
 for ($i = 1; $i <= 3; $i++) {
@@ -35,5 +35,5 @@ for ($i = 1; $i <= 3; $i++) {
     $lowlimit = 0;
     $limit = null;
 
-    discover_sensor($valid['sensor'], 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $volt);
+    discover_sensor(null, 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $volt);
 }

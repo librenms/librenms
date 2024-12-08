@@ -25,7 +25,6 @@
 
 namespace App\Http\Controllers\Widgets;
 
-use App\Models\Device;
 use Illuminate\Http\Request;
 use LibreNMS\Config;
 
@@ -37,11 +36,11 @@ class WorldMapController extends WidgetController
     {
         $this->defaults = [
             'title' => null,
-            'title_url' => Config::get('leaflet.tile_url', '{s}.tile.openstreetmap.org'),
-            'init_lat' => Config::get('leaflet.default_lat', 51.4800),
-            'init_lng' => Config::get('leaflet.default_lng', 0),
-            'init_zoom' => Config::get('leaflet.default_zoom', 2),
-            'group_radius' => Config::get('leaflet.group_radius', 80),
+            'init_lat' => Config::get('leaflet.default_lat'),
+            'init_lng' => Config::get('leaflet.default_lng'),
+            'init_zoom' => Config::get('leaflet.default_zoom'),
+            'init_layer' => Config::get('geoloc.layer'),
+            'group_radius' => Config::get('leaflet.group_radius'),
             'status' => '0,1',
             'device_group' => null,
         ];
@@ -50,47 +49,17 @@ class WorldMapController extends WidgetController
     public function getView(Request $request)
     {
         $settings = $this->getSettings();
-        $status = explode(',', $settings['status']);
-
         $settings['dimensions'] = $request->get('dimensions');
-
-        $devices = Device::hasAccess($request->user())
-            ->with('location')
-            ->isActive()
-            ->whereIn('status', $status)
-            ->when($settings['device_group'], function ($query) use ($settings) {
-                $query->inDeviceGroup($settings['device_group']);
-            })
-            ->get()
-            ->filter(function ($device) use ($status) {
-                /** @var Device $device */
-                if (! ($device->location_id && $device->location && $device->location->coordinatesValid())) {
-                    return false;
-                }
-
-                // add extra data
-                /** @phpstan-ignore-next-line */
-                $device->markerIcon = 'greenMarker';
-                /** @phpstan-ignore-next-line */
-                $device->zOffset = 0;
-
-                if ($device->status == 0) {
-                    $device->markerIcon = 'redMarker';
-                    $device->zOffset = 10000;
-
-                    if ($device->isUnderMaintenance()) {
-                        if (in_array(0, $status)) {
-                            return false;
-                        }
-                        $device->markerIcon = 'blueMarker';
-                        $device->zOffset = 5000;
-                    }
-                }
-
-                return true;
-            });
-
-        $settings['devices'] = $devices;
+        $settings['status'] = array_map('intval', explode(',', $settings['status']));
+        $settings['map_config'] = [
+            'engine' => Config::get('geoloc.engine'),
+            'api_key' => Config::get('geoloc.api_key'),
+            'tile_url' => Config::get('leaflet.tile_url'),
+            'lat' => $settings['init_lat'],
+            'lng' => $settings['init_lng'],
+            'zoom' => $settings['init_zoom'],
+            'layer' => $settings['init_layer'],
+        ];
 
         return view('widgets.worldmap', $settings);
     }

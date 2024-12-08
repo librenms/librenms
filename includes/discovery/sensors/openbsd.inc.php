@@ -54,7 +54,7 @@ if (is_array($oids)) {
 
             // echo($descr . "|" . $index . "|" .$current . "|" . $bogus . "\n");
             if (! $bogus) {
-                discover_sensor($valid['sensor'], $type, $device, $oid, $index, 'openbsd-sensor', $descr, '1', '1', null, null, null, null, $current);
+                discover_sensor(null, $type, $device, $oid, $index, 'openbsd-sensor', $descr, '1', '1', null, null, null, null, $current);
             }
         }//end if
     }//end foreach

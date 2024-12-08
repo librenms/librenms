@@ -159,31 +159,27 @@ $max_repeaters = $device->getAttrib('snmp_max_repeaters');
 if (isset($update_message)) {
     if (is_array($update_message)) {
         foreach ($update_message as $message) {
-            flash()->addSuccess($message);
+            toast()->success($message);
         }
     }
 
     if (is_string($update_message)) {
-        flash()->addSuccess($update_message);
+        toast()->success($update_message);
     }
 
     unset($message, $update_message);
 }
 
-// use flash()->addError to call attention to the problem; don't let it time out
+// use flash()->error to call attention to the problem; don't let it time out
 if (isset($update_failed_message)) {
     if (is_array($update_failed_message)) {
         foreach ($update_failed_message as $error) {
-            flash()
-                ->option('timeout', 30000)
-                ->addError($error);
+            toast()->error($error, options: ['timeOut' => 30000]);
         }
     }
 
     if (is_string($update_failed_message)) {
-        flash()
-            ->option('timeout', 30000)
-            ->addError($update_failed_message);
+        toast()->error($update_failed_message, options: ['timeOut' => 30000]);
     }
 
     unset($error, $update_failed_message);

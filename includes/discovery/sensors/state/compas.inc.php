@@ -44,7 +44,7 @@ if (is_numeric($batteryTestState)) {
 
     $descr = 'Battery Test Status';
     //Discover Sensors
-    discover_sensor($valid['sensor'], 'state', $device, $curOID, $index, $state_name, $descr, '1', '1', null, null, null, null, $batteryTestState);
+    discover_sensor(null, 'state', $device, $curOID, $index, $state_name, $descr, '1', '1', null, null, null, null, $batteryTestState);
     //Create Sensor To State Index
     create_sensor_to_state_index($device, $state_name, $index);
 }
@@ -65,7 +65,7 @@ if (is_numeric($dcMode)) {
 
     $descr = 'System DC Mode';
     //Discover Sensors
-    discover_sensor($valid['sensor'], 'state', $device, $curOID, $index, $state_name, $descr, '1', '1', null, null, null, null, $dcMode);
+    discover_sensor(null, 'state', $device, $curOID, $index, $state_name, $descr, '1', '1', null, null, null, null, $dcMode);
     //Create Sensor To State Index
     create_sensor_to_state_index($device, $state_name, $index);
 }

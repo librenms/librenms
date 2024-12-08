@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Util\Oid;
+
 echo ' NetScaler ';
 
 echo ' Caching OIDs:';
@@ -13,7 +15,7 @@ if (! is_array($ns_sensor_array)) {
 foreach ($ns_sensor_array as $descr => $data) {
     $current = $data['sysHealthCounterValue'];
 
-    $oid = '.1.3.6.1.4.1.5951.4.1.1.41.7.1.2.' . \LibreNMS\Util\Oid::ofString($descr);
+    $oid = '.1.3.6.1.4.1.5951.4.1.1.41.7.1.2.' . Oid::encodeString($descr);
 
     $divisor = 1;
     if (str_contains($descr, 'Temp')) {
@@ -30,7 +32,7 @@ foreach ($ns_sensor_array as $descr => $data) {
 
     if (is_numeric($current) && $type) {
         discover_sensor(
-            $valid['sensor'],
+            null,
             $type,
             $device,
             $oid,

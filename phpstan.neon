@@ -1,7 +1,7 @@
 includes:
     - phpstan-baseline.neon
     - tests/phpstan/ignore-by-php-version.neon.php
-    - vendor/nunomaduro/larastan/extension.neon
+    - vendor/larastan/larastan/extension.neon
     - vendor/phpstan/phpstan-mockery/extension.neon
 
 parameters:

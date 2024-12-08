@@ -1,9 +1,9 @@
 -- =================================================================
--- Copyright (C) 2017 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2020 by  HUAWEI TECHNOLOGIES. All rights reserved.
 --
 -- Description: Huawei Ethernet ND MIB
 -- Reference: HUAWEI Enterprise MIB
--- Version: V1.03
+-- Version: V1.16
 -- History:
 -- gaoning , 2014-06-27, add nodes for ND.
 -- =================================================================
@@ -21,11 +21,13 @@
                 FROM SNMPv2-CONF
             ifIndex, ifName, InterfaceIndex,InterfaceIndexOrZero,ifAdminStatus,ifOperStatus,ifDescr          
                 FROM IF-MIB
+            Ipv6Address                             
+                FROM IPV6-TC
             PhysicalIndex, entPhysicalIndex, entPhysicalName
                 FROM ENTITY-MIB;        
             
         hwNDMIB MODULE-IDENTITY 
-            LAST-UPDATED "201708171600Z"        
+            LAST-UPDATED "202011191449Z"         
             ORGANIZATION 
                   "Huawei Technologies Co.,Ltd."
             CONTACT-INFO 
@@ -36,9 +38,50 @@
                    Website: http://www.huawei.com
                    Email: support@huawei.com
                   "
+            
             DESCRIPTION 
-                "Please provide the descritpion."
+                "V1.16, Add enum of  hwNDLimitSuppressType at 2020-11-19."
 
+            REVISION    "202011191449Z"
+            DESCRIPTION 
+                "V1.15, Modify description of hwNDProxyDynThresholdExceedAlarm and hwNDProxyDynThresholdResumeAlarm at 2020-10-15"
+
+            REVISION    "202010151512Z"
+            DESCRIPTION 
+                "V1.14, Modify description of hwNDProxyThresholdExceedAlarm and hwNDProxyThresholdResumeAlarm at 2020-10-15"
+
+            REVISION    "202010150936Z"
+            DESCRIPTION 
+                "V1.13, Modify description of hwSlotProxyNDThresholdExceedAlarm and hwSlotProxyNDThresholdResumeAlarm at 2020-09-29"
+
+            REVISION    "202009291600Z"
+            DESCRIPTION 
+                "V1.12, modify English low-level mistakes."
+            REVISION    "202008101643Z" 
+            DESCRIPTION 
+                "V1.11, modify the element description of HwNDRateEntryLimit."
+            REVISION    "202005282000Z" 
+            DESCRIPTION 
+                "V1.10, modify the element type of HwNDRateEntryLimit."
+            REVISION    "202004231000Z" 
+            DESCRIPTION 
+                "V1.09, add hwNDAntiAttackRateLimit."
+            REVISION    "202003061000Z" 
+			DESCRIPTION 
+                "V1.08, add hwNDDADNotFinished."
+            REVISION    "201907181600Z" 
+            DESCRIPTION 
+                "V1.07, MOD hwNDDulicateTgtIf, hwNDDulicateLocalIf  OBJECT-TYPE."
+            REVISION    "201906051426Z" 
+            DESCRIPTION 
+                "V1.06, add hwNDDuplicateIPv6, hwNDDuplicateIPv6Resume."
+            REVISION    "201905271426Z"   
+            DESCRIPTION 
+                "V1.06, add hwNDDuplicateIPv6, hwNDDuplicateIPv6Resume."
+            REVISION    "201905251426Z"   
+            DESCRIPTION "V1.05, add hwNDSlotRemoteNumber and hwNDIntfRemoteNumber."
+            REVISION    "201802081600Z"   
+            DESCRIPTION "V1.04, add hwNDHostConflict and hwNDHostConflictResolved."
 			REVISION    "201708171600Z"   
             DESCRIPTION "V1.02, Modify description of hwNDSlotThresholdExceedValue and hwNDIntfThresholdExceedValue at 2017-07-04"
 
@@ -49,7 +92,7 @@
 			REVISION    "201407011600Z"   
             DESCRIPTION "V1.01, initial version."
 			
-			REVISION    "201008111600Z"   
+            REVISION    "201008111600Z"   
             DESCRIPTION "V1.00, initial version."
     
             ::= { hwDatacomm 332 }
@@ -83,7 +126,8 @@ hwNDStatisticsPerSlotTable OBJECT-TYPE
 		hwNDSlotThresholdResumeValue   Unsigned32  ,
 		hwNDSlotDynamicNumber   Unsigned32  ,
 		hwNDSlotStaticNumber   Unsigned32 ,
-		hwNDSlotTotalNumber    Unsigned32				
+		hwNDSlotTotalNumber    Unsigned32 ,
+		hwNDSlotRemoteNumber   Unsigned32                    
 	 }      
 
 	hwNDSlotPhysicalIndex  OBJECT-TYPE
@@ -133,6 +177,14 @@ hwNDStatisticsPerSlotTable OBJECT-TYPE
 	   DESCRIPTION
 		"Maximum ND entries number for slot."
 	::= { hwNDStatisticsPerSlotEntry 6 }  
+
+	hwNDSlotRemoteNumber  OBJECT-TYPE
+	   SYNTAX Unsigned32(0..4294967294)
+	   MAX-ACCESS read-only
+	   STATUS current
+	   DESCRIPTION
+		"Current remote ND entries in slot."
+	::= { hwNDStatisticsPerSlotEntry 7 }  
 										
 -- =================================================================
 -- 2th interface nd entries alarm
@@ -161,7 +213,8 @@ hwNDStatisticsPerIfTable OBJECT-TYPE
 		hwNDIntfThresholdResumeValue   Unsigned32  ,
 		hwNDIntfDynamicNumber   Unsigned32  ,
 		hwNDIntfStaticNumber   Unsigned32 ,
-		hwNDIntfTotalNumber    Unsigned32				
+		hwNDIntfTotalNumber    Unsigned32 ,	
+		hwNDIntfRemoteNumber   Unsigned32			
 	 }      
 
 	hwNDIntfIndex  OBJECT-TYPE
@@ -210,40 +263,591 @@ hwNDStatisticsPerIfTable OBJECT-TYPE
 	   STATUS current
 	   DESCRIPTION
 		"Maximum ND entries number for interface."
-	::= { hwNDStatisticsPerIfEntry 6 }  		
+	::= { hwNDStatisticsPerIfEntry 6 }  
+
+	hwNDIntfRemoteNumber  OBJECT-TYPE
+	   SYNTAX Unsigned32(0..4294967294)
+	   MAX-ACCESS read-only
+	   STATUS current
+	   DESCRIPTION
+		"Current remote ND entries in interface."
+	::= { hwNDStatisticsPerIfEntry 7 }  		
+
+-- =================================================================
+-- 3th ND host  IP address conflicted
+-- =================================================================           
+hwNDHostInfoTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF HwNDHostInfoEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The table contains the information of local host and remote host. 
+		The information includes host IP, host MAC, gateway VtepIP, gateway MAC."
+	::= { hwNDObjects 3 }  
+	
+	hwNDHostInfoEntry  OBJECT-TYPE
+	   SYNTAX HwNDHostInfoEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Entries of the host information table."
+	INDEX {hwNDHostBdId, hwNDHostIpv6Addr}
+	::= { hwNDHostInfoTable 1 }                                                
+									
+	HwNDHostInfoEntry ::=
+	SEQUENCE {
+		hwNDHostBdId  Unsigned32 ,		
+		hwNDHostIpv6Addr   Ipv6Address ,
+		hwNDHostLocalMAC   PhysAddress  ,
+		hwNDHostLocalIf   OCTET STRING ,
+		hwNDHostLocalPevid   Unsigned32 ,
+		hwNDHostLocalCevid    Unsigned32 ,		
+		hwNDHostRemoteMAC   PhysAddress  ,
+		hwNDHostRemoteIf   OCTET STRING ,
+		hwNDHostRemotePevid   Unsigned32 ,
+		hwNDHostRemoteCevid    Unsigned32				
+	 }      
+
+	hwNDHostBdId  OBJECT-TYPE
+		SYNTAX Unsigned32(0..4294967294)
+		MAX-ACCESS accessible-for-notify
+		STATUS current
+		DESCRIPTION
+		"The bridge domain ID of alarm generated."
+	::= { hwNDHostInfoEntry 1 } 
+   
+	hwNDHostIpv6Addr  OBJECT-TYPE
+	   SYNTAX Ipv6Address
+	   MAX-ACCESS accessible-for-notify
+	   STATUS current
+	   DESCRIPTION
+		"The IPv6 address of alarm generated in BD."
+	::= { hwNDHostInfoEntry 2 }  
+	
+	hwNDHostLocalMAC  OBJECT-TYPE
+	   SYNTAX PhysAddress
+	   MAX-ACCESS accessible-for-notify
+	   STATUS current
+	   DESCRIPTION
+		"The MAC address of hwNDHostIpv6Addr."
+	::= { hwNDHostInfoEntry 3 }  
+				
+	hwNDHostLocalIf  OBJECT-TYPE
+	   SYNTAX OCTET STRING
+	   MAX-ACCESS accessible-for-notify
+	   STATUS current
+	   DESCRIPTION
+		"The interface of BD that generate alarm."
+	::= { hwNDHostInfoEntry 4 }  
+				
+	hwNDHostLocalPevid  OBJECT-TYPE
+	   SYNTAX Unsigned32(0..4094)
+	   MAX-ACCESS accessible-for-notify
+	   STATUS current
+	   DESCRIPTION
+		"The pevid of hwNDHostWorkIfIndex."
+	::= { hwNDHostInfoEntry 5 }  									
+				
+	hwNDHostLocalCevid  OBJECT-TYPE
+	   SYNTAX Unsigned32(0..4094)
+	   MAX-ACCESS accessible-for-notify
+	   STATUS current
+	   DESCRIPTION
+		"The cevid of hwNDHostWorkIfIndex."
+	::= { hwNDHostInfoEntry 6 }  		
+
+	hwNDHostRemoteMAC  OBJECT-TYPE
+	   SYNTAX PhysAddress
+	   MAX-ACCESS accessible-for-notify
+	   STATUS current
+	   DESCRIPTION
+		"The MAC address of hwNDHostIpv6Addr."
+	::= { hwNDHostInfoEntry 7 }  
+				
+	hwNDHostRemoteIf  OBJECT-TYPE
+	   SYNTAX OCTET STRING
+	   MAX-ACCESS accessible-for-notify
+	   STATUS current
+	   DESCRIPTION
+		"The interface of BD that generate alarm."
+	::= { hwNDHostInfoEntry 8 }  
+				
+	hwNDHostRemotePevid  OBJECT-TYPE
+	   SYNTAX Unsigned32(0..4094)
+	   MAX-ACCESS accessible-for-notify
+	   STATUS current
+	   DESCRIPTION
+		"The pevid of hwNDHostWorkIfIndex."
+	::= { hwNDHostInfoEntry 9 }  									
+				
+	hwNDHostRemoteCevid  OBJECT-TYPE
+	   SYNTAX Unsigned32(0..4094)
+	   MAX-ACCESS accessible-for-notify
+	   STATUS current
+	   DESCRIPTION
+		"The cevid of hwNDHostWorkIfIndex."
+	::= { hwNDHostInfoEntry 10 }  
 								
-                                                                                          
+ 
+-- =================================================================
+-- ND Dupicate IPv6 address 
+-- =================================================================           
+hwNDDuplicateIPv6InfoTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF HwNDDuplicateIPv6InfoEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The table contains the information of duplicate ipv6 address and interface. 
+		The information includes PktType,TgtIpv6Address,TgtInterfaceName,LocInterfaceName,SrcMacAddress,DstMacAddress,SrcIpv6Address,DstIpv6Address,PeVLAN,CeVLAN,SelfLoop and DadAttempts."
+	::= { hwNDObjects 4 }  
+	
+	hwNDDuplicateIPv6InfoEntry  OBJECT-TYPE
+	   SYNTAX HwNDDuplicateIPv6InfoEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Entries of the Dupicate IPv6 table."  
+	INDEX {hwNDDulicatePktType, hwNDDulicateTgtIPv6Addr, hwNDDulicateTgtIf}
+	::= { hwNDDuplicateIPv6InfoTable 1 }   
+									
+	HwNDDuplicateIPv6InfoEntry ::=
+	SEQUENCE {
+		hwNDDulicatePktType  OCTET STRING ,
+		hwNDDulicateTgtIPv6Addr  Ipv6Address ,
+		hwNDDulicateTgtIf   DisplayString,
+		hwNDDulicateLocalIf   DisplayString,
+		hwNDDulicateSrcMAC   PhysAddress  ,
+		hwNDDulicateDstMAC   PhysAddress  ,
+		hwNDDulicateSrcIPv6Addr  Ipv6Address ,
+		hwNDDulicateDstIPv6Addr  Ipv6Address ,
+		hwNDDulicatePeVLAN  Unsigned32 ,
+		hwNDDulicateCeVLAN  Unsigned32 ,
+		hwNDDulicateSelfLoop  OCTET STRING ,
+		hwNDDulicateDadAttempts Unsigned32
+	 }      
+
+	hwNDDulicatePktType  OBJECT-TYPE
+	   SYNTAX OCTET STRING (SIZE (0..255))
+	   MAX-ACCESS accessible-for-notify
+	   STATUS current
+	   DESCRIPTION
+		"The packet type in the received ND message."
+	::= { hwNDDuplicateIPv6InfoEntry 1 } 
+	
+	hwNDDulicateTgtIPv6Addr  OBJECT-TYPE
+	   SYNTAX Ipv6Address
+	   MAX-ACCESS accessible-for-notify
+	   STATUS current
+	   DESCRIPTION
+		"The IPv6 address of alarm generated."
+	::= { hwNDDuplicateIPv6InfoEntry 2 }  
+	
+	hwNDDulicateTgtIf  OBJECT-TYPE
+	   SYNTAX DisplayString (SIZE (0..255))
+	   MAX-ACCESS accessible-for-notify
+	   STATUS current
+	   DESCRIPTION
+		"The interface name receiving the alarm."
+	::= { hwNDDuplicateIPv6InfoEntry 3 }  
+	
+	hwNDDulicateLocalIf  OBJECT-TYPE
+	   SYNTAX DisplayString (SIZE (0..255))
+	   MAX-ACCESS accessible-for-notify
+	   STATUS current
+	   DESCRIPTION
+		"The local interface name receiving the alarm."
+	::= { hwNDDuplicateIPv6InfoEntry 4 } 
+	
+	hwNDDulicateSrcMAC  OBJECT-TYPE
+	   SYNTAX PhysAddress
+	   MAX-ACCESS accessible-for-notify
+	   STATUS current
+	   DESCRIPTION
+		"The source MAC address in the received ND message."
+	::= { hwNDDuplicateIPv6InfoEntry 5 }  
+				
+	hwNDDulicateDstMAC  OBJECT-TYPE
+	   SYNTAX PhysAddress
+	   MAX-ACCESS accessible-for-notify
+	   STATUS current
+	   DESCRIPTION
+		"The destination MAC address in the received ND message."
+	::= { hwNDDuplicateIPv6InfoEntry 6 } 
+
+	hwNDDulicateSrcIPv6Addr  OBJECT-TYPE
+	   SYNTAX Ipv6Address
+	   MAX-ACCESS accessible-for-notify
+	   STATUS current
+	   DESCRIPTION
+		"The source IPv6 address in the received ND message."
+	::= { hwNDDuplicateIPv6InfoEntry 7 } 
+	
+	hwNDDulicateDstIPv6Addr  OBJECT-TYPE
+	   SYNTAX Ipv6Address
+	   MAX-ACCESS accessible-for-notify
+	   STATUS current
+	   DESCRIPTION
+		"The destination IPv6 address in the received ND message."
+	::= { hwNDDuplicateIPv6InfoEntry 8 } 
+	
+	hwNDDulicatePeVLAN  OBJECT-TYPE
+	   SYNTAX Unsigned32(0..4094)
+	   MAX-ACCESS accessible-for-notify
+	   STATUS current
+	   DESCRIPTION
+		"The outer VLAN ID carried in the received ND message."
+	::= { hwNDDuplicateIPv6InfoEntry 9 }  									
+				
+	hwNDDulicateCeVLAN  OBJECT-TYPE
+	   SYNTAX Unsigned32(0..4094)
+	   MAX-ACCESS accessible-for-notify
+	   STATUS current
+	   DESCRIPTION
+		"The inner VLAN ID carried in the received ND message."
+	::= { hwNDDuplicateIPv6InfoEntry 10 }  		
+
+	hwNDDulicateSelfLoop  OBJECT-TYPE
+	   SYNTAX OCTET STRING (SIZE (0..255))
+	   MAX-ACCESS accessible-for-notify
+	   STATUS current
+	   DESCRIPTION
+		"The self-loop flag in the received ND message."
+	::= { hwNDDuplicateIPv6InfoEntry 11 }  
+	
+	hwNDDulicateDadAttempts  OBJECT-TYPE
+		SYNTAX Unsigned32(0..4294967294)
+		MAX-ACCESS accessible-for-notify
+		STATUS current
+		DESCRIPTION
+		"The attempted times in the received message."
+	::= { hwNDDuplicateIPv6InfoEntry 12 } 
+
+-- =================================================================
+-- 5th ND DAD Not Finished
+-- =================================================================           
+hwNDDADInfoTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF HwNDDADInfoEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The table contains the information of DAD."
+	::= { hwNDObjects 5 }  
+	
+	hwNDDADInfoEntry  OBJECT-TYPE
+	   SYNTAX HwNDDADInfoEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Entries of the host information table."
+	INDEX {hwNDDADIf, hwNDDADAddr}
+	::= { hwNDDADInfoTable 1 }                                                
+									
+	HwNDDADInfoEntry ::=
+	SEQUENCE {
+		hwNDDADIf  OCTET STRING ,		
+		hwNDDADAddr   Ipv6Address ,
+		hwNDDADTimeout   Unsigned32				
+	 }
+	
+    hwNDDADIf  OBJECT-TYPE
+	   SYNTAX OCTET STRING
+	   MAX-ACCESS accessible-for-notify
+	   STATUS current
+	   DESCRIPTION
+		"The interface of DAD."
+	::= { hwNDDADInfoEntry 1 }  
+	
+	hwNDDADAddr  OBJECT-TYPE
+	   SYNTAX Ipv6Address
+	   MAX-ACCESS accessible-for-notify
+	   STATUS current
+	   DESCRIPTION
+		"The IPv6 address of DAD."
+	::= { hwNDDADInfoEntry 2 }  
+	
+	hwNDDADTimeout OBJECT-TYPE
+	   SYNTAX Unsigned32(1..60)
+	   MAX-ACCESS accessible-for-notify
+	   STATUS current
+	   DESCRIPTION
+		"The timeout of DAD."
+	::= { hwNDDADInfoEntry 3 } 
+
+-- =================================================================
+-- 6th ND Anti-attack Rate Limit 
+-- =================================================================           
+hwNDRateLimitTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF HwNDRateLimitEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The table contains the information of rate limit."
+	::= { hwNDObjects 6 }  
+	
+	hwNDRateLimitEntry  OBJECT-TYPE
+	   SYNTAX HwNDRateLimitEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Entries of the rate limit table."
+	INDEX {hwNDLimitPacketType}
+	::= { hwNDRateLimitTable 1 }                                                
+									
+	HwNDRateLimitEntry ::=
+	SEQUENCE {
+		hwNDLimitPacketType    INTEGER ,
+		hwNDLimitSuppressVal   Unsigned32 ,
+		hwNDLimitCurrentVal    Unsigned32 ,
+		hwNDLimitSuppressType  INTEGER ,
+		hwNDLimitIf            OCTET STRING ,
+		hwNDLimitWorkIf        OCTET STRING ,
+		hwNDLimitSrcMAC        PhysAddress ,
+		hwNDLimitDstMAC        PhysAddress ,
+		hwNDLimitSrcIP         Ipv6Address ,
+		hwNDLimitDstIP         Ipv6Address ,
+		hwNDLimitTargetIP      Ipv6Address ,
+		hwNDLimitPeVLAN        Unsigned32 ,
+		hwNDLimitCeVLAN        Unsigned32
+	 }
+     
+	hwNDLimitPacketType  OBJECT-TYPE
+	   SYNTAX  INTEGER {
+           rs(1),       -- router solicitation packet
+           ra(2),       -- router advertisement packet
+           ns(3),       -- neighbor solicitation packet
+           na(4),       -- neighbor advertisement packet 
+           ndmiss(5)    -- neighbor discovery miss
+       }
+	   MAX-ACCESS accessible-for-notify
+	   STATUS current
+	   DESCRIPTION
+		"Type of packets that are suppressed."
+	::= { hwNDRateLimitEntry 1 }
+     
+	hwNDLimitSuppressVal  OBJECT-TYPE
+	   SYNTAX Unsigned32(0..5000)
+	   MAX-ACCESS accessible-for-notify
+	   STATUS current
+	   DESCRIPTION
+		"Rate limit of ND packets or ND Miss messages."
+	::= { hwNDRateLimitEntry 2 }  
+    
+	hwNDLimitCurrentVal OBJECT-TYPE
+	   SYNTAX Unsigned32(0..4294967294)
+	   MAX-ACCESS accessible-for-notify
+	   STATUS current
+	   DESCRIPTION
+		"Current rate of ND packets or ND Miss messages."
+	::= { hwNDRateLimitEntry 3 }
+    
+	hwNDLimitSuppressType  OBJECT-TYPE
+	   SYNTAX  INTEGER {
+           srcip(1),            -- source ip
+           srcmac(2),           -- source mac
+           interface(3),        -- interface
+           interfacesrcip(4),   -- interface source ip
+           vsglobal(5),         -- virtual system
+           lsglobal(6),         -- logic system
+           dstip(7),            -- destination ip
+           tgtip(8)             -- target ip
+       }
+	   MAX-ACCESS accessible-for-notify
+	   STATUS current
+	   DESCRIPTION
+		"Suppress type."
+	::= { hwNDRateLimitEntry 4 }
+    
+	hwNDLimitIf  OBJECT-TYPE
+	   SYNTAX OCTET STRING
+	   MAX-ACCESS accessible-for-notify
+	   STATUS current
+	   DESCRIPTION
+		"Interface name."
+	::= { hwNDRateLimitEntry 5 }
+    
+	hwNDLimitWorkIf  OBJECT-TYPE
+	   SYNTAX OCTET STRING
+	   MAX-ACCESS accessible-for-notify
+	   STATUS current
+	   DESCRIPTION
+		"Work interface name."
+	::= { hwNDRateLimitEntry 6 }
+    
+	hwNDLimitSrcMAC  OBJECT-TYPE
+	   SYNTAX PhysAddress
+	   MAX-ACCESS accessible-for-notify
+	   STATUS current
+	   DESCRIPTION
+		"Source MAC address, if the address is an all-zero address, it is invalid."
+	::= { hwNDRateLimitEntry 7 }
+    
+	hwNDLimitDstMAC  OBJECT-TYPE
+	   SYNTAX PhysAddress
+	   MAX-ACCESS accessible-for-notify
+	   STATUS current
+	   DESCRIPTION
+		"Destination MAC address, if the address is an all-zero address, it is invalid."
+	::= { hwNDRateLimitEntry 8 }
+    
+	hwNDLimitSrcIP  OBJECT-TYPE
+	   SYNTAX Ipv6Address
+	   MAX-ACCESS accessible-for-notify
+	   STATUS current
+	   DESCRIPTION
+		"Source IPv6 address, when the packet type is not NS or RS, the source address is invalid if it is an unspecified address."
+	::= { hwNDRateLimitEntry 9 }
+
+	hwNDLimitDstIP  OBJECT-TYPE
+	   SYNTAX Ipv6Address
+	   MAX-ACCESS accessible-for-notify
+	   STATUS current
+	   DESCRIPTION
+		"Destination IPv6 address, if the address is an unspecified address, it is invalid."
+	::= { hwNDRateLimitEntry 10 }
+    
+	hwNDLimitTargetIP  OBJECT-TYPE
+	   SYNTAX Ipv6Address
+	   MAX-ACCESS accessible-for-notify
+	   STATUS current
+	   DESCRIPTION
+		"Target IPv6 address, if the address is an unspecified address, it is invalid."
+	::= { hwNDRateLimitEntry 11 }
+	
+	hwNDLimitPeVLAN  OBJECT-TYPE
+	   SYNTAX Unsigned32(0..4094)
+	   MAX-ACCESS accessible-for-notify
+	   STATUS current
+	   DESCRIPTION
+		"Outer VLAN ID."
+	::= { hwNDRateLimitEntry 12 }  									
+				
+	hwNDLimitCeVLAN  OBJECT-TYPE
+	   SYNTAX Unsigned32(0..4094)
+	   MAX-ACCESS accessible-for-notify
+	   STATUS current
+	   DESCRIPTION
+		"Inner VLAN ID."
+	::= { hwNDRateLimitEntry 13 }  	
+	
+-- =================================================================
+-- 7th slot nd proxy entries alarm
+-- =================================================================           
+    hwNDProxyObject OBJECT IDENTIFIER ::= { hwNDObjects 7 }
+	                                             
+   
+	hwNDProxyThresholdExceedValue  OBJECT-TYPE
+	   SYNTAX Unsigned32(1..100)
+	   MAX-ACCESS read-only
+	   STATUS current
+	   DESCRIPTION
+		"This object indicates an ND entry alarm threshold on a board. An ND entry threshold-exceeding alarm is generated when the ratio of the number of ND proxy entries on a board to the maximum number allowed is greater than or equal to the alarm threshold."
+	::= { hwNDProxyObject 1 }  
+	
+	hwNDProxyThresholdResumeValue  OBJECT-TYPE
+	   SYNTAX Unsigned32(1..100)
+	   MAX-ACCESS read-only
+	   STATUS current
+	   DESCRIPTION
+		"This object indicates an ND entry clear alarm threshold on a board. An ND entry clear alarm is generated when the ratio of the number of ND proxy entries on a board to the maximum number allowed is less than or equal to the clear alarm threshold."
+	::= { hwNDProxyObject 2 }  
+    
+	hwNDProxyDynamicNumber  OBJECT-TYPE
+	   SYNTAX Unsigned32(0..4294967294)
+	   MAX-ACCESS read-only
+	   STATUS current
+	   DESCRIPTION
+		"Current dynamic ND entries in slot."
+	::= { hwNDProxyObject 3 }
+	
+	
+    
 --  Notifications(trap) Definitions
 
     hwNDNotifications OBJECT IDENTIFIER ::= { hwNDMIB 2 } 	
             
     hwSlotNDThresholdExceedAlarm NOTIFICATION-TYPE
-            OBJECTS { entPhysicalName, hwNDSlotThresholdExceedValue,hwNDSlotDynamicNumber,hwNDSlotStaticNumber } 
+            OBJECTS { entPhysicalName, hwNDSlotThresholdExceedValue,hwNDSlotDynamicNumber,hwNDSlotStaticNumber,hwNDSlotRemoteNumber } 
             STATUS current     
             DESCRIPTION 
                 "This object indicates that an alarm is generated when the ratio of the number of ND entries on a board to the maximum number of ND entries supported on the board is greater than or equal to the 80% threshold."
             ::= { hwNDNotifications 1 }    
 			
     hwSlotNDThresholdResumeAlarm NOTIFICATION-TYPE
-            OBJECTS { entPhysicalName,hwNDSlotThresholdResumeValue,hwNDSlotDynamicNumber,hwNDSlotStaticNumber } 
+            OBJECTS { entPhysicalName,hwNDSlotThresholdResumeValue,hwNDSlotDynamicNumber,hwNDSlotStaticNumber,hwNDSlotRemoteNumber } 
             STATUS current     
             DESCRIPTION 
                 "This object indicates that a clear alarm is generated when the ratio of the number of ND entries on a board to the maximum number of ND entries supported on the board is less than or equal to the 70% threshold."
             ::= { hwNDNotifications 2 }    
 			
     hwInterfaceNDThresholdExceedAlarm NOTIFICATION-TYPE
-            OBJECTS { entPhysicalName,ifDescr,hwNDIntfThresholdExceedValue,hwNDIntfDynamicNumber,hwNDIntfStaticNumber } 
+            OBJECTS { entPhysicalName,ifDescr,hwNDIntfThresholdExceedValue,hwNDIntfDynamicNumber,hwNDIntfStaticNumber,hwNDIntfRemoteNumber } 
             STATUS current     
             DESCRIPTION 
                 "This object indicates that an alarm is generated when the ratio of the number of ND entries on an interface to the maximum number of ND entries supported on the interface is greater than or equal to the 80% threshold."
             ::= { hwNDNotifications 3 }    
             
     hwInterfaceNDThresholdResumeAlarm NOTIFICATION-TYPE
-            OBJECTS { entPhysicalName,ifDescr,hwNDIntfThresholdResumeValue,hwNDIntfDynamicNumber,hwNDIntfStaticNumber } 
+            OBJECTS { entPhysicalName,ifDescr,hwNDIntfThresholdResumeValue,hwNDIntfDynamicNumber,hwNDIntfStaticNumber,hwNDIntfRemoteNumber } 
             STATUS current     
             DESCRIPTION 
                 "This object indicates that a clear alarm is generated when the ratio of the number of ND entries on an interface to the maximum number of ND entries supported on the interface is less than or equal to the 70% threshold."
             ::= { hwNDNotifications 4 } 
+
+   hwNDHostIPConflict NOTIFICATION-TYPE
+            OBJECTS { hwNDHostBdId, hwNDHostIpv6Addr, hwNDHostLocalMAC,hwNDHostLocalIf,hwNDHostLocalPevid,hwNDHostLocalCevid,hwNDHostRemoteMAC,hwNDHostRemoteIf,hwNDHostRemotePevid,hwNDHostRemoteCevid } 
+            STATUS current     
+            DESCRIPTION 
+                "This object indicates that an alarm is generated when there may be two host have the same IPv6 address."
+            ::= { hwNDNotifications 5 }    
+            
+    hwNDHostIPConflictResume NOTIFICATION-TYPE
+            OBJECTS { hwNDHostBdId, hwNDHostIpv6Addr, hwNDHostLocalMAC,hwNDHostLocalIf,hwNDHostLocalPevid,hwNDHostLocalCevid,hwNDHostRemoteMAC,hwNDHostRemoteIf,hwNDHostRemotePevid,hwNDHostRemoteCevid } 
+            STATUS current     
+            DESCRIPTION 
+                "This object indicates the clear alarm of the alarm generated when there may be two host have the same IPv6 address."
+            ::= { hwNDNotifications 6 } 
+
+   hwNDDuplicateIPv6 NOTIFICATION-TYPE
+            OBJECTS { hwNDDulicatePktType,hwNDDulicateTgtIPv6Addr,hwNDDulicateTgtIf,hwNDDulicateLocalIf,hwNDDulicateSrcMAC,hwNDDulicateDstMAC,hwNDDulicateSrcIPv6Addr,hwNDDulicateDstIPv6Addr,hwNDDulicatePeVLAN,hwNDDulicateCeVLAN,hwNDDulicateSelfLoop,hwNDDulicateDadAttempts } 
+            STATUS current     
+            DESCRIPTION 
+                "This object indicates that an alarm is generated when customer config interface IPv6 address with the same as the current IPv6 address on the network."
+            ::= { hwNDNotifications 7 }    
+            
+   hwNDDuplicateIPv6Resume NOTIFICATION-TYPE
+            OBJECTS { hwNDDulicatePktType,hwNDDulicateTgtIPv6Addr,hwNDDulicateTgtIf,hwNDDulicateLocalIf,hwNDDulicateSrcMAC,hwNDDulicateDstMAC,hwNDDulicateSrcIPv6Addr,hwNDDulicateDstIPv6Addr,hwNDDulicatePeVLAN,hwNDDulicateCeVLAN,hwNDDulicateSelfLoop,hwNDDulicateDadAttempts } 
+            STATUS current     
+            DESCRIPTION 
+                "This object indicates the clear alarm of the alarm generated when there may not be an IPv6 address that has been used by any node to the interface"
+            ::= { hwNDNotifications 8 } 
+
+	hwNDDADNotFinished NOTIFICATION-TYPE
+            OBJECTS { hwNDDADIf, hwNDDADAddr, hwNDDADTimeout } 
+            STATUS current     
+            DESCRIPTION 
+                "This object indicates that an alarm is generated when DAD is not finished."
+            ::= { hwNDNotifications 9 }
+
+    hwNDAntiAttackRateLimit NOTIFICATION-TYPE
+            OBJECTS { hwNDLimitPacketType, hwNDLimitSuppressVal, hwNDLimitCurrentVal, hwNDLimitSuppressType, hwNDLimitIf, hwNDLimitWorkIf, hwNDLimitSrcMAC, hwNDLimitDstMAC, hwNDLimitSrcIP, hwNDLimitDstIP, hwNDLimitTargetIP, hwNDLimitPeVLAN, hwNDLimitCeVLAN } 
+            STATUS current     
+            DESCRIPTION 
+                "This object indicates that an alarm is generated when ND packet or ND Miss message speed exceeds the rate limit."
+            ::= { hwNDNotifications 10 } 
+
+    hwNDProxyDynThresholdExceedAlarm NOTIFICATION-TYPE
+            OBJECTS { hwNDProxyThresholdExceedValue, hwNDProxyDynamicNumber } 
+            STATUS current     
+            DESCRIPTION 
+                "This object indicates that an alarm is generated when the ratio of the number of proxy ND dynamic entries on a board to the maximum number of proxy ND entries supported on the board is greater than or equal to the 80% threshold."
+            ::= { hwNDNotifications 11 }    
+
+    hwNDProxyDynThresholdResumeAlarm NOTIFICATION-TYPE
+            OBJECTS { hwNDProxyThresholdResumeValue, hwNDProxyDynamicNumber } 
+            STATUS current     
+            DESCRIPTION 
+                "This object indicates that a clear alarm is generated when the ratio of the number of proxy ND dynmic entries on a board to the maximum number of proxy ND entries supported on the board is less than or equal to the 70% threshold."
+            ::= { hwNDNotifications 12 } 
  
 -- Conformance information
 
@@ -260,11 +864,12 @@ hwNDStatisticsPerIfTable OBJECT-TYPE
 		hwNDSlotThresholdResumeValue,
 		hwNDSlotDynamicNumber,
 		hwNDSlotStaticNumber,
-		hwNDSlotTotalNumber	
+		hwNDSlotTotalNumber,
+		hwNDSlotRemoteNumber
     }
     STATUS      current
     DESCRIPTION
-        "A collection of objects for ND threshold alarm in interface."
+        "A collection of objects for ND threshold alarm in slot."
     ::= { hwNDGroups 1 }		    	
 
     hwNDIntfGroup OBJECT-GROUP
@@ -274,19 +879,102 @@ hwNDStatisticsPerIfTable OBJECT-TYPE
 		hwNDIntfThresholdResumeValue,
 		hwNDIntfDynamicNumber,
 		hwNDIntfStaticNumber,
-		hwNDIntfTotalNumber	
+		hwNDIntfTotalNumber,
+		hwNDIntfRemoteNumber	
     }
     STATUS      current
     DESCRIPTION
-        "A collection of objects for ND threshold alarm in slot."
+        "A collection of objects for ND threshold alarm in interface."
     ::= { hwNDGroups  2 }	
+    
      hwNDNotificationsGroup NOTIFICATION-GROUP   
-        NOTIFICATIONS{ hwSlotNDThresholdExceedAlarm, hwSlotNDThresholdResumeAlarm, hwInterfaceNDThresholdExceedAlarm, hwInterfaceNDThresholdResumeAlarm}
+        NOTIFICATIONS{ hwSlotNDThresholdExceedAlarm, hwSlotNDThresholdResumeAlarm, hwInterfaceNDThresholdExceedAlarm, hwInterfaceNDThresholdResumeAlarm, hwNDHostIPConflict, hwNDHostIPConflictResume, hwNDDuplicateIPv6, hwNDDuplicateIPv6Resume, hwNDDADNotFinished, hwNDAntiAttackRateLimit, hwNDProxyDynThresholdExceedAlarm , hwNDProxyDynThresholdResumeAlarm}
         STATUS current
         DESCRIPTION
                  "notification Group."   
      ::= { hwNDGroups 3 }	
-		
+
+    hwNDHostInfoGroup OBJECT-GROUP
+    OBJECTS {
+		hwNDHostBdId,		
+		hwNDHostIpv6Addr,
+		hwNDHostLocalMAC,
+		hwNDHostLocalIf,
+		hwNDHostLocalPevid,
+		hwNDHostLocalCevid,	
+		hwNDHostRemoteMAC,
+		hwNDHostRemoteIf,
+		hwNDHostRemotePevid,
+		hwNDHostRemoteCevid
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects for host IPv6 address conflict."
+    ::= { hwNDGroups  4 }
+	
+    hwNDDuplicateIPv6InfoGroup OBJECT-GROUP
+    OBJECTS {
+		hwNDDulicatePktType,
+		hwNDDulicateTgtIPv6Addr,
+		hwNDDulicateTgtIf,
+		hwNDDulicateLocalIf,
+		hwNDDulicateSrcMAC,
+		hwNDDulicateDstMAC,
+		hwNDDulicateSrcIPv6Addr,
+		hwNDDulicateDstIPv6Addr,
+		hwNDDulicatePeVLAN,
+		hwNDDulicateCeVLAN,
+		hwNDDulicateSelfLoop,
+		hwNDDulicateDadAttempts
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects for duplicate IPv6 address."
+    ::= { hwNDGroups  5 }
+	
+	hwNDDADInfoGroup OBJECT-GROUP
+    OBJECTS {
+		hwNDDADIf,		
+		hwNDDADAddr,
+		hwNDDADTimeout
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects for DAD not finished."
+    ::= { hwNDGroups  6 }
+	
+    hwNDRateLimitGroup OBJECT-GROUP
+    OBJECTS {
+		hwNDLimitPacketType,
+		hwNDLimitSuppressVal,
+		hwNDLimitCurrentVal,
+		hwNDLimitSuppressType,
+		hwNDLimitIf,
+		hwNDLimitWorkIf,
+		hwNDLimitSrcMAC,
+		hwNDLimitDstMAC,
+		hwNDLimitSrcIP,
+		hwNDLimitDstIP,
+		hwNDLimitTargetIP,
+		hwNDLimitPeVLAN,
+		hwNDLimitCeVLAN
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects for ND packet or ND Miss message speed exceeding the rate limit."
+    ::= { hwNDGroups  7 }
+	
+	hwNDProxyGroup OBJECT-GROUP
+    OBJECTS {	
+		hwNDProxyThresholdExceedValue,
+		hwNDProxyThresholdResumeValue,
+		hwNDProxyDynamicNumber
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects for ND proxy threshold alarm in slot."
+    ::= { hwNDGroups 8 }	
+
 	hwNDCompliance MODULE-COMPLIANCE
     STATUS  current
     DESCRIPTION
@@ -294,7 +982,8 @@ hwNDStatisticsPerIfTable OBJECT-TYPE
     MODULE
         MANDATORY-GROUPS {
             hwNDSlotGroup,
-            hwNDIntfGroup
+            hwNDIntfGroup,
+            hwNDProxyGroup
         }  
       
    ::= { hwNDCompliances 1 }                                   

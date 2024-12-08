@@ -1,8 +1,8 @@
 -- ===================================================================
--- Copyright (C) 2016 by HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2020 by HUAWEI TECHNOLOGIES. All rights reserved.
 -- Description: 
 -- Reference:
--- Version: V1.01
+-- Version: V1.07
 -- ===================================================================
 
 
@@ -19,7 +19,7 @@
         OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP         FROM SNMPv2-CONF;
     
         hwNtpTrapMib MODULE-IDENTITY 
-            LAST-UPDATED "201610181600Z"        
+            LAST-UPDATED "202007071600Z"        
             ORGANIZATION 
                   "Huawei Technologies Co.,Ltd."
             CONTACT-INFO 
@@ -34,6 +34,24 @@
                 "This MIB is to provide TRAP support for NTP.
                 hwNtpStateChangeTrap & hwNtpSysPeerChangeTrap are added to notify the 
                 NTP state change & system peer change information"
+
+            REVISION    "202007071600Z"
+            DESCRIPTION "V1.07, adding hwNtpSynchronizationFailure hwNtpSynchronizationFailureResume"
+
+            REVISION    "202003121600Z"
+            DESCRIPTION "V1.06, adding hwNtpMaxPacketRecvPerSecReach, hwNtpMaxPacketRecvPerSecResume, hwNtpMaxPacketRecvPerSecr"
+
+            REVISION    "202003101600Z"
+            DESCRIPTION "V1.05, modify hwNtpMaxDynamicSessionsrange 0..100"
+
+            REVISION    "202003031600Z"
+            DESCRIPTION "V1.04, adding hwNtpDynamicSessionLimitReach, hwNtpDynamicSessionLimitReachResume, hwNtpMaxDynamicSessions"
+				
+            REVISION    "201909181600Z"
+            DESCRIPTION "V1.03, fixing the description of hwNtpCurrentClientNum"
+
+            REVISION    "201906182200Z"
+            DESCRIPTION "V1.02, adding hwNtpClientLimitExceed, hwNtpClientLimitExceedResume, hwNtpCurrentClientNum"
 				
             REVISION    "201610181600Z"
             DESCRIPTION "V1.01, adding hwNtpSourceVpnName, hwNtpOldSourceVpnName"
@@ -84,6 +102,30 @@
        DESCRIPTION
           "Indicates Vpn instance associated with the peer to which the local NTP clock is synchronized last time"
        ::= { hwNtpTrapObjects 5 }
+    
+       hwNtpCurrentClientNum OBJECT-TYPE
+        SYNTAX Integer32 (0..2147483647)
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "The value of this object identifies the current ntp client number."
+       ::= { hwNtpTrapObjects 6 }
+
+       hwNtpMaxDynamicSessions OBJECT-TYPE
+        SYNTAX Integer32 (0..100)
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "The value of this object identifies the maximum dynamic session number."
+       ::= { hwNtpTrapObjects 7 }
+
+       hwNtpMaxPacketRecvPerSecr OBJECT-TYPE
+        SYNTAX Integer32 (1..2147483647)
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "The value of this object identifies the current packet numbers which ntp received."
+       ::= { hwNtpTrapObjects 8 }
 
  hwNtpTraps OBJECT IDENTIFIER ::= { hwNtpTrapMib 2 }
         
@@ -111,7 +153,63 @@
                 "This TRAP is used to notify the NTP system peer change from one source IP to other source IP without state change.
                 This trap is generated when the selected NTP peer is changed"
             ::= { hwNtpTraps 2 }
+
+        hwNtpClientLimitExceed NOTIFICATION-TYPE
+            OBJECTS { hwNtpCurrentClientNum }
+            STATUS current
+            DESCRIPTION 
+                "This TRAP is used to notify the NTP client path limit exceed."
+            ::= { hwNtpTraps 3 }
+
+        hwNtpClientLimitExceedResume NOTIFICATION-TYPE
+            OBJECTS { hwNtpCurrentClientNum }
+            STATUS current
+            DESCRIPTION 
+                "This NTP client path limit exceed alarm was repaired."
+            ::= { hwNtpTraps 4 }
+
+        hwNtpDynamicSessionLimitReach NOTIFICATION-TYPE
+            OBJECTS { hwNtpMaxDynamicSessions }
+            STATUS current
+            DESCRIPTION 
+                "This TRAP is used to notify the NTP dynamic session limit reach."
+            ::= { hwNtpTraps 5 }
+
+        hwNtpDynamicSessionLimitReachResume NOTIFICATION-TYPE
+            OBJECTS { hwNtpMaxDynamicSessions }
+            STATUS current
+            DESCRIPTION 
+                "This NTP dynamic session limit reach alarm was repaired."
+            ::= { hwNtpTraps 6 }
         
+        hwNtpMaxPacketRecvPerSecReach NOTIFICATION-TYPE
+            OBJECTS { hwNtpMaxPacketRecvPerSecr }
+            STATUS current
+            DESCRIPTION 
+                "This TRAP is used to notify the NTP packet processing rate reaches the upper threshold."
+            ::= { hwNtpTraps 7 }
+
+        hwNtpMaxPacketRecvPerSecResume NOTIFICATION-TYPE
+            OBJECTS { hwNtpMaxPacketRecvPerSecr }
+            STATUS current
+            DESCRIPTION 
+                "This NTP packet processing rate reaches the upper threshold alarm was repaired."
+            ::= { hwNtpTraps 8 }
+
+        hwNtpSynchronizationFailure NOTIFICATION-TYPE
+            OBJECTS { hwNtpState, hwNtpSource }
+            STATUS current
+            DESCRIPTION 
+                "This TRAP is used to notify when the NTP state changes from synchronized to unsynchronized."
+            ::= { hwNtpTraps 9 }
+
+        hwNtpSynchronizationFailureResume NOTIFICATION-TYPE
+            OBJECTS { hwNtpState, hwNtpSource }
+            STATUS current
+            DESCRIPTION 
+                "This NTP state unsynchronized alarm was repaired."
+            ::= { hwNtpTraps 10 }
+ 
         hwNtpTrapMibConformance OBJECT IDENTIFIER ::= { hwNtpTrapMib 3 }
         hwNtpTrapMibCompliances OBJECT IDENTIFIER ::= { hwNtpTrapMibConformance 1 }
 
@@ -124,14 +222,14 @@
             ::= { hwNtpTrapMibCompliances 1 }
             
 	hwNtpTrapObjectsGroup OBJECT-GROUP
-			OBJECTS { hwNtpState, hwNtpSource, hwNtpSourceVpnName, hwNtpOldSource, hwNtpOldSourceVpnName }
+			OBJECTS { hwNtpState, hwNtpSource, hwNtpSourceVpnName, hwNtpOldSource, hwNtpOldSourceVpnName, hwNtpCurrentClientNum, hwNtpMaxDynamicSessions, hwNtpMaxPacketRecvPerSecr }
 			STATUS current
 			DESCRIPTION
 				"These objects are used to manage NTP trap parameters"
 	                ::= { hwNtpTrapMibCompliances 2 }
 	                
     hwNtpTrapEventGroup NOTIFICATION-GROUP
-            NOTIFICATIONS { hwNtpStateChangeTrap, hwNtpSysPeerChangeTrap }
+            NOTIFICATIONS { hwNtpStateChangeTrap, hwNtpSysPeerChangeTrap, hwNtpClientLimitExceed, hwNtpClientLimitExceedResume, hwNtpDynamicSessionLimitReach, hwNtpDynamicSessionLimitReachResume, hwNtpMaxPacketRecvPerSecReach, hwNtpMaxPacketRecvPerSecResume, hwNtpSynchronizationFailure, hwNtpSynchronizationFailureResume }
             STATUS current
             DESCRIPTION 
                 "These objects are used to manage NTP trap parameters."

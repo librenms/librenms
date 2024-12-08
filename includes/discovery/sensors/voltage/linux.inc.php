@@ -23,7 +23,7 @@ if (! empty($pre_cache['raspberry_pi_sensors'])) {
         }
         $value = current($pre_cache['raspberry_pi_sensors']['raspberry.' . $volt]);
         if (is_numeric($value)) {
-            discover_sensor($valid['sensor'], 'voltage', $device, $oid . $volt, $volt, $sensor_type, $descr, '1', '1', null, null, null, null, $value);
+            discover_sensor(null, 'voltage', $device, $oid . $volt, $volt, $sensor_type, $descr, '1', '1', null, null, null, null, $value);
         } else {
             break;
         }
@@ -61,7 +61,7 @@ foreach (explode("\n", $oids) as $data) {
             $descr = trim(str_ireplace('Voltage', '', $descr));
 
             if ($monitor == 'true') {
-                discover_sensor($valid['sensor'], 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', $lowlimit, null, null, $limit, $current);
+                discover_sensor(null, 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', $lowlimit, null, null, $limit, $current);
             }
         }
     }//end if
@@ -78,13 +78,13 @@ if (preg_match('/(Linux).+(ntc)/', $device['sysDescr'])) {
     $index = '116.2';
     $value = snmp_get($device, $oid . $index, '-Oqv');
     if (is_numeric($value)) {
-        discover_sensor($valid['sensor'], 'voltage', $device, $oid . $index, $index, $sensor_type, $descr, '1', '1', $lowlimit, $lowwarnlimit, $warnlimit, $limit, $value);
+        discover_sensor(null, 'voltage', $device, $oid . $index, $index, $sensor_type, $descr, '1', '1', $lowlimit, $lowwarnlimit, $warnlimit, $limit, $value);
     }
     $descr = 'VBUS voltage';
     $index = '116.4';
     $value = snmp_get($device, $oid . $index, '-Oqv');
     if (is_numeric($value)) {
-        discover_sensor($valid['sensor'], 'voltage', $device, $oid . $index, $index, $sensor_type, $descr, '1', '1', $lowlimit, $lowwarnlimit, $warnlimit, $limit, $value);
+        discover_sensor(null, 'voltage', $device, $oid . $index, $index, $sensor_type, $descr, '1', '1', $lowlimit, $lowwarnlimit, $warnlimit, $limit, $value);
     }
     $lowlimit = 2.75;
     $lowwarnlimit = 2.8;
@@ -94,65 +94,6 @@ if (preg_match('/(Linux).+(ntc)/', $device['sysDescr'])) {
     $index = '116.6';
     $value = snmp_get($device, $oid . $index, '-Oqv');
     if (is_numeric($value)) {
-        discover_sensor($valid['sensor'], 'voltage', $device, $oid . $index, $index, $sensor_type, $descr, '1', '1', $lowlimit, $lowwarnlimit, $warnlimit, $limit, $value);
+        discover_sensor(null, 'voltage', $device, $oid . $index, $index, $sensor_type, $descr, '1', '1', $lowlimit, $lowwarnlimit, $warnlimit, $limit, $value);
     }
-}
-
-$oids = '.1.3.6.1.4.1.8072.1.3.2.4.1.2.7.117.112.115.45.110.117.116.4';
-$value = snmp_get($device, $oids, '-Osqnv');
-
-if (! empty($value)) {
-    $type = 'ups-nut';
-    $index = 4;
-    $limit = 60;
-    $lowlimit = 0;
-    $lowwarnlimit = 0;
-    $descr = 'Battery Voltage';
-
-    discover_sensor($valid['sensor'], 'voltage', $device, $oids, $index, $type, $descr, 1, 1, $lowlimit, $lowwarnlimit, null, $limit, $value);
-}
-unset($oids);
-
-$oids = '.1.3.6.1.4.1.8072.1.3.2.4.1.2.7.117.112.115.45.110.117.116.5';
-$value = snmp_get($device, $oids, '-Osqnv');
-
-if (! empty($value)) {
-    $type = 'ups-nut';
-    $index = 5;
-    $limit = 60;
-    $lowlimit = 0;
-    $lowwarnlimit = 0;
-    $descr = 'Battery Nominal';
-
-    discover_sensor($valid['sensor'], 'voltage', $device, $oids, $index, $type, $descr, 1, 1, $lowlimit, $lowwarnlimit, null, $limit, $value);
-}
-unset($oids);
-
-$oids = '.1.3.6.1.4.1.8072.1.3.2.4.1.2.7.117.112.115.45.110.117.116.6';
-$value = snmp_get($device, $oids, '-Osqnv');
-
-if (! empty($value)) {
-    $type = 'ups-nut';
-    $index = 6;
-    $limit = 0;
-    $lowlimit = 0;
-    $lowwarnlimit = 0;
-    $descr = 'Line Nominal';
-
-    discover_sensor($valid['sensor'], 'voltage', $device, $oids, $index, $type, $descr, 1, 1, $lowlimit, $lowwarnlimit, null, $limit, $value);
-}
-unset($oids);
-
-$oids = '.1.3.6.1.4.1.8072.1.3.2.4.1.2.7.117.112.115.45.110.117.116.7';
-$value = snmp_get($device, $oids, '-Osqnv');
-
-if (! empty($value)) {
-    $type = 'ups-nut';
-    $index = 7;
-    $limit = 280;
-    $lowlimit = 200;
-    $lowwarnlimit = 0;
-    $descr = 'Input Voltage';
-
-    discover_sensor($valid['sensor'], 'voltage', $device, $oids, $index, $type, $descr, 1, 1, $lowlimit, $lowwarnlimit, null, $limit, $value);
 }

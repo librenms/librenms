@@ -230,11 +230,13 @@ $oid = 'mplsL3VpnVrfPerfCurrNumRoutes';
 $mpls_vpn_route_nb = snmpwalk_group($device, $oid, $mib, 6, []);
 $mpls_skip = false;
 
-foreach ($mpls_vpn_route_nb as $vpnId => $route_nb) {
-    if ($route_nb['mplsL3VpnVrfPerfCurrNumRoutes'] > $max_routes) {
-        echo "Skipping all MPLS routes because vpn instance $vpnId has more than $max_routes routes.";
-        $mpls_skip = true;
-        break;
+if (! empty($mpls_vpn_route_nb) && count($mpls_vpn_route_nb) > 1) {
+    foreach ($mpls_vpn_route_nb as $vpnId => $route_nb) {
+        if ($route_nb['mplsL3VpnVrfPerfCurrNumRoutes'] > $max_routes) {
+            echo "Skipping all MPLS routes because vpn instance $vpnId has more than $max_routes routes.";
+            $mpls_skip = true;
+            break;
+        }
     }
 }
 
@@ -269,6 +271,12 @@ if ($mpls_skip == false) {
                         $entry['inetCidrRouteProto'] = $entry['mplsL3VpnVrfRteInetCidrProto'];
                         $entry['inetCidrRouteMetric1'] = $entry['mplsL3VpnVrfRteInetCidrMetric1'];
                         $entry['inetCidrRouteNextHopAS'] = $entry['mplsL3VpnVrfRteInetCidrNextHopAS'];
+                        unset($entry['mplsL3VpnVrfRteInetCidrPolicy']);
+                        unset($entry['mplsL3VpnVrfRteInetCidrNextHop']);
+                        unset($entry['mplsL3VpnVrfRteInetCidrNHopType']);
+                        unset($entry['mplsL3VpnVrfRteInetCidrDest']);
+                        unset($entry['mplsL3VpnVrfRteInetCidrDestType']);
+                        unset($entry['mplsL3VpnVrfRteInetCidrPfxLen']);
                         unset($entry['mplsL3VpnVrfRteXCPointer']);
                         unset($entry['mplsL3VpnVrfRteInetCidrMetric1']);
                         unset($entry['mplsL3VpnVrfRteInetCidrMetric2']);

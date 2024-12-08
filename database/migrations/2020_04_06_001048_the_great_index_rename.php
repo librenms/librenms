@@ -114,7 +114,9 @@ return new class extends Migration
             $this->renameIndex('ports', 'if_2', 'ports_ifdescr_index', ['ifDescr']);
             $this->renameIndex('ports_adsl', 'interface_id', 'ports_adsl_port_id_unique', ['port_id'], true);
             $this->renameIndex('ports_fdb', 'mac_address', 'ports_fdb_mac_address_index', ['mac_address']);
-            $this->renameIndex('ports_stack', 'device_id', 'ports_stack_device_id_port_id_high_port_id_low_unique', ['device_id', 'port_id_high', 'port_id_low'], true);
+            if (Schema::hasColumn('ports_stack', 'port_id_high')) {
+                $this->renameIndex('ports_stack', 'device_id', 'ports_stack_device_id_port_id_high_port_id_low_unique', ['device_id', 'port_id_high', 'port_id_low'], true);
+            }
             $this->renameIndex('ports_stp', 'device_id', 'ports_stp_device_id_port_id_unique', ['device_id', 'port_id'], true);
             $this->renameIndex('ports_vlans', '`unique`', 'ports_vlans_device_id_port_id_vlan_unique', ['device_id', 'port_id', 'vlan'], true);
             $this->renameIndex('processes', 'device_id', 'processes_device_id_index', ['device_id']);

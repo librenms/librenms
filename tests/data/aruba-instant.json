@@ -2636,5 +2636,50 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "entity-physical": {
+        "discovery": {
+            "entPhysical": [
+                {
+                    "entPhysicalIndex": 1,
+                    "entPhysicalDescr": "10.128.0.10",
+                    "entPhysicalClass": "chassis",
+                    "entPhysicalName": "instant-ap-src-vc",
+                    "entPhysicalHardwareRev": null,
+                    "entPhysicalFirmwareRev": null,
+                    "entPhysicalSoftwareRev": null,
+                    "entPhysicalAlias": null,
+                    "entPhysicalAssetID": null,
+                    "entPhysicalIsFRU": null,
+                    "entPhysicalModelName": "Instant Virtual Controller Cluster",
+                    "entPhysicalVendorType": null,
+                    "entPhysicalSerialNum": "bb6a73be01282660f5f9a85b8b2e6b33539f10d9cfd2d86c8e",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": -1,
+                    "entPhysicalMfgName": "Aruba",
+                    "ifIndex": null
+                },
+                {
+                    "entPhysicalIndex": 2,
+                    "entPhysicalDescr": "70:3a:e:c9:c2:46",
+                    "entPhysicalClass": "other",
+                    "entPhysicalName": "instant-ap-src-1 10.128.0.11 Cluster Master",
+                    "entPhysicalHardwareRev": null,
+                    "entPhysicalFirmwareRev": null,
+                    "entPhysicalSoftwareRev": "8.4.0.0-8.4.0.0",
+                    "entPhysicalAlias": null,
+                    "entPhysicalAssetID": null,
+                    "entPhysicalIsFRU": null,
+                    "entPhysicalModelName": "ap225",
+                    "entPhysicalVendorType": "accessPoint",
+                    "entPhysicalSerialNum": "CNBJHMV0WN",
+                    "entPhysicalContainedIn": 1,
+                    "entPhysicalParentRelPos": -1,
+                    "entPhysicalMfgName": "Aruba",
+                    "ifIndex": null
+                }
+            ]
+        },
+        "poller": "matches discovery"
     }
 }

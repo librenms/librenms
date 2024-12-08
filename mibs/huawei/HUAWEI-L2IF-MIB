@@ -1,9 +1,9 @@
 -- ==================================================================
--- Copyright (C) 2017 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2020 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- 
 -- Description: HUAWEI Layer Two Interface Management MIB
 -- Reference:
--- Version: V2.14
+-- Version: V2.18
 -- History:
 --      V1.0 
 -- ==================================================================
@@ -34,12 +34,15 @@ IMPORTS
         FROM Q-BRIDGE-MIB       
     
     EnabledStatus
-        FROM P-BRIDGE-MIB;
+        FROM P-BRIDGE-MIB
+
+    hwL2Mgmt
+        FROM HUAWEI-MSTP-MIB;	
     
-     hwL2Mgmt OBJECT IDENTIFIER ::= { hwDatacomm 42 }
+    --hwL2Mgmt OBJECT IDENTIFIER ::= { hwDatacomm 42 }
      
     hwL2IfMib MODULE-IDENTITY
-        LAST-UPDATED "201708170900Z"        
+        LAST-UPDATED "202007250900Z"        
     ORGANIZATION 
         "Huawei Technologies Co.,Ltd."
     CONTACT-INFO 
@@ -53,6 +56,18 @@ IMPORTS
     DESCRIPTION
         "information of layer2 interface and information of hybrid port and
         information of trunk port"
+    REVISION	 "202007250900Z"
+    DESCRIPTION
+	"Modify descriptions of the nodes."
+    REVISION	 "202007200900Z"
+    DESCRIPTION
+	"Modify descriptions of the nodes."
+    REVISION                  "201803200900Z"
+    DESCRIPTION
+                    "Change import hwL2Mgmt." 
+    REVISION	 "201711170900Z"
+    DESCRIPTION
+	"Add hwL2IfDynPortVlanTable."   
     REVISION	 "201708170900Z"
     DESCRIPTION
 	"Modify descriptions of the nodes."
@@ -174,7 +189,7 @@ VlanList ::= TEXTUAL-CONVENTION
         STATUS current
         DESCRIPTION 
             "Number of layer2 interface port, a unique value,
-            for each port.It is recommended that values are assigned 
+            for each port. It is recommended that values are assigned 
             contiguously starting from 1. "
         ::= { hwL2IfEntry 1 }
         
@@ -219,7 +234,7 @@ VlanList ::= TEXTUAL-CONVENTION
         MAX-ACCESS read-only
         STATUS current
         DESCRIPTION 
-            " Whether to filter source MAC address. We don't support it now."
+            " Whether to filter source MAC address. We do not support it now."
         ::= { hwL2IfEntry 5 }
        
 
@@ -247,9 +262,9 @@ VlanList ::= TEXTUAL-CONVENTION
         STATUS current
         DESCRIPTION
              " Status indicates if the interface is allowed to learn mac 
-             address, enable(1) can be setted, (enabled(1) means that 
+             address, enable(1) can be set, (enabled(1) means that 
              the interface can learn mac address), otherwise disabled(2) 
-             can be setted. discard(3) means the interface will drop packets."
+             can be set. discard(3) means the interface will drop packets."
         ::= { hwL2IfEntry 7 }
       
     --suppression step of percentage mode       
@@ -312,7 +327,7 @@ VlanList ::= TEXTUAL-CONVENTION
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION 
-            " The flag of droping the broadcast packets,  
+            " The flag of dropping the broadcast packets. 
             1:discard;  2:forward(default)."
         ::= { hwL2IfEntry 14 }
         
@@ -321,7 +336,7 @@ VlanList ::= TEXTUAL-CONVENTION
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION 
-            " The flag of droping the unknown mutilcast packets,  
+            " The flag of dropping the unknown multicast packets. 
             1:discard;  2:forward(default)."
         ::= { hwL2IfEntry 15 }
         
@@ -330,7 +345,7 @@ VlanList ::= TEXTUAL-CONVENTION
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION 
-            " The flag of droping the unknown unicast packets,
+            " The flag of dropping the unknown unicast packets. 
             1:discard;  2:forward(default)."
         ::= { hwL2IfEntry 16 }   
         
@@ -464,7 +479,7 @@ VlanList ::= TEXTUAL-CONVENTION
         STATUS current
         DESCRIPTION 
             "The value enabled(1) indicates that the port is a member of the port-isolate group; disable(2) indicates that the port is not a member of the port-isolate group. The default value is disable(2)."
-        DEFVAL  {2}
+        DEFVAL  {disabled}
         ::= { hwL2IfEntry 31 }
 
         hwL2IfActivePortType  OBJECT-TYPE
@@ -894,9 +909,9 @@ VlanList ::= TEXTUAL-CONVENTION
         STATUS current
         DESCRIPTION   
             " Status indicates if the interface is allowed to notify stp TCN message
-              , enable(1) can be setted, (enabled(1) means that 
+              , enable(1) can be set, (enabled(1) means that 
               the interface can notify TCN), otherwise disabled(2) 
-              can be setted."
+              can be set."
         ::= { hwL2IfPortTcnEntry 2 }   
   
     hwL2IfTcnSmartLink            OBJECT-TYPE
@@ -905,9 +920,9 @@ VlanList ::= TEXTUAL-CONVENTION
         STATUS current
         DESCRIPTION   
             " Status indicates if the interface is allowed to notify SmartLink TCN message,
-              enable(1) can be setted, (enabled(1) means that 
+              enable(1) can be set, (enabled(1) means that 
               the interface can notify TCN), otherwise disabled(2) 
-              can be setted."
+              can be set."
         ::= { hwL2IfPortTcnEntry 3 }   
 
     hwL2IfTcnVlanListLow       OBJECT-TYPE
@@ -1298,7 +1313,93 @@ VlanList ::= TEXTUAL-CONVENTION
         DESCRIPTION  
              "The highest possible value of the tagged vlan list of Dynamic port-vlan table."
         ::= { hwL2IfDynamicPortVlanEntry 7 }         
-       
+
+-- ============================================================================
+-- real-time relationship of port-vlan duplicate
+-- ============================================================================		
+    hwL2IfDynPortVlanTable  OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwL2IfDynPortVlanEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION 
+            "Table for dynamic relationship of port-vlan."
+        ::= { hwL2Interface 20 }
+
+    hwL2IfDynPortVlanEntry  OBJECT-TYPE
+        SYNTAX HwL2IfDynPortVlanEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION 
+            "Entry of dynamic port-vlan relationship table."
+        INDEX { hwL2IfDynPortVlanPortIndex}
+            ::= { hwL2IfDynPortVlanTable 1}
+
+    HwL2IfDynPortVlanEntry  ::=
+    SEQUENCE 
+            {
+                hwL2IfDynPortVlanPortIndex
+                    Integer32, 
+                hwL2IfDynPortVlanPvid
+                    VlanIdOrNone, 
+                hwL2IfDynPortVlanUntaggedVlanListLow    
+                    VlanList,
+                hwL2IfDynPortVlanUntaggedVlanListHigh   
+                    VlanList,
+                hwL2IfDynPortVlanTaggedVlanListLow  
+                    VlanList,
+                hwL2IfDynPortVlanTaggedVlanListHigh 
+                    VlanList
+            }
+
+    hwL2IfDynPortVlanPortIndex OBJECT-TYPE
+        SYNTAX Integer32 (1..65535)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION 
+            "Port index of switch-port."
+        ::= { hwL2IfDynPortVlanEntry 1 }             
+
+    hwL2IfDynPortVlanPvid OBJECT-TYPE
+        SYNTAX VlanIdOrNone
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION 
+            "The Dynamic PVID of port-vlan table."
+        ::= { hwL2IfDynPortVlanEntry 2 }
+
+    hwL2IfDynPortVlanUntaggedVlanListLow OBJECT-TYPE
+        SYNTAX VlanList (SIZE(256))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION 
+            "The lowest possible value of the untagged vlan list of dynamic port-vlan table."
+        ::= { hwL2IfDynPortVlanEntry 3 }
+
+    hwL2IfDynPortVlanUntaggedVlanListHigh OBJECT-TYPE
+        SYNTAX VlanList (SIZE(256))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION   
+            "The highest possible value of the untagged vlan list of Dynamic port-vlan table."
+        ::= { hwL2IfDynPortVlanEntry 4 }
+
+    hwL2IfDynPortVlanTaggedVlanListLow OBJECT-TYPE
+        SYNTAX VlanList (SIZE(256))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION 
+            "The lowest possible value of the tagged vlan list of Dynamic port-vlan table."
+        ::= { hwL2IfDynPortVlanEntry 5 }
+
+    hwL2IfDynPortVlanTaggedVlanListHigh OBJECT-TYPE
+        SYNTAX VlanList (SIZE(256))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION  
+             "The highest possible value of the tagged vlan list of Dynamic port-vlan table."
+        ::= { hwL2IfDynPortVlanEntry 6 }         
+		
+
     hwL2IfTraps OBJECT IDENTIFIER ::= { hwL2IfObjects 2 }
 
     hwL2IfInvalidVlanPacketAlarm NOTIFICATION-TYPE

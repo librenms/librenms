@@ -45,11 +45,26 @@ We have two current mapping engines available:
   zoom levels](https://wiki.openstreetmap.org/wiki/Zoom_levels).
 - *Grouping radius*: Markers are grouped by area. This value define
   the maximum size of grouping areas.
-- *Show devices*: Show devices based on there status.
+- *Show devices*: Show devices based on status.
 
 Example Settings:
 
 ![Example World Map Settings](/img/world-map-widget-settings.png)
+
+### Device Overview World Map Settings
+
+If a device has a location with a valid latitude and logitude, the
+device overview page will have a panel showing the device on a world
+map.  The following settings affect this map:
+
+```bash
+# Does the world map start opened, or does the user need to clivk to view
+lnms config:set device_location_map_open false
+# Do we show all other devices on the map as well
+lnms config:set device_location_map_show_devices false
+# Do we show a network map based on device dependencies
+lnms config:set device_location_map_show_device_dependencies false
+```
 
 ## Offline OpenStreet Map
 
@@ -57,19 +72,25 @@ If you can't access OpenStreet map directly you can run a local [tile
 server](http://wiki.openstreetmap.org/wiki/Tile_servers). To specify a
 different url you can set:
 
-```php
-$config['leaflet']['tile_url'] = 'localhost.com';
+```bash
+lnms config:set leaflet.tile_url 'localhost.com'
 ```
 
 ## Additional Leaflet config
 
-```php
-$config['map']['engine']                                = "leaflet";
-$config['leaflet']['default_lat']                       = "51.981074";
-$config['leaflet']['default_lng']                       = "5.350342";
-$config['leaflet']['default_zoom']                      = 8;
-// Device grouping radius in KM default 80KM
-$config['leaflet']['group_radius']                      = 1;
+```bash
+lnms config:set map.engine leaflet
+lnms config:set leaflet.default_lat "51.981074"
+lnms config:set leaflet.default_lng "5.350342"
+lnms config:set leaflet.default_zoom 8
+# Device grouping radius in KM default 80KM
+lnms config:set leaflet.group_radius 1
+# Enable network map on world map
+lnms config:set network_map_show_on_worldmap true
+# Use CDP/LLDP for network map, or device dependencies
+lnms config:set network_map_worldmap_link_type xdp/depends
+# Do not show devices that have notifications disabled
+lnms config:set network_map_worldmap_show_disabled_alerts false
 ```
 
 ## Geocode engine config
@@ -98,13 +119,13 @@ Further custom options are available to load different maps of the
 world, set default coordinates of where the map will zoom and the zoom
 level by default. An example of this is:
 
-```php
-$config['map']['engine']          = "jquery-mapael";
-$config['mapael']['default_map']  = 'mapael-maps/united_kingdom/united_kingdom.js';
-$config['mapael']['map_width']    = 400;
-$config['mapael']['default_lat']  = '50.898482';
-$config['mapael']['default_lng']  = '-3.401402';
-$config['mapael']['default_zoom'] = 20;
+```bash
+lnms config:set map.engine jquery-mapael
+lnms config:set mapael.default_map 'mapael-maps/united_kingdom/united_kingdom.js'
+lnms config:set mapael.map_width 400
+lnms config:set mapael.default_lat '50.898482'
+lnms config:set mapael.default_lng '-3.401402'
+lnms config:set mapael.default_zoom 20
 ```
 
 A list of maps can be found in ```html/js/maps/``` or ```html/js/mapael-maps/```.

@@ -29,14 +29,23 @@ foreach ((array) $temp as $index => $entry) {
     $descr = $entry['amperageProbeLocationName'];
     if ($entry['amperageProbeType'] === 'amperageProbeTypeIsSystemWatts') {
         $divisor = 1;
-        $value = $entry['amperageProbeReading'];
-        $lowlimit = $entry['amperageProbeLowerCriticalThreshold'] / $divisor;
-        $low_warn_limit = $entry['amperageProbeLowerCriticalThreshold'] / $divisor;
-        $warnlimit = $entry['amperageProbeUpperNonCriticalThreshold'] / $divisor;
-        $limit = $entry['amperageProbeUpperCriticalThreshold'] / $divisor;
+        (isset($entry['amperageProbeReading'])) ? $value = $entry['amperageProbeReading'] : $value = null;
+        (isset($entry['amperageProbeLowerCriticalThreshold'])) ? $lowlimit = $entry['amperageProbeLowerCriticalThreshold'] / $divisor : $lowlimit = null;
+        (isset($entry['amperageProbeLowerCriticalThreshold'])) ? $low_warn_limit = $entry['amperageProbeLowerCriticalThreshold'] / $divisor : $low_warn_limit = null;
+        (isset($entry['amperageProbeUpperNonCriticalThreshold'])) ? $warnlimit = $entry['amperageProbeUpperNonCriticalThreshold'] / $divisor : $warnlimit = null;
+        (isset($entry['amperageProbeUpperCriticalThreshold'])) ? $limit = $entry['amperageProbeUpperCriticalThreshold'] / $divisor : $limit = null;
 
-        discover_sensor($valid['sensor'], 'power', $device, $cur_oid . $index, $index, 'dell', $descr, $divisor, '1', $lowlimit, $low_warn_limit, $warnlimit, $limit, $value, 'snmp', $index);
+        discover_sensor(null, 'power', $device, $cur_oid . $index, $index, 'dell', $descr, $divisor, '1', $lowlimit, $low_warn_limit, $warnlimit, $limit, $value, 'snmp', $index);
     }
+
+    unset(
+        $descr,
+        $value,
+        $lowlimit,
+        $low_warn_limit,
+        $warnlimit,
+        $limit
+    );
 }
 
 unset(

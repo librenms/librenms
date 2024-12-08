@@ -33,6 +33,7 @@ use LibreNMS\Interfaces\Polling\ProcessorPolling;
 use LibreNMS\Model;
 use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Util\Oid;
 
 class Processor extends Model implements DiscoveryModule, PollerModule, DiscoveryItem
 {
@@ -93,7 +94,7 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
         // handle string indexes
         if (Str::contains($oid, '"')) {
             $oid = preg_replace_callback('/"([^"]+)"/', function ($matches) {
-                return \LibreNMS\Util\Oid::ofString($matches[1]);
+                return Oid::encodeString($matches[1])->oid;
             }, $oid);
         }
         $proc->processor_oid = '.' . ltrim($oid, '.');
@@ -147,7 +148,7 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
 
         foreach ($processors as $processor) {
             $processor->processor_descr = substr($processor->processor_descr, 0, 64);
-            $processors[] = $processor;
+            $processor->processor_type = substr($processor->processor_type, 0, 16);
         }
 
         if (isset($processors) && is_array($processors)) {
@@ -258,7 +259,7 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
             return [];
         }
 
-        return YamlDiscovery::discover($os, get_class(), $discovery);
+        return YamlDiscovery::discover($os, get_called_class(), $discovery);
     }
 
     /**

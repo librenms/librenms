@@ -68,7 +68,8 @@ class FdbTablesController extends TableController
     protected function baseQuery($request)
     {
         return PortsFdb::hasAccess($request->user())
-            ->with(['device', 'port', 'vlan', 'ipv4Addresses']);
+            ->with(['device', 'port', 'vlan', 'ipv4Addresses'])
+            ->select('ports_fdb.*');
     }
 
     /**

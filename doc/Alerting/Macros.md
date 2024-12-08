@@ -143,13 +143,13 @@ AND state_translations.state_generic_value = 2)`
 
 Entity: `(macros.packet_loss_5m)`
 
-Description: Packet loss % value for the device within the last 5 minutes.
+Description: Packet loss % value for the device within the last 5 minutes. BROKEN, only return 100 (down) or 0.
 
 Example: `macros.packet_loss_5m` > 50
 
 Entity: `(macros.packet_loss_15m)`
 
-Description: Packet loss % value for the device within the last 15 minutes.
+Description: Packet loss % value for the device within the last 15 minutes. BROKEN, only return 100 (down) or 0.
 
 Example: `macros.packet_loss_15m` > 50
 

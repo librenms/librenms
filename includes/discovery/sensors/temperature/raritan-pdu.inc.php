@@ -33,7 +33,7 @@ if (is_array($raritan_data) && ! empty($raritan_data)) {
     $warn_limit = $raritan_data['unitTempUpperWarning.0'];
     $high_limit = $raritan_data['unitTempUpperCritical.0'];
     $current = $raritan_data['unitCpuTemp.0'] / $divisor;
-    discover_sensor($valid['sensor'], 'temperature', $device, $oid, $tmp_index, 'raritan', $descr, $divisor, 1, $low_limit, $low_limit, $warn_limit, $high_limit, $current);
+    discover_sensor(null, 'temperature', $device, $oid, $tmp_index, 'raritan', $descr, $divisor, 1, $low_limit, $low_limit, $warn_limit, $high_limit, $current);
 } else {
     $multiplier = '1';
     foreach ($pre_cache['raritan_extSensorConfig'] as $index => $data) {
@@ -59,7 +59,7 @@ if (is_array($raritan_data) && ! empty($raritan_data)) {
                 $user_func = 'fahrenheit_to_celsius';
             }
             if (is_numeric($current) && $current >= 0 && $sensor_available === 'true') {
-                discover_sensor($valid['sensor'], 'temperature', $device, $oid, 'measurementsExternalSensorValue.' . $index, 'raritan', $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current, 'snmp', null, null, $user_func);
+                discover_sensor(null, 'temperature', $device, $oid, 'measurementsExternalSensorValue.' . $index, 'raritan', $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current, 'snmp', null, null, $user_func);
             }
         }
     }
@@ -80,7 +80,7 @@ foreach ($oids as $index => $sensor) {
         $limit_low_warn = $sensor['externalSensorLowerCriticalThreshold'] / $divisor;
         $offset++;
         if (is_numeric($temp_current) && $temp_current >= 0) {
-            discover_sensor($valid['sensor'], 'temperature', $device, $oid, $offset, 'raritan', $descr, $divisor, 1, $limit_low, $limit_low_warn, $limit_high_warn, $limit_high, $temp_current);
+            discover_sensor(null, 'temperature', $device, $oid, $offset, 'raritan', $descr, $divisor, 1, $limit_low, $limit_low_warn, $limit_high_warn, $limit_high, $temp_current);
         }
     }
 }

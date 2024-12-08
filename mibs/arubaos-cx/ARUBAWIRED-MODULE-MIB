@@ -1,0 +1,282 @@
+--**MOD+************************************************************************
+--* Module:    ARUBAWIRED-MODULE-MIB :MODULE MIB file
+--*
+--* (c) Copyright 2021 Hewlett Packard Enterprise Development LP
+--* All Rights Reserved.
+--*
+--* The contents of this software are proprietary and confidential
+--* to the Hewlett-Packard Development Company, L.P.  No part of this
+--* program may be photocopied, reproduced, or translated into another
+--* programming language without prior written consent of the
+--* Hewlett-Packard Development Company, L.P.
+--*
+--* Purpose: This file contains MIB definition of ARUBAWIRED-MODULE-MIB
+--*
+--**MOD-************************************************************************
+
+ARUBAWIRED-MODULE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    DisplayString
+        FROM SNMPv2-TC
+    arubaWiredChassisMIB
+        FROM ARUBAWIRED-CHASSIS-MIB;
+
+arubaWiredModule MODULE-IDENTITY
+    LAST-UPDATED "202107010000Z" -- July 1, 2021
+    ORGANIZATION "HPE/Aruba Networking Division"
+    CONTACT-INFO "Hewlett Packard Company
+                  8000 Foothills Blvd.
+                  Roseville, CA 95747"
+    DESCRIPTION
+        "This MIB module describes management objects that manage
+         module componenets."
+
+    REVISION     "202107010000Z" -- July 1, 2021
+    DESCRIPTION  "New notifications for module insert, remove, unrecognized."
+
+    REVISION     "202101070000Z" -- January 7, 2021
+    DESCRIPTION  "Initial revision."
+
+    ::= { arubaWiredChassisMIB 6 }
+
+-- **********************************************************************
+-- Module Notifications
+-- **********************************************************************
+
+arubaWiredModuleNotifications OBJECT IDENTIFIER ::= { arubaWiredModule 0 }
+
+arubaWiredModuleStateNotification NOTIFICATION-TYPE
+      OBJECTS {
+                arubaWiredModuleType,
+                arubaWiredModuleName,
+                arubaWiredModuleState
+              }
+      STATUS current
+      DESCRIPTION
+               "A notification generated when a module state change occurs. This
+                can happen during the normal boot process of a module, as well
+                as when a module encounters an error and the module attempts
+                to reboot and/or goes to the down state."
+      ::= { arubaWiredModuleNotifications 1 }
+
+arubaWiredModuleInsertedNotification NOTIFICATION-TYPE
+    OBJECTS   {
+                arubaWiredModuleType,
+                arubaWiredModuleName
+              }
+    STATUS  current
+    DESCRIPTION "A notification generated when a module is inserted."
+     ::= { arubaWiredModuleNotifications 2 }
+
+arubaWiredModuleRemovedNotification NOTIFICATION-TYPE
+    OBJECTS   {
+                arubaWiredModuleType,
+                arubaWiredModuleName
+              }
+    STATUS  current
+    DESCRIPTION "A notification generated when a module is removed."
+     ::= { arubaWiredModuleNotifications 3 }
+
+arubaWiredModuleUnrecognizedNotification NOTIFICATION-TYPE
+    OBJECTS   {
+                arubaWiredModuleType,
+                arubaWiredModuleName,
+                arubaWiredModuleUnrecognizedDescriptor
+              }
+    STATUS  current
+    DESCRIPTION "A notification generated when a module is
+                 not recognized"
+     ::= { arubaWiredModuleNotifications 4 }
+
+-- **********************************************************************
+-- Module Objects
+-- **********************************************************************
+
+arubaWiredModuleTable OBJECT-TYPE
+      SYNTAX      SEQUENCE OF ArubaWiredModuleEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION "This table contains one row per module entity."
+      ::= { arubaWiredModule 1 }
+
+arubaWiredModuleEntry OBJECT-TYPE
+      SYNTAX      ArubaWiredModuleEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION "Information about the module physical entity table."
+      INDEX       { arubaWiredModuleGroupIndex , arubaWiredModuleTypeIndex, arubaWiredModuleSlotIndex }
+      ::= { arubaWiredModuleTable 1 }
+
+ArubaWiredModuleEntry ::=
+    SEQUENCE {
+        arubaWiredModuleGroupIndex             Integer32,
+        arubaWiredModuleTypeIndex              Integer32,
+        arubaWiredModuleSlotIndex              Integer32,
+        arubaWiredModuleName                   DisplayString,
+        arubaWiredModuleType                   DisplayString,
+        arubaWiredModuleState                  DisplayString,
+        arubaWiredModuleProductDescription     DisplayString,
+        arubaWiredModuleSerialNumber           DisplayString,
+        arubaWiredModuleProductNumber          DisplayString,
+        arubaWiredModuleAdminState             DisplayString,
+        arubaWiredModulePowerPriority          Integer32,
+        arubaWiredModuleUnrecognizedDescriptor DisplayString
+    }
+
+arubaWiredModuleGroupIndex OBJECT-TYPE
+      SYNTAX      Integer32 (1..2147483647)
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION "This variable uniquely identifies the group containing the
+                   module. Group means chassis in the stack and the value
+                   1 MUST be used for non-modular devices."
+      ::= { arubaWiredModuleEntry 1 }
+
+arubaWiredModuleTypeIndex OBJECT-TYPE
+      SYNTAX      Integer32 (1..2147483647)
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION "This variable defines the module type such as line card,
+                   or fabric card."
+      ::= { arubaWiredModuleEntry 2 }
+
+arubaWiredModuleSlotIndex OBJECT-TYPE
+      SYNTAX      Integer32 (1..2147483647)
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION "This variable defines the instance of the module type.
+                   Instance values will be between 1 and the maximum
+                   number of modules of a given type that exist in the
+                   system."
+      ::= { arubaWiredModuleEntry 3 }
+
+arubaWiredModuleName OBJECT-TYPE
+      SYNTAX      DisplayString (SIZE(0..20))
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "Identification of the module for the system."
+      ::= { arubaWiredModuleEntry 4 }
+
+arubaWiredModuleType OBJECT-TYPE
+      SYNTAX      DisplayString (SIZE(0..20))
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "Type of module."
+      ::= { arubaWiredModuleEntry 5 }
+
+arubaWiredModuleState OBJECT-TYPE
+      SYNTAX      DisplayString (SIZE(0..20))
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "Current status for the module."
+      ::= { arubaWiredModuleEntry 6 }
+
+arubaWiredModuleProductDescription OBJECT-TYPE
+      SYNTAX      DisplayString (SIZE(0..80))
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "System description in long form."
+      ::= { arubaWiredModuleEntry 7 }
+
+arubaWiredModuleSerialNumber OBJECT-TYPE
+      SYNTAX      DisplayString (SIZE(0..20))
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "Module serial number to uniquely identify the
+                   module."
+      ::= { arubaWiredModuleEntry 8 }
+
+arubaWiredModuleProductNumber OBJECT-TYPE
+      SYNTAX      DisplayString (SIZE(0..20))
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "Module product number to  identify the module
+                   type."
+      ::= { arubaWiredModuleEntry 9 }
+
+arubaWiredModuleAdminState OBJECT-TYPE
+      SYNTAX      DisplayString (SIZE(0..20))
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "Module administrative state."
+      ::= { arubaWiredModuleEntry 10 }
+
+arubaWiredModulePowerPriority OBJECT-TYPE
+      SYNTAX      Integer32 (1..254)
+      UNITS       "None"
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "Priority with which the module will be allocated power
+                   in relation to other modules in the system. Modules with
+                   higher priority will receive power first."
+      DEFVAL      { 128 }
+      ::= { arubaWiredModuleEntry 11 }
+
+arubaWiredModuleUnrecognizedDescriptor OBJECT-TYPE
+      SYNTAX      DisplayString (SIZE(0..40))
+      MAX-ACCESS  accessible-for-notify
+      STATUS      current
+      DESCRIPTION "Description of why module was not recognized."
+      ::= { arubaWiredModuleEntry 12 }
+
+
+-- **********************************************************************
+-- compliance statements
+-- **********************************************************************
+
+arubaWiredModuleConformance OBJECT IDENTIFIER
+      ::= { arubaWiredModule 99 }
+
+arubaWiredModuleCompliances OBJECT IDENTIFIER
+      ::= { arubaWiredModuleConformance 1 }
+
+arubaWiredModuleGroups      OBJECT IDENTIFIER
+      ::= { arubaWiredModuleConformance 2 }
+
+arubaWiredModuleCompliance MODULE-COMPLIANCE
+      STATUS      current
+      DESCRIPTION "A compliance statement for Aruba switch chassis."
+      MODULE
+      MANDATORY-GROUPS
+      {
+         arubaWiredModuleTable,
+         arubaWiredModuleNotificationsGroup
+      }
+      GROUP       arubaWiredModuleTableGroup
+      DESCRIPTION "A Collection of Object(s) that display the current module
+                   parameters information."
+
+      ::= { arubaWiredModuleCompliances 1 }
+
+arubaWiredModuleTableGroup OBJECT-GROUP
+      OBJECTS     {
+                    arubaWiredModuleName,
+                    arubaWiredModuleType,
+                    arubaWiredModuleState,
+                    arubaWiredModuleProductDescription,
+                    arubaWiredModuleSerialNumber,
+                    arubaWiredModuleProductNumber,
+                    arubaWiredModuleAdminState,
+                    arubaWiredModulePowerPriority,
+                    arubaWiredModuleUnrecognizedDescriptor
+                  }
+      STATUS      current
+      DESCRIPTION "A collection of objects display configuration, status,
+                   and measurements of Module table."
+      ::= { arubaWiredModuleGroups 1 }
+
+arubaWiredModuleNotificationsGroup NOTIFICATION-GROUP
+     NOTIFICATIONS { arubaWiredModuleStateNotification,
+                     arubaWiredModuleInsertedNotification,
+                     arubaWiredModuleRemovedNotification,
+                     arubaWiredModuleUnrecognizedNotification
+     }
+     STATUS current
+     DESCRIPTION "Notifications sent by module management."
+     ::= { arubaWiredModuleGroups 2 }
+END

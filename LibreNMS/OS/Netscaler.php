@@ -25,6 +25,7 @@
 
 namespace LibreNMS\OS;
 
+use Illuminate\Support\Facades\Log;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\RRD\RrdDefinition;
@@ -33,7 +34,7 @@ class Netscaler extends \LibreNMS\OS implements OSPolling
 {
     public function pollOS(DataStorageInterface $datastore): void
     {
-        echo ' IP';
+        Log::info('IP:');
 
         // These are at the start of large trees that we don't want to walk the entirety of, so we snmp_get_multi them
         $oids_gauge = [

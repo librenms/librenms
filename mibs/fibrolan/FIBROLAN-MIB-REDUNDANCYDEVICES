@@ -1,0 +1,605 @@
+--  =========================================================================================================================
+--  File              : FIBROLAN-MIB-REDUNDANCYDEVICES.mib
+--  Description       : Private MIB file for FibroLAN MetroStar I system Redudnacy devices - ATARA100, ATARA1000, ATARA1000RM
+--  By                : Tal Katz-Touaf
+--  MIB Version       : 2.0
+--  MetroStar Version : 1.6.2/build 12
+--  Date              : February 4, 2008
+--  =========================================================================================================================
+--
+--
+-- Copyright Fibrolan, 2008. All rights reserved.
+--
+-- Reproduction of this document is authorized on condition that this
+-- copyright notice is included.
+--
+FIBROLAN-MIB-REDUNDANCYDEVICES   DEFINITIONS ::= BEGIN
+
+	 IMPORTS
+		enterprises, OBJECT-TYPE, MODULE-IDENTITY, Integer32    FROM SNMPv2-SMI 
+		MODULE-COMPLIANCE, OBJECT-GROUP				FROM SNMPv2-CONF
+		DisplayString						FROM SNMPv2-TC
+		flMsChassisMvIndex, flMsChassisModuleMvIndex		FROM FIBROLAN-MIB-METRO-STAR-MV
+		flMsModuleMvChannelIndex				FROM FIBROLAN-MIB-MSMODULE;
+
+
+ flRedundantDev  MODULE-IDENTITY
+       LAST-UPDATED "0802040000Z"  
+       ORGANIZATION "Fibrolan ltd"
+       CONTACT-INFO
+         "http://www.fibrolan.com"
+       DESCRIPTION
+         "The MIB module to describe FibroLAN ATARA100,ATARA1000 and ATARA1000RM redudancy devices.
+          Copyright (C) Fibrolan Ltd (2008)."
+	::= { enterprises 4467 100 50 40 }
+
+
+    -- conformance information
+     flRedundantDevMIBConformance
+                   OBJECT IDENTIFIER ::= { flRedundantDev  1 }
+
+     flRedundantDevMIBCompliances			OBJECT IDENTIFIER ::= { flRedundantDevMIBConformance 1 }
+     flRedundantDevMIBGroups				OBJECT IDENTIFIER ::= { flRedundantDevMIBConformance 2 }
+
+
+	-- compliance statements
+     flRedundantDevMIBCompliance MODULE-COMPLIANCE
+              STATUS  current
+              DESCRIPTION
+                      "The compliance statement for flMetroStar entities
+                      which implement the ATARA100,ATARA1000 and ATARA1000RM MIB."
+              MODULE  -- this module
+                  MANDATORY-GROUPS { flRedundantDeviceGroup,
+									 flRedundantDeviceStatusGroup,
+									 flRedundantDevChannelGroup
+									}
+              ::= { flRedundantDevMIBCompliances 1 }
+
+     flRedundantDeviceGroup	OBJECT-GROUP
+	        OBJECTS		{	flRedundantDeviceReset,
+					flRedundantDeviceRestoreDefaults,
+					flRedundantDeviceFirmRevision,
+					flRedundantDeviceRedundancyMode,
+					flRedundantTemperature,
+					flRedundantSerialNumber}
+            STATUS  current
+            DESCRIPTION
+                    "A collection of objects providing basic
+                    instrumentation of the MetroStar ATARA100,ATARA1000 and ATARA1000RM entity."
+            ::= { flRedundantDevMIBGroups 1 }
+
+     flRedundantDeviceStatusGroup	OBJECT-GROUP
+	        OBJECTS		{	flRedundantDevActiveFoLink,
+					flRedundantDevActiveTpLink,
+					flRedundantDevStbyFoLink,
+					flRedundantDevStbyTpLink,
+					flRedundantDevMainFoInuse,
+					flRedundantDevMainTpInuse,
+					flRedundantDevBckpFoInuse,
+					flRedundantDevBckpTpInuse  }
+            STATUS  current
+            DESCRIPTION
+                    "A collection of objects providing basic
+                    links status of the MetroStar ATARA100,ATARA1000 and ATARA1000RM entity."
+            ::= { flRedundantDevMIBGroups 2 }
+
+	 flRedundantDevChannelGroup	OBJECT-GROUP
+	        OBJECTS		{	flRedundantDevChannelConfigIndex,
+					flRedundantDevUpstreamBw,
+					flRedundantDevEnableTpPort,
+					flRedundantDevPause,		--for ATARA100 only
+					flRedundantDevFo2TpFp,	--for ATARA100 and ATARA1000RM only
+					flRedundantDevFoLb,		--for ATARA1000 and ATARA1000RMonly
+					flRedundantDevTpLb,		--for ATARA1000 and ATARA1000RM only
+					flRedundantDevFo2TpLst,   --for ATARA1000 only
+					flRedundantDevFoBckp2Main,
+					flRedundantDevTpBckp2Main,
+					flRedundantDevForceFo,
+					flRedundantDevForceTp,
+					flRedundantDevBckpFoUnused,
+					flRedundantDevBckpTpUnused,
+					flRedundantDevPortDescription,
+					flRedundantDevTpFailOver,
+					flRedundantDevAutoNego}	--for ATARA1000RM only
+            STATUS  current
+            DESCRIPTION
+                    "A collection of objects providing extended
+                    instrumentation of the MetroStar  ATARA100, ATARA1000 and ATARA1000RM entity."
+            ::= { flRedundantDevMIBGroups 3 }
+
+
+-- ************************************************************
+-- ************************************************************
+-- FibroLan Object Identifier Definition
+-- ************************************************************
+-- ************************************************************
+
+fibrolan             OBJECT IDENTIFIER ::= { enterprises           4467 }
+
+fibrolanSNMP         OBJECT IDENTIFIER ::= { fibrolan               100 }
+
+flMaRemoteDevice     OBJECT IDENTIFIER ::= { fibrolanSNMP	         50 }
+
+--flRedundantDev 		 OBJECT IDENTIFIER ::= { flMaRemoteDevice        40 }
+
+
+flRedundantDevice			OBJECT IDENTIFIER ::= { flRedundantDev	    10 }
+flRedundantDevChannel		OBJECT IDENTIFIER ::= { flRedundantDev	    20 }
+
+-- ************************************************************
+-- ************************************************************
+-- ************************************************************
+-- Device configuration group
+-- ************************************************************
+-- ************************************************************
+-- ************************************************************
+     flRedundantDeviceConfigTable               OBJECT-TYPE
+         SYNTAX  SEQUENCE OF FlRedundantDeviceConfigEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "This table provides the device's general configuration"
+     ::= { flRedundantDevice 1 }
+
+     flRedundantDeviceConfigEntry				OBJECT-TYPE
+         SYNTAX  FlRedundantDeviceConfigEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "The entries of the table"
+         INDEX { flMsChassisMvIndex,
+		 flMsChassisModuleMvIndex,
+		 flMsModuleMvChannelIndex }
+     ::= { flRedundantDeviceConfigTable 1 }
+
+		FlRedundantDeviceConfigEntry ::= SEQUENCE
+		{
+			 flRedundantDeviceReset			        INTEGER, --only for ATARA100
+			 flRedundantDeviceRestoreDefaults		INTEGER,
+			 flRedundantDeviceFirmRevision		    DisplayString,
+			 flRedundantDeviceRedundancyMode		INTEGER,
+			 flRedundantTemperature					INTEGER, --only for ATARA1000RM
+			 flRedundantSerialNumber				DisplayString -- only for ATARA1000RM
+		}
+
+	--relavnt for ATARA100 only
+     flRedundantDeviceReset				OBJECT-TYPE
+		 SYNTAX    INTEGER {                     
+						  	  normal   (1), 
+						  	  reset	   (2)  
+						   }                     
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Reset device" 
+     ::= { flRedundantDeviceConfigEntry 2 }
+
+     flRedundantDeviceRestoreDefaults				OBJECT-TYPE
+		 SYNTAX    INTEGER {                     
+						  	  normal	(1), 
+						  	  restore	(2)  
+						   }                     
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Restore the device's defaults configuration" 
+     ::= { flRedundantDeviceConfigEntry 3 }
+
+     flRedundantDeviceFirmRevision				OBJECT-TYPE
+		 SYNTAX    DisplayString
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "The device's Firmware revision" 
+     ::= { flRedundantDeviceConfigEntry 4 }
+
+	 flRedundantDeviceRedundancyMode				OBJECT-TYPE
+		 SYNTAX    INTEGER {                     
+						  	  dual		(1), 
+						  	  redundant	(2),
+							  hybrid	(3)
+						   }                     
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Displays the device's redundancy mode" 
+     ::= { flRedundantDeviceConfigEntry 5 }
+
+	 flRedundantTemperature				OBJECT-TYPE
+		 SYNTAX    INTEGER                    
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Device temperature" 
+     ::= { flRedundantDeviceConfigEntry 6 }
+
+	 flRedundantSerialNumber				OBJECT-TYPE
+		 SYNTAX    DisplayString                    
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Device's serial number" 
+     ::= { flRedundantDeviceConfigEntry 7 }
+
+-- ************************************************************
+-- ************************************************************
+-- ************************************************************
+--  Redundancy device status group
+-- ************************************************************
+-- ************************************************************
+-- ************************************************************
+	flRedundantDeviceStatusTable               OBJECT-TYPE
+         SYNTAX  SEQUENCE OF FlRedundantDeviceStatusEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "This table provides the device's links' status"
+     ::= { flRedundantDevice 2 }
+
+     flRedundantDeviceStatusEntry				OBJECT-TYPE
+         SYNTAX  FlRedundantDeviceStatusEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "The entries of the table"
+         INDEX { flMsChassisMvIndex,
+		 flMsChassisModuleMvIndex,
+		 flMsModuleMvChannelIndex }
+     ::= { flRedundantDeviceStatusTable 1 }
+
+		FlRedundantDeviceStatusEntry ::= SEQUENCE
+		{
+			flRedundantDevActiveFoLink			INTEGER,
+			flRedundantDevActiveTpLink			INTEGER,
+			flRedundantDevStbyFoLink			INTEGER,
+			flRedundantDevStbyTpLink			INTEGER,
+			flRedundantDevMainFoInuse			INTEGER,
+			flRedundantDevMainTpInuse			INTEGER,
+			flRedundantDevBckpFoInuse			INTEGER,
+			flRedundantDevBckpTpInuse			INTEGER
+		}
+
+		flRedundantDevActiveFoLink				OBJECT-TYPE
+			SYNTAX	  INTEGER {
+								  down		 (1),
+								  bckp		 (2),
+								  fBckp      (3),
+								  main       (4)
+						      }
+			MAX-ACCESS     read-only
+			STATUS    current
+			DESCRIPTION
+			"Active Fo link status"
+	     ::= { flRedundantDeviceStatusEntry  1 }
+
+		 flRedundantDevActiveTpLink				OBJECT-TYPE
+			SYNTAX	  INTEGER {
+								  down		 (1),
+								  killed     (2),
+								  bckp		 (3),
+								  fBckp      (4),
+								  main       (5)
+							  }
+			 MAX-ACCESS     read-only
+			 STATUS    current
+			 DESCRIPTION
+			 "Active TP link status"
+		 ::= { flRedundantDeviceStatusEntry  2 }
+
+		 flRedundantDevStbyFoLink				OBJECT-TYPE
+			SYNTAX	  INTEGER {
+								  mainDown		 (1),
+								  bckpDown		 (2),
+								  bckpUnused     (3),
+								  mainUp		 (4),
+								  bckpUp		 (5)
+							  }
+			 MAX-ACCESS     read-only
+			 STATUS    current
+			 DESCRIPTION
+			 "Standby FO link status"
+		::= { flRedundantDeviceStatusEntry  3 }
+
+		flRedundantDevStbyTpLink				OBJECT-TYPE
+			SYNTAX	  INTEGER {
+								  mainDown		 (1),
+								  bckpDown		 (2),
+								  bckpUnused     (3),
+								  mainUp		 (4),
+								  bckpUp		 (5)
+							  }
+			 MAX-ACCESS     read-only
+			 STATUS    current
+			 DESCRIPTION
+			 "Standby TP link status"
+		::= { flRedundantDeviceStatusEntry 4 }
+
+		flRedundantDevMainFoInuse	  		   OBJECT-TYPE
+			SYNTAX	  INTEGER {
+								  off		 (1),
+								  on		 (2)
+							  }
+			 MAX-ACCESS     read-only
+			 STATUS    current
+			 DESCRIPTION
+			 "Main Fo port In-use LED"
+		::= { flRedundantDeviceStatusEntry 5 }
+
+		flRedundantDevMainTpInuse	  		   OBJECT-TYPE
+			SYNTAX	  INTEGER {
+								  off		 (1),
+								  on		 (2)
+							  }
+			 MAX-ACCESS     read-only
+			 STATUS    current
+			 DESCRIPTION
+			 "Main Fo port In-use LED"
+		::= { flRedundantDeviceStatusEntry 6 }
+
+		flRedundantDevBckpFoInuse	  		   OBJECT-TYPE
+			SYNTAX	  INTEGER {
+								  off		 (1),
+								  on		 (2)
+							  }
+			 MAX-ACCESS     read-only
+			 STATUS    current
+			 DESCRIPTION
+			 "Main Fo port In-use LED"
+		::= { flRedundantDeviceStatusEntry 7 }
+
+		flRedundantDevBckpTpInuse	  		   OBJECT-TYPE
+			SYNTAX	  INTEGER {
+								  off		 (1),
+								  on		 (2)
+							  }
+			 MAX-ACCESS     read-only
+			 STATUS    current
+			 DESCRIPTION
+			 "Main Fo port In-use LED"
+		::= { flRedundantDeviceStatusEntry 8 }
+
+
+-- ************************************************************
+-- ************************************************************
+-- ************************************************************
+--  Channel configuration group
+-- ************************************************************
+-- ************************************************************
+-- ************************************************************
+     flRedundantDevChannelConfigTable               OBJECT-TYPE
+         SYNTAX  SEQUENCE OF FlRedundantDevChannelConfigEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "This table provides the channel's configuration"
+     ::= { flRedundantDevChannel 1 }
+
+     flRedundantDevChannelConfigEntry				OBJECT-TYPE
+         SYNTAX  FlRedundantDevChannelConfigEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "The entries of the channel table"
+         INDEX { flMsChassisMvIndex,
+		 flMsChassisModuleMvIndex,
+		 flMsModuleMvChannelIndex,
+		 flRedundantDevChannelConfigIndex }
+     ::= { flRedundantDevChannelConfigTable 1 }
+
+		FlRedundantDevChannelConfigEntry ::= SEQUENCE
+		{	
+ 			flRedundantDevChannelConfigIndex	Integer32,
+			flRedundantDevUpstreamBw			INTEGER,
+			flRedundantDevEnableTpPort			INTEGER,
+			flRedundantDevPause				INTEGER,   --for ATARA100 only
+			flRedundantDevFo2TpFp				INTEGER,   --for ATARA100 and ATARA1000RM only
+			flRedundantDevFoLb				INTEGER,   --for ATARA1000 and ATARA1000RM only
+			flRedundantDevTpLb				INTEGER,   --for ATARA1000 and ATARA1000RM only
+			flRedundantDevFo2TpLst				INTEGER,   --for ATARA1000 only
+			flRedundantDevFoBckp2Main			INTEGER,
+			flRedundantDevTpBckp2Main			INTEGER,
+			flRedundantDevForceFo				INTEGER,
+			flRedundantDevForceTp				INTEGER,
+			flRedundantDevBckpFoUnused			INTEGER,
+			flRedundantDevBckpTpUnused			INTEGER,
+			flRedundantDevPortDescription			DisplayString,
+			flRedundantDevTpFailOver			INTEGER,   --for ATARA1000 and ATARA1000RM only
+			flRedundantDevAutoNego				INTEGER	   --for ATARA1000RM only
+		}
+
+
+     flRedundantDevChannelConfigIndex		OBJECT-TYPE
+		 SYNTAX    Integer32 (1..2)
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Table index" 
+     ::= { flRedundantDevChannelConfigEntry  1 }
+
+	flRedundantDevUpstreamBw			OBJECT-TYPE
+		 SYNTAX    INTEGER (1..1000)
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Upstream bandwidth, 1-100M for the ATARA100, 0-1000M (10M increments) for the ATARA1000 and ATARA1000RM" 
+	::= { flRedundantDevChannelConfigEntry  2 }
+
+    flRedundantDevEnableTpPort			OBJECT-TYPE
+		SYNTAX	  INTEGER {
+                              disable  (1),
+							  enable   (2)
+						  }
+         MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Disable/Enable TP port"
+    ::= { flRedundantDevChannelConfigEntry  3 }
+
+	--ATARA100 only
+   flRedundantDevPause				OBJECT-TYPE
+		SYNTAX	  INTEGER {		                                               
+							  off  (1),
+							  on   (2)
+						  }
+         MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Turn Pause Mode on/off"
+    ::= { flRedundantDevChannelConfigEntry  4 }
+
+	--ATARA100 and ATARA1000RM only
+    flRedundantDevFo2TpFp				OBJECT-TYPE
+		SYNTAX	  INTEGER {
+		                      off  (1),
+							  on   (2)
+						  }
+         MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		"FO to TP Fp Mode on/off"
+    ::= { flRedundantDevChannelConfigEntry  5 }
+
+	--ATARA1000 and ATARA1000RM only
+    flRedundantDevFoLb				OBJECT-TYPE
+		 SYNTAX    INTEGER {
+							  off  (1),
+						      on   (2)
+					       }
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "FO port loopback modeon/off" 
+	::= { flRedundantDevChannelConfigEntry  6 }
+
+	--ATARA1000 and ATARA1000RM only
+    flRedundantDevTpLb				OBJECT-TYPE
+		 SYNTAX    INTEGER {
+							  off  (1),
+						      on   (2)
+					       }
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "TP port loopback modeon/off" 
+	::= { flRedundantDevChannelConfigEntry  7 }
+
+	--ATARA1000 only
+    flRedundantDevFo2TpLst				OBJECT-TYPE
+		 SYNTAX    INTEGER {
+							  off  (1),
+						      on   (2)
+					       }
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "F0->TP LST mode, on/off" 
+	::= { flRedundantDevChannelConfigEntry  8 }
+
+	flRedundantDevFoBckp2Main	        OBJECT-TYPE
+		SYNTAX	  INTEGER {
+		                      sec0    (1),
+							  sec1    (2),
+							  sec5    (3),
+							  sec10   (4),
+							  sec20   (5),
+							  never   (6)
+						  }
+         MAX-ACCESS    read-write
+		 STATUS    current
+		 DESCRIPTION
+		"FO port Bckp 2 Main time"
+    ::= { flRedundantDevChannelConfigEntry  9 }
+
+	 flRedundantDevTpBckp2Main	        OBJECT-TYPE
+		SYNTAX	  INTEGER {
+		                      sec0    (1),
+							  sec1    (2),
+							  sec5    (3),
+							  sec10   (4),
+							  sec20   (5),
+							  never   (6)
+						  }
+         MAX-ACCESS    read-write
+		 STATUS    current
+		 DESCRIPTION
+		"TP port Bckp 2 Main time"
+    ::= { flRedundantDevChannelConfigEntry  10 }
+
+	 flRedundantDevForceFo	        OBJECT-TYPE
+		SYNTAX	  INTEGER {
+		                      off    (1),
+							  on     (2)
+						  }
+         MAX-ACCESS    read-write
+		 STATUS    current
+		 DESCRIPTION
+		"Force backup FO"
+    ::= { flRedundantDevChannelConfigEntry  11 }
+
+	 flRedundantDevForceTp	        OBJECT-TYPE
+		SYNTAX	  INTEGER {
+		                      off    (1),
+							  on     (2)
+						  }
+         MAX-ACCESS    read-write
+		 STATUS    current
+		 DESCRIPTION
+		"Force backup TP"
+    ::= { flRedundantDevChannelConfigEntry  12 }
+
+	 flRedundantDevBckpFoUnused	        OBJECT-TYPE
+		SYNTAX	  INTEGER {
+		                      off    (1),
+							  on     (2)
+						  }
+         MAX-ACCESS    read-write
+		 STATUS    current
+		 DESCRIPTION
+		"Backup FO unused"
+    ::= { flRedundantDevChannelConfigEntry  13 }
+
+	 flRedundantDevBckpTpUnused	        OBJECT-TYPE
+		SYNTAX	  INTEGER {
+		                      off    (1),
+							  on     (2)
+						  }
+         MAX-ACCESS    read-write
+		 STATUS    current
+		 DESCRIPTION
+		"Backup TP unused"
+    ::= { flRedundantDevChannelConfigEntry  14 }
+
+    flRedundantDevPortDescription			OBJECT-TYPE
+		 SYNTAX    DisplayString
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Port's textual description - up to 40 characters" 
+    ::= { flRedundantDevChannelConfigEntry  15 }
+
+	--ATARA1000 and ATARA1000RM only
+	flRedundantDevTpFailOver	        OBJECT-TYPE
+		SYNTAX	  INTEGER {
+		                      normal    (1),
+							  fast	     (2)
+						  }
+         MAX-ACCESS    read-write
+		 STATUS    current
+		 DESCRIPTION
+		"TP fail-over response time"
+    ::= { flRedundantDevChannelConfigEntry  16 }
+
+	--ATARA1000RM only
+	flRedundantDevAutoNego	        OBJECT-TYPE
+		SYNTAX	  INTEGER {
+		                      off    (1),
+							  on	 (2)
+						  }
+         MAX-ACCESS    read-write
+		 STATUS    current
+		 DESCRIPTION
+		"Channel's FO port Auto-Negotiation mode"
+    ::= { flRedundantDevChannelConfigEntry  17 }
+
+
+END

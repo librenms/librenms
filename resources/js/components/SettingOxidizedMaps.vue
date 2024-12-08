@@ -63,6 +63,7 @@
                                 <option value="sysDescr">sysDescr</option>
                                 <option value="location">location</option>
                                 <option value="ip">ip</option>
+                                <option value="poller_group">poller_group</option>
                             </select>
                         </div>
                     </div>

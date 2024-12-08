@@ -1,0 +1,1234 @@
+-- File Name : BW-BroadworksMediaServer.mib
+-- Date      : 08/15/05
+-- Author    : BroadSoft
+BW-BroadworksMediaServer DEFINITIONS ::= BEGIN
+	IMPORTS
+		enterprises, MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-TYPE, Counter32, Gauge32, Counter64
+			FROM SNMPv2-SMI
+		MODULE-COMPLIANCE, OBJECT-GROUP          
+			FROM SNMPv2-CONF
+		DateAndTime, DisplayString
+			FROM SNMPv2-TC;
+
+	broadsoft	MODULE-IDENTITY
+		LAST-UPDATED	"200508151430Z"
+		ORGANIZATION	"Broadsoft, Inc"
+		CONTACT-INFO	"Broadsoft, Inc.
+220 Perry Parkway
+Gaithersburg, MD  20877
+301-977-9440"
+		DESCRIPTION
+				"This document contains the management information that is
+				common to all elements in a Broadworks system."
+		REVISION		"200508151430Z"
+		DESCRIPTION
+				"Adding a MODULE-COMPLIANCE statement and OBJECT-GROUP definitions."
+		REVISION		"200009191431Z"
+		DESCRIPTION
+				""
+		::=  {  enterprises  6431  }
+
+	broadworks	OBJECT IDENTIFIER
+		::=  {  broadsoft  1  }
+
+	mediaServer	OBJECT IDENTIFIER
+		::=  {  broadworks  3  }
+
+	mcp	OBJECT IDENTIFIER
+		::=  {  mediaServer  1  }
+
+	rtp	OBJECT IDENTIFIER
+		::=  {  mediaServer  2  }
+
+	smtp	OBJECT IDENTIFIER
+		::=  {  mediaServer  3  }
+
+	system	OBJECT IDENTIFIER
+		::=  {  mediaServer  4  }
+
+	http	OBJECT IDENTIFIER
+		::=  {  mediaServer  5  }
+
+	management	OBJECT IDENTIFIER
+		::=  {  mediaServer  6  }
+
+	sip	OBJECT IDENTIFIER
+		::=  {  mediaServer  7  }
+
+	mscml	OBJECT IDENTIFIER
+		::=  {  mediaServer  8  }
+
+	liveaudio	OBJECT IDENTIFIER
+		::=  {  mediaServer  9  }
+
+	video	OBJECT IDENTIFIER
+		::=  {  mediaServer  10  }
+
+	fax	OBJECT IDENTIFIER
+		::=  {  mediaServer  11  }
+
+	vxml	OBJECT IDENTIFIER
+		::=  {  mediaServer  12  }
+
+	ccxml	OBJECT IDENTIFIER
+		::=  {  mediaServer  13  }
+
+	interfaces	OBJECT IDENTIFIER
+		::=  {  mediaServer  14  }
+
+	bwMsConformance	OBJECT IDENTIFIER
+		::=  {  mediaServer  20  }
+
+-- mcp modules  ...........................................
+
+	conferencing	OBJECT IDENTIFIER
+		::=  {  mcp  3  }
+
+	ivr	OBJECT IDENTIFIER
+		::=  {  mcp  4  }
+
+	msPortsInUse	OBJECT-TYPE
+		SYNTAX			Gauge32  ( 0 .. 4294967295  )
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"Total numbers of ports currently in use"
+		::=  {  mcp  5  }
+
+	msNoPortAvailableErrors	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"Number of 'no ports available' errors"
+		::=  {  mcp  6  }
+
+	msMCPNotificationsTransmitted	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			obsolete
+		DESCRIPTION
+				"number of MCP Notifications transmitted"
+		::=  {  mcp  7  }
+
+	msMCPNotificationsRetransmitted	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			obsolete
+		DESCRIPTION
+				"number of MCP Notifications re-transmitted"
+		::=  {  mcp  8  }
+
+	msMCPCommandsReceived	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			obsolete
+		DESCRIPTION
+				"number of MCP Commands received"
+		::=  {  mcp  9  }
+
+-- mcp/conferencing modules  ...........................................
+
+	msConfAddParticipantFailed	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			obsolete
+		DESCRIPTION
+				"Number of AddParticipant command failures"
+		::=  {  conferencing  1  }
+
+	msConfAddParticipant	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			obsolete
+		DESCRIPTION
+				"Number of AddParticipant commands received"
+		::=  {  conferencing  2  }
+
+	msConfAllocateBridge	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			obsolete
+		DESCRIPTION
+				"Number of AllocateBridge commands received"
+		::=  {  conferencing  3  }
+
+	msConfAllocateBridgeFailed	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			obsolete
+		DESCRIPTION
+				"Number of AllocateBridge command failures"
+		::=  {  conferencing  4  }
+
+	msConfRemoveParticipant	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			obsolete
+		DESCRIPTION
+				"Number of RemoveParticipant commands received"
+		::=  {  conferencing  5  }
+
+	msConfRemoveParticipantFailed	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			obsolete
+		DESCRIPTION
+				"Number of RemoveParticipant command failures"
+		::=  {  conferencing  6  }
+
+	msConfCurrentPortsInUse	OBJECT-TYPE
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			obsolete
+		DESCRIPTION
+				"Number of conferencing ports currently in use"
+		::=  {  conferencing  7  }
+
+	msConferenceCount	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"Total number of conferences"
+		::=  {  conferencing  8  }
+
+	msConfTotalDuration	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"Total duration of all conferences (in seconds)"
+		::=  {  conferencing  9  }
+
+	msConfUpdateParticipant	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			obsolete
+		DESCRIPTION
+				"Number of UpdateParticipant commands received"
+		::=  {  conferencing  11  }
+
+	msConfUpdateParticipantFailed	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			obsolete
+		DESCRIPTION
+				"Number of UpdateParticipant command failures"
+		::=  {  conferencing  12  }
+
+-- mcp/ivr modules  ...........................................
+
+	msIvrFreeAudioMemory	OBJECT-TYPE
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"Memory available for audio files (in bytes)"
+		::=  {  ivr  1  }
+
+	msIvrAudioMemoryInUse	OBJECT-TYPE
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"Audio memory currently in use (in bytes)"
+		::=  {  ivr  2  }
+
+	msIvrCurrentPortsInUse	OBJECT-TYPE
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			obsolete
+		DESCRIPTION
+				"Number of IVR ports currently in use"
+		::=  {  ivr  3  }
+
+	msIvrCreateConnection	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			obsolete
+		DESCRIPTION
+				"Number of CreateConnection commands received"
+		::=  {  ivr  4  }
+
+	msIvrCreateConnectionFailed	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			obsolete
+		DESCRIPTION
+				"Number of CreateConnection command failures"
+		::=  {  ivr  5  }
+
+	msIvrUpdateConnection	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			obsolete
+		DESCRIPTION
+				"Number of UpdateConnection commands received"
+		::=  {  ivr  6  }
+
+	msIvrUpdateConnectionFailed	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			obsolete
+		DESCRIPTION
+				"Number of UpdateConnection command failures"
+		::=  {  ivr  7  }
+
+	msIvrPlay	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			obsolete
+		DESCRIPTION
+				"Number of Play commands received"
+		::=  {  ivr  8  }
+
+	msIvrPlayFailed	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			obsolete
+		DESCRIPTION
+				"Number of Play command failures"
+		::=  {  ivr  9  }
+
+	msIvrPlayCollect	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			obsolete
+		DESCRIPTION
+				"Number of PlayCollect commands received"
+		::=  {  ivr  10  }
+
+	msIvrPlayCollectFailed	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			obsolete
+		DESCRIPTION
+				"Number of PlayCollect command failures"
+		::=  {  ivr  11  }
+
+	msIvrPlayRecord	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			obsolete
+		DESCRIPTION
+				"Number of PlayRecord commands received"
+		::=  {  ivr  12  }
+
+	msIvrPlayRecordFailed	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			obsolete
+		DESCRIPTION
+				"Number of PlayRecord command failures"
+		::=  {  ivr  13  }
+
+	msIvrSendEmail	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			obsolete
+		DESCRIPTION
+				"Number of SendEmail commands received"
+		::=  {  ivr  14  }
+
+	msIvrSendEmailFailed	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			obsolete
+		DESCRIPTION
+				"Number of SendEmail command failures"
+		::=  {  ivr  15  }
+
+	msIvrSessionCount	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"Total number of IVR sessions"
+		::=  {  ivr  16  }
+
+	msIvrTotalDuration	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"Total duration of all IVR sessions (in seconds)"
+		::=  {  ivr  17  }
+
+	msIvrTotalRecordingDuration	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			obsolete
+		DESCRIPTION
+				"Total duration of recorded voice messages (in seconds)"
+		::=  {  ivr  18  }
+
+	msIvrMerge	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			obsolete
+		DESCRIPTION
+				"Number of Merge commands received"
+		::=  {  ivr  21  }
+
+	msIvrMergeFailed	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			obsolete
+		DESCRIPTION
+				"Number of Merge command failures"
+		::=  {  ivr  22  }
+
+	msIvrEmptyRecordings	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			obsolete
+		DESCRIPTION
+				"Number of recordings that failed due to too few RTP packets received. This may be due to silence suppression at the remote RTP device, or the network dropping packets."
+		::=  {  ivr  23  }
+
+-- rtp modules  ...........................................
+
+	msRtpSessionsCount	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"Total number of RTP sessions"
+		::=  {  rtp  1  }
+
+	receive	OBJECT IDENTIFIER
+		::=  {  rtp  2  }
+
+	transmit	OBJECT IDENTIFIER
+		::=  {  rtp  3  }
+
+	msRtpSessionsInUse	OBJECT-TYPE
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"Total number of active RTP sessions"
+		::=  {  rtp  4  }
+
+-- rtp/receive modules  ...........................................
+
+	msRtcpSenderReports	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"Number of RTCP sender reports received"
+		::=  {  receive  1  }
+
+	msRtpPacketsExpected	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"Total number of packets that were expected"
+		::=  {  receive  2  }
+
+	msRtpPacketsReceived	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"Number of packets actually received"
+		::=  {  receive  3  }
+
+	msRtpOutOfOrder	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"Number of RTP packets that were received out of order"
+		::=  {  receive  5  }
+
+	msRtpBadPayload	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"Number of packets received which had a bad payload type"
+		::=  {  receive  6  }
+
+	msRtpSsrc	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"Number of packets received that had an invalid SSRC"
+		::=  {  receive  7  }
+
+	msRtpReceivedPacketJitter	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"Total jitter of packets received by this node"
+		::=  {  receive  8  }
+
+-- rtp/transmit modules  ...........................................
+
+	msRtpCumulativePacketsLost	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"Cumulative count of packets sent by this node but reported lost by remote nodes"
+		::=  {  transmit  1  }
+
+	msRtpPacketsSent	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"Number of packets sent"
+		::=  {  transmit  4  }
+
+	msRtpFramesSkipped	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"Number of frames that were skipped because CPU is overloaded (one frame = 1 packet per RTP session)"
+		::=  {  transmit  5  }
+
+	msRtpTransmitJitter	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"Jitter of packets transmitted by this node, as measured by remote nodes"
+		::=  {  transmit  6  }
+
+-- smtp modules  ...........................................
+
+	primary	OBJECT IDENTIFIER
+		::=  {  smtp  1  }
+
+	secondary	OBJECT IDENTIFIER
+		::=  {  smtp  2  }
+
+-- smtp/primary modules  ...........................................
+
+	msPrimaryEmailSent	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"Number of messages sent to primary SMTP server"
+		::=  {  primary  1  }
+
+	msPrimarySmtpErrors	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"Number of errors that occured to primary SMTP server"
+		::=  {  primary  2  }
+
+-- smtp/secondary modules  ...........................................
+
+	msSecondaryEmailSent	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"Number of e-mails sent to secondary SMTP server"
+		::=  {  secondary  1  }
+
+	msSecondarySmtpErrors	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"Number of errors that occured to secondary SMTP server"
+		::=  {  secondary  2  }
+
+-- system modules  ...........................................
+
+	msAlarmsCount	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"Number of alarms sent (i.e., SNMP Traps)"
+		::=  {  system  1  }
+
+	msSoftwareErrorsCount	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"Number of software errors that were reported"
+		::=  {  system  2  }
+
+	msACLViolationCount	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"Number of sip messages received from unauthorized host"
+		::=  {  system  3  }
+
+  msMaxCapacityInPorts OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS read-write
+    STATUS  current
+    DESCRIPTION
+      "The maximum number of 'G.711 ports' the MS is capable of handling"
+    ::= {  system 4  }
+
+  msNumLicensedPorts OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+      "The maximum number of licensed ports the MS is authorized to use according to its license file."
+    ::= {  system 5  }
+
+-- sip modules  ...........................................
+
+	msSipStatsInviteIns	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"Number of INVITE requests received by the MediaServer."
+		::=  {  sip  1  }
+
+	msSipStatsAckIns	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"Number of ACK requests received by the MediaServer."
+		::=  {  sip  2  }
+
+	msSipStatsByeIns	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"Number of BYE requests received by the MediaServer."
+		::=  {  sip  3  }
+
+	msSipStatsByeOuts	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"Number of BYE requests sent by the MediaServer."
+		::=  {  sip  4  }
+
+	msSipStatsInfoIns	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"Number of INFO requests received by the MediaServer."
+		::=  {  sip  5  }
+
+	msSipStatsInfoOuts	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"Number of INFO requests sent by the MediaServer."
+		::=  {  sip  6  }
+
+	msSipStatsOthersIns	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"Number of UNKNOWN requests received by the MediaServer."
+		::=  {  sip  7  }
+
+	msSipStatsOthersOuts	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"Number of UNKNOWN requests sent by the MediaServer."
+		::=  {  sip  8  }
+
+	msSipStatsResponsesIns	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"Number of responses received by the MediaServer, excluding retransmissions."
+		::=  {  sip  9  }
+
+	msSipStatsResponsesOuts	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"Number of responses sent by the MediaServer, excluding retransmissions."
+		::=  {  sip  10  }
+
+	msSipStatsInvite200OKRetransmitsOuts	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"Number of 200 OK to a SIP INVITE that were retransmitted by the media server to a SIP user agent."
+		::=  {  sip  11  }
+
+	msSipStatsRequestRetransmittedIns	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"Number of SIP requests retransmitted by a remote SIP user agent to the media server."
+		::=  {  sip  12  }
+
+	msSipStatsReferOuts	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"Number of SIP REFER sent by the media server."
+		::=  {  sip  13  }
+
+	msRedirectsCount	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This is the total number of times SIP Redirect Response (3xx) was received from the Load Balancer/SIP Redirect Proxy in response to INVITE."
+		::=  {  sip  14  }
+
+	msTimeOutRouteAdvancesCount	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This is the total number of times the initial INVITE from MS to the end point times out and a new IINVITE is sent to the next end point on the contact URI list."
+		::=  {  sip  15  }
+
+	msRouteAdvancesCount	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This is the total number of times MS had to iterate through the contact URI list either returned in the SIP Redirect Response or configured via CLI (for ASR and TTS servers)"
+		::=  {  sip  16  }
+
+
+-- mscml modules  ...........................................
+
+	msMSCMLPlayCollect	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"Number of PlayCollect commands received."
+		::=  {  mscml  1  }
+
+	msMSCMLPlayCollectFailed	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"Number of PlayCollect command failures."
+		::=  {  mscml  2  }
+
+	msMSCMLPlay	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"Number of Play commands received."
+		::=  {  mscml  3  }
+
+	msMSCMLPlayFailed	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"Number of Play command failures."
+		::=  {  mscml  4  }
+
+	msMSCMLPlayRecord	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"Number of PlayRecord commands received."
+		::=  {  mscml  5  }
+
+	msMSCMLRecordFailed	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"Number of PlayRecord command failures."
+		::=  {  mscml  6  }
+
+	msMSCMLSendMail	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"Number of SendEmail commands received."
+		::=  {  mscml  7  }
+
+	msMSCMLSendMailFailed	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"Number of SendEmail command failures."
+		::=  {  mscml  8  }
+
+	msMSCMLTotalRecordingDuration	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"Duration of all MSCML sessions (in seconds)."
+		::=  {  mscml  9  }
+
+	msMSCMLEmptyRecordings	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"Number of recordings that failed due to too few RTP packets received. This may be due to silence suppression at the remote RTP device, or the network dropping packets."
+		::=  {  mscml  10  }
+
+-- http modules  ...........................................
+
+	msFilesDownloaded	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"total number of files downloaded"
+		::=  {  http  1  }
+
+	msTotalSizeDownloadedFiles	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"total size of downloaded files"
+		::=  {  http  2  }
+
+	msFilesRetrievedFromCache	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"total number of files retrieved from cache"
+		::=  {  http  3  }
+
+-- liveaudio modules  ...........................................
+
+	msLiveAudioRequestCount	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			obsolete
+		DESCRIPTION
+				"total number of live audio request"
+		::=  {  liveaudio  1  }
+
+	msLiveAudioFailureCount	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			obsolete
+		DESCRIPTION
+				"total number of live audio failure"
+		::=  {  liveaudio  2  }
+
+	msLiveAudioTotalDuration	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			obsolete
+		DESCRIPTION
+				"total duration of all live audio sessions (in seconds)"
+		::=  {  liveaudio  3  }
+
+	msLiveAudioULawUserCount	OBJECT-TYPE
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			obsolete
+		DESCRIPTION
+				"current number of live audio sessions with ulaw codec."
+		::=  {  liveaudio  4  }
+
+	msLiveAudioALawUserCount	OBJECT-TYPE
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			obsolete
+		DESCRIPTION
+				"current number of live audio sessions with alaw codec."
+		::=  {  liveaudio  5  }
+
+	msLiveAudioG726UserCount	OBJECT-TYPE
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			obsolete
+		DESCRIPTION
+				"current number of live audio sessions with g726 codec."
+		::=  {  liveaudio  6  }
+
+	msLiveAudioG729UserCount	OBJECT-TYPE
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			obsolete
+		DESCRIPTION
+				"current number of live audio sessions with g729 codec."
+		::=  {  liveaudio  7  }
+
+-- video module  ...........................................
+
+	msVideoRecorded	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter is incremented whenever a video stream is recorded."
+		::=  {  video  6  }
+
+	msVideoPlayback	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter is incremented whenever a video stream is played back."
+		::=  {  video  7  }
+
+-- fax module  ...........................................
+
+	msFaxReceived	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter is incremented whenever an MS receives a fax on behalf of Broadworks subscriber."
+		::=  {  fax  1  }
+
+	msFaxReceptionFailure	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter is incremented whenever an MS fails to receive a fax on behalf of Broadworks subscriber."
+		::=  {  fax  2  }
+
+	msFaxPrinted	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter is incremented whenever an MS sends a fax on behalf of Broadworks subscriber."
+		::=  {  fax  3  }
+
+	msFaxPrintingFailure	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter is incremented whenever an MS fails to send a fax on behalf of Broadworks subscriber."
+		::=  {  fax  4  }
+
+-- vxml module  ...........................................
+
+	msVoiceXMLErrorCount	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"The VoiceXML error count counter is incremented whenever an error occurs while downloading or running a VoiceXML script."
+		::=  {  vxml  1  }
+
+	msVoiceXMLFilesDownloaded	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"The VoiceXML files downloaded counter is incremented whenever a VoiceXML file is downloaded.  It does not include media files."
+		::=  {  vxml  2  }
+
+-- ccxml module  ...........................................
+
+	msCallControlXMLSessionCount	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"Total number of CallControlXML Sessions"
+		::=  {  ccxml  1  }
+
+	msCallControlXMLCreateCallCount	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"Total number of CallControlXML calls created through the createcall tag"
+		::=  {  ccxml  2  }
+
+	msCallControlXMLDialogCount	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"Total number of CallControlXML dialogs"
+		::=  {  ccxml  3  }
+
+	msCallControlXMLConfCount	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"Total number of CallControlXML conferences"
+		::=  {  ccxml  4  }
+
+-- system management module  ...........................................
+
+	resetAllMSCounters	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"When set to a value other then 0, all the counters in the system are reset to 0."
+		::=  {  management  1  }
+
+-- interfaces module ...........................................
+
+	mrcp	OBJECT IDENTIFIER
+		::=  {  interfaces  1  }
+
+-- MRCP modules ...........................................
+
+	msMrcpAsrSessionsCount	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This is the total number of completed ASR MRCP sessions."
+		::=  {  mrcp  1  }
+
+	msMrcpAsrSessionsInUse	OBJECT-TYPE
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This is the total number of currently active ASR MRCP sessions."
+		::=  {  mrcp  2  }
+
+	msMrcpTtsSessionsCount	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This is the total number of completed TTS MRCP sessions."
+		::=  {  mrcp  3  }
+
+	msMrcpTtsSessionsInUse	OBJECT-TYPE
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This is the total number of currently active TTS MRCP sessions."
+		::=  {  mrcp  4  }
+
+	msMrcpRecognitionAttemptsCount	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This is the total number of times a RECOGNIZE request is executed during MRCP sessions."
+		::=  {  mrcp  8  }
+
+	msMrcpSuccessfulRecognitionsCount	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This is the total number of times a RECOGNIZE request is executed successfully during MRCP sessions."
+		::=  {  mrcp  9  }
+
+	msMrcpRequestsCount	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This is the total number of MRCP requests."
+		::=  {  mrcp  10  }
+
+	msMrcpFailedRequestsCount	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This is the total number of failed MRCP requests."
+		::=  {  mrcp  11  }
+
+	msMrcpFailedConnectionsCount	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This is the total number of times TCP or TLS connection attempts failed during initiating of an MRCP session."
+		::=  {  mrcp  12  }
+
+	msMrcpKeepAliveFailuresCount	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This is the total number of times GET-PARAMS command sent to ASR/TTS server fails to receive a response in a timely manner during initiating MRCP sessions."
+		::=  {  mrcp  13  }
+
+	msMrcpSpeakRequestsCount	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This is the total number of times SPEAK requests sent through the control channel to the TTS server."
+		::=  {  mrcp  14  }
+
+	msMrcpSpeakRequestFailuresCount	OBJECT-TYPE
+		SYNTAX			Counter64
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This is the total number of times SPEAK request sent to TTS server fails to receive a response <<SPEAK-COMPLETE>> with the completion cause other than <<Completion-Cause:000 normal>>."
+		::=  {  mrcp  15  }
+
+-- Media Server MIB Conformance Definition  ...........................................
+
+bwMSGroups		OBJECT IDENTIFIER ::= { bwMsConformance 1 }
+bwMSCompliancy		OBJECT IDENTIFIER ::= { bwMsConformance 2 }
+
+-- units of conformance
+
+bwMSGroupMCP    OBJECT-GROUP
+    OBJECTS {msPortsInUse, msNoPortAvailableErrors, msMCPNotificationsTransmitted, msMCPNotificationsRetransmitted, msMCPCommandsReceived }
+    STATUS  current
+    DESCRIPTION
+       "This group defines global counters for the MCP protocol."
+    ::= { bwMSGroups 1 }
+
+bwMSGroupMCPConferencing    OBJECT-GROUP
+    OBJECTS {msConfAddParticipantFailed, msConfAddParticipant, msConfAllocateBridge, msConfAllocateBridgeFailed, msConfRemoveParticipant, msConfRemoveParticipantFailed, msConfCurrentPortsInUse, msConferenceCount, msConfTotalDuration, msConfUpdateParticipant, msConfUpdateParticipantFailed }
+    STATUS  current
+    DESCRIPTION
+       "This group defines global counters for the MCP protocol for the Conferencing service."
+    ::= { bwMSGroups 2 }
+
+bwMSGroupMCPIVR    OBJECT-GROUP
+    OBJECTS {msIvrFreeAudioMemory, msIvrAudioMemoryInUse, msIvrCurrentPortsInUse, msIvrCreateConnection, msIvrCreateConnectionFailed, msIvrUpdateConnection, msIvrUpdateConnectionFailed, msIvrPlay, msIvrPlayFailed, msIvrPlayCollect, msIvrPlayCollectFailed, msIvrPlayRecord, msIvrPlayRecordFailed, msIvrSendEmail, msIvrSendEmailFailed, msIvrSessionCount, msIvrTotalDuration, msIvrTotalRecordingDuration, msIvrMerge, msIvrMergeFailed, msIvrEmptyRecordings }
+    STATUS  current
+    DESCRIPTION
+       "This group defines global counters for the MCP protocol for the IVR service."
+    ::= { bwMSGroups 3 }
+
+bwMSGroupRTP    OBJECT-GROUP
+    OBJECTS {msRtcpSenderReports, msRtpPacketsExpected, msRtpPacketsReceived, msRtpOutOfOrder, msRtpBadPayload, msRtpSsrc, msRtpReceivedPacketJitter, msRtpCumulativePacketsLost, msRtpPacketsSent, msRtpFramesSkipped, msRtpTransmitJitter, msRtpSessionsCount, msRtpSessionsInUse }
+    STATUS  current
+    DESCRIPTION
+       "This group defines global counters for the RTP packets."
+    ::= { bwMSGroups 4 }
+
+bwMSGroupSMTP    OBJECT-GROUP
+    OBJECTS {msPrimaryEmailSent, msPrimarySmtpErrors, msSecondaryEmailSent, msSecondarySmtpErrors}
+    STATUS  current
+    DESCRIPTION
+       "This group defines global counters for the SMTP protocol."
+    ::= { bwMSGroups 5 }
+
+bwMSGroupSystem    OBJECT-GROUP
+    OBJECTS {msAlarmsCount, msSoftwareErrorsCount, msACLViolationCount, msMaxCapacityInPorts, msNumLicensedPorts}
+    STATUS  current
+    DESCRIPTION
+       "This group defines miscellaneous MS system counters."
+    ::= { bwMSGroups 6 }
+
+bwMSGroupHTTP    OBJECT-GROUP
+    OBJECTS {msFilesDownloaded, msTotalSizeDownloadedFiles, msFilesRetrievedFromCache}
+    STATUS  current
+    DESCRIPTION
+       "This group defines global counters for the HTTP protocol."
+    ::= { bwMSGroups 7 }
+
+bwMSGroupManagement    OBJECT-GROUP
+    OBJECTS {resetAllMSCounters}
+    STATUS  current
+    DESCRIPTION
+       "This group defines global counters for the MS as extension to the BroadWorks Maintenance MIB."
+    ::= { bwMSGroups 8 }
+
+bwMSGroupSIP    OBJECT-GROUP
+    OBJECTS {msSipStatsInviteIns, msSipStatsAckIns, msSipStatsByeIns, msSipStatsByeOuts, msSipStatsInfoIns, msSipStatsInfoOuts, msSipStatsOthersIns, msSipStatsOthersOuts, msSipStatsResponsesIns, msSipStatsResponsesOuts, msSipStatsInvite200OKRetransmitsOuts, msSipStatsRequestRetransmittedIns, msSipStatsReferOuts, msRedirectsCount, msTimeOutRouteAdvancesCount, msRouteAdvancesCount}
+    STATUS  current
+    DESCRIPTION
+       "This group defines global counters for the SIP protocol."
+    ::= { bwMSGroups 9 }
+
+bwMSGroupMSCML    OBJECT-GROUP
+    OBJECTS {msMSCMLPlayCollect, msMSCMLPlayCollectFailed, msMSCMLPlay, msMSCMLPlayFailed, msMSCMLPlayRecord, msMSCMLRecordFailed, msMSCMLSendMail, msMSCMLSendMailFailed, msMSCMLTotalRecordingDuration, msMSCMLEmptyRecordings}
+    STATUS  current
+    DESCRIPTION
+       "This group defines global counters for the MSCML protocol."
+    ::= { bwMSGroups 10 }
+
+bwMSGroupLiveAudio    OBJECT-GROUP
+    OBJECTS {msLiveAudioRequestCount, msLiveAudioFailureCount, msLiveAudioTotalDuration, msLiveAudioULawUserCount, msLiveAudioALawUserCount, msLiveAudioG726UserCount, msLiveAudioG729UserCount}
+    STATUS  current
+    DESCRIPTION
+       "This group defines global counters for the live audio service."
+    ::= { bwMSGroups 11 }
+
+bwMSGroupVideo    OBJECT-GROUP
+    OBJECTS {msVideoRecorded, msVideoPlayback}
+    STATUS  current
+    DESCRIPTION
+       "This group defines global counters for the support of video by the media server."
+    ::= { bwMSGroups 12 }
+
+bwMSGroupFax    OBJECT-GROUP
+    OBJECTS {msFaxReceived, msFaxReceptionFailure, msFaxPrinted, msFaxPrintingFailure}
+    STATUS  current
+    DESCRIPTION
+       "This group defines global counters for the support of fax by the media server."
+    ::= { bwMSGroups 13 }
+    
+bwMSGroupVxml    OBJECT-GROUP
+    OBJECTS {msVoiceXMLErrorCount, msVoiceXMLFilesDownloaded}
+    STATUS  current
+    DESCRIPTION
+       "this group defines global counters for the support of VoiceXML by the media server."
+    ::= { bwMSGroups 14 }
+    
+bwMSGroupCcxml    OBJECT-GROUP
+    OBJECTS {msCallControlXMLSessionCount, msCallControlXMLCreateCallCount, msCallControlXMLDialogCount, msCallControlXMLConfCount}
+    STATUS  current
+    DESCRIPTION
+       "this group defines global counters for the support of CallControlXML by the media server."
+    ::= { bwMSGroups 15 }
+    
+bwMSGroupMrcp    OBJECT-GROUP
+    OBJECTS { msCallControlXMLConfCount, msMrcpAsrSessionsInUse, msMrcpTtsSessionsCount, msMrcpTtsSessionsInUse, msMrcpRecognitionAttemptsCount, msMrcpSuccessfulRecognitionsCount, msMrcpRequestsCount, msMrcpFailedRequestsCount, msMrcpFailedConnectionsCount, msMrcpKeepAliveFailuresCount, msMrcpSpeakRequestsCount, msMrcpSpeakRequestFailuresCount }
+    STATUS  current
+    DESCRIPTION
+       "this group defines global counters for the support of CallControlXML by the media server."
+    ::= { bwMSGroups 16 }
+    
+-- 
+bwMsBasicCompliance MODULE-COMPLIANCE
+	STATUS obsolete
+     	DESCRIPTION
+		"BroadWorks Media Server MIB Module compliance"
+	MODULE -- this module
+		MANDATORY-GROUPS { bwMSGroupMCP, bwMSGroupMCPConferencing, bwMSGroupMCPIVR, bwMSGroupRTP, bwMSGroupSMTP, bwMSGroupSystem, bwMSGroupHTTP, bwMSGroupManagement, bwMSGroupSIP, bwMSGroupMSCML, bwMSGroupLiveAudio, bwMSGroupVideo, bwMSGroupFax, bwMSGroupVxml, bwMSGroupCcxml , bwMSGroupMrcp }
+	::= { bwMSCompliancy 1 }
+
+
+END

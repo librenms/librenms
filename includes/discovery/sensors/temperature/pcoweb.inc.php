@@ -121,6 +121,6 @@ foreach ($temperatures as $temperature) {
 
     if (is_numeric($current) && $current != 0) {
         $index = implode('.', array_slice(explode('.', $temperature['oid']), -5));
-        discover_sensor($valid['sensor'], 'temperature', $device, $temperature['oid'], $index, 'pcoweb', $temperature['descr'], $temperature['precision'], '1', $low_limit, null, null, $high_limit, $current);
+        discover_sensor(null, 'temperature', $device, $temperature['oid'], $index, 'pcoweb', $temperature['descr'], $temperature['precision'], '1', $low_limit, null, null, $high_limit, $current);
     }
 }

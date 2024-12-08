@@ -59,9 +59,9 @@ class Alertmanager extends Transport
         foreach ($alertmanager_opts as $label => $value) {
             // To allow dynamic values
             if (preg_match('/^extra_[A-Za-z0-9_]+$/', $label) && ! empty($alert_data['faults'][1][$value])) {
-                $data[0]['labels'][$label] = $alert_data['faults'][1][$value];
+                $data[0]['labels'][$label] = strip_tags($alert_data['faults'][1][$value]);
             } else {
-                $data[0]['labels'][$label] = $value;
+                $data[0]['labels'][$label] = strip_tags($value);
             }
         }
 
