@@ -51,11 +51,11 @@ class Url
     public static function deviceLink($device, $text = '', $vars = [], $start = 0, $end = 0, $escape_text = 1, $overlib = 1)
     {
         if (! $device instanceof Device || ! $device->hostname) {
-            return (string) $text;
+            return $escape_text ? htmlentities($text) : (string) $text;
         }
 
         if (! $device->canAccess(Auth::user())) {
-            return $device->displayName();
+            return $escape_text ? htmlentities($device->displayName()) : $device->displayName();
         }
 
         if (! $start) {
@@ -79,30 +79,31 @@ class Url
         $url = Url::deviceUrl($device, $vars);
 
         // beginning of overlib box contains large hostname followed by hardware & OS details
-        $contents = '<div><span class="list-large">' . $device->displayName() . '</span>';
+        // because we are injecting this into javascript htmlentities alone won't work, so strip_tags too
+        $contents = '<div><span class="list-large">' . htmlentities(strip_tags($device->displayName())) . '</span>';
         $devinfo = '';
         if ($device->hardware) {
-            $devinfo .= htmlentities($device->hardware);
+            $devinfo .= $device->hardware;
         }
 
         if ($device->os) {
-            $devinfo .= ($devinfo ? ' - ' : '') . htmlentities(Config::getOsSetting($device->os, 'text'));
+            $devinfo .= ($devinfo ? ' - ' : '') . Config::getOsSetting($device->os, 'text');
         }
 
         if ($device->version) {
-            $devinfo .= ($devinfo ? ' - ' : '') . htmlentities($device->version);
+            $devinfo .= ($devinfo ? ' - ' : '') . $device->version;
         }
 
         if ($device->features) {
-            $devinfo .= ' (' . htmlentities($device->features) . ')';
+            $devinfo .= ' (' . $device->features . ')';
         }
 
         if ($devinfo) {
-            $contents .= '<br />' . $devinfo;
+            $contents .= '<br />' . htmlentities(strip_tags($devinfo));
         }
 
         if ($device->location_id) {
-            $contents .= '<br />' . htmlentities($device->location ?? '');
+            $contents .= '<br />' . htmlentities(strip_tags($device->location ?? ''));
         }
 
         $contents .= '</div><br />';
@@ -146,9 +147,10 @@ class Url
             $text = $label;
         }
 
-        $content = '<div class=list-large>' . addslashes(htmlentities($port->device?->displayName() . ' - ' . $label)) . '</div>';
+        // strip tags due to complexity of sanitizing here
+        $content = '<div class=list-large>' . addslashes(htmlentities(strip_tags($port->device?->displayName() . ' - ' . $label))) . '</div>';
         if ($description = $port->getDescription()) {
-            $content .= addslashes(htmlentities($description)) . '<br />';
+            $content .= addslashes(htmlentities(strip_tags($description))) . '<br />';
         }
 
         $content .= "<div style=\'width: 850px\'>";

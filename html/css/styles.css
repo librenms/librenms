@@ -3,7 +3,7 @@ body {
   margin: 0px;
   padding: 0px;
   padding-bottom: 50px;
-  padding-top: 50px;
+  padding-top: 0px;
   background: rgb(255,255,255); /* Old browsers */
   color: #555;
   font-size: 10pt;
@@ -1633,6 +1633,17 @@ tr.search:nth-child(odd) {
   min-height: 25px;
 }
 
+nav.navbar-sticky-top {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  border-bottom-width: 2px;
+  border-left-width: 0;
+  border-top-width: 0;
+  border-right-width: 0;
+  border-radius: 0;
+}
+
 .navbar-brand {
   padding: 8px 15px 8px 15px !important;
   line-height: 32px;
@@ -2130,6 +2141,13 @@ label {
   width:12px;
   float:left;
   background-color: #D9534F;
+}
+
+.availability-map-oldview-box-ignored {
+  height:12px;
+  width:12px;
+  float:left;
+  background-color: #36393D;
 }
 
 .availability-map-widget-header {

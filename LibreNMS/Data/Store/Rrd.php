@@ -26,6 +26,7 @@
 namespace LibreNMS\Data\Store;
 
 use App\Polling\Measure\Measurement;
+use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Enum\ImageFormat;
 use LibreNMS\Exceptions\FileExistsException;
@@ -108,16 +109,22 @@ class Rrd extends BaseDatastore
 
         $cwd = $this->rrd_dir;
 
-        if (! $this->isSyncRunning()) {
-            $this->sync_process = new Proc($command, $descriptor_spec, $cwd);
-        }
+        try {
+            if (! $this->isSyncRunning()) {
+                $this->sync_process = new Proc($command, $descriptor_spec, $cwd);
+            }
 
-        if ($dual_process && ! $this->isAsyncRunning()) {
-            $this->async_process = new Proc($command, $descriptor_spec, $cwd);
-            $this->async_process->setSynchronous(false);
-        }
+            if ($dual_process && ! $this->isAsyncRunning()) {
+                $this->async_process = new Proc($command, $descriptor_spec, $cwd);
+                $this->async_process->setSynchronous(false);
+            }
 
-        return $this->isSyncRunning() && ($dual_process ? $this->isAsyncRunning() : true);
+            return $this->isSyncRunning() && ($dual_process ? $this->isAsyncRunning() : true);
+        } catch (\Exception $e) {
+            Log::error('Failed to start RRD datastore: ' . $e->getMessage());
+
+            return false;
+        }
     }
 
     public function isSyncRunning()
@@ -372,9 +379,9 @@ class Rrd extends BaseDatastore
      */
     public function dirFromHost($host)
     {
-        $host = str_replace(':', '_', trim($host, '[]'));
+        $host = self::safeName(trim($host, '[]'));
 
-        return implode('/', [$this->rrd_dir, $host]);
+        return Str::finish($this->rrd_dir, '/') . $host;
     }
 
     /**

@@ -31,11 +31,11 @@ use App\Models\CustomMapEdge;
 use App\Models\CustomMapNode;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Config;
 use LibreNMS\Util\Number;
-use LibreNMS\Util\Url;
 
 class CustomMapDataController extends Controller
 {
@@ -43,9 +43,16 @@ class CustomMapDataController extends Controller
     {
         $this->authorize('view', $map);
 
+        // eager load relationships
+        $map->load(['nodes.device', 'nodes.device.location', 'nodes.linked_map']);
+
         $edges = [];
         $nodes = [];
 
+        if ($map->legend_colours) {
+            $sorted_colours = $map->legend_colours;
+            ksort($sorted_colours, SORT_NUMERIC);
+        }
         foreach ($map->edges as $edge) {
             $edgeid = $edge->custom_map_edge_id;
             $edges[$edgeid] = [
@@ -58,16 +65,18 @@ class CustomMapDataController extends Controller
                 'showpct' => $edge->showpct,
                 'showbps' => $edge->showbps,
                 'label' => $edge->label,
+                'fixed_width' => $edge->fixed_width,
                 'text_face' => $edge->text_face,
                 'text_size' => $edge->text_size,
                 'text_colour' => $edge->text_colour,
+                'text_align' => $edge->text_align,
                 'mid_x' => $edge->mid_x,
                 'mid_y' => $edge->mid_y,
             ];
             if ($edge->port) {
                 $edges[$edgeid]['device_id'] = $edge->port->device_id;
                 $edges[$edgeid]['port_name'] = $edge->port->device->displayName() . ' - ' . $edge->port->getLabel();
-                $edges[$edgeid]['port_info'] = Url::portLink($edge->port, null, null, false, true);
+                $edges[$edgeid]['port_info'] = Blade::render('<x-port-link-map :port="$port" />', ['port' => $edge->port]);
 
                 // Work out speed to and from
                 $speedto = 0;
@@ -118,15 +127,30 @@ class CustomMapDataController extends Controller
                     $edges[$edgeid]['port_frompct'] = $ratefrom / $speedfrom * 100.0;
                 }
                 if (! $edge->port->device->status) {
-                    $edges[$edgeid]['colour_to'] = 'darkred';
-                    $edges[$edgeid]['colour_from'] = 'darkred';
+                    if ($map->legend_colours) {
+                        $edges[$edgeid]['colour_to'] = $map->legend_colours['-2'];
+                        $edges[$edgeid]['colour_from'] = $map->legend_colours['-2'];
+                    } else {
+                        $edges[$edgeid]['colour_to'] = 'darkred';
+                        $edges[$edgeid]['colour_from'] = 'darkred';
+                    }
                 } elseif ($edge->port->ifOperStatus != 'up') {
                     // If the port is not online, show the same as speed unknown
-                    $edges[$edgeid]['colour_to'] = $this->speedColour(-1.0);
-                    $edges[$edgeid]['colour_from'] = $this->speedColour(-1.0);
+                    if ($map->legend_colours) {
+                        $edges[$edgeid]['colour_to'] = $map->legend_colours['-1'];
+                        $edges[$edgeid]['colour_from'] = $map->legend_colours['-1'];
+                    } else {
+                        $edges[$edgeid]['colour_to'] = $this->speedColour(-1.0);
+                        $edges[$edgeid]['colour_from'] = $this->speedColour(-1.0);
+                    }
                 } else {
-                    $edges[$edgeid]['colour_to'] = $this->speedColour($edges[$edgeid]['port_topct']);
-                    $edges[$edgeid]['colour_from'] = $this->speedColour($edges[$edgeid]['port_frompct']);
+                    if ($map->legend_colours) {
+                        $edges[$edgeid]['colour_to'] = $this->fixedColour($sorted_colours, $edges[$edgeid]['port_topct']);
+                        $edges[$edgeid]['colour_from'] = $this->fixedColour($sorted_colours, $edges[$edgeid]['port_frompct']);
+                    } else {
+                        $edges[$edgeid]['colour_to'] = $this->speedColour($edges[$edgeid]['port_topct']);
+                        $edges[$edgeid]['colour_from'] = $this->speedColour($edges[$edgeid]['port_frompct']);
+                    }
                 }
                 $edges[$edgeid]['port_topct'] = round($edges[$edgeid]['port_topct'], 2);
                 $edges[$edgeid]['port_frompct'] = round($edges[$edgeid]['port_frompct'], 2);
@@ -149,6 +173,7 @@ class CustomMapDataController extends Controller
                 'style' => $node->style,
                 'icon' => $node->icon,
                 'image' => $node->image,
+                'nodeimage' => $node->nodeimage ? $node->nodeimage->custom_map_node_image_id : null,
                 'size' => $node->size,
                 'border_width' => $node->border_width,
                 'text_face' => $node->text_face,
@@ -171,7 +196,7 @@ class CustomMapDataController extends Controller
             if ($node->device) {
                 $nodes[$nodeid]['device_name'] = $node->device->hostname . '(' . $node->device->sysName . ')';
                 $nodes[$nodeid]['device_image'] = $node->device->icon;
-                $nodes[$nodeid]['device_info'] = Url::deviceLink($node->device, null, [], 0, 0, 0, 0);
+                $nodes[$nodeid]['device_info'] = Blade::render('<x-device-link-map :device="$device" />', ['device' => $node->device]);
 
                 if ($node->device->disabled) {
                     $this->setNodeDisabledStyle($nodes[$nodeid]);
@@ -195,17 +220,25 @@ class CustomMapDataController extends Controller
             'edges' => 'array',
             'legend_x' => 'integer',
             'legend_y' => 'integer',
+            'legend_steps' => 'integer',
+            'legend_font_size' => 'integer',
+            'legend_hide_invalid' => 'boolean',
+            'legend_hide_overspeed' => 'boolean',
+            'legend_colours' => 'nullable|array',
         ]);
 
         $map->load(['nodes', 'edges']);
 
         DB::transaction(function () use ($map, $data) {
-            if ($map->legend_x != $data['legend_x'] || $map->legend_y != $data['legend_y']) {
-                $map->legend_x = $data['legend_x'];
-                $map->legend_y = $data['legend_y'];
+            $map->legend_x = $data['legend_x'];
+            $map->legend_y = $data['legend_y'];
+            $map->legend_steps = $data['legend_steps'];
+            $map->legend_font_size = $data['legend_font_size'];
+            $map->legend_hide_invalid = $data['legend_hide_invalid'];
+            $map->legend_hide_overspeed = $data['legend_hide_overspeed'];
+            $map->legend_colours = $data['legend_colours'];
 
-                $map->save();
-            }
+            $map->save();
 
             $dbnodes = $map->nodes->keyBy('custom_map_node_id')->all();
             $dbedges = $map->edges->keyBy('custom_map_edge_id')->all();
@@ -230,12 +263,13 @@ class CustomMapDataController extends Controller
                         abort(404);
                     }
                 }
-                $dbnode->device_id = is_numeric($node['title']) ? $node['title'] : null;
-                $dbnode->linked_custom_map_id = str_starts_with($node['title'], 'map:') ? (int) str_replace('map:', '', $node['title']) : null;
+                $dbnode->device_id = $node['device_id'];
+                $dbnode->linked_custom_map_id = $node['linked_map_id'];
                 $dbnode->label = $node['label'];
                 $dbnode->style = $node['shape'];
                 $dbnode->icon = $node['icon'];
                 $dbnode->image = $node['image']['unselected'] ?? '';
+                $dbnode->node_image_id = $node['nodeimage'] ?? null;
                 $dbnode->size = $node['size'];
                 $dbnode->text_face = $node['font']['face'];
                 $dbnode->text_size = $node['font']['size'];
@@ -268,10 +302,12 @@ class CustomMapDataController extends Controller
                 $dbedge->showpct = filter_var($edge['showpct'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
                 $dbedge->showbps = filter_var($edge['showbps'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
                 $dbedge->label = $edge['label'] ? $edge['label'] : '';
+                $dbedge->fixed_width = $edge['fixed_width'];
                 $dbedge->style = $edge['style'];
                 $dbedge->text_face = $edge['text_face'];
                 $dbedge->text_size = $edge['text_size'];
                 $dbedge->text_colour = $edge['text_colour'];
+                $dbedge->text_align = $edge['text_align'];
                 $dbedge->mid_x = intval($edge['mid_x']);
                 $dbedge->mid_y = intval($edge['mid_y']);
 
@@ -302,6 +338,19 @@ class CustomMapDataController extends Controller
     {
         // Only succeed if the string starts with a number optionally followed by a unit, return 0 for non-parsable
         return (int) Number::toBytes($speeds);
+    }
+
+    private function fixedColour(array $colours, float $pct): string
+    {
+        $last_colour = 'black';
+        foreach ($colours as $colour_pct => $colour) {
+            if ($colour_pct > $pct) {
+                break;
+            }
+            $last_colour = $colour;
+        }
+
+        return $last_colour;
     }
 
     private function speedColour(float $pct): string

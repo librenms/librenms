@@ -1,4 +1,5 @@
-<script type="text/javascript" src="{{ asset('js/vis.min.js') }}"></script>
+<script type="text/javascript" src="{{ asset('js/vis-network.min.js') }}"></script>
+<script type="text/javascript" src="{{ asset('js/vis-data.min.js') }}"></script>
 <script type="text/javascript">
     var custommap = {
         legendPctDefaultColour: function (pct) {
@@ -19,7 +20,7 @@
             return '#ff00ff';
         },
 
-        redrawDefaultLegend: function (nodes, num_steps, x_pos, y_pos, font_size, hide_invalid, hide_overspeed) {
+        redrawDefaultLegend: function (nodes, num_steps, x_pos, y_pos, font_size, hide_invalid, hide_overspeed, colours) {
             // Clear out the old legend
             old_nodes = nodes.get({filter: function(node) { return node.id.startsWith("legend_") }});
             old_nodes.forEach((node) => {
@@ -36,22 +37,39 @@
                 y_pos += y_inc;
 
                 if (!(Boolean(hide_invalid))) {
-                    let legend_invalid = {id: "legend_invalid", label: "???", title: "Link is down or link speed is not defined", shape: "box", borderWidth: 0, x: x_pos, y: y_pos, font: {face: 'courier new', size: font_size, color: "white"}, color: {background: "black"}};
+                    let this_colour = "black";
+                    if(colours) {
+                        this_colour = colours['-1'];
+                    }
+                    let legend_invalid = {id: "legend_invalid", label: "???", title: "Link is down or link speed is not defined", shape: "box", borderWidth: 0, x: x_pos, y: y_pos, font: {face: 'courier new', size: font_size, color: "white"}, color: {background: this_colour}};
                     y_pos += y_inc;
                     nodes.add(legend_invalid);
                 }
 
-                let pct_step;
-                if (Boolean(hide_overspeed)) {
-                    pct_step = 100.0 / (num_steps - 1);
+                if(colours) {
+                    let i = 0;
+                    Object.keys(colours).sort((a,b) => parseInt(a) > parseInt(b)).forEach((pct_key) => {
+                        let this_pct = parseFloat(pct_key);
+                        if(!isNaN(this_pct) && this_pct >= 0.0) {
+                            let legend_step = {id: "legend_" + i.toString(), label: this_pct.toString().padStart(3, " ") + "%", shape: "box", borderWidth: 0, x: x_pos, y: y_pos, font: {face: 'courier new', size: font_size, color: "black"}, color: {background: colours[pct_key]}};
+                            nodes.add(legend_step);
+                            y_pos += y_inc;
+                            i++;
+                        }
+                    });
                 } else {
-                    pct_step = 150.0 / (num_steps - 1);
-                }
-                for (let i=0; i < num_steps; i++) {
-                    let this_pct = Math.round(pct_step * i);
-                    let legend_step = {id: "legend_" + i.toString(), label: this_pct.toString().padStart(3, " ") + "%", shape: "box", borderWidth: 0, x: x_pos, y: y_pos, font: {face: 'courier new', size: font_size, color: "black"}, color: {background: custommap.legendPctDefaultColour(this_pct)}};
-                    nodes.add(legend_step);
-                    y_pos += y_inc;
+                    let pct_step;
+                    if (Boolean(hide_overspeed)) {
+                        pct_step = 100.0 / (num_steps - 1);
+                    } else {
+                        pct_step = 150.0 / (num_steps - 1);
+                    }
+                    for (let i=0; i < num_steps; i++) {
+                        let this_pct = Math.round(pct_step * i);
+                        let legend_step = {id: "legend_" + i.toString(), label: this_pct.toString().padStart(3, " ") + "%", shape: "box", borderWidth: 0, x: x_pos, y: y_pos, font: {face: 'courier new', size: font_size, color: "black"}, color: {background: custommap.legendPctDefaultColour(this_pct)}};
+                        nodes.add(legend_step);
+                        y_pos += y_inc;
+                    }
                 }
                 nodes.flush();
             }
@@ -84,16 +102,20 @@
         },
 
         getNodeCfg: function (nodeid, node, screenshot, custom_image_base) {
+            let nodeimage_base = '{{ route('maps.nodeimage.show', ['image' => '?' ]) }}'.replace("?", "");
             var node_cfg = {};
             node_cfg.id = nodeid;
 
-            if(node.device_id) {
-                node_cfg.title = node.device_info;
-            } else if(node.linked_map_name) {
+            if(node.linked_map_name) {
                 node_cfg.title = "Go to " + node.linked_map_name;
+            } else if(node.device_id) {
+                node_cfg.title = document.createElement("div");
+                node_cfg.title.innerHTML = node.device_info;
             } else {
                 node_cfg.title = null;
             }
+            node_cfg.device_id = node.device_id;
+            node_cfg.linked_map_id = node.linked_map_id;
             node_cfg.label = screenshot ? node.label.replace(/./g, ' ') : node.label;
             node_cfg.shape = node.style;
             node_cfg.borderWidth = node.border_width;
@@ -110,16 +132,21 @@
             if(node.style == "image" || node.style == "circularImage") {
                 if(node.image) {
                     node_cfg.image = {unselected: custom_image_base + node.image};
+                } else if(node.nodeimage) {
+                    node_cfg.image = {unselected: nodeimage_base + node.nodeimage};
                 } else if (node.device_image) {
                     node_cfg.image = {unselected: node.device_image};
                 } else {
-                    // If we do not get a valid image from the database, use defaults
-                    node_cfg.shape = newnodeconf.shape;
-                    node_cfg.icon = newnodeconf.icon;
-                    node_cfg.image = newnodeconf.image;
+                    // Default to box if we do not get a valid image from the database
+                    node.style = 'box';
+                    node_cfg.shape = 'box';
+                    node_cfg.image = undefined;
                 }
             } else {
-                node_cfg.image = {};
+                node_cfg.image = undefined;
+            }
+            if(! ["ellipse", "circle", "database", "box", "text"].includes(node.style)) {
+                node_cfg.font.background = "#FFFFFF";
             }
             return node_cfg;
         },
@@ -131,7 +158,7 @@
                 arrows = {to: {enabled: true, scaleFactor: 0.6}, from: {enabled: false}};
             }
 
-            var edge_cfg = {id: edgeid + "_" + fromto, to: edgeid + "_mid", arrows: arrows, font: {face: edge.text_face, size: edge.text_size, color: edge.text_colour}, smooth: {type: edge.style}};
+            var edge_cfg = {id: edgeid + "_" + fromto, to: edgeid + "_mid", arrows: arrows, font: {face: edge.text_face, size: edge.text_size, color: edge.text_colour, background: "#FFFFFF", align: edge.text_align || "horizontal"}, smooth: {type: edge.style}, arrowStrikethrough: false};
             if (fromto == "from") {
                 edge_cfg.from = edge.custom_map_node1_id;
                 var port_pct = Boolean(reverse_arrows) ? edge.port_topct : edge.port_frompct;
@@ -156,7 +183,8 @@
                 return {};
             }
             if(edge.port_id) {
-                edge_cfg.title = edge.port_info;
+                edge_cfg.title = document.createElement("div");
+                edge_cfg.title.innerHTML = edge.port_info;
                 if(edge.showpct) {
                     edge_cfg.label = port_pct + "%";
                 }
@@ -169,7 +197,7 @@
                     edge_cfg.label += port_bps;
                 }
                 edge_cfg.color = {color: port_colour};
-                edge_cfg.width = port_width;
+                edge_cfg.width = parseFloat(edge.fixed_width) || port_width;
             }
             return edge_cfg;
         },

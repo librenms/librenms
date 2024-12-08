@@ -1,0 +1,5491 @@
+FSP150-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    OBJECT-TYPE,
+    Unsigned32,
+    NOTIFICATION-TYPE,
+    MODULE-IDENTITY,
+    OBJECT-IDENTITY
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    ifIndex
+        FROM IF-MIB
+    entPhysicalIndex,
+    PhysicalIndex
+        FROM ENTITY-MIB
+    fsp150
+        FROM ADVA-MIB
+    IpAddress
+        FROM SNMPv2-SMI
+    MacAddress
+        FROM SNMPv2-TC
+    InterfaceIndex
+        FROM IF-MIB
+    ArcState,
+    TrapAlarmSeverity,
+    ServiceImpairment
+        FROM ADVA-MIB
+    DisplayString,
+    TruthValue
+        FROM SNMPv2-TC
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB
+    Counter64String
+        FROM ADVA-MIB
+    TimeStamp,
+    RowStatus
+        FROM SNMPv2-TC
+    Counter32
+        FROM SNMPv2-SMI
+    neEventLogTimeStamp,
+    neEventLogIdentityTranslation
+        FROM ADVA-MIB;
+
+-- MIB
+
+fsp150MIB MODULE-IDENTITY
+    LAST-UPDATED "200712200000Z"    -- 20 December 2007
+    ORGANIZATION "ADVA Optical Networking"
+    CONTACT-INFO
+        "www.advaoptical.com"
+    DESCRIPTION
+        "The FSP 150 2.6 MIB Revision: 1.1"
+    REVISION "200712200000Z"
+    DESCRIPTION
+        "The FSP 150 2.6 MIB Revision: 1.1"
+    ::= { fsp150 2 }
+
+-- topologyMIB
+
+fsp150TopologyMIB OBJECT IDENTIFIER ::= {fsp150MIB 1}
+
+-- Textual Conventions
+
+Fsp150ProvAssignmentType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION ""
+    SYNTAX INTEGER {
+        assigned (1),
+        unassigned (2)
+    }
+
+Fsp150ProvEquipmentType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION ""
+    SYNTAX INTEGER {
+        equipped (1),
+        unequipped (2)
+    }
+
+Fsp150ProvRequestType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION ""
+    SYNTAX INTEGER {
+        none (1),
+        accept (2),
+        delete (3)
+    }
+
+Fsp150ChassisType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION ""
+    SYNTAX INTEGER {
+        unknown (1),
+        fsp150CP10100 (2),
+        fsp150CPGIGABIT (3),
+        fsp150MO (5),
+        fsp150ME (6),
+        fsp150CPGIGREV2 (7),
+        fsp150MG (8),
+        fsp150CX (9)
+    }
+
+-- LocalChassis
+
+fsp150LocalChassisTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Fsp150LocalChassisEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The roots of the trees managed by this agent. (There can be
+        more than one if chassis are stacked and directly managed by
+        one NEMI. Currently this is not supported.)"
+    ::= { fsp150TopologyMIB 1 }
+
+fsp150LocalChassisEntry OBJECT-TYPE
+    SYNTAX Fsp150LocalChassisEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    INDEX { entPhysicalIndex }
+    ::= { fsp150LocalChassisTable 1 }
+
+Fsp150LocalChassisEntry ::= SEQUENCE {
+    fsp150LocalChassisProvAssignmentState Fsp150ProvAssignmentType,
+    fsp150LocalChassisProvEquipmentState Fsp150ProvEquipmentType,
+    fsp150LocalChassisProvRequest Fsp150ProvRequestType,
+    fsp150LocalChassisAgentAddr IpAddress,
+    fsp150LocalChassisAgentPort INTEGER
+    }
+
+fsp150LocalChassisProvAssignmentState OBJECT-TYPE
+    SYNTAX Fsp150ProvAssignmentType
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Is the chassis part of the logical configuration? Is it
+        managed by this agent?"
+    ::= { fsp150LocalChassisEntry 1 }
+
+fsp150LocalChassisProvEquipmentState OBJECT-TYPE
+    SYNTAX Fsp150ProvEquipmentType
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Is a chassis present? Note that this isn't necessarily the
+        configured one, check for localChassisMismatch alarm.
+        (During a firmware update the chassis is reported as
+        unequipped because the internal communications link is used
+        for the update and management access is not possible.)"
+    ::= { fsp150LocalChassisEntry 2 }
+
+fsp150LocalChassisProvRequest OBJECT-TYPE
+    SYNTAX Fsp150ProvRequestType
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Change the logical configuration. Writing accept adds the
+        currently connected tree to the logical configuration. In
+        case of a mismatch the old logical tree or parts of it are
+        deleted (i.e. some ifIndex/entPhysicalIndex values become
+        invalid). Writing delete removes the tree from the logical
+        configuration. The value read back is always none."
+    ::= { fsp150LocalChassisEntry 3 }
+
+fsp150LocalChassisAgentAddr OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The IP address of the SNMP agent managing the local system
+        or zero if the local system is managed by this agent. (The
+        NEMI running this agent may be fitted for monitoring
+        purposes only without actually controlling the local
+        system.) An address of 255.255.255.255 means that the
+        manager is not reachable via IP/SNMP."
+    ::= { fsp150LocalChassisEntry 4 }
+
+fsp150LocalChassisAgentPort OBJECT-TYPE
+    SYNTAX INTEGER (0..65535)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The UDP port used by the SNMP agent or zero."
+    ::= { fsp150LocalChassisEntry 5 }
+
+-- PortIDTranslation
+
+fsp150PortIDTranslationTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Fsp150PortIDTranslationEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Mapping of device IDs and port numbers to ifIndex values. If
+        another agent can 'see' a port via EFM, this table can be
+        used to identify the port using information from the other
+        agent's topology table."
+    ::= { fsp150TopologyMIB 2 }
+
+fsp150PortIDTranslationEntry OBJECT-TYPE
+    SYNTAX Fsp150PortIDTranslationEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    INDEX { fsp150PortIDTranslationDevID, fsp150PortIDTranslationPortNum }
+    ::= { fsp150PortIDTranslationTable 1 }
+
+Fsp150PortIDTranslationEntry ::= SEQUENCE {
+    fsp150PortIDTranslationDevID MacAddress,
+    fsp150PortIDTranslationPortNum INTEGER,
+    fsp150PortIDTranslationIndex InterfaceIndex
+    }
+
+fsp150PortIDTranslationDevID OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150PortIDTranslationEntry 1 }
+
+fsp150PortIDTranslationPortNum OBJECT-TYPE
+    SYNTAX INTEGER (0..65535)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150PortIDTranslationEntry 2 }
+
+fsp150PortIDTranslationIndex OBJECT-TYPE
+    SYNTAX InterfaceIndex
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150PortIDTranslationEntry 3 }
+
+-- ChassisIDTranslation
+
+fsp150ChassisIDTranslationTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Fsp150ChassisIDTranslationEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Mapping of device IDs to entPhysicalIndex values for
+        chassis."
+    ::= { fsp150TopologyMIB 3 }
+
+fsp150ChassisIDTranslationEntry OBJECT-TYPE
+    SYNTAX Fsp150ChassisIDTranslationEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    INDEX { fsp150ChassisIDTranslationDevID }
+    ::= { fsp150ChassisIDTranslationTable 1 }
+
+Fsp150ChassisIDTranslationEntry ::= SEQUENCE {
+    fsp150ChassisIDTranslationDevID MacAddress,
+    fsp150ChassisIDTranslationIndex PhysicalIndex
+    }
+
+fsp150ChassisIDTranslationDevID OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150ChassisIDTranslationEntry 1 }
+
+fsp150ChassisIDTranslationIndex OBJECT-TYPE
+    SYNTAX PhysicalIndex
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150ChassisIDTranslationEntry 2 }
+
+-- Topology
+
+fsp150TopologyTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Fsp150TopologyEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Information about how ports are connected to ports further
+        down in the tree. (Note that this is not symmetrical.)"
+    ::= { fsp150TopologyMIB 4 }
+
+fsp150TopologyEntry OBJECT-TYPE
+    SYNTAX Fsp150TopologyEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    INDEX { ifIndex }
+    ::= { fsp150TopologyTable 1 }
+
+Fsp150TopologyEntry ::= SEQUENCE {
+    fsp150TopologyProvAssignmentState Fsp150ProvAssignmentType,
+    fsp150TopologyProvEquipmentState Fsp150ProvEquipmentType,
+    fsp150TopologyProvRequest Fsp150ProvRequestType,
+    fsp150TopologyRemAgentAddr IpAddress,
+    fsp150TopologyRemAgentPort INTEGER,
+    fsp150TopologyRemChassisType Fsp150ChassisType,
+    fsp150TopologyRemDevID MacAddress,
+    fsp150TopologyRemPortNum INTEGER,
+    fsp150TopologyRemChassisIndex PhysicalIndex,
+    fsp150TopologyRemPortIndex InterfaceIndex,
+    fsp150TopologyPhysRemChassisType Fsp150ChassisType,
+    fsp150TopologyPhysRemDevID MacAddress,
+    fsp150TopologyPhysRemPortNum INTEGER
+    }
+
+fsp150TopologyProvAssignmentState OBJECT-TYPE
+    SYNTAX Fsp150ProvAssignmentType
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Is there a remote chassis configured for this port?"
+    ::= { fsp150TopologyEntry 1 }
+
+fsp150TopologyProvEquipmentState OBJECT-TYPE
+    SYNTAX Fsp150ProvEquipmentType
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Is a remote chassis actually connected? (Note that this
+        isn't necessarily the configured one. Check for
+        remChassisMismatch alarm.)"
+    ::= { fsp150TopologyEntry 2 }
+
+fsp150TopologyProvRequest OBJECT-TYPE
+    SYNTAX Fsp150ProvRequestType
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Change the logical configuration. Writing accept adds the
+        currently physically connected chassis/subtree to the
+        logical configuration. In case of a mismatch the old logical
+        subtree or parts of it are deleted (i.e. some
+        ifIndex/entPhysicalIndex values become invalid). Writing
+        delete removes the configured chassis/subtree. The value
+        read back is always none."
+    ::= { fsp150TopologyEntry 3 }
+
+fsp150TopologyRemAgentAddr OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The IP address of the SNMP agent managing the remote system
+        or zero if the remote system is managed by the same agent.
+        An address of 255.255.255.255 means that the manager is not
+        reachable via IP/SNMP."
+    ::= { fsp150TopologyEntry 4 }
+
+fsp150TopologyRemAgentPort OBJECT-TYPE
+    SYNTAX INTEGER (0..65535)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The UDP port used by the SNMP agent or zero."
+    ::= { fsp150TopologyEntry 5 }
+
+fsp150TopologyRemChassisType OBJECT-TYPE
+    SYNTAX Fsp150ChassisType
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The type of the remote system. In case of a mismatch between
+        logical and physical configuration the value from the
+        logical configuration is reported."
+    ::= { fsp150TopologyEntry 6 }
+
+fsp150TopologyRemDevID OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The device ID of the remote system. The ID is only available
+        when the system is physically connected."
+    ::= { fsp150TopologyEntry 7 }
+
+fsp150TopologyRemPortNum OBJECT-TYPE
+    SYNTAX INTEGER (0..65535)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of the remote port to which this port is
+        connected (1 = network port A, 2 = network port B). Device
+        ID and port number are used as an agent independent port ID.
+        In case of a mismatch between logical and physical
+        configuration the value from the logical configuration is
+        reported."
+    ::= { fsp150TopologyEntry 8 }
+
+fsp150TopologyRemChassisIndex OBJECT-TYPE
+    SYNTAX PhysicalIndex
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The entPhysicalIndex (valid for this agent) of the remote
+        chassis This is meant as a shortcut."
+    ::= { fsp150TopologyEntry 9 }
+
+fsp150TopologyRemPortIndex OBJECT-TYPE
+    SYNTAX InterfaceIndex
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The entPhysicalIndex/ifIndex (valid for this agent) of the
+        remote port."
+    ::= { fsp150TopologyEntry 10 }
+
+fsp150TopologyPhysRemChassisType OBJECT-TYPE
+    SYNTAX Fsp150ChassisType
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The type of the system to which this port is actually
+        connected. This can be used by the manager to analyse a
+        mismatch between logical and physical configuration."
+    ::= { fsp150TopologyEntry 11 }
+
+fsp150TopologyPhysRemDevID OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The device ID of the system to which this port is actually
+        connected."
+    ::= { fsp150TopologyEntry 12 }
+
+fsp150TopologyPhysRemPortNum OBJECT-TYPE
+    SYNTAX INTEGER (0..65535)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of the remote port to which this port is actually
+        connected."
+    ::= { fsp150TopologyEntry 13 }
+
+-- alarmMIB
+
+fsp150AlarmMIB OBJECT IDENTIFIER ::= {fsp150MIB 2}
+
+-- alarmFilters
+
+fsp150AlarmFilters OBJECT IDENTIFIER ::= {fsp150AlarmMIB 1}
+
+-- Textual Conventions
+
+Fsp150AlarmType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION ""
+    SYNTAX INTEGER {
+        voltageTooLow (1),
+        voltageTooHigh (2),
+        tempTooHigh (3),
+        psuFailure (4),
+        fanFailure (5),
+        localChassisMissing (6),
+        localChassisMismatch (7),
+        configFailed (8),
+        configuring (9),
+        lossOfSignal (101),
+        lowOIP (102),
+        txFailure (103),
+        lossOfLink (104),
+        eqMismatch (105),
+        remChassisMissing (106),
+        remChassisMismatch (107),
+        loopback (108),
+        sfpMissing (109)
+    }
+
+-- equipmentAlarmReportControl
+
+fsp150EquipmentAlarmReportControlTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Fsp150EquipmentAlarmReportControlEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Disable/enable the generation of traps for alarms/standing
+        conditions (not for transient events) by this entity. While
+        traps are disabled active standing conditions are shown with
+        severity notReported in the
+        fsp150EquipmentCurrentAlarmTable. When traps are re-enabled
+        traps are sent/resent with the configured severity values."
+    ::= { fsp150AlarmFilters 1 }
+
+fsp150EquipmentAlarmReportControlEntry OBJECT-TYPE
+    SYNTAX Fsp150EquipmentAlarmReportControlEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    INDEX { entPhysicalIndex }
+    ::= { fsp150EquipmentAlarmReportControlTable 1 }
+
+Fsp150EquipmentAlarmReportControlEntry ::= SEQUENCE {
+    fsp150EquipmentAlarmReportControlState ArcState
+    }
+
+fsp150EquipmentAlarmReportControlState OBJECT-TYPE
+    SYNTAX ArcState
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150EquipmentAlarmReportControlEntry 1 }
+
+-- interfaceAlarmReportControl
+
+fsp150InterfaceAlarmReportControlTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Fsp150InterfaceAlarmReportControlEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150AlarmFilters 2 }
+
+fsp150InterfaceAlarmReportControlEntry OBJECT-TYPE
+    SYNTAX Fsp150InterfaceAlarmReportControlEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    INDEX { ifIndex }
+    ::= { fsp150InterfaceAlarmReportControlTable 1 }
+
+Fsp150InterfaceAlarmReportControlEntry ::= SEQUENCE {
+    fsp150InterfaceAlarmReportControlState ArcState
+    }
+
+fsp150InterfaceAlarmReportControlState OBJECT-TYPE
+    SYNTAX ArcState
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150InterfaceAlarmReportControlEntry 1 }
+
+-- alarmSeverity
+
+fsp150AlarmSeverityTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Fsp150AlarmSeverityEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The severity values with which various standing conditions
+        are reported. Changing a value does not cause any traps to
+        be resent."
+    ::= { fsp150AlarmFilters 3 }
+
+fsp150AlarmSeverityEntry OBJECT-TYPE
+    SYNTAX Fsp150AlarmSeverityEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    INDEX { fsp150AlarmSeverityType }
+    ::= { fsp150AlarmSeverityTable 1 }
+
+Fsp150AlarmSeverityEntry ::= SEQUENCE {
+    fsp150AlarmSeverityType Fsp150AlarmType,
+    fsp150AlarmSeverityValue TrapAlarmSeverity
+    }
+
+fsp150AlarmSeverityType OBJECT-TYPE
+    SYNTAX Fsp150AlarmType
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150AlarmSeverityEntry 1 }
+
+fsp150AlarmSeverityValue OBJECT-TYPE
+    SYNTAX TrapAlarmSeverity
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150AlarmSeverityEntry 2 }
+
+-- currentAlarms
+
+fsp150CurrentAlarms OBJECT IDENTIFIER ::= {fsp150AlarmMIB 2}
+
+-- equipmentCurrentAlarm
+
+fsp150EquipmentCurrentAlarmTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Fsp150EquipmentCurrentAlarmEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The currently active standing conditions (severity other
+        than cleared) for this piece of equipment."
+    ::= { fsp150CurrentAlarms 1 }
+
+fsp150EquipmentCurrentAlarmEntry OBJECT-TYPE
+    SYNTAX Fsp150EquipmentCurrentAlarmEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    INDEX { entPhysicalIndex, fsp150EquipmentCurrentAlarmType }
+    ::= { fsp150EquipmentCurrentAlarmTable 1 }
+
+Fsp150EquipmentCurrentAlarmEntry ::= SEQUENCE {
+    fsp150EquipmentCurrentAlarmType Fsp150AlarmType,
+    fsp150EquipmentCurrentAlarmSeverity TrapAlarmSeverity,
+    fsp150EquipmentCurrentAlarmImpairment ServiceImpairment
+    }
+
+fsp150EquipmentCurrentAlarmType OBJECT-TYPE
+    SYNTAX Fsp150AlarmType
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150EquipmentCurrentAlarmEntry 1 }
+
+fsp150EquipmentCurrentAlarmSeverity OBJECT-TYPE
+    SYNTAX TrapAlarmSeverity
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150EquipmentCurrentAlarmEntry 2 }
+
+fsp150EquipmentCurrentAlarmImpairment OBJECT-TYPE
+    SYNTAX ServiceImpairment
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150EquipmentCurrentAlarmEntry 3 }
+
+-- interfaceCurrentAlarm
+
+fsp150InterfaceCurrentAlarmTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Fsp150InterfaceCurrentAlarmEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The currently active standing conditions (severity other
+        than cleared) for this interface."
+    ::= { fsp150CurrentAlarms 2 }
+
+fsp150InterfaceCurrentAlarmEntry OBJECT-TYPE
+    SYNTAX Fsp150InterfaceCurrentAlarmEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    INDEX { ifIndex, fsp150InterfaceCurrentAlarmType }
+    ::= { fsp150InterfaceCurrentAlarmTable 1 }
+
+Fsp150InterfaceCurrentAlarmEntry ::= SEQUENCE {
+    fsp150InterfaceCurrentAlarmType Fsp150AlarmType,
+    fsp150InterfaceCurrentAlarmSeverity TrapAlarmSeverity,
+    fsp150InterfaceCurrentAlarmImpairment ServiceImpairment
+    }
+
+fsp150InterfaceCurrentAlarmType OBJECT-TYPE
+    SYNTAX Fsp150AlarmType
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150InterfaceCurrentAlarmEntry 1 }
+
+fsp150InterfaceCurrentAlarmSeverity OBJECT-TYPE
+    SYNTAX TrapAlarmSeverity
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150InterfaceCurrentAlarmEntry 2 }
+
+fsp150InterfaceCurrentAlarmImpairment OBJECT-TYPE
+    SYNTAX ServiceImpairment
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150InterfaceCurrentAlarmEntry 3 }
+
+-- alarmDelay
+
+fsp150AlarmDelayRaise OBJECT-TYPE
+    SYNTAX INTEGER (0..65535)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Delay in seconds (0 to 10) when raising an alarm."
+    ::= { fsp150AlarmMIB 3 }
+
+fsp150AlarmDelayClear OBJECT-TYPE
+    SYNTAX INTEGER (0..65535)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Delay in seconds (0 to 10) when clearing an alarm."
+    ::= { fsp150AlarmMIB 4 }
+
+-- configAndStatus
+
+fsp150ConfigAndStatus OBJECT IDENTIFIER ::= {fsp150MIB 3}
+
+-- Textual Conventions
+
+Fsp150ProtectionType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION ""
+    SYNTAX INTEGER {
+        auto (1),
+        l2WithoutST (2),
+        l2WithST (3),
+        l3 (4),
+        pointToPoint (5),
+        forceA (6),
+        forceB (7),
+        detecting (8),
+        linkAggregate (9),
+        none (10)
+    }
+
+Fsp150IngressDepartureConfig ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION ""
+    SYNTAX INTEGER {
+        both (1),
+        single (2)
+    }
+
+Fsp150EgressArrivalConfig ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION ""
+    SYNTAX INTEGER {
+        both (1),
+        network1 (2),
+        network2 (3),
+        aps (4)
+    }
+
+Fsp150AddressFilter ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Filter MAC addresses 01:80:c2:00:00:00 (bit 0) to
+        01:80:c2:00:00:0f (bit 15)"
+    SYNTAX BITS {
+        addr00 (0),
+        addr01 (1),
+        addr02 (2)
+    }
+
+Fsp150PreferredNetwork ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION ""
+    SYNTAX INTEGER {
+        none (1),
+        network1 (2),
+        network2 (3)
+    }
+
+-- Mx
+Fsp150MulticastProtectionType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION ""
+    SYNTAX INTEGER {
+        sameAsUnicast (0),
+        l2WithoutST (1),
+        l3 (2),
+        pointToPoint (3),
+        forceA (4),
+        forceB (5),
+        linkAggregate (6)
+    }
+
+Fsp150NEMIModeType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION ""
+    SYNTAX INTEGER {
+        unknown (1),
+        notFitted (2),
+        master (3),
+        slave (4)
+    }
+
+Fsp150IngressDepartureStatus ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION ""
+    SYNTAX INTEGER {
+        both (1),
+        single (2),
+        tandem (3)
+    }
+
+Fsp150EgressArrivalStatus ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION ""
+    SYNTAX INTEGER {
+        both (1),
+        network1 (2),
+        network2 (3),
+        tandem (4)
+    }
+
+Fsp150AdminStatusType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION ""
+    SYNTAX INTEGER {
+        up (1),
+        down (2),
+        testing (3),
+        forcedLinkDown (4)
+    }
+
+Fsp150TechnologyAbility ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION ""
+    SYNTAX BITS {
+        tech10BaseT (1),
+        tech10BaseTfullDuplex (2),
+        tech100BaseT4 (3),
+        tech100BaseTX (4),
+        tech100BaseTXfullDuplex (5),
+        techPAUSE (8),
+        techAsymmetricPAUSE (9),
+        tech1000BaseTfullDuplex (15)
+    }
+
+Fsp150AutoNegStatus ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION ""
+    SYNTAX INTEGER {
+        other (1),
+        configuring (2),
+        completed (3),
+        disabled (4),
+        parallelDetectFail (5),
+        unknown (6)
+    }
+
+Fsp150FanStatus ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION ""
+    SYNTAX INTEGER {
+        ok (1),
+        failed (2)
+    }
+
+Fsp150PSUStatus ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION ""
+    SYNTAX INTEGER {
+        ok (1),
+        failed (2)
+    }
+
+Fsp150OAMLoopbackCommandType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION ""
+    SYNTAX INTEGER {
+        noLoopback (1),
+        startRemoteLoopback (2),
+        stopRemoteLoopback (3),
+        startLoopback (6),
+        stopLoopback (7),
+        startLocalLoopback (8),
+        stopLocalLoopback (9),
+        startTerminalLoopback (10),
+        stopTerminalLoopback (11)
+    }
+
+Fsp150OAMLoopbackStatusType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION ""
+    SYNTAX INTEGER {
+        noLoopback (1),
+        initiatingLoopback (2),
+        remoteLoopback (3),
+        terminatingLoopback (4),
+        loopback (5),
+        localTailLoopback (7),
+        unknown (6)
+    }
+
+Fsp150AccessPortForwardMode ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION ""
+    SYNTAX INTEGER {
+        both (1),
+        network1 (2),
+        network2 (3),
+        tandem (4)
+    }
+
+Fsp150AccessPortTagMode ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION ""
+    SYNTAX INTEGER {
+        branch (1),
+        leaf (2)
+    }
+
+Fsp150PriorityType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION ""
+    SYNTAX INTEGER {
+        default (0),
+        force (1),
+        copy (2)
+    }
+
+Fsp150DataRates ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Data rates supported by an interface."
+    SYNTAX BITS {
+        rate10Mbps (0),
+        rate100Mbps (1),
+        rate1000Mbps (2),
+        rateMaxSpeed (5)
+    }
+
+Fsp150TxModes ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Tx modes supported by an interface."
+    SYNTAX BITS {
+        halfDuplex (0),
+        fullDuplex (1)
+    }
+
+Fsp150AutoNegSupp ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Auto negotiation support for an interface. Auto negotiation
+        can be fixed enabled or disabled (one bit set) or
+        configurable (both bits set)."
+    SYNTAX BITS {
+        disabled (0),
+        enabled (1)
+    }
+
+-- Mx
+Fsp150MulticastIGMPConfig ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION ""
+    SYNTAX INTEGER {
+        unmodified (1),
+        multicastVLAN (2),
+        both (3)
+    }
+
+-- ChassisConfig
+
+fsp150ChassisConfigTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Fsp150ChassisConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150ConfigAndStatus 1 }
+
+fsp150ChassisConfigEntry OBJECT-TYPE
+    SYNTAX Fsp150ChassisConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    INDEX { entPhysicalIndex }
+    ::= { fsp150ChassisConfigTable 1 }
+
+Fsp150ChassisConfigEntry ::= SEQUENCE {
+    fsp150ChassisConfigNetAIndex InterfaceIndex,
+    fsp150ChassisConfigNetBIndex InterfaceIndex,
+    fsp150ChassisConfigProtType Fsp150ProtectionType,
+    fsp150ChassisConfigUserString1 DisplayString,
+    fsp150ChassisConfigUserString2 DisplayString,
+    fsp150ChassisConfigUserString3 DisplayString,
+    fsp150ChassisConfigLowVoltageThreshold INTEGER,
+    fsp150ChassisConfigHighVoltageThreshold INTEGER,
+    fsp150ChassisConfigHighTempThreshold INTEGER,
+    fsp150ChassisConfigForwardHSRP TruthValue,
+    fsp150ChassisConfigForwardVRRP TruthValue,
+    fsp150ChassisConfigBPDUInflation INTEGER,
+    fsp150ChassisConfigIngressDepartureConfig Fsp150IngressDepartureConfig,
+    fsp150ChassisConfigEgressArrivalConfig Fsp150EgressArrivalConfig,
+    fsp150ChassisConfigLinkLossFwd TruthValue,
+    fsp150ChassisConfigPointToPointMode TruthValue,
+    fsp150ChassisConfigTagProtocolId INTEGER,
+    fsp150ChassisConfigTrafficMgmtClassification TruthValue,
+    fsp150ChassisConfigJumboFrame TruthValue,
+    fsp150ChassisConfigTandemMode TruthValue,
+    fsp150ChassisConfigRingId INTEGER,
+    fsp150ChassisConfigPauseEnable TruthValue,
+    fsp150ChassisConfigBpduFilter Fsp150AddressFilter,
+    fsp150ChassisConfigTmSupp TruthValue,
+    fsp150ChassisConfigPreferredNet Fsp150PreferredNetwork,
+    fsp150ChassisConfigSwSyncRequest INTEGER,
+    fsp150ChassisConfigMACAddressLearning TruthValue,
+    fsp150ChassisConfigUnitEgressMulticastCIR Unsigned32,
+    fsp150ChassisConfigUnitEgressMulticastCBS Unsigned32,
+    fsp150ChassisConfigMulticastProtType Fsp150MulticastProtectionType
+    }
+
+fsp150ChassisConfigNetAIndex OBJECT-TYPE
+    SYNTAX InterfaceIndex
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The interface index for network port A."
+    ::= { fsp150ChassisConfigEntry 2 }
+
+fsp150ChassisConfigNetBIndex OBJECT-TYPE
+    SYNTAX InterfaceIndex
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The interface index for network port B."
+    ::= { fsp150ChassisConfigEntry 3 }
+
+fsp150ChassisConfigProtType OBJECT-TYPE
+    SYNTAX Fsp150ProtectionType
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Selection of the protection mechanism."
+    ::= { fsp150ChassisConfigEntry 4 }
+
+fsp150ChassisConfigUserString1 OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..40))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "A string associated with the chassis configurable by the
+        manager. The same string is reported as entPhysicalAlias."
+    ::= { fsp150ChassisConfigEntry 5 }
+
+fsp150ChassisConfigUserString2 OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..40))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "A string associated with the chassis configurable by the
+        manager."
+    ::= { fsp150ChassisConfigEntry 6 }
+
+fsp150ChassisConfigUserString3 OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..40))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "A string associated with the chassis configurable by the
+        manager."
+    ::= { fsp150ChassisConfigEntry 7 }
+
+fsp150ChassisConfigLowVoltageThreshold OBJECT-TYPE
+    SYNTAX INTEGER (0..65535)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The rail voltage in mV below which an fsp150VoltageTooLow
+        alarm is raised."
+    ::= { fsp150ChassisConfigEntry 8 }
+
+fsp150ChassisConfigHighVoltageThreshold OBJECT-TYPE
+    SYNTAX INTEGER (0..65535)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The rail voltage in mV above which an fsp150VoltageTooHigh
+        alarm is raised."
+    ::= { fsp150ChassisConfigEntry 9 }
+
+fsp150ChassisConfigHighTempThreshold OBJECT-TYPE
+    SYNTAX INTEGER (-32768..32767)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The chassis temperature in degrees Celsius above which an
+        fsp150TempTooHigh alarm is raised."
+    ::= { fsp150ChassisConfigEntry 10 }
+
+fsp150ChassisConfigForwardHSRP OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "For layer 3 protection."
+    ::= { fsp150ChassisConfigEntry 11 }
+
+fsp150ChassisConfigForwardVRRP OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "For layer 3 protection."
+    ::= { fsp150ChassisConfigEntry 12 }
+
+fsp150ChassisConfigBPDUInflation OBJECT-TYPE
+    SYNTAX INTEGER (-2147483648..2147483647)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150ChassisConfigEntry 13 }
+
+fsp150ChassisConfigIngressDepartureConfig OBJECT-TYPE
+    SYNTAX Fsp150IngressDepartureConfig
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150ChassisConfigEntry 14 }
+
+fsp150ChassisConfigEgressArrivalConfig OBJECT-TYPE
+    SYNTAX Fsp150EgressArrivalConfig
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150ChassisConfigEntry 15 }
+
+fsp150ChassisConfigLinkLossFwd OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Unit link loss forwarding"
+    ::= { fsp150ChassisConfigEntry 16 }
+
+fsp150ChassisConfigPointToPointMode OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Unit point to point mode"
+    ::= { fsp150ChassisConfigEntry 17 }
+
+fsp150ChassisConfigTagProtocolId OBJECT-TYPE
+    SYNTAX INTEGER (0..65535)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Unit VLAN Tag Protocol ID (TPID)"
+    ::= { fsp150ChassisConfigEntry 18 }
+
+fsp150ChassisConfigTrafficMgmtClassification OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Unit traffic management classification. If enabled, CIR and
+        CBS values are possible to configure for all access ports"
+    ::= { fsp150ChassisConfigEntry 19 }
+
+fsp150ChassisConfigJumboFrame OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Unit jumbo frame"
+    ::= { fsp150ChassisConfigEntry 20 }
+
+fsp150ChassisConfigTandemMode OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Unit tandem mode"
+    ::= { fsp150ChassisConfigEntry 21 }
+
+fsp150ChassisConfigRingId OBJECT-TYPE
+    SYNTAX INTEGER (0..65535)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Ring ID number, used for identifying this node when the node
+        is a member of a ring."
+    ::= { fsp150ChassisConfigEntry 22 }
+
+fsp150ChassisConfigPauseEnable OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150ChassisConfigEntry 23 }
+
+fsp150ChassisConfigBpduFilter OBJECT-TYPE
+    SYNTAX Fsp150AddressFilter
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150ChassisConfigEntry 24 }
+
+fsp150ChassisConfigTmSupp OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Unit supports traffic management (and
+        fsp150TrafficManagementMIB)"
+    ::= { fsp150ChassisConfigEntry 25 }
+
+fsp150ChassisConfigPreferredNet OBJECT-TYPE
+    SYNTAX Fsp150PreferredNetwork
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Selection of the preferred network protection port (Mx
+        only)."
+    ::= { fsp150ChassisConfigEntry 26 }
+
+fsp150ChassisConfigSwSyncRequest OBJECT-TYPE
+    SYNTAX INTEGER (-32768..32767)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Synchronise software. Writing a non-zero value initiates an
+        update of the microcontroller firmware of this chassis to
+        the version that is running on the local chassis.
+        neSwUpgradeState in the ADVA-MIB reflects the status of the
+        process. Read always returns 0."
+    ::= { fsp150ChassisConfigEntry 27 }
+
+fsp150ChassisConfigMACAddressLearning OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "MAC Address Learning"
+    ::= { fsp150ChassisConfigEntry 28 }
+
+-- Mx
+fsp150ChassisConfigUnitEgressMulticastCIR OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "MG only"
+    ::= { fsp150ChassisConfigEntry 29 }
+
+-- Mx
+fsp150ChassisConfigUnitEgressMulticastCBS OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150ChassisConfigEntry 30 }
+
+-- Mx
+fsp150ChassisConfigMulticastProtType OBJECT-TYPE
+    SYNTAX Fsp150MulticastProtectionType
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Selection of the multicast protection mechanism (MG only)."
+    ::= { fsp150ChassisConfigEntry 31 }
+
+-- ChassisStatus
+
+fsp150ChassisStatusTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Fsp150ChassisStatusEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Only chassis that are physically present and connected to
+        the local system have entries in this table."
+    ::= { fsp150ConfigAndStatus 2 }
+
+fsp150ChassisStatusEntry OBJECT-TYPE
+    SYNTAX Fsp150ChassisStatusEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    INDEX { entPhysicalIndex }
+    ::= { fsp150ChassisStatusTable 1 }
+
+Fsp150ChassisStatusEntry ::= SEQUENCE {
+    fsp150ChassisStatusProtState Fsp150ProtectionType,
+    fsp150ChassisStatusTemperature INTEGER,
+    fsp150ChassisStatusRailVoltage INTEGER,
+    fsp150ChassisStatusNEMIMode Fsp150NEMIModeType,
+    fsp150ChassisStatusActiveNetwork INTEGER,
+    fsp150ChassisStatusBootTimer Unsigned32,
+    fsp150ChassisStatusIngressDepartureStatus Fsp150IngressDepartureStatus,
+    fsp150ChassisStatusEgressArrivalStatus Fsp150EgressArrivalStatus,
+    fsp150ChassisStatusPreferredNet Fsp150PreferredNetwork,
+    fsp150ChassisStatusMulticastActiveNetwork INTEGER
+    }
+
+fsp150ChassisStatusProtState OBJECT-TYPE
+    SYNTAX Fsp150ProtectionType
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The protection mechanism currently used. In case the
+        configured protection type is automatic this variable gives
+        the currently selected type. Otherwise both types should
+        agree."
+    ::= { fsp150ChassisStatusEntry 1 }
+
+fsp150ChassisStatusTemperature OBJECT-TYPE
+    SYNTAX INTEGER (-32768..32767)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The current chassis temperature in degrees Celsius."
+    ::= { fsp150ChassisStatusEntry 2 }
+
+fsp150ChassisStatusRailVoltage OBJECT-TYPE
+    SYNTAX INTEGER (0..65535)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The current rail voltage in mV."
+    ::= { fsp150ChassisStatusEntry 3 }
+
+fsp150ChassisStatusNEMIMode OBJECT-TYPE
+    SYNTAX Fsp150NEMIModeType
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Indicates whether a management module is fitted and whether
+        it is controlling its system."
+    ::= { fsp150ChassisStatusEntry 4 }
+
+fsp150ChassisStatusActiveNetwork OBJECT-TYPE
+    SYNTAX INTEGER (0..65535)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The network port(s) from which the system is currently
+        receiving (0 = both, 1 = network port A, 2 = network port B,
+        3 = none/fault). Depending on the protection mechanism used,
+        the system is transmitting on the same or on both ports."
+    ::= { fsp150ChassisStatusEntry 5 }
+
+fsp150ChassisStatusBootTimer OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Aproximate time in seconds since the unit was powered on or
+        resetted. Note that this counter may increment in jumps,
+        depending on the resolution of the internal clock."
+    ::= { fsp150ChassisStatusEntry 6 }
+
+fsp150ChassisStatusIngressDepartureStatus OBJECT-TYPE
+    SYNTAX Fsp150IngressDepartureStatus
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150ChassisStatusEntry 7 }
+
+fsp150ChassisStatusEgressArrivalStatus OBJECT-TYPE
+    SYNTAX Fsp150EgressArrivalStatus
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150ChassisStatusEntry 8 }
+
+fsp150ChassisStatusPreferredNet OBJECT-TYPE
+    SYNTAX Fsp150PreferredNetwork
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The configured preferred network protection port. (Mx only)"
+    ::= { fsp150ChassisStatusEntry 9 }
+
+-- Mx
+fsp150ChassisStatusMulticastActiveNetwork OBJECT-TYPE
+    SYNTAX INTEGER (0..65535)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The network port(s) from which the system is currently
+        receiving multicast data (0 = none/fault, 1 = network port
+        A, 2 = network port B, 3 = both)."
+    ::= { fsp150ChassisStatusEntry 10 }
+
+-- IfConfig
+
+fsp150IfConfigTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Fsp150IfConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150ConfigAndStatus 3 }
+
+fsp150IfConfigEntry OBJECT-TYPE
+    SYNTAX Fsp150IfConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    INDEX { ifIndex }
+    ::= { fsp150IfConfigTable 1 }
+
+Fsp150IfConfigEntry ::= SEQUENCE {
+    fsp150IfConfigUserString DisplayString,
+    fsp150IfConfigLinkLossFwd TruthValue,
+    fsp150IfConfigAutoNeg TruthValue,
+    fsp150IfConfigDataRate INTEGER,
+    fsp150IfConfigAdminStatus Fsp150AdminStatusType,
+    fsp150IfConfigRingController TruthValue,
+    fsp150IfConfigDasaSwapping TruthValue,
+    fsp150IfConfigTerminalLoopback TruthValue
+    }
+
+fsp150IfConfigUserString OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..40))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "A string associated with the interface configurable by the
+        manager. The same string is reported as entPhysicalAlias."
+    ::= { fsp150IfConfigEntry 1 }
+
+fsp150IfConfigLinkLossFwd OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Only supported for access interfaces. If true the link will
+        be brought down when the network side is down, so connected
+        Ethernet equipment can detect the fault."
+    ::= { fsp150IfConfigEntry 2 }
+
+fsp150IfConfigAutoNeg OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Enable auto negotiation."
+    ::= { fsp150IfConfigEntry 3 }
+
+fsp150IfConfigDataRate OBJECT-TYPE
+    SYNTAX INTEGER (0..65535)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The configured data rate in Mbits/sec (10 | 100 | 1000) or 0
+        to select the highest rate supported by an SFP. This setting
+        is only effective when auto negotiation is disabled."
+    ::= { fsp150IfConfigEntry 4 }
+
+fsp150IfConfigAdminStatus OBJECT-TYPE
+    SYNTAX Fsp150AdminStatusType
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The admin status (1 = up, 2 = down, 3 = testing, 4 = forced
+        linkdown)."
+    ::= { fsp150IfConfigEntry 5 }
+
+fsp150IfConfigRingController OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "True if ring controller is started for this port."
+    ::= { fsp150IfConfigEntry 6 }
+
+fsp150IfConfigDasaSwapping OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Enable CP'S dasaswap"
+    ::= { fsp150IfConfigEntry 7 }
+
+fsp150IfConfigTerminalLoopback OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Enable CP'S terminalloopback"
+    ::= { fsp150IfConfigEntry 8 }
+
+-- If
+
+fsp150IfTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Fsp150IfEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Only interfaces that are physically present and connected to
+        the local system have entries in this table."
+    ::= { fsp150ConfigAndStatus 4 }
+
+fsp150IfEntry OBJECT-TYPE
+    SYNTAX Fsp150IfEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    INDEX { ifIndex }
+    ::= { fsp150IfTable 1 }
+
+Fsp150IfEntry ::= SEQUENCE {
+    fsp150IfConnectorType SnmpAdminString,
+    fsp150IfLinkLossFwdActive TruthValue,
+    fsp150IfDataRate INTEGER
+    }
+
+fsp150IfConnectorType OBJECT-TYPE
+    SYNTAX SnmpAdminString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The type of the connector, e.g. 'SC', 'FC', 'MU'."
+    ::= { fsp150IfEntry 1 }
+
+fsp150IfLinkLossFwdActive OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Is the link down due to link loss forwarding?"
+    ::= { fsp150IfEntry 2 }
+
+fsp150IfDataRate OBJECT-TYPE
+    SYNTAX INTEGER (0..65535)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The current data rate in Mbits/sec."
+    ::= { fsp150IfEntry 3 }
+
+-- OpticalIfConfig
+
+fsp150OpticalIfConfigTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Fsp150OpticalIfConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150ConfigAndStatus 5 }
+
+fsp150OpticalIfConfigEntry OBJECT-TYPE
+    SYNTAX Fsp150OpticalIfConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    INDEX { ifIndex }
+    ::= { fsp150OpticalIfConfigTable 1 }
+
+Fsp150OpticalIfConfigEntry ::= SEQUENCE {
+    fsp150OpticalIfConfigLowOIPThreshold INTEGER
+    }
+
+fsp150OpticalIfConfigLowOIPThreshold OBJECT-TYPE
+    SYNTAX INTEGER (-32768..32767)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The optical input power level in dBm below which an
+        fsp150LowOIP alarm is raised. Only available for network
+        interfaces. In this version this value cannot be changed.
+        Writing to it will fail."
+    ::= { fsp150OpticalIfConfigEntry 1 }
+
+-- OpticalIf
+
+fsp150OpticalIfTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Fsp150OpticalIfEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150ConfigAndStatus 6 }
+
+fsp150OpticalIfEntry OBJECT-TYPE
+    SYNTAX Fsp150OpticalIfEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    INDEX { ifIndex }
+    ::= { fsp150OpticalIfTable 1 }
+
+Fsp150OpticalIfEntry ::= SEQUENCE {
+    fsp150OpticalIfLinkLength9um INTEGER,
+    fsp150OpticalIfLinkLength50um INTEGER,
+    fsp150OpticalIfLinkLength62d5um INTEGER,
+    fsp150OpticalIfLinkLengthCopper INTEGER,
+    fsp150OpticalIfWavelength INTEGER
+    }
+
+fsp150OpticalIfLinkLength9um OBJECT-TYPE
+    SYNTAX INTEGER (0..65535)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The maximum link length in 100 metres supported for 9/125
+        micrometre fibre."
+    ::= { fsp150OpticalIfEntry 1 }
+
+fsp150OpticalIfLinkLength50um OBJECT-TYPE
+    SYNTAX INTEGER (0..65535)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The maximum link length in metres supported for 50/125
+        micrometre fibre."
+    ::= { fsp150OpticalIfEntry 2 }
+
+fsp150OpticalIfLinkLength62d5um OBJECT-TYPE
+    SYNTAX INTEGER (0..65535)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The maximum link length in metres supported for 62.5/125
+        micrometre fibre."
+    ::= { fsp150OpticalIfEntry 3 }
+
+fsp150OpticalIfLinkLengthCopper OBJECT-TYPE
+    SYNTAX INTEGER (0..65535)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The maximum link length in metres supported for copper."
+    ::= { fsp150OpticalIfEntry 4 }
+
+fsp150OpticalIfWavelength OBJECT-TYPE
+    SYNTAX INTEGER (0..65535)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The nominal wavelength in nm."
+    ::= { fsp150OpticalIfEntry 5 }
+
+-- OpticalIfStatus
+
+fsp150OpticalIfStatusTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Fsp150OpticalIfStatusEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150ConfigAndStatus 7 }
+
+fsp150OpticalIfStatusEntry OBJECT-TYPE
+    SYNTAX Fsp150OpticalIfStatusEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    INDEX { ifIndex }
+    ::= { fsp150OpticalIfStatusTable 1 }
+
+Fsp150OpticalIfStatusEntry ::= SEQUENCE {
+    fsp150OpticalIfStatusLaserBias INTEGER,
+    fsp150OpticalIfStatusTxPower INTEGER,
+    fsp150OpticalIfStatusRxPower INTEGER,
+    fsp150OpticalIfStatusLaserTemp INTEGER
+    }
+
+fsp150OpticalIfStatusLaserBias OBJECT-TYPE
+    SYNTAX INTEGER (-32768..32767)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The current laser bias in micro Amps."
+    ::= { fsp150OpticalIfStatusEntry 1 }
+
+fsp150OpticalIfStatusTxPower OBJECT-TYPE
+    SYNTAX INTEGER (-32768..32767)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The current transmit power in dBm."
+    ::= { fsp150OpticalIfStatusEntry 2 }
+
+fsp150OpticalIfStatusRxPower OBJECT-TYPE
+    SYNTAX INTEGER (-32768..32767)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The current receive power in dBm."
+    ::= { fsp150OpticalIfStatusEntry 3 }
+
+fsp150OpticalIfStatusLaserTemp OBJECT-TYPE
+    SYNTAX INTEGER (-32768..32767)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The current laser temperature in degrees Celsius."
+    ::= { fsp150OpticalIfStatusEntry 4 }
+
+-- ElectricalIfConfig
+
+fsp150ElectricalIfConfigTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Fsp150ElectricalIfConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150ConfigAndStatus 8 }
+
+fsp150ElectricalIfConfigEntry OBJECT-TYPE
+    SYNTAX Fsp150ElectricalIfConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    INDEX { ifIndex }
+    ::= { fsp150ElectricalIfConfigTable 1 }
+
+Fsp150ElectricalIfConfigEntry ::= SEQUENCE {
+    fsp150ElectricalIfConfigFullDuplex TruthValue
+    }
+
+fsp150ElectricalIfConfigFullDuplex OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Full duplex mode enabled? Only writable when auto
+        negotiation is disabled."
+    ::= { fsp150ElectricalIfConfigEntry 1 }
+
+-- IfAutoNegConfig
+
+fsp150IfAutoNegConfigTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Fsp150IfAutoNegConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table has entries for electrical interfaces only."
+    ::= { fsp150ConfigAndStatus 9 }
+
+fsp150IfAutoNegConfigEntry OBJECT-TYPE
+    SYNTAX Fsp150IfAutoNegConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    INDEX { ifIndex }
+    ::= { fsp150IfAutoNegConfigTable 1 }
+
+Fsp150IfAutoNegConfigEntry ::= SEQUENCE {
+    fsp150IfAutoNegConfigAdvertisedTechnologyAbility Fsp150TechnologyAbility
+    }
+
+fsp150IfAutoNegConfigAdvertisedTechnologyAbility OBJECT-TYPE
+    SYNTAX Fsp150TechnologyAbility
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The advertised ability of the local device."
+    ::= { fsp150IfAutoNegConfigEntry 1 }
+
+-- IfAutoNegStatus
+
+fsp150IfAutoNegStatusTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Fsp150IfAutoNegStatusEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table has entries for electrical interfaces only."
+    ::= { fsp150ConfigAndStatus 10 }
+
+fsp150IfAutoNegStatusEntry OBJECT-TYPE
+    SYNTAX Fsp150IfAutoNegStatusEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    INDEX { ifIndex }
+    ::= { fsp150IfAutoNegStatusTable 1 }
+
+Fsp150IfAutoNegStatusEntry ::= SEQUENCE {
+    fsp150IfAutoNegStatusRemSignallingDetected TruthValue,
+    fsp150IfAutoNegStatusStatus Fsp150AutoNegStatus,
+    fsp150IfAutoNegStatusLocalTechnologyAbility Fsp150TechnologyAbility,
+    fsp150IfAutoNegStatusReceivedTechnologyAbility Fsp150TechnologyAbility
+    }
+
+fsp150IfAutoNegStatusRemSignallingDetected OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Indicates whether signalling from the remote device has been
+        detected."
+    ::= { fsp150IfAutoNegStatusEntry 1 }
+
+fsp150IfAutoNegStatusStatus OBJECT-TYPE
+    SYNTAX Fsp150AutoNegStatus
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The status of the auto negotiation process."
+    ::= { fsp150IfAutoNegStatusEntry 2 }
+
+fsp150IfAutoNegStatusLocalTechnologyAbility OBJECT-TYPE
+    SYNTAX Fsp150TechnologyAbility
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The ability of the local device."
+    ::= { fsp150IfAutoNegStatusEntry 3 }
+
+fsp150IfAutoNegStatusReceivedTechnologyAbility OBJECT-TYPE
+    SYNTAX Fsp150TechnologyAbility
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The received ability of the remote device."
+    ::= { fsp150IfAutoNegStatusEntry 4 }
+
+-- Fan
+
+fsp150FanTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Fsp150FanEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150ConfigAndStatus 11 }
+
+fsp150FanEntry OBJECT-TYPE
+    SYNTAX Fsp150FanEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    INDEX { entPhysicalIndex }
+    ::= { fsp150FanTable 1 }
+
+Fsp150FanEntry ::= SEQUENCE {
+    fsp150FanStatus Fsp150FanStatus
+    }
+
+fsp150FanStatus OBJECT-TYPE
+    SYNTAX Fsp150FanStatus
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Status of the fan"
+    ::= { fsp150FanEntry 1 }
+
+-- PSU
+
+fsp150PSUTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Fsp150PSUEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150ConfigAndStatus 12 }
+
+fsp150PSUEntry OBJECT-TYPE
+    SYNTAX Fsp150PSUEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    INDEX { entPhysicalIndex }
+    ::= { fsp150PSUTable 1 }
+
+Fsp150PSUEntry ::= SEQUENCE {
+    fsp150PSUType SnmpAdminString,
+    fsp150PSUStatus Fsp150PSUStatus,
+    fsp150PSUVoltage INTEGER
+    }
+
+fsp150PSUType OBJECT-TYPE
+    SYNTAX SnmpAdminString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The type of PSU fitted, 'AC' or 'DC'."
+    ::= { fsp150PSUEntry 1 }
+
+fsp150PSUStatus OBJECT-TYPE
+    SYNTAX Fsp150PSUStatus
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Operational status of the PSU"
+    ::= { fsp150PSUEntry 2 }
+
+fsp150PSUVoltage OBJECT-TYPE
+    SYNTAX INTEGER (-2147483648..2147483647)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Voltage output from PSU, in millivolts, or -1 if measurement
+        not possible."
+    ::= { fsp150PSUEntry 3 }
+
+-- IfOAMConfig
+
+fsp150IfOAMConfigTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Fsp150IfOAMConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150ConfigAndStatus 13 }
+
+fsp150IfOAMConfigEntry OBJECT-TYPE
+    SYNTAX Fsp150IfOAMConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    INDEX { ifIndex }
+    ::= { fsp150IfOAMConfigTable 1 }
+
+Fsp150IfOAMConfigEntry ::= SEQUENCE {
+    fsp150IfOAMConfigOAMEnable TruthValue,
+    fsp150IfOAMConfigLoopbackCommand Fsp150OAMLoopbackCommandType,
+    fsp150IfOAMConfigLoopbackStatus Fsp150OAMLoopbackStatusType,
+    fsp150IfOAMConfigOAMActive TruthValue,
+    fsp150IfOAMConfigOAMInfoEnable TruthValue,
+    fsp150IfOAMConfigLoopbacktimer INTEGER,
+    fsp150IfOAMConfigTestTrafficEnable TruthValue,
+    fsp150IfOAMConfigResetCounters TruthValue,
+    fsp150IfOAMConfigDaSaSwapping TruthValue
+    }
+
+fsp150IfOAMConfigOAMEnable OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Enable OAM for this interface. If disabled the interface
+        acts as if the OAM sublayer were absent, except that
+        re-enabling OAM via OAM is possible."
+    ::= { fsp150IfOAMConfigEntry 1 }
+
+fsp150IfOAMConfigLoopbackCommand OBJECT-TYPE
+    SYNTAX Fsp150OAMLoopbackCommandType
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Activate/deactivate a loopback on this interface. Available
+        on network and access ports. The value read back is always
+        noLoopback. Loopback configuration is not stored in the
+        database. Loopbacks will be reset when a chassis is
+        disconnected or the NEMI reboots."
+    ::= { fsp150IfOAMConfigEntry 2 }
+
+fsp150IfOAMConfigLoopbackStatus OBJECT-TYPE
+    SYNTAX Fsp150OAMLoopbackStatusType
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The loopback status of the interface. A loopback at the
+        connected remote interface is also reported on the local
+        interface."
+    ::= { fsp150IfOAMConfigEntry 3 }
+
+fsp150IfOAMConfigOAMActive OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Initiate OAM discovery"
+    ::= { fsp150IfOAMConfigEntry 4 }
+
+fsp150IfOAMConfigOAMInfoEnable OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "OAM Info discovery on/off"
+    ::= { fsp150IfOAMConfigEntry 5 }
+
+fsp150IfOAMConfigLoopbacktimer OBJECT-TYPE
+    SYNTAX INTEGER (0..65535)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This object allows specification of timer value in seconds
+        for timed local loopbacks. Timed local loopbacks are
+        automatically removed at the expiration of specified time.
+        The default timer (0,...300s)."
+    ::= { fsp150IfOAMConfigEntry 6 }
+
+fsp150IfOAMConfigTestTrafficEnable OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Allow traffic generator when setting the remote loopback
+        mode"
+    ::= { fsp150IfOAMConfigEntry 7 }
+
+fsp150IfOAMConfigResetCounters OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Allow reset the OAM performance counters"
+    ::= { fsp150IfOAMConfigEntry 8 }
+-- Cp
+fsp150IfOAMConfigDaSaSwapping OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Allow swapping destination MAC address and source MAC
+        address when setting the local loopback on network port or
+        terminal loopback on Access port"
+    ::= { fsp150IfOAMConfigEntry 9 }
+
+-- AccessIfConfig
+
+fsp150AccessIfConfigTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Fsp150AccessIfConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150ConfigAndStatus 14 }
+
+fsp150AccessIfConfigEntry OBJECT-TYPE
+    SYNTAX Fsp150AccessIfConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    INDEX { ifIndex }
+    ::= { fsp150AccessIfConfigTable 1 }
+
+Fsp150AccessIfConfigEntry ::= SEQUENCE {
+    fsp150AccessIfConfigForwardMode Fsp150AccessPortForwardMode,
+    fsp150AccessIfConfigTagMode Fsp150AccessPortTagMode,
+    fsp150AccessIfConfigEgressCirLow INTEGER,
+    fsp150AccessIfConfigEgressCbsLow INTEGER,
+    fsp150AccessIfConfigEgressCirMed INTEGER,
+    fsp150AccessIfConfigEgressCbsMed INTEGER,
+    fsp150AccessIfConfigEgressCirHigh INTEGER,
+    fsp150AccessIfConfigEgressCbsHigh INTEGER,
+    fsp150AccessIfConfigIngressCirLow INTEGER,
+    fsp150AccessIfConfigIngressCbsLow INTEGER,
+    fsp150AccessIfConfigIngressCirMed INTEGER,
+    fsp150AccessIfConfigIngressCbsMed INTEGER,
+    fsp150AccessIfConfigIngressCirHigh INTEGER,
+    fsp150AccessIfConfigIngressCbsHigh INTEGER,
+    fsp150AccessIfConfigPriorityType Fsp150PriorityType,
+    fsp150AccessIfConfigPriorityValue INTEGER
+    }
+
+fsp150AccessIfConfigForwardMode OBJECT-TYPE
+    SYNTAX Fsp150AccessPortForwardMode
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Controls how ingress traffic is forwarded."
+    ::= { fsp150AccessIfConfigEntry 1 }
+
+fsp150AccessIfConfigTagMode OBJECT-TYPE
+    SYNTAX Fsp150AccessPortTagMode
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Controls tag processing mode on a port."
+    ::= { fsp150AccessIfConfigEntry 2 }
+
+fsp150AccessIfConfigEgressCirLow OBJECT-TYPE
+    SYNTAX INTEGER (-2147483648..2147483647)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Controls the maximum Commited Information Rate (CIR) for low
+        priority egress traffic on this port. Value -1 means not
+        supported"
+    ::= { fsp150AccessIfConfigEntry 3 }
+
+fsp150AccessIfConfigEgressCbsLow OBJECT-TYPE
+    SYNTAX INTEGER (-2147483648..2147483647)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Controls the maximum Commited Burst Size (CBS) for low
+        priority egress traffic on this port. Value -1 means not
+        supported"
+    ::= { fsp150AccessIfConfigEntry 4 }
+
+fsp150AccessIfConfigEgressCirMed OBJECT-TYPE
+    SYNTAX INTEGER (-2147483648..2147483647)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Controls the maximum Commited Information Rate (CIR) for
+        medium priority egress traffic on this port. Value -1 means
+        not supported"
+    ::= { fsp150AccessIfConfigEntry 5 }
+
+fsp150AccessIfConfigEgressCbsMed OBJECT-TYPE
+    SYNTAX INTEGER (-2147483648..2147483647)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Controls the maximum Commited Burst Size (CBS) for medium
+        priority egress traffic on this port. Value -1 means not
+        supported"
+    ::= { fsp150AccessIfConfigEntry 6 }
+
+fsp150AccessIfConfigEgressCirHigh OBJECT-TYPE
+    SYNTAX INTEGER (-2147483648..2147483647)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Controls the maximum Commited Information Rate (CIR) for
+        high priority egress traffic on this port. Value -1 means
+        not supported"
+    ::= { fsp150AccessIfConfigEntry 7 }
+
+fsp150AccessIfConfigEgressCbsHigh OBJECT-TYPE
+    SYNTAX INTEGER (-2147483648..2147483647)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Controls the maximum Commited Burst Size (CBS) for high
+        priority egress traffic on this port. Value -1 means not
+        supported"
+    ::= { fsp150AccessIfConfigEntry 8 }
+
+fsp150AccessIfConfigIngressCirLow OBJECT-TYPE
+    SYNTAX INTEGER (-2147483648..2147483647)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Controls the maximum Commited Information Rate (CIR) for low
+        priority ingress traffic on this port. Value -1 means not
+        supported"
+    ::= { fsp150AccessIfConfigEntry 9 }
+
+fsp150AccessIfConfigIngressCbsLow OBJECT-TYPE
+    SYNTAX INTEGER (-2147483648..2147483647)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Controls the maximum Commited Burst Size (CBS) for low
+        priority ingress traffic on this port. Value -1 means not
+        supported"
+    ::= { fsp150AccessIfConfigEntry 10 }
+
+fsp150AccessIfConfigIngressCirMed OBJECT-TYPE
+    SYNTAX INTEGER (-2147483648..2147483647)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Controls the maximum Commited Information Rate (CIR) for
+        medium priority ingress traffic on this port. Value -1 means
+        not supported"
+    ::= { fsp150AccessIfConfigEntry 11 }
+
+fsp150AccessIfConfigIngressCbsMed OBJECT-TYPE
+    SYNTAX INTEGER (-2147483648..2147483647)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Controls the maximum Commited Burst Size (CBS) for medium
+        priority ingress traffic on this port. Value -1 means not
+        supported"
+    ::= { fsp150AccessIfConfigEntry 12 }
+
+fsp150AccessIfConfigIngressCirHigh OBJECT-TYPE
+    SYNTAX INTEGER (-2147483648..2147483647)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Controls the maximum Commited Information Rate (CIR) for
+        high priority ingress traffic on this port. Value -1 means
+        not supported"
+    ::= { fsp150AccessIfConfigEntry 13 }
+
+fsp150AccessIfConfigIngressCbsHigh OBJECT-TYPE
+    SYNTAX INTEGER (-2147483648..2147483647)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Controls the maximum Commited Burst Size (CBS) for high
+        priority ingress traffic on this port. Value -1 means not
+        supported"
+    ::= { fsp150AccessIfConfigEntry 14 }
+
+fsp150AccessIfConfigPriorityType OBJECT-TYPE
+    SYNTAX Fsp150PriorityType
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Sets the priority classification mode for this port. In mode
+        off, all traffic is classified as low priority. In mode
+        force, the priority is always set to the value set with
+        fsp150AccessIfPriorityValue. In mode copy, the priority is
+        copied as is, unless the packet doesn't have a VLAN tag, in
+        which case the value in fsp150AccessIfPriorityValue is used."
+    ::= { fsp150AccessIfConfigEntry 15 }
+
+fsp150AccessIfConfigPriorityValue OBJECT-TYPE
+    SYNTAX INTEGER (0..65535)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Sets the priority used when fsp150AccessIfPriorityType is in
+        copy or force mode."
+    ::= { fsp150AccessIfConfigEntry 16 }
+
+-- AccessIfStatus
+
+fsp150AccessIfStatusTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Fsp150AccessIfStatusEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150ConfigAndStatus 15 }
+
+fsp150AccessIfStatusEntry OBJECT-TYPE
+    SYNTAX Fsp150AccessIfStatusEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    INDEX { ifIndex }
+    ::= { fsp150AccessIfStatusTable 1 }
+
+Fsp150AccessIfStatusEntry ::= SEQUENCE {
+    fsp150AccessIfStatusForwardMode Fsp150AccessPortForwardMode,
+    fsp150AccessIfStatusEgressRegulatorOverflowLow Counter64String,
+    fsp150AccessIfStatusEgressRegulatorOverflowMed Counter64String,
+    fsp150AccessIfStatusEgressRegulatorOverflowHigh Counter64String,
+    fsp150AccessIfStatusIngressRegulatorOverflowLow Counter64String,
+    fsp150AccessIfStatusIngressRegulatorOverflowMed Counter64String,
+    fsp150AccessIfStatusIngressRegulatorOverflowHigh Counter64String
+    }
+
+fsp150AccessIfStatusForwardMode OBJECT-TYPE
+    SYNTAX Fsp150AccessPortForwardMode
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150AccessIfStatusEntry 1 }
+
+fsp150AccessIfStatusEgressRegulatorOverflowLow OBJECT-TYPE
+    SYNTAX Counter64String
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Counts the number of times a packet had to be dropped
+        because the regulator overflowed."
+    ::= { fsp150AccessIfStatusEntry 2 }
+
+fsp150AccessIfStatusEgressRegulatorOverflowMed OBJECT-TYPE
+    SYNTAX Counter64String
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Counts the number of times a packet had to be dropped
+        because the regulator overflowed."
+    ::= { fsp150AccessIfStatusEntry 3 }
+
+fsp150AccessIfStatusEgressRegulatorOverflowHigh OBJECT-TYPE
+    SYNTAX Counter64String
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Counts the number of times a packet had to be dropped
+        because the regulator overflowed."
+    ::= { fsp150AccessIfStatusEntry 4 }
+
+fsp150AccessIfStatusIngressRegulatorOverflowLow OBJECT-TYPE
+    SYNTAX Counter64String
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Counts the number of times a packet had to be dropped
+        because the regulator overflowed."
+    ::= { fsp150AccessIfStatusEntry 5 }
+
+fsp150AccessIfStatusIngressRegulatorOverflowMed OBJECT-TYPE
+    SYNTAX Counter64String
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Counts the number of times a packet had to be dropped
+        because the regulator overflowed."
+    ::= { fsp150AccessIfStatusEntry 6 }
+
+fsp150AccessIfStatusIngressRegulatorOverflowHigh OBJECT-TYPE
+    SYNTAX Counter64String
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Counts the number of times a packet had to be dropped
+        because the regulator overflowed."
+    ::= { fsp150AccessIfStatusEntry 7 }
+
+-- IfCaps
+
+fsp150IfCapsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Fsp150IfCapsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150ConfigAndStatus 16 }
+
+fsp150IfCapsEntry OBJECT-TYPE
+    SYNTAX Fsp150IfCapsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    INDEX { ifIndex }
+    ::= { fsp150IfCapsTable 1 }
+
+Fsp150IfCapsEntry ::= SEQUENCE {
+    fsp150IfCapsSuppRates Fsp150DataRates,
+    fsp150IfCapsSuppTxModes Fsp150TxModes,
+    fsp150IfCapsSuppAutoNeg Fsp150AutoNegSupp
+    }
+
+fsp150IfCapsSuppRates OBJECT-TYPE
+    SYNTAX Fsp150DataRates
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150IfCapsEntry 1 }
+
+fsp150IfCapsSuppTxModes OBJECT-TYPE
+    SYNTAX Fsp150TxModes
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150IfCapsEntry 2 }
+
+fsp150IfCapsSuppAutoNeg OBJECT-TYPE
+    SYNTAX Fsp150AutoNegSupp
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150IfCapsEntry 3 }
+
+-- NetworkIfConfig
+
+fsp150NetworkIfConfigTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Fsp150NetworkIfConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150ConfigAndStatus 17 }
+
+fsp150NetworkIfConfigEntry OBJECT-TYPE
+    SYNTAX Fsp150NetworkIfConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    INDEX { ifIndex }
+    ::= { fsp150NetworkIfConfigTable 1 }
+
+Fsp150NetworkIfConfigEntry ::= SEQUENCE {
+    fsp150NetworkIfConfigTransmitAc INTEGER,
+    fsp150NetworkIfConfigTransmitAbs INTEGER,
+    fsp150NetworkIfConfigTranslation TruthValue
+    }
+
+fsp150NetworkIfConfigTransmitAc OBJECT-TYPE
+    SYNTAX INTEGER (-2147483648..2147483647)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Controls the maximum Allocated Capacity (AC) on the network
+        ports. Primarily used when the node is used in ring mode.
+        Value -1 means not supported"
+    ::= { fsp150NetworkIfConfigEntry 1 }
+
+fsp150NetworkIfConfigTransmitAbs OBJECT-TYPE
+    SYNTAX INTEGER (-2147483648..2147483647)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Controls the maximum Allocated Burst Size (ABS) on the
+        network ports. Primarily used when the node is used in ring
+        mode. Value -1 means not supported"
+    ::= { fsp150NetworkIfConfigEntry 2 }
+
+fsp150NetworkIfConfigTranslation OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Controls the PID translation on the network ports."
+    ::= { fsp150NetworkIfConfigEntry 3 }
+
+-- TrafficManagementMIB
+
+fsp150TrafficManagementMIB OBJECT IDENTIFIER ::= {fsp150ConfigAndStatus 18}
+
+-- Textual Conventions
+
+Fsp150TMPort ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "The FSP 150 traffic management MIB uses port numbers (1,...
+        number of relevant ports) rather than ifIndex values. A port
+        table maps ifIndex values to traffic management ports. A set
+        of traffic management ports. Bit n is set iff port number n
+        belongs to the set. VLAN identifier, a number from 0 to
+        4094. VLAN classification configuration. VLAN filtering
+        configuration.
+        The maximum number of classification rules. The maximum
+        number of traffic classes. The maximum number of meters. The
+        maximum number of queues per port. Last change time stamp
+        for traffic management settings for a given chassis. The
+        traffic management port number for a given ifIndex. Note
+        that the same number can be used by more than one interface;
+        the two access ports on an FSP 150CP share one traffic
+        management port. The default VID of a port (0,...4094). The
+        VLAN classification configuration of a port. The tag
+        protocol identity configuration of a port (0x0600 - 0xffff).
+        The VLAN filtering configuration of a port. Writing"
+    SYNTAX INTEGER (0..65535)
+
+Fsp150VID ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "VLAN identifier, a number from 0 to 4094."
+    SYNTAX INTEGER (0..65535)
+
+Fsp150VIDctrl ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "VLAN classification configuration."
+    SYNTAX INTEGER {
+        qBridge (1),
+        force (2),
+        qInQ (3),
+        translate (4)
+    }
+
+Fsp150VLANfilter ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "VLAN filtering configuration."
+    SYNTAX INTEGER {
+        all (1),
+        onlyTagged (2),
+        onlyUntagged (3)
+    }
+-- Cp
+Fsp150TMPortMap ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "A set of traffic management ports. Bit n is set iff port
+        number n belongs to the set."
+    SYNTAX BITS {
+        port1 (1),
+        port2 (2),
+        port3 (3)
+    }
+
+Fsp150TrafficClassIndex ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION ""
+    SYNTAX INTEGER (0..65535)
+
+Fsp150TMColour ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION ""
+    SYNTAX INTEGER {
+        green (1),
+        yellow (2)
+    }
+
+Fsp150ColourMode ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION ""
+    SYNTAX INTEGER {
+        blind (1),
+        aware (2)
+    }
+-- TMBase
+
+fsp150TMBaseTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Fsp150TMBaseEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The VID translation function of a given traffic management
+        port in a given chassis. Only non-identical translations are
+        in this table. Associate a meter with a traffic class. More
+        than one traffic class can be metered by the same meter. The
+        shaping parameters for a queue associated with a given
+        output port in a given chassis (queue index non-zero) or for
+        the port itself (queue index 0). The configuration of the
+        frame modification function."
+    ::= { fsp150TrafficManagementMIB 1 }
+
+fsp150TMBaseEntry OBJECT-TYPE
+    SYNTAX Fsp150TMBaseEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    INDEX { entPhysicalIndex }
+    ::= { fsp150TMBaseTable 1 }
+
+Fsp150TMBaseEntry ::= SEQUENCE {
+    fsp150TMBaseMaxClassRules INTEGER,
+    fsp150TMBaseMaxClasses INTEGER,
+    fsp150TMBaseMaxMeters INTEGER,
+    fsp150TMBaseMaxQueues INTEGER,
+    fsp150TMBaseLastChangeTime TimeStamp
+    }
+
+fsp150TMBaseMaxClassRules OBJECT-TYPE
+    SYNTAX INTEGER (0..65535)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The maximum number of classification rules."
+    ::= { fsp150TMBaseEntry 1 }
+
+fsp150TMBaseMaxClasses OBJECT-TYPE
+    SYNTAX INTEGER (0..65535)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The maximum number of traffic classes."
+    ::= { fsp150TMBaseEntry 2 }
+
+fsp150TMBaseMaxMeters OBJECT-TYPE
+    SYNTAX INTEGER (0..65535)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The maximum number of meters."
+    ::= { fsp150TMBaseEntry 3 }
+
+fsp150TMBaseMaxQueues OBJECT-TYPE
+    SYNTAX INTEGER (0..65535)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The maximum number of queues per port."
+    ::= { fsp150TMBaseEntry 4 }
+
+fsp150TMBaseLastChangeTime OBJECT-TYPE
+    SYNTAX TimeStamp
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Last change time stamp for traffic management settings for a
+        given chassis."
+    ::= { fsp150TMBaseEntry 5 }
+
+-- TMPort
+
+fsp150TMPortTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Fsp150TMPortEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150TrafficManagementMIB 2 }
+
+fsp150TMPortEntry OBJECT-TYPE
+    SYNTAX Fsp150TMPortEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    INDEX { ifIndex }
+    ::= { fsp150TMPortTable 1 }
+
+Fsp150TMPortEntry ::= SEQUENCE {
+    fsp150TMPortPortNo Fsp150TMPort
+    }
+
+fsp150TMPortPortNo OBJECT-TYPE
+    SYNTAX Fsp150TMPort
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The traffic management port number for a given ifIndex. Note
+        that the same number can be used by more than one interface;
+        the two access ports on an FSP 150CP share one traffic
+        management port."
+    ::= { fsp150TMPortEntry 1 }
+-- Cp end
+
+-- TMPortConfig
+
+fsp150TMPortConfigTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Fsp150TMPortConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150TrafficManagementMIB 3 }
+
+fsp150TMPortConfigEntry OBJECT-TYPE
+    SYNTAX Fsp150TMPortConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    INDEX { entPhysicalIndex, fsp150TMPortConfigPortNo }
+    ::= { fsp150TMPortConfigTable 1 }
+
+Fsp150TMPortConfigEntry ::= SEQUENCE {
+    fsp150TMPortConfigPortNo Fsp150TMPort,
+    fsp150TMPortConfigPVID Fsp150VID,
+    fsp150TMPortConfigPVIDctrl Fsp150VIDctrl,
+    fsp150TMPortConfigTPID INTEGER,
+    fsp150TMPortConfigVLANfilter Fsp150VLANfilter
+    }
+
+fsp150TMPortConfigPortNo OBJECT-TYPE
+    SYNTAX Fsp150TMPort
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150TMPortConfigEntry 1 }
+
+fsp150TMPortConfigPVID OBJECT-TYPE
+    SYNTAX Fsp150VID
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The default VID of a port (0,...4094)."
+    ::= { fsp150TMPortConfigEntry 2 }
+
+fsp150TMPortConfigPVIDctrl OBJECT-TYPE
+    SYNTAX Fsp150VIDctrl
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The VLAN classification configuration of a port."
+    ::= { fsp150TMPortConfigEntry 3 }
+
+fsp150TMPortConfigTPID OBJECT-TYPE
+    SYNTAX INTEGER (0..65535)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The tag protocol identity configuration of a port (0x0600 -
+        0xffff)."
+    ::= { fsp150TMPortConfigEntry 4 }
+
+fsp150TMPortConfigVLANfilter OBJECT-TYPE
+    SYNTAX Fsp150VLANfilter
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The VLAN filtering configuration of a port."
+    ::= { fsp150TMPortConfigEntry 5 }
+
+-- VIDtranslation
+
+fsp150VIDtranslationTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Fsp150VIDtranslationEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The VID translation function of a given traffic management
+        port in a given chassis. Only non-identical translations are
+        in this table."
+    ::= { fsp150TrafficManagementMIB 4 }
+
+fsp150VIDtranslationEntry OBJECT-TYPE
+    SYNTAX Fsp150VIDtranslationEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    INDEX { entPhysicalIndex, fsp150VIDtranslationPortNo, fsp150VIDtranslationInternal }
+    ::= { fsp150VIDtranslationTable 1 }
+
+Fsp150VIDtranslationEntry ::= SEQUENCE {
+    fsp150VIDtranslationPortNo Fsp150TMPort,
+    fsp150VIDtranslationInternal Fsp150VID,
+    fsp150VIDtranslationExternal Fsp150VID,
+    fsp150VIDtranslationRowStatus RowStatus
+    }
+
+fsp150VIDtranslationPortNo OBJECT-TYPE
+    SYNTAX Fsp150TMPort
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150VIDtranslationEntry 1 }
+
+fsp150VIDtranslationInternal OBJECT-TYPE
+    SYNTAX Fsp150VID
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150VIDtranslationEntry 2 }
+
+fsp150VIDtranslationExternal OBJECT-TYPE
+    SYNTAX Fsp150VID
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150VIDtranslationEntry 3 }
+
+fsp150VIDtranslationRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Writing destroy(6) deletes the entry. Entries can be created
+        by just setting the external VID. If row status is set as
+        well it should be set to createAndGo(4). Read will always
+        return active(1)."
+    ::= { fsp150VIDtranslationEntry 4 }
+-- CP start
+-- Filtering
+
+fsp150FilteringTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Fsp150FilteringEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150TrafficManagementMIB 5 }
+
+fsp150FilteringEntry OBJECT-TYPE
+    SYNTAX Fsp150FilteringEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    INDEX { entPhysicalIndex, fsp150FilteringVlanId }
+    ::= { fsp150FilteringTable 1 }
+
+Fsp150FilteringEntry ::= SEQUENCE {
+    fsp150FilteringVlanId Fsp150VID,
+    fsp150FilteringMembers Fsp150TMPortMap,
+    fsp150FilteringTrunkMode Fsp150TMPortMap,
+    fsp150FilteringRowStatus RowStatus
+    }
+
+fsp150FilteringVlanId OBJECT-TYPE
+    SYNTAX Fsp150VID
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150FilteringEntry 1 }
+
+fsp150FilteringMembers OBJECT-TYPE
+    SYNTAX Fsp150TMPortMap
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The ports that are members of the VLAN. Entries without
+        members are discarded."
+    ::= { fsp150FilteringEntry 3 }
+
+fsp150FilteringTrunkMode OBJECT-TYPE
+    SYNTAX Fsp150TMPortMap
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The ports for which trunk mode is enabled. Trunk mode can
+        only be enabled for VLAN members."
+    ::= { fsp150FilteringEntry 4 }
+
+fsp150FilteringRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Writing destroy(6) or setting the member field to zero
+        deletes the entry. Entries can be created by setting the
+        member field to non-zero. If row status is set as well it
+        should be set to createAndGo(4). Read will always return
+        active(1)."
+    ::= { fsp150FilteringEntry 5 }
+
+-- Classification
+
+fsp150ClassificationTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Fsp150ClassificationEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150TrafficManagementMIB 6 }
+
+fsp150ClassificationEntry OBJECT-TYPE
+    SYNTAX Fsp150ClassificationEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    INDEX { entPhysicalIndex, fsp150ClassificationPriority }
+    ::= { fsp150ClassificationTable 1 }
+
+Fsp150ClassificationEntry ::= SEQUENCE {
+    fsp150ClassificationPriority INTEGER,
+    fsp150ClassificationArrivalPortMask Fsp150TMPortMap,
+    fsp150ClassificationInVID Fsp150VID,
+    fsp150ClassificationInPCP INTEGER,
+    fsp150ClassificationInDE INTEGER,
+    fsp150ClassificationInDSCP INTEGER,
+    fsp150ClassificationOutTrafficClass Fsp150TrafficClassIndex,
+    fsp150ClassificationOutColour Fsp150TMColour,
+    fsp150ClassificationRowStatus RowStatus
+    }
+
+fsp150ClassificationPriority OBJECT-TYPE
+    SYNTAX INTEGER (0..65535)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150ClassificationEntry 1 }
+
+fsp150ClassificationArrivalPortMask OBJECT-TYPE
+    SYNTAX Fsp150TMPortMap
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The incoming ports for which this rule is applicable."
+    ::= { fsp150ClassificationEntry 2 }
+
+fsp150ClassificationInVID OBJECT-TYPE
+    SYNTAX Fsp150VID
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The VLAN ID of the incoming frame, 0 for a value of 0 or
+        none, 4095 for any."
+    ::= { fsp150ClassificationEntry 3 }
+
+fsp150ClassificationInPCP OBJECT-TYPE
+    SYNTAX INTEGER (0..65535)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The PCP (0,... 7) of the incoming frame or 8 for any."
+    ::= { fsp150ClassificationEntry 4 }
+
+fsp150ClassificationInDE OBJECT-TYPE
+    SYNTAX INTEGER (0..65535)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The DE (0, 1) of the incoming frame or 2 for any."
+    ::= { fsp150ClassificationEntry 5 }
+
+fsp150ClassificationInDSCP OBJECT-TYPE
+    SYNTAX INTEGER (0..65535)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The DSCP (0,... 63) of the incoming frame or 64 for any."
+    ::= { fsp150ClassificationEntry 6 }
+
+fsp150ClassificationOutTrafficClass OBJECT-TYPE
+    SYNTAX Fsp150TrafficClassIndex
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The traffic class to which the frame is assigned. The first
+        rule (i.e. the one with the lowest priority value) that
+        matches a frame determines its traffic class and colour."
+    ::= { fsp150ClassificationEntry 7 }
+
+fsp150ClassificationOutColour OBJECT-TYPE
+    SYNTAX Fsp150TMColour
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150ClassificationEntry 8 }
+
+fsp150ClassificationRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Writing destroy(6) deletes the entry. Rules with priority
+        values greater than the one of the deleted entry are moved
+        up in the table, i.e. their priority values are decremented.
+        Writing createAndGo(4) together with all other columns
+        creates a new entry, i.e. inserts an entry with the given
+        priority. Existing entries with priority values greater than
+        or equal to the priority of the new entry are moved down in
+        the table, i.e. their priority values are incremented. The
+        maximum priority value (i.e. the lowest priority) for a new
+        entry is the highest existing priority value plus one. Read
+        will always return active(1)."
+    ::= { fsp150ClassificationEntry 9 }
+
+-- ClassificationStatistics
+
+fsp150ClassificationStatisticsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Fsp150ClassificationStatisticsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150TrafficManagementMIB 7 }
+
+fsp150ClassificationStatisticsEntry OBJECT-TYPE
+    SYNTAX Fsp150ClassificationStatisticsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    INDEX { entPhysicalIndex, fsp150ClassificationStatisticsPriority }
+    ::= { fsp150ClassificationStatisticsTable 1 }
+
+Fsp150ClassificationStatisticsEntry ::= SEQUENCE {
+    fsp150ClassificationStatisticsPriority INTEGER,
+    fsp150ClassificationStatisticsClassified Counter32
+    }
+
+fsp150ClassificationStatisticsPriority OBJECT-TYPE
+    SYNTAX INTEGER (0..65535)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150ClassificationStatisticsEntry 1 }
+
+fsp150ClassificationStatisticsClassified OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of frames classified by this rule."
+    ::= { fsp150ClassificationStatisticsEntry 2 }
+
+-- MeterAllocation
+
+fsp150MeterAllocationTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Fsp150MeterAllocationEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Associate a meter with a traffic class. More than one
+        traffic class can be metered by the same meter."
+    ::= { fsp150TrafficManagementMIB 8 }
+
+fsp150MeterAllocationEntry OBJECT-TYPE
+    SYNTAX Fsp150MeterAllocationEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    INDEX { entPhysicalIndex, fsp150MeterAllocationTrafficClass }
+    ::= { fsp150MeterAllocationTable 1 }
+
+Fsp150MeterAllocationEntry ::= SEQUENCE {
+    fsp150MeterAllocationTrafficClass Fsp150TrafficClassIndex,
+    fsp150MeterAllocationMeterIndex INTEGER,
+    fsp150MeterAllocationRowStatus RowStatus
+    }
+
+fsp150MeterAllocationTrafficClass OBJECT-TYPE
+    SYNTAX Fsp150TrafficClassIndex
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150MeterAllocationEntry 1 }
+
+fsp150MeterAllocationMeterIndex OBJECT-TYPE
+    SYNTAX INTEGER (0..65535)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150MeterAllocationEntry 2 }
+
+fsp150MeterAllocationRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Writing destroy(6) deletes the entry. Deleting the last
+        entry with a given meter index deletes the corresponding
+        entry in the meter table as well. Entries can be created by
+        setting meter index. If row status is set as well it should
+        be set to createAndGo(4). Assigning a meter index for the
+        first time creates the corresponding entry in the meter
+        table. Read will always return active(1)."
+    ::= { fsp150MeterAllocationEntry 3 }
+
+-- Meter
+
+fsp150MeterTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Fsp150MeterEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150TrafficManagementMIB 9 }
+
+fsp150MeterEntry OBJECT-TYPE
+    SYNTAX Fsp150MeterEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    INDEX { entPhysicalIndex, fsp150MeterMeterIndex }
+    ::= { fsp150MeterTable 1 }
+
+Fsp150MeterEntry ::= SEQUENCE {
+    fsp150MeterMeterIndex INTEGER,
+    fsp150MeterCIR Unsigned32,
+    fsp150MeterCBS Unsigned32,
+    fsp150MeterEIR Unsigned32,
+    fsp150MeterEBS Unsigned32,
+    fsp150MeterCM Fsp150ColourMode,
+    fsp150MeterCF TruthValue
+    }
+
+fsp150MeterMeterIndex OBJECT-TYPE
+    SYNTAX INTEGER (0..65535)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150MeterEntry 1 }
+
+fsp150MeterCIR OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Committed information rate in Kbits/sec."
+    ::= { fsp150MeterEntry 2 }
+
+fsp150MeterCBS OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Committed burst size in Kbytes."
+    ::= { fsp150MeterEntry 3 }
+
+fsp150MeterEIR OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Excess information rate in Kbits/sec."
+    ::= { fsp150MeterEntry 4 }
+
+fsp150MeterEBS OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Excess burst size in Kbytes."
+    ::= { fsp150MeterEntry 5 }
+
+fsp150MeterCM OBJECT-TYPE
+    SYNTAX Fsp150ColourMode
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Colour mode."
+    ::= { fsp150MeterEntry 6 }
+
+fsp150MeterCF OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Coupling flag."
+    ::= { fsp150MeterEntry 7 }
+
+-- MeterStatistics
+
+fsp150MeterStatisticsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Fsp150MeterStatisticsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150TrafficManagementMIB 10 }
+
+fsp150MeterStatisticsEntry OBJECT-TYPE
+    SYNTAX Fsp150MeterStatisticsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    INDEX { entPhysicalIndex, fsp150MeterStatisticsMeterIndex }
+    ::= { fsp150MeterStatisticsTable 1 }
+
+Fsp150MeterStatisticsEntry ::= SEQUENCE {
+    fsp150MeterStatisticsMeterIndex INTEGER,
+    fsp150MeterStatisticsUnchanged Counter32,
+    fsp150MeterStatisticsReMarked Counter32,
+    fsp150MeterStatisticsDropped Counter32
+    }
+
+fsp150MeterStatisticsMeterIndex OBJECT-TYPE
+    SYNTAX INTEGER (0..65535)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150MeterStatisticsEntry 1 }
+
+fsp150MeterStatisticsUnchanged OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of frames passed unchanged by this meter."
+    ::= { fsp150MeterStatisticsEntry 2 }
+
+fsp150MeterStatisticsReMarked OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of frames passed and re-marked as yellow by this
+        meter."
+    ::= { fsp150MeterStatisticsEntry 3 }
+
+fsp150MeterStatisticsDropped OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of frames dropped by this meter."
+    ::= { fsp150MeterStatisticsEntry 4 }
+
+-- QueueMapping
+
+fsp150QueueMappingTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Fsp150QueueMappingEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150TrafficManagementMIB 11 }
+
+fsp150QueueMappingEntry OBJECT-TYPE
+    SYNTAX Fsp150QueueMappingEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Configure the shaping queue (if any) to be used for a given
+        traffic class and outgoing port number in a given chassis."
+    INDEX { entPhysicalIndex, fsp150QueueMappingPortNo, fsp150QueueMappingTrafficClass }
+    ::= { fsp150QueueMappingTable 1 }
+
+Fsp150QueueMappingEntry ::= SEQUENCE {
+    fsp150QueueMappingPortNo Fsp150TMPort,
+    fsp150QueueMappingTrafficClass Fsp150TrafficClassIndex,
+    fsp150QueueMappingOutQueueIndex INTEGER,
+    fsp150QueueMappingRowStatus RowStatus
+    }
+
+fsp150QueueMappingPortNo OBJECT-TYPE
+    SYNTAX Fsp150TMPort
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150QueueMappingEntry 1 }
+
+fsp150QueueMappingTrafficClass OBJECT-TYPE
+    SYNTAX Fsp150TrafficClassIndex
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150QueueMappingEntry 2 }
+
+fsp150QueueMappingOutQueueIndex OBJECT-TYPE
+    SYNTAX INTEGER (0..65535)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150QueueMappingEntry 3 }
+
+fsp150QueueMappingRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Writing destroy(6) deletes the entry. Entries can be created
+        by just setting queue index. If row status is set as well,
+        it should be set to createAndGo(4). Read will always return
+        active(1)."
+    ::= { fsp150QueueMappingEntry 4 }
+
+-- Shaper
+
+fsp150ShaperTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Fsp150ShaperEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The shaping parameters for a queue associated with a given
+        output port in a given chassis (queue index non-zero) or for
+        the port itself (queue index 0)."
+    ::= { fsp150TrafficManagementMIB 12 }
+
+fsp150ShaperEntry OBJECT-TYPE
+    SYNTAX Fsp150ShaperEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    INDEX { entPhysicalIndex, fsp150ShaperPortNo, fsp150ShaperQueueIndex }
+    ::= { fsp150ShaperTable 1 }
+
+Fsp150ShaperEntry ::= SEQUENCE {
+    fsp150ShaperPortNo Fsp150TMPort,
+    fsp150ShaperQueueIndex INTEGER,
+    fsp150ShaperAC Unsigned32,
+    fsp150ShaperABS Unsigned32
+    }
+
+fsp150ShaperPortNo OBJECT-TYPE
+    SYNTAX Fsp150TMPort
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150ShaperEntry 1 }
+
+fsp150ShaperQueueIndex OBJECT-TYPE
+    SYNTAX INTEGER (0..65535)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150ShaperEntry 2 }
+
+fsp150ShaperAC OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The allocated capacity in Kbits/sec."
+    ::= { fsp150ShaperEntry 3 }
+
+fsp150ShaperABS OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The allocated burst size in Kbytes."
+    ::= { fsp150ShaperEntry 4 }
+
+-- FrameModification
+
+fsp150FrameModificationTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Fsp150FrameModificationEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The configuration of the frame modification function."
+    ::= { fsp150TrafficManagementMIB 13 }
+
+fsp150FrameModificationEntry OBJECT-TYPE
+    SYNTAX Fsp150FrameModificationEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    INDEX { entPhysicalIndex, fsp150FrameModificationDeparturePort, fsp150FrameModificationTrafficClass }
+    ::= { fsp150FrameModificationTable 1 }
+
+Fsp150FrameModificationEntry ::= SEQUENCE {
+    fsp150FrameModificationDeparturePort Fsp150TMPort,
+    fsp150FrameModificationTrafficClass Fsp150TrafficClassIndex,
+    fsp150FrameModificationOutGreenPCP INTEGER,
+    fsp150FrameModificationOutGreenDE INTEGER,
+    fsp150FrameModificationOutYellowPCP INTEGER,
+    fsp150FrameModificationOutYellowDE INTEGER
+    }
+
+fsp150FrameModificationDeparturePort OBJECT-TYPE
+    SYNTAX Fsp150TMPort
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150FrameModificationEntry 1 }
+
+fsp150FrameModificationTrafficClass OBJECT-TYPE
+    SYNTAX Fsp150TrafficClassIndex
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150FrameModificationEntry 2 }
+
+fsp150FrameModificationOutGreenPCP OBJECT-TYPE
+    SYNTAX INTEGER (0..65535)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The PCP (0... 7) to be set in an outgoing frame marked as
+        green."
+    ::= { fsp150FrameModificationEntry 4 }
+
+fsp150FrameModificationOutGreenDE OBJECT-TYPE
+    SYNTAX INTEGER (0..65535)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The DE (0, 1) to be set in an outgoing frame marked as
+        green."
+    ::= { fsp150FrameModificationEntry 5 }
+
+fsp150FrameModificationOutYellowPCP OBJECT-TYPE
+    SYNTAX INTEGER (0..65535)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The PCP (0... 7) to be set in an outgoing frame marked as
+        yellow."
+    ::= { fsp150FrameModificationEntry 6 }
+
+fsp150FrameModificationOutYellowDE OBJECT-TYPE
+    SYNTAX INTEGER (0..65535)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The DE (0, 1) to be set in an outgoing frame marked as
+        yellow."
+    ::= { fsp150FrameModificationEntry 7 }
+-- CP end
+
+-- ConfigManagementMIB
+
+fsp150ConfigManagementMIB OBJECT IDENTIFIER ::= {fsp150ConfigAndStatus 19}
+
+-- Textual Conventions
+
+Fsp150ConfigMgmtCommandType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION ""
+    SYNTAX INTEGER {
+        none (1),
+        save (2),
+        backup (3),
+        activate (4),
+        reset (5),
+        factory (6)
+    }
+
+Fsp150ConfigMgmtFileStatusType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION ""
+    SYNTAX INTEGER {
+        undefined (1),
+        upToDate (2),
+        notUpToDate (3),
+        rstPend (4)
+    }
+
+-- Node
+
+fsp150NodeTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Fsp150NodeEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150ConfigManagementMIB 1 }
+
+fsp150NodeEntry OBJECT-TYPE
+    SYNTAX Fsp150NodeEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    INDEX { entPhysicalIndex }
+    ::= { fsp150NodeTable 1 }
+
+Fsp150NodeEntry ::= SEQUENCE {
+    fsp150NodeCmd Fsp150ConfigMgmtCommandType,
+    fsp150NodeActStatus Fsp150ConfigMgmtFileStatusType,
+    fsp150NodeBakStatus Fsp150ConfigMgmtFileStatusType
+    }
+
+fsp150NodeCmd OBJECT-TYPE
+    SYNTAX Fsp150ConfigMgmtCommandType
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Specify the command to perform"
+    ::= { fsp150NodeEntry 1 }
+
+fsp150NodeActStatus OBJECT-TYPE
+    SYNTAX Fsp150ConfigMgmtFileStatusType
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Specifies whether the ACTIVE memory configuration is equal
+        to the running node configuration or not."
+    ::= { fsp150NodeEntry 2 }
+
+fsp150NodeBakStatus OBJECT-TYPE
+    SYNTAX Fsp150ConfigMgmtFileStatusType
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Specifies whether the BACKUP memory configuration is equal
+        to the ACTIVE memory configuration or not."
+    ::= { fsp150NodeEntry 3 }
+
+-- Mx start
+-- NetworkPortMulticastConfig
+
+fsp150NetworkPortMulticastConfigTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Fsp150NetworkPortMulticastConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150ConfigAndStatus 20 }
+
+fsp150NetworkPortMulticastConfigEntry OBJECT-TYPE
+    SYNTAX Fsp150NetworkPortMulticastConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    INDEX { ifIndex }
+    ::= { fsp150NetworkPortMulticastConfigTable 1 }
+
+Fsp150NetworkPortMulticastConfigEntry ::= SEQUENCE {
+    fsp150NetworkPortMulticastConfigMulticastIGMPConfig Fsp150MulticastIGMPConfig
+    }
+
+fsp150NetworkPortMulticastConfigMulticastIGMPConfig OBJECT-TYPE
+    SYNTAX Fsp150MulticastIGMPConfig
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150NetworkPortMulticastConfigEntry 1 }
+
+-- AccessPortMulticastConfig
+
+fsp150AccessPortMulticastConfigTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Fsp150AccessPortMulticastConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150ConfigAndStatus 21 }
+
+fsp150AccessPortMulticastConfigEntry OBJECT-TYPE
+    SYNTAX Fsp150AccessPortMulticastConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    INDEX { ifIndex }
+    ::= { fsp150AccessPortMulticastConfigTable 1 }
+
+Fsp150AccessPortMulticastConfigEntry ::= SEQUENCE {
+    fsp150AccessPortMulticastConfigMulticastEnable TruthValue
+    }
+
+fsp150AccessPortMulticastConfigMulticastEnable OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150AccessPortMulticastConfigEntry 1 }
+-- Mx end
+
+-- performanceMIB
+
+fsp150PerformanceMIB OBJECT IDENTIFIER ::= {fsp150MIB 4}
+
+-- IfPerf
+
+fsp150IfPerfTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Fsp150IfPerfEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150PerformanceMIB 1 }
+
+fsp150IfPerfEntry OBJECT-TYPE
+    SYNTAX Fsp150IfPerfEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    INDEX { ifIndex }
+    ::= { fsp150IfPerfTable 1 }
+
+Fsp150IfPerfEntry ::= SEQUENCE {
+    fsp150IfPerfOutFrames Counter32,
+    fsp150IfPerfOutOctets Counter32,
+    fsp150IfPerfSingleCollisionFrames Counter32,
+    fsp150IfPerfMultipleCollisionFrames Counter32,
+    fsp150IfPerfInGoodFrames Counter32,
+    fsp150IfPerfInOctets Counter32,
+    fsp150IfPerfAlignmentErrors Counter32,
+    fsp150IfPerfFCSErrors Counter32,
+    fsp150IfPerfFramesTooLong Counter32,
+    fsp150IfPerfSymbolErrors Counter32,
+    fsp150IfPerfOutTestFrames Counter32,
+    fsp150IfPerfInTestFrames Counter32,
+    fsp150IfPerfRFCSErrors Counter32,
+    fsp150IfPerfROutTestFrames Counter32,
+    fsp150IfPerfRInTestFrames Counter32,
+    fsp150IfPerfRInGoodFrames Counter32,
+    fsp150IfPerfROutFrames Counter32,
+    fsp150IfPerfROutOctets Counter32,
+    fsp150IfPerfRInOctets Counter32,
+    fsp150IfPerfRFramesTooLong Counter32,
+    fsp150IfPerfRTestFCSErrors Counter32,
+    fsp150IfPerfRSingleCollisionFrames Counter32,
+    fsp150IfPerfRMultipleCollisionFrames Counter32
+    }
+
+fsp150IfPerfOutFrames OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150IfPerfEntry 1 }
+
+fsp150IfPerfOutOctets OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150IfPerfEntry 2 }
+
+fsp150IfPerfSingleCollisionFrames OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150IfPerfEntry 3 }
+
+fsp150IfPerfMultipleCollisionFrames OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150IfPerfEntry 4 }
+
+fsp150IfPerfInGoodFrames OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150IfPerfEntry 5 }
+
+fsp150IfPerfInOctets OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150IfPerfEntry 6 }
+
+fsp150IfPerfAlignmentErrors OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS deprecated
+    DESCRIPTION
+        "No longer supported; always returns 0."
+    ::= { fsp150IfPerfEntry 7 }
+
+fsp150IfPerfFCSErrors OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150IfPerfEntry 8 }
+
+fsp150IfPerfFramesTooLong OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150IfPerfEntry 9 }
+
+fsp150IfPerfSymbolErrors OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS deprecated
+    DESCRIPTION
+        "No longer supported; always returns 0."
+    ::= { fsp150IfPerfEntry 10 }
+
+fsp150IfPerfOutTestFrames OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Test frames are only counted on ports that support loopback
+        test. They do not include OAM frames."
+    ::= { fsp150IfPerfEntry 11 }
+
+fsp150IfPerfInTestFrames OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150IfPerfEntry 12 }
+
+fsp150IfPerfRFCSErrors OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150IfPerfEntry 13 }
+
+fsp150IfPerfROutTestFrames OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150IfPerfEntry 14 }
+
+fsp150IfPerfRInTestFrames OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150IfPerfEntry 15 }
+
+-- Cp start
+fsp150IfPerfRInGoodFrames OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150IfPerfEntry 16 }
+
+fsp150IfPerfROutFrames OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150IfPerfEntry 17 }
+
+fsp150IfPerfROutOctets OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150IfPerfEntry 18 }
+
+fsp150IfPerfRInOctets OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150IfPerfEntry 19 }
+
+fsp150IfPerfRFramesTooLong OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150IfPerfEntry 20 }
+
+fsp150IfPerfRTestFCSErrors OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150IfPerfEntry 21 }
+
+fsp150IfPerfRSingleCollisionFrames OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150IfPerfEntry 22 }
+
+fsp150IfPerfRMultipleCollisionFrames OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150IfPerfEntry 23 }
+-- Cp end
+-- IfOAMStats
+
+fsp150IfOAMStatsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Fsp150IfOAMStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150PerformanceMIB 2 }
+
+fsp150IfOAMStatsEntry OBJECT-TYPE
+    SYNTAX Fsp150IfOAMStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    INDEX { ifIndex }
+    ::= { fsp150IfOAMStatsTable 1 }
+
+Fsp150IfOAMStatsEntry ::= SEQUENCE {
+    fsp150IfOAMStatsPduTx Counter32,
+    fsp150IfOAMStatsPduRx Counter32,
+    fsp150IfOAMStatsInformationTx Counter32,
+    fsp150IfOAMStatsInformationRx Counter32,
+    fsp150IfOAMStatsUniqueEventNotificationTx Counter32,
+    fsp150IfOAMStatsUniqueEventNotificationRx Counter32,
+    fsp150IfOAMStatsDuplicateEventNotificationRx Counter32,
+    fsp150IfOAMStatsLoopbackControlTx Counter32,
+    fsp150IfOAMStatsLoopbackControlRx Counter32,
+    fsp150IfOAMStatsVariableRequestTx Counter32,
+    fsp150IfOAMStatsVariableRequestRx Counter32,
+    fsp150IfOAMStatsVariableResponseTx Counter32,
+    fsp150IfOAMStatsVariableResponseRx Counter32,
+    fsp150IfOAMStatsOrgSpecificTx Counter32,
+    fsp150IfOAMStatsOrgSpecificRx Counter32,
+    fsp150IfOAMStatsUnsupportedCodesRx Counter32,
+    fsp150IfOAMStatsDuplicateEventNotificationTx Counter32,
+    fsp150IfOAMStatsUnsupportedCodesTx Counter32,
+    fsp150IfOAMStatsFramesLostDueToOam Counter32
+    }
+
+fsp150IfOAMStatsPduTx OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150IfOAMStatsEntry 1 }
+
+fsp150IfOAMStatsPduRx OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150IfOAMStatsEntry 2 }
+
+fsp150IfOAMStatsInformationTx OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150IfOAMStatsEntry 3 }
+
+fsp150IfOAMStatsInformationRx OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150IfOAMStatsEntry 4 }
+
+fsp150IfOAMStatsUniqueEventNotificationTx OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150IfOAMStatsEntry 5 }
+
+fsp150IfOAMStatsUniqueEventNotificationRx OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150IfOAMStatsEntry 6 }
+
+fsp150IfOAMStatsDuplicateEventNotificationRx OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150IfOAMStatsEntry 7 }
+
+fsp150IfOAMStatsLoopbackControlTx OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150IfOAMStatsEntry 8 }
+
+fsp150IfOAMStatsLoopbackControlRx OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150IfOAMStatsEntry 9 }
+
+fsp150IfOAMStatsVariableRequestTx OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150IfOAMStatsEntry 10 }
+
+fsp150IfOAMStatsVariableRequestRx OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150IfOAMStatsEntry 11 }
+
+fsp150IfOAMStatsVariableResponseTx OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150IfOAMStatsEntry 12 }
+
+fsp150IfOAMStatsVariableResponseRx OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150IfOAMStatsEntry 13 }
+
+fsp150IfOAMStatsOrgSpecificTx OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150IfOAMStatsEntry 14 }
+
+fsp150IfOAMStatsOrgSpecificRx OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150IfOAMStatsEntry 15 }
+
+fsp150IfOAMStatsUnsupportedCodesRx OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150IfOAMStatsEntry 16 }
+
+fsp150IfOAMStatsDuplicateEventNotificationTx OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150IfOAMStatsEntry 17 }
+
+fsp150IfOAMStatsUnsupportedCodesTx OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150IfOAMStatsEntry 18 }
+
+fsp150IfOAMStatsFramesLostDueToOam OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150IfOAMStatsEntry 19 }
+
+-- SystemStats
+
+fsp150SystemStatsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Fsp150SystemStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150PerformanceMIB 3 }
+
+fsp150SystemStatsEntry OBJECT-TYPE
+    SYNTAX Fsp150SystemStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    INDEX { entPhysicalIndex }
+    ::= { fsp150SystemStatsTable 1 }
+
+Fsp150SystemStatsEntry ::= SEQUENCE {
+    fsp150SystemStatsEgressArrivalPathChanges Counter32,
+    fsp150SystemStatsEgressBufferOverflowLow Counter64String,
+    fsp150SystemStatsEgressBufferOverflowMed Counter64String,
+    fsp150SystemStatsEgressBufferOverflowHigh Counter64String,
+    fsp150SystemStatsIngressBufferOverflowLow Counter64String,
+    fsp150SystemStatsIngressBufferOverflowMed Counter64String,
+    fsp150SystemStatsIngressBufferOverflowHigh Counter64String,
+    fsp150SystemStatsEgressMulticastRegOverflow Counter64String
+    }
+
+fsp150SystemStatsEgressArrivalPathChanges OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150SystemStatsEntry 1 }
+
+fsp150SystemStatsEgressBufferOverflowLow OBJECT-TYPE
+    SYNTAX Counter64String
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Counts the number of times one of the low priority egress
+        buffers overflowed."
+    ::= { fsp150SystemStatsEntry 2 }
+
+fsp150SystemStatsEgressBufferOverflowMed OBJECT-TYPE
+    SYNTAX Counter64String
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Counts the number of times one of the medium priority egress
+        buffers overflowed."
+    ::= { fsp150SystemStatsEntry 3 }
+
+fsp150SystemStatsEgressBufferOverflowHigh OBJECT-TYPE
+    SYNTAX Counter64String
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Counts the number of times one of the medium priority egress
+        buffers overflowed."
+    ::= { fsp150SystemStatsEntry 4 }
+
+fsp150SystemStatsIngressBufferOverflowLow OBJECT-TYPE
+    SYNTAX Counter64String
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Counts the number of times one of the low priority ingress
+        buffers overflowed."
+    ::= { fsp150SystemStatsEntry 5 }
+
+fsp150SystemStatsIngressBufferOverflowMed OBJECT-TYPE
+    SYNTAX Counter64String
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Counts the number of times one of the medium priority
+        ingress buffers overflowed."
+    ::= { fsp150SystemStatsEntry 6 }
+
+fsp150SystemStatsIngressBufferOverflowHigh OBJECT-TYPE
+    SYNTAX Counter64String
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Counts the number of times one of the high priority ingress
+        buffers overflowed."
+    ::= { fsp150SystemStatsEntry 7 }
+
+-- Mx start
+fsp150SystemStatsEgressMulticastRegOverflow OBJECT-TYPE
+    SYNTAX Counter64String
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Counts the number of times the multicast regulator overflows"
+    ::= { fsp150SystemStatsEntry 8 }
+-- Mx end
+
+-- IfPerf64
+
+fsp150IfPerf64Table OBJECT-TYPE
+    SYNTAX SEQUENCE OF Fsp150IfPerf64Entry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150PerformanceMIB 4 }
+
+fsp150IfPerf64Entry OBJECT-TYPE
+    SYNTAX Fsp150IfPerf64Entry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    INDEX { ifIndex }
+    ::= { fsp150IfPerf64Table 1 }
+
+Fsp150IfPerf64Entry ::= SEQUENCE {
+    fsp150IfPerf64OutOctets64 Counter64String,
+    fsp150IfPerf64InOctets64 Counter64String,
+    fsp150IfPerf64SymbolErrors64 Counter64String,
+    fsp150IfPerf64MulticastFramesRx64 Counter64String,
+    fsp150IfPerf64MulticastFramesTx64 Counter64String,
+    fsp150IfPerf64MulticastOctetsRx64 Counter64String,
+    fsp150IfPerf64MulticastOctetsTx64 Counter64String
+    }
+
+fsp150IfPerf64OutOctets64 OBJECT-TYPE
+    SYNTAX Counter64String
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150IfPerf64Entry 2 }
+
+fsp150IfPerf64InOctets64 OBJECT-TYPE
+    SYNTAX Counter64String
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150IfPerf64Entry 6 }
+
+fsp150IfPerf64SymbolErrors64 OBJECT-TYPE
+    SYNTAX Counter64String
+    MAX-ACCESS read-only
+    STATUS deprecated
+    DESCRIPTION
+        "No longer supported; always returns '0'."
+    ::= { fsp150IfPerf64Entry 10 }
+
+-- Mx start
+fsp150IfPerf64MulticastFramesRx64 OBJECT-TYPE
+    SYNTAX Counter64String
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150IfPerf64Entry 11 }
+
+fsp150IfPerf64MulticastFramesTx64 OBJECT-TYPE
+    SYNTAX Counter64String
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150IfPerf64Entry 12 }
+
+fsp150IfPerf64MulticastOctetsRx64 OBJECT-TYPE
+    SYNTAX Counter64String
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150IfPerf64Entry 13 }
+
+fsp150IfPerf64MulticastOctetsTx64 OBJECT-TYPE
+    SYNTAX Counter64String
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150IfPerf64Entry 14 }
+-- Mx end
+
+-- trapMIB
+
+fsp150TrapMIB OBJECT IDENTIFIER ::= {fsp150MIB 5 0}
+
+fsp150TrapsinkChange NOTIFICATION-TYPE
+    OBJECTS {neEventLogTimeStamp}
+    STATUS current
+    DESCRIPTION
+        "The neTrapsinkTable has been changed."
+    ::= {fsp150TrapMIB 51}
+
+fsp150NeAttributeValueChange NOTIFICATION-TYPE
+    OBJECTS {neEventLogTimeStamp}
+    STATUS current
+    DESCRIPTION
+        "A variable associated with the NE has been changed. The trap
+        contains the changed variable as the first varbind."
+    ::= {fsp150TrapMIB 52}
+
+fsp150TopologyChange NOTIFICATION-TYPE
+    OBJECTS {neEventLogTimeStamp}
+    STATUS current
+    DESCRIPTION
+        "The fsp150TopologyTable has changed."
+    ::= {fsp150TrapMIB 53}
+
+fsp150InterfaceAttributeValueChange NOTIFICATION-TYPE
+    OBJECTS {neEventLogTimeStamp,
+        neEventLogIdentityTranslation}
+    STATUS current
+    DESCRIPTION
+        "A variable associated with an interface has been changed.
+        The trap contains the changed variable as the first varbind."
+    ::= {fsp150TrapMIB 54}
+
+fsp150EquipmentAttributeValueChange NOTIFICATION-TYPE
+    OBJECTS {neEventLogTimeStamp,
+        neEventLogIdentityTranslation}
+    STATUS current
+    DESCRIPTION
+        "A variable associated with a piece of equipment has been
+        changed. The trap contains the changed variable as the first
+        varbind."
+    ::= {fsp150TrapMIB 55}
+
+fsp150ProtectionSwitch NOTIFICATION-TYPE
+    OBJECTS {fsp150ChassisStatusActiveNetwork,
+        neEventLogTimeStamp,
+        neEventLogIdentityTranslation}
+    STATUS current
+    DESCRIPTION
+        "The system has switched to the other network."
+    ::= {fsp150TrapMIB 56}
+
+fsp150InterfaceStatusChange NOTIFICATION-TYPE
+    OBJECTS {neEventLogTimeStamp,
+        neEventLogIdentityTranslation}
+    STATUS current
+    DESCRIPTION
+        "The status of an interface has changed. The trap contains
+        the changed status variable as the first varbind."
+    ::= {fsp150TrapMIB 57}
+
+fsp150DyingGasp NOTIFICATION-TYPE
+    OBJECTS {entPhysicalIndex,
+        neEventLogTimeStamp,
+        neEventLogIdentityTranslation}
+    STATUS current
+    DESCRIPTION
+        "An EFM Dying Gasp has been received from a remote system
+        managed by this agent."
+    ::= {fsp150TrapMIB 58}
+
+fsp150TempTooHigh NOTIFICATION-TYPE
+    OBJECTS {fsp150EquipmentCurrentAlarmSeverity,
+        neEventLogTimeStamp,
+        neEventLogIdentityTranslation,
+        fsp150EquipmentCurrentAlarmImpairment}
+    STATUS current
+    DESCRIPTION ""
+    ::= {fsp150TrapMIB 100}
+
+fsp150NoTempTooHigh NOTIFICATION-TYPE
+    OBJECTS {fsp150EquipmentCurrentAlarmSeverity,
+        neEventLogTimeStamp,
+        neEventLogIdentityTranslation,
+        fsp150EquipmentCurrentAlarmImpairment}
+    STATUS current
+    DESCRIPTION
+        "fsp150TempTooHigh has been cleared."
+    ::= {fsp150TrapMIB 101}
+
+fsp150PSUFailure NOTIFICATION-TYPE
+    OBJECTS {fsp150EquipmentCurrentAlarmSeverity,
+        neEventLogTimeStamp,
+        neEventLogIdentityTranslation,
+        fsp150EquipmentCurrentAlarmImpairment}
+    STATUS current
+    DESCRIPTION ""
+    ::= {fsp150TrapMIB 102}
+
+fsp150NoPSUFailure NOTIFICATION-TYPE
+    OBJECTS {fsp150EquipmentCurrentAlarmSeverity,
+        neEventLogTimeStamp,
+        neEventLogIdentityTranslation,
+        fsp150EquipmentCurrentAlarmImpairment}
+    STATUS current
+    DESCRIPTION
+        "fsp150PSUFailure has been cleared."
+    ::= {fsp150TrapMIB 103}
+
+fsp150FanFailure NOTIFICATION-TYPE
+    OBJECTS {fsp150EquipmentCurrentAlarmSeverity,
+        neEventLogTimeStamp,
+        neEventLogIdentityTranslation,
+        fsp150EquipmentCurrentAlarmImpairment}
+    STATUS current
+    DESCRIPTION ""
+    ::= {fsp150TrapMIB 104}
+
+fsp150NoFanFailure NOTIFICATION-TYPE
+    OBJECTS {fsp150EquipmentCurrentAlarmSeverity,
+        neEventLogTimeStamp,
+        neEventLogIdentityTranslation,
+        fsp150EquipmentCurrentAlarmImpairment}
+    STATUS current
+    DESCRIPTION
+        "fsp150FanFailure has been cleared."
+    ::= {fsp150TrapMIB 105}
+
+fsp150VoltageTooLow NOTIFICATION-TYPE
+    OBJECTS {fsp150EquipmentCurrentAlarmSeverity,
+        neEventLogTimeStamp,
+        neEventLogIdentityTranslation,
+        fsp150EquipmentCurrentAlarmImpairment}
+    STATUS current
+    DESCRIPTION ""
+    ::= {fsp150TrapMIB 106}
+
+fsp150NoVoltageTooLow NOTIFICATION-TYPE
+    OBJECTS {fsp150EquipmentCurrentAlarmSeverity,
+        neEventLogTimeStamp,
+        neEventLogIdentityTranslation,
+        fsp150EquipmentCurrentAlarmImpairment}
+    STATUS current
+    DESCRIPTION
+        "fsp150VoltageTooLow has been cleared."
+    ::= {fsp150TrapMIB 107}
+
+fsp150VoltageTooHigh NOTIFICATION-TYPE
+    OBJECTS {fsp150EquipmentCurrentAlarmSeverity,
+        neEventLogTimeStamp,
+        neEventLogIdentityTranslation,
+        fsp150EquipmentCurrentAlarmImpairment}
+    STATUS current
+    DESCRIPTION ""
+    ::= {fsp150TrapMIB 108}
+
+fsp150NoVoltageTooHigh NOTIFICATION-TYPE
+    OBJECTS {fsp150EquipmentCurrentAlarmSeverity,
+        neEventLogTimeStamp,
+        neEventLogIdentityTranslation,
+        fsp150EquipmentCurrentAlarmImpairment}
+    STATUS current
+    DESCRIPTION
+        "fsp150VoltageTooHigh has been cleared."
+    ::= {fsp150TrapMIB 109}
+
+fsp150LocalChassisMissing NOTIFICATION-TYPE
+    OBJECTS {fsp150EquipmentCurrentAlarmSeverity,
+        neEventLogTimeStamp,
+        neEventLogIdentityTranslation,
+        fsp150EquipmentCurrentAlarmImpairment}
+    STATUS current
+    DESCRIPTION ""
+    ::= {fsp150TrapMIB 110}
+
+fsp150NoLocalChassisMissing NOTIFICATION-TYPE
+    OBJECTS {fsp150EquipmentCurrentAlarmSeverity,
+        neEventLogTimeStamp,
+        neEventLogIdentityTranslation,
+        fsp150EquipmentCurrentAlarmImpairment}
+    STATUS current
+    DESCRIPTION
+        "fsp150LocalChassisMissing has been cleared."
+    ::= {fsp150TrapMIB 111}
+
+fsp150LocalChassisMismatch NOTIFICATION-TYPE
+    OBJECTS {fsp150EquipmentCurrentAlarmSeverity,
+        neEventLogTimeStamp,
+        neEventLogIdentityTranslation,
+        fsp150EquipmentCurrentAlarmImpairment}
+    STATUS current
+    DESCRIPTION ""
+    ::= {fsp150TrapMIB 112}
+
+fsp150NoLocalChassisMismatch NOTIFICATION-TYPE
+    OBJECTS {fsp150EquipmentCurrentAlarmSeverity,
+        neEventLogTimeStamp,
+        neEventLogIdentityTranslation,
+        fsp150EquipmentCurrentAlarmImpairment}
+    STATUS current
+    DESCRIPTION
+        "fsp150LocalChassisMismatch has been cleared."
+    ::= {fsp150TrapMIB 113}
+
+fsp150Configuring NOTIFICATION-TYPE
+    OBJECTS {fsp150EquipmentCurrentAlarmSeverity,
+        neEventLogTimeStamp,
+        neEventLogIdentityTranslation,
+        fsp150EquipmentCurrentAlarmImpairment}
+    STATUS current
+    DESCRIPTION
+        "The chassis and its ports are in the process of being
+        configured according to the saved configuration. Until the
+        end of this process no notifications are sent."
+    ::= {fsp150TrapMIB 114}
+
+fsp150NoConfiguring NOTIFICATION-TYPE
+    OBJECTS {fsp150EquipmentCurrentAlarmSeverity,
+        neEventLogTimeStamp,
+        neEventLogIdentityTranslation,
+        fsp150EquipmentCurrentAlarmImpairment}
+    STATUS current
+    DESCRIPTION
+        "fsp150Configuring has been cleared."
+    ::= {fsp150TrapMIB 115}
+
+fsp150ConfigFailed NOTIFICATION-TYPE
+    OBJECTS {fsp150EquipmentCurrentAlarmSeverity,
+        neEventLogTimeStamp,
+        neEventLogIdentityTranslation,
+        fsp150EquipmentCurrentAlarmImpairment}
+    STATUS current
+    DESCRIPTION
+        "Configuring the chassis according to the saved configuration
+        failed."
+    ::= {fsp150TrapMIB 116}
+
+fsp150NoConfigFailed NOTIFICATION-TYPE
+    OBJECTS {fsp150EquipmentCurrentAlarmSeverity,
+        neEventLogTimeStamp,
+        neEventLogIdentityTranslation,
+        fsp150EquipmentCurrentAlarmImpairment}
+    STATUS current
+    DESCRIPTION
+        "fsp150ConfigFailed has been cleared."
+    ::= {fsp150TrapMIB 117}
+
+fsp150LossOfSignal NOTIFICATION-TYPE
+    OBJECTS {fsp150InterfaceCurrentAlarmSeverity,
+        neEventLogTimeStamp,
+        neEventLogIdentityTranslation,
+        fsp150InterfaceCurrentAlarmImpairment}
+    STATUS current
+    DESCRIPTION ""
+    ::= {fsp150TrapMIB 200}
+
+fsp150NoLossOfSignal NOTIFICATION-TYPE
+    OBJECTS {fsp150InterfaceCurrentAlarmSeverity,
+        neEventLogTimeStamp,
+        neEventLogIdentityTranslation,
+        fsp150InterfaceCurrentAlarmImpairment}
+    STATUS current
+    DESCRIPTION
+        "fsp150LossOfSignal has been cleared."
+    ::= {fsp150TrapMIB 201}
+
+fsp150EqMismatch NOTIFICATION-TYPE
+    OBJECTS {fsp150InterfaceCurrentAlarmSeverity,
+        neEventLogTimeStamp,
+        neEventLogIdentityTranslation,
+        fsp150InterfaceCurrentAlarmImpairment}
+    STATUS current
+    DESCRIPTION ""
+    ::= {fsp150TrapMIB 202}
+
+fsp150NoEqMismatch NOTIFICATION-TYPE
+    OBJECTS {fsp150InterfaceCurrentAlarmSeverity,
+        neEventLogTimeStamp,
+        neEventLogIdentityTranslation,
+        fsp150InterfaceCurrentAlarmImpairment}
+    STATUS current
+    DESCRIPTION
+        "fsp150EqMismatch has been cleared."
+    ::= {fsp150TrapMIB 203}
+
+fsp150LowOIP NOTIFICATION-TYPE
+    OBJECTS {fsp150InterfaceCurrentAlarmSeverity,
+        neEventLogTimeStamp,
+        neEventLogIdentityTranslation,
+        fsp150InterfaceCurrentAlarmImpairment}
+    STATUS current
+    DESCRIPTION ""
+    ::= {fsp150TrapMIB 204}
+
+fsp150NoLowOIP NOTIFICATION-TYPE
+    OBJECTS {fsp150InterfaceCurrentAlarmSeverity,
+        neEventLogTimeStamp,
+        neEventLogIdentityTranslation,
+        fsp150InterfaceCurrentAlarmImpairment}
+    STATUS current
+    DESCRIPTION
+        "fsp150LowOIP has been cleared."
+    ::= {fsp150TrapMIB 205}
+
+fsp150TxFailure NOTIFICATION-TYPE
+    OBJECTS {fsp150InterfaceCurrentAlarmSeverity,
+        neEventLogTimeStamp,
+        neEventLogIdentityTranslation,
+        fsp150InterfaceCurrentAlarmImpairment}
+    STATUS current
+    DESCRIPTION ""
+    ::= {fsp150TrapMIB 206}
+
+fsp150NoTxFailure NOTIFICATION-TYPE
+    OBJECTS {fsp150InterfaceCurrentAlarmSeverity,
+        neEventLogTimeStamp,
+        neEventLogIdentityTranslation,
+        fsp150InterfaceCurrentAlarmImpairment}
+    STATUS current
+    DESCRIPTION
+        "fsp150TxFailure has been cleared."
+    ::= {fsp150TrapMIB 207}
+
+fsp150LossOfLink NOTIFICATION-TYPE
+    OBJECTS {fsp150InterfaceCurrentAlarmSeverity,
+        neEventLogTimeStamp,
+        neEventLogIdentityTranslation,
+        fsp150InterfaceCurrentAlarmImpairment}
+    STATUS current
+    DESCRIPTION ""
+    ::= {fsp150TrapMIB 208}
+
+fsp150NoLossOfLink NOTIFICATION-TYPE
+    OBJECTS {fsp150InterfaceCurrentAlarmSeverity,
+        neEventLogTimeStamp,
+        neEventLogIdentityTranslation,
+        fsp150InterfaceCurrentAlarmImpairment}
+    STATUS current
+    DESCRIPTION
+        "fsp150LossOfLink has been cleared."
+    ::= {fsp150TrapMIB 209}
+
+fsp150RemoteChassisMissing NOTIFICATION-TYPE
+    OBJECTS {fsp150InterfaceCurrentAlarmSeverity,
+        neEventLogTimeStamp,
+        neEventLogIdentityTranslation,
+        fsp150InterfaceCurrentAlarmImpairment}
+    STATUS current
+    DESCRIPTION
+        "The logical configuration has a remote chassis for this port
+        but no remote chassis is physically connected."
+    ::= {fsp150TrapMIB 210}
+
+fsp150NoRemoteChassisMissing NOTIFICATION-TYPE
+    OBJECTS {fsp150InterfaceCurrentAlarmSeverity,
+        neEventLogTimeStamp,
+        neEventLogIdentityTranslation,
+        fsp150InterfaceCurrentAlarmImpairment}
+    STATUS current
+    DESCRIPTION
+        "fsp150RemoteChassisMissing has been cleared."
+    ::= {fsp150TrapMIB 211}
+
+fsp150RemoteChassisMismatch NOTIFICATION-TYPE
+    OBJECTS {fsp150InterfaceCurrentAlarmSeverity,
+        neEventLogTimeStamp,
+        neEventLogIdentityTranslation,
+        fsp150InterfaceCurrentAlarmImpairment}
+    STATUS current
+    DESCRIPTION
+        "The port is connected in a way that doesn't match the saved
+        logical configuration."
+    ::= {fsp150TrapMIB 212}
+
+fsp150NoRemoteChassisMismatch NOTIFICATION-TYPE
+    OBJECTS {fsp150InterfaceCurrentAlarmSeverity,
+        neEventLogTimeStamp,
+        neEventLogIdentityTranslation,
+        fsp150InterfaceCurrentAlarmImpairment}
+    STATUS current
+    DESCRIPTION
+        "fsp150RemoteChassisMismatch has been cleared."
+    ::= {fsp150TrapMIB 213}
+
+fsp150Loopback NOTIFICATION-TYPE
+    OBJECTS {fsp150InterfaceCurrentAlarmSeverity,
+        neEventLogTimeStamp,
+        neEventLogIdentityTranslation,
+        fsp150InterfaceCurrentAlarmImpairment}
+    STATUS current
+    DESCRIPTION ""
+    ::= {fsp150TrapMIB 214}
+
+fsp150NoLoopback NOTIFICATION-TYPE
+    OBJECTS {fsp150InterfaceCurrentAlarmSeverity,
+        neEventLogTimeStamp,
+        neEventLogIdentityTranslation,
+        fsp150InterfaceCurrentAlarmImpairment}
+    STATUS current
+    DESCRIPTION
+        "fsp150Loopback has been cleared."
+    ::= {fsp150TrapMIB 215}
+
+fsp150SFPMissing NOTIFICATION-TYPE
+    OBJECTS {fsp150InterfaceCurrentAlarmSeverity,
+        neEventLogTimeStamp,
+        neEventLogIdentityTranslation,
+        fsp150InterfaceCurrentAlarmImpairment}
+    STATUS current
+    DESCRIPTION ""
+    ::= {fsp150TrapMIB 216}
+
+fsp150NoSFPMissing NOTIFICATION-TYPE
+    OBJECTS {fsp150InterfaceCurrentAlarmSeverity,
+        neEventLogTimeStamp,
+        neEventLogIdentityTranslation,
+        fsp150InterfaceCurrentAlarmImpairment}
+    STATUS current
+    DESCRIPTION
+        "fsp150SFPMissing has been cleared."
+    ::= {fsp150TrapMIB 217}
+
+-- vendorTypes
+
+fsp150VendorTypes OBJECT IDENTIFIER ::= {fsp150MIB 6}
+
+-- chassis
+
+fsp150Chassis OBJECT IDENTIFIER ::= {fsp150VendorTypes 3}
+
+fsp150ChassisUnknown OBJECT IDENTIFIER ::= {fsp150Chassis 1}
+
+fsp150ChassisFsp150CP10100 OBJECT IDENTIFIER ::= {fsp150Chassis 2}
+
+fsp150ChassisFsp150CPGigabit OBJECT IDENTIFIER ::= {fsp150Chassis 3}
+
+fsp150ChassisFsp150MO OBJECT IDENTIFIER ::= {fsp150Chassis 5}
+
+fsp150ChassisFsp150ME OBJECT IDENTIFIER ::= {fsp150Chassis 6}
+
+fsp150ChassisFsp150CPGigabitRev2 OBJECT IDENTIFIER ::= {fsp150Chassis 7}
+
+fsp150ChassisFsp150MG OBJECT IDENTIFIER ::= {fsp150Chassis 8}
+
+-- powerSupplies
+
+fsp150PowerSupplies OBJECT IDENTIFIER ::= {fsp150VendorTypes 6}
+
+fsp150PowerSupplyUnknown OBJECT IDENTIFIER ::= {fsp150PowerSupplies 1}
+
+fsp150PowerSupplyAC OBJECT IDENTIFIER ::= {fsp150PowerSupplies 2}
+
+fsp150PowerSupplyDC OBJECT IDENTIFIER ::= {fsp150PowerSupplies 3}
+
+-- ports
+
+fsp150Ports OBJECT IDENTIFIER ::= {fsp150VendorTypes 10}
+
+fsp150PortUnknown OBJECT IDENTIFIER ::= {fsp150Ports 1}
+
+fsp150PortNetwork OBJECT IDENTIFIER ::= {fsp150Ports 2200}
+
+fsp150PortOpticalAccess OBJECT IDENTIFIER ::= {fsp150Ports 2201}
+
+fsp150PortElectricalAccess OBJECT IDENTIFIER ::= {fsp150Ports 2202}
+
+fsp150PortAccess OBJECT IDENTIFIER ::= {fsp150Ports 2203}
+
+fsp150PortElectricalNetwork OBJECT IDENTIFIER ::= {fsp150Ports 2204}
+
+-- pidTranslation
+
+fsp150PidTranslation OBJECT IDENTIFIER ::= {fsp150MIB 7}
+
+-- PidToSvid
+
+fsp150PidToSvidTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Fsp150PidToSvidEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150PidTranslation 1 }
+
+fsp150PidToSvidEntry OBJECT-TYPE
+    SYNTAX Fsp150PidToSvidEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    INDEX { entPhysicalIndex, fsp150PidToSvidPid }
+    ::= { fsp150PidToSvidTable 1 }
+
+Fsp150PidToSvidEntry ::= SEQUENCE {
+    fsp150PidToSvidPid Unsigned32,
+    fsp150PidToSvidSvid INTEGER
+    }
+
+fsp150PidToSvidPid OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150PidToSvidEntry 1 }
+
+fsp150PidToSvidSvid OBJECT-TYPE
+    SYNTAX INTEGER (-2147483648..2147483647)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Controls the mapping between and Service VLAN IDs (SVID)
+        Port IDs (PID). If a PID results in SVID -1, the packet is
+        dropped."
+    ::= { fsp150PidToSvidEntry 2 }
+
+-- SvidToPid
+
+fsp150SvidToPidTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Fsp150SvidToPidEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150PidTranslation 2 }
+
+fsp150SvidToPidEntry OBJECT-TYPE
+    SYNTAX Fsp150SvidToPidEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    INDEX { entPhysicalIndex, fsp150SvidToPidSvid }
+    ::= { fsp150SvidToPidTable 1 }
+
+Fsp150SvidToPidEntry ::= SEQUENCE {
+    fsp150SvidToPidSvid Unsigned32,
+    fsp150SvidToPidPid INTEGER
+    }
+
+fsp150SvidToPidSvid OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150SvidToPidEntry 1 }
+
+fsp150SvidToPidPid OBJECT-TYPE
+    SYNTAX INTEGER (-2147483648..2147483647)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Controls the mapping between Port IDs (PID) and Service VLAN
+        IDs (SVID). If a SVID results in PID -1, the packet is
+        dropped."
+    ::= { fsp150SvidToPidEntry 2 }
+
+-- trafficTestMIB
+
+fsp150TrafficTestMIB OBJECT IDENTIFIER ::= {fsp150MIB 8}
+
+-- Textual Conventions
+
+Fsp150TTPayloadType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION ""
+    SYNTAX INTEGER {
+        all0 (1),
+        all1 (2),
+        incr (3),
+        random (4)
+    }
+
+Fsp150TTStateType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION ""
+    SYNTAX INTEGER {
+        idle (1),
+        running (2)
+    }
+
+Fsp150TTActionType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION ""
+    SYNTAX INTEGER {
+        pass (1),
+        drop (2)
+    }
+
+-- IngressGeneratorConfig
+
+fsp150IngressGeneratorConfigTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Fsp150IngressGeneratorConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150TrafficTestMIB 1 }
+
+fsp150IngressGeneratorConfigEntry OBJECT-TYPE
+    SYNTAX Fsp150IngressGeneratorConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    INDEX { entPhysicalIndex }
+    ::= { fsp150IngressGeneratorConfigTable 1 }
+
+Fsp150IngressGeneratorConfigEntry ::= SEQUENCE {
+    fsp150IngressGeneratorConfigPortIndex InterfaceIndex,
+    fsp150IngressGeneratorConfigFrameSize INTEGER,
+    fsp150IngressGeneratorConfigFrameCount Unsigned32,
+    fsp150IngressGeneratorConfigSignature DisplayString,
+    fsp150IngressGeneratorConfigPayload Fsp150TTPayloadType,
+    fsp150IngressGeneratorConfigCir Unsigned32,
+    fsp150IngressGeneratorConfigCbs Unsigned32,
+    fsp150IngressGeneratorConfigSVlanEnable TruthValue,
+    fsp150IngressGeneratorConfigSVlanVid INTEGER,
+    fsp150IngressGeneratorConfigSVlanPriority INTEGER,
+    fsp150IngressGeneratorConfigCVlanEnable TruthValue,
+    fsp150IngressGeneratorConfigCVlanVid INTEGER,
+    fsp150IngressGeneratorConfigCVlanPriority INTEGER,
+    fsp150IngressGeneratorConfigState Fsp150TTStateType
+    }
+
+fsp150IngressGeneratorConfigPortIndex OBJECT-TYPE
+    SYNTAX InterfaceIndex
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Assign the packet generator to a certain port. The ingress
+        generator can be assigned to an access port while the egress
+        generator can be assigned to a network port."
+    ::= { fsp150IngressGeneratorConfigEntry 1 }
+
+fsp150IngressGeneratorConfigFrameSize OBJECT-TYPE
+    SYNTAX INTEGER (0..65535)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Generate packets with a certain frame size in the interval
+        from 64bytes to 9250bytes"
+    ::= { fsp150IngressGeneratorConfigEntry 2 }
+
+fsp150IngressGeneratorConfigFrameCount OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Generate a certain number of packets in the interval from 1
+        to 2^32 (4294967295) packets or to generate packets in
+        continuous mode (0)"
+    ::= { fsp150IngressGeneratorConfigEntry 3 }
+
+fsp150IngressGeneratorConfigSignature OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..255))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Generate packets with a certain 8byte signature, which can
+        be configured in hex or ASCII"
+    ::= { fsp150IngressGeneratorConfigEntry 4 }
+
+fsp150IngressGeneratorConfigPayload OBJECT-TYPE
+    SYNTAX Fsp150TTPayloadType
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The remaining part of the pre-defined ADVA specific frame
+        can be configured to different patterns such as random
+        bytes, incremental bytes, all ones or all zeros. Random
+        bytes is according to the IEEE short continuous random test
+        pattern"
+    ::= { fsp150IngressGeneratorConfigEntry 5 }
+
+fsp150IngressGeneratorConfigCir OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Generate packets at a certain bitrate in the interval from
+        0kbps to 1048512kbps"
+    ::= { fsp150IngressGeneratorConfigEntry 6 }
+
+fsp150IngressGeneratorConfigCbs OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Generate packets with a certain burst in the interval from
+        16kByte to 4095kByte"
+    ::= { fsp150IngressGeneratorConfigEntry 7 }
+
+fsp150IngressGeneratorConfigSVlanEnable OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Specify whether a service VLAN tag should be inserted into
+        the pre-defined ADVA specific frame or not. The service VLAN
+        tag is optionally for the ingress generator, but mandatory
+        for the egress generator. Note. The service VLAN tag is
+        mandatory since the VID specifies the access port for which
+        the packets will be routed through the node(s), e.g. a VID
+        equal to two means that the packets will be routed to access
+        port 2"
+    ::= { fsp150IngressGeneratorConfigEntry 8 }
+
+fsp150IngressGeneratorConfigSVlanVid OBJECT-TYPE
+    SYNTAX INTEGER (0..65535)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The VLAN ID of the service VLAN tag"
+    ::= { fsp150IngressGeneratorConfigEntry 9 }
+
+fsp150IngressGeneratorConfigSVlanPriority OBJECT-TYPE
+    SYNTAX INTEGER (0..65535)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The priority of the service VLAN tag"
+    ::= { fsp150IngressGeneratorConfigEntry 10 }
+
+fsp150IngressGeneratorConfigCVlanEnable OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Specify whether a customer VLAN tag should be inserted into
+        the pre-defined ADVA specific frame or not"
+    ::= { fsp150IngressGeneratorConfigEntry 11 }
+
+fsp150IngressGeneratorConfigCVlanVid OBJECT-TYPE
+    SYNTAX INTEGER (0..65535)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The VLAN ID of the customer VLAN tag"
+    ::= { fsp150IngressGeneratorConfigEntry 12 }
+
+fsp150IngressGeneratorConfigCVlanPriority OBJECT-TYPE
+    SYNTAX INTEGER (0..65535)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The priority of the customer VLAN tag"
+    ::= { fsp150IngressGeneratorConfigEntry 13 }
+
+fsp150IngressGeneratorConfigState OBJECT-TYPE
+    SYNTAX Fsp150TTStateType
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The state of the generator"
+    ::= { fsp150IngressGeneratorConfigEntry 14 }
+
+-- IngressGeneratorStatus
+
+fsp150IngressGeneratorStatusTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Fsp150IngressGeneratorStatusEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150TrafficTestMIB 2 }
+
+fsp150IngressGeneratorStatusEntry OBJECT-TYPE
+    SYNTAX Fsp150IngressGeneratorStatusEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    INDEX { entPhysicalIndex }
+    ::= { fsp150IngressGeneratorStatusTable 1 }
+
+Fsp150IngressGeneratorStatusEntry ::= SEQUENCE {
+    fsp150IngressGeneratorStatusState Fsp150TTStateType,
+    fsp150IngressGeneratorStatusRateGenerated Unsigned32,
+    fsp150IngressGeneratorStatusFramesGenerated OCTET STRING
+    }
+
+fsp150IngressGeneratorStatusState OBJECT-TYPE
+    SYNTAX Fsp150TTStateType
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Running state of the generator"
+    ::= { fsp150IngressGeneratorStatusEntry 1 }
+
+fsp150IngressGeneratorStatusRateGenerated OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Generated rate in kbps"
+    ::= { fsp150IngressGeneratorStatusEntry 2 }
+
+fsp150IngressGeneratorStatusFramesGenerated OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (1..20))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of frames generated"
+    ::= { fsp150IngressGeneratorStatusEntry 3 }
+
+-- EgressGeneratorConfig
+
+fsp150EgressGeneratorConfigTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Fsp150EgressGeneratorConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150TrafficTestMIB 3 }
+
+fsp150EgressGeneratorConfigEntry OBJECT-TYPE
+    SYNTAX Fsp150EgressGeneratorConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    INDEX { entPhysicalIndex }
+    ::= { fsp150EgressGeneratorConfigTable 1 }
+
+Fsp150EgressGeneratorConfigEntry ::= SEQUENCE {
+    fsp150EgressGeneratorConfigPortIndex InterfaceIndex,
+    fsp150EgressGeneratorConfigFrameSize INTEGER,
+    fsp150EgressGeneratorConfigFrameCount Unsigned32,
+    fsp150EgressGeneratorConfigSignature DisplayString,
+    fsp150EgressGeneratorConfigPayload Fsp150TTPayloadType,
+    fsp150EgressGeneratorConfigCir Unsigned32,
+    fsp150EgressGeneratorConfigCbs Unsigned32,
+    fsp150EgressGeneratorConfigSVlanVid INTEGER,
+    fsp150EgressGeneratorConfigSVlanPriority INTEGER,
+    fsp150EgressGeneratorConfigCVlanEnable TruthValue,
+    fsp150EgressGeneratorConfigCVlanVid INTEGER,
+    fsp150EgressGeneratorConfigCVlanPriority INTEGER,
+    fsp150EgressGeneratorConfigState Fsp150TTStateType
+    }
+
+fsp150EgressGeneratorConfigPortIndex OBJECT-TYPE
+    SYNTAX InterfaceIndex
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Assign the packet generator to a certain port. The ingress
+        generator can be assigned to an access port while the egress
+        generator can be assigned to a network port."
+    ::= { fsp150EgressGeneratorConfigEntry 1 }
+
+fsp150EgressGeneratorConfigFrameSize OBJECT-TYPE
+    SYNTAX INTEGER (0..65535)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Generate packets with a certain frame size in the interval
+        from 64bytes to 9250bytes"
+    ::= { fsp150EgressGeneratorConfigEntry 2 }
+
+fsp150EgressGeneratorConfigFrameCount OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Generate a certain number of packets in the interval from 1
+        to 2^32 (4294967295) packets or to generate packets in
+        continuous mode (0)"
+    ::= { fsp150EgressGeneratorConfigEntry 3 }
+
+fsp150EgressGeneratorConfigSignature OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..255))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Generate packets with a certain 8byte signature, which can
+        be configured in hex or ASCII"
+    ::= { fsp150EgressGeneratorConfigEntry 4 }
+
+fsp150EgressGeneratorConfigPayload OBJECT-TYPE
+    SYNTAX Fsp150TTPayloadType
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The remaining part of the pre-defined ADVA specific frame
+        can be configured to different patterns such as random
+        bytes, incremental bytes, all ones or all zeros. Random
+        bytes is according to the IEEE short continuous random test
+        pattern"
+    ::= { fsp150EgressGeneratorConfigEntry 5 }
+
+fsp150EgressGeneratorConfigCir OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Generate packets at a certain bitrate in the interval from
+        0kbps to 1048512kbps"
+    ::= { fsp150EgressGeneratorConfigEntry 6 }
+
+fsp150EgressGeneratorConfigCbs OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Generate packets with a certain burst in the interval from
+        16kByte to 4095kByte"
+    ::= { fsp150EgressGeneratorConfigEntry 7 }
+
+fsp150EgressGeneratorConfigSVlanVid OBJECT-TYPE
+    SYNTAX INTEGER (0..65535)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The VLAN ID of the service VLAN tag"
+    ::= { fsp150EgressGeneratorConfigEntry 8 }
+
+fsp150EgressGeneratorConfigSVlanPriority OBJECT-TYPE
+    SYNTAX INTEGER (0..65535)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The priority of the service VLAN tag"
+    ::= { fsp150EgressGeneratorConfigEntry 9 }
+
+fsp150EgressGeneratorConfigCVlanEnable OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Specify whether a customer VLAN tag should be inserted into
+        the pre-defined ADVA specific frame or not"
+    ::= { fsp150EgressGeneratorConfigEntry 10 }
+
+fsp150EgressGeneratorConfigCVlanVid OBJECT-TYPE
+    SYNTAX INTEGER (0..65535)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The VLAN ID of the customer VLAN tag"
+    ::= { fsp150EgressGeneratorConfigEntry 11 }
+
+fsp150EgressGeneratorConfigCVlanPriority OBJECT-TYPE
+    SYNTAX INTEGER (0..65535)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The priority of the customer VLAN tag"
+    ::= { fsp150EgressGeneratorConfigEntry 12 }
+
+fsp150EgressGeneratorConfigState OBJECT-TYPE
+    SYNTAX Fsp150TTStateType
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The state of the generator"
+    ::= { fsp150EgressGeneratorConfigEntry 13 }
+
+-- EgressGeneratorStatus
+
+fsp150EgressGeneratorStatusTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Fsp150EgressGeneratorStatusEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150TrafficTestMIB 4 }
+
+fsp150EgressGeneratorStatusEntry OBJECT-TYPE
+    SYNTAX Fsp150EgressGeneratorStatusEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    INDEX { entPhysicalIndex }
+    ::= { fsp150EgressGeneratorStatusTable 1 }
+
+Fsp150EgressGeneratorStatusEntry ::= SEQUENCE {
+    fsp150EgressGeneratorStatusState Fsp150TTStateType,
+    fsp150EgressGeneratorStatusRateGenerated Unsigned32,
+    fsp150EgressGeneratorStatusFramesGenerated OCTET STRING
+    }
+
+fsp150EgressGeneratorStatusState OBJECT-TYPE
+    SYNTAX Fsp150TTStateType
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Running state of the generator"
+    ::= { fsp150EgressGeneratorStatusEntry 1 }
+
+fsp150EgressGeneratorStatusRateGenerated OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Generated rate in kbps"
+    ::= { fsp150EgressGeneratorStatusEntry 2 }
+
+fsp150EgressGeneratorStatusFramesGenerated OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (1..20))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of frames generated"
+    ::= { fsp150EgressGeneratorStatusEntry 3 }
+
+-- IngressFilterConfig
+
+fsp150IngressFilterConfigTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Fsp150IngressFilterConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150TrafficTestMIB 5 }
+
+fsp150IngressFilterConfigEntry OBJECT-TYPE
+    SYNTAX Fsp150IngressFilterConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    INDEX { entPhysicalIndex }
+    ::= { fsp150IngressFilterConfigTable 1 }
+
+Fsp150IngressFilterConfigEntry ::= SEQUENCE {
+    fsp150IngressFilterConfigEnable TruthValue,
+    fsp150IngressFilterConfigPortIndex InterfaceIndex,
+    fsp150IngressFilterConfigSignature DisplayString,
+    fsp150IngressFilterConfigAction Fsp150TTActionType
+    }
+
+fsp150IngressFilterConfigEnable OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Enable/disable the filter"
+    ::= { fsp150IngressFilterConfigEntry 1 }
+
+fsp150IngressFilterConfigPortIndex OBJECT-TYPE
+    SYNTAX InterfaceIndex
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Assign the filter to a certain access port for which
+        statistics of received frames will be performed"
+    ::= { fsp150IngressFilterConfigEntry 2 }
+
+fsp150IngressFilterConfigSignature OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..255))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Detect frames with a certain 8byte signature, which can be
+        configured in hex or ASCII"
+    ::= { fsp150IngressFilterConfigEntry 3 }
+
+fsp150IngressFilterConfigAction OBJECT-TYPE
+    SYNTAX Fsp150TTActionType
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "To drop or pass detected packets through the node, i.e.
+        filter action configuration"
+    ::= { fsp150IngressFilterConfigEntry 4 }
+
+-- EgressFilterConfig
+
+fsp150EgressFilterConfigTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Fsp150EgressFilterConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150TrafficTestMIB 6 }
+
+fsp150EgressFilterConfigEntry OBJECT-TYPE
+    SYNTAX Fsp150EgressFilterConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    INDEX { entPhysicalIndex }
+    ::= { fsp150EgressFilterConfigTable 1 }
+
+Fsp150EgressFilterConfigEntry ::= SEQUENCE {
+    fsp150EgressFilterConfigEnable TruthValue,
+    fsp150EgressFilterConfigPortIndex InterfaceIndex,
+    fsp150EgressFilterConfigSignature DisplayString,
+    fsp150EgressFilterConfigAction Fsp150TTActionType
+    }
+
+fsp150EgressFilterConfigEnable OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Enable/disable the filter"
+    ::= { fsp150EgressFilterConfigEntry 1 }
+
+fsp150EgressFilterConfigPortIndex OBJECT-TYPE
+    SYNTAX InterfaceIndex
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Assign the filter to a certain access port for which
+        statistics of received frames will be performed"
+    ::= { fsp150EgressFilterConfigEntry 2 }
+
+fsp150EgressFilterConfigSignature OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..255))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Detect frames with a certain 8byte signature, which can be
+        configured in hex or ASCII"
+    ::= { fsp150EgressFilterConfigEntry 3 }
+
+fsp150EgressFilterConfigAction OBJECT-TYPE
+    SYNTAX Fsp150TTActionType
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "To drop or pass detected packets through the node, i.e.
+        filter action configuration"
+    ::= { fsp150EgressFilterConfigEntry 4 }
+
+-- IngressFilterStatus
+
+fsp150IngressFilterStatusTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Fsp150IngressFilterStatusEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150TrafficTestMIB 7 }
+
+fsp150IngressFilterStatusEntry OBJECT-TYPE
+    SYNTAX Fsp150IngressFilterStatusEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    INDEX { entPhysicalIndex }
+    ::= { fsp150IngressFilterStatusTable 1 }
+
+Fsp150IngressFilterStatusEntry ::= SEQUENCE {
+    fsp150IngressFilterStatusFramesReceivedOneAccess Counter64String,
+    fsp150IngressFilterStatusBytesReceivedOneAccess Counter64String,
+    fsp150IngressFilterStatusFramesReceivedAllAccess Counter64String,
+    fsp150IngressFilterStatusBytesReceivedAllAccess Counter64String,
+    fsp150IngressFilterStatusFramesSentNetwork1 Counter64String,
+    fsp150IngressFilterStatusBytesSentNetwork1 Counter64String,
+    fsp150IngressFilterStatusFramesSentNetwork2 Counter64String,
+    fsp150IngressFilterStatusBytesSentNetwork2 Counter64String,
+    fsp150IngressFilterStatusFramesActionDropped Counter64String,
+    fsp150IngressFilterStatusRegulatorOverflowDropped Counter64String,
+    fsp150IngressFilterStatusBufferOverflowDropped Counter64String,
+    fsp150IngressFilterStatusOtherReasonDropped Counter64String
+    }
+
+fsp150IngressFilterStatusFramesReceivedOneAccess OBJECT-TYPE
+    SYNTAX Counter64String
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of frames detected by filter on the assigned access
+        port"
+    ::= { fsp150IngressFilterStatusEntry 1 }
+
+fsp150IngressFilterStatusBytesReceivedOneAccess OBJECT-TYPE
+    SYNTAX Counter64String
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of bytes detected by filter on the assigned access
+        port"
+    ::= { fsp150IngressFilterStatusEntry 2 }
+
+fsp150IngressFilterStatusFramesReceivedAllAccess OBJECT-TYPE
+    SYNTAX Counter64String
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of frames detected by filter on any access port"
+    ::= { fsp150IngressFilterStatusEntry 3 }
+
+fsp150IngressFilterStatusBytesReceivedAllAccess OBJECT-TYPE
+    SYNTAX Counter64String
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of bytes detected by filter on any access port"
+    ::= { fsp150IngressFilterStatusEntry 4 }
+
+fsp150IngressFilterStatusFramesSentNetwork1 OBJECT-TYPE
+    SYNTAX Counter64String
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of frames detected by filter on network1"
+    ::= { fsp150IngressFilterStatusEntry 5 }
+
+fsp150IngressFilterStatusBytesSentNetwork1 OBJECT-TYPE
+    SYNTAX Counter64String
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of bytes detected by filter on network1"
+    ::= { fsp150IngressFilterStatusEntry 6 }
+
+fsp150IngressFilterStatusFramesSentNetwork2 OBJECT-TYPE
+    SYNTAX Counter64String
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of frames detected by filter on network2"
+    ::= { fsp150IngressFilterStatusEntry 7 }
+
+fsp150IngressFilterStatusBytesSentNetwork2 OBJECT-TYPE
+    SYNTAX Counter64String
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of bytes detected by filter on network2"
+    ::= { fsp150IngressFilterStatusEntry 8 }
+
+fsp150IngressFilterStatusFramesActionDropped OBJECT-TYPE
+    SYNTAX Counter64String
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of frames detected by filter and dropped due to
+        filter action"
+    ::= { fsp150IngressFilterStatusEntry 9 }
+
+fsp150IngressFilterStatusRegulatorOverflowDropped OBJECT-TYPE
+    SYNTAX Counter64String
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of frames detected by filter and dropped due to
+        regulator overflow"
+    ::= { fsp150IngressFilterStatusEntry 10 }
+
+fsp150IngressFilterStatusBufferOverflowDropped OBJECT-TYPE
+    SYNTAX Counter64String
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of frames detected by filter and dropped due to
+        buffer overflow"
+    ::= { fsp150IngressFilterStatusEntry 11 }
+
+fsp150IngressFilterStatusOtherReasonDropped OBJECT-TYPE
+    SYNTAX Counter64String
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of frames detected by filter and dropped due to other
+        reason"
+    ::= { fsp150IngressFilterStatusEntry 12 }
+
+-- EgressFilterStatus
+
+fsp150EgressFilterStatusTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Fsp150EgressFilterStatusEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150TrafficTestMIB 8 }
+
+fsp150EgressFilterStatusEntry OBJECT-TYPE
+    SYNTAX Fsp150EgressFilterStatusEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    INDEX { entPhysicalIndex }
+    ::= { fsp150EgressFilterStatusTable 1 }
+
+Fsp150EgressFilterStatusEntry ::= SEQUENCE {
+    fsp150EgressFilterStatusFramesReceivedNetwork1 Counter64String,
+    fsp150EgressFilterStatusBytesReceivedNetwork1 Counter64String,
+    fsp150EgressFilterStatusFramesReceivedNetwork2 Counter64String,
+    fsp150EgressFilterStatusBytesReceivedNetwork2 Counter64String,
+    fsp150EgressFilterStatusFramesSentOneAccess Counter64String,
+    fsp150EgressFilterStatusBytesSentOneAccess Counter64String,
+    fsp150EgressFilterStatusFramesSentAllAccess Counter64String,
+    fsp150EgressFilterStatusBytesSentAllAccess Counter64String,
+    fsp150EgressFilterStatusFramesActionDropped Counter64String,
+    fsp150EgressFilterStatusRegulatorOverflowDropped Counter64String,
+    fsp150EgressFilterStatusBufferOverflowDropped Counter64String,
+    fsp150EgressFilterStatusOtherReasonDropped Counter64String
+    }
+
+fsp150EgressFilterStatusFramesReceivedNetwork1 OBJECT-TYPE
+    SYNTAX Counter64String
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of frames detected by filter on network1"
+    ::= { fsp150EgressFilterStatusEntry 1 }
+
+fsp150EgressFilterStatusBytesReceivedNetwork1 OBJECT-TYPE
+    SYNTAX Counter64String
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of bytes detected by filter on network1"
+    ::= { fsp150EgressFilterStatusEntry 2 }
+
+fsp150EgressFilterStatusFramesReceivedNetwork2 OBJECT-TYPE
+    SYNTAX Counter64String
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of frames detected by filter on network2"
+    ::= { fsp150EgressFilterStatusEntry 3 }
+
+fsp150EgressFilterStatusBytesReceivedNetwork2 OBJECT-TYPE
+    SYNTAX Counter64String
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of bytes detected by filter on network2"
+    ::= { fsp150EgressFilterStatusEntry 4 }
+
+fsp150EgressFilterStatusFramesSentOneAccess OBJECT-TYPE
+    SYNTAX Counter64String
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of frames detected by filter on the assigned access
+        port"
+    ::= { fsp150EgressFilterStatusEntry 5 }
+
+fsp150EgressFilterStatusBytesSentOneAccess OBJECT-TYPE
+    SYNTAX Counter64String
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of bytes detected by filter on the assigned access
+        port"
+    ::= { fsp150EgressFilterStatusEntry 6 }
+
+fsp150EgressFilterStatusFramesSentAllAccess OBJECT-TYPE
+    SYNTAX Counter64String
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of frames detected by filter on any access port"
+    ::= { fsp150EgressFilterStatusEntry 7 }
+
+fsp150EgressFilterStatusBytesSentAllAccess OBJECT-TYPE
+    SYNTAX Counter64String
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of bytes detected by filter on any access port"
+    ::= { fsp150EgressFilterStatusEntry 8 }
+
+fsp150EgressFilterStatusFramesActionDropped OBJECT-TYPE
+    SYNTAX Counter64String
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of frames detected by filter and dropped due to
+        filter action"
+    ::= { fsp150EgressFilterStatusEntry 9 }
+
+fsp150EgressFilterStatusRegulatorOverflowDropped OBJECT-TYPE
+    SYNTAX Counter64String
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of frames detected by filter and dropped due to
+        regulator overflow"
+    ::= { fsp150EgressFilterStatusEntry 10 }
+
+fsp150EgressFilterStatusBufferOverflowDropped OBJECT-TYPE
+    SYNTAX Counter64String
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of frames detected by filter and dropped due to
+        buffer overflow"
+    ::= { fsp150EgressFilterStatusEntry 11 }
+
+fsp150EgressFilterStatusOtherReasonDropped OBJECT-TYPE
+    SYNTAX Counter64String
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of frames detected by filter and dropped due to other
+        reason"
+    ::= { fsp150EgressFilterStatusEntry 12 }
+
+--Mx start
+-- upgradeMIB
+
+fsp150UpgradeMIB OBJECT IDENTIFIER ::= {fsp150MIB 9}
+
+-- Textual Conventions
+
+Fsp150UpgradeState ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION ""
+    SYNTAX INTEGER {
+        none (0),
+        downloading (1),
+        downloaded (2),
+        downloadFailed (3),
+        erasing (4),
+        installing (5),
+        installed (6),
+        verifying (7),
+        failed (8),
+        done (9),
+        fileNotFound (10)
+    }
+
+Fsp150UpgradeRequestCmd ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION ""
+    SYNTAX INTEGER {
+        none (0),
+        upgrade (1),
+        reset (2)
+    }
+
+-- UpgradeFwStatus
+
+fsp150UpgradeFwStatusTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Fsp150UpgradeFwStatusEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150UpgradeMIB 1 }
+
+fsp150UpgradeFwStatusEntry OBJECT-TYPE
+    SYNTAX Fsp150UpgradeFwStatusEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    INDEX { entPhysicalIndex }
+    ::= { fsp150UpgradeFwStatusTable 1 }
+
+Fsp150UpgradeFwStatusEntry ::= SEQUENCE {
+    fsp150UpgradeFwStatusState Fsp150UpgradeState,
+    fsp150UpgradeFwStatusProgress INTEGER,
+    fsp150UpgradeFwStatusDetailedMsg DisplayString,
+    fsp150UpgradeFwStatusProgressAvailable TruthValue
+    }
+
+fsp150UpgradeFwStatusState OBJECT-TYPE
+    SYNTAX Fsp150UpgradeState
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The UpgradeState to the GetUpgradeFwStatus function"
+    ::= { fsp150UpgradeFwStatusEntry 1 }
+
+fsp150UpgradeFwStatusProgress OBJECT-TYPE
+    SYNTAX INTEGER (-32768..32767)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The progress to the GetUpgradeFwStatus function"
+    ::= { fsp150UpgradeFwStatusEntry 2 }
+
+fsp150UpgradeFwStatusDetailedMsg OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..255))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The detailed message to the GetUpgradeFwStatus function"
+    ::= { fsp150UpgradeFwStatusEntry 3 }
+
+fsp150UpgradeFwStatusProgressAvailable OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The available of progress to the GetUpgradeFwStatus function"
+    ::= { fsp150UpgradeFwStatusEntry 4 }
+
+-- UpgradeFwRequest
+
+fsp150UpgradeFwRequestTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Fsp150UpgradeFwRequestEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { fsp150UpgradeMIB 2 }
+
+fsp150UpgradeFwRequestEntry OBJECT-TYPE
+    SYNTAX Fsp150UpgradeFwRequestEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    INDEX { entPhysicalIndex }
+    ::= { fsp150UpgradeFwRequestTable 1 }
+
+Fsp150UpgradeFwRequestEntry ::= SEQUENCE {
+    fsp150UpgradeFwRequestUrl DisplayString,
+    fsp150UpgradeFwRequestRequest Fsp150UpgradeRequestCmd
+    }
+
+fsp150UpgradeFwRequestUrl OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..255))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The URL to the SetUpgradeFwRequest function"
+    ::= { fsp150UpgradeFwRequestEntry 1 }
+
+fsp150UpgradeFwRequestRequest OBJECT-TYPE
+    SYNTAX Fsp150UpgradeRequestCmd
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The request to the SetUpgradeFwRequest function"
+    ::= { fsp150UpgradeFwRequestEntry 2 }
+
+-- Products
+
+fsp150Products OBJECT IDENTIFIER ::= {fsp150 1}
+
+-- CP
+
+fsp150CP OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The value of sysObjectID for an agent running on a FSP
+        150CP."
+    ::= { fsp150Products 1 }
+
+-- Mx
+
+fsp150Mx OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The value of sysObjectID for an agent running on a FSP 150MO
+        or FSP 150ME."
+    ::= { fsp150Products 2 }
+
+END
