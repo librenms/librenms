@@ -744,14 +744,14 @@ if (! empty($peers)) {
                 $cbgpPeerWithdrawnPrefixes = set_numeric($cbgpPeerWithdrawnPrefixes);
 
                 $cbgpPeers_cbgp_fields = [
-                    'AcceptedPrefixes'     => $cbgpPeerAcceptedPrefixes,
-                    'DeniedPrefixes'       => $cbgpPeerDeniedPrefixes,
-                    'PrefixAdminLimit'     => $cbgpPeerPrefixAdminLimit,
-                    'PrefixThreshold'      => $cbgpPeerPrefixThreshold,
+                    'AcceptedPrefixes' => $cbgpPeerAcceptedPrefixes,
+                    'DeniedPrefixes' => $cbgpPeerDeniedPrefixes,
+                    'PrefixAdminLimit' => $cbgpPeerPrefixAdminLimit,
+                    'PrefixThreshold' => $cbgpPeerPrefixThreshold,
                     'PrefixClearThreshold' => $cbgpPeerPrefixClearThreshold,
-                    'AdvertisedPrefixes'   => $cbgpPeerAdvertisedPrefixes,
-                    'SuppressedPrefixes'   => $cbgpPeerSuppressedPrefixes,
-                    'WithdrawnPrefixes'    => $cbgpPeerWithdrawnPrefixes,
+                    'AdvertisedPrefixes' => $cbgpPeerAdvertisedPrefixes,
+                    'SuppressedPrefixes' => $cbgpPeerSuppressedPrefixes,
+                    'WithdrawnPrefixes' => $cbgpPeerWithdrawnPrefixes,
                 ];
 
                 foreach ($cbgpPeers_cbgp_fields as $field => $value) {
@@ -796,11 +796,11 @@ if (! empty($peers)) {
                     ->addDataset('SuppressedPrefixes', 'GAUGE', null, 100000000000)
                     ->addDataset('WithdrawnPrefixes', 'GAUGE', null, 100000000000);
                 $fields = [
-                    'AcceptedPrefixes'    => $cbgpPeerAcceptedPrefixes,
-                    'DeniedPrefixes'      => $cbgpPeerDeniedPrefixes,
-                    'AdvertisedPrefixes'  => $cbgpPeerAdvertisedPrefixes,
-                    'SuppressedPrefixes'  => $cbgpPeerSuppressedPrefixes,
-                    'WithdrawnPrefixes'   => $cbgpPeerWithdrawnPrefixes,
+                    'AcceptedPrefixes' => $cbgpPeerAcceptedPrefixes,
+                    'DeniedPrefixes' => $cbgpPeerDeniedPrefixes,
+                    'AdvertisedPrefixes' => $cbgpPeerAdvertisedPrefixes,
+                    'SuppressedPrefixes' => $cbgpPeerSuppressedPrefixes,
+                    'WithdrawnPrefixes' => $cbgpPeerWithdrawnPrefixes,
                 ];
 
                 $tags = [
