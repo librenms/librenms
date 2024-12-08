@@ -38,6 +38,9 @@ class DocsTest extends TestCase
         'General/Changelogs/2018.md',
         'General/Changelogs/2019.md',
         'General/Changelogs/2020.md',
+        'General/Changelogs/2021.md',
+        'General/Changelogs/2022.md',
+        'General/Changelogs/2023.md',
     ];
 
     /**

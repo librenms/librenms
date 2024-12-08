@@ -123,6 +123,11 @@
 }
 
 .devices-graphs-select {
-    margin-right: 5px; 
+    margin-right: 5px;
      color: #555;
+}
+
+.panel-title select {
+    background-color: black;
+    color: white;
 }

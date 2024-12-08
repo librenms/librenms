@@ -29,7 +29,7 @@ if (strstr($device['sysObjectID'], '.1.3.6.1.4.1.6321.1.2.3')) { // E5-1xx Serie
                 $descr = str_replace('"', '', $descr);
                 $current = $temperature;
 
-                discover_sensor($valid['sensor'], 'temperature', $device, $temperature_oid, $oid, 'calix', $descr, '1', '1', null, null, null, null, $current);
+                discover_sensor(null, 'temperature', $device, $temperature_oid, $oid, 'calix', $descr, '1', '1', null, null, null, null, $current);
             }
         }
     }
@@ -49,7 +49,7 @@ if (strstr($device['sysObjectID'], '.1.3.6.1.4.1.6321.1.2.3')) { // E5-1xx Serie
                 $descr = str_replace('"', '', $descr);
                 $current = $temperature;
 
-                discover_sensor($valid['sensor'], 'temperature', $device, $temperature_oid, $oid, 'calix', $descr, '1', '1', null, null, null, null, $current);
+                discover_sensor(null, 'temperature', $device, $temperature_oid, $oid, 'calix', $descr, '1', '1', null, null, null, null, $current);
             }
         }
     }
@@ -69,7 +69,7 @@ if (strstr($device['sysObjectID'], '.1.3.6.1.4.1.6321.1.2.3')) { // E5-1xx Serie
                 $descr = str_replace('"', '', $descr);
                 $current = $temperature;
 
-                discover_sensor($valid['sensor'], 'temperature', $device, $temperature_oid, $oid, 'calix', $descr, '1', '1', null, null, null, null, $current);
+                discover_sensor(null, 'temperature', $device, $temperature_oid, $oid, 'calix', $descr, '1', '1', null, null, null, null, $current);
             }
         }
     }
@@ -89,7 +89,7 @@ if (strstr($device['sysObjectID'], '.1.3.6.1.4.1.6321.1.2.3')) { // E5-1xx Serie
                 $descr = str_replace('"', '', $descr);
                 $current = $temperature;
 
-                discover_sensor($valid['sensor'], 'temperature', $device, $temperature_oid, $oid, 'calix', $descr, '1', '1', null, null, null, null, $current);
+                discover_sensor(null, 'temperature', $device, $temperature_oid, $oid, 'calix', $descr, '1', '1', null, null, null, null, $current);
             }
         }
     }

@@ -298,6 +298,11 @@ Socialite can specifiy scopes that should be included with in the authentication
 For example, if Okta is configured to expose group information it is possible to use these group
 names to configure User Roles.
 
+This requires configuration in Okta.  You can set the 'Groups claim type' to 'Filter' and supply
+a regex of which groups should be returned which can be mapped below.
+
+![socialite-okta-1](/img/socialite-okta-4.png)
+
 First enable sending the 'groups' claim (along with the normal openid, profile, and email claims).
 Be aware that the scope name must match the claim name. For identity providers where the scope does
 not match (e.g. Keycloak: roles -> groups) you need to configure a custom scope.

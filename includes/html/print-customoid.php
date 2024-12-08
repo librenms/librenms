@@ -84,14 +84,14 @@ $full_query = "SELECT * $query $where ORDER BY customoid_descr ASC LIMIT $start,
 
 foreach (dbFetchRows($full_query, $param) as $oid) {
     echo "<tr class='" . $oid['customoid_id'] . "' id='row_" . $oid['customoid_id'] . "'>";
-    echo '<td>' . $oid['customoid_descr'] . '</td>';
-    echo '<td>' . $oid['customoid_oid'] . '</td>';
-    echo '<td>' . $oid['customoid_current'] . '</td>';
-    echo '<td>' . $oid['customoid_unit'] . '</td>';
-    echo '<td>' . $oid['customoid_limit'] . '</td>';
-    echo '<td>' . $oid['customoid_limit_low'] . '</td>';
-    echo '<td>' . $oid['customoid_limit_warn'] . '</td>';
-    echo '<td>' . $oid['customoid_limit_low_warn'] . '</td>';
+    echo '<td>' . htmlentities($oid['customoid_descr']) . '</td>';
+    echo '<td>' . htmlentities($oid['customoid_oid']) . '</td>';
+    echo '<td>' . htmlentities($oid['customoid_current']) . '</td>';
+    echo '<td>' . htmlentities($oid['customoid_unit']) . '</td>';
+    echo '<td>' . htmlentities($oid['customoid_limit']) . '</td>';
+    echo '<td>' . htmlentities($oid['customoid_limit_low']) . '</td>';
+    echo '<td>' . htmlentities($oid['customoid_limit_warn']) . '</td>';
+    echo '<td>' . htmlentities($oid['customoid_limit_low_warn']) . '</td>';
     echo "<td><input id='" . $oid['customoid_id'] . "' type='checkbox' name='alert'" . ($oid['customoid_alert'] ? ' checked' : '') . ' disabled></td>';
     echo "<td><input id='" . $oid['customoid_id'] . "' type='checkbox' name='passed'" . ($oid['customoid_passed'] ? ' checked' : '') . ' disabled></td>';
     echo '<td>';

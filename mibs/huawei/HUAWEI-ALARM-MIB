@@ -1,9 +1,9 @@
 -- ==================================================================
--- Copyright (C) 2017 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2019 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- 
 -- Description: HUAWEI ALARM MIB
 -- Reference:
--- Version: V2.14
+-- Version: V2.17
 -- History: 
 --  V1.0      2009-03-20   publish
 -- ==================================================================
@@ -23,7 +23,7 @@
     
     
         hwAlarmMIB MODULE-IDENTITY 
-            LAST-UPDATED "201707141136Z"        -- July 14, 2017 at 11:36 GMT
+            LAST-UPDATED "201905211501Z"        -- May 21, 2019 at 15:01 GMT
             ORGANIZATION "Huawei Technologies Co.,Ltd."
             CONTACT-INFO 
                 "Huawei Industrial Base
@@ -34,7 +34,16 @@
                    Email: support@huawei.com"
             DESCRIPTION 
                 "The MIB module for creating and deleting bulk files of
-                SNMP data for file transfer."
+                SNMP data for file transfer." 
+            REVISION "201905211501Z"        -- May 21, 2019 at 15:01 GMT
+            DESCRIPTION
+                "Add hwApName  node."
+            REVISION "201804111550Z"        -- April 11, 2018 at 15:50 GMT
+            DESCRIPTION
+                "Modified hwSnmpTargetAddrExtIndex node."
+            REVISION "201709200950Z"        -- September 20, 2017 at 9:50 GMT
+            DESCRIPTION
+                "Add hwAlarmVNFCName for trap."
             REVISION "201707141136Z"        -- July 14, 2017 at 11:36 GMT
             DESCRIPTION
                 "Revert to the revision 2.10."
@@ -91,7 +100,7 @@
              }
 
         hwSnmpTargetAddrExtIndex OBJECT-TYPE
-            SYNTAX OCTET STRING (SIZE (1..32))
+            SYNTAX OCTET STRING (SIZE (1..128))
             MAX-ACCESS accessible-for-notify
             STATUS current
             DESCRIPTION
@@ -460,7 +469,15 @@
             DESCRIPTION
                 "Alarm severity."
             ::= { hwAlarmObjects 25 }        
-               
+ 
+        hwAlarmVNFCName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..32))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                " Alarm VNFC name."
+            ::= { hwAlarmObjects 26 }
+
         hwSnmpTargetSyncIndexTable OBJECT-TYPE
             SYNTAX SEQUENCE OF HwSnmpTargetSyncIndexEntry
             MAX-ACCESS not-accessible
@@ -645,6 +662,14 @@
             DESCRIPTION
                 "The VS id of the event."
             ::= { hwEventSyncVsEntry 3 }
+
+        hwApName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..246))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "Alarm AP name."
+           ::= { hwAlarmObjects 40 }
                 
         hwAlarmNotifications OBJECT IDENTIFIER ::= { hwAlarmMIB 2 }
         

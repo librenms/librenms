@@ -13,7 +13,9 @@ $drives = [];
 
 $app_data = $app->data;
 
-array_multisort(array_keys($app_data['disks']), SORT_ASC, $app_data['disks']);
+if (isset($app_data['disks']) && is_array($app_data['disks'])) {
+    array_multisort(array_keys($app_data['disks']), SORT_ASC, $app_data['disks']);
+}
 
 foreach ($app_data['disks'] as $label => $disk_data) {
     $disk = $label;

@@ -363,10 +363,6 @@ return [
             'description' => 'Journaux de connexions plus anciens que',
             'help' => 'Nettoyage effectué par daily.sh',
         ],
-        'device_perf_purge' => [
-            'description' => 'Stats de performances plus anciennes que',
-            'help' => 'Statistiques de performances des équipements. Le nettoyage effectué par daily.sh',
-        ],
         'discovery_modules' => [
             'arp-table' => [
                 'description' => 'Table ARP',
@@ -376,9 +372,6 @@ return [
             ],
             'bgp-peers' => [
                 'description' => 'Adjacences BGP',
-            ],
-            'cisco-cbqos' => [
-                'description' => 'Cisco CBQOS',
             ],
             'cisco-cef' => [
                 'description' => 'Cisco CEF',
@@ -851,12 +844,6 @@ return [
             ],
             'cisco-asa-firewall' => [
                 'description' => 'Cisco ASA Firewall',
-            ],
-            'cisco-voice' => [
-                'description' => 'Cisco Voice',
-            ],
-            'cisco-cbqos' => [
-                'description' => 'Cisco CBQOS',
             ],
             'cisco-otv' => [
                 'description' => 'Cisco OTV',

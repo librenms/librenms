@@ -1,6 +1,6 @@
 --
--- Juniper Enterprise Specific MIB: FRU management for OTN Equipments
--- 
+-- Juniper Enterprise Specific MIB: FRU management
+--
 -- Copyright (c) 2012-2013, Juniper Networks, Inc.
 -- All rights reserved.
 --
@@ -31,7 +31,7 @@ jnxFruMib MODULE-IDENTITY
 
     DESCRIPTION
             "This MIB module defines objects used for managing the
-             OTN FRU's for Juniper products."
+             FRU's for Juniper products."
     REVISION      "201201260000Z"
     DESCRIPTION
                "Initial revision."
@@ -67,7 +67,7 @@ jnxFruCfgTable   OBJECT-TYPE
         MAX-ACCESS not-accessible
         STATUS     current
         DESCRIPTION
-                "Information about the otn FRU's. "
+                "Information about the FRU's. "
         ::= { jnxFruCfg 1 }
 
 jnxFruCfgEntry OBJECT-TYPE
@@ -75,7 +75,7 @@ jnxFruCfgEntry OBJECT-TYPE
         MAX-ACCESS not-accessible
         STATUS     current
         DESCRIPTION
-                 "Information about the otn FRU's."
+                 "Information about the FRU's."
         INDEX   { jnxFruCfgContentsIndex, jnxFruCfgL1Index,
                   jnxFruCfgL2Index, jnxFruCfgL3Index }
         ::= { jnxFruCfgTable 1 }
@@ -96,7 +96,7 @@ JnxFruCfgEntry ::=
         MAX-ACCESS      accessible-for-notify
         STATUS          current
         DESCRIPTION
-                "The associated jnxContentsContainerIndex in the 
+                "The associated jnxContentsContainerIndex in the
                 jnxContentsTable."
         ::= { jnxFruCfgEntry 1 }
 
@@ -114,7 +114,7 @@ JnxFruCfgEntry ::=
         MAX-ACCESS      accessible-for-notify
         STATUS          current
         DESCRIPTION
-                "The level two index associated with this 
+                "The level two index associated with this
                 subject.  Zero if unavailable or inapplicable."
         ::= { jnxFruCfgEntry 3 }
 
@@ -134,7 +134,7 @@ JnxFruCfgEntry ::=
         DESCRIPTION
                 "The object ID for this FRU"
         ::= { jnxFruCfgEntry 5 }
- 
+
     jnxFruCfgAdminState OBJECT-TYPE
         SYNTAX          JnxFruAdminStates
         MAX-ACCESS      read-write
@@ -167,7 +167,7 @@ jnxFruNotifMismatch NOTIFICATION-TYPE
         DESCRIPTION
                 "A jnxFruInsertion trap signifies that the SNMP
                 entity, acting in an agent role, has detected that
-                the specified FRU (Field Replaceable Unit)  
+                the specified FRU (Field Replaceable Unit)
                 inserted into the chassis does not match what was
                 configured."
         ::= { jnxFruTraps 1 }
@@ -181,19 +181,19 @@ jnxFruNotifAdminStatus NOTIFICATION-TYPE
                         }
         STATUS  current
         DESCRIPTION
-                "Notification of the Administrative state of the otn interface"
+                "Notification of the Administrative state of the PIC"
         ::= { jnxFruTraps 2 }
 
 jnxFruNotifOperStatus NOTIFICATION-TYPE
         OBJECTS         { jnxFruCfgContentsIndex,
                           jnxFruCfgL1Index,
                           jnxFruCfgL2Index,
-                          jnxFruCfgL3Index, 
+                          jnxFruCfgL3Index,
                           jnxFruCfgOperState
                         }
         STATUS  current
         DESCRIPTION
-                "Notification of Operational state of the otn interface"
+                "Notification of Operational state of the PIC/FRU"
         ::= { jnxFruTraps 3 }
 
 END

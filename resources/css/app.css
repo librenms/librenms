@@ -2,4 +2,4 @@
 @tailwind components;
 @tailwind utilities;
 
-@import 'flasher.css';
+@import 'toast.css';

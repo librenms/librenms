@@ -1,108 +1,9 @@
 -- =================================================================
--- Copyright (C) 2017 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2022 by  HUAWEI TECHNOLOGIES. All rights reserved.
 --
 -- Description: HUAWEI-ETHOAM-MIB
 -- Reference:
--- Version:     V2.35
--- History:
--- Revision history
---            REVISION     "201708170000Z"    
---            DESCRIPTION  "V2.35, Modify the description of hwDot3ahEfmNonThresholdRecovery,hwDot1agCfmUnexpectedMEP,hwDot1agCfmUnexpectedPeriod,hwDot1agCfmUnexpectedMACCleared,hwDot1agCfmLOC,hwDot1agCfmLOCCleared,hwY1731AisExceedMaxPktNumCleared."
---            REVISION     "201705090000Z"    
---            DESCRIPTION  "V2.34, Modify the description of hwY1731TestIdSingleSynEndedLMSendMeasureMentCount node."
---            REVISION     "201702100000Z"    
---            DESCRIPTION  "V2.33, Add hwY1731TestIdSingleSynEndedLMSendPacketSize and hwY1731TestIdSingleSynEndedLMSendMeasureMentCount node in hwY1731TestIdSingleSynEndedLMSendTable,
---                                                          add  hwY1731TestIdStatTrapLogTable , add hwY1731TestIdStatistic and hwY1731TestIdStatisticClear trap nodes."
---            REVISION     "201601120000Z"    
---            DESCRIPTION  "V2.32, Delete BITS in IMPORTS."
---            REVISION     "201512160000Z"    
---            DESCRIPTION  "V2.31, Add hwY1731TestIdTwoDelayCurIndex, hwY1731TestIdSingleSynLossCurIndex, hwY1731SingleLossCurIndex, hwY1731TestIdSingleLossCurIndex."
---            REVISION     "201511300000Z"    
---            DESCRIPTION  "V2.30, Add hwDot3ahEfmNonThresholdCriticalEventTriggerErrDown, hwDot3ahEfmNonThresholdDyinggaspTriggerErrDown,
---                                          hwDot3ahEfmNonThresholdLinkFaultTriggerErrDown,  hwDot3ahEfmNonThresholdTimeoutTriggerErrDown nodes in hwDot3ahEfmEventConfigTable."
---            REVISION     "201511270000Z"    
---            DESCRIPTION  "V2.29, Add hwY1731TunnelNonSupport, hwY1731TunnelNonSupportResumed leaf node for vpls over gre."
---            REVISION     "201504240000Z"    
---            DESCRIPTION  "V2.28, Add hwDot1agCfmGmacTraceTable, hwDot1agCfmGmacTraceReplyTable, hwDot1agCfmGmacTraceEnabled leaf node for Gmac Trace."
---            REVISION     "201503030000Z"    
---            DESCRIPTION  "V2.27, Add hwY1731TestIdQueuePriority leaf node in hwY1731TestIdTable."
---            REVISION     "201501150000Z"    
---            DESCRIPTION  "V2.26, Add table Index of hwY1731TestIdSingleLossSummaryStatTable"
---            REVISION     "201501060000Z"    
---            DESCRIPTION  "V2.25, Modify hwDot1agCfmMaTable, hwY1731TestIdSingleEndedLMSendTable, hwY1731TestIdOneWayDMSendTable, hwY1731TestIdTwoWayDMSendTable."
---            REVISION     "201412260000Z"    
---            DESCRIPTION  "V2.24, Add table Index of hwY1731TestIdTwoDelaySummaryStatTable, hwY1731TestIdSingleSynLossSummaryStatTable , and hwY1731SingleLossSummaryStatTable."
---            REVISION     "201412100000Z"    
---            DESCRIPTION  "V2.23, Modify hwY1731TestIdStatisticResetTable , add hwY1731TestIdSingleSynEndedLMSendTable, hwY1731TestIdSingleSynEndedLMReceiveTable,
---                      hwY1731TestIdSingleLossSummaryStatTable, hwY1731TestIdSingleSynLossStatTable."
---            REVISION     "201410080000Z"    
---            DESCRIPTION  "V2.22, Modify hwY1731TestIdTwoDelaySummaryStatTable, add hwY1731TestIdSingleSynLossSummaryStatTable and hwY1731SingleLossSummaryStatTable."
---            REVISION     "201409150000Z"    
---            DESCRIPTION  "V2.21, Modify the description of hwDot3ahEfmAdminState, enabled(2) state to enabled(1) state."
---            REVISION     "201408120000Z"    
---            DESCRIPTION  "V2.20, Add hwY1731TestIdTwoDelaySummaryStatTable and hwY1731TestIdIsRecordFile ."
---            REVISION     "201406260000Z"        
---            DESCRIPTION  "V2.19, Modify the max value of hwDot1agCfmMacPingPacketSize from 2000 to 9500."
---            REVISION     "201406030000Z"        
---            DESCRIPTION  "V2.18, Add hwY1731OneDelayOnDemandStartTime, hwY1731TwoDelayOnDemandStartTime, hwY1731SingleLossOnDemandStartTime,
---                                            hwY1731TestIdSingleLossOnDemandStartTime, hwY1731TestIdOneDelayOnDemandStartTime, hwY1731TestIdTwoDelayOnDemandStartTime"
---            REVISION     "201405060000Z"        
---            DESCRIPTION  "V2.17, Modify the description of hwY1731LckExceedThreshold, hwY1731LckExceedThresholdRecovery"
---            REVISION     "201404260000Z"        
---            DESCRIPTION  "V2.16, Add hwY1731LckExceedThreshold, hwY1731LckExceedThresholdRecovery"
---            REVISION     "201404090000Z"        
---            DESCRIPTION  "V2.15, Add hwY1731SingleLossStatistic8021pValue, hwY1731OneDelayStatistic8021pValue, hwY1731TwoDelayStatistic8021pValue"
---            REVISION     "201312040000Z"        
---            DESCRIPTION  "V1.10, Add hwCfmVlanOneDelayTrapLogDelayValueHigh, hwCfmVlanOneDelayTrapLogDelayValueLow, hwCfmVlanOneDelayRecoveryTrapLogDelayValueHigh, 
---                      hwCfmVlanOneDelayRecoveryTrapLogDelayValueLow, hwCfmVlanTwoDelayTrapLogDelayValueHigh, hwCfmVlanTwoDelayTrapLogDelayValueLow,
---                      hwY1731StatisticTrapLogValueHigh, hwY1731StatisticTrapLogValueLow, hwCfmVlanTwoDelayRecoveryTrapLogDelayValueHigh, hwCfmVlanTwoDelayRecoveryTrapLogDelayValueLow"
---            REVISION     "201310070000Z"        
---            DESCRIPTION  "V1.09, Add hwY1731TestIdTable,hwY1731TestIdSingleEndedLMSendTable,hwY1731TestIdSingleEndedLMReceiveTable,
---                      hwY1731TestIdOneWayDMSendTable,hwY1731TestIdOneWayDMSendTable,hwY1731TestIdTwoWayDMSendTable,hwY1731TestIdTwoWayDMReceiveTable,
---                      hwY1731TestIdSingleLossStatTable,hwY1731TestIdOneDelayStatTable,hwY1731TestIdTwoDelayStatTable,hwY1731TestIdStatisticResetTable,hwY1731MaxTestId for multiflow mib"
---            REVISION     "201304011045Z"        
---            DESCRIPTION  "V1.08, hwY1731ServiceType add unbind value"
---            REVISION     "201207030000Z"        
---            DESCRIPTION  "V1.07, add hwY1731OneDelayPacketSize, hwY1731TwoDelayPacketSize"
---            REVISION     "2012050240000Z"        
---            DESCRIPTION  "V1.07, add hwY1731LckDefect, hwY1731LckDefectCleared"
---            REVISION     "201202080000Z"        
---            DESCRIPTION  "V1.07, add hwY1731TwoDelayUnresponsivePacketCount leaf node for HK-GAN y1731 statistics"
---            REVISION     "201201300000Z"        
---            DESCRIPTION  "V1.06, add hwDot3ahEfmInterval leaf node for efm interval configuration"  
---            REVISION     "201109090000Z"        
---            DESCRIPTION  "V1.05, add hwY1731AisExceedMaxPktNumCleared leaf node for AIS"
---            REVISION     "201109090000Z"        
---            DESCRIPTION  "V1.05, add hwY1731AisMaxPktNum leaf node for AIS"
---            REVISION     "201109090000Z"        
---            DESCRIPTION  "V1.05, add hwY1731AisExceedMaxPktNum leaf node for AIS"
---            REVISION     "201109050000Z"        
---            DESCRIPTION  "V1.05, add hwY1731SingleLossLocalMax, hwY1731SingleLossLocalMin, hwY1731SingleLossLocalAvg, 
---                      hwY1731SingleLossRemoteMax, hwY1731SingleLossRemoteMin, hwY1731SingleLossRemoteAvg,
---                      hwY1731OneDelayStatisticMax, hwY1731OneDelayStatisticMin, hwY1731OneDelayStatisticAvg, 
---                      hwY1731TwoDelayStatisticMax, hwY1731TwoDelayStatisticMin, hwY1731TwoDelayStatisticAvg"
---            REVISION     "201105230000Z"        
---            DESCRIPTION  "V1.05, add hwDot1agCfmMdFormatName, hwDot1agCfmMaFormat, hwDot1agCfmMaFormatName for new 1ag MD/MA format support"      
---            REVISION     "201105110000Z"        
---            DESCRIPTION  "V1.05, add  hwDot1agCfmUnexpectedMEGLevel, 
---                          hwDot1agCfmUnexpectedMEGLevelCleared, hwDot1agCfmMismerge, hwDot1agCfmMismergeCleared, 
---                          hwDot1agCfmUnexpectedMEP, hwDot1agCfmUnexpectedMEPCleared, hwDot1agCfmUnexpectedPeriod, 
---                          hwDot1agCfmUnexpectedPeriodCleared, hwDot1agCfmUnexpectedMAC, hwDot1agCfmUnexpectedMACCleared, 
---                          hwDot1agCfmLOC, hwDot1agCfmLOCCleared, hwDot1agCfmExceptionalMACStatusfor new 1ag traps support"
---            REVISION     "201104210000Z"        
---            DESCRIPTION  "V1.05, add hwY1731AisVlanConfigTable table for ais vlan configuration"
---            REVISION     "201103230000Z"
---            DESCRIPTION  "V1.05, add hwDot3ahEfmLoopbackFailed, hwY1731AisDefectAlarm, hwY1731AisDefectAlarmRecovery trap node for PTN6900"
---            REVISION     "201102130000Z"        
---            DESCRIPTION  "V1.04, add hwDot3ahEfmHoldUpTime leaf node for efm holdup timer configuration"
---            REVISION     "201012040000Z"        
---            DESCRIPTION  "V1.03, add hwY1731ResetStatistic8021pValue leaf nodes for Y1731 COS 
---                          statistic configuration"
---            REVISION     "201011120000Z"        
---            DESCRIPTION  "V1.02, add hwY1731SingleLossRecv8021pValue and hwY1731OneDelayRecv8021pValue,hwY1731TwoDelayRecv8021pValue 
---                         leaf nodes for Y1731 COS statistic configuration"
---            REVISION     "201011010000Z"        
---            DESCRIPTION  "V1.01, add hwDot3ahEfmTimeout leaf node for efm timeout configuration"
+-- Version:     V2.44
 -- ==================================================================
 
     HUAWEI-ETHOAM-MIB DEFINITIONS ::= BEGIN
@@ -129,7 +30,7 @@
 
 
         hwEthOamMib MODULE-IDENTITY
-            LAST-UPDATED "201708170000Z"        
+            LAST-UPDATED "202205040000Z"        
             ORGANIZATION
                 "Huawei Technologies Co.,Ltd."
             CONTACT-INFO
@@ -140,8 +41,30 @@
                    Website: http://www.huawei.com
                    Email: support@huawei.com
                  "
+            DESCRIPTION  "V2.44, Delete employee ID for this mib."
+            REVISION     "202205040000Z"   
+            DESCRIPTION  "V2.43, Motify hwY1731PwTrunkNonSupport and hwY1731PwTrunkNonSupportResumed node for this mib."
+            REVISION     "202108120000Z"   
+            DESCRIPTION  "V2.42, Add hwY1731PwTrunkNonSupport and hwY1731PwTrunkNonSupportResumed node for this mib."
+            REVISION     "202107170000Z"    
             DESCRIPTION
                 "Ethernet OAM MIB"
+            -- Revision history
+              REVISION     "202104250000Z"    
+              DESCRIPTION  "V2.41, Modify the value of hwY1731OneDelayInterval and hwY1731TwoDelayInterval."
+              REVISION     "202104210000Z"    
+              DESCRIPTION  "V2.40, Delete comment."
+              REVISION     "201901140000Z"    
+              DESCRIPTION  "V2.39, Modify the description of hwY1731OneDelayInterval."
+              REVISION     "201812210000Z"    
+              DESCRIPTION  "V2.38, Modify the value of hwY1731OneDelayInterval and hwY1731TwoDelayInterval."
+              REVISION     "201809290000Z"    
+              DESCRIPTION  "V2.37, Modify the description of hwDot1agCfmVersion, hwDot1agCfmMdFormat, hwDot1agCfmMdMhfCreation, hwDot1agCfmMdMhfIdPermission, hwDot1agCfmMaMapType, hwDot1agCfmMaMapL2vcType, hwDot1agCfmMaCcmInterval, hwDot1agCfmMaFormat, hwDot1agCfmMepDirection, hwDot1agCfmRMepStateIsUp, hwDot1agCfmMacTraceResult, hwDot1agCfmGmacTraceServiceType, hwDot1agCfmGmacTraceL2vcType, hwDot1agCfmGmacTraceResult, hwDot1agCfmMPAddressModel, hwDot3ahEfmOperStatus, hwDot3ahEfmMode, hwDot3ahEfmPeerMode, 
+hwDot3ahEfmLoopbackStatus, hwDot3ahEfmLoopbackIgnoreRx, hwDot3ahEfmEventLogLocation, hwDot3ahEvrrpCpuState, hwY1731PwMeasureMode, hwY1731ServiceType, hwY1731SingleLossInterval, hwY1731OneDelayInterval, hwY1731TwoDelayInterval, 
+hwY1731AisSendInterval, hwY1731TestIdQueuePriority, hwY1731TestIdSingleEndedLMSendInterval, hwY1731TestIdOneWayDMSendInterval, hwY1731TestIdTwoWayDMSendInterval, hwY1731TestIdSingleSynEndedLMSendInterval, hwY1731ResetStatisticType, 
+hwY1731SingleLossStatisticGatherInterval, hwY1731StatisticTrapLogType, hwY1731TestIdResetStatisticType, hwY1731TestIdStatTrapLogType."
+              REVISION     "201801160000Z"    
+              DESCRIPTION  "V2.36, Modify the description of hwDot3ahEfmThresholdEvent,hwDot3ahEfmNonThresholdEvent,hwDot3ahEfmRemoteDyingGaspEvent,hwDot3ahEfmNonThresholdRecovery,hwCfmVlanOnewayDelay,hwCfmVlanOnewayDelayRecovery,hwCfmVlanTwowayDelay,hwCfmVlanTwowayDelayRecovery,hwDot3ahEfmLoopbackFailed,hwY1731AisDefectAlarm,hwY1731AisDefectAlarmRecovery,hwDot1agCfmUnexpectedMEGLevel,hwDot1agCfmUnexpectedMEGLevelCleared,hwDot1agCfmMismerge,hwDot1agCfmMismergeCleared,hwDot1agCfmUnexpectedMEP,hwDot1agCfmUnexpectedMEPCleared,hwDot1agCfmUnexpectedPeriod,hwDot1agCfmUnexpectedPeriodCleared,hwDot1agCfmUnexpectedMAC,hwDot1agCfmUnexpectedMACCleared,hwDot1agCfmLOC,hwDot1agCfmLOCCleared,hwDot1agCfmExceptionalMACStatus,hwDot1agCfmExceptionalMACStatusCleared,hwDot1agCfmRDI,hwDot1agCfmRDICleared,hwY1731AisExceedMaxPktNum,hwY1731AisExceedMaxPktNumCleared,hwY1731LckDefect,hwY1731LckDefectCleared,hwY1731Statistic,hwY1731StatisticClear,hwY1731TunnelNonSupport,hwY1731TunnelNonSupportResumed."
               REVISION     "201708170000Z"    
               DESCRIPTION  "V2.35, Modify the description of hwDot3ahEfmNonThresholdRecovery,hwDot1agCfmUnexpectedMEP,hwDot1agCfmUnexpectedPeriod,hwDot1agCfmUnexpectedMACCleared,hwDot1agCfmLOC,hwDot1agCfmLOCCleared,hwY1731AisExceedMaxPktNumCleared."
               REVISION     "201705090000Z"    
@@ -159,7 +82,7 @@
               REVISION     "201511270000Z"    
               DESCRIPTION  "V2.29, Add hwY1731TunnelNonSupport, hwY1731TunnelNonSupportResumed leaf node for vpls over gre."
               REVISION     "201504240000Z"    
-	      DESCRIPTION  "V2.28, Add hwDot1agCfmGmacTraceTable, hwDot1agCfmGmacTraceReplyTable, hwDot1agCfmGmacTraceEnabled leaf node for Gmac Trace."
+              DESCRIPTION  "V2.28, Add hwDot1agCfmGmacTraceTable, hwDot1agCfmGmacTraceReplyTable, hwDot1agCfmGmacTraceEnabled leaf node for Gmac Trace."
               REVISION     "201503030000Z"    
               DESCRIPTION  "V2.27, Add hwY1731TestIdQueuePriority leaf node in hwY1731TestIdTable."
               REVISION     "201501150000Z"    
@@ -182,26 +105,26 @@
               REVISION     "201406030000Z"        
               DESCRIPTION  "V2.18, Add hwY1731OneDelayOnDemandStartTime, hwY1731TwoDelayOnDemandStartTime, hwY1731SingleLossOnDemandStartTime,
                                              hwY1731TestIdSingleLossOnDemandStartTime, hwY1731TestIdOneDelayOnDemandStartTime, hwY1731TestIdTwoDelayOnDemandStartTime"
-		 REVISION     "201405060000Z"
-		 DESCRIPTION  "V2.17, Modify the description of hwY1731LckExceedThreshold, hwY1731LckExceedThresholdRecovery"
-		 REVISION     "201404260000Z"
-		 DESCRIPTION  "V2.16, Add hwY1731LckExceedThreshold, hwY1731LckExceedThresholdRecovery"
-                 REVISION     "201404090000Z"  
-                 DESCRIPTION  "support on-demand OAM config 802.1p. Add hwY1731SingleLossStatistic8021pValue, 
-                                                hwY1731OneDelayStatistic8021pValue, hwY1731TwoDelayStatistic8021pValue"
-                 REVISION     "201312040000Z"  
-                 DESCRIPTION  "extended  DM statistical data to 64bit, added the following nodes:
+              REVISION     "201405060000Z"
+              DESCRIPTION  "V2.17, Modify the description of hwY1731LckExceedThreshold, hwY1731LckExceedThresholdRecovery"
+              REVISION     "201404260000Z"
+              DESCRIPTION  "V2.16, Add hwY1731LckExceedThreshold, hwY1731LckExceedThresholdRecovery"
+              REVISION     "201404090000Z"  
+              DESCRIPTION  "V2.15, support on-demand OAM config 802.1p. Add hwY1731SingleLossStatistic8021pValue, 
+                                           hwY1731OneDelayStatistic8021pValue, hwY1731TwoDelayStatistic8021pValue"
+              REVISION     "201312040000Z"  
+              DESCRIPTION  "V1.10, extended  DM statistical data to 64bit, added the following nodes:
                                                 hwCfmVlanOneDelayTrapLogDelayValueHigh, hwCfmVlanOneDelayTrapLogDelayValueLow, 
                                                 hwCfmVlanOneDelayRecoveryTrapLogDelayValueHigh, hwCfmVlanOneDelayRecoveryTrapLogDelayValueLow, 
                                                 hwCfmVlanTwoDelayTrapLogDelayValueHigh, hwCfmVlanTwoDelayTrapLogDelayValueLow,
                                                 hwY1731StatisticTrapLogValueHigh, hwY1731StatisticTrapLogValueLow, 
                                                 hwCfmVlanTwoDelayRecoveryTrapLogDelayValueHigh, hwCfmVlanTwoDelayRecoveryTrapLogDelayValueLow"
-                 REVISION     "201310070000Z"  
-                 DESCRIPTION  "modified for multiflow mib"
-                 REVISION     "201304011045Z"
-                 DESCRIPTION  "modified by 00145247"
-                 REVISION     "201302061102Z"
-                 DESCRIPTION  "modified by 00218832"
+              REVISION     "201310070000Z"  
+              DESCRIPTION  "V1.09, modified for multiflow mib"
+              REVISION     "201304011045Z"
+              DESCRIPTION  "V1.08, modified"
+              REVISION     "201302061102Z"
+              DESCRIPTION  "V1.07, modified"
 
             ::= { hwEthOam 1 }
 
@@ -396,9 +319,9 @@
             DESCRIPTION
                 "
                 This object indicates the supported CFM version.
-                The value of this object can be:
-                  draft: indicates IEEE 802.1ag Draft 7.
-                  standard: indicates IEEE Standard 802.1ag-2007.
+                Options:
+                1. draft7(1) -indicates IEEE 802.1ag Draft 7.
+                2. standard(2) -indicates IEEE Standard 802.1ag-2007.
                 "
             ::= { hwEthOam1ag 2 }
 
@@ -499,7 +422,12 @@
             DESCRIPTION
                 "
                 This object indicates the format of the MD name.
-                By default, the value is string.
+                Options:
+                1. noMdName(1)   -indicates that CCM packets have no maintenance domain name.
+                2. dns(2)        -indicates that the maintenance domain name is CCM packets DNS name.
+                3. macAddress(3) -indicates that the maintenance domain name is MAC and 2-octet integer (H-H-H:U<0-65535>, 0001-0001-0001:1 for example).
+                4. string(4)     -indicates that the maintenance domain name is in the string format.
+                                 By default, the value is string.
                 "
             DEFVAL { string }
             ::= { hwDot1agCfmMdEntry 2 }
@@ -549,12 +477,12 @@
             DESCRIPTION
                 "
                 This object indicates whether the management entity can create MIPs for the MD.
-                The value of this object can be:
-                  defMHFnone: indicates that the MIPs are not automatically created.
-                  defMHFdefault: indicates that the management entity automatically
-                                 creates MIPs based on certain rules.
-                  defMHFexplicit: indicates that the management entity automatically
-                                  creates MIPs based on certain rules.
+                Options:
+                1. defMHFnone(1)     -indicates that the MIPs are not automatically created.
+                2. defMHFdefault(2)  -indicates that the management entity automatically
+                                     creates MIPs based on certain rules.
+                3. defMHFexplicit(3) -indicates that the management entity automatically
+                                     creates MIPs based on certain rules.
                 By default, the value is defMHFnone.
                 "
             DEFVAL { defMHFnone }
@@ -575,18 +503,18 @@
             DESCRIPTION
                 "
                 This object indicates what is to be included in the Sender ID TLV
-                transmitted by MPs configured in the MD. The value of this object
-                can be:
-                  sendIdNone: indicates that the Sender ID TLV is not to be sent.
-                  sendIdChassis: indicates that the Sender ID TLV to be sent contains
-                                 the chassis ID information.
-                  sendIdManage: indicates that the Sender ID TLV to be sent contains
-                                management address information.
-                  sendIdChassisManage: indicates that the Sender ID TLV to be sent
-                                       contains both chassis ID information and
-                                       management address information.
-                  sendIdDefer: indicates that the contents of the Sender ID TLV to be
-                               sent are determined by the MD management entity.
+                transmitted by MPs configured in the MD. 
+                Options:
+                1. sendIdNone(1)          -indicates that the Sender ID TLV is not to be sent.
+                2. sendIdChassis(2)       -indicates that the Sender ID TLV to be sent contains
+                                          the chassis ID information.
+                3. sendIdManage(3)        -indicates that the Sender ID TLV to be sent contains
+                                          management address information.
+                4. sendIdChassisManage(4) -indicates that the Sender ID TLV to be sent
+                                          contains both chassis ID information and
+                                          management address information.
+                5. sendIdDefer(5)         -indicates that the contents of the Sender ID TLV to be
+                                          sent are determined by the MD management entity.
                 By default, the value is sendIdDefer.
                 "
             DEFVAL { sendIdDefer }
@@ -609,7 +537,6 @@
                 responsibility for each Maintenance Domain.
                 "
             ::= { hwDot1agCfmMdEntry 7 }
-
 
         hwDot1agCfmMdRowStatus OBJECT-TYPE
             SYNTAX RowStatus
@@ -738,12 +665,12 @@
             DESCRIPTION
                 "
                 This object indicates what is associated with the MA.
-                The value of this object can be:
-                  mapVlan: indicates that a VLAN is associated with the current MA.
-                  mapVsi: indicates that a VSI is associated with the current MA.
-                  mapL2vc: indicates that an L2VC is associated with the current MA.
-                  unbind: indicates that the MA is not associated with any service instance.
-                  mapCcc: indicates that a CCC is associated with the current MA.
+                Options:
+                1. mapVlan(1) -indicates that a VLAN is associated with the current MA.
+                2. mapVsi(2)  -indicates that a VSI is associated with the current MA.
+                3. mapL2vc(3) -indicates that an L2VC is associated with the current MA.
+                4. unbind(4)  -indicates that the MA is not associated with any service instance.
+                5. mapCcc(5)  -indicates that a CCC is associated with the current MA.
                 By default, the value is unbind.
                 "
             DEFVAL { unbind }
@@ -787,11 +714,11 @@
             DESCRIPTION
                 "
                 This object indicates the encapsulation type of the L2VC associated with the MA.
-                The value of this object can be:
-                  invalid: indicates that no display shows that the L2VC is associated
-                           with the current MA.
-                  l2vcRaw: indicates that the VLAN tag is not encapsulated into the packet.
-                  l2vcTagged: indicates that the VLAN tag is encapsulated into the packet.
+                Options:
+                1. invalid(1)    -invalid: indicates that no display shows that the L2VC is associated
+                                 with the current MA.
+                2. l2vcRaw(2)    -indicates that the VLAN tag is not encapsulated into the packet.
+                3. l2vcTagged(3) -indicates that the VLAN tag is encapsulated into the packet.
                 By default, the value is invalid.
                 "
             DEFVAL { invalid }
@@ -831,17 +758,18 @@
             DESCRIPTION
                 "
                 This object indicates the interval for an MEP in the MA to send
-                or probe CCMs. The value of this object can be:
-                  3.3 milliseconds
-                  10 milliseconds
-                  20 milliseconds
-                  30 milliseconds
-                  50 milliseconds
-                  100 milliseconds
-                  1 second
-                  10 seconds
-                  1 minute
-                  10 minutes
+                or probe CCMs. 
+                Options:
+                1. interval10ms(1)    -10 milliseconds
+                2. interval20ms(2)    -20 milliseconds
+                3. interval30ms(3)    -30 milliseconds
+                4. interval50ms(4)    -50 milliseconds
+                5. interval100ms(5)   -100 milliseconds
+                6. interval1s(6)      -1 second
+                7. interval10s(7)     -10 seconds
+                8. interval3Dot3ms(8) -3.3 milliseconds
+                9. interval1min(9)    -1 minute
+                10. interval10min(10) -10 minutes
                 By default, the value is 1 second.
                 "
             REFERENCE
@@ -904,8 +832,9 @@
             DESCRIPTION
                 "
                 This object indicates the format of the MA name.
-                string: indicates that the format of the MA name is string.
-                icc-based: indicates that the format of the MA name is ICC-based.
+                Options:
+                1. string(2)    -indicates that the format of the MA name is string.
+                2. iccBased(32) -indicates that the format of the MA name is ICC-based.
                 By default, the value is string.
                 "
             DEFVAL { string }
@@ -1089,15 +1018,15 @@
                 "
                 This object indicates the direction in which the MEP sends the 802.1ag
                 protocol packets.
-                The value of this object can be:
-                  invalid: indicates the invalid value.
-                  dirInward: indicates that the 802.1ag protocol packets sent by an
+                Options:
+                1. invalid(1)    -indicates the invalid value.
+                2. dirInward(2)  -indicates that the 802.1ag protocol packets sent by an
                              inward-facing MEP are transmitted through all the interfaces
                              in the VLAN associated with the current MA (except the
                              interface where the MEP resides). That is, an inward-facing
                              MEP broadcasts the 802.1ag protocol packets in the VLAN
                              associated with the current MA.
-                  dirOutward: indicates that the 802.1ag protocol packets sent by an
+                3. dirOutward(3) -indicates that the 802.1ag protocol packets sent by an
                               outward-facing MEP are transmitted directly through the
                               interface on which the MEP resides.
                 By default, the value is invalid.
@@ -1243,10 +1172,11 @@
             STATUS current
             DESCRIPTION
                 "
-                This object indicates the CFM status. The value can be:
-                  up: indicates that the CFM status is Up.
-                  down: indicates that the CFM status is Down.
-                  invalid: indicates that the CFM status is not enabled.
+                This object indicates the CFM status. 
+                Options:
+                1. up(1)      -indicates that the CFM status is Up.
+                2. down(2)    -indicates that the CFM status is Down.
+                3. invalid(3) -indicates that the CFM status is not enabled.
                 "
             ::= { hwDot1agCfmRMepEntry 4 }
 
@@ -1900,6 +1830,10 @@
             DESCRIPTION
                 "
                 This object indicates the result of the MAC trace operation.
+                Options:
+                1. invalid(1)    -indicates that the MAC trace operation is invalid.
+                2. successful(2) -indicates that the MAC trace operation succeeds.
+                3. failed(3)     -indicates that the MAC trace operation fails.
                 "
             ::= { hwDot1agCfmMacTraceEntry 13 }
 
@@ -2348,9 +2282,9 @@
 		DESCRIPTION
 			"
 			This object indicates the service type associated with the gmac trace.
-			The value of this object can be:
-			  vlan: indicates that a VLAN is associated with the gmac trace.
-			  invalid: indicates that no service type is specified for the gmac trace.
+            Options:
+			1. vlan(1)      -indicates that a VLAN is associated with the gmac trace.
+			2. invalid(255) -indicates that no service type is specified for the gmac trace.
 			By default, the value is invalid.
 			"
 		::= { hwDot1agCfmGmacTraceEntry 4}
@@ -2400,11 +2334,11 @@
 		DESCRIPTION
 			"
 			This object indicates the encapsulation type of the L2VC associated with the gmac trace.
-			The value of this object can be:
-			  invalid: indicates that no display shows that the L2VC is associated
-			           with the current gmac trace.
-			  l2vcRaw: indicates that the VLAN tag is not encapsulated into the packet.
-			  l2vcTagged: indicates that the VLAN tag is encapsulated into the packet.
+            Options:
+			1. invalid(1)    -indicates that no display shows that the L2VC is associated
+			                 with the current gmac trace.
+			2. l2vcRaw(2)    -indicates that the VLAN tag is not encapsulated into the packet.
+			3. l2vcTagged(3) -indicates that the VLAN tag is encapsulated into the packet.
 			By default, the value is invalid.
 			"
 		DEFVAL { invalid }
@@ -2502,6 +2436,10 @@
 		DESCRIPTION
 			"
 			This object indicates the result of the GMAC trace operation.
+            Options:
+            1. invalid(1)    -indicates that the GMAC trace operation is invalid.
+            2. successful(2) -indicates that the GMAC trace operation succeeds.
+            3. failed(3)     -indicates that the GMAC trace operation fails.
 			"
 		::= { hwDot1agCfmGmacTraceEntry 16 }
 
@@ -2723,9 +2661,9 @@
             DESCRIPTION
                 "
                 This object indicates the MP address model of the CFM.
-                The value of this object can be:
-                  bridge: indicates bridge MAC MP address model.
-                  individual: indicates individual MP address model.
+                Options:
+                1. bridge(1)     -indicates bridge MAC MP address model.
+                2. individual(2) -indicates individual MP address model.
                 "
             ::= { hwEthOam1ag 101 }            
 
@@ -2915,6 +2853,18 @@
                 "At initialization and failure conditions, two OAM entities on
                 the same full-duplex Ethernet link begin a discovery phase to
                 determine what OAM capabilities may be used on that link.
+                Options:
+                1. disabled(1) -indicates that the type of the EfmOperStatus is disabled.
+                2. linkFault(2) -indicates that the type of the EfmOperStatus is linkFault.
+                3. passiveWait(3) -indicates that the type of the EfmOperStatus is passiveWait.
+                4. activeSendLocal(4) -indicates that the type of the EfmOperStatus is activeSendLocal.
+                5. sendLocalAndRemote(5) -indicates that the type of the EfmOperStatus is sendLocalAndRemote.
+                6. sendLocalAndRemoteOk(6) -indicates that the type of the EfmOperStatus is sendIdNone.
+                7. oamPeeringLocallyRejected(7) -indicates that the type of the EfmOperStatus is sendLocalAndRemoteOk.
+                8. oamPeeringRemotelyRejected(8) -indicates that the type of the EfmOperStatus is oamPeeringRemotelyRejected.
+                9. operational(9) -indicates that the type of the EfmOperStatus is operational.
+                10. nonOperHalfDuplex(10) -indicates that the type of the EfmOperStatus is nonOperHalfDuplex.
+                
                 "
             REFERENCE
                 "[802.3ah], 30.3.6.1.4, 30.3.6.1.10, 30.3.6.1.11"
@@ -2933,6 +2883,9 @@
                 "This object configures the mode of OAM operation for this
                 Ethernet like interface.  OAM on Ethernet interfaces may be in
                 'active' mode or 'passive' mode.
+                Options:
+                1. active(1)  -indicates that OAM on Ethernet interfaces is in active mode.
+                2. passive(2) -indicates that OAM on Ethernet interfaces is in passive mode.
                 "
             REFERENCE
                 "[802.3ah], 30.3.6.1.3"
@@ -3168,11 +3121,15 @@
                 Information OAMPDU received with a Local Information TLV.  The
                 mode of the peer can be determined from the Configuration
                 field in the Local Information TLV of the last Information
-                OAMPDU received from the peer.  The value is unknown(3)
-                whenever no Local Information TLV has been received.  The
-                values of active(1) and passive(2) are returned when a Local
+                OAMPDU received from the peer.  
+                Options:
+                1. active(1)  -The value of active(1)is returned when a Local
                 Information TLV has been received indicating the peer is in
-                active or passive mode, respectively.
+                active mode.
+                2. passive(2) -The value of passive(2)is returned when a Local
+                Information TLV has been received indicating the peer is in
+                passive mode.
+                3. unknown(3) -The value is unknown(3) whenever no Local Information TLV has been received.
                 "
             REFERENCE
                 "[802.3ah], 30.3.6.1.7."
@@ -3331,6 +3288,13 @@
                 The values initiatingLooopback(2) and terminatingLoopback(4)
                 can be read or written.  The other values can only be read -
                 they can never be written.
+                Options:
+                1. noLoopback(1) -indicates that the loopback status of the OAM entity is noLoopback.
+                2. initiatingLoopback (2) -indicates that the loopback status of the OAM entity is initiatingLoopback.
+                3. remoteLoopback(3) -indicates that the loopback status of the OAM entity is remoteLoopback.
+                4. terminatingLoopback(4) -indicates that the loopback status of the OAM entity is terminatingLoopback.
+                5. localLoopback(5) -indicates that the loopback status of the OAM entity is localLoopback.
+                6. unknown(6) -indicates that the loopback status of the OAM entity is unknown.
                 "
             REFERENCE
                 "[802.3ah], REFERENCE 57.2.11, 30.3.61.14,
@@ -3350,10 +3314,11 @@
                 "Since OAM loopback is a disruptive operation (user traffic
                 does not pass), this attribute provides a mechanism to provide
                 controls over whether received OAM loopback commands are
-                processed or ignored.  When the value is ignore(1), received
-                loopback commands are ignored.  When the value is process(2),
-                OAM loopback commands are processed.  The default value is to
-                process loopback commands (process(2)).
+                processed or ignored.  
+                Options:
+                1. ignore(1)  -When the value is ignore(1), received loopback commands are ignored.
+                2. process(2) -When the value is process(2), OAM loopback commands are processed.
+                The default value is to process loopback commands.
                 "
             REFERENCE
                 "[802.3ah], REFERENCE 57.2.11, 30.3.61.14,
@@ -4511,6 +4476,9 @@
             DESCRIPTION
                 "Whether this event occurred locally (local(1)), or was
                 received from the OAM peer via Ethernet OAM (remote(2)).
+                Options:
+                1. local(1)  -indicates that an EfmEvent occurred locally.
+                2. remote(2) -indicates that an EfmEvent was received from the OAM peer through Ethernet OAM.
                 "
             ::= { hwDot3ahEfmEventLogEntry 5 }
 
@@ -4737,7 +4705,6 @@
             ::= { hwDot3ahEfmManagerEntry 2 }
 
 -- Ethernet OAM EVRRP group
--- add by liujin 64168 2008-9-25
 
       hwDot3ahEvrrpTable OBJECT-TYPE
         SYNTAX      SEQUENCE OF HwDot3ahEvrrpEntry
@@ -4782,13 +4749,11 @@
         DESCRIPTION
           "This object indicates the state in the OAMPDU which sended by
           the peer interface.
-
-          If it is master(1), EFM will make the link work as the master
-          state. And if it is slave(2), EFM will make the link works as
-          the slave chain link.
-
-          The default state is unknown(3). That means the peer interface
-          didn't send any OAMPDU which contains the state of link status.
+          Options:
+          1. master(1)  -If it is master(1), EFM will make the link work as the master state.
+          2. slave(2)   -if it is slave(2), EFM will make the link works as the slave chain link.
+          3. unknown(3) -That means the peer interface didn't send any OAMPDU which contains the state of link status.
+          The default state is unknown(3).
           "
         ::= { hwDot3ahEvrrpEntry 1 }
 
@@ -5222,23 +5187,7 @@
                 hwDot3ahEfmEventLogEventTotal }
             STATUS current
             DESCRIPTION
-                "A hwDot3ahEfmThresholdEvent notification is sent when a local or
-                remote threshold crossing event is detected.  A local
-                threshold crossing event is detected by the local entity,
-                while a remote threshold crossing event is detected by the
-                reception of an Ethernet OAM Event Notification OAMPDU
-                indicating a threshold event.
-
-                This notification should not be sent more than once per
-                second.
-
-                The OAM entity can be derived from extracting the ifIndex from
-                the variable bindings.  The objects in the notification
-                correspond to the values in a row instance of in the
-                hwDot3ahEfmEventLogTable.
-
-                The management entity should periodically check
-                hwDot3ahEfmEventLogTable to detect any missed events."
+                "This object indicates that an hwDot3ahEfmThresholdEvent notification is sent when a local or remote threshold-crossing event is detected. A local threshold-crossing event is detected by the local entity, whereas a remote threshold-crossing event is detected through the reception of an Ethernet OAM Event Notification OAMPDU indicating a threshold event. This notification should not be sent more than once per second. The OAM entity can be obtained from the ifIndex in the variable bindings. The objects in the notification correspond to the values in a row instance of in the hwDot3ahEfmEventLogTable. The management entity should periodically check hwDot3ahEfmEventLogTable to detect any missed events."
             ::= { hwEthOamTraps 4 }
 
 
@@ -5247,22 +5196,7 @@
 
             STATUS current
             DESCRIPTION
-                "A hwDot3ahEfmNonThresholdEvent notification is sent when a local
-                or remote non-threshold crossing event is detected.  A local
-                event is detected by the local entity, while a remote event is
-                detected by the reception of an Ethernet OAM Event
-                Notification OAMPDU indicating a non-threshold crossing event.
-
-                This notification should not be sent more than once per
-                second.
-
-                The OAM entity can be derived from extracting the ifIndex from
-                the variable bindings.  The objects in the notification
-                correspond to the values in a row instance of the
-                hwDot3ahEfmEventLogTable.
-
-                The management entity should periodically check
-                hwDot3ahEfmEventLogTable to detect any missed events."
+                "This object indicates that an hwDot3ahEfmNonThresholdEvent notification is sent when a local or remote non-threshold-crossing event is detected. A local event is detected by the local entity, whereas a remote event is detected through the reception of an Ethernet OAM Event Notification OAMPDU indicating a non-threshold-crossing event. This notification should not be sent more than once per second. The OAM entity can be obtained from the ifIndex in the variable bindings. The objects in the notification correspond to the values in a row instance of the hwDot3ahEfmEventLogTable. The management entity should periodically check hwDot3ahEfmEventLogTable to detect any missed events."
             ::= { hwEthOamTraps 5 }
 
         hwDot3ahEfmRemoteDyingGaspEvent NOTIFICATION-TYPE
@@ -5270,17 +5204,14 @@
                  }
             STATUS current
             DESCRIPTION
-                "A hwDot3ahEfmRemoteDyingGaspEvent notification is sent when a remote
-                Dying-Gasp event is detected. A remote event is detected by
-                the reception of an Ethernet OAM Event Notification OAMPDU
-                indicating a Dying-Gasp event."
+                "This object indicates that an hwDot3ahEfmRemoteDyingGaspEvent notification is sent when a remote Dying-Gasp event is detected. A remote event is detected through the reception of an Ethernet OAM Event Notification OAMPDU indicating a Dying-Gasp event."
             ::= { hwEthOamTraps 8 }
 
         hwDot3ahEfmNonThresholdRecovery  NOTIFICATION-TYPE
             OBJECTS { hwDot3ahEfmEventLogTimestamp, hwDot3ahEfmEventLogOui, hwDot3ahEfmEventLogType, hwDot3ahEfmEventLogLocation}
             STATUS current
             DESCRIPTION
-                "The non-threshold-crossing event is cleared."
+                "This object indicates that the non-threshold-crossing event is cleared."
             ::= { hwEthOamTraps 17 }
 
         hwCfmVlanOnewayDelay NOTIFICATION-TYPE
@@ -5290,7 +5221,7 @@
             STATUS current
             DESCRIPTION
                 "
-                In the VLAN networking, the oneway delay exceeded the trap threshold.
+                This object indicates that the one-way delay exceeds the trap threshold in the VLAN networking.
                 "
             ::= { hwEthOamTraps 23 }
 
@@ -5301,7 +5232,7 @@
             STATUS current
             DESCRIPTION
                 "
-                In the VLAN networking, the oneway delay fell below the trap threshold.
+                This object indicates that the one-way delay falls below the trap threshold in the VLAN networking.
                 "
             ::= { hwEthOamTraps 24 }
 
@@ -5311,7 +5242,7 @@
             STATUS current
             DESCRIPTION
                 "
-                In the VLAN networking, the twoway delay exceeded the trap threshold.
+                This object indicates that the two-way delay exceeds the trap threshold in the VLAN networking.
                 "
             ::= { hwEthOamTraps 25 }
 
@@ -5325,7 +5256,7 @@
             STATUS current
             DESCRIPTION
                 "
-                In the VLAN networking, the twoway delay fell below the trap threshold.
+                This object indicates that the two-way delay falls below the trap threshold in the VLAN networking.
                 "
             ::= { hwEthOamTraps 26 }
 
@@ -5334,11 +5265,7 @@
             STATUS current
             DESCRIPTION
                 "
-                A hwDot3ahEfmLoopbackFailed notification is sent when failed to start
-                loopback on a interface.
-
-                This notification should not be sent more than once per
-                second.
+                This object indicates that an hwDot3ahEfmLoopbackFailed notification is sent when loopback fails to start on an interface. This notification should not be sent more than once per second.
                 "
             ::= { hwEthOamTraps 29 }
 
@@ -5346,112 +5273,112 @@
             OBJECTS { hwDot1agCfmMdName, hwDot1agCfmMaName, hwDot1agCfmMepIdentifier}
             STATUS current
             DESCRIPTION
-                "AIS status has been entered."
+                "This object indicates that the MEP receives an AIS PDU and enters the faulty state."
             ::= { hwEthOamTraps 30 }
 
         hwY1731AisDefectAlarmRecovery NOTIFICATION-TYPE
             OBJECTS { hwDot1agCfmMdName, hwDot1agCfmMaName, hwDot1agCfmMepIdentifier}
             STATUS current
             DESCRIPTION
-                "AIS status has been existed."
+                "This object indicates that the MEP does not receive an AIS PDU within the AIS PDU timeout period and exits the faulty state."
             ::= { hwEthOamTraps 31 }
 
         hwDot1agCfmUnexpectedMEGLevel NOTIFICATION-TYPE
             OBJECTS { hwDot1agCfmMdName, hwDot1agCfmMaName, hwDot1agCfmMepIdentifier }
             STATUS current
             DESCRIPTION
-                "Indicates a CCM frame with unexpected MEG level."
+                "This object indicates that the MEP receives a CCM with an unexpected MEG level."
             ::= { hwEthOamTraps 32}
             
         hwDot1agCfmUnexpectedMEGLevelCleared NOTIFICATION-TYPE
             OBJECTS { hwDot1agCfmMdName, hwDot1agCfmMaName, hwDot1agCfmMepIdentifier }
             STATUS current
             DESCRIPTION
-                "Indicates resuming from receiving a CCM frame with unexpected MEG level."
+                "This object indicates that the MEP does not receive a CCM with an unexpected MEG level within the CCM timeout period."
             ::= { hwEthOamTraps 33}
             
         hwDot1agCfmMismerge NOTIFICATION-TYPE
             OBJECTS { hwDot1agCfmMdName, hwDot1agCfmMaName, hwDot1agCfmMepIdentifier }
             STATUS current
             DESCRIPTION
-                "Indicates a CCM frame with unexpected MEG ID"
+                "This object indicates that the MEP receives a CCM carrying the correct MEG level but the incorrect MEG ID."
             ::= { hwEthOamTraps 34 }
         
         hwDot1agCfmMismergeCleared NOTIFICATION-TYPE
             OBJECTS { hwDot1agCfmMdName, hwDot1agCfmMaName, hwDot1agCfmMepIdentifier }
             STATUS current
             DESCRIPTION
-                "Indicates resuming from receiving a CCM frame with unexpected MEG ID."
+                "This object indicates that the MEP does not receive a CCM with an unexpected MEG ID within the CCM timeout period."
             ::= { hwEthOamTraps 35 }
             
         hwDot1agCfmUnexpectedMEP NOTIFICATION-TYPE
             OBJECTS { hwDot1agCfmMdName, hwDot1agCfmMaName, hwDot1agCfmMepIdentifier }
             STATUS current
             DESCRIPTION
-                "The MEP received a CCM that has the correct MEG level, correct MEG ID, and unexpected MEP ID."
+                "This object indicates that the MEP receives a CCM that has the correct MEG level, correct MEG ID, and unexpected MEP ID."
             ::= { hwEthOamTraps 36 }
             
         hwDot1agCfmUnexpectedMEPCleared NOTIFICATION-TYPE
             OBJECTS { hwDot1agCfmMdName, hwDot1agCfmMaName, hwDot1agCfmMepIdentifier }
             STATUS current
             DESCRIPTION
-                "Indicates resuming from receiving a CCM frame with unexpected MEP ID."
+                "This object indicates that the MEP does not receive a CCM with an unexpected MEP ID within the CCM timeout period."
             ::= { hwEthOamTraps 37 }
             
         hwDot1agCfmUnexpectedPeriod NOTIFICATION-TYPE
             OBJECTS { hwDot1agCfmMdName, hwDot1agCfmMaName, hwDot1agCfmMepIdentifier, hwDot1agCfmRMepIdentifier }
             STATUS current
             DESCRIPTION
-                "The MEP received a CCM that has the correct MEG level, correct MEG ID, correct MEP ID, and unexpected period."
+                "This object indicates that the MEP receives a CCM that has the correct MEG level, correct MEG ID, correct MEP ID, and unexpected period."
             ::= { hwEthOamTraps 38}
             
         hwDot1agCfmUnexpectedPeriodCleared NOTIFICATION-TYPE
             OBJECTS { hwDot1agCfmMdName, hwDot1agCfmMaName, hwDot1agCfmMepIdentifier, hwDot1agCfmRMepIdentifier }
             STATUS current
             DESCRIPTION
-                "Indicates resuming from receiving a CCM frame with unexpected period."
+                "This object indicates that the MEP does not receive a CCM with an unexpected period within the CCM timeout period."
             ::= { hwEthOamTraps 39 }
             
         hwDot1agCfmUnexpectedMAC NOTIFICATION-TYPE
             OBJECTS { hwDot1agCfmMdName, hwDot1agCfmMaName, hwDot1agCfmMepIdentifier, hwDot1agCfmRMepIdentifier }
             STATUS current
             DESCRIPTION
-                "Indicates a CCM frame with unexpected MAC."
+                "This object indicates that the MEP receives a CCM with an unexpected MAC address."
             ::= { hwEthOamTraps 40 }
             
         hwDot1agCfmUnexpectedMACCleared NOTIFICATION-TYPE
             OBJECTS { hwDot1agCfmMdName, hwDot1agCfmMaName, hwDot1agCfmMepIdentifier, hwDot1agCfmRMepIdentifier }
             STATUS current
             DESCRIPTION
-                "In the CCM timeout period, the MEP did not receive a CCM with the MAC address that is different from the MAC address configured for the RMEP on the local end."
+                "This object indicates that the MEP does not receive a CCM with an unexpected MAC address within the CCM timeout period."
             ::= { hwEthOamTraps 41 }
             
         hwDot1agCfmLOC NOTIFICATION-TYPE
             OBJECTS { hwDot1agCfmMdName, hwDot1agCfmMaName, hwDot1agCfmMepIdentifier, hwDot1agCfmRMepIdentifier }
             STATUS current
             DESCRIPTION
-                "In the CCM timeout period, the MEP did not receive any CCM from the RMEP."
+                "This object indicates that the MEP does not receive any CCM from the RMEP within the CCM timeout period."
             ::= { hwEthOamTraps 42 }
             
         hwDot1agCfmLOCCleared NOTIFICATION-TYPE
             OBJECTS { hwDot1agCfmMdName, hwDot1agCfmMaName, hwDot1agCfmMepIdentifier, hwDot1agCfmRMepIdentifier }
             STATUS current
             DESCRIPTION
-                "In the CCM timeout period, the MEP received n (n is greater than or equal to 3) CCMs from the RMEP (MEP ID = i)."
+                "This object indicates that the MEP receives n (n is greater than or equal to 3) CCMs from the RMEP (MEP ID = i) within the CCM timeout period."
             ::= { hwEthOamTraps 43 }
 
         hwDot1agCfmExceptionalMACStatus NOTIFICATION-TYPE
             OBJECTS { hwDot1agCfmMdName, hwDot1agCfmMaName, hwDot1agCfmMepIdentifier, hwDot1agCfmRMepIdentifier }
             STATUS current
             DESCRIPTION
-                "Indicates the remote MEP is reporting an error status in its Port Status TLV or Interface Status TLV."
+                "This object indicates that the remote MEP is reporting an error status in its Port Status TLV or Interface Status TLV."
             ::= { hwEthOamTraps 44 }
             
         hwDot1agCfmExceptionalMACStatusCleared NOTIFICATION-TYPE
             OBJECTS { hwDot1agCfmMdName, hwDot1agCfmMaName, hwDot1agCfmMepIdentifier, hwDot1agCfmRMepIdentifier }
             STATUS current
             DESCRIPTION
-                "Indicates the remote MEP resumes from an error status indicated in its Port Status TLV or Interface Status TLV."
+                "This object indicates that the remote MEP resumes from an error status indicated in its Port Status TLV or Interface Status TLV."
             ::= { hwEthOamTraps 45 }
 
             
@@ -5459,55 +5386,55 @@
             OBJECTS { hwDot1agCfmMdName, hwDot1agCfmMaName, hwDot1agCfmMepIdentifier, hwDot1agCfmRMepIdentifier }
             STATUS current
             DESCRIPTION
-                "Indicates that MEP receives a CCM frame with the RDI field set."
+                "This object indicates that the MEP receives a CCM with the RDI field set."
             ::= { hwEthOamTraps 46 }
             
         hwDot1agCfmRDICleared NOTIFICATION-TYPE
             OBJECTS { hwDot1agCfmMdName, hwDot1agCfmMaName, hwDot1agCfmMepIdentifier, hwDot1agCfmRMepIdentifier }
             STATUS current
             DESCRIPTION
-                "Indicates that MEP receives a CCM frame with the RDI field cleared."
+                "This object indicates that the MEP receives a CCM with the RDI field cleared."
             ::= { hwEthOamTraps 47 }
 
         hwY1731AisExceedMaxPktNum NOTIFICATION-TYPE
             OBJECTS { hwY1731AisMaxPktNum }
             STATUS current
             DESCRIPTION
-                "Indicates that the number of AIS packets transmitted in one second exceeds the upper limit."
+                "This object indicates that the number of packets sent or received in 1s exceeds the maximum value."
             ::= { hwEthOamTraps 48 }
 
         hwY1731AisExceedMaxPktNumCleared NOTIFICATION-TYPE
             STATUS current
             DESCRIPTION
-                "The number of packets sent or received in 1s fell below the maximum value."
+                "This object indicates that the number of packets sent or received in 1s falls below the maximum value."
             ::= { hwEthOamTraps 49 }
 
         hwY1731LckDefect NOTIFICATION-TYPE
             OBJECTS { hwDot1agCfmMdName, hwDot1agCfmMaName, hwDot1agCfmMepIdentifier}
             STATUS current
             DESCRIPTION
-                "LCK status has been entered."
+                "This object indicates that the MEP enters the LCK faulty state."
             ::= { hwEthOamTraps 50 }
 
         hwY1731LckDefectCleared NOTIFICATION-TYPE
             OBJECTS { hwDot1agCfmMdName, hwDot1agCfmMaName, hwDot1agCfmMepIdentifier}
             STATUS current
             DESCRIPTION
-                "LCK status has been exited."
+                "This object indicates that the MEP exits from the LCK faulty state."
             ::= { hwEthOamTraps 51 }
             
         hwY1731Statistic NOTIFICATION-TYPE
             OBJECTS { hwDot1agCfmMdName, hwDot1agCfmMaName, hwDot1agCfmMepIdentifier, hwY1731StatisticTrapLogValue, hwY1731StatisticTrapLogUpperLimitThreshold, hwY1731StatisticTrapLogLowerLimitThreshold, hwY1731StatisticTrapLogValueHigh, hwY1731StatisticTrapLogValueLow}
             STATUS current
             DESCRIPTION
-                "The Y.1731 statistic value exceeded the upper limit value of the threshold."
+                "This object indicates that the Y.1731 statistic value exceeds the upper threshold."
             ::= { hwEthOamTraps 52 }
             
         hwY1731StatisticClear NOTIFICATION-TYPE
             OBJECTS { hwDot1agCfmMdName, hwDot1agCfmMaName, hwDot1agCfmMepIdentifier, hwY1731StatisticTrapLogValue, hwY1731StatisticTrapLogUpperLimitThreshold, hwY1731StatisticTrapLogLowerLimitThreshold, hwY1731StatisticTrapLogValueHigh, hwY1731StatisticTrapLogValueLow}
             STATUS current
             DESCRIPTION
-                "The Y.1731 statistic value fell below lower limit value of the threshold."
+                "This object indicates that the Y.1731 statistic value falls below the lower threshold."
             ::= { hwEthOamTraps 53 }
 			
         hwY1731LckExceedThreshold NOTIFICATION-TYPE
@@ -5528,14 +5455,14 @@
             OBJECTS { hwDot1agCfmMdName, hwDot1agCfmMaName, hwDot1agCfmMepIdentifier }
             STATUS current
             DESCRIPTION
-                "Y.1731 does not support the current public tunnel."
+                "This object indicates that Y.1731 does not support the current public tunnel."
             ::= { hwEthOamTraps 56 }
 
         hwY1731TunnelNonSupportResumed NOTIFICATION-TYPE
             OBJECTS { hwDot1agCfmMdName, hwDot1agCfmMaName, hwDot1agCfmMepIdentifier }
             STATUS current
             DESCRIPTION
-                "The alarm that Y.1731 does not support the current public tunnel is resumed."
+                "This object indicates that the alarm that Y.1731 does not support the current public tunnel is cleared."
             ::= { hwEthOamTraps 57 }   
 
        hwY1731TestIdStatistic NOTIFICATION-TYPE
@@ -5551,6 +5478,20 @@
             DESCRIPTION
                 "The Y.1731 statistic value fell below lower limit value of the threshold."
             ::= { hwEthOamTraps 59 }
+
+        hwY1731PwTrunkNonSupport NOTIFICATION-TYPE
+            OBJECTS { hwDot1agCfmMdName, hwDot1agCfmMaName, hwDot1agCfmMepIdentifier}
+            STATUS current
+            DESCRIPTION
+                "This object indicates that Y.1731 PW-side frame loss measurement is not supported on an Eth-Trunk interface configured as the PW's public network-side interface."
+            ::= { hwEthOamTraps 60 }
+
+        hwY1731PwTrunkNonSupportResumed NOTIFICATION-TYPE
+            OBJECTS { hwDot1agCfmMdName, hwDot1agCfmMaName, hwDot1agCfmMepIdentifier}
+            STATUS current
+            DESCRIPTION
+                "This object indicates that The alarm that Y.1731 PW-side frame loss measurement is not supported on an Eth-Trunk interface configured as the PW's public network-side interface is cleared."
+            ::= { hwEthOamTraps 61 }   
 
         hwEthOamConformance OBJECT IDENTIFIER ::= { hwEthOamMib 7 }
 
@@ -5739,7 +5680,8 @@
                             hwDot1agCfmUnexpectedPeriodCleared, hwDot1agCfmUnexpectedMAC, hwDot1agCfmUnexpectedMACCleared, hwDot1agCfmLOC, hwDot1agCfmLOCCleared, hwDot1agCfmExceptionalMACStatus, 
                             hwDot1agCfmExceptionalMACStatusCleared, hwDot1agCfmRDI, hwDot1agCfmRDICleared, hwDot3ahEfmLoopbackFailed, hwY1731AisDefectAlarm, hwY1731AisDefectAlarmRecovery, 
                             hwY1731AisExceedMaxPktNum, hwY1731AisExceedMaxPktNumCleared, hwY1731LckDefect, hwY1731LckDefectCleared, hwY1731Statistic, hwY1731StatisticClear,
-			    hwY1731LckExceedThreshold, hwY1731LckExceedThresholdRecovery, hwY1731TunnelNonSupport, hwY1731TunnelNonSupportResumed}
+                            hwY1731LckExceedThreshold, hwY1731LckExceedThresholdRecovery, hwY1731TunnelNonSupport, hwY1731TunnelNonSupportResumed, hwY1731PwTrunkNonSupport,
+                            hwY1731PwTrunkNonSupportResumed}
             STATUS current
             DESCRIPTION
                 "Objects for the Notifications group.
@@ -6191,12 +6133,10 @@
             STATUS current
             DESCRIPTION
                 "This object indicates the PW measure mode.
-                 The value can be:
-                        invalid
-                        symmetry
-                        asymmetry
-                 If MA associates with a VLAN, the value is invalid.
-                 If MA associates with VSI or VLL, the default value is asymmetry.
+                Options:
+                1. invalid(1)   -indicates that the value is invalid if MA is associated with a VLAN.
+                2. symmetry(2)  -indicates that the type of the CfmMdMhfIdPermission is symmetry.
+                3. asymmetry(3) -indicates that the default value is asymmetry if MA is associated with a VSI or VLL.
                 "
             ::= { hwY1731BaseConfigEntry 1 }
 
@@ -6386,11 +6326,13 @@
             STATUS current
             DESCRIPTION
                 "This object indicates the type of service.
-                 The service can be:
-                        vlan
-                        vsi
-                        vll
-                        unbind
+                Options:
+                1. vlan(1)   -indicates that the type of service is vlan.
+                2. vsi(2)    -indicates that the type of service is vsi.
+                3. vll(3)    -indicates that the type of service is vll.
+                4. unknown(4) -indicates that the type of service is unknown.
+                5. unbind(5) -indicates that the type of service is unbind.
+                6. ccc(6) -indicates that the type of service is ccc.
                 "
             ::= { hwY1731ConfigEntry 5 }
 
@@ -6525,6 +6467,11 @@
                     1 second
                     10 seconds
                     30 seconds
+                Options:
+                1. invalid(1)     -invalid value.
+                2. interval1s(2)  -1 second.
+                3. interval10s(3) -10 seconds.
+                4. interval30s(4) -30 seconds.
                 "
             ::= { hwY1731ConfigEntry 16 }
 
@@ -6679,6 +6626,11 @@
                     1 second
                     10 seconds
                     30 seconds
+                Options:
+                1. invalid(1)    -invalid value.
+                2. interval1s(2)    -1 second.
+                3. interval10s(3)    -10 seconds.
+                4. interval30s(4)    -30 seconds.
                 "
             ::= { hwY1731ConfigEntry 28 }
 
@@ -6791,6 +6743,11 @@
                     1 second
                     10 seconds
                     30 seconds
+                Options:
+                1. invalid(1)    -invalid value.
+                2. interval1s(2)    -1 second.
+                3. interval10s(3)    -10 seconds.
+                4. interval30s(4)    -30 seconds.
                 "
             ::= { hwY1731ConfigEntry 37 }
 
@@ -7014,10 +6971,10 @@
             STATUS current
             DESCRIPTION
                 "This object indicates the interval of the sent AIS frames.
-                 The value can be:
-                    1 second
-                    60 seconds
-                 The default value is 1 second.
+                Options:
+                1. interval1s(1)  -1 second.
+                2. interval60s(2) -60 seconds.
+                The default value is 1 second.
                 "
             DEFVAL { interval1s }
             ::= { hwY1731AisEntry 3 }
@@ -7821,6 +7778,16 @@
             DESCRIPTION
                 "This object indicates the queue priority.
                  The queue priority can be (1..9).
+                Options:
+                1. invalid(1) -indicates that the queue priority is invalid.
+                2. af1(2)     -indicates that the queue priority is af1.
+                3. af2(3)     -indicates that the queue priority is af2.
+                4. af3(4)     -indicates that the queue priority is af3.
+                5. af4(5)     -indicates that the queue priority is af4.
+                6. be(6)      -indicates that the queue priority is be.
+                7. cs6(7)     -indicates that the queue priority is cs6.
+                8. cs7(8)     -indicates that the queue priority is cs7.
+                9. ef(9)      -indicates that the queue priority is ef.
                 "
             ::= { hwY1731TestIdEntry 17 }
        
@@ -7877,11 +7844,12 @@
             STATUS current
             DESCRIPTION
                 "This object indicates the interval at which LMM frames are sent.
-                 the value can be:
-                    1 second
-                    10 seconds
-                    30 seconds
-                    60 seconds
+                Options:
+                1. invalid(1)     -invalid value.
+                2. interval1s(2)  -1 second.
+                3. interval10s(3) -10 seconds.
+                4. interval30s(4) -30 seconds.
+                5. interval60s(5) -60 seconds.
                 "
             ::= { hwY1731TestIdSingleEndedLMSendEntry 2 }
 
@@ -7998,11 +7966,12 @@
             STATUS current
             DESCRIPTION
                 "This object indicates the interval at which 1DM frames are sent.
-                 the value can be:
-                    1 second
-                    10 seconds
-                    30 seconds
-                    60 seconds
+                Options:
+                1. invalid(1)     -invalid value.
+                2. interval1s(2)  -1 second.
+                3. interval10s(3) -10 seconds.
+                4. interval30s(4) -30 seconds.
+                5. interval60s(5) -60 seconds.
                 "
             ::= { hwY1731TestIdOneWayDMSendEntry 2 }
 
@@ -8148,6 +8117,13 @@
                     30 seconds
                     60 seconds
                     15 seconds
+                Options:
+                1. invalid(1)     -invalid value.
+                2. interval1s(2)  -1 second.
+                3. interval10s(3) -10 seconds.
+                4. interval30s(4) -30 seconds.
+                5. interval60s(5) -60 seconds.
+                6. interval15s(6) -15 seconds.
                 "
             ::= { hwY1731TestIdTwoWayDMSendEntry 2 }
 
@@ -8285,6 +8261,13 @@
                     3.3 milliseconds
                     10 milliseconds
                     100 milliseconds
+                Options:
+                1. invalid(1)         -invalid value
+                2. interval1s(2)      -1 second
+                3. interval10s(3)     -10 seconds
+                4. interval3Dot3ms(4) -3.3 milliseconds
+                5. interval10ms(5)    -10 milliseconds
+                6. interval100ms(6)   -100 milliseconds
                 "
             ::= { hwY1731TestIdSingleSynEndedLMSendEntry 2 }
 
@@ -8435,13 +8418,13 @@
             STATUS current
             DESCRIPTION
                 "This object indicates the type of reset.
-                 The value can be:
-                    invalid
-                    singleloss
-                    dualloss
-                    onewaydelay
-                    twowaydelay
-                 The default value is invalid."
+                Options:
+                1. invalid(1)     -indicates that the type of reset is invalid.
+                2. singleloss(2)  -indicates that the type of reset is singleloss.
+                3. dualloss(3)    -indicates that the type of reset is dualloss.
+                4. onewaydelay(4) -indicates that the type of reset is onewaydelay.
+                5. twowaydelay(5) -indicates that the type of reset is twowaydelay.
+                The default value is invalid."
             ::= { hwY1731ResetStatisticEntry 1 }
             
         hwY1731ResetStatistic8021pValue OBJECT-TYPE
@@ -8578,7 +8561,14 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "This object identifies an interval for collecting packet loss statistics."
+                "
+                This object identifies an interval for collecting packet loss statistics.
+                Options:
+                1. invalid(1)         -indicates that the interval for collecting packet loss statistics is invalid.
+                2. interval1000ms(2)  -indicates that the interval for collecting packet loss statistics is 1000 ms.
+                3. interval10000ms(3) -indicates that the interval for collecting packet loss statistics is 10000 ms.
+                4. interval30000ms(4) -indicates that the interval for collecting packet loss statistics is 30000 ms.
+                "
             ::= { hwY1731StatisticEntry 1 }
 
          hwY1731SingleLossLocalStatistic OBJECT-TYPE
@@ -9372,14 +9362,14 @@
                 "
                 Specific trap type.
                 Options:                         
-                1. OneDelay(1)              -indicates the trap type is delay of one-way ETH-DM.
-                2. TwoDelay(2)              -indicates the trap type is delay of two-way ETH-DM.
-                3. OneDelayVariation(3)     -indicates the trap type is delay variation of one-way ETH-DM.
-                4. TweDelayVariation(4)     -indicates the trap type is delay variation of two-way ETH-DM.
-                5. SingleLossLocalRatio(5)  -indicates the trap type is local loss ratio of single-ended ETH-LM.
-                6. SingleLossRemoteRatio(6) -indicates the trap type is remote loss ratio of single-ended ETH-LM.
-                7. DualLossLocalRatio(7)    -indicates the trap type is local loss ratio of dual-ended ETH-LM.
-                8. DualLossRemoteRatio(8)   -indicates the trap type is remote loss ratio of dual-ended ETH-LM. 
+                1. onedelay(1)              -indicates the trap type is delay of one-way ETH-DM.
+                2. twodelay(2)              -indicates the trap type is delay of two-way ETH-DM.
+                3. onedelayvariation(3)     -indicates the trap type is delay variation of one-way ETH-DM.
+                4. twedelayvariation(4)     -indicates the trap type is delay variation of two-way ETH-DM.
+                5. singlelosslocalratio(5)  -indicates the trap type is local loss ratio of single-ended ETH-LM.
+                6. singlelossremoteratio(6) -indicates the trap type is remote loss ratio of single-ended ETH-LM.
+                7. duallosslocalratio(7)    -indicates the trap type is local loss ratio of dual-ended ETH-LM.
+                8. duallossremoteratio(8)   -indicates the trap type is remote loss ratio of dual-ended ETH-LM. 
                 "                            
             ::= { hwY1731StatisticTrapLogEntry 1} 
             
@@ -9723,14 +9713,14 @@
             STATUS current
             DESCRIPTION
                 "This object indicates the type of reset.
-                 The value can be:
-                    invalid
-                    singleloss
-                    dualloss
-                    onewaydelay
-                    twowaydelay
-		    singlesynloss
-                 The default value is invalid."
+                Options:
+                1. invalid(1)       -indicates that the type of reset is invalid.
+                2. singleloss(2)    -indicates that the type of reset is singleloss.
+                3. dualloss(3)      -indicates that the type of reset is dualloss.
+                4. onewaydelay(4)   -indicates that the type of reset is onewaydelay.
+                5. twowaydelay(5)   -indicates that the type of reset is twowaydelay.
+                6. singlesynloss(6) -indicates that the type of reset is singlesynloss.
+                The default value is invalid."
             ::= { hwY1731TestIdStatisticResetEntry 1 }
 
         hwY1731TestIdTwoDelaySummaryStatTable OBJECT-TYPE
@@ -10525,7 +10515,7 @@
                   onedelayvariation(2),
                   twodelay(3),
                   twodelayvariation(4),
-                 singlelossremoteratio(5),
+                  singlelossremoteratio(5),
                   singlelosslocalratio(6),
                   singlesyntheticlossremoteratio(7),
                   singlesyntheticlosslocalratio(8)
@@ -10538,14 +10528,14 @@
                 "
                 Specific trap type.
                 Options:                         
-                1. OneDelay(1)              -indicates the trap type is delay of one-way ETH-DM.
-                2. OneDelayVariation(2)     -indicates the trap type is delay variation of one-way ETH-DM.
-                3. TwoDelay(3)              -indicates the trap type is delay of two-way ETH-DM.
-                4. TweDelayVariation(4)     -indicates the trap type is delay variation of two-way ETH-DM.
-                5. SingleLossRemoteRatio(5) -indicates the trap type is remote loss ratio of single-ended ETH-LM.
-                6. SingleLossLocalRatio(6)  -indicates the trap type is local loss ratio of single-ended ETH-LM.
-                7. Singlesyntheticlossremoteratio(7)    -indicates the trap type is remote loss ratio of single-ended-synthetic ETH-LM.
-                8. Singlesyntheticlosslocalratio(8)   -indicates the trap type is local loss ratio of single-ended-synthetic ETH-LM. 
+                1. onedelay(1)              -indicates the trap type is delay of one-way ETH-DM.
+                2. onedelayvariation(2)     -indicates the trap type is delay variation of one-way ETH-DM.
+                3. twodelay(3)              -indicates the trap type is delay of two-way ETH-DM.
+                4. twodelayvariation(4)     -indicates the trap type is delay variation of two-way ETH-DM.
+                5. singlelossremoteratio(5) -indicates the trap type is remote loss ratio of single-ended ETH-LM.
+                6. singlelosslocalratio(6)  -indicates the trap type is local loss ratio of single-ended ETH-LM.
+                7. singlesyntheticlossremoteratio(7)    -indicates the trap type is remote loss ratio of single-ended-synthetic ETH-LM.
+                8. singlesyntheticlosslocalratio(8)   -indicates the trap type is local loss ratio of single-ended-synthetic ETH-LM. 
                 "                            
             ::= { hwY1731TestIdStatTrapLogEntry 1} 
             

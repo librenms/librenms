@@ -1,9 +1,9 @@
 --==================================================================
--- Copyright (C) 2017 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2022 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- 
 -- Description: HUAWEI Layer Two VLAN MIB
 -- Reference:
--- Version: V2.09
+-- Version: V2.15
 -- History:
 -- ==================================================================
 -- ==================================================================
@@ -42,7 +42,7 @@ IMPORTS
     hwL2Mgmt OBJECT IDENTIFIER ::= { hwDatacomm 42 }
     
     hwL2Vlan MODULE-IDENTITY
-            LAST-UPDATED "201708170000Z"                
+            LAST-UPDATED "202207270000Z"                
     ORGANIZATION 
             "Huawei Technologies Co.,Ltd."
     CONTACT-INFO 
@@ -53,9 +53,32 @@ IMPORTS
                Website: http://www.huawei.com
                Email: support@huawei.com
              "
+    DESCRIPTION
+            "Modify the hwL2VlanVoiceVlanEnabledVlanId."
+  REVISION
+            "202207270000Z" 
+   DESCRIPTION
+            "Modify the description of  hwL2VlanMacLearn" 
+  REVISION
+            "202206300000Z" 
+   DESCRIPTION
+            "Modify traps hwVlantransExceedChipSpec and  hwVlantransExceedChipSpecResume" 
+  REVISION
+            "202205310000Z" 
+   DESCRIPTION
+            "Add traps hwVlantransExceedChipSpec and  hwVlantransExceedChipSpecResume"
+  REVISION
+            "202007250000Z" 
+   DESCRIPTION
+            "Modify the description of the nodes"
+  REVISION
+            "202007200000Z" 
+   DESCRIPTION
+            "Modify the description of the nodes"
+   REVISION
+            "201711100000Z" 
    DESCRIPTION
             "add a mib node hwL2QinQVlanInnerRemark."
-   
    REVISION
             "201708170000Z"
    DESCRIPTION
@@ -193,7 +216,7 @@ hwL2VlanStatistics     OBJECT IDENTIFIER ::= { hwL2VlanMngObjects 3 }
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION 
-           "The value of this object identifies the type of a VLAN.Change the value from '2' to '1' indicates that the common-vlan is configured into super-vlan; 
+           "The value of this object identifies the type of a VLAN. Change the value from '2' to '1' indicates that the common-vlan is configured into super-vlan; 
 		   Change the value from '1' to '2' indicates that the super-vlan is canceled; Change the value from '2' to '4' indicates that the common-vlan is configured into mux-vlan; 
 		   Change the value from '4' to '2' indicates that the mux-vlan is canceled; Change the value from '2' to '6' indicates that the common-vlan is configured into protocol-transparent-vlan; 
 		   Change the value from '6' to '2' indicates that the protocol-transparent-vlan is canceled; Note that the switch between other pairs is forbidden."
@@ -227,7 +250,7 @@ hwL2VlanStatistics     OBJECT IDENTIFIER ::= { hwL2VlanMngObjects 3 }
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION 
-           "The value of this object identifies whether the VLAN multicast function is enabled.The value enabled(1) indicates vlan Multicasting is allowed; disable(2) indicates it's closed. The default value is disable(2)."
+           "The value of this object identifies whether the MAC address learning function is enabled. The value enabled(1) indicates MAC address learning is allowed; disable(2) indicates it's closed. Only Super VLAN and Sub VLAN support this function."
         ::= { hwL2VlanMIBEntry 7 }
  
         
@@ -244,8 +267,8 @@ hwL2VlanStatistics     OBJECT IDENTIFIER ::= { hwL2VlanMngObjects 3 }
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION 
-           "The value of this object identifies whether a VLAN is shut down.Value disable(2) indicates shutdown the vlan; enabled(1) indicates open the vlan."
-        DEFVAL  {1}
+           "The value of this object identifies whether a VLAN is shut down. Value disable(2) indicates shutdown the vlan; enabled(1) indicates open the vlan."
+        DEFVAL  {enabled}
         ::= { hwL2VlanMIBEntry 9 }
         
         
@@ -254,8 +277,8 @@ hwL2VlanStatistics     OBJECT IDENTIFIER ::= { hwL2VlanMngObjects 3 }
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION 
-           "The value of this object identifies whether the VLAN statistics function is enabled.The value enabled(1) indicates Statistics onvlan are allowed; disable(2) indicates aren't. The default value is disable(2)."
-        DEFVAL  {2}
+           "The value of this object identifies whether the VLAN statistics function is enabled. The value enabled(1) indicates Statistics onvlan are allowed; disable(2) indicates aren't. The default value is disable(2)."
+        DEFVAL  {disabled}
         ::= { hwL2VlanMIBEntry 10 }
         
     hwL2VlanCreateStatus  OBJECT-TYPE
@@ -268,8 +291,7 @@ hwL2VlanStatistics     OBJECT IDENTIFIER ::= { hwL2VlanMngObjects 3 }
         MAX-ACCESS read-only
         STATUS current
         DESCRIPTION 
-           "The status indicates how the vlan is created,
-           static configured by management or created dynamicly by GVRP."
+           "The status indicates how the VLAN is created, which is statically configured by management or created dynamically by GVRP."
         ::= { hwL2VlanMIBEntry 11 }
         
     hwL2VlanRowStatus  OBJECT-TYPE
@@ -286,7 +308,7 @@ hwL2VlanStatistics     OBJECT IDENTIFIER ::= { hwL2VlanMngObjects 3 }
         STATUS current
         DESCRIPTION 
            "Whether to broadcast the broadcast packets when ports receive it.
-           enabled(1) indicates broadcast the packets,disable(2) indicates it'll discard 
+           enabled(1) indicates broadcast the packets, disable(2) indicates it'll discard 
            the broadcast packet. Default value is enabled(1)."
         ::= { hwL2VlanMIBEntry 13 }  
         
@@ -301,7 +323,7 @@ hwL2VlanStatistics     OBJECT IDENTIFIER ::= { hwL2VlanMngObjects 3 }
         DESCRIPTION 
            "Whether to broadcast the unknown multicast packets when ports receive it.
            broadcast(1) indicates broadcast the packet, discard(2) indicates it'll discard 
-           the unknow multicast packet. Default value is broadcast(1)."
+           the unknown multicast packet. Default value is broadcast(1)."
         ::= { hwL2VlanMIBEntry 14 }   
         
     hwL2VlanProperty OBJECT-TYPE
@@ -1565,7 +1587,7 @@ hwL2VlanStatistics     OBJECT IDENTIFIER ::= { hwL2VlanMngObjects 3 }
         STATUS current
         DESCRIPTION
             "Enable QinQ VLAN translation."
-        DEFVAL  {2}
+        DEFVAL  {disabled}
         ::= { hwL2VlanQinqVlanTransEnaEntry 2 }                 
         
     hwL2VlanQinqVlanTransEnaRowStatus OBJECT-TYPE
@@ -2128,7 +2150,7 @@ hwL2VlanStatistics     OBJECT IDENTIFIER ::= { hwL2VlanMngObjects 3 }
         
 
     hwL2VlanVoiceVlanEnabledVlanId  OBJECT-TYPE
-        SYNTAX  Integer32(0..4294967295)
+        SYNTAX  Integer32(0..2147483647)
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION "Indicates the global voice VLAN ID. Global voice VLAN is enabled if the value  ranges from 1 to 4094; global voice VLAN is disabled if the value is 0."
@@ -3073,7 +3095,7 @@ hwL2VlanStatistics     OBJECT IDENTIFIER ::= { hwL2VlanMngObjects 3 }
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION 
-           "The packet will be mapped or stacked or poped."
+           "The packet will be mapped or stacked or popped."
         ::= { hwL2VlanXlateEntry 7 }  
                                      
     hwL2VlanXlateToVlanId  OBJECT-TYPE
@@ -4595,7 +4617,21 @@ hwL2VlanStatistics     OBJECT IDENTIFIER ::= { hwL2VlanMngObjects 3 }
             DESCRIPTION 
                "The number of the VLAN mapping and VLAN stacking configurations on the interface fell below the threshold."
             ::= { hwL2VlanTraps 7 }
-	
+
+    hwVlantransExceedChipSpec NOTIFICATION-TYPE
+            OBJECTS { hwVlantransIfName, hwVlantransVlanBgn, hwVlantransVlanEnd, hwVlantransVlanPriBgn, hwVlantransVlanPriEnd, hwVlantransInnerVlanBgn, hwVlantransInnerVlanEnd, hwVlantransChipSpec}
+            STATUS current
+            DESCRIPTION 
+               "The number of VLAN mapping or VLAN stacking configurations exceeded the chip specification."
+            ::= { hwL2VlanTraps 8 }
+
+    hwVlantransExceedChipSpecResume NOTIFICATION-TYPE
+            OBJECTS { hwVlantransIfName, hwVlantransVlanBgn, hwVlantransVlanEnd, hwVlantransVlanPriBgn, hwVlantransVlanPriEnd, hwVlantransInnerVlanBgn, hwVlantransInnerVlanEnd, hwVlantransChipSpec}
+            STATUS current
+            DESCRIPTION 
+               "The number of VLAN mapping or VLAN stacking configurations fell below the chip specification."
+            ::= { hwL2VlanTraps 9 }			
+			
      hwL2VlanTrapObjects OBJECT IDENTIFIER ::= { hwL2VlanMngObjects 5 }
      hwVcmpDeviceMac OBJECT-TYPE
             SYNTAX MacAddress
@@ -4653,6 +4689,70 @@ hwL2VlanStatistics     OBJECT IDENTIFIER ::= { hwL2VlanMngObjects 3 }
                 "Lower threshold for the number of vlan mapping and vlan stacking configurations on the interface."
             ::= { hwL2VlanTrapObjects 7 }
 
+      hwVlantransIfName OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The interface name has vlan mapping or vlan stacking configured."
+            ::= { hwL2VlanTrapObjects 8 }			
+			
+     hwVlantransVlanBgn OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The begin mapping or stacking vlan configurations on the interface."
+            ::= { hwL2VlanTrapObjects 9 }			
+
+     hwVlantransVlanEnd OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The end mapping or stacking vlan configurations on the interface."
+            ::= { hwL2VlanTrapObjects 10 }
+
+     hwVlantransVlanPriBgn OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The begin mapping or stacking vlan-priority configurations on the interface."
+            ::= { hwL2VlanTrapObjects 11 }
+
+     hwVlantransVlanPriEnd OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The end mapping or stacking vlan-priority configurations on the interface."
+            ::= { hwL2VlanTrapObjects 12 }
+
+     hwVlantransInnerVlanBgn OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The begin mapping or stacking inner vlan configurations on the interface."
+            ::= { hwL2VlanTrapObjects 13 }			
+
+     hwVlantransInnerVlanEnd OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The end mapping or stacking inner vlan configurations on the interface."
+            ::= { hwL2VlanTrapObjects 14 }
+
+     hwVlantransChipSpec OBJECT-TYPE
+            SYNTAX Integer32 (0..2147483647)
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "Specification for the number of vlan mapping or vlan stacking configurations on the chip."
+            ::= { hwL2VlanTrapObjects 15 }
+   
 -- ============================================================
 -- IEEE 802.1Q MIB - Conformance Information
 -- ============================================================
@@ -5230,7 +5330,9 @@ hwL2vlanQinQInterfaceGroup OBJECT-GROUP
                         hwMuxVlanGroupCountExceedThreshold,
                         hwMuxVlanGroupCountExceedThresholdResume,
                         hwVlantransCountExceedThreshold,
-                        hwVlantransCountExceedThresholdResume
+                        hwVlantransCountExceedThresholdResume,
+                        hwVlantransExceedChipSpec,
+                        hwVlantransExceedChipSpecResume
                     }
             STATUS current
             DESCRIPTION 

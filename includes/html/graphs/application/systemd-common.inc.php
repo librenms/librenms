@@ -24,7 +24,7 @@ foreach (array_keys($rrdArray) as $state_type) {
         $state_type,
     ]);
 
-    if (Rrd::checkRrdExists($rrd_filename)) {
+    if (Rrd::checkRrdExists($shared_rrd_filename)) {
         foreach ($rrdArray[$state_type] as $state_status => $state_status_aa) {
             if ($state_status_aa['rrd_location'] === 'individual') {
                 $individual_rrd_filename = Rrd::name($device['hostname'], [
@@ -43,7 +43,7 @@ foreach (array_keys($rrdArray) as $state_type) {
             $i++;
         }
     } else {
-        graph_error('No Data file ' . basename($rrd_filename), 'No Data');
+        graph_error('No Data file ' . basename($shared_rrd_filename), 'No Data');
     }
 }
 

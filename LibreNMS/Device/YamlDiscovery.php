@@ -161,7 +161,7 @@ class YamlDiscovery
         }
 
         try {
-            $num_oid = Oid::toNumeric($data['value'], $search_mib);
+            $num_oid = Oid::of($data['value'])->toNumeric($search_mib);
         } catch (\Exception $e) {
             throw $e;
         }
@@ -188,6 +188,11 @@ class YamlDiscovery
             $variables = [
                 'index' => $index,
                 'count' => $count,
+                // we compute a numOid compatible version of index
+                // string length followed by ASCII of each char.
+                'str_index_as_numeric' => implode('.', array_map(function ($index) {
+                    return strlen($index) . '.' . implode('.', unpack('c*', $index));
+                }, explode('.', $index))),
             ];
             foreach (explode('.', $index) as $pos => $subindex) {
                 $variables['subindex' . $pos] = $subindex;
@@ -378,6 +383,8 @@ class YamlDiscovery
                 if (isset($skip_value['device'])) {
                     // field from device model
                     $tmp_value = \DeviceCache::getPrimary()[$skip_value['device']] ?? null;
+                } elseif ($skip_value['oid'] == 'index') {
+                    $tmp_value = $index;
                 } else {
                     // oid previously fetched from the device
                     $tmp_value = static::getValueFromData($skip_value['oid'], $index, $yaml_item_data, $pre_cache);

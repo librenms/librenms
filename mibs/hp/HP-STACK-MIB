@@ -1,0 +1,889 @@
+HP-STACK-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        OBJECT-TYPE, MODULE-IDENTITY, Integer32,
+        TimeTicks, NOTIFICATION-TYPE
+            FROM SNMPv2-SMI
+    OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP
+            FROM SNMPv2-CONF
+    RowStatus, TruthValue, DisplayString
+            FROM SNMPv2-TC
+    SnmpAdminString
+            FROM SNMP-FRAMEWORK-MIB
+    PhysicalIndex 
+           FROM ENTITY-MIB 
+    hpSwitchBaseMACAddress
+            FROM NETSWITCH-MIB
+    hpSwitch
+            FROM HP-ICF-OID;
+
+    hpStackMIB MODULE-IDENTITY
+        LAST-UPDATED "201001030000Z"  -- January 3, 2010
+        ORGANIZATION "HP Networking"
+        CONTACT-INFO "Hewlett Packard Company
+                      8000 Foothills Blvd.
+                      Roseville, CA 95747"
+        DESCRIPTION  "This MIB module describes objects for managing
+                      the stacking features."
+
+        REVISION     "201001030000Z"  -- January 3, 2010
+        DESCRIPTION  "Initial version of this MIB."
+
+        ::= { hpSwitch 69 }
+
+
+    -- Configuration support for Stacking
+    hpStackNotifications       OBJECT IDENTIFIER ::= { hpStackMIB 0 }
+    hpStackObjects             OBJECT IDENTIFIER ::= { hpStackMIB 1 }
+    hpStackConformance         OBJECT IDENTIFIER ::= { hpStackMIB 2 }    
+
+    hpStackConfig              OBJECT IDENTIFIER ::= { hpStackObjects 1 }             
+
+
+    --*************************************************************
+    --*    Scalar Group
+    --*************************************************************
+     hpStackId   OBJECT-TYPE
+            SYNTAX          OCTET STRING (SIZE (1..255))
+            MAX-ACCESS      read-only
+            STATUS          current
+            DESCRIPTION
+                  "The stack ID uniquely identifies the stack; all
+                   members of the stack have the same stack ID. A
+                   switch is considered to be a part of a stack
+                   When it has the same stack ID as the stack
+                   commander. The stack ID is valid only when
+                   hpStackSwitchAdminStatus is true (1).  This
+                   value is set by the first elected commander and
+                   stays with the stack until the user sets the
+                   hpStackSwitchAdminStatus to 'false (2)' or when
+                   hpStackSetStacking is set to 'true (1)' in an
+                   inactive fragment."
+   
+    ::= {  hpStackConfig 1 } 
+       
+    hpStackOperStatus   OBJECT-TYPE
+         SYNTAX      INTEGER {
+                          unAvailable (0),
+                          disabled (1),
+                          active (2),
+                          fragmentInactive (3),
+                          fragmentActive (4)
+                     }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION 
+               "This is the current operational status of 
+                the stack. "
+    ::= { hpStackConfig 2 }
+
+    hpStackSetStacking   OBJECT-TYPE
+       SYNTAX      TruthValue
+       MAX-ACCESS  read-write    
+       STATUS      current 
+       DESCRIPTION  
+             "This variable allows configuration of a stack
+              fragment created by a stack split. 
+              When set to 'true (1)' in the greater fragment, the
+              physically present members of the current stack
+              become the only members, and the configuration of
+              the missing members is converted to strict
+              provisioned configuration.
+
+              When set to 'true (1)' on a lesser fragment, the
+              existing stack information is cleared and a new
+              stack ID is created.  The switches in the stack will
+              become 'active' and retain their configuration.
+ 
+               No action is taken when set to  'false (2)' in any
+               stack."   
+    ::= {  hpStackConfig 3 }
+
+    hpStackTopology   OBJECT-TYPE 
+         SYNTAX      INTEGER {
+                          unKnown (0),
+                          chain (1),
+                          ring (2),
+                          mesh (3),
+                          partialMesh (4)
+                     }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION 
+            " This describes the physical topology of the
+              current stack."
+    ::= { hpStackConfig 4 }
+
+    hpStackTrapEnable   OBJECT-TYPE 
+         SYNTAX      INTEGER {
+                          enable (1),
+                          disable (2)
+                     }
+         MAX-ACCESS  read-write 
+         STATUS      current
+         DESCRIPTION 
+               " This enables or disables the hpStack traps."
+
+    ::= { hpStackConfig 5 }
+
+    --*************************************************************
+    --*    hpStackConfigTable
+    --*************************************************************
+    hpStackConfigTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF HpStackConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Table to configure basic 
+                     stacking feature."
+        ::= { hpStackObjects 2 }
+
+    hpStackConfigEntry OBJECT-TYPE
+        SYNTAX      HpStackConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "A row in the stack config table."
+        INDEX       { hpStackSequenceNum }
+        ::= { hpStackConfigTable 1 }
+
+    HpStackConfigEntry ::=
+        SEQUENCE {
+                hpStackSequenceNum               Integer32,
+                hpStackSwitchAdminStatus         INTEGER,
+                hpStackSwitchPreferredPriority   Integer32,
+                hpStackSwitchPreferredMemberId   Integer32
+        }
+
+    hpStackSequenceNum OBJECT-TYPE
+        SYNTAX      Integer32 (1..255)  
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION 
+               "This is the sequence number to this table.
+                At any instance of time only one entry exists." 
+        ::= { hpStackConfigEntry 1 }
+
+    hpStackSwitchAdminStatus   OBJECT-TYPE
+       SYNTAX      INTEGER {
+                      enable (1),
+                      disable (2)
+                   }
+       MAX-ACCESS  read-write 
+       STATUS      current 
+       DESCRIPTION 
+             "The admin status of the stacking feature. When set
+              to 'enable (1)', this will enable stacking on a
+              standalone switch that had stacking disabled
+              previously. Once stacking is enabled, the switch
+              will not have a stack ID and merges automatically
+              to any stack it is connected to and learns the
+              stack ID of that stack.
+
+              It has no effect on a switch where stacking is
+              already enabled.
+
+              Setting this to 'disable (2)' will disable
+              stacking on a standalone switch. Once stacking is
+              disabled, the stack ports will be kept down. This
+              will prevent the switch from ever joining or
+              creating a stack.  This is allowed only on a
+              standalone switch, that is, a switch that is not
+              connected over a stacking link to any other
+              switch.  It has no effect on a switch where
+              stacking is already disabled.
+                                  
+              Enabling or disabling stacking will trigger a
+              reboot of the switch.
+      
+              When hpStackSwitchAdminStatus is set to 'true
+              (1)', and if the user wants to set the preferred
+              priority and the member ID of the switch, then
+              hpStackSwitchPreferredPriority and
+              hpStackSwitchPreferredMemberId needs to be set
+              along with hpStackSwitchAdminStatus. If the
+              priority and member ID are not specified, then the
+              default values will be used."
+
+       ::= {  hpStackConfigEntry 2 } 
+
+
+    hpStackSwitchPreferredPriority   OBJECT-TYPE
+         SYNTAX      Integer32  (1..255)
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION 
+               " This allows the user to set the priority of a
+                 switch when stacking is enabled on it.
+                 hpStackSwitchPreferredPriority needs to be set
+                 along with hpStackSwitchAdminStatus being set to
+                'true (1)'.
+                                  
+                 Note that this is to be used only when enabling
+                 stacking. To set the priority of a switch on
+                 which stacking is already enabled, 
+                 use hpStackMemberTable.
+                                  
+                 hpStackSwitchPreferredPriority is unused when 
+                 hpStackSwitchAdminStatus is false (2)."
+
+       ::= { hpStackConfigEntry 3 }
+
+    hpStackSwitchPreferredMemberId   OBJECT-TYPE
+         SYNTAX      Integer32 (1..65535)  
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION 
+               " This allows the user to set the preferred
+                 member ID of a switch when stacking is enabled on
+                 it. hpStackSwitchPreferredMemberId needs to be
+                 set along with setting hpStackSwitchAdminStatus
+                 being set to 'true (1)'. This entry is useful only
+                 at the time of setting hpStackSwitchAdminStatus to
+                 'true (1)'.  hpStackSwitchPreferredMemberId is
+                 unused when hpStackSwitchAdminStatus is set to
+                 false (2)."
+       ::= { hpStackConfigEntry 4 }
+
+    --*************************************************************
+    --*    hpStackMemberTable
+    --*************************************************************
+    hpStackMemberTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF HpStackMemberEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Table to configure stack members."
+        ::= { hpStackObjects 3 }
+
+    hpStackMemberEntry OBJECT-TYPE
+        SYNTAX      HpStackMemberEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "A row in the stack member table."
+        INDEX       { hpStackMemberId }
+        ::= { hpStackMemberTable 1 }
+
+    HpStackMemberEntry ::=
+        SEQUENCE {
+            hpStackMemberId                 Integer32,
+            hpStackMemberProductId          DisplayString,
+            hpStackMemberMacAddr            OCTET STRING,
+            hpStackMemberShutdown           TruthValue,
+            hpStackMemberReboot             TruthValue,
+            hpStackMemberAdminPriority      Integer32,
+            hpStackMemberEntryStatus        RowStatus,
+            hpStackMemberEntPhysicalIndex   PhysicalIndex,
+            hpStackMemberState              INTEGER,
+            hpStackMemberProductName        SnmpAdminString,
+            hpStackMemberUpTime             TimeTicks, 
+            hpStackMemberSysOid             OBJECT IDENTIFIER,
+            hpStackMemberIdForTrap          Integer32,
+            hpStackMemberSerialNum          DisplayString, 
+            hpStackMemberCpuUtil            Integer32,
+            hpStackMemberTotalMemory        Integer32,
+            hpStackMemberFreeMemory         Integer32,
+            hpStackMemberBootRomVersion     DisplayString,
+            hpStackMemberOsVersion          DisplayString,
+            hpStackMemberBootImage          INTEGER
+       }
+
+    hpStackMemberId OBJECT-TYPE
+        SYNTAX      Integer32 (1..65535)  
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION 
+               "This is the member ID of the switch and 
+                index to this table. This identifies 
+                each member in the stack."
+        ::= { hpStackMemberEntry 1 }
+
+    hpStackMemberProductId OBJECT-TYPE
+        SYNTAX      DisplayString 
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION 
+              "This is the product ID [J-number] of
+               the switch. When a member is provisioned, 
+               this is a mandatory field. The product must be
+               capable of stacking support."
+
+        ::= { hpStackMemberEntry 2 }
+
+    hpStackMemberMacAddr OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE(0|6)) 
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION 
+             "The MAC address that identifies the member switch.
+              The configuration of MAC address will not be 
+              allowed if another table exists with the same
+              MAC address."
+        ::= { hpStackMemberEntry 3 }
+
+
+    hpStackMemberShutdown OBJECT-TYPE
+        SYNTAX      TruthValue 
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION  
+             "For the members that physically exist, 
+              this will cause the switch to shutdown.
+              If the switch is a standby, a new standby 
+              switch will be chosen. 
+              To shutdown, it needs to be set to 
+              'true (1)'. A write operation of 'false (2)' 
+              leads to no operation. This can be set to 
+              'true (1)' only if the member physically exists 
+              and is an active member of the stack. This
+              variable cannot be set to 'true (1)' if
+              the member ID corresponds to a commander. 
+              This object will always return 'false (2)'."
+        ::= { hpStackMemberEntry 4 } 
+
+    hpStackMemberReboot OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+              "Setting this variable to 'true (1)'
+               will reboot the switch. A write operation of
+              'false (2)' leads to no operation. 
+               This object will always return 'false (2)'
+               Reboot is allowed only when a 
+               member exist physically."
+        ::= { hpStackMemberEntry 5 }
+
+    hpStackMemberAdminPriority OBJECT-TYPE
+        SYNTAX      Integer32 (1..255)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION 
+             "This assigns the priority to the member.
+              If the stack is rebooted and the members are 
+              assigned with priorities, then commander will 
+              be the one with the highest priority and the 
+              standby will be the one with the next highest
+              priority. The following rules apply for assigning
+              the priority:
+         
+         1. In the existing stack, if the priority 
+            is increased, the member is likely to become 
+            commander only the next time the stack is rebooted, 
+            it will not be immediately elected as commander. 
+         
+         2. A switch with the highest priority will not be elected
+            as commander if it is a new member of the stack 
+            even when the stack is rebooted as it will not have
+            the latest configurations. 
+
+         3. If a commander switch with highest priority fails 
+            over to standby, it will not become commander again
+            in the subsequent reboot. The stack itself needs to 
+            be booted or the failover to this commander should
+            happen. 
+
+        4. A switch that joins an already active stack will not 
+           become the commander even if it has the highest priority.
+
+        5. If the priority is assigned to the member when it is in
+           standalone state and when it joins the stack, if the stack 
+           configuration has an existing pre-provisioned priority for this
+           member, then the pre-provisioned value preempts the 
+           standalone value.
+
+           To assign priority to a member, the member can
+           either be provisioned or physically present."
+   
+        DEFVAL { 128 }
+        ::= { hpStackMemberEntry 6 }
+
+    hpStackMemberEntryStatus OBJECT-TYPE
+        SYNTAX      RowStatus 
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION  
+              "The status of a stack member entry.
+               The member entry is created with the
+               row status value as createAndGo (4)
+               and the hpStackMemberProductId.
+               The createAndWait(5) is not 
+               supported by this mib table.
+               To remove the switch from the stack, 
+               row status is set to destroy (6).
+               Setting it to 'destory (6)' is not 
+               allowed if the member ID corresponds
+               to a commander switch.
+        
+               For the physically existing switch,
+               if hpStackMemberReboot is set to 
+               'true (1)' along with the row status to  
+               'destroy (6), the switch will come up with a 
+               blank configuration and will acquire a new
+               hpStackMemberId." 
+        ::= { hpStackMemberEntry 7 } 
+
+    hpStackMemberEntPhysicalIndex OBJECT-TYPE
+        SYNTAX      PhysicalIndex 
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION  
+              "This gives the index of this member in the
+               entPhysicalTable (rfc2737)."          
+        ::= { hpStackMemberEntry 8 } 
+
+    hpStackMemberState OBJECT-TYPE
+        SYNTAX      INTEGER  {
+                      unusedId             (0),
+                      missing              (1),
+                      provision            (2),
+                      commander            (3),
+                      standby              (4),
+                      member               (5),
+                      shutdown             (6),
+                      booting              (7),
+                      communicationFailure (8),
+                      incompatibleOs       (9),
+                      unknownState         (10),
+                      standbyBooting       (11)
+               }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION  
+               "This gives the status of the switch in the stack. 
+                unusedId (0)      - The member ID does not exist. 
+                missing (1)       - A member switch in the stack when
+                                    it becomes Non responsive, it is 
+                                    marked as the missing member. Either 
+                                    the stack link goes down or the stack 
+                                    member crashed. Note that it is possible 
+                                    to remove even the missing member from 
+                                    the stack. In this case, the missing members               
+                                    configuration is removed from the 
+                                    stack config file.
+               provision (2)      - A member switch whose config is 
+                                    provisioned and that does not exist physically.
+               commander (3)      - One physical switch whose master 
+                                    CPU takes up the role that the
+                                    active management module in 
+                                    the 8200 switch would take.
+               standby (4)        - One physical switch whose master
+                                    CPU takes up the role that the
+                                    standby management module in 
+                                    the 8200 switch would take.
+               member (5)         - A switch that is part of the
+                                    stack.
+               shutdown (6)       - The switch is in the shutdown 
+                                    state.
+               booting (7)        - The switch is in the booting 
+                                    state.
+               communicationFailure (8) - This is an error condition. 
+                                          The switch cannot be reached.
+               incompatibleOs (9)      - This is an error condition. 
+                                         The member switch runs with a different
+                                         OS image.
+               unknownState (10)       - The member switch's state cannot be 
+                                          determined. This is an error condition.
+               standbyBooting (11)     - The standby switch is currently
+                                         booting up. When boot is
+                                         completed, the state will be
+                                        'standby (4)'."
+
+        ::= { hpStackMemberEntry 9 } 
+
+   hpStackMemberProductName OBJECT-TYPE
+        SYNTAX      SnmpAdminString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+             "This gives the product name of the switch."
+        ::= { hpStackMemberEntry 10 }
+
+   hpStackMemberUpTime OBJECT-TYPE
+        SYNTAX      TimeTicks
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+             "This provides the uptime of this specific 
+              member. This is different from the stack
+              uptime."
+        ::= { hpStackMemberEntry 11 }
+
+   hpStackMemberSysOid OBJECT-TYPE
+        SYNTAX      OBJECT IDENTIFIER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+             "This provides the sysObjectId of this 
+              specific member."
+        ::= { hpStackMemberEntry 12 }
+
+   hpStackMemberIdForTrap OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+             "This is same as hpStackMemberId. 
+              This is useful only for the notifications."
+        ::= { hpStackMemberEntry 13 }
+
+    hpStackMemberSerialNum OBJECT-TYPE
+        SYNTAX      DisplayString 
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+               "This is the serial number of
+                the member switch."
+        ::= { hpStackMemberEntry 14 }
+
+    hpStackMemberCpuUtil OBJECT-TYPE
+        SYNTAX      Integer32 
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+               "This is the percantage of CPU utilization
+                of the member the switch."
+        ::= { hpStackMemberEntry 15 }
+
+    hpStackMemberTotalMemory OBJECT-TYPE
+        SYNTAX      Integer32 
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+               "This is the total memory usage in bytes of the 
+                member switch."
+        ::= { hpStackMemberEntry 16 }
+
+    hpStackMemberFreeMemory OBJECT-TYPE
+        SYNTAX      Integer32 
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+              "This is the free memory available, in bytes, on
+                                        the member switch."
+        ::= { hpStackMemberEntry 17 }
+
+   hpStackMemberBootRomVersion OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+               "This is the boot ROM version in the member
+                switch."
+        ::= { hpStackMemberEntry 18 }
+
+    hpStackMemberOsVersion OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+               "This is the switch operating system version on
+                the member switch."
+        ::= { hpStackMemberEntry 19 }
+
+    hpStackMemberBootImage OBJECT-TYPE
+        SYNTAX      INTEGER {
+                      primary (1),
+                      secondary (2)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+               "This is the boot image information of the member."
+        ::= { hpStackMemberEntry 20 }
+
+    --*************************************************************
+    --*    hpStackPortTable
+    --*************************************************************
+    hpStackPortTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF HpStackPortEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Table of info about the stack ports."
+        ::= { hpStackObjects 5 }
+
+    hpStackPortEntry OBJECT-TYPE
+        SYNTAX      HpStackPortEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "A row in the stack port table."
+        INDEX       { hpStackMemberId,
+                      hpStackPortId,
+                      hpStackPortType
+                    }
+        ::= { hpStackPortTable 1 }
+
+    HpStackPortEntry ::=
+        SEQUENCE {
+            hpStackPortId             Integer32,
+            hpStackPortType           INTEGER,
+            hpStackPortOperStatus     INTEGER,
+            hpStackPortNeighbor       OCTET STRING,
+            hpStackPortCost           Integer32,
+            hpStackPortIdForTrap      Integer32,
+            hpStackPortTypeForTrap    INTEGER,
+            hpStackPortAdminStatus    INTEGER
+        }
+
+
+    hpStackPortId  OBJECT-TYPE 
+        SYNTAX      Integer32  (1..65535)  
+        MAX-ACCESS  not-accessible 
+        STATUS      current 
+        DESCRIPTION 
+                    "This is the stack port ID."
+        ::= { hpStackPortEntry 1 }
+
+    hpStackPortType  OBJECT-TYPE 
+        SYNTAX      INTEGER {
+                       backPlane  (1),
+                       frontPlane (2)
+                    }
+        MAX-ACCESS  not-accessible 
+        STATUS      current 
+        DESCRIPTION 
+                    "This is the stack port type."
+        ::= { hpStackPortEntry 2 }
+
+    hpStackPortOperStatus OBJECT-TYPE 
+        SYNTAX      INTEGER {
+                       up   (1),
+                       down (2),
+                       disabled (3),
+                       blocked (4)
+                    }
+        MAX-ACCESS  read-only 
+        STATUS      current 
+        DESCRIPTION 
+                    "This gives the stack port state."
+        ::= { hpStackPortEntry 3 }
+
+    hpStackPortNeighbor OBJECT-TYPE 
+        SYNTAX      OCTET STRING (SIZE (1..255))
+        MAX-ACCESS  read-only 
+        STATUS      current 
+        DESCRIPTION
+             "This contains the value of the 
+              hpStackMemberId and hpStackPortId 
+              of the switch's chassis to which this 
+              stack port is connected. If the 
+              stack port is not connected, it returns 
+              a value of zero."
+        ::= { hpStackPortEntry 4 }
+
+    hpStackPortCost OBJECT-TYPE 
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only 
+        STATUS      current 
+        DESCRIPTION 
+             "This gives the stack port cost."
+        ::= { hpStackPortEntry 5 }
+
+   hpStackPortIdForTrap OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+             "This is same as hpStackPortId. 
+              This is useful only for the notifications."
+        ::= { hpStackPortEntry 6 }
+
+   hpStackPortTypeForTrap OBJECT-TYPE
+        SYNTAX      INTEGER {
+                       backPlane  (1),
+                       frontPlane (2)
+                    }
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+             "This is same as hpStackPortType. 
+              This is useful only for the notifications."
+        ::= { hpStackPortEntry 7 }
+
+    hpStackPortAdminStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        enable   (1),
+                        disable  (2)
+                      }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Setting this variable to 'enable(1)' is allowed only when 
+             hpStackPortOperStatus is in 'disabled(3)' state.
+             A set operation of disable(2) is not allowed.
+             A get operation on this returns 'enabled' only when 
+             the hpStackPortOperStatus is up."
+         ::={ hpStackPortEntry 8 }
+
+
+   --*************************************************************
+   --*    hpStackNotifications
+   --*************************************************************
+   hpStackPortChange  NOTIFICATION-TYPE
+        OBJECTS { hpStackMemberIdForTrap,
+                  hpStackPortIdForTrap,
+                  hpStackPortTypeForTrap,
+                  hpStackPortOperStatus, 
+                  hpStackPortNeighbor 
+                }
+        STATUS  current
+        DESCRIPTION
+                "This notification is generated when the state
+                 of a stack port has changed."
+        ::= { hpStackNotifications 1 }
+
+   hpStackCommanderChange  NOTIFICATION-TYPE
+        OBJECTS { hpStackMemberIdForTrap,
+                  hpStackMemberState
+                }
+        STATUS  current
+        DESCRIPTION
+                "This notification is generated when a new commander 
+                 first comes up. The notification is also sent when 
+                 a failover happens, and the standby becomes commander or
+                 when the commander is down."
+        ::= { hpStackNotifications 2 }
+
+   hpStackMemberChange  NOTIFICATION-TYPE
+        OBJECTS { hpStackMemberIdForTrap,
+                  hpStackMemberState
+                }  
+        STATUS  current
+        DESCRIPTION
+                "This notification is generated when a new member joins 
+                 the stack or when it moves from a loose provisioned to 
+                 strict provisioned."
+        ::= { hpStackNotifications 3 }
+
+   hpStackMemberStatusChange  NOTIFICATION-TYPE
+        OBJECTS { hpStackMemberIdForTrap,
+                  hpSwitchBaseMACAddress,
+                  hpStackMemberState
+                }  
+        STATUS  current
+        DESCRIPTION
+                "This notification is generated when a member becomes
+                 active or inactive."
+        ::= { hpStackNotifications 4 }
+
+   hpStackMergeFailed  NOTIFICATION-TYPE
+        OBJECTS { hpStackMemberIdForTrap, 
+                  hpStackMemberState, 
+                  hpStackId 
+                }
+        STATUS  current
+        DESCRIPTION
+             "This notification is generated when a new member
+              attempts to join the stack, but was denied. 
+              This could be because of:
+                     a.   Merge policy of stack prevents the switch from joining
+                     b.   Merge policy of switch prevents it from joining
+                     c.   Stacking disabled on switch
+                     d.   No available member ID's on stack
+                     e.   Switch is incorrectly provisioned 
+                          (wrong J-Number, correct MAC).
+                          hpStackId here is the other Stack Id." 
+        ::= { hpStackNotifications 5 }
+
+   hpStackMergeSuccess  NOTIFICATION-TYPE
+        OBJECTS { hpStackMemberIdForTrap, 
+                  hpStackMemberState, 
+                  hpStackId 
+                }
+        STATUS  current
+        DESCRIPTION
+             "This notification is generated when a new member 
+              attempts to join the stack and have successfully merged. 
+              This will be sent by each stack that got merged."
+        ::= { hpStackNotifications 6 }
+  
+   --*************************************************************
+   --*    hpStackNotifications
+   --*************************************************************
+   hpStackCompliances OBJECT IDENTIFIER ::=
+                             { hpStackConformance 1 }
+   hpStackGroups      OBJECT IDENTIFIER ::=
+                             { hpStackConformance 2 }
+
+   hpStackCompliance MODULE-COMPLIANCE
+        STATUS      current
+        DESCRIPTION "The compliance statement for the hpStack mib."
+        MODULE       -- this module
+        MANDATORY-GROUPS 
+                    { 
+                      hpStackConfigScalarGroup,
+                      hpStackMemberGroup,
+                      hpStackPortGroup,
+                      hpStackNotificationsGroup
+                    }
+
+       ::= { hpStackCompliances 1 }
+
+   hpStackConfigScalarGroup OBJECT-GROUP
+        OBJECTS     {
+                       hpStackId,
+                       hpStackOperStatus,
+                       hpStackSetStacking,
+                       hpStackTopology,
+                       hpStackTrapEnable,
+                       hpStackSwitchAdminStatus,
+                       hpStackSwitchPreferredPriority,
+                       hpStackSwitchPreferredMemberId
+                    }
+        STATUS      current
+        DESCRIPTION "A collection of objects for the basic stack configuration."
+        ::= { hpStackGroups 1 }
+
+   hpStackMemberGroup OBJECT-GROUP
+        OBJECTS     {
+                       hpStackMemberProductId,
+                       hpStackMemberMacAddr,
+                       hpStackMemberShutdown, 
+                       hpStackMemberReboot,     
+                       hpStackMemberAdminPriority,
+                       hpStackMemberEntryStatus, 
+                       hpStackMemberEntPhysicalIndex,  
+                       hpStackMemberState,       
+                       hpStackMemberProductName, 
+                       hpStackMemberUpTime, 
+                       hpStackMemberSysOid,
+                       hpStackMemberIdForTrap,
+                       hpStackMemberSerialNum,
+                       hpStackMemberCpuUtil,
+                       hpStackMemberTotalMemory,
+                       hpStackMemberFreeMemory,
+                       hpStackMemberBootRomVersion,
+                       hpStackMemberOsVersion,
+                       hpStackMemberBootImage
+
+                    }
+        STATUS      current
+        DESCRIPTION "A collection of objects for the configuring a 
+                     member switch of the stack."
+        ::= { hpStackGroups 2 }
+
+   hpStackPortGroup OBJECT-GROUP
+        OBJECTS     {
+                       hpStackPortOperStatus,
+                       hpStackPortNeighbor,
+                       hpStackPortCost,
+                       hpStackPortIdForTrap,
+                       hpStackPortTypeForTrap,
+                       hpStackPortAdminStatus
+                    }
+        STATUS      current
+        DESCRIPTION "A collection of objects providing 
+                     information about the stack ports."
+        ::= { hpStackGroups 3 }
+
+   hpStackNotificationsGroup NOTIFICATION-GROUP
+        NOTIFICATIONS {
+                         hpStackPortChange,
+                         hpStackCommanderChange,
+                         hpStackMemberChange,
+                         hpStackMemberStatusChange,
+                         hpStackMergeFailed,
+                         hpStackMergeSuccess
+                      }
+        STATUS      current
+        DESCRIPTION "A collection of objects providing 
+                     information about the stack ports."
+        ::= { hpStackGroups 4 }
+END   

@@ -2,6 +2,7 @@ os: netvision-rfc
 text: 'Socomec Net Vision'
 type: power
 icon: netvision
+mib_dir: socomec
 rfc1628_compat: true
 over:
     - { graph: device_current, text: Current }

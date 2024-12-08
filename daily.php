@@ -136,11 +136,6 @@ if ($options['f'] === 'callback') {
     \LibreNMS\Util\Stats::submit();
 }
 
-if ($options['f'] === 'device_perf') {
-    $ret = lock_and_purge('device_perf', 'timestamp < DATE_SUB(NOW(),INTERVAL ? DAY)');
-    exit($ret);
-}
-
 if ($options['f'] === 'ports_purge') {
     if (Config::get('ports_purge')) {
         $lock = Cache::lock('ports_purge', 86000);
@@ -265,27 +260,16 @@ if ($options['f'] === 'alert_log') {
     // we want only to keep the last alert_log that contains the alert details
 
     $msg = "Deleting history of active alert_logs more than %d days\n";
-    $sql = 'DELETE
+    $sql = 'DELETE alert_log FROM
+                alert_log
+                INNER JOIN
+                (SELECT device_id, rule_id, max(time_logged) AS mtime_logged
                     FROM alert_log
-                    WHERE id IN(
-                        SELECT id FROM(
-                            SELECT id
-                            FROM alert_log a1
-                            WHERE
-                                time_logged < DATE_SUB(NOW(),INTERVAL ? DAY)
-                                AND (device_id, rule_id, time_logged) NOT IN (
-                                    SELECT device_id, rule_id, max(time_logged)
-                                    FROM alert_log a2 WHERE a1.device_id = a2.device_id AND a1.rule_id = a2.rule_id
-                                    AND a2.time_logged < DATE_SUB(NOW(),INTERVAL ? DAY)
-                                )
-                        ) as c
-                    )
-                ';
-    $purge_duration = Config::get('alert_log_purge');
-    if (! (is_numeric($purge_duration) && $purge_duration > 0)) {
-        return -2;
-    }
-    $sql = preg_replace('/\?/', strval($purge_duration), $sql, 1);
+                    WHERE time_logged < DATE_SUB(NOW(), INTERVAL ? DAY)
+                    GROUP BY device_id, rule_id) AS b
+                ON
+                    alert_log.device_id = b.device_id AND alert_log.rule_id = b.rule_id
+                WHERE alert_log.time_logged < b.mtime_logged';
     lock_and_purge_query($table, $sql, $msg);
 }
 
@@ -349,7 +333,11 @@ if ($options['f'] === 'refresh_device_groups') {
 
 if ($options['f'] === 'notify') {
     if (\LibreNMS\Config::has('alert.default_mail')) {
-        \LibreNMS\Util\Mail::send(\LibreNMS\Config::get('alert.default_mail'), '[LibreNMS] Auto update has failed for ' . Config::get('distributed_poller_name'), "We just attempted to update your install but failed. The information below should help you fix this.\r\n\r\n" . $options['o'], false);
+        try {
+            \LibreNMS\Util\Mail::send(\LibreNMS\Config::get('alert.default_mail'), '[LibreNMS] Auto update has failed for ' . Config::get('distributed_poller_name'), "We just attempted to update your install but failed. The information below should help you fix this.\r\n\r\n" . $options['o'], false);
+        } catch (Exception $e) {
+            echo 'Failed to send update failed email. ' . $e->getMessage();
+        }
     }
 }
 
@@ -376,7 +364,13 @@ if ($options['f'] === 'recalculate_device_dependencies') {
         // update all root nodes and recurse, chunk so we don't blow up
         Device::doesntHave('parents')->with('children')->chunkById(100, function (Collection $devices) {
             // anonymous recursive function
-            $recurse = function (Device $device) use (&$recurse) {
+            $processed = [];
+            $recurse = function (Device $device) use (&$recurse, &$processed) {
+                // Do not process the same device 2 times
+                if (array_key_exists($device->device_id, $processed)) {
+                    return;
+                }
+                $processed[$device->device_id] = true;
                 $device->updateMaxDepth();
 
                 $device->children->each($recurse);

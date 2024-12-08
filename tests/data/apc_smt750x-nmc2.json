@@ -569,7 +569,7 @@
                     "group": null,
                     "sensor_divisor": 6000,
                     "sensor_multiplier": 1,
-                    "sensor_current": 10976200,
+                    "sensor_current": 1829.3666666667,
                     "sensor_limit": 3000,
                     "sensor_limit_warn": 2000,
                     "sensor_limit_low": 5,
@@ -1077,7 +1077,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_prev": 10976200,
+                    "sensor_prev": 1829.3666666667,
                     "user_func": null,
                     "rrd_type": "GAUGE",
                     "state_name": null

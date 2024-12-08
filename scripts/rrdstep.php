@@ -56,11 +56,14 @@ $icmp_step = Config::get('ping_rrd_step', $system_step);
 $system_heartbeat = Config::get('rrd.heartbeat', $system_step * 2);
 $rrdtool = Config::get('rrdtool', 'rrdtool');
 $tmp_path = Config::get('temp_dir', '/tmp');
+$rrd_dir = Config::get('rrd_dir', Config::get('install_dir') . '/rrd');
 
+$files = [];
 if ($hostname === 'all') {
-    $hostname = '*';
+    $files = glob(Str::finish($rrd_dir, '/') . '*/*.rrd');
+} else {
+    $files = glob(Rrd::dirFromHost($hostname) . '/*.rrd');
 }
-$files = glob(Rrd::dirFromHost($hostname) . '/*.rrd');
 
 $converted = 0;
 $skipped = 0;
@@ -70,7 +73,7 @@ foreach ($files as $file) {
     $random = $tmp_path . '/' . mt_rand() . '.xml';
     $rrd_file = basename($file, '.rrd');
 
-    if ($rrd_file == 'ping-perf') {
+    if ($rrd_file == 'icmp-perf') {
         $step = $icmp_step;
         $heartbeat = $icmp_step * 2;
     } else {

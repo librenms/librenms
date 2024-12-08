@@ -743,6 +743,75 @@ Output:
 }
 ```
 
+### `get_device_transceivers`
+
+Get a list of FDB entries associated with a device.
+
+Route: `/api/v0/devices/:hostname/transceivers`
+
+- hostname can be either the device hostname or id
+
+Example:
+
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/transceivers
+```
+
+Output:
+
+```json
+{
+    "status": "ok",
+    "transceivers": [
+        {
+            "id": 12,
+            "created_at": "2024-06-26T23:46:06.000000Z",
+            "updated_at": "2024-06-26T23:46:57.000000Z",
+            "device_id": 3138,
+            "port_id": 50735,
+            "index": "50",
+            "type": "10G_BASE_LR_SFP",
+            "vendor": "FS",
+            "oui": "00 00 00",
+            "model": null,
+            "revision": "",
+            "serial": "G000999AA",
+            "date": null,
+            "ddm": true,
+            "encoding": null,
+            "cable": "SM",
+            "distance": 20000,
+            "wavelength": 1330,
+            "connector": "LC",
+            "channels": 1
+        },
+        {
+            "id": 13,
+            "created_at": "2024-06-26T23:46:06.000000Z",
+            "updated_at": "2024-06-27T00:00:07.000000Z",
+            "device_id": 3138,
+            "port_id": 50736,
+            "index": "51",
+            "type": "10G_BASE_SR_SFP",
+            "vendor": "HPE",
+            "oui": "64 9D 99",
+            "model": null,
+            "revision": "1",
+            "serial": "AAAA0000AAA",
+            "date": null,
+            "ddm": true,
+            "encoding": null,
+            "cable": "SM",
+            "distance": 300,
+            "wavelength": 850,
+            "connector": "LC",
+            "channels": 1
+        }
+    ]
+}
+```
+
+
 ### `get_components`
 
 Get a list of components for a particular device.
@@ -1046,7 +1115,7 @@ Input:
   - ipv4: search by IPv4 address
   - ipv6: search by IPv6 address (compressed or uncompressed)
   - location: search by location
-  - location_id: serach by locaiton_id
+  - location_id: search by location_id
   - hostname: search by hostname
   - sysName: search by sysName
   - display: search by display name
@@ -1099,6 +1168,31 @@ Output:
    "icon": null
   }
  ]
+}
+```
+
+### `device_under_maintenance`
+
+Get the current maintenance status of a device.
+
+Route: `/api/v0/devices/:hostname/maintenance`
+
+Input:
+
+ -
+
+Example:
+
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/maintenance
+```
+
+Output:
+
+```json
+{
+    "status": "ok",
+    "is_under_maintenance": true
 }
 ```
 

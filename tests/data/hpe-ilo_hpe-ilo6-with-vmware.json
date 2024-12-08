@@ -860,7 +860,7 @@
                     "mempool_class": "system",
                     "mempool_precision": 1048576,
                     "mempool_descr": "Paging Memory",
-                    "mempool_perc": -3085,
+                    "mempool_perc": 0,
                     "mempool_perc_oid": null,
                     "mempool_used": -515661365248,
                     "mempool_used_oid": null,

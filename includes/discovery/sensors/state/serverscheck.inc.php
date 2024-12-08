@@ -31,6 +31,9 @@ $serverscheck_oids = [
     'sensor3Value.0' => '.1.3.6.1.4.1.17095.3.10.0',
     'sensor4Value.0' => '.1.3.6.1.4.1.17095.3.14.0',
     'sensor5Value.0' => '.1.3.6.1.4.1.17095.3.18.0',
+    'sensor6Value.0' => '.1.3.6.1.4.1.17095.3.22.0',
+    'sensor7Value.0' => '.1.3.6.1.4.1.17095.3.26.0',
+    'sensor8Value.0' => '.1.3.6.1.4.1.17095.3.30.0',
 ];
 
 foreach ($pre_cache['serverscheck_control'] as $oid_name => $oid_value) {
@@ -49,7 +52,7 @@ foreach ($pre_cache['serverscheck_control'] as $oid_name => $oid_value) {
             ];
             create_state_index($state_name, $states);
 
-            discover_sensor($valid['sensor'], 'state', $device, $serverscheck_oids[$tmp_oid], $index, $state_name, $descr, 1, 1, null, null, null, null, 1);
+            discover_sensor(null, 'state', $device, $serverscheck_oids[$tmp_oid], $index, $state_name, $descr, 1, 1, null, null, null, null, 1);
             create_sensor_to_state_index($device, $state_name, $index);
         }
     }

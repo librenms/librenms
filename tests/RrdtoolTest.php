@@ -45,7 +45,6 @@ class RrdtoolTest extends TestCase
         $cmd = $this->buildCommandProxy('update', '/opt/librenms/rrd/f', 'o');
         $this->assertEquals('update /opt/librenms/rrd/f o', $cmd);
 
-        $this->app->forgetInstance(Rrd::class);
         Config::set('rrdtool_version', '1.6');
 
         $cmd = $this->buildCommandProxy('create', '/opt/librenms/rrd/f', 'o');
@@ -73,7 +72,6 @@ class RrdtoolTest extends TestCase
         $cmd = $this->buildCommandProxy('update', '/opt/librenms/rrd/f', 'o');
         $this->assertEquals('update f o --daemon server:42217', $cmd);
 
-        $this->app->forgetInstance(Rrd::class);
         Config::set('rrdtool_version', '1.6');
 
         $cmd = $this->buildCommandProxy('create', '/opt/librenms/rrd/f', 'o');
@@ -98,11 +96,10 @@ class RrdtoolTest extends TestCase
 
     private function buildCommandProxy($command, $filename, $options)
     {
-        // todo better tests
-        $reflection = new \ReflectionClass(Rrd::class);
-        $method = $reflection->getMethod('buildCommand');
-        $method->setAccessible(true);
+        $mock = $this->mock(Rrd::class)->makePartial(); // avoid constructor
+        // @phpstan-ignore method.protected
+        $mock->loadConfig(); // load config every time to clear cached settings
 
-        return $method->invokeArgs($this->app->make(Rrd::class), func_get_args());
+        return $mock->buildCommand($command, $filename, $options);
     }
 }

@@ -34,6 +34,13 @@ class CustomMapNode extends BaseModel
     use HasFactory;
     protected $primaryKey = 'custom_map_node_id';
 
+    public function linkedMapIsDown(): bool
+    {
+        return $this->linked_custom_map_id &&
+            CustomMapNode::where('custom_map_id', $this->linked_custom_map_id)
+                ->whereRelation('device', fn ($q) => $q->isDown())->exists();
+    }
+
     public function scopeHasAccess($query, User $user)
     {
         if ($user->hasGlobalRead()) {
@@ -57,6 +64,11 @@ class CustomMapNode extends BaseModel
     public function linked_map(): BelongsTo
     {
         return $this->belongsTo(CustomMap::class, 'linked_custom_map_id');
+    }
+
+    public function nodeimage(): BelongsTo
+    {
+        return $this->belongsTo(CustomMapNodeImage::class, 'node_image_id');
     }
 
     public function edges1(): HasMany
