@@ -73,4 +73,17 @@ if ($device['os'] == 'vrp') {
         data_update($device, 'poe', $tags, $fields);
         echo 'PoE(jetstream) ';
     }
+} elseif ($device['os'] == 'ironware') {
+    if (isset($this_port['snAgentPoePortControl']) && $this_port['snAgentPoePortControl'] != 'other') {
+        $fields = [
+            'PortPwrAllocated' => $this_port['snAgentPoePortWattage'],
+            'PortPwrAvailable' => $this_port['snAgentPoePortWattage'],
+            'PortConsumption' => $this_port['snAgentPoePortConsumed'],
+            'PortMaxPwrDrawn' => $this_port['snAgentPoePortWattage'],
+        ];
+
+        $tags = compact('ifName', 'rrd_name', 'rrd_def');
+        data_update($device, 'poe', $tags, $fields);
+        echo 'PoE(ironware) ';
+    }
 }
