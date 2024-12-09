@@ -1,4 +1,4 @@
-mib: POWERSUPPLY-MIB:FAN-MIB:STATISTICS-MIB:HP-ICF-POE-MIB:HP-STACK-MIB
+mib: POWERSUPPLY-MIB:FAN-MIB:STATISTICS-MIB:HP-ICF-POE-MIB:HP-STACK-MIB:ENTITY-MIB:ENTITY-STATE-MIB
 modules:
     mempools:
         data:
@@ -36,6 +36,12 @@ modules:
                 num_oid: '.1.3.6.1.4.1.11.2.14.11.5.1.9.6.1.{{ $index }}'
                 type: procurve-fixed
     sensors:
+        pre-cache:
+            data:
+                -
+                    oid:
+                        - entPhysicalDescr
+                        - entPhysicalName 
         temperature:
             data:
                 -
@@ -144,3 +150,20 @@ modules:
                         - { descr: incompatibleOs , graph: 1, value: 9, generic: 3 }
                         - { descr: unknownState , graph: 1, value: 10, generic: 3 }
                         - { descr: standbyBooting , graph: 1, value: 11, generic: 3 }
+                -
+                    oid: entStateOper
+                    value: entStateOper
+                    num_oid: '.1.3.6.1.2.1.131.1.1.1.3.{{ $index }}'
+                    descr: '{{ $entPhysicalName }} [{{ $entPhysicalDescr }}]'
+                    index: 'entStateOper.{{ $index }}'
+                    state_name: entStateOper
+                    states:
+                        - { descr: notPresent, graph: 1, value: 1, generic: 3 }
+                        - { descr: unknown, graph: 1, value: 2, generic: 1 }
+                        - { descr: ok, graph: 1, value: 3, generic: 0 }
+                        - { descr: failed, graph: 1, value: 4, generic: 2 }
+                    skip_values:
+                        -
+                            oid: entPhysicalDescr
+                            op: 'in_array'
+                            value: ['', 'Chassis Sensor', 'Aruba JL073A Switch interface module pseudocontainer', 'Aruba JL073A Switch power supply bay pseudocontainer', 'Aruba JL073A Switch temperature sensor', 'Aruba JL073A Switch Management Module Slot', 'Aruba JL073A Switch port module slot', 'Aruba JL073A Switch power supply bay', 'Aruba JL073A Switch power supply', 'Aruba JL073A Switch fan', 'Aruba JL073A Switch Stacking Port', 'Aruba JL073x Fixed 24p 1GBase-T PoE+ Module', 'Aruba JL073x No Card', 'Aruba JL073x 100/1000BASE-T Port', 'Aruba JL074A Switch interface module pseudocontainer', 'Aruba JL074A Switch power supply bay pseudocontainer', 'Aruba JL074A Switch temperature sensor', 'Aruba JL074A Switch Management Module Slot', 'Aruba JL074A Switch port module slot', 'Aruba JL074A Switch power supply bay', 'Aruba JL074A Switch power supply', 'Aruba JL074A Switch fan', 'Aruba JL074A Switch Stacking Port', 'Aruba JL074x Fixed 24p 1GBase-T PoE+ Module', 'Aruba JL074y Fixed 24p 1GBase-T PoE+ Module', 'Aruba JL074x No Card', 'Aruba JL074y No Card', 'Aruba JL074x 100/1000BASE-T Port', 'Aruba JL074y 100/1000BASE-T Port', 'Aruba JL083A 4-port Stacking Module', 'Aruba JL084A 4-port Stacking Module', 'HP J9850A Switch interface module pseudocontainer', 'HP J9850A Switch power supply bay pseudocontainer', 'HP J9850A Switch temperature sensor', 'HP J9850A Switch Management Module Slot', 'HP J9850A Switch port module slot', 'HP J9850A Switch power supply bay', 'HP J9850A Switch power supply', 'HP J9850A Switch fan', 'HP J9851A Switch interface module pseudocontainer', 'HP J9851A Switch power supply bay pseudocontainer', 'HP J9851A Switch temperature sensor', 'HP J9851A Switch Management Module Slot', 'HP J9851A Switch port module slot', 'HP J9851A Switch power supply bay', 'HP J9851A Switch power supply', 'HP J9851A Switch fan', 'HP J9990A 100/1000BASE-T Port', 'HP J9990A 10GIGBASE-GEN Port', 'HP J9990A No Card']
