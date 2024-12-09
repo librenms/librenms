@@ -25,9 +25,8 @@
 
 namespace App\Models;
 
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use LibreNMS\Enum\Severity;
 
 class Eventlog extends DeviceRelatedModel
@@ -54,39 +53,16 @@ class Eventlog extends DeviceRelatedModel
      */
     public static function log($text, $device = null, $type = null, Severity $severity = Severity::Info, $reference = null): void
     {
-        $model = app()->make(Eventlog::class);
-        $model->_log($text, $device, $type, $severity, $reference);
-    }
-
-    /**
-     * Log events to the event table
-     *
-     * @param  string  $text
-     * @param  Device|int|null  $device
-     * @param  string  $type
-     * @param  Severity  $severity
-     * @param  int|string|null  $reference
-     */
-    public function _log($text, $device = null, $type = null, Severity $severity = Severity::Info, $reference = null): void
-    {
-        $log = new static([
-            'reference' => $reference,
-            'type' => $type,
-            'datetime' => Carbon::now(),
-            'severity' => $severity,
-            'message' => $text,
-            'username' => (class_exists('\Auth') && Auth::check()) ? Auth::user()->username : '',
-        ]);
-
-        if (is_numeric($device)) {
-            $log->device_id = $device;
-        }
-
-        if ($device instanceof Device) {
-            $device->eventlogs()->save($log);
-        } else {
-            $log->save();
-        }
+        Log::channel('event')->log(
+            $severity->toLogLevel(),
+            $text,
+            [
+                'device_id' => $device instanceof Device ? $device->device_id : $device,
+                'type' => $type,
+                'severity' => $severity,
+                'reference' => $reference,
+            ],
+        );
     }
 
     // ---- Define Relationships ----
