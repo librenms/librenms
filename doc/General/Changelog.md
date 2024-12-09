@@ -835,6 +835,7 @@ Thanks to maintainers and others that helped with pull requests this month:
 * Fix php issue in cisco ntp code ([#16172](https://github.com/librenms/librenms/pull/16172)) - [murrant](https://github.com/murrant)
 * Allow for AXIS Panoramic cameras such as the P4707 ([#16166](https://github.com/librenms/librenms/pull/16166)) - [dennypage](https://github.com/dennypage)
 * Add support for Fiberstore branded BDCOM switches ([#16162](https://github.com/librenms/librenms/pull/16162)) - [freddy36](https://github.com/freddy36)
+* Add support for Fiberstore branded ALPHABRIDGE switches ([#16162](https://github.com/librenms/librenms/pull/16162)) - [freddy36](https://github.com/freddy36)
 * Add transceiver monitoring ([#16160](https://github.com/librenms/librenms/pull/16160)) - [freddy36](https://github.com/freddy36)
 * Add support for more Cisco FTD devices ([#16150](https://github.com/librenms/librenms/pull/16150)) - [normand-hue](https://github.com/normand-hue)
 * ArubaOS - Addtional support to poll Active VPN sessions ([#16137](https://github.com/librenms/librenms/pull/16137)) - [schnobbc](https://github.com/schnobbc)
@@ -957,6 +958,7 @@ Thanks to maintainers and others that helped with pull requests this month:
 * Update Hatteras DSLAM name ([#16054](https://github.com/librenms/librenms/pull/16054)) - [cadirol](https://github.com/cadirol)
 * Add initial support for socomec-ups ([#16018](https://github.com/librenms/librenms/pull/16018)) - [Npeca75](https://github.com/Npeca75)
 * Fix bdcom/pbn neighbour discovery ([#15935](https://github.com/librenms/librenms/pull/15935)) - [freddy36](https://github.com/freddy36)
+* Fix ALPHABRIDGE/pbn neighbour discovery ([#15935](https://github.com/librenms/librenms/pull/15935)) - [freddy36](https://github.com/freddy36)
 * Add support for new sensors on Firebrick 9000 models. ([#15842](https://github.com/librenms/librenms/pull/15842)) - [cjsoftuk](https://github.com/cjsoftuk)
 
 #### Webui

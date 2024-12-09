@@ -346,6 +346,13 @@ class DeviceController extends TableController
             'onclick' => 'http_fallback(this); return false;',
             'icon' => 'fa-globe',
         ];
+        $actions[$row][] = [
+            'title' => 'Launch browser to ' . $device->hostname,
+            'href' => 'http://' . $device->hostname,
+            'onclick' => 'http_fallback(this); return false;',
+            'icon' => 'fa-thin fa-link',
+            'style' => 'color:red',
+        ];
 
         foreach (array_values(Arr::wrap(Config::get('html.device.links'))) as $index => $custom) {
             if ($custom['action'] ?? false) {

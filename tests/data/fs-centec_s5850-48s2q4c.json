@@ -12317,6 +12317,17 @@
                 {
                     "active": 1,
                     "protocol": "lldp",
+                    "remote_hostname": "sw11894",
+                    "remote_port": "TGi0/1 (ac128e7b2dfe)",
+                    "remote_platform": null,
+                    "remote_version": "ALPHABRIDGE(tm) S2900-24T4X Software, Version 2.2.0F\nSerial: 2005702913357029133\nCopyright by Alpha Bridge Technologies Private Limited.\nCompiled: 2024-12-09 10:20:21 by SYS",
+                    "ifAlias": "<private>",
+                    "ifDescr": "eth-0-11",
+                    "ifName": "eth-0-11"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
                     "remote_hostname": "sw11323.f1",
                     "remote_port": "609 (5c4527b6be40)",
                     "remote_platform": null,

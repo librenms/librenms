@@ -1,3 +1,8 @@
+<style>
+    .panel.panel-default {
+    margin: 100px;
+}
+</style>
 <x-panel>
     <x-slot name="title">
         <img class="logon-logo img-responsive" src="{{ asset(\LibreNMS\Config::get('title_image', 'images/telequill_loginpage.svg')) }}">
@@ -5,7 +10,9 @@
 
     @config('login_message')
     <x-slot name="footer" class="text-center">
-        <div class="logon-message">{{ \LibreNMS\Config::get('login_message') }}</div>
+        {{-- <div class="logon-message">{{ \LibreNMS\Config::get('login_message') }}</div> --}}
+        <div class="logon-message">Alpha Bridge Technologies Pvt Ltd.</div>
+        <span>Version 1.0</span>
     </x-slot>
     @endconfig
 
@@ -60,3 +67,4 @@
         @endforeach
     </div>
 </x-panel>
+
