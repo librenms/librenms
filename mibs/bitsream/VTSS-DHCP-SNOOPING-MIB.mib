@@ -1,0 +1,581 @@
+-- *****************************************************************
+-- DHCP-SNOOPING-MIB:  Vitesse private MIB
+--
+-- Copyright (c) 2002-2013 Vitesse Semiconductor Corporation "Vitesse".
+-- All Rights Reserved.
+--
+-- ****************************************************************
+
+VTSS-DHCP-SNOOPING-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    vtssSwitchMgmt
+        FROM VTSS-SMI
+    Integer32 FROM SNMPv2-SMI
+    IpAddress FROM SNMPv2-SMI
+    Unsigned32 FROM SNMPv2-SMI
+    MacAddress FROM SNMPv2-TC
+    TruthValue FROM SNMPv2-TC
+    VTSSInterfaceIndex FROM VTSS-TC
+    ;
+
+vtssDhcpSnoopingMib MODULE-IDENTITY
+    LAST-UPDATED "201410100000Z"
+    ORGANIZATION
+        "Vitesse Semiconductor Corporation"
+    CONTACT-INFO
+        "Application support <application_support@vitesse.com>"
+    DESCRIPTION
+        "This is a private version of the DHCP Snooping MIB"
+    REVISION    "201410100000Z"
+    DESCRIPTION
+        "Editorial changes"
+    REVISION    "201407010000Z"
+    DESCRIPTION
+        "Initial version"
+    ::= { vtssSwitchMgmt 56 }
+
+
+vtssDhcpSnoopingMibObjects OBJECT IDENTIFIER
+    ::= { vtssDhcpSnoopingMib 1 }
+
+vtssDhcpSnoopingConfig OBJECT IDENTIFIER
+    ::= { vtssDhcpSnoopingMibObjects 2 }
+
+vtssDhcpSnoopingConfigGlobals OBJECT IDENTIFIER
+    ::= { vtssDhcpSnoopingConfig 1 }
+
+vtssDhcpSnoopingConfigGlobalsMode OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the DHCP snooping mode operation. Possible modes are - true:
+         Enable DHCP snooping mode operation. When DHCP snooping mode operation
+         is enabled, the DHCP request messages will be forwarded to trusted
+         ports and only allow reply packets from trusted ports. false: Disable
+         DHCP snooping mode operation."
+    ::= { vtssDhcpSnoopingConfigGlobals 1 }
+
+vtssDhcpSnoopingConfigInterfaceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VTSSDhcpSnoopingConfigInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is a table of DHCP Snooping port configuration parameters"
+    ::= { vtssDhcpSnoopingConfig 2 }
+
+vtssDhcpSnoopingConfigInterfaceEntry OBJECT-TYPE
+    SYNTAX      VTSSDhcpSnoopingConfigInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each port has a set of parameters"
+    INDEX       { vtssDhcpSnoopingConfigInterfaceIfIndex }
+    ::= { vtssDhcpSnoopingConfigInterfaceTable 1 }
+
+VTSSDhcpSnoopingConfigInterfaceEntry ::= SEQUENCE {
+    vtssDhcpSnoopingConfigInterfaceIfIndex      VTSSInterfaceIndex,
+    vtssDhcpSnoopingConfigInterfaceTrustMode    TruthValue
+}
+
+vtssDhcpSnoopingConfigInterfaceIfIndex OBJECT-TYPE
+    SYNTAX      VTSSInterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Logical interface number of the physical port."
+    ::= { vtssDhcpSnoopingConfigInterfaceEntry 1 }
+
+vtssDhcpSnoopingConfigInterfaceTrustMode OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the DHCP snooping port mode. Possible port modes are - true:
+         Configures the port as trusted source of the DHCP messages. false:
+         Configures the port as untrusted source of the DHCP messages."
+    ::= { vtssDhcpSnoopingConfigInterfaceEntry 2 }
+
+vtssDhcpSnoopingStatus OBJECT IDENTIFIER
+    ::= { vtssDhcpSnoopingMibObjects 3 }
+
+vtssDhcpSnoopingStatusAssignedIpTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VTSSDhcpSnoopingStatusAssignedIpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is a table of assigned IP information in DHCP Snooping "
+    ::= { vtssDhcpSnoopingStatus 1 }
+
+vtssDhcpSnoopingStatusAssignedIpEntry OBJECT-TYPE
+    SYNTAX      VTSSDhcpSnoopingStatusAssignedIpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each entry has a set of parameters"
+    INDEX       { vtssDhcpSnoopingStatusAssignedIpMacAddress, vtssDhcpSnoopingStatusAssignedIpVlanId }
+    ::= { vtssDhcpSnoopingStatusAssignedIpTable 1 }
+
+VTSSDhcpSnoopingStatusAssignedIpEntry ::= SEQUENCE {
+    vtssDhcpSnoopingStatusAssignedIpMacAddress      MacAddress,
+    vtssDhcpSnoopingStatusAssignedIpVlanId      Integer32,
+    vtssDhcpSnoopingStatusAssignedIpIfIndex     VTSSInterfaceIndex,
+    vtssDhcpSnoopingStatusAssignedIpIpAddress   IpAddress,
+    vtssDhcpSnoopingStatusAssignedIpNetmask     IpAddress,
+    vtssDhcpSnoopingStatusAssignedIpDhcpServerIp    IpAddress
+}
+
+vtssDhcpSnoopingStatusAssignedIpMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "MAC address."
+    ::= { vtssDhcpSnoopingStatusAssignedIpEntry 1 }
+
+vtssDhcpSnoopingStatusAssignedIpVlanId OBJECT-TYPE
+    SYNTAX      Integer32 (1..4095)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The VLAN id of the VLAN."
+    ::= { vtssDhcpSnoopingStatusAssignedIpEntry 2 }
+
+vtssDhcpSnoopingStatusAssignedIpIfIndex OBJECT-TYPE
+    SYNTAX      VTSSInterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Logical interface number of the physical port of the DHCP client."
+    ::= { vtssDhcpSnoopingStatusAssignedIpEntry 3 }
+
+vtssDhcpSnoopingStatusAssignedIpIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "IP address assigned to DHCP client by DHCP server."
+    ::= { vtssDhcpSnoopingStatusAssignedIpEntry 4 }
+
+vtssDhcpSnoopingStatusAssignedIpNetmask OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Netmask assigned to DHCP client by DHCP server."
+    ::= { vtssDhcpSnoopingStatusAssignedIpEntry 5 }
+
+vtssDhcpSnoopingStatusAssignedIpDhcpServerIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "IP address of the DHCP server that assigns the IP address and netmask."
+    ::= { vtssDhcpSnoopingStatusAssignedIpEntry 6 }
+
+vtssDhcpSnoopingControl OBJECT IDENTIFIER
+    ::= { vtssDhcpSnoopingMibObjects 4 }
+
+vtssDhcpSnoopingControlInterfaceClearStatisticsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VTSSDhcpSnoopingControlInterfaceClearStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is a table to clear port statistics in DHCP Snooping"
+    ::= { vtssDhcpSnoopingControl 1 }
+
+vtssDhcpSnoopingControlInterfaceClearStatisticsEntry OBJECT-TYPE
+    SYNTAX      VTSSDhcpSnoopingControlInterfaceClearStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each port has a set of parameters"
+    INDEX       { vtssDhcpSnoopingControlInterfaceClearStatisticsIfIndex }
+    ::= { vtssDhcpSnoopingControlInterfaceClearStatisticsTable 1 }
+
+VTSSDhcpSnoopingControlInterfaceClearStatisticsEntry ::= SEQUENCE {
+    vtssDhcpSnoopingControlInterfaceClearStatisticsIfIndex      VTSSInterfaceIndex,
+    vtssDhcpSnoopingControlInterfaceClearStatisticsClear    TruthValue
+}
+
+vtssDhcpSnoopingControlInterfaceClearStatisticsIfIndex OBJECT-TYPE
+    SYNTAX      VTSSInterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Logical interface number of the physical port."
+    ::= { vtssDhcpSnoopingControlInterfaceClearStatisticsEntry 1 }
+
+vtssDhcpSnoopingControlInterfaceClearStatisticsClear OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "clear statistics per physical port."
+    ::= { vtssDhcpSnoopingControlInterfaceClearStatisticsEntry 2 }
+
+vtssDhcpSnoopingStatistics OBJECT IDENTIFIER
+    ::= { vtssDhcpSnoopingMibObjects 5 }
+
+vtssDhcpSnoopingStatisticsInterfaceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VTSSDhcpSnoopingStatisticsInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is a table of port statistics in DHCP Snooping "
+    ::= { vtssDhcpSnoopingStatistics 2 }
+
+vtssDhcpSnoopingStatisticsInterfaceEntry OBJECT-TYPE
+    SYNTAX      VTSSDhcpSnoopingStatisticsInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each entry has a set of parameters"
+    INDEX       { vtssDhcpSnoopingStatisticsInterfaceIfIndex }
+    ::= { vtssDhcpSnoopingStatisticsInterfaceTable 1 }
+
+VTSSDhcpSnoopingStatisticsInterfaceEntry ::= SEQUENCE {
+    vtssDhcpSnoopingStatisticsInterfaceIfIndex      VTSSInterfaceIndex,
+    vtssDhcpSnoopingStatisticsInterfaceRxDiscover   Unsigned32,
+    vtssDhcpSnoopingStatisticsInterfaceRxOffer      Unsigned32,
+    vtssDhcpSnoopingStatisticsInterfaceRxRequest    Unsigned32,
+    vtssDhcpSnoopingStatisticsInterfaceRxDecline    Unsigned32,
+    vtssDhcpSnoopingStatisticsInterfaceRxAck    Unsigned32,
+    vtssDhcpSnoopingStatisticsInterfaceRxNak    Unsigned32,
+    vtssDhcpSnoopingStatisticsInterfaceRxRelease    Unsigned32,
+    vtssDhcpSnoopingStatisticsInterfaceRxInform     Unsigned32,
+    vtssDhcpSnoopingStatisticsInterfaceRxLeaseQuery     Unsigned32,
+    vtssDhcpSnoopingStatisticsInterfaceRxLeaseUnassigned    Unsigned32,
+    vtssDhcpSnoopingStatisticsInterfaceRxLeaseUnknown   Unsigned32,
+    vtssDhcpSnoopingStatisticsInterfaceRxLeaseActive    Unsigned32,
+    vtssDhcpSnoopingStatisticsInterfaceRxDiscardChksumErr   Unsigned32,
+    vtssDhcpSnoopingStatisticsInterfaceRxDiscardUntrust     Unsigned32,
+    vtssDhcpSnoopingStatisticsInterfaceTxDiscover   Unsigned32,
+    vtssDhcpSnoopingStatisticsInterfaceTxOffer      Unsigned32,
+    vtssDhcpSnoopingStatisticsInterfaceTxRequest    Unsigned32,
+    vtssDhcpSnoopingStatisticsInterfaceTxDecline    Unsigned32,
+    vtssDhcpSnoopingStatisticsInterfaceTxAck    Unsigned32,
+    vtssDhcpSnoopingStatisticsInterfaceTxNak    Unsigned32,
+    vtssDhcpSnoopingStatisticsInterfaceTxRelease    Unsigned32,
+    vtssDhcpSnoopingStatisticsInterfaceTxInform     Unsigned32,
+    vtssDhcpSnoopingStatisticsInterfaceTxLeaseQuery     Unsigned32,
+    vtssDhcpSnoopingStatisticsInterfaceTxLeaseUnassigned    Unsigned32,
+    vtssDhcpSnoopingStatisticsInterfaceTxLeaseUnknown   Unsigned32,
+    vtssDhcpSnoopingStatisticsInterfaceTxLeaseActive    Unsigned32
+}
+
+vtssDhcpSnoopingStatisticsInterfaceIfIndex OBJECT-TYPE
+    SYNTAX      VTSSInterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Logical interface number of the physical port."
+    ::= { vtssDhcpSnoopingStatisticsInterfaceEntry 1 }
+
+vtssDhcpSnoopingStatisticsInterfaceRxDiscover OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of discover (option 53 with value 1) packets received."
+    ::= { vtssDhcpSnoopingStatisticsInterfaceEntry 2 }
+
+vtssDhcpSnoopingStatisticsInterfaceRxOffer OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of offer (option 53 with value 2) packets received."
+    ::= { vtssDhcpSnoopingStatisticsInterfaceEntry 3 }
+
+vtssDhcpSnoopingStatisticsInterfaceRxRequest OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of request (option 53 with value 3) packets received."
+    ::= { vtssDhcpSnoopingStatisticsInterfaceEntry 4 }
+
+vtssDhcpSnoopingStatisticsInterfaceRxDecline OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of decline (option 53 with value 4) packets received."
+    ::= { vtssDhcpSnoopingStatisticsInterfaceEntry 5 }
+
+vtssDhcpSnoopingStatisticsInterfaceRxAck OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of ACK (option 53 with value 5) packets received."
+    ::= { vtssDhcpSnoopingStatisticsInterfaceEntry 6 }
+
+vtssDhcpSnoopingStatisticsInterfaceRxNak OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of NAK (option 53 with value 6) packets received."
+    ::= { vtssDhcpSnoopingStatisticsInterfaceEntry 7 }
+
+vtssDhcpSnoopingStatisticsInterfaceRxRelease OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of release (option 53 with value 7) packets received."
+    ::= { vtssDhcpSnoopingStatisticsInterfaceEntry 8 }
+
+vtssDhcpSnoopingStatisticsInterfaceRxInform OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of inform (option 53 with value 8) packets received."
+    ::= { vtssDhcpSnoopingStatisticsInterfaceEntry 9 }
+
+vtssDhcpSnoopingStatisticsInterfaceRxLeaseQuery OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of lease query (option 53 with value 10) packets received."
+    ::= { vtssDhcpSnoopingStatisticsInterfaceEntry 10 }
+
+vtssDhcpSnoopingStatisticsInterfaceRxLeaseUnassigned OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of lease unassigned (option 53 with value 11) packets
+         received."
+    ::= { vtssDhcpSnoopingStatisticsInterfaceEntry 11 }
+
+vtssDhcpSnoopingStatisticsInterfaceRxLeaseUnknown OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of lease unknown (option 53 with value 12) packets received."
+    ::= { vtssDhcpSnoopingStatisticsInterfaceEntry 12 }
+
+vtssDhcpSnoopingStatisticsInterfaceRxLeaseActive OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of lease active (option 53 with value 13) packets received."
+    ::= { vtssDhcpSnoopingStatisticsInterfaceEntry 13 }
+
+vtssDhcpSnoopingStatisticsInterfaceRxDiscardChksumErr OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of discard packet that IP/UDP checksum is error."
+    ::= { vtssDhcpSnoopingStatisticsInterfaceEntry 14 }
+
+vtssDhcpSnoopingStatisticsInterfaceRxDiscardUntrust OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of discard packet that are coming from untrusted port."
+    ::= { vtssDhcpSnoopingStatisticsInterfaceEntry 15 }
+
+vtssDhcpSnoopingStatisticsInterfaceTxDiscover OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of discover (option 53 with value 1) packets transmited."
+    ::= { vtssDhcpSnoopingStatisticsInterfaceEntry 16 }
+
+vtssDhcpSnoopingStatisticsInterfaceTxOffer OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of offer (option 53 with value 2) packets transmited."
+    ::= { vtssDhcpSnoopingStatisticsInterfaceEntry 17 }
+
+vtssDhcpSnoopingStatisticsInterfaceTxRequest OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of request (option 53 with value 3) packets transmited."
+    ::= { vtssDhcpSnoopingStatisticsInterfaceEntry 18 }
+
+vtssDhcpSnoopingStatisticsInterfaceTxDecline OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of decline (option 53 with value 4) packets transmited."
+    ::= { vtssDhcpSnoopingStatisticsInterfaceEntry 19 }
+
+vtssDhcpSnoopingStatisticsInterfaceTxAck OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of ACK (option 53 with value 5) packets transmited."
+    ::= { vtssDhcpSnoopingStatisticsInterfaceEntry 20 }
+
+vtssDhcpSnoopingStatisticsInterfaceTxNak OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of NAK (option 53 with value 6) packets transmited."
+    ::= { vtssDhcpSnoopingStatisticsInterfaceEntry 21 }
+
+vtssDhcpSnoopingStatisticsInterfaceTxRelease OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of release (option 53 with value 7) packets transmited."
+    ::= { vtssDhcpSnoopingStatisticsInterfaceEntry 22 }
+
+vtssDhcpSnoopingStatisticsInterfaceTxInform OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of inform (option 53 with value 8) packets transmited."
+    ::= { vtssDhcpSnoopingStatisticsInterfaceEntry 23 }
+
+vtssDhcpSnoopingStatisticsInterfaceTxLeaseQuery OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of lease query (option 53 with value 10) packets transmited."
+    ::= { vtssDhcpSnoopingStatisticsInterfaceEntry 24 }
+
+vtssDhcpSnoopingStatisticsInterfaceTxLeaseUnassigned OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of lease unassigned (option 53 with value 11) packets
+         transmited."
+    ::= { vtssDhcpSnoopingStatisticsInterfaceEntry 25 }
+
+vtssDhcpSnoopingStatisticsInterfaceTxLeaseUnknown OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of lease unknown (option 53 with value 12) packets
+         transmited."
+    ::= { vtssDhcpSnoopingStatisticsInterfaceEntry 26 }
+
+vtssDhcpSnoopingStatisticsInterfaceTxLeaseActive OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of lease active (option 53 with value 13) packets
+         transmited."
+    ::= { vtssDhcpSnoopingStatisticsInterfaceEntry 27 }
+
+vtssDhcpSnoopingMibConformance OBJECT IDENTIFIER
+    ::= { vtssDhcpSnoopingMib 2 }
+
+vtssDhcpSnoopingMibCompliances OBJECT IDENTIFIER
+    ::= { vtssDhcpSnoopingMibConformance 1 }
+
+vtssDhcpSnoopingMibGroups OBJECT IDENTIFIER
+    ::= { vtssDhcpSnoopingMibConformance 2 }
+
+vtssDhcpSnoopingConfigGlobalsInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssDhcpSnoopingConfigGlobalsMode }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssDhcpSnoopingMibGroups 1 }
+
+vtssDhcpSnoopingConfigInterfaceInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssDhcpSnoopingConfigInterfaceTrustMode }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssDhcpSnoopingMibGroups 2 }
+
+vtssDhcpSnoopingStatusAssignedIpTableInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssDhcpSnoopingStatusAssignedIpIfIndex, 
+                  vtssDhcpSnoopingStatusAssignedIpIpAddress, 
+                  vtssDhcpSnoopingStatusAssignedIpNetmask, 
+                  vtssDhcpSnoopingStatusAssignedIpDhcpServerIp }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssDhcpSnoopingMibGroups 3 }
+
+vtssDhcpSnoopingControlInterfaceClearStatisticsTableInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssDhcpSnoopingControlInterfaceClearStatisticsClear }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssDhcpSnoopingMibGroups 4 }
+
+vtssDhcpSnoopingStatisticsInterfaceTableInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssDhcpSnoopingStatisticsInterfaceRxDiscover, 
+                  vtssDhcpSnoopingStatisticsInterfaceRxOffer, 
+                  vtssDhcpSnoopingStatisticsInterfaceRxRequest, 
+                  vtssDhcpSnoopingStatisticsInterfaceRxDecline, 
+                  vtssDhcpSnoopingStatisticsInterfaceRxAck, 
+                  vtssDhcpSnoopingStatisticsInterfaceRxNak, 
+                  vtssDhcpSnoopingStatisticsInterfaceRxRelease, 
+                  vtssDhcpSnoopingStatisticsInterfaceRxInform, 
+                  vtssDhcpSnoopingStatisticsInterfaceRxLeaseQuery, 
+                  vtssDhcpSnoopingStatisticsInterfaceRxLeaseUnassigned, 
+                  vtssDhcpSnoopingStatisticsInterfaceRxLeaseUnknown, 
+                  vtssDhcpSnoopingStatisticsInterfaceRxLeaseActive, 
+                  vtssDhcpSnoopingStatisticsInterfaceRxDiscardChksumErr, 
+                  vtssDhcpSnoopingStatisticsInterfaceRxDiscardUntrust, 
+                  vtssDhcpSnoopingStatisticsInterfaceTxDiscover, 
+                  vtssDhcpSnoopingStatisticsInterfaceTxOffer, 
+                  vtssDhcpSnoopingStatisticsInterfaceTxRequest, 
+                  vtssDhcpSnoopingStatisticsInterfaceTxDecline, 
+                  vtssDhcpSnoopingStatisticsInterfaceTxAck, 
+                  vtssDhcpSnoopingStatisticsInterfaceTxNak, 
+                  vtssDhcpSnoopingStatisticsInterfaceTxRelease, 
+                  vtssDhcpSnoopingStatisticsInterfaceTxInform, 
+                  vtssDhcpSnoopingStatisticsInterfaceTxLeaseQuery, 
+                  vtssDhcpSnoopingStatisticsInterfaceTxLeaseUnassigned, 
+                  vtssDhcpSnoopingStatisticsInterfaceTxLeaseUnknown, 
+                  vtssDhcpSnoopingStatisticsInterfaceTxLeaseActive }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssDhcpSnoopingMibGroups 5 }
+
+vtssDhcpSnoopingMibCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the implementation."
+
+    MODULE      -- this module
+
+        MANDATORY-GROUPS        { vtssDhcpSnoopingConfigGlobalsInfoGroup, 
+                  vtssDhcpSnoopingConfigInterfaceInfoGroup, 
+                  vtssDhcpSnoopingStatusAssignedIpTableInfoGroup, 
+                  vtssDhcpSnoopingControlInterfaceClearStatisticsTableInfoGroup, 
+                  vtssDhcpSnoopingStatisticsInterfaceTableInfoGroup }
+
+    ::= { vtssDhcpSnoopingMibCompliances 1 }
+
+END

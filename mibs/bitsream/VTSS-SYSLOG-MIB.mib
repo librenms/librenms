@@ -1,0 +1,257 @@
+-- *****************************************************************
+-- SYSLOG-MIB:  Vitesse private MIB
+--
+-- Copyright (c) 2002-2013 Vitesse Semiconductor Corporation "Vitesse".
+-- All Rights Reserved.
+--
+-- ****************************************************************
+
+VTSS-SYSLOG-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    vtssSwitchMgmt
+        FROM VTSS-SMI
+    Integer32 FROM SNMPv2-SMI
+    DateAndTime FROM SNMPv2-TC
+    TruthValue FROM SNMPv2-TC
+    VTSSDisplayString FROM VTSS-TC
+    VTSSInetAddress FROM VTSS-TC
+    ;
+
+vtssSyslogMib MODULE-IDENTITY
+    LAST-UPDATED "201407010000Z"
+    ORGANIZATION
+        "Vitesse Semiconductor Corporation"
+    CONTACT-INFO
+        "Application support <application_support@vitesse.com>"
+    DESCRIPTION
+        "This is a private MIB for Syslog"
+    REVISION    "201407010000Z"
+    DESCRIPTION
+        "Initial version"
+    ::= { vtssSwitchMgmt 37 }
+
+
+VTSSSyslogLevelType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The syslog severity level."
+    SYNTAX      INTEGER { error(3), warning(4), notice(5), informational(6), all(8) }
+
+vtssSyslogMibObjects OBJECT IDENTIFIER
+    ::= { vtssSyslogMib 1 }
+
+vtssSyslogConfig OBJECT IDENTIFIER
+    ::= { vtssSyslogMibObjects 2 }
+
+vtssSyslogConfigServer OBJECT IDENTIFIER
+    ::= { vtssSyslogConfig 1 }
+
+vtssSyslogConfigServerMode OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the syslog server mode operation. When the mode operation is
+         enabled, the syslog message will send out to syslog server."
+    ::= { vtssSyslogConfigServer 1 }
+
+vtssSyslogConfigServerAddress OBJECT-TYPE
+    SYNTAX      VTSSInetAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The domain name of syslog server."
+    ::= { vtssSyslogConfigServer 2 }
+
+vtssSyslogConfigServerLevel OBJECT-TYPE
+    SYNTAX      VTSSSyslogLevelType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Indicates what level of message will send to syslog server. For
+         example, the error level will send the specific messages which severity
+         code is less or equal than error(3), the warning level will send the
+         specific messages which severity code is less or equal than warning(4),
+         the notice level will send the specific messages which severity code is
+         less or equal than notice(5), the informational level will send the
+         specific messages which severity code is less or equal than
+         informational(6) and the enumeration option of all(8) isn't used in
+         this case."
+    ::= { vtssSyslogConfigServer 3 }
+
+vtssSyslogStatus OBJECT IDENTIFIER
+    ::= { vtssSyslogMibObjects 3 }
+
+vtssSyslogStatusHistoryTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VTSSSyslogStatusHistoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The syslog history table."
+    ::= { vtssSyslogStatus 1 }
+
+vtssSyslogStatusHistoryEntry OBJECT-TYPE
+    SYNTAX      VTSSSyslogStatusHistoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each row contains a set of parameters."
+    INDEX       { vtssSyslogStatusHistorySwitchId, vtssSyslogStatusHistoryMsgId }
+    ::= { vtssSyslogStatusHistoryTable 1 }
+
+VTSSSyslogStatusHistoryEntry ::= SEQUENCE {
+    vtssSyslogStatusHistorySwitchId     Integer32,
+    vtssSyslogStatusHistoryMsgId    Integer32,
+    vtssSyslogStatusHistoryMsgLevel     VTSSSyslogLevelType,
+    vtssSyslogStatusHistoryMsgTimeStamp     DateAndTime,
+    vtssSyslogStatusHistoryMsgText      VTSSDisplayString
+}
+
+vtssSyslogStatusHistorySwitchId OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The identification of switch. For non-stackable switch, the valid value
+         is limited to 1. "
+    ::= { vtssSyslogStatusHistoryEntry 1 }
+
+vtssSyslogStatusHistoryMsgId OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The identification of Syslog message."
+    ::= { vtssSyslogStatusHistoryEntry 2 }
+
+vtssSyslogStatusHistoryMsgLevel OBJECT-TYPE
+    SYNTAX      VTSSSyslogLevelType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The severity level of the system log message. Note that enumeration
+         option of all(8) isn't used in this case."
+    ::= { vtssSyslogStatusHistoryEntry 3 }
+
+vtssSyslogStatusHistoryMsgTimeStamp OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The value of sysUpTime when this message was generated."
+    ::= { vtssSyslogStatusHistoryEntry 4 }
+
+vtssSyslogStatusHistoryMsgText OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The detailed context of the system log message."
+    ::= { vtssSyslogStatusHistoryEntry 5 }
+
+vtssSyslogControl OBJECT IDENTIFIER
+    ::= { vtssSyslogMibObjects 4 }
+
+vtssSyslogControlHistoryTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VTSSSyslogControlHistoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The syslog history clear table."
+    ::= { vtssSyslogControl 1 }
+
+vtssSyslogControlHistoryEntry OBJECT-TYPE
+    SYNTAX      VTSSSyslogControlHistoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each row contains a set of parameters."
+    INDEX       { vtssSyslogControlHistorySwitchId, vtssSyslogControlHistoryClearLevel }
+    ::= { vtssSyslogControlHistoryTable 1 }
+
+VTSSSyslogControlHistoryEntry ::= SEQUENCE {
+    vtssSyslogControlHistorySwitchId    Integer32,
+    vtssSyslogControlHistoryClearLevel      VTSSSyslogLevelType,
+    vtssSyslogControlHistoryClear   TruthValue
+}
+
+vtssSyslogControlHistorySwitchId OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The identification of switch. For non-stackable switch, the valid value
+         is limited to 1. For stackable switch, value 0 means the action is
+         applied to all switches."
+    ::= { vtssSyslogControlHistoryEntry 1 }
+
+vtssSyslogControlHistoryClearLevel OBJECT-TYPE
+    SYNTAX      VTSSSyslogLevelType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Indicates which level of message want to clear."
+    ::= { vtssSyslogControlHistoryEntry 2 }
+
+vtssSyslogControlHistoryClear OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Clear syslog history by setting to true."
+    ::= { vtssSyslogControlHistoryEntry 3 }
+
+vtssSyslogMibConformance OBJECT IDENTIFIER
+    ::= { vtssSyslogMib 2 }
+
+vtssSyslogMibCompliances OBJECT IDENTIFIER
+    ::= { vtssSyslogMibConformance 1 }
+
+vtssSyslogMibGroups OBJECT IDENTIFIER
+    ::= { vtssSyslogMibConformance 2 }
+
+vtssSyslogConfigServerInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssSyslogConfigServerMode, vtssSyslogConfigServerAddress, 
+                  vtssSyslogConfigServerLevel }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssSyslogMibGroups 1 }
+
+vtssSyslogStatusHistoryTableInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssSyslogStatusHistoryMsgLevel, 
+                  vtssSyslogStatusHistoryMsgTimeStamp, 
+                  vtssSyslogStatusHistoryMsgText }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssSyslogMibGroups 2 }
+
+vtssSyslogControlHistoryTableInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssSyslogControlHistoryClear }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssSyslogMibGroups 3 }
+
+vtssSyslogMibCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the implementation."
+
+    MODULE      -- this module
+
+        MANDATORY-GROUPS        { vtssSyslogConfigServerInfoGroup, 
+                  vtssSyslogStatusHistoryTableInfoGroup, 
+                  vtssSyslogControlHistoryTableInfoGroup }
+
+    ::= { vtssSyslogMibCompliances 1 }
+
+END

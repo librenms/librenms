@@ -1,0 +1,478 @@
+-- *****************************************************************
+-- DDMI-MIB:  Vitesse private MIB
+--
+-- Copyright (c) 2002-2013 Vitesse Semiconductor Corporation "Vitesse".
+-- All Rights Reserved.
+--
+-- ****************************************************************
+
+VTSS-DDMI-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    vtssSwitchMgmt
+        FROM VTSS-SMI
+    TruthValue FROM SNMPv2-TC
+    VTSSDisplayString FROM VTSS-TC
+    VTSSInterfaceIndex FROM VTSS-TC
+    VTSSSfpTransceiver FROM VTSS-TC
+    ;
+
+vtssDdmiMib MODULE-IDENTITY
+    LAST-UPDATED "201410100000Z"
+    ORGANIZATION
+        "Vitesse Semiconductor Corporation"
+    CONTACT-INFO
+        "Application support <application_support@vitesse.com>"
+    DESCRIPTION
+        "This is a private version of DDMI"
+    REVISION    "201410100000Z"
+    DESCRIPTION
+        "Editorial changes"
+    REVISION    "201407010000Z"
+    DESCRIPTION
+        "Initial version"
+    ::= { vtssSwitchMgmt 121 }
+
+
+vtssDdmiMibObjects OBJECT IDENTIFIER
+    ::= { vtssDdmiMib 1 }
+
+vtssDdmiConfig OBJECT IDENTIFIER
+    ::= { vtssDdmiMibObjects 2 }
+
+vtssDdmiConfigGlobals OBJECT IDENTIFIER
+    ::= { vtssDdmiConfig 1 }
+
+vtssDdmiConfigGlobalsMode OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Global operation mode of DDMI. true is to enable the functions of DDMI
+         and false is to disable it."
+    ::= { vtssDdmiConfigGlobals 1 }
+
+vtssDdmiStatus OBJECT IDENTIFIER
+    ::= { vtssDdmiMibObjects 3 }
+
+vtssDdmiStatusInterfaceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VTSSDdmiStatusInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is a DDMI status table of port interface."
+    ::= { vtssDdmiStatus 2 }
+
+vtssDdmiStatusInterfaceEntry OBJECT-TYPE
+    SYNTAX      VTSSDdmiStatusInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each entry has a set of DDMI status."
+    INDEX       { vtssDdmiStatusInterfaceIfIndex }
+    ::= { vtssDdmiStatusInterfaceTable 1 }
+
+VTSSDdmiStatusInterfaceEntry ::= SEQUENCE {
+    vtssDdmiStatusInterfaceIfIndex      VTSSInterfaceIndex,
+    vtssDdmiStatusInterfaceA0Supported      TruthValue,
+    vtssDdmiStatusInterfaceA0SfpDetected    TruthValue,
+    vtssDdmiStatusInterfaceA0Vendor     VTSSDisplayString,
+    vtssDdmiStatusInterfaceA0PartNumber     VTSSDisplayString,
+    vtssDdmiStatusInterfaceA0SerialNumber   VTSSDisplayString,
+    vtssDdmiStatusInterfaceA0Revision   VTSSDisplayString,
+    vtssDdmiStatusInterfaceA0DateCode   VTSSDisplayString,
+    vtssDdmiStatusInterfaceA0SfpType    VTSSSfpTransceiver,
+    vtssDdmiStatusInterfaceA2Supported      TruthValue,
+    vtssDdmiStatusInterfaceA2CurrentTemperature     VTSSDisplayString,
+    vtssDdmiStatusInterfaceA2TemperatureHighAlarmThreshold      VTSSDisplayString,
+    vtssDdmiStatusInterfaceA2TemperatureLowAlarmThreshold   VTSSDisplayString,
+    vtssDdmiStatusInterfaceA2TemperatureHighWarnThreshold   VTSSDisplayString,
+    vtssDdmiStatusInterfaceA2TemperatureLowWarnThreshold    VTSSDisplayString,
+    vtssDdmiStatusInterfaceA2CurrentVoltage     VTSSDisplayString,
+    vtssDdmiStatusInterfaceA2VoltageHighAlarmThreshold      VTSSDisplayString,
+    vtssDdmiStatusInterfaceA2VoltageLowAlarmThreshold   VTSSDisplayString,
+    vtssDdmiStatusInterfaceA2VoltageHighWarnThreshold   VTSSDisplayString,
+    vtssDdmiStatusInterfaceA2VoltageLowWarnThreshold    VTSSDisplayString,
+    vtssDdmiStatusInterfaceA2CurrentTxBias      VTSSDisplayString,
+    vtssDdmiStatusInterfaceA2TxBiasHighAlarmThreshold   VTSSDisplayString,
+    vtssDdmiStatusInterfaceA2TxBiasLowAlarmThreshold    VTSSDisplayString,
+    vtssDdmiStatusInterfaceA2TxBiasHighWarnThreshold    VTSSDisplayString,
+    vtssDdmiStatusInterfaceA2TxBiasLowWarnThreshold     VTSSDisplayString,
+    vtssDdmiStatusInterfaceA2CurrentTxPower     VTSSDisplayString,
+    vtssDdmiStatusInterfaceA2TxPowerHighAlarmThreshold      VTSSDisplayString,
+    vtssDdmiStatusInterfaceA2TxPowerLowAlarmThreshold   VTSSDisplayString,
+    vtssDdmiStatusInterfaceA2TxPowerHighWarnThreshold   VTSSDisplayString,
+    vtssDdmiStatusInterfaceA2TxPowerLowWarnThreshold    VTSSDisplayString,
+    vtssDdmiStatusInterfaceA2CurrentRxPower     VTSSDisplayString,
+    vtssDdmiStatusInterfaceA2RxPowerHighAlarmThreshold      VTSSDisplayString,
+    vtssDdmiStatusInterfaceA2RxPowerLowAlarmThreshold   VTSSDisplayString,
+    vtssDdmiStatusInterfaceA2RxPowerHighWarnThreshold   VTSSDisplayString,
+    vtssDdmiStatusInterfaceA2RxPowerLowWarnThreshold    VTSSDisplayString
+}
+
+vtssDdmiStatusInterfaceIfIndex OBJECT-TYPE
+    SYNTAX      VTSSInterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Logical interface number of physical port."
+    ::= { vtssDdmiStatusInterfaceEntry 1 }
+
+vtssDdmiStatusInterfaceA0Supported OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Support transceiver status information or not. true is to supported and
+         false is not supported."
+    ::= { vtssDdmiStatusInterfaceEntry 2 }
+
+vtssDdmiStatusInterfaceA0SfpDetected OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "SFP module is detected or not. true is to detected and false is not
+         detected."
+    ::= { vtssDdmiStatusInterfaceEntry 3 }
+
+vtssDdmiStatusInterfaceA0Vendor OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Vendor name."
+    ::= { vtssDdmiStatusInterfaceEntry 4 }
+
+vtssDdmiStatusInterfaceA0PartNumber OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Part number."
+    ::= { vtssDdmiStatusInterfaceEntry 5 }
+
+vtssDdmiStatusInterfaceA0SerialNumber OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Serial number."
+    ::= { vtssDdmiStatusInterfaceEntry 6 }
+
+vtssDdmiStatusInterfaceA0Revision OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Revision."
+    ::= { vtssDdmiStatusInterfaceEntry 7 }
+
+vtssDdmiStatusInterfaceA0DateCode OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Date Code."
+    ::= { vtssDdmiStatusInterfaceEntry 8 }
+
+vtssDdmiStatusInterfaceA0SfpType OBJECT-TYPE
+    SYNTAX      VTSSSfpTransceiver
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "SFP type. none(0) means no SFP module. notSupported(1) means SFP module
+         is not supported. sfp100Fx(2) means SFP 100BASE-FX. sfp100BaseLx(3)
+         means SFP 100BASE-LX. sfp100BaseBx10(4) means SFP 100BASE-BX10.
+         sfp100BaseT(5) means SFP 100BASE-T. sfp1000BaseBx10(6) means SFP
+         1000BASE-BX10. sfp1000BaseT(7) means SFP 1000BASE-T. sfp1000BaseCx(8)
+         means SFP 1000BASE-CX. sfp1000BaseSx(9) means SFP 1000BASE-SX.
+         sfp1000BaseLx(10) means SFP 1000BASE-LX. sfp1000BaseX(11) means SFP
+         1000BASE-X. sfp2G5(12) means SFP 2.5G. sfp5G(13) means SFP 5G.
+         sfp10G(14) means SFP 10G."
+    ::= { vtssDdmiStatusInterfaceEntry 9 }
+
+vtssDdmiStatusInterfaceA2Supported OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Support DDMI status information or not. true is to supported and false
+         is not supported."
+    ::= { vtssDdmiStatusInterfaceEntry 1002 }
+
+vtssDdmiStatusInterfaceA2CurrentTemperature OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Current temperature in Celcius."
+    ::= { vtssDdmiStatusInterfaceEntry 1003 }
+
+vtssDdmiStatusInterfaceA2TemperatureHighAlarmThreshold OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Temperature high alarm threshold in Celcius."
+    ::= { vtssDdmiStatusInterfaceEntry 1004 }
+
+vtssDdmiStatusInterfaceA2TemperatureLowAlarmThreshold OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Temperature low alarm threshold in Celcius."
+    ::= { vtssDdmiStatusInterfaceEntry 1005 }
+
+vtssDdmiStatusInterfaceA2TemperatureHighWarnThreshold OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Temperature high warning threshold in Celcius."
+    ::= { vtssDdmiStatusInterfaceEntry 1006 }
+
+vtssDdmiStatusInterfaceA2TemperatureLowWarnThreshold OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Temperature low warning threshold in Celcius."
+    ::= { vtssDdmiStatusInterfaceEntry 1007 }
+
+vtssDdmiStatusInterfaceA2CurrentVoltage OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Current voltage in Volt."
+    ::= { vtssDdmiStatusInterfaceEntry 1008 }
+
+vtssDdmiStatusInterfaceA2VoltageHighAlarmThreshold OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Voltage high alarm threshold in Volt."
+    ::= { vtssDdmiStatusInterfaceEntry 1009 }
+
+vtssDdmiStatusInterfaceA2VoltageLowAlarmThreshold OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Voltage low alarm threshold in Volt."
+    ::= { vtssDdmiStatusInterfaceEntry 1010 }
+
+vtssDdmiStatusInterfaceA2VoltageHighWarnThreshold OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Voltage high warning threshold in Volt."
+    ::= { vtssDdmiStatusInterfaceEntry 1011 }
+
+vtssDdmiStatusInterfaceA2VoltageLowWarnThreshold OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Voltage low warning threshold in Volt."
+    ::= { vtssDdmiStatusInterfaceEntry 1012 }
+
+vtssDdmiStatusInterfaceA2CurrentTxBias OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Current Tx bias in mA."
+    ::= { vtssDdmiStatusInterfaceEntry 1013 }
+
+vtssDdmiStatusInterfaceA2TxBiasHighAlarmThreshold OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Tx bias high alarm threshold in mA."
+    ::= { vtssDdmiStatusInterfaceEntry 1014 }
+
+vtssDdmiStatusInterfaceA2TxBiasLowAlarmThreshold OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Tx bias low alarm threshold in mA."
+    ::= { vtssDdmiStatusInterfaceEntry 1015 }
+
+vtssDdmiStatusInterfaceA2TxBiasHighWarnThreshold OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Tx bias high warning threshold in mA."
+    ::= { vtssDdmiStatusInterfaceEntry 1016 }
+
+vtssDdmiStatusInterfaceA2TxBiasLowWarnThreshold OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Tx bias low warning threshold in mA."
+    ::= { vtssDdmiStatusInterfaceEntry 1017 }
+
+vtssDdmiStatusInterfaceA2CurrentTxPower OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Current Tx power in mV."
+    ::= { vtssDdmiStatusInterfaceEntry 1018 }
+
+vtssDdmiStatusInterfaceA2TxPowerHighAlarmThreshold OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Tx power high alarm threshold in mV."
+    ::= { vtssDdmiStatusInterfaceEntry 1019 }
+
+vtssDdmiStatusInterfaceA2TxPowerLowAlarmThreshold OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Tx power low alarm threshold in mV."
+    ::= { vtssDdmiStatusInterfaceEntry 1020 }
+
+vtssDdmiStatusInterfaceA2TxPowerHighWarnThreshold OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Tx power high warning threshold in mV."
+    ::= { vtssDdmiStatusInterfaceEntry 1021 }
+
+vtssDdmiStatusInterfaceA2TxPowerLowWarnThreshold OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Tx power low warning threshold in mV."
+    ::= { vtssDdmiStatusInterfaceEntry 1022 }
+
+vtssDdmiStatusInterfaceA2CurrentRxPower OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Current Rx power in mV."
+    ::= { vtssDdmiStatusInterfaceEntry 1023 }
+
+vtssDdmiStatusInterfaceA2RxPowerHighAlarmThreshold OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Rx power high alarm threshold in mV."
+    ::= { vtssDdmiStatusInterfaceEntry 1024 }
+
+vtssDdmiStatusInterfaceA2RxPowerLowAlarmThreshold OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Rx power low alarm threshold in mV."
+    ::= { vtssDdmiStatusInterfaceEntry 1025 }
+
+vtssDdmiStatusInterfaceA2RxPowerHighWarnThreshold OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Rx power high warning threshold in mV."
+    ::= { vtssDdmiStatusInterfaceEntry 1026 }
+
+vtssDdmiStatusInterfaceA2RxPowerLowWarnThreshold OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Rx power low warning threshold in mV."
+    ::= { vtssDdmiStatusInterfaceEntry 1027 }
+
+vtssDdmiMibConformance OBJECT IDENTIFIER
+    ::= { vtssDdmiMib 2 }
+
+vtssDdmiMibCompliances OBJECT IDENTIFIER
+    ::= { vtssDdmiMibConformance 1 }
+
+vtssDdmiMibGroups OBJECT IDENTIFIER
+    ::= { vtssDdmiMibConformance 2 }
+
+vtssDdmiConfigGlobalsInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssDdmiConfigGlobalsMode }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssDdmiMibGroups 1 }
+
+vtssDdmiStatusInterfaceTableInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssDdmiStatusInterfaceA0Supported, 
+                  vtssDdmiStatusInterfaceA0SfpDetected, 
+                  vtssDdmiStatusInterfaceA0Vendor, 
+                  vtssDdmiStatusInterfaceA0PartNumber, 
+                  vtssDdmiStatusInterfaceA0SerialNumber, 
+                  vtssDdmiStatusInterfaceA0Revision, 
+                  vtssDdmiStatusInterfaceA0DateCode, 
+                  vtssDdmiStatusInterfaceA0SfpType, 
+                  vtssDdmiStatusInterfaceA2Supported, 
+                  vtssDdmiStatusInterfaceA2CurrentTemperature, 
+                  vtssDdmiStatusInterfaceA2TemperatureHighAlarmThreshold, 
+                  vtssDdmiStatusInterfaceA2TemperatureLowAlarmThreshold, 
+                  vtssDdmiStatusInterfaceA2TemperatureHighWarnThreshold, 
+                  vtssDdmiStatusInterfaceA2TemperatureLowWarnThreshold, 
+                  vtssDdmiStatusInterfaceA2CurrentVoltage, 
+                  vtssDdmiStatusInterfaceA2VoltageHighAlarmThreshold, 
+                  vtssDdmiStatusInterfaceA2VoltageLowAlarmThreshold, 
+                  vtssDdmiStatusInterfaceA2VoltageHighWarnThreshold, 
+                  vtssDdmiStatusInterfaceA2VoltageLowWarnThreshold, 
+                  vtssDdmiStatusInterfaceA2CurrentTxBias, 
+                  vtssDdmiStatusInterfaceA2TxBiasHighAlarmThreshold, 
+                  vtssDdmiStatusInterfaceA2TxBiasLowAlarmThreshold, 
+                  vtssDdmiStatusInterfaceA2TxBiasHighWarnThreshold, 
+                  vtssDdmiStatusInterfaceA2TxBiasLowWarnThreshold, 
+                  vtssDdmiStatusInterfaceA2CurrentTxPower, 
+                  vtssDdmiStatusInterfaceA2TxPowerHighAlarmThreshold, 
+                  vtssDdmiStatusInterfaceA2TxPowerLowAlarmThreshold, 
+                  vtssDdmiStatusInterfaceA2TxPowerHighWarnThreshold, 
+                  vtssDdmiStatusInterfaceA2TxPowerLowWarnThreshold, 
+                  vtssDdmiStatusInterfaceA2CurrentRxPower, 
+                  vtssDdmiStatusInterfaceA2RxPowerHighAlarmThreshold, 
+                  vtssDdmiStatusInterfaceA2RxPowerLowAlarmThreshold, 
+                  vtssDdmiStatusInterfaceA2RxPowerHighWarnThreshold, 
+                  vtssDdmiStatusInterfaceA2RxPowerLowWarnThreshold }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssDdmiMibGroups 2 }
+
+vtssDdmiMibCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the implementation."
+
+    MODULE      -- this module
+
+        MANDATORY-GROUPS        { vtssDdmiConfigGlobalsInfoGroup, 
+                  vtssDdmiStatusInterfaceTableInfoGroup }
+
+    ::= { vtssDdmiMibCompliances 1 }
+
+END

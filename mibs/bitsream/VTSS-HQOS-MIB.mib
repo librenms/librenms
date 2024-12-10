@@ -1,0 +1,451 @@
+-- *****************************************************************
+-- HQOS-MIB:  Vitesse private MIB
+--
+-- Copyright (c) 2002-2013 Vitesse Semiconductor Corporation "Vitesse".
+-- All Rights Reserved.
+--
+-- ****************************************************************
+
+VTSS-HQOS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    vtssSwitchMgmt
+        FROM VTSS-SMI
+    Integer32 FROM SNMPv2-SMI
+    Unsigned32 FROM SNMPv2-SMI
+    TruthValue FROM SNMPv2-TC
+    VTSSInterfaceIndex FROM VTSS-TC
+    VTSSRowEditorState FROM VTSS-TC
+    VTSSUnsigned8 FROM VTSS-TC
+    ;
+
+vtssHqosMib MODULE-IDENTITY
+    LAST-UPDATED "201504070000Z"
+    ORGANIZATION
+        "Vitesse Semiconductor Corporation"
+    CONTACT-INFO
+        "Application support <application_support@vitesse.com>"
+    DESCRIPTION
+        "This is a private MIB for HQoS"
+    REVISION    "201504070000Z"
+    DESCRIPTION
+        "Added HqosConfigInterfaceHqosShaperRateType,
+         HqosConfigInterfaceHqosQueueShaperRateType objects."
+    REVISION    "201501090000Z"
+    DESCRIPTION
+        "Minor description changes"
+    REVISION    "201407010000Z"
+    DESCRIPTION
+        "Initial version"
+    ::= { vtssSwitchMgmt 125 }
+
+
+VTSSHqosShaperRateType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "An integer that indicates the shaper rate type.
+         
+         If the value is zero, it indicates the shaper uses line-rate.
+         
+         If the value is one, it indicates the shaper uses data-rate."
+    SYNTAX      INTEGER { line(0), data(1) }
+
+VTSShqosSchMode ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The HQoS scheduling mode."
+    SYNTAX      INTEGER { normal(0), basic(1), hierarchical(2) }
+
+vtssHqosMibObjects OBJECT IDENTIFIER
+    ::= { vtssHqosMib 1 }
+
+vtssHqosCapabilities OBJECT IDENTIFIER
+    ::= { vtssHqosMibObjects 1 }
+
+vtssHqosCapabilitiesHasQueueShaperRateType OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "If true, the platform supports HQoS queue shaper rate-type selection."
+    ::= { vtssHqosCapabilities 1 }
+
+vtssHqosConfig OBJECT IDENTIFIER
+    ::= { vtssHqosMibObjects 2 }
+
+vtssHqosConfigInterface OBJECT IDENTIFIER
+    ::= { vtssHqosConfig 2 }
+
+vtssHqosConfigInterfaceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VTSSHqosConfigInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This table provides HQoS configuration for interfaces"
+    ::= { vtssHqosConfigInterface 1 }
+
+vtssHqosConfigInterfaceEntry OBJECT-TYPE
+    SYNTAX      VTSSHqosConfigInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each row contains the configuration for an interface"
+    INDEX       { vtssHqosConfigInterfaceIfIndex }
+    ::= { vtssHqosConfigInterfaceTable 1 }
+
+VTSSHqosConfigInterfaceEntry ::= SEQUENCE {
+    vtssHqosConfigInterfaceIfIndex      VTSSInterfaceIndex,
+    vtssHqosConfigInterfaceSchMode      VTSShqosSchMode
+}
+
+vtssHqosConfigInterfaceIfIndex OBJECT-TYPE
+    SYNTAX      VTSSInterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Logical interface index."
+    ::= { vtssHqosConfigInterfaceEntry 1 }
+
+vtssHqosConfigInterfaceSchMode OBJECT-TYPE
+    SYNTAX      VTSShqosSchMode
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "HQoS scheduling mode."
+    ::= { vtssHqosConfigInterfaceEntry 2 }
+
+vtssHqosConfigInterfaceHqosTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VTSSHqosConfigInterfaceHqosEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This table contains the configuration for HQoS entries"
+    ::= { vtssHqosConfigInterface 2 }
+
+vtssHqosConfigInterfaceHqosEntry OBJECT-TYPE
+    SYNTAX      VTSSHqosConfigInterfaceHqosEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each row contains the configuration for an HQoS entry"
+    INDEX       { vtssHqosConfigInterfaceHqosIfIndex, vtssHqosConfigInterfaceHqosHqosId }
+    ::= { vtssHqosConfigInterfaceHqosTable 1 }
+
+VTSSHqosConfigInterfaceHqosEntry ::= SEQUENCE {
+    vtssHqosConfigInterfaceHqosIfIndex      VTSSInterfaceIndex,
+    vtssHqosConfigInterfaceHqosHqosId   Integer32,
+    vtssHqosConfigInterfaceHqosDwrrCount    VTSSUnsigned8,
+    vtssHqosConfigInterfaceHqosShaperEnable     TruthValue,
+    vtssHqosConfigInterfaceHqosShaperRate   Unsigned32,
+    vtssHqosConfigInterfaceHqosMinRate      Unsigned32,
+    vtssHqosConfigInterfaceHqosShaperRateType   VTSSHqosShaperRateType,
+    vtssHqosConfigInterfaceHqosAction   VTSSRowEditorState
+}
+
+vtssHqosConfigInterfaceHqosIfIndex OBJECT-TYPE
+    SYNTAX      VTSSInterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Logical interface index."
+    ::= { vtssHqosConfigInterfaceHqosEntry 1 }
+
+vtssHqosConfigInterfaceHqosHqosId OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "HQoS ID, allowed range depends on platform."
+    ::= { vtssHqosConfigInterfaceHqosEntry 2 }
+
+vtssHqosConfigInterfaceHqosDwrrCount OBJECT-TYPE
+    SYNTAX      VTSSUnsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Number of queues using DWRR."
+    ::= { vtssHqosConfigInterfaceHqosEntry 3 }
+
+vtssHqosConfigInterfaceHqosShaperEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Enable or disable shaper."
+    ::= { vtssHqosConfigInterfaceHqosEntry 4 }
+
+vtssHqosConfigInterfaceHqosShaperRate OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Shaper rate in kbps."
+    ::= { vtssHqosConfigInterfaceHqosEntry 5 }
+
+vtssHqosConfigInterfaceHqosMinRate OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Minimum guaranteed bandwidth in kbps."
+    ::= { vtssHqosConfigInterfaceHqosEntry 6 }
+
+vtssHqosConfigInterfaceHqosShaperRateType OBJECT-TYPE
+    SYNTAX      VTSSHqosShaperRateType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the shaper's rate type.
+         
+         Valid selections are line-rate (0) and data-rate (1)."
+    ::= { vtssHqosConfigInterfaceHqosEntry 7 }
+
+vtssHqosConfigInterfaceHqosAction OBJECT-TYPE
+    SYNTAX      VTSSRowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Action"
+    ::= { vtssHqosConfigInterfaceHqosEntry 10000 }
+
+vtssHqosConfigInterfaceHqosTableRowEditor OBJECT IDENTIFIER
+    ::= { vtssHqosConfigInterface 3 }
+
+vtssHqosConfigInterfaceHqosTableRowEditorIfIndex OBJECT-TYPE
+    SYNTAX      VTSSInterfaceIndex
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Logical interface index."
+    ::= { vtssHqosConfigInterfaceHqosTableRowEditor 1 }
+
+vtssHqosConfigInterfaceHqosTableRowEditorHqosId OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "HQoS ID, allowed range depends on platform."
+    ::= { vtssHqosConfigInterfaceHqosTableRowEditor 2 }
+
+vtssHqosConfigInterfaceHqosTableRowEditorDwrrCount OBJECT-TYPE
+    SYNTAX      VTSSUnsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Number of queues using DWRR."
+    ::= { vtssHqosConfigInterfaceHqosTableRowEditor 3 }
+
+vtssHqosConfigInterfaceHqosTableRowEditorShaperEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Enable or disable shaper."
+    ::= { vtssHqosConfigInterfaceHqosTableRowEditor 4 }
+
+vtssHqosConfigInterfaceHqosTableRowEditorShaperRate OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Shaper rate in kbps."
+    ::= { vtssHqosConfigInterfaceHqosTableRowEditor 5 }
+
+vtssHqosConfigInterfaceHqosTableRowEditorMinRate OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Minimum guaranteed bandwidth in kbps."
+    ::= { vtssHqosConfigInterfaceHqosTableRowEditor 6 }
+
+vtssHqosConfigInterfaceHqosTableRowEditorShaperRateType OBJECT-TYPE
+    SYNTAX      VTSSHqosShaperRateType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the shaper's rate type.
+         
+         Valid selections are line-rate (0) and data-rate (1)."
+    ::= { vtssHqosConfigInterfaceHqosTableRowEditor 7 }
+
+vtssHqosConfigInterfaceHqosTableRowEditorAction OBJECT-TYPE
+    SYNTAX      VTSSRowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Action"
+    ::= { vtssHqosConfigInterfaceHqosTableRowEditor 10000 }
+
+vtssHqosConfigInterfaceHqosQueueTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VTSSHqosConfigInterfaceHqosQueueEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This table contains the configuration for HQoS queues"
+    ::= { vtssHqosConfigInterface 4 }
+
+vtssHqosConfigInterfaceHqosQueueEntry OBJECT-TYPE
+    SYNTAX      VTSSHqosConfigInterfaceHqosQueueEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each row contains the configuration for a queue of an HQoS entry"
+    INDEX       { vtssHqosConfigInterfaceHqosQueueIfIndex, vtssHqosConfigInterfaceHqosQueueHqosId, vtssHqosConfigInterfaceHqosQueueQueue }
+    ::= { vtssHqosConfigInterfaceHqosQueueTable 1 }
+
+VTSSHqosConfigInterfaceHqosQueueEntry ::= SEQUENCE {
+    vtssHqosConfigInterfaceHqosQueueIfIndex     VTSSInterfaceIndex,
+    vtssHqosConfigInterfaceHqosQueueHqosId      Integer32,
+    vtssHqosConfigInterfaceHqosQueueQueue   Integer32,
+    vtssHqosConfigInterfaceHqosQueueShaperEnable    TruthValue,
+    vtssHqosConfigInterfaceHqosQueueShaperRate      Unsigned32,
+    vtssHqosConfigInterfaceHqosQueueSchedulerWeight     VTSSUnsigned8,
+    vtssHqosConfigInterfaceHqosQueueShaperRateType      VTSSHqosShaperRateType
+}
+
+vtssHqosConfigInterfaceHqosQueueIfIndex OBJECT-TYPE
+    SYNTAX      VTSSInterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Logical interface index."
+    ::= { vtssHqosConfigInterfaceHqosQueueEntry 1 }
+
+vtssHqosConfigInterfaceHqosQueueHqosId OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "HQoS ID, allowed range depends on platform."
+    ::= { vtssHqosConfigInterfaceHqosQueueEntry 2 }
+
+vtssHqosConfigInterfaceHqosQueueQueue OBJECT-TYPE
+    SYNTAX      Integer32 (0..7)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Queue number."
+    ::= { vtssHqosConfigInterfaceHqosQueueEntry 3 }
+
+vtssHqosConfigInterfaceHqosQueueShaperEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Enable or disable shaper."
+    ::= { vtssHqosConfigInterfaceHqosQueueEntry 4 }
+
+vtssHqosConfigInterfaceHqosQueueShaperRate OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Shaper rate in kbps."
+    ::= { vtssHqosConfigInterfaceHqosQueueEntry 5 }
+
+vtssHqosConfigInterfaceHqosQueueSchedulerWeight OBJECT-TYPE
+    SYNTAX      VTSSUnsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Scheduler weight, 1-100."
+    ::= { vtssHqosConfigInterfaceHqosQueueEntry 6 }
+
+vtssHqosConfigInterfaceHqosQueueShaperRateType OBJECT-TYPE
+    SYNTAX      VTSSHqosShaperRateType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the shaper's rate type.
+         
+         Valid selections are line-rate (0) and data-rate (1).
+         
+         This object is only available if the capability object
+         'vtssHqosCapabilitiesHasQueueShaperRateType' is True."
+    ::= { vtssHqosConfigInterfaceHqosQueueEntry 7 }
+
+vtssHqosConfigHqos OBJECT IDENTIFIER
+    ::= { vtssHqosConfig 4 }
+
+vtssHqosMibConformance OBJECT IDENTIFIER
+    ::= { vtssHqosMib 2 }
+
+vtssHqosMibCompliances OBJECT IDENTIFIER
+    ::= { vtssHqosMibConformance 1 }
+
+vtssHqosMibGroups OBJECT IDENTIFIER
+    ::= { vtssHqosMibConformance 2 }
+
+vtssHqosCapabilitiesInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssHqosCapabilitiesHasQueueShaperRateType }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssHqosMibGroups 1 }
+
+vtssHqosConfigInterfaceTableInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssHqosConfigInterfaceSchMode }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssHqosMibGroups 2 }
+
+vtssHqosConfigInterfaceHqosTableInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssHqosConfigInterfaceHqosDwrrCount, 
+                  vtssHqosConfigInterfaceHqosShaperEnable, 
+                  vtssHqosConfigInterfaceHqosShaperRate, 
+                  vtssHqosConfigInterfaceHqosMinRate, 
+                  vtssHqosConfigInterfaceHqosShaperRateType, 
+                  vtssHqosConfigInterfaceHqosAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssHqosMibGroups 3 }
+
+vtssHqosConfigInterfaceHqosTableRowEditorInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssHqosConfigInterfaceHqosTableRowEditorIfIndex, 
+                  vtssHqosConfigInterfaceHqosTableRowEditorHqosId, 
+                  vtssHqosConfigInterfaceHqosTableRowEditorDwrrCount, 
+                  vtssHqosConfigInterfaceHqosTableRowEditorShaperEnable, 
+                  vtssHqosConfigInterfaceHqosTableRowEditorShaperRate, 
+                  vtssHqosConfigInterfaceHqosTableRowEditorMinRate, 
+                  vtssHqosConfigInterfaceHqosTableRowEditorShaperRateType, 
+                  vtssHqosConfigInterfaceHqosTableRowEditorAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssHqosMibGroups 4 }
+
+vtssHqosConfigInterfaceHqosQueueTableInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssHqosConfigInterfaceHqosQueueShaperEnable, 
+                  vtssHqosConfigInterfaceHqosQueueShaperRate, 
+                  vtssHqosConfigInterfaceHqosQueueSchedulerWeight, 
+                  vtssHqosConfigInterfaceHqosQueueShaperRateType }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssHqosMibGroups 5 }
+
+vtssHqosMibCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the implementation."
+
+    MODULE      -- this module
+
+        MANDATORY-GROUPS        { vtssHqosCapabilitiesInfoGroup, 
+                  vtssHqosConfigInterfaceTableInfoGroup, 
+                  vtssHqosConfigInterfaceHqosTableInfoGroup, 
+                  vtssHqosConfigInterfaceHqosTableRowEditorInfoGroup, 
+                  vtssHqosConfigInterfaceHqosQueueTableInfoGroup }
+
+    ::= { vtssHqosMibCompliances 1 }
+
+END

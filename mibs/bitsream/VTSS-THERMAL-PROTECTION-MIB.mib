@@ -1,0 +1,251 @@
+-- *****************************************************************
+-- THERMAL-PROTECTION-MIB:  Vitesse private MIB
+--
+-- Copyright (c) 2002-2013 Vitesse Semiconductor Corporation "Vitesse".
+-- All Rights Reserved.
+--
+-- ****************************************************************
+
+VTSS-THERMAL-PROTECTION-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    vtssSwitchMgmt
+        FROM VTSS-SMI
+    Integer32 FROM SNMPv2-SMI
+    TruthValue FROM SNMPv2-TC
+    VTSSInteger16 FROM VTSS-TC
+    VTSSInterfaceIndex FROM VTSS-TC
+    VTSSUnsigned8 FROM VTSS-TC
+    ;
+
+vtssThermalProtectionMib MODULE-IDENTITY
+    LAST-UPDATED "201407010000Z"
+    ORGANIZATION
+        "Vitesse Semiconductor Corporation"
+    CONTACT-INFO
+        "Application support <application_support@vitesse.com>"
+    DESCRIPTION
+        "This is a private version of thermal protection. The PHY thermal
+         protections consists of four groups. Each PHY is associated to a group,
+         and each group has a configured max temperature. If the average
+         temperature of all sensors exceeds the configured max temperature of a
+         group, then the PHYs in that group is shoutdown."
+    REVISION    "201407010000Z"
+    DESCRIPTION
+        "Initial version"
+    ::= { vtssSwitchMgmt 78 }
+
+
+vtssThermalProtectionMibObjects OBJECT IDENTIFIER
+    ::= { vtssThermalProtectionMib 1 }
+
+vtssThermalProtectionCapabilities OBJECT IDENTIFIER
+    ::= { vtssThermalProtectionMibObjects 1 }
+
+vtssThermalProtectionCapabilitiesMaxSupportedGroup OBJECT-TYPE
+    SYNTAX      VTSSUnsigned8
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Maximum number of supported thermal protection groups."
+    ::= { vtssThermalProtectionCapabilities 1 }
+
+vtssThermalProtectionConfig OBJECT IDENTIFIER
+    ::= { vtssThermalProtectionMibObjects 2 }
+
+vtssThermalProtectionConfigGlobals OBJECT IDENTIFIER
+    ::= { vtssThermalProtectionConfig 1 }
+
+vtssThermalProtectionConfigGlobalsParamTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VTSSThermalProtectionConfigGlobalsParamEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is a table to assign a temperature to each of the groups"
+    ::= { vtssThermalProtectionConfigGlobals 1 }
+
+vtssThermalProtectionConfigGlobalsParamEntry OBJECT-TYPE
+    SYNTAX      VTSSThermalProtectionConfigGlobalsParamEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each group associates with a temperature"
+    INDEX       { vtssThermalProtectionConfigGlobalsParamGroupIndex }
+    ::= { vtssThermalProtectionConfigGlobalsParamTable 1 }
+
+VTSSThermalProtectionConfigGlobalsParamEntry ::= SEQUENCE {
+    vtssThermalProtectionConfigGlobalsParamGroupIndex   Integer32,
+    vtssThermalProtectionConfigGlobalsParamGroupTemperature     VTSSInteger16
+}
+
+vtssThermalProtectionConfigGlobalsParamGroupIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0..3)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Group number."
+    ::= { vtssThermalProtectionConfigGlobalsParamEntry 1 }
+
+vtssThermalProtectionConfigGlobalsParamGroupTemperature OBJECT-TYPE
+    SYNTAX      VTSSInteger16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Temperature(in C) where the interfaces mapped to the group will be shut
+         down."
+    ::= { vtssThermalProtectionConfigGlobalsParamEntry 2 }
+
+vtssThermalProtectionConfigInterface OBJECT IDENTIFIER
+    ::= { vtssThermalProtectionConfig 2 }
+
+vtssThermalProtectionConfigInterfaceParamTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VTSSThermalProtectionConfigInterfaceParamEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is a table to interface group configuration"
+    ::= { vtssThermalProtectionConfigInterface 1 }
+
+vtssThermalProtectionConfigInterfaceParamEntry OBJECT-TYPE
+    SYNTAX      VTSSThermalProtectionConfigInterfaceParamEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each physical port associates with a group temperature"
+    INDEX       { vtssThermalProtectionConfigInterfaceParamIfIndex }
+    ::= { vtssThermalProtectionConfigInterfaceParamTable 1 }
+
+VTSSThermalProtectionConfigInterfaceParamEntry ::= SEQUENCE {
+    vtssThermalProtectionConfigInterfaceParamIfIndex    VTSSInterfaceIndex,
+    vtssThermalProtectionConfigInterfaceParamGroup      VTSSUnsigned8
+}
+
+vtssThermalProtectionConfigInterfaceParamIfIndex OBJECT-TYPE
+    SYNTAX      VTSSInterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Logical interface number."
+    ::= { vtssThermalProtectionConfigInterfaceParamEntry 1 }
+
+vtssThermalProtectionConfigInterfaceParamGroup OBJECT-TYPE
+    SYNTAX      VTSSUnsigned8 (0..4)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Thermal protection groups. Object value (4) mean disable thermal
+         protect for the interface. Object values from 0 to 3 are for the
+         temperature group. "
+    ::= { vtssThermalProtectionConfigInterfaceParamEntry 2 }
+
+vtssThermalProtectionStatus OBJECT IDENTIFIER
+    ::= { vtssThermalProtectionMibObjects 3 }
+
+vtssThermalProtectionStatusInterfaceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VTSSThermalProtectionStatusInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is a table to thermal protection interface status"
+    ::= { vtssThermalProtectionStatus 1 }
+
+vtssThermalProtectionStatusInterfaceEntry OBJECT-TYPE
+    SYNTAX      VTSSThermalProtectionStatusInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each interface has a set of status parameters"
+    INDEX       { vtssThermalProtectionStatusInterfaceIfIndex }
+    ::= { vtssThermalProtectionStatusInterfaceTable 1 }
+
+VTSSThermalProtectionStatusInterfaceEntry ::= SEQUENCE {
+    vtssThermalProtectionStatusInterfaceIfIndex     VTSSInterfaceIndex,
+    vtssThermalProtectionStatusInterfaceTemperature     VTSSInteger16,
+    vtssThermalProtectionStatusInterfacePower   TruthValue
+}
+
+vtssThermalProtectionStatusInterfaceIfIndex OBJECT-TYPE
+    SYNTAX      VTSSInterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Logical interface number."
+    ::= { vtssThermalProtectionStatusInterfaceEntry 1 }
+
+vtssThermalProtectionStatusInterfaceTemperature OBJECT-TYPE
+    SYNTAX      VTSSInteger16
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Current port temperature(in C)."
+    ::= { vtssThermalProtectionStatusInterfaceEntry 2 }
+
+vtssThermalProtectionStatusInterfacePower OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Port thermal protection status. false means port link is up and port is
+         operating normally. true means port link is down and port is thermal
+         protected."
+    ::= { vtssThermalProtectionStatusInterfaceEntry 3 }
+
+vtssThermalProtectionMibConformance OBJECT IDENTIFIER
+    ::= { vtssThermalProtectionMib 2 }
+
+vtssThermalProtectionMibCompliances OBJECT IDENTIFIER
+    ::= { vtssThermalProtectionMibConformance 1 }
+
+vtssThermalProtectionMibGroups OBJECT IDENTIFIER
+    ::= { vtssThermalProtectionMibConformance 2 }
+
+vtssThermalProtectionCapabilitiesInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssThermalProtectionCapabilitiesMaxSupportedGroup }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssThermalProtectionMibGroups 1 }
+
+vtssThermalProtectionConfigGlobalsParamTableInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssThermalProtectionConfigGlobalsParamGroupTemperature }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssThermalProtectionMibGroups 2 }
+
+vtssThermalProtectionConfigInterfaceParamTableInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssThermalProtectionConfigInterfaceParamGroup }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssThermalProtectionMibGroups 3 }
+
+vtssThermalProtectionStatusInterfaceTableInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssThermalProtectionStatusInterfaceTemperature, 
+                  vtssThermalProtectionStatusInterfacePower }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssThermalProtectionMibGroups 4 }
+
+vtssThermalProtectionMibCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the implementation."
+
+    MODULE      -- this module
+
+        MANDATORY-GROUPS        { vtssThermalProtectionCapabilitiesInfoGroup, 
+                  vtssThermalProtectionConfigGlobalsParamTableInfoGroup, 
+                  vtssThermalProtectionConfigInterfaceParamTableInfoGroup, 
+                  vtssThermalProtectionStatusInterfaceTableInfoGroup }
+
+    ::= { vtssThermalProtectionMibCompliances 1 }
+
+END
