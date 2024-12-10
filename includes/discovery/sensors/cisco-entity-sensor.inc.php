@@ -200,9 +200,8 @@ if ($device['os_group'] == 'cisco') {
 
                         $entPhysicalClass = $entity_array[$phys_index]['entPhysicalClass'];
                         $entPhysicalName = $entity_array[$phys_index]['entPhysicalName'];
-                        $transceivers =  \App\Models\Transceiver::where('device_id', $device['device_id'])->where('index', '=', $phys_index)->first();
+                        $transceivers = \App\Models\Transceiver::where('device_id', $device['device_id'])->where('index', '=', $phys_index)->first();
                         if (! empty($transceivers)) {
-                            d_echo ("LOOP OUT");
                             // If we already have a mapping done in transceivers, let's use it.
                             $entPhysicalIndex = $phys_index;
                             $entry['entSensorMeasuredEntity'] = 'ports';
