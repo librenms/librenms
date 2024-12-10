@@ -1,0 +1,10 @@
+os: hyperion
+text: 'Bitstream Hyperion 200'
+type: network
+icon: bitstream.png
+group: bistream
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.6603
