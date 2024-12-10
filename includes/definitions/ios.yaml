@@ -32,26 +32,26 @@ bad_ifXEntry:
     - cisco886Va
     - cisco2811
 poller_modules:
-    cisco-ace-serverfarms: true
-    cisco-ace-loadbalancer: true
-    cisco-cbqos: true
-    cisco-cef: true
-    cisco-mac-accounting: true
-    cisco-voice: true
-    cisco-remote-access-monitor: true
-    slas: true
-    cisco-ipsec-flow-monitor: true
-    cipsec-tunnels: true
-    cisco-otv: true
-    cisco-vpdn: true
+    cisco-ace-serverfarms: false
+    cisco-ace-loadbalancer: false
+    cisco-cbqos: false
+    cisco-cef: false
+    cisco-mac-accounting: false
+    cisco-voice: false
+    cisco-remote-access-monitor: false
+    slas: false
+    cisco-ipsec-flow-monitor: false
+    cipsec-tunnels: false
+    cisco-otv: false
+    cisco-vpdn: false
     ipmi: false
-    xdsl: true
+    xdsl: false
 discovery_modules:
-    cisco-cef: true
-    slas: true
-    cisco-mac-accounting: true
-    cisco-otv: true
-    cisco-pw: true
-    vrf: true
-    cisco-vrf-lite: true
-    xdsl: true
+    cisco-cef: false
+    slas: false
+    cisco-mac-accounting: false
+    cisco-otv: false
+    cisco-pw: false
+    vrf: false
+    cisco-vrf-lite: false
+    xdsl: false
