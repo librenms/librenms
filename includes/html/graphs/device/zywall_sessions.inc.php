@@ -1,7 +1,7 @@
 <?php
 
 $rrd_filename = Rrd::name($device['hostname'], 'zywall-sessions');
-
+dd($rrd_filename);
 $ds = 'sessions';
 
 $colour_area = '9999cc';

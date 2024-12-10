@@ -1,0 +1,309 @@
+-- *****************************************************************
+-- ALPHABRIDGE-MEMORY-POOL-MIB
+--
+-- October 2003
+--
+-- Copyright (c) 2003 by ALPHABRIDGE, Inc.
+-- All rights reserved.
+-- *****************************************************************
+
+ALPHABRIDGE-MEMORY-POOL-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    Integer32,
+    Gauge32
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION,
+    DisplayString,
+    TruthValue
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP
+        FROM SNMPv2-CONF
+    bdMgmt
+        FROM ALPHABRIDGE-SMI
+    Percent
+        FROM ALPHABRIDGE-QOS-PIB-MIB;
+
+alphabridgeMemoryPoolMIB MODULE-IDENTITY
+	LAST-UPDATED "200310160000Z"
+	ORGANIZATION "ALPHABRIDGE, Inc."
+	CONTACT-INFO
+		" Tel:   +86-21-50800666  
+		 Postal: No.123,Juli RD,Zhangjiang Hitech Park,
+			 Shanghai Baud Data Communication Corporation Inc,
+			 Shanghai City 201203,
+		 	P.R.C "
+    	DESCRIPTION
+        	"MIB module for monitoring memory pools"
+   	REVISION        "200310160000Z"
+	DESCRIPTION
+		"Initial version of this MIB."
+    ::= { bdMgmt 48 }
+
+ALPHABRIDGEMemoryPoolTypes ::= TEXTUAL-CONVENTION
+    STATUS        current
+    DESCRIPTION
+        "Represents the different types of memory pools that
+        may be present in a managed device.  Memory pools can
+        be roughly categorized into two groups, predefined
+        pools and dynamic pools.  The following pool types
+        are currently predefined:
+            1:  processor memory
+            2:  i/o memory
+            3:  pci memory
+            4:  fast memory
+            5:  multibus memory
+
+        Dynamic pools will have a pool type value greater than
+        any of the predefined types listed above.
+
+        Note that only the processor pool is required to be
+        supported by all devices.  Support for other pool types
+        is dependent on the device being managed."
+    SYNTAX        Integer32 (1..65535)
+
+alphabridgeMemoryPoolObjects
+    OBJECT IDENTIFIER ::= { alphabridgeMemoryPoolMIB 1 }
+
+alphabridgeMemoryPoolTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF ALPHABRIDGEMemoryPoolEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "A table of memory pool monitoring entries."
+    ::= { alphabridgeMemoryPoolObjects 1 }
+
+alphabridgeMemoryPoolEntry OBJECT-TYPE
+    SYNTAX        ALPHABRIDGEMemoryPoolEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "An entry in the memory pool monitoring table."
+    INDEX        { alphabridgeMemoryPoolType }
+    ::= { alphabridgeMemoryPoolTable 1 }
+
+ALPHABRIDGEMemoryPoolEntry ::=
+    SEQUENCE {
+        alphabridgeMemoryPoolType               ALPHABRIDGEMemoryPoolTypes,
+        alphabridgeMemoryPoolName               DisplayString,
+        alphabridgeMemoryPoolAlternate          Integer32,
+        alphabridgeMemoryPoolValid              TruthValue,
+        alphabridgeMemoryPoolUsed               Gauge32,
+        alphabridgeMemoryPoolFree               Gauge32,
+        alphabridgeMemoryPoolLargestFree        Gauge32
+    }
+
+alphabridgeMemoryPoolType OBJECT-TYPE
+    SYNTAX        ALPHABRIDGEMemoryPoolTypes
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "The type of memory pool for which this entry
+        contains information."
+    ::= { alphabridgeMemoryPoolEntry 1 }
+
+alphabridgeMemoryPoolName OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "A textual name assigned to the memory pool.  This
+        object is suitable for output to a human operator,
+        and may also be used to distinguish among the various
+        pool types, especially among dynamic pools."
+    ::= { alphabridgeMemoryPoolEntry 2 }
+
+alphabridgeMemoryPoolAlternate OBJECT-TYPE
+    SYNTAX        Integer32 (0..65535)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates whether or not this memory pool has an
+        alternate pool configured.  Alternate pools are
+        used for fallback when the current pool runs out
+        of memory.
+
+        If an instance of this object has a value of zero,
+        then this pool does not have an alternate.  Otherwise
+        the value of this object is the same as the value of
+        alphabridgeMemoryPoolType of the alternate pool."
+    ::= { alphabridgeMemoryPoolEntry 3 }
+
+alphabridgeMemoryPoolValid OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates whether or not the remaining objects in
+        this entry contain accurate data.  If an instance
+        of this object has the value false (which in and of
+        itself indicates an internal error condition), the
+        values of the remaining objects in the conceptual row
+        may contain inaccurate information (specifically, the
+        reported values may be less than the actual values)."
+    ::= { alphabridgeMemoryPoolEntry 4 }
+
+alphabridgeMemoryPoolUsed OBJECT-TYPE
+    SYNTAX        Gauge32
+    UNITS         "bytes"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates the number of bytes from the memory pool
+        that are currently in use by applications on the
+        managed device."
+    ::= { alphabridgeMemoryPoolEntry 5 }
+
+alphabridgeMemoryPoolFree OBJECT-TYPE
+    SYNTAX        Gauge32
+    UNITS         "bytes"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates the number of bytes from the memory pool
+        that are currently unused on the managed device.
+
+        Note that the sum of alphabridgeMemoryPoolUsed and
+        alphabridgeMemoryPoolFree is the total amount of memory
+        in the pool"
+    ::= { alphabridgeMemoryPoolEntry 6 }
+
+alphabridgeMemoryPoolLargestFree OBJECT-TYPE
+    SYNTAX        Gauge32
+    UNITS         "bytes"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates the largest number of contiguous bytes
+        from the memory pool that are currently unused on
+        the managed device."
+    ::= { alphabridgeMemoryPoolEntry 7 }
+
+alphabridgeMemoryPoolUtilizationTable OBJECT-TYPE
+  SYNTAX      SEQUENCE OF ALPHABRIDGEMemoryPoolUtilizationEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "A table of memory pool utilization entries. Each of the
+     objects provides a general idea of how much of the memory
+     pool has been used over a given period of time. It is
+     determined as a weighted decaying average."
+  ::= { alphabridgeMemoryPoolObjects 2 }
+
+alphabridgeMemoryPoolUtilizationEntry OBJECT-TYPE
+  SYNTAX      ALPHABRIDGEMemoryPoolUtilizationEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "An entry in the memory pool utilization table."
+  AUGMENTS { alphabridgeMemoryPoolEntry }
+  ::= { alphabridgeMemoryPoolUtilizationTable 1 }
+
+ALPHABRIDGEMemoryPoolUtilizationEntry ::=
+  SEQUENCE {
+    alphabridgeMemoryPoolUtilization1Min  Percent,
+    alphabridgeMemoryPoolUtilization5Min  Percent,
+    alphabridgeMemoryPoolUtilization10Min Percent
+  }
+
+alphabridgeMemoryPoolUtilization1Min OBJECT-TYPE
+    SYNTAX        Percent
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This is the memory pool utilization for 1 minute."
+    ::= { alphabridgeMemoryPoolUtilizationEntry 1 }
+
+alphabridgeMemoryPoolUtilization5Min OBJECT-TYPE
+    SYNTAX        Percent
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This is the memory pool utilization for 5 minutes."
+    ::= { alphabridgeMemoryPoolUtilizationEntry 2 }
+
+alphabridgeMemoryPoolUtilization10Min OBJECT-TYPE
+    SYNTAX        Percent
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This is the memory pool utilization for 10 minutes."
+    ::= { alphabridgeMemoryPoolUtilizationEntry 3 }
+
+-- notifications
+
+alphabridgeMemoryPoolNotifications
+    OBJECT IDENTIFIER ::= { alphabridgeMemoryPoolMIB 2 }
+
+-- (no notifications are currently defined)
+
+
+-- conformance information
+
+alphabridgeMemoryPoolConformance
+    OBJECT IDENTIFIER ::= { alphabridgeMemoryPoolMIB 3 }
+alphabridgeMemoryPoolCompliances
+    OBJECT IDENTIFIER ::= { alphabridgeMemoryPoolConformance 1 }
+alphabridgeMemoryPoolGroups
+    OBJECT IDENTIFIER ::= { alphabridgeMemoryPoolConformance 2 }
+
+
+-- compliance statements
+
+alphabridgeMemoryPoolCompliance MODULE-COMPLIANCE
+    STATUS    deprecated -- superceded by alphabridgeMemoryPoolComplianceRev1
+    DESCRIPTION
+        "The compliance statement for entities which implement
+        the ALPHABRIDGE Memory Pool MIB"
+    MODULE    -- this module
+        MANDATORY-GROUPS { alphabridgeMemoryPoolGroup }
+    ::= { alphabridgeMemoryPoolCompliances 1 }
+
+alphabridgeMemoryPoolComplianceRev1 MODULE-COMPLIANCE
+    STATUS        current
+    DESCRIPTION
+        "The compliance statement for entities which implement
+        the ALPHABRIDGE Memory Pool MIB"
+    MODULE    -- this module
+        MANDATORY-GROUPS { alphabridgeMemoryPoolGroup }
+
+        GROUP alphabridgeMemoryPoolUtilizationGroup
+        DESCRIPTION
+            "Per memory pool utilization statistics is mandatory for
+            the managed system that supports memory pool utilization."
+    ::= { alphabridgeMemoryPoolCompliances 2 }
+
+
+-- units of conformance
+
+alphabridgeMemoryPoolGroup OBJECT-GROUP
+    OBJECTS {
+        alphabridgeMemoryPoolName,
+        alphabridgeMemoryPoolAlternate,
+        alphabridgeMemoryPoolValid,
+        alphabridgeMemoryPoolUsed,
+        alphabridgeMemoryPoolFree,
+        alphabridgeMemoryPoolLargestFree
+    }
+    STATUS        current
+    DESCRIPTION
+        "A collection of objects providing memory pool monitoring."
+    ::= { alphabridgeMemoryPoolGroups 1 }
+
+alphabridgeMemoryPoolUtilizationGroup OBJECT-GROUP
+    OBJECTS {
+        alphabridgeMemoryPoolUtilization1Min,
+        alphabridgeMemoryPoolUtilization5Min,
+        alphabridgeMemoryPoolUtilization10Min
+    }
+    STATUS        current
+    DESCRIPTION
+        "An optional group providing a collection of memory pool
+        utilization objects."
+    ::= { alphabridgeMemoryPoolGroups 2 }
+
+
+END

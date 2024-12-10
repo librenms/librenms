@@ -57,6 +57,7 @@ foreach ($menu_options as $option => $text) {
 $listoptions .= '&nbsp;&nbsp;&nbsp;<span class="devices-font-bold">Graphs: </span>';
 
 $menu_options = ['bits' => 'Bits',
+    'alphabridge'=>'alphabridge',
     'processor' => 'CPU',
     'ucd_load' => 'Load',
     'mempool' => 'Memory',

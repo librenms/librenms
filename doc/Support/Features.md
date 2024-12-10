@@ -113,6 +113,7 @@ rg --pcre2 "^text: *([\"']?)(.+)\1" --replace '$2' --no-filename includes/defini
 * AXIS Audio Appliances
 * AXIS Network Camera
 * AXIS Network Document Server
+* ALPHABRIDGE(tm) Software
 
 ### B
 * Baicells CPE
@@ -333,6 +334,7 @@ rg --pcre2 "^text: *([\"']?)(.+)\1" --replace '$2' --no-filename includes/defini
 * FiberHome Switch
 * Fibernet XMUX 4+
 * Fiberstore (BDCOM)
+* Fiberstore (ALPHABRIDGE)
 * Fiberstore (Centec CNOS)
 * Fiberstore Datacenter Switch
 * Fiberstore GBN
