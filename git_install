@@ -2,3 +2,16 @@ git config --global http.postBuffer 157286400
 git config --global http.maxRequests 10 
 git config --global core.compression 0
 git clone --depth 1 https://github.com/alphabridgetech/librenms.git
+
+1.---- dev to master file merge ----
+git checkout master
+git pull origin master
+git merge dev
+
+Resolve any merge conflicts (if any):
+git add <file>
+git commit
+
+2.final push in master
+git push origin master
+
