@@ -3665,7 +3665,7 @@
             "transceivers": [
                 {
                     "index": "1332",
-                    "entity_physical_index": null,
+                    "entity_physical_index": 1332,
                     "type": "10GE CU3M",
                     "vendor": "CISCO-MOLEX",
                     "oui": null,
@@ -3680,11 +3680,11 @@
                     "wavelength": null,
                     "connector": null,
                     "channels": 1,
-                    "ifIndex": null
+                    "ifIndex": 5
                 },
                 {
                     "index": "1344",
-                    "entity_physical_index": null,
+                    "entity_physical_index": 1344,
                     "type": "10GE CU3M",
                     "vendor": "CISCO-MOLEX",
                     "oui": null,
@@ -3699,7 +3699,7 @@
                     "wavelength": null,
                     "connector": null,
                     "channels": 1,
-                    "ifIndex": null
+                    "ifIndex": 6
                 }
             ]
         }

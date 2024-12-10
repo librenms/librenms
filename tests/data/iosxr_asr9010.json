@@ -52389,7 +52389,7 @@
             "transceivers": [
                 {
                     "index": "12626805",
-                    "entity_physical_index": null,
+                    "entity_physical_index": 12626805,
                     "type": "Non-Cisco OPTOKON SFP 1G Pluggable Optics Module",
                     "vendor": "",
                     "oui": null,
@@ -52408,7 +52408,7 @@
                 },
                 {
                     "index": "15752416",
-                    "entity_physical_index": null,
+                    "entity_physical_index": 15752416,
                     "type": "Non-Cisco OEM SFP 1G Pluggable Optics Module",
                     "vendor": "",
                     "oui": null,
@@ -52427,7 +52427,7 @@
                 },
                 {
                     "index": "20702176",
-                    "entity_physical_index": null,
+                    "entity_physical_index": 20702176,
                     "type": "1000BASE-LX/LH SFP transceiver module, MMF/SMF, 1310nm, DOM",
                     "vendor": "",
                     "oui": null,
@@ -52446,7 +52446,7 @@
                 },
                 {
                     "index": "25245506",
-                    "entity_physical_index": null,
+                    "entity_physical_index": 25245506,
                     "type": "Non-Cisco OPTOKON SFP 1G Pluggable Optics Module",
                     "vendor": "",
                     "oui": null,
@@ -52465,7 +52465,7 @@
                 },
                 {
                     "index": "28667368",
-                    "entity_physical_index": null,
+                    "entity_physical_index": 28667368,
                     "type": "Non-Cisco OPTOKON SFP 1G Pluggable Optics Module",
                     "vendor": "",
                     "oui": null,
@@ -52484,7 +52484,7 @@
                 },
                 {
                     "index": "33243763",
-                    "entity_physical_index": null,
+                    "entity_physical_index": 33243763,
                     "type": "Non-Cisco OPTOKON SFP 1G Pluggable Optics Module",
                     "vendor": "",
                     "oui": null,
@@ -52503,7 +52503,7 @@
                 },
                 {
                     "index": "37780378",
-                    "entity_physical_index": null,
+                    "entity_physical_index": 37780378,
                     "type": "1000BASE-LX/LH SFP transceiver module, MMF/SMF, 1310nm, DOM",
                     "vendor": "",
                     "oui": null,
@@ -52522,7 +52522,7 @@
                 },
                 {
                     "index": "38193523",
-                    "entity_physical_index": null,
+                    "entity_physical_index": 38193523,
                     "type": "Non-Cisco OPTOKON SFP 1G Pluggable Optics Module",
                     "vendor": "",
                     "oui": null,
@@ -52541,7 +52541,7 @@
                 },
                 {
                     "index": "41901182",
-                    "entity_physical_index": null,
+                    "entity_physical_index": 41901182,
                     "type": "1000BASE-LX/LH SFP transceiver module, MMF/SMF, 1310nm, DOM",
                     "vendor": "",
                     "oui": null,
@@ -52560,7 +52560,7 @@
                 },
                 {
                     "index": "43477411",
-                    "entity_physical_index": null,
+                    "entity_physical_index": 43477411,
                     "type": "1000BASE-T SFP transceiver module for Category 5 copper wire",
                     "vendor": "",
                     "oui": null,
@@ -52579,7 +52579,7 @@
                 },
                 {
                     "index": "46460939",
-                    "entity_physical_index": null,
+                    "entity_physical_index": 46460939,
                     "type": "Non-Cisco OPTOKON SFP 1G Pluggable Optics Module",
                     "vendor": "",
                     "oui": null,
@@ -52598,7 +52598,7 @@
                 },
                 {
                     "index": "46850942",
-                    "entity_physical_index": null,
+                    "entity_physical_index": 46850942,
                     "type": "1000BASE-LX/LH SFP transceiver module, MMF/SMF, 1310nm, DOM",
                     "vendor": "",
                     "oui": null,
@@ -52617,7 +52617,7 @@
                 },
                 {
                     "index": "4860170",
-                    "entity_physical_index": null,
+                    "entity_physical_index": 4860170,
                     "type": "1000BASE-LX/LH SFP transceiver module, MMF/SMF, 1310nm, DOM",
                     "vendor": "",
                     "oui": null,
@@ -52636,7 +52636,7 @@
                 },
                 {
                     "index": "53949430",
-                    "entity_physical_index": null,
+                    "entity_physical_index": 53949430,
                     "type": "Non-Cisco OPTOKON SFP 1G Pluggable Optics Module",
                     "vendor": "",
                     "oui": null,
@@ -52655,7 +52655,7 @@
                 },
                 {
                     "index": "56148731",
-                    "entity_physical_index": null,
+                    "entity_physical_index": 56148731,
                     "type": "Non-Cisco OPTOKON SFP 1G Pluggable Optics Module",
                     "vendor": "",
                     "oui": null,
@@ -52674,7 +52674,7 @@
                 },
                 {
                     "index": "58899190",
-                    "entity_physical_index": null,
+                    "entity_physical_index": 58899190,
                     "type": "Non-Cisco OPTOKON SFP 1G Pluggable Optics Module",
                     "vendor": "",
                     "oui": null,
@@ -52693,7 +52693,7 @@
                 },
                 {
                     "index": "59315058",
-                    "entity_physical_index": null,
+                    "entity_physical_index": 59315058,
                     "type": "GE T",
                     "vendor": "",
                     "oui": null,
@@ -52712,7 +52712,7 @@
                 },
                 {
                     "index": "60375226",
-                    "entity_physical_index": null,
+                    "entity_physical_index": 60375226,
                     "type": "GE T",
                     "vendor": "",
                     "oui": null,
@@ -52731,7 +52731,7 @@
                 },
                 {
                     "index": "60459837",
-                    "entity_physical_index": null,
+                    "entity_physical_index": 60459837,
                     "type": "1000BASE-LX/LH SFP transceiver module, MMF/SMF, 1310nm, DOM",
                     "vendor": "",
                     "oui": null,
@@ -52750,7 +52750,7 @@
                 },
                 {
                     "index": "6606577",
-                    "entity_physical_index": null,
+                    "entity_physical_index": 6606577,
                     "type": "Non-Cisco OPTOKON SFP 1G Pluggable Optics Module",
                     "vendor": "",
                     "oui": null,
@@ -52769,7 +52769,7 @@
                 },
                 {
                     "index": "8198755",
-                    "entity_physical_index": null,
+                    "entity_physical_index": 8198755,
                     "type": "Multirate 10GBASE-LR and OC-192/STM-64 SR-1 XFP, SMF",
                     "vendor": "",
                     "oui": null,
@@ -52788,7 +52788,7 @@
                 },
                 {
                     "index": "8913339",
-                    "entity_physical_index": null,
+                    "entity_physical_index": 8913339,
                     "type": "Multirate 10GBASE-LR and OC-192/STM-64 SR-1 XFP, SMF",
                     "vendor": "",
                     "oui": null,
