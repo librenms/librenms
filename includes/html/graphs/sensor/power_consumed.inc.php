@@ -1,4 +1,5 @@
 <?php
+
 // This is a workaround to avoid duplicate SI metrics like kkWh.
 
 use LibreNMS\Data\Store\Rrd;
