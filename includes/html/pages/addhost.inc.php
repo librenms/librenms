@@ -153,7 +153,7 @@ $pagetitle[] = 'Add host';
             </select>
           </div>
           <div class="col-sm-3">
-            <input type="text" name="port" placeholder="port" class="form-control input-sm">
+            <input type="text" name="port" placeholder="port" value="161" class="form-control input-sm">
           </div>
           <div class="col-sm-3">
             <select name="transport" id="transport" class="form-control input-sm">
