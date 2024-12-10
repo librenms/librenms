@@ -200,6 +200,12 @@ if ($device['os_group'] == 'cisco') {
 
                         $entPhysicalClass = $entity_array[$phys_index]['entPhysicalClass'];
                         $entPhysicalName = $entity_array[$phys_index]['entPhysicalName'];
+                        $transceivers =  \App\Models\Transceiver::where('device_id', $device['device_id'])->where('index', '=', $phys_index)->first()
+                        if (! empty($transceivers)) {
+                            // If we already have a mapping done in transceivers, let's use it.
+                            $tmp_ifindex = $transceivers->entity_physical_index;
+                            break;
+                        }
                         //either sensor is contained by a port class entity.
                         if ($entPhysicalClass === 'port') {
                             $entAliasMappingIdentifier = $entity_array[$phys_index][0]['entAliasMappingIdentifier'];
