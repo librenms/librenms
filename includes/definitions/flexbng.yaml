@@ -5,8 +5,8 @@ icon: netelastic
 mib_dir: netelastic
 over:
     - { graph: device_bits, text: 'Device Traffic' }
-    - { graph: device_mempools, text: 'Memory Usage' }
-    - { graph: device_processors, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+    - { graph: device_processor, text: 'CPU Usage' }
 discovery:
     -
         sysObjectID:
