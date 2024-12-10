@@ -641,6 +641,10 @@ class Cisco extends OS implements
             $data = $this->getDevice()->entityPhysical()->whereIn('entPhysicalContainedIn', $dbSfpCages->keys())->get()->map(function ($ent) use ($dbSfpCages) {
                 if (empty($ent->ifIndex) && $dbSfpCages->has($ent->entPhysicalContainedIn)) {
                     $ent->ifIndex = $dbSfpCages->get($ent->entPhysicalContainedIn);
+                    if (empty($ent->ifIndex)) {
+                        // Lets try to find the 1st subentity with an ifIndex below this one and use it. A few ISR on IOSXE at least are behaving like this.
+                    $ent->ifIndex = $this->getDevice()->entityPhysical()->whereIn('entPhysicalContainedIn', [$ent->entPhysicalIndex])->whereNotNull('ifIndex')->first()->ifIndex;
+                    }
                 }
 
                 return $ent;
