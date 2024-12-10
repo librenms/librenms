@@ -34244,7 +34244,7 @@
             "transceivers": [
                 {
                     "index": "1062",
-                    "entity_physical_index": null,
+                    "entity_physical_index": 1062,
                     "type": "1000BaseSX SFP",
                     "vendor": "",
                     "oui": null,
@@ -34263,7 +34263,7 @@
                 },
                 {
                     "index": "3062",
-                    "entity_physical_index": null,
+                    "entity_physical_index": 3062,
                     "type": "1000BaseSX SFP",
                     "vendor": "",
                     "oui": null,
