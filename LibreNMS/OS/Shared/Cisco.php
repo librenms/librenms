@@ -452,9 +452,9 @@ class Cisco extends OS implements
     {
         $nac = new Collection();
 
-        $portAuthSessionEntry = snmpwalk_cache_oid($this->getDeviceArray(), 'cafSessionEntry', [], 'CISCO-AUTH-FRAMEWORK-MIB');
+        $portAuthSessionEntry = snmpwalk_cache_oid($this->getDeviceArray(), 'cafSessionEntry', [], 'CISCO-AUTH-FRAMEWORK-MIB', null, '-OQUsx');
         if (! empty($portAuthSessionEntry)) {
-            $cafSessionMethodsInfoEntry = collect(snmpwalk_cache_oid($this->getDeviceArray(), 'cafSessionMethodsInfoEntry', [], 'CISCO-AUTH-FRAMEWORK-MIB'))->mapWithKeys(function ($item, $key) {
+            $cafSessionMethodsInfoEntry = collect(snmpwalk_cache_oid($this->getDeviceArray(), 'cafSessionMethodsInfoEntry', [], 'CISCO-AUTH-FRAMEWORK-MIB', null, '-OQUsx'))->mapWithKeys(function ($item, $key) {
                 $key_parts = explode('.', $key);
                 $key = implode('.', array_slice($key_parts, 0, 2)); // remove the auth method
 
@@ -468,7 +468,7 @@ class Cisco extends OS implements
             foreach ($portAuthSessionEntry as $index => $portAuthSessionEntryParameters) {
                 [$ifIndex, $auth_id] = explode('.', str_replace("'", '', $index));
                 $session_info = $cafSessionMethodsInfoEntry->get($ifIndex . '.' . $auth_id);
-                $mac_address = strtolower(implode(array_map('zeropad', explode(':', $portAuthSessionEntryParameters['cafSessionClientMacAddress']))));
+                $mac_address = strtolower(implode(array_map('zeropad', explode(':', $portAuthSessionEntryParameters['cafSessionClientMacAddress'] ?? null))));
 
                 $nac->put($mac_address, new PortsNac([
                     'port_id' => $ifIndex_map->get($ifIndex, 0),
