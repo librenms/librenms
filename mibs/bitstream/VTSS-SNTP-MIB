@@ -1,0 +1,131 @@
+-- *****************************************************************
+-- SNTP-MIB:  Vitesse private MIB
+--
+-- Copyright (c) 2002-2013 Vitesse Semiconductor Corporation "Vitesse".
+-- All Rights Reserved.
+--
+-- ****************************************************************
+
+VTSS-SNTP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    vtssSwitchMgmt
+        FROM VTSS-SMI
+    TruthValue FROM SNMPv2-TC
+    VTSSInetAddress FROM VTSS-TC
+    ;
+
+vtssSntpMib MODULE-IDENTITY
+    LAST-UPDATED "201405210000Z"
+    ORGANIZATION
+        "Vitesse Semiconductor Corporation"
+    CONTACT-INFO
+        "Eric Lee <elee@vitesse.com>"
+    DESCRIPTION
+        "This is a private version of SNTP"
+    REVISION    "201405210000Z"
+    DESCRIPTION
+        "Initial version"
+    ::= { vtssSwitchMgmt 105 }
+
+
+vtssSntpMibObjects OBJECT IDENTIFIER
+    ::= { vtssSntpMib 1 }
+
+vtssSntpCapabilities OBJECT IDENTIFIER
+    ::= { vtssSntpMibObjects 1 }
+
+vtssSntpCapabilitiesServerSupportIPv4 OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicate if SNTP server supports Internet address type of IPv4 or not.
+         true(1) means supported. false(2) means not supported."
+    ::= { vtssSntpCapabilities 1 }
+
+vtssSntpCapabilitiesServerSupportIPv6 OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicate if SNTP server supports Internet address type of IPv6 or not.
+         true(1) means supported. false(2) means not supported."
+    ::= { vtssSntpCapabilities 2 }
+
+vtssSntpCapabilitiesServerSupportDns OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicate if SNTP server supports Internet address type of DNS domain
+         name or not. true(1) means supported. false(2) means not supported."
+    ::= { vtssSntpCapabilities 3 }
+
+vtssSntpConfig OBJECT IDENTIFIER
+    ::= { vtssSntpMibObjects 2 }
+
+vtssSntpConfigGlobals OBJECT IDENTIFIER
+    ::= { vtssSntpConfig 1 }
+
+vtssSntpConfigGlobalsMode OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Global config mode of SNTP. true(1) is to enable SNTP function in the
+         system and false(2) is to disable it."
+    ::= { vtssSntpConfigGlobals 1 }
+
+vtssSntpConfigGlobalsServerAddress OBJECT-TYPE
+    SYNTAX      VTSSInetAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Internet address of a SNTP server."
+    ::= { vtssSntpConfigGlobals 2 }
+
+vtssSntpMibConformance OBJECT IDENTIFIER
+    ::= { vtssSntpMib 2 }
+
+vtssSntpMibCompliances OBJECT IDENTIFIER
+    ::= { vtssSntpMibConformance 1 }
+
+vtssSntpMibGroups OBJECT IDENTIFIER
+    ::= { vtssSntpMibConformance 2 }
+
+vtssSntpCapabilitiesInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssSntpCapabilitiesServerSupportIPv4, 
+                  vtssSntpCapabilitiesServerSupportIPv6, 
+                  vtssSntpCapabilitiesServerSupportDns }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssSntpMibGroups 1 }
+
+vtssSntpConfigGlobalsInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssSntpConfigGlobalsMode, vtssSntpConfigGlobalsServerAddress }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssSntpMibGroups 2 }
+
+vtssSntpMibCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the implementation."
+
+    MODULE      -- this module
+
+        MANDATORY-GROUPS        { vtssSntpCapabilitiesInfoGroup, 
+                  vtssSntpConfigGlobalsInfoGroup }
+
+    ::= { vtssSntpMibCompliances 1 }
+
+END

@@ -1,0 +1,165 @@
+BTS-POE-MONITOR DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION FROM SNMPv2-TC
+    switchMgmt FROM BTS-SMI
+    Integer32 FROM SNMPv2-SMI
+    Unsigned32 FROM SNMPv2-SMI
+    TruthValue FROM SNMPv2-TC
+    VTSSIpAddress FROM VTSS-TC
+    VTSSTimeStamp FROM VTSS-TC
+    DisplayString FROM RFC1213-MIB;    
+    ;
+    
+poeMonitorRoot					OBJECT IDENTIFIER ::= { switchMgmt 8 }
+poeMonitorPDInfo	 		OBJECT IDENTIFIER ::= { poeMonitorRoot 1 }
+
+poweredDevicesCount OBJECT-TYPE
+    SYNTAX  INTEGER (0..100)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "Powered Devices Count."
+    ::= { poeMonitorPDInfo 1 }
+
+totalPower OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..32))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "Total PD Supply Power in Watts."
+    ::= { poeMonitorPDInfo 2 } 
+
+totalEnergy OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..32))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "Total PD Supply Energy in Watt Hours."
+    ::= { poeMonitorPDInfo 3 }
+    
+-- POE Powered Devices Status Table
+poeMonitorPDStatsTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF poeMonitorPDStatsTableEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+            "A list of POE Monitor Powered Devices Statistics Table Entries."
+    ::= { poeMonitorRoot 3 }
+     
+poeMonitorPDStatsTableEntry OBJECT-TYPE
+    SYNTAX  poeMonitorPDStatsTableEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+            "POE Monitor Table Entry."
+    INDEX   { rowIdxStats }
+    ::= { poeMonitorPDStatsTable 1 }
+
+poeMonitorPDStatsTableEntry ::=
+    SEQUENCE {
+    	rowIdxStats
+    		INTEGER,
+        pdEthIfName
+            DisplayString (SIZE (0..32)),
+        powerOnStatus
+            INTEGER,
+        detectStatus
+            DisplayString (SIZE (0..32)),
+        classStatus
+            DisplayString (SIZE (0..32)),
+        upTime
+            DisplayString (SIZE (0..32)),
+        voltageVolts
+        	DisplayString (SIZE (0..32)),
+        currentMiliAmps
+        	DisplayString (SIZE (0..32)),
+        powerWats
+        	DisplayString (SIZE (0..32)),
+        energyWatHours
+        	DisplayString (SIZE (0..32))
+    }
+    
+rowIdxStats OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "A unique value for each PD supply."
+    ::= { poeMonitorPDStatsTableEntry 50 }
+        
+pdEthIfName OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..32))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "PD Physical Network Interface Name."
+    ::= { poeMonitorPDStatsTableEntry 1 }
+    
+powerOnStatus OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "PD Power on/off status. On = 1, Off = 0."
+    ::= { poeMonitorPDStatsTableEntry 2 }
+        
+detectStatus OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..32))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "PD Detection Descriptive Status."
+    ::= { poeMonitorPDStatsTableEntry 3 }
+        
+classStatus OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..32))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "PD Classification Descriptive Status."
+    ::= { poeMonitorPDStatsTableEntry 4 }
+    
+upTime OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..32))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "PD Up Time."
+    ::= { poeMonitorPDStatsTableEntry 5 }
+        
+voltageVolts OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..32))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "PD Supply Voltage in Volts."
+    ::= { poeMonitorPDStatsTableEntry 6 }
+
+currentMiliAmps OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..32))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "PD Supply Amperes in Milli Amperes."
+    ::= { poeMonitorPDStatsTableEntry 7 }
+
+powerWats OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..32))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "PD Supply Power in Watts."
+    ::= { poeMonitorPDStatsTableEntry 8 }
+
+energyWatHours OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..32))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "PD Supply Energy in Watt Hours."
+    ::= { poeMonitorPDStatsTableEntry 9 }
+
+    
+END

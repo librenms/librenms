@@ -1,0 +1,679 @@
+-- *****************************************************************
+-- IPMC-PROFILE-MIB:  Vitesse private MIB
+--
+-- Copyright (c) 2002-2013 Vitesse Semiconductor Corporation "Vitesse".
+-- All Rights Reserved.
+--
+-- ****************************************************************
+
+VTSS-IPMC-PROFILE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    vtssSwitchMgmt
+        FROM VTSS-SMI
+    InetAddressIPv6 FROM INET-ADDRESS-MIB
+    Integer32 FROM SNMPv2-SMI
+    IpAddress FROM SNMPv2-SMI
+    TruthValue FROM SNMPv2-TC
+    VTSSDisplayString FROM VTSS-TC
+    VTSSRowEditorState FROM VTSS-TC
+    ;
+
+vtssIpmcProfileMib MODULE-IDENTITY
+    LAST-UPDATED "201407010000Z"
+    ORGANIZATION
+        "Vitesse Semiconductor Corporation"
+    CONTACT-INFO
+        "Application support <application_support@vitesse.com>"
+    DESCRIPTION
+        "This is a private version of the IPMC Profile MIB"
+    REVISION    "201407010000Z"
+    DESCRIPTION
+        "Initial version"
+    ::= { vtssSwitchMgmt 38 }
+
+
+VTSSIpmcProfileRuleActionType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This enumeration indicates the configured action type for IPMC profile
+         rule."
+    SYNTAX      INTEGER { deny(0), permit(1) }
+
+vtssIpmcProfileMibObjects OBJECT IDENTIFIER
+    ::= { vtssIpmcProfileMib 1 }
+
+vtssIpmcProfileConfig OBJECT IDENTIFIER
+    ::= { vtssIpmcProfileMibObjects 2 }
+
+vtssIpmcProfileConfigGlobals OBJECT IDENTIFIER
+    ::= { vtssIpmcProfileConfig 1 }
+
+vtssIpmcProfileConfigGlobalsAdminState OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Enable/Disable the IPMC Profile global functionality."
+    ::= { vtssIpmcProfileConfigGlobals 1 }
+
+vtssIpmcProfileConfigManagementTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VTSSIpmcProfileConfigManagementEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is a table for managing IPMC profile entries."
+    ::= { vtssIpmcProfileConfig 2 }
+
+vtssIpmcProfileConfigManagementEntry OBJECT-TYPE
+    SYNTAX      VTSSIpmcProfileConfigManagementEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each entry has a set of parameters"
+    INDEX       { vtssIpmcProfileConfigManagementProfileName }
+    ::= { vtssIpmcProfileConfigManagementTable 1 }
+
+VTSSIpmcProfileConfigManagementEntry ::= SEQUENCE {
+    vtssIpmcProfileConfigManagementProfileName      VTSSDisplayString,
+    vtssIpmcProfileConfigManagementProfileDescription   VTSSDisplayString,
+    vtssIpmcProfileConfigManagementAction   VTSSRowEditorState
+}
+
+vtssIpmcProfileConfigManagementProfileName OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..16))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The name of the IPMC profile management entry."
+    ::= { vtssIpmcProfileConfigManagementEntry 1 }
+
+vtssIpmcProfileConfigManagementProfileDescription OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..64))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The description of the IPMC Profile management entry."
+    ::= { vtssIpmcProfileConfigManagementEntry 2 }
+
+vtssIpmcProfileConfigManagementAction OBJECT-TYPE
+    SYNTAX      VTSSRowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Action"
+    ::= { vtssIpmcProfileConfigManagementEntry 100 }
+
+vtssIpmcProfileConfigManagementTableRowEditor OBJECT IDENTIFIER
+    ::= { vtssIpmcProfileConfig 3 }
+
+vtssIpmcProfileConfigManagementTableRowEditorProfileName OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..16))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The name of the IPMC profile management entry."
+    ::= { vtssIpmcProfileConfigManagementTableRowEditor 1 }
+
+vtssIpmcProfileConfigManagementTableRowEditorProfileDescription OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..64))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The description of the IPMC Profile management entry."
+    ::= { vtssIpmcProfileConfigManagementTableRowEditor 2 }
+
+vtssIpmcProfileConfigManagementTableRowEditorAction OBJECT-TYPE
+    SYNTAX      VTSSRowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Action"
+    ::= { vtssIpmcProfileConfigManagementTableRowEditor 100 }
+
+vtssIpmcProfileConfigIpv4AddressRangeTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VTSSIpmcProfileConfigIpv4AddressRangeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is a table for managing the IPv4 address range entries that will
+         be applied for IPMC profile(s)."
+    ::= { vtssIpmcProfileConfig 4 }
+
+vtssIpmcProfileConfigIpv4AddressRangeEntry OBJECT-TYPE
+    SYNTAX      VTSSIpmcProfileConfigIpv4AddressRangeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each entry has a set of parameters"
+    INDEX       { vtssIpmcProfileConfigIpv4AddressRangeRangeName }
+    ::= { vtssIpmcProfileConfigIpv4AddressRangeTable 1 }
+
+VTSSIpmcProfileConfigIpv4AddressRangeEntry ::= SEQUENCE {
+    vtssIpmcProfileConfigIpv4AddressRangeRangeName      VTSSDisplayString,
+    vtssIpmcProfileConfigIpv4AddressRangeStartAddress   IpAddress,
+    vtssIpmcProfileConfigIpv4AddressRangeEndAddress     IpAddress,
+    vtssIpmcProfileConfigIpv4AddressRangeAction     VTSSRowEditorState
+}
+
+vtssIpmcProfileConfigIpv4AddressRangeRangeName OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..16))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The name of the IPMC profile address range entry."
+    ::= { vtssIpmcProfileConfigIpv4AddressRangeEntry 1 }
+
+vtssIpmcProfileConfigIpv4AddressRangeStartAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The starting IPv4 address of the range that IPMC Profile performs
+         checking."
+    ::= { vtssIpmcProfileConfigIpv4AddressRangeEntry 2 }
+
+vtssIpmcProfileConfigIpv4AddressRangeEndAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The ending IPv4 address of the range that IPMC Profile performs
+         checking."
+    ::= { vtssIpmcProfileConfigIpv4AddressRangeEntry 3 }
+
+vtssIpmcProfileConfigIpv4AddressRangeAction OBJECT-TYPE
+    SYNTAX      VTSSRowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Action"
+    ::= { vtssIpmcProfileConfigIpv4AddressRangeEntry 100 }
+
+vtssIpmcProfileConfigIpv4AddressRangeTableRowEditor OBJECT IDENTIFIER
+    ::= { vtssIpmcProfileConfig 5 }
+
+vtssIpmcProfileConfigIpv4AddressRangeTableRowEditorRangeName OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..16))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The name of the IPMC profile address range entry."
+    ::= { vtssIpmcProfileConfigIpv4AddressRangeTableRowEditor 1 }
+
+vtssIpmcProfileConfigIpv4AddressRangeTableRowEditorStartAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The starting IPv4 address of the range that IPMC Profile performs
+         checking."
+    ::= { vtssIpmcProfileConfigIpv4AddressRangeTableRowEditor 2 }
+
+vtssIpmcProfileConfigIpv4AddressRangeTableRowEditorEndAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The ending IPv4 address of the range that IPMC Profile performs
+         checking."
+    ::= { vtssIpmcProfileConfigIpv4AddressRangeTableRowEditor 3 }
+
+vtssIpmcProfileConfigIpv4AddressRangeTableRowEditorAction OBJECT-TYPE
+    SYNTAX      VTSSRowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Action"
+    ::= { vtssIpmcProfileConfigIpv4AddressRangeTableRowEditor 100 }
+
+vtssIpmcProfileConfigIpv6AddressRangeTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VTSSIpmcProfileConfigIpv6AddressRangeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is a table for managing the IPv6 address range entries that will
+         be applied for IPMC profile(s)."
+    ::= { vtssIpmcProfileConfig 6 }
+
+vtssIpmcProfileConfigIpv6AddressRangeEntry OBJECT-TYPE
+    SYNTAX      VTSSIpmcProfileConfigIpv6AddressRangeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each entry has a set of parameters"
+    INDEX       { vtssIpmcProfileConfigIpv6AddressRangeRangeName }
+    ::= { vtssIpmcProfileConfigIpv6AddressRangeTable 1 }
+
+VTSSIpmcProfileConfigIpv6AddressRangeEntry ::= SEQUENCE {
+    vtssIpmcProfileConfigIpv6AddressRangeRangeName      VTSSDisplayString,
+    vtssIpmcProfileConfigIpv6AddressRangeStartAddress   InetAddressIPv6,
+    vtssIpmcProfileConfigIpv6AddressRangeEndAddress     InetAddressIPv6,
+    vtssIpmcProfileConfigIpv6AddressRangeAction     VTSSRowEditorState
+}
+
+vtssIpmcProfileConfigIpv6AddressRangeRangeName OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..16))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The name of the IPMC profile address range entry."
+    ::= { vtssIpmcProfileConfigIpv6AddressRangeEntry 1 }
+
+vtssIpmcProfileConfigIpv6AddressRangeStartAddress OBJECT-TYPE
+    SYNTAX      InetAddressIPv6
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The starting IPv6 address of the range that IPMC Profile performs
+         checking."
+    ::= { vtssIpmcProfileConfigIpv6AddressRangeEntry 2 }
+
+vtssIpmcProfileConfigIpv6AddressRangeEndAddress OBJECT-TYPE
+    SYNTAX      InetAddressIPv6
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The ending IPv6 address of the range that IPMC Profile performs
+         checking."
+    ::= { vtssIpmcProfileConfigIpv6AddressRangeEntry 3 }
+
+vtssIpmcProfileConfigIpv6AddressRangeAction OBJECT-TYPE
+    SYNTAX      VTSSRowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Action"
+    ::= { vtssIpmcProfileConfigIpv6AddressRangeEntry 100 }
+
+vtssIpmcProfileConfigIpv6AddressRangeTableRowEditor OBJECT IDENTIFIER
+    ::= { vtssIpmcProfileConfig 7 }
+
+vtssIpmcProfileConfigIpv6AddressRangeTableRowEditorRangeName OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..16))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The name of the IPMC profile address range entry."
+    ::= { vtssIpmcProfileConfigIpv6AddressRangeTableRowEditor 1 }
+
+vtssIpmcProfileConfigIpv6AddressRangeTableRowEditorStartAddress OBJECT-TYPE
+    SYNTAX      InetAddressIPv6
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The starting IPv6 address of the range that IPMC Profile performs
+         checking."
+    ::= { vtssIpmcProfileConfigIpv6AddressRangeTableRowEditor 2 }
+
+vtssIpmcProfileConfigIpv6AddressRangeTableRowEditorEndAddress OBJECT-TYPE
+    SYNTAX      InetAddressIPv6
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The ending IPv6 address of the range that IPMC Profile performs
+         checking."
+    ::= { vtssIpmcProfileConfigIpv6AddressRangeTableRowEditor 3 }
+
+vtssIpmcProfileConfigIpv6AddressRangeTableRowEditorAction OBJECT-TYPE
+    SYNTAX      VTSSRowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Action"
+    ::= { vtssIpmcProfileConfigIpv6AddressRangeTableRowEditor 100 }
+
+vtssIpmcProfileConfigRuleTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VTSSIpmcProfileConfigRuleEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is a table for managing the filtering rules with respect to a set
+         of address range used in a specific IPMC profile management entry."
+    ::= { vtssIpmcProfileConfig 8 }
+
+vtssIpmcProfileConfigRuleEntry OBJECT-TYPE
+    SYNTAX      VTSSIpmcProfileConfigRuleEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each entry has a set of parameters"
+    INDEX       { vtssIpmcProfileConfigRuleProfileName, vtssIpmcProfileConfigRuleRuleRange }
+    ::= { vtssIpmcProfileConfigRuleTable 1 }
+
+VTSSIpmcProfileConfigRuleEntry ::= SEQUENCE {
+    vtssIpmcProfileConfigRuleProfileName    VTSSDisplayString,
+    vtssIpmcProfileConfigRuleRuleRange      VTSSDisplayString,
+    vtssIpmcProfileConfigRuleNextRuleRange      VTSSDisplayString,
+    vtssIpmcProfileConfigRuleRuleAction     VTSSIpmcProfileRuleActionType,
+    vtssIpmcProfileConfigRuleRuleLog    TruthValue,
+    vtssIpmcProfileConfigRuleAction     VTSSRowEditorState
+}
+
+vtssIpmcProfileConfigRuleProfileName OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..16))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The name of the IPMC profile management entry."
+    ::= { vtssIpmcProfileConfigRuleEntry 1 }
+
+vtssIpmcProfileConfigRuleRuleRange OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..16))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The name of the IPMC profile address range used as a rule."
+    ::= { vtssIpmcProfileConfigRuleEntry 2 }
+
+vtssIpmcProfileConfigRuleNextRuleRange OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..16))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The next rule's address range name that this IPMC Profile management
+         entry performs checking."
+    ::= { vtssIpmcProfileConfigRuleEntry 3 }
+
+vtssIpmcProfileConfigRuleRuleAction OBJECT-TYPE
+    SYNTAX      VTSSIpmcProfileRuleActionType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The filtering action while this IPMC Profile management entry performs
+         checking. deny(0) will prohibit the IPMC control frames destined to
+         protocol stack. permit(1) will pass the IPMC control frames destined to
+         protocol stack."
+    ::= { vtssIpmcProfileConfigRuleEntry 4 }
+
+vtssIpmcProfileConfigRuleRuleLog OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Enable the IPMC Profile will log matched group address that is filtered
+         by this rule with the corresponding action (deny or permit). Disable
+         the IPMC Profile will not log any action for any group address whether
+         or not to be filtered by this rule."
+    ::= { vtssIpmcProfileConfigRuleEntry 5 }
+
+vtssIpmcProfileConfigRuleAction OBJECT-TYPE
+    SYNTAX      VTSSRowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Action"
+    ::= { vtssIpmcProfileConfigRuleEntry 100 }
+
+vtssIpmcProfileConfigRuleTableRowEditor OBJECT IDENTIFIER
+    ::= { vtssIpmcProfileConfig 9 }
+
+vtssIpmcProfileConfigRuleTableRowEditorProfileName OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..16))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The name of the IPMC profile management entry."
+    ::= { vtssIpmcProfileConfigRuleTableRowEditor 1 }
+
+vtssIpmcProfileConfigRuleTableRowEditorRuleRange OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..16))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The name of the IPMC profile address range used as a rule."
+    ::= { vtssIpmcProfileConfigRuleTableRowEditor 2 }
+
+vtssIpmcProfileConfigRuleTableRowEditorNextRuleRange OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..16))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The next rule's address range name that this IPMC Profile management
+         entry performs checking."
+    ::= { vtssIpmcProfileConfigRuleTableRowEditor 3 }
+
+vtssIpmcProfileConfigRuleTableRowEditorRuleAction OBJECT-TYPE
+    SYNTAX      VTSSIpmcProfileRuleActionType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The filtering action while this IPMC Profile management entry performs
+         checking. deny(0) will prohibit the IPMC control frames destined to
+         protocol stack. permit(1) will pass the IPMC control frames destined to
+         protocol stack."
+    ::= { vtssIpmcProfileConfigRuleTableRowEditor 4 }
+
+vtssIpmcProfileConfigRuleTableRowEditorRuleLog OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Enable the IPMC Profile will log matched group address that is filtered
+         by this rule with the corresponding action (deny or permit). Disable
+         the IPMC Profile will not log any action for any group address whether
+         or not to be filtered by this rule."
+    ::= { vtssIpmcProfileConfigRuleTableRowEditor 5 }
+
+vtssIpmcProfileConfigRuleTableRowEditorAction OBJECT-TYPE
+    SYNTAX      VTSSRowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Action"
+    ::= { vtssIpmcProfileConfigRuleTableRowEditor 100 }
+
+vtssIpmcProfileConfigPrecedenceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VTSSIpmcProfileConfigPrecedenceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is a table for displaying the rule entries of a specific IPMC
+         profile in precedence order."
+    ::= { vtssIpmcProfileConfig 10 }
+
+vtssIpmcProfileConfigPrecedenceEntry OBJECT-TYPE
+    SYNTAX      VTSSIpmcProfileConfigPrecedenceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each entry has a set of parameters."
+    INDEX       { vtssIpmcProfileConfigPrecedenceProfileName, vtssIpmcProfileConfigPrecedenceRulePrecedence }
+    ::= { vtssIpmcProfileConfigPrecedenceTable 1 }
+
+VTSSIpmcProfileConfigPrecedenceEntry ::= SEQUENCE {
+    vtssIpmcProfileConfigPrecedenceProfileName      VTSSDisplayString,
+    vtssIpmcProfileConfigPrecedenceRulePrecedence   Integer32,
+    vtssIpmcProfileConfigPrecedenceRuleRange    VTSSDisplayString,
+    vtssIpmcProfileConfigPrecedenceNextRuleRange    VTSSDisplayString,
+    vtssIpmcProfileConfigPrecedenceRuleAction   VTSSIpmcProfileRuleActionType,
+    vtssIpmcProfileConfigPrecedenceRuleLog      TruthValue
+}
+
+vtssIpmcProfileConfigPrecedenceProfileName OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..16))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The name of the IPMC profile management entry."
+    ::= { vtssIpmcProfileConfigPrecedenceEntry 1 }
+
+vtssIpmcProfileConfigPrecedenceRulePrecedence OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The precedence of the IPMC profile rule entry."
+    ::= { vtssIpmcProfileConfigPrecedenceEntry 2 }
+
+vtssIpmcProfileConfigPrecedenceRuleRange OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The name of the IPMC profile address range used as a rule."
+    ::= { vtssIpmcProfileConfigPrecedenceEntry 3 }
+
+vtssIpmcProfileConfigPrecedenceNextRuleRange OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The next rule's address range name that this IPMC Profile management
+         entry performs checking."
+    ::= { vtssIpmcProfileConfigPrecedenceEntry 4 }
+
+vtssIpmcProfileConfigPrecedenceRuleAction OBJECT-TYPE
+    SYNTAX      VTSSIpmcProfileRuleActionType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The filtering action while this IPMC Profile management entry performs
+         checking. deny(0) will prohibit the IPMC control frames destined to
+         protocol stack. permit(1) will pass the IPMC control frames destined to
+         protocol stack."
+    ::= { vtssIpmcProfileConfigPrecedenceEntry 5 }
+
+vtssIpmcProfileConfigPrecedenceRuleLog OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Enable the IPMC Profile will log matched group address that is filtered
+         by this rule with the corresponding action (deny or permit). Disable
+         the IPMC Profile will not log any action for any group address whether
+         or not to be filtered by this rule."
+    ::= { vtssIpmcProfileConfigPrecedenceEntry 6 }
+
+vtssIpmcProfileMibConformance OBJECT IDENTIFIER
+    ::= { vtssIpmcProfileMib 2 }
+
+vtssIpmcProfileMibCompliances OBJECT IDENTIFIER
+    ::= { vtssIpmcProfileMibConformance 1 }
+
+vtssIpmcProfileMibGroups OBJECT IDENTIFIER
+    ::= { vtssIpmcProfileMibConformance 2 }
+
+vtssIpmcProfileConfigGlobalsInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssIpmcProfileConfigGlobalsAdminState }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssIpmcProfileMibGroups 1 }
+
+vtssIpmcProfileConfigManagementTableInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssIpmcProfileConfigManagementProfileDescription, 
+                  vtssIpmcProfileConfigManagementAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssIpmcProfileMibGroups 2 }
+
+vtssIpmcProfileConfigManagementTableRowEditorInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssIpmcProfileConfigManagementTableRowEditorProfileName, 
+                  vtssIpmcProfileConfigManagementTableRowEditorProfileDescription, 
+                  vtssIpmcProfileConfigManagementTableRowEditorAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssIpmcProfileMibGroups 3 }
+
+vtssIpmcProfileConfigIpv4AddressRangeTableInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssIpmcProfileConfigIpv4AddressRangeStartAddress, 
+                  vtssIpmcProfileConfigIpv4AddressRangeEndAddress, 
+                  vtssIpmcProfileConfigIpv4AddressRangeAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssIpmcProfileMibGroups 4 }
+
+vtssIpmcProfileConfigIpv4AddressRangeTableRowEditorInfoGroup OBJECT-GROUP
+    OBJECTS     { 
+                  vtssIpmcProfileConfigIpv4AddressRangeTableRowEditorRangeName, 
+                  vtssIpmcProfileConfigIpv4AddressRangeTableRowEditorStartAddress, 
+                  vtssIpmcProfileConfigIpv4AddressRangeTableRowEditorEndAddress, 
+                  vtssIpmcProfileConfigIpv4AddressRangeTableRowEditorAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssIpmcProfileMibGroups 5 }
+
+vtssIpmcProfileConfigIpv6AddressRangeTableInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssIpmcProfileConfigIpv6AddressRangeStartAddress, 
+                  vtssIpmcProfileConfigIpv6AddressRangeEndAddress, 
+                  vtssIpmcProfileConfigIpv6AddressRangeAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssIpmcProfileMibGroups 6 }
+
+vtssIpmcProfileConfigIpv6AddressRangeTableRowEditorInfoGroup OBJECT-GROUP
+    OBJECTS     { 
+                  vtssIpmcProfileConfigIpv6AddressRangeTableRowEditorRangeName, 
+                  vtssIpmcProfileConfigIpv6AddressRangeTableRowEditorStartAddress, 
+                  vtssIpmcProfileConfigIpv6AddressRangeTableRowEditorEndAddress, 
+                  vtssIpmcProfileConfigIpv6AddressRangeTableRowEditorAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssIpmcProfileMibGroups 7 }
+
+vtssIpmcProfileConfigRuleTableInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssIpmcProfileConfigRuleNextRuleRange, 
+                  vtssIpmcProfileConfigRuleRuleAction, 
+                  vtssIpmcProfileConfigRuleRuleLog, 
+                  vtssIpmcProfileConfigRuleAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssIpmcProfileMibGroups 8 }
+
+vtssIpmcProfileConfigRuleTableRowEditorInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssIpmcProfileConfigRuleTableRowEditorProfileName, 
+                  vtssIpmcProfileConfigRuleTableRowEditorRuleRange, 
+                  vtssIpmcProfileConfigRuleTableRowEditorNextRuleRange, 
+                  vtssIpmcProfileConfigRuleTableRowEditorRuleAction, 
+                  vtssIpmcProfileConfigRuleTableRowEditorRuleLog, 
+                  vtssIpmcProfileConfigRuleTableRowEditorAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssIpmcProfileMibGroups 9 }
+
+vtssIpmcProfileConfigPrecedenceTableInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssIpmcProfileConfigPrecedenceRuleRange, 
+                  vtssIpmcProfileConfigPrecedenceNextRuleRange, 
+                  vtssIpmcProfileConfigPrecedenceRuleAction, 
+                  vtssIpmcProfileConfigPrecedenceRuleLog }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssIpmcProfileMibGroups 10 }
+
+vtssIpmcProfileMibCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the implementation."
+
+    MODULE      -- this module
+
+        MANDATORY-GROUPS        { vtssIpmcProfileConfigGlobalsInfoGroup, 
+                  vtssIpmcProfileConfigManagementTableInfoGroup, 
+                  vtssIpmcProfileConfigManagementTableRowEditorInfoGroup, 
+                  vtssIpmcProfileConfigIpv4AddressRangeTableInfoGroup, 
+                  vtssIpmcProfileConfigIpv4AddressRangeTableRowEditorInfoGroup, 
+                  vtssIpmcProfileConfigIpv6AddressRangeTableInfoGroup, 
+                  vtssIpmcProfileConfigIpv6AddressRangeTableRowEditorInfoGroup, 
+                  vtssIpmcProfileConfigRuleTableInfoGroup, 
+                  vtssIpmcProfileConfigRuleTableRowEditorInfoGroup, 
+                  vtssIpmcProfileConfigPrecedenceTableInfoGroup }
+
+    ::= { vtssIpmcProfileMibCompliances 1 }
+
+END

@@ -1,0 +1,169 @@
+-- *****************************************************************
+-- GVRP-MIB:  Vitesse private MIB
+--
+-- Copyright (c) 2002-2013 Vitesse Semiconductor Corporation "Vitesse".
+-- All Rights Reserved.
+--
+-- ****************************************************************
+
+VTSS-GVRP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    vtssSwitchMgmt
+        FROM VTSS-SMI
+    Integer32 FROM SNMPv2-SMI
+    TruthValue FROM SNMPv2-TC
+    ;
+
+vtssGvrpMib MODULE-IDENTITY
+    LAST-UPDATED "201408220000Z"
+    ORGANIZATION
+        "Vitesse Semiconductor Corporation"
+    CONTACT-INFO
+        "Application support <application_support@vitesse.com>"
+    DESCRIPTION
+        "Private GVRP MIB."
+    REVISION    "201408220000Z"
+    DESCRIPTION
+        "Initial version"
+    ::= { vtssSwitchMgmt 89 }
+
+
+vtssGvrpMibObjects OBJECT IDENTIFIER
+    ::= { vtssGvrpMib 1 }
+
+vtssGvrpCapabilities OBJECT IDENTIFIER
+    ::= { vtssGvrpMibObjects 1 }
+
+vtssGvrpConfig OBJECT IDENTIFIER
+    ::= { vtssGvrpMibObjects 2 }
+
+vtssGvrpConfigGlobal OBJECT IDENTIFIER
+    ::= { vtssGvrpConfig 1 }
+
+vtssGvrpConfigGlobalGlobalEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Global enabling of GVRP protocol."
+    ::= { vtssGvrpConfigGlobal 1 }
+
+vtssGvrpConfigGlobalJoinTimer OBJECT-TYPE
+    SYNTAX      Integer32 (1..20)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Join-time protocol parameter. Range [1,20] centi seconds."
+    ::= { vtssGvrpConfigGlobal 2 }
+
+vtssGvrpConfigGlobalLeaveTimer OBJECT-TYPE
+    SYNTAX      Integer32 (60..300)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Leave-time protocol parameter. Range [60,300] centi seconds."
+    ::= { vtssGvrpConfigGlobal 3 }
+
+vtssGvrpConfigGlobalLeaveAllTimer OBJECT-TYPE
+    SYNTAX      Integer32 (1000..5000)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Leave-all-time protocol parameter. Range [1000,5000] centi seconds."
+    ::= { vtssGvrpConfigGlobal 4 }
+
+vtssGvrpConfigGlobalMaxVlans OBJECT-TYPE
+    SYNTAX      Integer32 (1..4094)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Maximum of VLANs simultaniously supported by GVRP. Range [1,4094].
+         Setting this attribute will fail, if GVRP is globally enabled *and* the
+         new value is less than what is actually in use."
+    ::= { vtssGvrpConfigGlobal 5 }
+
+vtssGvrpConfigPortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VTSSGvrpConfigPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is the configurable part of GVRP ports."
+    ::= { vtssGvrpConfig 2 }
+
+vtssGvrpConfigPortEntry OBJECT-TYPE
+    SYNTAX      VTSSGvrpConfigPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The portId index must be a value must be a value from 1 up to the
+         number of ports."
+    INDEX       { vtssGvrpConfigPortPortId }
+    ::= { vtssGvrpConfigPortTable 1 }
+
+VTSSGvrpConfigPortEntry ::= SEQUENCE {
+    vtssGvrpConfigPortPortId    Integer32,
+    vtssGvrpConfigPortPortEnable    TruthValue
+}
+
+vtssGvrpConfigPortPortId OBJECT-TYPE
+    SYNTAX      Integer32 (0..32767)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "-"
+    ::= { vtssGvrpConfigPortEntry 1 }
+
+vtssGvrpConfigPortPortEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The GVRP enable state of port."
+    ::= { vtssGvrpConfigPortEntry 2 }
+
+vtssGvrpMibConformance OBJECT IDENTIFIER
+    ::= { vtssGvrpMib 2 }
+
+vtssGvrpMibCompliances OBJECT IDENTIFIER
+    ::= { vtssGvrpMibConformance 1 }
+
+vtssGvrpMibGroups OBJECT IDENTIFIER
+    ::= { vtssGvrpMibConformance 2 }
+
+vtssGvrpConfigGlobalInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssGvrpConfigGlobalGlobalEnable, 
+                  vtssGvrpConfigGlobalJoinTimer, vtssGvrpConfigGlobalLeaveTimer, 
+                  vtssGvrpConfigGlobalLeaveAllTimer, 
+                  vtssGvrpConfigGlobalMaxVlans }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssGvrpMibGroups 1 }
+
+vtssGvrpConfigPortTableInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssGvrpConfigPortPortEnable }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssGvrpMibGroups 2 }
+
+vtssGvrpMibCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the implementation."
+
+    MODULE      -- this module
+
+        MANDATORY-GROUPS        { vtssGvrpConfigGlobalInfoGroup, 
+                  vtssGvrpConfigPortTableInfoGroup }
+
+    ::= { vtssGvrpMibCompliances 1 }
+
+END

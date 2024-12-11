@@ -1,0 +1,646 @@
+-- *****************************************************************
+-- SYNCE-MIB:  Vitesse private MIB
+--
+-- Copyright (c) 2002-2013 Vitesse Semiconductor Corporation "Vitesse".
+-- All Rights Reserved.
+--
+-- ****************************************************************
+
+VTSS-SYNCE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    vtssSwitchMgmt
+        FROM VTSS-SMI
+    Integer32 FROM SNMPv2-SMI
+    Unsigned32 FROM SNMPv2-SMI
+    TruthValue FROM SNMPv2-TC
+    VTSSInterfaceIndex FROM VTSS-TC
+    VTSSUnsigned8 FROM VTSS-TC
+    ;
+
+vtssSynceMib MODULE-IDENTITY
+    LAST-UPDATED "201406240000Z"
+    ORGANIZATION
+        "Vitesse Semiconductor Corporation"
+    CONTACT-INFO
+        "Application support <application_support@vitesse.com>"
+    DESCRIPTION
+        "Private SyncE MIB."
+    REVISION    "201406240000Z"
+    DESCRIPTION
+        "Initial version"
+    ::= { vtssSwitchMgmt 42 }
+
+
+VTSSsynceAnegMode ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "-"
+    SYNTAX      INTEGER { none(0), preferedSlave(1), preferedMaster(2), forcedSlave(3) }
+
+VTSSsynceEecOption ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "-"
+    SYNTAX      INTEGER { eecOption1(0), eecOption2(1) }
+
+VTSSsynceFrequency ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "-"
+    SYNTAX      INTEGER { disabled(0), freq1544kHz(1), freq2048kHz(2), freq10MHz(3), freqMax(4) }
+
+VTSSsynceQualityLevel ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "-"
+    SYNTAX      INTEGER { qlNone(0), qlPrc(1), qlSsua(2), qlSsub(3), qlEec2(4), qlEec1(5), qlDnu(6), qlInv(7), qlFail(8), qlLink(9) }
+
+VTSSsynceSelectionMode ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "-"
+    SYNTAX      INTEGER { manual(0), manualToSelected(1), autoNonrevertive(2), autoRevertive(3), forcedHoldover(4), forcedFreeRun(5) }
+
+VTSSsynceSelectorState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "-"
+    SYNTAX      INTEGER { locked(0), holdover(1), freerun(2), ptp(3), refFailed(4), acquiring(5) }
+
+vtssSynceMibObjects OBJECT IDENTIFIER
+    ::= { vtssSynceMib 1 }
+
+vtssSynceCapabilities OBJECT IDENTIFIER
+    ::= { vtssSynceMibObjects 1 }
+
+vtssSynceCapabilitiesGlobal OBJECT IDENTIFIER
+    ::= { vtssSynceCapabilities 1 }
+
+vtssSynceCapabilitiesGlobalSourceCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of SyncE sources supported by the device."
+    ::= { vtssSynceCapabilitiesGlobal 1 }
+
+vtssSynceConfig OBJECT IDENTIFIER
+    ::= { vtssSynceMibObjects 2 }
+
+vtssSynceConfigGlobal OBJECT IDENTIFIER
+    ::= { vtssSynceConfig 1 }
+
+vtssSynceConfigGlobalClockSelectionMode OBJECT IDENTIFIER
+    ::= { vtssSynceConfigGlobal 1 }
+
+vtssSynceConfigGlobalClockSelectionModeSelectionMode OBJECT-TYPE
+    SYNTAX      VTSSsynceSelectionMode
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The selection mode."
+    ::= { vtssSynceConfigGlobalClockSelectionMode 1 }
+
+vtssSynceConfigGlobalClockSelectionModeSource OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Nominated source for manuel selection mode."
+    ::= { vtssSynceConfigGlobalClockSelectionMode 2 }
+
+vtssSynceConfigGlobalClockSelectionModeWtrTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "WTR timer value in minutes. Range is 0 to 12 minutes where 0 means that
+         the timer is disabled."
+    ::= { vtssSynceConfigGlobalClockSelectionMode 3 }
+
+vtssSynceConfigGlobalClockSelectionModeSsmHoldover OBJECT-TYPE
+    SYNTAX      VTSSsynceQualityLevel
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Tx overwrite SSM used when clock controller is hold over."
+    ::= { vtssSynceConfigGlobalClockSelectionMode 4 }
+
+vtssSynceConfigGlobalClockSelectionModeSsmFreerun OBJECT-TYPE
+    SYNTAX      VTSSsynceQualityLevel
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Tx overwrite SSM used when clock controller is free run."
+    ::= { vtssSynceConfigGlobalClockSelectionMode 5 }
+
+vtssSynceConfigGlobalClockSelectionModeEecOption OBJECT-TYPE
+    SYNTAX      VTSSsynceEecOption
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Synchronous Ethernet Equipment Clock option."
+    ::= { vtssSynceConfigGlobalClockSelectionMode 6 }
+
+vtssSynceConfigGlobalStationClocks OBJECT IDENTIFIER
+    ::= { vtssSynceConfigGlobal 2 }
+
+vtssSynceConfigGlobalStationClocksStationClkOut OBJECT-TYPE
+    SYNTAX      VTSSsynceFrequency
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Station clock output frequency setting."
+    ::= { vtssSynceConfigGlobalStationClocks 1 }
+
+vtssSynceConfigGlobalStationClocksStationClkIn OBJECT-TYPE
+    SYNTAX      VTSSsynceFrequency
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Station clock input frequency setting."
+    ::= { vtssSynceConfigGlobalStationClocks 2 }
+
+vtssSynceConfigSources OBJECT IDENTIFIER
+    ::= { vtssSynceConfig 2 }
+
+vtssSynceConfigSourcesClockSourceNominationTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VTSSSynceConfigSourcesClockSourceNominationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is the SyncE source nomination configuration."
+    ::= { vtssSynceConfigSources 1 }
+
+vtssSynceConfigSourcesClockSourceNominationEntry OBJECT-TYPE
+    SYNTAX      VTSSSynceConfigSourcesClockSourceNominationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The sourceId index must be a value from 0 up to the number of sources
+         minus one."
+    INDEX       { vtssSynceConfigSourcesClockSourceNominationSourceId }
+    ::= { vtssSynceConfigSourcesClockSourceNominationTable 1 }
+
+VTSSSynceConfigSourcesClockSourceNominationEntry ::= SEQUENCE {
+    vtssSynceConfigSourcesClockSourceNominationSourceId     Integer32,
+    vtssSynceConfigSourcesClockSourceNominationNominated    TruthValue,
+    vtssSynceConfigSourcesClockSourceNominationNetworkPort      VTSSInterfaceIndex,
+    vtssSynceConfigSourcesClockSourceNominationClkInPort    VTSSUnsigned8,
+    vtssSynceConfigSourcesClockSourceNominationPriority     Unsigned32,
+    vtssSynceConfigSourcesClockSourceNominationAnegMode     VTSSsynceAnegMode,
+    vtssSynceConfigSourcesClockSourceNominationSsmOverwrite     VTSSsynceQualityLevel,
+    vtssSynceConfigSourcesClockSourceNominationHoldoffTime      Unsigned32
+}
+
+vtssSynceConfigSourcesClockSourceNominationSourceId OBJECT-TYPE
+    SYNTAX      Integer32 (0..32767)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "-"
+    ::= { vtssSynceConfigSourcesClockSourceNominationEntry 1 }
+
+vtssSynceConfigSourcesClockSourceNominationNominated OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Indicates if source is nominated."
+    ::= { vtssSynceConfigSourcesClockSourceNominationEntry 2 }
+
+vtssSynceConfigSourcesClockSourceNominationNetworkPort OBJECT-TYPE
+    SYNTAX      VTSSInterfaceIndex
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Interface index of the norminated source."
+    ::= { vtssSynceConfigSourcesClockSourceNominationEntry 3 }
+
+vtssSynceConfigSourcesClockSourceNominationClkInPort OBJECT-TYPE
+    SYNTAX      VTSSUnsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Clock input of the norminated source."
+    ::= { vtssSynceConfigSourcesClockSourceNominationEntry 4 }
+
+vtssSynceConfigSourcesClockSourceNominationPriority OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Priority of the nominated source."
+    ::= { vtssSynceConfigSourcesClockSourceNominationEntry 5 }
+
+vtssSynceConfigSourcesClockSourceNominationAnegMode OBJECT-TYPE
+    SYNTAX      VTSSsynceAnegMode
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Autonogotiation mode auto-master-slave."
+    ::= { vtssSynceConfigSourcesClockSourceNominationEntry 6 }
+
+vtssSynceConfigSourcesClockSourceNominationSsmOverwrite OBJECT-TYPE
+    SYNTAX      VTSSsynceQualityLevel
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "SSM overwrite quality."
+    ::= { vtssSynceConfigSourcesClockSourceNominationEntry 7 }
+
+vtssSynceConfigSourcesClockSourceNominationHoldoffTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Hold Off timer value in 100ms (3 - 18). Zero means no hold off."
+    ::= { vtssSynceConfigSourcesClockSourceNominationEntry 8 }
+
+vtssSynceConfigPorts OBJECT IDENTIFIER
+    ::= { vtssSynceConfig 3 }
+
+vtssSynceConfigPortsPortConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VTSSSynceConfigPortsPortConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is the SyncE port configuration."
+    ::= { vtssSynceConfigPorts 1 }
+
+vtssSynceConfigPortsPortConfigEntry OBJECT-TYPE
+    SYNTAX      VTSSSynceConfigPortsPortConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The portId index must be a value from 0 up to the number of ports minus
+         one."
+    INDEX       { vtssSynceConfigPortsPortConfigPortId }
+    ::= { vtssSynceConfigPortsPortConfigTable 1 }
+
+VTSSSynceConfigPortsPortConfigEntry ::= SEQUENCE {
+    vtssSynceConfigPortsPortConfigPortId    VTSSInterfaceIndex,
+    vtssSynceConfigPortsPortConfigSsmEnabled    TruthValue
+}
+
+vtssSynceConfigPortsPortConfigPortId OBJECT-TYPE
+    SYNTAX      VTSSInterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "-"
+    ::= { vtssSynceConfigPortsPortConfigEntry 1 }
+
+vtssSynceConfigPortsPortConfigSsmEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Quality level via SSM enabled."
+    ::= { vtssSynceConfigPortsPortConfigEntry 2 }
+
+vtssSynceStatus OBJECT IDENTIFIER
+    ::= { vtssSynceMibObjects 3 }
+
+vtssSynceStatusGlobal OBJECT IDENTIFIER
+    ::= { vtssSynceStatus 1 }
+
+vtssSynceStatusGlobalClockSelectionMode OBJECT IDENTIFIER
+    ::= { vtssSynceStatusGlobal 1 }
+
+vtssSynceStatusGlobalClockSelectionModeClockInput OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The clock source locked to when clock selector is in locked state."
+    ::= { vtssSynceStatusGlobalClockSelectionMode 1 }
+
+vtssSynceStatusGlobalClockSelectionModeSelectorState OBJECT-TYPE
+    SYNTAX      VTSSsynceSelectorState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This is indicating the state of the clock selector."
+    ::= { vtssSynceStatusGlobalClockSelectionMode 2 }
+
+vtssSynceStatusGlobalClockSelectionModeLosx OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "LOSX"
+    ::= { vtssSynceStatusGlobalClockSelectionMode 3 }
+
+vtssSynceStatusGlobalClockSelectionModeLol OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Clock selector has raised the Los Of Lock alarm."
+    ::= { vtssSynceStatusGlobalClockSelectionMode 4 }
+
+vtssSynceStatusGlobalClockSelectionModeDhold OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Clock selector has not yet calculated the holdover frequency offset to
+         local oscillator."
+    ::= { vtssSynceStatusGlobalClockSelectionMode 5 }
+
+vtssSynceStatusSources OBJECT IDENTIFIER
+    ::= { vtssSynceStatus 2 }
+
+vtssSynceStatusSourcesClockSourceNominationTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VTSSSynceStatusSourcesClockSourceNominationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is the clock source nomination status."
+    ::= { vtssSynceStatusSources 1 }
+
+vtssSynceStatusSourcesClockSourceNominationEntry OBJECT-TYPE
+    SYNTAX      VTSSSynceStatusSourcesClockSourceNominationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The sourceId index must be a value must be a value from 0 up to the
+         number of sources minus one."
+    INDEX       { vtssSynceStatusSourcesClockSourceNominationSourceId }
+    ::= { vtssSynceStatusSourcesClockSourceNominationTable 1 }
+
+VTSSSynceStatusSourcesClockSourceNominationEntry ::= SEQUENCE {
+    vtssSynceStatusSourcesClockSourceNominationSourceId     Integer32,
+    vtssSynceStatusSourcesClockSourceNominationLocs     TruthValue,
+    vtssSynceStatusSourcesClockSourceNominationFos      TruthValue,
+    vtssSynceStatusSourcesClockSourceNominationSsm      TruthValue,
+    vtssSynceStatusSourcesClockSourceNominationWtr      TruthValue
+}
+
+vtssSynceStatusSourcesClockSourceNominationSourceId OBJECT-TYPE
+    SYNTAX      Integer32 (0..32767)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "-"
+    ::= { vtssSynceStatusSourcesClockSourceNominationEntry 1 }
+
+vtssSynceStatusSourcesClockSourceNominationLocs OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "LOCS"
+    ::= { vtssSynceStatusSourcesClockSourceNominationEntry 2 }
+
+vtssSynceStatusSourcesClockSourceNominationFos OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "FOS"
+    ::= { vtssSynceStatusSourcesClockSourceNominationEntry 3 }
+
+vtssSynceStatusSourcesClockSourceNominationSsm OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "SSM"
+    ::= { vtssSynceStatusSourcesClockSourceNominationEntry 4 }
+
+vtssSynceStatusSourcesClockSourceNominationWtr OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "WTR"
+    ::= { vtssSynceStatusSourcesClockSourceNominationEntry 5 }
+
+vtssSynceStatusPorts OBJECT IDENTIFIER
+    ::= { vtssSynceStatus 3 }
+
+vtssSynceStatusPortsPortStatusTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VTSSSynceStatusPortsPortStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is the port status."
+    ::= { vtssSynceStatusPorts 1 }
+
+vtssSynceStatusPortsPortStatusEntry OBJECT-TYPE
+    SYNTAX      VTSSSynceStatusPortsPortStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The portId index must be a value must be a value from 0 up to the
+         number of ports minus one."
+    INDEX       { vtssSynceStatusPortsPortStatusPortId }
+    ::= { vtssSynceStatusPortsPortStatusTable 1 }
+
+VTSSSynceStatusPortsPortStatusEntry ::= SEQUENCE {
+    vtssSynceStatusPortsPortStatusPortId    VTSSInterfaceIndex,
+    vtssSynceStatusPortsPortStatusSsmRx     VTSSsynceQualityLevel,
+    vtssSynceStatusPortsPortStatusSsmTx     VTSSsynceQualityLevel,
+    vtssSynceStatusPortsPortStatusMaster    TruthValue
+}
+
+vtssSynceStatusPortsPortStatusPortId OBJECT-TYPE
+    SYNTAX      VTSSInterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "-"
+    ::= { vtssSynceStatusPortsPortStatusEntry 1 }
+
+vtssSynceStatusPortsPortStatusSsmRx OBJECT-TYPE
+    SYNTAX      VTSSsynceQualityLevel
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Monitoring of the received SSM QL on this port."
+    ::= { vtssSynceStatusPortsPortStatusEntry 2 }
+
+vtssSynceStatusPortsPortStatusSsmTx OBJECT-TYPE
+    SYNTAX      VTSSsynceQualityLevel
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Monitoring of the transmitted SSM QL on this port."
+    ::= { vtssSynceStatusPortsPortStatusEntry 3 }
+
+vtssSynceStatusPortsPortStatusMaster OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "If PHY is in 1000BaseT Mode then this is monitoring the master/slave
+         mode."
+    ::= { vtssSynceStatusPortsPortStatusEntry 4 }
+
+vtssSynceControl OBJECT IDENTIFIER
+    ::= { vtssSynceMibObjects 4 }
+
+vtssSynceControlSources OBJECT IDENTIFIER
+    ::= { vtssSynceControl 1 }
+
+vtssSynceControlSourcesClockSourceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VTSSSynceControlSourcesClockSourceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is the SyncE sources control structure."
+    ::= { vtssSynceControlSources 1 }
+
+vtssSynceControlSourcesClockSourceEntry OBJECT-TYPE
+    SYNTAX      VTSSSynceControlSourcesClockSourceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The sourceId index must be a value must be a value from 0 up to the
+         number of sources minus one."
+    INDEX       { vtssSynceControlSourcesClockSourceSourceId }
+    ::= { vtssSynceControlSourcesClockSourceTable 1 }
+
+VTSSSynceControlSourcesClockSourceEntry ::= SEQUENCE {
+    vtssSynceControlSourcesClockSourceSourceId      Integer32,
+    vtssSynceControlSourcesClockSourceClearWtr      VTSSUnsigned8
+}
+
+vtssSynceControlSourcesClockSourceSourceId OBJECT-TYPE
+    SYNTAX      Integer32 (0..32767)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "-"
+    ::= { vtssSynceControlSourcesClockSourceEntry 1 }
+
+vtssSynceControlSourcesClockSourceClearWtr OBJECT-TYPE
+    SYNTAX      VTSSUnsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "-"
+    ::= { vtssSynceControlSourcesClockSourceEntry 2 }
+
+vtssSynceMibConformance OBJECT IDENTIFIER
+    ::= { vtssSynceMib 2 }
+
+vtssSynceMibCompliances OBJECT IDENTIFIER
+    ::= { vtssSynceMibConformance 1 }
+
+vtssSynceMibGroups OBJECT IDENTIFIER
+    ::= { vtssSynceMibConformance 2 }
+
+vtssSynceCapabilitiesGlobalInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssSynceCapabilitiesGlobalSourceCount }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssSynceMibGroups 1 }
+
+vtssSynceConfigGlobalClockSelectionModeInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssSynceConfigGlobalClockSelectionModeSelectionMode, 
+                  vtssSynceConfigGlobalClockSelectionModeSource, 
+                  vtssSynceConfigGlobalClockSelectionModeWtrTime, 
+                  vtssSynceConfigGlobalClockSelectionModeSsmHoldover, 
+                  vtssSynceConfigGlobalClockSelectionModeSsmFreerun, 
+                  vtssSynceConfigGlobalClockSelectionModeEecOption }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssSynceMibGroups 2 }
+
+vtssSynceConfigGlobalStationClocksInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssSynceConfigGlobalStationClocksStationClkOut, 
+                  vtssSynceConfigGlobalStationClocksStationClkIn }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssSynceMibGroups 3 }
+
+vtssSynceConfigSourcesClockSourceNominationInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssSynceConfigSourcesClockSourceNominationNominated, 
+                  vtssSynceConfigSourcesClockSourceNominationNetworkPort, 
+                  vtssSynceConfigSourcesClockSourceNominationClkInPort, 
+                  vtssSynceConfigSourcesClockSourceNominationPriority, 
+                  vtssSynceConfigSourcesClockSourceNominationAnegMode, 
+                  vtssSynceConfigSourcesClockSourceNominationSsmOverwrite, 
+                  vtssSynceConfigSourcesClockSourceNominationHoldoffTime }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssSynceMibGroups 4 }
+
+vtssSynceConfigPortsPortConfigInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssSynceConfigPortsPortConfigSsmEnabled }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssSynceMibGroups 5 }
+
+vtssSynceStatusGlobalClockSelectionModeInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssSynceStatusGlobalClockSelectionModeClockInput, 
+                  vtssSynceStatusGlobalClockSelectionModeSelectorState, 
+                  vtssSynceStatusGlobalClockSelectionModeLosx, 
+                  vtssSynceStatusGlobalClockSelectionModeLol, 
+                  vtssSynceStatusGlobalClockSelectionModeDhold }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssSynceMibGroups 6 }
+
+vtssSynceStatusSourcesClockSourceNominationInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssSynceStatusSourcesClockSourceNominationLocs, 
+                  vtssSynceStatusSourcesClockSourceNominationFos, 
+                  vtssSynceStatusSourcesClockSourceNominationSsm, 
+                  vtssSynceStatusSourcesClockSourceNominationWtr }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssSynceMibGroups 7 }
+
+vtssSynceStatusPortsPortStatusInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssSynceStatusPortsPortStatusSsmRx, 
+                  vtssSynceStatusPortsPortStatusSsmTx, 
+                  vtssSynceStatusPortsPortStatusMaster }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssSynceMibGroups 8 }
+
+vtssSynceControlSourcesClockSourceInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssSynceControlSourcesClockSourceClearWtr }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssSynceMibGroups 9 }
+
+vtssSynceMibCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the implementation."
+
+    MODULE      -- this module
+
+        MANDATORY-GROUPS        { vtssSynceCapabilitiesGlobalInfoGroup, 
+                  vtssSynceConfigGlobalClockSelectionModeInfoGroup, 
+                  vtssSynceConfigGlobalStationClocksInfoGroup, 
+                  vtssSynceConfigSourcesClockSourceNominationInfoGroup, 
+                  vtssSynceConfigPortsPortConfigInfoGroup, 
+                  vtssSynceStatusGlobalClockSelectionModeInfoGroup, 
+                  vtssSynceStatusSourcesClockSourceNominationInfoGroup, 
+                  vtssSynceStatusPortsPortStatusInfoGroup, 
+                  vtssSynceControlSourcesClockSourceInfoGroup }
+
+    ::= { vtssSynceMibCompliances 1 }
+
+END
