@@ -66,11 +66,6 @@ modules:
                     descr: 'Group {{ $pdug5GroupName }} Voltage'
                     index: 'pdug5GroupVoltage.{{ $index }}'
                     snmp_flags: ['-ObsaQ']
-                    skip_values:
-                        -
-                             oid: pdug5GroupName
-                             op: 'not_contains'
-                             value: 'B'
 
         frequency:
               data:
