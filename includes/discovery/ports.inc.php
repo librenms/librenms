@@ -72,7 +72,6 @@ if ($device['os'] == 'cnmatrix') {
     require base_path('includes/discovery/ports/cnmatrix.inc.php');
 }
 
-
 //Get Tachyon ports
 if ($device['os'] == 'tachyon') {
     require base_path('includes/discovery/ports/tachyon.inc.php');
