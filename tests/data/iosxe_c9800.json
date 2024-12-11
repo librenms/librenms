@@ -17,7 +17,8 @@
                     "icon": "cisco.svg"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {
