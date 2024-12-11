@@ -1,0 +1,426 @@
+H300-TELEMETRY DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE FROM SNMPv2-SMI
+    bitstream, switchMgmt FROM H300-SMI
+    Integer32 FROM SNMPv2-SMI
+    Unsigned32 FROM SNMPv2-SMI
+    TruthValue FROM SNMPv2-TC
+    ;
+    
+    
+telemetry	OBJECT IDENTIFIER ::= { switchMgmt 7 }
+
+-- the Sensors group
+sensors		OBJECT IDENTIFIER ::= { telemetry 1 }
+
+sensor1		OBJECT IDENTIFIER ::= { sensors 1 }
+sensor2		OBJECT IDENTIFIER ::= { sensors 2 }
+sensor3		OBJECT IDENTIFIER ::= { sensors 3 }
+sensor4		OBJECT IDENTIFIER ::= { sensors 4 }
+sensor5		OBJECT IDENTIFIER ::= { sensors 5 }
+sensor6		OBJECT IDENTIFIER ::= { sensors 6 }
+sensor7		OBJECT IDENTIFIER ::= { sensors 7 }
+sensor8		OBJECT IDENTIFIER ::= { sensors 8 }
+
+sensorCount  OBJECT-TYPE
+    SYNTAX  INTEGER (0..8)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "T/H sensors count"
+    ::= { sensors 100 }
+    
+sensor1Type  OBJECT-TYPE
+    SYNTAX  INTEGER (0..3)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "T/H sensor type. 0 - Dallas DS18B20 (T), 1 - DHT22 (T/H), 2 - DHT11 (T/H), 3 - DS2438 + HIH-5030 (T/H)"
+    ::= { sensor1 1 }
+    
+sensor1Id  OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE(8))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "T/H sensor 8 byte identification."
+    ::= { sensor1 2 }
+    
+sensor1Temp  OBJECT-TYPE
+    SYNTAX  INTEGER (-9999..9999)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "T/H sensor measured temperature value in celsius degrees. Need divide by 10 to acquire real value"
+    ::= { sensor1 3 }
+        
+sensor1Humid  OBJECT-TYPE
+    SYNTAX  INTEGER (0..100)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "T/H sensor measured relavite humidity value in percent. Need divide by 10 to acquire real value"
+    ::= { sensor1 4 }
+
+sensor2Type  OBJECT-TYPE
+    SYNTAX  INTEGER (0..3)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "T/H sensor type. 0 - Dallas DS18B20 (T), 1 - DHT22 (T/H), 2 - DHT11 (T/H), 3 - DS2438 + HIH-5030 (T/H)"
+    ::= { sensor2 1 }
+    
+sensor2Id  OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE(8))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "T/H sensor 8 byte identification."
+    ::= { sensor2 2 }
+    
+sensor2Temp  OBJECT-TYPE
+    SYNTAX  INTEGER (-9999..9999)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "T/H sensor measured temperature value in celsius degrees. Need divide by 10 to acquire real value"
+    ::= { sensor2 3 }
+        
+sensor2Humid  OBJECT-TYPE
+    SYNTAX  INTEGER (0..100)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "T/H sensor measured relavite humidity value in percent. Need divide by 10 to acquire real value"
+    ::= { sensor2 4 }            
+    
+sensor3Type  OBJECT-TYPE
+    SYNTAX  INTEGER (0..3)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "T/H sensor type. 0 - Dallas DS18B20 (T), 1 - DHT22 (T/H), 2 - DHT11 (T/H), 3 - DS2438 + HIH-5030 (T/H)"
+    ::= { sensor3 1 }
+    
+sensor3Id  OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE(8))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "T/H sensor 8 byte identification."
+    ::= { sensor3 2 }
+    
+sensor3Temp  OBJECT-TYPE
+    SYNTAX  INTEGER (-9999..9999)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "T/H sensor measured temperature value in celsius degrees. Need divide by 10 to acquire real value"
+    ::= { sensor3 3 }
+        
+sensor3Humid  OBJECT-TYPE
+    SYNTAX  INTEGER (0..100)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "T/H sensor measured relavite humidity value in percent. Need divide by 10 to acquire real value"
+    ::= { sensor3 4 }
+    
+sensor4Type  OBJECT-TYPE
+    SYNTAX  INTEGER (0..3)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "T/H sensor type. 0 - Dallas DS18B20 (T), 1 - DHT22 (T/H), 2 - DHT11 (T/H), 3 - DS2438 + HIH-5030 (T/H)"
+    ::= { sensor4 1 }
+    
+sensor4Id  OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE(8))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "T/H sensor 8 byte identification."
+    ::= { sensor4 2 }
+    
+sensor4Temp  OBJECT-TYPE
+    SYNTAX  INTEGER (-9999..9999)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "T/H sensor measured temperature value in celsius degrees. Need divide by 10 to acquire real value"
+    ::= { sensor4 3 }
+        
+sensor4Humid  OBJECT-TYPE
+    SYNTAX  INTEGER (0..100)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "T/H sensor measured relavite humidity value in percent. Need divide by 10 to acquire real value"
+    ::= { sensor4 4 }
+
+sensor5Type  OBJECT-TYPE
+    SYNTAX  INTEGER (0..3)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "T/H sensor type. 0 - Dallas DS18B20 (T), 1 - DHT22 (T/H), 2 - DHT11 (T/H), 3 - DS2438 + HIH-5030 (T/H)"
+    ::= { sensor5 1 }
+    
+sensor5Id  OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE(8))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "T/H sensor 8 byte identification."
+    ::= { sensor5 2 }
+    
+sensor5Temp  OBJECT-TYPE
+    SYNTAX  INTEGER (-9999..9999)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "T/H sensor measured temperature value in celsius degrees. Need divide by 10 to acquire real value"
+    ::= { sensor5 3 }
+        
+sensor5Humid  OBJECT-TYPE
+    SYNTAX  INTEGER (0..100)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "T/H sensor measured relavite humidity value in percent. Need divide by 10 to acquire real value"
+    ::= { sensor5 4 }
+
+sensor6Type  OBJECT-TYPE
+    SYNTAX  INTEGER (0..3)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "T/H sensor type. 0 - Dallas DS18B20 (T), 1 - DHT22 (T/H), 2 - DHT11 (T/H), 3 - DS2438 + HIH-5030 (T/H)"
+    ::= { sensor6 1 }
+    
+sensor6Id  OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE(8))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "T/H sensor 8 byte identification."
+    ::= { sensor6 2 }
+    
+sensor6Temp  OBJECT-TYPE
+    SYNTAX  INTEGER (-9999..9999)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "T/H sensor measured temperature value in celsius degrees. Need divide by 10 to acquire real value"
+    ::= { sensor6 3 }
+        
+sensor6Humid  OBJECT-TYPE
+    SYNTAX  INTEGER (0..100)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "T/H sensor measured relavite humidity value in percent. Need divide by 10 to acquire real value"
+    ::= { sensor6 4 } 
+    
+sensor7Type  OBJECT-TYPE
+    SYNTAX  INTEGER (0..3)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "T/H sensor type. 0 - Dallas DS18B20 (T), 1 - DHT22 (T/H), 2 - DHT11 (T/H), 3 - DS2438 + HIH-5030 (T/H)"
+    ::= { sensor7 1 }
+    
+sensor7Id  OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE(8))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "T/H sensor 8 byte identification."
+    ::= { sensor7 2 }
+    
+sensor7Temp  OBJECT-TYPE
+    SYNTAX  INTEGER (-9999..9999)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "T/H sensor measured temperature value in celsius degrees. Need divide by 10 to acquire real value"
+    ::= { sensor7 3 }
+        
+sensor7Humid  OBJECT-TYPE
+    SYNTAX  INTEGER (0..100)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "T/H sensor measured relavite humidity value in percent. Need divide by 10 to acquire real value"
+    ::= { sensor7 4 }       
+   
+sensor8Type  OBJECT-TYPE
+    SYNTAX  INTEGER (0..3)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "T/H sensor type. 0 - Dallas DS18B20 (T), 1 - DHT22 (T/H), 2 - DHT11 (T/H), 3 - DS2438 + HIH-5030 (T/H)"
+    ::= { sensor8 1 }
+    
+sensor8Id  OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE(8))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "T/H sensor 8 byte identification."
+    ::= { sensor8 2 }
+    
+sensor8Temp  OBJECT-TYPE
+    SYNTAX  INTEGER (-9999..9999)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "T/H sensor measured temperature value in celsius degrees. Need divide by 10 to acquire real value"
+    ::= { sensor8 3 }
+        
+sensor8Humid  OBJECT-TYPE
+    SYNTAX  INTEGER (0..100)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "T/H sensor measured relavite humidity value in percent. Need divide by 10 to acquire real value"
+    ::= { sensor8 4 }
+    
+    
+    
+-- the Digital Inputs group
+digitalInputs		OBJECT IDENTIFIER ::= { telemetry 2 }
+
+digitalIn1		OBJECT IDENTIFIER ::= { digitalInputs 1 }
+digitalIn2		OBJECT IDENTIFIER ::= { digitalInputs 2 }
+digitalIn3		OBJECT IDENTIFIER ::= { digitalInputs 3 }
+digitalIn4		OBJECT IDENTIFIER ::= { digitalInputs 4 }
+digitalIn5		OBJECT IDENTIFIER ::= { digitalInputs 5 }
+digitalIn6		OBJECT IDENTIFIER ::= { digitalInputs 6 }
+digitalIn7		OBJECT IDENTIFIER ::= { digitalInputs 7 }
+digitalIn8		OBJECT IDENTIFIER ::= { digitalInputs 8 }
+
+digitalInCount  OBJECT-TYPE
+    SYNTAX  INTEGER (0..8)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "Digital Inputs count"
+    ::= { digitalInputs 100 }
+    
+digitalIn1State  OBJECT-TYPE
+    SYNTAX  INTEGER { Non Active(0), Active(1) }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "Digital Input state (0,1)."
+    ::= { digitalIn1 1 }
+
+digitalIn2State  OBJECT-TYPE
+    SYNTAX  INTEGER { Non Active(0), Active(1) }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "Digital Input state (0,1)."
+    ::= { digitalIn2 1 }    
+
+digitalIn3State  OBJECT-TYPE
+    SYNTAX  INTEGER { Non Active(0), Active(1) }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "Digital Input state (0,1)."
+    ::= { digitalIn3 1 }
+    
+digitalIn4State  OBJECT-TYPE
+    SYNTAX  INTEGER { Non Active(0), Active(1) }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "Digital Input state (0,1)."
+    ::= { digitalIn4 1 }
+    
+digitalIn5State  OBJECT-TYPE
+    SYNTAX  INTEGER { Non Active(0), Active(1) }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "Digital Input state (0,1)."
+    ::= { digitalIn5 1 }
+    
+digitalIn6State  OBJECT-TYPE
+    SYNTAX  INTEGER { Non Active(0), Active(1) }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "Digital Input state (0,1)."
+    ::= { digitalIn6 1 }
+    
+digitalIn7State  OBJECT-TYPE
+    SYNTAX  INTEGER { Non Active(0), Active(1) }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "Digital Input state (0,1)."
+    ::= { digitalIn7 1 }
+    
+digitalIn8State  OBJECT-TYPE
+    SYNTAX  INTEGER { Non Active(0), Active(1) }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "Digital Input state (0,1)."
+    ::= { digitalIn8 1 }            
+            
+            
+-- the Digital Outputs (Relays) group
+digitalOutputs		OBJECT IDENTIFIER ::= { telemetry 3 }
+
+digitalOut1		OBJECT IDENTIFIER ::= { digitalOutputs 1 }
+digitalOut2		OBJECT IDENTIFIER ::= { digitalOutputs 2 }
+digitalOut3		OBJECT IDENTIFIER ::= { digitalOutputs 3 }
+digitalOut4		OBJECT IDENTIFIER ::= { digitalOutputs 4 }
+
+digitalOutCount  OBJECT-TYPE
+    SYNTAX  INTEGER (0..4)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "Digital Outputs count"
+    ::= { digitalOutputs 100 }
+    
+digitalOut1State  OBJECT-TYPE
+    SYNTAX  INTEGER { Non Active(0), Active(1) }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+            "Digital Output state (0,1)."
+    ::= { digitalOut1 1 }
+
+digitalOut2State  OBJECT-TYPE
+    SYNTAX  INTEGER { Non Active(0), Active(1) }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+            "Digital Output state (0,1)."
+    ::= { digitalOut2 1 }    
+
+digitalOut3State  OBJECT-TYPE
+    SYNTAX  INTEGER { Non Active(0), Active(1) }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+            "Digital Output state (0,1)."
+    ::= { digitalOut3 1 }
+    
+digitalOut4State  OBJECT-TYPE
+    SYNTAX  INTEGER { Non Active(0), Active(1) }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+            "Digital Output state (0,1)."
+    ::= { digitalOut4 1 }
+
+
+END

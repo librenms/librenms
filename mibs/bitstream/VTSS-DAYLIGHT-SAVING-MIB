@@ -1,0 +1,317 @@
+-- *****************************************************************
+-- DAYLIGHT-SAVING-MIB:  Vitesse private MIB
+--
+-- Copyright (c) 2002-2013 Vitesse Semiconductor Corporation "Vitesse".
+-- All Rights Reserved.
+--
+-- ****************************************************************
+
+VTSS-DAYLIGHT-SAVING-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    vtssSwitchMgmt
+        FROM VTSS-SMI
+    VTSSDisplayString FROM VTSS-TC
+    VTSSInteger16 FROM VTSS-TC
+    VTSSUnsigned16 FROM VTSS-TC
+    VTSSUnsigned8 FROM VTSS-TC
+    ;
+
+vtssDaylightSavingMib MODULE-IDENTITY
+    LAST-UPDATED "201407010000Z"
+    ORGANIZATION
+        "Vitesse Semiconductor Corporation"
+    CONTACT-INFO
+        "Application support <application_support@vitesse.com>"
+    DESCRIPTION
+        "This is a private version of daylight saving. Used to configure system
+         Summer time(Daylight Saving) and Time Zone."
+    REVISION    "201407010000Z"
+    DESCRIPTION
+        "Initial version"
+    ::= { vtssSwitchMgmt 97 }
+
+
+VTSSDaylightSavingMode ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This enumeration defines the available summer time(Daylight Saving)
+         mode."
+    SYNTAX      INTEGER { disable(0), recurring(1), nonRecurring(2) }
+
+vtssDaylightSavingMibObjects OBJECT IDENTIFIER
+    ::= { vtssDaylightSavingMib 1 }
+
+vtssDaylightSavingConfig OBJECT IDENTIFIER
+    ::= { vtssDaylightSavingMibObjects 2 }
+
+vtssDaylightSavingConfigGlobals OBJECT IDENTIFIER
+    ::= { vtssDaylightSavingConfig 1 }
+
+vtssDaylightSavingConfigGlobalsTimeZoneAcronym OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..16))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "This is a acronym to identify the time zone."
+    ::= { vtssDaylightSavingConfigGlobals 1 }
+
+vtssDaylightSavingConfigGlobalsTimeZoneOffset OBJECT-TYPE
+    SYNTAX      VTSSInteger16 (-720..720)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "To set the system time zone with respect to UTC in minutes."
+    ::= { vtssDaylightSavingConfigGlobals 2 }
+
+vtssDaylightSavingConfigGlobalsSummerTimeMode OBJECT-TYPE
+    SYNTAX      VTSSDaylightSavingMode
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "This is a summer time mode.
+         
+         Disabled: The daylight feature is disabled,
+         
+         and no input validation is performed on remaining configurations
+         parameters.
+         
+         Recurring mode: Summer time configuration will repeat every year.
+         
+         To enable this mode requires that the parameters Month, Week and Day
+         are configured with valid
+         
+         values (non zero). The parameters Year and Date must be set to 0,
+         
+         signaling that they are not used.
+         
+         Non recurring mode: Summer time configuration is done once.
+         
+         To enable this feature requires that the following values are
+         configured with valid values
+         
+         (non zero): Year, Month and Date. The parameters Week and Day must be
+         set to 0
+         
+         signaling that they are not used."
+    ::= { vtssDaylightSavingConfigGlobals 3 }
+
+vtssDaylightSavingConfigGlobalsSummerTimeWeekStart OBJECT-TYPE
+    SYNTAX      VTSSUnsigned8 (0..5)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "This is a summer time starting week.
+         
+         This object needs to be set when summer time mode is recurring.
+         
+         Object value 0 means unused object."
+    ::= { vtssDaylightSavingConfigGlobals 4 }
+
+vtssDaylightSavingConfigGlobalsSummerTimeDayStart OBJECT-TYPE
+    SYNTAX      VTSSUnsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "This is a summer time starting day.
+         
+         where monday = 1, sunday = 7.
+         
+         This object needs to be set when summer time mode is recurring.
+         
+         Object value 0 means unused object."
+    ::= { vtssDaylightSavingConfigGlobals 5 }
+
+vtssDaylightSavingConfigGlobalsSummerTimeMonthStart OBJECT-TYPE
+    SYNTAX      VTSSUnsigned8 (1..12)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "This is a summer time starting month.
+         
+         This object needs to be set when summer time mode is not disabled."
+    ::= { vtssDaylightSavingConfigGlobals 6 }
+
+vtssDaylightSavingConfigGlobalsSummerTimeDateStart OBJECT-TYPE
+    SYNTAX      VTSSUnsigned8 (0..31)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "This is a summer time starting date.
+         
+         This object needs to be set when summer time mode is non recurring."
+    ::= { vtssDaylightSavingConfigGlobals 7 }
+
+vtssDaylightSavingConfigGlobalsSummerTimeYearStart OBJECT-TYPE
+    SYNTAX      VTSSUnsigned16 (0..2097)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "This is a summer time starting year.
+         
+         This object needs to be set when summer time mode is non recurring.
+         
+         Object value 0 means unused object."
+    ::= { vtssDaylightSavingConfigGlobals 8 }
+
+vtssDaylightSavingConfigGlobalsSummerTimeHourStart OBJECT-TYPE
+    SYNTAX      VTSSUnsigned8 (0..23)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "This is a summer time starting hour.
+         
+         This object needs to be set when summer time mode is not disabled."
+    ::= { vtssDaylightSavingConfigGlobals 9 }
+
+vtssDaylightSavingConfigGlobalsSummerTimeMinuteStart OBJECT-TYPE
+    SYNTAX      VTSSUnsigned8 (0..59)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "This is a summer time starting minute.
+         
+         This object needs to be set when summer time mode is not disabled."
+    ::= { vtssDaylightSavingConfigGlobals 10 }
+
+vtssDaylightSavingConfigGlobalsSummerTimeWeekEnd OBJECT-TYPE
+    SYNTAX      VTSSUnsigned8 (0..5)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "This is a summer time ending week.
+         
+         This object needs to be set when summer time mode is recurring.
+         
+         Object value 0 means unused object."
+    ::= { vtssDaylightSavingConfigGlobals 11 }
+
+vtssDaylightSavingConfigGlobalsSummerTimeDayEnd OBJECT-TYPE
+    SYNTAX      VTSSUnsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "This is a summer time ending day.
+         
+         This object needs to be set when summer time mode is recurring.
+         
+         Object value 0 means unused object."
+    ::= { vtssDaylightSavingConfigGlobals 12 }
+
+vtssDaylightSavingConfigGlobalsSummerTimeMonthEnd OBJECT-TYPE
+    SYNTAX      VTSSUnsigned8 (1..12)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "This is a summer time ending month.
+         
+         This object needs to be set when summer time mode is not disabled."
+    ::= { vtssDaylightSavingConfigGlobals 13 }
+
+vtssDaylightSavingConfigGlobalsSummerTimeDateEnd OBJECT-TYPE
+    SYNTAX      VTSSUnsigned8 (0..31)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "This is a summer time ending date.
+         
+         This object needs to be set when summer time mode is non recurring.
+         
+         Object value 0 means unused object."
+    ::= { vtssDaylightSavingConfigGlobals 14 }
+
+vtssDaylightSavingConfigGlobalsSummerTimeYearEnd OBJECT-TYPE
+    SYNTAX      VTSSUnsigned16 (0..2097)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "This is a summer time ending year.
+         
+         This object needs to be set when summer time mode is non recurring.
+         
+         Object value 0 means unused object."
+    ::= { vtssDaylightSavingConfigGlobals 15 }
+
+vtssDaylightSavingConfigGlobalsSummerTimeHourEnd OBJECT-TYPE
+    SYNTAX      VTSSUnsigned8 (0..23)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "This is a summer time ending hour.
+         
+         This object needs to be set when summer time mode is not disabled."
+    ::= { vtssDaylightSavingConfigGlobals 16 }
+
+vtssDaylightSavingConfigGlobalsSummerTimeMinuteEnd OBJECT-TYPE
+    SYNTAX      VTSSUnsigned8 (0..59)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "This is a summer time ending minute.
+         
+         This object needs to be set when summer time mode is not disabled."
+    ::= { vtssDaylightSavingConfigGlobals 17 }
+
+vtssDaylightSavingConfigGlobalsSummerTimeOffset OBJECT-TYPE
+    SYNTAX      VTSSInteger16 (1..1440)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The value of this object indicates
+         
+         the number of minutes to add or to subtract during summertime.
+         
+         This object needs to be set when summer time mode is not disabled."
+    ::= { vtssDaylightSavingConfigGlobals 18 }
+
+vtssDaylightSavingMibConformance OBJECT IDENTIFIER
+    ::= { vtssDaylightSavingMib 2 }
+
+vtssDaylightSavingMibCompliances OBJECT IDENTIFIER
+    ::= { vtssDaylightSavingMibConformance 1 }
+
+vtssDaylightSavingMibGroups OBJECT IDENTIFIER
+    ::= { vtssDaylightSavingMibConformance 2 }
+
+vtssDaylightSavingConfigGlobalsInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssDaylightSavingConfigGlobalsTimeZoneAcronym, 
+                  vtssDaylightSavingConfigGlobalsTimeZoneOffset, 
+                  vtssDaylightSavingConfigGlobalsSummerTimeMode, 
+                  vtssDaylightSavingConfigGlobalsSummerTimeWeekStart, 
+                  vtssDaylightSavingConfigGlobalsSummerTimeDayStart, 
+                  vtssDaylightSavingConfigGlobalsSummerTimeMonthStart, 
+                  vtssDaylightSavingConfigGlobalsSummerTimeDateStart, 
+                  vtssDaylightSavingConfigGlobalsSummerTimeYearStart, 
+                  vtssDaylightSavingConfigGlobalsSummerTimeHourStart, 
+                  vtssDaylightSavingConfigGlobalsSummerTimeMinuteStart, 
+                  vtssDaylightSavingConfigGlobalsSummerTimeWeekEnd, 
+                  vtssDaylightSavingConfigGlobalsSummerTimeDayEnd, 
+                  vtssDaylightSavingConfigGlobalsSummerTimeMonthEnd, 
+                  vtssDaylightSavingConfigGlobalsSummerTimeDateEnd, 
+                  vtssDaylightSavingConfigGlobalsSummerTimeYearEnd, 
+                  vtssDaylightSavingConfigGlobalsSummerTimeHourEnd, 
+                  vtssDaylightSavingConfigGlobalsSummerTimeMinuteEnd, 
+                  vtssDaylightSavingConfigGlobalsSummerTimeOffset }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssDaylightSavingMibGroups 1 }
+
+vtssDaylightSavingMibCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the implementation."
+
+    MODULE      -- this module
+
+        MANDATORY-GROUPS        { vtssDaylightSavingConfigGlobalsInfoGroup }
+
+    ::= { vtssDaylightSavingMibCompliances 1 }
+
+END

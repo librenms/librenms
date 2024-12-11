@@ -1,0 +1,672 @@
+-- *****************************************************************
+-- EPS-MIB:  Vitesse private MIB
+--
+-- Copyright (c) 2002-2013 Vitesse Semiconductor Corporation "Vitesse".
+-- All Rights Reserved.
+--
+-- ****************************************************************
+
+VTSS-EPS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    vtssSwitchMgmt
+        FROM VTSS-SMI
+    Integer32 FROM SNMPv2-SMI
+    Unsigned32 FROM SNMPv2-SMI
+    TruthValue FROM SNMPv2-TC
+    VTSSInterfaceIndex FROM VTSS-TC
+    VTSSRowEditorState FROM VTSS-TC
+    ;
+
+vtssEpsMib MODULE-IDENTITY
+    LAST-UPDATED "201411050000Z"
+    ORGANIZATION
+        "Vitesse Semiconductor Corporation"
+    CONTACT-INFO
+        "Application support <application_support@vitesse.com>"
+    DESCRIPTION
+        "This is a private Linear EPS (G.8031) MIB"
+    REVISION    "201411050000Z"
+    DESCRIPTION
+        "Remove the vtss_appl_eps_domain_t type and the domain from
+         vtss_appl_eps_create_param_t"
+    REVISION    "201407010000Z"
+    DESCRIPTION
+        "Initial version"
+    ::= { vtssSwitchMgmt 45 }
+
+
+VTSSEpsArchitecture ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The EPS protection architecture."
+    SYNTAX      INTEGER { onePlusOne(0), oneForOne(1) }
+
+VTSSEpsCommand ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "protection group command."
+    SYNTAX      INTEGER { none(0), clear(1), lockOut(2), forcedSwitch(3), manualSwitchProtection(4), manualSwitchWorking(5), exercise(6), localFreeze(7), localLockOut(8) }
+
+VTSSEpsDefectState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Flow defect state."
+    SYNTAX      INTEGER { ok(0), sd(1), sf(2) }
+
+VTSSEpsDirectional ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The EPS 1+1 directional."
+    SYNTAX      INTEGER { uniDirectional(0), biDirectional(1) }
+
+VTSSEpsProtectionState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "protection group state."
+    SYNTAX      INTEGER { disabled(0), noRequestWorking(1), noRequestProtecting(2), lockOut(3), forcedSwitch(4), signalFailWorking(5), signalFailProtecting(6), manualSwitchWorking(7), manualSwitchProtecting(8), waitToRestore(9), exerciseWorking(10), exerciseProtecting(11), reverseRequestWorking(12), reverseRequestProtecting(13), doNotRevert(14) }
+
+VTSSEpsRequest ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "APS request/state."
+    SYNTAX      INTEGER { nr(0), dnr(1), rr(2), exer(3), wtr(4), msW(5), msP(6), sd(7), sfW(8), fs(9), sfP(10), lo(11) }
+
+vtssEpsMibObjects OBJECT IDENTIFIER
+    ::= { vtssEpsMib 1 }
+
+vtssEpsCapabilities OBJECT IDENTIFIER
+    ::= { vtssEpsMibObjects 1 }
+
+vtssEpsCapabilitiesInstanceMax OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Maximum number of created EPS instances"
+    ::= { vtssEpsCapabilities 1 }
+
+vtssEpsCapabilitiesWtrMax OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Maximum WTR timer value"
+    ::= { vtssEpsCapabilities 2 }
+
+vtssEpsCapabilitiesHoldOffOff OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hold Off timer OFF value"
+    ::= { vtssEpsCapabilities 3 }
+
+vtssEpsCapabilitiesHoldOffMax OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Maximum Hold Off timer value"
+    ::= { vtssEpsCapabilities 4 }
+
+vtssEpsCapabilitiesMepMax OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Maximum MEP relation instance value"
+    ::= { vtssEpsCapabilities 5 }
+
+vtssEpsCapabilitiesMepInvalid OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Invalid MEP indication. This is returned when EPS has no MEP relations"
+    ::= { vtssEpsCapabilities 6 }
+
+vtssEpsConfig OBJECT IDENTIFIER
+    ::= { vtssEpsMibObjects 2 }
+
+vtssEpsConfigInstanceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VTSSEpsConfigInstanceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is a table of created EPS instance parameters."
+    ::= { vtssEpsConfig 1 }
+
+vtssEpsConfigInstanceEntry OBJECT-TYPE
+    SYNTAX      VTSSEpsConfigInstanceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is a created EPS instance parameters. No parameters can be changed
+         after create."
+    INDEX       { vtssEpsConfigInstanceId }
+    ::= { vtssEpsConfigInstanceTable 1 }
+
+VTSSEpsConfigInstanceEntry ::= SEQUENCE {
+    vtssEpsConfigInstanceId     Integer32,
+    vtssEpsConfigInstanceArchitecture   VTSSEpsArchitecture,
+    vtssEpsConfigInstanceWorkingFlow    VTSSInterfaceIndex,
+    vtssEpsConfigInstanceProtectingFlow     VTSSInterfaceIndex,
+    vtssEpsConfigInstanceAction     VTSSRowEditorState
+}
+
+vtssEpsConfigInstanceId OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The EPS instance ID"
+    ::= { vtssEpsConfigInstanceEntry 1 }
+
+vtssEpsConfigInstanceArchitecture OBJECT-TYPE
+    SYNTAX      VTSSEpsArchitecture
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The protection architecture. Cannot be changed after creation."
+    ::= { vtssEpsConfigInstanceEntry 2 }
+
+vtssEpsConfigInstanceWorkingFlow OBJECT-TYPE
+    SYNTAX      VTSSInterfaceIndex
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The working flow. Cannot be changed after creation."
+    ::= { vtssEpsConfigInstanceEntry 3 }
+
+vtssEpsConfigInstanceProtectingFlow OBJECT-TYPE
+    SYNTAX      VTSSInterfaceIndex
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The protecting flow. Cannot be changed after creation."
+    ::= { vtssEpsConfigInstanceEntry 4 }
+
+vtssEpsConfigInstanceAction OBJECT-TYPE
+    SYNTAX      VTSSRowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Action"
+    ::= { vtssEpsConfigInstanceEntry 100 }
+
+vtssEpsConfigInstanceRowEditor OBJECT IDENTIFIER
+    ::= { vtssEpsConfig 2 }
+
+vtssEpsConfigInstanceRowEditorId OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The EPS instance ID"
+    ::= { vtssEpsConfigInstanceRowEditor 1 }
+
+vtssEpsConfigInstanceRowEditorArchitecture OBJECT-TYPE
+    SYNTAX      VTSSEpsArchitecture
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The protection architecture. Cannot be changed after creation."
+    ::= { vtssEpsConfigInstanceRowEditor 2 }
+
+vtssEpsConfigInstanceRowEditorWorkingFlow OBJECT-TYPE
+    SYNTAX      VTSSInterfaceIndex
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The working flow. Cannot be changed after creation."
+    ::= { vtssEpsConfigInstanceRowEditor 3 }
+
+vtssEpsConfigInstanceRowEditorProtectingFlow OBJECT-TYPE
+    SYNTAX      VTSSInterfaceIndex
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The protecting flow. Cannot be changed after creation."
+    ::= { vtssEpsConfigInstanceRowEditor 4 }
+
+vtssEpsConfigInstanceRowEditorAction OBJECT-TYPE
+    SYNTAX      VTSSRowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Action"
+    ::= { vtssEpsConfigInstanceRowEditor 100 }
+
+vtssEpsConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VTSSEpsConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is a table of created EPS instance configuration parameters. When
+         an EPS instance is created in the 'InstanceTable', an entry is
+         automatically created here with default value."
+    ::= { vtssEpsConfig 3 }
+
+vtssEpsConfigEntry OBJECT-TYPE
+    SYNTAX      VTSSEpsConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is a created EPS instance configuration parameters"
+    INDEX       { vtssEpsConfigId }
+    ::= { vtssEpsConfigTable 1 }
+
+VTSSEpsConfigEntry ::= SEQUENCE {
+    vtssEpsConfigId     Integer32,
+    vtssEpsConfigDirectional    VTSSEpsDirectional,
+    vtssEpsConfigApsEnable      TruthValue,
+    vtssEpsConfigRevertive      TruthValue,
+    vtssEpsConfigRestoreTimer   Unsigned32,
+    vtssEpsConfigHoldOffTimer   Unsigned32
+}
+
+vtssEpsConfigId OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The EPS instance ID"
+    ::= { vtssEpsConfigEntry 1 }
+
+vtssEpsConfigDirectional OBJECT-TYPE
+    SYNTAX      VTSSEpsDirectional
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Protection is uni or bi directional. Only for 1+1."
+    ::= { vtssEpsConfigEntry 2 }
+
+vtssEpsConfigApsEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "APS can be enabled or disabled. Only for 1+1."
+    ::= { vtssEpsConfigEntry 3 }
+
+vtssEpsConfigRevertive OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Revertive operation can enabled or disabled."
+    ::= { vtssEpsConfigEntry 4 }
+
+vtssEpsConfigRestoreTimer OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Wait to restore timer in seconds - max. 720 - min. 1."
+    ::= { vtssEpsConfigEntry 5 }
+
+vtssEpsConfigHoldOffTimer OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Hold off timer in 100 ms - max. 100 - 0 means no hold off"
+    ::= { vtssEpsConfigEntry 6 }
+
+vtssEpsConfigMepTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VTSSEpsConfigMepEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is a table of created EPS instance MEP configuration parameters.
+         When an EPS instance is created in the 'InstanceTable', an entry is
+         automatically created here with default value 100 - meaning no MEP
+         instance related."
+    ::= { vtssEpsConfig 4 }
+
+vtssEpsConfigMepEntry OBJECT-TYPE
+    SYNTAX      VTSSEpsConfigMepEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is a created EPS instance MEP configuration parameters."
+    INDEX       { vtssEpsConfigMepId }
+    ::= { vtssEpsConfigMepTable 1 }
+
+VTSSEpsConfigMepEntry ::= SEQUENCE {
+    vtssEpsConfigMepId      Integer32,
+    vtssEpsConfigMepWorkingMep      Unsigned32,
+    vtssEpsConfigMepProtectingMep   Unsigned32,
+    vtssEpsConfigMepApsMep      Unsigned32
+}
+
+vtssEpsConfigMepId OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The EPS instance ID"
+    ::= { vtssEpsConfigMepEntry 1 }
+
+vtssEpsConfigMepWorkingMep OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Working SF MEP reference - max. 100-1 - min. 0. During get 100 indicate
+         no reference"
+    ::= { vtssEpsConfigMepEntry 2 }
+
+vtssEpsConfigMepProtectingMep OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Protecting SF MEP reference - max. 100-1 - min. 0. During get 100
+         indicate no reference"
+    ::= { vtssEpsConfigMepEntry 3 }
+
+vtssEpsConfigMepApsMep OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "APS MEP reference - max. 100-1 - min. 0. During get 100 indicate no
+         reference"
+    ::= { vtssEpsConfigMepEntry 4 }
+
+vtssEpsConfigCommandTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VTSSEpsConfigCommandEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is a table of created EPS instance command. When an EPS instance
+         is created in the 'InstanceTable', an entry is automatically created
+         here with 'no command'."
+    ::= { vtssEpsConfig 5 }
+
+vtssEpsConfigCommandEntry OBJECT-TYPE
+    SYNTAX      VTSSEpsConfigCommandEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is a created EPS instance command"
+    INDEX       { vtssEpsConfigCommandId }
+    ::= { vtssEpsConfigCommandTable 1 }
+
+VTSSEpsConfigCommandEntry ::= SEQUENCE {
+    vtssEpsConfigCommandId      Integer32,
+    vtssEpsConfigCommandCommand     VTSSEpsCommand
+}
+
+vtssEpsConfigCommandId OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The EPS instance ID"
+    ::= { vtssEpsConfigCommandEntry 1 }
+
+vtssEpsConfigCommandCommand OBJECT-TYPE
+    SYNTAX      VTSSEpsCommand
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "protection group command"
+    ::= { vtssEpsConfigCommandEntry 2 }
+
+vtssEpsStatus OBJECT IDENTIFIER
+    ::= { vtssEpsMibObjects 3 }
+
+vtssEpsStatusTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VTSSEpsStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is a table of created EPS instance status."
+    ::= { vtssEpsStatus 1 }
+
+vtssEpsStatusEntry OBJECT-TYPE
+    SYNTAX      VTSSEpsStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is a created EPS instance status."
+    INDEX       { vtssEpsStatusId }
+    ::= { vtssEpsStatusTable 1 }
+
+VTSSEpsStatusEntry ::= SEQUENCE {
+    vtssEpsStatusId     Integer32,
+    vtssEpsStatusProtectionState    VTSSEpsProtectionState,
+    vtssEpsStatusWorkingState   VTSSEpsDefectState,
+    vtssEpsStatusProtectingState    VTSSEpsDefectState,
+    vtssEpsStatusTransmittedApsRequest      VTSSEpsRequest,
+    vtssEpsStatusTransmittedApsReSignal     Unsigned32,
+    vtssEpsStatusTransmittedApsBrSignal     Unsigned32,
+    vtssEpsStatusReceivedApsRequest     VTSSEpsRequest,
+    vtssEpsStatusReceivedApsReSignal    Unsigned32,
+    vtssEpsStatusReceivedApsBrSignal    Unsigned32,
+    vtssEpsStatusDfopPm     TruthValue,
+    vtssEpsStatusDfopCm     TruthValue,
+    vtssEpsStatusDfopNr     TruthValue,
+    vtssEpsStatusDfopNoAps      TruthValue
+}
+
+vtssEpsStatusId OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The EPS instance ID"
+    ::= { vtssEpsStatusEntry 1 }
+
+vtssEpsStatusProtectionState OBJECT-TYPE
+    SYNTAX      VTSSEpsProtectionState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Protection state according to to G.8031 Annex A"
+    ::= { vtssEpsStatusEntry 2 }
+
+vtssEpsStatusWorkingState OBJECT-TYPE
+    SYNTAX      VTSSEpsDefectState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Working flow defect state"
+    ::= { vtssEpsStatusEntry 3 }
+
+vtssEpsStatusProtectingState OBJECT-TYPE
+    SYNTAX      VTSSEpsDefectState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Protecting flow defect state"
+    ::= { vtssEpsStatusEntry 4 }
+
+vtssEpsStatusTransmittedApsRequest OBJECT-TYPE
+    SYNTAX      VTSSEpsRequest
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Transmitted APS request"
+    ::= { vtssEpsStatusEntry 5 }
+
+vtssEpsStatusTransmittedApsReSignal OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Transmitted APS requested signal"
+    ::= { vtssEpsStatusEntry 6 }
+
+vtssEpsStatusTransmittedApsBrSignal OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Transmitted APS bridged signal"
+    ::= { vtssEpsStatusEntry 7 }
+
+vtssEpsStatusReceivedApsRequest OBJECT-TYPE
+    SYNTAX      VTSSEpsRequest
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Received APS request"
+    ::= { vtssEpsStatusEntry 8 }
+
+vtssEpsStatusReceivedApsReSignal OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Received APS requested signal"
+    ::= { vtssEpsStatusEntry 9 }
+
+vtssEpsStatusReceivedApsBrSignal OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Received APS bridged signal"
+    ::= { vtssEpsStatusEntry 10 }
+
+vtssEpsStatusDfopPm OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "FOP Protection type Mismatch - unexpected B bit"
+    ::= { vtssEpsStatusEntry 11 }
+
+vtssEpsStatusDfopCm OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "FOP Configuration Mismatch - APS received on working"
+    ::= { vtssEpsStatusEntry 12 }
+
+vtssEpsStatusDfopNr OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "FOP Not expected Request - receiving request is not the expected
+         (transmitted)"
+    ::= { vtssEpsStatusEntry 13 }
+
+vtssEpsStatusDfopNoAps OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "FOP No APS received"
+    ::= { vtssEpsStatusEntry 14 }
+
+vtssEpsControl OBJECT IDENTIFIER
+    ::= { vtssEpsMibObjects 4 }
+
+vtssEpsMibConformance OBJECT IDENTIFIER
+    ::= { vtssEpsMib 2 }
+
+vtssEpsMibCompliances OBJECT IDENTIFIER
+    ::= { vtssEpsMibConformance 1 }
+
+vtssEpsMibGroups OBJECT IDENTIFIER
+    ::= { vtssEpsMibConformance 2 }
+
+vtssEpsCapabilitiesInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssEpsCapabilitiesInstanceMax, vtssEpsCapabilitiesWtrMax, 
+                  vtssEpsCapabilitiesHoldOffOff, vtssEpsCapabilitiesHoldOffMax, 
+                  vtssEpsCapabilitiesMepMax, vtssEpsCapabilitiesMepInvalid }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssEpsMibGroups 1 }
+
+vtssEpsConfigInstanceTableInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssEpsConfigInstanceArchitecture, 
+                  vtssEpsConfigInstanceWorkingFlow, 
+                  vtssEpsConfigInstanceProtectingFlow, 
+                  vtssEpsConfigInstanceAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssEpsMibGroups 2 }
+
+vtssEpsConfigInstanceRowEditorInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssEpsConfigInstanceRowEditorId, 
+                  vtssEpsConfigInstanceRowEditorArchitecture, 
+                  vtssEpsConfigInstanceRowEditorWorkingFlow, 
+                  vtssEpsConfigInstanceRowEditorProtectingFlow, 
+                  vtssEpsConfigInstanceRowEditorAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssEpsMibGroups 3 }
+
+vtssEpsConfigTableInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssEpsConfigDirectional, vtssEpsConfigApsEnable, 
+                  vtssEpsConfigRevertive, vtssEpsConfigRestoreTimer, 
+                  vtssEpsConfigHoldOffTimer }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssEpsMibGroups 4 }
+
+vtssEpsConfigMepTableInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssEpsConfigMepWorkingMep, vtssEpsConfigMepProtectingMep, 
+                  vtssEpsConfigMepApsMep }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssEpsMibGroups 5 }
+
+vtssEpsConfigCommandTableInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssEpsConfigCommandCommand }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssEpsMibGroups 6 }
+
+vtssEpsStatusTableInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssEpsStatusProtectionState, vtssEpsStatusWorkingState, 
+                  vtssEpsStatusProtectingState, 
+                  vtssEpsStatusTransmittedApsRequest, 
+                  vtssEpsStatusTransmittedApsReSignal, 
+                  vtssEpsStatusTransmittedApsBrSignal, 
+                  vtssEpsStatusReceivedApsRequest, 
+                  vtssEpsStatusReceivedApsReSignal, 
+                  vtssEpsStatusReceivedApsBrSignal, vtssEpsStatusDfopPm, 
+                  vtssEpsStatusDfopCm, vtssEpsStatusDfopNr, vtssEpsStatusDfopNoAps }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssEpsMibGroups 7 }
+
+vtssEpsMibCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the implementation."
+
+    MODULE      -- this module
+
+        MANDATORY-GROUPS        { vtssEpsCapabilitiesInfoGroup, 
+                  vtssEpsConfigInstanceTableInfoGroup, 
+                  vtssEpsConfigInstanceRowEditorInfoGroup, 
+                  vtssEpsConfigTableInfoGroup, vtssEpsConfigMepTableInfoGroup, 
+                  vtssEpsConfigCommandTableInfoGroup, 
+                  vtssEpsStatusTableInfoGroup }
+
+    ::= { vtssEpsMibCompliances 1 }
+
+END

@@ -1,0 +1,388 @@
+-- *****************************************************************
+-- FIRMWARE-MIB:  Vitesse private MIB
+--
+-- Copyright (c) 2002-2013 Vitesse Semiconductor Corporation "Vitesse".
+-- All Rights Reserved.
+--
+-- ****************************************************************
+
+VTSS-FIRMWARE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    vtssSwitchMgmt
+        FROM VTSS-SMI
+    Integer32 FROM SNMPv2-SMI
+    Unsigned32 FROM SNMPv2-SMI
+    TruthValue FROM SNMPv2-TC
+    VTSSDisplayString FROM VTSS-TC
+    ;
+
+vtssFirmwareMib MODULE-IDENTITY
+    LAST-UPDATED "201412160000Z"
+    ORGANIZATION
+        "Vitesse Semiconductor Corporation"
+    CONTACT-INFO
+        "Application support <application_support@vitesse.com>"
+    DESCRIPTION
+        "This is a private version of Firmware"
+    REVISION    "201412160000Z"
+    DESCRIPTION
+        "Add switch table"
+    REVISION    "201410100000Z"
+    DESCRIPTION
+        "Editorial changes"
+    REVISION    "201407010000Z"
+    DESCRIPTION
+        "Initial version"
+    ::= { vtssSwitchMgmt 28 }
+
+
+VTSSFirmwareStatusImageEnum ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This enumeration defines the type of image for status."
+    SYNTAX      INTEGER { bootloader(0), activeFirmware(1), alternativeFirmware(2) }
+
+VTSSFirmwareUploadImageEnum ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This enumeration defines the type of image to upload."
+    SYNTAX      INTEGER { bootloader(0), firmware(1) }
+
+VTSSFirmwareUploadStatusEnum ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This enumeration defines the status of upload operation."
+    SYNTAX      INTEGER { none(0), success(1), inProgress(2), errIvalidIp(3), errTftpFailed(4), errBusy(5), errMemoryInsufficient(6), errInvalidImage(7), errWriteFlash(8), errSameImageExisted(9), errUnknownImage(10), errFlashImageNotFound(11), errFlashEntryNotFound(12), errCrc(13), errImageSize(14), errEraseFlash(15), errIncorrectImageVersion(16), errDownloadUrl(17), errInvalidUrl(18) }
+
+vtssFirmwareMibObjects OBJECT IDENTIFIER
+    ::= { vtssFirmwareMib 1 }
+
+vtssFirmwareStatus OBJECT IDENTIFIER
+    ::= { vtssFirmwareMibObjects 3 }
+
+vtssFirmwareStatusImageTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VTSSFirmwareStatusImageEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is a table of status of images in flash."
+    ::= { vtssFirmwareStatus 1 }
+
+vtssFirmwareStatusImageEntry OBJECT-TYPE
+    SYNTAX      VTSSFirmwareStatusImageEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each entry has a set of image status."
+    INDEX       { vtssFirmwareStatusImageNumber }
+    ::= { vtssFirmwareStatusImageTable 1 }
+
+VTSSFirmwareStatusImageEntry ::= SEQUENCE {
+    vtssFirmwareStatusImageNumber   Integer32,
+    vtssFirmwareStatusImageType     VTSSFirmwareStatusImageEnum,
+    vtssFirmwareStatusImageName     VTSSDisplayString,
+    vtssFirmwareStatusImageVersion      VTSSDisplayString,
+    vtssFirmwareStatusImageBuiltDate    VTSSDisplayString,
+    vtssFirmwareStatusImageCodeRevision     VTSSDisplayString
+}
+
+vtssFirmwareStatusImageNumber OBJECT-TYPE
+    SYNTAX      Integer32 (0..2)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The number of image. The number starts from 0."
+    ::= { vtssFirmwareStatusImageEntry 1 }
+
+vtssFirmwareStatusImageType OBJECT-TYPE
+    SYNTAX      VTSSFirmwareStatusImageEnum
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Image type of the status. bootloader(0) is for boot loader.
+         activeFirmware(1) is for active (primary) firmware.
+         alternativeFirmware(2) is for alternative (backup) firmware."
+    ::= { vtssFirmwareStatusImageEntry 2 }
+
+vtssFirmwareStatusImageName OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..127))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Image name."
+    ::= { vtssFirmwareStatusImageEntry 3 }
+
+vtssFirmwareStatusImageVersion OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Image version."
+    ::= { vtssFirmwareStatusImageEntry 4 }
+
+vtssFirmwareStatusImageBuiltDate OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The built date when the image is built."
+    ::= { vtssFirmwareStatusImageEntry 5 }
+
+vtssFirmwareStatusImageCodeRevision OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..127))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The code revesion which the image is built."
+    ::= { vtssFirmwareStatusImageEntry 6 }
+
+vtssFirmwareStatusImageUpload OBJECT IDENTIFIER
+    ::= { vtssFirmwareStatus 2 }
+
+vtssFirmwareStatusImageUploadStatus OBJECT-TYPE
+    SYNTAX      VTSSFirmwareUploadStatusEnum
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The status indicates the status of current upload operation. It is
+         updated automatically. Modifying this flag does not take any effect.
+         none(0) means no upload operation. success(1) means upload operation is
+         successful. inProgress(2) means current upload operation is in
+         progress. errIvalidIp(3) means upload operation is failed due to
+         invalid IP address. errTftpFailed(4) means upload operation is failed
+         due to failed TFTP operation. errBusy(5) means upload operation is
+         failed due to other upload in processing. errMemoryInsufficient(6)
+         means upload operation is failed due to memory insufficient.
+         errInvalidImage(7) means upload operation is failed due to invalid
+         image. errWriteFlash(8) means upload operation is failed due to failed
+         writing flash. errSameImageExisted(9) means upload operation is failed
+         because the upload image is the same as the one in flash.
+         errUnknownImage(10) means upload operation is failed because the type
+         of upload image is unknown. errFlashImageNotFound(11) means upload
+         operation is failed because the location in flash to upload the image
+         is not found. errFlashEntryNotFound(12) means upload operation is
+         failed because the corresponding entry in flash to upload the image is
+         not found. errCrc(13) means upload operation is failed due to incorrect
+         CRC in the upload image. errImageSize(14) means upload operation is
+         failed due to invalid image size. errEraseFlash(15) means upload
+         operation is failed due to failed erasing flash.
+         errIncorrectImageVersion(16) means upload operation is failed due to
+         incorrect version of the upload image. errDownloadUrl(17) means upload
+         operation is failed due to fail to download image from URL.
+         errInvalidUrl(18) means upload operation is failed due to invalid URL. "
+    ::= { vtssFirmwareStatusImageUpload 1 }
+
+vtssFirmwareStatusSwitchTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VTSSFirmwareStatusSwitchEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is a table of status of images in switch."
+    ::= { vtssFirmwareStatus 3 }
+
+vtssFirmwareStatusSwitchEntry OBJECT-TYPE
+    SYNTAX      VTSSFirmwareStatusSwitchEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each entry has a set of image status."
+    INDEX       { vtssFirmwareStatusSwitchSwitchId }
+    ::= { vtssFirmwareStatusSwitchTable 1 }
+
+VTSSFirmwareStatusSwitchEntry ::= SEQUENCE {
+    vtssFirmwareStatusSwitchSwitchId    Integer32,
+    vtssFirmwareStatusSwitchChipId      VTSSDisplayString,
+    vtssFirmwareStatusSwitchBoardType   VTSSDisplayString,
+    vtssFirmwareStatusSwitchPortCnt     Unsigned32,
+    vtssFirmwareStatusSwitchProduct     VTSSDisplayString,
+    vtssFirmwareStatusSwitchVersion     VTSSDisplayString,
+    vtssFirmwareStatusSwitchBuiltDate   VTSSDisplayString
+}
+
+vtssFirmwareStatusSwitchSwitchId OBJECT-TYPE
+    SYNTAX      Integer32 (1..16)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The ID of switch."
+    ::= { vtssFirmwareStatusSwitchEntry 1 }
+
+vtssFirmwareStatusSwitchChipId OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..31))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "ID of chip."
+    ::= { vtssFirmwareStatusSwitchEntry 2 }
+
+vtssFirmwareStatusSwitchBoardType OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..63))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Type of board."
+    ::= { vtssFirmwareStatusSwitchEntry 3 }
+
+vtssFirmwareStatusSwitchPortCnt OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Count of ports."
+    ::= { vtssFirmwareStatusSwitchEntry 4 }
+
+vtssFirmwareStatusSwitchProduct OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..63))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Product name."
+    ::= { vtssFirmwareStatusSwitchEntry 5 }
+
+vtssFirmwareStatusSwitchVersion OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Image version."
+    ::= { vtssFirmwareStatusSwitchEntry 6 }
+
+vtssFirmwareStatusSwitchBuiltDate OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The built date when the image is built."
+    ::= { vtssFirmwareStatusSwitchEntry 7 }
+
+vtssFirmwareControl OBJECT IDENTIFIER
+    ::= { vtssFirmwareMibObjects 4 }
+
+vtssFirmwareControlGlobals OBJECT IDENTIFIER
+    ::= { vtssFirmwareControl 1 }
+
+vtssFirmwareControlGlobalsSwapFirmware OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Swap firmware between active (primary) and alternative (backup). true
+         is to swap the firmware. false is to do nothing."
+    ::= { vtssFirmwareControlGlobals 1 }
+
+vtssFirmwareControlImageUpload OBJECT IDENTIFIER
+    ::= { vtssFirmwareControl 2 }
+
+vtssFirmwareControlImageUploadDoUpload OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Action to do upload image or not. true is to do the upload operation.
+         false is to do nothing. The upload operation may need longer time to
+         upload the image, so the SNMP timeout time needs to be modified
+         accordingly."
+    ::= { vtssFirmwareControlImageUpload 1 }
+
+vtssFirmwareControlImageUploadImageType OBJECT-TYPE
+    SYNTAX      VTSSFirmwareUploadImageEnum
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Type of image to upload. bootloader(0) is to upload bootloader.
+         firmware(1) is to upload application firmware."
+    ::= { vtssFirmwareControlImageUpload 2 }
+
+vtssFirmwareControlImageUploadUrl OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..255))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The location of image to upload. It is a specific character string that
+         constitutes a reference to a resource. Syntax:
+         <protocol>://[<username>[:<password>]@]<host>[:<port>][/<path>]/<file_name>
+         For example, tftp://10.10.10.10/new_image_path/new_image.dat,
+         http://username:password@10.10.10.10:80/new_image_path/new_image.dat. A
+         valid file name is a text string drawn from alphabet (A-Za-z), digits
+         (0-9), dot (.), hyphen (-), under score(_). The maximum length is 63
+         and hyphen must not be first character. The file name content that only
+         contains '.' is not allowed."
+    ::= { vtssFirmwareControlImageUpload 3 }
+
+vtssFirmwareMibConformance OBJECT IDENTIFIER
+    ::= { vtssFirmwareMib 2 }
+
+vtssFirmwareMibCompliances OBJECT IDENTIFIER
+    ::= { vtssFirmwareMibConformance 1 }
+
+vtssFirmwareMibGroups OBJECT IDENTIFIER
+    ::= { vtssFirmwareMibConformance 2 }
+
+vtssFirmwareStatusImageTableInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssFirmwareStatusImageType, vtssFirmwareStatusImageName, 
+                  vtssFirmwareStatusImageVersion, 
+                  vtssFirmwareStatusImageBuiltDate, 
+                  vtssFirmwareStatusImageCodeRevision }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssFirmwareMibGroups 1 }
+
+vtssFirmwareStatusImageUploadInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssFirmwareStatusImageUploadStatus }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssFirmwareMibGroups 2 }
+
+vtssFirmwareStatusSwitchTableInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssFirmwareStatusSwitchChipId, 
+                  vtssFirmwareStatusSwitchBoardType, 
+                  vtssFirmwareStatusSwitchPortCnt, 
+                  vtssFirmwareStatusSwitchProduct, 
+                  vtssFirmwareStatusSwitchVersion, 
+                  vtssFirmwareStatusSwitchBuiltDate }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssFirmwareMibGroups 3 }
+
+vtssFirmwareControlGlobalsInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssFirmwareControlGlobalsSwapFirmware }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssFirmwareMibGroups 4 }
+
+vtssFirmwareControlImageUploadInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssFirmwareControlImageUploadDoUpload, 
+                  vtssFirmwareControlImageUploadImageType, 
+                  vtssFirmwareControlImageUploadUrl }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssFirmwareMibGroups 5 }
+
+vtssFirmwareMibCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the implementation."
+
+    MODULE      -- this module
+
+        MANDATORY-GROUPS        { vtssFirmwareStatusImageTableInfoGroup, 
+                  vtssFirmwareStatusImageUploadInfoGroup, 
+                  vtssFirmwareStatusSwitchTableInfoGroup, 
+                  vtssFirmwareControlGlobalsInfoGroup, 
+                  vtssFirmwareControlImageUploadInfoGroup }
+
+    ::= { vtssFirmwareMibCompliances 1 }
+
+END
