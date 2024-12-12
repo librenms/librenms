@@ -3502,7 +3502,7 @@
             "transceivers": [
                 {
                     "index": "4125",
-                    "entity_physical_index": null,
+                    "entity_physical_index": 4125,
                     "type": "GE LX",
                     "vendor": "FLEXOPTIX",
                     "oui": null,
