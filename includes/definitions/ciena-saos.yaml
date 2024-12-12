@@ -7,9 +7,10 @@ over:
 discovery:
     - sysObjectID:
         - .1.3.6.1.4.1.562.68.11
+        - .1.3.6.1.4.1.1271.1
     - sysDescr_regex:
         - '/.*Version saos-.*/'
-mib_dir: nortel
+mib_dir: ciena
 group: ciena
 discovery_modules:
     processors: false
