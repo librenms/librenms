@@ -8,7 +8,7 @@ $sensor['sensor_descr_fixed'] = Rrd::fixedSafeDescr($sensor->sensor_descr, 25);
 // Next line is a workaround while rrdtool --left-axis-format doesn't support %S
 // https://github.com/oetiker/rrdtool-1.x/issues/1271
 //$rrd_options .= ' --left-axis-format "%4.1lF%S' . str_replace('%', '%%', $sensor->unit()) . '"';
-$rrd_options .= ' --left-axis-format "%5.1lf' . str_replace('%', '%%', trim(substr(LibreNMS\Util\Number::formatSi($sensor->sensor_current, 0, 0, ''), -1)) . $sensor->unit()) . '"';
+$rrd_options .= ' --left-axis-format "%5.1lf' . str_replace('%', '%%', trim(substr(Number::formatSi($sensor->sensor_current, 0, 0, ''), -1)) . $sensor->unit()) . '"';
 $rrd_options .= ' --vertical-label "' . $sensor->classDescr() . '"';
 $rrd_options .= ' DEF:sensor=' . $rrd_filename . ':sensor:AVERAGE';
 $rrd_options .= ' DEF:sensor_max=' . $rrd_filename . ':sensor:MAX';
