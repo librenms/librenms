@@ -130,6 +130,9 @@
                     return (data[a]["sname"] > data[b]["sname"]) ? 1 : -1;
                 }
 
+                // Keep track of all edges so we know if any go missing
+                all_edges = [];
+
                 var keys = Object.keys(data).sort(deviceSort);
                 $.each( keys, function( dev_idx, device_id ) {
                     var device = data[device_id];
@@ -172,10 +175,12 @@
                     }
                     $.each( device["parents"], function( parent_idx, parent_id ) {
                         link_id = device_id + "." + parent_id;
+                        all_edges[link_id] = null;
                         if (!network_edges.get(link_id)) {
-                            network_edges.add([{from: device_id, to: parent_id, width: 2}]);
+                            network_edges.add([{id: link_id, from: device_id, to: parent_id, width: 2}]);
                         }
                     })
+
                 })
 
                 // Initialise map if we haven't already.  If we do it earlier, the radom seeding doesn not work
@@ -207,12 +212,40 @@
                             window.location.href = "device/device="+properties.nodes+"/"
                         }
                     });
+                    network.on('showPopup', function (itemId) {
+                        let item = null;
+                        if(itemId.includes('.')) {
+                            // Edges have a .
+                            item = network_edges.get(itemId);
+                        } else {
+                            // Nodes are numeric
+                            item = network_nodes.get(itemId);
+                        }
+                        if (item && item.title) {
+                            for (let img of item.title.getElementsByClassName('graph-image')) {
+                                if(img.src.includes('&refreshnum=')) {
+                                    let regex = /&refreshnum=\d+/;
+                                    img.src = img.src.replace(regex, "&refreshnum=" + Countdown.refreshNum.toString());
+                                } else {
+                                    img.src += "&refreshnum=" + Countdown.refreshNum.toString();
+                                }
+                            }
+                        }
+                    });
                 } else {
+                    // Remove any nodes that have disappeared
                     $.each( network_nodes.getIds(), function( dev_idx, device_id ) {
                         if (!(device_id in data)) {
                             network_nodes.remove(device_id);
                             var option_id = "#highlight-device-" + device_id;
                             $(option_id).remove();
+                        }
+                    });
+
+                    // Remove any edges that have disappeared
+                    $.each( network_edges.getIds(), function( link_idx, link_id ) {
+                        if (!(link_id in all_edges)) {
+                            network_edges.remove(link_id);
                         }
                     });
                 }

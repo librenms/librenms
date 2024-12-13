@@ -60,9 +60,6 @@
         "poller_modules": {
             "type": "object",
             "properties": {
-                "cisco-cbqos": {
-                    "type": "boolean"
-                },
                 "cisco-qfp": {
                     "type": "boolean"
                 },
@@ -70,9 +67,6 @@
                     "type": "boolean"
                 },
                 "cisco-mac-accounting": {
-                    "type": "boolean"
-                },
-                "cisco-voice": {
                     "type": "boolean"
                 },
                 "cisco-remote-access-monitor": {

@@ -395,6 +395,10 @@ modules:
                             op: '='
                             value: '-1'
                         -
+                            oid: hwEntityOpticalVoltage
+                            op: '='
+                            value: '-255'
+                        -
                             oid: hwEntityOpticalMode
                             op: '='
                             value: '1'
@@ -451,6 +455,10 @@ modules:
                             op: '='
                             value: '-1'
                         -
+                            oid: hwEntityOpticalBiasCurrent
+                            op: '='
+                            value: '-255'
+                        -
                             oid: hwEntityOpticalMode
                             op: '='
                             value: '1'
@@ -473,6 +481,10 @@ modules:
                             oid: hwEntityOpticalBiasCurrent
                             op: '='
                             value: '-1'
+                        -
+                            oid: hwEntityOpticalBiasCurrent
+                            op: '='
+                            value: '-255'
                         -
                             oid: hwEntityOpticalMode
                             op: '='
