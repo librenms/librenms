@@ -3,6 +3,10 @@ text: 'NetElastic Flex BNG'
 type: network
 icon: netelastic
 mib_dir: netelastic
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+    - { graph: device_processor, text: 'CPU Usage' }
 discovery:
     -
         sysObjectID:
