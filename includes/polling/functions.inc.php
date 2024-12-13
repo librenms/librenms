@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Sensor;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Enum\Severity;
@@ -135,42 +136,9 @@ function poll_sensor($device, $class)
  */
 function record_sensor_data($device, $all_sensors)
 {
-    $supported_sensors = [
-        'airflow' => 'cfm',
-        'ber' => '',
-        'bitrate' => 'bps',
-        'charge' => '%',
-        'chromatic_dispersion' => 'ps/nm',
-        'cooling' => 'W',
-        'count' => '',
-        'current' => 'A',
-        'delay' => 's',
-        'dbm' => 'dBm',
-        'eer' => 'eer',
-        'fanspeed' => 'rpm',
-        'frequency' => 'Hz',
-        'humidity' => '%',
-        'load' => '%',
-        'loss' => '%',
-        'percent' => '%',
-        'power' => 'W',
-        'power_consumed' => 'kWh',
-        'power_factor' => '',
-        'pressure' => 'kPa',
-        'quality_factor' => 'dB',
-        'runtime' => 'Min',
-        'signal' => 'dBm',
-        'snr' => 'SNR',
-        'state' => '#',
-        'temperature' => 'C',
-        'tv_signal' => 'dBmV',
-        'voltage' => 'V',
-        'waterflow' => 'l/m',
-    ];
-
     foreach ($all_sensors as $sensor) {
         $class = ucfirst($sensor['sensor_class']);
-        $unit = $supported_sensors[$sensor['sensor_class']];
+        $unit = __('sensors.' . $sensor['sensor_class'] . '.unit');
         $sensor_value = Number::extract($sensor['new_value']);
         $prev_sensor_value = $sensor['sensor_current'];
 

@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Sensor;
 use LibreNMS\Config;
 use LibreNMS\OS;
 
@@ -46,41 +47,8 @@ if ($device['os'] == 'loop-telecom') {
     include 'includes/discovery/sensors/temperature/loop-telecom.inc.php';
 }
 
-$run_sensors = [
-    'airflow',
-    'current',
-    'charge',
-    'dbm',
-    'fanspeed',
-    'frequency',
-    'humidity',
-    'load',
-    'loss',
-    'power',
-    'power_consumed',
-    'power_factor',
-    'runtime',
-    'signal',
-    'state',
-    'count',
-    'temperature',
-    'tv_signal',
-    'bitrate',
-    'voltage',
-    'snr',
-    'pressure',
-    'cooling',
-    'delay',
-    'quality_factor',
-    'chromatic_dispersion',
-    'ber',
-    'eer',
-    'waterflow',
-    'percent',
-];
-
 // filter submodules
-$run_sensors = array_intersect($run_sensors, Config::get('discovery_submodules.sensors', $run_sensors));
+$run_sensors = array_intersect($run_sensors, Config::get('discovery_submodules.sensors', Sensor::getTypes()));
 
 sensors($run_sensors, $os, $pre_cache);
 unset(
