@@ -223,6 +223,8 @@ class YamlDiscovery
                 return $replace;
             });
             $value = (string) $template;
+        } else {
+            \Log::debug("Setting value of $name to $value");
         }
 
         return $value;
@@ -245,10 +247,15 @@ class YamlDiscovery
         }
 
         if (isset($discovery_data['oid']) && ! is_array($discovery_data['oid']) && isset($pre_cache[$discovery_data['oid']][$index]) && isset($pre_cache[$discovery_data['oid']][$index][$name])) {
+            $value = $pre_cache[$discovery_data['oid']][$index][$name];
+            \Log::debug("Using {$pre_cache[$discovery_data['oid']][$index][$name]}"
+                . " from discovery data for $name");
             return $pre_cache[$discovery_data['oid']][$index][$name];
         }
 
         if (isset($pre_cache[$index][$name])) {
+            \Log::debug("Using {$pre_cache[$index][$name]}"
+               . " from pre_cache for $name");
             return $pre_cache[$index][$name];
         }
 
@@ -270,13 +277,21 @@ class YamlDiscovery
         if (isset($pre_cache[$name]) && ! is_numeric($name)) {
             if (is_array($pre_cache[$name])) {
                 if (isset($pre_cache[$name][$index][$name])) {
+                    \Log::debug("Using {$pre_cache[$name][$index][$name]}"
+                       . " from pre_cache[$name][$index][$name] for $name");
                     return $pre_cache[$name][$index][$name];
                 } elseif (isset($pre_cache[$name][$index])) {
+                    \Log::debug("Using {$pre_cache[$name][$index]}"
+                       . " from pre_cache[$name][$index] for $name");
                     return $pre_cache[$name][$index];
                 } elseif (count($pre_cache[$name]) === 1 && ! is_array(current($pre_cache[$name]))) {
+                    \Log::debug("Using single entry {$pre_cache[$name]}"
+                       . " from pre_cache[$name] for $name");
                     return current($pre_cache[$name]);
                 }
             } else {
+                \Log::debug("Using {$pre_cache[$name]}"
+                   . " from pre_cache[$name] for $name");
                 return $pre_cache[$name];
             }
         }
@@ -285,6 +300,8 @@ class YamlDiscovery
         if (str_contains($name, '::')) {
             foreach ($pre_cache as $table_name => $table) {
                 if (is_array($table) && isset($table[$index][$name])) {
+                    \Log::debug("Using {$table[$index][$name]}"
+                        . "from walked $table_name[$index][$name] for $name");
                     return $table[$index][$name];
                 }
             }
