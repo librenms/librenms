@@ -716,39 +716,39 @@ function discovery_process($os, $sensor_class, $pre_cache)
                     // process the divisor - cannot be 0
                     if (isset($data['divisor'])) {
                         if (is_numeric($data['divisor'])) {
-                            $divisor = (int)$data['divisor'];
+                            $divisor = (int) $data['divisor'];
                         } else {
-                            $divisor = (int)YamlDiscovery::replaceValues('divisor', $index, $count, $data, $pre_cache);
+                            $divisor = (int) YamlDiscovery::replaceValues('divisor', $index, $count, $data, $pre_cache);
                         }
                     } elseif (isset($sensor_options['divisor'])) {
-                        $divisor = (int)$sensor_options['divisor'];
+                        $divisor = (int) $sensor_options['divisor'];
                     } else {
                         $divisor = 1;
                     }
                     if ($divisor == 0) {
-                        \Log::warning("Valid nonzero number not found for divisor, defaulting to 1");
+                        \Log::warning('Valid nonzero number not found for divisor, defaulting to 1');
                         $divisor = 1;
                     }
 
                     // process the multiplier
                     if (isset($data['multiplier'])) {
                         if (is_numeric($data['multiplier'])) {
-                            $multiplier = (int)$data['multiplier'];
+                            $multiplier = (int) $data['multiplier'];
                         } else {
                             $multiplier = YamlDiscovery::replaceValues('multiplier', $index, $count, $data, $pre_cache);
                             if (is_numeric($multiplier)) {
-                                $multiplier = (int)$multiplier;
+                                $multiplier = (int) $multiplier;
                             } else {
-                                \Log::warning("Valid number not found in data for multiplier, defaulting to 1");
+                                \Log::warning('Valid number not found in data for multiplier, defaulting to 1');
                                 $multiplier = 1;
                             }
                         }
                     } elseif (isset($sensor_options['multiplier'])) {
                         $multipler = $sensor_options['multiplier'];
                         if (is_numeric($multiplier)) {
-                            $multiplier = (int)$multiplier;
+                            $multiplier = (int) $multiplier;
                         } else {
-                            \Log::warning("Valid number not found in sensor options for multiplier, defaulting to 1");
+                            \Log::warning('Valid number not found in sensor options for multiplier, defaulting to 1');
                             $multiplier = 1;
                         }
                     } else {
