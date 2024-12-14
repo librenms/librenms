@@ -10,8 +10,8 @@ modules:
         divisor: 10
         skip_value_lt: 0
       data:
-        - oid: 'pduTable'
-          value: 'pdu01Value' 
+        - oid: 'DigiPower-PDU-MIB::pduTable'
+          value: 'DigiPower-PDU-MIB::pdu01Value' 
           num_oid: '.1.3.6.1.4.1.17420.1.2.9.1.11.{{ $index }}'
           index: 0
           descr: 'Current'
@@ -21,8 +21,8 @@ modules:
       options:
         skip_value_lt: 0
       data:
-        - oid: 'pduTable'
-          value: 'pdu01Voltage'
+        - oid: 'DigiPower-PDU-MIB::pduTable'
+          value: 'DigiPower-PDU-MIB::pdu01Voltage'
           num_oid: '.1.3.6.1.4.1.17420.1.2.9.1.17.{{ $index }}'
           descr: 'Voltage'
           index: 0
@@ -31,11 +31,11 @@ modules:
         divisor: 10
         skip_value_lt: 0
       data:
-        - oid: 'pduTable'
-          value: 'pdu01Value' 
+        - oid: 'DigiPower-PDU-MIB::pduTable'
+          value: 'DigiPower-PDU-MIB::pdu01Value' 
           num_oid: '.1.3.6.1.4.1.17420.1.2.9.1.11.{{ $index }}'
           index: 0
           descr: 'Power'
-          multiplier: 'pdu01Voltage'
+          multiplier: 'DigiPower-PDU-MIB::pdu01Voltage'
 
 
