@@ -15,54 +15,28 @@
  * @author     LibreNMS Contributors
 */
 
+use App\Models\Sensor;
+use LibreNMS\Util\ObjectCache;
+
 $no_refresh = true;
 
-$datas = ['mempool', 'processor', 'storage'];
+$datas = collect(['mempool', 'processor', 'storage'])
+    ->merge(collect(ObjectCache::sensors())
+        ->flatMap(fn ($types) => collect($types)->pluck('class'))
+);
 
-$used_sensors = \LibreNMS\Util\ObjectCache::sensors();
-foreach ($used_sensors as $group => $types) {
-    foreach ($types as $entry) {
-        $datas[] = $entry['class'];
-    }
-}
 
-$type_text = [
+$type_text = collect([
     'overview' => 'Overview',
     'temperature' => 'Temperature',
-    'charge' => 'Battery Charge',
-    'humidity' => 'Humidity',
     'mempool' => 'Memory',
     'storage' => 'Storage',
     'diskio' => 'Disk I/O',
     'processor' => 'Processor',
-    'voltage' => 'Voltage',
-    'fanspeed' => 'Fanspeed',
-    'frequency' => 'Frequency',
-    'runtime' => 'Runtime',
-    'current' => 'Current',
-    'power' => 'Power',
-    'power_consumed' => 'Power Consumed',
-    'power_factor' => 'Power Factor',
-    'dbm' => 'dBm',
-    'load' => 'Load',
-    'loss' => 'Loss',
-    'state' => 'State',
-    'count' => 'Count',
-    'signal' => 'Signal',
-    'tv_signal' => 'TV signal',
-    'bitrate' => 'Bitrate',
-    'snr' => 'SNR',
-    'pressure' => 'Pressure',
-    'cooling' => 'Cooling',
     'toner' => 'Toner',
-    'delay' => 'Delay',
-    'quality_factor' => 'Quality factor',
-    'chromatic_dispersion' => 'Chromatic Dispersion',
-    'ber' => 'Bit Error Rate',
-    'eer' => 'Energy Efficiency Ratio',
-    'waterflow' => 'Water Flow Rate',
-    'percent' => 'Percent',
-];
+    ])->merge(collect(Sensor::getTypes())
+      ->mapWithKeys(fn ($type) => [ $type => __('sensors.' . $type . '.short')])
+    )->toArray();
 
 $active_metric = basename(array_key_exists($vars['metric'], $type_text) ? $vars['metric'] : 'processor');
 

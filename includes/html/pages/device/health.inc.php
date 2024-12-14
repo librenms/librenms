@@ -64,13 +64,7 @@ if (DiskIo::where('device_id', $device['device_id'])->count()) {
     $datas[] = 'diskio';
 }
 
-$sensors = [
-    'airflow', 'ber', 'bitrate', 'charge', 'chromatic_dispersion', 'cooling', 'count', 'current', 'dBm', 'delay', 'eer',
-    'fanspeed', 'frequency', 'humidity', 'load', 'loss', 'percent', 'power', 'power_consumed', 'power_factor', 'pressure',
-    'runtime', 'signal', 'snr', 'state', 'temperature', 'tv_signal', 'voltage', 'waterflow', 'quality_factor',
-];
-
-foreach ($sensors as $sensor_name) {
+foreach (Sensor::getTypes() as $sensor_name) {
     if (Sensor::where('sensor_class', $sensor_name)->where('device_id', $device['device_id'])->count()) {
         //strtolower because 'dBm - dbm' difference
         $lowname = strtolower($sensor_name);

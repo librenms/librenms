@@ -10,6 +10,7 @@ the values we expect to see the data in:
 | ------------------------------- | --------------------------- |
 | airflow                         | cfm                         |
 | ber                             | ratio                       |
+| bitrate                         | bps                         |
 | charge                          | %                           |
 | chromatic_dispersion            | ps/nm                       |
 | cooling                         | W                           |
@@ -23,6 +24,7 @@ the values we expect to see the data in:
 | humidity                        | %                           |
 | load                            | %                           |
 | loss                            | %                           |
+| percent                         | %                           |
 | power                           | W                           |
 | power_consumed                  | kWh                         |
 | power_factor                    | ratio                       |
@@ -34,10 +36,8 @@ the values we expect to see the data in:
 | state                           | #                           |
 | temperature                     | C                           |
 | tv_signal                       | dBmV                        |
-| bitrate                         | bps                         |
 | voltage                         | V                           |
 | waterflow                       | l/m                         |
-| percent                         | %                           |
 
 #### Simple health discovery
 
@@ -297,7 +297,6 @@ You will need to add code for your new sensor class in the following existing fi
 - `app/Models/Sensor.php`: add a free icon from [Font Awesome](https://fontawesome.com/icons?d=gallery&m=free)
 in the $icons array.
 - `doc/Developing/os/Health-Information.md`: documentation for every sensor class is mandatory.
-- `includes/discovery/sensors.inc.php`: add the sensor class to the $run_sensors array.
 - `includes/discovery/functions.inc.php`: optional - if sensible low_limit and high_limit values
 are guessable when a SNMP-retrievable threshold is not available, add a case for the sensor class
 to the sensor_limit() and/or sensor_low_limit() functions.
