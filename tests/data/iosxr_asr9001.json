@@ -27700,7 +27700,7 @@
                     "wavelength": null,
                     "connector": null,
                     "channels": 1,
-                    "ifIndex": null
+                    "ifIndex": 25
                 },
                 {
                     "index": "30054631",
@@ -27719,7 +27719,7 @@
                     "wavelength": null,
                     "connector": null,
                     "channels": 1,
-                    "ifIndex": null
+                    "ifIndex": 42
                 },
                 {
                     "index": "31415605",
@@ -27738,7 +27738,7 @@
                     "wavelength": null,
                     "connector": null,
                     "channels": 1,
-                    "ifIndex": null
+                    "ifIndex": 44
                 },
                 {
                     "index": "37336673",
@@ -27757,7 +27757,7 @@
                     "wavelength": null,
                     "connector": null,
                     "channels": 1,
-                    "ifIndex": null
+                    "ifIndex": 21
                 },
                 {
                     "index": "66227682",
@@ -27776,7 +27776,7 @@
                     "wavelength": null,
                     "connector": null,
                     "channels": 1,
-                    "ifIndex": null
+                    "ifIndex": 23
                 }
             ]
         }
