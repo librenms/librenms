@@ -25,7 +25,6 @@ $datas = collect(['mempool', 'processor', 'storage'])
         ->flatMap(fn ($types) => collect($types)->pluck('class'))
     );
 
-
 $type_text = collect([
     'overview' => 'Overview',
     'temperature' => 'Temperature',
