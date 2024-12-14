@@ -3,3 +3,79 @@ modules:
     hardware: PM8ECCMIB::midDeviceName.1
     serial: PM8ECCMIB::midSerialNumber.1
     version: PM8ECCMIB::midFirmwareVersion.1
+  sensors:
+    current:
+      data:
+        -
+          oid: PM8ECCMIB::loadCurrentTable
+          value: PM8ECCMIB::lcIa
+          num_oid: '.1.3.6.1.4.1.3833.1.7.255.15.1.1.2.1.2.{{ $index }}'
+          descr: 'Phase A'
+          index: 'lcIa'
+        -
+          oid: PM8ECCMIB::loadCurrentTable
+          value: PM8ECCMIB::lcIb
+          num_oid: '.1.3.6.1.4.1.3833.1.7.255.15.1.1.2.1.3.{{ $index }}'
+          descr: 'Phase B'
+          index: 'lcIb'
+        -
+          oid: PM8ECCMIB::loadCurrentTable
+          value: PM8ECCMIB::lcIc
+          num_oid: '.1.3.6.1.4.1.3833.1.7.255.15.1.1.2.1.4.{{ $index }}'
+          descr: 'Phase C'
+          index: 'lcIc'
+    frequency:
+      data:
+          -
+              oid: PM8ECCMIB::frequencyTable
+              value: PM8ECCMIB::fFrequency
+              num_oid: '.1.3.6.1.4.1.3833.1.7.255.15.1.1.6.1.2.{{ $index }}'
+              descr: 'Frequency'
+              index: 'fFrequency'
+    power:
+        data:
+            -
+                oid: PM8ECCMIB::powerTable
+                value: PM8ECCMIB::pReal
+                num_oid: '.1.3.6.1.4.1.3833.1.7.255.15.1.1.3.1.2.{{ $index }}'
+                multiplier: 1000
+                descr: 'Power'
+                index: 'pReal'
+    voltage:
+        data:
+            -
+                oid: PM8ECCMIB::voltageTable
+                value: PM8ECCMIB::vVab
+                num_oid: '.1.3.6.1.4.1.3833.1.7.255.15.1.1.5.1.2.{{ $index }}'
+                descr: 'Line A to B'
+                index: 'vVab'
+            -
+                oid: PM8ECCMIB::voltageTable
+                value: PM8ECCMIB::vVbc
+                num_oid: '.1.3.6.1.4.1.3833.1.7.255.15.1.1.5.1.3.{{ $index }}'
+                descr: 'Line B to C'
+                index: 'vVbc'
+            -
+                oid: PM8ECCMIB::voltageTable
+                value: PM8ECCMIB::vVca
+                num_oid: '.1.3.6.1.4.1.3833.1.7.255.15.1.1.5.1.4.{{ $index }}'
+                descr: 'Line C to A'
+                index: 'vVca'
+            -
+                oid: PM8ECCMIB::voltageTable
+                value: PM8ECCMIB::vVan
+                num_oid: '.1.3.6.1.4.1.3833.1.7.255.15.1.1.5.1.6.{{ $index }}'
+                descr: 'Line A to neutral'
+                index: 'vVan'
+            -
+                oid: PM8ECCMIB::voltageTable
+                value: PM8ECCMIB::vVbn
+                num_oid: '.1.3.6.1.4.1.3833.1.7.255.15.1.1.5.1.7.{{ $index }}'
+                descr: 'Line B to neutral'
+                index: 'vVbn'
+            -
+                oid: PM8ECCMIB::voltageTable
+                value: PM8ECCMIB::vVcn
+                num_oid: '.1.3.6.1.4.1.3833.1.7.255.15.1.1.5.1.8.{{ $index }}'
+                descr: 'Line C to neutral'
+                index: 'vVcn'

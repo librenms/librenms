@@ -1,0 +1,192 @@
+-- 2019-01-04 14:24:10
+-- Namespace: http://netelastic.com/nfv/flexbng/netelastic-ippool
+
+NETELASTIC-FLEXBNG-IPPOOL DEFINITIONS ::= BEGIN
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Integer32, Unsigned32, Counter32, Counter64,
+    Gauge32, IpAddress
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, RowStatus, DateAndTime,
+    TruthValue
+        FROM SNMPv2-TC
+    bras
+	FROM NETELASTIC-FLEXBNG-MIB
+;
+
+ippoolMib MODULE-IDENTITY
+    LAST-UPDATED "201511200000Z"
+    ORGANIZATION "@ORGANIZATION"
+    CONTACT-INFO "@CONTACT-INFO"
+    DESCRIPTION ""
+    REVISION "201511200000Z"
+    DESCRIPTION "@REVISION-DESCRIPTION"
+    ::= { bras 2 }
+
+String ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION "xs:string"
+    SYNTAX      OCTET STRING
+
+-- Show IPv4 pool allocate status
+-- tagpath /ippool/allocate-status
+allocateStatus OBJECT IDENTIFIER ::= { ippoolMib 3 }
+
+-- tagpath /ippool/allocate-status/total_valid_ip_number
+totalValidIpNumber OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "IPv4 pool total valid ip number"
+    ::= { allocateStatus 1 }
+
+-- tagpath /ippool/allocate-status/total_used_ip_number
+totalUsedIpNumber OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "IPv4 pool total used ip number"
+    ::= { allocateStatus 2 }
+
+-- tagpath /ippool/allocate-status/total_allocate_percent
+totalAllocatePercent OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "IPv4 pool total allocate percent"
+    ::= { allocateStatus 3 }
+
+-- tagpath /ippool/status/group
+groupTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF GroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ippoolMib 1 }
+
+-- tagpath /ippool/status/group
+groupEntry OBJECT-TYPE
+    SYNTAX      GroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { groupName }
+        ::= { groupTable 1 }
+
+GroupEntry ::=
+    SEQUENCE {
+        groupName String,
+        vrfName String,
+        groupValidIpNumber Unsigned32,
+        groupUsedIpNumber Unsigned32,
+        groupAllocatePercent Unsigned32
+    }
+
+-- tagpath /ippool/status/group/group-name
+groupName OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Pool name"
+    ::= { groupEntry 1 }
+
+-- tagpath /ippool/status/group/vrf
+vrfName OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "VRF name"
+    ::= { groupEntry 2 }
+
+-- tagpath /ippool/status/group/group-valid-ip-number
+groupValidIpNumber OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Pool valid ip number"
+    ::= { groupEntry 3 }
+
+-- tagpath /ippool/status/group/group-used-ip-number
+groupUsedIpNumber OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Pool used ip number"
+    ::= { groupEntry 4 }
+
+-- tagpath /ippool/status/group/group-allocate-percent
+groupAllocatePercent OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Pool allocate ip percent"
+    ::= { groupEntry 5 }
+
+-- tagpath /ippool/status/group/section
+sectionTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SectionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "IPv4 address section status"
+    ::= { ippoolMib 2 }
+
+-- tagpath /ippool/status/group/section
+sectionEntry OBJECT-TYPE
+    SYNTAX      SectionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { groupName, startIP, endIP }
+        ::= { sectionTable 1 }
+
+SectionEntry ::=
+    SEQUENCE {
+        startIP IpAddress,
+        endIP IpAddress,
+        sectionTotalIpNumber Unsigned32,
+        sectionIpAllocateNumber Unsigned32,
+        sectionIpAllocatePercent Unsigned32
+    }
+
+-- tagpath /ippool/status/group/section/start-ip
+startIP OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Start IPv4 address"
+    ::= { sectionEntry 1 }
+
+-- tagpath /ippool/status/group/section/end-ip
+endIP OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "End IPv4 address"
+    ::= { sectionEntry 2 }
+
+-- tagpath /ippool/status/group/section/total-ip-number
+sectionTotalIpNumber OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Section total ip number"
+    ::= { sectionEntry 3 }
+
+-- tagpath /ippool/status/group/section/ip-allocate-number
+sectionIpAllocateNumber OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Section allocate ip number"
+    ::= { sectionEntry 4 }
+
+-- tagpath /ippool/status/group/section/ip-allocate-percent
+sectionIpAllocatePercent OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Section allocate ip percent"
+    ::= { sectionEntry 5 }
+
+END

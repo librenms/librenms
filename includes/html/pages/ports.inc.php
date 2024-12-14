@@ -139,7 +139,7 @@ if ((isset($vars['searchbar']) && $vars['searchbar'] != 'hide') || ! isset($vars
     foreach ($ifSpeed as $data) {
         if ($data['ifSpeed']) {
             $speedselected = isset($vars['ifSpeed']) && $data['ifSpeed'] == $vars['ifSpeed'] ? 'selected' : '';
-            $output .= "<option value='" . $data['ifSpeed'] . "'" . $speedselected . '>' . \LibreNMS\Util\Number::formatSi($data['ifSpeed'], 2, 3, 'bps') . '</option>';
+            $output .= "<option value='" . $data['ifSpeed'] . "'" . $speedselected . '>' . \LibreNMS\Util\Number::formatSi($data['ifSpeed'], 2, 0, 'bps') . '</option>';
         }
     }
 

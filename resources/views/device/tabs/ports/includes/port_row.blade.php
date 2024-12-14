@@ -65,24 +65,24 @@
     <td class="tw-whitespace-nowrap">
         <div>
             <i class="fa fa-long-arrow-left fa-lg tw-text-green-600" aria-hidden="true"></i>
-            <span style="color: {{ \LibreNMS\Util\Color::percent($port->in_rate, $port->ifSpeed) }}">{{ \LibreNMS\Util\Number::formatSi($port->ifInOctets_rate * 8, 2, 3, 'bps') }}</span>
+            <span style="color: {{ \LibreNMS\Util\Color::percent($port->in_rate, $port->ifSpeed) }}">{{ \LibreNMS\Util\Number::formatSi($port->ifInOctets_rate * 8, 2, 0, 'bps') }}</span>
         </div>
         <div>
             <i class="fa fa-long-arrow-right fa-lg" style="color:blue" aria-hidden="true"></i>
-            <span style="color: {{ \LibreNMS\Util\Color::percent($port->out_rate, $port->ifSpeed) }}">{{ \LibreNMS\Util\Number::formatSi($port->ifOutOctets_rate * 8, 2, 3, 'bps') }}</span>
+            <span style="color: {{ \LibreNMS\Util\Color::percent($port->out_rate, $port->ifSpeed) }}">{{ \LibreNMS\Util\Number::formatSi($port->ifOutOctets_rate * 8, 2, 0, 'bps') }}</span>
         </div>
         <div>
             <i class="fa fa-long-arrow-left fa-lg" style="color:purple" aria-hidden="true"></i>
-            {{ \LibreNMS\Util\Number::formatBi($port->ifInUcastPkts_rate, 2, 3, 'pps') }}
+            {{ \LibreNMS\Util\Number::formatBi($port->ifInUcastPkts_rate, 2, 0, 'pps') }}
         </div>
         <div>
             <i class="fa fa-long-arrow-right fa-lg" style="color:darkorange" aria-hidden="true"></i>
-            {{ \LibreNMS\Util\Number::formatBi($port->ifOutUcastPkts_rate, 2, 3, 'pps') }}
+            {{ \LibreNMS\Util\Number::formatBi($port->ifOutUcastPkts_rate, 2, 0, 'pps') }}
         </div>
     </td>
     <td class="tw-whitespace-nowrap">
         @if($port->ifSpeed)
-            <div>{{ \LibreNMS\Util\Number::formatSi($port->ifSpeed, 2, 3, 'bps') }}</div>
+            <div>{{ \LibreNMS\Util\Number::formatSi($port->ifSpeed, 2, 0, 'bps') }}</div>
         @endif
         @if($port->ifDuplex != 'unknown')
             <div>{{ $port->ifDuplex }}</div>
@@ -107,13 +107,13 @@
     <td @if($collapsing)class="tw-hidden sm:tw-table-cell"@endif>
         @if($port->adsl)
             <div>{{ $port->adsl->adslLineCoding }}/{{ \LibreNMS\Util\Rewrite::dslLineType($port->adsl->adslLineType) }}</div>
-            <div>{{ __('port.xdsl.sync_stat', ['down' => \LibreNMS\Util\Number::formatSi($port->adsl->adslAtucChanCurrTxRate, 2, 3, 'bps'), 'up' => \LibreNMS\Util\Number::formatSi($port->adsl->adslAturChanCurrTxRate, 2, 3, 'bps')]) }}</div>
-            <div>{{ __('port.xdsl.attainable_stat', ['down' => \LibreNMS\Util\Number::formatSi($port->adsl->adslAtucCurrAttainableRate, 2, 3, 'bps'), 'up' => \LibreNMS\Util\Number::formatSi($port->adsl->adslAturCurrAttainableRate, 2, 3, 'bps')]) }}</div>
+            <div>{{ __('port.xdsl.sync_stat', ['down' => \LibreNMS\Util\Number::formatSi($port->adsl->adslAtucChanCurrTxRate, 2, 0, 'bps'), 'up' => \LibreNMS\Util\Number::formatSi($port->adsl->adslAturChanCurrTxRate, 2, 0, 'bps')]) }}</div>
+            <div>{{ __('port.xdsl.attainable_stat', ['down' => \LibreNMS\Util\Number::formatSi($port->adsl->adslAtucCurrAttainableRate, 2, 0, 'bps'), 'up' => \LibreNMS\Util\Number::formatSi($port->adsl->adslAturCurrAttainableRate, 2, 0, 'bps')]) }}</div>
             <div>{{ __('port.xdsl.attenuation_stat', ['down' => $port->adsl->adslAtucCurrAtn . 'dB', 'up' => $port->adsl->adslAturCurrAtn . 'dB']) }}</div>
             <div>{{ __('port.xdsl.snr_stat', ['down' => $port->adsl->adslAtucCurrSnrMgn . 'dB','up' => $port->adsl->adslAturCurrSnrMgn . 'dB']) }}</div>
         @elseif($port->vdsl)
-            <div>{{ __('port.xdsl.sync_stat', ['down' => \LibreNMS\Util\Number::formatSi($port->vdsl->xdsl2ChStatusActDataRateXtuc, 2, 3, 'bps'), 'up' => \LibreNMS\Util\Number::formatSi($port->vdsl->xdsl2ChStatusActDataRateXtur, 2, 3, 'bps')]) }}</div>
-            <div>{{ __('port.xdsl.attainable_stat', ['down' => \LibreNMS\Util\Number::formatSi($port->vdsl->xdsl2LineStatusAttainableRateDs, 2, 3, 'bps'), 'up' => \LibreNMS\Util\Number::formatSi($port->vdsl->xdsl2LineStatusAttainableRateUs, 2, 3, 'bps')]) }}</div>
+            <div>{{ __('port.xdsl.sync_stat', ['down' => \LibreNMS\Util\Number::formatSi($port->vdsl->xdsl2ChStatusActDataRateXtuc, 2, 0, 'bps'), 'up' => \LibreNMS\Util\Number::formatSi($port->vdsl->xdsl2ChStatusActDataRateXtur, 2, 0, 'bps')]) }}</div>
+            <div>{{ __('port.xdsl.attainable_stat', ['down' => \LibreNMS\Util\Number::formatSi($port->vdsl->xdsl2LineStatusAttainableRateDs, 2, 0, 'bps'), 'up' => \LibreNMS\Util\Number::formatSi($port->vdsl->xdsl2LineStatusAttainableRateUs, 2, 0, 'bps')]) }}</div>
         @else
             <div>{{ \LibreNMS\Util\Rewrite::normalizeIfType($port->ifType) }}</div>
         @endif

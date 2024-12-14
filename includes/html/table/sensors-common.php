@@ -122,9 +122,9 @@ foreach (dbFetchRows($sql, $param) as $sensor) {
         'alert' => $alert,
         'sensor_current' => $sensor_current,
         'sensor_limit_low' => is_null($sensor['sensor_limit_low']) ? '-' :
-            '<span class=\'label label-default\'>' . trim(\LibreNMS\Util\Number::formatSi($sensor['sensor_limit_low'], 2, 3, '') . $unit) . '</span>',
+            '<span class=\'label label-default\'>' . trim(\LibreNMS\Util\Number::formatSi($sensor['sensor_limit_low'], 2, 0, '') . $unit) . '</span>',
         'sensor_limit' => is_null($sensor['sensor_limit']) ? '-' :
-            '<span class=\'label label-default\'>' . trim(\LibreNMS\Util\Number::formatSi($sensor['sensor_limit'], 2, 3, '') . $unit) . '</span>',
+            '<span class=\'label label-default\'>' . trim(\LibreNMS\Util\Number::formatSi($sensor['sensor_limit'], 2, 0, '') . $unit) . '</span>',
     ];
 
     if ($vars['view'] == 'graphs') {

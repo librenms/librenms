@@ -108,12 +108,12 @@ trait YamlMempoolsDiscovery
 
     private function getOid($field, $index, $yaml)
     {
-        if (Oid::isNumeric($yaml[$field] ?? '')) {
+        if (Oid::of($yaml[$field] ?? '')->isNumeric()) {
             return $yaml[$field];
         }
 
         if (isset($this->mempoolsOids[$field])) {
-            return Oid::toNumeric("{$this->mempoolsOids[$field]}.$index");
+            return Oid::of("{$this->mempoolsOids[$field]}.$index")->toNumeric();
         }
 
         return null;
@@ -138,7 +138,7 @@ trait YamlMempoolsDiscovery
         foreach ($this->mempoolsFields as $field) {
             if (isset($yaml[$field]) && ! is_numeric($yaml[$field])) { // allow for hard-coded values
                 $oid = $yaml[$field];
-                if (Oid::isNumeric($oid)) { // if numeric oid, it is not a table, just fetch it
+                if (Oid::of($oid)->isNumeric()) { // if numeric oid, it is not a table, just fetch it
                     $this->mempoolsData[0][$oid] = snmp_get($this->getDeviceArray(), $oid, '-Oqv');
                     continue;
                 }
@@ -146,7 +146,7 @@ trait YamlMempoolsDiscovery
                 if (empty($yaml['oid'])) { // if table given, skip individual oids
                     $this->mempoolsData = snmpwalk_cache_oid($this->getDeviceArray(), $oid, $this->mempoolsData, null, null, $options);
                 }
-                $this->mempoolsOids[$field] = Oid::toNumeric($oid, $mib);
+                $this->mempoolsOids[$field] = Oid::of($oid)->toNumeric($mib);
             }
         }
     }

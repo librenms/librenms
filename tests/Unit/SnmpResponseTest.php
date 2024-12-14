@@ -127,6 +127,26 @@ class SnmpResponseTest extends TestCase
         ], $response->valuesByIndex($existing));
     }
 
+    public function testGroupByIndex(): void
+    {
+        $response = new SnmpResponse(".1.3.6.1.2.1.2.2.1.10.1 = 495813425\n.1.3.6.1.2.1.2.2.1.10.2 = 3495809228\n");
+        $this->assertTrue($response->isValid());
+        $this->assertEquals([1 => ['.1.3.6.1.2.1.2.2.1.10.1' => 495813425], 2 => ['.1.3.6.1.2.1.2.2.1.10.2' => 3495809228]], $response->groupByIndex());
+        $this->assertEquals(['1.10.1' => ['.1.3.6.1.2.1.2.2.1.10.1' => 495813425], '1.10.2' => ['.1.3.6.1.2.1.2.2.1.10.2' => 3495809228]], $response->groupByIndex(3));
+        $this->assertEquals(['6.1.2.1.2.2.1.10.1' => ['.1.3.6.1.2.1.2.2.1.10.1' => 495813425], '6.1.2.1.2.2.1.10.2' => ['.1.3.6.1.2.1.2.2.1.10.2' => 3495809228]], $response->groupByIndex(-2));
+
+        $response = new SnmpResponse(".1.3.6.1.2.1.2.2.1.10.1 = 495813425\n.1.3.6.1.2.1.2.2.1.11.1 = 3495809228\n");
+        $this->assertEquals([1 => ['.1.3.6.1.2.1.2.2.1.10.1' => 495813425, '.1.3.6.1.2.1.2.2.1.11.1' => 3495809228]], $response->groupByIndex());
+        $this->assertEquals(['10.1' => ['.1.3.6.1.2.1.2.2.1.10.1' => 495813425], '11.1' => ['.1.3.6.1.2.1.2.2.1.11.1' => 3495809228]], $response->groupByIndex(2));
+        $this->assertEquals(['1.2.2.1.10.1' => ['.1.3.6.1.2.1.2.2.1.10.1' => 495813425], '1.2.2.1.11.1' => ['.1.3.6.1.2.1.2.2.1.11.1' => 3495809228]], $response->groupByIndex(-5));
+
+        $response = new SnmpResponse("SOME-MIB::oid.1.1.0 = 14\nSOME-MIB::oid.1.2.0 = 42\n");
+        $this->assertTrue($response->isValid());
+        $this->assertEquals([0 => ['SOME-MIB::oid.1.1.0' => '14', 'SOME-MIB::oid.1.2.0' => '42']], $response->groupByIndex());
+        $this->assertEquals(['1.0' => ['SOME-MIB::oid.1.1.0' => '14'], '2.0' => ['SOME-MIB::oid.1.2.0' => '42']], $response->groupByIndex(2));
+        $this->assertEquals(['1.1.0' => ['SOME-MIB::oid.1.1.0' => '14'], '1.2.0' => ['SOME-MIB::oid.1.2.0' => '42']], $response->groupByIndex(-1));
+    }
+
     public function testMultiLine(): void
     {
         $response = new SnmpResponse("SNMPv2-MIB::sysDescr.1 = \"something\n on two lines\"\n");

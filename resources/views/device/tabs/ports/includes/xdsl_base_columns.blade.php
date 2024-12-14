@@ -8,9 +8,9 @@
     @endif
 </td>
 <td>
-    {{ \LibreNMS\Util\Number::formatSi($dslPort->port->ifInOctets_rate * 8, 2, 3, 'bps') }}
+    {{ \LibreNMS\Util\Number::formatSi($dslPort->port->ifInOctets_rate * 8, 2, 0, 'bps') }}
     <i class='fa fa-arrows-v fa-lg icon-theme' aria-hidden='true'></i>
-    {{ \LibreNMS\Util\Number::formatSi($dslPort->port->ifOutOctets_rate * 8, 2, 3, 'bps') }}
+    {{ \LibreNMS\Util\Number::formatSi($dslPort->port->ifOutOctets_rate * 8, 2, 0, 'bps') }}
     <br />
     <x-graph :port="$dslPort->port" type="port_bits" width="120" height="40" legend="no"></x-graph>
 </td>

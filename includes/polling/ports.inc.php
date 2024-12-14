@@ -714,8 +714,8 @@ foreach ($ports as $port) {
                 }
 
                 if ($oid == 'ifSpeed') {
-                    $old = Number::formatSi($port[$oid], 2, 3, 'bps');
-                    $new = Number::formatSi($current_oid, 2, 3, 'bps');
+                    $old = Number::formatSi($port[$oid], 2, 0, 'bps');
+                    $new = Number::formatSi($current_oid, 2, 0, 'bps');
                 } else {
                     $old = $port[$oid];
                     $new = $current_oid;
@@ -824,9 +824,9 @@ foreach ($ports as $port) {
                 $current_port_stats['ifOutBits_perc'] = Number::calculatePercent($current_port_stats['ifOutBits_rate'], $this_port['ifSpeed'], 0);
             }
 
-            echo 'bps(' . Number::formatSi($current_port_stats['ifInBits_rate'], 2, 3, 'bps') . '/' . Number::formatSi($current_port_stats['ifOutBits_rate'], 2, 3, 'bps') . ')';
+            echo 'bps(' . Number::formatSi($current_port_stats['ifInBits_rate'], 2, 3, 'bps') . '/' . Number::formatSi($current_port_stats['ifOutBits_rate'], 2, 0, 'bps') . ')';
             echo 'bytes(' . Number::formatBi($current_port_stats['ifInOctets_diff'] ?? 0) . '/' . Number::formatBi($current_port_stats['ifOutOctets_diff'] ?? 0) . ')';
-            echo 'pkts(' . Number::formatSi($current_port_stats['ifInUcastPkts_rate'] ?? 0, 2, 3, 'pps') . '/' . Number::formatSi($current_port_stats['ifOutUcastPkts_rate'] ?? 0, 2, 3, 'pps') . ')';
+            echo 'pkts(' . Number::formatSi($current_port_stats['ifInUcastPkts_rate'] ?? 0, 2, 3, 'pps') . '/' . Number::formatSi($current_port_stats['ifOutUcastPkts_rate'] ?? 0, 2, 0, 'pps') . ')';
 
             // Update data stores
             $rrd_name = Rrd::portName($port_id, '');

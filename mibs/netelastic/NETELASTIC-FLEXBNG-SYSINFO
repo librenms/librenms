@@ -1,0 +1,52 @@
+NETELASTIC-FLEXBNG-SYSINFO DEFINITIONS ::= BEGIN
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Integer32, Unsigned32, Counter32, Counter64,
+    Gauge32, IpAddress
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, RowStatus, DateAndTime,
+    TruthValue
+        FROM SNMPv2-TC
+    flexbng
+        FROM NETELASTIC-FLEXBNG-MIB
+;
+
+sysInfoMib MODULE-IDENTITY
+    LAST-UPDATED "201601300000Z"
+    ORGANIZATION "@ORGANIZATION"
+    CONTACT-INFO "@CONTACT-INFO"
+    DESCRIPTION ""
+    REVISION "201601300000Z"
+    DESCRIPTION "@REVISION-DESCRIPTION"
+    ::= { flexbng 8 }
+
+ConfdString ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION "xs: and confd: types mapped to strings"
+    SYNTAX      OCTET STRING
+
+String ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION "xs:string"
+    SYNTAX      OCTET STRING
+
+-- MIB information
+sysInfoMibInfo OBJECT IDENTIFIER ::= { sysInfoMib 1 }
+
+cpuUsage OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 .. 100)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { sysInfoMibInfo 1 }
+
+memUsage OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 .. 100)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { sysInfoMibInfo 2 }
+
+END

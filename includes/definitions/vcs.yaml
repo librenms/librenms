@@ -3,10 +3,8 @@ text: 'Video Communication Server'
 type: collaboration
 icon: cisco
 poller_modules:
-    cisco-cbqos: true
     cisco-cef: true
     cisco-mac-accounting: true
-    cisco-voice: true
     cisco-remote-access-monitor: true
     slas: true
     cisco-ipsec-flow-monitor: true

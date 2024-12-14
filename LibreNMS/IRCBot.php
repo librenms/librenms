@@ -899,10 +899,10 @@ class IRCBot
             return $this->respond('Error: Port not found or you do not have access.');
         }
 
-        $bps_in = Number::formatSi($port['ifInOctets_rate'] * 8, 2, 3, 'bps');
-        $bps_out = Number::formatSi($port['ifOutOctets_rate'] * 8, 2, 3, 'bps');
-        $pps_in = Number::formatBi($port['ifInUcastPkts_rate'], 2, 3, 'pps');
-        $pps_out = Number::formatBi($port['ifOutUcastPkts_rate'], 2, 3, 'pps');
+        $bps_in = Number::formatSi($port['ifInOctets_rate'] * 8, 2, 0, 'bps');
+        $bps_out = Number::formatSi($port['ifOutOctets_rate'] * 8, 2, 0, 'bps');
+        $pps_in = Number::formatBi($port['ifInUcastPkts_rate'], 2, 0, 'pps');
+        $pps_out = Number::formatBi($port['ifOutUcastPkts_rate'], 2, 0, 'pps');
 
         return $this->respond($port['ifAdminStatus'] . '/' . $port['ifOperStatus'] . ' ' . $bps_in . ' > bps > ' . $bps_out . ' | ' . $pps_in . ' > PPS > ' . $pps_out);
     }

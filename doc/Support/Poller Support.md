@@ -74,7 +74,6 @@ disable it for one device then you can do this within the WebUI Device
     lnms config:set poller_modules.cisco-ace-loadbalancer false
     lnms config:set poller_modules.cisco-ace-serverfarms false
     lnms config:set poller_modules.cisco-asa-firewall false
-    lnms config:set poller_modules.cisco-voice false
     lnms config:set poller_modules.cisco-cbqos false
     lnms config:set poller_modules.cisco-otv false
     lnms config:set poller_modules.cisco-vpdn false

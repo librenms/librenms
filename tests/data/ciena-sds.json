@@ -36145,11 +36145,30 @@
                     "ifIndex": null
                 },
                 {
+                    "entPhysicalIndex": 57,
+                    "entPhysicalDescr": "port  850 nm  transceiver manufactured 08/23/18 ",
+                    "entPhysicalClass": "sensor",
+                    "entPhysicalName": null,
+                    "entPhysicalHardwareRev": "000A",
+                    "entPhysicalFirmwareRev": null,
+                    "entPhysicalSoftwareRev": null,
+                    "entPhysicalAlias": null,
+                    "entPhysicalAssetID": null,
+                    "entPhysicalIsFRU": "true",
+                    "entPhysicalModelName": "SFP-10GSR-85",
+                    "entPhysicalVendorType": null,
+                    "entPhysicalSerialNum": "S1812345678",
+                    "entPhysicalContainedIn": 56212,
+                    "entPhysicalParentRelPos": -1,
+                    "entPhysicalMfgName": "FS",
+                    "ifIndex": null
+                },
+                {
                     "entPhysicalIndex": 401,
                     "entPhysicalDescr": null,
                     "entPhysicalClass": "container",
                     "entPhysicalName": "Modules",
-                    "entPhysicalHardwareRev": "",
+                    "entPhysicalHardwareRev": null,
                     "entPhysicalFirmwareRev": null,
                     "entPhysicalSoftwareRev": null,
                     "entPhysicalAlias": null,
@@ -36168,7 +36187,7 @@
                     "entPhysicalDescr": null,
                     "entPhysicalClass": "container",
                     "entPhysicalName": "Power Supplies",
-                    "entPhysicalHardwareRev": "",
+                    "entPhysicalHardwareRev": null,
                     "entPhysicalFirmwareRev": null,
                     "entPhysicalSoftwareRev": null,
                     "entPhysicalAlias": null,
@@ -36503,7 +36522,7 @@
                     "entPhysicalContainedIn": 551,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100001
+                    "ifIndex": 1
                 },
                 {
                     "entPhysicalIndex": 562,
@@ -36522,7 +36541,7 @@
                     "entPhysicalContainedIn": 551,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100002
+                    "ifIndex": 2
                 },
                 {
                     "entPhysicalIndex": 563,
@@ -36541,7 +36560,7 @@
                     "entPhysicalContainedIn": 551,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100003
+                    "ifIndex": 3
                 },
                 {
                     "entPhysicalIndex": 564,
@@ -36560,7 +36579,7 @@
                     "entPhysicalContainedIn": 551,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100004
+                    "ifIndex": 4
                 },
                 {
                     "entPhysicalIndex": 565,
@@ -36579,7 +36598,7 @@
                     "entPhysicalContainedIn": 551,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100005
+                    "ifIndex": 5
                 },
                 {
                     "entPhysicalIndex": 566,
@@ -36598,7 +36617,7 @@
                     "entPhysicalContainedIn": 551,
                     "entPhysicalParentRelPos": 6,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100006
+                    "ifIndex": 6
                 },
                 {
                     "entPhysicalIndex": 567,
@@ -36617,7 +36636,7 @@
                     "entPhysicalContainedIn": 551,
                     "entPhysicalParentRelPos": 7,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100007
+                    "ifIndex": 7
                 },
                 {
                     "entPhysicalIndex": 568,
@@ -36636,7 +36655,7 @@
                     "entPhysicalContainedIn": 551,
                     "entPhysicalParentRelPos": 8,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100008
+                    "ifIndex": 8
                 },
                 {
                     "entPhysicalIndex": 569,
@@ -36655,7 +36674,7 @@
                     "entPhysicalContainedIn": 551,
                     "entPhysicalParentRelPos": 9,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100009
+                    "ifIndex": 9
                 },
                 {
                     "entPhysicalIndex": 5117,
@@ -36921,7 +36940,7 @@
                     "entPhysicalContainedIn": 551,
                     "entPhysicalParentRelPos": 10,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100010
+                    "ifIndex": 10
                 },
                 {
                     "entPhysicalIndex": 5611,
@@ -36940,7 +36959,7 @@
                     "entPhysicalContainedIn": 551,
                     "entPhysicalParentRelPos": 11,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100011
+                    "ifIndex": 11
                 },
                 {
                     "entPhysicalIndex": 5612,
@@ -36959,7 +36978,7 @@
                     "entPhysicalContainedIn": 551,
                     "entPhysicalParentRelPos": 12,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100012
+                    "ifIndex": 12
                 },
                 {
                     "entPhysicalIndex": 5613,
@@ -36978,7 +36997,7 @@
                     "entPhysicalContainedIn": 551,
                     "entPhysicalParentRelPos": 13,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100013
+                    "ifIndex": 13
                 },
                 {
                     "entPhysicalIndex": 5614,
@@ -36997,7 +37016,7 @@
                     "entPhysicalContainedIn": 551,
                     "entPhysicalParentRelPos": 14,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100014
+                    "ifIndex": 14
                 },
                 {
                     "entPhysicalIndex": 5615,
@@ -37016,7 +37035,7 @@
                     "entPhysicalContainedIn": 551,
                     "entPhysicalParentRelPos": 15,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100015
+                    "ifIndex": 15
                 },
                 {
                     "entPhysicalIndex": 5616,
@@ -37035,7 +37054,7 @@
                     "entPhysicalContainedIn": 551,
                     "entPhysicalParentRelPos": 16,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100016
+                    "ifIndex": 16
                 },
                 {
                     "entPhysicalIndex": 5617,
@@ -37054,7 +37073,7 @@
                     "entPhysicalContainedIn": 551,
                     "entPhysicalParentRelPos": 17,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100017
+                    "ifIndex": 17
                 },
                 {
                     "entPhysicalIndex": 5618,
@@ -37073,7 +37092,7 @@
                     "entPhysicalContainedIn": 551,
                     "entPhysicalParentRelPos": 18,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100018
+                    "ifIndex": 18
                 },
                 {
                     "entPhysicalIndex": 5619,
@@ -37092,7 +37111,7 @@
                     "entPhysicalContainedIn": 551,
                     "entPhysicalParentRelPos": 19,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100019
+                    "ifIndex": 19
                 },
                 {
                     "entPhysicalIndex": 5620,
@@ -37111,7 +37130,7 @@
                     "entPhysicalContainedIn": 551,
                     "entPhysicalParentRelPos": 20,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100020
+                    "ifIndex": 20
                 },
                 {
                     "entPhysicalIndex": 5621,
@@ -37130,7 +37149,7 @@
                     "entPhysicalContainedIn": 551,
                     "entPhysicalParentRelPos": 21,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100021
+                    "ifIndex": 21
                 },
                 {
                     "entPhysicalIndex": 5622,
@@ -37149,7 +37168,7 @@
                     "entPhysicalContainedIn": 551,
                     "entPhysicalParentRelPos": 22,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100022
+                    "ifIndex": 22
                 },
                 {
                     "entPhysicalIndex": 5623,
@@ -37168,7 +37187,7 @@
                     "entPhysicalContainedIn": 551,
                     "entPhysicalParentRelPos": 23,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100023
+                    "ifIndex": 23
                 },
                 {
                     "entPhysicalIndex": 5624,
@@ -37187,7 +37206,7 @@
                     "entPhysicalContainedIn": 551,
                     "entPhysicalParentRelPos": 24,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100024
+                    "ifIndex": 24
                 },
                 {
                     "entPhysicalIndex": 5625,
@@ -37206,7 +37225,7 @@
                     "entPhysicalContainedIn": 551,
                     "entPhysicalParentRelPos": 25,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100025
+                    "ifIndex": 25
                 },
                 {
                     "entPhysicalIndex": 5626,
@@ -37225,7 +37244,7 @@
                     "entPhysicalContainedIn": 551,
                     "entPhysicalParentRelPos": 26,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100026
+                    "ifIndex": 26
                 },
                 {
                     "entPhysicalIndex": 5627,
@@ -37244,7 +37263,7 @@
                     "entPhysicalContainedIn": 551,
                     "entPhysicalParentRelPos": 27,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100027
+                    "ifIndex": 27
                 },
                 {
                     "entPhysicalIndex": 5628,
@@ -37263,7 +37282,7 @@
                     "entPhysicalContainedIn": 551,
                     "entPhysicalParentRelPos": 28,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100028
+                    "ifIndex": 28
                 },
                 {
                     "entPhysicalIndex": 5629,
@@ -37282,7 +37301,7 @@
                     "entPhysicalContainedIn": 551,
                     "entPhysicalParentRelPos": 29,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100029
+                    "ifIndex": 29
                 },
                 {
                     "entPhysicalIndex": 5630,
@@ -37301,7 +37320,7 @@
                     "entPhysicalContainedIn": 551,
                     "entPhysicalParentRelPos": 30,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100030
+                    "ifIndex": 30
                 },
                 {
                     "entPhysicalIndex": 5631,
@@ -37320,7 +37339,7 @@
                     "entPhysicalContainedIn": 551,
                     "entPhysicalParentRelPos": 31,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100031
+                    "ifIndex": 31
                 },
                 {
                     "entPhysicalIndex": 5632,
@@ -37339,7 +37358,7 @@
                     "entPhysicalContainedIn": 551,
                     "entPhysicalParentRelPos": 32,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100032
+                    "ifIndex": 32
                 },
                 {
                     "entPhysicalIndex": 5633,
@@ -37358,7 +37377,7 @@
                     "entPhysicalContainedIn": 551,
                     "entPhysicalParentRelPos": 33,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100033
+                    "ifIndex": 33
                 },
                 {
                     "entPhysicalIndex": 5634,
@@ -37377,7 +37396,7 @@
                     "entPhysicalContainedIn": 551,
                     "entPhysicalParentRelPos": 34,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100034
+                    "ifIndex": 34
                 },
                 {
                     "entPhysicalIndex": 5635,
@@ -37396,7 +37415,7 @@
                     "entPhysicalContainedIn": 551,
                     "entPhysicalParentRelPos": 35,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100035
+                    "ifIndex": 35
                 },
                 {
                     "entPhysicalIndex": 5636,
@@ -37415,7 +37434,7 @@
                     "entPhysicalContainedIn": 551,
                     "entPhysicalParentRelPos": 36,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100036
+                    "ifIndex": 36
                 },
                 {
                     "entPhysicalIndex": 5637,
@@ -37434,7 +37453,7 @@
                     "entPhysicalContainedIn": 551,
                     "entPhysicalParentRelPos": 37,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100037
+                    "ifIndex": 37
                 },
                 {
                     "entPhysicalIndex": 5638,
@@ -37453,7 +37472,7 @@
                     "entPhysicalContainedIn": 551,
                     "entPhysicalParentRelPos": 38,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100038
+                    "ifIndex": 38
                 },
                 {
                     "entPhysicalIndex": 5639,
@@ -37472,7 +37491,7 @@
                     "entPhysicalContainedIn": 551,
                     "entPhysicalParentRelPos": 39,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100039
+                    "ifIndex": 39
                 },
                 {
                     "entPhysicalIndex": 5640,
@@ -37491,7 +37510,7 @@
                     "entPhysicalContainedIn": 551,
                     "entPhysicalParentRelPos": 40,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100040
+                    "ifIndex": 40
                 },
                 {
                     "entPhysicalIndex": 5641,
@@ -37510,7 +37529,7 @@
                     "entPhysicalContainedIn": 551,
                     "entPhysicalParentRelPos": 41,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100041
+                    "ifIndex": 41
                 },
                 {
                     "entPhysicalIndex": 5642,
@@ -37529,7 +37548,7 @@
                     "entPhysicalContainedIn": 551,
                     "entPhysicalParentRelPos": 42,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100042
+                    "ifIndex": 42
                 },
                 {
                     "entPhysicalIndex": 5643,
@@ -37548,7 +37567,7 @@
                     "entPhysicalContainedIn": 551,
                     "entPhysicalParentRelPos": 43,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100043
+                    "ifIndex": 43
                 },
                 {
                     "entPhysicalIndex": 5644,
@@ -37567,7 +37586,7 @@
                     "entPhysicalContainedIn": 551,
                     "entPhysicalParentRelPos": 44,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100044
+                    "ifIndex": 44
                 },
                 {
                     "entPhysicalIndex": 5665,
@@ -37586,7 +37605,7 @@
                     "entPhysicalContainedIn": 552,
                     "entPhysicalParentRelPos": 65,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100065
+                    "ifIndex": 65
                 },
                 {
                     "entPhysicalIndex": 5666,
@@ -37605,7 +37624,7 @@
                     "entPhysicalContainedIn": 552,
                     "entPhysicalParentRelPos": 66,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100066
+                    "ifIndex": 66
                 },
                 {
                     "entPhysicalIndex": 5667,
@@ -37624,7 +37643,7 @@
                     "entPhysicalContainedIn": 552,
                     "entPhysicalParentRelPos": 67,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100067
+                    "ifIndex": 67
                 },
                 {
                     "entPhysicalIndex": 5668,
@@ -37643,7 +37662,7 @@
                     "entPhysicalContainedIn": 552,
                     "entPhysicalParentRelPos": 68,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100068
+                    "ifIndex": 68
                 },
                 {
                     "entPhysicalIndex": 5669,
@@ -37662,7 +37681,7 @@
                     "entPhysicalContainedIn": 552,
                     "entPhysicalParentRelPos": 69,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100069
+                    "ifIndex": 69
                 },
                 {
                     "entPhysicalIndex": 5670,
@@ -37681,7 +37700,7 @@
                     "entPhysicalContainedIn": 552,
                     "entPhysicalParentRelPos": 70,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100070
+                    "ifIndex": 70
                 },
                 {
                     "entPhysicalIndex": 5671,
@@ -37700,7 +37719,7 @@
                     "entPhysicalContainedIn": 552,
                     "entPhysicalParentRelPos": 71,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100071
+                    "ifIndex": 71
                 },
                 {
                     "entPhysicalIndex": 5672,
@@ -37719,7 +37738,7 @@
                     "entPhysicalContainedIn": 552,
                     "entPhysicalParentRelPos": 72,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100072
+                    "ifIndex": 72
                 },
                 {
                     "entPhysicalIndex": 56129,
@@ -37738,7 +37757,7 @@
                     "entPhysicalContainedIn": 553,
                     "entPhysicalParentRelPos": 129,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100129
+                    "ifIndex": 129
                 },
                 {
                     "entPhysicalIndex": 56130,
@@ -37757,7 +37776,7 @@
                     "entPhysicalContainedIn": 553,
                     "entPhysicalParentRelPos": 130,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100130
+                    "ifIndex": 130
                 },
                 {
                     "entPhysicalIndex": 56131,
@@ -37776,7 +37795,7 @@
                     "entPhysicalContainedIn": 553,
                     "entPhysicalParentRelPos": 131,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100131
+                    "ifIndex": 131
                 },
                 {
                     "entPhysicalIndex": 56132,
@@ -37795,7 +37814,7 @@
                     "entPhysicalContainedIn": 553,
                     "entPhysicalParentRelPos": 132,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100132
+                    "ifIndex": 132
                 },
                 {
                     "entPhysicalIndex": 56133,
@@ -37814,7 +37833,7 @@
                     "entPhysicalContainedIn": 553,
                     "entPhysicalParentRelPos": 133,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100133
+                    "ifIndex": 133
                 },
                 {
                     "entPhysicalIndex": 56134,
@@ -37833,7 +37852,7 @@
                     "entPhysicalContainedIn": 553,
                     "entPhysicalParentRelPos": 134,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100134
+                    "ifIndex": 134
                 },
                 {
                     "entPhysicalIndex": 56135,
@@ -37852,7 +37871,7 @@
                     "entPhysicalContainedIn": 553,
                     "entPhysicalParentRelPos": 135,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100135
+                    "ifIndex": 135
                 },
                 {
                     "entPhysicalIndex": 56136,
@@ -37871,7 +37890,7 @@
                     "entPhysicalContainedIn": 553,
                     "entPhysicalParentRelPos": 136,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100136
+                    "ifIndex": 136
                 },
                 {
                     "entPhysicalIndex": 56193,
@@ -37890,7 +37909,7 @@
                     "entPhysicalContainedIn": 554,
                     "entPhysicalParentRelPos": 193,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100193
+                    "ifIndex": 193
                 },
                 {
                     "entPhysicalIndex": 56194,
@@ -37909,7 +37928,7 @@
                     "entPhysicalContainedIn": 554,
                     "entPhysicalParentRelPos": 194,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100194
+                    "ifIndex": 194
                 },
                 {
                     "entPhysicalIndex": 56195,
@@ -37928,7 +37947,7 @@
                     "entPhysicalContainedIn": 554,
                     "entPhysicalParentRelPos": 195,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100195
+                    "ifIndex": 195
                 },
                 {
                     "entPhysicalIndex": 56196,
@@ -37947,7 +37966,7 @@
                     "entPhysicalContainedIn": 554,
                     "entPhysicalParentRelPos": 196,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100196
+                    "ifIndex": 196
                 },
                 {
                     "entPhysicalIndex": 56197,
@@ -37966,7 +37985,7 @@
                     "entPhysicalContainedIn": 554,
                     "entPhysicalParentRelPos": 197,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100197
+                    "ifIndex": 197
                 },
                 {
                     "entPhysicalIndex": 56198,
@@ -37985,7 +38004,7 @@
                     "entPhysicalContainedIn": 554,
                     "entPhysicalParentRelPos": 198,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100198
+                    "ifIndex": 198
                 },
                 {
                     "entPhysicalIndex": 56199,
@@ -38004,7 +38023,7 @@
                     "entPhysicalContainedIn": 554,
                     "entPhysicalParentRelPos": 199,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100199
+                    "ifIndex": 199
                 },
                 {
                     "entPhysicalIndex": 56200,
@@ -38023,7 +38042,7 @@
                     "entPhysicalContainedIn": 554,
                     "entPhysicalParentRelPos": 200,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100200
+                    "ifIndex": 200
                 },
                 {
                     "entPhysicalIndex": 56201,
@@ -38042,7 +38061,7 @@
                     "entPhysicalContainedIn": 554,
                     "entPhysicalParentRelPos": 201,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100201
+                    "ifIndex": 201
                 },
                 {
                     "entPhysicalIndex": 56202,
@@ -38061,7 +38080,7 @@
                     "entPhysicalContainedIn": 554,
                     "entPhysicalParentRelPos": 202,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100202
+                    "ifIndex": 202
                 },
                 {
                     "entPhysicalIndex": 56203,
@@ -38080,7 +38099,7 @@
                     "entPhysicalContainedIn": 554,
                     "entPhysicalParentRelPos": 203,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100203
+                    "ifIndex": 203
                 },
                 {
                     "entPhysicalIndex": 56204,
@@ -38099,7 +38118,7 @@
                     "entPhysicalContainedIn": 554,
                     "entPhysicalParentRelPos": 204,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100204
+                    "ifIndex": 204
                 },
                 {
                     "entPhysicalIndex": 56205,
@@ -38118,7 +38137,7 @@
                     "entPhysicalContainedIn": 554,
                     "entPhysicalParentRelPos": 205,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100205
+                    "ifIndex": 205
                 },
                 {
                     "entPhysicalIndex": 56206,
@@ -38137,7 +38156,7 @@
                     "entPhysicalContainedIn": 554,
                     "entPhysicalParentRelPos": 206,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100206
+                    "ifIndex": 206
                 },
                 {
                     "entPhysicalIndex": 56207,
@@ -38156,7 +38175,7 @@
                     "entPhysicalContainedIn": 554,
                     "entPhysicalParentRelPos": 207,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100207
+                    "ifIndex": 207
                 },
                 {
                     "entPhysicalIndex": 56208,
@@ -38175,7 +38194,7 @@
                     "entPhysicalContainedIn": 554,
                     "entPhysicalParentRelPos": 208,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100208
+                    "ifIndex": 208
                 },
                 {
                     "entPhysicalIndex": 56209,
@@ -38194,7 +38213,7 @@
                     "entPhysicalContainedIn": 554,
                     "entPhysicalParentRelPos": 209,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100209
+                    "ifIndex": 209
                 },
                 {
                     "entPhysicalIndex": 56210,
@@ -38213,7 +38232,7 @@
                     "entPhysicalContainedIn": 554,
                     "entPhysicalParentRelPos": 210,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100210
+                    "ifIndex": 210
                 },
                 {
                     "entPhysicalIndex": 56211,
@@ -38232,7 +38251,7 @@
                     "entPhysicalContainedIn": 554,
                     "entPhysicalParentRelPos": 211,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100211
+                    "ifIndex": 211
                 },
                 {
                     "entPhysicalIndex": 56212,
@@ -38251,7 +38270,7 @@
                     "entPhysicalContainedIn": 554,
                     "entPhysicalParentRelPos": 212,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100212
+                    "ifIndex": 212
                 },
                 {
                     "entPhysicalIndex": 56213,
@@ -38270,7 +38289,7 @@
                     "entPhysicalContainedIn": 554,
                     "entPhysicalParentRelPos": 213,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100213
+                    "ifIndex": 213
                 },
                 {
                     "entPhysicalIndex": 56214,
@@ -38289,7 +38308,7 @@
                     "entPhysicalContainedIn": 554,
                     "entPhysicalParentRelPos": 214,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100214
+                    "ifIndex": 214
                 },
                 {
                     "entPhysicalIndex": 56215,
@@ -38308,7 +38327,7 @@
                     "entPhysicalContainedIn": 554,
                     "entPhysicalParentRelPos": 215,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100215
+                    "ifIndex": 215
                 },
                 {
                     "entPhysicalIndex": 56216,
@@ -38327,7 +38346,7 @@
                     "entPhysicalContainedIn": 554,
                     "entPhysicalParentRelPos": 216,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100216
+                    "ifIndex": 216
                 },
                 {
                     "entPhysicalIndex": 56217,
@@ -38346,7 +38365,7 @@
                     "entPhysicalContainedIn": 554,
                     "entPhysicalParentRelPos": 217,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100217
+                    "ifIndex": 217
                 },
                 {
                     "entPhysicalIndex": 56218,
@@ -38365,7 +38384,7 @@
                     "entPhysicalContainedIn": 554,
                     "entPhysicalParentRelPos": 218,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100218
+                    "ifIndex": 218
                 },
                 {
                     "entPhysicalIndex": 56219,
@@ -38384,7 +38403,7 @@
                     "entPhysicalContainedIn": 554,
                     "entPhysicalParentRelPos": 219,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100219
+                    "ifIndex": 219
                 },
                 {
                     "entPhysicalIndex": 56220,
@@ -38403,7 +38422,7 @@
                     "entPhysicalContainedIn": 554,
                     "entPhysicalParentRelPos": 220,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100220
+                    "ifIndex": 220
                 },
                 {
                     "entPhysicalIndex": 56221,
@@ -38422,7 +38441,7 @@
                     "entPhysicalContainedIn": 554,
                     "entPhysicalParentRelPos": 221,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100221
+                    "ifIndex": 221
                 },
                 {
                     "entPhysicalIndex": 56222,
@@ -38441,7 +38460,7 @@
                     "entPhysicalContainedIn": 554,
                     "entPhysicalParentRelPos": 222,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100222
+                    "ifIndex": 222
                 },
                 {
                     "entPhysicalIndex": 56223,
@@ -38460,463 +38479,7 @@
                     "entPhysicalContainedIn": 554,
                     "entPhysicalParentRelPos": 223,
                     "entPhysicalMfgName": null,
-                    "ifIndex": 100223
-                },
-                {
-                    "entPhysicalIndex": 100001,
-                    "entPhysicalDescr": " qsfpPlus transceiver manufactured 18/10/20 ",
-                    "entPhysicalClass": "sensor",
-                    "entPhysicalName": null,
-                    "entPhysicalHardwareRev": "",
-                    "entPhysicalFirmwareRev": null,
-                    "entPhysicalSoftwareRev": null,
-                    "entPhysicalAlias": null,
-                    "entPhysicalAssetID": null,
-                    "entPhysicalIsFRU": "true",
-                    "entPhysicalModelName": "323637322D30325630322001",
-                    "entPhysicalVendorType": null,
-                    "entPhysicalSerialNum": "S1812345678",
-                    "entPhysicalContainedIn": 561,
-                    "entPhysicalParentRelPos": -1,
-                    "entPhysicalMfgName": "",
-                    "ifIndex": null
-                },
-                {
-                    "entPhysicalIndex": 100003,
-                    "entPhysicalDescr": "CIENA qsfp28 transceiver manufactured 03/02/20 ",
-                    "entPhysicalClass": "sensor",
-                    "entPhysicalName": null,
-                    "entPhysicalHardwareRev": "",
-                    "entPhysicalFirmwareRev": null,
-                    "entPhysicalSoftwareRev": null,
-                    "entPhysicalAlias": null,
-                    "entPhysicalAssetID": null,
-                    "entPhysicalIsFRU": "true",
-                    "entPhysicalModelName": "160-9400-900",
-                    "entPhysicalVendorType": null,
-                    "entPhysicalSerialNum": "AVAGCN1234FG1234",
-                    "entPhysicalContainedIn": 563,
-                    "entPhysicalParentRelPos": -1,
-                    "entPhysicalMfgName": "CIENA",
-                    "ifIndex": null
-                },
-                {
-                    "entPhysicalIndex": 100004,
-                    "entPhysicalDescr": "FFFFFFFFFF qsfp28 transceiver manufactured 12/06/18 ",
-                    "entPhysicalClass": "sensor",
-                    "entPhysicalName": null,
-                    "entPhysicalHardwareRev": "",
-                    "entPhysicalFirmwareRev": null,
-                    "entPhysicalSoftwareRev": null,
-                    "entPhysicalAlias": null,
-                    "entPhysicalAssetID": null,
-                    "entPhysicalIsFRU": "true",
-                    "entPhysicalModelName": "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
-                    "entPhysicalVendorType": null,
-                    "entPhysicalSerialNum": "S1812345678",
-                    "entPhysicalContainedIn": 564,
-                    "entPhysicalParentRelPos": -1,
-                    "entPhysicalMfgName": "FFFFFFFFFF",
-                    "ifIndex": null
-                },
-                {
-                    "entPhysicalIndex": 100005,
-                    "entPhysicalDescr": "CIENA-INN qsfp28 transceiver manufactured 02/24/20 ",
-                    "entPhysicalClass": "sensor",
-                    "entPhysicalName": null,
-                    "entPhysicalHardwareRev": "",
-                    "entPhysicalFirmwareRev": null,
-                    "entPhysicalSoftwareRev": null,
-                    "entPhysicalAlias": null,
-                    "entPhysicalAssetID": null,
-                    "entPhysicalIsFRU": "true",
-                    "entPhysicalModelName": "XCVR-Q30V31",
-                    "entPhysicalVendorType": null,
-                    "entPhysicalSerialNum": "INKAC5123456",
-                    "entPhysicalContainedIn": 565,
-                    "entPhysicalParentRelPos": -1,
-                    "entPhysicalMfgName": "CIENA-INN",
-                    "ifIndex": null
-                },
-                {
-                    "entPhysicalIndex": 100006,
-                    "entPhysicalDescr": "CIENA-INN qsfp28 transceiver manufactured 02/24/20 ",
-                    "entPhysicalClass": "sensor",
-                    "entPhysicalName": null,
-                    "entPhysicalHardwareRev": "",
-                    "entPhysicalFirmwareRev": null,
-                    "entPhysicalSoftwareRev": null,
-                    "entPhysicalAlias": null,
-                    "entPhysicalAssetID": null,
-                    "entPhysicalIsFRU": "true",
-                    "entPhysicalModelName": "XCVR-Q30V31",
-                    "entPhysicalVendorType": null,
-                    "entPhysicalSerialNum": "INKAC5123456",
-                    "entPhysicalContainedIn": 566,
-                    "entPhysicalParentRelPos": -1,
-                    "entPhysicalMfgName": "CIENA-INN",
-                    "ifIndex": null
-                },
-                {
-                    "entPhysicalIndex": 100007,
-                    "entPhysicalDescr": "CIENA-INN qsfp28 transceiver manufactured 02/24/20 ",
-                    "entPhysicalClass": "sensor",
-                    "entPhysicalName": null,
-                    "entPhysicalHardwareRev": "",
-                    "entPhysicalFirmwareRev": null,
-                    "entPhysicalSoftwareRev": null,
-                    "entPhysicalAlias": null,
-                    "entPhysicalAssetID": null,
-                    "entPhysicalIsFRU": "true",
-                    "entPhysicalModelName": "XCVR-Q30V31",
-                    "entPhysicalVendorType": null,
-                    "entPhysicalSerialNum": "INKAC5123456",
-                    "entPhysicalContainedIn": 567,
-                    "entPhysicalParentRelPos": -1,
-                    "entPhysicalMfgName": "CIENA-INN",
-                    "ifIndex": null
-                },
-                {
-                    "entPhysicalIndex": 100065,
-                    "entPhysicalDescr": " qsfpPlus transceiver manufactured 18/10/20 ",
-                    "entPhysicalClass": "sensor",
-                    "entPhysicalName": null,
-                    "entPhysicalHardwareRev": "",
-                    "entPhysicalFirmwareRev": null,
-                    "entPhysicalSoftwareRev": null,
-                    "entPhysicalAlias": null,
-                    "entPhysicalAssetID": null,
-                    "entPhysicalIsFRU": "true",
-                    "entPhysicalModelName": "323637322D30325630322001",
-                    "entPhysicalVendorType": null,
-                    "entPhysicalSerialNum": "S1812345678",
-                    "entPhysicalContainedIn": 5665,
-                    "entPhysicalParentRelPos": -1,
-                    "entPhysicalMfgName": "",
-                    "ifIndex": null
-                },
-                {
-                    "entPhysicalIndex": 100067,
-                    "entPhysicalDescr": "CIENA qsfp28 transceiver manufactured 03/02/20 ",
-                    "entPhysicalClass": "sensor",
-                    "entPhysicalName": null,
-                    "entPhysicalHardwareRev": "",
-                    "entPhysicalFirmwareRev": null,
-                    "entPhysicalSoftwareRev": null,
-                    "entPhysicalAlias": null,
-                    "entPhysicalAssetID": null,
-                    "entPhysicalIsFRU": "true",
-                    "entPhysicalModelName": "160-9400-900",
-                    "entPhysicalVendorType": null,
-                    "entPhysicalSerialNum": "AVAGCN1234FG1234",
-                    "entPhysicalContainedIn": 5667,
-                    "entPhysicalParentRelPos": -1,
-                    "entPhysicalMfgName": "CIENA",
-                    "ifIndex": null
-                },
-                {
-                    "entPhysicalIndex": 100068,
-                    "entPhysicalDescr": "CIENA-INN qsfp28 transceiver manufactured 02/24/20 ",
-                    "entPhysicalClass": "sensor",
-                    "entPhysicalName": null,
-                    "entPhysicalHardwareRev": "",
-                    "entPhysicalFirmwareRev": null,
-                    "entPhysicalSoftwareRev": null,
-                    "entPhysicalAlias": null,
-                    "entPhysicalAssetID": null,
-                    "entPhysicalIsFRU": "true",
-                    "entPhysicalModelName": "XCVR-Q30V31",
-                    "entPhysicalVendorType": null,
-                    "entPhysicalSerialNum": "INKAC5123456",
-                    "entPhysicalContainedIn": 5668,
-                    "entPhysicalParentRelPos": -1,
-                    "entPhysicalMfgName": "CIENA-INN",
-                    "ifIndex": null
-                },
-                {
-                    "entPhysicalIndex": 100069,
-                    "entPhysicalDescr": "CIENA-INN qsfp28 transceiver manufactured 02/24/20 ",
-                    "entPhysicalClass": "sensor",
-                    "entPhysicalName": null,
-                    "entPhysicalHardwareRev": "",
-                    "entPhysicalFirmwareRev": null,
-                    "entPhysicalSoftwareRev": null,
-                    "entPhysicalAlias": null,
-                    "entPhysicalAssetID": null,
-                    "entPhysicalIsFRU": "true",
-                    "entPhysicalModelName": "XCVR-Q30V31",
-                    "entPhysicalVendorType": null,
-                    "entPhysicalSerialNum": "INKAC5123456",
-                    "entPhysicalContainedIn": 5669,
-                    "entPhysicalParentRelPos": -1,
-                    "entPhysicalMfgName": "CIENA-INN",
-                    "ifIndex": null
-                },
-                {
-                    "entPhysicalIndex": 100070,
-                    "entPhysicalDescr": "CIENA-INN qsfp28 transceiver manufactured 02/24/20 ",
-                    "entPhysicalClass": "sensor",
-                    "entPhysicalName": null,
-                    "entPhysicalHardwareRev": "",
-                    "entPhysicalFirmwareRev": null,
-                    "entPhysicalSoftwareRev": null,
-                    "entPhysicalAlias": null,
-                    "entPhysicalAssetID": null,
-                    "entPhysicalIsFRU": "true",
-                    "entPhysicalModelName": "XCVR-Q30V31",
-                    "entPhysicalVendorType": null,
-                    "entPhysicalSerialNum": "INKAC5123456",
-                    "entPhysicalContainedIn": 5670,
-                    "entPhysicalParentRelPos": -1,
-                    "entPhysicalMfgName": "CIENA-INN",
-                    "ifIndex": null
-                },
-                {
-                    "entPhysicalIndex": 100071,
-                    "entPhysicalDescr": "CIENA-INN qsfp28 transceiver manufactured 02/24/20 ",
-                    "entPhysicalClass": "sensor",
-                    "entPhysicalName": null,
-                    "entPhysicalHardwareRev": "",
-                    "entPhysicalFirmwareRev": null,
-                    "entPhysicalSoftwareRev": null,
-                    "entPhysicalAlias": null,
-                    "entPhysicalAssetID": null,
-                    "entPhysicalIsFRU": "true",
-                    "entPhysicalModelName": "XCVR-Q30V31",
-                    "entPhysicalVendorType": null,
-                    "entPhysicalSerialNum": "INKAC5123456",
-                    "entPhysicalContainedIn": 5671,
-                    "entPhysicalParentRelPos": -1,
-                    "entPhysicalMfgName": "CIENA-INN",
-                    "ifIndex": null
-                },
-                {
-                    "entPhysicalIndex": 100131,
-                    "entPhysicalDescr": "FFFFFFFFFF qsfp28 transceiver manufactured 12/06/18 ",
-                    "entPhysicalClass": "sensor",
-                    "entPhysicalName": null,
-                    "entPhysicalHardwareRev": "",
-                    "entPhysicalFirmwareRev": null,
-                    "entPhysicalSoftwareRev": null,
-                    "entPhysicalAlias": null,
-                    "entPhysicalAssetID": null,
-                    "entPhysicalIsFRU": "true",
-                    "entPhysicalModelName": "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
-                    "entPhysicalVendorType": null,
-                    "entPhysicalSerialNum": "S1812345678",
-                    "entPhysicalContainedIn": 56131,
-                    "entPhysicalParentRelPos": -1,
-                    "entPhysicalMfgName": "FFFFFFFFFF",
-                    "ifIndex": null
-                },
-                {
-                    "entPhysicalIndex": 100132,
-                    "entPhysicalDescr": "CIENA-INN qsfp28 transceiver manufactured 02/24/20 ",
-                    "entPhysicalClass": "sensor",
-                    "entPhysicalName": null,
-                    "entPhysicalHardwareRev": "",
-                    "entPhysicalFirmwareRev": null,
-                    "entPhysicalSoftwareRev": null,
-                    "entPhysicalAlias": null,
-                    "entPhysicalAssetID": null,
-                    "entPhysicalIsFRU": "true",
-                    "entPhysicalModelName": "XCVR-Q30V31",
-                    "entPhysicalVendorType": null,
-                    "entPhysicalSerialNum": "INKAC5123456",
-                    "entPhysicalContainedIn": 56132,
-                    "entPhysicalParentRelPos": -1,
-                    "entPhysicalMfgName": "CIENA-INN",
-                    "ifIndex": null
-                },
-                {
-                    "entPhysicalIndex": 100133,
-                    "entPhysicalDescr": "CIENA-INN qsfp28 transceiver manufactured 02/24/20 ",
-                    "entPhysicalClass": "sensor",
-                    "entPhysicalName": null,
-                    "entPhysicalHardwareRev": "",
-                    "entPhysicalFirmwareRev": null,
-                    "entPhysicalSoftwareRev": null,
-                    "entPhysicalAlias": null,
-                    "entPhysicalAssetID": null,
-                    "entPhysicalIsFRU": "true",
-                    "entPhysicalModelName": "XCVR-Q30V31",
-                    "entPhysicalVendorType": null,
-                    "entPhysicalSerialNum": "INKAC5123456",
-                    "entPhysicalContainedIn": 56133,
-                    "entPhysicalParentRelPos": -1,
-                    "entPhysicalMfgName": "CIENA-INN",
-                    "ifIndex": null
-                },
-                {
-                    "entPhysicalIndex": 100134,
-                    "entPhysicalDescr": "CIENA-INN qsfp28 transceiver manufactured 02/24/20 ",
-                    "entPhysicalClass": "sensor",
-                    "entPhysicalName": null,
-                    "entPhysicalHardwareRev": "",
-                    "entPhysicalFirmwareRev": null,
-                    "entPhysicalSoftwareRev": null,
-                    "entPhysicalAlias": null,
-                    "entPhysicalAssetID": null,
-                    "entPhysicalIsFRU": "true",
-                    "entPhysicalModelName": "XCVR-Q30V31",
-                    "entPhysicalVendorType": null,
-                    "entPhysicalSerialNum": "INKAC5123456",
-                    "entPhysicalContainedIn": 56134,
-                    "entPhysicalParentRelPos": -1,
-                    "entPhysicalMfgName": "CIENA-INN",
-                    "ifIndex": null
-                },
-                {
-                    "entPhysicalIndex": 100135,
-                    "entPhysicalDescr": "CIENA-INN qsfp28 transceiver manufactured 02/24/20 ",
-                    "entPhysicalClass": "sensor",
-                    "entPhysicalName": null,
-                    "entPhysicalHardwareRev": "",
-                    "entPhysicalFirmwareRev": null,
-                    "entPhysicalSoftwareRev": null,
-                    "entPhysicalAlias": null,
-                    "entPhysicalAssetID": null,
-                    "entPhysicalIsFRU": "true",
-                    "entPhysicalModelName": "XCVR-Q30V31",
-                    "entPhysicalVendorType": null,
-                    "entPhysicalSerialNum": "INKAC5123456",
-                    "entPhysicalContainedIn": 56135,
-                    "entPhysicalParentRelPos": -1,
-                    "entPhysicalMfgName": "CIENA-INN",
-                    "ifIndex": null
-                },
-                {
-                    "entPhysicalIndex": 100193,
-                    "entPhysicalDescr": "FS 850 nm sfp transceiver manufactured 08/23/18 ",
-                    "entPhysicalClass": "sensor",
-                    "entPhysicalName": null,
-                    "entPhysicalHardwareRev": "000A",
-                    "entPhysicalFirmwareRev": null,
-                    "entPhysicalSoftwareRev": null,
-                    "entPhysicalAlias": null,
-                    "entPhysicalAssetID": null,
-                    "entPhysicalIsFRU": "true",
-                    "entPhysicalModelName": "SFP-10GSR-85",
-                    "entPhysicalVendorType": null,
-                    "entPhysicalSerialNum": "S1812345678",
-                    "entPhysicalContainedIn": 56193,
-                    "entPhysicalParentRelPos": -1,
-                    "entPhysicalMfgName": "FS",
-                    "ifIndex": null
-                },
-                {
-                    "entPhysicalIndex": 100195,
-                    "entPhysicalDescr": "FS 850 nm sfp transceiver manufactured 08/23/18 ",
-                    "entPhysicalClass": "sensor",
-                    "entPhysicalName": null,
-                    "entPhysicalHardwareRev": "000A",
-                    "entPhysicalFirmwareRev": null,
-                    "entPhysicalSoftwareRev": null,
-                    "entPhysicalAlias": null,
-                    "entPhysicalAssetID": null,
-                    "entPhysicalIsFRU": "true",
-                    "entPhysicalModelName": "SFP-10GSR-85",
-                    "entPhysicalVendorType": null,
-                    "entPhysicalSerialNum": "S1812345678",
-                    "entPhysicalContainedIn": 56195,
-                    "entPhysicalParentRelPos": -1,
-                    "entPhysicalMfgName": "FS",
-                    "ifIndex": null
-                },
-                {
-                    "entPhysicalIndex": 100196,
-                    "entPhysicalDescr": "FS 850 nm sfp transceiver manufactured 08/23/18 ",
-                    "entPhysicalClass": "sensor",
-                    "entPhysicalName": null,
-                    "entPhysicalHardwareRev": "000A",
-                    "entPhysicalFirmwareRev": null,
-                    "entPhysicalSoftwareRev": null,
-                    "entPhysicalAlias": null,
-                    "entPhysicalAssetID": null,
-                    "entPhysicalIsFRU": "true",
-                    "entPhysicalModelName": "SFP-10GSR-85",
-                    "entPhysicalVendorType": null,
-                    "entPhysicalSerialNum": "S1812345678",
-                    "entPhysicalContainedIn": 56196,
-                    "entPhysicalParentRelPos": -1,
-                    "entPhysicalMfgName": "FS",
-                    "ifIndex": null
-                },
-                {
-                    "entPhysicalIndex": 100197,
-                    "entPhysicalDescr": "CIENA-XGI 1550 nm sfp transceiver manufactured 07/02/19 ",
-                    "entPhysicalClass": "sensor",
-                    "entPhysicalName": null,
-                    "entPhysicalHardwareRev": "003",
-                    "entPhysicalFirmwareRev": null,
-                    "entPhysicalSoftwareRev": null,
-                    "entPhysicalAlias": null,
-                    "entPhysicalAssetID": null,
-                    "entPhysicalIsFRU": "true",
-                    "entPhysicalModelName": "XCVR-S40V55",
-                    "entPhysicalVendorType": null,
-                    "entPhysicalSerialNum": "191234567890",
-                    "entPhysicalContainedIn": 56197,
-                    "entPhysicalParentRelPos": -1,
-                    "entPhysicalMfgName": "CIENA-XGI",
-                    "ifIndex": null
-                },
-                {
-                    "entPhysicalIndex": 100198,
-                    "entPhysicalDescr": "CIENA-XGI 1550 nm sfp transceiver manufactured 07/02/19 ",
-                    "entPhysicalClass": "sensor",
-                    "entPhysicalName": null,
-                    "entPhysicalHardwareRev": "003",
-                    "entPhysicalFirmwareRev": null,
-                    "entPhysicalSoftwareRev": null,
-                    "entPhysicalAlias": null,
-                    "entPhysicalAssetID": null,
-                    "entPhysicalIsFRU": "true",
-                    "entPhysicalModelName": "XCVR-S40V55",
-                    "entPhysicalVendorType": null,
-                    "entPhysicalSerialNum": "191234567890",
-                    "entPhysicalContainedIn": 56198,
-                    "entPhysicalParentRelPos": -1,
-                    "entPhysicalMfgName": "CIENA-XGI",
-                    "ifIndex": null
-                },
-                {
-                    "entPhysicalIndex": 100211,
-                    "entPhysicalDescr": "FS 850 nm sfp transceiver manufactured 08/23/18 ",
-                    "entPhysicalClass": "sensor",
-                    "entPhysicalName": null,
-                    "entPhysicalHardwareRev": "000A",
-                    "entPhysicalFirmwareRev": null,
-                    "entPhysicalSoftwareRev": null,
-                    "entPhysicalAlias": null,
-                    "entPhysicalAssetID": null,
-                    "entPhysicalIsFRU": "true",
-                    "entPhysicalModelName": "SFP-10GSR-85",
-                    "entPhysicalVendorType": null,
-                    "entPhysicalSerialNum": "S1812345678",
-                    "entPhysicalContainedIn": 56211,
-                    "entPhysicalParentRelPos": -1,
-                    "entPhysicalMfgName": "FS",
-                    "ifIndex": null
-                },
-                {
-                    "entPhysicalIndex": 100212,
-                    "entPhysicalDescr": "FS 850 nm sfp transceiver manufactured 08/23/18 ",
-                    "entPhysicalClass": "sensor",
-                    "entPhysicalName": null,
-                    "entPhysicalHardwareRev": "000A",
-                    "entPhysicalFirmwareRev": null,
-                    "entPhysicalSoftwareRev": null,
-                    "entPhysicalAlias": null,
-                    "entPhysicalAssetID": null,
-                    "entPhysicalIsFRU": "true",
-                    "entPhysicalModelName": "SFP-10GSR-85",
-                    "entPhysicalVendorType": null,
-                    "entPhysicalSerialNum": "S1812345678",
-                    "entPhysicalContainedIn": 56212,
-                    "entPhysicalParentRelPos": -1,
-                    "entPhysicalMfgName": "FS",
-                    "ifIndex": null
+                    "ifIndex": 223
                 }
             ]
         },

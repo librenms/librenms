@@ -291,15 +291,18 @@ class SnmpQueryMock implements SnmpQueryInterface
 
     private function outputLine(string $oid, string $num_oid, string $type, string $data): string
     {
+        $oid = new Oid($oid);
+
         if ($type == 6) {
-            $data = $this->numeric ? ".$data" : $this->mibs($this->extractMib($oid))->translate($data);
+            $mib = $oid->getMib();
+            $data = $this->numeric ? ".$data" : $this->mibs($mib ? [$mib] : [])->translate($data);
         }
 
         if ($this->numeric) {
             return "$num_oid = $data";
         }
 
-        if (! empty($oid) && Oid::isNumeric($oid)) {
+        if (! empty($oid->oid) && $oid->isNumeric()) {
             $oid = $this->translate($oid);
         }
 
@@ -335,7 +338,7 @@ class SnmpQueryMock implements SnmpQueryInterface
                 return '1.3.6.1.4.1.6574.1.1.0';
         }
 
-        if (Oid::isNumeric($oid)) {
+        if (Oid::of($oid)->isNumeric()) {
             return ltrim($oid, '.');
         }
 
@@ -361,14 +364,5 @@ class SnmpQueryMock implements SnmpQueryInterface
         }
 
         return $community;
-    }
-
-    private function extractMib(string $oid): array
-    {
-        if (Str::contains($oid, '::')) {
-            return [explode('::', $oid, 2)[0]];
-        }
-
-        return [];
     }
 }

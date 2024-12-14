@@ -515,9 +515,6 @@ return [
             'bgp-peers' => [
                 'description' => 'Pares BGP',
             ],
-            'cisco-cbqos' => [
-                'description' => 'Cisco CBQOS',
-            ],
             'cisco-cef' => [
                 'description' => 'Cisco CEF',
             ],
@@ -1254,12 +1251,6 @@ return [
             ],
             'cisco-asa-firewall' => [
                 'description' => 'Firewall Cisco ASA',
-            ],
-            'cisco-voice' => [
-                'description' => 'Cisco Voice',
-            ],
-            'cisco-cbqos' => [
-                'description' => 'Cisco CBQOS',
             ],
             'cisco-otv' => [
                 'description' => 'Cisco OTV',

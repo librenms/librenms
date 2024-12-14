@@ -161,7 +161,7 @@ class YamlDiscovery
         }
 
         try {
-            $num_oid = Oid::toNumeric($data['value'], $search_mib);
+            $num_oid = Oid::of($data['value'])->toNumeric($search_mib);
         } catch (\Exception $e) {
             throw $e;
         }

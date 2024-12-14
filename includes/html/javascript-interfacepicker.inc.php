@@ -21,10 +21,21 @@ function getInterfaceList(sel)
         }
 }
 
-function createInterfaces(index)
-{
-        var obj = document.getElementById('port_id');
-        eval(ajax[index].response);     // Executing the response from Ajax as Javascript code
-}
+function createInterfaces(index) {
+    const obj = document.getElementById('port_id');
 
+    // Assuming ajax[index].response contains JavaScript-like code as a string
+    const lines = ajax[index].response.split(';'); // Split into individual lines of code
+
+    lines.forEach(line => {
+        if (line.trim()) { // Skip empty lines
+            const match = line.match(/new Option\(['"](.*?)['"],['"](.*?)['"]\)/);
+            if (match) {
+                const label = match[1];
+                const value = match[2];
+                obj.options[obj.options.length] = new Option(label, value);
+            }
+        }
+    });
+}
 </script>

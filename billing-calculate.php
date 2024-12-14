@@ -67,8 +67,8 @@ foreach (dbFetchRows('SELECT * FROM `bills` ORDER BY `bill_id`') as $bill) {
                 $type = 'CDR';
                 $allowed = $bill['bill_cdr'];
                 $used = $rate_data['rate_95th'];
-                $allowed_text = Number::formatSi($allowed, 2, 3, 'bps');
-                $used_text = Number::formatSi($used, 2, 3, 'bps');
+                $allowed_text = Number::formatSi($allowed, 2, 0, 'bps');
+                $used_text = Number::formatSi($used, 2, 0, 'bps');
                 $overuse = ($used - $allowed);
                 $overuse = (($overuse <= 0) ? '0' : $overuse);
                 $percent = Number::calculatePercent($rate_data['rate_95th'], $bill['bill_cdr']);

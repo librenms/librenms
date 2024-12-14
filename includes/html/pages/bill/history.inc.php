@@ -75,26 +75,26 @@ foreach (dbFetchRows('SELECT * FROM `bill_history` WHERE `bill_id` = ? ORDER BY 
         $type = $history['bill_type'];
         $percent = $history['bill_percent'];
         $dir_95th = $history['dir_95th'];
-        $rate_95th = Number::formatSi($history['rate_95th'], 2, 3, 'bps');
-        $total_data = Number::formatBase($history['traf_total'], \LibreNMS\Config::get('billing.base'), 2, 3, '');
+        $rate_95th = Number::formatSi($history['rate_95th'], 2, 0, 'bps');
+        $total_data = Number::formatBase($history['traf_total'], \LibreNMS\Config::get('billing.base'), 2, 0, '');
 
         $background = \LibreNMS\Util\Color::percentage($percent, null);
 
         if ($type == 'CDR') {
-            $allowed = Number::formatSi($history['bill_allowed'], 2, 3, 'bps');
-            $used = Number::formatSi($history['rate_95th'], 2, 3, 'bps');
-            $in = Number::formatSi($history['rate_95th_in'], 2, 3, 'bps');
-            $out = Number::formatSi($history['rate_95th_out'], 2, 3, 'bps');
-            $overuse = (($history['bill_overuse'] <= 0) ? '-' : '<span style="color: #' . $background['left'] . '; font-weight: bold;">' . Number::formatSi($history['bill_overuse'], 2, 3, 'bps') . '</span>');
+            $allowed = Number::formatSi($history['bill_allowed'], 2, 0, 'bps');
+            $used = Number::formatSi($history['rate_95th'], 2, 0, 'bps');
+            $in = Number::formatSi($history['rate_95th_in'], 2, 0, 'bps');
+            $out = Number::formatSi($history['rate_95th_out'], 2, 0, 'bps');
+            $overuse = (($history['bill_overuse'] <= 0) ? '-' : '<span style="color: #' . $background['left'] . '; font-weight: bold;">' . Number::formatSi($history['bill_overuse'], 2, 0, 'bps') . '</span>');
         } elseif ($type == 'Quota') {
-            $allowed = Number::formatBase($history['bill_allowed'], \LibreNMS\Config::get('billing.base'), 2, 3, '');
-            $used = Number::formatBase($history['total_data'], \LibreNMS\Config::get('billing.base'), 2, 3, '');
-            $in = Number::formatBase($history['traf_in'], \LibreNMS\Config::get('billing.base'), 2, 3, '');
-            $out = Number::formatBase($history['traf_out'], \LibreNMS\Config::get('billing.base'), 2, 3, '');
+            $allowed = Number::formatBase($history['bill_allowed'], \LibreNMS\Config::get('billing.base'), 2, 0, '');
+            $used = Number::formatBase($history['total_data'], \LibreNMS\Config::get('billing.base'), 2, 0, '');
+            $in = Number::formatBase($history['traf_in'], \LibreNMS\Config::get('billing.base'), 2, 0, '');
+            $out = Number::formatBase($history['traf_out'], \LibreNMS\Config::get('billing.base'), 2, 0, '');
             $overuse = (($history['bill_overuse'] <= 0) ? '-' : '<span style="color: #' . $background['left'] . '; font-weight: bold;">' . Number::formatBase($history['bill_overuse'], \LibreNMS\Config::get('billing.base')) . '</span>');
         }
-        $peakOut = Number::formatBase($history['bill_peak_out'], \LibreNMS\Config::get('billing.base'), 2, 3, '');
-        $peakIn = Number::formatBase($history['bill_peak_in'], \LibreNMS\Config::get('billing.base'), 2, 3, '');
+        $peakOut = Number::formatBase($history['bill_peak_out'], \LibreNMS\Config::get('billing.base'), 2, 0, '');
+        $peakIn = Number::formatBase($history['bill_peak_in'], \LibreNMS\Config::get('billing.base'), 2, 0, '');
 
         $total_data = (($type == 'Quota') ? '<b>' . $total_data . '</b>' : $total_data);
         $rate_95th = (($type == 'CDR') ? '<b>' . $rate_95th . '</b>' : $rate_95th);

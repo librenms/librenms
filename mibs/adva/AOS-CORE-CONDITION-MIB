@@ -1,0 +1,153 @@
+AOS-CORE-CONDITION-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+             FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, Integer32
+             FROM SNMPv2-SMI
+    TimeStamp, DisplayString, TruthValue, RowPointer,
+    TEXTUAL-CONVENTION
+             FROM SNMPv2-TC
+    aosCommon
+             FROM ADVA-MIB
+    ConditionType, ConditionEntityTranslation, ConditionDescr
+             FROM AOS-CORE-ALARM-MIB;
+
+aosCoreConditionMIB MODULE-IDENTITY
+    LAST-UPDATED    "201510230000Z"
+    ORGANIZATION    "ADVA Optical Networking"
+    CONTACT-INFO
+                    "ADVA Optical Networking, Inc."
+    DESCRIPTION     "This module defines the Condition Monitoring MIB definitions
+                     used by the AOS based product lines.
+                     Copyright (C) ADVA Optical Networking."
+    REVISION        "201510230000Z"
+    DESCRIPTION     "Initial release."
+    ::= {aosCommon 2}
+
+--
+-- OID definitions
+--
+conditionObjects             OBJECT IDENTIFIER ::= {aosCoreConditionMIB 1}
+conditionConformance         OBJECT IDENTIFIER ::= {aosCoreConditionMIB 2}
+
+--
+-- Textual conventions.
+--
+
+--
+-- Scalar definitions.
+--
+
+--
+-- Table definitions.
+--
+aosCoreConditionTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF AosCoreConditionEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "A list of entries corresponding to the standing conditions.
+
+            Entries cannot be created in this table by management
+            application action."
+    ::= { conditionObjects 1 }
+
+aosCoreConditionEntry  OBJECT-TYPE
+    SYNTAX     AosCoreConditionEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry containing information applicable to a particular
+             condition."
+    INDEX { aosCoreConditionIndex }
+    ::= { aosCoreConditionTable 1 }
+
+AosCoreConditionEntry ::= SEQUENCE {
+    aosCoreConditionIndex              INTEGER,
+    aosCoreConditionType               ConditionType,
+    aosCoreConditionEntityTranslation  ConditionEntityTranslation,
+    aosCoreConditionEntity             RowPointer,
+    aosCoreConditionDescr              ConditionDescr,
+    aosCoreConditionTimestamp          DisplayString
+}
+
+aosCoreConditionIndex OBJECT-TYPE
+    SYNTAX     INTEGER
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+         "This object is an order number of the condition in the aosCoreConditionTable."
+     ::= { aosCoreConditionEntry 1 }
+
+aosCoreConditionType OBJECT-TYPE
+    SYNTAX     ConditionType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object identifies the type of the condition."
+     ::= { aosCoreConditionEntry 2 }
+
+aosCoreConditionEntityTranslation OBJECT-TYPE
+    SYNTAX     ConditionEntityTranslation
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object identifies the entity"
+     ::= { aosCoreConditionEntry 3 }
+
+aosCoreConditionEntity OBJECT-TYPE
+    SYNTAX     RowPointer
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Pointer to the table that contains definition of the alarmed entity."
+     ::= { aosCoreConditionEntry 4 }
+
+aosCoreConditionDescr OBJECT-TYPE
+    SYNTAX     ConditionDescr
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object contains a text description of the condition."
+     ::= { aosCoreConditionEntry 5 }
+
+aosCoreConditionTimestamp OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object contains the system time when the condition occurred."
+     ::= { aosCoreConditionEntry 6 }
+
+--
+-- Conformance
+--
+aosCoreConditionCompliances OBJECT IDENTIFIER ::= {conditionConformance 1}
+aosCoreConditionGroups      OBJECT IDENTIFIER ::= {conditionConformance 2}
+
+aosCoreConditionCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "Describes the requirements for conformance to the Condition Services."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+              aosCoreConditionObjectGroup
+        }
+    ::= { aosCoreConditionCompliances 1 }
+
+aosCoreConditionObjectGroup OBJECT-GROUP
+    OBJECTS {
+        aosCoreConditionIndex,
+        aosCoreConditionType,
+        aosCoreConditionEntityTranslation,
+        aosCoreConditionEntity,
+        aosCoreConditionDescr,
+        aosCoreConditionTimestamp
+    }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects used to manage the Conditions Services."
+    ::= { aosCoreConditionGroups 1 }
+
+END

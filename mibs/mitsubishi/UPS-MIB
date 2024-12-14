@@ -3,6 +3,8 @@
 UPS-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
+	    enterprises
+	        FROM RFC1155-SMI
         TRAP-TYPE
                 FROM RFC-1215
         DisplayString
@@ -57,7 +59,7 @@ upsIdentAgentSoftwareVersion OBJECT-TYPE
     STATUS  mandatory
     DESCRIPTION
             "The UPS agent software version.  This variable may or may
-             not have the same value as upsIdentUPSSoftwareVersion in 
+             not have the same value as upsIdentUPSSoftwareVersion in
              some implementations."
     ::= { upsIdent 4 }
 
@@ -82,7 +84,7 @@ upsIdentAttachedDevices OBJECT-TYPE
 upsBattery OBJECT IDENTIFIER ::= { MitsubishiUPS 2 }
 
 upsBatteryStatus OBJECT-TYPE
-    SYNTAX  INTEGER 
+    SYNTAX  INTEGER
     {
         unknown(1),
         batteryNormal(2),
@@ -92,12 +94,12 @@ upsBatteryStatus OBJECT-TYPE
     ACCESS  read-only
     STATUS  mandatory
     DESCRIPTION
-           "The indication of the capacity remaining in the UPS batteries.   
-            A value of batteryNormal indicates a normal battery condition.  
-            A value of batteryLow indicates the remaining battery run-time 
+           "The indication of the capacity remaining in the UPS batteries.
+            A value of batteryNormal indicates a normal battery condition.
+            A value of batteryLow indicates the remaining battery run-time
             will not maintain the output load for an extended period of time.
             A value of batteryDepleted indicates that the UPS will be unable
-            to sustain the present load when and if the utility power is lost." 
+            to sustain the present load when and if the utility power is lost."
     ::= { upsBattery 1 }
 
 upsSecondsOnBattery OBJECT-TYPE
@@ -106,8 +108,8 @@ upsSecondsOnBattery OBJECT-TYPE
     STATUS  mandatory
     DESCRIPTION
            "If the unit is on battery power, the elapsed time in seconds
-            since the UPS last switched to battery power, or the time since 
-            the network management system was last restarted, whichever is less.  
+            since the UPS last switched to battery power, or the time since
+            the network management system was last restarted, whichever is less.
             Zero shall be returned if the unit is not on battery power."
     ::= { upsBattery 2 }
 
@@ -117,7 +119,7 @@ upsEstimatedMinutesRemaining OBJECT-TYPE
     STATUS  mandatory
     DESCRIPTION
            "An estimate of the time in minutes until the battery is depleted
-            under the present load conditions if the utility power is off and 
+            under the present load conditions if the utility power is off and
             remains off, or if it were to be lost and remain off."
     ::= { upsBattery 3 }
 
@@ -126,7 +128,7 @@ upsEstimatedChargeRemaining OBJECT-TYPE
     ACCESS  read-only
     STATUS  mandatory
     DESCRIPTION
-           "An estimate of the battery charge remaining expressed as a 
+           "An estimate of the battery charge remaining expressed as a
             percent of full charge."
     ::= { upsBattery 4 }
 
@@ -162,9 +164,9 @@ upsInputLineBads OBJECT-TYPE
     STATUS  mandatory
     DESCRIPTION
            "A count of the number of times the input entered an
-            out-of-tolerance condition as defined by the manufacturer.  
-            This count is incremented by one each time the input 
-            transitions from zero out-of-tolerance lines to one or more 
+            out-of-tolerance condition as defined by the manufacturer.
+            This count is incremented by one each time the input
+            transitions from zero out-of-tolerance lines to one or more
             input lines out-of-tolerance."
     ::= { upsInput 1 }
 
@@ -197,7 +199,7 @@ upsInputEntry OBJECT-TYPE
     ::= { upsInputTable  1 }
 
 UpsInputEntry ::=
-    SEQUENCE 
+    SEQUENCE
     {
         upsInputLineIndex PositiveInteger,
         upsInputFrequency NonNegativeInteger,
@@ -249,7 +251,7 @@ upsInputTruePower OBJECT-TYPE
 upsOutput OBJECT IDENTIFIER ::= { MitsubishiUPS 4 }
 
 upsOutputSource OBJECT-TYPE
-    SYNTAX  INTEGER 
+    SYNTAX  INTEGER
     {
         other(1),
         none(2),
@@ -263,7 +265,7 @@ upsOutputSource OBJECT-TYPE
     STATUS  mandatory
     DESCRIPTION
            "The present source of output power.  A value of none (2) indicates
-            there is no source of output power (and therefore no output power), 
+            there is no source of output power (and therefore no output power),
             for example, the system has opened the output breaker."
     ::= { upsOutput 1 }
 
@@ -304,7 +306,7 @@ upsOutputEntry OBJECT-TYPE
     ::= { upsOutputTable 1 }
 
 UpsOutputEntry ::=
-    SEQUENCE 
+    SEQUENCE
     {
         upsOutputLineIndex          PositiveInteger,
         upsOutputVoltage            NonNegativeInteger,
@@ -350,8 +352,8 @@ upsOutputPercentLoad OBJECT-TYPE
     ACCESS  read-only
     STATUS  mandatory
     DESCRIPTION
-           "The percentage of the UPS power capacity presently being 
-            used on this output line (the greater of the percent load 
+           "The percentage of the UPS power capacity presently being
+            used on this output line (the greater of the percent load
             of true power capacity and the percent load of VA."
     ::= { upsOutputEntry 5 }
 
@@ -394,7 +396,7 @@ upsBypassEntry OBJECT-TYPE
     ::= { upsBypassTable 1 }
 
 UpsBypassEntry ::=
-    SEQUENCE 
+    SEQUENCE
     {
         upsBypassLineIndex          PositiveInteger,
         upsBypassVoltage            NonNegativeInteger,
@@ -449,11 +451,11 @@ upsAlarmTable OBJECT-TYPE
     ACCESS  not-accessible
     STATUS  mandatory
     DESCRIPTION
-           "A list of alarm table entries.  Alarms are named by 
-            an OBJECT IDENTIFIER, upsAlarmDescr, to allow a single 
-            table to reflect well known alarms plus alarms defined 
+           "A list of alarm table entries.  Alarms are named by
+            an OBJECT IDENTIFIER, upsAlarmDescr, to allow a single
+            table to reflect well known alarms plus alarms defined
             by a particular implementation, i.e., as documented in
-            the private enterprise MIB definition for the device.  
+            the private enterprise MIB definition for the device.
             No two rows will have the same value of upsAlarmDescr,
             since alarms define conditions.  In order to meet this
             requirement, care should be taken in the definition of
@@ -475,7 +477,7 @@ upsAlarmEntry OBJECT-TYPE
     ::= { upsAlarmTable 1 }
 
 UpsAlarmEntry ::=
-    SEQUENCE 
+    SEQUENCE
     {
         upsAlarmId            PositiveInteger,
         upsAlarmDescr         AutonomousType,
@@ -746,7 +748,7 @@ upsAlarmAwaitingPower OBJECT-TYPE
 upsTest OBJECT IDENTIFIER ::= { MitsubishiUPS 7 }
 
   upsTestId OBJECT-TYPE
-      SYNTAX OBJECT IDENTIFIER 
+      SYNTAX OBJECT IDENTIFIER
       ACCESS read-write
       STATUS mandatory
       DESCRIPTION
@@ -765,7 +767,7 @@ upsTestSpinLock OBJECT-TYPE
     ::= { upsTest 2 }
 
 upsTestResultsSummary OBJECT-TYPE
-    SYNTAX  INTEGER 
+    SYNTAX  INTEGER
     {
         donePass(1),
         doneWarning(2),
@@ -880,7 +882,7 @@ upsTestDeepBatteryCalibration OBJECT-TYPE
 upsControl OBJECT IDENTIFIER ::= { MitsubishiUPS 8 }
 
 upsShutdownType OBJECT-TYPE
-    SYNTAX  INTEGER 
+    SYNTAX  INTEGER
     {
         output(1),
         system(2)
@@ -976,7 +978,7 @@ upsRebootWithDuration OBJECT-TYPE
     ::= { upsControl 4 }
 
 upsAutoRestart OBJECT-TYPE
-    SYNTAX  INTEGER 
+    SYNTAX  INTEGER
     {
         on(1),
         off(2)
@@ -1003,7 +1005,7 @@ upsConfigInputVoltage OBJECT-TYPE
     ACCESS  read-write
     STATUS  mandatory
     DESCRIPTION
-           "The magnitude of the nominal input voltage (RMS Volts).  
+           "The magnitude of the nominal input voltage (RMS Volts).
             On those systems which support read-write access to this
             object, if there is an attempt to set this variable to
             a value that is not supported, the request must be
@@ -1030,7 +1032,7 @@ upsConfigOutputVoltage OBJECT-TYPE
     ACCESS  read-write
     STATUS  mandatory
     DESCRIPTION
-           "The magnitude of the nominal output voltage (RMS Volts).  
+           "The magnitude of the nominal output voltage (RMS Volts).
             On those systems which support read-write access to this
             object, if there is an attempt to set this variable to
             a value that is not supported, the request must be
@@ -1044,7 +1046,7 @@ upsConfigOutputFreq OBJECT-TYPE
     ACCESS  read-write
     STATUS  mandatory
     DESCRIPTION
-           "The nominal output frequency (0.1 Hertz).  On those systems 
+           "The nominal output frequency (0.1 Hertz).  On those systems
             which support read-write access to this object, if there is
             an attempt to set this variable to a value that is not
             supported, the request must be rejected and the agent
@@ -1083,7 +1085,7 @@ upsConfigLowBattTime OBJECT-TYPE
     ::= { upsConfig 7 }
 
 upsConfigAudibleStatus OBJECT-TYPE
-    SYNTAX  INTEGER 
+    SYNTAX  INTEGER
     {
         disabled(1),
         enabled(2),
@@ -1111,7 +1113,7 @@ upsConfigLowVoltageTransferPoint OBJECT-TYPE
     ACCESS  read-write
     STATUS  mandatory
     DESCRIPTION
-           "The minimum input line voltage (RMS Volts) allowed before 
+           "The minimum input line voltage (RMS Volts) allowed before
             the UPS system transfers to battery backup."
     ::= { upsConfig 9 }
 
@@ -1147,7 +1149,7 @@ trapDescription OBJECT-TYPE
 -- upsTraps OBJECT IDENTIFIER ::= { Tag 101 }
 
 alarmCritical TRAP-TYPE
-	ENTERPRISE MitsubishiUPS 
+	ENTERPRISE MitsubishiUPS
 	VARIABLES  { trapCode, trapDescription }
 	DESCRIPTION
 		"Critical alarm."
@@ -1161,7 +1163,7 @@ alarmWarning TRAP-TYPE
 	::= 2
 
 alarmInformation TRAP-TYPE
-	ENTERPRISE MitsubishiUPS 
+	ENTERPRISE MitsubishiUPS
 	VARIABLES  { trapCode, trapDescription }
 	DESCRIPTION
 		"Information alarm."
@@ -1175,7 +1177,7 @@ upsAlarmCleared TRAP-TYPE
 	::= 4
 
 upsTrapInitialization TRAP-TYPE
-	ENTERPRISE  MitsubishiUPS 
+	ENTERPRISE  MitsubishiUPS
 	VARIABLES   { upsIdentName }
 	DESCRIPTION
 		"This trap is sent each time a NetCom device is initialized."

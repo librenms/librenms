@@ -1029,6 +1029,11 @@ class Device extends BaseModel
         return $this->hasMany(LoadbalancerRserver::class, 'device_id');
     }
 
+    public function qos(): HasMany
+    {
+        return $this->hasMany(Qos::class, 'device_id');
+    }
+
     public function slas(): HasMany
     {
         return $this->hasMany(Sla::class, 'device_id');

@@ -17,10 +17,10 @@ foreach (dbFetchRows('SELECT * FROM `sensors` WHERE `sensor_class` = ? AND `devi
 
     $sensor_current = $graph_type == 'sensor_state' ? get_state_label($sensor) : get_sensor_label_color($sensor);
 
-    $sensor_limit = trim(\LibreNMS\Util\Number::formatSi($sensor['sensor_limit'], 2, 3, '') . $unit);
-    $sensor_limit_low = trim(\LibreNMS\Util\Number::formatSi($sensor['sensor_limit_low'], 2, 3, '') . $unit);
-    $sensor_limit_warn = trim(\LibreNMS\Util\Number::formatSi($sensor['sensor_limit_warn'], 2, 3, '') . $unit);
-    $sensor_limit_low_warn = trim(\LibreNMS\Util\Number::formatSi($sensor['sensor_limit_low_warn'], 2, 3, '') . $unit);
+    $sensor_limit = trim(\LibreNMS\Util\Number::formatSi($sensor['sensor_limit'], 2, 0, '') . $unit);
+    $sensor_limit_low = trim(\LibreNMS\Util\Number::formatSi($sensor['sensor_limit_low'], 2, 0, '') . $unit);
+    $sensor_limit_warn = trim(\LibreNMS\Util\Number::formatSi($sensor['sensor_limit_warn'], 2, 0, '') . $unit);
+    $sensor_limit_low_warn = trim(\LibreNMS\Util\Number::formatSi($sensor['sensor_limit_low_warn'], 2, 0, '') . $unit);
 
     echo "<div class='panel panel-default'>
         <div class='panel-heading'>

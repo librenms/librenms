@@ -14086,7 +14086,7 @@
                 {
                     "index": "17305857",
                     "entity_physical_index": 17305857,
-                    "type": "sfpplus multiMode6",
+                    "type": "sfpplus multiMode5",
                     "vendor": "OEM",
                     "oui": null,
                     "model": "CAB-AOC-10GSFP-P",
@@ -14105,7 +14105,7 @@
                 {
                     "index": "17305858",
                     "entity_physical_index": 17305858,
-                    "type": "sfpplus multiMode6",
+                    "type": "sfpplus multiMode5",
                     "vendor": "OEM",
                     "oui": null,
                     "model": "CAB-AOC-10GSFP-P",
@@ -14124,7 +14124,7 @@
                 {
                     "index": "17305864",
                     "entity_physical_index": 17305864,
-                    "type": "sfpplus multiMode6",
+                    "type": "sfpplus multiMode5",
                     "vendor": "OEM",
                     "oui": null,
                     "model": "CAB-AOC-10GSFP-P",
@@ -14143,7 +14143,7 @@
                 {
                     "index": "17305866",
                     "entity_physical_index": 17305866,
-                    "type": "sfpplus multiMode6",
+                    "type": "sfpplus multiMode5",
                     "vendor": "OEM",
                     "oui": null,
                     "model": "CAB-AOC-10GSFP-P",

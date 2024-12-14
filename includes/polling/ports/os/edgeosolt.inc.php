@@ -13,6 +13,7 @@ foreach ($sfp_stats as $index => $sfpport_stats) {
     $port_stats[$curIfIndex]['ifInOctets'] = $sfpport_stats['ubntSfpRxBytes'];
     $port_stats[$curIfIndex]['ifOutOctets'] = $sfpport_stats['ubntSfpTxBytes'];
     $port_stats[$curIfIndex]['ifOperStatus'] = ($sfpport_stats['ubntSfpUp'] == 1 ? 'up' : 'down');
+    $port_stats[$curIfIndex]['ifAdminStatus'] = 'up';
 }
 
 unset($sfp_stats);

@@ -242,8 +242,7 @@ class OS implements
     public static function make(array &$device): OS
     {
         if (isset($device['os'])) {
-            // load os definition and populate os_group
-            \LibreNMS\Util\OS::loadDefinition($device['os']);
+            // Populate os_group
             $device['os_group'] = Config::get("os.{$device['os']}.group");
 
             $class = StringHelpers::toClass($device['os'], 'LibreNMS\\OS\\');
