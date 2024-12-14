@@ -1,20 +1,23 @@
 <?php
 
-$sensors = DeviceCache::getPrimary()->sensors->where('sensor_class', $sensor_class)->where('group', '!=', 'transceiver'); // cache all sensors on device and exclude transceivers
+// cache all sensors on device and exclude transceivers
+$sensors = DeviceCache::getPrimary()
+    ->sensors
+    ->where('sensor_class', $sensor_class)
+    ->where('group', '!=', 'transceiver');
 
 if ($sensors->isNotEmpty()) {
-    $sensor_fa_icon = 'fa-' . $sensors->first()->icon();
-
     echo '
         <div class="row">
         <div class="col-md-12">
         <div class="panel panel-default panel-condensed">
         <div class="panel-heading">';
-    echo '<a href="device/device=' . $device['device_id'] . '/tab=health/metric=' . $sensor_class . '/"><i class="fa ' . $sensor_fa_icon . ' fa-lg icon-theme" aria-hidden="true"></i><strong> ' . \LibreNMS\Util\StringHelpers::niceCase($sensor_type) . '</strong></a>';
+    echo '<a href="device/device=' . $sensors[0]->device_id . '/tab=health/metric=' . $sensor[0]->sensor_class . '/"><i class="fa ' . $sensor[0]->icon() . ' fa-lg icon-theme" aria-hidden="true"></i><strong> ' . $sensor[0]->classDescrLong() . '</strong></a>';
     echo '      </div>
         <table class="table table-hover table-condensed table-striped">';
     $group = '';
     foreach ($sensors as $sensor) {
+
         if (! isset($sensor->sensor_current)) {
             $sensor->sensor_current = 'NaN';
         }
