@@ -35,7 +35,7 @@ $type_text = collect([
     'processor' => 'Processor',
     'toner' => 'Toner',
     ])->merge(collect(Sensor::getTypes())
-      ->mapWithKeys(fn ($type) => [ $type => __('sensors.' . $type . '.short')])
+      ->mapWithKeys(fn ($type) => [ $type => Sensor::getClassDescr($type)])
     )->toArray();
 
 $active_metric = basename(array_key_exists($vars['metric'], $type_text) ? $vars['metric'] : 'processor');

@@ -15,59 +15,9 @@
  * @author     LibreNMS Contributors
 */
 
-switch ($class) {
-    case 'charge':
-        $pagetitle[] = 'Health :: Charge';
-        break;
-    case 'cooling':
-        $pagetitle[] = 'Health :: Cooling';
-        break;
-    case 'current':
-        $pagetitle[] = 'Health :: Current';
-        break;
-    case 'dbm':
-        $pagetitle[] = 'Health :: dBm';
-        break;
-    case 'fanspeed':
-        $pagetitle[] = 'Health :: Fanspeed';
-        break;
-    case 'frequency':
-        $pagetitle[] = 'Health :: Frequency';
-        break;
-    case 'humidity':
-        $pagetitle[] = 'Health :: Humidity';
-        break;
-    case 'load':
-        $pagetitle[] = 'Health :: Load';
-        break;
-    case 'power':
-        $pagetitle[] = 'Health :: Power';
-        break;
-    case 'pressure':
-        $pagetitle[] = 'Health :: Pressure';
-        break;
-    case 'runtime':
-        $pagetitle[] = 'Health :: Runtime';
-        break;
-    case 'signal':
-        $pagetitle[] = 'Health :: Signal';
-        break;
-    case 'snr':
-        $pagetitle[] = 'Health :: SNR';
-        break;
-    case 'state':
-        $pagetitle[] = 'Health :: State';
-        break;
-    case 'count':
-        $pagetitle[] = 'Health :: Count';
-        break;
-    case 'temperature':
-        $pagetitle[] = 'Health :: Temperature';
-        break;
-    case 'voltage':
-        $pagetitle[] = 'Health :: Voltage';
-        break;
-}
+use App\Models\Sensor;
+
+$pagetitle[] = 'Health :: ' . Sensor::getClass($class);
 
 ?>
 <div class="panel panel-default panel-condensed">

@@ -74,27 +74,49 @@ class Sensor extends DeviceRelatedModel implements Keyable
 
     public function classDescr(): string
     {
-        return __('sensors.' . $this->sensor_class . '.short');
+        return static::getClassDescr($this->sensor_class);
     }
 
     public function classDescrLong(): string
     {
-        return __('sensors.' . $this->sensor_class . '.long');
+        return static::getClassDescrLong($this->sensor_class);
     }
 
     public function unit(): string
     {
-        return __('sensors.' . $this->sensor_class . '.unit');
+        return static::getUnit($this->sensor_class);
     }
 
     public function unitLong(): string
     {
-        return __('sensors.' . $this->sensor_class . '.unit_long');
+        return static::getUnitLong($this->sensor_class);
     }
 
     public function icon()
     {
         return collect(self::$icons)->get($this->sensor_class, 'delicius');
+    }
+
+    // Static Methods
+
+    public static function getClassDescr(string $class): string
+    {
+        return __('sensors.' . $class . '.short');
+    }
+
+    public static function getClassDescrLong(string $class): string
+    {
+        return __('sensors.' . $class . '.long');
+    }
+
+    public static function getUnit(string $class): string
+    {
+        return __('sensors.' . $class . '.unit');
+    }
+
+    public static function getUnitLong(string $class): string
+    {
+        return __('sensors.' . $class . '.unit_long');
     }
 
     public static function getTypes()
