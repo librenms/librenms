@@ -112,7 +112,13 @@ foreach ($datas as $type) {
 print_optionbar_end();
 
 $metric = basename($vars['metric']);
-if (is_file("includes/html/pages/device/health/$metric.inc.php")) {
+
+if (in_array($metric, Sensor::getTypes())) {
+    $class = $metric;
+    $unit = Sensor::getUnit($metric);
+    $graph_type = 'sensor_' . $metric;
+    include "includes/html/pages/device/health/sensors.inc.php";
+} elseif (is_file("includes/html/pages/device/health/$metric.inc.php")) {
     include "includes/html/pages/device/health/$metric.inc.php";
 } else {
     foreach ($datas as $type) {
