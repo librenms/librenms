@@ -70,18 +70,26 @@ class Sensor extends DeviceRelatedModel implements Keyable
         'percent' => 'percent',
     ];
 
-    // ---- Helper Functions ----
+    // ---- Helper Methods ----
 
-    public function classDescr()
+    public function classDescr(): string
     {
-        $nice = collect([
-            'ber' => 'BER',
-            'dbm' => 'dBm',
-            'eer' => 'EER',
-            'snr' => 'SNR',
-        ]);
+        return __('sensors.' . $this->sensor_class . '.short');
+    }
 
-        return $nice->get($this->sensor_class, ucwords(str_replace('_', ' ', $this->sensor_class)));
+    public function classDescrLong(): string
+    {
+        return __('sensors.' . $this->sensor_class . '.long');
+    }
+
+    public function unit(): string
+    {
+        return __('sensors.' . $this->sensor_class . '.unit');
+    }
+
+    public function unitLong(): string
+    {
+        return __('sensors.' . $this->sensor_class . '.unit_long');
     }
 
     public function icon()
@@ -135,12 +143,10 @@ class Sensor extends DeviceRelatedModel implements Keyable
      */
     public function formatValue(): string
     {
-        $units = __('sensors.' . $this->sensor_class . '.unit');
-
         return match ($this->sensor_class) {
-            'current', 'power' => Number::formatSi($this->sensor_current, 3, 0, $units),
-            'dbm' => round($this->sensor_current, 3) . " $units",
-            default => "$this->sensor_current $units",
+            'current', 'power' => Number::formatSi($this->sensor_current, 3, 0, $this->unit()),
+            'dbm' => round($this->sensor_current, 3) . ' ' . $this->unit(),
+            default => $this->sensor_current . ' ' . $this->unit(),
         };
     }
 
