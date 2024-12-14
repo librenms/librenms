@@ -23,7 +23,7 @@ $no_refresh = true;
 $datas = collect(['mempool', 'processor', 'storage'])
     ->merge(collect(ObjectCache::sensors())
         ->flatMap(fn ($types) => collect($types)->pluck('class'))
-);
+    );
 
 
 $type_text = collect([
@@ -34,8 +34,8 @@ $type_text = collect([
     'diskio' => 'Disk I/O',
     'processor' => 'Processor',
     'toner' => 'Toner',
-    ])->merge(collect(Sensor::getTypes())
-      ->mapWithKeys(fn ($type) => [ $type => Sensor::getClassDescr($type)])
+])->merge(collect(Sensor::getTypes())
+      ->mapWithKeys(fn ($type) => [$type => Sensor::getClassDescr($type)])
     )->toArray();
 
 $active_metric = basename(array_key_exists($vars['metric'], $type_text) ? $vars['metric'] : 'processor');

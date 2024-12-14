@@ -137,8 +137,8 @@ function poll_sensor($device, $class)
 function record_sensor_data($device, $all_sensors)
 {
     foreach ($all_sensors as $sensor) {
-        $class = ucfirst($sensor['sensor_class']);
-        $unit = __('sensors.' . $sensor['sensor_class'] . '.unit');
+        $class = Sensor::getClassDescr($sensor['sensor_class']);
+        $unit = Sensor::getUnit($sensor['sensor_class']);
         $sensor_value = Number::extract($sensor['new_value']);
         $prev_sensor_value = $sensor['sensor_current'];
 

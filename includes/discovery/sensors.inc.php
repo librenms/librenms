@@ -48,7 +48,7 @@ if ($device['os'] == 'loop-telecom') {
 }
 
 // filter submodules
-$run_sensors = array_intersect($run_sensors, Config::get('discovery_submodules.sensors', Sensor::getTypes()));
+$run_sensors = array_intersect(Sensor::getTypes(), Config::get('discovery_submodules.sensors'));
 
 sensors($run_sensors, $os, $pre_cache);
 unset(
