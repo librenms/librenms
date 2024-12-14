@@ -764,7 +764,7 @@ function discovery_process($os, $sensor_class, $pre_cache)
                             $$limit = YamlDiscovery::getValueFromData($limit, $index, $data, $pre_cache, 'null');
                             if (is_numeric($$limit)) {
                                 $$limit = ($$limit / $divisor) * $multiplier;
-                            } else {
+                            } elseif (isset($data[$limit])) {
                                 \Log::warning("Valid number not found in data for $limit, not setting");
                             }
                             if (is_numeric($$limit) && isset($user_function)) {
