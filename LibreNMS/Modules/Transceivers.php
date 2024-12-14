@@ -41,7 +41,7 @@ class Transceivers implements Module
 
     public function dependencies(): array
     {
-        return ['ports'];
+        return ['ports', 'entity-physical'];
     }
 
     public function shouldDiscover(OS $os, ModuleStatus $status): bool
