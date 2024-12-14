@@ -42,7 +42,8 @@ require 'overview/mempools.inc.php';
 require 'overview/storage.inc.php';
 require 'overview/toner.inc.php';
 foreach (Sensor::getTypes() as $type) {
-    require 'overview/sensors/' . $type . '.inc.php';
+    $sensor_class = $type;
+    require 'overview/sensors.inc.php';
 }
 require 'overview/eventlog.inc.php';
 require 'overview/services.inc.php';
