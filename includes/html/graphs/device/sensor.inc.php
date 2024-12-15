@@ -39,7 +39,7 @@ foreach (Sensor::where('sensor_class', $class)->where('device_id', $device['devi
     }//end switch
 
     $sensor_descr_fixed = \LibreNMS\Data\Store\Rrd::fixedSafeDescr($sensor->sensor_descr, 12);
-    $unit = str_replace('%','%%',$sensor->unit());
+    $unit = str_replace('%', '%%', $sensor->unit());
     $rrd_filename = get_sensor_rrd($device, $sensor);
     $rrd_options .= " DEF:sensor{$sensor->sensor_id}=$rrd_filename:sensor:AVERAGE";
     $rrd_options .= " LINE1:sensor{$sensor->sensor_id}#$colour:'$sensor_descr_fixed'";
