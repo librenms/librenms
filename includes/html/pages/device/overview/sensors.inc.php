@@ -22,7 +22,6 @@ if ($sensors->count()) {
         <table class="table table-hover table-condensed table-striped">';
     $group = '';
     foreach ($sensors as $sensor) {
-
         if (! is_numeric($sensor->sensor_current)) {
             $sensor->sensor_current = 'NaN';
         }

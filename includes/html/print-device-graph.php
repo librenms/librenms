@@ -1,6 +1,7 @@
 <?php
+
 if (empty($graph_array['type'])) {
-    $graph_array['type'] = $type;
+    $graph_array['type'] = 'sensor_' . $type;
 }
 if (empty($graph_array['device'])) {
     $graph_array['device'] = $device['device_id'];

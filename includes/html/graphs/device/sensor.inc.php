@@ -1,11 +1,12 @@
 <?php
 
+use App\Models\Sensor;
+
 require 'includes/html/graphs/common.inc.php';
 
 $col_w = 7 + strlen($unit);
 $rrd_options .= " COMMENT:'" . str_pad($unit_long, 19) . str_pad('Cur', $col_w) . str_pad('Min', $col_w) . str_pad('Max', $col_w) . "Avg\\n'";
-
-foreach (Sensor::where('sensor_class',$class)->where('device_id',$device->device_id)->get() as $index => $sensor) {
+foreach (Sensor::where('sensor_class', $class)->where('device_id', $device['device_id'])->get() as $index => $sensor) {
     // FIXME generic colour function
     switch ($index % 7) {
         case 0:
@@ -38,12 +39,13 @@ foreach (Sensor::where('sensor_class',$class)->where('device_id',$device->device
     }//end switch
 
     $sensor_descr_fixed = \LibreNMS\Data\Store\Rrd::fixedSafeDescr($sensor->sensor_descr, 12);
+    $unit = str_replace('%','%%',$sensor->unit());
     $rrd_filename = get_sensor_rrd($device, $sensor);
-    $rrd_options .= " DEF:sensor{$sensor->sensor_id}=$rrd_filename:sensor:AVERAGE";
-    $rrd_options .= " LINE1:sensor{$sensor->sensor_id}#$colour:'$sensor_descr_fixed'";
-    $rrd_options .= " GPRINT:sensor{$sensor->sensor_id}:LAST:%5.1lf" . $sensor->unit();
-    $rrd_options .= " GPRINT:sensor{$sensor->sensor_id}:MIN:%5.1lf" . $sensor->unit();
-    $rrd_options .= " GPRINT:sensor{$sensor->sensor_id}:MAX:%5.1lf" . $sensor->unit();
-    $rrd_options .= " GPRINT:sensor{$sensor->sensor_id}:AVERAGE:%5.2lf" . $sensor->unit() . "\\l ";
+    $rrd_options .= ' DEF:sensor' . $sensor->sensor_id . '=' . $rrd_filename . ':sensor:AVERAGE';
+    $rrd_options .= ' LINE1:sensor' . $sensor->sensor_id . '#$colour:"' . $sensor_descr_fixed . '"';
+    $rrd_options .= ' GPRINT:sensor' . $sensor->sensor_id . ':LAST:%5.1lf' . $unit;
+    $rrd_options .= ' GPRINT:sensor' . $sensor->sensor_id . ':MIN:%5.1lf' . $unit;
+    $rrd_options .= ' GPRINT:sensor' . $sensor->sensor_id . ':MAX:%5.1lf' . $unit;
+    $rrd_options .= ' GPRINT:sensor' . $sensor->sensor_id . ':AVERAGE:%5.2lf' . $unit . '\\l ';
     $iter++;
 }//end foreach
