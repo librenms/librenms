@@ -26,8 +26,8 @@ if ($device['os_group'] == 'cisco') {
             $tunnel_full = array_merge($tunnel, $ike_array[$tunnel['cipSecTunIkeTunnelIndex']]);
         } else {
             $tunnel_full = $tunnel;
-            $tunnel_full['cikeTunLocalValue'] = (string) IP::fromHexString($tunnel_full['cipSecTunLocalAddr']);
-            $tunnel_full['cikeTunLocalName'] = (string) IP::fromHexString($tunnel_full['cipSecTunLocalAddr']);
+            $tunnel_full['cikeTunLocalValue'] = (string) IP::fromHexString($tunnel_full['cipSecTunLocalAddr'], true) ?? '';
+            $tunnel_full['cikeTunLocalName'] = (string) IP::fromHexString($tunnel_full['cipSecTunLocalAddr'], true) ?? '';
         }
 
         d_echo($tunnel_full);
