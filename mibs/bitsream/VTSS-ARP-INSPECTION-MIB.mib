@@ -1,0 +1,497 @@
+-- *****************************************************************
+-- ARP-INSPECTION-MIB:  Vitesse private MIB
+--
+-- Copyright (c) 2002-2013 Vitesse Semiconductor Corporation "Vitesse".
+-- All Rights Reserved.
+--
+-- ****************************************************************
+
+VTSS-ARP-INSPECTION-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    vtssSwitchMgmt
+        FROM VTSS-SMI
+    Integer32 FROM SNMPv2-SMI
+    IpAddress FROM SNMPv2-SMI
+    MacAddress FROM SNMPv2-TC
+    TruthValue FROM SNMPv2-TC
+    VTSSInterfaceIndex FROM VTSS-TC
+    VTSSRowEditorState FROM VTSS-TC
+    ;
+
+vtssArpInspectionMib MODULE-IDENTITY
+    LAST-UPDATED "201407010000Z"
+    ORGANIZATION
+        "Vitesse Semiconductor Corporation"
+    CONTACT-INFO
+        "Application support <application_support@vitesse.com>"
+    DESCRIPTION
+        "This is a private version of the ARP Inspection MIB"
+    REVISION    "201407010000Z"
+    DESCRIPTION
+        "Initial version"
+    ::= { vtssSwitchMgmt 63 }
+
+
+VTSSArpInspectionLogType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This enumeration indicates the ARP entry log type."
+    SYNTAX      INTEGER { none(0), deny(1), permit(2), all(3) }
+
+VTSSArpInspectionRegisterStatus ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This enumeration indicates the ARP entry registration type."
+    SYNTAX      INTEGER { static(0), dynamic(1) }
+
+vtssArpInspectionMibObjects OBJECT IDENTIFIER
+    ::= { vtssArpInspectionMib 1 }
+
+vtssArpInspectionConfig OBJECT IDENTIFIER
+    ::= { vtssArpInspectionMibObjects 2 }
+
+vtssArpInspectionConfigGlobals OBJECT IDENTIFIER
+    ::= { vtssArpInspectionConfig 1 }
+
+vtssArpInspectionConfigGlobalsAdminState OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Enable/Disable the ARP Inspection global functionality."
+    ::= { vtssArpInspectionConfigGlobals 1 }
+
+vtssArpInspectionConfigPortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VTSSArpInspectionConfigPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is a table for managing ARP Inspection per port basis"
+    ::= { vtssArpInspectionConfig 2 }
+
+vtssArpInspectionConfigPortEntry OBJECT-TYPE
+    SYNTAX      VTSSArpInspectionConfigPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each port has a set of parameters"
+    INDEX       { vtssArpInspectionConfigPortIfIndex }
+    ::= { vtssArpInspectionConfigPortTable 1 }
+
+VTSSArpInspectionConfigPortEntry ::= SEQUENCE {
+    vtssArpInspectionConfigPortIfIndex      VTSSInterfaceIndex,
+    vtssArpInspectionConfigPortMode     TruthValue,
+    vtssArpInspectionConfigPortCheckVlan    TruthValue,
+    vtssArpInspectionConfigPortLogType      VTSSArpInspectionLogType
+}
+
+vtssArpInspectionConfigPortIfIndex OBJECT-TYPE
+    SYNTAX      VTSSInterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Logical interface number of the physical port."
+    ::= { vtssArpInspectionConfigPortEntry 1 }
+
+vtssArpInspectionConfigPortMode OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Enable/Disable the ARP Inspection per-port functionality. Only when
+         both Global Mode and Port Mode on a given port are enabled, ARP
+         Inspection is enabled on this given port."
+    ::= { vtssArpInspectionConfigPortEntry 2 }
+
+vtssArpInspectionConfigPortCheckVlan OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Enable the ARP Inspection VLAN checking will log the inspected entries
+         by referring to arpInspectionVlanConfigTable setting. Disable the ARP
+         Inspection VLAN checking will log the inspected entries by referring to
+         arpInspectionPortConfigTable setting."
+    ::= { vtssArpInspectionConfigPortEntry 3 }
+
+vtssArpInspectionConfigPortLogType OBJECT-TYPE
+    SYNTAX      VTSSArpInspectionLogType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The capability to log the inspected entries per port basis. none(0)
+         will log nothing. deny(1) will log the denied entries. permit(2) will
+         log the permitted entries. all(3) will log all kinds of inspected
+         entries."
+    ::= { vtssArpInspectionConfigPortEntry 4 }
+
+vtssArpInspectionConfigVlanTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VTSSArpInspectionConfigVlanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is a table for managing ARP Inspection per VLAN basis"
+    ::= { vtssArpInspectionConfig 3 }
+
+vtssArpInspectionConfigVlanEntry OBJECT-TYPE
+    SYNTAX      VTSSArpInspectionConfigVlanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each VLAN has a set of parameters"
+    INDEX       { vtssArpInspectionConfigVlanVlanId }
+    ::= { vtssArpInspectionConfigVlanTable 1 }
+
+VTSSArpInspectionConfigVlanEntry ::= SEQUENCE {
+    vtssArpInspectionConfigVlanVlanId   Integer32,
+    vtssArpInspectionConfigVlanLogType      VTSSArpInspectionLogType,
+    vtssArpInspectionConfigVlanAction   VTSSRowEditorState
+}
+
+vtssArpInspectionConfigVlanVlanId OBJECT-TYPE
+    SYNTAX      Integer32 (1..4095)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The VID of the VLAN."
+    ::= { vtssArpInspectionConfigVlanEntry 1 }
+
+vtssArpInspectionConfigVlanLogType OBJECT-TYPE
+    SYNTAX      VTSSArpInspectionLogType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The capability to log the inspected entries per VLAN basis. none(0)
+         will log nothing. deny(1) will log the denied entries. permit(2) will
+         log the permitted entries. all(3) will log all kinds of inspected
+         entries."
+    ::= { vtssArpInspectionConfigVlanEntry 2 }
+
+vtssArpInspectionConfigVlanAction OBJECT-TYPE
+    SYNTAX      VTSSRowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Action"
+    ::= { vtssArpInspectionConfigVlanEntry 100 }
+
+vtssArpInspectionConfigVlanTableRowEditor OBJECT IDENTIFIER
+    ::= { vtssArpInspectionConfig 4 }
+
+vtssArpInspectionConfigVlanTableRowEditorVlanId OBJECT-TYPE
+    SYNTAX      Integer32 (1..4095)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The VID of the VLAN."
+    ::= { vtssArpInspectionConfigVlanTableRowEditor 1 }
+
+vtssArpInspectionConfigVlanTableRowEditorLogType OBJECT-TYPE
+    SYNTAX      VTSSArpInspectionLogType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The capability to log the inspected entries per VLAN basis. none(0)
+         will log nothing. deny(1) will log the denied entries. permit(2) will
+         log the permitted entries. all(3) will log all kinds of inspected
+         entries."
+    ::= { vtssArpInspectionConfigVlanTableRowEditor 2 }
+
+vtssArpInspectionConfigVlanTableRowEditorAction OBJECT-TYPE
+    SYNTAX      VTSSRowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Action"
+    ::= { vtssArpInspectionConfigVlanTableRowEditor 100 }
+
+vtssArpInspectionConfigStaticTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VTSSArpInspectionConfigStaticEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is a table for managing static ARP Inspection configuration"
+    ::= { vtssArpInspectionConfig 5 }
+
+vtssArpInspectionConfigStaticEntry OBJECT-TYPE
+    SYNTAX      VTSSArpInspectionConfigStaticEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each entry has a set of parameters"
+    INDEX       { vtssArpInspectionConfigStaticIfIndex, vtssArpInspectionConfigStaticVlanId, vtssArpInspectionConfigStaticMacAddress, vtssArpInspectionConfigStaticIpAddress }
+    ::= { vtssArpInspectionConfigStaticTable 1 }
+
+VTSSArpInspectionConfigStaticEntry ::= SEQUENCE {
+    vtssArpInspectionConfigStaticIfIndex    VTSSInterfaceIndex,
+    vtssArpInspectionConfigStaticVlanId     Integer32,
+    vtssArpInspectionConfigStaticMacAddress     MacAddress,
+    vtssArpInspectionConfigStaticIpAddress      IpAddress,
+    vtssArpInspectionConfigStaticAction     VTSSRowEditorState
+}
+
+vtssArpInspectionConfigStaticIfIndex OBJECT-TYPE
+    SYNTAX      VTSSInterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Logical interface number of the physical port."
+    ::= { vtssArpInspectionConfigStaticEntry 1 }
+
+vtssArpInspectionConfigStaticVlanId OBJECT-TYPE
+    SYNTAX      Integer32 (1..4095)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The VID of the VLAN."
+    ::= { vtssArpInspectionConfigStaticEntry 2 }
+
+vtssArpInspectionConfigStaticMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Assigned MAC address."
+    ::= { vtssArpInspectionConfigStaticEntry 3 }
+
+vtssArpInspectionConfigStaticIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Assigned IPv4 address."
+    ::= { vtssArpInspectionConfigStaticEntry 4 }
+
+vtssArpInspectionConfigStaticAction OBJECT-TYPE
+    SYNTAX      VTSSRowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Action"
+    ::= { vtssArpInspectionConfigStaticEntry 100 }
+
+vtssArpInspectionConfigStaticTableRowEditor OBJECT IDENTIFIER
+    ::= { vtssArpInspectionConfig 6 }
+
+vtssArpInspectionConfigStaticTableRowEditorIfIndex OBJECT-TYPE
+    SYNTAX      VTSSInterfaceIndex
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Logical interface number of the physical port."
+    ::= { vtssArpInspectionConfigStaticTableRowEditor 1 }
+
+vtssArpInspectionConfigStaticTableRowEditorVlanId OBJECT-TYPE
+    SYNTAX      Integer32 (1..4095)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The VID of the VLAN."
+    ::= { vtssArpInspectionConfigStaticTableRowEditor 2 }
+
+vtssArpInspectionConfigStaticTableRowEditorMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Assigned MAC address."
+    ::= { vtssArpInspectionConfigStaticTableRowEditor 3 }
+
+vtssArpInspectionConfigStaticTableRowEditorIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Assigned IPv4 address."
+    ::= { vtssArpInspectionConfigStaticTableRowEditor 4 }
+
+vtssArpInspectionConfigStaticTableRowEditorAction OBJECT-TYPE
+    SYNTAX      VTSSRowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Action"
+    ::= { vtssArpInspectionConfigStaticTableRowEditor 100 }
+
+vtssArpInspectionStatus OBJECT IDENTIFIER
+    ::= { vtssArpInspectionMibObjects 3 }
+
+vtssArpInspectionStatusDynamicAddressTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VTSSArpInspectionStatusDynamicAddressEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is a table for displaying all ARP Inspection entries"
+    ::= { vtssArpInspectionStatus 1 }
+
+vtssArpInspectionStatusDynamicAddressEntry OBJECT-TYPE
+    SYNTAX      VTSSArpInspectionStatusDynamicAddressEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each entry has a set of parameters"
+    INDEX       { vtssArpInspectionStatusDynamicAddressIfIndex, vtssArpInspectionStatusDynamicAddressVlanId, vtssArpInspectionStatusDynamicAddressMacAddress, vtssArpInspectionStatusDynamicAddressIpAddress }
+    ::= { vtssArpInspectionStatusDynamicAddressTable 1 }
+
+VTSSArpInspectionStatusDynamicAddressEntry ::= SEQUENCE {
+    vtssArpInspectionStatusDynamicAddressIfIndex    VTSSInterfaceIndex,
+    vtssArpInspectionStatusDynamicAddressVlanId     Integer32,
+    vtssArpInspectionStatusDynamicAddressMacAddress     MacAddress,
+    vtssArpInspectionStatusDynamicAddressIpAddress      IpAddress,
+    vtssArpInspectionStatusDynamicAddressType   VTSSArpInspectionRegisterStatus
+}
+
+vtssArpInspectionStatusDynamicAddressIfIndex OBJECT-TYPE
+    SYNTAX      VTSSInterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Logical interface number of the physical port."
+    ::= { vtssArpInspectionStatusDynamicAddressEntry 1 }
+
+vtssArpInspectionStatusDynamicAddressVlanId OBJECT-TYPE
+    SYNTAX      Integer32 (1..4095)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The VID of the VLAN."
+    ::= { vtssArpInspectionStatusDynamicAddressEntry 2 }
+
+vtssArpInspectionStatusDynamicAddressMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Assigned MAC address."
+    ::= { vtssArpInspectionStatusDynamicAddressEntry 3 }
+
+vtssArpInspectionStatusDynamicAddressIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Assigned IPv4 address."
+    ::= { vtssArpInspectionStatusDynamicAddressEntry 4 }
+
+vtssArpInspectionStatusDynamicAddressType OBJECT-TYPE
+    SYNTAX      VTSSArpInspectionRegisterStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Either static(0) or dynamic(1) for the specific ARP entry."
+    ::= { vtssArpInspectionStatusDynamicAddressEntry 5 }
+
+vtssArpInspectionControl OBJECT IDENTIFIER
+    ::= { vtssArpInspectionMibObjects 4 }
+
+vtssArpInspectionControlGlobals OBJECT IDENTIFIER
+    ::= { vtssArpInspectionControl 1 }
+
+vtssArpInspectionControlGlobalsTranslateDynamicToStatic OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "To trigger the control action (only) when TRUE."
+    ::= { vtssArpInspectionControlGlobals 1 }
+
+vtssArpInspectionMibConformance OBJECT IDENTIFIER
+    ::= { vtssArpInspectionMib 2 }
+
+vtssArpInspectionMibCompliances OBJECT IDENTIFIER
+    ::= { vtssArpInspectionMibConformance 1 }
+
+vtssArpInspectionMibGroups OBJECT IDENTIFIER
+    ::= { vtssArpInspectionMibConformance 2 }
+
+vtssArpInspectionConfigGlobalsInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssArpInspectionConfigGlobalsAdminState }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssArpInspectionMibGroups 1 }
+
+vtssArpInspectionConfigPortTableInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssArpInspectionConfigPortMode, 
+                  vtssArpInspectionConfigPortCheckVlan, 
+                  vtssArpInspectionConfigPortLogType }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssArpInspectionMibGroups 2 }
+
+vtssArpInspectionConfigVlanTableInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssArpInspectionConfigVlanLogType, 
+                  vtssArpInspectionConfigVlanAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssArpInspectionMibGroups 3 }
+
+vtssArpInspectionConfigVlanTableRowEditorInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssArpInspectionConfigVlanTableRowEditorVlanId, 
+                  vtssArpInspectionConfigVlanTableRowEditorLogType, 
+                  vtssArpInspectionConfigVlanTableRowEditorAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssArpInspectionMibGroups 4 }
+
+vtssArpInspectionConfigStaticTableInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssArpInspectionConfigStaticAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssArpInspectionMibGroups 5 }
+
+vtssArpInspectionConfigStaticTableRowEditorInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssArpInspectionConfigStaticTableRowEditorIfIndex, 
+                  vtssArpInspectionConfigStaticTableRowEditorVlanId, 
+                  vtssArpInspectionConfigStaticTableRowEditorMacAddress, 
+                  vtssArpInspectionConfigStaticTableRowEditorIpAddress, 
+                  vtssArpInspectionConfigStaticTableRowEditorAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssArpInspectionMibGroups 6 }
+
+vtssArpInspectionStatusDynamicAddressTableInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssArpInspectionStatusDynamicAddressType }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssArpInspectionMibGroups 7 }
+
+vtssArpInspectionControlGlobalsInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssArpInspectionControlGlobalsTranslateDynamicToStatic }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssArpInspectionMibGroups 8 }
+
+vtssArpInspectionMibCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the implementation."
+
+    MODULE      -- this module
+
+        MANDATORY-GROUPS        { vtssArpInspectionConfigGlobalsInfoGroup, 
+                  vtssArpInspectionConfigPortTableInfoGroup, 
+                  vtssArpInspectionConfigVlanTableInfoGroup, 
+                  vtssArpInspectionConfigVlanTableRowEditorInfoGroup, 
+                  vtssArpInspectionConfigStaticTableInfoGroup, 
+                  vtssArpInspectionConfigStaticTableRowEditorInfoGroup, 
+                  vtssArpInspectionStatusDynamicAddressTableInfoGroup, 
+                  vtssArpInspectionControlGlobalsInfoGroup }
+
+    ::= { vtssArpInspectionMibCompliances 1 }
+
+END

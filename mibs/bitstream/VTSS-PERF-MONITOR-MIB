@@ -1,0 +1,1413 @@
+-- *****************************************************************
+-- PERF-MONITOR-MIB:  Vitesse private MIB
+--
+-- Copyright (c) 2002-2013 Vitesse Semiconductor Corporation "Vitesse".
+-- All Rights Reserved.
+--
+-- ****************************************************************
+
+VTSS-PERF-MONITOR-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    vtssSwitchMgmt
+        FROM VTSS-SMI
+    Counter64 FROM SNMPv2-SMI
+    Unsigned32 FROM SNMPv2-SMI
+    MacAddress FROM SNMPv2-TC
+    TruthValue FROM SNMPv2-TC
+    VTSSDisplayString FROM VTSS-TC
+    VTSSInterfaceIndex FROM VTSS-TC
+    VTSSUnsigned16 FROM VTSS-TC
+    VTSSUnsigned8 FROM VTSS-TC
+    ;
+
+vtssPerfMonitorMib MODULE-IDENTITY
+    LAST-UPDATED "201410060000Z"
+    ORGANIZATION
+        "Vitesse Semiconductor Corporation"
+    CONTACT-INFO
+        "Application support <application_support@vitesse.com>"
+    DESCRIPTION
+        "This is a private version of the Performance Monitor MIB."
+    REVISION    "201410060000Z"
+    DESCRIPTION
+        "Initial version."
+    ::= { vtssSwitchMgmt 117 }
+
+
+VTSSPerfMonitorEvcPortType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This enumeration indicates per port type for EVC statistics."
+    SYNTAX      INTEGER { evcNni(0), evcUni(1) }
+
+VTSSPerfMonitorMepDirection ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This enumeration indicates MEP instance direction measured by PM."
+    SYNTAX      INTEGER { down(0), up(1) }
+
+VTSSPerfMonitorMepDmTimeUnit ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This enumeration indicates time resolution of the DM results measured
+         by PM."
+    SYNTAX      INTEGER { us(0), ns(1) }
+
+VTSSPerfMonitorMepRate ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This enumeration indicates MEP frame rate of CCM/LMM PDU which is the
+         inverse of transmission period as described in Y.1731."
+    SYNTAX      INTEGER { frames300PerSecond(1), frames100PerSecond(2), frames10PerSecond(3), frames1PerSecond(4), frames6PerMinute(5), frames1PerMinute(6), frames6PerHour(7) }
+
+VTSSPerfMonitorTransferMode ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This enumeration indicates PM transfer interval mode."
+    SYNTAX      INTEGER { all(1), new(2), fixAmount(3) }
+
+vtssPerfMonitorMibObjects OBJECT IDENTIFIER
+    ::= { vtssPerfMonitorMib 1 }
+
+vtssPerfMonitorConfig OBJECT IDENTIFIER
+    ::= { vtssPerfMonitorMibObjects 2 }
+
+vtssPerfMonitorConfigGlobals OBJECT IDENTIFIER
+    ::= { vtssPerfMonitorConfig 1 }
+
+vtssPerfMonitorConfigGlobalsMgmt OBJECT IDENTIFIER
+    ::= { vtssPerfMonitorConfigGlobals 1 }
+
+vtssPerfMonitorConfigGlobalsMgmtLossMeasurementAdminState OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Administrative control for PM's LM function, TRUE is to enable
+         monitoring LM and FALSE is to disable it."
+    ::= { vtssPerfMonitorConfigGlobalsMgmt 1 }
+
+vtssPerfMonitorConfigGlobalsMgmtLossMeasurementStorageState OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Administrative control for storing PM's LM result, TRUE is to enable
+         storing LM statistics and FALSE is to disable it."
+    ::= { vtssPerfMonitorConfigGlobalsMgmt 2 }
+
+vtssPerfMonitorConfigGlobalsMgmtLossMeasurementInterval OBJECT-TYPE
+    SYNTAX      VTSSUnsigned8 (1..60)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Interval for tracking LM, in minute. The configurable value ranges from
+         1 to 60."
+    ::= { vtssPerfMonitorConfigGlobalsMgmt 3 }
+
+vtssPerfMonitorConfigGlobalsMgmtDelayMeasurementAdminState OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Administrative control for PM's DM function, TRUE is to enable
+         monitoring DM and FALSE is to disable it."
+    ::= { vtssPerfMonitorConfigGlobalsMgmt 4 }
+
+vtssPerfMonitorConfigGlobalsMgmtDelayMeasurementStorageState OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Administrative control for storing PM's DM result, TRUE is to enable
+         storing DM statistics and FALSE is to disable it."
+    ::= { vtssPerfMonitorConfigGlobalsMgmt 5 }
+
+vtssPerfMonitorConfigGlobalsMgmtDelayMeasurementInterval OBJECT-TYPE
+    SYNTAX      VTSSUnsigned8 (1..60)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Interval for tracking DM, in minute. The configurable value ranges from
+         1 to 60."
+    ::= { vtssPerfMonitorConfigGlobalsMgmt 6 }
+
+vtssPerfMonitorConfigGlobalsMgmtDelayMeasurementBinStorageState OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Administrative control for storing PM's DM bucket result, TRUE is to
+         enable storing DM bucket statistics and FALSE is to disable it."
+    ::= { vtssPerfMonitorConfigGlobalsMgmt 7 }
+
+vtssPerfMonitorConfigGlobalsMgmtEvcAdminState OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Administrative control for PM's EVC monitoring function, TRUE is to
+         enable monitoring EVC and FALSE is to disable it."
+    ::= { vtssPerfMonitorConfigGlobalsMgmt 8 }
+
+vtssPerfMonitorConfigGlobalsMgmtEvcStorageState OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Administrative control for storing PM's EVC monitoring result, TRUE is
+         to enable storing EVC statistics and FALSE is to disable it."
+    ::= { vtssPerfMonitorConfigGlobalsMgmt 9 }
+
+vtssPerfMonitorConfigGlobalsMgmtEvcMeasureInterval OBJECT-TYPE
+    SYNTAX      VTSSUnsigned8 (1..60)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Interval for tracking EVC, in minute. The configurable value ranges
+         from 1 to 60."
+    ::= { vtssPerfMonitorConfigGlobalsMgmt 10 }
+
+vtssPerfMonitorConfigGlobalsTransfer OBJECT IDENTIFIER
+    ::= { vtssPerfMonitorConfigGlobals 2 }
+
+vtssPerfMonitorConfigGlobalsTransferAdminState OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Administrative control for PM's transfer function, TRUE is to enable
+         sending PM's monitoring result and FALSE is to disable it."
+    ::= { vtssPerfMonitorConfigGlobalsTransfer 1 }
+
+vtssPerfMonitorConfigGlobalsTransferServerUrl OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..64))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The URL for the server directory that keeps PM's monitoring result."
+    ::= { vtssPerfMonitorConfigGlobalsTransfer 2 }
+
+vtssPerfMonitorConfigGlobalsTransferIntervalMode OBJECT-TYPE
+    SYNTAX      VTSSPerfMonitorTransferMode
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Transfer mode, based on selected interval type, for sending PM results.
+         When 'all' is set, PM result from all available intervals will be sent.
+         When 'new' is set, PM result from new intervals since last transfer
+         will be sent. When 'fixAmount' is set, PM result from a fixed number of
+         intervals will be sent."
+    ::= { vtssPerfMonitorConfigGlobalsTransfer 3 }
+
+vtssPerfMonitorConfigGlobalsTransferFixedNumberOfInterval OBJECT-TYPE
+    SYNTAX      VTSSUnsigned8 (1..96)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "PM result from this fixed number of intervals will be sent. It is
+         working only when 'IntervalMode' is 'fixAmount'. The configurable value
+         ranges from 1 to 96."
+    ::= { vtssPerfMonitorConfigGlobalsTransfer 4 }
+
+vtssPerfMonitorConfigGlobalsTransferRetryIncompletedTransfer OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Administrative control to retry sending PM result from last incompleted
+         transmission, TRUE is to enable retrying the incompleted PM result
+         transfer and FALSE is to disable it."
+    ::= { vtssPerfMonitorConfigGlobalsTransfer 5 }
+
+vtssPerfMonitorConfigGlobalsXferSched OBJECT IDENTIFIER
+    ::= { vtssPerfMonitorConfigGlobals 3 }
+
+vtssPerfMonitorConfigGlobalsXferSchedHourTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VTSSPerfMonitorConfigGlobalsXferSchedHourEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is a table for managing PM hourly scheduled transfer
+         configuration."
+    ::= { vtssPerfMonitorConfigGlobalsXferSched 1 }
+
+vtssPerfMonitorConfigGlobalsXferSchedHourEntry OBJECT-TYPE
+    SYNTAX      VTSSPerfMonitorConfigGlobalsXferSchedHourEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each entry has a set of parameters."
+    INDEX       { vtssPerfMonitorConfigGlobalsXferSchedHourIndex }
+    ::= { vtssPerfMonitorConfigGlobalsXferSchedHourTable 1 }
+
+VTSSPerfMonitorConfigGlobalsXferSchedHourEntry ::= SEQUENCE {
+    vtssPerfMonitorConfigGlobalsXferSchedHourIndex      Unsigned32,
+    vtssPerfMonitorConfigGlobalsXferSchedHourEnabled    TruthValue
+}
+
+vtssPerfMonitorConfigGlobalsXferSchedHourIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..23)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Hour value in 24 hour time."
+    ::= { vtssPerfMonitorConfigGlobalsXferSchedHourEntry 1 }
+
+vtssPerfMonitorConfigGlobalsXferSchedHourEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Administrative control for managing the transfer schedule, TRUE is to
+         enable specific time for transfer schedule and FALSE is to disable it."
+    ::= { vtssPerfMonitorConfigGlobalsXferSchedHourEntry 2 }
+
+vtssPerfMonitorConfigGlobalsXferSchedQuarterTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VTSSPerfMonitorConfigGlobalsXferSchedQuarterEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is a table for managing PM quarterly scheduled transfer
+         configuration."
+    ::= { vtssPerfMonitorConfigGlobalsXferSched 2 }
+
+vtssPerfMonitorConfigGlobalsXferSchedQuarterEntry OBJECT-TYPE
+    SYNTAX      VTSSPerfMonitorConfigGlobalsXferSchedQuarterEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each entry has a set of parameters."
+    INDEX       { vtssPerfMonitorConfigGlobalsXferSchedQuarterIndex }
+    ::= { vtssPerfMonitorConfigGlobalsXferSchedQuarterTable 1 }
+
+VTSSPerfMonitorConfigGlobalsXferSchedQuarterEntry ::= SEQUENCE {
+    vtssPerfMonitorConfigGlobalsXferSchedQuarterIndex   Unsigned32,
+    vtssPerfMonitorConfigGlobalsXferSchedQuarterEnabled     TruthValue
+}
+
+vtssPerfMonitorConfigGlobalsXferSchedQuarterIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..3)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Quarter value in a hour."
+    ::= { vtssPerfMonitorConfigGlobalsXferSchedQuarterEntry 1 }
+
+vtssPerfMonitorConfigGlobalsXferSchedQuarterEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Administrative control for managing the transfer schedule, TRUE is to
+         enable specific time for transfer schedule and FALSE is to disable it."
+    ::= { vtssPerfMonitorConfigGlobalsXferSchedQuarterEntry 2 }
+
+vtssPerfMonitorConfigGlobalsXferSchedOffset OBJECT IDENTIFIER
+    ::= { vtssPerfMonitorConfigGlobalsXferSched 3 }
+
+vtssPerfMonitorConfigGlobalsXferSchedOffsetMinute OBJECT-TYPE
+    SYNTAX      VTSSUnsigned8 (0..15)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The scheduled transfer time offset by minutes. The configurable value
+         ranges from 0 to 15."
+    ::= { vtssPerfMonitorConfigGlobalsXferSchedOffset 1 }
+
+vtssPerfMonitorConfigGlobalsXferSchedOffsetRandomSecond OBJECT-TYPE
+    SYNTAX      VTSSUnsigned16 (0..900)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The scheduled transfer time random offset by seconds. It provides a
+         range for choosing a random second offset. The configurable value
+         ranges from 0 to 900."
+    ::= { vtssPerfMonitorConfigGlobalsXferSchedOffset 2 }
+
+vtssPerfMonitorStatus OBJECT IDENTIFIER
+    ::= { vtssPerfMonitorMibObjects 3 }
+
+vtssPerfMonitorStatusStatistics OBJECT IDENTIFIER
+    ::= { vtssPerfMonitorStatus 1 }
+
+vtssPerfMonitorStatusStatisticsLmTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VTSSPerfMonitorStatusStatisticsLmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is a table for displaying PM loss measurement statistics."
+    ::= { vtssPerfMonitorStatusStatistics 1 }
+
+vtssPerfMonitorStatusStatisticsLmEntry OBJECT-TYPE
+    SYNTAX      VTSSPerfMonitorStatusStatisticsLmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each entry has a set of LM statistics."
+    INDEX       { vtssPerfMonitorStatusStatisticsLmIntervalId, vtssPerfMonitorStatusStatisticsLmEntryId }
+    ::= { vtssPerfMonitorStatusStatisticsLmTable 1 }
+
+VTSSPerfMonitorStatusStatisticsLmEntry ::= SEQUENCE {
+    vtssPerfMonitorStatusStatisticsLmIntervalId     Unsigned32,
+    vtssPerfMonitorStatusStatisticsLmEntryId    Unsigned32,
+    vtssPerfMonitorStatusStatisticsLmMepInstance    VTSSUnsigned16,
+    vtssPerfMonitorStatusStatisticsLmResidencePort      VTSSInterfaceIndex,
+    vtssPerfMonitorStatusStatisticsLmMepId      VTSSUnsigned16,
+    vtssPerfMonitorStatusStatisticsLmMepMacAddress      MacAddress,
+    vtssPerfMonitorStatusStatisticsLmMepPeerMepId   VTSSUnsigned16,
+    vtssPerfMonitorStatusStatisticsLmMepPeerMacAddress      MacAddress,
+    vtssPerfMonitorStatusStatisticsLmMepDirection   VTSSPerfMonitorMepDirection,
+    vtssPerfMonitorStatusStatisticsLmMepLevel   VTSSUnsigned8,
+    vtssPerfMonitorStatusStatisticsLmMepFlowInstance    VTSSInterfaceIndex,
+    vtssPerfMonitorStatusStatisticsLmMepTaggedVid   VTSSUnsigned16,
+    vtssPerfMonitorStatusStatisticsLmPriority   Unsigned32,
+    vtssPerfMonitorStatusStatisticsLmRate   VTSSPerfMonitorMepRate,
+    vtssPerfMonitorStatusStatisticsLmTx     Unsigned32,
+    vtssPerfMonitorStatusStatisticsLmRx     Unsigned32,
+    vtssPerfMonitorStatusStatisticsLmNearEndLossCount   Unsigned32,
+    vtssPerfMonitorStatusStatisticsLmNearEndLossRate    Unsigned32,
+    vtssPerfMonitorStatusStatisticsLmFarEndLossCount    Unsigned32,
+    vtssPerfMonitorStatusStatisticsLmFarEndLossRate     Unsigned32
+}
+
+vtssPerfMonitorStatusStatisticsLmIntervalId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The measurement interval identifier for the performance monitor data
+         sets."
+    ::= { vtssPerfMonitorStatusStatisticsLmEntry 1 }
+
+vtssPerfMonitorStatusStatisticsLmEntryId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The entry identifier for the performance monitor data sets."
+    ::= { vtssPerfMonitorStatusStatisticsLmEntry 2 }
+
+vtssPerfMonitorStatusStatisticsLmMepInstance OBJECT-TYPE
+    SYNTAX      VTSSUnsigned16
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The MEP instance for the performance monitor data sets."
+    ::= { vtssPerfMonitorStatusStatisticsLmEntry 3 }
+
+vtssPerfMonitorStatusStatisticsLmResidencePort OBJECT-TYPE
+    SYNTAX      VTSSInterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The residence port for the MEP."
+    ::= { vtssPerfMonitorStatusStatisticsLmEntry 4 }
+
+vtssPerfMonitorStatusStatisticsLmMepId OBJECT-TYPE
+    SYNTAX      VTSSUnsigned16
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Two bytes CCM MEP ID in the transmitted CCM."
+    ::= { vtssPerfMonitorStatusStatisticsLmEntry 5 }
+
+vtssPerfMonitorStatusStatisticsLmMepMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "MAC address of this MEP which can be used by other MEP when unicast is
+         selected."
+    ::= { vtssPerfMonitorStatusStatisticsLmEntry 6 }
+
+vtssPerfMonitorStatusStatisticsLmMepPeerMepId OBJECT-TYPE
+    SYNTAX      VTSSUnsigned16
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "An expected MEP identifier in the received CCM."
+    ::= { vtssPerfMonitorStatusStatisticsLmEntry 7 }
+
+vtssPerfMonitorStatusStatisticsLmMepPeerMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "MAC address to be used when unicast is selected with the peer MEP.
+         Also, this MAC is used to create HW checking of receiving CCM PDU from
+         this MEP."
+    ::= { vtssPerfMonitorStatusStatisticsLmEntry 8 }
+
+vtssPerfMonitorStatusStatisticsLmMepDirection OBJECT-TYPE
+    SYNTAX      VTSSPerfMonitorMepDirection
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Upstream or downstream that needs to be monitored."
+    ::= { vtssPerfMonitorStatusStatisticsLmEntry 10 }
+
+vtssPerfMonitorStatusStatisticsLmMepLevel OBJECT-TYPE
+    SYNTAX      VTSSUnsigned8
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The MEG level of this MEP."
+    ::= { vtssPerfMonitorStatusStatisticsLmEntry 11 }
+
+vtssPerfMonitorStatusStatisticsLmMepFlowInstance OBJECT-TYPE
+    SYNTAX      VTSSInterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The MEP is related to this flow depends on 'MepDomain'."
+    ::= { vtssPerfMonitorStatusStatisticsLmEntry 12 }
+
+vtssPerfMonitorStatusStatisticsLmMepTaggedVid OBJECT-TYPE
+    SYNTAX      VTSSUnsigned16
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "An outer C/S-tag or the subscriber VID that identifies the subscriber
+         flow in EVC where the MIP is active."
+    ::= { vtssPerfMonitorStatusStatisticsLmEntry 13 }
+
+vtssPerfMonitorStatusStatisticsLmPriority OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The priority to be inserted as PCP bits in TAG (if any)."
+    ::= { vtssPerfMonitorStatusStatisticsLmEntry 14 }
+
+vtssPerfMonitorStatusStatisticsLmRate OBJECT-TYPE
+    SYNTAX      VTSSPerfMonitorMepRate
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Frame rate of CCM/LMM PDU which is the inverse of transmission period
+         as described in Y.1731."
+    ::= { vtssPerfMonitorStatusStatisticsLmEntry 15 }
+
+vtssPerfMonitorStatusStatisticsLmTx OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of frame transmitted."
+    ::= { vtssPerfMonitorStatusStatisticsLmEntry 16 }
+
+vtssPerfMonitorStatusStatisticsLmRx OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of frame received."
+    ::= { vtssPerfMonitorStatusStatisticsLmEntry 17 }
+
+vtssPerfMonitorStatusStatisticsLmNearEndLossCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The near end loss count."
+    ::= { vtssPerfMonitorStatusStatisticsLmEntry 18 }
+
+vtssPerfMonitorStatusStatisticsLmNearEndLossRate OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The near end loss ratio."
+    ::= { vtssPerfMonitorStatusStatisticsLmEntry 19 }
+
+vtssPerfMonitorStatusStatisticsLmFarEndLossCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The far end loss count."
+    ::= { vtssPerfMonitorStatusStatisticsLmEntry 20 }
+
+vtssPerfMonitorStatusStatisticsLmFarEndLossRate OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The far end loss ratio."
+    ::= { vtssPerfMonitorStatusStatisticsLmEntry 21 }
+
+vtssPerfMonitorStatusStatisticsDmTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VTSSPerfMonitorStatusStatisticsDmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is a table for displaying PM delay measurement statistics."
+    ::= { vtssPerfMonitorStatusStatistics 2 }
+
+vtssPerfMonitorStatusStatisticsDmEntry OBJECT-TYPE
+    SYNTAX      VTSSPerfMonitorStatusStatisticsDmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each entry has a set of DM statistics."
+    INDEX       { vtssPerfMonitorStatusStatisticsDmIntervalId, vtssPerfMonitorStatusStatisticsDmEntryId }
+    ::= { vtssPerfMonitorStatusStatisticsDmTable 1 }
+
+VTSSPerfMonitorStatusStatisticsDmEntry ::= SEQUENCE {
+    vtssPerfMonitorStatusStatisticsDmIntervalId     Unsigned32,
+    vtssPerfMonitorStatusStatisticsDmEntryId    Unsigned32,
+    vtssPerfMonitorStatusStatisticsDmMepInstance    VTSSUnsigned16,
+    vtssPerfMonitorStatusStatisticsDmResidencePort      VTSSInterfaceIndex,
+    vtssPerfMonitorStatusStatisticsDmMepId      VTSSUnsigned16,
+    vtssPerfMonitorStatusStatisticsDmMepMacAddress      MacAddress,
+    vtssPerfMonitorStatusStatisticsDmMepPeerMepId   VTSSUnsigned16,
+    vtssPerfMonitorStatusStatisticsDmMepPeerMacAddress      MacAddress,
+    vtssPerfMonitorStatusStatisticsDmMepDirection   VTSSPerfMonitorMepDirection,
+    vtssPerfMonitorStatusStatisticsDmMepLevel   VTSSUnsigned8,
+    vtssPerfMonitorStatusStatisticsDmMepFlowInstance    VTSSInterfaceIndex,
+    vtssPerfMonitorStatusStatisticsDmMepTaggedVid   VTSSUnsigned16,
+    vtssPerfMonitorStatusStatisticsDmPriority   Unsigned32,
+    vtssPerfMonitorStatusStatisticsDmRate   VTSSUnsigned8,
+    vtssPerfMonitorStatusStatisticsDmUnit   VTSSPerfMonitorMepDmTimeUnit,
+    vtssPerfMonitorStatusStatisticsDmTx     Unsigned32,
+    vtssPerfMonitorStatusStatisticsDmRx     Unsigned32,
+    vtssPerfMonitorStatusStatisticsDmFarToNearDelayAverage      Unsigned32,
+    vtssPerfMonitorStatusStatisticsDmFarToNearDelayAverageVariation     Unsigned32,
+    vtssPerfMonitorStatusStatisticsDmFarToNearDelayMin      Unsigned32,
+    vtssPerfMonitorStatusStatisticsDmFarToNearDelayMax      Unsigned32,
+    vtssPerfMonitorStatusStatisticsDmNearToFarDelayAverage      Unsigned32,
+    vtssPerfMonitorStatusStatisticsDmNearToFarDelayAverageVariation     Unsigned32,
+    vtssPerfMonitorStatusStatisticsDmNearToFarDelayMin      Unsigned32,
+    vtssPerfMonitorStatusStatisticsDmNearToFarDelayMax      Unsigned32,
+    vtssPerfMonitorStatusStatisticsDm2WayDelayAverage   Unsigned32,
+    vtssPerfMonitorStatusStatisticsDm2WayDelayAverageVariation      Unsigned32,
+    vtssPerfMonitorStatusStatisticsDm2WayDelayMin   Unsigned32,
+    vtssPerfMonitorStatusStatisticsDm2WayDelayMax   Unsigned32
+}
+
+vtssPerfMonitorStatusStatisticsDmIntervalId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The measurement interval identifier for the performance monitor data
+         sets."
+    ::= { vtssPerfMonitorStatusStatisticsDmEntry 1 }
+
+vtssPerfMonitorStatusStatisticsDmEntryId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The entry identifier for the performance monitor data sets."
+    ::= { vtssPerfMonitorStatusStatisticsDmEntry 2 }
+
+vtssPerfMonitorStatusStatisticsDmMepInstance OBJECT-TYPE
+    SYNTAX      VTSSUnsigned16
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The MEP instance for the performance monitor data sets."
+    ::= { vtssPerfMonitorStatusStatisticsDmEntry 3 }
+
+vtssPerfMonitorStatusStatisticsDmResidencePort OBJECT-TYPE
+    SYNTAX      VTSSInterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The residence port for the MEP."
+    ::= { vtssPerfMonitorStatusStatisticsDmEntry 4 }
+
+vtssPerfMonitorStatusStatisticsDmMepId OBJECT-TYPE
+    SYNTAX      VTSSUnsigned16
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Two bytes CCM MEP ID in the transmitted CCM."
+    ::= { vtssPerfMonitorStatusStatisticsDmEntry 5 }
+
+vtssPerfMonitorStatusStatisticsDmMepMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "MAC address of this MEP which can be used by other MEP when unicast is
+         selected."
+    ::= { vtssPerfMonitorStatusStatisticsDmEntry 6 }
+
+vtssPerfMonitorStatusStatisticsDmMepPeerMepId OBJECT-TYPE
+    SYNTAX      VTSSUnsigned16
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "An expected MEP identifier in the received CCM."
+    ::= { vtssPerfMonitorStatusStatisticsDmEntry 7 }
+
+vtssPerfMonitorStatusStatisticsDmMepPeerMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "MAC address to be used when unicast is selected with the peer MEP.
+         Also, this MAC is used to create HW checking of receiving CCM PDU from
+         this MEP."
+    ::= { vtssPerfMonitorStatusStatisticsDmEntry 8 }
+
+vtssPerfMonitorStatusStatisticsDmMepDirection OBJECT-TYPE
+    SYNTAX      VTSSPerfMonitorMepDirection
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Upstream or downstream that needs to be monitored."
+    ::= { vtssPerfMonitorStatusStatisticsDmEntry 10 }
+
+vtssPerfMonitorStatusStatisticsDmMepLevel OBJECT-TYPE
+    SYNTAX      VTSSUnsigned8
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The MEG level of this MEP."
+    ::= { vtssPerfMonitorStatusStatisticsDmEntry 11 }
+
+vtssPerfMonitorStatusStatisticsDmMepFlowInstance OBJECT-TYPE
+    SYNTAX      VTSSInterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The MEP is related to this flow depends on 'MepDomain'."
+    ::= { vtssPerfMonitorStatusStatisticsDmEntry 12 }
+
+vtssPerfMonitorStatusStatisticsDmMepTaggedVid OBJECT-TYPE
+    SYNTAX      VTSSUnsigned16
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "An outer C/S-tag or the subscriber VID that identifies the subscriber
+         flow in EVC where the MIP is active."
+    ::= { vtssPerfMonitorStatusStatisticsDmEntry 13 }
+
+vtssPerfMonitorStatusStatisticsDmPriority OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The priority to be inserted as PCP bits in TAG (if any)."
+    ::= { vtssPerfMonitorStatusStatisticsDmEntry 14 }
+
+vtssPerfMonitorStatusStatisticsDmRate OBJECT-TYPE
+    SYNTAX      VTSSUnsigned8
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The gap between transmitting 1DM/DMM PDU in 10ms. The range is 10 to
+         65535."
+    ::= { vtssPerfMonitorStatusStatisticsDmEntry 15 }
+
+vtssPerfMonitorStatusStatisticsDmUnit OBJECT-TYPE
+    SYNTAX      VTSSPerfMonitorMepDmTimeUnit
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The time resolution."
+    ::= { vtssPerfMonitorStatusStatisticsDmEntry 16 }
+
+vtssPerfMonitorStatusStatisticsDmTx OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of frame transmitted."
+    ::= { vtssPerfMonitorStatusStatisticsDmEntry 17 }
+
+vtssPerfMonitorStatusStatisticsDmRx OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of frame received."
+    ::= { vtssPerfMonitorStatusStatisticsDmEntry 18 }
+
+vtssPerfMonitorStatusStatisticsDmFarToNearDelayAverage OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The far to near average delay."
+    ::= { vtssPerfMonitorStatusStatisticsDmEntry 19 }
+
+vtssPerfMonitorStatusStatisticsDmFarToNearDelayAverageVariation OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The far to near average delay variation."
+    ::= { vtssPerfMonitorStatusStatisticsDmEntry 20 }
+
+vtssPerfMonitorStatusStatisticsDmFarToNearDelayMin OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The minimum far to near delay."
+    ::= { vtssPerfMonitorStatusStatisticsDmEntry 21 }
+
+vtssPerfMonitorStatusStatisticsDmFarToNearDelayMax OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The maximum far to near delay."
+    ::= { vtssPerfMonitorStatusStatisticsDmEntry 22 }
+
+vtssPerfMonitorStatusStatisticsDmNearToFarDelayAverage OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The near to far average delay."
+    ::= { vtssPerfMonitorStatusStatisticsDmEntry 23 }
+
+vtssPerfMonitorStatusStatisticsDmNearToFarDelayAverageVariation OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The near to far average delay variation."
+    ::= { vtssPerfMonitorStatusStatisticsDmEntry 24 }
+
+vtssPerfMonitorStatusStatisticsDmNearToFarDelayMin OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The minimum near to far delay."
+    ::= { vtssPerfMonitorStatusStatisticsDmEntry 25 }
+
+vtssPerfMonitorStatusStatisticsDmNearToFarDelayMax OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The maximum near to far delay."
+    ::= { vtssPerfMonitorStatusStatisticsDmEntry 26 }
+
+vtssPerfMonitorStatusStatisticsDm2WayDelayAverage OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The two-way average delay."
+    ::= { vtssPerfMonitorStatusStatisticsDmEntry 27 }
+
+vtssPerfMonitorStatusStatisticsDm2WayDelayAverageVariation OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The two-way average delay variation."
+    ::= { vtssPerfMonitorStatusStatisticsDmEntry 28 }
+
+vtssPerfMonitorStatusStatisticsDm2WayDelayMin OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The minimum two-way delay."
+    ::= { vtssPerfMonitorStatusStatisticsDmEntry 29 }
+
+vtssPerfMonitorStatusStatisticsDm2WayDelayMax OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The maximum two-way delay."
+    ::= { vtssPerfMonitorStatusStatisticsDmEntry 30 }
+
+vtssPerfMonitorStatusStatisticsDmBinTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VTSSPerfMonitorStatusStatisticsDmBinEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is a table for displaying PM bin delay measurement statistics."
+    ::= { vtssPerfMonitorStatusStatistics 3 }
+
+vtssPerfMonitorStatusStatisticsDmBinEntry OBJECT-TYPE
+    SYNTAX      VTSSPerfMonitorStatusStatisticsDmBinEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each entry has a set of DM bin statistics."
+    INDEX       { vtssPerfMonitorStatusStatisticsDmBinIntervalId, vtssPerfMonitorStatusStatisticsDmBinEntryId, vtssPerfMonitorStatusStatisticsDmBinType, vtssPerfMonitorStatusStatisticsDmBinDirection, vtssPerfMonitorStatusStatisticsDmBinBucketId }
+    ::= { vtssPerfMonitorStatusStatisticsDmBinTable 1 }
+
+VTSSPerfMonitorStatusStatisticsDmBinEntry ::= SEQUENCE {
+    vtssPerfMonitorStatusStatisticsDmBinIntervalId      Unsigned32,
+    vtssPerfMonitorStatusStatisticsDmBinEntryId     Unsigned32,
+    vtssPerfMonitorStatusStatisticsDmBinType    Unsigned32,
+    vtssPerfMonitorStatusStatisticsDmBinDirection   Unsigned32,
+    vtssPerfMonitorStatusStatisticsDmBinBucketId    Unsigned32,
+    vtssPerfMonitorStatusStatisticsDmBinHitCount    Unsigned32
+}
+
+vtssPerfMonitorStatusStatisticsDmBinIntervalId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The measurement interval identifier for the performance monitor data
+         sets."
+    ::= { vtssPerfMonitorStatusStatisticsDmBinEntry 1 }
+
+vtssPerfMonitorStatusStatisticsDmBinEntryId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The entry identifier for the performance monitor data sets."
+    ::= { vtssPerfMonitorStatusStatisticsDmBinEntry 2 }
+
+vtssPerfMonitorStatusStatisticsDmBinType OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..2)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The type for DM bin statistics. It's used for indicating what kinds of
+         delay frame are counted in the bin.'1' presents the frame delay.
+         
+         '2' presents the inter frame delay variation.
+         
+         "
+    ::= { vtssPerfMonitorStatusStatisticsDmBinEntry 3 }
+
+vtssPerfMonitorStatusStatisticsDmBinDirection OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..3)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The direction for DM bin statistics. It's used for indicating the
+         measuring method of the delay frame.
+         
+         '1' presents one-way delay from remote devices to the local devices.
+         
+         '2' presents one-way delay from local devices to the remote devices.
+         
+         '3' presents 2-way delay from near to far then far to near."
+    ::= { vtssPerfMonitorStatusStatisticsDmBinEntry 4 }
+
+vtssPerfMonitorStatusStatisticsDmBinBucketId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The bin ID."
+    ::= { vtssPerfMonitorStatusStatisticsDmBinEntry 5 }
+
+vtssPerfMonitorStatusStatisticsDmBinHitCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The hit count for the DM bin"
+    ::= { vtssPerfMonitorStatusStatisticsDmBinEntry 6 }
+
+vtssPerfMonitorStatusStatisticsEvcTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VTSSPerfMonitorStatusStatisticsEvcEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is a table for displaying PM EVC statistics."
+    ::= { vtssPerfMonitorStatusStatistics 4 }
+
+vtssPerfMonitorStatusStatisticsEvcEntry OBJECT-TYPE
+    SYNTAX      VTSSPerfMonitorStatusStatisticsEvcEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each entry has a set of EVC statistics."
+    INDEX       { vtssPerfMonitorStatusStatisticsEvcIntervalId, vtssPerfMonitorStatusStatisticsEvcEntryId }
+    ::= { vtssPerfMonitorStatusStatisticsEvcTable 1 }
+
+VTSSPerfMonitorStatusStatisticsEvcEntry ::= SEQUENCE {
+    vtssPerfMonitorStatusStatisticsEvcIntervalId    Unsigned32,
+    vtssPerfMonitorStatusStatisticsEvcEntryId   Unsigned32,
+    vtssPerfMonitorStatusStatisticsEvcEvcInstance   VTSSUnsigned16,
+    vtssPerfMonitorStatusStatisticsEvcPortType      VTSSPerfMonitorEvcPortType,
+    vtssPerfMonitorStatusStatisticsEvcPort      VTSSInterfaceIndex,
+    vtssPerfMonitorStatusStatisticsEvcCos   Unsigned32,
+    vtssPerfMonitorStatusStatisticsEvcGreenRxFrames     Counter64,
+    vtssPerfMonitorStatusStatisticsEvcGreenTxFrames     Counter64,
+    vtssPerfMonitorStatusStatisticsEvcGreenRxBytes      Counter64,
+    vtssPerfMonitorStatusStatisticsEvcGreenTxBytes      Counter64,
+    vtssPerfMonitorStatusStatisticsEvcYellowRxFrames    Counter64,
+    vtssPerfMonitorStatusStatisticsEvcYellowTxFrames    Counter64,
+    vtssPerfMonitorStatusStatisticsEvcYellowRxBytes     Counter64,
+    vtssPerfMonitorStatusStatisticsEvcYellowTxBytes     Counter64,
+    vtssPerfMonitorStatusStatisticsEvcRedRxFrames   Counter64,
+    vtssPerfMonitorStatusStatisticsEvcRedRxBytes    Counter64,
+    vtssPerfMonitorStatusStatisticsEvcDiscardedRxFrames     Counter64,
+    vtssPerfMonitorStatusStatisticsEvcDiscardedTxFrames     Counter64,
+    vtssPerfMonitorStatusStatisticsEvcDiscardedRxBytes      Counter64,
+    vtssPerfMonitorStatusStatisticsEvcDiscardedTxBytes      Counter64
+}
+
+vtssPerfMonitorStatusStatisticsEvcIntervalId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The measurement interval identifier for the performance monitor data
+         sets."
+    ::= { vtssPerfMonitorStatusStatisticsEvcEntry 1 }
+
+vtssPerfMonitorStatusStatisticsEvcEntryId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The entry identifier for the performance monitor data sets."
+    ::= { vtssPerfMonitorStatusStatisticsEvcEntry 2 }
+
+vtssPerfMonitorStatusStatisticsEvcEvcInstance OBJECT-TYPE
+    SYNTAX      VTSSUnsigned16
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The EVC instance for the performance monitor data sets."
+    ::= { vtssPerfMonitorStatusStatisticsEvcEntry 3 }
+
+vtssPerfMonitorStatusStatisticsEvcPortType OBJECT-TYPE
+    SYNTAX      VTSSPerfMonitorEvcPortType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The port type for the EVC."
+    ::= { vtssPerfMonitorStatusStatisticsEvcEntry 4 }
+
+vtssPerfMonitorStatusStatisticsEvcPort OBJECT-TYPE
+    SYNTAX      VTSSInterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The interface ID for the EVC."
+    ::= { vtssPerfMonitorStatusStatisticsEvcEntry 5 }
+
+vtssPerfMonitorStatusStatisticsEvcCos OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The COS queue ID on the interface, '4294967295' indicates the port is
+         NNI port."
+    ::= { vtssPerfMonitorStatusStatisticsEvcEntry 6 }
+
+vtssPerfMonitorStatusStatisticsEvcGreenRxFrames OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of green frames received."
+    ::= { vtssPerfMonitorStatusStatisticsEvcEntry 7 }
+
+vtssPerfMonitorStatusStatisticsEvcGreenTxFrames OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of green frames transmitted."
+    ::= { vtssPerfMonitorStatusStatisticsEvcEntry 8 }
+
+vtssPerfMonitorStatusStatisticsEvcGreenRxBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of green bytes received."
+    ::= { vtssPerfMonitorStatusStatisticsEvcEntry 9 }
+
+vtssPerfMonitorStatusStatisticsEvcGreenTxBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of green bytes transmitted."
+    ::= { vtssPerfMonitorStatusStatisticsEvcEntry 10 }
+
+vtssPerfMonitorStatusStatisticsEvcYellowRxFrames OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of yellow frames received."
+    ::= { vtssPerfMonitorStatusStatisticsEvcEntry 11 }
+
+vtssPerfMonitorStatusStatisticsEvcYellowTxFrames OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of yellow frames transmitted."
+    ::= { vtssPerfMonitorStatusStatisticsEvcEntry 12 }
+
+vtssPerfMonitorStatusStatisticsEvcYellowRxBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of yellow bytes received."
+    ::= { vtssPerfMonitorStatusStatisticsEvcEntry 13 }
+
+vtssPerfMonitorStatusStatisticsEvcYellowTxBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of yellow bytes transmitted."
+    ::= { vtssPerfMonitorStatusStatisticsEvcEntry 14 }
+
+vtssPerfMonitorStatusStatisticsEvcRedRxFrames OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of red frames received."
+    ::= { vtssPerfMonitorStatusStatisticsEvcEntry 15 }
+
+vtssPerfMonitorStatusStatisticsEvcRedRxBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of red bytes received."
+    ::= { vtssPerfMonitorStatusStatisticsEvcEntry 16 }
+
+vtssPerfMonitorStatusStatisticsEvcDiscardedRxFrames OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of frames discarded in the ingress queue system."
+    ::= { vtssPerfMonitorStatusStatisticsEvcEntry 17 }
+
+vtssPerfMonitorStatusStatisticsEvcDiscardedTxFrames OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of frames discarded in the egress queue system."
+    ::= { vtssPerfMonitorStatusStatisticsEvcEntry 18 }
+
+vtssPerfMonitorStatusStatisticsEvcDiscardedRxBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of bytes discarded in the ingress queue system."
+    ::= { vtssPerfMonitorStatusStatisticsEvcEntry 19 }
+
+vtssPerfMonitorStatusStatisticsEvcDiscardedTxBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of bytes discarded in the egress queue system."
+    ::= { vtssPerfMonitorStatusStatisticsEvcEntry 20 }
+
+vtssPerfMonitorStatusInterval OBJECT IDENTIFIER
+    ::= { vtssPerfMonitorStatus 2 }
+
+vtssPerfMonitorStatusIntervalInfoTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VTSSPerfMonitorStatusIntervalInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is a table for displaying per type and interval PM time
+         information."
+    ::= { vtssPerfMonitorStatusInterval 1 }
+
+vtssPerfMonitorStatusIntervalInfoEntry OBJECT-TYPE
+    SYNTAX      VTSSPerfMonitorStatusIntervalInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each entry has a set of time information."
+    INDEX       { vtssPerfMonitorStatusIntervalInfoType, vtssPerfMonitorStatusIntervalInfoIntervalId }
+    ::= { vtssPerfMonitorStatusIntervalInfoTable 1 }
+
+VTSSPerfMonitorStatusIntervalInfoEntry ::= SEQUENCE {
+    vtssPerfMonitorStatusIntervalInfoType   Unsigned32,
+    vtssPerfMonitorStatusIntervalInfoIntervalId     Unsigned32,
+    vtssPerfMonitorStatusIntervalInfoStartTime      VTSSDisplayString,
+    vtssPerfMonitorStatusIntervalInfoEndTime    VTSSDisplayString,
+    vtssPerfMonitorStatusIntervalInfoElapsedTime    Counter64
+}
+
+vtssPerfMonitorStatusIntervalInfoType OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..3)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The type for the performance monitor interval information. '1' presents
+         LM; '2' presents DM; '3' presents EVC."
+    ::= { vtssPerfMonitorStatusIntervalInfoEntry 1 }
+
+vtssPerfMonitorStatusIntervalInfoIntervalId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The measurement interval identifier for the performance monitor data
+         sets."
+    ::= { vtssPerfMonitorStatusIntervalInfoEntry 2 }
+
+vtssPerfMonitorStatusIntervalInfoStartTime OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The date and time when PM starts."
+    ::= { vtssPerfMonitorStatusIntervalInfoEntry 3 }
+
+vtssPerfMonitorStatusIntervalInfoEndTime OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The date and time when PM stops."
+    ::= { vtssPerfMonitorStatusIntervalInfoEntry 4 }
+
+vtssPerfMonitorStatusIntervalInfoElapsedTime OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The elapsed time ticks for the specific monitoring type and the
+         corresponding interval identifier."
+    ::= { vtssPerfMonitorStatusIntervalInfoEntry 5 }
+
+vtssPerfMonitorControl OBJECT IDENTIFIER
+    ::= { vtssPerfMonitorMibObjects 4 }
+
+vtssPerfMonitorControlGlobals OBJECT IDENTIFIER
+    ::= { vtssPerfMonitorControl 1 }
+
+vtssPerfMonitorControlGlobalsAction OBJECT IDENTIFIER
+    ::= { vtssPerfMonitorControlGlobals 1 }
+
+vtssPerfMonitorControlGlobalsActionDeleteLmStatisticsAll OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Clear all the LM statistics."
+    ::= { vtssPerfMonitorControlGlobalsAction 1 }
+
+vtssPerfMonitorControlGlobalsActionDeleteDmStatisticsAll OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Clear all the DM statistics."
+    ::= { vtssPerfMonitorControlGlobalsAction 2 }
+
+vtssPerfMonitorControlGlobalsActionDeleteEvcStatisticsAll OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Clear all the EVC statistics."
+    ::= { vtssPerfMonitorControlGlobalsAction 3 }
+
+vtssPerfMonitorMibConformance OBJECT IDENTIFIER
+    ::= { vtssPerfMonitorMib 2 }
+
+vtssPerfMonitorMibCompliances OBJECT IDENTIFIER
+    ::= { vtssPerfMonitorMibConformance 1 }
+
+vtssPerfMonitorMibGroups OBJECT IDENTIFIER
+    ::= { vtssPerfMonitorMibConformance 2 }
+
+vtssPerfMonitorConfigGlobalsMgmtInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssPerfMonitorConfigGlobalsMgmtLossMeasurementAdminState, 
+                  vtssPerfMonitorConfigGlobalsMgmtLossMeasurementStorageState, 
+                  vtssPerfMonitorConfigGlobalsMgmtLossMeasurementInterval, 
+                  vtssPerfMonitorConfigGlobalsMgmtDelayMeasurementAdminState, 
+                  vtssPerfMonitorConfigGlobalsMgmtDelayMeasurementStorageState, 
+                  vtssPerfMonitorConfigGlobalsMgmtDelayMeasurementInterval, 
+                  vtssPerfMonitorConfigGlobalsMgmtDelayMeasurementBinStorageState, 
+                  vtssPerfMonitorConfigGlobalsMgmtEvcAdminState, 
+                  vtssPerfMonitorConfigGlobalsMgmtEvcStorageState, 
+                  vtssPerfMonitorConfigGlobalsMgmtEvcMeasureInterval }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssPerfMonitorMibGroups 1 }
+
+vtssPerfMonitorConfigGlobalsTransferInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssPerfMonitorConfigGlobalsTransferAdminState, 
+                  vtssPerfMonitorConfigGlobalsTransferServerUrl, 
+                  vtssPerfMonitorConfigGlobalsTransferIntervalMode, 
+                  vtssPerfMonitorConfigGlobalsTransferFixedNumberOfInterval, 
+                  vtssPerfMonitorConfigGlobalsTransferRetryIncompletedTransfer }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssPerfMonitorMibGroups 2 }
+
+vtssPerfMonitorConfigGlobalsXferSchedHourTableInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssPerfMonitorConfigGlobalsXferSchedHourEnabled }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssPerfMonitorMibGroups 3 }
+
+vtssPerfMonitorConfigGlobalsXferSchedQuarterTableInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssPerfMonitorConfigGlobalsXferSchedQuarterEnabled }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssPerfMonitorMibGroups 4 }
+
+vtssPerfMonitorConfigGlobalsXferSchedOffsetInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssPerfMonitorConfigGlobalsXferSchedOffsetMinute, 
+                  vtssPerfMonitorConfigGlobalsXferSchedOffsetRandomSecond }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssPerfMonitorMibGroups 5 }
+
+vtssPerfMonitorStatusStatisticsLmTableInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssPerfMonitorStatusStatisticsLmMepInstance, 
+                  vtssPerfMonitorStatusStatisticsLmResidencePort, 
+                  vtssPerfMonitorStatusStatisticsLmMepId, 
+                  vtssPerfMonitorStatusStatisticsLmMepMacAddress, 
+                  vtssPerfMonitorStatusStatisticsLmMepPeerMepId, 
+                  vtssPerfMonitorStatusStatisticsLmMepPeerMacAddress, 
+                  vtssPerfMonitorStatusStatisticsLmMepDirection, 
+                  vtssPerfMonitorStatusStatisticsLmMepLevel, 
+                  vtssPerfMonitorStatusStatisticsLmMepFlowInstance, 
+                  vtssPerfMonitorStatusStatisticsLmMepTaggedVid, 
+                  vtssPerfMonitorStatusStatisticsLmPriority, 
+                  vtssPerfMonitorStatusStatisticsLmRate, 
+                  vtssPerfMonitorStatusStatisticsLmTx, 
+                  vtssPerfMonitorStatusStatisticsLmRx, 
+                  vtssPerfMonitorStatusStatisticsLmNearEndLossCount, 
+                  vtssPerfMonitorStatusStatisticsLmNearEndLossRate, 
+                  vtssPerfMonitorStatusStatisticsLmFarEndLossCount, 
+                  vtssPerfMonitorStatusStatisticsLmFarEndLossRate }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssPerfMonitorMibGroups 6 }
+
+vtssPerfMonitorStatusStatisticsDmTableInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssPerfMonitorStatusStatisticsDmMepInstance, 
+                  vtssPerfMonitorStatusStatisticsDmResidencePort, 
+                  vtssPerfMonitorStatusStatisticsDmMepId, 
+                  vtssPerfMonitorStatusStatisticsDmMepMacAddress, 
+                  vtssPerfMonitorStatusStatisticsDmMepPeerMepId, 
+                  vtssPerfMonitorStatusStatisticsDmMepPeerMacAddress, 
+                  vtssPerfMonitorStatusStatisticsDmMepDirection, 
+                  vtssPerfMonitorStatusStatisticsDmMepLevel, 
+                  vtssPerfMonitorStatusStatisticsDmMepFlowInstance, 
+                  vtssPerfMonitorStatusStatisticsDmMepTaggedVid, 
+                  vtssPerfMonitorStatusStatisticsDmPriority, 
+                  vtssPerfMonitorStatusStatisticsDmRate, 
+                  vtssPerfMonitorStatusStatisticsDmUnit, 
+                  vtssPerfMonitorStatusStatisticsDmTx, 
+                  vtssPerfMonitorStatusStatisticsDmRx, 
+                  vtssPerfMonitorStatusStatisticsDmFarToNearDelayAverage, 
+                  vtssPerfMonitorStatusStatisticsDmFarToNearDelayAverageVariation, 
+                  vtssPerfMonitorStatusStatisticsDmFarToNearDelayMin, 
+                  vtssPerfMonitorStatusStatisticsDmFarToNearDelayMax, 
+                  vtssPerfMonitorStatusStatisticsDmNearToFarDelayAverage, 
+                  vtssPerfMonitorStatusStatisticsDmNearToFarDelayAverageVariation, 
+                  vtssPerfMonitorStatusStatisticsDmNearToFarDelayMin, 
+                  vtssPerfMonitorStatusStatisticsDmNearToFarDelayMax, 
+                  vtssPerfMonitorStatusStatisticsDm2WayDelayAverage, 
+                  vtssPerfMonitorStatusStatisticsDm2WayDelayAverageVariation, 
+                  vtssPerfMonitorStatusStatisticsDm2WayDelayMin, 
+                  vtssPerfMonitorStatusStatisticsDm2WayDelayMax }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssPerfMonitorMibGroups 7 }
+
+vtssPerfMonitorStatusStatisticsDmBinTableInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssPerfMonitorStatusStatisticsDmBinHitCount }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssPerfMonitorMibGroups 8 }
+
+vtssPerfMonitorStatusStatisticsEvcTableInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssPerfMonitorStatusStatisticsEvcEvcInstance, 
+                  vtssPerfMonitorStatusStatisticsEvcPortType, 
+                  vtssPerfMonitorStatusStatisticsEvcPort, 
+                  vtssPerfMonitorStatusStatisticsEvcCos, 
+                  vtssPerfMonitorStatusStatisticsEvcGreenRxFrames, 
+                  vtssPerfMonitorStatusStatisticsEvcGreenTxFrames, 
+                  vtssPerfMonitorStatusStatisticsEvcGreenRxBytes, 
+                  vtssPerfMonitorStatusStatisticsEvcGreenTxBytes, 
+                  vtssPerfMonitorStatusStatisticsEvcYellowRxFrames, 
+                  vtssPerfMonitorStatusStatisticsEvcYellowTxFrames, 
+                  vtssPerfMonitorStatusStatisticsEvcYellowRxBytes, 
+                  vtssPerfMonitorStatusStatisticsEvcYellowTxBytes, 
+                  vtssPerfMonitorStatusStatisticsEvcRedRxFrames, 
+                  vtssPerfMonitorStatusStatisticsEvcRedRxBytes, 
+                  vtssPerfMonitorStatusStatisticsEvcDiscardedRxFrames, 
+                  vtssPerfMonitorStatusStatisticsEvcDiscardedTxFrames, 
+                  vtssPerfMonitorStatusStatisticsEvcDiscardedRxBytes, 
+                  vtssPerfMonitorStatusStatisticsEvcDiscardedTxBytes }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssPerfMonitorMibGroups 9 }
+
+vtssPerfMonitorStatusIntervalInfoTableInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssPerfMonitorStatusIntervalInfoStartTime, 
+                  vtssPerfMonitorStatusIntervalInfoEndTime, 
+                  vtssPerfMonitorStatusIntervalInfoElapsedTime }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssPerfMonitorMibGroups 10 }
+
+vtssPerfMonitorControlGlobalsActionInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssPerfMonitorControlGlobalsActionDeleteLmStatisticsAll, 
+                  vtssPerfMonitorControlGlobalsActionDeleteDmStatisticsAll, 
+                  vtssPerfMonitorControlGlobalsActionDeleteEvcStatisticsAll }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssPerfMonitorMibGroups 11 }
+
+vtssPerfMonitorMibCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the implementation."
+
+    MODULE      -- this module
+
+        MANDATORY-GROUPS        { vtssPerfMonitorConfigGlobalsMgmtInfoGroup, 
+                  vtssPerfMonitorConfigGlobalsTransferInfoGroup, 
+                  vtssPerfMonitorConfigGlobalsXferSchedHourTableInfoGroup, 
+                  vtssPerfMonitorConfigGlobalsXferSchedQuarterTableInfoGroup, 
+                  vtssPerfMonitorConfigGlobalsXferSchedOffsetInfoGroup, 
+                  vtssPerfMonitorStatusStatisticsLmTableInfoGroup, 
+                  vtssPerfMonitorStatusStatisticsDmTableInfoGroup, 
+                  vtssPerfMonitorStatusStatisticsDmBinTableInfoGroup, 
+                  vtssPerfMonitorStatusStatisticsEvcTableInfoGroup, 
+                  vtssPerfMonitorStatusIntervalInfoTableInfoGroup, 
+                  vtssPerfMonitorControlGlobalsActionInfoGroup }
+
+    ::= { vtssPerfMonitorMibCompliances 1 }
+
+END

@@ -1,0 +1,649 @@
+-- *****************************************************************
+-- TOPO-MIB:  Vitesse private MIB
+--
+-- Copyright (c) 2002-2013 Vitesse Semiconductor Corporation "Vitesse".
+-- All Rights Reserved.
+--
+-- ****************************************************************
+
+VTSS-TOPO-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    vtssSwitchMgmt
+        FROM VTSS-SMI
+    Integer32 FROM SNMPv2-SMI
+    TruthValue FROM SNMPv2-TC
+    VTSSDisplayString FROM VTSS-TC
+    VTSSInterfaceIndex FROM VTSS-TC
+    ;
+
+vtssTopoMib MODULE-IDENTITY
+    LAST-UPDATED "201410010000Z"
+    ORGANIZATION
+        "Vitesse Semiconductor Corporation"
+    CONTACT-INFO
+        "Application support <application_support@vitesse.com>"
+    DESCRIPTION
+        "This is the Vitesse stack topology private MIB."
+    REVISION    "201410010000Z"
+    DESCRIPTION
+        "Initial version"
+    ::= { vtssSwitchMgmt 5 }
+
+
+VTSStopoTopologyType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This enumeration reflects the current topology."
+    SYNTAX      INTEGER { back2back(0), ring(1), chain(2) }
+
+vtssTopoMibObjects OBJECT IDENTIFIER
+    ::= { vtssTopoMib 1 }
+
+vtssTopoConfig OBJECT IDENTIFIER
+    ::= { vtssTopoMibObjects 2 }
+
+vtssTopoConfigStackingTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VTSSTopoConfigStackingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The topology configuration table."
+    ::= { vtssTopoConfig 1 }
+
+vtssTopoConfigStackingEntry OBJECT-TYPE
+    SYNTAX      VTSSTopoConfigStackingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Switch Id index."
+    INDEX       { vtssTopoConfigStackingSid }
+    ::= { vtssTopoConfigStackingTable 1 }
+
+VTSSTopoConfigStackingEntry ::= SEQUENCE {
+    vtssTopoConfigStackingSid   Integer32,
+    vtssTopoConfigStackingEnableStacking    TruthValue,
+    vtssTopoConfigStackingStackIfA      VTSSInterfaceIndex,
+    vtssTopoConfigStackingStackIfB      VTSSInterfaceIndex
+}
+
+vtssTopoConfigStackingSid OBJECT-TYPE
+    SYNTAX      Integer32 (1..16)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Switch Id."
+    ::= { vtssTopoConfigStackingEntry 1 }
+
+vtssTopoConfigStackingEnableStacking OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "If the stack consists of one active switch or stacking is disabled
+         (false), it is possible to configure whether stacking must be enabled
+         (true). When changing this setting, the switch must be rebooted before
+         this takes effect."
+    ::= { vtssTopoConfigStackingEntry 2 }
+
+vtssTopoConfigStackingStackIfA OBJECT-TYPE
+    SYNTAX      VTSSInterfaceIndex
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "A stack uses two interfaces for stacking, which are named interface A
+         and B. Selecting which physical interface to be used for stacking
+         interface A. Note: Not all interfaces can be used as stacking
+         interface."
+    ::= { vtssTopoConfigStackingEntry 3 }
+
+vtssTopoConfigStackingStackIfB OBJECT-TYPE
+    SYNTAX      VTSSInterfaceIndex
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "A stack uses two interfaces for stacking, which are named interface A
+         and B. Selecting which physical interface to be used for stacking
+         interface B. Note: Not all interfaces can be used as stacking
+         interface."
+    ::= { vtssTopoConfigStackingEntry 4 }
+
+vtssTopoConfigMstPrioTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VTSSTopoConfigMstPrioEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "For stack master re-election priority configuration."
+    ::= { vtssTopoConfig 2 }
+
+vtssTopoConfigMstPrioEntry OBJECT-TYPE
+    SYNTAX      VTSSTopoConfigMstPrioEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Switch Id index."
+    INDEX       { vtssTopoConfigMstPrioSid }
+    ::= { vtssTopoConfigMstPrioTable 1 }
+
+VTSSTopoConfigMstPrioEntry ::= SEQUENCE {
+    vtssTopoConfigMstPrioSid    Integer32,
+    vtssTopoConfigMstPrioPriority   Integer32
+}
+
+vtssTopoConfigMstPrioSid OBJECT-TYPE
+    SYNTAX      Integer32 (1..16)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Switch Id."
+    ::= { vtssTopoConfigMstPrioEntry 1 }
+
+vtssTopoConfigMstPrioPriority OBJECT-TYPE
+    SYNTAX      Integer32 (1..4)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Each switch in the stack has a priority which is used to determine
+         which switch in the stack that shall be the master. For setting the
+         switch priority. The lower priority number the higher priority"
+    ::= { vtssTopoConfigMstPrioEntry 2 }
+
+vtssTopoConfigMacTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VTSSTopoConfigMacEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The topology configuration table for assigning a switch id to a switch
+         with a specific MAC address."
+    ::= { vtssTopoConfig 3 }
+
+vtssTopoConfigMacEntry OBJECT-TYPE
+    SYNTAX      VTSSTopoConfigMacEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Switch Id index."
+    INDEX       { vtssTopoConfigMacSid }
+    ::= { vtssTopoConfigMacTable 1 }
+
+VTSSTopoConfigMacEntry ::= SEQUENCE {
+    vtssTopoConfigMacSid    Integer32,
+    vtssTopoConfigMacMacAddr    OCTET STRING
+}
+
+vtssTopoConfigMacSid OBJECT-TYPE
+    SYNTAX      Integer32 (1..16)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Switch Id."
+    ::= { vtssTopoConfigMacEntry 1 }
+
+vtssTopoConfigMacMacAddr OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(6))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Used to assign a switch id to a switch with a specific MAC address. For
+         changing switch id for the switches in the stack, you normally use the
+         swap function. In the case where a switch has been added to a stack,
+         but could not be assigned a switch id at detection time (e.g. due to
+         switches which is no longer in the stack still have a switch id
+         assigned), it might be necessary to assign the switch id based upon the
+         MAC address. The following must be true in order to be able to assign
+         the switch id. 1) The switch id must not already be assigned to another
+         switch. 2) The switch must have been detected (the MAC address must be
+         shown the status)."
+    ::= { vtssTopoConfigMacEntry 2 }
+
+vtssTopoStatus OBJECT IDENTIFIER
+    ::= { vtssTopoMibObjects 3 }
+
+vtssTopoStatusTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VTSSTopoStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The topology status and statistics counters."
+    ::= { vtssTopoStatus 1 }
+
+vtssTopoStatusEntry OBJECT-TYPE
+    SYNTAX      VTSSTopoStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Switch Id index."
+    INDEX       { vtssTopoStatusSid }
+    ::= { vtssTopoStatusTable 1 }
+
+VTSSTopoStatusEntry ::= SEQUENCE {
+    vtssTopoStatusSid   Integer32,
+    vtssTopoStatusSwitchCnt     Integer32,
+    vtssTopoStatusTopologyType      VTSStopoTopologyType,
+    vtssTopoStatusChangeTime    VTSSDisplayString,
+    vtssTopoStatusUpdateRxCntA      Integer32,
+    vtssTopoStatusUpdatePeriodicTxCntA      Integer32,
+    vtssTopoStatusUpdateTriggeredTxCntA     Integer32,
+    vtssTopoStatusUpdateTxPolicerDropA      Integer32,
+    vtssTopoStatusUpdateRxErrCntA   Integer32,
+    vtssTopoStatusUpdateTxErrCntA   Integer32,
+    vtssTopoStatusAlertRxCntA   Integer32,
+    vtssTopoStatusAlertTxCntA   Integer32,
+    vtssTopoStatusAlertTxPolicerDropCntA    Integer32,
+    vtssTopoStatusAlertRxErrCntA    Integer32,
+    vtssTopoStatusAlertTxErrCntA    Integer32,
+    vtssTopoStatusUpdateRxCntB      Integer32,
+    vtssTopoStatusUpdatePeriodicTxCntB      Integer32,
+    vtssTopoStatusUpdateTriggeredTxCntB     Integer32,
+    vtssTopoStatusUpdateTxPolicerDropB      Integer32,
+    vtssTopoStatusUpdateRxErrCntB   Integer32,
+    vtssTopoStatusUpdateTxErrCntB   Integer32,
+    vtssTopoStatusAlertRxCntB   Integer32,
+    vtssTopoStatusAlertTxCntB   Integer32,
+    vtssTopoStatusAlertTxPolicerDropCntB    Integer32,
+    vtssTopoStatusAlertRxErrCntB    Integer32,
+    vtssTopoStatusAlertTxErrCntB    Integer32
+}
+
+vtssTopoStatusSid OBJECT-TYPE
+    SYNTAX      Integer32 (1..16)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Switch Id."
+    ::= { vtssTopoStatusEntry 1 }
+
+vtssTopoStatusSwitchCnt OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Current number of switches in the stack."
+    ::= { vtssTopoStatusEntry 3 }
+
+vtssTopoStatusTopologyType OBJECT-TYPE
+    SYNTAX      VTSStopoTopologyType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Current topology type:
+         
+         Back2Back - Two units connected with two stacking cables.
+         
+         Ring - Ring topology with more than two units.
+         
+         Chain - Chain topology."
+    ::= { vtssTopoStatusEntry 4 }
+
+vtssTopoStatusChangeTime OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..25))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Time of last topology change since boot in seconds."
+    ::= { vtssTopoStatusEntry 5 }
+
+vtssTopoStatusUpdateRxCntA OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Received updates counter, including bad ones counter for interface A."
+    ::= { vtssTopoStatusEntry 6 }
+
+vtssTopoStatusUpdatePeriodicTxCntA OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Transmitted Updates, periodic (tx OK) counter for interface A."
+    ::= { vtssTopoStatusEntry 7 }
+
+vtssTopoStatusUpdateTriggeredTxCntA OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Transmitted Updates, triggered (tx OK) counter for interface A."
+    ::= { vtssTopoStatusEntry 8 }
+
+vtssTopoStatusUpdateTxPolicerDropA OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Transmitted Updates, triggered (tx OK) counter for interface A."
+    ::= { vtssTopoStatusEntry 9 }
+
+vtssTopoStatusUpdateRxErrCntA OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Received errornuous Updates counter for interface A."
+    ::= { vtssTopoStatusEntry 10 }
+
+vtssTopoStatusUpdateTxErrCntA OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Tx of Update failed counter for interface A."
+    ::= { vtssTopoStatusEntry 11 }
+
+vtssTopoStatusAlertRxCntA OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Received Alerts, including bad ones counter for interface A."
+    ::= { vtssTopoStatusEntry 12 }
+
+vtssTopoStatusAlertTxCntA OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Transmitted Alerts (tx OK) counter for interface A."
+    ::= { vtssTopoStatusEntry 13 }
+
+vtssTopoStatusAlertTxPolicerDropCntA OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Tx-drops by Tx-policer counter for interface A."
+    ::= { vtssTopoStatusEntry 14 }
+
+vtssTopoStatusAlertRxErrCntA OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Received errornuous Alerts counter for interface A."
+    ::= { vtssTopoStatusEntry 15 }
+
+vtssTopoStatusAlertTxErrCntA OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Tx of Alert failed counter for interface A."
+    ::= { vtssTopoStatusEntry 16 }
+
+vtssTopoStatusUpdateRxCntB OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Received updates counter, including bad ones counter for interface B."
+    ::= { vtssTopoStatusEntry 17 }
+
+vtssTopoStatusUpdatePeriodicTxCntB OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Transmitted Updates, periodic (tx OK) counter for interface B."
+    ::= { vtssTopoStatusEntry 18 }
+
+vtssTopoStatusUpdateTriggeredTxCntB OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Transmitted Updates, triggered (tx OK) counter for interface B."
+    ::= { vtssTopoStatusEntry 19 }
+
+vtssTopoStatusUpdateTxPolicerDropB OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Transmitted Updates, triggered (tx OK) counter for interface B."
+    ::= { vtssTopoStatusEntry 20 }
+
+vtssTopoStatusUpdateRxErrCntB OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Received errornuous Updates counter for interface B."
+    ::= { vtssTopoStatusEntry 21 }
+
+vtssTopoStatusUpdateTxErrCntB OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Tx of Update failed counter for interface B."
+    ::= { vtssTopoStatusEntry 22 }
+
+vtssTopoStatusAlertRxCntB OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Received Alerts, including bad ones counter for interface B."
+    ::= { vtssTopoStatusEntry 23 }
+
+vtssTopoStatusAlertTxCntB OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Transmitted Alerts (tx OK) counter for interface B."
+    ::= { vtssTopoStatusEntry 24 }
+
+vtssTopoStatusAlertTxPolicerDropCntB OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Tx-drops by Tx-policer counter for interface B."
+    ::= { vtssTopoStatusEntry 25 }
+
+vtssTopoStatusAlertRxErrCntB OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Received errornuous Alerts counter for interface B."
+    ::= { vtssTopoStatusEntry 26 }
+
+vtssTopoStatusAlertTxErrCntB OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Tx of Alert failed counter for interface B."
+    ::= { vtssTopoStatusEntry 27 }
+
+vtssTopoStatusMaster OBJECT IDENTIFIER
+    ::= { vtssTopoStatus 2 }
+
+vtssTopoStatusMasterMasterChangeTime OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..25))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Time of last master change since boot in seconds."
+    ::= { vtssTopoStatusMaster 2 }
+
+vtssTopoStatusMasterMacAddr OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(6))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "MAC address for the switch which is currently master."
+    ::= { vtssTopoStatusMaster 3 }
+
+vtssTopoControl OBJECT IDENTIFIER
+    ::= { vtssTopoMibObjects 4 }
+
+vtssTopoControlSwapSidTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VTSSTopoControlSwapSidEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The topology configuration for swapping switch ids"
+    ::= { vtssTopoControl 4 }
+
+vtssTopoControlSwapSidEntry OBJECT-TYPE
+    SYNTAX      VTSSTopoControlSwapSidEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Switch Id index"
+    INDEX       { vtssTopoControlSwapSidSid }
+    ::= { vtssTopoControlSwapSidTable 1 }
+
+VTSSTopoControlSwapSidEntry ::= SEQUENCE {
+    vtssTopoControlSwapSidSid   Integer32,
+    vtssTopoControlSwapSidSwitchId      Integer32
+}
+
+vtssTopoControlSwapSidSid OBJECT-TYPE
+    SYNTAX      Integer32 (1..16)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Switch Id."
+    ::= { vtssTopoControlSwapSidEntry 1 }
+
+vtssTopoControlSwapSidSwitchId OBJECT-TYPE
+    SYNTAX      Integer32 (1..16)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Switch Id for the switch to swap id with. Each switch in the stack has
+         a switch ID. Swapping switch id between two switches in the stack."
+    ::= { vtssTopoControlSwapSidEntry 3 }
+
+vtssTopoControlMstElectSid OBJECT IDENTIFIER
+    ::= { vtssTopoControl 5 }
+
+vtssTopoControlMstElectSidReElect OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Makes the stack re-elect a master."
+    ::= { vtssTopoControlMstElectSid 1 }
+
+vtssTopoControlDelSid OBJECT IDENTIFIER
+    ::= { vtssTopoControl 6 }
+
+vtssTopoControlDelSidDel OBJECT-TYPE
+    SYNTAX      Integer32 (1..16)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Deletes a switch from the stack."
+    ::= { vtssTopoControlDelSid 1 }
+
+vtssTopoMibConformance OBJECT IDENTIFIER
+    ::= { vtssTopoMib 2 }
+
+vtssTopoMibCompliances OBJECT IDENTIFIER
+    ::= { vtssTopoMibConformance 1 }
+
+vtssTopoMibGroups OBJECT IDENTIFIER
+    ::= { vtssTopoMibConformance 2 }
+
+vtssTopoConfigStackingTableInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssTopoConfigStackingEnableStacking, 
+                  vtssTopoConfigStackingStackIfA, vtssTopoConfigStackingStackIfB }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssTopoMibGroups 1 }
+
+vtssTopoConfigMstPrioInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssTopoConfigMstPrioPriority }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssTopoMibGroups 2 }
+
+vtssTopoConfigMacInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssTopoConfigMacMacAddr }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssTopoMibGroups 3 }
+
+vtssTopoStatusInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssTopoStatusSwitchCnt, vtssTopoStatusTopologyType, 
+                  vtssTopoStatusChangeTime, vtssTopoStatusUpdateRxCntA, 
+                  vtssTopoStatusUpdatePeriodicTxCntA, 
+                  vtssTopoStatusUpdateTriggeredTxCntA, 
+                  vtssTopoStatusUpdateTxPolicerDropA, 
+                  vtssTopoStatusUpdateRxErrCntA, vtssTopoStatusUpdateTxErrCntA, 
+                  vtssTopoStatusAlertRxCntA, vtssTopoStatusAlertTxCntA, 
+                  vtssTopoStatusAlertTxPolicerDropCntA, 
+                  vtssTopoStatusAlertRxErrCntA, vtssTopoStatusAlertTxErrCntA, 
+                  vtssTopoStatusUpdateRxCntB, vtssTopoStatusUpdatePeriodicTxCntB, 
+                  vtssTopoStatusUpdateTriggeredTxCntB, 
+                  vtssTopoStatusUpdateTxPolicerDropB, 
+                  vtssTopoStatusUpdateRxErrCntB, vtssTopoStatusUpdateTxErrCntB, 
+                  vtssTopoStatusAlertRxCntB, vtssTopoStatusAlertTxCntB, 
+                  vtssTopoStatusAlertTxPolicerDropCntB, 
+                  vtssTopoStatusAlertRxErrCntB, vtssTopoStatusAlertTxErrCntB }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssTopoMibGroups 4 }
+
+vtssTopoStatusMasterInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssTopoStatusMasterMasterChangeTime, 
+                  vtssTopoStatusMasterMacAddr }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssTopoMibGroups 5 }
+
+vtssTopoControlSwapSidInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssTopoControlSwapSidSwitchId }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssTopoMibGroups 6 }
+
+vtssTopoControlMstElectSidInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssTopoControlMstElectSidReElect }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssTopoMibGroups 7 }
+
+vtssTopoControlDelSidInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssTopoControlDelSidDel }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssTopoMibGroups 8 }
+
+vtssTopoMibCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the implementation."
+
+    MODULE      -- this module
+
+        MANDATORY-GROUPS        { vtssTopoConfigStackingTableInfoGroup, 
+                  vtssTopoConfigMstPrioInfoGroup, vtssTopoConfigMacInfoGroup, 
+                  vtssTopoStatusInfoGroup, vtssTopoStatusMasterInfoGroup, 
+                  vtssTopoControlSwapSidInfoGroup, 
+                  vtssTopoControlMstElectSidInfoGroup, 
+                  vtssTopoControlDelSidInfoGroup }
+
+    ::= { vtssTopoMibCompliances 1 }
+
+END

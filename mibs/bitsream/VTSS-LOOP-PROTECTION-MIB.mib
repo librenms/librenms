@@ -1,0 +1,260 @@
+-- *****************************************************************
+-- LOOP-PROTECTION-MIB:  Vitesse private MIB
+--
+-- Copyright (c) 2002-2013 Vitesse Semiconductor Corporation "Vitesse".
+-- All Rights Reserved.
+--
+-- ****************************************************************
+
+VTSS-LOOP-PROTECTION-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    vtssSwitchMgmt
+        FROM VTSS-SMI
+    Unsigned32 FROM SNMPv2-SMI
+    TruthValue FROM SNMPv2-TC
+    VTSSInterfaceIndex FROM VTSS-TC
+    VTSSUnsigned64 FROM VTSS-TC
+    ;
+
+vtssLoopProtectionMib MODULE-IDENTITY
+    LAST-UPDATED "201407010000Z"
+    ORGANIZATION
+        "Vitesse Semiconductor Corporation"
+    CONTACT-INFO
+        "Application support <application_support@vitesse.com>"
+    DESCRIPTION
+        "This is a private MIB for loop protection"
+    REVISION    "201407010000Z"
+    DESCRIPTION
+        "Initial version"
+    ::= { vtssSwitchMgmt 91 }
+
+
+VTSSLoopProtectionAction ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This enumeration defines the available actions for when a loop on an
+         interface is detected."
+    SYNTAX      INTEGER { shutdown(0), shutdownAndLogEvent(1), logEvent(2) }
+
+vtssLoopProtectionMibObjects OBJECT IDENTIFIER
+    ::= { vtssLoopProtectionMib 1 }
+
+vtssLoopProtectionConfig OBJECT IDENTIFIER
+    ::= { vtssLoopProtectionMibObjects 2 }
+
+vtssLoopProtectionConfigGlobals OBJECT IDENTIFIER
+    ::= { vtssLoopProtectionConfig 1 }
+
+vtssLoopProtectionConfigGlobalsEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Global enabled for loop protection on any port."
+    ::= { vtssLoopProtectionConfigGlobals 1 }
+
+vtssLoopProtectionConfigGlobalsTransmitInterval OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Port transmission interval (seconds). Valid range: 1-10 seconds."
+    ::= { vtssLoopProtectionConfigGlobals 2 }
+
+vtssLoopProtectionConfigGlobalsShutdownPeriod OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Port shutdown period (seconds). Valid range: 0 to 604800 seconds."
+    ::= { vtssLoopProtectionConfigGlobals 3 }
+
+vtssLoopProtectionConfigInterface OBJECT IDENTIFIER
+    ::= { vtssLoopProtectionConfig 2 }
+
+vtssLoopProtectionConfigInterfaceParamTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VTSSLoopProtectionConfigInterfaceParamEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is a table of loop protection interface parameters"
+    ::= { vtssLoopProtectionConfigInterface 1 }
+
+vtssLoopProtectionConfigInterfaceParamEntry OBJECT-TYPE
+    SYNTAX      VTSSLoopProtectionConfigInterfaceParamEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each physical interface has a set of parameters"
+    INDEX       { vtssLoopProtectionConfigInterfaceParamIfIndex }
+    ::= { vtssLoopProtectionConfigInterfaceParamTable 1 }
+
+VTSSLoopProtectionConfigInterfaceParamEntry ::= SEQUENCE {
+    vtssLoopProtectionConfigInterfaceParamIfIndex   VTSSInterfaceIndex,
+    vtssLoopProtectionConfigInterfaceParamEnabled   TruthValue,
+    vtssLoopProtectionConfigInterfaceParamAction    VTSSLoopProtectionAction,
+    vtssLoopProtectionConfigInterfaceParamTransmit      TruthValue
+}
+
+vtssLoopProtectionConfigInterfaceParamIfIndex OBJECT-TYPE
+    SYNTAX      VTSSInterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Logical interface number."
+    ::= { vtssLoopProtectionConfigInterfaceParamEntry 1 }
+
+vtssLoopProtectionConfigInterfaceParamEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Enabled loop protection on port"
+    ::= { vtssLoopProtectionConfigInterfaceParamEntry 2 }
+
+vtssLoopProtectionConfigInterfaceParamAction OBJECT-TYPE
+    SYNTAX      VTSSLoopProtectionAction
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Action if loop detected"
+    ::= { vtssLoopProtectionConfigInterfaceParamEntry 3 }
+
+vtssLoopProtectionConfigInterfaceParamTransmit OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Actively generate PDUs"
+    ::= { vtssLoopProtectionConfigInterfaceParamEntry 4 }
+
+vtssLoopProtectionStatus OBJECT IDENTIFIER
+    ::= { vtssLoopProtectionMibObjects 3 }
+
+vtssLoopProtectionStatusInterface OBJECT IDENTIFIER
+    ::= { vtssLoopProtectionStatus 2 }
+
+vtssLoopProtectionStatusInterfaceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VTSSLoopProtectionStatusInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is a table of loop protection interface status"
+    ::= { vtssLoopProtectionStatusInterface 1 }
+
+vtssLoopProtectionStatusInterfaceEntry OBJECT-TYPE
+    SYNTAX      VTSSLoopProtectionStatusInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each physical interface has a set of status objects"
+    INDEX       { vtssLoopProtectionStatusInterfaceIfIndex }
+    ::= { vtssLoopProtectionStatusInterfaceTable 1 }
+
+VTSSLoopProtectionStatusInterfaceEntry ::= SEQUENCE {
+    vtssLoopProtectionStatusInterfaceIfIndex    VTSSInterfaceIndex,
+    vtssLoopProtectionStatusInterfaceDisabled   TruthValue,
+    vtssLoopProtectionStatusInterfaceLoopDetected   TruthValue,
+    vtssLoopProtectionStatusInterfaceLoopCount      Unsigned32,
+    vtssLoopProtectionStatusInterfaceLastLoop   VTSSUnsigned64
+}
+
+vtssLoopProtectionStatusInterfaceIfIndex OBJECT-TYPE
+    SYNTAX      VTSSInterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Logical interface number."
+    ::= { vtssLoopProtectionStatusInterfaceEntry 1 }
+
+vtssLoopProtectionStatusInterfaceDisabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Whether a port is currently disabled"
+    ::= { vtssLoopProtectionStatusInterfaceEntry 2 }
+
+vtssLoopProtectionStatusInterfaceLoopDetected OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Whether a port has a loop detected"
+    ::= { vtssLoopProtectionStatusInterfaceEntry 3 }
+
+vtssLoopProtectionStatusInterfaceLoopCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Number of times a loop has been detected on a port"
+    ::= { vtssLoopProtectionStatusInterfaceEntry 4 }
+
+vtssLoopProtectionStatusInterfaceLastLoop OBJECT-TYPE
+    SYNTAX      VTSSUnsigned64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Time of last loop condition"
+    ::= { vtssLoopProtectionStatusInterfaceEntry 5 }
+
+vtssLoopProtectionMibConformance OBJECT IDENTIFIER
+    ::= { vtssLoopProtectionMib 2 }
+
+vtssLoopProtectionMibCompliances OBJECT IDENTIFIER
+    ::= { vtssLoopProtectionMibConformance 1 }
+
+vtssLoopProtectionMibGroups OBJECT IDENTIFIER
+    ::= { vtssLoopProtectionMibConformance 2 }
+
+vtssLoopProtectionConfigGlobalsInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssLoopProtectionConfigGlobalsEnabled, 
+                  vtssLoopProtectionConfigGlobalsTransmitInterval, 
+                  vtssLoopProtectionConfigGlobalsShutdownPeriod }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssLoopProtectionMibGroups 1 }
+
+vtssLoopProtectionConfigInterfaceParamTableInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssLoopProtectionConfigInterfaceParamEnabled, 
+                  vtssLoopProtectionConfigInterfaceParamAction, 
+                  vtssLoopProtectionConfigInterfaceParamTransmit }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssLoopProtectionMibGroups 2 }
+
+vtssLoopProtectionStatusInterfaceTableInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssLoopProtectionStatusInterfaceDisabled, 
+                  vtssLoopProtectionStatusInterfaceLoopDetected, 
+                  vtssLoopProtectionStatusInterfaceLoopCount, 
+                  vtssLoopProtectionStatusInterfaceLastLoop }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssLoopProtectionMibGroups 3 }
+
+vtssLoopProtectionMibCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the implementation."
+
+    MODULE      -- this module
+
+        MANDATORY-GROUPS        { vtssLoopProtectionConfigGlobalsInfoGroup, 
+                  vtssLoopProtectionConfigInterfaceParamTableInfoGroup, 
+                  vtssLoopProtectionStatusInterfaceTableInfoGroup }
+
+    ::= { vtssLoopProtectionMibCompliances 1 }
+
+END

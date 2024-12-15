@@ -1,0 +1,378 @@
+-- *****************************************************************
+-- VOICE-VLAN-MIB:  Vitesse private MIB
+--
+-- Copyright (c) 2002-2013 Vitesse Semiconductor Corporation "Vitesse".
+-- All Rights Reserved.
+--
+-- ****************************************************************
+
+VTSS-VOICE-VLAN-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    vtssSwitchMgmt
+        FROM VTSS-SMI
+    Unsigned32 FROM SNMPv2-SMI
+    TruthValue FROM SNMPv2-TC
+    VTSSDisplayString FROM VTSS-TC
+    VTSSInterfaceIndex FROM VTSS-TC
+    VTSSRowEditorState FROM VTSS-TC
+    VTSSUnsigned16 FROM VTSS-TC
+    ;
+
+vtssVoiceVlanMib MODULE-IDENTITY
+    LAST-UPDATED "201409160000Z"
+    ORGANIZATION
+        "Vitesse Semiconductor Corporation"
+    CONTACT-INFO
+        "Application support <application_support@vitesse.com>"
+    DESCRIPTION
+        "This is a private version of the Voice VLAN MIB."
+    REVISION    "201409160000Z"
+    DESCRIPTION
+        "Initial version."
+    ::= { vtssSwitchMgmt 70 }
+
+
+VTSSVoiceVlanPortDiscoveryProtocol ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This enumeration indicates per port Voice VLAN discovery protocol."
+    SYNTAX      INTEGER { oui(0), lldp(1), both(2) }
+
+VTSSVoiceVlanPortManagementType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This enumeration indicates per port Voice VLAN function administrative
+         type."
+    SYNTAX      INTEGER { disabled(0), forced(1), automatic(2) }
+
+vtssVoiceVlanMibObjects OBJECT IDENTIFIER
+    ::= { vtssVoiceVlanMib 1 }
+
+vtssVoiceVlanCapabilities OBJECT IDENTIFIER
+    ::= { vtssVoiceVlanMibObjects 1 }
+
+vtssVoiceVlanCapabilitiesSupportLldpDiscovery OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The capability to support voice device discovery from LLDP
+         notification."
+    ::= { vtssVoiceVlanCapabilities 1 }
+
+vtssVoiceVlanCapabilitiesMinAgeTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The minimum time value in second for aging telephony OUI sources in
+         voice VLAN."
+    ::= { vtssVoiceVlanCapabilities 2 }
+
+vtssVoiceVlanCapabilitiesMaxAgeTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The maximum time value in second for aging telephony OUI sources in
+         voice VLAN."
+    ::= { vtssVoiceVlanCapabilities 3 }
+
+vtssVoiceVlanCapabilitiesMaxTrafficClass OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The maximum allowed CoS (Class of Service) value to be used in
+         forwarding voice VLAN traffic."
+    ::= { vtssVoiceVlanCapabilities 4 }
+
+vtssVoiceVlanCapabilitiesMaxOuiEntryCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The maximum number of telephony OUI entry registration."
+    ::= { vtssVoiceVlanCapabilities 5 }
+
+vtssVoiceVlanConfig OBJECT IDENTIFIER
+    ::= { vtssVoiceVlanMibObjects 2 }
+
+vtssVoiceVlanConfigGlobals OBJECT IDENTIFIER
+    ::= { vtssVoiceVlanConfig 1 }
+
+vtssVoiceVlanConfigGlobalsMgmt OBJECT IDENTIFIER
+    ::= { vtssVoiceVlanConfigGlobals 1 }
+
+vtssVoiceVlanConfigGlobalsMgmtAdminState OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Administrative control for system wide voice VLAN function, TRUE is to
+         enable the voice VLAN function and FALSE is to disable it."
+    ::= { vtssVoiceVlanConfigGlobalsMgmt 1 }
+
+vtssVoiceVlanConfigGlobalsMgmtVlanId OBJECT-TYPE
+    SYNTAX      VTSSUnsigned16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "VLAN ID, which should be unique in the system, for voice VLAN."
+    ::= { vtssVoiceVlanConfigGlobalsMgmt 2 }
+
+vtssVoiceVlanConfigGlobalsMgmtAgingTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "MAC address aging time (T) for telephony OUI source registrated by
+         voice VLAN. The actual timing in purging the specific entry ranges from
+         T to 2T."
+    ::= { vtssVoiceVlanConfigGlobalsMgmt 3 }
+
+vtssVoiceVlanConfigGlobalsMgmtTrafficClass OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Traffic class value used in frame CoS queuing insides voice VLAN. All
+         kinds of traffic on voice VLAN apply this traffic class."
+    ::= { vtssVoiceVlanConfigGlobalsMgmt 4 }
+
+vtssVoiceVlanConfigInterface OBJECT IDENTIFIER
+    ::= { vtssVoiceVlanConfig 2 }
+
+vtssVoiceVlanConfigInterfacePortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VTSSVoiceVlanConfigInterfacePortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is a table for managing per port voice VLAN functions."
+    ::= { vtssVoiceVlanConfigInterface 1 }
+
+vtssVoiceVlanConfigInterfacePortEntry OBJECT-TYPE
+    SYNTAX      VTSSVoiceVlanConfigInterfacePortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each entry has a set of parameters."
+    INDEX       { vtssVoiceVlanConfigInterfacePortIfIndex }
+    ::= { vtssVoiceVlanConfigInterfacePortTable 1 }
+
+VTSSVoiceVlanConfigInterfacePortEntry ::= SEQUENCE {
+    vtssVoiceVlanConfigInterfacePortIfIndex     VTSSInterfaceIndex,
+    vtssVoiceVlanConfigInterfacePortMode    VTSSVoiceVlanPortManagementType,
+    vtssVoiceVlanConfigInterfacePortDiscoveryProtocol   VTSSVoiceVlanPortDiscoveryProtocol,
+    vtssVoiceVlanConfigInterfacePortSecured     TruthValue
+}
+
+vtssVoiceVlanConfigInterfacePortIfIndex OBJECT-TYPE
+    SYNTAX      VTSSInterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Logical interface number of the Voice VLAN port."
+    ::= { vtssVoiceVlanConfigInterfacePortEntry 1 }
+
+vtssVoiceVlanConfigInterfacePortMode OBJECT-TYPE
+    SYNTAX      VTSSVoiceVlanPortManagementType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Management mode of the specific port in voice VLAN. 'disabled' will
+         disjoin the port from voice VLAN. 'forced' will force the port to join
+         voice VLAN. 'automatic' will join the port in voice VLAN upon detecting
+         attached VoIP devices by using DiscoveryProtocol parameter."
+    ::= { vtssVoiceVlanConfigInterfacePortEntry 2 }
+
+vtssVoiceVlanConfigInterfacePortDiscoveryProtocol OBJECT-TYPE
+    SYNTAX      VTSSVoiceVlanPortDiscoveryProtocol
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Specify the protocol for detecting attached VoIP devices. It only works
+         when 'automatic' is set in Mode parameter, and voice VLAN will restart
+         automatic detecting process upon changing the protocol. When 'oui' is
+         given, voice VLAN performs VoIP device detection based on checking
+         telephony OUI settings via new MAC address notification. When 'lldp' is
+         given, voice VLAN performs VoIP device detection based on LLDP
+         notifications.When 'both' is given, voice VLAN performs VoIP device
+         detection based on either new MAC address notification or LLDP
+         notifications.
+         
+         In addition, the first come notification will be first served."
+    ::= { vtssVoiceVlanConfigInterfacePortEntry 3 }
+
+vtssVoiceVlanConfigInterfacePortSecured OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Manage the security control of this port interface in voice VLAN, TRUE
+         is to enable the security control and FALSE is to disable it. When it
+         is disabled, all the traffic in voice VLAN will be permit. When it is
+         enabled, all non-telephonic MAC addresses in the voice VLAN will be
+         blocked for 10 seconds and thus the traffic from these senders will be
+         deny."
+    ::= { vtssVoiceVlanConfigInterfacePortEntry 4 }
+
+vtssVoiceVlanConfigOui OBJECT IDENTIFIER
+    ::= { vtssVoiceVlanConfig 3 }
+
+vtssVoiceVlanConfigOuiTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VTSSVoiceVlanConfigOuiEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is a table for managing the telephony OUI settings that will be
+         used for voice VLAN functions."
+    ::= { vtssVoiceVlanConfigOui 1 }
+
+vtssVoiceVlanConfigOuiEntry OBJECT-TYPE
+    SYNTAX      VTSSVoiceVlanConfigOuiEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each entry has a set of parameters."
+    INDEX       { vtssVoiceVlanConfigOuiPrefix }
+    ::= { vtssVoiceVlanConfigOuiTable 1 }
+
+VTSSVoiceVlanConfigOuiEntry ::= SEQUENCE {
+    vtssVoiceVlanConfigOuiPrefix    OCTET STRING,
+    vtssVoiceVlanConfigOuiDescription   VTSSDisplayString,
+    vtssVoiceVlanConfigOuiAction    VTSSRowEditorState
+}
+
+vtssVoiceVlanConfigOuiPrefix OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(3..3))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Address prefix of the telephony OUI. A leading 3 bytes index used to
+         denote whether specific MAC address is presenting a voice device."
+    ::= { vtssVoiceVlanConfigOuiEntry 1 }
+
+vtssVoiceVlanConfigOuiDescription OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The description for the specific telephony OUI."
+    ::= { vtssVoiceVlanConfigOuiEntry 2 }
+
+vtssVoiceVlanConfigOuiAction OBJECT-TYPE
+    SYNTAX      VTSSRowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Action"
+    ::= { vtssVoiceVlanConfigOuiEntry 100 }
+
+vtssVoiceVlanConfigOuiTableRowEditor OBJECT IDENTIFIER
+    ::= { vtssVoiceVlanConfigOui 2 }
+
+vtssVoiceVlanConfigOuiTableRowEditorPrefix OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(3..3))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Address prefix of the telephony OUI. A leading 3 bytes index used to
+         denote whether specific MAC address is presenting a voice device."
+    ::= { vtssVoiceVlanConfigOuiTableRowEditor 1 }
+
+vtssVoiceVlanConfigOuiTableRowEditorDescription OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The description for the specific telephony OUI."
+    ::= { vtssVoiceVlanConfigOuiTableRowEditor 2 }
+
+vtssVoiceVlanConfigOuiTableRowEditorAction OBJECT-TYPE
+    SYNTAX      VTSSRowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Action"
+    ::= { vtssVoiceVlanConfigOuiTableRowEditor 100 }
+
+vtssVoiceVlanMibConformance OBJECT IDENTIFIER
+    ::= { vtssVoiceVlanMib 2 }
+
+vtssVoiceVlanMibCompliances OBJECT IDENTIFIER
+    ::= { vtssVoiceVlanMibConformance 1 }
+
+vtssVoiceVlanMibGroups OBJECT IDENTIFIER
+    ::= { vtssVoiceVlanMibConformance 2 }
+
+vtssVoiceVlanCapabilitiesInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssVoiceVlanCapabilitiesSupportLldpDiscovery, 
+                  vtssVoiceVlanCapabilitiesMinAgeTime, 
+                  vtssVoiceVlanCapabilitiesMaxAgeTime, 
+                  vtssVoiceVlanCapabilitiesMaxTrafficClass, 
+                  vtssVoiceVlanCapabilitiesMaxOuiEntryCount }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssVoiceVlanMibGroups 1 }
+
+vtssVoiceVlanConfigGlobalsMgmtInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssVoiceVlanConfigGlobalsMgmtAdminState, 
+                  vtssVoiceVlanConfigGlobalsMgmtVlanId, 
+                  vtssVoiceVlanConfigGlobalsMgmtAgingTime, 
+                  vtssVoiceVlanConfigGlobalsMgmtTrafficClass }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssVoiceVlanMibGroups 2 }
+
+vtssVoiceVlanConfigInterfacePortTableInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssVoiceVlanConfigInterfacePortMode, 
+                  vtssVoiceVlanConfigInterfacePortDiscoveryProtocol, 
+                  vtssVoiceVlanConfigInterfacePortSecured }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssVoiceVlanMibGroups 3 }
+
+vtssVoiceVlanConfigOuiTableInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssVoiceVlanConfigOuiDescription, 
+                  vtssVoiceVlanConfigOuiAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssVoiceVlanMibGroups 4 }
+
+vtssVoiceVlanConfigOuiTableRowEditorInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssVoiceVlanConfigOuiTableRowEditorPrefix, 
+                  vtssVoiceVlanConfigOuiTableRowEditorDescription, 
+                  vtssVoiceVlanConfigOuiTableRowEditorAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssVoiceVlanMibGroups 5 }
+
+vtssVoiceVlanMibCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the implementation."
+
+    MODULE      -- this module
+
+        MANDATORY-GROUPS        { vtssVoiceVlanCapabilitiesInfoGroup, 
+                  vtssVoiceVlanConfigGlobalsMgmtInfoGroup, 
+                  vtssVoiceVlanConfigInterfacePortTableInfoGroup, 
+                  vtssVoiceVlanConfigOuiTableInfoGroup, 
+                  vtssVoiceVlanConfigOuiTableRowEditorInfoGroup }
+
+    ::= { vtssVoiceVlanMibCompliances 1 }
+
+END
