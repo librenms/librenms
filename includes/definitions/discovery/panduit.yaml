@@ -20,8 +20,8 @@ modules:
                     skip_values:
                         -
                              oid: pdug5GroupName
-                             op: 'not_contains'
-                             value: 'B'
+                             op: '='
+                             value: '.'
                 -
                     oid: pdug5InputEntry
                     value: pdug5InputPowerWatts
@@ -29,7 +29,6 @@ modules:
                     multiplier: 1
                     descr: 'Input power'
                     snmp_flags: ['-ObsaQ']
-
         current:
             data:
                 -
@@ -45,8 +44,8 @@ modules:
                     skip_values:
                         -
                              oid: pdug5GroupName
-                             op: 'not_contains'
-                             value: 'B'
+                             op: '='
+                             value: '.'
                 -
                     oid: pdug5InputEntry
                     value: pdug5InputTotalCurrent
@@ -54,8 +53,6 @@ modules:
                     divisor: 100
                     descr: 'Input current'
                     snmp_flags: ['-ObsaQ']
-
-
         voltage:
             data:
                 -
@@ -66,7 +63,11 @@ modules:
                     descr: 'Group {{ $pdug5GroupName }} Voltage'
                     index: 'pdug5GroupVoltage.{{ $index }}'
                     snmp_flags: ['-ObsaQ']
-
+                    skip_values:
+                        -
+                            oid: pdug5GroupName
+                            op: '='
+                            value: '.'
         frequency:
               data:
                   -
