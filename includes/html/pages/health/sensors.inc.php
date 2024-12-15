@@ -17,7 +17,7 @@
 
 use App\Models\Sensor;
 
-$pagetitle[] = 'Health :: ' . Sensor::getClass($class);
+$pagetitle[] = 'Health :: ' . Sensor::getClassDescr($active_metric);
 
 ?>
 <div class="panel panel-default panel-condensed">
@@ -56,9 +56,9 @@ $pagetitle[] = 'Health :: ' . Sensor::getClass($class);
             return {
                 id: 'sensors',
                 view: '<?php echo htmlspecialchars($vars['view']); ?>',
-                graph_type: '<?php echo htmlspecialchars($graph_type); ?>',
-                unit: '<?php echo htmlspecialchars($unit); ?>',
-                class: '<?php echo htmlspecialchars($class); ?>'
+                graph_type: '<?php echo htmlspecialchars('sensor_' . $active_metric); ?>',
+                unit: '<?php echo htmlspecialchars(Sensor::getUnit($active_metric)); ?>',
+                class: '<?php echo htmlspecialchars($active_metric); ?>'
             };
         },
         url: "ajax_table.php"

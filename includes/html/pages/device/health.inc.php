@@ -66,10 +66,8 @@ if (DiskIo::where('device_id', $device['device_id'])->count()) {
 
 foreach (Sensor::getTypes() as $sensor_name) {
     if (Sensor::where('sensor_class', $sensor_name)->where('device_id', $device['device_id'])->count()) {
-        //strtolower because 'dBm - dbm' difference
-        $lowname = strtolower($sensor_name);
-        $datas[] = $lowname;
-        $type_text[$lowname] = trans('sensors.' . $lowname . '.short');
+        $datas[] = $sensor_name;
+        $type_text[$sensor_name] = Sensor::getClassDescr($sensor_name);
     }
 }
 
@@ -112,7 +110,6 @@ foreach ($datas as $type) {
 print_optionbar_end();
 
 $metric = basename($vars['metric']);
-
 if (in_array($metric, Sensor::getTypes())) {
     $class = $metric;
     $unit = Sensor::getUnit($metric);
