@@ -38,7 +38,7 @@ use LibreNMS\Util\Oid;
 class YamlDiscovery
 {
     /**
-     * @param  OS  $os
+     * @param  \LibreNMS\OS  $os
      * @param  DiscoveryItem|string  $class
      * @param  array  $yaml_data
      * @return array
