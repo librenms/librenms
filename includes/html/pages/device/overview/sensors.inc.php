@@ -1,30 +1,35 @@
 <?php
 
-// cache all sensors on device and exclude transceivers
+use LibreNMS\Config;
+use LibreNMS\Util\Rewrite;
+use LibreNMS\Util\Url;
+
+// Cache all sensors on device and exclude transceivers
 $sensors = DeviceCache::getPrimary()
     ->sensors
     ->where('sensor_class', $sensor_class)
-    ->where('group', '!=', 'transceiver');
-
-if ($sensors->isNotEmpty()) {
+    ->where('group', '!=', 'transceiver')
+    ->sortBy('group')
+    ->sortBy('sensor_descr');
+if ($sensors->count()) {
     echo '
         <div class="row">
         <div class="col-md-12">
         <div class="panel panel-default panel-condensed">
         <div class="panel-heading">';
-    echo '<a href="device/device=' . $sensors[0]->device_id . '/tab=health/metric=' . $sensor[0]->sensor_class . '/"><i class="fa ' . $sensor[0]->icon() . ' fa-lg icon-theme" aria-hidden="true"></i><strong> ' . $sensor[0]->classDescrLong() . '</strong></a>';
+    echo '<a href="device/device=' . $sensors->first()->device_id . '/tab=health/metric=' . $sensors->first()->sensor_class . '/"><i class="fa fa-' . $sensors->first()->icon() . ' fa-lg icon-theme" aria-hidden="true"></i><strong> ' . $sensors->first()->classDescr() . '</strong></a>';
     echo '      </div>
         <table class="table table-hover table-condensed table-striped">';
     $group = '';
     foreach ($sensors as $sensor) {
 
-        if (! isset($sensor->sensor_current)) {
+        if (! is_numeric($sensor->sensor_current)) {
             $sensor->sensor_current = 'NaN';
         }
 
-        if ($group != $sensor->group) {
+        if ($sensor->group != '' && $group != $sensor->group) {
             $group = $sensor->group;
-            echo "<tr><td colspan='3'><strong>$group</strong></td></tr>";
+            echo '<tr><td colspan="3"><strong>$group</strong></td></tr>';
         }
 
         // FIXME - make this "four graphs in popup" a function/include and "small graph" a function.
@@ -33,16 +38,16 @@ if ($sensors->isNotEmpty()) {
         $graph_array = [];
         $graph_array['height'] = '100';
         $graph_array['width'] = '210';
-        $graph_array['to'] = \LibreNMS\Config::get('time.now');
+        $graph_array['to'] = Config::get('time.now');
         $graph_array['id'] = $sensor->sensor_id;
         $graph_array['type'] = 'sensor_' . $sensor->sensor_type;
-        $graph_array['from'] = \LibreNMS\Config::get('time.day');
+        $graph_array['from'] = Config::get('time.day');
         $graph_array['legend'] = 'no';
 
         $link_array = $graph_array;
         $link_array['page'] = 'graphs';
         unset($link_array['height'], $link_array['width'], $link_array['legend']);
-        $link = \LibreNMS\Util\Url::generate($link_array);
+        $link = Url::generate($link_array);
 
         if ($sensor->poller_type == 'ipmi') {
             $sensor->sensor_descr = substr(ipmiSensorName($device['hardware'], $sensor->sensor_descr), 0, 48);
@@ -52,25 +57,24 @@ if ($sensors->isNotEmpty()) {
 
         $overlib_content = '<div class=overlib><span class=overlib-text>' . $device['hostname'] . ' - ' . $sensor->sensor_descr . '</span><br />';
         foreach (['day', 'week', 'month', 'year'] as $period) {
-            $graph_array['from'] = \LibreNMS\Config::get("time.$period");
-            $overlib_content .= str_replace('"', "\'", \LibreNMS\Util\Url::graphTag($graph_array));
+            $graph_array['from'] = Config::get("time.$period");
+            $overlib_content .= str_replace('"', "\'", Url::graphTag($graph_array));
         }
 
         $overlib_content .= '</div>';
 
         $graph_array['width'] = 80;
         $graph_array['height'] = 20;
-        $graph_array['bg'] = 'ffffff00';
-        // the 00 at the end makes the area transparent.
-        $graph_array['from'] = \LibreNMS\Config::get('time.day');
-        $sensor_minigraph = \LibreNMS\Util\Url::lazyGraphTag($graph_array);
+        $graph_array['bg'] = 'ffffff00'; // the 00 at the end makes the area transparent.
+        $graph_array['from'] = Config::get('time.day');
+        $sensor_minigraph = Url::lazyGraphTag($graph_array);
 
         $sensor_current = $sensor->sensor_class == 'state' ? get_state_label($sensor) : get_sensor_label_color($sensor);
 
         echo '<tr><td><div style="display: grid; grid-gap: 10px; grid-template-columns: 3fr 1fr 1fr;">
-            <div>' . \LibreNMS\Util\Url::overlibLink($link, \LibreNMS\Util\Rewrite::shortenIfType($sensor->sensor_descr), $overlib_content, $sensor->sensor_class) . '</div>
-            <div>' . \LibreNMS\Util\Url::overlibLink($link, $sensor_minigraph, $overlib_content, $sensor->sensor_class) . '</div>
-            <div>' . \LibreNMS\Util\Url::overlibLink($link, $sensor_current, $overlib_content, $sensor->sensor_class) . '</div>
+            <div>' . Url::overlibLink($link, Rewrite::shortenIfType($sensor->sensor_descr), $overlib_content, $sensor->sensor_class) . '</div>
+            <div>' . Url::overlibLink($link, $sensor_minigraph, $overlib_content, $sensor->sensor_class) . '</div>
+            <div>' . Url::overlibLink($link, $sensor_current, $overlib_content, $sensor->sensor_class) . '</div>
             </div></td></tr>';
     }//end foreach
 

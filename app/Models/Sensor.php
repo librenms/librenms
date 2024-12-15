@@ -104,7 +104,7 @@ class Sensor extends DeviceRelatedModel implements Keyable
         return __('sensors.' . $class . '.short');
     }
 
-    public static function getClassDescrLong(string $class): string
+    public function getClassDescrLong(string $class): string
     {
         return __('sensors.' . $class . '.long');
     }

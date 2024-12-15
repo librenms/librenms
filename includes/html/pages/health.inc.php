@@ -21,9 +21,7 @@ use LibreNMS\Util\ObjectCache;
 $no_refresh = true;
 
 $datas = collect(['mempool', 'processor', 'storage'])
-    ->merge(collect(ObjectCache::sensors())
-        ->flatMap(fn ($types) => collect($types)->pluck('class'))
-    );
+    ->merge(collect(ObjectCache::sensors())->pluck('class'));
 
 $type_text = collect([
     'overview' => 'Overview',
@@ -81,7 +79,7 @@ if ($vars['view'] != 'graphs') {
     $displayoptions .= '</span>';
 }
 
-if (in_array($active_metric, $datas)) {
+if ($datas->contains($active_metric)) {
     include "includes/html/pages/health/$active_metric.inc.php";
 } else {
     echo "No sensors of type $active_metric found.";
