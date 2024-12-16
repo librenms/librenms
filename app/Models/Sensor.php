@@ -218,6 +218,7 @@ class Sensor extends DeviceRelatedModel implements Keyable
     {
         return $query->where('sensor_alert', 0);
     }
+
     public function __toString()
     {
         $data = $this->only([
