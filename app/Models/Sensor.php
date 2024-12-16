@@ -204,10 +204,8 @@ class Sensor extends DeviceRelatedModel implements Keyable
      */
     public function scopeIsCritical($query)
     {
-        return $query->whereColumn([
-            ['sensor_current', '<', 'sensor_limit_low', 'or'],
-            ['sensor_current', '>', 'sensor_limit', 'or'],
-        ]);
+        return $query->whereColumn('sensor_current','<','sensor_limit_low')
+            ->orWhereColumn('sensor_current','>','sensor_limit');
     }
 
     /**
