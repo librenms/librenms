@@ -37,6 +37,7 @@ class Sensor extends DeviceRelatedModel implements Keyable
         'group',
         'rrd_type',
     ];
+
     protected static $icons = [
         'airflow' => 'angle-double-right',
         'ber' => 'sort-amount-desc',
@@ -154,7 +155,6 @@ class Sensor extends DeviceRelatedModel implements Keyable
 
         if ($low_warn) {
             $this->sensor_limit_low_warn = match ($this->sensor_class) {
-                'charge' => 50,
                 default => null,
             };
         }
@@ -168,7 +168,6 @@ class Sensor extends DeviceRelatedModel implements Keyable
                 'power_factor' => -1,
                 'signal' => -80,
                 'airflow', 'snr', 'frequency', 'pressure', 'cooling' => $this->sensor_current * 0.95,
-                'charge' => 15,
                 default => null,
             };
         }
