@@ -87,7 +87,7 @@ $link_array = [
 
 print_optionbar_start();
 
-echo "<span style='font-weight: bold;'>" . __('Health') . "</span> &#187; ";
+echo '<span style="font-weight: bold;">' . __('Health') . '</span> &#187; ';
 
 if (empty($vars['metric'])) {
     $vars['metric'] = 'overview';
