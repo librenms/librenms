@@ -7,9 +7,9 @@ $nototal = (($width < 224) ? 1 : 0);
 $unit_text = 'Milliseconds';
 $rrd_filename = Rrd::name($device['hostname'], ['app', 'ntp-server', $app->app_id]);
 $array = [
-    'offset'    => ['descr' => 'Offset'],
-    'jitter'    => ['descr' => 'Jitter'],
-    'noise'     => ['descr' => 'Noise'],
+    'offset' => ['descr' => 'Offset'],
+    'jitter' => ['descr' => 'Jitter'],
+    'noise' => ['descr' => 'Noise'],
     'stability' => ['descr' => 'Stability'],
 ];
 

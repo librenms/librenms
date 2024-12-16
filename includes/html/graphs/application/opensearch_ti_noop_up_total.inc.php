@@ -14,8 +14,8 @@ $rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'NoOP Updates',
-        'ds'       => 'ti_noop_up_total',
+        'descr' => 'NoOP Updates',
+        'ds' => 'ti_noop_up_total',
     ];
 } else {
     d_echo('RRD "' . $rrd_filename . '" not found');

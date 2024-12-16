@@ -14,8 +14,8 @@ $rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Capacity',
-        'ds'       => 'cap',
+        'descr' => 'Capacity',
+        'ds' => 'cap',
     ];
 } else {
     d_echo('RRD "' . $rrd_filename . '" not found');

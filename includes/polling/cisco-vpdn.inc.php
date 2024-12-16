@@ -21,9 +21,9 @@ if ($device['os_group'] == 'cisco') {
                 ->addDataset('denied', 'COUNTER', 0, 100000);
 
             $fields = [
-                'tunnels'   => $vpdn['cvpdnSystemTunnelTotal'],
-                'sessions'  => $vpdn['cvpdnSystemSessionTotal'],
-                'denied'    => $vpdn['cvpdnSystemDeniedUsersTotal'],
+                'tunnels' => $vpdn['cvpdnSystemTunnelTotal'],
+                'sessions' => $vpdn['cvpdnSystemSessionTotal'],
+                'denied' => $vpdn['cvpdnSystemDeniedUsersTotal'],
             ];
 
             $tags = compact('type', 'rrd_name', 'rrd_def');

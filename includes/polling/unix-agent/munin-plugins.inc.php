@@ -45,14 +45,14 @@ if (! empty($agent_data['munin'])) {
 
         if (! is_array($plugins_db[$plugin_type])) {
             $insert = [
-                'device_id'      => $device['device_id'],
-                'mplug_type'     => $plugin_type,
+                'device_id' => $device['device_id'],
+                'mplug_type' => $plugin_type,
                 'mplug_instance' => $instance,
                 'mplug_category' => ($plugin['graph']['category'] == null ? 'general' : strtolower($plugin['graph']['category'])),
-                'mplug_title'    => $plugin['graph']['title'],
-                'mplug_vlabel'   => $plugin['graph']['vlabel'],
-                'mplug_args'     => $plugin['graph']['args'],
-                'mplug_info'     => $plugin['graph']['info'],
+                'mplug_title' => $plugin['graph']['title'],
+                'mplug_vlabel' => $plugin['graph']['vlabel'],
+                'mplug_args' => $plugin['graph']['args'],
+                'mplug_info' => $plugin['graph']['info'],
             ];
             $mplug_id = dbInsert($insert, 'munin_plugins');
         } else {
@@ -93,32 +93,32 @@ if (! empty($agent_data['munin'])) {
                 ];
 
                 $tags = [
-                    'plugin'   => $plugin_type,
-                    'rrd_def'  => RrdDefinition::make()->addDataset('val', $data['type']),
+                    'plugin' => $plugin_type,
+                    'rrd_def' => RrdDefinition::make()->addDataset('val', $data['type']),
                     'rrd_name' => $base_rrd_name . '_' . $name,
                 ];
                 data_update($device, 'munin-plugins', $tags, $fields);
 
                 if (empty($ds_list[$ds_uniq])) {
                     $insert = [
-                        'mplug_id'    => $mplug_id,
-                        'ds_name'     => $name,
-                        'ds_type'     => $data['type'],
-                        'ds_label'    => $data['label'],
-                        'ds_cdef'     => $data['cdef'],
-                        'ds_draw'     => $data['draw'],
-                        'ds_info'     => $data['info'],
-                        'ds_extinfo'  => $data['extinfo'],
-                        'ds_min'      => $data['min'],
-                        'ds_max'      => $data['max'],
-                        'ds_graph'    => $data['graph'],
+                        'mplug_id' => $mplug_id,
+                        'ds_name' => $name,
+                        'ds_type' => $data['type'],
+                        'ds_label' => $data['label'],
+                        'ds_cdef' => $data['cdef'],
+                        'ds_draw' => $data['draw'],
+                        'ds_info' => $data['info'],
+                        'ds_extinfo' => $data['extinfo'],
+                        'ds_min' => $data['min'],
+                        'ds_max' => $data['max'],
+                        'ds_graph' => $data['graph'],
                         'ds_negative' => $data['negative'],
-                        'ds_warning'  => $data['warning'],
+                        'ds_warning' => $data['warning'],
                         'ds_critical' => $data['critical'],
-                        'ds_colour'   => $data['colour'],
-                        'ds_sum'      => $data['sum'],
-                        'ds_stack'    => $data['stack'],
-                        'ds_line'     => $data['line'],
+                        'ds_colour' => $data['colour'],
+                        'ds_sum' => $data['sum'],
+                        'ds_stack' => $data['stack'],
+                        'ds_line' => $data['line'],
                     ];
                     $ds_id = dbInsert($insert, 'munin_plugins_ds');
                 }//end if

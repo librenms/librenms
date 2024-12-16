@@ -14,13 +14,13 @@ $rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'L2 Write',
-        'ds'       => 'l2_write_bytes',
+        'descr' => 'L2 Write',
+        'ds' => 'l2_write_bytes',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'L2 Read',
-        'ds'       => 'l2_read_bytes',
+        'descr' => 'L2 Read',
+        'ds' => 'l2_read_bytes',
     ];
 } else {
     d_echo('RRD "' . $rrd_filename . '" not found');

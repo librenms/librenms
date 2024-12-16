@@ -1,0 +1,198 @@
+-- %DNP% $Id: ERICSSON-ROUTER-ENVMON-CAP.my,v 1.2.4.3.146.8 2011/09/07 19:09:29 sraj Exp $
+-- %DNP% $Source: /cvsroot/pkt/sw/se/xc/bsd/config/snmp/mibs/ERICSSON-ROUTER-ENVMON-CAP.my,v $
+-- *****************************************************************
+-- ERICSSON-ROUTER-ENVMON-CAP	Environmental Monitor MIB Capabilities
+--
+-- Copyright (c) 1999-2002, 2006-2007, 2010-2011, 2015 Ericsson AB.
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+ERICSSON-ROUTER-ENVMON-CAP DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY
+		FROM SNMPv2-SMI
+	AGENT-CAPABILITIES
+		FROM SNMPv2-CONF
+	eriRouterCapabilities
+		FROM ERICSSON-ROUTER-SMI;
+
+eriRouterEnvMonCap MODULE-IDENTITY
+        LAST-UPDATED    "201501141800Z" -- Jan 14, 2015
+        ORGANIZATION    "Ericsson Inc."
+        CONTACT-INFO
+                "       Ericsson, Inc.
+
+                Postal: 100 Headquarters Dr.
+                        San Jose, CA  95134
+                        USA
+
+                 Phone: +1 408 750 5000
+                   Fax: +1 408 750 5599
+                "
+	DESCRIPTION
+		"The Agent Capabilities of the Environmental 
+                 Monitor MIB (ERICSSON-ROUTER-ENVMON-MIB).
+
+                If this MIB implementation is platform-dependent,
+                the PRODUCT-RELEASE clause contains Ericsson SEOS version and
+                at least one of the following Ericsson product families:
+                    [SE]  SmartEdge Multi-service Edge Router (MSER) family
+                    [SM]  SM family of Metro Ethernet Service Transport platforms
+                    [SSR] Smart Service Router (SSR) family"
+
+        REVISION        "201501141800Z" -- Jan 14, 2015
+        DESCRIPTION
+                "Updated RBN/rbn/Rbn as ERICSSON-ROUTER/eriRouter/EriRouter
+                 to migrate RBN MIB to ERICSSON MIB."
+
+        REVISION        "201109020000Z" -- September 02, 2011
+        DESCRIPTION
+                "Added new OID:
+                        eriRouterEnvMonCap6."
+
+        REVISION        "201106150000Z" -- Jun 15, 2011
+        DESCRIPTION
+            "Update DESCRIPTION clause of MODULE-IDENTITY
+            and PRODUCT-RELEASE clause of AGENT-CAPABILITIES."
+        
+        REVISION    "201011110000Z" -- Nov 11, 2010
+        DESCRIPTION
+            "Modified PRODUCT-RELEASE clause for consistent naming.
+             Updated CONTACT-INFO."
+
+        REVISION        "200811110000Z" -- November 11, 2008
+        DESCRIPTION
+                "Added new OID:
+                        eriRouterEnvMonCap5."
+
+	REVISION	"200601160000Z" -- January 16, 2006
+	DESCRIPTION
+		"Added new OID:
+			eriRouterEnvMonCap4"
+	REVISION	"200206050000Z" -- June 5, 2002
+	DESCRIPTION
+		"Updated/corrected CONTACT-INFO."
+	REVISION	"200107250000Z" -- July 25, 2001
+	DESCRIPTION
+		"Added new OID:
+			eriRouterEnvMonCap3"
+	REVISION	"200004240000Z" -- May 24, 2000
+	DESCRIPTION
+		"Added voltage and temperature sensor tables."
+	REVISION        "199903092300Z" -- Mar 9, 1999
+	DESCRIPTION
+		"Initial version."
+	::= { eriRouterCapabilities 17 }
+
+eriRouterEnvMonCap1 AGENT-CAPABILITIES
+	PRODUCT-RELEASE	"2.3.X.X"
+	STATUS		obsolete
+	DESCRIPTION	"ERICSSON-ROUTER-ENVMON-MIB capabilities"
+	SUPPORTS	ERICSSON-ROUTER-ENVMON-MIB
+	INCLUDES {
+		eriRouterEnvMonMIBObjectGroup,
+		eriRouterEnvMonMIBNotificationGroup
+		}
+
+	::= { eriRouterEnvMonCap 1 }
+
+eriRouterEnvMonCap2 AGENT-CAPABILITIES
+	PRODUCT-RELEASE	"4.0.X.X"
+	STATUS		current
+	DESCRIPTION	"ERICSSON-ROUTER-ENVMON-MIB capabilities"
+	SUPPORTS	ERICSSON-ROUTER-ENVMON-MIB
+	INCLUDES {
+		eriRouterEnvMonMIBObjectGroup,
+		eriRouterEnvMonMIBNotificationGroup,
+		eriRouterEnvMonVoltageObjectGroup,
+		eriRouterEnvMonTempObjectGroup
+		}
+
+	::= { eriRouterEnvMonCap 2 }
+
+eriRouterEnvMonCap3 AGENT-CAPABILITIES
+	PRODUCT-RELEASE "SmartEdge 2.0.4"
+	STATUS		current
+	DESCRIPTION	"ERICSSON-ROUTER-ENVMON-MIB capabilities"
+	SUPPORTS	ERICSSON-ROUTER-ENVMON-MIB
+	INCLUDES {
+		eriRouterEnvMonMIBObjectGroupV2,
+		eriRouterEnvMonMIBNotificationGroupV2,
+		eriRouterEnvMonVoltageObjectGroup
+		}
+
+	::= { eriRouterEnvMonCap 3 }
+
+eriRouterEnvMonCap4 AGENT-CAPABILITIES
+	PRODUCT-RELEASE "SmartEdge 5.0.5"
+	STATUS		current
+	DESCRIPTION	"ERICSSON-ROUTER-ENVMON-MIB capabilities"
+	SUPPORTS	ERICSSON-ROUTER-ENVMON-MIB
+	INCLUDES {
+		eriRouterEnvMonMIBObjectGroupV2,
+		eriRouterEnvMonMIBNotificationGroupV2,
+		eriRouterEnvMonVoltageObjectGroup,
+		eriRouterEnvMonFanSpeedObjectGroup
+		}
+
+	VARIATION eriRouterFanUnitDescr
+	DESCRIPTION
+	"This object is only supported in SE100."
+
+	VARIATION eriRouterFanSpeedCurrent
+	DESCRIPTION
+	"This object is only supported in SE100."
+
+	::= { eriRouterEnvMonCap 4 }
+
+eriRouterEnvMonCap5 AGENT-CAPABILITIES
+        PRODUCT-RELEASE "SEOS 6.2.1 [SE]; SEOS 6.3.X [SM]; SEOS 11.1.X [SSR]"
+        STATUS          current
+        DESCRIPTION     "ERICSSON-ROUTER-ENVMON-MIB capabilities"
+        SUPPORTS        ERICSSON-ROUTER-ENVMON-MIB
+        INCLUDES {
+                eriRouterEnvMonMIBObjectGroupV2,
+                eriRouterEnvMonMIBNotificationGroupV2,
+                eriRouterEnvMonVoltageObjectGroup,
+                eriRouterEnvMonFanSpeedObjectGroup,
+                eriRouterEnvMonEntityObjectGroup
+                }
+
+        VARIATION eriRouterFanUnitDescr
+        DESCRIPTION
+        "This object is only supported in SE100."
+
+        VARIATION eriRouterFanSpeedCurrent
+        DESCRIPTION
+        "This object is only supported in SE100."
+
+        ::= { eriRouterEnvMonCap 5 }
+
+eriRouterEnvMonCap6 AGENT-CAPABILITIES
+        PRODUCT-RELEASE "IPOS 11.1.X"
+        STATUS          current
+        DESCRIPTION     "ERICSSON-ROUTER-ENVMON-MIB capabilities"
+        SUPPORTS        ERICSSON-ROUTER-ENVMON-MIB
+        INCLUDES {
+                eriRouterEnvMonMIBObjectGroupV2,
+                eriRouterEnvMonMIBNotificationGroupV2,
+                eriRouterEnvMonVoltageObjectGroup,
+                eriRouterEnvMonFanSpeedObjectGroup,
+                eriRouterEnvMonEntityObjectGroup
+                }
+
+        VARIATION eriRouterFanUnitDescr
+        DESCRIPTION
+        "This object is only supported in SE100 and SSR."
+
+        VARIATION eriRouterFanSpeedCurrent
+        DESCRIPTION
+        "This object is only supported in SE100 and SSR."
+
+        ::= { eriRouterEnvMonCap 6 }
+
+END
+
+

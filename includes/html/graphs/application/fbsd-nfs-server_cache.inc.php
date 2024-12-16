@@ -18,27 +18,27 @@ if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list = [
         [
             'filename' => $rrd_filename,
-            'descr'    => 'inprog',
-            'ds'       => 'inprog',
-            'colour'   => '582a72',
+            'descr' => 'inprog',
+            'ds' => 'inprog',
+            'colour' => '582a72',
         ],
         [
             'filename' => $rrd_filename,
-            'descr'    => 'idem',
-            'ds'       => 'idem',
-            'colour'   => 'ffd1aa',
+            'descr' => 'idem',
+            'ds' => 'idem',
+            'colour' => 'ffd1aa',
         ],
         [
             'filename' => $rrd_filename,
-            'descr'    => 'nonidem',
-            'ds'       => 'nonidem',
-            'colour'   => 'aa6c39',
+            'descr' => 'nonidem',
+            'ds' => 'nonidem',
+            'colour' => 'aa6c39',
         ],
         [
             'filename' => $rrd_filename,
-            'descr'    => 'misses',
-            'ds'       => 'misses',
-            'colour'   => '28536c',
+            'descr' => 'misses',
+            'ds' => 'misses',
+            'colour' => '28536c',
         ],
     ];
 } else {

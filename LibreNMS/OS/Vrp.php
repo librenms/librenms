@@ -27,13 +27,16 @@ namespace LibreNMS\OS;
 
 use App\Models\AccessPoint;
 use App\Models\Device;
+use App\Models\EntPhysical;
 use App\Models\Mempool;
 use App\Models\PortsNac;
 use App\Models\Sla;
+use App\Models\Transceiver;
 use App\Observers\ModuleModelObserver;
 use Carbon\Carbon;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use LibreNMS\DB\SyncsModels;
 use LibreNMS\Device\Processor;
@@ -45,10 +48,12 @@ use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessApCountDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\Interfaces\Discovery\SlaDiscovery;
+use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
 use LibreNMS\Interfaces\Polling\NacPolling;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\Interfaces\Polling\SlaPolling;
 use LibreNMS\OS;
+use LibreNMS\OS\Traits\EntityMib;
 use LibreNMS\RRD\RrdDefinition;
 
 class Vrp extends OS implements
@@ -60,9 +65,136 @@ class Vrp extends OS implements
     WirelessClientsDiscovery,
     SlaDiscovery,
     SlaPolling,
+    TransceiverDiscovery,
     OSDiscovery
 {
     use SyncsModels;
+    use EntityMib {EntityMib::discoverEntityPhysical as discoverBaseEntityPhysical; }
+
+    public function discoverEntityPhysical(): Collection
+    {
+        // normal ENTITY-MIB collection
+        $inventory = $this->discoverBaseEntityPhysical();
+
+        // add additional data from Huawei MIBs
+        $extra = \SnmpQuery::walk([
+            'HUAWEI-ENTITY-EXTENT-MIB::hwEntityBoardType',
+            'HUAWEI-ENTITY-EXTENT-MIB::hwEntityBomEnDesc',
+        ])->table(1);
+
+        $inventory->each(function (EntPhysical $entry) use ($extra) {
+            if (isset($entry->entPhysicalIndex)) {
+                if (! empty($extra[$entry->entPhysicalIndex]['HUAWEI-ENTITY-EXTENT-MIB::hwEntityBomEnDesc'])) {
+                    $entry->entPhysicalDescr = $extra[$entry->entPhysicalIndex]['HUAWEI-ENTITY-EXTENT-MIB::hwEntityBomEnDesc'];
+                }
+
+                if (! empty($extra[$entry->entPhysicalIndex]['HUAWEI-ENTITY-EXTENT-MIB::hwEntityBoardType'])) {
+                    $entry->entPhysicalModelName = $extra[$entry->entPhysicalIndex]['HUAWEI-ENTITY-EXTENT-MIB::hwEntityBoardType'];
+                }
+            }
+        });
+
+        return $inventory;
+    }
+
+    public function discoverTransceivers(): Collection
+    {
+        // Get a map of ifIndex to port_id for proper association with ports
+        $ifIndexToPortId = $this->getDevice()->ports()->pluck('port_id', 'ifIndex');
+
+        // EntityPhysicalIndex to ifIndex
+        $entityToIfIndex = $this->getIfIndexEntPhysicalMap();
+
+        // Walk through the MIB table for transceiver information
+        return \SnmpQuery::walk('HUAWEI-ENTITY-EXTENT-MIB::hwOpticalModuleInfoTable')->mapTable(function ($data, $entIndex) use ($entityToIfIndex, $ifIndexToPortId) {
+            // Skip inactive transceivers
+            if ($data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalType'] === 'inactive') {
+                return null;
+            }
+            if ($data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalMode'] == 1) {
+                return null;
+            }
+
+            // Skip when it is not a plugable optic
+            if ($data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalType'] === '0') {
+                return null;
+            }
+
+            // Handle cases where required data might not be available (fallback to null)
+            $connector = $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalConnectType'] ?? null;
+            if ($connector == '-') {
+                $connector = null;
+            }
+
+            $distance = $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalTransferDistance'] ?? '';
+            if (preg_match_all("/(([0-9]+)\([^\)]+\))+/i", $distance, $matches)) {
+                $distance = intval(max($matches[2]));
+            } else {
+                $distance = intval($distance);
+            }
+            if ($distance <= 0) {
+                $distance = $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalTransDistance'] ?? 0;
+            }
+            if ($distance <= 0) {
+                $distance = null;
+            }
+            $wavelength = $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalWaveLengthExact'] ?? 0;
+            if ($wavelength <= 0) {
+                $wavelength = $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalWaveLength'] ?? 0;
+            }
+            if ($wavelength <= 0) {
+                $wavelength = null;
+            }
+            $ifIndex = $entityToIfIndex[$entIndex];
+            $port_id = $ifIndexToPortId->get($ifIndex) ?? null;
+            if (is_null($port_id)) {
+                // Invalid
+                return null;
+            }
+
+            $type = $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalType'] ?? null;
+            $typeToDesc = ['unknown', 'sc', 'gbic', 'sfp', 'esfp', 'rj45', 'xfp', 'xenpak', 'transponder', 'cfp', 'smb', 'sfpplus', 'cxp', 'qsfp', 'qsfpplus', 'cfp2', 'dwdmsfp', 'msa100glh', 'gps', 'csfp', 'cfp4', 'qsfp28', 'sfpsfpplus', 'gponsfp', 'cfp8', 'sfp28', 'qsfpdd', 'cfp2dco', 'sfp56', 'qsfp56', 'oa'];
+
+            $mode = $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalMode'] ?? '';
+            $modeToText = [null, 'notSupported', 'singleMode', 'multiMode5', 'multiMode6', 'noValue', 'gpsMode'];
+            if (isset($modeToText[$mode])) {
+                $mode = ' ' . $modeToText[$mode];
+            }
+            if (! is_null($type) && isset($typeToDesc[$type])) {
+                $type = $typeToDesc[$type];
+            }
+            $entityType = $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalTransType'] ?? null;
+            if (! is_null($type) && ! is_null($entityType)) {
+                $type .= " ($entityType)";
+            } else {
+                $type = $type ?? $entityType;
+            }
+            if (! is_null($type)) {
+                $type .= $mode;
+            }
+
+            if (empty($data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalVenderName']) && empty($data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalVenderPn']) && empty($data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalVendorSn'])) {
+                return null; //Probably no transceiver around here
+            }
+
+            // Create a new Transceiver object with the retrieved data
+            return new Transceiver([
+                'port_id' => $port_id,
+                'index' => $entIndex,
+                'vendor' => $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalVenderName'] ?? null,
+                'type' => $type,
+                'model' => $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalVenderPn'] ?? null,
+                'serial' => $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalVendorSn'] ?? null,
+                'connector' => $connector,
+                'revision' => null,
+                'cable' => null,
+                'distance' => $distance,
+                'date' => $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalManufacturedDate'] ?? null,
+                'wavelength' => $wavelength,
+                'entity_physical_index' => $entIndex,
+            ]);
+        })->filter();  // Filter out null values
+    }
 
     public function discoverMempools()
     {
@@ -133,7 +265,7 @@ class Vrp extends OS implements
                 'hwWlanRadioChUtilizationRate',
                 'hwWlanRadioChInterferenceRate',
                 'hwWlanRadioActualEIRP',
-                'hwWlanRadioFreqType',
+                'hwWlanRadioType',
                 'hwWlanRadioWorkingChannel',
             ];
 
@@ -181,17 +313,39 @@ class Vrp extends OS implements
                     $txpow = $radio['hwWlanRadioActualEIRP'] ?? 0;
                     $interference = $radio['hwWlanRadioChInterferenceRate'] ?? 0;
                     $radioutil = $radio['hwWlanRadioChUtilizationRate'] ?? 0;
+                    $radioutil = ($radioutil > 100 || $radioutil < 0) ? -1 : $radioutil;
                     $numasoclients = $clientPerRadio[$ap_id][$r_id] ?? 0;
+                    $radio['hwWlanRadioType'] = $radio['hwWlanRadioType'] ?? 0;
 
-                    switch ($radio['hwWlanRadioFreqType'] ?? null) {
-                        case 1:
-                            $type = '2.4Ghz';
-                            break;
-                        case 2:
-                            $type = '5Ghz';
-                            break;
-                        default:
-                            $type = 'unknown (huawei ' . ($radio['hwWlanRadioFreqType'] ?? null) . ')';
+                    if ($txpow > 127) {
+                        // means the radio is disabled for some reason.
+                        $txpow = 0;
+                    }
+
+                    $type = 'dot11';
+
+                    if ($radio['hwWlanRadioType'] & 2) {
+                        $type .= 'a';
+                    }
+
+                    if ($radio['hwWlanRadioType'] & 1) {
+                        $type .= 'b';
+                    }
+
+                    if ($radio['hwWlanRadioType'] & 4) {
+                        $type .= 'g';
+                    }
+
+                    if ($radio['hwWlanRadioType'] & 8) {
+                        $type .= 'n';
+                    }
+
+                    if ($radio['hwWlanRadioType'] & 16) {
+                        $type .= '_ac';
+                    }
+
+                    if ($radio['hwWlanRadioType'] & 32) {
+                        $type .= '_ax';
                     }
 
                     // TODO
@@ -333,6 +487,9 @@ class Vrp extends OS implements
 
             // update the DB
             foreach ($portAuthSessionEntry as $authId => $portAuthSessionEntryParameters) {
+                if (! array_key_exists('hwAccessInterface', $portAuthSessionEntryParameters) || ! array_key_exists('hwAccessMACAddress', $portAuthSessionEntryParameters)) {
+                    continue;
+                }
                 $mac_address = strtolower(implode(array_map('zeropad', explode(':', $portAuthSessionEntryParameters['hwAccessMACAddress']))));
                 $port_id = $ifName_map->get($portAuthSessionEntryParameters['hwAccessInterface'], 0);
                 if ($port_id <= 0) {
@@ -342,15 +499,15 @@ class Vrp extends OS implements
                     'port_id' => $ifName_map->get($portAuthSessionEntryParameters['hwAccessInterface'] ?? null, 0),
                     'mac_address' => $mac_address,
                     'auth_id' => $authId,
-                    'domain' => $portAuthSessionEntryParameters['hwAccessDomain'] ?? null,
+                    'domain' => $portAuthSessionEntryParameters['hwAccessDomain'] ?? '',
                     'username' => $portAuthSessionEntryParameters['hwAccessUserName'] ?? '',
-                    'ip_address' => $portAuthSessionEntryParameters['hwAccessIPAddress'] ?? null,
+                    'ip_address' => $portAuthSessionEntryParameters['hwAccessIPAddress'] ?? '',
                     'authz_by' => $portAuthSessionEntryParameters['hwAccessType'] ?? '',
                     'authz_status' => $portAuthSessionEntryParameters['hwAccessAuthorizetype'] ?? '',
                     'host_mode' => $portAuthSessionEntryParameters['hwAccessAuthType'] ?? 'default',
-                    'timeout' => $portAuthSessionEntryParameters['hwAccessSessionTimeout'] ?? null,
+                    'timeout' => $portAuthSessionEntryParameters['hwAccessSessionTimeout'] ?? '',
                     'time_elapsed' => $portAuthSessionEntryParameters['hwAccessOnlineTime'] ?? null,
-                    'authc_status' => $portAuthSessionEntryParameters['hwAccessCurAuthenPlace'] ?? null,
+                    'authc_status' => $portAuthSessionEntryParameters['hwAccessCurAuthenPlace'] ?? '',
                     'method' => $portAuthSessionEntryParameters['hwAccessAuthtype'] ?? '',
                     'vlan' => $portAuthSessionEntryParameters['hwAccessVLANID'] ?? null,
                 ]));
@@ -508,7 +665,7 @@ class Vrp extends OS implements
 
             $sla->rtt = ($data[$owner][$test]['pingResultsAverageRtt'] ?? 0) / $divisor;
             $time = Carbon::parse($data[$owner][$test]['pingResultsLastGoodProbe'] ?? null)->toDateTimeString();
-            echo 'SLA : ' . $rtt_type . ' ' . $owner . ' ' . $test . '... ' . $sla->rtt . 'ms at ' . $time . "\n";
+            Log::info('SLA : ' . $rtt_type . ' ' . $owner . ' ' . $test . '... ' . $sla->rtt . 'ms at ' . $time);
 
             $collected = ['rtt' => $sla->rtt];
 

@@ -71,9 +71,9 @@ foreach (dbFetchRows($sql, $param) as $processor) {
     $bar_link = \LibreNMS\Util\Url::overlibLink($link, print_percentage_bar(400, 20, $perc, $perc . '%', 'ffffff', $background['left'], (100 - $perc) . '%', 'ffffff', $background['right']), \LibreNMS\Util\Url::graphTag($graph_array_zoom));
 
     $response[] = [
-        'hostname'        => generate_device_link($processor),
+        'hostname' => generate_device_link($processor),
         'processor_descr' => $processor['processor_descr'],
-        'graph'           => $mini_graph,
+        'graph' => $mini_graph,
         'processor_usage' => $bar_link,
     ];
     if ($vars['view'] == 'graphs') {
@@ -86,18 +86,18 @@ foreach (dbFetchRows($sql, $param) as $processor) {
         include 'includes/html/print-graphrow.inc.php';
         unset($return_data);
         $response[] = [
-            'hostname'        => $graph_data[0],
+            'hostname' => $graph_data[0],
             'processor_descr' => $graph_data[1],
-            'graph'           => $graph_data[2],
+            'graph' => $graph_data[2],
             'processor_usage' => $graph_data[3],
         ];
     } //end if
 }//end foreach
 
 $output = [
-    'current'  => $current,
+    'current' => $current,
     'rowCount' => $rowCount,
-    'rows'     => $response,
-    'total'    => $total,
+    'rows' => $response,
+    'total' => $total,
 ];
 echo json_encode($output, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);

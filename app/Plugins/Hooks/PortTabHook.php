@@ -27,11 +27,10 @@ namespace App\Plugins\Hooks;
 
 use App\Models\Port;
 use App\Models\User;
-use App\Plugins\Hook;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\Str;
 
-abstract class PortTabHook implements Hook
+abstract class PortTabHook implements \LibreNMS\Interfaces\Plugins\Hooks\PortTabHook
 {
     /** @var string */
     public $view = 'resources.views.port-tab';
@@ -45,7 +44,7 @@ abstract class PortTabHook implements Hook
     {
         return [
             'title' => __CLASS__,
-            'port'  => $port,
+            'port' => $port,
         ];
     }
 

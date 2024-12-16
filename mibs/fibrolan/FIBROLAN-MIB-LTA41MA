@@ -1,0 +1,2185 @@
+--  ===============================================================================
+--  File              : FIBROLAN-MIB-LTA41MA.mib
+--  Description       : Private MIB file for FibroLAN MetroStar I system - LTA41/MA
+--  By                : Tal Katz-Touaf and Michal Carmeli
+--  MIB Version       : 2.1
+--  MetroStar Version : 1.6.2/build 13
+--  Date              : February 22, 2010
+--  ===============================================================================
+--
+--
+-- Copyright Fibrolan, 2010. All rights reserved.
+--
+-- Reproduction of this document is authorized on condition that this
+-- copyright notice is included.
+--
+FIBROLAN-MIB-LTA41MA-V2   DEFINITIONS ::= BEGIN
+
+	 IMPORTS
+		enterprises, OBJECT-TYPE, MODULE-IDENTITY			FROM SNMPv2-SMI
+		DisplayString						        FROM SNMPv2-TC --FROM RFC1213-MIB
+		MODULE-COMPLIANCE, OBJECT-GROUP					FROM SNMPv2-CONF
+		Counter								FROM RFC1155-SMI
+		flMsChassisMvIndex, flMsChassisModuleMvIndex			FROM FIBROLAN-MIB-METRO-STAR-MV
+		flMsModuleMvChannelIndex					FROM FIBROLAN-MIB-MSMODULE;
+
+
+
+ flLta41ma-V2  MODULE-IDENTITY
+       LAST-UPDATED "1002220000Z"  
+       ORGANIZATION "FibroLAN ltd"
+       CONTACT-INFO
+         "http://www.fibrolan.com"
+       DESCRIPTION
+         "The MIB module to describe FibroLAN LTA41/MA.
+          Copyright (C) Fibrolan Ltd (2008)."
+	::= { enterprises 4467 100 50 21 }
+
+
+    -- conformance information
+     flLta41ma-V2MIBConformance        OBJECT IDENTIFIER ::= { flLta41ma-V2  1 }
+
+	 flLta41ma-V2MIBCompliances		OBJECT IDENTIFIER ::= { flLta41ma-V2MIBConformance 1 }
+     flLta41ma-V2MIBGroups				OBJECT IDENTIFIER ::= { flLta41ma-V2MIBConformance 2 }
+
+
+	-- compliance statements
+     flLta41ma-V2MIBCompliance MODULE-COMPLIANCE
+              STATUS  current
+              DESCRIPTION
+                      "The compliance statement for flMetroStar entities
+                      which implement the converters MIB."
+              MODULE  -- this module
+                  MANDATORY-GROUPS { flLta41ma-V2GlobalGroup,
+						flLta41ma-V2PortsGroup,
+						flLta41ma-V2PortsBwConfigGroup,
+						flLta41ma-V2VlanConfigGroup,
+						flLta41ma-V2VlanTableGroup,
+						flLta41ma-V2VlanPortsConfigGroup,
+						flLta41ma-V2PriorityGroup,
+						flLta41ma-V2MacGroup,
+						flLta41ma-V2StatisticsGroup  }
+              ::= { flLta41ma-V2MIBCompliances 1 }
+
+     flLta41ma-V2GlobalGroup	OBJECT-GROUP
+	        OBJECTS		{		   flLta41ma-V2GlobalBufferShare,
+						   flLta41ma-V2GlobalMulticastProtection,
+						   flLta41ma-V2GlobalBroadcastRate,
+						   flLta41ma-V2GlobalMaxPacketSize,
+						   flLta41ma-V2GlobalSleLogic,
+						   flLta41ma-V2GlobalSlePort1,
+						   flLta41ma-V2GlobalSlePort2,
+						   flLta41ma-V2GlobalSlePort3,
+						   flLta41ma-V2GlobalSlePort4,
+						   flLta41ma-V2RestartDevice,
+						   flLta41ma-V2RestoreDefaults,
+						   flLta41ma-V2Temperature,				
+						   flLta41ma-V2FirmRevision  }
+            STATUS  current
+            DESCRIPTION
+                    "A collection of objects providing basic
+                    instrumentation of the MetroStar LTA41/MA entity."
+            ::= { flLta41ma-V2MIBGroups 1 }
+
+     flLta41ma-V2PortsGroup	OBJECT-GROUP
+	        OBJECTS		{  flLta41ma-V2PortNumber,
+					flLta41ma-V2PortType,
+					flLta41ma-V2PortLink,
+					flLta41ma-V2PortDescription,
+					flLta41ma-V2PortAutoNego,
+					flLta41ma-V2PortDuplex,
+					flLta41ma-V2PortDatarate,
+					flLta41ma-V2PortEnabled,
+					flLta41ma-V2PortAutoCross,
+					flLta41ma-V2PortMdix,
+					flLta41ma-V2PortFef,
+					flLta41ma-V2PortReset,
+					flLta41ma-V2PortBroadcastProtection  }
+            STATUS  current
+            DESCRIPTION
+                    "A collection of objects providing ports'
+                    instrumentation of the MetroStar LTA41/MA entity."
+            ::= { flLta41ma-V2MIBGroups 2 }
+
+     flLta41ma-V2PortsBwConfigGroup	OBJECT-GROUP
+	        OBJECTS		{  flLta41ma-V2PortRxHighBw,
+						   flLta41ma-V2PortTxHighBw,
+						   flLta41ma-V2PortRxLowBw,
+						   flLta41ma-V2PortTxLowBw,
+						   flLta41ma-V2PortRxDiffBw,
+						   flLta41ma-V2PortRxHighFlowControl,
+						   flLta41ma-V2PortRxLowFlowControl,
+						   flLta41ma-V2PortTxDiffBw  }
+            STATUS  current
+            DESCRIPTION
+                    "A collection of objects providing ports' bandwidth configuration
+                    instrumentation of the MetroStar LTA41/MA entity."
+            ::= { flLta41ma-V2MIBGroups 3 }
+
+     flLta41ma-V2VlanConfigGroup		OBJECT-GROUP
+	        OBJECTS		{  flLta41ma-V2Vlan8021q,
+						   flLta41ma-V2VlanNullVidReplace,
+						   flLta41ma-V2CreateDefaultVlans,
+						   flLta41ma-V2DeleteAllVlans  }
+            STATUS  current
+            DESCRIPTION
+                    "A collection of objects providing VLANs'
+                    instrumentation of the MetroStar LTA41/MA entity."
+            ::= { flLta41ma-V2MIBGroups 4 }
+
+     flLta41ma-V2VlanTableGroup		OBJECT-GROUP
+	        OBJECTS		{  flLta41ma-V2VlanFid,
+						   flLta41ma-V2VlanVid,
+						   flLta41ma-V2VlanName,
+						   flLta41ma-V2VlanPort1Member,
+						   flLta41ma-V2VlanPort2Member,
+						   flLta41ma-V2VlanPort3Member,
+						   flLta41ma-V2VlanPort4Member,
+						   flLta41ma-V2VlanPort5Member,
+						   flLta41ma-V2VlanTableStatus  }
+            STATUS  current
+            DESCRIPTION
+                    "A collection of objects providing VLAN table configuration
+                    instrumentation of the MetroStar LTA41/MA entity."
+            ::= { flLta41ma-V2MIBGroups 5 }
+
+     flLta41ma-V2VlanPortsConfigGroup		OBJECT-GROUP
+	        OBJECTS		{   flLta41ma-V2PortIngressFilter,
+						    flLta41ma-V2PortTagInsertion,
+							flLta41ma-V2PortTagRemoval,
+							flLta41ma-V2PortVid,
+							flLta41ma-V2PortDiscardNonPvid }
+            STATUS  current
+            DESCRIPTION
+                    "A collection of objects providing VLAN ports' configuration
+                    instrumentation of the MetroStar LTA41/MA entity."
+            ::= { flLta41ma-V2MIBGroups 6 }
+
+     flLta41ma-V2PriorityGroup		OBJECT-GROUP
+	        OBJECTS		{   flLta41ma-V2PriorityRatio,
+							flLta41ma-V28021pBase,
+							flLta41ma-V2DscpCode,
+							flLta41ma-V2DscpCodePriority,
+							flLta41ma-V2PortPriority,
+							flLta41ma-V2Port8021pClassification,
+							flLta41ma-V2PortDiffServClassification,
+							flLta41ma-V2PortUserPriority }
+            STATUS  current
+            DESCRIPTION
+                    "A collection of objects providing priority
+                    instrumentation of the MetroStar LTA41/MA entity."
+            ::= { flLta41ma-V2MIBGroups 7 }
+
+     flLta41ma-V2MacGroup	OBJECT-GROUP
+	        OBJECTS		{   flLta41ma-V2ClearDynamicMacTable,
+							flLta41ma-V2ClearStaticMacTable,
+							flLta41ma-V2DynamicEntryNumber,
+							flLta41ma-V2DynamicMacAddress,
+							flLta41ma-V2SrcPort,
+							flLta41ma-V2DynamicFid,
+							flLta41ma-V2StaticEntryNumber,
+							flLta41ma-V2StaticMacAddress,
+							flLta41ma-V2FwdPort1,
+							flLta41ma-V2FwdPort2,
+							flLta41ma-V2FwdPort3,
+							flLta41ma-V2FwdPort4,
+							flLta41ma-V2FwdPort5,
+							flLta41ma-V2Fid,
+							flLta41ma-V2StaticUseFid,
+							flLta41ma-V2StaticMacTableStatus,
+							flLta41ma-V2MacLinkDownFlush }
+            STATUS  current
+            DESCRIPTION
+                    "A collection of objects providing MAC addresses
+                    instrumentation of the MetroStar LTA41/MA entity."
+            ::= { flLta41ma-V2MIBGroups 8 }
+
+    flLta41ma-V2StatisticsGroup	OBJECT-GROUP
+	        OBJECTS	 {   flLta41ma-V2ClearDynamicMacTable,
+						 flLta41ma-V2RxUndersizePackets,
+						 flLta41ma-V2RxFragmentPackets,
+						 flLta41ma-V2RxOversizePackets,
+						 flLta41ma-V2RxCrcErrorPackets,
+						 flLta41ma-V2RxAlignmentErrorPackets,
+						 flLta41ma-V2RxRefreshCounters,
+						 flLta41ma-V2RxClearCounters,
+						 flLta41ma-V2RxUnicastPackets,
+						 flLta41ma-V2RxMulticastPackets,
+						 flLta41ma-V2RxBroadcastPackets,
+						 flLta41ma-V2RxMacControlPackets,
+						 flLta41ma-V2RxPausePackets,
+						 flLta41ma-V2RxRefreshGoodCounters,
+						 flLta41ma-V2RxClearGoodCounters,
+						 flLta41ma-V2TxUnicastPackets,
+						 flLta41ma-V2TxMulticastPackets,
+						 flLta41ma-V2TxBroadcastPackets,
+						 flLta41ma-V2TxPausePackets,
+						 flLta41ma-V2TxRefreshGoodCounters,
+						 flLta41ma-V2TxClearGoodCounters,
+						 flLta41ma-V2RxDroppedPackets,
+						 flLta41ma-V2Rx64BytesPackets,
+						 flLta41ma-V2Rx65-127BytesPackets,
+						 flLta41ma-V2Rx128-255BytesPackets,
+						 flLta41ma-V2Rx256-511BytesPackets,
+						 flLta41ma-V2Rx512-1023BytesPackets,
+						 flLta41ma-V2Rx1024-MaxBytesPackets,
+						 flLta41ma-V2RxRefreshTotalCounters,
+						 flLta41ma-V2RxClearTotalCounters,
+						 flLta41ma-V2TxDroppedPackets,
+						 flLta41ma-V2TxRefreshTotalCounters,
+						 flLta41ma-V2TxClearTotalCounters,
+						 flLta41ma-V2TxTotalCols,
+						 flLta41ma-V2TxLateCols,
+						 flLta41ma-V2TxExcessiveCols,
+						 flLta41ma-V2TxSingleCols,
+						 flLta41ma-V2TxMultipleCols,
+						 flLta41ma-V2TxRefreshColCounters,
+						 flLta41ma-V2TxClearColCounters  }
+            STATUS  current
+            DESCRIPTION
+                    "A collection of objects providing statistic coounters
+                    instrumentation of the MetroStar LTA41/MA entity."
+            ::= { flLta41ma-V2MIBGroups 9 }
+
+
+-- ************************************************************
+-- ************************************************************
+-- FibroLan Object Identifier Definition
+-- ************************************************************
+-- ************************************************************
+
+fibrolan             OBJECT IDENTIFIER ::= { enterprises       4467 }
+
+fibrolanSNMP         OBJECT IDENTIFIER ::= { fibrolan           100 }
+
+flMaRemoteDevice	 OBJECT IDENTIFIER ::= { fibrolanSNMP        50 }
+
+--flLta41ma-V2			OBJECT IDENTIFIER ::= { flMaRemoteDevice	20 }
+
+flLta41ma-V2Global			OBJECT IDENTIFIER ::= { flLta41ma-V2	    10 }
+flLta41ma-V2Ports			OBJECT IDENTIFIER ::= { flLta41ma-V2	    20 }
+flLta41ma-V2Vlan			OBJECT IDENTIFIER ::= { flLta41ma-V2	    30 }
+flLta41ma-V2Priority		OBJECT IDENTIFIER ::= { flLta41ma-V2	    40 }
+flLta41ma-V2Mac			OBJECT IDENTIFIER ::= { flLta41ma-V2	    50 }
+flLta41ma-V2Statistics		OBJECT IDENTIFIER ::= { flLta41ma-V2	    60 }
+
+
+-- ************************************************************
+-- ************************************************************
+
+
+      EntryStatus ::= INTEGER
+                       { valid(1),
+                         createRequest(2),
+                         underCreation(3),
+                         invalid(4)
+                       }
+
+
+-- ************************************************************
+-- ************************************************************
+-- ************************************************************
+-- Global device configuration group
+-- ************************************************************
+-- ************************************************************
+-- ************************************************************
+     flLta41ma-V2GlobalConfigTable               OBJECT-TYPE
+         SYNTAX  SEQUENCE OF FlLta41ma-V2GlobalConfigEntry
+         MAX-ACCESS    not-accessible
+         STATUS  current
+         DESCRIPTION
+         "This table provides the device's global configuration"
+     ::= { flLta41ma-V2Global 1 }
+
+     flLta41ma-V2GlobalConfigEntry				OBJECT-TYPE
+         SYNTAX  FlLta41ma-V2GlobalConfigEntry
+         MAX-ACCESS    not-accessible
+         STATUS  current
+         DESCRIPTION
+         "The entries of the table"
+         INDEX { flMsChassisMvIndex,
+		 flMsChassisModuleMvIndex,
+		 flMsModuleMvChannelIndex }
+     ::= { flLta41ma-V2GlobalConfigTable 1 }
+
+		FlLta41ma-V2GlobalConfigEntry ::= SEQUENCE
+		{
+			 flLta41ma-V2GlobalBufferShare			INTEGER,
+			 flLta41ma-V2GlobalMulticastProtection		INTEGER,
+			 flLta41ma-V2GlobalBroadcastRate		INTEGER,
+			 flLta41ma-V2GlobalMaxPacketSize		INTEGER,
+			 flLta41ma-V2GlobalSleLogic			INTEGER,
+			 flLta41ma-V2GlobalSlePort1			INTEGER,
+			 flLta41ma-V2GlobalSlePort2			INTEGER,
+			 flLta41ma-V2GlobalSlePort3			INTEGER,
+			 flLta41ma-V2GlobalSlePort4			INTEGER,
+			 flLta41ma-V2RestartDevice			INTEGER,
+			 flLta41ma-V2RestoreDefaults			INTEGER,
+			 flLta41ma-V2Temperature  			INTEGER,
+			 flLta41ma-V2FirmRevision			DisplayString
+		}
+
+     flLta41ma-V2GlobalBufferShare				OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								off		(1),
+								on		(2)
+						   }
+         MAX-ACCESS     read-write
+         STATUS    current
+         DESCRIPTION
+         "Buffer pool sharing mode"
+	 ::= { flLta41ma-V2GlobalConfigEntry 2 }
+
+     flLta41ma-V2GlobalMulticastProtection		OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								off		(1),
+								on		(2)
+						   }
+         MAX-ACCESS     read-write
+         STATUS    current
+         DESCRIPTION
+         "Multicast storm protection mode"
+	 ::= { flLta41ma-V2GlobalConfigEntry 3 }
+
+     flLta41ma-V2GlobalBroadcastRate			OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								pct5		(1),
+								pct10		(2),
+								pct15		(3),
+								pct20		(4),
+								pct25		(5)
+						   }
+         MAX-ACCESS     read-write
+         STATUS    current
+         DESCRIPTION
+         "Broadcast storm protection rate in percents"
+	 ::= { flLta41ma-V2GlobalConfigEntry 4 }
+
+     flLta41ma-V2GlobalMaxPacketSize			OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								bytes1522		(1),
+								bytes1536		(2),
+								bytes1916		(3)
+						   }
+         MAX-ACCESS     read-write
+         STATUS    current
+         DESCRIPTION
+         "Maximum allowed receive packet size in bytes"
+	 ::= { flLta41ma-V2GlobalConfigEntry 5 }
+
+     flLta41ma-V2GlobalSleLogic				OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								or		(1),
+								and		(2)
+						   }
+         MAX-ACCESS     read-write
+         STATUS    current
+         DESCRIPTION
+         "SLE logic function: 'AND' or 'OR'"
+	 ::= { flLta41ma-V2GlobalConfigEntry 6 }
+
+     flLta41ma-V2GlobalSlePort1				OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								off		(1),
+								on		(2)
+						   }
+         MAX-ACCESS     read-write
+         STATUS    current
+         DESCRIPTION
+         "TP port 1 participation in the SLE function"
+	 ::= { flLta41ma-V2GlobalConfigEntry 7 }
+
+     flLta41ma-V2GlobalSlePort2				OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								off		(1),
+								on		(2)
+						   }
+         MAX-ACCESS     read-write
+         STATUS    current
+         DESCRIPTION
+         "TP port 2 participation in the SLE function"
+	 ::= { flLta41ma-V2GlobalConfigEntry 8 }
+
+     flLta41ma-V2GlobalSlePort3				OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								off		(1),
+								on		(2)
+						   }
+         MAX-ACCESS     read-write
+         STATUS    current
+         DESCRIPTION
+         "TP port 3 participation in the SLE function"
+	 ::= { flLta41ma-V2GlobalConfigEntry 9 }
+
+     flLta41ma-V2GlobalSlePort4				OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								off		(1),
+								on		(2)
+						   }
+         MAX-ACCESS     read-write
+         STATUS    current
+         DESCRIPTION
+         "TP port 4 participation in the SLE function"
+	 ::= { flLta41ma-V2GlobalConfigEntry 10 }
+
+     flLta41ma-V2RestartDevice				OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								running		(1),
+								restart		(2)
+						   }
+         MAX-ACCESS     read-write
+         STATUS    current
+         DESCRIPTION
+         "Restart the device"
+	 ::= { flLta41ma-V2GlobalConfigEntry 11 }
+
+     flLta41ma-V2RestoreDefaults		OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								normal		(1),
+								restore		(2)
+						   }
+         MAX-ACCESS     read-write
+         STATUS    current
+         DESCRIPTION
+         "Restore the device's default configuration"
+	 ::= { flLta41ma-V2GlobalConfigEntry 12 }
+
+	 flLta41ma-V2Temperature			OBJECT-TYPE
+		 SYNTAX    INTEGER 
+		 MAX-ACCESS     read-only
+         STATUS    current
+         DESCRIPTION
+         "The Device's temperature"
+	 ::= { flLta41ma-V2GlobalConfigEntry 13 }
+
+
+	 flLta41ma-V2FirmRevision			OBJECT-TYPE
+		 SYNTAX    DisplayString 
+		 MAX-ACCESS     read-only
+         STATUS    current
+         DESCRIPTION
+         "The Device's Firm Revision"
+	 ::= { flLta41ma-V2GlobalConfigEntry 14 }
+
+
+-- ************************************************************
+-- ************************************************************
+-- ************************************************************
+-- Device's ports configuration group
+-- ************************************************************
+-- ************************************************************
+-- ************************************************************
+
+-- ************************************************************
+-- Port configuration table
+-- ************************************************************
+
+	 flLta41ma-V2PortsConfigTable               OBJECT-TYPE
+         SYNTAX  SEQUENCE OF FlLta41ma-V2PortConfigEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "This table provides the ports' basic configuration"
+     ::= { flLta41ma-V2Ports 1 }
+
+     flLta41ma-V2PortConfigEntry				OBJECT-TYPE
+         SYNTAX  FlLta41ma-V2PortConfigEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "The entries of the table"
+         INDEX { flMsChassisMvIndex,
+		 flMsChassisModuleMvIndex,
+		 flMsModuleMvChannelIndex,
+		 flLta41ma-V2PortNumber	}
+     ::= { flLta41ma-V2PortsConfigTable 1 }
+
+		FlLta41ma-V2PortConfigEntry ::= SEQUENCE
+		{
+			 flLta41ma-V2PortNumber				INTEGER,
+			 flLta41ma-V2PortType				INTEGER,
+			 flLta41ma-V2PortLink				INTEGER,
+			 flLta41ma-V2PortDescription			DisplayString,
+			 flLta41ma-V2PortAutoNego			INTEGER,
+			 flLta41ma-V2PortDuplex				INTEGER,
+			 flLta41ma-V2PortDatarate			INTEGER,
+			 flLta41ma-V2PortEnabled			INTEGER,
+			 flLta41ma-V2PortAutoCross			INTEGER,
+			 flLta41ma-V2PortMdix				INTEGER,
+			 flLta41ma-V2PortFef				INTEGER,
+			 flLta41ma-V2PortReset				INTEGER,
+			 flLta41ma-V2PortBroadcastProtection		INTEGER
+		}
+
+     flLta41ma-V2PortNumber				OBJECT-TYPE
+		 SYNTAX    INTEGER (1..5)
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Table index - port number" 
+	 ::= { flLta41ma-V2PortConfigEntry 1 }
+
+     flLta41ma-V2PortType				OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								tp		(1),
+								fo		(2)
+						   }
+         MAX-ACCESS     read-only
+         STATUS    current
+         DESCRIPTION
+         "Port type"
+	 ::= { flLta41ma-V2PortConfigEntry 2 }
+
+     flLta41ma-V2PortLink				OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								off		(1),
+								on		(2),
+								killed  (3)
+						   }
+         MAX-ACCESS     read-only
+         STATUS    current
+         DESCRIPTION
+         "Port's link status"
+	 ::= { flLta41ma-V2PortConfigEntry 3 }
+
+     flLta41ma-V2PortDescription			OBJECT-TYPE
+		 SYNTAX    DisplayString
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Port's textual description - up to 40 characters" 
+	 ::= { flLta41ma-V2PortConfigEntry 4 }
+
+     flLta41ma-V2PortAutoNego				OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								disabled		(1),
+								enabled			(2)
+						   }
+         MAX-ACCESS     read-write
+         STATUS    current
+         DESCRIPTION
+         "Port's Auto-Negotiation mode"
+	 ::= { flLta41ma-V2PortConfigEntry 5 }
+
+     flLta41ma-V2PortDuplex				OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								hdx		(1),
+								fdx		(2),
+								n-a		(3)
+						   }
+         MAX-ACCESS     read-write
+         STATUS    current
+         DESCRIPTION
+         "Port's duplex mode"
+	 ::= { flLta41ma-V2PortConfigEntry 6 }
+
+     flLta41ma-V2PortDatarate				OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								m10		(1),
+								m100	(2),
+								n-a		(3)
+						   }
+         MAX-ACCESS     read-write
+         STATUS    current
+         DESCRIPTION
+         "Port's data rate mode - 10/100Mbps"
+	 ::= { flLta41ma-V2PortConfigEntry 7 }
+
+     flLta41ma-V2PortEnabled				OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								disabled		(1),
+								enabled			(2)
+						   }
+         MAX-ACCESS     read-write
+         STATUS    current
+         DESCRIPTION
+         "Port enabling or disabling"
+	 ::= { flLta41ma-V2PortConfigEntry 8 }
+
+     flLta41ma-V2PortAutoCross				OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								off		(1),
+								on		(2)
+						   }
+         MAX-ACCESS     read-write
+         STATUS    current
+         DESCRIPTION
+         "Port's Auto-cross mode"
+	 ::= { flLta41ma-V2PortConfigEntry 9 }
+
+     flLta41ma-V2PortMdix				OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								mdi		(1),
+								mdix	(2)
+						   }
+         MAX-ACCESS     read-write
+         STATUS    current
+         DESCRIPTION
+         "Port's MDI mode - MDI or MDIX"
+	 ::= { flLta41ma-V2PortConfigEntry 10 }
+
+     flLta41ma-V2PortFef				OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								off		(1),
+								on		(2)
+						   }
+         MAX-ACCESS     read-write
+         STATUS    current
+         DESCRIPTION
+         "Port's FEF mode (only FO)"
+	 ::= { flLta41ma-V2PortConfigEntry 11 }
+
+     flLta41ma-V2PortReset				OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								normal		(1),
+								reset		(2)
+						   }
+         MAX-ACCESS     read-write
+         STATUS    current
+         DESCRIPTION
+         "Port's reset"
+	 ::= { flLta41ma-V2PortConfigEntry 12 }
+
+     flLta41ma-V2PortBroadcastProtection				OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								off		(1),
+								on		(2)
+						   }
+         MAX-ACCESS     read-write
+         STATUS    current
+         DESCRIPTION
+         "Port's broadcast storm protection mode"
+	 ::= { flLta41ma-V2PortConfigEntry 13 }
+
+
+-- ************************************************************
+-- Port bandwidth configuration table
+-- ************************************************************
+
+	 flLta41ma-V2PortsBwConfigTable               OBJECT-TYPE
+         SYNTAX  SEQUENCE OF FlLta41ma-V2PortBwConfigEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "This table provides the ports' bandwidth configuration"
+     ::= { flLta41ma-V2Ports 2 }
+
+     flLta41ma-V2PortBwConfigEntry				OBJECT-TYPE
+         SYNTAX  FlLta41ma-V2PortBwConfigEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "The entries of the table"
+         INDEX { flMsChassisMvIndex,
+		 flMsChassisModuleMvIndex,
+		 flMsModuleMvChannelIndex,
+		 flLta41ma-V2PortNumber }
+     ::= { flLta41ma-V2PortsBwConfigTable 1 }
+
+		FlLta41ma-V2PortBwConfigEntry ::= SEQUENCE
+		{
+			 flLta41ma-V2PortRxHighBw				INTEGER,
+			 flLta41ma-V2PortTxHighBw				INTEGER,
+			 flLta41ma-V2PortRxLowBw				INTEGER,
+			 flLta41ma-V2PortTxLowBw				INTEGER,
+			 flLta41ma-V2PortRxDiffBw				INTEGER,
+			 flLta41ma-V2PortRxHighFlowControl		INTEGER,
+			 flLta41ma-V2PortRxLowFlowControl		INTEGER,
+			 flLta41ma-V2PortTxDiffBw				INTEGER
+		}
+
+     flLta41ma-V2PortRxHighBw			OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								k256		(129),
+								k512		(130),
+								m01			(1),
+								m02			(2),
+								m03			(3),
+								m04			(4),
+								m05			(5),
+								m06			(6),
+								m07			(7),
+								m08			(8),
+								m09			(9),
+								m10			(10),
+								m20			(20),
+								m30			(30),
+								m40			(40),
+								m50			(50),
+								m60			(60),
+								m70			(70),
+								m80			(80),
+								m90			(90),
+								m100		(100)
+						   }
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Port's receive high priority bandwidth" 
+	 ::= { flLta41ma-V2PortBwConfigEntry  1 }
+
+     flLta41ma-V2PortTxHighBw			OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								k256		(129),
+								k512		(130),
+								m01			(1),
+								m02			(2),
+								m03			(3),
+								m04			(4),
+								m05			(5),
+								m06			(6),
+								m07			(7),
+								m08			(8),
+								m09			(9),
+								m10			(10),
+								m20			(20),
+								m30			(30),
+								m40			(40),
+								m50			(50),
+								m60			(60),
+								m70			(70),
+								m80			(80),
+								m90			(90),
+								m100		(100)
+						   }
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Port's transmit high priority bandwidth" 
+	 ::= { flLta41ma-V2PortBwConfigEntry  2 }
+
+     flLta41ma-V2PortRxLowBw			OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								k256		(129),
+								k512		(130),
+								m01			(1),
+								m02			(2),
+								m03			(3),
+								m04			(4),
+								m05			(5),
+								m06			(6),
+								m07			(7),
+								m08			(8),
+								m09			(9),
+								m10			(10),
+								m20			(20),
+								m30			(30),
+								m40			(40),
+								m50			(50),
+								m60			(60),
+								m70			(70),
+								m80			(80),
+								m90			(90),
+								m100		(100)
+						   }
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Port's receive low priority bandwidth" 
+	 ::= { flLta41ma-V2PortBwConfigEntry  3 }
+
+     flLta41ma-V2PortTxLowBw			OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								k256		(129),
+								k512		(130),
+								m01			(1),
+								m02			(2),
+								m03			(3),
+								m04			(4),
+								m05			(5),
+								m06			(6),
+								m07			(7),
+								m08			(8),
+								m09			(9),
+								m10			(10),
+								m20			(20),
+								m30			(30),
+								m40			(40),
+								m50			(50),
+								m60			(60),
+								m70			(70),
+								m80			(80),
+								m90			(90),
+								m100		(100)
+						   }
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Port's transmit low priority bandwidth" 
+	 ::= { flLta41ma-V2PortBwConfigEntry  4 }
+
+     flLta41ma-V2PortRxDiffBw			OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								off			(1),
+								on			(2)
+						   }
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Port's differential (priority) receive bandwidth mode" 
+	 ::= { flLta41ma-V2PortBwConfigEntry  5 }
+ 
+     flLta41ma-V2PortRxHighFlowControl			OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								off			(1),
+								on			(2)
+						   }
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Port's high priority receive flow control mode" 
+	 ::= { flLta41ma-V2PortBwConfigEntry  6 }
+
+     flLta41ma-V2PortRxLowFlowControl			OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								off			(1),
+								on			(2)
+						   }
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Port's low priority receive flow control mode" 
+	 ::= { flLta41ma-V2PortBwConfigEntry  7 }
+
+     flLta41ma-V2PortTxDiffBw			OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								off			(1),
+								on			(2)
+						   }
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Port's differential (priority) transmit bandwidth mode" 
+	 ::= { flLta41ma-V2PortBwConfigEntry  8 }
+
+
+
+-- ************************************************************
+-- ************************************************************
+-- ************************************************************
+-- Device's VLAN configuration group
+-- ************************************************************
+-- ************************************************************
+-- ************************************************************
+
+     flLta41ma-V2VlanGlobalTable               OBJECT-TYPE
+         SYNTAX  SEQUENCE OF FlLta41ma-V2VlanGlobalEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "This table provides the device's VLAN global configuration"
+     ::= { flLta41ma-V2Vlan 1 }
+
+     flLta41ma-V2VlanGlobalEntry				OBJECT-TYPE
+         SYNTAX  FlLta41ma-V2VlanGlobalEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "The entries of the table"
+         INDEX { flMsChassisMvIndex,
+		 flMsChassisModuleMvIndex,
+		 flMsModuleMvChannelIndex }
+     ::= { flLta41ma-V2VlanGlobalTable 1 }
+
+		FlLta41ma-V2VlanGlobalEntry ::= SEQUENCE
+		{
+			 flLta41ma-V2Vlan8021q				INTEGER,
+			 flLta41ma-V2VlanNullVidReplace			INTEGER,
+			 flLta41ma-V2CreateDefaultVlans			INTEGER,
+			 flLta41ma-V2DeleteAllVlans			INTEGER
+		}
+
+     flLta41ma-V2Vlan8021q			        OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								off			(1),
+								on			(2)
+						   }
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Enable or disable 802.1q VLAN filtering" 
+	 ::= { flLta41ma-V2VlanGlobalEntry 1 }
+
+     flLta41ma-V2VlanNullVidReplace		OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								off			(1),
+								on			(2)
+						   }
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Port's null VID replacing mode" 
+	 ::= { flLta41ma-V2VlanGlobalEntry 2 }
+
+     flLta41ma-V2CreateDefaultVlans		OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								normal			(1),
+								create			(2)
+						   }
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Create the default VLANs" 
+	 ::= { flLta41ma-V2VlanGlobalEntry 3 }
+
+     flLta41ma-V2DeleteAllVlans			OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								normal			(1),
+								delete			(2)
+						   }
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Delete all active VLANs (null the VID)" 
+	 ::= { flLta41ma-V2VlanGlobalEntry 4 }
+
+
+-- ************************************************************
+-- VLANs table
+-- ************************************************************
+
+	 flLta41ma-V2VlansTable               OBJECT-TYPE
+         SYNTAX  SEQUENCE OF FlLta41ma-V2VlanEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "This table provides VLANs defined in the device"
+     ::= { flLta41ma-V2Vlan 10 }
+
+     flLta41ma-V2VlanEntry				OBJECT-TYPE
+         SYNTAX  FlLta41ma-V2VlanEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "The entries of the table"
+         INDEX { flMsChassisMvIndex,
+		 flMsChassisModuleMvIndex,
+		 flMsModuleMvChannelIndex,
+		 flLta41ma-V2VlanFid }
+     ::= { flLta41ma-V2VlansTable 1 }
+
+		FlLta41ma-V2VlanEntry ::= SEQUENCE
+		{
+			 flLta41ma-V2VlanFid			INTEGER,
+			 flLta41ma-V2VlanVid			INTEGER,
+			 flLta41ma-V2VlanName			DisplayString,
+			 flLta41ma-V2VlanPort1Member		INTEGER,
+			 flLta41ma-V2VlanPort2Member		INTEGER,
+			 flLta41ma-V2VlanPort3Member		INTEGER,
+			 flLta41ma-V2VlanPort4Member		INTEGER,
+			 flLta41ma-V2VlanPort5Member		INTEGER,
+			 flLta41ma-V2VlanTableStatus       EntryStatus
+		}
+
+     flLta41ma-V2VlanFid				OBJECT-TYPE
+		 SYNTAX    INTEGER (0..15)
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Table index - VLAN Filter ID" 
+	 ::= { flLta41ma-V2VlanEntry 1 }
+
+     flLta41ma-V2VlanVid				OBJECT-TYPE
+		 SYNTAX    INTEGER	(0..4095)
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "VLAN ID" 
+	 ::= { flLta41ma-V2VlanEntry 2 }
+
+     flLta41ma-V2VlanName				OBJECT-TYPE
+		 SYNTAX    DisplayString
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "VLAN name - up to 15 characters" 
+	 ::= { flLta41ma-V2VlanEntry 3 }
+
+     flLta41ma-V2VlanPort1Member			OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								none		(1),
+								native		(2),
+								tagged		(3)
+						   }
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "TP Port 1 membership type in VLAN" 
+	 ::= { flLta41ma-V2VlanEntry 4 }
+
+     flLta41ma-V2VlanPort2Member			OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								none		(1),
+								native		(2),
+								tagged		(3)
+						   }
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "TP Port 2 membership type in VLAN" 
+	 ::= { flLta41ma-V2VlanEntry 5 }
+
+     flLta41ma-V2VlanPort3Member			OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								none		(1),
+								native		(2),
+								tagged		(3)
+						   }
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "TP Port 3 membership type in VLAN" 
+	 ::= { flLta41ma-V2VlanEntry 6 }
+
+     flLta41ma-V2VlanPort4Member			OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								none		(1),
+								native		(2),
+								tagged		(3)
+						   }
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "TP Port 4 membership type in VLAN" 
+	 ::= { flLta41ma-V2VlanEntry 7 }
+
+     flLta41ma-V2VlanPort5Member			OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								none		(1),
+								native		(2),
+								tagged		(3)
+						   }
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "FO Port (5) membership type in VLAN" 
+	 ::= { flLta41ma-V2VlanEntry 8 }
+
+	 flLta41ma-V2VlanTableStatus		 OBJECT-TYPE
+		 SYNTAX EntryStatus  
+		 MAX-ACCESS  read-write
+		 STATUS current
+         DESCRIPTION
+           "The status of this table entry.  (Refer to the RFC 1757 definition
+              of 'EntryStatus.)"
+    ::= { flLta41ma-V2VlanEntry 9 }
+
+
+-- ************************************************************
+-- Port VLAN configuration table
+-- ************************************************************
+
+	 flLta41ma-V2PortsVlanConfigTable               OBJECT-TYPE
+         SYNTAX  SEQUENCE OF FlLta41ma-V2PortVlanConfigEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "This table provides the ports' VLAN related configuration"
+     ::= { flLta41ma-V2Vlan 20 }
+
+     flLta41ma-V2PortVlanConfigEntry				OBJECT-TYPE
+         SYNTAX  FlLta41ma-V2PortVlanConfigEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "The entries of the table"
+         INDEX { flMsChassisMvIndex,
+		 flMsChassisModuleMvIndex,
+		 flMsModuleMvChannelIndex,
+		 flLta41ma-V2PortNumber }
+     ::= { flLta41ma-V2PortsVlanConfigTable 1 }
+
+		FlLta41ma-V2PortVlanConfigEntry ::= SEQUENCE
+		{
+			 flLta41ma-V2PortIngressFilter			INTEGER,
+			 flLta41ma-V2PortTagInsertion			INTEGER,
+			 flLta41ma-V2PortTagRemoval			INTEGER,
+			 flLta41ma-V2PortVid				INTEGER,
+			 flLta41ma-V2PortDiscardNonPvid			INTEGER
+		}
+
+
+     flLta41ma-V2PortIngressFilter				OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								off		(1),
+								on		(2)
+						   }
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Port's ingress VLAN filtering mode" 
+	 ::= { flLta41ma-V2PortVlanConfigEntry 1 }
+
+     flLta41ma-V2PortTagInsertion				OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								off		(1),
+								on		(2)
+						   }
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Port's VLAN tag insertion mode" 
+	 ::= { flLta41ma-V2PortVlanConfigEntry 2 }
+
+     flLta41ma-V2PortTagRemoval				OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								off		(1),
+								on		(2)
+						   }
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Port's VLAN tag removal mode" 
+	 ::= { flLta41ma-V2PortVlanConfigEntry 3 }
+
+     flLta41ma-V2PortVid				OBJECT-TYPE
+		 SYNTAX    INTEGER (0..4095)
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Default port VID (used in tag insertion)" 
+	 ::= { flLta41ma-V2PortVlanConfigEntry 4 }
+
+     flLta41ma-V2PortDiscardNonPvid				OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								off		(1),
+								on		(2)
+						   }
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Port's discard non port VID tagged packets mode" 
+	 ::= { flLta41ma-V2PortVlanConfigEntry 5 }
+
+
+-- ************************************************************
+-- ************************************************************
+-- ************************************************************
+-- Device's priority (QoS) configuration table
+-- ************************************************************
+-- ************************************************************
+-- ************************************************************
+   flLta41ma-V2QoSGlobalTable				OBJECT-TYPE
+     SYNTAX  SEQUENCE OF FlLta41ma-V2QoSGlobalEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "This table provides the device's QoS global configuration"
+     ::= { flLta41ma-V2Priority 1 }
+
+     flLta41ma-V2QosGlobalEntry				OBJECT-TYPE
+         SYNTAX  FlLta41ma-V2QoSGlobalEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "The entries of the table"
+         INDEX { flMsChassisMvIndex,
+		 flMsChassisModuleMvIndex,
+		 flMsModuleMvChannelIndex }
+     ::= { flLta41ma-V2QoSGlobalTable 1 }
+
+		FlLta41ma-V2QoSGlobalEntry ::= SEQUENCE
+		{
+			 flLta41ma-V28021pBase			INTEGER,
+			 flLta41ma-V2PriorityRatio		INTEGER
+		}
+
+     flLta41ma-V28021pBase				OBJECT-TYPE
+		 SYNTAX		INTEGER (0..7)
+		 MAX-ACCESS     read-write
+		 STATUS		current
+		 DESCRIPTION
+		 "802.1p base priority - values below are low priority" 
+	 ::= { flLta41ma-V2QosGlobalEntry 1 }
+
+	   flLta41ma-V2PriorityRatio			OBJECT-TYPE
+		 SYNTAX    INTEGER{
+					alwaysHi	(1),
+					ratio10-1	(2),
+					ratio5-1	(3),
+					ratio2-1	(4)
+				  }
+		 MAX-ACCESS     read-write
+		 STATUS		current
+		 DESCRIPTION
+		 "Priority packet transmission policy - ratio is hi:lo" 
+	 ::= { flLta41ma-V2QosGlobalEntry 2 }
+
+
+-- ************************************************************
+-- DSCP table
+-- ************************************************************
+
+	 flLta41ma-V2DscpTable               OBJECT-TYPE
+         SYNTAX  SEQUENCE OF FlLta41ma-V2DscpEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "This table provides the DSCP priority settings"
+     ::= { flLta41ma-V2Priority 10 }
+
+     flLta41ma-V2DscpEntry				OBJECT-TYPE
+         SYNTAX  FlLta41ma-V2DscpEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "The entries of the table"
+         INDEX { flMsChassisMvIndex,
+		 flMsChassisModuleMvIndex,
+		 flMsModuleMvChannelIndex,
+		 flLta41ma-V2DscpCode }
+     ::= { flLta41ma-V2DscpTable 1 }
+
+		FlLta41ma-V2DscpEntry ::= SEQUENCE
+		{
+			 flLta41ma-V2DscpCode				INTEGER,
+			 flLta41ma-V2DscpCodePriority		INTEGER
+		}
+
+     flLta41ma-V2DscpCode				OBJECT-TYPE
+		 SYNTAX    INTEGER(1..64)	
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Table index - DSCP code" 
+	 ::= { flLta41ma-V2DscpEntry 1 }
+
+     flLta41ma-V2DscpCodePriority				OBJECT-TYPE
+		 SYNTAX    INTEGER	{
+								low		(1),
+								high	(2)
+							}
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "DSCP code priority" 
+	 ::= { flLta41ma-V2DscpEntry 2 }
+
+-- ************************************************************
+-- Port priority configuration table
+-- ************************************************************
+
+	 flLta41ma-V2PortsPriorityConfigTable               OBJECT-TYPE
+         SYNTAX  SEQUENCE OF FlLta41ma-V2PortPriorityConfigEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "This table provides the ports' priority related configuration"
+     ::= { flLta41ma-V2Priority 20 }
+
+     flLta41ma-V2PortPriorityConfigEntry				OBJECT-TYPE
+         SYNTAX  FlLta41ma-V2PortPriorityConfigEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "The entries of the table"
+         INDEX { flMsChassisMvIndex,
+		 flMsChassisModuleMvIndex,
+		 flMsModuleMvChannelIndex,
+		 flLta41ma-V2PortNumber }
+     ::= { flLta41ma-V2PortsPriorityConfigTable 1 }
+
+		FlLta41ma-V2PortPriorityConfigEntry ::= SEQUENCE
+		{
+			 flLta41ma-V2PortPriority					INTEGER,
+			 flLta41ma-V2Port8021pClassification		INTEGER,
+			 flLta41ma-V2PortDiffServClassification	INTEGER,
+			 flLta41ma-V2PortUserPriority				INTEGER
+		}
+
+
+     flLta41ma-V2PortPriority				OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								low		(1),
+								high	(2)
+						   }
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Port priority mode" 
+	 ::= { flLta41ma-V2PortPriorityConfigEntry 1 }
+
+     flLta41ma-V2Port8021pClassification				OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								off		(1),
+								on		(2)
+						   }
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Port's 802.1p packet classification mode" 
+	 ::= { flLta41ma-V2PortPriorityConfigEntry 2 }
+
+     flLta41ma-V2PortDiffServClassification				OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								off		(1),
+								on		(2)
+						   }
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Port's DiffServ packet classification mode" 
+	 ::= { flLta41ma-V2PortPriorityConfigEntry 3 }
+
+     flLta41ma-V2PortUserPriority				OBJECT-TYPE
+		 SYNTAX    INTEGER (0..7)
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Port's user priority" 
+	 ::= { flLta41ma-V2PortPriorityConfigEntry 4 }
+
+
+
+-- ************************************************************
+-- ************************************************************
+-- ************************************************************
+-- Device's MAC address global table
+-- ************************************************************
+-- ************************************************************
+-- ************************************************************
+     flLta41ma-V2MacAddressGlobalTable               OBJECT-TYPE
+	 SYNTAX  SEQUENCE OF FlLta41ma-V2MacAddressGlobalEntry
+	 MAX-ACCESS   not-accessible
+	 STATUS  current
+	 DESCRIPTION
+	 "This table provides the device's MAC address globals"
+     ::= { flLta41ma-V2Mac 1 }
+
+     flLta41ma-V2MacAddressGlobalEntry				OBJECT-TYPE
+         SYNTAX  FlLta41ma-V2MacAddressGlobalEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "The entries of the table"
+         INDEX { flMsChassisMvIndex,
+		 flMsChassisModuleMvIndex,
+		 flMsModuleMvChannelIndex }
+     ::= { flLta41ma-V2MacAddressGlobalTable 1 }
+
+		FlLta41ma-V2MacAddressGlobalEntry ::= SEQUENCE
+		{
+			 flLta41ma-V2ClearDynamicMacTable	INTEGER,
+			 flLta41ma-V2ClearStaticMacTable	INTEGER,
+			 flLta41ma-V2MacLinkDownFlush		INTEGER
+		}
+   
+     flLta41ma-V2ClearDynamicMacTable			OBJECT-TYPE
+		 SYNTAX    INTEGER {
+					normal			(1),
+					clear			(2)
+				   }
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Clear the device's dynamic MAC address table" 
+	 ::= { flLta41ma-V2MacAddressGlobalEntry 1 }
+
+     flLta41ma-V2ClearStaticMacTable			OBJECT-TYPE
+		 SYNTAX    INTEGER {
+					normal			(1),
+					clear			(2)
+				   }
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Clear the device's static MAC address table" 
+	 ::= { flLta41ma-V2MacAddressGlobalEntry 2 }
+
+     flLta41ma-V2MacLinkDownFlush			OBJECT-TYPE
+		 SYNTAX    INTEGER {
+					off			(1),
+					on			(2)
+				   }
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "MAC flushing on link down mode" 
+	 ::= { flLta41ma-V2MacAddressGlobalEntry 3 }
+
+
+-- ************************************************************
+-- Dynamic MAC table
+-- ************************************************************
+
+	 flLta41ma-V2DynamicMacTable               OBJECT-TYPE
+         SYNTAX  SEQUENCE OF FlLta41ma-V2DynamicMacEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "This table provides the device's dynamic MAC address table.
+		  this table is read only"
+     ::= { flLta41ma-V2Mac 10 }
+
+     flLta41ma-V2DynamicMacEntry				OBJECT-TYPE
+         SYNTAX  FlLta41ma-V2DynamicMacEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "The entries of the table"
+         INDEX { flMsChassisMvIndex,
+		 flMsChassisModuleMvIndex,
+		 flMsModuleMvChannelIndex,
+		 flLta41ma-V2DynamicEntryNumber }
+     ::= { flLta41ma-V2DynamicMacTable 1 }
+
+		FlLta41ma-V2DynamicMacEntry ::= SEQUENCE
+		{
+			 flLta41ma-V2DynamicEntryNumber		INTEGER,
+			 flLta41ma-V2DynamicMacAddress		DisplayString,
+			 flLta41ma-V2SrcPort			INTEGER,
+			 flLta41ma-V2DynamicFid			INTEGER
+		}
+
+     flLta41ma-V2DynamicEntryNumber			OBJECT-TYPE
+		 SYNTAX    INTEGER (1..100)
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Table index - entry number" 
+	 ::= { flLta41ma-V2DynamicMacEntry 1 }
+
+     flLta41ma-V2DynamicMacAddress				OBJECT-TYPE
+		 SYNTAX    DisplayString
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "MAC address" 
+	 ::= { flLta41ma-V2DynamicMacEntry 2 }
+
+     flLta41ma-V2SrcPort						OBJECT-TYPE
+		 SYNTAX    INTEGER
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Address's source port" 
+	 ::= { flLta41ma-V2DynamicMacEntry 3 }
+
+	 --flLta41ma-V2DynamicUseFid					OBJECT-TYPE  (changed 21-12-04, Anat)
+	 flLta41ma-V2DynamicFid					OBJECT-TYPE
+		 SYNTAX    INTEGER	(0..15)
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "VLAN filter FID" 
+	 ::= { flLta41ma-V2DynamicMacEntry 4 }
+
+-- ************************************************************
+-- Static MAC table
+-- ************************************************************
+
+	 flLta41ma-V2StaticMacTable               OBJECT-TYPE
+         SYNTAX  SEQUENCE OF FlLta41ma-V2StaticMacEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "This table provides the device's static MAC address table."
+     ::= { flLta41ma-V2Mac 20 }
+
+     flLta41ma-V2StaticMacEntry				OBJECT-TYPE
+         SYNTAX  FlLta41ma-V2StaticMacEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "The entries of the table"
+         INDEX { flMsChassisMvIndex,
+		 flMsChassisModuleMvIndex,
+		 flMsModuleMvChannelIndex,
+		 flLta41ma-V2StaticEntryNumber }
+     ::= { flLta41ma-V2StaticMacTable 1 }
+
+		FlLta41ma-V2StaticMacEntry ::= SEQUENCE
+		{
+			 flLta41ma-V2StaticEntryNumber			INTEGER,
+			 flLta41ma-V2StaticMacAddress			DisplayString,
+			 flLta41ma-V2FwdPort1					INTEGER,
+			 flLta41ma-V2FwdPort2					INTEGER,
+			 flLta41ma-V2FwdPort3					INTEGER,
+			 flLta41ma-V2FwdPort4					INTEGER,
+			 flLta41ma-V2FwdPort5					INTEGER,
+			 flLta41ma-V2Fid						INTEGER,
+			 flLta41ma-V2StaticUseFid				INTEGER,
+			 flLta41ma-V2StaticMacTableStatus      EntryStatus
+		}
+
+     flLta41ma-V2StaticEntryNumber				OBJECT-TYPE
+		 SYNTAX    INTEGER (1..10)
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Table index - entry number" 
+	 ::= { flLta41ma-V2StaticMacEntry 1 }
+
+     flLta41ma-V2StaticMacAddress				OBJECT-TYPE
+		 SYNTAX    DisplayString
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "MAC address" 
+	 ::= { flLta41ma-V2StaticMacEntry 2 }
+
+     flLta41ma-V2FwdPort1						OBJECT-TYPE
+		 SYNTAX    INTEGER	{
+								no	(1),
+								yes	(2)
+							}
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Forward packets with the MAC address to port 1" 
+	 ::= { flLta41ma-V2StaticMacEntry 3 }
+
+     flLta41ma-V2FwdPort2						OBJECT-TYPE
+		 SYNTAX    INTEGER	{
+								no	(1),
+								yes	(2)
+							}
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Forward packets with the MAC address to port 2" 
+	 ::= { flLta41ma-V2StaticMacEntry 4 }
+
+     flLta41ma-V2FwdPort3						OBJECT-TYPE
+		 SYNTAX    INTEGER	{
+								no	(1),
+								yes	(2)
+							}
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Forward packets with the MAC address to port 3" 
+	 ::= { flLta41ma-V2StaticMacEntry 5 }
+
+     flLta41ma-V2FwdPort4						OBJECT-TYPE
+		 SYNTAX    INTEGER	{
+								no	(1),
+								yes	(2)
+							}
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Forward packets with the MAC address to port 4" 
+	 ::= { flLta41ma-V2StaticMacEntry 6 }
+
+     flLta41ma-V2FwdPort5						OBJECT-TYPE
+		 SYNTAX    INTEGER	{
+								no	(1),
+								yes	(2)
+							}
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Forward packets with the MAC address to port 5" 
+	 ::= { flLta41ma-V2StaticMacEntry 7 }
+
+	 flLta41ma-V2Fid							OBJECT-TYPE
+		 SYNTAX    INTEGER	(0..15)	
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "The VLAN filter to be used (by FID)" 
+	 ::= { flLta41ma-V2StaticMacEntry 8 }
+
+	 flLta41ma-V2StaticUseFid					OBJECT-TYPE
+		 SYNTAX    INTEGER	{
+								no	(1),
+								yes	(2)
+							}
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Uses a VLAN filter (by FID)" 
+	 ::= { flLta41ma-V2StaticMacEntry 9 }
+
+	 flLta41ma-V2StaticMacTableStatus		 OBJECT-TYPE
+		 SYNTAX EntryStatus  
+		 MAX-ACCESS  read-write
+		 STATUS current
+         DESCRIPTION
+           "The status of this table entry.  (Refer to the RFC 1757 definition
+              of 'EntryStatus.)"
+    ::= { flLta41ma-V2StaticMacEntry 10 }
+
+
+-- insert UMA here !!!!!!!
+
+
+-- ************************************************************
+-- ************************************************************
+-- ************************************************************
+-- Device's traffic statistics group
+-- ************************************************************
+-- ************************************************************
+-- ************************************************************
+
+-- ************************************************************
+-- Rx Errors table
+-- ************************************************************
+	 flLta41ma-V2RxErrorPacketsTable               OBJECT-TYPE
+         SYNTAX  SEQUENCE OF FlLta41ma-V2RxErrorPacketsEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "This table provides the error packet statistics for all ports.
+		  Table is read only"
+     ::= { flLta41ma-V2Statistics 10 }
+
+     flLta41ma-V2RxErrorPacketsEntry				OBJECT-TYPE
+         SYNTAX  FlLta41ma-V2RxErrorPacketsEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "The entries of the table"
+         INDEX { flMsChassisMvIndex,
+		 flMsChassisModuleMvIndex,
+		 flMsModuleMvChannelIndex,
+		 flLta41ma-V2PortNumber }
+     ::= { flLta41ma-V2RxErrorPacketsTable 1 }
+
+		FlLta41ma-V2RxErrorPacketsEntry ::= SEQUENCE
+		{
+			 flLta41ma-V2RxUndersizePackets			Counter,
+			 flLta41ma-V2RxFragmentPackets				Counter,
+			 flLta41ma-V2RxOversizePackets				Counter,
+			 flLta41ma-V2RxCrcErrorPackets				Counter,
+			 flLta41ma-V2RxAlignmentErrorPackets		Counter,
+			 flLta41ma-V2RxRefreshCounters				INTEGER,
+			 flLta41ma-V2RxClearCounters				INTEGER
+		}
+
+
+     flLta41ma-V2RxUndersizePackets				OBJECT-TYPE
+		 SYNTAX    Counter
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Number of undersized packets that arrived on the port" 
+	 ::= { flLta41ma-V2RxErrorPacketsEntry 1 }
+
+     flLta41ma-V2RxFragmentPackets					OBJECT-TYPE
+		 SYNTAX    Counter
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Number of fragmented packets that arrived on the port" 
+	 ::= { flLta41ma-V2RxErrorPacketsEntry 2 }
+
+     flLta41ma-V2RxOversizePackets					OBJECT-TYPE
+		 SYNTAX    Counter
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Number of oversized packets that arrived on the port" 
+	 ::= { flLta41ma-V2RxErrorPacketsEntry 3 }
+
+     flLta41ma-V2RxCrcErrorPackets					OBJECT-TYPE
+		 SYNTAX    Counter
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Number of CRC errored packets that arrived on the port" 
+	 ::= { flLta41ma-V2RxErrorPacketsEntry 4 }
+
+     flLta41ma-V2RxAlignmentErrorPackets			OBJECT-TYPE
+		 SYNTAX    Counter
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Number of alignment error packets that arrived on the port" 
+	 ::= { flLta41ma-V2RxErrorPacketsEntry 5 }
+
+     flLta41ma-V2RxRefreshCounters					OBJECT-TYPE
+		 SYNTAX    INTEGER	{
+								normal		(1),
+								refresh		(2)
+							}
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Refresh the port's counters for this table" 
+	 ::= { flLta41ma-V2RxErrorPacketsEntry 6 }
+
+     flLta41ma-V2RxClearCounters					OBJECT-TYPE
+		 SYNTAX    INTEGER	{
+								normal		(1),
+								clear		(2)
+							}
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Clear the port's counters for this table" 
+	 ::= { flLta41ma-V2RxErrorPacketsEntry 7 }
+
+
+-- ************************************************************
+-- Rx good packets table
+-- ************************************************************
+	 flLta41ma-V2RxGoodPacketsTable               OBJECT-TYPE
+         SYNTAX  SEQUENCE OF FlLta41ma-V2RxGoodPacketsEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "This table provides the received good packet statistics for all ports.
+		  Table is read only"
+     ::= { flLta41ma-V2Statistics 20 }
+
+     flLta41ma-V2RxGoodPacketsEntry				OBJECT-TYPE
+         SYNTAX  FlLta41ma-V2RxGoodPacketsEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "The entries of the table"
+         INDEX { flMsChassisMvIndex,
+		 flMsChassisModuleMvIndex,
+		 flMsModuleMvChannelIndex,
+		 flLta41ma-V2PortNumber }
+     ::= { flLta41ma-V2RxGoodPacketsTable 1 }
+
+		FlLta41ma-V2RxGoodPacketsEntry ::= SEQUENCE
+		{
+			 flLta41ma-V2RxUnicastPackets				Counter,
+			 flLta41ma-V2RxMulticastPackets			Counter,
+			 flLta41ma-V2RxBroadcastPackets			Counter,
+			 flLta41ma-V2RxMacControlPackets			Counter,
+			 flLta41ma-V2RxPausePackets				Counter,
+			 flLta41ma-V2RxRefreshGoodCounters			INTEGER,
+			 flLta41ma-V2RxClearGoodCounters			INTEGER
+		}
+
+
+     flLta41ma-V2RxUnicastPackets					OBJECT-TYPE
+		 SYNTAX    Counter
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Number of good unicast packets that arrived on the port" 
+	 ::= { flLta41ma-V2RxGoodPacketsEntry 1 }
+
+     flLta41ma-V2RxMulticastPackets				OBJECT-TYPE
+		 SYNTAX    Counter
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Number of good multicast packets that arrived on the port" 
+	 ::= { flLta41ma-V2RxGoodPacketsEntry 2 }
+
+     flLta41ma-V2RxBroadcastPackets				OBJECT-TYPE
+		 SYNTAX    Counter
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Number of good broadcast packets that arrived on the port" 
+	 ::= { flLta41ma-V2RxGoodPacketsEntry 3 }
+
+     flLta41ma-V2RxMacControlPackets				OBJECT-TYPE
+		 SYNTAX    Counter
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Number of good MAC control packets that arrived on the port" 
+	 ::= { flLta41ma-V2RxGoodPacketsEntry 4 }
+
+     flLta41ma-V2RxPausePackets					OBJECT-TYPE
+		 SYNTAX    Counter
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Number of good Pause packets that arrived on the port" 
+	 ::= { flLta41ma-V2RxGoodPacketsEntry 5 }
+
+     flLta41ma-V2RxRefreshGoodCounters				OBJECT-TYPE
+		 SYNTAX    INTEGER	{
+								normal		(1),
+								refresh		(2)
+							}
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Refresh the port's counters for this table" 
+	 ::= { flLta41ma-V2RxGoodPacketsEntry 6 }
+
+     flLta41ma-V2RxClearGoodCounters				OBJECT-TYPE
+		 SYNTAX    INTEGER	{
+								normal		(1),
+								clear		(2)
+							}
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Clear the port's counters for this table" 
+	 ::= { flLta41ma-V2RxGoodPacketsEntry 7 }
+
+
+-- ************************************************************
+-- Tx good packets table
+-- ************************************************************
+	 flLta41ma-V2TxGoodPacketsTable               OBJECT-TYPE
+         SYNTAX  SEQUENCE OF FlLta41ma-V2TxGoodPacketsEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "This table provides the transmitted good packet statistics for all ports.
+		  Table is read only"
+     ::= { flLta41ma-V2Statistics 30 }
+
+     flLta41ma-V2TxGoodPacketsEntry				OBJECT-TYPE
+         SYNTAX  FlLta41ma-V2TxGoodPacketsEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "The entries of the table"
+         INDEX { flMsChassisMvIndex,
+		 flMsChassisModuleMvIndex,
+		 flMsModuleMvChannelIndex,
+		 flLta41ma-V2PortNumber }
+     ::= { flLta41ma-V2TxGoodPacketsTable 1 }
+
+		FlLta41ma-V2TxGoodPacketsEntry ::= SEQUENCE
+		{
+			 flLta41ma-V2TxUnicastPackets				Counter,
+			 flLta41ma-V2TxMulticastPackets			Counter,
+			 flLta41ma-V2TxBroadcastPackets			Counter,
+			 flLta41ma-V2TxPausePackets				Counter,
+			 flLta41ma-V2TxRefreshGoodCounters			INTEGER,
+			 flLta41ma-V2TxClearGoodCounters			INTEGER
+		}
+
+
+     flLta41ma-V2TxUnicastPackets				OBJECT-TYPE
+		 SYNTAX    Counter
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Number of good unicast packets that were transmitted on the port" 
+	 ::= { flLta41ma-V2TxGoodPacketsEntry 1 }
+
+     flLta41ma-V2TxMulticastPackets				OBJECT-TYPE
+		 SYNTAX    Counter
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Number of good multicast packets that were transmitted on the port" 
+	 ::= { flLta41ma-V2TxGoodPacketsEntry 2 }
+
+     flLta41ma-V2TxBroadcastPackets				OBJECT-TYPE
+		 SYNTAX    Counter
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Number of good broadcast packets that were transmitted on the port" 
+	 ::= { flLta41ma-V2TxGoodPacketsEntry 3 }
+
+     flLta41ma-V2TxPausePackets				OBJECT-TYPE
+		 SYNTAX    Counter
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Number of good Pause packets that were transmitted on the port" 
+	 ::= { flLta41ma-V2TxGoodPacketsEntry 4 }
+
+     flLta41ma-V2TxRefreshGoodCounters			OBJECT-TYPE
+		 SYNTAX    INTEGER	{
+								normal		(1),
+								refresh		(2)
+							}
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Refresh the port's counters for this table" 
+	 ::= { flLta41ma-V2TxGoodPacketsEntry 5 }
+
+     flLta41ma-V2TxClearGoodCounters			OBJECT-TYPE
+		 SYNTAX    INTEGER	{
+								normal		(1),
+								clear		(2)
+							}
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Clear the port's counters for this table" 
+	 ::= { flLta41ma-V2TxGoodPacketsEntry 6 }
+
+
+-- ************************************************************
+-- Rx total packets table
+-- ************************************************************
+	 flLta41ma-V2RxTotalPacketsTable               OBJECT-TYPE
+         SYNTAX  SEQUENCE OF FlLta41ma-V2RxTotalPacketsEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "This table provides the total received packet statistics for all ports.
+		  Table is read only"
+     ::= { flLta41ma-V2Statistics 40 }
+
+     flLta41ma-V2RxTotalPacketsEntry				OBJECT-TYPE
+         SYNTAX  FlLta41ma-V2RxTotalPacketsEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "The entries of the table"
+         INDEX { flMsChassisMvIndex,
+		 flMsChassisModuleMvIndex,
+		 flMsModuleMvChannelIndex,
+		 flLta41ma-V2PortNumber }
+     ::= { flLta41ma-V2RxTotalPacketsTable 1 }
+
+		FlLta41ma-V2RxTotalPacketsEntry ::= SEQUENCE
+		{
+			 flLta41ma-V2RxDroppedPackets				Counter,
+			 flLta41ma-V2Rx64BytesPackets				Counter,
+			 flLta41ma-V2Rx65-127BytesPackets			Counter,
+			 flLta41ma-V2Rx128-255BytesPackets			Counter,
+			 flLta41ma-V2Rx256-511BytesPackets			Counter,
+			 flLta41ma-V2Rx512-1023BytesPackets		Counter,
+			 flLta41ma-V2Rx1024-MaxBytesPackets		Counter,
+			 flLta41ma-V2RxRefreshTotalCounters		INTEGER,
+			 flLta41ma-V2RxClearTotalCounters			INTEGER
+		}
+
+
+     flLta41ma-V2RxDroppedPackets						OBJECT-TYPE
+		 SYNTAX    Counter
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Number of dropped received packets" 
+	 ::= { flLta41ma-V2RxTotalPacketsEntry 1 }
+
+     flLta41ma-V2Rx64BytesPackets						OBJECT-TYPE
+		 SYNTAX    Counter
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Number of packets received in size of 64 bytes" 
+	 ::= { flLta41ma-V2RxTotalPacketsEntry 2 }
+
+     flLta41ma-V2Rx65-127BytesPackets					OBJECT-TYPE
+		 SYNTAX    Counter
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Number of packets received in size range of 65-127 bytes" 
+	 ::= { flLta41ma-V2RxTotalPacketsEntry 3 }
+
+     flLta41ma-V2Rx128-255BytesPackets					OBJECT-TYPE
+		 SYNTAX    Counter
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Number of packets received in size range of 128-255 bytes" 
+	 ::= { flLta41ma-V2RxTotalPacketsEntry 4 }
+
+     flLta41ma-V2Rx256-511BytesPackets					OBJECT-TYPE
+		 SYNTAX    Counter
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Number of packets received in size range of 256-511 bytes" 
+	 ::= { flLta41ma-V2RxTotalPacketsEntry 5 }
+
+     flLta41ma-V2Rx512-1023BytesPackets				OBJECT-TYPE
+		 SYNTAX    Counter
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Number of packets received in size range of 512-1023 bytes" 
+	 ::= { flLta41ma-V2RxTotalPacketsEntry 6 }
+
+     flLta41ma-V2Rx1024-MaxBytesPackets				OBJECT-TYPE
+		 SYNTAX    Counter
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Number of packets received in size range of 1024-Max (packet size) bytes" 
+	 ::= { flLta41ma-V2RxTotalPacketsEntry 7 }
+
+     flLta41ma-V2RxRefreshTotalCounters				OBJECT-TYPE
+		 SYNTAX    INTEGER	{
+								normal		(1),
+								refresh		(2)
+							}
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Refresh the port's counters for this table" 
+	 ::= { flLta41ma-V2RxTotalPacketsEntry 8 }
+
+     flLta41ma-V2RxClearTotalCounters					OBJECT-TYPE
+		 SYNTAX    INTEGER	{
+								normal		(1),
+								clear		(2)
+							}
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Clear the port's counters for this table" 
+	 ::= { flLta41ma-V2RxTotalPacketsEntry 9 }
+
+
+-- ************************************************************
+-- Tx total packets table
+-- ************************************************************
+	 flLta41ma-V2TxTotalPacketsTable               OBJECT-TYPE
+         SYNTAX  SEQUENCE OF FlLta41ma-V2TxTotalPacketsEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "This table provides the total transmitted packet statistics for all ports.
+		  Table is read only"
+     ::= { flLta41ma-V2Statistics 50 }
+
+     flLta41ma-V2TxTotalPacketsEntry				OBJECT-TYPE
+         SYNTAX  FlLta41ma-V2TxTotalPacketsEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "The entries of the table"
+         INDEX { flMsChassisMvIndex,
+		 flMsChassisModuleMvIndex,
+		 flMsModuleMvChannelIndex,
+		 flLta41ma-V2PortNumber }
+     ::= { flLta41ma-V2TxTotalPacketsTable 1 }
+
+		FlLta41ma-V2TxTotalPacketsEntry ::= SEQUENCE
+		{
+			 flLta41ma-V2TxDroppedPackets				Counter,
+			 flLta41ma-V2TxRefreshTotalCounters		INTEGER,
+			 flLta41ma-V2TxClearTotalCounters			INTEGER
+		}
+
+     
+     flLta41ma-V2TxDroppedPackets				OBJECT-TYPE
+		 SYNTAX    Counter
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Number of dropped transmitted packets" 
+	 ::= { flLta41ma-V2TxTotalPacketsEntry 1 }
+
+     flLta41ma-V2TxRefreshTotalCounters		OBJECT-TYPE
+		 SYNTAX    INTEGER	{
+								normal		(1),
+								refresh		(2)
+							}
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Refresh the port's counters for this table" 
+	 ::= { flLta41ma-V2TxTotalPacketsEntry 2 }
+
+     flLta41ma-V2TxClearTotalCounters			OBJECT-TYPE
+		 SYNTAX    INTEGER	{
+								normal		(1),
+								clear		(2)
+							}
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Clear the port's counters for this table" 
+	 ::= { flLta41ma-V2TxTotalPacketsEntry 3 }
+
+
+
+-- ************************************************************
+-- Tx collisions table
+-- ************************************************************
+	 flLta41ma-V2TxCollisionsTable               OBJECT-TYPE
+         SYNTAX  SEQUENCE OF FlLta41ma-V2TxCollisionsEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "This table provides the collision statistics for all ports.
+		  Table is read only"
+     ::= { flLta41ma-V2Statistics 60 }
+
+     flLta41ma-V2TxCollisionsEntry				OBJECT-TYPE
+         SYNTAX  FlLta41ma-V2TxCollisionsEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "The entries of the table"
+         INDEX { flMsChassisMvIndex,
+		 flMsChassisModuleMvIndex,
+		 flMsModuleMvChannelIndex,
+		 flLta41ma-V2PortNumber }
+     ::= { flLta41ma-V2TxCollisionsTable 1 }
+
+		FlLta41ma-V2TxCollisionsEntry ::= SEQUENCE
+		{
+			 flLta41ma-V2TxTotalCols				Counter,
+			 flLta41ma-V2TxLateCols				Counter,
+			 flLta41ma-V2TxExcessiveCols			Counter,
+			 flLta41ma-V2TxSingleCols				Counter,
+			 flLta41ma-V2TxMultipleCols			Counter,
+			 flLta41ma-V2TxRefreshColCounters		INTEGER,
+			 flLta41ma-V2TxClearColCounters		INTEGER
+		}
+
+
+     flLta41ma-V2TxTotalCols				OBJECT-TYPE
+		 SYNTAX    Counter
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Total number of collisions" 
+	 ::= { flLta41ma-V2TxCollisionsEntry 1 }
+
+     flLta41ma-V2TxLateCols				OBJECT-TYPE
+		 SYNTAX    Counter
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Number of late collisions" 
+	 ::= { flLta41ma-V2TxCollisionsEntry 2 }
+
+     flLta41ma-V2TxExcessiveCols			OBJECT-TYPE
+		 SYNTAX    Counter
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Number of excessive collisions" 
+	 ::= { flLta41ma-V2TxCollisionsEntry 3 }
+
+     flLta41ma-V2TxSingleCols				OBJECT-TYPE
+		 SYNTAX    Counter
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Number of single collisions" 
+	 ::= { flLta41ma-V2TxCollisionsEntry 4 }
+
+     flLta41ma-V2TxMultipleCols			OBJECT-TYPE
+		 SYNTAX    Counter
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Number of multiple collisions" 
+	 ::= { flLta41ma-V2TxCollisionsEntry 5 }
+
+     flLta41ma-V2TxRefreshColCounters		OBJECT-TYPE
+		 SYNTAX    INTEGER	{
+								normal		(1),
+								refresh		(2)
+							}
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Refresh the port's counters for this table" 
+	 ::= { flLta41ma-V2TxCollisionsEntry 6 }
+
+     flLta41ma-V2TxClearColCounters		OBJECT-TYPE
+		 SYNTAX    INTEGER	{
+								normal		(1),
+								clear		(2)
+							}
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Clear the port's counters for this table" 
+	 ::= { flLta41ma-V2TxCollisionsEntry 7 }
+
+
+END
+

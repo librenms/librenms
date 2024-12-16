@@ -24,15 +24,15 @@ if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list = [
         [
             'filename' => $rrd_filename,
-            'descr'    => 'Scans',
-            'ds'       => 'seqscan',
-            'colour'   => '582A72',
+            'descr' => 'Scans',
+            'ds' => 'seqscan',
+            'colour' => '582A72',
         ],
         [
             'filename' => $rrd_filename,
-            'descr'    => 'Tuples Read',
-            'ds'       => 'seqtupread',
-            'colour'   => '28536C',
+            'descr' => 'Tuples Read',
+            'ds' => 'seqtupread',
+            'colour' => '28536C',
         ],
     ];
 } else {

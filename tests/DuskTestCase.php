@@ -20,7 +20,7 @@ abstract class DuskTestCase extends BaseTestCase
      */
     public static function prepare()
     {
-        if (! static::runningInSail()) {
+        if (! static::runningInSail() && ! getenv('GITHUB_ACTIONS')) {
             static::startChromeDriver();
         }
     }
@@ -47,16 +47,5 @@ abstract class DuskTestCase extends BaseTestCase
                 ChromeOptions::CAPABILITY, $options
             )
         );
-    }
-
-    /**
-     * Determine whether the Dusk command has disabled headless mode.
-     *
-     * @return bool
-     */
-    protected function hasHeadlessDisabled()
-    {
-        return isset($_SERVER['DUSK_HEADLESS_DISABLED']) ||
-               isset($_ENV['DUSK_HEADLESS_DISABLED']);
     }
 }

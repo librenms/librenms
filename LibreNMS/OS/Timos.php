@@ -28,6 +28,7 @@
 namespace LibreNMS\OS;
 
 use App\Models\Device;
+use App\Models\EntPhysical;
 use App\Models\MplsLsp;
 use App\Models\MplsLspPath;
 use App\Models\MplsSap;
@@ -581,7 +582,10 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
                 $ip = long2ip(hexdec(str_replace(' ', '', $value['sdpFarEndInetAddress'])));
             } else {
                 //Fixme implement ipv6 conversion
-                $ip = $value['sdpFarEndInetAddress'];
+                //$value['sdpFarEndInetAddress'] might still be any of these:
+                //  -> unknown(0), ipv4(1), ipv6(2), ipv4z(3), ipv6z(4), dns(16)
+
+                $ip = $value['sdpFarEndInetAddress'] ?? null;
             }
             $sdps->push(new MplsSdp([
                 'sdp_oid' => $value['sdpId'],
@@ -595,8 +599,8 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
                 'sdpOperPathMtu' => $value['sdpOperPathMtu'],
                 'sdpLastMgmtChange' => round($value['sdpLastMgmtChange'] / 100),
                 'sdpLastStatusChange' => round($value['sdpLastStatusChange'] / 100),
-                'sdpActiveLspType' => $value['sdpActiveLspType'],
-                'sdpFarEndInetAddressType' => $value['sdpFarEndInetAddressType'],
+                'sdpActiveLspType' => $value['sdpActiveLspType'] ?? null,
+                'sdpFarEndInetAddressType' => $value['sdpFarEndInetAddressType'] ?? null,
                 'sdpFarEndInetAddress' => $ip,
             ]));
         }
@@ -787,7 +791,11 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
         $arhops = new Collection();
         foreach ($mplsTunnelArHopCache as $key => $value) {
             [$mplsTunnelARHopListIndex, $mplsTunnelARHopIndex] = explode('.', $key);
-            $lsp_path_id = $paths->firstWhere('mplsLspPathTunnelARHopListIndex', $mplsTunnelARHopListIndex)->lsp_path_id;
+            $firstPath = $paths->firstWhere('mplsLspPathTunnelARHopListIndex', $mplsTunnelARHopListIndex);
+            if (! isset($firstPath)) {
+                continue;
+            }
+            $lsp_path_id = $firstPath->lsp_path_id;
             $protection = intval($value['vRtrMplsTunnelARHopProtection'] ?? 0, 16);
 
             $localLinkProtection = ($protection & $localAvailable) ? 'true' : 'false';
@@ -841,12 +849,12 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
                 'mplsTunnelCHopIndex' => $mplsTunnelCHopIndex,
                 'lsp_path_id' => $lsp_path_id,
                 'device_id' => $this->getDeviceId(),
-                'mplsTunnelCHopAddrType' => $value['vRtrMplsTunnelCHopAddrType'],
-                'mplsTunnelCHopIpv4Addr' => $value['vRtrMplsTunnelCHopIpv4Addr'],
-                'mplsTunnelCHopIpv6Addr' => $value['vRtrMplsTunnelCHopIpv6Addr'],
-                'mplsTunnelCHopAsNumber' => $value['vRtrMplsTunnelCHopAsNumber'],
-                'mplsTunnelCHopStrictOrLoose' => $value['vRtrMplsTunnelCHopStrictOrLoose'],
-                'mplsTunnelCHopRouterId' => $value['vRtrMplsTunnelCHopRtrID'],
+                'mplsTunnelCHopAddrType' => $value['vRtrMplsTunnelCHopAddrType'] ?? null,
+                'mplsTunnelCHopIpv4Addr' => $value['vRtrMplsTunnelCHopIpv4Addr'] ?? null,
+                'mplsTunnelCHopIpv6Addr' => $value['vRtrMplsTunnelCHopIpv6Addr'] ?? null,
+                'mplsTunnelCHopAsNumber' => $value['vRtrMplsTunnelCHopAsNumber'] ?? null,
+                'mplsTunnelCHopStrictOrLoose' => $value['vRtrMplsTunnelCHopStrictOrLoose'] ?? null,
+                'mplsTunnelCHopRouterId' => $value['vRtrMplsTunnelCHopRtrID'] ?? null,
             ]));
         }
 
@@ -961,5 +969,49 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
 
         return $sensors;
     }
-    // End Class Timos
+
+    public function discoverEntityPhysical(): Collection
+    {
+        $inventory = new Collection;
+
+        $chassis = \SnmpQuery::walk('TIMETRA-CHASSIS-MIB::tmnxChassisType')->pluck();
+        $chassisTypes = \SnmpQuery::walk('TIMETRA-CHASSIS-MIB::tmnxChassisTypeTable')->table(1);
+        $hardware = \SnmpQuery::enumStrings()->walk('TIMETRA-CHASSIS-MIB::tmnxHwTable');
+
+        foreach ($hardware->table(2) as $tmnxChassisIndex => $chassisContents) {
+            $type = $chassis[$tmnxChassisIndex];
+
+            if (isset($chassisTypes[$type])) {
+                $inventory->push(new EntPhysical([
+                    'entPhysicalIndex' => $tmnxChassisIndex,
+                    'entPhysicalDescr' => $chassisTypes[$type]['TIMETRA-CHASSIS-MIB::tmnxChassisTypeDescription'] ?? null,
+                    'entPhysicalClass' => 'chassis',
+                    'entPhysicalContainedIn' => 0,
+                    'entPhysicalName' => $chassisTypes[$type]['TIMETRA-CHASSIS-MIB::tmnxChassisTypeName'] ?? null,
+                ]));
+            }
+
+            foreach ($chassisContents as $tmnxHwIndex => $entry) {
+                $inventory->push(new EntPhysical([
+                    'entPhysicalIndex' => $tmnxHwIndex,
+                    'entPhysicalClass' => $entry['TIMETRA-CHASSIS-MIB::tmnxHwClass'],
+                    //                    'entPhysicalDescr' => $entry['TIMETRA-CHASSIS-MIB::tmnxHwID'],
+                    'entPhysicalName' => $entry['TIMETRA-CHASSIS-MIB::tmnxHwName'],
+                    'entPhysicalModelName' => $entry['TIMETRA-CHASSIS-MIB::tmnxHwMfgBoardNumber'],
+                    'entPhysicalSerialNum' => $entry['TIMETRA-CHASSIS-MIB::tmnxHwSerialNumber'],
+                    'entPhysicalContainedIn' => $entry['TIMETRA-CHASSIS-MIB::tmnxHwContainedIn'],
+                    'entPhysicalMfgName' => $entry['TIMETRA-CHASSIS-MIB::tmnxHwMfgBoardNumber'],
+                    'entPhysicalParentRelPos' => $entry['TIMETRA-CHASSIS-MIB::tmnxHwParentRelPos'],
+                    'entPhysicalHardwareRev' => '1.0',
+                    'entPhysicalFirmwareRev' => $entry['TIMETRA-CHASSIS-MIB::tmnxHwBootCodeVersion'],
+                    'entPhysicalSoftwareRev' => $entry['TIMETRA-CHASSIS-MIB::tmnxHwBootCodeVersion'],
+                    'entPhysicalIsFRU' => $entry['TIMETRA-CHASSIS-MIB::tmnxHwIsFRU'],
+                    'entPhysicalAlias' => $entry['TIMETRA-CHASSIS-MIB::tmnxHwAlias'],
+                    'entPhysicalAssetID' => $entry['TIMETRA-CHASSIS-MIB::tmnxHwAssetID'],
+                ]));
+            }
+        }
+
+        return $inventory;
+    }
 }

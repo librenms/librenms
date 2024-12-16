@@ -1,8 +1,8 @@
 -- ============================================================================
--- Copyright (C) 2018 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2022 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- Description: 
 -- Reference: None
--- Version:V3.30
+-- Version:V3.94
 -- ============================================================================
 
 	HUAWEI-ENTITY-TRAP-MIB DEFINITIONS ::= BEGIN
@@ -37,7 +37,7 @@
 -- January 17, 2007 at 00:00 GMT
 		-- 1.3.6.1.4.1.2011.5.25.219
 		hwEntityTrapMIB MODULE-IDENTITY 
-			LAST-UPDATED "201812130000Z"
+			LAST-UPDATED "202211031624Z"
 			ORGANIZATION 
 				"Huawei Technologies Co.,Ltd."		
 			CONTACT-INFO 
@@ -49,7 +49,199 @@
 				   Email: support@huawei.com
 				 "
 DESCRIPTION 
-				"This is the base trap definition for DataCom."
+ 				"This is the base trap definition for DataCom."
+         REVISION     "202211031624Z"
+         DESCRIPTION  "v3.94 add hwBoardFail, hwBoardWarning, 132212, 147221,
+         Modify hwBoardFail, theFullinSignalOfTheBoardIsAbnormal, theFullinSignalOfTheBoardIsAbnormal"
+
+         REVISION     "202210282030Z"
+         DESCRIPTION  "v3.93 add hwBoardFail, hwBoardInvalid, hwBoardWarning, 132207, 132208, 132209, 132215, 132216, 132279, 132285, 132286, 132287, 132296, 132297, 132313, 132314, 132319, 132320, 132321, 132324, 132685, 132686, 147217,
+         Modify hwBoardFail, hwBoardInvalid, hwCardFail, 132213, 132690, 132691, 135204"
+
+         REVISION     "202210191830Z"
+         DESCRIPTION  "v3.92 add theMasterAndSlaveCFCARDsSizeDismatch"
+
+         REVISION     "202209271528Z"
+         DESCRIPTION  "v3.91 add hwBoardFail, hwBoardFailResume, 132347, 132348, 132349."
+
+         REVISION     "202208041138Z"
+         DESCRIPTION  "v3.90 add  trap node hwEntityFileSystemAbnormalResume."
+REVISION     "202207091000Z"
+         DESCRIPTION  "v3.89 add  hwCardBandwidthModeChange OBJECTS ."
+
+         REVISION     "202207021150Z"
+         DESCRIPTION  "v3.88 add  BoardBurntDueToHighPoEPower."
+
+         REVISION     "202203251150Z"
+         DESCRIPTION  "v3.87 add  hwSystemTrap, hwSystemBakeupStartup."
+
+         REVISION     "202203091000Z"
+         DESCRIPTION  "v3.86 add  hwCrlInvalid, hwCrlInvalidResume."
+
+         REVISION     "202202261000Z"
+         DESCRIPTION  "v3.85 modify hwPortFail, hwPortFailResume."
+
+         REVISION     "202202151000Z"
+         DESCRIPTION  "v3.84 add hwPortFail, hwPortFailResume, 132330, 132331."
+         
+         REVISION     "202112301000Z"
+         DESCRIPTION  "v3.83 add hwSACSessionOverloadTrap hwSACSessionOverloadRestoreTrap hwCapCurSACSessionRate hwCapUpperSACSessionThreshold hwCapLowerSACSessionThreshold."
+
+         REVISION     "202112131000Z"
+         DESCRIPTION  "v3.82 add hwPeerDevPnPTrunkAggregationFailure."
+
+         REVISION     "202111201000Z"
+         DESCRIPTION  "v3.81 add thePowerCurrentOfTheOpticalModuleIsTooHigh."
+
+         REVISION     "202111131000Z"
+         DESCRIPTION  "v3.80 modify hwFrerLinkPacketLossTrap."
+
+         REVISION     "202111121000Z"
+         DESCRIPTION  "v3.79 modify hwFrerLinkPacketLossTrap."
+
+	 REVISION     "202109281000Z"
+         DESCRIPTION  "v3.78 add hwCapTableUsageTrap hwSipfpmFlowOverloadTrap hwSipfpmFlowOverloadRestoreTrap hwCapCurSipfpmFlowRate hwCapUpperSipfpmFlowThreshold hwCapLowerSipfpmFlowThreshold"
+
+         REVISION     "202109161000Z"
+         DESCRIPTION  "v3.77 add 136996,132315,132316,132317,132318."
+
+         REVISION     "202109042200Z"
+         DESCRIPTION  "v3.76 add OBJECTS to hwInsSpaceLackTrap and hwVfpSysCheckErrResume."
+				
+         REVISION     "202108282200Z"
+         DESCRIPTION  "v3.75 add hwFrerLinkPacketLossTrap."
+			
+         REVISION     "202107142200Z"
+         DESCRIPTION  "v3.74 add 143627."
+	
+         REVISION     "202106032200Z"
+         DESCRIPTION  "v3.73 add hwNoConsolePassword."
+
+         REVISION     "202105250000Z"
+         DESCRIPTION  "v3.72, Add trap node hwVirtualLicenseNearDeadlineResume ."
+
+		 REVISION     "202103161030Z"
+         DESCRIPTION  "v3.71 add hwPowerLimited."
+
+		 REVISION     "202102270955Z"
+         DESCRIPTION  "V3.70, add the objects of hwCapSingleCoreThresholdCurrent, hwCapSingleCoreIndex, hwCapSingleCoreThresholdValue, hwCapMemType, hwCapMemThresholdValue, hwCapMemThresholdCurrent and the traps of hwCapMemUtilizationResume, hwCapMemUtilizationRising,hwCapSingleCoreCPUUtilizationRising,hwCapSingleCoreCPUUtilizationResume ."
+
+         REVISION     "202102092131Z"
+         DESCRIPTION  "v3.69 add  hwContainerName."
+         
+		 REVISION     "202102022131Z"
+         DESCRIPTION  "v3.68 add hwCertExpired hwCertExpiredResume."
+		 
+		 REVISION     "202101301644Z"
+         DESCRIPTION  "v3.67 add hwCfgDatabaseException."
+				
+         REVISION     "202101291600Z"
+         DESCRIPTION  "v3.66 add hwNetconfDatabaseAbnormal hwNetconfDatabaseRestore."
+		 
+         REVISION     "202101231110Z"
+         DESCRIPTION  "v3.65 add 135204."
+
+		 REVISION     "202101161500Z"
+		 DESCRIPTION  "v3.64 add hwContainerCpuUtilizationRising hwContainerCpuUtilizationResume hwContainerMemUtilizationRising hwContainerMemUtilizationResume hwContainerStorageInsufficient hwContainerStorageInsufficientResume hwContainerAbnormal hwContainerAbnormalResume hwContainerAppAbnormal hwContainerAppAbnormalResume"
+		 
+		 REVISION     "202012301500Z"
+		 DESCRIPTION  "v3.63 add hwFwdCPUUtilizationRising, hwFwdCPUUtilizationResume"
+		 
+         REVISION     "202012211500Z"
+         DESCRIPTION  "v3.62 add 132425,132426,132427,132428,132429,132690,132691,132692,132693,132694."
+
+         REVISION     "202012101500Z"
+         DESCRIPTION  "v3.61 add 132290,132699,132302."
+
+         REVISION     "202012071605Z"
+         DESCRIPTION  "v3.60 Modify hwInnerPortSlotId."
+
+         REVISION     "202012051531Z"
+         DESCRIPTION  "v3.59 add hwBatteryGroupFault, hwBatteryGroupFaultResume, hwBatteryFault, hwBatteryFaultResume, hwBatteryMinorFault, hwBatteryMinorFaultResume."	
+
+         REVISION     "202011181531Z"
+         DESCRIPTION  "v3.58 add TheForwardingPipeIsFaulty."
+         
+         REVISION     "202011060819Z"
+         DESCRIPTION  "v3.57 add hwInternalProtocolNetworkPortFaultAlarm, hwInternalProtocolNetworkPortFaultResume."
+
+         REVISION     "202010301150Z"
+         DESCRIPTION  "v3.56 add 135681."
+         REVISION     "202010161646Z"
+         DESCRIPTION  "v3.55 add 132303."
+
+         REVISION     "202009092040Z"
+         DESCRIPTION  "v3.54 add 136222, 143624, 75315, 132143, 132132, 136223, 136233,136234."
+
+         REVISION     "202008170000Z"
+         DESCRIPTION  "v3.53 Modify hwSoftwareVersion, hwStartupSoftwareFileName, hwSystemRollback." 
+
+         REVISION     "202008120000Z"
+         DESCRIPTION  "v3.52 add hwBoardLicenseActSuccess, hwBoardLicenseActFail." 
+
+         REVISION     "202007281736Z"
+         DESCRIPTION  "v3.51 Modify trap node hwVfpSysCheckErr hwVfpSysCheckErrResume."
+
+         REVISION     "202007271736Z"
+         DESCRIPTION  "v3.50 Modify trap node hwChassisFail."
+
+         REVISION     "202007221734Z"
+         DESCRIPTION  "v3.49 Modify trap node hwOpticalUnAuthorized."
+
+         REVISION     "202006161732Z"
+         DESCRIPTION  "v3.48 add hwStorageInsufficient, hwStorageInsufficientResume." 
+
+         REVISION     "202006121940Z"
+         DESCRIPTION  "v3.47 add hwInnerPortPacketCrcErr,  hwInnerPortPacketCrcErrResume, hwInnerPortLinkDown, hwInnerPortLinkUp." 
+
+         REVISION     "202006121118Z"
+         DESCRIPTION  "v3.46 Modify trap node hwForwardEngineInvalid."
+
+         REVISION     "202006051123Z"
+         DESCRIPTION  "v3.45 Modify trap node hwForwardEngineInvalid." 
+
+         REVISION     "202004241500Z"
+         DESCRIPTION  "v3.44 Modify trap node hwAllLpuSfuFailResume." 
+
+         REVISION     "202004022100Z"
+         DESCRIPTION  "v3.43 add hwForwardEngineFail,  hwForwardEngineFailResume, hwForwardEngineInvalid, hwForwardEngineInvalidResume." 
+
+         REVISION     "202003250000Z"
+         DESCRIPTION  "v3.41 add hwIntegratedPowerFault,  hwIntegratedPowerFault." 
+
+         REVISION     "202001151623Z"
+         DESCRIPTION  "v3.41 add hwBoardSoftwareNotSupport, hwVirtualLicenseExpResume,  hwSystemConfigNotMatchTrap." 
+
+         REVISION     "202001080000Z"
+         DESCRIPTION  "v3.40 add hwBoardOffline." 
+
+         REVISION     "202001040000Z"
+         DESCRIPTION  "v3.39 add hwOpticalBiasCurrentAlarm, hwOpticalBiasCurrentAlarmResume." 
+
+         REVISION     "202001030000Z"
+         DESCRIPTION  "v3.38 add hwBootloaderPwdEmpty, hwBootloaderPwdEmptyResume." 
+
+         REVISION     "201912310000Z"
+         DESCRIPTION  "v3.37 add hwPortInvalid."
+		 
+         REVISION     "201911250000Z"
+         DESCRIPTION  "v3.36 add hwCardPortInvalid."
+
+         REVISION     "201909300000Z"
+         DESCRIPTION  "v3.35 add hwProcessName, hwEntityFileSystemFdAlarm, hwEntityFileSystemFdResume"
+
+         REVISION     "201909170000Z"
+         DESCRIPTION  "v3.34 Modify trap node hwBiosOrBootloaderPwdError, hwBiosOrBootloaderPwdErrorResume"
+
+         REVISION     "201909160000Z"
+         DESCRIPTION  "v3.33 Modify trap node hwSystemRollback. "
+
+         REVISION     "201905150000Z"
+         DESCRIPTION  "V3.32, add hwIOSwitchAlarm,hwIOSwitchAlarmResume. "         
+
+         REVISION      "201903220000Z"
+         DESCRIPTION  "v3.31 Add trap node hwCmuFail, hwCmuFailResume."       
+
          REVISION      "201812130000Z"
          DESCRIPTION  "v3.30 Modify trap node hwEntityFileSystemAbnormal."         
 
@@ -571,8 +763,74 @@ hwDiskPartitionUtilizationResume to hwDiskPartitionUseageResume"
 			sPIBusFault	(132184),
 			-- 132205:  The HiGig Link On The Board Failed
 			theHiGigLinkOnTheBoardFailed	(132205),
-			-- 132213:  The external TCAM chip could not be accessed
-			theexternalTCAMchipcouldnotbeaccessed	(132213),
+			-- 132207:  The board clock fails
+			theBoardClockFails	(132207),
+			-- 132208:  A DDR fault occurs on the board
+			aDDRFaultOccursOnTheBoard	(132208),
+			-- 132209:  The slot ID of the board fails to be checked
+			theSlotIdOfTheBoardFailsToBeChecked	(132209),
+			-- 132212:  Access to the flash memory of the board fails
+			accessToTheFlashMemoryOfTheBoardFails(132212),
+			-- 132213:  The micro switch of the board fails
+			theMicroSwitchOfTheBoardFails	(132213),
+			-- 132279:  Failed to check the voltage of the board
+			failedToCheckTheVoltageOfTheBoard	(132279),
+			-- 132285:  The disk will soon become invalid
+			theDiskWillSoonBecomeInvalid	(132285),
+			-- 132286:  A HTM chip fault occurred
+			aHTMChipFaultOccurred	(132286),
+			-- 132287:  The frequency synthesizer failed
+			theFrequencySynthesizerFailed	(132287),
+			-- 132290:  The slot ID signal from the CANBUS is abnormal
+			slotIdSignalFromCanbusIsAbnormal	(132290),
+			-- 132296:  Overcurrent occurred on the board
+			overcurrentOccurredOnTheBoard	(132296),
+			-- 132297:  The FPGA is abnormal
+			theFPGAIsAbnormal	(132297),
+			-- 132313:  A voltage drop occurred on the board
+			aVoltageDropOccurredOnTheBoard	(132313),
+			-- 132314:  The serial management bus of the board malfunctions
+			theSerialManagementBusOfTheBoardMalfunctions	(132314),
+			-- 132319:  Failed to access backplane IIC
+			failedToAccessBackPlaneIIC	(132319),
+			-- 132320:  Failed to check backplane ID
+			failedToCheckBackPlaneID	(132320),
+			-- 132321:  The IIC of MCU module is abnormal
+			theIICOfMcuModuleIsAbnormal	(132321),
+			-- 132324:  The board clock(156M) failed
+			theBoard156MClockFailed	(132324),
+			-- 132315:  The negotiated rate level of the SATA disk does not meet the requirement
+			theSataRateLevelIsAbnormal	(132315),
+			-- 132316:  The remaining life of SATA is not enough
+			theSataRemainLifeNotEnough	(132316),
+			-- 132317:  The SATA is abnormal
+			theSataIsAbnormal	(132317),
+			-- 132318:  The SATA permission becomes read-only
+			theSataIsReadOnly	(132318),
+			-- 132330:  Port received package with preamble code error
+			portReceivePreambleCodeErrorPackage	(132330),
+			-- 132331:  Port cannot go up due to lack of serdes mode
+			portCannotGoUpDueToLackOfSerdesMode	(132331),
+			-- 132347:  Failed to check the voltage of the card
+			failedToCheckTheVoltageOfTheCard	(132347),
+			-- 132348:  E1 framer of the board was faulty
+			e1FramerOfTheBoardWasFaulty	(132348),
+			-- 132349:  LTE module of the board was faulty
+			lteModuleOfTheBoardWasFaulty	(132349),
+			-- 132350:  The FULLIN signal of the board is abnormal
+			theFullinSignalOfTheBoardIsAbnormal	(132350),
+			-- 132351:  A SerialCpldLocalbus fault occurs on the board
+			aSerialCpldLocalbusFaultOccursOnTheBoard	(132351),
+			-- 132425:  The FPGA1 logic of the board is abnormal
+			theFPGA1logicoftheboardisabnormal	(132425),
+                        -- 132426:  The FPGA2 logic of the board is abnormal
+			theFPGA2logicoftheboardisabnormal	(132426),
+                        -- 132427:  The FPGA3 logic of the board is abnormal
+			theFPGA3logicoftheboardisabnormal	(132427),
+                        -- 132428:  The FPGA4 logic of the board is abnormal
+			theFPGA4logicoftheboardisabnormal	(132428),
+                        -- 132429:  The FPGA5 logic of the board is abnormal
+			theFPGA5logicoftheboardisabnormal	(132429),
 			-- 132608:  The Board Selfcheck Failed
 			theBoardSelfcheckFailed	(132608),
 			-- 132609:  Heartbeats Of The Board Were Lost And Thus The Board Was Reset
@@ -587,6 +845,8 @@ hwDiskPartitionUtilizationResume to hwDiskPartitionUseageResume"
 			theFPGALogicOfTheBoardWasFaulty	(132613),
 			-- 132614:  The EPLD Logic Of The Board Was Faulty
 			theEPLDLogicOfTheBoardWasFaulty	(132614),
+			-- 132711:  Board burnt due to high PoE power
+			BoardBurntDueToHighPoEPower	(132711),
 			-- 132615:  Signals Provided By The Clock Board Failed
 			signalsProvidedByTheClockBoardFailed	(132615),
 			-- 132616:  Clock Signals Failed On The Board
@@ -689,10 +949,26 @@ hwDiskPartitionUtilizationResume to hwDiskPartitionUseageResume"
 			trafficCongestionDueToTheTrafficBackpressure	(132665),
 			-- 132666:  Board Type Mismatches The Preconfiguration
 			boardTypeMismatchesThePreconfiguration	(132666),
-                                                          -- 132675: The LSW port connected to the MPU fails
-                                                               thsLswPortConnectedToTheMpuFails                  (132675),
+                        -- 132675: The LSW port connected to the MPU fails
+                        thsLswPortConnectedToTheMpuFails                  (132675),
 			-- 132677:  The FPGA localbus self-test failed
 			theFPGALocalbusSelf-testFailed	(132677),
+			-- 132685:  The board is not installed properly
+			theBoardIsNotInstalledProperly	(132685),
+			-- 132686:  The smi serial of the board is abnormal
+			theSmiSerialOfTheBoardIsAbnormal	(132686),
+			-- 132690:  USB overcurrent occurred
+			usbOvercurrentOccurred	(132690),
+			-- 132691:  The power supply self-check failed
+			thePowerSupplySelfCheckFailed	(132691),
+                        -- 132692:  The FPGA3 logic of the board failed
+			theFPGA3logicoftheboardfailed	(132692),
+                        -- 132693:  The FPGA4 logic of the board failed
+			theFPGA4logicoftheboardfailed	(132693),
+                        -- 132694:  The FPGA5 logic of the board failed
+			theFPGA5logicoftheboardfailed	(132694),
+			-- 132699:  Different SFUs were installed in the same chassis
+			differentSFUswereinstalledinthesamechassis	(132699),
 			-- 133120:  The Master/slave Board Switchover Was Performed
 			theMasterSlaveBoardSwitchoverWasPerformed	(133120),
 			-- 133121:  PMU Board Leave Master
@@ -755,6 +1031,8 @@ hwDiskPartitionUtilizationResume to hwDiskPartitionUseageResume"
 			interfaceMACCRCErrorOnASubcard	(135195),
 			-- 135196:  E-label CRC Error On A Subcard
 			e-labelCRCErrorOnASubcard	(135196),
+			-- 135204:  Failed to check the voltage
+			theVoltageFailedToBeChecked    (135204),
 			-- 135424:  The EPLD Logic Of The Subcard Was Faulty
 			theEPLDLogicOfTheSubcardWasFaulty	(135424),
 			-- 135425:  The FPGA Logic Of The Subcard Was Faulty
@@ -807,6 +1085,8 @@ hwDiskPartitionUtilizationResume to hwDiskPartitionUseageResume"
 			theSlaveKeychipOfTheSubcardWasFaulty	(135448),
 			-- 135680:  The Optical Module Was Removed
 			theOpticalModuleWasRemoved	(135680),
+			-- 135681:  The Optical Module Was Inserted
+			theOpticalModuleWasInserted	(135681),
 			-- 135936:  The Optical Module Did Not Match The Subcard
 			theOpticalModuleDidNotMatchTheSubcard	(135936),
 			-- 135937:  Optical Module Transmission Power Is Too High
@@ -861,6 +1141,8 @@ hwDiskPartitionUtilizationResume to hwDiskPartitionUseageResume"
 			opticalModulePowerSupplyError	(136206),
 			-- 136207:  CFP Checksum Error
 			cFPChecksumError	(136207),
+            -- 136242:  The power current of the optical module is too high
+			thePowerCurrentOfTheOpticalModuleIsTooHigh	(136242),
 			-- 136448:  The Power Supply Module Was Removed
 			thePowerSupplyModuleWasRemoved	(136448),
 			-- 136704:  Communication Between Power Supply Module And Device Failed
@@ -963,6 +1245,8 @@ hwDiskPartitionUtilizationResume to hwDiskPartitionUseageResume"
 			noOutputPowerOfRPSPowerSupply	(136984),
 			-- 136985:  Power Supply Module Is Installed In The Wrong Slot
 			powerSupplyModuleIsInstalledInTheWrongSlot	(136985),
+			-- 136996:  The wind direction of the power supply does not match the wind direction of the device
+			powerSupplyWindDirecMisMatch	(136996),
 			-- 137216:  The Fan Module Was Not Installed In The Slot
 			theFanModuleWasNotInstalledInTheSlot	(137216),
 			-- 137472:  The Fan Module Was In The Abnormal State
@@ -1091,6 +1375,8 @@ hwDiskPartitionUtilizationResume to hwDiskPartitionUseageResume"
 			thePowerModuleTemperatureFellBelowTheLowerLimit	(143622),
 			-- 143623:  The Power Module Temperature Was Too High
 			thePowerModuleTemperatureWasTooHigh	(143623),
+			-- 143627:  The Board Temperature is higher than the upper threshold
+			theBoardTemperatureIsHigherThanTheUpperThreshold	(143627),
 			-- 143872:  The Board Temperature Exceeded The Fatal Limit
 			theBoardTemperatureExceededTheFatalLimit	(143872),
 			-- 143873:  The Card Temperature Exceeded The Fatal Limit
@@ -1115,6 +1401,8 @@ hwDiskPartitionUtilizationResume to hwDiskPartitionUseageResume"
 			theMasterAndSlaveMPUsMemoryDismatch	(144133),
 			-- 144134:  Device Type Dismatch The License File
 			deviceTypeDismatchTheLicenseFile	(144134),
+                        -- 144135:  The Master And Slave CFCARDs' Size Dismatch
+                        theMasterAndSlaveCFCARDsSizeDismatch	(144135),
 			-- 144384:  The Physical Interface Was Down
 			thePhysicalInterfaceWasDown	(144384),
 			-- 144896:  CPU Utilization Exceeded The Prealarm Threshold
@@ -1134,7 +1422,41 @@ hwDiskPartitionUtilizationResume to hwDiskPartitionUseageResume"
 			-- 146688:  There Is A FAN That Is Abnormal In The Fan Module
 			thereIsAFANThatIsAbnormalInTheFanModule	(146688),
 			-- 147208:  The CPU failed to send packets
-			theCPUfailedtosendpackets	(147208)
+			theCPUfailedtosendpackets	(147208),
+			-- 147217:  Frequent erase and write operations are performed on the disk
+			frequentEraseAndWriteOperationsArePerformedOnTheDisk	(147217),
+			-- 147221:  The data disk will soon become invalid
+			theDataDiskWillSoonBecomeInvalid(147221),
+			-- 155904:  The forwarding register was unstable
+			theForwardingRegisterWasUnstable	(155904),
+			-- 155648:  The coprocessor failed
+			theCoprocessorFailed	          (155648),
+                                                          -- 155649:  The PCIE interface of the forwarding chip failed
+			pcieInterFault	          (155649),
+			-- 155650:  The Die connectivity of the forwarding chip was abnormal
+			dieCrackConnectionAbnormal	          (155650),
+			-- 136222:  The TX FAULT of the optical module failed
+			theTXFAULTOfTheOpticalModuleFailed              (136222),
+			-- 143624:  Hard disk power supply voltage is abnormal
+			hardDiskPowerSupplyVoltageIsAbnormal	          (143624),
+			-- 75315:  Chip cascade port is abnormal
+			chipCascadePortIsAbnormal	          (75315),
+			-- 132143:  Voltage fault in the tested CPLD
+			voltageFaultInTheTestedCPLD	          (132143),
+			-- 132132:  clock 100 MHz fault
+			clock100MHzFault	          (132132),
+	                -- 136223:  The RX LOS of the optical module failed
+  	               theRXLOSOfTheOpticalModuleFailed              (136223),
+			-- 136233:  The speed of the optical module is mismatch with port
+			theSpeedOfTheOpticalModuleIsMismatchWithPort	          (136233),
+			-- 136234:  The optical was not certificated by HUAWEI
+			theOpticalWasNotCertificatedByHUAWEI	          (136234),
+			-- 132302:  The currently used hard disk is not certified by Huawei
+			hardDiskIsNotCertifiedbyHuawei	          (132302),
+			-- 132303:  The disk was pulled out
+			diskPulledOut	          (132303),
+                        -- 155905:  The forwarding pipe is faulty
+                        TheForwardingPipeIsFaulty	       (155905)
 	            }
 
 	
@@ -1332,7 +1654,7 @@ hwDiskPartitionUtilizationResume to hwDiskPartitionUseageResume"
 			MAX-ACCESS accessible-for-notify
 			STATUS current
 			DESCRIPTION
-				"Description."
+				"The version of software."
 			::= { hwEntityTrapObject 8 }
 
 
@@ -1343,7 +1665,7 @@ hwDiskPartitionUtilizationResume to hwDiskPartitionUseageResume"
 			MAX-ACCESS accessible-for-notify
 			STATUS current
 			DESCRIPTION
-				"Description."
+				"The name of software."
 			::= { hwEntityTrapObject 9 }
 
 
@@ -1523,7 +1845,7 @@ hwDiskPartitionUtilizationResume to hwDiskPartitionUseageResume"
 -- 1.3.6.1.4.1.2011.5.25.219.1.24
         -- 1.3.6.1.4.1.2011.5.25.219.1.24
 		hwEntityBandwidthMode OBJECT-TYPE
-                                                                  SYNTAX INTEGER {eth28x10gf(1),eth26x10gf18xgf(2),eth20x10gf24xgf(3)}
+                                                                  SYNTAX INTEGER {eth28x10gf(1),eth26x10gf18xgf(2),eth20x10gf24xgf(3),eth2x50ge2x25ge2x10gf14xgf(16),eth2x50ge6x10gf14xgf(17),eth2x25ge12x10gf14xgf(18),eth16x10gf14xgf(19)}
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
@@ -2169,7 +2491,230 @@ Access Restriction: The entries in this table cannot be accessed."
 			DESCRIPTION
 				"The item name of virtual license."
 			::= { hwEntityTrapObject 44 }
-		
+
+-- 1.3.6.1.4.1.2011.5.25.219.1.45
+		-- 1.3.6.1.4.1.2011.5.25.219.1.45
+		hwPorcessName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The name of the process."
+			::= { hwEntityTrapObject 45 }
+
+-- 1.3.6.1.4.1.2011.5.25.219.1.46
+		-- 1.3.6.1.4.1.2011.5.25.219.1.46
+		hwInnerPortSlotId OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The id of the slot."
+			::= { hwEntityTrapObject 46 }
+			
+-- 1.3.6.1.4.1.2011.5.25.219.1.47
+		-- 1.3.6.1.4.1.2011.5.25.219.1.47
+		hwInnerPortCpuId OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The id of the cpu."
+			::= { hwEntityTrapObject 47 }
+			
+-- 1.3.6.1.4.1.2011.5.25.219.1.48
+		-- 1.3.6.1.4.1.2011.5.25.219.1.48
+		hwInnerPortPortId OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The id of the port."
+			::= { hwEntityTrapObject 48 }
+			
+-- 1.3.6.1.4.1.2011.5.25.219.1.49
+        -- 1.3.6.1.4.1.2011.5.25.219.1.49
+		hwContainerName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The name of Container."
+			::= { hwEntityTrapObject 49 }
+			
+-- 1.3.6.1.4.1.2011.5.25.219.1.50
+        -- 1.3.6.1.4.1.2011.5.25.219.1.50
+		hwContainerAppName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The name of app run in Container."
+			::= { hwEntityTrapObject 50 }
+
+-- 1.3.6.1.4.1.2011.5.25.219.1.51
+        -- 1.3.6.1.4.1.2011.5.25.219.1.51
+		hwCapMemType OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The memory type of Cap memory Utilization."
+			::= { hwEntityTrapObject 51 }
+			
+-- 1.3.6.1.4.1.2011.5.25.219.1.52
+        -- 1.3.6.1.4.1.2011.5.25.219.1.52
+		hwCapMemThresholdValue OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The threshold value of Cap memory Utilization."
+			::= { hwEntityTrapObject 52 }
+			
+-- 1.3.6.1.4.1.2011.5.25.219.1.53
+        -- 1.3.6.1.4.1.2011.5.25.219.1.53
+		hwCapMemThresholdCurrent OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The average value of Cap memory Utilization."
+			::= { hwEntityTrapObject 53 }
+
+-- 1.3.6.1.4.1.2011.5.25.219.1.54
+        -- 1.3.6.1.4.1.2011.5.25.219.1.54
+		hwCapSingleCoreThresholdCurrent OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The current value of Cap single core CPU Utilization."
+			::= { hwEntityTrapObject 54 }
+
+-- 1.3.6.1.4.1.2011.5.25.219.1.55
+        -- 1.3.6.1.4.1.2011.5.25.219.1.55
+		hwCapSingleCoreIndex OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The core index of Cap single core CPU Utilization."
+			::= { hwEntityTrapObject 55 }
+
+-- 1.3.6.1.4.1.2011.5.25.219.1.56
+        -- 1.3.6.1.4.1.2011.5.25.219.1.56
+		hwCapSingleCoreThresholdValue OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The threshold value of Cap single core CPU Utilization."
+			::= { hwEntityTrapObject 56 }
+
+-- 1.3.6.1.4.1.2011.5.25.219.1.57
+        -- 1.3.6.1.4.1.2011.5.25.219.1.57
+		hwEntityFrerLinkApID OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The ApID of FRER Link."
+			::= { hwEntityTrapObject 57 }
+
+-- 1.3.6.1.4.1.2011.5.25.219.1.58
+        -- 1.3.6.1.4.1.2011.5.25.219.1.58
+		hwEntityFrerLinkWlanID OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The WlanID of FRER Link."
+			::= { hwEntityTrapObject 58 }
+
+-- 1.3.6.1.4.1.2011.5.25.219.1.59
+        -- 1.3.6.1.4.1.2011.5.25.219.1.59
+		hwEntityFrerLinkRadioID OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The RadioID of FRER Link."
+			::= { hwEntityTrapObject 59 }
+-- 1.3.6.1.4.1.2011.5.25.219.1.60
+        -- 1.3.6.1.4.1.2011.5.25.219.1.60
+		hwCapCurSipfpmFlowRate OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"Current Sipfpm flow rate."
+			::= { hwEntityTrapObject 60 }
+-- 1.3.6.1.4.1.2011.5.25.219.1.61
+        -- 1.3.6.1.4.1.2011.5.25.219.1.61
+		hwCapUpperSipfpmFlowThreshold OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"Upper alarm threshold of the Sipfpm flow rate."
+			::= { hwEntityTrapObject 61 }
+-- 1.3.6.1.4.1.2011.5.25.219.1.62
+        -- 1.3.6.1.4.1.2011.5.25.219.1.62
+		hwCapLowerSipfpmFlowThreshold OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"Lower alarm threshold of the Sipfpm flow rate."
+			::= { hwEntityTrapObject 62 }
+
+-- 1.3.6.1.4.1.2011.5.25.219.1.63
+        -- 1.3.6.1.4.1.2011.5.25.219.1.63
+		hwEntityCpeRemoteStationMAC OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"Mac address of cpe remote station."
+			::= { hwEntityTrapObject 63 }
+			
+
+--  1.3.6.1.4.1.2011.5.25.219.1.5.1.64          
+		-- 1.3.6.1.4.1.2011.5.25.219.1.64
+		hwDeviceMasterESN OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"ESN of the master device."
+			::= { hwEntityTrapObject 64 }
+
+        -- 1.3.6.1.4.1.2011.5.25.219.1.65
+		hwCapCurSACSessionRate OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"Current SAC session rate."
+			::= { hwEntityTrapObject 65 }
+        -- 1.3.6.1.4.1.2011.5.25.219.1.66
+		hwCapUpperSACSessionThreshold OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"Upper alarm threshold of the SAC session rate."
+			::= { hwEntityTrapObject 66 }
+        -- 1.3.6.1.4.1.2011.5.25.219.1.67
+		hwCapLowerSACSessionThreshold OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"Lower alarm threshold of the SAC session rate."
+			::= { hwEntityTrapObject 67 }
+
 -- 1.3.6.1.4.1.2011.5.25.219.2
 		-- 1.3.6.1.4.1.2011.5.25.219.2			
 		hwEntityTraps OBJECT IDENTIFIER ::= { hwEntityTrapMIB 2 }	
@@ -2203,7 +2748,7 @@ Access Restriction: The entries in this table cannot be accessed."
 --  1.3.6.1.4.1.2011.5.25.219.2.1.3
 		-- 1.3.6.1.4.1.2011.5.25.219.2.1.3
 		hwChassisFail NOTIFICATION-TYPE
-			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID, hwEntityOperStatus}
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID, hwEntityOperStatus, hwEntityTrapReasonDescr }
 			STATUS current
 			DESCRIPTION 
 				"This object indicates that a chassis encounters a partial failure."
@@ -2213,7 +2758,7 @@ Access Restriction: The entries in this table cannot be accessed."
 --  1.3.6.1.4.1.2011.5.25.219.2.1.4
 		-- 1.3.6.1.4.1.2011.5.25.219.2.1.4
 		hwChassisFailResume NOTIFICATION-TYPE
-			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID, hwEntityOperStatus}
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID, hwEntityOperStatus, hwEntityTrapReasonDescr }
 			STATUS current
 			DESCRIPTION 
 				"This object indicates that a chassis recovers from a partial failure."
@@ -2577,7 +3122,7 @@ Access Restriction: The entries in this table cannot be accessed."
 		hwAllLpuSfuFailResume NOTIFICATION-TYPE
 			STATUS current
 			DESCRIPTION 
-				"Not all installed LPUs and SFUs were not registered."
+				"An LPU or SFU is registered ,or all LPUs and SFUs are powered off."
 			::= { hwBoardTrap 39 }
 		
 --   1.3.6.1.4.1.2011.5.25.219.2.2.40
@@ -2615,7 +3160,163 @@ Access Restriction: The entries in this table cannot be accessed."
 			DESCRIPTION 
 				"This object indicates that a board recovers from an overall failure."
 			::= { hwBoardTrap 43 }
-		
+--  1.3.6.1.4.1.2011.5.25.219.2.2.44
+		-- 1.3.6.1.4.1.2011.5.25.219.2.2.44
+		hwBiosOrBootloaderPwdError NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapEntType }
+			STATUS current
+			DESCRIPTION 
+				"The bios/bootloader menu password experienced a fault."
+			::= { hwBoardTrap 44 }
+
+--  1.3.6.1.4.1.2011.5.25.219.2.2.45
+		-- 1.3.6.1.4.1.2011.5.25.219.2.2.45
+		hwBiosOrBootloaderPwdErrorResume NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapEntType }
+			STATUS current
+			DESCRIPTION 
+				"The bios/bootloader menu password resumes from the fault."
+			::= { hwBoardTrap 45 }
+--  1.3.6.1.4.1.2011.5.25.219.2.2.46
+		-- 1.3.6.1.4.1.2011.5.25.219.2.2.46
+		hwBootloaderPwdEmpty NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapEntType }
+			STATUS current
+			DESCRIPTION 
+				"The password of bootloader is empty."
+			::= { hwBoardTrap 46 }
+
+--  1.3.6.1.4.1.2011.5.25.219.2.2.47
+		-- 1.3.6.1.4.1.2011.5.25.219.2.2.47
+		hwBootloaderPwdEmptyResume NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapEntType }
+			STATUS current
+			DESCRIPTION 
+				"The password of bootloader is set."
+			::= { hwBoardTrap 47 }
+
+--  1.3.6.1.4.1.2011.5.25.219.2.2.48
+		-- 1.3.6.1.4.1.2011.5.25.219.2.2.48
+		hwBoardOffline NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName }
+			STATUS current
+			DESCRIPTION 
+				"The board is offline."
+			::= { hwBoardTrap 48 }
+
+--  1.3.6.1.4.1.2011.5.25.219.2.2.49
+		-- 1.3.6.1.4.1.2011.5.25.219.2.2.49
+		hwBoardSoftwareNotSupport NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName }
+			STATUS current
+			DESCRIPTION 
+				"The current or next startup system software is not support the board."
+			::= { hwBoardTrap 49 }
+
+--  1.3.6.1.4.1.2011.5.25.219.2.2.50
+		-- 1.3.6.1.4.1.2011.5.25.219.2.2.50
+		hwForwardEngineInvalid NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapEntType, hwEntityTrapFaultID }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that a forwarding engine encounters an overall failure."
+			::= { hwBoardTrap 50 }
+
+--  1.3.6.1.4.1.2011.5.25.219.2.2.51
+		-- 1.3.6.1.4.1.2011.5.25.219.2.2.51
+		hwForwardEngineInvalidResume NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapEntType, hwEntityTrapFaultID }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that a forwarding engine recovers from an overall failure."
+			::= { hwBoardTrap 51 }       
+			
+--  1.3.6.1.4.1.2011.5.25.219.2.2.52
+		-- 1.3.6.1.4.1.2011.5.25.219.2.2.52
+		hwForwardEngineFail NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapEntType, hwEntityTrapFaultID }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that a forwarding engine encounters a partial failure."
+			::= { hwBoardTrap 52 }
+
+--  1.3.6.1.4.1.2011.5.25.219.2.2.53
+		-- 1.3.6.1.4.1.2011.5.25.219.2.2.53
+		hwForwardEngineFailResume NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapEntType, hwEntityTrapFaultID }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that a forwarding engine recovers from a partial failure."
+			::= { hwBoardTrap 53 }
+
+--  1.3.6.1.4.1.2011.5.25.219.2.2.54
+		-- 1.3.6.1.4.1.2011.5.25.219.2.2.54
+		hwStorageInsufficient NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwStorageDevName, hwEntityThresholdWarning, hwEntityThresholdCurrent }
+			STATUS current
+			DESCRIPTION 
+				"Storage utilization exceeded the alarm threshold."
+			::= { hwBoardTrap 54 }
+			
+--  1.3.6.1.4.1.2011.5.25.219.2.2.55
+		-- 1.3.6.1.4.1.2011.5.25.219.2.2.55
+		hwStorageInsufficientResume NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwStorageDevName, hwEntityThresholdWarning, hwEntityThresholdCurrent }
+			STATUS current
+			DESCRIPTION 
+				"Storage utilization resumed from exceeding the alarm threshold."
+			::= { hwBoardTrap 55 }
+
+--  1.3.6.1.4.1.2011.5.25.219.2.2.56
+		-- 1.3.6.1.4.1.2011.5.25.219.2.2.56
+		hwBoardLicenseActFail NOTIFICATION-TYPE
+			OBJECTS { hwGtlItemIndex, hwGtlItemName, entPhysicalIndex, entPhysicalName }
+			STATUS current
+			DESCRIPTION 
+				"The license for board fails to be activated."
+			::= { hwBoardTrap 56 }
+
+--  1.3.6.1.4.1.2011.5.25.219.2.2.57
+		-- 1.3.6.1.4.1.2011.5.25.219.2.2.57
+		hwBoardLicenseActSuccess NOTIFICATION-TYPE
+			OBJECTS { hwGtlItemIndex, hwGtlItemName, entPhysicalIndex, entPhysicalName }
+			STATUS current
+			DESCRIPTION 
+				"The license for board is successfully activated."
+			::= { hwBoardTrap 57 }
+			
+--  1.3.6.1.4.1.2011.5.25.219.2.2.58
+        -- 1.3.6.1.4.1.2011.5.25.219.2.2.58
+        hwCertExpired NOTIFICATION-TYPE
+            STATUS current
+            DESCRIPTION
+               "The certificate will expire."
+            ::= { hwBoardTrap 58 }
+
+--  1.3.6.1.4.1.2011.5.25.219.2.2.59
+        -- 1.3.6.1.4.1.2011.5.25.219.2.2.59
+        hwCertExpiredResume NOTIFICATION-TYPE
+			STATUS current
+            DESCRIPTION
+                "The certificate is updated."
+            ::= { hwBoardTrap 59 }
+
+--  1.3.6.1.4.1.2011.5.25.219.2.2.60
+        -- 1.3.6.1.4.1.2011.5.25.219.2.2.60
+        hwCrlInvalid NOTIFICATION-TYPE
+            STATUS current
+            DESCRIPTION
+               "The Crl is invalid."
+            ::= { hwBoardTrap 60 }
+
+--  1.3.6.1.4.1.2011.5.25.219.2.2.61
+        -- 1.3.6.1.4.1.2011.5.25.219.2.2.61
+        hwCrlInvalidResume NOTIFICATION-TYPE
+			STATUS current
+            DESCRIPTION
+                "The Crl is updated."
+            ::= { hwBoardTrap 61 }
+
 --  1.3.6.1.4.1.2011.5.25.219.2.3
 		-- 1.3.6.1.4.1.2011.5.25.219.2.3
 		hwCardTrap OBJECT IDENTIFIER ::= { hwEntityTraps 3 }
@@ -2748,6 +3449,15 @@ Access Restriction: The entries in this table cannot be accessed."
 				"Succeed to activate the RTU license."
 			::= {  hwCardTrap 14 }	
 
+--  1.3.6.1.4.1.2011.5.25.219.2.3.15
+		-- 1.3.6.1.4.1.2011.5.25.219.2.3.15
+		hwCardPortInvalid NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapEntType, hwEntityTrapFaultID, hwEntityTrapReasonDescr, hwEntityOperStatus}
+			STATUS current
+			DESCRIPTION 
+				"Card port is invalid."
+			::= { hwCardTrap 15 }
+
 --  1.3.6.1.4.1.2011.5.25.219.2.4
 		-- 1.3.6.1.4.1.2011.5.25.219.2.4
 		hwOpticalTrap OBJECT IDENTIFIER ::= { hwEntityTraps 4 }
@@ -2841,7 +3551,7 @@ Access Restriction: The entries in this table cannot be accessed."
 			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID, hwEntityTrapReasonDescr }
 			STATUS current
 			DESCRIPTION 
-				"The optical module authentication alarm occured."
+				"The optical module authentication alarm occurred."
 			::= { hwOpticalTrap 9 }
 
 
@@ -2929,7 +3639,27 @@ Access Restriction: The entries in this table cannot be accessed."
 				"The partial function of optical module resumed from partial failure."
 			::= { hwOpticalTrap 18 }
 
-
+--   1.3.6.1.4.1.2011.5.25.219.2.4.5
+-- 1.3.6.1.4.1.2011.5.25.219.2.4.5
+		-- 1.3.6.1.4.1.2011.5.25.219.2.4.19
+		hwOpticalBiasCurrentAlarm NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID, hwEntityTrapReasonDescr }
+			STATUS current
+			DESCRIPTION 
+				"Bias current rise over or fall below the warning alarm threshold.
+				Only indicate the temperature of board,card or optical module."
+			::= { hwOpticalTrap 19 }
+		
+--   1.3.6.1.4.1.2011.5.25.219.2.4.6
+-- 1.3.6.1.4.1.2011.5.25.219.2.4.6
+		-- 1.3.6.1.4.1.2011.5.25.219.2.4.20
+		hwOpticalBiasCurrentAlarmResume NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID, hwEntityTrapReasonDescr }
+			STATUS current
+			DESCRIPTION 
+				"Bias current  rise over or fall below the warning alarm threshold.
+				Only indicate the temperature of board,card or optical module."
+			::= { hwOpticalTrap 20 }
 												   
 --  1.3.6.1.4.1.2011.5.25.219.2.5
 		-- 1.3.6.1.4.1.2011.5.25.219.2.5
@@ -3033,6 +3763,33 @@ Access Restriction: The entries in this table cannot be accessed."
 			DESCRIPTION 
 				"AP power supply insufficient resume."
 			::= { hwPowerTrap 10 }
+
+--  1.3.6.1.4.1.2011.5.25.219.2.5.11
+		-- 1.3.6.1.4.1.2011.5.25.219.2.5.11
+		hwIntegratedPowerFault NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID, hwEntityTrapReasonDescr }
+			STATUS current
+			DESCRIPTION 
+				"Integrated power failure."
+			::= { hwPowerTrap 11 }
+
+--  1.3.6.1.4.1.2011.5.25.219.2.5.12
+		-- 1.3.6.1.4.1.2011.5.25.219.2.5.12
+		hwIntegratedPowerFaultResume NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID, hwEntityTrapReasonDescr }
+			STATUS current
+			DESCRIPTION 
+				"Integrated power failure resume."
+			::= { hwPowerTrap 12 }
+
+--  1.3.6.1.4.1.2011.5.25.219.2.5.13
+		-- 1.3.6.1.4.1.2011.5.25.219.2.5.13
+		hwPowerLimited NOTIFICATION-TYPE
+			OBJECTS { hwPowerWorkMode, hwExpectPowerWorkMode }
+			STATUS current
+			DESCRIPTION 
+				"The AP works in Limited mode due to insufficient power supply."
+			::= { hwPowerTrap 13 }
 		
 --  1.3.6.1.4.1.2011.5.25.219.2.6
 		-- 1.3.6.1.4.1.2011.5.25.219.2.6
@@ -3267,6 +4024,26 @@ Access Restriction: The entries in this table cannot be accessed."
 				"This object indicates that a CMU becomes available."
 			::= { hwCmuTrap 6 }
 
+
+--  1.3.6.1.4.1.2011.5.25.219.2.8.7
+		-- 1.3.6.1.4.1.2011.5.25.219.2.8.7
+		hwCmuFail NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID }
+			STATUS current
+			DESCRIPTION 
+				"The CMU experienced a partial failure."
+			::= { hwCmuTrap 7 }
+
+		
+--  1.3.6.1.4.1.2011.5.25.219.2.8.8
+		-- 1.3.6.1.4.1.2011.5.25.219.2.8.8
+		hwCmuFailResume NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID }
+			STATUS current
+			DESCRIPTION 
+				"The CMU recovered from a partial failure."
+			::= { hwCmuTrap 8 }
+
 		
 --  1.3.6.1.4.1.2011.5.25.219.2.9
 		-- 1.3.6.1.4.1.2011.5.25.219.2.9
@@ -3294,6 +4071,45 @@ Access Restriction: The entries in this table cannot be accessed."
 				"This object indicates that a channel recovers from a fault."
 			::= { hwCommunicateTrap 2 }
 
+--  1.3.6.1.4.1.2011.5.25.219.2.9.3
+		-- 1.3.6.1.4.1.2011.5.25.219.2.9.3
+		hwInnerPortPacketCrcErr NOTIFICATION-TYPE
+			OBJECTS { hwInnerPortSlotId, hwInnerPortCpuId, hwInnerPortPortId 
+				 }
+			STATUS current
+			DESCRIPTION 
+				"The internal communication interface encountered a CRC error."
+			::= { hwCommunicateTrap 3 }
+		
+--  1.3.6.1.4.1.2011.5.25.219.2.9.4
+		-- 1.3.6.1.4.1.2011.5.25.219.2.9.4
+		hwInnerPortPacketCrcErrResume NOTIFICATION-TYPE
+			OBJECTS { hwInnerPortSlotId, hwInnerPortCpuId, hwInnerPortPortId 
+				 }
+			STATUS current
+			DESCRIPTION 
+				"The internal communication interface recovered from a CRC error."
+			::= { hwCommunicateTrap 4 }
+			
+--  1.3.6.1.4.1.2011.5.25.219.2.9.5
+		-- 1.3.6.1.4.1.2011.5.25.219.2.9.5
+		hwInnerPortLinkDown NOTIFICATION-TYPE
+			OBJECTS { hwInnerPortSlotId, hwInnerPortCpuId, hwInnerPortPortId 
+				 }
+			STATUS current
+			DESCRIPTION 
+				"The link of the internal communication interface went down."
+			::= { hwCommunicateTrap 5 }
+
+--  1.3.6.1.4.1.2011.5.25.219.2.9.6
+		-- 1.3.6.1.4.1.2011.5.25.219.2.9.6
+		hwInnerPortLinkUp NOTIFICATION-TYPE
+			OBJECTS { hwInnerPortSlotId, hwInnerPortCpuId, hwInnerPortPortId 
+				 }
+			STATUS current
+			DESCRIPTION 
+				"The link status of the internal communication interface went up."
+			::= { hwCommunicateTrap 6 }
 		
 --  1.3.6.1.4.1.2011.5.25.219.2.10
 		-- 1.3.6.1.4.1.2011.5.25.219.2.10
@@ -3557,6 +4373,24 @@ Access Restriction: The entries in this table cannot be accessed."
 				"Power supply failed."
 			::= { hwEnvironmentTrap 25 }
 
+--  1.3.6.1.4.1.2011.5.25.219.2.10.26
+		-- 1.3.6.1.4.1.2011.5.25.219.2.10.26
+		hwIOSwitchAlarm NOTIFICATION-TYPE
+		    OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwUserDefAlarmName }
+			STATUS current
+			DESCRIPTION 
+				"The IO-alarm arise."
+			::= { hwEnvironmentTrap 26 }
+
+--  1.3.6.1.4.1.2011.5.25.219.2.10.27
+		-- 1.3.6.1.4.1.2011.5.25.219.2.10.27
+		hwIOSwitchAlarmResume NOTIFICATION-TYPE
+		    OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwUserDefAlarmName }
+			STATUS current
+			DESCRIPTION 
+				"The IO-alarm resumed."
+			::= { hwEnvironmentTrap 27 }
+
 --  1.3.6.1.4.1.2011.5.25.219.2.11
 		-- 1.3.6.1.4.1.2011.5.25.219.2.11
 		hwSystemConfigTrap OBJECT IDENTIFIER ::= { hwEntityTraps 11 }
@@ -3584,10 +4418,10 @@ Access Restriction: The entries in this table cannot be accessed."
 -- 1.3.6.1.4.1.2011.5.25.219.2.11.3
 		-- 1.3.6.1.4.1.2011.5.25.219.2.11.3
 		hwSystemRollback NOTIFICATION-TYPE
-			OBJECTS { hwEntityTrapFaultID, hwSoftwareVersion, hwStartupSoftwareFileName }
+			OBJECTS { hwEntityTrapReasonDescr, hwSoftwareVersion, hwStartupSoftwareFileName }
 			STATUS current
 			DESCRIPTION 
-				"System configuration error has been detected."
+				"The system was rollback."
 			::= { hwSystemConfigTrap 3 }
 
 -- 1.3.6.1.4.1.2011.5.25.219.2.11.4
@@ -3633,7 +4467,61 @@ Access Restriction: The entries in this table cannot be accessed."
 				"The virtual license of device has expired."
 			::= { hwSystemConfigTrap 8 }
 
+-- 1.3.6.1.4.1.2011.5.25.219.2.11.9			
+		-- 1.3.6.1.4.1.2011.5.25.219.2.11.9
+		hwVirtualLicenseExpResume NOTIFICATION-TYPE
+			OBJECTS { hwVirtualLicenseItemName }		
+			STATUS current
+			DESCRIPTION 
+				"The virtual license expiry alarm was cleared."
+			::= { hwSystemConfigTrap 9 }			
+
+			
+-- 1.3.6.1.4.1.2011.5.25.219.2.11.10			
+		-- 1.3.6.1.4.1.2011.5.25.219.2.11.10
+		hwSystemConfigNotMatchTrap NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapEntType, hwEntityTrapFaultID, hwEntityTrapReasonDescr }		
+			STATUS current
+			DESCRIPTION 
+				"The configuration on the device is different from that on the controller."
+			::= { hwSystemConfigTrap 10 }
+			
+		-- 1.3.6.1.4.1.2011.5.25.219.2.11.11
+		hwNetconfDatabaseAbnormal NOTIFICATION-TYPE
+			STATUS current
+			DESCRIPTION 
+				"Database failed to pass the self-test process."
+			::= { hwSystemConfigTrap 11 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.219.2.11.12
+		hwNetconfDatabaseRestore NOTIFICATION-TYPE
+			STATUS current
+			DESCRIPTION 
+				"Abnormal database resume."
+			::= { hwSystemConfigTrap 12 }			
  
+ 		-- 1.3.6.1.4.1.2011.5.25.219.2.11.13
+		hwCfgDatabaseException NOTIFICATION-TYPE
+			STATUS current
+			DESCRIPTION 
+				"The database has occured exception and the device needs to restart."
+			::= { hwSystemConfigTrap 13 }
+  
+ 		-- 1.3.6.1.4.1.2011.5.25.219.2.11.14
+		hwVirtualLicenseNearDeadlineResume NOTIFICATION-TYPE
+			OBJECTS { hwVirtualLicenseItemName }
+			STATUS current
+			DESCRIPTION 
+				"The virtual license near deadline alarm was cleared."
+			::= { hwSystemConfigTrap 14 }
+			
+		-- 1.3.6.1.4.1.2011.5.25.219.2.11.15
+		hwNoConsolePassword NOTIFICATION-TYPE
+			STATUS current
+			DESCRIPTION 
+				"No password is configured for the console."
+			::= { hwSystemConfigTrap 15 }
+			
 --  1.3.6.1.4.1.2011.5.25.219.2.12
 		-- 1.3.6.1.4.1.2011.5.25.219.2.12
 		hwPortTrap OBJECT IDENTIFIER ::= { hwEntityTraps 12 }
@@ -3702,6 +4590,33 @@ Access Restriction: The entries in this table cannot be accessed."
                                 " The current port is valid." 
                         ::= { hwPortTrap 9}
 
+--  1.3.6.1.4.1.2011.5.25.219.2.12.10
+		-- 1.3.6.1.4.1.2011.5.25.219.2.12.10
+ 		hwPortInvalid NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapEntType, hwEntityTrapFaultID, hwEntityTrapReasonDescr, hwEntityOperStatus }
+			STATUS current
+			DESCRIPTION 
+				"Port is invalid."
+			::= { hwPortTrap 10 }
+
+--  1.3.6.1.4.1.2011.5.25.219.2.12.11
+		-- 1.3.6.1.4.1.2011.5.25.219.2.12.11
+ 		hwPortFail NOTIFICATION-TYPE
+			OBJECTS { entPhysicalIndex, entPhysicalName, hwEntityTrapFaultID }
+			STATUS current
+			DESCRIPTION 
+				"The port failed partially."
+			::= { hwPortTrap 11 }
+
+--  1.3.6.1.4.1.2011.5.25.219.2.12.12
+		-- 1.3.6.1.4.1.2011.5.25.219.2.12.12
+ 		hwPortFailResume NOTIFICATION-TYPE
+			OBJECTS { entPhysicalIndex, entPhysicalName, hwEntityTrapFaultID }
+			STATUS current
+			DESCRIPTION 
+				"The port resumed from partial failure."
+			::= { hwPortTrap 12 }
+			
 --  1.3.6.1.4.1.2011.5.25.219.2.13
 		-- 1.3.6.1.4.1.2011.5.25.219.2.13
  		hwUserDefTrap OBJECT IDENTIFIER ::= { hwEntityTraps 13 }
@@ -3725,6 +4640,16 @@ Access Restriction: The entries in this table cannot be accessed."
 			DESCRIPTION 
 				"Resume from User defined alarm."
 			::= { hwUserDefTrap 2 }
+
+                
+--  1.3.6.1.4.1.2011.5.25.219.2.13.3
+		-- 1.3.6.1.4.1.2011.5.25.219.2.13.3
+		hwPeerDevPnPTrunkAggregationFailure NOTIFICATION-TYPE
+			OBJECTS { hwDeviceMasterESN }
+			STATUS current
+			DESCRIPTION 
+				"The peer device cannot go online because Eth-Trunk auto-negotiation fails."
+			::= { hwUserDefTrap 3 }
 
         
 --   1.3.6.1.4.1.2011.5.25.219.2.14
@@ -3773,7 +4698,27 @@ Access Restriction: The entries in this table cannot be accessed."
 				"The cpu resumed from failure."
 			::= { hwCPUTrap 4 }
 
-  
+			
+--   1.3.6.1.4.1.2011.5.25.219.2.14.5
+		-- 1.3.6.1.4.1.2011.5.25.219.2.14.5
+		hwFwdCPUUtilizationRising NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityThresholdType, hwEntityThresholdWarning, hwEntityThresholdCurrent, 
+			hwEntityTrapFaultID }
+			STATUS current
+			DESCRIPTION 
+				"CPU utilization overrun."
+			::= { hwCPUTrap 5 }
+
+--   1.3.6.1.4.1.2011.5.25.219.2.14.6
+		-- 1.3.6.1.4.1.2011.5.25.219.2.14.6
+		hwFwdCPUUtilizationResume NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityThresholdType, hwEntityThresholdWarning, hwEntityThresholdCurrent, 
+			hwEntityTrapFaultID }
+			STATUS current
+			DESCRIPTION 
+				"CPU utilization back to normal level"
+			::= { hwCPUTrap 6 }
+			 
 --   1.3.6.1.4.1.2011.5.25.219.2.15
 		-- 1.3.6.1.4.1.2011.5.25.219.2.15
 		hwMemoryTrap OBJECT IDENTIFIER ::= { hwEntityTraps 15 }
@@ -3800,6 +4745,23 @@ Access Restriction: The entries in this table cannot be accessed."
 				"Memory utilization back to normal level"
 			::= { hwMemoryTrap 2 }
 
+--   1.3.6.1.4.1.2011.5.25.219.2.15.3
+		-- 1.3.6.1.4.1.2011.5.25.219.2.15.3
+		hwCapMemUtilizationRising NOTIFICATION-TYPE
+			OBJECTS { hwCapMemThresholdCurrent, hwCapMemThresholdValue, hwCapMemType }
+			STATUS current
+			DESCRIPTION 
+				"The average value of Cap Memory Utilization exceeds specifications."
+			::= { hwMemoryTrap 3 }
+
+--   1.3.6.1.4.1.2011.5.25.219.2.15.4
+		-- 1.3.6.1.4.1.2011.5.25.219.2.15.4
+		hwCapMemUtilizationResume NOTIFICATION-TYPE
+			OBJECTS { hwCapMemThresholdCurrent, hwCapMemThresholdValue, hwCapMemType }
+			STATUS current
+			DESCRIPTION 
+				"The average value of Cap Memory utilization back to normal level."
+			::= { hwMemoryTrap 4 }
 
 --   1.3.6.1.4.1.2011.5.25.219.2.16
 		-- 1.3.6.1.4.1.2011.5.25.219.2.16     
@@ -4133,6 +5095,53 @@ Access Restriction: The entries in this table cannot be accessed."
 				"This object indicates that temperature of the RPS power supply has restored to the normal range."
 			::= { hwBatteryTrap 15 }
 
+	        -- 1.3.6.1.4.1.2011.5.25.219.2.22.16
+		hwBatteryGroupFault NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID, hwEntityTrapReasonDescr }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that a battery group failed."
+			::= { hwBatteryTrap 16 }
+			
+		-- 1.3.6.1.4.1.2011.5.25.219.2.22.17
+		hwBatteryGroupFaultResume NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID, hwEntityTrapReasonDescr }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that a battery group recovered."
+			::= { hwBatteryTrap 17 }
+			
+		-- 1.3.6.1.4.1.2011.5.25.219.2.22.18
+		hwBatteryFault NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID, hwEntityTrapReasonDescr }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that a battery failed."
+			::= { hwBatteryTrap 18 }
+			
+		-- 1.3.6.1.4.1.2011.5.25.219.2.22.19
+		hwBatteryFaultResume NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID, hwEntityTrapReasonDescr }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that a battery recovered."
+			::= { hwBatteryTrap 19 }
+			
+		-- 1.3.6.1.4.1.2011.5.25.219.2.22.20
+		hwBatteryMinorFault NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID, hwEntityTrapReasonDescr }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates a minor alarm of a battery fault."
+			::= { hwBatteryTrap 20 }
+			
+		-- 1.3.6.1.4.1.2011.5.25.219.2.22.21
+		hwBatteryMinorFaultResume NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID, hwEntityTrapReasonDescr }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that a minor alarm of a battery fault is cleared."
+			::= { hwBatteryTrap 21 }
 
 --   1.3.6.1.4.1.2011.5.25.219.2.23
 		-- 1.3.6.1.4.1.2011.5.25.219.2.23
@@ -4304,6 +5313,7 @@ Access Restriction: The entries in this table cannot be accessed."
 --   1.3.6.1.4.1.2011.5.25.219.2.30.1
 		-- 1.3.6.1.4.1.2011.5.25.219.2.30.1
 		hwInsSpaceLackAlarm NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID }
 			STATUS current
 			DESCRIPTION
 				"The instruction space required for the current configuration exceeds the total instruction space of the forwarding chip."
@@ -4312,6 +5322,7 @@ Access Restriction: The entries in this table cannot be accessed."
 --   1.3.6.1.4.1.2011.5.25.219.2.30.2
 		-- 1.3.6.1.4.1.2011.5.25.219.2.30.2
 		hwInsSpaceLackResume NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID }
 			STATUS current
 			DESCRIPTION
 				"The instruction space required for the current configuration exceeds the total instruction space of the forwarding chip alarm cleared."
@@ -4324,7 +5335,7 @@ Access Restriction: The entries in this table cannot be accessed."
 --   1.3.6.1.4.1.2011.5.25.219.2.31.1
 		-- 1.3.6.1.4.1.2011.5.25.219.2.31.1
 		hwVfpSysCheckErr NOTIFICATION-TYPE
-			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID }
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID, hwEntityTrapEntType}
 			STATUS current
 			DESCRIPTION
 				"A kind of vfp system error occured. "
@@ -4332,7 +5343,7 @@ Access Restriction: The entries in this table cannot be accessed."
 --   1.3.6.1.4.1.2011.5.25.219.2.31.2
 		-- 1.3.6.1.4.1.2011.5.25.219.2.31.2
 		hwVfpSysCheckErrResume NOTIFICATION-TYPE
-			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID }
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID, hwEntityTrapEntType}
 			STATUS current
 			DESCRIPTION
 				"Vfp system error goes away."
@@ -4359,6 +5370,24 @@ Access Restriction: The entries in this table cannot be accessed."
 			DESCRIPTION 
 				"The average value of Cap CPU utilization back to normal level."
 			::= { hwCapCPUTrap 2 }
+
+--   1.3.6.1.4.1.2011.5.25.219.2.32.3
+		-- 1.3.6.1.4.1.2011.5.25.219.2.32.3
+		hwCapSingleCoreCPUUtilizationRising NOTIFICATION-TYPE
+			OBJECTS { hwCapSingleCoreThresholdCurrent, hwCapSingleCoreIndex, hwCapSingleCoreThresholdValue }
+			STATUS current
+			DESCRIPTION 
+				"The value of Cap single core CPU Utilization exceeds specifications."
+			::= { hwCapCPUTrap 3 }
+			
+--   1.3.6.1.4.1.2011.5.25.219.2.32.4
+		-- 1.3.6.1.4.1.2011.5.25.219.2.32.4
+		hwCapSingleCoreCPUUtilizationResume NOTIFICATION-TYPE
+			OBJECTS { hwCapSingleCoreThresholdCurrent, hwCapSingleCoreIndex, hwCapSingleCoreThresholdValue }
+			STATUS current
+			DESCRIPTION 
+				"The value of Cap single core CPU utilization back to normal level."
+			::= { hwCapCPUTrap 4 }
 
 --   1.3.6.1.4.1.2011.5.25.219.2.33
 		-- 1.3.6.1.4.1.2011.5.25.219.2.33
@@ -4938,6 +5967,32 @@ Access Restriction: The entries in this table cannot be accessed."
 			::= { hwEntityFileSystemTrap 2 }
 
 
+-- 1.3.6.1.4.1.2011.5.25.219.2.39.3
+		-- 1.3.6.1.4.1.2011.5.25.219.2.39.3
+		hwEntityFileSystemFdAlarm NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwPorcessName }
+			STATUS current
+			DESCRIPTION 
+				"The file handle exceeds the threshold."
+			::= { hwEntityFileSystemTrap 3 }
+
+-- 1.3.6.1.4.1.2011.5.25.219.2.39.4
+		-- 1.3.6.1.4.1.2011.5.25.219.2.39.4
+		hwEntityFileSystemFdResume NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwPorcessName }
+			STATUS current
+			DESCRIPTION 
+				"The file handle exceeds the threshold alarm cleared."
+			::= { hwEntityFileSystemTrap 4 }
+
+-- 1.3.6.1.4.1.2011.5.25.219.2.39.5
+		-- 1.3.6.1.4.1.2011.5.25.219.2.39.5
+		hwEntityFileSystemAbnormalResume NOTIFICATION-TYPE
+			OBJECTS  { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID, hwEntityTrapReasonDescr }
+			STATUS current
+			DESCRIPTION 
+				"The filesystem abnormal cleared."
+			::= { hwEntityFileSystemTrap 5 }
 
 --   1.3.6.1.4.1.2011.5.25.219.2.40
                  -- 1.3.6.1.4.1.2011.5.25.219.2.40
@@ -4963,6 +6018,182 @@ Access Restriction: The entries in this table cannot be accessed."
                  DESCRIPTION 
                  "MCU Hardeware Fault." 
                  ::= { hwEntityHardewareFaultTrap 3 } 
+
+--   1.3.6.1.4.1.2011.5.25.219.2.41
+                -- 1.3.6.1.4.1.2011.5.25.219.2.41
+                hwInternalProtocolNetworkPortTrap  OBJECT IDENTIFIER ::= { hwEntityTraps 41 } 
+--   1.3.6.1.4.1.2011.5.25.219.2.41.1 
+                -- 1.3.6.1.4.1.2011.5.25.219.2.41.1 
+                hwInternalProtocolNetworkPortFaultAlarm NOTIFICATION-TYPE
+                OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID }
+                STATUS current 
+                DESCRIPTION
+                "One of the internal protocol network ports failed." 
+                ::= { hwInternalProtocolNetworkPortTrap 1 }
+--   1.3.6.1.4.1.2011.5.25.219.2.41.2 
+                -- 1.3.6.1.4.1.2011.5.25.219.2.41.2
+                hwInternalProtocolNetworkPortFaultResume NOTIFICATION-TYPE
+                OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID }
+                STATUS current 
+                DESCRIPTION
+                "The fault on internal protocol network port is cleared ." 
+                ::= { hwInternalProtocolNetworkPortTrap 2 }
+
+--   1.3.6.1.4.1.2011.5.25.219.2.42
+                -- 1.3.6.1.4.1.2011.5.25.219.2.42
+                hwContainerTrap  OBJECT IDENTIFIER ::= { hwEntityTraps 42 } 
+--   1.3.6.1.4.1.2011.5.25.219.2.42.1
+		-- 1.3.6.1.4.1.2011.5.25.219.2.42.1
+		hwContainerCpuUtilizationRising  NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwContainerName, hwEntityThresholdType, hwEntityThresholdWarning, hwEntityThresholdCurrent, 
+			hwEntityTrapFaultID }
+			STATUS current
+			DESCRIPTION 
+				"Container CPU utilization overrun"
+			::= { hwContainerTrap 1 }
+			
+--   1.3.6.1.4.1.2011.5.25.219.2.42.2
+		-- 1.3.6.1.4.1.2011.5.25.219.2.42.2
+		hwContainerCpuUtilizationResume NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwContainerName, hwEntityThresholdType, hwEntityThresholdWarning, hwEntityThresholdCurrent, 
+			hwEntityTrapFaultID }
+			STATUS current
+			DESCRIPTION 
+				"Container CPU utilization back to normal level"
+			::= { hwContainerTrap 2 }
+			
+--   1.3.6.1.4.1.2011.5.25.219.2.42.3
+		-- 1.3.6.1.4.1.2011.5.25.219.2.42.3
+		hwContainerMemUtilizationRising NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwContainerName, hwEntityThresholdType, hwEntityThresholdWarning, hwEntityThresholdCurrent, 
+			hwEntityTrapFaultID }
+			STATUS current
+			DESCRIPTION 
+				"Container mem utilization overrun"
+			::= { hwContainerTrap 3 }
+			
+--   1.3.6.1.4.1.2011.5.25.219.2.42.4
+		-- 1.3.6.1.4.1.2011.5.25.219.2.42.4
+		hwContainerMemUtilizationResume NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwContainerName, hwEntityThresholdType, hwEntityThresholdWarning, hwEntityThresholdCurrent, 
+			hwEntityTrapFaultID }
+			STATUS current
+			DESCRIPTION 
+				"Container mem utilization back to normal level"
+			::= { hwContainerTrap 4 }
+			
+--   1.3.6.1.4.1.2011.5.25.219.2.42.5
+		-- 1.3.6.1.4.1.2011.5.25.219.2.42.5
+		hwContainerStorageInsufficient NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwContainerName, hwEntityThresholdType, hwEntityThresholdWarning, hwEntityThresholdCurrent, 
+			hwEntityTrapFaultID }
+			STATUS current
+			DESCRIPTION 
+				"Container storage insufficient"
+			::= { hwContainerTrap 5 }
+			
+--   1.3.6.1.4.1.2011.5.25.219.2.42.6
+		-- 1.3.6.1.4.1.2011.5.25.219.2.42.6
+		hwContainerStorageInsufficientResume NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwContainerName, hwEntityThresholdType, hwEntityThresholdWarning, hwEntityThresholdCurrent, 
+			hwEntityTrapFaultID }
+			STATUS current
+			DESCRIPTION 
+				"Container storage back to normal level"
+			::= { hwContainerTrap 6 }
+			
+--   1.3.6.1.4.1.2011.5.25.219.2.42.7
+		-- 1.3.6.1.4.1.2011.5.25.219.2.42.7
+		hwContainerAbnormal NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwContainerName, hwEntityTrapFaultID }
+			STATUS current
+			DESCRIPTION 
+				"Container run abnormal"
+			::= { hwContainerTrap 7 }
+--   1.3.6.1.4.1.2011.5.25.219.2.42.8
+		-- 1.3.6.1.4.1.2011.5.25.219.2.42.8
+		hwContainerAbnormalResume NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwContainerName, hwEntityTrapFaultID }
+			STATUS current
+			DESCRIPTION 
+				"Container run back to normal"
+			::= { hwContainerTrap 8 }
+--   1.3.6.1.4.1.2011.5.25.219.2.42.9
+		-- 1.3.6.1.4.1.2011.5.25.219.2.42.9
+		hwContainerAppAbnormal NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwContainerName, hwContainerAppName, hwEntityTrapFaultID }
+			STATUS current
+			DESCRIPTION 
+				"App in Container run abnormal"
+			::= { hwContainerTrap 9 }
+--   1.3.6.1.4.1.2011.5.25.219.2.42.10
+		-- 1.3.6.1.4.1.2011.5.25.219.2.42.10
+		hwContainerAppAbnormalResume NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwContainerName, hwContainerAppName, hwEntityTrapFaultID }
+			STATUS current
+			DESCRIPTION 
+				"App in Container back to normal level"
+			::= { hwContainerTrap 10 }
+--   1.3.6.1.4.1.2011.5.25.219.2.42.11
+		-- 1.3.6.1.4.1.2011.5.25.219.2.42.11
+		hwFrerLinkPacketLossTrap NOTIFICATION-TYPE
+			OBJECTS {hwEntityCpeRemoteStationMAC }
+			STATUS current
+			DESCRIPTION 
+				"Packet loss occurs on the FRER (dual fed and selective receiving) link on the CPE."
+			::= { hwContainerTrap 11 }
+--   1.3.6.1.4.1.2011.5.25.219.2.42.12
+		-- 1.3.6.1.4.1.2011.5.25.219.2.42.12
+		hwFrerLinkPacketLossTrapRestore NOTIFICATION-TYPE
+			OBJECTS { hwEntityCpeRemoteStationMAC }
+			STATUS current
+			DESCRIPTION 
+				"Cleared the alarm of packet loss on the FRER (dual fed and selective receiving) link on the CPE. "
+			::= { hwContainerTrap 12 }
+--   1.3.6.1.4.1.2011.5.25.219.2.43
+                -- 1.3.6.1.4.1.2011.5.25.219.2.43
+                hwCapTableUsageTrap  OBJECT IDENTIFIER ::= { hwEntityTraps 43 } 
+--   1.3.6.1.4.1.2011.5.25.219.2.43.1
+		-- 1.3.6.1.4.1.2011.5.25.219.2.43.1
+		hwSipfpmFlowOverloadTrap  NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwCapCurSipfpmFlowRate, hwCapUpperSipfpmFlowThreshold, hwCapLowerSipfpmFlowThreshold }
+			STATUS current
+			DESCRIPTION 
+				"The s-ipfpm stream number overload."
+			::= { hwCapTableUsageTrap 1 }
+--   1.3.6.1.4.1.2011.5.25.219.2.43.2
+		-- 1.3.6.1.4.1.2011.5.25.219.2.43.2
+		hwSipfpmFlowOverloadRestoreTrap  NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwCapCurSipfpmFlowRate, hwCapUpperSipfpmFlowThreshold, hwCapLowerSipfpmFlowThreshold }
+			STATUS current
+			DESCRIPTION 
+				"The s-ipfpm stream number overload restore."
+			::= { hwCapTableUsageTrap 2 }
+		-- 1.3.6.1.4.1.2011.5.25.219.2.43.3
+		hwSACSessionOverloadTrap  NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwCapCurSACSessionRate, hwCapUpperSACSessionThreshold, hwCapLowerSACSessionThreshold }
+			STATUS current
+			DESCRIPTION 
+				"The SAC session usage exceeded the threshold."
+			::= { hwCapTableUsageTrap 3 }
+		-- 1.3.6.1.4.1.2011.5.25.219.2.43.4
+		hwSACSessionOverloadRestoreTrap  NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwCapCurSACSessionRate, hwCapUpperSACSessionThreshold, hwCapLowerSACSessionThreshold }
+			STATUS current
+			DESCRIPTION 
+				"The SAC session usage was restored to the normal range."
+			::= { hwCapTableUsageTrap 4 }
+
+--   1.3.6.1.4.1.2011.5.25.219.2.44
+                -- 1.3.6.1.4.1.2011.5.25.219.2.44
+                hwSystemTrap OBJECT IDENTIFIER ::= { hwEntityTraps 44 } 
+--   1.3.6.1.4.1.2011.5.25.219.2.44.1
+		-- 1.3.6.1.4.1.2011.5.25.219.2.44.1
+		hwSystemBakeupStartup NOTIFICATION-TYPE
+			STATUS current
+			DESCRIPTION 
+				"The device starts up from the backup software."
+			::= { hwSystemTrap 1 }
 
 --   1.3.6.1.4.1.2011.5.25.219.3
 -- 1.3.6.1.4.1.2011.5.25.219.3
@@ -4999,7 +6230,7 @@ Access Restriction: The entries in this table cannot be accessed."
 		hwEntityObjectGroup OBJECT-GROUP
 			OBJECTS { hwEntityPhysicalIndex, hwEntityTrapEntType, hwEntityTrapFaultID, hwEntityCommunicateType, hwEntityThresholdType, 
 				hwEntityThresholdValue, hwEntityThresholdCurrent, hwEntityThresholdCritical, hwEntityThresholdWarning, hwUserDefAlarmName, 
-				hwUserDefChannel, hwSoftwareVersion, hwStartupSoftwareFileName, hwStorageDevName, hwPortDownReason, 
+				hwUserDefChannel, hwDeviceMasterESN, hwSoftwareVersion, hwStartupSoftwareFileName, hwStorageDevName, hwPortDownReason, 
                                 hwEntityTrapRelativeResource, hwEntityTrapReasonDescr,hwUsbOperType, hwOpticalVendorName, hwOpticalVendorSN, hwMasterOpUser, hwAPAdminIP, hwAPID, hwOperation, hwReason,
 				hwBoardID, hwCapCPUThresholdType, hwCapCPUThresholdValue, hwCapCPUThresholdCurrent, hwSyslogModuleName, 
 				hwSyslogSeverityLevel, hwSyslogBrief, hwSyslogDescription, hwSyslogTimeStamp, hwEntityNpsVMName, 
@@ -5009,7 +6240,9 @@ Access Restriction: The entries in this table cannot be accessed."
 				hwEntityNpsPartitionUsage, hwEntityNpsPartitionUsageThreshold, hwEntityNpsPartitionAvailableSpace, hwEntityNpsPartitionCapacityThreshold, hwEntityNpsRUName, 
 				hwEntityNpsVNFCName, hwEntityNpsVNFCType, hwEntityNpsAPPType, hwEntityNpsSoftwareVersionType, hwEntityNpsSoftwareVersionID, 
 				hwEntityNpsLocalVMName, hwEntityNpsRemoteVMName, hwEntityNpsNetworkPlaneID, hwEntityNpsNetworkErrorThreshold, hwEntityNpsDeviceID, 
-				hwEntityNpsDriverVendor, hwEntityNpsDriverType,hwEntityNpsQuality,hwLicenseRemainTime, hwVirtualLicenseItemName }
+				hwEntityNpsDriverVendor, hwEntityNpsDriverType,hwEntityNpsQuality,hwLicenseRemainTime, hwVirtualLicenseItemName, hwCapMemType, hwCapMemThresholdValue, hwCapMemThresholdCurrent,
+				hwCapSingleCoreThresholdCurrent, hwCapSingleCoreIndex, hwCapSingleCoreThresholdValue, hwCapCurSipfpmFlowRate, hwCapUpperSipfpmFlowThreshold, hwCapLowerSipfpmFlowThreshold, hwEntityCpeRemoteStationMAC,
+				hwCapCurSACSessionRate, hwCapUpperSACSessionThreshold, hwCapLowerSACSessionThreshold }
 			STATUS current
 			DESCRIPTION 
 				"Group for base trap objects."
@@ -5019,24 +6252,24 @@ Access Restriction: The entries in this table cannot be accessed."
 --  1.3.6.1.4.1.2011.5.25.219.3.2.2
 		-- 1.3.6.1.4.1.2011.5.25.219.3.2.2
 		hwEntityTrapGroup NOTIFICATION-GROUP
-			NOTIFICATIONS { hwChassisRemove, hwChassisInsert, hwChassisFail, hwChassisFailResume, hwChassisInvalid, 
-				hwChassisInvalidResume, hwBoardRemove, hwBoardInsert, hwBoardFail, hwBoardFailResume, 
+			NOTIFICATIONS { hwBoardLicenseActSuccess, hwBoardLicenseActFail, hwChassisRemove, hwChassisInsert, hwChassisFail, hwChassisFailResume, hwChassisInvalid, 
+				hwChassisInvalidResume, hwBoardRemove, hwBoardInsert, hwBoardFail, hwBoardFailResume, hwForwardEngineFail,  hwForwardEngineFailResume, hwForwardEngineInvalid, hwForwardEngineInvalidResume,
 				hwBoardInvalid, hwBoardInvalidResume, hwBoardLeaveMaster, hwBoardBecomeMaster, hwCardRemove, 
 				hwCardInsert, hwCardFail, hwCardFailResume, hwCardInvalid, hwCardInvalidResume, hwCardResExceed, hwCardResExceedResume,
 				hwOpticalRemove, hwOpticalInsert, hwOpticalFail, hwOpticalFailResume, hwOpticalInvalid, 
-				hwOpticalInvalidResume, hwGpsModuleRemove,hwGpsModuleInsert,hwOptCfgNotMatch,hwOptCfgNotMatchResume,hwPowerRemove, hwPowerInsert, hwPowerFail, hwPowerFailResume, 
+				hwOpticalInvalidResume, hwGpsModuleRemove,hwGpsModuleInsert,hwOptCfgNotMatch,hwOptCfgNotMatchResume,hwOpticalBiasCurrentAlarm,hwOpticalBiasCurrentAlarmResume ,hwPowerRemove, hwPowerInsert, hwPowerFail, hwPowerFailResume, 
 				hwPowerInvalid, hwPowerInvalidResume, hwPowerUnusable, hwPowerUnusableResume, hwFanRemove, 
 				hwFanInsert, hwFanFail, hwFanFailResume, hwFanInvalid, hwFanInvalidResume, hwFanMinorAlarm, hwFanMinorAlarmResume,
 				hwFanUnusable, hwFanUnusableResume, hwLcdRemove, hwLcdInsert, hwLcdInvalid, 
 				hwLcdInvalidResume, hwLcdUnusable, hwLcdUnusableResume, hwCmuRemove, hwCmuInsert, 
-				hwCmuInvalid, hwCmuInvalidResume, hwCmuUnusable, hwCmuUnusableResume, hwCommunicateError, 
+				hwCmuInvalid, hwCmuInvalidResume, hwCmuUnusable, hwCmuUnusableResume, hwCmuFail, hwCmuFailResume, hwCommunicateError, 
 				hwCommunicateResume, hwTempAlarm, hwTempResume, hwHumidityAlarm, hwHumidityResume, 
 				hwVoltAlarm, hwVoltResume, hwGateAlarm, hwGateResume, hwFogAlarm, 
 				hwFogResume, hwUnstableAlarm, hwUnstableResume, hwBrdTempAlarm, hwBrdTempResume, 
 				hwBrdTempFatalAlarm, hwBrdTempFatalResume, hwPowerFailureAlarm, hwPowerFailureResume, hwIOSwitchOneAlarm, 
-				hwIOSwitchOneAlarmResume, hwIOSwitchTwoAlarm, hwIOSwitchTwoAlarmResume, hwIOSwitchThreeAlarm, hwIOSwitchThreeAlarmResume, 
+				hwIOSwitchOneAlarmResume, hwIOSwitchTwoAlarm, hwIOSwitchTwoAlarmResume, hwIOSwitchThreeAlarm, hwIOSwitchThreeAlarmResume, hwIOSwitchAlarm, hwIOSwitchAlarmResume,
 				hwEntityDyingGaspEvent, hwSystemConfigError, hwSystemConfigResume, hwPortDown, 
-				hwPortUp, hwPortNoSupportOETrap, hwPortRemove, hwPortInsert,hwPortOpticalPositionInvalid,hwPortOpticalPositionValid, hwUserDefAlarm, hwUserDefResume, hwCPUUtilizationRising, hwCPUUtilizationResume, hwCpuFail, hwCpuFailResume,     
+				hwPortUp, hwPortNoSupportOETrap, hwPortRemove, hwPortInsert,hwPortOpticalPositionInvalid,hwPortOpticalPositionValid, hwUserDefAlarm, hwUserDefResume, hwPeerDevPnPTrunkAggregationFailure, hwCPUUtilizationRising, hwCPUUtilizationResume, hwCpuFail, hwCpuFailResume,     
 				hwUSBUnidentifiedResume, hwUSBUnidentified,
 				hwMemUtilizationRising, hwMemUtilizationResume, hwStorageDevRemove, hwStorageDevInsert, hwSystemRollback, hwVirtualAccessDrvConfigError,
 				hwUpMicroSwitchOpen, hwUpMicroSwitchClose, hwDownMicroSwitchOpen, hwDownMicroSwitchClose, hwBoardPowerOff, hwOpticalPowerAlarm, 
@@ -5047,7 +6280,7 @@ Access Restriction: The entries in this table cannot be accessed."
 				hwBoardResetByCmd, hwBoardResetByCmdResume, hwCardResetByCmd, hwDiskUtilizationResume, hwDiskUtilizationRising, hwCardResetByCmdResume, hwBoardHeartbeatTimeout, 
 				hwBoardHeartbeatResume, hwBandwidthOfAllCardsExceedsThresholdAlarm,hwBandwidthOfAllCardsExceedsThresholdResume,
 				hwBandwidthOfAllCardsExceedsThresholdFatalAlarm, hwBandwidthOfAllCardsExceedsThresholdFatalResume,hwPinchCardReset,hwPinchCardResetResume,hwVMResInconsist,hwVMResInconsistResume, hwNeedModifyCfgTrap, hwCardBandwidthModeChange, hwCardSplitChange,
-				hwBoardWarning, hwBoardWarningResume, hwBoardPortsConflict, hwDataplaneCpuOverloadAlarm, hwDataplaneCpuOverloadResume, hwInsSpaceLackAlarm, hwInsSpaceLackResume, hwVfpSysCheckErr, hwVfpSysCheckErrResume,hwBoardlowmemoryoverload,hwBoardlowmemoryoverloadResume, 
+				hwBoardWarning, hwBoardWarningResume, hwBoardPortsConflict, hwDataplaneCpuOverloadAlarm, hwDataplaneCpuOverloadResume, hwInsSpaceLackAlarm, hwInsSpaceLackResume, hwVfpSysCheckErr, hwVfpSysCheckErrResume,hwBoardlowmemoryoverload,hwBoardlowmemoryoverloadResume, hwBiosOrBootloaderPwdError, hwBiosOrBootloaderPwdErrorResume,hwBootloaderPwdEmpty, hwBootloaderPwdEmptyResume,
                                 hwCapCPUUtilizationResume, hwCapCPUUtilizationRising, hwCardInconsistent, hwBoardAdd, hwBoardDelete, hwRTULicenseActSuccess, hwSMSReboot, hwPduNotPresent, hwPduPresent, hwPduCommLost, hwPduCommLostResume, hwPduDmuHardwareFault, hwPduDmuHardwareFaultResume, hwPduDMUAutoUpgradeFail, hwPduDMUAutoUpgradeFailResume, hwPduDacsHardwareFault, hwPduDacsHardwareFaultResume, 
 				hwPduDacsTempAlarm, hwPduDacsTempAlarmResume, hwPduDacsI2CChannelFault, hwPduDacsI2CChannelFaultResume, hwReportSyslogInfo,
 				hwEntityNpsPatchInstallFail, hwEntityNpsPatchInstallFailResume, hwEntityNpsPatchPacketError, 
@@ -5059,7 +6292,9 @@ Access Restriction: The entries in this table cannot be accessed."
 				hwEntityNpsVMResInconsistResume, hwEntityNpsVmFault, hwEntityNpsVmFaultResume, hwEntityNpsVNFMConnectFault, hwEntityNpsVNFMConnectResume, 
 				hwEntityNpsFabricOamPlaneDown, hwEntityNpsFabricOamPlaneDownResume, hwEntityNpsFabricLinkSubhealthy, hwEntityNpsFabricLinkSubhealthyResume, hwEntityNpsDriverTypeMismatch, 
 				hwEntityNpsDriverTypeMismatchResume, hwEntityNpsRuCreateFail, hwEntityNpsRuCreateFailResume, hwEntityNpsIpSecRuleFail, hwBoardUpCoverResume, hwBoardUpCoverAlarm, hwEntityNpsIpSecRuleFailResume, hwAllLpuSfuFail, hwAllLpuSfuFailResume,hwEntityNpsBaseLinkSubhealthy,hwEntityNpsBaseLinkSubhealthyResume,
-				hwVirtualLicenseExpire, hwVirtualLicenseNearDeadline, hwNPDomainDropCauseCntNumabruptlyAlarm, hwNPDomainDropCauseCntNumabruptlyResume,hwNPResourceExcAlarm,hwNPResourceExcResume,hwEntityFileSystemRebuild,hwEntityFileSystemAbnormal,hwEntityCODECHardewareFaultAlarm,hwEntityTPMHardewareFaultAlarm,hwEntityMCUHardewareFaultAlarm}
+				hwVirtualLicenseExpire, hwVirtualLicenseNearDeadline, hwNPDomainDropCauseCntNumabruptlyAlarm, hwNPDomainDropCauseCntNumabruptlyResume,hwNPResourceExcAlarm,hwNPResourceExcResume,hwEntityFileSystemRebuild,hwEntityFileSystemAbnormal,hwEntityFileSystemAbnormalResume,hwEntityCODECHardewareFaultAlarm,hwEntityTPMHardewareFaultAlarm,hwEntityMCUHardewareFaultAlarm, hwInternalProtocolNetworkPortFaultAlarm, hwInternalProtocolNetworkPortFaultResume, 
+                hwBatteryGroupFault, hwBatteryGroupFaultResume, hwBatteryFault, hwBatteryFaultResume, hwBatteryMinorFault, hwBatteryMinorFaultResume, hwCertExpired, hwCertExpiredResume, hwCrlInvalid, hwCrlInvalidResume, hwCapMemUtilizationRising, hwCapMemUtilizationResume, hwCapSingleCoreCPUUtilizationRising, hwCapSingleCoreCPUUtilizationResume,hwVirtualLicenseNearDeadlineResume, hwSipfpmFlowOverloadTrap, hwSipfpmFlowOverloadRestoreTrap, hwFrerLinkPacketLossTrap, hwFrerLinkPacketLossTrapRestore,
+				hwSACSessionOverloadTrap, hwSACSessionOverloadRestoreTrap, hwSystemBakeupStartup }
 			STATUS current
 			DESCRIPTION 
 				"Group for all base traps."
@@ -5072,6 +6307,20 @@ Access Restriction: The entries in this table cannot be accessed."
 --
 -- HUAWEI-ENTITY-TRAP-MIB.my
 --
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

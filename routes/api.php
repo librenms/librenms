@@ -68,6 +68,10 @@ Route::prefix('v0')->namespace('\App\Api\Controllers')->group(function () {
         });
 
         Route::prefix('devicegroups')->group(function () {
+            Route::patch('{name}', 'LegacyApiController@update_device_group')->name('update_device_group');
+            Route::delete('{name}', 'LegacyApiController@delete_device_group')->name('delete_device_group');
+            Route::post('{name}/devices', 'LegacyApiController@update_device_group_add_devices')->name('update_device_group_add_devices');
+            Route::delete('{name}/devices', 'LegacyApiController@update_device_group_remove_devices')->name('update_device_group_remove_devices');
             Route::post('{name}/maintenance', 'LegacyApiController@maintenance_devicegroup')->name('maintenance_devicegroup');
         });
 
@@ -96,6 +100,8 @@ Route::prefix('v0')->namespace('\App\Api\Controllers')->group(function () {
         Route::patch('services/{id}', 'LegacyApiController@edit_service_for_host')->name('edit_service_for_host');
         Route::post('bgp/{id}', 'LegacyApiController@edit_bgp_descr')->name('edit_bgp_descr');
         Route::post('syslogsink', 'LegacyApiController@post_syslogsink')->name('post_syslogsink');
+
+        Route::get('poller_group/{poller_group_id_or_name?}', 'LegacyApiController@get_poller_group')->name('get_poller_group');
     });
 
     // restricted by access
@@ -115,8 +121,10 @@ Route::prefix('v0')->namespace('\App\Api\Controllers')->group(function () {
         Route::get('{hostname}/ports', 'LegacyApiController@get_port_graphs')->name('get_port_graphs');
         Route::get('{hostname}/ip', 'LegacyApiController@get_device_ip_addresses')->name('get_ip_addresses');
         Route::get('{hostname}/port_stack', 'LegacyApiController@get_port_stack')->name('get_port_stack');
+        Route::get('{hostname}/transceivers', 'LegacyApiController@get_transceivers')->name('get_transceivers');
         Route::get('{hostname}/components', 'LegacyApiController@get_components')->name('get_components');
         Route::get('{hostname}/groups', 'LegacyApiController@get_device_groups')->name('get_device_groups_device');
+        Route::get('{hostname}/maintenance', 'LegacyApiController@device_under_maintenance')->name('device_under_maintenance');
         // consumes the route below, but passes to it when detected
         Route::get('{hostname}/ports/{ifname}', 'LegacyApiController@get_port_stats_by_port_hostname')->name('get_port_stats_by_port_hostname')->where('ifname', '.*');
         Route::get('{hostname}/ports/{ifname}/{type}', 'LegacyApiController@get_graph_by_port_hostname')->name('get_graph_by_port_hostname');
@@ -128,10 +136,15 @@ Route::prefix('v0')->namespace('\App\Api\Controllers')->group(function () {
 
     Route::prefix('ports')->group(function () {
         Route::get('{portid}', 'LegacyApiController@get_port_info')->name('get_port_info');
+        Route::get('{portid}/fdb', 'LegacyApiController@get_port_fdb')->name('get_port_fdb');
         Route::get('{portid}/ip', 'LegacyApiController@get_port_ip_addresses')->name('get_port_ip_info');
+        Route::get('{portid}/transceiver', 'LegacyApiController@get_port_transceiver')->name('get_port_transceiver');
+        Route::patch('transceiver/metric/{metric}', 'LegacyApiController@update_transceiver_metric_thresholds')->name('update_transceiver_metric_thresholds');
         Route::get('search/{field}/{search?}', 'LegacyApiController@search_ports')->name('search_ports')->where('search', '.*');
         Route::get('mac/{search}', 'LegacyApiController@search_by_mac')->name('search_mac');
         Route::get('', 'LegacyApiController@get_all_ports')->name('get_all_ports');
+        Route::get('{portid}/description', 'LegacyApiController@get_port_description')->name('get_port_description');
+        Route::patch('{portid}/description', 'LegacyApiController@update_port_description')->name('update_port_description');
     });
 
     Route::prefix('bills')->group(function () {

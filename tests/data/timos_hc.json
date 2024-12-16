@@ -3337,8 +3337,8 @@
                     "ifName": "system",
                     "portName": null,
                     "ifIndex": 1,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "false",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -4937,8 +4937,8 @@
                     "ifName": "1/3/1",
                     "portName": null,
                     "ifIndex": 39878656,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
@@ -5037,8 +5037,8 @@
                     "ifName": "1/3/2",
                     "portName": null,
                     "ifIndex": 39911424,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
@@ -6537,8 +6537,8 @@
                     "ifName": "bbg-1.nat-out-ip",
                     "portName": null,
                     "ifIndex": 1493172258,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "false",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -8430,8 +8430,8 @@
                     "sdpLastMgmtChange": 4,
                     "sdpLastStatusChange": 0,
                     "sdpActiveLspType": "not-applicable",
-                    "sdpFarEndInetAddressType": "ipv4",
-                    "sdpFarEndInetAddress": "10.1.97.30"
+                    "sdpFarEndInetAddress": "10.1.97.30",
+                    "sdpFarEndInetAddressType": "ipv4"
                 }
             ],
             "mpls_sdp_binds": [
@@ -8503,8 +8503,8 @@
                     "sdpLastMgmtChange": 4,
                     "sdpLastStatusChange": 0,
                     "sdpActiveLspType": "not-applicable",
-                    "sdpFarEndInetAddressType": "ipv4",
-                    "sdpFarEndInetAddress": "10.1.97.30"
+                    "sdpFarEndInetAddress": "10.1.97.30",
+                    "sdpFarEndInetAddressType": "ipv4"
                 }
             ],
             "mpls_sdp_binds": [
@@ -8559,6 +8559,282 @@
                     "sapOperStatus": "down",
                     "sapLastMgmtChange": 4,
                     "sapLastStatusChange": 0
+                }
+            ]
+        }
+    },
+    "entity-physical": {
+        "discovery": {
+            "entPhysical": [
+                {
+                    "entPhysicalIndex": 1,
+                    "entPhysicalDescr": "Integrated: 6p 10/100 Mbps Ethernet, 2 Serial, 3G/LTE cellular, Wi-Fi",
+                    "entPhysicalClass": "chassis",
+                    "entPhysicalName": "7705 SAR-Hm",
+                    "entPhysicalHardwareRev": null,
+                    "entPhysicalFirmwareRev": null,
+                    "entPhysicalSoftwareRev": null,
+                    "entPhysicalAlias": null,
+                    "entPhysicalAssetID": null,
+                    "entPhysicalIsFRU": null,
+                    "entPhysicalModelName": null,
+                    "entPhysicalVendorType": null,
+                    "entPhysicalSerialNum": null,
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": -1,
+                    "entPhysicalMfgName": null,
+                    "ifIndex": null
+                },
+                {
+                    "entPhysicalIndex": 50331649,
+                    "entPhysicalDescr": null,
+                    "entPhysicalClass": "physChassis",
+                    "entPhysicalName": "Chassis 1",
+                    "entPhysicalHardwareRev": "1.0",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "false",
+                    "entPhysicalModelName": "3HE11600AAAA0112",
+                    "entPhysicalVendorType": null,
+                    "entPhysicalSerialNum": "NS173160469",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": -1,
+                    "entPhysicalMfgName": "3HE11600AAAA0112",
+                    "ifIndex": null
+                },
+                {
+                    "entPhysicalIndex": 134217729,
+                    "entPhysicalDescr": null,
+                    "entPhysicalClass": "ioModule",
+                    "entPhysicalName": "Slot 1",
+                    "entPhysicalHardwareRev": "1.0",
+                    "entPhysicalFirmwareRev": "Fake bootrom",
+                    "entPhysicalSoftwareRev": "Fake bootrom",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "false",
+                    "entPhysicalModelName": "3HE11600AAAA0112",
+                    "entPhysicalVendorType": null,
+                    "entPhysicalSerialNum": "NS173160469",
+                    "entPhysicalContainedIn": 50331649,
+                    "entPhysicalParentRelPos": 1,
+                    "entPhysicalMfgName": "3HE11600AAAA0112",
+                    "ifIndex": null
+                },
+                {
+                    "entPhysicalIndex": 150994977,
+                    "entPhysicalDescr": null,
+                    "entPhysicalClass": "cpmModule",
+                    "entPhysicalName": "Slot A",
+                    "entPhysicalHardwareRev": "1.0",
+                    "entPhysicalFirmwareRev": "Fake bootrom",
+                    "entPhysicalSoftwareRev": "Fake bootrom",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "false",
+                    "entPhysicalModelName": "3HE11600AAAA0112",
+                    "entPhysicalVendorType": null,
+                    "entPhysicalSerialNum": "NS173160469",
+                    "entPhysicalContainedIn": 50331649,
+                    "entPhysicalParentRelPos": 2,
+                    "entPhysicalMfgName": "3HE11600AAAA0112",
+                    "ifIndex": null
+                },
+                {
+                    "entPhysicalIndex": 167772162,
+                    "entPhysicalDescr": null,
+                    "entPhysicalClass": "fabricModule",
+                    "entPhysicalName": "Slot A",
+                    "entPhysicalHardwareRev": "1.0",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "false",
+                    "entPhysicalModelName": "",
+                    "entPhysicalVendorType": null,
+                    "entPhysicalSerialNum": "",
+                    "entPhysicalContainedIn": 50331649,
+                    "entPhysicalParentRelPos": 2,
+                    "entPhysicalMfgName": "",
+                    "ifIndex": null
+                },
+                {
+                    "entPhysicalIndex": 184549633,
+                    "entPhysicalDescr": null,
+                    "entPhysicalClass": "mdaModule",
+                    "entPhysicalName": "MDA 1/1",
+                    "entPhysicalHardwareRev": "1.0",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "false",
+                    "entPhysicalModelName": "3HE11600AAAA0112",
+                    "entPhysicalVendorType": null,
+                    "entPhysicalSerialNum": "NS173160469",
+                    "entPhysicalContainedIn": 134217729,
+                    "entPhysicalParentRelPos": 1,
+                    "entPhysicalMfgName": "3HE11600AAAA0112",
+                    "ifIndex": null
+                },
+                {
+                    "entPhysicalIndex": 184549634,
+                    "entPhysicalDescr": null,
+                    "entPhysicalClass": "mdaModule",
+                    "entPhysicalName": "MDA 1/2",
+                    "entPhysicalHardwareRev": "1.0",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "false",
+                    "entPhysicalModelName": "3HE11600AAAA0112",
+                    "entPhysicalVendorType": null,
+                    "entPhysicalSerialNum": "NS173160469",
+                    "entPhysicalContainedIn": 134217729,
+                    "entPhysicalParentRelPos": 2,
+                    "entPhysicalMfgName": "3HE11600AAAA0112",
+                    "ifIndex": null
+                },
+                {
+                    "entPhysicalIndex": 184549635,
+                    "entPhysicalDescr": null,
+                    "entPhysicalClass": "mdaModule",
+                    "entPhysicalName": "MDA 1/3",
+                    "entPhysicalHardwareRev": "1.0",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "false",
+                    "entPhysicalModelName": "3HE11600AAAA0112",
+                    "entPhysicalVendorType": null,
+                    "entPhysicalSerialNum": "NS173160469",
+                    "entPhysicalContainedIn": 134217729,
+                    "entPhysicalParentRelPos": 3,
+                    "entPhysicalMfgName": "3HE11600AAAA0112",
+                    "ifIndex": null
+                },
+                {
+                    "entPhysicalIndex": 184549636,
+                    "entPhysicalDescr": null,
+                    "entPhysicalClass": "mdaModule",
+                    "entPhysicalName": "MDA 1/4",
+                    "entPhysicalHardwareRev": "1.0",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "false",
+                    "entPhysicalModelName": "3HE11600AAAA0112",
+                    "entPhysicalVendorType": null,
+                    "entPhysicalSerialNum": "NS173160469",
+                    "entPhysicalContainedIn": 134217729,
+                    "entPhysicalParentRelPos": 4,
+                    "entPhysicalMfgName": "3HE11600AAAA0112",
+                    "ifIndex": null
+                },
+                {
+                    "entPhysicalIndex": 184549637,
+                    "entPhysicalDescr": null,
+                    "entPhysicalClass": "mdaModule",
+                    "entPhysicalName": "MDA 1/5",
+                    "entPhysicalHardwareRev": "1.0",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "false",
+                    "entPhysicalModelName": "3HE11600AAAA0112",
+                    "entPhysicalVendorType": null,
+                    "entPhysicalSerialNum": "NS173160469",
+                    "entPhysicalContainedIn": 134217729,
+                    "entPhysicalParentRelPos": 5,
+                    "entPhysicalMfgName": "3HE11600AAAA0112",
+                    "ifIndex": null
+                },
+                {
+                    "entPhysicalIndex": 184549638,
+                    "entPhysicalDescr": null,
+                    "entPhysicalClass": "mdaModule",
+                    "entPhysicalName": "MDA 1/6",
+                    "entPhysicalHardwareRev": "1.0",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "false",
+                    "entPhysicalModelName": "3HE11600AAAA0112",
+                    "entPhysicalVendorType": null,
+                    "entPhysicalSerialNum": "NS173160469",
+                    "entPhysicalContainedIn": 134217729,
+                    "entPhysicalParentRelPos": 6,
+                    "entPhysicalMfgName": "3HE11600AAAA0112",
+                    "ifIndex": null
+                },
+                {
+                    "entPhysicalIndex": 201327107,
+                    "entPhysicalDescr": null,
+                    "entPhysicalClass": "flashDiskModule",
+                    "entPhysicalName": "cf3:",
+                    "entPhysicalHardwareRev": "1.0",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "false",
+                    "entPhysicalModelName": "",
+                    "entPhysicalVendorType": null,
+                    "entPhysicalSerialNum": "",
+                    "entPhysicalContainedIn": 150994977,
+                    "entPhysicalParentRelPos": 3,
+                    "entPhysicalMfgName": "",
+                    "ifIndex": null
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    },
+    "ports-stack": {
+        "discovery": {
+            "ports_stack": [
+                {
+                    "high_ifIndex": 35684352,
+                    "low_ifIndex": 2,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 37781504,
+                    "low_ifIndex": 3,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 46170112,
+                    "low_ifIndex": 1509949473,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 46235648,
+                    "low_ifIndex": 131073,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 46235648,
+                    "low_ifIndex": 131074,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 46333952,
+                    "low_ifIndex": 1509949478,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1509949473,
+                    "low_ifIndex": 131075,
+                    "ifStackStatus": "active"
                 }
             ]
         }

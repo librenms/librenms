@@ -1,0 +1,324 @@
+-- ===================================================================
+-- Copyright (C) 2021 by HUAWEI TECHNOLOGIES. All rights reserved.
+-- Description: HUAWEI MASTER KEY MIB
+-- Reference:
+-- Version: V1.14
+-- ===================================================================
+
+ 
+    HUAWEI-MASTERKEY-MIB DEFINITIONS ::= BEGIN
+ 
+        IMPORTS                                            
+            OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP            
+                FROM SNMPv2-CONF            
+            DisplayString, RowStatus, DateAndTime                        
+                FROM SNMPv2-TC
+            TimeTicks, Integer32, Unsigned32, IpAddress, Counter32, OBJECT-TYPE, 
+            MODULE-IDENTITY, NOTIFICATION-TYPE            
+                FROM SNMPv2-SMI
+            hwDatacomm            
+                FROM HUAWEI-MIB;
+
+    
+         hwMasterKey MODULE-IDENTITY 
+            LAST-UPDATED "202111090900Z"        
+            ORGANIZATION 
+                  "Huawei Technologies Co.,Ltd."
+            CONTACT-INFO 
+                  "Huawei Industrial Base
+  Bantian, Longgang
+   Shenzhen 518129
+   People's Republic of China
+   Website: http://www.huawei.com
+   Email: support@huawei.com
+ "
+            DESCRIPTION 
+                "The HUAWEI-MASTERKEY-MIB contains objects to manage the system
+                master key. such as set and clear master key, query master key configuration 
+                and modify information. This module can only be accessed from SNMPv3 agents."
+
+            -- Revision history
+            REVISION    "202111090900Z"
+            DESCRIPTION "V1.14, modify description."
+
+            REVISION    "202105310900Z"
+            DESCRIPTION "V1.13, add hwOperateMasterKey."
+
+            REVISION    "202101210900Z"   
+            DESCRIPTION "V1.12, modify hwClearMasterKey ."
+
+            REVISION    "202012160900Z"   
+            DESCRIPTION "V1.11, modify hwSetExportKey and hwNewMasterKey."
+
+            REVISION    "202010260900Z"   
+            DESCRIPTION "V1.10, modify hwClearMasterKey ."
+
+            REVISION    "202009190900Z"   
+            DESCRIPTION "V1.09, add hwSetExportKey and hwExportKeyConfig."
+
+            REVISION    "202003190900Z"   
+            DESCRIPTION "V1.08, modify hwMasterKeyAutoUpdateInterval."
+
+            REVISION    "202001150900Z"   
+            DESCRIPTION "V1.07, add hwMasterKeyAutoUpdateInterval."
+
+            REVISION    "201903251900Z"   
+            DESCRIPTION "V1.06, add hwMasterKeyExpiredAlarm and hwMasterKeyExpiredResume."
+
+            REVISION    "201903251900Z"   
+            DESCRIPTION "V1.05, modify description of hwMKOperateFailedReason."
+
+            REVISION    "201903211900Z"   
+            DESCRIPTION "V1.04, modify description of hwNewMasterKey."
+            
+            REVISION    "201901041600Z"   
+            DESCRIPTION "V1.03, modify description of some nodes and 
+                           the string length range of node hwNewMasterKey."
+            
+            REVISION    "201812261600Z"   
+            DESCRIPTION "V1.02, add description of only support SNMPv3."
+
+            REVISION    "201603251600Z"   
+            DESCRIPTION "V1.01, change the hwMKOperateResult  enum value ."
+
+            REVISION    "201602281600Z"   
+            DESCRIPTION "V1.00, initial version."
+
+            ::= { hwDatacomm 346 }
+
+        hwMasterKeyConfig OBJECT-TYPE 
+        SYNTAX INTEGER
+		    {
+            default(1),
+            userDefined(2),
+            autoupdate(3)
+            }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "The value of this object identifies current master is default or
+		user defined."
+        ::= { hwMasterKey 1 }
+ 
+        hwClearMasterKey OBJECT-TYPE 
+        SYNTAX DisplayString (SIZE (1..256))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "The value of this object identifies the current user password
+         this object is used to clear master key, the read length is 0."
+        ::= { hwMasterKey 2 }
+ 
+        hwSetMasterKey OBJECT IDENTIFIER ::= { hwMasterKey 3 }
+        
+        hwNewMasterKey  OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (0..0 | 20..32))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "The value of this object identifies the new master key
+          this object is used to set master key, the read length is 0.
+          The master key value is a string of 20 to 32 characters and
+          must be a combination of uppercase letters, lowercase letters, 
+          digits, and special characters. 
+          Because of the limitation of snmp protocol, some characters such as space can not be used."
+        ::= { hwSetMasterKey 1 }
+                
+        hwCurMasterKey OBJECT-TYPE 
+        SYNTAX DisplayString (SIZE (1..32))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "The value of this object identifies the current master key 
+        this object is used to set master key, the read length is 0."
+        ::= { hwSetMasterKey 2 }
+        
+
+        hwMasterKeyOperateInfo OBJECT IDENTIFIER ::= { hwMasterKey 4 }
+
+        hwMKOperateResult OBJECT-TYPE 
+        SYNTAX INTEGER
+		    {
+            success(1),
+            operating(2),
+            failure(3)
+            }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "The value of this object identifies master key modify result."
+        ::= { hwMasterKeyOperateInfo 1 }
+        
+        hwMKOperateFailedReason OBJECT-TYPE 
+        SYNTAX OCTET STRING (SIZE (1..128))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "The value of this object identifies the failed reason of master key modification.
+        Specially for the failure of the mib asynchronous setting."
+        ::= { hwMasterKeyOperateInfo 2 }
+                
+        hwMKOperateStartTime OBJECT-TYPE 
+        SYNTAX DateAndTime
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "The value of this object identifies the start time of master key modification
+		in the format of YYYY-MM-DD,HH:MM:SS."
+        ::= { hwMasterKeyOperateInfo 3 }
+                        
+        hwMKOperateEndTime OBJECT-TYPE 
+        SYNTAX DateAndTime
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "The value of this object identifies the end time of master key modification
+		in the format of YYYY-MM-DD,HH:MM:SS."
+        ::= { hwMasterKeyOperateInfo 4 }
+
+        hwMasterKeyAutoUpdateInterval OBJECT-TYPE 
+        SYNTAX Unsigned32 (0..3650)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "The interval of masterkey auto-updating."
+        ::= { hwMasterKey 5 }
+
+        -- 1.3.6.1.4.1.2011.5.25.346.6
+        -- 1.3.6.1.4.1.2011.5.25.346.6
+        hwMasterKeyTraps OBJECT IDENTIFIER ::= { hwMasterKey 6 }
+
+        -- 1.3.6.1.4.1.2011.5.25.346.6.1
+        -- 1.3.6.1.4.1.2011.5.25.346.6.1
+        hwMasterKeyExpiredTrap OBJECT IDENTIFIER ::= { hwMasterKeyTraps 1 }
+
+        -- 1.3.6.1.4.1.2011.5.25.346.6.1.1
+        -- 1.3.6.1.4.1.2011.5.25.346.6.1.1
+        hwMasterKeyExpiredAlarm NOTIFICATION-TYPE
+            STATUS current
+            DESCRIPTION
+                "The MasterKey of the user expiration alarm."
+            ::= { hwMasterKeyExpiredTrap 1 }
+
+        -- 1.3.6.1.4.1.2011.5.25.346.6.1.2
+        -- 1.3.6.1.4.1.2011.5.25.346.6.1.2
+        hwMasterKeyExpiredResume NOTIFICATION-TYPE
+            STATUS current
+            DESCRIPTION
+                "The MasterKey of the user expiration alarm is cleared."
+            ::= { hwMasterKeyExpiredTrap 2 }
+        
+        hwSetExportKey OBJECT-TYPE 
+        SYNTAX DisplayString (SIZE (0..0 | 32))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "The value of this object identifies the new export key
+        this object is used to set export key, the read length is 0.
+        The master key value is a string of 32 characters and
+        must be a combination of uppercase letters, lowercase letters, 
+        digits, and special characters. 
+        Because of the limitation of snmp protocol, some characters such as space can not be used."
+        ::= { hwMasterKey 7 }
+        
+        hwExportKeyConfig OBJECT-TYPE 
+        SYNTAX INTEGER
+            {
+            default(1),
+            userDefined(2)
+            }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "The value of this object identifies current export key is default or
+        user defined."
+        ::= { hwMasterKey 8 }
+
+        hwOperateMasterKey OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            autoGeneratedBySystem (1)
+            }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This object is used to operate master key.
+            Options:
+            1. autoGeneratedBySystem (1)
+            "
+        ::= { hwMasterKey 10 }
+
+        hwMasterKeyMIBConformance OBJECT IDENTIFIER ::= { hwMasterKey 9 }
+
+        hwMasterKeyMIBCompliances OBJECT IDENTIFIER ::= { hwMasterKeyMIBConformance 1 }
+		hwMasterKeyMIBCompliance MODULE-COMPLIANCE
+        STATUS current
+        DESCRIPTION 
+            "The compliance statement for entities which implement
+            the Huawei Master Key MIB."
+        MODULE -- this module
+            MANDATORY-GROUPS { hwMKConfigGroup, hwMKSetGroup, hwMKClearGroup, hwMKOperateInfoGroup, hwMKAutoUpdate, hwMKSetExportKey, hwMKExportKeyConfig}
+        ::= { hwMasterKeyMIBCompliances 1 }
+		
+        hwMasterKeyMIBGroups OBJECT IDENTIFIER ::= { hwMasterKeyMIBConformance 2 }
+		
+		hwMKConfigGroup OBJECT-GROUP
+        OBJECTS { hwMasterKeyConfig }
+        STATUS current
+        DESCRIPTION 
+            "A collection of master key configuration."
+        ::= { hwMasterKeyMIBGroups 1 }
+		
+		hwMKSetGroup OBJECT-GROUP
+        OBJECTS { hwNewMasterKey, hwCurMasterKey }
+        STATUS current
+        DESCRIPTION 
+            "A collection of set master key."
+        ::= { hwMasterKeyMIBGroups 2 }
+		
+        hwMKClearGroup OBJECT-GROUP
+        OBJECTS { hwClearMasterKey }
+        STATUS current
+        DESCRIPTION 
+            "A collection of clear master key."
+        ::= { hwMasterKeyMIBGroups 3 }
+		
+		hwMKOperateInfoGroup OBJECT-GROUP
+        OBJECTS { hwMKOperateResult, hwMKOperateFailedReason, hwMKOperateStartTime, hwMKOperateEndTime }
+        STATUS current
+        DESCRIPTION 
+            "A collection of mater key operate information."
+        ::= { hwMasterKeyMIBGroups 4 }
+        
+        hwMKAutoUpdate OBJECT-GROUP
+        OBJECTS { hwMasterKeyAutoUpdateInterval }
+        STATUS current
+        DESCRIPTION 
+            "auto-update master key."
+        ::= { hwMasterKeyMIBGroups 5 }
+        
+        hwMKSetExportKey OBJECT-GROUP
+        OBJECTS { hwSetExportKey }
+        STATUS current
+        DESCRIPTION 
+            "A collection of set export key."
+        ::= { hwMasterKeyMIBGroups 6 }
+
+        hwMKExportKeyConfig OBJECT-GROUP
+        OBJECTS { hwExportKeyConfig }
+        STATUS current
+        DESCRIPTION 
+            "A collection of set export key."
+        ::= { hwMasterKeyMIBGroups 7 }
+
+        hwMKOperateGroup OBJECT-GROUP
+        OBJECTS { hwOperateMasterKey }
+        STATUS current
+        DESCRIPTION
+            "A collection of set random master key."
+        ::= { hwMasterKeyMIBGroups 8 }
+    END
+
+--
+-- HUAWEI-MASTERKEY-MIB.mib
+--

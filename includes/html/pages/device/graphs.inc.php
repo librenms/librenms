@@ -2,9 +2,9 @@
 
 // Graphs are printed in the order they exist in \LibreNMS\Config::get('graph_types')
 $link_array = [
-    'page'   => 'device',
+    'page' => 'device',
     'device' => $device['device_id'],
-    'tab'    => 'graphs',
+    'tab' => 'graphs',
 ];
 
 $bg = '#ffffff';

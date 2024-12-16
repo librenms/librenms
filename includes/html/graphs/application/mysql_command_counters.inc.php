@@ -5,40 +5,40 @@ require 'includes/html/graphs/common.inc.php';
 $rrd_filename = Rrd::name($device['hostname'], ['app', 'mysql', $app->app_id]);
 
 $array = [
-    'CDe'  => [
-        'descr'  => 'Delete',
+    'CDe' => [
+        'descr' => 'Delete',
         'colour' => '22FF22',
     ],
-    'CIt'  => [
-        'descr'  => 'Insert',
+    'CIt' => [
+        'descr' => 'Insert',
         'colour' => '0022FF',
     ],
     'CISt' => [
-        'descr'  => 'Insert Select',
+        'descr' => 'Insert Select',
         'colour' => 'FF0000',
     ],
-    'CLd'  => [
-        'descr'  => 'Load Data',
+    'CLd' => [
+        'descr' => 'Load Data',
         'colour' => '00AAAA',
     ],
-    'CRe'  => [
-        'descr'  => 'Replace',
+    'CRe' => [
+        'descr' => 'Replace',
         'colour' => 'FF00FF',
     ],
     'CRSt' => [
-        'descr'  => 'Replace Select',
+        'descr' => 'Replace Select',
         'colour' => 'FFA500',
     ],
-    'CSt'  => [
-        'descr'  => 'Select',
+    'CSt' => [
+        'descr' => 'Select',
         'colour' => 'CC0000',
     ],
-    'CUe'  => [
-        'descr'  => 'Update',
+    'CUe' => [
+        'descr' => 'Update',
         'colour' => '0000CC',
     ],
     'CUMi' => [
-        'descr'  => 'Update Multiple',
+        'descr' => 'Update Multiple',
         'colour' => '0080C0',
     ],
 ];

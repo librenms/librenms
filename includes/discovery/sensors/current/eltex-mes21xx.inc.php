@@ -41,7 +41,7 @@ if ($oids) {
                 $tmp = get_port_by_index_cache($device['device_id'], $ifIndex);
                 $descr = $tmp['ifName'];
                 discover_sensor(
-                    $valid['sensor'], 'current', $device, $split, 'txbias' . $ifIndex, 'rlPhyTestTableTxBias', 'SfpTxBias-' . $descr, $divisor, '1', $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $value
+                    null, 'current', $device, $split, 'txbias' . $ifIndex, 'rlPhyTestTableTxBias', 'SfpTxBias-' . $descr, $divisor, '1', $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $value
                 );
             }
         }

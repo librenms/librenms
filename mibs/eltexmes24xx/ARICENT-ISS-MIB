@@ -1,0 +1,4740 @@
+-- Copyright (C) 2006-2012 Aricent Group . All Rights Reserved
+
+--******************************************************************************
+--$Id: fsiss.mib,v 1.114 2016/09/17 12:43:08 siva Exp $
+--
+--Description : This file contains MIB definitions for ISS module.
+--
+--******************************************************************************/
+
+-- ISS MIB Definition
+
+-- MIB for 'Intelligent Switch Solution'
+
+-- The 'Intelligent Switch Solution' MIB definition is as follows:
+
+
+ARICENT-ISS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+   MODULE-IDENTITY, OBJECT-TYPE,
+   Counter32,enterprises, IpAddress, Integer32, Unsigned32, NOTIFICATION-TYPE
+   FROM SNMPv2-SMI
+   InterfaceIndex                  FROM IF-MIB
+   RowStatus, TruthValue, DisplayString,
+   TEXTUAL-CONVENTION, MacAddress, StorageType       FROM SNMPv2-TC
+   InetAddress, InetAddressType     FROM INET-ADDRESS-MIB;
+
+   iss MODULE-IDENTITY
+      LAST-UPDATED "202203140000Z"
+      ORGANIZATION "ARICENT COMMUNICATIONS SOFTWARE"
+      CONTACT-INFO "support@aricent.com"
+      DESCRIPTION
+         "The MIB for ISS."
+
+      REVISION "202203140000Z"
+      DESCRIPTION
+         "Extended maximum issSwitchName object size from 15 to 128."
+
+      REVISION "201209050000Z"
+      DESCRIPTION
+         "The MIB for ISS."
+   ::= { enterprises futuresoftware (2076) 81 }
+
+
+PortList ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Each octet within this value specifies a set of eight
+        ports, with the first octet specifying ports 1 through
+        8, the second octet specifying ports 9 through 16, etc.
+        Within each octet, the most significant bit represents
+        the lowest numbered port, and the least significant bit
+        represents the highest numbered port.  Thus, each port
+        of the bridge is represented by a single bit within the
+        value of this object.  If that bit has a value of '1'
+        then that port is included in the set of ports; the port
+        is not included if its bit has a value of '0'."
+    SYNTAX      OCTET STRING
+
+
+-- ----------------------------------------------------------------- --
+-- groups in the MIB
+-- ----------------------------------------------------------------- --
+
+      issNotifications         OBJECT IDENTIFIER ::= { iss 0 }
+      issSystem                OBJECT IDENTIFIER ::= { iss 1 }
+      issConfigControl         OBJECT IDENTIFIER ::= { iss 2 }
+      issMirror                OBJECT IDENTIFIER ::= { iss 3 }
+      issRateControl           OBJECT IDENTIFIER ::= { iss 4 }
+      issL2Filter              OBJECT IDENTIFIER ::= { iss 5 }
+      issL3Filter              OBJECT IDENTIFIER ::= { iss 6 }
+      issIpAuthMgr             OBJECT IDENTIFIER ::= { iss 7 }
+      issExt                   OBJECT IDENTIFIER ::= { iss 8 }
+      issL4Switching           OBJECT IDENTIFIER ::= { iss 9 }
+      issSystemTrap            OBJECT IDENTIFIER ::= { iss 10 }
+      issAuditTrap             OBJECT IDENTIFIER ::= { iss 11 }
+      issModule                OBJECT IDENTIFIER ::= { iss 12 }
+      issSwitchFan             OBJECT IDENTIFIER ::= { iss 13 }
+      issAclNp                 OBJECT IDENTIFIER ::= { iss 14 }
+      issAclTrafficControl     OBJECT IDENTIFIER ::= { iss 15 }
+      issLogTrap               OBJECT IDENTIFIER ::= { iss 16 }
+      issHealthCheckGroup      OBJECT IDENTIFIER ::= { iss 17 }
+      issZtp                   OBJECT IDENTIFIER ::= { iss 18 }
+      issRunConfig             OBJECT IDENTIFIER ::= { iss 19 }
+
+-- ---------------------------------------------------------------- --
+
+-- System Group
+
+-- System Information
+
+issSwitchName OBJECT-TYPE
+   SYNTAX      DisplayString (SIZE(1..128))
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "System name used for identification of the device."
+      DEFVAL { "ISS" }
+   ::= { issSystem 1 }
+issHardwareVersion OBJECT-TYPE
+   SYNTAX      DisplayString (SIZE(1..15))
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Version number of the Hardware."
+      DEFVAL { "" }
+   ::= { issSystem 2 }
+issFirmwareVersion OBJECT-TYPE
+   SYNTAX      DisplayString (SIZE(1..15))
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Version number of the Firmware."
+      DEFVAL { "" }
+   ::= { issSystem 3 }
+
+issDefaultIpAddrCfgMode OBJECT-TYPE
+   SYNTAX      INTEGER {
+                manual(1),
+                dynamic(2)
+               }
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "Specifies the means by which the default interface in the device
+      gets the IP address.
+
+      If 'manual' mode is selected, the default interface takes the
+      'issDefaultIpAddr' configured in the system.
+
+      If 'dynamic' mode is selected, the default interface gets the IP address
+      through dynamic IP address configuration protocols such as RARP client,
+      BootP client, DHCP Client, etc.
+
+      If the system fails to get the IP address dynamically through all the
+      above protocols, the default interface uses the 'issDefaultIpAddr'
+      configured in the system."
+   DEFVAL  { manual }
+   ::= { issSystem 4 }
+
+issDefaultIpAddr  OBJECT-TYPE
+   SYNTAX      IpAddress
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "Default IP Address of the system.
+
+       This IP address, if modified, will take effect only when the
+       configuration is stored & restored."
+   ::= { issSystem 5 }
+
+issDefaultIpSubnetMask  OBJECT-TYPE
+   SYNTAX      IpAddress
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "IP subnet mask for the default IP address.
+
+       This subnet mask, if modified, will take effect only when the
+       configuration is stored & restored."
+   ::= { issSystem 6 }
+
+issEffectiveIpAddr  OBJECT-TYPE
+   SYNTAX      IpAddress
+   MAX-ACCESS  read-only
+   STATUS      deprecated
+   DESCRIPTION
+      "Effective IP address of the switch to be used for contacting
+       through SNMP interface or web interface.
+
+       This IP address will be same as the default IP address if the
+       device fails to get the IP address dynamically or the
+       'DefaultIpAddrCfgMode' is 'manual'.
+
+       This IP address will be different from the default IP address
+       if the device manages to get the IP address dynamically.
+
+       In either condition, this is the effective IP address to be
+       used for contacting the switch."
+   ::= { issSystem 7 }
+
+issDefaultInterface  OBJECT-TYPE
+   SYNTAX      DisplayString (SIZE(1..24))
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "Name of the default interface that can be used for
+       communicating with the system for configuration through SNMP
+       or WebInterface.
+
+       The default interface, if modified, will take effect only when
+       the configuration is stored & restored."
+      DEFVAL { "eth0" }
+   ::= { issSystem 8 }
+
+issRestart OBJECT-TYPE
+   SYNTAX      TruthValue
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "This object allows the user to restart the Switch
+      (i.e)the entire switch will operationally go down and
+       start again.  Setting  a value of 'true' causes the switch
+       to be restarted.
+
+       When  the switch operationally goes down, configuration
+       save operation is initiated based on the configuration save
+       option chosen.
+
+       When the switch operationally come up, the saved configurations
+       are restored based on the restore option chosen.
+
+       Once the switch is restarted, the value of this object reverts
+       to 'false'."
+   DEFVAL  { false }
+   ::= { issSystem 9 }
+
+-- Configurtion Save related configuration / information
+
+issConfigSaveOption  OBJECT-TYPE
+   SYNTAX      INTEGER {
+                noSave(1),
+                flashSave(2),
+                remoteSave(3),
+                startupConfig(4)
+               }
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "Specifies whether the configurations of the switch has to be
+       saved or not.
+
+       The value 'noSave' specifies that the configurations need
+       not be saved.
+
+       The value 'flashSave' specifies that the configurations need
+       to be saved in flash in the specified file name issConfigSaveFileName.
+
+       The value 'remoteSave' specifies that the configurations need
+       to be saved in specified remote system.
+
+       The value 'startupConfig' specifies that the configurations need
+       to be saved in flash in the 'Startup Configuration File'.
+
+	   When the issConfigIncrSaveFlag and the issConfigAutoSaveTrigger are set
+	   as true then the default value of issConfigSaveOption is startupConfig.
+	   When issConfigIncrSaveFlag is set as false or when
+	   issConfigAutoSaveTrigger is set as false then the default value of
+	   issConfigSaveOption is noSave."
+   DEFVAL  { noSave }
+   ::= { issSystem 10 }
+
+issConfigSaveIpAddr    OBJECT-TYPE
+   SYNTAX      IpAddress
+   MAX-ACCESS  read-write
+   STATUS      deprecated
+   DESCRIPTION
+      "IP Address of the remote system to which the switch
+       configurations have to be saved.
+
+       This object is valid only if 'issConfigSaveOption' is chosen to be
+       'remoteSave'. This object is deprecated, as this object supports only
+       IPv4, this IP can be set through issConfigSaveIpvxAddr object and object
+       issConfigSaveIpvxAddrType will be set to 1 i.e. IPv4"
+   ::= { issSystem 11 }
+
+issConfigSaveFileName OBJECT-TYPE
+   SYNTAX      DisplayString (SIZE(1..128))
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "Name of the file in which the switch configurations are
+       to be saved.
+
+       This object is valid only if 'issConfigSaveOption' is chosen
+       to be 'flashSave' or 'remoteSave'."
+      DEFVAL { "iss.conf" }
+   ::= { issSystem 12 }
+
+issInitiateConfigSave  OBJECT-TYPE
+   SYNTAX      TruthValue
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "When set as 'true' switch configurations save operation is
+       initiated.
+       As soon as the configuration save operation is completed, the value
+       of this object reverts back to 'false'.
+
+       All the configurations made via the three interfaces
+       viz.
+           -> commandline interface
+           -> Web Interface
+           -> SNMP interface
+       are saved either in 'Startup Configuration File' in the flash or
+       in the specified 'issConfigSaveFileName' in the flash or
+       in the chosen remote system, depending upon 'ConfigSaveOption'."
+   DEFVAL  { false }
+   ::= { issSystem 13 }
+
+issConfigSaveStatus OBJECT-TYPE
+   SYNTAX     INTEGER {
+              saveInProgress(1),
+              saveSuccessful(2),
+              saveFailed(3),
+              notInitiated(4)
+             }
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Status of configuration save operation."
+   DEFVAL  { notInitiated }
+   ::= { issSystem 14 }
+
+
+-- Configuration Restoration related configuration / information
+
+issConfigRestoreOption  OBJECT-TYPE
+   SYNTAX      INTEGER {
+                noRestore(1),
+                restore(2)
+               }
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "Specifies whether the switch configurations have to be restored
+       or not.
+
+       The value 'noRestore' specifies that the switch configurations
+       need not be restored when the system is restarted.
+
+       The value 'restore' specifies that the configurations
+       need to be restored from the 'Startup Configuration File' in the flash
+       when the system is restarted."
+   DEFVAL  { noRestore }
+   ::= { issSystem 15 }
+
+issConfigRestoreIpAddr    OBJECT-TYPE
+   SYNTAX      IpAddress
+   MAX-ACCESS  read-write
+   STATUS      deprecated
+   DESCRIPTION
+      "IP Address of the remote system from where the switch configurations
+      have to be downloaded to the 'Startup Configuration File' in the flash.
+      This object is deprecated, as this object supports only IPv4,
+      this IP can be set through issConfigRestoreIpvxAddr object and object
+      issConfigRestoreAddrType will be set to 1 i.e. IPv4"
+   ::= { issSystem 16 }
+
+issConfigRestoreFileName OBJECT-TYPE
+   SYNTAX      DisplayString (SIZE(1..128))
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "The configuration file name in the remote system which has to be
+      downloaded to the 'Startup Configuration File' in the flash."
+      DEFVAL { "iss.conf" }
+   ::= { issSystem 17 }
+
+issInitiateConfigRestore  OBJECT-TYPE
+   SYNTAX      TruthValue
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "When set as 'true', the switch configurations will be downloaded
+       from the specified remote system to the 'Startup Configuration File'
+       in the flash.
+
+       As soon as the configuration download operation is completed, the value
+       of this object reverts back to 'false'."
+
+   DEFVAL  { false }
+   ::= { issSystem 18 }
+
+
+issConfigRestoreStatus    OBJECT-TYPE
+   SYNTAX      INTEGER {
+               restoreInprogress(1),
+               restoreSuccessful(2),
+               restoreFailed(3),
+               notInitiated(4)
+              }
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The status of the switch configuration restore operation."
+   DEFVAL  { notInitiated }
+   ::= { issSystem 19 }
+
+
+-- Image Downloading related configuration / information
+
+issDlImageFromIp OBJECT-TYPE
+   SYNTAX        IpAddress
+   MAX-ACCESS    read-write
+   STATUS        deprecated
+   DESCRIPTION
+      "The Ip Address of machine from where the image has to be downloaded.
+       This object is deprecated, as this object supports only
+       IPv4, this IP can be set through issDlImageFromIpvxAddr object and object
+       issDlImageFromIpAddrType will be set to 1 i.e. IPv4"
+   ::= { issSystem 20 }
+
+issDlImageName OBJECT-TYPE
+   SYNTAX      DisplayString (SIZE(1..128))
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "The image name which is to be downloaded to the switch."
+      DEFVAL { "iss.exe" }
+   ::= { issSystem 21 }
+
+issInitiateDlImage OBJECT-TYPE
+   SYNTAX        TruthValue
+   MAX-ACCESS    read-write
+   STATUS        current
+   DESCRIPTION
+      "Initiates the Image Download operation."
+   ::= { issSystem 22 }
+
+-- Event logging related configuration / information
+
+issLoggingOption OBJECT-TYPE
+   SYNTAX      INTEGER {
+               console(1),
+               file(2),
+               flash(3)
+              }
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "The Logging option specifying whether the logging is to be
+       done at console or to a file(system buffer) in the system.
+       Flash specifies the logging of traces into a file."
+       DEFVAL { console }
+   ::= { issSystem 23 }
+
+issUploadLogFileToIp OBJECT-TYPE
+   SYNTAX        IpAddress
+   MAX-ACCESS    read-write
+   STATUS        deprecated
+   DESCRIPTION
+      "The Ip Address of machine to which the log file is to be uploaded.
+       This object is deprecated, as this object supports only
+       IPv4, this IP can be set through issUploadLogFileToIpvxAddr object and
+       object issUploadLogFileToAddrType will be set to 1 i.e. IPv4"
+   ::= { issSystem 24 }
+
+issLogFileName OBJECT-TYPE
+   SYNTAX      DisplayString (SIZE(1..128))
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "The file name to be used for uploading the logs from 'file' to the
+      remote system.
+
+      This object is useful only when the 'LogOption' is chosen as 'file'."
+      DEFVAL { "iss.log" }
+   ::= { issSystem 25 }
+
+issInitiateUlLogFile OBJECT-TYPE
+   SYNTAX        TruthValue
+   MAX-ACCESS    read-write
+   STATUS        current
+   DESCRIPTION
+      "Initiates uploading of Log File to the specified IP address in
+      'issUploadLogFileToIp'.
+
+      The logs will be uploaded in the specified 'issLogFileName'."
+   ::= { issSystem 26 }
+
+-- Remote save status
+
+issRemoteSaveStatus OBJECT-TYPE
+   SYNTAX     INTEGER {
+              inprogress(1),
+              successful(2),
+              failed(3),
+              notInitiated(4)
+             }
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Status of remote save operation.
+
+       The remote save operation could be a
+           a) configuration file save to remote system
+           b) log file upload to remote system."
+   DEFVAL  { notInitiated }
+   ::= { issSystem 27 }
+
+-- Download status
+
+issDownloadStatus    OBJECT-TYPE
+   SYNTAX      INTEGER {
+               inprogress(1),
+               successful(2),
+               failed(3),
+               notInitiated(4)
+              }
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "The status of the Image download operation to the switch."
+   DEFVAL  { notInitiated }
+   ::= { issSystem 28 }
+
+issSysContact OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(1..50))
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION
+            "The textual identification of the contact person for this
+            managed node, together with information on how to contact
+            this person.  If no contact information is known, the value
+            is the zero-length string."
+   ::= { issSystem 29 }
+
+issSysLocation OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(1..50))
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION
+            "The physical location of this node (e.g., `telephone
+            closet, 3rd floor').  If the location is unknown, the value
+            is the zero-length string."
+   ::= { issSystem 30 }
+
+-- Login Authentication mechanism
+
+issLoginAuthentication OBJECT-TYPE
+   SYNTAX      INTEGER {
+               local(1),
+               remoteRadius(2),
+               remoteTacacs(3),
+	       radiusFallbackToLocal(4),
+	       tacacsFallbackToLocal(5)
+
+              }
+   MAX-ACCESS  read-write
+   STATUS      deprecated
+   DESCRIPTION
+	"Configures the mechanism by which the user login has to be authenticated
+	for accessing the GUI to manage the switch. Authentication is done
+	either locally or in the remote side through a RADIUS Server or TACACS.
+        If Authentication is configured as radiusLocal or tacacsLocal then
+        Local authentication  provides a back door or a secondary option
+        for authentication if the server fails."
+
+   DEFVAL  { local }
+   ::= { issSystem 31 }
+
+issSwitchBaseMacAddress OBJECT-TYPE
+   SYNTAX      MacAddress
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "Ethernet address (base address) of the Switch.
+       This base Mac Address, if modified, will take effect only when the
+       Switch is restarted."
+
+   DEFVAL  { '000102030405'h }
+   ::= { issSystem 32 }
+
+
+
+-- OOB Interface Existence
+
+issOOBInterface OBJECT-TYPE
+   SYNTAX      TruthValue
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Indicates wheteher OOB Interface Exists in the System"
+   ::= { issSystem 33 }
+
+
+
+    issSwitchDate OBJECT-TYPE
+    SYNTAX       DisplayString (SIZE(1..40))
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+
+    " The date is configured in the switch in the format,
+    Hours:Minutes:Seconds Day Month Year
+    e.g 19:10:31 11 08 2005
+
+    01-12  Month - beginning from January to December
+    The railway time  00 to 24 hours can be configured and
+    displayed.
+    The Display of the date is in the format ,
+    WeekDay  Month  Day  Hours:Minutes:Seconds Year
+    e.g 04 09 21 18:11:30 2005
+
+    01-07  WeekDay - beginning from Sunday to Saturday
+    01-12  Month - beginning from January to December "
+
+    ::= { issSystem 34 }
+
+issNoCliConsole OBJECT-TYPE
+   SYNTAX      TruthValue
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "Indicates whether the CLI console prompt will be made available
+       to the user for the session through serial console. When set to
+       TRUE CLI prompt will be available in serial console, when set to
+       FALSE CLI prompt will NOT be available in serial console session,
+       for the value to take effect, the switch must be restarted,
+       the value does not affect the availability of ISS CLI prompt in
+       sessions established through Telnet."
+   ::= { issSystem 35 }
+
+issDefaultIpAddrAllocProtocol OBJECT-TYPE
+   SYNTAX      INTEGER {
+           rarp(1),
+           dhcp(2),
+           bootp(3)
+       }
+   MAX-ACCESS        read-write
+   STATUS            current
+   DESCRIPTION
+       "Specifies the protocol to be used to obtain IP address for this
+       interface.  This object is valid only when issDefaultIpAddrCfgMode
+       is set to dynamic (2).  Currently rarp (1) option is not supported."
+   DEFVAL  { dhcp }
+   ::= { issSystem 36 }
+
+issHttpPort  OBJECT-TYPE
+   SYNTAX      Integer32 (0..65535)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+
+       "The port to be used by the hosts/PC to configure ISS using the Web Interface
+        The HTTP server must be disabled before this configuration is done"
+   DEFVAL  { 80 }
+
+   ::= { issSystem 37 }
+
+issHttpStatus  OBJECT-TYPE
+   SYNTAX       INTEGER {
+                enable(1),
+                disable(2)
+               }
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "This object is for enabling or disabling HTTP in the system."
+
+   DEFVAL  { enable }
+   ::= { issSystem 38 }
+
+issConfigRestoreFileVersion OBJECT-TYPE
+   SYNTAX      DisplayString (SIZE(1..12))
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Config Restoration file version. This version will be compared in each
+       reboot against version stored in restoration file. Restoration
+       will occur only if the first field in restoration file is this OID and the
+       RestoreFileVersion value also matches."
+   ::= { issSystem 39 }
+
+issDefaultRmIfName  OBJECT-TYPE
+   SYNTAX      DisplayString (SIZE(1..23))
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "Name of the default RM interface that can be used for
+       communication between the Active and Standby nodes for
+       providing redundancy support.The default RM interface,
+       if modified, will take effect only when the switch is
+       restarted"
+      DEFVAL { "NONE" }
+   ::= { issSystem 40 }
+
+issDefaultVlanId  OBJECT-TYPE
+   SYNTAX      Integer32 (1..4094)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "The Default VLAN Identifier to be used at system startup.
+       The VLAN Module creates this vlan as the default vlan.
+       The Default VLAN Identifier, if modified, will take effect
+       only when the switch is restarted.
+
+       It is not advisable to change the default VLAN ID when some
+       configurations are already saved.
+
+       Once the Default VLAN Id is configured, the switch has to
+       be restarted before saving any configuration.
+       "
+       DEFVAL  { 1 }
+   ::= { issSystem 41 }
+
+issNpapiMode  OBJECT-TYPE
+   SYNTAX      DisplayString (SIZE(1..15))
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "The Mode of NPAPI Processing. It can be
+	   1. Synchronous, 2. Asynchronous."
+       DEFVAL  { "Synchronous" }
+   ::= { issSystem 42 }
+
+
+issConfigAutoSaveTrigger OBJECT-TYPE
+   SYNTAX      TruthValue
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "When set as 'true', automatic save operation is enabled. i.e., every
+	    configuration is saved automatically.
+        When set as 'false', automatic save operation is disabled. i.e.,
+		configuration done will not be save automatically.
+		IncrSave is ON : auto save can be enabled /disabled in the system.
+		IncrSave is OFF : auto save can be enabled /disabled in the system,
+						  No effect in the system behaviour(in this case no
+						  update trigger is generated towards MSR).
+   ============================================================================
+   issConfig        issConfig
+   incrSaveFlag     AutoSaveOption    Behaviour
+   ============================================================================
+   TRUE             TRUE    Data is added to RB Tree and based on save option
+							data is added to remote/local incremental file.
+
+   TRUE        		FALSE   Data is added to RB tree only.
+
+   FALSE         	xx      in this case no update trigger is generated towards
+							MSR.
+   ============================================================================
+
+		To enable issConfigAutoSaveTrigger, the issConfigIncrSaveFlag has to be
+		enabled.
+		The configuration update to issConfigIncrSaveFlag will become applicable
+                only after switch restart.
+		When issConfigIncrSaveFlag is enabled, the configuration of
+		issConfigAutoSaveTrigger will be immediately reflected in the system.
+
+		"
+
+   DEFVAL  { false }
+   ::= { issSystem 43 }
+
+issConfigIncrSaveFlag OBJECT-TYPE
+   SYNTAX      TruthValue
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "Indicates whether SNMP Update Trigger for Incremental Save shall be generated or not.
+        'True' value implies that the update trigger shall be generated each time a nmhSet
+         operation is successful.
+        'False' value implies that the update trigger shall not be generated at all.
+
+   Following table explains the combinations of various configurations
+   ============================================================================
+   issConfig      issConfig       issConfig
+   IncrSaveFlag  AutoSaveTrigger  SaveOption    Behaviour
+   ============================================================================
+   TRUE          TRUE             Remote Save   tftp to remote (on every update trigger)
+   TRUE          FALSE            Remote Save   tftp to remote (operator triggered)
+   FALSE         xx               Remote Save   tftp to remote (operator triggered)
+   TRUE          TRUE             Flash Save    save to local (on every update trigger)
+   TRUE          FALSE            Flash Save    save to local (operator triggered)
+   FALSE         xx               Flash Save    save to local (operator triggered)
+   TRUE          TRUE             No Save       Data added to RB Tree
+   TRUE          FALSE            No Save       Data added to RB Tree
+   FALSE         xx               No Save       No Update trigger is sent to MSR
+   ============================================================================
+
+        The configuration of the issConfigIncrSaveFlag object from true to false
+        or vice versa will be used only after switch restart.
+
+		As the auto save of configurations cannot be used when the
+		issConfigIncrSaveFlag is set to false, the issConfigAutoSaveTrigger
+		has to be set to false before setting the issConfigIncrSaveFlag
+		to false."
+   DEFVAL  { false }
+   ::= { issSystem 44 }
+
+
+issConfigRollbackFlag OBJECT-TYPE
+   SYNTAX      INTEGER {
+                disabled(1),
+                enabled(2)
+               }
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "Indicates whether SNMP Rollback feature is enabled or disabled.
+
+        'enabled' value implies that failure in set operation for any varbind will result in rollback of all varbinds whose value has been set in this SET PDU
+
+        'disabled' value implies that failure in set operation will simply return error."
+   DEFVAL  { enabled }
+   ::= { issSystem 45 }
+
+issConfigSyncUpOperation OBJECT-TYPE
+   SYNTAX      INTEGER {
+                syncup(1)
+               }
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+   "Indicates that sync operation is to be performed.
+   Incremental save OFF:  RB tree, incremental file/buffer are not present in
+					  the system, sync operation is not allowed in the system.
+   Incremental save ON  : On receiving this event, MSR deletes the data present
+						in the RB tree and configuration data at MSR shall be
+						made In sync with data store at protocols.
+
+   Following table explains the combinations of various configurations
+   ============================================================================
+   issConfig        issConfig
+   IncrSaveFlag   SaveOption    Behaviour
+   ============================================================================
+   TRUE        Remote Save    RB Tree data made in sync with the data stored
+						  at protocols, same data Is updated at remote
+							  system, incremental file (at remote) is emptied.
+
+   TRUE        Local  Save    RB Tree data made in sync with the data stored at
+							  protocols, same data Is updated in local
+							  configuration file and incremental file
+							  (issinc.conf) is emptied.
+
+   FALSE         xx           Event is not allowed in the system,
+							  MSR returns failure.
+   ============================================================================"
+
+   DEFVAL  { syncup }
+   ::= { issSystem 46 }
+
+issFrontPanelPortCount  OBJECT-TYPE
+     SYNTAX      Integer32
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        "The object defines the number of physical ports configured
+         in a device for the purpose of switching/routing. The value
+         of the object should not exceed system defined MAX physical
+         interfaces, when the configured value is less than the MAX
+         physical interfaces, the difference in port count shall be
+         used for stacking purpose only when the stacking object
+         issColdStandbyStacking is enabled else the ports are considered
+         as physically not present and would not be initialized.
+
+         It is not advisable to change the Front panel port count when some
+         configurations are already saved.
+
+         Once the Front panel port count is configured, the switch has to
+         be restarted before saving any configuration."
+
+     ::= { issSystem 47 }
+
+issAuditLogStatus OBJECT-TYPE
+     SYNTAX       INTEGER { enable (1) , disable(2) }
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION "To Enable or disable Audit Logging"
+     DEFVAL     { disable }
+
+     ::= { issSystem 48 }
+
+issAuditLogFileName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(1..128))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The name of the file to which Audit log is saved"
+    DEFVAL      { "config.txt" }
+
+     ::= { issSystem 49 }
+
+issAuditLogFileSize OBJECT-TYPE
+     SYNTAX      Unsigned32 (1024 .. 1048576)
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION "This is the maximum file size in bytes of the config.txt file"
+     DEFVAL   { 1048576 }
+
+     ::= { issSystem 50 }
+issAuditLogReset   OBJECT-TYPE
+  SYNTAX      TruthValue
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION "Setting this to true ,erases the contents in configs.txt
+               fileand start logging"
+  DEFVAL  { false }
+     ::= { issSystem 51 }
+
+issAuditLogRemoteIpAddr    OBJECT-TYPE
+  SYNTAX      IpAddress
+  MAX-ACCESS  read-write
+  STATUS      deprecated
+  DESCRIPTION "IP Address of the remote system to which the
+               Audit file has to be transfered from flash.
+               This object is deprecated, as this object supports only
+               IPv4, this IP can be set through issAuditLogRemoteIpvxAddr object
+               and object issAuditLogRemoteAddrType will be set to 1 i.e. IPv4"
+     ::= { issSystem 52 }
+
+issAuditLogInitiateTransfer OBJECT-TYPE
+   SYNTAX      TruthValue
+   MAX-ACCESS  read-write
+   STATUS      current
+    DESCRIPTION "Setting this will start transfer of the file indicated by
+                 issAuditLogFileName from flash
+                 to remote Address mentioned by issAuditLogRemoteIpAddr"
+    DEFVAL  { false }
+     ::= { issSystem 53 }
+issAuditTransferFileName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..128))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The name of the file to be retrieved from flash"
+    DEFVAL      { "config.txt" }
+
+     ::= { issSystem 54 }
+
+issDownLoadTransferMode OBJECT-TYPE
+   SYNTAX     INTEGER {
+                tftp (1),
+                sftp  (2)
+              }
+   MAX-ACCESS read-write
+   STATUS     current
+   DESCRIPTION
+      "To select the Transfer mode for downloading image."
+    DEFVAL  { tftp }
+   ::= { issSystem 55 }
+
+issDownLoadUserName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..20))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This mib-object is used for setting User name required for downloading
+        image.  When Transfer Mode is selected as tftp, contents of this
+        mib-object becomes irrelevant."
+    ::= { issSystem  56 }
+
+issDownLoadPassword OBJECT-TYPE
+SYNTAX      DisplayString (SIZE(0..20))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This mib-object is used for setting password required for downloading
+        image.  When Transfer Mode is selected as tftp, contents of this
+        mib-object becomes irrelevant."
+    ::= { issSystem 57 }
+
+issUploadLogTransferMode OBJECT-TYPE
+   SYNTAX     INTEGER {
+                tftp (1),
+                sftp  (2)
+              }
+   MAX-ACCESS read-write
+   STATUS     current
+   DESCRIPTION
+      "To select the Transfer mode for uploading log file."
+   DEFVAL  { tftp }
+   ::= { issSystem 58 }
+
+
+issUploadLogUserName OBJECT-TYPE
+   SYNTAX      DisplayString (SIZE(0..20))
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "This mib-object is used for setting User name required for uploading
+       log file. When Transfer Mode is selected as tftp, contents of this
+       mib-object becomes irrelevant."
+   ::= { issSystem 59 }
+
+issUploadLogPasswd OBJECT-TYPE
+   SYNTAX      DisplayString (SIZE(0..20))
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "This mib-object is used for setting password required for uploading log file.
+       When Transfer Mode is selected as tftp, contents of this mib-object becomes
+       irrelevant."
+   ::= { issSystem 60 }
+
+issConfigSaveTransferMode OBJECT-TYPE
+   SYNTAX     INTEGER {
+                tftp (1),
+                sftp  (2)
+              }
+   MAX-ACCESS read-write
+   STATUS     current
+   DESCRIPTION
+      "To select the Transfer mode for uploading/downloading configurations       to/from a remote system. Contents of this mib is relevant only when
+       issConfigSaveOption is remote save."
+   DEFVAL  { tftp }
+   ::= { issSystem 61 }
+
+issConfigSaveUserName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..20))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This mib-object is used for setting User name required for
+        uploading/downloading the configurations to/from a remote site. Contents of this mib is relevant only
+        when issConfigSaveOption is remote save and issConfigSaveTransferMode is
+        SFTP."
+    ::= { issSystem  62 }
+
+issConfigSavePassword OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..20))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This mib-object is used for setting Password required for
+        uploading/downloading the configurations to/from a remote site. Contents of this mib is relevant
+        only when the value of issConfigSaveOption is remote save and
+        issConfigSaveTransferMode is SFTP."
+    ::= { issSystem 63 }
+
+issSwitchMinThresholdTemperature    OBJECT-TYPE
+    SYNTAX          Integer32 (-35..30)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+    "Indicates the minimum threshold temperature of the switch in celsius.
+     When the current temperature drops below the threshold,
+     an SNMP trap with maximum severity will be sent to the manager."
+
+    DEFVAL { -5 }
+    ::= {  issSystem 64 }
+
+issSwitchMaxThresholdTemperature    OBJECT-TYPE
+    SYNTAX          Integer32 (35..90)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+    "Indicates the maximum threshold temperature of the switch in celsius.
+     When the current temperature rises above the threshold,
+     an SNMP trap with maximum severity will be sent to the manager."
+
+     DEFVAL { 80 }
+     ::= {  issSystem 65 }
+
+issSwitchCurrentTemperature    OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+    "Indicates the current temperature of the switch in celsius."
+
+     ::= {  issSystem 66 }
+
+issSwitchMaxCPUThreshold    OBJECT-TYPE
+    SYNTAX          Integer32 (1..100)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+    "Indicates the maximum CPU usage of the switch in percentage.
+     When CPU load exceeds the threshold value,
+     an SNMP trap with maximum severity will be sent to the manager."
+
+     DEFVAL { 95 }
+     ::= {  issSystem 67 }
+
+issSwitchCurrentCPUThreshold    OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+    "Indicates the current CPU threshold of the switch in percentage"
+
+    ::= {  issSystem 68 }
+
+issSwitchPowerSurge    OBJECT-TYPE
+    SYNTAX          Integer32 (1..255)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+    "Indicates the maximum power supply of the switch in volts.
+     When the current voltage exceeds the threshold value,
+     an SNMP trap with maximum severity will be sent to the manager."
+
+     DEFVAL { 230 }
+     ::= {  issSystem 69 }
+
+issSwitchPowerFailure    OBJECT-TYPE
+    SYNTAX          Integer32 (1..255)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+    "Indicates the minimum power supply of the switch in volts.
+    When the current voltage drops below the threshold value,
+    an SNMP trap with maximum severity will be sent to the manager."
+
+    DEFVAL { 100 }
+    ::= {  issSystem 70 }
+
+issSwitchCurrentPowerSupply    OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+    "Indicates the current power supply in volts."
+
+    ::= {  issSystem 71 }
+
+issSwitchMaxRAMUsage    OBJECT-TYPE
+    SYNTAX          Integer32 (1..100)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+    "Indicates the maximum RAM usage of the switch in percentage.
+     When the RAM usage crosses the threshold percentage
+     an SNMP trap with maximum severity will be sent to the manager."
+
+     DEFVAL { 90 }
+     ::= {  issSystem 72 }
+
+issSwitchCurrentRAMUsage   OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+    "Indicates the current RAM usage of the switch in percentage"
+
+    ::= {  issSystem 73 }
+
+issSwitchMaxFlashUsage    OBJECT-TYPE
+    SYNTAX          Integer32 (1..100)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+    "Indicates the maximum flash usage of the switch in percentage.
+     When the flash usage crosses the threshold percentage
+     an SNMP trap with maximum severity will be sent to the manager."
+
+     DEFVAL { 95 }
+     ::= {  issSystem 74 }
+
+issSwitchCurrentFlashUsage    OBJECT-TYPE
+     SYNTAX          Integer32
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+     "Indicates the current flash usage of the switch in percentage"
+
+     ::= {  issSystem 75 }
+
+
+issConfigRestoreFileFormatVersion OBJECT-TYPE
+   SYNTAX      DisplayString (SIZE(1..12))
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Config Save Restoration file format Version.This issConfigRestoreFile
+     FormatVersion value will be compared in each reboot against file format
+     version value stored in restoration file.Restoration will occur only if
+     the Restore file format version OID in restoration file matches this
+     OID and the value of Restore file format version  field in restoration
+     file matches this OID's value.
+
+        The current value of this issConfigRestoreFileFormatVersion is 1.1.
+     If any change happens in Restore File Format,then the value of this object
+     will be updated like this 1.2,1.3,1.4,1.5,...."
+
+   ::= { issSystem 76 }
+
+issDebugOption OBJECT-TYPE
+          SYNTAX      DisplayString (SIZE(0..288))
+          MAX-ACCESS  read-write
+          STATUS      current
+          DESCRIPTION
+            "This object stores the trace option string input given by the user.
+             To enable particular trace the user has to enter
+             the corresponding string(given below) assigned for that.
+             And for enabling more than once traces the user has to enter the
+             corresponding strings with SPACE delimiter between each string.
+             enable          - Enables the corresponding option.
+             disable         - Disables the corresponding option.
+             init-shut       - Init and Shutdown traces
+             failure         - All Failure Traces
+             func-entry-exit - Funtion entry and exit
+          for example to enable init-shut and failure trace the input string
+          should be  enable init-shut failure"
+    ::= { issSystem 77 }
+
+issConfigDefaultValueSaveOption OBJECT-TYPE
+    SYNTAX      INTEGER {
+                          enabled(1),
+                          disabled(2)
+                        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Indicates whether default values needs to be saved or not when
+        incremental save option is true.'enabled' value implies, MSR stores
+        default values also when Incremental save is true.'disabled' value
+        implies, MSR does not store default values when Incremental save is
+        true.
+
+        Configuring this object value will update in issnvram.txt file.
+        The configured value will get into effect only after rebooting the ISS."
+
+    DEFVAL  { disabled }
+
+    ::= { issSystem 78 }
+
+issConfigSaveIpAddrType    OBJECT-TYPE
+   SYNTAX      InetAddressType
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "This object specifies the address type of the remote system to which
+       the switch configurations have to be saved.The address type can be
+       IPv4 or IPv6 unicast address or DNS.
+
+       This object is valid only if 'issConfigSaveOption' is chosen to be
+       'remoteSave'."
+   ::= { issSystem 79 }
+
+issConfigSaveIpvxAddr    OBJECT-TYPE
+   SYNTAX      InetAddress
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "This object specifies the IP Address of the remote system to which the switch
+       configurations have to be saved. It supports DNS host name
+       when 'issConfigSaveIpAddrType' is of DNS Type.
+
+       This object is valid only if 'issConfigSaveOption' is chosen to be
+       'remoteSave'."
+   ::= { issSystem 80 }
+
+issConfigRestoreIpAddrType    OBJECT-TYPE
+   SYNTAX      InetAddressType
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "This object specifies the IP Address type of the remote system from where
+       the switch configurations have to be downloaded to the
+       'Startup Configuration File' in the flash.
+       The address type can be IPv4 or IPv6 unicast address or DNS."
+   ::= { issSystem 81 }
+
+issConfigRestoreIpvxAddr    OBJECT-TYPE
+   SYNTAX      InetAddress
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "This object specifies the IP Address of the remote system from where
+      the switch configurations have to be downloaded to the
+      'Startup Configuration File' in the flash.
+      The address type can be IPv4 or IPv6 unicast address or DNS type."
+   ::= { issSystem 82 }
+
+issDlImageFromIpAddrType OBJECT-TYPE
+   SYNTAX        InetAddressType
+   MAX-ACCESS    read-write
+   STATUS        current
+   DESCRIPTION
+      "This object specifies the address type of machine from where the image
+       has to be downloaded. The address type can be IPv4 or IPv6
+       unicast address or DNS."
+   ::= { issSystem 83 }
+
+issDlImageFromIpvx OBJECT-TYPE
+   SYNTAX        InetAddress
+   MAX-ACCESS    read-write
+   STATUS        current
+   DESCRIPTION
+      "The IP Address of machine from where the image has to be downloaded."
+   ::= { issSystem 84 }
+
+issUploadLogFileToIpAddrType OBJECT-TYPE
+   SYNTAX        InetAddressType
+   MAX-ACCESS    read-write
+   STATUS        current
+   DESCRIPTION
+      "This object specifies the address Type of machine to which the log file is
+       to be uploaded.The address type can be IPv4 or IPv6 unicast address or DNS."
+   ::= { issSystem 85 }
+
+issUploadLogFileToIpvx OBJECT-TYPE
+   SYNTAX        InetAddress
+   MAX-ACCESS    read-write
+   STATUS        current
+   DESCRIPTION
+      "This object specifies the address type of machine to which the log file is to be uploaded."
+   ::= { issSystem 86 }
+
+issAuditLogRemoteIpAddrType    OBJECT-TYPE
+  SYNTAX      InetAddressType
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION "IP Address Type of the remote system to which the
+               Audit file has to be transfered from flash."
+     ::= { issSystem 87 }
+
+issAuditLogRemoteIpvxAddr    OBJECT-TYPE
+  SYNTAX      InetAddress
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION "IP Address of the remote system to which the
+               Audit file has to be transfered from flash."
+     ::= { issSystem 88 }
+
+-- Set System Timer speed configuration
+
+issSystemTimerSpeed    OBJECT-TYPE
+  SYNTAX      Unsigned32 (1..1000)
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION "Configures the system timer speed. This is for testing purpose.
+               Value - 1 enables the timer to run in real time speed.
+               Values from (2 - 1000), enables the timer to run
+               (2x - 1000x) faster."
+     ::= { issSystem 89 }
+
+issMgmtInterfaceRouting OBJECT-TYPE
+    SYNTAX      INTEGER {
+                            enabled(1),
+                            disabled(2)
+                        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " Enables / Disables Routing over the Management Interface.
+
+        This object can be configured only if the Management Port
+        is used for IP Access. "
+
+    DEFVAL  { disabled }
+
+    ::= { issSystem 90 }
+
+issMacLearnRateLimit   OBJECT-TYPE
+    SYNTAX       Integer32 (0..2147483647)
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+            "Maximum number of unicast dynamic MAC (L2) entries hardware can  learn
+             in the system, in a configured time interval 'issMacLearnRateLimitInterval'.
+             In next subsequent time interval, hardware can learn number of previously
+             learnt MAC entries plus present 'issMacLearnRateLimit' value, this
+             cycle will continue until MAC learning reaches to maximum number of L2
+             unicast dynamic entries learning capacity of the system. If rate limit is
+             changed while 'issMacLearnLimitRateInterval' timer is running, new rate
+             limit value takes effect on next timer restart.
+
+             This limit is to control the number of MAC entries indication to control
+             plane from hardware, when hardware MAC learning is enabled.
+
+             Configuration value '0' disables this feature in the system.
+             This configuration does not impose any restrictions on multicast/broadcast
+             and dynamic/static/protocol(MMRP) MAC learning capability limits."
+    DEFVAL { 1000 }
+   ::= { issSystem 91 }
+
+issMacLearnRateLimitInterval   OBJECT-TYPE
+    SYNTAX       Unsigned32 (1..100000)
+    UNITS        "milliseconds"
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+            "Number of MAC entries,'issMacLearnRateLimit' that can be learnt in
+             the system in this configured time interval. Any changed timer interval
+             value will take effect in next timer restart."
+    DEFVAL { 1000 }
+   ::= { issSystem 92 }
+
+issVrfUnqMacFlag OBJECT-TYPE
+    SYNTAX    INTEGER {
+              disable (0),
+              enable (1)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Unique mac address can be assigned to each virtual router by enabling
+         this flag. Configuring this object value will result in updation to
+         issnvram.file. The configured value will take effect in ISS on next reboot."
+
+    DEFVAL { disable }
+    ::= {issSystem 93}
+
+issLoginAttempts OBJECT-TYPE
+    SYNTAX 	Integer32(1..10)
+    MAX-ACCESS 	read-write
+    STATUS	current
+    DESCRIPTION
+	"Number of times a user may be allowed to login using
+	 wrong password in the login prompt."
+    DEFVAL {3}
+    ::= {issSystem 94}
+
+issLoginLockTime OBJECT-TYPE
+    SYNTAX	Integer32(30..600)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+	"Time in seconds a user is blocked following unsuccessful logins."
+    DEFVAL {30}
+    ::= {issSystem 95}
+
+issAuditLogSizeThreshold OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..99)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+				"This is the threshold value of the Log storage space with respect
+				 to the maximum Log Storage Space. It is entered as a percentage value."
+    DEFVAL   { 70 }
+    ::= { issSystem 96}
+
+
+issTelnetStatus  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    enable(1),
+                    disable(2),
+                    enableInProgress(3),
+                    disableInProgress(4)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This object is for enabling or disabling the TELNET in the system.
+       Set operation of enable will move this object to the enableInProgress
+       first then to the enable on successfull transition. Otherwise it will
+       move back to the old state. Same applies to the disable also.
+
+       CAUTION: enableInProgress and disableInProgress are not admin
+       configurable values"
+    DEFVAL      { enable }
+    ::= { issSystem 97 }
+
+issWebSessionTimeOut   OBJECT-TYPE
+    SYNTAX       Integer32 (1..300)
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+       "Set the Web Session Time Out Value in Seconds"
+    DEFVAL      { 300 }
+  ::= { issSystem 98 }
+
+issWebSessionMaxUsers   OBJECT-TYPE
+    SYNTAX       Integer32
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+       "Set the maximum number of web sessions"
+  DEFVAL      { 7 }
+  ::= { issSystem 99 }
+
+issHeartBeatMode OBJECT-TYPE
+    SYNTAX    INTEGER  {
+                 internal (1),
+                 external (2)
+               }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+       "The object is for setting the method for Redundancy manager election
+        mechanism, it can be internal election logic or it can be a external
+        logic. When this object is set to be internal, proprietary
+        election logic called as HearBeat mechanism is applied for electing the
+        Active/Standby card in a redundant systems. When this object is set
+        to be external, external election logic should be applied for electing
+        Active/Standby card in a redundant systems.
+
+        By default this object is set to Internal."
+    DEFVAL { internal }
+    ::= {issSystem 100}
+
+issRmRType OBJECT-TYPE
+    SYNTAX    INTEGER  {
+              hot (1),
+              cold(2)
+    }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+       "The object is for setting the type of the Redundancy manager, it can be
+        Hot or Cold. When this object is set to be cold, whenever there is node
+        state transition from Standby to Active, the node needs to re-start,
+        re-initialized the hardware completely. When this object is set to be
+        Hot, whenever there is node state transition from Standby to Active,
+        the hardware should not be re-initialized. When the configurations are
+        saved in a file in Active node, then this needs to be transferred to
+        the standby node in both the redundancy modes.
+
+        By default this is set to Hot."
+    DEFVAL { hot }
+    ::= {issSystem 101}
+
+issRmDType OBJECT-TYPE
+    SYNTAX    INTEGER  {
+              shared (1),
+              separate (2)
+    }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+       "This object specifies the type of the dataplane/hardware, it can be a
+        shared dataplane or a separate dataplane. When this object is set to
+        be shared, standby card in a redundancy system should not program the
+        hardware and hardware audit should be conducted to sync the hardware
+        and software after switchover/node-transition. When this object is set
+        to be separate, it specifies that the nodes have separate hardware,
+        therefore standby card in a redundant system should program the
+        hardware and hardware audit is not required, since the hardware and
+        software are in sync always.
+
+        By default this is set to Shared."
+    DEFVAL { shared }
+    ::= {issSystem 102}
+
+issClearConfig OBJECT-TYPE
+   SYNTAX        TruthValue
+   MAX-ACCESS    read-write
+   STATUS        current
+   DESCRIPTION
+       "When the object is set to TRUE, configurations will be cleared and
+       default configurations will be restored. The value will be reset to
+       FALSE again."
+
+   DEFVAL       { false }
+   ::= { issSystem 103 }
+
+issClearConfigFileName OBJECT-TYPE
+   SYNTAX      DisplayString (SIZE(1..128))
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "This is the name of the file, which contains the default configurations
+       to be restored once configurations are cleared. This is optional. When
+       this file name is given, configurations in this file are assumed to be
+       default configurations. This configuration will be restored once the
+       configurations are cleared in ISS data base. When this file name is not
+       given, default configurations will not be restored. Only default
+       interface and VLAN will be brought up for management connectivity.
+
+       When default configurations are to be restored, this object should be
+       configured first before configuring the issClearConfig object."
+
+      DEFVAL { "clear.conf" }
+   ::= { issSystem 104 }
+
+issTelnetClientStatus  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                          disabled(0),
+                          enabled(1)
+                        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This object is for enabling or disabling the TELNET client functionality
+        in the system. Set operation of enable will allow to establish new Telnet
+        client sessions. Set operation of disable will not allow a new Telnet client
+        session, also terminates the active client sessions which are already running.
+        By default it will be enabled"
+
+    DEFVAL      { enabled }
+    ::= { issSystem 105 }
+
+issSshClientStatus  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                          disabled(0),
+                          enabled(1)
+                        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This object is for enabling or disabling the SSH client functionality
+        in the system. Set operation of enable will allow to establish new SSH client
+        sessions. Set operation of disable will not allow a new SSH client sessions,
+        also terminates the active client sessions which are already running.
+        By default it will be enabled"
+    DEFVAL      { enabled }
+    ::= { issSystem 106 }
+
+issActiveTelnetClientSessions  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Specifies the number of active Telnet client sessions running"
+    ::= { issSystem 107 }
+
+issActiveSshClientSessions  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Specifies the number of active SSH client sessions running"
+    ::= { issSystem 108 }
+
+issLogFileSize OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION "This is the maximum file size in bytes of the log file"
+     DEFVAL   { 1048576 }
+
+     ::= { issSystem 109 }
+
+issLogReset   OBJECT-TYPE
+  SYNTAX      TruthValue
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION "Setting this to true ,erases the contents in configs.txt
+               fileand start logging"
+  DEFVAL  { false }
+     ::= { issSystem 110 }
+
+issLogSizeThreshold OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..99)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This is the threshold value of the Log storage space with respect
+	to the maximum Log Storage Space. It is entered as a percentage value."
+    DEFVAL   { 70 }
+    ::= { issSystem 111 }
+
+   issAutomaticPortCreate OBJECT-TYPE
+   SYNTAX      INTEGER {
+               enabled (1),
+               disabled (2)
+              }
+
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "This object is for enabling and disabling automatic
+       port create feature.When set to enabled the ports in
+       will be automatically created in RSTP module when it
+       is mapped  to a context.When set to disabled ports
+       are not created automatically and ports can be created
+       at rstp module level. "
+   DEFVAL      { enabled }
+   ::= { issSystem 112 }
+
+   issUlRemoteLogFileName OBJECT-TYPE
+   SYNTAX      DisplayString (SIZE(1..128))
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "This object is used to specify the filename/filename with path
+      to which the local file need to be copied in the remote system.
+
+      This object is useful only when the 'LogOption' is chosen as 'file'."
+   DEFVAL { "iss.log" }
+   ::= { issSystem 113 }
+
+
+   issDefaultExecTimeOut OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "This object is for configuring the default idle time out for
+       ISS Prompt (exec-time out)."
+   ::= { issSystem 114 }
+
+   issRmStackingInterfaceType OBJECT-TYPE
+   SYNTAX      INTEGER {
+               oob (1),
+               inband (2)
+              }
+
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       " This object is used to specify the type of stacking Interface used for
+         RM communication . Interface can be either an Out of Band port (or)
+         an Inband Ethernet port. This will be specified in issnvram.txt.
+
+         If an Out of Band port is used,RM Interface should be specified in
+         issnvram.txt . RM Heartbeat and synchronization messages will be
+         transmitted as IP packets. Native Linux TCP/IP stack is used to
+         achieve Transport protocol functionality.
+
+         If an Inband Ethernet port is used, RM Stack Interface will be
+         specified in Nodeid file . RM Heartbeat messages will be transmitted
+         as Ethernet packets and synchronization messages will be transmitted
+         as IP packets .Aricent TCP/IP stack is used to achieve Transport
+         protocol functionality.IP Address and the subnet Mask to be used for
+         this TCP/IP communication will be specified in NodeId file.
+
+         Configuring this object  will result in updation to issnvram.txt file.
+         The configured value will take effect in ISS on next reboot."
+
+   DEFVAL { oob }
+   ::= { issSystem 115 }
+
+
+issPeerLoggingOption OBJECT-TYPE
+   SYNTAX      INTEGER {
+               console(1),
+               file(2),
+               flash(3)
+              }
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "The Logging option specifying whether the Standby logging is to be
+       done at console or to a file(system buffer) in the system.
+       Flash specifies the logging of traces into a file."
+       DEFVAL { console }
+   ::= { issSystem 116 }
+
+issStandbyRestart OBJECT-TYPE
+SYNTAX      TruthValue
+MAX-ACCESS  read-write
+STATUS      current
+DESCRIPTION
+ " In a High Availability System, this object allows the user to  restart the
+   Standby switch (i.e) the entire Standby switch will operationally go down and
+   start again.
+
+   Setting  a value of 'true' causes the Standby switch  to be restarted. This
+   configuration will be done in the Active switch in order to restart the
+   Standby switch.
+
+   This configuration will not have any impact on the Active switch.
+   Active switch can be restarted using issRestart object."
+
+DEFVAL  { false }
+::= { issSystem 117 }
+
+issRestoreType  OBJECT-TYPE
+   SYNTAX      INTEGER {
+                msr (1),
+                csr (2)
+               }
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+
+      "Specifies whether the restoration type is MIB based save and restore
+       or CLI based save and restore.
+
+       The value 'msr' specifies that the configuration restore will be
+       in the format of MIB OID.
+
+       The value 'csr' specifies that the configuration restore will be
+       in the format of CLI commands"
+
+
+   DEFVAL  { msr }
+   ::= { issSystem 118 }
+
+issSwitchModeType  OBJECT-TYPE
+   SYNTAX	  INTEGER {
+		   cutThrough   (1),
+		   storeForward	(2)
+                   }
+   MAX-ACCESS      read-write
+   STATUS          current
+   DESCRIPTION
+      "Configures the switching mode and determines when the
+       switch begins forwarding the frame. The configuration is
+       applicable to all packets being switched or routed through
+       the switch.
+
+      When configured as store-forward, the switch stores each
+      frame until the entire frame has been received and
+      checked for cyclic redundancy check (CRC) errors before
+      forwarding them to the network.
+
+      When configured as cut-through, the switch starts forwarding
+      the frame even before receiving the entire frame as soon as
+      the destination details are read from the  packet header
+
+      The switching speed will be slower in store-forward when
+      compared to cut-through mode"
+
+
+   DEFVAL   { storeForward }
+   ::={ issSystem 119 }
+
+issHardwareSerialNumber OBJECT-TYPE
+   SYNTAX      DisplayString (SIZE(1..15))
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Serial number of the Hardware."
+      DEFVAL { "" }
+   ::= { issSystem 120 }
+
+issDlImageType OBJECT-TYPE
+   SYNTAX     INTEGER {
+                firmware (1),
+                bootloader (2)
+              }
+   MAX-ACCESS read-write
+   STATUS     current
+   DESCRIPTION
+      "To select the type of image to be downloaded."
+   DEFVAL  { firmware }
+   ::= { issSystem 121 }
+
+
+------ Config Control Group ------------------------------------
+
+issConfigCtrlTable OBJECT-TYPE
+   SYNTAX      SEQUENCE OF IssConfigCtrlEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "A table to control device features like egress traffic control,
+        stats collection, etc. either for the entire switch or for each
+        interface in the switch."
+   ::= { issConfigControl 1 }
+
+issConfigCtrlEntry OBJECT-TYPE
+   SYNTAX      IssConfigCtrlEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "An entry appears in this table for each interface in the system.
+
+       In addition to that an entry with index '0' is created in this
+       table by default.
+
+       If 'issConfigCtrlStatus' of the entry '0' is made 'valid', then
+       global control is chosen and the values against entry '0' is
+       applicable for all the interfaces of the switch.
+
+       If 'issConfigCtrlStatus' of the entry '0' is made 'invalid',
+       then interface-wise control is chosen & the values against each
+       interface index is applicable for that interface.
+
+       At a particular point of time, either global control will be
+       applicable or interface-wise control is applicable.
+       Both will not be considered together.
+
+       Index to the table is the interface index of the port."
+
+   INDEX { issConfigCtrlIndex }
+   ::= { issConfigCtrlTable 1 }
+
+IssConfigCtrlEntry ::=
+   SEQUENCE {
+      issConfigCtrlIndex
+         Integer32,
+      issConfigCtrlEgressStatus
+         INTEGER,
+      issConfigCtrlStatsCollection
+         INTEGER,
+      issConfigCtrlStatus
+         INTEGER
+  }
+
+issConfigCtrlIndex OBJECT-TYPE
+   SYNTAX      Integer32 (0..65535)
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "Interface index of the port for which the configuration
+      in this entry applies.
+
+      If any configuration is made in this table for the index '0',
+      that configuration will be considered as global configuration
+      and is applicable for all the interfaces of the switch."
+   ::= { issConfigCtrlEntry 1 }
+
+issConfigCtrlEgressStatus OBJECT-TYPE
+   SYNTAX      INTEGER {
+               enabled (1),
+               disabled (2)
+              }
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "Controls the transmission of egress traffic over this interface.
+
+       This value for entry '0' controls the egress traffic over all
+       interfaces."
+   DEFVAL  { enabled }
+   ::= { issConfigCtrlEntry 2 }
+
+
+issConfigCtrlStatsCollection OBJECT-TYPE
+   SYNTAX      INTEGER {
+               enabled (1),
+               disabled (2)
+              }
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "Enables or disables statistics collection for this interface.
+
+       This value for entry '0' controls the stats collection for all
+       interfaces."
+   DEFVAL  { enabled }
+   ::= { issConfigCtrlEntry 3 }
+
+issConfigCtrlStatus OBJECT-TYPE
+   SYNTAX      INTEGER {
+               valid (1),
+               invalid (2)
+              }
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "Speficies the validity of the entry.
+
+       If the 'Config Control Status' for entry '0' is made 'valid',
+       then global control is chosen in the system.
+       It signifies that the values against entry '0' is applicable
+       for all the interfaces of the switch.
+
+       If the 'Config Control Status' for entry '0' is made 'invalid',
+       then interface-wise control is chosen.
+       Then the values against each interface index is applicable
+       for that interface.
+
+       By default, 'issConfigCtrlStatus' will be 'invalid' for
+       entry '0' and 'valid' for all other entries.
+       (ie) by default, interface-wise configuration is enabled
+       in the system.
+
+       The status of entries other than the zeroth(0th) entry can not be
+       made 'invalid'."
+   ::= { issConfigCtrlEntry 4 }
+
+
+-- Port Control Table
+
+issPortCtrlTable OBJECT-TYPE
+   SYNTAX      SEQUENCE OF IssPortCtrlEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "A table to control the port specific parameters of the device like speed,
+        duplex mode, etc."
+   ::= { issConfigControl 2 }
+
+issPortCtrlEntry OBJECT-TYPE
+   SYNTAX      IssPortCtrlEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "An entry appears in this table for each interface in the system.
+
+       Index to the table is the interface index of the port."
+
+   INDEX { issPortCtrlIndex }
+   ::= { issPortCtrlTable 1 }
+
+IssPortCtrlEntry ::=
+   SEQUENCE {
+      issPortCtrlIndex
+         Integer32,
+      issPortCtrlMode
+         INTEGER,
+      issPortCtrlDuplex
+         INTEGER,
+      issPortCtrlSpeed
+         INTEGER,
+      issPortCtrlFlowControl
+         INTEGER,
+      issPortCtrlRenegotiate
+         INTEGER,
+      issPortCtrlMaxMacAddr
+         Integer32,
+      issPortCtrlMaxMacAction
+          INTEGER,
+      issPortHOLBlockPrevention
+         INTEGER,
+      issPortAutoNegAdvtCapBits
+         OCTET STRING,
+      issPortCpuControlledLearning
+         INTEGER,
+      issPortMdiOrMdixCap
+         INTEGER,
+      issPortCtrlFlowControlMaxRate
+         Integer32,
+      issPortCtrlFlowControlMinRate
+         Integer32
+}
+
+issPortCtrlIndex OBJECT-TYPE
+   SYNTAX      Integer32 (1..65535)
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "Interface index of the port for which the configuration
+      in this entry applies."
+
+   ::= { issPortCtrlEntry 1 }
+
+issPortCtrlMode OBJECT-TYPE
+   SYNTAX      INTEGER {
+                 auto          (1),
+                 noNegotiation (2)
+              }
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "Speficies the mode in which the speed, duplex modes and flow control
+       of the interface is determined.
+
+       If set as 'auto', the hardware senses speed and negotiates with the port
+       on the other end of the link for data transfer operation as
+       'full-duplex' or 'half-duplex' and about flow contol.
+
+       If set as 'nonegotiation', the configured values for interface
+       speed, duplex mode and flow control will be effective."
+
+   DEFVAL  { auto }
+   ::= { issPortCtrlEntry 2 }
+
+issPortCtrlDuplex OBJECT-TYPE
+   SYNTAX      INTEGER {
+                 full  (1),
+                 half  (2)
+              }
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "Configures interface data transfer mode as full-duplex or half-duplex.
+
+      This object can be configured only if the 'PortCtrlMode' is 'nonegotiation'.
+      If the 'PortCtrlMode' is 'auto', it obtains the value from Hardware
+      after negotiating  with its peer"
+
+   ::= { issPortCtrlEntry 3 }
+
+issPortCtrlSpeed OBJECT-TYPE
+   SYNTAX      INTEGER {
+                 tenMBPS     (1),
+                 hundredMBPS (2),
+                 oneGB       (3),
+                 tenGB       (4),
+                 fortyGB     (5),
+		 fiftyGB  (6),
+		 twothousandfivehundredMBPS       (7),
+         twentyfiveGB (8),
+         onehundredGB (9)
+              }
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "Configures interface speed.
+
+      This object can be configured only if the 'PortCtrlMode' is 'nonegotiation'.
+      If the 'PortCtrlMode' is 'auto', it obtains the value from Hardware
+      after negotiating  with its peer"
+
+   ::= { issPortCtrlEntry 4 }
+
+issPortCtrlFlowControl OBJECT-TYPE
+   SYNTAX      INTEGER {
+                 enable     (1),
+                 disable    (2)
+              }
+   MAX-ACCESS  read-write
+   STATUS      deprecated
+   DESCRIPTION
+      "Enables / disables flow control for the interface.
+
+      This object be configured only if the 'PortCtrlMode' is 'nonegotiation'.
+      If the 'PortCtrlMode' is 'auto', it obtains the value from Hardware
+      after negotiating  with its peer.
+
+      Since this object is deprecated, corresponding functionality can be
+      realised by dot3PauseAdminMode from stdether.mib"
+
+   ::= { issPortCtrlEntry 5 }
+
+issPortCtrlRenegotiate OBJECT-TYPE
+   SYNTAX      TruthValue
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "When configured as 'true', restarts autonegotiation on the interface.
+
+       Once autonegotiation is restarted, the value of this object reverts
+       to 'false'."
+
+   DEFVAL  { false }
+   ::= { issPortCtrlEntry 6 }
+
+issPortCtrlMaxMacAddr OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "Specifies the maximum number of new MAC addresses that can be
+      learnt over the interface."
+   ::= { issPortCtrlEntry 7 }
+
+issPortCtrlMaxMacAction OBJECT-TYPE
+   SYNTAX      INTEGER {
+                  drop     (1),
+                  purgeLRU (2)
+               }
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "Specifies the action to be taken when the maximum number of new MAC
+      addresses that can be learnt over the interface is exceeded.
+
+      If the action is 'drop', the packet with new mac address will be
+      dropped once the maximum number of new MAC addresses that can be
+      learnt over the interface is exceeded.
+
+      If the action is 'purgeLRU', the 'Least Recently Used' mac address
+      will be deleted from the MAC table and the new mac address will be
+      added."
+   ::= { issPortCtrlEntry 8 }
+
+issPortHOLBlockPrevention OBJECT-TYPE
+   SYNTAX       INTEGER {
+                   disabled  (1),
+                   enabled   (2)
+                }
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "Enables or disables Head-Of-Line Blocking prevention on a port."
+   DEFVAL  { enabled }
+   ::= { issPortCtrlEntry 9 }
+issPortAutoNegAdvtCapBits OBJECT-TYPE
+   SYNTAX      OCTET STRING
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "A value uniquely identifies the set of capabilities advertised
+       by the local auto negotiation entity other than the standard
+       capabilities supported by ifMauAutoNegCapAdvertisedBits.
+       When this object is needed to be configured, one of the capabilities
+       from the standard object should be set to bOther."
+   ::= { issPortCtrlEntry 10 }
+
+issPortCpuControlledLearning OBJECT-TYPE
+   SYNTAX       INTEGER {
+                   disabled  (1),
+                   enabled   (2)
+                }
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "Enables or disables the CPU controlled learning on a port.
+       The default behavior is hardware learning. By enabling this object
+       software learning on that particular port is enabled.
+
+       When CPU controlled learning is enabled, for the first time, packet
+       will be copied to CPU and source MAC address learning will not happen
+       in the hardware. When packet is received at PNAC - if the source MAC
+       address is authorized, the packet will be allowed to go through further
+       processing. Else, the packet will be dropped.  When packets from
+       authorized MAC address are received at VLAN, MAC learning will happen
+       at VLAN and the same entry will be programmed in the hardware. Once the
+       MAC address is learnt, further forwarding will happen at driver itself.
+
+       The Mac address entries which are added through software learning are
+       checked in periodical intervals for the HIT entry. If there is no
+       traffic for that entry, the HIT flag won't be set. The entry will be
+       removed from the hardware if the hit flag is not set.
+       Note: When software learning is enabled, rate limiting to the port
+       needs to be configured"
+
+   DEFVAL  { disabled }
+   ::= { issPortCtrlEntry 11 }
+
+issPortMdiOrMdixCap OBJECT-TYPE
+   SYNTAX       INTEGER {
+                   auto (1),
+                   mdi  (2),
+                   mdix (3)
+                }
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "Specifies the port should be in Auto-Mdix mode or Mdi/Mdix.
+
+       Setting the value to `auto` enables the Auto MDIX in the port -
+       issPortCtrlIndex. This will be effective only when the speed of the
+       particular port is auto negotiable.
+
+       Setting the value to `mdi` disables the Auto MDIX in the port and the
+       port will be in mdi mode.
+
+       Setting the value to `mdix` disables the Auto MDIX in the port and the
+       port will be in mdix mode."
+   DEFVAL  { auto }
+   ::= { issPortCtrlEntry 12 }
+
+issPortCtrlFlowControlMaxRate OBJECT-TYPE
+   SYNTAX      Integer32 (0..80000000)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "Configures the maximum rate (kbps) - a high water mark beyond which
+      pause frames will be generated to flow control the ingress traffic.
+      This value should be set to 0 if no pause frame generation is required.
+      In chipsets that does not support seperate rate configuration for
+      pause frame generation, this object's value will take effect on
+      the interface ingress speed."
+   ::= { issPortCtrlEntry 13 }
+
+issPortCtrlFlowControlMinRate OBJECT-TYPE
+   SYNTAX      Integer32 (0..80000000)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "Configures the minimum rate (kbps) - a low water mark below which pause
+      frames generation will be stopped. This value should be set to a value
+      lesser that of 'issPortCtrlFlowControlMaxRate'. This value should be set
+      to zero only when flow control is disabled. Chipsets on which this low
+      water mark is not supported, the 'issPortCtrlFlowControlMaxRate' will
+      alone be used."
+   ::= { issPortCtrlEntry 14 }
+
+-- ------------------------------------------------------------------
+-- Port Isolation Table
+-- ------------------------------------------------------------------
+
+issPortIsolationTable    OBJECT-TYPE
+     SYNTAX        SEQUENCE OF IssPortIsolationEntry
+     MAX-ACCESS    not-accessible
+     STATUS        current
+     DESCRIPTION
+     "This table is used to configure the port isolation feature.
+      For a given port, user can configure the list of allowed
+      forwarding/egress ports, where the packets for particular vlan that
+      ingress the port can be forwarded. If the Vlan is not given, then
+      the rule will be applied for all packets that ingress the given port.
+
+      This table can be configured only for physical and link aggregated
+      ports.
+
+      Before a packet is sent out of a port (after all L2/L3 processing), port
+      isolation table entry is referred for the ingress port of that packet.
+      If an entry is present for that ingress port and if the outgoing port
+      is configured as one of the egress ports , then the packet
+      will be transmitted out of that outgoing port. Otherwise the packet
+      will be dropped.
+
+      If there is no entry configured for that ingress port in this
+      table, then the packet will be transmitted on that outgoing port."
+      ::= { issConfigControl 3 }
+
+issPortIsolationEntry    OBJECT-TYPE
+     SYNTAX              IssPortIsolationEntry
+     MAX-ACCESS          not-accessible
+     STATUS              current
+     DESCRIPTION
+     "Each etnry in this table gives a ingress port to egress port mapping."
+     INDEX { issPortIsolationIngressPort, issPortIsolationInVlanId, issPortIsolationEgressPort}
+     ::= { issPortIsolationTable 1 }
+
+IssPortIsolationEntry ::=
+     SEQUENCE {
+        issPortIsolationIngressPort
+           InterfaceIndex,
+        issPortIsolationInVlanId
+           Integer32,
+        issPortIsolationEgressPort
+           InterfaceIndex,
+	issPortIsolationStorageType
+	   StorageType,
+        issPortIsolationRowStatus
+           RowStatus
+     }
+
+issPortIsolationIngressPort        OBJECT-TYPE
+    SYNTAX            InterfaceIndex
+    MAX-ACCESS        not-accessible
+    STATUS            current
+    DESCRIPTION
+      "This object speficies the IfIndex of the ingress port. This port can
+       be a physical or link aggregated port."
+    ::= { issPortIsolationEntry 1 }
+
+issPortIsolationInVlanId        OBJECT-TYPE
+    SYNTAX            Integer32 (0..4094)
+    MAX-ACCESS        not-accessible
+    STATUS            current
+    DESCRIPTION
+      "If this object value is non-zero, then the port isolation rule is
+       applied for all packets received on the given ingress port.
+       Otherwise the rule is applied for this vlan packets received on the
+       given ingress port."
+    ::= { issPortIsolationEntry 2 }
+
+issPortIsolationEgressPort OBJECT-TYPE
+    SYNTAX          InterfaceIndex
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+       "This object specifies one of the allowed egress ports for the given
+        ingress port identified by the first index for this row.
+        This port can be either a physical or link aggregated port."
+    ::= { issPortIsolationEntry 3 }
+
+issPortIsolationStorageType OBJECT-TYPE
+    SYNTAX      StorageType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "Indicates the storage type of this entry.
+         Only 'volatile' and 'nonVolatile' values are allowed for this object.
+	 'readOnly', 'permenant' and 'other' values are not allowed for this
+         object.
+
+         If this table is configured for an ingress port and InVlanId via
+         management, then the issPortIsolationStorageType for all the entries
+         with this ingress port as primary index and this InVlanId as
+         secondary index will have the values as 'nonVolatile'.
+         Otherwise it will be set to 'volatile'.
+
+         Entries in this table will be restored on reboot, only if the
+         corresponding issPortIsolationStorageType object is set as
+         nonVolatile."
+    ::= { issPortIsolationEntry 4 }
+
+
+issPortIsolationRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+    "Denotes the Row Status for port isolation table entry.
+     Only 'CreateAndGo' and 'destroy' values are allowed for this
+     object. 'CreateAndWait' and 'notInService' values are not allowed.
+     Example:
+        To add ports 2, 3 as egress ports for ingress port 1 in this table,
+        the following sequence to be followed:
+
+           1. Set the issPortIsolationRowStatus as 'CreateAndGo' for the
+              entry with index
+              (issPortIsolationIngressPort = 1, issPortIsolationInVlanId =0,
+               issPortIsolationEgressPort = 2)
+           2. Set the issPortIsolationRowStatus as 'CreateAndGo' for the
+              entry with index
+              (issPortIsolationIngressPort = 1, issPortIsolationInVlanId =0,
+               issPortIsolationEgressPort = 3)
+
+        To add ports 5, 6 as egress ports for ingress port 7 and for vlan 5
+        in this table, the following sequence to be followed:
+
+           1. Set the issPortIsolationRowStatus as 'CreateAndGo' for the
+              entry with index
+              (issPortIsolationIngressPort = 7, issPortIsolationInVlanId =5,
+               issPortIsolationEgressPort = 5)
+           2. Set the issPortIsolationRowStatus as 'CreateAndGo' for the
+              entry with index
+              (issPortIsolationIngressPort = 7, issPortIsolationInVlanId =5,
+               issPortIsolationEgressPort = 6)
+
+        To delete a egress port 3 from the list of egress ports for ingress
+        port 1 do the following:
+              Set the issPortIsolationRowStatus as 'destroy' for the
+              entry with index
+              (issPortIsolationIngressPort = 1, issPortIsolationEgressPort = 3)"
+
+    ::= { issPortIsolationEntry 5 }
+
+-- Mirror Group ------------------------------------------------------
+
+issMirrorStatus OBJECT-TYPE
+   SYNTAX      INTEGER {
+                  disabled      (1),
+                  enabled       (2)
+               }
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "This object is used to enable/disable mirroring
+        feature in hardware.
+        When set to 'disabled (1)', all mirroring configurations will be
+        removed from hardware.
+        When set to 'enabled (2)', all mirroring configurations
+        present in software will be programmed in hardware."
+
+   DEFVAL  { enabled }
+   ::= { issMirror 1 }
+
+issMirrorToPort OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+         "Specifies the port to which the active mirrored traffic controlled
+         by issMirrorCtrlTable is to be copied."
+   ::= { issMirror 2 }
+
+-- Mirror Control Table
+
+issMirrorCtrlTable OBJECT-TYPE
+   SYNTAX      SEQUENCE OF IssMirrorCtrlEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A table to control mirroring features for each interface
+       in the switch.
+
+       Parameters in this table are valid only when the
+       'issMirrorStatus' for the switch is not 'disabled'."
+   ::= { issMirror 3 }
+
+issMirrorCtrlEntry OBJECT-TYPE
+   SYNTAX      IssMirrorCtrlEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "An entry appears in this table for each interface
+        in the system."
+   INDEX { issMirrorCtrlIndex }
+   ::= { issMirrorCtrlTable 1 }
+
+IssMirrorCtrlEntry ::=
+   SEQUENCE {
+      issMirrorCtrlIndex
+         Integer32,
+      issMirrorCtrlIngressMirroring
+         INTEGER,
+      issMirrorCtrlEgressMirroring
+         INTEGER,
+      issMirrorCtrlStatus
+         INTEGER
+  }
+
+issMirrorCtrlIndex OBJECT-TYPE
+   SYNTAX      Integer32 (1..65535)
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "The interface index of the port for which the configuration
+      in this entry applies."
+   ::= { issMirrorCtrlEntry 1 }
+
+issMirrorCtrlIngressMirroring OBJECT-TYPE
+   SYNTAX      INTEGER {
+               enabled(1),
+               disabled(2)
+               }
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "Provides control to enable or disable mirroring of ingress
+        traffic over this interface to the mirrored-to port."
+   DEFVAL  { disabled }
+   ::= { issMirrorCtrlEntry 2 }
+
+issMirrorCtrlEgressMirroring OBJECT-TYPE
+   SYNTAX      INTEGER {
+               enabled(1),
+               disabled(2)
+              }
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "Provides control to enable or disable mirroring of egress
+        traffic over this interface to the mirrored-to port."
+   DEFVAL  { disabled }
+   ::= { issMirrorCtrlEntry 3 }
+
+issMirrorCtrlStatus OBJECT-TYPE
+   SYNTAX      INTEGER {
+               valid(1),
+               invalid(2)
+              }
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "Specifies the validity of the entry."
+   ::= { issMirrorCtrlEntry 4 }
+
+-- Mirror Control Extension Table
+
+issMirrorCtrlRemainingSrcRcrds OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Specifies the number of source records remaining in the system.
+       Each record can store at least one source information. In case
+       consecutive source id are configured then record will store the range"
+   ::= { issMirror 4 }
+
+issMirrorCtrlRemainingDestRcrds OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Specifies the number of destination records remaining in the system.
+       Each record can store at least one destination information. In case
+       consecutive destination id are configured then record will store the
+       range"
+   ::= { issMirror 5 }
+
+issMirrorCtrlExtnTable OBJECT-TYPE
+   SYNTAX      SEQUENCE OF IssMirrorCtrlExtnEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "This Table is used to configure advanced mirroring features like
+       - Port Based Mirroring:
+       - flow based mirroring
+       - vlan based mirroring
+
+            Following are the configuration details for Port based mirroring:
+                To configure source ports in a session
+               - issMirrorCtrlExtnMirrType - is set to portBased
+               - issMirrorCtrlExtnSrcTable - should be used to configure list
+                                             of source ports to be mirrored
+                                             in a session
+               - issMirrorCtrlExtnSrcId  - represents the source port.
+                                           The port Id to be mirrored
+                                           should be given here.
+               - issMirrorCtrlExtnSrcCfg - this object is used to
+                                           add/remove a port in the
+                                           source port list
+
+               Example
+               To create a session 1 with source ports 5,6 following
+               sequence of configuration should be followed
+               For table issMirrorCtrlExtnTable
+               issMirrorCtrlExtnSessionIndex = 1 as index
+               issMirrorCtrlExtnMirrType = portBased
+
+               For table issMirrorCtrlExtnSrcTable
+               issMirrorCtrlExtnSessionIndex = 1 as index
+               issMirrorCtrlExtnSrcId  = 5 as index
+               issMirrorCtrlExtnSrcCfg = add
+               issMirrorCtrlExtnSessionIndex = 1 as index
+               issMirrorCtrlExtnSrcId  = 6 as index
+               issMirrorCtrlExtnSrcCfg = add
+
+               To configure destination ports in a session
+                - issMirrorCtrlExtnDestinationTable - should be used to
+                                                      configure list of
+                                                      destination ports to be
+                                                      mirrored in a session
+                    - issMirrorCtrlExtnDestination  - represents the
+                                                      destination port. The
+                                                      port Id to which packets
+                                                      should be mirrored should
+                                                      be given here.
+                    - issMirrorCtrlExtnDestCfg - this object is used to
+                                                 add/remove a port in the
+                                                 source port list.
+                    Example
+                    To create a session 1 with destination port 10,11 following
+                    sequence of configuration should be followed
+                    For table issMirrorCtrlExtnTable
+                    issMirrorCtrlExtnSessionIndex = 1 as index
+                    issMirrorCtrlExtnMirrType = portBased
+
+                    For table issMirrorCtrlExtnDestinationTable
+                    issMirrorCtrlExtnSessionIndex = 1 as index
+                    issMirrorCtrlExtnDestination  = 10 as index
+                    issMirrorCtrlExtnDestCfg = add
+                    issMirrorCtrlExtnSessionIndex = 1 as index
+                    issMirrorCtrlExtnDestination  = 11 as index
+                    issMirrorCtrlExtnDestCfg = add
+
+               To Activate a session
+                - issMirrorCtrlExtnStatus - should be used to
+                                            activate/deactivate mirroring for a
+                                            session
+                    Example
+                    To enable mirroring for a session following sequence of
+                    configuration should be followed
+                    For table issMirrorCtrlExtnTable
+                    issMirrorCtrlExtnSessionIndex = 1 as index
+                    issMirrorCtrlExtnStatus = active
+
+                Above configurations applies to flow based mirroring also, the
+                issMirrorCtrlExtnSrcId used above for configuratin ports
+                should be used to configure flow Id
+
+               To enable remote monitoring of sources for a session
+                - issMirrorCtrlExtnRSpanStatus - should be used to
+                                                 enable/disable remote
+                                                 monitoring for a session
+                                                 it can be used to set a
+                                                 session as source rspan
+                                                 session which implies source
+                                                 entities for this session are
+                                                 monitored remotely or can be
+                                                 used to set a session
+                                                 as destination rspan session
+                                                 which implies that mirrored
+                                                 data is received for this
+                                                 session should be forwarded to
+                                                 destination entities of this
+                                                 session
+                - issMirrorCtrlExtnRSpanVlanId - it is the vlan id which is
+                                                 reserved in the network to
+                                                 carry Mirrored data,if the
+                                                 session is configured as
+                                                 source rspan session then data
+                                                 mirrored for the source
+                                                 entities will be forwarded on
+                                                 this vlan if the session is
+                                                 configured as destination
+                                                 rspan session then data
+                                                 received on this vlan will be
+                                                 forwarded to the destination
+                                                 entities of this session
+
+            Following are the configuration details for configurating Vlan
+            based mirroring:
+                To configure vlans as source for a session
+               - issMirrorCtrlExtnMirrType - is set to vlanBased
+               - issMirrorCtrlExtnSrcVlanTable - should be used to configure
+                                                 list of source vlans to be
+                                                 mirrored in a session
+                 - issMirrorCtrlExtnSrcVlanId  - represents a source vlan. The
+                                                 vlan to be mirrored should be
+                                                 given here.
+                 - issMirrorCtrlExtnSrcVlanCfg - this object is used to
+                                                 add/remove a vlan in the
+                                                 source vlan list
+                    Example
+                    To create a session 1 with source list as vlan 5,6
+                    belonging to context 1 following sequence of configuration
+                    should be followed
+                    For table issMirrorCtrlExtnTable
+                    issMirrorCtrlExtnSessionIndex = 1 as index
+                    issMirrorCtrlExtnMirrType = vlanBased
+
+                    For table issMirrorCtrlExtnSrcVlanTable
+                    issMirrorCtrlExtnSrcVlanContext = 1 as index
+                    issMirrorCtrlExtnSessionIndex = 1 as index
+                    issMirrorCtrlExtnSrcVlanId  = 5 as index
+                    issMirrorCtrlExtnSrcVlanCfg = add
+                    issMirrorCtrlExtnSrcVlanContext = 1 as index
+                    issMirrorCtrlExtnSessionIndex = 1 as index
+                    issMirrorCtrlExtnSrcVlanId  = 6 as index
+                    issMirrorCtrlExtnSrcVlanCfg = add
+
+       Entries for this table can be configured only when issMirrorStatus
+       is set to enabled.
+       Configurations done through 'issMirrorCtrlTable' will change the
+       following for the first session on this table:
+            - Mirroring type will be changed to port-based
+            - Mode and Source entities will be overwritten
+              with the values configured through 'issMirrorCtrlTable'
+            - Destination entities will be overwritten
+              with the value configured through 'issMirrorToPort' object "
+   ::= { issMirror 6 }
+
+issMirrorCtrlExtnEntry OBJECT-TYPE
+   SYNTAX      IssMirrorCtrlExtnEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "An entry appears in this table for each session
+        in the system."
+   INDEX { issMirrorCtrlExtnSessionIndex}
+   ::= { issMirrorCtrlExtnTable 1 }
+
+IssMirrorCtrlExtnEntry ::=
+   SEQUENCE {
+      issMirrorCtrlExtnSessionIndex
+         Integer32,
+      issMirrorCtrlExtnMirrType
+         INTEGER,
+      issMirrorCtrlExtnRSpanStatus
+         INTEGER,
+      issMirrorCtrlExtnRSpanVlanId
+         Integer32,
+      issMirrorCtrlExtnRSpanContext
+         Integer32,
+      issMirrorCtrlExtnStatus
+         RowStatus
+  }
+
+issMirrorCtrlExtnSessionIndex OBJECT-TYPE
+   SYNTAX      Integer32 (1..20)
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "The index of the mirroring session for which the configuration
+      in this entry applies."
+   ::= { issMirrorCtrlExtnEntry 1 }
+
+issMirrorCtrlExtnMirrType OBJECT-TYPE
+     SYNTAX       INTEGER{
+                    portBased(1),
+                    mac-flowBased(2),
+                    vlanBased(3),
+                    invalid(4),
+                    ip-flowBased(5)
+     }
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+         "This object tells the type of mirroring this session supports.
+          This object needs to be set before doing any configuration for
+          a mirroring session"
+     DEFVAL       { invalid }
+     ::= { issMirrorCtrlExtnEntry 2 }
+
+issMirrorCtrlExtnRSpanStatus OBJECT-TYPE
+     SYNTAX       INTEGER{
+                    sourceRSpanVlan(1),
+                    destinationRSpanVlan(2),
+                    disabled(3)
+     }
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+         "This object indicates session is enabled or disabled for
+         Remote monitoring.
+         If set as 'source-rspan-vlanid' indicates that the session is
+         enabled for Remote monitoring and the source entities for this
+         session will be remotely monitored.
+         If set as 'destination-rspan-vlanid' indicates that the session
+         should monitor remote traffic mirrored with RSPAN VLAN ID tag.
+         RSPAN VLAN ID should be configured through object
+         'issMirrorCtrlExtnRSpanVlanId'.
+         If set as 'disabled' Remote monitoring is disabled for this
+         mirroring session."
+
+     DEFVAL       { disabled }
+     ::= { issMirrorCtrlExtnEntry 3 }
+
+issMirrorCtrlExtnRSpanVlanId OBJECT-TYPE
+     SYNTAX       Integer32
+     MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "Vlan Id used for Remote monitoring for this session.
+         If issMirrorCtrlExtnRSpanStatus is set to disabled, then
+         this object will have an invalid value (zero)"
+     DEFVAL { 0 }
+     ::= { issMirrorCtrlExtnEntry 4 }
+
+issMirrorCtrlExtnRSpanContext OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "Specifies the Context Id to which the RSpan Vlan belongs.
+        Value '0' mean this object is not considered for this
+        mirroring session."
+   DEFVAL  { 0 }
+     ::= { issMirrorCtrlExtnEntry 5 }
+
+issMirrorCtrlExtnStatus OBJECT-TYPE
+   SYNTAX      RowStatus
+   MAX-ACCESS  read-create
+   STATUS      current
+   DESCRIPTION
+      "This object indicates the status of the entry. The entry can be
+       made active only if issMirrorCtrlExtnMirrType is configured and
+       source and destination entries for this sesion is also configured"
+   ::= { issMirrorCtrlExtnEntry 6 }
+
+issMirrorCtrlExtnSrcTable OBJECT-TYPE
+   SYNTAX      SEQUENCE OF IssMirrorCtrlExtnSrcEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A table to configure list of source entities for mirroring sessions"
+   ::= { issMirror 7 }
+
+issMirrorCtrlExtnSrcEntry OBJECT-TYPE
+   SYNTAX      IssMirrorCtrlExtnSrcEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "An entry appears in this table for each mirroring session."
+   INDEX { issMirrorCtrlExtnSessionIndex, issMirrorCtrlExtnSrcId }
+   ::= { issMirrorCtrlExtnSrcTable 1 }
+
+IssMirrorCtrlExtnSrcEntry ::=
+   SEQUENCE {
+      issMirrorCtrlExtnSrcId
+         Integer32,
+      issMirrorCtrlExtnSrcCfg
+         INTEGER,
+      issMirrorCtrlExtnSrcMode
+         INTEGER
+   }
+
+issMirrorCtrlExtnSrcId OBJECT-TYPE
+   SYNTAX      Integer32 (1..65535)
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "Specifies the source id which participates in a mirroring session.
+        For Port based mirroring this object can be port IfIndex.
+        To mirror Tunnel and Trunk ports the same Id can be used for
+        specifying Tunnel/Trunk Id.
+        For Flow based mirroring this object can be Acl Ids."
+   ::= { issMirrorCtrlExtnSrcEntry 1 }
+
+issMirrorCtrlExtnSrcCfg OBJECT-TYPE
+   SYNTAX      INTEGER{
+                add(1),
+                delete(2)
+               }
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "This object is used to create/delete a source entry for a session."
+   ::= { issMirrorCtrlExtnSrcEntry 2 }
+
+issMirrorCtrlExtnSrcMode OBJECT-TYPE
+   SYNTAX      INTEGER {
+               ingress(1),
+               egress(2),
+               both(3),
+               disable(4)
+              }
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "Provides control to set the mode of mirroring.
+        It can be ingress, egress, both or disable."
+   DEFVAL  { both }
+   ::= { issMirrorCtrlExtnSrcEntry 3 }
+
+issMirrorCtrlExtnSrcVlanTable OBJECT-TYPE
+   SYNTAX      SEQUENCE OF IssMirrorCtrlExtnSrcVlanEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A table to configure list of vlan source entities for mirroring sessions"
+   ::= { issMirror 8 }
+
+issMirrorCtrlExtnSrcVlanEntry OBJECT-TYPE
+   SYNTAX      IssMirrorCtrlExtnSrcVlanEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "An entry appears in this table for each mirroring session."
+   INDEX { issMirrorCtrlExtnSessionIndex, issMirrorCtrlExtnSrcVlanContext, issMirrorCtrlExtnSrcVlanId }
+   ::= { issMirrorCtrlExtnSrcVlanTable 1 }
+
+IssMirrorCtrlExtnSrcVlanEntry ::=
+   SEQUENCE {
+      issMirrorCtrlExtnSrcVlanContext
+         Integer32,
+      issMirrorCtrlExtnSrcVlanId
+         Integer32,
+      issMirrorCtrlExtnSrcVlanCfg
+         INTEGER,
+      issMirrorCtrlExtnSrcVlanMode
+         INTEGER
+   }
+
+issMirrorCtrlExtnSrcVlanContext OBJECT-TYPE
+   SYNTAX      Integer32 (1..64)
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "Specifies the Context Id to which the source entity belongs, this
+       is used in case of specifying vlan as source.
+       Value '-1' mean this object is not considered for this mirroring
+       session."
+   ::= { issMirrorCtrlExtnSrcVlanEntry 1 }
+
+issMirrorCtrlExtnSrcVlanId OBJECT-TYPE
+   SYNTAX      Integer32 (1..4094)
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "Specifies the Vlan id which participates in a mirroring session."
+   ::= { issMirrorCtrlExtnSrcVlanEntry 2 }
+
+issMirrorCtrlExtnSrcVlanCfg OBJECT-TYPE
+   SYNTAX      INTEGER{
+                add(1),
+                delete(2)
+               }
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "This object is used to create/delete a vlan entry for a session."
+   ::= { issMirrorCtrlExtnSrcVlanEntry 3 }
+
+issMirrorCtrlExtnSrcVlanMode OBJECT-TYPE
+   SYNTAX      INTEGER {
+               ingress(1),
+               egress(2),
+               both(3)
+              }
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "Provides control to set the mode of mirroring.
+        It can be ingerss,Egress or Both."
+   DEFVAL  { both }
+   ::= { issMirrorCtrlExtnSrcVlanEntry 4 }
+
+issMirrorCtrlExtnDestinationTable OBJECT-TYPE
+   SYNTAX      SEQUENCE OF IssMirrorCtrlExtnDestinationEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A table to configure list of destination entities"
+   ::= { issMirror 9 }
+
+issMirrorCtrlExtnDestinationEntry OBJECT-TYPE
+   SYNTAX      IssMirrorCtrlExtnDestinationEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "An entry appears in this table for each destination entity
+        in a mirroring session."
+   INDEX { issMirrorCtrlExtnSessionIndex, issMirrorCtrlExtnDestination }
+   ::= { issMirrorCtrlExtnDestinationTable 1 }
+
+IssMirrorCtrlExtnDestinationEntry ::=
+   SEQUENCE {
+      issMirrorCtrlExtnDestination
+         Integer32,
+      issMirrorCtrlExtnDestCfg
+         INTEGER
+   }
+
+issMirrorCtrlExtnDestination OBJECT-TYPE
+   SYNTAX      Integer32 (1..65535)
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "Specifies the destination port id which participates in a mirroring
+        session."
+   ::= { issMirrorCtrlExtnDestinationEntry 1 }
+
+issMirrorCtrlExtnDestCfg OBJECT-TYPE
+   SYNTAX      INTEGER{
+                add (1),
+                delete (2)
+               }
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "This object is used to create/delete a destination entry for a session."
+   ::= { issMirrorCtrlExtnDestinationEntry 2 }
+
+issCpuMirrorType OBJECT-TYPE
+   SYNTAX      INTEGER {
+                ingress (1),
+                egress  (2),
+                both    (3),
+                disable (4)
+               }
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "This object is used to set the type of mirroring
+        to be done for CPU traffic.
+        When set to 'ingress(1)', enables mirroring of ingress
+        traffic over CPU port to the CPU mirrored-to port
+        specified in 'issCpuMirrorToPort'.
+        When set to 'egress(2)', enables mirroring of egress
+        traffic over CPU port to the CPU mirrored-to port.
+        specified in 'issCpuMirrorToPort'.
+        When set to 'both(3)', enables mirroring of egress and ingress
+        traffic over CPU port to the CPU mirrored-to port
+        specified in 'issCpuMirrorToPort'.
+        When set to 'disable(4)', CPU mirroring configuration will be
+        removed."
+
+   DEFVAL  { disable }
+   ::= { issMirror 10 }
+
+issCpuMirrorToPort OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+         "This object specifies the physical port to which the CPU traffic specified
+         by issCpuMirrorType are mirrored."
+   DEFVAL  { 0 }
+   ::= { issMirror 11 }
+
+-- ------------------------------------------------------------------
+-- IP Authorized Manager
+
+issIpAuthMgrTable OBJECT-TYPE
+   SYNTAX      SEQUENCE OF IssIpAuthMgrEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "A table to configure IP authorized managers in the system."
+   ::= { issIpAuthMgr 1 }
+
+issIpAuthMgrEntry OBJECT-TYPE
+   SYNTAX      IssIpAuthMgrEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "Each entry in this table represents rules for particular
+        IP authorized manager."
+   INDEX { issIpAuthMgrIpAddr, issIpAuthMgrIpMask }
+   ::= { issIpAuthMgrTable 1 }
+
+IssIpAuthMgrEntry ::=
+   SEQUENCE {
+      issIpAuthMgrIpAddr
+         IpAddress,
+      issIpAuthMgrIpMask
+         IpAddress,
+      issIpAuthMgrPortList
+         PortList,
+      issIpAuthMgrVlanList
+         OCTET STRING,
+      issIpAuthMgrOOBPort
+         TruthValue,
+      issIpAuthMgrAllowedServices
+         Integer32,
+      issIpAuthMgrRowStatus
+         RowStatus
+ }
+
+issIpAuthMgrIpAddr OBJECT-TYPE
+   SYNTAX      IpAddress
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "Specifies either the Network or Host address from which the switch
+        can be managed.
+        An address 0.0.0.0 indicates 'Any Manager'."
+   ::= { issIpAuthMgrEntry 1 }
+
+issIpAuthMgrIpMask OBJECT-TYPE
+   SYNTAX      IpAddress
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "Specifies the IP address mask to be applied on issIpAuthMgrIpAddr.
+        Value 0.0.0.0 indicates mask for 'Any Manager'."
+   ::= { issIpAuthMgrEntry 2 }
+
+issIpAuthMgrPortList OBJECT-TYPE
+   SYNTAX       PortList
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION
+       "Specifies the port numbers through which the authorized manager can
+        access the switch.
+
+        By default the authorized manager is allowed to access the switch
+        through all the ports.
+
+        If a set of ports are configured in the 'PortList', the manager can
+        access the switch only through the configured ports."
+   ::= { issIpAuthMgrEntry 3 }
+
+issIpAuthMgrVlanList OBJECT-TYPE
+   SYNTAX       OCTET STRING
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION
+       "Specifies the Vlan's in which the IP authorized manager can reside.
+        By default the manager is allowed to reside in any vlan.
+
+        If a set of vlans are configured in the 'VlanList', the manager can
+        reside only in the configured vlan set.  Access to the switch
+        will be denied from any other vlan."
+   ::= { issIpAuthMgrEntry 4 }
+
+issIpAuthMgrOOBPort OBJECT-TYPE
+     SYNTAX       TruthValue
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+         "Specifies whether the authorized manager can access the switch
+         through OOB Port
+          By default the manager is denied access to reside on OOB Interface"
+     DEFVAL       { false }
+     ::= { issIpAuthMgrEntry 5 }
+
+issIpAuthMgrAllowedServices OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "Specifies the allowed services through which the authorized manager can
+        access the switch.
+	This object takes bit mask values. The services represented by each bit
+	position is as given below:
+
+	With bit 0 being the Least Significant Bit,
+
+			Bit0  --> snmp
+			Bit1  --> telnet
+			Bit2  --> http
+			Bit3  --> https
+			Bit4  --> ssh
+
+        If the particular bit is set to 1,corresponding service is allowed for
+        the configured manager.
+
+	By default all services are allowed for the configured manager."
+
+   DEFVAL  { '1F'h }
+   ::= { issIpAuthMgrEntry 6 }
+
+issIpAuthMgrRowStatus OBJECT-TYPE
+   SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+   STATUS      current
+   DESCRIPTION
+      "This object indicates the status of this entry."
+   ::= { issIpAuthMgrEntry 7 }
+
+
+-- Iss Extension Group ------------------------------------
+-- Rate Control Group --------------------------------------------- --
+
+issRateCtrlTable OBJECT-TYPE
+   SYNTAX      SEQUENCE OF IssRateCtrlEntry
+   MAX-ACCESS  not-accessible
+   STATUS      deprecated
+   DESCRIPTION
+      "A table to control the rate limiting parameters
+       either for the entire switch or for each interface in the switch.
+       This object is deprecated and the corresponding functionality is
+       met with issRateControl objects in fsissext.mib."
+   ::= { issRateControl 1 }
+
+issRateCtrlEntry OBJECT-TYPE
+   SYNTAX      IssRateCtrlEntry
+   MAX-ACCESS  not-accessible
+   STATUS      deprecated
+   DESCRIPTION
+      "An entry appears in this table for each physical
+       interface in the switch.
+       This object is deprecated and the corresponding functionality is
+       met with issRateControl objects in fsissext.mib."
+   INDEX { issRateCtrlIndex }
+   ::= { issRateCtrlTable 1 }
+
+IssRateCtrlEntry ::=
+   SEQUENCE {
+      issRateCtrlIndex
+         Integer32,
+      issRateCtrlDLFLimitValue
+         Integer32,
+      issRateCtrlBCASTLimitValue
+         Integer32,
+      issRateCtrlMCASTLimitValue
+         Integer32,
+      issRateCtrlPortRateLimit
+         Integer32,
+      issRateCtrlPortBurstSize
+         Integer32
+  }
+
+issRateCtrlIndex OBJECT-TYPE
+   SYNTAX      Integer32 (1..65535)
+   MAX-ACCESS  not-accessible
+   STATUS      deprecated
+   DESCRIPTION
+      "The interface index for which the configuration in this
+       entry applies.
+       This object is deprecated and the corresponding functionality is
+       met with issRateControl objects in fsissext.mib."
+   ::= { issRateCtrlEntry 1 }
+
+issRateCtrlDLFLimitValue OBJECT-TYPE
+   SYNTAX      Integer32 (0..2147483647)
+   MAX-ACCESS  read-write
+   STATUS      deprecated
+   DESCRIPTION
+      "Allows to configure the limiting value for the maximum number
+       of dlf packets that can be transmitted per second over this interface.
+       Setting this object to the value zero disables rate limiting for
+       Destination lookup failure packets on this interface. The value that
+       can be set for this object is limited by the underlying hardware
+       This object is deprecated and the corresponding functionality is
+       met with issRateControl objects in fsissext.mib."
+
+   DEFVAL  {0}
+   ::= { issRateCtrlEntry 2 }
+
+issRateCtrlBCASTLimitValue OBJECT-TYPE
+   SYNTAX      Integer32 (0..2147483647)
+   MAX-ACCESS  read-write
+   STATUS      deprecated
+   DESCRIPTION
+      "Allows to configure the limiting value for the maximum number
+       of broadcast packets that can be transmitted per second over this
+       interface. Setting this object to the value zero disables rate
+       limiting for Broadcast packets on this interface. The value that
+       can be set for this object is limited by the underlying hardware
+       This object is deprecated and the corresponding functionality is
+       met with issRateControl objects in fsissext.mib."
+
+   DEFVAL  {0}
+   ::= { issRateCtrlEntry 3 }
+
+
+issRateCtrlMCASTLimitValue OBJECT-TYPE
+   SYNTAX      Integer32 (0..2147483647)
+   MAX-ACCESS  read-write
+   STATUS      deprecated
+   DESCRIPTION
+      "Allows to configure the limiting value for the maximum number
+       of multicast packets that can be transmitted per second over this
+       interface. Setting this object to the value zero disables rate
+       limiting for Multicast packets on this interface. The value that
+       can be set for this object is limited by the underlying hardware
+       This object is deprecated and the corresponding functionality is
+       met with issRateControl objects in fsissext.mib."
+
+   DEFVAL  {0}
+   ::= { issRateCtrlEntry 4}
+
+issRateCtrlPortRateLimit OBJECT-TYPE
+   SYNTAX      Integer32 (0..80000000)
+   MAX-ACCESS  read-write
+   STATUS      deprecated
+   DESCRIPTION
+      "Configures interface Rate Limit (Packet that can be transferred
+      on a port at a particular second).
+
+      This object's value will take effect on the interface speed. Based
+      on the operating speed of the port, the rate limit will be applied.
+      This value can also be affected by the metering. A value of zero(0)
+      disable rate limiting i.e. sets the port to full speed.
+      This object is deprecated and the corresponding functionality is
+      met with issRateControl objects in fsissext.mib."
+
+   ::= { issRateCtrlEntry 5 }
+
+issRateCtrlPortBurstSize OBJECT-TYPE
+   SYNTAX      Integer32 (0..80000000)
+   MAX-ACCESS  read-write
+   STATUS      deprecated
+   DESCRIPTION
+      "Configures interface Burst Pkt Rate. (Packet Burst that can be
+       transferred on a port at a particular second)
+
+      This object's value will take effect on the interface speed. Based
+      on the operating speed of the port, the burst size of the port
+      will be applied. This value can also be affected by the metering. A
+      value of zero(0) disable burst rate limiting i.e. sets the port burst
+      rate limit to full speed.
+      This object is deprecated and the corresponding functionality is
+      met with issRateControl objects in fsissext.mib."
+
+   ::= { issRateCtrlEntry 6 }
+
+
+
+
+-- ------------------------------------------------------------------
+-- L2 Filter Group --------------------------------------------------
+
+issL2FilterTable OBJECT-TYPE
+
+   SYNTAX      SEQUENCE OF IssL2FilterEntry
+   MAX-ACCESS  not-accessible
+   STATUS      deprecated
+   DESCRIPTION
+       "A table to configure L2 filter rules in the system.
+       This object is deprecated and the corresponding functionality is
+       met with issL2Filter objects in fsissext.mib."
+   ::= { issL2Filter 1 }
+
+issL2FilterEntry OBJECT-TYPE
+   SYNTAX      IssL2FilterEntry
+   MAX-ACCESS  not-accessible
+   STATUS      deprecated
+   DESCRIPTION
+       "Each entry in this table is a L2 filter rule.Index to the table
+       is the L2 filter number.This object is deprecated and the
+       corresponding functionality is met with issL2Filter objects
+       in fsissext.mib."
+
+   INDEX { issL2FilterNo}
+   ::= { issL2FilterTable 1 }
+
+IssL2FilterEntry ::=
+   SEQUENCE {
+      issL2FilterNo
+         Integer32,
+      issL2FilterPriority
+         Integer32,
+      issL2FilterEtherType
+         Integer32,
+      issL2FilterProtocolType
+         Unsigned32,
+      issL2FilterDstMacAddr
+         MacAddress,
+      issL2FilterSrcMacAddr
+         MacAddress,
+      issL2FilterVlanId
+         Integer32,
+      issL2FilterInPortList
+         PortList,
+      issL2FilterAction
+         INTEGER,
+      issL2FilterMatchCount
+         Counter32,
+      issL2FilterStatus
+         RowStatus,
+      issL2FilterOutPortList
+         PortList,
+      issL2FilterDirection
+         INTEGER
+
+  }
+
+issL2FilterNo OBJECT-TYPE
+   SYNTAX      Integer32 (1..65535)
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "L2 Filter rule number.
+      This object is deprecated and the corresponding functionality is
+      met with issL2Filter objects in fsissext.mib."
+   ::= { issL2FilterEntry 1 }
+
+issL2FilterPriority OBJECT-TYPE
+   SYNTAX      Integer32 (1..255)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "The priority of the L2 filter can be used to decide which filter rule
+       is applicable when
+          --> the packet matches with more than one filter rules
+          --> All the filter rules result in 'allow'ing the packet
+
+      Higher value of 'filter priority' implies a higher priority.
+
+      Usage of 'L2FilterPriority' is implementation dependant.
+      This object is deprecated and the corresponding functionality is
+      met with issL2Filter objects in fsissext.mib."
+   DEFVAL  { 1 }
+   ::= { issL2FilterEntry 2 }
+
+issL2FilterEtherType OBJECT-TYPE
+   SYNTAX      Integer32 (0..65535)
+   MAX-ACCESS  read-write
+   STATUS      deprecated
+   DESCRIPTION
+      "The value in the Type/Len field of a frame that will
+      be matched to trigger this filter. The default value of
+      this object is '0'. When this object is SET with the default
+      value, frames are not matched for the value in the Type/Len
+      field with the value set for this object.
+      This object is deprecated and the corresponding functionality is
+      met with issL2Filter objects in fsissext.mib."
+   DEFVAL  { 0 }
+   ::= { issL2FilterEntry 3 }
+
+
+issL2FilterProtocolType OBJECT-TYPE
+   SYNTAX      Unsigned32 (0..65535)
+   MAX-ACCESS  read-write
+   STATUS      deprecated
+   DESCRIPTION
+      "Specifies the non IP protocol type to be filtered.
+       aarp | amber | dec-spanning | decnet-iv |
+       diagnostic | dsm |etype-6000 | etype-8042 |
+       lat | lavc-sca | mop-console | mop-dump |
+       msdos | mumps | netbios | vines-echo |
+       vines-ip | xns-idp: A non-IP protocol.
+
+      A value of '0' means, the filter is applicable for all protocols.
+      This object is deprecated and the corresponding functionality is
+      met with issL2Filter objects in fsissext.mib."
+   DEFVAL  { 0 }
+   ::= { issL2FilterEntry 4 }
+
+issL2FilterDstMacAddr OBJECT-TYPE
+   SYNTAX      MacAddress
+   MAX-ACCESS  read-write
+   STATUS      deprecated
+   DESCRIPTION
+      "Destination MAC address to be matched with the packet. By Default, the
+       Destination Mac Address will be zero which means dont care condition ie)
+       any Dst Mac Address .This object is deprecated and the corresponding
+       functionality is met with issL2Filter objects in fsissext.mib."
+   ::= { issL2FilterEntry 5 }
+
+issL2FilterSrcMacAddr OBJECT-TYPE
+   SYNTAX      MacAddress
+   MAX-ACCESS  read-write
+   STATUS      deprecated
+   DESCRIPTION
+      "Source MAC address to be matched with the packet. By Default, the Source
+       Mac Address will be zero which means dont care condition ie) any Src Mac
+       address This object is deprecated and the corresponding functionality is
+       met with issL2Filter objects in fsissext.mib."
+   ::= { issL2FilterEntry 6 }
+
+
+issL2FilterVlanId OBJECT-TYPE
+   SYNTAX      Integer32 (0..4094)
+   MAX-ACCESS  read-write
+   STATUS      deprecated
+   DESCRIPTION
+      "Vlan Id to be filtered. In case of Provider bridges, This Vlan Id will
+      be treated as customer Vlan Id.
+      A value of '0' means, this object is unused. Configuring this value is not
+      allowed.
+      This object is deprecated and the corresponding functionality is
+      met with issL2Filter objects in fsissext.mib."
+   DEFVAL  { 0 }
+   ::= { issL2FilterEntry 7 }
+
+
+issL2FilterInPortList OBJECT-TYPE
+   SYNTAX      PortList
+   MAX-ACCESS  read-write
+   STATUS      deprecated
+   DESCRIPTION
+      "Specifies the complete set of ports over which this filter is applied
+       for packets ingress at ports in this list.
+       If the In port list is '0', the filter rule is applicable for  the
+       incoming packets on all ports.
+       Even though the issL2FilterInPortList is configured, It is applicable only
+       if issL2FilterDirection is configured as 'in'.
+       By default inport list is maintained as '0'.
+       This object is deprecated and the corresponding functionality is
+       met with issL2Filter objects in fsissext.mib."
+   ::= { issL2FilterEntry 8 }
+
+issL2FilterAction OBJECT-TYPE
+   SYNTAX      INTEGER {
+                  allow (1),
+                  drop  (2)
+               }
+   MAX-ACCESS  read-write
+   STATUS      deprecated
+   DESCRIPTION
+      "Specifies the action to be taken on the packet if the filter
+      rule matches.
+      If the action is 'allow', the packet will be forwarded according
+      to the forwarding rules.
+      If the action is 'drop', the packet will be discarded.
+      This object is deprecated and the corresponding functionality is
+      met with issL2Filter objects in fsissext.mib."
+   DEFVAL  { allow }
+   ::= { issL2FilterEntry 9 }
+
+issL2FilterMatchCount OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      deprecated
+   DESCRIPTION
+      "Number of times this filter is matched.
+      This object is deprecated and the corresponding functionality is
+      met with issL2Filter objects in fsissext.mib."
+
+   ::= { issL2FilterEntry 10 }
+
+issL2FilterStatus OBJECT-TYPE
+   SYNTAX      RowStatus
+   MAX-ACCESS  read-create
+   STATUS      deprecated
+   DESCRIPTION
+        "This object indicates the status of this entry. An entry is
+        created in this table when this object is SET to 'createAndWait'.
+        The entry in this table is used when the status of this object
+        is SET 'active'. The entry in this table is not used when this
+        object is SET 'notInService'. An entry created in this table is
+        be deleted when this object is SET 'destroy'.
+        This object is deprecated and the corresponding functionality is
+        met with issL2Filter objects in fsissext.mib."
+   ::= { issL2FilterEntry 11 }
+
+issL2FilterOutPortList OBJECT-TYPE
+   SYNTAX      PortList
+   MAX-ACCESS  read-write
+   STATUS      deprecated
+   DESCRIPTION
+      "Specifies the complete set of ports over which this filter is applied
+       for packets egress at Ports in this list.
+      If the Out port list is '0', the filter rule is applicable for  the
+      outgoing packets on all ports.
+      Even though the issL2FilterOutPortList is configured, It is applicable only
+      if issL2FilterDirection is configured as 'out'.
+      By default outport list is maintained as '0'.
+      This object is deprecated and the corresponding functionality is
+      met with issL2Filter objects in fsissext.mib."
+   ::= { issL2FilterEntry 12 }
+
+issL2FilterDirection OBJECT-TYPE
+   SYNTAX      INTEGER {
+                    in (1),
+                    out (2)
+               }
+   MAX-ACCESS  read-write
+   STATUS      deprecated
+   DESCRIPTION
+      "Specifies the direction of this filter to be applied. By Default the
+      filter will be applied on ingress direction.
+      When the direction of this filter is 'in', It is applied on specified
+      ports of the issL2FilterInPortList.
+      When the direction of this filter is 'out', It is applied on specified
+      ports of the issL2FilterOutPortList.
+      This object is deprecated and the corresponding functionality is
+      met with issL2Filter objects in fsissext.mib."
+   DEFVAL  { in }
+   ::= { issL2FilterEntry 13 }
+
+-- ------------------------------------------------------------------
+-- L3 Filter Group --------------------------------------------------
+
+
+issL3FilterTable OBJECT-TYPE
+   SYNTAX      SEQUENCE OF IssL3FilterEntry
+   MAX-ACCESS  not-accessible
+   STATUS      deprecated
+   DESCRIPTION
+       " A table to configure L3 filter rules in the system.
+       This object is deprecated and the corresponding functionality is
+       met with issL3Filter objects in fsissext.mib."
+   ::= { issL3Filter 1 }
+
+issL3FilterEntry OBJECT-TYPE
+   SYNTAX      IssL3FilterEntry
+   MAX-ACCESS  not-accessible
+   STATUS      deprecated
+   DESCRIPTION
+       " Each entry in this table is a L3 filter rule.
+         Index to the table is L3 filter number.
+         This object is deprecated and the corresponding functionality is
+         met with issL3Filter objects in fsissext.mib."
+   INDEX { issL3FilterNo}
+   ::= { issL3FilterTable 1 }
+
+IssL3FilterEntry ::=
+   SEQUENCE {
+      issL3FilterNo
+         Integer32,
+      issL3FilterPriority
+         Integer32,
+      issL3FilterProtocol
+         Integer32,
+      issL3FilterMessageType
+         Integer32,
+      issL3FilterMessageCode
+         Integer32,
+      issL3FilterDstIpAddr
+         IpAddress,
+      issL3FilterSrcIpAddr
+         IpAddress,
+      issL3FilterDstIpAddrMask
+         IpAddress,
+      issL3FilterSrcIpAddrMask
+         IpAddress,
+      issL3FilterMinDstProtPort
+         Unsigned32,
+      issL3FilterMaxDstProtPort
+         Unsigned32,
+      issL3FilterMinSrcProtPort
+         Unsigned32,
+      issL3FilterMaxSrcProtPort
+         Unsigned32,
+      issL3FilterInPortList
+         PortList,
+      issL3FilterOutPortList
+         PortList,
+      issL3FilterAckBit
+         INTEGER,
+      issL3FilterRstBit
+         INTEGER,
+      issL3FilterTos
+         Integer32,
+      issL3FilterDscp
+         Integer32,
+      issL3FilterDirection
+         INTEGER,
+      issL3FilterAction
+         INTEGER,
+      issL3FilterMatchCount
+         Counter32,
+      issL3FilterStatus
+         RowStatus
+  }
+
+issL3FilterNo OBJECT-TYPE
+   SYNTAX      Integer32 (1..65535)
+   MAX-ACCESS  not-accessible
+   STATUS      deprecated
+   DESCRIPTION
+      "L3 Filter rule number.
+      This object is deprecated and the corresponding functionality is
+      met with issL3Filter objects in fsissext.mib."
+   ::= { issL3FilterEntry 1 }
+
+issL3FilterPriority OBJECT-TYPE
+   SYNTAX      Integer32 (1..255)
+   MAX-ACCESS  read-write
+   STATUS      deprecated
+   DESCRIPTION
+      "The priority of the filter can be used to decide which filter rule
+       is applicable when
+          --> the packet matches with more than one filter rules
+          --> All the filter rules result in 'allow'ing the packet
+      Higher value of 'L3 filter priority' implies a higher priority.
+      Usage of 'L3FilterPriority' is implementation dependant.
+      This object is deprecated and the corresponding functionality is
+      met with issL3Filter objects in fsissext.mib."
+   DEFVAL  { 1 }
+   ::= { issL3FilterEntry 2 }
+
+issL3FilterProtocol OBJECT-TYPE
+   SYNTAX      Integer32 (0..255)
+   MAX-ACCESS  read-write
+   STATUS      deprecated
+   DESCRIPTION
+      " The type of protocol to be checked against the packet. The
+      default value is 255. If the value is 255, it means that the
+      protocol type can be anything and it will not be checked to
+      decide the action.
+      This object is deprecated and the corresponding functionality is
+      met with issL3Filter objects in fsissext.mib."
+   DEFVAL   { 255 }
+   ::= { issL3FilterEntry 3 }
+
+issL3FilterMessageType OBJECT-TYPE
+   SYNTAX      Integer32 (0..65535)
+   MAX-ACCESS  read-write
+   STATUS      deprecated
+   DESCRIPTION
+     " The message type to be checked against the packet. If the
+      message type matches with the packet, then the packet will be
+      dropped / allowed based on the action set in issL3FilterAction.
+      The default value is 255. It means that message type is not
+      configured and need not be checked.
+      Generally the value zero is given as default. But here
+      zero can be an ICMP Type value. Hence 255 is given as the
+      default value.
+      Some ICMP message types are:
+           echoReply(0),
+           destinationUnreachable(3),
+           sourceQuench(4),
+           redirect(5),
+           echoRequest(8),
+           timeExceeded(11),
+           parameterProblem(12),
+           timestampRequest(13),
+           timestampReply(14),
+           informationRequest(15),
+           informationReply(16),
+           addressMaskRequest(17),
+           addressMaskReply (18),
+           noICMPType(255)
+       This object is deprecated and the corresponding functionality is
+       met with issL3Filter objects in fsissext.mib."
+   DEFVAL  { 255 }
+   ::= { issL3FilterEntry 4 }
+
+issL3FilterMessageCode OBJECT-TYPE
+   SYNTAX      Integer32 (0..65535)
+   MAX-ACCESS  read-write
+   STATUS      deprecated
+   DESCRIPTION
+      " The message code to be checked against the packet. If the
+      packet matches with the message code, then the packet will
+      be dropped / allowed based on the action set in issL3FilterAction.
+      The default value is 255. It means that message code is not
+      configured and need not be checked. Generally the value zero
+      will be given as default. But here, zero can be an ICMP Code
+      value. Hence 255 is given as the default value.
+      Some ICMP message codes are :
+           networkUnreachable(0),
+           hostUnreachable(1),
+           protocolUnreachable(2),
+           portUnreachable(3),
+           fragmentNeed(4),
+           sourceRouteFail(5),
+           destNetworkUnknown(6),
+           destHostUnknown(7),
+           srcHostIsolated(8),
+           destNetworkAdminProhibited(9),
+           destHostAdminProhibited(10),
+           networkUnreachableTOS(11),
+           hostUnreachableTOS(12),
+           noICMPCode(255)
+      This object is deprecated and the corresponding functionality is
+      met with issL3Filter objects in fsissext.mib."
+   DEFVAL   { 255 }
+   ::= { issL3FilterEntry 5 }
+
+issL3FilterDstIpAddr OBJECT-TYPE
+   SYNTAX      IpAddress
+   MAX-ACCESS  read-write
+   STATUS      deprecated
+   DESCRIPTION
+      "Destination IP address to be matched with the packet.
+      This object is valid only if the 'issFilterType' is 'l3filter'.
+      This object is deprecated and the corresponding functionality is
+      met with issL3Filter objects in fsissext.mib."
+   DEFVAL  { '00000000'h }
+   ::= { issL3FilterEntry 6 }
+
+issL3FilterSrcIpAddr OBJECT-TYPE
+   SYNTAX      IpAddress
+   MAX-ACCESS  read-write
+   STATUS      deprecated
+   DESCRIPTION
+      "Source IP address to be matched with the packet.
+      This object is valid only if the 'issFilterType' is 'l3filter'
+      This object is deprecated and the corresponding functionality is
+      met with issL3Filter objects in fsissext.mib."
+   DEFVAL  { '00000000'h }
+   ::= { issL3FilterEntry 7 }
+
+issL3FilterDstIpAddrMask OBJECT-TYPE
+   SYNTAX      IpAddress
+   MAX-ACCESS  read-write
+   STATUS      deprecated
+   DESCRIPTION
+      "The IP subnet mask for Destination IP address.
+      This object is valid only if the 'issFilterType' is 'l3filter'
+      This object is deprecated and the corresponding functionality is
+      met with issL3Filter objects in fsissext.mib."
+   DEFVAL  { 'FFFFFFFF'h }
+   ::= { issL3FilterEntry 8 }
+
+issL3FilterSrcIpAddrMask OBJECT-TYPE
+   SYNTAX      IpAddress
+   MAX-ACCESS  read-write
+   STATUS      deprecated
+   DESCRIPTION
+      "The IP subnet mask for Source IP address.
+      This object is valid only if the 'issFilterType' is 'l3filter'.
+      This object is deprecated and the corresponding functionality is
+      met with issL3Filter objects in fsissext.mib."
+   DEFVAL  { 'FFFFFFFF'h }
+   ::= { issL3FilterEntry 9 }
+
+issL3FilterMinDstProtPort OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-write
+   STATUS      deprecated
+   DESCRIPTION
+      "The minimum port in the destination port range. Please note
+       these ports are the TCP / UDP ports.
+       This object is deprecated and the corresponding functionality is
+       met with issL3Filter objects in fsissext.mib."
+   DEFVAL   { 0 }
+   ::= { issL3FilterEntry 10 }
+
+issL3FilterMaxDstProtPort OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-write
+   STATUS      deprecated
+   DESCRIPTION
+      "The maximum port in the destination port range. Please note
+       these ports are the TCP / UDP ports.
+       This object is deprecated and the corresponding functionality is
+       met with issL3Filter objects in fsissext.mib."
+   DEFVAL   { 65535 }
+   ::= { issL3FilterEntry 11 }
+
+issL3FilterMinSrcProtPort OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-write
+   STATUS      deprecated
+   DESCRIPTION
+      "The minimum port in the source port range. Please note
+       these ports are the TCP / UDP ports.
+       This object is deprecated and the corresponding functionality is
+       met with issL3Filter objects in fsissext.mib."
+   DEFVAL   { 0 }
+   ::= { issL3FilterEntry 12 }
+
+issL3FilterMaxSrcProtPort OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-write
+   STATUS      deprecated
+   DESCRIPTION
+      "The maximum port in the source port range. Please note
+       these ports are the TCP / UDP ports.
+       This object is deprecated and the corresponding functionality is
+       met with issL3Filter objects in fsissext.mib."
+   DEFVAL   { 65535 }
+   ::= { issL3FilterEntry 13 }
+
+issL3FilterInPortList OBJECT-TYPE
+   SYNTAX      PortList
+   MAX-ACCESS  read-write
+   STATUS      deprecated
+   DESCRIPTION
+      "Specifies the complete set of ports over which if the packet arrives
+      this filter rule will be applicable.
+      If the incoming port list is '0', the filter rule is applicable for all the
+      incoming ports.
+      By default inport list is maintained as '0'.
+      This object is deprecated and the corresponding functionality is
+      met with issL3Filter objects in fsissext.mib."
+   ::= { issL3FilterEntry 14 }
+
+issL3FilterOutPortList OBJECT-TYPE
+   SYNTAX      PortList
+   MAX-ACCESS  read-write
+   STATUS      deprecated
+   DESCRIPTION
+      "Specifies the complete set of ports over which if the packet goes out,
+      this filter rule will be applicable.
+      If the outgoing port list is '0',the filter rule is applicable for all the
+      outgoing packets in all ports.
+      By default outport list is maintained as '0'
+      This object is deprecated and the corresponding functionality is
+      met with issL3Filter objects in fsissext.mib."
+   ::= { issL3FilterEntry 15 }
+
+issL3FilterAckBit		OBJECT-TYPE
+	SYNTAX	INTEGER	{
+			establish(1),
+		        notEstablish(2),
+		        any(3)
+			}
+	MAX-ACCESS	read-create
+	STATUS		deprecated
+	DESCRIPTION
+		" The TCP ACK bit to be checked against the packet. The default
+		value is 'any'(3). It means that ACK bit will not be checked
+		to decide the action.
+       This object is deprecated and the corresponding functionality is
+       met with issL3Filter objects in fsissext.mib."
+	DEFVAL	{ any }
+	::= { issL3FilterEntry 16 }
+
+issL3FilterRstBit	 OBJECT-TYPE
+	SYNTAX	INTEGER	{
+		          set(1),
+			  notSet(2),
+			  any(3)
+			}
+	MAX-ACCESS	read-create
+	STATUS		deprecated
+	DESCRIPTION
+		" The TCP RST bit to be checked against the packet. The default
+		value is 'any'(3). It means that RST bit will not be checked to
+		decide the action.
+        This object is deprecated and the corresponding functionality is
+       met with issL3Filter objects in fsissext.mib."
+	DEFVAL	{ any }
+	::= { issL3FilterEntry 17 }
+
+issL3FilterTos		OBJECT-TYPE
+	SYNTAX		Integer32 (-1..7)
+	MAX-ACCESS	read-create
+	STATUS		deprecated
+	DESCRIPTION
+		" The IP TOS bit to be checked against the packet. This is a
+		single byte integer of which the last three bits (least
+      significant bits) indicate Delay, Throughput and Reliability
+      i.e 'uuuuudtr', u-unused, d-delay, t-throughput, r-reliability.
+		For example '6' indicates low delay and high throughput.
+                A value of '-1' means, the Tos Field becomes dont care
+       This object is deprecated and the corresponding functionality is
+       met with issL3Filter objects in fsissext.mib."
+	DEFVAL	{ -1 }
+	::= { issL3FilterEntry 18 }
+
+issL3FilterDscp		OBJECT-TYPE
+	SYNTAX		Integer32 (-1..63)
+	MAX-ACCESS	read-create
+	STATUS		deprecated
+	DESCRIPTION
+		" The IP Dscp value to be checked against the packet.
+        A value of '-1' means, the Dscp Field becomes dont care.
+        This object is deprecated and the corresponding functionality is
+        met with issL3Filter objects in fsissext.mib."
+	DEFVAL	{ -1 }
+	::= { issL3FilterEntry 19 }
+
+issL3FilterDirection OBJECT-TYPE
+   SYNTAX      INTEGER {
+                          in (1),
+                          out(2)
+                       }
+   MAX-ACCESS  read-write
+   STATUS      deprecated
+   DESCRIPTION
+      "Specifies the direction of this filter to be applied. By Default the
+      filter will be applied on ingress direction.
+      When the direction of this filter is 'in', It is applied on specified
+      ports of the issL3FilterInPortList.
+      When the direction of this filter is 'out', It is applied on specified
+      ports of the issL3FilterOutPortList.This object is deprecated and
+      the corresponding functionality is met with issL3Filter objects in
+      fsissext.mib."
+   DEFVAL	{ in }
+	::= { issL3FilterEntry 20 }
+
+issL3FilterAction OBJECT-TYPE
+   SYNTAX      INTEGER {
+                  allow (1),
+                  drop  (2)
+               }
+   MAX-ACCESS  read-write
+   STATUS      deprecated
+   DESCRIPTION
+      "Specifies the action to be taken on the packet if the filter
+      rule matches.
+      If the action is 'allow', the packet will be sent to the
+      ports in 'out port list'. If the out port list is '0',
+      the port over which the packet is to be switched will be decided
+      based on further processing on the packet.
+      If the action is 'drop', the packet will be discardedThis object is
+      deprecated and the corresponding functionality is
+      met with issL3Filter objects in fsissext.mib."
+   DEFVAL  { allow }
+   ::= { issL3FilterEntry 21 }
+
+issL3FilterMatchCount OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      deprecated
+   DESCRIPTION
+      "Number of times this filter is matched.
+       This object is deprecated and the corresponding functionality is
+       met with issL3Filter objects in fsissext.mib."
+   ::= { issL3FilterEntry 22 }
+
+issL3FilterStatus OBJECT-TYPE
+   SYNTAX      RowStatus
+   MAX-ACCESS  read-create
+   STATUS      deprecated
+   DESCRIPTION
+        "This object indicates the status of this entry. An entry is
+        created in this table when this object is SET to 'createAndWait'.
+        The entry in this table is used when the status of this object
+        is SET 'active'. The entry in this table is not used when this
+        object is SET 'notInService'. An entry created in this table is
+        be deleted when this object is SET 'destroy.This object is
+        deprecated and the corresponding functionality is
+        met with issL3Filter objects in fsissext.mib."
+   ::= { issL3FilterEntry 23 }
+
+
+-- ------------------------------------------------------------------
+------------------------------------------------------------------
+-- Layer 4 Switching
+
+
+issL4SwitchingFilterTable OBJECT-TYPE
+   SYNTAX      SEQUENCE OF IssL4SwitchingFilterEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       " A table to L4 Switching rules in the system.
+       "
+   ::= { issL4Switching 1 }
+
+issL4SwitchingFilterEntry OBJECT-TYPE
+   SYNTAX      IssL4SwitchingFilterEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       " Each entry in this table is a L4 Switching rule.
+         Index to the table is L4 filter number. "
+   INDEX { issL4SwitchingFilterNo}
+   ::= { issL4SwitchingFilterTable 1 }
+
+IssL4SwitchingFilterEntry ::=
+   SEQUENCE {
+      issL4SwitchingFilterNo
+         Integer32,
+      issL4SwitchingProtocol
+         Integer32,
+      issL4SwitchingPortNo
+         Unsigned32,
+      issL4SwitchingCopyToPort
+         Integer32,
+      issL4SwitchingFilterStatus
+         RowStatus
+  }
+
+issL4SwitchingFilterNo OBJECT-TYPE
+   SYNTAX      Integer32 (1..65535)
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "L4 Switching Filter rule number."
+   ::= { issL4SwitchingFilterEntry 1 }
+
+
+issL4SwitchingProtocol OBJECT-TYPE
+   SYNTAX      Integer32 (0..255)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "The type of protocol to be checked against the packet. The
+      default value is 255. If the value is 255, it means that the
+      protocol type can be anything and it will not be checked to
+      decide the action. "
+   DEFVAL   { 255 }
+   ::= { issL4SwitchingFilterEntry 2 }
+
+
+issL4SwitchingPortNo OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "The Layer 4 port no. Please note
+       these ports are the TCP / UDP ports."
+   DEFVAL   { 0 }
+   ::= { issL4SwitchingFilterEntry 3 }
+
+issL4SwitchingCopyToPort OBJECT-TYPE
+   SYNTAX      Integer32(0..65535)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "This object is Port to which the packet would be switched"
+
+   ::= { issL4SwitchingFilterEntry 4 }
+
+issL4SwitchingFilterStatus OBJECT-TYPE
+   SYNTAX      RowStatus
+   MAX-ACCESS  read-create
+   STATUS      current
+   DESCRIPTION
+      "This object indicates the status of this entry."
+
+  ::= { issL4SwitchingFilterEntry 5 }
+
+-- issModule Group BEGINS
+
+issModuleTable OBJECT-TYPE
+   SYNTAX      SEQUENCE OF IssModuleEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       " A table for triggering Graceful shutdown and Start"
+   ::= { issModule 1 }
+
+issModuleEntry OBJECT-TYPE
+   SYNTAX      IssModuleEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       " Each entry in this table corresponding to one protocol"
+   INDEX { issModuleId }
+   ::= { issModuleTable 1 }
+
+IssModuleEntry ::=
+   SEQUENCE {
+      issModuleId
+         Integer32,
+      issModuleSystemControl
+         INTEGER
+  }
+
+issModuleId OBJECT-TYPE
+   SYNTAX      Integer32 (1..65535)
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "This object indicates the ID of the protocol.
+      Following IDs are supported.
+      1. OSPF
+      2. OSPFV3
+      3. BGP
+      4. ISIS
+      5. RSVPTE
+      6. LDP "
+
+   ::= { issModuleEntry 1 }
+
+issModuleSystemControl OBJECT-TYPE
+   SYNTAX      INTEGER {
+                         idle         (0),
+                         shutdown     (1),  -- shutdown the process
+                         start        (2)   -- start the process
+                       }
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "This object shuts and starts the process"
+   DEFVAL      { start }
+   ::= { issModuleEntry 2 }
+
+-- issModule Group ENDS
+
+-- ------------------------------------------------------------------
+--- FAN Table
+issSwitchFanTable    OBJECT-TYPE
+     SYNTAX                   SEQUENCE OF IssSwitchFanEntry
+     MAX-ACCESS               not-accessible
+     STATUS                   current
+     DESCRIPTION
+     "Table containing the Fan information."
+     ::= { issSwitchFan 1 }
+
+issSwitchFanEntry    OBJECT-TYPE
+     SYNTAX                       IssSwitchFanEntry
+     MAX-ACCESS                   not-accessible
+     STATUS                       current
+     DESCRIPTION
+     "Indicates information related to fan status of
+     the switch."
+     INDEX { issSwitchFanIndex }
+     ::= { issSwitchFanTable 1 }
+
+IssSwitchFanEntry ::=
+     SEQUENCE {
+         issSwitchFanIndex                Integer32,
+         issSwitchFanStatus               INTEGER
+     }
+
+issSwitchFanIndex       OBJECT-TYPE
+    SYNTAX            Integer32 (1..5)
+    MAX-ACCESS        not-accessible
+    STATUS            current
+    DESCRIPTION
+    "Indicates the fan number in the switch"
+    ::= { issSwitchFanEntry 1 }
+
+issSwitchFanStatus     OBJECT-TYPE
+    SYNTAX    INTEGER {
+                  normal(1),
+                  faulty(2),
+                  critical(3),
+                  not-present(4)
+              }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+    "Indicates the fan status of the switch."
+    ::= { issSwitchFanEntry 2 }
+
+-----------------------------------------------------------------------
+-- Trap Objects
+
+issMsrFailedOid        OBJECT-TYPE
+   SYNTAX              OBJECT IDENTIFIER
+   MAX-ACCESS          accessible-for-notify
+   STATUS              current
+   DESCRIPTION
+      "Indicates the OID for which updation failure has occured at MSR"
+   ::= { issSystemTrap 1 }
+
+issMsrFailedValue  OBJECT-TYPE
+   SYNTAX          DisplayString
+   MAX-ACCESS      accessible-for-notify
+   STATUS          current
+   DESCRIPTION
+      "Indicates the value of corresponding OID for which updation failure
+       has occured at MSR"
+   ::= { issSystemTrap 2 }
+
+-- Audit Trap Objects
+
+ issAuditTrapEvent OBJECT-TYPE
+     SYNTAX       INTEGER {
+                  openFailed(1),
+                  writeFailed(2),
+                  sizeExceeded(3),
+                  sizeThresholdHit(4)
+                  }
+     MAX-ACCESS   accessible-for-notify
+     STATUS       current
+     DESCRIPTION
+          " openFailed - Open operation on Audit File failed.
+            writeFailed - Write operation on Audit File failed.
+            sizeExceeded - Audit File Size exceeded.
+            sizeThresholdHit - Audit Log Size Hit the threshold value."
+     ::= { issAuditTrap 1 }
+
+ issAuditTrapEventTime OBJECT-TYPE
+     SYNTAX       DisplayString(SIZE(24))
+     MAX-ACCESS   accessible-for-notify
+     STATUS       current
+     DESCRIPTION
+        "This object specifies the date and time at which fsAuditTrapEvent
+         was performed."
+     ::= { issAuditTrap 2 }
+
+ issAuditTrapFileName OBJECT-TYPE
+     SYNTAX       DisplayString (SIZE(1..128))
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+         "Audit File name in the trap message."
+     ::= { issAuditTrap 3 }
+
+-- Log Trap Objects
+
+ issLogTrapEvent OBJECT-TYPE
+     SYNTAX       INTEGER {
+                  openFailed(1),
+                  writeFailed(2),
+                  sizeExceeded(3),
+                  sizeThresholdHit(4)
+                  }
+     MAX-ACCESS   accessible-for-notify
+     STATUS       current
+     DESCRIPTION
+          " openFailed - Open operation on Log File failed.
+            writeFailed - Write operation on Log File failed.
+            sizeExceeded - Log File Size exceeded.
+            sizeThresholdHit - Log Size Hit the threshold value."
+     ::= { issLogTrap 1 }
+
+ issLogTrapEventTime OBJECT-TYPE
+     SYNTAX       DisplayString(SIZE(24))
+     MAX-ACCESS   accessible-for-notify
+     STATUS       current
+     DESCRIPTION
+        "This object specifies the date and time at which fsLogTrapEvent
+         was performed."
+     ::= { issLogTrap 2 }
+
+ issLogTrapFileName OBJECT-TYPE
+     SYNTAX       DisplayString (SIZE(1..128))
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+         "Log File name in the trap message."
+     ::= { issLogTrap 3 }
+
+-- ------------------------------------------------------------------
+-- Iss Notifications
+
+issTrapConfigRestore NOTIFICATION-TYPE
+     OBJECTS      {
+                    issConfigRestoreStatus
+                  }
+     STATUS       current
+     DESCRIPTION
+         "This trap signifies the successful restoration of
+          the saved configuration"
+     ::= { issNotifications 1 }
+
+issMsrUpdateEventFail NOTIFICATION-TYPE
+	OBJECTS {
+           issMsrFailedOid,
+           issMsrFailedValue
+	}
+        STATUS      current
+        DESCRIPTION
+	   "An MsrUpdateEventFail notification is sent when there is some
+            failure in configuration change event received from SNMP Agent.
+            issMsrFailedOid indicates the OID for which configuration change
+            event has failed.
+            issMsrFailedValue indicates the value of the corresponding OID for
+            which configuration change event failure has occured."
+        ::= { issNotifications 2 }
+
+-- AUDIT TRAP MESSAGE
+issAuditTrapMessage NOTIFICATION-TYPE
+     OBJECTS      {
+                    issAuditTrapEvent,
+                    issAuditTrapEventTime,
+                    issAuditTrapFileName
+                  }
+     STATUS       current
+     DESCRIPTION
+         "This trap notifies  the erros on
+          Audit file."
+     ::= { issNotifications 3 }
+
+issTrapTemperature NOTIFICATION-TYPE
+     OBJECTS      {
+                    issSwitchMinThresholdTemperature,
+                    issSwitchMaxThresholdTemperature,
+                    issSwitchCurrentTemperature
+                  }
+     STATUS       current
+     DESCRIPTION
+         "This notification is sent when the current
+          temperature rises above or drops below the threshold."
+     ::= { issNotifications 4 }
+
+issTrapCPUThreshold NOTIFICATION-TYPE
+     OBJECTS      {
+                    issSwitchMaxCPUThreshold,
+                    issSwitchCurrentCPUThreshold
+                  }
+     STATUS       current
+     DESCRIPTION
+         "This notification is sent when CPU load exceeds
+          the threshold value"
+     ::= { issNotifications 5 }
+
+issTrapPowerSupply NOTIFICATION-TYPE
+     OBJECTS      {
+                    issSwitchPowerSurge,
+                    issSwitchPowerFailure,
+                    issSwitchCurrentPowerSupply
+                  }
+     STATUS       current
+     DESCRIPTION
+         "This notification is sent when the current
+          voltage drops below or exceeds the threshold value"
+     ::= { issNotifications 6 }
+
+issTrapRAMUsage NOTIFICATION-TYPE
+     OBJECTS      {
+                    issSwitchMaxRAMUsage,
+                    issSwitchCurrentRAMUsage
+                  }
+     STATUS       current
+     DESCRIPTION
+         "This notification is sent when the RAM usage crosses
+         the threshold percentage."
+     ::= { issNotifications 7 }
+
+issTrapFlashUsage NOTIFICATION-TYPE
+     OBJECTS      {
+                    issSwitchMaxFlashUsage,
+                    issSwitchCurrentFlashUsage
+                  }
+     STATUS       current
+     DESCRIPTION
+         "This notification is sent when the flash
+          usage crosses the threshold."
+     ::= { issNotifications 8 }
+
+issTrapFanStatus NOTIFICATION-TYPE
+     OBJECTS      {
+                    issSwitchFanIndex,
+                    issSwitchFanStatus
+                  }
+     STATUS       current
+     DESCRIPTION
+         "This notification is sent when the fan status is changed
+          from down state to up state or vice versa."
+     ::= { issNotifications 9 }
+
+-- LOG TRAP MESSAGE
+issLogTrapMessage NOTIFICATION-TYPE
+     OBJECTS      {
+                    issLogTrapEvent,
+                    issLogTrapEventTime,
+                    issLogTrapFileName
+                  }
+     STATUS       current
+     DESCRIPTION
+         "This trap notifies  the erros on
+          System Log file."
+     ::= { issNotifications 10 }
+
+issAclProvisionMode OBJECT-TYPE
+   SYNTAX      INTEGER {
+                immediate(1),
+                consolidated(2)
+               }
+   MAX-ACCESS  read-write
+   STATUS      current
+  DESCRIPTION
+      "The MIB object issAclProvisionMode is used to configure the
+       mode for provisioning active Filter Rules to the hardware.
+       This object takes values immediate/consolidated. When this
+       object is set to immediate, active ACL rules are programmed
+       to hardware immediately. This is the default mode. In this
+       mode, the sequence of configuration determines the order of
+       provisioning  the Filter rule to the hardware.
+       When this object is set to consolidated, active Filter Rules
+       are provisioned whenever a commit is triggered using MIB
+       object issAclTriggerCommit. In the consolidated mode, the
+       Filter rules are programmed/re-programmed to hardware in
+       the order of configured priority."
+      DEFVAL { immediate }
+   ::= { issAclNp 1 }
+
+
+issAclTriggerCommit  OBJECT-TYPE
+   SYNTAX      INTEGER {
+                false(0),
+                true(1)
+               }
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "The MIB object issAclTriggerCommit takes values true(1)/false (0).
+       A SET on this object ( only true is allowed) triggers the
+       programming of active ACL entries to the device based on
+       configured priority.After completion of the operation, this MIB object
+       is reset to false( 0) .This object is applicable only when the MIB
+       object issAclProvisionMode is set to ' consolidated.
+       A set on this object will impact the existing traffic flow as existing
+       Filter entries are deleted
+       and re-programmed to hardware based on configured priority.
+       Filter entries that are associated with quality-of-service configurations
+       will also be impacted when this object
+       triggers the re-programming of the active ACL entries to the hardware.
+       The administrator needs to ensure that corresponding Filter entries are
+       de-provisioned before triggering commit."
+      DEFVAL { false }
+   ::= { issAclNp 2 }
+
+-- Traffic Control Group ------------------------------------------ --
+
+issAclTrafficSeperationCtrl OBJECT-TYPE
+   SYNTAX      INTEGER {
+                  systemdefault (1),
+                  userconfig (2),
+			  none(3)
+               }
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "This object provides control to administrator, to have system default or
+       user defined ACL/QoS rules to carry control traffic to CPU.
+
+       system-default: ACL/QoS rules for all the control packets will be
+       automatically installed by the ISS software at system init time.Either a
+       'switch-and-copy-to-cpu'filter (or) 'drop-and-copy-to-cpu' filter will be
+       installed, as appropriate, for getting the control packets to CPU, for
+       processing. Each ACL rule will be associated with class-map, meter and
+       policy map with protocol ID, and CPU queue number
+
+       user-config: The ACL/QoS rules for receiving all the control packets to
+       CPU for processing, will NOT be automatically installed by the the ISS
+       software.The administrator is expected to install required rules for the
+       control packets as requried.
+
+       none: ACL/QoS rules for all the control packets will be automatically
+       installed by the ISS software at system init time.Either a 'switch-and-co
+       py-to-cpu'filter (or) 'drop-and-copy-to-cpu' filter will be installed,
+       as appropriate, for getting the control packets to CPU, for processing.
+       Default mode is none
+
+       If the configuration is changed from 'systemdefault' to 'userconfig'
+       option, then all the default ACL/QoS rules for carrying protocol control
+       packets to CPU are removed.Then user has to install the specific ACL/QoS
+       rules, to carry the intended control packets to CPU for the processing.
+
+       If the configuration is changed from 'userconfig' to 'systemdefault',
+       all the default ACL/QoS rules are installed. Already existing(if any)
+       user configured ACL rules in the system are not removed.
+
+       If the configuration is changed from 'none' to 'systemdefault'
+       option, then all the default ACL filters for carrying protocol control
+       packets to CPU are removed and new set of filters will be installed.
+       Each filter will be associated with Qos rules.
+
+       If the configuration is changed from 'none' to 'userconfig'
+       option, then all the default ACL filters for carrying protocol control
+       packets to CPU are removed.Then user has to install the specific ACL/QoS
+       rules, to carry the intended control packets to CPU for the processing.
+
+       If the configuration is changed from 'userconfig' to 'none'
+       all the default ACL filters are installed. Already existing(if any)
+       user configured ACL rules in the system are not removed.
+
+       Above three options can be configured during system runtime."
+
+   DEFVAL      { none }
+   ::= { issAclTrafficControl 1 }
+
+--ISShealthchk--
+
+issHealthChkStatus    OBJECT-TYPE
+    SYNTAX        INTEGER { upAndRunning(1),
+                            downNonRecoverableErr(2),
+                            upRecoverableRuntimeErr(3) }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "upAndRunning(1), This status indicates that ISS is up and running
+         and carrying out its job smoothly.
+
+         downNonRecoverableErr(2), This indicates that the health status of ISS is down
+         due to occurence of some non-recoverable error.
+
+         upRecoverableRuntimeErr(3), This indicates that the health status of ISS is up
+         but indicates the occurence of a runtime error that is recoverable."
+
+
+    ::= { issHealthCheckGroup 1 }
+
+issHealthChkErrorReason    OBJECT-TYPE
+    SYNTAX        INTEGER { nonRecovTaskInitializationFailure(1),
+                            nonRecovInsufficientStartupMemory(2),
+                            recovCruBuffExhausted(3),
+                            recovConfigRestoreFailed(4),
+                            recovProtocolMemPoolExhausted(5) }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "When the MIB object 'issHealthChkStatus' indicates health as down, this object provides the
+         reason for errors encountered.
+
+         nonRecovTaskInitializationFailure(1), Indicates the occurence of non-recoverable failure during
+         Task initialization.
+
+         nonRecovInsufficientStartupMemory(2), Indicates that there is insufficient memory for successful
+         startup. This error is non-recoverable and requires sufficient memory to be available in the system
+         for successful ISS startup.
+
+         recovCruBuffExhausted(3), Indicates that CRU Buffer Exhausted.
+
+         recovConfigRestoreFailed(4), Indicates that config-restore failed for ISS. This is a recoverable error.
+
+         recovProtocolMemPoolExhausted(5), Indicates that a mem-pool associated with a specific module in ISS has
+         drained out. This error may affect the functioning of the specific protocol alone and is treated as
+         a recoverable error.
+
+         By default issHealthChkErrorReason is 0."
+
+
+    ::= { issHealthCheckGroup 2 }
+
+issHealthChkMemAllocErrPoolId    OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object retrieves the mem-pool identifier for which memory allocation
+         failure was encountered at run-time.This object will get updated when
+         MIB object fsISSHealthChkErrorReason takes value of recovProtocolMemPoolExhausted (5)."
+
+    ::= { issHealthCheckGroup 3}
+
+issHealthChkConfigRestoreStatus    OBJECT-TYPE
+    SYNTAX        INTEGER { configRestoreSuccess(1),
+			    configRestoreFailed(2),
+			    configRestoreInProgress(3),
+			    configRestoreDefault(4) }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "configRestoreSuccess(1), Indicates that configuration restore operation
+         was successfully done.
+
+         configRestoreFailed(2),Indicates that configuration restoration was unsuccessful.
+
+	 configRestoreInProgress(3), Indicates that configuration restore operation is in-progress for ISS.
+
+         configRestoreDefault(4),  Indicates the absence of config-restore file (iss.conf)
+         and that ISS was started with default values.
+
+         By default issHealthChkConfigRestoreStatus is 4."
+
+
+    ::= { issHealthCheckGroup 4}
+
+issHealthChkClearCtr    OBJECT-TYPE
+    SYNTAX        BITS{
+			bgp(1),
+			ospf(2),
+			rip(3),
+			rip6(4),
+			ospf3(5),
+			ipv4(6),
+			ipv6(7)
+		      }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "This object clears the counters
+         associated with the following protocols -
+         BGP, OSPFv2, RIPv2/ng, OSPFv3, RTMv4/v6, ARP/ND, NETIP(v4/v6)
+         All the bit is set as 1, it clears the specified  protocol counters.
+         bgp(1) When this bit is set,clears bgp protocol counters.
+         ospf(2) When this bit is set,clears ospf protocol counters.
+         rip(3) When this bit is set,clears rip protocol counters.
+         rip6(4) When this bit is set,clears rip6 protocol counters.
+         ospf3(5) When this bit is set,clears ospf3 protocol counters.
+         ipv4(6) When this bit is set,clears ipv4 protocol counters.
+         ipv6(7) When this bit is set,clears ipv6 protocol counters."
+
+    ::= { issHealthCheckGroup 5}
+
+-- Zero touch provisioning related objects
+issZtpConfigStatus OBJECT-TYPE
+    SYNTAX    INTEGER{
+              enabled(1),
+              disabled(2)
+              }
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+                "Object to enable/disable ZTP in the system.
+                 The configuration will be updated in iss nvram file.
+                 It will take effect only in the next reload"
+     DEFVAL { disabled }
+     ::= { issZtp 1 }
+
+issZtpCurrentStatus OBJECT-TYPE
+    SYNTAX    INTEGER{
+              shutdown(1),
+              waiting(2),
+              download(3),
+              install(4),
+              reload(5),
+              complete(6),
+              error(7)}
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+                "This object indicates the current status of ZTP operation in the switch."
+     DEFVAL { shutdown }
+     ::= { issZtp 2 }
+
+-- Running config Related objects
+
+issRunConfigFileTransferMode  OBJECT-TYPE
+   SYNTAX     INTEGER {
+                tftp (1),
+                sftp  (2)
+              }
+   MAX-ACCESS read-write
+   STATUS     current
+   DESCRIPTION
+      "This object indicates the Transfer mode ,for downloading the
+       configuration file in CLI command format"
+   DEFVAL  { 1 }
+   ::= { issRunConfig 1 }
+
+ issRunConfigIpAddrType    OBJECT-TYPE
+   SYNTAX      InetAddressType
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+   "This mib object specifies the address type of the remote system from which
+   the running configuration in CLI format has to be downloaded.The address type can be
+   IPv4 or IPv6 unicast address"
+
+   ::= { issRunConfig 2 }
+
+issRunConfigIpAddr    OBJECT-TYPE
+   SYNTAX      InetAddress
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "This mib object indicates the IP Address of the remote system from
+      which the running configuration in CLI format has to be downloaded"
+
+   ::= { issRunConfig 3 }
+
+issRunConfigUserName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..20))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+	"This mib object indicates the User name required for downloading
+	running-config file in CLI command format. The user name is
+	applicable when transfer mode is sftp. This object is
+	not valid when Transfer Mode is selected as tftp"
+
+
+    ::= { issRunConfig 4 }
+
+issRunConfigPassword OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..20))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+	"This mib object indicates the Password required for downloading
+	running-config file in CLI command format. This password is
+	applicable when transfer mode is sftp. This object is
+	not valid when Transfer Mode is selected as tftp"
+    ::= { issRunConfig 5 }
+
+issRunConfigFileName OBJECT-TYPE
+   SYNTAX      DisplayString (SIZE(1..128))
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+      "This mib object indicates the Name of the running-config
+       file to be downloaded from remote server."
+   ::= { issRunConfig 6 }
+
+issApplyConfigToRunningConfig  OBJECT-TYPE
+   SYNTAX      TruthValue
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "When set as 'true' the configuration file in CLI command format is downloaded
+       from remote tftp/sftp server. The configurations are applied on the switch and the value
+       of this object reverts back to 'false'.
+       This object is applicable only when the configuration restore type
+       (issRestoreType) is CSR. This command is recommended to be used only when
+       switch has just come up and no configurations are performed to the switch.
+       When the switch is already running with some configurations, issuing
+       this command may result in errors for the conflicting command.
+       Note: For uploading switch running configuration to remote tftp/sftp
+       server the mib object 'issInitiateRunningConfig' should be used"
+
+       DEFVAL  { false }
+   ::= { issRunConfig 7 }
+
+issConfigToRunningConfigStatus  OBJECT-TYPE
+   SYNTAX     INTEGER {
+              inprogress(1),
+              successful(2),
+              failed(3),
+              notInitiated(4)
+             }
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "Status of applying CLI command configuration to the running configuration of the switch"
+
+   ::= { issRunConfig 8 }
+
+   issInitiateRunningConfig  OBJECT-TYPE
+   SYNTAX      TruthValue
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "When set as 'true', the running configurations in the switch
+        will be uploaded to the TFTP/SFTP server.
+        As soon as the running configurations upload operation is completed
+        in the chosen remote system, the value  of this object reverts back to 'false'."
+   DEFVAL  { false }
+   ::= { issRunConfig 9 }
+
+issCopyStartupConfig  OBJECT-TYPE
+   SYNTAX      TruthValue
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "When set as 'true', the 'startup configuration file' in the switch
+        will be uploaded to the TFTP/SFTP server.
+        As soon as the upload operation is completed in the chosen remote system,
+        the value  of this object reverts back to 'false'.
+        The objects such as issRunConfigIpAddr , issRunConfigFileName are
+        used to configure the attributes required for the Copy Startup Config operation."
+   DEFVAL  { false }
+   ::= { issRunConfig 10 }
+
+issStartupToRunningConfig  OBJECT-TYPE
+   SYNTAX      TruthValue
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+       "When set as 'true' the configuration file in CLI command format will be copied
+       from startup-config file to running-config.The configurations are applied
+       on the switch and the value of this object reverts back to 'false'.
+       This object is applicable only when the configuration restore type
+       (issRestoreType) is CSR. This command is recommended to be used only when
+       switch has just come up and no configurations are performed to the switch.
+       When the switch is already running with some configurations, issuing
+       this command may result in errors for the conflicting command. "
+   DEFVAL  { false }
+   ::= { issRunConfig 11 }
+
+END

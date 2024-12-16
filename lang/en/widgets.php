@@ -16,6 +16,9 @@ return [
     'component-status' => [
         'title' => 'Component Status',
     ],
+    'custom-map' => [
+        'title' => 'Custom Map',
+    ],
     'device-summary-horiz' => [
         'title' => 'Device Summary Horizontal',
     ],

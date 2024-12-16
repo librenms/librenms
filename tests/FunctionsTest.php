@@ -26,7 +26,9 @@
 namespace LibreNMS\Tests;
 
 use LibreNMS\Device\YamlDiscovery;
+use LibreNMS\Enum\IntegerType;
 use LibreNMS\Util\Number;
+use LibreNMS\Util\StringHelpers;
 use LibreNMS\Util\Time;
 
 class FunctionsTest extends TestCase
@@ -44,10 +46,10 @@ class FunctionsTest extends TestCase
 
     public function testIsHexString(): void
     {
-        $this->assertTrue(isHexString('af 28 02'));
-        $this->assertTrue(isHexString('aF 28 02 CE'));
-        $this->assertFalse(isHexString('a5 fj 53'));
-        $this->assertFalse(isHexString('a5fe53'));
+        $this->assertTrue(StringHelpers::isHex('af 28 02'));
+        $this->assertTrue(StringHelpers::isHex('aF 28 02 CE'));
+        $this->assertFalse(StringHelpers::isHex('a5 fj 53'));
+        $this->assertFalse(StringHelpers::isHex('a5fe53'));
     }
 
     public function testDynamicDiscoveryGetValue(): void
@@ -125,5 +127,30 @@ class FunctionsTest extends TestCase
         $this->assertSame(-12325234523.43, Number::cast('-12325234523.43asdf'));
         $this->assertSame(1, Number::cast(1.0));
         $this->assertSame(2, Number::cast('2.000'));
+    }
+
+    public function testNumberAsUnsigned()
+    {
+        $this->assertSame(42, Number::constrainInteger('42', IntegerType::int32));  /** @phpstan-ignore-line */
+        $this->assertSame(2147483647, Number::constrainInteger(2147483647, IntegerType::int32));
+        $this->assertSame(-2147483648, Number::constrainInteger(2147483648, IntegerType::int32));
+        $this->assertSame(-2147483647, Number::constrainInteger(2147483649, IntegerType::int32));
+        $this->assertSame(-1, Number::constrainInteger(4294967295, IntegerType::int32));
+        $this->assertSame(-3757, Number::constrainInteger(61779, IntegerType::int16));
+        $this->assertSame(0, Number::constrainInteger(0, IntegerType::uint32));
+        $this->assertSame(42, Number::constrainInteger(42, IntegerType::uint32));
+        $this->assertSame(4294967252, Number::constrainInteger(-42, IntegerType::uint32));
+        $this->assertSame(2147483648, Number::constrainInteger(-2147483646, IntegerType::uint32));
+        $this->assertSame(2147483647, Number::constrainInteger(-2147483647, IntegerType::uint32));
+        $this->assertSame(2147483646, Number::constrainInteger(-2147483648, IntegerType::uint32));
+        $this->assertSame(2147483645, Number::constrainInteger(-2147483649, IntegerType::uint32));
+    }
+
+    public function testNumberAsUnsignedValueExceedsMaxUnsignedValue()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        // Exceeds the maximum representable value for a 16-bit unsigned integer
+        Number::constrainInteger(4294967296, IntegerType::int16);
     }
 }

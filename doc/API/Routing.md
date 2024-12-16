@@ -11,6 +11,10 @@ Input:
 - remote_asn = Filter by remote peer ASN
 - remote_address = Filter by remote peer address
 - local_address = Filter by local address
+- bgp_descr = Filter by BGP neighbor description
+- bgp_state = Filter by BGP session state (like established,idle...)
+- bgp_state = Filter by BGP admin state (start,stop,running...)
+- bgp_family = Filter by BGP address Family (4,6)
 
 
 
@@ -22,6 +26,11 @@ curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bgp?hostnam
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bgp?asn=1234
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bgp?remote_asn=1234
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bgp?local_address=1.1.1.1&remote_address=2.2.2.2
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bgp?bgp_descr=UPSTREAM
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bgp?bgp_state=established
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bgp?bgp_adminstate=start
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bgp?bgp_family=6
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bgp?bgp_state=idle&bgp_descr=CORE&bgp_family=4
 ```
 
 Output:
@@ -32,21 +41,27 @@ Output:
  "message": "",
  "bgp_sessions": [
         {
-            "bgpPeer_id": "4",
-            "device_id": "2",
-            "astext": "",
-            "bgpPeerIdentifier": "1234:1b80:1:12::2",
-            "bgpPeerRemoteAs": "54321",
+            "bgpPeer_id": 1260,
+            "device_id": 7,
+            "vrf_id": null,
+            "astext": "Acme Ltd",
+            "bgpPeerIdentifier": "2001:0DB8:0000:24cb:0000:0000:0000:0001",
+            "bgpPeerRemoteAs": 65432,
             "bgpPeerState": "established",
-            "bgpPeerAdminStatus": "running",
-            "bgpLocalAddr": "1234:1b80:1:12::1",
+            "bgpPeerAdminStatus": "start",
+            "bgpPeerLastErrorCode": 6,
+            "bgpPeerLastErrorSubCode": 2,
+            "bgpPeerLastErrorText": "administrative shutdown",
+            "bgpPeerIface": 268,
+            "bgpLocalAddr": "2001:0DB8:0000:24cb:0000:0000:0000:0002",
             "bgpPeerRemoteAddr": "0.0.0.0",
-            "bgpPeerInUpdates": "3",
-            "bgpPeerOutUpdates": "1",
-            "bgpPeerInTotalMessages": "0",
-            "bgpPeerOutTotalMessages": "0",
-            "bgpPeerFsmEstablishedTime": "0",
-            "bgpPeerInUpdateElapsedTime": "0",
+            "bgpPeerDescr": "Another one #CORE",
+            "bgpPeerInUpdates": 283882969,
+            "bgpPeerOutUpdates": 7008,
+            "bgpPeerInTotalMessages": 283883031,
+            "bgpPeerOutTotalMessages": 1386692,
+            "bgpPeerFsmEstablishedTime": 1628487,
+            "bgpPeerInUpdateElapsedTime": 0,
             "context_name": ""
         },
     ...

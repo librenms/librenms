@@ -40,16 +40,16 @@ $sql = "SELECT `bgpLocalAs` $sql";
 foreach (dbFetchRows($sql, $param) as $asn) {
     $astext = \LibreNMS\Util\AutonomousSystem::get($asn['bgpLocalAs'])->name();
     $response[] = [
-        'bgpLocalAs'    => $asn['bgpLocalAs'],
+        'bgpLocalAs' => $asn['bgpLocalAs'],
         'asname' => $astext,
         'action' => "<a class='btn btn-sm btn-primary' href='" . \LibreNMS\Util\Url::generate(['page' => 'peering', 'section' => 'ix-list', 'bgpLocalAs' => $asn['bgpLocalAs']]) . "' role='button'>Show connected IXes</a>",
     ];
 }
 
 $output = [
-    'current'  => $current,
+    'current' => $current,
     'rowCount' => $rowCount,
-    'rows'     => $response,
-    'total'    => $total,
+    'rows' => $response,
+    'total' => $total,
 ];
 echo json_encode($output, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);

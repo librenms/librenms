@@ -1,0 +1,712 @@
+-- %DNP% $Id: ERICSSON-ROUTER-OPTICAL-TRANSCEIVER-MIB.my,v 1.1.4.3.62.2 2015/06/25 17:26:18 $
+-- %DNP% $Source: /cvsroot/pkt/sw/se/xc/bsd/config/snmp/mibs/ERICSSON-ROUTER-OPTICAL-TRANSCEIVER-MIB.my,v $
+-- *****************************************************************
+-- ERICSSON-ROUTER-OPTICAL-TRANSCEIVER-MIB
+--
+-- %DNP% Copyright (c) 2015 Ericsson AB.
+-- %DNP% All rights reserved.
+--
+-- *****************************************************************
+
+ERICSSON-ROUTER-OPTICAL-TRANSCEIVER-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Integer32, transmission,
+    Unsigned32, NOTIFICATION-TYPE
+          FROM SNMPv2-SMI
+    DisplayString, TruthValue,
+    DateAndTime, TEXTUAL-CONVENTION
+          FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+          FROM SNMPv2-CONF
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB
+    IANAItuProbableCause
+          FROM IANA-ITU-ALARM-TC-MIB
+    ifIndex
+          FROM IF-MIB
+    eriRouterMgmt
+            FROM ERICSSON-ROUTER-SMI
+    EriRouterSlot, EriRouterPort
+            FROM ERICSSON-ROUTER-TC
+    EriRouterAlarmId, EriRouterAlarmServiceAffecting,
+    EriRouterAlarmPerceivedSeverity
+          FROM ERICSSON-ROUTER-ALARM-TC
+    eriRouterSfpMonMIBObjects,eriRouterSfpMonMIBNotifications,
+    eriRouterSfpAlarmId, eriRouterSfpAlarmType,
+    eriRouterSfpAlarmDescription,
+    eriRouterSfpMonMIBConformance, eriRouterSfpAlarmSeverity,
+    eriRouterSfpAlarmDateAndTime,
+    eriRouterSfpAlarmProbableCause
+          FROM ERICSSON-ROUTER-SFP-MIB;
+
+eriRouterOpticalTransceiver MODULE-IDENTITY
+        LAST-UPDATED    "201506250000Z" -- June 25, 2015
+        ORGANIZATION    "Ericsson AB"
+        CONTACT-INFO
+                "       Ericsson AB.
+
+                Postal: 200 Headquarters Dr
+                        San Jose, CA  95134
+                        USA
+
+                 Phone: +1 408 750 5000
+                   Fax: +1 408 750 5599
+
+                "
+
+        DESCRIPTION
+                "The MIB used to manage the Optical Transceivers
+                 in Line Card ports in SSR
+                "
+        REVISION        "201506250000Z" -- June 25, 2015
+        DESCRIPTION
+                "Initial version."
+        ::= { eriRouterMgmt 50 }
+
+eriRouterOpticalTransceiverDetails OBJECT IDENTIFIER
+        ::= { eriRouterOpticalTransceiver 1 }
+
+eriRouterOpticalTransceiverPortTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF                         EriRouterOpticalTransceiverPortEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                "This table contains the ports with optical transceivers
+		  and corresponding parameters"
+        ::= { eriRouterOpticalTransceiverDetails 1 }
+
+eriRouterOpticalTransceiverPortEntry OBJECT-TYPE
+        SYNTAX      EriRouterOpticalTransceiverPortEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                "Line Card port optical transceiver parameter
+                 description.
+                "
+        INDEX   {ifIndex }
+        ::= { eriRouterOpticalTransceiverPortTable 1 }
+
+
+EriRouterOpticalTransceiverPortEntry ::= SEQUENCE {
+        eriRouterOpticalTransceiverCardSlot                 EriRouterSlot,
+        eriRouterOpticalTransceiverPort                     EriRouterPort,
+        eriRouterOpticalTransceiverType                     OCTET STRING,
+        eriRouterOpticalTransceiverMediaType                OCTET STRING,
+        eriRouterOpticalTransceiverEriRouterEricssonApproved      TruthValue,
+        eriRouterOpticalTransceiverDiagMonitoring           TruthValue,
+        eriRouterOpticalTransceiverCLEIcode                 OCTET STRING,
+        eriRouterOpticalTransceiverSerialNo                 OCTET STRING,
+        eriRouterOpticalTransceiverFrequency                OCTET STRING,
+        eriRouterOpticalTransceiverWaveLength               EriRouterOpticalTransceiverParamWaveLength,
+        eriRouterOpticalTransceiverAdditionalFeatures       OCTET STRING,
+        eriRouterOpticalTransceiverFrequencyStart           OCTET STRING,
+        eriRouterOpticalTransceiverFrequencyEnd             OCTET STRING,
+        eriRouterOpticalTransceiverFrequencySpacing         OCTET STRING,
+        eriRouterOpticalTransceiverOTNFramer                OCTET STRING,
+        eriRouterOpticalTransceiverOTNFEC                   OCTET STRING,
+        eriRouterOpticalTransceiverPowerLevel               OCTET STRING,
+        eriRouterOpticalTransceiverActiveAlarmCount         INTEGER,
+        eriRouterOpticalTransceiverParamBitMask             Integer32,
+        eriRouterOpticalTransceiverLaneCount                INTEGER
+}
+
+
+eriRouterOpticalTransceiverCardSlot OBJECT-TYPE
+        SYNTAX          EriRouterSlot
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "The chassis slot number in which the card is
+                 present where the Optical Transceiver plugged in."
+        ::= { eriRouterOpticalTransceiverPortEntry 1 }
+
+
+eriRouterOpticalTransceiverPort OBJECT-TYPE
+        SYNTAX          EriRouterPort
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "The port number where the Optical Transceiver plugged in."
+        ::= { eriRouterOpticalTransceiverPortEntry 2 }
+
+eriRouterOpticalTransceiverType OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(0..255))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "Type and category of Optical Transceiver"
+        ::= { eriRouterOpticalTransceiverPortEntry 3 }
+
+eriRouterOpticalTransceiverMediaType OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(0..255))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "Optical Transceiver Media Type"
+        ::= { eriRouterOpticalTransceiverPortEntry 4 }
+
+eriRouterOpticalTransceiverEriRouterEricssonApproved OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "Is the Optical Transceiver n this port approved
+                 by Ericsson, Yes/No?
+                "
+        ::= { eriRouterOpticalTransceiverPortEntry 5 }
+
+eriRouterOpticalTransceiverDiagMonitoring OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "Is Optical Transceiver Diag Monitoring On or Off?"
+        ::= { eriRouterOpticalTransceiverPortEntry 6 }
+
+eriRouterOpticalTransceiverCLEIcode OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(0..255))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "Optical Transceiver Common Language Equipment Identifier (CLEI) code."
+        ::= { eriRouterOpticalTransceiverPortEntry 7 }
+
+eriRouterOpticalTransceiverSerialNo OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(0..255))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "Optical Transceiver serial number"
+        ::= { eriRouterOpticalTransceiverPortEntry 8 }
+
+
+eriRouterOpticalTransceiverFrequency OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(0..255))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "Optical Transceiver Frequency"
+        ::= { eriRouterOpticalTransceiverPortEntry 9 }
+
+
+eriRouterOpticalTransceiverWaveLength OBJECT-TYPE
+        SYNTAX          EriRouterOpticalTransceiverParamWaveLength
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "Optical Transceiver Wave Length"
+        ::= { eriRouterOpticalTransceiverPortEntry 10 }
+
+eriRouterOpticalTransceiverAdditionalFeatures OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(0..255))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "Optical Transceiver Additional Features such as,
+                 Is Optical Transceiver OTN capable?
+		 and/or Is Optical Transceiver Tunable?"
+        ::= { eriRouterOpticalTransceiverPortEntry 11 }
+
+eriRouterOpticalTransceiverFrequencyStart OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(0..255))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "Frequency Start for tunable optical transceiver.
+                 Not applicable if optical transceiver is not tunable"
+        ::= { eriRouterOpticalTransceiverPortEntry 12 }
+
+eriRouterOpticalTransceiverFrequencyEnd OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(0..255))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "Frequency End for tunable optical transceiver.
+                 Not applicable if optical transceiver is not tunable"
+        ::= { eriRouterOpticalTransceiverPortEntry 13 }
+
+eriRouterOpticalTransceiverFrequencySpacing OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(0..255))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "Frequency Spacing for tunable optical transceiver.
+                 Not applicable if optical transceiver is not tunable"
+        ::= { eriRouterOpticalTransceiverPortEntry 14 }
+
+eriRouterOpticalTransceiverOTNFramer OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(0..255))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "Framer of OTN if optical transceiver is OTN capable.
+                 Not applicable if optical transceiver is not OTN
+                 capable
+                "
+        ::= { eriRouterOpticalTransceiverPortEntry 15 }
+
+eriRouterOpticalTransceiverOTNFEC OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(0..255))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "FEC of OTN if optical transceiver is OTN capable.
+                 Not applicable if optical transceiver is not OTN
+                 capable
+                "
+        ::= { eriRouterOpticalTransceiverPortEntry 16 }
+
+eriRouterOpticalTransceiverPowerLevel OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(0..255))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "Optical Transceiver Power Level"
+        ::= { eriRouterOpticalTransceiverPortEntry 17 }
+
+eriRouterOpticalTransceiverActiveAlarmCount OBJECT-TYPE
+        SYNTAX          INTEGER
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "Number of alarms active on the Optical Transceiver
+		"
+        ::= { eriRouterOpticalTransceiverPortEntry 18 }
+
+eriRouterOpticalTransceiverParamBitMask OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "This Bit Mask indicates which values are valid for
+                 EriRouterOpticalTransceiverParamType in
+                 eriRouterOpticalTransceiverParamTable:
+                     0x0001 optical transceiver txpower valid
+                     0x0002 optical transceiver rxpower valid
+                     0x0004 optical transceiver temperature valid
+                     0x0008 optical transceiver laserBiasCurrent valid
+                     0x0010 optical transceiver soaBiasCurrent valid
+                     0x0020 optical transceiver Vcc valid
+                     0x0040 optical transceiver aux1 valid
+                     0x0080 optical transceiver aux2 valid
+                     0x0100 optical transceiver lane txpower valid
+                     0x0200 optical transceiver lane rxpower valid
+                     0x0400 optical transceiver lane temperature valid
+                     0x0800 optical transceiver lane laserBiasCurrent valid
+                "
+        ::= { eriRouterOpticalTransceiverPortEntry 19 }
+
+eriRouterOpticalTransceiverLaneCount OBJECT-TYPE
+        SYNTAX          INTEGER
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "Number of Lanes in optical transceiver"
+        ::= { eriRouterOpticalTransceiverPortEntry 20 }
+
+EriRouterOpticalTransceiverParamType ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "Enums for optical transceiver parameters
+
+        txpower (1)           : transmitter power
+        rxpower (2)           : receiver power
+        temperature (3)       : Temperature
+        laserBiasCurrent (4)  : Laser bias current in 100s of microamperes
+        soaBiasCurrent (5)    : SOA Bias Current in 100s of microamperes
+                                Applicable for CFP  and similar types of optical
+                                transceivers.
+        Vcc (6)               : Voltage
+        aux1 (7)              : Auxiliary measurement 1 for XFP/CFP and similar types
+                                of optical transceivers defined in Byte 222 in
+                                INF-8077i: 10 Gigabit Small Form Factor
+                                Pluggable Module.
+        aux2 (8)              : Auxiliary measurement 2 for XFP/CFP and similar types
+                                of optical transceivers defined in Byte 222 in
+                                INF-8077i: 10 Gigabit Small Form Factor
+                                Pluggable Module
+        "
+    SYNTAX          INTEGER  {
+                        txpower(1),
+                        rxpower(2),
+                        temperature(3),
+                        laserBiasCurrent(4),
+                        soaBiasCurrent(5),
+                        vcc(6),
+                        aux1 (7),
+                        aux2 (8)
+                    }
+
+
+EriRouterOpticalTransceiverParamWaveLength ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT    "d-2"
+    STATUS          current
+    DESCRIPTION
+                    "Wave Length in NM in 1/100th"
+    SYNTAX          Integer32 (-1000000..1000000 )
+
+
+EriRouterOpticalTransceiverParameterValue ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT    "d-3"
+    STATUS          current
+    DESCRIPTION
+                    "Tx power value or threshold value     - unit milli dbm
+                     Rx power value or threshold value     - unit milli dbm
+                     temperature value or threshold value  - Represents a temperature,
+                                   in degrees Celsius (0..(100.000))
+                     Bias Current value or threshold value - unit 100s of microamperes
+                     Vcc value or threshold value in millivolts
+                     AUX1 if measured will be one of the following
+                          APD Bias Voltage value or threshold value
+                          TEC Current value or threshold value
+                          Laser Temperature value or threshold value
+                          Laser Wavelength value or threshold value
+                          Supply voltage options (+5V or +3.3V or + 1.8V or -5.2V)
+				value or threshold value
+                          Supply current options (+5V or +3.3V or + 1.8V or -5.2V)
+				value or threshold value
+                          Reserved
+                     AUX2 if measured will be one of the following
+                          APD Bias Voltage value or threshold value
+                          TEC Current value or threshold value
+                          Laser Temperature value or threshold value
+                          Laser Wavelength value or threshold value
+                          Supply voltage options (+5V or +3.3V or + 1.8V or -5.2V)
+				value or threshold value
+                          Supply current options (+5V or +3.3V or + 1.8V or -5.2V)
+				value or threshold value
+                          Reserved
+                     "
+    SYNTAX          Integer32 (-1000000..1000000 )
+
+
+eriRouterOpticalTransceiverParamTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF EriRouterOpticalTransceiverParamEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table provides objects to monitor optical
+        transceiver parameters in a network element. It also
+        provides objects for monitoring high and low warning and
+	alarm threshold on these monitored parameters."
+    ::= { eriRouterOpticalTransceiverDetails 2 }
+
+
+eriRouterOpticalTransceiverParamEntry OBJECT-TYPE
+        SYNTAX      EriRouterOpticalTransceiverParamEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                "OpticalTransceiver Parameter Entries in Table"
+        INDEX   { ifIndex, eriRouterOpticalTransceiverParamType }
+        ::= { eriRouterOpticalTransceiverParamTable 1 }
+
+
+EriRouterOpticalTransceiverParamEntry ::= SEQUENCE {
+        eriRouterOpticalTransceiverParamType 		  EriRouterOpticalTransceiverParamType,
+        eriRouterOpticalTransceiverParamDescription     OCTET STRING,
+        eriRouterOpticalTransceiverCurrentValue         EriRouterOpticalTransceiverParameterValue,
+        eriRouterOpticalTransceiverMaxAlarmValue        EriRouterOpticalTransceiverParameterValue,
+        eriRouterOpticalTransceiverMaxWarningValue      EriRouterOpticalTransceiverParameterValue,
+        eriRouterOpticalTransceiverMinAlarmValue        EriRouterOpticalTransceiverParameterValue,
+        eriRouterOpticalTransceiverMinWarningValue      EriRouterOpticalTransceiverParameterValue
+}
+
+
+eriRouterOpticalTransceiverParamType OBJECT-TYPE
+    SYNTAX          EriRouterOpticalTransceiverParamType
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the optical parameter type that
+         is being monitored in this entry.
+        "
+    ::= { eriRouterOpticalTransceiverParamEntry 1 }
+
+eriRouterOpticalTransceiverParamDescription OBJECT-TYPE
+    SYNTAX          OCTET STRING (SIZE(0..128))
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the optical parameter description including
+         units that is being monitored in this entry.
+        "
+    ::= { eriRouterOpticalTransceiverParamEntry 2 }
+
+
+
+eriRouterOpticalTransceiverCurrentValue OBJECT-TYPE
+    SYNTAX          EriRouterOpticalTransceiverParameterValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The current value of tx power, rx power, temperature,
+         bias current and Vcc
+        "
+    ::= { eriRouterOpticalTransceiverParamEntry 3 }
+
+
+eriRouterOpticalTransceiverMaxAlarmValue OBJECT-TYPE
+    SYNTAX          EriRouterOpticalTransceiverParameterValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The alarm high threshold value of tx power, rx power,
+         temperature, bias current and Vcc
+        "
+    ::= { eriRouterOpticalTransceiverParamEntry 4 }
+
+
+eriRouterOpticalTransceiverMaxWarningValue OBJECT-TYPE
+    SYNTAX          EriRouterOpticalTransceiverParameterValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The warning high threshold value of tx power, rx power,
+         temperature, bias current and Vcc
+        "
+    ::= { eriRouterOpticalTransceiverParamEntry 5 }
+
+
+eriRouterOpticalTransceiverMinAlarmValue OBJECT-TYPE
+    SYNTAX          EriRouterOpticalTransceiverParameterValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The alarm low threshold value of tx power, rx power,
+         temperature, bias current and Vcc
+        "
+    ::= { eriRouterOpticalTransceiverParamEntry 6 }
+
+
+eriRouterOpticalTransceiverMinWarningValue OBJECT-TYPE
+    SYNTAX          EriRouterOpticalTransceiverParameterValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The warning low threshold value of tx power, rx power,
+         temperature, bias current and Vcc
+        "
+    ::= { eriRouterOpticalTransceiverParamEntry 7 }
+
+
+EriRouterLaneInOpticalTransceiverParamType ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "Enums for optical transceiver parameters
+
+        laneTxPower (1)           : transmitter power
+        laneRxPower (2)           : receiver power
+        laneTemperature (3)        : Temperature
+        laneLaserBiasCurrent (4)   : Laser bias current in 100s of microamperes
+        "
+    SYNTAX          INTEGER  {
+                        laneTxPower(1),
+                        laneRxPower(2),
+                        laneTemperature(3),
+                        laneLaserBiasCurrent(4)
+                    }
+
+
+EriRouterLaneInOpticalTransceiverParameterValue ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT    "d-3"
+    STATUS          current
+    DESCRIPTION
+                    "Tx power range     - unit milli dbm
+                     Rx power range     - unit milli dbm
+                     temperature range  - Represents a temperature,
+                                   in degrees Celsius (0..(100.000))
+                     Bias Current Range - unit 100s of microamperes"
+    SYNTAX          Integer32 (-1000000..1000000 )
+
+
+eriRouterLaneInOpticalTransceiverParamTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF EriRouterLaneInOpticalTransceiverParamEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table provides objects to monitor optical
+        transceiver parameters in a network element. It also
+        provides objects for monitoring high and low  warning and
+        alarm threshold on these monitored parameters.
+        "
+    ::= { eriRouterOpticalTransceiverDetails 3 }
+
+
+eriRouterLaneInOpticalTransceiverParamEntry OBJECT-TYPE
+        SYNTAX      EriRouterLaneInOpticalTransceiverParamEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                "LaneInOpticalTransceiver Parameter Entries in Table"
+        INDEX   { ifIndex, eriRouterLaneInOpticalTransceiverParamType, eriRouterLaneInOpticalTransceiver }
+        ::= { eriRouterLaneInOpticalTransceiverParamTable 1 }
+
+
+EriRouterLaneInOpticalTransceiverParamEntry ::= SEQUENCE {
+        eriRouterLaneInOpticalTransceiver                     Integer32,
+        eriRouterLaneInOpticalTransceiverParamType            EriRouterLaneInOpticalTransceiverParamType,
+        eriRouterLaneInOpticalTransceiverCurrentValue         EriRouterLaneInOpticalTransceiverParameterValue,
+        eriRouterLaneInOpticalTransceiverMaxAlarmValue        EriRouterLaneInOpticalTransceiverParameterValue,
+        eriRouterLaneInOpticalTransceiverMaxWarningValue      EriRouterLaneInOpticalTransceiverParameterValue,
+        eriRouterLaneInOpticalTransceiverMinAlarmValue        EriRouterLaneInOpticalTransceiverParameterValue,
+        eriRouterLaneInOpticalTransceiverMinWarningValue      EriRouterLaneInOpticalTransceiverParameterValue
+}
+
+
+eriRouterLaneInOpticalTransceiver OBJECT-TYPE
+    SYNTAX          Integer32 (1..16)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the optical tranceiver lane that
+         is being monitored in this entry.
+        "
+    ::= { eriRouterLaneInOpticalTransceiverParamEntry 1 }
+
+
+eriRouterLaneInOpticalTransceiverParamType OBJECT-TYPE
+    SYNTAX          EriRouterLaneInOpticalTransceiverParamType
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the optical parameter type that
+         is being monitored in this entry.
+        "
+    ::= { eriRouterLaneInOpticalTransceiverParamEntry 2 }
+
+
+eriRouterLaneInOpticalTransceiverCurrentValue OBJECT-TYPE
+    SYNTAX          EriRouterLaneInOpticalTransceiverParameterValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The current value of tx power, rx power, temperature,
+         bias current and Vcc
+        "
+    ::= { eriRouterLaneInOpticalTransceiverParamEntry 3 }
+
+
+eriRouterLaneInOpticalTransceiverMaxAlarmValue OBJECT-TYPE
+    SYNTAX          EriRouterLaneInOpticalTransceiverParameterValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The alarm high threshold value of tx power, rx power,
+         temperature, bias current and Vcc
+        "
+    ::= { eriRouterLaneInOpticalTransceiverParamEntry 4 }
+
+
+eriRouterLaneInOpticalTransceiverMaxWarningValue OBJECT-TYPE
+    SYNTAX          EriRouterLaneInOpticalTransceiverParameterValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The warning high threshold value of tx power, rx power,
+         temperature, bias current and Vcc
+        "
+    ::= { eriRouterLaneInOpticalTransceiverParamEntry 5 }
+
+
+eriRouterLaneInOpticalTransceiverMinAlarmValue OBJECT-TYPE
+    SYNTAX          EriRouterLaneInOpticalTransceiverParameterValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The alarm low threshold value of tx power, rx power,
+         temperature, bias current and Vcc
+        "
+    ::= { eriRouterLaneInOpticalTransceiverParamEntry 6 }
+
+
+eriRouterLaneInOpticalTransceiverMinWarningValue OBJECT-TYPE
+    SYNTAX          EriRouterLaneInOpticalTransceiverParameterValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The warning low threshold value of tx power, rx power,
+         temperature, bias current and Vcc"
+    ::= { eriRouterLaneInOpticalTransceiverParamEntry 7 }
+
+-- MIB Objects
+
+
+eriRouterOpticalTransceiverAlarm NOTIFICATION-TYPE
+        OBJECTS     {
+                      ifIndex,
+                      eriRouterOpticalTransceiverCardSlot,
+                      eriRouterOpticalTransceiverPort,
+                      eriRouterOpticalTransceiverParamType,
+                      eriRouterSfpAlarmId,
+                      eriRouterSfpAlarmSeverity,
+                      eriRouterSfpAlarmType,
+                      eriRouterSfpAlarmDateAndTime,
+                      eriRouterSfpAlarmDescription,
+                      eriRouterSfpAlarmProbableCause
+                    }
+        STATUS      current
+        DESCRIPTION
+                "An eriRouterOpticalTransceiverAlarm notification signifies that an
+                alarm has been raised or cleared on a Optical Transceiver"
+        ::= { eriRouterSfpMonMIBNotifications 2 }
+
+
+eriRouterOpticalTransceiverLaneAlarm NOTIFICATION-TYPE
+        OBJECTS     {
+                      ifIndex,
+                      eriRouterOpticalTransceiverCardSlot,
+                      eriRouterOpticalTransceiverPort,
+                      eriRouterLaneInOpticalTransceiver,
+                      eriRouterLaneInOpticalTransceiverParamType,
+                      eriRouterSfpAlarmId,
+                      eriRouterSfpAlarmSeverity,
+                      eriRouterSfpAlarmType,
+                      eriRouterSfpAlarmDateAndTime,
+                      eriRouterSfpAlarmDescription,
+                      eriRouterSfpAlarmProbableCause
+                    }
+        STATUS      current
+        DESCRIPTION
+                "An eriRouterOpticalTransceiverLaneAlarm notification signifies that an
+                alarm has been raised or cleared in a lane on a Optical Transceiver"
+        ::= { eriRouterSfpMonMIBNotifications 3 }
+
+
+-- Conformance Statements
+
+eriRouterOpticalTransceiverMonMIBGroups OBJECT IDENTIFIER
+        ::= { eriRouterSfpMonMIBConformance 3 }
+
+eriRouterOpticalTransceiverMonMIBCompliances OBJECT IDENTIFIER
+        ::= { eriRouterSfpMonMIBConformance 4 }
+
+eriRouterOpticalTransceiverMonMIBNotificationGroup NOTIFICATION-GROUP
+      NOTIFICATIONS   {   eriRouterOpticalTransceiverAlarm,
+                          eriRouterOpticalTransceiverLaneAlarm
+                      }
+      STATUS      current
+      DESCRIPTION
+              "A collection of notifications providing Optical Transceiver
+               fault condition
+              "
+      ::= {eriRouterOpticalTransceiverMonMIBGroups 2 }
+
+eriRouterOpticalTransceiverMonMIBCompliance MODULE-COMPLIANCE
+      STATUS      current
+      DESCRIPTION
+              "The compliance statement for the OpticalTransceiver MIB"
+      MODULE      -- this module
+      GROUP      eriRouterOpticalTransceiverMonMIBNotificationGroup
+      DESCRIPTION
+		"This group is mandatory for devices which contain
+                 Optical Transceiver alarm monitoring capabilities
+                "
+
+      ::= { eriRouterOpticalTransceiverMonMIBCompliances 1 }
+
+
+END
+

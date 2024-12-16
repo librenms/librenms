@@ -18,7 +18,7 @@ if ($inlet_oids) {
             $inlet_divisor = pow(10, snmp_get($device, "inletSensorDecimalDigits.$inlet_index.activePower", '-Ovq', 'PDU2-MIB'));
             $inlet_power = (snmp_get($device, "measurementsInletSensorValue.$inlet_index.activePower", '-Ovq', 'PDU2-MIB') / $inlet_divisor);
             if ($inlet_power >= 0) {
-                discover_sensor($valid['sensor'], 'power', $device, $inlet_oid, $inlet_index, 'raritan', $inlet_descr, $inlet_divisor, $multiplier, null, null, null, null, $inlet_power);
+                discover_sensor(null, 'power', $device, $inlet_oid, $inlet_index, 'raritan', $inlet_descr, $inlet_divisor, $multiplier, null, null, null, null, $inlet_power);
             }
         }
     }
@@ -41,7 +41,7 @@ if ($outlet_oids) {
             $outlet_descr = snmp_get($device, "outletLabel.$outletsuffix", '-Ovq', 'PDU-MIB');
             $outlet_power = snmp_get($device, "outletApparentPower.$outletsuffix", '-Ovq', 'PDU-MIB');
             if ($outlet_power >= 0) {
-                discover_sensor($valid['sensor'], 'power', $device, $outlet_oid, $outlet_insert_index, 'raritan', $outlet_descr, $divisor, $multiplier, null, null, null, null, $outlet_power);
+                discover_sensor(null, 'power', $device, $outlet_oid, $outlet_insert_index, 'raritan', $outlet_descr, $divisor, $multiplier, null, null, null, null, $outlet_power);
             }
         }
     }
@@ -68,7 +68,7 @@ if ($outlet_oids) {
             $outlet_divisor = pow(10, snmp_get($device, "outletSensorDecimalDigits.1.$outlet_index.activePower", '-Ovq', 'PDU2-MIB'));
             $outlet_power = (snmp_get($device, "measurementsOutletSensorValue.1.$outlet_index.activePower", '-Ovq', 'PDU2-MIB') / $outlet_divisor);
             if ($outlet_power >= 0) {
-                discover_sensor($valid['sensor'], 'power', $device, $outlet_oid, $outlet_insert_index, 'raritan', $outlet_descr, $outlet_divisor, $multiplier, null, null, null, null, $outlet_power);
+                discover_sensor(null, 'power', $device, $outlet_oid, $outlet_insert_index, 'raritan', $outlet_descr, $outlet_divisor, $multiplier, null, null, null, null, $outlet_power);
             }
         }
     }

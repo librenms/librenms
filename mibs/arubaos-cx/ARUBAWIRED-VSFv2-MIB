@@ -1,0 +1,606 @@
+
+
+--**MOD+************************************************************************
+--* Module:    ARUBAWIRED-VSFv2-MIB :VSF MIB file
+--*
+--* (c) Copyright 2019-2022 Hewlett Packard Enterprise Development LP
+--* All Rights Reserved.
+--*
+--* The contents of this software are proprietary and confidential
+--* to the Hewlett-Packard Development Company, L.P.  No part of this
+--* program may be photocopied, reproduced, or translated into another
+--* programming language without prior written consent of the
+--* Hewlett-Packard Development Company, L.P.
+--*
+--* Purpose: This file contains MIB definition of ARUBAWIRED-VSFv2-MIB
+--*
+--**MOD-************************************************************************
+
+ARUBAWIRED-VSFv2-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, NOTIFICATION-TYPE,
+    TimeTicks
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    DisplayString, TruthValue, MacAddress
+        FROM SNMPv2-TC
+    PortList
+        FROM Q-BRIDGE-MIB
+    wndFeatures
+        FROM ARUBAWIRED-NETWORKING-OID;
+
+arubaWiredVsfv2MIB MODULE-IDENTITY
+    LAST-UPDATED "202203030000Z" -- March 03, 2022
+    ORGANIZATION "HPE/Aruba Networking Division"
+    CONTACT-INFO "Hewlett Packard Company 8000 Foothills Blvd. Roseville,
+                  CA 95747"
+
+    DESCRIPTION   "This MIB module describes objects used to manage Virtual
+                   Switching Framework (VSF) feature."
+
+    REVISION     "202203030000Z" -- March 03, 2022
+    DESCRIPTION  "Fixed syntax errors"
+
+    REVISION     "202111210000Z" -- November 24, 2021
+    DESCRIPTION  "Added a new error status to arubaWiredVsfv2PortStatusStr"
+
+    REVISION     "202011180000Z" -- November 18, 2020
+    DESCRIPTION  "Added arubaWiredVsfv2PortTable and arubaWiredVsfv2Secondary"
+
+    REVISION     "202009090000Z" -- September 09, 2020
+    DESCRIPTION  "Added new scalar MIB objects"
+
+    REVISION     "202007130000Z" -- July 13, 2020
+    DESCRIPTION  "Initial Revision"
+    ::= { wndFeatures 15 }
+
+-- Configuration support for Virtual Switch Framework
+
+arubaWiredVsfv2Notifications OBJECT IDENTIFIER ::= { arubaWiredVsfv2MIB 0 }
+arubaWiredVsfv2Objects       OBJECT IDENTIFIER ::= { arubaWiredVsfv2MIB 1 }
+arubaWiredVsfv2Config        OBJECT IDENTIFIER ::= { arubaWiredVsfv2Objects 0 }
+arubaWiredVsfv2Status        OBJECT IDENTIFIER ::= { arubaWiredVsfv2Objects 1 }
+
+--*************************************************************
+--*    Scalar Group
+--*************************************************************
+
+arubaWiredVsfv2TrapEnable   OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "If set to 'true', SNMP traps will be generated for VSF events."
+    ::= { arubaWiredVsfv2Config 1 }
+
+arubaWiredVsfv2SplitDetectConfigured   OBJECT-TYPE
+    SYNTAX      INTEGER {
+                          none (1),
+                          mgmt (2)
+                        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Split detection scheme configured on the VSF stack. Supported
+             schemes:
+             'none`: No split detection. In the event of a stack split,
+                     multiple fragments can be active.
+             `mgmt`: The management network interface will be used to detect a
+                     stack split. If multiple fragments are detected, only
+                     the stack fragment containing the 'primary' member will
+                     keep its network interfaces active."
+
+    ::= { arubaWiredVsfv2Config 2 }
+
+--*************************************************************
+--*    VSF Status Scalar Group
+--*************************************************************
+
+arubaWiredVsfv2OperStatus   OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Describes current split state of VSF stack. Split state can be
+             one of the following:
+             no_split:          Both primary and secondary members are
+                                physically present and operational.
+             fragment_active:   A stack split has been detected and all network
+                                interfaces in this fragment are active.
+             fragment_inactive: A stack split has been detected and all network
+                                interfaces in this fragment are inactive."
+    ::= { arubaWiredVsfv2Status 1 }
+
+arubaWiredVsfv2Topology   OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object describes the physical topology of the VSF stack.
+             Supported technologies include:
+             standalone: The VSF stack comprises a single member only.
+             chain:      The VSF stack members are connected in a daisy chain.
+             ring:       The VSF stack members are connected in a ring."
+    ::= { arubaWiredVsfv2Status 2 }
+
+arubaWiredVsfv2StackMacAddr   OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This object describes MAC address of a VSF stack."
+
+    ::= { arubaWiredVsfv2Status 3 }
+
+arubaWiredVsfv2DomainId OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..37))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This object uniquely identifies the VSF stack. All members
+                 of the stack have the same domain ID. It is valid only when
+                 we have more than a member in a stack."
+
+    ::= { arubaWiredVsfv2Status 4 }
+
+arubaWiredVsfv2Secondary OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..3))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This object uniquely identifies the designated secondary
+                 switch for the stack. This switch would normally become the
+                 standby member of the stack."
+
+    ::= { arubaWiredVsfv2Status 5 }
+
+--*************************************************************
+--*    arubaWiredVsfv2MemberTable
+--*************************************************************
+
+arubaWiredVsfv2MemberTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF ArubaWiredVsfv2MemberEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "This table contains information about the Virtual Switching
+                 Framework members."
+    ::= { arubaWiredVsfv2Objects 2 }
+
+arubaWiredVsfv2MemberEntry OBJECT-TYPE
+    SYNTAX      ArubaWiredVsfv2MemberEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "A row in the Virtual Switching Framework member table."
+    INDEX       { arubaWiredVsfv2MemberIndex }
+    ::= { arubaWiredVsfv2MemberTable 1 }
+
+ArubaWiredVsfv2MemberEntry ::=
+    SEQUENCE {
+             arubaWiredVsfv2MemberIndex                Integer32,
+             arubaWiredVsfv2MemberRole                 DisplayString,
+             arubaWiredVsfv2MemberStatus               DisplayString,
+             arubaWiredVsfv2MemberPartNumber           DisplayString,
+             arubaWiredVsfv2MemberMacAddr              MacAddress,
+             arubaWiredVsfv2MemberProductName          DisplayString,
+             arubaWiredVsfv2MemberSerialNum            DisplayString,
+             arubaWiredVsfv2MemberBootImage            DisplayString,
+             arubaWiredVsfv2MemberCpuUtil              Integer32,
+             arubaWiredVsfv2MemberMemoryUtil           Integer32,
+             arubaWiredVsfv2MemberBootTime             TimeTicks,
+             arubaWiredVsfv2MemberBootRomVersion       DisplayString,
+             arubaWiredVsfv2MemberTotalMemory          Integer32,
+             arubaWiredVsfv2MemberCurrentUsage         Integer32
+             }
+
+arubaWiredVsfv2MemberIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Virtual Switching Framework Member ID."
+    ::= { arubaWiredVsfv2MemberEntry 1 }
+
+arubaWiredVsfv2MemberRole OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Role of VSF member in stack."
+    ::= { arubaWiredVsfv2MemberEntry 2 }
+
+arubaWiredVsfv2MemberStatus OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Specifies the status of the member-switch in the VSF
+                 stack. The switch status can be one of:
+
+                `not_present`:            Member is not physically part of the
+                                          stack.
+                `booting`:                Member is booting up.
+                `ready`:                  Member has finished booting, and its
+                                          interfaces can forward traffic.
+                `version_mismatch`:       Member is not running the same
+                                          operating system version as the conductor
+                                          switch.
+                `communication_failure`:  The conductor switch is unable to
+                                          communicate with the member.
+                `in_other_fragment`:      Member is part of another fragment as
+                                          discovered through split detection."
+    ::= { arubaWiredVsfv2MemberEntry 3 }
+
+arubaWiredVsfv2MemberPartNumber OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The Part Number Identifier of the VSF stack member."
+    ::= { arubaWiredVsfv2MemberEntry 4 }
+
+arubaWiredVsfv2MemberMacAddr OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The switch base MAC address of this VSF stack member."
+    ::= { arubaWiredVsfv2MemberEntry 5 }
+
+arubaWiredVsfv2MemberProductName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This product name of this VSF stack member."
+    ::= { arubaWiredVsfv2MemberEntry 6 }
+
+arubaWiredVsfv2MemberSerialNum OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The serial number identifier of this VSF stack member."
+    ::= { arubaWiredVsfv2MemberEntry 7 }
+
+arubaWiredVsfv2MemberBootImage OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The software image version running on this VSF stack member."
+    ::= { arubaWiredVsfv2MemberEntry 8 }
+
+arubaWiredVsfv2MemberCpuUtil OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The CPU utilization, in percentage, of this VSF stack member."
+    ::= { arubaWiredVsfv2MemberEntry 9 }
+
+arubaWiredVsfv2MemberMemoryUtil OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The memory utilization, in percentage, of this VSF stack
+                 member."
+    ::= { arubaWiredVsfv2MemberEntry 10 }
+
+arubaWiredVsfv2MemberBootTime OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The boot up time, in seconds, of this VSF stack member."
+    ::= { arubaWiredVsfv2MemberEntry 11 }
+
+arubaWiredVsfv2MemberBootRomVersion OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The software version of the running ServiceOS image on this
+                 VSF stack member."
+    ::= { arubaWiredVsfv2MemberEntry 12 }
+
+arubaWiredVsfv2MemberTotalMemory OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Specifies the total memory (RAM) available on this
+                 VSF stack member."
+    ::= { arubaWiredVsfv2MemberEntry 13 }
+
+arubaWiredVsfv2MemberCurrentUsage OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Specifies the current memory (RAM) usage on this
+                 VSF stack member."
+    ::= { arubaWiredVsfv2MemberEntry 14 }
+
+--*************************************************************
+--*    arubaWiredVsfv2LinkTable
+--*************************************************************
+
+arubaWiredVsfv2LinkTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF ArubaWiredVsfv2LinkEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "This table contains information about the Virtual Switching
+                 Framework Links."
+    ::= { arubaWiredVsfv2Objects 3 }
+
+arubaWiredVsfv2LinkEntry OBJECT-TYPE
+    SYNTAX      ArubaWiredVsfv2LinkEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "A row in the Virtual Switching Framework Link table."
+    INDEX       { arubaWiredVsfv2LinkMemberId,
+                  arubaWiredVsfv2LinkId }
+    ::= { arubaWiredVsfv2LinkTable 1 }
+
+ArubaWiredVsfv2LinkEntry ::=
+    SEQUENCE {
+             arubaWiredVsfv2LinkMemberId               Integer32,
+             arubaWiredVsfv2LinkId                     Integer32,
+             arubaWiredVsfv2LinkOperStatus             DisplayString,
+             arubaWiredVsfv2LinkPeerMemberId           Integer32,
+             arubaWiredVsfv2LinkPeerLinkId             Integer32,
+             arubaWiredVsfv2LinkPortList               PortList
+             }
+
+arubaWiredVsfv2LinkMemberId OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Virtual Switching Framework link member ID."
+    ::= { arubaWiredVsfv2LinkEntry 1 }
+
+arubaWiredVsfv2LinkId OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Virtual Switching Framework link ID."
+    ::= { arubaWiredVsfv2LinkEntry 2 }
+
+arubaWiredVsfv2LinkOperStatus OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The state of the VSF link."
+    ::= { arubaWiredVsfv2LinkEntry 3 }
+
+arubaWiredVsfv2LinkPeerMemberId OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The member ID of the peer switch on the link."
+    ::= { arubaWiredVsfv2LinkEntry 4 }
+
+arubaWiredVsfv2LinkPeerLinkId OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The link id of the peer member on the link."
+    ::= { arubaWiredVsfv2LinkEntry 5 }
+
+arubaWiredVsfv2LinkPortList OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Interface(s) associated to the link."
+    ::= { arubaWiredVsfv2LinkEntry 6 }
+
+--*************************************************************
+--*    arubaWiredVsfv2PortTable
+--*************************************************************
+
+arubaWiredVsfv2PortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF ArubaWiredVsfv2PortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "This table contains information about the Virtual
+                 Switching Framework physical ports."
+    ::= { arubaWiredVsfv2Objects 4 }
+
+arubaWiredVsfv2PortEntry OBJECT-TYPE
+    SYNTAX      ArubaWiredVsfv2PortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "A row in the VSF port table."
+    INDEX       { arubaWiredVsfv2PortIfIndex }
+    ::= { arubaWiredVsfv2PortTable 1 }
+
+ArubaWiredVsfv2PortEntry ::=
+    SEQUENCE {
+             arubaWiredVsfv2PortIfIndex          Integer32,
+             arubaWiredVsfv2PortOperStatus       DisplayString,
+             arubaWiredVsfv2PortStatusStr        DisplayString,
+             arubaWiredVsfv2PortPeerInterface    PortList,
+             arubaWiredVsfv2PortPeerSysMac       MacAddress,
+             arubaWiredVsfv2PortPeerProductType  DisplayString
+    }
+
+arubaWiredVsfv2PortIfIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "A unique value, greater than zero, for each interface."
+    ::= { arubaWiredVsfv2PortEntry 1 }
+
+arubaWiredVsfv2PortOperStatus OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The state of the VSF interface. The interface state
+                 can be one of:
+
+                 `up`                    : Interface is brought up.
+                 `down`                  : Interface is brought down.
+                 `error`                 : Interface is in error state.
+                 `autojoin in progress`  : Interface is in autojoin progress."
+    ::= { arubaWiredVsfv2PortEntry 2 }
+
+arubaWiredVsfv2PortStatusStr OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The status string for the VSF interface. The interface state
+                 can be one of :
+
+                 'Successfully connected to <ifname>'                              : Interface is connected and brought up.
+                 'Interface physically down'                                       : Interface is down.
+                 'Peer with inconsistent system MAC address'                       : Peer MAC address inconsistent across other interfaces belonging to this link.
+                 'Peer with incompatible product type'                             : Peer switch with incompatible product type.
+                 'Loop detected on the interface'                                  : Loop detected on this interface.
+                 'Peer timed out'                                                  : No response from the peer switch.
+                 'Peer autojoin in progress'                                       : Peer switch is autojoin in progress.
+                 'Peer is not autojoin eligible'                                   : Peer switch not autojoin eligible.
+                 'Peer with incompatible software version'                         : Peer switch running incompatible software version.
+                 'Peer autojoin validations failed'                                : Attempt to autojoin by the peer failed.
+                 'Peer with multiple VSF interfaces attempting to autojoin'        : Attempt to autojoin via multiple VSF interfaces.
+                 'Peer attempting to autojoin on non-provisioned interface'        : Peer switch VSF interface configuration mismatch.
+                 'Peer with non-default VSF interface attempting to autojoin'      : Attempt to autojoin on non default VSF interface.
+                 'Peer autojoin failed as there is no free member number available': Attempt to autojoin by the peer failed as there is no free member number available.
+                 'Peer autojoin failed as it is connected in incorrect direction'  : Attempt to autojoin by the peer failed as it is not connected in right direction.
+                 'Peer with inconsistent VSF link configuration'                   : Peer switch with VSF link configuration mismatch.
+                 'Peer autojoin failed as it has MACsec configuration'             : Peer switch with MACsec configuration on the interface."
+
+    ::= { arubaWiredVsfv2PortEntry 3 }
+
+arubaWiredVsfv2PortPeerInterface OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Interface name of the peer VSF switch connected to this interface."
+    ::= { arubaWiredVsfv2PortEntry 4 }
+
+arubaWiredVsfv2PortPeerSysMac OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "MAC address of the peer VSF switch connected to this interface."
+    ::= { arubaWiredVsfv2PortEntry 5 }
+
+arubaWiredVsfv2PortPeerProductType OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..10))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Product type of the peer VSF switch connected to this interface."
+    ::= { arubaWiredVsfv2PortEntry 6 }
+
+--*************************************************************
+--*    arubaWiredVsfv2Notifications
+--*************************************************************
+
+arubaWiredVsfv2MemberStatusChange NOTIFICATION-TYPE
+    OBJECTS {
+        arubaWiredVsfv2MemberIndex,
+        arubaWiredVsfv2MemberRole,
+        arubaWiredVsfv2MemberStatus
+    }
+    STATUS        current
+    DESCRIPTION
+            "This notification is generated when a new member joins the VSF
+            stack."
+    ::= { arubaWiredVsfv2Notifications 1 }
+
+arubaWiredVsfv2FragmentStatusChange NOTIFICATION-TYPE
+     OBJECTS {
+        arubaWiredVsfv2MemberIndex,
+        arubaWiredVsfv2OperStatus
+    }
+    STATUS        current
+    DESCRIPTION
+            "This notification is generated when a stack fragment becomes
+            active or inactive."
+    ::= { arubaWiredVsfv2Notifications 2 }
+
+arubaWiredVsfv2Conformance OBJECT IDENTIFIER ::= {arubaWiredVsfv2MIB 2 }
+arubaWiredVsfv2Compliances OBJECT IDENTIFIER ::= {arubaWiredVsfv2Conformance 1}
+arubaWiredVsfv2Groups      OBJECT IDENTIFIER ::= {arubaWiredVsfv2Conformance 2}
+
+arubaWiredVsfv2ConfigScalarGroup OBJECT-GROUP
+    OBJECTS   {
+               arubaWiredVsfv2Topology,
+               arubaWiredVsfv2TrapEnable,
+               arubaWiredVsfv2StackMacAddr,
+               arubaWiredVsfv2DomainId,
+               arubaWiredVsfv2Secondary
+              }
+    STATUS      current
+    DESCRIPTION "A collection of Virtual Switching Framework scalar objects."
+    ::= { arubaWiredVsfv2Groups 1 }
+
+arubaWiredVsfv2StatusScalarGroup OBJECT-GROUP
+    OBJECTS   {
+               arubaWiredVsfv2OperStatus,
+               arubaWiredVsfv2SplitDetectConfigured
+              }
+    STATUS      current
+    DESCRIPTION "A collection of Virtual Switching Framework notifications
+                 objects."
+    ::= { arubaWiredVsfv2Groups 2 }
+
+arubaWiredVsfv2MemberTableGroup OBJECT-GROUP
+    OBJECTS   {
+               arubaWiredVsfv2MemberIndex,
+               arubaWiredVsfv2MemberRole,
+               arubaWiredVsfv2MemberStatus,
+               arubaWiredVsfv2MemberPartNumber,
+               arubaWiredVsfv2MemberMacAddr,
+               arubaWiredVsfv2MemberProductName,
+               arubaWiredVsfv2MemberSerialNum,
+               arubaWiredVsfv2MemberBootImage,
+               arubaWiredVsfv2MemberCpuUtil,
+               arubaWiredVsfv2MemberMemoryUtil,
+               arubaWiredVsfv2MemberBootTime,
+               arubaWiredVsfv2MemberBootRomVersion,
+               arubaWiredVsfv2MemberTotalMemory,
+               arubaWiredVsfv2MemberCurrentUsage
+               }
+    STATUS      current
+    DESCRIPTION "A collection of Virtual Switching Framework member table
+                 objects."
+    ::= { arubaWiredVsfv2Groups 3 }
+
+arubaWiredVsfv2LinkTableGroup OBJECT-GROUP
+    OBJECTS   {
+               arubaWiredVsfv2LinkOperStatus,
+               arubaWiredVsfv2LinkPeerMemberId,
+               arubaWiredVsfv2LinkPeerLinkId,
+               arubaWiredVsfv2LinkPortList
+              }
+    STATUS      current
+    DESCRIPTION "A collection of Virtual Switching Framework link table
+                 objects."
+    ::= { arubaWiredVsfv2Groups 4 }
+
+arubaWiredVsfv2PortTableGroup OBJECT-GROUP
+    OBJECTS   {
+               arubaWiredVsfv2PortIfIndex,
+               arubaWiredVsfv2PortOperStatus,
+               arubaWiredVsfv2PortStatusStr,
+               arubaWiredVsfv2PortPeerInterface,
+               arubaWiredVsfv2PortPeerSysMac,
+               arubaWiredVsfv2PortPeerProductType
+              }
+    STATUS      current
+    DESCRIPTION "A collection of Virtual Switching Framework port table
+                 objects."
+    ::= { arubaWiredVsfv2Groups 5 }
+
+arubaWiredVsfv2NotificationsGroup NOTIFICATION-GROUP
+    NOTIFICATIONS   {
+                     arubaWiredVsfv2MemberStatusChange,
+                     arubaWiredVsfv2FragmentStatusChange
+                    }
+    STATUS      current
+    DESCRIPTION "A collection of VSF virtual chassis notifications objects."
+    ::= { arubaWiredVsfv2Groups 6 }
+
+arubaWiredVsfv2MibCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION "The compliance statement for devices implementing the
+                 ARUBA WIRED VSF Mib."
+    MODULE
+    MANDATORY-GROUPS {
+                      arubaWiredVsfv2ConfigScalarGroup,
+                      arubaWiredVsfv2StatusScalarGroup,
+                      arubaWiredVsfv2MemberTableGroup,
+                      arubaWiredVsfv2LinkTableGroup,
+                      arubaWiredVsfv2PortTableGroup,
+                      arubaWiredVsfv2NotificationsGroup
+                      }
+    ::= { arubaWiredVsfv2Compliances 1 }
+END
+

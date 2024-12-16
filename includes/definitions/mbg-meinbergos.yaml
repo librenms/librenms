@@ -1,0 +1,9 @@
+os: mbg-meinbergos
+text: 'Meinberg microSync'
+type: timing
+icon: meinberg
+group: meinberg
+mib_dir: meinberg
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.5597.7

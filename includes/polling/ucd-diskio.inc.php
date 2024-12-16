@@ -18,20 +18,20 @@ if (count($diskio_data)) {
         d_echo($entry);
 
         $tags = [
-            'rrd_name'  => ['ucd_diskio', $diskio['diskio_descr']],
-            'rrd_def'   => RrdDefinition::make()
+            'rrd_name' => ['ucd_diskio', $diskio['diskio_descr']],
+            'rrd_def' => RrdDefinition::make()
                 ->addDataset('read', 'DERIVE', 0, 125000000000)
                 ->addDataset('written', 'DERIVE', 0, 125000000000)
                 ->addDataset('reads', 'DERIVE', 0, 125000000000)
                 ->addDataset('writes', 'DERIVE', 0, 125000000000),
-            'descr'     => $diskio['diskio_descr'],
+            'descr' => $diskio['diskio_descr'],
         ];
 
         $fields = [
-            'read'    => $entry['diskIONReadX'],
+            'read' => $entry['diskIONReadX'],
             'written' => $entry['diskIONWrittenX'],
-            'reads'   => $entry['diskIOReads'],
-            'writes'  => $entry['diskIOWrites'],
+            'reads' => $entry['diskIOReads'],
+            'writes' => $entry['diskIOWrites'],
         ];
 
         data_update($device, 'ucd_diskio', $tags, $fields);

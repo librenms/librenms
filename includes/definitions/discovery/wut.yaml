@@ -1,10 +1,26 @@
-mib:  WebGraph-Thermo-Hygrometer-MIB:WebGraph-Thermo-Hygro-Barometer-MIB:WebGraph-Thermo-Hygrometer-US-MIB
+mib:  WebGraph-Thermo-Hygrometer-MIB:WebGraph-Thermo-Hygro-Barometer-MIB:WebGraph-Thermo-Hygrometer-US-MIB:WebGraph-Thermometer-MIB:WebGraph-Thermometer-NTC-MIB
 modules:
+    os:
+        hardware:
+            - WebGraph-Thermometer-MIB::wtWebioAn1GraphMfOrderNo.0
+            - WebGraph-Thermometer-NTC-MIB::wtWebioAn1GraphNtcMfDeviceTyp.0
     sensors:
         temperature:
             options:
                 divisor: 10
             data:
+                -
+                    oid: wtWebioAn1GraphNtc
+                    value: wtWebioAn1GraphNtcBinaryTempValue
+                    num_oid: '.1.3.6.1.4.1.5040.1.2.18.1.4.1.1.{{ $index }}'
+                    descr: wtWebioAn1GraphNtcPortText
+                    index: wtWebioAn1GraphNtcSensorNo.{{ $index }}
+                -
+                    oid: wtWebioAn1Graph
+                    value: wtWebioAn1GraphBinaryTempValue
+                    num_oid: '.1.3.6.1.4.1.5040.1.2.8.1.4.1.1.{{ $index }}'
+                    descr: wtWebioAn1GraphPortText
+                    index: wtWebioAn1GraphSensorNo.{{ $index }}
                 -
                     oid: wtWebGraphThermHygro
                     value: wtWebGraphThermHygroBinaryTempValue

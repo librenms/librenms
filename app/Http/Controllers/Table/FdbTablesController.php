@@ -46,7 +46,7 @@ class FdbTablesController extends TableController
         return [
             'port_id' => 'nullable|integer',
             'device_id' => 'nullable|integer',
-            'searchby' => 'in:mac,vlan,dnsname,ip,description,first_seen,last_seen',
+            'searchby' => 'in:mac,vlan,dnsname,ip,description,first_seen,last_seen,vendor,',
             'dns' => 'nullable|in:true,false',
         ];
     }
@@ -68,7 +68,8 @@ class FdbTablesController extends TableController
     protected function baseQuery($request)
     {
         return PortsFdb::hasAccess($request->user())
-            ->with(['device', 'port', 'vlan', 'ipv4Addresses']);
+            ->with(['device', 'port', 'vlan', 'ipv4Addresses'])
+            ->select('ports_fdb.*');
     }
 
     /**

@@ -12,7 +12,7 @@ if (file_exists(Config::get('install_dir') . "/includes/discovery/bgp-peers/{$de
 }
 
 if (empty($bgpLocalAs)) {
-    $bgpLocalAs = snmp_getnext($device, 'bgpLocalAs', '-OQUsv', 'BGP4-MIB');
+    $bgpLocalAs = \SnmpQuery::get('BGP4-MIB::bgpLocalAs.0')->value();
 }
 
 foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
@@ -102,7 +102,7 @@ foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
                 $safis[133] = 'flow';
 
                 if (! isset($j_peerIndexes)) {
-                    $j_bgp = snmpwalk_cache_multi_oid($device, 'jnxBgpM2PeerTable', [], 'BGP4-V2-MIB-JUNIPER', 'junos');
+                    $j_bgp = snmpwalk_cache_multi_oid($device, 'jnxBgpM2PeerTable', [], 'BGP4-V2-MIB-JUNIPER', 'junos', '-OQUbs');
                     d_echo($j_bgp);
                     $j_peerIndexes = [];
                     foreach ($j_bgp as $index => $entry) {

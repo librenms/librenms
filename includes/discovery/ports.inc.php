@@ -22,6 +22,11 @@ $port_stats = snmpwalk_cache_oid($device, 'ifAlias', $port_stats, 'IF-MIB');
 $port_stats = snmpwalk_cache_oid($device, 'ifType', $port_stats, 'IF-MIB', null, $typeSnmpFlags);
 $port_stats = snmpwalk_cache_oid($device, 'ifOperStatus', $port_stats, 'IF-MIB', null, $operStatusSnmpFlags);
 
+// Get adva-fsp150cp
+if ($device['os'] == 'adva-fsp150cp') {
+    require base_path('includes/discovery/ports/adva-fsp150cp.inc.php');
+}
+
 // Get Trellix NSP ports
 if ($device['os'] == 'mlos-nsp') {
     require base_path('includes/discovery/ports/mlos-nsp.inc.php');
@@ -55,6 +60,11 @@ if ($device['os'] == 'luminato') {
 //Moxa Etherdevice portName mapping
 if ($device['os'] == 'moxa-etherdevice') {
     require base_path('includes/discovery/ports/moxa-etherdevice.inc.php');
+}
+
+//Remove extra ports on Zhone slms devices
+if ($device['os'] == 'slms') {
+    require base_path('includes/discovery/ports/slms.inc.php');
 }
 
 //Cambium cnMatrix port description mapping

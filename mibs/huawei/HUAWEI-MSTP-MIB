@@ -1,9 +1,9 @@
 -- ==================================================================
--- Copyright (C) 2017 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2022 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- 
 -- Description: HUAWEI MSTP MIB
 -- Reference:
--- Version:     V2.11
+-- Version:     V2.19
 -- History:     2008-06-14  MSTP Process
 -- History:     2008-10-08  MSTP Process- v3     
 -- History:     2009-3-01  MSTP Process- v4
@@ -27,7 +27,7 @@
                         Integer32, Counter32, OBJECT-TYPE, MODULE-IDENTITY, OBJECT-IDENTITY, 
                         NOTIFICATION-TYPE                       
                                 FROM SNMPv2-SMI                 
-                        RowStatus, TEXTUAL-CONVENTION                   
+                        RowStatus, TEXTUAL-CONVENTION, MacAddress
                                 FROM SNMPv2-TC
                         InterfaceIndex, ifIndex, ifName 
                                 FROM IF-MIB         
@@ -37,7 +37,7 @@
         
         
                 hwMstp MODULE-IDENTITY
-                        LAST-UPDATED "201708171000Z"
+                        LAST-UPDATED "202208041000Z"
                         ORGANIZATION
                                 "Huawei Technologies Co.,Ltd."
                         CONTACT-INFO
@@ -51,11 +51,46 @@
                         DESCRIPTION
                                 "This module include the information about MSTP protocol in the bridge.
                                 The information can be read and some of them can be set."
+                        REVISION    "202208041000Z"
+                        DESCRIPTION "Add for : hwMstpProLoopDetectedRising
+                                               hwMstpProLoopDetectedResume"
+
+                        REVISION    "202206271000Z"
+                        DESCRIPTION "modified description"
+
+                        REVISION    "202007301000Z"
+                        DESCRIPTION "modified description"
+
+                        REVISION    "202007251000Z"
+                        DESCRIPTION "modified description"
+
+                        REVISION    "201904091000Z"
+                        DESCRIPTION "Add for : hwMstpProTcFlap
+                                                                  hwMstpProTcFlapResume
+                                                                  hwMstpProRcvTcFlap"
+						
+								
+                        REVISION    "201808061000Z"
+                        DESCRIPTION "Add for : hwMstpProRootShake 
+                                                                  hwMstpProRootShakeResume"
+																  
+                        REVISION    "201804081000Z"
+                        DESCRIPTION "modified for:hwMstpProTcNotifyProcess
+                                                                       hwMstpProLinkShareGuard."
+
+                        REVISION    "201710241000Z"
+                        DESCRIPTION "Add for : hwMstpProRootLost 
+                                                                  hwMstpProRootResume"
 
                         REVISION    "201708171000Z"
                         DESCRIPTION "modified description"
+                        
+                        REVISION    "201706300000Z"
+                        DESCRIPTION "Modify description : 
+                                     hwMstpiRowStatus, hwMstpPortVlanListLow,
+                                     hwMstpPortVlanListHigh, hwMstpProNewPortType."
 						
-						REVISION    "201703041000Z"
+	     REVISION    "201703041000Z"
                         DESCRIPTION "modified for:hwMstpiPortIndex."
 
                         REVISION    "201511261000Z"
@@ -99,11 +134,7 @@
                         DESCRIPTION  "Fix the errors checked by a tool."
                         REVISION    "201303191000Z"
                         DESCRIPTION "Modify bpdu encapsulation enum value."
-                        REVISION    "201706300000Z"
-                        DESCRIPTION "Modify description : 
-                                     hwMstpiRowStatus, hwMstpPortVlanListLow,
-                                     hwMstpPortVlanListHigh, hwMstpProNewPortType."
-
+                        
                         ::= { hwL2Mgmt 4 }
                       
 --
@@ -301,7 +332,7 @@
                         DESCRIPTION
                                 "This object identifies the default mapping relationship between the VLANs and the MSTIs in the MST region.
                                  1: enable When you set this object, the value can be enable only.
-                                 65535: ununsed When you access the value of this object, it is unused.
+                                 65535: unused When you access the value of this object, it is unused.
                                  In addition to the VLANs added to the MSTIs, the rest are added to the default MSTI 0."
                         ::= { hwMstpObjects 15 }
                 
@@ -778,7 +809,7 @@
                         DESCRIPTION
                                "The value of this object identifies the operation of MCHECK on the port.
                                 1: enable When you set this object, the value can be enable only.
-                                2: ununsed When you access the value of this object, it is unused."
+                                2: unused When you access the value of this object, it is unused."
 
                         ::= { hwMstpPortEntry 11 }
                 
@@ -865,7 +896,7 @@
                         DESCRIPTION
                                "The value of this object identifies the status of clearing statistics on the port.
                                1: clear When you perform SET operation to this object, the value can be clear only.
-                               2: ununsed When you perform GET operation to this object, the value of this object is unused."
+                               2: unused When you perform GET operation to this object, the value of this object is unused."
 
                         ::= { hwMstpPortEntry 21 }
                 
@@ -880,7 +911,7 @@
                         DESCRIPTION
                                 "The value of this object identifies the default cost of the port.
                                 1: reset When you perform SET operation to this object, the value can be reset only.
-                                2: ununsed When you perform GET operation to this object, the value of this object is unused.
+                                2: unused When you perform GET operation to this object, the value of this object is unused.
                                 By default, the path cost value of the port on each MSTI is the path cost corresponding to the port rate."
                         ::= { hwMstpPortEntry 22 }
                 
@@ -890,7 +921,7 @@
                         STATUS current
                         DESCRIPTION
                                 "The value of this object identifies the spanning tree status on the port.
-                                1: enbale
+                                1: enable
                                 2: disable
                                 The default value is enable."
                         DEFVAL { enabled }
@@ -902,7 +933,7 @@
                         STATUS current
                         DESCRIPTION
                                 "The value of this object identifies whether the root protection is enabled on the port.
-                                1: enbale
+                                1: enable
                                 2: disable
                                 By default, the root protection is disabled."
                         DEFVAL { disabled }
@@ -914,7 +945,7 @@
                         STATUS current
                         DESCRIPTION
                                 "The value of this object identifies whether the loopback protection is enabled on the port.
-                                1: enbale
+                                1: enable
                                 2: disable
                                By default, the loopback protection is disabled."
 
@@ -935,7 +966,7 @@
                                 The protocol format can be one of the following:
                                 1: auto (the self-adaptive protocol format) 
                                 2: dotls (the standard IEEE 802.1s format)
-                                3: legacy (the private protocol format)
+                                3: legacy (the proprietary protocol format)
                                 By default, the protocol format of the MSTP packet is self-adaptive, that is, auto(1)."
                         DEFVAL { auto }
                         ::= { hwMstpPortEntry 26 }
@@ -958,7 +989,7 @@
                         STATUS current
                         DESCRIPTION
                                 "Whether enhance agreement is enabled. 
-                                When Huawei datacomm devices running the VRP are internetworking 
+                                When Huawei datacomm devices are internetworking 
                                 with non-Huawei devices, you need to enable this on Huawei devices 
                                 to configure the mode of the fast transition mechanism the same as 
                                 that on non-Huawei devices."
@@ -1165,7 +1196,7 @@
 
                 hwMstpProID OBJECT-TYPE
             SYNTAX Integer32 (0..288)
-                        MAX-ACCESS not-accessible
+                        MAX-ACCESS accessible-for-notify
                         STATUS current
                         DESCRIPTION
                                 "MSTP process identifier."
@@ -1298,7 +1329,7 @@
                                   1: enabled
                                   65535: unused
                                   By default, the MCheck mark of an MSTP process is unused."
-                        DEFVAL { 65535 }
+                        DEFVAL { unused }
                         ::= { hwMstpProEntry 12 }
                 
                 hwMstpProPathCostStandard OBJECT-TYPE
@@ -1317,7 +1348,7 @@
                               2: indicates dot1t, which is the IEEE 802.1t standard
                               3: indicates legacy, which is the calculation standard developed by Huawei
                               By default, the path calculation standard of an MSTP process is dot1t."
-                        DEFVAL { 2 }
+                        DEFVAL { dot1t }
                         ::= { hwMstpProEntry 13 }
                 
                 hwMstpProHelloTime OBJECT-TYPE
@@ -1397,8 +1428,8 @@
                         STATUS current
                         DESCRIPTION
                                 "This object indicates whether the TC guard function is enabled for the MSTP process. 
-								After the TC guard function is enabled for the MSTP process and the number of TC BPDUs received by an MSTI in a unit time exceeds the threshold,
-								the subsequent TC BPDUs are not processed until the TC guard time expires.
+                                 After the TC guard function is enabled for the MSTP process and the number of TC BPDUs received by an MSTI in a unit time exceeds the threshold,
+                                 the subsequent TC BPDUs are not processed until the TC guard time expires.
                                  The value can be:
                                   1: enabled
                                   2: disabled
@@ -1420,7 +1451,7 @@
                         STATUS current
                         DESCRIPTION
                                 "Whether the current MSTP process notifies MSTP process 0 to update 
-                                MAC entries and ARP entries after receiving a TC message."
+                                MAC entries and ARP entries after receiving a TC message. The value of this object can be set for the processes except process 0."
                         DEFVAL { disabled }
                         ::= { hwMstpProEntry 23 }
                 
@@ -1447,7 +1478,8 @@
                 "Whether the Link-share Guard function is enabled on the MSTP process. 
                                                 If the function is enabled, the root Guard function will also 
                                                 work on port in all instance besides instance 0, when the link 
-                                                between the ports either of which is in Link_share mode broken down."
+                                                between the ports either of which is in Link_share mode broken down.
+                                                The value of this object can be set for the processes except process 0."
             DEFVAL { disabled }
             ::= { hwMstpProEntry 25 }
             
@@ -1521,8 +1553,7 @@
                         STATUS current
                         DESCRIPTION
                                 "The port bind entry."
-                        INDEX { hwMstpProID, hwMstpPortId1, hwMstpPortId2, hwMstpPortId3, hwMstpPortId4, 
-                                hwMstpPortIdFlag }
+                        INDEX { hwMstpProID, hwMstpPortId1, hwMstpPortId2, hwMstpPortId3, hwMstpPortId4, hwMstpPortIdFlag }
                         ::= { hwMstpPortBindTable 1 }
                 
                 HwMstpPortBindEntry ::=
@@ -1986,7 +2017,7 @@
                                 The protocol format can be one of the following:
                                 1: auto (the self-adaptive protocol format) 
                                 2: dotls (the standard IEEE 802.1s format)
-                                3: legacy (the private protocol format)
+                                3: legacy (the proprietary protocol format)
                                 By default, the protocol format of the MSTP packet is self-adaptive, that is, auto(1)."
                         DEFVAL { auto }
                         ::= { hwMstpProPortEntry 26 }
@@ -2009,7 +2040,7 @@
                         STATUS current
                         DESCRIPTION
                                 "Whether enhance agreement is enabled. 
-                                When Huawei datacomm devices running the VRP are internetworking 
+                                When Huawei datacomm devices are internetworking 
                                 with non-Huawei devices, you need to enable this on Huawei devices 
                                 to configure the mode of the fast transition mechanism the same as 
                                 that on non-Huawei devices."
@@ -2048,7 +2079,7 @@
                         DESCRIPTION
                                 "Whether the Bridge TC Guard function is enabled. 
                                 If the function is enabled, the TC message in each instance exceeded 
-                                threshold will be defered to deal with at the end of TC protection time.
+                                threshold will be deferred to deal with at the end of TC protection time.
                                 By default, the function is disabled."                        
                         ::= { hwMstpObjects 26 }
                 
@@ -2236,8 +2267,7 @@
                         STATUS current
                         DESCRIPTION
                                 "The entry of the MSTP process port information table. "
-                        INDEX { hwMstpProID, hwMstpInstanceID, hwMstpPortId1, hwMstpPortId2, hwMstpPortId3, 
-                                hwMstpPortId4, hwMstpPortIdFlag }
+                        INDEX { hwMstpProID, hwMstpInstanceID, hwMstpPortId1, hwMstpPortId2, hwMstpPortId3, hwMstpPortId4, hwMstpPortIdFlag }
                         ::= { hwMstpProNewPortTable 1 }
                 
                 HwMstpProNewPortEntry ::=
@@ -2524,7 +2554,7 @@
                             "The value of this object identifies the default path cost of the port where the MSTI is configured:
                             The value can be:
                               1: reset When you perform SET operation to this object, the value can be reset only.
-                              65535: ununsed When you perform GET operation to this object, the value of this object is unused.
+                              65535: unused When you perform GET operation to this object, the value of this object is unused.
                               By default, the path cost value of the port on each MSTI is calculated on the basis of the port speed."
 
                         ::= { hwMstpProNewPortEntry 21 }
@@ -2578,7 +2608,7 @@
                                 The protocol format can be one of the following:
                                 1: auto (the self-adaptive protocol format) 
                                 2: dotls (the standard IEEE 802.1s format)
-                                3: legacy (the private protocol format)
+                                3: legacy (the proprietary protocol format)
                                 By default, the protocol format of the MSTP packet is self-adaptive, that is, auto(1)."
                         DEFVAL { auto }
                         ::= { hwMstpProNewPortEntry 25 }
@@ -2748,6 +2778,15 @@
                                 "The value of this object identifies the lower threshold for the number of Up STP-capable interfaces."
                         ::= { hwMstpObjects 36 } 
                 
+                -- 1.3.6.1.4.1.2011.5.25.42.4.1.37
+                hwMstpSrcMacAddress OBJECT-TYPE
+                        SYNTAX MacAddress
+                        MAX-ACCESS accessible-for-notify
+                        STATUS current
+                        DESCRIPTION
+                                "source macaddress"
+                        ::= { hwMstpObjects 37 } 
+
                 hwMstpPortTcSnoopingEntry OBJECT-TYPE
                         SYNTAX HwMstpPortTcSnoopingEntry
                         MAX-ACCESS not-accessible
@@ -3018,6 +3057,78 @@
                                 "This notification indicates that the number of Up STP-capable interfaces fell below the lower threshold."
                         ::= { hwMstpTraps 27 } 
 
+                -- 1.3.6.1.4.1.2011.5.25.42.4.2.28
+                hwMstpProRootLost NOTIFICATION-TYPE
+                        OBJECTS { hwMstpProInstanceRootType   }
+                        STATUS current
+                        DESCRIPTION
+                                "This notification indicates that the bridge is no longer the root bridge."
+                        ::= { hwMstpTraps 28 }   
+                
+                -- 1.3.6.1.4.1.2011.5.25.42.4.2.29
+                hwMstpProRootResume NOTIFICATION-TYPE
+                        OBJECTS { hwMstpProInstanceRootType  }
+                        STATUS current
+                        DESCRIPTION
+                                "This notification indicates that the bridge is the root bridge."
+                        ::= { hwMstpTraps 29 } 
+
+                -- 1.3.6.1.4.1.2011.5.25.42.4.2.30
+                hwMstpProRootShake NOTIFICATION-TYPE
+                        OBJECTS { hwMstpProID, hwMstpInstanceID }
+                        STATUS current
+                        DESCRIPTION
+                                "This notification indicates that the root bridge role flapped."
+                        ::= { hwMstpTraps 30 }
+
+                -- 1.3.6.1.4.1.2011.5.25.42.4.2.31
+                hwMstpProRootShakeResume NOTIFICATION-TYPE
+                        OBJECTS { hwMstpProID, hwMstpInstanceID }
+                        STATUS current
+                        DESCRIPTION
+                                "This notification indicates that the flapping of the root bridge role resumed."
+                        ::= { hwMstpTraps 31 } 
+
+                -- 1.3.6.1.4.1.2011.5.25.42.4.2.32
+                hwMstpProTcFlap NOTIFICATION-TYPE
+                        OBJECTS { hwMstpProID, hwMstpInstanceID }
+                        STATUS current
+                        DESCRIPTION
+                                "This notification indicates that the local device proactively detected its STP topology was flapping."
+                        ::= { hwMstpTraps 32 }
+
+                -- 1.3.6.1.4.1.2011.5.25.42.4.2.33
+                hwMstpProTcFlapResume NOTIFICATION-TYPE
+                        OBJECTS { hwMstpProID, hwMstpInstanceID }
+                        STATUS current
+                        DESCRIPTION
+                                "This notification indicates that the STP topology of the local device stopped flapping."
+                        ::= { hwMstpTraps 33 }
+
+                -- 1.3.6.1.4.1.2011.5.25.42.4.2.34
+                hwMstpProRcvTcFlap NOTIFICATION-TYPE
+                        OBJECTS { hwMstpProID, hwMstpInstanceID, ifName, hwMstpPwName, hwMstpSrcMacAddress }
+                        STATUS current
+                        DESCRIPTION
+                                "This notification indicates that the local device received many TC BPDUs from neighbors"
+                        ::= { hwMstpTraps 34 }
+
+                -- 1.3.6.1.4.1.2011.5.25.42.4.2.35
+                hwMstpProLoopDetectedRising NOTIFICATION-TYPE
+                        OBJECTS { hwMstpProNewPortState, ifName, hwMstpPwName }
+                        STATUS current
+                        DESCRIPTION
+                                "This notification indicates that loopback of protocol packets is detected on the port."
+                        ::= { hwMstpTraps 35 }
+
+                -- 1.3.6.1.4.1.2011.5.25.42.4.2.36
+                hwMstpProLoopDetectedResume NOTIFICATION-TYPE
+                        OBJECTS { hwMstpProNewPortState, ifName, hwMstpPwName }
+                        STATUS current
+                        DESCRIPTION
+                                "This notification indicates that loopback of protocol packets is not detected on the port for a long time."
+                        ::= { hwMstpTraps 36 } 			
+						
                 hwMstpConformance OBJECT IDENTIFIER ::= { hwMstp 3 }
                 
                 hwMstpGroups OBJECT IDENTIFIER ::= { hwMstpConformance 1 }
@@ -3079,7 +3190,8 @@
                         NOTIFICATIONS { hwMstpiPortStateForwarding, hwMstpiPortStateDiscarding, hwMstpiBridgeLostRootPrimary, hwMstpiPortRootGuarded, hwMstpiPortBpduGuarded, 
                                 hwMstpiPortLoopGuarded, hwMstpiEdgePortChanged, hwMstpiTcGuarded, hwMstpProPortLoopGuarded, hwMstpProPortRootGuarded, hwMstpProBridgeLostRootPrimary,
                                 hwMstpProPortStateDiscarding, hwMstpProPortStateForwarding, hwMstpProLoopbackDetected, hwMstpProEdgePortChanged, hwMstpProPortBpduGuarded, 
-                                hwMstpPortCountExceedThreshold, hwMstpPortCountExceedThresholdResume }
+                                hwMstpPortCountExceedThreshold, hwMstpPortCountExceedThresholdResume, hwMstpProRootLost, hwMstpProRootResume,hwMstpProRootShake,hwMstpProRootShakeResume,
+                                hwMstpProTcFlap, hwMstpProTcFlapResume, hwMstpProRcvTcFlap, hwMstpProLoopDetectedRising, hwMstpProLoopDetectedResume}
                         STATUS current
                         DESCRIPTION
                                 "Notification."

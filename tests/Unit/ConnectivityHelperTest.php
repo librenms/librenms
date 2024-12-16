@@ -20,7 +20,7 @@ class ConnectivityHelperTest extends TestCase
         $this->app->singleton(Fping::class, function () {
             $mock = Mockery::mock(Fping::class);
             $up = FpingResponse::artificialUp();
-            $down = new FpingResponse(1, 0, 100, 0, 0, 0, 0, 0);
+            $down = FpingResponse::artificialDown();
             $mock->shouldReceive('ping')
                 ->times(8)
                 ->andReturn(

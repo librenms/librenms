@@ -14,8 +14,8 @@ $rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Flush Time',
-        'ds'       => 'tf_time',
+        'descr' => 'Flush Time',
+        'ds' => 'tf_time',
     ];
 } else {
     d_echo('RRD "' . $rrd_filename . '" not found');

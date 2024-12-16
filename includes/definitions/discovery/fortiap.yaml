@@ -1,0 +1,5 @@
+mib: FORTINET-FORTIAP-MIB
+modules:
+    os:
+        version: FORTINET-FORTIAP-MIB::fapVersion.0
+        serial: FORTINET-FORTIAP-MIB::fapSerialNum.0

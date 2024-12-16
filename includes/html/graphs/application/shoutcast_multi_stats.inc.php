@@ -15,7 +15,7 @@ foreach ($rrd_filenames as $file) {
     [$host, $port] = explode('_', $hostname, 2);
     $rrd_list[] = [
         'filename' => $file,
-        'descr'    => $host . ':' . $port,
+        'descr' => $host . ':' . $port,
         //        'colour'   => $colour
     ];
 }

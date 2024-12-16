@@ -22,13 +22,13 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('virus', 'COUNTER', 0, 125000000000);
 
 $fields = [
-    'msg_recv'     => $msg_recv,
+    'msg_recv' => $msg_recv,
     'msg_rejected' => $msg_rejected,
-    'msg_relay'    => $msg_relay,
-    'msg_sent'     => $msg_sent,
-    'msg_waiting'  => $msg_waiting,
-    'spam'         => $spam,
-    'virus'        => $virus,
+    'msg_relay' => $msg_relay,
+    'msg_sent' => $msg_sent,
+    'msg_waiting' => $msg_waiting,
+    'spam' => $spam,
+    'virus' => $virus,
 ];
 
 $tags = [

@@ -13,9 +13,9 @@ $sensors = dbFetchColumn(
 $datas = array_intersect(array_keys($types), $sensors);
 
 $wireless_link_array = [
-    'page'   => 'device',
+    'page' => 'device',
     'device' => $device['device_id'],
-    'tab'    => 'wireless',
+    'tab' => 'wireless',
 ];
 
 print_optionbar_start();
@@ -85,9 +85,9 @@ if ($vars['metric'] == 'overview') {
             $sensor_limit = ((int) $sensor['sensor_limit']) . $unit;
             $sensor_limit_low = ((int) $sensor['sensor_limit_low']) . $unit;
         } else {
-            $sensor_current = Number::formatSi($sensor['sensor_current'] * $factor, 3, 3, $unit);
-            $sensor_limit = Number::formatSi($sensor['sensor_limit'] * $factor, 3, 3, $unit);
-            $sensor_limit_low = Number::formatSi($sensor['sensor_limit_low'] * $factor, 3, 3, $unit);
+            $sensor_current = Number::formatSi($sensor['sensor_current'] * $factor, 3, 0, $unit);
+            $sensor_limit = Number::formatSi($sensor['sensor_limit'] * $factor, 3, 0, $unit);
+            $sensor_limit_low = Number::formatSi($sensor['sensor_limit_low'] * $factor, 3, 0, $unit);
         }
 
         echo "<div class='panel panel-default'>

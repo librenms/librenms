@@ -54,7 +54,8 @@ class MempoolsController extends TableController
             return Device::hasAccess($request->user())->has('mempools')->with('mempools');
         }
 
-        $query = Mempool::hasAccess($request->user())->with('device');
+        $query = Mempool::hasAccess($request->user())
+            ->with(['device', 'device.location']);
 
         // join devices table to sort by hostname or search
         if (array_key_exists('hostname', $request->get('sort', $this->default_sort)) || $request->get('searchPhrase')) {
@@ -80,21 +81,21 @@ class MempoolsController extends TableController
             ]);
 
             return [
-                'hostname'      => Url::deviceLink($device),
+                'hostname' => Url::deviceLink($device),
                 'mempool_descr' => $graphs[0],
-                'graph'         => $graphs[1],
-                'mempool_used'  => $graphs[2],
-                'mempool_perc'  => $graphs[3],
+                'graph' => $graphs[1],
+                'mempool_used' => $graphs[2],
+                'mempool_perc' => $graphs[3],
             ];
         }
 
         /** @var Mempool $mempool */
         return [
-            'hostname'      => Url::deviceLink($mempool->device),
+            'hostname' => Url::deviceLink($mempool->device),
             'mempool_descr' => $mempool->mempool_descr,
-            'graph'         => $this->miniGraph($mempool),
-            'mempool_used'  => $this->barLink($mempool),
-            'mempool_perc'  => $mempool->mempool_perc . '%',
+            'graph' => $this->miniGraph($mempool),
+            'mempool_used' => $this->barLink($mempool),
+            'mempool_perc' => $mempool->mempool_perc . '%',
         ];
     }
 

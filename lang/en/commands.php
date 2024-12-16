@@ -1,6 +1,9 @@
 <?php
 
 return [
+    'config:clear' => [
+        'description' => 'Clear config cache.  This will allow any changes that have been made since the last full config load to be reflected in the current config.',
+    ],
     'config:get' => [
         'description' => 'Get configuration value',
         'arguments' => [
@@ -63,6 +66,7 @@ return [
         'exit' => 'Ctrl-C to stop',
         'removed' => 'Device :id removed',
         'updated' => 'Device :hostname (:id) updated',
+        'setup' => 'Setting up snmpsim venv in :dir',
     ],
     'device:add' => [
         'description' => 'Add a new device',
@@ -194,6 +198,20 @@ return [
         'enabled' => ':count plugin enabled|:count plugins enabled',
         'failed' => 'Failed to enable plugin(s)',
     ],
+    'report:devices' => [
+        'description' => 'Print out data from devices',
+        'columns' => 'Database columns:',
+        'synthetic' => 'Additional fields:',
+        'counts' => 'Relationship counts:',
+        'arguments' => [
+            'device spec' => 'Device spec to poll: device_id, hostname, wildcard (*), odd, even, all',
+        ],
+        'options' => [
+            'list-fields' => 'Print out a list of valid fields',
+            'fields' => 'A comma seperated list of fields to display. Valid options: device column names from the database, relationship counts (ports_count), and/or displayName',
+            'output' => 'Output format to display the data :types',
+        ],
+    ],
     'smokeping:generate' => [
         'args-nonsense' => 'Use one of --probes and --targets',
         'config-insufficient' => 'In order to generate a smokeping configuration, you must have set "smokeping.probes", "fping", and "fping6" set in your configuration',
@@ -216,10 +234,11 @@ return [
     'snmp:fetch' => [
         'description' => 'Run snmp query against a device',
         'arguments' => [
-            'device spec' => 'Device to query: device_id, hostname/ip, hostname regex, or all',
+            'device spec' => 'Device spec to poll: device_id, hostname, wildcard (*), odd, even, all',
             'oid(s)' => 'One or more SNMP OID to fetch.  Should be either MIB::oid or a numeric oid',
         ],
         'failed' => 'SNMP command failed!',
+        'numeric' => 'Numeric',
         'oid' => 'OID',
         'options' => [
             'output' => 'Specify the output format :formats',
@@ -227,6 +246,7 @@ return [
             'depth' => 'Depth to group the snmp table at. Usually the same number as the items in the index of the table',
         ],
         'not_found' => 'Device not found',
+        'textual' => 'Textual',
         'value' => 'Value',
     ],
     'translation:generate' => [
@@ -247,5 +267,8 @@ return [
         'password-request' => "Please enter the user's password",
         'success' => 'Successfully added user: :username',
         'wrong-auth' => 'Warning! You will not be able to log in with this user because you are not using MySQL auth',
+    ],
+    'maintenance:database-cleanup' => [
+        'description' => 'Database cleanup of orphaned items.',
     ],
 ];

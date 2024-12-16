@@ -1,0 +1,155 @@
+mib: BAICELLS-MIB
+modules:
+    os:
+        hardware: BAICELLS-MIB::HardwareVersion.0
+        serial: BAICELLS-MIB::SerialNumber.0
+        version: BAICELLS-MIB::SoftwareVersion.0
+    sensors:
+        runtime:
+            data:
+                -
+                    oid: ConnectionTime
+                    num_oid: .1.3.6.1.4.1.53058.2.3.5.{{ $index }}
+                    index: 'ConnectionTime'
+                    descr: 'Connection time'
+                    user_func: '\LibreNMS\OS\BaicellsOd04::hhmmss_to_minutes'
+        dbm:
+            data:
+                -
+                    oid: AntRSRP0
+                    num_oid: .1.3.6.1.4.1.53058.2.2.7.{{ $index }}
+                    descr: 'Ant0 RSRP'
+                    index: 'RSRP.0'
+                    group: 'RSPR'
+                -
+                    oid: AntRSRP1
+                    num_oid: .1.3.6.1.4.1.53058.2.2.8.{{ $index }}
+                    descr: 'Ant1 RSRP'
+                    index: 'RSRP.1'
+                    group: 'RSPR'
+                -
+                    oid: TxPower
+                    num_oid: .1.3.6.1.4.1.53058.2.2.13.{{ $index }}
+                    index: 'TxPower.0'
+                    descr: 'Tx power'
+        quality_factor:
+            data:
+                -
+                    oid: AntRSRQ
+                    num_oid: .1.3.6.1.4.1.53058.2.2.9.{{ $index }}
+                    descr: 'Ant RSRQ'
+                    index: 'RSRQ.0'
+                    group: 'RSRQ'
+                -
+                    oid: AntSINR
+                    num_oid: .1.3.6.1.4.1.53058.2.2.10.{{ $index }}
+                    descr: 'Ant SINR'
+                    index: 'SINR.1'
+                    group: 'RSRQ'
+                -
+                    oid: AntCINR0
+                    num_oid: .1.3.6.1.4.1.53058.2.2.11.{{ $index }}
+                    descr: 'Ant0 CINR'
+                    index: 'CINR.0'
+                    group: 'CINR'
+                -
+                    oid: AntCINR1
+                    num_oid: .1.3.6.1.4.1.53058.2.2.12.{{ $index }}
+                    descr: 'Ant1 CINR'
+                    index: 'CINR.1'
+                    group: 'CINR'
+        frequency:
+            data:
+                -
+                    # TODO skip invalid 65535
+                    oid: DownLinkFrequency
+                    num_oid: .1.3.6.1.4.1.53058.2.2.3.{{ $index }}
+                    index: DownLinkFrequency
+                    descr: 'Downlink Freq'
+                    multiplier: 1000
+                    skip_values:
+                        -
+                            oid: DownLinkFrequency
+                            op: '='
+                            value: '65535'                    
+                -
+                    # TODO skip invalid 65535
+                    oid: UpLinkFrequency
+                    num_oid: .1.3.6.1.4.1.53058.2.2.4.{{ $index }}
+                    index: UpLinkFrequency
+                    descr: 'Uplink Freq'
+                    multiplier: 1000
+                    skip_values:
+                        -
+                            oid: UpLinkFrequency
+                            op: '='
+                            value: '65535'
+                -
+                    # TODO skip invalid 65535
+                    oid: BandWidth
+                    num_oid: .1.3.6.1.4.1.53058.2.2.5.{{ $index }}
+                    index: BandWidth
+                    descr: 'Bandwidth'
+                    multiplier: 1000
+                    skip_values:
+                        -
+                            oid: BandWidth
+                            op: '='
+                            value: '65535'
+        bitrate:
+            data:
+                -
+                    oid: DownloadRate
+                    num_oid: .1.3.6.1.4.1.53058.2.3.12.{{ $index }}
+                    index: DownloadRate
+                    descr: 'Rx Rate'
+                -
+                    oid: UploadRate
+                    num_oid: .1.3.6.1.4.1.53058.2.3.15.{{ $index }}
+                    index: UploadRate
+                    descr: 'Tx Rate'
+        count:
+            data:
+                -
+                    oid: IMSI
+                    num_oid: .1.3.6.1.4.1.53058.2.3.3.{{ $index }}
+                    index: IMSI
+                    descr: 'CPE IMSI'
+                    group: Mobile
+                    skip_values:
+                        -
+                            oid: IMSI
+                            op: '='
+                            value: '0'
+                -
+                    # TODO skip invalid 65535
+                    oid: eNBID
+                    index: eNBID
+                    descr: 'eNodeB ID'
+                    group: Mobile
+                    skip_values:
+                        -
+                            oid: eNBID
+                            op: '='
+                            value: '65535'
+                -
+                    oid: CellID
+                    num_oid: .1.3.6.1.4.1.53058.2.2.16.{{ $index }}
+                    index: CellID
+                    descr: 'Cell ID'
+                    group: Mobile
+                    skip_values:
+                        -
+                            oid: CellID
+                            op: '='
+                            value: '65535'
+                -
+                    oid: SendPackages
+                    num_oid: .1.3.6.1.4.1.53058.2.3.20.{{ $index }}
+                    index: SendPackages
+                    descr: 'Tx Packets'
+                -
+                    oid: RecvPakcages  # yes, 'RecvPakcages'
+                    num_oid: .1.3.6.1.4.1.53058.2.3.21.{{ $index }}
+                    index: RecvPakcages  # yes, 'RecvPakcages'
+                    descr: 'Rx Packets'

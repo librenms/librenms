@@ -1,0 +1,147 @@
+--
+-- Eltex MES ISS MIB: Structure of Management Information
+--
+-- Copyright (c) 2018, Eltex Co
+--
+-- The contents of this document are subject to change without notice.
+--
+
+ELTEX-MES-ISS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE
+                FROM SNMPv2-SMI
+        OBJECT-GROUP
+                FROM SNMPv2-CONF
+        elHardware
+                FROM ELTEX-SMI-ACTUAL;
+
+eltMesIss MODULE-IDENTITY
+        LAST-UPDATED "202304100000Z"
+        ORGANIZATION "Eltex Enterprise, Ltd."
+        CONTACT-INFO
+                "eltex-co.ru"
+        DESCRIPTION
+                "The Structure of Management Information for Eltex MES
+                products based on the ISS platform."
+        REVISION "202304100000Z"
+        DESCRIPTION
+                "Added eltMesIssDhcpSrvMIB object identifier."
+        REVISION "202205040000Z"
+        DESCRIPTION
+                "Added eltMesIssPnacMIB object identifier."
+        REVISION "202112060000Z"
+        DESCRIPTION
+                "Added eltMesIssErpsMIB object identifier."
+        REVISION "202110070000Z"
+        DESCRIPTION
+                "Added eltMesIssDhcpRelayMIB object identifier."
+        REVISION "202104210000Z"
+        DESCRIPTION
+                "Added eltMesIssFwlMIB object identifier."
+        REVISION "202103090000Z"
+        DESCRIPTION
+                "Added eltMesIssArpMIB object identifier."
+        REVISION "201811130000Z"
+        DESCRIPTION "Initial revision."
+    ::= { elHardware 139 }
+
+eltMesIssAclMIB  OBJECT IDENTIFIER               ::= { eltMesIss 1 }
+-- see ELTEX-MES-ISS-ACL-MIB.mib
+
+eltMesIssPppoeMIB  OBJECT IDENTIFIER             ::= { eltMesIss 2 }
+-- see ELTEX-MES-ISS-PPPOE-MIB.mib
+
+eltMesIssVlanMIB  OBJECT IDENTIFIER              ::= { eltMesIss 3 }
+-- see ELTEX-MES-ISS-VLAN-MIB.mib
+
+eltMesIssInterfacesMIB  OBJECT IDENTIFIER        ::= { eltMesIss 4 }
+-- see ELTEX-MES-ISS-INTERFACES-MIB.mib
+
+eltMesIssQoSMIB  OBJECT IDENTIFIER               ::= { eltMesIss 5 }
+-- see ELTEX-MES-ISS-QOS-MIB.mib
+
+eltMesIssCpuUtilMIB  OBJECT IDENTIFIER           ::= { eltMesIss 6 }
+-- see ELTEX-MES-ISS-CPU-UTIL-MIB.mib
+
+eltMesIssAaaMIB  OBJECT IDENTIFIER               ::= { eltMesIss 7 }
+-- see ELTEX-MES-ISS-AAA-MIB.mib
+
+eltMesIssSnoopMIB  OBJECT IDENTIFIER             ::= { eltMesIss 8 }
+-- see ELTEX-MES-ISS-SNOOP-MIB.mib
+
+eltMesIssIpDbMIB  OBJECT IDENTIFIER              ::= { eltMesIss 9 }
+-- see ELTEX-MES-ISS-IPDB-MIB.mib
+
+eltMesIssLldpMIB  OBJECT IDENTIFIER              ::= { eltMesIss 10 }
+-- see ELTEX-MES-ISS-LLDP-MIB.mib
+
+eltMesIssPoeMIB OBJECT IDENTIFIER                ::= { eltMesIss 11 }
+-- see ELTEX-MES-ISS-POE-MIB.mib
+
+eltMesIssEnvMIB OBJECT IDENTIFIER                ::= { eltMesIss 12 }
+-- see ELTEX-MES-ISS-ENV-MIB.mib
+
+eltMesIssDcsMIB OBJECT IDENTIFIER                ::= { eltMesIss 13 }
+-- see ELTEX-MES-ISS-DCS-MIB.mib
+
+eltMesIssBridgeMIB OBJECT IDENTIFIER             ::= { eltMesIss 14 }
+-- see ELTEX-MES-ISS-BRIDGE-MIB.mib
+
+eltMesIssCopyMIB OBJECT IDENTIFIER               ::= { eltMesIss 15 }
+-- see ELTEX-MES-ISS-COPY-MIB.mib
+
+eltMesIssSntpMIB OBJECT IDENTIFIER               ::= { eltMesIss 16 }
+-- see ELTEX-MES-ISS-SNTP-MIB.mib
+
+-- eltMesIssIpSlaMIB OBJECT IDENTIFIER              ::= { eltMesIss 17 }
+-- see ELTEX-MES-ISS-IPSLA-MIB.mib
+
+eltMesIssSystemMIB OBJECT IDENTIFIER             ::= { eltMesIss 18 }
+-- see ELTEX-MES-ISS-SYSTEM-MIB.mib
+
+eltMesIssSnmp3MIB OBJECT IDENTIFIER              ::= { eltMesIss 19 }
+-- see ELTEX-MES-ISS-SNMP3-MIB.mib
+
+eltMesIssCfaMIB OBJECT IDENTIFIER                ::= { eltMesIss 20 }
+-- see ELTEX-MES-ISS-CFA-MIB.mib
+
+eltMesIssL2ptMIB OBJECT IDENTIFIER               ::= { eltMesIss 21 }
+-- see ELTEX-MES-ISS-VLAN-TUNNEL-MIB.mib
+
+eltMesIssSyslogMIB OBJECT IDENTIFIER             ::= { eltMesIss 22 }
+-- see ELTEX-MES-ISS-SYSLOG-MIB.mib
+
+eltMesIssLaMIB OBJECT IDENTIFIER                 ::= { eltMesIss 23 }
+-- see ELTEX-MES-ISS-LA-MIB.mib
+
+eltMesIssIpMIB OBJECT IDENTIFIER                 ::= { eltMesIss 24 }
+-- see ELTEX-MES-ISS-IP-MIB.mib
+
+eltMesIssL2Ip6SnpMIB OBJECT IDENTIFIER           ::= { eltMesIss 25 }
+-- see ELTEX-MES-ISS-L2IP6-SNOOP-MIB.mib
+
+eltMesIssArpMIB OBJECT IDENTIFIER                ::= { eltMesIss 26 }
+-- see ELTEX-MES-ISS-ARP-MIB
+
+eltMesIssFwlMIB OBJECT IDENTIFIER                ::= { eltMesIss 27 }
+-- see ELTEX-MES-ISS-ARP-MIB
+
+eltMesIssDhcpRelayMIB OBJECT IDENTIFIER          ::= { eltMesIss 28 }
+-- see ELTEX-MES-ISS-DHCP-RELAY-MIB.mib
+
+eltMesIssErpsMIB OBJECT IDENTIFIER               ::= { eltMesIss 29 }
+-- see ELTEX-MES-ISS-ERPS-MIB
+
+eltMesIssSshMIB OBJECT IDENTIFIER                ::= { eltMesIss 30 }
+-- see ELTEX-MES-ISS-SSH-MIB.mib
+
+eltMesIssPnacMIB OBJECT IDENTIFIER               ::= { eltMesIss 31 }
+-- see ELTEX-MES-ISS-PNAC-MIB.mib
+
+eltMesIssDhcpSnoopMIB OBJECT IDENTIFIER          ::= { eltMesIss 32 }
+-- see ELTEX-MES-ISS-DHCP-SNOOP-MIB.mib
+
+eltMesIssDhcpSrvMIB OBJECT IDENTIFIER            ::= { eltMesIss 33 }
+-- see ELTEX-MES-ISS-DHCP-SRV-MIB.mib
+END

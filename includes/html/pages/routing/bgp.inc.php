@@ -1,13 +1,17 @@
 <?php
 
+use App\Models\Device;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IPv6;
+use LibreNMS\Util\Number;
+use LibreNMS\Util\Time;
+use LibreNMS\Util\Url;
 
 if (! Auth::user()->hasGlobalRead()) {
     include 'includes/html/error-no-perm.inc.php';
 } else {
     $link_array = [
-        'page'     => 'routing',
+        'page' => 'routing',
         'protocol' => 'bgp',
     ];
 
@@ -272,26 +276,26 @@ if (! Auth::user()->hasGlobalRead()) {
         // display overlib graphs
         $graph_array = [];
         $graph_array['type'] = 'bgp_updates';
-        $graph_array['id'] = $peer['bgpPeer_id'];
         $graph_array['to'] = \LibreNMS\Config::get('time.now');
         $graph_array['from'] = \LibreNMS\Config::get('time.day');
         $graph_array['height'] = '110';
         $graph_array['width'] = $width;
 
         // Peer Address
+        $peer_device = Device::whereHas('bgppeers', fn ($q) => $q->where('bgpLocalAddr', $peer['bgpPeerIdentifier']))->first();
+        $peeraddresslink = '<span class=list-large>' . Url::deviceLink($peer_device, $peer_addr, ['tab' => 'routing', 'proto' => 'bgp']) . '</span>';
+
+        // Local Address
+        $graph_array['id'] = $peer['bgpPeer_id'];
+        $graph_array['afi'] = 'ipv4';
+        $graph_array['safi'] = 'unicast';
         $graph_array_zoom = $graph_array;
         $graph_array_zoom['height'] = '150';
         $graph_array_zoom['width'] = '500';
-        $overlib_link = 'device/device=' . $peer['device_id'] . '/tab=routing/proto=bgp/';
-        $peeraddresslink = '<span class=list-large>' . \LibreNMS\Util\Url::overlibLink($overlib_link, $peer_addr, \LibreNMS\Util\Url::graphTag($graph_array_zoom)) . '</span>';
-
-        // Local Address
-        $graph_array['afi'] = 'ipv4';
-        $graph_array['safi'] = 'unicast';
         $graph_array_zoom['afi'] = 'ipv4';
         $graph_array_zoom['safi'] = 'unicast';
         $overlib_link = 'device/device=' . $peer['device_id'] . '/tab=routing/proto=bgp/';
-        $localaddresslink = '<span class=list-large>' . \LibreNMS\Util\Url::overlibLink($overlib_link, $local_addr, \LibreNMS\Util\Url::graphTag($graph_array_zoom)) . '</span>';
+        $localaddresslink = '<span class=list-large>' . Url::overlibLink($overlib_link, $local_addr, Url::graphTag($graph_array_zoom)) . '</span>';
 
         if ($peer['bgpPeerLastErrorCode'] == 0 && $peer['bgpPeerLastErrorSubCode'] == 0) {
             $last_error = $peer['bgpPeerLastErrorText'];
@@ -313,21 +317,20 @@ if (! Auth::user()->hasGlobalRead()) {
         }
 
         unset($sep);
-        $peer_device = \App\Models\Device::whereHas('bgppeers', fn ($q) => $q->where('bgpLocalAddr', $peer['bgpPeerIdentifier']))->first();
 
         echo '  <td></td>
             <td width=150>' . $localaddresslink . '<br />' . generate_device_link($peer, null, ['tab' => 'routing', 'proto' => 'bgp']) . '</td>
             <td width=30><b>&#187;</b></td>
-            <td width=150>' . $peeraddresslink . '<br />' . \LibreNMS\Util\Url::deviceLink($peer_device, vars: ['tab' => 'routing', 'proto' => 'bgp']) . "</td>
+            <td width=150>' . $peeraddresslink . '<br />' . Url::deviceLink($peer_device, vars: ['tab' => 'routing', 'proto' => 'bgp']) . "</td>
             <td width=50><b>$peer_type</b></td>
             <td width=50>" . $peer['afi'] . '</td>
             <td><strong>AS' . $peer['bgpPeerRemoteAs'] . '</strong><br />' . $peer['astext'] . '</td>
             <td>' . $peer['bgpPeerDescr'] . "</td>
             <td><strong><span style='color: $admin_col;'>" . $peer['bgpPeerAdminStatus'] . "</span><br /><span style='color: $col;'>" . $peer['bgpPeerState'] . '</span></strong></td>
             <td>' . $last_error . '</td>
-            <td>' . \LibreNMS\Util\Time::formatInterval($peer['bgpPeerFsmEstablishedTime']) . "<br />
-            Updates <i class='fa fa-arrow-down icon-theme' aria-hidden='true'></i> " . \LibreNMS\Util\Number::formatSi($peer['bgpPeerInUpdates'], 2, 3, '') . "
-            <i class='fa fa-arrow-up icon-theme' aria-hidden='true'></i> " . \LibreNMS\Util\Number::formatSi($peer['bgpPeerOutUpdates'], 2, 3, '') . '</td></tr>';
+            <td>' . Time::formatInterval($peer['bgpPeerFsmEstablishedTime']) . "<br />
+            Updates <i class='fa fa-arrow-down icon-theme' aria-hidden='true'></i> " . Number::formatSi($peer['bgpPeerInUpdates'], 2, 0, '') . "
+            <i class='fa fa-arrow-up icon-theme' aria-hidden='true'></i> " . Number::formatSi($peer['bgpPeerOutUpdates'], 2, 0, '') . '</td></tr>';
 
         unset($invalid);
         switch ($vars['graph']) {

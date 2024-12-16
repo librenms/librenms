@@ -1,0 +1,20 @@
+os: zyxelwlc
+text: 'Zyxel Zyxelwlc'
+group: zyxel
+type: wireless
+over:
+    - { graph: device_bits, text: Traffic }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+    - { graph: device_sensor-count-zyxelwlc-sessionNum, text: 'Active Sessions' }
+    - { graph: device_wireless_clients, text: 'Number of Clients' }
+    - { graph: device_wireless_ap-count, text: 'Connected APs' }
+mib_dir: zyxel
+icon: zyxel
+discovery:
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.890.1.6
+            - .1.3.6.1.4.1.890.1.15
+        sysDescr_regex:
+            - '/^NXC/'

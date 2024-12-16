@@ -1,7 +1,80 @@
+mib: ENTITY-MIB:ENTITY-SENSOR-MIB:ARUBAWIRED-VSX-MIB:ARUBAWIRED-TEMPSENSOR-MIB:ARUBAWIRED-POWERSUPPLY-MIB
 modules:
     os:
-        sysDescr_regex: 
+        sysDescr_regex:
             - '/ (?<hardware>\d{4,}.*) Swch (?<version>\D{2}\.\d{2}\.\d{2}\.\d{4})/'
             - '/ (?<hardware>\d{4,}) (?<version>\D{2}\.\d{2}\.\d{2}\.\d{4})/'
             - '/(?<version>\D{2}\.\d{2}\.\d{2}\.\d{4})/'
-        serial: ENTITY-MIB::entPhysicalSerialNum.1
+        serial:
+            - ENTITY-MIB::entPhysicalSerialNum.1
+            - ENTITY-MIB::entPhysicalSerialNum.101001
+        version:
+            - ENTITY-MIB::entPhysicalSoftwareRev.1
+            - ENTITY-MIB::entPhysicalSoftwareRev.101001
+        hardware:
+            - ENTITY-MIB::entPhysicalDescr.1
+            - ENTITY-MIB::entPhysicalDescr.101001
+    sensors:
+        pre-cache:
+            data:
+                -
+                    oid:
+                        - entPhysicalName
+        temperature:
+            data:
+                -
+                    oid: arubaWiredTempSensorTable
+                    num_oid: '.1.3.6.1.4.1.47196.4.1.1.3.11.3.1.1.7.{{ $index }}'
+                    descr: arubaWiredTempSensorName
+                    divisor: 1000
+                    value: arubaWiredTempSensorTemperature
+        power:
+            data:
+                -
+                    oid: arubaWiredPowerSupplyTable
+                    num_oid: '.1.3.6.1.4.1.47196.4.1.1.3.11.2.1.1.7.{{ $index }}'
+                    descr: 'Power Supply {{ $arubaWiredPSUName }}'
+                    value: arubaWiredPSUInstantaneousPower
+                    high_limit: arubaWiredPSUMaximumPower
+        state:
+            data:
+                -
+                    oid: entPhySensorTable
+                    num_oid: '.1.3.6.1.2.1.99.1.1.1.5.{{ $index }}'
+                    descr: entPhysicalName
+                    value: entPhySensorOperStatus
+                    skip_values:
+                        -
+                            oid: entPhySensorType
+                            op: '!='
+                            value: 6
+                    states:
+                        - { value: 1, descr: OK, graph: 1, generic: 0 }
+                        - { value: 3, descr: Not OK, graph: 1, generic: 2 }
+                -
+                    oid: arubaWiredPowerSupplyTable
+                    num_oid: '.1.3.6.1.4.1.47196.4.1.1.3.11.2.1.1.11.{{ $index }}'
+                    descr: 'Power Supply {{ $arubaWiredPSUName }}'
+                    value: arubaWiredPSUStateEnum
+                    states:
+                        - { value: 1, descr: ok, graph: 1, generic: 0 }
+                        - { value: 2, descr: Absent, graph: 1, generic: 2 }
+                        - { value: 3, descr: Fault Input, graph: 1, generic: 2 }
+                        - { value: 4, descr: Fault Output, graph: 1, generic: 2 }
+                        - { value: 5, descr: Fault POE, graph: 1, generic: 2 }
+                        - { value: 6, descr: Fault No Recovery, graph: 1, generic: 2 }
+                        - { value: 7, descr: alert, graph: 1, generic: 2 }
+                        - { value: 8, descr: unknown, graph: 1, generic: 3 }
+                        - { value: 9, descr: unsuppored, graph: 1, generic: 3 }
+                        - { value: 10, descr: warning, graph: 1, generic: 1 }
+                        - { value: 11, descr: init, graph: 1, generic: 3 }
+                -
+                    oid: arubaWiredVsxIslOperState
+                    num_oid: '.1.3.6.1.4.1.47196.4.1.1.3.7.2.1.1.{{ $index }}'
+                    descr: ISL
+                    value: arubaWiredVsxIslOperState
+                    states:
+                        - { value: 1, descr: init, graph: 1, generic: 3 }
+                        - { value: 2, descr: out Sync, graph: 1, generic: 2 }
+                        - { value: 3, descr: in Sync, graph: 1, generic: 0 }
+

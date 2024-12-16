@@ -9,10 +9,9 @@ try {
         $device = is_numeric($vars['device'])
             ? device_by_id_cache($vars['device'])
             : device_by_name($vars['device']);
-        if (empty($device['device_id'])) {
-            throw new \LibreNMS\Exceptions\RrdGraphException('Device not found');
+        if (isset($device['device_id'])) {
+            DeviceCache::setPrimary($device['device_id']);
         }
-        DeviceCache::setPrimary($device['device_id']);
     }
 
     // variables for included graphs
@@ -48,6 +47,8 @@ try {
         include Config::get('install_dir') . '/includes/html/graphs/customoid/customoid.inc.php';
     } elseif ($auth && is_file(Config::get('install_dir') . "/includes/html/graphs/$type/$subtype.inc.php")) {
         include Config::get('install_dir') . "/includes/html/graphs/$type/$subtype.inc.php";
+    } elseif ($auth && is_file(Config::get('install_dir') . "/includes/html/graphs/$type/generic.inc.php")) {
+        include Config::get('install_dir') . "/includes/html/graphs/$type/generic.inc.php";
     } else {
         graph_error("$type*$subtype Graph Template Missing", "$type*$subtype");
     }
@@ -57,6 +58,11 @@ try {
         graph_error('No Authorization', 'No Auth');
 
         return;
+    }
+
+    // check after auth
+    if (isset($vars['device']) && empty($device['device_id'])) {
+        throw new \LibreNMS\Exceptions\RrdGraphException('Device not found');
     }
 
     $rrd_options = $graph_params . ' ' . $rrd_options;
@@ -92,9 +98,9 @@ try {
 
     // output the graph
     if (\LibreNMS\Util\Debug::isEnabled()) {
-        echo '<img src="data:' . ImageFormat::forGraph()->contentType() . ';base64,' . base64_encode($image_data) . '" alt="graph" />';
+        echo '<img src="data:' . ImageFormat::forGraph($vars['graph_type'] ?? null)->contentType() . ';base64,' . base64_encode($image_data) . '" alt="graph" />';
     } else {
-        header('Content-type: ' . ImageFormat::forGraph()->contentType());
+        header('Content-type: ' . ImageFormat::forGraph($vars['graph_type'] ?? null)->contentType());
         echo (isset($vars['output']) && $vars['output'] === 'base64') ? base64_encode($image_data) : $image_data;
     }
 } catch (\LibreNMS\Exceptions\RrdGraphException $e) {

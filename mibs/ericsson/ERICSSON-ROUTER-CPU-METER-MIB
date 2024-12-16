@@ -1,0 +1,364 @@
+-- %DNP% $Id: ERICSSON-ROUTER-CPU-METER-MIB.my,v 1.1.2.2.434.4 2011/12/16 22:31:28 chiachun Exp $
+-- %DNP% $Source: /cvsroot/pkt/sw/se/xc/bsd/config/snmp/mibs/Attic/ERICSSON-ROUTER-CPU-METER-MIB.my,v $
+-- *****************************************************************
+-- ERICSSON-ROUTER-CPU-METER-MIB    The ERICSSON-ROUTER CPU utilization MIB
+--
+-- Copyright (c) 1999, 2003, 2011, 2015 Ericsson AB.
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+ERICSSON-ROUTER-CPU-METER-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-TYPE, Integer32, Unsigned32, Counter32, Gauge32
+                FROM SNMPv2-SMI
+        MODULE-COMPLIANCE,
+        OBJECT-GROUP
+                FROM SNMPv2-CONF
+        TEXTUAL-CONVENTION, DisplayString
+                FROM SNMPv2-TC
+        eriRouterMgmt
+                FROM ERICSSON-ROUTER-SMI
+        EriRouterPercentage
+                FROM ERICSSON-ROUTER-TC;
+
+eriRouterCpuMeterMIB MODULE-IDENTITY
+        LAST-UPDATED    "201501141800Z" -- Jan 14, 2015
+        ORGANIZATION    "Ericsson AB."
+        CONTACT-INFO
+                "       Ericsson AB.
+
+                Postal: 100 Headquarters Dr
+                        San Jose, CA 95134
+                        USA
+
+                 Phone: +1 408 750 5000
+                   Fax: +1 408 750 5599
+
+                "
+        DESCRIPTION
+                "This management information module measures CPU 
+                utilization on a device."
+
+    REVISION      "201501141800Z" -- Jan 14, 2015
+    DESCRIPTION
+        "Updated RBN/rbn/Rbn as ERICSSON-ROUTER/eriRouter/EriRouter
+         to migrate RBN MIB to ERICSSON MIB."
+
+    REVISION      "201112131800Z" -- Dec 13, 2011
+    DESCRIPTION
+        "Added eriRouterCpuMeterFiveSecondPeak, eriRouterCpuMeterOneMinutePeak, and
+        eriRouterCpuMeterFiveMinutePeak to monitor system peak CPU usage. Updated
+        conformance information."
+
+    REVISION      "201101191800Z" -- Jan 19, 2011
+    DESCRIPTION
+        "Update CONTACT-INFO & ORGANIZATION. Corrected max length of
+        eriRouterCpuProcName"
+
+    REVISION      "200212160000Z" -- December 16, 2002
+    DESCRIPTION
+        "Added a per process table to monitor the cpu usage of
+         each of the processes on the system."
+
+    REVISION      "200206260000Z" -- June 26, 2002
+    DESCRIPTION
+        "Updated CONTACT-INFO. Deprecated TEXTUAL-CONVENTION: Percentage.  
+        Use EriRouterPercentage in SYNTAX."
+
+    REVISION      "200205290000Z" -- May 29, 2002
+    DESCRIPTION
+        "Update/correct CONTACT-INFO. Fix syntax errors on IMPORTS list."
+
+    REVISION      "199906162300Z"
+    DESCRIPTION
+        "Creation of the CPU meter MIB."
+        ::= { eriRouterMgmt 6 }
+
+
+eriRouterCpuMeterMIBObjects OBJECT IDENTIFIER
+        ::= { eriRouterCpuMeterMIB 1 }
+
+eriRouterCpuMeterMIBConformance OBJECT IDENTIFIER
+        ::= { eriRouterCpuMeterMIB 2 }
+
+eriRouterCpuProcMIBObjects OBJECT IDENTIFIER
+        ::= { eriRouterCpuMeterMIB 3 }
+
+Percentage ::= TEXTUAL-CONVENTION
+    STATUS deprecated
+    DESCRIPTION
+    "This Textual Convention describes an object that stores 
+     a whole integer percentage value."
+    SYNTAX Integer32 (0..100)    
+
+-- MIB Objects
+
+eriRouterCpuMeterFiveSecondAvg OBJECT-TYPE
+        SYNTAX      EriRouterPercentage
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Provides the CPU usage percentage over the first five
+                 second period in the scheduler."
+        ::= { eriRouterCpuMeterMIBObjects 1 }
+
+eriRouterCpuMeterOneMinuteAvg OBJECT-TYPE
+        SYNTAX      EriRouterPercentage
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Provides a cumulative average of the CPU usage percentage
+                 over a one minute period."
+        ::= { eriRouterCpuMeterMIBObjects 2 }
+
+eriRouterCpuMeterFiveMinuteAvg OBJECT-TYPE
+        SYNTAX      EriRouterPercentage
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Provides a cumulative average of the CPU usage percentage
+                 over a five minute period." 
+        ::= { eriRouterCpuMeterMIBObjects 3 }
+
+eriRouterCpuMeterFiveSecondPeak OBJECT-TYPE
+        SYNTAX      EriRouterPercentage
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The peak CPU usage percentage over the first five
+                 second period."
+        ::= { eriRouterCpuMeterMIBObjects 4 }
+
+eriRouterCpuMeterOneMinutePeak OBJECT-TYPE
+        SYNTAX      EriRouterPercentage
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The peak CPU usage percentage over a one minute
+                 period."
+        ::= { eriRouterCpuMeterMIBObjects 5 }
+
+eriRouterCpuMeterFiveMinutePeak OBJECT-TYPE
+        SYNTAX      EriRouterPercentage
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The peak CPU usage percentage over a five minute
+                 period." 
+        ::= { eriRouterCpuMeterMIBObjects 6 }
+
+--
+-- Per Process Table
+--
+
+eriRouterCpuProcTable OBJECT-TYPE
+        SYNTAX       SEQUENCE OF EriRouterCpuProcEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+                "This table contains the objects which identify cpu processes.
+                With respect to creation and deletion of entries in this table,
+                rows in the table are created or deleted as processes are started 
+                or terminated."
+
+        ::= { eriRouterCpuProcMIBObjects 1 }
+
+eriRouterCpuProcEntry OBJECT-TYPE
+        SYNTAX       EriRouterCpuProcEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+                "A conceptual row in the eriRouterCpuProcTable."
+        INDEX        { IMPLIED eriRouterCpuProcName }
+
+        ::= { eriRouterCpuProcTable 1 }
+
+EriRouterCpuProcEntry ::=
+        SEQUENCE {
+                eriRouterCpuProcName          DisplayString,
+                eriRouterCpuProcPriority      Unsigned32,
+                eriRouterCpuProcTime          Counter32,
+                eriRouterCpuProcCalls         Counter32,
+                eriRouterCpuProc5Sec          EriRouterPercentage,
+                eriRouterCpuProc1Min          EriRouterPercentage,
+                eriRouterCpuProc5Min          EriRouterPercentage,
+                eriRouterCpuProcLongest       Gauge32
+        }
+
+eriRouterCpuProcName OBJECT-TYPE
+        SYNTAX       DisplayString (SIZE (1..114))
+        MAX-ACCESS   read-only 
+        STATUS       current
+        DESCRIPTION
+                "The name for this process."
+
+        ::= { eriRouterCpuProcEntry 1 }
+
+eriRouterCpuProcPriority OBJECT-TYPE
+        SYNTAX       Unsigned32 (0..255)
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+                "The priority of this process. This value ranges 
+                from 0 to 255, with 0 being the highest priority."
+
+        ::= { eriRouterCpuProcEntry 2 }
+
+eriRouterCpuProcTime OBJECT-TYPE
+        SYNTAX       Counter32
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+                "The total time, in milliseconds, that has been spent 
+                in this process."
+
+        ::= { eriRouterCpuProcEntry 3 }
+
+eriRouterCpuProcCalls OBJECT-TYPE
+        SYNTAX       Counter32
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+                "The number of times that this process has acquired
+                 the cpu."
+
+        ::= { eriRouterCpuProcEntry 4 }
+
+eriRouterCpuProc5Sec OBJECT-TYPE
+        SYNTAX       EriRouterPercentage
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+                "The average cpu usage in a 5 second window for this process."
+
+        ::= { eriRouterCpuProcEntry 5 }
+
+eriRouterCpuProc1Min OBJECT-TYPE
+        SYNTAX       EriRouterPercentage
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+                "The average cpu usage in a 1 minute window for this process."
+
+        ::= { eriRouterCpuProcEntry 6 }
+
+eriRouterCpuProc5Min OBJECT-TYPE
+        SYNTAX       EriRouterPercentage
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+                "The average cpu usage in a 5 minute window for this process."
+
+        ::= { eriRouterCpuProcEntry 7 }
+
+eriRouterCpuProcLongest OBJECT-TYPE
+        SYNTAX       Gauge32
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+                "The maximum time, in milliseconds, spent in this process."
+
+        ::= { eriRouterCpuProcEntry 8 }
+
+-- Conformance Information
+
+
+eriRouterCpuMeterMIBGroups OBJECT IDENTIFIER ::= 
+        { eriRouterCpuMeterMIBConformance 1 }
+
+eriRouterCpuMeterMIBCompliances OBJECT IDENTIFIER ::=
+        { eriRouterCpuMeterMIBConformance 2 }
+
+eriRouterCpuProcGroups OBJECT IDENTIFIER ::=
+        { eriRouterCpuMeterMIBConformance 3 }
+
+-- Compliance Statements
+
+eriRouterCpuMeterMIBCompliance MODULE-COMPLIANCE
+        STATUS      deprecated 
+        DESCRIPTION
+                "The compliance statement for the CPU meter MIB."
+        MODULE      -- this module
+        MANDATORY-GROUPS 
+                {
+                    eriRouterCpuMeterStatsGroup
+                }
+        ::= { eriRouterCpuMeterMIBCompliances 1 }
+
+eriRouterCpuMeterMIBCompliance1 MODULE-COMPLIANCE
+        STATUS      deprecated 
+        DESCRIPTION
+                "The compliance statement for the CPU meter MIB
+                with added support for per process monitoring."
+        MODULE      -- this module
+        MANDATORY-GROUPS 
+                {
+                    eriRouterCpuMeterStatsGroup,
+                    eriRouterCpuProcGroup
+                }
+        ::= { eriRouterCpuMeterMIBCompliances 2 }
+
+eriRouterCpuMeterMIBCompliance2 MODULE-COMPLIANCE
+        STATUS      current
+        DESCRIPTION
+                "The compliance statement for the CPU meter MIB
+                with added support for per process monitoring."
+        MODULE      -- this module
+        MANDATORY-GROUPS 
+                {
+                    eriRouterCpuMeterStatsGroup2,
+                    eriRouterCpuProcGroup
+                }
+        ::= { eriRouterCpuMeterMIBCompliances 3 }
+
+-- Units of Conformance
+
+eriRouterCpuMeterStatsGroup OBJECT-GROUP
+        OBJECTS 
+              {
+                eriRouterCpuMeterFiveSecondAvg,
+                eriRouterCpuMeterOneMinuteAvg,
+                eriRouterCpuMeterFiveMinuteAvg
+              }
+        STATUS      deprecated 
+        DESCRIPTION
+                "A collection of objects providing CPU utilization
+                 information."
+        ::= { eriRouterCpuMeterMIBGroups 1 }
+
+eriRouterCpuProcGroup     OBJECT-GROUP
+        OBJECTS {
+                eriRouterCpuProcName,
+                eriRouterCpuProcPriority,
+                eriRouterCpuProcTime,
+                eriRouterCpuProcCalls,
+                eriRouterCpuProc5Sec,
+                eriRouterCpuProc1Min,
+                eriRouterCpuProc5Min,
+                eriRouterCpuProcLongest
+        }
+        STATUS       current
+        DESCRIPTION
+                "The collection of all objects used for monitoring cpu
+                utilization of each process."
+        ::= { eriRouterCpuProcGroups 1}
+
+eriRouterCpuMeterStatsGroup2 OBJECT-GROUP
+        OBJECTS 
+              {
+                eriRouterCpuMeterFiveSecondAvg,
+                eriRouterCpuMeterOneMinuteAvg,
+                eriRouterCpuMeterFiveMinuteAvg,
+                eriRouterCpuMeterFiveSecondPeak,
+                eriRouterCpuMeterOneMinutePeak,
+                eriRouterCpuMeterFiveMinutePeak
+              }
+        STATUS      current
+        DESCRIPTION
+                "A collection of objects providing CPU utilization
+                information."
+        ::= { eriRouterCpuMeterMIBGroups 2 }
+END

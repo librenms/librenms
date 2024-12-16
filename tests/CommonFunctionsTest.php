@@ -96,8 +96,8 @@ class CommonFunctionsTest extends TestCase
         $this->assertEquals('&lt;script&gt;alert("test")&lt;/script&gt;', Clean::html('<script>alert("test")</script>', []));
 
         $tmp_config = [
-            'HTML.Allowed'    => 'b,iframe,i,ul,li,h1,h2,h3,h4,br,p',
-            'HTML.Trusted'    => true,
+            'HTML.Allowed' => 'b,iframe,i,ul,li,h1,h2,h3,h4,br,p',
+            'HTML.Trusted' => true,
             'HTML.SafeIframe' => true,
         ];
 
@@ -127,7 +127,7 @@ class CommonFunctionsTest extends TestCase
         $this->assertTrue(Validate::hostname('www.averylargedomainthatdoesnotreallyexist.com'), 'www.averylargedomainthatdoesnotreallyexist.com');
         $this->assertTrue(Validate::hostname('cont-ains.h-yph-en-s.com'), 'cont-ains.h-yph-en-s.com');
         $this->assertTrue(Validate::hostname('cisco-3750x'), 'cisco-3750x');
-        $this->assertFalse(Validate::hostname('cisco_3750x'), 'cisco_3750x');
+        $this->assertTrue(Validate::hostname('cisco_3750x'), 'cisco_3750x');
         $this->assertFalse(Validate::hostname('goo gle.com'), 'goo gle.com');
         $this->assertFalse(Validate::hostname('google..com'), 'google..com');
         $this->assertFalse(Validate::hostname('google.com '), 'google.com ');

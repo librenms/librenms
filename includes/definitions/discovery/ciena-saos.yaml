@@ -1,12 +1,15 @@
-mib: NORTEL-OPTICAL-PM-MIB
+mib: BRIDGE-MIB:NORTEL-OPTICAL-PM-MIB:CIENA-CES-PORT-XCVR-MIB:CIENA-CES-PORT-MIB:BRIDGE-MIB:CIENA-SMI:CIENA-CES-CHASSIS-MIB:CIENA-CES-FEATURE-LICENSE-MIB:CIENA-CES-PORT-MIB:CIENA-CES-PORT-XCVR-MIB:WWP-PRODUCTS-MIB:WWP-LEOS-PORT-XCVR-MIB:WWP-LEOS-SYSTEM-CONFIG-MIB:CIENA-CES-RAPS-MIB
 modules:
     os:
-        sysDescr_regex: '/(?<hardware>.*)SW:(?<version>\S+)/'
+        sysDescr_regex:
+            - '/(?<hardware>.*)SW:(?<version>\S+)/'
+            - '/Ciena Corporation, (?<hardware>.*) SAOS Operating System, Version saos-(?<version>.*+)/'
     pre-cache:
         data:
             -
                 oid: nnOpticalPmRecentTable
                 snmp_flags: [-OeQUsb]
+            - oid: ifName
     sensors:
         count:
             data:
@@ -98,4 +101,189 @@ modules:
                             op: 'regex'
                             value: (.*(LOW|HIGH).*)
                     group: nnOpticalPmRecentIfIndexDescr
-                                    
+        temperature:
+            data:
+                -   oid: cienaCesPortXcvrTable
+                    value: cienaCesPortXcvrTemperature
+                    num_oid: '.1.3.6.1.4.1.1271.2.1.9.1.1.1.1.3.{{ $index }}'
+                    descr: 'Port {{ $ifName }} Transceiver'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: 'ports'
+                    group: transceiver
+                    low_limit: cienaCesPortXcvrLowTempAlarmThreshold
+                    high_limit: cienaCesPortXcvrHighTempAlarmThreshold
+                    snmp_flags: '-OQUsbe'
+                    skip_values:
+                        -   oid: cienaCesPortXcvrOperState
+                            op: 'in_array'
+                            value: [ 4 ]
+        voltage:
+            data:
+                -   oid: cienaCesPortXcvrTable
+                    value: cienaCesPortXcvrVcc
+                    num_oid: '.1.3.6.1.4.1.1271.2.1.9.1.1.1.1.4.{{ $index }}'
+                    descr: 'Port {{ $ifName }} Transceiver Vcc'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: 'ports'
+                    group: transceiver
+                    low_limit: cienaCesPortXcvrLowVccAlarmThreshold
+                    high_limit: cienaCesPortXcvrHighVccAlarmThreshold
+                    divisor: 1000
+                    snmp_flags: '-OQUsbe'
+                    index: 'xcvr-vcc-{{ $index }}'
+                    skip_values:
+                        -   oid: cienaCesPortXcvrOperState
+                            op: 'in_array'
+                            value: [ 4 ]
+        current:
+            data:
+                -
+                    oid: cienaCesPortXcvrTable
+                    value: cienaCesPortXcvrBias
+                    num_oid: '.1.3.6.1.4.1.1271.2.1.9.1.1.1.1.5.{{ $index }}'
+                    descr: 'Port {{ $ifName }} Transceiver Bias Current'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: 'ports'
+                    low_limit: 0
+                    high_limit: cienaCesPortXcvrHighBiasAlarmThreshold
+                    divisor: 1000
+                    snmp_flags: '-OQUsbe'
+                    group: 'Transceivers'
+                    index: 'xcvr-i-{{ $index }}'
+                    skip_values:
+                        -
+                            oid: cienaCesPortXcvrOperState
+                            op: 'in_array'
+                            value: [4]
+        power:
+            data:
+                -
+                    oid: cienaCesPortXcvrTable
+                    value: cienaCesPortXcvrRxPower
+                    num_oid: '.1.3.6.1.4.1.1271.2.1.9.1.1.1.1.6.{{ $index }}'
+                    descr: 'Port {{ $ifName }} Transceiver Rx Power'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: 'ports'
+                    group: transceiver
+                    low_limit: cienaCesPortXcvrLowRxPwAlarmThreshold
+                    high_limit: cienaCesPortXcvrHighRxPwAlarmThreshold
+                    divisor: 1000000
+                    snmp_flags: '-OQUsbe'
+                    index: 'rx-{{ $index }}'
+                    skip_values:
+                        -
+                            oid: cienaCesPortXcvrOperState
+                            op: 'in_array'
+                            value: [1,4]
+                -
+                    oid: cienaCesPortXcvrTable
+                    value: cienaCesPortXcvrTxOutputPower
+                    num_oid: '.1.3.6.1.4.1.1271.2.1.9.1.1.1.1.35.{{ $index }}'
+                    descr: 'Port {{ $ifName }} Transceiver Tx Power'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: 'ports'
+                    group: transceiver
+                    low_limit: cienaCesPortXcvrLowTxPwAlarmThreshold
+                    high_limit: cienaCesPortXcvrHighTxPwAlarmThreshold
+                    divisor: 1000000
+                    snmp_flags: '-OQUsbe'
+                    index: 'tx-{{ $index }}'
+                    skip_values:
+                        -
+                            oid: cienaCesPortXcvrOperState
+                            op: 'in_array'
+                            value: [4]
+                        -
+                            oid: cienaCesPortXcvrTxState
+                            op: 'in_array'
+                            value: [2]
+        state:
+            data:
+                -
+                    oid: cienaCesPortXcvrTable
+                    value: cienaCesPortXcvrFecMode
+                    num_oid: '.1.3.6.1.4.1.1271.2.1.9.1.1.1.1.36.{{ $index }}'
+                    descr: 'Port {{ $ifName }} Transceiver FEC Mode'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: 'ports'
+                    state_name: cienaCesPortXcvrFecMode
+                    skip_values:
+                        -
+                            oid: cienaCesPortXcvrFecMode
+                            op: 'in_array'
+                            value: [1]
+                        -
+                            oid: cienaCesPortXcvrOperState
+                            op: 'in_array'
+                            value: [4]
+                    states:
+                        - { value: 1, generic: 0, graph: 0, descr: disabled }
+                        - { value: 2, generic: 0, graph: 0, descr: generic }
+                        - { value: 3, generic: 0, graph: 0, descr: enhanced }
+                    snmp_flags: '-OQUsbe'
+                    group: 'Transceiver FEC Mode'
+                -
+                    oid: cienaCesModuleTable
+                    value: cienaCesModuleAdminState
+                    num_oid: '.1.3.6.1.4.1.1271.2.1.2.1.2.1.1.7.{{ $index }}'
+                    descr: 'Slot {{ $subindex2 }} Admin State - {{ $cienaCesModuleModel }}'
+                    state_name: cienaCesModuleAdminState
+                    states:
+                        - { value: 1, generic: 0, graph: 0, descr: enabled }
+                        - { value: 2, generic: 0, graph: 0, descr: disabled }
+                        - { value: 3, generic: 0, graph: 0, descr: shutdown }
+                    group: 'Module Admin State'
+                -
+                    oid: cienaCesModuleTable
+                    value: cienaCesModuleOperState
+                    num_oid: '.1.3.6.1.4.1.1271.2.1.2.1.2.1.1.8.{{ $index }}'
+                    descr: 'Slot {{ $subindex2 }} Oper State - {{ $cienaCesModuleModel }}'
+                    entPhysicalIndex: '55{{ $subindex2 }}'
+                    state_name: cienaCesModuleOperState
+                    states:
+                        - { value:  1, generic: 0, graph: 0, descr: uninstalled }
+                        - { value:  2, generic: 0, graph: 0, descr: unequipped }
+                        - { value:  3, generic: 1, graph: 0, descr: init }
+                        - { value:  4, generic: 0, graph: 0, descr: disabled }
+                        - { value:  5, generic: 0, graph: 0, descr: enabled }
+                        - { value:  6, generic: 2, graph: 0, descr: faulted }
+                        - { value:  7, generic: 0, graph: 0, descr: hotswap }
+                        - { value:  8, generic: 1, graph: 0, descr: poweroff }
+                        - { value:  9, generic: 1, graph: 0, descr: hitlessInit }
+                        - { value: 10, generic: 1, graph: 0, descr: fastReload }
+                        - { value: 11, generic: 1, graph: 0, descr: krnInit }
+                        - { value: 12, generic: 2, graph: 0, descr: unsupported }
+                        - { value: 13, generic: 1, graph: 0, descr: installing }
+                        - { value: 14, generic: 2, graph: 0, descr: failed }
+                        - { value: 15, generic: 1, graph: 0, descr: krnDisable }
+                        - { value: 16, generic: 2, graph: 0, descr: appFault }
+                        - { value: 17, generic: 1, graph: 0, descr: booting }
+                        - { value: 18, generic: 1, graph: 0, descr: powerdown }
+                    group: 'Module Operational State'
+                -
+                    oid: cienaCesModuleTable
+                    value: cienaCesModuleLastRebootReason
+                    num_oid: '.1.3.6.1.4.1.1271.2.1.2.1.2.1.1.11.{{ $index }}'
+                    descr: 'Slot {{ $subindex2 }} Reboot Reason'
+                    state_name: cienaCesModuleLastRebootReason
+                    states:
+                        - { value:  1, generic: 3, graph: 0, descr: unknown }
+                        - { value:  2, generic: 0, graph: 0, descr: snmp }
+                        - { value:  3, generic: 0, graph: 0, descr: pwrFail }
+                        - { value:  4, generic: 0, graph: 0, descr: appLoad }
+                        - { value:  5, generic: 0, graph: 0, descr: errorHandler }
+                        - { value:  6, generic: 0, graph: 0, descr: watchdog }
+                        - { value:  7, generic: 0, graph: 0, descr: upgrade }
+                        - { value:  8, generic: 0, graph: 0, descr: cli }
+                        - { value:  9, generic: 0, graph: 0, descr: resetButton }
+                        - { value: 10, generic: 0, graph: 0, descr: failOver }
+                        - { value: 11, generic: 0, graph: 0, descr: faultManager }
+                        - { value: 12, generic: 0, graph: 0, descr: communicationFailure }
+                        - { value: 13, generic: 0, graph: 0, descr: configurationRevert }
+                        - { value: 14, generic: 0, graph: 0, descr: unprotectedFailure }
+                        - { value: 15, generic: 0, graph: 0, descr: bootFailure }
+                        - { value: 16, generic: 0, graph: 0, descr: softwareRevert }
+                        - { value: 17, generic: 0, graph: 0, descr: processorWarmRestart }
+                        - { value: 18, generic: 0, graph: 0, descr: coldRestart }
+                        - { value: 19, generic: 0, graph: 0, descr: primaryRestart }
+                    group: 'Module Last Reboot Reason'

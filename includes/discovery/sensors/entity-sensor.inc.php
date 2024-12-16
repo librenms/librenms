@@ -26,21 +26,29 @@ if (! empty($entity_array)) {
     if ($device['os'] === 'arista_eos') {
         $entity_oids = snmpwalk_cache_oid($device, 'aristaEntSensorThresholdTable', $entity_oids, 'ARISTA-ENTITY-SENSOR-MIB');
     }
+    if ($device['os'] === 'xos') {
+        echo ' XOS:entPhysicalContainedIn';
+        $entity_oids = snmpwalk_cache_oid($device, 'entPhysicalContainedIn', $entity_oids, 'ENTITY-MIB');
+        echo ' XOS:entAliasMappingIdentifier';
+        $entity_oids = snmpwalk_cache_oid($device, 'entAliasMappingIdentifier', $entity_oids, 'ENTITY-MIB');
+        echo ' XOS:ifName';
+        $xos_ifname = snmpwalk_cache_oid($device, 'ifName', [], 'IF-MIB');
+    }
     echo ' entPhySensorOperStatus';
     $entity_oids = snmpwalk_cache_multi_oid($device, 'entPhySensorOperStatus', $entity_oids, 'ENTITY-SENSOR-MIB');
 }
 
 if (! empty($entity_oids)) {
     $entitysensor = [
-        'voltsDC'   => 'voltage',
-        'voltsAC'   => 'voltage',
-        'amperes'   => 'current',
-        'watts'     => 'power',
-        'hertz'     => 'freq',
+        'voltsDC' => 'voltage',
+        'voltsAC' => 'voltage',
+        'amperes' => 'current',
+        'watts' => 'power',
+        'hertz' => 'freq',
         'percentRH' => 'humidity',
-        'rpm'       => 'fanspeed',
-        'celsius'   => 'temperature',
-        'dBm'       => 'dbm',
+        'rpm' => 'fanspeed',
+        'celsius' => 'temperature',
+        'dBm' => 'dbm',
     ];
 
     foreach ($entity_oids as $index => $entry) {
@@ -73,6 +81,10 @@ if (! empty($entity_oids)) {
                     $card = $card[0] . $card[1] . '00';
                 }
                 $descr = ucwords($entity_array[$card]['entPhysicalName'] ?? '') . ' ' . ucwords($entity_array[$index]['entPhysicalDescr'] ?? '');
+            } elseif ($device['os'] === 'xos' && str_starts_with($entity_oids[$entity_oids[$index]['entPhysicalContainedIn'] . '.0']['entAliasMappingIdentifier'], 'mib-2.2.2.1.1.')) {
+                $xos_ifindex = end(explode('.', $entity_oids[$entity_oids[$index]['entPhysicalContainedIn'] . '.0']['entAliasMappingIdentifier']));
+                $xos_portname = $xos_ifname[$xos_ifindex]['ifName'];
+                $descr = ucwords($xos_portname . ' ' . str_replace(' Sensor', '', $entity_array[$index]['entPhysicalDescr']));
             } else {
                 $descr = ucwords($entity_array[$index]['entPhysicalName']);
             }
@@ -100,41 +112,23 @@ if (! empty($entity_oids)) {
             }
             $valid_sensor = check_entity_sensor($descr, $device);
             $type = $entitysensor[$entry['entPhySensorType']];
-            // FIXME this stuff is foul
-            if ($entry['entPhySensorScale'] == 'nano') {
-                $divisor = '1000000000';
-                $multiplier = '1';
-            }
-            if ($entry['entPhySensorScale'] == 'micro') {
-                $divisor = '1000000';
-                $multiplier = '1';
-            }
-            if ($entry['entPhySensorScale'] == 'milli') {
-                $divisor = '1000';
-                $multiplier = '1';
-            }
-            if ($entry['entPhySensorScale'] == 'units') {
-                $divisor = '1';
-                $multiplier = '1';
-            }
-            if ($entry['entPhySensorScale'] == 'kilo') {
-                $divisor = '1';
-                $multiplier = '1000';
-            }
-            if ($entry['entPhySensorScale'] == 'mega') {
-                $divisor = '1';
-                $multiplier = '1000000';
-            }
-            if ($entry['entPhySensorScale'] == 'giga') {
-                $divisor = '1';
-                $multiplier = '1000000000';
-            }
-            if ($entry['entPhySensorScale'] == 'yocto') {
-                $divisor = '1';
-                $multiplier = '1';
-            }
-            if (is_numeric($entry['entPhySensorPrecision']) && $entry['entPhySensorPrecision'] > '0') {
-                $divisor = $divisor . str_pad('', $entry['entPhySensorPrecision'], '0');
+
+            // Try to handle the scale
+            [$divisor, $multiplier] = match ($entry['entPhySensorScale']) {
+                'zepto' => [1000000000000000000, 1],
+                'nano' => [1000000000, 1],
+                'micro' => [1000000, 1],
+                'milli' => [1000, 1],
+                'units' => [1, 1],
+                'kilo' => [1, 1000],
+                'mega' => [1, 1000000],
+                'giga' => [1, 1000000000],
+                'yocto' => [1, 1],
+                default => [1, 1],
+            };
+
+            if (is_numeric($entry['entPhySensorPrecision']) && $entry['entPhySensorPrecision'] > 0) {
+                $divisor .= str_pad('', $entry['entPhySensorPrecision'], '0');
             }
 
             $current = ($current * $multiplier / $divisor);
@@ -144,6 +138,14 @@ if (! empty($entity_oids)) {
                 }
                 $descr = preg_replace('/[T|t]emperature[|s]/', '', $descr);
             }
+
+            // Fix for FortiSwitch - ALL FortiSwitches as of 14/2/2024 output fan speeds as percentages while entPhySensorType is RPM.
+            if ($device['os'] == 'fortiswitch' && $entry['entPhySensorType'] == 'rpm') {
+                $type = 'percent';
+                $divisor = 1;
+                $current = $current * 10;
+            }
+
             if ($device['os'] == 'rittal-lcp') {
                 if ($type == 'voltage') {
                     $divisor = 1000;
@@ -162,9 +164,14 @@ if (! empty($entity_oids)) {
                 $valid_sensor = false;
             }
             // Check for valid sensors
-            if (isset($entry['entPhySensorOperStatus']) && $entry['entPhySensorOperStatus'] === 'unavailable') {
+            if (isset($entry['entPhySensorOperStatus']) && ($entry['entPhySensorOperStatus'] === 'unavailable' || $entry['entPhySensorOperStatus'] === 'nonoperational')) {
                 $valid_sensor = false;
             }
+
+            if ($entry['entPhySensorValue'] == '-1000000000') {
+                $valid_sensor = false;
+            }
+
             if ($valid_sensor && dbFetchCell("SELECT COUNT(*) FROM `sensors` WHERE device_id = ? AND `sensor_class` = ? AND `sensor_type` = 'cisco-entity-sensor' AND `sensor_index` = ?", [$device['device_id'], $type, $index]) == '0') {
                 // Check to make sure we've not already seen this sensor via cisco's entity sensor mib
                 if ($type == 'power' && $device['os'] == 'arista_eos' && preg_match('/DOM (R|T)x Power/i', $descr)) {
@@ -231,7 +238,7 @@ if (! empty($entity_oids)) {
                     // End grouping sensors
                 }
                 $descr = trim($descr);
-                discover_sensor($valid['sensor'], $type, $device, $oid, $index, 'entity-sensor', $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $current, 'snmp', $entPhysicalIndex, $entry['entSensorMeasuredEntity'] ?? null, null, $group);
+                discover_sensor(null, $type, $device, $oid, $index, 'entity-sensor', $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $current, 'snmp', $entPhysicalIndex, $entry['entSensorMeasuredEntity'] ?? null, null, $group);
             }
         }//end if
     }//end foreach

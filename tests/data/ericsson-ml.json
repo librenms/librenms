@@ -2263,70 +2263,6 @@
                     "mempool_class": "buffers",
                     "mempool_precision": 1024,
                     "mempool_descr": "Memory buffers",
-                    "mempool_perc": 100,
-                    "mempool_perc_oid": null,
-                    "mempool_used": 1055735808,
-                    "mempool_used_oid": ".1.3.6.1.4.1.2021.4.14.0",
-                    "mempool_free": 0,
-                    "mempool_free_oid": null,
-                    "mempool_total": 1055735808,
-                    "mempool_total_oid": null,
-                    "mempool_largestfree": null,
-                    "mempool_lowestfree": null,
-                    "mempool_deleted": 0,
-                    "mempool_perc_warn": null
-                },
-                {
-                    "mempool_index": "4",
-                    "entPhysicalIndex": null,
-                    "mempool_type": "ucd",
-                    "mempool_class": "cached",
-                    "mempool_precision": 1024,
-                    "mempool_descr": "Cached memory",
-                    "mempool_perc": 86,
-                    "mempool_perc_oid": null,
-                    "mempool_used": 902991872,
-                    "mempool_used_oid": ".1.3.6.1.4.1.2021.4.15.0",
-                    "mempool_free": 152743936,
-                    "mempool_free_oid": null,
-                    "mempool_total": 1055735808,
-                    "mempool_total_oid": null,
-                    "mempool_largestfree": null,
-                    "mempool_lowestfree": null,
-                    "mempool_deleted": 0,
-                    "mempool_perc_warn": null
-                }
-            ]
-        },
-        "poller": {
-            "mempools": [
-                {
-                    "mempool_index": "1",
-                    "entPhysicalIndex": null,
-                    "mempool_type": "ucd",
-                    "mempool_class": "system",
-                    "mempool_precision": 1024,
-                    "mempool_descr": "Physical memory",
-                    "mempool_perc": 12,
-                    "mempool_perc_oid": null,
-                    "mempool_used": 124243968,
-                    "mempool_used_oid": null,
-                    "mempool_free": 931491840,
-                    "mempool_free_oid": ".1.3.6.1.4.1.2021.4.6.0",
-                    "mempool_total": 1055735808,
-                    "mempool_total_oid": null,
-                    "mempool_largestfree": null,
-                    "mempool_lowestfree": null,
-                    "mempool_deleted": 0,
-                    "mempool_perc_warn": null
-                },
-                {
-                    "mempool_index": "3",
-                    "entPhysicalIndex": null,
-                    "mempool_type": "ucd",
-                    "mempool_class": "buffers",
-                    "mempool_precision": 1024,
-                    "mempool_descr": "Memory buffers",
                     "mempool_perc": 0,
                     "mempool_perc_oid": null,
                     "mempool_used": 0,
@@ -2361,6 +2297,90 @@
                     "mempool_perc_warn": null
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
+    },
+    "entity-physical": {
+        "discovery": {
+            "entPhysical": [
+                {
+                    "entPhysicalIndex": 40100,
+                    "entPhysicalDescr": "1xge-3x10ge-radio-channel-single",
+                    "entPhysicalClass": "module",
+                    "entPhysicalName": "MINI-LINK 6352 80/21H",
+                    "entPhysicalHardwareRev": "R2A",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "CXP9026371/3 R15A411",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "true",
+                    "entPhysicalModelName": "UKL 501 57/21H",
+                    "entPhysicalVendorType": "zeroDotZero",
+                    "entPhysicalSerialNum": "CR9P103835",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": 0,
+                    "entPhysicalMfgName": "",
+                    "ifIndex": null
+                },
+                {
+                    "entPhysicalIndex": 60100,
+                    "entPhysicalDescr": "",
+                    "entPhysicalClass": "module",
+                    "entPhysicalName": "Removable Memory Module",
+                    "entPhysicalHardwareRev": "R2A",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "true",
+                    "entPhysicalModelName": "RYS 110 243/1",
+                    "entPhysicalVendorType": "zeroDotZero",
+                    "entPhysicalSerialNum": "BS82000242",
+                    "entPhysicalContainedIn": 40100,
+                    "entPhysicalParentRelPos": 0,
+                    "entPhysicalMfgName": "",
+                    "ifIndex": null
+                },
+                {
+                    "entPhysicalIndex": 70102,
+                    "entPhysicalDescr": "1000base-lx-10",
+                    "entPhysicalClass": "module",
+                    "entPhysicalName": "LC",
+                    "entPhysicalHardwareRev": "0000",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "true",
+                    "entPhysicalModelName": "SFP LX",
+                    "entPhysicalVendorType": "zeroDotZero",
+                    "entPhysicalSerialNum": "",
+                    "entPhysicalContainedIn": 40100,
+                    "entPhysicalParentRelPos": 0,
+                    "entPhysicalMfgName": "Optech",
+                    "ifIndex": null
+                },
+                {
+                    "entPhysicalIndex": 80100,
+                    "entPhysicalDescr": "Wi-Fi Adapter -> NOT AVAILABLE",
+                    "entPhysicalClass": "module",
+                    "entPhysicalName": "Wi-Fi Adapter -> NOT AVAILABLE",
+                    "entPhysicalHardwareRev": "UNKNOWN",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "UNKNOWN",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "true",
+                    "entPhysicalModelName": "UNKNOWN",
+                    "entPhysicalVendorType": "zeroDotZero",
+                    "entPhysicalSerialNum": "UNKNOWN",
+                    "entPhysicalContainedIn": 40100,
+                    "entPhysicalParentRelPos": 0,
+                    "entPhysicalMfgName": "",
+                    "ifIndex": null
+                }
+            ]
+        },
+        "poller": "matches discovery"
     }
 }

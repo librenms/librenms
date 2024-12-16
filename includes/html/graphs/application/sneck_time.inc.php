@@ -14,13 +14,13 @@ $rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'On Dev',
-        'ds'       => 'time',
+        'descr' => 'On Dev',
+        'ds' => 'time',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'To Polling',
-        'ds'       => 'time_to_polling',
+        'descr' => 'To Polling',
+        'ds' => 'time_to_polling',
     ];
 } else {
     d_echo('RRD "' . $rrd_filename . '" not found');

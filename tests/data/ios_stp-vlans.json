@@ -3537,8 +3537,8 @@
                     "ifName": "StackPort2",
                     "portName": null,
                     "ifIndex": 5182,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "false",
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
@@ -3637,8 +3637,8 @@
                     "ifName": "StackSub-St2-1",
                     "portName": null,
                     "ifIndex": 5183,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
@@ -3737,8 +3737,8 @@
                     "ifName": "StackSub-St2-2",
                     "portName": null,
                     "ifIndex": 5184,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
@@ -7224,6 +7224,32 @@
                     "designatedPort": 80,
                     "forwardTransitions": 1,
                     "ifIndex": 10624
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    },
+    "entity-physical": {
+        "discovery": {
+            "entPhysical": [
+                {
+                    "entPhysicalIndex": 1,
+                    "entPhysicalDescr": null,
+                    "entPhysicalClass": null,
+                    "entPhysicalName": "C29xx Stacking",
+                    "entPhysicalHardwareRev": null,
+                    "entPhysicalFirmwareRev": null,
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": null,
+                    "entPhysicalAssetID": null,
+                    "entPhysicalIsFRU": null,
+                    "entPhysicalModelName": "",
+                    "entPhysicalVendorType": null,
+                    "entPhysicalSerialNum": "",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": -1,
+                    "entPhysicalMfgName": null,
+                    "ifIndex": null
                 }
             ]
         },

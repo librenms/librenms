@@ -1,0 +1,9 @@
+mib: MOXA-SYSTEM-INFO-MIB:MOXA-SYSTEM-UTILIZATION-MIB:MOXA-PORT-MIB:MOXA-DEVICE-IO-MIB
+modules:
+    os:
+        hardware:
+            - MOXA-SYSTEM-INFO-MIB::siStatProductInfoModelName.0            
+        version:
+            - MOXA-SYSTEM-INFO-MIB::siStatProductInfoFirmwareVersion.0
+        serial:
+            - MOXA-SYSTEM-INFO-MIB::siStatProductInfoSerialNumber.0

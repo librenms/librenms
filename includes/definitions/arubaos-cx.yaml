@@ -1,6 +1,7 @@
 os: arubaos-cx
 text: 'ArubaOS-CX'
 type: network
+mib_dir: arubaos-cx
 icon: aruba
 over:
     - { graph: device_bits, text: Traffic }

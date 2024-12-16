@@ -1,0 +1,296 @@
+--**MOD+***********************************************************************
+--* Module:    ARUBAWIRED-AAA-MIB.mib
+--*
+--* (c) Copyright 2020-2021 Hewlett Packard Enterprise Development LP
+--* All Rights Reserved.
+--*
+--* The contents of this software are proprietary and confidential
+--* to the Hewlett-Packard Development Company, L.P.  No part of this
+--* program may be photocopied, reproduced, or translated into another
+--* programming language without prior written consent of the
+--* Hewlett-Packard Development Company, L.P.
+--*
+--* Purpose: This file contains MIB definition of ARUBAWIRED-CIPT-MIB
+--*
+--**MOD-***********************************************************************
+
+ARUBAWIRED-AAA-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        OBJECT-TYPE, MODULE-IDENTITY, Unsigned32, NOTIFICATION-TYPE
+            FROM SNMPv2-SMI
+        DisplayString
+            FROM SNMPv2-TC
+        MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+        wndFeatures
+        FROM ARUBAWIRED-NETWORKING-OID;
+
+    arubaWiredAAAMIB MODULE-IDENTITY
+        LAST-UPDATED "202107140000Z" -- July 14, 2021
+        ORGANIZATION "HPE/Aruba Networking Division"
+        CONTACT-INFO "Hewlett-Packard Company
+                      8000 Foothills Blvd.
+                      Roseville, CA 95747"
+        DESCRIPTION  "This MIB module contains HPE proprietary
+                      AAA MIBs."
+
+        REVISION     "202107140000Z" -- July 14, 2021
+        DESCRIPTION  "Removed ServerReachabilityStatus from index"
+
+        REVISION     "202010080000Z" -- October 08, 2020
+        DESCRIPTION  "Initial revision."
+
+        ::= { wndFeatures 16 }
+
+
+-- *************************************************************
+-- Start of MIB Objects
+-- *************************************************************
+
+arubaWiredAAAStatusNotifications OBJECT IDENTIFIER          ::= { arubaWiredAAAMIB 0 }
+arubaWiredAAAObjects             OBJECT IDENTIFIER          ::= { arubaWiredAAAMIB 1 }
+-- ************************************************************
+--  AAA - Radius Server Status details
+-- ************************************************************
+arubaWiredRadiusServer         OBJECT IDENTIFIER
+                                ::= { arubaWiredAAAObjects 1 }
+
+    arubaWiredRadiusServerTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF ArubaWiredRadiusServerEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Radius Server table has the Radius Server Details."
+        ::= { arubaWiredRadiusServer 1 }
+
+    arubaWiredRadiusServerEntry OBJECT-TYPE
+        SYNTAX      ArubaWiredRadiusServerEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Radius Server configurations."
+        INDEX       {
+                      arubaWiredRadiusServerVrfName,
+                      arubaWiredRadiusServerAddress,
+                      arubaWiredRadiusServerPort,
+                      arubaWiredRadiusServerPortType
+                    }
+        ::= { arubaWiredRadiusServerTable 1 }
+
+    ArubaWiredRadiusServerEntry ::= SEQUENCE {
+            arubaWiredRadiusServerVrfName     DisplayString,
+            arubaWiredRadiusServerAddress     DisplayString,
+            arubaWiredRadiusServerPort        Unsigned32,
+            arubaWiredRadiusServerPortType    DisplayString,
+            arubaWiredRadiusServerReachabilityStatus DisplayString
+        }
+
+    arubaWiredRadiusServerVrfName OBJECT-TYPE
+      SYNTAX      DisplayString (SIZE(0..33))
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "RADIUS Server VRF."
+      ::= { arubaWiredRadiusServerEntry 1 }
+
+    arubaWiredRadiusServerAddress OBJECT-TYPE
+      SYNTAX      DisplayString (SIZE(0..257))
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "RADIUS Server Address."
+      ::= { arubaWiredRadiusServerEntry 2 }
+
+    arubaWiredRadiusServerPort OBJECT-TYPE
+      SYNTAX      Unsigned32 (1..65535)
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "RADIUS Server Port."
+      ::= { arubaWiredRadiusServerEntry 3 }
+
+    arubaWiredRadiusServerPortType OBJECT-TYPE
+      SYNTAX      DisplayString (SIZE(0..4))
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "RADIUS Server PortType."
+      ::= { arubaWiredRadiusServerEntry 4 }
+
+     arubaWiredRadiusServerReachabilityStatus OBJECT-TYPE
+      SYNTAX      DisplayString (SIZE(0..32))
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "RADIUS Server Reachability Status."
+      ::= { arubaWiredRadiusServerEntry 5 }
+
+
+-- ************************************************************
+--  AAA - TACACS Server Status details
+-- ************************************************************
+arubaWiredTacacsServer         OBJECT IDENTIFIER
+                                ::= { arubaWiredAAAObjects 2 }
+
+    arubaWiredTacacsServerTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF ArubaWiredTacacsServerEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Tacacs Server table has the Tacacs Server Details."
+        ::= { arubaWiredTacacsServer 1 }
+
+    arubaWiredTacacsServerEntry OBJECT-TYPE
+        SYNTAX      ArubaWiredTacacsServerEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Tacacs Server configurations."
+        INDEX       {
+                      arubaWiredTacacsServerVrfName,
+                      arubaWiredTacacsServerAddress,
+                      arubaWiredTacacsServerPort
+                    }
+        ::= { arubaWiredTacacsServerTable 1 }
+
+    ArubaWiredTacacsServerEntry ::= SEQUENCE {
+            arubaWiredTacacsServerVrfName     DisplayString,
+            arubaWiredTacacsServerAddress     DisplayString,
+            arubaWiredTacacsServerPort        Unsigned32,
+            arubaWiredTacacsServerReachabilityStatus DisplayString
+        }
+
+    arubaWiredTacacsServerVrfName OBJECT-TYPE
+      SYNTAX      DisplayString (SIZE(0..33))
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "TACACS Server VRF."
+      ::= { arubaWiredTacacsServerEntry 1 }
+
+    arubaWiredTacacsServerAddress OBJECT-TYPE
+      SYNTAX      DisplayString (SIZE(0..257))
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "TACACS Server Address."
+      ::= { arubaWiredTacacsServerEntry 2 }
+
+    arubaWiredTacacsServerPort OBJECT-TYPE
+      SYNTAX      Unsigned32 (1..65535)
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "TACACS Server Port."
+      ::= { arubaWiredTacacsServerEntry 3 }
+
+     arubaWiredTacacsServerReachabilityStatus OBJECT-TYPE
+      SYNTAX      DisplayString (SIZE(0..32))
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "TACACS Server Reachability Status."
+      ::= { arubaWiredTacacsServerEntry 4 }
+
+--*************************************************************
+--*    arubaWiredAAAStatusNotifications
+--*************************************************************
+arubaWiredRadiusServerStatusChange NOTIFICATION-TYPE
+    OBJECTS {
+        arubaWiredRadiusServerVrfName,
+        arubaWiredRadiusServerAddress,
+        arubaWiredRadiusServerPort,
+        arubaWiredRadiusServerPortType,
+        arubaWiredRadiusServerReachabilityStatus
+    }
+    STATUS        current
+    DESCRIPTION
+            "This notification is generated when a RADIUS server status changes."
+    ::= { arubaWiredAAAStatusNotifications 1 }
+
+arubaWiredTacacsServerStatusChange NOTIFICATION-TYPE
+    OBJECTS {
+        arubaWiredTacacsServerVrfName,
+        arubaWiredTacacsServerAddress,
+        arubaWiredTacacsServerPort,
+        arubaWiredTacacsServerReachabilityStatus
+    }
+    STATUS        current
+    DESCRIPTION
+            "This notification is generated when a TACACS server status changes."
+    ::= { arubaWiredAAAStatusNotifications 2 }
+
+
+-- **********************************************************************
+-- AAA Server Conformance information
+-- **********************************************************************
+
+    arubaWiredAAAServerConformance   OBJECT IDENTIFIER  ::= { arubaWiredAAAMIB 2 }
+
+    arubaWiredRadiusServerGroups        OBJECT IDENTIFIER
+                               ::= { arubaWiredAAAServerConformance 1 }
+
+    arubaWiredRadiusServerCompliances   OBJECT IDENTIFIER
+                               ::= { arubaWiredAAAServerConformance 2 }
+
+    arubaWiredTacacsServerGroups        OBJECT IDENTIFIER
+                               ::= { arubaWiredAAAServerConformance 3 }
+
+    arubaWiredTacacsServerCompliances   OBJECT IDENTIFIER
+                               ::= { arubaWiredAAAServerConformance 4 }
+
+    arubaWiredRadiusServerGroup OBJECT-GROUP
+        OBJECTS     {
+                      arubaWiredRadiusServerVrfName,
+                      arubaWiredRadiusServerAddress,
+                      arubaWiredRadiusServerPort,
+                      arubaWiredRadiusServerPortType,
+                      arubaWiredRadiusServerReachabilityStatus
+                    }
+        STATUS      current
+        DESCRIPTION "The RADIUS server configurations."
+
+        ::= {arubaWiredRadiusServerGroups 1 }
+
+    arubaWiredAAARadiusStatusNotificationsGroup NOTIFICATION-GROUP
+    NOTIFICATIONS   {
+                     arubaWiredRadiusServerStatusChange
+                    }
+    STATUS      current
+    DESCRIPTION "A collection of VSF virtual chassis notifications objects."
+    ::= { arubaWiredRadiusServerGroups 2 }
+
+    arubaWiredTacacsServerGroup OBJECT-GROUP
+     OBJECTS     {
+                      arubaWiredTacacsServerVrfName,
+                      arubaWiredTacacsServerAddress,
+                      arubaWiredTacacsServerPort,
+                      arubaWiredTacacsServerReachabilityStatus
+                    }
+     STATUS      current
+     DESCRIPTION "The TACACS server configurations."
+
+     ::= {arubaWiredRadiusServerGroups 3 }
+
+    arubaWiredAAATacacsStatusNotificationsGroup NOTIFICATION-GROUP
+    NOTIFICATIONS   {
+                     arubaWiredTacacsServerStatusChange
+                    }
+    STATUS      current
+    DESCRIPTION "A collection of VSF virtual chassis notifications objects."
+    ::= { arubaWiredRadiusServerGroups 4 }
+
+    arubaWiredRadiusServerCompliance MODULE-COMPLIANCE
+        STATUS      current
+        DESCRIPTION "The compliance statement for HP Switches with
+                     support for arubaWired RADIUS server configuration."
+
+        MODULE
+            MANDATORY-GROUPS {
+                              arubaWiredRadiusServerGroup,
+                              arubaWiredAAARadiusStatusNotificationsGroup }
+
+        ::= { arubaWiredRadiusServerCompliances 1 }
+
+    arubaWiredTacacsServerCompliance MODULE-COMPLIANCE
+        STATUS      current
+        DESCRIPTION "The compliance statement for HP Switches with
+                     support for arubaWired TACACS server configuration."
+
+        MODULE
+            MANDATORY-GROUPS {
+                              arubaWiredTacacsServerGroup,
+                              arubaWiredAAATacacsStatusNotificationsGroup }
+
+        ::= { arubaWiredRadiusServerCompliances 2 }
+
+END
+

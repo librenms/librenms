@@ -6,15 +6,15 @@ $rrd_filename = Rrd::name($device['hostname'], 'ib_dhcp_messages');
 $rrd_options .= " --vertical-label='Messages per minute'";
 
 $stats = [
-    'request'   => '#FFAB00FF',
-    'ack'       => '#007283FF',
-    'discover'  => '#74C366FF',
-    'offer'     => '#B1441EFF',
-    'inform'    => '#8D85F3FF',
-    'nack'      => '#FAFD9EFF',
-    'release'   => '#96E78AFF',
-    'decline'   => '#FF0000FF',
-    'other'     => '#8F9286FF',
+    'request' => '#FFAB00FF',
+    'ack' => '#007283FF',
+    'discover' => '#74C366FF',
+    'offer' => '#B1441EFF',
+    'inform' => '#8D85F3FF',
+    'nack' => '#FAFD9EFF',
+    'release' => '#96E78AFF',
+    'decline' => '#FF0000FF',
+    'other' => '#8F9286FF',
 ];
 
 $i = 0;

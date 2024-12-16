@@ -97,13 +97,14 @@ class GraylogApi
      */
     public function buildSimpleQuery(?string $search = null, ?Device $device = null): string
     {
+        $field = Config::get('graylog.query.field');
         $query = [];
         if ($search) {
             $query[] = 'message:"' . $search . '"';
         }
 
         if ($device) {
-            $query[] = 'source: ("' . $this->getAddresses($device)->implode('" OR "') . '")';
+            $query[] = $field . ': ("' . $this->getAddresses($device)->implode('" OR "') . '")';
         }
 
         if (empty($query)) {

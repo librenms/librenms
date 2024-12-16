@@ -59,7 +59,7 @@ if (isset($searchPhrase) && ! empty($searchPhrase)) {
     $param[] = "%$searchPhrase%";
 }
 
-$sql = " FROM `alert_log` AS E LEFT JOIN devices AS D ON E.device_id=D.device_id RIGHT JOIN alert_rules AS R ON E.rule_id=R.id WHERE $where";
+$sql = " FROM `alert_log` AS E LEFT JOIN devices AS D ON E.device_id=D.device_id LEFT JOIN alert_rules AS R ON E.rule_id=R.id WHERE $where";
 
 $count_sql = "SELECT COUNT(`E`.`id`) $sql";
 $total = dbFetchCell($count_sql, $param);
@@ -92,7 +92,6 @@ if (session('preferences.timezone')) {
 $rulei = 0;
 foreach (dbFetchRows($sql, $param) as $alertlog) {
     $dev = device_by_id_cache($alertlog['device_id']);
-    logfile($alertlog['rule_id']);
     $log = dbFetchCell('SELECT details FROM alert_log WHERE rule_id = ? AND device_id = ? AND `state` = 1 ORDER BY id DESC LIMIT 1', [$alertlog['rule_id'], $alertlog['device_id']]);
     $alert_log_id = dbFetchCell('SELECT id FROM alert_log WHERE rule_id = ? AND device_id = ? ORDER BY id DESC LIMIT 1', [$alertlog['rule_id'], $alertlog['device_id']]);
     [$fault_detail, $max_row_length] = alert_details($log);

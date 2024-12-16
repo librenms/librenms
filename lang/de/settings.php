@@ -138,9 +138,6 @@ return [
             'description' => 'Erlaube diesem Netzwerk Zugriff auf Graphen',
             'help' => 'Erlaube den angegebenen Netzwerken Zugrif auf Graphen ohne eingeloggt zu sein (funktioniert nicht wenn authentifizierte Graphen aktiviert sind)',
         ],
-        'api_demo' => [
-            'description' => 'Dies ist eine Demo',
-        ],
         'apps' => [
             'powerdns-recursor' => [
                 'api-key' => [
@@ -323,10 +320,6 @@ return [
         'base_url' => [
             'description' => 'Spezifiziere URL',
             'help' => 'Sollte nur gesetzt werden wenn man den Zugriff nur über einen bestimmten Hostnamen/Port erlauben möchte',
-        ],
-        'device_perf_purge' => [
-            'description' => 'Entferne Performanzdaten welche älter sind als',
-            'help' => 'Wird durch daily.sh erledigt',
         ],
         'distributed_poller' => [
             'description' => 'aktiviere Distributed Polling (benötigt zusätzliche Konfiguration)',

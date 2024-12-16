@@ -46,9 +46,17 @@ class Graph extends Component
      */
     public $absolute_size;
     /**
-     * @var bool|string
+     * @var bool
      */
     private $link;
+    /**
+     * @var bool|string
+     */
+    private $popup;
+    /**
+     * @var string
+     */
+    public mixed $popupTitle;
 
     /**
      * Create a new component instance.
@@ -76,6 +84,8 @@ class Graph extends Component
         ?int $height = null,
         int $absolute_size = 0,
         $link = true,
+        $popup = false,
+        $popupTitle = '',
         $device = null,
         $port = null
     ) {
@@ -87,6 +97,8 @@ class Graph extends Component
         $this->absolute_size = $absolute_size;
         $this->width = $width ?: ($aspect == 'wide' ? self::DEFAULT_WIDE_WIDTH : self::DEFAULT_NORMAL_WIDTH);
         $this->height = $height ?: ($aspect == 'wide' ? self::DEFAULT_WIDE_HEIGHT : self::DEFAULT_NORMAL_HEIGHT);
+        $this->popupTitle = $popupTitle;
+        $this->popup = filter_var($popup, FILTER_VALIDATE_BOOLEAN);
         $this->link = $link;
 
         // handle device and port ids/models for convenience could be set in $vars
@@ -108,16 +120,13 @@ class Graph extends Component
      */
     public function render()
     {
-        if ($this->link === false) {
-            return view('components.graph', [
-                'src' => $this->getSrc(),
-            ]);
-        }
-
-        return view('components.linked-graph', [
+        $view = $this->popup ? 'components.graph-popup' : ($this->link === false ? 'components.graph' : 'components.linked-graph');
+        $data = [
             'link' => $this->getLink(),
             'src' => $this->getSrc(),
-        ]);
+        ];
+
+        return view($view, $data);
     }
 
     /**
@@ -127,10 +136,19 @@ class Graph extends Component
      */
     public function filterAttributes($value, $key): bool
     {
-        return ! in_array($key, [
+        $filtered = [
             'legend',
             'height',
-        ]);
+            'loading',
+        ];
+
+        // do not add class and style to the image, add them to the outer link
+        if ($this->link) {
+            $filtered[] = 'class';
+            $filtered[] = 'style';
+        }
+
+        return ! in_array($key, $filtered);
     }
 
     private function getSrc(): string
@@ -148,20 +166,14 @@ class Graph extends Component
 
     private function getLink(): string
     {
-        if ($this->link === true) {
-            $url = url('graphs') . '/' . http_build_query($this->vars + [
+        return match ($this->link) {
+            true => url('graphs') . '/' . http_build_query($this->vars + [
                 'type' => $this->type,
                 'from' => $this->from,
                 'to' => $this->to,
-            ], '', '/');
-
-            return $url;
-        }
-
-        if ($this->link === false) {
-            return '';
-        }
-
-        return $this->link;
+            ], '', '/'),
+            false => '',
+            default => $this->link,
+        };
     }
 }

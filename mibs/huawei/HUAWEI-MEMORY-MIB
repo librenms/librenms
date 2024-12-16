@@ -1,9 +1,9 @@
 -- =================================================================
--- Copyright (C) 2017 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2019 by  HUAWEI TECHNOLOGIES. All rights reserved.
 --
 -- Description: the huawei memory mib from huawei-device-mib
 -- Reference:
--- Version:     V1.01
+-- Version:     V1.02
 -- History:
 --    
 -- =================================================================
@@ -17,13 +17,13 @@ HUAWEI-MEMORY-MIB DEFINITIONS ::= BEGIN
             FROM HUAWEI-DEVICE-MIB            
         OBJECT-GROUP, MODULE-COMPLIANCE            
             FROM SNMPv2-CONF            
-        OBJECT-TYPE, MODULE-IDENTITY, Unsigned32, Integer32
+        OBJECT-TYPE, MODULE-IDENTITY, Unsigned32, Integer32, Counter64
             FROM SNMPv2-SMI
         CounterBasedGauge64
             FROM HCNUM-TC;
 
     hwMemoryDev MODULE-IDENTITY
-        LAST-UPDATED "201708170000Z"
+        LAST-UPDATED "201909180000Z"
         ORGANIZATION
             "Huawei Technologies Co.,Ltd."
         CONTACT-INFO
@@ -39,6 +39,11 @@ HUAWEI-MEMORY-MIB DEFINITIONS ::= BEGIN
             This mib module defines the memory information. NMS can query memory
             utilization statistics from device by the mib.
             " 
+         REVISION "201909180000Z"
+        DESCRIPTION "V1.02,
+	                1.Modify the hwMemoryDevSize type, from Unsigned32 to Counter64.
+	                2.Modify the hwMemoryDevFree type, from Unsigned32 to Counter64.
+	                 "
         REVISION     "201708170000Z"
         DESCRIPTION  "V1.01, change DESCRIPTION."
         REVISION     "201407260000Z"
@@ -82,9 +87,9 @@ HUAWEI-MEMORY-MIB DEFINITIONS ::= BEGIN
             hwMemoryDevModuleIndex
                 Integer32,
             hwMemoryDevSize
-                Unsigned32,
+                Counter64,
             hwMemoryDevFree
-                Unsigned32,
+                Counter64,
             hwMemoryDevRawSliceUsed
                 Unsigned32,
             hwMemoryDevLargestFree
@@ -114,7 +119,7 @@ HUAWEI-MEMORY-MIB DEFINITIONS ::= BEGIN
         ::= { hwMemoryDevEntry 1 }
     
     hwMemoryDevSize OBJECT-TYPE
-        SYNTAX Unsigned32
+        SYNTAX Counter64
         MAX-ACCESS read-only
         STATUS current
         DESCRIPTION
@@ -125,7 +130,7 @@ HUAWEI-MEMORY-MIB DEFINITIONS ::= BEGIN
         ::= { hwMemoryDevEntry 2 }
     
     hwMemoryDevFree OBJECT-TYPE
-        SYNTAX Unsigned32
+        SYNTAX Counter64
         MAX-ACCESS read-only
         STATUS current
         DESCRIPTION

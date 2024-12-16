@@ -1,0 +1,333 @@
+--  =================================================================================
+--  File              : FIBROLAN-MIB-GBE-MCM1000.mib
+--  Description       : Private MIB file for FIBROLAN MetroStar I system - MCM1000T/S
+--  By                : Shamir Stein
+--  MIB Version       : 1.1
+--  MetroStar Version : 1.6.2/build 12
+--  Date              : March 27, 2008
+--  =================================================================================
+--
+--
+-- Copyright Fibrolan, 2008. All rights reserved.
+--
+-- Reproduction of this document is authorized on condition that this
+-- copyright notice is included.
+
+
+FIBROLAN-MIB-GBE-MCM1000     DEFINITIONS ::= BEGIN
+
+	 IMPORTS
+		enterprises, OBJECT-TYPE, MODULE-IDENTITY		  FROM SNMPv2-SMI 
+		DisplayString						              FROM SNMPv2-TC
+		MODULE-COMPLIANCE, OBJECT-GROUP					  FROM SNMPv2-CONF
+		flMsModuleMvLinkEntry, flMsModuleMvChannelEntry   FROM FIBROLAN-MIB-MSMODULE;
+
+   flMcm1000Mv  MODULE-IDENTITY
+       LAST-UPDATED "0803270000Z"  
+       ORGANIZATION "Fibrolan ltd"
+       CONTACT-INFO
+         "http://www.fibrolan.com"
+       DESCRIPTION
+         "The MIB module to describe MCM1XX interface objects.
+          Copyright (C) Fibrolan Ltd (2008)."
+	::= { enterprises 4467 100 500 10 30 110}
+
+			
+    -- conformance information
+     flMcm1000MvMIBConformance
+                   OBJECT IDENTIFIER ::= { flMcm1000Mv  1 }
+
+     flMcm1000MvMIBCompliances  OBJECT IDENTIFIER ::= { flMcm1000MvMIBConformance 1 }
+     flMcm1000MvMIBGroups       OBJECT IDENTIFIER ::= { flMcm1000MvMIBConformance 2 }
+
+
+	-- compliance statements
+     flMcm1000MvMIBCompliance MODULE-COMPLIANCE
+              STATUS  current
+              DESCRIPTION
+                      "The compliance statement for flMetroStar entities
+                      which implement the flMcm1xxMv MIB."
+			  MODULE FIBROLAN-MIB-MSMODULE
+				  MANDATORY-GROUPS{ flMsModuleMvChannelsGroup, flMsModuleMvLinksGroup}
+              MODULE  -- this module
+                  MANDATORY-GROUPS { flMcm1000MvChannelsGroup, flMcm1000MvLinksGroup }
+              ::= { flMcm1000MvMIBCompliances 1 }
+
+
+
+     flMcm1000MvChannelsGroup	OBJECT-GROUP
+	        OBJECTS		{ flMcm1000ChannelExtMvP2Link, --FO link in MCM1000T
+			 			  flMcm1000ChannelExtMvP1Link, --TP link in MCM1000T
+			              flMcm1000ChannelExtMvPortDescription,
+			              flMcm1000ChannelExtMvP2SignalDetect, --FO Signal Detect in MCM1000T
+			              flMcm1000ChannelExtMvP1SignalDetect, --does not exist in MCM1000T
+			              flMcm1000ChannelExtMvChannelEnable,
+			              flMcm1000ChannelExtMvP2LoopBack, --FO loopback in MCM1000T
+			              flMcm1000ChannelExtMvP1LoopBack } --TP loopback in MCM1000T
+            STATUS  current
+            DESCRIPTION
+                    "A collection of objects providing basic
+                    instrumentation of the MetroStar extended channel entity."
+            ::= { flMcm1000MvMIBGroups 1 }
+
+     flMcm1000MvLinksGroup	OBJECT-GROUP
+	        OBJECTS		{ flMcm1000LinkExtMvUpstreamBw,
+						  flMcm1000LinkExtMvDownstreamBw,
+			              flMcm1000LinkExtMvP2-P1Lst, -- flMcm1000LinkExtMvFo-TpLst - in MCM1000T
+			              flMcm1000LinkExtMvP1-P2Lst, -- flMcm1000LinkExtMvTp-FoLst - in MCM1000T
+			              flMcm1000LinkExtMvUpSle,
+			              flMcm1000LinkExtMvDnSle }
+            STATUS  current
+            DESCRIPTION
+                    "A collection of objects providing basic
+                    instrumentation of the MetroStar extended link entity."
+            ::= { flMcm1000MvMIBGroups 2 }
+	
+-- ************************************************************
+-- ************************************************************
+-- FibroLan Object Identifier Definition
+-- ************************************************************
+-- ************************************************************
+
+fibrolan            OBJECT IDENTIFIER ::= { enterprises       4467 }
+
+fibrolanSNMP        OBJECT IDENTIFIER ::= { fibrolan           100 }
+
+flMetroStarMv 		OBJECT IDENTIFIER ::=  { fibrolanSNMP      500 }
+
+flMsChassisMv		OBJECT IDENTIFIER ::=  { flMetroStarMv	    10 }
+
+flMsModuleMv		OBJECT IDENTIFIER ::=  { flMsChassisMv	    30 }
+
+--flMcm1000Mv			OBJECT IDENTIFIER ::=  { flMsModuleMv      110 }
+
+
+flMcm1000ModuleMv		    OBJECT IDENTIFIER ::= { flMcm1000Mv	    10 }
+flMcm1000ChannelsMv		    OBJECT IDENTIFIER ::= { flMcm1000Mv	    20 }
+flMcm1000LinksMv			OBJECT IDENTIFIER ::= { flMcm1000Mv	    30 }
+
+
+-- ************************************************************
+-- ************************************************************
+--   Channel extended table 
+-- ************************************************************
+-- ************************************************************
+     flMcm1000ChannelExtMvTable           OBJECT-TYPE
+         SYNTAX  SEQUENCE OF FlMcm1000ChannelExtMvEntry
+         MAX-ACCESS  not-accessible
+         STATUS  current
+         DESCRIPTION
+         "This table shows the chassis' channel status"
+     ::= { flMcm1000ChannelsMv  1 }
+
+     flMcm1000ChannelExtMvEntry       OBJECT-TYPE
+         SYNTAX  FlMcm1000ChannelExtMvEntry
+         MAX-ACCESS  not-accessible
+         STATUS  current
+         DESCRIPTION
+         "The entries of the table."
+         AUGMENTS { flMsModuleMvChannelEntry}
+     ::= { flMcm1000ChannelExtMvTable   1 }
+
+		FlMcm1000ChannelExtMvEntry ::= SEQUENCE
+		{
+			 flMcm1000ChannelExtMvP2Link			        INTEGER, --FO link in MCM1000T
+			 flMcm1000ChannelExtMvP1Link			        INTEGER, --TP link in MCM1000T
+			 flMcm1000ChannelExtMvPortDescription			DisplayString,
+			 flMcm1000ChannelExtMvP2SignalDetect			INTEGER, --FO Signal Detect in MCM1000T
+			 flMcm1000ChannelExtMvP1SignalDetect			INTEGER, --does not exist in MCM1000T
+			 flMcm1000ChannelExtMvChannelEnable		        INTEGER,
+			 flMcm1000ChannelExtMvP2LoopBack		        INTEGER, --FO loopback in MCM1000T
+			 flMcm1000ChannelExtMvP1LoopBack		        INTEGER  --TP loopback in MCM1000T
+		}
+
+	--flMcm1000ChannelExtMvFoLink - in MCM1000T
+    flMcm1000ChannelExtMvP2Link				   OBJECT-TYPE
+		SYNTAX	  INTEGER {
+                             off	 (1),
+						     on		 (2)
+						  }
+         MAX-ACCESS    read-only
+		 STATUS    current
+		 DESCRIPTION
+	     "P1(FOin MCM1000T) link status"
+    ::= { flMcm1000ChannelExtMvEntry  1 }
+
+	--flMcm1000ChannelExtMvTpLink - in MCM1000T
+    flMcm1000ChannelExtMvP1Link				   OBJECT-TYPE
+		SYNTAX	  INTEGER {
+         	                 off     (1),
+							 on      (2),
+							 killed  (3)  -- only in MCM1000T
+						  }
+         MAX-ACCESS    read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "P2(TP in MCM1000T) link status"
+    ::= { flMcm1000ChannelExtMvEntry  2 }
+
+    flMcm1000ChannelExtMvPortDescription		OBJECT-TYPE
+		 SYNTAX    DisplayString
+		 MAX-ACCESS    read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Port's textual description - up to 40 characters" 
+    ::= { flMcm1000ChannelExtMvEntry  3 }
+
+	--flMcm1000ChannelExtMvFoSignalDetect - in MCM1000T
+    flMcm1000ChannelExtMvP2SignalDetect				OBJECT-TYPE
+		 SYNTAX    INTEGER {
+							  off	 (1),
+							  on	 (2)
+						   }
+         MAX-ACCESS    read-only
+         STATUS    current
+         DESCRIPTION
+         "P1(FO in MCM1000T) signal detect mode"
+    ::= { flMcm1000ChannelExtMvEntry  4 }
+
+	-- exist only in MCM1000S
+    flMcm1000ChannelExtMvP1SignalDetect		OBJECT-TYPE
+		SYNTAX	  INTEGER {
+                             off   (1),
+						     on    (2)
+						  }
+         MAX-ACCESS    read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "P2 signal detect mode"
+    ::= { flMcm1000ChannelExtMvEntry  5 }
+
+    flMcm1000ChannelExtMvChannelEnable			    OBJECT-TYPE
+		SYNTAX	  INTEGER {
+		                      disable (1),
+							  enable  (2)
+						  }
+         MAX-ACCESS    read-write
+		 STATUS    current
+		 DESCRIPTION
+		"channel enable mode"
+    ::= { flMcm1000ChannelExtMvEntry  6 }
+
+	--flMcm1000ChannelExtMvFoLoopBack - in MCM1000T
+    flMcm1000ChannelExtMvP2LoopBack     		OBJECT-TYPE
+		SYNTAX	  INTEGER {
+		                     off  (1),
+							 on   (2)
+						  }
+         MAX-ACCESS    read-write
+		 STATUS    current
+		 DESCRIPTION
+		"P1(FO in MCM1000T) loopback mode"
+    ::= { flMcm1000ChannelExtMvEntry  7 }
+
+	--flMcm1000ChannelExtMvTpLoopBack - in MCM1000T
+	flMcm1000ChannelExtMvP1LoopBack				OBJECT-TYPE
+		SYNTAX	  INTEGER {
+		                      off  (1),
+							  on   (2)
+						  }
+         MAX-ACCESS    read-write
+		 STATUS    current
+		 DESCRIPTION
+		"P2(TP in MCM1000T) loopback mode"
+    ::= { flMcm1000ChannelExtMvEntry  8 }
+
+
+-- ************************************************************
+-- ************************************************************
+--   Link extended table 
+-- ************************************************************
+-- ************************************************************
+     flMcm1000LinkExtMvTable               OBJECT-TYPE
+         SYNTAX  SEQUENCE OF FlMcm1000LinkExtMvEntry
+         MAX-ACCESS  not-accessible
+         STATUS  current
+         DESCRIPTION
+         "This table provides the link's configuration"
+     ::= { flMcm1000LinksMv  1 }
+
+     flMcm1000LinkExtMvEntry				OBJECT-TYPE
+         SYNTAX  FlMcm1000LinkExtMvEntry
+         MAX-ACCESS  not-accessible
+         STATUS  current
+         DESCRIPTION
+         "The entries of the link table"
+         AUGMENTS { flMsModuleMvLinkEntry }
+     ::= { flMcm1000LinkExtMvTable 1 }
+
+		FlMcm1000LinkExtMvEntry ::= SEQUENCE
+		{
+			 flMcm1000LinkExtMvUpstreamBw			INTEGER,
+			 flMcm1000LinkExtMvDownstreamBw  		INTEGER,
+			 flMcm1000LinkExtMvP2-P1Lst			    INTEGER, -- flMcm1000LinkExtMvFo-TpLst - in MCM1000T
+			 flMcm1000LinkExtMvP1-P2Lst			    INTEGER, -- flMcm1000LinkExtMvTp-FoLst - in MCM1000T
+			 flMcm1000LinkExtMvUpSle				INTEGER,
+			 flMcm1000LinkExtMvDnSle				INTEGER
+		}
+
+
+   flMcm1000LinkExtMvUpstreamBw				OBJECT-TYPE
+		 SYNTAX	  INTEGER (0..1000)
+         MAX-ACCESS    read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Upstream Bandwidth, from 0 to 1000M in 10M steps"
+    ::= { flMcm1000LinkExtMvEntry  1 }
+
+	flMcm1000LinkExtMvDownstreamBw				OBJECT-TYPE
+		 SYNTAX	  INTEGER (0..1000)
+         MAX-ACCESS    read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Downstream Bandwidth, from 0 to 1000M in 10M steps"
+    ::= { flMcm1000LinkExtMvEntry  2 }
+
+	-- flMcm1000LinkExtMvFo-TpLst - in MCM1000T
+    flMcm1000LinkExtMvP2-P1Lst			 OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								off		(1),
+								on		(2)
+						   }
+         MAX-ACCESS    read-write
+         STATUS    current
+         DESCRIPTION
+         "P1->P2 LST (FO->TP in MCM1000T)"
+    ::= { flMcm1000LinkExtMvEntry  3 }
+
+	-- flMcm1000LinkExtMvTp-FoLst - in MCM1000T
+    flMcm1000LinkExtMvP1-P2Lst				OBJECT-TYPE  
+		SYNTAX	  INTEGER {
+		                     off (1),
+							 on  (2)
+						  }
+         MAX-ACCESS    read-write
+		 STATUS    current
+		 DESCRIPTION
+		"P2->P1 LST (TP->FO in MCM1000T)"
+    ::= { flMcm1000LinkExtMvEntry  4 }
+
+	flMcm1000LinkExtMvUpSle				OBJECT-TYPE
+		SYNTAX	  INTEGER {
+		                     off  (1),
+							 on   (2)
+						  }
+         MAX-ACCESS    read-write
+		 STATUS    current
+		 DESCRIPTION
+		"SLE up Mode"
+    ::= { flMcm1000LinkExtMvEntry  5 }
+
+	 flMcm1000LinkExtMvDnSle         OBJECT-TYPE
+		 SYNTAX    INTEGER	{
+								off	 (1),
+								on	 (2)
+							}
+		 MAX-ACCESS    read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "SLE down Mode" 
+	 ::= { flMcm1000LinkExtMvEntry  6 }
+  
+
+END

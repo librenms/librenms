@@ -32,7 +32,6 @@ use LibreNMS\Config;
 use LibreNMS\Data\Source\Fping;
 use LibreNMS\Data\Source\FpingResponse;
 use LibreNMS\Enum\Severity;
-use LibreNMS\RRD\RrdDefinition;
 use SnmpQuery;
 use Symfony\Component\Process\Process;
 
@@ -97,7 +96,7 @@ class ConnectivityHelper
 
         if ($this->saveMetrics) {
             if ($this->canPing()) {
-                $this->savePingStats($ping_response);
+                $ping_response->saveStats($this->device);
             }
             $this->updateAvailability($previous, $this->device->status);
 
@@ -113,20 +112,14 @@ class ConnectivityHelper
     public function isPingable(): FpingResponse
     {
         if (! $this->canPing()) {
-            return FpingResponse::artificialUp();
+            return FpingResponse::artificialUp($this->target);
         }
 
-        $status = app()->make(Fping::class)->ping(
-            $this->target,
-            Config::get('fping_options.count', 3),
-            Config::get('fping_options.interval', 500),
-            Config::get('fping_options.timeout', 500),
-            $this->ipFamily()
-        );
+        $status = app()->make(Fping::class)->ping($this->target, $this->ipFamily());
 
         if ($status->duplicates > 0) {
             Eventlog::log('Duplicate ICMP response detected! This could indicate a network issue.', $this->device, 'icmp', Severity::Warning);
-            $status->exit_code = 0;   // when duplicate is detected fping returns 1. The device is up, but there is another issue. Clue admins in with above event.
+            $status->ignoreFailure(); // when duplicate is detected fping returns 1. The device is up, but there is another issue. Clue admins in with above event.
         }
 
         return $status;
@@ -194,26 +187,5 @@ class ConnectivityHelper
             // open new outage
             $this->device->outages()->save(new DeviceOutage(['going_down' => time()]));
         }
-    }
-
-    /**
-     * Save the ping stats to db and rrd, also updates last_ping_timetaken and saves the device model.
-     */
-    private function savePingStats(FpingResponse $ping_response): void
-    {
-        $perf = $ping_response->toModel();
-        $perf->debug = ['poller_name'=>Config::get('distributed_poller_name')];
-        if (! $ping_response->success() && Config::get('debug.run_trace', false)) {
-            $perf->debug = array_merge($perf->debug, $this->traceroute());
-        }
-        $this->device->perf()->save($perf);
-        $this->device->last_ping_timetaken = $ping_response->avg_latency ?: $this->device->last_ping_timetaken;
-        $this->device->save();
-
-        app('Datastore')->put($this->device->toArray(), 'ping-perf', [
-            'rrd_def' => RrdDefinition::make()->addDataset('ping', 'GAUGE', 0, 65535),
-        ], [
-            'ping' => $ping_response->avg_latency,
-        ]);
     }
 }

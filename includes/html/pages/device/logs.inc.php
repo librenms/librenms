@@ -57,7 +57,7 @@ if (\LibreNMS\Config::get('enable_syslog') == 1) {
     }
 }
 
-if (\LibreNMS\Config::get('graylog.port')) {
+if (\LibreNMS\Config::get('graylog.server')) {
     echo ' | ';
     if ($vars['section'] == 'graylog') {
         echo '<span class="pagemenu-selected">';

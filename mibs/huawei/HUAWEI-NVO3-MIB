@@ -1,9 +1,9 @@
 -- ==================================================================
--- Copyright (C) 2017 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2022 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- 
 -- Description: HUAWEI NVO3 MIB
 -- Reference:
--- Version: V1.05
+-- Version: V1.14
 -- History: V1.0 gaoyuan, 2014-07-02,publish
 -- created 2014-7-2
 -- ==================================================================
@@ -19,13 +19,13 @@
                 FROM SNMPv2-SMI           
             InterfaceIndex
                 FROM  IF-MIB         
-            RowStatus, TEXTUAL-CONVENTION            
+            RowStatus, TEXTUAL-CONVENTION, DisplayString            
                 FROM SNMPv2-TC
 			Ipv6Address   
 				FROM IPV6-TC;
 
         hwNvo3Mgmt MODULE-IDENTITY 
-            LAST-UPDATED "201706201408Z"      -- June 20, 2017 at 14:08GMT 
+            LAST-UPDATED "202210251648Z"        -- Oct 25, 2022 at 16:48GMT
             ORGANIZATION 
                   "Huawei Technologies Co.,Ltd."
             CONTACT-INFO 
@@ -37,7 +37,36 @@
                      Email: support@huawei.com
                    "
             DESCRIPTION 
-                "The MIB module for nvo3 management." 				  
+                "The MIB module for nvo3 management." 
+
+            REVISION "202210251648Z"        -- Oct 25, 2022 at 16:48GMT
+            DESCRIPTION 
+                "V1.13 The modify revision of this MIB module."
+
+            REVISION "202107051925Z"        -- July 05, 2021 at 19:25GMT
+            DESCRIPTION 
+                "V1.12 The modify revision of this MIB module."
+
+            REVISION "202101271925Z"        -- Jan 27, 2021 at 19:25GMT
+            DESCRIPTION 
+                "V1.11 The modify revision of this MIB module."
+
+            REVISION "202008141651Z"        -- Aug 14, 2020 at 16:51GMT
+            DESCRIPTION 
+                "V1.09 The modify revision of this MIB module." 	
+            REVISION "202007301626Z"        -- July 30, 2020 at 16:26GMT
+            DESCRIPTION 
+                "V1.08 Add MIB module for vxlan ip path detection." 	
+            REVISION "202005211659Z"        -- May 21, 2020 at 16:59GMT
+            DESCRIPTION 
+                "delete hwNvo3VxlanNveMacConflict." 	
+            REVISION "201910171022Z"        -- Oct 17, 2019 at 10:22GMT 
+            DESCRIPTION 
+                "The MIB module for nvo3 management." 	
+            REVISION "201908191832Z"        -- Aug 19, 2019 at 18:32GMT 
+            DESCRIPTION 
+                "V1.06, The modify revision of this MIB module."  
+			  
             REVISION "201706201408Z"        -- June 20, 2017 at 14:08GMT 
             DESCRIPTION 
                 "V1.05, The modify revision of this MIB module."  
@@ -205,7 +234,7 @@
               MAX-ACCESS not-accessible
               STATUS current
               DESCRIPTION
-                  "The vxlan tunnel destionation address."
+                  "The vxlan tunnel destination address."
               ::= { hwNvo3VxlanTnlEntry 2 } 
                         
        hwNvo3VxlanTnlStatus  OBJECT-TYPE
@@ -261,7 +290,7 @@
               MAX-ACCESS not-accessible
               STATUS current
               DESCRIPTION
-                  "The vxlan tunnel destionation address"
+                  "The vxlan tunnel destination address"
               ::= { hwNvo3VxlanIPv6TnlEntry 2 } 
                         
        hwNvo3VxlanIPv6TnlStatus  OBJECT-TYPE
@@ -326,6 +355,160 @@
                 "The rate of sent bits per second about vni."
             ::= { hwNvo3VniStatsEntry 3 }  
           				
+    hwVxlanIpPathDetectTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwVxlanIpPathDetectEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Description: This table describes result information of a path detect test instance."
+            ::= { hwNvo3MIBInstances 6 }
+        
+        hwVxlanIpPathDetectEntry OBJECT-TYPE
+            SYNTAX HwVxlanIpPathDetectEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The entry of hwVxlanIpPathDetectTable."
+            INDEX { hwVxlanPathDetectTestId }
+            ::= { hwVxlanIpPathDetectTable 1 }
+
+        HwVxlanIpPathDetectEntry ::=
+            SEQUENCE { 
+                hwVxlanPathDetectTestId
+                    Unsigned32,
+                hwVxlanPathDetectSipv4Addr
+                    IpAddress,
+                hwVxlanPathDetectDipv4Addr
+                    IpAddress,
+                hwVxlanPathDetectSipv6Addr
+                    Ipv6Address,
+                hwVxlanPathDetectDipv6Addr
+                    Ipv6Address,
+                hwVxlanPathDetectProtocol
+                    Unsigned32,
+                hwVxlanPathDetectSrcPort
+                    Unsigned32,
+                hwVxlanPathDetectDstPort
+                    Unsigned32,
+                hwVxlanPathDetectDscp
+                    Unsigned32,
+                hwVxlanPathDetectVrfName
+                    DisplayString,
+                hwVxlanPathDetectIfName
+                    OCTET STRING,
+                hwVxlanPathDetectDirection
+                    INTEGER,
+                hwVxlanPathDetectTtl
+                    Unsigned32
+             }
+
+        hwVxlanPathDetectTestId OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The test index."
+            ::= { hwVxlanIpPathDetectEntry 1 }
+
+        hwVxlanPathDetectSipv4Addr OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The source address of test packet. "
+            ::= { hwVxlanIpPathDetectEntry 2 }
+        
+        hwVxlanPathDetectDipv4Addr OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The destination address of test packet. "
+            ::= { hwVxlanIpPathDetectEntry 3 }
+
+        hwVxlanPathDetectSipv6Addr OBJECT-TYPE
+            SYNTAX Ipv6Address
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The source address of test packet. "
+            ::= { hwVxlanIpPathDetectEntry 4 }
+        
+        hwVxlanPathDetectDipv6Addr OBJECT-TYPE
+            SYNTAX Ipv6Address
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The destination address of test packet. "
+            ::= { hwVxlanIpPathDetectEntry 5 }
+            
+        hwVxlanPathDetectProtocol OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The Protocol of test packet."
+            ::= { hwVxlanIpPathDetectEntry 6 }
+            
+        hwVxlanPathDetectSrcPort OBJECT-TYPE
+            SYNTAX Unsigned32 (1..65535)
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The source port of test packet."
+            ::= { hwVxlanIpPathDetectEntry 7 }   
+            
+        hwVxlanPathDetectDstPort OBJECT-TYPE
+            SYNTAX Unsigned32 (1..65535)
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The destination port of test packet."
+            ::= { hwVxlanIpPathDetectEntry 8 }   
+            
+        hwVxlanPathDetectDscp OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The ip packet dscp."
+            ::= { hwVxlanIpPathDetectEntry 9 }
+
+        hwVxlanPathDetectVrfName OBJECT-TYPE
+            SYNTAX      DisplayString(SIZE(1..31))
+            MAX-ACCESS  accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "Specifies the VRF (VPN Routing & Forwarding) instances name of tests."
+            ::= { hwVxlanIpPathDetectEntry 10 }
+            
+        hwVxlanPathDetectIfName OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the name of interface of the test packet through."
+            ::= { hwVxlanIpPathDetectEntry 11 }
+            
+        hwVxlanPathDetectDirection OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                ingress(1),
+                egress(2)
+            }
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The direction of the test packet through. When the packet from the ingress, hwVxlanPathDetectDirection is 1; when the packet from the egress, hwVxlanPathDetectDirection is 2."
+            ::= { hwVxlanIpPathDetectEntry 12 }
+
+        hwVxlanPathDetectTtl OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The ip packet TTL."
+            ::= { hwVxlanIpPathDetectEntry 13 }
 
      hwNvo3TnlStatusEvent OBJECT IDENTIFIER ::= { hwNvo3Mgmt 2 }
         
@@ -333,7 +516,7 @@
             OBJECTS { hwNvo3VxlanTnlStatus}
             STATUS current
             DESCRIPTION
-                "The SNMP trap that is generated when an vxlan tunnle status change.
+                "The SNMP trap that is generated when an vxlan tunnel status change.
                 When alarm is down trigger, hwNvo3VxlanTnlStatus is 1, when alarm is up trigger, hwNvo3VxlanTnlStatus is 2.
                 "
             ::= { hwNvo3TnlStatusEvent 1 }
@@ -343,7 +526,7 @@
             OBJECTS { hwNvo3VxlanTnlStatus}
             STATUS current
             DESCRIPTION
-                "The SNMP trap that is generated when an vxlan tunnle status change.
+                "The SNMP trap that is generated when an vxlan tunnel status change.
                 When alarm is down trigger, hwNvo3VxlanTnlStatus is 0, when alarm is up trigger, hwNvo3VxlanTnlStatus is 1.
                 "
             ::= { hwNvo3TnlStatusEvent 2 }  
@@ -357,7 +540,7 @@
             DESCRIPTION
                 "The nvo3 management compliance."
             MODULE -- this module
-                MANDATORY-GROUPS { hwNvo3NveMIBGroup, hwNvo3NveVniPeerGroup, hwNvo3VxlanTnlGroup, hwNvo3NotificationGroup, hwNvo3VxlanIPv6TnlGroup, hwNvo3IPv6NotificationGroup}
+                MANDATORY-GROUPS { hwNvo3NveMIBGroup, hwNvo3NveVniPeerGroup, hwNvo3VxlanTnlGroup, hwNvo3NotificationGroup, hwNvo3VxlanIPv6TnlGroup, hwNvo3IPv6NotificationGroup, hwNvo3PathDetectNotificationGroup}
             ::= { hwNvo3Compliances 1 }
         
         hwNvo3Group OBJECT IDENTIFIER ::= { hwNvo3Conformance 2 }
@@ -384,7 +567,7 @@
             ::= { hwNvo3Group 3 }
      
          hwNvo3NotificationGroup NOTIFICATION-GROUP    
-            NOTIFICATIONS { hwNvo3VxlanTnlDown, hwNvo3VxlanTnlUp}
+            NOTIFICATIONS { hwNvo3VxlanTnlDown, hwNvo3VxlanTnlUp,hwIPv4VxlanTunnelDown,hwIPv4VxlanTunnelUp}
             STATUS current
             DESCRIPTION
                 "The  vxlan tunnel alarm group."
@@ -398,13 +581,41 @@
             ::= { hwNvo3Group 5 }
 			
 	 hwNvo3IPv6NotificationGroup NOTIFICATION-GROUP    
-            NOTIFICATIONS { hwNvo3VxlanIPv6TnlDown, hwNvo3VxlanIPv6TnlUp}
+            NOTIFICATIONS { hwNvo3VxlanIPv6TnlDown, hwNvo3VxlanIPv6TnlUp,hwIPv6VxlanTunnelDown,hwIPv6VxlanTunnelUp}
             STATUS current
             DESCRIPTION
                 "The  vxlan IPv6 tunnel alarm group."
             ::= { hwNvo3Group 6 }
-            
-    --vxlan tunnel statistic
+
+    hwVxlanIpPathDetectGroup OBJECT-GROUP
+            OBJECTS { 
+                hwVxlanPathDetectTestId,
+                hwVxlanPathDetectSipv4Addr,
+                hwVxlanPathDetectDipv4Addr,
+                hwVxlanPathDetectSipv6Addr,
+                hwVxlanPathDetectDipv6Addr,
+                hwVxlanPathDetectProtocol,
+                hwVxlanPathDetectSrcPort,
+                hwVxlanPathDetectDstPort,
+                hwVxlanPathDetectDscp,
+                hwVxlanPathDetectVrfName,
+                hwVxlanPathDetectIfName,
+                hwVxlanPathDetectDirection,
+                hwVxlanPathDetectTtl
+            }
+            STATUS current
+            DESCRIPTION
+                "The ip path detection packet info group."
+            ::= { hwNvo3Group 7 }
+
+    hwNvo3PathDetectNotificationGroup NOTIFICATION-GROUP    
+            NOTIFICATIONS { hwNvo3IpPathDetectResultIpv4Pkt, hwNvo3IpPathDetectResultIpv6Pkt}
+            STATUS current
+            DESCRIPTION
+                "The ip path detection records packet group."
+            ::= { hwNvo3Group 8 }           
+ 
+   --vxlan tunnel statistic
       hwVxlanTunnelStatEnableObjects  OBJECT IDENTIFIER ::= { hwNvo3Mgmt 4 }     
     
    --vxlan tunnel statistic get
@@ -561,14 +772,38 @@
             DESCRIPTION
                 "The VXLAN tunnel and VRF instance are no longer mapped to more than one VNI."
             ::= { hwNvo3TnlTrap 4 }
-			
-	hwNvo3IPv6TnlStatusEvent OBJECT IDENTIFIER ::= { hwNvo3Mgmt 7 }
+	hwIPv4VxlanTunnelDown NOTIFICATION-TYPE
+	    OBJECTS { hwNvo3VxlanTnlStatus}
+	    STATUS current
+	    DESCRIPTION
+                "The IPv4 vxlan tunnel status changes."
+            ::= { hwNvo3TnlTrap 5 }
+	hwIPv4VxlanTunnelUp NOTIFICATION-TYPE
+	    OBJECTS { hwNvo3VxlanTnlStatus}
+	    STATUS current
+	    DESCRIPTION
+                "The IPv4 vxlan tunnel status changes."
+            ::= { hwNvo3TnlTrap 6 }
+	hwIPv6VxlanTunnelDown NOTIFICATION-TYPE
+	    OBJECTS { hwNvo3VxlanIPv6TnlStatus}
+	    STATUS current
+	    DESCRIPTION
+	        "The IPv6 vxlan tunnel status changes."
+	    ::= { hwNvo3TnlTrap 7 }
+	hwIPv6VxlanTunnelUp NOTIFICATION-TYPE
+	    OBJECTS { hwNvo3VxlanIPv6TnlStatus}
+	    STATUS current
+	    DESCRIPTION
+	        "The IPv6 vxlan tunnel status changes."
+	    ::= { hwNvo3TnlTrap 8 }					
+	
+    hwNvo3IPv6TnlStatusEvent OBJECT IDENTIFIER ::= { hwNvo3Mgmt 7 }
         
         hwNvo3VxlanIPv6TnlDown NOTIFICATION-TYPE
             OBJECTS { hwNvo3VxlanIPv6TnlStatus}
             STATUS current
             DESCRIPTION
-                "The SNMP trap that is generated when an vxlan tunnle status change.
+                "The SNMP trap that is generated when an vxlan tunnel status change.
                 When alarm is down trigger, hwNvo3VxlanIPv6TnlStatus is 1, when alarm is up trigger, hwNvo3VxlanIPv6TnlStatus is 2.
                 "
             ::= { hwNvo3IPv6TnlStatusEvent 1 }
@@ -578,9 +813,109 @@
             OBJECTS { hwNvo3VxlanIPv6TnlStatus}
             STATUS current
             DESCRIPTION
-                "The SNMP trap that is generated when an vxlan tunnle status change.
+                "The SNMP trap that is generated when an vxlan tunnel status change.
                 When alarm is down trigger, hwNvo3VxlanIPv6TnlStatus is 0, when alarm is up trigger, hwNvo3VxlanIPv6TnlStatus is 1.
                 "
             ::= { hwNvo3IPv6TnlStatusEvent 2 } 
-          
+
+    hwNvo3IpPathDetectResultPacketNotificaiton OBJECT IDENTIFIER ::= { hwNvo3Mgmt 8 }
+
+        hwNvo3IpPathDetectResultIpv4Pkt NOTIFICATION-TYPE
+            OBJECTS {
+                hwVxlanPathDetectTestId,
+                hwVxlanPathDetectSipv4Addr,
+                hwVxlanPathDetectDipv4Addr,
+                hwVxlanPathDetectProtocol,
+                hwVxlanPathDetectSrcPort,
+                hwVxlanPathDetectDstPort,
+                hwVxlanPathDetectDscp,
+                hwVxlanPathDetectVrfName,
+                hwVxlanPathDetectIfName,
+                hwVxlanPathDetectDirection,
+                hwVxlanPathDetectTtl
+            }
+            STATUS current
+            DESCRIPTION
+                "If receive the ip path detect ipv4 packet, the system sends packed trap information. "
+            ::= { hwNvo3IpPathDetectResultPacketNotificaiton 1 }
+
+        hwNvo3IpPathDetectResultIpv6Pkt NOTIFICATION-TYPE
+            OBJECTS {
+                hwVxlanPathDetectTestId,
+                hwVxlanPathDetectSipv6Addr,
+                hwVxlanPathDetectDipv6Addr,
+                hwVxlanPathDetectProtocol,
+                hwVxlanPathDetectSrcPort,
+                hwVxlanPathDetectDstPort,
+                hwVxlanPathDetectDscp,
+                hwVxlanPathDetectVrfName,
+                hwVxlanPathDetectIfName,
+                hwVxlanPathDetectDirection,
+                hwVxlanPathDetectTtl
+            }
+            STATUS current
+            DESCRIPTION
+                "If receive the ip path detect ipv6 packet, the system sends packed trap information. "
+            ::= { hwNvo3IpPathDetectResultPacketNotificaiton 2 }
+    hwEvplMIBInstances OBJECT IDENTIFIER ::= { hwNvo3Mgmt 9 }
+        hwEvplCccTable OBJECT-TYPE
+          SYNTAX SEQUENCE OF HwEvplCccEntry
+          MAX-ACCESS not-accessible
+          STATUS current
+          DESCRIPTION
+              "The evpl ccc table, providing read operations."
+          ::= { hwEvplMIBInstances 1 }
+        hwEvplCccEntry OBJECT-TYPE
+          SYNTAX HwEvplCccEntry
+          MAX-ACCESS not-accessible
+          STATUS current
+          DESCRIPTION
+              "The entry of hwEvplCccTable."
+          INDEX { hwEvplIndex, hwEvplCccIfname1, hwEvplCccIfname2 }
+          ::= { hwEvplCccTable 1 }
+        HwEvplCccEntry ::=
+            SEQUENCE { 
+                hwEvplIndex
+                    Unsigned32,
+                hwEvplCccIfname1
+                    InterfaceIndex,
+                hwEvplCccIfname2
+                    InterfaceIndex
+             }
+        hwEvplIndex  OBJECT-TYPE
+          SYNTAX Unsigned32
+          MAX-ACCESS read-only
+          STATUS current
+          DESCRIPTION
+              "The evpl instance index."
+          ::= { hwEvplCccEntry 1 } 
+        hwEvplCccIfname1  OBJECT-TYPE
+          SYNTAX InterfaceIndex
+          MAX-ACCESS read-only
+          STATUS current
+          DESCRIPTION
+              "The name of the interface1."
+          ::= { hwEvplCccEntry 2 } 
+        hwEvplCccIfname2  OBJECT-TYPE
+          SYNTAX InterfaceIndex
+          MAX-ACCESS read-only
+          STATUS current
+          DESCRIPTION
+              "The name of the interface2."
+          ::= { hwEvplCccEntry 3 }
+    hwEvplCccEvent OBJECT IDENTIFIER ::= { hwNvo3Mgmt 10 }
+        hwEvplCccDown NOTIFICATION-TYPE
+          OBJECTS { hwEvplIndex, hwEvplCccIfname1, hwEvplCccIfname2 }
+          STATUS current
+          DESCRIPTION
+              "The Evpl Ccc status changes."
+          ::= { hwEvplCccEvent 1 }
+        hwEvplCccUp NOTIFICATION-TYPE
+          OBJECTS { hwEvplIndex, hwEvplCccIfname1, hwEvplCccIfname2 }
+          STATUS current
+          DESCRIPTION
+              "The Evpl Ccc status changes."
+          ::= { hwEvplCccEvent 2 }
+
+
     END

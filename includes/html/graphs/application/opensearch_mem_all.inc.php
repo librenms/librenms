@@ -17,68 +17,68 @@ $tseg_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id,
 $rrd_list = [];
 $rrd_list[] = [
     'filename' => $tqc_rrd_filename,
-    'descr'    => 'Query Cache',
-    'ds'       => 'tqc_size',
+    'descr' => 'Query Cache',
+    'ds' => 'tqc_size',
 ];
 $rrd_list[] = [
     'filename' => $trc_rrd_filename,
-    'descr'    => 'Request Cache',
-    'ds'       => 'trc_size',
+    'descr' => 'Request Cache',
+    'ds' => 'trc_size',
 ];
 $rrd_list[] = [
     'filename' => $tfd_rrd_filename,
-    'descr'    => 'Fielddata',
-    'ds'       => 'tfd_size',
+    'descr' => 'Fielddata',
+    'ds' => 'tfd_size',
 ];
 $rrd_list[] = [
     'filename' => $tseg_rrd_filename,
-    'descr'    => 'Segments',
-    'ds'       => 'tseg_size',
+    'descr' => 'Segments',
+    'ds' => 'tseg_size',
 ];
 $rrd_list[] = [
     'filename' => $tseg_rrd_filename,
-    'descr'    => 'Seg. Terms',
-    'ds'       => 'tseg_terms_size',
+    'descr' => 'Seg. Terms',
+    'ds' => 'tseg_terms_size',
 ];
 $rrd_list[] = [
     'filename' => $tseg_rrd_filename,
-    'descr'    => 'Seg. Fields',
-    'ds'       => 'tseg_fields_size',
+    'descr' => 'Seg. Fields',
+    'ds' => 'tseg_fields_size',
 ];
 $rrd_list[] = [
     'filename' => $tseg_rrd_filename,
-    'descr'    => 'Seg.Term.Vectors',
-    'ds'       => 'tseg_tvector_size',
+    'descr' => 'Seg.Term.Vectors',
+    'ds' => 'tseg_tvector_size',
 ];
 $rrd_list[] = [
     'filename' => $tseg_rrd_filename,
-    'descr'    => 'Seg. Norms',
-    'ds'       => 'tseg_norms_size',
+    'descr' => 'Seg. Norms',
+    'ds' => 'tseg_norms_size',
 ];
 $rrd_list[] = [
     'filename' => $tseg_rrd_filename,
-    'descr'    => 'Seg. Points',
-    'ds'       => 'tseg_points_size',
+    'descr' => 'Seg. Points',
+    'ds' => 'tseg_points_size',
 ];
 $rrd_list[] = [
     'filename' => $tseg_rrd_filename,
-    'descr'    => 'Seg. Doc Vals',
-    'ds'       => 'tseg_docval_size',
+    'descr' => 'Seg. Doc Vals',
+    'ds' => 'tseg_docval_size',
 ];
 $rrd_list[] = [
     'filename' => $tseg_rrd_filename,
-    'descr'    => 'Seg.Ind.Wrt.',
-    'ds'       => 'tseg_indwrt_size',
+    'descr' => 'Seg.Ind.Wrt.',
+    'ds' => 'tseg_indwrt_size',
 ];
 $rrd_list[] = [
     'filename' => $tseg_rrd_filename,
-    'descr'    => 'Seg. Ver. Map.',
-    'ds'       => 'tseg_vermap_size',
+    'descr' => 'Seg. Ver. Map.',
+    'ds' => 'tseg_vermap_size',
 ];
 $rrd_list[] = [
     'filename' => $tseg_rrd_filename,
-    'descr'    => 'Seg. Fixed Bit Set',
-    'ds'       => 'tseg_fbs_size',
+    'descr' => 'Seg. Fixed Bit Set',
+    'ds' => 'tseg_fbs_size',
 ];
 
 require 'includes/html/graphs/generic_multi_line.inc.php';

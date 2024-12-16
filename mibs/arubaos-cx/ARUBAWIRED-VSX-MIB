@@ -1,0 +1,562 @@
+--**MOD+***********************************************************************
+--* Module:    ARUBAWIRED-VSX-MIB.mib
+--*
+--* (c) Copyright 2018-2021 Hewlett Packard Enterprise Development LP
+--* All Rights Reserved.
+--*
+--* The contents of this software are proprietary and confidential
+--* to the Hewlett-Packard Development Company, L.P.  No part of this
+--* program may be photocopied, reproduced, or translated into another
+--* programming language without prior written consent of the
+--* Hewlett-Packard Development Company, L.P.
+--*
+--* Purpose: This file contains MIB definition of ARUBAWIRED-VSX-MIB
+--*
+--**MOD-***********************************************************************
+
+ARUBAWIRED-VSX-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+  MODULE-IDENTITY, OBJECT-TYPE, Integer32, TimeTicks
+                FROM SNMPv2-SMI
+  DisplayString, TruthValue, TEXTUAL-CONVENTION
+                FROM SNMPv2-TC
+  MODULE-COMPLIANCE, OBJECT-GROUP
+                FROM SNMPv2-CONF
+  InterfaceIndex
+                FROM IF-MIB
+  InetAddressType, InetAddress
+                FROM INET-ADDRESS-MIB
+  wndFeatures
+                FROM ARUBAWIRED-NETWORKING-OID;
+
+arubaWiredVsxMIB MODULE-IDENTITY
+        LAST-UPDATED "201809050000Z" -- September 05, 2018
+        ORGANIZATION "HPE/Aruba Networking Division"
+        CONTACT-INFO "Hewlett Packard Company
+                       8000 Foothills Blvd.
+                       Roseville, CA 95747"
+        DESCRIPTION  "This is the MIB module related to HPE Aruba VSX feature"
+
+        REVISION     "201809050000Z" -- September 05, 2018
+        DESCRIPTION  "Config-sync MIB implementation for VSX feature"
+
+        REVISION     "201806080000Z" -- June 08, 2018
+        DESCRIPTION  "Initial revision."
+
+        ::= { wndFeatures 7 }
+
+-- -------------------------------------------------------------
+-- Textual Conventions
+-- -------------------------------------------------------------
+
+   VidList ::= TEXTUAL-CONVENTION
+      DISPLAY-HINT "512x"
+      STATUS      current
+      DESCRIPTION
+         "Each octet within this value specifies a set of eight
+         VLAN index (VID), with the first octet specifying VIDs 1
+         through 8, the second octet specifying VIDs 9 through 16,
+         etc.  Within each octet, the most significant bit represents
+         the lowest numbered VID, and the least significant bit
+         represents the highest numbered VID.  Thus, each VID
+         is represented by a single bit within the value of this
+         object.  If that bit has a value of 1 then that VID is
+         included in the set of VIDs; the VID is not included if its
+         bit has a value of 0.  This list represents the entire
+         range of VLAN index values defined in the scope of IEEE
+         802.1Q."
+      SYNTAX      OCTET STRING (SIZE (512))
+
+-- -------------------------------------------------------------
+-- Start of MIB Objects
+-- -------------------------------------------------------------
+
+arubaWiredVsxConfig       OBJECT IDENTIFIER
+                                ::= { arubaWiredVsxMIB 1 }
+
+arubaWiredVsxStatus       OBJECT IDENTIFIER
+                                ::= { arubaWiredVsxMIB 2 }
+
+arubaWiredVsxNotifications       OBJECT IDENTIFIER
+                                 ::= { arubaWiredVsxMIB 3 }
+
+------------------------------------------------------------------------
+--  VSX global configuration - ISL
+------------------------------------------------------------------------
+arubaWiredVsxIslConfig 	         OBJECT IDENTIFIER
+                                ::= { arubaWiredVsxConfig 1 }
+
+arubaWiredVsxIslPort OBJECT-TYPE
+      SYNTAX      DisplayString
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION "Interface name corresponding to the VSX InterSwitchLink port.
+                   A value of 0 means there is no ISL port configuration."
+      DEFVAL      { 0 }
+      ::= { arubaWiredVsxIslConfig 1 }
+
+arubaWiredVsxIslHelloInterval OBJECT-TYPE
+      SYNTAX      Integer32 (1..5)
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION "ISLP hello interval in seconds. The default value is 1."
+      DEFVAL      { 1 }
+      ::= { arubaWiredVsxIslConfig 2 }
+
+arubaWiredVsxIslHoldTime OBJECT-TYPE
+      SYNTAX      Integer32 (0..3)
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION "ISL port-flap hold time in seconds. The default value is 0."
+      DEFVAL      { 0 }
+      ::= { arubaWiredVsxIslConfig 3 }
+
+arubaWiredVsxIslHelloTimeout OBJECT-TYPE
+      SYNTAX      Integer32 (3..20)
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION "ISL hello timeout in seconds. The default value is 3."
+      DEFVAL      { 3 }
+      ::= { arubaWiredVsxIslConfig 4 }
+
+arubaWiredVsxIslSystemID OBJECT-TYPE
+      SYNTAX      DisplayString
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "Device identifier. This is advertised over ISL."
+      ::= { arubaWiredVsxIslConfig 5 }
+
+arubaWiredVsxIslPlatformName OBJECT-TYPE
+      SYNTAX      DisplayString
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "Device type. This is advertised over ISL."
+      ::= { arubaWiredVsxIslConfig 6 }
+
+arubaWiredVsxIslSwVersion OBJECT-TYPE
+      SYNTAX      DisplayString
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "S/W version running on the device type. This is advertised over ISL."
+      ::= { arubaWiredVsxIslConfig 7 }
+
+arubaWiredVsxIslVIDList OBJECT-TYPE
+      SYNTAX      VidList
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "VLAN IDs that the ISL port is a member of."
+      ::= { arubaWiredVsxIslConfig 8 }
+
+------------------------------------------------------------------------
+--  VSX global configuration - KeepAlive
+------------------------------------------------------------------------
+
+arubaWiredVsxKeepAliveConfig                  OBJECT IDENTIFIER
+                                ::= { arubaWiredVsxConfig 2 }
+
+arubaWiredVsxKeepAliveSrcIPAddrType OBJECT-TYPE
+      SYNTAX      InetAddressType
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION "The KeepAlive source address type. It can be IPv4 or IPv6."
+      ::= { arubaWiredVsxKeepAliveConfig 1 }
+
+arubaWiredVsxKeepAliveSrcIPAddr OBJECT-TYPE
+      SYNTAX      InetAddress
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION "The KeepAlive source address. It can be IPv4 or IPv6."
+      ::= { arubaWiredVsxKeepAliveConfig 2 }
+
+arubaWiredVsxKeepAliveVrf OBJECT-TYPE
+      SYNTAX      DisplayString
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION "The KeepAlive VRF domain."
+      ::= { arubaWiredVsxKeepAliveConfig 3 }
+
+arubaWiredVsxKeepAliveUdpPort OBJECT-TYPE
+      SYNTAX      Integer32(1024..65535)
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION "The KeepAlive UDP port. Same port is used as source and destination UDP ports."
+      ::= { arubaWiredVsxKeepAliveConfig 4 }
+
+arubaWiredVsxKeepAlivePeerIPAddrType OBJECT-TYPE
+      SYNTAX      InetAddressType
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION "The KeepAlive peer address type. It can be IPv4 or IPv6."
+      ::= { arubaWiredVsxKeepAliveConfig 5 }
+
+arubaWiredVsxKeepAlivePeerIPAddr OBJECT-TYPE
+      SYNTAX      InetAddress
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION "The KeepAlive peer address. It can be IPv4 or IPv6."
+      ::= { arubaWiredVsxKeepAliveConfig 6 }
+
+arubaWiredVsxKeepAliveHelloInterval OBJECT-TYPE
+      SYNTAX      Integer32 (1..5)
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION "KeepAlive hello interval in seconds. The default value is 1."
+      DEFVAL      { 1 }
+      ::= { arubaWiredVsxKeepAliveConfig 7 }
+
+arubaWiredVsxKeepAliveHelloTimeout OBJECT-TYPE
+      SYNTAX      Integer32 (3..20)
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION "KeepAlive hello timeout in seconds. The default value is 3."
+      DEFVAL      { 3 }
+      ::= { arubaWiredVsxKeepAliveConfig 8 }
+
+arubaWiredVsxKeepAliveSystemID OBJECT-TYPE
+      SYNTAX      DisplayString
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "Device  identifier that will be advertised via KeepAlive protocol."
+      ::= { arubaWiredVsxKeepAliveConfig 9 }
+
+arubaWiredVsxKeepAlivePlatformName OBJECT-TYPE
+      SYNTAX      DisplayString
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "Device type that will be advertised via KeepAlive protocol."
+      ::= { arubaWiredVsxKeepAliveConfig 10 }
+
+arubaWiredVsxKeepAliveSwVersion OBJECT-TYPE
+      SYNTAX      DisplayString
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "S/W version that will be advertised via KeepAlive protocol."
+      ::= { arubaWiredVsxKeepAliveConfig 11 }
+
+------------------------------------------------------------------------
+--  VSX Aggregator configuration - Per LAG
+------------------------------------------------------------------------
+arubaWiredVsxAggregatorConfig    OBJECT IDENTIFIER
+                                ::= { arubaWiredVsxConfig 3 }
+
+arubaWiredVsxAggregatorTable OBJECT-TYPE
+      SYNTAX      SEQUENCE OF ArubaWiredVsxAggregatorEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION "This table supplements the table 'dot3adAggTable'
+                  in ieee802.3ad mib."
+      ::= { arubaWiredVsxAggregatorConfig 1 }
+
+arubaWiredVsxAggregatorEntry OBJECT-TYPE
+      SYNTAX      ArubaWiredVsxAggregatorEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION "The fields in this entry will be used to supplement
+                  fields of dot3adAggEntry in ieee802.3ad mib."
+      INDEX   { arubaWiredVsxAggregatorIndex }
+      ::= { arubaWiredVsxAggregatorTable 1 }
+
+ArubaWiredVsxAggregatorEntry ::=
+    SEQUENCE {
+        arubaWiredVsxAggregatorIndex
+            InterfaceIndex,
+        arubaWiredVsxAggregatorType
+            INTEGER,
+        arubaWiredVsxVlanList
+            VidList,
+        arubaWiredVsxLoopProtectEnabled
+            TruthValue,
+        arubaWiredVsxLoadBalanceScheme
+            INTEGER,
+        arubaWiredVsxCosOverride
+            INTEGER,
+        arubaWiredVsxDscpOverride
+            INTEGER,
+        arubaWiredVsxQoSTrust
+            INTEGER
+     }
+
+arubaWiredVsxAggregatorIndex OBJECT-TYPE
+      SYNTAX      InterfaceIndex
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION "The unique identifier allocated to this Aggregator by
+                   the local System.  This attribute identifies an
+                   Aggregator instance among the subordinate managed
+                   objects of the containing object.
+                   This value is read-only."
+      ::= { arubaWiredVsxAggregatorEntry 1 }
+
+arubaWiredVsxAggregatorType OBJECT-TYPE
+      SYNTAX      INTEGER {
+                            point2Point (1),
+                            multiChassis (2)
+                          }
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION "This field specifies the aggregator/lag type."
+      ::= { arubaWiredVsxAggregatorEntry 2 }
+
+arubaWiredVsxVlanList OBJECT-TYPE
+      SYNTAX      VidList
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "VLANs that this aggregator is a member of. This is used for configuration consistency validation."
+::= { arubaWiredVsxAggregatorEntry 3 }
+
+arubaWiredVsxLoopProtectEnabled OBJECT-TYPE
+      SYNTAX      TruthValue
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "Loop Protect protocol admin state for this VSX. This is used for configuration consistency validation."
+::= { arubaWiredVsxAggregatorEntry 4 }
+
+arubaWiredVsxLoadBalanceScheme OBJECT-TYPE
+      SYNTAX      INTEGER {
+                   l2-Src-Dst (1),
+                   l3-Src-Dst (2),
+                   l4-Src-Dst (3)
+          }
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "Load balance scheme configured for this VSX. This is used for configuration consistency validation."
+::= { arubaWiredVsxAggregatorEntry 5}
+
+arubaWiredVsxCosOverride OBJECT-TYPE
+      SYNTAX      INTEGER(0..7)
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "CoS override configuration for this VSX. This is used for configuration consistency validation."
+::= { arubaWiredVsxAggregatorEntry 6}
+
+arubaWiredVsxDscpOverride OBJECT-TYPE
+      SYNTAX      INTEGER(0..63)
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "DSCP override configuration for this VSX. This is used for configuration consistency validation."
+::= { arubaWiredVsxAggregatorEntry 7}
+
+arubaWiredVsxQoSTrust OBJECT-TYPE
+      SYNTAX      INTEGER {
+                   cos  (1),
+                   dscp (2)
+          }
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "Port QoS trust mode configured for this VSX. This is used for configuration consistency validation."
+::= { arubaWiredVsxAggregatorEntry 8}
+
+------------------------------------------------------------------------
+--  VSX global configuration
+------------------------------------------------------------------------
+arubaWiredVsxGlobalConfiguration   OBJECT IDENTIFIER
+                                    ::= { arubaWiredVsxConfig 4 }
+arubaWiredVsxDeviceRole OBJECT-TYPE
+      SYNTAX      INTEGER {
+                   primary       (1),
+                   secondary     (2),
+                   notConfigured (3)
+          }
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "VSX device role."
+       ::= { arubaWiredVsxGlobalConfiguration 1 }
+
+arubaWiredVsxConfigSync OBJECT-TYPE
+      SYNTAX      INTEGER {
+                   enabled  (1),
+                   disabled (2)
+          }
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "VSX config sync."
+       ::= { arubaWiredVsxGlobalConfiguration 2 }
+
+------------------------------------------------------------------------
+--  VSX global status & statistics - ISL
+------------------------------------------------------------------------
+
+arubaWiredVsxIslStatus       OBJECT IDENTIFIER
+                                ::= { arubaWiredVsxStatus 1 }
+
+arubaWiredVsxIslOperState  OBJECT-TYPE
+      SYNTAX      INTEGER {
+                   init   (1),
+                   outSync(2),
+                   inSync (3)
+          }
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "ISL operational state."
+      ::= { arubaWiredVsxIslStatus 1 }
+
+arubaWiredVsxIslPduTx OBJECT-TYPE
+      SYNTAX      Integer32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "Number of ISL PDUs transmitted by this device."
+       ::= { arubaWiredVsxIslStatus 2 }
+
+arubaWiredVsxIslPduRx OBJECT-TYPE
+      SYNTAX      Integer32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "Number of ISL PDUs received by this device."
+       ::= { arubaWiredVsxIslStatus 3 }
+
+arubaWiredVsxIslHelloTx OBJECT-TYPE
+      SYNTAX      Integer32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "Number of ISL Hello packets transmitted by this device."
+       ::= { arubaWiredVsxIslStatus 4 }
+
+arubaWiredVsxIslHelloRx OBJECT-TYPE
+      SYNTAX      Integer32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "Number of ISL Hello packets received by this device."
+       ::= { arubaWiredVsxIslStatus 5 }
+
+arubaWiredVsxDeviceOperSystemID OBJECT-TYPE
+      SYNTAX      DisplayString
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "System identifier used by this device - derived from
+                       system identifier values of the 2 devices."
+       ::= { arubaWiredVsxIslStatus 6 }
+
+------------------------------------------------------------------------
+--  KeepAlive global status & statistics - KeepAlive
+------------------------------------------------------------------------
+arubaWiredVsxKeepAliveStatus       OBJECT IDENTIFIER
+                                ::= { arubaWiredVsxStatus 2 }
+
+arubaWiredVsxKeepAliveOperState  OBJECT-TYPE
+      SYNTAX      INTEGER {
+                   init                (1),
+                   configured          (2),
+                   inSyncEstablished   (3),
+                   outofSyncEstablished(4),
+                   initEstablished     (5),
+                   failed              (6),
+                   stopped             (7)
+          }
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "KeepAlive protocol operational state."
+      ::= { arubaWiredVsxKeepAliveStatus 1 }
+
+arubaWiredVsxKeepAlivePacketsTx OBJECT-TYPE
+      SYNTAX      Integer32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "Number of KeepAlive protocol packets transmitted by this device."
+       ::= { arubaWiredVsxKeepAliveStatus 2 }
+
+arubaWiredVsxKeepAlivePacketsRx OBJECT-TYPE
+      SYNTAX      Integer32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "Number of KeepAlive protocol packets received by this device."
+       ::= { arubaWiredVsxKeepAliveStatus 3 }
+
+arubaWiredVsxKeepAlivePacketsDrop OBJECT-TYPE
+      SYNTAX      Integer32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "Number of KeepAlive protocol packets dropped."
+       ::= { arubaWiredVsxKeepAliveStatus 4 }
+
+arubaWiredVsxKeepAliveTimeoutCount OBJECT-TYPE
+      SYNTAX      Integer32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "Number of times KeepAlive protocol went to failed state because of KeepAlive timer expiry."
+       ::= { arubaWiredVsxKeepAliveStatus 5 }
+
+arubaWiredVsxKeepAliveLastEstablishedTime  OBJECT-TYPE
+      SYNTAX      TimeTicks
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "Stores the most recent time KeepAlive handshake was successful
+                   and a value of 0 indicates KeepAlive handshake was never established."
+      ::= { arubaWiredVsxKeepAliveStatus 6 }
+
+arubaWiredVsxKeepAliveLastFailedTime  OBJECT-TYPE
+      SYNTAX      TimeTicks
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "Stores the most recent time KeepAlive handshake failed
+                   and a value of 0 indicates KeepAlive handshake never failed."
+      ::= { arubaWiredVsxKeepAliveStatus 7 }
+
+------------------------------------------------------------------------
+--  VSX Notifications (Traps)
+------------------------------------------------------------------------
+arubaWiredVsxTraps   OBJECT IDENTIFIER
+                             ::= { arubaWiredVsxNotifications 1 }
+
+islUp NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION "An islUp trap signifies that ISL transitioned to inSync state"
+     ::= { arubaWiredVsxTraps 1 }
+
+islDown NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION "An islDown trap signifies that ISL transitioned to outOfSync
+                 state"
+     ::= { arubaWiredVsxTraps 2 }
+
+keepAliveUp NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION "A keepAliveUp trap signifies that KA is in established state"
+     ::= { arubaWiredVsxTraps 3 }
+
+keepAliveDown NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION "A keepAliveDown trap signifies that KA is in failed state"
+     ::= { arubaWiredVsxTraps 4 }
+
+mclagLocalUpPeerUp NOTIFICATION-TYPE
+    OBJECTS   {
+               arubaWiredVsxAggregatorIndex
+              }
+    STATUS  current
+    DESCRIPTION "A mclagLocalUpPeerUp trap signifies that the McLAG is up in
+                 both the primary and secondary VSX devices."
+     ::= { arubaWiredVsxTraps 5 }
+
+
+mclagLocalUpPeerDown NOTIFICATION-TYPE
+    OBJECTS   {
+               arubaWiredVsxAggregatorIndex
+              }
+    STATUS  current
+    DESCRIPTION "A mclagLocalUpPeerDown trap signifies that the McLAG is up in
+                 the local device but down in the peer VSX device."
+     ::= { arubaWiredVsxTraps 6 }
+
+mclagLocalDownPeerUp NOTIFICATION-TYPE
+    OBJECTS   {
+               arubaWiredVsxAggregatorIndex
+              }
+    STATUS  current
+    DESCRIPTION "A mclagLocalDownPeerUp trap signifies that the McLAG is down in
+                 the local device but up in the peer VSX device."
+     ::= { arubaWiredVsxTraps 7 }
+
+mclagLocalDownPeerDown NOTIFICATION-TYPE
+    OBJECTS   {
+               arubaWiredVsxAggregatorIndex
+              }
+    STATUS  current
+    DESCRIPTION "A mclagLocalDownPeerDown trap signifies that the McLAG is down in
+                 both the primary and secondary VSX devices."
+     ::= { arubaWiredVsxTraps 8 }
+
+
+
+
+END

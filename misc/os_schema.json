@@ -60,9 +60,6 @@
         "poller_modules": {
             "type": "object",
             "properties": {
-                "cisco-cbqos": {
-                    "type": "boolean"
-                },
                 "cisco-qfp": {
                     "type": "boolean"
                 },
@@ -70,9 +67,6 @@
                     "type": "boolean"
                 },
                 "cisco-mac-accounting": {
-                    "type": "boolean"
-                },
-                "cisco-voice": {
                     "type": "boolean"
                 },
                 "cisco-remote-access-monitor": {
@@ -99,10 +93,10 @@
                 "entity-state": {
                     "type": "boolean"
                 },
-                "wifi": {
+                "ipmi": {
                     "type": "boolean"
                 },
-                "ipmi": {
+                "isis": {
                     "type": "boolean"
                 },
                 "entity-physical": {
@@ -267,6 +261,9 @@
                 "hr-device": {
                     "type": "boolean"
                 },
+                "isis": {
+                    "type": "boolean"
+                },
                 "discovery-protocols": {
                     "type": "boolean"
                 },
@@ -360,6 +357,9 @@
         "ifname": {
             "type": "boolean"
         },
+        "ifalias": {
+            "type": "boolean"
+        },
         "mib_dir": {
             "type":  "string"
         },
@@ -387,6 +387,22 @@
         "snmp_max_oid": {
             "type": "integer",
             "minimum": 1
+        },
+        "syslog_hook": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "regex": {
+                        "type": "string"
+                    },
+                    "script": {
+                        "type": "string"
+                    }
+                },
+                "required": ["regex", "script"],
+                "additionalProperties": false
+            }
         },
         "ifXmcbc": {
             "type": "boolean"

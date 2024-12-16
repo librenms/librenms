@@ -53,7 +53,7 @@ class DeviceController extends SelectController
         // list devices the user does not have access to
         if ($request->get('access') == 'inverted' && $user_id && $request->user()->isAdmin()) {
             return Device::query()
-                ->select('device_id', 'hostname', 'sysName')
+                ->select('device_id', 'hostname', 'sysName', 'display', 'icon')
                 ->whereNotIn('device_id', function ($query) use ($user_id) {
                     $query->select('device_id')
                         ->from('devices_perms')
@@ -63,7 +63,7 @@ class DeviceController extends SelectController
         }
 
         return Device::hasAccess($request->user())
-            ->select('device_id', 'hostname', 'sysName')
+            ->select('device_id', 'hostname', 'sysName', 'display', 'icon')
             ->orderBy('hostname');
     }
 
@@ -73,6 +73,7 @@ class DeviceController extends SelectController
         return [
             'id' => $device->{$this->id},
             'text' => $device->displayName(),
+            'icon' => $device->icon,
         ];
     }
 }

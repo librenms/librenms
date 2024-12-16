@@ -184,10 +184,6 @@ return [
             'description' => 'Autoriser l\'accès aux graphes pour les réseaux suivants sans login',
             'help' => '(ne s\'applique pas si l\'accès sans login est déjà permis)',
         ],
-        'api_demo' => [
-            'description' => 'Ceci est la démo',
-            'help' => 'Démo',
-        ],
         'apps' => [
             'powerdns-recursor' => [
                 'api-key' => [
@@ -367,10 +363,6 @@ return [
             'description' => 'Journaux de connexions plus anciens que',
             'help' => 'Nettoyage effectué par daily.sh',
         ],
-        'device_perf_purge' => [
-            'description' => 'Stats de performances plus anciennes que',
-            'help' => 'Statistiques de performances des équipements. Le nettoyage effectué par daily.sh',
-        ],
         'discovery_modules' => [
             'arp-table' => [
                 'description' => 'Table ARP',
@@ -380,9 +372,6 @@ return [
             ],
             'bgp-peers' => [
                 'description' => 'Adjacences BGP',
-            ],
-            'cisco-cbqos' => [
-                'description' => 'Cisco CBQOS',
             ],
             'cisco-cef' => [
                 'description' => 'Cisco CEF',
@@ -823,9 +812,6 @@ return [
             'ucd-diskio' => [
                 'description' => 'UCD DiskIO',
             ],
-            'wifi' => [
-                'description' => 'Wifi',
-            ],
             'wireless' => [
                 'description' => 'Wireless',
             ],
@@ -858,12 +844,6 @@ return [
             ],
             'cisco-asa-firewall' => [
                 'description' => 'Cisco ASA Firewall',
-            ],
-            'cisco-voice' => [
-                'description' => 'Cisco Voice',
-            ],
-            'cisco-cbqos' => [
-                'description' => 'Cisco CBQOS',
             ],
             'cisco-otv' => [
                 'description' => 'Cisco OTV',
@@ -922,6 +902,10 @@ return [
         ],
         'ports_fdb_purge' => [
             'description' => 'Table port FDB, entrées plus anciennes que',
+            'help' => 'Nettoyage effectué par daily.sh',
+        ],
+        'ports_nac_purge' => [
+            'description' => 'Table port NAC, entrées plus anciennes que',
             'help' => 'Nettoyage effectué par daily.sh',
         ],
         'ports_purge' => [
