@@ -36,7 +36,12 @@ class SensorObserver
         }
 
         if (Config::get('sensors.guess_limits') && $sensor->sensor_current !== null) {
-            $sensor->guessLimits($sensor->sensor_limit === null, $sensor->sensor_limit_low === null);
+            $sensor->guessLimits(
+                $sensor->sensor_limit === null,
+                $sensor->sensor_limit_warn === null,
+                $sensor->sensor_limit_low_warn === null,
+                $sensor->sensor_limit_low === null
+            );
         }
 
         // Fix high/low thresholds (i.e. on negative numbers)

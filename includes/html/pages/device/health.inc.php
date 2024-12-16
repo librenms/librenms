@@ -64,10 +64,10 @@ if (DiskIo::where('device_id', $device['device_id'])->count()) {
     $datas[] = 'diskio';
 }
 
-foreach (Sensor::getTypes() as $sensor_name) {
-    if (Sensor::where('sensor_class', $sensor_name)->where('device_id', $device['device_id'])->count()) {
-        $datas[] = $sensor_name;
-        $type_text[$sensor_name] = Sensor::getClassDescr($sensor_name);
+foreach (Sensor::getTypes() as $sensor_class) {
+    if (Sensor::where('sensor_class', $sensor_class)->where('device_id', $device['device_id'])->count()) {
+        $datas[] = $sensor_class;
+        $type_text[$sensor_class] = Sensor::getClassDescr($sensor_class);
     }
 }
 

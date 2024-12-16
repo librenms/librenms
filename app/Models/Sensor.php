@@ -130,7 +130,7 @@ class Sensor extends DeviceRelatedModel implements Keyable
         return self::$icons;
     }
 
-    public function guessLimits(bool $high, bool $low): void
+    public function guessLimits(bool $high, bool $high_warn, bool $low_warn, bool $low): void
     {
         if ($high) {
             $this->sensor_limit = match ($this->sensor_class) {
@@ -146,6 +146,19 @@ class Sensor extends DeviceRelatedModel implements Keyable
             };
         }
 
+        if ($high_warn) {
+            $this->sensor_limit_warn = match ($this->sensor_class) {
+                default => null,
+            };
+        }
+
+        if ($low_warn) {
+            $this->sensor_limit_low_warn = match ($this->sensor_class) {
+                'charge' => 50,
+                default => null,
+            };
+        }
+
         if ($low) {
             $this->sensor_limit_low = match ($this->sensor_class) {
                 'temperature' => $this->sensor_current - 10,
@@ -155,6 +168,7 @@ class Sensor extends DeviceRelatedModel implements Keyable
                 'power_factor' => -1,
                 'signal' => -80,
                 'airflow', 'snr', 'frequency', 'pressure', 'cooling' => $this->sensor_current * 0.95,
+                'charge' => 15,
                 default => null,
             };
         }
