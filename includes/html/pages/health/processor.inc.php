@@ -15,7 +15,7 @@
  * @author     LibreNMS Contributors
 */
 
-$pagetitle[] = 'Health :: Processor';
+$pagetitle[] = __('Health') . ' :: ' . __('Processor');
 ?>
 
 <div class="panel panel-default panel-condensed">

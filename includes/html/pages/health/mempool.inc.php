@@ -15,7 +15,7 @@
  * @author     LibreNMS Contributors
 */
 
-$pagetitle[] = 'Health :: Memory';
+$pagetitle[] = __('Health') . ' :: ' . __('Memory');
 $graph_view = $vars['view'] == 'graphs';
 
 ?>

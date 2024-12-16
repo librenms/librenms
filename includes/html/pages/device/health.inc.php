@@ -28,6 +28,7 @@ use App\Models\Mempool;
 use App\Models\Processor;
 use App\Models\Sensor;
 use App\Models\Storage;
+use LibreNMS\Component;
 
 /*
 # QFP count for cisco devices
@@ -35,7 +36,7 @@ use App\Models\Storage;
 
 $qfp = 0;
 if ($device['os_group'] == 'cisco') {
-    $component = new LibreNMS\Component();
+    $component = new Component();
     $components = $component->getComponents($device['device_id'], ['type' => 'cisco-qfp']);
     $components = $components[$device['device_id']];
     $qfp = isset($components) ? count($components) : 0;
@@ -71,12 +72,12 @@ foreach (Sensor::getTypes() as $sensor_class) {
     }
 }
 
-$type_text['overview'] = 'Overview';
-$type_text['qfp'] = 'QFP';
-$type_text['processor'] = 'Processor';
-$type_text['mempool'] = 'Memory';
-$type_text['storage'] = 'Disk Usage';
-$type_text['diskio'] = 'Disk I/O';
+$type_text['overview'] = __('Overview');
+$type_text['qfp'] = __('QFP');
+$type_text['processor'] = __('Processor');
+$type_text['mempool'] = __('Memory');
+$type_text['storage'] = __('Disk Usage');
+$type_text['diskio'] = __('Disk I/O');
 
 $link_array = [
     'page' => 'device',
@@ -86,7 +87,7 @@ $link_array = [
 
 print_optionbar_start();
 
-echo "<span style='font-weight: bold;'>Health</span> &#187; ";
+echo "<span style='font-weight: bold;'>". __('Health') . "</span> &#187; ";
 
 if (empty($vars['metric'])) {
     $vars['metric'] = 'overview';

@@ -17,7 +17,7 @@
 
 use App\Models\Sensor;
 
-$pagetitle[] = 'Health :: ' . Sensor::getClassDescr($active_metric);
+$pagetitle[] = __('Health') . ' :: ' . Sensor::getClassDescr($active_metric);
 
 ?>
 <div class="panel panel-default panel-condensed">

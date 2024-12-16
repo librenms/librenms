@@ -26,13 +26,13 @@ $datas = collect(['mempool', 'processor', 'storage'])
     );
 
 $type_text = collect([
-    'overview' => 'Overview',
-    'temperature' => 'Temperature',
-    'mempool' => 'Memory',
-    'storage' => 'Storage',
-    'diskio' => 'Disk I/O',
-    'processor' => 'Processor',
-    'toner' => 'Toner',
+    'overview' => __('Overview'),
+    'temperature' => __('Temperature'),
+    'mempool' => __('Memory'),
+    'storage' => __('Storage'),
+    'diskio' => __('Disk I/O'),
+    'processor' => __('Processor'),
+    'toner' => __('Toner'),
 ])->merge(collect(Sensor::getTypes())
       ->mapWithKeys(fn ($type) => [$type => Sensor::getClassDescr($type)])
 )->toArray();
@@ -42,7 +42,7 @@ $active_metric = basename(array_key_exists($vars['metric'], $type_text) ? $vars[
 $vars['view'] = $vars['view'] ?? 'detail';
 $link_array = ['page' => 'health'];
 
-$navbar = '<span style="font-weight: bold;">Health</span> &#187; ';
+$navbar = '<span style="font-weight: bold;">' . __('Health') . '</span> &#187; ';
 $sep = '';
 foreach ($datas as $texttype) {
     $metric = strtolower($texttype);
