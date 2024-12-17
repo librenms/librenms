@@ -610,10 +610,17 @@ class Cisco extends OS implements
         $vlans = $this->getDevice()->vlans;
         $instances = new Collection;
 
+        //get Cisco stpxSpanningTreeType
+        $stpxSpanningTreeType = \SnmpQuery::cache()->enumStrings()->hideMib()->get('CISCO-STP-EXTENSIONS-MIB::stpxSpanningTreeType.0')->value();
+
         // attempt to discover context based vlan instances
         foreach ($vlans->isEmpty() ? [null] : $vlans as $vlan) {
             $vlan = (empty($vlan->vlan_vlan) || $vlan->vlan_vlan == '1') ? null : (string) $vlan->vlan_vlan;
-            $instances = $instances->merge(parent::discoverStpInstances($vlan));
+            $instance = parent::discoverStpInstances($vlan);
+            if ($instance[0]->protocolSpecification == 'unknown') {
+                $instance[0]->protocolSpecification = $stpxSpanningTreeType;
+            }
+            $instances = $instances->merge($instance);
         }
 
         return $instances;
