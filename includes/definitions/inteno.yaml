@@ -13,3 +13,4 @@ discovery:
             - '/VxWorks/'
             - '/quanta/i'
             - '/FASTPATH (Switching|Routing)/'
+            - '/SONiC Software Version/'
