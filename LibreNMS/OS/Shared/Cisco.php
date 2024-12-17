@@ -611,7 +611,7 @@ class Cisco extends OS implements
         $instances = new Collection;
 
         //get Cisco stpxSpanningTreeType
-        $stpxSpanningTreeType = \SnmpQuery::cache()->enumStrings()->hideMib()->get('CISCO-STP-EXTENSIONS-MIB::stpxSpanningTreeType.0')->value();
+        $stpxSpanningTreeType = \SnmpQuery::enumStrings()->hideMib()->get('CISCO-STP-EXTENSIONS-MIB::stpxSpanningTreeType.0')->value();
 
         // attempt to discover context based vlan instances
         foreach ($vlans->isEmpty() ? [null] : $vlans as $vlan) {
