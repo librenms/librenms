@@ -28,10 +28,10 @@ namespace App\Http\Controllers\Table;
 use App\Models\Port;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\DB;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Rewrite;
-use LibreNMS\Util\Url;
 
 class PortsController extends TableController
 {
@@ -160,8 +160,8 @@ class PortsController extends TableController
 
         return [
             'status' => $status,
-            'device' => Url::deviceLink($port->device),
-            'port' => Url::portLink($port),
+            'device' => Blade::render('<x-device-link :device="$device" />', ['device' => $port->device]),
+            'port' => Blade::render('<x-port-link :port="$port"/>', ['port' => $port]),
             'secondsIfLastChange' => ceil($port->device?->uptime - ($port->ifLastChange / 100)),
             'ifConnectorPresent' => ($port->ifConnectorPresent == 'true') ? 'yes' : 'no',
             'ifSpeed' => $port->ifSpeed,

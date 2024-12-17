@@ -31,13 +31,13 @@ use DateInterval;
 use DateTime;
 use DateTimeZone;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Blade;
 use LibreNMS\Config;
-use LibreNMS\Util\Url;
 
 class GraylogController extends SimpleTableController
 {
     private $timezone;
-    private $deviceCache = [];
+    private $deviceLinkCache = [];
 
     public function __construct()
     {
@@ -111,16 +111,14 @@ class GraylogController extends SimpleTableController
             $displayTime = $message['message']['timestamp'];
         }
 
-        $origin = $this->deviceFromSource($message['message']['gl2_remote_ip']);
-        $source = $this->deviceFromSource($message['message']['source']);
         $level = $message['message']['level'] ?? '';
         $facility = $message['message']['facility'] ?? '';
 
         return [
-            'origin' => $origin ? Url::deviceLink($origin) : htmlspecialchars($message['message']['gl2_remote_ip']),
+            'origin' => $this->deviceLinkFromSource($message['message']['gl2_remote_ip']),
             'severity' => $this->severityLabel($level),
             'timestamp' => $displayTime,
-            'source' => $source ? Url::deviceLink($source) : htmlspecialchars($message['message']['source']),
+            'source' => $this->deviceLinkFromSource($message['message']['source']),
             'message' => htmlspecialchars($message['message']['message'] ?? ''),
             'facility' => is_numeric($facility) ? "($facility) " . __("syslog.facility.$facility") : $facility,
             'level' => (is_numeric($level) && $level >= 0) ? "($level) " . __("syslog.severity.$level") : $level,
@@ -149,14 +147,18 @@ class GraylogController extends SimpleTableController
      * Cache device lookups so we don't lookup for every entry
      *
      * @param  mixed  $source
-     * @return mixed
+     * @return string
      */
-    private function deviceFromSource($source)
+    private function deviceLinkFromSource($source): string
     {
-        if (! isset($this->deviceCache[$source])) {
-            $this->deviceCache[$source] = Device::findByIp($source) ?: Device::findByHostname($source);
+        if (! isset($this->deviceLinkCache[$source])) {
+            $device = Device::findByIp($source) ?: Device::findByHostname($source);
+
+            $this->deviceLinkCache[$source] = $device
+                ? Blade::render('<x-device-link :device="$device"/>', ['device' => $device])
+                : htmlspecialchars($source);
         }
 
-        return $this->deviceCache[$source];
+        return $this->deviceLinkCache[$source];
     }
 }
