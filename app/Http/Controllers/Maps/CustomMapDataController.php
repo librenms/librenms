@@ -156,8 +156,8 @@ class CustomMapDataController extends Controller
                 $edges[$edgeid]['port_frompct'] = round($edges[$edgeid]['port_frompct'], 2);
                 $edges[$edgeid]['port_tobps'] = $this->rateString($rateto);
                 $edges[$edgeid]['port_frombps'] = $this->rateString($ratefrom);
-                $edges[$edgeid]['width_to'] = $this->speedWidth($speedto) + $rateto / $speedto * 100.0;
-                $edges[$edgeid]['width_from'] = $this->speedWidth($speedfrom) + $ratefrom / $speedfrom * 100.0;
+                $edges[$edgeid]['width_to'] = $this->edgeWidth($speedto,$rateto);
+                $edges[$edgeid]['width_from'] = $this->edgeWidth($speedfrom,$ratefrom);
             }
         }
 
@@ -375,13 +375,15 @@ class CustomMapDataController extends Controller
         return '#FF00FF';
     }
 
-    private function speedWidth(int $speed): float
+    private function edgeWidth(int $speed,int $rate): float
     {
         if ($speed < 1000000) {
-            return 1.0;
+            $speed_width = 1.0;
         }
-
-        return (strlen((string) $speed) - 5) / 2.0;
+        else {
+            $speed_width = (strlen((string) $speed) - 5) / 2.0;
+        }
+        return $speed_width + $rate / $speed * 10;
     }
 
     protected function setNodeDisabledStyle(array &$node_data_array): void
