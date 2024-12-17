@@ -29,9 +29,9 @@ use App\Models\Port;
 use App\Models\PortsNac;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\DB;
 use LibreNMS\Util\Mac;
-use LibreNMS\Util\Url;
 
 class PortNacController extends TableController
 {
@@ -136,10 +136,10 @@ class PortNacController extends TableController
         $mac = Mac::parse($item['mac_address']);
         $item['updated_at'] = $nac->updated_at ? ($item['historical'] == 0 ? $nac->updated_at->diffForHumans() : $nac->updated_at->toDateTimeString()) : '';
         $item['created_at'] = $nac->created_at ? $nac->created_at->toDateTimeString() : '';
-        $item['port_id'] = Url::portLink($nac->port, $nac->port->getShortLabel());
+        $item['port_id'] = Blade::render('<x-port-link :port="$port">{{ $port->getShortLabel() }}</x-port-link>', ['port' => $nac->port]);
         $item['mac_oui'] = $mac->vendor();
         $item['mac_address'] = $mac->readable();
-        $item['device_id'] = Url::deviceLink($nac->device);
+        $item['device_id'] = Blade::render('<x-device-link :device="$device"/>', ['device' => $nac->device]);
         unset($item['device']); //avoid sending all device data in the JSON reply
         unset($item['port']); //free some unused data to be sent to the browser
 
