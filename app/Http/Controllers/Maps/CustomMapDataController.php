@@ -127,8 +127,8 @@ class CustomMapDataController extends Controller
                 }
                 $edges[$edgeid]['port_tobps'] = $this->rateString($rateto);
                 $edges[$edgeid]['port_frombps'] = $this->rateString($ratefrom);
-                $edges[$edgeid]['width_to'] = $this->speedWidth($speedto);
-                $edges[$edgeid]['width_from'] = $this->speedWidth($speedfrom);
+                $edges[$edgeid]['width_to'] = 2 + $rateto / $speedto * 100.0;
+                $edges[$edgeid]['width_from'] = 2 + $ratefrom / $speedfrom * 100.0;
             }
         }
 
