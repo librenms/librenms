@@ -49,6 +49,33 @@ discovery:
         - op: <["=","!=","==","!==","<=",">=","<",">","starts","ends","contains","regex","not_starts","not_ends","not_contains","not_regex","in_array","not_in_array","exists"]>
         - value: <'string' | boolean>
 ```
+- `type` You can override the type of device within any discovery section.
+  In the example below, unifi devices will default to having a type of wireless,
+  but the unifi gateway routers in the second discovery section will have a type
+  of network.
+```
+os: unifi
+text: 'Ubiquiti UniFi'
+type: wireless
+
+.....
+discovery:
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.41112
+            - .1.3.6.1.4.1.8072.3.2.10
+        sysDescr_regex:
+            - '/^UAP/'
+            - '/^U6/'
+            - '/^U7/'
+            - '/^U-LTE/'
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.8072.3.2.10
+        sysDescr_regex:
+            - '/^Ubiquiti UniFi/'
+        type: network
+```
 - `_except` You can add this to any of the above to exclude that
   element. As an example:
 
