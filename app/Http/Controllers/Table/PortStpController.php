@@ -92,7 +92,7 @@ class PortStpController extends TableController
         $db = DeviceCache::get(Stp::where('bridgeAddress', $stpPort->designatedBridge)->value('device_id'));
 
         return [
-            'port_id' => Blade::render('<x-port-link :port="$port">{{ $port->getShortLabel() }}</x-port-link><br /> {{ $port->getDescription() }}', ['port' => $port]),
+            'port_id' => Blade::render('<x-port-link :port="$port">{{ $port->getShortLabel() }}</x-port-link><br /> {{ $port->getDescription() }}', ['port' => $stpPort->port]),
             'vlan' => $stpPort->vlan ?: 1,
             'priority' => $stpPort->priority,
             'state' => $stpPort->state,
