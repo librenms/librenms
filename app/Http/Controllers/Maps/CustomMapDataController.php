@@ -382,7 +382,7 @@ class CustomMapDataController extends Controller
         } else {
             $speed_width = (strlen((string) $speed) - 5) / 2.0;
         }
-        
+
         return $speed_width + $rate / $speed * 10;
     }
 
