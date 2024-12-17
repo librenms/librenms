@@ -156,8 +156,8 @@ class CustomMapDataController extends Controller
                 $edges[$edgeid]['port_frompct'] = round($edges[$edgeid]['port_frompct'], 2);
                 $edges[$edgeid]['port_tobps'] = $this->rateString($rateto);
                 $edges[$edgeid]['port_frombps'] = $this->rateString($ratefrom);
-                $edges[$edgeid]['width_to'] = $this->edgeWidth($speedto,$rateto);
-                $edges[$edgeid]['width_from'] = $this->edgeWidth($speedfrom,$ratefrom);
+                $edges[$edgeid]['width_to'] = $this->edgeWidth($speedto, $rateto);
+                $edges[$edgeid]['width_from'] = $this->edgeWidth($speedfrom, $ratefrom);
             }
         }
 
@@ -375,14 +375,14 @@ class CustomMapDataController extends Controller
         return '#FF00FF';
     }
 
-    private function edgeWidth(int $speed,int $rate): float
+    private function edgeWidth(int $speed, int $rate): float
     {
         if ($speed < 1000000) {
             $speed_width = 1.0;
-        }
-        else {
+        } else {
             $speed_width = (strlen((string) $speed) - 5) / 2.0;
         }
+        
         return $speed_width + $rate / $speed * 10;
     }
 
