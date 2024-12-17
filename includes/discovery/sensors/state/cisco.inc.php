@@ -54,6 +54,8 @@ foreach ($tables as $tablevalue) {
         if ((isset($temp[0][$state_name]) && $temp[0][$state_name] == 'nonRedundant') || (isset($temp[0]['cswMaxSwitchNum']) && $temp[0]['cswMaxSwitchNum'] == '1')) {
             break;
         }
+        // Cisco StackWise Virtual always reports FALSE (2) for cswRingRedundant as this OID has no meaning in the context of StackWise Virtual
+        // Skip the creation of the "Stack Ring - Redundant" state sensor if the device operates in StackWise Virtual mode as identified by "Virtual Stack" in entPhysicalName OID
         if (isset($temp[0]['cswRingRedundant']) && $temp[0]['cswRingRedundant'] == 2 && $entPhysName == 'Virtual Stack') {
             continue;
         }
