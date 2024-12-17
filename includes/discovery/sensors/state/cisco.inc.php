@@ -12,6 +12,7 @@
 
 $role_data = SnmpQuery::walk('CISCO-STACKWISE-MIB::cswSwitchRole')->values();
 $redundant_data = SnmpQuery::enumStrings()->get('CISCO-STACKWISE-MIB::cswRingRedundant.0')->value();
+$entPhysName = SnmpQuery::get('ENTITY-MIB::entPhysicalName.1')->value();
 
 $tables = [
     ['num_oid' => '.1.3.6.1.4.1.9.9.661.1.3.1.1.6.',    'oid' => 'CISCO-WAN-3G-MIB::c3gModemStatus',                            'state_name' => 'c3gModemStatus',                  'descr' => 'Modem status'],
@@ -52,6 +53,9 @@ foreach ($tables as $tablevalue) {
 
         if ((isset($temp[0][$state_name]) && $temp[0][$state_name] == 'nonRedundant') || (isset($temp[0]['cswMaxSwitchNum']) && $temp[0]['cswMaxSwitchNum'] == '1')) {
             break;
+        }
+        if (isset($temp[0]['cswRingRedundant']) && $temp[0]['cswRingRedundant'] == 2 && $entPhysName == 'Virtual Stack') {
+            continue;
         }
 
         //Create State Index
