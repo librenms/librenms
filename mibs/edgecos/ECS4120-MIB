@@ -502,7 +502,7 @@ SwitchFanEntry ::= SEQUENCE
     switchUnitIndex     Integer32,
     switchFanIndex      Integer32,
     switchFanStatus     INTEGER,
-    switchFanOperSpeed    Integer32,
+    switchFanOperSpeed    Integer32
 }
 
 switchUnitIndex OBJECT-TYPE
@@ -6998,7 +6998,7 @@ vlanPortMode OBJECT-TYPE
                     Setting it to access(3) sets an access link."
         ::= { vlanPortEntry 2 }
 
---¡@SYS_CPNT_COMMUNITY_PRIVATE_VLAN¡@(use PVLAN_MGR API) start
+-- SYS_CPNT_COMMUNITY_PRIVATE_VLAN (use PVLAN_MGR API) start
 vlanPortPrivateVlanType OBJECT-TYPE
         SYNTAX     INTEGER
                    {
@@ -18107,8 +18107,8 @@ dhcpSnoopInformationOptionRID     OBJECT-TYPE
                         string(5),
                         tr101IP(6),
                         tr101Sysname(7),
-                        string_plus_port_description(8),
-                        port_description(9)
+                        stringPlusPortDescription(8),
+                        portDescription(9)
                     }
         MAX-ACCESS  read-write
         STATUS      current
@@ -22154,7 +22154,7 @@ ip6SrcGuardPortIfIndex       OBJECT-TYPE
         ::= { ip6SrcGuardConfigEntry 1 }
 
 ip6SrcGuardMode      OBJECT-TYPE
-        SYNTAX      INTEGER { disabled(1), srcIp(2), srcPrefix(3) srcIp-srcPrefix(4)}
+        SYNTAX      INTEGER { disabled(1), srcIp(2), srcPrefix(3), srcIp-srcPrefix(4)}
         MAX-ACCESS  read-write
         STATUS      current
         DESCRIPTION "This object indicates whether IPv6 Source Guard is enabled

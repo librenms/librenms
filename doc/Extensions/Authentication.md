@@ -196,6 +196,13 @@ setsebool -P httpd_can_connect_ldap 1
 Install __php_ldap__ or __php7.0-ldap__, making sure to install the
 same version as PHP.
 
+For the below, keep in mind the auth DN is composed using a string
+join of `auth_ldap_prefix`, the username, and `auth_ldap_suffix`. This
+means it needs to include `=` in the prefix and `,` in the suffix. So
+lets say we have a prefix of `uid=`, the user `derp`, and the suffix of
+`,ou=users,dc=foo,dc=bar`, then the result is
+`uid=derp,ou=users,dc=foo,dc=bar`.
+
 ### Standard config
 
 !!! setting "auth/ldap"

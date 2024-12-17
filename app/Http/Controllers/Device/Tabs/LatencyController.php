@@ -27,10 +27,10 @@ namespace App\Http\Controllers\Device\Tabs;
 
 use App\Models\Device;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 use LibreNMS\Config;
 use LibreNMS\Interfaces\UI\DeviceTab;
 use LibreNMS\Util\Smokeping;
-use Request;
 
 class LatencyController implements DeviceTab
 {
@@ -54,10 +54,10 @@ class LatencyController implements DeviceTab
         return __('Latency');
     }
 
-    public function data(Device $device): array
+    public function data(Device $device, Request $request): array
     {
-        $from = Request::get('dtpickerfrom', Carbon::now(session('preferences.timezone'))->subDays(2)->format(Config::get('dateformat.byminute')));
-        $to = Request::get('dtpickerto', Carbon::now(session('preferences.timezone'))->format(Config::get('dateformat.byminute')));
+        $from = $request->get('dtpickerfrom', Carbon::now(session('preferences.timezone'))->subDays(2)->format(Config::get('dateformat.byminute')));
+        $to = $request->get('dtpickerto', Carbon::now(session('preferences.timezone'))->format(Config::get('dateformat.byminute')));
 
         $smokeping = new Smokeping($device);
         $smokeping_tabs = [];

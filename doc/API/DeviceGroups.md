@@ -212,7 +212,7 @@ Output:
 
 Set a device group into maintenance mode.
 
-Route: `/api/v0/devicesgroups/:name/maintenance`
+Route: `/api/v0/devicegroups/:name/maintenance`
 
 Input (JSON):
 
@@ -276,7 +276,7 @@ Output:
 
 Add devices to a device group.
 
-Route: `/api/v0/devicesgroups/:name/devices`
+Route: `/api/v0/devicegroups/:name/devices`
 
 - name Is the name of the device group which can be obtained using
   [`get_devicegroups`](#function-get_devicegroups). Please ensure that
@@ -308,7 +308,7 @@ Output:
 
 Removes devices from a device group.
 
-Route: `/api/v0/devicesgroups/:name/devices`
+Route: `/api/v0/devicegroups/:name/devices`
 
 - name Is the name of the device group which can be obtained using
   [`get_devicegroups`](#function-get_devicegroups). Please ensure that

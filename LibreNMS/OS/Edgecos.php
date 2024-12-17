@@ -56,9 +56,9 @@ class Edgecos extends OS implements MempoolsDiscovery, ProcessorDiscovery
         ]);
 
         if (! empty($data['memoryAllocated.0'])) {
-            $mempool->mempool_used_oid = Oid::toNumeric('memoryAllocated.0', $mib);
+            $mempool->mempool_used_oid = Oid::of('memoryAllocated.0')->toNumeric($mib);
         } else {
-            $mempool->mempool_free_oid = Oid::toNumeric('memoryFreed.0', $mib);
+            $mempool->mempool_free_oid = Oid::of('memoryFreed.0')->toNumeric($mib);
         }
 
         $mempool->fillUsage($data['memoryAllocated.0'] ?? null, $data['memoryTotal.0'] ?? null, $data['memoryFreed.0']);
@@ -117,7 +117,7 @@ class Edgecos extends OS implements MempoolsDiscovery, ProcessorDiscovery
             ];
         }
 
-        return [];
+        return parent::discoverProcessors();
     }
 
     /**

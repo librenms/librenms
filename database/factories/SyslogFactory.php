@@ -2,18 +2,15 @@
 
 namespace Database\Factories;
 
-use App\Models\Syslog;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use LibreNMS\Enum\SyslogSeverity;
 
-/** @extends Factory<Syslog> */
+/** @extends Factory<\App\Models\Syslog> */
 class SyslogFactory extends Factory
 {
     /**
      * Define the model's default state.
-     *
-     * @return array
      */
     public function definition(): array
     {

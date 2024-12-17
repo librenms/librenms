@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Str;
+use LibreNMS\Config;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\JsonAppBase64DecodeException;
 use LibreNMS\Exceptions\JsonAppBlankJsonException;
@@ -13,6 +14,7 @@ use LibreNMS\Exceptions\JsonAppWrongVersionException;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Number;
+use LibreNMS\Util\Oid;
 use LibreNMS\Util\UserFuncHelper;
 
 function bulk_sensor_snmpget($device, $sensors)
@@ -40,8 +42,8 @@ function bulk_sensor_snmpget($device, $sensors)
 function sensor_precache($device, $type)
 {
     $sensor_cache = [];
-    if (file_exists('includes/polling/sensors/pre-cache/' . $device['os'] . '.inc.php')) {
-        include 'includes/polling/sensors/pre-cache/' . $device['os'] . '.inc.php';
+    if (file_exists(Config::get('install_dir') . '/includes/polling/sensors/pre-cache/' . $device['os'] . '.inc.php')) {
+        include Config::get('install_dir') . '/includes/polling/sensors/pre-cache/' . $device['os'] . '.inc.php';
     }
 
     return $sensor_cache;
@@ -76,11 +78,10 @@ function poll_sensor($device, $class)
             $mibdir = null;
 
             $sensor_value = trim(str_replace('"', '', $snmp_data[$sensor['sensor_oid']] ?? ''));
-
-            if (file_exists('includes/polling/sensors/' . $class . '/' . $device['os'] . '.inc.php')) {
-                require 'includes/polling/sensors/' . $class . '/' . $device['os'] . '.inc.php';
-            } elseif (isset($device['os_group']) && file_exists('includes/polling/sensors/' . $class . '/' . $device['os_group'] . '.inc.php')) {
-                require 'includes/polling/sensors/' . $class . '/' . $device['os_group'] . '.inc.php';
+            if (file_exists(Config::get('install_dir') . '/includes/polling/sensors/' . $class . '/' . $device['os'] . '.inc.php')) {
+                require Config::get('install_dir') . '/includes/polling/sensors/' . $class . '/' . $device['os'] . '.inc.php';
+            } elseif (isset($device['os_group']) && file_exists(Config::get('install_dir') . '/includes/polling/sensors/' . $class . '/' . $device['os_group'] . '.inc.php')) {
+                require Config::get('install_dir') . '/includes/polling/sensors/' . $class . '/' . $device['os_group'] . '.inc.php';
             }
 
             if ($class == 'state') {
@@ -441,7 +442,7 @@ function update_application($app, $response, $metrics = [], $status = '')
  */
 function json_app_get($device, $extend, $min_version = 1)
 {
-    $output = snmp_get($device, 'nsExtendOutputFull.' . \LibreNMS\Util\Oid::ofString($extend), '-Oqv', 'NET-SNMP-EXTEND-MIB');
+    $output = snmp_get($device, 'nsExtendOutputFull.' . Oid::encodeString($extend), '-Oqv', 'NET-SNMP-EXTEND-MIB');
 
     // save for returning if not JSON
     $orig_output = $output;

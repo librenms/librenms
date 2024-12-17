@@ -8971,5 +8971,31 @@
                 }
             ]
         }
+    },
+    "entity-physical": {
+        "discovery": {
+            "entPhysical": [
+                {
+                    "entPhysicalIndex": 1,
+                    "entPhysicalDescr": "Falcon-MX",
+                    "entPhysicalClass": "chassis",
+                    "entPhysicalName": "<private>",
+                    "entPhysicalHardwareRev": "",
+                    "entPhysicalFirmwareRev": "7.4.4.24",
+                    "entPhysicalSoftwareRev": "7.4.4.24",
+                    "entPhysicalAlias": "None",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "true",
+                    "entPhysicalModelName": "Jaguar2-cu8sfp16",
+                    "entPhysicalVendorType": "enterprises.4467.1000.340",
+                    "entPhysicalSerialNum": "System MAC: 00-05-80-05-91-60",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": -1,
+                    "entPhysicalMfgName": "",
+                    "ifIndex": null
+                }
+            ]
+        },
+        "poller": "matches discovery"
     }
 }

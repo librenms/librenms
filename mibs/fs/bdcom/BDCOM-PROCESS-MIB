@@ -1,0 +1,404 @@
+-- *****************************************************************
+-- BDCOM-PROCESS-MIB.my: MIB for CPU and process statistics
+--
+-- October 2003
+--
+-- Copyright (c) 2003 by BDCOM, Inc.
+-- All rights reserved.
+-- *****************************************************************
+--
+
+BDCOM-PROCESS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY,
+	OBJECT-TYPE,
+	Counter32,
+	Gauge32
+		FROM SNMPv2-SMI
+	TimeStamp,
+	DisplayString
+		FROM SNMPv2-TC
+	MODULE-COMPLIANCE,
+	OBJECT-GROUP
+		FROM SNMPv2-CONF
+	bdMgmt
+		FROM BDCOM-SMI
+	Unsigned32 FROM SNMPv2-SMI
+	EntPhysicalIndexOrZero
+		FROM BDCOM-TC;
+
+
+bdcomProcessMIB MODULE-IDENTITY
+	LAST-UPDATED "200311060000Z"
+	ORGANIZATION "BDCOM, Inc."
+	CONTACT-INFO
+		" Tel:   +86-21-50800666  
+		 Postal: No.123,Juli RD,Zhangjiang Hitech Park,
+			 Shanghai Baud Data Communication Corporation Inc,
+			 Shanghai City 201203,
+		 	P.R.C "
+	DESCRIPTION
+		"The MIB module to describe active system processes."
+	REVISION        "200310160000Z"
+	DESCRIPTION
+		"Initial version of this MIB."		
+	::= { bdMgmt 109 }
+
+-- This MIB displays memory and CPU utilization on cisco devices. CPU 
+-- utilization will give a general idea of how busy the processor is. 
+-- The numbers are a ratio of the current idle time over the longest 
+-- idle time. Please note that this information should be used as an 
+-- estimate only. 
+
+bdcomProcessMIBObjects	OBJECT IDENTIFIER ::= { bdcomProcessMIB 1 }
+bdpmCPU		OBJECT IDENTIFIER ::= { bdcomProcessMIBObjects 1 }
+bdpmProcess		OBJECT IDENTIFIER ::= { bdcomProcessMIBObjects 2 }
+
+
+--BDCOM CPU Total Table
+
+bdpmCPUTotalTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF BdpmCPUTotalEntry
+	MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+		"A table of overall CPU statistics. "
+	::= { bdpmCPU 1 }
+
+bdpmCPUTotalEntry OBJECT-TYPE
+	SYNTAX		BdpmCPUTotalEntry
+	MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+		"Overall information about the CPU load. Entries in this
+		table come and go as CPUs are added and removed from the
+		system."
+	INDEX	{ bdpmCPUTotalIndex }
+	::= { bdpmCPUTotalTable 1 }
+
+BdpmCPUTotalEntry ::=
+	SEQUENCE {
+		bdpmCPUTotalIndex		Unsigned32,
+		bdpmCPUTotalPhysicalIndex	EntPhysicalIndexOrZero,
+		bdpmCPUTotal5sec		Gauge32,
+		bdpmCPUTotal1min		Gauge32,
+		bdpmCPUTotal5min		Gauge32
+	}
+
+bdpmCPUTotalIndex OBJECT-TYPE
+	SYNTAX          Unsigned32 (1.. 4294967295)
+	MAX-ACCESS      not-accessible
+	STATUS          current
+	DESCRIPTION
+		"An index that uniquely represents a CPU (or group of CPUs)
+		whose CPU load information is reported by a row in this table.
+		This index is assigned arbitrarily by the engine
+		and is not saved over reboots."
+	::= { bdpmCPUTotalEntry 1 }
+
+bdpmCPUTotalPhysicalIndex OBJECT-TYPE
+	SYNTAX	        EntPhysicalIndexOrZero
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+		"The entPhysicalIndex of the physical entity for which
+		 the CPU statistics in this entry are maintained.
+		 The physical entity can be a CPU chip, a group of CPUs,
+		 a CPU card etc. The exact type of this entity is described by
+		 its entPhysicalVendorType value. If the CPU statistics
+		 in this entry correspond to more than one physical entity
+		 (or to no physical entity), or if the entPhysicalTable is
+		 not supported on the SNMP agent, the value of this object
+		 must be zero."
+	::= { bdpmCPUTotalEntry 2 }
+
+bdpmCPUTotal5sec OBJECT-TYPE
+        SYNTAX          Gauge32 (1..100)
+	UNITS		"percent"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+		"The overall CPU busy percentage in the last 5 second 
+		period. This object obsoletes the busyPer object from 
+		the OLD-CISCO-SYSTEM-MIB. This object is deprecated
+		by bdpmCPUTotal5secRev which has the changed range of
+		value (0..100)."
+	::= { bdpmCPUTotalEntry 3 }
+
+bdpmCPUTotal1min OBJECT-TYPE
+        SYNTAX          Gauge32  (1..100)
+	UNITS		"percent"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+		"The overall CPU busy percentage in the last 1 minute
+		period. This object obsoletes the avgBusy1 object from 
+		the OLD-CISCO-SYSTEM-MIB. This object is deprecated
+		by bdpmCPUTotal1minRev which has the changed range
+		of value (0..100)."
+	::= { bdpmCPUTotalEntry 4 }
+
+bdpmCPUTotal5min OBJECT-TYPE
+        SYNTAX          Gauge32 (1..100)
+	UNITS		"percent"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+		"The overall CPU busy percentage in the last 5 minute
+		period. This object deprecates the avgBusy5 object from 
+		the OLD-CISCO-SYSTEM-MIB. This object is deprecated
+		by bdpmCPUTotal5minRev which has the changed range 
+		of value (0..100)."
+	::= { bdpmCPUTotalEntry 5 }
+
+
+-- BDCOM Processes Common Table
+
+bdpmProcessTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF BdpmProcessEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+		"A table of generic information on all active 
+		processes on this device."
+	::= { bdpmProcess 1 }
+
+bdpmProcessEntry OBJECT-TYPE
+	SYNTAX    	BdpmProcessEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+		"Generic information about an active process on this 
+		device. Entries in this table come and go as processes are 
+		created and destroyed by the device."
+	INDEX	{ bdpmCPUTotalIndex, bdpmProcessPID }
+	::= { bdpmProcessTable 1 }
+
+BdpmProcessEntry ::=
+	SEQUENCE {
+		bdpmProcessPID
+			Unsigned32,
+		bdpmProcessName 
+			DisplayString,
+		bdpmProcessPriority
+			INTEGER,
+		bdpmProcessTimeCreated
+			TimeStamp
+	}
+
+bdpmProcessPID OBJECT-TYPE
+	SYNTAX    	Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+		"This object contains the process ID. bdpmProcessTimeCreated
+		should be checked against the last time it was polled,
+		and if it has changed the PID has been reused and the
+		 entire entry should be polled again. The process IDs
+		are discrete."
+	::= { bdpmProcessEntry 1 }
+
+bdpmProcessName OBJECT-TYPE
+	SYNTAX    	DisplayString(SIZE(1..32))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+		"The name associated with this process. If the name is
+		longer than 32 characters, it will be truncated to the first
+		31 characters, and a `*' will be appended as the last
+		character to imply this is a truncated process name."
+	::= { bdpmProcessEntry 2 }
+
+bdpmProcessPriority OBJECT-TYPE
+	SYNTAX		INTEGER {
+				critical(0),
+				veryhigh(55),
+				high(60),
+				normal(128),
+				low(180),
+				verylow(255)
+			}
+	MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+		"The priority level at which the process is 
+		running. This object is deprecated by
+		bdpmProcExtPriorityRev."
+	::= { bdpmProcessEntry 3 }
+
+bdpmProcessTimeCreated OBJECT-TYPE
+	SYNTAX		TimeStamp
+	MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+		"The time when the process was created. The process ID 
+		and the time when the process was created, uniquely 
+		identifies a process."
+	::= { bdpmProcessEntry 4 }
+
+-- notifications
+
+bdcomProcessMIBNotifPrefix OBJECT IDENTIFIER ::= { bdcomProcessMIB 2 }
+bdcomProcessMIBNotifs OBJECT IDENTIFIER ::=
+	{ bdcomProcessMIBNotifPrefix 0 }
+
+-- (no notifications are currently defined)
+
+
+-- conformance information
+--
+--bdcomProcessMIBConformance OBJECT IDENTIFIER ::= { bdcomProcessMIB 3 }
+--bdpmCompliances OBJECT IDENTIFIER ::= { bdcomProcessMIBConformance 1 }
+--bdpmGroups OBJECT IDENTIFIER ::=      { bdcomProcessMIBConformance 2 }
+--
+--bdProcessMIBCompliance  MODULE-COMPLIANCE
+--	STATUS	deprecated
+--	DESCRIPTION
+--		"The compliance statement for entities which implement
+--		the BDCOM Process MIB. This is deprecated and new 
+--		compliance bdProcessMIBComplianceRev is added."
+-- this module
+--	MODULE	
+--		MANDATORY-GROUPS { bdpmCPUTotalGroup, bdpmProcessGroup }
+--
+--
+--	GROUP bdpmProcessExtGroup
+--	DESCRIPTION
+--		"The bdpmProcessExtGroup is optional for all entities."
+--
+--	OBJECT		bdpmProcExtPriority
+--	MIN-ACCESS	read-only
+--	DESCRIPTION     "Write access is not required."
+--
+--	::= { bdpmCompliances 1 }
+--
+--bdProcessMIBComplianceRev  MODULE-COMPLIANCE
+--	STATUS	current
+--	DESCRIPTION
+--		"The compliance statement for entities which implement
+--		the BDCOM Process MIB. This compliance module
+--		deprecates bdProcessMIBCompliance."
+-- this module
+--	MODULE	
+--		MANDATORY-GROUPS { bdpmCPUTotalGroupRev, bdpmProcessGroupRev}	
+--
+--	GROUP bdpmProcessExtGroupRev
+--	DESCRIPTION
+--		"The bdpmProcessExtGroupRev is optional for all
+--		entities. This object is defined after deprecating
+--		bdpmProcessExtGroup."
+--	
+--	::= { bdpmCompliances 2 }
+--
+-- units of conformance
+--
+--bdpmCPUTotalGroup OBJECT-GROUP
+--	OBJECTS {
+--		bdpmCPUTotalPhysicalIndex,
+--		bdpmCPUTotal5sec,
+--		bdpmCPUTotal1min,
+--		bdpmCPUTotal5min
+--	}
+--	STATUS  deprecated
+--	DESCRIPTION
+--		"A collection of objects providing CPU load monitoring
+--		information. This group is mandatory for all cisco devices.
+--		This group is deprecated since the objects bdpmCPUTotal5sec,
+--		bdpmCPUTotal1min and bdpmCPUTotal5min are
+--		deprecated. A new object bdpmCPUTotalGroupRev is
+--		added in place of it."
+--	::= { bdpmGroups 1 }
+--
+--bdpmProcessGroup OBJECT-GROUP
+--	OBJECTS {
+--		bdpmProcessPID,
+--		bdpmProcessName,
+--		bdpmProcessuSecs,
+--		bdpmProcessTimeCreated
+--	}
+--	STATUS	deprecated
+--	DESCRIPTION
+--		"A collection of objects providing common process 
+--		monitoring information. This group is mandatory for 
+--		all cisco devices. This object is deprecated
+--		by bdpmProcessGroupRev."
+--	::= { bdpmGroups 2 }
+--
+--bdpmProcessExtGroup OBJECT-GROUP
+--	OBJECTS {
+--		bdpmProcExtMemAllocated,
+--		bdpmProcExtMemFreed,
+--		bdpmProcExtInvoked,
+--		bdpmProcExtRuntime,
+--		bdpmProcExtUtil5Sec,
+--		bdpmProcExtUtil1Min,
+--		bdpmProcExtUtil5Min,
+--		bdpmProcExtPriority
+--	}
+--	STATUS	deprecated
+--	DESCRIPTION
+--		"A collection of objects providing additional and 
+--		more detailed process monitoring information. This 
+--		group is mandatory for all cisco devices that have 
+--		the internal capability to keep this information. 
+--		This group is deprecated and new group
+--		bdpmProcessExtGroupRev is added."
+--	::= { bdpmGroups 3 }
+--
+--bdpmCPUTotalGroupRev OBJECT-GROUP
+--	OBJECTS {
+--		bdpmCPUTotalPhysicalIndex,
+--		bdpmCPUTotal5secRev,
+--		bdpmCPUTotal1minRev,
+--		bdpmCPUTotal5minRev
+--	}
+--	STATUS  current
+--	DESCRIPTION
+--		"A collection of objects providing CPU load monitoring
+--		information. This group is mandatory for all cisco
+--		devices. This group deprecates bdpmCPUTotalGroup."
+--	::= { bdpmGroups 4 }
+--
+--bdpmProcessExtGroupRev OBJECT-GROUP
+--	OBJECTS {
+--		bdpmProcExtMemAllocatedRev,
+--		bdpmProcExtMemFreedRev,
+--		bdpmProcExtInvokedRev,
+--		bdpmProcExtRuntimeRev,
+--		bdpmProcExtUtil5SecRev,
+--		bdpmProcExtUtil1MinRev,
+--		bdpmProcExtUtil5MinRev,
+--		bdpmProcExtPriorityRev
+--	}
+--	STATUS	current
+--	DESCRIPTION
+--		"A collection of objects providing additional and 
+--		more detailed process monitoring information. This 
+--		group is mandatory for all cisco devices that have 
+--		the internal capability to keep this information.
+--		This group is formed after deprecating bdpmProcessExtGroup.
+--		bdpmProcExtMemAllocatedRev, bdpmProcExtMemFreedRev,
+--		bdpmProcExtInvokedRev, bdpmProcExtRuntimeRev,
+--		bdpmProcExtUtil5SecRev, bdpmProcExtUtil1MinRev and 
+--		bdpmProcExtUtil5MinRev are the new objects added."
+--	::= { bdpmGroups 5 }
+--
+--bdpmProcessGroupRev OBJECT-GROUP
+--	OBJECTS {
+--		bdpmProcessPID,
+--		bdpmProcessName,
+--		bdpmProcessAverageUSecs,
+--		bdpmProcessTimeCreated
+--	}
+--	STATUS	current
+--	DESCRIPTION
+--		"A collection of objects providing common process 
+--		monitoring information. This group is mandatory for 
+--		all cisco devices. This object deprecates
+--		bdpmProcessGroup."
+--	::= { bdpmGroups 6 }
+
+END
+
+

@@ -48,9 +48,9 @@ if (! empty($_POST['editing'])) {
 
         if ($device_model->isDirty()) {
             if ($device_model->save()) {
-                flash()->addSuccess(__('Device record updated'));
+                toast()->success(__('Device record updated'));
             } else {
-                flash()->addError(__('Device record update error'));
+                toast()->error(__('Device record update error'));
             }
         }
 
@@ -58,13 +58,13 @@ if (! empty($_POST['editing'])) {
             if (Auth::user()->hasGlobalAdmin()) {
                 $result = renamehost($device['device_id'], trim($_POST['hostname']), 'webui');
                 if ($result == '') {
-                    flash()->addSuccess("Hostname updated from {$device['hostname']} to {$_POST['hostname']}");
+                    toast()->success("Hostname updated from {$device['hostname']} to {$_POST['hostname']}");
                     $reload = true;
                 } else {
-                    flash()->addError($result . '.  Does your web server have permission to modify the rrd files?');
+                    toast()->error($result . '.  Does your web server have permission to modify the rrd files?');
                 }
             } else {
-                flash()->addError('Only administrative users may update the device hostname');
+                toast()->error('Only administrative users may update the device hostname');
             }
         }
 
@@ -387,7 +387,7 @@ If `devices.ignore = 0` or `macros.device = 1` condition is is set and ignore al
 <?php
 print_optionbar_start();
 [$sizeondisk, $numrrds] = foldersize(Rrd::dirFromHost($device['hostname']));
-echo 'Size on Disk: <b>' . \LibreNMS\Util\Number::formatBi($sizeondisk, 2, 3) . '</b> in <b>' . $numrrds . ' RRD files</b>.';
+echo 'Size on Disk: <b>' . \LibreNMS\Util\Number::formatBi($sizeondisk, 2, 0) . '</b> in <b>' . $numrrds . ' RRD files</b>.';
 echo ' | Last polled: <b>' . $device['last_polled'] . '</b>';
 if ($device['last_discovered']) {
     echo ' | Last discovered: <b>' . $device['last_discovered'] . '</b>';

@@ -27,6 +27,7 @@ namespace App\Http\Controllers\Device\Tabs;
 
 use App\Facades\DeviceCache;
 use App\Models\Device;
+use Illuminate\Http\Request;
 use LibreNMS\Config;
 use LibreNMS\Interfaces\UI\DeviceTab;
 
@@ -67,7 +68,7 @@ class InventoryController implements DeviceTab
         return __('Inventory');
     }
 
-    public function data(Device $device): array
+    public function data(Device $device, Request $request): array
     {
         return [
             'tab' => $this->type, // inject to load correct legacy file

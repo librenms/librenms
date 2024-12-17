@@ -1,6 +1,9 @@
 <?php
 
 return [
+    'config:clear' => [
+        'description' => 'Clear config cache.  This will allow any changes that have been made since the last full config load to be reflected in the current config.',
+    ],
     'config:get' => [
         'description' => 'Get configuration value',
         'arguments' => [
@@ -63,6 +66,7 @@ return [
         'exit' => 'Ctrl-C to stop',
         'removed' => 'Device :id removed',
         'updated' => 'Device :hostname (:id) updated',
+        'setup' => 'Setting up snmpsim venv in :dir',
     ],
     'device:add' => [
         'description' => 'Add a new device',
@@ -234,6 +238,7 @@ return [
             'oid(s)' => 'One or more SNMP OID to fetch.  Should be either MIB::oid or a numeric oid',
         ],
         'failed' => 'SNMP command failed!',
+        'numeric' => 'Numeric',
         'oid' => 'OID',
         'options' => [
             'output' => 'Specify the output format :formats',
@@ -241,6 +246,7 @@ return [
             'depth' => 'Depth to group the snmp table at. Usually the same number as the items in the index of the table',
         ],
         'not_found' => 'Device not found',
+        'textual' => 'Textual',
         'value' => 'Value',
     ],
     'translation:generate' => [
@@ -261,5 +267,8 @@ return [
         'password-request' => "Please enter the user's password",
         'success' => 'Successfully added user: :username',
         'wrong-auth' => 'Warning! You will not be able to log in with this user because you are not using MySQL auth',
+    ],
+    'maintenance:database-cleanup' => [
+        'description' => 'Database cleanup of orphaned items.',
     ],
 ];

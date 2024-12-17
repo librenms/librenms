@@ -100,19 +100,28 @@ class Availability implements Module
         $os->getDevice()->availability()->whereNotIn('availability_id', $valid_ids)->delete();
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function cleanup(Device $device): void
+    public function dataExists(Device $device): bool
     {
-        $device->availability()->delete();
+        return $device->availability()->exists();
     }
 
     /**
      * @inheritDoc
      */
-    public function dump(Device $device)
+    public function cleanup(Device $device): int
     {
+        return $device->availability()->delete();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function dump(Device $device, string $type): ?array
+    {
+        if ($type == 'discovery') {
+            return null;
+        }
+
         return [
             'availability' => $device->availability()->orderBy('duration')
                 ->get()->map->makeHidden(['availability_id', 'device_id']),

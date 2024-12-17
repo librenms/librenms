@@ -12471,5 +12471,31 @@
                 }
             ]
         }
+    },
+    "entity-physical": {
+        "discovery": {
+            "entPhysical": [
+                {
+                    "entPhysicalIndex": 1,
+                    "entPhysicalDescr": "Falcon-X/424",
+                    "entPhysicalClass": "stack",
+                    "entPhysicalName": "<private>",
+                    "entPhysicalHardwareRev": "1.2.1.6.0",
+                    "entPhysicalFirmwareRev": "1.4.4",
+                    "entPhysicalSoftwareRev": "6.4.7.4",
+                    "entPhysicalAlias": "None",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "true",
+                    "entPhysicalModelName": "",
+                    "entPhysicalVendorType": "zeroDotZero",
+                    "entPhysicalSerialNum": "704014060028",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": -1,
+                    "entPhysicalMfgName": "",
+                    "ifIndex": null
+                }
+            ]
+        },
+        "poller": "matches discovery"
     }
 }

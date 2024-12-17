@@ -2444,5 +2444,31 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "entity-physical": {
+        "discovery": {
+            "entPhysical": [
+                {
+                    "entPhysicalIndex": 1,
+                    "entPhysicalDescr": "MB2520 L2F6PRRB",
+                    "entPhysicalClass": "other",
+                    "entPhysicalName": "MB2520 L2F6PRRB",
+                    "entPhysicalHardwareRev": "ne",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "true",
+                    "entPhysicalModelName": "LBB_350",
+                    "entPhysicalVendorType": "zeroDotZero",
+                    "entPhysicalSerialNum": "T2012008334003892",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": -1,
+                    "entPhysicalMfgName": "",
+                    "ifIndex": null
+                }
+            ]
+        },
+        "poller": "matches discovery"
     }
 }

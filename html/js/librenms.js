@@ -181,30 +181,6 @@ $(document).on("click", '.collapse-neighbors', function(event)
     continued.toggle();
 });
 
-//availability-map mode change
-$(document).on("change", '#mode', function() {
-    $.post('ajax/set_map_view',
-        {
-            map_view: $(this).val()
-        },
-        function(data) {
-                location.reload();
-        },'json'
-    );
-});
-
-//availability-map device group
-$(document).on("change", '#group', function() {
-    $.post('ajax/set_map_group',
-        {
-            group_view: $(this).val()
-        },
-        function(data){
-            location.reload();
-        },'json'
-    );
-});
-
 $(document).ready(function() {
     var lines = 'on';
     $("#linenumbers").button().on("click", function() {
@@ -356,6 +332,53 @@ function init_map(id, config = {}) {
             (config.layer in baseMaps ? baseMaps[config.layer] : roads).addTo(leaflet);
             leaflet.layerControl._container.style.display = (config.readonly ? 'none' : 'block');
         });
+    } else if (config.engine === 'esri') {
+        leaflet.setMaxZoom(18);
+        // use vector maps if we have an API key
+        if (config.api_key) {
+            loadjs('js/esri-leaflet.js', function () {
+                loadjs('js/esri-leaflet-vector.js', function () {
+                    var roads = L.esri.Vector.vectorBasemapLayer("ArcGIS:Streets", {
+                        apikey: config.api_key
+                    });
+                    var topology = L.esri.Vector.vectorBasemapLayer("ArcGIS:Topographic", {
+                        apikey: config.api_key
+                    });
+                    var satellite = L.esri.Vector.vectorBasemapLayer("ArcGIS:Imagery", {
+                        apikey: config.api_key
+                    });
+
+                    baseMaps = {
+                        "Streets": roads,
+                        "Topography": topology,
+                        "Satellite": satellite
+                    };
+                    leaflet.layerControl = L.control.layers(baseMaps, null, {position: 'bottomleft'}).addTo(leaflet);
+                    (config.layer in baseMaps ? baseMaps[config.layer] : roads).addTo(leaflet);
+                    leaflet.layerControl._container.style.display = (config.readonly ? 'none' : 'block');
+                });
+            });
+        } else {
+            let attribution = 'Powered by <a href="https://www.esri.com/">Esri</a> | Esri Community Maps Contributors, Maxar, Microsoft, Iowa DNR, © OpenStreetMap, Microsoft, TomTom, Garmin, SafeGraph, GeoTechnologies, Inc, METI/NASA, USGS, EPA, NPS, US Census Bureau, USDA, USFWS';
+            var roads = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+                attribution: attribution
+            });
+            var topology = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x', {
+                attribution: attribution
+            });
+            var satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                attribution: attribution
+            });
+
+            baseMaps = {
+                "Streets": roads,
+                "Topography": topology,
+                "Satellite": satellite
+            };
+            leaflet.layerControl = L.control.layers(baseMaps, null, {position: 'bottomleft'}).addTo(leaflet);
+            (config.layer in baseMaps ? baseMaps[config.layer] : roads).addTo(leaflet);
+            leaflet.layerControl._container.style.display = (config.readonly ? 'none' : 'block');
+        }
     } else {
         leaflet.setMaxZoom(20);
         const tile_url = config.tile_url ? config.tile_url : '{s}.tile.openstreetmap.org';
@@ -390,83 +413,6 @@ function destroy_map(id) {
         leaflet.remove();
         delete window.maps[id];
     }
-}
-
-function populate_map_markers(map_id, group_radius = 10, status = [0,1], device_group = 0) {
-    $.ajax({
-        type: "GET",
-        url: ajax_url + '/dash/worldmap',
-        dataType: "json",
-        data: { status: status, device_group: device_group },
-        success: function (data) {
-            var redMarker = L.AwesomeMarkers.icon({
-                icon: 'server',
-                markerColor: 'red', prefix: 'fa', iconColor: 'white'
-            });
-            var blueMarker = L.AwesomeMarkers.icon({
-                icon: 'server',
-                markerColor: 'blue', prefix: 'fa', iconColor: 'white'
-            });
-            var greenMarker = L.AwesomeMarkers.icon({
-                icon: 'server',
-                markerColor: 'green', prefix: 'fa', iconColor: 'white'
-            });
-
-            var markers = data.map((device) => {
-                var markerData = {title: device.name};
-                switch (device.status) {
-                    case 0: // down
-                        markerData.icon = redMarker;
-                        markerData.zIndexOffset = 5000;
-                        break;
-                    case 3: // down + maintenance
-                        markerData.icon = blueMarker;
-                        markerData.zIndexOffset = 10000;
-                        break;
-                    default: // up
-                        markerData.icon = greenMarker;
-                        markerData.zIndexOffset = 0;
-                }
-
-                var marker = L.marker(new L.LatLng(device.lat, device.lng), markerData);
-                marker.bindPopup(`<a href="${device.url}"><img src="${device.icon}" width="32" height="32" alt=""> ${device.name}</a>`);
-                return marker;
-            });
-
-            var map = get_map(map_id);
-            if (! map.markerCluster) {
-                map.markerCluster = L.markerClusterGroup({
-                    maxClusterRadius: group_radius,
-                    iconCreateFunction: function (cluster) {
-                        var markers = cluster.getAllChildMarkers();
-                        var color = "green";
-                        var newClass = "Cluster marker-cluster marker-cluster-small leaflet-zoom-animated leaflet-clickable";
-                        for (var i = 0; i < markers.length; i++) {
-                            if (markers[i].options.icon.options.markerColor == "blue" && color != "red") {
-                                color = "blue";
-                            }
-                            if (markers[i].options.icon.options.markerColor == "red") {
-                                color = "red";
-                            }
-                        }
-                        return L.divIcon({
-                            html: cluster.getChildCount(),
-                            className: color + newClass,
-                            iconSize: L.point(40, 40)
-                        });
-                    }
-                });
-
-                map.addLayer(map.markerCluster);
-            }
-
-            map.markerCluster.clearLayers();
-            map.markerCluster.addLayers(markers);
-        },
-        error: function(error){
-            toastr.error(error.statusText);
-        }
-    });
 }
 
 function disable_map_interaction(leaflet) {
@@ -681,3 +627,36 @@ function popUp(URL)
 {
     window.open(URL, '_blank', 'toolbar=0,scrollbars=1,location=0,statusbar=0,menubar=0,resizable=1,width=550,height=600');
 }
+
+// popup component javascript.  Hopefully temporary.
+document.addEventListener("alpine:init", () => {
+    Alpine.data("popup", () => ({
+        popupShow: false,
+        showTimeout: null,
+        hideTimeout: null,
+        ignoreNextShownEvent: false,
+        delay: 300,
+        show(timeout) {
+            clearTimeout(this.hideTimeout);
+            this.showTimeout = setTimeout(() => {
+                this.popupShow = true;
+                Popper.createPopper(this.$refs.targetRef, this.$refs.popupRef, {
+                    padding: 8
+                });
+
+                // close other popups, except this one
+                this.ignoreNextShownEvent = true;
+                this.$dispatch('librenms-popup-shown', this.$el);
+            }, timeout);
+        },
+        hide(timeout) {
+            if (this.ignoreNextShownEvent) {
+                this.ignoreNextShownEvent = false;
+                return;
+            }
+
+            clearTimeout(this.showTimeout);
+            this.hideTimeout = setTimeout(() => this.popupShow = false, timeout)
+        }
+    }));
+});

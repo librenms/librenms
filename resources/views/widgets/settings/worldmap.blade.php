@@ -23,10 +23,11 @@
     </div>
 
     <div class="form-group">
-        <label for="init_layer-{{ $id }}" class="control-label">{{ __('Initial Layer') }}</label>
+        <label for="init_layer-{{ $id }}" class="control-label" title="{{ __('settings.settings.geoloc.layer.help') }}">{{ __('settings.settings.geoloc.layer.description') }}</label>
         <select class="form-control" name="init_layer" id="init_layer-{{ $id }}">
-            <option value="Streets" @if($init_layer == 'Streets') selected @endif>{{ __('Streets') }}</option>
-            <option value="Satellite" @if($init_layer == 'Satellite') selected @endif>{{ __('Satellite') }}</option>
+            <option value="Streets" @if($init_layer == 'Streets') selected @endif>{{ __('settings.settings.geoloc.layer.options.Streets') }}</option>
+            <option value="Satellite" @if($init_layer == 'Satellite') selected @endif>{{ __('settings.settings.geoloc.layer.options.Satellite') }}</option>
+            <option value="Topography" @if($init_layer == 'Topography') selected @endif>{{ __('settings.settings.geoloc.layer.options.Topography') }}</option>
         </select>
     </div>
 

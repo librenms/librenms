@@ -1968,5 +1968,31 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "entity-physical": {
+        "discovery": {
+            "entPhysical": [
+                {
+                    "entPhysicalIndex": 1,
+                    "entPhysicalDescr": "MB520 AV2aF5PWnacxG",
+                    "entPhysicalClass": "other",
+                    "entPhysicalName": "MB520 AV2aF5PWnacxG",
+                    "entPhysicalHardwareRev": "ne",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "true",
+                    "entPhysicalModelName": "LBB_154",
+                    "entPhysicalVendorType": "zeroDotZero",
+                    "entPhysicalSerialNum": "S2116008555223620",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": -1,
+                    "entPhysicalMfgName": "",
+                    "ifIndex": null
+                }
+            ]
+        },
+        "poller": "matches discovery"
     }
 }

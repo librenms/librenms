@@ -4,6 +4,8 @@ use LibreNMS\Config;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IPv6;
 
+$valid ??= []; // may not be instantiated.  I think this is the last place that uses this global.
+
 foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
     $device['context_name'] = $context_name;
 
@@ -14,6 +16,12 @@ foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
             ->walk(['IP-MIB::ipAddressIfIndex.ipv6', 'IP-MIB::ipAddressOrigin.ipv6', 'IP-MIB::ipAddressPrefix.ipv6'])
             ->table(4);
         foreach ($oids['ipv6'] ?? [] as $address => $data) {
+            if (! is_array($data)) {
+                \Illuminate\Support\Facades\Log::debug('IPv6 data invalid');
+
+                continue;
+            }
+
             try {
                 $ifIndex = $data['IP-MIB::ipAddressIfIndex'];
                 $ipv6_address = IPv6::fromHexString($address)->uncompressed();

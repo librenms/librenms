@@ -67,11 +67,11 @@
             error: '',
             resetBackground() {
                 this.type = this.initial_type;
-                this.color = 'color' in this.initial_data ? this.initial_data.color : '#badaee';
-                this.lat = 'lat' in this.initial_data ? this.initial_data.lat : 40;
-                this.lng = 'lng' in this.initial_data ? this.initial_data.lng : -20;
-                this.zoom = 'zoom' in this.initial_data ? this.initial_data.zoom : 3;
-                this.layer = 'layer' in this.initial_data ? this.initial_data.layer :  null;
+                this.color = 'color' in this.initial_data ? this.initial_data.color : '{{ Config::get('custom_map.background_data.color') }}';
+                this.lat = 'lat' in this.initial_data ? this.initial_data.lat : {{ (float) Config::get('custom_map.background_data.lat') }};
+                this.lng = 'lng' in this.initial_data ? this.initial_data.lng : {{ (float) Config::get('custom_map.background_data.lng') }};
+                this.zoom = 'zoom' in this.initial_data ? this.initial_data.zoom : {{ (int) Config::get('custom_map.background_data.zoom') }};
+                this.layer = 'layer' in this.initial_data ? this.initial_data.layer :  {{ Js::from(Config::get('custom_map.background_data.layer')) }};
                 this.image = this.initial_data['original_filename'];
                 this.image_content = null;
                 this.show_image_export = (! 'engine' in this.initial_data) || ! ['google', 'bing'].includes(this.initial_data['engine']);
@@ -195,5 +195,22 @@
                 this.resetBackground();
             }
         }
+    }
+
+    function startBackgroundMapAdjust() {
+        $('#map-editButton,#map-nodeDefaultsButton,#map-edgeDefaultsButton,#map-bgButton').hide();
+        $('#map-bgEndAdjustButton').show();
+    }
+
+    function endBackgroundMapAdjust() {
+        $('#map-editButton,#map-nodeDefaultsButton,#map-edgeDefaultsButton,#map-bgButton').show();
+        $('#map-bgEndAdjustButton').hide();
+
+        document.getElementById('custom-map-bg-geo-map').style.zIndex = '1';
+        const leaflet = get_map('custom-map-bg-geo-map');
+        if (leaflet) {
+            disable_map_interaction(leaflet)
+        }
+        editMapBackground();
     }
 </script>

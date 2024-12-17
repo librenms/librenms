@@ -39,8 +39,17 @@ continue to function as normal.
     lnms config:set influxdbv2.token 'admin'
     lnms config:set influxdbv2.allow_redirect true
     lmns config:set influxdbv2.organization 'librenms'
+    lmns config:set influxdbv2.debug false
+    lmns config:set influxdbv2.log_file '/opt/librenms/logs/influxdbv2.log'
+    lmns config:set influxdbv2.groups-exclude ["group_name_1","group_name_2"]
+    lmns config:set influxdbv2.timeout 5
+    lmns config:set influxdbv2.verify false
+    lmns config:set influxdbv2.batch_size 1000
+    lmns config:set influxdbv2.max_retry 2
     ```
 
 The same data stored within rrd will be sent to InfluxDB and
 recorded. You can then create graphs within Grafana or InfluxDB to display the
 information you need.
+
+Please note that polling will slow down when the poller isn't able to reach or write data to InfluxDBv2.
