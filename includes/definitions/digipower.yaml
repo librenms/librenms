@@ -3,6 +3,7 @@ text: Digipower
 type: power
 over:
     - { graph: device_current, text: Current }
+snmp_max_oid: 2
 discovery:
-    -
-        sysObjectID: .1.3.6.1.4.1.17420
+    - sysObjectID:
+        - .1.3.6.1.4.1.17420
