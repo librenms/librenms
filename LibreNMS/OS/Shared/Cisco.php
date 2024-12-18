@@ -26,10 +26,12 @@
 
 namespace LibreNMS\OS\Shared;
 
+use App\Models\Component;
 use App\Models\Device;
 use App\Models\EntPhysical;
 use App\Models\Mempool;
 use App\Models\PortsNac;
+use App\Models\Qos;
 use App\Models\Sla;
 use App\Models\Transceiver;
 use Illuminate\Support\Arr;
@@ -39,10 +41,12 @@ use LibreNMS\Device\Processor;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
+use LibreNMS\Interfaces\Discovery\QosDiscovery;
 use LibreNMS\Interfaces\Discovery\SlaDiscovery;
 use LibreNMS\Interfaces\Discovery\StpInstanceDiscovery;
 use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
 use LibreNMS\Interfaces\Polling\NacPolling;
+use LibreNMS\Interfaces\Polling\QosPolling;
 use LibreNMS\Interfaces\Polling\SlaPolling;
 use LibreNMS\OS;
 use LibreNMS\OS\Traits\YamlOSDiscovery;
@@ -54,8 +58,10 @@ class Cisco extends OS implements
     SlaDiscovery,
     StpInstanceDiscovery,
     ProcessorDiscovery,
+    QosDiscovery,
     MempoolsDiscovery,
     NacPolling,
+    QosPolling,
     SlaPolling,
     TransceiverDiscovery
 {
@@ -66,6 +72,7 @@ class Cisco extends OS implements
         OS\Traits\EntityMib::discoverEntityPhysical as discoverBaseEntityPhysical;
     }
 
+    private Collection $qosIdxToParent;
     protected ?string $entityVendorTypeMib = 'CISCO-ENTITY-VENDORTYPE-OID-MIB';
 
     public function discoverOS(Device $device): void
@@ -125,6 +132,8 @@ class Cisco extends OS implements
         }
 
         if ((empty($hardware) || preg_match('/Switch System/', $hardware)) && ! empty($data[1000]['entPhysicalModelName'])) {
+            $hardware = $data[1000]['entPhysicalModelName'];
+        } elseif ((empty($hardware) || preg_match('/Virtual Stack/', $hardware)) && ! empty($data[1000]['entPhysicalModelName'])) {
             $hardware = $data[1000]['entPhysicalModelName'];
         } elseif (empty($hardware) && ! empty($data[1000]['entPhysicalContainedIn'])) {
             $hardware = $data[$data[1000]['entPhysicalContainedIn']]['entPhysicalName'];
@@ -443,9 +452,9 @@ class Cisco extends OS implements
     {
         $nac = new Collection();
 
-        $portAuthSessionEntry = snmpwalk_cache_oid($this->getDeviceArray(), 'cafSessionEntry', [], 'CISCO-AUTH-FRAMEWORK-MIB');
+        $portAuthSessionEntry = snmpwalk_cache_oid($this->getDeviceArray(), 'cafSessionEntry', [], 'CISCO-AUTH-FRAMEWORK-MIB', null, '-OQUsx');
         if (! empty($portAuthSessionEntry)) {
-            $cafSessionMethodsInfoEntry = collect(snmpwalk_cache_oid($this->getDeviceArray(), 'cafSessionMethodsInfoEntry', [], 'CISCO-AUTH-FRAMEWORK-MIB'))->mapWithKeys(function ($item, $key) {
+            $cafSessionMethodsInfoEntry = collect(snmpwalk_cache_oid($this->getDeviceArray(), 'cafSessionMethodsInfoEntry', [], 'CISCO-AUTH-FRAMEWORK-MIB', null, '-OQUsx'))->mapWithKeys(function ($item, $key) {
                 $key_parts = explode('.', $key);
                 $key = implode('.', array_slice($key_parts, 0, 2)); // remove the auth method
 
@@ -459,7 +468,7 @@ class Cisco extends OS implements
             foreach ($portAuthSessionEntry as $index => $portAuthSessionEntryParameters) {
                 [$ifIndex, $auth_id] = explode('.', str_replace("'", '', $index));
                 $session_info = $cafSessionMethodsInfoEntry->get($ifIndex . '.' . $auth_id);
-                $mac_address = strtolower(implode(array_map('zeropad', explode(':', $portAuthSessionEntryParameters['cafSessionClientMacAddress']))));
+                $mac_address = strtolower(implode(array_map('zeropad', explode(':', $portAuthSessionEntryParameters['cafSessionClientMacAddress'] ?? null))));
 
                 $nac->put($mac_address, new PortsNac([
                     'port_id' => $ifIndex_map->get($ifIndex, 0),
@@ -672,5 +681,199 @@ class Cisco extends OS implements
                 'entity_physical_index' => $ifIndex,
             ]);
         });
+    }
+
+    public function discoverQos(): Collection
+    {
+        $this->qosIdxToParent = new Collection();
+        $qos = new Collection();
+
+        // Map QoS index to port
+        $ifIndexToPortId = $this->getDevice()->ports()->pluck('port_id', 'ifIndex');
+
+        // SNMP lookup tables
+        $servicePolicies = \SnmpQuery::hideMib()->walk('CISCO-CLASS-BASED-QOS-MIB::cbQosServicePolicyTable')->table(1);
+        $policyMaps = \SnmpQuery::hideMib()->walk('CISCO-CLASS-BASED-QOS-MIB::cbQosPolicyMapCfgTable')->table(1);
+        $classMaps = \SnmpQuery::hideMib()->walk('CISCO-CLASS-BASED-QOS-MIB::cbQosCMCfgTable')->table(1);
+        $matchStatements = \SnmpQuery::hideMib()->walk('CISCO-CLASS-BASED-QOS-MIB::cbQosMatchStmtCfgTable')->table(1);
+        $qosObjects = \SnmpQuery::hideMib()->walk('CISCO-CLASS-BASED-QOS-MIB::cbQosObjectsTable')->table(2);
+
+        // Iterate over a 2 level table with keys of the policy ID, then the object ID
+        foreach ($qosObjects as $policyId => $spObjects) {
+            // Policy level settings
+            $direction = $servicePolicies[$policyId]['cbQosPolicyDirection'];
+
+            foreach ($spObjects as $objectId => $qosObject) {
+                $qosObjectIndex = $qosObject['cbQosConfigIndex'];
+                $type = $qosObject['cbQosObjectsType'];
+                $parent = $qosObject['cbQosParentObjectsIndex'];
+                $snmpIndex = "$policyId.$objectId";
+
+                $tooltip = null;
+                if ($type == 1) {
+                    // Policy map
+                    $dbtype = 'cisco_cbqos_policymap';
+                    // Type 1 is not polled, but we need to set RRD ID to somethign unique because it's part of the DB key
+                    $rrd_id = 'cbqos-policymap-' . $policyId . '-' . $objectId;
+                    $pm = $policyMaps[$qosObjectIndex];
+                    $title = $pm['cbQosPolicyMapDesc'] ? $pm['cbQosPolicyMapName'] . ' - ' . $pm['cbQosPolicyMapDesc'] : $pm['cbQosPolicyMapName'];
+                } elseif ($type == 2) {
+                    // Class Map
+                    $dbtype = 'cisco_cbqos_classmap';
+                    // RRD name matches the original cbqos module
+                    $rrd_id = 'port-' . $servicePolicies[$policyId]['cbQosIfIndex'] . '-cbqos-' . $policyId . '-' . $objectId;
+                    $cm = $classMaps[$qosObjectIndex];
+                    $title = $cm['cbQosCMDesc'] ? $cm['cbQosCMName'] . ' - ' . $cm['cbQosCMDesc'] : $cm['cbQosCMName'];
+
+                    // Fill in the match type
+                    if ($cm['cbQosCMInfo'] == 2) {
+                        $tooltip = 'Match-All:';
+                    } elseif ($cm['cbQosCMInfo'] == 3) {
+                        $tooltip = 'Match-Any:';
+                    } else {
+                        $tooltip = 'None';
+                    }
+
+                    // Then find the match statements
+                    $statements = [];
+                    foreach ($qosObjects[$policyId] as $sqObjectId => $sqObject) {
+                        // Find child objects (we are the parent) that are type 3 (match statements)
+                        if ($sqObject['cbQosParentObjectsIndex'] == $objectId && $sqObject['cbQosObjectsType'] == 3) {
+                            array_push($statements, $matchStatements[$qosObjects[$policyId][$sqObjectId]['cbQosConfigIndex']]['cbQosMatchStmtName']);
+                        }
+                    }
+
+                    if (count($statements) > 0) {
+                        $tooltip .= "\n - " . implode("\n - ", $statements);
+                    }
+                } else {
+                    // Other types are not relevant
+                    continue;
+                }
+
+                d_echo("\nIndex: " . $qosObjectIndex . "\n");
+                d_echo('  SNMP Index: ' . $snmpIndex . "\n");
+                d_echo('  Title     : ' . $title . "\n");
+                d_echo('  Direction : ' . $direction . "\n");
+                d_echo('  Parent    : ' . $policyId . '.' . $parent . "\n");
+
+                // Our parent's SNMP index will share the same policyId
+                $this->qosIdxToParent->put($snmpIndex, "$policyId.$parent");
+
+                $qos->push(new Qos([
+                    'device_id' => $this->getDeviceId(),
+                    'port_id' => $parent ? null : $ifIndexToPortId->get($servicePolicies[$policyId]['cbQosIfIndex'], null),
+                    'type' => $dbtype,
+                    'title' => $title,
+                    'tooltip' => $tooltip,
+                    'rrd_id' => $rrd_id,
+                    'snmp_idx' => $snmpIndex,
+                    'ingress' => $direction == 1 ? 1 : 0,
+                    'egress' => $direction == 2 ? 1 : 0,
+                ]));
+            }
+        }
+
+        // Clean up legacy component based config
+        $oldConfig = Component::where('type', 'Cisco-CBQOS')->get();
+        if ($oldConfig->count()) {
+            foreach ($oldConfig as $oc) {
+                $oc->delete();
+            }
+        }
+
+        return $qos;
+    }
+
+    public function setQosParents($qos)
+    {
+        $qos->each(function (Qos $thisQos, int $key) use ($qos) {
+            $parent_idx = $this->qosIdxToParent->get($thisQos->snmp_idx);
+
+            if ($parent_idx) {
+                $parent = $qos->where('snmp_idx', $parent_idx)->first();
+
+                if ($parent) {
+                    $parent_id = $parent->qos_id;
+                } else {
+                    $parent_id = null;
+                }
+            } else {
+                $parent_id = null;
+            }
+
+            $thisQos->parent_id = $parent_id;
+            $thisQos->save();
+        });
+    }
+
+    public function pollQos($qos)
+    {
+        $poll_time = time();
+        $preBytes = \SnmpQuery::hideMib()->walk('CISCO-CLASS-BASED-QOS-MIB::cbQosCMPrePolicyByte64')->table(2);
+        $postBytes = \SnmpQuery::hideMib()->walk('CISCO-CLASS-BASED-QOS-MIB::cbQosCMPostPolicyByte64')->table(2);
+        $dropBytes = \SnmpQuery::hideMib()->walk('CISCO-CLASS-BASED-QOS-MIB::cbQosCMDropByte64')->table(2);
+        $bufferDrops = \SnmpQuery::hideMib()->walk('CISCO-CLASS-BASED-QOS-MIB::cbQosCMNoBufDropPkt64')->table(2);
+        $prePackets = \SnmpQuery::hideMib()->walk('CISCO-CLASS-BASED-QOS-MIB::cbQosCMPrePolicyPkt64')->table(2);
+        $dropPackets = \SnmpQuery::hideMib()->walk('CISCO-CLASS-BASED-QOS-MIB::cbQosCMDropPkt64')->table(2);
+
+        foreach ($qos as $thisQos) {
+            if ($thisQos->type == 'cisco_cbqos_classmap') {
+                $snmp_parts = explode('.', $thisQos->snmp_idx);
+
+                // Ignore changes to QoS maps between discovery runs
+                if (! array_key_exists($snmp_parts[0], $preBytes) || ! array_key_exists($snmp_parts[1], $preBytes[$snmp_parts[0]])) {
+                    d_echo('Cisco CBQoS ' . $thisQos->title . ' not processed because SNMP did not return any data');
+
+                    // Null out all values so we get a break in the graph
+                    $thisQos->last_polled = $poll_time;
+                    $thisQos->last_bytes_in = null;
+                    $thisQos->last_bytes_out = null;
+                    $thisQos->last_bytes_drop_in = null;
+                    $thisQos->last_bytes_drop_out = null;
+                    $thisQos->last_packets_in = null;
+                    $thisQos->last_packets_out = null;
+                    $thisQos->last_packets_drop_in = null;
+                    $thisQos->last_packets_drop_out = null;
+                    $thisQos->poll_data['postbytes'] = null;
+                    $thisQos->poll_data['bufferdrops'] = null;
+
+                    continue;
+                }
+
+                // Values ony saved to RRD
+                $thisQos->poll_data['postbytes'] = $postBytes ? $postBytes[$snmp_parts[0]][$snmp_parts[1]]['cbQosCMPostPolicyByte64'] : null;
+                $thisQos->poll_data['bufferdrops'] = $bufferDrops ? $bufferDrops[$snmp_parts[0]][$snmp_parts[1]]['cbQosCMNoBufDropPkt64'] : null;
+
+                // Cisco CBQoS is one directional
+                if ($thisQos->ingress) {
+                    $thisQos->last_polled = $poll_time;
+                    $thisQos->last_bytes_in = $preBytes ? $preBytes[$snmp_parts[0]][$snmp_parts[1]]['cbQosCMPrePolicyByte64'] : null;
+                    $thisQos->last_bytes_out = null;
+                    $thisQos->last_bytes_drop_in = $dropBytes ? $dropBytes[$snmp_parts[0]][$snmp_parts[1]]['cbQosCMDropByte64'] : null;
+                    $thisQos->last_bytes_drop_out = null;
+                    $thisQos->last_packets_in = $prePackets ? $prePackets[$snmp_parts[0]][$snmp_parts[1]]['cbQosCMPrePolicyPkt64'] : null;
+                    $thisQos->last_packets_out = null;
+                    $thisQos->last_packets_drop_in = $dropPackets ? $dropPackets[$snmp_parts[0]][$snmp_parts[1]]['cbQosCMDropPkt64'] : null;
+                    $thisQos->last_packets_drop_out = null;
+                } elseif ($thisQos->egress) {
+                    $thisQos->last_polled = $poll_time;
+                    $thisQos->last_bytes_in = null;
+                    $thisQos->last_bytes_out = $preBytes ? $preBytes[$snmp_parts[0]][$snmp_parts[1]]['cbQosCMPrePolicyByte64'] : null;
+                    $thisQos->last_bytes_drop_in = null;
+                    $thisQos->last_bytes_drop_out = $dropBytes ? $dropBytes[$snmp_parts[0]][$snmp_parts[1]]['cbQosCMDropByte64'] : null;
+                    $thisQos->last_packets_in = null;
+                    $thisQos->last_packets_out = $prePackets ? $prePackets[$snmp_parts[0]][$snmp_parts[1]]['cbQosCMPrePolicyPkt64'] : null;
+                    $thisQos->last_packets_drop_in = null;
+                    $thisQos->last_packets_drop_out = $dropPackets ? $dropPackets[$snmp_parts[0]][$snmp_parts[1]]['cbQosCMDropPkt64'] : null;
+                } else {
+                    d_echo('Cisco CBQoS ' . $thisQos->title . ' not processed because it it not marked as ingress or egress');
+                }
+            } elseif ($thisQos->type == 'cisco_cbqos_policymap') {
+                // No polling for policymap
+            } else {
+                d_echo('Cisco CBQoS ' . $thisQos->type . ' not implemented in LibreNMS/OS/Shared/Cisco.php');
+            }
+        }
     }
 }

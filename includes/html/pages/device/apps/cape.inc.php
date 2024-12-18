@@ -23,6 +23,10 @@ foreach ($vars_to_check as $index => $value) {
     }
 }
 
+if (isset($vars['package'])) {
+    $vars['package'] = htmlspecialchars($vars['package']);
+}
+
 if (sizeof($packages) > 0) {
     print_optionbar_start();
 
@@ -36,7 +40,7 @@ if (sizeof($packages) > 0) {
     echo ' | <b>Packages:</b> ';
     $packages_int = 0;
     while (isset($packages[$packages_int])) {
-        $package = $packages[$packages_int];
+        $package = htmlspecialchars($packages[$packages_int]);
         $label = $package;
 
         if ($vars['package'] == $package) {

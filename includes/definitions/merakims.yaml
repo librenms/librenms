@@ -9,3 +9,6 @@ discovery:
     -
         sysDescr_regex:
             - '/^Meraki MS/'
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.29671.2.388

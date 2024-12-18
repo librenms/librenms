@@ -1157,15 +1157,16 @@ or [MetaCPAN](https://metacpan.org/dist/HV-Monitor).
 For Debian based systems this is as below.
 
 ```
+# Debian
 apt-get install libjson-perl libmime-base64-perl cpanminus
 cpanm HV::Monitor
-```
 
-And on FreeBSD as below.
-
-```
+# FreeBSD
 pkg install p5-App-cpanminus p5-JSON p5-MIME-Base64 p5-Module-List
 cpanm HV::Monitor
+
+# Generic
+cpanm JSON MIME::Base64 Module::List
 ```
 
 2. Set it up to be be ran by cron by root. Yes, you can directly call
@@ -1217,9 +1218,20 @@ extend icecast /etc/snmp/icecast-stats.sh
 A small python3 script that reports current DHCP leases stats and pool usage of ISC DHCP Server.
 
 Also you have to install the dhcpd-pools and the required Perl
-modules. Under Ubuntu/Debian just run `apt install
-cpanminus ; cpanm Net::ISC::DHCPd::Leases Mime::Base64 File::Slurp` or under FreeBSD
-`pkg install p5-JSON p5-MIME-Base64 p5-App-cpanminus p5-File-Slurp ; cpanm Net::ISC::DHCPd::Leases`.
+modules.
+
+```
+# Debian
+apt install cpanminus libmime-base64-perl libfile-slurp-perl
+cpanm Net::ISC::DHCPd::Leases
+
+# FreeBSD
+pkg install p5-JSON p5-MIME-Base64 p5-App-cpanminus p5-File-Slurp
+cpanm Net::ISC::DHCPd::Leases
+
+# Generic
+cpanm Net::ISC::DHCPd::Leases MIME::Base64 File::Slurp
+```
 
 ### SNMP Extend
 
@@ -1278,9 +1290,13 @@ chmod +x /etc/snmp/logsize
 ```
 # FreeBSD
 pkg install p5-File-Find-Rule p5-JSON p5-TOML p5-Time-Piece p5-MIME-Base64 p5-File-Slurp p5-Statistics-Lite
+
 # Debian
 apt-get install cpanminus libjson-perl libmime-base64-perl libfile-slurp-perl libtoml-perl libfile-find-rule-perl libstatistics-lite-perl
 cpanm Time::Piece
+
+# Generic
+cpanm File::Find::Rule JSON TOML Time::Piece MIME::Base64 File::Slurp Statistics::Lite Time::Piece
 ```
 
 3. Configure the config at `/usr/local/etc/logsize.conf`. You can find
@@ -1373,7 +1389,8 @@ extend linux_config_files /etc/snmp/linux_config_files.py
 ```
 # Debian
 apt-get install -y libfile-slurp-perl libmime-base64-perl libjson-perl
-# generic cpanm
+
+# Generic
 cpanm JSON File::Slurp MIME::Base64
 ```
 
@@ -1656,6 +1673,56 @@ extend mysql /etc/snmp/mysql
 The application should be auto-discovered as described at the top of
 the page. If it is not, please follow the steps set out under `SNMP
 Extend` heading top of page.
+
+## Nextcloud
+
+### SNMP
+
+1. Copy the shell script to the desired host.
+```
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/nextcloud -O /etc/snmp/nextcloud
+```
+
+2. Make the script executable
+```
+chmod +x /etc/snmp/nextcloud
+```
+
+3. Install depends.
+```
+# FreeBSD
+pkg install p5-JSON p5-File-Slurp p5-MIME-Base64 p5-Time-Piece
+
+# Debian
+apt-get install libjson-perl libfile-slurp-perl libmime-base64-perl cpanminus
+cpanm Time::Piece
+
+# generic cpanm
+cpanm JSON File::Slurp Mime::Base64 Time::Piece
+
+# CentOS / RHEL
+dnf install perl-JSON perl-File-Slurp perl-MIME-Base64 perl-String-ShellQuote perl-Time-Piece
+```
+
+4. Create the cache dir and chown it to the user Nextcloud is running
+   as.
+```
+mkdir /var/cache/nextcloud_extend
+chown -R $nextcloud_user /var/cache/nextcloud_extend
+```
+
+5. Set it up in the crontab for the Nextcloud user using `-i` to point
+   it to the Nextcloud install dir.
+```
+*/5 * * * * /etc/snmpd/nextcloud -q -i $install_dir
+```
+
+6. Add it to snmpd.conf
+```
+extend nextcloud /bin/cat /var/cache/nextcloud_extend/snmp
+```
+
+Then just wait for it to be rediscovered.
 
 ## NGINX
 
@@ -1951,9 +2018,11 @@ chmod +x /etc/snmp/opensearch
 ```
 # FreeBSD
 pkg install p5-JSON p5-File-Slurp p5-MIME-Base64 p5-LWP-Protocol-https
+
 # Debian/Ubuntu
 apt-get install libjson-perl libfile-slurp-perl liblwp-protocol-https-perl libmime-base64-perl
-# cpanm
+
+# Generic
 cpanm JSON Libwww File::Slurp LWP::Protocol::HTTPS MIME::Base64
 ```
 
@@ -2042,14 +2111,22 @@ extend opensips /etc/snmp/opensips-stats.sh
 1. Install the depends...
 
 ```shell
-# FreeBSD
-pkg install p5-JSON p5-Mime-Base64 p5-Clone p5-File-Slurp p5-IO-Interface p5-App-cpanminus
-
 # Debian
 apt-get install libjson-perl libclone-perl libmime-base64-perl libfile-slurp-perl libio-interface-perl cpanminus
+
+# Generic
+cpanm JSON Clone Mime::Base64 File::Slurp IO::Interface
 ```
 
-2. Install... `cpanm OSLV::Monitor`
+2. Install...
+
+```
+# FreeBSD
+pkg install p5-OSLV-Monitor
+
+# Debian / Generic
+cpanm OSLV::Monitor
+```
 
 3. Setup cron.
 
@@ -2732,6 +2809,9 @@ pkg install p5-JSON p5-MIME-Base64 p5-File-Slurp p5-File-ReadBackwards p5-IPC-Ru
 # Debian
 apt-get install libjson-perl libmime-base64-perl libfile-slurp-perl libfile-readbackwards-perl libipc-run3-perl cpanminus
 cpanm Time::Piece
+
+# Generic
+cpanm Time::Piece JSON MIME::Base64 File::Slurp File::ReadBackwards IPC::Run3
 ```
 
 3. Add the extend to snmpd.conf and restart snmpd.
@@ -3290,8 +3370,12 @@ at [MetaCPAN](https://metacpan.org/dist/Monitoring-Sneck-Boop_Snoot) and
 # FreeBSD
 pkg install p5-JSON p5-File-Slurp p5-MIME-Base64 p5-App-cpanminus
 cpanm Monitoring::Sneck
+
 # Debian based systems
 apt-get install cpanminus libjson-perl libfile-slurp-perl libmime-base64-perl
+cpanm Monitoring::Sneck
+
+# Generic
 cpanm Monitoring::Sneck
 ```
 
@@ -3414,6 +3498,9 @@ cpanm Sagan::Monitoring
 
 # Debian
 apt-get install libjson-perl libfile-readbackwards-perl libfile-slurp-perl libmime-base64-perl cpanminus
+cpanm Sagan::Monitoring
+
+# Generic
 cpanm Sagan::Monitoring
 ```
 
@@ -3581,8 +3668,12 @@ semodule -i snmpd_ss.pp
 # FreeBSD
 pkg install p5-JSON p5-File-Path p5-File-Slurp p5-Time-Piece p5-MIME-Base64 p5-Hash-Flatten p5-Carp p5-App-cpanminus
 cpanm Suricata::Monitoring
+
 # Debian
 apt-get install libjson-perl libfile-path-perl libfile-slurp-perl libmime-base64-perl cpanminus
+cpanm Suricata::Monitoring
+
+# Generic
 cpanm Suricata::Monitoring
 ```
 
@@ -3866,8 +3957,12 @@ wget https://github.com/librenms/librenms-agent/raw/master/snmp/wireguard.pl -O 
 ```
 # FreeBSD
 pkg install p5-JSON p5-File-Slurp p5-MIME-Base64
+
 # Debian
 apt-get install libjson-perl libmime-base64-perl libfile-slurp-perl
+
+# Generic
+cpanm JSON MIME::Base64 File::Slurp
 ```
 
 3. Make the script executable
@@ -3912,11 +4007,14 @@ The default for `pubkey_resolvers` is
 
 1: Install the depends.
 ```
-### FreeBSD
+# FreeBSD
 pkg install p5-JSON p5-MIME-Base64 p5-File-Slurp
 
-### Debian
+# Debian
 apt-get install -y libjson-perl libmime-base64-perl libfile-slurp-perl
+
+# Generic
+cpanm JSON MIME::Base64 File::Slurp
 ```
 
 2: Fetch the script in question and make it executable.

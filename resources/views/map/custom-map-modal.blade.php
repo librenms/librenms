@@ -51,6 +51,24 @@
                                     <input class="form-check-input" type="checkbox" role="switch" id="mapreversearrows">
                                 </div>
                             </div>
+                            <div class="form-group row">
+                                <label for="mapopt-zoom" class="col-sm-3 control-label">{{ __('map.custom.edit.map.zoom') }}</label>
+                                <div class="col-sm-9">
+                                    <input class="form-check-input" type="checkbox" role="switch" id="mapopt-zoom">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="mapopt-dragnodes" class="col-sm-3 control-label">{{ __('map.custom.edit.map.dragnodes') }}</label>
+                                <div class="col-sm-9">
+                                    <input class="form-check-input" type="checkbox" role="switch" id="mapopt-dragnodes">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="mapopt-physics" class="col-sm-3 control-label">{{ __('map.custom.edit.map.physics') }}</label>
+                                <div class="col-sm-9">
+                                    <input class="form-check-input" type="checkbox" role="switch" id="mapopt-physics">
+                                </div>
+                            </div>
                             <hr>
                             <div class="row">
                                 <div class="col-sm-12" id="savemap-alert">
@@ -91,6 +109,15 @@
         var height = $("#mapheight").val();
         var node_align = $("#mapnodealign").val();
         var post_options = structuredClone(map_options);
+
+        // Fixes for known issues if the data in the DB is corrupt
+        if (Array.isArray(post_options.physics)) {
+            post_options.physics = {};
+        }
+        if (Array.isArray(post_options.interaction)) {
+            post_options.interaction = {};
+        }
+
         post_options.interaction.zoomView = post_options.interaction.dragView = $("#mapopt-zoom").prop('checked');
         post_options.interaction.dragNodes = $("#mapopt-dragnodes").prop('checked');
         post_options.physics.enabled = $("#mapopt-physics").prop('checked');
@@ -106,6 +133,25 @@
         }
 
         @if(isset($map_id))
+            if (width.endsWith("px") && height.endsWith("px")) {
+                widthInt = parseInt(width);
+                heightInt = parseInt(height);
+
+                var nodeError = false;
+                network_nodes.forEach((node) => {
+                    if (node.x > widthInt - {{ isset($hmargin) ? $hmargin : 10 }} || node.y > heightInt - {{ isset($vmargin) ? $vmargin : 10 }}) {
+                        nodeError = true;
+                    }
+                });
+                if (nodeError) {
+                    let alert_content = $("#savemap-alert");
+                    alert_content.text('Please move nodes inside the new area before shrinking the map');
+                    alert_content.attr("class", "col-sm-12 alert alert-danger");
+                    $("#map-saveButton").removeAttr('disabled');
+                    return;
+                }
+            }
+
             var url = '{{ route('maps.custom.update', ['map' => $map_id]) }}';
             var method = 'PUT';
         @else

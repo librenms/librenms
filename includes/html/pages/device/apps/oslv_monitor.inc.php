@@ -14,6 +14,10 @@ $link_array = [
     'app' => 'oslv_monitor',
 ];
 
+if (isset($vars['oslvm'])) {
+    $vars['oslvm'] = htmlspecialchars($vars['oslvm']);
+}
+
 $app_data = $app->data;
 
 if (! isset($app_data['has']) || ! is_array($app_data['has'])) {
@@ -39,6 +43,7 @@ if (isset($app_data['backend']) && $app_data['backend'] != 'cgroups') {
     }
     $index_int = 0;
     foreach ($app_data['oslvms'] as $index => $oslvm) {
+        $oslvm = htmlspecialchars($oslvm);
         $label = (! isset($vars['oslvm']) || $vars['oslvm'] != $oslvm)
             ? $oslvm
             : '<span class="pagemenu-selected">' . $oslvm . '</span>';
@@ -53,6 +58,7 @@ if (isset($app_data['backend']) && $app_data['backend'] != 'cgroups') {
         sort($app_data['inactive']);
         $index_int = 0;
         foreach ($app_data['inactive'] as $index => $oslvm) {
+            $oslvm = htmlspecialchars($oslvm);
             $label = (! isset($vars['inactive']) || $vars['oslvm'] != $oslvm)
                 ? $oslvm
                 : '<span class="pagemenu-selected">' . $oslvm . '</span>';
@@ -72,6 +78,7 @@ if (isset($app_data['backend']) && $app_data['backend'] == 'cgroups') {
     $other_containers = [];
     $user_containers = [];
     foreach ($app_data['oslvms'] as $index => $oslvm) {
+        $oslvm = htmlspecialchars($oslvm);
         if (preg_match('/^d_.*/', $oslvm)) {
             $docker_containers[] = $oslvm;
         } elseif (preg_match('/^s_.*/', $oslvm)) {
@@ -90,6 +97,7 @@ if (isset($app_data['backend']) && $app_data['backend'] == 'cgroups') {
     $seen_other_containers = [];
     $seen_user_containers = [];
     foreach ($app_data['inactive'] as $index => $oslvm) {
+        $oslvm = htmlspecialchars($oslvm);
         if (preg_match('/^d_.*/', $oslvm)) {
             $seen_docker_containers[] = $oslvm;
         } elseif (preg_match('/^s_.*/', $oslvm)) {
@@ -310,6 +318,7 @@ if (isset($vars['oslvm']) && isset($app_data['oslvm_data'][$vars['oslvm']])) {
             'rows' => [],
         ];
         foreach ($app_data['oslvm_data'][$vars['oslvm']]['path'] as $index => $path) {
+            $path = htmlspecialchars($path);
             $path = preg_replace('/\/$/', '', $path);
             $mount_path = $path;
             $mount_path_raw = false;
@@ -420,12 +429,15 @@ if (isset($vars['oslvm']) && isset($app_data['oslvm_data'][$vars['oslvm']])) {
                 if (is_array($ip_data)) {
                     if (isset($ip_data['ip']) && ! is_null($ip_data['ip'])) {
                         $ip = $ip_data['ip'];
+                        $ip = htmlspecialchars($ip);
                     }
                     if (isset($ip_data['gw']) && ! is_null($ip_data['gw'])) {
                         $gw_ip = $ip_data['gw'];
+                        $gw_ip = htmlspecialchars($gw_ip);
                     }
                     if (isset($ip_data['if']) && ! is_null($ip_data['if'])) {
                         $interface = $ip_data['if'];
+                        $interface = htmlspecialchars($interface);
                         $port = Port::with('device')->firstWhere(['device_id' => $app->device_id, 'ifName' => $interface]);
                         if (isset($port)) {
                             $interface_raw = true;
@@ -446,6 +458,7 @@ if (isset($vars['oslvm']) && isset($app_data['oslvm_data'][$vars['oslvm']])) {
                     }
                     if (isset($ip_data['gw_if']) && ! is_null($ip_data['gw_if'])) {
                         $gw_interface = $ip_data['gw_if'];
+                        $gw_interface = htmlspecialchars($gw_interface);
                         $port = Port::with('device')->firstWhere(['device_id' => $app->device_id, 'ifName' => $gw_interface]);
                         if (isset($port)) {
                             $gw_interface_raw = true;

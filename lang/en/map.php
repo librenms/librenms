@@ -14,6 +14,17 @@ return [
             'loading' => 'Loading data',
             'no_devices' => 'No devices found',
         ],
+        'nodeimage' => [
+            'delete' => 'Delete Image',
+            'upload' => 'Upload Image',
+            'name' => 'Image Name',
+            'new' => 'New Image',
+            'title' => [
+                'edit' => 'Edit Node Image',
+                'manage' => 'Manage Node Images',
+                'new' => 'New Node Image',
+            ],
+        ],
         'edit' => [
             'text_font' => 'Text Font',
             'text_size' => 'Text Size',
@@ -43,8 +54,10 @@ return [
             ],
             'map' => [
                 'settings_title' => 'Map Settings',
+                'selectall' => 'Select All',
                 'name' => 'Name',
                 'menu_group' => 'Menu Group',
+                'multiselect_info' => 'Either long-click or hold down ctrl to select multiple nodes',
                 'no_group' => 'No Group',
                 'width' => 'Width',
                 'height' => 'Height',
@@ -54,6 +67,7 @@ return [
                 'saving' => 'Saving...',
                 'save_errors' => 'Save failed due to the following errors:',
                 'save_error' => 'Save failed.  Server returned error response code: :code',
+                'clone' => 'Clone :name?',
                 'delete' => 'Delete :name?',
                 'list' => 'Return to map list',
                 'unsavedchanges' => 'You have unsaved changes.  Press confirm to discard changes and return to the map list, or cancel to return to the editor.',
@@ -161,6 +175,13 @@ return [
                 ],
                 'show_usage_percent' => 'Show percent usage',
                 'show_usage_bps' => 'Show bps usage',
+                'text_align' => 'Text Alignment',
+                'align_options' => [
+                    'horizontal' => 'Horizontal',
+                    'top' => 'Top',
+                    'middle' => 'Middle',
+                    'bottom' => 'Bottom',
+                ],
                 'label' => 'Label',
                 'recenter' => 'Recenter Line',
             ],
@@ -172,6 +193,9 @@ return [
                 'height_percent' => 'Height percent must be between 10 and 100',
                 'height_pixels' => 'Height in pixels must be at least 200',
             ],
+        ],
+        'widget' => [
+            'not_found' => 'No map selected.  Edit widget to select map.',
         ],
     ],
 ];
