@@ -825,5 +825,28 @@
                                          ],"valid":false},
     "name": "SMART: one or more disk is has self test unknown failures",
     "severity": "critical"
+  },
+  {
+    "builder": {"condition":"AND","rules":[
+                                           {"id":"mempools.mempool_class","field":"mempools.mempool_class","type":"string","input":"text","operator":"equal","value":"system"},
+                                           {"id":"mempools.mempool_perc","field":"mempools.mempool_perc","type":"string","input":"number","operator":"greater_or_equal","value":"90"},
+                                           {"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"linux"}
+                                         ],"valid":false},
+    "name": "Linux High Memory Usage, >= 90% in use",
+    "severity": "warning"
+  },
+  {
+    "builder": {"condition":"AND","rules":[
+                                           {"id":"mempools.mempool_class","field":"mempools.mempool_class","type":"string","input":"text","operator":"equal","value":"system"},
+                                           {"id":"mempools.mempool_perc","field":"mempools.mempool_perc","type":"string","input":"number","operator":"greater_or_equal","value":"95"},
+                                           {"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"linux"}
+                                         ],"valid":false},
+    "name": "Linux High Memory Usage, >= 95% in use",
+    "severity": "critical"
+  },
+  {
+    "rule": "applications.app_type = \"zfs\" && application_metrics.metric like \"pool_%_%_errors\" && application_metrics.value > \"0\"",
+    "name": "ZFS: pool with errors present",
+    "severity": "critical"
   }
 ]

@@ -136,6 +136,7 @@ Route::prefix('v0')->namespace('\App\Api\Controllers')->group(function () {
 
     Route::prefix('ports')->group(function () {
         Route::get('{portid}', 'LegacyApiController@get_port_info')->name('get_port_info');
+        Route::get('{portid}/fdb', 'LegacyApiController@get_port_fdb')->name('get_port_fdb');
         Route::get('{portid}/ip', 'LegacyApiController@get_port_ip_addresses')->name('get_port_ip_info');
         Route::get('{portid}/transceiver', 'LegacyApiController@get_port_transceiver')->name('get_port_transceiver');
         Route::patch('transceiver/metric/{metric}', 'LegacyApiController@update_transceiver_metric_thresholds')->name('update_transceiver_metric_thresholds');

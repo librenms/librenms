@@ -472,9 +472,6 @@ return [
             'bgp-peers' => [
                 'description' => 'BGP Peers',
             ],
-            'cisco-cbqos' => [
-                'description' => 'Cisco CBQOS',
-            ],
             'cisco-cef' => [
                 'description' => 'Cisco CEF',
             ],
@@ -1115,12 +1112,6 @@ return [
             'cisco-asa-firewall' => [
                 'description' => 'Cisco ASA Firewall',
             ],
-            'cisco-voice' => [
-                'description' => 'Cisco Voice',
-            ],
-            'cisco-cbqos' => [
-                'description' => 'Cisco CBQOS',
-            ],
             'cisco-otv' => [
                 'description' => 'Cisco OTV',
             ],
@@ -1265,10 +1256,6 @@ return [
             'description' => 'Sets the version of rrdtool on your server',
             'help' => 'Anything over 1.5.5 supports all features LibreNMS uses, do not set higher than your installed version',
         ],
-        'service_poller_enabled' => [
-            'description' => 'Enable Polling',
-            'help' => 'Enable poller workers. Sets the default value for all nodes.',
-        ],
         'service_poller_workers' => [
             'description' => 'Poller Workers',
             'help' => 'Amount of poller workers to spawn. Sets the default value for all nodes.',
@@ -1281,10 +1268,6 @@ return [
             'description' => 'Device Down Retry',
             'help' => 'If a device is down when polling is attempted. This is the amount of time to wait before retrying. Sets the default value for all nodes.',
         ],
-        'service_discovery_enabled' => [
-            'description' => 'Discovery Enabled',
-            'help' => 'Enable discovery workers. Sets the default value for all nodes.',
-        ],
         'service_discovery_workers' => [
             'description' => 'Discovery Workers',
             'help' => 'Amount of discovery workers to run. Setting too high can cause overload. Sets the default value for all nodes.',
@@ -1292,10 +1275,6 @@ return [
         'service_discovery_frequency' => [
             'description' => 'Discovery Frequency',
             'help' => 'How often to run device discovery. Sets the default value for all nodes. Default is 4 times a day.',
-        ],
-        'service_services_enabled' => [
-            'description' => 'Services Enabled',
-            'help' => 'Enable services workers. Sets the default value for all nodes.',
         ],
         'service_services_workers' => [
             'description' => 'Services Workers',
@@ -1305,10 +1284,6 @@ return [
             'description' => 'Services Frequency',
             'help' => 'How often to run services. This should match poller frequency. Sets the default value for all nodes.',
         ],
-        'service_billing_enabled' => [
-            'description' => 'Billing Enabled',
-            'help' => 'Enable billing workers. Sets the default value for all nodes.',
-        ],
         'service_billing_frequency' => [
             'description' => 'Billing Frequency',
             'help' => 'How often to collect billing data. Sets the default value for all nodes.',
@@ -1317,17 +1292,9 @@ return [
             'description' => 'Billing Calculate Frequency',
             'help' => 'How often to calculate bill usage. Sets the default value for all nodes.',
         ],
-        'service_alerting_enabled' => [
-            'description' => 'Alerting Enabled',
-            'help' => 'Enable the alerting worker. Sets the default value for all nodes.',
-        ],
         'service_alerting_frequency' => [
             'description' => 'Alerting Frequency',
             'help' => 'How often alert rules are checked. Note that data is only updated based on poller frequency. Sets the default value for all nodes.',
-        ],
-        'service_ping_enabled' => [
-            'description' => 'Fast Ping Enabled',
-            'help' => 'Fast Ping just pings devices to check if they are up or down. Sets the default value for all nodes.',
         ],
         'service_update_enabled' => [
             'description' => 'Daily Maintenance Enabled',

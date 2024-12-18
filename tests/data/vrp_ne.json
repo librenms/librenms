@@ -7641,5 +7641,51 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "ports-stack": {
+        "discovery": {
+            "ports_stack": [
+                {
+                    "high_ifIndex": 10,
+                    "low_ifIndex": 49,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 11,
+                    "low_ifIndex": 49,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 15,
+                    "low_ifIndex": 53,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 17,
+                    "low_ifIndex": 51,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 18,
+                    "low_ifIndex": 52,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 43,
+                    "low_ifIndex": 47,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 44,
+                    "low_ifIndex": 47,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 47,
+                    "low_ifIndex": 48,
+                    "ifStackStatus": "active"
+                }
+            ]
+        }
     }
 }
