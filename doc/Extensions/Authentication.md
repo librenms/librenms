@@ -305,9 +305,9 @@ unless radius sends a reply attribute with a role.
 
 You can change the default role(s) by setting
 !!! setting "auth/radius"
-```bash
-lnms config:set radius.default_roles '["csr"]'
-```
+    ```bash
+    lnms config:set radius.default_roles '["csr"]'
+    ```
 
 The attribute `Filter-ID` is a standard Radius-Reply-Attribute (string) that
 can be assigned a specially formatted string to assign a single role to the user. 
@@ -458,9 +458,9 @@ $config['auth_ldap_bindpassword'] = 'password';
 
 !!! setting "webui/graph"
     ```bash
-    lnms config:set allow_unauth_graphs_cidr ['127.0.0.1/32']
+    lnms config:set allow_unauth_graphs_cidr '["127.0.0.1/32"]'
     lnms config:set allow_unauth_graphs true
-```
+    ```
 
 ## Single Sign-on
 
