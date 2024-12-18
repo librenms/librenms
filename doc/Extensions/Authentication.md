@@ -458,7 +458,7 @@ $config['auth_ldap_bindpassword'] = 'password';
 
 !!! setting "webui/graph"
     ```bash
-    lnms config:set allow_unauth_graphs_cidr ['127.0.0.1/32']
+    lnms config:set allow_unauth_graphs_cidr '["127.0.0.1/32"]'
     lnms config:set allow_unauth_graphs true
     ```
 
