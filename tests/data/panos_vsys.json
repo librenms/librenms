@@ -12973,6 +12973,31 @@
                     "sensor_deleted": 0,
                     "sensor_class": "count",
                     "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.25461.2.1.2.5.1.3.0",
+                    "sensor_index": "panGPGWUtilizationActiveTunnels.0",
+                    "sensor_type": "panos",
+                    "sensor_descr": "GlobalProtect VPN Active Sessions",
+                    "group": "VPN",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 0,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": 0,
+                    "sensor_limit_low_warn": 0,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "count",
+                    "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.25461.2.1.2.3.3.0",
                     "sensor_index": "panSessionActive.0",
                     "sensor_type": "panos",
@@ -13380,7 +13405,7 @@
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": 2,
+                    "sensor_current": 4,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
@@ -13405,7 +13430,7 @@
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": 1,
+                    "sensor_current": 5,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
@@ -13587,45 +13612,129 @@
                 },
                 {
                     "state_name": "panSysHAPeerState",
-                    "state_descr": "active",
+                    "state_descr": "unknown",
                     "state_draw_graph": 1,
-                    "state_value": 1,
-                    "state_generic_value": 0
-                },
-                {
-                    "state_name": "panSysHAPeerState",
-                    "state_descr": "passive",
-                    "state_draw_graph": 1,
-                    "state_value": 2,
-                    "state_generic_value": 3
+                    "state_value": 0,
+                    "state_generic_value": 2
                 },
                 {
                     "state_name": "panSysHAPeerState",
                     "state_descr": "suspended",
                     "state_draw_graph": 1,
-                    "state_value": 3,
+                    "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
-                    "state_name": "panSysHAState",
+                    "state_name": "panSysHAPeerState",
+                    "state_descr": "non-functional",
+                    "state_draw_graph": 1,
+                    "state_value": 2,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "panSysHAPeerState",
+                    "state_descr": "initial",
+                    "state_draw_graph": 1,
+                    "state_value": 3,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "panSysHAPeerState",
+                    "state_descr": "passive",
+                    "state_draw_graph": 1,
+                    "state_value": 4,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "panSysHAPeerState",
                     "state_descr": "active",
                     "state_draw_graph": 1,
-                    "state_value": 1,
+                    "state_value": 5,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "panSysHAPeerState",
+                    "state_descr": "tentative",
+                    "state_draw_graph": 1,
+                    "state_value": 10,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "panSysHAPeerState",
+                    "state_descr": "active-secondary",
+                    "state_draw_graph": 1,
+                    "state_value": 11,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "panSysHAPeerState",
+                    "state_descr": "active-primary",
+                    "state_draw_graph": 1,
+                    "state_value": 12,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "panSysHAState",
-                    "state_descr": "passive",
+                    "state_descr": "unknown",
                     "state_draw_graph": 1,
-                    "state_value": 2,
-                    "state_generic_value": 3
+                    "state_value": 0,
+                    "state_generic_value": 2
                 },
                 {
                     "state_name": "panSysHAState",
                     "state_descr": "suspended",
                     "state_draw_graph": 1,
-                    "state_value": 3,
+                    "state_value": 1,
                     "state_generic_value": 2
+                },
+                {
+                    "state_name": "panSysHAState",
+                    "state_descr": "non-functional",
+                    "state_draw_graph": 1,
+                    "state_value": 2,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "panSysHAState",
+                    "state_descr": "initial",
+                    "state_draw_graph": 1,
+                    "state_value": 3,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "panSysHAState",
+                    "state_descr": "passive",
+                    "state_draw_graph": 1,
+                    "state_value": 4,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "panSysHAState",
+                    "state_descr": "active",
+                    "state_draw_graph": 1,
+                    "state_value": 5,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "panSysHAState",
+                    "state_descr": "tentative",
+                    "state_draw_graph": 1,
+                    "state_value": 10,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "panSysHAState",
+                    "state_descr": "active-secondary",
+                    "state_draw_graph": 1,
+                    "state_value": 11,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "panSysHAState",
+                    "state_descr": "active-primary",
+                    "state_draw_graph": 1,
+                    "state_value": 12,
+                    "state_generic_value": 0
                 }
             ]
         },
@@ -13942,12 +14051,193 @@
                     "active": 1,
                     "protocol": "lldp",
                     "remote_hostname": "acme-xxx-sr-001",
-                    "remote_port": "31:30:47:45:32:2f:34:2f:30:2f:37 (32303a32383a33653a36653a65333a3131)",
+                    "remote_port": "10GE2/4/0/7 (32303a32383a33653a36653a65333a3131)",
                     "remote_platform": null,
                     "remote_version": "Huawei Versatile Routing Platform Software\nVRP (R) software, Version 8.150 (CE12800 V200R002C50SPC800)\r\nCopyright (C) 2012-2017 Huawei Technologies Co., Ltd.\r\nHUAWEI CE12804S",
                     "ifAlias": "ethernet1/12",
                     "ifDescr": "ethernet1/12",
                     "ifName": "ethernet1/12"
+                }
+            ]
+        }
+    },
+    "ports-stack": {
+        "discovery": {
+            "ports_stack": [
+                {
+                    "high_ifIndex": 300000000,
+                    "low_ifIndex": 300000001,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 300000000,
+                    "low_ifIndex": 300000002,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 300000000,
+                    "low_ifIndex": 300000004,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 300000000,
+                    "low_ifIndex": 300000005,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 400000000,
+                    "low_ifIndex": 400000001,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 400000000,
+                    "low_ifIndex": 400000002,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 400000000,
+                    "low_ifIndex": 400000101,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 400000000,
+                    "low_ifIndex": 400000102,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 400000000,
+                    "low_ifIndex": 400000103,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 400000000,
+                    "low_ifIndex": 400000107,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 400000000,
+                    "low_ifIndex": 400000108,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 400000000,
+                    "low_ifIndex": 400000109,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 400000000,
+                    "low_ifIndex": 400000201,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 400000000,
+                    "low_ifIndex": 400000202,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 400000000,
+                    "low_ifIndex": 400000301,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 400000000,
+                    "low_ifIndex": 400000302,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 400000000,
+                    "low_ifIndex": 400000303,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 400000000,
+                    "low_ifIndex": 400000304,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 400000000,
+                    "low_ifIndex": 400000306,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 400000000,
+                    "low_ifIndex": 400000401,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 400000000,
+                    "low_ifIndex": 400000501,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 500050000,
+                    "low_ifIndex": 500050010,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 500050000,
+                    "low_ifIndex": 500050030,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 500050000,
+                    "low_ifIndex": 500050035,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 500050000,
+                    "low_ifIndex": 500050060,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 500050000,
+                    "low_ifIndex": 500050070,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 500050000,
+                    "low_ifIndex": 500050075,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 500050000,
+                    "low_ifIndex": 500050121,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 500050000,
+                    "low_ifIndex": 500050200,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 500050000,
+                    "low_ifIndex": 500050220,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 500050000,
+                    "low_ifIndex": 500050251,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 500050000,
+                    "low_ifIndex": 500050255,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 500050000,
+                    "low_ifIndex": 500050290,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 500050000,
+                    "low_ifIndex": 500050300,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 500050000,
+                    "low_ifIndex": 500050320,
+                    "ifStackStatus": "active"
                 }
             ]
         }

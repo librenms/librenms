@@ -5805,5 +5805,49 @@
                 }
             ]
         }
+    },
+    "transceivers": {
+        "discovery": {
+            "transceivers": [
+                {
+                    "index": "1332",
+                    "entity_physical_index": null,
+                    "type": "10GE CU3M",
+                    "vendor": "CISCO-MOLEX",
+                    "oui": null,
+                    "model": "SFP-H10GB-CU3M",
+                    "revision": "V03",
+                    "serial": "MPH2624A287",
+                    "date": null,
+                    "ddm": null,
+                    "encoding": null,
+                    "cable": null,
+                    "distance": null,
+                    "wavelength": null,
+                    "connector": null,
+                    "channels": 1,
+                    "ifIndex": null
+                },
+                {
+                    "index": "1344",
+                    "entity_physical_index": null,
+                    "type": "10GE CU3M",
+                    "vendor": "CISCO-MOLEX",
+                    "oui": null,
+                    "model": "SFP-H10GB-CU3M",
+                    "revision": "V03",
+                    "serial": "MPH2624A285",
+                    "date": null,
+                    "ddm": null,
+                    "encoding": null,
+                    "cable": null,
+                    "distance": null,
+                    "wavelength": null,
+                    "connector": null,
+                    "channels": 1,
+                    "ifIndex": null
+                }
+            ]
+        }
     }
 }

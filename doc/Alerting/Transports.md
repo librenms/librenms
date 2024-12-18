@@ -269,20 +269,23 @@ Here an example using 3 numbers, any amount of numbers is supported:
 ## Discord
 
 The Discord transport will POST the alert message to your Discord
-Incoming WebHook. Simple html tags are stripped from  the message.
+Incoming WebHook. The only required value is Discord URL, without this no call to Discord will be made. 
 
-The only required value is for url, without this no call to Discord
-will be made. The Options field supports the JSON/Form Params listed
-in the Discord Docs below.
+Graphs can be included in the template using: ```<img class="librenms-graph" src=""/>```. The rest of the html tags are stripped from the message.
 
-[Discord Docs](https://discordapp.com/developers/docs/resources/webhook#execute-webhook)
+
+ The Options field supports JSON/Form Params listed
+in the 
+[Discord Docs](https://discordapp.com/developers/docs/resources/webhook#execute-webhook). Fields to embed is a comma separated list from the [Alert Data](https://github.com/librenms/librenms/blob/master/LibreNMS/Alert/AlertData.php)).
+
 
 **Example:**
 
 | Config | Example |
 | ------ | ------- |
 | Discord URL | <https://discordapp.com/api/webhooks/4515489001665127664/82-sf4385ysuhfn34u2fhfsdePGLrg8K7cP9wl553Fg6OlZuuxJGaa1d54fe> |
-| Options | username=myname |
+| Options | username=myname</br>content=Some content</br>tts=false |
+| Fields to embed | hostname,name,timestamp,severity |
 
 ## Elasticsearch
 
@@ -356,6 +359,50 @@ Configuration of the LibreNMS IRC-Bot is described [here](https://github.com/lib
 | Config | Example |
 | ------ | ------- |
 | IRC | enabled |
+
+## IBM On Call Manager
+
+## IBM On Call Manager (OCM)
+
+LibreNMS can integrate with IBM On Call Manager by using a webhook URL you create by adding the LibreNMS integration.
+
+The webhook URL (referred to as `ocm-url`) can be found under 'Integrations' in the IBM On Call Manager portal after selecting LibreNMS as the integration.
+
+IBM On Call Manager uses the webhook to send the name of the alert rule, along with other relevant details. It will include the name or IP address of the system sending the alert, the name of the alert, the severity, timestamp, OS, location, and a unique ID. 
+
+**Example:**
+
+| Config  | Example                                  |
+| ------- | ---------------------------------------- |
+| ocm-url | https://ibm-ocm-webhook.example.com/api |
+
+**Payload Example**:
+
+```json
+{
+  "eventSource": {
+    "name": "{{ $alert->sysName }}",
+    "description": "{{ $alert->sysDescr }}",
+    "displayName": "LibreNMS Alerts - DBAoC",
+    "type": "server",
+    "sourceID": "LibreNMS-DBAoC"
+  },
+  "resourceAffected": {
+    "hostname": "{{ $alert->hostname }}",
+    "ipAddress": "{{ $alert->ip }}",
+    "os": "{{ $alert->os }}",
+    "location": "{{ $alert->location }}",
+    "component": "{{ $alert->sysName }}"
+  },
+  "eventInfo": {
+    "summary": "{{ $alert->title }}",
+    "msg": "{{ $alert->msg }}",
+    "severity": "{{ $alert->severity }}",
+    "timestamp": "{{ $alert->timestamp }}",
+    "uniqueID": "{{ $alert->uid }}"
+  }
+}
+```
 
 ## JIRA
 

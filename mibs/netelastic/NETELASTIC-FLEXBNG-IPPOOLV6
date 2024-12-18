@@ -1,0 +1,171 @@
+-- 2017-03-11 16:21:51
+-- Namespace: http://netelastic.com/nfv/flexbng/netelastic-ippoolv6
+
+NETELASTIC-FLEXBNG-IPPOOLV6 DEFINITIONS ::= BEGIN
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Integer32, Unsigned32, Counter32, Counter64,
+    Gauge32, IpAddress
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, RowStatus, DateAndTime,
+    TruthValue
+        FROM SNMPv2-TC
+    Ipv6Address
+        FROM IPV6-TC
+    bras
+	FROM NETELASTIC-FLEXBNG-MIB
+;
+
+ippoolv6Mib MODULE-IDENTITY
+    LAST-UPDATED "201612070000Z"
+    ORGANIZATION "@ORGANIZATION"
+    CONTACT-INFO "@CONTACT-INFO"
+    DESCRIPTION ""
+    REVISION "201612070000Z"
+    DESCRIPTION "@REVISION-DESCRIPTION"
+    ::= { bras 3 }
+
+ConfdString ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION "xs: and confd: types mapped to strings"
+    SYNTAX      OCTET STRING
+
+String ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION "xs:string"
+    SYNTAX      OCTET STRING
+
+V6pool-status ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      INTEGER {unlock(0),lock(1)}
+
+-- tagpath /ippoolv6/delegation-pool-status/delegation-pool
+delegationPoolTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF DelegationPoolEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ippoolv6Mib 1 }
+
+-- tagpath /ippoolv6/delegation-pool-status/delegation-pool
+delegationPoolEntry OBJECT-TYPE
+    SYNTAX      DelegationPoolEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { delegationGroupName }
+        ::= { delegationPoolTable 1 }
+
+DelegationPoolEntry ::=
+    SEQUENCE {
+        delegationGroupName String,
+        prefixAllocatePercent Unsigned32
+    }
+
+-- tagpath /ippoolv6/delegation-pool-status/delegation-pool/group-name
+delegationGroupName OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only 
+    STATUS      current
+    DESCRIPTION "Pool name"
+    ::= { delegationPoolEntry 1 }
+
+-- tagpath /ippoolv6/delegation-pool-status/delegation-pool/prefix-allocate-percent
+prefixAllocatePercent OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Delegation pool allocate IPv6 address percent"
+    ::= { delegationPoolEntry 2 }
+
+-- tagpath /ippoolv6/addr-pool-status/addr-pool
+addrPoolTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AddrPoolEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ippoolv6Mib 2 }
+
+-- tagpath /ippoolv6/addr-pool-status/addr-pool
+addrPoolEntry OBJECT-TYPE
+    SYNTAX      AddrPoolEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { addrGroupName }
+        ::= { addrPoolTable 1 }
+
+AddrPoolEntry ::=
+    SEQUENCE {
+        addrGroupName String,
+        vrfName String
+    }
+
+-- tagpath /ippoolv6/addr-pool-status/addr-pool/group-name
+addrGroupName OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only 
+    STATUS      current
+    DESCRIPTION "Pool name"
+    ::= { addrPoolEntry 1 }
+
+-- tagpath /ippoolv6/addr-pool-status/addr-pool/vrf
+vrfName OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { addrPoolEntry 2 }
+
+-- tagpath /ippoolv6/addr-pool-status/addr-pool/addr-range
+rangeTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RangeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "IPv6 address section"
+    ::= { ippoolv6Mib 3 }
+
+-- tagpath /ippoolv6/addr-pool-status/addr-pool/addr-range
+rangeEntry OBJECT-TYPE
+    SYNTAX      RangeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { addrGroupName, startIPv6, endIPv6 }
+        ::= { rangeTable 1 }
+
+RangeEntry ::=
+    SEQUENCE {
+        startIPv6 Ipv6Address,
+        endIPv6 Ipv6Address,
+        addrAllocatePercent Unsigned32
+    }
+
+-- tagpath /ippoolv6/addr-pool-status/addr-pool/addr-range/start-ipv6-ip
+startIPv6 OBJECT-TYPE
+    SYNTAX      Ipv6Address
+    MAX-ACCESS  read-only 
+    STATUS      current
+    DESCRIPTION "Start IPv6 address"
+    ::= { rangeEntry 1 }
+
+-- tagpath /ippoolv6/addr-pool-status/addr-pool/addr-range/end-ipv6-ip
+endIPv6 OBJECT-TYPE
+    SYNTAX      Ipv6Address
+    MAX-ACCESS  read-only 
+    STATUS      current
+    DESCRIPTION "End IPv6 address"
+    ::= { rangeEntry 2 }
+
+-- tagpath /ippoolv6/addr-pool-status/addr-pool/addr-range/ip-allocate-percent
+addrAllocatePercent OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Section allocate IPv6 address percent"
+    ::= { rangeEntry 3 }
+
+END
