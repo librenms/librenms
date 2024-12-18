@@ -48,6 +48,7 @@ class Datastore implements DataStorageInterface
             'p' => 'prometheus.enable',
             'g' => 'graphite.enable',
             '2' => 'influxdbv2.enable',
+            'k' => 'kafka.enable',
         ];
         foreach ($opts as $opt => $setting) {
             if (isset($options[$opt])) {
