@@ -22,6 +22,7 @@ $alert_states = [
     'acknowledged' => 2,
     'worse' => 3,
     'better' => 4,
+    'changed' => 5,
 ];
 
 $alert_severities = [
