@@ -5,6 +5,7 @@ namespace App\Listeners;
 use App\Action;
 use App\Actions\Alerts\RunAlertRulesAction;
 use App\Events\DevicePolled;
+use App\Facades\LibrenmsConfig;
 use Log;
 
 class CheckAlerts
@@ -26,6 +27,10 @@ class CheckAlerts
      */
     public function handle(DevicePolled $event): void
     {
+        if (LibrenmsConfig::get('alert.disable')) {
+            return;
+        }
+
         Log::info('#### Start Alerts ####');
         $start = microtime(true);
 

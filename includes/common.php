@@ -739,7 +739,15 @@ function string_to_float($value)
  */
 function uw_to_dbm($value)
 {
-    return $value <= 0 ? -60 : 10 * log10($value / 1000);
+    if ($value < 0) {
+        return null;
+    }
+
+    if ($value == 0) {
+        return -60;
+    }
+
+    return 10 * log10($value / 1000);
 }
 
 /**
@@ -748,7 +756,15 @@ function uw_to_dbm($value)
  */
 function mw_to_dbm($value)
 {
-    return $value <= 0 ? -60 : 10 * log10($value);
+    if ($value < 0) {
+        return null;
+    }
+
+    if ($value == 0) {
+        return -60;
+    }
+
+    return 10 * log10($value);
 }
 
 /**
@@ -795,6 +811,27 @@ function get_vm_parent_id($device)
     }
 
     return dbFetchCell('SELECT `device_id` FROM `vminfo` WHERE `vmwVmDisplayName` = ? OR `vmwVmDisplayName` = ?', [$device['hostname'], $device['hostname'] . '.' . Config::get('mydomain')]);
+}
+
+/**
+ * Converts ieee754 32-bit floating point decimal represenation to decimal
+ */
+function ieee754_to_decimal($value)
+{
+    $hex = dechex($value);
+    $binary = str_pad(base_convert($hex, 16, 2), 32, '0', STR_PAD_LEFT);
+    $sign = (int) $binary[0];
+    $exponent = bindec(substr($binary, 1, 8)) - 127;
+    $mantissa = substr($binary, 9);
+    $mantissa_value = 1;
+    for ($i = 0; $i < strlen($mantissa); $i++) {
+        if ($mantissa[$i] == '1') {
+            $mantissa_value += pow(2, -($i + 1));
+        }
+    }
+    $value = pow(-1, $sign) * $mantissa_value * pow(2, $exponent);
+
+    return $value;
 }
 
 /**

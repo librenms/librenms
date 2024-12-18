@@ -3063,5 +3063,141 @@
                 }
             ]
         }
+    },
+    "ports-stack": {
+        "discovery": {
+            "ports_stack": [
+                {
+                    "high_ifIndex": 1000001,
+                    "low_ifIndex": 19,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1000002,
+                    "low_ifIndex": 19,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1000003,
+                    "low_ifIndex": 500,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1000004,
+                    "low_ifIndex": 500,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1000005,
+                    "low_ifIndex": 30,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1000006,
+                    "low_ifIndex": 30,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1000007,
+                    "low_ifIndex": 1,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1000007,
+                    "low_ifIndex": 19,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1000007,
+                    "low_ifIndex": 30,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1000007,
+                    "low_ifIndex": 100,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1000007,
+                    "low_ifIndex": 500,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1000008,
+                    "low_ifIndex": 1,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1000008,
+                    "low_ifIndex": 19,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1000008,
+                    "low_ifIndex": 30,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1000008,
+                    "low_ifIndex": 100,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1000008,
+                    "low_ifIndex": 500,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1000009,
+                    "low_ifIndex": 1,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1000009,
+                    "low_ifIndex": 19,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1000009,
+                    "low_ifIndex": 30,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1000009,
+                    "low_ifIndex": 100,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1000009,
+                    "low_ifIndex": 500,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1000010,
+                    "low_ifIndex": 1,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1000010,
+                    "low_ifIndex": 19,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1000010,
+                    "low_ifIndex": 30,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1000010,
+                    "low_ifIndex": 100,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1000010,
+                    "low_ifIndex": 500,
+                    "ifStackStatus": "active"
+                }
+            ]
+        }
     }
 }

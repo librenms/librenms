@@ -93,18 +93,23 @@ class Vminfo implements \LibreNMS\Interfaces\Module
         $this->discover($os);
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function cleanup(Device $device): void
+    public function dataExists(Device $device): bool
     {
-        $device->vminfo()->delete();
+        return $device->vminfo()->exists();
     }
 
     /**
      * @inheritDoc
      */
-    public function dump(Device $device)
+    public function cleanup(Device $device): int
+    {
+        return $device->vminfo()->delete();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function dump(Device $device, string $type): ?array
     {
         return [
             'vminfo' => $device->vminfo()->orderBy('vmwVmVMID')

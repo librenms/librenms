@@ -7,7 +7,7 @@
                     "sysObjectID": ".1.3.6.1.4.1.10002.1",
                     "sysDescr": "Linux 4.9.241 #2 SMP Thu Dec 30 12:43:55 EET 2021 armv7l",
                     "sysContact": "<private>",
-                    "version": "GP.ipq806x.v2.6.0-RC.46590.211230.1238",
+                    "version": "v2.6.0-RC",
                     "hardware": "AF60-LR",
                     "features": null,
                     "location": "<private>",
@@ -1036,7 +1036,7 @@
                 {
                     "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
-                    "processor_oid": ".1.3.6.1.4.1.41112.1.11.2.6",
+                    "processor_oid": ".1.3.6.1.4.1.41112.1.11.1.2.6.1",
                     "processor_index": "1",
                     "processor_type": "airos-af60",
                     "processor_usage": 3,
@@ -1046,21 +1046,7 @@
                 }
             ]
         },
-        "poller": {
-            "processors": [
-                {
-                    "entPhysicalIndex": 0,
-                    "hrDeviceIndex": 0,
-                    "processor_oid": ".1.3.6.1.4.1.41112.1.11.2.6",
-                    "processor_index": "1",
-                    "processor_type": "airos-af60",
-                    "processor_usage": 0,
-                    "processor_descr": "Processor",
-                    "processor_precision": 1,
-                    "processor_perc_warn": 75
-                }
-            ]
-        }
+        "poller": "matches discovery"
     },
     "sensors": {
         "discovery": {

@@ -21,6 +21,7 @@
  *
  * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  */
+
 use LibreNMS\Util\Oid;
 
 $snmpData = SnmpQuery::cache()->hideMib()->walk('NET-SNMP-EXTEND-MIB::nsExtendOutLine."ups-nut"')->table(3);
@@ -47,7 +48,7 @@ if (! empty($snmpData)) {
         $sensor_oid = 9 + $index;
 
         if (! empty($snmpData[$sensor_oid])) {
-            $oid = Oid::toNumeric('NET-SNMP-EXTEND-MIB::nsExtendOutLine."ups-nut".' . $sensor_oid);
+            $oid = Oid::of('NET-SNMP-EXTEND-MIB::nsExtendOutLine."ups-nut".' . $sensor_oid)->toNumeric();
             $value = current($snmpData[$sensor_oid]);
             $state_name = $sensor['state_name'];
             $descr = $sensor['descr'];

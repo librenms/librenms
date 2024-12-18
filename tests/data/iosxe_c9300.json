@@ -15545,5 +15545,31 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "ports-stack": {
+        "discovery": {
+            "ports_stack": [
+                {
+                    "high_ifIndex": 71,
+                    "low_ifIndex": 70,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 72,
+                    "low_ifIndex": 70,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 137,
+                    "low_ifIndex": 136,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 138,
+                    "low_ifIndex": 136,
+                    "ifStackStatus": "active"
+                }
+            ]
+        }
     }
 }

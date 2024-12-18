@@ -42,7 +42,7 @@ class LegacyModule implements Module
     /** @var array */
     private $module_deps = [
         'arp-table' => ['ports'],
-        'bgp-peers' => ['ports', 'vrf'],
+        'bgp-peers' => ['ports', 'vrf', 'ipv4-addresses', 'ipv6-addresses'],
         'cisco-mac-accounting' => ['ports'],
         'fdb-table' => ['ports', 'vlans'],
         'vlans' => ['ports'],
@@ -117,20 +117,32 @@ class LegacyModule implements Module
         Debug::enableErrorReporting(); // and back to normal
     }
 
-    public function cleanup(Device $device): void
+    public function dataExists(Device $device): bool
     {
-        // TODO: Implement cleanup() method.
+        return false; // impossible to determine for legacy modules
+    }
+
+    public function cleanup(Device $device): int
+    {
+        return 0; // Not possible to cleanup legacy modules
     }
 
     /**
      * @inheritDoc
      */
-    public function dump(Device $device)
+    public function dump(Device $device, string $type): ?array
     {
+        if ($type == 'discovery' && ! \LibreNMS\Util\Module::legacyDiscoveryExists($this->name)) {
+            return null;
+        }
+        if ($type == 'poller' && ! \LibreNMS\Util\Module::legacyPollingExists($this->name)) {
+            return null;
+        }
+
         $data = [];
         $dump_rules = $this->moduleDumpDefinition();
         if (empty($dump_rules)) {
-            return false; // not supported for this legacy module
+            return null; // not supported for this legacy module
         }
 
         foreach ($dump_rules as $table => $info) {

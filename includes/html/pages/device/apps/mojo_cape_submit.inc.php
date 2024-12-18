@@ -15,6 +15,7 @@ echo ' | Slugs: ';
 $slugs = $app->data['slugs'];
 
 foreach (array_keys($slugs) as $index => $slug) {
+    $slug = htmlspecialchars($slug);
     $label = $vars['slug'] == $slug
         ? '<span class="pagemenu-selected">' . $slug . '</span>'
         : $slug;
@@ -29,6 +30,7 @@ foreach (array_keys($slugs) as $index => $slug) {
 print_optionbar_end();
 
 if (isset($vars['slug'])) {
+    $vars['slug'] = htmlspecialchars($vars['slug']);
     $graphs = [
         'mojo_cape_submit_subs' => 'Submissions',
         'mojo_cape_submit_hash_changed' => 'Submissions where the hashes changed',
