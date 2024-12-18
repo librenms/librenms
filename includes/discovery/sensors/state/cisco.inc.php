@@ -58,7 +58,7 @@ foreach ($tables as $tablevalue) {
         // This OID has no meaning in the context of StackWise Virtual
         // Skip the creation of the "Stack Ring - Redundant" state sensor if the device operates in StackWise Virtual mode
         // This can be identified by "Virtual Stack" in entPhysicalName OID
-        if (isset($temp[0]['cswRingRedundant']) && $temp[0]['cswRingRedundant'] == 2 && $entPhysName == 'Virtual Stack') {
+        if (isset($temp[0]['cswRingRedundant']) && $temp[0]['cswRingRedundant'] == 2 && ($entPhysName == 'Virtual Stack' || $entPhysName == 'c95xx Stack')) {
             continue;
         }
 
