@@ -17,7 +17,10 @@ mib_dir: nokia
 bad_iftype:
     - aluGponOnu
     - bridge
-    - ieee8023adLag
     - l2vlan
     - slip
     - softwareLoopback
+    - aluGponPhysicalUni
+    - linegroup
+    - gpon
+    - other
