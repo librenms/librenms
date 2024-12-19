@@ -32,13 +32,13 @@ class CheckStatus
     const ERROR = 2;
     const UNKNOWN = 3;
 
-    public static function toSeverity(int $state) : Severity
+    public static function toSeverity(int $state): Severity
     {
-            return collect([
-                self::OK => Severity::Ok,
-                self::WARNING => Severity::Warning,
-                self::ERROR => Severity::Error,
-                self::UNKNOWN => Severity::Unknown
-            ])->get($state);
+        return collect([
+            self::OK => Severity::Ok,
+            self::WARNING => Severity::Warning,
+            self::ERROR => Severity::Error,
+            self::UNKNOWN => Severity::Unknown
+        ])->get($state);
     }
 }
