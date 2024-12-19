@@ -129,9 +129,12 @@ class DevCheckCommand extends LnmsCommand
             $this->helper->enableDb();
         }
 
+        if ($this->option('verbose')) {
+            $this->helper->enableVerbose();
+        }
+
         if ($this->option('debug')) {
             $this->helper->enableDebug();
         }
-
     }
 }

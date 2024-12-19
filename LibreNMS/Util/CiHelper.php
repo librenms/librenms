@@ -96,6 +96,11 @@ class CiHelper
 
     public function enableDebug()
     {
+        Debug::setOnly();
+    }
+
+    public function enableVerbose()
+    {
         Debug::setVerbose();
     }
 
