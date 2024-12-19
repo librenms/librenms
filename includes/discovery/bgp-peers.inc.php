@@ -17,12 +17,16 @@ if (empty($bgpLocalAs)) {
 
 foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
     $device['context_name'] = $context_name;
+
+    $vrfs = array_keys(DeviceCache::getPrimary()->vrfs->pluck('vrf_id', 'vrf_oid')->toArray());
+
     $peer2 = false;
     $peers_data = '';
     $bgp4_mib = false;
 
     if (is_numeric($bgpLocalAs)) {
         echo "AS$bgpLocalAs ";
+        echo "\n";
         if ($bgpLocalAs != $device['bgpLocalAs']) {
             dbUpdate(['bgpLocalAs' => $bgpLocalAs], 'devices', 'device_id=?', [$device['device_id']]);
             echo 'Updated AS ';
@@ -30,6 +34,16 @@ foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
 
         if ($device['os_group'] === 'arista') {
             $peers_data = snmp_walk($device, 'aristaBgp4V2PeerRemoteAs', '-Oq', 'ARISTA-BGP4V2-MIB');
+            $peers_data = $peers_data . "\n";
+
+            foreach ($vrfs as $vrf_name) {
+                $snmp_walk_options = [];
+                $snmp_walk_options[] = '-Oq';
+                $snmp_walk_options[] = '-c' . $device['community'] . '@' . $vrf_name;
+
+                $peers_data = $peers_data . snmp_walk($device, 'aristaBgp4V2PeerRemoteAs', $snmp_walk_options, 'ARISTA-BGP4V2-MIB');
+            }
+
             $peer2 = true;
         } elseif ($device['os'] == 'junos') {
             $peers_data = snmp_walk($device, 'jnxBgpM2PeerRemoteAs', '-Onq', 'BGP4-V2-MIB-JUNIPER', 'junos');
@@ -51,6 +65,14 @@ foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
             dbUpdate(['bgpLocalAs' => null], 'devices', 'device_id=?', [$device['device_id']]);
             echo ' (Removed ASN) ';
         }
+    }
+    $peer_count = count(array_unique(explode("\n", $peers_data)));
+    if ($peer_count > 0) {
+        echo 'BGP peers found: ' . $peer_count . '\n';
+        echo '##########################' . '\n';
+        print_r($peers_data);
+        echo "\n";
+        echo '##########################' . '\n';
     }
 
     $peerlist = build_bgp_peers($device, $peers_data, $peer2);
@@ -75,7 +97,14 @@ foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
                         $peer2 = false;
                     }
                 } elseif ($device['os_group'] === 'arista') {
-                    $af_data = snmpwalk_cache_oid($device, 'aristaBgp4V2PrefixInPrefixes', $af_data, 'ARISTA-BGP4V2-MIB');
+                    $oid = 'aristaBgp4V2PrefixInPrefixes';
+                    $mib = 'ARISTA-BGP4V2-MIB';
+                    $af_data = snmpwalk_cache_oid($device, $oid, $af_data, $mib);
+
+                    foreach ($vrfs as $vrf_name) {
+                        $vrf_af_data = snmp_walk_arista($device, $device['community'], $vrf_name, $oid, [], $mib);
+                        $af_data = array_merge($af_data, $vrf_af_data);
+                    }
                 } elseif ($device['os'] === 'aos7') {
                     $af_data = snmpwalk_cache_oid($device, 'alaBgpPeerRcvdPrefixes', $af_data, 'ALCATEL-IND1-BGP-MIB');
                 }
