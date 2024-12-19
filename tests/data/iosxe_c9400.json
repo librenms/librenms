@@ -29427,7 +29427,7 @@
                     "vlan": null,
                     "rootBridge": 0,
                     "bridgeAddress": "00eeab8f4200",
-                    "protocolSpecification": "unknown",
+                    "protocolSpecification": "rapidPvstPlus",
                     "priority": 32769,
                     "timeSinceTopologyChange": "2879862",
                     "topChanges": 167,

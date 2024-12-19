@@ -12926,7 +12926,7 @@
                     "vlan": null,
                     "rootBridge": 0,
                     "bridgeAddress": "f872eae009bc",
-                    "protocolSpecification": "unknown",
+                    "protocolSpecification": "rapidPvstPlus",
                     "priority": 32769,
                     "timeSinceTopologyChange": "2620382",
                     "topChanges": 1,
