@@ -94,6 +94,16 @@ class CiHelper
         $this->unitEnv['DBTEST'] = 1;
     }
 
+    public function enableDebug()
+    {
+        Debug::setOnly();
+    }
+
+    public function enableVerbose()
+    {
+        Debug::setVerbose();
+    }
+
     public function enableSnmpsim()
     {
         $this->unitEnv['SNMPSIM'] = 1;
