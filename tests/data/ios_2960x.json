@@ -30730,7 +30730,7 @@
                     "vlan": null,
                     "rootBridge": 0,
                     "bridgeAddress": "ac7e8a19bf00",
-                    "protocolSpecification": "unknown",
+                    "protocolSpecification": "rapidPvstPlus",
                     "priority": 32769,
                     "timeSinceTopologyChange": "7184723",
                     "topChanges": 6,
