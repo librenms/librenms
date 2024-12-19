@@ -7993,7 +7993,7 @@
                     "group": "HA",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": -1,
+                    "sensor_current": 1,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
@@ -8018,7 +8018,7 @@
                     "group": "HA",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": -1,
+                    "sensor_current": 1,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
@@ -8950,7 +8950,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": "1",
                     "entPhysicalIndex_measured": null,
-                    "sensor_prev": -1,
+                    "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
                     "state_name": "fgHaStatsSyncStatus"
@@ -8975,7 +8975,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": "2",
                     "entPhysicalIndex_measured": null,
-                    "sensor_prev": -1,
+                    "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
                     "state_name": "fgHaStatsSyncStatus"
@@ -9739,5 +9739,61 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "ports-stack": {
+        "discovery": {
+            "ports_stack": [
+                {
+                    "high_ifIndex": 9,
+                    "low_ifIndex": 26,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 9,
+                    "low_ifIndex": 27,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 9,
+                    "low_ifIndex": 29,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 9,
+                    "low_ifIndex": 30,
+                    "ifStackStatus": "notInService"
+                },
+                {
+                    "high_ifIndex": 9,
+                    "low_ifIndex": 31,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 9,
+                    "low_ifIndex": 32,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 9,
+                    "low_ifIndex": 33,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 9,
+                    "low_ifIndex": 134,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 10,
+                    "low_ifIndex": 9,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 11,
+                    "low_ifIndex": 9,
+                    "ifStackStatus": "active"
+                }
+            ]
+        }
     }
 }
