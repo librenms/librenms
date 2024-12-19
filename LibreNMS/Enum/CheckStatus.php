@@ -38,7 +38,7 @@ class CheckStatus
             self::OK => Severity::Ok,
             self::WARNING => Severity::Warning,
             self::ERROR => Severity::Error,
-            self::UNKNOWN => Severity::Unknown
+            self::UNKNOWN => Severity::Unknown,
         ])->get($state);
     }
 }

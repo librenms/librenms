@@ -154,7 +154,7 @@ class Sensor extends DeviceRelatedModel implements Keyable
 
     public function currentStatus(): Severity
     {
-        if ($this->sensor_class === 'state'){
+        if ($this->sensor_class === 'state') {
             return CheckStatus::toSeverity((int) $this->state->state_generic_value);
         }
         if ($this->sensor_limit !== null && $this->sensor_current >= $this->sensor_limit) {
