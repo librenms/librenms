@@ -52,6 +52,7 @@ class DevCheckCommand extends LnmsCommand
         $this->addOption('full', null, InputOption::VALUE_NONE);
         $this->addOption('os-modules-only', null, InputOption::VALUE_NONE);
         $this->addOption('commands', 'c', InputOption::VALUE_NONE);
+        $this->addOption('debug', 'd', InputOption::VALUE_NONE);
     }
 
     /**
@@ -127,5 +128,10 @@ class DevCheckCommand extends LnmsCommand
         if ($this->option('db')) {
             $this->helper->enableDb();
         }
+
+        if ($this->option('debug')) {
+            $this->helper->enableDebug();
+        }
+
     }
 }
