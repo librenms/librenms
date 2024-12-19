@@ -29,6 +29,7 @@ use App\Models\Device;
 use App\Models\Route;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Blade;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Url;
 
@@ -186,7 +187,7 @@ class RoutesTablesController extends TableController
 
         $item['inetCidrRouteIfIndex'] = $route_entry->inetCidrRouteIfIndex == 0 ? 'Undefined' : 'IfIndex ' . $route_entry->inetCidrRouteIfIndex;
         if ($port = $route_entry->port()->first()) {
-            $item['inetCidrRouteIfIndex'] = Url::portLink($port, htmlspecialchars($port->getShortLabel()));
+            $item['inetCidrRouteIfIndex'] = Blade::render('<x-port-link :port="$port">{{ $port->getShortLabel() }}</x-port-link>', ['port' => $port]);
         }
 
         try {
@@ -198,9 +199,9 @@ class RoutesTablesController extends TableController
         $device = Device::findByIp($route_entry->inetCidrRouteNextHop);
         if ($device) {
             if ($device->device_id == $route_entry->device_id || in_array($route_entry->inetCidrRouteNextHop, ['127.0.0.1', '::1'])) {
-                $item['inetCidrRouteNextHop'] = Url::deviceLink($device, 'localhost');
+                $item['inetCidrRouteNextHop'] = Blade::render('<x-device-link :device="$device">localhost</x-device-link>', ['device' => $device]);
             } else {
-                $item['inetCidrRouteNextHop'] = $item['inetCidrRouteNextHop'] . '<br>(' . Url::deviceLink($device) . ')';
+                $item['inetCidrRouteNextHop'] = $item['inetCidrRouteNextHop'] . '<br>(' . Blade::render('<x-device-link :device="$device"/>', ['device' => $device]) . ')';
             }
         }
 
