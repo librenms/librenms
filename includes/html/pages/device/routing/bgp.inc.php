@@ -121,6 +121,9 @@ foreach (dbFetchRows("SELECT * FROM `bgpPeers` WHERE `device_id` = ? $extra_sql 
     unset($alert);
     unset($peerhost, $peername);
 
+    // load the peer identifier into an object
+    $peerIdentifierIp = IP::parse($peer['bgpPeerIdentifier'], true);
+
     if ($peer['bgpPeerState'] == 'established') {
         $col = 'green';
     } else {
@@ -159,7 +162,7 @@ foreach (dbFetchRows("SELECT * FROM `bgpPeers` WHERE `device_id` = ? $extra_sql 
     $query = 'SELECT * FROM ipv6_addresses AS A, ports AS I, devices AS D WHERE ';
     $query .= '(A.ipv6_address = ? AND I.port_id = A.port_id)';
     $query .= ' AND D.device_id = I.device_id';
-    $ipv6_host = dbFetchRow($query, [$peer['bgpPeerIdentifier']]);
+    $ipv6_host = dbFetchRow($query, [$peerIdentifierIp?->uncompressed()]);
 
     if ($ipv4_host) {
         $peerhost = $ipv4_host;
@@ -198,9 +201,6 @@ foreach (dbFetchRows("SELECT * FROM `bgpPeers` WHERE `device_id` = ? $extra_sql 
         // Build a list of valid AFI/SAFI for this peer
     }
 
-    // make ipv6 look pretty
-    $peer['bgpPeerIdentifier'] = (string) IP::parse($peer['bgpPeerIdentifier'], true);
-
     // display overlib graphs
     $graph_array = [];
     $graph_array['type'] = 'bgp_updates';
@@ -222,7 +222,7 @@ foreach (dbFetchRows("SELECT * FROM `bgpPeers` WHERE `device_id` = ? $extra_sql 
     $link_array['page'] = 'graphs';
     unset($link_array['height'], $link_array['width'], $link_array['legend']);
     $link = \LibreNMS\Util\Url::generate($link_array);
-    $peeraddresslink = '<span class=list-large>' . \LibreNMS\Util\Url::overlibLink($link, $peer['bgpPeerIdentifier'], \LibreNMS\Util\Url::graphTag($graph_array_zoom)) . '</span>';
+    $peeraddresslink = '<span class=list-large>' . \LibreNMS\Util\Url::overlibLink($link, $peerIdentifierIp?->compressed(), \LibreNMS\Util\Url::graphTag($graph_array_zoom)) . '</span>';
 
     if ($peer['bgpPeerLastErrorCode'] == 0 && $peer['bgpPeerLastErrorSubCode'] == 0) {
         $last_error = $peer['bgpPeerLastErrorText'];
