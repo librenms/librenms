@@ -178,24 +178,22 @@ class PortsController implements DeviceTab
             }
         }
 
-        if ($this->detail) {
-            // IPv4 + IPv6 subnet if detailed
-            // fa-arrow-right green portlink on devicelink
-            if ($port->ipv4Networks->isNotEmpty()) {
-                $ids = $port->ipv4Networks->map(fn ($net) => $net->ipv4->pluck('port_id'))->flatten();
-                foreach ($ids as $port_id) {
-                    if ($port_id !== $port->port_id) {
-                        $this->addPortNeighbor($neighbors, 'ipv4_network', $port_id);
-                    }
+        // IPv4 + IPv6 subnet if detailed
+        // fa-arrow-right green portlink on devicelink
+        if ($port->macLinkedPorts->isNotEmpty()) {
+            $ids = $port->macLinkedPorts->pluck('port_id');
+            foreach ($ids as $port_id) {
+                if ($port_id !== $port->port_id) {
+                    $this->addPortNeighbor($neighbors, 'ipv4_network', $port_id);
                 }
             }
+        }
 
-            if ($port->ipv6Networks->isNotEmpty()) {
-                $ids = $port->ipv6Networks->map(fn ($net) => $net->ipv6->pluck('port_id'))->flatten();
-                foreach ($ids as $port_id) {
-                    if ($port_id !== $port->port_id) {
-                        $this->addPortNeighbor($neighbors, 'ipv6_network', $port_id);
-                    }
+        if ($port->ipv6Networks->isNotEmpty()) {
+            $ids = $port->ipv6Networks->map(fn ($net) => $net->ipv6->pluck('port_id'))->flatten();
+            foreach ($ids as $port_id) {
+                if ($port_id !== $port->port_id) {
+                    $this->addPortNeighbor($neighbors, 'ipv6_network', $port_id);
                 }
             }
         }
