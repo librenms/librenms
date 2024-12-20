@@ -1435,13 +1435,6 @@
             "default": false,
             "type": "boolean"
         },
-        "discovery_modules.transceivers": {
-            "order": 322,
-            "group": "discovery",
-            "section": "discovery_modules",
-            "default": true,
-            "type": "boolean"
-        },
         "discovery_modules.entity-physical": {
             "order": 110,
             "group": "discovery",
@@ -1559,6 +1552,13 @@
             "group": "discovery",
             "section": "discovery_modules",
             "default": false,
+            "type": "boolean"
+        },
+        "discovery_modules.transceivers": {
+            "order": 322,
+            "group": "discovery",
+            "section": "discovery_modules",
+            "default": true,
             "type": "boolean"
         },
         "discovery_modules.sensors": {
