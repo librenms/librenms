@@ -171,12 +171,14 @@ class RoutesTablesController extends TableController
      */
     public function formatItem($route_entry)
     {
-        $item['updated_at'] = $route_entry->updated_at ? $route_entry->updated_at->diffForHumans() : $route_entry->updated_at;
-        $item['created_at'] = $route_entry->created_at ? $route_entry->created_at->toDateTimeString() : $route_entry->created_at;
-        $item['inetCidrRouteIfIndex'] = $route_entry->inetCidrRouteIfIndex == 0 ? 'Undefined' : $route_entry->inetCidrRouteIfIndex;
-        $item['inetCidrRouteMetric1'] = $route_entry->inetCidrRouteMetric1;
-        $item['inetCidrRoutePfxLen'] = $route_entry->inetCidrRoutePfxLen;
-        $item['inetCidrRouteDestType'] = $route_entry->inetCidrRouteDestType;
+        $item = [
+            'updated_at' => $route_entry->updated_at ? $route_entry->updated_at->diffForHumans() : $route_entry->updated_at,
+            'created_at' => $route_entry->created_at ? $route_entry->created_at->toDateTimeString() : $route_entry->created_at,
+            'inetCidrRouteIfIndex' => $route_entry->inetCidrRouteIfIndex == 0 ? 'Undefined' : $route_entry->inetCidrRouteIfIndex,
+            'inetCidrRouteMetric1' => $route_entry->inetCidrRouteMetric1,
+            'inetCidrRoutePfxLen' => $route_entry->inetCidrRoutePfxLen,
+            'inetCidrRouteDestType' => $route_entry->inetCidrRouteDestType,
+        ];
 
         try {
             $obj_inetCidrRouteDest = IP::parse($route_entry->inetCidrRouteDest);
@@ -201,7 +203,7 @@ class RoutesTablesController extends TableController
             if ($device->device_id == $route_entry->device_id || in_array($route_entry->inetCidrRouteNextHop, ['127.0.0.1', '::1'])) {
                 $item['inetCidrRouteNextHop'] = Blade::render('<x-device-link :device="$device">localhost</x-device-link>', ['device' => $device]);
             } else {
-                $item['inetCidrRouteNextHop'] = $item['inetCidrRouteNextHop'] . '<br>(' . Blade::render('<x-device-link :device="$device"/>', ['device' => $device]) . ')';
+                $item['inetCidrRouteNextHop'] = $item['inetCidrRouteNextHop'] . '<br>(' . rtrim(Blade::render('<x-device-link :device="$device"/>', ['device' => $device])) . ')';
             }
         }
 
