@@ -98,6 +98,7 @@ class OSModulesTest extends DBTestCase
         $this->requireSnmpsim();  // require snmpsim for tests
         // stub out Eventlog::log and Fping->ping, we don't need to store them for these tests
         $this->stubClasses();
+        $modules = array_intersect_assoc($this->discoveryModules, $modules);
 
         try {
             Debug::set(false); // avoid all undefined index errors in the legacy code
