@@ -5,7 +5,7 @@ modules:
             data:
                 -
                     oid:
-                        - cvSipMsgRateWMValue
+                        - CISCO-VOICE-DIAL-CONTROL-MIB::cvSipMsgRateWMValue
         power:
             data:
                 -
