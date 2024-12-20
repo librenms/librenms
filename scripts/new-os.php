@@ -16,15 +16,15 @@ if ($options['h'] && $options['o'] && $options['t'] && $options['v']) {
     Debug::set(isset($options['d']));
 
     $device_id = ctype_digit($options['h']) ? $options['h'] : getidbyname($options['h']);
-    $device = device_by_id_cache($device_id);
+    $device_arr = device_by_id_cache($device_id);
     $definition_file = Config::get('install_dir') . "/includes/definitions/{$options['o']}.yaml";
     $discovery_file = Config::get('install_dir') . "/includes/definitions/discovery/{$options['o']}.yaml";
     $test_file = Config::get('install_dir') . "/tests/snmpsim/{$options['o']}.snmprec";
     if (file_exists($definition_file)) {
         c_echo("The OS {$options['o']} appears to exist already, skipping to sensors support\n");
     } else {
-        $sysDescr = snmp_get($device, 'sysDescr.0', '-OvQ', 'SNMPv2-MIB');
-        $sysObjectID = explode('.', ltrim(snmp_get($device, 'sysObjectID.0', '-OnvQ', 'SNMPv2-MIB'), '.'));
+        $sysDescr = snmp_get($device_arr, 'sysDescr.0', '-OvQ', 'SNMPv2-MIB');
+        $sysObjectID = explode('.', ltrim(snmp_get($device_arr, 'sysObjectID.0', '-OnvQ', 'SNMPv2-MIB'), '.'));
         $end_oid = array_pop($sysObjectID);
         $sysObjectID = '.' . implode('.', $sysObjectID);
         $full_sysObjectID = "$sysObjectID.$end_oid";
@@ -35,10 +35,11 @@ sysObjectID: $full_sysObjectID
 
 ");
 
-        $os = Core::detectOS(new \App\Models\Device($device));
+        $device = new \App\Models\Device($device_arr);
+        Core::detectOS($device);
         $continue = 'n';
-        if ($os != 'generic') {
-            $continue = get_user_input("We already detect this device as OS $os type, do you want to continue to add sensors? (Y/n)");
+        if ($device->os != 'generic') {
+            $continue = get_user_input("We already detect this device as OS $device->os type, do you want to continue to add sensors? (Y/n)");
         }
 
         if (! str_i_contains($continue, 'y')) {
@@ -80,7 +81,7 @@ discovery:
             file_put_contents($test_file, $snmprec);
         }
 
-        if ($os === 'generic') {
+        if ($device->os === 'generic') {
             c_echo('Base discovery file created,');
         }
     }
