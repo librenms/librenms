@@ -1,0 +1,190 @@
+mib: NETSURE-NCU-MIB
+modules:
+  os:
+    version: NETSURE-NCU-MIB::identControllerFirmwareVersion.0
+    serial: NETSURE-NCU-MIB::identControllerSerialNumber.0
+    location: NETSURE-NCU-MIB::identName.0
+  sensors:
+    load:
+      data:
+        -
+          oid: systemUsedCapacity
+          value: systemUsedCapacity
+          num_oid: '.1.3.6.1.4.1.6302.2.1.2.4.0'
+          descr: System Used Capacity
+          index: 'systemUsedCapacity.0'
+          divisor: 1
+        -
+          oid: rectifiersUsedCapacity
+          value: rectifiersUsedCapacity
+          num_oid: '.1.3.6.1.4.1.6302.2.1.2.11.3.{{ $index }}'
+          descr: Rectifiers Used Capacity
+          index: 'rectifiersUsedCapacity.{{ $index }}'
+          divisor: 1
+    current:
+      options:
+        skip_value_gt: 2147483646
+      data:
+        -
+          oid: systemCurrent
+          value: systemCurrent
+          num_oid: '.1.3.6.1.4.1.6302.2.1.2.3.0'
+          descr: System DC Current
+          index: 'systemCurrent.0'
+          divisor: 1000
+        -
+          oid: psBatteryCurrent
+          value: psBatteryCurrent
+          num_oid: '.1.3.6.1.4.1.6302.2.1.2.5.5.1.2.{{ $index }}'
+          descr: System DC Battery Current
+          index: 'psBatteryCurrent.{{ $index }}'
+          divisor: 1000
+        -
+          oid: psRectifierCurrent
+          value: psRectifierCurrent
+          num_oid: '.1.3.6.1.4.1.6302.2.1.2.11.4.1.6.{{ $index }}'
+          descr: Rectifier Current
+          index: 'psRectifierCurrent.{{ $index }}'
+          divisor: 1000
+        -
+          oid: psInputPhaseACurrent
+          value: psInputPhaseACurrent
+          num_oid: '.1.3.6.1.4.1.6302.2.1.2.6.4.0'
+          descr: AC Current Line A
+          index: psInputPhaseACurrent
+          divisor: 1000
+        -
+          oid: psInputPhaseBCurrent
+          value: psInputPhaseBCurrent
+          num_oid: '.1.3.6.1.4.1.6302.2.1.2.6.5.0'
+          descr: AC Current Line B
+          index: psInputPhaseBCurrent
+          divisor: 1000
+        -
+          oid: psInputPhaseCCurrent
+          value: psInputPhaseCCurrent
+          num_oid: '.1.3.6.1.4.1.6302.2.1.2.6.6.0'
+          descr: AC Current Line C
+          index: psInputPhaseCCurrent
+          divisor: 1000
+    voltage:
+      data:
+        -
+          oid: systemVoltage
+          value: systemVoltage
+          num_oid: '.1.3.6.1.4.1.6302.2.1.2.2.0'
+          descr: DC Voltage
+          index: systemVoltage
+          divisor: 1000
+        -
+          oid: psInputLineAVoltage
+          value: psInputLineAVoltage
+          num_oid: '.1.3.6.1.4.1.6302.2.1.2.6.1.0'
+          descr: AC Voltage Line A
+          index: psInputLineAVoltage
+          divisor: 1000
+        -
+          oid: psInputLineBVoltage
+          value: psInputLineBVoltage
+          num_oid: '.1.3.6.1.4.1.6302.2.1.2.6.2.0'
+          descr: AC Voltage Line B
+          index: psInputLineBVoltage
+          divisor: 1000
+        -
+          oid: psInputLineCVoltage
+          value: psInputLineCVoltage
+          num_oid: '.1.3.6.1.4.1.6302.2.1.2.6.3.0'
+          descr: AC Voltage Line C
+          index: psInputLineCVoltage
+          divisor: 1000
+    charge:
+      data:
+        -
+          oid: psBatteryCapacityPercent
+          value: psBatteryCapacityPercent
+          num_oid: '.1.3.6.1.4.1.6302.2.1.2.5.5.1.5.{{ $index }}'
+          index: '.1.3.6.1.4.1.6302.2.1.2.5.5.1.1.{{ $index }}'
+          descr: Battery 1
+          divisor: 1
+    state:
+      data:
+        -
+          oid: systemStatus
+          value: systemStatus
+          num_oid: '.1.3.6.1.4.1.6302.2.1.2.1.{{ $index }}'
+          descr: System Status
+          index: systemStatus
+          state_name: systemStatus
+          states:
+            - { value: 1, generic: 3, graph: 0, descr: unknown }
+            - { value: 2, generic: 0, graph: 0, descr: normal }
+            - { value: 3, generic: 1, graph: 0, descr: warning }
+            - { value: 4, generic: 1, graph: 0, descr: minor }
+            - { value: 5, generic: 2, graph: 0, descr: major }
+            - { value: 6, generic: 2, graph: 0, descr: critical }
+            - { value: 7, generic: 3, graph: 0, descr: unmanaged }
+            - { value: 7, generic: 3, graph: 0, descr: restricted }
+            - { value: 9, generic: 3, graph: 0, descr: testing }
+            - { value: 10, generic: 3, graph: 0, descr: disabled }
+        -
+          oid: psStatusBatteryMode
+          value: psStatusBatteryMode
+          num_oid: '.1.3.6.1.4.1.6302.2.1.2.1.{{ $index }}'
+          descr: Battery Status
+          index: psStatusBatteryMode
+          state_name: psStatusBatteryMode
+          states:
+            - { value: 1, generic: 3, graph: 0, descr: unknown }
+            - { value: 2, generic: 0, graph: 0, descr: FloatCharging }
+            - { value: 3, generic: 3, graph: 0, descr: ShortTest }
+            - { value: 4, generic: 3, graph: 0, descr: EqualizeChargingForTest }
+            - { value: 5, generic: 3, graph: 0, descr: ManualTesting }
+            - { value: 6, generic: 3, graph: 0, descr: PlanTesting }
+            - { value: 7, generic: 3, graph: 0, descr: ACFailTesting }
+            - { value: 7, generic: 2, graph: 0, descr: ACFail }
+            - { value: 9, generic: 3, graph: 0, descr: ManualEqualizeCharging }
+            - { value: 10, generic: 3, graph: 0, descr: AutoEqualizeCharging }
+            - { value: 11, generic: 3, graph: 0, descr: CyclicEqualizeCharging }
+            - { value: 12, generic: 3, graph: 0, descr: MasterEqualizeCharging }
+            - { value: 13, generic: 3, graph: 0, descr: MasterBatteryTesting }
+        -
+          oid: psRectifierFail
+          value: psRectifierFail
+          num_oid: '.1.3.6.1.4.1.6302.2.1.2.11.4.1.8.{{ $index }}'
+          descr: Rectifier Fail
+          index: 'psRectifierFail.{{ $index }}'
+          state_name: psRectifierFail
+          states:
+            - { value: 1, generic: 2, graph: 0, descr: Activiated }
+            - { value: 2, generic: 0, graph: 0, descr: Deactivated }
+    count:
+      data:
+        -
+          oid: numberOfInstalledRectifiers
+          value: numberOfInstalledRectifiers
+          num_oid: '.1.3.6.1.4.1.6302.2.1.2.11.1.{{ $index }}'
+          descr: Number of Installed Rectifiers
+          index: 'numberOfInstalledRectifiers.{{ $index }}'
+          state_name: numberOfInstalledRectifiers
+        -
+          oid: numberOfRectifiersCommunicating
+          value: numberOfRectifiersCommunicating
+          num_oid: '.1.3.6.1.4.1.6302.2.1.2.11.2.{{ $index }}'
+          descr: Number of Communicating Rectifiers
+          index: 'numberOfRectifiersCommunicating.{{ $index }}'
+          state_name: numberOfRectifiersCommunicating
+        -
+          oid: alarmLastTrapNo
+          value: alarmLastTrapNo
+          num_oid: '.1.3.6.1.4.1.6302.2.1.3.{{ $index }}'
+          descr: Alarms sent
+          index: 'alarmLastTrapNo.{{ $index }}'
+          state_name: alarmLastTrapNo
+        -
+          oid: psBatteryRatedCapacity
+          value: psBatteryRatedCapacity
+          num_oid: '.1.3.6.1.4.1.6302.2.1.2.5.5.1.6.{{ $index }}'
+          descr: Battery Capacity (Ah)
+          index: 'psBatteryRatedCapacity.{{ $index }}'
+          state_name: psBatteryRatedCapacity
+          divisor: 1000
