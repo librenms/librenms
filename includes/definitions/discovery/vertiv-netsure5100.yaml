@@ -40,12 +40,12 @@ modules:
           index: 'psBatteryCurrent.{{ $index }}'
           divisor: 1000
         -
-          oid: psRectifierCurrent
-          value: psRectifierCurrent
+          oid: psRectifierTable
           num_oid: '.1.3.6.1.4.1.6302.2.1.2.11.4.1.6.{{ $index }}'
-          descr: Rectifier Current
-          index: 'psRectifierCurrent.{{ $index }}'
+          value: psRectifierCurrent
           divisor: 1000
+          index: 'psRectifierTable.{{ $index }}'
+          descr: psRectifierIdent
         -
           oid: psInputPhaseACurrent
           value: psInputPhaseACurrent
@@ -148,11 +148,11 @@ modules:
             - { value: 12, generic: 3, graph: 0, descr: MasterEqualizeCharging }
             - { value: 13, generic: 3, graph: 0, descr: MasterBatteryTesting }
         -
-          oid: psRectifierFail
+          oid: psRectifierTable
           value: psRectifierFail
           num_oid: '.1.3.6.1.4.1.6302.2.1.2.11.4.1.8.{{ $index }}'
-          descr: Rectifier Fail
-          index: 'psRectifierFail.{{ $index }}'
+          descr: psRectifierIdent
+          index: 'psRectifierTable.{{ $index }}'
           state_name: psRectifierFail
           states:
             - { value: 1, generic: 2, graph: 0, descr: Activiated }
