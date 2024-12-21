@@ -1,0 +1,2137 @@
+-- *****************************************************************
+-- LLDP-MIB:  Vitesse private MIB
+--
+-- Copyright (c) 2002-2013 Vitesse Semiconductor Corporation "Vitesse".
+-- All Rights Reserved.
+--
+-- ****************************************************************
+
+VTSS-LLDP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    vtssSwitchMgmt
+        FROM VTSS-SMI
+    Integer32 FROM SNMPv2-SMI
+    Unsigned32 FROM SNMPv2-SMI
+    TruthValue FROM SNMPv2-TC
+    VTSSDisplayString FROM VTSS-TC
+    VTSSInteger64 FROM VTSS-TC
+    VTSSInterfaceIndex FROM VTSS-TC
+    VTSSRowEditorState FROM VTSS-TC
+    VTSSUnsigned16 FROM VTSS-TC
+    VTSSUnsigned64 FROM VTSS-TC
+    VTSSUnsigned8 FROM VTSS-TC
+    ;
+
+vtssLldpMib MODULE-IDENTITY
+    LAST-UPDATED "201407010000Z"
+    ORGANIZATION
+        "Vitesse Semiconductor Corporation"
+    CONTACT-INFO
+        "Application support <application_support@vitesse.com>"
+    DESCRIPTION
+        "This is a private version of the LLDP MIB"
+    REVISION    "201407010000Z"
+    DESCRIPTION
+        "Initial version"
+    ::= { vtssSwitchMgmt 34 }
+
+
+VTSSlldpAdminState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This enumerations the admin state."
+    SYNTAX      INTEGER { disabled(0), txAndRx(1), txOnly(2), rxOnly(3) }
+
+VTSSlldpmedAltitudeType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This enumerations the altitude type."
+    SYNTAX      INTEGER { meters(1), floors(2) }
+
+VTSSlldpmedCivicAddressType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This enumerations the civic address type."
+    SYNTAX      INTEGER { state(1), county(2), city(3), district(4), block(5), street(6), leadingStreetDirection(16), trailingStreetSuffix(17), streetSuffix(18), houseNo(19), houseNoSuffix(20), landmark(21), additionalInformation(22), name(23), zipCode(24), building(25), apartment(26), floor(27), roomNumber(28), placeType(29), postalCommunityName(30), poBox(31), additionalCode(32) }
+
+VTSSlldpmedDatumType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This enumerations the datum (geodetic system)."
+    SYNTAX      INTEGER { wgs84(1), nad83navd88(2), nad83mllw(3) }
+
+VTSSlldpmedDeviceType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This enumerations the device type that the device shall operate as."
+    SYNTAX      INTEGER { connectivity(0), endpoint(1) }
+
+VTSSlldpmedRemoteDeviceType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This enumerations the remote neighbor's device type."
+    SYNTAX      INTEGER { notDefined(0), endpointClassI(1), endpointClassII(2), endpointClassIII(3), networkConnectivity(4), reserved(5) }
+
+VTSSlldpmedRemoteNetworkPolicyApplicationType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This enumerations the remote neighbor's network policy's application
+         type."
+    SYNTAX      INTEGER { voice(1), voiceSignaling(2), guestVoice(3), guestVoiceSignaling(4), softphoneVoice(5), videoConferencing(6), streamingVideo(7), videoSignaling(8) }
+
+vtssLldpMibObjects OBJECT IDENTIFIER
+    ::= { vtssLldpMib 1 }
+
+vtssLldpConfig OBJECT IDENTIFIER
+    ::= { vtssLldpMibObjects 2 }
+
+vtssLldpConfigGlobal OBJECT IDENTIFIER
+    ::= { vtssLldpConfig 1 }
+
+vtssLldpConfigGlobalReInitDelay OBJECT-TYPE
+    SYNTAX      VTSSUnsigned16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Set the LLDP tx reinitialization delay in seconds. Valid range 1-10.
+         
+         When a port is disabled, LLDP is disabled or the switch is rebooted, a
+         LLDP shutdown frame is transmitted to the neighboring units, signaling
+         that the LLDP information isn't valid anymore.
+         
+         Tx reinitialization delay controls the amount of seconds between the
+         shutdown frame and a new LLDP initialization.
+         
+         
+         
+         Note: Must be less than 0.25 times the Tx interval."
+    ::= { vtssLldpConfigGlobal 1 }
+
+vtssLldpConfigGlobalMsgTxHold OBJECT-TYPE
+    SYNTAX      VTSSUnsigned16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Set the LLDP tx hold times . Valid range 2-10.
+         
+         Each LLDP frame contains information about how long time the
+         information in the LLDP frame shall be considered valid. The LLDP
+         information valid period is set to tx hold times multiplied by tx
+         interval seconds."
+    ::= { vtssLldpConfigGlobal 2 }
+
+vtssLldpConfigGlobalMsgTxInterval OBJECT-TYPE
+    SYNTAX      VTSSUnsigned16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Set the LLDP tx interval in seconds.
+         
+         The switch periodically transmits LLDP frames to its neighbors for
+         having the network discovery information up-to-date. The interval
+         between each LLDP frame is determined by the tx Interval value.
+         
+         
+         
+         Valid range 5-32768 seconds."
+    ::= { vtssLldpConfigGlobal 3 }
+
+vtssLldpConfigGlobalTxDelay OBJECT-TYPE
+    SYNTAX      VTSSUnsigned16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Set the LLDP tx delay in seconds. Valid range 1-8192.
+         
+         If some configuration is changed (e.g. the IP address) a new LLDP frame
+         is transmitted, but the time between the LLDP frames will always be at
+         least the value of tx delay seconds.
+         
+         Note: tx Delay cannot be larger than 1/4 of the tx interval."
+    ::= { vtssLldpConfigGlobal 4 }
+
+vtssLldpConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VTSSLldpConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is a table to configure LLDP configurations for a specific
+         interface."
+    ::= { vtssLldpConfig 2 }
+
+vtssLldpConfigEntry OBJECT-TYPE
+    SYNTAX      VTSSLldpConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each interface has a set of control parameters"
+    INDEX       { vtssLldpConfigIfIndex }
+    ::= { vtssLldpConfigTable 1 }
+
+VTSSLldpConfigEntry ::= SEQUENCE {
+    vtssLldpConfigIfIndex   VTSSInterfaceIndex,
+    vtssLldpConfigAdminState    VTSSlldpAdminState,
+    vtssLldpConfigCdpAware      TruthValue,
+    vtssLldpConfigOptionalTlvs      VTSSUnsigned8
+}
+
+vtssLldpConfigIfIndex OBJECT-TYPE
+    SYNTAX      VTSSInterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Logical interface number index."
+    ::= { vtssLldpConfigEntry 1 }
+
+vtssLldpConfigAdminState OBJECT-TYPE
+    SYNTAX      VTSSlldpAdminState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Sets the LLDP admin state for the interface."
+    ::= { vtssLldpConfigEntry 3 }
+
+vtssLldpConfigCdpAware OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Enables/disables CDP awareness for the interface.
+         
+         CDP is Cisco's equivalent to LLDP.
+         
+         
+         
+         The CDP operation is restricted to decoding incoming CDP frames (The
+         switch doesn't transmit CDP frames). CDP frames are only decoded if
+         LLDP on the port is enabled.
+         
+         
+         
+         Only CDP TLVs that can be mapped to a corresponding field in the LLDP
+         neighbors' table are decoded. All other TLVs are discarded
+         (Unrecognized CDP TLVs and discarded CDP frames are not shown in the
+         LLDP statistics.).
+         
+         CDP TLVs are mapped onto LLDP neighbors' table as shown below.
+         
+         CDP TLV 'Device ID' is mapped to the LLDP 'Chassis ID' field.
+         
+         CDP TLV 'Address' is mapped to the LLDP 'Management Address' field. The
+         CDP address TLV can contain multiple addresses, but only the first
+         address is shown in the LLDP neighbors table.
+         
+         CDP TLV 'Port ID' is mapped to the LLDP 'Port ID' field.
+         
+         CDP TLV 'Version and Platform' is mapped to the LLDP 'System
+         Description' field.
+         
+         Both the CDP and LLDP support 'system capabilities', but the CDP
+         capabilities cover capabilities that are not part of the LLDP. These
+         capabilities are shown as 'others' in the LLDP neighbors' table.
+         
+         
+         
+         If all ports have CDP awareness disabled the switch forwards CDP frames
+         received from neighbor devices. If at least one port has CDP awareness
+         enabled all CDP frames are terminated by the switch.
+         
+         
+         
+         Note: When CDP awareness on a port is disabled the CDP information
+         isn't removed immediately, but gets removed when the hold time is
+         exceeded."
+    ::= { vtssLldpConfigEntry 4 }
+
+vtssLldpConfigOptionalTlvs OBJECT-TYPE
+    SYNTAX      VTSSUnsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Enables/Disables the LLDP optional TLVs. Bit mask, where setting the
+         bit to 1 means enable transmission of the corresponding TLV.
+         
+         Bit 0 represents Port Description TLV.
+         
+         Bit 1 represents System Name TLV.
+         
+         Bit 2 represents System Description.
+         
+         Bit 3 represents System Capabilities TLV.
+         
+         Bit 4 represents Management Address TLV."
+    ::= { vtssLldpConfigEntry 5 }
+
+vtssLldpConfigMed OBJECT IDENTIFIER
+    ::= { vtssLldpConfig 3 }
+
+vtssLldpConfigMedTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VTSSLldpConfigMedEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is a table to configure LLDP MEDIA configurations for a specific
+         interface."
+    ::= { vtssLldpConfigMed 1 }
+
+vtssLldpConfigMedEntry OBJECT-TYPE
+    SYNTAX      VTSSLldpConfigMedEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each interface has a set of control parameters"
+    INDEX       { vtssLldpConfigMedIfIndex }
+    ::= { vtssLldpConfigMedTable 1 }
+
+VTSSLldpConfigMedEntry ::= SEQUENCE {
+    vtssLldpConfigMedIfIndex    VTSSInterfaceIndex,
+    vtssLldpConfigMedOptionalTlvs   VTSSUnsigned8,
+    vtssLldpConfigMedDeviceType     VTSSlldpmedDeviceType
+}
+
+vtssLldpConfigMedIfIndex OBJECT-TYPE
+    SYNTAX      VTSSInterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Logical interface number index."
+    ::= { vtssLldpConfigMedEntry 1 }
+
+vtssLldpConfigMedOptionalTlvs OBJECT-TYPE
+    SYNTAX      VTSSUnsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Enables/Disables the LLDP optional TLVs. Bit mask, where setting the
+         bit to 1 means
+         
+         enable transmission of the corresponding optional TLV.
+         
+         Bit 0 represents the capabilities TLV.
+         
+         Bit 1 represents the network Policy TLV.
+         
+         Bit 2 represents the location TLV.
+         
+         Bit 3 represents the PoE TLV."
+    ::= { vtssLldpConfigMedEntry 3 }
+
+vtssLldpConfigMedDeviceType OBJECT-TYPE
+    SYNTAX      VTSSlldpmedDeviceType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Setting device type to configure the mode the device shall operate as."
+    ::= { vtssLldpConfigMedEntry 4 }
+
+vtssLldpConfigMedPolicyTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VTSSLldpConfigMedPolicyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is a table to configure LLDP MED Policies for the device."
+    ::= { vtssLldpConfigMed 2 }
+
+vtssLldpConfigMedPolicyEntry OBJECT-TYPE
+    SYNTAX      VTSSLldpConfigMedPolicyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Network Policy Discovery enables the efficient discovery and diagnosis
+         of mismatch issues with the VLAN configuration, along with the
+         associated Layer 2 and Layer 3 attributes, which apply for a set of
+         specific protocol applications on that port. Improper network policy
+         configurations are a very significant issue in VoIP environments that
+         frequently result in voice quality degradation or loss of service.
+         Policies are only intended for use with applications that have specific
+         'real-time' network policy requirements, such as interactive voice
+         and/or video services."
+    INDEX       { vtssLldpConfigMedPolicyLldpmedPolicy }
+    ::= { vtssLldpConfigMedPolicyTable 1 }
+
+VTSSLldpConfigMedPolicyEntry ::= SEQUENCE {
+    vtssLldpConfigMedPolicyLldpmedPolicy    Integer32,
+    vtssLldpConfigMedPolicyApplicationType      VTSSlldpmedRemoteNetworkPolicyApplicationType,
+    vtssLldpConfigMedPolicyTagged   TruthValue,
+    vtssLldpConfigMedPolicyVlanId   VTSSUnsigned16,
+    vtssLldpConfigMedPolicyL2Priority   VTSSUnsigned8,
+    vtssLldpConfigMedPolicyDscp     VTSSUnsigned8,
+    vtssLldpConfigMedPolicyAction   VTSSRowEditorState
+}
+
+vtssLldpConfigMedPolicyLldpmedPolicy OBJECT-TYPE
+    SYNTAX      Integer32 (0..31)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Policy index."
+    ::= { vtssLldpConfigMedPolicyEntry 1 }
+
+vtssLldpConfigMedPolicyApplicationType OBJECT-TYPE
+    SYNTAX      VTSSlldpmedRemoteNetworkPolicyApplicationType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The LLDP policy application type."
+    ::= { vtssLldpConfigMedPolicyEntry 3 }
+
+vtssLldpConfigMedPolicyTagged OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The LLDP policy tagged flag. Defines if LLDP policy uses tagged VLAN."
+    ::= { vtssLldpConfigMedPolicyEntry 4 }
+
+vtssLldpConfigMedPolicyVlanId OBJECT-TYPE
+    SYNTAX      VTSSUnsigned16 (1..4095)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The LLDP policy VLAN ID. Only valid when policy 'Tagged' is TRUE"
+    ::= { vtssLldpConfigMedPolicyEntry 5 }
+
+vtssLldpConfigMedPolicyL2Priority OBJECT-TYPE
+    SYNTAX      VTSSUnsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The LLDP policy L2 priority."
+    ::= { vtssLldpConfigMedPolicyEntry 6 }
+
+vtssLldpConfigMedPolicyDscp OBJECT-TYPE
+    SYNTAX      VTSSUnsigned8 (0..63)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The LLDP policy DSCP."
+    ::= { vtssLldpConfigMedPolicyEntry 7 }
+
+vtssLldpConfigMedPolicyAction OBJECT-TYPE
+    SYNTAX      VTSSRowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Action"
+    ::= { vtssLldpConfigMedPolicyEntry 100 }
+
+vtssLldpConfigMedPolicyListTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VTSSLldpConfigMedPolicyListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each interface can be mapped to multiple policies. Set to TRUE in order
+         to enable the corresponding policy to be transmitted at the interface.
+         It is a requirement that the policy is defined."
+    ::= { vtssLldpConfigMed 3 }
+
+vtssLldpConfigMedPolicyListEntry OBJECT-TYPE
+    SYNTAX      VTSSLldpConfigMedPolicyListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each location information has a control parameter"
+    INDEX       { vtssLldpConfigMedPolicyListIfIndex, vtssLldpConfigMedPolicyListLldpmedPolicy }
+    ::= { vtssLldpConfigMedPolicyListTable 1 }
+
+VTSSLldpConfigMedPolicyListEntry ::= SEQUENCE {
+    vtssLldpConfigMedPolicyListIfIndex      VTSSInterfaceIndex,
+    vtssLldpConfigMedPolicyListLldpmedPolicy    Integer32,
+    vtssLldpConfigMedPolicyListLldpmedPoliciesList      TruthValue
+}
+
+vtssLldpConfigMedPolicyListIfIndex OBJECT-TYPE
+    SYNTAX      VTSSInterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Logical interface number index."
+    ::= { vtssLldpConfigMedPolicyListEntry 1 }
+
+vtssLldpConfigMedPolicyListLldpmedPolicy OBJECT-TYPE
+    SYNTAX      Integer32 (0..31)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Policy index."
+    ::= { vtssLldpConfigMedPolicyListEntry 3 }
+
+vtssLldpConfigMedPolicyListLldpmedPoliciesList OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Set to TRUE assign the corresponding policy index to the interface."
+    ::= { vtssLldpConfigMedPolicyListEntry 4 }
+
+vtssLldpConfigMedGlobal OBJECT IDENTIFIER
+    ::= { vtssLldpConfigMed 4 }
+
+vtssLldpConfigMedGlobalFastRepeatCount OBJECT-TYPE
+    SYNTAX      VTSSUnsigned8 (1..10)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Number of times to repeat LLDP frame transmission at fast start
+         
+         Rapid startup and Emergency Call Service Location Identification
+         Discovery of endpoints is a critically important aspect of VoIP systems
+         in general. In addition, it is best to advertise only those pieces of
+         information which are specifically relevant to particular endpoint
+         types (for example only advertise the voice network policy to permitted
+         voice-capable devices), both in order to conserve the limited LLDPU
+         space and to reduce security and system integrity issues that can come
+         with inappropriate knowledge of the network policy.
+         
+         With this in mind LLDP-MED defines an LLDP-MED Fast Start interaction
+         between the protocol and the application layers on top of the protocol,
+         in order to achieve these related properties. Initially, a Network
+         Connectivity Device will only transmit LLDP TLVs in an LLDPDU. Only
+         after an LLDP-MED Endpoint Device is detected, will an LLDP-MED capable
+         Network Connectivity Device start to advertise LLDP-MED TLVs in
+         outgoing LLDPDUs on the associated port. The LLDP-MED application will
+         temporarily speed up the transmission of the LLDPDU to start within a
+         second, when a new LLDP-MED neighbor has been detected in order share
+         LLDP-MED information as fast as possible to new neighbors.
+         
+         Because there is a risk of an LLDP frame being lost during transmission
+         between neighbors, it is recommended to repeat the fast start
+         transmission multiple times to increase the possibility of the
+         neighbors receiving the LLDP frame. With fast start repeat count it is
+         possible to specify the number of times the fast start transmission
+         would be repeated. The recommended value is 4 times, given that 4 LLDP
+         frames with a 1 second interval will be transmitted, when an LLDP frame
+         with new information is received.
+         
+         It should be noted that LLDP-MED and the LLDP-MED Fast Start mechanism
+         is only intended to run on links between LLDP-MED Network Connectivity
+         Devices and Endpoint Devices, and as such does not apply to links
+         between LAN infrastructure elements, including Network Connectivity
+         Devices, or other types of links."
+    ::= { vtssLldpConfigMedGlobal 1 }
+
+vtssLldpConfigMedGlobalLatitude OBJECT-TYPE
+    SYNTAX      VTSSInteger64
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Latitude degrees in 2s-complement as specified in RFC 3825. Positive
+         numbers are north of the equator and negative numbers are south of the
+         equator."
+    ::= { vtssLldpConfigMedGlobal 2 }
+
+vtssLldpConfigMedGlobalLongitude OBJECT-TYPE
+    SYNTAX      VTSSInteger64
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Longitude degrees in 2s-complement as specified in RFC 3825. Positive
+         values are East of the prime meridian and negative numbers are West of
+         the prime meridian."
+    ::= { vtssLldpConfigMedGlobal 3 }
+
+vtssLldpConfigMedGlobalAltitudeType OBJECT-TYPE
+    SYNTAX      VTSSlldpmedAltitudeType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Setting altitude type
+         
+         Possible to select between two altitude types (floors or meters).
+         Meters are representing meters of altitude defined by the vertical
+         datum specified. Floors are representing altitude in a form more
+         relevant in buildings which have different floor-to-floor dimensions.
+         An altitude = 0.0 is meaningful even outside a building, and represents
+         ground level at the given latitude and longitude. Inside a building,
+         0.0 represents the floor level associated with ground level at the main
+         entrance."
+    ::= { vtssLldpConfigMedGlobal 4 }
+
+vtssLldpConfigMedGlobalAltitude OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Altitude value in 2s-complement as specified in RFC 3825"
+    ::= { vtssLldpConfigMedGlobal 5 }
+
+vtssLldpConfigMedGlobalElinAddr OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..25))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Emergency Call Service ELIN identifier data format is defined to carry
+         the ELIN identifier as used during emergency call setup to a
+         traditional CAMA or ISDN trunk-based PSAP. This format consists of a
+         numerical digit string, corresponding to the ELIN to be used for
+         emergency calling. Maximum number of octets are 25."
+    ::= { vtssLldpConfigMedGlobal 6 }
+
+vtssLldpConfigMedGlobalDatum OBJECT-TYPE
+    SYNTAX      VTSSlldpmedDatumType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Setting datum to configure the datum (geodetic system) to use.
+         
+         The Map Datum is used for the coordinates given in these options:
+         
+         WGS84: (Geographical 3D) - World Geodesic System 1984, CRS Code 4327,
+         Prime Meridian Name: Greenwich.
+         
+         NAD83/NAVD88: North American Datum 1983, CRS Code 4269, Prime Meridian
+         Name: Greenwich;The associated vertical datum is the North American
+         Vertical Datum of 1988 (NAVD88).This datum pair is to be used when
+         referencing locations on land, not near tidal water(which would use
+         Datum = NAD83/MLLW).
+         
+         NAD83/MLLW: North American Datum 1983, CRS Code 4269, Prime Meridian
+         Name: Greenwich; The associated vertical datum is Mean Lower Low Water
+         (MLLW). This datum pair is to be used when referencing locations on
+         water/sea/ocean."
+    ::= { vtssLldpConfigMedGlobal 7 }
+
+vtssLldpConfigMedGlobalCountryCode OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..2))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The two-letter ISO 3166 country code in capital ASCII letters -
+         Example: DK, DE or US."
+    ::= { vtssLldpConfigMedGlobal 8 }
+
+vtssLldpConfigMedLocationInformationTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VTSSLldpConfigMedLocationInformationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The civic address location information. Each civic address can contain
+         up to 250 characters, but the total amount of characters for the
+         combined civic address locations must not exceed 250 bytes. Note: If an
+         civic address location is non-empty it uses the amount of characters
+         plus addition two characters. This is described in TIA1057, Section
+         10.2.4.3.2."
+    ::= { vtssLldpConfigMed 5 }
+
+vtssLldpConfigMedLocationInformationEntry OBJECT-TYPE
+    SYNTAX      VTSSLldpConfigMedLocationInformationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each civic address type as defined in TIA1057, Section 3.4 in Annex B"
+    INDEX       { vtssLldpConfigMedLocationInformationLldpmedIndex }
+    ::= { vtssLldpConfigMedLocationInformationTable 1 }
+
+VTSSLldpConfigMedLocationInformationEntry ::= SEQUENCE {
+    vtssLldpConfigMedLocationInformationLldpmedIndex    VTSSlldpmedCivicAddressType,
+    vtssLldpConfigMedLocationInformationCivicAddress    VTSSDisplayString
+}
+
+vtssLldpConfigMedLocationInformationLldpmedIndex OBJECT-TYPE
+    SYNTAX      VTSSlldpmedCivicAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Civic address type.
+         
+         1 - State/National subdivisions
+         
+         2 - County, parish, gun (JP), district (IN)
+         
+         3 - City, township
+         
+         4 - City division, borough, city district, ward, chou (JP)
+         
+         5 - Neighborhood, block
+         
+         6 - Street
+         
+         16 - Leading street direction
+         
+         17 - Trailing street direction
+         
+         18 - Street suffix
+         
+         19 - House number
+         
+         20 - House number suffix
+         
+         21 - Landmark or vanity address
+         
+         22 - Additional location information
+         
+         23 - Name
+         
+         24 - Postal/zip code
+         
+         25 - Building
+         
+         26 - Unit
+         
+         27 - Floor
+         
+         28 - Room
+         
+         29 - Place type
+         
+         30 - Postal
+         
+         31 - Post office
+         
+         32 - Additional code"
+    ::= { vtssLldpConfigMedLocationInformationEntry 2 }
+
+vtssLldpConfigMedLocationInformationCivicAddress OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..250))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Civic address"
+    ::= { vtssLldpConfigMedLocationInformationEntry 3 }
+
+vtssLldpConfigMedPolicyRowEditor OBJECT IDENTIFIER
+    ::= { vtssLldpConfigMed 6 }
+
+vtssLldpConfigMedPolicyRowEditorLldpmedPolicy OBJECT-TYPE
+    SYNTAX      Integer32 (0..31)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Policy index."
+    ::= { vtssLldpConfigMedPolicyRowEditor 1 }
+
+vtssLldpConfigMedPolicyRowEditorApplicationType OBJECT-TYPE
+    SYNTAX      VTSSlldpmedRemoteNetworkPolicyApplicationType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The LLDP policy application type."
+    ::= { vtssLldpConfigMedPolicyRowEditor 3 }
+
+vtssLldpConfigMedPolicyRowEditorTagged OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The LLDP policy tagged flag. Defines if LLDP policy uses tagged VLAN."
+    ::= { vtssLldpConfigMedPolicyRowEditor 4 }
+
+vtssLldpConfigMedPolicyRowEditorVlanId OBJECT-TYPE
+    SYNTAX      VTSSUnsigned16 (1..4095)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The LLDP policy VLAN ID. Only valid when policy 'Tagged' is TRUE"
+    ::= { vtssLldpConfigMedPolicyRowEditor 5 }
+
+vtssLldpConfigMedPolicyRowEditorL2Priority OBJECT-TYPE
+    SYNTAX      VTSSUnsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The LLDP policy L2 priority."
+    ::= { vtssLldpConfigMedPolicyRowEditor 6 }
+
+vtssLldpConfigMedPolicyRowEditorDscp OBJECT-TYPE
+    SYNTAX      VTSSUnsigned8 (0..63)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The LLDP policy DSCP."
+    ::= { vtssLldpConfigMedPolicyRowEditor 7 }
+
+vtssLldpConfigMedPolicyRowEditorAction OBJECT-TYPE
+    SYNTAX      VTSSRowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Action"
+    ::= { vtssLldpConfigMedPolicyRowEditor 100 }
+
+vtssLldpStatus OBJECT IDENTIFIER
+    ::= { vtssLldpMibObjects 3 }
+
+vtssLldpStatusStatistics OBJECT IDENTIFIER
+    ::= { vtssLldpStatus 1 }
+
+vtssLldpStatusStatisticsGlobalCounters OBJECT IDENTIFIER
+    ::= { vtssLldpStatusStatistics 1 }
+
+vtssLldpStatusStatisticsGlobalCountersTableInserts OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Shows the number of new entries added since switch reboot."
+    ::= { vtssLldpStatusStatisticsGlobalCounters 1 }
+
+vtssLldpStatusStatisticsGlobalCountersTableDeletes OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Shows the number of new entries deleted since switch reboot."
+    ::= { vtssLldpStatusStatisticsGlobalCounters 2 }
+
+vtssLldpStatusStatisticsGlobalCountersTableDrops OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Shows the number of LLDP frames dropped due to the entry table being
+         full."
+    ::= { vtssLldpStatusStatisticsGlobalCounters 3 }
+
+vtssLldpStatusStatisticsGlobalCountersTableAgeOuts OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Shows the number of entries deleted due to Time-To-Live expiring."
+    ::= { vtssLldpStatusStatisticsGlobalCounters 4 }
+
+vtssLldpStatusStatisticsGlobalCountersLastChangeTime OBJECT-TYPE
+    SYNTAX      VTSSUnsigned64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Shows the time when the last entry was last deleted or added. It also
+         shows the time elapsed since the last change was detected."
+    ::= { vtssLldpStatusStatisticsGlobalCounters 5 }
+
+vtssLldpStatusStatisticsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VTSSLldpStatusStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This table represents the LLDP interface counters"
+    ::= { vtssLldpStatusStatistics 2 }
+
+vtssLldpStatusStatisticsEntry OBJECT-TYPE
+    SYNTAX      VTSSLldpStatusStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each port interface has a set of statistics counters"
+    INDEX       { vtssLldpStatusStatisticsIfIndex }
+    ::= { vtssLldpStatusStatisticsTable 1 }
+
+VTSSLldpStatusStatisticsEntry ::= SEQUENCE {
+    vtssLldpStatusStatisticsIfIndex     VTSSInterfaceIndex,
+    vtssLldpStatusStatisticsTxTotal     Unsigned32,
+    vtssLldpStatusStatisticsRxTotal     Unsigned32,
+    vtssLldpStatusStatisticsRxError     Unsigned32,
+    vtssLldpStatusStatisticsRxDiscarded     Unsigned32,
+    vtssLldpStatusStatisticsTLVsDiscarded   Unsigned32,
+    vtssLldpStatusStatisticsTLVsUnrecognized    Unsigned32,
+    vtssLldpStatusStatisticsTLVsOrgDiscarded    Unsigned32,
+    vtssLldpStatusStatisticsAgeOuts     Unsigned32
+}
+
+vtssLldpStatusStatisticsIfIndex OBJECT-TYPE
+    SYNTAX      VTSSInterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Logical interface number index."
+    ::= { vtssLldpStatusStatisticsEntry 1 }
+
+vtssLldpStatusStatisticsTxTotal OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Shows the number of LLDP frames transmitted."
+    ::= { vtssLldpStatusStatisticsEntry 2 }
+
+vtssLldpStatusStatisticsRxTotal OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Shows the number of LLDP frames received."
+    ::= { vtssLldpStatusStatisticsEntry 3 }
+
+vtssLldpStatusStatisticsRxError OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Shows the number of received LLDP frames containing some kind of error."
+    ::= { vtssLldpStatusStatisticsEntry 4 }
+
+vtssLldpStatusStatisticsRxDiscarded OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Show the number of LLDP frames discarded. If a LLDP frame is received
+         at an interface, and the switch's internal table has run full, the LLDP
+         frame is counted and discarded. This situation is known as 'Too Many
+         Neighbors' in the LLDP standard. LLDP frames require a new entry in the
+         table when the Chassis ID or Remote Port ID is not already contained
+         within the table. Entries are removed from the table when a given
+         interface's link is down, an LLDP shutdown frame is received, or when
+         the entry ages out."
+    ::= { vtssLldpStatusStatisticsEntry 5 }
+
+vtssLldpStatusStatisticsTLVsDiscarded OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Shows the number of TLVs discarded. Each LLDP frame can contain
+         multiple pieces of information, known as TLVs (TLV is short for 'Type
+         Length Value'). If a TLV is malformed, it is counted and discarded."
+    ::= { vtssLldpStatusStatisticsEntry 6 }
+
+vtssLldpStatusStatisticsTLVsUnrecognized OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Shows the number of well-formed TLVs, but with an unknown type value."
+    ::= { vtssLldpStatusStatisticsEntry 7 }
+
+vtssLldpStatusStatisticsTLVsOrgDiscarded OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Shows the number of well-formed TLVs, but with an organizationally TLV
+         which is not supported."
+    ::= { vtssLldpStatusStatisticsEntry 8 }
+
+vtssLldpStatusStatisticsAgeOuts OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Show the number of age-outs. Each frame contains information about how
+         long time the LLDP information is valid (age-out time). If no new LLDP
+         frame is received within the age out time, the information is removed,
+         and the counter is incremented."
+    ::= { vtssLldpStatusStatisticsEntry 9 }
+
+vtssLldpStatusNeighborsInformationTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VTSSLldpStatusNeighborsInformationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is a table to show the LLDP neighbors information for a specific
+         interface."
+    ::= { vtssLldpStatus 2 }
+
+vtssLldpStatusNeighborsInformationEntry OBJECT-TYPE
+    SYNTAX      VTSSLldpStatusNeighborsInformationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each interface has a set of neighbors information"
+    INDEX       { vtssLldpStatusNeighborsInformationIfIndex, vtssLldpStatusNeighborsInformationLldpmedIndex }
+    ::= { vtssLldpStatusNeighborsInformationTable 1 }
+
+VTSSLldpStatusNeighborsInformationEntry ::= SEQUENCE {
+    vtssLldpStatusNeighborsInformationIfIndex   VTSSInterfaceIndex,
+    vtssLldpStatusNeighborsInformationLldpmedIndex      Integer32,
+    vtssLldpStatusNeighborsInformationChassisId     VTSSDisplayString,
+    vtssLldpStatusNeighborsInformationPortId    VTSSDisplayString,
+    vtssLldpStatusNeighborsInformationPortDescription   VTSSDisplayString,
+    vtssLldpStatusNeighborsInformationSystemName    VTSSDisplayString,
+    vtssLldpStatusNeighborsInformationSystemDescription     VTSSDisplayString,
+    vtssLldpStatusNeighborsInformationSystemCapabilities    VTSSUnsigned16,
+    vtssLldpStatusNeighborsInformationSystemCapabilitiesEnable      VTSSUnsigned16
+}
+
+vtssLldpStatusNeighborsInformationIfIndex OBJECT-TYPE
+    SYNTAX      VTSSInterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Logical interface number index."
+    ::= { vtssLldpStatusNeighborsInformationEntry 1 }
+
+vtssLldpStatusNeighborsInformationLldpmedIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0..192)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Neighbor information table entry index."
+    ::= { vtssLldpStatusNeighborsInformationEntry 2 }
+
+vtssLldpStatusNeighborsInformationChassisId OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..254))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Shows the LLDP neighbor's chassis Id."
+    ::= { vtssLldpStatusNeighborsInformationEntry 4 }
+
+vtssLldpStatusNeighborsInformationPortId OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..254))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Shows the LLDP neighbor's port id."
+    ::= { vtssLldpStatusNeighborsInformationEntry 5 }
+
+vtssLldpStatusNeighborsInformationPortDescription OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..254))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Shows the LLDP neighbor's port description."
+    ::= { vtssLldpStatusNeighborsInformationEntry 6 }
+
+vtssLldpStatusNeighborsInformationSystemName OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..254))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Shows the LLDP neighbor's system name."
+    ::= { vtssLldpStatusNeighborsInformationEntry 7 }
+
+vtssLldpStatusNeighborsInformationSystemDescription OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..254))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Shows the LLDP neighbor's system description."
+    ::= { vtssLldpStatusNeighborsInformationEntry 8 }
+
+vtssLldpStatusNeighborsInformationSystemCapabilities OBJECT-TYPE
+    SYNTAX      VTSSUnsigned16
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Shows the LLDP neighbor's system capabilities as bit mask.
+         
+         If the bit is set, it means that the functionality is supported by the
+         neighbor system.
+         
+         Bit 0 represents Other.
+         
+         Bit 1 represents Repeater.
+         
+         Bit 2 represents Bridge.
+         
+         Bit 3 represents WLAN Access Point.
+         
+         Bit 4 represents Router.
+         
+         Bit 5 represents Telephone.
+         
+         Bit 6 represents DOCSIS cable device.
+         
+         Bit 7 represents Station Only.
+         
+         Bit 8 represents Reserved."
+    ::= { vtssLldpStatusNeighborsInformationEntry 9 }
+
+vtssLldpStatusNeighborsInformationSystemCapabilitiesEnable OBJECT-TYPE
+    SYNTAX      VTSSUnsigned16
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Shows the LLDP neighbor's system capabilities which is enabled.
+         
+         If the bit is set, it means that the functionality is currently enabled
+         at the neighbor system.
+         
+         Bit 0 represents Other.
+         
+         Bit 1 represents Repeater.
+         
+         Bit 2 represents Bridge.
+         
+         Bit 3 represents WLAN Access Point.
+         
+         Bit 4 represents Router.
+         
+         Bit 5 represents Telephone.
+         
+         Bit 6 represents DOCSIS cable device.
+         
+         Bit 7 represents Station Only.
+         
+         Bit 8 represents Reserved."
+    ::= { vtssLldpStatusNeighborsInformationEntry 10 }
+
+vtssLldpStatusNeighborsMgmtInformationTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VTSSLldpStatusNeighborsMgmtInformationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is a table to show the LLDP neighbors information for a specific
+         interface."
+    ::= { vtssLldpStatus 3 }
+
+vtssLldpStatusNeighborsMgmtInformationEntry OBJECT-TYPE
+    SYNTAX      VTSSLldpStatusNeighborsMgmtInformationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each interface has a set of neighbors information"
+    INDEX       { vtssLldpStatusNeighborsMgmtInformationIfIndex, vtssLldpStatusNeighborsMgmtInformationLldpmedIndex, vtssLldpStatusNeighborsMgmtInformationLldpManagement }
+    ::= { vtssLldpStatusNeighborsMgmtInformationTable 1 }
+
+VTSSLldpStatusNeighborsMgmtInformationEntry ::= SEQUENCE {
+    vtssLldpStatusNeighborsMgmtInformationIfIndex   VTSSInterfaceIndex,
+    vtssLldpStatusNeighborsMgmtInformationLldpmedIndex      Integer32,
+    vtssLldpStatusNeighborsMgmtInformationLldpManagement    Integer32,
+    vtssLldpStatusNeighborsMgmtInformationSystemMgmAddressSubtype   VTSSUnsigned8,
+    vtssLldpStatusNeighborsMgmtInformationSystemMgmtAddress     VTSSDisplayString,
+    vtssLldpStatusNeighborsMgmtInformationSystemMgmtInterfaceSubtype    Integer32,
+    vtssLldpStatusNeighborsMgmtInformationSystemMgmtInterface   Integer32,
+    vtssLldpStatusNeighborsMgmtInformationSystemMgmtOid     OBJECT IDENTIFIER
+}
+
+vtssLldpStatusNeighborsMgmtInformationIfIndex OBJECT-TYPE
+    SYNTAX      VTSSInterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Logical interface number index."
+    ::= { vtssLldpStatusNeighborsMgmtInformationEntry 1 }
+
+vtssLldpStatusNeighborsMgmtInformationLldpmedIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0..192)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Neighbor information table entry index."
+    ::= { vtssLldpStatusNeighborsMgmtInformationEntry 2 }
+
+vtssLldpStatusNeighborsMgmtInformationLldpManagement OBJECT-TYPE
+    SYNTAX      Integer32 (0..1)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Neighbor management information table entry index."
+    ::= { vtssLldpStatusNeighborsMgmtInformationEntry 4 }
+
+vtssLldpStatusNeighborsMgmtInformationSystemMgmAddressSubtype OBJECT-TYPE
+    SYNTAX      VTSSUnsigned8
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "LLDP neighbor's management address subtype , section 9.5.9.3
+         IEEE802.1AB-2005."
+    ::= { vtssLldpStatusNeighborsMgmtInformationEntry 5 }
+
+vtssLldpStatusNeighborsMgmtInformationSystemMgmtAddress OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..31))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "LLDP neighbor's management address string, section 9.5.9.4
+         IEEE802.1AB-2005."
+    ::= { vtssLldpStatusNeighborsMgmtInformationEntry 6 }
+
+vtssLldpStatusNeighborsMgmtInformationSystemMgmtInterfaceSubtype OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Interface numbering subtype, section 9.5.9.5 IEEE802.1AB-2005."
+    ::= { vtssLldpStatusNeighborsMgmtInformationEntry 7 }
+
+vtssLldpStatusNeighborsMgmtInformationSystemMgmtInterface OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Interface number, section 9.5.9.6 IEEE802.1AB-2005."
+    ::= { vtssLldpStatusNeighborsMgmtInformationEntry 8 }
+
+vtssLldpStatusNeighborsMgmtInformationSystemMgmtOid OBJECT-TYPE
+    SYNTAX      OBJECT IDENTIFIER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Object identifier, section 9.5.9.8 IEEE802.1AB-2005."
+    ::= { vtssLldpStatusNeighborsMgmtInformationEntry 9 }
+
+vtssLldpStatusMed OBJECT IDENTIFIER
+    ::= { vtssLldpStatus 4 }
+
+vtssLldpStatusMedRemoteDeviceInfoTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VTSSLldpStatusMedRemoteDeviceInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is a table to show the LLDP neighbors information for a specific
+         interface."
+    ::= { vtssLldpStatusMed 1 }
+
+vtssLldpStatusMedRemoteDeviceInfoEntry OBJECT-TYPE
+    SYNTAX      VTSSLldpStatusMedRemoteDeviceInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each interface has a set of neighbors information"
+    INDEX       { vtssLldpStatusMedRemoteDeviceInfoIfIndex, vtssLldpStatusMedRemoteDeviceInfoLldpmedIndex }
+    ::= { vtssLldpStatusMedRemoteDeviceInfoTable 1 }
+
+VTSSLldpStatusMedRemoteDeviceInfoEntry ::= SEQUENCE {
+    vtssLldpStatusMedRemoteDeviceInfoIfIndex    VTSSInterfaceIndex,
+    vtssLldpStatusMedRemoteDeviceInfoLldpmedIndex   Integer32,
+    vtssLldpStatusMedRemoteDeviceInfoCapabilities   VTSSUnsigned16,
+    vtssLldpStatusMedRemoteDeviceInfoCapabilitiesEnabled    VTSSUnsigned16,
+    vtssLldpStatusMedRemoteDeviceInfoLatitude   VTSSInteger64,
+    vtssLldpStatusMedRemoteDeviceInfoLongitude      VTSSInteger64,
+    vtssLldpStatusMedRemoteDeviceInfoAltitudeType   VTSSlldpmedAltitudeType,
+    vtssLldpStatusMedRemoteDeviceInfoAltitude   Integer32,
+    vtssLldpStatusMedRemoteDeviceInfoDatum      VTSSlldpmedDatumType,
+    vtssLldpStatusMedRemoteDeviceInfoElinaddr   VTSSDisplayString,
+    vtssLldpStatusMedRemoteDeviceInfoDeviceType     VTSSlldpmedRemoteDeviceType,
+    vtssLldpStatusMedRemoteDeviceInfoHwRev      VTSSDisplayString,
+    vtssLldpStatusMedRemoteDeviceInfoFwRev      VTSSDisplayString,
+    vtssLldpStatusMedRemoteDeviceInfoSwRev      VTSSDisplayString,
+    vtssLldpStatusMedRemoteDeviceInfoSerialNo   VTSSDisplayString,
+    vtssLldpStatusMedRemoteDeviceInfoManufacturerName   VTSSDisplayString,
+    vtssLldpStatusMedRemoteDeviceInfoModelName      VTSSDisplayString,
+    vtssLldpStatusMedRemoteDeviceInfoAssetId    VTSSDisplayString,
+    vtssLldpStatusMedRemoteDeviceInfoEeeRxTwSys     VTSSUnsigned16,
+    vtssLldpStatusMedRemoteDeviceInfoEeeTxTwSys     VTSSUnsigned16,
+    vtssLldpStatusMedRemoteDeviceInfoEeeFbTwSys     VTSSUnsigned16,
+    vtssLldpStatusMedRemoteDeviceInfoEeeTxTwSysEcho     VTSSUnsigned16,
+    vtssLldpStatusMedRemoteDeviceInfoEeeRxTwSysEcho     VTSSUnsigned16
+}
+
+vtssLldpStatusMedRemoteDeviceInfoIfIndex OBJECT-TYPE
+    SYNTAX      VTSSInterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Logical interface number index."
+    ::= { vtssLldpStatusMedRemoteDeviceInfoEntry 1 }
+
+vtssLldpStatusMedRemoteDeviceInfoLldpmedIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0..192)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Neighbor information table entry index."
+    ::= { vtssLldpStatusMedRemoteDeviceInfoEntry 2 }
+
+vtssLldpStatusMedRemoteDeviceInfoCapabilities OBJECT-TYPE
+    SYNTAX      VTSSUnsigned16
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "LLDP neighbor's capabilities bit mask.
+         
+         Bit 0 represents LLDP-MED capabilities.
+         
+         Bit 1 represents Network Policy.
+         
+         Bit 2 represents Location Identification.
+         
+         Bit 3 represents Extended Power via MDI - PSE.
+         
+         Bit 4 represents Extended Power via MDI - PD
+         
+         Bit 5 represents Inventory
+         
+         "
+    ::= { vtssLldpStatusMedRemoteDeviceInfoEntry 4 }
+
+vtssLldpStatusMedRemoteDeviceInfoCapabilitiesEnabled OBJECT-TYPE
+    SYNTAX      VTSSUnsigned16
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "LLDP neighbor's capabilities bit mask for the capabilities which are
+         currently enabled.
+         
+         Bit 0 represents LLDP-MED capabilities.
+         
+         Bit 1 represents Network Policy.
+         
+         Bit 2 represents Location Identification.
+         
+         Bit 3 represents Extended Power via MDI - PSE.
+         
+         Bit 4 represents Extended Power via MDI - PD
+         
+         Bit 5 represents Inventory
+         
+         "
+    ::= { vtssLldpStatusMedRemoteDeviceInfoEntry 5 }
+
+vtssLldpStatusMedRemoteDeviceInfoLatitude OBJECT-TYPE
+    SYNTAX      VTSSInteger64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Latitude degrees in 2s-complement as specified in RFC 3825. Positive
+         numbers are north of the equator and negative numbers are south of the
+         equator."
+    ::= { vtssLldpStatusMedRemoteDeviceInfoEntry 6 }
+
+vtssLldpStatusMedRemoteDeviceInfoLongitude OBJECT-TYPE
+    SYNTAX      VTSSInteger64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Longitude degrees in 2s-complement as specified in RFC 3825. Positive
+         values are East of the prime meridian and negative numbers are West of
+         the prime meridian."
+    ::= { vtssLldpStatusMedRemoteDeviceInfoEntry 7 }
+
+vtssLldpStatusMedRemoteDeviceInfoAltitudeType OBJECT-TYPE
+    SYNTAX      VTSSlldpmedAltitudeType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Altitude type as either floors or meters. Meters are representing
+         meters of altitude defined by the vertical datum specified. Floors are
+         representing altitude in a form more relevant in buildings which have
+         different floor-to-floor dimensions. An altitude = 0.0 is meaningful
+         even outside a building, and represents ground level at the given
+         latitude and longitude. Inside a building, 0.0 represents the floor
+         level associated with ground level at the main entrance."
+    ::= { vtssLldpStatusMedRemoteDeviceInfoEntry 8 }
+
+vtssLldpStatusMedRemoteDeviceInfoAltitude OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Altitude value in 2s-complement as specified in RFC 3825"
+    ::= { vtssLldpStatusMedRemoteDeviceInfoEntry 9 }
+
+vtssLldpStatusMedRemoteDeviceInfoDatum OBJECT-TYPE
+    SYNTAX      VTSSlldpmedDatumType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Datum (geodetic system) .
+         
+         The Map Datum is used for the coordinates given in these options:
+         
+         WGS84: (Geographical 3D) - World Geodesic System 1984, CRS Code 4327,
+         Prime Meridian Name: Greenwich.
+         
+         NAD83/NAVD88: North American Datum 1983, CRS Code 4269, Prime Meridian
+         Name: Greenwich; The associated vertical datum is the North American
+         Vertical Datum of 1988 (NAVD88). This datum pair is to be used when
+         referencing locations on land, not near tidal water(which would use
+         Datum = NAD83/MLLW).
+         
+         NAD83/MLLW: North American Datum 1983, CRS Code 4269, Prime Meridian
+         Name: Greenwich; The associated vertical datum is Mean Lower Low Water
+         (MLLW). This datum pair is to be used when referencing locations on
+         water/sea/ocean."
+    ::= { vtssLldpStatusMedRemoteDeviceInfoEntry 10 }
+
+vtssLldpStatusMedRemoteDeviceInfoElinaddr OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..25))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Emergency Call Service ELIN identifier data format is defined to carry
+         the ELIN identifier as used during emergency call setup to a
+         traditional CAMA or ISDN trunk-based PSAP. This format consists of a
+         numerical digit string, corresponding to the ELIN to be used for
+         emergency calling. Maximum number of octets are 25."
+    ::= { vtssLldpStatusMedRemoteDeviceInfoEntry 11 }
+
+vtssLldpStatusMedRemoteDeviceInfoDeviceType OBJECT-TYPE
+    SYNTAX      VTSSlldpmedRemoteDeviceType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Shows the LLDP neighbor's device type."
+    ::= { vtssLldpStatusMedRemoteDeviceInfoEntry 12 }
+
+vtssLldpStatusMedRemoteDeviceInfoHwRev OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..31))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Shows the LLDP neighbor's hardware revision."
+    ::= { vtssLldpStatusMedRemoteDeviceInfoEntry 13 }
+
+vtssLldpStatusMedRemoteDeviceInfoFwRev OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..31))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Shows the LLDP neighbor's firmware revision."
+    ::= { vtssLldpStatusMedRemoteDeviceInfoEntry 14 }
+
+vtssLldpStatusMedRemoteDeviceInfoSwRev OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..31))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Shows the LLDP neighbor's software revision."
+    ::= { vtssLldpStatusMedRemoteDeviceInfoEntry 15 }
+
+vtssLldpStatusMedRemoteDeviceInfoSerialNo OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..31))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Shows the LLDP neighbor's serial number."
+    ::= { vtssLldpStatusMedRemoteDeviceInfoEntry 16 }
+
+vtssLldpStatusMedRemoteDeviceInfoManufacturerName OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..31))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Shows the LLDP neighbor's manufacturer name."
+    ::= { vtssLldpStatusMedRemoteDeviceInfoEntry 17 }
+
+vtssLldpStatusMedRemoteDeviceInfoModelName OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..31))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Shows the LLDP neighbor's model name."
+    ::= { vtssLldpStatusMedRemoteDeviceInfoEntry 18 }
+
+vtssLldpStatusMedRemoteDeviceInfoAssetId OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..31))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Shows the LLDP neighbor's asset id."
+    ::= { vtssLldpStatusMedRemoteDeviceInfoEntry 19 }
+
+vtssLldpStatusMedRemoteDeviceInfoEeeRxTwSys OBJECT-TYPE
+    SYNTAX      VTSSUnsigned16
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Shows the LLDP neighbor's Receive tw_sys_rx . Tw_sys_rx is defined as
+         the time (expressed in microseconds) that the transmitting link partner
+         will wait before it starts transmitting data after leaving the Low
+         Power Idle (LPI) mode. Section 79.3.5.2, IEEE802.3az."
+    ::= { vtssLldpStatusMedRemoteDeviceInfoEntry 20 }
+
+vtssLldpStatusMedRemoteDeviceInfoEeeTxTwSys OBJECT-TYPE
+    SYNTAX      VTSSUnsigned16
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Shows the LLDP neighbor's Transmit Tw_sys_tx . Tw_sys_tx is defined as
+         the time (expressed in microseconds) that the receiving link partner is
+         requesting the transmitting link partner to wait before starting the
+         transmission data following the Low Power Idle (LPI) mode. Section
+         79.3.5.1, IEEE802.3az."
+    ::= { vtssLldpStatusMedRemoteDeviceInfoEntry 21 }
+
+vtssLldpStatusMedRemoteDeviceInfoEeeFbTwSys OBJECT-TYPE
+    SYNTAX      VTSSUnsigned16
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Shows the LLDP neighbor's Fallback tw_sys_tx. A receiving link partner
+         may inform the transmitter of an alternate desired Tw_sys_tx. Since a
+         receiving link partner is likely to have discrete levels for savings,
+         this provides the transmitter with additional information that it may
+         use for a more efficient allocation. Section 79.3.5.3, IEEE802.3az."
+    ::= { vtssLldpStatusMedRemoteDeviceInfoEntry 22 }
+
+vtssLldpStatusMedRemoteDeviceInfoEeeTxTwSysEcho OBJECT-TYPE
+    SYNTAX      VTSSUnsigned16
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Shows the LLDP neighbor's echo transmit Tw. The respective echo values
+         shall be defined as the local link partners reflection (echo) of the
+         remote link partners respective values. When a local link partner
+         receives its echoed values from the remote link partner it can
+         determine whether or not the remote link partner has received,
+         registered, and processed its most recent values. Section 79.3.5.4,
+         IEEE802.3az."
+    ::= { vtssLldpStatusMedRemoteDeviceInfoEntry 23 }
+
+vtssLldpStatusMedRemoteDeviceInfoEeeRxTwSysEcho OBJECT-TYPE
+    SYNTAX      VTSSUnsigned16
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Shows the LLDP neighbor's echo receive Tw. The respective echo values
+         shall be defined as the local link partners reflection (echo) of the
+         remote link partners respective values. When a local link partner
+         receives its echoed values from the remote link partner it can
+         determine whether or not the remote link partner has received,
+         registered, and processed its most recent values. Section 79.3.5.4,
+         IEEE802.3az."
+    ::= { vtssLldpStatusMedRemoteDeviceInfoEntry 24 }
+
+vtssLldpStatusMedRemoteDeviceLocInfoTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VTSSLldpStatusMedRemoteDeviceLocInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is a table to show the LLDP-MED remote device (neighbor) civic
+         location information for a specific interface."
+    ::= { vtssLldpStatusMed 2 }
+
+vtssLldpStatusMedRemoteDeviceLocInfoEntry OBJECT-TYPE
+    SYNTAX      VTSSLldpStatusMedRemoteDeviceLocInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each interface has a set of neighbors information"
+    INDEX       { vtssLldpStatusMedRemoteDeviceLocInfoIfIndex, vtssLldpStatusMedRemoteDeviceLocInfoLldpmedIndex }
+    ::= { vtssLldpStatusMedRemoteDeviceLocInfoTable 1 }
+
+VTSSLldpStatusMedRemoteDeviceLocInfoEntry ::= SEQUENCE {
+    vtssLldpStatusMedRemoteDeviceLocInfoIfIndex     VTSSInterfaceIndex,
+    vtssLldpStatusMedRemoteDeviceLocInfoLldpmedIndex    Integer32,
+    vtssLldpStatusMedRemoteDeviceLocInfoState   VTSSDisplayString,
+    vtssLldpStatusMedRemoteDeviceLocInfoCounty      VTSSDisplayString,
+    vtssLldpStatusMedRemoteDeviceLocInfoCity    VTSSDisplayString,
+    vtssLldpStatusMedRemoteDeviceLocInfoDistrict    VTSSDisplayString,
+    vtssLldpStatusMedRemoteDeviceLocInfoBlock   VTSSDisplayString,
+    vtssLldpStatusMedRemoteDeviceLocInfoStreet      VTSSDisplayString,
+    vtssLldpStatusMedRemoteDeviceLocInfoLeadingStreetDirection      VTSSDisplayString,
+    vtssLldpStatusMedRemoteDeviceLocInfoTrailingStreetSuffix    VTSSDisplayString,
+    vtssLldpStatusMedRemoteDeviceLocInfoStreetSuffix    VTSSDisplayString,
+    vtssLldpStatusMedRemoteDeviceLocInfoHouseNo     VTSSDisplayString,
+    vtssLldpStatusMedRemoteDeviceLocInfoHouseNoSuffix   VTSSDisplayString,
+    vtssLldpStatusMedRemoteDeviceLocInfoLandmark    VTSSDisplayString,
+    vtssLldpStatusMedRemoteDeviceLocInfoAdditionalInfo      VTSSDisplayString,
+    vtssLldpStatusMedRemoteDeviceLocInfoName    VTSSDisplayString,
+    vtssLldpStatusMedRemoteDeviceLocInfoZipCode     VTSSDisplayString,
+    vtssLldpStatusMedRemoteDeviceLocInfoBuilding    VTSSDisplayString,
+    vtssLldpStatusMedRemoteDeviceLocInfoApartment   VTSSDisplayString,
+    vtssLldpStatusMedRemoteDeviceLocInfoFloor   VTSSDisplayString,
+    vtssLldpStatusMedRemoteDeviceLocInfoRoomNumber      VTSSDisplayString,
+    vtssLldpStatusMedRemoteDeviceLocInfoPlaceType   VTSSDisplayString,
+    vtssLldpStatusMedRemoteDeviceLocInfoPostalCommunityName     VTSSDisplayString,
+    vtssLldpStatusMedRemoteDeviceLocInfoPoBox   VTSSDisplayString,
+    vtssLldpStatusMedRemoteDeviceLocInfoAdditionalCode      VTSSDisplayString,
+    vtssLldpStatusMedRemoteDeviceLocInfoCountryCode     VTSSDisplayString
+}
+
+vtssLldpStatusMedRemoteDeviceLocInfoIfIndex OBJECT-TYPE
+    SYNTAX      VTSSInterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Logical interface number index."
+    ::= { vtssLldpStatusMedRemoteDeviceLocInfoEntry 1 }
+
+vtssLldpStatusMedRemoteDeviceLocInfoLldpmedIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0..192)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Neighbor information table entry index."
+    ::= { vtssLldpStatusMedRemoteDeviceLocInfoEntry 2 }
+
+vtssLldpStatusMedRemoteDeviceLocInfoState OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..250))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "National subdivision"
+    ::= { vtssLldpStatusMedRemoteDeviceLocInfoEntry 5 }
+
+vtssLldpStatusMedRemoteDeviceLocInfoCounty OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..250))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "County"
+    ::= { vtssLldpStatusMedRemoteDeviceLocInfoEntry 6 }
+
+vtssLldpStatusMedRemoteDeviceLocInfoCity OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..250))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "City"
+    ::= { vtssLldpStatusMedRemoteDeviceLocInfoEntry 7 }
+
+vtssLldpStatusMedRemoteDeviceLocInfoDistrict OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..250))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "City district"
+    ::= { vtssLldpStatusMedRemoteDeviceLocInfoEntry 8 }
+
+vtssLldpStatusMedRemoteDeviceLocInfoBlock OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..250))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Block (Neighborhood)"
+    ::= { vtssLldpStatusMedRemoteDeviceLocInfoEntry 9 }
+
+vtssLldpStatusMedRemoteDeviceLocInfoStreet OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..250))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Street"
+    ::= { vtssLldpStatusMedRemoteDeviceLocInfoEntry 10 }
+
+vtssLldpStatusMedRemoteDeviceLocInfoLeadingStreetDirection OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..250))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Street Direction"
+    ::= { vtssLldpStatusMedRemoteDeviceLocInfoEntry 11 }
+
+vtssLldpStatusMedRemoteDeviceLocInfoTrailingStreetSuffix OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..250))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Trailing Street Suffix"
+    ::= { vtssLldpStatusMedRemoteDeviceLocInfoEntry 12 }
+
+vtssLldpStatusMedRemoteDeviceLocInfoStreetSuffix OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..250))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Street Suffix"
+    ::= { vtssLldpStatusMedRemoteDeviceLocInfoEntry 13 }
+
+vtssLldpStatusMedRemoteDeviceLocInfoHouseNo OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..250))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "House No."
+    ::= { vtssLldpStatusMedRemoteDeviceLocInfoEntry 14 }
+
+vtssLldpStatusMedRemoteDeviceLocInfoHouseNoSuffix OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..250))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "House No. Suffix"
+    ::= { vtssLldpStatusMedRemoteDeviceLocInfoEntry 15 }
+
+vtssLldpStatusMedRemoteDeviceLocInfoLandmark OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..250))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Landmark"
+    ::= { vtssLldpStatusMedRemoteDeviceLocInfoEntry 16 }
+
+vtssLldpStatusMedRemoteDeviceLocInfoAdditionalInfo OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..250))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Additional Location Info"
+    ::= { vtssLldpStatusMedRemoteDeviceLocInfoEntry 17 }
+
+vtssLldpStatusMedRemoteDeviceLocInfoName OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..250))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Name"
+    ::= { vtssLldpStatusMedRemoteDeviceLocInfoEntry 18 }
+
+vtssLldpStatusMedRemoteDeviceLocInfoZipCode OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..250))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Zip code"
+    ::= { vtssLldpStatusMedRemoteDeviceLocInfoEntry 19 }
+
+vtssLldpStatusMedRemoteDeviceLocInfoBuilding OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..250))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Building"
+    ::= { vtssLldpStatusMedRemoteDeviceLocInfoEntry 20 }
+
+vtssLldpStatusMedRemoteDeviceLocInfoApartment OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..250))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Apartment/unit"
+    ::= { vtssLldpStatusMedRemoteDeviceLocInfoEntry 21 }
+
+vtssLldpStatusMedRemoteDeviceLocInfoFloor OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..250))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Floor"
+    ::= { vtssLldpStatusMedRemoteDeviceLocInfoEntry 22 }
+
+vtssLldpStatusMedRemoteDeviceLocInfoRoomNumber OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..250))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Room Number"
+    ::= { vtssLldpStatusMedRemoteDeviceLocInfoEntry 23 }
+
+vtssLldpStatusMedRemoteDeviceLocInfoPlaceType OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..250))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Place type"
+    ::= { vtssLldpStatusMedRemoteDeviceLocInfoEntry 24 }
+
+vtssLldpStatusMedRemoteDeviceLocInfoPostalCommunityName OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..250))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Postal Community Name"
+    ::= { vtssLldpStatusMedRemoteDeviceLocInfoEntry 25 }
+
+vtssLldpStatusMedRemoteDeviceLocInfoPoBox OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..250))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Post Office Box"
+    ::= { vtssLldpStatusMedRemoteDeviceLocInfoEntry 26 }
+
+vtssLldpStatusMedRemoteDeviceLocInfoAdditionalCode OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..250))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Addination Code"
+    ::= { vtssLldpStatusMedRemoteDeviceLocInfoEntry 27 }
+
+vtssLldpStatusMedRemoteDeviceLocInfoCountryCode OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..2))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The two-letter ISO 3166 country code in capital ASCII letters -
+         Example: DK, DE or US."
+    ::= { vtssLldpStatusMedRemoteDeviceLocInfoEntry 28 }
+
+vtssLldpStatusMedRemoteDeviceNetworkPolicyInfoTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VTSSLldpStatusMedRemoteDeviceNetworkPolicyInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is a table to show the LLDP-MED remote device (neighbor) network
+         policies information for a specific interface."
+    ::= { vtssLldpStatusMed 3 }
+
+vtssLldpStatusMedRemoteDeviceNetworkPolicyInfoEntry OBJECT-TYPE
+    SYNTAX      VTSSLldpStatusMedRemoteDeviceNetworkPolicyInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each interface has a set of neighbors information"
+    INDEX       { vtssLldpStatusMedRemoteDeviceNetworkPolicyInfoIfIndex, vtssLldpStatusMedRemoteDeviceNetworkPolicyInfoLldpmedIndex, vtssLldpStatusMedRemoteDeviceNetworkPolicyInfoLldpmedPolicy }
+    ::= { vtssLldpStatusMedRemoteDeviceNetworkPolicyInfoTable 1 }
+
+VTSSLldpStatusMedRemoteDeviceNetworkPolicyInfoEntry ::= SEQUENCE {
+    vtssLldpStatusMedRemoteDeviceNetworkPolicyInfoIfIndex   VTSSInterfaceIndex,
+    vtssLldpStatusMedRemoteDeviceNetworkPolicyInfoLldpmedIndex      Integer32,
+    vtssLldpStatusMedRemoteDeviceNetworkPolicyInfoLldpmedPolicy     Integer32,
+    vtssLldpStatusMedRemoteDeviceNetworkPolicyInfoApplicationType   VTSSlldpmedRemoteNetworkPolicyApplicationType,
+    vtssLldpStatusMedRemoteDeviceNetworkPolicyInfoUnknownPolicy     TruthValue,
+    vtssLldpStatusMedRemoteDeviceNetworkPolicyInfoTagged    TruthValue,
+    vtssLldpStatusMedRemoteDeviceNetworkPolicyInfoVlanId    VTSSUnsigned16,
+    vtssLldpStatusMedRemoteDeviceNetworkPolicyInfoL2Priority    VTSSUnsigned8,
+    vtssLldpStatusMedRemoteDeviceNetworkPolicyInfoDscp      VTSSUnsigned8
+}
+
+vtssLldpStatusMedRemoteDeviceNetworkPolicyInfoIfIndex OBJECT-TYPE
+    SYNTAX      VTSSInterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Logical interface number index."
+    ::= { vtssLldpStatusMedRemoteDeviceNetworkPolicyInfoEntry 1 }
+
+vtssLldpStatusMedRemoteDeviceNetworkPolicyInfoLldpmedIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0..192)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Neighbor information table entry index."
+    ::= { vtssLldpStatusMedRemoteDeviceNetworkPolicyInfoEntry 2 }
+
+vtssLldpStatusMedRemoteDeviceNetworkPolicyInfoLldpmedPolicy OBJECT-TYPE
+    SYNTAX      Integer32 (0..31)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Policy index."
+    ::= { vtssLldpStatusMedRemoteDeviceNetworkPolicyInfoEntry 3 }
+
+vtssLldpStatusMedRemoteDeviceNetworkPolicyInfoApplicationType OBJECT-TYPE
+    SYNTAX      VTSSlldpmedRemoteNetworkPolicyApplicationType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The LLDP policy application type."
+    ::= { vtssLldpStatusMedRemoteDeviceNetworkPolicyInfoEntry 5 }
+
+vtssLldpStatusMedRemoteDeviceNetworkPolicyInfoUnknownPolicy OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Policy indicates that an Endpoint Device wants to explicitly advertise
+         that the policy is required by the device. Can be either Defined or
+         Unknown
+         
+         Unknown: The network policy for the specified application type is
+         currently unknown.
+         
+         Defined: The network policy is defined (known)."
+    ::= { vtssLldpStatusMedRemoteDeviceNetworkPolicyInfoEntry 6 }
+
+vtssLldpStatusMedRemoteDeviceNetworkPolicyInfoTagged OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Defines if LLDP policy uses tagged VLAN."
+    ::= { vtssLldpStatusMedRemoteDeviceNetworkPolicyInfoEntry 7 }
+
+vtssLldpStatusMedRemoteDeviceNetworkPolicyInfoVlanId OBJECT-TYPE
+    SYNTAX      VTSSUnsigned16 (1..4095)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The policy VLAN ID. Only valid when policy 'Tagged' is TRUE"
+    ::= { vtssLldpStatusMedRemoteDeviceNetworkPolicyInfoEntry 8 }
+
+vtssLldpStatusMedRemoteDeviceNetworkPolicyInfoL2Priority OBJECT-TYPE
+    SYNTAX      VTSSUnsigned8 (0..7)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Shows the LLDP neighbor's policy L2 priority."
+    ::= { vtssLldpStatusMedRemoteDeviceNetworkPolicyInfoEntry 9 }
+
+vtssLldpStatusMedRemoteDeviceNetworkPolicyInfoDscp OBJECT-TYPE
+    SYNTAX      VTSSUnsigned8 (0..63)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "LLDP policy DSCP."
+    ::= { vtssLldpStatusMedRemoteDeviceNetworkPolicyInfoEntry 10 }
+
+vtssLldpControl OBJECT IDENTIFIER
+    ::= { vtssLldpMibObjects 4 }
+
+vtssLldpControlStatisticsClear OBJECT IDENTIFIER
+    ::= { vtssLldpControl 1 }
+
+vtssLldpControlStatisticsClearTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VTSSLldpControlStatisticsClearEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is a table to clear LLDP statistics for a specific interface."
+    ::= { vtssLldpControlStatisticsClear 1 }
+
+vtssLldpControlStatisticsClearEntry OBJECT-TYPE
+    SYNTAX      VTSSLldpControlStatisticsClearEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each interface has a set of statistics counters"
+    INDEX       { vtssLldpControlStatisticsClearIfIndex }
+    ::= { vtssLldpControlStatisticsClearTable 1 }
+
+VTSSLldpControlStatisticsClearEntry ::= SEQUENCE {
+    vtssLldpControlStatisticsClearIfIndex   VTSSInterfaceIndex,
+    vtssLldpControlStatisticsClearStatisticsClear   TruthValue
+}
+
+vtssLldpControlStatisticsClearIfIndex OBJECT-TYPE
+    SYNTAX      VTSSInterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Logical interface number index."
+    ::= { vtssLldpControlStatisticsClearEntry 1 }
+
+vtssLldpControlStatisticsClearStatisticsClear OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Set to TRUE to clear the LLDP statistics of an interface."
+    ::= { vtssLldpControlStatisticsClearEntry 2 }
+
+vtssLldpControlStatisticsClearGlobal OBJECT IDENTIFIER
+    ::= { vtssLldpControlStatisticsClear 2 }
+
+vtssLldpControlStatisticsClearGlobalClear OBJECT-TYPE
+    SYNTAX      VTSSUnsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Clear LLDP global counters."
+    ::= { vtssLldpControlStatisticsClearGlobal 1 }
+
+vtssLldpMibConformance OBJECT IDENTIFIER
+    ::= { vtssLldpMib 2 }
+
+vtssLldpMibCompliances OBJECT IDENTIFIER
+    ::= { vtssLldpMibConformance 1 }
+
+vtssLldpMibGroups OBJECT IDENTIFIER
+    ::= { vtssLldpMibConformance 2 }
+
+vtssLldpConfigGlobalInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssLldpConfigGlobalReInitDelay, vtssLldpConfigGlobalMsgTxHold, 
+                  vtssLldpConfigGlobalMsgTxInterval, vtssLldpConfigGlobalTxDelay }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssLldpMibGroups 1 }
+
+vtssLldpConfigInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssLldpConfigAdminState, vtssLldpConfigCdpAware, 
+                  vtssLldpConfigOptionalTlvs }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssLldpMibGroups 2 }
+
+vtssLldpConfigMedInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssLldpConfigMedOptionalTlvs, vtssLldpConfigMedDeviceType }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssLldpMibGroups 3 }
+
+vtssLldpConfigMedPolicyInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssLldpConfigMedPolicyApplicationType, 
+                  vtssLldpConfigMedPolicyTagged, vtssLldpConfigMedPolicyVlanId, 
+                  vtssLldpConfigMedPolicyL2Priority, vtssLldpConfigMedPolicyDscp, 
+                  vtssLldpConfigMedPolicyAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssLldpMibGroups 4 }
+
+vtssLldpConfigMedPolicyListInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssLldpConfigMedPolicyListLldpmedPoliciesList }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssLldpMibGroups 5 }
+
+vtssLldpConfigMedGlobalInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssLldpConfigMedGlobalFastRepeatCount, 
+                  vtssLldpConfigMedGlobalLatitude, 
+                  vtssLldpConfigMedGlobalLongitude, 
+                  vtssLldpConfigMedGlobalAltitudeType, 
+                  vtssLldpConfigMedGlobalAltitude, 
+                  vtssLldpConfigMedGlobalElinAddr, vtssLldpConfigMedGlobalDatum, 
+                  vtssLldpConfigMedGlobalCountryCode }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssLldpMibGroups 6 }
+
+vtssLldpConfigMedLocationInformationInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssLldpConfigMedLocationInformationCivicAddress }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssLldpMibGroups 7 }
+
+vtssLldpConfigMedPolicyRowEditorInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssLldpConfigMedPolicyRowEditorLldpmedPolicy, 
+                  vtssLldpConfigMedPolicyRowEditorApplicationType, 
+                  vtssLldpConfigMedPolicyRowEditorTagged, 
+                  vtssLldpConfigMedPolicyRowEditorVlanId, 
+                  vtssLldpConfigMedPolicyRowEditorL2Priority, 
+                  vtssLldpConfigMedPolicyRowEditorDscp, 
+                  vtssLldpConfigMedPolicyRowEditorAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssLldpMibGroups 8 }
+
+vtssLldpStatusStatisticsGlobalCountersInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssLldpStatusStatisticsGlobalCountersTableInserts, 
+                  vtssLldpStatusStatisticsGlobalCountersTableDeletes, 
+                  vtssLldpStatusStatisticsGlobalCountersTableDrops, 
+                  vtssLldpStatusStatisticsGlobalCountersTableAgeOuts, 
+                  vtssLldpStatusStatisticsGlobalCountersLastChangeTime }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssLldpMibGroups 9 }
+
+vtssLldpStatusStatisticsTableInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssLldpStatusStatisticsTxTotal, 
+                  vtssLldpStatusStatisticsRxTotal, 
+                  vtssLldpStatusStatisticsRxError, 
+                  vtssLldpStatusStatisticsRxDiscarded, 
+                  vtssLldpStatusStatisticsTLVsDiscarded, 
+                  vtssLldpStatusStatisticsTLVsUnrecognized, 
+                  vtssLldpStatusStatisticsTLVsOrgDiscarded, 
+                  vtssLldpStatusStatisticsAgeOuts }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssLldpMibGroups 10 }
+
+vtssLldpStatusNeighborsInformationInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssLldpStatusNeighborsInformationChassisId, 
+                  vtssLldpStatusNeighborsInformationPortId, 
+                  vtssLldpStatusNeighborsInformationPortDescription, 
+                  vtssLldpStatusNeighborsInformationSystemName, 
+                  vtssLldpStatusNeighborsInformationSystemDescription, 
+                  vtssLldpStatusNeighborsInformationSystemCapabilities, 
+                  vtssLldpStatusNeighborsInformationSystemCapabilitiesEnable }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssLldpMibGroups 11 }
+
+vtssLldpStatusNeighborsMgmtInformationInfoGroup OBJECT-GROUP
+    OBJECTS     { 
+                  vtssLldpStatusNeighborsMgmtInformationSystemMgmAddressSubtype, 
+                  vtssLldpStatusNeighborsMgmtInformationSystemMgmtAddress, 
+                  vtssLldpStatusNeighborsMgmtInformationSystemMgmtInterfaceSubtype, 
+                  vtssLldpStatusNeighborsMgmtInformationSystemMgmtInterface, 
+                  vtssLldpStatusNeighborsMgmtInformationSystemMgmtOid }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssLldpMibGroups 12 }
+
+vtssLldpStatusMedRemoteDeviceInfoInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssLldpStatusMedRemoteDeviceInfoCapabilities, 
+                  vtssLldpStatusMedRemoteDeviceInfoCapabilitiesEnabled, 
+                  vtssLldpStatusMedRemoteDeviceInfoLatitude, 
+                  vtssLldpStatusMedRemoteDeviceInfoLongitude, 
+                  vtssLldpStatusMedRemoteDeviceInfoAltitudeType, 
+                  vtssLldpStatusMedRemoteDeviceInfoAltitude, 
+                  vtssLldpStatusMedRemoteDeviceInfoDatum, 
+                  vtssLldpStatusMedRemoteDeviceInfoElinaddr, 
+                  vtssLldpStatusMedRemoteDeviceInfoDeviceType, 
+                  vtssLldpStatusMedRemoteDeviceInfoHwRev, 
+                  vtssLldpStatusMedRemoteDeviceInfoFwRev, 
+                  vtssLldpStatusMedRemoteDeviceInfoSwRev, 
+                  vtssLldpStatusMedRemoteDeviceInfoSerialNo, 
+                  vtssLldpStatusMedRemoteDeviceInfoManufacturerName, 
+                  vtssLldpStatusMedRemoteDeviceInfoModelName, 
+                  vtssLldpStatusMedRemoteDeviceInfoAssetId, 
+                  vtssLldpStatusMedRemoteDeviceInfoEeeRxTwSys, 
+                  vtssLldpStatusMedRemoteDeviceInfoEeeTxTwSys, 
+                  vtssLldpStatusMedRemoteDeviceInfoEeeFbTwSys, 
+                  vtssLldpStatusMedRemoteDeviceInfoEeeTxTwSysEcho, 
+                  vtssLldpStatusMedRemoteDeviceInfoEeeRxTwSysEcho }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssLldpMibGroups 13 }
+
+vtssLldpStatusMedRemoteDeviceLocInfoInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssLldpStatusMedRemoteDeviceLocInfoState, 
+                  vtssLldpStatusMedRemoteDeviceLocInfoCounty, 
+                  vtssLldpStatusMedRemoteDeviceLocInfoCity, 
+                  vtssLldpStatusMedRemoteDeviceLocInfoDistrict, 
+                  vtssLldpStatusMedRemoteDeviceLocInfoBlock, 
+                  vtssLldpStatusMedRemoteDeviceLocInfoStreet, 
+                  vtssLldpStatusMedRemoteDeviceLocInfoLeadingStreetDirection, 
+                  vtssLldpStatusMedRemoteDeviceLocInfoTrailingStreetSuffix, 
+                  vtssLldpStatusMedRemoteDeviceLocInfoStreetSuffix, 
+                  vtssLldpStatusMedRemoteDeviceLocInfoHouseNo, 
+                  vtssLldpStatusMedRemoteDeviceLocInfoHouseNoSuffix, 
+                  vtssLldpStatusMedRemoteDeviceLocInfoLandmark, 
+                  vtssLldpStatusMedRemoteDeviceLocInfoAdditionalInfo, 
+                  vtssLldpStatusMedRemoteDeviceLocInfoName, 
+                  vtssLldpStatusMedRemoteDeviceLocInfoZipCode, 
+                  vtssLldpStatusMedRemoteDeviceLocInfoBuilding, 
+                  vtssLldpStatusMedRemoteDeviceLocInfoApartment, 
+                  vtssLldpStatusMedRemoteDeviceLocInfoFloor, 
+                  vtssLldpStatusMedRemoteDeviceLocInfoRoomNumber, 
+                  vtssLldpStatusMedRemoteDeviceLocInfoPlaceType, 
+                  vtssLldpStatusMedRemoteDeviceLocInfoPostalCommunityName, 
+                  vtssLldpStatusMedRemoteDeviceLocInfoPoBox, 
+                  vtssLldpStatusMedRemoteDeviceLocInfoAdditionalCode, 
+                  vtssLldpStatusMedRemoteDeviceLocInfoCountryCode }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssLldpMibGroups 14 }
+
+vtssLldpStatusMedRemoteDeviceNetworkPolicyInfoInfoGroup OBJECT-GROUP
+    OBJECTS     { 
+                  vtssLldpStatusMedRemoteDeviceNetworkPolicyInfoApplicationType, 
+                  vtssLldpStatusMedRemoteDeviceNetworkPolicyInfoUnknownPolicy, 
+                  vtssLldpStatusMedRemoteDeviceNetworkPolicyInfoTagged, 
+                  vtssLldpStatusMedRemoteDeviceNetworkPolicyInfoVlanId, 
+                  vtssLldpStatusMedRemoteDeviceNetworkPolicyInfoL2Priority, 
+                  vtssLldpStatusMedRemoteDeviceNetworkPolicyInfoDscp }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssLldpMibGroups 15 }
+
+vtssLldpControlStatisticsClearTableInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssLldpControlStatisticsClearStatisticsClear }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssLldpMibGroups 16 }
+
+vtssLldpControlStatisticsClearGlobalInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssLldpControlStatisticsClearGlobalClear }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssLldpMibGroups 17 }
+
+vtssLldpMibCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the implementation."
+
+    MODULE      -- this module
+
+        MANDATORY-GROUPS        { vtssLldpConfigGlobalInfoGroup, 
+                  vtssLldpConfigInfoGroup, vtssLldpConfigMedInfoGroup, 
+                  vtssLldpConfigMedPolicyInfoGroup, 
+                  vtssLldpConfigMedPolicyListInfoGroup, 
+                  vtssLldpConfigMedGlobalInfoGroup, 
+                  vtssLldpConfigMedLocationInformationInfoGroup, 
+                  vtssLldpConfigMedPolicyRowEditorInfoGroup, 
+                  vtssLldpStatusStatisticsGlobalCountersInfoGroup, 
+                  vtssLldpStatusStatisticsTableInfoGroup, 
+                  vtssLldpStatusNeighborsInformationInfoGroup, 
+                  vtssLldpStatusNeighborsMgmtInformationInfoGroup, 
+                  vtssLldpStatusMedRemoteDeviceInfoInfoGroup, 
+                  vtssLldpStatusMedRemoteDeviceLocInfoInfoGroup, 
+                  vtssLldpStatusMedRemoteDeviceNetworkPolicyInfoInfoGroup, 
+                  vtssLldpControlStatisticsClearTableInfoGroup, 
+                  vtssLldpControlStatisticsClearGlobalInfoGroup }
+
+    ::= { vtssLldpMibCompliances 1 }
+
+END
