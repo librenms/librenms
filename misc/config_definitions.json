@@ -5297,13 +5297,6 @@
             "default": false,
             "type": "boolean"
         },
-        "poller_modules.transceivers": {
-            "order": 322,
-            "group": "poller",
-            "section": "poller_modules",
-            "default": true,
-            "type": "boolean"
-        },
         "poller_modules.customoid": {
             "default": true,
             "type": "boolean"
@@ -5479,6 +5472,13 @@
         },
         "poller_modules.entity-physical": {
             "order": 170,
+            "group": "poller",
+            "section": "poller_modules",
+            "default": true,
+            "type": "boolean"
+        },
+        "poller_modules.transceivers": {
+            "order": 322,
             "group": "poller",
             "section": "poller_modules",
             "default": true,
