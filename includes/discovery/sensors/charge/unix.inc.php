@@ -29,7 +29,7 @@ if (! empty($snmpData)) {
     echo 'UPS-NUT-MIB: ' . PHP_EOL;
     $snmpData = array_shift($snmpData); //drop [ups-nut]
     $upsnut = [
-        1 => ['descr' => 'Battery Charge', 'LL' => 0, 'LW' => 10, 'W' => null, 'H' => 100],
+        1 => ['descr' => 'Battery Charge', 'LL' => 0, 'LW' => 10, 'W' => null, 'H' => null],
     ];
     foreach ($snmpData as $index => $upsData) {
         if ($upsnut[$index]) {
