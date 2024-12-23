@@ -179,8 +179,9 @@ modules:
                     value: DELL-RAC-MIB::physicalDiskState
                     num_oid: '.1.3.6.1.4.1.674.10892.2.6.1.20.130.4.1.4.{{ $index }}'
                     descr: '{{ $DELL-RAC-MIB::physicalDiskName }} State'
-                    index: 'physicalDiskStatus.{{ $index }}'
-                    state_name: DELL-RAC-MIB::physicalDiskTable
+                    index: '{{ $index }}'
+                    entPhysicalIndex: '{{ $index }}'
+                    state_name: physicalDiskState
                     states:
                         - { value: 1, descr: unknown, graph: 1, generic: 3 }
                         - { value: 2, descr: ready, graph: 1, generic: 0 }
@@ -193,12 +194,43 @@ modules:
                         - { value: 9, descr: nonrecoverable, graph: 1, generic: 2 }
                         - { value: 10, descr: readonly, graph: 1, generic: 0 }
                 -
+                    oid: IDRAC-MIB-SMIv2::physicalDiskTable
+                    value: IDRAC-MIB-SMIv2::physicalDiskState
+                    num_oid: '.1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.4.{{ $index }}'
+                    descr: '{{ $IDRAC-MIB-SMIv2::physicalDiskName }}'
+                    index: '{{ $index }}'
+                    entPhysicalIndex: '{{ $index }}'
+                    state_name: physicalDiskState
+                    states:
+                        - { value: 1, descr: unknown, graph: 1, generic: 3 }
+                        - { value: 2, descr: ready, graph: 1, generic: 0 }
+                        - { value: 3, descr: online, graph: 1, generic: 0 }
+                        - { value: 4, descr: foreign, graph: 1, generic: 1 }
+                        - { value: 5, descr: offline, graph: 1, generic: 2 }
+                        - { value: 6, descr: blocked, graph: 1, generic: 2}
+                        - { value: 7, descr: failed, graph: 1, generic: 2 }
+                        - { value: 8, descr: nonraid, graph: 1, generic: 0 }
+                        - { value: 9, descr: nonrecoverable, graph: 1, generic: 2 }
+                        - { value: 10, descr: readonly, graph: 1, generic: 0 }
+                -
+                    oid: IDRAC-MIB-SMIv2::virtualDiskTable
+                    value: IDRAC-MIB-SMIv2::virtualDiskState
+                    num_oid: '.1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.4.{{ $index }}'
+                    descr: '{{ $IDRAC-MIB-SMIv2::virtualDiskName }}'
+                    index: '{{ $index }}'
+                    state_name: virtualDiskState
+                    states:
+                        - { value: 1, descr: unknown, graph: 0, generic: 3 }
+                        - { value: 2, descr: online, graph: 0, generic: 0 }
+                        - { value: 3, descr: failed, graph: 0, generic: 2 }
+                        - { value: 4, descr: degraded, graph: 0, generic: 1 }
+                -
                     oid: DELL-RAC-MIB::controllerTable
                     value: DELL-RAC-MIB::controllerComponentStatus
                     num_oid: '.1.3.6.1.4.1.674.10892.2.6.1.20.130.1.1.38.{{ $index }}'
-                    descr: '{{ $DELL-RAC-MIB::controllerName }} {{ $DELL-RAC-MIB::controllerDisplayName }}  State'
+                    descr: '{{ $DELL-RAC-MIB::controllerName }} {{ $DELL-RAC-MIB::controllerDisplayName }}'
                     index: 'controllerComponentStatus.{{ $index }}'
-                    state_name: DELL-RAC-MIB::controllerTable
+                    state_name: controllerState
                     states:
                         - { value: 1, descr: other, graph: 1, generic: 3 }
                         - { value: 2, descr: unknown, graph: 1, generic: 3  }
@@ -207,10 +239,108 @@ modules:
                         - { value: 5, descr: critical, graph: 1, generic: 2 }
                         - { value: 6, descr: nonrecoverable, graph: 1, generic: 2}
                 -
+                    oid: IDRAC-MIB-SMIv2::controllerTable
+                    value: IDRAC-MIB-SMIv2::controllerComponentStatus
+                    num_oid: '.1.3.6.1.4.1.674.10892.5.5.1.20.130.1.1.38.{{ $index }}'
+                    descr: '{{ $IDRAC-MIB-SMIv2::controllerName }} {{ $IDRAC-MIB-SMIv2::controllerDisplayName }}'
+                    index: 'controllerComponentStatus.{{ $index }}'
+                    state_name: controllerState
+                    states:
+                        - { value: 1, descr: other, graph: 0, generic: 3 }
+                        - { value: 2, descr: unknown, graph: 0, generic: 3  }
+                        - { value: 3, descr: ok, graph: 0, generic: 0 }
+                        - { value: 4, descr: nonCritical, graph: 0, generic: 1 }
+                        - { value: 5, descr: critical, graph: 0, generic: 2 }
+                        - { value: 6, descr: nonRecoverable, graph: 0, generic: 2}
+                -
+                    oid: processorDeviceTable
+                    value: processorDeviceStatus
+                    num_oid: '.1.3.6.1.4.1.674.10892.5.4.1100.30.1.5.{{ $index }}'
+                    descr: '{{ $processorDeviceBrandName }}'
+                    index: '{{ $index }}'
+                    entPhysicalIndex: '{{ $index }}'
+                    state_name: processorDeviceStatus
+                    states:
+                        - { value: 1, descr: other, graph: 0, generic: 3 }
+                        - { value: 2, descr: unknown, graph: 0, generic: 3  }
+                        - { value: 3, descr: ok, graph: 0, generic: 0 }
+                        - { value: 4, descr: nonCritical, graph: 0, generic: 1 }
+                        - { value: 5, descr: critical, graph: 0, generic: 2 }
+                        - { value: 6, descr: nonRecoverable, graph: 0, generic: 2}
+                -
+                    oid: memoryDeviceTable
+                    value: memoryDeviceStatus
+                    num_oid: '.1.3.6.1.4.1.674.10892.5.4.1100.50.1.5.{{ $index }}'
+                    descr: '{{ $memoryDeviceLocationName }}'
+                    index: '{{ $index }}'
+                    entPhysicalIndex: '{{ $index }}'
+                    state_name: memoryDeviceStatus
+                    states:
+                        - { value: 1, descr: other, graph: 0, generic: 3 }
+                        - { value: 2, descr: unknown, graph: 0, generic: 3  }
+                        - { value: 3, descr: ok, graph: 0, generic: 0 }
+                        - { value: 4, descr: nonCritical, graph: 0, generic: 1 }
+                        - { value: 5, descr: critical, graph: 0, generic: 2 }
+                        - { value: 6, descr: nonRecoverable, graph: 0, generic: 2}
+                -
+                    oid: voltageProbeTable
+                    value: voltageProbeStatus
+                    num_oid: '.1.3.6.1.4.1.674.10892.5.4.600.20.1.5.{{ $index }}'
+                    descr: '{{ $voltageProbeLocationName }}'
+                    index: '{{ $index }}'
+                    entPhysicalIndex: '{{ $index }}'
+                    state_name: voltageProbeStatus
+                    states:
+                        - { value: 1, descr: other, graph: 0, generic: 3 }
+                        - { value: 2, descr: unknown, graph: 0, generic: 3  }
+                        - { value: 3, descr: ok, graph: 0, generic: 0 }
+                        - { value: 4, descr: nonCriticalUpper, graph: 0, generic: 1 }
+                        - { value: 5, descr: criticalUpper, graph: 0, generic: 2 }
+                        - { value: 6, descr: nonRecoverableUpper, graph: 0, generic: 2 }
+                        - { value: 7, descr: nonCriticalLower, graph: 0, generic: 1 }
+                        - { value: 8, descr: criticalLower, graph: 0, generic: 2 }
+                        - { value: 9, descr: nonRecoverableLower, graph: 0, generic: 2 }
+                -
+                    oid: amperageProbeTable
+                    value: amperageProbeStatus
+                    num_oid: '.1.3.6.1.4.1.674.10892.5.4.600.30.1.5.{{ $index }}'
+                    descr: '{{ $amperageProbeLocationName }}'
+                    index: '{{ $index }}'
+                    entPhysicalIndex: '{{ $index }}'
+                    state_name: amperageProbeStatus
+                    states:
+                        - { value: 1, descr: other, graph: 0, generic: 3 }
+                        - { value: 2, descr: unknown, graph: 0, generic: 3  }
+                        - { value: 3, descr: ok, graph: 0, generic: 0 }
+                        - { value: 4, descr: nonCriticalUpper, graph: 0, generic: 1 }
+                        - { value: 5, descr: criticalUpper, graph: 0, generic: 2 }
+                        - { value: 6, descr: nonRecoverableUpper, graph: 0, generic: 2 }
+                        - { value: 7, descr: nonCriticalLower, graph: 0, generic: 1 }
+                        - { value: 8, descr: criticalLower, graph: 0, generic: 2 }
+                        - { value: 9, descr: nonRecoverableLower, graph: 0, generic: 2 }
+                -
+                    oid: systemBatteryTable
+                    value: systemBatteryStatus
+                    num_oid: '.1.3.6.1.4.1.674.10892.5.4.600.50.1.5.{{ $index }}'
+                    descr: '{{ $systemBatteryLocationName }}'
+                    index: '{{ $index }}'
+                    entPhysicalIndex: '{{ $index }}'
+                    state_name: systemBatteryStatus
+                    states:
+                        - { value: 1, descr: other, graph: 0, generic: 3 }
+                        - { value: 2, descr: unknown, graph: 0, generic: 3  }
+                        - { value: 3, descr: ok, graph: 0, generic: 0 }
+                        - { value: 4, descr: nonCriticalUpper, graph: 0, generic: 1 }
+                        - { value: 5, descr: criticalUpper, graph: 0, generic: 2 }
+                        - { value: 6, descr: nonRecoverableUpper, graph: 0, generic: 2 }
+                        - { value: 7, descr: nonCriticalLower, graph: 0, generic: 1 }
+                        - { value: 8, descr: criticalLower, graph: 0, generic: 2 }
+                        - { value: 9, descr: nonRecoverableLower, graph: 0, generic: 2 }
+                -
                     oid: drsCMCServerTable
                     value: drsServerMonitoringCapable
                     num_oid: '.1.3.6.1.4.1.674.10892.2.5.1.1.2.{{ $index }}'
-                    descr: 'Slot {{ $drsServerSlotNumber }} {{ $drsServerSlotName }} {{ $drsServerModel }} State'
+                    descr: 'Slot {{ $drsServerSlotNumber }} {{ $drsServerSlotName }} {{ $drsServerModel }}'
                     index: 'drsServerMonitoringCapable.{{ $index }}'
                     skip_values:
                         -
