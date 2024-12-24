@@ -392,6 +392,13 @@ modules:
                     value: drsPSUVoltsReading
                     num_oid: '.1.3.6.1.4.1.674.10892.2.4.2.1.5.{{ $index }}'
                     descr: 'Chassis {{ $drsPSUChassisIndex }} PS-{{ $drsPSUIndex }}'
+                -
+                    oid: powerSupplyTable
+                    value: powerSupplyCurrentInputVoltage
+                    num_oid: '.1.3.6.1.4.1.674.10892.5.4.600.12.1.16.{{ $index }}'
+                    index: 'powerSupplyCurrentInputVoltage.{{ $index }}'
+                    descr: powerSupplyLocationName
+                    high_limit: powerSupplyMaximumInputVoltage
         current:
             data:
                 -
