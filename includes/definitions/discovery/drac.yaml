@@ -2,19 +2,39 @@ mib: DELL-RAC-MIB:IDRAC-MIB-SMIv2
 modules:
     os:
         hardware:
-          - .1.3.6.1.4.1.674.10892.5.1.3.12.0
-          - .1.3.6.1.4.1.674.10892.2.1.1.2.0
-        version: .1.3.6.1.4.1.674.10892.2.1.2.1.0
-        serial: .1.3.6.1.4.1.674.10892.2.1.1.11.0
-        location: .1.3.6.1.4.1.674.10892.5.1.3.8.0
+          - IDRAC-MIB-SMIv2::systemModelName.0
+          - DELL-RAC-MIB::drsProductShortName.0
+        version:
+          - IDRAC-MIB-SMIv2::racFirmwareVersion.0
+          - DELL-RAC-MIB::drsFirmwareVersion.0
+        serial:
+          - IDRAC-MIB-SMIv2::systemServiceTag.0
+          - DELL-RAC-MIB::drsSystemServiceTag.0
+        location: IDRAC-MIB-SMIv2::systemDataCenterName.0
     sensors:
+        fanspeed:
+            data:
+                -
+                    oid: IDRAC-MIB-SMIv2::coolingDeviceTable
+                    value: IDRAC-MIB-SMIv2::coolingDeviceReading
+                    num_oid: '.1.3.6.1.4.1.674.10892.5.4.700.12.1.6.{{ $index }}'
+                    descr: IDRAC-MIB-SMIv2::coolingDeviceLocationName
+                    index: '{{ $index }}'
+                    high_limit: IDRAC-MIB-SMIv2::coolingDeviceUpperCriticalThreshold
+                    low_limit: IDRAC-MIB-SMIv2::coolingDeviceLowerCriticalThreshold
+                    # Following can be enabled with new testfiles for Poweredge R640, iDRAC7, Poweredge M1000e
+                    # skip_values:
+                    #    -
+                    #        oid: IDRAC-MIB-SMIv2::coolingDeviceSubType
+                    #        op: 'not_in_array'
+                    #        value: [ 3, 5 ]
         state:
             data:
                 -
                     oid: drsGlobalSystemStatus
                     value: drsGlobalSystemStatus
                     num_oid: '.1.3.6.1.4.1.674.10892.2.2.1.{{ $index }}'
-                    descr: 'Global System Status'
+                    descr: 'Global System'
                     index: 'drsGlobalSystemStatus.{{ $index }}'
                     states:
                         - { value: 1, descr: other, graph: 1, generic: 3 }
@@ -27,7 +47,7 @@ modules:
                     oid: systemStateIDSDMCardUnitStatusCombined
                     value: systemStateIDSDMCardUnitStatusCombined
                     num_oid: '.1.3.6.1.4.1.674.10892.5.4.200.10.1.58.{{ $index }}'
-                    descr: 'IDSDM Card Unit Combined Status'
+                    descr: 'IDSDM Card Unit Combined'
                     index: 'systemStateIDSDMCardUnitStatusCombined.{{ $index }}'
                     states:
                         - { value: 1, descr: other, graph: 1, generic: 3 }
@@ -40,7 +60,7 @@ modules:
                     oid: systemStateIDSDMCardDeviceStatusCombined
                     value: systemStateIDSDMCardDeviceStatusCombined
                     num_oid: '.1.3.6.1.4.1.674.10892.5.4.200.10.1.60.{{ $index }}'
-                    descr: 'IDSDM Card Device Combined Status'
+                    descr: 'IDSDM Card Device Combined'
                     index: 'systemStateIDSDMCardDeviceStatusCombined.{{ $index }}'
                     states:
                         - { value: 1, descr: other, graph: 1, generic: 3 }
@@ -53,7 +73,7 @@ modules:
                     oid: intrusionStatus
                     value: intrusionStatus
                     num_oid: '.1.3.6.1.4.1.674.10892.5.4.300.70.1.5.{{ $index }}'
-                    descr: 'Intrusion Status'
+                    descr: 'Intrusion'
                     index: 'intrusionStatus.{{ $index }}'
                     states:
                         - { value: 1, descr: other, graph: 1, generic: 3 }
@@ -77,7 +97,7 @@ modules:
                     oid: drsIOMCurrStatus
                     value: drsIOMCurrStatus
                     num_oid: '.1.3.6.1.4.1.674.10892.2.3.1.2.{{ $index }}'
-                    descr: 'IOM Status'
+                    descr: 'IOM'
                     index: 'drsIOMCurrStatus.{{ $index }}'
                     states:
                         - { value: 1, descr: other, graph: 1, generic: 3 }
@@ -90,7 +110,7 @@ modules:
                     oid: drsKVMCurrStatus
                     value: drsKVMCurrStatus
                     num_oid: '.1.3.6.1.4.1.674.10892.2.3.1.3.{{ $index }}'
-                    descr: 'KVM Status'
+                    descr: 'KVM'
                     index: 'drsKVMCurrStatus.{{ $index }}'
                     states:
                         - { value: 1, descr: other, graph: 1, generic: 3 }
@@ -103,7 +123,7 @@ modules:
                     oid: drsRedCurrStatus
                     value: drsRedCurrStatus
                     num_oid: '.1.3.6.1.4.1.674.10892.2.3.1.4.{{ $index }}'
-                    descr: 'Redundancy Status'
+                    descr: 'Redundancy'
                     index: 'drsRedCurrStatus.{{ $index }}'
                     states:
                         - { value: 1, descr: other, graph: 1, generic: 3 }
@@ -116,7 +136,7 @@ modules:
                     oid: drsPowerCurrStatus
                     value: drsPowerCurrStatus
                     num_oid: '.1.3.6.1.4.1.674.10892.2.3.1.5.{{ $index }}'
-                    descr: 'Power Status'
+                    descr: 'Power'
                     index: 'drsPowerCurrStatus.{{ $index }}'
                     states:
                         - { value: 1, descr: other, graph: 1, generic: 3 }
@@ -129,7 +149,7 @@ modules:
                     oid: drsFanCurrStatus
                     value: drsFanCurrStatus
                     num_oid: '.1.3.6.1.4.1.674.10892.2.3.1.6.{{ $index }}'
-                    descr: 'FAN Status'
+                    descr: 'FAN'
                     index: 'drsFanCurrStatus.{{ $index }}'
                     states:
                         - { value: 1, descr: other, graph: 1, generic: 3 }
@@ -141,7 +161,7 @@ modules:
                 -
                     oid: drsBladeCurrStatus
                     num_oid: '.1.3.6.1.4.1.674.10892.2.3.1.7.{{ $index }}'
-                    descr: 'Blade Status'
+                    descr: 'Blade'
                     index: 'drsBladeCurrStatus.{{ $index }}'
                     states:
                         - { value: 1, descr: other, graph: 1, generic: 3 }
@@ -153,7 +173,7 @@ modules:
                 -
                     oid: drsTempCurrStatus
                     num_oid: '.1.3.6.1.4.1.674.10892.2.3.1.8.{{ $index }}'
-                    descr: 'Temperature Status'
+                    descr: 'Temperature'
                     index: 'drsTempCurrStatus.{{ $index }}'
                     states:
                         - { value: 1, descr: other, graph: 1, generic: 3 }
@@ -165,7 +185,7 @@ modules:
                 -
                     oid: drsCMCCurrStatus
                     num_oid: '.1.3.6.1.4.1.674.10892.2.3.1.9.{{ $index }}'
-                    descr: 'CMC Status'
+                    descr: 'CMC'
                     index: 'drsCMCCurrStatus.{{ $index }}'
                     states:
                         - { value: 1, descr: other, graph: 1, generic: 3 }
@@ -178,8 +198,9 @@ modules:
                     oid: DELL-RAC-MIB::physicalDiskTable
                     value: DELL-RAC-MIB::physicalDiskState
                     num_oid: '.1.3.6.1.4.1.674.10892.2.6.1.20.130.4.1.4.{{ $index }}'
-                    descr: '{{ $DELL-RAC-MIB::physicalDiskName }} State'
-                    index: '{{ $index }}'
+                    descr: '{{ $DELL-RAC-MIB::physicalDiskName }}'
+                    index: 'physicalDiskStatus.{{ $index }}'
+                    group: 'Storage'
                     entPhysicalIndex: '{{ $index }}'
                     state_name: physicalDiskState
                     states:
@@ -199,6 +220,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.4.{{ $index }}'
                     descr: '{{ $IDRAC-MIB-SMIv2::physicalDiskName }}'
                     index: '{{ $index }}'
+                    group: 'Storage'
                     entPhysicalIndex: '{{ $index }}'
                     state_name: physicalDiskState
                     states:
@@ -218,6 +240,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.4.{{ $index }}'
                     descr: '{{ $IDRAC-MIB-SMIv2::virtualDiskName }}'
                     index: '{{ $index }}'
+                    group: 'Storage'
                     state_name: virtualDiskState
                     states:
                         - { value: 1, descr: unknown, graph: 0, generic: 3 }
@@ -230,6 +253,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.674.10892.2.6.1.20.130.1.1.38.{{ $index }}'
                     descr: '{{ $DELL-RAC-MIB::controllerName }} {{ $DELL-RAC-MIB::controllerDisplayName }}'
                     index: 'controllerComponentStatus.{{ $index }}'
+                    group: 'Storage'
                     state_name: controllerState
                     states:
                         - { value: 1, descr: other, graph: 1, generic: 3 }
@@ -244,6 +268,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.674.10892.5.5.1.20.130.1.1.38.{{ $index }}'
                     descr: '{{ $IDRAC-MIB-SMIv2::controllerName }} {{ $IDRAC-MIB-SMIv2::controllerDisplayName }}'
                     index: 'controllerComponentStatus.{{ $index }}'
+                    group: 'Storage'
                     state_name: controllerState
                     states:
                         - { value: 1, descr: other, graph: 0, generic: 3 }
@@ -273,6 +298,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.674.10892.5.4.1100.50.1.5.{{ $index }}'
                     descr: '{{ $memoryDeviceLocationName }}'
                     index: '{{ $index }}'
+                    group: 'Memory'
                     entPhysicalIndex: '{{ $index }}'
                     state_name: memoryDeviceStatus
                     states:
@@ -300,6 +326,7 @@ modules:
                         - { value: 7, descr: nonCriticalLower, graph: 0, generic: 1 }
                         - { value: 8, descr: criticalLower, graph: 0, generic: 2 }
                         - { value: 9, descr: nonRecoverableLower, graph: 0, generic: 2 }
+                        - { value: 10, descr: failed, graph: 0, generic: 2 }
                 -
                     oid: amperageProbeTable
                     value: amperageProbeStatus
@@ -318,6 +345,7 @@ modules:
                         - { value: 7, descr: nonCriticalLower, graph: 0, generic: 1 }
                         - { value: 8, descr: criticalLower, graph: 0, generic: 2 }
                         - { value: 9, descr: nonRecoverableLower, graph: 0, generic: 2 }
+                        - { value: 10, descr: failed, graph: 0, generic: 2 }
                 -
                     oid: systemBatteryTable
                     value: systemBatteryStatus
@@ -336,11 +364,12 @@ modules:
                         - { value: 7, descr: nonCriticalLower, graph: 0, generic: 1 }
                         - { value: 8, descr: criticalLower, graph: 0, generic: 2 }
                         - { value: 9, descr: nonRecoverableLower, graph: 0, generic: 2 }
+                        - { value: 10, descr: failed, graph: 0, generic: 2 }
                 -
                     oid: drsCMCServerTable
                     value: drsServerMonitoringCapable
                     num_oid: '.1.3.6.1.4.1.674.10892.2.5.1.1.2.{{ $index }}'
-                    descr: 'Slot {{ $drsServerSlotNumber }} {{ $drsServerSlotName }} {{ $drsServerModel }}'
+                    descr: 'Slot {{ $drsServerSlotNumber }} {{ $drsServerModel }}'
                     index: 'drsServerMonitoringCapable.{{ $index }}'
                     skip_values:
                         -
@@ -348,8 +377,8 @@ modules:
                             op: '=='
                             value: 'N/A'
                     states:
-                        - { value: 1, descr: absent, graph: 1, generic: 0 }
-                        - { value: 2, descr: none, graph: 1, generic: 0  }
+                        - { value: 1, descr: absent, graph: 1, generic: 3 }
+                        - { value: 2, descr: none, graph: 1, generic: 3  }
                         - { value: 3, descr: basic, graph: 1, generic: 0 }
                         - { value: 4, descr: off l, graph: 1, generic: 1 }
         temperature:
@@ -422,7 +451,6 @@ modules:
                             oid: amperageProbeType
                             op: '!='
                             value: 23
-
         power:
             data:
                 -
@@ -471,3 +499,4 @@ modules:
                             oid: amperageProbeType
                             op: '!='
                             value: 26
+
