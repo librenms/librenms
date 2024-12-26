@@ -212,7 +212,7 @@ modules:
                         - { value: 6, descr: blocked, graph: 1, generic: 2}
                         - { value: 7, descr: failed, graph: 1, generic: 2 }
                         - { value: 8, descr: nonraid, graph: 1, generic: 0 }
-                        - { value: 9, descr: nonrecoverable, graph: 1, generic: 2 }
+                        - { value: 9, descr: removed, graph: 1, generic: 2 }
                         - { value: 10, descr: readonly, graph: 1, generic: 0 }
                 -
                     oid: IDRAC-MIB-SMIv2::physicalDiskTable
@@ -232,7 +232,7 @@ modules:
                         - { value: 6, descr: blocked, graph: 1, generic: 2}
                         - { value: 7, descr: failed, graph: 1, generic: 2 }
                         - { value: 8, descr: nonraid, graph: 1, generic: 0 }
-                        - { value: 9, descr: nonrecoverable, graph: 1, generic: 2 }
+                        - { value: 9, descr: removed, graph: 1, generic: 2 }
                         - { value: 10, descr: readonly, graph: 1, generic: 0 }
                 -
                     oid: IDRAC-MIB-SMIv2::virtualDiskTable

@@ -4923,7 +4923,7 @@
                 },
                 {
                     "state_name": "physicalDiskState",
-                    "state_descr": "nonrecoverable",
+                    "state_descr": "removed",
                     "state_draw_graph": 1,
                     "state_value": 9,
                     "state_generic_value": 2
@@ -9523,7 +9523,7 @@
                 },
                 {
                     "state_name": "physicalDiskState",
-                    "state_descr": "nonrecoverable",
+                    "state_descr": "removed",
                     "state_draw_graph": 1,
                     "state_value": 9,
                     "state_generic_value": 2
