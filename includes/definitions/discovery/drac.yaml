@@ -19,7 +19,7 @@ modules:
                     value: IDRAC-MIB-SMIv2::coolingDeviceReading
                     num_oid: '.1.3.6.1.4.1.674.10892.5.4.700.12.1.6.{{ $index }}'
                     descr: IDRAC-MIB-SMIv2::coolingDeviceLocationName
-                    index: '{{ $index }}'
+                    index: 'fanspeed.{{ $index }}'
                     high_limit: IDRAC-MIB-SMIv2::coolingDeviceUpperCriticalThreshold
                     low_limit: IDRAC-MIB-SMIv2::coolingDeviceLowerCriticalThreshold
                     # Following can be enabled with new testfiles for Poweredge R640, iDRAC7, Poweredge M1000e
@@ -107,8 +107,8 @@ modules:
                         - { value: 5, descr: critical, graph: 1, generic: 2 }
                         - { value: 6, descr: nonRecoverable, graph: 1, generic: 2 }
                 -
-                    oid: drsKVMCurrStatus
-                    value: drsKVMCurrStatus
+                    oid: DELL-RAC-MIB::drsKVMCurrStatus
+                    value: DELL-RAC-MIB::drsKVMCurrStatus
                     num_oid: '.1.3.6.1.4.1.674.10892.2.3.1.3.{{ $index }}'
                     descr: 'KVM'
                     index: 'drsKVMCurrStatus.{{ $index }}'
@@ -133,8 +133,8 @@ modules:
                         - { value: 5, descr: critical, graph: 1, generic: 2 }
                         - { value: 6, descr: nonRecoverable, graph: 1, generic: 2 }
                 -
-                    oid: drsPowerCurrStatus
-                    value: drsPowerCurrStatus
+                    oid: DELL-RAC-MIB::drsPowerCurrStatus
+                    value: DELL-RAC-MIB::drsPowerCurrStatus
                     num_oid: '.1.3.6.1.4.1.674.10892.2.3.1.5.{{ $index }}'
                     descr: 'Power'
                     index: 'drsPowerCurrStatus.{{ $index }}'
@@ -146,7 +146,7 @@ modules:
                         - { value: 5, descr: critical, graph: 1, generic: 2 }
                         - { value: 6, descr: nonRecoverable, graph: 1, generic: 2 }
                 -
-                    oid: drsFanCurrStatus
+                    oid: DELL-RAC-MIB::drsFanCurrStatus
                     value: drsFanCurrStatus
                     num_oid: '.1.3.6.1.4.1.674.10892.2.3.1.6.{{ $index }}'
                     descr: 'FAN'
@@ -159,7 +159,7 @@ modules:
                         - { value: 5, descr: critical, graph: 1, generic: 2 }
                         - { value: 6, descr: nonRecoverable, graph: 1, generic: 2 }
                 -
-                    oid: drsBladeCurrStatus
+                    oid: DELL-RAC-MIB::drsBladeCurrStatus
                     num_oid: '.1.3.6.1.4.1.674.10892.2.3.1.7.{{ $index }}'
                     descr: 'Blade'
                     index: 'drsBladeCurrStatus.{{ $index }}'
@@ -171,7 +171,7 @@ modules:
                         - { value: 5, descr: critical, graph: 1, generic: 2 }
                         - { value: 6, descr: nonRecoverable, graph: 1, generic: 2 }
                 -
-                    oid: drsTempCurrStatus
+                    oid: DELL-RAC-MIB::drsTempCurrStatus
                     num_oid: '.1.3.6.1.4.1.674.10892.2.3.1.8.{{ $index }}'
                     descr: 'Temperature'
                     index: 'drsTempCurrStatus.{{ $index }}'
@@ -183,7 +183,7 @@ modules:
                         - { value: 5, descr: critical, graph: 1, generic: 2 }
                         - { value: 6, descr: nonRecoverable, graph: 1, generic: 2 }
                 -
-                    oid: drsCMCCurrStatus
+                    oid: DELL-RAC-MIB::drsCMCCurrStatus
                     num_oid: '.1.3.6.1.4.1.674.10892.2.3.1.9.{{ $index }}'
                     descr: 'CMC'
                     index: 'drsCMCCurrStatus.{{ $index }}'
@@ -201,7 +201,6 @@ modules:
                     descr: '{{ $DELL-RAC-MIB::physicalDiskName }}'
                     index: 'physicalDiskStatus.{{ $index }}'
                     group: 'Storage'
-                    entPhysicalIndex: '{{ $index }}'
                     state_name: physicalDiskState
                     states:
                         - { value: 1, descr: unknown, graph: 1, generic: 3 }
@@ -219,10 +218,9 @@ modules:
                     value: IDRAC-MIB-SMIv2::physicalDiskState
                     num_oid: '.1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.4.{{ $index }}'
                     descr: '{{ $IDRAC-MIB-SMIv2::physicalDiskName }}'
-                    index: '{{ $index }}'
+                    index: 'physicalDiskStateV2.{{ $index }}'
                     group: 'Storage'
-                    entPhysicalIndex: '{{ $index }}'
-                    state_name: physicalDiskState
+                    state_name: physicalDiskStateV2
                     states:
                         - { value: 1, descr: unknown, graph: 1, generic: 3 }
                         - { value: 2, descr: ready, graph: 1, generic: 0 }
@@ -239,9 +237,9 @@ modules:
                     value: IDRAC-MIB-SMIv2::virtualDiskState
                     num_oid: '.1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.4.{{ $index }}'
                     descr: '{{ $IDRAC-MIB-SMIv2::virtualDiskName }}'
-                    index: '{{ $index }}'
+                    index: 'virtualDiskState.{{ $index }}'
                     group: 'Storage'
-                    state_name: virtualDiskState
+                    state_name: virtualDiskStateV2
                     states:
                         - { value: 1, descr: unknown, graph: 0, generic: 3 }
                         - { value: 2, descr: online, graph: 0, generic: 0 }
@@ -278,12 +276,11 @@ modules:
                         - { value: 5, descr: critical, graph: 0, generic: 2 }
                         - { value: 6, descr: nonRecoverable, graph: 0, generic: 2}
                 -
-                    oid: processorDeviceTable
-                    value: processorDeviceStatus
+                    oid: IDRAC-MIB-SMIv2::processorDeviceTable
+                    value: IDRAC-MIB-SMIv2::processorDeviceStatus
                     num_oid: '.1.3.6.1.4.1.674.10892.5.4.1100.30.1.5.{{ $index }}'
-                    descr: '{{ $processorDeviceBrandName }}'
-                    index: '{{ $index }}'
-                    entPhysicalIndex: '{{ $index }}'
+                    descr: '{{ $IDRAC-MIB-SMIv2::processorDeviceBrandName }}'
+                    index: 'processorDeviceStatus.{{ $index }}'
                     state_name: processorDeviceStatus
                     states:
                         - { value: 1, descr: other, graph: 0, generic: 3 }
@@ -293,13 +290,12 @@ modules:
                         - { value: 5, descr: critical, graph: 0, generic: 2 }
                         - { value: 6, descr: nonRecoverable, graph: 0, generic: 2}
                 -
-                    oid: memoryDeviceTable
-                    value: memoryDeviceStatus
+                    oid: IDRAC-MIB-SMIv2::memoryDeviceTable
+                    value: IDRAC-MIB-SMIv2::memoryDeviceStatus
                     num_oid: '.1.3.6.1.4.1.674.10892.5.4.1100.50.1.5.{{ $index }}'
-                    descr: '{{ $memoryDeviceLocationName }}'
-                    index: '{{ $index }}'
+                    descr: '{{ $IDRAC-MIB-SMIv2::memoryDeviceLocationName }}'
+                    index: 'memoryDeviceStatus.{{ $index }}'
                     group: 'Memory'
-                    entPhysicalIndex: '{{ $index }}'
                     state_name: memoryDeviceStatus
                     states:
                         - { value: 1, descr: other, graph: 0, generic: 3 }
@@ -309,12 +305,11 @@ modules:
                         - { value: 5, descr: critical, graph: 0, generic: 2 }
                         - { value: 6, descr: nonRecoverable, graph: 0, generic: 2}
                 -
-                    oid: voltageProbeTable
-                    value: voltageProbeStatus
+                    oid: IDRAC-MIB-SMIv2::voltageProbeTable
+                    value: IDRAC-MIB-SMIv2::voltageProbeStatus
                     num_oid: '.1.3.6.1.4.1.674.10892.5.4.600.20.1.5.{{ $index }}'
-                    descr: '{{ $voltageProbeLocationName }}'
-                    index: '{{ $index }}'
-                    entPhysicalIndex: '{{ $index }}'
+                    descr: '{{ $IDRAC-MIB-SMIv2::voltageProbeLocationName }}'
+                    index: 'voltageProbeStatus.{{ $index }}'
                     state_name: voltageProbeStatus
                     states:
                         - { value: 1, descr: other, graph: 0, generic: 3 }
@@ -328,12 +323,11 @@ modules:
                         - { value: 9, descr: nonRecoverableLower, graph: 0, generic: 2 }
                         - { value: 10, descr: failed, graph: 0, generic: 2 }
                 -
-                    oid: amperageProbeTable
-                    value: amperageProbeStatus
+                    oid: IDRAC-MIB-SMIv2::amperageProbeTable
+                    value: IDRAC-MIB-SMIv2::amperageProbeStatus
                     num_oid: '.1.3.6.1.4.1.674.10892.5.4.600.30.1.5.{{ $index }}'
-                    descr: '{{ $amperageProbeLocationName }}'
-                    index: '{{ $index }}'
-                    entPhysicalIndex: '{{ $index }}'
+                    descr: '{{ $IDRAC-MIB-SMIv2::amperageProbeLocationName }}'
+                    index: 'amperageProbeStatus.{{ $index }}'
                     state_name: amperageProbeStatus
                     states:
                         - { value: 1, descr: other, graph: 0, generic: 3 }
@@ -347,12 +341,11 @@ modules:
                         - { value: 9, descr: nonRecoverableLower, graph: 0, generic: 2 }
                         - { value: 10, descr: failed, graph: 0, generic: 2 }
                 -
-                    oid: systemBatteryTable
-                    value: systemBatteryStatus
+                    oid: IDRAC-MIB-SMIv2::systemBatteryTable
+                    value: IDRAC-MIB-SMIv2::systemBatteryStatus
                     num_oid: '.1.3.6.1.4.1.674.10892.5.4.600.50.1.5.{{ $index }}'
-                    descr: '{{ $systemBatteryLocationName }}'
-                    index: '{{ $index }}'
-                    entPhysicalIndex: '{{ $index }}'
+                    descr: '{{ $IDRAC-MIB-SMIv2::systemBatteryLocationName }}'
+                    index: 'systemBatteryStatus.{{ $index }}'
                     state_name: systemBatteryStatus
                     states:
                         - { value: 1, descr: other, graph: 0, generic: 3 }
@@ -388,7 +381,7 @@ modules:
                     value: drsChassisFrontPanelAmbientTemperature
                     num_oid: '.1.3.6.1.4.1.674.10892.2.3.1.10.{{ $index }}'
                     index: 'drsChassisFrontPanelAmbientTemperature.{{ $index }}'
-                    descr: 'Chassis {{ $drsChassisIndex }} Front Panel Temperature'
+                    descr: 'Chassis Front Panel Temperature'
                 -
                     oid: drsCMCAmbientTemperature
                     value: drsCMCAmbientTemperature
@@ -405,7 +398,7 @@ modules:
                     oid: temperatureProbeTable
                     value: temperatureProbeReading
                     num_oid: '.1.3.6.1.4.1.674.10892.5.4.700.20.1.6.{{ $index }}'
-                    index: '{{ $index }}'
+                    index: 'temperatureProbeReading.{{ $index }}'
                         # Better but break graphs
                         #index: 'temperatureProbeReading.{{ $index }}'
                     descr: temperatureProbeLocationName
