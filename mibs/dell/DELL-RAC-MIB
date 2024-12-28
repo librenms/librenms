@@ -1081,7 +1081,7 @@ batteryTableEntry OBJECT-TYPE
     ::= { batteryTable 1 }
 
 batteryNumber OBJECT-TYPE
-    SYNTAX         INTEGER (1..255)
+    SYNTAX         INTEGER (0..255)
     ACCESS         read-only
     STATUS         mandatory
     DESCRIPTION
@@ -2454,7 +2454,7 @@ virtualDiskTableEntry OBJECT-TYPE
     ::= { virtualDiskTable 1 }
 
 virtualDiskNumber OBJECT-TYPE
-    SYNTAX          INTEGER (1..100000000)
+    SYNTAX          INTEGER (0..100000000)
     ACCESS          read-only
     STATUS          mandatory
     DESCRIPTION
@@ -2953,7 +2953,7 @@ enclosureTableEntry OBJECT-TYPE
     ::= { enclosureTable 1 }
 
 enclosureNumber OBJECT-TYPE
-    SYNTAX          INTEGER (1..255)
+    SYNTAX          INTEGER (0..255)
     ACCESS          read-only
     STATUS          mandatory
     DESCRIPTION
@@ -3256,7 +3256,7 @@ enclosureManagementModuleTableEntry OBJECT-TYPE
     ::= { enclosureManagementModuleTable 1 }
 
 enclosureManagementModuleNumber OBJECT-TYPE
-    SYNTAX          INTEGER (1..255)
+    SYNTAX          INTEGER (0..255)
     ACCESS          read-only
     STATUS          mandatory
     DESCRIPTION
@@ -3397,7 +3397,7 @@ enclosureFanTableEntry OBJECT-TYPE
     ::= { enclosureFanTable 1 }
 
 enclosureFanNumber OBJECT-TYPE
-    SYNTAX          INTEGER (1..255)
+    SYNTAX          INTEGER (0..255)
     ACCESS          read-only
     STATUS          mandatory
     DESCRIPTION
@@ -3529,7 +3529,7 @@ enclosurePowerSupplyTableEntry OBJECT-TYPE
     ::= { enclosurePowerSupplyTable 1 }
 
 enclosurePowerSupplyNumber OBJECT-TYPE
-    SYNTAX          INTEGER (1..255)
+    SYNTAX          INTEGER (0..255)
     ACCESS          read-only
     STATUS          mandatory
     DESCRIPTION
@@ -3663,7 +3663,7 @@ enclosureTemperatureProbeTableEntry OBJECT-TYPE
     ::= { enclosureTemperatureProbeTable 1 }
 
 enclosureTemperatureProbeNumber OBJECT-TYPE
-    SYNTAX          INTEGER (1..255)
+    SYNTAX          INTEGER (0..255)
     ACCESS          read-only
     STATUS          mandatory
     DESCRIPTION
