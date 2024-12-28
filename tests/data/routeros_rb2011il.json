@@ -351,7 +351,7 @@
                     "last_bytes_in": 9995956661,
                     "last_bytes_out": 10411401954,
                     "bytes_in_rate": 5,
-                    "bytes_out_rate": 6,
+                    "bytes_out_rate": 5,
                     "last_bytes_drop_in": null,
                     "last_bytes_drop_out": null,
                     "bytes_drop_in_rate": null,
@@ -397,8 +397,8 @@
                     "last_packets_drop_out": 453,
                     "packets_drop_in_rate": 0,
                     "packets_drop_out_rate": 0,
-                    "bytes_drop_in_pct": 0,
-                    "bytes_drop_out_pct": 0,
+                    "bytes_drop_in_pct": null,
+                    "bytes_drop_out_pct": null,
                     "packets_drop_in_pct": null,
                     "packets_drop_out_pct": null
                 }
