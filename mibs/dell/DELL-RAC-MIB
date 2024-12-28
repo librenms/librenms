@@ -1239,7 +1239,7 @@ controllerTableEntry OBJECT-TYPE
     ::= { controllerTable 1 }
 
 controllerNumber OBJECT-TYPE
-    SYNTAX         INTEGER (1..255)
+    SYNTAX         INTEGER (0..255)
     ACCESS         read-only
     STATUS         mandatory
     DESCRIPTION
