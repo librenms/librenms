@@ -19,8 +19,8 @@
  *
  * @link       https://www.librenms.org
  *
- * @copyright  2024 Peca Nesovanovic
- * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
+ * @copyright  2024 Peca Nesovanovic, 2024 LibreNMS
+ * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>, Daniel 'f0o' Preussker <git@f0o.dev>
  */
 
 use App\Models\Eventlog;
@@ -73,9 +73,10 @@ if (! empty($vlans)) {
         $portsData = SnmpQuery::hideMib()->walk('HUAWEI-L2IF-MIB::hwL2IfHybridTaggedVlanListHigh')->table(1, $portsData);
     }
     if (! empty($portsData)) {
-        foreach ($portsData as $pdIndex => $vlanData) {
-            if (! empty($portsIndexes[$pdIndex])) {
-                $ifIndex = $portsIndexes[$pdIndex]['hwL2IfPortIfIndex'];
+        foreach ($portsIndexes as $pdIndex => $portData) {
+            $vlanData = $portsData[$pdIndex] ?? null;
+            $ifIndex = $portsIndexes[$pdIndex]['hwL2IfPortIfIndex'];
+            if (isset($vlanData)) {
                 foreach (['Low', 'High'] as $hilo) {
                     foreach (['TrunkAllowPass', 'HybridTagged'] as $pType) {
                         $oid = 'hwL2If' . $pType . 'VlanList' . $hilo;
@@ -90,6 +91,10 @@ if (! empty($vlans)) {
                         }
                     }
                 }
+            }
+            $vrp_pvid = SnmpQuery::hideMib()->get('HUAWEI-L2IF-MIB::hwL2IfPVID.' . $pdIndex)->value();
+            if ($vrp_pvid > 0) {
+                $per_vlan_data[$vrp_pvid][$ifIndex]['untagged'] = 1;
             }
         }
     }
