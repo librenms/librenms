@@ -173,6 +173,7 @@ class CustomMapDataController extends Controller
                 'style' => $node->style,
                 'icon' => $node->icon,
                 'image' => $node->image,
+                'nodeimage' => $node->nodeimage ? $node->nodeimage->custom_map_node_image_id : null,
                 'size' => $node->size,
                 'border_width' => $node->border_width,
                 'text_face' => $node->text_face,
@@ -262,12 +263,13 @@ class CustomMapDataController extends Controller
                         abort(404);
                     }
                 }
-                $dbnode->device_id = is_numeric($node['title']) ? $node['title'] : null;
-                $dbnode->linked_custom_map_id = str_starts_with($node['title'], 'map:') ? (int) str_replace('map:', '', $node['title']) : null;
+                $dbnode->device_id = $node['device_id'];
+                $dbnode->linked_custom_map_id = $node['linked_map_id'];
                 $dbnode->label = $node['label'];
                 $dbnode->style = $node['shape'];
                 $dbnode->icon = $node['icon'];
                 $dbnode->image = $node['image']['unselected'] ?? '';
+                $dbnode->node_image_id = $node['nodeimage'] ?? null;
                 $dbnode->size = $node['size'];
                 $dbnode->text_face = $node['font']['face'];
                 $dbnode->text_size = $node['font']['size'];

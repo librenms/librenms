@@ -15,10 +15,10 @@ foreach ($sensors as $sensor) {
 
     $sensor_current = $graph_type == 'sensor_state' ? get_state_label($sensor) : get_sensor_label_color($sensor);
 
-    $sensor_limit = trim(Number::formatSi($sensor['sensor_limit'], 2, 3, $unit));
-    $sensor_limit_low = trim(Number::formatSi($sensor['sensor_limit_low'], 2, 3, $unit));
-    $sensor_limit_warn = trim(Number::formatSi($sensor['sensor_limit_warn'], 2, 3, $unit));
-    $sensor_limit_low_warn = trim(Number::formatSi($sensor['sensor_limit_low_warn'], 2, 3, $unit));
+    $sensor_limit = trim(Number::formatSi($sensor['sensor_limit'], 2, 0, $unit));
+    $sensor_limit_low = trim(Number::formatSi($sensor['sensor_limit_low'], 2, 0, $unit));
+    $sensor_limit_warn = trim(Number::formatSi($sensor['sensor_limit_warn'], 2, 0, $unit));
+    $sensor_limit_low_warn = trim(Number::formatSi($sensor['sensor_limit_low_warn'], 2, 0, $unit));
 
     echo "<div class='panel panel-default'>\n" .
          "    <div class='panel-heading'>\n" .

@@ -99,7 +99,8 @@
     var edge_nodes_map = [];
     var node_device_map = {};
     var custom_image_base = "{{ $base_url }}images/custommap/icons/";
-    var network_options = {{ Js::from($map_conf) }};
+    var nodeimage_base = '{{ route('maps.nodeimage.show', ['image' => '?' ]) }}'.replace("?", "");
+    var network_options = {{ Js::from($map_conf) }}
 
     function edgeNodesRemove(nm_id, edgeid) {
         // Remove old item from map if it exists
@@ -583,8 +584,13 @@
                 if(node.image && "unselected" in node.image) {
                     if(node.image.unselected.indexOf(custom_image_base) == 0) {
                         node.image.unselected = node.image.unselected.replace(custom_image_base, "");
+                        node.nodeimage = null;
+                    } else if(node.image.unselected.indexOf(nodeimage_base) == 0) {
+                        node.nodeimage = node.image.unselected.replace(nodeimage_base, "");
+                        node.image = undefined;
                     } else {
                         node.image = undefined;
+                        node.nodeimage = null;
                     }
                 }
                 nodes[node.id] = node;
@@ -712,11 +718,13 @@
                 $.each( data.nodes, function( nodeid, node) {
                     var node_cfg = {};
                     node_cfg.id = nodeid;
+                    node_cfg.device_id = node.device_id;
+                    node_cfg.linked_map_id = node.linked_map_id;
                     if(node.device_id) {
                         node_device_map[nodeid] = {device_id: node.device_id, device_name: node.device_name, device_image: node.device_image};
-                        node_cfg.title = node.device_id;
+                        node_cfg.title = "Device " + node.device_id;
                     } else if(node.linked_map_id) {
-                        node_cfg.title = "map:" + node.linked_map_id;
+                        node_cfg.title = "Link to map " + node.linked_map_id;
                     } else {
                         node_cfg.title = null;
                     }
@@ -736,6 +744,8 @@
                     if(node.style == "image" || node.style == "circularImage") {
                         if(node.image) {
                             node_cfg.image = {unselected: custom_image_base + node.image};
+                        } else if(node.nodeimage) {
+                            node_cfg.image = {unselected: nodeimage_base + node.nodeimage};
                         } else if (node.device_image) {
                             node_cfg.image = {unselected: node.device_image};
                         } else {

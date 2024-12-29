@@ -1,4 +1,4 @@
-<nav class="navbar navbar-default {{ $navbar }} navbar-fixed-top" role="navigation">
+<nav class="navbar navbar-default {{ $navbar }} navbar-sticky-top" role="navigation">
     <div class="container-fluid">
         <div class="navbar-header">
             <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navHeaderCollapse">
@@ -259,6 +259,9 @@
                             <i class="fa fa-pen-to-square fa-fw fa-lg" aria-hidden="true"></i> {{ __('Edit Current Map') }}
                         </a></li>
                         @endif
+                        <li><a href="{{ route('maps.nodeimage.index') }}">
+                            <i class="fa fa-image fa-fw fa-lg" aria-hidden="true"></i> {{ __('Custom Node Image Manager') }}
+                        </a></li>
                         @endadmin
 
                     </ul>
