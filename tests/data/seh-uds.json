@@ -11,7 +11,7 @@
                     "hardware": "myUTN-50a",
                     "features": null,
                     "location": null,
-                    "os": "seh",
+                    "os": "seh-uds",
                     "type": "appliance",
                     "serial": "27120560201360",
                     "icon": "seh.svg"
