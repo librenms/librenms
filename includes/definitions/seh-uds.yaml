@@ -1,4 +1,4 @@
-os: seh
+os: seh-uds
 text: 'SEH'
 type: appliance
 icon: seh
