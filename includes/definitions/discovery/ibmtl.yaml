@@ -33,5 +33,3 @@ modules:
                         - { value: 17, generic: 0, descr: completed, graph: 1 }
                         - { value: 18, generic: 1, descr: powerMode, graph: 1 }
                         - { value: 19, generic: 1, descr: dMTFReserved, graph: 1 }
-                        - { value: 32768, generic: 3, descr: vendorReserved, graph: 1 }
-
