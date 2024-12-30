@@ -114,7 +114,7 @@ and it will print out what it thinks it should be.
 
 === "Agent"
 
-    1. [Install the agent](../Agent-Setup.md)) on this device if it isn't
+    1. [Install the agent](../Agent-Setup.md) on this device if it isn't
     
     2. Download the script onto the desired host:
 
