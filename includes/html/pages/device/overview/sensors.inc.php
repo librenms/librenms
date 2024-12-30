@@ -28,7 +28,7 @@ if ($sensors->count()) {
 
         if ($sensor->group != '' && $group != $sensor->group) {
             $group = $sensor->group;
-            echo '<tr><td colspan="3"><strong>$group</strong></td></tr>';
+            echo '<tr><td colspan="3"><strong>' . $group . '</strong></td></tr>';
         }
 
         // FIXME - make this "four graphs in popup" a function/include and "small graph" a function.
