@@ -13,7 +13,7 @@ Script to monitor your Redis Server
         ```
 
     2. Make the script executable
-        
+
         ```bash
         chmod +x /etc/snmp/redis.py
         ```

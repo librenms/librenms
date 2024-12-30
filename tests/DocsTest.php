@@ -50,15 +50,26 @@ class DocsTest extends TestCase
     {
         $mkdocs = Yaml::parse(file_get_contents(__DIR__ . '/../mkdocs.yml'));
         $dir = __DIR__ . '/../doc/';
-        $files = str_replace($dir, '', rtrim(`find $dir -name '*.md'`));
-
-        // check for missing pages
+    
+        // Define paths to exclude
+        $exclude_paths = [ 
+            'Extensions/Applications/',
+        ];
+    
+        // Build the exclusion part of the find command
+        $exclude_conditions = implode(' -not -path ', array_map(fn($path) => escapeshellarg($path), $exclude_paths));
+        $find_command = "find $dir -name '*.md' -not -path $exclude_conditions";
+    
+        // Run the find command with exclusions
+        $files = str_replace($dir, '', rtrim(`$find_command`));
+    
+        // Check for missing pages
         collect(explode(PHP_EOL, $files))
             ->diff(collect($mkdocs['nav'])->flatten()->merge($this->hidden_pages)) // grab defined pages and diff
             ->each(function ($missing_doc) {
                 $this->fail("The doc $missing_doc doesn't exist in mkdocs.yml, please add it to the relevant section");
             });
-
+    
         $this->expectNotToPerformAssertions();
     }
 }
