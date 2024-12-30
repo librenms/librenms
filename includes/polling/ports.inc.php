@@ -21,8 +21,6 @@ $data_oids = [
     'ifPhysAddress',
     'ifConnectorPresent',
     'ifDuplex',
-    'ifTrunk',
-    'ifVlan',
 ];
 
 $stat_oids = [
@@ -278,10 +276,6 @@ if ($device['os'] === 'f5' && (version_compare($device['version'], '11.2.0', '>=
 
                     $port_stats = snmp_get_multi($device, $oids, '-OQUst', 'IF-MIB', null, $port_stats);
                     $port_stats = snmp_get_multi($device, $extra_oids, '-OQUst', 'EtherLike-MIB', null, $port_stats);
-
-                    if ($device['os'] != 'asa') {
-                        $port_stats = snmp_get_multi($device, "dot1qPvid.$ifIndex", '-OQUst', 'Q-BRIDGE-MIB', null, $port_stats);
-                    }
                 }
             }
         }
@@ -320,7 +314,6 @@ if ($device['os'] === 'f5' && (version_compare($device['version'], '11.2.0', '>=
                 $dot3StatsDuplexStatusSnmpFlags = '-Cc';
             }
             $port_stats = snmpwalk_cache_oid($device, 'dot3StatsDuplexStatus', $port_stats, 'EtherLike-MIB', null, $dot3StatsDuplexStatusSnmpFlags);
-            $port_stats = snmpwalk_cache_oid($device, 'dot1qPvid', $port_stats, 'Q-BRIDGE-MIB');
         }
     }
 }
@@ -424,12 +417,6 @@ if ($device['os_group'] == 'cisco' && $device['os'] != 'asa') {
             $port_stats = snmpwalk_cache_oid($device, $oid, $port_stats, 'CISCO-PAGP-MIB');
         }
     }
-
-    // Grab data to put ports into vlans or make them trunks
-    // FIXME we probably shouldn't be doing this from the VTP MIB, right?
-    $port_stats = snmpwalk_cache_oid($device, 'vmVlan', $port_stats, 'CISCO-VLAN-MEMBERSHIP-MIB');
-    $port_stats = snmpwalk_cache_oid($device, 'vlanTrunkPortEncapsulationOperType', $port_stats, 'CISCO-VTP-MIB');
-    $port_stats = snmpwalk_cache_oid($device, 'vlanTrunkPortNativeVlan', $port_stats, 'CISCO-VTP-MIB');
 }//end if
 
 /*
@@ -638,30 +625,10 @@ foreach ($ports as $port) {
             $port['update']['ifLastChange'] = 0;  // no data, so use the same as device uptime
         }
 
-        // Set VLAN and Trunk from Cisco
-        if (isset($this_port['vlanTrunkPortEncapsulationOperType']) && $this_port['vlanTrunkPortEncapsulationOperType'] != 'notApplicable') {
-            $this_port['ifTrunk'] = $this_port['vlanTrunkPortEncapsulationOperType'];
-            if (isset($this_port['vlanTrunkPortNativeVlan'])) {
-                $this_port['ifVlan'] = $this_port['vlanTrunkPortNativeVlan'];
-            }
-        }
-
-        if (isset($this_port['vmVlan'])) {
-            $this_port['ifVlan'] = $this_port['vmVlan'];
-        }
-
-        // Set VLAN and Trunk from Q-BRIDGE-MIB
-        if (! isset($this_port['ifVlan']) && isset($this_port['dot1qPvid'])) {
-            $this_port['ifVlan'] = $this_port['dot1qPvid'];
-        }
-
         // Set ifConnectorPresent to null when the device does not support IF-MIB truth values.
         if (isset($this_port['ifConnectorPresent']) && ! in_array($this_port['ifConnectorPresent'], ['true', 'false'])) {
             $this_port['ifConnectorPresent'] = null;
         }
-
-        // FIXME use $q_bridge_mib[$this_port['ifIndex']] to see if it is a trunk (>1 array count)
-        echo 'VLAN = ' . ($this_port['ifVlan'] ?? '?') . ' ';
 
         // attempt to fill missing fields
         port_fill_missing_and_trim($this_port, $device);
