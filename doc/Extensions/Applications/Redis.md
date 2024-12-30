@@ -52,5 +52,5 @@ Script to monitor your Redis Server
 
 === "Agent"
 
-    [Install the agent](Agent-Setup.md) on this device if it isn't already
+    [Install the agent](../Agent-Setup.md) on this device if it isn't already
     and copy the `redis` script to `/usr/lib/check_mk_agent/local/`

@@ -44,7 +44,7 @@ location /nginx-status {
 
 === "Agent"
 
-    [Install the agent](Agent-Setup.md) on this device if it isn't already
+    [Install the agent](../Agent-Setup.md) on this device if it isn't already
     and copy the `nginx` script to `/usr/lib/check_mk_agent/local/`
 
 #### SELinux

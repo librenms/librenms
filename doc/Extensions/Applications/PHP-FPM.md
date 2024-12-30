@@ -61,5 +61,5 @@ A small shell script that reports the status of PHP-FPM (FastCGI Process Manager
 
 === "Agent"
 
-    [Install the agent](Agent-Setup.md) on this device if it isn't already
+    [Install the agent](../Agent-Setup.md) on this device if it isn't already
     and copy the `phpfpmsp` script to `/usr/lib/check_mk_agent/local/`

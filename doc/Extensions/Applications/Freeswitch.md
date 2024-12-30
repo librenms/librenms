@@ -6,7 +6,7 @@ Install via the agent or extend.
 
 === "Agent"
 
-    1. [Install the agent](Agent-Setup.md) on this device if it isn't already
+    1. [Install the agent](../Agent-Setup.md) on this device if it isn't already
     and copy the `freeswitch` script to `/usr/lib/check_mk_agent/local/`
 
     ```bash
