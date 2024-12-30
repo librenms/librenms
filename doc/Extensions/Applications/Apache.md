@@ -62,7 +62,7 @@ Either use SNMP extend or use the agent.
 
     ### install agent
 
-    [Install the agent](../Agent-Setup.md) on this device if it isn't already
+    [Install the agent](../Agent-Setup.md)) on this device if it isn't already
     and copy the `apache` script to `/usr/lib/check_mk_agent/local/`
 
     1. Verify it is working by running `/usr/lib/check_mk_agent/local/apache`

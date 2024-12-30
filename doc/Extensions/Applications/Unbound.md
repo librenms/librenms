@@ -48,4 +48,4 @@ working by running `unbound-control stats`.
 
 === "Agent"
 
-    [Install the agent](#agent-setup) on this device if it isn't already and copy the `unbound.sh` script to `/usr/lib/check_mk_agent/local/`
+    [Install the agent](../Agent-Setup.md) on this device if it isn't already and copy the `unbound.sh` script to `/usr/lib/check_mk_agent/local/`

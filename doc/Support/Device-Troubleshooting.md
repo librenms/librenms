@@ -7,7 +7,7 @@ troubleshooting a device or when requesting help.
 This feature can be found by going to the device that you are
 troubleshooting in the webui, clicking on the settings icon menu on
 far right and selecting Capture.
-![Capture-Debug-Icon](/img/capture-debug-icon.png)
+![Capture-Debug-Icon](../img/capture-debug-icon.png)
 
 ## Discovery
 
@@ -26,5 +26,5 @@ SNMP will run SNMP Bulk Walk on the device and output the information.
 Alerts Capture is handy when you are creating alerts and need to see
 if your alert rule matches.
 
-![device-troubleshooting](/img/device-troubleshooting.png)
+![device-troubleshooting](../img/device-troubleshooting.png)
 

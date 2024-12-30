@@ -8,4 +8,4 @@ through the following menu options:
  - Overview -> Maps -> Device Groups Dependencies
 
 ## Settings
-The map display can be configured by altering the [VisJS-Config.md](Vis JS Options)
+The map display can be configured by altering the [Vis JS Options](VisJS-Config.md)

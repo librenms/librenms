@@ -22,7 +22,7 @@ A recursive DNS server: <https://www.powerdns.com/recursor.html>
 
 === "Agent"
 
-    [Install the agent](Agent-Setup.md) on this device if it isn't already
+    [Install the agent](../Agent-Setup.md) on this device if it isn't already
     and copy the `powerdns-recursor` script to
     `/usr/lib/check_mk_agent/local/`
 

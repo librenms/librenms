@@ -158,7 +158,7 @@ if congiured to do so.
 1. This will be automatically saved, and you should get a green
    confirmation pop-up message.
 
-![Enable-application-module](/img/Enable_application_module.png)
+![Enable-application-module](../img/Enable_application_module.png)
 
 After you have enabled the application module, it would be wise to
 then also enable which applications you want to monitor, in the rare
@@ -175,7 +175,7 @@ LibreNMS during discovery and polling.
 1. This will also be automatically saved, and you should get a green
    confirmation pop-up message.
 
-![Enable-applications](/img/Enable_applications.png)
+![Enable-applications](../img/Enable_applications.png)
 
 
 ## Agent
