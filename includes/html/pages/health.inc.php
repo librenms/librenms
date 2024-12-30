@@ -82,7 +82,11 @@ if ($vars['view'] != 'graphs') {
 }
 
 if ($datas->contains($active_metric)) {
-    include 'includes/html/pages/health/sensors.inc.php';
+    if(file_exists('includes/html/pages/health/' . $active_metric . '.inc.php')){
+        include 'includes/html/pages/health/' . $active_metric . '.inc.php';
+    }else{
+        include 'includes/html/pages/health/sensors.inc.php';
+    }
 } else {
     echo 'No sensors of type ' . $active_metric . ' found.';
 }
