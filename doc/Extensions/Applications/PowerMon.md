@@ -2,7 +2,7 @@
 
 PowerMon tracks the power usage on your host and can report on both consumption and cost, using a python script installed on the host.
 
-[PowerMon consumption graph](../img/example-app-powermon-consumption-02.png)
+[PowerMon consumption graph](/img/example-app-powermon-consumption-02.png)
 
 Currently the script uses one of two methods to determine current power usage:
 

@@ -54,6 +54,7 @@ so you need to also include the line `$chk_options['slave'] = false;` into `mysq
 === "Agent"
 
     [Install the agent](../Agent-Setup.md) on this device if it isn't already
+
     and copy the `mysql` script to `/usr/lib/check_mk_agent/local/`
 
     Verify it is working by running `/usr/lib/check_mk_agent/local/mysql`

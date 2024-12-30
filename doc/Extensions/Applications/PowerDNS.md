@@ -31,4 +31,5 @@ An authoritative DNS server: <https://www.powerdns.com/auth.html>
 === "Agent"
 
     [Install the agent](../Agent-Setup.md) on this device if it isn't already
+
     and copy the `powerdns` script to `/usr/lib/check_mk_agent/local/`
