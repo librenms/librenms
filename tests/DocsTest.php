@@ -53,7 +53,7 @@ class DocsTest extends TestCase
     
         // Define paths to exclude
         $exclude_paths = [ 
-            'Extensions/Applications/',
+            '*/Extensions/Applications/*',
         ];
     
         // Build the exclusion part of the find command
