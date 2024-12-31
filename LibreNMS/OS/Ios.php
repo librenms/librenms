@@ -25,8 +25,12 @@
 
 namespace LibreNMS\OS;
 
+use App\Models\Device;
+use App\Models\Port;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Str;
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessCellDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessChannelDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
@@ -34,6 +38,8 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessRsrpDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRsrqDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
+use LibreNMS\Interfaces\Polling\OSPolling;
+use LibreNMS\Interfaces\Polling\PortSecurityPolling;
 use LibreNMS\OS\Shared\Cisco;
 use LibreNMS\OS\Traits\CiscoCellular;
 
@@ -44,9 +50,16 @@ class Ios extends Cisco implements
     WirelessRssiDiscovery,
     WirelessRsrqDiscovery,
     WirelessRsrpDiscovery,
-    WirelessSnrDiscovery
+    WirelessSnrDiscovery,
+    PortSecurityPolling,
+    OSPolling
 {
     use CiscoCellular;
+
+    public function pollOS(DataStorageInterface $datastore): void
+    {
+        // Don't poll Ciscowlc FIXME remove when wireless-controller module exists
+    }
 
     /**
      * @return array Sensors
@@ -101,5 +114,87 @@ class Ios extends Cisco implements
         }
 
         return $sensors;
+    }
+
+    public function pollPortSecurity($os, $device): Collection
+    {
+        // Polling for current data
+        $port_id = 0;
+        $record = [];
+        $device = $device->toArray();
+
+        $portsec_snmp = [];
+        $portsec_snmp = snmpwalk_cache_oid($device, 'cpsIfPortSecurityEnable', $portsec_snmp, 'CISCO-PORT-SECURITY-MIB');
+        $portsec_snmp = snmpwalk_cache_oid($device, 'cpsIfPortSecurityStatus', $portsec_snmp, 'CISCO-PORT-SECURITY-MIB');
+        $portsec_snmp = snmpwalk_cache_oid($device, 'cpsIfMaxSecureMacAddr', $portsec_snmp, 'CISCO-PORT-SECURITY-MIB');
+        $portsec_snmp = snmpwalk_cache_oid($device, 'cpsIfCurrentSecureMacAddrCount', $portsec_snmp, 'CISCO-PORT-SECURITY-MIB');
+        $portsec_snmp = snmpwalk_cache_oid($device, 'cpsIfViolationAction', $portsec_snmp, 'CISCO-PORT-SECURITY-MIB');
+        $portsec_snmp = snmpwalk_cache_oid($device, 'cpsIfViolationCount', $portsec_snmp, 'CISCO-PORT-SECURITY-MIB');
+        $portsec_snmp = snmpwalk_cache_oid($device, 'cpsIfSecureLastMacAddress', $portsec_snmp, 'CISCO-PORT-SECURITY-MIB');
+        $portsec_snmp = snmpwalk_cache_oid($device, 'cpsIfStickyEnable', $portsec_snmp, 'CISCO-PORT-SECURITY-MIB');
+        $portsec_snmp = snmpwalk_cache_oid($device, 'cpsIfSecureLastMacAddrVlanId', $portsec_snmp, 'CISCO-PORT-SECURITY-MIB');
+
+        // Storing all polled data into an array using ifIndex as the index
+        // Getting all ports from device. Port has to exist in ports table to be populated in port_security
+        // Using ifIndex to map the port-security data to a port_id to compare/update against the correct records
+        $ports = new Port();
+        $device = $os->getDevice();
+        $device_id = $device->device_id;
+        $port_list = $ports->select('port_id', 'ifIndex')->where('device_id', $device_id)->get()->toArray();
+        $port_key = [];
+        foreach ($port_list as $item) {
+            $if_index = $item['ifIndex'];
+            $port_id = $item['port_id'];
+            $port_key[$if_index] = $port_id;
+            $portsec_snmp[$if_index]['ifIndex'] = $if_index;
+
+            if (array_key_exists($if_index, $portsec_snmp)) {
+                $portsec_snmp[$if_index]['port_id'] = $port_id;
+                $portsec_snmp[$if_index]['device_id'] = $device_id;
+            }
+        }
+
+        // Assigning port_id and device_id to SNMP array for comparison
+        $portsec = $device->portSecurity;
+
+        foreach ($portsec_snmp as $item) {
+            $if_index = $item['ifIndex'];
+            if (array_key_exists('ifIndex', $portsec_snmp[$if_index]) and array_key_exists($portsec_snmp[$if_index]['ifIndex'], $port_key)) {
+                $portsec_snmp[$if_index]['port_id'] = $port_key[$portsec_snmp[$if_index]['ifIndex']];
+                $portsec_snmp[$if_index]['device_id'] = $device_id;
+            }
+
+            if (array_key_exists($if_index, $port_key)) {
+                $port_id = $port_key[$if_index];
+                $record = $portsec_snmp[$if_index];
+                unset($record['ifIndex']);
+            }
+
+            $update = new \App\Models\PortSecurity;
+            $entry = $portsec->where('port_id', $port_id)->first();
+            // Checking if entry exists in DB already. If true, compare polled to DB.
+            // If no entry, insert new.
+            if ($entry) {
+                $entry = $entry->toArray();
+                unset($entry['id']);
+                unset($entry['laravel_through_key']);
+                // This OID currently always returns null so doesn't poulate $portsec_snmp
+                if (! array_key_exists('cpsIfSecureLastMacAddrVlanId', $record)) {
+                    unset($entry['cpsIfSecureLastMacAddrVlanId']);
+                }
+                // Checking that polled data exists and doesn't match. Else if polled data exists, insert a new record.
+                if (array_key_exists('cpsIfPortSecurityEnable', $record) and $record != $entry) {
+                    unset($record['port_id']);
+                    //echo "Updating\n";
+                    $update->where('port_id', $port_id)->update($record);
+                }
+            } elseif (array_key_exists('cpsIfPortSecurityEnable', $record)) {
+                //$update->where('port_id', $port_id)->update($record);
+                //echo "Creating\n";
+                $update->create($record);
+            }
+        }
+
+        return $portsec;
     }
 }
