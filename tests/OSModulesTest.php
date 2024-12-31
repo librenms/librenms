@@ -101,6 +101,21 @@ class OSModulesTest extends DBTestCase
 
         try {
             Debug::set(false); // avoid all undefined index errors in the legacy code
+
+
+print_r ("\nPipoCANAJA - TEST OS $$os, $variant \n");
+print_r ($this->discoveryModules);
+print_r ("---\n");
+print_r ($modules);
+print_r ("---\n");
+//$modules = array_intersect_assoc($this->discoveryModules, $modules);
+$dmodules = array_fill_keys(array_intersect(array_keys($this->discoveryModules), array_keys($modules)), true);
+$pmodules = array_fill_keys(array_intersect(array_keys($this->pollerModules), array_keys($modules)), true);
+$modules = array_merge($dmodules, $pmodules);
+print_r ("---\n");
+print_r ($modules);
+print_r ("\nPipoCANAJA - FIN TEST OS $$os, $variant \n");
+
             $helper = new ModuleTestHelper($modules, $os, $variant);
             $helper->setQuiet();
 

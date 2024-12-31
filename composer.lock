@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "fee5d24447dced4397e26066f8c9ee59",
+    "content-hash": "36897a0a675c39bc572a838824536ce0",
     "packages": [
         {
             "name": "amenadiel/jpgraph",
@@ -485,6 +485,50 @@
                 "source": "https://github.com/dflydev/dflydev-dot-access-data/tree/v3.0.3"
             },
             "time": "2024-07-08T12:26:09+00:00"
+        },
+        {
+            "name": "dmbokhan/vlans-compare",
+            "version": "1.0.5",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/dmbokhan/vlans-compare.git",
+                "reference": "d15120d55ca22f3848f4840baebf9c0c0a7853a1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/dmbokhan/vlans-compare/zipball/d15120d55ca22f3848f4840baebf9c0c0a7853a1",
+                "reference": "d15120d55ca22f3848f4840baebf9c0c0a7853a1",
+                "shasum": ""
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Dmbokhan\\VlansCompare\\Providers\\VlansCompareServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Dmbokhan\\VlansCompare\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Dmitry Bokhan",
+                    "email": "dmbokhan@yandex.ru"
+                }
+            ],
+            "description": "A LibreNMS plugin package that shows the difference between lists of vlans on devices or ports",
+            "support": {
+                "issues": "https://github.com/dmbokhan/vlans-compare/issues",
+                "source": "https://github.com/dmbokhan/vlans-compare/tree/1.0.5"
+            },
+            "time": "2023-11-28T12:05:58+00:00"
         },
         {
             "name": "doctrine/cache",
@@ -14750,6 +14794,6 @@
         "ext-xml": "*",
         "ext-zlib": "*"
     },
-    "platform-dev": [],
+    "platform-dev": {},
     "plugin-api-version": "2.6.0"
 }

@@ -30,6 +30,7 @@
         "amenadiel/jpgraph": "^4",
         "clue/socket-raw": "^1.4",
         "dapphp/radius": "^3.0",
+        "dmbokhan/vlans-compare": "^1.0",
         "doctrine/dbal": "^3.5",
         "easybook/geshi": "^1.0.8",
         "enshrined/svg-sanitize": "^0.20.0",
