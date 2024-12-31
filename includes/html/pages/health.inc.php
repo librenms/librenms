@@ -82,9 +82,9 @@ if ($vars['view'] != 'graphs') {
 }
 
 if ($datas->contains($active_metric)) {
-    if(file_exists('includes/html/pages/health/' . $active_metric . '.inc.php')){
+    if (file_exists('includes/html/pages/health/' . $active_metric . '.inc.php')){
         include 'includes/html/pages/health/' . $active_metric . '.inc.php';
-    }else{
+    } else {
         include 'includes/html/pages/health/sensors.inc.php';
     }
 } else {
