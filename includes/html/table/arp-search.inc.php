@@ -56,7 +56,7 @@ if (isset($vars['searchPhrase']) && ! empty($vars['searchPhrase'])) {
 $pag = $query->paginate($rowCount);
 
 foreach ($pag->items() as $arp) {
-    if ($arp->port->ifInErrors > 0 || $arp->port->ifOutErrors > 0) {
+    if ($arp->port->ifInErrors_delta > 0 || $arp->port->ifOutErrors_delta > 0) {
         $error_img = generate_port_link($arp->port, "<i class='fa fa-flag fa-lg' style='color:red' aria-hidden='true'></i>", 'port_errors');
     } else {
         $error_img = '';

@@ -187,7 +187,7 @@ class FdbTablesController extends TableController
         if ($fdb_entry->port) {
             $item['interface'] = Blade::render('<x-port-link :port="$port">{{ $port->getShortLabel() }}</x-port-link>', ['port' => $fdb_entry->port]);
             $item['description'] = $fdb_entry->port->ifAlias;
-            if ($fdb_entry->port->ifInErrors > 0 || $fdb_entry->port->ifOutErrors > 0) {
+            if ($fdb_entry->port->ifInErrors_delta > 0 || $fdb_entry->port->ifOutErrors_delta > 0) {
                 $item['interface'] .= Blade::render(' <x-port-link :port="$port"><i class="fa fa-flag fa-lg" style="color:red" aria-hidden="true"></i></x-port-link>', ['port' => $fdb_entry->port]);
             }
             if ($this->getMacCount($fdb_entry->port) == 1) {
