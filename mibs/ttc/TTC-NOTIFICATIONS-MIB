@@ -1,0 +1,942 @@
+TTC-NOTIFICATIONS-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        enterprises, MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+        OBJECT-IDENTITY, Counter32, Gauge32, Integer32, Unsigned32, mib-2,
+        TimeTicks
+            FROM SNMPv2-SMI
+
+        DisplayString, TimeStamp, TimeInterval, TestAndIncr,
+        AutonomousType, TEXTUAL-CONVENTION
+            FROM SNMPv2-TC
+
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+    FROM SNMPv2-CONF;
+    
+
+
+    notifications  MODULE-IDENTITY
+    LAST-UPDATED "202209131822Z"
+    ORGANIZATION "Tigo Technology Center"
+    CONTACT-INFO
+    "       Cloud Delivery Team
+            E-mail: ttc-cloud-delivery@millicom.com
+    "
+    DESCRIPTION
+    "       MIB module to describe SNMP trap alarms sent from LibreNMS to HPE vTeMIP
+    "
+
+    REVISION    "202209131822Z"
+    DESCRIPTION
+    "   - Fixed entity with formal PEN assigned by IANA for Tigo Technology Center."
+
+    REVISION    "202209130931Z"
+    DESCRIPTION
+    "   - Added description for Ping related OIDs.
+        - Added contact structure."
+
+    REVISION    "202209120259Z"
+    DESCRIPTION
+    "   - Fix for fault entries as table for event trap
+        - Fix name of module (TIGO-NOTIFICATIONS-MIB moving to TTC-NOTIFICATIONS-MIB)"
+
+    REVISION    "202209100000Z"
+    DESCRIPTION
+    "Merge work done for Tigo SV, as TIGO-NOTIFY-MIB with last update as of 202206280000Z. Adds support for Icinga notifications per that project definition.
+    
+    tigoCA MODULE-IDENTITY
+    LAST-UPDATED 202206280000Z
+    ORGANIZATION Tigo CA
+    CONTACT-INFO
+           Omar Ibrahim Alabi Mendez
+            E-mail: imendez@sv.tigo.com
+    
+    DESCRIPTION
+           MIB module to describe Monitoring Project Tigo CA by jesus.arley@intelicolab.com
+            www.intelicolab.com
+    "
+
+    REVISION    "202209080000Z"
+    DESCRIPTION
+    "Send Traps from LibreNMS to northbound server, default Alert Template only"
+
+    ::= {monitoring 1}
+
+
+    ttc OBJECT IDENTIFIER ::= { enterprises 59372 }
+
+    monitoring OBJECT IDENTIFIER ::=  { ttc 100 }
+
+--------------------------------
+--
+-- LibreNMS section
+--
+--------------------------------
+    libreNMS OBJECT IDENTIFIER
+    ::= { notifications 1 }
+
+--
+-- Default Alert template
+--
+    defaultAlert OBJECT IDENTIFIER
+    ::= { libreNMS 1 }
+
+    daTitle OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "Alarm title, friendly name."
+    REFERENCE
+    "Internally defined by LibreNMS as $alert->title."
+    ::= { defaultAlert 1 }
+    
+
+
+    daAlertID OBJECT-TYPE
+    SYNTAX	Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "Unique ID for the Alert. Kept for all the events related to the same alert."
+    REFERENCE
+    "Internally defined by LibreNMS as $alert->id."
+    ::= { defaultAlert 2 }
+
+    daEventID OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "It's unique to events, multiple events will be associated to an alert."
+    REFERENCE
+    "Internally defined by LibreNMS as $alert->uid."
+    ::= { defaultAlert 3 }
+    
+    daState OBJECT-TYPE
+    SYNTAX     INTEGER
+    {
+        daStCLEAR(0),
+        daStACTIVE(1),
+        daStACKNOWLEDGED(2),
+        daStWORSE(3),
+        daStBETTER(4)
+    }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    " Alert state, known by LibreNMS as $alert->state."
+    REFERENCE
+    " Defined in code as:
+    
+        const CLEAR = 0;
+        const ACTIVE = 1;
+        const ACKNOWLEDGED = 2;
+        const WORSE = 3;
+        const BETTER = 4;
+        const RECOVERED = 0;
+    "
+    ::= { defaultAlert 4 }
+
+
+    daSeverity OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    " Alert Severity reported as lowercase constant, known in LibreNMS as $alert->severity and internally defined as: 
+
+        const UNKNOWN = 0;
+        const OK = 1;
+        const INFO = 2;
+        const NOTICE = 3;
+        const WARNING = 4;
+        const ERROR = 5;
+    "  
+    ::= { defaultAlert 5 }
+
+    daRuleID OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "Internal Rule identificator"
+    REFERENCE
+    "Internally defined by LibreNMS as $alert->rule_id"
+    ::= { defaultAlert 6 }
+
+    daRuleName OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "Friendly name for daRuleID"
+    REFERENCE
+    "Known by LibreNMS as $alert->name"
+    ::= { defaultAlert 7 }
+
+    daProcedure OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "It's an optional URL that can link each Alert definition to a documented procedure link. Links must conform to http:// or https:// URI schemas."
+    REFERENCE
+    "Internally defined as $alert->proc."
+    ::= { defaultAlert 8 }
+    
+    daACKNotes OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "Notes documented at alarm acknowledgement."
+    REFERENCE
+    "Known by LibreNMS as $alert->_notes."
+    ::={ defaultAlert 9 }
+
+    daTimestamp OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "Timestamp of the event identification. Format: YYYY-MM-DD HH:mm:ss, with monitor node configured timezone. 
+    Note: For TTC implementation, nodes are running un UTC regardless of node location."
+    REFERENCE
+    "Known internally by LibreNMS as $alert->timestamp"
+    ::= { defaultAlert 10 }
+
+    daTimeElapsed OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "Human friendly elapsed time since trigger, it's only available on recovery"
+    REFERENCE
+    "Internally identified by LibreNMS as $alert->elapsed"
+    ::= { defaultAlert 11 }
+    
+    daDevice OBJECT IDENTIFIER
+    ::= { defaultAlert 12 }
+
+    daDeviceID OBJECT-TYPE
+    SYNTAX	Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "Device ID, internal LibreNMS identifier"
+    REFERENCE
+    "Internally defined by LibreNMS as $alert->device_id"
+    ::= { daDevice 1 }
+
+    daDevHostname OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "Device hostname as known by LibreNMS. In a properly configured environment, daHostname should be equal to daSysName"
+    REFERENCE
+    "Internally defined by LibreNMS as $alert->hostname. "
+    ::= { daDevice 2 }
+    
+    daDevSysName OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "Device hostname as reported by the device. In a properly configured environment, daSysName should be equal to daHostname."
+    REFERENCE
+    "Internally defined by LibreNMS as $alert->sysName."
+    ::= { daDevice 3 }
+    
+    daDevSysDescr OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "System description as reported by the monitored node (sysDescr attribute)."
+    REFERENCE
+    "Known internally by LibreNMS as $alert->sysDescr."
+    ::= { daDevice 4 }
+
+    daDevMgmtIP OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "Management IP of the device."
+    REFERENCE
+    "Known internally by LibreNMS as $alert->ip."
+    ::= { daDevice 5 }
+
+    daDevOS OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "Shorthand for operating system being run on the monitored node."
+    REFERENCE
+    "Known internally by LibreNMS as $alert->os."
+    ::= { daDevice 6 }
+
+    daDevType OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "Shorthand for device type."
+    REFERENCE
+    "Known internally by LibreNMS as $alert->type."
+    ::= { daDevice 7 }
+
+    daDevHardware OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "Hardware platform as reported by the device."
+    REFERENCE
+    "Known internally by LibreNMS as $alert->hardware."
+    ::= { daDevice 8 }
+
+    daDevVersion OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "Firmware/software version as reported by the device."
+    REFERENCE
+    "Known internally by LibreNMS as $alert->version."
+    ::= { daDevice 9 }
+
+    daDevFeatures OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "Additional software information."
+    REFERENCE
+    "Known internally by LibreNMS as $alert->features."
+    ::= { daDevice 10 }
+
+    daDevSerial OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "Device Serial Number."
+    REFERENCE
+    "Known internally by LibreNMS as $alert->serial."
+    ::= { daDevice 11 }
+
+    daDevLocation OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "Device Location as reported by the device."
+    REFERENCE
+    "Known internally by LibreNMS as $alert->location."
+    ::= { daDevice 12 }
+
+    daDevUptime OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "Uptime reported by device as SNMPv2-MIB::sysUpTime."
+    REFERENCE
+    "Known internally by LibreNMS as $alert->uptime."
+    ::= { daDevice 13 }
+
+    daDevShortUptime OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "Uptime reported by device, with format Xd Yh Zm Ks."
+    REFERENCE
+    "Known internally by LibreNMS as $alert->uptime_short."
+    ::= { daDevice 14 }
+
+    daDevLongUptime OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "Uptime reported by device, with format X days Y hours Z minutes K seconds."
+    REFERENCE
+    "Known internally by LibreNMS as $alert->uptime_long."
+    ::= { daDevice 15 }
+
+    daDevPurpose OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "Device purpose."
+    REFERENCE
+    "Known internally by LibreNMS as $alert->description"
+    ::= { daDevice 16 }
+
+    daDevNotes OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "Notes documented for the Device."
+    REFERENCE
+    "Known internally by LibreNMS as $alert->notes."
+    ::= { daDevice 17 }
+
+    daDevPingTimestamp OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "When was last ICMP Echo request test executed."
+    REFERENCE
+    "Known internally by LibreNMS as $alert->timestamp."
+    ::= { daDevice 18 }
+    
+    daDevPingLoss OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "Percentage of lost packages (ICMP ECHO REQUEST without REPLY). Test done from LibreNMS instance to device."
+    REFERENCE
+    "Known internally by LibreNMS as $alert->ping_loss"
+    ::= { daDevice 19 }
+
+    daDevPingMin OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "Best time for ICMP ECHO REQUEST/REPLY. Test done from LibreNMS instance to device."
+    REFERENCE
+    "Known internally by LibreNMS as $alert->ping_min"
+    ::= { daDevice 20 }
+    
+    daDevPingMax OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "Worse time for ICMP ECHO REQUEST/REPLY. Test done from LibreNMS instance to device."
+    REFERENCE
+    "Known internally by LibreNMS as $alert->ping_max"
+    ::= { daDevice 21 }
+    
+    daDevPingAvg OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "Average time for ICMP ECHO REQUEST/REPLY. Test done from LibreNMS instance to device."
+    REFERENCE
+    "Known internally by LibreNMS as $alert->ping_avg"
+    ::= { daDevice 22 }
+
+    -- Faults in the event
+
+    daFaultTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF DaFaultTableEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+	"This table contains all active faults in the given Alarm. Its
+	single index value (daFaultTableEntryID) is not an
+	identifier of the fault: it corresponds to the position
+	of the fault in the list and therefore may change between
+	alert status changes (partial recoveries & new faults addition)."
+    ::= { defaultAlert 13 }
+
+    daFaultTableEntry OBJECT-TYPE
+    SYNTAX        DaFaultTableEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+         "Entry of the faults table for the given alert."
+    INDEX         { daFaultTableEntryID }
+    ::= { daFaultTable 1 }
+
+    DaFaultTableEntry ::=
+    SEQUENCE
+    {
+		daFaultTableEntryID			Unsigned32,
+		daFaultTableEntryDetail		OCTET STRING
+    }
+
+    daFaultTableEntryID OBJECT-TYPE
+    SYNTAX        Unsigned32
+    --MAX-ACCESS    read-only
+    MAX-ACCESS        not-accessible
+    STATUS        current
+    DESCRIPTION
+	"Table index. Does not identify the fault and may change
+	each time the table is sent."
+    ::= { daFaultTableEntry 1 }
+
+    daFaultTableEntryDetail OBJECT-TYPE
+    SYNTAX        OCTET STRING
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+         "Full detail of the fault."
+    ::= { daFaultTableEntry 2 }
+
+    -- Contacts
+
+    daContactsTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF DaContactsTableEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+	"Device Contacts, email & name."
+    ::= { defaultAlert 14 }
+
+    daContactsTableEntry OBJECT-TYPE
+    SYNTAX        DaContactsTableEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+         "Entry of the contacts table for the given alert."
+    INDEX         { daContactsTableEntryID }
+    ::= { daContactsTable 1 }
+
+    DaContactsTableEntry ::=
+    SEQUENCE
+    {
+		daContactsTableEntryID			Unsigned32,
+		daContactsTableEntryName		OCTET STRING,
+        daContactsTableEntryEmail		OCTET STRING
+    }
+
+    daContactsTableEntryID OBJECT-TYPE
+    SYNTAX        Unsigned32
+    --MAX-ACCESS    read-only
+    MAX-ACCESS        not-accessible
+    STATUS        current
+    DESCRIPTION
+	"Table index. Does not identify the contact and may change
+	each time the table is sent."
+    ::= { daContactsTableEntry 1 }
+
+    daContactsTableEntryName OBJECT-TYPE
+    SYNTAX        OCTET STRING
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+         "Name of the contact"
+    ::= { daContactsTableEntry 2 }
+
+    daContactsTableEntryEmail OBJECT-TYPE
+    SYNTAX        OCTET STRING
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+         "Name of the contact"
+    ::= { daContactsTableEntry 3 }
+    -- Actual trap definition for default alarm template
+
+    daEvent  NOTIFICATION-TYPE
+    OBJECTS 
+    { daTitle, daDeviceID, daEventID, daEventID, daState, daSeverity, daRuleID, daRuleName,
+    daProcedure, daACKNotes, daTimestamp, daTimeElapsed, 
+    daDeviceID, daDevHostname, daDevSysName, daDevSysDescr, daDevOS, daDevType,
+    daDevHardware, daDevVersion, daDevFeatures, daDevSerial,
+    daDevLocation, daDevUptime, daDevShortUptime, daDevLongUptime,
+    daDevPurpose, daDevNotes, 
+    daDevPingTimestamp, daDevPingLoss, daDevPingMin, daDevPingMax, daDevPingAvg,
+    daFaultTableEntryDetail, daContactsTableEntryName, daContactsTableEntryEmail }
+    STATUS  current
+    DESCRIPTION
+    "The SNMP trap as a result of Alarms with default Alarm Template"
+    ::= { libreNMS 2}
+
+--------------------------------
+--
+-- Icinga section
+--
+--------------------------------
+
+    icinga OBJECT IDENTIFIER
+    ::= { notifications 2 }
+
+    notifyHost  OBJECT IDENTIFIER
+    ::= { icinga  1 }
+
+    nhHostCountry  OBJECT-TYPE
+    SYNTAX     INTEGER
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "Host Country as specified in Icinga configuration (i.e. 503 - El Salvador, 506 - Costa Rica)"
+    ::= { notifyHost 1 }
+
+    nhNotifyDate  OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "Current date and time of the notification."
+    ::= { notifyHost 2 }
+
+    nhHostName  OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "Hostname as specified in the Icinga configuration."
+    ::= { notifyHost 3 }
+
+    nhHostState       OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The current state of the host: UP, DOWN, 
+    UNREACHABLE."
+    ::= { notifyHost 4 }
+
+    nhHostOutput  OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "The text output from the last host check (i.e. Ping OK)."
+    ::= { notifyHost 5 }
+
+    nhNotifyType  OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "The Notify Type in Icinga. (i.e. PROBLEM, RECOVERY)"
+    ::= { notifyHost 6 }
+
+    nhHostDeviceType  OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "The Device Type specified in Icinga configuration. (i.e air-conditioner, cmts, cre, daas, downstream, downstream_node, firewall, router, sensor, server, swtich, ups, upstream, upstream_node, wireless)"
+    ::= { notifyHost 7 }
+
+    nhHostLocation  OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "The Location specified in Icinga configuration."
+    ::= { notifyHost 8 }
+
+    nhHostEvent  NOTIFICATION-TYPE
+    OBJECTS { nhHostCountry, nhNotifyDate, nhHostName, nhHostState, nhHostOutput, nhNotifyType, nhHostDeviceType, nhHostLocation }
+    STATUS  current
+    DESCRIPTION
+    "The SNMP trap that is generated as a result of an event with the host
+    in Icinga."
+    ::= { icinga 2}
+
+    notifyService         OBJECT IDENTIFIER ::= { icinga  3 }
+
+    nsHostCountry  OBJECT-TYPE
+    SYNTAX     INTEGER
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "Host Country as specified in Icinga configuration (i.e. 503 - El Salvador, 506 - Costa Rica)"
+    ::= { notifyService 1 }
+
+    nsNotifyDate  OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "Current date and time of the notification."
+    ::= { notifyService 2 }
+
+    nsHostName  OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "Hostname as specified in the Icinga configuration."
+    ::= { notifyService 3 }
+
+    nsServiceName  OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "Servicename as specified in the Icinga configuration."
+    ::= { notifyService 4 }
+
+    nsServiceState        OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The current state of the service: OK, WARNING, 
+    CRITICAL, UNKNOWN."
+    ::= { notifyService 5 }
+
+    nsServiceOutput  OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "The text output from the last service check (i.e. Ping OK)."
+    ::= { notifyService 6 }
+
+    nsServiceSNMPIndex OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "The SNMP Index specified in Icinga configuration."
+    ::= { notifyService 7 }
+
+    nsNotifyType  OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "The Notify Type in Icinga."
+    ::= { notifyService 8 }
+
+    nsHostDeviceType  OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "The Device Type specified in Icinga configuration. (i.e air-conditioner, cmts, cre, daas, downstream, downstream_node, firewall, router, sensor, server, swtich, ups, upstream, upstream_node, wireless)"
+    ::= { notifyService 9 }
+
+    nsHostLocation  OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "The Location specified in Icinga configuration."
+    ::= { notifyService 10 }
+
+    nsServiceEvent NOTIFICATION-TYPE
+    OBJECTS { nsHostCountry, nsNotifyDate, nsHostName, nsServiceName, nsServiceState, nsServiceOutput, nsServiceSNMPIndex, nsNotifyType, nsHostDeviceType, nsHostLocation }
+    STATUS  current
+    DESCRIPTION
+    "The SNMP trap that is generated as a result of an event with the service
+    in Icinga."
+    ::= { icinga 4}
+
+    notifyHostCMTS  OBJECT IDENTIFIER
+    ::= { icinga  5 }
+
+    nhHostCountryCMTS  OBJECT-TYPE
+    SYNTAX     INTEGER
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "Host Country as specified in Icinga configuration (i.e. 503 - El Salvador, 506 - Costa Rica)"
+    ::= { notifyHostCMTS 1 }
+
+    nhNotifyDateCMTS  OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "Current date and time of the notification."
+    ::= { notifyHostCMTS 2 }
+
+    nhHostNameCMTS  OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "Hostname as specified in the Icinga configuration."
+    ::= { notifyHostCMTS 3 }
+
+    nhHostStateCMTS        OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The current state of the host: UP, DOWN, 
+    UNREACHABLE."
+    ::= { notifyHostCMTS 4 }
+
+    nhHostOutputCMTS  OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "The text output from the last host check (i.e. Ping OK)."
+    ::= { notifyHostCMTS 5 }
+
+    nhNotifyTypeCMTS  OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "The Notify Type in Icinga. (i.e. PROBLEM, RECOVERY)"
+    ::= { notifyHostCMTS 6 }
+
+    nhHostDeviceTypeCMTS  OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "The Device Type specified in Icinga configuration. (i.e air-conditioner, cmts, cre, daas, downstream, downstream_node, firewall, router, sensor, server, swtich, ups, upstream, upstream_node, wireless)"
+    ::= { notifyHostCMTS 7 }
+
+    nhHostLocationCMTS  OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "The Location specified in Icinga configuration."
+    ::= { notifyHostCMTS 8 }
+
+    nhHostNodoCMTS  OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "The Node specified in Icinga configuration."
+    ::= { notifyHostCMTS 9 }
+
+    nhHostSNMPIndexCMTS  OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "The SNMP Index specified in Icinga configuration."
+    ::= { notifyHostCMTS 10 }
+
+    nhHostIFPortCMTS  OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "The IF Port specified in Icinga configuration."
+    ::= { notifyHostCMTS 11 }
+
+    nhHostEventCMTS  NOTIFICATION-TYPE
+    OBJECTS { nhHostCountryCMTS, nhNotifyDateCMTS, nhHostNameCMTS, nhHostStateCMTS, nhHostOutputCMTS, nhNotifyTypeCMTS, nhHostDeviceTypeCMTS, nhHostLocationCMTS, nhHostNodoCMTS, nhHostSNMPIndexCMTS, nhHostIFPortCMTS }
+    STATUS  current
+    DESCRIPTION
+    "The SNMP trap that is generated as a result of an event with the host
+    in Icinga."
+    ::= { icinga 6}
+
+    notifyServiceCMTS          OBJECT IDENTIFIER ::= { icinga  7 }
+
+    nsHostCountryCMTS  OBJECT-TYPE
+    SYNTAX     INTEGER
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "Host Country as specified in Icinga configuration (i.e. 503 - El Salvador, 506 - Costa Rica)"
+    ::= { notifyServiceCMTS 1 }
+
+    nsNotifyDateCMTS  OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "Current date and time of the notification."
+    ::= { notifyServiceCMTS 2 }
+
+    nsHostNameCMTS  OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "Hostname as specified in the Icinga configuration."
+    ::= { notifyServiceCMTS 3 }
+
+    nsServiceNameCMTS  OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "Servicename as specified in the Icinga configuration."
+    ::= { notifyServiceCMTS 4 }
+
+    nsServiceStateCMTS        OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The current state of the service: OK, WARNING, 
+    CRITICAL, UNKNOWN."
+    ::= { notifyServiceCMTS 5 }
+
+    nsServiceOutputCMTS  OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "The text output from the last service check (i.e. Ping OK)."
+    ::= { notifyServiceCMTS 6 }
+
+    nsNotifyTypeCMTS  OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "The Notify Type in Icinga."
+    ::= { notifyServiceCMTS 7 }
+
+    nsHostDeviceTypeCMTS  OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "The Device Type specified in Icinga configuration. (i.e air-conditioner, cmts, cre, daas, downstream, downstream_node, firewall, router, sensor, server, swtich, ups, upstream, upstream_node, wireless)"
+    ::= { notifyServiceCMTS 8 }
+
+    nsHostLocationCMTS  OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "The Location specified in Icinga configuration."
+    ::= { notifyServiceCMTS 9 }
+
+    nsHostNodoCMTS  OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "The Nodo specified in Icinga configuration."
+    ::= { notifyServiceCMTS 10 }
+
+    nsHostSNMPIndexCMTS  OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "The SNMP Index specified in Icinga configuration."
+    ::= { notifyServiceCMTS 11 }
+
+    nsHostIFPortCMTS  OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "The IF Port specified in Icinga configuration."
+    ::= { notifyServiceCMTS 12 }
+
+    nsServiceEventCMTS  NOTIFICATION-TYPE
+    OBJECTS { nsHostCountryCMTS, nsNotifyDateCMTS, nsHostNameCMTS, nsServiceNameCMTS, nsServiceStateCMTS, nsServiceOutputCMTS, nsNotifyTypeCMTS, nsHostDeviceTypeCMTS, nsHostLocationCMTS, nsHostNodoCMTS, nsHostSNMPIndexCMTS, nsHostIFPortCMTS }
+    STATUS  current
+    DESCRIPTION
+    "The SNMP trap that is generated as a result of an event with the service
+    in Icinga."
+    ::= { icinga 8}
+
+    END
