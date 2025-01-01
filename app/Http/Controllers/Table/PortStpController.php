@@ -28,8 +28,8 @@ namespace App\Http\Controllers\Table;
 use App\Facades\DeviceCache;
 use App\Models\PortStp;
 use App\Models\Stp;
+use Illuminate\Support\Facades\Blade;
 use LibreNMS\Util\Mac;
-use LibreNMS\Util\Url;
 
 class PortStpController extends TableController
 {
@@ -88,8 +88,11 @@ class PortStpController extends TableController
         $drMac = Mac::parse($stpPort->designatedRoot);
         $dbMac = Mac::parse($stpPort->designatedBridge);
 
+        $dr = DeviceCache::get(Stp::where('bridgeAddress', $stpPort->designatedRoot)->value('device_id'));
+        $db = DeviceCache::get(Stp::where('bridgeAddress', $stpPort->designatedBridge)->value('device_id'));
+
         return [
-            'port_id' => Url::portLink($stpPort->port, $stpPort->port->getShortLabel()) . '<br />' . $stpPort->port->getDescription(),
+            'port_id' => Blade::render('<x-port-link :port="$port">{{ $port->getShortLabel() }}</x-port-link><br /> {{ $port->getDescription() }}', ['port' => $stpPort->port]),
             'vlan' => $stpPort->vlan ?: 1,
             'priority' => $stpPort->priority,
             'state' => $stpPort->state,
@@ -97,11 +100,11 @@ class PortStpController extends TableController
             'pathCost' => $stpPort->pathCost,
             'designatedRoot' => $drMac->readable(),
             'designatedRoot_vendor' => $drMac->vendor(),
-            'designatedRoot_device' => Url::deviceLink(DeviceCache::get(Stp::where('bridgeAddress', $stpPort->designatedRoot)->value('device_id'))),
+            'designatedRoot_device' => Blade::render('<x-device-link :device="$device"/>', ['device' => $dr]),
             'designatedCost' => $stpPort->designatedCost,
             'designatedBridge' => $dbMac->readable(),
             'designatedBridge_vendor' => $dbMac->vendor(),
-            'designatedBridge_device' => Url::deviceLink(DeviceCache::get(Stp::where('bridgeAddress', $stpPort->designatedBridge)->value('device_id'))),
+            'designatedBridge_device' => Blade::render('<x-device-link :device="$device"/>', ['device' => $db]),
             'designatedPort' => $stpPort->designatedPort,
             'forwardTransitions' => $stpPort->forwardTransitions,
         ];

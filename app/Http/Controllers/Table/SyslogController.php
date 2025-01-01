@@ -26,6 +26,7 @@
 namespace App\Http\Controllers\Table;
 
 use App\Models\Syslog;
+use Illuminate\Support\Facades\Blade;
 use LibreNMS\Enum\SyslogSeverity;
 
 class SyslogController extends TableController
@@ -96,13 +97,11 @@ class SyslogController extends TableController
      */
     public function formatItem($syslog)
     {
-        $device = $syslog->device;
-
         return [
             'label' => $this->setLabel($syslog),
             'timestamp' => $syslog->timestamp,
             'level' => htmlentities($syslog->level),
-            'device_id' => $device ? \LibreNMS\Util\Url::deviceLink($device, $device->shortDisplayName()) : '',
+            'device_id' => Blade::render('<x-device-link :device="$device"/>', ['device' => $syslog->device]),
             'program' => htmlentities($syslog->program),
             'msg' => htmlentities($syslog->msg),
             'priority' => htmlentities($syslog->priority),

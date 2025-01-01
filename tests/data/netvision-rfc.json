@@ -863,7 +863,7 @@
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 100,
-                    "sensor_limit": 101,
+                    "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": 15,
                     "sensor_limit_low_warn": 50,

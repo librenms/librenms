@@ -240,4 +240,38 @@ class ObjectCache
             }
         });
     }
+
+    /**
+     * @param  array  $fields  array of counts to get. Valid options: total, ok, critical, disable_notify
+     * @return array
+     */
+    public static function sensorCounts($fields = ['total'], $device_id = 0)
+    {
+        $result = [];
+        foreach ($fields as $field) {
+            $result[$field] = self::getSensorCount($field, $device_id);
+        }
+
+        return $result;
+    }
+
+    private static function getSensorCount($field, $device_id)
+    {
+        return Cache::remember("ObjectCache:sensor_{$field}_count:" . auth()->id(), self::$cache_time, function () use ($field, $device_id) {
+            $query = Sensor::hasAccess(auth()->user())->when($device_id, function ($query) use ($device_id) {
+                $query->where('device_id', $device_id);
+            });
+            switch ($field) {
+                case 'ok':
+                    return $query->count() - $query->isCritical()->count();
+                case 'critical':
+                    return $query->isCritical()->count();
+                case 'disable_notify':
+                    return $query->isDisabled()->count();
+                case 'total':
+                default:
+                    return $query->count();
+            }
+        });
+    }
 }
