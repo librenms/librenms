@@ -15,61 +15,34 @@
  * @author     LibreNMS Contributors
 */
 
+use App\Models\Sensor;
+use LibreNMS\Util\ObjectCache;
+
 $no_refresh = true;
 
-$datas = ['mempool', 'processor', 'storage'];
+$datas = collect(['mempool', 'processor', 'storage'])
+    ->merge(collect(ObjectCache::sensors())
+        ->flatMap(fn ($types) => collect($types)->pluck('class'))
+    );
 
-$used_sensors = \LibreNMS\Util\ObjectCache::sensors();
-foreach ($used_sensors as $group => $types) {
-    foreach ($types as $entry) {
-        $datas[] = $entry['class'];
-    }
-}
-
-$type_text = [
-    'overview' => 'Overview',
-    'temperature' => 'Temperature',
-    'charge' => 'Battery Charge',
-    'humidity' => 'Humidity',
-    'mempool' => 'Memory',
-    'storage' => 'Storage',
-    'diskio' => 'Disk I/O',
-    'processor' => 'Processor',
-    'voltage' => 'Voltage',
-    'fanspeed' => 'Fanspeed',
-    'frequency' => 'Frequency',
-    'runtime' => 'Runtime',
-    'current' => 'Current',
-    'power' => 'Power',
-    'power_consumed' => 'Power Consumed',
-    'power_factor' => 'Power Factor',
-    'dbm' => 'dBm',
-    'load' => 'Load',
-    'loss' => 'Loss',
-    'state' => 'State',
-    'count' => 'Count',
-    'signal' => 'Signal',
-    'tv_signal' => 'TV signal',
-    'bitrate' => 'Bitrate',
-    'snr' => 'SNR',
-    'pressure' => 'Pressure',
-    'cooling' => 'Cooling',
-    'toner' => 'Toner',
-    'delay' => 'Delay',
-    'quality_factor' => 'Quality factor',
-    'chromatic_dispersion' => 'Chromatic Dispersion',
-    'ber' => 'Bit Error Rate',
-    'eer' => 'Energy Efficiency Ratio',
-    'waterflow' => 'Water Flow Rate',
-    'percent' => 'Percent',
-];
+$type_text = collect([
+    'overview' => __('Overview'),
+    'temperature' => __('Temperature'),
+    'mempool' => __('Memory'),
+    'storage' => __('Storage'),
+    'diskio' => __('Disk I/O'),
+    'processor' => __('Processor'),
+    'toner' => __('Toner'),
+])->merge(collect(Sensor::getTypes())
+      ->mapWithKeys(fn ($type) => [$type => Sensor::getClassDescr($type)])
+)->toArray();
 
 $active_metric = basename(array_key_exists($vars['metric'], $type_text) ? $vars['metric'] : 'processor');
 
 $vars['view'] = $vars['view'] ?? 'detail';
 $link_array = ['page' => 'health'];
 
-$navbar = '<span style="font-weight: bold;">Health</span> &#187; ';
+$navbar = '<span style="font-weight: bold;">' . __('Health') . '</span> &#187; ';
 $sep = '';
 foreach ($datas as $texttype) {
     $metric = strtolower($texttype);
@@ -108,8 +81,12 @@ if ($vars['view'] != 'graphs') {
     $displayoptions .= '</span>';
 }
 
-if (in_array($active_metric, $datas)) {
-    include "includes/html/pages/health/$active_metric.inc.php";
+if ($datas->contains($active_metric)) {
+    if (file_exists('includes/html/pages/health/' . $active_metric . '.inc.php')){
+        include 'includes/html/pages/health/' . $active_metric . '.inc.php';
+    } else {
+        include 'includes/html/pages/health/sensors.inc.php';
+    }
 } else {
-    echo "No sensors of type $active_metric found.";
+    echo 'No sensors of type ' . $active_metric . ' found.';
 }
