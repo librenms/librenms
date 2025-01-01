@@ -8,6 +8,7 @@
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
 
+use App\Models\Device;
 use App\Models\StateTranslation;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
@@ -409,29 +410,14 @@ function fix_integer_value($value)
 
 /**
  * Checks if the $hostname provided exists in the DB already
- *
- * @param  string  $hostname  The hostname to check for
- * @param  string  $sysName  The sysName to check
- * @return bool true if hostname already exists
- *              false if hostname doesn't exist
  */
-function host_exists($hostname, $sysName = null)
+function host_exists(string $hostname, ?string $sysName = null): bool
 {
-    $query = 'SELECT COUNT(*) FROM `devices` WHERE `hostname`=?';
-    $params = [$hostname];
-
-    if (! empty($sysName) && ! Config::get('allow_duplicate_sysName')) {
-        $query .= ' OR `sysName`=?';
-        $params[] = $sysName;
-
-        if (! empty(Config::get('mydomain'))) {
-            $full_sysname = rtrim($sysName, '.') . '.' . Config::get('mydomain');
-            $query .= ' OR `sysName`=?';
-            $params[] = $full_sysname;
-        }
-    }
-
-    return dbFetchCell($query, $params) > 0;
+    return Device::where('hostname', $hostname)
+        ->when(! empty($sysName), function($query) use ($sysName) {
+            $query->when(! Config::get('allow_duplicate_sysName'), fn ($q) => $q->orWhere('sysName',$sysName))
+                  ->when(! empty(Config::get('mydomain')), fn ($q) => $q->orWhere('sysName', rtrim($sysName, '.') . '.' . Config::get('mydomain')));
+        })->exists();
 }
 
 /**
