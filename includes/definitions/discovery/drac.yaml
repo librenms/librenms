@@ -19,7 +19,7 @@ modules:
                     value: IDRAC-MIB-SMIv2::coolingDeviceReading
                     num_oid: '.1.3.6.1.4.1.674.10892.5.4.700.12.1.6.{{ $index }}'
                     descr: IDRAC-MIB-SMIv2::coolingDeviceLocationName
-                    index: 'fanspeed.{{ $index }}'
+                    index: '{{ $index }}'
                     high_limit: IDRAC-MIB-SMIv2::coolingDeviceUpperCriticalThreshold
                     low_limit: IDRAC-MIB-SMIv2::coolingDeviceLowerCriticalThreshold
                     # Following can be enabled with new testfiles for Poweredge R640, iDRAC7, Poweredge M1000e
@@ -280,7 +280,7 @@ modules:
                     value: IDRAC-MIB-SMIv2::processorDeviceStatus
                     num_oid: '.1.3.6.1.4.1.674.10892.5.4.1100.30.1.5.{{ $index }}'
                     descr: '{{ $IDRAC-MIB-SMIv2::processorDeviceBrandName }}'
-                    index: 'processorDeviceStatus.{{ $index }}'
+                    index: '{{ $index }}'
                     state_name: processorDeviceStatus
                     states:
                         - { value: 1, descr: other, graph: 0, generic: 3 }
@@ -327,7 +327,7 @@ modules:
                     value: IDRAC-MIB-SMIv2::amperageProbeStatus
                     num_oid: '.1.3.6.1.4.1.674.10892.5.4.600.30.1.5.{{ $index }}'
                     descr: '{{ $IDRAC-MIB-SMIv2::amperageProbeLocationName }}'
-                    index: 'amperageProbeStatus.{{ $index }}'
+                    index: '{{ $index }}'
                     state_name: amperageProbeStatus
                     states:
                         - { value: 1, descr: other, graph: 0, generic: 3 }
@@ -345,7 +345,7 @@ modules:
                     value: IDRAC-MIB-SMIv2::systemBatteryStatus
                     num_oid: '.1.3.6.1.4.1.674.10892.5.4.600.50.1.5.{{ $index }}'
                     descr: '{{ $IDRAC-MIB-SMIv2::systemBatteryLocationName }}'
-                    index: 'systemBatteryStatus.{{ $index }}'
+                    index: '{{ $index }}'
                     state_name: systemBatteryStatus
                     states:
                         - { value: 1, descr: other, graph: 0, generic: 3 }
@@ -363,7 +363,8 @@ modules:
                     value: drsServerMonitoringCapable
                     num_oid: '.1.3.6.1.4.1.674.10892.2.5.1.1.2.{{ $index }}'
                     descr: 'Slot {{ $drsServerSlotNumber }} {{ $drsServerModel }}'
-                    index: 'drsServerMonitoringCapable.{{ $index }}'
+                    index: '{{ $index }}'
+                    state_name: drsServerMonitoringCapable
                     skip_values:
                         -
                             oid: drsServerSlotName
