@@ -23,24 +23,25 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 use App\Models\Application;
+use App\Models\Device;
 
 if (! Auth::user()->hasGlobalAdmin()) {
     $status = ['status' => 1, 'message' => 'You need to be admin'];
 } else {
-    $device_id = $_POST['device_id'];
+    $device = Device::find($_POST['device_id']);
     $app = $_POST['application'];
 
-    if (! isset($app) && validate_device_id($device_id) === false) {
+    if (! isset($app) && $device === null) {
         $status = ['status' => 1, 'message' => 'Error with data'];
     } else {
         $status = ['status' => 1, 'message' => 'Database update failed'];
-        $app = Application::withTrashed()->firstOrNew(['device_id' => $device_id, 'app_type' => $app]);
+        $app = Application::withTrashed()->firstOrNew(['device_id' => $device->device_id, 'app_type' => $app]);
         if ($_POST['state'] == 'true') {
             if ($app->trashed()) {
                 $app->restore();
             }
             if ($app->save()) {
-                log_event("Application enabled by user: $app", $device_id, 'application', 1);
+                log_event("Application enabled by user: $app", $device->device_id, 'application', 1);
                 $status = ['status' => 0, 'message' => 'Application enabled'];
             } else {
                 $status = ['status' => 1, 'message' => 'Database update for enabling the application failed'];
@@ -48,7 +49,7 @@ if (! Auth::user()->hasGlobalAdmin()) {
         } else {
             $app->delete();
             if ($app->save()) {
-                log_event("Application disabled by user: $app", $device_id, 'application', 3);
+                log_event("Application disabled by user: $app", $device->device_id, 'application', 3);
                 $status = ['status' => 0, 'message' => 'Application disabled'];
             } else {
                 $status = ['status' => 1, 'message' => 'Database update for disabling the application failed'];
