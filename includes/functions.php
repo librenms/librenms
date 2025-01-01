@@ -286,12 +286,12 @@ function is_port_valid($port, $device)
     $ifType = $port['ifType'];
     $ifOperStatus = $port['ifOperStatus'] ?? '';
 
-    if (str_i_contains($ifDescr, Config::getOsSetting($device['os'], 'good_if', Config::get('good_if')))) {
+    if (Str::contains($ifDescr, Config::getOsSetting($device['os'], 'good_if', Config::get('good_if')), ignoreCase: true)) {
         return true;
     }
 
     foreach (Config::getCombined($device['os'], 'bad_if') as $bi) {
-        if (str_i_contains($ifDescr, $bi)) {
+        if (Str::contains($ifDescr, $bi, ignoreCase: true)) {
             d_echo("ignored by ifDescr: $ifDescr (matched: $bi)\n");
 
             return false;

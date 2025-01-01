@@ -611,24 +611,6 @@ function ResolveGlues($tables, $target, $x = 0, $hist = [], $last = [])
 }
 
 /**
- * Determine if a given string contains a given substring.
- *
- * @param  string  $haystack
- * @param  string|array  $needles
- * @return bool
- */
-function str_i_contains($haystack, $needles)
-{
-    foreach ((array) $needles as $needle) {
-        if ($needle != '' && stripos($haystack, $needle) !== false) {
-            return true;
-        }
-    }
-
-    return false;
-}
-
-/**
  * Get alert_rules sql filter by minimal severity
  *
  * @param  string|int  $min_severity
