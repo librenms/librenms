@@ -70,11 +70,6 @@ function logfile($string)
     fclose($fd);
 }
 
-function percent_colour($perc)
-{
-    return \LibreNMS\Util\Color::percent(percent: $perc);
-}
-
 /**
  * @param  $device
  * @return string the path to the icon image for this device.  Close to square.
