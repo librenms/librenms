@@ -371,22 +371,6 @@ function port_fill_missing_and_trim(&$port, $device)
     }
 }
 
-function validate_device_id($id)
-{
-    if (empty($id) || ! is_numeric($id)) {
-        $return = false;
-    } else {
-        $device_id = dbFetchCell('SELECT `device_id` FROM `devices` WHERE `device_id` = ?', [$id]);
-        if ($device_id == $id) {
-            $return = true;
-        } else {
-            $return = false;
-        }
-    }
-
-    return $return;
-}
-
 function convert_delay($delay)
 {
     if (preg_match('/(\d+)([mhd]?)/', $delay, $matches)) {
