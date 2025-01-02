@@ -414,7 +414,7 @@ function fix_integer_value($value)
 function host_exists(string $hostname, ?string $sysName = null): bool
 {
     return Device::where('hostname', $hostname)
-        ->when(! empty($sysName), function($query) use ($sysName) {
+        ->when(! empty($sysName), function ($query) use ($sysName) {
             $query->when(! Config::get('allow_duplicate_sysName'), fn ($q) => $q->orWhere('sysName',$sysName))
                   ->when(! empty(Config::get('mydomain')), fn ($q) => $q->orWhere('sysName', rtrim($sysName, '.') . '.' . Config::get('mydomain')));
         })->exists();
