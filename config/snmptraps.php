@@ -25,7 +25,7 @@ return [
         'AXIS-VIDEO-MIB::alarmCleared' => LibreNMS\Snmptrap\Handlers\AxisAlarmCleared::class,
         'AXIS-VIDEO-MIB::alarmNew' => LibreNMS\Snmptrap\Handlers\AxisAlarmNew::class,
         'AXIS-VIDEO-MIB::alarmSingle' => LibreNMS\Snmptrap\Handlers\AxisAlarmSingle::class,
-	'BGP4-MIB::bgpBackwardTransition' => LibreNMS\Snmptrap\Handlers\BgpBackwardTransition::class,
+        'BGP4-MIB::bgpBackwardTransition' => LibreNMS\Snmptrap\Handlers\BgpBackwardTransition::class,
         'BGP4-MIB::bgpEstablished' => LibreNMS\Snmptrap\Handlers\BgpEstablished::class,
         'BGP4-V2-MIB-JUNIPER::jnxBgpM2BackwardTransition' => LibreNMS\Snmptrap\Handlers\JnxBgpM2BackwardTransition::class,
         'BGP4-V2-MIB-JUNIPER::jnxBgpM2Established' => LibreNMS\Snmptrap\Handlers\JnxBgpM2Established::class,
