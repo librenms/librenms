@@ -13,10 +13,21 @@
             @endif
         </select>
     </div>
+    <div class="form-group">
+        <label for="screenshot-{{ $id }}" class="control-label">{{ __('Screenshot Mode') }}</label>
+        <input type="checkbox" class="form-control" name="screenshot" id="screenshot-{{ $id }}" value=0 data-size="normal" @if($screenshot) checked @endif>
+    </div>
 @endsection
 
 @section('javascript')
     <script type="text/javascript">
         init_select2('#custom_map-{{ $id }}', 'custom-map', {});
+
+        $('#screenshot-{{ $id }}')
+            .bootstrapSwitch('offColor','danger')
+            .on('switchChange.bootstrapSwitch', function (e, data) {
+                let thisval = $(this).is(':checked') ? "1": "0";
+                $('#screenshot-{{ $id }}').val(thisval);
+            });
     </script>
 @endsection

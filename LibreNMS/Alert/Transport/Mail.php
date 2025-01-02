@@ -37,7 +37,7 @@ class Mail extends Transport
             'sysContact' => AlertUtil::findContactsSysContact($alert_data['faults']),
             'owners' => AlertUtil::findContactsOwners($alert_data['faults']),
             'role' => AlertUtil::findContactsRoles([$this->config['role']]),
-            default => $this->config['email'],
+            default => $this->config['email'] ?? $alert_data['contacts'] ?? [], // contacts is only used by legacy synthetic transport
         };
 
         $html = Config::get('email_html');
@@ -52,8 +52,6 @@ class Mail extends Transport
 
         try {
             return \LibreNMS\Util\Mail::send($emails, $alert_data['title'], $msg, $html, $this->config['bcc'] ?? false, $this->config['attach-graph'] ?? null);
-        } catch (\PHPMailer\PHPMailer\Exception $e) {
-            throw new AlertTransportDeliveryException($alert_data, 0, $e->errorMessage());
         } catch (Exception $e) {
             throw new AlertTransportDeliveryException($alert_data, 0, $e->getMessage());
         }

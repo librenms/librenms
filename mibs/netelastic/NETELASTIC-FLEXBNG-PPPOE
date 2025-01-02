@@ -1,0 +1,144 @@
+-- 2017-03-16 17:22:22
+-- Namespace: http://netelastic.com/nfv/flexbng/netelastic-pppoe
+
+NETELASTIC-FLEXBNG-PPPOE DEFINITIONS ::= BEGIN
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Integer32, Unsigned32, Counter32, Counter64,
+    Gauge32, IpAddress
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, RowStatus, DateAndTime,
+    TruthValue
+        FROM SNMPv2-TC
+    Ipv6Address
+        FROM IPV6-TC
+    bras
+        FROM NETELASTIC-FLEXBNG-MIB
+;
+
+pppoeMib MODULE-IDENTITY
+    LAST-UPDATED "201511190000Z"
+    ORGANIZATION "@ORGANIZATION"
+    CONTACT-INFO "@CONTACT-INFO"
+    DESCRIPTION ""
+    REVISION "201511190000Z"
+    DESCRIPTION "@REVISION-DESCRIPTION"
+    ::= { bras 1 }
+
+UnsignedShort ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION "xs:unsignedShort"
+    SYNTAX      Unsigned32 (0 .. 65535)
+
+String ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION "xs:string"
+    SYNTAX      OCTET STRING
+
+HexList ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1x:"
+    STATUS      current
+    DESCRIPTION "confd:hexList"
+    SYNTAX      OCTET STRING
+
+Ppp-auth-type ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      INTEGER {pap(0),chap(1),auto(2)}
+
+Info-user-type ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      INTEGER {pppoe(0),l2tp(1)}
+
+-- tagpath /pppoe/all/connection-count
+connection OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "PPPoE request connection count"
+    ::= { pppoeMib 2 }
+
+-- tagpath /pppoe/all/connection-success-count
+connection-success OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "PPPoE request connection success count"
+    ::= { pppoeMib 1 }
+
+-- tagpath /pppoe/statistics/online-fail/discovery-timeout
+discovery-timeout OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The number of connection which get a PPPoE request but over before PPP open"
+    ::= { pppoeMib 3 }
+
+-- tagpath /pppoe/statistics/online-fail/lcp-timeout
+lcp-fail-other OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The number of LCP fail for other reason"
+    ::= { pppoeMib 5 }
+
+-- tagpath /pppoe/statistics/online-fail/lcp-fail
+lcp-fail OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The number of LCP fail for common reason"
+    ::= { pppoeMib 4 }
+
+-- tagpath /pppoe/statistics/online-fail/auth-timeout
+auth-fail-other OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The number of authentication fail for other reason"
+    ::= { pppoeMib 7 }
+
+-- tagpath /pppoe/statistics/online-fail/auth-fail
+auth-fail OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The number of authentication fail for common reason"
+    ::= { pppoeMib 6 }
+
+-- tagpath /pppoe/statistics/online-fail/ipcp-timeout
+ipcp-fail-other OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The number of IPCP fail for other reason"
+    ::= { pppoeMib 9 }
+
+-- tagpath /pppoe/statistics/online-fail/ipcp-fail
+ipcp-fail OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The number of IPCP fail for common reason"
+    ::= { pppoeMib 8 }
+
+-- tagpath /pppoe/statistics/online-fail/ippool-fail
+ipv4-assign-fail OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The number of IPv4 address assign fail"
+    ::= { pppoeMib 10 }
+
+-- tagpath /pppoe/statistics/online-fail/recv-padt
+user-disconnect OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The number of recv PADT"
+    ::= { pppoeMib 11 }
+
+END

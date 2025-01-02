@@ -136,11 +136,11 @@ class RunAlerts
         if ($alert['state'] >= AlertState::ACTIVE) {
             $obj['title'] = $template->title ?: 'Alert for device ' . $obj['display'] . ' - ' . ($alert['name'] ?: $alert['rule']);
             if ($alert['state'] == AlertState::ACKNOWLEDGED) {
-                $obj['title'] .= ' got acknowledged';
+                $obj['title'] .= ' Has been acknowledged';
             } elseif ($alert['state'] == AlertState::WORSE) {
-                $obj['title'] .= ' got worse';
+                $obj['title'] .= ' Has worsened';
             } elseif ($alert['state'] == AlertState::BETTER) {
-                $obj['title'] .= ' got better';
+                $obj['title'] .= ' Has improved';
             }
 
             foreach ($extra['rule'] as $incident) {
@@ -512,7 +512,6 @@ class RunAlerts
             $transport_maps[] = [
                 'transport_id' => null,
                 'transport_type' => 'mail',
-                'opts' => $obj,
             ];
         }
 
@@ -530,7 +529,7 @@ class RunAlerts
                 c_echo(" :: $transport_title => ");
                 try {
                     $instance = new $class(AlertTransport::find($item['transport_id']));
-                    $tmp = $instance->deliverAlert($obj, $item['opts'] ?? []);
+                    $tmp = $instance->deliverAlert($obj);
                     $this->alertLog($tmp, $obj, $obj['transport']);
                 } catch (AlertTransportDeliveryException $e) {
                     Eventlog::log($e->getTraceAsString() . PHP_EOL . $e->getMessage(), $obj['device_id'], 'alert', Severity::Error);
@@ -555,8 +554,8 @@ class RunAlerts
             AlertState::RECOVERED => 'recovery',
             AlertState::ACTIVE => $obj['severity'] . ' alert',
             AlertState::ACKNOWLEDGED => 'acknowledgment',
-            AlertState::WORSE => 'got worse',
-            AlertState::BETTER => 'got better',
+            AlertState::WORSE => 'worsened',
+            AlertState::BETTER => 'improved',
         ];
 
         $severity = match ($obj['state']) {

@@ -58,7 +58,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                                 $interface = cleanPort($interface);
                                 $string = $interface['label'] . ' - ' . \LibreNMS\Util\Clean::html($interface['ifAlias'], []);
                                 $selected = $interface['port_id'] === $port['port_id'] ? ' selected' : '';
-                                echo "<option value='${interface['port_id']}' $selected>$string</option>\n";
+                                echo "<option value='{$interface['port_id']}' $selected>$string</option>\n";
                             }
                         } ?>
                         </select>
