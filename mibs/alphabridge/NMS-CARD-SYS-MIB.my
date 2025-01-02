@@ -11,13 +11,13 @@
 NMS-CARD-SYS-MIB DEFINITIONS ::= BEGIN 
 
 IMPORTS
-    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,INTEGER,
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE
                                                 FROM SNMPv2-SMI
     TEXTUAL-CONVENTION, TimeStamp
                                                 FROM SNMPv2-TC
     MODULE-COMPLIANCE, OBJECT-GROUP,
     NOTIFICATION-GROUP                          FROM SNMPv2-CONF
-    nmsMgmt, nmslocal                             FROM NMS-SMI
+    nmsMgmt                                     FROM NMS-SMI
     DisplayString				FROM RFC1213-MIB
     nmscardIndex,nmscardDescr,nmscardType          FROM NMS-CHASSIS;
 
@@ -41,7 +41,7 @@ IMPORTS
                    STATUS  mandatory
                    DESCRIPTION
                             "A collection of cards to be reset."
-                   INDEX { cardIndex }
+                   INDEX { nmscardIndex }
                ::= { cardSystemSetTable 1 }
 
                CardSystemSetEntry ::=
@@ -66,8 +66,8 @@ IMPORTS
                        	   INTEGER,
                        cardMemUtilThresholdMax
                        	   INTEGER,
-                      cardSystemTemptureNodeNumber 
-                      `	   INTEGER
+                       cardSystemTemptureNodeNumber
+                     	   INTEGER
                   }
 
 
@@ -155,7 +155,8 @@ IMPORTS
                    ACCESS  read-only
                    STATUS  mandatory
                    DESCRIPTION
-                           "Maximal value of card memory utilization . For example, 60 means the maxmial value of memory utilization is 60%, maximal value is 100."
+                           "Maximal value of card memory utilization . For example, 60 means the maxmial value of memory 
+                           utilization is 60%, maximal value is 100."
                    ::= { cardSystemSetEntry 10 }
 
                cardSystemTemptureNodeNumber OBJECT-TYPE
@@ -212,7 +213,7 @@ IMPORTS
     		::= { cardSysNotifications 1 }
 
 
--- cardSystemTemptureNodeTable(ï¿½å¿¨ï¿½Â¶È½Úµï¿½ï¿½Â¶ï¿½ï¿½Ð±ï¿½)
+-- cardSystemTemptureNodeTable(°å¿¨ÎÂ¶È½ÚµãÎÂ¶ÈÁÐ±í)
 
 
                cardSystemTemptureNodeTable OBJECT-TYPE
@@ -245,7 +246,7 @@ IMPORTS
                   }
 
 
-               cardSysIndex OBJECT-TYPE
+               cardSysTempIndex OBJECT-TYPE
                    SYNTAX  INTEGER
                    ACCESS  read-only
                    STATUS  mandatory

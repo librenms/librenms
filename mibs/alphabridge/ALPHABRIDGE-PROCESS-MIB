@@ -1,9 +1,9 @@
 -- *****************************************************************
 -- ALPHABRIDGE-PROCESS-MIB.my: MIB for CPU and process statistics
 --
--- October 2003
+-- October 2023
 --
--- Copyright (c) 2003 by ALPHABRIDGE, Inc.
+-- Copyright (c) 2023 by ALPHABRIDGE, Inc.
 -- All rights reserved.
 -- *****************************************************************
 --
@@ -22,7 +22,7 @@ IMPORTS
 	MODULE-COMPLIANCE,
 	OBJECT-GROUP
 		FROM SNMPv2-CONF
-	bdMgmt
+	abMgmt
 		FROM ALPHABRIDGE-SMI
 	Unsigned32 FROM SNMPv2-SMI
 	EntPhysicalIndexOrZero
@@ -43,7 +43,7 @@ alphabridgeProcessMIB MODULE-IDENTITY
 	REVISION        "200310160000Z"
 	DESCRIPTION
 		"Initial version of this MIB."		
-	::= { bdMgmt 109 }
+	::= { abMgmt 109 }
 
 -- This MIB displays memory and CPU utilization on cisco devices. CPU 
 -- utilization will give a general idea of how busy the processor is. 
@@ -52,21 +52,21 @@ alphabridgeProcessMIB MODULE-IDENTITY
 -- estimate only. 
 
 alphabridgeProcessMIBObjects	OBJECT IDENTIFIER ::= { alphabridgeProcessMIB 1 }
-bdpmCPU		OBJECT IDENTIFIER ::= { alphabridgeProcessMIBObjects 1 }
-bdpmProcess		OBJECT IDENTIFIER ::= { alphabridgeProcessMIBObjects 2 }
+abpmCPU		OBJECT IDENTIFIER ::= { alphabridgeProcessMIBObjects 1 }
+abpmProcess		OBJECT IDENTIFIER ::= { alphabridgeProcessMIBObjects 2 }
 
 
 --ALPHABRIDGE CPU Total Table
 
-bdpmCPUTotalTable OBJECT-TYPE
+abpmCPUTotalTable OBJECT-TYPE
 	SYNTAX		SEQUENCE OF BdpmCPUTotalEntry
 	MAX-ACCESS      not-accessible
         STATUS          current
         DESCRIPTION
 		"A table of overall CPU statistics. "
-	::= { bdpmCPU 1 }
+	::= { abpmCPU 1 }
 
-bdpmCPUTotalEntry OBJECT-TYPE
+abpmCPUTotalEntry OBJECT-TYPE
 	SYNTAX		BdpmCPUTotalEntry
 	MAX-ACCESS      not-accessible
         STATUS          current
@@ -74,19 +74,19 @@ bdpmCPUTotalEntry OBJECT-TYPE
 		"Overall information about the CPU load. Entries in this
 		table come and go as CPUs are added and removed from the
 		system."
-	INDEX	{ bdpmCPUTotalIndex }
-	::= { bdpmCPUTotalTable 1 }
+	INDEX	{ abpmCPUTotalIndex }
+	::= { abpmCPUTotalTable 1 }
 
 BdpmCPUTotalEntry ::=
 	SEQUENCE {
-		bdpmCPUTotalIndex		Unsigned32,
-		bdpmCPUTotalPhysicalIndex	EntPhysicalIndexOrZero,
-		bdpmCPUTotal5sec		Gauge32,
-		bdpmCPUTotal1min		Gauge32,
-		bdpmCPUTotal5min		Gauge32
+		abpmCPUTotalIndex		Unsigned32,
+		abpmCPUTotalPhysicalIndex	EntPhysicalIndexOrZero,
+		abpmCPUTotal5sec		Gauge32,
+		abpmCPUTotal1min		Gauge32,
+		abpmCPUTotal5min		Gauge32
 	}
 
-bdpmCPUTotalIndex OBJECT-TYPE
+abpmCPUTotalIndex OBJECT-TYPE
 	SYNTAX          Unsigned32 (1.. 4294967295)
 	MAX-ACCESS      not-accessible
 	STATUS          current
@@ -95,9 +95,9 @@ bdpmCPUTotalIndex OBJECT-TYPE
 		whose CPU load information is reported by a row in this table.
 		This index is assigned arbitrarily by the engine
 		and is not saved over reboots."
-	::= { bdpmCPUTotalEntry 1 }
+	::= { abpmCPUTotalEntry 1 }
 
-bdpmCPUTotalPhysicalIndex OBJECT-TYPE
+abpmCPUTotalPhysicalIndex OBJECT-TYPE
 	SYNTAX	        EntPhysicalIndexOrZero
         MAX-ACCESS      read-only
         STATUS          current
@@ -111,9 +111,9 @@ bdpmCPUTotalPhysicalIndex OBJECT-TYPE
 		 (or to no physical entity), or if the entPhysicalTable is
 		 not supported on the SNMP agent, the value of this object
 		 must be zero."
-	::= { bdpmCPUTotalEntry 2 }
+	::= { abpmCPUTotalEntry 2 }
 
-bdpmCPUTotal5sec OBJECT-TYPE
+abpmCPUTotal5sec OBJECT-TYPE
         SYNTAX          Gauge32 (1..100)
 	UNITS		"percent"
         MAX-ACCESS      read-only
@@ -122,11 +122,11 @@ bdpmCPUTotal5sec OBJECT-TYPE
 		"The overall CPU busy percentage in the last 5 second 
 		period. This object obsoletes the busyPer object from 
 		the OLD-CISCO-SYSTEM-MIB. This object is deprecated
-		by bdpmCPUTotal5secRev which has the changed range of
+		by abpmCPUTotal5secRev which has the changed range of
 		value (0..100)."
-	::= { bdpmCPUTotalEntry 3 }
+	::= { abpmCPUTotalEntry 3 }
 
-bdpmCPUTotal1min OBJECT-TYPE
+abpmCPUTotal1min OBJECT-TYPE
         SYNTAX          Gauge32  (1..100)
 	UNITS		"percent"
         MAX-ACCESS      read-only
@@ -135,11 +135,11 @@ bdpmCPUTotal1min OBJECT-TYPE
 		"The overall CPU busy percentage in the last 1 minute
 		period. This object obsoletes the avgBusy1 object from 
 		the OLD-CISCO-SYSTEM-MIB. This object is deprecated
-		by bdpmCPUTotal1minRev which has the changed range
+		by abpmCPUTotal1minRev which has the changed range
 		of value (0..100)."
-	::= { bdpmCPUTotalEntry 4 }
+	::= { abpmCPUTotalEntry 4 }
 
-bdpmCPUTotal5min OBJECT-TYPE
+abpmCPUTotal5min OBJECT-TYPE
         SYNTAX          Gauge32 (1..100)
 	UNITS		"percent"
         MAX-ACCESS      read-only
@@ -148,23 +148,23 @@ bdpmCPUTotal5min OBJECT-TYPE
 		"The overall CPU busy percentage in the last 5 minute
 		period. This object deprecates the avgBusy5 object from 
 		the OLD-CISCO-SYSTEM-MIB. This object is deprecated
-		by bdpmCPUTotal5minRev which has the changed range 
+		by abpmCPUTotal5minRev which has the changed range 
 		of value (0..100)."
-	::= { bdpmCPUTotalEntry 5 }
+	::= { abpmCPUTotalEntry 5 }
 
 
 -- ALPHABRIDGE Processes Common Table
 
-bdpmProcessTable OBJECT-TYPE
+abpmProcessTable OBJECT-TYPE
 	SYNTAX		SEQUENCE OF BdpmProcessEntry
         MAX-ACCESS      not-accessible
         STATUS          current
         DESCRIPTION
 		"A table of generic information on all active 
 		processes on this device."
-	::= { bdpmProcess 1 }
+	::= { abpmProcess 1 }
 
-bdpmProcessEntry OBJECT-TYPE
+abpmProcessEntry OBJECT-TYPE
 	SYNTAX    	BdpmProcessEntry
         MAX-ACCESS      not-accessible
         STATUS          current
@@ -172,34 +172,34 @@ bdpmProcessEntry OBJECT-TYPE
 		"Generic information about an active process on this 
 		device. Entries in this table come and go as processes are 
 		created and destroyed by the device."
-	INDEX	{ bdpmCPUTotalIndex, bdpmProcessPID }
-	::= { bdpmProcessTable 1 }
+	INDEX	{ abpmCPUTotalIndex, abpmProcessPID }
+	::= { abpmProcessTable 1 }
 
 BdpmProcessEntry ::=
 	SEQUENCE {
-		bdpmProcessPID
+		abpmProcessPID
 			Unsigned32,
-		bdpmProcessName 
+		abpmProcessName 
 			DisplayString,
-		bdpmProcessPriority
+		abpmProcessPriority
 			INTEGER,
-		bdpmProcessTimeCreated
+		abpmProcessTimeCreated
 			TimeStamp
 	}
 
-bdpmProcessPID OBJECT-TYPE
+abpmProcessPID OBJECT-TYPE
 	SYNTAX    	Unsigned32
         MAX-ACCESS      read-only
         STATUS          current
         DESCRIPTION
-		"This object contains the process ID. bdpmProcessTimeCreated
+		"This object contains the process ID. abpmProcessTimeCreated
 		should be checked against the last time it was polled,
 		and if it has changed the PID has been reused and the
 		 entire entry should be polled again. The process IDs
 		are discrete."
-	::= { bdpmProcessEntry 1 }
+	::= { abpmProcessEntry 1 }
 
-bdpmProcessName OBJECT-TYPE
+abpmProcessName OBJECT-TYPE
 	SYNTAX    	DisplayString(SIZE(1..32))
         MAX-ACCESS      read-only
         STATUS          current
@@ -208,9 +208,9 @@ bdpmProcessName OBJECT-TYPE
 		longer than 32 characters, it will be truncated to the first
 		31 characters, and a `*' will be appended as the last
 		character to imply this is a truncated process name."
-	::= { bdpmProcessEntry 2 }
+	::= { abpmProcessEntry 2 }
 
-bdpmProcessPriority OBJECT-TYPE
+abpmProcessPriority OBJECT-TYPE
 	SYNTAX		INTEGER {
 				critical(0),
 				veryhigh(55),
@@ -224,10 +224,10 @@ bdpmProcessPriority OBJECT-TYPE
         DESCRIPTION
 		"The priority level at which the process is 
 		running. This object is deprecated by
-		bdpmProcExtPriorityRev."
-	::= { bdpmProcessEntry 3 }
+		abpmProcExtPriorityRev."
+	::= { abpmProcessEntry 3 }
 
-bdpmProcessTimeCreated OBJECT-TYPE
+abpmProcessTimeCreated OBJECT-TYPE
 	SYNTAX		TimeStamp
 	MAX-ACCESS      read-only
         STATUS          current
@@ -235,7 +235,7 @@ bdpmProcessTimeCreated OBJECT-TYPE
 		"The time when the process was created. The process ID 
 		and the time when the process was created, uniquely 
 		identifies a process."
-	::= { bdpmProcessEntry 4 }
+	::= { abpmProcessEntry 4 }
 
 -- notifications
 
@@ -249,92 +249,92 @@ alphabridgeProcessMIBNotifs OBJECT IDENTIFIER ::=
 -- conformance information
 --
 --alphabridgeProcessMIBConformance OBJECT IDENTIFIER ::= { alphabridgeProcessMIB 3 }
---bdpmCompliances OBJECT IDENTIFIER ::= { alphabridgeProcessMIBConformance 1 }
---bdpmGroups OBJECT IDENTIFIER ::=      { alphabridgeProcessMIBConformance 2 }
+--abpmCompliances OBJECT IDENTIFIER ::= { alphabridgeProcessMIBConformance 1 }
+--abpmGroups OBJECT IDENTIFIER ::=      { alphabridgeProcessMIBConformance 2 }
 --
---bdProcessMIBCompliance  MODULE-COMPLIANCE
+--abProcessMIBCompliance  MODULE-COMPLIANCE
 --	STATUS	deprecated
 --	DESCRIPTION
 --		"The compliance statement for entities which implement
 --		the ALPHABRIDGE Process MIB. This is deprecated and new 
---		compliance bdProcessMIBComplianceRev is added."
+--		compliance abProcessMIBComplianceRev is added."
 -- this module
 --	MODULE	
---		MANDATORY-GROUPS { bdpmCPUTotalGroup, bdpmProcessGroup }
+--		MANDATORY-GROUPS { abpmCPUTotalGroup, abpmProcessGroup }
 --
 --
---	GROUP bdpmProcessExtGroup
+--	GROUP abpmProcessExtGroup
 --	DESCRIPTION
---		"The bdpmProcessExtGroup is optional for all entities."
+--		"The abpmProcessExtGroup is optional for all entities."
 --
---	OBJECT		bdpmProcExtPriority
+--	OBJECT		abpmProcExtPriority
 --	MIN-ACCESS	read-only
 --	DESCRIPTION     "Write access is not required."
 --
---	::= { bdpmCompliances 1 }
+--	::= { abpmCompliances 1 }
 --
---bdProcessMIBComplianceRev  MODULE-COMPLIANCE
+--abProcessMIBComplianceRev  MODULE-COMPLIANCE
 --	STATUS	current
 --	DESCRIPTION
 --		"The compliance statement for entities which implement
 --		the ALPHABRIDGE Process MIB. This compliance module
---		deprecates bdProcessMIBCompliance."
+--		deprecates abProcessMIBCompliance."
 -- this module
 --	MODULE	
---		MANDATORY-GROUPS { bdpmCPUTotalGroupRev, bdpmProcessGroupRev}	
+--		MANDATORY-GROUPS { abpmCPUTotalGroupRev, abpmProcessGroupRev}	
 --
---	GROUP bdpmProcessExtGroupRev
+--	GROUP abpmProcessExtGroupRev
 --	DESCRIPTION
---		"The bdpmProcessExtGroupRev is optional for all
+--		"The abpmProcessExtGroupRev is optional for all
 --		entities. This object is defined after deprecating
---		bdpmProcessExtGroup."
+--		abpmProcessExtGroup."
 --	
---	::= { bdpmCompliances 2 }
+--	::= { abpmCompliances 2 }
 --
 -- units of conformance
 --
---bdpmCPUTotalGroup OBJECT-GROUP
+--abpmCPUTotalGroup OBJECT-GROUP
 --	OBJECTS {
---		bdpmCPUTotalPhysicalIndex,
---		bdpmCPUTotal5sec,
---		bdpmCPUTotal1min,
---		bdpmCPUTotal5min
+--		abpmCPUTotalPhysicalIndex,
+--		abpmCPUTotal5sec,
+--		abpmCPUTotal1min,
+--		abpmCPUTotal5min
 --	}
 --	STATUS  deprecated
 --	DESCRIPTION
 --		"A collection of objects providing CPU load monitoring
 --		information. This group is mandatory for all cisco devices.
---		This group is deprecated since the objects bdpmCPUTotal5sec,
---		bdpmCPUTotal1min and bdpmCPUTotal5min are
---		deprecated. A new object bdpmCPUTotalGroupRev is
+--		This group is deprecated since the objects abpmCPUTotal5sec,
+--		abpmCPUTotal1min and abpmCPUTotal5min are
+--		deprecated. A new object abpmCPUTotalGroupRev is
 --		added in place of it."
---	::= { bdpmGroups 1 }
+--	::= { abpmGroups 1 }
 --
---bdpmProcessGroup OBJECT-GROUP
+--abpmProcessGroup OBJECT-GROUP
 --	OBJECTS {
---		bdpmProcessPID,
---		bdpmProcessName,
---		bdpmProcessuSecs,
---		bdpmProcessTimeCreated
+--		abpmProcessPID,
+--		abpmProcessName,
+--		abpmProcessuSecs,
+--		abpmProcessTimeCreated
 --	}
 --	STATUS	deprecated
 --	DESCRIPTION
 --		"A collection of objects providing common process 
 --		monitoring information. This group is mandatory for 
 --		all cisco devices. This object is deprecated
---		by bdpmProcessGroupRev."
---	::= { bdpmGroups 2 }
+--		by abpmProcessGroupRev."
+--	::= { abpmGroups 2 }
 --
---bdpmProcessExtGroup OBJECT-GROUP
+--abpmProcessExtGroup OBJECT-GROUP
 --	OBJECTS {
---		bdpmProcExtMemAllocated,
---		bdpmProcExtMemFreed,
---		bdpmProcExtInvoked,
---		bdpmProcExtRuntime,
---		bdpmProcExtUtil5Sec,
---		bdpmProcExtUtil1Min,
---		bdpmProcExtUtil5Min,
---		bdpmProcExtPriority
+--		abpmProcExtMemAllocated,
+--		abpmProcExtMemFreed,
+--		abpmProcExtInvoked,
+--		abpmProcExtRuntime,
+--		abpmProcExtUtil5Sec,
+--		abpmProcExtUtil1Min,
+--		abpmProcExtUtil5Min,
+--		abpmProcExtPriority
 --	}
 --	STATUS	deprecated
 --	DESCRIPTION
@@ -343,33 +343,33 @@ alphabridgeProcessMIBNotifs OBJECT IDENTIFIER ::=
 --		group is mandatory for all cisco devices that have 
 --		the internal capability to keep this information. 
 --		This group is deprecated and new group
---		bdpmProcessExtGroupRev is added."
---	::= { bdpmGroups 3 }
+--		abpmProcessExtGroupRev is added."
+--	::= { abpmGroups 3 }
 --
---bdpmCPUTotalGroupRev OBJECT-GROUP
+--abpmCPUTotalGroupRev OBJECT-GROUP
 --	OBJECTS {
---		bdpmCPUTotalPhysicalIndex,
---		bdpmCPUTotal5secRev,
---		bdpmCPUTotal1minRev,
---		bdpmCPUTotal5minRev
+--		abpmCPUTotalPhysicalIndex,
+--		abpmCPUTotal5secRev,
+--		abpmCPUTotal1minRev,
+--		abpmCPUTotal5minRev
 --	}
 --	STATUS  current
 --	DESCRIPTION
 --		"A collection of objects providing CPU load monitoring
 --		information. This group is mandatory for all cisco
---		devices. This group deprecates bdpmCPUTotalGroup."
---	::= { bdpmGroups 4 }
+--		devices. This group deprecates abpmCPUTotalGroup."
+--	::= { abpmGroups 4 }
 --
---bdpmProcessExtGroupRev OBJECT-GROUP
+--abpmProcessExtGroupRev OBJECT-GROUP
 --	OBJECTS {
---		bdpmProcExtMemAllocatedRev,
---		bdpmProcExtMemFreedRev,
---		bdpmProcExtInvokedRev,
---		bdpmProcExtRuntimeRev,
---		bdpmProcExtUtil5SecRev,
---		bdpmProcExtUtil1MinRev,
---		bdpmProcExtUtil5MinRev,
---		bdpmProcExtPriorityRev
+--		abpmProcExtMemAllocatedRev,
+--		abpmProcExtMemFreedRev,
+--		abpmProcExtInvokedRev,
+--		abpmProcExtRuntimeRev,
+--		abpmProcExtUtil5SecRev,
+--		abpmProcExtUtil1MinRev,
+--		abpmProcExtUtil5MinRev,
+--		abpmProcExtPriorityRev
 --	}
 --	STATUS	current
 --	DESCRIPTION
@@ -377,27 +377,27 @@ alphabridgeProcessMIBNotifs OBJECT IDENTIFIER ::=
 --		more detailed process monitoring information. This 
 --		group is mandatory for all cisco devices that have 
 --		the internal capability to keep this information.
---		This group is formed after deprecating bdpmProcessExtGroup.
---		bdpmProcExtMemAllocatedRev, bdpmProcExtMemFreedRev,
---		bdpmProcExtInvokedRev, bdpmProcExtRuntimeRev,
---		bdpmProcExtUtil5SecRev, bdpmProcExtUtil1MinRev and 
---		bdpmProcExtUtil5MinRev are the new objects added."
---	::= { bdpmGroups 5 }
+--		This group is formed after deprecating abpmProcessExtGroup.
+--		abpmProcExtMemAllocatedRev, abpmProcExtMemFreedRev,
+--		abpmProcExtInvokedRev, abpmProcExtRuntimeRev,
+--		abpmProcExtUtil5SecRev, abpmProcExtUtil1MinRev and 
+--		abpmProcExtUtil5MinRev are the new objects added."
+--	::= { abpmGroups 5 }
 --
---bdpmProcessGroupRev OBJECT-GROUP
+--abpmProcessGroupRev OBJECT-GROUP
 --	OBJECTS {
---		bdpmProcessPID,
---		bdpmProcessName,
---		bdpmProcessAverageUSecs,
---		bdpmProcessTimeCreated
+--		abpmProcessPID,
+--		abpmProcessName,
+--		abpmProcessAverageUSecs,
+--		abpmProcessTimeCreated
 --	}
 --	STATUS	current
 --	DESCRIPTION
 --		"A collection of objects providing common process 
 --		monitoring information. This group is mandatory for 
 --		all cisco devices. This object deprecates
---		bdpmProcessGroup."
---	::= { bdpmGroups 6 }
+--		abpmProcessGroup."
+--	::= { abpmGroups 6 }
 
 END
 

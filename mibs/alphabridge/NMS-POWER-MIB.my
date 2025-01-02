@@ -1,0 +1,191 @@
+-- *****************************************************************
+-- NMS-POWER-MIB: NMS POWER MIB
+--
+-- AUG 2010
+-- Edit by LIUQIANG
+-- Copyright (c) 2010 by NMS, Inc.
+-- All rights reserved.
+-- *****************************************************************
+
+NMS-POWER-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+    Integer32, Unsigned32                       FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP,
+    NOTIFICATION-GROUP                          FROM SNMPv2-CONF
+    nmsEPONGroup,nmsMgmt                                 FROM NMS-SMI
+    DisplayString   FROM RFC1213-MIB;
+
+
+               power         OBJECT IDENTIFIER ::= { nmsMgmt 189 }
+               
+              
+-- Notifications
+          powerStatus OBJECT-TYPE
+              SYNTAX  INTEGER {
+                          power-A-normal(1), 
+                          power-B-normal(2),     
+                          power-A-B-normal(3),
+                          other(4)
+                          }
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Power status, power-A-normal(1), power-B-normal(2), power-A-B-normal(3), other(4)."
+              ::= { power 1 }
+          
+          powerOldStatus OBJECT-TYPE
+              SYNTAX  INTEGER {
+                          power-A-normal(1), 
+                          power-B-normal(2),     
+                          power-A-B-normal(3),
+                          other(4)
+                          }
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "Power status before change, power-A-normal(1), power-B-normal(2), power-A-B-normal(3), other(4)."
+              ::= { power 2 }
+          
+          powerNewStatus OBJECT-TYPE
+              SYNTAX  INTEGER {
+                          power-A-normal(1), 
+                          power-B-normal(2),     
+                          power-A-B-normal(3),
+                          other(4)
+                          }
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "Power status after change, power-A-normal(1), power-B-normal(2), power-A-B-normal(3), other(4)."
+              ::= { power 3 }
+          
+          
+
+	powerNotifications OBJECT IDENTIFIER
+                                ::= { power 4 }
+
+
+	powerNotification NOTIFICATION-TYPE
+    		OBJECTS {
+                       powerOldStatus,
+                       powerNewStatus
+                        }
+    		STATUS      current
+    		DESCRIPTION
+        	"The agent generates this notification when power status changes.
+        	 powerOldStatus: power-A-normal(1), power-B-normal(2), power-A-B-normal(3), other(4).
+        	 powerNewStatus: power-A-normal(1), power-B-normal(2), power-A-B-normal(3), other(4)."
+    		::= { powerNotifications 1 }
+
+
+--电源节点的扩展，为了定义95设备和堆叠设备
+	powerExtDef OBJECT IDENTIFIER
+                                ::= { power 5 }
+	
+               powerDeviceTable OBJECT-TYPE
+                   SYNTAX  SEQUENCE OF  PowerDeviceEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A list of  Power-Device entries."
+                   ::= { powerExtDef 1 }
+
+               powerDeviceEntry OBJECT-TYPE
+                   SYNTAX  PowerDeviceEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A collection of Power-Device ."
+                   INDEX { PowerDeviceIndex,PowerShelfNum }
+               ::= { powerDeviceTable 1 }
+
+               PowerDeviceEntry ::=
+                   SEQUENCE {
+                       powerDeviceIndex
+                           INTEGER,
+                       powerDeviceOnSiteStatus
+                           INTEGER,
+                       powerDeviceDescr
+                       	   DisplayString,
+                       powerDeviceStatus
+                       	   INTEGER,
+                   	   powerShelfNum
+                       	   INTEGER
+
+                  }
+              powerDeviceIndex OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Index of Power-Device"
+                   ::= { powerDeviceEntry 1 }
+
+
+               powerDeviceOnSiteStatus OBJECT-TYPE
+                   SYNTAX  INTEGER  { 
+                                    empty-shelf(0),
+                                    on-shelf(1)                                  
+                                   }
+
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Type of Power-Device ."
+                   ::= { powerDeviceEntry 2 }
+
+
+
+               powerDeviceDescr OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Text description of this Power-Device."
+                   ::= { powerDeviceEntry 3 }
+
+               powerDeviceStatus OBJECT-TYPE
+                   SYNTAX  INTEGER{ 
+                                    on(1),
+                                    off(2)                                    
+                                   }
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "When value is ON(1), that means Power-Device is working; when value is OFF(2) means Power-Device is out of working."
+                   ::= { powerDeviceEntry 4 }
+                   
+                powerShelfNum   OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Powerdevice belong to which shelf.If there is only one device , the value will be 1. 
+                           If there are two or more devices such as stacking, the value will be added to 2,3...... as followed."
+                   ::= { powerDeviceEntry 5 }
+
+	powerExtDefNotifications OBJECT IDENTIFIER
+                                ::= { powerExtDef 2 }
+
+
+	powerExtDefNotification NOTIFICATION-TYPE
+    		OBJECTS {
+                       PowerShelfNum,
+                       PowerDeviceIndex,
+                       PowerDeviceOnSiteStatus,
+                       PowerDeviceStatus,
+                       PowerDeviceDescr
+                        }
+    		STATUS      current
+    		DESCRIPTION
+        	"The agent generates this notification when power status changes."
+    		::= { powerExtDefNotifications 1 }
+
+
+
+
+
+              
+END

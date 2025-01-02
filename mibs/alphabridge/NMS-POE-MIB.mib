@@ -1,0 +1,98 @@
+--------------------------------------------------------------------
+-- NMS-POE-MIB
+-- AUTHER : LIUQIANG
+-- OCT 2011
+--------------------------------------------------------------------
+
+            NMS-POE-MIB DEFINITIONS ::= BEGIN
+
+            IMPORTS
+                    TimeTicks
+            FROM RFC1155-SMI
+                    OBJECT-TYPE
+			FROM RFC-1212
+                    DisplayString
+			FROM RFC1213-MIB
+		    nmslocal
+			FROM NMS-SMI
+		    IpAddress     FROM  RFC1155-SMI
+		    TruthValue  	FROM SNMPv2-TC;
+          
+               poe             OBJECT IDENTIFIER ::= { nmslocal 236 }
+
+
+               powerEtherTable OBJECT-TYPE
+                   SYNTAX  SEQUENCE OF PowerEtherTableEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A table of power ehternet mib."
+                   ::= { poe 1 }
+
+               powerEtherTableEntry OBJECT-TYPE
+                   SYNTAX  PowerEtherTableEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A collection of power ethernet interface."
+                   INDEX { ifIndex }
+               ::= { powerEtherTable 1 }
+
+               PowerEtherTableEntry ::=
+                   SEQUENCE {
+                       ifIndex
+                           INTEGER,
+                       ifDescr
+                           DisplayString,
+                       ifPethPortControlAbility
+                       	   TruthValue,
+                       ifPethPortMaxPower
+                           INTEGER,
+                       ifPethPortConsumptionPower
+                           INTEGER
+                          }
+	
+               ifIndex OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Interface index of device. The same value as ifIndex in ifTable. "
+                   ::= { powerEtherTableEntry 1 }
+                   
+               ifDescr OBJECT-TYPE
+                   SYNTAX  DisplayString (SIZE (0..255))
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Interface description of device. The same value as ifDescr in ifTable. "
+                   ::= { powerEtherTableEntry 2 }
+                   
+               ifPethPortControlAbility OBJECT-TYPE
+                   SYNTAX  TruthValue
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Describes the capability of controlling the PSE functions."
+                   ::= { powerEtherTableEntry 3 }
+                   
+               ifPethPortMaxPower OBJECT-TYPE
+                   SYNTAX  INTEGER(1..30)
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Limit the maximal available power on a port. The maximal value is 30, unit is Watts."
+                   ::= { powerEtherTableEntry 4 }
+                   
+               ifPethPortConsumptionPower OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Measured usage power expressed in Watts. Unit is Watts."
+                   ::= { powerEtherTableEntry 5 }
+                   
+                   
+              
+
+END

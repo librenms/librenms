@@ -1,8 +1,24 @@
+<style>
+    .list-group-item.active {
+        background-color: rgb(217, 255, 0);
+        /* Highlight color */
+        color: white;
+        /* Text color */
+        font-weight: bold;
+    }
+
+    li.list-group-item.active:hover {
+        color: #ffffff;
+        background: yellow;
+    }
+</style>
 <?php
 
 // FIXME svn stuff still using optc etc, won't work, needs updating!
 use LibreNMS\Config;
 use Symfony\Component\Process\Process;
+
+
 
 if (Auth::user()->hasGlobalAdmin()) {
     if (! empty($rancid_file)) {
@@ -42,7 +58,7 @@ if (Auth::user()->hasGlobalAdmin()) {
 
                 $sep = ' | ';
             }
-        }//end if
+        } //end if
         if (Config::get('rancid_repo_type') == 'git') {
             $sep = ' | ';
 
@@ -185,7 +201,7 @@ if (Auth::user()->hasGlobalAdmin()) {
         if ($config_total > 1) {
             // populate current_version
             if (isset($_POST['config'])) {
-                [$oid,$date,$version] = explode('|', htmlspecialchars($_POST['config']));
+                [$oid, $date, $version] = explode('|', htmlspecialchars($_POST['config']));
                 $current_config = ['oid' => $oid, 'date' => $date, 'version' => $version];
             } else { // no version selected
                 $current_config = ['oid' => $config_versions[0]['oid'], 'date' => $config_versions[0]['date'], 'version' => $config_total];
@@ -193,7 +209,7 @@ if (Auth::user()->hasGlobalAdmin()) {
 
             // populate previous_version
             if (isset($_POST['diff'])) { // diff requested
-                [$oid,$date,$version] = explode('|', $_POST['prevconfig']);
+                [$oid, $date, $version] = explode('|', $_POST['prevconfig']);
                 if (isset($oid) && $oid != $current_config['oid']) {
                     $previous_config = ['oid' => $oid, 'date' => $date, 'version' => $version];
                 } elseif ($current_config['version'] != 1) {  // assume previous, unless current is first config
@@ -233,20 +249,116 @@ if (Auth::user()->hasGlobalAdmin()) {
             ';
 
             if (is_array($node_info)) {
+                // Dynamically fetch base URL
+                $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
+                $host = $_SERVER['HTTP_HOST'];
+
+                // Ensure the base URL is correct
+                $uri_parts = explode('/', $_SERVER['REQUEST_URI']);
+                $base_url = $protocol . $host . '/' . $uri_parts[1] . '/' . $uri_parts[2] . '/showconfig';
+
+                // Extract the current configuration from the URL
+                $current_config = basename(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
+
+
+                // Check if any configuration is active
+                $is_l2_config_expanded = in_array($current_config, [
+                    "gvrp_config",
+                    "stp_config",
+                    "basic_arp",
+                    "vlan_config",
+                    "igmp_snooping",
+                    "lldp_config",
+                    "ddm_config",
+                ]);
+
                 echo '
-                      <div class="col-sm-4">
-                          <div class="panel panel-primary">
-                              <div class="panel-heading">Sync status: <strong>' . $node_info['last']['status'] . '</strong></div>
-                              <ul class="list-group">
-                                  <li class="list-group-item"><strong>Node:</strong> ' . $node_info['name'] . '</li>
-                                  <li class="list-group-item"><strong>IP:</strong> ' . $node_info['ip'] . '</li>
-                                  <li class="list-group-item"><strong>Model:</strong> ' . $node_info['model'] . '</li>
-                                  <li class="list-group-item" style="overflow:hidden"><strong>Last Sync:</strong> ' . $node_info['last']['end'] . ' &nbsp;<button class="btn btn-primary btn-xs" style="float: right;" name="queue-refresh"  onclick=\'refresh_oxidized_node("' . $device['hostname'] . '")\'>Refresh</button></li>
-                              </ul>
-                          </div>
-                      </div>
+
+                    <div class="col-md-4 col-sm-12">
+                        <div class="panel panel-primary">
+                            <div class="panel-heading">
+                    <a class="btn btn-link" data-toggle="collapse" href="#l2ConfigDropdown" role="button" aria-expanded="' . ($is_l2_config_expanded ? 'true' : 'false') . '" aria-controls="l2ConfigDropdown" style="color:rgb(255, 255, 255); font-weight: bold; text-decoration: none;">
+                        L2 Configuration
+                    </a>
+                    <a href="' . $base_url . '" class="close" style="float: right; color:rgb(255, 251, 251); font-size: 20px; text-decoration: none;" aria-label="Close">&times;</a>
+                  </div>
+                            <div id="l2ConfigDropdown" class="collapse ' . ($is_l2_config_expanded ? 'show' : '') . '">
+                                <ul class="list-group" style="list-style-type: none; padding: 0; margin: 0;">
+                                    <li class="list-group-item ' . ($current_config === "gvrp_config" ? "active" : "") . '">
+                                        <a href="' . $base_url . '/gvrp_config">GVRP Configuration</a>
+                                    </li>
+                                    <li class="list-group-item ' . ($current_config === "stp_config" ? "active" : "") . '">
+                                        <a href="' . $base_url . '/stp_config">STP Configuration</a>
+                                    </li>
+                                    <li class="list-group-item ' . ($current_config === "basic_arp" ? "active" : "") . '">
+                                        <a href="' . $base_url . '/basic_arp">Basic ARP</a>
+                                    </li>
+                                    <li class="list-group-item ' . ($current_config === "vlan_config" ? "active" : "") . '">
+                                        <a href="' . $base_url . '/vlan_config">VLAN Configuration</a>
+                                    </li>
+                                    <li class="list-group-item ' . ($current_config === "igmp_snooping" ? "active" : "") . '">
+                                        <a href="' . $base_url . '/igmp_snooping">IGMP Snooping</a>
+                                    </li>
+                                    <li class="list-group-item ' . ($current_config === "lldp_config" ? "active" : "") . '">
+                                        <a href="' . $base_url . '/lldp_config">LLDP Configuration</a>
+                                    </li>
+                                    <li class="list-group-item ' . ($current_config === "ddm_config" ? "active" : "") . '">
+                                        <a href="' . $base_url . '/ddm_config">DDM Configuration</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                        <div class="col-md-8 col-sm-12">
+                        <div class="panel panel-primary">
+                        <div class="panel-heading">Tab: <strong>' . $current_config . '</strong></div>
+    ';
+    
+    // Print "demo1" if the current configuration is gvrp_config
+            if ($current_config === "gvrp_config") {
+                echo "demo1";
+            }
+
+    echo '
+        </div>
+        </div>
+
+        <div class="col-md-12 col-sm-12">
+        </div>
+ 
+                    <div class="col-md-4 col-sm-12">
+                        <div class="panel panel-primary">
+                            <div class="panel-heading">Sync status: <strong>' . $node_info['last']['status'] . '</strong></div>
+                            <ul class="list-group">
+                                <li class="list-group-item"><strong>Node:</strong> ' . $node_info['name'] . '</li>
+                                <li class="list-group-item"><strong>IP:</strong> ' . $node_info['ip'] . '</li>
+                                <li class="list-group-item"><strong>Model:</strong> ' . $node_info['model'] . '</li>
+                                <li class="list-group-item" style="overflow:hidden">
+                                    <strong>Last Sync:</strong> ' . $node_info['last']['end'] . ' 
+                                    &nbsp;<button class="btn btn-primary btn-xs" style="float: right;" name="queue-refresh" onclick=\'refresh_oxidized_node("' . $device['hostname'] . '")\'>Refresh</button>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                   
+
+                    
                 ';
             }
+
+
+
+
+
+
+
+
+
+
+
+
 
             if ($config_total > 1) {
                 echo '
@@ -303,7 +415,7 @@ if (Auth::user()->hasGlobalAdmin()) {
             print_error("We couldn't retrieve the device information from Oxidized");
             $text = '';
         }
-    }//end if
+    } //end if
 
     if (! empty($author)) {
         echo '
@@ -329,6 +441,12 @@ if (Auth::user()->hasGlobalAdmin()) {
         echo $geshi->parse_code();
         echo '</div>';
     }
-}//end if
+    
+} //end if
 
 $pagetitle[] = 'Config';
+
+?>
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js"></script>

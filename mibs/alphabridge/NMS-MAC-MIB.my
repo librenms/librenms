@@ -1,0 +1,535 @@
+-- *****************************************************************
+-- mac MIB -  The MIB for Switch Product
+--
+-- FEB 2012 LIUQIANG
+
+-- Copyright (c) 2012 by  Co., Ltd. 
+-- All rights reserved.
+-- *****************************************************************
+   
+-- ********************************************************************************   
+ 
+NMS-MAC-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, 
+    OBJECT-TYPE, 
+    Counter32,
+    Gauge32,
+    Counter64,
+    Integer32, 
+    TimeTicks, 
+    mib-2, 
+    NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION,
+    DisplayString, 
+    PhysAddress, 
+    TruthValue, 
+    RowStatus, 
+    TimeStamp, 
+    AutonomousType, 
+    TestAndIncr,
+    MacAddress
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, 
+    OBJECT-GROUP
+        FROM SNMPv2-CONF 
+    nms
+        FROM NMS-SMI;
+  
+    mac	MODULE-IDENTITY
+        LAST-UPDATED    "201909230000Z"
+        ORGANIZATION    " nms Co., Ltd."
+        CONTACT-INFO    " nms Co., Ltd."
+        DESCRIPTION     "."
+        ::= { nms 152 }
+    
+--fdbReadByPortTable
+
+        fdbReadByPortTable OBJECT-TYPE
+            SYNTAX  SEQUENCE OF FdbReadByPortEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+                    "A list of fdb Read By Port entries."
+            ::= { mac 1 }
+
+        fdbReadByPortEntry OBJECT-TYPE
+            SYNTAX  FdbReadByPortEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+                    "An fdb Read By Port entry containing objects at the
+                    subnetwork layer and below for a particular interface."
+            INDEX   { ifFdbReadByPortIndex,ifFdbReadByPortVlanID,ifFdbReadByPortMacAddress }
+            ::= { fdbReadByPortTable 1 }
+
+        FdbReadByPortEntry ::=
+            SEQUENCE {
+                ifFdbReadByPortIndex
+                    INTEGER,
+                ifFdbReadByPortVlanID
+                    INTEGER,
+                ifFdbReadByPortMacAddress
+                    MacAddress
+            }
+
+        ifFdbReadByPortIndex OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+
+            DESCRIPTION
+                    "Indexs of interface. The same value as ifIndex in ifTable of RFC1213."
+            ::= { fdbReadByPortEntry 1 }
+
+        ifFdbReadByPortVlanID OBJECT-TYPE
+            SYNTAX  INTEGER(1..4094)
+            ACCESS  read-write
+            STATUS  mandatory
+
+            DESCRIPTION
+                    "Indexs of interface. VlanID of mac address. The range is 1-4094."
+            ::= { fdbReadByPortEntry 2 }
+
+        ifFdbReadByPortMacAddress OBJECT-TYPE
+            SYNTAX  MacAddress
+            ACCESS  read-write
+            STATUS  mandatory
+
+            DESCRIPTION
+                    "Indexs of interface. Mac address."
+            ::= { fdbReadByPortEntry 3 }
+
+
+--userFdbTable
+
+        userFdbTable OBJECT-TYPE
+            SYNTAX  SEQUENCE OF UserFdbEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+                    "A list of user Fdb entries."
+            ::= { mac 2 }
+
+        userFdbEntry OBJECT-TYPE
+            SYNTAX  UserFdbEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+                    "An user Fdb entry containing objects at the
+                    subnetwork layer and below for a particular interface."
+            INDEX   { ifUserFdbModuleID,ifUserFdbIndex }
+            ::= { userFdbTable 1 }
+
+        UserFdbEntry ::=
+            SEQUENCE {
+                ifUserFdbModuleID
+                    INTEGER,
+                ifUserFdbIndex
+                    INTEGER,
+                ifUserFdbMacAddress1
+                    MacAddress,
+                ifUserFdbMacAddress2
+                    MacAddress,
+                ifUserFdbMacAddress3
+                    MacAddress,
+                ifUserFdbMacAddress4
+                    MacAddress,
+                ifUserFdbMacAddress5
+                    MacAddress,
+                ifUserFdbMacAddress6
+                    MacAddress,
+                ifUserFdbMacAddress7
+                    MacAddress,
+                ifUserFdbMacAddress8
+                    MacAddress
+            }
+            
+        ifUserFdbModuleID OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                    "Indexs of interface.ModuleID. Value is fixed to 1."
+            ::= { userFdbEntry 1 }
+            
+        ifUserFdbIndex OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                    "Indexs of interface. The same value as ifIndex in ifTable of RFC1213."
+            ::= { userFdbEntry 2 }
+            
+          ifUserFdbMacAddress1 OBJECT-TYPE
+            SYNTAX  MacAddress
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION
+                    "The first of user mac address."
+            ::= { userFdbEntry 3 }
+            
+        ifUserFdbMacAddress2 OBJECT-TYPE
+            SYNTAX  MacAddress
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION
+                    "The second of user mac address."
+            ::= { userFdbEntry 4 }
+            
+        ifUserFdbMacAddress3 OBJECT-TYPE
+            SYNTAX  MacAddress
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION
+                    "The third of user mac address."
+            ::= { userFdbEntry 5 }
+            
+        ifUserFdbMacAddress4 OBJECT-TYPE
+            SYNTAX  MacAddress
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION
+                    "The forth of user mac address."
+            ::= { userFdbEntry 6 }
+            
+        ifUserFdbMacAddress5 OBJECT-TYPE
+            SYNTAX  MacAddress
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION
+                    "The fifth of user mac address."
+            ::= { userFdbEntry 7 }
+            
+        ifUserFdbMacAddress6 OBJECT-TYPE
+            SYNTAX  MacAddress
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION
+                    "The sixth of user mac address."
+            ::= { userFdbEntry 8 }
+            
+        ifUserFdbMacAddress7 OBJECT-TYPE
+            SYNTAX  MacAddress
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION
+                    "The seventh of user mac address."
+            ::= { userFdbEntry 9 }
+            
+        ifUserFdbMacAddress8 OBJECT-TYPE
+            SYNTAX  MacAddress
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION
+                    "The eighth of user mac address."
+            ::= { userFdbEntry 10 }
+            
+
+--portDisableLearningTable
+
+        portDisableLearningTable OBJECT-TYPE
+            SYNTAX  SEQUENCE OF PortDisableLearningEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+                    "A list of port Disable Learning entries."
+            ::= { mac 3 }
+
+        portDisableLearningEntry OBJECT-TYPE
+            SYNTAX  PortDisableLearningEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+                    "An port Disable Learning entry containing objects at the
+                    subnetwork layer and below for a particular interface."
+            INDEX   { ifPortDisableLearningIndex }
+            ::= { portDisableLearningTable 1 }
+
+        PortDisableLearningEntry ::=
+            SEQUENCE {
+                ifPortDisableLearningIndex
+                    INTEGER,
+                disableLearning
+                    INTEGER
+            }
+
+        ifPortDisableLearningIndex OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+
+            DESCRIPTION
+                    "Indexs of interface. The same value as ifIndex in ifTable of RFC1213."
+            ::= { portDisableLearningEntry 1 }
+
+        disableLearning OBJECT-TYPE
+            SYNTAX  INTEGER{
+                            enable-learning(1),
+                            disable-learning(2)
+            }
+            ACCESS  read-write
+            STATUS  mandatory
+
+            DESCRIPTION
+                    "Interface mac address learning config. 1-enable, 2-disable. Default is enable."
+            ::= { portDisableLearningEntry 2 }
+
+--vlanDisableLearningTable
+
+        vlanDisableLearningTable OBJECT-TYPE
+            SYNTAX  SEQUENCE OF VlanDisableLearningEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+                    "A list of VLAN Disable Learning entries."
+            ::= { mac 4 }
+
+        vlanDisableLearningEntry OBJECT-TYPE
+            SYNTAX  VlanDisableLearningEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+                    "An VLAN Disable Learning entry containing objects at the
+                    subnetwork layer and below for a particular interface."
+            INDEX   { ifVlanDisableLearningIndex }
+            ::= { vlanDisableLearningTable 1 }
+
+        VlanDisableLearningEntry ::=
+            SEQUENCE {
+                ifVlanDisableLearningIndex
+                    INTEGER,
+                vlanDisableLearning
+                    INTEGER
+            }
+
+        ifVlanDisableLearningIndex OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+
+            DESCRIPTION
+                    "Indexs of interface. The same value as ifIndex in ifTable of RFC1213."
+            ::= { vlanDisableLearningEntry 1 }
+
+        vlanDisableLearning OBJECT-TYPE
+            SYNTAX  INTEGER{
+                            enable-learning(1),
+                            disable-learning(2)
+            }
+            ACCESS  read-write
+            STATUS  mandatory
+
+            DESCRIPTION
+                    "Interface vlan learning config. 1-enable, 2-disable. Default is enable."
+            ::= { vlanDisableLearningEntry 2 }
+
+
+-- fdbStatistic（mac地址表统计）1.3.6.1.4.1.3320.152.5
+
+        fdbStatistic         OBJECT IDENTIFIER ::= { mac 5 }
+
+        fdbStatisticEntry         OBJECT IDENTIFIER ::= { fdbStatistic 1 }
+
+        fdbGlobalCurrentNumber OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+
+            DESCRIPTION
+                    "Current entry number in mac address table."
+            ::= { fdbStatisticEntry 1 }
+
+        fdbGlobalMaxNumber OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+
+            DESCRIPTION
+                    "Max entry number in mac address table."
+            ::= { fdbStatisticEntry 2 }
+
+-- fdbChange（MAC地址转发表变化）1.3.6.1.4.1.3320.152.6
+
+        fdbChange               OBJECT IDENTIFIER ::= { mac 6 }
+
+        fdbChangeGroup          OBJECT IDENTIFIER ::= { fdbChange 1 }
+
+        fdbChangeMacAddress OBJECT-TYPE
+            SYNTAX  MacAddress
+            ACCESS  accessible-for-notify
+            STATUS  mandatory
+
+            DESCRIPTION
+                    "Mac Address"
+            ::= { fdbChangeGroup 1 }
+
+        fdbChangeVlan OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  accessible-for-notify
+            STATUS  mandatory
+
+            DESCRIPTION
+                    "VLAN ID"
+            ::= { fdbChangeGroup 2 }
+
+        fdbChangeStatus OBJECT-TYPE
+            SYNTAX  INTEGER {
+                    new-learnt(1),
+                    station-move(2),
+                    aged-out(3)
+            }
+            ACCESS  accessible-for-notify
+            STATUS  mandatory
+
+            DESCRIPTION
+                    "Status change type of the FDB entry"
+            ::= { fdbChangeGroup 3 }
+
+        fdbChangeIfindex OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  accessible-for-notify
+            STATUS  mandatory
+
+            DESCRIPTION
+                    "Index of interface"
+            ::= { fdbChangeGroup 4 }
+
+        fdbChangeIfDescr OBJECT-TYPE
+            SYNTAX  DisplayString
+            ACCESS  accessible-for-notify
+            STATUS  mandatory
+
+            DESCRIPTION
+                    "Description of interface"
+            ::= { fdbChangeGroup 5 }
+
+        fdbChangeOriginIfindex OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  accessible-for-notify
+            STATUS  mandatory
+
+            DESCRIPTION
+                    "Index of interface, which is the original interface before station movement."
+            ::= { fdbChangeGroup 6 }
+
+        fdbChangeOriginIfDescr OBJECT-TYPE
+            SYNTAX  DisplayString
+            ACCESS  accessible-for-notify
+            STATUS  mandatory
+
+            DESCRIPTION
+                    "Description of interface, which is the original interface before station movement."
+            ::= { fdbChangeGroup 7 }
+
+
+        fdbChangeNotifications          OBJECT IDENTIFIER ::= { fdbChange 2 }
+        
+        fdbChangeNotification NOTIFICATION-TYPE
+            OBJECTS {
+                fdbChangeMacAddress,
+                fdbChangeVlan,
+                fdbChangeStatus,
+                fdbChangeIfindex,
+                fdbChangeIfDescr,
+                fdbChangeOriginIfindex,
+                fdbChangeOriginIfDescr
+            }
+            STATUS  mandatory
+            DESCRIPTION
+                    "The agent generates this notification when fdb changes."
+            ::= { fdbChangeNotifications 1 }
+
+        fdbChangeConfig          OBJECT IDENTIFIER ::= { fdbChange 3 }
+        
+        fdbChangeSelNotifyInterval OBJECT-TYPE
+            SYNTAX  INTEGER(1..60)
+            ACCESS  read-write
+            STATUS  mandatory
+
+            DESCRIPTION
+                    "Set notifiy interval in seconds(default 1)."
+            ::= { fdbChangeConfig 1 }
+
+        fdbChangeSelNotifyMacMoveAction OBJECT-TYPE
+            SYNTAX  BITS {
+                    syslog(0),
+                    snmp-trap(1)
+            }
+            ACCESS  read-write
+            STATUS  mandatory
+
+            DESCRIPTION
+                    "Select notify action for mac-move."
+            ::= { fdbChangeConfig 2 }
+
+        fdbChangeSelNotifyMacLearnAction OBJECT-TYPE
+            SYNTAX  BITS {
+                    syslog(0),
+                    snmp-trap(1)
+            }
+            ACCESS  read-write
+            STATUS  mandatory
+
+            DESCRIPTION
+                    "Select notify action for mac learning."
+            ::= { fdbChangeConfig 3 }
+
+-- fdbBlackhole（黑洞mac地址）1.3.6.1.4.1.3320.152.7
+        fdbBlackholeMacTable OBJECT-TYPE
+            SYNTAX  SEQUENCE OF FdbBlackholeMacEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+                    "A list of blackhole mac address entries."
+            ::= { mac 7 }
+
+        fdbBlackholeMacEntry OBJECT-TYPE
+            SYNTAX  FdbBlackholeMacEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+                    "Blackhole mac address."
+            INDEX   { fdbBlackholeMacAddress, fdbBlackholeMacVlan }
+            ::= { fdbBlackholeMacTable 1 }
+          
+        FdbBlackholeMacEntry ::=
+            SEQUENCE {
+                fdbBlackholeMacAddress
+                    MacAddress,
+                fdbBlackholeMacVlan
+                    INTEGER,
+                fdbBlackholeRowStatus
+                    RowStatus
+            }
+
+        fdbBlackholeMacAddress OBJECT-TYPE
+            SYNTAX  MacAddress
+            ACCESS  read-create
+            STATUS  mandatory
+
+            DESCRIPTION
+                    "A list of blackhole mac address entries."
+            ::= { fdbBlackholeMacEntry 1 }
+
+        fdbBlackholeMacVlan OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-create
+            STATUS  mandatory
+
+            DESCRIPTION
+                    "The vlan of the blackhole mac address."
+            ::= { fdbBlackholeMacEntry 2 }
+
+        fdbBlackholeRowStatus OBJECT-TYPE
+            SYNTAX  RowStatus
+            ACCESS  read-create
+            STATUS  mandatory
+
+            DESCRIPTION
+                    "Row status of blackhole mac address entry."
+            ::= { fdbBlackholeMacEntry 3 }
+END
+

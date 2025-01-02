@@ -1,0 +1,66 @@
+-- *****************************************************************
+-- NMS-CONFIG-MGMT.my: MIB for CPU and process statistics
+--
+-- July 2009
+--
+-- Copyright (c) 2003 by NMS, Inc.
+-- All rights reserved.
+-- *****************************************************************
+ NMS-CONFIG-MGMT  DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY,
+	OBJECT-TYPE
+		FROM SNMPv2-SMI
+	nmsWorkGroup
+		FROM NMS-SMI;
+
+
+       linmsm       OBJECT IDENTIFIER ::= { nmsWorkGroup 15 }
+       configuration       OBJECT IDENTIFIER ::= { linmsm 1 }
+
+
+          operation OBJECT-TYPE
+              SYNTAX  INTEGER (0..127)
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION  "1 means to save the commmand configuration. 2 means to save ifIndex configuration."
+             ::= { configuration 1 }
+
+          result OBJECT-TYPE
+              SYNTAX  INTEGER {
+                             no_err(0),
+                             err_enterfilesys(1),
+                             err_openfile(2),
+                             err_closefile(3),
+                             err_exitfilesys(4),
+                             err_getredirection(5),
+                             err_setredirection(6),
+                             err_setfileattr(7),
+                             err_writefile(8)
+              }
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION  ""
+             ::= { configuration 2 }
+
+	nmsSaveConfigNotifications OBJECT IDENTIFIER
+                                ::= { linmsm 2 }
+
+
+	nmsSaveConfigNotification NOTIFICATION-TYPE
+    		OBJECTS {
+        		operation,
+        		result
+        		   		}
+    		STATUS      current
+    		DESCRIPTION
+        	"The agent generates this notification when the operation of saving configuration is finished ."
+    		::= { nmsSaveConfigNotifications 1 }
+
+               
+
+
+
+END
+

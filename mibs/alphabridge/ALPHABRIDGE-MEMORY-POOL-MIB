@@ -1,9 +1,9 @@
 -- *****************************************************************
 -- ALPHABRIDGE-MEMORY-POOL-MIB
 --
--- October 2003
+-- October 2023
 --
--- Copyright (c) 2003 by ALPHABRIDGE, Inc.
+-- Copyright (c) 2023 by ALPHABRIDGE, Inc.
 -- All rights reserved.
 -- *****************************************************************
 
@@ -22,7 +22,7 @@ IMPORTS
     MODULE-COMPLIANCE,
     OBJECT-GROUP
         FROM SNMPv2-CONF
-    bdMgmt
+    abMgmt
         FROM ALPHABRIDGE-SMI
     Percent
         FROM ALPHABRIDGE-QOS-PIB-MIB;
@@ -41,7 +41,7 @@ alphabridgeMemoryPoolMIB MODULE-IDENTITY
    	REVISION        "200310160000Z"
 	DESCRIPTION
 		"Initial version of this MIB."
-    ::= { bdMgmt 48 }
+    ::= { abMgmt 48 }
 
 ALPHABRIDGEMemoryPoolTypes ::= TEXTUAL-CONVENTION
     STATUS        current

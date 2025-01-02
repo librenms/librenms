@@ -1,0 +1,1014 @@
+NMS-IF-MIB  DEFINITIONS ::= BEGIN
+
+	IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        Gauge32,
+        TimeTicks
+            FROM SNMPv2-SMI
+        DisplayString
+			FROM RFC1213-MIB
+        nmsMgmt
+            FROM NMS-SMI 
+        PhysAddress 
+            FROM SNMPv2-TC;
+                        
+nmsIfMIB  MODULE-IDENTITY
+        LAST-UPDATED    "200509070000Z"
+        ORGANIZATION    ""
+        CONTACT-INFO
+                	""
+			
+        DESCRIPTION
+                "Analog Voice Interface MIB module.
+                 This MIB manages the E&M, FXO, FXS         
+                 Interfaces in the router.
+                "
+        ::= { nmsMgmt 63 }
+
+
+
+nmsIfObjects   OBJECT IDENTIFIER ::= { nmsIfMIB 1 }  
+
+
+--***************************************************************************
+--The Aanalog Voice Interface Group
+--***************************************************************************
+
+          -- the Voice Interfaces group
+
+          -- Implementation of the Voice Interfaces group is mandatory for
+          -- all systems having VOICE interfaces
+          -- the Voice Interfaces table
+
+          -- The Voice Interfaces table contains information on the entity's
+          -- Voice interfaces.  Each Voice interface is thought of as being
+          -- attached to a `subnetwork'.  Note that this term should
+          -- not be confused with `subnet' which refers to an
+          -- addressing partitioning scheme used in the Internet suite
+          -- of protocols.
+
+          vifTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF VIfEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "A list of voice interface entries.  The number of
+                      entries is given by the value of ifNumber."
+              ::= { nmsIfObjects 1 }
+
+          vifEntry OBJECT-TYPE
+              SYNTAX  VIfEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "An interface entry containing objects at the
+                      subnetwork layer and below for a particular
+                      interface."
+              INDEX   { vifIndex }
+              ::= { vifTable 1 }
+
+          VIfEntry ::=
+              SEQUENCE {
+                  vifIndex
+                      INTEGER,
+                  vifDescr
+                      DisplayString,
+                  vifType
+                      INTEGER,
+                  vifMtu
+                      INTEGER,
+                  vifSpeed
+                      Gauge32,
+                  vifPhysAddress
+                      PhysAddress,
+                  vifAdminStatus
+                      INTEGER,
+                  vifOperStatus
+                      INTEGER,
+                  vifLastChange
+                      TimeTicks
+              }
+          vifIndex OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "A unique value for each voice interface.  Its value
+                      ranges between 1 and the value of vifNumber.  The
+                      value for each voice interface must remain constant at
+                      least from one re-initialization of the entity's
+                      network management system to the next re-
+                      initialization."
+              ::= { vifEntry 1 }
+
+          vifDescr OBJECT-TYPE
+              SYNTAX  DisplayString (SIZE (0..255))
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "A textual string containing information about the
+                      voice interface.  This string should include the name of
+                      the manufacturer, the product name and the version
+                      of the hardware interface."
+              ::= { vifEntry 2 }
+
+          vifType OBJECT-TYPE
+              SYNTAX  INTEGER {
+                          other(1),          -- none of the following
+                          voiceEM(100),       -- voice recEive and transMit
+                   		  voiceFXO(101),      -- voice Foreign Exchange Office
+                   		  voiceFXS(102)       -- voice Foreign Exchange Station
+                      }
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The type of Voice interface, distinguished according to
+                      the physical/link protocol(s) immediately `below'
+                      the network layer in the protocol stack."
+              ::= { vifEntry 3 }
+
+          vifMtu OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The size of the largest datagram which can be
+                      sent/received on the voice interface, specified in
+                      octets.  in fact,for voice interface,this value should be 0"
+              ::= { vifEntry 4 }
+
+          vifSpeed OBJECT-TYPE
+              SYNTAX  Gauge32
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "contains a zero value."
+              ::= { vifEntry 5 }
+
+          vifPhysAddress OBJECT-TYPE
+              SYNTAX  PhysAddress
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "contains an octet string of zero length."
+              ::= { vifEntry 6 }
+
+          vifAdminStatus OBJECT-TYPE
+              SYNTAX  INTEGER {
+                          up(1),       -- ready to pass packets
+                   		  down(2),
+                   		  testing(3)   -- in some test mode
+                      }
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "The desired administrative status of the
+                      Analog Telephony interface port."
+              ::= { vifEntry 7 }
+
+          vifOperStatus OBJECT-TYPE
+              SYNTAX  INTEGER {
+                          up(1),       -- ready to pass packets
+                   		  down(2),
+                   		  testing(3),  -- in some test mode
+                   		  unknown(4),  -- status can not be determined
+                                	   -- for some reason.
+                   		  dormant(5)
+                      }
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The current operational state of the interface.
+                      The testing(3) state indicates that no operational
+                      packets can be passed."
+              ::= { vifEntry 8 }
+
+          vifLastChange OBJECT-TYPE
+              SYNTAX  TimeTicks
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The value of sysUpTime at the time the interface
+                      entered its current operational state.  If the
+                      current state was entered prior to the last re-
+                      initialization of the local network management
+                      subsystem, then this object contains a zero
+                      value."
+              ::= { vifEntry 9 }              
+              
+              
+
+          ifStormControlTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF IfStormControlEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "A list of interface entries.  The number of
+                      entries is given by the value of ifNumber."
+              ::= { nmsIfObjects 2 }
+
+          ifStormControlEntry OBJECT-TYPE
+              SYNTAX  IfStormControlEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "An interface entry containing objects at the
+                      subnetwork layer and below for a particular
+                      interface."
+              INDEX   { ifIndex }
+              ::= { ifStormControlTable 1 }
+
+          IfStormControlEntry ::=
+              SEQUENCE {
+                  ifIndex
+                      INTEGER,
+                  ifStormControlBroadcast
+                      INTEGER,
+                  ifStormControlMulticast
+                      INTEGER,
+                  ifStormControlUnicast
+                      INTEGER,
+                  ifStormControlBroadcastAction
+                      INTEGER,
+                  ifStormControlBroadcastAutoResume
+                      INTEGER,
+                  ifStormControlMulticastAction
+                      INTEGER,
+                  ifStormControlMulticastAutoResume
+                      INTEGER,
+                  ifStormControlMode
+                      INTEGER,
+                  ifStormControlEnable
+                      BITS
+              }
+          ifIndex OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "A unique value for each voice interface.  Its value
+                      ranges between 1 and the value of vifNumber.  The
+                      value for each voice interface must remain constant at
+                      least from one re-initialization of the entity's
+                      network management system to the next re-
+                      initialization."
+              ::= { ifStormControlEntry 1 }
+
+
+          ifStormControlBroadcast OBJECT-TYPE
+              SYNTAX  INTEGER(10..1000000)
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "Interface Storm Control Broadcast, range is 10-1000000kbps"
+              ::= { ifStormControlEntry 2 }
+
+          ifStormControlMulticast OBJECT-TYPE
+              SYNTAX  INTEGER(10..1000000)
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "Interface Storm Control Multicast, range is 10-1000000kbps"
+              ::= { ifStormControlEntry 3 }
+
+          ifStormControlUnicast OBJECT-TYPE
+              SYNTAX  INTEGER(10..1000000)
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "Interface Storm Control Unicast, range is 10-1000000kbps"
+              ::= { ifStormControlEntry 4 }
+
+          ifStormControlBroadcastAction OBJECT-TYPE
+              SYNTAX  INTEGER{
+                      null(0),
+                      shutdown(1),
+                      block(2),
+                      resume(3)
+              }
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "Interface Storm Control Broadcast Action. shutdown, block, resume or null"
+              ::= { ifStormControlEntry 5 }
+
+          ifStormControlBroadcastAutoResume OBJECT-TYPE
+              SYNTAX  INTEGER(60..36000)
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "Interface Storm Control Broadcast AutoResume, range is 60s-36000s"
+              ::= { ifStormControlEntry 6 }
+
+          ifStormControlMulticastAction OBJECT-TYPE
+              SYNTAX  INTEGER{
+                      null(0),
+                      shutdown(1),
+                      block(2),
+                      resume(3)
+              }
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "Interface Storm Control Multicast Action. shutdown, block, resume or null"
+              ::= { ifStormControlEntry 7 }
+
+          ifStormControlMulticastAutoResume OBJECT-TYPE
+              SYNTAX  INTEGER(60..36000)
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "Interface Storm Control Multicast AutoResume, range is 60s-36000s"
+              ::= { ifStormControlEntry 8 }
+
+          ifStormControlMode OBJECT-TYPE
+              SYNTAX  INTEGER{
+                      pps(0),
+                      kbps(1)
+              }
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "Interface Storm Control Mode, pps or kbps"
+              ::= { ifStormControlEntry 9 }
+
+          ifStormControlEnable OBJECT-TYPE
+              SYNTAX  BITS{
+                      log(0),
+                      trap(1)
+              }
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "Interface Storm Control Warning Enable"
+              ::= { ifStormControlEntry 10 }
+
+ --ifSfpParameterTable
+             ifSfpParameterTable OBJECT-TYPE
+                 SYNTAX  SEQUENCE OF IfSfpParameterEntry
+                 ACCESS  not-accessible
+                 STATUS  mandatory
+                 DESCRIPTION
+                          "A list of sfp property table entries."
+                 ::= { nmsIfObjects 7 }
+
+             ifSfpParameterEntry OBJECT-TYPE
+                 SYNTAX IfSfpParameterEntry
+                 ACCESS  not-accessible
+                 STATUS  mandatory
+                 DESCRIPTION
+                          "A collection of additional objects in the
+                          sfp property table."
+                 INDEX { ifSfpIndex }
+             ::= { ifSfpParameterTable 1 }
+
+             IfSfpParameterEntry ::=
+                 SEQUENCE {
+                     ifSfpIndex
+                         INTEGER,
+                     txPower1
+                         INTEGER,
+                     rxPower1
+                         INTEGER,   
+                     temperature
+                         INTEGER,
+                     vlotage
+                         INTEGER,
+                     curr1
+                         INTEGER,
+                     vendname
+                         OCTET STRING,
+                     txPower2
+                         INTEGER,
+                     rxPower2
+                         INTEGER,   
+                     curr2
+                         INTEGER,
+                     txPower3
+                         INTEGER,
+                     rxPower3
+                         INTEGER,   
+                     curr3
+                         INTEGER,
+                     txPower4
+                         INTEGER,
+                     rxPower4
+                         INTEGER,   
+                     curr4
+                         INTEGER,
+		     type                         
+                          INTEGER,
+		     transDist                         
+                          INTEGER,
+		     waveLen                         
+                          INTEGER,
+		     sfpPresentStatus                         
+                          INTEGER,
+		     sfpLostStatus                         
+                          INTEGER,
+		     sfpMismatchStatus                         
+                          INTEGER,
+             sfpSeqNum
+                          OCTET STRING
+
+                }
+
+             ifSfpIndex OBJECT-TYPE
+                 SYNTAX  INTEGER
+                 ACCESS  read-only
+                 STATUS  mandatory
+                 DESCRIPTION
+                         "The only diid of port in System."
+                 ::= { ifSfpParameterEntry 1 } 
+        
+             txPower1 OBJECT-TYPE
+                 SYNTAX  INTEGER
+                 ACCESS  read-only
+                 STATUS  mandatory
+                 DESCRIPTION
+                         "The tx power 1 of optical module. The unit is 0.01DBm."
+                 ::= { ifSfpParameterEntry 2 } 
+    
+             rxPower1 OBJECT-TYPE
+                 SYNTAX  INTEGER
+                 ACCESS  read-only
+                 STATUS  mandatory
+                 DESCRIPTION
+                         "The rx power 1 of optical module. The unit is 0.01DBm."
+                 ::= { ifSfpParameterEntry 3 } 
+     
+             temperature OBJECT-TYPE
+                 SYNTAX  INTEGER
+                 ACCESS  read-only
+                 STATUS  mandatory
+                 DESCRIPTION
+                         "Sfp module temperature. The unit is 1/256 degree."
+                 ::= { ifSfpParameterEntry 4 } 
+    
+             vlotage OBJECT-TYPE
+                 SYNTAX  INTEGER
+                 ACCESS  read-only
+                 STATUS  mandatory
+                 DESCRIPTION
+                         "Sfp module volt. The unit is 0.1mV."
+                 ::= { ifSfpParameterEntry 5 } 
+    
+             curr1 OBJECT-TYPE
+                 SYNTAX  INTEGER
+                 ACCESS  read-only
+                 STATUS  mandatory
+                 DESCRIPTION
+                         "Sfp module bias current 1. The unit is 2uA."
+                 ::= { ifSfpParameterEntry 6 }
+  
+             vendname OBJECT-TYPE
+                 SYNTAX  OCTET STRING
+                 ACCESS  read-only
+                 STATUS  mandatory
+                 DESCRIPTION
+                         "Sfp module vend name."
+                 ::= { ifSfpParameterEntry 7 }
+            txPower2 OBJECT-TYPE
+                 SYNTAX  INTEGER
+                 ACCESS  read-only
+                 STATUS  mandatory
+                 DESCRIPTION
+                         "The tx 2 power of optical module. The unit is 0.01DBm."
+                 ::= { ifSfpParameterEntry 8 } 
+            rxPower2 OBJECT-TYPE
+                 SYNTAX  INTEGER
+                 ACCESS  read-only
+                 STATUS  mandatory
+                 DESCRIPTION
+                         "The rx 2 power of optical module. The unit is 0.01DBm."
+                 ::= { ifSfpParameterEntry 9 } 
+            curr2 OBJECT-TYPE
+                 SYNTAX  INTEGER
+                 ACCESS  read-only
+                 STATUS  mandatory
+                 DESCRIPTION
+                         "Sfp module bias current 2. The unit is 2uA."
+                 ::= { ifSfpParameterEntry 10 }
+            txPower3 OBJECT-TYPE
+                 SYNTAX  INTEGER
+                 ACCESS  read-only
+                 STATUS  mandatory
+                 DESCRIPTION
+                         "The tx 3 power of optical module. The unit is 0.01DBm."
+                 ::= { ifSfpParameterEntry 11 } 
+            rxPower3 OBJECT-TYPE
+                 SYNTAX  INTEGER
+                 ACCESS  read-only
+                 STATUS  mandatory
+                 DESCRIPTION
+                         "The rx 3 power of optical module. The unit is 0.01DBm."
+                 ::= { ifSfpParameterEntry 12 } 
+            curr3 OBJECT-TYPE
+                 SYNTAX  INTEGER
+                 ACCESS  read-only
+                 STATUS  mandatory
+                 DESCRIPTION
+                         "Sfp module bias current 3. The unit is 2uA."
+                 ::= { ifSfpParameterEntry 13 }
+            txPower4 OBJECT-TYPE
+                 SYNTAX  INTEGER
+                 ACCESS  read-only
+                 STATUS  mandatory
+                 DESCRIPTION
+                         "The tx 4 power  of optical module. The unit is 0.01DBm."
+                 ::= { ifSfpParameterEntry 14 } 
+            rxPower4 OBJECT-TYPE
+                 SYNTAX  INTEGER
+                 ACCESS  read-only
+                 STATUS  mandatory
+                 DESCRIPTION
+                         "The rx 4 power of optical module. The unit is 0.01DBm."
+                 ::= { ifSfpParameterEntry 15 } 
+            curr4 OBJECT-TYPE
+                 SYNTAX  INTEGER
+                 ACCESS  read-only
+                 STATUS  mandatory
+                 DESCRIPTION
+                         "Sfp module bias current 4. The unit is 2uA."
+                 ::= { ifSfpParameterEntry 16 }    
+                               
+            type OBJECT-TYPE
+                 SYNTAX  INTEGER{
+                                   sfp(1),
+                                   copper-sfp(2),
+                                   other(3)
+                                 }
+                 ACCESS  read-only
+                 STATUS  mandatory
+                 DESCRIPTION
+                         "Sfp module interface type. "
+                 ::= { ifSfpParameterEntry 17 }    
+                               
+            transDist OBJECT-TYPE
+                 SYNTAX  INTEGER
+                 ACCESS  read-only
+                 STATUS  mandatory
+                 DESCRIPTION
+                         "Sfp module interface transmission distance. Unit is meter. "
+                 ::= { ifSfpParameterEntry 18 }    
+                               
+            waveLen OBJECT-TYPE
+                 SYNTAX  INTEGER
+                 ACCESS  read-only
+                 STATUS  mandatory
+                 DESCRIPTION
+                         "Sfp module interface wave length. Unit is nm. "
+                 ::= { ifSfpParameterEntry 19 }    
+                               
+            sfpPresentStatus OBJECT-TYPE
+                 SYNTAX  INTEGER{
+                 		 online(1),
+                                 offline(2)                             
+                                 }
+                 ACCESS  read-only
+                 STATUS  mandatory
+                 DESCRIPTION
+                         "SFP status. "
+                 ::= { ifSfpParameterEntry 20 }    
+                               
+            sfpLostStatus OBJECT-TYPE
+                 SYNTAX  INTEGER{
+                 		 normal(1),
+                                 lost(2)
+                                 }
+                 ACCESS  read-only
+                 STATUS  mandatory
+                 DESCRIPTION
+                         "SFP status. "
+                 ::= { ifSfpParameterEntry 21 }    
+                               
+            sfpMismatchStatus OBJECT-TYPE
+                 SYNTAX  INTEGER{
+                 		 match(1),
+                                 mismatch(2)
+                                 }
+                 ACCESS  read-only
+                 STATUS  mandatory
+                 DESCRIPTION
+                         "SFP status. "
+                 ::= { ifSfpParameterEntry 22 }    
+                               
+           sfpSeqNum OBJECT-TYPE
+                 SYNTAX  OCTET STRING
+                 ACCESS  read-only
+                 STATUS  mandatory
+                 DESCRIPTION
+                         "SFP sequence number. "
+                 ::= { ifSfpParameterEntry 23 }    
+                               
+             
+                          
+                                
+                               
+                               
+                               
+ --cableDiagnoseTable
+             cableDiagnoseTable OBJECT-TYPE
+                 SYNTAX  SEQUENCE OF CableDiagnoseEntry
+                 ACCESS  not-accessible
+                 STATUS  mandatory
+                 DESCRIPTION
+                          "A interface list of cable diagnose table entries."
+                 ::= { nmsIfObjects 8 }
+
+             cableDiagnoseEntry OBJECT-TYPE
+                 SYNTAX CableDiagnoseEntry
+                 ACCESS  not-accessible
+                 STATUS  mandatory
+                 DESCRIPTION
+                          "A collection of cable diagnose objects in the
+                          interface table."
+                 INDEX { cableDiagIfIndex }
+             ::= { cableDiagnoseTable 1 }
+
+             CableDiagnoseEntry ::=
+                 SEQUENCE {
+                     cableDiagIfIndex
+                         INTEGER,
+--                     enable
+--                         INTEGER,
+--                     period
+--                         INTEGER,   
+--                     description 
+--                         OCTET STRING                      
+                     cableDiagnoseResult 
+                         OCTET STRING                      
+                 }
+
+             cableDiagIfIndex OBJECT-TYPE
+                 SYNTAX  INTEGER
+                 ACCESS  read-only
+                 STATUS  mandatory
+                 DESCRIPTION
+                         "The only diid of port in System."
+                 ::= { cableDiagnoseEntry 1 } 
+        
+--             enable OBJECT-TYPE
+--                 SYNTAX  INTEGER{
+--                                enable(1),
+--                                disable(2)
+--                                }
+--                 ACCESS  read-write
+--                 STATUS  mandatory
+--                 DESCRIPTION
+--                         "enable=1,disable=2."
+--                 ::= { cableDiagnoseEntry 2 } 
+--    
+--             period OBJECT-TYPE
+--                 SYNTAX  INTEGER(0..32767)
+--                 ACCESS  read-write
+--                 STATUS  mandatory
+--                 DESCRIPTION
+--                         "period=0 means manual scanning, the range of auto scanning period is 1-32767."
+--                 ::= { cableDiagnoseEntry 3 } 
+--        
+--             description OBJECT-TYPE
+--                 SYNTAX  OCTET STRING 
+--                 ACCESS  read-only
+--                 STATUS  mandatory
+--                 DESCRIPTION
+--                         "cable diagnoisis descpription."
+--                 ::= { cableDiagnoseEntry 4 } 
+        
+             cableDiagnoseResult OBJECT-TYPE
+                 SYNTAX  OCTET STRING 
+                 ACCESS  read-only
+                 STATUS  mandatory
+                 DESCRIPTION
+                         "cable diagnoisis descpription."
+                 ::= { cableDiagnoseEntry 2 } 
+        
+ --ifportMtuTable
+             ifportMtuTable OBJECT-TYPE
+                 SYNTAX  SEQUENCE OF IfportMtuEntry
+                 ACCESS  not-accessible
+                 STATUS  mandatory
+                 DESCRIPTION
+                          "A interface list of switchport mtujumbo."
+                 ::= { nmsIfObjects 9 }
+
+             ifportMtuEntry OBJECT-TYPE
+                 SYNTAX IfportMtuEntry
+                 ACCESS  not-accessible
+                 STATUS  mandatory
+                 DESCRIPTION
+                          "A collection of switchport mtujumbo objects in the
+                          interface table."
+                 INDEX { ifportMtuIndex }
+             ::= { ifportMtuTable 1 }
+
+             IfportMtuEntry ::=
+                 SEQUENCE {
+                     ifportMtuIndex
+                         INTEGER,
+                     ifportMtuJumbo
+                         INTEGER,
+                 }
+
+             ifportMtuIndex OBJECT-TYPE
+                 SYNTAX  INTEGER
+                 ACCESS  read-only
+                 STATUS  mandatory
+                 DESCRIPTION
+                         "The only diid of port in System."
+                 ::= { ifportMtuEntry 1 } 
+
+             ifportMtuJumbo OBJECT-TYPE
+                 SYNTAX  INTEGER
+                 ACCESS  read-write
+                 STATUS  mandatory
+                 DESCRIPTION
+                         "Set the MTU size in bytes <1500-9216>."
+                 ::= { ifportMtuEntry 2 }                
+                 
+-- stormctlWarning（STORM-CONTROL告警）1.3.6.1.4.1.3320.9.63.1.10
+
+        stormctlWarning               OBJECT IDENTIFIER ::= { nmsIfObjects 10 }
+
+        stormctlWarningGroup          OBJECT IDENTIFIER ::= { stormctlWarning 1 }
+
+        stormctlWarningIfindex OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  accessible-for-notify
+            STATUS  mandatory
+
+            DESCRIPTION
+                    "Index of interface"
+            ::= { stormctlWarningGroup 1 }
+
+        stormctlWarningIfDescr OBJECT-TYPE
+            SYNTAX  DisplayString
+            ACCESS  accessible-for-notify
+            STATUS  mandatory
+
+            DESCRIPTION
+                    "Description of interface"
+            ::= { stormctlWarningGroup 2 }
+
+        stormctlWarningType OBJECT-TYPE
+            SYNTAX  INTEGER {
+                    broadcast(1),
+                    multicast(2),
+            }
+            ACCESS  accessible-for-notify
+            STATUS  mandatory
+
+            DESCRIPTION
+                    "Type of flow which exceeded"
+            ::= { stormctlWarningGroup 3 }
+
+        stormctlWarningInfo OBJECT-TYPE
+            SYNTAX  DisplayString
+            ACCESS  accessible-for-notify
+            STATUS  mandatory
+
+            DESCRIPTION
+                    "Description of the detail information"
+            ::= { stormctlWarningGroup 4 }
+
+        stormctlWarningNotifications          OBJECT IDENTIFIER ::= { stormctlWarning 2 }
+        
+        stormctlWarningNotification NOTIFICATION-TYPE
+            OBJECTS {
+                stormctlWarningIfindex,
+                stormctlWarningIfDescr,
+                stormctlWarningType,
+                stormctlWarningInfo            }
+                
+            STATUS  mandatory
+            DESCRIPTION
+                    "The agent generates this notification when storm-control exceeds."
+            ::= { stormctlWarningNotifications 1 }
+              
+
+
+-- trafficNotify（traffic notify告警）1.3.6.1.4.1.3320.9.63.1.11
+
+        trafficNotify               OBJECT IDENTIFIER ::= { nmsIfObjects 11 }
+
+        trafficNotifyGroup          OBJECT IDENTIFIER ::= { trafficNotify 1 }
+
+        trafficNotifyIfIndex OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  accessible-for-notify
+            STATUS  mandatory
+
+            DESCRIPTION
+                    "Index of interface"
+            ::= { trafficNotifyGroup 1 }
+
+        trafficNotifyIfDescr OBJECT-TYPE
+            SYNTAX  DisplayString
+            ACCESS  accessible-for-notify
+            STATUS  mandatory
+
+            DESCRIPTION
+                    "Description of interface"
+            ::= { trafficNotifyGroup 2 }
+
+        trafficNotifyType OBJECT-TYPE
+            SYNTAX  INTEGER {
+                    exceed(1),
+                    resume(2),
+            }
+            ACCESS  accessible-for-notify
+            STATUS  mandatory
+
+            DESCRIPTION
+                    "Type of notify"
+            ::= { trafficNotifyGroup 3 }
+
+        trafficNotifyInfo OBJECT-TYPE
+            SYNTAX  DisplayString
+            ACCESS  accessible-for-notify
+            STATUS  mandatory
+
+            DESCRIPTION
+                    "Description of the detail information"
+            ::= { trafficNotifyGroup 4 }
+
+        trafficNotifyNotifications          OBJECT IDENTIFIER ::= { trafficNotify 2 }
+        
+        trafficNotifyNotification NOTIFICATION-TYPE
+            OBJECTS {
+                trafficNotifyIfindex,
+                trafficNotifyIfDescr,
+                trafficNotifyType,
+                trafficNotifyInfo            }
+                
+            STATUS  mandatory
+            DESCRIPTION
+                    "The agent generates this notification when interface's utility is too high."
+            ::= { trafficNotifyNotifications 1 }
+              
+        trafficNotifyConfig          OBJECT IDENTIFIER ::= { trafficNotify 3 }
+
+        trafficNotifyAction    OBJECT-TYPE
+                    SYNTAX  BITS {
+                            syslog(0),
+                            snmp-trap(1)
+                    }
+                    ACCESS  read-write
+                    STATUS  mandatory
+
+                    DESCRIPTION
+                            "Interface traffic notifty  Enable."
+                    ::= { trafficNotifyConfig 1 }
+
+
+        trafficNotifyInterval OBJECT-TYPE
+                    SYNTAX  INTEGER(0..600)
+                    ACCESS  read-write
+                    STATUS  mandatory
+                    DESCRIPTION
+                            "Set notifiy interval in seconds(default 20). Log and trap will be turned off after set.Set 0 means no cmd."
+                    ::= { trafficNotifyConfig 2 }
+
+
+-- ifTrafficNotifyTable （端口的traffic notify报警利用率）1.3.6.1.4.1.3320.9.63.1.12
+ifTrafficNotifyTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF IfTrafficNotifyEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "A list of interface entries.  The number of
+                      entries is given by the value of ifNumber."
+              ::= { nmsIfObjects 12 }
+
+          ifTrafficNotifyEntry OBJECT-TYPE
+              SYNTAX  IfTrafficNotifyEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "An interface entry containing objects at the
+                      subnetwork layer and below for a particular
+                      interface."
+              INDEX   { ifTrafficNotifyIndex }
+              ::= { ifTrafficNotifyTable 1 }
+
+          IfTrafficNotifyEntry ::=
+              SEQUENCE {
+                ifTrafficNotifyIndex
+                    INTEGER,
+                ifTrafficNotifyInHighRate
+                    INTEGER,
+                ifTrafficNotifyInResumeRate
+                    INTEGER,
+                ifTrafficNotifyOutHighRate
+                    INTEGER,
+                ifTrafficNotifyOutResumeRate
+                    INTEGER
+              }
+
+
+            ifTrafficNotifyIndex OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-only
+                STATUS  mandatory
+
+                DESCRIPTION
+                        "A unique value for each voice interface.  Its value
+                        ranges between 1 and the value of vifNumber.  The
+                        value for each voice interface must remain constant at
+                        least from one re-initialization of the entity's
+                        network management system to the next re-
+                        initialization."
+                ::= { ifTrafficNotifyEntry 1 }
+
+
+            ifTrafficNotifyInHighRate OBJECT-TYPE
+                SYNTAX  INTEGER(0..100)
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "The alarm utility rate of port inlet direction, set 0 means no cmd."
+                ::= { ifTrafficNotifyEntry 2 }
+
+            ifTrafficNotifyInResumeRate OBJECT-TYPE
+                SYNTAX  INTEGER(0..100)
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "The resume utility rate of port inlet direction, set 0 means no cmd."
+                ::= { ifTrafficNotifyEntry 3 }
+
+            ifTrafficNotifyOutHighRate OBJECT-TYPE
+                SYNTAX  INTEGER(0..100)
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "The alarm utility rate of port outlet direction, set 0 means no cmd."
+                ::= { ifTrafficNotifyEntry 4 }
+
+            ifTrafficNotifyOutResumeRate OBJECT-TYPE
+                SYNTAX  INTEGER(0..100)
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "The resume utility rate of port outlet direction, set 0 means no cmd."
+                ::= { ifTrafficNotifyEntry 5 }
+
+
+
+
+
+-- port-security-violation-notify（端口安全保护动作日志）1.3.6.1.4.1.3320.9.63.1.13
+
+        portSecurityViolationNotify               OBJECT IDENTIFIER ::= { nmsIfObjects 13 }
+
+        portSecurityViolationNotifyGroup          OBJECT IDENTIFIER ::= { portSecurityViolationNotify 1 }
+
+        portSecurityViolationNotifyIfindex OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  accessible-for-notify
+            STATUS  mandatory
+
+            DESCRIPTION
+                    "Index of interface"
+            ::= { portSecurityViolationNotifyGroup 1 }
+
+        portSecurityViolationNotifyIfDescr OBJECT-TYPE
+            SYNTAX  DisplayString
+            ACCESS  accessible-for-notify
+            STATUS  mandatory
+
+            DESCRIPTION
+                    "Description of interface"
+            ::= { portSecurityViolationNotifyGroup 2 }
+
+        portSecurityViolationNotifyInfo OBJECT-TYPE
+            SYNTAX  DisplayString
+            ACCESS  accessible-for-notify
+            STATUS  mandatory
+
+            DESCRIPTION
+                    "Description of the detail log information"
+            ::= { portSecurityViolationNotifyGroup 3 }
+
+        portSecurityViolationNotifyNotifications          OBJECT IDENTIFIER ::= { portSecurityViolationNotify 2 }
+        
+        portSecurityViolationNotifyNotification NOTIFICATION-TYPE
+            OBJECTS {
+                portSecurityViolationNotifyIfindex,
+                portSecurityViolationNotifyIfDescr,
+                portSecurityViolationNotifyInfo            }
+                
+            STATUS  mandatory
+            DESCRIPTION
+                    "The agent generates this notification when port security violantin log."
+            ::= { portSecurityViolationNotifyNotifications 1 }
+             
+
+
+END
+
+
+

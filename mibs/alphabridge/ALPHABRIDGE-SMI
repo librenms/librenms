@@ -1,7 +1,7 @@
 -- *****************************************************************
 -- ALPHABRIDGE-SMI.my:  alphabridge Enterprise Structure of Management Information
 --
--- June 2000
+-- June 2023
 --
 -- *****************************************************************
 
@@ -36,23 +36,23 @@ alphabridgeProducts OBJECT-IDENTITY
 		which sysObjectID values are assigned."
 	::= { alphabridge 1 }
 
-bdlocal OBJECT-IDENTITY
+ablocal OBJECT-IDENTITY
 	STATUS	current
 	DESCRIPTION
 		"Subtree beneath which pre-10.2 MIBS were built."
 	::= { alphabridge 2 }
 	
-bdtemporary OBJECT-IDENTITY
+abtemporary OBJECT-IDENTITY
 	STATUS	current
 	DESCRIPTION
 		"Subtree beneath which pre-10.2 experiments were
 		placed."
 	::= { alphabridge 3 }
 	
-bdMgmt OBJECT-IDENTITY
+abMgmt OBJECT-IDENTITY
 	STATUS	current
 	DESCRIPTION
-		"bdMgmt is the main subtree for new mib development."
+		"abMgmt is the main subtree for new mib development."
 	::= { alphabridge 9 }  
 alphabridgeModules OBJECT-IDENTITY
 	STATUS	current
