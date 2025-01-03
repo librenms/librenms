@@ -50,10 +50,10 @@ class AxisAlarmCleared implements SnmptrapHandler
         } else {
             $AlarmID = $trap->getOidData($trap->findOid('AXIS-VIDEO-MIB::alarmID'));
         }
-        
+
         $AlarmName = $trap->getOidData($trap->findOid('AXIS-VIDEO-MIB::alarmName'));
         $Message = $trap->getOidData($trap->findOid('AXIS-VIDEO-MIB::alarmText'));
-        
+
         $trap->log("Axis Alarm Cleared Trap: Alarm ID $AlarmID for $AlarmName with text \"$Message\" has cleared", Severity::Ok);
     }
 }
