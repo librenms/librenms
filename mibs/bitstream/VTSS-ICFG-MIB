@@ -1,0 +1,331 @@
+-- *****************************************************************
+-- ICFG-MIB:  Vitesse private MIB
+--
+-- Copyright (c) 2002-2013 Vitesse Semiconductor Corporation "Vitesse".
+-- All Rights Reserved.
+--
+-- ****************************************************************
+
+VTSS-ICFG-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    vtssSwitchMgmt
+        FROM VTSS-SMI
+    Integer32 FROM SNMPv2-SMI
+    Unsigned32 FROM SNMPv2-SMI
+    TruthValue FROM SNMPv2-TC
+    VTSSDisplayString FROM VTSS-TC
+    ;
+
+vtssIcfgMib MODULE-IDENTITY
+    LAST-UPDATED "201410100000Z"
+    ORGANIZATION
+        "Vitesse Semiconductor Corporation"
+    CONTACT-INFO
+        "Application support <application_support@vitesse.com>"
+    DESCRIPTION
+        "This is a private version of ICFG"
+    REVISION    "201410100000Z"
+    DESCRIPTION
+        "Editorial changes"
+    REVISION    "201407010000Z"
+    DESCRIPTION
+        "Initial version"
+    ::= { vtssSwitchMgmt 101 }
+
+
+VTSSIcfgConfigStatus ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This enumeration defines the type of configuration."
+    SYNTAX      INTEGER { none(0), success(1), inProgress(2), errOtherInProcessing(3), errNoSuchFile(4), errSameSrcDst(5), errPermissionDenied(6), errLoadSrc(7), errSaveDst(8) }
+
+VTSSIcfgConfigType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This enumeration defines the type of configuration."
+    SYNTAX      INTEGER { none(0), runningConfig(1), startupConfig(2), configFile(3) }
+
+VTSSIcfgReloadDefault ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This enumeration defines the type of reload default."
+    SYNTAX      INTEGER { none(0), default(1), defaultKeepIp(2) }
+
+vtssIcfgMibObjects OBJECT IDENTIFIER
+    ::= { vtssIcfgMib 1 }
+
+vtssIcfgStatus OBJECT IDENTIFIER
+    ::= { vtssIcfgMibObjects 3 }
+
+vtssIcfgStatusFileStatistics OBJECT IDENTIFIER
+    ::= { vtssIcfgStatus 1 }
+
+vtssIcfgStatusFileStatisticsNumberOfFiles OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Number of files in flash."
+    ::= { vtssIcfgStatusFileStatistics 1 }
+
+vtssIcfgStatusFileStatisticsTotalBytes OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Total number of bytes used by all files in flash."
+    ::= { vtssIcfgStatusFileStatistics 2 }
+
+vtssIcfgStatusFileTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VTSSIcfgStatusFileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is a table of status of files in flash."
+    ::= { vtssIcfgStatus 2 }
+
+vtssIcfgStatusFileEntry OBJECT-TYPE
+    SYNTAX      VTSSIcfgStatusFileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each entry has a set of file status."
+    INDEX       { vtssIcfgStatusFileFileNo }
+    ::= { vtssIcfgStatusFileTable 1 }
+
+VTSSIcfgStatusFileEntry ::= SEQUENCE {
+    vtssIcfgStatusFileFileNo    Integer32,
+    vtssIcfgStatusFileFileName      VTSSDisplayString,
+    vtssIcfgStatusFileBytes     Unsigned32,
+    vtssIcfgStatusFileModifiedTime      VTSSDisplayString,
+    vtssIcfgStatusFileAttribute     VTSSDisplayString
+}
+
+vtssIcfgStatusFileFileNo OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The number of File. The number starts from 1."
+    ::= { vtssIcfgStatusFileEntry 1 }
+
+vtssIcfgStatusFileFileName OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..127))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "File name."
+    ::= { vtssIcfgStatusFileEntry 2 }
+
+vtssIcfgStatusFileBytes OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Number of bytes of the file."
+    ::= { vtssIcfgStatusFileEntry 3 }
+
+vtssIcfgStatusFileModifiedTime OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..39))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Last modified time of the file."
+    ::= { vtssIcfgStatusFileEntry 4 }
+
+vtssIcfgStatusFileAttribute OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..15))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "File attribute in the linux format of drwxrwxrwx. 'd' is directory or
+         not, the permission of rwx is for owner, group and other, respectively."
+    ::= { vtssIcfgStatusFileEntry 5 }
+
+vtssIcfgStatusCopyConfig OBJECT IDENTIFIER
+    ::= { vtssIcfgStatus 3 }
+
+vtssIcfgStatusCopyConfigStatus OBJECT-TYPE
+    SYNTAX      VTSSIcfgConfigStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The status indicates the status of current copy operation. none(0)
+         means no copy operation. success(1) means copy operation is successful.
+         inProgress(2) means current copy operation is in progress.
+         errOtherInProcessing(3) means copy operation is failed due to other in
+         processing. errNoSuchFile(4) means copy operation is failed due to file
+         not existing. errSameSrcDst(5) means copy operation is failed due to
+         the source and destination are the same. errPermissionDenied(6) means
+         copy operation is failed due to the destination is not permitted to
+         modify. errLoadSrc(7) means copy operation is failed due to the error
+         to load source file. errSaveDst(8) means copy operation is failed due
+         to the error to save or commit destination."
+    ::= { vtssIcfgStatusCopyConfig 1 }
+
+vtssIcfgControl OBJECT IDENTIFIER
+    ::= { vtssIcfgMibObjects 4 }
+
+vtssIcfgControlGlobals OBJECT IDENTIFIER
+    ::= { vtssIcfgControl 1 }
+
+vtssIcfgControlGlobalsReloadDefault OBJECT-TYPE
+    SYNTAX      VTSSIcfgReloadDefault
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Reset system to default. none(0) is to do nothing. default(1) is to
+         reset the whole system to default. defaultKeepIp(2) is to reset system
+         to default, but keep IP address of VLAN 1."
+    ::= { vtssIcfgControlGlobals 1 }
+
+vtssIcfgControlGlobalsDeleteFile OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..127))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Delete file in flash. The format is flash:filename. Where
+         'default-config' is read-only and not allowed to be deleted."
+    ::= { vtssIcfgControlGlobals 2 }
+
+vtssIcfgControlCopyConfig OBJECT IDENTIFIER
+    ::= { vtssIcfgControl 2 }
+
+vtssIcfgControlCopyConfigCopy OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Action to do copy or not. true is to do the copy operation. false is to
+         do nothing"
+    ::= { vtssIcfgControlCopyConfig 1 }
+
+vtssIcfgControlCopyConfigSourceConfigType OBJECT-TYPE
+    SYNTAX      VTSSIcfgConfigType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Source configuration type. none(0) means no configuration file.
+         runningConfig(1) means running configuration. startupConfig(2) means
+         startup configuration file in flash. configFile(3) is the configuration
+         file specified in SourceConfigFile."
+    ::= { vtssIcfgControlCopyConfig 2 }
+
+vtssIcfgControlCopyConfigSourceConfigFile OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..127))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Source configuration file. If the configuration file is in flash then
+         the format is flash:'filename'. If the configuration file is from tftp
+         then the format is tftp://server[:port]/path-to-file."
+    ::= { vtssIcfgControlCopyConfig 3 }
+
+vtssIcfgControlCopyConfigDestinationConfigType OBJECT-TYPE
+    SYNTAX      VTSSIcfgConfigType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Source configuration type. none(0) means no configuration file.
+         runningConfig(1) means running configuration. startupConfig(2) means
+         startup configuration file in flash. configFile(3) is the configuration
+         file specified in DestinationConfigFile."
+    ::= { vtssIcfgControlCopyConfig 4 }
+
+vtssIcfgControlCopyConfigDestinationConfigFile OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..127))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Destination configuration file. If the configuration file is in flash
+         then the format is flash:filename. If the configuration file is from
+         tftp then the format is tftp://server[:port]/filename_with_path. Where
+         'default-config' is read-only and not allowed to be deleted."
+    ::= { vtssIcfgControlCopyConfig 5 }
+
+vtssIcfgControlCopyConfigMerge OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "This flag works only if DestinationConfigType is runningConfig(1). true
+         is to merge the source configuration into the current running
+         configuration. false is to replace the current running configuration
+         with the source configuration."
+    ::= { vtssIcfgControlCopyConfig 6 }
+
+vtssIcfgMibConformance OBJECT IDENTIFIER
+    ::= { vtssIcfgMib 2 }
+
+vtssIcfgMibCompliances OBJECT IDENTIFIER
+    ::= { vtssIcfgMibConformance 1 }
+
+vtssIcfgMibGroups OBJECT IDENTIFIER
+    ::= { vtssIcfgMibConformance 2 }
+
+vtssIcfgStatusFileStatisticsInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssIcfgStatusFileStatisticsNumberOfFiles, 
+                  vtssIcfgStatusFileStatisticsTotalBytes }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssIcfgMibGroups 1 }
+
+vtssIcfgStatusFileTableInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssIcfgStatusFileFileName, vtssIcfgStatusFileBytes, 
+                  vtssIcfgStatusFileModifiedTime, vtssIcfgStatusFileAttribute }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssIcfgMibGroups 2 }
+
+vtssIcfgStatusCopyConfigInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssIcfgStatusCopyConfigStatus }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssIcfgMibGroups 3 }
+
+vtssIcfgControlGlobalsInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssIcfgControlGlobalsReloadDefault, 
+                  vtssIcfgControlGlobalsDeleteFile }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssIcfgMibGroups 4 }
+
+vtssIcfgControlCopyConfigInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssIcfgControlCopyConfigCopy, 
+                  vtssIcfgControlCopyConfigSourceConfigType, 
+                  vtssIcfgControlCopyConfigSourceConfigFile, 
+                  vtssIcfgControlCopyConfigDestinationConfigType, 
+                  vtssIcfgControlCopyConfigDestinationConfigFile, 
+                  vtssIcfgControlCopyConfigMerge }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssIcfgMibGroups 5 }
+
+vtssIcfgMibCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the implementation."
+
+    MODULE      -- this module
+
+        MANDATORY-GROUPS        { vtssIcfgStatusFileStatisticsInfoGroup, 
+                  vtssIcfgStatusFileTableInfoGroup, 
+                  vtssIcfgStatusCopyConfigInfoGroup, 
+                  vtssIcfgControlGlobalsInfoGroup, 
+                  vtssIcfgControlCopyConfigInfoGroup }
+
+    ::= { vtssIcfgMibCompliances 1 }
+
+END

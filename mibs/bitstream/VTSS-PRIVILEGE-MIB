@@ -1,0 +1,139 @@
+-- *****************************************************************
+-- PRIVILEGE-MIB:  Vitesse private MIB
+--
+-- Copyright (c) 2002-2013 Vitesse Semiconductor Corporation "Vitesse".
+-- All Rights Reserved.
+--
+-- ****************************************************************
+
+VTSS-PRIVILEGE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    vtssSwitchMgmt
+        FROM VTSS-SMI
+    Unsigned32 FROM SNMPv2-SMI
+    VTSSDisplayString FROM VTSS-TC
+    ;
+
+vtssPrivilegeMib MODULE-IDENTITY
+    LAST-UPDATED "201407010000Z"
+    ORGANIZATION
+        "Vitesse Semiconductor Corporation"
+    CONTACT-INFO
+        "Application support <application_support@vitesse.com>"
+    DESCRIPTION
+        "This is a private version of Privilege"
+    REVISION    "201407010000Z"
+    DESCRIPTION
+        "Initial version"
+    ::= { vtssSwitchMgmt 59 }
+
+
+vtssPrivilegeMibObjects OBJECT IDENTIFIER
+    ::= { vtssPrivilegeMib 1 }
+
+vtssPrivilegeConfig OBJECT IDENTIFIER
+    ::= { vtssPrivilegeMibObjects 2 }
+
+vtssPrivilegeConfigWebTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VTSSPrivilegeConfigWebEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is a table to configure web privilege"
+    ::= { vtssPrivilegeConfig 1 }
+
+vtssPrivilegeConfigWebEntry OBJECT-TYPE
+    SYNTAX      VTSSPrivilegeConfigWebEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each module has a set of parameters"
+    INDEX       { vtssPrivilegeConfigWebModuleName }
+    ::= { vtssPrivilegeConfigWebTable 1 }
+
+VTSSPrivilegeConfigWebEntry ::= SEQUENCE {
+    vtssPrivilegeConfigWebModuleName    VTSSDisplayString,
+    vtssPrivilegeConfigWebConfigRoPriv      Unsigned32,
+    vtssPrivilegeConfigWebConfigRwPriv      Unsigned32,
+    vtssPrivilegeConfigWebStatusRoPriv      Unsigned32,
+    vtssPrivilegeConfigWebStatusRwPriv      Unsigned32
+}
+
+vtssPrivilegeConfigWebModuleName OBJECT-TYPE
+    SYNTAX      VTSSDisplayString (SIZE(0..31))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Module name."
+    ::= { vtssPrivilegeConfigWebEntry 1 }
+
+vtssPrivilegeConfigWebConfigRoPriv OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Web privilege of read-only configuration."
+    ::= { vtssPrivilegeConfigWebEntry 2 }
+
+vtssPrivilegeConfigWebConfigRwPriv OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Web privilege of read-write configuration."
+    ::= { vtssPrivilegeConfigWebEntry 3 }
+
+vtssPrivilegeConfigWebStatusRoPriv OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Web privilege of read-only status."
+    ::= { vtssPrivilegeConfigWebEntry 4 }
+
+vtssPrivilegeConfigWebStatusRwPriv OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Web privilege of read-write status."
+    ::= { vtssPrivilegeConfigWebEntry 5 }
+
+vtssPrivilegeMibConformance OBJECT IDENTIFIER
+    ::= { vtssPrivilegeMib 2 }
+
+vtssPrivilegeMibCompliances OBJECT IDENTIFIER
+    ::= { vtssPrivilegeMibConformance 1 }
+
+vtssPrivilegeMibGroups OBJECT IDENTIFIER
+    ::= { vtssPrivilegeMibConformance 2 }
+
+vtssPrivilegeConfigWebInfoGroup OBJECT-GROUP
+    OBJECTS     { vtssPrivilegeConfigWebConfigRoPriv, 
+                  vtssPrivilegeConfigWebConfigRwPriv, 
+                  vtssPrivilegeConfigWebStatusRoPriv, 
+                  vtssPrivilegeConfigWebStatusRwPriv }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vtssPrivilegeMibGroups 1 }
+
+vtssPrivilegeMibCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the implementation."
+
+    MODULE      -- this module
+
+        MANDATORY-GROUPS        { vtssPrivilegeConfigWebInfoGroup }
+
+    ::= { vtssPrivilegeMibCompliances 1 }
+
+END

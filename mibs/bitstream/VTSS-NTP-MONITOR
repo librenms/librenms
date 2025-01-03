@@ -1,0 +1,245 @@
+VTSS-NTP-MONITOR DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION FROM SNMPv2-TC
+    vtssSwitchMgmt FROM VTSS-SMI
+    Integer32 FROM SNMPv2-SMI
+    Unsigned32 FROM SNMPv2-SMI
+    TruthValue FROM SNMPv2-TC
+    VTSSIpAddress FROM VTSS-TC
+    VTSSTimeStamp FROM VTSS-TC
+    DisplayString FROM RFC1213-MIB;    
+    ;
+    
+    
+NTPmonitorRoot					OBJECT IDENTIFIER ::= { vtssSwitchMgmt 9 }
+NTPmonitorClientInfo	 		OBJECT IDENTIFIER ::= { NTPmonitorRoot 1 }
+
+clientCount OBJECT-TYPE
+    SYNTAX  INTEGER (0..100)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "NTP client count."
+    ::= { NTPmonitorClientInfo 1 }
+    
+-- Client Statistics Table    
+ntpMonitorClientStatsTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF ntpMonitorClientStatsTableEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+            "A list of NTP Monitor Client Statistics Table Entries."
+    ::= { NTPmonitorRoot 3 }
+     
+ntpMonitorClientStatsTableEntry OBJECT-TYPE
+    SYNTAX  NtpMonitorClientStatsTableEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+            "NTP Monitor Client Statistics Table Entry."
+    INDEX   { rowIdxStats }
+    ::= { ntpMonitorClientStatsTable 1 }
+
+NtpMonitorClientStatsTableEntry ::=
+    SEQUENCE {
+    	rowIdxStats
+    		INTEGER,
+        clientIndexStats
+            INTEGER,
+        serverIndexStats
+            INTEGER,            
+        clientIpAddrStats
+            DisplayString (SIZE (0..20)),
+        serverIpAddrStats
+            DisplayString (SIZE (0..20)),
+        refIDStats
+        	DisplayString (SIZE (0..20)),
+        serverDelay
+        	INTEGER (-65535..65535),
+        serverOffset
+        	INTEGER (0..65535), 
+        serverJitter
+        	INTEGER (0..65535),
+        serverJitterMean
+        	INTEGER (0..65535),
+        serverJitterDeviation
+        	INTEGER (0..65535)
+    }
+    
+rowIdxStats OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "A unique value for each NTP client, sync. server pair."
+    ::= { ntpMonitorClientStatsTableEntry 100 }
+        
+clientIndexStats OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "A unique value for each NTP client."
+    ::= { ntpMonitorClientStatsTableEntry 1 }
+    
+serverIndexStats OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "A unique value for each NTP client's server."
+    ::= { ntpMonitorClientStatsTableEntry 2 }
+        
+clientIpAddrStats OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..20))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "Ip address of the client."
+    ::= { ntpMonitorClientStatsTableEntry 3 }
+        
+serverIpAddrStats OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..20))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "Ip address of the synchronization server IP address."
+    ::= { ntpMonitorClientStatsTableEntry 4 }
+    
+refIDStats OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..20))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "Ip address of the synchronization server reference IP address."
+    ::= { ntpMonitorClientStatsTableEntry 5 }
+        
+serverDelay OBJECT-TYPE
+    SYNTAX  INTEGER (-65535..65535) 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "ms of Delay multiplied by 1000"
+    ::= { ntpMonitorClientStatsTableEntry 6 }
+
+serverOffset OBJECT-TYPE
+    SYNTAX  INTEGER (0..65535) 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "ms of Offset multiplied by 1000"
+    ::= { ntpMonitorClientStatsTableEntry 7 }
+
+serverJitter OBJECT-TYPE
+    SYNTAX  INTEGER (0..65535) 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "ms of Jitter multiplied by 1000"
+    ::= { ntpMonitorClientStatsTableEntry 8 }
+
+serverJitterMean OBJECT-TYPE
+    SYNTAX  INTEGER (0..65535) 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "Mean value of Jitter multiplied by 1000"
+    ::= { ntpMonitorClientStatsTableEntry 9 }
+
+serverJitterDeviation OBJECT-TYPE
+    SYNTAX  INTEGER (0..65535) 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "Deviation value of Jitter multiplied by 1000"
+    ::= { ntpMonitorClientStatsTableEntry 10 }
+        
+    
+-- Client Data Table
+ntpMonitorClientDataTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF ntpMonitorClientDataTableEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+            "A list of NTP Monitor Client Data Table Entries."
+    ::= { NTPmonitorRoot 2 }
+
+ntpMonitorClientDataTableEntry OBJECT-TYPE
+    SYNTAX  NtpMonitorClientDataTableEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+            "NTP Monitor Client Data Table Entry."
+    INDEX   { clientIndex }
+    ::= { ntpMonitorClientDataTable 1 }	
+
+NtpMonitorClientDataTableEntry ::=
+    SEQUENCE {
+        clientIndex
+            INTEGER,
+        clientIpAddr
+            DisplayString (SIZE (0..20)),
+        serverIpAddr
+            DisplayString (SIZE (0..20)),
+        lastEventTime
+        	DisplayString (SIZE (0..32)),
+       	lastEventSecondsCounter
+       	 	INTEGER (0..1000),
+       	lastEventCounter
+       		INTEGER (0..1000)
+    }
+
+clientIndex OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "A unique value for each NTP client."
+    ::= { ntpMonitorClientDataTableEntry 1 }
+
+clientIpAddr OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..20)),
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "Ip address of NTP Client."
+    ::= { ntpMonitorClientDataTableEntry 2 }
+
+serverIpAddr OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..20)),
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "Ip address of NTP Server to which client is connected to."
+    ::= { ntpMonitorClientDataTableEntry 3 }
+    
+lastEventTime OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..32)),
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "Timestamp in seconds of the last event."
+    ::= { ntpMonitorClientDataTableEntry 4 }
+
+lastEventSecondsCounter OBJECT-TYPE
+    SYNTAX  INTEGER (0..1000)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "Time in seconds passed since the last event."
+    ::= { ntpMonitorClientDataTableEntry 5 }
+
+lastEventCounter OBJECT-TYPE
+    SYNTAX  INTEGER (0..1000)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "Event counter."
+    ::= { ntpMonitorClientDataTableEntry 6 }
+    
+            
+
+    
+END
