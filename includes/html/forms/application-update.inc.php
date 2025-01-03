@@ -43,7 +43,7 @@ if (! Auth::user()->hasGlobalAdmin()) {
                 $app->restore();
             }
             if ($app->save()) {
-                EventLog::log("Application enabled by user ' . Auth::user()->username . ': ' . $app, $device->device_id, 'application', Severity::Ok);
+                Eventlog::log("Application enabled by user ' . Auth::user()->username . ': ' . $app, $device->device_id, 'application', Severity::Ok);
                 $status = ['status' => 0, 'message' => 'Application enabled'];
             } else {
                 $status = ['status' => 1, 'message' => 'Database update for enabling the application failed'];
@@ -51,7 +51,7 @@ if (! Auth::user()->hasGlobalAdmin()) {
         } else {
             $app->delete();
             if ($app->save()) {
-                EventLog::log("Application disabled by user ' . Auth::user()->username . ': ' . $app, $device->device_id, 'application', Severity::Notice);
+                Eventlog::log("Application disabled by user ' . Auth::user()->username . ': ' . $app, $device->device_id, 'application', Severity::Notice);
                 $status = ['status' => 0, 'message' => 'Application disabled'];
             } else {
                 $status = ['status' => 1, 'message' => 'Database update for disabling the application failed'];
