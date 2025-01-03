@@ -50,8 +50,8 @@ class AxisAlarmSingle implements SnmptrapHandler
         } else {
             $AlarmID = $trap->getOidData($trap->findOid('AXIS-VIDEO-MIB::alarmID'));
         }
-        
-	    $AlarmName = $trap->getOidData($trap->findOid('AXIS-VIDEO-MIB::alarmName'));
+
+        $AlarmName = $trap->getOidData($trap->findOid('AXIS-VIDEO-MIB::alarmName'));
         $Message = $trap->getOidData($trap->findOid('AXIS-VIDEO-MIB::alarmText'));
 
         $trap->log("Axis Alarm Trap: Alarm ID $AlarmID: $AlarmName: $Message", Severity::Warning);
