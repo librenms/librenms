@@ -118,10 +118,10 @@ class Time
     /**
      * Take a date and return the number of days from now
      */
-    public static function dateToDays(string|int $date): int
+    public static function dateToMinutes(string|int $date): int
     {
         $carbon = new Carbon();
 
-        return $carbon->diffInDays($date, false);
+        return $carbon->diffInMinutes($date, false);
     }
 }
