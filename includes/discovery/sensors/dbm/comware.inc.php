@@ -1,4 +1,7 @@
 <?php
+
+use LibreNMS\Util\Rewrite;
+
 /*
  * LibreNMS
  *
@@ -31,7 +34,7 @@ foreach ($hh3cTransceiverInfoTable as $index => $entry) {
         $current = $entry['HH3C-TRANSCEIVER-INFO-MIB::hh3cTransceiverCurRXPower'] / $divisor;
         $entPhysicalIndex = $index;
         $entPhysicalIndex_measured = 'ports';
-        $descr = makeshortif($interface['ifDescr']) . ' Receive Power';
+        $descr = Rewrite::shortenIfType($interface['ifDescr']) . ' Receive Power';
         discover_sensor(null, 'dbm', $device, $oid, 'rx-' . $index, 'comware', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured, group: 'transceiver');
     }
 
@@ -46,7 +49,7 @@ foreach ($hh3cTransceiverInfoTable as $index => $entry) {
         $entPhysicalIndex_measured = 'ports';
         $interface = get_port_by_index_cache($device['device_id'], $index);
         if ($interface['ifAdminStatus'] == 'up') {
-            $descr = makeshortif($interface['ifDescr']) . ' Transmit Power';
+            $descr = Rewrite::shortenIfType($interface['ifDescr']) . ' Transmit Power';
             discover_sensor(null, 'dbm', $device, $oid, 'tx-' . $index, 'comware', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured, group: 'transceiver');
         }
     }
