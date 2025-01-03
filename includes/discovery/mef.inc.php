@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\Eventlog;
+
 /*
  * Try to discover any MEF Links
  */
@@ -37,7 +39,7 @@ foreach ($oids as $index => $entry) {
      */
     if (dbFetchCell('SELECT COUNT(id) FROM `mefinfo` WHERE `device_id` = ? AND `mefID` = ?', [$device['device_id'], $index]) == 0) {
         $mefid = dbInsert(['device_id' => $device['device_id'], 'mefID' => $index, 'mefType' => $mefType, 'mefIdent' => $mefIdent, 'mefMTU' => $mefMtu, 'mefAdmState' => $mefAdmState, 'mefRowState' => $mefRowState], 'mefinfo');
-        log_event('MEF link: ' . $mefIdent . ' (' . $index . ') Discovered', $device, 'system', 2);
+        Eventlog::log('MEF link: ' . $mefIdent . ' (' . $index . ') Discovered', $device, 'system', 2);
         echo '+';
     } else {
         echo '.';
@@ -59,7 +61,7 @@ foreach (dbFetchRows($sql) as $db_mef) {
      */
     if (! in_array($db_mef['mefID'], $mef_list)) {
         dbDelete('mefinfo', '`id` = ?', [$db_mef['id']]);
-        log_event('MEF link: ' . $db_mef['mefIdent'] . ' Removed', $device, 'system', 3);
+        Eventlog::log('MEF link: ' . $db_mef['mefIdent'] . ' Removed', $device, 'system', 3);
         echo '-';
     }
 }

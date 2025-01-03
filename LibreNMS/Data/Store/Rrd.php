@@ -25,6 +25,7 @@
 
 namespace LibreNMS\Data\Store;
 
+use App\Models\Eventlog;
 use App\Polling\Measure\Measurement;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
@@ -342,11 +343,11 @@ class Rrd extends BaseDatastore
         $newrrd = self::name($device['hostname'], $newname);
         if (is_file($oldrrd) && ! is_file($newrrd)) {
             if (rename($oldrrd, $newrrd)) {
-                log_event("Renamed $oldrrd to $newrrd", $device, 'poller', 1);
+                Eventlog::log("Renamed $oldrrd to $newrrd", $device, 'poller', 1);
 
                 return true;
             } else {
-                log_event("Failed to rename $oldrrd to $newrrd", $device, 'poller', 5);
+                Eventlog::log("Failed to rename $oldrrd to $newrrd", $device, 'poller', 5);
 
                 return false;
             }

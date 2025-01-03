@@ -24,6 +24,7 @@
  */
 
 use App\Models\Application;
+use App\Models\Eventlog;
 use App\Observers\ModuleModelObserver;
 use LibreNMS\Config;
 
@@ -86,7 +87,7 @@ foreach ($results as $extend => $result) {
             }
             $app_obj->discovered = 1;
             $app_obj->save();
-            log_event("Application enabled by discovery: $app", $device, 'application', 1);
+            Eventlog::log("Application enabled by discovery: $app", $device, 'application', 1);
         }
     }
 }

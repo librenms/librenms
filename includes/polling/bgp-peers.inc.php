@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Eventlog;
 use Illuminate\Support\Str;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\RRD\RrdDefinition;
@@ -481,11 +482,11 @@ if (! empty($peers)) {
                     || $peer_data['bgpPeerState'] != $peer['bgpPeerState'])
             ) {
                 if ($peer['bgpPeerState'] == $peer_data['bgpPeerState']) {
-                    log_event('BGP Session Flap: ' . $peer['bgpPeerIdentifier'] . ' (AS' . $peer['bgpPeerRemoteAs'] . ' ' . $peer['bgpPeerDescr'] . '), last error: ' . describe_bgp_error_code($peer['bgpPeerLastErrorCode'], $peer['bgpPeerLastErrorSubCode']), $device, 'bgpPeer', 4, $peer_ip);
+                    Eventlog::log('BGP Session Flap: ' . $peer['bgpPeerIdentifier'] . ' (AS' . $peer['bgpPeerRemoteAs'] . ' ' . $peer['bgpPeerDescr'] . '), last error: ' . describe_bgp_error_code($peer['bgpPeerLastErrorCode'], $peer['bgpPeerLastErrorSubCode']), $device, 'bgpPeer', 4, $peer_ip);
                 } elseif ($peer_data['bgpPeerState'] == 'established') {
-                    log_event('BGP Session Up: ' . $peer['bgpPeerIdentifier'] . ' (AS' . $peer['bgpPeerRemoteAs'] . ' ' . $peer['bgpPeerDescr'] . ')', $device, 'bgpPeer', 1, $peer_ip);
+                    Eventlog::log('BGP Session Up: ' . $peer['bgpPeerIdentifier'] . ' (AS' . $peer['bgpPeerRemoteAs'] . ' ' . $peer['bgpPeerDescr'] . ')', $device, 'bgpPeer', 1, $peer_ip);
                 } elseif ($peer['bgpPeerState'] == 'established') {
-                    log_event('BGP Session Down: ' . $peer['bgpPeerIdentifier'] . ' (AS' . $peer['bgpPeerRemoteAs'] . ' ' . $peer['bgpPeerDescr'] . '), last error: ' . describe_bgp_error_code($peer['bgpPeerLastErrorCode'], $peer['bgpPeerLastErrorSubCode']), $device, 'bgpPeer', 5, $peer_ip);
+                    Eventlog::log('BGP Session Down: ' . $peer['bgpPeerIdentifier'] . ' (AS' . $peer['bgpPeerRemoteAs'] . ' ' . $peer['bgpPeerDescr'] . '), last error: ' . describe_bgp_error_code($peer['bgpPeerLastErrorCode'], $peer['bgpPeerLastErrorSubCode']), $device, 'bgpPeer', 5, $peer_ip);
                 }
             }
         }

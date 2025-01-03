@@ -14,6 +14,7 @@
 // License: GPLv3
 //
 
+use App\Models\Eventlog;
 use LibreNMS\Config;
 
 $hostname = $device['hostname'];
@@ -52,7 +53,7 @@ foreach (dbFetchRows($sql, [$deviceid]) as $entry) {
 
     if (! match_network(Config::get('nets'), $ip)) {
         echo 'i';
-        log_event("Ignored $ip", $deviceid, 'interface', 3, $if);
+        Eventlog::log("Ignored $ip", $deviceid, 'interface', 3, $if);
         continue;
     }
 

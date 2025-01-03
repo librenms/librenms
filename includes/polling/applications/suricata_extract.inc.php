@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Eventlog;
 use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\RRD\RrdDefinition;
 
@@ -48,7 +49,7 @@ $fields = [
 ];
 
 if (isset($data['last_errors']) && isset($data['last_errors'][0])) {
-    log_event('suricata_extract_submit errors found: ' . json_encode($data['last_errors']), $device, 'application', 5);
+    Eventlog::log('suricata_extract_submit errors found: ' . json_encode($data['last_errors']), $device, 'application', 5);
 }
 
 $tags = [

@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\Eventlog;
+
 if ($device['os_group'] == 'cisco') {
     echo "Cisco VLANs:\n";
 
@@ -23,7 +25,7 @@ if ($device['os_group'] == 'cisco') {
                     if ($vlan_data['vlan_name'] != $vlan['vtpVlanName']) {
                         $vlan_upd['vlan_name'] = $vlan['vtpVlanName'];
                         dbUpdate($vlan_upd, 'vlans', '`vlan_id` = ?', [$vlan_data['vlan_id']]);
-                        log_event("VLAN $vlan_id changed name {$vlan_data['vlan_name']} -> {$vlan['vtpVlanName']} ", $device, 'vlan', 3, $vlan_data['vlan_id']);
+                        Eventlog::log("VLAN $vlan_id changed name {$vlan_data['vlan_name']} -> {$vlan['vtpVlanName']} ", $device, 'vlan', 3, $vlan_data['vlan_id']);
                         echo 'U';
                     } else {
                         echo '.';
