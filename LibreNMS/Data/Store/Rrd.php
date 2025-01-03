@@ -344,11 +344,11 @@ class Rrd extends BaseDatastore
         $newrrd = self::name($device['hostname'], $newname);
         if (is_file($oldrrd) && ! is_file($newrrd)) {
             if (rename($oldrrd, $newrrd)) {
-                Eventlog::log("Renamed $oldrrd to $newrrd", $device, 'poller', Severity::Ok);
+                Eventlog::log("Renamed $oldrrd to $newrrd", $device['device_id'], 'poller', Severity::Ok);
 
                 return true;
             } else {
-                Eventlog::log("Failed to rename $oldrrd to $newrrd", $device, 'poller', Severity::Error);
+                Eventlog::log("Failed to rename $oldrrd to $newrrd", $device['device_id'], 'poller', Severity::Error);
 
                 return false;
             }
