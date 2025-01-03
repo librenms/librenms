@@ -27,6 +27,7 @@ namespace LibreNMS\Device;
 
 use App\Models\Eventlog;
 use LibreNMS\Config;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\Discovery\DiscoveryModule;
 use LibreNMS\Interfaces\Polling\PollerModule;
 use LibreNMS\OS;
@@ -170,7 +171,7 @@ class Sensor implements DiscoveryModule, PollerModule
             if ($this->sensor_id !== null) {
                 $name = static::$name;
                 $message = "$name Discovered: {$this->type} {$this->subtype} {$this->index} {$this->description}";
-                Eventlog::log($message, $this->device_id, static::$table, 3, $this->sensor_id);
+                Eventlog::log($message, $this->device_id, static::$table, Severity::Notice, $this->sensor_id);
                 echo '+';
             }
         }
@@ -575,7 +576,7 @@ class Sensor implements DiscoveryModule, PollerModule
 
             $message = static::$name;
             $message .= " Deleted: $type {$sensor['sensor_type']} {$sensor['sensor_index']} {$sensor['sensor_descr']}";
-            Eventlog::log($message, $device_id, static::$table, 3, $sensor['sensor_id']);
+            Eventlog::log($message, $device_id, static::$table, Severity::Notice, $sensor['sensor_id']);
         }
         if (! empty($delete)) {
             dbDelete($table, $where, $params);

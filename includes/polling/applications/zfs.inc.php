@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Eventlog;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\Exceptions\JsonAppMissingKeysException;
 use LibreNMS\RRD\RrdDefinition;
@@ -332,9 +333,9 @@ if (isset($zfs['health'])) {
     $health = $zfs['health'];
     if ($old_health != $zfs['health']) {
         if ($zfs['health'] == 1) {
-            Eventlog::log('ZFS pool(s) now healthy', $device, 'application', 1);
+            Eventlog::log('ZFS pool(s) now healthy', $device, 'application', Severity::Ok);
         } else {
-            Eventlog::log('ZFS pool(s) DEGRADED, FAULTED, UNAVAIL, REMOVED, or unknown', $device, 'application', 5);
+            Eventlog::log('ZFS pool(s) DEGRADED, FAULTED, UNAVAIL, REMOVED, or unknown', $device, 'application', Severity::Error);
         }
     }
 } else {
@@ -345,7 +346,7 @@ if (isset($zfs['health'])) {
 $old_l2_errors = $app->data['l2_errors'] ?? 0;
 if (isset($zfs['l2_errors'])) {
     if ($old_l2_errors != $zfs['l2_errors']) {
-        Eventlog::log('ZFS L2 cache has experienced errors', $device, 'application', 5);
+        Eventlog::log('ZFS L2 cache has experienced errors', $device, 'application', Severity::Error);
     }
 }
 

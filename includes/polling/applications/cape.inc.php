@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Eventlog;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\RRD\RrdDefinition;
 
@@ -1004,19 +1005,19 @@ foreach ($current_packages as $index => $current_package) {
 // log any warnings
 if (sizeof($returned['warnings']) > 0) {
     $log_message = 'CAPE Warns: ' . json_encode($returned['warnings']);
-    Eventlog::log($log_message, $device, 'application', 4);
+    Eventlog::log($log_message, $device, 'application', Severity::Warning);
 }
 
 // log any criticals
 if (sizeof($returned['criticals']) > 0) {
     $log_message = 'CAPE Criticals: ' . json_encode($returned['criticals']);
-    Eventlog::log($log_message, $device, 'application', 5);
+    Eventlog::log($log_message, $device, 'application', Severity::Error);
 }
 
 // log any criticals
 if (sizeof($returned['errors']) > 0) {
     $log_message = 'CAPE Errors: ' . json_encode($returned['errors']);
-    Eventlog::log($log_message, $device, 'application', 5);
+    Eventlog::log($log_message, $device, 'application', Severity::Error);
 }
 
 update_application($app, 'OK', $metrics);

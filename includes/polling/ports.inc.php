@@ -3,6 +3,7 @@
 use App\Models\Eventlog;
 use LibreNMS\Config;
 use LibreNMS\Enum\PortAssociationMode;
+use LibreNMS\Enum\Severity;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Mac;
@@ -689,7 +690,7 @@ foreach ($ports as $port) {
 
             if ($port[$oid] != $current_oid && ! isset($current_oid)) {
                 $port['update'][$oid] = null;
-                Eventlog::log($oid . ': ' . $port[$oid] . ' -> NULL', $device, 'interface', 4, $port['port_id']);
+                Eventlog::log($oid . ': ' . $port[$oid] . ' -> NULL', $device, 'interface', Severity::Warning, $port['port_id']);
                 d_echo($oid . ': ' . $port[$oid] . ' -> NULL ', $oid . ' ');
             } elseif ($port[$oid] != $current_oid) {
                 // if the value is different, update it
@@ -722,7 +723,7 @@ foreach ($ports as $port) {
                     $new = $current_oid;
                 }
 
-                Eventlog::log($oid . ': ' . $old . ' -> ' . $new, $device, 'interface', 3, $port['port_id']);
+                Eventlog::log($oid . ': ' . $old . ' -> ' . $new, $device, 'interface', Severity::Notice, $port['port_id']);
                 if (Debug::isEnabled()) {
                     d_echo($oid . ': ' . $old . ' -> ' . $new . ' ');
                 } else {
@@ -761,7 +762,7 @@ foreach ($ports as $port) {
                     }
 
                     $port['update'][$attrib_key] = $port_ifAlias[$attrib];
-                    Eventlog::log($attrib . ': ' . $port[$attrib_key] . ' -> ' . $log_port, $device, 'interface', 3, $port['port_id']);
+                    Eventlog::log($attrib . ': ' . $port[$attrib_key] . ' -> ' . $log_port, $device, 'interface', Severity::Notice, $port['port_id']);
                     unset($log_port);
                 }
             }
@@ -903,7 +904,7 @@ foreach ($ports as $port) {
                         // If data has changed, build a query
                         $port['update'][$oid] = $current_oid;
                         echo 'PAgP ';
-                        Eventlog::log("$oid -> " . $current_oid, $device, 'interface', 3, $port['port_id']);
+                        Eventlog::log("$oid -> " . $current_oid, $device, 'interface', Severity::Notice, $port['port_id']);
                     }
                 }
             }

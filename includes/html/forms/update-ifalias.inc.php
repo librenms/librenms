@@ -1,7 +1,7 @@
 <?php
 
 use App\Models\Eventlog;
-
+use LibreNMS\Enum\Severity;
 
 /*
  * LibreNMS
@@ -33,10 +33,10 @@ if (! empty($ifName) && is_numeric($port_id)) {
         $device = device_by_id_cache($device_id);
         if ($descr === 'repoll') {
             del_dev_attrib($device, 'ifName:' . $ifName);
-            Eventlog::log("$ifName Port ifAlias cleared manually", $device, 'interface', 3, $port_id);
+            Eventlog::log("$ifName Port ifAlias cleared manually", $device, 'interface', Severity::Notice, $port_id);
         } else {
             set_dev_attrib($device, 'ifName:' . $ifName, 1);
-            Eventlog::log("$ifName Port ifAlias set manually: $descr", $device, 'interface', 3, $port_id);
+            Eventlog::log("$ifName Port ifAlias set manually: $descr", $device, 'interface', Severity::Notice, $port_id);
         }
         $status = 'ok';
     } else {

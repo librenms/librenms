@@ -9,6 +9,7 @@
  */
 
 use App\Models\Device;
+use App\Models\Eventlog;
 use App\Models\StateTranslation;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
@@ -105,19 +106,19 @@ function renamehost($id, $new, $source = 'console')
     $new_rrd_dir = Rrd::dirFromHost($new);
 
     if (is_dir($new_rrd_dir)) {
-        Eventlog::log("Renaming of $host failed due to existing RRD folder for $new", $id, 'system', 5);
+        Eventlog::log("Renaming of $host failed due to existing RRD folder for $new", $id, 'system', Severity::Error);
 
         return "Renaming of $host failed due to existing RRD folder for $new\n";
     }
 
     if (! is_dir($new_rrd_dir) && rename(Rrd::dirFromHost($host), $new_rrd_dir) === true) {
         dbUpdate(['hostname' => $new, 'ip' => null], 'devices', 'device_id=?', [$id]);
-        Eventlog::log("Hostname changed -> $new ($source)", $id, 'system', 3);
+        Eventlog::log("Hostname changed -> $new ($source)", $id, 'system', Severity::Notice);
 
         return '';
     }
 
-    Eventlog::log("Renaming of $host failed", $id, 'system', 5);
+    Eventlog::log("Renaming of $host failed", $id, 'system', Severity::Error);
 
     return "Renaming of $host failed\n";
 }

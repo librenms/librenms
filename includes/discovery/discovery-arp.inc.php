@@ -16,6 +16,7 @@
 
 use App\Models\Eventlog;
 use LibreNMS\Config;
+use LibreNMS\Enum\Severity;
 
 $hostname = $device['hostname'];
 $deviceid = $device['device_id'];
@@ -53,7 +54,7 @@ foreach (dbFetchRows($sql, [$deviceid]) as $entry) {
 
     if (! match_network(Config::get('nets'), $ip)) {
         echo 'i';
-        Eventlog::log("Ignored $ip", $deviceid, 'interface', 3, $if);
+        Eventlog::log("Ignored $ip", $deviceid, 'interface', Severity::Notice, $if);
         continue;
     }
 
