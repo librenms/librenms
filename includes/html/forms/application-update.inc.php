@@ -26,7 +26,6 @@ use App\Models\Device;
 use App\Models\Eventlog;
 use LibreNMS\Enum\Severity;
 
-
 if (! Auth::user()->hasGlobalAdmin()) {
     $status = ['status' => 1, 'message' => 'You need to be admin'];
 } else {
