@@ -98,10 +98,8 @@ class OSModulesTest extends DBTestCase
         $this->requireSnmpsim();  // require snmpsim for tests
         // stub out Eventlog::log and Fping->ping, we don't need to store them for these tests
         $this->stubClasses();
-        // Order modules following both disovery and poller
-        $dmodules = array_fill_keys(array_intersect(array_keys($this->discoveryModules), array_keys($modules)), true);
-        $pmodules = array_fill_keys(array_intersect(array_keys($this->pollerModules), array_keys($modules)), true);
-        $modules = array_merge($dmodules, $pmodules);
+        // Order discovery modules
+        $modules = array_fill_keys(array_intersect(array_keys($this->discoveryModules), array_keys($modules)), true);
 
         try {
             Debug::set(false); // avoid all undefined index errors in the legacy code
