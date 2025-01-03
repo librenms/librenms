@@ -55,7 +55,7 @@ class WebServer extends BaseValidation
                 $actual_host = $actual_host_match[1] ?? '';
                 $expected_host = $expected_host_match[1] ?? "parse failure ($expected)";
 
-                if ($base_url == '/' && ! str_contains($actual_host, '/') || !Str::startsWith($base_url, 'http')) {
+                if ($base_url == '/' && ! str_contains($actual_host, '/') || ! Str::startsWith($base_url, 'http')) {
                     $validator->warn('base_url could be more specific', "lnms config:set base_url $correct_base");
                 } elseif ($actual_host != $expected_host) {
                     $nginx = Str::startsWith(request()->server->get('SERVER_SOFTWARE'), 'nginx');
