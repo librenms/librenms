@@ -24,7 +24,7 @@ foreach (dbFetchRows('SELECT * FROM `customoids` WHERE `customoid_passed` = 1 AN
         $oid_value = $rawdata;
     } elseif (
         $unit &&
-        str_i_contains($rawdata, $unit) &&
+        Str::contains($rawdata, $unit, ignoreCase: true) &&
         is_numeric(trim(str_replace($unit, '', $rawdata)))
     ) {
         $os->enableGraph('customoid');

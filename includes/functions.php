@@ -8,6 +8,7 @@
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
 
+use App\Models\Device;
 use App\Models\StateTranslation;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
@@ -68,11 +69,6 @@ function logfile($string)
 
     fputs($fd, $string . "\n");
     fclose($fd);
-}
-
-function percent_colour($perc)
-{
-    return \LibreNMS\Util\Color::percent(percent: $perc);
 }
 
 /**
@@ -286,12 +282,12 @@ function is_port_valid($port, $device)
     $ifType = $port['ifType'];
     $ifOperStatus = $port['ifOperStatus'] ?? '';
 
-    if (str_i_contains($ifDescr, Config::getOsSetting($device['os'], 'good_if', Config::get('good_if')))) {
+    if (Str::contains($ifDescr, Config::getOsSetting($device['os'], 'good_if', Config::get('good_if')), ignoreCase: true)) {
         return true;
     }
 
     foreach (Config::getCombined($device['os'], 'bad_if') as $bi) {
-        if (str_i_contains($ifDescr, $bi)) {
+        if (Str::contains($ifDescr, $bi, ignoreCase: true)) {
             d_echo("ignored by ifDescr: $ifDescr (matched: $bi)\n");
 
             return false;
@@ -376,22 +372,6 @@ function port_fill_missing_and_trim(&$port, $device)
     }
 }
 
-function validate_device_id($id)
-{
-    if (empty($id) || ! is_numeric($id)) {
-        $return = false;
-    } else {
-        $device_id = dbFetchCell('SELECT `device_id` FROM `devices` WHERE `device_id` = ?', [$id]);
-        if ($device_id == $id) {
-            $return = true;
-        } else {
-            $return = false;
-        }
-    }
-
-    return $return;
-}
-
 function convert_delay($delay)
 {
     if (preg_match('/(\d+)([mhd]?)/', $delay, $matches)) {
@@ -430,29 +410,14 @@ function fix_integer_value($value)
 
 /**
  * Checks if the $hostname provided exists in the DB already
- *
- * @param  string  $hostname  The hostname to check for
- * @param  string  $sysName  The sysName to check
- * @return bool true if hostname already exists
- *              false if hostname doesn't exist
  */
-function host_exists($hostname, $sysName = null)
+function host_exists(string $hostname, ?string $sysName = null): bool
 {
-    $query = 'SELECT COUNT(*) FROM `devices` WHERE `hostname`=?';
-    $params = [$hostname];
-
-    if (! empty($sysName) && ! Config::get('allow_duplicate_sysName')) {
-        $query .= ' OR `sysName`=?';
-        $params[] = $sysName;
-
-        if (! empty(Config::get('mydomain'))) {
-            $full_sysname = rtrim($sysName, '.') . '.' . Config::get('mydomain');
-            $query .= ' OR `sysName`=?';
-            $params[] = $full_sysname;
-        }
-    }
-
-    return dbFetchCell($query, $params) > 0;
+    return Device::where('hostname', $hostname)
+        ->when(! empty($sysName), function ($query) use ($sysName) {
+            $query->when(! Config::get('allow_duplicate_sysName'), fn ($q) => $q->orWhere('sysName', $sysName))
+                  ->when(! empty(Config::get('mydomain')), fn ($q) => $q->orWhere('sysName', rtrim($sysName, '.') . '.' . Config::get('mydomain')));
+        })->exists();
 }
 
 /**

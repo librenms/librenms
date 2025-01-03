@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Data\Graphing\GraphParameters;
 use LibreNMS\Enum\ImageFormat;
@@ -72,7 +73,7 @@ try {
         echo "<div class='infobox'>";
         echo "<p style='font-size: 16px; font-weight: bold;'>RRDTool Command</p>";
         echo "<pre class='rrd-pre'>";
-        echo escapeshellcmd('rrdtool ' . Rrd::buildCommand('graph', Config::get('temp_dir') . '/' . strgen(), $rrd_options));
+        echo escapeshellcmd('rrdtool ' . Rrd::buildCommand('graph', Config::get('temp_dir') . '/' . Str::random(), $rrd_options));
         echo '</pre>';
         try {
             Rrd::graph($rrd_options, $env);
