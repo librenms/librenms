@@ -346,7 +346,8 @@ Please ensure that you set the `$config['authlog_purge']` value to be
 greater than `$config['radius']['users_purge']` otherwise old users
 won't be removed.
 
-## HTTP Authentication
+## <a name="http-auth"> HTTP Authentication</a>
+
 
 Config option: `http-auth`
 

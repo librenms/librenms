@@ -31,7 +31,7 @@ will start to receive Temperatures and Fan speed data.
 
 Download OpenManage from Dell's support page
 [Link](http://www.dell.com/support/contents/us/en/04/article/product-support/self-support-knowledgebase/enterprise-resource-center/systemsmanagement/OMSA)
-and install OpenManage on your windows server. Make sure you have [SNMP](/Support/SNMP-Configuration-Examples/#windows-server-2012-r2-and-newer)
+and install OpenManage on your windows server. Make sure you have [SNMP](../Support/SNMP-Configuration-Examples.md#windows-server-2012-r2-and-newer)
 setup and running on your windows server.
 
 
