@@ -27,6 +27,7 @@ use App\Models\Application;
 use App\Models\Eventlog;
 use App\Observers\ModuleModelObserver;
 use LibreNMS\Config;
+use LibreNMS\Enum\Severity;
 
 echo "\nApplications: ";
 
