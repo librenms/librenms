@@ -55,6 +55,9 @@ jobs:
           php-version: ${{ matrix.php }}
           tools: composer
           coverage: none
+          extensions: pam
+        env:
+          PAM_LINUX_LIBS: libpam0g-dev
 
       -
         name: Get composer cache directory
