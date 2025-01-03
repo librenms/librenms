@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Eventlog;
 use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\Exceptions\JsonAppParsingFailedException;
 use LibreNMS\RRD\RrdDefinition;
@@ -71,7 +72,7 @@ if (count($added_jails) > 0 || count($removed_jails) > 0) {
     $log_message = 'Fail2ban Jail Change:';
     $log_message .= count($added_jails) > 0 ? ' Added ' . implode(',', $added_jails) : '';
     $log_message .= count($removed_jails) > 0 ? ' Removed ' . implode(',', $added_jails) : '';
-    log_event($log_message, $device, 'application');
+    Eventlog::log($log_message, $device, 'application');
 }
 
 update_application($app, 'ok', $metrics);

@@ -1,6 +1,7 @@
 <?php
 
 use LibreNMS\Util\Mac;
+use LibreNMS\Util\Rewrite;
 
 $port = $vars['id'];
 $stat = $vars['stat'] ?: 'bits';
@@ -64,7 +65,7 @@ foreach ($accs as $acc) {
                 [$addy['ipv4_address']]
             );
             if ($peer) {
-                $name = $peer['hostname'] . ' ' . makeshortif($peer['ifDescr']) . ' (' . $mac . ')';
+                $name = $peer['hostname'] . ' ' . Rewrite::shortenIfType($peer['ifDescr']) . ' (' . $mac . ')';
             }
 
             if (dbFetchCell('SELECT count(*) FROM bgpPeers WHERE device_id = ? AND bgpPeerIdentifier = ?', [$acc['device_id'], $addy['ipv4_address']])) {

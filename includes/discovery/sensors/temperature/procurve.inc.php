@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Util\Rewrite;
+
 echo 'Procurve ';
 
 $divisor = 1000;
@@ -13,7 +15,7 @@ foreach (SnmpQuery::cache()->walk('HP-ICF-TRANSCEIVER-MIB::hpicfXcvrInfoTable')-
         $current = $entry['HP-ICF-TRANSCEIVER-MIB::hpicfXcvrTemp'] / $divisor;
         $entPhysicalIndex = $index;
         $entPhysicalIndex_measured = 'ports';
-        $descr = makeshortif($entry['HP-ICF-TRANSCEIVER-MIB::hpicfXcvrPortDesc']) . ' Temperature';
+        $descr = Rewrite::shortenIfType($entry['HP-ICF-TRANSCEIVER-MIB::hpicfXcvrPortDesc']) . ' Temperature';
         discover_sensor(null, 'temperature', $device, $oid, 'temp-trans-' . $index, 'procurve', $descr, $divisor, 1, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured, group: 'transceiver');
     }
 }

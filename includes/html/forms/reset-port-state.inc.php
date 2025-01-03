@@ -25,6 +25,7 @@
  */
 
 use App\Models\Device;
+use App\Models\Eventlog;
 
 if (! Auth::user()->hasGlobalAdmin()) {
     $response = [
@@ -42,7 +43,7 @@ if (isset($_POST['device_id'])) {
     } else {
         $device = Device::find($_POST['device_id']);
 
-        log_event('Port state history reset by ' . Auth::user()->username, $device);
+        Eventlog::log('Port state history reset by ' . Auth::user()->username, $device);
 
         try {
             foreach ($device->ports()->get() as $port) {

@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Eventlog;
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'postgres';
@@ -112,7 +113,7 @@ if (count($added_databases) > 0 || count($removed_databases) > 0) {
     if (count($removed_databases)) {
         $log_message .= ' Removed ' . implode(',', $removed_databases);
     }
-    log_event($log_message, $device, 'application');
+    Eventlog::log($log_message, $device, 'application');
 }
 
 update_application($app, $postgres, $metrics);

@@ -1,6 +1,8 @@
 <?php
 
+use App\Models\Eventlog;
 use App\Models\Vlan;
+use LibreNMS\Enum\Severity;
 
 echo 'ALCATEL-IND1-VLAN-MGR-MIB VLANs: ';
 
@@ -14,7 +16,7 @@ foreach ($vlans as $vlan_id => $vlan) {
         if ($vlan_data['vlan_name'] != $vlan['vlanDescription']) {
             $vlan_upd['vlan_name'] = $vlan['vlanDescription'];
             Vlan::where('vlan_id', $vlan_data['vlan_id'])->update(['vlan_name' => $vlan['vlanDescription']]);
-            log_event("VLAN $vlan_id changed name {$vlan_data['vlan_name']} -> {$vlan['vlanDescription']} ", $device, 'vlan', 3, $vlan_data['vlan_id']);
+            Eventlog::log("VLAN $vlan_id changed name {$vlan_data['vlan_name']} -> {$vlan['vlanDescription']} ", $device, 'vlan', Severity::Notice, $vlan_data['vlan_id']);
             echo 'U';
         } else {
             echo '.';

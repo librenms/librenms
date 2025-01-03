@@ -1,4 +1,7 @@
 <?php
+
+use LibreNMS\Util\Rewrite;
+
 /*
  * LibreNMS
  *
@@ -33,7 +36,7 @@ foreach ($hh3cTransceiverInfoTable as $index => $entry) {
         $entPhysicalIndex = $index;
         $entPhysicalIndex_measured = 'ports';
 
-        $descr = makeshortif($interface['ifDescr']) . ' Bias Current';
+        $descr = Rewrite::shortenIfType($interface['ifDescr']) . ' Bias Current';
         discover_sensor(null, 'current', $device, $oid, 'bias-' . $index, 'comware', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured, group: 'transceiver');
     }
 }

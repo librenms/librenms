@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Eventlog;
 use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\RRD\RrdDefinition;
 
@@ -129,7 +130,7 @@ if (count($added_ports) > 0 || count($removed_ports) > 0) {
     $log_message = 'Portactivity Port Change:';
     $log_message .= count($added_ports) > 0 ? ' Added ' . implode(',', $added_ports) : '';
     $log_message .= count($removed_ports) > 0 ? ' Removed ' . implode(',', $added_ports) : '';
-    log_event($log_message, $device, 'application');
+    Eventlog::log($log_message, $device, 'application');
 }
 
 update_application($app, 'OK', data_flatten($ports));
