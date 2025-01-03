@@ -81,8 +81,8 @@ return [
         'single' => [
             'driver' => 'single',
             'path' => env('APP_LOG', base_path('logs/librenms.log')),
-            'formatter' => \App\Logging\NoColorFormatter::class,
-            'level' => env('LOG_LEVEL', 'error'),
+            'formatter' => \App\Logging\LogFileFormatter::class,
+            'level' => env('LOG_LEVEL', 'warning'),
             'replace_placeholders' => true,
         ],
 
