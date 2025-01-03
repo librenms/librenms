@@ -246,7 +246,7 @@ function discover_juniAtmVp(&$valid, $device, $port_id, $vp_id, $vp_descr)
         d_echo("( $inserted inserted )\n");
 
         // FIXME vv no $device!
-        ::log('Juniper ATM VP Added: port ' . $port_id . ' vp ' . $vp_id . ' descr' . $vp_descr, $device, 'juniAtmVp', 3, $inserted);
+        Eventlog::log('Juniper ATM VP Added: port ' . $port_id . ' vp ' . $vp_id . ' descr' . $vp_descr, $device, 'juniAtmVp', 3, $inserted);
     } else {
         echo '.';
     }
