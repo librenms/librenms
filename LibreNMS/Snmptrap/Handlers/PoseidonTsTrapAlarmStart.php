@@ -46,7 +46,7 @@ class PoseidonTsTrapAlarmStart implements SnmptrapHandler
         $id         = substr($oid, strlen($oid) + 1);
         $AlarmID    = $trap->getOidData($trap->findOid('POSEIDON-MIB::tsAlarmId.' . $id));
         $AlarmDescr = $trap->getOidData($trap->findOid('POSEIDON-MIB::tsAlarmDescr.' . $id));
-       
+
         $trap->log("Poseidon Alarm Start: Alarm ID $AlarmID: $AlarmDescr. Check the following Poseidon Alarm State Change trap for details", Severity::Warning);
     }
 }
