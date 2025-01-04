@@ -58635,7 +58635,7 @@
             "transceivers": [
                 {
                     "index": "1249",
-                    "entity_physical_index": 5,
+                    "entity_physical_index": 1249,
                     "type": "10GE CU3M",
                     "vendor": "CISCO-AMPHENOL",
                     "oui": null,
@@ -58654,7 +58654,7 @@
                 },
                 {
                     "index": "1267",
-                    "entity_physical_index": 6,
+                    "entity_physical_index": 1267,
                     "type": "10GE CU3M",
                     "vendor": "CISCO-AMPHENOL",
                     "oui": null,
@@ -58673,7 +58673,7 @@
                 },
                 {
                     "index": "1285",
-                    "entity_physical_index": 7,
+                    "entity_physical_index": 1285,
                     "type": "10GE CU3M",
                     "vendor": "CISCO-AMPHENOL",
                     "oui": null,
@@ -58692,7 +58692,7 @@
                 },
                 {
                     "index": "1303",
-                    "entity_physical_index": 8,
+                    "entity_physical_index": 1303,
                     "type": "10GE CU3M",
                     "vendor": "CISCO-AMPHENOL",
                     "oui": null,
@@ -58711,7 +58711,7 @@
                 },
                 {
                     "index": "1915",
-                    "entity_physical_index": 42,
+                    "entity_physical_index": 1915,
                     "type": "10GE SR",
                     "vendor": "CISCO-ACCELINK",
                     "oui": null,
@@ -58730,7 +58730,7 @@
                 },
                 {
                     "index": "1933",
-                    "entity_physical_index": 43,
+                    "entity_physical_index": 1933,
                     "type": "10GE CU1M",
                     "vendor": "CISCO-AMPHENOL",
                     "oui": null,
@@ -58749,7 +58749,7 @@
                 },
                 {
                     "index": "7249",
-                    "entity_physical_index": 83,
+                    "entity_physical_index": 7249,
                     "type": "10GE CU3M",
                     "vendor": "CISCO-AMPHENOL",
                     "oui": null,
@@ -58768,7 +58768,7 @@
                 },
                 {
                     "index": "7267",
-                    "entity_physical_index": 84,
+                    "entity_physical_index": 7267,
                     "type": "10GE CU3M",
                     "vendor": "CISCO-AMPHENOL",
                     "oui": null,
@@ -58787,7 +58787,7 @@
                 },
                 {
                     "index": "7285",
-                    "entity_physical_index": 85,
+                    "entity_physical_index": 7285,
                     "type": "10GE CU3M",
                     "vendor": "CISCO-AMPHENOL",
                     "oui": null,
@@ -58806,7 +58806,7 @@
                 },
                 {
                     "index": "7303",
-                    "entity_physical_index": 86,
+                    "entity_physical_index": 7303,
                     "type": "10GE CU3M",
                     "vendor": "CISCO-AMPHENOL",
                     "oui": null,
@@ -58825,7 +58825,7 @@
                 },
                 {
                     "index": "7933",
-                    "entity_physical_index": 121,
+                    "entity_physical_index": 7933,
                     "type": "10GE CU1M",
                     "vendor": "CISCO-AMPHENOL",
                     "oui": null,
@@ -58844,7 +58844,7 @@
                 },
                 {
                     "index": "7951",
-                    "entity_physical_index": 122,
+                    "entity_physical_index": 7951,
                     "type": "10GE CU1M",
                     "vendor": "CISCO-AMPHENOL",
                     "oui": null,
@@ -69899,7 +69899,7 @@
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
-                    "entPhysicalIndex": "42",
+                    "entPhysicalIndex": "1915",
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
@@ -69924,7 +69924,7 @@
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
-                    "entPhysicalIndex": "42",
+                    "entPhysicalIndex": "1915",
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
@@ -69949,7 +69949,7 @@
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
-                    "entPhysicalIndex": "42",
+                    "entPhysicalIndex": "1915",
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
@@ -74499,7 +74499,7 @@
                     "sensor_limit_low_warn": -1,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
-                    "entPhysicalIndex": "42",
+                    "entPhysicalIndex": "1915",
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
@@ -75924,7 +75924,7 @@
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
-                    "entPhysicalIndex": "42",
+                    "entPhysicalIndex": "1915",
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
