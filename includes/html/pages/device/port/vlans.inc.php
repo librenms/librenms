@@ -58,7 +58,7 @@ foreach ($vlans as $vlan) {
     $vsep = '';
     foreach ($vlan_ports as $otherport) {
         $otherport = cleanPort($otherport);
-        echo $vsep . generate_port_link($otherport, Rewrite::shortenIfType($otherport['ifDescr']));
+        echo $vsep . generate_port_link($otherport, Rewrite::shortenIfName($otherport['ifDescr']));
         if ($otherport['untagged']) {
             echo '(U)';
         }

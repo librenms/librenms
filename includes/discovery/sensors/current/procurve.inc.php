@@ -13,7 +13,7 @@ foreach (SnmpQuery::cache()->walk('HP-ICF-TRANSCEIVER-MIB::hpicfXcvrInfoTable')-
         $current = $entry['HP-ICF-TRANSCEIVER-MIB::hpicfXcvrBias'] / $divisor;
         $entPhysicalIndex = $index;
         $entPhysicalIndex_measured = 'ports';
-        $descr = Rewrite::shortenIfType($entry['HP-ICF-TRANSCEIVER-MIB::hpicfXcvrPortDesc']) . ' Bias Current';
+        $descr = Rewrite::shortenIfName($entry['HP-ICF-TRANSCEIVER-MIB::hpicfXcvrPortDesc']) . ' Bias Current';
         discover_sensor(null, 'current', $device, $oid, 'hpicfXcvrBias.' . $index, 'procurve', $descr, $divisor, 1, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured, group: 'transceiver');
     }
 }

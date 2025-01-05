@@ -135,7 +135,7 @@ if (Config::get('enable_vrfs')) {
                 echo "\n  [VRF $vrf_name] PORTS - ";
                 foreach ($port_table[$vrf_oid] as $if_id) {
                     $interface = dbFetchRow('SELECT * FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ?', [$device['device_id'], $if_id]);
-                    echo Rewrite::shortenIfType($interface['ifDescr']) . ' ';
+                    echo Rewrite::shortenIfName($interface['ifDescr']) . ' ';
                     dbUpdate(['ifVrf' => $vrf_id], 'ports', 'port_id=?', [$interface['port_id']]);
                     $if = $interface['port_id'];
                     $valid_vrf_if[$vrf_id][$if] = 1;
@@ -192,7 +192,7 @@ if (Config::get('enable_vrfs')) {
             echo "\n  [VRF $vrf_name] PORTS - ";
             foreach ($port_table[$vrf_oid] as $if_index => $if_name) {
                 $interface = dbFetchRow('SELECT * FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ?', [$device['device_id'], $if_index]);
-                echo Rewrite::shortenIfType($interface['ifDescr']) . ' ';
+                echo Rewrite::shortenIfName($interface['ifDescr']) . ' ';
                 dbUpdate(['ifVrf' => $vrf_id], 'ports', 'port_id=?', [$interface['port_id']]);
                 $if = $interface['port_id'];
                 $valid_vrf_if[$vrf_id][$if] = 1;
@@ -240,7 +240,7 @@ if (Config::get('enable_vrfs')) {
                 $vrf_id = dbFetchCell('SELECT vrf_id FROM vrfs WHERE device_id = ? AND `vrf_oid`=?', [$device['device_id'], $ifVrfName]);
                 $valid_vrf[$vrf_id] = 1;
                 $interface = dbFetchRow('SELECT * FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ?', [$device['device_id'], $if_index]);
-                echo Rewrite::shortenIfType($interface['ifDescr']) . ' ';
+                echo Rewrite::shortenIfName($interface['ifDescr']) . ' ';
                 dbUpdate(['ifVrf' => $vrf_id], 'ports', 'port_id=?', [$interface['port_id']]);
                 $if = $interface['port_id'];
                 $valid_vrf_if[$vrf_id][$if] = 1;

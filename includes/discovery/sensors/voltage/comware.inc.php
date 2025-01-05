@@ -36,7 +36,7 @@ foreach ($hh3cTransceiverInfoTable as $index => $entry) {
         $entPhysicalIndex = $index;
         $entPhysicalIndex_measured = 'ports';
 
-        $descr = Rewrite::shortenIfType($interface['ifDescr']) . ' Supply Voltage';
+        $descr = Rewrite::shortenIfName($interface['ifDescr']) . ' Supply Voltage';
         discover_sensor(null, 'voltage', $device, $oid, 'volt-' . $index, 'comware', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured, group: 'transceiver');
     }
 }

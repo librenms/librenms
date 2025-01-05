@@ -65,7 +65,7 @@ foreach ($accs as $acc) {
                 [$addy['ipv4_address']]
             );
             if ($peer) {
-                $name = $peer['hostname'] . ' ' . Rewrite::shortenIfType($peer['ifDescr']) . ' (' . $mac . ')';
+                $name = $peer['hostname'] . ' ' . Rewrite::shortenIfName($peer['ifDescr']) . ' (' . $mac . ')';
             }
 
             if (dbFetchCell('SELECT count(*) FROM bgpPeers WHERE device_id = ? AND bgpPeerIdentifier = ?', [$acc['device_id'], $addy['ipv4_address']])) {

@@ -35,7 +35,7 @@ if (! isset($vars['device'])) {
 
 if ($entry['type'] == 'interface') {
     $this_if = cleanPort(getifbyid($entry['reference']));
-    $entry['link'] = '<b>' . generate_port_link($this_if, Rewrite::shortenIfType(strtolower($this_if['label']))) . '</b>';
+    $entry['link'] = '<b>' . generate_port_link($this_if, Rewrite::shortenIfName(strtolower($this_if['label']))) . '</b>';
 } else {
     $entry['link'] = 'System';
 }

@@ -15,7 +15,7 @@ foreach (SnmpQuery::cache()->walk('HP-ICF-TRANSCEIVER-MIB::hpicfXcvrInfoTable')-
         $current = $entry['HP-ICF-TRANSCEIVER-MIB::hpicfXcvrRxPower'] / $divisor;
         $entPhysicalIndex = $index;
         $entPhysicalIndex_measured = 'ports';
-        $descr = Rewrite::shortenIfType($entry['HP-ICF-TRANSCEIVER-MIB::hpicfXcvrPortDesc']) . ' Rx Power';
+        $descr = Rewrite::shortenIfName($entry['HP-ICF-TRANSCEIVER-MIB::hpicfXcvrPortDesc']) . ' Rx Power';
         discover_sensor(null, 'dbm', $device, $oid, 'hpicfXcvrRxPower.' . $index, 'procurve', $descr, $divisor, 1, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured, group: 'transceiver');
     }
 
@@ -28,7 +28,7 @@ foreach (SnmpQuery::cache()->walk('HP-ICF-TRANSCEIVER-MIB::hpicfXcvrInfoTable')-
         $current = $entry['HP-ICF-TRANSCEIVER-MIB::hpicfXcvrTxPower'] / $divisor;
         $entPhysicalIndex = $index;
         $entPhysicalIndex_measured = 'ports';
-        $descr = Rewrite::shortenIfType($entry['HP-ICF-TRANSCEIVER-MIB::hpicfXcvrPortDesc']) . ' Tx Power';
+        $descr = Rewrite::shortenIfName($entry['HP-ICF-TRANSCEIVER-MIB::hpicfXcvrPortDesc']) . ' Tx Power';
         discover_sensor(null, 'dbm', $device, $oid, 'hpicfXcvrTxPower.-' . $index, 'procurve', $descr, $divisor, 1, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured, group: 'transceiver');
     }
 }

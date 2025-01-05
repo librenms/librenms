@@ -19,7 +19,7 @@ foreach (dbFetchRows($sql, $param) as $port) {
             'filename' => $rrd_filename,
             'descr' => $port['hostname'] . '-' . $port['ifDescr'],
             'descr_in' => shorthost($port['hostname']),
-            'descr_out' => Rewrite::shortenIfType($port['ifDescr']),
+            'descr_out' => Rewrite::shortenIfName($port['ifDescr']),
         ];
     }
 }

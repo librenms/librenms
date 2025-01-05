@@ -76,7 +76,7 @@ foreach (dbFetchRows($sql, $param) as $eventlog) {
     $dev = device_by_id_cache($eventlog['device_id']);
     if ($eventlog['type'] == 'interface') {
         $this_if = cleanPort(getifbyid($eventlog['reference']));
-        $type = '<b>' . generate_port_link($this_if, Rewrite::shortenIfType(strtolower($this_if['label']))) . '</b>';
+        $type = '<b>' . generate_port_link($this_if, Rewrite::shortenIfName(strtolower($this_if['label']))) . '</b>';
     } else {
         $type = $eventlog['type'];
     }
