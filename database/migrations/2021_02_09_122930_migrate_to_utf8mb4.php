@@ -3,7 +3,8 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\DB;
 
-return new class extends Migration {
+return new class extends Migration
+{
     /**
      * Run the migrations.
      *
@@ -26,7 +27,7 @@ return new class extends Migration {
 
     protected function migrateCharsetTo($charset, $collation)
     {
-        if (LibreNMS\DB\Eloquent::getDriver() != 'mysql') {
+        if (\LibreNMS\DB\Eloquent::getDriver() != 'mysql') {
             return;
         }
 

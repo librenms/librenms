@@ -209,12 +209,12 @@ class SetConfigCommand extends LnmsCommand
      * @param  string  $setting
      * @param  mixed  $value
      *
-     * @throws ValidationException
+     * @throws \JsonSchema\Exception\ValidationException
      */
     private function validateOsSetting(string $os, string $setting, $value)
     {
         // prep data to be validated
-        $os_data = Config::get("os.$os");
+        $os_data = \LibreNMS\Config::get("os.$os");
         if ($os_data === null) {
             throw new ValidationException(trans('commands.config:set.errors.invalid_os', ['os' => $os]));
         }

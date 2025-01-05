@@ -35,7 +35,7 @@ class Jira extends Transport
             if (! $webhook_on) {
                 $url .= '/rest/api/latest/issue';
             }
-            // Messsage is a recovery
+        // Messsage is a recovery
         } else {
             if (! $webhook_on) {
                 return false; // Webhooks not enabled, do nothing.

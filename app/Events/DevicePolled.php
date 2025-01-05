@@ -11,7 +11,7 @@ class DevicePolled
     use Dispatchable, SerializesModels;
 
     /**
-     * @var Device
+     * @var \App\Models\Device
      */
     public $device;
 

@@ -41,7 +41,7 @@ class EnvHelper
      * @param  string  $file
      * @return string
      *
-     * @throws FileWriteFailedException
+     * @throws \LibreNMS\Exceptions\FileWriteFailedException
      */
     public static function writeEnv($settings, $unset = [], $file = '.env')
     {
@@ -111,7 +111,7 @@ class EnvHelper
      *
      * @return bool|string
      *
-     * @throws FileWriteFailedException
+     * @throws \LibreNMS\Exceptions\FileWriteFailedException
      */
     public static function init()
     {

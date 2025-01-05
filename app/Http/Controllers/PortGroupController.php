@@ -36,7 +36,7 @@ class PortGroupController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  Request  $request
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\RedirectResponse
      */
     public function store(Request $request, ToastInterface $toast)
@@ -56,7 +56,7 @@ class PortGroupController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  PortGroup  $portGroup
+     * @param  \App\Models\PortGroup  $portGroup
      * @return \Illuminate\View\View
      */
     public function edit(PortGroup $portGroup)
@@ -69,8 +69,8 @@ class PortGroupController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  Request  $request
-     * @param  PortGroup  $portGroup
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Models\PortGroup  $portGroup
      * @return \Illuminate\Http\RedirectResponse
      */
     public function update(Request $request, PortGroup $portGroup, ToastInterface $toast)
@@ -103,7 +103,7 @@ class PortGroupController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  PortGroup  $portGroup
+     * @param  \App\Models\PortGroup  $portGroup
      * @return \Illuminate\Http\Response
      */
     public function destroy(PortGroup $portGroup)

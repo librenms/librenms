@@ -13,7 +13,7 @@ use LibreNMS\Util\Url;
 class GraphController extends Controller
 {
     /**
-     * @throws RrdGraphException
+     * @throws \LibreNMS\Exceptions\RrdGraphException
      */
     public function __invoke(Request $request, string $path = ''): Response
     {

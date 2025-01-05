@@ -68,7 +68,7 @@ class Mempools implements Module
         });
         $this->calculateAvailable($mempools);
 
-        MempoolObserver::observe(Mempool::class);
+        MempoolObserver::observe(\App\Models\Mempool::class);
         $this->syncModels($os->getDevice(), 'mempools', $mempools);
 
         $mempools->each(function ($mempool) {
@@ -125,9 +125,9 @@ class Mempools implements Module
     }
 
     /**
-     * @param  OS  $os
-     * @param  Collection  $mempools
-     * @return Collection
+     * @param  \LibreNMS\OS  $os
+     * @param  \Illuminate\Support\Collection  $mempools
+     * @return \Illuminate\Support\Collection
      */
     private function defaultPolling($os, $mempools)
     {
@@ -172,8 +172,8 @@ class Mempools implements Module
     /**
      * Calculate available memory.  This is free + buffers + cached.
      *
-     * @param  Collection  $mempools
-     * @return Collection
+     * @param  \Illuminate\Support\Collection  $mempools
+     * @return \Illuminate\Support\Collection
      */
     private function calculateAvailable(Collection $mempools)
     {

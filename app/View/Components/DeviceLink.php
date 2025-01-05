@@ -10,7 +10,7 @@ use LibreNMS\Util\Graph;
 class DeviceLink extends Component
 {
     /**
-     * @var Device
+     * @var \App\Models\Device
      */
     public $device;
     /**
@@ -29,7 +29,7 @@ class DeviceLink extends Component
     /**
      * Create a new component instance.
      *
-     * @param  int|Device  $device
+     * @param  int|\App\Models\Device  $device
      */
     public function __construct($device, ?string $tab = null, ?string $section = null)
     {

@@ -201,16 +201,16 @@ class ServiceTemplate extends BaseModel
 
     public function devices(): BelongsToMany
     {
-        return $this->belongsToMany(Device::class, 'service_templates_device', 'service_template_id', 'device_id');
+        return $this->belongsToMany(\App\Models\Device::class, 'service_templates_device', 'service_template_id', 'device_id');
     }
 
     public function services(): BelongsToMany
     {
-        return $this->belongsToMany(Service::class, 'service_templates_device', 'service_template_id', 'device_id');
+        return $this->belongsToMany(\App\Models\Service::class, 'service_templates_device', 'service_template_id', 'device_id');
     }
 
     public function groups(): BelongsToMany
     {
-        return $this->belongsToMany(DeviceGroup::class, 'service_templates_device_group', 'service_template_id', 'device_group_id');
+        return $this->belongsToMany(\App\Models\DeviceGroup::class, 'service_templates_device_group', 'service_template_id', 'device_group_id');
     }
 }

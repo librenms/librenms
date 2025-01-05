@@ -40,7 +40,7 @@ class LocationController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  Request  $request
+     * @param  \Illuminate\Http\Request  $request
      * @param  Location  $location
      * @return \Illuminate\Http\JsonResponse
      *

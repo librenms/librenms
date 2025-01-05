@@ -3,7 +3,8 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 
-return new class extends Migration {
+return new class extends Migration
+{
     /**
      * Run the migrations.
      *
@@ -20,8 +21,8 @@ return new class extends Migration {
             $table->timestamp('time_logged')->useCurrent()->index();
         });
 
-        if (LibreNMS\DB\Eloquent::getDriver() == 'mysql') {
-            DB::statement('ALTER TABLE `alert_log` CHANGE `details` `details` longblob NULL ;');
+        if (\LibreNMS\DB\Eloquent::getDriver() == 'mysql') {
+            \DB::statement('ALTER TABLE `alert_log` CHANGE `details` `details` longblob NULL ;');
         }
     }
 

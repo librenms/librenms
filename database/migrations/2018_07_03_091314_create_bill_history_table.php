@@ -3,7 +3,8 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 
-return new class extends Migration {
+return new class extends Migration
+{
     /**
      * Run the migrations.
      *
@@ -36,8 +37,8 @@ return new class extends Migration {
             $table->unique(['bill_id', 'bill_datefrom', 'bill_dateto']);
         });
 
-        if (LibreNMS\DB\Eloquent::getDriver() == 'mysql') {
-            DB::statement('ALTER TABLE `bill_history` CHANGE `pdf` `pdf` longblob NULL ;');
+        if (\LibreNMS\DB\Eloquent::getDriver() == 'mysql') {
+            \DB::statement('ALTER TABLE `bill_history` CHANGE `pdf` `pdf` longblob NULL ;');
         }
     }
 

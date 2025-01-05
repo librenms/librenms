@@ -21,7 +21,7 @@ class QueryMetricListener
     /**
      * Handle the event.
      *
-     * @param  QueryExecuted  $event
+     * @param  \Illuminate\Database\Events\QueryExecuted  $event
      * @return void
      */
     public function handle(QueryExecuted $event): void

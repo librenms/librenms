@@ -71,7 +71,7 @@ class DashboardController extends Controller
     }
 
     /**
-     * @param  Request  $request
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Contracts\View\View
      */
     public function index(Request $request)
@@ -117,8 +117,8 @@ class DashboardController extends Controller
     }
 
     /**
-     * @param  Request  $request
-     * @param  Dashboard  $dashboard
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Models\Dashboard  $dashboard
      * @return \Illuminate\Contracts\View\View
      */
     public function show(Request $request, Dashboard $dashboard)
@@ -257,7 +257,7 @@ class DashboardController extends Controller
     }
 
     /**
-     * @param  User  $user
+     * @param  \App\Models\User  $user
      * @return \Illuminate\Support\Collection<\App\Models\Dashboard>
      */
     private function getAvailableDashboards(User $user): Collection

@@ -47,8 +47,8 @@ class Unifi extends OS implements
     WirelessPowerDiscovery,
     WirelessUtilizationDiscovery
 {
-    use Traits\FrogfootResources {
-        Traits\FrogfootResources::discoverProcessors as discoverFrogfootProcessors;
+    use OS\Traits\FrogfootResources {
+        OS\Traits\FrogfootResources::discoverProcessors as discoverFrogfootProcessors;
     }
 
     private $ccqDivisor = 10;

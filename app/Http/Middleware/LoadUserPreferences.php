@@ -12,8 +12,8 @@ class LoadUserPreferences
     /**
      * Handle an incoming request.
      *
-     * @param  Request  $request
-     * @param  Closure  $next
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Closure  $next
      */
     public function handle(Request $request, Closure $next): Response
     {
@@ -40,7 +40,7 @@ class LoadUserPreferences
      * Fetch preferences from the database
      * Load all preferences at once if we need to query the database
      *
-     * @param  Request  $request
+     * @param  \Illuminate\Http\Request  $request
      * @param  array  $preferences
      */
     private function loadPreferences($request, $preferences)
@@ -52,7 +52,7 @@ class LoadUserPreferences
     }
 
     /**
-     * @param  Request  $request
+     * @param  \Illuminate\Http\Request  $request
      * @param  string  $pref
      * @param  callable  $callable
      */

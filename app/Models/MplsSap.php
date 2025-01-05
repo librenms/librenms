@@ -41,11 +41,11 @@ class MplsSap extends DeviceRelatedModel implements Keyable
 
     public function binds(): HasMany
     {
-        return $this->hasMany(MplsSdpBind::class, 'svc_id');
+        return $this->hasMany(\App\Models\MplsSdpBind::class, 'svc_id');
     }
 
     public function services(): HasMany
     {
-        return $this->hasMany(MplsService::class, 'svc_id');
+        return $this->hasMany(\App\Models\MplsService::class, 'svc_id');
     }
 }

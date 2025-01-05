@@ -12,7 +12,7 @@ class StpObserver
     /**
      * Handle the Stp "updating" event.
      *
-     * @param  Stp  $stp
+     * @param  \App\Models\Stp  $stp
      * @return void
      */
     public function updating(Stp $stp)

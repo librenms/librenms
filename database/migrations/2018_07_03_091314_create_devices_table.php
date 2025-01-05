@@ -3,7 +3,8 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 
-return new class extends Migration {
+return new class extends Migration
+{
     /**
      * Run the migrations.
      *
@@ -62,8 +63,8 @@ return new class extends Migration {
             $table->integer('max_depth')->default(0);
         });
 
-        if (LibreNMS\DB\Eloquent::getDriver() == 'mysql') {
-            DB::statement('ALTER TABLE `devices` CHANGE `ip` `ip` varbinary(16) NULL ;');
+        if (\LibreNMS\DB\Eloquent::getDriver() == 'mysql') {
+            \DB::statement('ALTER TABLE `devices` CHANGE `ip` `ip` varbinary(16) NULL ;');
         }
     }
 

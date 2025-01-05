@@ -71,7 +71,7 @@ class DynamicConfig
     /**
      * Get all groups defined
      *
-     * @return Collection
+     * @return \Illuminate\Support\Collection
      */
     public function getGroups()
     {

@@ -35,7 +35,7 @@ use Log;
 
 class InfluxDB extends BaseDatastore
 {
-    /** @var Database */
+    /** @var \InfluxDB\Database */
     private $connection;
 
     public function __construct(Database $influx)
@@ -132,7 +132,7 @@ class InfluxDB extends BaseDatastore
     /**
      * Create a new client and select the database
      *
-     * @return Database
+     * @return \InfluxDB\Database
      */
     public static function createFromConfig()
     {

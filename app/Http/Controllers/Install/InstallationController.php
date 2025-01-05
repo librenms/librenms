@@ -34,10 +34,10 @@ class InstallationController extends Controller
     protected $connection = 'setup';
     protected $step;
     protected $steps = [
-        'checks' => ChecksController::class,
-        'database' => DatabaseController::class,
-        'user' => MakeUserController::class,
-        'finish' => FinalizeController::class,
+        'checks' => \App\Http\Controllers\Install\ChecksController::class,
+        'database' => \App\Http\Controllers\Install\DatabaseController::class,
+        'user' => \App\Http\Controllers\Install\MakeUserController::class,
+        'finish' => \App\Http\Controllers\Install\FinalizeController::class,
     ];
 
     public function redirectToFirst()

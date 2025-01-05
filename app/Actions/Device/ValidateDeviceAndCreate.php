@@ -41,7 +41,7 @@ use SnmpQuery;
 class ValidateDeviceAndCreate
 {
     /**
-     * @var Device
+     * @var \App\Models\Device
      */
     private $device;
     /**
@@ -69,9 +69,9 @@ class ValidateDeviceAndCreate
      * @return bool
      *
      * @throws \LibreNMS\Exceptions\HostExistsException
-     * @throws HostUnreachablePingException
+     * @throws \LibreNMS\Exceptions\HostUnreachablePingException
      * @throws \LibreNMS\Exceptions\HostUnreachableException
-     * @throws SnmpVersionUnsupportedException
+     * @throws \LibreNMS\Exceptions\SnmpVersionUnsupportedException
      */
     public function execute(): bool
     {
@@ -105,7 +105,7 @@ class ValidateDeviceAndCreate
 
     /**
      * @throws \LibreNMS\Exceptions\HostUnreachableException
-     * @throws SnmpVersionUnsupportedException
+     * @throws \LibreNMS\Exceptions\SnmpVersionUnsupportedException
      */
     private function detectCredentials(): void
     {

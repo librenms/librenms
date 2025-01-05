@@ -31,5 +31,5 @@ use LibreNMS\OS;
 
 class Quanta extends OS implements ProcessorDiscovery, ProcessorPolling
 {
-    use Traits\VxworksProcessorUsage;
+    use OS\Traits\VxworksProcessorUsage;
 }

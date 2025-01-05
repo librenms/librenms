@@ -142,7 +142,7 @@ class PortsController extends TableController
     }
 
     /**
-     * @param  Port  $port
+     * @param  \App\Models\Port  $port
      * @return array
      */
     public function formatItem($port)

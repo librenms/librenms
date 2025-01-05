@@ -95,11 +95,11 @@ class AppServiceProvider extends ServiceProvider
     {
         $sensor_types = [];
         foreach (Sensor::getTypes() as $sensor_type) {
-            $sensor_types[$sensor_type] = Sensor::class;
+            $sensor_types[$sensor_type] = \App\Models\Sensor::class;
         }
         Relation::morphMap(array_merge([
             'interface' => \App\Models\Port::class,
-            'sensor' => Sensor::class,
+            'sensor' => \App\Models\Sensor::class,
             'device' => \App\Models\Device::class,
             'device_group' => \App\Models\DeviceGroup::class,
             'location' => \App\Models\Location::class,
@@ -143,7 +143,7 @@ class AppServiceProvider extends ServiceProvider
         \App\Models\Device::observe(\App\Observers\DeviceObserver::class);
         \App\Models\Package::observe(\App\Observers\PackageObserver::class);
         \App\Models\Qos::observe(\App\Observers\QosObserver::class);
-        Sensor::observe(\App\Observers\SensorObserver::class);
+        \App\Models\Sensor::observe(\App\Observers\SensorObserver::class);
         \App\Models\Service::observe(\App\Observers\ServiceObserver::class);
         \App\Models\Stp::observe(\App\Observers\StpObserver::class);
         \App\Models\User::observe(\App\Observers\UserObserver::class);

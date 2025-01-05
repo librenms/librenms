@@ -33,9 +33,9 @@ class SettingsController extends Controller
      * Update the specified resource in storage.
      *
      * @param  DynamicConfig  $config
-     * @param  Request  $request
+     * @param  \Illuminate\Http\Request  $request
      * @param  string  $id
-     * @return JsonResponse
+     * @return \Illuminate\Http\JsonResponse
      */
     public function update(DynamicConfig $config, Request $request, $id)
     {
@@ -64,7 +64,7 @@ class SettingsController extends Controller
      *
      * @param  DynamicConfig  $config
      * @param  string  $id
-     * @return JsonResponse
+     * @return \Illuminate\Http\JsonResponse
      */
     public function destroy(DynamicConfig $config, $id)
     {
@@ -98,7 +98,7 @@ class SettingsController extends Controller
      * @param  string  $message
      * @param  mixed  $value
      * @param  int  $status
-     * @return JsonResponse
+     * @return \Illuminate\Http\JsonResponse
      */
     protected function jsonResponse($id, $message, $value = null, $status = 200)
     {

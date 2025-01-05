@@ -15,16 +15,16 @@ class PortsFdb extends PortRelatedModel
 
     public function device(): BelongsTo
     {
-        return $this->belongsTo(Device::class, 'device_id', 'device_id');
+        return $this->belongsTo(\App\Models\Device::class, 'device_id', 'device_id');
     }
 
     public function vlan(): BelongsTo
     {
-        return $this->belongsTo(Vlan::class, 'vlan_id', 'vlan_id');
+        return $this->belongsTo(\App\Models\Vlan::class, 'vlan_id', 'vlan_id');
     }
 
     public function ipv4Addresses(): HasMany
     {
-        return $this->hasMany(Ipv4Mac::class, 'mac_address', 'mac_address');
+        return $this->hasMany(\App\Models\Ipv4Mac::class, 'mac_address', 'mac_address');
     }
 }

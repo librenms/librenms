@@ -11,7 +11,7 @@ use LibreNMS\Util\Url;
 class PortLink extends Component
 {
     /**
-     * @var Port
+     * @var \App\Models\Port
      */
     public $port;
     /**

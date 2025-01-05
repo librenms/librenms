@@ -64,7 +64,7 @@ class Vminfo extends DeviceRelatedModel implements Keyable
 
     public function parentDevice(): HasOne
     {
-        return $this->hasOne(Device::class, 'hostname', 'vmwVmDisplayName');
+        return $this->hasOne(\App\Models\Device::class, 'hostname', 'vmwVmDisplayName');
     }
 
     public function getCompositeKey()

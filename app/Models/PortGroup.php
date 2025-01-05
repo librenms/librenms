@@ -42,6 +42,6 @@ class PortGroup extends BaseModel
 
     public function ports()
     {
-        return $this->belongsToMany(Port::class, 'port_group_port', 'port_group_id', 'port_id');
+        return $this->belongsToMany(\App\Models\Port::class, 'port_group_port', 'port_group_id', 'port_id');
     }
 }

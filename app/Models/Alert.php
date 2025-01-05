@@ -66,16 +66,16 @@ class Alert extends Model
 
     public function device(): BelongsTo
     {
-        return $this->belongsTo(Device::class, 'device_id');
+        return $this->belongsTo(\App\Models\Device::class, 'device_id');
     }
 
     public function rule(): BelongsTo
     {
-        return $this->belongsTo(AlertRule::class, 'rule_id', 'id');
+        return $this->belongsTo(\App\Models\AlertRule::class, 'rule_id', 'id');
     }
 
     public function users(): BelongsToMany
     {
-        return $this->belongsToMany(User::class, 'devices_perms', 'device_id', 'user_id');
+        return $this->belongsToMany(\App\Models\User::class, 'devices_perms', 'device_id', 'user_id');
     }
 }

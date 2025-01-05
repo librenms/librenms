@@ -3,7 +3,8 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 
-return new class extends Migration {
+return new class extends Migration
+{
     /**
      * Run the migrations.
      *
@@ -17,14 +18,14 @@ return new class extends Migration {
             $table->string('type');
             $table->string('dtype', 16)->default('static');
             $table->text('drules')->nullable();
-            if (LibreNMS\DB\Eloquent::getDriver() !== 'sqlite') {
+            if (\LibreNMS\DB\Eloquent::getDriver() !== 'sqlite') {
                 $table->string('dgtype', 16)->default('static');
                 $table->text('dgrules')->nullable();
             }
             $table->text('desc')->nullable()->default(null);
             $table->text('param')->nullable()->default(null);
             $table->boolean('ignore')->default(0);
-            if (LibreNMS\DB\Eloquent::getDriver() == 'mysql') {
+            if (\LibreNMS\DB\Eloquent::getDriver() == 'mysql') {
                 $table->timestamp('changed')->default(DB::raw('CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP'));
             } else {
                 $table->timestamp('changed')->useCurrent();

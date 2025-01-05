@@ -35,7 +35,7 @@ Artisan::command('release:tag
                 $this->error('Failed to create release, check github to see what was completed.');
             }
         }
-    } catch (Exception $e) {
+    } catch (\Exception $e) {
         $this->error($e->getMessage());
     }
 

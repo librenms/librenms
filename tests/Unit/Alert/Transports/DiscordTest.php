@@ -33,6 +33,7 @@ use Illuminate\Support\Facades\Http;
 use LibreNMS\Alert\AlertData;
 use LibreNMS\Alert\Transport;
 use LibreNMS\Tests\TestCase;
+
 use function PHPUnit\Framework\assertEquals;
 
 class DiscordTest extends TestCase

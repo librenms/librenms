@@ -39,7 +39,7 @@ use LibreNMS\OS;
 use SnmpQuery;
 
 class Arubaos extends OS implements
-    OSDiscovery,
+    OsDiscovery,
     WirelessApCountDiscovery,
     WirelessClientsDiscovery,
     WirelessFrequencyDiscovery,

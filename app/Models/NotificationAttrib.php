@@ -16,11 +16,11 @@ class NotificationAttrib extends Model
 
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(\App\Models\User::class, 'user_id');
     }
 
     public function notification(): BelongsTo
     {
-        return $this->belongsTo(Notification::class, 'notifications_id');
+        return $this->belongsTo(\App\Models\Notification::class, 'notifications_id');
     }
 }

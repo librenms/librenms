@@ -31,7 +31,7 @@ class PollDevice implements ShouldQueue
     private ?\App\Models\Device $device = null;
     private ?array $deviceArray = null;
     /**
-     * @var OS|OS\Generic
+     * @var \LibreNMS\OS|\LibreNMS\OS\Generic
      */
     private $os;
 

@@ -28,7 +28,7 @@ abstract class DuskTestCase extends BaseTestCase
     /**
      * Create the RemoteWebDriver instance.
      *
-     * @return RemoteWebDriver
+     * @return \Facebook\WebDriver\Remote\RemoteWebDriver
      */
     protected function driver()
     {

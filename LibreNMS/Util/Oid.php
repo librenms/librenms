@@ -105,7 +105,7 @@ class Oid
     /**
      * Converts an oid to numeric and caches the result
      *
-     * @throws InvalidOidException
+     * @throws \LibreNMS\Exceptions\InvalidOidException
      */
     public function toNumeric(string $mib = 'ALL', int $cache = 1800): string
     {

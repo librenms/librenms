@@ -27,7 +27,7 @@ namespace LibreNMS\OS;
 
 use App\Models\Device;
 
-class Jetdirect extends Shared\Printer
+class Jetdirect extends \LibreNMS\OS\Shared\Printer
 {
     public function discoverOS(Device $device): void
     {

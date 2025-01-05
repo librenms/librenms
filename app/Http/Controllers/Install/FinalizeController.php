@@ -136,7 +136,7 @@ class FinalizeController extends InstallationController implements InstallerStep
     }
 
     /**
-     * @throws FileWriteFailedException
+     * @throws \LibreNMS\Exceptions\FileWriteFailedException
      */
     private function writeConfigFile()
     {

@@ -88,7 +88,7 @@ trait GeocodingHelper
      * @param  string  $address
      * @return array
      *
-     * @throws Exception you may throw an Exception if validation fails
+     * @throws \Exception you may throw an Exception if validation fails
      */
     abstract protected function buildGeocodingOptions(string $address): array;
 }

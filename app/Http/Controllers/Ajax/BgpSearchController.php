@@ -49,7 +49,7 @@ class BgpSearchController extends SearchController
     }
 
     /**
-     * @param  BgpPeer  $peer
+     * @param  \App\Models\BgpPeer  $peer
      * @return array
      */
     public function formatItem($peer): array

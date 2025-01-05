@@ -63,7 +63,7 @@ class Edgecos extends OS implements MempoolsDiscovery, ProcessorDiscovery
 
         $mempool->fillUsage($data['memoryAllocated.0'] ?? null, $data['memoryTotal.0'] ?? null, $data['memoryFreed.0']);
 
-        return new Collection([$mempool]);
+        return new \Illuminate\Support\Collection([$mempool]);
     }
 
     public function discoverOS(Device $device): void

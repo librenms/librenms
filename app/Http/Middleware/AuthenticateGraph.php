@@ -37,20 +37,20 @@ class AuthenticateGraph
 {
     /** @var string[] */
     protected $auth = [
-        LegacyExternalAuth::class,
-        Authenticate::class,
-        VerifyTwoFactor::class,
-        LoadUserPreferences::class,
+        \App\Http\Middleware\LegacyExternalAuth::class,
+        \App\Http\Middleware\Authenticate::class,
+        \App\Http\Middleware\VerifyTwoFactor::class,
+        \App\Http\Middleware\LoadUserPreferences::class,
     ];
 
     /**
      * Handle an incoming request.
      *
-     * @param  Request  $request
-     * @param  Closure  $next
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Closure  $next
      * @param  string|null  $relative
      *
-     * @throws AuthenticationException
+     * @throws \Illuminate\Auth\AuthenticationException
      */
     public function handle(Request $request, Closure $next, $relative = null): Response
     {

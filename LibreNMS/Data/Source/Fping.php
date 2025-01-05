@@ -58,7 +58,7 @@ class Fping
      *
      * @param  string  $host  hostname or ip
      * @param  string  $address_family  ipv4 or ipv6
-     * @return FpingResponse
+     * @return \LibreNMS\Data\Source\FpingResponse
      */
     public function ping($host, $address_family = 'ipv4'): FpingResponse
     {

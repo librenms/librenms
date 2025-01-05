@@ -67,7 +67,7 @@ class Configuration extends BaseValidation
     }
 
     /**
-     * @param  Validator  $validator
+     * @param  \LibreNMS\Validator  $validator
      */
     private function failKeyChanged(Validator $validator): void
     {

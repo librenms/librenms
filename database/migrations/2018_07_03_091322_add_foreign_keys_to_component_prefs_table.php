@@ -3,7 +3,8 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 
-return new class extends Migration {
+return new class extends Migration
+{
     /**
      * Run the migrations.
      *
@@ -23,7 +24,7 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        if (LibreNMS\DB\Eloquent::getDriver() !== 'sqlite') {
+        if (\LibreNMS\DB\Eloquent::getDriver() !== 'sqlite') {
             Schema::table('component_prefs', function (Blueprint $table) {
                 $table->dropForeign('component_prefs_ibfk_1');
             });

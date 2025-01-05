@@ -13,7 +13,7 @@ class ServiceTemplatePolicy
     /**
      * Determine whether the user can view any service templates.
      *
-     * @param  User  $user
+     * @param  \App\Models\User  $user
      */
     public function viewAny(User $user): bool
     {
@@ -23,8 +23,8 @@ class ServiceTemplatePolicy
     /**
      * Determine whether the user can view the service template.
      *
-     * @param  User  $user
-     * @param  ServiceTemplate  $template
+     * @param  \App\Models\User  $user
+     * @param  \App\Models\ServiceTemplate  $template
      */
     public function view(User $user, ServiceTemplate $template): bool
     {
@@ -34,7 +34,7 @@ class ServiceTemplatePolicy
     /**
      * Determine whether the user can create service templates.
      *
-     * @param  User  $user
+     * @param  \App\Models\User  $user
      */
     public function create(User $user): bool
     {
@@ -44,8 +44,8 @@ class ServiceTemplatePolicy
     /**
      * Determine whether the user can update the service template.
      *
-     * @param  User  $user
-     * @param  ServiceTemplate  $template
+     * @param  \App\Models\User  $user
+     * @param  \App\Models\ServiceTemplate  $template
      */
     public function update(User $user, ServiceTemplate $template): bool
     {
@@ -55,8 +55,8 @@ class ServiceTemplatePolicy
     /**
      * Determine whether the user can delete the service template.
      *
-     * @param  User  $user
-     * @param  ServiceTemplate  $template
+     * @param  \App\Models\User  $user
+     * @param  \App\Models\ServiceTemplate  $template
      */
     public function delete(User $user, ServiceTemplate $template): bool
     {
@@ -66,8 +66,8 @@ class ServiceTemplatePolicy
     /**
      * Determine whether the user can restore the service template.
      *
-     * @param  User  $user
-     * @param  ServiceTemplate  $template
+     * @param  \App\Models\User  $user
+     * @param  \App\Models\ServiceTemplate  $template
      */
     public function restore(User $user, ServiceTemplate $template): bool
     {
@@ -77,8 +77,8 @@ class ServiceTemplatePolicy
     /**
      * Determine whether the user can permanently delete the service template.
      *
-     * @param  User  $user
-     * @param  ServiceTemplate  $template
+     * @param  \App\Models\User  $user
+     * @param  \App\Models\ServiceTemplate  $template
      */
     public function forceDelete(User $user, ServiceTemplate $template): bool
     {
@@ -89,8 +89,8 @@ class ServiceTemplatePolicy
      * Determine whether the user can view the stored configuration of the service template
      * from Oxidized or Rancid
      *
-     * @param  User  $user
-     * @param  ServiceTemplate  $template
+     * @param  \App\Models\User  $user
+     * @param  \App\Models\ServiceTemplate  $template
      */
     public function showConfig(User $user, ServiceTemplate $template): bool
     {
@@ -100,8 +100,8 @@ class ServiceTemplatePolicy
     /**
      * Determine whether the user can update service template notes.
      *
-     * @param  User  $user
-     * @param  ServiceTemplate  $template
+     * @param  \App\Models\User  $user
+     * @param  \App\Models\ServiceTemplate  $template
      */
     public function updateNotes(User $user, ServiceTemplate $template): bool
     {

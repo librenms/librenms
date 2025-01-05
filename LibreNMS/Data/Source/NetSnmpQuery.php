@@ -141,7 +141,7 @@ class NetSnmpQuery implements SnmpQueryInterface
      *
      * @param  string|null  $context  Version 2/3 context name
      * @param  string|null  $v3_prefix  Optional context prefix to prepend for Version 3 queries
-     * @return SnmpQueryInterface
+     * @return \LibreNMS\Data\Source\SnmpQueryInterface
      */
     public function context(?string $context, ?string $v3_prefix = null): SnmpQueryInterface
     {
@@ -269,7 +269,7 @@ class NetSnmpQuery implements SnmpQueryInterface
      * Commonly used to fetch a single or multiple explicit values.
      *
      * @param  array|string  $oid
-     * @return SnmpResponse
+     * @return \LibreNMS\Data\Source\SnmpResponse
      */
     public function get($oid): SnmpResponse
     {
@@ -281,7 +281,7 @@ class NetSnmpQuery implements SnmpQueryInterface
      * Fetches all OIDs under a given OID, commonly used with tables.
      *
      * @param  array|string  $oid
-     * @return SnmpResponse
+     * @return \LibreNMS\Data\Source\SnmpResponse
      */
     public function walk($oid): SnmpResponse
     {
@@ -293,7 +293,7 @@ class NetSnmpQuery implements SnmpQueryInterface
      * snmpnext retrieves the first oid after the given oid.
      *
      * @param  array|string  $oid
-     * @return SnmpResponse
+     * @return \LibreNMS\Data\Source\SnmpResponse
      */
     public function next($oid): SnmpResponse
     {

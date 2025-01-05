@@ -4,7 +4,8 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     /**
      * Run the migrations.
      *
@@ -13,7 +14,7 @@ return new class extends Migration {
     public function up(): void
     {
         // try to run index like this to hopefully allow mysql to optimize away the reindex
-        if (LibreNMS\DB\Eloquent::getDriver() == 'mysql') {
+        if (\LibreNMS\DB\Eloquent::getDriver() == 'mysql') {
             $this->renameIndex('access_points', 'deleted', 'access_points_deleted_index', ['deleted']);
             $this->renameIndex('access_points', 'deleted', 'access_points_deleted_index', ['deleted']);
             $this->renameIndex('alerts', 'device_id', 'alerts_device_id_index', ['device_id']);

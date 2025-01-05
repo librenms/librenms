@@ -8,7 +8,7 @@ use Illuminate\View\Component;
 class PortLinkMap extends Component
 {
     /**
-     * @var Port
+     * @var \App\Models\Port
      */
     public $port;
 

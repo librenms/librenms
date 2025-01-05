@@ -97,7 +97,7 @@ class Graph
      * @param  array|string  $vars
      * @return GraphImage
      *
-     * @throws RrdGraphException
+     * @throws \LibreNMS\Exceptions\RrdGraphException
      */
     public static function get($vars): GraphImage
     {
