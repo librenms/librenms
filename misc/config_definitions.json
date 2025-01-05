@@ -5344,13 +5344,6 @@
             "default": false,
             "type": "boolean"
         },
-        "poller_modules.wifi": {
-            "order": 430,
-            "group": "poller",
-            "section": "poller_modules",
-            "default": false,
-            "type": "boolean"
-        },
         "poller_modules.wireless": {
             "order": 440,
             "group": "poller",
