@@ -1,6 +1,7 @@
 <?php
 
 use LibreNMS\Util\Rewrite;
+
 /*
  * LibreNMS
  *

@@ -52,7 +52,7 @@ class PortSearchController extends SearchController
     }
 
     /**
-     * @param  \App\Models\Port  $port
+     * @param  Port  $port
      * @return array
      */
     public function formatItem($port): array

@@ -144,7 +144,7 @@ class YamlDiscovery
     }
 
     /**
-     * @param  \LibreNMS\OS  $os  OS/device we areworking on
+     * @param  OS  $os  OS/device we areworking on
      * @param  array  $data  Array derived from YAML
      * @return string
      *

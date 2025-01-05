@@ -75,7 +75,7 @@ class PollerCluster extends Model
      * @param  string  $name
      * @return mixed
      *
-     * @throws \LibreNMS\Exceptions\InvalidNameException
+     * @throws InvalidNameException
      */
     public function getSettingValue(string $name)
     {
@@ -287,6 +287,6 @@ class PollerCluster extends Model
 
     public function stats(): HasMany
     {
-        return $this->hasMany(\App\Models\PollerClusterStat::class, 'parent_poller', 'id');
+        return $this->hasMany(PollerClusterStat::class, 'parent_poller', 'id');
     }
 }

@@ -206,12 +206,12 @@ return [
         'Redis' => Illuminate\Support\Facades\Redis::class,
 
         // LibreNMS
-        'DeviceCache' => \App\Facades\DeviceCache::class,
-        'Permissions' => \App\Facades\Permissions::class,
-        'PluginManager' => \App\Facades\PluginManager::class,
-        'Rrd' => \App\Facades\Rrd::class,
-        'SnmpQuery' => \App\Facades\FacadeAccessorSnmp::class,
-        'LibrenmsConfig' => \App\Facades\LibrenmsConfig::class,
+        'DeviceCache' => App\Facades\DeviceCache::class,
+        'Permissions' => App\Facades\Permissions::class,
+        'PluginManager' => App\Facades\PluginManager::class,
+        'Rrd' => App\Facades\Rrd::class,
+        'SnmpQuery' => App\Facades\FacadeAccessorSnmp::class,
+        'LibrenmsConfig' => App\Facades\LibrenmsConfig::class,
     ])->forget([
         'Http', // don't use Laravel Http facade, LibreNMS has its own wrapper
     ])->toArray(),

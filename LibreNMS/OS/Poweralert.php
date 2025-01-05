@@ -44,7 +44,7 @@ class Poweralert extends \LibreNMS\OS implements OSPolling
     }
 
     /**
-     * @param  \App\Models\Device  $device
+     * @param  Device  $device
      */
     private function customSysName(Device $device): void
     {

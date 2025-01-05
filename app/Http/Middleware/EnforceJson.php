@@ -34,8 +34,8 @@ class EnforceJson
     /**
      * Enforce json
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
+     * @param  Request  $request
+     * @param  Closure  $next
      */
     public function handle(Request $request, Closure $next): Response
     {

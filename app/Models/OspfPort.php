@@ -69,6 +69,6 @@ class OspfPort extends PortRelatedModel
 
     public function device(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\Device::class, 'device_id');
+        return $this->belongsTo(Device::class, 'device_id');
     }
 }

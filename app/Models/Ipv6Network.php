@@ -43,7 +43,7 @@ class Ipv6Network extends Model
 
     public function ipv6(): HasMany
     {
-        return $this->hasMany(\App\Models\Ipv6Address::class, 'ipv6_network_id');
+        return $this->hasMany(Ipv6Address::class, 'ipv6_network_id');
     }
 
     public function connectedPorts(): HasManyThrough

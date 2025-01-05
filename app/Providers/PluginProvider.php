@@ -79,7 +79,7 @@ class PluginProvider extends ServiceProvider
      * @param  string  $class
      * @return string
      *
-     * @throws \App\Exceptions\PluginDoesNotImplementHookException
+     * @throws PluginDoesNotImplementHookException
      */
     protected function hookType(string $class): string
     {

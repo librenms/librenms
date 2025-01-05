@@ -53,9 +53,9 @@ class ObjectCache implements ArrayAccess
                 $GLOBALS['_ObjCache'] = [];
             }
 
-            if (file_exists(\LibreNMS\Config::get('install_dir') . '/includes/caches/' . $obj . '.inc.php')) {
+            if (file_exists(Config::get('install_dir') . '/includes/caches/' . $obj . '.inc.php')) {
                 $data = [];
-                include \LibreNMS\Config::get('install_dir') . '/includes/caches/' . $obj . '.inc.php';
+                include Config::get('install_dir') . '/includes/caches/' . $obj . '.inc.php';
                 $this->data = $data;
                 $GLOBALS['_ObjCacheSkell'][$obj] = $this->data;
                 if (! (isset($GLOBALS['_ObjCache'][$obj]) && is_array($GLOBALS['_ObjCache'][$obj]))) {

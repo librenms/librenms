@@ -157,7 +157,7 @@ class Datastore implements DataStorageInterface
     /**
      * Get the measurements for all datastores, keyed by datastore name
      *
-     * @return \Illuminate\Support\Collection
+     * @return Collection
      */
     public function getStats(): Collection
     {

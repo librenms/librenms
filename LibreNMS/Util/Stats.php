@@ -183,7 +183,7 @@ class Stats
     /**
      * @param  Builder|string  $table
      * @param  array  $groups
-     * @return \Illuminate\Support\Collection
+     * @return Collection
      */
     private function selectTotal($table, array $groups = []): Collection
     {

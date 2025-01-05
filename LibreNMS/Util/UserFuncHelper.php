@@ -41,7 +41,7 @@ class UserFuncHelper
 
     public function dateToDays(): int
     {
-        return \LibreNMS\Util\Time::dateToDays($this->value_raw);
+        return Time::dateToDays($this->value_raw);
     }
 
     public function fsParseChannelValue(): float
