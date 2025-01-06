@@ -42,6 +42,6 @@ class CiscoNSDatabaseFull implements SnmptrapHandler
      */
     public function handle(Device $device, Trap $trap)
     {
-        $trap->log("Cisco Nameserver entry failed, database full", Severity::Error);
+        $trap->log('Cisco Nameserver entry failed, database full', Severity::Error);
     }
 }
