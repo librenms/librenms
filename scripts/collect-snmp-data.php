@@ -2,6 +2,7 @@
 <?php
 
 use App\Facades\LibrenmsConfig;
+use App\Models\Device;
 use Illuminate\Support\Str;
 use LibreNMS\Exceptions\InvalidModuleException;
 use LibreNMS\Util\Debug;
@@ -45,7 +46,7 @@ if (isset($hostname)) {
     if (is_numeric($hostname)) {
         $device = device_by_id_cache($hostname);
     } elseif (! empty($hostname)) {
-        $device = device_by_name($hostname);
+        $device = Device::findByHostname($hostname);
     }
 
     if (isset($device['os']) && $device['os'] != 'generic') {

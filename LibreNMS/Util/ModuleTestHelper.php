@@ -564,7 +564,7 @@ class ModuleTestHelper
         }
 
         // Remove existing device in case it didn't get removed previously
-        if (($existing_device = device_by_name($snmpsim->ip)) && isset($existing_device['device_id'])) {
+        if (($existing_device = Device::findByHostname($snmpsim->ip)) && isset($existing_device['device_id'])) {
             delete_device($existing_device['device_id']);
         }
 

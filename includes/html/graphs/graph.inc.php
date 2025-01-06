@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Device;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Data\Graphing\GraphParameters;
@@ -9,7 +10,7 @@ try {
     if (isset($vars['device'])) {
         $device = is_numeric($vars['device'])
             ? device_by_id_cache($vars['device'])
-            : device_by_name($vars['device']);
+            : Device::findByHostname($vars['device']);
         if (isset($device['device_id'])) {
             DeviceCache::setPrimary($device['device_id']);
         }

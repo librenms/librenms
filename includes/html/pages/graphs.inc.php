@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Device;
 use LibreNMS\Config;
 use LibreNMS\Util\Time;
 
@@ -27,7 +28,7 @@ $id = $vars['id'] ?? null;
 if (isset($vars['device'])) {
     $device = is_numeric($vars['device'])
         ? device_by_id_cache($vars['device'])
-        : device_by_name($vars['device']);
+        : Device::findByHostname($vars['device']);
 }
 
 $auth = false;
