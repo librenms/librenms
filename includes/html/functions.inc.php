@@ -91,7 +91,7 @@ function bill_permitted($bill_id)
 function port_permitted($port_id, $device_id = null)
 {
     if (! is_numeric($device_id)) {
-        $device_id = Device::whereHas('ports',fn($port) => $port->port_id = $port_id);
+        $device_id = Device::whereHas('ports',fn($p) => $p->port_id = $port_id)->device_id;
     }
 
     if (device_permitted($device_id)) {

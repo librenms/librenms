@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Port;
 use LibreNMS\Config;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\StringHelpers;
@@ -101,7 +102,7 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
         foreach ($lldp_array as $key => $lldp) {
             $local_port_ifName = $lldp_ports[hexdec($lldp_ports_num[$key]['mtxrNeighborInterfaceID'])]['mtxrInterfaceStatsName'];
             $local_port_id = find_port_id($local_port_ifName, null, $device['device_id']);
-            $interface = get_port_by_id($local_port_id);
+            $interface = Port::find($local_port_id);
             if ($lldp['lldpRemPortIdSubtype'] == 3) { // 3 = macaddress
                 $remote_port_mac = str_replace([' ', ':', '-'], '', strtolower($lldp['lldpRemPortId']));
             }
@@ -219,7 +220,7 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
             if (! $interface['port_id']) {
                 $local_ifName = $lldp['lldpNeighborPortId'][$IndexId][1];
                 $local_port_id = find_port_id('gigabitEthernet ' . $local_ifName, null, $device['device_id']);
-                $interface = get_port_by_id($local_port_id);
+                $interface = Port::find($local_port_id);
             }
 
             $remote_device_id = find_device_id($lldp['lldpNeighborDeviceName'][$IndexId][1]);
@@ -342,7 +343,7 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
             } else {
                 $local_port_id = find_port_id($lldp_ports[$entry_key]['lldpLocPortId'], $ifIndex, $device['device_id']);
             }
-            $interface = get_port_by_id($local_port_id);
+            $interface = Port::find($local_port_id);
 
             d_echo($lldp_instance);
 
