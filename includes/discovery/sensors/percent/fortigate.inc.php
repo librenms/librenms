@@ -10,35 +10,36 @@
  *
  * @package    LibreNMS
  * @link       https://www.librenms.org
- * @copyright  2024 LibreNMS
+ *
+ * @copyright  2025 CTNET BV
  * @author     Rudy Broersma
  */
 
-$fgDhcpTables = snmpwalk_cache_multi_oid($device, 'fgDhcpTables', [], 'FORTINET-FORTIGATE-MIB');
+$fgDhcpTables = SnmpQuery::hideMIB()->walk('FORTINET-FORTIGATE-MIB::fgDhcpTables')->table(0);
 
-if (! empty($fgDhcpTables)) {
-    $vgEntNames = snmpwalk_cache_multi_oid($device, 'fgVdEntName', [], 'FORTINET-FORTIGATE-MIB');
+if (! empty($fgDhcpTables['fgDhcpLeaseUsage'])) {
+  foreach ($fgDhcpTables['fgDhcpLeaseUsage'] as $vdomID => $table) {
+    $vdomName = SnmpQuery::enumStrings()->hideMIB()->get('FORTINET-FORTIGATE-MIB:fgVdEntName.' . $vdomID)->value();
 
-    foreach ($fgDhcpTables as $index => $entry) {
+    foreach ($table as $index => $value) {
         $indexSplit = explode('.', $index);
-        $fgVdomID = $indexSplit[0];
         $fgDhcpServerID = $indexSplit[1];
 
         discover_sensor(
             null,
             'percent',
             $device,
-            '.1.3.6.1.4.1.12356.101.23.2.1.1.2.' . $index,
-            'fgDhcpLeaseUsage.' . $index,
+            '.1.3.6.1.4.1.12356.101.23.2.1.1.2.' . $vdomID . '.' . $fgDhcpServerID,
+            'fgDhcpLeaseUsage.' . $vdomID . '.' . $fgDhcpServerID,
             'fortigate',
-            $vgEntNames[$fgVdomID]['fgVdEntName'] . ' Server ID ' . $fgDhcpServerID . ' Pool Usage',
+            $vdomName . ' Server ID ' . $fgDhcpServerID . ' Pool Usage',
             1,
             1,
             null,
             null,
             90,
             95,
-            $entry['fgDhcpLeaseUsage'],
+            $value,
             'snmp',
             null,
             null,
@@ -47,4 +48,6 @@ if (! empty($fgDhcpTables)) {
             'gauge'
         );
     }
+  }
+
 }
