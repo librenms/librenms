@@ -1,8 +1,6 @@
 <?php
 
-use Illuminate\Support\Str;
 use LibreNMS\Util\Mac;
-use LibreNMS\Util\Rewrite;
 
 /**
  * jetstream.inc.php
