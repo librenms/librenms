@@ -55,6 +55,7 @@ use LibreNMS\Interfaces\Polling\SlaPolling;
 use LibreNMS\OS;
 use LibreNMS\OS\Traits\EntityMib;
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Util\Rewrite;
 
 class Vrp extends OS implements
     MempoolsDiscovery,
@@ -490,7 +491,7 @@ class Vrp extends OS implements
                 if (! array_key_exists('hwAccessInterface', $portAuthSessionEntryParameters) || ! array_key_exists('hwAccessMACAddress', $portAuthSessionEntryParameters)) {
                     continue;
                 }
-                $mac_address = strtolower(implode(array_map(fn ($mac) => Str::padLeft($mac, 2, 0), explode(':', $portAuthSessionEntryParameters['hwAccessMACAddress']))));
+                $mac_address = Rewrite::normalizeMac($portAuthSessionEntryParameters['hwAccessMACAddress']);
                 $port_id = $ifName_map->get($portAuthSessionEntryParameters['hwAccessInterface'], 0);
                 if ($port_id <= 0) {
                     continue; //this would happen for an SSH session for instance

@@ -53,6 +53,7 @@ use LibreNMS\OS;
 use LibreNMS\OS\Traits\YamlOSDiscovery;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\IP;
+use LibreNMS\Util\Rewrite;
 
 class Cisco extends OS implements
     OSDiscovery,
@@ -469,7 +470,7 @@ class Cisco extends OS implements
             foreach ($portAuthSessionEntry as $index => $portAuthSessionEntryParameters) {
                 [$ifIndex, $auth_id] = explode('.', str_replace("'", '', $index));
                 $session_info = $cafSessionMethodsInfoEntry->get($ifIndex . '.' . $auth_id);
-                $mac_address = strtolower(implode(array_map(fn ($mac) => Str::padLeft($mac, 2, 0), explode(':', $portAuthSessionEntryParameters['cafSessionClientMacAddress'] ?? null))));
+                $mac_address = Rewrite::normalizeMac($portAuthSessionEntryParameters['cafSessionClientMacAddress'] ?? '');
 
                 $nac->put($mac_address, new PortsNac([
                     'port_id' => $ifIndex_map->get($ifIndex, 0),

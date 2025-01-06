@@ -14,6 +14,8 @@
  * @author     Tony Murray <murraytony@gmail.com> (bridge.inc.php used as base)
  */
 
+use LibreNMS\Util\Rewrite;
+
 $fdbPort_table = snmpwalk_group($device, 'hwDynFdbPort', 'HUAWEI-L2MAM-MIB');
 $hwCfgMacAddrQueryIfIndex = snmpwalk_group($device, 'hwCfgMacAddrQueryIfIndex', 'HUAWEI-L2MAM-MIB', 10);
 
@@ -29,7 +31,7 @@ if (! empty($fdbPort_table)) {
             }
             $port = get_port_by_index_cache($device['device_id'], $ifIndex);
             $port_id = $port['port_id'];
-            $mac_address = implode(array_map(fn ($mac) => Str::padLeft($mac, 2, 0), explode(':', $mac)));
+            $mac_address = Rewrite::normalizeMac($mac);
             if (strlen($mac_address) != 12) {
                 d_echo("MAC address padding failed for $mac\n");
                 continue;
@@ -55,7 +57,7 @@ if (! empty($hwCfgMacAddrQueryIfIndex)) {
                     }
                     $port = get_port_by_index_cache($device['device_id'], $ifIndex);
                     $port_id = $port['port_id'];
-                    $mac_address = implode(array_map(fn ($mac) => Str::padLeft($mac, 2, 0), explode(':', $mac)));
+                    $mac_address = Rewrite::normalizeMac($mac);
                     if (strlen($mac_address) != 12) {
                         d_echo("MAC address padding failed for $mac\n");
                         continue;

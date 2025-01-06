@@ -24,6 +24,8 @@
  * @author     cjwbath
  */
 
+use LibreNMS\Util\Rewrite;
+
 // Try Q-BRIDGE-MIB::dot1qTpFdbPort first
 $fdbPort_table = snmpwalk_group($device, 'dot1qTpFdbPort', 'Q-BRIDGE-MIB');
 if (! empty($fdbPort_table)) {
@@ -75,7 +77,7 @@ if (! empty($fdbPort_table)) {
                 d_echo("No port known for $mac\n");
                 continue;
             }
-            $mac_address = implode(array_map(fn ($mac) => Str::padLeft($mac, 2, 0), explode(':', $mac)));
+            $mac_address = Rewrite::normalizeMac($mac);
             if (strlen($mac_address) != 12) {
                 d_echo("MAC address padding failed for $mac\n");
                 continue;

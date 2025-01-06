@@ -23,6 +23,9 @@
  * @author    Tony Murray <murraytony@gmail.com>
  * @author    JoseUPV
  */
+
+use LibreNMS\Util\Rewrite;
+
 if (empty($fdbPort_table)) { // no empty if come from aos7 script
     // try nokia/ALCATEL-IND1-MAC-ADDRESS-MIB::slMacAddressDisposition
     $dot1d = snmpwalk_group($device, 'slMacAddressDisposition', 'ALCATEL-IND1-MAC-ADDRESS-MIB', 0, [], 'nokia');
@@ -56,7 +59,7 @@ if (! empty($fdbPort_table)) {
                 d_echo("No port known for $mac\n");
                 continue;
             }
-            $mac_address = implode(array_map(fn ($mac) => Str::padLeft($mac, 2, 0), explode(':', $mac)));
+            $mac_address = Rewrite::normalizeMac($mac);
             if (strlen($mac_address) != 12) {
                 d_echo("MAC address padding failed for $mac\n");
                 continue;

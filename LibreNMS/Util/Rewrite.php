@@ -26,6 +26,7 @@
 namespace LibreNMS\Util;
 
 use App\Models\Device;
+use Illuminate\Support\Str;
 use LibreNMS\Config;
 
 class Rewrite
@@ -400,5 +401,10 @@ class Rewrite
     public static function addIpv6Brackets($ip): ?string
     {
         return IPv6::isValid($ip) ? "[$ip]" : $ip;
+    }
+
+    public static function normalizeMac(array|string $mac): string
+    {
+        return strtolower(implode(array_map(fn ($mac) => Str::padLeft($mac, 2, 0), explode(':', $mac))));
     }
 }
