@@ -38,7 +38,7 @@ $type = $_REQUEST['type'];
 switch ($type) {
     case 'alerts':
         $filename = "alerts-$hostname.txt";
-        $device_id = getidbyname($hostname);
+        $device_id = Device::find($hostname)->device_id;
         $device = device_by_id_cache($device_id);
         $rules = AlertUtil::getRules($device_id);
         $output = '';

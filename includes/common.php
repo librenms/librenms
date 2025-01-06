@@ -16,6 +16,7 @@
  * the source code distribution for details.
  */
 
+use App\Models\Device;
 use LibreNMS\Config;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\InvalidIpException;
@@ -200,7 +201,7 @@ function ifclass($ifOperStatus, $ifAdminStatus)
 
 function device_by_name($name)
 {
-    return device_by_id_cache(getidbyname($name));
+    return Device::findByHostname($name);
 }
 
 function accesspoint_by_id($ap_id, $refresh = '0')
@@ -235,11 +236,6 @@ function truncate($substring, $max = 50, $rep = '...')
     } else {
         return $string;
     }
-}
-
-function getidbyname($hostname)
-{
-    return DeviceCache::getByHostname($hostname)->device_id;
 }
 
 function zeropad($num, $length = 2)

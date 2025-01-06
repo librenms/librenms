@@ -1,6 +1,7 @@
 #!/usr/bin/env php
 <?php
 
+use App\Models\Device;
 use LibreNMS\Alert\RunAlerts;
 use LibreNMS\Util\Debug;
 
@@ -14,7 +15,7 @@ if (isset($options['r']) && isset($options['h'])) {
     $runAlerts = new RunAlerts();
 
     $rule_id = (int) $options['r'];
-    $device_id = ctype_digit($options['h']) ? $options['h'] : getidbyname($options['h']);
+    $device_id = ctype_digit($options['h']) ? $options['h'] : Device::findByHostname($options['h'])->device_id;
     $where = "alerts.device_id = $device_id && alerts.rule_id = $rule_id";
     $alerts = $runAlerts->loadAlerts($where);
     if (empty($alerts)) {
