@@ -43,7 +43,7 @@ class CiscoNSRejectRegNotify implements SnmptrapHandler
     public function handle(Device $device, Trap $trap)
     {
         $Code = $trap->getOidData($trap->findOid('CISCO-NS-MIB::fcNameServerRejectReasonCode'));
-        $Exp  = $trap->getOidData($trap->findOid('CISCO-NS-MIB::fcNameServerRejReasonCodeExp'));
+        $Exp = $trap->getOidData($trap->findOid('CISCO-NS-MIB::fcNameServerRejReasonCodeExp'));
 
         $trap->log("Cisco Nameserver rejected a registration request with error code $Code due to $Exp", Severity::Warning);
     }
