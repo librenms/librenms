@@ -5,6 +5,7 @@ namespace LibreNMS\OS;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessMseDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRateDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
 use LibreNMS\OS;
@@ -12,6 +13,7 @@ use LibreNMS\OS;
 class SmOs extends OS implements
     WirelessRateDiscovery,
     WirelessRssiDiscovery,
+    WirelessPowerDiscovery,
     WirelessFrequencyDiscovery,
     WirelessMseDiscovery
 {
@@ -87,26 +89,78 @@ class SmOs extends OS implements
             }
         }
 
+        $sensors[] = new WirelessSensor(
+            'rate',
+            $this->getDeviceId(),
+            '.1.3.6.1.4.1.3373.1103.15.4.1.17.1',
+            'alfo80hd-tx-rate',
+            1,
+            'Tx Rate',
+            null,
+            1000,
+            1
+        );
+
+        $sensors[] = new WirelessSensor(
+            'rate',
+            $this->getDeviceId(),
+            '.1.3.6.1.4.1.3373.1103.15.4.1.18.1',
+            'alfo80hd-rx-rate',
+            2,
+            'Rx Rate',
+            null,
+            1000,
+            1
+        );
+
         return $sensors;
     }
 
     public function discoverWirelessRssi()
     {
+
+        $sensors[] = new WirelessSensor(
+            'rssi',
+            $this->getDeviceId(),
+            '.1.3.6.1.4.1.3373.1103.39.2.1.12.1',
+            'alfo80hd-rx',
+            1,
+            'RSSI'
+        );
+
+        return $sensors;
+    }
+
+    public function discoverWirelessPower()
+    {
         $oids = snmpwalk_cache_oid($this->getDeviceArray(), 'radioPrx', [], 'SIAE-RADIO-SYSTEM-MIB');
+        $oids = snmpwalk_cache_oid($this->getDeviceArray(), 'radioPtx', $oids, 'SIAE-RADIO-SYSTEM-MIB');
         $sensors = [];
 
         foreach ($oids as $index => $entry) {
             $sensors[] = new WirelessSensor(
-                'rssi',
+                'power',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.3373.1103.80.12.1.3.' . $index,
                 'sm-os',
-                $index,
-                $this->getRadioLabel($index),
+                "radioPrx.$index",
+                'Received Power Level',
                 $entry['radioPrx']
+            );
+            $sensors[] = new WirelessSensor(
+                'power',
+                $this->getDeviceId(),
+                '.1.3.6.1.4.1.3373.1103.80.12.1.4.' . $index,
+                'sm-os',
+                "radioPtx.$index",
+                'Transmitted Power Level',
+                $entry['radioPtx']
             );
         }
 
+        $oid = '.1.3.6.1.4.1.3373.1103.39.2.1.13.1';
+
+        $sensors[] =         new WirelessSensor('power', $this->getDeviceId(), $oid, 'alfo80hd-tx', 1, 'Tx Power');
         return $sensors;
     }
 
@@ -128,6 +182,18 @@ class SmOs extends OS implements
                 1000
             );
         }
+
+        $sensors[] = new WirelessSensor(
+            'frequency',
+            $this->getDeviceId(),
+            '.1.3.6.1.4.1.3373.1103.39.2.1.2.1',
+            'alfo80hd-tx-freq',
+            1,
+            'Tx Frequency',
+            null,
+            1,
+            1000
+        );
 
         return $sensors;
     }
