@@ -4537,8 +4537,8 @@
                     "ifName": "modem",
                     "portName": null,
                     "ifIndex": 19,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
@@ -4637,8 +4637,8 @@
                     "ifName": "ssl.root",
                     "portName": null,
                     "ifIndex": 22,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "false",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -4737,8 +4737,8 @@
                     "ifName": "npu0_vlink0",
                     "portName": null,
                     "ifIndex": 23,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
@@ -4837,8 +4837,8 @@
                     "ifName": "npu0_vlink1",
                     "portName": null,
                     "ifIndex": 24,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
@@ -5137,8 +5137,8 @@
                     "ifName": "KMB.canteen",
                     "portName": null,
                     "ifIndex": 27,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "false",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -5337,8 +5337,8 @@
                     "ifName": "KMB_LDAP",
                     "portName": null,
                     "ifIndex": 29,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "false",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -6648,7 +6648,7 @@
                     "ospfIfMetricValue": 0,
                     "ospfIfMetricStatus": "notInService",
                     "context_name": "",
-                    "ifIndex": 25
+                    "ifIndex": null
                 }
             ],
             "ospf_instances": [
@@ -7175,36 +7175,5 @@
             ]
         },
         "poller": "matches discovery"
-    },
-    "ports-stack": {
-        "discovery": {
-            "ports_stack": [
-                {
-                    "high_ifIndex": 11,
-                    "low_ifIndex": 25,
-                    "ifStackStatus": "active"
-                },
-                {
-                    "high_ifIndex": 12,
-                    "low_ifIndex": 25,
-                    "ifStackStatus": "active"
-                },
-                {
-                    "high_ifIndex": 14,
-                    "low_ifIndex": 26,
-                    "ifStackStatus": "active"
-                },
-                {
-                    "high_ifIndex": 15,
-                    "low_ifIndex": 28,
-                    "ifStackStatus": "active"
-                },
-                {
-                    "high_ifIndex": 16,
-                    "low_ifIndex": 28,
-                    "ifStackStatus": "active"
-                }
-            ]
-        }
     }
 }
