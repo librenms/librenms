@@ -2,7 +2,6 @@
 
 use App\Models\Port;
 
-
 /**
  * LibreNMS
  *

@@ -1,6 +1,7 @@
 #!/usr/bin/env php
 <?php
 
+use App\Models\Device;
 use LibreNMS\Config;
 use LibreNMS\Modules\Core;
 use LibreNMS\Util\Debug;
@@ -15,7 +16,7 @@ if ($options['h'] && $options['o'] && $options['t'] && $options['v']) {
     $vendor = $options['v'];
     Debug::set(isset($options['d']));
 
-    $device_id = ctype_digit($options['h']) ? $options['h'] : Device::find($options['h'])->device_id;
+    $device_id = ctype_digit($options['h']) ? $options['h'] : Device::findByHostname($options['h'])->device_id;
     $device = device_by_id_cache($device_id);
     $definition_file = Config::get('install_dir') . "/includes/definitions/{$options['o']}.yaml";
     $discovery_file = Config::get('install_dir') . "/includes/definitions/discovery/{$options['o']}.yaml";

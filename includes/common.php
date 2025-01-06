@@ -17,6 +17,7 @@
  */
 
 use App\Models\Device;
+use App\Models\Port;
 use LibreNMS\Config;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\InvalidIpException;
@@ -164,9 +165,11 @@ function get_port_by_index_cache($device_id, $ifIndex)
     return $port;
 }
 
-function get_port_by_ifIndex($device_id, $ifIndex)
+function get_port_by_ifIndex(int $device_id, int $ifIndex): Port
 {
-    return dbFetchRow('SELECT * FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ?', [$device_id, $ifIndex]);
+    return Port::where('device_id', $device_id)
+        ->where('ifIndex', $ifIndex)
+        ->first();
 }
 
 function ifclass($ifOperStatus, $ifAdminStatus)

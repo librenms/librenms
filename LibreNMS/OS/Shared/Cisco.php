@@ -471,7 +471,7 @@ class Cisco extends OS implements
             foreach ($portAuthSessionEntry as $index => $portAuthSessionEntryParameters) {
                 [$ifIndex, $auth_id] = explode('.', str_replace("'", '', $index));
                 $session_info = $cafSessionMethodsInfoEntry->get($ifIndex . '.' . $auth_id);
-                $mac_address = Mac::parse($portAuthSessionEntryParameters['cafSessionClientMacAddress'])->hex());
+                $mac_address = Mac::parse($portAuthSessionEntryParameters['cafSessionClientMacAddress'])->hex();
 
                 $nac->put($mac_address, new PortsNac([
                     'port_id' => $ifIndex_map->get($ifIndex, 0),
