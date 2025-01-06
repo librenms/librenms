@@ -6,7 +6,6 @@ modules:
             - SNMPv2-MIB::sysDescr.0
             - ENTITY-MIB::entPhysicalName.1
             - ENTITY-MIB::entPhysicalHardwareRev.1
-        hardware_template: '{{ SNMPv2-MIB::sysDescr.0 }}'
         serial: ENTITY-MIB::entPhysicalSerialNum.1
         version: ENTITY-MIB::entPhysicalSoftwareRev.1
     sensors:
