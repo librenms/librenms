@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Str;
+use LibreNMS\Util\Mac;
 use LibreNMS\Util\Rewrite;
 
 /**
@@ -35,7 +36,7 @@ if (! empty($oids)) {
             $port = $macData['dot1qTpFdbPort'];
             //try both variation with & without space
             $port_id = find_port_id('gigabitEthernet 1/0/' . $port, 'gigabitEthernet1/0/' . $port, $device['device_id']) ?? 0;
-            $mac_address = Rewrite::normalizeMac($mac);
+            $mac_address = ::parse($mac)->hex();
             if (strlen($mac_address) != 12) {
                 d_echo("MAC address padding failed for $mac\n");
                 continue;

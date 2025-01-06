@@ -24,7 +24,7 @@
  * @author    JoseUPV
  */
 
-use LibreNMS\Util\Rewrite;
+use LibreNMS\Util\Mac;
 
 if (empty($fdbPort_table)) { // no empty if come from aos7 script
     // try nokia/ALCATEL-IND1-MAC-ADDRESS-MIB::slMacAddressDisposition
@@ -59,7 +59,7 @@ if (! empty($fdbPort_table)) {
                 d_echo("No port known for $mac\n");
                 continue;
             }
-            $mac_address = Rewrite::normalizeMac($mac);
+            $mac_address = Mac::parse($mac)->hex();
             if (strlen($mac_address) != 12) {
                 d_echo("MAC address padding failed for $mac\n");
                 continue;

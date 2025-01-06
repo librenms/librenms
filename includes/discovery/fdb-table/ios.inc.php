@@ -1,7 +1,6 @@
 <?php
 
-use Illuminate\Support\Str;
-use LibreNMS\Util\Rewrite;
+use LibreNMS\Util\Mac;
 
 $vtpdomains = snmpwalk_group($device, 'managementDomainName', 'CISCO-VTP-MIB');
 $vlans = snmpwalk_group($device, 'vtpVlanEntry', 'CISCO-VTP-MIB', 2);
@@ -32,7 +31,7 @@ foreach ($vtpdomains as $vtpdomain_id => $vtpdomain) {
             }
 
             foreach ((array) $fdbPort_table['BRIDGE-MIB::dot1dTpFdbPort'] as $mac => $dot1dBasePort) {
-                $mac_address = Rewrite::normalizeMac($mac);
+                $mac_address = Mac::parse($mac)->hex();
                 if (strlen($mac_address) != 12) {
                     d_echo("MAC address padding failed for $mac\n");
                     continue;
