@@ -14,7 +14,7 @@
                     "os": "hyperion",
                     "type": "network",
                     "serial": "System MAC: 00-50-c2-0d-e1-55",
-                    "icon": "generic.svg"
+                    "icon": "bitstream.png"
                 }
             ]
         },
