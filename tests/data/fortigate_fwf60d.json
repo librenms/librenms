@@ -2224,5 +2224,16 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "ports-stack": {
+        "discovery": {
+            "ports_stack": [
+                {
+                    "high_ifIndex": 2,
+                    "low_ifIndex": 9,
+                    "ifStackStatus": "active"
+                }
+            ]
+        }
     }
 }
