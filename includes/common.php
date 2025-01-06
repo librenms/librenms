@@ -165,7 +165,7 @@ function get_port_by_index_cache($device_id, $ifIndex)
     return $port;
 }
 
-function get_port_by_ifIndex(int $device_id, int $ifIndex): ?Port
+function get_port_by_ifIndex(int $device_id, string $ifIndex): ?Port
 {
     return Port::where('device_id', $device_id)
         ->where('ifIndex', $ifIndex)
