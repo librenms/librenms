@@ -65,7 +65,7 @@ SNMPv2-MIB::snmpTrapOID.0 CISCO-NS-MIB::fcNameServerEntryDelete',
             'Cisco Nameserver database entry deleted',
             'Could not handle CISCO-NS-MIB::fcNameServerEntryDelete test trap',
             [Severity::Notice],
-	);
+        );
     }
 
     public function testCiscoNSRejectRegNotify(): void
