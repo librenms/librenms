@@ -334,7 +334,7 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling,
             });
     }
 
-    private function findTransceiverEntityByPortName(array $entPhysical, string $ifName): array
+    private function findTransceiverEntityByPortName(array $entPhysical, ?string $ifName): array
     {
         if (preg_match('#-(\d+/\d+/\d+)#', $ifName, $matches)) {
             $expected_tail = ' @ ' . $matches[1];
