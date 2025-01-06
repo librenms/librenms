@@ -99,7 +99,7 @@ function getImageName($device, $use_database = true, $dir = 'images/os/')
     return \LibreNMS\Util\Url::findOsImage($device['os'], $device['features'] ?? '', $use_database ? $device['icon'] : null, $dir);
 }
 
-function renamehost(Device $id, $new, $source = 'console')
+function renamehost($id, $new, $source = 'console')
 {
     $device = Device::find($id);
     $new_rrd_dir = Rrd::dirFromHost($new);

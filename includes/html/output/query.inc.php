@@ -23,6 +23,7 @@
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
+use App\Models\Device;
 use LibreNMS\Alert\AlertDB;
 use LibreNMS\Alert\AlertUtil;
 use LibreNMS\Alerting\QueryBuilderParser;
@@ -38,7 +39,7 @@ $type = $_REQUEST['type'];
 switch ($type) {
     case 'alerts':
         $filename = "alerts-$hostname.txt";
-        $device_id = Device::find($hostname)->device_id;
+        $device_id = Device::findByHostname($hostname)->device_id;
         $device = device_by_id_cache($device_id);
         $rules = AlertUtil::getRules($device_id);
         $output = '';
