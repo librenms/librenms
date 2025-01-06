@@ -166,7 +166,7 @@ class Sgos extends OS implements ProcessorDiscovery, OSPolling
                 $this->getName(),
                 $this->getDeviceId(),
                 ".1.3.6.1.4.1.3417.2.11.2.4.1.8.$index",
-                Str::padLeft($index, 2, 0),
+                Str::padLeft($index, 2, '0'),
                 "Processor $count",
                 1,
                 $entry['s5ChasUtilCPUUsageLast10Minutes']

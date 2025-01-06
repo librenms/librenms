@@ -83,7 +83,7 @@ class Boss extends OS implements OSDiscovery, ProcessorDiscovery
                 'avaya-ers',
                 $this->getDeviceId(),
                 ".1.3.6.1.4.1.45.1.6.3.8.1.1.6.$index",
-                Str::padLeft($count, 2, 0),
+                Str::padLeft($count, 2, '0'),
                 "Unit $count processor",
                 1,
                 $entry['sgProxyCpuCoreBusyPerCent'] ?? null

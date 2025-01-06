@@ -11,12 +11,12 @@ if ($device['os_group'] == 'cisco') {
         [$if, $direction, $a_a, $a_b, $a_c, $a_d, $a_e, $a_f] = explode('.', $oid);
         unset($interface);
         $interface = dbFetchRow('SELECT * FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ?', [$device['device_id'], $if]);
-        $ah_a = Str::padLeft(dechex($a_a), 2, 0);
-        $ah_b = Str::padLeft(dechex($a_b), 2, 0);
-        $ah_c = Str::padLeft(dechex($a_c), 2, 0);
-        $ah_d = Str::padLeft(dechex($a_d), 2, 0);
-        $ah_e = Str::padLeft(dechex($a_e), 2, 0);
-        $ah_f = Str::padLeft(dechex($a_f), 2, 0);
+        $ah_a = Str::padLeft(dechex($a_a), 2, '0');
+        $ah_b = Str::padLeft(dechex($a_b), 2, '0');
+        $ah_c = Str::padLeft(dechex($a_c), 2, '0');
+        $ah_d = Str::padLeft(dechex($a_d), 2, '0');
+        $ah_e = Str::padLeft(dechex($a_e), 2, '0');
+        $ah_f = Str::padLeft(dechex($a_f), 2, '0');
         $mac = "$ah_a$ah_b$ah_c$ah_d$ah_e$ah_f";
 
         if ($interface) {

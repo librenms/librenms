@@ -21,7 +21,7 @@ class Billing
 
     public static function getDates($dayofmonth, $months = 0): array
     {
-        $dayofmonth = Str::padLeft($dayofmonth, 2, 0);
+        $dayofmonth = Str::padLeft($dayofmonth, 2, '0');
         $year = date('Y');
         $month = date('m');
 
