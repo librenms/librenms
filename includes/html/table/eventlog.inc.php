@@ -1,4 +1,6 @@
 <?php
+
+use App\Models\Port;
 /*
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -73,7 +75,7 @@ $sql = "SELECT `E`.*,DATE_FORMAT(datetime, '" . \LibreNMS\Config::get('dateforma
 foreach (dbFetchRows($sql, $param) as $eventlog) {
     $dev = device_by_id_cache($eventlog['device_id']);
     if ($eventlog['type'] == 'interface') {
-        $this_if = cleanPort(getifbyid($eventlog['reference']));
+        $this_if = cleanPort(Port::find($eventlog['reference']));
         $type = '<b>' . generate_port_link($this_if, makeshortif(strtolower($this_if['label']))) . '</b>';
     } else {
         $type = $eventlog['type'];

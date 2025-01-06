@@ -16,6 +16,7 @@
 */
 
 use App\Models\Device;
+use App\Models\Port;
 
 $hostname = Device::find($entry['device_id'])->hostname;
 
@@ -34,7 +35,7 @@ if (! isset($vars['device'])) {
 }
 
 if ($entry['type'] == 'interface') {
-    $this_if = cleanPort(getifbyid($entry['reference']));
+    $this_if = cleanPort(Port::find($entry['reference']));
     $entry['link'] = '<b>' . generate_port_link($this_if, makeshortif(strtolower($this_if['label']))) . '</b>';
 } else {
     $entry['link'] = 'System';
