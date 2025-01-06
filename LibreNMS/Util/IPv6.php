@@ -25,6 +25,7 @@
 
 namespace LibreNMS\Util;
 
+use Illuminate\Support\Str;
 use LibreNMS\Exceptions\InvalidIpException;
 
 class IPv6 extends IP
@@ -169,7 +170,7 @@ class IPv6 extends IP
         $parts = explode(':', $ip, 8);
 
         return implode(':', array_map(function ($section) {
-            return Rewrite::zeropad($section, 4);
+            return Str::padLeft($section, 4, 0);
         }, $parts));
     }
 

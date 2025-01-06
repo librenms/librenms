@@ -64,7 +64,7 @@ if (! empty($fdbPort_table)) {
                 d_echo("No port known for $mac\n");
                 continue;
             }
-            $mac_address = implode(array_map('zeropad', explode(':', $mac)));
+            $mac_address = implode(array_map(fn ($mac) => Str::padLeft($mac, 2, 0), explode(':', $mac)));
             if (strlen($mac_address) != 12) {
                 d_echo("MAC address padding failed for $mac\n");
                 continue;

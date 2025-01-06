@@ -5,6 +5,7 @@ namespace LibreNMS;
 use DateTime;
 use DateTimeZone;
 use LibreNMS\Util\Number;
+use Str;
 
 class Billing
 {
@@ -20,7 +21,7 @@ class Billing
 
     public static function getDates($dayofmonth, $months = 0): array
     {
-        $dayofmonth = zeropad($dayofmonth);
+        $dayofmonth = Str::padLeft($dayofmonth,2,0);
         $year = date('Y');
         $month = date('m');
 

@@ -490,7 +490,7 @@ class Vrp extends OS implements
                 if (! array_key_exists('hwAccessInterface', $portAuthSessionEntryParameters) || ! array_key_exists('hwAccessMACAddress', $portAuthSessionEntryParameters)) {
                     continue;
                 }
-                $mac_address = strtolower(implode(array_map('zeropad', explode(':', $portAuthSessionEntryParameters['hwAccessMACAddress']))));
+                $mac_address = strtolower(implode(array_map(fn ($mac) => Str::padLeft($mac, 2, 0), explode(':', $portAuthSessionEntryParameters['hwAccessMACAddress']))));
                 $port_id = $ifName_map->get($portAuthSessionEntryParameters['hwAccessInterface'], 0);
                 if ($port_id <= 0) {
                     continue; //this would happen for an SSH session for instance

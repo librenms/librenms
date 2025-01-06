@@ -1,4 +1,7 @@
 <?php
+
+use Illuminate\Support\Str;
+
 /*
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -17,22 +20,22 @@ foreach ($port_stats as $index => $port) {
         if ($portNum < 50) {
             $portNum++;
             //Leading 0 for single digits
-            $ifName = '1/' . zeropad($portNum);
+            $ifName = '1/' . Str::padLeft($portNum, 2, 0);
         }
         if ($portNum > 63 && $portNum < 128) {
             $portNum = $portNum - 63;
             //Leading 0 for single digits
-            $ifName = '2/' . zeropad($portNum);
+            $ifName = '2/' . Str::padLeft($portNum, 2, 0);
         }
         if ($portNum > 127 && $portNum < 192) {
             $portNum = $portNum - 127;
             //Leading 0 for single digits
-            $ifName = '3/' . zeropad($portNum);
+            $ifName = '3/' . Str::padLeft($portNum, 2, 0);
         }
         if ($portNum > 191) {
             $portNum = $portNum - 191;
             //Leading 0 for single digits
-            $ifName = '4/' . zeropad($portNum);
+            $ifName = '4/' . Str::padLeft($portNum, 2, 0);
         }
     } else {
         //Set port number to match current

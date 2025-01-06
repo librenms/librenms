@@ -18,7 +18,7 @@ foreach (explode("\n", $oids) as $data) {
         $temperature = snmp_get($device, $temperature_oid, '-Oqv', '');
         $descr = "Hard disk $temperature_id";
         if ($temperature != -128) { // -128 = not measured/present
-            discover_sensor(null, 'temperature', $device, $temperature_oid, zeropad($temperature_id), 'areca', $descr, '1', '1', null, null, null, null, $temperature);
+            discover_sensor(null, 'temperature', $device, $temperature_oid, Str::padLeft($temperature_id, 2, 0), 'areca', $descr, '1', '1', null, null, null, null, $temperature);
         }
     }
 }

@@ -26,6 +26,7 @@
 namespace LibreNMS\OS;
 
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use LibreNMS\Device\Processor;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
@@ -165,7 +166,7 @@ class Sgos extends OS implements ProcessorDiscovery, OSPolling
                 $this->getName(),
                 $this->getDeviceId(),
                 ".1.3.6.1.4.1.3417.2.11.2.4.1.8.$index",
-                zeropad($index),
+                Str::padLeft($index, 2, 0),
                 "Processor $count",
                 1,
                 $entry['s5ChasUtilCPUUsageLast10Minutes']

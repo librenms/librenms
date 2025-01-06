@@ -37,6 +37,7 @@ use App\Models\Transceiver;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use LibreNMS\Device\Processor;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
@@ -468,7 +469,7 @@ class Cisco extends OS implements
             foreach ($portAuthSessionEntry as $index => $portAuthSessionEntryParameters) {
                 [$ifIndex, $auth_id] = explode('.', str_replace("'", '', $index));
                 $session_info = $cafSessionMethodsInfoEntry->get($ifIndex . '.' . $auth_id);
-                $mac_address = strtolower(implode(array_map('zeropad', explode(':', $portAuthSessionEntryParameters['cafSessionClientMacAddress'] ?? null))));
+                $mac_address = strtolower(implode(array_map(fn ($mac) => Str::padLeft($mac, 2, 0), explode(':', $portAuthSessionEntryParameters['cafSessionClientMacAddress'] ?? null))));
 
                 $nac->put($mac_address, new PortsNac([
                     'port_id' => $ifIndex_map->get($ifIndex, 0),

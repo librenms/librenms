@@ -29,7 +29,7 @@ if (! empty($fdbPort_table)) {
             }
             $port = get_port_by_index_cache($device['device_id'], $ifIndex);
             $port_id = $port['port_id'];
-            $mac_address = implode(array_map('zeropad', explode(':', $mac)));
+            $mac_address = implode(array_map(fn ($mac) => Str::padLeft($mac, 2, 0), explode(':', $mac)));
             if (strlen($mac_address) != 12) {
                 d_echo("MAC address padding failed for $mac\n");
                 continue;
@@ -55,7 +55,7 @@ if (! empty($hwCfgMacAddrQueryIfIndex)) {
                     }
                     $port = get_port_by_index_cache($device['device_id'], $ifIndex);
                     $port_id = $port['port_id'];
-                    $mac_address = implode(array_map('zeropad', explode(':', $mac)));
+                    $mac_address = implode(array_map(fn ($mac) => Str::padLeft($mac, 2, 0), explode(':', $mac)));
                     if (strlen($mac_address) != 12) {
                         d_echo("MAC address padding failed for $mac\n");
                         continue;
