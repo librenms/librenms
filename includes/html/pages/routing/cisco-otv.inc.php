@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\Device;
+
 $COMPONENT = new LibreNMS\Component();
 $options = [];
 $options['filter']['ignore'] = ['=', 0];
@@ -10,7 +12,7 @@ foreach ($COMPONENTS as $DEVICE_ID => $COMP) {
     $LINK = \LibreNMS\Util\Url::generate(['page' => 'device', 'device' => $DEVICE_ID, 'tab' => 'routing', 'proto' => 'cisco-otv']); ?>
 <div class="panel panel-default" id="overlays-<?php echo $DEVICE_ID?>">
     <div class="panel-heading">
-        <h3 class="panel-title"><a href="<?php echo $LINK?>"><?php echo gethostbyid($DEVICE_ID)?> - Overlay's & Adjacencies</a></h3>
+        <h3 class="panel-title"><a href="<?php echo $LINK?>"><?php echo Device::find($DEVICE_ID)->hostname ?> - Overlay's & Adjacencies</a></h3>
     </div>
     <div class="panel list-group">
         <?php

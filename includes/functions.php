@@ -99,27 +99,27 @@ function getImageName($device, $use_database = true, $dir = 'images/os/')
     return \LibreNMS\Util\Url::findOsImage($device['os'], $device['features'] ?? '', $use_database ? $device['icon'] : null, $dir);
 }
 
-function renamehost($id, $new, $source = 'console')
+function renamehost(Device $id, $new, $source = 'console')
 {
-    $host = gethostbyid($id);
+    $device = Device::find($id);
     $new_rrd_dir = Rrd::dirFromHost($new);
 
     if (is_dir($new_rrd_dir)) {
-        log_event("Renaming of $host failed due to existing RRD folder for $new", $id, 'system', 5);
+        log_event("Renaming of $device->hostname failed due to existing RRD folder for $new", $id, 'system', 5);
 
-        return "Renaming of $host failed due to existing RRD folder for $new\n";
+        return "Renaming of $device->hostname failed due to existing RRD folder for $new\n";
     }
 
-    if (! is_dir($new_rrd_dir) && rename(Rrd::dirFromHost($host), $new_rrd_dir) === true) {
+    if (! is_dir($new_rrd_dir) && rename(Rrd::dirFromHost($device->hostname), $new_rrd_dir) === true) {
         dbUpdate(['hostname' => $new, 'ip' => null], 'devices', 'device_id=?', [$id]);
         log_event("Hostname changed -> $new ($source)", $id, 'system', 3);
 
         return '';
     }
 
-    log_event("Renaming of $host failed", $id, 'system', 5);
+    log_event("Renaming of $device->hostname failed", $id, 'system', 5);
 
-    return "Renaming of $host failed\n";
+    return "Renaming of $device->hostname failed\n";
 }
 
 function device_discovery_trigger($id)

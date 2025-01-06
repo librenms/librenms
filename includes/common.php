@@ -237,11 +237,6 @@ function truncate($substring, $max = 50, $rep = '...')
     }
 }
 
-function gethostbyid($device_id)
-{
-    return DeviceCache::get((int) $device_id)->hostname;
-}
-
 function getifbyid($id)
 {
     return dbFetchRow('SELECT * FROM `ports` WHERE `port_id` = ?', [$id]);

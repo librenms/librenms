@@ -15,7 +15,9 @@
  * @author     LibreNMS Contributors
 */
 
-$hostname = gethostbyid($entry['device_id']);
+use App\Models\Device;
+
+$hostname = Device::find($entry['device_id'])->hostname;
 
 unset($icon);
 
