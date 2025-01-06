@@ -42,6 +42,6 @@ class CiscoNSEntryDelete implements SnmptrapHandler
      */
     public function handle(Device $device, Trap $trap)
     {
-        $trap->log("Cisco Nameserver database entry deleted", Severity::Notice);
+        $trap->log('Cisco Nameserver database entry deleted', Severity::Notice);
     }
 }
