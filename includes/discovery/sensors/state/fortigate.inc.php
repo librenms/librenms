@@ -21,11 +21,9 @@
  *
  * @copyright  2020 Net Entertainment AB
  * @author     Patrik Jonsson <patrik.jonsson@gmail.com>
- *
  * @copyright  2025 CTNET BV
  * @author     Rudy Broersma <r.broersma@ctnet.nl>
  */
-
 $systemMode = SnmpQuery::enumStrings()->get('FORTINET-FORTIGATE-MIB::fgHaSystemMode.0')->value(0);
 
 // Verify that the device is clustered
