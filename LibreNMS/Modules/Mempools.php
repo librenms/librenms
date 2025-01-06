@@ -220,7 +220,7 @@ class Mempools implements Module
 
     private function printMempool(Mempool $mempool): void
     {
-        $status = "$mempool->mempool_type [$mempool->mempool_class]: $mempool->mempool_descr: $mempool->mempool_perc%";
+        $status = "$mempool->mempool_descr ($mempool->mempool_class): $mempool->mempool_perc%";
         if ($mempool->mempool_total != 100) {
             $used = Number::formatBi($mempool->mempool_used);
             $total = Number::formatBi($mempool->mempool_total);

@@ -129,12 +129,17 @@ class Storage implements Module
     /**
      * @inheritDoc
      */
-    public function cleanup(Device $device): void
+    public function cleanup(Device $device): int
     {
-        $device->storage()->delete();
+        return $device->storage()->delete();
     }
 
-    public function dump(Device $device)
+    public function dataExists(Device $device): bool
+    {
+        return $device->storage()->exists();
+    }
+
+    public function dump(Device $device, string $type): ?array
     {
         return [
             'storage' => $device->storage()
@@ -145,7 +150,8 @@ class Storage implements Module
 
     private function printStorage(\App\Models\Storage $storage): void
     {
-        $message = "$storage->storage_descr: $storage->storage_perc%";
+        $storage_type = str_replace('hrStorage', '', $storage->storage_type);
+        $message = "$storage->storage_descr ($storage_type): $storage->storage_perc%";
         if ($storage->storage_size != 100) {
             $used = Number::formatBi($storage->storage_used);
             $total = Number::formatBi($storage->storage_size);

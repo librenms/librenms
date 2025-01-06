@@ -113,14 +113,14 @@ class YamlDiscoveryDefinition
 
                 // fill attributes
                 foreach ($this->fields as $field) {
-                    $field->value = $field->handle($yamlItem, $fetchedData, $index, $count);
+                    $field->value = $field->handle($yamlItem, $fetchedData, $index);
                     $modelAttributes[$field->model_column] = $field->value;
                 }
 
                 $newModel = new $this->model($modelAttributes);
 
                 if ($this->afterEachCallback) {
-                    call_user_func($this->afterEachCallback, $newModel, $this, $yamlItem, $index);
+                    call_user_func($this->afterEachCallback, $newModel, $this, $yamlItem, $index, $count);
                 }
 
                 $models->push($newModel);

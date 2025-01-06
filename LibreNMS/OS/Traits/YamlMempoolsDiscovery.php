@@ -59,7 +59,7 @@ trait YamlMempoolsDiscovery
                         $mempool->mempool_used_oid = SimpleTemplate::parse($yaml['used_num_oid'], ['index' => $index]);
                     } else {
                         Log::critical('used_num_oid should be added to the discovery yaml to increase performance');
-                        $mempool->mempool_used_oid = Oid::toNumeric($yaml['used'] . '.' . $index);
+                        $mempool->mempool_used_oid = Oid::of($yaml['used'] . '.' . $index)->toNumeric();
                     }
                     $mempool->mempool_free_oid = null;
                     $mempool->mempool_perc_oid = null;
@@ -68,7 +68,7 @@ trait YamlMempoolsDiscovery
                         $mempool->mempool_free_oid = SimpleTemplate::parse($yaml['free_num_oid'], ['index' => $index]);
                     } else {
                         Log::critical('free_num_oid should be added to the discovery yaml to increase performance');
-                        $mempool->mempool_free_oid = Oid::toNumeric($yaml['free'] . '.' . $index);
+                        $mempool->mempool_free_oid = Oid::of($yaml['free'] . '.' . $index)->toNumeric();
                     }
                     $mempool->mempool_used_oid = null;
                     $mempool->mempool_perc_oid = null;
@@ -77,66 +77,13 @@ trait YamlMempoolsDiscovery
                         $mempool->mempool_perc_oid = SimpleTemplate::parse($yaml['percent_used_num_oid'], ['index' => $index]);
                     } else {
                         Log::critical('percent_used_num_oid should be added to the discovery yaml to increase performance');
-                        $mempool->mempool_perc_oid = Oid::toNumeric($yaml['percent_used'] . '.' . $index);
+                        $mempool->mempool_perc_oid = Oid::of($yaml['percent_used'] . '.' . $index)->toNumeric();
                     }
                     $mempool->mempool_used_oid = null;
                     $mempool->mempool_free_oid = null;
                 }
-
-                $used = $this->getData('used', $index, $yaml);
-                $total = $this->getData('total', $index, $yaml);
-                $mempool = (new Mempool([
-                    'mempool_index' => isset($yaml['index']) ? YamlDiscovery::replaceValues('index', $index, $count, $yaml, $snmp_data) : $index,
-                    'mempool_type' => $yaml['type'] ?? $this->getName(),
-                    'mempool_class' => $yaml['class'] ?? 'system',
-                    'mempool_precision' => $yaml['precision'] ?? 1,
-                    'mempool_descr' => isset($yaml['descr']) ? ucwords(YamlDiscovery::replaceValues('descr', $index, $count, $yaml, $snmp_data)) : 'Memory',
-                    'mempool_used_oid' => $this->getOid('used', $index, $yaml),
-                    'mempool_free_oid' => ($used === null || $total === null) ? $this->getOid('free', $index, $yaml) : null, // only use "free" if we have both used and total
-                    'mempool_perc_oid' => $this->getOid('percent_used', $index, $yaml),
-                    'mempool_perc_warn' => isset($yaml['warn_percent']) ? YamlDiscovery::replaceValues('warn_percent', $index, $count, $yaml, $snmp_data) : 90,
-                ]))->fillUsage(
-                    $used,
-                    $total,
-                    $this->getData('free', $index, $yaml),
-                    $this->getData('percent_used', $index, $yaml)
-
-                $fields = $def->getFields();
-                $mempool->fillUsage(
-                    $fields['used']->value,
-                    $fields['total']->value,
-                    $fields['free']->value,
-                    $fields['percent_used']->value,
-                );
             });
 
         return $def->discover($mempools_yaml);
-    }
-
-    private function getData($field, $index, $yaml)
-    {
-        $data = $yaml[$field] ?? null;
-        if (isset($this->mempoolsData[$index][$data])) {
-            return $this->mempoolsData[$index][$data];
-        }
-
-        if (isset($this->mempoolsPrefetch[$index][$data])) {
-            return $this->mempoolsPrefetch[$index][$data];
-        }
-
-        return is_numeric($data) ? $data : null;  // hard coded number
-    }
-
-    private function getOid($field, $index, $yaml)
-    {
-        if (Oid::of($yaml[$field] ?? '')->isNumeric()) {
-            return $yaml[$field];
-        }
-
-        if (isset($this->mempoolsOids[$field])) {
-            return Oid::of("{$this->mempoolsOids[$field]}.$index")->toNumeric();
-        }
-
-        return null;
     }
 }
