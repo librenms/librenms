@@ -27,8 +27,8 @@ if (! empty($licenseOids)) {
             $descr = $entry['fgLicContractDesc'];
 
             // Convert the human-readable timestamp (eg: Sat Jul 26 01:00:00 2025) to unix timestamp,
-	    // then subtract current unix timestamp to get the remaining days till license expiration
-	    $sensor_value = round((strtotime($entry['fgLicContractExpiry']) - strtotime('now')) / 86400, 0);
+            // then subtract current unix timestamp to get the remaining days till license expiration
+            $sensor_value = round((strtotime($entry['fgLicContractExpiry']) - strtotime('now')) / 86400, 0);
 
             discover_sensor(
                 null,
