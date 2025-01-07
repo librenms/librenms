@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @author     Stephan Leruth <Stephan.Leruth@ineos.com>
  */
 
@@ -42,6 +43,5 @@ class FgTrapUsageCpu implements SnmptrapHandler
     {
         $trap->getOidData($trap->findOid('FORTINET-CORE-MIB::fnTrapCpuThreshold'));
         $trap->log("CPU usage has exceeded the configured threshold (80%) on $device->hostname.", Severity::Warning);
-
     }
 }
