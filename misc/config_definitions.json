@@ -5421,13 +5421,6 @@
             "default": false,
             "type": "boolean"
         },
-        "poller_modules.cisco-asa-firewall": {
-            "order": 60,
-            "group": "poller",
-            "section": "poller_modules",
-            "default": false,
-            "type": "boolean"
-        },
         "poller_modules.cisco-otv": {
             "order": 110,
             "group": "poller",
