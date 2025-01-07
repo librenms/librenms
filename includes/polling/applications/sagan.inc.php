@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Eventlog;
 use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\RRD\RrdDefinition;
 
@@ -92,7 +93,7 @@ if (sizeof($added_instances) > 0 or sizeof($removed_instances) > 0) {
     $log_message = 'Sagan Instance Change:';
     $log_message .= count($added_instances) > 0 ? ' Added ' . json_encode($added_instances) : '';
     $log_message .= count($removed_instances) > 0 ? ' Removed ' . json_encode($added_instances) : '';
-    log_event($log_message, $device, 'application');
+    Eventlog::log($log_message, $device, 'application');
 }
 
 $app->data = ['instances' => $instances];

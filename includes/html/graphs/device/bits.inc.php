@@ -42,7 +42,7 @@ foreach ($ports as $port) {
         // Fix Labels! ARGH. This needs to be in the bloody database!
         $rrd_filenames[] = $rrd_filename;
         $rrd_list[$i]['filename'] = $rrd_filename;
-        $rrd_list[$i]['descr'] = \LibreNMS\Util\Rewrite::shortenIfType($port['label']);
+        $rrd_list[$i]['descr'] = \LibreNMS\Util\Rewrite::shortenIfName($port['label']);
         $rrd_list[$i]['descr_in'] = $port['label'];
         $rrd_list[$i]['descr_out'] = \LibreNMS\Util\Clean::html($port['ifAlias'], []);
         $rrd_list[$i]['ds_in'] = $ds_in;

@@ -1,6 +1,7 @@
 <?php
 
 use LibreNMS\Util\ObjectCache;
+use LibreNMS\Util\Rewrite;
 
 if (ObjectCache::portCounts(['total'], $device['device_id'])['total'] > 0) {
     echo '<div class="row">
@@ -53,7 +54,7 @@ if (ObjectCache::portCounts(['total'], $device['device_id'])['total'] > 0) {
     foreach (dbFetchRows("SELECT * FROM `ports` WHERE device_id = ? AND `deleted` != '1' AND `disabled` = 0 ORDER BY ifName", [$device['device_id']]) as $data) {
         $data = cleanPort($data);
         $data = array_merge($data, $device);
-        echo "$ifsep" . generate_port_link($data, makeshortif(strtolower($data['label'])));
+        echo "$ifsep" . generate_port_link($data, Rewrite::shortenIfName(strtolower($data['label'])));
         $ifsep = ', ';
     }
 

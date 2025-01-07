@@ -49,7 +49,7 @@ function discover_new_device($hostname, $device, $method, $interface = null)
         $ip = $hostname;
         if (! Config::get('discovery_by_ip', false)) {
             d_echo('Discovery by IP disabled, skipping ' . $hostname);
-            log_event("$method discovery of " . $hostname . ' failed - Discovery by IP disabled', $device['device_id'], 'discovery', 4);
+            Eventlog::log("$method discovery of " . $hostname . ' failed - Discovery by IP disabled', $device['device_id'], 'discovery', Severity::Warning);
 
             return false;
         }
@@ -64,7 +64,7 @@ function discover_new_device($hostname, $device, $method, $interface = null)
         $ip = gethostbyname($hostname);
         if ($ip == $hostname) {
             d_echo("name lookup of $hostname failed\n");
-            log_event("$method discovery of " . $hostname . ' failed - Check name lookup', $device['device_id'], 'discovery', 5);
+            Eventlog::log("$method discovery of " . $hostname . ' failed - Check name lookup', $device['device_id'], 'discovery', Severity::Error);
 
             return false;
         }
@@ -246,7 +246,7 @@ function discover_juniAtmVp(&$valid, $device, $port_id, $vp_id, $vp_descr)
         d_echo("( $inserted inserted )\n");
 
         // FIXME vv no $device!
-        log_event('Juniper ATM VP Added: port ' . $port_id . ' vp ' . $vp_id . ' descr' . $vp_descr, $device, 'juniAtmVp', 3, $inserted);
+        Eventlog::log('Juniper ATM VP Added: port ' . $port_id . ' vp ' . $vp_id . ' descr' . $vp_descr, $device, 'juniAtmVp', 3, $inserted);
     } else {
         echo '.';
     }
