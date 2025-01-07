@@ -1,4 +1,8 @@
 <?php
+
+use App\Models\Port;
+use LibreNMS\Util\Rewrite;
+
 /*
  * LibreNMS
  *
@@ -36,7 +40,7 @@ if (! isset($vars['device'])) {
 
 if ($entry['type'] == 'interface') {
     $this_if = cleanPort(Port::find($entry['reference']));
-    $entry['link'] = '<b>' . generate_port_link($this_if, makeshortif(strtolower($this_if['label']))) . '</b>';
+    $entry['link'] = '<b>' . generate_port_link($this_if, Rewrite::shortenIfName(strtolower($this_if['label']))) . '</b>';
 } else {
     $entry['link'] = 'System';
 }

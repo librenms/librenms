@@ -1,6 +1,9 @@
 <?php
 
+
 use App\Models\Port;
+use LibreNMS\Util\Rewrite;
+
 
 /*
  * This program is free software: you can redistribute it and/or modify it
@@ -77,7 +80,7 @@ foreach (dbFetchRows($sql, $param) as $eventlog) {
     $dev = device_by_id_cache($eventlog['device_id']);
     if ($eventlog['type'] == 'interface') {
         $this_if = cleanPort(Port::find($eventlog['reference']));
-        $type = '<b>' . generate_port_link($this_if, makeshortif(strtolower($this_if['label']))) . '</b>';
+        $type = '<b>' . generate_port_link($this_if, Rewrite::shortenIfName(strtolower($this_if['label']))) . '</b>';
     } else {
         $type = $eventlog['type'];
     }
