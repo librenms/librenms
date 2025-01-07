@@ -45,6 +45,5 @@ class FgTrapAvVirus implements SnmptrapHandler
     {
         $VirusName = $trap->getOidData($trap->findOid('FORTINET-FORTIGATE-MIB::fgAvTrapVirName'));
         $trap->log("A virus has been detected by the anti-virus engine on $device->hostname. Virus Name: $VirusName", Severity::Warning);
-
     }
 }
