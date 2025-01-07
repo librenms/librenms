@@ -1,0 +1,95 @@
+-- *****************************************************************
+-- POSITRON-SMI:  Positron enterprise structure
+--
+-- Copyright (c) 2016 Positron Access Solutions Corp.
+-- All Rights Reserved.
+--
+-- ****************************************************************
+
+POSITRON-SMI DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    enterprises
+        FROM SNMPv2-SMI;
+
+positron MODULE-IDENTITY
+    LAST-UPDATED   "201608110000Z"
+    ORGANIZATION   "Positron Access Solutions Corp."
+    CONTACT-INFO   "Positron Access Solutions Corp.
+                    Customer Service
+
+                    Postal:    5101 Buchan Street, Suite 220
+                               Montreal, QC
+                               H4P 2R9
+                               CANADA
+
+                    Phone:     +1-514-345-2220
+                    Toll Free: +1-888-577-5254
+                    Fax:       +1-514-345-2271
+
+                    E-mail:    info@positronaccess.com"
+    DESCRIPTION    "The Structure of Management Information for the
+                    Positron enterprise."
+    REVISION       "201608110000Z"
+    DESCRIPTION    "Initial release."
+    ::= { enterprises 20095 }  -- assigned by IANA
+
+aktinoProducts OBJECT-IDENTITY
+    STATUS   current
+    DESCRIPTION
+        "aktinoProducts is the root OBJECT IDENTIFIER from
+        which sysObjectID values are assigned.  Actual
+        values are defined in AKTINO-PRODUCTS-MIB."
+    ::= { positron 1 }
+
+aktinoModules OBJECT-IDENTITY
+    STATUS   current
+    DESCRIPTION
+        "aktinoModules provides a root object identifier
+        from which MODULE-IDENTITY values may be assigned."
+    ::= { positron 2 }
+
+aktinoMgmt OBJECT-IDENTITY
+    STATUS   current
+    DESCRIPTION
+        "aktinoMgmt is the root object for the Aktino
+         products management."
+    ::= { positron 3 }
+
+aktinoExperiment OBJECT-IDENTITY
+    STATUS   current
+    DESCRIPTION
+        "aktinoExperiment provides a root object identifier
+        from which experimental mibs may be temporarily
+        based.
+
+        NOTE WELL:  support for mibs in the aktinoExperiment
+        subtree will be deleted when a permanent object
+        identifier assignment is made."
+    ::= { positron 999 }
+
+flexstreamMgmt OBJECT-IDENTITY
+    STATUS          current
+    DESCRIPTION
+        "flexstreamMgmt is the root object for the FlexStream
+         products management."
+    ::= { positron 1001 }
+
+gamProducts OBJECT-IDENTITY
+    STATUS   current
+    DESCRIPTION
+        "gamProducts is the root OBJECT IDENTIFIER from
+        which sysObjectID values are assigned.  Actual
+        values are defined in GAM-PRODUCTS-MIB."
+    ::= { positron 2000 }
+
+gamMgmt OBJECT-IDENTITY
+    STATUS          current
+    DESCRIPTION
+        "gamMgmt is the root object for the GAM
+         products management."
+    ::= { positron 2001 }
+
+END
+

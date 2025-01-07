@@ -39,7 +39,7 @@ if (! empty($oids)) {
             $index = (100 + $index);
 
             if ($extra[$keys[0]]['eqlMemberHealthDetailsTemperatureCurrentState'] != 'unknown') {
-                discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, 'snmp', $descr, 1, 1, $low_limit, $low_warn, $high_limit, $high_warn, $temperature);
+                discover_sensor(null, 'temperature', $device, $oid, $index, 'snmp', $descr, 1, 1, $low_limit, $low_warn, $high_limit, $high_warn, $temperature);
             }
         }//end if
     }//end foreach

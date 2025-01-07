@@ -1,8 +1,10 @@
 <?php
 
 use App\Models\Device;
+use App\Models\Eventlog;
 use LibreNMS\Alert\AlertRules;
 use LibreNMS\Config;
+use LibreNMS\Enum\Severity;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Clean;
 use LibreNMS\Util\IP;
@@ -112,7 +114,7 @@ function discover_service($device, $service)
 {
     if (! dbFetchCell('SELECT COUNT(service_id) FROM `services` WHERE `service_type`= ? AND `device_id` = ?', [$service, $device['device_id']])) {
         add_service($device, $service, "$service Monitoring (Auto Discovered)", null, null, 0, 0, 0, "AUTO: $service");
-        log_event('Autodiscovered service: type ' . $service, $device, 'service', 2);
+        Eventlog::log('Autodiscovered service: type ' . $service, $device, 'service', Severity::Info);
         echo '+';
     }
     echo "$service ";
@@ -196,11 +198,11 @@ function poll_service($service)
         $old_status_text = isset($status_text[$old_status]) ? $status_text[$old_status] : 'Critical';
         $new_status_text = isset($status_text[$new_status]) ? $status_text[$new_status] : 'Critical';
 
-        log_event(
+        Eventlog::log(
             "Service '{$service['service_type']}' changed status from $old_status_text to $new_status_text - {$service['service_desc']} - $msg",
             $service['device_id'],
             'service',
-            4,
+            Severity::Warning,
             $service['service_id']
         );
 
@@ -247,8 +249,10 @@ function check_service($command)
     // Split out the response and the performance data.
     [$response, $perf] = explode('|', $response_string);
 
-    // Split each performance metric
-    $perf_arr = explode(' ', $perf);
+    // Split performance metrics into an array
+    preg_match_all('/\'[^\']*\'\S*|\S+/', $perf, $perf_arr);
+    // preg_match_all returns a 2D array, we only need the first one
+    $perf_arr = $perf_arr[0];
 
     // Create an array for our metrics.
     $metrics = [];

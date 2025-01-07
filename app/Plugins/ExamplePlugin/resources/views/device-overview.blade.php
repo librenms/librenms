@@ -7,9 +7,7 @@
             <div class="panel-body">
                 <div class="row">
                     <div class="col-sm-12">
-                        {{-- This is a comment.  Below we output the markdown output unescaped because we want the raw html
-                         to be output to the page.  Be careful with unescaped output as it can lead to security issues. --}}
-                        {!! Str::markdown($device->notes ?? '') !!}
+                        {!! Str::markdown($device->notes ?? '', ['html_input' => 'strip', 'allow_unsafe_links' => false]) !!}
                     </div>
         </div>
         </div>

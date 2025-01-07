@@ -1002,6 +1002,144 @@ You may need to configure `$server` or `$port`.
 
 Verify it is working by running `/usr/lib/check_mk_agent/local/gpsd`
 
+## HTTP Access Log Combined
+
+### SNMP Extend
+
+1. Download the script onto the desired host.
+```
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/http_access_log_combined -O /etc/snmp/http_access_log_combined
+```
+
+2. Make the script executable
+```
+chmod +x /etc/snmp/http_access_log_combined
+```
+
+3. Install the depends
+```
+# FreeBSD
+pkg install p5-File-Slurp p5-MIME-Base64 p5-JSON p5-Statistics-Lite p5-File-ReadBackwards
+
+# Debian
+apt-get install libfile-slurp-perl libmime-base64-perl libjson-perl libstatistics-lite-perl libfile-readbackwards-perl
+```
+
+4. Configure it if neeeded. Uses
+   `/usr/local/etc/http_access_log_combined_extend.json`, unless
+   specified via `-c`. See further below for configuration
+   information.
+
+5. If on large setups where it won't complete in a timely manner, run
+   it via cron.
+```
+*/5 * * * * root /etc/snmp/http_access_log_combined -b -q -w
+```
+
+6. Add it to `snmpd.conf`.
+```
+# if not using cron
+extend http_access_log_combined /etc/snmp/http_access_log_combined -b
+
+# if using cron
+extend http_access_log_combined cat /var/cache/http_access_log_combined.json.snmp
+```
+
+7. Either manually enable it for the device, rediscover the device, or
+   wait for it to be rediscovered.
+   
+| Key               | Type         | Description                                                                                                                              |
+|-------------------|--------------|------------------------------------------------------------------------------------------------------------------------------------------|
+| access            | hash         | A hash of access logs to monitor. The key is the reporting name while the value is the path to it.                                       |
+| error             | hash         | A hash of errors logs to monitor. The key is the reporting name while the value is the path to it. Must have a matching entry in access  |
+| auto              | boolean, 0/1 | If auto mode should be used or not. If not defined and .access is not defined, then it will default to 1. Other wise it is undef, false. |
+| auto_dir          | string       | The dir to look for files in. Default: `/var/log/apache/`                                                                                |
+| auto_end_regex    | string       | What to match files ending in. Default: `.log$`                                                                                          |
+| auto_access_regex | string       | What will be prepended to the end regexp for looking for access log files. Default: `-access`                                            |
+| auto_error_regex  | string       | What will be prepended to the end regexp for looking for error log files. Default: `-error`                                              |
+
+Auto will attempt to generate a list of log files to process. Will
+look under the directory specified for files matching the built
+regexp. The regexp is built by joining the access/error regexps to the
+end regexp. so for access it would be come `-access.log$`.
+
+The default auto config would look like below.
+
+```JSON
+{
+    "auto": 1,
+    "auto_dir": "/var/log/apache/",
+    "auto_end_regex": ".log$",
+    "auto_access_regex": "-access",
+    "auto_error_regex": "-error"
+}
+```
+
+So lets say the log dir, `/some/dir` in our case, has the following files.
+
+```
+foo:80-access.log
+foo:80-error.log
+foo:443-access.log
+foo:443-error.log
+bar-access.log
+```
+
+Then the auto generated stuff would be a like below.
+
+```JSON
+{
+    "access":{
+        "foo:80": "/some/dir/foo:80-access.log",
+        "foo:443": "/some/dir/foo:443-access.log",
+        "bar": "/some/dir/bar-access.log",
+    },
+    "error":{
+        "foo:80": "/some/dir/foo:80-error.log",
+        "foo:443": "/some/dir/foo:443-error.log",
+    }
+}
+```
+
+A manual config would be like below. Note that only `foo` has a error
+log that the size will be checked for and reported via the stat
+`error_size`.
+
+```JSON
+{
+    "auto": 0,
+    "access":{
+        "foo":"/var/log/www/foo.log",
+        "bar:80":"/var/log/www/bar:80.log"
+        "bar:443":"/var/log/www/bar:443.log"
+    },
+    "error":{
+        "foo":"/var/log/www/foo-error.log"
+    }
+}
+```
+
+8. (Optional) If you have SELinux in Enforcing mode, you must add a module so the script can open and read the httpd log files:
+```
+cat << EOF > snmpd_http_access_log_combined.te
+module snmp_http_access_log_combined 1.0;
+
+require {
+        type httpd_log_t;
+        type snmpd_t;
+        class file { open read };
+}
+
+#============= snmpd_t ==============
+
+allow snmpd_t httpd_log_t:file { open read };
+
+EOF
+checkmodule -M -m -o snmpd_http_access_log_combined.mod snmpd_http_access_log_combined.te
+semodule_package -o snmpd_http_access_log_combined.pp -m snmpd_http_access_log_combined.mod
+semodule -i snmpd_http_access_log_combined.pp
+```
+
 ## HV Monitor
 
 HV Monitor provides a generic way to monitor hypervisors. Currently
@@ -1019,15 +1157,16 @@ or [MetaCPAN](https://metacpan.org/dist/HV-Monitor).
 For Debian based systems this is as below.
 
 ```
-apt-get install zlib1g-dev cpanminus libjson-perl
+# Debian
+apt-get install libjson-perl libmime-base64-perl cpanminus
 cpanm HV::Monitor
-```
 
-And on FreeBSD as below.
-
-```
-pkg install p5-App-cpanminus p5-JSON p5-MIME-Base64 p5-Gzip-Faster
+# FreeBSD
+pkg install p5-App-cpanminus p5-JSON p5-MIME-Base64 p5-Module-List
 cpanm HV::Monitor
+
+# Generic
+cpanm JSON MIME::Base64 Module::List
 ```
 
 2. Set it up to be be ran by cron by root. Yes, you can directly call
@@ -1079,9 +1218,20 @@ extend icecast /etc/snmp/icecast-stats.sh
 A small python3 script that reports current DHCP leases stats and pool usage of ISC DHCP Server.
 
 Also you have to install the dhcpd-pools and the required Perl
-modules. Under Ubuntu/Debian just run `apt install
-cpanminus ; cpanm Net::ISC::DHCPd::Leases Mime::Base64 File::Slurp` or under FreeBSD
-`pkg install p5-JSON p5-MIME-Base64 p5-App-cpanminus p5-File-Slurp ; cpanm Net::ISC::DHCPd::Leases`.
+modules.
+
+```
+# Debian
+apt install cpanminus libmime-base64-perl libfile-slurp-perl
+cpanm Net::ISC::DHCPd::Leases
+
+# FreeBSD
+pkg install p5-JSON p5-MIME-Base64 p5-App-cpanminus p5-File-Slurp
+cpanm Net::ISC::DHCPd::Leases
+
+# Generic
+cpanm Net::ISC::DHCPd::Leases MIME::Base64 File::Slurp
+```
 
 ### SNMP Extend
 
@@ -1140,9 +1290,13 @@ chmod +x /etc/snmp/logsize
 ```
 # FreeBSD
 pkg install p5-File-Find-Rule p5-JSON p5-TOML p5-Time-Piece p5-MIME-Base64 p5-File-Slurp p5-Statistics-Lite
+
 # Debian
-apt-get install cpanminus
-cpanm File::Find::Rule JSON TOML Time::Piece MIME::Base64 File::Slurp Statistics::Lite
+apt-get install cpanminus libjson-perl libmime-base64-perl libfile-slurp-perl libtoml-perl libfile-find-rule-perl libstatistics-lite-perl
+cpanm Time::Piece
+
+# Generic
+cpanm File::Find::Rule JSON TOML Time::Piece MIME::Base64 File::Slurp Statistics::Lite Time::Piece
 ```
 
 3. Configure the config at `/usr/local/etc/logsize.conf`. You can find
@@ -1233,8 +1387,11 @@ extend linux_config_files /etc/snmp/linux_config_files.py
 
 1: Install the depends, which on a Debian based system would be as below.
 ```
-apt-get install -y cpanminus zlib1g-dev
-cpanm File::Slurp MIME::Base64 JSON Gzip::Faster
+# Debian
+apt-get install -y libfile-slurp-perl libmime-base64-perl libjson-perl
+
+# Generic
+cpanm JSON File::Slurp MIME::Base64
 ```
 
 2. Download the script into the desired host.
@@ -1517,6 +1674,56 @@ The application should be auto-discovered as described at the top of
 the page. If it is not, please follow the steps set out under `SNMP
 Extend` heading top of page.
 
+## Nextcloud
+
+### SNMP
+
+1. Copy the shell script to the desired host.
+```
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/nextcloud -O /etc/snmp/nextcloud
+```
+
+2. Make the script executable
+```
+chmod +x /etc/snmp/nextcloud
+```
+
+3. Install depends.
+```
+# FreeBSD
+pkg install p5-JSON p5-File-Slurp p5-MIME-Base64 p5-Time-Piece
+
+# Debian
+apt-get install libjson-perl libfile-slurp-perl libmime-base64-perl cpanminus
+cpanm Time::Piece
+
+# generic cpanm
+cpanm JSON File::Slurp Mime::Base64 Time::Piece
+
+# CentOS / RHEL
+dnf install perl-JSON perl-File-Slurp perl-MIME-Base64 perl-String-ShellQuote perl-Time-Piece
+```
+
+4. Create the cache dir and chown it to the user Nextcloud is running
+   as.
+```
+mkdir /var/cache/nextcloud_extend
+chown -R $nextcloud_user /var/cache/nextcloud_extend
+```
+
+5. Set it up in the crontab for the Nextcloud user using `-i` to point
+   it to the Nextcloud install dir.
+```
+*/5 * * * * /etc/snmpd/nextcloud -q -i $install_dir
+```
+
+6. Add it to snmpd.conf
+```
+extend nextcloud /bin/cat /var/cache/nextcloud_extend/snmp
+```
+
+Then just wait for it to be rediscovered.
+
 ## NGINX
 
 NGINX is a free, open-source, high-performance HTTP server: <https://www.nginx.org/>
@@ -1603,14 +1810,26 @@ wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/nfs -
 chmod +x /etc/snmp/nfs
 ```
 
-3. Add it to snmpd.conf.
+3. Install the requirements.
+```
+# debian
+apt-get install libfile-slurp-perl libjson-perl libmime-base64-perl
+
+# freebsd
+pkg install p5-File-Slurp p5-JSON p5-MIME-Base64
+
+# rhel / alma
+dnf install perl-File-Slurp perl-JSON perl-MIME-Base64
+```
+
+4. Add it to snmpd.conf.
 ```
 extend nfs /usr/bin/env PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin /etc/snmp/nfs
 ```
 
-4. Restart snmpd on your host
+5. Restart snmpd on your host
 
-5. Either wait for it to be rediscovered, rediscover it, or enable it.
+6. Either wait for it to be rediscovered, rediscover it, or enable it.
 
 If using SELinux, the following is needed.
 
@@ -1618,21 +1837,40 @@ If using SELinux, the following is needed.
 
 2. Make a file (snmp_nfs.te) with the following contents and install
    the policy with the command `semodule -i snmp_nfs.te`.
+
 ```
-module snmp_nfs 1.0;
+module local_snmp 1.0;
 
 require {
-        type mountd_port_t;
-        type snmpd_t;
-        type hi_reserved_port_t;
-        class tcp_socket { name_bind name_connect };
-        class udp_socket name_bind;
+    type snmpd_t;
+    type portmap_port_t;
+    type sysctl_rpc_t;
+    type device_t;
+    type mountd_port_t;
+    type hi_reserved_port_t;
+    class tcp_socket { name_bind name_connect };
+    class udp_socket name_bind;
+    class dir search;
+    class file { read getattr open };
+    class chr_file { open ioctl read write };
 }
 
-#============= snmpd_t ==============
+# Allow snmpd_t to connect to tcp_socket of type portmap_port_t
+allow snmpd_t portmap_port_t:tcp_socket name_connect;
 allow snmpd_t hi_reserved_port_t:tcp_socket name_bind;
 allow snmpd_t hi_reserved_port_t:udp_socket name_bind;
 allow snmpd_t mountd_port_t:tcp_socket name_connect;
+
+# Allow snmpd_t to search directories and access files of type sysctl_rpc_t
+allow snmpd_t sysctl_rpc_t:dir search;
+allow snmpd_t sysctl_rpc_t:file { read getattr open };
+
+# Allow snmpd_t to perform open, ioctl, read, and write operations on chr_file of type device_t
+allow snmpd_t device_t:chr_file { open ioctl read write };
+
+# this policy allows : 
+# zfs extension (fixes root needs to run this)
+# nfs extension (fixes file not found error)
 ```
 
 ## Linux NFS Server
@@ -1779,16 +2017,18 @@ chmod +x /etc/snmp/opensearch
 3. Install the required Perl dependencies.
 ```
 # FreeBSD
-pkg install p5-JSON p5-libwww
+pkg install p5-JSON p5-File-Slurp p5-MIME-Base64 p5-LWP-Protocol-https
+
 # Debian/Ubuntu
-apt-get install libjson-perl libwww-perl
-# cpanm
-cpanm JSON Libwww
+apt-get install libjson-perl libfile-slurp-perl liblwp-protocol-https-perl libmime-base64-perl
+
+# Generic
+cpanm JSON Libwww File::Slurp LWP::Protocol::HTTPS MIME::Base64
 ```
 
 4. Update your snmpd.conf.
 ```
-extend opensearch /bin/cat /var/cache/opensearch.json
+extend opensearch /bin/cat /var/cache/opensearch.json.snmp
 ```
 
 5. Update root crontab with. This is required as it will this will
@@ -1796,10 +2036,18 @@ likely time out otherwise. Use `*/1` if you want to have the most
 recent stats when polled or to `*/5` if you just want at exactly a 5
 minute interval.
 ```
-*/5 * * * * /etc/snmp/opensearch > /var/cache/opensearch.json
+*/5 * * * * /etc/snmp/opensearch -w -q
 ```
 
 6. Enable it or wait for the device to be re-disocvered.
+
+Alternatively cron can be skipped and the extend can be told to run
+like below, but if under heavy load it time out waiting for Opensearch
+to respond.
+
+```
+extend opensearch /etc/snmp/opensearch
+```
 
 ## Open Grid Scheduler
 
@@ -1850,6 +2098,149 @@ chmod +x /etc/snmp/opensips-stats.sh
 ```
 extend opensips /etc/snmp/opensips-stats.sh
 ```
+
+## OS Level Virtualization Monitoring
+
+| OS      | Supported                           |
+|---------|-------------------------------------|
+| FreeBSD | jails                               |
+| Linux   | cgroups v2(Docker, Podman included) |
+
+### SNMP Extend
+
+1. Install the depends...
+
+```shell
+# Debian
+apt-get install libjson-perl libclone-perl libmime-base64-perl libfile-slurp-perl libio-interface-perl cpanminus
+
+# Generic
+cpanm JSON Clone Mime::Base64 File::Slurp IO::Interface
+```
+
+2. Install...
+
+```
+# FreeBSD
+pkg install p5-OSLV-Monitor
+
+# Debian / Generic
+cpanm OSLV::Monitor
+```
+
+3. Setup cron.
+
+```
+ */5 * * * * /usr/local/bin/oslv_monitor -q > /dev/null 2> /dev/null
+```
+
+4. Setup snmpd.
+
+```
+extend oslv_monitor /bin/cat /var/cache/oslv_monitor/snmp
+```
+
+Wait for it to be rediscovered by LibreNMS.
+
+An optional config file may be specified via -f or placed at
+`/usr/local/etc/oslv_monitor.json`.
+
+The following keys are used in the JSON config file.
+
+    - include :: An array of regular expressions to include.
+        Default :: ["^.*$"]
+
+    - exclude :: An array of regular expressions to exlclude.
+        Default :: undef
+
+    - backend :: Override the backend and automatically choose it.
+
+    - time_divider :: Override the time_divider value. The default value varies
+        per backend and if it is needed.
+
+Time divider notes.
+
+    - cgroups :: While the default for usec to sec conversion should be 1000000,
+              some settings report the value in nanoseconds, requiring 1000000000.
+        Default :: 1000000
+
+    - FreeBSD :: not used
+
+By Defaults the backends are as below.
+
+    FreeBSD: FreeBSD
+    Linux: cgroups
+
+Default would be like this.
+
+```json
+{
+  "include": ["^.*$"]
+}
+```
+
+
+### Metric Notes
+
+| Key                     | Description                                                  |
+|-------------------------|--------------------------------------------------------------|
+| `running_$name`         | 0 or 1 based on if it is running or not.                     |
+| `oslvm___$name___$stat` | The a specific stat for a specific OSLVMs.                   |
+| `totals_$stat`          | A stat representing a total for all stats across all OSLVMs. |
+
+Something is considered not running if it has been seen. How long
+something is considred to have been seen is controlled by
+`apps.oslv_monitor.seen_age`, which is the number of seconds ago it
+would of have to be seen. The default is `604800` which is seven days
+in seconds.
+
+All time values are in seconds.
+
+All counter stats are per second values for that time period.
+
+### Backend Notes
+
+#### FreeBSD
+
+The stats names match those produced by `ps --libxo json`.
+
+#### Linux cgroups v2
+
+The cgroup to name mapping is done like below.
+
+- systemd -> s_$name
+- user -> u_$name
+- docker -> d_$name
+- podman -> p_$name
+- anything else -> $name
+
+The following ps to stats mapping are as below.
+
+- %cpu -> percent-cpu
+- %mem -> percent-memory
+- rss -> rss
+- vsize -> virtual-size
+- trs -> text-size
+- drs -> data-size
+- size -> size
+
+"procs" is a total number of procs in that cgroup.
+
+The rest of the values are pulled from the following files with
+the names kept as is.
+
+- cpu.stat
+- io.stat
+- memory.stat
+
+The following mappings are done though.
+
+- pgfault -> minor-faults
+- pgmajfault -> major-faults
+- usage_usec -> cpu-time
+- system_usec -> system-time
+- user_usec -> user-time
+- throttled_usecs -> throttled-time
 
 ## OS Updates
 
@@ -1919,6 +2310,8 @@ chmod +x /etc/snmp/php-fpm
 pkg install p5-File-Slurp p5-JSON p5-String-ShellQuote p5-MIME-Base64
 # Debian
 apt-get install libfile-slurp-perl libjson-perl libstring-shellquote-perl libmime-base64-perl
+# Fedora
+dnf install perl-JSON perl-File-Slurp perl-String-ShellQuote
 ```
 
 3. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
@@ -2105,6 +2498,36 @@ moderate usage.
 The application should be auto-discovered as described at the top of
 the page. If it is not, please follow the steps set out under `SNMP
 Extend` heading top of page.
+
+## Poudriere
+
+### SNMP Extend
+
+1. Copy the extend into place
+```
+wget https://github.com/librenms/librenms-agent/raw/master/snmp/poudriere -O /usr/local/etc/snmp/poudriere
+```
+
+2. Make it executable.
+```
+chmod +x /usr/local/etc/snmp/poudriere
+```
+
+3. Install the depends
+```
+pkg install p5-Data-Dumper p5-JSON p5-MIME-Base64 p5-File-Slurp
+```
+
+4. Setup the cronjob. The extend needs to be ran as root. See
+`poudriere --help` for option info.
+```
+4/5 * * * * root /usr/local/etc/snmp/poudriere -q -a -w -z
+```
+
+5. Add the extend to snmpd.conf and restart snmpd
+```
+extend poudriere cat /var/cache/poudriere.json.snmp
+```
 
 ## PowerDNS
 
@@ -2383,10 +2806,14 @@ chmod +x /etc/snmp/privoxy
 2. Install the depdenencies.
 ```
 # FreeBSD
-pkg install p5-File-ReadBackwards p5-Time-Piece p5-JSON p5-IPC-Run3 p5-Gzip-Faster p5-MIME-Base64
+pkg install p5-JSON p5-MIME-Base64 p5-File-Slurp p5-File-ReadBackwards p5-IPC-Run3 p5-Time-Piece
+
 # Debian
-apt-get install cpanminus zlib1g
-cpanm File::ReadBackwards Time::Piece JSON IPC::Run3 MIME::Base64 Gzip::Faster
+apt-get install libjson-perl libmime-base64-perl libfile-slurp-perl libfile-readbackwards-perl libipc-run3-perl cpanminus
+cpanm Time::Piece
+
+# Generic
+cpanm Time::Piece JSON MIME::Base64 File::Slurp File::ReadBackwards IPC::Run3
 ```
 
 3. Add the extend to snmpd.conf and restart snmpd.
@@ -2403,6 +2830,19 @@ a `$PATH` set to something that includes it.
 
 Once that is done, just wait for the server to be rediscovered or just
 enable it manually.
+
+If you are having timeouts or there is privelege seperation issues,
+then it can be ran via cron like below. `-w` can be used to write it
+out and `-o` can be used to control where it is written to. See
+`--help` for more information.
+
+```
+# cron
+*/5 * * * * root /etc/snmp/privoxy -w > /dev/null
+
+# snmpd.conf
+extend privoxy /bin/cat /var/cache/privoxy_extend.json.snmp
+```
 
 ## Pwrstatd
 
@@ -2791,8 +3231,7 @@ wget https://github.com/librenms/librenms-agent/raw/master/snmp/smart-v1 -O /etc
 # FreeBSD
 pkg install p5-JSON p5-MIME-Base64 smartmontools
 # Debian
-apt-get install cpanminus smartmontools
-cpanm MIME::Base64 JSON
+apt-get install smartmontools libjson-perl libmime-base64-perl
 # CentOS
 dnf install smartmontools perl-JSON perl-MIME-Base64
 ```
@@ -2931,10 +3370,14 @@ at [MetaCPAN](https://metacpan.org/dist/Monitoring-Sneck-Boop_Snoot) and
 
 ```
 # FreeBSD
-pkg install p5-JSON p5-File-Slurp p5-MIME-Base64 p5-Gzip-Faster p5-App-cpanminus
+pkg install p5-JSON p5-File-Slurp p5-MIME-Base64 p5-App-cpanminus
 cpanm Monitoring::Sneck
+
 # Debian based systems
-apt-get install zlib1g-dev cpanminus
+apt-get install cpanminus libjson-perl libfile-slurp-perl libmime-base64-perl
+cpanm Monitoring::Sneck
+
+# Generic
 cpanm Monitoring::Sneck
 ```
 
@@ -3051,6 +3494,15 @@ one found among all the instances.
 
 1. Install the extend.
 ```
+# FreeBSD
+pkg install p5-JSON p5-File-ReadBackwards p5-File-Slurp p5-MIME-Base64 p5-Time-Piece p5-App-cpanminus
+cpanm Sagan::Monitoring
+
+# Debian
+apt-get install libjson-perl libfile-readbackwards-perl libfile-slurp-perl libmime-base64-perl cpanminus
+cpanm Sagan::Monitoring
+
+# Generic
 cpanm Sagan::Monitoring
 ```
 
@@ -3215,6 +3667,15 @@ semodule -i snmpd_ss.pp
 
 1. Install the extend.
 ```
+# FreeBSD
+pkg install p5-JSON p5-File-Path p5-File-Slurp p5-Time-Piece p5-MIME-Base64 p5-Hash-Flatten p5-Carp p5-App-cpanminus
+cpanm Suricata::Monitoring
+
+# Debian
+apt-get install libjson-perl libfile-path-perl libfile-slurp-perl libmime-base64-perl cpanminus
+cpanm Suricata::Monitoring
+
+# Generic
 cpanm Suricata::Monitoring
 ```
 
@@ -3498,8 +3959,12 @@ wget https://github.com/librenms/librenms-agent/raw/master/snmp/wireguard.pl -O 
 ```
 # FreeBSD
 pkg install p5-JSON p5-File-Slurp p5-MIME-Base64
+
 # Debian
 apt-get install libjson-perl libmime-base64-perl libfile-slurp-perl
+
+# Generic
+cpanm JSON MIME::Base64 File::Slurp
 ```
 
 3. Make the script executable
@@ -3544,11 +4009,14 @@ The default for `pubkey_resolvers` is
 
 1: Install the depends.
 ```
-### FreeBSD
-pkg install p5-JSON p5-MIME-Base64 p5-Gzip-Faster p5-File-Slurp
-### Debian
-apt-get install -y cpanminus zlib1g-dev
-cpanm Mime::Base64 JSON Gzip::Faster
+# FreeBSD
+pkg install p5-JSON p5-MIME-Base64 p5-File-Slurp
+
+# Debian
+apt-get install -y libjson-perl libmime-base64-perl libfile-slurp-perl
+
+# Generic
+cpanm JSON MIME::Base64 File::Slurp
 ```
 
 2: Fetch the script in question and make it executable.
@@ -3557,7 +4025,8 @@ wget https://github.com/librenms/librenms-agent/raw/master/snmp/zfs -O /etc/snmp
 chmod +x /etc/snmp/zfs
 ```
 
-3: Add the following to snmpd.conf and restart snmpd.
+3: Add the following to snmpd.conf and restart snmpd. If `-s`, passed
+as a arg, status is returned for display.
 ```
-extend zfs /etc/snmp/zfs
+extend zfs /etc/snmp/zfs -b
 ```

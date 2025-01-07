@@ -8,6 +8,9 @@
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
 
+use App\Models\Device;
+use App\Models\Eventlog;
+use App\Models\StateTranslation;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Enum\Severity;
@@ -69,11 +72,6 @@ function logfile($string)
     fclose($fd);
 }
 
-function percent_colour($perc)
-{
-    return \LibreNMS\Util\Color::percent(percent: $perc);
-}
-
 /**
  * @param  $device
  * @return string the path to the icon image for this device.  Close to square.
@@ -108,19 +106,19 @@ function renamehost($id, $new, $source = 'console')
     $new_rrd_dir = Rrd::dirFromHost($new);
 
     if (is_dir($new_rrd_dir)) {
-        log_event("Renaming of $host failed due to existing RRD folder for $new", $id, 'system', 5);
+        Eventlog::log("Renaming of $host failed due to existing RRD folder for $new", $id, 'system', Severity::Error);
 
         return "Renaming of $host failed due to existing RRD folder for $new\n";
     }
 
     if (! is_dir($new_rrd_dir) && rename(Rrd::dirFromHost($host), $new_rrd_dir) === true) {
         dbUpdate(['hostname' => $new, 'ip' => null], 'devices', 'device_id=?', [$id]);
-        log_event("Hostname changed -> $new ($source)", $id, 'system', 3);
+        Eventlog::log("Hostname changed -> $new ($source)", $id, 'system', Severity::Notice);
 
         return '';
     }
 
-    log_event("Renaming of $host failed", $id, 'system', 5);
+    Eventlog::log("Renaming of $host failed", $id, 'system', Severity::Error);
 
     return "Renaming of $host failed\n";
 }
@@ -216,25 +214,6 @@ function snmp2ipv6($ipv6_snmp)
     return implode(':', $ipv6_2);
 }
 
-/**
- * Log events to the event table
- *
- * @param  string  $text  message describing the event
- * @param  array|int  $device  device array or device_id
- * @param  string  $type  brief category for this event. Examples: sensor, state, stp, system, temperature, interface
- * @param  int  $severity  1: ok, 2: info, 3: notice, 4: warning, 5: critical, 0: unknown
- * @param  int  $reference  the id of the referenced entity.  Supported types: interface
- */
-function log_event($text, $device = null, $type = null, $severity = 2, $reference = null)
-{
-    // handle legacy device array
-    if (is_array($device) && isset($device['device_id'])) {
-        $device = $device['device_id'];
-    }
-
-    \App\Models\Eventlog::log($text, $device, $type, Severity::tryFrom((int) $severity) ?? Severity::Info, $reference);
-}
-
 function hex2str($hex)
 {
     $string = '';
@@ -250,12 +229,6 @@ function hex2str($hex)
 function snmp_hexstring($hex)
 {
     return hex2str(str_replace(' ', '', str_replace(' 00', '', $hex)));
-}
-
-// Check if the supplied string is an SNMP hex string
-function isHexString($str)
-{
-    return (bool) preg_match('/^[a-f0-9][a-f0-9]( [a-f0-9][a-f0-9])*$/is', trim($str));
 }
 
 /**
@@ -291,12 +264,12 @@ function is_port_valid($port, $device)
     $ifType = $port['ifType'];
     $ifOperStatus = $port['ifOperStatus'] ?? '';
 
-    if (str_i_contains($ifDescr, Config::getOsSetting($device['os'], 'good_if', Config::get('good_if')))) {
+    if (Str::contains($ifDescr, Config::getOsSetting($device['os'], 'good_if', Config::get('good_if')), ignoreCase: true)) {
         return true;
     }
 
     foreach (Config::getCombined($device['os'], 'bad_if') as $bi) {
-        if (str_i_contains($ifDescr, $bi)) {
+        if (Str::contains($ifDescr, $bi, ignoreCase: true)) {
             d_echo("ignored by ifDescr: $ifDescr (matched: $bi)\n");
 
             return false;
@@ -321,7 +294,7 @@ function is_port_valid($port, $device)
 
     foreach (Config::getCombined($device['os'], 'bad_ifalias_regexp') as $bar) {
         if (preg_match($bar . 'i', $ifAlias)) {
-            d_echo("ignored by ifName: $ifAlias (matched: $bar)\n");
+            d_echo("ignored by ifAlias: $ifAlias (matched: $bar)\n");
 
             return false;
         }
@@ -381,22 +354,6 @@ function port_fill_missing_and_trim(&$port, $device)
     }
 }
 
-function validate_device_id($id)
-{
-    if (empty($id) || ! is_numeric($id)) {
-        $return = false;
-    } else {
-        $device_id = dbFetchCell('SELECT `device_id` FROM `devices` WHERE `device_id` = ?', [$id]);
-        if ($device_id == $id) {
-            $return = true;
-        } else {
-            $return = false;
-        }
-    }
-
-    return $return;
-}
-
 function convert_delay($delay)
 {
     if (preg_match('/(\d+)([mhd]?)/', $delay, $matches)) {
@@ -435,29 +392,14 @@ function fix_integer_value($value)
 
 /**
  * Checks if the $hostname provided exists in the DB already
- *
- * @param  string  $hostname  The hostname to check for
- * @param  string  $sysName  The sysName to check
- * @return bool true if hostname already exists
- *              false if hostname doesn't exist
  */
-function host_exists($hostname, $sysName = null)
+function host_exists(string $hostname, ?string $sysName = null): bool
 {
-    $query = 'SELECT COUNT(*) FROM `devices` WHERE `hostname`=?';
-    $params = [$hostname];
-
-    if (! empty($sysName) && ! Config::get('allow_duplicate_sysName')) {
-        $query .= ' OR `sysName`=?';
-        $params[] = $sysName;
-
-        if (! empty(Config::get('mydomain'))) {
-            $full_sysname = rtrim($sysName, '.') . '.' . Config::get('mydomain');
-            $query .= ' OR `sysName`=?';
-            $params[] = $full_sysname;
-        }
-    }
-
-    return dbFetchCell($query, $params) > 0;
+    return Device::where('hostname', $hostname)
+        ->when(! empty($sysName), function ($query) use ($sysName) {
+            $query->when(! Config::get('allow_duplicate_sysName'), fn ($q) => $q->orWhere('sysName', $sysName))
+                  ->when(! empty(Config::get('mydomain')), fn ($q) => $q->orWhere('sysName', rtrim($sysName, '.') . '.' . Config::get('mydomain')));
+        })->exists();
 }
 
 /**
@@ -499,106 +441,23 @@ function dnslookup($device, $type = false, $return = false)
  *
  * @param  string  $state_name  the unique name for this state translation
  * @param  array  $states  array of states, each must contain keys: descr, graph, value, generic
- * @return int|null
+ * @return void
  */
-function create_state_index($state_name, $states = [])
+function create_state_index($state_name, $states = []): void
 {
-    $state_index_id = dbFetchCell('SELECT `state_index_id` FROM state_indexes WHERE state_name = ? LIMIT 1', [$state_name]);
-    if (! is_numeric($state_index_id)) {
-        $state_index_id = dbInsert(['state_name' => $state_name], 'state_indexes');
-
-        // legacy code, return index so states are created
-        if (empty($states)) {
-            return $state_index_id;
-        }
-    }
-
-    // check or synchronize states
-    if (empty($states)) {
-        $translations = dbFetchRows('SELECT * FROM `state_translations` WHERE `state_index_id` = ?', [$state_index_id]);
-        if (count($translations) == 0) {
-            // If we don't have any translations something has gone wrong so return the state_index_id so they get created.
-            return $state_index_id;
-        }
-    } else {
-        sync_sensor_states($state_index_id, $states);
-    }
-
-    return null;
-}
-
-/**
- * Synchronize the sensor state translations with the database
- *
- * @param  int  $state_index_id  index of the state
- * @param  array  $states  array of states, each must contain keys: descr, graph, value, generic
- */
-function sync_sensor_states($state_index_id, $states)
-{
-    $new_translations = array_reduce($states, function ($array, $state) use ($state_index_id) {
-        $array[$state['value']] = [
-            'state_index_id' => $state_index_id,
+    app('sensor-discovery')->withStateTranslations($state_name, array_map(function ($state) {
+        return new StateTranslation([
             'state_descr' => $state['descr'],
             'state_draw_graph' => $state['graph'],
             'state_value' => $state['value'],
             'state_generic_value' => $state['generic'],
-        ];
-
-        return $array;
-    }, []);
-
-    $existing_translations = dbFetchRows(
-        'SELECT `state_index_id`,`state_descr`,`state_draw_graph`,`state_value`,`state_generic_value` FROM `state_translations` WHERE `state_index_id`=?',
-        [$state_index_id]
-    );
-
-    foreach ($existing_translations as $translation) {
-        $value = $translation['state_value'];
-        if (isset($new_translations[$value])) {
-            if ($new_translations[$value] != $translation) {
-                dbUpdate(
-                    $new_translations[$value],
-                    'state_translations',
-                    '`state_index_id`=? AND `state_value`=?',
-                    [$state_index_id, $value]
-                );
-            }
-
-            // this translation is synchronized, it doesn't need to be inserted
-            unset($new_translations[$value]);
-        } else {
-            dbDelete('state_translations', '`state_index_id`=? AND `state_value`=?', [$state_index_id, $value]);
-        }
-    }
-
-    // insert any new translations
-    dbBulkInsert($new_translations, 'state_translations');
+        ]);
+    }, $states));
 }
 
 function create_sensor_to_state_index($device, $state_name, $index)
 {
-    $sensor_entry = dbFetchRow('SELECT sensor_id FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ? AND `sensor_type` = ? AND `sensor_index` = ?', [
-        'state',
-        $device['device_id'],
-        $state_name,
-        $index,
-    ]);
-    $state_indexes_entry = dbFetchRow('SELECT state_index_id FROM `state_indexes` WHERE `state_name` = ?', [
-        $state_name,
-    ]);
-    if (! empty($sensor_entry['sensor_id']) && ! empty($state_indexes_entry['state_index_id'])) {
-        $insert = [
-            'sensor_id' => $sensor_entry['sensor_id'],
-            'state_index_id' => $state_indexes_entry['state_index_id'],
-        ];
-        foreach ($insert as $key => $val_check) {
-            if (! isset($val_check)) {
-                unset($insert[$key]);
-            }
-        }
-
-        dbInsert($insert, 'sensors_to_state_indexes');
-    }
+    // no op
 }
 
 function delta_to_bits($delta, $period)
@@ -608,7 +467,7 @@ function delta_to_bits($delta, $period)
 
 function report_this($message)
 {
-    return '<h2>' . $message . ' Please <a href="' . Config::get('project_issues') . '">report this</a> to the ' . Config::get('project_name') . ' developers.</h2>';
+    return '<h2>' . htmlentities($message) . ' Please <a href="' . htmlentities(Config::get('project_issues')) . '">report this</a> to the ' . htmlentities(Config::get('project_name')) . ' developers.</h2>';
 }//end report_this()
 
 function hytera_h2f($number, $nd)
@@ -672,87 +531,6 @@ function hytera_h2f($number, $nd)
 
     return number_format($floatfinal, $nd, '.', '');
 }
-
-/*
- * Cisco CIMC functions
- */
-// Create an entry in the entPhysical table if it doesnt already exist.
-function setCIMCentPhysical($location, $data, &$entphysical, &$index)
-{
-    // Go get the location, this will create it if it doesnt exist.
-    $entPhysicalIndex = getCIMCentPhysical($location, $entphysical, $index);
-
-    // See if we need to update
-    $update = [];
-    foreach ($data as $key => $value) {
-        // Is the Array(DB) value different to the supplied data
-        if ($entphysical[$location][$key] != $value) {
-            $update[$key] = $value;
-            $entphysical[$location][$key] = $value;
-        } // End if
-    } // end foreach
-
-    // Do we need to update
-    if (count($update) > 0) {
-        dbUpdate($update, 'entPhysical', '`entPhysical_id` = ?', [$entphysical[$location]['entPhysical_id']]);
-    }
-    $entPhysicalId = $entphysical[$location]['entPhysical_id'];
-
-    return [$entPhysicalId, $entPhysicalIndex];
-}
-
-function getCIMCentPhysical($location, &$entphysical, &$index)
-{
-    global $device;
-
-    // Level 1 - Does the location exist
-    if (isset($entphysical[$location])) {
-        // Yes, return the entPhysicalIndex.
-        return $entphysical[$location]['entPhysicalIndex'];
-    } else {
-        /*
-         * No, the entry doesnt exist.
-         * Find its parent so we can create it.
-         */
-
-        // Pull apart the location
-        $parts = explode('/', $location);
-
-        // Level 2 - Are we at the root
-        if (count($parts) == 1) {
-            // Level 2 - Yes. We are the root, there is no parent
-            d_echo('ROOT - ' . $location . "\n");
-            $shortlocation = $location;
-            $parent = 0;
-        } else {
-            // Level 2 - No. Need to go deeper.
-            d_echo('NON-ROOT - ' . $location . "\n");
-            $shortlocation = array_pop($parts);
-            $parentlocation = implode('/', $parts);
-            d_echo('Decend - parent location: ' . $parentlocation . "\n");
-            $parent = getCIMCentPhysical($parentlocation, $entphysical, $index);
-        } // end if - Level 2
-        d_echo('Parent: ' . $parent . "\n");
-
-        // Now we have an ID, create the entry.
-        $index++;
-        $insert = [
-            'device_id' => $device['device_id'],
-            'entPhysicalIndex' => $index,
-            'entPhysicalClass' => 'container',
-            'entPhysicalVendorType' => $location,
-            'entPhysicalName' => $shortlocation,
-            'entPhysicalContainedIn' => $parent,
-            'entPhysicalParentRelPos' => '-1',
-        ];
-
-        // Add to the DB and Array.
-        $id = dbInsert($insert, 'entPhysical');
-        $entphysical[$location] = dbFetchRow('SELECT * FROM entPhysical WHERE entPhysical_id=?', [$id]);
-
-        return $index;
-    } // end if - Level 1
-} // end function
 
 function q_bridge_bits2indices($hex_data)
 {

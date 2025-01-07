@@ -29,14 +29,41 @@ use LibreNMS\Enum\IntegerType;
 
 class Number
 {
-    public static function formatBase($value, $base = 1000, $round = 2, $sf = 3, $suffix = 'B'): string
+    public static function formatBase($value, $base = 1000, $round = 2, $sf = 0, $suffix = 'B'): string
     {
         return $base == 1000
             ? self::formatSi($value, $round, $sf, $suffix)
             : self::formatBi($value, $round, $sf, $suffix);
     }
 
-    public static function formatSi($value, $round = 2, $sf = 3, $suffix = 'B'): string
+    private static function calcRound(float $value, int $round, int $sf): int
+    {
+        // If we want to track significat figures
+        if ($sf) {
+            $sfround = $sf;
+            if ($value > 1) {
+                // Get the number of digits to the left of the decimal
+                $sflen = strlen(strval(intval($value)));
+
+                if ($sflen >= $sf) {
+                    // We have enough significant figures to the left of the decimal point, so we don't need anything to the right
+                    $sfround = 0;
+                } else {
+                    // We can round one less for every digit to the left of the decimal place
+                    $sfround -= $sflen;
+                }
+            }
+            // If significant figures results in rounding to less decimal places, return this value
+            if ($sfround < $round) {
+                return $sfround;
+            }
+        }
+
+        // Default
+        return $round;
+    }
+
+    public static function formatSi($value, $round = 2, $sf = 0, $suffix = 'B'): string
     {
         $value = (float) $value;
         $neg = $value < 0;
@@ -60,14 +87,17 @@ class Number
             }
         }
 
+        // Re-calculate rounding based on $sf before converting back to a negative value
+        $round = self::calcRound($value, $round, $sf);
+
         if ($neg) {
             $value = $value * -1;
         }
 
-        return self::cast(number_format(round($value, $round), $sf, '.', '')) . " $ext$suffix";
+        return self::cast(number_format($value, $round, '.', '')) . " $ext$suffix";
     }
 
-    public static function formatBi($value, $round = 2, $sf = 3, $suffix = 'B'): string
+    public static function formatBi($value, $round = 2, $sf = 0, $suffix = 'B'): string
     {
         $value = (float) $value;
         $neg = $value < 0;
@@ -81,11 +111,14 @@ class Number
             $ext = $sizes[$i];
         }
 
+        // Re-calculate rounding based on $sf before converting back to a negative value
+        $round = self::calcRound($value, $round, $sf);
+
         if ($neg) {
             $value = $value * -1;
         }
 
-        return self::cast(number_format(round($value, $round), $sf, '.', '')) . " $ext$suffix";
+        return self::cast(number_format($value, $round, '.', '')) . " $ext$suffix";
     }
 
     /**
@@ -153,7 +186,8 @@ class Number
      */
     public static function calculatePercent($part, $total, int $precision = 2): float
     {
-        if ($total == 0) {
+        // ensure total is strict positive and part is positive
+        if ($total <= 0 || $part < 0) {
             return 0;
         }
 
@@ -168,7 +202,7 @@ class Number
             if ($value > $maxSignedValue) {
                 $signedValue = $value - $maxSignedValue * 2 - 2;
 
-                // if conversion was successfull, the number will still be in the valid range
+                // if conversion was successful, the number will still be in the valid range
                 if ($signedValue > $maxSignedValue) {
                     throw new \InvalidArgumentException('Unsigned value exceeds the maximum representable value of ' . $integerSize->name);
                 }

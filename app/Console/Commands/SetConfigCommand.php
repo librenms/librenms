@@ -12,7 +12,6 @@ use JsonSchema\Validator;
 use LibreNMS\Config;
 use LibreNMS\DB\Eloquent;
 use LibreNMS\Util\DynamicConfig;
-use LibreNMS\Util\OS;
 use Symfony\Component\Console\Input\InputArgument;
 
 class SetConfigCommand extends LnmsCommand
@@ -50,7 +49,9 @@ class SetConfigCommand extends LnmsCommand
         if (preg_match('/^os\.(?<os>[a-z_\-]+)\.(?<setting>.*)$/', $setting, $matches)) {
             $os = $matches['os'];
             try {
-                $this->validateOsSetting($os, $matches['setting'], $value);
+                if (! $force) {
+                    $this->validateOsSetting($os, $matches['setting'], $value);
+                }
             } catch (ValidationException $e) {
                 $this->error(trans('commands.config:set.errors.invalid'));
                 $this->line($e->getMessage());
@@ -213,7 +214,6 @@ class SetConfigCommand extends LnmsCommand
     private function validateOsSetting(string $os, string $setting, $value)
     {
         // prep data to be validated
-        OS::loadDefinition($os);
         $os_data = \LibreNMS\Config::get("os.$os");
         if ($os_data === null) {
             throw new ValidationException(trans('commands.config:set.errors.invalid_os', ['os' => $os]));

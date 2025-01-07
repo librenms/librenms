@@ -108,7 +108,7 @@ class SnmpResponse
         foreach ($oids as $oid) {
             if ($forceNumeric) {
                 // translate all to numeric to make it easier to match
-                $oid = Oid::toNumeric($oid);
+                $oid = Oid::of($oid)->toNumeric();
             }
 
             if (isset($values[$oid]) && $values[$oid] !== '') {
@@ -173,6 +173,48 @@ class SnmpResponse
         return $this->values;
     }
 
+    /**
+     * Create a key to value pair for an OID
+     * Only works for single indexed tables
+     * You may omit $oid if there is only one $oid in the walk
+     */
+    public function pluck(?string $oid = null): array
+    {
+        $output = [];
+        $oid = $oid ?? '[a-zA-Z0-9:.-]+';
+        $regex = "/^{$oid}[[.](\d+)]?$/";
+
+        foreach ($this->values() as $key => $value) {
+            if (preg_match($regex, $key, $matches)) {
+                $output[$matches[1]] = $value;
+            }
+        }
+
+        return $output;
+    }
+
+    /**
+     * Group values by index as specified by $index_count
+     * Useful when dealing with numeric oids
+     * (By default this counts from right to left, using a negative index count will count from left to right)
+     */
+    public function groupByIndex(int $index_count = 1, array &$array = []): array
+    {
+        foreach ($this->values() as $oid => $value) {
+            $parts = $this->getOidParts(ltrim($oid, '.')); // trim leftmost . so negative counts work as expected
+            $suffix = array_slice($parts, -$index_count);
+            $index = implode('.', $suffix);
+
+            $array[$index][$oid] = $value;
+        }
+
+        return $array;
+    }
+
+    /**
+     * Separate the index from the OID name
+     * Insert into array as index => oidName
+     */
     public function valuesByIndex(array &$array = []): array
     {
         foreach ($this->values() as $oid => $value) {

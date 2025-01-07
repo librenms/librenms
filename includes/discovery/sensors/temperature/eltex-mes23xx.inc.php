@@ -24,40 +24,38 @@
  */
 $divisor = 1;
 $multiplier = 1;
-if ($pre_cache['eltex-mes23xx-sfp']) {
-    foreach ($pre_cache['eltex-mes23xx-sfp'] as $ifIndex => $data) {
-        if (isset($data['rlPhyTestTableTransceiverTemp']['rlPhyTestGetResult'])) {
-            $value = $data['rlPhyTestTableTransceiverTemp']['rlPhyTestGetResult'] / $divisor;
-            if ($value) {
-                $high_limit = $data['temperature']['eltPhdTransceiverThresholdHighAlarm'] / $divisor;
-                $high_warn_limit = $data['temperature']['eltPhdTransceiverThresholdHighWarning'] / $divisor;
-                $low_warn_limit = $data['temperature']['eltPhdTransceiverThresholdLowWarning'] / $divisor;
-                $low_limit = $data['temperature']['eltPhdTransceiverThresholdLowAlarm'] / $divisor;
-                $tmp = get_port_by_index_cache($device['device_id'], $ifIndex);
-                $descr = $tmp['ifName'];
-                $oid = '.1.3.6.1.4.1.89.90.1.2.1.3.' . $ifIndex . '.5';
-                discover_sensor(
-                    $valid['sensor'],
-                    'temperature',
-                    $device,
-                    $oid,
-                    'SfpTemp' . $ifIndex,
-                    'rlPhyTestTableTransceiverTemp',
-                    'SfpTemp-' . $descr,
-                    $divisor,
-                    $multiplier,
-                    $low_limit,
-                    $low_warn_limit,
-                    $high_warn_limit,
-                    $high_limit,
-                    $value,
-                    'snmp',
-                    null,
-                    null,
-                    null,
-                    'Transceiver'
-                );
-            }
-        }
+
+$oids = SnmpQuery::cache()->hideMib()->walk('ELTEX-MES-PHYSICAL-DESCRIPTION-MIB::eltPhdTransceiverThresholdTable')->table(2);
+$oids = SnmpQuery::cache()->hideMib()->walk('RADLAN-PHY-MIB::rlPhyTestGetResult')->table(1, $oids);
+
+foreach ($oids as $ifIndex => $data) {
+    if (isset($data['rlPhyTestGetResult']['rlPhyTestTableTransceiverTemp'])) {
+        $value = $data['rlPhyTestGetResult']['rlPhyTestTableTransceiverTemp'] / $divisor;
+        $high_limit = $data['temperature']['eltPhdTransceiverThresholdHighAlarm'] / $divisor;
+        $high_warn_limit = $data['temperature']['eltPhdTransceiverThresholdHighWarning'] / $divisor;
+        $low_warn_limit = $data['temperature']['eltPhdTransceiverThresholdLowWarning'] / $divisor;
+        $low_limit = $data['temperature']['eltPhdTransceiverThresholdLowAlarm'] / $divisor;
+        $descr = get_port_by_index_cache($device['device_id'], $ifIndex)['ifName'];
+        $oid = '.1.3.6.1.4.1.89.90.1.2.1.3.' . $ifIndex . '.5';
+
+        app('sensor-discovery')->discover(new \App\Models\Sensor([
+            'poller_type' => 'snmp',
+            'sensor_class' => 'temperature',
+            'sensor_oid' => $oid,
+            'sensor_index' => 'SfpTemp' . $ifIndex,
+            'sensor_type' => 'rlPhyTestTableTransceiverTemp',
+            'sensor_descr' => 'SfpTemp-' . $descr,
+            'sensor_divisor' => $divisor,
+            'sensor_multiplier' => $multiplier,
+            'sensor_limit_low' => $low_limit,
+            'sensor_limit_low_warn' => $low_warn_limit,
+            'sensor_limit_warn' => $high_warn_limit,
+            'sensor_limit' => $high_limit,
+            'sensor_current' => $value,
+            'entPhysicalIndex' => $ifIndex,
+            'entPhysicalIndex_measured' => 'port',
+            'user_func' => null,
+            'group' => 'transceiver',
+        ]));
     }
 }
