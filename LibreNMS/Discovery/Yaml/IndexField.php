@@ -27,12 +27,14 @@ namespace LibreNMS\Discovery\Yaml;
 
 class IndexField extends YamlDiscoveryField
 {
-    public function handle(array $yaml, array $data, string $index, int $count): mixed
+    public function calculateValue(array $yaml, array $data, string $index, int $count): void
     {
-        if (isset($yaml[$this->key])) {
-           return parent::handle($yaml, $data, $index, $count);
+        if (array_key_exists($this->key, $yaml)) {
+            parent::calculateValue($yaml, $data, $index, $count);
+
+            return;
         }
 
-        return $index;
+        $this->value = $index;
     }
 }

@@ -46,7 +46,7 @@ class Mempool extends DeviceRelatedModel implements Keyable
         }
     }
 
-    public function isValid()
+    public function isValid(): bool
     {
         return $this->mempool_total > 0;
     }
@@ -70,9 +70,10 @@ class Mempool extends DeviceRelatedModel implements Keyable
                 $multiplier,
             );
         } catch (InsufficientDataException|UncorrectableNegativeException $e) {
+            Log::info(get_class($e));
             Log::debug($e->getMessage());
 
-            return $this; //
+            return $this;
         }
 
         return $this;

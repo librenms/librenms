@@ -27,8 +27,10 @@ namespace LibreNMS\OS\Traits;
 
 use App\Models\Storage;
 use Illuminate\Support\Collection;
-use LibreNMS\Device\YamlDiscovery;
+use LibreNMS\Discovery\Yaml\IndexField;
+use LibreNMS\Discovery\Yaml\OidField;
 use LibreNMS\Discovery\Yaml\YamlDiscoveryField;
+use LibreNMS\Discovery\YamlDiscoveryDefinition;
 
 trait YamlStorageDiscovery
 {
@@ -36,28 +38,26 @@ trait YamlStorageDiscovery
 
     public function discoverYamlStorage(): Collection
     {
-        $storages = YamlDiscovery::from($this->getDiscovery('storage'),
-            \App\Models\Storage::class,
-            [
-                'type' => new YamlDiscoveryField('type', 'storage_type', 'Storage'),
-                'descr' => new YamlDiscoveryField('descr', 'storage_descr', 'Disk {{ $index }}'),
-                'units' => new YamlDiscoveryField('units', 'storage_units', 1048576), // TODO good default?
-                'size' => new YamlDiscoveryField('size', 'storage_size', fetch: true),
-                'used' => new YamlDiscoveryField('used', 'storage_used', fetch: true),
-                'free' => new YamlDiscoveryField('free', 'storage_free', fetch: true),
-                'percent_used' => new YamlDiscoveryField('percent_used', 'storage_perc', fetch: true),
-                'index' => new YamlDiscoveryField('index', 'storage_index', '{{ $index }}'),
-            ], [
-                'type' => $this->getName(),
-            ], function (Storage $storage, $fields) {
+        $discovery = YamlDiscoveryDefinition::make(Storage::class)
+            ->addField(new YamlDiscoveryField('type', 'storage_type', 'Storage'))
+            ->addField(new YamlDiscoveryField('type', 'storage_type', 'Storage'))
+            ->addField(new YamlDiscoveryField('descr', 'storage_descr', 'Disk {{ $index }}'))
+            ->addField(new YamlDiscoveryField('units', 'storage_units', 1048576)) // TODO good default?
+            ->addField(new OidField('size', 'storage_size'))
+            ->addField(new OidField('used', 'storage_used'))
+            ->addField(new OidField('free', 'storage_free'))
+            ->addField(new OidField('percent_used', 'storage_perc'))
+            ->addField(new IndexField('index', 'storage_index', '{{ $index }}'))
+            ->afterEach(function (Storage $storage, YamlDiscoveryDefinition $def, $yaml, $index) {
+                // fill missing values
                 $storage->fillUsage(
-                    $fields['used']->value,
-                    $fields['size']->value,
-                    $fields['free']->value,
-                    $fields['percent_used']->value,
+                    $storage->storage_used,
+                    $storage->storage_size,
+                    $storage->storage_free,
+                    $storage->storage_perc,
                 );
             });
 
-        return $storages;
+        return $discovery->discover($this->getDiscovery('storage'));
     }
 }

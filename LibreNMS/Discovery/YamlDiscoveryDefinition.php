@@ -94,7 +94,6 @@ class YamlDiscoveryDefinition
     {
         $models = new Collection;
         $fetchedData = [];  // TODO preCache?
-//        dd($yaml);
 
         foreach ($yaml['data'] ?? [] as $yamlItem) {
             $oids = Arr::only($yamlItem, collect($this->fields)->where('isOid')->keys()->all());
@@ -113,7 +112,7 @@ class YamlDiscoveryDefinition
 
                 // fill attributes
                 foreach ($this->fields as $field) {
-                    $field->value = $field->handle($yamlItem, $fetchedData, $index);
+                    $field->calculateValue($yamlItem, $fetchedData, $index, $count);
                     $modelAttributes[$field->model_column] = $field->value;
                 }
 

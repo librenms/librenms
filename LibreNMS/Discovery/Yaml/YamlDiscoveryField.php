@@ -30,7 +30,6 @@ use LibreNMS\Device\YamlDiscovery;
 class YamlDiscoveryField
 {
     public mixed $value = null;
-    public bool $isOid = false;
 
     public function __construct(
         public readonly string    $key,
@@ -39,16 +38,20 @@ class YamlDiscoveryField
         public readonly ?\Closure $callback = null,
     ) {}
 
-    public function handle(array $yaml, array $data, string $index, int $count): mixed
+    public function calculateValue(array $yaml, array $data, string $index, int $count): void
     {
         if (array_key_exists($this->key, $yaml)) {
-            return YamlDiscovery::replaceValues($this->key, $index, $count, $yaml[$this->key], $data);
+            $this->value = YamlDiscovery::replaceValues($this->key, $index, $count, $yaml, $data);
+
+            return;
         }
 
         if (empty($this->default)) {
-            return $this->default;
+            $this->value = $this->default;
+
+            return;
         }
 
-        return YamlDiscovery::replaceValues('default', $index, $count, ['default' => $this->default], $data);
+        $this->value = YamlDiscovery::replaceValues('default', $index, $count, ['default' => $this->default], $data);
     }
 }

@@ -37,7 +37,7 @@ use LibreNMS\Util\Oid;
 trait YamlMempoolsDiscovery
 {
 
-    public function discoverYamlMempools()
+    public function discoverYamlMempools(): \Illuminate\Support\Collection
     {
         $mempools_yaml = $this->getDiscovery('mempools');
 
@@ -50,7 +50,7 @@ trait YamlMempoolsDiscovery
             ->addField(new OidField('used','mempool_used'))
             ->addField(new OidField('free','mempool_free'))
             ->addField(new OidField('total','mempool_total'))
-            ->addField(new OidField('percent_used','mempool_prec'))
+            ->addField(new OidField('percent_used','mempool_perc'))
             ->addField(new YamlDiscoveryField('warn_percent', 'mempool_perc_warn', 90))
             ->afterEach(function (Mempool $mempool, YamlDiscoveryDefinition $def, $yaml, $index) {
                 // fill numeric oid that should be polled
@@ -82,6 +82,9 @@ trait YamlMempoolsDiscovery
                     $mempool->mempool_used_oid = null;
                     $mempool->mempool_free_oid = null;
                 }
+
+                // fill missing values
+                $mempool->fillUsage($mempool->mempool_used, $mempool->mempool_total, $mempool->mempool_free, $mempool->mempool_perc);
             });
 
         return $def->discover($mempools_yaml);

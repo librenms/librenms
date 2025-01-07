@@ -277,12 +277,12 @@ class Number
                 $total = $used / ($used_percent / 100);
             } elseif ($available && $used_percent) {
                 $total = $available / (1 - ($used_percent / 100));
-            } elseif ($used_percent) {
+            } elseif (is_numeric($used_percent)) {
                 $total = 100; // only have percent, mark total as 100
             }
         }
 
-        if (! $total || ($used === null && $available === null && ! $used_percent)) {
+        if (! $total || ($used === null && $available === null && ! is_numeric($used_percent))) {
             throw new InsufficientDataException('Unable to calculate missing ratio values, not enough information. ' . json_encode(get_defined_vars()));
         }
 

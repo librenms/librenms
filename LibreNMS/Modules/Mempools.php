@@ -63,9 +63,12 @@ class Mempools implements Module
                 return true;
             }
             Log::debug("Rejecting Mempool $mempool->mempool_index $mempool->mempool_descr: Invalid total value $mempool->mempool_total");
+            Log::info('x');
 
             return false;
         });
+
+        // check if linux or similar and calculate available ram
         $this->calculateAvailable($mempools);
 
         MempoolObserver::observe(\App\Models\Mempool::class);
