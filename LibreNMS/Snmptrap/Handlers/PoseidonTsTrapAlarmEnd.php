@@ -42,9 +42,9 @@ class PoseidonTsTrapAlarmEnd implements SnmptrapHandler
      */
     public function handle(Device $device, Trap $trap)
     {
-        $oid        = $trap->findOid('POSEIDON-MIB::tsAlarmId');
-        $id         = substr($oid, strlen($oid) + 1);
-        $AlarmID    = $trap->getOidData($trap->findOid('POSEIDON-MIB::tsAlarmId.' . $id));
+        $oid = $trap->findOid('POSEIDON-MIB::tsAlarmId');
+        $id = substr($oid, strlen($oid) + 1);
+        $AlarmID = $trap->getOidData($trap->findOid('POSEIDON-MIB::tsAlarmId.' . $id));
         $AlarmDescr = $trap->getOidData($trap->findOid('POSEIDON-MIB::tsAlarmDescr.' . $id));
 
         $trap->log("Poseidon Alarm End: Alarm ID $AlarmID: $AlarmDescr. Check the following Poseidon Alarm State Change trap for details", Severity::Ok);
