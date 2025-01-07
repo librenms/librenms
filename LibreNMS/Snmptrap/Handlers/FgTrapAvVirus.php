@@ -20,6 +20,7 @@
  * The Fortigate Antivirus feature detected a virus. Nothing to do.
  *
  * @link       https://www.librenms.org
+ *
  * @author     Stephan Leruth <Stephan.Leruth@ineos.com>
  */
 
