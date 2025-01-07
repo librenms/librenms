@@ -16,6 +16,9 @@ return [
     'component-status' => [
         'title' => '元件狀態',
     ],
+    'custom-map' => [
+        'title' => '自訂地圖',
+    ],
     'device-summary-horiz' => [
         'title' => '橫式裝置概觀',
     ],

@@ -30,6 +30,11 @@ if (! empty($snmpData)) {
     foreach ($snmpData as $lmData) {
         $type = 'lmTempSensors';
         $divisor = 1000;
+
+        if (! isset($lmData[$type . 'Index'])) {
+            continue;
+        }
+
         $index = $lmData[$type . 'Index'];
         $descr = $lmData[$type . 'Device'];
         $value = intval($lmData[$type . 'Value']) / $divisor;
