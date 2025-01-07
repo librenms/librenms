@@ -17,9 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * The Fortigate received a file that is larger than the proxy buffer for
- * AV scanning. Nothing to do.
- *
  * @link       https://www.librenms.org
  * @author     Stephan Leruth <Stephan.Leruth@ineos.com>
  */
