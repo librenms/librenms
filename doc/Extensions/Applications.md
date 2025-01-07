@@ -2310,6 +2310,8 @@ chmod +x /etc/snmp/php-fpm
 pkg install p5-File-Slurp p5-JSON p5-String-ShellQuote p5-MIME-Base64
 # Debian
 apt-get install libfile-slurp-perl libjson-perl libstring-shellquote-perl libmime-base64-perl
+# Fedora
+dnf install perl-JSON perl-File-Slurp perl-String-ShellQuote
 ```
 
 3. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
