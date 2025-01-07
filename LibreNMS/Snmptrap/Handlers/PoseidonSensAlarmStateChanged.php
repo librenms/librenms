@@ -72,7 +72,7 @@ class PoseidonSensAlarmStateChanged implements SnmptrapHandler
             default:
                 $State = 'unknown';
                 $SeverityColour = Severity::Warning; // yellow
-	    }
+        }
         $trap->log("Poseidon Sensor State Change: $SensorName changed state to $State: $SensorValue $SensorUnit", $SeverityColour);
     }
 }
