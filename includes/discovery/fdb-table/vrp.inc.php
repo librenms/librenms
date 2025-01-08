@@ -57,7 +57,7 @@ if (! empty($hwCfgMacAddrQueryIfIndex)) {
                     }
                     $port = get_port_by_index_cache($device['device_id'], $ifIndex);
                     $port_id = $port['port_id'];
-                    $mac_address = MAc::parse($mac)->hex();
+                    $mac_address = Mac::parse($mac)->hex();
                     if (strlen($mac_address) != 12) {
                         d_echo("MAC address padding failed for $mac\n");
                         continue;
