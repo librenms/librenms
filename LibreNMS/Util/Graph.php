@@ -118,7 +118,7 @@ class Graph
         }
 
         if (isset($vars['device'])) {
-            $device = device_by_id_cache(is_numeric($vars['device']) ? $vars['device'] : Device::findByHostname($vars['device'])->device_id);
+            $device = device_by_id_cache(is_numeric($vars['device']) ? $vars['device'] : DeviceCache::getByHostname($vars['device'])->device_id);
             DeviceCache::setPrimary($device['device_id']);
         }
 

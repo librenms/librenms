@@ -24,7 +24,7 @@
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
-use App\Models\Device;
+use App\Facades\DeviceCache;
 use LibreNMS\Config;
 
 $init_modules = [];
@@ -44,7 +44,7 @@ if (empty($hostname)) {
 }
 
 if ($hostname !== 'all') {
-    $hostname = ! ctype_digit($hostname) ? $hostname : Device::find($hostname)->hostname;
+    $hostname = ! ctype_digit($hostname) ? $hostname : DeviceCache::get($hostname)->hostname;
 }
 
 if (empty($hostname)) {

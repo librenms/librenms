@@ -25,7 +25,7 @@
 
 namespace App\Http\Controllers\Widgets;
 
-use App\Models\Device;
+use App\Facades\DeviceCache;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -56,7 +56,7 @@ class GraylogController extends WidgetController
         $data = $this->getSettings(true);
 
         if ($data['device']) {
-            $data['device'] = Device::find($data['device']);
+            $data['device'] = DeviceCache::get($data['device']);
         }
 
         return view('widgets.settings.graylog', $data);

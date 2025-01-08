@@ -1,6 +1,6 @@
 <?php
 
-use App\Models\Device;
+use App\Facades\DeviceCache;
 
 $scale_min = '0';
 $scale_max = '100';
@@ -15,7 +15,7 @@ $iter = '1';
 
 $rrd_options .= " COMMENT:'                        Size      Free   % Used\\n'";
 
-$hostname = Device::find($storage['device_id'])->hostname;
+$hostname = DeviceCache::get($storage['device_id'])->hostname;
 
 $colour = 'CC0000';
 $colour_area = 'ffaaaa';

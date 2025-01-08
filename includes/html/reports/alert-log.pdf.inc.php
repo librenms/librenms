@@ -1,5 +1,6 @@
 <?php
 
+use App\Facades\DeviceCache;
 use App\Models\Device;
 
 $pdf->AddPage('L');
@@ -40,7 +41,7 @@ if (isset($_GET['results']) && is_numeric($_GET['results'])) {
 $full_query = "SELECT D.device_id,name,state,time_logged,DATE_FORMAT(time_logged, '" . \LibreNMS\Config::get('dateformat.mysql.compact') . "') as humandate $query LIMIT $start,$numresults";
 
 foreach (dbFetchRows($full_query, $param) as $alert_entry) {
-    $hostname = Device::find($alert_entry['device_id'])->hostname;
+    $hostname = DeviceCache::get($alert_entry['device_id'])->hostname;
     $alert_state = $alert_entry['state'];
 
     if ($alert_state == '0') {

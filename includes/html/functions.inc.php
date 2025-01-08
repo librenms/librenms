@@ -888,7 +888,7 @@ function search_oxidized_config($search_in_conf_textbox)
     $nodes = json_decode(file_get_contents($oxidized_search_url, false, $context), true);
     // Look up Oxidized node names to LibreNMS devices for a link
     foreach ($nodes as &$n) {
-        $dev = Device::findByHostname($n['node']);
+        $dev = DeviceCache::getByHostname($n['node']);
         $n['dev_id'] = $dev ? $dev['device_id'] : false;
         $n['full_name'] = $n['dev_id'] ? DeviceCache::get($n['dev_id'])->displayName() : $n['full_name'];
     }
@@ -951,7 +951,7 @@ function get_oxidized_nodes_list()
     $data = json_decode(file_get_contents(Config::get('oxidized.url') . '/nodes?format=json', false, $context), true);
 
     foreach ($data as $object) {
-        $device = Device::findByHostname($object['name']);
+        $device = DeviceCache::getByHostname($object['name']);
         if (! device_permitted($device['device_id'])) {
             //user cannot see this device, so let's skip it.
             continue;

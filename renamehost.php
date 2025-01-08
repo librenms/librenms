@@ -11,6 +11,7 @@
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
 
+use App\Facades\DeviceCache;
 use App\Models\Device;
 
 $init_modules = [];
@@ -19,10 +20,10 @@ require __DIR__ . '/includes/init.php';
 // Remove a host and all related data from the system
 if ($argv[1] && $argv[2]) {
     $host = strtolower($argv[1]);
-    $id = Device::findByHostname($host)->device_id;
+    $id = DeviceCache::getByHostname($host)->device_id;
     if ($id) {
         $tohost = strtolower($argv[2]);
-        $toid = Device::findByHostname($tohost)->device_id;
+        $toid = Device::getByHostname($tohost)->device_id;
         if ($toid) {
             echo "NOT renamed. New hostname $tohost already exists.\n";
             exit(1);

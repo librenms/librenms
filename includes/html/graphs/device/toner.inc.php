@@ -1,7 +1,5 @@
 <?php
 
-use App\Models\Device;
-
 require 'includes/html/graphs/common.inc.php';
 
 $rrd_options .= ' -l 0 -E ';
@@ -45,8 +43,6 @@ foreach (dbFetchRows('SELECT * FROM printer_supplies where device_id = ?', [$dev
                 break;
         }//end switch
     }//end if
-
-    $hostname = Device::find($toner['device_id'])->hostname;
 
     $descr = \LibreNMS\Data\Store\Rrd::safeDescr(substr(str_pad($toner['supply_descr'], 16), 0, 16));
     $rrd_filename = Rrd::name($device['hostname'], ['toner', $toner['supply_type'], $toner['supply_index']]);

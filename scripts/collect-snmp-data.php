@@ -1,6 +1,7 @@
 #!/usr/bin/env php
 <?php
 
+use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use Illuminate\Support\Str;
@@ -46,7 +47,7 @@ if (isset($hostname)) {
     if (is_numeric($hostname)) {
         $device = device_by_id_cache($hostname);
     } elseif (! empty($hostname)) {
-        $device = Device::findByHostname($hostname);
+        $device = DeviceCache::getByHostname($hostname);
     }
 
     if (isset($device['os']) && $device['os'] != 'generic') {

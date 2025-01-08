@@ -4,6 +4,7 @@
 $init_modules = ['alerts', 'laravel'];
 require __DIR__ . '/../includes/init.php';
 
+use App\Facades\DeviceCache;
 use App\Models\Device;
 use LibreNMS\Alert\AlertData;
 use LibreNMS\Alert\RunAlerts;
@@ -17,7 +18,7 @@ if (isset($options['t']) && isset($options['h']) && isset($options['r'])) {
     $runAlerts = new RunAlerts();
 
     $template_id = $options['t'];
-    $device_id = ctype_digit($options['h']) ? $options['h'] : Device::findByHostname($options['h'])->device_id;
+    $device_id = ctype_digit($options['h']) ? $options['h'] : DeviceCache::getByHostname($options['h'])->device_id;
     $rule_id = (int) $options['r'];
 
     $where = 'alerts.device_id=' . $device_id . ' && alerts.rule_id=' . $rule_id;

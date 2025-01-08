@@ -1,6 +1,6 @@
 <?php
 
-use App\Models\Device;
+use App\Facades\DeviceCache;
 
 /**
  * output.php
@@ -39,7 +39,7 @@ switch ($type) {
         $filename = "poller-$hostname.txt";
         break;
     case 'snmpwalk':
-        $device = Device::findByHostname($hostname);
+        $device = DeviceCache::getByHostname($hostname);
 
         $cmd = gen_snmpwalk_cmd($device, '.', '-OUneb');
 

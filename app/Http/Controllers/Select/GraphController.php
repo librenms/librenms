@@ -25,8 +25,8 @@
 
 namespace App\Http\Controllers\Select;
 
+use App\Facades\DeviceCache;
 use App\Http\Controllers\Controller;
-use App\Models\Device;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -49,7 +49,7 @@ class GraphController extends Controller
         $data = [];
         $search = $request->get('term');
         $device_id = $request->get('device');
-        $device = $device_id ? Device::find($device_id) : null;
+        $device = $device_id ? DeviceCache::get($device_id) : null;
 
         foreach (Graph::getTypes() as $type) {
             $graphs = $this->filterTypeGraphs(collect(Graph::getSubtypes($type, $device)), $type, $search);

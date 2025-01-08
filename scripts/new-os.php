@@ -1,6 +1,7 @@
 #!/usr/bin/env php
 <?php
 
+use App\Facades\DeviceCache;
 use App\Models\Device;
 use LibreNMS\Config;
 use LibreNMS\Modules\Core;
@@ -16,7 +17,7 @@ if ($options['h'] && $options['o'] && $options['t'] && $options['v']) {
     $vendor = $options['v'];
     Debug::set(isset($options['d']));
 
-    $device_id = ctype_digit($options['h']) ? $options['h'] : Device::findByHostname($options['h'])->device_id;
+    $device_id = ctype_digit($options['h']) ? $options['h'] : DeviceCache::getByHostname($options['h'])->device_id;
     $device = device_by_id_cache($device_id);
     $definition_file = Config::get('install_dir') . "/includes/definitions/{$options['o']}.yaml";
     $discovery_file = Config::get('install_dir') . "/includes/definitions/discovery/{$options['o']}.yaml";
@@ -36,7 +37,7 @@ sysObjectID: $full_sysObjectID
 
 ");
 
-        $os = Core::detectOS(new \App\Models\Device($device));
+        $os = Core::detectOS(new Device($device));
         $continue = 'n';
         if ($os != 'generic') {
             $continue = get_user_input("We already detect this device as OS $os type, do you want to continue to add sensors? (Y/n)");

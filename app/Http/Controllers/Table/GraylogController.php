@@ -26,6 +26,7 @@
 namespace App\Http\Controllers\Table;
 
 use App\ApiClients\GraylogApi;
+use App\Facades\DeviceCache;
 use App\Models\Device;
 use DateInterval;
 use DateTime;
@@ -62,7 +63,7 @@ class GraylogController extends SimpleTableController
 
         $search = $request->get('searchPhrase');
         $device_id = (int) $request->get('device');
-        $device = $device_id ? Device::find($device_id) : null;
+        $device = $device_id ? DeviceCache::get($device_id) : null;
         $range = (int) $request->get('range', 0);
         $limit = (int) $request->get('rowCount', 10);
         $page = (int) $request->get('current', 1);

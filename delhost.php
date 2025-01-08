@@ -9,7 +9,7 @@
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
 
-use App\Models\Device;
+use App\Facades\DeviceCache;
 
 $init_modules = [];
 require __DIR__ . '/includes/init.php';
@@ -17,7 +17,7 @@ require __DIR__ . '/includes/init.php';
 // Remove a host and all related data from the system
 if ($argv[1]) {
     $host = strtolower($argv[1]);
-    $id = Device::findByHostname($host)->device_id;
+    $id = DeviceCache::getByHostname($host)->device_id;
     if ($id) {
         echo delete_device($id) . "\n";
     } else {

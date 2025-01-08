@@ -8,6 +8,7 @@
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
 
+use App\Facades\DeviceCache;
 use App\Models\Device;
 use App\Models\Eventlog;
 use App\Models\StateTranslation;
@@ -100,25 +101,24 @@ function getImageName($device, $use_database = true, $dir = 'images/os/')
     return \LibreNMS\Util\Url::findOsImage($device['os'], $device['features'] ?? '', $use_database ? $device['icon'] : null, $dir);
 }
 
-function renamehost($id, $new, $source = 'console')
+function renamehost(Device $device, string $newHostname, $source = 'console'): string
 {
-    $device = Device::find($id);
-    $new_rrd_dir = Rrd::dirFromHost($new);
+    $new_rrd_dir = Rrd::dirFromHost($newHostname);
 
     if (is_dir($new_rrd_dir)) {
-        Eventlog::log("Renaming of $device->hostname failed due to existing RRD folder for $new", $id, 'system', Severity::Error);
+        Eventlog::log("Renaming of $device->hostname failed due to existing RRD folder for $newHostname", $device->device_id, 'system', Severity::Error);
 
-        return "Renaming of $device->hostname failed due to existing RRD folder for $new\n";
+        return "Renaming of $device->hostname failed due to existing RRD folder for $newHostname\n";
     }
 
     if (! is_dir($new_rrd_dir) && rename(Rrd::dirFromHost($device->hostname), $new_rrd_dir) === true) {
-        dbUpdate(['hostname' => $new, 'ip' => null], 'devices', 'device_id=?', [$id]);
-        Eventlog::log("Hostname changed -> $new ($source)", $id, 'system', Severity::Notice);
+        dbUpdate(['hostname' => $newHostname, 'ip' => null], 'devices', 'device_id=?', [$device->device_id]);
+        Eventlog::log("Hostname changed -> $newHostname ($source)", $device->device_id, 'system', Severity::Notice);
 
         return '';
     }
 
-    Eventlog::log("Renaming of $device->hostname failed", $id, 'system', Severity::Error);
+    Eventlog::log("Renaming of $device->hostname failed", $device->device_id, 'system', Severity::Error);
 
     return "Renaming of $device->hostname failed\n";
 }

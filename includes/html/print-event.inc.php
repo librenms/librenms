@@ -1,5 +1,6 @@
 <?php
 
+use App\Facades\DeviceCache;
 use App\Models\Port;
 use LibreNMS\Util\Rewrite;
 
@@ -19,10 +20,7 @@ use LibreNMS\Util\Rewrite;
  * @author     LibreNMS Contributors
 */
 
-use App\Models\Device;
-use App\Models\Port;
-
-$hostname = Device::find($entry['device_id'])->hostname;
+$hostname = DeviceCache::get($entry['device_id'])->hostname;
 
 unset($icon);
 
