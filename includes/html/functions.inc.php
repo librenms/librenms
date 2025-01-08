@@ -91,7 +91,7 @@ function bill_permitted($bill_id)
 
 function port_permitted($port_id, $unused = null)
 {
-    if (device_permitted(Port::find($port_id)->device_id)) {
+    if (device_permitted(Port::where('port_id', $port_id)->value('device_id'))) {
         return true;
     }
 

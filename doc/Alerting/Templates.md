@@ -362,7 +362,7 @@ Timestamp: {{ $alert->timestamp }}
 Rule: @if ($alert->name) {{ $alert->name }} @else {{ $alert->rule }} @endif
 @if ($alert->faults) Faults:
 @foreach ($alert->faults as $key => $value)
-  Local interface: {{ \App\Models\Port::find($value['port_id'])->ifName }}
+  Local interface: {{ \App\Models\Port::where('port_id',$value['port_id'])->value('ifName') }}
   Adjacent IP: {{ $value['isisISAdjIPAddrAddress'] }}
   Adjacent state: {{ $value['isisISAdjState'] }}
 
