@@ -8,7 +8,7 @@ $wireless_stats = SnmpQuery::cache()
     ->table();
 
 foreach ($wireless_stats as $index => $wireless_entry) {
-    $curIfIndex = $offset + $index;
+    $curIfIndex = $offset + (int)$index;
 
     $port_stats[$curIfIndex]['ifPhysAddress'] = strtolower(str_replace(':', '', $wireless_entry['wirelessPeerMac'] ?? null));
     $port_stats[$curIfIndex]['ifDescr'] = $wireless_entry['wirelessPeerName'] ?? null;
