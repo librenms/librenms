@@ -817,7 +817,7 @@ class Cisco extends OS implements
     public function pollQos($qos)
     {
         // get a list of oids to fetch
-        $snmp_ids = $qos->pluck('snmp_idx');
+        $snmp_ids = $qos->where('type', 'cisco_cbqos_classmap')->pluck('snmp_idx');
         $oids = [];
         foreach ($snmp_ids as $snmp_id) {
             $oids[] = ".1.3.6.1.4.1.9.9.166.1.15.1.1.3.$snmp_id"; // CISCO-CLASS-BASED-QOS-MIB::cbQosCMPrePolicyPkt64
