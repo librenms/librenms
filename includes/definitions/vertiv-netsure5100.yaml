@@ -9,12 +9,7 @@ over:
     - { graph: device_state, text: State }
 discovery:
     - sysDescr:
-        - ES_Controller
-    -
-      snmpget:
-        - oid: .1.3.6.1.4.1.6302.2.1.1.2.0
-        - op: contains
-        - value: 'NCU'
+        - ES_Controller 4.19
 mib_dir: vertiv
 discovery_modules:
     storage: false
