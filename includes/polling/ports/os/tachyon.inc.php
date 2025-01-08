@@ -1,7 +1,5 @@
 <?php
 
-use LibreNMS\SnmpQuery;
-
 $offset = 1000;
 
 $wireless_stats = SnmpQuery::cache()
