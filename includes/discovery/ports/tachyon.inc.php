@@ -1,8 +1,13 @@
 <?php
 
-$wireless_stats = snmpwalk_group($device, 'wirelessPeersTable', 'TACHYON-MIB');
+use LibreNMS\SnmpQuery;
 
 $offset = 1000;
+
+$wireless_stats = SnmpQuery::cache()
+    ->hideMib()
+    ->walk('TACHYON-MIB::wirelessPeersTable')
+    ->table();
 
 foreach ($wireless_stats as $index => $wireless_entry) {
     $curIfIndex = $offset + $index;
