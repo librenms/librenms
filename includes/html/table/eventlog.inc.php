@@ -1,9 +1,7 @@
 <?php
 
-
 use App\Models\Port;
 use LibreNMS\Util\Rewrite;
-
 
 /*
  * This program is free software: you can redistribute it and/or modify it

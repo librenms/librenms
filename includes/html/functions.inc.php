@@ -89,7 +89,7 @@ function bill_permitted($bill_id)
     return \Permissions::canAccessBill($bill_id, Auth::id());
 }
 
-function port_permitted($port_id, $unused =  null)
+function port_permitted($port_id, $unused = null)
 {
     if (device_permitted(Port::find($port_id)->device_id)) {
         return true;

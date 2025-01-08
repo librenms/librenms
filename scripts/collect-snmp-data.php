@@ -3,7 +3,6 @@
 
 use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
-use App\Models\Device;
 use Illuminate\Support\Str;
 use LibreNMS\Exceptions\InvalidModuleException;
 use LibreNMS\Util\Debug;

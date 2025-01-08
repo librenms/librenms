@@ -1,7 +1,6 @@
 <?php
 
 use App\Facades\DeviceCache;
-use App\Models\Device;
 
 $pdf->AddPage('L');
 $where = '1';

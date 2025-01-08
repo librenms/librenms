@@ -5,7 +5,6 @@ $init_modules = ['alerts', 'laravel'];
 require __DIR__ . '/../includes/init.php';
 
 use App\Facades\DeviceCache;
-use App\Models\Device;
 use LibreNMS\Alert\AlertData;
 use LibreNMS\Alert\RunAlerts;
 use LibreNMS\Alert\Template;

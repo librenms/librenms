@@ -2,7 +2,6 @@
 <?php
 
 use App\Facades\DeviceCache;
-use App\Models\Device;
 use LibreNMS\Alert\RunAlerts;
 use LibreNMS\Util\Debug;
 
