@@ -26,13 +26,10 @@
 namespace LibreNMS\OS\Traits;
 
 use App\Models\Mempool;
-use App\View\SimpleTemplate;
-use Illuminate\Support\Facades\Log;
 use LibreNMS\Discovery\Yaml\IndexField;
 use LibreNMS\Discovery\Yaml\OidField;
 use LibreNMS\Discovery\Yaml\YamlDiscoveryField;
 use LibreNMS\Discovery\YamlDiscoveryDefinition;
-use LibreNMS\Util\Oid;
 
 trait YamlMempoolsDiscovery
 {
@@ -47,42 +44,12 @@ trait YamlMempoolsDiscovery
             ->addField(new YamlDiscoveryField('class', 'mempool_class', 'system'))
             ->addField(new YamlDiscoveryField('precision', 'mempool_precision', 1))
             ->addField(new YamlDiscoveryField('descr', 'mempool_descr', 'Memory', callback: fn($value) => ucwords($value)))
-            ->addField(new OidField('used','mempool_used'))
-            ->addField(new OidField('free','mempool_free'))
+            ->addField(new OidField('used','mempool_used', priority: 3))
+            ->addField(new OidField('free','mempool_free', priority: 2))
             ->addField(new OidField('total','mempool_total'))
-            ->addField(new OidField('percent_used','mempool_perc'))
+            ->addField(new OidField('percent_used','mempool_perc', priority: 1))
             ->addField(new YamlDiscoveryField('warn_percent', 'mempool_perc_warn', 90))
             ->afterEach(function (Mempool $mempool, YamlDiscoveryDefinition $def, $yaml, $index) {
-                // fill numeric oid that should be polled
-                if (isset($yaml['used']) && $def->getFieldCurrentValue('used') !== null) {
-                    if (isset($yaml['used_num_oid'])) {
-                        $mempool->mempool_used_oid = SimpleTemplate::parse($yaml['used_num_oid'], ['index' => $index]);
-                    } else {
-                        Log::critical('used_num_oid should be added to the discovery yaml to increase performance');
-                        $mempool->mempool_used_oid = Oid::of($yaml['used'] . '.' . $index)->toNumeric();
-                    }
-                    $mempool->mempool_free_oid = null;
-                    $mempool->mempool_perc_oid = null;
-                } elseif (isset($yaml['free']) && $def->getFieldCurrentValue('free') !== null) {
-                    if (isset($yaml['free_num_oid'])) {
-                        $mempool->mempool_free_oid = SimpleTemplate::parse($yaml['free_num_oid'], ['index' => $index]);
-                    } else {
-                        Log::critical('free_num_oid should be added to the discovery yaml to increase performance');
-                        $mempool->mempool_free_oid = Oid::of($yaml['free'] . '.' . $index)->toNumeric();
-                    }
-                    $mempool->mempool_used_oid = null;
-                    $mempool->mempool_perc_oid = null;
-                } elseif (isset($yaml['percent_used']) && $def->getFieldCurrentValue('percent_used') !== null) {
-                    if (isset($yaml['percent_used_num_oid'])) {
-                        $mempool->mempool_perc_oid = SimpleTemplate::parse($yaml['percent_used_num_oid'], ['index' => $index]);
-                    } else {
-                        Log::critical('percent_used_num_oid should be added to the discovery yaml to increase performance');
-                        $mempool->mempool_perc_oid = Oid::of($yaml['percent_used'] . '.' . $index)->toNumeric();
-                    }
-                    $mempool->mempool_used_oid = null;
-                    $mempool->mempool_free_oid = null;
-                }
-
                 // fill missing values
                 $mempool->fillUsage($mempool->mempool_used, $mempool->mempool_total, $mempool->mempool_free, $mempool->mempool_perc);
             });

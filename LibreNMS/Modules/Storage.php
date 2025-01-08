@@ -114,15 +114,24 @@ class Storage implements Module
         // fetch all data
         $oids = $storages->map->only(['storage_used_oid', 'storage_size_oid', 'storage_free_oid', 'storage_perc_oid'])
             ->flatten()->filter()->unique()->values()->all();
-        $data = \SnmpQuery::get($oids)->values();
+
+        if (empty($oids)) {
+            Log::debug('No OIDs to poll');
+
+            return;
+        }
+
+        $data = \SnmpQuery::numeric()->get($oids)->values();
 
         $storages->each(function (\App\Models\Storage $storage) use ($data) {
             $storage->fillUsage(
                 $data[$storage->storage_used_oid] ?? null,
-                $data[$storage->storage_size_oid] ?? null,
+                $storage->storage_units ? $storage->storage_size / $storage->storage_units : null,
                 $data[$storage->storage_free_oid] ?? null,
-                $data[$storage->storage_perc_oid] ?? null
+                $data[$storage->storage_perc_oid] ?? null,
             );
+
+            $storage->save();
         });
     }
 

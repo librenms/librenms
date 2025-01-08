@@ -44,9 +44,9 @@ trait YamlStorageDiscovery
             ->addField(new YamlDiscoveryField('descr', 'storage_descr', 'Disk {{ $index }}'))
             ->addField(new YamlDiscoveryField('units', 'storage_units', 1048576)) // TODO good default?
             ->addField(new OidField('size', 'storage_size'))
-            ->addField(new OidField('used', 'storage_used'))
-            ->addField(new OidField('free', 'storage_free'))
-            ->addField(new OidField('percent_used', 'storage_perc'))
+            ->addField(new OidField('used', 'storage_used', priority: 3))
+            ->addField(new OidField('free', 'storage_free', priority: 2))
+            ->addField(new OidField('percent_used', 'storage_perc', priority: 1))
             ->addField(new IndexField('index', 'storage_index', '{{ $index }}'))
             ->afterEach(function (Storage $storage, YamlDiscoveryDefinition $def, $yaml, $index) {
                 // fill missing values

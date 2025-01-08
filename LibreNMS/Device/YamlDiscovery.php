@@ -28,14 +28,12 @@ namespace LibreNMS\Device;
 use App\View\SimpleTemplate;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\OS;
 use LibreNMS\Util\Compare;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Oid;
-use SnmpQuery;
 
 class YamlDiscovery
 {
@@ -181,7 +179,7 @@ class YamlDiscovery
      * @param  array  $pre_cache  snmp data fetched from device
      * @return mixed|string|string[]|null
      */
-    public static function replaceValues($name, $index, $count, $def, $pre_cache)
+    public static function replaceValues($name, $index, $count, $def, $pre_cache = [])
     {
         $value = static::getValueFromData($name, $index, $def, $pre_cache);
 
@@ -442,63 +440,5 @@ class YamlDiscovery
         }
 
         return false;
-    }
-
-    /**
-     * @param array $yaml
-     * @param string $model
-     * @param array $fields<\LibreNMS\Polling\DiscoveryItem>
-     * @param array $attributes
-     * @return Collection
-     */
-    public static function from(array $yaml, string $model, array $fields, array $attributes = [], callable $callback = null): Collection
-    {
-        $models = new Collection;
-        $fetchedData = [];  // TODO preCache?
-
-        foreach ($yaml['data'] ?? [] as $yamlItem) {
-            $oids = $yamlItem['oid'] ?? Arr::only($yamlItem, collect($fields)->where('fetch')->keys()->all());
-            $response = SnmpQuery::enumStrings()->walk($oids);
-            $fetchedData = array_replace_recursive($fetchedData, $response->table(100)); // merge into cached data
-            $count = 0;
-
-            foreach ($response->valuesByIndex() as $index => $snmpItem) {
-                if (YamlDiscovery::canSkipItem(null, $index, $yaml, [], $fetchedData)) {
-                    echo 's';
-                    continue;
-                }
-
-                $count++;
-                $modelAttributes = $attributes;
-
-                /** @var \LibreNMS\Discovery\Yaml\YamlDiscoveryField $field */
-                foreach ($fields as $key => $field) {
-                    if (! array_key_exists($key, $yamlItem)) {
-                        // field not filled from yaml, use the default (if the default is empty, just pass through)
-                        $field->value = $field->default ? self::replaceValues('default', $index, $count, ['default' => $field->default], $fetchedData) : $field->default;
-                    } else {
-                        $field->value = self::replaceValues($key, $index, $count, $yamlItem, $fetchedData);
-                        dump($field->value);
-
-                        // record numeric oid for polling
-                        if ( $field->oid_column && $field->value !== null) {
-                            $modelAttributes[$field->oid_column] = Oid::toNumeric($yamlItem[$key]) . '.' . $index;
-                        }
-                    }
-
-                    $modelAttributes[$field->model_column] = $field->value;
-                }
-
-                $newModel = new $model($modelAttributes);
-
-                if ($callback) {
-                    $callback($newModel, $fields, $yamlItem, $index);
-                }
-
-                $models->push($newModel);
-            }
-        }
-
-        return $models;
     }
 }

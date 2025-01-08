@@ -29,6 +29,7 @@ use LibreNMS\Device\YamlDiscovery;
 
 class YamlDiscoveryField
 {
+    public bool $isOid = false;
     public mixed $value = null;
 
     public function __construct(

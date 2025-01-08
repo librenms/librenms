@@ -270,7 +270,7 @@ class Number
         }
 
         // total is missing try to calculate it
-        if (! $total) {
+        if (! is_numeric($total)) {
             if (isset($used, $available)) {
                 $total = $used + $available;
             } elseif ($used && $used_percent) {
@@ -282,7 +282,7 @@ class Number
             }
         }
 
-        if (! $total || ($used === null && $available === null && ! is_numeric($used_percent))) {
+        if (! is_numeric($total) || ($used === null && $available === null && ! is_numeric($used_percent))) {
             throw new InsufficientDataException('Unable to calculate missing ratio values, not enough information. ' . json_encode(get_defined_vars()));
         }
 

@@ -29,4 +29,8 @@ class OidField extends YamlDiscoveryField
 {
     public bool $isOid = true;
 
+    public function __construct(string $key, ?string $model_column = null, ?string $default = null, ?\Closure $callback = null, public readonly int $priority = 0)
+    {
+        parent::__construct($key, $model_column, $default, $callback);
+    }
 }
