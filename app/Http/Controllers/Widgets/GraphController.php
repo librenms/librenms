@@ -25,9 +25,9 @@
 
 namespace App\Http\Controllers\Widgets;
 
-use App\Facades\DeviceCache;
 use App\Models\Application;
 use App\Models\Bill;
+use App\Models\Device;
 use App\Models\MuninPlugin;
 use App\Models\Port;
 use App\Models\Service;
@@ -37,7 +37,6 @@ use Illuminate\View\View;
 use LibreNMS\Config;
 use LibreNMS\Util\Graph;
 use LibreNMS\Util\Time;
-
 
 class GraphController extends WidgetController
 {
@@ -70,7 +69,7 @@ class GraphController extends WidgetController
         // automatic title
         $type = $this->getGraphType();
         if ($type == 'device') {
-            $device = DeviceCache::get($settings['graph_device']);
+            $device = Device::find($settings['graph_device']);
 
             return ($device ? $device->displayName() : 'Device') . ' / ' . $settings['graph_type'];
         } elseif ($type == 'aggregate') {
@@ -117,7 +116,7 @@ class GraphController extends WidgetController
 
         // format display for selected items
         if ($primary == 'device' && $data['graph_device']) {
-            $device = DeviceCache::get($data['graph_device']);
+            $device = Device::find($data['graph_device']);
         }
         $data['device_text'] = isset($device) ? $device->displayName() : __('Device does not exist');
 

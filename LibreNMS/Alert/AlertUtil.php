@@ -25,8 +25,9 @@
 
 namespace LibreNMS\Alert;
 
-use App\Facades\DeviceCache;
+use App\Models\Device;
 use App\Models\User;
+use DeviceCache;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Arr;
 use LibreNMS\Config;
@@ -218,7 +219,7 @@ class AlertUtil
      */
     public static function hasDisableNotify($device_id)
     {
-        $device = DeviceCache::get($device_id);
+        $device = Device::find($device_id);
 
         return ! is_null($device) && $device->disable_notify;
     }

@@ -26,9 +26,9 @@
 namespace LibreNMS\Util;
 
 use App\Actions\Device\ValidateDeviceAndCreate;
-use App\Facades\DeviceCache;
 use App\Jobs\PollDevice;
 use App\Models\Device;
+use DeviceCache;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -564,7 +564,7 @@ class ModuleTestHelper
         }
 
         // Remove existing device in case it didn't get removed previously
-        if (($existing_device = DeviceCache::getByHostname($snmpsim->ip)) && isset($existing_device['device_id'])) {
+        if (($existing_device = Device::findByHostname($snmpsim->ip)) && isset($existing_device['device_id'])) {
             delete_device($existing_device['device_id']);
         }
 
