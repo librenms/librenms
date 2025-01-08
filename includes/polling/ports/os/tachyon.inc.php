@@ -5,10 +5,11 @@ $offset = 1000;
 $wireless_stats = SnmpQuery::cache()
     ->hideMib()
     ->walk('TACHYON-MIB::wirelessPeersTable')
-    ->table();
+    ->table(1);
 
 foreach ($wireless_stats as $index => $wireless_entry) {
-    $curIfIndex = $offset + (int) $index;
+    $cleanIndex = (int) filter_var($index, FILTER_SANITIZE_NUMBER_INT);
+    $curIfIndex = $offset + $cleanIndex;
 
     $port_stats[$curIfIndex]['ifPhysAddress'] = strtolower(str_replace(':', '', $wireless_entry['wirelessPeerMac'] ?? null));
     $port_stats[$curIfIndex]['ifDescr'] = $wireless_entry['wirelessPeerName'] ?? null;
