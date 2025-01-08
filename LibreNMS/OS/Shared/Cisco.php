@@ -816,21 +816,28 @@ class Cisco extends OS implements
 
     public function pollQos($qos)
     {
+        // get a list of oids to fetch
+        $snmp_ids = $qos->pluck('snmp_idx');
+        $oids = [];
+        foreach ($snmp_ids as $snmp_id) {
+            $oids[] = ".1.3.6.1.4.1.9.9.166.1.15.1.1.3.$snmp_id"; // CISCO-CLASS-BASED-QOS-MIB::cbQosCMPrePolicyPkt64
+            $oids[] = ".1.3.6.1.4.1.9.9.166.1.15.1.1.6.$snmp_id"; // CISCO-CLASS-BASED-QOS-MIB::cbQosCMPrePolicyByte64
+            $oids[] = ".1.3.6.1.4.1.9.9.166.1.15.1.1.10.$snmp_id"; // CISCO-CLASS-BASED-QOS-MIB::cbQosCMPostPolicyByte64
+            $oids[] = ".1.3.6.1.4.1.9.9.166.1.15.1.1.14.$snmp_id"; // CISCO-CLASS-BASED-QOS-MIB::cbQosCMDropPkt64
+            $oids[] = ".1.3.6.1.4.1.9.9.166.1.15.1.1.17.$snmp_id"; // CISCO-CLASS-BASED-QOS-MIB::cbQosCMDropByte64
+            $oids[] = ".1.3.6.1.4.1.9.9.166.1.15.1.1.21.$snmp_id"; // CISCO-CLASS-BASED-QOS-MIB::cbQosCMNoBufDropPkt64
+        }
+
+        // fetch data
         $poll_time = time();
-        $preBytes = \SnmpQuery::hideMib()->walk('CISCO-CLASS-BASED-QOS-MIB::cbQosCMPrePolicyByte64')->table(2);
-        $postBytes = \SnmpQuery::hideMib()->walk('CISCO-CLASS-BASED-QOS-MIB::cbQosCMPostPolicyByte64')->table(2);
-        $dropBytes = \SnmpQuery::hideMib()->walk('CISCO-CLASS-BASED-QOS-MIB::cbQosCMDropByte64')->table(2);
-        $bufferDrops = \SnmpQuery::hideMib()->walk('CISCO-CLASS-BASED-QOS-MIB::cbQosCMNoBufDropPkt64')->table(2);
-        $prePackets = \SnmpQuery::hideMib()->walk('CISCO-CLASS-BASED-QOS-MIB::cbQosCMPrePolicyPkt64')->table(2);
-        $dropPackets = \SnmpQuery::hideMib()->walk('CISCO-CLASS-BASED-QOS-MIB::cbQosCMDropPkt64')->table(2);
+        $response = \SnmpQuery::numeric()->get($oids);
+        $qosData = $response->values();
 
         foreach ($qos as $thisQos) {
             if ($thisQos->type == 'cisco_cbqos_classmap') {
-                $snmp_parts = explode('.', $thisQos->snmp_idx);
-
                 // Ignore changes to QoS maps between discovery runs
-                if (! array_key_exists($snmp_parts[0], $preBytes) || ! array_key_exists($snmp_parts[1], $preBytes[$snmp_parts[0]])) {
-                    d_echo('Cisco CBQoS ' . $thisQos->title . ' not processed because SNMP did not return any data');
+                if (! array_key_exists(".1.3.6.1.4.1.9.9.166.1.15.1.1.6.$thisQos->snmp_idx", $qosData)) {
+                    Log::debug('Cisco CBQoS ' . $thisQos->title . ' not processed because SNMP did not return any data');
 
                     // Null out all values so we get a break in the graph
                     $thisQos->last_polled = $poll_time;
@@ -849,37 +856,37 @@ class Cisco extends OS implements
                 }
 
                 // Values ony saved to RRD
-                $thisQos->poll_data['postbytes'] = $postBytes ? $postBytes[$snmp_parts[0]][$snmp_parts[1]]['cbQosCMPostPolicyByte64'] : null;
-                $thisQos->poll_data['bufferdrops'] = $bufferDrops ? $bufferDrops[$snmp_parts[0]][$snmp_parts[1]]['cbQosCMNoBufDropPkt64'] : null;
+                $thisQos->poll_data['postbytes'] = $qosData[".1.3.6.1.4.1.9.9.166.1.15.1.1.10.$thisQos->snmp_idx"] ?? null;
+                $thisQos->poll_data['bufferdrops'] = $qosData[".1.3.6.1.4.1.9.9.166.1.15.1.1.21.$thisQos->snmp_idx"] ?? null;
 
                 // Cisco CBQoS is one directional
                 if ($thisQos->ingress) {
                     $thisQos->last_polled = $poll_time;
-                    $thisQos->last_bytes_in = $preBytes ? $preBytes[$snmp_parts[0]][$snmp_parts[1]]['cbQosCMPrePolicyByte64'] : null;
+                    $thisQos->last_bytes_in = $qosData[".1.3.6.1.4.1.9.9.166.1.15.1.1.6.$thisQos->snmp_idx"] ?? null;
                     $thisQos->last_bytes_out = null;
-                    $thisQos->last_bytes_drop_in = $dropBytes ? $dropBytes[$snmp_parts[0]][$snmp_parts[1]]['cbQosCMDropByte64'] : null;
+                    $thisQos->last_bytes_drop_in = $qosData[".1.3.6.1.4.1.9.9.166.1.15.1.1.17.$thisQos->snmp_idx"] ?? null;
                     $thisQos->last_bytes_drop_out = null;
-                    $thisQos->last_packets_in = $prePackets ? $prePackets[$snmp_parts[0]][$snmp_parts[1]]['cbQosCMPrePolicyPkt64'] : null;
+                    $thisQos->last_packets_in = $qosData[".1.3.6.1.4.1.9.9.166.1.15.1.1.3.$thisQos->snmp_idx"] ?? null;
                     $thisQos->last_packets_out = null;
-                    $thisQos->last_packets_drop_in = $dropPackets ? $dropPackets[$snmp_parts[0]][$snmp_parts[1]]['cbQosCMDropPkt64'] : null;
+                    $thisQos->last_packets_drop_in = $qosData[".1.3.6.1.4.1.9.9.166.1.15.1.1.14.$thisQos->snmp_idx"] ?? null;
                     $thisQos->last_packets_drop_out = null;
                 } elseif ($thisQos->egress) {
                     $thisQos->last_polled = $poll_time;
                     $thisQos->last_bytes_in = null;
-                    $thisQos->last_bytes_out = $preBytes ? $preBytes[$snmp_parts[0]][$snmp_parts[1]]['cbQosCMPrePolicyByte64'] : null;
+                    $thisQos->last_bytes_out = $qosData[".1.3.6.1.4.1.9.9.166.1.15.1.1.6.$thisQos->snmp_idx"] ?? null;
                     $thisQos->last_bytes_drop_in = null;
-                    $thisQos->last_bytes_drop_out = $dropBytes ? $dropBytes[$snmp_parts[0]][$snmp_parts[1]]['cbQosCMDropByte64'] : null;
+                    $thisQos->last_bytes_drop_out = $qosData[".1.3.6.1.4.1.9.9.166.1.15.1.1.17.$thisQos->snmp_idx"] ?? null;
                     $thisQos->last_packets_in = null;
-                    $thisQos->last_packets_out = $prePackets ? $prePackets[$snmp_parts[0]][$snmp_parts[1]]['cbQosCMPrePolicyPkt64'] : null;
+                    $thisQos->last_packets_out = $qosData[".1.3.6.1.4.1.9.9.166.1.15.1.1.3.$thisQos->snmp_idx"] ?? null;
                     $thisQos->last_packets_drop_in = null;
-                    $thisQos->last_packets_drop_out = $dropPackets ? $dropPackets[$snmp_parts[0]][$snmp_parts[1]]['cbQosCMDropPkt64'] : null;
+                    $thisQos->last_packets_drop_out = $qosData[".1.3.6.1.4.1.9.9.166.1.15.1.1.14.$thisQos->snmp_idx"] ?? null;
                 } else {
-                    d_echo('Cisco CBQoS ' . $thisQos->title . ' not processed because it it not marked as ingress or egress');
+                    Log::debug('Cisco CBQoS ' . $thisQos->title . ' not processed because it it not marked as ingress or egress');
                 }
             } elseif ($thisQos->type == 'cisco_cbqos_policymap') {
                 // No polling for policymap
             } else {
-                d_echo('Cisco CBQoS ' . $thisQos->type . ' not implemented in LibreNMS/OS/Shared/Cisco.php');
+                Log::debug('Cisco CBQoS ' . $thisQos->type . ' not implemented in LibreNMS/OS/Shared/Cisco.php');
             }
         }
     }
