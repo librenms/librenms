@@ -1,6 +1,7 @@
 <?php
 
 use LibreNMS\Config;
+
 /*
  * LibreNMS per-module poller performance
  *
