@@ -131,7 +131,7 @@ class Oid
 
         $key = 'Oid:toNumeric:' . $this->oid . '/' . $mib;
 
-        $numeric_oid = Cache::remember($key, $cache, function () use ($mib) {
+        $numeric_oid = Cache::driver($cache === 0 ? 'null' : null)->remember($key, $cache, function () use ($mib) {
             $snmpQuery = \SnmpQuery::numeric();
 
             if ($mib) {

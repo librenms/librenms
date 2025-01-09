@@ -174,7 +174,7 @@ class YamlDiscoveryDefinition
                     } elseif (isset($yaml[$field->key])) {
                         Log::critical("$yaml_num_oid_field_name should be added to the discovery yaml to increase performance");
 
-                        $num_oid = Oid::of($yaml[$field->key] . '.' . $index)->toNumeric();
+                        $num_oid = Oid::of($yaml[$field->key] . '.' . $index)->toNumeric(cache: 0);  // don't cache because of idiotic vendors naming MIBs the same
                     }
                 }
 
