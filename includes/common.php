@@ -242,11 +242,6 @@ function gethostbyid($device_id)
     return DeviceCache::get((int) $device_id)->hostname;
 }
 
-function getifbyid($id)
-{
-    return dbFetchRow('SELECT * FROM `ports` WHERE `port_id` = ?', [$id]);
-}
-
 function getidbyname($hostname)
 {
     return DeviceCache::getByHostname($hostname)->device_id;
