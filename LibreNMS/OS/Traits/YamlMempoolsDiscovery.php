@@ -44,10 +44,10 @@ trait YamlMempoolsDiscovery
             ->addField(new YamlDiscoveryField('class', 'mempool_class', 'system'))
             ->addField(new YamlDiscoveryField('precision', 'mempool_precision', 1))
             ->addField(new YamlDiscoveryField('descr', 'mempool_descr', 'Memory', callback: fn($value) => ucwords($value)))
-            ->addField(new OidField('used','mempool_used', priority: 3))
-            ->addField(new OidField('free','mempool_free', priority: 2))
-            ->addField(new OidField('total','mempool_total'))
-            ->addField(new OidField('percent_used','mempool_perc', priority: 1))
+            ->addField(new OidField('used','mempool_used'))
+            ->addField(new OidField('free','mempool_free'))
+            ->addField(new OidField('total','mempool_total', should_poll: false))
+            ->addField(new OidField('percent_used','mempool_perc'))
             ->addField(new YamlDiscoveryField('warn_percent', 'mempool_perc_warn', 90))
             ->afterEach(function (Mempool $mempool, YamlDiscoveryDefinition $def, $yaml, $index) {
                 // fill missing values

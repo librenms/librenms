@@ -96,7 +96,7 @@ class YamlDiscoveryDefinition
     public function discover($yaml, $attributes = []): Collection
     {
         $models = new Collection;
-        $fetchedData = [];  // TODO preCache?
+        $fetchedData = $this->preFetch($yaml);
 
         foreach ($yaml['data'] ?? [] as $yamlItem) {
             // if a table is given fetch it otherwise, fetch scalar or table columns individually
@@ -141,49 +141,48 @@ class YamlDiscoveryDefinition
         return $models;
     }
 
+    private function preFetch(array $yaml): array
+    {
+        if (empty($yaml['pre-cache']['oids'])) {
+            return [];
+        }
+
+        $query = SnmpQuery::enumStrings();
+
+        if (isset($yaml['pre-cache']['snmp_flags'])) {
+            $query->options($yaml['pre-cache']['snmp_flags']);
+        }
+
+        return $query->walk($yaml['pre-cache']['oids'])->table(100);
+    }
+
     private function fillNumericOids(array &$modelAttributes, array $yaml, int|string $index): void
     {
-        $poller_fields = $this->getPollerFields();
-
         foreach($this->fields as $field) {
             if($field->isOid) {
                 $num_oid = null;
 
-                if (in_array($field, $poller_fields)) {
+                if (call_user_func($field->should_poll, $this)) {
                     $yaml_num_oid_field_name = $field->key . '_num_oid';
+
+                    // make sure index is not an encoded string... possibly a bug here
+                    if (! Oid::of($index)->isNumeric()) {
+                        $index = Oid::encodeString($index);
+                    }
 
                     if (isset($yaml[$yaml_num_oid_field_name])) {
                         $num_oid = SimpleTemplate::parse($yaml[$yaml_num_oid_field_name], ['index' => $index]);
-                    } else {
+                    } elseif (isset($yaml[$field->key])) {
                         Log::critical("$yaml_num_oid_field_name should be added to the discovery yaml to increase performance");
-                        $num_oid = Oid::of($yaml[$field->key])->toNumeric() . '.' . $index;
+
+                        $num_oid = Oid::of($yaml[$field->key] . '.' . $index)->toNumeric();
                     }
                 }
 
                 $modelAttributes[$field->model_column . '_oid'] = $num_oid;
             }
         }
-    }
 
-    /**
-     * Figure out what fields will have num_oid added for the poller
-     */
-    private function getPollerFields(): array
-    {
-        $num_oid_fields = [];
-        $num_oid_curent_priority = 0;
-
-        foreach ($this->fields as $field) {
-            if ($field->isOid && $field->value !== null) {
-                if ($field->priority > $num_oid_curent_priority) {
-                    $num_oid_curent_priority = $field->priority;
-                    $num_oid_fields = [$field];
-                } elseif ($field->priority == $num_oid_curent_priority) {
-                    $num_oid_fields[] = $field;
-                }
-            }
-        }
-
-        return $num_oid_fields;
+        return;
     }
 }

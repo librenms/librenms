@@ -26,18 +26,22 @@
 namespace LibreNMS\Discovery\Yaml;
 
 use LibreNMS\Device\YamlDiscovery;
+use LibreNMS\Discovery\YamlDiscoveryDefinition;
 
 class YamlDiscoveryField
 {
     public bool $isOid = false;
     public mixed $value = null;
+    public ?\Closure $should_poll;
 
     public function __construct(
         public readonly string    $key,
         public readonly ?string   $model_column = null,
         public readonly ?string   $default = null,
         public readonly ?\Closure $callback = null,
-    ) {}
+    ) {
+        $this->should_poll = fn(YamlDiscoveryDefinition $def) => false;
+    }
 
     public function calculateValue(array $yaml, array $data, string $index, int $count): void
     {

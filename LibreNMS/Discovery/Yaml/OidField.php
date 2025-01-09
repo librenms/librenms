@@ -25,12 +25,21 @@
 
 namespace LibreNMS\Discovery\Yaml;
 
+use LibreNMS\Discovery\YamlDiscoveryDefinition;
+
 class OidField extends YamlDiscoveryField
 {
     public bool $isOid = true;
 
-    public function __construct(string $key, ?string $model_column = null, ?string $default = null, ?\Closure $callback = null, public readonly int $priority = 0)
+    public function __construct(string $key, ?string $model_column = null, ?string $default = null, ?\Closure $callback = null, \Closure|bool|null $should_poll = null)
     {
         parent::__construct($key, $model_column, $default, $callback);
+
+        // should poll heuristic
+        if (is_bool($should_poll)) {
+            $this->should_poll = fn(YamlDiscoveryDefinition $def) => $should_poll;
+        } elseif ($should_poll === null) {
+            $this->should_poll = fn(YamlDiscoveryDefinition $def) => $this->value !== null;
+        }
     }
 }
