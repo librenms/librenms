@@ -608,11 +608,11 @@ hzQtmAtpcStatus  OBJECT-TYPE
 	STATUS     current
 	DESCRIPTION
 		"Indicates the actual condition of ATPC:
-		Enabled – if config is on and no issues
+		Enabled Â– if config is on and no issues
 
-		Auto-Disabled – when ATPC coordinated power alarm present
+		Auto-Disabled Â– when ATPC coordinated power alarm present
 
-		Disabled-manual – if config set to off"
+		Disabled-manual Â– if config set to off"
 	::= { hzQtmAtpc 2 }
 
 hzQtmAtpcCoordinatedPower  OBJECT-TYPE
