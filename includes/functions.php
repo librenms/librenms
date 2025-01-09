@@ -205,7 +205,7 @@ function snmp2ipv6($ipv6_snmp)
     $ipv6_2 = [];
 
     for ($i = 0; $i <= 15; $i++) {
-        $ipv6[$i] = Str::padLeft(dechex($ipv6[$i]),2 , '0');
+        $ipv6[$i] = Str::padLeft(dechex($ipv6[$i]), 2, '0');
     }
     for ($i = 0; $i <= 15; $i += 2) {
         $ipv6_2[] = $ipv6[$i] . $ipv6[$i + 1];
