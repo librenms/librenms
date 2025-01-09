@@ -108,6 +108,13 @@ modules:
                     descr: 'Unit {{ $subindex1 }} return temp'
                     divisor: 10
                 -
+                    oid: unitOutsideAirTemperature
+                    value: unitOutsideAirTemperature
+                    num_oid: '.1.3.6.1.4.1.29462.10.2.1.1.1.1.1.1.1.1196.{{ $index }}'
+                    index: 'unitOutsideAirTemperature.{{ $index }}'
+                    descr: 'Unit {{ $subindex1 }} outside air temp'
+                    divisor: 10
+                -
                     oid: unitWaterInTemperature1
                     value: unitWaterInTemperature1
                     num_oid: '.1.3.6.1.4.1.29462.10.2.1.1.1.2.1.1.1191.{{ $index }}'
