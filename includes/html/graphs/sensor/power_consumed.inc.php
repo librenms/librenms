@@ -21,7 +21,7 @@ $rrd_options .= ' CDEF:sensor_max=t_sensor_max,1000,*';
 $rrd_options .= ' CDEF:sensor_min=t_sensor_min,1000,*';
 $rrd_options .= ' AREA:sensor_max#c5c5c5';
 $rrd_options .= ' AREA:sensor_min#ffffffff';
-$rrd_options .= ' COMMENT:"Alert tresholds\:"';
+$rrd_options .= ' COMMENT:"Alert thresholds\:"';
 $rrd_options .= ($sensor->sensor_limit_low) ? '  LINE1.5:' . $sensor->sensor_limit_low . '#00008b:"low = ' . Number::formatSi($sensor->sensor_limit_low, 2, 3, $sensor->unit()) . '":dashes' : '';
 $rrd_options .= ($sensor->sensor_limit_low_warn) ? ' LINE1.5:' . $sensor->sensor_limit_low_warn . '#005bdf:"low_warn = ' . Number::formatSi($sensor->sensor_limit_low_warn, 2, 3, $sensor->unit()) . '":dashes' : '';
 $rrd_options .= ($sensor->sensor_limit_warn) ? (' LINE1.5:' . $sensor->sensor_limit_warn . '#ffa420:"high_warn = ' . Number::formatSi($sensor->sensor_limit_warn, 2, 3, $sensor->unit()) . '":dashes') : '';
