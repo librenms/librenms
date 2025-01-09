@@ -106,8 +106,8 @@ class YamlDiscoveryDefinition
                 $oids = Arr::only($yamlItem, collect($this->fields)->where('isOid')->keys()->all());
             }
 
-            $response = SnmpQuery::enumStrings()->walk($oids);
-            $response->table(100, $fetchedData); // load into the fetchedData array
+            $response = SnmpQuery::enumStrings()->numericIndex()->walk($oids);
+            $response->valuesByIndex($fetchedData); // load into the fetchedData array
             $count = 0;
 
             foreach ($response->valuesByIndex() as $index => $snmpItem) {
@@ -147,13 +147,13 @@ class YamlDiscoveryDefinition
             return [];
         }
 
-        $query = SnmpQuery::enumStrings();
+        $query = SnmpQuery::enumStrings()->numericIndex();
 
         if (isset($yaml['pre-cache']['snmp_flags'])) {
             $query->options($yaml['pre-cache']['snmp_flags']);
         }
 
-        return $query->walk($yaml['pre-cache']['oids'])->table(100);
+        return $query->walk($yaml['pre-cache']['oids'])->valuesByIndex();
     }
 
     private function fillNumericOids(array &$modelAttributes, array $yaml, int|string $index): void
@@ -164,11 +164,6 @@ class YamlDiscoveryDefinition
 
                 if (call_user_func($field->should_poll, $this)) {
                     $yaml_num_oid_field_name = $field->key . '_num_oid';
-
-                    // make sure index is not an encoded string... possibly a bug here
-                    if (! Oid::of($index)->isNumeric()) {
-                        $index = Oid::encodeString($index);
-                    }
 
                     if (isset($yaml[$yaml_num_oid_field_name])) {
                         $num_oid = SimpleTemplate::parse($yaml[$yaml_num_oid_field_name], ['index' => $index]);
