@@ -15,6 +15,7 @@ use LibreNMS\Config;
 use LibreNMS\Enum\ImageFormat;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Rewrite;
+use LibreNMS\Util\Url;
 
 function toner2colour($descr, $percent)
 {
@@ -256,7 +257,7 @@ function generate_port_link($port, $text = null, $type = null, $overlib = 1, $si
         $port['graph_type'] = 'port_bits';
     }
 
-    $class = ifclass($port['ifOperStatus'], $port['ifAdminStatus']);
+    $class = Url::portLinkDisplayClass($port);
 
     if (! isset($port['hostname'])) {
         $port = array_merge($port, device_by_id_cache($port['device_id']));
