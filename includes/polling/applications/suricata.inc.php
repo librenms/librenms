@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Eventlog;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\RRD\RrdDefinition;
@@ -249,7 +250,7 @@ if (count($added_instances) > 0 || count($removed_instances) > 0) {
     $log_message = 'Suricata Instance Change:';
     $log_message .= count($added_instances) > 0 ? ' Added ' . implode(',', $added_instances) : '';
     $log_message .= count($removed_instances) > 0 ? ' Removed ' . implode(',', $added_instances) : '';
-    log_event($log_message, $device, 'application');
+    Eventlog::log($log_message, $device, 'application');
 }
 
 $app->data = $new_data;

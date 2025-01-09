@@ -9,6 +9,7 @@
  */
 
 use App\Models\Device;
+use App\Models\Eventlog;
 use App\Models\StateTranslation;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
@@ -105,19 +106,19 @@ function renamehost($id, $new, $source = 'console')
     $new_rrd_dir = Rrd::dirFromHost($new);
 
     if (is_dir($new_rrd_dir)) {
-        log_event("Renaming of $host failed due to existing RRD folder for $new", $id, 'system', 5);
+        Eventlog::log("Renaming of $host failed due to existing RRD folder for $new", $id, 'system', Severity::Error);
 
         return "Renaming of $host failed due to existing RRD folder for $new\n";
     }
 
     if (! is_dir($new_rrd_dir) && rename(Rrd::dirFromHost($host), $new_rrd_dir) === true) {
         dbUpdate(['hostname' => $new, 'ip' => null], 'devices', 'device_id=?', [$id]);
-        log_event("Hostname changed -> $new ($source)", $id, 'system', 3);
+        Eventlog::log("Hostname changed -> $new ($source)", $id, 'system', Severity::Notice);
 
         return '';
     }
 
-    log_event("Renaming of $host failed", $id, 'system', 5);
+    Eventlog::log("Renaming of $host failed", $id, 'system', Severity::Error);
 
     return "Renaming of $host failed\n";
 }
@@ -211,25 +212,6 @@ function snmp2ipv6($ipv6_snmp)
     }
 
     return implode(':', $ipv6_2);
-}
-
-/**
- * Log events to the event table
- *
- * @param  string  $text  message describing the event
- * @param  array|int  $device  device array or device_id
- * @param  string  $type  brief category for this event. Examples: sensor, state, stp, system, temperature, interface
- * @param  int  $severity  1: ok, 2: info, 3: notice, 4: warning, 5: critical, 0: unknown
- * @param  int  $reference  the id of the referenced entity.  Supported types: interface
- */
-function log_event($text, $device = null, $type = null, $severity = 2, $reference = null)
-{
-    // handle legacy device array
-    if (is_array($device) && isset($device['device_id'])) {
-        $device = $device['device_id'];
-    }
-
-    \App\Models\Eventlog::log($text, $device, $type, Severity::tryFrom((int) $severity) ?? Severity::Info, $reference);
 }
 
 function hex2str($hex)
