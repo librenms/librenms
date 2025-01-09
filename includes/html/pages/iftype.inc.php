@@ -52,7 +52,8 @@ if ($if_list) {
         unset($class);
         $port['ifAlias'] = str_ireplace($port['type'] . ': ', '', $port['ifAlias']);
         $port['ifAlias'] = str_ireplace('[PNI]', 'Private', $port['ifAlias']);
-        $ifclass = Url::portLinkDisplayClass($port);
+
+        $ifclass = Url::portLinkDisplayClass((object)['ifOperStatus' => $port['ifOperStatus'], 'ifAdminStatus' => $port['ifAdminStatus']]);
         if ($bg == '#ffffff') {
             $bg = '#e5e5e5';
         } else {
