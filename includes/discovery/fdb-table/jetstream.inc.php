@@ -22,23 +22,27 @@
  * @copyright  2022 Peca Nesovanovic
  * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  */
+
+use Illuminate\Support\Facades\Log;
+use LibreNMS\Util\Mac;
+
 $oids = SnmpQuery::allowUnordered()->hideMib()->walk('Q-BRIDGE-MIB::dot1qTpFdbPort')->table(2);
 if (! empty($oids)) {
     $insert = [];
-    d_echo('Jetstream: FDB Table');
+    Log::debug('Jetstream: FDB Table');
     foreach ($oids as $vlan => $oidData) {
         foreach ($oidData as $mac => $macData) {
             $port = $macData['dot1qTpFdbPort'];
             //try both variation with & without space
             $port_id = find_port_id('gigabitEthernet 1/0/' . $port, 'gigabitEthernet1/0/' . $port, $device['device_id']) ?? 0;
-            $mac_address = implode(array_map('zeropad', explode(':', $mac)));
+            $mac_address = Mac::parse($mac)->hex();
             if (strlen($mac_address) != 12) {
-                d_echo("MAC address padding failed for $mac\n");
+                Log::debug("MAC address padding failed for $mac\n");
                 continue;
             }
             $vlan_id = $vlans_dict[$vlan] ?? 0;
             $insert[$vlan_id][$mac_address]['port_id'] = $port_id;
-            d_echo("vlan $vlan_id mac $mac_address port $port_id\n");
+            Log::debug("vlan $vlan_id mac $mac_address port $port_id\n");
         }
     }
 }

@@ -14,6 +14,9 @@
  * @author     Tony Murray <murraytony@gmail.com> (bridge.inc.php used as base)
  */
 
+use Illuminate\Support\Facades\Log;
+use LibreNMS\Util\Mac;
+
 $fdbPort_table = snmpwalk_group($device, 'hwDynFdbPort', 'HUAWEI-L2MAM-MIB');
 $hwCfgMacAddrQueryIfIndex = snmpwalk_group($device, 'hwCfgMacAddrQueryIfIndex', 'HUAWEI-L2MAM-MIB', 10);
 
@@ -29,14 +32,14 @@ if (! empty($fdbPort_table)) {
             }
             $port = get_port_by_index_cache($device['device_id'], $ifIndex);
             $port_id = $port['port_id'];
-            $mac_address = implode(array_map('zeropad', explode(':', $mac)));
+            $mac_address = Mac::parse($mac)->hex();
             if (strlen($mac_address) != 12) {
-                d_echo("MAC address padding failed for $mac\n");
+                Log::debug("MAC address padding failed for $mac\n");
                 continue;
             }
             $vlan_id = isset($vlans_dict[$vlan]) ? $vlans_dict[$vlan] : 0;
             $insert[$vlan_id][$mac_address]['port_id'] = $port_id;
-            d_echo("vlan $vlan mac $mac_address port ($ifIndex) $port_id\n");
+            Log::debug("vlan $vlan mac $mac_address port ($ifIndex) $port_id\n");
         }
     }
 }
@@ -55,14 +58,14 @@ if (! empty($hwCfgMacAddrQueryIfIndex)) {
                     }
                     $port = get_port_by_index_cache($device['device_id'], $ifIndex);
                     $port_id = $port['port_id'];
-                    $mac_address = implode(array_map('zeropad', explode(':', $mac)));
+                    $mac_address = Mac::parse($mac)->hex();
                     if (strlen($mac_address) != 12) {
-                        d_echo("MAC address padding failed for $mac\n");
+                        Log::debug("MAC address padding failed for $mac\n");
                         continue;
                     }
                     $vlan_id = isset($vlans_dict[$vlan]) ? $vlans_dict[$vlan] : 0;
                     $insert[$vlan_id][$mac_address]['port_id'] = $port_id;
-                    d_echo("vlan $vlan mac $mac_address port ($ifIndex) $port_id\n");
+                    Log::debug("vlan $vlan mac $mac_address port ($ifIndex) $port_id\n");
                 }
             }
         }

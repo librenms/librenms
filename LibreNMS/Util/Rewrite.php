@@ -391,11 +391,6 @@ class Rewrite
         return $guests[$guest_id] ?? $guest_id;
     }
 
-    public static function zeropad($num, $length = 2)
-    {
-        return str_pad($num, $length, '0', STR_PAD_LEFT);
-    }
-
     /**
      * If given input is an IPv6 address, wrap it in [] for use in applications that require it
      *
