@@ -1,4 +1,6 @@
 <?php
+
+use LibreNMS\Config;
 /*
  * LibreNMS per-module poller performance
  *
@@ -13,16 +15,16 @@
  */
 
 $scale_min = '0';
-$attribs = get_dev_attribs($device['device_id']);
-$modules = \LibreNMS\Config::get('poller_modules');
+$attribs = $device->getAttribs();
+$modules = Config::get('poller_modules');
 ksort($modules);
 
 require 'includes/html/graphs/common.inc.php';
 
 foreach ($modules as $module => $module_status) {
-    $rrd_filename = Rrd::name($device['hostname'], ['poller-perf', $module]);
+    $rrd_filename = Rrd::name($device->hostname, ['poller-perf', $module]);
     if ($attribs['poll_' . $module] || ($module_status && ! isset($attribs['poll_' . $module])) ||
-        (\LibreNMS\Config::getOsSetting($device['os'], 'poller_modules.' . $module) && ! isset($attribs['poll_' . $module]))) {
+        (Config::getOsSetting($device->os, 'poller_modules.' . $module) && ! isset($attribs['poll_' . $module]))) {
         if (Rrd::checkRrdExists($rrd_filename)) {
             $ds['ds'] = 'poller';
             $ds['descr'] = $module;
