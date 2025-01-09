@@ -27,6 +27,7 @@ namespace LibreNMS\Discovery\Yaml;
 
 use LibreNMS\Device\YamlDiscovery;
 use LibreNMS\Discovery\YamlDiscoveryDefinition;
+use LibreNMS\Util\Number;
 
 class YamlDiscoveryField
 {
@@ -66,6 +67,10 @@ class YamlDiscoveryField
             $this->value = call_user_func($this->callback, $value);
 
             return;
+        }
+
+        if ($this->isOid && $value !== null) {
+            $value = Number::cast($value);
         }
 
         $this->value = $value;
