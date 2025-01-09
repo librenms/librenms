@@ -486,11 +486,8 @@ class Url
 
     /**
      * Get html class for a port using ifAdminStatus and ifOperStatus
-     *
-     * @param  Port  $port
-     * @return string
      */
-    public static function portLinkDisplayClass($port)
+    public static function portLinkDisplayClass(Port $port): string
     {
         if ($port->ifAdminStatus == 'down') {
             return 'interface-admindown';
