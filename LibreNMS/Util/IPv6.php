@@ -170,7 +170,7 @@ class IPv6 extends IP
         $parts = explode(':', $ip, 8);
 
         return implode(':', array_map(function ($section) {
-            return Str::padLeft($section, 4, 2, '0');
+            return Str::padLeft($section, 4, '0');
         }, $parts));
     }
 
