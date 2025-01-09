@@ -16,6 +16,11 @@ use LibreNMS\Config;
  */
 
 $scale_min = '0';
+
+// Workaround to load the Object from the SQL query array.
+// TODO Convert the initial SQL query to Eloquent
+$device = DeviceCache::get($device['device_id']);
+
 $attribs = $device->getAttribs();
 $modules = Config::get('poller_modules');
 ksort($modules);
