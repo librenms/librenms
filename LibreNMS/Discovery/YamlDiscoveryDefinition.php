@@ -106,7 +106,11 @@ class YamlDiscoveryDefinition
                 $oids = Arr::only($yamlItem, collect($this->fields)->where('isOid')->keys()->all());
             }
 
-            $response = SnmpQuery::enumStrings()->numericIndex()->walk($oids);
+            $query = SnmpQuery::enumStrings()->numericIndex();
+            if (isset($yamlItem['snmp_flags'])) {
+                $query->options($yamlItem['snmp_flags']);
+            }
+            $response = $query->walk($oids);
             $response->valuesByIndex($fetchedData); // load into the fetchedData array
             $count = 0;
 
@@ -177,7 +181,5 @@ class YamlDiscoveryDefinition
                 $modelAttributes[$field->model_column . '_oid'] = $num_oid;
             }
         }
-
-        return;
     }
 }
