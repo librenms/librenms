@@ -111,7 +111,7 @@ class YamlDiscoveryDefinition
             $count = 0;
 
             foreach ($response->valuesByIndex() as $index => $snmpItem) {
-                if (YamlDiscovery::canSkipItem(null, $index, $yaml, [], $fetchedData)) {
+                if (YamlDiscovery::canSkipItem(null, $index, $yamlItem, $yaml, $fetchedData)) {
                     echo 's';
                     continue;
                 }
