@@ -25,6 +25,9 @@
 
 namespace LibreNMS\Discovery\Yaml;
 
+use Illuminate\Support\Str;
+use LibreNMS\Util\Oid;
+
 class IndexField extends YamlDiscoveryField
 {
     public function calculateValue(array $yaml, array $data, string $index, int $count): void
@@ -34,6 +37,14 @@ class IndexField extends YamlDiscoveryField
 
             return;
         }
+
+        if (Str::startsWith($index, '.') && Oid::of($index)->isNumeric()) {
+            // if this is a full numeric oid instead of an index, assume it is a scalar
+            $this->value = 0;
+
+            return;
+        }
+
 
         $this->value = $index;
     }

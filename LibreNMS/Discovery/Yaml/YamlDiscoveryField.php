@@ -47,18 +47,21 @@ class YamlDiscoveryField
     public function calculateValue(array $yaml, array $data, string $index, int $count): void
     {
         if (array_key_exists($this->key, $yaml)) {
-            $this->setValue(YamlDiscovery::replaceValues($this->key, $index, $count, $yaml, $data));
+            $key = $this->key;
+        } else {
+            $key = $this->default;
+            $yaml = [$key => $this->default];
+        }
+
+
+        if (empty($yaml[$key]) || is_numeric($yaml[$key])) {
+            // if default is an empty or simple value, just set it
+            $this->setValue($yaml[$key]);
 
             return;
         }
 
-        if (empty($this->default)) {
-            $this->setValue($this->default);
-
-            return;
-        }
-
-        $this->setValue(YamlDiscovery::replaceValues('default', $index, $count, ['default' => $this->default], $data));
+        $this->setValue(YamlDiscovery::replaceValues($key, $index, $count, $yaml, $data));
     }
 
     private function setValue(mixed $value): void

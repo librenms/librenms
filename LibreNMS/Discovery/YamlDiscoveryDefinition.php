@@ -26,7 +26,6 @@
 namespace LibreNMS\Discovery;
 
 use App\View\SimpleTemplate;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Device\YamlDiscovery;
@@ -101,20 +100,41 @@ class YamlDiscoveryDefinition
         foreach ($yaml['data'] ?? [] as $yamlItem) {
             // if a table is given fetch it otherwise, fetch scalar or table columns individually
             if (isset($yamlItem['oid'])) {
-                $oids = $yamlItem['oid'];
+                if (Oid::of($yamlItem['oid'])->isNumeric()) {
+                    $oids = [];
+                    $numeric_oids = $yamlItem['oid'];
+                } else {
+                    $oids = $yamlItem['oid'];
+                    $numeric_oids = [];
+                }
             } else {
-                $oids = Arr::only($yamlItem, collect($this->fields)->where('isOid')->keys()->all());
+                [$numeric_oids, $oids] = collect($yamlItem)->only(collect($this->fields)->where('isOid')->keys())
+                        ->partition(fn($oid) => Oid::of($oid)->isNumeric())->toArray();
             }
 
-            $query = SnmpQuery::enumStrings()->numericIndex();
-            if (isset($yamlItem['snmp_flags'])) {
-                $query->options($yamlItem['snmp_flags']);
+            $snmp_data = [];
+            if (! empty($numeric_oids)) {
+                $snmpQuery = SnmpQuery::numeric();
+                if (isset($yamlItem['snmp_flags'])) {
+                    $snmpQuery->options($yamlItem['snmp_flags']);
+                }
+                $snmp_data = $snmpQuery->get($numeric_oids)->values();
+                $fetchedData = array_merge($fetchedData, $snmp_data);
             }
-            $response = $query->walk($oids);
-            $response->valuesByIndex($fetchedData); // load into the fetchedData array
+
+            if (! empty($oids)) {
+                $snmpQuery = SnmpQuery::enumStrings()->numericIndex();
+                if (isset($yamlItem['snmp_flags'])) {
+                    $snmpQuery->options($yamlItem['snmp_flags']);
+                }
+                $response = $snmpQuery->walk($oids);
+                $response->valuesByIndex($snmp_data); // load into the $snmp_data array
+                $response->valuesByIndex($fetchedData); // load into the $fetchedData array
+            }
+
             $count = 0;
 
-            foreach ($response->valuesByIndex() as $index => $snmpItem) {
+            foreach ($snmp_data as $index => $snmpItem) {
                 if (YamlDiscovery::canSkipItem(null, $index, $yamlItem, $yaml, $fetchedData)) {
                     echo 's';
                     continue;
@@ -172,9 +192,14 @@ class YamlDiscoveryDefinition
                     if (isset($yaml[$yaml_num_oid_field_name])) {
                         $num_oid = SimpleTemplate::parse($yaml[$yaml_num_oid_field_name], ['index' => $index]);
                     } elseif (isset($yaml[$field->key])) {
-                        Log::critical("$yaml_num_oid_field_name should be added to the discovery yaml to increase performance");
+                        if (Oid::of($yaml[$field->key])->isNumeric()) {
+                            // if numeric, assume it is a scalar, not a table
+                            $num_oid = $yaml[$field->key];
+                        } else {
+                            Log::critical("$yaml_num_oid_field_name should be added to the discovery yaml to increase discovery performance");
 
-                        $num_oid = Oid::of($yaml[$field->key] . '.' . $index)->toNumeric(cache: 0);  // don't cache because of idiotic vendors naming MIBs the same
+                            $num_oid = Oid::of($yaml[$field->key] . '.' . $index)->toNumeric(cache: 0);  // don't cache because of idiotic vendors naming MIBs the same
+                        }
                     }
                 }
 
