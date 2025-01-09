@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\Port;
+use Illuminate\Support\Facades\Log;
 use LibreNMS\Config;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\StringHelpers;
@@ -12,7 +14,7 @@ if ($device['os'] == 'ironware') {
 
     foreach ($fdp_array as $key => $fdp_if_array) {
         $interface = get_port_by_ifIndex($device['device_id'], $key);
-        d_echo($fdp_if_array);
+        Log::debug($fdp_if_array);
 
         foreach ($fdp_if_array as $entry_key => $fdp) {
             $remote_device_id = find_device_id($fdp['snFdpCacheDeviceId']);
@@ -50,7 +52,7 @@ if (isset($device['os_group']) && $device['os_group'] == 'cisco') {
         $interface = get_port_by_ifIndex($device['device_id'], $key);
 
         foreach ($cdp_if_array as $entry_key => $cdp) {
-            d_echo($cdp);
+            Log::debug($cdp);
 
             $cdp_ip = IP::fromHexString($cdp['cdpCacheAddress'], true);
             $remote_device_id = find_device_id($cdp['cdpCacheDeviceId'], $cdp_ip);
@@ -101,7 +103,7 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
         foreach ($lldp_array as $key => $lldp) {
             $local_port_ifName = $lldp_ports[hexdec($lldp_ports_num[$key]['mtxrNeighborInterfaceID'])]['mtxrInterfaceStatsName'];
             $local_port_id = find_port_id($local_port_ifName, null, $device['device_id']);
-            $interface = get_port_by_id($local_port_id);
+            $interface = Port::find($local_port_id);
             if ($lldp['lldpRemPortIdSubtype'] == 3) { // 3 = macaddress
                 $remote_port_mac = str_replace([' ', ':', '-'], '', strtolower($lldp['lldpRemPortId']));
             }
@@ -137,7 +139,7 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
     $lldp_array = SnmpQuery::hideMib()->walk('NMS-LLDP-MIB::lldpRemoteSystemsData')->table(2);
     foreach ($lldp_array as $key => $lldp_array_inner) {
         foreach ($lldp_array_inner as $ifIndex => $lldp) {
-            d_echo($lldp);
+            Log::debug($lldp);
             $interface = get_port_by_ifIndex($device['device_id'], $lldp['lldpRemLocalPortNum']);
             $remote_device_id = find_device_id($lldp['lldpRemSysName']);
 
@@ -219,7 +221,7 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
             if (! $interface['port_id']) {
                 $local_ifName = $lldp['lldpNeighborPortId'][$IndexId][1];
                 $local_port_id = find_port_id('gigabitEthernet ' . $local_ifName, null, $device['device_id']);
-                $interface = get_port_by_id($local_port_id);
+                $interface = Port::find($local_port_id);
             }
 
             $remote_device_id = find_device_id($lldp['lldpNeighborDeviceName'][$IndexId][1]);
@@ -342,9 +344,9 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
             } else {
                 $local_port_id = find_port_id($lldp_ports[$entry_key]['lldpLocPortId'], $ifIndex, $device['device_id']);
             }
-            $interface = get_port_by_id($local_port_id);
+            $interface = Port::find($local_port_id);
 
-            d_echo($lldp_instance);
+            Log::debug($lldp_instance);
 
             foreach ($lldp_instance as $entry_instance => $lldp) {
                 // If lldpRemPortIdSubtype is 5 and lldpRemPortId is hex, convert it to ASCII.
@@ -379,7 +381,7 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
 
                     if (! $remote_device_id && Config::get('discovery_by_ip', false)) {
                         $ptopo_array = snmpwalk_cache_multi_oid($device, 'ptopoConnEntry', [], 'PTOPO-MIB');
-                        d_echo($ptopo_array);
+                        Log::debug($ptopo_array);
                         foreach ($ptopo_array as $ptopo) {
                             if (strcmp(trim($ptopo['ptopoConnRemoteChassis']), trim($lldp['lldpRemChassisId'])) == 0) {
                                 $ip = IP::fromHexString($ptopo['ptopoConnAgentNetAddr'], true);
