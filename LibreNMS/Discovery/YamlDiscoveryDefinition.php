@@ -28,6 +28,7 @@ namespace LibreNMS\Discovery;
 use App\View\SimpleTemplate;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 use LibreNMS\Device\YamlDiscovery;
 use LibreNMS\Discovery\Yaml\YamlDiscoveryField;
 use LibreNMS\Util\Oid;
@@ -155,7 +156,7 @@ class YamlDiscoveryDefinition
                         $num_oid = SimpleTemplate::parse($yaml[$yaml_num_oid_field_name], ['index' => $index]);
                     } else {
                         Log::critical("$yaml_num_oid_field_name should be added to the discovery yaml to increase performance");
-                        $num_oid = Oid::of($yaml[$field->key])->toNumeric();
+                        $num_oid = Oid::of($yaml[$field->key])->toNumeric() . '.' . $index;
                     }
                 }
 
