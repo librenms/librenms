@@ -54,9 +54,7 @@ class Mempool extends DeviceRelatedModel implements Keyable
     public function fillUsage($used = null, $total = null, $free = null, $percent = null, $multiplier = null): self
     {
         try {
-            if ($multiplier === null) {
-                $multiplier = $this->mempool_precision ?: 1;
-            }
+            $multiplier ??= $this->mempool_precision ?: 1;
             $total = Number::correctIntegerOverflow($total) ?? ($this->mempool_total ? $this->mempool_total / $multiplier : null);
             $used = Number::correctIntegerOverflow($used, $total);
             $free = Number::correctIntegerOverflow($free, $total);

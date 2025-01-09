@@ -295,7 +295,7 @@ class Number
 
         // fill percent if it is missing
         if ($used_percent == null) {
-            $used_percent = Number::calculatePercent($used, $total, $precision);
+            $used_percent = static::calculatePercent($used, $total, $precision);
         }
 
         // fill available if it is missing

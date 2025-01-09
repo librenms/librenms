@@ -40,6 +40,8 @@ class OidField extends YamlDiscoveryField
             $this->should_poll = fn(YamlDiscoveryDefinition $def) => $should_poll;
         } elseif ($should_poll === null) {
             $this->should_poll = fn(YamlDiscoveryDefinition $def) => $this->value !== null;
+        } else {
+            $this->should_poll = $should_poll;
         }
     }
 }
