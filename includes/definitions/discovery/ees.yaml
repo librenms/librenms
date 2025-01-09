@@ -4,6 +4,22 @@ modules:
         serial: EES-POWER-MIB::identControllerSerialNumber.0
         version: EES-POWER-MIB::identControllerFirmwareVersion.0
     sensors:
+        load:
+            data:
+                -
+                    oid: systemUsedCapacity
+                    value: systemUsedCapacity
+                    num_oid: '.1.3.6.1.4.1.6302.2.1.2.4.0'
+                    descr: System Used Capacity
+                    index: 'systemUsedCapacity.0'
+                    divisor: 1
+                -
+                    oid: rectifiersUsedCapacity
+                    value: rectifiersUsedCapacity
+                    num_oid: '.1.3.6.1.4.1.6302.2.1.2.11.3.{{ $index }}'
+                    descr: Rectifiers Used Capacity
+                    index: 'rectifiersUsedCapacity.{{ $index }}'
+                    divisor: 1
         temperature:
             data:
                 -
@@ -83,6 +99,15 @@ modules:
                     index: 'psConverterVoltage.{{ $index }}'
                     descr: 'Converter Voltage'
                     skip_values: 2147483647
+        charge:
+            data:
+                -
+                    oid: psBatteryCapacityPercent
+                    value: psBatteryCapacityPercent
+                    num_oid: '.1.3.6.1.4.1.6302.2.1.2.5.5.1.5.{{ $index }}'
+                    index: '.1.3.6.1.4.1.6302.2.1.2.5.5.1.1.{{ $index }}'
+                    descr: Battery 1
+                    divisor: 1
         current:
             data:
                 -
@@ -102,6 +127,7 @@ modules:
                 -
                     oid: psBatteryTable
                     num_oid: '.1.3.6.1.4.1.6302.2.1.2.5.5.1.2.{{ $index }}'
+                    divisor: 1000
                     value: psBatteryCurrent
                     index: 'psBatteryTable.{{ $index }}'
                     descr: psBatteryName
@@ -217,3 +243,13 @@ modules:
                         - { descr: low, graph: 1, value: 1, generic: 2 }
                         - { descr: fail, graph: 1, value: 2, generic: 2 }
                         - { descr: none, graph: 1, value: 3, generic: 0 }
+                -
+                    oid: psRectifierTable
+                    value: psRectifierFail
+                    num_oid: '.1.3.6.1.4.1.6302.2.1.2.11.4.1.8.{{ $index }}'
+                    descr: psRectifierIdent
+                    index: 'psRectifierTable.{{ $index }}'
+                    state_name: psRectifierFail
+                    states:
+                        - { value: 1, generic: 2, graph: 0, descr: Activiated }
+                        - { value: 2, generic: 0, graph: 0, descr: Deactivated }

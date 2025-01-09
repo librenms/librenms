@@ -1,0 +1,1384 @@
+------------------------------------------------------------
+-- Vertiv Energy Systems (EES)
+-- Power MIB
+------------------------------------------------------------
+
+NETSURE-NCU-MIB DEFINITIONS ::= BEGIN
+
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+	Integer32, Counter32, enterprises
+		FROM SNMPv2-SMI
+	TEXTUAL-CONVENTION, DisplayString, DateAndTime
+		FROM SNMPv2-TC;
+		
+		
+powerMIB MODULE-IDENTITY
+	LAST-UPDATED "202004060836Z"
+	ORGANIZATION "
+		Vertiv Tech Co. Ltd"
+	CONTACT-INFO "
+		Vertiv Corp.
+		1510 Kansas Ave.
+		Lorain, OH"
+	DESCRIPTION "
+		Vertiv Tech Co. Ltd Power MIB, revision J."
+	::= { enterprises 6302 2 1 }
+
+------------------------------------------------------------
+-- Node definitions
+------------------------------------------------------------
+
+ees OBJECT IDENTIFIER ::= { enterprises 6302 }
+
+global OBJECT IDENTIFIER ::= { ees 2 }
+
+------------------------------------------------------------
+-- Textual conventions
+------------------------------------------------------------
+
+Status ::= TEXTUAL-CONVENTION
+	STATUS current
+	DESCRIPTION "
+		This integer value represents the operational or administrative
+		status of the system. Also used as alarm severity.
+		Depending on situation there may be limits on allowed values.
+		Operational values:
+		(1) unknown - status has not yet been defined
+		(2) normal - there are no activated alarms
+		(3) warning - OA, lowest level of 'abnormal' status
+		(4) minor - A3
+		(5) major - MA
+		(6) critical - CA, highest level of 'abnormal' status
+		Administrative values:
+		(7) unmanaged
+		(8) restricted
+		(9) testing
+		(10) disabled"
+	SYNTAX INTEGER {
+		unknown(1),
+		normal(2),
+		warning(3),
+		minor(4),
+		major(5),
+		critical(6),
+		unmanaged(7),
+		restricted(8),
+		testing(9),
+		disabled(10) }
+
+StatusChange ::= TEXTUAL-CONVENTION
+	STATUS current
+	DESCRIPTION "
+		Indicates 'activated' (1) or 'deactivated' (2) alarm events."
+	SYNTAX INTEGER {
+		activated(1),
+		deactivated(2) }
+
+
+------------------------------------------------------------
+-- 1.1 Identification of the plant { powerMIB 1 }
+------------------------------------------------------------
+
+ident OBJECT IDENTIFIER ::= { powerMIB 1 }
+
+identManufacturer OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "
+		The name of the equipment manufacturer."
+	::= { ident 1 }
+
+identModel OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "
+		The manufacturers model designation of the power system."
+	::= { ident 2 }
+
+identControllerFirmwareVersion OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "
+		The firmware (software) version of the controller."
+	::= { ident 3 }
+
+identName OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "
+		The name of the power plant. This object should be set by
+		the administrator."
+	::= { ident 4 }
+
+identSNMPCfgVer OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "
+		The snmp cfg version"
+	::= { ident 5 }
+	
+identControllerSerialNumber OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "
+		The serial number of this controller"
+	::= { ident 6 }	
+	
+------------------------------------------------------------
+-- 1.2 System values { powerMIB 2 }
+------------------------------------------------------------
+
+system OBJECT IDENTIFIER ::= { powerMIB 2 }
+
+systemStatus OBJECT-TYPE
+	SYNTAX Status
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "
+		Status of the complete plant (highest alarm). One of
+		(1) unknown - status has not yet been defined
+		(2) normal - there are no activated alarms
+		(3) warning - OA, lowest level of 'abnormal' status
+		(4) minor - A3
+		(5) major - MA
+		(6) critical - CA, highest level of 'abnormal' status
+		(7) unmanaged
+		(8) restricted
+		(9) testing
+		(10) disabled"
+	::= { system 1 }
+
+systemVoltage OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "
+		System voltage, stored as mV, including positive or negative
+		sign. The integer 2147483647 represents invalid value."
+	::= { system 2 }
+
+systemCurrent OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "
+		System current, stored as mA, including positive or negative
+		sign. The integer 2147483647 represents invalid value."
+	::= { system 3 }
+
+systemUsedCapacity OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "
+		Used capacity, stored as % of the total capacity.
+		The integer 2147483647 represents invalid value."
+	::= { system 4 }
+
+
+
+-- ------------------------------------------------------------------------ 
+-- 1.2.5. Battery group
+-- ------------------------------------------------------------------------ 
+
+psBattery OBJECT IDENTIFIER ::= { system 5 }
+
+    psBatteryVoltage OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Battery voltage, stored as mV, including positive or negative
+		sign. The integer 2147483647 represents invalid value."
+        ::= { psBattery 1 }
+    
+    psTotalBatteryCurrent OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Battery current, stored as mA, including positive or negative
+		sign. The integer 2147483647 represents invalid value."
+        ::= { psBattery 2 }
+
+	psLowestBatteryCapacity OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION "
+			Calculated capacity, stored as % of the total capacity.
+			Lowest available capacity for multiple battery strings.
+			The integer 2147483647 represents invalid value."
+		::= { psBattery 3 }
+
+    psBatteryTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF PSBatteryEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION     
+                "Battery Table."
+    ::= { psBattery 5 }
+    
+    psBatteryEntry OBJECT-TYPE
+        SYNTAX PSBatteryEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Battery Measurement Table Entry."
+        INDEX { psBatteryIndex }
+    ::= { psBatteryTable 1 }
+
+    PSBatteryEntry ::= SEQUENCE {
+        psBatteryIndex              Integer32,
+        psBatteryCurrent         	Integer32,
+        psBatteryName		  		DisplayString,
+		psBatteryCapacity			Integer32,
+		psBatteryCapacityPercent	Integer32,
+		psBatteryRatedCapacity		Integer32
+    }
+
+    psBatteryIndex OBJECT-TYPE
+        SYNTAX		  Integer32(1..16777215)
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+                "Automatically generated index object."
+    ::= { psBatteryEntry 1 }
+
+    psBatteryCurrent OBJECT-TYPE
+        SYNTAX 		  Integer32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+                "Battery current in mA."
+    ::= { psBatteryEntry 2 }
+
+    psBatteryName OBJECT-TYPE
+        SYNTAX 		  DisplayString
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+                "Battery shunt name."
+    ::= { psBatteryEntry 3 }
+
+    psBatteryCapacity OBJECT-TYPE
+        SYNTAX 		  Integer32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+                "Battery capacity in Ah."
+    ::= { psBatteryEntry 4 }
+
+    psBatteryCapacityPercent OBJECT-TYPE
+        SYNTAX 		  Integer32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+                "Battery capacity in percent."
+    ::= { psBatteryEntry 5 }
+
+    psBatteryRatedCapacity OBJECT-TYPE
+        SYNTAX 		  Integer32
+        MAX-ACCESS              read-write
+        STATUS                  current
+        DESCRIPTION
+                "Battery capacity in Ah * 1000."
+    ::= { psBatteryEntry 6 }
+
+
+-- ------------------------------------------------------------------------ 
+-- 1.2.6. the psInput group
+-- ------------------------------------------------------------------------ 
+
+psInput OBJECT IDENTIFIER ::= { system 6 }
+
+    psInputLineAVoltage OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The AC line A voltage, stored as mV. The integer 2147483647 
+		represents invalid value."
+        ::= { psInput 1 }
+
+    psInputLineBVoltage OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The AC line B voltage, stored as mV. The integer 2147483647 
+		represents invalid value."
+        ::= { psInput 2 }
+
+    psInputLineCVoltage OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The AC line C voltage, stored as mV. The integer 2147483647 
+		represents invalid value."
+        ::= { psInput 3 }
+
+    psInputPhaseACurrent OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The AC Phase A current, stored as mA. The integer 2147483647 
+		represents invalid value."
+        ::= { psInput 4 }
+
+    psInputPhaseBCurrent OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The AC Phase B current, stored as mA. The integer 2147483647 
+		represents invalid value."
+        ::= { psInput 5 }
+
+    psInputPhaseCCurrent OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The AC Phase C current, stored as mA. The integer 2147483647 
+		represents invalid value."
+        ::= { psInput 6 }
+
+-- ------------------------------------------------------------------------ 
+-- 1.2.7. the temperatures
+-- ------------------------------------------------------------------------ 
+
+psTemperature OBJECT IDENTIFIER ::= { system 7 }
+
+    psTemperature1 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The first route temperature, stored as 0.001 Celsius degree. 
+		The integer 2147483647 represents invalid value."
+        ::= { psTemperature 1 }
+
+    psTemperature2 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The second route temperature, stored as 0.001 Celsius degree. 
+		The integer 2147483647 represents invalid value.."
+        ::= { psTemperature 2 }
+
+
+    psTemperatureTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF PSTemperatureEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION     
+                "Temperature Measurement Table."
+    ::= { psTemperature 3 }
+    
+    psTemperatureEntry OBJECT-TYPE
+        SYNTAX PSTemperatureEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Temperature Measurement Table Entry."
+        INDEX { psTemperatureIndex }
+    ::= { psTemperatureTable 1 }
+
+    PSTemperatureEntry ::= SEQUENCE {
+        psTemperatureIndex               Integer32,
+        psTemperatureMeasurement         Integer32,
+        psTemperatureName                DisplayString,
+        psTemperatureType                INTEGER,	
+        psTemperatureAlarmStatus         INTEGER
+    }
+
+    psTemperatureIndex OBJECT-TYPE
+        SYNTAX Integer32(1..71)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Temperature Probe Number "
+    ::= { psTemperatureEntry 1 }
+
+    psTemperatureMeasurement OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Temperature Value In degrees Centigrade * 1000."
+    ::= { psTemperatureEntry 2 }
+
+    psTemperatureName OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Configured Temperature Probe Name."
+    ::= { psTemperatureEntry 3 }
+
+    psTemperatureType OBJECT-TYPE
+        SYNTAX INTEGER { 
+        none(0), 
+        ambient(1), 
+        battery(2) 
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Temperature Probe Type "
+    ::= { psTemperatureEntry 4 }
+
+    psTemperatureAlarmStatus OBJECT-TYPE
+        SYNTAX INTEGER { 
+        high(0), 
+        low(1), 
+        fail(2), 
+        none(3) 
+        }
+        MAX-ACCESS                  read-only
+        STATUS                  current
+        DESCRIPTION
+                "Temperature Probe Alarm Status "
+    ::= { psTemperatureEntry 5 }
+
+psStatusCommunication OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(1),
+            normal(2),
+            interrupt(3)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The status of communication with the Power System. interrupt(3) indicates
+             some errors occurred between Power System and agent."
+        ::= { system 8 }
+
+psStatusBatteryMode OBJECT-TYPE
+        SYNTAX INTEGER  {
+	    unknown(1),
+	    floatCharging(2),
+	    shortTest(3),
+	    bcForTest(4),
+	    manualTesting(5),
+	    planTesting(6),
+	    acFailTesting(7),
+	    acFail(8),
+	    manualBC(9),
+	    autoBC(10),
+	    cyclicBC(11),
+	    masterBC(12),
+	    masterBT(13)
+	}
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The status of battery modes, 
+		FloatCharging(2),
+		ShortTest(3),
+		BoostChargingForTest(4),
+		ManualTesting(5),
+		PlanTesting(6),
+		ACFailTesting(7),
+		ACFail(8),
+		ManualBoostCharging(9),
+		AutoBoostCharging(10),
+		CyclicBoostCharging(11),
+		MasterBoostCharging(12),
+		MasterBateryTesting(13)."
+        ::= { system 9 }
+
+-- ------------------------------------------------------------------------ 
+-- 1.2.10. the SM series group(only get number of SM series)
+-- ------------------------------------------------------------------------ 
+
+psSMNumber OBJECT IDENTIFIER ::= { system 10 }
+
+    psSMACNumber OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of SM AC module."
+        ::= { psSMNumber 1 }
+
+    psSMBATNumber OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of SM BAT module."
+        ::= { psSMNumber 2 }
+
+    psSMIONumber OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of SM IO module."
+        ::= { psSMNumber 3 }
+
+-- ------------------------------------------------------------------------ 
+-- 1.2.11. Rectifier group
+-- ------------------------------------------------------------------------ 
+
+psRectifier OBJECT IDENTIFIER ::= { system 11 }
+
+numberOfInstalledRectifiers OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "
+		number of rectifiers, stored as integer.
+		The integer 2147483647 represents invalid value."
+	::= { psRectifier 1 }
+
+numberOfRectifiersCommunicating OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "
+		number of rectifiers communicating, stored as integer.
+		The integer 2147483647 represents invalid value."
+	::= { psRectifier 2 }
+
+rectifiersUsedCapacity OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "
+		Used capacity, stored as % of the total capacity.
+		The integer 2147483647 represents invalid value."
+	::= { psRectifier 3 }
+
+psRectifierTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF PSRectifierEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "
+		Table holding information about indivual rectifiers."
+	::= { psRectifier 4 }
+
+psRectifierEntry OBJECT-TYPE
+	SYNTAX PSRectifierEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "
+		An entry (conceptual row) in the rectifierInfoTable."
+	INDEX { psRectifierIndex }
+	::= { psRectifierTable 1 }
+
+PSRectifierEntry ::= SEQUENCE {
+	psRectifierIndex Integer32,
+	psRectifierProductNumber DisplayString,
+	psRectifierHWVersion DisplayString,
+	psRectifierSWVersion DisplayString,
+	psRectifierSerialNumber DisplayString,
+	psRectifierCurrent Integer32,
+	psRectifierIdent DisplayString,
+	psRectifierFail StatusChange
+	}
+
+psRectifierIndex OBJECT-TYPE
+  SYNTAX Integer32(1..16777215)
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "Automatically generated index object."
+::= { psRectifierEntry 1 }
+
+psRectifierProductNumber OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Rectifier Product Number."
+::= { psRectifierEntry 2}
+
+psRectifierHWVersion OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Rectifier Hardware Revision."
+::= { psRectifierEntry 3}
+
+psRectifierSWVersion OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Rectifier Software Revision."
+::= { psRectifierEntry 4}
+
+psRectifierSerialNumber OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Rectifier Serial Number."
+::= { psRectifierEntry 5}
+
+psRectifierCurrent OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Rectifier Current."
+::= { psRectifierEntry 6}
+
+psRectifierIdent OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Rectifier physical location identifier."
+::= { psRectifierEntry 7}
+
+psRectifierFail OBJECT-TYPE
+        SYNTAX StatusChange
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "
+	The type of alarm change. One of
+	(1) activated
+	(2) deactivated"
+::= { psRectifierEntry 8}
+
+-- ------------------------------------------------------------------------ 
+-- 1.2.12. the Distribution
+-- ------------------------------------------------------------------------ 
+
+psDistribution OBJECT IDENTIFIER ::= { system 12 }
+
+psTotalLoadCurrent OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "
+		Total Load current, stored as mA.
+		The integer 2147483647 represents invalid value."
+	::= { psDistribution 1 }
+    psDistributionLoadTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF PSDistributionLoadEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION     
+                "Distribution Table."
+    ::= { psDistribution 2 }
+    
+    psDistributionLoadEntry OBJECT-TYPE
+        SYNTAX PSDistributionLoadEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Distribution Measurement Table Entry."
+        INDEX { psDistributionLoadIndex }
+    ::= { psDistributionLoadTable 1 }
+
+    PSDistributionLoadEntry ::= SEQUENCE {
+        psDistributionLoadIndex               Integer32,
+        psDistributionLoadCurrent         	  Integer32,
+        psDistributionLoadName		  DisplayString	
+    }
+
+    psDistributionLoadIndex OBJECT-TYPE
+        SYNTAX		  Integer32(1..268386303)
+        MAX-ACCESS              not-accessible
+        STATUS                  current
+        DESCRIPTION
+                "Automatically generated index object."
+    ::= { psDistributionLoadEntry 1 }
+
+    psDistributionLoadCurrent OBJECT-TYPE
+        SYNTAX 		  Integer32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+                "Distribution current in mA."
+    ::= { psDistributionLoadEntry 2 }
+
+    psDistributionLoadName OBJECT-TYPE
+        SYNTAX 		  DisplayString
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+                "Distribution name."
+    ::= { psDistributionLoadEntry 3 }
+
+    psDistributionGeneralTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF PSDistributionGeneralEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION     
+                "Distribution Table."
+    ::= { psDistribution 3 }
+    
+    psDistributionGeneralEntry OBJECT-TYPE
+        SYNTAX PSDistributionGeneralEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Distribution Measurement Table Entry."
+        INDEX { psDistributionGeneralIndex }
+    ::= { psDistributionGeneralTable 1 }
+
+    PSDistributionGeneralEntry ::= SEQUENCE {
+        psDistributionGeneralIndex               Integer32,
+        psDistributionGeneralCurrent         	  Integer32,
+        psDistributionGeneralName		  DisplayString	
+    }
+
+    psDistributionGeneralIndex OBJECT-TYPE
+        SYNTAX		  Integer32(1..268386303)
+        MAX-ACCESS              not-accessible
+        STATUS                  current
+        DESCRIPTION
+                "Automatically generated index object."
+    ::= { psDistributionGeneralEntry 1 }
+
+    psDistributionGeneralCurrent OBJECT-TYPE
+        SYNTAX 		  Integer32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+                "Distribution current in mA."
+    ::= { psDistributionGeneralEntry 2 }
+
+    psDistributionGeneralName OBJECT-TYPE
+        SYNTAX 		  DisplayString
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+                "Distribution name."
+    ::= { psDistributionGeneralEntry 3 }
+
+-- ------------------------------------------------------------------------ 
+-- 1.2.13. Converter group
+-- ------------------------------------------------------------------------ 
+
+psConverter OBJECT IDENTIFIER ::= { system 13 }
+
+numberOfInstalledConverters OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "
+		number of converters, stored as integer.
+		The integer 2147483647 represents invalid value."
+	::= { psConverter 1 }
+
+numberOfConvertersCommunicating OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "
+		number of converters communicating, stored as integer.
+		The integer 2147483647 represents invalid value."
+	::= { psConverter 2 }
+
+convertersUsedCapacity OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "
+		Used capacity, stored as % of the total capacity.
+		The integer 2147483647 represents invalid value."
+	::= { psConverter 3 }
+
+psConverterVoltage OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "
+		Converter voltage in mV.
+		The integer 2147483647 represents invalid value."
+	::= { psConverter 4 }
+
+psTotalConverterCurrent OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "
+		Total Converter current in mA.
+		The integer 2147483647 represents invalid value."
+	::= { psConverter 5 }
+
+psConverterTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF PSConverterEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "
+		Table holding information about indivual converters."
+	::= { psConverter 6 }
+
+psConverterEntry OBJECT-TYPE
+	SYNTAX PSConverterEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "
+		An entry (conceptual row) in the ConverterInfoTable."
+	INDEX { psConverterIndex }
+	::= { psConverterTable 1 }
+
+PSConverterEntry ::= SEQUENCE {
+	psConverterIndex Integer32,
+	psConverterProductNumber DisplayString,
+	psConverterHWVersion DisplayString,
+	psConverterSWVersion DisplayString,
+	psConverterSerialNumber DisplayString,
+	psConverterCurrent Integer32,
+          psConverterIdent DisplayString,
+          psConverterFail StatusChange	}
+
+psConverterIndex OBJECT-TYPE
+  SYNTAX Integer32(1..100)
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "Automatically generated index object."
+::= { psConverterEntry 1 }
+
+psConverterProductNumber OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Converter Product Number."
+::= { psConverterEntry 2}
+
+psConverterHWVersion OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Converter Hardware Revision."
+::= { psConverterEntry 3}
+
+psConverterSWVersion OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Converter Software Revision."
+::= { psConverterEntry 4}
+
+psConverterSerialNumber OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Converter Serial Number."
+::= { psConverterEntry 5}
+
+psConverterCurrent OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Converter Current."
+::= { psConverterEntry 6}
+
+psConverterIdent OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Converter physical location identifier."
+::= { psConverterEntry 7}
+
+psConverterFail OBJECT-TYPE
+        SYNTAX StatusChange
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "
+	The type of alarm change. One of
+	(1) activated
+	(2) deactivated"
+::= { psConverterEntry 8}
+
+-- ------------------------------------------------------------------------ 
+-- 1.2.14. Control group
+-- ------------------------------------------------------------------------ 
+
+psControl OBJECT IDENTIFIER ::= { system 14 }
+
+controlBatteryTest OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "
+		Control battery test, start(1), stop(0)."
+	::= { psControl 1 }
+
+controlRelay8 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "
+		Control relay8, close(1), open(0)."
+	::= { psControl 2 }
+
+controlRelay7 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "
+		Control relay7, close(1), open(0)."
+	::= { psControl 3 }
+
+controlRelay6 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "
+		Control relay6, close(1), open(0)."
+	::= { psControl 4 }
+
+controlRelayTest OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "
+		Control Relay test, auto(2), manual(1), disabled(0)."
+	::= { psControl 5 }
+
+-- ------------------------------------------------------------------------ 
+-- 1.2.15. EquipmentSignalTable
+-- ------------------------------------------------------------------------ 
+
+psEquipmentSignalTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF EquipmentSignalTableEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "
+		Table of indexed equipment signal values."
+	::= { system 15 }
+
+equipmentSignalTableEntry OBJECT-TYPE
+	SYNTAX EquipmentSignalTableEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "
+		An entry (conceptual row) in the psEquipment Signal Table."
+	INDEX { psEquipmentSignalTableEntryIndex }
+	::= { psEquipmentSignalTable 1 }
+
+EquipmentSignalTableEntry ::= SEQUENCE {
+	psEquipmentSignalTableEntryIndex Integer32,
+	psEquipmentSignalValue Integer32 }
+
+psEquipmentSignalTableEntryIndex OBJECT-TYPE
+	SYNTAX Integer32(1..268386303)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "
+		The unique sequence number of this equipment signal."
+	::= { equipmentSignalTableEntry 1 }
+
+psEquipmentSignalValue OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "
+		Indexed equipment signal value."
+	::= { equipmentSignalTableEntry 2 }
+
+-- ------------------------------------------------------------------------ 
+-- 1.2.16. Setting group
+-- ------------------------------------------------------------------------ 
+
+psSetting OBJECT IDENTIFIER ::= { system 16 }
+
+settingFloatVoltage OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "
+		Float voltage stored as mV"
+	::= { psSetting 1 }
+
+settingEQChargeVoltage OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "
+		Equalize charge voltage stored as mV"
+	::= { psSetting 6 }
+
+settingBatteryCurrentLimit OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "
+		Battery charge current limit stored as thousandths of C10"
+	::= { psSetting 7 }
+
+settingResetBatteryCapacity OBJECT-TYPE
+        SYNTAX INTEGER  {
+	    yes(1)
+	}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "
+            Reset Battery Capacity, 
+		Voltage(1)"
+	::= { psSetting 8 }
+	
+settingAutoEqualize OBJECT-TYPE
+        SYNTAX INTEGER  {
+	    disabled(0),
+	    enabled(1)
+	}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "
+            Automatic Equalize, 
+		disabled(0),
+		enabled(1)"
+	::= { psSetting 9 }
+
+settingEQStartCurrent OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "
+		Equalize start current stored as thousandths of C10(0.04 to 0.08)"
+	::= { psSetting 10 }
+
+settingEQStartCapacity OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+                "Auto Equalize start capacity in percent(0 - 99)."
+	::= { psSetting 11 }
+
+settingEQStopCurrent OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "
+		Equalize stop current stored as thousandths of C10(0.002 to 0.02)"
+	::= { psSetting 12 }
+
+settingEQStopDelay OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "
+		Equalize stop delay time stored as minutes."
+	::= { psSetting 13 }
+
+settingMaxEQChargeTime OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "
+		Maximum Equalize charge time stored as minutes."
+	::= { psSetting 14 }
+
+settingSolarMode OBJECT-TYPE
+        SYNTAX INTEGER  {
+	    disabled(0),
+	    rect-solar(1),
+	    solar(2)
+	}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "
+            Solar mode, 
+		Disabled(0),
+		RECT-SOLAR(1),
+		Solar(2)"
+	::= { psSetting 15 }
+
+settingSolarFloatVoltage OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "
+		Solar Float voltage stored as mV"
+	::= { psSetting 16 }
+
+settingSolarEQChargeVoltage OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "
+		Solar Equalize voltage stored as mV"
+	::= { psSetting 17 }
+	
+settingRectifierFloatVoltage OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "
+		Rectifier Float voltage stored as mV"
+	::= { psSetting 18 }
+
+settingRectifierEQChargeVoltage OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "
+		Rectifier Equalize voltage stored as mV"
+	::= { psSetting 19 }
+	
+settingGeneratorFunction OBJECT-TYPE
+        SYNTAX INTEGER  {
+	    disabled(0),
+	    voltage(1),
+	    batteryCapacity(2)
+	}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "
+            Automatic Generator Control, 
+		Disabled(0),
+		Voltage(1),
+		BatteryCapacity(2)"
+	::= { psSetting 20 }
+
+settingGeneratorStartVoltage OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "
+		Generator start voltage stored in mV"
+	::= { psSetting 21 }
+	
+settingGeneratorManualStart OBJECT-TYPE
+        SYNTAX INTEGER  {
+	    disabled(0),
+	    active(1)
+	}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "
+		Generator Manual Start,
+		    Disabled(0),
+		    Active(1)"
+	::= { psSetting 22 }
+
+settingGeneratorStartCapacity OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "
+		Battery capacity in % * 1000"
+	::= { psSetting 23 }
+	
+settingDIforGenerator OBJECT-TYPE
+        SYNTAX INTEGER  {
+	    none(0),
+	    di2(1),
+	    di3(2),
+	    di4(3),
+	    di5(4),
+	    di6(5),
+	    di7(6)
+	}    
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "
+		Digital input for Generator,
+		    None(0),
+		    DI2(1),
+		    DI3(2),
+		    DI4(3),
+		    DI5(4),
+		    DI6(5),
+		    DI7(6)"
+	::= { psSetting 24 }
+
+settingUtilityPowerPresent OBJECT-TYPE
+        SYNTAX INTEGER  {
+	    no(0),
+	    yes(1)
+	}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "
+		Utility Power is present,
+		    No(0),
+		    Yes(1)"
+	::= { psSetting 25 }
+
+
+
+	
+------------------------------------------------------------
+-- Alarm trap counter { powerMIB 3 }
+------------------------------------------------------------
+
+alarmLastTrapNo OBJECT-TYPE
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "
+		The sequence number of last submitted alarm trap,
+		also last row in alarmTrapTable."
+	::= { powerMIB 3 }
+
+------------------------------------------------------------
+-- Active Alarm table { powerMIB 4 }
+------------------------------------------------------------
+
+alarmActiveAlarmTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF ActiveAlarmEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "
+		Table holding information about the currently active alarms."
+	::= { powerMIB 4 }
+
+activeAlarmEntry OBJECT-TYPE
+	SYNTAX ActiveAlarmEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "
+		An entry (conceptual row) in the alarmTrapTable."
+	INDEX { alarmIndex }
+	::= { alarmActiveAlarmTable 1 }
+
+ActiveAlarmEntry ::= SEQUENCE {
+	alarmIndex Counter32,
+	alarmTime DateAndTime,
+	alarmStatusChange StatusChange,
+	alarmSeverity Status,
+	alarmDescription DisplayString,
+	alarmType Integer32 }
+
+alarmIndex OBJECT-TYPE
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "
+		The unique sequence number of this alarm trap."
+	::= { activeAlarmEntry 1 }
+
+alarmTime OBJECT-TYPE
+	SYNTAX DateAndTime
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "
+		Date and time when event occured (local time), including
+		timezone if supported by controller."
+	::= { activeAlarmEntry 2 }
+
+alarmStatusChange OBJECT-TYPE
+	SYNTAX StatusChange
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "
+		The type of alarm change. One of
+		(1) activated
+		(2) deactivated"
+	::= { activeAlarmEntry 3 }
+
+alarmSeverity OBJECT-TYPE
+	SYNTAX Status
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "
+		The severity of the alarm. One of
+		(3) warning - OA, lowest level of alarm severity
+		(4) minor - A3
+		(5) major - MA
+		(6) critical - CA, highest level of alarm severity"
+	::= { activeAlarmEntry 4 }
+
+alarmDescription OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "
+		Free-text description of alarm."
+	::= { activeAlarmEntry 5 }
+
+alarmType OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "
+		Alarm type, i.e. an integer specifying the type of alarm."
+	::= { activeAlarmEntry 6 }
+
+------------------------------------------------------------
+-- Events/traps { powerMIB 5 }
+------------------------------------------------------------
+
+powerEvents OBJECT IDENTIFIER ::= { powerMIB 5 }
+
+alarmTrap NOTIFICATION-TYPE
+	OBJECTS {
+		alarmIndex,
+		alarmTime,
+		alarmStatusChange,
+		alarmSeverity,
+		alarmDescription,
+		alarmType }
+	STATUS current
+	DESCRIPTION "
+		An alarm trap is sent when an alarm occurs (activated) or
+		returns to normal state (deactivated). Alarm traps are logged
+		in alarmTrapTable. Variables in this trap:
+		* alarmIndex - The unique sequence number of this alarm trap.
+		* alarmTime - Date and time when event occured (local time),
+		      including timezone if supported by controller.
+		* alarmStatusChange - (1) activated or (2) deactivated.
+		* alarmSeverity - Integer describing the severity of the alarm.
+		* alarmDescription - Free-text description of alarm.
+		* alarmType - Integer indicating type of alarm."
+	::= { powerEvents 1 }
+
+alarmActiveTrap NOTIFICATION-TYPE
+	OBJECTS {
+		alarmTime,
+		alarmSeverity,
+		alarmDescription,
+		alarmType }
+	STATUS current
+	DESCRIPTION "
+		An alarm trap is sent when an alarm occurs (activated)
+		Variables in this trap
+		* alarmTime - Date and time when event occured (local time),
+		      including timezone if supported by controller.
+		* alarmSeverity - Integer describing the severity of the alarm.
+		* alarmDescription - Free-text description of alarm.
+		* alarmType - Integer indicating type of alarm."
+	::= { powerEvents 2 }
+
+alarmCeaseTrap NOTIFICATION-TYPE
+	OBJECTS {
+		alarmTime,
+		alarmSeverity,
+		alarmDescription,
+		alarmType }
+	STATUS current
+	DESCRIPTION "
+		An alarm trap is sent when an alarm returns to normal state (clear, deactivated). 
+                Variables in this trap:
+		* alarmTime - Date and time when event occured (local time),
+		      including timezone if supported by controller.
+		* alarmSeverity - Integer describing the severity of the alarm.
+		* alarmDescription - Free-text description of alarm.
+		* alarmType - Integer indicating type of alarm."
+	::= { powerEvents 3 }
+
+------------------------------------------------------------
+-- End of MIB definitions
+------------------------------------------------------------
+
+END
