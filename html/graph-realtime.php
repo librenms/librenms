@@ -10,6 +10,7 @@
  * @license    BSD
  */
 
+use App\Facades\DeviceCache;
 use App\Models\Port;
 
 $init_modules = ['web', 'auth'];
@@ -17,7 +18,7 @@ require realpath(__DIR__ . '/..') . '/includes/init.php';
 
 if (is_numeric($_GET['id']) && (Config::get('allow_unauth_graphs') || port_permitted($_GET['id']))) {
     $port = cleanPort(Port::find($_GET['id']));
-    $device = device_by_id_cache($port['device_id']);
+    $device = DeviceCache::get($port->device_id);
     $title = generate_device_link($device);
     $title .= ' :: Port  ' . generate_port_link($port);
     $auth = true;
@@ -29,8 +30,8 @@ if (is_numeric($_GET['id']) && (Config::get('allow_unauth_graphs') || port_permi
 header('Content-type: image/svg+xml');
 
 /********** HTTP GET Based Conf ***********/
-$ifnum = @$port['ifIndex'];  // BSD / SNMP interface name / number
-$ifname = $port['label']; //Interface name that will be showed on top right of graph
+$ifnum = $port->ifIndex;  // BSD / SNMP interface name / number
+$ifname = $port->label; //Interface name that will be showed on top right of graph
 $hostname = shorthost($device['hostname']);
 
 if (isset($_GET['title'])) {

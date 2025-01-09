@@ -117,10 +117,10 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
                 $remote_device_id = discover_new_device($lldp['lldpRemSysName'], $device, 'LLDP', $interface);
             }
 
-            if ($interface['port_id'] && $lldp['lldpRemSysName'] && $lldp['lldpRemPortId']) {
+            if ($interface->port_id && $lldp['lldpRemSysName'] && $lldp['lldpRemPortId']) {
                 $remote_port_id = find_port_id($lldp['lldpRemPortDesc'], $lldp['lldpRemPortId'], $remote_device_id);
                 discover_link(
-                    $interface['port_id'],
+                    $interface->port_id,
                     'lldp',
                     $remote_port_id,
                     $lldp['lldpRemSysName'],

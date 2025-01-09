@@ -36,7 +36,7 @@ Log::debug('exists');
 
 $rrd_filename = $filename;
 $port = cleanPort(Port::find($acc['port_id']));
-$device = DeviceCache::get($port['device_id']);
+$device = DeviceCache::get($port->device_id);
 $title = generate_device_link($device);
 $title .= ' :: Port  ' . generate_port_link($port);
 $title .= ' :: ' . Mac::parse($acc['mac'])->readable();
