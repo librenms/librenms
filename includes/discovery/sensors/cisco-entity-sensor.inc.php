@@ -1,5 +1,6 @@
-<?php
+<?php:wq!
 
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 if ($device['os_group'] == 'cisco') {
@@ -26,7 +27,7 @@ if ($device['os_group'] == 'cisco') {
         $port['ifIndex'] = $index;
         $port_reverse_array[$port['ifName']] = $port;
     }
-    d_echo($port_reverse_array);
+    Log::debug($port_reverse_array);
 
     echo '  entSensorType';
     $oids = snmpwalk_cache_multi_oid($device, 'entSensorType', $oids, 'CISCO-ENTITY-SENSOR-MIB');
@@ -47,18 +48,20 @@ if ($device['os_group'] == 'cisco') {
     echo ' entSensorThresholdValue';
     $t_oids = snmpwalk_cache_twopart_oid($device, 'entSensorThresholdValue', $t_oids, 'CISCO-ENTITY-SENSOR-MIB');
 
-    d_echo($oids);
+    Log::debug($oids);
 
-    $entitysensor['voltsDC'] = 'voltage';
-    $entitysensor['voltsAC'] = 'voltage';
-    $entitysensor['amperes'] = 'current';
-    $entitysensor['watt'] = 'power';
-    $entitysensor['hertz'] = 'freq';
-    $entitysensor['percentRH'] = 'humidity';
-    $entitysensor['rpm'] = 'fanspeed';
-    $entitysensor['celsius'] = 'temperature';
-    $entitysensor['watts'] = 'power';
-    $entitysensor['dBm'] = 'dbm';
+    $entitysensor = [
+        'voltsDC' => 'voltage',
+        'voltsAC' => 'voltage',
+        'amperes' => 'current',
+        'watt' => 'power',
+        'hertz' => 'freq',
+        'percentRH' => 'humidity',
+        'rpm' => 'fanspeed',
+        'celsius' => 'temperature',
+        'watts' => 'power',
+        'dBm' => 'dbm',
+    ];
 
     if (is_array($oids)) {
         foreach ($oids as $index => $entry) {
@@ -91,41 +94,18 @@ if ($device['os_group'] == 'cisco') {
                 $current = $entry['entSensorValue'];
                 $type = $entitysensor[$entry['entSensorType']];
 
-                // echo("$index : ".$entry['entSensorScale']."|");
-                // FIXME this stuff is foul
-                if ($entry['entSensorScale'] == 'nano') {
-                    $divisor = '1000000000';
-                    $multiplier = '1';
-                }
-
-                if ($entry['entSensorScale'] == 'micro') {
-                    $divisor = '1000000';
-                    $multiplier = '1';
-                }
-
-                if ($entry['entSensorScale'] == 'milli') {
-                    $divisor = '1000';
-                    $multiplier = '1';
-                }
-
-                if ($entry['entSensorScale'] == 'units') {
-                    $divisor = '1';
-                    $multiplier = '1';
-                }
-
-                if ($entry['entSensorScale'] == 'kilo') {
-                    $divisor = '1';
-                    $multiplier = '1000';
-                }
-
-                if ($entry['entSensorScale'] == 'mega') {
-                    $divisor = '1';
-                    $multiplier = '1000000';
-                }
-
-                if ($entry['entSensorScale'] == 'giga') {
-                    $divisor = '1';
-                    $multiplier = '1000000000';
+                $scaleTable = [
+                    'nano'  => ['divisor' => 1000000000, 'multiplier' => 1],
+                    'micro' => ['divisor' => 1000000, 'multiplier' => 1],
+                    'milli' => ['divisor' => 1000, 'multiplier' => 1],
+                    'units' => ['divisor' => 1, 'multiplier' => 1],
+                    'kilo'  => ['divisor' => 1, 'multiplier' => 1000],
+                    'mega'  => ['divisor' => 1, 'multiplier' => 1000000],
+                    'giga'  => ['divisor' => 1, 'multiplier' => 1000000000],
+                ];
+                if (isset($scaleTable[$entry['entSensorScale']])) {
+                    $divisor = $scaleTable[$entry['entSensorScale']]['divisor'];
+                    $multiplier = $scaleTable[$entry['entSensorScale']]['multiplier'];
                 }
 
                 if (is_numeric($entry['entSensorPrecision'])
@@ -217,7 +197,7 @@ if ($device['os_group'] == 'cisco') {
                     }
                     if ($tmp_ifindex != 0) {
                         $tmp_port = get_port_by_index_cache($device['device_id'], $tmp_ifindex);
-                        if (is_array($tmp_port)) {
+                        if ($tmp_port) {
                             $entPhysicalIndex = $tmp_ifindex;
                             $entry['entSensorMeasuredEntity'] = 'ports';
                             $group = 'transceiver';

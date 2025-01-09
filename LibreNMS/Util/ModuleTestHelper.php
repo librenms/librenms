@@ -26,6 +26,7 @@
 namespace LibreNMS\Util;
 
 use App\Actions\Device\ValidateDeviceAndCreate;
+use App\Facades\DeviceCache as FacadesDeviceCache;
 use App\Jobs\PollDevice;
 use App\Models\Device;
 use DeviceCache;

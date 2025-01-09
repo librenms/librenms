@@ -151,7 +151,7 @@ function get_port_rrdfile_path($hostname, $port_id, $suffix = '')
     return Rrd::name($hostname, Rrd::portName($port_id, $suffix));
 }
 
-function get_port_by_index_cache($device_id, $ifIndex)
+function get_port_by_index_cache(int $device_id, string $ifIndex): ?Port
 {
     global $port_index_cache;
 

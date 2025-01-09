@@ -44,7 +44,7 @@ if (empty($hostname)) {
 }
 
 if ($hostname !== 'all') {
-    $hostname = ! ctype_digit($hostname) ? $hostname : DeviceCache::get($hostname)->hostname;
+    $hostname = ! ctype_digit($hostname) ? $hostname : DeviceCache::get($hostname)->value('hostname');
 }
 
 if (empty($hostname)) {

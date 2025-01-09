@@ -28,6 +28,7 @@ namespace LibreNMS\Util;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class Mac
 {
@@ -41,12 +42,12 @@ class Mac
             // strings without delimiters must have 12 characters
             if (! preg_match('/^[0-9a-f]{0,11}$/', $mac)) {
                 $this->mac = [
-                    str_pad($matches[1], 2, '0', STR_PAD_LEFT),
-                    str_pad($matches[2], 2, '0', STR_PAD_LEFT),
-                    str_pad($matches[3], 2, '0', STR_PAD_LEFT),
-                    str_pad($matches[4], 2, '0', STR_PAD_LEFT),
-                    str_pad($matches[5], 2, '0', STR_PAD_LEFT),
-                    str_pad($matches[6], 2, '0', STR_PAD_LEFT),
+                    Str::padLeft($matches[1], 2, '0'),
+                    Str::padLeft($matches[2], 2, '0'),
+                    Str::padLeft($matches[3], 2, '0'),
+                    Str::padLeft($matches[4], 2, '0'),
+                    Str::padLeft($matches[5], 2, '0'),
+                    Str::padLeft($matches[6], 2, '0'),
                 ];
             }
         }
