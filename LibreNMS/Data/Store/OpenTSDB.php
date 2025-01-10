@@ -35,18 +35,17 @@ class OpenTSDB extends BaseDatastore
 {
     /** @var \Socket\Raw\Socket */
     protected $connection;
+    private $config;
 
-    public function __construct(\Socket\Raw\Factory $socketFactory)
+    public function __construct(\Socket\Raw\Factory $socketFactory, Config $config = null)
     {
         parent::__construct();
-        $host = Config::get('opentsdb.host');
-        $port = Config::get('opentsdb.port', 2181);
-        try {
-            if (self::isEnabled() && $host && $port) {
-                $this->connection = $socketFactory->createClient("$host:$port");
-            }
-        } catch (\Socket\Raw\Exception $e) {
-            Log::debug('OpenTSDB Error: ' . $e->getMessage());
+        $this->config = $config ?? new Config();
+        $host = $this->config::get('opentsdb.host');
+        $port = $this->config::get('opentsdb.port', 2181);
+
+        if ($this->shouldConnect()) {
+            $this->connection = $socketFactory->createClient("$host:$port");
         }
 
         if ($this->connection) {
@@ -84,7 +83,7 @@ class OpenTSDB extends BaseDatastore
             return;
         }
 
-        $flag = Config::get('opentsdb.co');
+        $flag = $this->config::get('opentsdb.co');
         $timestamp = Carbon::now()->timestamp;
         $tmp_tags = 'hostname=' . $device['hostname'];
 
@@ -144,5 +143,12 @@ class OpenTSDB extends BaseDatastore
     public function wantsRrdTags()
     {
         return false;
+    }
+
+    private function shouldConnect()
+    {
+        return $this->config::get('opentsdb.enable', false) &&
+            $this->config::get('opentsdb.host') &&
+            $this->config::get('opentsdb.port', 2181);
     }
 }
