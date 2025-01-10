@@ -77,7 +77,7 @@ if ($vlanversion == 'version1' || $vlanversion == '2') {
             if ($vlan_data['vlan_name'] != $jet_vlan_data['dot1qVlanDescription']) {
                 $vlan_upd['vlan_name'] = $jet_vlan_data['dot1qVlanDescription'];
                 dbUpdate($vlan_upd, 'vlans', '`vlan_id` = ?', [$vlan_data['vlan_id']]);
-                Eventlog::log("VLAN $vlan_id changed name {$vlan_data['vlan_name']} -> " . $jet_vlan_data['dot1qVlanDescription'], $device, 'vlan');
+                Eventlog::log("VLAN $vlan_id changed name {$vlan_data['vlan_name']} -> " . $jet_vlan_data['dot1qVlanDescription'], $device['device_id'], 'vlan');
                 echo 'U';
             } else {
                 echo '.';
@@ -91,7 +91,7 @@ if ($vlanversion == 'version1' || $vlanversion == '2') {
                 'vlan_type' => null,
             ], 'vlans');
 
-            Eventlog::log('VLAN added: ' . $jet_vlan_data['dot1qVlanDescription'] . ", $jet_vlan_id", $device, 'vlan');
+            Eventlog::log('VLAN added: ' . $jet_vlan_data['dot1qVlanDescription'] . ", $jet_vlan_id", $device['device_id'], 'vlan');
             echo '+';
         }
         $device['vlans'][$vtpdomain_id][$jet_vlan_id] = $jet_vlan_id;
