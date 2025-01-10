@@ -8,6 +8,8 @@
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
 
+use App\Models\Device;
+use App\Models\Eventlog;
 use App\Models\StateTranslation;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
@@ -70,11 +72,6 @@ function logfile($string)
     fclose($fd);
 }
 
-function percent_colour($perc)
-{
-    return \LibreNMS\Util\Color::percent(percent: $perc);
-}
-
 /**
  * @param  $device
  * @return string the path to the icon image for this device.  Close to square.
@@ -109,19 +106,19 @@ function renamehost($id, $new, $source = 'console')
     $new_rrd_dir = Rrd::dirFromHost($new);
 
     if (is_dir($new_rrd_dir)) {
-        log_event("Renaming of $host failed due to existing RRD folder for $new", $id, 'system', 5);
+        Eventlog::log("Renaming of $host failed due to existing RRD folder for $new", $id, 'system', Severity::Error);
 
         return "Renaming of $host failed due to existing RRD folder for $new\n";
     }
 
     if (! is_dir($new_rrd_dir) && rename(Rrd::dirFromHost($host), $new_rrd_dir) === true) {
         dbUpdate(['hostname' => $new, 'ip' => null], 'devices', 'device_id=?', [$id]);
-        log_event("Hostname changed -> $new ($source)", $id, 'system', 3);
+        Eventlog::log("Hostname changed -> $new ($source)", $id, 'system', Severity::Notice);
 
         return '';
     }
 
-    log_event("Renaming of $host failed", $id, 'system', 5);
+    Eventlog::log("Renaming of $host failed", $id, 'system', Severity::Error);
 
     return "Renaming of $host failed\n";
 }
@@ -217,25 +214,6 @@ function snmp2ipv6($ipv6_snmp)
     return implode(':', $ipv6_2);
 }
 
-/**
- * Log events to the event table
- *
- * @param  string  $text  message describing the event
- * @param  array|int  $device  device array or device_id
- * @param  string  $type  brief category for this event. Examples: sensor, state, stp, system, temperature, interface
- * @param  int  $severity  1: ok, 2: info, 3: notice, 4: warning, 5: critical, 0: unknown
- * @param  int  $reference  the id of the referenced entity.  Supported types: interface
- */
-function log_event($text, $device = null, $type = null, $severity = 2, $reference = null)
-{
-    // handle legacy device array
-    if (is_array($device) && isset($device['device_id'])) {
-        $device = $device['device_id'];
-    }
-
-    \App\Models\Eventlog::log($text, $device, $type, Severity::tryFrom((int) $severity) ?? Severity::Info, $reference);
-}
-
 function hex2str($hex)
 {
     $string = '';
@@ -286,12 +264,12 @@ function is_port_valid($port, $device)
     $ifType = $port['ifType'];
     $ifOperStatus = $port['ifOperStatus'] ?? '';
 
-    if (str_i_contains($ifDescr, Config::getOsSetting($device['os'], 'good_if', Config::get('good_if')))) {
+    if (Str::contains($ifDescr, Config::getOsSetting($device['os'], 'good_if', Config::get('good_if')), ignoreCase: true)) {
         return true;
     }
 
     foreach (Config::getCombined($device['os'], 'bad_if') as $bi) {
-        if (str_i_contains($ifDescr, $bi)) {
+        if (Str::contains($ifDescr, $bi, ignoreCase: true)) {
             d_echo("ignored by ifDescr: $ifDescr (matched: $bi)\n");
 
             return false;
@@ -376,22 +354,6 @@ function port_fill_missing_and_trim(&$port, $device)
     }
 }
 
-function validate_device_id($id)
-{
-    if (empty($id) || ! is_numeric($id)) {
-        $return = false;
-    } else {
-        $device_id = dbFetchCell('SELECT `device_id` FROM `devices` WHERE `device_id` = ?', [$id]);
-        if ($device_id == $id) {
-            $return = true;
-        } else {
-            $return = false;
-        }
-    }
-
-    return $return;
-}
-
 function convert_delay($delay)
 {
     if (preg_match('/(\d+)([mhd]?)/', $delay, $matches)) {
@@ -430,29 +392,14 @@ function fix_integer_value($value)
 
 /**
  * Checks if the $hostname provided exists in the DB already
- *
- * @param  string  $hostname  The hostname to check for
- * @param  string  $sysName  The sysName to check
- * @return bool true if hostname already exists
- *              false if hostname doesn't exist
  */
-function host_exists($hostname, $sysName = null)
+function host_exists(string $hostname, ?string $sysName = null): bool
 {
-    $query = 'SELECT COUNT(*) FROM `devices` WHERE `hostname`=?';
-    $params = [$hostname];
-
-    if (! empty($sysName) && ! Config::get('allow_duplicate_sysName')) {
-        $query .= ' OR `sysName`=?';
-        $params[] = $sysName;
-
-        if (! empty(Config::get('mydomain'))) {
-            $full_sysname = rtrim($sysName, '.') . '.' . Config::get('mydomain');
-            $query .= ' OR `sysName`=?';
-            $params[] = $full_sysname;
-        }
-    }
-
-    return dbFetchCell($query, $params) > 0;
+    return Device::where('hostname', $hostname)
+        ->when(! empty($sysName), function ($query) use ($sysName) {
+            $query->when(! Config::get('allow_duplicate_sysName'), fn ($q) => $q->orWhere('sysName', $sysName))
+                  ->when(! empty(Config::get('mydomain')), fn ($q) => $q->orWhere('sysName', rtrim($sysName, '.') . '.' . Config::get('mydomain')));
+        })->exists();
 }
 
 /**

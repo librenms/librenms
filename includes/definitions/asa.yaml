@@ -34,4 +34,4 @@ discovery_modules:
 discovery:
     -
         sysDescr_regex:
-            - '/^Cisco Adaptive Security Appliance/'
+            - '/^Cisco (Adaptive|Industrial) Security Appliance/'
