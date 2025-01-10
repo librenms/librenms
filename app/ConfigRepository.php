@@ -25,7 +25,6 @@
 
 namespace App;
 
-use App\Models\Callback;
 use App\Models\GraphType;
 use Exception;
 use Illuminate\Database\QueryException;
