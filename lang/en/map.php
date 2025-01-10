@@ -90,6 +90,7 @@ return [
                 'zoom' => 'Pan and Zoom',
                 'dragnodes' => 'Move Nodes',
                 'physics' => 'Physics Engine',
+                'link_bulge' => 'Link Bulging',
             ],
             'node' => [
                 'new' => 'New Node',
