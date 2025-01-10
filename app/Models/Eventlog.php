@@ -52,7 +52,7 @@ class Eventlog extends DeviceRelatedModel
      * @param  Severity  $severity  1: ok, 2: info, 3: notice, 4: warning, 5: critical, 0: unknown
      * @param  int|string|null  $reference  the id of the referenced entity.  Supported types: interface
      */
-    public static function log(string $text, Device|int|null $device = null,string $type = null, Severity $severity = Severity::Info, int|string|null $reference = null): void
+    public static function log(string $text, Device|int|null $device = null, string $type = null, Severity $severity = Severity::Info, int|string|null $reference = null): void
     {
         $model = app()->make(Eventlog::class);
         $model->_log($text, $device, $type, $severity, $reference);
@@ -61,7 +61,7 @@ class Eventlog extends DeviceRelatedModel
     /**
      * Log events to the event table
      */
-    public function _log(string $text, Device|int|null $device = null,string $type = null, Severity $severity = Severity::Info, int|string|null $reference = null): void
+    public function _log(string $text, Device|int|null $device = null, string $type = null, Severity $severity = Severity::Info, int|string|null $reference = null): void
     {
         $log = new static([
             'reference' => $reference,
