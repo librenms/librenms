@@ -113,7 +113,7 @@ if (count($added_databases) > 0 || count($removed_databases) > 0) {
     if (count($removed_databases)) {
         $log_message .= ' Removed ' . implode(',', $removed_databases);
     }
-    Eventlog::log($log_message, $device, 'application');
+    Eventlog::log($log_message, $device['device_id'], 'application');
 }
 
 update_application($app, $postgres, $metrics);

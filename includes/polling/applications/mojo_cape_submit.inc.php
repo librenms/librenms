@@ -103,11 +103,11 @@ foreach ($app_data['slugs'] as $slug => $slug_data) {
 }
 
 if ($data['totals']['hash_changed'] >= 1) {
-    Eventlog::log('Mojo Cape Submit has recieved submissions with changed hashes: ' . json_encode($data['changed_hashes']), $device, 'application', Severity::Error);
+    Eventlog::log('Mojo Cape Submit has recieved submissions with changed hashes: ' . json_encode($data['changed_hashes']), $device['device_id'], 'application', Severity::Error);
 }
 
 if (isset($new_slugs[0])) {
-    Eventlog::log('Mojo Cape Submit has seen one or more new slugs: ' . json_encode($new_slugs), $device, 'application', Severity::Ok);
+    Eventlog::log('Mojo Cape Submit has seen one or more new slugs: ' . json_encode($new_slugs), $device['device_id'], 'application', Severity::Ok);
 }
 
 uasort($app_data['slugs'], function ($a, $b) {

@@ -15,7 +15,7 @@ foreach ($vlans as $vlan_id => $vlan) {
         if ($vlan_data['vlan_name'] != $vlan['vlanDescription']) {
             $vlan_upd['vlan_name'] = $vlan['vlanDescription'];
             dbUpdate($vlan_upd, 'vlans', '`vlan_id` = ?', [$vlan_data['vlan_id']]);
-            Eventlog::log("VLAN $vlan_id changed name {$vlan_data['vlan_name']} -> {$vlan['vlanDescription']} ", $device, 'vlan', Severity::Notice, $vlan_data['vlan_id']);
+            Eventlog::log("VLAN $vlan_id changed name {$vlan_data['vlan_name']} -> {$vlan['vlanDescription']} ", $device['device_id'], 'vlan', Severity::Notice, $vlan_data['vlan_id']);
             echo 'U';
         } else {
             echo '.';

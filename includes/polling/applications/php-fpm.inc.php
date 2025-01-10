@@ -128,7 +128,7 @@ if (count($added_pools) > 0 || count($removed_pools) > 0) {
     $log_message = 'Suricata Instance Change:';
     $log_message .= count($added_pools) > 0 ? ' Added ' . implode(',', $added_pools) : '';
     $log_message .= count($removed_pools) > 0 ? ' Removed ' . implode(',', $added_pools) : '';
-    Eventlog::log($log_message, $device, 'application');
+    Eventlog::log($log_message, $device['device_id'], 'application');
 }
 
 $app->data = $new_app_data;

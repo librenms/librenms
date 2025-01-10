@@ -84,7 +84,7 @@ foreach ($ss_section_list as $gen_type) {
         array_push($allowed_afs, $gen_type);
     } else {
         $log_message = 'Socket Statistics Invalid Socket or AF Returned by Script: ' . $gen_type;
-        Eventlog::log($log_message, $device, 'application');
+        Eventlog::log($log_message, $device['device_id'], 'application');
         continue;
     }
 
@@ -114,7 +114,7 @@ foreach ($ss_section_list as $gen_type) {
                 $log_message = 'Secure Sockets Polling Warning: Invalid data returned by ';
                 $log_message .= 'application for socket ' . 'type ' . $gen_type . ' with socket ';
                 $log_message .= 'state' . $socket_state . '.';
-                Eventlog::log($log_message, $device, 'application');
+                Eventlog::log($log_message, $device['device_id'], 'application');
                 continue;
             }
             $rrd_def->addDataset($field_name, 'GAUGE', 0);
@@ -136,7 +136,7 @@ foreach ($ss_section_list as $gen_type) {
                 array_push($allowed_sockets, $netid);
             } else {
                 $log_message = 'Socket Statistics Invalid Socket Returned by Script: ' . $gen_type;
-                Eventlog::log($log_message, $device, 'application');
+                Eventlog::log($log_message, $device['device_id'], 'application');
                 continue;
             }
 
@@ -163,7 +163,7 @@ foreach ($ss_section_list as $gen_type) {
                     $log_message = 'Secure Sockets Polling Warning: Invalid data returned by ';
                     $log_message .= 'application for socket ' . 'type ' . $gen_type . ' with ';
                     $log_message .= 'netid ' . $netid . ' and socket state' . $socket_state . '.';
-                    Eventlog::log($log_message, $device, 'application');
+                    Eventlog::log($log_message, $device['device_id'], 'application');
                     continue;
                 }
                 $rrd_def->addDataset($field_name, 'GAUGE', 0);
@@ -192,7 +192,7 @@ if (count($added_sockets) > 0 || count($removed_sockets) > 0) {
     $log_message = 'Socket Statistics Allowed Sockets Change:';
     $log_message .= count($added_sockets) > 0 ? ' Added ' . implode(',', $added_sockets) : '';
     $log_message .= count($removed_sockets) > 0 ? ' Removed ' . implode(',', $removed_sockets) : '';
-    Eventlog::log($log_message, $device, 'application');
+    Eventlog::log($log_message, $device['device_id'], 'application');
 }
 
 // Check for address family changes.
@@ -202,7 +202,7 @@ if (count($added_afs) > 0 || count($removed_afs) > 0) {
     $log_message = 'Socket Statistics Allowed Address Families Change:';
     $log_message .= count($added_afs) > 0 ? ' Added ' . implode(',', $added_afs) : '';
     $log_message .= count($removed_afs) > 0 ? ' Removed ' . implode(',', $removed_afs) : '';
-    Eventlog::log($log_message, $device, 'application');
+    Eventlog::log($log_message, $device['device_id'], 'application');
 }
 
 $app->data = $updated_app_data;

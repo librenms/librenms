@@ -50,7 +50,7 @@ $fields = [
 ];
 
 if (isset($data['last_errors']) && isset($data['last_errors'][0])) {
-    Eventlog::log('suricata_extract_submit errors found: ' . json_encode($data['last_errors']), $device, 'application', Severity::Error);
+    Eventlog::log('suricata_extract_submit errors found: ' . json_encode($data['last_errors']), $device['device_id'], 'application', Severity::Error);
 }
 
 $tags = [

@@ -280,7 +280,7 @@ data_update($device, 'app', $tags, $metrics);
 // save clustername upon changes and log it post initial set
 if (isset($app->data['cluster'])) {
     if ($app->data['cluster'] != $returned['data']['cluster_name']) {
-        Eventlog::log('Elastic/Opensearch: Cluster name changed to "' . $returned['data']['cluster_name'] . '"', $device, 'application');
+        Eventlog::log('Elastic/Opensearch: Cluster name changed to "' . $returned['data']['cluster_name'] . '"', $device['device_id'], 'application');
 
         // save the found cluster name
         $app->data = ['cluster' => $returned['data']['cluster_name']];

@@ -333,9 +333,9 @@ if (isset($zfs['health'])) {
     $health = $zfs['health'];
     if ($old_health != $zfs['health']) {
         if ($zfs['health'] == 1) {
-            Eventlog::log('ZFS pool(s) now healthy', $device, 'application', Severity::Ok);
+            Eventlog::log('ZFS pool(s) now healthy', $device['device_id'], 'application', Severity::Ok);
         } else {
-            Eventlog::log('ZFS pool(s) DEGRADED, FAULTED, UNAVAIL, REMOVED, or unknown', $device, 'application', Severity::Error);
+            Eventlog::log('ZFS pool(s) DEGRADED, FAULTED, UNAVAIL, REMOVED, or unknown', $device['device_id'], 'application', Severity::Error);
         }
     }
 } else {
@@ -346,7 +346,7 @@ if (isset($zfs['health'])) {
 $old_l2_errors = $app->data['l2_errors'] ?? 0;
 if (isset($zfs['l2_errors'])) {
     if ($old_l2_errors != $zfs['l2_errors']) {
-        Eventlog::log('ZFS L2 cache has experienced errors', $device, 'application', Severity::Error);
+        Eventlog::log('ZFS L2 cache has experienced errors', $device['device_id'], 'application', Severity::Error);
     }
 }
 
@@ -360,7 +360,7 @@ if (count($added_pools) > 0 || count($removed_pools) > 0) {
     $log_message = 'ZFS Pool Change:';
     $log_message .= count($added_pools) > 0 ? ' Added ' . implode(',', $added_pools) : '';
     $log_message .= count($removed_pools) > 0 ? ' Removed ' . implode(',', $added_pools) : '';
-    Eventlog::log($log_message, $device, 'application');
+    Eventlog::log($log_message, $device['device_id'], 'application');
 }
 
 // update the app data
