@@ -16,11 +16,6 @@ modules:
                 precision: 1
                 descr: 'Heap'
                 class: Heap
-                skip_values:
-                    - # Skip on esp8266 as its unsupported
-                        oid: ESPHOME-ESP8266-SNMP-MIB::chipType
-                        op: '='
-                        value: 8266
             - # SPI RAM If Attached
                 oid: HOST-RESOURCES-MIB::hrStorage
                 total: HOST-RESOURCES-MIB::hrStorageSize
