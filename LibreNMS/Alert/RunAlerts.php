@@ -193,7 +193,7 @@ class RunAlerts
         $obj['uid'] = $alert['id'];
         $obj['alert_id'] = $alert['alert_id'];
         $obj['severity'] = $alert['severity'];
-        $obj['rule'] = $alert['rule'] ?: json_encode($alert['builder']);
+        $obj['rule'] = $alert['rule_id'] ?: json_encode($alert['builder']);
         $obj['name'] = $alert['name'];
         $obj['timestamp'] = $alert['time_logged'];
         $obj['contacts'] = $extra['contacts'];
