@@ -154,7 +154,6 @@ nav:
     - First steps:
       - Adding a device: Support/Adding-a-Device.md
       - Grouping Devices: Extensions/Device-Groups.md
-      - Submitting stats: General/Callback-Stats-and-Privacy.md
       - Migrating from Observium: Installation/Migrating-from-Observium.md
 
   - Setup:

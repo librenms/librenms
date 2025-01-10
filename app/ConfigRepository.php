@@ -457,9 +457,6 @@ class ConfigRepository
         if (! $this->has('snmp.unescape')) {
             $this->persist('snmp.unescape', version_compare((new Version($this))->netSnmp(), '5.8.0', '<'));
         }
-        if (! $this->has('reporting.usage')) {
-            $this->persist('reporting.usage', (bool) Callback::get('enabled'));
-        }
 
         // populate legacy DB credentials, just in case something external uses them.  Maybe remove this later
         $this->populateLegacyDbCredentials();
