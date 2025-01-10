@@ -36,6 +36,7 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessUtilizationDiscovery;
 use LibreNMS\Interfaces\Polling\Sensors\WirelessFrequencyPolling;
 use LibreNMS\OS;
+use LibreNMS\Util\Number;
 use SnmpQuery;
 
 class Arubaos extends OS implements
@@ -162,7 +163,7 @@ class Arubaos extends OS implements
 
     protected function decodeChannel($channel)
     {
-        return cast_number($channel) & 255; // mask off the channel width information
+        return Number::cast($channel) & 255; // mask off the channel width information
     }
 
     private function discoverInstantRadio($type, $oid, $desc = 'Radio %s')
