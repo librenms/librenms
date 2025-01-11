@@ -328,7 +328,9 @@ if ($device['os'] === 'f5' && (version_compare($device['version'], '11.2.0', '>=
 }
 
 $os_file = base_path("includes/polling/ports/os/{$device['os']}.inc.php");
+d_echo($device['os']);
 if (file_exists($os_file)) {
+    d_echo('true: $os_file');
     require $os_file;
 }
 
