@@ -1237,6 +1237,6 @@ Alert sent to:
 @endif
 ```
 
-| Config | Example |
-| ------ | ------- |
-| WebHook URL | <https://www.zenduty.com/api/integration/librenms/integration-key/> |
+| Config | Example                                                      |
+| ------ |--------------------------------------------------------------|
+| WebHook URL | <https://events.zenduty.com/integration/we8jv/generic/hash/> |
