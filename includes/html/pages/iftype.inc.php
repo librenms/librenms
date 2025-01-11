@@ -1,6 +1,9 @@
 <table class="table table-condensed table-hover table-striped">
 <?php
 
+use App\Models\Port;
+use LibreNMS\Util\Url;
+
 if ($bg == '#ffffff') {
     $bg = '#e5e5e5';
 } else {
@@ -49,7 +52,8 @@ if ($if_list) {
         unset($class);
         $port['ifAlias'] = str_ireplace($port['type'] . ': ', '', $port['ifAlias']);
         $port['ifAlias'] = str_ireplace('[PNI]', 'Private', $port['ifAlias']);
-        $ifclass = ifclass($port['ifOperStatus'], $port['ifAdminStatus']);
+
+        $ifclass = Url::portLinkDisplayClass((object)['ifOperStatus' => $port['ifOperStatus'], 'ifAdminStatus' => $port['ifAdminStatus']]);
         if ($bg == '#ffffff') {
             $bg = '#e5e5e5';
         } else {
