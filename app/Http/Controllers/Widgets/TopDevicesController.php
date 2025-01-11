@@ -38,7 +38,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 use LibreNMS\Util\Html;
-use LibreNMS\Util\StringHelpers;
 use LibreNMS\Util\Url;
 use LibreNMS\Util\Validate;
 
