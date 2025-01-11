@@ -192,12 +192,6 @@ function get_device_id_by_port_id($port_id)
     }
 }
 
-function ifclass($ifOperStatus, $ifAdminStatus)
-{
-    // fake a port model
-    return \LibreNMS\Util\Url::portLinkDisplayClass((object) ['ifOperStatus' => $ifOperStatus, 'ifAdminStatus' => $ifAdminStatus]);
-}
-
 function device_by_name($name)
 {
     return device_by_id_cache(getidbyname($name));
@@ -253,11 +247,6 @@ function zeropad($num, $length = 2)
 function set_dev_attrib($device, $attrib_type, $attrib_value)
 {
     return DeviceCache::get((int) $device['device_id'])->setAttrib($attrib_type, $attrib_value);
-}
-
-function get_dev_attribs($device_id)
-{
-    return DeviceCache::get((int) $device_id)->getAttribs();
 }
 
 function get_dev_attrib($device, $attrib_type)

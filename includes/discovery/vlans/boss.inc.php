@@ -19,7 +19,7 @@ if ($device['os'] == 'boss') {
             if ($vlan_data['vlan_name'] != $vlan['rcVlanName']) {
                 $vlan_upd['vlan_name'] = $vlan['rcVlanName'];
                 dbUpdate($vlan_upd, 'vlans', '`vlan_id` = ?', [$vlan_data['vlan_id']]);
-                Eventlog::log("VLAN $vlan_id changed name {$vlan_data['vlan_name']} -> {$vlan['rcVlanName']} ", $device, 'vlan', Severity::Notice, $vlan_data['vlan_id']);
+                Eventlog::log("VLAN $vlan_id changed name {$vlan_data['vlan_name']} -> {$vlan['rcVlanName']} ", $device['device_id'], 'vlan', Severity::Notice, $vlan_data['vlan_id']);
                 echo 'U';
             } else {
                 echo '.';

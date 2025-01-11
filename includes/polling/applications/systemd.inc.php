@@ -124,7 +124,7 @@ foreach ($systemd_mapper as $state_type => $state_statuses) {
                 $state_status .
                 ' state status: ' .
                 $field_value;
-            Eventlog::log($log_message, $device, 'application');
+            Eventlog::log($log_message, $device['device_id'], 'application');
             continue;
         }
 
