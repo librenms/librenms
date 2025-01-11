@@ -5,13 +5,8 @@ icon: esphome
 mib_dir: esphome
 snmp_bulk: false
 over:
+    - { graph: device_mempool, text: 'Memory Usage' }
     - { graph: device_dbm, text: 'Wifi RSSI' }
 discovery:
     - sysDescr:
           - 'ESPHome'
-poller_modules:
-    sensors: true
-    mempools: true
-discovery_modules:
-    sensors: true
-    mempools: true
