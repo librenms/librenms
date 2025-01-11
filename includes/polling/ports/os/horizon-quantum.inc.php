@@ -1,12 +1,14 @@
 <?php
 
-$hzqtm_stats = snmpwalk_group($device, 'hzQtmEnetPortConfigTable', 'DRAGONWAVE-HORIZON-QUANTUM-MIB', 2);
-$hzqtm_stats = snmpwalk_group($device, 'hzQtmEnetPortStatsTable', 'DRAGONWAVE-HORIZON-QUANTUM-MIB', 2, $hzqtm_stats);
+$hzqtm_stats = snmpwalk_group($device, 'hzQtmEnetPortConfigTable', 'DRAGONWAVE-HORIZON-QUANTUM-MIB');
+$hzqtm_stats = snmpwalk_group($device, 'hzQtmEnetPortStatsTable', 'DRAGONWAVE-HORIZON-QUANTUM-MIB', 1, $hzqtm_stats);
+$hzqtm_stats = snmpwalk_group($device, 'hzQtmEnetPortStatusTable', 'DRAGONWAVE-HORIZON-QUANTUM-MIB', 1, $hzqtm_stats);
 
 d_echo($hzqtm_stats);
 
 $required = [
     'ifName' => 'hzQtmEnetPortName',
+    'ifDescr' => 'hzQtmEnetPortName',
     'ifMtu' => 'hzQtmEnetPortMaxFrameSize',
     'ifInOctets' => 'hzQtmEnetPortRxBytes',
     'ifOutOctets' => 'hzQtmEnetPortTxBytes',
@@ -17,22 +19,21 @@ $required = [
 ];
 
 $hzqtmPortSpeed = [
-    1 => '10000000',
-    2 => '100000000',
-    3 => '1000000000',
-    4 => '1000000000',
+    1 => ['10000000', '10'],
+    2 => ['100000000', '100'],
+    3 => ['1000000000', '1000'],
+    4 => ['1000000000', '1000'],
 ];
 
-$hzqtm_ports = [];
+
 foreach ($hzqtm_stats as $index => $port) {
     foreach ($required as $key => $val) {
-        $hzqtm_ports[$index][$key] = $hzqtm_stats[$index][$val];
+        $port_stats[$port['hzQtmEnetPortIndex']][$key] = $hzqtm_stats[$index][$val];
     }
-    $hzqtm_ports[$index]['ifDescr'] = $port['ifName'];
-    $hzqtm_ports[$index]['ifType'] = 'ethernetCsmacd';
-    $hzqtm_ports[$index]['ifOperStatus'] = $port['hzQtmEnetPortLinkStatus'] == 1 ? 'up' : 'down';
-    $hzqtm_ports[$index]['ifAdminStatus'] = $port['hzQtmEnetPortAdminState'] == 1 ? 'up' : 'down';
-    $hzqtm_ports[$index]['ifSpeed'] = $hzqtmPortSpeed[$port['hzQtmEnetPortSpeed']];
+    $port_stats[$port['hzQtmEnetPortIndex']]['ifOperStatus'] = $port['hzQtmEnetPortLinkStatus'] == 2 ? 'up' : 'down';
+    $port_stats[$port['hzQtmEnetPortIndex']]['ifAdminStatus'] = $port['hzQtmEnetPortAdminState'] == 1 ? 'up' : 'down';
+    $port_stats[$port['hzQtmEnetPortIndex']]['ifSpeed'] = $hzqtmPortSpeed[$port['hzQtmEnetPortSpeed']][0];
+    $port_stats[$port['hzQtmEnetPortIndex']]['ifHighSpeed'] = $hzqtmPortSpeed[$port['hzQtmEnetPortSpeed']][1];
 }
-$port_stats = array_replace_recursive($hzqtm_ports, $port_stats);
-unset($hzqtm_ports);
+
+unset($hzqtm_stats);
