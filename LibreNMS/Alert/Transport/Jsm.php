@@ -6,7 +6,7 @@ use LibreNMS\Alert\Transport;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
 use LibreNMS\Util\Http;
 
-class Jiraservicemanagement extends Transport
+class Jsm extends Transport
 {
     protected string $name = 'Jira Service Management';
 
