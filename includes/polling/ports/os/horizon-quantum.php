@@ -3,6 +3,8 @@
 $hzqtm_stats = snmpwalk_group($device, 'hzQtmEnetPortConfigTable', 'DRAGONWAVE-HORIZON-QUANTUM-MIB', 2);
 $hzqtm_stats = snmpwalk_group($device, 'hzQtmEnetPortStatsTable', 'DRAGONWAVE-HORIZON-QUANTUM-MIB', 2, $hzqtm_stats);
 
+d_echo($hzqtm_stats);
+
 $required = [
     'ifName' => 'hzQtmEnetPortName',
     'ifMtu' => 'hzQtmEnetPortMaxFrameSize',
