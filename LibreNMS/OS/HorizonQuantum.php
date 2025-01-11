@@ -69,13 +69,13 @@ class HorizonQuantum extends OS implements WirelessSnrDiscovery, WirelessPowerDi
         $data = snmpwalk_group($this->getDeviceArray(), 'hzQtmModemRxSpeed', 'DRAGONWAVE-HORIZON-QUANTUM-MIB');
         $sensors = [];
         foreach ($data as $index => $rate_value) {
-            if ($errors_value['hzQtmModemRxSpeed'] != '-99') {
+            if ($rate_value['hzQtmModemRxSpeed'] != '-99') {
                 $sensors[] = new WirelessSensor('errors', $this->getDeviceId(), '.1.3.6.1.4.1.7262.2.4.5.2.1.1.6.' . $index, 'horizon-quantum' . $index, 'Rx rate radio ' . $index , $rate_value['hzQtmModemRxSpeed'], 1, 10);
             }
         }
         $data = snmpwalk_group($this->getDeviceArray(), 'hzQtmModemTxSpeed', 'DRAGONWAVE-HORIZON-QUANTUM-MIB');
         foreach ($data as $index => $rate_value) {
-            if ($errors_value['hzQtmModemTxSpeed'] != '-99') {
+            if ($rate_value['hzQtmModemTxSpeed'] != '-99') {
                 $sensors[] = new WirelessSensor('errors', $this->getDeviceId(), '.1.3.6.1.4.1.7262.2.4.5.2.1.1.7.' . $index, 'horizon-quantum' . $index, 'Tx rate radio ' . $index , $rate_value['hzQtmModemTxSpeed'], 1, 10);
             }
         }
