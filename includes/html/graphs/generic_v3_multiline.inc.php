@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Str;
+
 require 'includes/html/graphs/common.inc.php';
 
 if ($width > '500') {
@@ -13,7 +15,7 @@ if ($printtotal === 1) {
     $unitlen += '2';
 }
 
-$unit_text = str_pad(truncate($unit_text, $unitlen), $unitlen);
+$unit_text = Str::of($unit_text)->limit($unitlen, '')->padRight($unitlen);
 
 if ($width > '500') {
     $rrd_options .= " COMMENT:'" . substr(str_pad($unit_text, $descr_len + 10), 0, $descr_len + 10) . "Now         Min         Max        Avg\l'";

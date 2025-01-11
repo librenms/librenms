@@ -222,21 +222,6 @@ function device_by_id_cache($device_id, $refresh = false)
     return $device;
 }
 
-function truncate($substring, $max = 50, $rep = '...')
-{
-    if (strlen($substring) < 1) {
-        $string = $rep;
-    } else {
-        $string = $substring;
-    }
-    $leave = $max - strlen($rep);
-    if (strlen($string) > $max) {
-        return substr_replace($string, $rep, $leave);
-    } else {
-        return $string;
-    }
-}
-
 function gethostbyid($device_id)
 {
     return DeviceCache::get((int) $device_id)->hostname;

@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Str;
+
 require 'includes/html/graphs/common.inc.php';
 
 $unitlen = $unitlen ?? 0;
@@ -26,7 +28,7 @@ if ($nototal) {
     $unitlen += 2;
 }
 
-$unit_text = str_pad(truncate($unit_text, $unitlen), $unitlen);
+$unit_text = Str::of($unit_text)->limit($unitlen, '')->padRight($unitlen);
 
 $colour_iter = 0;
 foreach ($rrd_list as $i => $rrd) {
