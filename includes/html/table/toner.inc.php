@@ -15,6 +15,7 @@
  * @author     LibreNMS Contributors
 */
 
+use Illuminate\Support\Facades\Auth;
 use LibreNMS\Util\StringHelpers;
 
 $graph_type = 'toner_usage';
@@ -55,7 +56,7 @@ if ($rowCount != -1) {
 }
 
 foreach (dbFetchRows($sql, $param) as $toner) {
-    if (device_permitted($toner['device_id'])) {
+    if (Auth::user()->canAccessDevice($toner['device_id'])) {
         $perc = $toner['supply_current'];
         $type = $toner['supply_type'];
 

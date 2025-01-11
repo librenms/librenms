@@ -35,6 +35,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use LibreNMS\Alerting\QueryBuilderParser;
@@ -144,7 +145,7 @@ function check_bill_permission($bill_id, $callback)
 
 function check_device_permission($device_id, $callback = null)
 {
-    if (! device_permitted($device_id)) {
+    if (! Auth::user()->canAccessDevice($device_id)) {
         return api_error(403, 'Insufficient permissions to access this device');
     }
 
@@ -153,7 +154,7 @@ function check_device_permission($device_id, $callback = null)
 
 function check_port_permission($port_id, $device_id, $callback)
 {
-    if (! device_permitted($device_id) && ! port_permitted($port_id, $device_id)) {
+    if (! Auth::user()->canAccessDevice($device_id) && ! port_permitted($port_id, $device_id)) {
         return api_error(403, 'Insufficient permissions to access this port');
     }
 

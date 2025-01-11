@@ -237,7 +237,7 @@ if ($format == 'graph') {
             $row_colour = \LibreNMS\Config::get('list_colour.odd');
         }
 
-        if (device_permitted($device['device_id'])) {
+        if (Auth::user()->canAccessDevice($device['device_id'])) {
             $graph_type = 'device_' . $subformat;
 
             if (session('widescreen')) {

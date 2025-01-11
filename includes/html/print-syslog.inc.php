@@ -1,6 +1,8 @@
 <?php
 
-if (device_permitted($entry['device_id'])) {
+use Illuminate\Support\Facades\Auth;
+
+if (Auth::user()->canAccessDevice($entry['device_id'])) {
     $syslog_output .= '<tr>';
 
     // Stop shortening hostname. Issue #61

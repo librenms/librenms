@@ -11,6 +11,7 @@
  */
 
 use App\Facades\DeviceCache;
+use Illuminate\Support\Facades\Auth;
 use LibreNMS\Config;
 use LibreNMS\Enum\ImageFormat;
 use LibreNMS\Util\Number;
@@ -93,20 +94,11 @@ function port_permitted($port_id, $device_id = null)
         $device_id = get_device_id_by_port_id($port_id);
     }
 
-    if (device_permitted($device_id)) {
+    if (Auth::user()->canAccessDevice($device_id)) {
         return true;
     }
 
     return \Permissions::canAccessPort($port_id, Auth::id());
-}
-
-function device_permitted($device_id)
-{
-    if (Auth::user() && Auth::user()->hasGlobalRead()) {
-        return true;
-    }
-
-    return \Permissions::canAccessDevice($device_id, Auth::id());
 }
 
 function alert_layout($severity)
@@ -954,7 +946,7 @@ function get_oxidized_nodes_list()
 
     foreach ($data as $object) {
         $device = device_by_name($object['name']);
-        if (! device_permitted($device['device_id'])) {
+        if (! Auth::user()->canAccessDevice($device['device_id'])) {
             //user cannot see this device, so let's skip it.
             continue;
         }

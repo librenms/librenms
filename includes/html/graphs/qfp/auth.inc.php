@@ -12,6 +12,8 @@
  * @author     Pavle Obradovic <pobradovic08@gmail.com>
  */
 
+use Illuminate\Support\Facades\Auth;
+
 /*
  * Get a single module component with specified ID
  */
@@ -31,7 +33,7 @@ if (isset($vars['id'])) {
     /*
      * Check if component exists and we're authenticated
      */
-    if ($components && isset($components[$device_id][$vars['id']]) && ($auth || device_permitted($device_id))) {
+    if ($components && isset($components[$device_id][$vars['id']]) && ($auth || Auth::user()->canAccessDevice($device_id))) {
         $components = $components[$device_id][$vars['id']];
         $device = device_by_id_cache($device_id);
 

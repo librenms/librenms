@@ -1,9 +1,11 @@
 <?php
 
+use Illuminate\Support\Facades\Auth;
+
 if (is_numeric($vars['id'])) {
     $service = dbFetchRow('SELECT * FROM services WHERE service_id = ?', [$vars['id']]);
 
-    if (is_numeric($service['device_id']) && ($auth || device_permitted($service['device_id']))) {
+    if (is_numeric($service['device_id']) && ($auth || Auth::user()->canAccessDevice($service['device_id']))) {
         $device = device_by_id_cache($service['device_id']);
 
         // This doesn't quite work for all yet.
