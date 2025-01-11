@@ -201,6 +201,15 @@ class StringHelpers
         return preg_replace($regex, '', str_replace("\n", '', $string));
     }
 
+    /**
+     * If string has a number at the start (excluding whitespace) that can be extraced by Number::cast()
+     */
+    public static function hasNumber(string $string): bool
+    {
+        return (bool) preg_match('/^\s*-?\d+(\.\d+)?/', $string);
+    }
+
+
     public static function isHex(string $string): bool
     {
         return (bool) preg_match('/^[a-f0-9][a-f0-9]( [a-f0-9][a-f0-9])*$/is', trim($string));

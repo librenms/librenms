@@ -28,6 +28,7 @@ namespace LibreNMS\Discovery\Yaml;
 use LibreNMS\Device\YamlDiscovery;
 use LibreNMS\Discovery\YamlDiscoveryDefinition;
 use LibreNMS\Util\Number;
+use LibreNMS\Util\StringHelpers;
 
 class YamlDiscoveryField
 {
@@ -53,7 +54,6 @@ class YamlDiscoveryField
             $yaml = [$key => $this->default];
         }
 
-
         if (empty($yaml[$key]) || is_numeric($yaml[$key])) {
             // if default is an empty or simple value, just set it
             $this->setValue($yaml[$key]);
@@ -61,7 +61,16 @@ class YamlDiscoveryField
             return;
         }
 
-        $this->setValue(YamlDiscovery::replaceValues($key, $index, $count, $yaml, $data));
+        $value = YamlDiscovery::replaceValues($key, $index, $count, $yaml, $data);
+
+        // oid is specifically looking for a number. So if it is not a number, return null
+        if ($this->isOid && ! StringHelpers::hasNumber($value)) {
+            $this->setValue(null);
+
+            return;
+        }
+
+        $this->setValue($value);
     }
 
     private function setValue(mixed $value): void
