@@ -6,7 +6,7 @@ modules:
             - ESPHOME-ESP8266-SNMP-MIB::chipRevision.0
         hardware_template: 'Model: {{ $ESPHOME-ESP8266-SNMP-MIB::chipModel.0 }} Revision: {{ $ESPHOME-ESP8266-SNMP-MIB::chipRevision.0 }}'
         version: SNMPv2-MIB::sysDescr.0
-        version_regex: '/(?<version>version [0-9]+\.[0-9]+\.[0-9]+)/'
+        version_regex: '/version (?<version>[^ ]+)/'
     mempools:
         data:
             - # Heap ESP32 only
