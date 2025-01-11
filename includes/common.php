@@ -192,12 +192,6 @@ function get_device_id_by_port_id($port_id)
     }
 }
 
-function ifclass($ifOperStatus, $ifAdminStatus)
-{
-    // fake a port model
-    return \LibreNMS\Util\Url::portLinkDisplayClass((object) ['ifOperStatus' => $ifOperStatus, 'ifAdminStatus' => $ifAdminStatus]);
-}
-
 function device_by_name($name)
 {
     return device_by_id_cache(getidbyname($name));
