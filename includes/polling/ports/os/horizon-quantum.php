@@ -28,8 +28,8 @@ foreach ($hzqtm_stats as $index => $port) {
     }
     $hzqtm_ports[$index]['ifDescr'] = $port['ifName'];
     $hzqtm_ports[$index]['ifType'] = 'ethernetCsmacd';
-    $hzqtm_ports[$index]['ifOperStatus'] = $port['hzQtmEnetPortLinkStatus'] == 1 ? 'up' : 'down');
-    $hzqtm_ports[$index]['ifAdminStatus'] = $port['hzQtmEnetPortAdminState'] == 1 ? 'up' : 'down');
+    $hzqtm_ports[$index]['ifOperStatus'] = $port['hzQtmEnetPortLinkStatus'] == 1 ? 'up' : 'down';
+    $hzqtm_ports[$index]['ifAdminStatus'] = $port['hzQtmEnetPortAdminState'] == 1 ? 'up' : 'down';
     $hzqtm_ports[$index]['ifSpeed'] = $hzqtmPortSpeed[$port['hzQtmEnetPortSpeed']];
 }
 $port_stats = array_replace_recursive($hzqtm_ports, $port_stats);
