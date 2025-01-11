@@ -64,6 +64,12 @@
                                 </div>
                             </div>
                             <div class="form-group row">
+                                <label for="mapopt-link_bulge" class="col-sm-3 control-label">{{ __('map.custom.edit.map.link_bulge') }}</label>
+                                <div class="col-sm-9">
+                                    <input class="form-check-input" type="checkbox" role="switch" id="mapopt-link_bulge">
+                                </div>
+                            </div>
+                            <div class="form-group row">
                                 <label for="mapopt-physics" class="col-sm-3 control-label">{{ __('map.custom.edit.map.physics') }}</label>
                                 <div class="col-sm-9">
                                     <input class="form-check-input" type="checkbox" role="switch" id="mapopt-physics">
