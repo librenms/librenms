@@ -52,7 +52,7 @@ class ZenDuty extends Transport
                     'link_url' => route('device', ['device' => $alert_data['device_id']]),
                     'link_text' => $alert_data['hostname'],
                 ],
-            ]
+            ],
         ];
 
         $tmp_msg = json_decode($alert_data['msg'], true);
