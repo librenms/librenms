@@ -111,10 +111,6 @@
     "name": "Device took too long to poll"
   },
   {
-    "rule": "macros.device_up = \"1\" && devices.os = \"asa\" && ciscoASA.data > \"5000\"",
-    "name": "Cisco ASA connections over 5000"
-  },
-  {
     "rule": "processors.processor_usage > \"85\" && macros.device_up = \"1\"",
     "name": "Processor usage over 85%"
   },

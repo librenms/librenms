@@ -10,7 +10,6 @@ over:
     - { graph: device_mempool, text: 'Memory Usage' }
 poller_modules:
     bgp-peers: false
-    cisco-asa-firewall: true
     cisco-cef: true
     cisco-mac-accounting: true
     cisco-remote-access-monitor: true

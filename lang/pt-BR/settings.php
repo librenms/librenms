@@ -1249,9 +1249,6 @@ return [
             'cisco-ace-serverfarms' => [
                 'description' => 'Serverfarms Cisco ACE',
             ],
-            'cisco-asa-firewall' => [
-                'description' => 'Firewall Cisco ASA',
-            ],
             'cisco-otv' => [
                 'description' => 'Cisco OTV',
             ],
