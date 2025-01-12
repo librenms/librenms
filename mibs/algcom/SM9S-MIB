@@ -1,0 +1,56 @@
+SM9S-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+DisplayString FROM RFC1213-MIB
+OBJECT-TYPE FROM RFC-1212
+enterprises FROM RFC1155-SMI;
+algcom OBJECT IDENTIFIER ::= { enterprises 49136 }
+SM9S OBJECT IDENTIFIER ::= { algcom 100 }
+sensorName OBJECT IDENTIFIER ::= { SM9S 1 }
+sensorDescription OBJECT IDENTIFIER ::= { SM9S 2 }
+sensorValue OBJECT IDENTIFIER ::= { SM9S 3 }
+sensorUnit OBJECT IDENTIFIER ::= { SM9S 4 }
+sensorThrMin OBJECT IDENTIFIER ::= { SM9S 5 }
+sensorThrMax OBJECT IDENTIFIER ::= { SM9S 6 }
+
+--ambientTemperature OBJECT IDENTIFIER ::= {sensorValue 1 }
+--ambientHumidity OBJECT IDENTIFIER ::= {sensorValue 4 }
+--acVoltage OBJECT IDENTIFIER ::= {sensorValue 5 }
+--dcVoltage OBJECT IDENTIFIER ::= {sensorValue 6 }
+--dryContactInput01 OBJECT IDENTIFIER ::= {sensorValue 10 }
+--dryContactInput02 OBJECT IDENTIFIER ::= {sensorValue 11 }
+--dryContactInput03 OBJECT IDENTIFIER ::= {sensorValue 12 }
+--digitalInput01 OBJECT IDENTIFIER ::= {sensorValue 26 }
+--relayOutput01 OBJECT IDENTIFIER ::= {sensorValue 31 }
+
+--desc01 OBJECT IDENTIFIER ::= {sensorDescription 1}
+--desc04 OBJECT IDENTIFIER ::= {sensorDescription 4}
+--desc05 OBJECT IDENTIFIER ::= {sensorDescription 5}
+--desc06 OBJECT IDENTIFIER ::= {sensorDescription 6}
+--desc10 OBJECT IDENTIFIER ::= {sensorDescription 10}
+--desc11 OBJECT IDENTIFIER ::= {sensorDescription 11}
+--desc12 OBJECT IDENTIFIER ::= {sensorDescription 12}
+--desc26 OBJECT IDENTIFIER ::= {sensorDescription 26}
+--desc31 OBJECT IDENTIFIER ::= {sensorDescription 31}
+
+--sensorValue OBJECT-TYPE
+--	SYNTAX	sensorValue
+--	MAX-ACCESS read-only
+--	STATUS current
+--	DESCRIPTION
+--	"raw sensor values"
+--	::= { SM9S 3 }
+--
+
+
+--sensorValue ::= SEQUENCE {
+--        ambientTemperature      Unsigned32,
+--        ambientHumidity         Unsigned32,
+--        acVoltage               Unsigned32,
+--        dcVoltage               Unsigned32,
+--        dryContactInput01       Unsigned32,
+--        dryContactInput02       Unsigned32,
+--        dryContactInput03       Unsigned32,
+--        digitalInput01          Unsigned32,
+--        relayOutput01           Unsigned32
+--}
+END
