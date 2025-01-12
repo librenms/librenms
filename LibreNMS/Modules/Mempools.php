@@ -62,7 +62,13 @@ class Mempools implements Module
             if ($mempool->isValid()) {
                 return true;
             }
-            Log::debug("Rejecting Mempool $mempool->mempool_index $mempool->mempool_descr: Invalid total value $mempool->mempool_total");
+
+            $reason = 'Not enough data';
+            if ($mempool->mempool_total <= 0) {
+                $reason = "Invalid total value $mempool->mempool_total";
+            }
+
+            Log::debug("Rejecting Mempool $mempool->mempool_index $mempool->mempool_descr: $reason");
             Log::info('x');
 
             return false;

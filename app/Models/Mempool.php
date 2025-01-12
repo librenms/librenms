@@ -48,7 +48,7 @@ class Mempool extends DeviceRelatedModel implements Keyable
 
     public function isValid(): bool
     {
-        return $this->mempool_total > 0;
+        return $this->mempool_total > 0 && $this->mempool_used !== null && $this->mempool_free !== null && $this->mempool_perc !== null;
     }
 
     public function fillUsage($used = null, $total = null, $free = null, $percent = null, $multiplier = null): self
