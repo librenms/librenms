@@ -26,9 +26,11 @@
 namespace LibreNMS\OS\Traits;
 
 use App\Models\Mempool;
+use App\Models\Storage;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Device\Processor;
+use LibreNMS\Util\Number;
 
 trait UcdResources
 {
@@ -123,6 +125,28 @@ trait UcdResources
         }
 
         return $mempools;
+    }
+
+    public function discoverStorage(): Collection
+    {
+        $disks = new Collection;
+        return \SnmpQuery::walk('UCD-SNMP-MIB::dskTable')->mapTable(function ($data, $index) {
+            $total = $data['UCD-SNMP-MIB::dskTotal'] * 1024;
+            $used = $data['UCD-SNMP-MIB::dskUsed'] * 1024;
+
+            return new Storage([
+                'type' => 'ucd-dsktable',
+                'storage_index' => $index,
+                'storage_type' => 'UcdDisk',
+                'storage_descr' => $data['UCD-SNMP-MIB::dskPath'],
+                'storage_size' => $total,
+                'storage_units' => 1024,
+                'storage_used' => $used,
+                'storage_used_oid' => '.1.3.6.1.4.1.2021.9.1.8.' . $index,
+                'storage_free' => $total - $used,
+                'storage_perc' => Number::calculatePercent($used, $total),
+            ]);
+        });
     }
 
     private function oidValid($data, $oid)
