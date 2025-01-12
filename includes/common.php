@@ -168,18 +168,6 @@ function get_port_by_ifIndex($device_id, $ifIndex)
     return dbFetchRow('SELECT * FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ?', [$device_id, $ifIndex]);
 }
 
-function get_port_by_id($port_id)
-{
-    if (is_numeric($port_id)) {
-        $port = dbFetchRow('SELECT * FROM `ports` WHERE `port_id` = ?', [$port_id]);
-        if (is_array($port)) {
-            return $port;
-        } else {
-            return false;
-        }
-    }
-}
-
 function get_device_id_by_port_id($port_id)
 {
     if (is_numeric($port_id)) {
@@ -233,11 +221,6 @@ function truncate($substring, $max = 50, $rep = '...')
 function gethostbyid($device_id)
 {
     return DeviceCache::get((int) $device_id)->hostname;
-}
-
-function getifbyid($id)
-{
-    return dbFetchRow('SELECT * FROM `ports` WHERE `port_id` = ?', [$id]);
 }
 
 function getidbyname($hostname)
