@@ -42,7 +42,7 @@ trait YamlStorageDiscovery
             ->addField(new YamlDiscoveryField('poller_type', 'type', $this->getName()))
             ->addField(new YamlDiscoveryField('type', 'storage_type', 'Storage'))
             ->addField(new YamlDiscoveryField('descr', 'storage_descr', 'Disk {{ $index }}'))
-            ->addField(new YamlDiscoveryField('units', 'storage_units', 1048576)) // TODO good default?
+            ->addField(new YamlDiscoveryField('units', 'storage_units', 1)) // 1 for percentage only storages
             ->addField(new OidField('size', 'storage_size', should_poll: false))
             ->addField(new OidField('used', 'storage_used'))
             ->addField(new OidField('free', 'storage_free', should_poll: function (YamlDiscoveryDefinition $def) {

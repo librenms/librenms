@@ -207,14 +207,20 @@ trait HostResources
 
         return collect($hr_storage)->filter(function ($storage) {
             if (empty($storage['hrStorageType'])) {
+                Log::debug('Host Resources: skipped storage due to missing hrStorageType');
+
                 return false;
             }
 
-            if (empty($storage['hrStorageUsed']) || $storage['hrStorageUsed'] < 0) {
+            if (! isset($storage['hrStorageUsed']) || $storage['hrStorageUsed'] < 0) {
+                Log::debug('Host Resources: skipped storage due to missing or negative hrStorageUsed');
+
                 return false;
             }
 
-            if (empty($storage['hrStorageSize']) || $storage['hrStorageSize'] < 0) {
+            if (! isset($storage['hrStorageSize']) || $storage['hrStorageSize'] <= 0) {
+                Log::debug('Host Resources: skipped storage due to missing, negative, or 0 hrStorageSize');
+
                 return false;
             }
 
