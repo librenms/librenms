@@ -118,7 +118,7 @@ class Oid
      *
      * @throws \LibreNMS\Exceptions\InvalidOidException
      */
-    public function toNumeric(string $mib = 'ALL', int $cache = 1800): string
+    public function toNumeric(string $mib = 'ALL'): string
     {
         if ($this->isNumeric()) {
             return $this->oid;
@@ -131,7 +131,8 @@ class Oid
 
         $key = 'Oid:toNumeric:' . $this->oid . '/' . $mib;
 
-        $numeric_oid = Cache::driver($cache === 0 ? 'null' : null)->remember($key, $cache, function () use ($mib) {
+        // only cache for this runtime
+        $numeric_oid = Cache::driver('array')->remember($key, null, function () use ($mib) {
             $snmpQuery = \SnmpQuery::numeric();
 
             if ($mib) {

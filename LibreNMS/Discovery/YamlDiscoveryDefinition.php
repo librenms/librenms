@@ -205,9 +205,15 @@ class YamlDiscoveryDefinition
                             $num_oid = $yaml[$field->key];
                             $num_oid_found = true;
                         } else {
-                            Log::critical("$yaml_num_oid_field_name should be added to the discovery yaml to increase discovery performance");
+                            Log::debug("$yaml_num_oid_field_name should be added to the discovery yaml to increase discovery performance");
                             try {
-                                $num_oid = Oid::of($yaml[$field->key] . '.' . $index)->toNumeric(cache: 0);  // don't cache because of idiotic vendors naming MIBs the same
+                                // if index is numeric, exclude it so we can cache the translation
+                                if (Oid::of($index)->isNumeric()) {
+                                    $num_oid = Oid::of($yaml[$field->key])->toNumeric() . '.' . $index;
+                                } else {
+                                    $num_oid = Oid::of($yaml[$field->key] . '.' . $index)->toNumeric();
+                                }
+
                                 $num_oid_found = true;
                             } catch (InvalidOidException $e) {
                                 Log::critical($e->getMessage());
