@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use LibreNMS\Data\Source\NetSnmpQuery;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\IPv4;
@@ -189,6 +190,11 @@ class Device extends BaseModel
         }
 
         return false; // no known snmpver
+    }
+
+    public function snmpQuery(): \LibreNMS\Data\Source\NetSnmpQuery
+    {
+        return NetSnmpQuery::make()->device($this);
     }
 
     /**

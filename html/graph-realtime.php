@@ -12,15 +12,14 @@
 
 use App\Facades\DeviceCache;
 use App\Models\Port;
+use LibreNMS\Util\Url;
 
 $init_modules = ['web', 'auth'];
 require realpath(__DIR__ . '/..') . '/includes/init.php';
 
 if (is_numeric($_GET['id']) && (Config::get('allow_unauth_graphs') || port_permitted($_GET['id']))) {
-    $port = cleanPort(Port::find($_GET['id']));
-    $device = DeviceCache::get($port->device_id);
-    $title = generate_device_link($device);
-    $title .= ' :: Port  ' . generate_port_link($port);
+    $port = cleanPort(Port::with('device')->find($_GET['id']));
+    $title = Url::deviceLink($port->device) . ' :: Port  ' . Url::portLink($port);
     $auth = true;
 } else {
     echo 'Unauthenticated';
@@ -32,7 +31,7 @@ header('Content-type: image/svg+xml');
 /********** HTTP GET Based Conf ***********/
 $ifnum = $port->ifIndex;  // BSD / SNMP interface name / number
 $ifname = $port->label; //Interface name that will be showed on top right of graph
-$hostname = shorthost($device['hostname']);
+$hostname = shorthost($port->device->hostname);
 
 if (isset($_GET['title'])) {
     $ifname = \LibreNMS\Util\Clean::html($_GET['title'], []);

@@ -8,27 +8,42 @@
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
 
-use App\Facades\DeviceCache;
 use App\Models\Port;
+use LibreNMS\Config;
+use LibreNMS\Util\Url;
 
 $init_modules = ['web', 'auth'];
 require realpath(__DIR__ . '/..') . '/includes/init.php';
 
-if (is_numeric($_GET['id']) && (\LibreNMS\Config::get('allow_unauth_graphs') || port_permitted($_GET['id']))) {
-    $port = cleanPort(Port::find($_GET['id']));
-    $device = DeviceCache::get($port->device_id);
-    $title = generate_device_link($device);
-    $title .= ' :: Port  ' . generate_port_link($port);
+if (is_numeric($_GET['id']) && (Config::get('allow_unauth_graphs') || port_permitted($_GET['id']))) {
+    $port = cleanPort(Port::with('device')->find($_GET['id']));
+    $title = Url::deviceLink($port->device) . ' :: Port  ' . Url::portLink($port);
     $auth = true;
 
-    $in = snmp_get($device, 'ifHCInOctets.' . $port->ifIndex, '-OUqnv', 'IF-MIB');
+    $in = $port->device->snmpQuery()
+            ->mibs(['IF-MIB'])
+            ->options('-OUqnv')
+            ->get('ifHCInOctets.' . $port->ifIndex)
+            ->value();
     if (empty($in)) {
-        $in = snmp_get($device, 'ifInOctets.' . $port->ifIndex, '-OUqnv', 'IF-MIB');
+        $in = $port->device->snmpQuery()
+            ->mibs(['IF-MIB'])
+            ->options('-OUqnv')
+            ->get('ifInOctets.' . $port->ifIndex)
+            ->value();
     }
 
-    $out = snmp_get($device, 'ifHCOutOctets.' . $port->ifIndex, '-OUqnv', 'IF-MIB');
+    $out = $port->device->snmpQuery()
+            ->mibs(['IF-MIB'])
+            ->options('-OUqnv')
+            ->get('ifHCOutOctets.' . $port->ifIndex)
+            ->value();
     if (empty($out)) {
-        $out = snmp_get($device, 'ifOutOctets.' . $port->ifIndex, '-OUqnv', 'IF-MIB');
+        $out = $port->device->snmpQuery()
+            ->mibs(['IF-MIB'])
+            ->options('-OUqnv')
+            ->get('ifOutOctets.' . $port->ifIndex)
+            ->value();
     }
 
     $time = microtime(true);
