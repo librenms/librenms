@@ -18,7 +18,17 @@ class HorizonQuantum extends OS implements WirelessSnrDiscovery, WirelessPowerDi
         $sensors = [];
         foreach ($data as $index => $snr_value) {
             if ($snr_value['hzQtmModemSNR'] != '-99') {
-                $sensors[] = new WirelessSensor('snr', $this->getDeviceId(), '.1.3.6.1.4.1.7262.2.4.5.2.1.1.8.' . $index, 'horizon-quantum' . $index, 'SNR radio ' . $index , $snr_value['hzQtmModemSNR'], 1, 10);
+                $sensors[] = new WirelessSensor(
+                    'snr',
+                    $this->getDeviceId(),
+                    '.1.3.6.1.4.1.7262.2.4.5.2.1.1.8.' . $index,
+                    'horizon-quantum',
+                    $index,
+                    'SNR radio ' . $index,
+                    null,
+                    1,
+                    10
+                );
             }
         }
 
@@ -31,7 +41,17 @@ class HorizonQuantum extends OS implements WirelessSnrDiscovery, WirelessPowerDi
         $sensors = [];
         foreach ($data as $index => $power_value) {
             if ($power_value['hzQtmRadioActualTransmitPowerdBm'] != '-99') {
-                $sensors[] = new WirelessSensor('power', $this->getDeviceId(), '.1.3.6.1.4.1.7262.2.4.5.4.1.1.19.' . $index, 'horizon-quantum' . $index, 'TX power radio ' . $index , $power_value['hzQtmRadioActualTransmitPowerdBm'], 1, 10);
+                $sensors[] = new WirelessSensor(
+                    'power',
+                    $this->getDeviceId(),
+                    '.1.3.6.1.4.1.7262.2.4.5.4.1.1.19.' . $index,
+                    'horizon-quantum',
+                    $index,
+                    'TX power radio ' . $index, 
+                    null,
+                    1,
+                    10
+                );
             }
         }
 
@@ -44,7 +64,17 @@ class HorizonQuantum extends OS implements WirelessSnrDiscovery, WirelessPowerDi
         $sensors = [];
         foreach ($data as $index => $rssi_value) {
             if ($rssi_value['hzQtmModemChannelizedRSL'] != '-99') {
-                $sensors[] = new WirelessSensor('rssi', $this->getDeviceId(), '.1.3.6.1.4.1.7262.2.4.5.2.1.1.3.' . $index, 'horizon-quantum' . $index, 'RSSI radio ' . $index , $rssi_value['hzQtmModemChannelizedRSL'], 1, 10);
+                $sensors[] = new WirelessSensor(
+                    'rssi',
+                    $this->getDeviceId(),
+                    '.1.3.6.1.4.1.7262.2.4.5.2.1.1.3.' . $index,
+                    'horizon-quantum',
+                    $index,
+                    'RSSI radio ' . $index,
+                    null,
+                    1,
+                    10
+                );
             }
         }
 
@@ -57,7 +87,17 @@ class HorizonQuantum extends OS implements WirelessSnrDiscovery, WirelessPowerDi
         $sensors = [];
         foreach ($data as $index => $errors_value) {
             if ($errors_value['hzQtmModemRxBlocksErrors'] != '-99') {
-                $sensors[] = new WirelessSensor('errors', $this->getDeviceId(), '.1.3.6.1.4.1.7262.2.4.5.4.1.1.19.' . $index, 'horizon-quantum' . $index, 'Rx Errors radio ' . $index , $errors_value['hzQtmModemRxBlocksErrors'], 1, 10);
+                $sensors[] = new WirelessSensor(
+                    'errors',
+                    $this->getDeviceId(),
+                    '.1.3.6.1.4.1.7262.2.4.5.4.1.1.19.' . $index,
+                    'horizon-quantum',
+                    $index,
+                    'Rx Errors radio ' . $index,
+                    null,
+                    1,
+                    10
+                );
             }
         }
 
@@ -70,13 +110,33 @@ class HorizonQuantum extends OS implements WirelessSnrDiscovery, WirelessPowerDi
         $sensors = [];
         foreach ($data as $index => $rate_value) {
             if ($rate_value['hzQtmModemRxSpeed'] != '-99') {
-                $sensors[] = new WirelessSensor('errors', $this->getDeviceId(), '.1.3.6.1.4.1.7262.2.4.5.2.1.1.6.' . $index, 'horizon-quantum' . $index, 'Rx rate radio ' . $index , $rate_value['hzQtmModemRxSpeed'], 1, 10);
+                $sensors[] = new WirelessSensor(
+                    'rate',
+                    $this->getDeviceId(),
+                    '.1.3.6.1.4.1.7262.2.4.5.2.1.1.6.' . $index,
+                    'horizon-quantum',
+                    $index,
+                    'Rx rate radio ' . $index,
+                    null,
+                    1,
+                    10
+                );
             }
         }
         $data = snmpwalk_group($this->getDeviceArray(), 'hzQtmModemTxSpeed', 'DRAGONWAVE-HORIZON-QUANTUM-MIB');
         foreach ($data as $index => $rate_value) {
             if ($rate_value['hzQtmModemTxSpeed'] != '-99') {
-                $sensors[] = new WirelessSensor('errors', $this->getDeviceId(), '.1.3.6.1.4.1.7262.2.4.5.2.1.1.7.' . $index, 'horizon-quantum' . $index, 'Tx rate radio ' . $index , $rate_value['hzQtmModemTxSpeed'], 1, 10);
+                $sensors[] = new WirelessSensor(
+                    'rate',
+                    $this->getDeviceId(),
+                    '.1.3.6.1.4.1.7262.2.4.5.2.1.1.7.' . $index,
+                    'horizon-quantum',
+                    $index,
+                    'Tx rate radio ' . $index,
+                    null,
+                    1,
+                    10
+                );
             }
         }
 
