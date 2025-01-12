@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Log;
 use LibreNMS\Exceptions\RrdGraphException;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Mac;
+use LibreNMS\Util\Url;
 
 if (! is_numeric($vars['id'])) {
     throw new RrdGraphException('invalid id');
@@ -35,9 +36,6 @@ if (! is_file($filename)) {
 Log::debug('exists');
 
 $rrd_filename = $filename;
-$port = cleanPort(Port::find($acc['port_id']));
-$device = DeviceCache::get($port->device_id);
-$title = generate_device_link($device);
-$title .= ' :: Port  ' . generate_port_link($port);
-$title .= ' :: ' . Mac::parse($acc['mac'])->readable();
+$port = cleanPort(Port::with('device')->find($acc['port_id']));
+$title = Url::deviceLink($device) . ' :: Port  ' . Url::portLink($port) . ' :: ' . Mac::parse($acc['mac'])->readable();
 $auth = true;
