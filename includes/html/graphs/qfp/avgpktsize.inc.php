@@ -1,4 +1,7 @@
 <?php
+
+use Illuminate\Support\Str;
+
 /**
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -36,9 +39,9 @@ if (! isset($in_text)) {
     $in_text = 'In';
 }
 
-$unit_text = str_pad(truncate($unit_text, $length), $length);
-$in_text = str_pad(truncate($in_text, $length), $length);
-$out_text = str_pad(truncate($out_text, $length), $length);
+$unit_text = Str::of($unit_text)->limit($length, '')->padRight($length);
+$in_text = Str::of($in_text)->limit($length, '')->padRight($length);
+$out_text = Str::of($out_text)->limit($length, '')->padRight($length);
 
 $rrd_options .= ' DEF:in_packets=' . $rrd_filename . ':InTotalPps:AVERAGE';
 $rrd_options .= ' DEF:out_packets=' . $rrd_filename . ':OutTotalPps:AVERAGE';

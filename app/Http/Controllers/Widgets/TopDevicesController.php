@@ -35,9 +35,9 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 use LibreNMS\Util\Html;
-use LibreNMS\Util\StringHelpers;
 use LibreNMS\Util\Url;
 use LibreNMS\Util\Validate;
 
@@ -320,7 +320,7 @@ class TopDevicesController extends WidgetController
 
             return [
                 Url::deviceLink($device, $device->shortDisplayName()),
-                StringHelpers::shortenText($storage->storage_descr, 50),
+                Str::limit($storage->storage_descr, 50),
                 Url::overlibLink(
                     $link,
                     Html::percentageBar(150, 20, $storage->storage_perc, '', $storage->storage_perc . '%', $storage->storage_perc_warn),
