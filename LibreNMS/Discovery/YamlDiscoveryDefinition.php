@@ -30,6 +30,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Device\YamlDiscovery;
 use LibreNMS\Discovery\Yaml\YamlDiscoveryField;
+use LibreNMS\Exceptions\InvalidOidException;
 use LibreNMS\Util\Oid;
 use SnmpQuery;
 
@@ -150,7 +151,11 @@ class YamlDiscoveryDefinition
                     $modelAttributes[$field->model_column] = $field->value;
                 }
 
-                $this->fillNumericOids($modelAttributes, $yamlItem, $index);
+                // if no pollable oid found, skip this index
+                if(! $this->fillNumericOids($modelAttributes, $yamlItem, $index)) {
+                    Log::debug("skipping index $index, no pollable oid found");
+                    continue;
+                }
 
                 $newModel = new $this->model($modelAttributes);
 
@@ -180,8 +185,10 @@ class YamlDiscoveryDefinition
         return $query->walk($yaml['pre-cache']['oids'])->valuesByIndex();
     }
 
-    private function fillNumericOids(array &$modelAttributes, array $yaml, int|string $index): void
+    private function fillNumericOids(array &$modelAttributes, array $yaml, int|string $index): bool
     {
+        $num_oid_found = false;
+
         foreach($this->fields as $field) {
             if($field->isOid) {
                 $num_oid = null;
@@ -191,14 +198,20 @@ class YamlDiscoveryDefinition
 
                     if (isset($yaml[$yaml_num_oid_field_name])) {
                         $num_oid = SimpleTemplate::parse($yaml[$yaml_num_oid_field_name], ['index' => $index]);
+                        $num_oid_found = true;
                     } elseif (isset($yaml[$field->key])) {
                         if (Oid::of($yaml[$field->key])->isNumeric()) {
                             // if numeric, assume it is a scalar, not a table
                             $num_oid = $yaml[$field->key];
+                            $num_oid_found = true;
                         } else {
                             Log::critical("$yaml_num_oid_field_name should be added to the discovery yaml to increase discovery performance");
-
-                            $num_oid = Oid::of($yaml[$field->key] . '.' . $index)->toNumeric(cache: 0);  // don't cache because of idiotic vendors naming MIBs the same
+                            try {
+                                $num_oid = Oid::of($yaml[$field->key] . '.' . $index)->toNumeric(cache: 0);  // don't cache because of idiotic vendors naming MIBs the same
+                                $num_oid_found = true;
+                            } catch (InvalidOidException $e) {
+                                Log::critical($e->getMessage());
+                            }
                         }
                     }
                 }
@@ -206,5 +219,7 @@ class YamlDiscoveryDefinition
                 $modelAttributes[$field->model_column . '_oid'] = $num_oid;
             }
         }
+
+        return $num_oid_found;
     }
 }
