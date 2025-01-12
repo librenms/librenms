@@ -39,14 +39,16 @@ trait YamlStorageDiscovery
     public function discoverYamlStorage(): Collection
     {
         $discovery = YamlDiscoveryDefinition::make(Storage::class)
-            ->addField(new YamlDiscoveryField('type', 'storage_type', 'Storage'))
+            ->addField(new YamlDiscoveryField('poller_type', 'type', $this->getName()))
             ->addField(new YamlDiscoveryField('type', 'storage_type', 'Storage'))
             ->addField(new YamlDiscoveryField('descr', 'storage_descr', 'Disk {{ $index }}'))
             ->addField(new YamlDiscoveryField('units', 'storage_units', 1048576)) // TODO good default?
-            ->addField(new OidField('size', 'storage_size'))
-            ->addField(new OidField('used', 'storage_used', priority: 3))
-            ->addField(new OidField('free', 'storage_free', priority: 2))
-            ->addField(new OidField('percent_used', 'storage_perc', priority: 1))
+            ->addField(new OidField('size', 'storage_size', should_poll: false))
+            ->addField(new OidField('used', 'storage_used'))
+            ->addField(new OidField('free', 'storage_free', should_poll: function (YamlDiscoveryDefinition $def) {
+                return ($def->getFieldCurrentValue('used') === null || $def->getFieldCurrentValue('total') === null) && is_numeric($def->getFieldCurrentValue('free'));
+            }))
+            ->addField(new OidField('percent_used', 'storage_perc'))
             ->addField(new IndexField('index', 'storage_index', '{{ $index }}'))
             ->afterEach(function (Storage $storage, YamlDiscoveryDefinition $def, $yaml, $index) {
                 // fill missing values
