@@ -386,7 +386,6 @@ main () {
                                "syslog"
                                "eventlog"
                                "authlog"
-                               "callback"
                                "purgeusers"
                                "bill_data"
                                "alert_log"

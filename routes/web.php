@@ -66,7 +66,6 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('preferences', 'UserPreferencesController')->only('index', 'store');
     Route::resource('users', 'UserController');
     Route::get('about', [AboutController::class, 'index'])->name('about');
-    Route::delete('reporting', [AboutController::class, 'clearReportingData'])->name('reporting.clear');
     Route::get('authlog', 'UserController@authlog');
     Route::get('overview', 'OverviewController@index')->name('overview');
     Route::get('/', 'OverviewController@index')->name('home');

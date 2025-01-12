@@ -132,10 +132,6 @@ if ($options['f'] === 'authlog') {
     exit($ret);
 }
 
-if ($options['f'] === 'callback') {
-    \LibreNMS\Util\Stats::submit();
-}
-
 if ($options['f'] === 'ports_purge') {
     if (Config::get('ports_purge')) {
         $lock = Cache::lock('ports_purge', 86000);

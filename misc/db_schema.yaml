@@ -397,13 +397,6 @@ cache_locks:
     - { Field: expiration, Type: int, 'Null': false, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [key], Unique: true, Type: BTREE }
-callback:
-  Columns:
-    - { Field: callback_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
-    - { Field: name, Type: char(64), 'Null': false, Extra: '' }
-    - { Field: value, Type: char(64), 'Null': false, Extra: '' }
-  Indexes:
-    PRIMARY: { Name: PRIMARY, Columns: [callback_id], Unique: true, Type: BTREE }
 cef_switching:
   Columns:
     - { Field: cef_switching_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }

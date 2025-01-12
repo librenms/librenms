@@ -5690,13 +5690,6 @@
             "section": "reporting",
             "order": 3
         },
-        "reporting.usage": {
-            "group": "system",
-            "section": "reporting",
-            "order": 0,
-            "default": false,
-            "type": "boolean"
-        },
         "rewrite_if": {
             "type": "array"
         },
