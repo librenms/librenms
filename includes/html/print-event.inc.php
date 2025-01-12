@@ -1,7 +1,9 @@
 <?php
 
+use App\Facades\DeviceCache;
 use App\Models\Port;
 use LibreNMS\Util\Rewrite;
+use LibreNMS\Util\Url;
 
 /*
  * LibreNMS
@@ -31,13 +33,13 @@ echo '<td>' . $icon . '</td>';
 echo '<td style="vertical-align: middle;">' . $entry['datetime'] . '</td>';
 
 if (! isset($vars['device'])) {
-    $dev = device_by_id_cache($entry['device_id']);
-    echo '<td style="vertical-align: middle;">' . generate_device_link($dev, shorthost($dev['hostname'])) . '</td>';
+    $dev = DeviceCache::get($entry['device_id']);
+    echo '<td style="vertical-align: middle;">' . Url::deviceLink($dev, shorthost($dev->hostname)) . '</td>';
 }
 
 if ($entry['type'] == 'interface') {
     $this_if = cleanPort(Port::find($entry['reference']));
-    $entry['link'] = '<b>' . generate_port_link($this_if, Rewrite::shortenIfName(strtolower($this_if->label))) . '</b>';
+    $entry['link'] = '<b>' . Url::portLink($this_if, Rewrite::shortenIfName(strtolower($this_if->label))) . '</b>';
 } else {
     $entry['link'] = 'System';
 }
