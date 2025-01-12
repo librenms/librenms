@@ -210,6 +210,14 @@ trait HostResources
                 return false;
             }
 
+            if (empty($storage['hrStorageUsed']) || $storage['hrStorageUsed'] < 0) {
+                return false;
+            }
+
+            if (empty($storage['hrStorageSize']) || $storage['hrStorageSize'] < 0) {
+                return false;
+            }
+
             return ! in_array($storage['hrStorageType'], $this->storageIgnoreTypes);
         })->map(function ($storage) {
             return (new Storage([

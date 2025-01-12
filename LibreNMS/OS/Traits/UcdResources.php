@@ -137,7 +137,7 @@ trait UcdResources
             return new Storage([
                 'type' => 'ucd-dsktable',
                 'storage_index' => $index,
-                'storage_type' => 'UcdDisk',
+                'storage_type' => 'ucdDisk',
                 'storage_descr' => $data['UCD-SNMP-MIB::dskPath'],
                 'storage_size' => $total,
                 'storage_units' => 1024,
