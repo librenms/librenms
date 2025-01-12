@@ -215,7 +215,7 @@ trait HostResources
             return (new Storage([
                 'type' => 'hrstorage',
                 'storage_index' => $storage['hrStorageIndex'],
-                'storage_type' => $storage['hrStorageType'],
+                'storage_type' => str_replace('.0', '', $storage['hrStorageType']),
                 'storage_descr' => $storage['hrStorageDescr'],
                 'storage_used_oid' => '.1.3.6.1.2.1.25.2.3.1.6.' . $storage['hrStorageIndex'],
                 'storage_units' => $storage['hrStorageAllocationUnits'],
