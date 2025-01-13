@@ -101,6 +101,7 @@ class OSModulesTest extends DBTestCase
 
         try {
             Debug::set(false); // avoid all undefined index errors in the legacy code
+            $modules = array_fill_keys(array_intersect(array_keys($this->discoveryModules), array_keys($modules)), true);
             $helper = new ModuleTestHelper($modules, $os, $variant);
             $helper->setQuiet();
 
