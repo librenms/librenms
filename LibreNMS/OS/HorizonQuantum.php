@@ -49,10 +49,10 @@ class HorizonQuantum extends OS implements
         foreach ($data as $oid => $power_value) {
             if ($power_value['hzQtmRadioActualTransmitPowerdBm'] != '-99') {
                 $sensors[] = new WirelessSensor(
-                    'power-tx',
+                    'power',
                     $this->getDeviceId(),
                     '.1.3.6.1.4.1.7262.2.4.5.4.1.1.19.' . $index[$oid]['hzQtmRadioIndex'],
-                    'horizon-quantum',
+                    'horizon-quantum-tx',
                     $oid,
                     $oid . ' TX Power',
                     null,
