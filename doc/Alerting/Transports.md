@@ -334,6 +334,47 @@ You will also find additional information is sent as part of the payload to Graf
 can be useful within the templates or routes. If you perform a test of the LibreNMS transport 
 you will be able to see the payload within the Grafana interface.
 
+customise what is sent to ZenDuty and override or add additional fields, you can create
+a custom template which outputs the correct information via JSON. As an example:
+
+```
+{
+    "message": "Severity: {{ $alert->severity }}\nTimestamp: {{ $alert->timestamp }}\nRule: {{ $alert->title }}\n @foreach ($alert->faults as $key => $value) {{ $key }}: {{ $value['string'] }}\n @endforeach",
+    "number_of_processors": \App\Models\Processors::where('device_id', $alert->device_id)->count(),
+    "title": "{{ $alert->title }}",
+    "link_to_upstream_details": "{{ \LibreNMS\Util\Url::deviceUrl($device) }}",
+}
+```
+If you are using more than one transport for an alert rule and need to customise the output per
+transport then you can do the following:
+
+```
+@if ($alert->transport == 'grafana')
+{
+  "message": "Severity: {{ $alert->severity }}\nTimestamp: {{ $alert->timestamp }}\nRule: {{ $alert->title }}\n @foreach ($alert->faults as $key => $value) {{ $key }}: {{ $value['string'] }}\n @endforeach",
+  "number_of_processors": \App\Models\Processors::where('device_id', $alert->device_id)->count(),
+  "title": "{{ $alert->title }}",
+  "link_to_upstream_details": "{{ \LibreNMS\Util\Url::deviceUrl($device) }}",
+}
+@else
+{{ $alert->title }}
+Severity: {{ $alert->severity }}
+@if ($alert->state == 0) Time elapsed: {{ $alert->elapsed }} @endif
+Timestamp: {{ $alert->timestamp }}
+Unique-ID: {{ $alert->uid }}
+Rule: @if ($alert->name) {{ $alert->name }} @else {{ $alert->rule }} @endif
+@if ($alert->faults) Faults:
+@foreach ($alert->faults as $key => $value)
+  {{ $key }}: {{ $value['string'] }}
+@endforeach
+@endif
+Alert sent to:
+@foreach ($alert->contacts as $key => $value)
+  {{ $value }} <{{ $key }}>
+@endforeach
+@endif
+```
+
 **Example:**
 
 | Config | Example |
