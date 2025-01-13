@@ -90,7 +90,6 @@ class ZenDuty extends Transport
             $data['summary'] = $alert_data['msg'];
         }
 
-        var_dump($data);
         $client = Http::client();
 
         $res = $client->withHeaders(
