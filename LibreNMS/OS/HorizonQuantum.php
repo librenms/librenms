@@ -38,7 +38,7 @@ class HorizonQuantum extends OS implements WirelessSnrDiscovery, WirelessPowerDi
 
     public function discoverWirelessPower()
     {
-        $index = snmpwalk_group($this->getDeviceArray(), 'hzQtmRadioEntry', 'DRAGONWAVE-HORIZON-QUANTUM-MIB');
+        $index = snmpwalk_group($this->getDeviceArray(), 'hzQtmRadioIndex', 'DRAGONWAVE-HORIZON-QUANTUM-MIB');
         $data = snmpwalk_group($this->getDeviceArray(), 'hzQtmRadioActualTransmitPowerdBm', 'DRAGONWAVE-HORIZON-QUANTUM-MIB');
         $sensors = [];
         foreach ($data as $oid => $power_value) {
@@ -46,7 +46,7 @@ class HorizonQuantum extends OS implements WirelessSnrDiscovery, WirelessPowerDi
                 $sensors[] = new WirelessSensor(
                     'power',
                     $this->getDeviceId(),
-                    '.1.3.6.1.4.1.7262.2.4.5.4.1.1.19.' . $index[$oid]['hzQtmRadioEntry'],
+                    '.1.3.6.1.4.1.7262.2.4.5.4.1.1.19.' . $index[$oid]['hzQtmRadioIndex'],
                     'horizon-quantum',
                     $oid,
                     $oid . ' TX Power',
