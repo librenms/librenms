@@ -129,6 +129,10 @@ class ConvertStorageData extends Command
             return 1;
         }
 
+        if ($storage['storage_mib'] == 'forcepoint') {
+            return 1024;
+        }
+
         return $storage['storage_units'];
     }
     private function getStorageUsed(string $snmprec_file, array $storage): ?int
@@ -168,6 +172,10 @@ class ConvertStorageData extends Command
 
         if ($storage['storage_mib'] == 'datadomain') {
             return '.1.3.6.1.4.1.19746.1.3.2.1.1.5.' . $storage['storage_index'];
+        }
+
+        if ($storage['storage_mib'] == 'forcepoint') {
+            return '.1.3.6.1.4.1.1369.5.2.1.11.3.1.5.' . $storage['storage_index'];
         }
 
         return null;
