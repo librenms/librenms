@@ -94,7 +94,7 @@ class HorizonQuantum extends OS implements WirelessSnrDiscovery, WirelessPowerDi
                 $sensors[] = new WirelessSensor(
                     'errors',
                     $this->getDeviceId(),
-                    '.1.3.6.1.4.1.7262.2.4.5.2.3.1.4' . $index[$oid]['hzQtmWirelessEnetPortIndex'],
+                    '.1.3.6.1.4.1.7262.2.4.5.2.3.1.4.' . $index[$oid]['hzQtmWirelessEnetPortIndex'],
                     'horizon-quantum',
                     $oid,
                     $oid . ' Rx Errors',
