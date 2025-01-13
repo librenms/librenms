@@ -9,7 +9,8 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessRateDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
 use LibreNMS\OS;
-class HorizonQuantum extends OS implements 
+
+class HorizonQuantum extends OS implements
     WirelessSnrDiscovery,
     WirelessPowerDiscovery,
     WirelessRssiDiscovery,
