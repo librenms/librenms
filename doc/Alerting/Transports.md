@@ -317,7 +317,22 @@ tokens to authenticate with GitLab and will store the token in cleartext.
 
 ## Grafana Oncall
 
-Send alerts to Grafana Oncall using a [Formatted Webhook](https://grafana.com/docs/oncall/latest/integrations/webhook/)
+Send alerts to Grafana Oncall via either a Formatted Webhook or Webhook.
+[See the Grafana documentation for both](https://grafana.com/docs/oncall/latest/integrations/webhook/).
+
+There is little difference between the two, but the Formatted Webhook will 
+provide a more friendly view of things by default.
+
+> NOTE: By default Grafana translates acknowledged alerts to resolved alerts.
+> This can be changed by updating the Template settings for the integration you
+> added as follows.
+
+Autoresolution: `{% if payload.get("raw_state", "") != 2 and payload.get("state", "").upper() == "OK" %}True{% endif %}`
+Auto acknowledge: `{{ payload.get("raw_state", "") == 2 }}`
+
+You will also find additional information is sent as part of the payload to Grafana which 
+can be useful within the templates or routes. If you perform a test of the LibreNMS transport 
+you will be able to see the payload within the Grafana interface.
 
 **Example:**
 
