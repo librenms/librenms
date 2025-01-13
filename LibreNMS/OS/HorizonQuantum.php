@@ -86,15 +86,15 @@ class HorizonQuantum extends OS implements WirelessSnrDiscovery, WirelessPowerDi
 
     public function discoverWirelessErrors()
     {
-        $index = snmpwalk_group($this->getDeviceArray(), 'hzQtmModemIndex', 'DRAGONWAVE-HORIZON-QUANTUM-MIB');
-        $data = snmpwalk_group($this->getDeviceArray(), 'hzQtmModemRxBlocksErrors', 'DRAGONWAVE-HORIZON-QUANTUM-MIB');
+        $index = snmpwalk_group($this->getDeviceArray(), 'hzQtmWirelessEnetPortIndex', 'DRAGONWAVE-HORIZON-QUANTUM-MIB');
+        $data = snmpwalk_group($this->getDeviceArray(), 'hzQtmWirelessEnetPortRxFramesErrors', 'DRAGONWAVE-HORIZON-QUANTUM-MIB');
         $sensors = [];
         foreach ($data as $oid => $errors_value) {
-            if ($errors_value['hzQtmModemRxBlocksErrors'] != '-99') {
+            if ($errors_value['hzQtmWirelessEnetPortRxFramesErrors'] != '-99') {
                 $sensors[] = new WirelessSensor(
                     'errors',
                     $this->getDeviceId(),
-                    '.1.3.6.1.4.1.7262.2.4.5.4.1.1.19.' . $index[$oid]['hzQtmModemIndex'],
+                    '.1.3.6.1.4.1.7262.2.4.5.2.3.1.4' . $index[$oid]['hzQtmWirelessEnetPortIndex'],
                     'horizon-quantum',
                     $oid,
                     $oid . ' Rx Errors',
