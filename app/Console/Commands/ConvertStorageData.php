@@ -26,7 +26,7 @@ class ConvertStorageData extends Command
      */
     public function handle()
     {
-        foreach(glob(base_path('tests/data/*.json')) as $file) {
+        foreach (glob(base_path('tests/data/*.json')) as $file) {
             $data = json_decode(file_get_contents($file), true);
 
             if (empty($data['storage'])) {
@@ -54,7 +54,7 @@ class ConvertStorageData extends Command
                             'storage_descr' => $storage['storage_descr'],
                             'storage_size' => $storage['storage_size'],
                             'storage_size_oid' => null,
-                            'storage_units' => $storage['storage_units'],
+                            'storage_units' => $this->getStorageUnits($snmprec_file, $storage),
                             'storage_used' => $this->getStorageUsed($snmprec_file, $storage),
                             'storage_used_oid' => $this->getUsedOid($snmprec_file, $storage),
                             'storage_free' => $data['storage']['poller'][$table][$index]['storage_free'] ?: $storage['storage_free'],
@@ -77,7 +77,7 @@ class ConvertStorageData extends Command
             }
 
 
-            file_put_contents($file, json_encode($data, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES));
+            file_put_contents($file, json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
 //            $this->info('updated: ' . basename($file));
         }
     }
@@ -119,6 +119,14 @@ class ConvertStorageData extends Command
         return 'Storage';
     }
 
+    private function getStorageUnits(string $snmprec_file, array $storage): ?int
+    {
+        if (Str::startsWith($snmprec_file, 'eltex-mes')) {
+            return 1;
+        }
+
+        return $storage['storage_units'];
+    }
     private function getStorageUsed(string $snmprec_file, array $storage): ?int
     {
         if ($snmprec_file == 'arbos_tms') {
@@ -155,6 +163,14 @@ class ConvertStorageData extends Command
             return '.1.3.6.1.4.1.2.6.191.6.2.1.6.' . $storage['storage_index'];
         }
 
+        if ($storage['storage_mib'] == 'eltex-mes24xx') {
+            return null;
+        }
+
+        if (Str::startsWith($snmprec_file, 'eltex-mes')) {
+            return '.1.3.6.1.4.1.89.96.5.0';
+        }
+
         return null;
     }
 
@@ -162,6 +178,10 @@ class ConvertStorageData extends Command
     {
         if ($storage['storage_mib'] == 'arbos') {
             return '.1.3.6.1.4.1.9694.1.5.2.6.0';
+        }
+
+        if ($storage['storage_mib'] == 'eltex-mes24xx') {
+            return '.1.3.6.1.4.1.2076.81.1.75.0';
         }
 
         return null;
@@ -182,6 +202,10 @@ class ConvertStorageData extends Command
         }
 
         if ($snmprec_file == 'canonprinter_tm') {
+            return true;
+        }
+
+        if (Str::startsWith($snmprec_file, 'dell-os10') && $storage['storage_mib'] == 'ucd-dsktable') {
             return true;
         }
 
