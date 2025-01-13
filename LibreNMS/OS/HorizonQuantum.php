@@ -49,7 +49,7 @@ class HorizonQuantum extends OS implements
         foreach ($data as $oid => $power_value) {
             if ($power_value['hzQtmRadioActualTransmitPowerdBm'] != '-99') {
                 $sensors[] = new WirelessSensor(
-                    'power',
+                    'power-tx',
                     $this->getDeviceId(),
                     '.1.3.6.1.4.1.7262.2.4.5.4.1.1.19.' . $index[$oid]['hzQtmRadioIndex'],
                     'horizon-quantum',
@@ -100,7 +100,7 @@ class HorizonQuantum extends OS implements
                     'errors',
                     $this->getDeviceId(),
                     '.1.3.6.1.4.1.7262.2.4.5.2.3.1.4.' . $index[$oid]['hzQtmWirelessEnetPortIndex'],
-                    'horizon-quantum',
+                    'horizon-quantum-rx',
                     $oid,
                     $oid . ' Rx Errors',
                     null,
@@ -125,7 +125,7 @@ class HorizonQuantum extends OS implements
                     'rate',
                     $this->getDeviceId(),
                     '.1.3.6.1.4.1.7262.2.4.5.2.1.1.6.' . $index[$oid]['hzQtmModemIndex'],
-                    'horizon-quantum',
+                    'horizon-quantum-rx',
                     $oid,
                     $oid . ' Rx Rate',
                     null,
@@ -142,7 +142,7 @@ class HorizonQuantum extends OS implements
                     'rate',
                     $this->getDeviceId(),
                     '.1.3.6.1.4.1.7262.2.4.5.2.1.1.7.' . $index[$oid]['hzQtmModemIndex'],
-                    'horizon-quantum',
+                    'horizon-quantum-tx',
                     $oid,
                     $oid . ' Tx Rate',
                     null,
