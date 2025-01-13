@@ -144,10 +144,7 @@ class HorizonQuantum extends OS implements
                     '.1.3.6.1.4.1.7262.2.4.5.2.1.1.7.' . $index[$oid]['hzQtmModemIndex'],
                     'horizon-quantum-tx',
                     $oid,
-                    $oid . ' Tx Rate',
-                    null,
-                    1,
-                    10
+                    $oid . ' Tx Rate'
                 );
             }
         }
