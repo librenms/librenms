@@ -3,7 +3,7 @@ modules:
     os:
         version: DRAGONWAVE-HORIZON-QUANTUM-MIB::hzQtmSwInvAppOmniVersionNo.0
         serial: DRAGONWAVE-HORIZON-QUANTUM-MIB::hzQtmUnitSerialNo.0
-        hardware: DRAGONWAVE-HORIZON-QUANTUM-MIB::hzOduUnitAssemblylNo.0
+        hardware: DRAGONWAVE-HORIZON-QUANTUM-MIB::hzQtmUnitAssemblylNo.0
     sensors:
         temperature:
             data:
