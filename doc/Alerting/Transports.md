@@ -327,8 +327,15 @@ provide a more friendly view of things by default.
 > This can be changed by updating the Template settings for the integration you
 > added as follows.
 
-Autoresolution: `{% if payload.get("raw_state", "") != 2 and payload.get("state", "").upper() == "OK" %}True{% endif %}`
-Auto acknowledge: `{{ payload.get("raw_state", "") == 2 }}`
+Autoresolution:
+
+```
+{% if payload.get("raw_state", "") != 2 and payload.get("state", "").upper() == "OK" %}True{% endif %}
+```
+Auto acknowledge:
+```
+{{ payload.get("raw_state", "") == 2 }}
+```
 
 You will also find additional information is sent as part of the payload to Grafana which 
 can be useful within the templates or routes. If you perform a test of the LibreNMS transport 
