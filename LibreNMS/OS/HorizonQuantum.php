@@ -110,9 +110,10 @@ class HorizonQuantum extends OS implements WirelessSnrDiscovery, WirelessPowerDi
 
     public function discoverWirelessRate()
     {
-        $index = snmpwalk_group($this->getDeviceArray(), 'hzQtmModemIndex', 'DRAGONWAVE-HORIZON-QUANTUM-MIB');
-        $data = snmpwalk_group($this->getDeviceArray(), 'hzQtmModemRxSpeed', 'DRAGONWAVE-HORIZON-QUANTUM-MIB');
         $sensors = [];
+        $index = snmpwalk_group($this->getDeviceArray(), 'hzQtmModemIndex', 'DRAGONWAVE-HORIZON-QUANTUM-MIB');
+
+        $data = snmpwalk_group($this->getDeviceArray(), 'hzQtmModemRxSpeed', 'DRAGONWAVE-HORIZON-QUANTUM-MIB');
         foreach ($data as $oid => $rate_value) {
             if ($rate_value['hzQtmModemRxSpeed'] != '-99') {
                 $sensors[] = new WirelessSensor(
