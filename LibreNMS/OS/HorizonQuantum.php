@@ -3,12 +3,13 @@
 namespace LibreNMS\OS;
 
 use LibreNMS\Device\WirelessSensor;
-use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
-use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
-use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessErrorsDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRateDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
 use LibreNMS\OS;
+
 
 class HorizonQuantum extends OS implements 
     WirelessSnrDiscovery,
