@@ -47,7 +47,7 @@ class HorizonQuantum extends OS implements WirelessSnrDiscovery, WirelessPowerDi
                     '.1.3.6.1.4.1.7262.2.4.5.4.1.1.19.' . $index,
                     'horizon-quantum',
                     $index,
-                    'TX power radio ' . $index, 
+                    'TX power radio ' . $index,
                     null,
                     1,
                     10
