@@ -1180,6 +1180,9 @@ Escalation Policies, etc.
 Follow the instructions in the above link to obtain your Webhook URL and then paste that 
 into the `ZenDuty WebHook` field when setting up the LibreNMS transport.
 
+You can also set the SLA ID and Escalation Policy ID from within the Transport configuration 
+which will be sent with all alerts.
+
 This transport will send over the following fields:
 
 `message` - The alert title
@@ -1193,13 +1196,23 @@ a custom template which outputs the correct information via JSON. As an example:
 
 ```json
 {
-  "message": "{{ $alert->title }}",
-  "payload": {
-    "Device Type": "{{ $alert->type }}",
-    "Device OS": "{{ $alert->os }}"
-  },
-  "summary": "@foreach ($alert->faults as $key => $value) Key: {{ $key }} Value: {{ $value }} @endforeach",
-  "escalation_policy" : "272841e2-2cbf-40a8-9a9a-64227fd3d722"
+    "message": "{{ $alert->title }}",
+    "payload": {
+        "sysName": "{{ $alert->sysName }}",
+        "Device Type": "{{ $alert->type }}"
+    },
+    "summary": "Severity: {{ $alert->severity }}\nTimestamp: {{ $alert->timestamp }}\nRule: {{ $alert->title }}\n @foreach ($alert->faults as $key => $value) {{ $key }}: {{ $value['string'] }}\n @endforeach",
+    "sla": "ccaf3fd6-db51-4f9f-818b-de42aee54f29",
+    "urls": [
+        {
+            "link_url": "{{ route('device', ['device' => $alert->device_id ?: 1]) }}",
+            "link_text": "{{ $alert->hostname }}"
+        },
+        {
+            "link_url": "{{ route('device', ['device' => $alert->device_id ?? 1, 'tab' => 'alerts']) }}",
+            "link_text": "{{ $alert->hostname }} - Alerts"
+        }
+    ]
 }
 ```
 If you are using more than one transport for an alert rule and need to customise the output per 
@@ -1208,15 +1221,23 @@ transport then you can do the following:
 ```
 @if ($alert->transport == 'ZenDuty')
 {
-  {
-    "message": "{{ $alert->title }}",
-    "payload": {
-      "Device Type": "{{ $alert->type }}",
-      "Device OS": "{{ $alert->os }}"
+  "message": "{{ $alert->title }}",
+  "payload": {
+    "sysName": "{{ $alert->sysName }}",
+    "Device Type": "{{ $alert->type }}"
+  },
+  "summary": "Severity: {{ $alert->severity }}\nTimestamp: {{ $alert->timestamp }}\nRule: {{ $alert->title }}\n @foreach ($alert->faults as $key => $value) {{ $key }}: {{ $value['string'] }}\n @endforeach",
+  "sla": "ccaf3fd6-db51-4f9f-818b-de42aee54f29",
+  "urls": [
+    {
+      "link_url": "{{ route('device', ['device' => $alert->device_id ?: 1]) }}",
+      "link_text": "{{ $alert->hostname }}"
     },
-    "summary": "@foreach ($alert->faults as $key => $value) Key: {{ $key }} Value: {{ $value }} @endforeach",
-    "escalation_policy" : "272841e2-2cbf-40a8-9a9a-64227fd3d722"
-  }
+    {
+      "link_url": "{{ route('device', ['device' => $alert->device_id ?? 1, 'tab' => 'alerts']) }}",
+      "link_text": "{{ $alert->hostname }} - Alerts"
+    }
+  ]
 }
 @else
 {{ $alert->title }}
@@ -1237,6 +1258,8 @@ Alert sent to:
 @endif
 ```
 
-| Config | Example                                                      |
-| ------ |--------------------------------------------------------------|
-| WebHook URL | <https://events.zenduty.com/integration/we8jv/generic/hash/> |
+| Config               | Example                                                      |
+|----------------------|--------------------------------------------------------------|
+| WebHook URL          | <https://events.zenduty.com/integration/we8jv/generic/hash/> |
+| SLA ID               | g27u4gr824r-dd32rf2wdedeas-3e2wd223d23                       |
+| Escalation Policy ID | KIJDi23rwnef23-dankjd323r-DSAD£2232fds                        |

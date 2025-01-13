@@ -43,10 +43,30 @@ class ZenDuty extends Transport
             $alert_type = $alert_data['severity'];
         }
         // Set the standard data ZD expects to see
+        $msg = (json_decode($alert_data['msg'], true)) ? json_decode($alert_data['msg'], true) : $alert_data['msg'];
         $data = [
             'message' => $alert_data['title'],
             'alert_type' => $alert_type,
             'entity_id' => $alert_data['alert_id'],
+            'payload' => [
+                'hostname' => $alert_data['hostname'],
+                'sysName' => $alert_data['sysName'],
+                'id' => $alert_data['id'],
+                'uid' => $alert_data['uid'],
+                'sysDescr' => $alert_data['sysDescr'],
+                'os' => $alert_data['os'],
+                'type' => $alert_type,
+                'ip' => $alert_data['ip'],
+                'hardware' => $alert_data['hardware'],
+                'version' => $alert_data['version'],
+                'uptime' => $alert_data['uptime'],
+                'uptime_short' => $alert_data['uptime_short'],
+                'timestamp' => $alert_data['timestamp'],
+                'description' => $alert_data['description'],
+                'title' => $alert_data['title'],
+                'msg' => $msg,
+                'state' => $alert_data['state'],
+            ],
             'urls' => [
                 [
                     'link_url' => route('device', ['device' => $alert_data['device_id']]),
@@ -55,6 +75,14 @@ class ZenDuty extends Transport
             ],
         ];
 
+        if (isset($this->config['sla_id'])) {
+            $data['sla'] = $this->config['sla_id'];
+        }
+
+        if (isset($this->config['escalation_policy_id'])) {
+            $data['escalation_policy'] = $this->config['escalation_policy_id'];
+        }
+
         $tmp_msg = json_decode($alert_data['msg'], true);
         if (isset($tmp_msg['message']) && isset($tmp_msg['summary'])) {
             $data = array_merge($data, $tmp_msg);
@@ -62,6 +90,7 @@ class ZenDuty extends Transport
             $data['summary'] = $alert_data['msg'];
         }
 
+        var_dump($data);
         $client = Http::client();
 
         $res = $client->withHeaders(
@@ -85,6 +114,18 @@ class ZenDuty extends Transport
                     'title' => 'ZenDuty WebHook',
                     'name' => 'zenduty-url',
                     'descr' => 'ZenDuty WebHook',
+                    'type' => 'text',
+                ],
+                [
+                    'title' => 'SLA ID',
+                    'name' => 'sla_id',
+                    'descr' => 'Unique ID of the SLA',
+                    'type' => 'text',
+                ],
+                [
+                    'title' => 'Escalation Policy ID',
+                    'name' => 'escalation_policy_id',
+                    'descr' => 'Unique ID of the Escalation Policy',
                     'type' => 'text',
                 ],
             ],
