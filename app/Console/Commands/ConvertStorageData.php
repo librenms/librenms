@@ -52,12 +52,12 @@ class ConvertStorageData extends Command
                             'storage_index' => $storage['storage_index'],
                             'storage_type' => $this->getStorageType($snmprec_file, $storage),
                             'storage_descr' => $storage['storage_descr'],
-                            'storage_size' => $storage['storage_size'],
+                            'storage_size' => $this->getStorageSize($snmprec_file, $storage),
                             'storage_size_oid' => null,
                             'storage_units' => $this->getStorageUnits($snmprec_file, $storage),
                             'storage_used' => $this->getStorageUsed($snmprec_file, $storage),
                             'storage_used_oid' => $this->getUsedOid($snmprec_file, $storage),
-                            'storage_free' => $data['storage']['poller'][$table][$index]['storage_free'] ?: $storage['storage_free'],
+                            'storage_free' => $this->getStorageFree($snmprec_file, $storage, $data['storage']['poller'][$table][$index]['storage_free']),
                             'storage_free_oid' => $this->getFreeOid($snmprec_file, $storage),
                             'storage_perc' => $data['storage']['poller'][$table][$index]['storage_perc'] ?: $storage['storage_perc'],
                             'storage_perc_oid' => $this->getPercOid($snmprec_file, $storage),
@@ -116,6 +116,10 @@ class ConvertStorageData extends Command
             return 'Active Tier';
         }
 
+        if ($storage['storage_mib'] == 'ericsson-ipos') {
+            return 'flashMemory';
+        }
+
         return 'Storage';
     }
 
@@ -131,6 +135,18 @@ class ConvertStorageData extends Command
     {
         if ($snmprec_file == 'arbos_tms') {
             return 8;
+        }
+
+        if ($storage['storage_mib'] == 'ericsson-ipos') {
+            if ($storage['storage_index'] == '84') {
+                return 4619112243;
+            }
+
+            if ($storage['storage_index'] == '85') {
+                return 5054368358;
+            }
+
+            return $storage['storage_used'] * 1024;
         }
 
         if (is_numeric($storage['storage_used'])) {
@@ -184,10 +200,14 @@ class ConvertStorageData extends Command
             return '.1.3.6.1.4.1.2076.81.1.75.0';
         }
 
+        if ($storage['storage_mib'] == 'ericsson-ipos') {
+            return '.1.3.6.1.4.1.193.218.2.24.1.2.1.1.6.' . $storage['storage_index'];
+        }
+
         return null;
     }
 
-    private function shouldSkip(string $snmprec_file, $storage): bool
+    private function shouldSkip(string $snmprec_file, array $storage): bool
     {
         if ($snmprec_file == 'aix_net-snmp' && $storage['storage_index'] == '42') {
             return true; // /aha (negative values)
@@ -210,5 +230,33 @@ class ConvertStorageData extends Command
         }
 
         return false;
+    }
+
+    private function getStorageSize(string $snmprec_file, array $storage): ?int
+    {
+        if ($storage['storage_mib'] == 'ericsson-ipos') {
+            return $storage['storage_size'] * 1024;
+        }
+
+        return $storage['storage_size'];
+    }
+
+    private function getStorageFree(string $snmprec_file, array $storage, $poller_free)
+    {
+        $value = $poller_free ?: $storage['storage_free'];
+
+        if ($storage['storage_mib'] == 'ericsson-ipos') {
+            if ($storage['storage_index'] == '84') {
+                return 30912520397;
+            }
+
+            if ($storage['storage_index'] == '85') {
+                return 28641420698;
+            }
+
+            return $storage['storage_used'] * 1024;
+        }
+
+        return $value;
     }
 }
