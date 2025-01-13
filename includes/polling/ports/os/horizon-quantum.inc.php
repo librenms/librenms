@@ -30,7 +30,6 @@ $hzqtmPortSpeed = [
     4 => ['1000000000', '1000'],
 ];
 
-
 foreach ($hzqtm_stats as $index => $port) {
     foreach ($required as $key => $val) {
         $port_stats[$port['hzQtmEnetPortIndex']][$key] = $hzqtm_stats[$index][$val];
