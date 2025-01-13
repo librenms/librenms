@@ -14,8 +14,13 @@ $required = [
     'ifOutOctets' => 'hzQtmEnetPortTxBytes',
     'ifInUcastPkts' => 'hzQtmEnetPortRxUcastPkts',
     'ifOutUcastPkts' => 'hzQtmEnetPortTxUcastPkts',
+    'ifInNUcastPkts'=> 'hzQtmEnetPortRxNUcastPkts',
+    'ifOutNUcastPkts' => 'hzQtmEnetPortTxNUcastPkts',
     'ifInErrors' => 'hzQtmEnetPortRxErrors',
     'ifOutErrors' => 'hzQtmEnetPortTxErrors',
+    'ifInDiscards'=> 'hzQtmEnetPortRxDiscards',
+    'ifOutDiscards' => 'hzQtmEnetPortTxDiscards',
+    'ifInUnknownProtos' => 'hzQtmEnetPortRxUnknownProtos',
 ];
 
 $hzqtmPortSpeed = [
