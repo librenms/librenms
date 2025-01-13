@@ -102,10 +102,7 @@ class HorizonQuantum extends OS implements
                     '.1.3.6.1.4.1.7262.2.4.5.2.3.1.4.' . $index[$oid]['hzQtmWirelessEnetPortIndex'],
                     'horizon-quantum-rx',
                     $oid,
-                    $oid . ' Rx Errors',
-                    null,
-                    1,
-                    10
+                    $oid . ' Rx Errors'
                 );
             }
         }
@@ -144,7 +141,10 @@ class HorizonQuantum extends OS implements
                     '.1.3.6.1.4.1.7262.2.4.5.2.1.1.7.' . $index[$oid]['hzQtmModemIndex'],
                     'horizon-quantum-tx',
                     $oid,
-                    $oid . ' Tx Rate'
+                    $oid . ' Tx Rate',
+                    null,
+                    1,
+                    10
                 );
             }
         }
