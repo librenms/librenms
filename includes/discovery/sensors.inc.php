@@ -27,6 +27,10 @@ if ($device['os'] == 'linux') {
     include 'includes/discovery/sensors/rpigpiomonitor.inc.php';
 }
 
+if ($device['os_group'] == 'unix') {
+    include 'includes/discovery/sensors/custom.inc.php';
+}
+
 if (isset($device['hardware']) && strstr($device['hardware'], 'Dell')) {
     include 'includes/discovery/sensors/fanspeed/dell.inc.php';
     include 'includes/discovery/sensors/power/dell.inc.php';
