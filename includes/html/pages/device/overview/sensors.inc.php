@@ -6,11 +6,12 @@ use LibreNMS\Util\Url;
 
 // Cache all sensors on device and exclude transceivers
 $sensors = DeviceCache::getPrimary()
-    ->sensors
+    ->sensors()
     ->where('sensor_class', $sensor_class)
     ->where('group', '!=', 'transceiver')
-    ->sortBy('group')
-    ->sortBy('sensor_descr');
+    ->orderBy('group')
+    ->orderBy('sensor_descr')
+    ->get();
 if ($sensors->count()) {
     echo '
         <div class="row">
