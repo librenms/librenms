@@ -76,7 +76,6 @@ class Edgecos extends OS implements MempoolsDiscovery, ProcessorDiscovery
         $device->hardware = $data[0]['swProdName'] ?? null;
         $device->serial = $data[1]['swSerialNumber'] ?? null;
     }
-class Edgecos extends OS implements TransceiverDiscovery
 {
     public function discoverTransceivers(): Collection
     {
