@@ -1,7 +1,7 @@
 <?php
 
-use App\Models\Sensor;
 use App\Models\Eventlog;
+use App\Models\Sensor;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Enum\Severity;
