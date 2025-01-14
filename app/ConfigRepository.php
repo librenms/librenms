@@ -549,7 +549,9 @@ class ConfigRepository
         $this->set('time.twelvehour', $now - 43200); // time() - (12 * 60 * 60);
         $this->set('time.day', $now - 86400); // time() - (24 * 60 * 60);
         $this->set('time.twoday', $now - 172800); // time() - (2 * 24 * 60 * 60);
+        $this->set('time.threeday', $now - 259200); // time() - (3 * 24 * 60 * 60);
         $this->set('time.week', $now - 604800); // time() - (7 * 24 * 60 * 60);
+        $this->set('time.tenday', $now - 864000); // time() - (10 * 24 * 60 * 60);
         $this->set('time.twoweek', $now - 1209600); // time() - (2 * 7 * 24 * 60 * 60);
         $this->set('time.month', $now - 2678400); // time() - (31 * 24 * 60 * 60);
         $this->set('time.twomonth', $now - 5356800); // time() - (2 * 31 * 24 * 60 * 60);
