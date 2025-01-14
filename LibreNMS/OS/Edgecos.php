@@ -30,6 +30,7 @@ use App\Models\Mempool;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use LibreNMS\Device\Processor;
+use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\OS;
@@ -75,6 +76,39 @@ class Edgecos extends OS implements MempoolsDiscovery, ProcessorDiscovery
         $device->hardware = $data[0]['swProdName'] ?? null;
         $device->serial = $data[1]['swSerialNumber'] ?? null;
     }
+class Edgecos extends OS implements TransceiverDiscovery
+{
+    public function discoverTransceivers(): Collection
+    {
+        $ifIndexToPortId = $this->getDevice()->ports()->pluck('port_id', 'ifIndex');
+
+        return SnmpQuery::cache()->walk('ECS4120-MIB::portMediaInfoTable')->mapTable(function ($data, $ifIndex) use ($ifIndexToPortId) {
+            if ($data['ECS4120-MIB::portMediaInfoConnectorType'] === 'inactive') {
+                return null;
+            }
+
+            $cable = $data['ECS4120-MIB::portMediaInfoFiberType'] ?? null;
+            $distance = null;
+
+            if (isset($data['ECS4120-MIB::portMediaInfoBaudRate']) && $data['ECS4120-MIB::portMediaInfoBaudRate'] > 0) {
+                $distance = $data['ECS4120-MIB::portMediaInfoBaudRate'];
+            }
+
+            return new Transceiver([
+                'port_id' => $ifIndexToPortId->get($ifIndex),
+                'index' => $ifIndex,
+                'vendor' => $data['ECS4120-MIB::portMediaInfoVendorName'] ?? null,
+                'type' => $data['ECS4120-MIB::portMediaInfoConnectorType'] ?? null,
+                'model' => $data['ECS4120-MIB::portMediaInfoPartNumber'] ?? null,
+                'serial' => $data['ECS4120-MIB::portMediaInfoSerialNumber'] ?? null,
+                'cable' => $cable,
+                'distance' => $distance,
+                'wavelength' => $data['ECS4120-MIB::portMediaInfoEthComplianceCodes'] ?? null,
+                'entity_physical_index' => $ifIndex,
+            ]);
+        })->filter();
+    }
+}
 
     /**
      * Discover processors.
