@@ -2,7 +2,6 @@ os: esphome
 text: 'ESP-Home'
 type: appliance
 icon: esphome
-mib_dir: esphome
 snmp_bulk: false
 over:
     - { graph: device_mempool, text: 'Memory Usage' }
