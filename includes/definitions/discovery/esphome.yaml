@@ -1,4 +1,4 @@
-mib_dir: esphome
+mib: ESPHOME-ESP8266-SNMP-MIB:HOST-RESOURCES-MIB:SNMPv2-MIB
 modules:
     os:
         hardware:
