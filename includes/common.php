@@ -203,13 +203,6 @@ function device_by_name($name)
     return device_by_id_cache(getidbyname($name));
 }
 
-function accesspoint_by_id($ap_id, $refresh = '0')
-{
-    $ap = dbFetchRow('SELECT * FROM `access_points` WHERE `accesspoint_id` = ?', [$ap_id]);
-
-    return $ap;
-}
-
 function device_by_id_cache($device_id, $refresh = false)
 {
     $model = $refresh ? DeviceCache::refresh((int) $device_id) : DeviceCache::get((int) $device_id);
@@ -242,22 +235,6 @@ function gethostbyid($device_id)
     return DeviceCache::get((int) $device_id)->hostname;
 }
 
-function strgen($length = 16)
-{
-    $entropy = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 'a', 'A', 'b', 'B', 'c', 'C', 'd', 'D', 'e',
-        'E', 'f', 'F', 'g', 'G', 'h', 'H', 'i', 'I', 'j', 'J', 'k', 'K', 'l', 'L', 'm', 'M', 'n',
-        'N', 'o', 'O', 'p', 'P', 'q', 'Q', 'r', 'R', 's', 'S', 't', 'T', 'u', 'U', 'v', 'V', 'w',
-        'W', 'x', 'X', 'y', 'Y', 'z', 'Z', ];
-    $string = '';
-
-    for ($i = 0; $i < $length; $i++) {
-        $key = mt_rand(0, 61);
-        $string .= $entropy[$key];
-    }
-
-    return $string;
-}
-
 function getifbyid($id)
 {
     return dbFetchRow('SELECT * FROM `ports` WHERE `port_id` = ?', [$id]);
@@ -276,11 +253,6 @@ function zeropad($num, $length = 2)
 function set_dev_attrib($device, $attrib_type, $attrib_value)
 {
     return DeviceCache::get((int) $device['device_id'])->setAttrib($attrib_type, $attrib_value);
-}
-
-function get_dev_attribs($device_id)
-{
-    return DeviceCache::get((int) $device_id)->getAttribs();
 }
 
 function get_dev_attrib($device, $attrib_type)
@@ -623,24 +595,6 @@ function ResolveGlues($tables, $target, $x = 0, $hist = [], $last = [])
     }
 
     //You should never get here.
-    return false;
-}
-
-/**
- * Determine if a given string contains a given substring.
- *
- * @param  string  $haystack
- * @param  string|array  $needles
- * @return bool
- */
-function str_i_contains($haystack, $needles)
-{
-    foreach ((array) $needles as $needle) {
-        if ($needle != '' && stripos($haystack, $needle) !== false) {
-            return true;
-        }
-    }
-
     return false;
 }
 

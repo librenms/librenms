@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasOneThrough;
@@ -230,6 +231,25 @@ class Sensor extends DeviceRelatedModel implements Keyable
     public function syncGroup(): string
     {
         return "$this->sensor_class-$this->poller_type";
+    }
+
+    /**
+     * @param  Builder  $query
+     * @return Builder
+     */
+    public function scopeIsCritical($query)
+    {
+        return $query->whereColumn('sensor_current', '<', 'sensor_limit_low')
+            ->orWhereColumn('sensor_current', '>', 'sensor_limit');
+    }
+
+    /**
+     * @param  Builder  $query
+     * @return Builder
+     */
+    public function scopeIsDisabled($query)
+    {
+        return $query->where('sensor_alert', 0);
     }
 
     public function __toString()
