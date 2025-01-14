@@ -1,0 +1,1256 @@
+-- Namespace: http://viptela.com/wwan
+
+VIPTELA-WWAN DEFINITIONS ::= BEGIN
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Integer32, Unsigned32, Counter32, Counter64,
+    Gauge32, IpAddress
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, RowStatus, DateAndTime,
+    TruthValue
+        FROM SNMPv2-TC
+    viptela
+        FROM VIPTELA-GLOBAL
+;
+
+viptela-wwan MODULE-IDENTITY
+    LAST-UPDATED "202007010000Z"
+    ORGANIZATION "Viptela, Inc."
+    CONTACT-INFO "Viptela, Inc.  Email:support@viptela.com"
+    DESCRIPTION "This module defines the data model for cellular management"
+    REVISION "202007010000Z"
+    DESCRIPTION "Viptela Revision 20.3"
+    REVISION "202002240000Z"
+    DESCRIPTION "Viptela Revision 20.1"
+    REVISION "201911150000Z"
+    DESCRIPTION "Viptela Revision 19.3"
+    REVISION "201908150000Z"
+    DESCRIPTION "Viptela Revision 19.2"
+    REVISION "201811010000Z"
+    DESCRIPTION "Viptela Revision 18.4"
+    REVISION "201808200000Z"
+    DESCRIPTION "Viptela Revision 18.3.1"
+    REVISION "201806250000Z"
+    DESCRIPTION "Viptela Revision 18.3"
+    REVISION "201804250000Z"
+    DESCRIPTION "Viptela Revision 18.2"
+    REVISION "201803150000Z"
+    DESCRIPTION "Viptela Revision 18.1.1"
+    REVISION "201801160000Z"
+    DESCRIPTION "Viptela Revision 17.2.3"
+    REVISION "201711010000Z"
+    DESCRIPTION "Viptela Revision 17.2.1"
+    REVISION "201708010000Z"
+    DESCRIPTION "Viptela Revision 17.2"
+    REVISION "201705250000Z"
+    DESCRIPTION "Viptela Revision 17.1.1"
+    REVISION "201704060000Z"
+    DESCRIPTION "Viptela Revision 17.1"
+    REVISION "201702150000Z"
+    DESCRIPTION "Viptela Revision 16.3.2"
+    REVISION "201702060000Z"
+    DESCRIPTION "Viptela Revision 16.3.1"
+    REVISION "201611160000Z"
+    DESCRIPTION "Viptela Revision 16.3"
+    REVISION "201610250000Z"
+    DESCRIPTION "Viptela Revision 16.2.10"
+    REVISION "201610240000Z"
+    DESCRIPTION "Viptela Revision 16.2.4"
+    REVISION "201608100000Z"
+    DESCRIPTION "Viptela Revision 16.2.2"
+    REVISION "201608010000Z"
+    DESCRIPTION "Viptela Revision 16.2.1"
+    REVISION "201606090000Z"
+    DESCRIPTION "Viptela Revision 16.2"
+    REVISION "201604220000Z"
+    DESCRIPTION "Viptela Revision 16.1.1"
+    REVISION "201603150000Z"
+    DESCRIPTION "Viptela Revision 16.1"
+    REVISION "201601300000Z"
+    DESCRIPTION "Viptela Revision 15.4.3"
+    REVISION "201512280000Z"
+    DESCRIPTION "Viptela Revision 15.4.1"
+    REVISION "201507010000Z"
+    DESCRIPTION "Viptela Revision 15.3"
+    ::= { viptela 16 }
+
+Byte ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION "xs:byte"
+    SYNTAX      Integer32 (-128 .. 127)
+
+UnsignedByte ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION "xs:unsignedByte"
+    SYNTAX      Unsigned32 (0 .. 255)
+
+Short ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION "xs:short"
+    SYNTAX      Integer32 (-32768 .. 32767)
+
+UnsignedShort ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION "xs:unsignedShort"
+    SYNTAX      Unsigned32 (0 .. 65535)
+
+ConfdString ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION "xs: and confd: types mapped to strings"
+    SYNTAX      OCTET STRING
+
+String ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION "xs:string"
+    SYNTAX      OCTET STRING
+
+WwanAuthType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      INTEGER {none(0),pAP(1),cHAP(2),pAP-CHAP(3)}
+
+WwanPdnType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      INTEGER {iPv4(0),iPv6(2),iPv46(3)}
+
+WwanRegistrationStatus ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      INTEGER {not-registered(0),registered(1),searching(2),registration-denied(3),unknown(4)}
+
+WwanRadioEnum ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      INTEGER {no-service(0),aMPS(1),cDMA(2),gSM(3),hDR(4),wCDMA(5),gPS(6),not-used(7),wLAN(8),lTE(9)}
+
+WwanActivationEnum ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      INTEGER {not-activated(0),activated(1),not-applicable(2)}
+
+WwanQosEnum ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      INTEGER {activated(1),modified(2),deleted(3),suspended(4),enabled(5),disabled(6)}
+
+WwanStatusEnum ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      INTEGER {inactive(0),active(1)}
+
+-- Configure cellular
+-- tagpath /cellular
+cellular OBJECT IDENTIFIER ::= { viptela-wwan 1 }
+
+-- tagpath /cellular/radio
+cellularRadioTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CellularRadioEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Display cellular radio information"
+    ::= { cellular 1 }
+
+-- tagpath /cellular/radio
+cellularRadioEntry OBJECT-TYPE
+    SYNTAX      CellularRadioEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { IMPLIED cellularRadioIfName }
+        ::= { cellularRadioTable 1 }
+
+CellularRadioEntry ::=
+    SEQUENCE {
+        cellularRadioIfName String,
+        cellularRadioBand UnsignedByte,
+        cellularRadioBandwidth ConfdString,
+        cellularRadioTxChannel UnsignedShort,
+        cellularRadioRxChannel UnsignedShort,
+        cellularRadioRssi Byte,
+        cellularRadioRsrp Short,
+        cellularRadioRsrpComment String,
+        cellularRadioRsrq Byte,
+        cellularRadioRsrqComment String,
+        cellularRadioSnr ConfdString,
+        cellularRadioSnrComment String,
+        cellularRadioEcio ConfdString,
+        cellularRadioSinr ConfdString,
+        cellularRadioIo Integer32,
+        cellularRadioMode WwanRadioEnum,
+        cellularRadioBandClass String,
+        cellularRadioChannel UnsignedShort
+    }
+
+-- tagpath /cellular/radio/if-name
+cellularRadioIfName OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Interface name"
+    ::= { cellularRadioEntry 1 }
+
+-- tagpath /cellular/radio/band
+cellularRadioBand OBJECT-TYPE
+    SYNTAX      UnsignedByte
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Frequency band"
+    ::= { cellularRadioEntry 2 }
+
+-- tagpath /cellular/radio/bandwidth
+cellularRadioBandwidth OBJECT-TYPE
+    SYNTAX      ConfdString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Bandwidth"
+    ::= { cellularRadioEntry 3 }
+
+-- tagpath /cellular/radio/tx-channel
+cellularRadioTxChannel OBJECT-TYPE
+    SYNTAX      UnsignedShort
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Transmit channel"
+    ::= { cellularRadioEntry 4 }
+
+-- tagpath /cellular/radio/rx-channel
+cellularRadioRxChannel OBJECT-TYPE
+    SYNTAX      UnsignedShort
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Receive channel"
+    ::= { cellularRadioEntry 5 }
+
+-- tagpath /cellular/radio/rssi
+cellularRadioRssi OBJECT-TYPE
+    SYNTAX      Byte
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Received signal strength indicator"
+    ::= { cellularRadioEntry 6 }
+
+-- tagpath /cellular/radio/rsrp
+cellularRadioRsrp OBJECT-TYPE
+    SYNTAX      Short
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Reference signal receive power"
+    ::= { cellularRadioEntry 7 }
+
+-- tagpath /cellular/radio/rsrp-comment
+cellularRadioRsrpComment OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "RSRP value classification"
+    ::= { cellularRadioEntry 8 }
+
+-- tagpath /cellular/radio/rsrq
+cellularRadioRsrq OBJECT-TYPE
+    SYNTAX      Byte
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Reference signal receive quality"
+    ::= { cellularRadioEntry 9 }
+
+-- tagpath /cellular/radio/rsrq-comment
+cellularRadioRsrqComment OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "RSRQ value classification"
+    ::= { cellularRadioEntry 10 }
+
+-- tagpath /cellular/radio/snr
+cellularRadioSnr OBJECT-TYPE
+    SYNTAX      ConfdString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Signal-to-noise ratio"
+    ::= { cellularRadioEntry 11 }
+
+-- tagpath /cellular/radio/snr-comment
+cellularRadioSnrComment OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "SNR value classification"
+    ::= { cellularRadioEntry 12 }
+
+-- tagpath /cellular/radio/ecio
+cellularRadioEcio OBJECT-TYPE
+    SYNTAX      ConfdString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "EC/IO"
+    ::= { cellularRadioEntry 13 }
+
+-- tagpath /cellular/radio/sinr
+cellularRadioSinr OBJECT-TYPE
+    SYNTAX      ConfdString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "SINR"
+    ::= { cellularRadioEntry 14 }
+
+-- tagpath /cellular/radio/io
+cellularRadioIo OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Received IO"
+    ::= { cellularRadioEntry 15 }
+
+-- tagpath /cellular/radio/mode
+cellularRadioMode OBJECT-TYPE
+    SYNTAX      WwanRadioEnum
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Radio Mode"
+    ::= { cellularRadioEntry 16 }
+
+-- tagpath /cellular/radio/band-class
+cellularRadioBandClass OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Band class"
+    ::= { cellularRadioEntry 17 }
+
+-- tagpath /cellular/radio/channel
+cellularRadioChannel OBJECT-TYPE
+    SYNTAX      UnsignedShort
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Active channel"
+    ::= { cellularRadioEntry 18 }
+    
+-- tagpath /cellular/sessions
+cellularSessionsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CellularSessionsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Display cellular data session information"
+    ::= { cellular 2 }
+
+-- tagpath /cellular/sessions
+cellularSessionsEntry OBJECT-TYPE
+    SYNTAX      CellularSessionsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { cellularSessionsIfName, cellularSessionsSessionId }
+        ::= { cellularSessionsTable 1 }
+
+CellularSessionsEntry ::=
+    SEQUENCE {
+        cellularSessionsIfName String,
+        cellularSessionsSessionId UnsignedByte,
+        cellularSessionsDataBearer String,
+        cellularSessionsDormancyState String,
+        cellularSessionsActiveProfile UnsignedByte,
+        cellularSessionsRxPackets Counter64,
+        cellularSessionsRxDrops Counter64,
+        cellularSessionsRxErrors Counter64,
+        cellularSessionsRxOverflows Counter64,
+        cellularSessionsTxPackets Counter64,
+        cellularSessionsTxDrops Counter64,
+        cellularSessionsTxErrors Counter64,
+        cellularSessionsTxOverflows Counter64,
+        cellularSessionsRxOctets Counter64,
+        cellularSessionsTxOctets Counter64,
+        cellularSessionsIpv4Addr IpAddress, 
+        cellularSessionsIpv4Mask UnsignedByte,
+        cellularSessionsIpv4Gw   IpAddress,
+        cellularSessionsIpv4DnsPri IpAddress,
+        cellularSessionsIpv4DnsSec IpAddress,
+        cellularSessionsUptime String
+    }
+
+-- tagpath /cellular/sessions/if-name
+cellularSessionsIfName OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Interface name"
+    ::= { cellularSessionsEntry 1 }
+
+-- tagpath /cellular/sessions/session-id
+cellularSessionsSessionId OBJECT-TYPE
+    SYNTAX      UnsignedByte
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Session ID"
+    ::= { cellularSessionsEntry 2 }
+
+-- tagpath /cellular/sessions/data-bearer
+cellularSessionsDataBearer OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Data bearer technology"
+    ::= { cellularSessionsEntry 3 }
+
+-- tagpath /cellular/sessions/dormancy-state
+cellularSessionsDormancyState OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Dormancy state"
+    ::= { cellularSessionsEntry 4 }
+
+-- tagpath /cellular/sessions/active-profile
+cellularSessionsActiveProfile OBJECT-TYPE
+    SYNTAX      UnsignedByte (1 .. 16)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Active profile"
+    ::= { cellularSessionsEntry 5 }
+
+-- tagpath /cellular/sessions/rx-packets
+cellularSessionsRxPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Receive packets "
+    ::= { cellularSessionsEntry 6 }
+
+-- tagpath /cellular/sessions/rx-drops
+cellularSessionsRxDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Receive drops"
+    ::= { cellularSessionsEntry 7 }
+
+-- tagpath /cellular/sessions/rx-errors
+cellularSessionsRxErrors OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Receive errors"
+    ::= { cellularSessionsEntry 8 }
+
+-- tagpath /cellular/sessions/rx-overflows
+cellularSessionsRxOverflows OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Receive overflows"
+    ::= { cellularSessionsEntry 9 }
+
+-- tagpath /cellular/sessions/tx-packets
+cellularSessionsTxPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Transmit packets "
+    ::= { cellularSessionsEntry 10 }
+
+-- tagpath /cellular/sessions/tx-drops
+cellularSessionsTxDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Transmit drops"
+    ::= { cellularSessionsEntry 11 }
+
+-- tagpath /cellular/sessions/tx-errors
+cellularSessionsTxErrors OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Transmit errors"
+    ::= { cellularSessionsEntry 12 }
+
+-- tagpath /cellular/sessions/tx-overflows
+cellularSessionsTxOverflows OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Transmit overflows"
+    ::= { cellularSessionsEntry 13 }
+
+-- tagpath /cellular/sessions/rx-octets
+cellularSessionsRxOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Receive octets"
+    ::= { cellularSessionsEntry 14 }
+
+-- tagpath /cellular/sessions/tx-octets
+cellularSessionsTxOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Transmit octets"
+    ::= { cellularSessionsEntry 15 }
+
+-- tagpath /cellular/sessions/ipv4-addr
+cellularSessionsIpv4Addr OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "IPv4 address"
+    ::= { cellularSessionsEntry 16 }
+
+-- tagpath /cellular/sessions/ipv4-mask
+cellularSessionsIpv4Mask OBJECT-TYPE
+    SYNTAX      UnsignedByte
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "IPv4 mask length"
+    ::= { cellularSessionsEntry 17 }
+
+-- tagpath /cellular/sessions/ipv4-gw
+cellularSessionsIpv4Gw OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "IPv4 gateway"
+    ::= { cellularSessionsEntry 18 }
+
+-- tagpath /cellular/sessions/ipv4-dns-pri
+cellularSessionsIpv4DnsPri OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Primary IPv4 DNS server"
+    ::= { cellularSessionsEntry 19 }
+
+-- tagpath /cellular/sessions/ipv4-dns-sec
+cellularSessionsIpv4DnsSec OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Secondary IPv4 DNS server"
+    ::= { cellularSessionsEntry 20 }
+
+-- tagpath /cellular/sessions/uptime
+cellularSessionsUptime OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Session uptime"
+    ::= { cellularSessionsEntry 21 }
+
+-- tagpath /cellular/network
+cellularNetworkTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CellularNetworkEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Display cellular network information"
+    ::= { cellular 3 }
+
+-- tagpath /cellular/network
+cellularNetworkEntry OBJECT-TYPE
+    SYNTAX      CellularNetworkEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { IMPLIED cellularNetworkIfName }
+        ::= { cellularNetworkTable 1 }
+
+CellularNetworkEntry ::=
+    SEQUENCE {
+        cellularNetworkIfName String,
+        cellularNetworkRegStatus WwanRegistrationStatus,
+        cellularNetworkRoamStatus String,
+        cellularNetworkDomainStatus String,
+        cellularNetworkMcc UnsignedShort,
+        cellularNetworkMnc UnsignedShort,
+        cellularNetworkNwName String,
+        cellularNetworkEmmState String,
+        cellularNetworkEmmSubstate String,
+        cellularNetworkEmmConnstate String,
+        cellularNetworkCellid ConfdString,
+        cellularNetworkTac UnsignedShort,
+        cellularNetworkLac UnsignedShort,
+        cellularNetworkRadioMode WwanRadioEnum,
+        cellularNetworkBsic UnsignedByte,
+        cellularNetworkPsc UnsignedShort,
+        cellularNetworkSid UnsignedShort,
+        cellularNetworkNid UnsignedShort,
+        cellularNetworkBid UnsignedShort
+    }
+
+-- tagpath /cellular/network/if-name
+cellularNetworkIfName OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Interface name"
+    ::= { cellularNetworkEntry 1 }
+
+-- tagpath /cellular/network/reg-status
+cellularNetworkRegStatus OBJECT-TYPE
+    SYNTAX      WwanRegistrationStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Registration status"
+    ::= { cellularNetworkEntry 2 }
+
+-- tagpath /cellular/network/roam-status
+cellularNetworkRoamStatus OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Roaming status"
+    ::= { cellularNetworkEntry 3 }
+
+-- tagpath /cellular/network/domain-status
+cellularNetworkDomainStatus OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Packet-switched domain state"
+    ::= { cellularNetworkEntry 4 }
+
+-- tagpath /cellular/network/mcc
+cellularNetworkMcc OBJECT-TYPE
+    SYNTAX      UnsignedShort
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Mobile country code (MCC)"
+    ::= { cellularNetworkEntry 5 }
+
+-- tagpath /cellular/network/mnc
+cellularNetworkMnc OBJECT-TYPE
+    SYNTAX      UnsignedShort
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Mobile network code (MNC)"
+    ::= { cellularNetworkEntry 6 }
+
+-- tagpath /cellular/network/nw-name
+cellularNetworkNwName OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Network name"
+    ::= { cellularNetworkEntry 7 }
+
+-- tagpath /cellular/network/emm-state
+cellularNetworkEmmState OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "EPS mobility management (EMM) state"
+    ::= { cellularNetworkEntry 8 }
+
+-- tagpath /cellular/network/emm-substate
+cellularNetworkEmmSubstate OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "EPS mobility management (EMM) substate"
+    ::= { cellularNetworkEntry 9 }
+
+-- tagpath /cellular/network/emm-connstate
+cellularNetworkEmmConnstate OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "EPS mobility management (EMM) connection state"
+    ::= { cellularNetworkEntry 10 }
+
+-- tagpath /cellular/network/cellid
+cellularNetworkCellid OBJECT-TYPE
+    SYNTAX      ConfdString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Cell ID"
+    ::= { cellularNetworkEntry 11 }
+
+-- tagpath /cellular/network/tac
+cellularNetworkTac OBJECT-TYPE
+    SYNTAX      UnsignedShort
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Tracking area code (TAC)"
+    ::= { cellularNetworkEntry 12 }
+    
+-- tagpath /cellular/network/lac
+cellularNetworkLac OBJECT-TYPE
+    SYNTAX      UnsignedShort
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Location area code (LAC)"
+    ::= { cellularNetworkEntry 13 }
+
+-- tagpath /cellular/network/radio-mode
+cellularNetworkRadioMode OBJECT-TYPE
+    SYNTAX      WwanRadioEnum
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Radio Mode"
+    ::= { cellularNetworkEntry 14 }
+
+-- tagpath /cellular/network/bsic
+cellularNetworkBsic OBJECT-TYPE
+    SYNTAX      UnsignedByte
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Base station identity code (BSIC)"
+    ::= { cellularNetworkEntry 15 }
+
+-- tagpath /cellular/network/psc
+cellularNetworkPsc OBJECT-TYPE
+    SYNTAX      UnsignedShort
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Primary scrambling code (PSC)"
+    ::= { cellularNetworkEntry 16 }
+
+-- tagpath /cellular/network/sid
+cellularNetworkSid OBJECT-TYPE
+    SYNTAX      UnsignedShort
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "System ID (SID)"
+    ::= { cellularNetworkEntry 17 }
+
+-- tagpath /cellular/network/nid
+cellularNetworkNid OBJECT-TYPE
+    SYNTAX      UnsignedShort
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Network ID (NID)"
+    ::= { cellularNetworkEntry 18 }
+
+-- tagpath /cellular/network/bid
+cellularNetworkBid OBJECT-TYPE
+    SYNTAX      UnsignedShort
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Base statation ID (BID)"
+    ::= { cellularNetworkEntry 19 }
+
+-- tagpath /cellular/modem
+cellularModemTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CellularModemEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Display cellular modem information"
+    ::= { cellular 4 }
+
+-- tagpath /cellular/modem
+cellularModemEntry OBJECT-TYPE
+    SYNTAX      CellularModemEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { IMPLIED cellularModemIfName }
+        ::= { cellularModemTable 1 }
+
+CellularModemEntry ::=
+    SEQUENCE {
+        cellularModemIfName String,
+        cellularModemModel String,
+        cellularModemFwVersion String,
+        cellularModemFwDate String,
+        cellularModemFwTime String,
+        cellularModemFwPkgVer String,
+        cellularModemFwPkgCarrier String,
+        cellularModemFwPkgPri String,
+        cellularModemFwPkgSubver String,
+        cellularModemHwVersion String,
+        cellularModemModemStatus String,
+        cellularModemTemperature Byte,
+        cellularModemImsi String,
+        cellularModemImei String,
+        cellularModemIccid String,
+        cellularModemMsisdn String,
+        cellularModemEsn String
+    }
+
+-- tagpath /cellular/modem/if-name
+cellularModemIfName OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Interface name"
+    ::= { cellularModemEntry 1 }
+
+-- tagpath /cellular/modem/model
+cellularModemModel OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Model number"
+    ::= { cellularModemEntry 2 }
+
+-- tagpath /cellular/modem/fw-version
+cellularModemFwVersion OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Firmware version"
+    ::= { cellularModemEntry 3 }
+
+-- tagpath /cellular/modem/fw-date
+cellularModemFwDate OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Firmware release date"
+    ::= { cellularModemEntry 4 }
+
+-- tagpath /cellular/modem/fw-time
+cellularModemFwTime OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Firmware release time"
+    ::= { cellularModemEntry 5 }
+
+-- tagpath /cellular/modem/fw-pkg-ver
+cellularModemFwPkgVer OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Firmware package version"
+    ::= { cellularModemEntry 6 }
+
+-- tagpath /cellular/modem/fw-pkg-carrier
+cellularModemFwPkgCarrier OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Firmware package carrier"
+    ::= { cellularModemEntry 7 }
+
+-- tagpath /cellular/modem/fw-pkg-pri
+cellularModemFwPkgPri OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Firmware package PRI version"
+    ::= { cellularModemEntry 8 }
+
+-- tagpath /cellular/modem/fw-pkg-subver
+cellularModemFwPkgSubver OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Firmware package subversion"
+    ::= { cellularModemEntry 9 }
+
+-- tagpath /cellular/modem/hw-version
+cellularModemHwVersion OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Hardware version"
+    ::= { cellularModemEntry 10 }
+
+-- tagpath /cellular/modem/modem-status
+cellularModemModemStatus OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Modem status"
+    ::= { cellularModemEntry 11 }
+
+-- tagpath /cellular/modem/temperature
+cellularModemTemperature OBJECT-TYPE
+    SYNTAX      Byte
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Modem temperature, in degrees C"
+    ::= { cellularModemEntry 12 }
+
+-- tagpath /cellular/modem/imsi
+cellularModemImsi OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "International mobile subscriber identity (IMSI)"
+    ::= { cellularModemEntry 13 }
+
+-- tagpath /cellular/modem/imei
+cellularModemImei OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "International mobile equipment identity (IMEI)"
+    ::= { cellularModemEntry 14 }
+
+-- tagpath /cellular/modem/iccid
+cellularModemIccid OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Integrated circuit card ID (ICCID)"
+    ::= { cellularModemEntry 15 }
+
+-- tagpath /cellular/modem/msisdn
+cellularModemMsisdn OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Mobile subscriber ISDN (MSISDN)"
+    ::= { cellularModemEntry 16 }
+
+-- tagpath /cellular/modem/esn
+cellularModemEsn OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Electronic serial number (ESN)"
+    ::= { cellularModemEntry 17 }
+
+-- tagpath /cellular/status
+cellularStatusTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CellularStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Display cellular status"
+    ::= { cellular 5 }
+
+-- tagpath /cellular/status
+cellularStatusEntry OBJECT-TYPE
+    SYNTAX      CellularStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { IMPLIED cellularStatusIfName }
+        ::= { cellularStatusTable 1 }
+
+CellularStatusEntry ::=
+    SEQUENCE {
+        cellularStatusIfName String,
+        cellularStatusModemStatus String,
+        cellularStatusSimStatus String,
+        cellularStatusRadioMode WwanRadioEnum,
+        cellularStatusSignalStrength String,
+        cellularStatusNetworkStatus WwanRegistrationStatus,
+        cellularStatusLastSeenError String,
+        cellularStatusActivationStatus WwanActivationEnum
+    }
+
+-- tagpath /cellular/status/if-name
+cellularStatusIfName OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Interface name"
+    ::= { cellularStatusEntry 1 }
+
+-- tagpath /cellular/status/modem-status
+cellularStatusModemStatus OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Modem status"
+    ::= { cellularStatusEntry 2 }
+
+-- tagpath /cellular/status/sim-status
+cellularStatusSimStatus OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "SIM status"
+    ::= { cellularStatusEntry 3 }
+
+-- tagpath /cellular/status/radio-mode
+cellularStatusRadioMode OBJECT-TYPE
+    SYNTAX      WwanRadioEnum
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Radio Mode"
+    ::= { cellularStatusEntry 4 }
+
+-- tagpath /cellular/status/signal-strength
+cellularStatusSignalStrength OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Signal Strength"
+    ::= { cellularStatusEntry 5 }
+
+-- tagpath /cellular/status/network-status
+cellularStatusNetworkStatus OBJECT-TYPE
+    SYNTAX      WwanRegistrationStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Network registration status"
+    ::= { cellularStatusEntry 6 }
+
+-- tagpath /cellular/status/last-seen-error
+cellularStatusLastSeenError OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 200))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Last seen error"
+    ::= { cellularStatusEntry 7 }
+
+-- tagpath /cellular/status/act-status
+cellularStatusActivationStatus OBJECT-TYPE
+    SYNTAX      WwanActivationEnum
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Activation status"
+    ::= { cellularStatusEntry 8 }
+
+-- tagpath /cellular/profiles
+cellularProfilesTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CellularProfilesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Display cellular  profile information"
+    ::= { cellular 6 }
+
+-- tagpath /cellular/profiles
+cellularProfilesEntry OBJECT-TYPE
+    SYNTAX      CellularProfilesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { cellularProfilesIfName, cellularProfilesProfileId }
+        ::= { cellularProfilesTable 1 }
+
+CellularProfilesEntry ::=
+    SEQUENCE {
+        cellularProfilesIfName String,
+        cellularProfilesProfileId UnsignedByte,
+        cellularProfilesPdnType WwanPdnType,
+        cellularProfilesApn String,
+        cellularProfilesName String,
+        cellularProfilesAuth WwanAuthType,
+        cellularProfilesIpAddr IpAddress,
+        cellularProfilesPrimaryDns IpAddress,
+        cellularProfilesSecondaryDns IpAddress,
+        cellularProfilesUserName String
+    }
+
+-- tagpath /cellular/profiles/if-name
+cellularProfilesIfName OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Interface name"
+    ::= { cellularProfilesEntry 1 }
+
+-- tagpath /cellular/profiles/profile-id
+cellularProfilesProfileId OBJECT-TYPE
+    SYNTAX      UnsignedByte
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Profile ID"
+    ::= { cellularProfilesEntry 2 }
+
+-- tagpath /cellular/profiles/pdn-type
+cellularProfilesPdnType OBJECT-TYPE
+    SYNTAX      WwanPdnType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Packet data network type"
+    ::= { cellularProfilesEntry 3 }
+
+-- tagpath /cellular/profiles/apn
+cellularProfilesApn OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 104))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Access point name"
+    ::= { cellularProfilesEntry 4 }
+
+-- tagpath /cellular/profiles/name
+cellularProfilesName OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 17))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Profile name"
+    ::= { cellularProfilesEntry 5 }
+
+-- tagpath /cellular/profiles/auth
+cellularProfilesAuth OBJECT-TYPE
+    SYNTAX      WwanAuthType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Authentication"
+    ::= { cellularProfilesEntry 6 }
+
+-- tagpath /cellular/profiles/ip-addr
+cellularProfilesIpAddr OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Assigned IP address"
+    ::= { cellularProfilesEntry 7 }
+
+-- tagpath /cellular/profiles/primary-dns
+cellularProfilesPrimaryDns OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Assigned primary DNS address"
+    ::= { cellularProfilesEntry 8 }
+
+-- tagpath /cellular/profiles/secondary-dns
+cellularProfilesSecondaryDns OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Assigned secondary DNS address"
+    ::= { cellularProfilesEntry 9 }
+
+-- tagpath /cellular/profiles/user-name
+cellularProfilesUserName OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 129))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Profile username"
+    ::= { cellularProfilesEntry 10 }
+
+-- tagpath /cellular/qos
+cellularQosTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CellularQosEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Display cellular qos status"
+    ::= { cellular 7 }
+
+-- tagpath /cellular/qos
+cellularQosEntry OBJECT-TYPE
+    SYNTAX      CellularQosEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { IMPLIED cellularQosIfName }
+        ::= { cellularQosTable 1 }
+
+CellularQosEntry ::=
+    SEQUENCE {
+        cellularQosIfName String,
+        cellularQosFlowId Unsigned32,
+        cellularQosBearerId UnsignedByte,
+        cellularQosQci UnsignedByte,
+        cellularQosBearerStatus WwanQosEnum
+    }
+
+-- tagpath /cellular/qos/if-name
+cellularQosIfName OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Interface name"
+    ::= { cellularQosEntry 1 }
+
+-- tagpath /cellular/qos/flow-id
+cellularQosFlowId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "QoS flow identifier"
+    ::= { cellularQosEntry 2 }
+
+-- tagpath /cellular/qos/bearer-id
+cellularQosBearerId OBJECT-TYPE
+    SYNTAX      UnsignedByte
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Bearer identifier"
+    ::= { cellularQosEntry 3 }
+
+-- tagpath /cellular/qos/qci
+cellularQosQci OBJECT-TYPE
+    SYNTAX      UnsignedByte
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "QoS class identifier"
+    ::= { cellularQosEntry 4 }
+
+-- tagpath /cellular/qos/bearer-status
+cellularQosBearerStatus OBJECT-TYPE
+    SYNTAX      WwanQosEnum
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Bearer status"
+    ::= { cellularQosEntry 5 }
+
+-- tagpath /cellular/firmware
+cellularFirmwareTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CellularFirmwareEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Display cellular firmware information"
+    ::= { cellular 8 }
+
+-- tagpath /cellular/firmware
+cellularFirmwareEntry OBJECT-TYPE
+    SYNTAX      CellularFirmwareEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { cellularFirmwareIfName, cellularFirmwareImageIndex }
+        ::= { cellularFirmwareTable 1 }
+
+CellularFirmwareEntry ::=
+    SEQUENCE {
+        cellularFirmwareIfName String,
+        cellularFirmwareImageIndex UnsignedByte,
+        cellularFirmwareCarrier String,
+        cellularFirmwareVersion String,
+        cellularFirmwarePriVersion String,
+        cellularFirmwareImageStatus WwanStatusEnum
+    }
+
+-- tagpath /cellular/firmware/if-name
+cellularFirmwareIfName OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Interface name"
+    ::= { cellularFirmwareEntry 1 }
+
+-- tagpath /cellular/firmware/image-index
+cellularFirmwareImageIndex OBJECT-TYPE
+    SYNTAX      UnsignedByte
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Image Index"
+    ::= { cellularFirmwareEntry 2 }
+
+-- tagpath /cellular/firmware/carrier
+cellularFirmwareCarrier OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Carrier"
+    ::= { cellularFirmwareEntry 3 }
+
+-- tagpath /cellular/firmware/version
+cellularFirmwareVersion OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Firmware Version"
+    ::= { cellularFirmwareEntry 4 }
+
+-- tagpath /cellular/firmware/pri-version
+cellularFirmwarePriVersion OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "PRI Version"
+    ::= { cellularFirmwareEntry 5 }
+
+-- tagpath /cellular/firmware/status
+cellularFirmwareImageStatus OBJECT-TYPE
+    SYNTAX      WwanStatusEnum
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Image Status"
+    ::= { cellularFirmwareEntry 6 }
+
+END
