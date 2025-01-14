@@ -18,7 +18,7 @@
  * along with this program.  If not, see <.
  *
  * @package    LibreNMS
- * @link       
+ * @link
  * @copyright  2020 Tony Murray
  * @author     Tony Murray <>
  */
@@ -34,6 +34,7 @@ use LibreNMS\OS;
 class Viptela extends OS implements ProcessorDiscovery, ProcessorPolling
 {
     private string $procOid = '.1.3.6.1.4.1.41916.11.1.16.0';
+
     public function discoverOS(Device $device): void
     {
         parent::discoverOS($device); // yaml
@@ -80,6 +81,7 @@ class Viptela extends OS implements ProcessorDiscovery, ProcessorPolling
             1,
             $idle_cpu,
         );
+
         return $processors;
     }
 
@@ -99,5 +101,4 @@ class Viptela extends OS implements ProcessorDiscovery, ProcessorPolling
 
         return $data;
     }
-
 }
