@@ -153,33 +153,4 @@ class Edgecos extends OS implements MempoolsDiscovery, ProcessorDiscovery
         return parent::discoverProcessors();
     }
 
-    /**
-     * Find the MIB based on sysObjectID
-     *
-     * @return string
-     */
-    protected function findMib(): ?string
-    {
-        $table = [
-            '.1.3.6.1.4.1.259.6.' => 'ES3528MO-MIB',
-            '.1.3.6.1.4.1.259.10.1.22.' => 'ES3528MV2-MIB',
-            '.1.3.6.1.4.1.259.10.1.24.' => 'ECS4510-MIB',
-            '.1.3.6.1.4.1.259.10.1.39.' => 'ECS4110-MIB',
-            '.1.3.6.1.4.1.259.10.1.42.' => 'ECS4210-MIB',
-            '.1.3.6.1.4.1.259.10.1.27.' => 'ECS3510-MIB',
-            '.1.3.6.1.4.1.259.10.1.45.' => 'ECS4120-MIB',
-            '.1.3.6.1.4.1.259.8.1.11' => 'ES3510MA-MIB',
-            '.1.3.6.1.4.1.259.10.1.43.' => 'ECS2100-MIB',
-            '.1.3.6.1.4.1.259.10.1.46.' => 'ECS4100-52T-MIB',
-            '.1.3.6.1.4.1.259.10.1.5' => 'ECS4610-24F-MIB',
-        ];
-
-        foreach ($table as $prefix => $mib) {
-            if (Str::startsWith($this->getDevice()->sysObjectID, $prefix)) {
-                return $mib;
-            }
-        }
-
-        return null;
-    }
-}
+    
