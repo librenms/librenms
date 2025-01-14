@@ -15,12 +15,12 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @package    LibreNMS
- * @link
+ * @link       https://www.librenms.org
  * @copyright  2020 Tony Murray
- * @author     Tony Murray <>
+ * @author     Tony Murray <murraytony@gmail.com>
  */
 
 namespace LibreNMS\OS;
