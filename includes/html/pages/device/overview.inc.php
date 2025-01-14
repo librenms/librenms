@@ -41,9 +41,7 @@ require 'overview/processors.inc.php';
 require 'overview/mempools.inc.php';
 require 'overview/storage.inc.php';
 require 'overview/toner.inc.php';
-foreach (Sensor::getTypes() as $sensor_class) {
-    require 'overview/sensors.inc.php';
-}
+require 'overview/sensors.inc.php';
 require 'overview/eventlog.inc.php';
 require 'overview/services.inc.php';
 require 'overview/syslog.inc.php';

@@ -1,12 +1,12 @@
 <?php
 
-use App\Models\Sensor;
+use App\Facades\DeviceCache;
 
 require 'includes/html/graphs/common.inc.php';
 
 $col_w = 7 + strlen($unit);
 $rrd_options .= " COMMENT:'" . str_pad($unit_long, 19) . str_pad('Cur', $col_w) . str_pad('Min', $col_w) . str_pad('Max', $col_w) . "Avg\\n'";
-foreach (Sensor::where('sensor_class', $class)->where('device_id', $device['device_id'])->get() as $index => $sensor) {
+foreach (DeviceCache::getPrimary()->sensors()->where('sensor_class', $class)->get() as $index => $sensor) {
     // FIXME generic colour function
     switch ($index % 7) {
         case 0:

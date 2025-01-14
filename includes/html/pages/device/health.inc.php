@@ -23,6 +23,7 @@
  * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  */
 
+use App\Facades\DeviceCache;
 use App\Models\DiskIo;
 use App\Models\Mempool;
 use App\Models\Processor;
@@ -64,12 +65,10 @@ if (Storage::where('device_id', $device['device_id'])->count()) {
 if (DiskIo::where('device_id', $device['device_id'])->count()) {
     $datas[] = 'diskio';
 }
-
-foreach (Sensor::getTypes() as $sensor_class) {
-    if (Sensor::where('sensor_class', $sensor_class)->where('device_id', $device['device_id'])->count()) {
-        $datas[] = $sensor_class;
-        $type_text[$sensor_class] = Sensor::getClassDescr($sensor_class);
-    }
+// TODO:  The filling of two arrays are ugly but works for the moment
+foreach (DeviceCache::getPrimary()->sensors()->distinct()->select('sensor_class')->get() as $sensor) {
+        $datas[] = $sensor->sensor_class;
+        $type_text[$sensor->sensor_class] = $sensor->classDescr($sensor_class);
 }
 
 $type_text['overview'] = __('Overview');

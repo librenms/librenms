@@ -1,85 +1,91 @@
 <?php
 
+use App\Facades\DeviceCache;
+use App\Models\Sensor;
 use LibreNMS\Config;
 use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Url;
 
-// Cache all sensors on device and exclude transceivers
-$sensors = DeviceCache::getPrimary()
+// Get all sensors on device and exclude transceivers
+// the later Controller part...
+$grouped_sensors = DeviceCache::getPrimary()
     ->sensors()
-    ->where('sensor_class', $sensor_class)
-    ->where('group', '!=', 'transceiver')
+    ->where(fn($q) => $q->where('group', '!=', 'transceiver')->orWhereNull('group'))
+    ->whereIn('sensor_class', Sensor::getTypes())
     ->orderBy('group')
     ->orderBy('sensor_descr')
-    ->get();
-if ($sensors->count()) {
-    echo '
-        <div class="row">
-        <div class="col-md-12">
-        <div class="panel panel-default panel-condensed">
-        <div class="panel-heading">';
-    echo '<a href="device/device=' . $sensors->first()->device_id . '/tab=health/metric=' . $sensors->first()->sensor_class . '/"><i class="fa fa-' . $sensors->first()->icon() . ' fa-lg icon-theme" aria-hidden="true"></i><strong> ' . $sensors->first()->classDescr() . '</strong></a>';
-    echo '      </div>
-        <table class="table table-hover table-condensed table-striped">';
-    $group = '';
-    foreach ($sensors as $sensor) {
-        if (! is_numeric($sensor->sensor_current)) {
-            $sensor->sensor_current = 'NaN';
+    ->get()
+    ->groupBy('sensnor_class');
+
+//TODO: from here should be a blade view once graph is a object
+foreach($grouped_sensors as $sensor_class => $sensors){
+        echo '
+            <div class="row">
+            <div class="col-md-12">
+            <div class="panel panel-default panel-condensed">
+            <div class="panel-heading">';
+            echo '<a href="device/device=' . DeviceCache::getPrimary()->device_id . '/tab=health/metric=' . $sensor_class . '/"><i class="fa fa-' . $sensors->first()->icon() . ' fa-lg icon-theme" aria-hidden="true"></i><strong> ' . $sensors->first()->classDescr() . '</strong></a>';
+        echo '      </div>
+            <table class="table table-hover table-condensed table-striped">';
+        $group = '';
+        foreach ($sensors as $sensor) {
+            if (! is_numeric($sensor->sensor_current)) {
+                $sensor->sensor_current = 'NaN';
+            }
+
+            if ($sensor->group != '' && $group != $sensor->group) {
+                $group = $sensor->group;
+                echo '<tr><td colspan="3"><strong>' . $group . '</strong></td></tr>';
+            }
+
+            // FIXME - make this "four graphs in popup" a function/include and "small graph" a function.
+            // FIXME - So now we need to clean this up and move it into a function. Isn't it just "print-graphrow"?
+            // FIXME - DUPLICATED IN health/sensors
+            $graph_array = [];
+            $graph_array['height'] = '100';
+            $graph_array['width'] = '210';
+            $graph_array['to'] = Config::get('time.now');
+            $graph_array['id'] = $sensor->sensor_id;
+            $graph_array['type'] = 'sensor_' . $sensor->sensor_type;
+            $graph_array['from'] = Config::get('time.day');
+            $graph_array['legend'] = 'no';
+
+            $link_array = $graph_array;
+            $link_array['page'] = 'graphs';
+            unset($link_array['height'], $link_array['width'], $link_array['legend']);
+            $link = Url::generate($link_array);
+
+            if ($sensor->poller_type == 'ipmi') {
+                $sensor->sensor_descr = substr(ipmiSensorName($device['hardware'], $sensor->sensor_descr), 0, 48);
+            } else {
+                $sensor->sensor_descr = substr($sensor->sensor_descr, 0, 48);
+            }
+
+            $overlib_content = '<div class=overlib><span class=overlib-text>' . $device['hostname'] . ' - ' . $sensor->sensor_descr . '</span><br />';
+            foreach (['day', 'week', 'month', 'year'] as $period) {
+                $graph_array['from'] = Config::get("time.$period");
+                $overlib_content .= str_replace('"', "\'", Url::graphTag($graph_array));
+            }
+
+            $overlib_content .= '</div>';
+
+            $graph_array['width'] = 80;
+            $graph_array['height'] = 20;
+            $graph_array['bg'] = 'ffffff00'; // the 00 at the end makes the area transparent.
+            $graph_array['from'] = Config::get('time.day');
+            $sensor_minigraph = Url::lazyGraphTag($graph_array);
+
+            $sensor_current = $sensor->sensor_class == 'state' ? get_state_label($sensor) : get_sensor_label_color($sensor);
+
+            echo '<tr><td><div style="display: grid; grid-gap: 10px; grid-template-columns: 3fr 1fr 1fr;">
+                <div>' . Url::overlibLink($link, Rewrite::shortenIfType($sensor->sensor_descr), $overlib_content, $sensor->sensor_class) . '</div>
+                <div>' . Url::overlibLink($link, $sensor_minigraph, $overlib_content, $sensor->sensor_class) . '</div>
+                <div>' . Url::overlibLink($link, $sensor_current, $overlib_content, $sensor->sensor_class) . '</div>
+                </div></td></tr>';
         }
 
-        if ($sensor->group != '' && $group != $sensor->group) {
-            $group = $sensor->group;
-            echo '<tr><td colspan="3"><strong>' . $group . '</strong></td></tr>';
-        }
-
-        // FIXME - make this "four graphs in popup" a function/include and "small graph" a function.
-        // FIXME - So now we need to clean this up and move it into a function. Isn't it just "print-graphrow"?
-        // FIXME - DUPLICATED IN health/sensors
-        $graph_array = [];
-        $graph_array['height'] = '100';
-        $graph_array['width'] = '210';
-        $graph_array['to'] = Config::get('time.now');
-        $graph_array['id'] = $sensor->sensor_id;
-        $graph_array['type'] = 'sensor_' . $sensor->sensor_type;
-        $graph_array['from'] = Config::get('time.day');
-        $graph_array['legend'] = 'no';
-
-        $link_array = $graph_array;
-        $link_array['page'] = 'graphs';
-        unset($link_array['height'], $link_array['width'], $link_array['legend']);
-        $link = Url::generate($link_array);
-
-        if ($sensor->poller_type == 'ipmi') {
-            $sensor->sensor_descr = substr(ipmiSensorName($device['hardware'], $sensor->sensor_descr), 0, 48);
-        } else {
-            $sensor->sensor_descr = substr($sensor->sensor_descr, 0, 48);
-        }
-
-        $overlib_content = '<div class=overlib><span class=overlib-text>' . $device['hostname'] . ' - ' . $sensor->sensor_descr . '</span><br />';
-        foreach (['day', 'week', 'month', 'year'] as $period) {
-            $graph_array['from'] = Config::get("time.$period");
-            $overlib_content .= str_replace('"', "\'", Url::graphTag($graph_array));
-        }
-
-        $overlib_content .= '</div>';
-
-        $graph_array['width'] = 80;
-        $graph_array['height'] = 20;
-        $graph_array['bg'] = 'ffffff00'; // the 00 at the end makes the area transparent.
-        $graph_array['from'] = Config::get('time.day');
-        $sensor_minigraph = Url::lazyGraphTag($graph_array);
-
-        $sensor_current = $sensor->sensor_class == 'state' ? get_state_label($sensor) : get_sensor_label_color($sensor);
-
-        echo '<tr><td><div style="display: grid; grid-gap: 10px; grid-template-columns: 3fr 1fr 1fr;">
-            <div>' . Url::overlibLink($link, Rewrite::shortenIfType($sensor->sensor_descr), $overlib_content, $sensor->sensor_class) . '</div>
-            <div>' . Url::overlibLink($link, $sensor_minigraph, $overlib_content, $sensor->sensor_class) . '</div>
-            <div>' . Url::overlibLink($link, $sensor_current, $overlib_content, $sensor->sensor_class) . '</div>
-            </div></td></tr>';
-    }//end foreach
-
-    echo '</table>';
-    echo '</div>';
-    echo '</div>';
-    echo '</div>';
-}//end if
+        echo '</table>';
+        echo '</div>';
+        echo '</div>';
+        echo '</div>';
+}
