@@ -5,7 +5,8 @@ namespace LibreNMS\Enum;
 use Illuminate\Support\Collection;
 use ReflectionClass;
 
-class SensorClass {
+class SensorClass
+{
     const airflow = 'angle-double-right';
     const ber = 'sort-amount-desc';
     const charge = 'battery-half';

@@ -27,7 +27,6 @@ use App\Facades\DeviceCache;
 use App\Models\DiskIo;
 use App\Models\Mempool;
 use App\Models\Processor;
-use App\Models\Sensor;
 use App\Models\Storage;
 use LibreNMS\Component;
 use LibreNMS\Enum\SensorClass;

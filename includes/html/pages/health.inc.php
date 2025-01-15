@@ -15,7 +15,6 @@
  * @author     LibreNMS Contributors
 */
 
-use App\Models\Sensor;
 use LibreNMS\Enum\SensorClass;
 use LibreNMS\Util\ObjectCache;
 
