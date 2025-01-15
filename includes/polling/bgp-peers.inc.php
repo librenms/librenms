@@ -26,7 +26,7 @@ if (! empty($peers)) {
 
     $generic = false;
     if ($device['os'] == 'junos') {
-        $peer_data_check = SnmpQuery::mibDir('junos')->enumStrings()->abortOnFailure()->walk([
+        $peer_data_check = SnmpQuery::mibDir('junos')->numericIndex()->abortOnFailure()->walk([
             'BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerIndex',
             'BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerState',
             'BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerStatus',
@@ -135,9 +135,10 @@ if (! empty($peers)) {
                         'bgpPeerLastErrorText' => $junos[$address]['BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerLastErrorReceivedText'] ?? null,
                     ];
 
-                    $error_data = explode(' ', $junos[$address]['BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerLastErrorReceived']);
+                    $error_data = explode(' ', $junos[$address]['BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerLastErrorReceived'] ?? ' ');
                     $peer_data['bgpPeerLastErrorCode'] = intval($error_data[0]);
                     $peer_data['bgpPeerLastErrorSubCode'] = intval($error_data[1]);
+                    $peer_data['bgpPeerInUpdateElapsedTime'] = null;
 
                     try {
                         $peer_data['bgpLocalAddr'] = IP::fromHexString($junos[$address]['BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerLocalAddr'])->uncompressed();
@@ -643,11 +644,17 @@ if (! empty($peers)) {
                         ])->table(3);
                     }
 
-                    $jnxPeerIndex = $junos[$peer_ip->uncompressed()]['BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerIndex'];
-                    $current_peer_data = $j_prefixes[$jnxPeerIndex][$afi][$safis[$safi]];
-                    $cbgpPeerAcceptedPrefixes = $current_peer_data['BGP4-V2-MIB-JUNIPER::jnxBgpM2PrefixInPrefixesAccepted'];
-                    $cbgpPeerDeniedPrefixes = $current_peer_data['BGP4-V2-MIB-JUNIPER::jnxBgpM2PrefixInPrefixesRejected'];
-                    $cbgpPeerAdvertisedPrefixes = $current_peer_data['BGP4-V2-MIB-JUNIPER::jnxBgpM2PrefixOutPrefixes'];
+
+                    $jnxPeerIndex = $junos[$peer_ip->uncompressed()]['BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerIndex'] ?? null;
+                    $current_peer_data = $j_prefixes[$jnxPeerIndex][$afi][$safis[$safi]] ?? [];
+                    $cbgpPeerAcceptedPrefixes = $current_peer_data['BGP4-V2-MIB-JUNIPER::jnxBgpM2PrefixInPrefixesAccepted'] ?? null;
+                    $cbgpPeerDeniedPrefixes = $current_peer_data['BGP4-V2-MIB-JUNIPER::jnxBgpM2PrefixInPrefixesRejected'] ?? null;
+                    $cbgpPeerAdvertisedPrefixes = $current_peer_data['BGP4-V2-MIB-JUNIPER::jnxBgpM2PrefixOutPrefixes'] ?? null;
+                    $cbgpPeerPrefixAdminLimit = null;
+                    $cbgpPeerPrefixThreshold = null;
+                    $cbgpPeerPrefixClearThreshold = null;
+                    $cbgpPeerSuppressedPrefixes = null;
+                    $cbgpPeerWithdrawnPrefixes = null;
                 }//end if
 
                 if ($device['os_group'] === 'arista') {
@@ -774,7 +781,7 @@ if (! empty($peers)) {
                     }
                 }
 
-                if ($peer['c_update']) {
+                if (! empty($peer['c_update'])) {
                     dbUpdate(
                         $peer['c_update'],
                         'bgpPeers_cbgp',
