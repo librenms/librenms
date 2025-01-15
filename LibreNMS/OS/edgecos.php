@@ -23,15 +23,17 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
+<?php
+
 namespace LibreNMS\OS;
 
-use App\Models\Mempool;
-use App\Models\Processor;
+use App\Models\Device;
 use App\Models\Transceiver;
+use App\Models\Processor;
 use Illuminate\Support\Collection;
+use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
-use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
 use LibreNMS\OS;
 use SnmpQuery;
 
@@ -84,13 +86,8 @@ class Edgecos extends OS implements TransceiverDiscovery, MempoolsDiscovery, Pro
 
         $inventory->each(function ($entry) use ($extra) {
             if (isset($entry->entPhysicalIndex)) {
-                if (! empty($extra[$entry->entPhysicalIndex]['ECS4120-MIB::portMediaInfoVendorName'])) {
-                    $entry->entPhysicalDescr = $extra[$entry->entPhysicalIndex]['ECS4120-MIB::portMediaInfoVendorName'];
-                }
-
-                if (! empty($extra[$entry->entPhysicalIndex]['ECS4120-MIB::portMediaInfoPartNumber'])) {
-                    $entry->entPhysicalModelName = $extra[$entry->entPhysicalIndex]['ECS4120-MIB::portMediaInfoPartNumber'];
-                }
+                $entry->entPhysicalDescr = $extra[$entry->entPhysicalIndex]['ECS4120-MIB::portMediaInfoVendorName'] ?? '';
+                $entry->entPhysicalModelName = $extra[$entry->entPhysicalIndex]['ECS4120-MIB::portMediaInfoPartNumber'] ?? '';
             }
         });
 
@@ -105,19 +102,18 @@ class Edgecos extends OS implements TransceiverDiscovery, MempoolsDiscovery, Pro
         $data = SnmpQuery::walk('ECS4120-MIB::deviceCpuUsageTable')->table(1);
 
         foreach ($data as $index => $entry) {
-            $usage_oid = '.1.3.6.1.4.1.259.10.1.2.1.5.' . $index;
+            $usage_oid = ".1.3.6.1.4.1.259.10.1.2.1.5." . $index;
             $descr = $entry['ECS4120-MIB::deviceCpuUsageDescr'] ?? "Processor $index";
             $usage = $entry['ECS4120-MIB::deviceCpuUsage'] ?? 0;
 
-            $processors[] = Processor::discover(
-                'edgecos',
-                $this->getDeviceId(),
-                $usage_oid,
-                $index,
-                $descr,
-                1,
-                $usage
-            );
+            $processors[] = new Processor([
+                'device_id' => $this->getDeviceId(),
+                'index' => $index,
+                'usage_oid' => $usage_oid,
+                'description' => $descr,
+                'precision' => 1,
+                'usage' => $usage,
+            ]);
         }
 
         return $processors;
@@ -152,3 +148,4 @@ class Edgecos extends OS implements TransceiverDiscovery, MempoolsDiscovery, Pro
         return $mempools;
     }
 }
+
