@@ -67,8 +67,8 @@ if (DiskIo::where('device_id', $device['device_id'])->count()) {
 }
 // TODO:  The filling of two arrays are ugly but works for the moment
 foreach (DeviceCache::getPrimary()->sensors()->distinct()->select('sensor_class')->get() as $sensor) {
-        $datas[] = $sensor->sensor_class;
-        $type_text[$sensor->sensor_class] = $sensor->classDescr($sensor_class);
+    $datas[] = $sensor->sensor_class;
+    $type_text[$sensor->sensor_class] = $sensor->classDescr($sensor_class);
 }
 
 $type_text['overview'] = __('Overview');

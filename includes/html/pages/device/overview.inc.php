@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\Sensor;
 use LibreNMS\Interfaces\Plugins\Hooks\DeviceOverviewHook;
 
 $overview = 1;
