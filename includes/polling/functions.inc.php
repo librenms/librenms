@@ -4,6 +4,7 @@ use App\Models\Eventlog;
 use App\Models\Sensor;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
+use LibreNMS\Enum\SensorClass;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\JsonAppBase64DecodeException;
 use LibreNMS\Exceptions\JsonAppBlankJsonException;
@@ -138,8 +139,8 @@ function poll_sensor($device, $class)
 function record_sensor_data($device, $all_sensors)
 {
     foreach ($all_sensors as $sensor) {
-        $class = Sensor::getClassDescr($sensor['sensor_class']);
-        $unit = Sensor::getUnit($sensor['sensor_class']);
+        $class = SensorClass::descr($sensor['sensor_class']);
+        $unit = SensorClass::unit($sensor['sensor_class']);
         $sensor_value = Number::extract($sensor['new_value']);
         $prev_sensor_value = $sensor['sensor_current'];
 

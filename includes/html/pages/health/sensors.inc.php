@@ -16,8 +16,9 @@
 */
 
 use App\Models\Sensor;
+use LibreNMS\Enum\SensorClass;
 
-$pagetitle[] = __('Health') . ' :: ' . Sensor::getClassDescr($active_metric);
+$pagetitle[] = __('Health') . ' :: ' . SensorClass::descr($active_metric);
 
 ?>
 <div class="panel panel-default panel-condensed">
@@ -57,7 +58,7 @@ $pagetitle[] = __('Health') . ' :: ' . Sensor::getClassDescr($active_metric);
                 id: 'sensors',
                 view: '<?php echo htmlspecialchars($vars['view']); ?>',
                 graph_type: '<?php echo htmlspecialchars('sensor_' . $active_metric); ?>',
-                unit: '<?php echo htmlspecialchars(Sensor::getUnit($active_metric)); ?>',
+                unit: '<?php echo htmlspecialchars(SensorClass::unit($active_metric)); ?>',
                 class: '<?php echo htmlspecialchars($active_metric); ?>'
             };
         },

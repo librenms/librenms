@@ -1,7 +1,7 @@
 <?php
 
-use App\Models\Sensor;
 use LibreNMS\Config;
+use LibreNMS\Enum\SensorClass;
 use LibreNMS\OS;
 
 /** @var OS $os */
@@ -48,7 +48,9 @@ if ($device['os'] == 'loop-telecom') {
 }
 
 // filter submodules
-$run_sensors = array_intersect(Sensor::getTypes(), Config::get('discovery_submodules.sensors', Sensor::getTypes()));
+$run_sensors = SensorClass::all()
+    ->intersect(Config::get('discovery_submodules.sensors', SensorClass::all()->toArray()))
+    ->toArray();
 
 sensors($run_sensors, $os, $pre_cache);
 unset(

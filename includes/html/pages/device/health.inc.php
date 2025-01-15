@@ -30,6 +30,7 @@ use App\Models\Processor;
 use App\Models\Sensor;
 use App\Models\Storage;
 use LibreNMS\Component;
+use LibreNMS\Enum\SensorClass;
 
 /*
 # QFP count for cisco devices
@@ -110,9 +111,9 @@ foreach ($datas as $type) {
 print_optionbar_end();
 
 $metric = basename($vars['metric']);
-if (in_array($metric, Sensor::getTypes())) {
+if (SensorClass::all()->contains($metric)) {
     $class = $metric;
-    $unit = Sensor::getUnit($metric);
+    $unit = SensorClass::unit($metric);
     $graph_type = 'sensor_' . $metric;
     include 'includes/html/pages/device/health/sensors.inc.php';
 } elseif (is_file('includes/html/pages/device/health/' . $metric . '.inc.php')) {

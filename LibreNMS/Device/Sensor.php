@@ -586,24 +586,6 @@ class Sensor implements DiscoveryModule, PollerModule
     }
 
     /**
-     * Return a list of valid types with metadata about each type
-     * $class => array(
-     *  'short' - short text for this class
-     *  'long'  - long text for this class
-     *  'unit'  - units used by this class 'dBm' for example
-     *  'icon'  - font awesome icon used by this class
-     * )
-     *
-     * @param  bool  $valid  filter this list by valid types in the database
-     * @param  int  $device_id  when filtering, only return types valid for this device_id
-     * @return array
-     */
-    public static function getTypes($valid = false, $device_id = null)
-    {
-        return [];
-    }
-
-    /**
      * Record sensor data in the database and data stores
      *
      * @param  OS  $os
@@ -612,7 +594,7 @@ class Sensor implements DiscoveryModule, PollerModule
      */
     protected static function recordSensorData(OS $os, $sensors, $data)
     {
-        $types = static::getTypes();
+        $types = [];
 
         foreach ($sensors as $sensor) {
             $sensor_value = $data[$sensor['sensor_id']];

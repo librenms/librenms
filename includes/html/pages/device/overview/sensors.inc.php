@@ -1,8 +1,8 @@
 <?php
 
 use App\Facades\DeviceCache;
-use App\Models\Sensor;
 use LibreNMS\Config;
+use LibreNMS\Enum\SensorClass;
 use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Url;
 
@@ -11,7 +11,7 @@ use LibreNMS\Util\Url;
 $grouped_sensors = DeviceCache::getPrimary()
     ->sensors()
     ->where(fn ($q) => $q->where('group', '!=', 'transceiver')->orWhereNull('group'))
-    ->whereIn('sensor_class', Sensor::getTypes())
+    ->whereIn('sensor_class', SensorClass::all()->toArray())
     ->orderBy('group')
     ->orderBy('sensor_descr')
     ->get()

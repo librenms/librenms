@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
+use LibreNMS\Enum\SensorClass;
 
 return new class extends Migration
 {
@@ -11,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        foreach (\App\Models\Sensor::getTypes() as $type) {
+        foreach (SensorClass::all() as $type) {
             DB::table('eventlog')->where('type', ucfirst($type))->update(['type' => $type]);
         }
     }
@@ -23,7 +24,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        foreach (\App\Models\Sensor::getTypes() as $type) {
+        foreach (SensorClass::all() as $type) {
             DB::table('eventlog')->where('type', $type)->update(['type' => ucfirst($type)]);
         }
     }

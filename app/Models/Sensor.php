@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use LibreNMS\Enum\SensorClass;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\Models\Keyable;
 use LibreNMS\Util\Number;
@@ -39,98 +40,34 @@ class Sensor extends DeviceRelatedModel implements Keyable
         'rrd_type',
     ];
 
-    protected static $icons = [
-        'airflow' => 'angle-double-right',
-        'ber' => 'sort-amount-desc',
-        'charge' => 'battery-half',
-        'chromatic_dispersion' => 'indent',
-        'cooling' => 'thermometer-full',
-        'count' => 'hashtag',
-        'current' => 'bolt fa-flip-horizontal',
-        'dbm' => 'sun-o',
-        'delay' => 'clock-o',
-        'eer' => 'snowflake-o',
-        'fanspeed' => 'refresh',
-        'frequency' => 'line-chart',
-        'humidity' => 'tint',
-        'load' => 'percent',
-        'loss' => 'percentage',
-        'power' => 'power-off',
-        'power_consumed' => 'plug',
-        'power_factor' => 'calculator',
-        'pressure' => 'thermometer-empty',
-        'quality_factor' => 'arrows',
-        'runtime' => 'hourglass-half',
-        'signal' => 'wifi',
-        'snr' => 'signal',
-        'state' => 'bullseye',
-        'temperature' => 'thermometer-three-quarters',
-        'tv_signal' => 'signal',
-        'bitrate' => 'bar-chart',
-        'voltage' => 'bolt',
-        'waterflow' => 'tint',
-        'percent' => 'percent',
-    ];
-
     // ---- Helper Methods ----
 
     public function classDescr(): string
     {
-        return static::getClassDescr($this->sensor_class);
+        return SensorClass::descr($this->sensor_class);
     }
 
     public function classDescrLong(): string
     {
-        return static::getClassDescrLong($this->sensor_class);
+        return SensorClass::descrLong($this->sensor_class);
     }
 
     public function unit(): string
     {
-        return static::getUnit($this->sensor_class);
+        return SensorClass::unit($this->sensor_class);
     }
 
     public function unitLong(): string
     {
-        return static::getUnitLong($this->sensor_class);
+        return SensorClass::unitLong($this->sensor_class);
     }
 
     public function icon()
     {
-        return collect(self::$icons)->get($this->sensor_class, 'delicius');
+        return SensorClass::icon($this->sensor_class);
     }
 
     // Static Methods
-
-    public static function getClassDescr(string $class): string
-    {
-        return __('sensors.' . $class . '.short');
-    }
-
-    public function getClassDescrLong(string $class): string
-    {
-        return __('sensors.' . $class . '.long');
-    }
-
-    public static function getUnit(string $class): string
-    {
-        return __('sensors.' . $class . '.unit');
-    }
-
-    public static function getUnitLong(string $class): string
-    {
-        return __('sensors.' . $class . '.unit_long');
-    }
-
-    public static function getTypes()
-    {
-        return array_keys(self::$icons);
-    }
-
-    // for the legacy menu
-    public static function getIconMap()
-    {
-        return self::$icons;
-    }
 
     public function guessLimits(bool $high, bool $high_warn, bool $low_warn, bool $low): void
     {

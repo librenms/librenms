@@ -16,6 +16,7 @@
 */
 
 use App\Models\Sensor;
+use LibreNMS\Enum\SensorClass;
 use LibreNMS\Util\ObjectCache;
 
 $no_refresh = true;
@@ -33,9 +34,8 @@ $type_text = collect([
     'diskio' => __('Disk I/O'),
     'processor' => __('Processor'),
     'toner' => __('Toner'),
-])->merge(collect(Sensor::getTypes())
-      ->mapWithKeys(fn ($type) => [$type => Sensor::getClassDescr($type)])
-)->toArray();
+])->merge(SensorClass::descrMap())
+  ->toArray();
 
 $active_metric = basename(array_key_exists($vars['metric'], $type_text) ? $vars['metric'] : 'processor');
 

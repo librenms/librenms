@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
 use LibreNMS\Cache\PermissionsCache;
+use LibreNMS\Enum\SensorClass;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Validate;
 use Validator;
@@ -94,7 +95,7 @@ class AppServiceProvider extends ServiceProvider
     private function configureMorphAliases()
     {
         $sensor_types = [];
-        foreach (Sensor::getTypes() as $sensor_type) {
+        foreach (SensorClass::all() as $sensor_type) {
             $sensor_types[$sensor_type] = \App\Models\Sensor::class;
         }
         Relation::morphMap(array_merge([
