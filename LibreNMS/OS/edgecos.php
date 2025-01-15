@@ -25,7 +25,6 @@
 
 namespace LibreNMS\OS;
 
-use App\Models\Device;
 use App\Models\Mempool;
 use App\Models\Processor;
 use App\Models\Transceiver;
@@ -85,11 +84,11 @@ class Edgecos extends OS implements TransceiverDiscovery, MempoolsDiscovery, Pro
 
         $inventory->each(function ($entry) use ($extra) {
             if (isset($entry->entPhysicalIndex)) {
-                if (!empty($extra[$entry->entPhysicalIndex]['ECS4120-MIB::portMediaInfoVendorName'])) {
+                if (! empty($extra[$entry->entPhysicalIndex]['ECS4120-MIB::portMediaInfoVendorName'])) {
                     $entry->entPhysicalDescr = $extra[$entry->entPhysicalIndex]['ECS4120-MIB::portMediaInfoVendorName'];
                 }
 
-                if (!empty($extra[$entry->entPhysicalIndex]['ECS4120-MIB::portMediaInfoPartNumber'])) {
+                if (! empty($extra[$entry->entPhysicalIndex]['ECS4120-MIB::portMediaInfoPartNumber'])) {
                     $entry->entPhysicalModelName = $extra[$entry->entPhysicalIndex]['ECS4120-MIB::portMediaInfoPartNumber'];
                 }
             }
@@ -106,7 +105,7 @@ class Edgecos extends OS implements TransceiverDiscovery, MempoolsDiscovery, Pro
         $data = SnmpQuery::walk('ECS4120-MIB::deviceCpuUsageTable')->table(1);
 
         foreach ($data as $index => $entry) {
-            $usage_oid = ".1.3.6.1.4.1.259.10.1.2.1.5." . $index;
+            $usage_oid = '.1.3.6.1.4.1.259.10.1.2.1.5.' . $index;
             $descr = $entry['ECS4120-MIB::deviceCpuUsageDescr'] ?? "Processor $index";
             $usage = $entry['ECS4120-MIB::deviceCpuUsage'] ?? 0;
 
