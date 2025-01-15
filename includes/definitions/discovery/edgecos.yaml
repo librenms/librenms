@@ -1,0 +1,108 @@
+mib: EDGECORE-MIB:EDGECORE-ENTITY-MIB:EDGECORE-SYSTEM-MIB
+modules:
+    os:
+        sysDescr_regex: '/\((?<hardware>[^)]+) (?<version>[A-Za-z0-9.-]+)/'
+        hardware:
+            - EDGECORE-ENTITY-MIB::ecEntityHardwareName
+            - ENTITY-MIB::entPhysicalName
+        serial:
+            - EDGECORE-ENTITY-MIB::ecEntitySerialNumber
+            - ENTITY-MIB::entPhysicalSerialNum
+    processors:
+        data:
+            -
+                oid: ecProcessorTable
+                value: ecProcessorUsage
+                num_oid: '.1.3.6.1.4.1.259.10.1.2.1.5.{{ $index }}'
+                descr: '{{ $entPhysicalName }} Processor'
+                skip_values:
+                    -
+                        oid: ecProcessorState
+                        op: '!='
+                        value: 3
+    sensors:
+        temperature:
+            data:
+                -
+                    oid: ecTemperatureTable
+                    value: ecTemperatureValue
+                    num_oid: '.1.3.6.1.4.1.259.10.1.3.1.6.{{ $index }}'
+                    descr: '{{ $entPhysicalName }} Temperature'
+                    index: '{{ $index }}'
+                    entPhysicalIndex: '{{ $index }}'
+                    group: sensor
+                    skip_values:
+                        -
+                            oid: ecTemperatureValue
+                            op: '<'
+                            value: '-50'
+                        -
+                            oid: ecTemperatureValue
+                            op: '>='
+                            value: '2147483646'
+        voltage:
+            data:
+                -
+                    oid: ecVoltageTable
+                    value: ecVoltageValue
+                    num_oid: '.1.3.6.1.4.1.259.10.1.4.1.6.{{ $index }}'
+                    descr: '{{ $entPhysicalName }} Voltage'
+                    index: '{{ $index }}'
+                    entPhysicalIndex: '{{ $index }}'
+                    group: sensor
+                    divisor: 1000
+                    skip_values:
+                        -
+                            oid: ecVoltageValue
+                            op: '='
+                            value: '-1'
+                        -
+                            oid: ecVoltageValue
+                            op: '='
+                            value: '-255'
+        fanspeed:
+            data:
+                -
+                    oid: ecFanTable
+                    value: ecFanSpeed
+                    num_oid: '.1.3.6.1.4.1.259.10.1.5.1.7.{{ $index }}'
+                    descr: 'Fan {{ $subindex0 }} Speed'
+                    group: fan
+                    divisor: 1
+        power:
+            data:
+                -
+                    oid: ecPowerTable
+                    value: ecPowerUsage
+                    num_oid: '.1.3.6.1.4.1.259.10.1.6.1.8.{{ $index }}'
+                    descr: '{{ $entPhysicalName }} Power'
+                    index: '{{ $index }}'
+                    group: power
+                    divisor: 1000
+    transceivers:
+        data:
+            -
+                oid: ecTransceiverTable
+                value: ecTransceiverVendor
+                num_oid: '.1.3.6.1.4.1.259.10.1.7.1.3.{{ $index }}'
+                descr: '{{ $entPhysicalName }} Transceiver'
+                index: '{{ $index }}'
+                entPhysicalIndex: '{{ $index }}'
+                group: transceiver
+                additional:
+                    -
+                        oid: ecTransceiverModel
+                        num_oid: '.1.3.6.1.4.1.259.10.1.7.1.4.{{ $index }}'
+                        descr: 'Model'
+                    -
+                        oid: ecTransceiverSerial
+                        num_oid: '.1.3.6.1.4.1.259.10.1.7.1.5.{{ $index }}'
+                        descr: 'Serial'
+                    -
+                        oid: ecTransceiverWavelength
+                        num_oid: '.1.3.6.1.4.1.259.10.1.7.1.6.{{ $index }}'
+                        descr: 'Wavelength'
+                    -
+                        oid: ecTransceiverDistance
+                        num_oid: '.1.3.6.1.4.1.259.10.1.7.1.7.{{ $index }}'
+                        descr: 'Distance'
