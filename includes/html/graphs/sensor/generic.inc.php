@@ -6,7 +6,7 @@ use LibreNMS\Util\Number;
 $sensor['sensor_descr_fixed'] = Rrd::fixedSafeDescr($sensor->sensor_descr, 25);
 $sensor['sensor_color'] = (Config::get('applied_site_style') == 'dark') ? '#f2f2f2' : '#272b30';
 $sensor['background_color'] = (Config::get('applied_site_style') == 'dark') ? '#272b30' : '#ffffff';
-$sensor['varianz_color'] = (Config::get('applied_site_style') == 'dark') ? '#3e444c' : '#c5c5c5';
+$sensor['variance_color'] = (Config::get('applied_site_style') == 'dark') ? '#3e444c' : '#c5c5c5';
 
 // Next line is a workaround while rrdtool --left-axis-format doesn't support %S
 // https://github.com/oetiker/rrdtool-1.x/issues/1271
@@ -16,7 +16,7 @@ $rrd_options .= ' --vertical-label "' . $sensor->classDescr() . '"';
 $rrd_options .= ' DEF:sensor=' . $rrd_filename . ':sensor:AVERAGE';
 $rrd_options .= ' DEF:sensor_max=' . $rrd_filename . ':sensor:MAX';
 $rrd_options .= ' DEF:sensor_min=' . $rrd_filename . ':sensor:MIN';
-$rrd_options .= ' AREA:sensor_max' . $sensor['varianz_color'];
+$rrd_options .= ' AREA:sensor_max' . $sensor['variance_color'];
 $rrd_options .= ' AREA:sensor_min' . $sensor['background_color'];
 $rrd_options .= ' COMMENT:"Alert thresholds\:"';
 $rrd_options .= ($sensor->sensor_limit_low) ? '  LINE1.5:' . $sensor->sensor_limit_low . '#00008b:"low = ' . Number::formatSi($sensor->sensor_limit_low, 2, 3, $sensor->unit()) . '":dashes' : '';
