@@ -41,28 +41,6 @@ class Viptela extends OS implements ProcessorDiscovery, ProcessorPolling
         $device->hardware = $this->getHardware($device->hardware);
     }
 
-    private function getHardware($id)
-    {
-        $hardware = [
-            '1' => 'Viptela vSmart Controller',
-            '2' => 'Viptela vManage NMS',
-            '3' => 'Viptela vBond Orchestrator',
-            '4' => 'Viptela vEdge-1000',
-            '5' => 'Viptela vEdge-2000',
-            '6' => 'Viptela vEdge-100',
-            '7' => 'Viptela vEdge-100-W2',
-            '8' => 'Viptela vEdge-100-WM',
-            '9' => 'Viptela vEdge-100-M2',
-            '10' => 'Viptela vEdge-100-M',
-            '11' => 'Viptela vEdge-100-B',
-            '12' => 'Viptela vEdge Cloud',
-            '13' => 'Viptela vContainer',
-            '14' => 'Viptela vEdge-5000',
-        ];
-
-        return $hardware[(string) $id] ?? $id;
-    }
-
     /**
      * Discover processors.
      * Returns an array of LibreNMS\Device\Processor objects that have been discovered
@@ -71,7 +49,7 @@ class Viptela extends OS implements ProcessorDiscovery, ProcessorPolling
      */
     public function discoverProcessors()
     {
-        $idle_cpu = 100 - \SnmpQuery::get([$this->procOid])->value();
+        $idle_cpu = 100 - (int)\SnmpQuery::get([$this->procOid])->value();
         $processors[] = Processor::discover(
             'viptela',
             $this->getDeviceId(),
@@ -96,7 +74,7 @@ class Viptela extends OS implements ProcessorDiscovery, ProcessorPolling
         $data = [];
 
         foreach ($processors as $processor) {
-            $data[$processor['processor_id']] = 100 - \SnmpQuery::get([$this->procOid])->value();
+            $data[$processor['processor_id']] = 100 - (int)\SnmpQuery::get([$this->procOid])->value();
         }
 
         return $data;
