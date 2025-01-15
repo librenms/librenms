@@ -24235,7 +24235,7 @@
             "transceivers": [
                 {
                     "index": "13073",
-                    "entity_physical_index": 110,
+                    "entity_physical_index": 13073,
                     "type": "10GE CU1.5M",
                     "vendor": "CISCO-TYCO",
                     "oui": null,
@@ -24254,7 +24254,7 @@
                 },
                 {
                     "index": "13091",
-                    "entity_physical_index": 111,
+                    "entity_physical_index": 13091,
                     "type": "10GE CU1.5M",
                     "vendor": "CISCO-TYCO",
                     "oui": null,
@@ -24273,7 +24273,7 @@
                 },
                 {
                     "index": "13109",
-                    "entity_physical_index": 112,
+                    "entity_physical_index": 13109,
                     "type": "10GE CU1.5M",
                     "vendor": "CISCO-TYCO",
                     "oui": null,
@@ -24292,7 +24292,7 @@
                 },
                 {
                     "index": "13127",
-                    "entity_physical_index": 113,
+                    "entity_physical_index": 13127,
                     "type": "10GE CU1.5M",
                     "vendor": "CISCO-TYCO",
                     "oui": null,
@@ -24311,7 +24311,7 @@
                 },
                 {
                     "index": "3073",
-                    "entity_physical_index": 51,
+                    "entity_physical_index": 3073,
                     "type": "10GE CU1.5M",
                     "vendor": "CISCO-TYCO",
                     "oui": null,
@@ -24330,7 +24330,7 @@
                 },
                 {
                     "index": "3091",
-                    "entity_physical_index": 52,
+                    "entity_physical_index": 3091,
                     "type": "10GE CU1.5M",
                     "vendor": "CISCO-TYCO",
                     "oui": null,
@@ -24349,7 +24349,7 @@
                 },
                 {
                     "index": "3109",
-                    "entity_physical_index": 53,
+                    "entity_physical_index": 3109,
                     "type": "10GE CU1.5M",
                     "vendor": "CISCO-TYCO",
                     "oui": null,
@@ -24368,7 +24368,7 @@
                 },
                 {
                     "index": "3127",
-                    "entity_physical_index": 54,
+                    "entity_physical_index": 3127,
                     "type": "10GE CU1.5M",
                     "vendor": "CISCO-TYCO",
                     "oui": null,

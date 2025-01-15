@@ -27,8 +27,12 @@ function parse_modules($type, $options)
     $override = false;
 
     if (! empty($options['m'])) {
+        // parse options and ensure order of modules
+        // https://github.com/librenms/librenms/pull/16856 for why the below is here
+        $modules = array_intersect(array_keys(Config::get("{$type}_modules", [])), explode(',', $options['m']));
+
         Config::set("{$type}_modules", []);
-        foreach (explode(',', $options['m']) as $module) {
+        foreach ($modules as $module) {
             // parse submodules (only supported by some modules)
             if (Str::contains($module, '/')) {
                 [$module, $submodule] = explode('/', $module, 2);
