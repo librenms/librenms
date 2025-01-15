@@ -18,8 +18,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
+ *
  * @copyright  2023 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -72,6 +72,7 @@ class NumberTest extends TestCase
         $this->assertEquals(0, Number::calculatePercent(43, -43));
         $this->assertEquals(29394.26, Number::calculatePercent(12639.53, 43));
     }
+
     public function testFillMissingRatio()
     {
         $this->assertEquals([20, 10, 10, 50], Number::fillMissingRatio(total: 20, used: 10));

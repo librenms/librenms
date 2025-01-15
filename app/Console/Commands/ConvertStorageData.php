@@ -76,7 +76,6 @@ class ConvertStorageData extends Command
                 }
             }
 
-
             file_put_contents($file, json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
 //            $this->info('updated: ' . basename($file));
         }
@@ -135,6 +134,7 @@ class ConvertStorageData extends Command
 
         return $storage['storage_units'];
     }
+
     private function getStorageUsed(string $snmprec_file, array $storage, string $data_type): int|float|null
     {
         if ($snmprec_file == 'arbos_tms') {
@@ -257,7 +257,6 @@ class ConvertStorageData extends Command
         if ($storage['storage_mib'] == 'hpe-ilo' && $data_type == 'discovery') {
             return $storage['storage_size'] * 1048576;
         }
-
 
         return $storage['storage_size'];
     }

@@ -356,7 +356,7 @@ class OS implements
     public function discoverStorage(): Collection
     {
         if ($this->hasYamlDiscovery('storage')) {
-            $storage =  $this->discoverYamlStorage();
+            $storage = $this->discoverYamlStorage();
             if ($storage->isNotEmpty()) {
                 return $storage;
             }

@@ -64,7 +64,6 @@ class Oid
         return (bool) preg_match('/[-_A-Za-z0-9]+::[-_A-Za-z0-9]+', $this->oid);
     }
 
-
     public function hasMib(): bool
     {
         return str_contains($this->oid, '::');

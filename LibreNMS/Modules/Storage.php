@@ -103,8 +103,8 @@ class Storage implements Module
                     ->addDataset('used', 'GAUGE', 0)
                     ->addDataset('free', 'GAUGE', 0),
             ], [
-                'used'   => $storage->storage_used,
-                'free'   => $storage->storage_free,
+                'used' => $storage->storage_used,
+                'free' => $storage->storage_free,
             ]);
         }
     }

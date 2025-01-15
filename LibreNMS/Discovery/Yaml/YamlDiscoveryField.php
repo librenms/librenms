@@ -37,12 +37,12 @@ class YamlDiscoveryField
     public ?\Closure $should_poll;
 
     public function __construct(
-        public readonly string    $key,
-        public readonly ?string   $model_column = null,
-        public readonly ?string   $default = null,
+        public readonly string $key,
+        public readonly ?string $model_column = null,
+        public readonly ?string $default = null,
         public readonly ?\Closure $callback = null,
     ) {
-        $this->should_poll = fn(YamlDiscoveryDefinition $def) => false;
+        $this->should_poll = fn (YamlDiscoveryDefinition $def) => false;
     }
 
     public function calculateValue(array $yaml, array $data, string $index, int $count): void

@@ -45,7 +45,6 @@ class IndexField extends YamlDiscoveryField
             return;
         }
 
-
         $this->value = $index;
     }
 }

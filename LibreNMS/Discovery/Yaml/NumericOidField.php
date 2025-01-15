@@ -30,11 +30,11 @@ class NumericOidField extends YamlDiscoveryField
     private $required;
 
     /**
-     * @param string $key
-     * @param string|null $model_column
-     * @param string|null $default
-     * @param callable|null $callback
-     * @param callable|bool $required
+     * @param  string  $key
+     * @param  string|null  $model_column
+     * @param  string|null  $default
+     * @param  callable|null  $callback
+     * @param  callable|bool  $required
      */
     public function __construct(string $key, ?string $model_column = null, ?string $default = null, $callback = null, callable|bool $required = false)
     {

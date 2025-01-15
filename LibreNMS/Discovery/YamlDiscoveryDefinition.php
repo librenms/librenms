@@ -49,7 +49,6 @@ class YamlDiscoveryDefinition
     public function __construct(
         private readonly string $model,
     ) {
-
     }
 
     public static function make(string $model): static
@@ -110,7 +109,7 @@ class YamlDiscoveryDefinition
                 }
             } else {
                 [$numeric_oids, $oids] = collect($yamlItem)->only(collect($this->fields)->where('isOid')->keys())
-                        ->partition(fn($oid) => Oid::of($oid)->isNumeric())->toArray();
+                        ->partition(fn ($oid) => Oid::of($oid)->isNumeric())->toArray();
             }
 
             $snmp_data = [];
@@ -152,7 +151,7 @@ class YamlDiscoveryDefinition
                 }
 
                 // if no pollable oid found, skip this index
-                if(! $this->fillNumericOids($modelAttributes, $yamlItem, $index)) {
+                if (! $this->fillNumericOids($modelAttributes, $yamlItem, $index)) {
                     Log::debug("skipping index $index, no pollable oid found");
                     continue;
                 }
@@ -189,8 +188,8 @@ class YamlDiscoveryDefinition
     {
         $num_oid_found = false;
 
-        foreach($this->fields as $field) {
-            if($field->isOid) {
+        foreach ($this->fields as $field) {
+            if ($field->isOid) {
                 $num_oid = null;
 
                 if (call_user_func($field->should_poll, $this)) {
