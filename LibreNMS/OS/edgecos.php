@@ -23,8 +23,6 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-<?php
-
 namespace LibreNMS\OS;
 
 use App\Models\Device;
