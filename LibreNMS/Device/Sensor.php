@@ -594,8 +594,6 @@ class Sensor implements DiscoveryModule, PollerModule
      */
     protected static function recordSensorData(OS $os, $sensors, $data)
     {
-        $types = [];
-
         foreach ($sensors as $sensor) {
             $sensor_value = $data[$sensor['sensor_id']];
 
@@ -608,7 +606,7 @@ class Sensor implements DiscoveryModule, PollerModule
                 $sensor['sensor_type'],
                 $sensor['sensor_index'],
             ];
-            $rrd_type = (isset($types[$sensor['sensor_class']]) && isset($types[$sensor['sensor_class']]['type'])) ? strtoupper($types[$sensor['sensor_class']]['type']) : $sensor['rrd_type'];
+            $rrd_type = $sensor['rrd_type'];
             $rrd_def = RrdDefinition::make()->addDataset('sensor', $rrd_type);
 
             $fields = [
