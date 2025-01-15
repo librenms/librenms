@@ -118,7 +118,7 @@ class Oid
      *
      * @throws \LibreNMS\Exceptions\InvalidOidException
      */
-    public function toNumeric(string $mib = 'ALL'): string
+    public function toNumeric(?string $mib = 'ALL'): string
     {
         if ($this->isNumeric()) {
             return $this->oid;

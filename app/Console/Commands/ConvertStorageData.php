@@ -51,11 +51,11 @@ class ConvertStorageData extends Command
                             'type' => $storage['storage_mib'],
                             'storage_index' => $storage['storage_index'],
                             'storage_type' => $this->getStorageType($snmprec_file, $storage),
-                            'storage_descr' => $storage['storage_descr'],
-                            'storage_size' => $this->getStorageSize($snmprec_file, $storage),
+                            'storage_descr' => str_replace('\\\\', '\\', $storage['storage_descr']),
+                            'storage_size' => $this->getStorageSize($snmprec_file, $storage, $type),
                             'storage_size_oid' => null,
                             'storage_units' => $this->getStorageUnits($snmprec_file, $storage),
-                            'storage_used' => $this->getStorageUsed($snmprec_file, $storage),
+                            'storage_used' => $this->getStorageUsed($snmprec_file, $storage, $type),
                             'storage_used_oid' => $this->getUsedOid($snmprec_file, $storage),
                             'storage_free' => $this->getStorageFree($snmprec_file, $storage, $data['storage']['poller'][$table][$index]['storage_free']),
                             'storage_free_oid' => $this->getFreeOid($snmprec_file, $storage),
@@ -135,7 +135,7 @@ class ConvertStorageData extends Command
 
         return $storage['storage_units'];
     }
-    private function getStorageUsed(string $snmprec_file, array $storage): ?int
+    private function getStorageUsed(string $snmprec_file, array $storage, string $data_type): int|float|null
     {
         if ($snmprec_file == 'arbos_tms') {
             return 8;
@@ -151,6 +151,10 @@ class ConvertStorageData extends Command
             }
 
             return $storage['storage_used'] * 1024;
+        }
+
+        if ($storage['storage_mib'] == 'hpe-ilo' && $data_type == 'discovery') {
+            return $storage['storage_used'] * 1048576;
         }
 
         if (is_numeric($storage['storage_used'])) {
@@ -176,6 +180,10 @@ class ConvertStorageData extends Command
 
         if ($storage['storage_mib'] == 'forcepoint') {
             return '.1.3.6.1.4.1.1369.5.2.1.11.3.1.5.' . $storage['storage_index'];
+        }
+
+        if ($storage['storage_mib'] == 'hpe-ilo') {
+            return '.1.3.6.1.4.1.232.11.2.4.1.1.4.' . $storage['storage_index'];
         }
 
         return null;
@@ -240,11 +248,16 @@ class ConvertStorageData extends Command
         return false;
     }
 
-    private function getStorageSize(string $snmprec_file, array $storage): ?int
+    private function getStorageSize(string $snmprec_file, array $storage, string $data_type): int|float|null
     {
         if ($storage['storage_mib'] == 'ericsson-ipos') {
             return $storage['storage_size'] * 1024;
         }
+
+        if ($storage['storage_mib'] == 'hpe-ilo' && $data_type == 'discovery') {
+            return $storage['storage_size'] * 1048576;
+        }
+
 
         return $storage['storage_size'];
     }
