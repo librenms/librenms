@@ -608,7 +608,7 @@ class Sensor implements DiscoveryModule, PollerModule
                 $sensor['sensor_type'],
                 $sensor['sensor_index'],
             ];
-            $rrd_type = (isset($types[$sensor['sensor_class']] && isset($types[$sensor['sensor_class']]['type']) ? strtoupper($types[$sensor['sensor_class']]['type']) : $sensor['rrd_type'];
+            $rrd_type = (isset($types[$sensor['sensor_class']]) && isset($types[$sensor['sensor_class']]['type'])) ? strtoupper($types[$sensor['sensor_class']]['type']) : $sensor['rrd_type'];
             $rrd_def = RrdDefinition::make()->addDataset('sensor', $rrd_type);
 
             $fields = [

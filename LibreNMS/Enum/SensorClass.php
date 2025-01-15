@@ -38,7 +38,6 @@ class SensorClass
     const waterflow = 'tint';
     const percent = 'percent';
 
-
     public static function all(): Collection
     {
         return static::iconMap()->keys();
