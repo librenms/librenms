@@ -28,6 +28,7 @@ namespace LibreNMS\Device;
 use App\Models\Eventlog;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Config;
+use LibreNMS\Enum\SensorClass;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\Discovery\DiscoveryModule;
 use LibreNMS\Interfaces\Polling\PollerModule;
@@ -41,7 +42,6 @@ class Sensor implements DiscoveryModule, PollerModule
     protected static $name = 'Sensor';
     protected static $table = 'sensors';
     protected static $data_name = 'sensor';
-    protected static $translation_prefix = 'sensors';
 
     private $valid = true;
 
@@ -599,7 +599,7 @@ class Sensor implements DiscoveryModule, PollerModule
         foreach ($sensors as $sensor) {
             $sensor_value = $data[$sensor['sensor_id']];
 
-            echo "  {$sensor['sensor_descr']}: $sensor_value " . __(static::$translation_prefix . '.' . $sensor['sensor_class'] . '.unit') . PHP_EOL;
+            echo "  {$sensor['sensor_descr']}: $sensor_value " . SensorClass::unit($sensor['sensor_class']) . PHP_EOL;
 
             // update rrd and database
             $rrd_name = [
@@ -608,7 +608,7 @@ class Sensor implements DiscoveryModule, PollerModule
                 $sensor['sensor_type'],
                 $sensor['sensor_index'],
             ];
-            $rrd_type = isset($types[$sensor['sensor_class']]['type']) ? strtoupper($types[$sensor['sensor_class']]['type']) : $sensor['rrd_type'];
+            $rrd_type = (isset($types[$sensor['sensor_class']] && isset($types[$sensor['sensor_class']]['type']) ? strtoupper($types[$sensor['sensor_class']]['type']) : $sensor['rrd_type'];
             $rrd_def = RrdDefinition::make()->addDataset('sensor', $rrd_type);
 
             $fields = [
