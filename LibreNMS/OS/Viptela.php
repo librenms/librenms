@@ -49,7 +49,7 @@ class Viptela extends OS implements ProcessorDiscovery, ProcessorPolling
      */
     public function discoverProcessors()
     {
-        $idle_cpu = 100 - (int)\SnmpQuery::get([$this->procOid])->value();
+        $idle_cpu = 100 - (int) \SnmpQuery::get([$this->procOid])->value();
         $processors[] = Processor::discover(
             'viptela',
             $this->getDeviceId(),
@@ -74,7 +74,7 @@ class Viptela extends OS implements ProcessorDiscovery, ProcessorPolling
         $data = [];
 
         foreach ($processors as $processor) {
-            $data[$processor['processor_id']] = 100 - (int)\SnmpQuery::get([$this->procOid])->value();
+            $data[$processor['processor_id']] = 100 - (int) \SnmpQuery::get([$this->procOid])->value();
         }
 
         return $data;
