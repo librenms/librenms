@@ -509,6 +509,9 @@ class Cisco extends OS implements
             $rtt_type = $sla->rtt_type;
 
             // Lets process each SLA
+            if (! isset($data[$sla_nr]['rttMonLatestRttOperTime'])) {
+                continue;
+            }
             $unixtime = intval($data[$sla_nr]['rttMonLatestRttOperTime'] / 100 + $time_offset);
             $time = date('Y-m-d H:i:s', $unixtime);
 
