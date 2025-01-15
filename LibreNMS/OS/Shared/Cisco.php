@@ -510,6 +510,9 @@ class Cisco extends OS implements
             $rtt_type = $sla->rtt_type;
 
             // Lets process each SLA
+            if (! isset($data[$sla_nr]['rttMonLatestRttOperTime'])) {
+                continue;
+            }
             $unixtime = intval($data[$sla_nr]['rttMonLatestRttOperTime'] / 100 + $time_offset);
             $time = date('Y-m-d H:i:s', $unixtime);
 
@@ -646,11 +649,17 @@ class Cisco extends OS implements
     public function discoverTransceivers(): Collection
     {
         // use data collected by entPhysical module if available
-        $dbSfpCages = $this->getDevice()->entityPhysical()->whereIn('entPhysicalVendorType', ['cevContainerSFP', 'cevContainerGbic', 'cevContainer10GigBasePort', 'cevContainerTransceiver', 'cevContainerXFP', 'cevContainer40GigBasePort', 'cevContainerCFP', 'cevContainerCXP', 'cevContainerCPAK', 'cevContainerNCS4KSFP', 'cevContainerQSFP28SR', 'cevContainerQSFP28LR', 'cevContainerQSFP28CR', 'cevContainerQSFP28AOC', 'cevContainerQSFP28CWDM', 'cevContainerNonCiscoQSFP28SR', 'cevContainerNonCiscoQSFP28LR', 'cevContainerNonCiscoQSFP28CR', 'cevContainerNonCiscoQSFP28AOC', 'cevContainerNonCiscoQSFP28CWDM'])->pluck('ifIndex', 'entPhysicalIndex');
+        $arrayOfContainers = ['cevContainerSFP', 'cevContainerGbic', 'cevContainer10GigBasePort', 'cevContainerTransceiver', 'cevContainerXFP', 'cevContainer40GigBasePort', 'cevContainerCFP', 'cevContainerCXP', 'cevContainerCPAK', 'cevContainerNCS4KSFP', 'cevContainerQSFP28SR', 'cevContainerQSFP28LR', 'cevContainerQSFP28CR', 'cevContainerQSFP28AOC', 'cevContainerQSFP28CWDM', 'cevContainerNonCiscoQSFP28SR', 'cevContainerNonCiscoQSFP28LR', 'cevContainerNonCiscoQSFP28CR', 'cevContainerNonCiscoQSFP28AOC', 'cevContainerNonCiscoQSFP28CWDM'];
+
+        $dbSfpCages = $this->getDevice()->entityPhysical()->whereIn('entPhysicalVendorType', $arrayOfContainers)->pluck('ifIndex', 'entPhysicalIndex');
         if ($dbSfpCages->isNotEmpty()) {
             $data = $this->getDevice()->entityPhysical()->whereIn('entPhysicalContainedIn', $dbSfpCages->keys())->get()->map(function ($ent) use ($dbSfpCages) {
                 if (empty($ent->ifIndex) && $dbSfpCages->has($ent->entPhysicalContainedIn)) {
                     $ent->ifIndex = $dbSfpCages->get($ent->entPhysicalContainedIn);
+                    if (empty($ent->ifIndex)) {
+                        // Lets try to find the 1st subentity with an ifIndex below this one and use it. Some (most?) ISR and ASR on IOSXE at least are behaving like this.
+                        $ent->ifIndex = $this->getDevice()->entityPhysical()->where('entPhysicalContainedIn', '=', $ent->entPhysicalIndex)->whereNotNull('ifIndex')->first()->ifIndex;
+                    }
                 }
 
                 return $ent;
@@ -663,16 +672,28 @@ class Cisco extends OS implements
             }
 
             $snmpData = collect(\SnmpQuery::hideMib()->mibs(['IF-MIB'])->walk('ENTITY-MIB::entAliasMappingIdentifier')->table(1, $snmpData));
-
-            $sfpCages = $snmpData->filter(fn ($ent) => isset($ent['entPhysicalVendorType']) && $ent['entPhysicalVendorType'] == 'cevContainerSFP');
-            $data = $snmpData->filter(fn ($ent) => $sfpCages->has($ent['entPhysicalContainedIn'] ?? null))->map(function ($e) {
+            $sfpCages = $snmpData->filter(fn ($ent) => isset($ent['entPhysicalVendorType']) && in_array($ent['entPhysicalVendorType'], $arrayOfContainers));
+            $dataFilter = $snmpData->filter(fn ($ent) => $sfpCages->has($ent['entPhysicalContainedIn'] ?? null));
+            $data = $dataFilter->map(function ($e, $e_index) use ($snmpData) {
+                $e['entPhysicalIndex'] = $e_index;
                 if (isset($e['entAliasMappingIdentifier'][0])) {
                     $e['ifIndex'] = preg_replace('/^.*ifIndex[.[](\d+).*$/', '$1', $e['entAliasMappingIdentifier'][0]);
+                } else {
+                    // Lets try to find the 1st subentity with an ifIndex below this one and use it. Some (most?) ISR and ASR on IOSXE at least are behaving like this.
+                    $sibling = $snmpData->filter(fn ($ent, $ent_index) => ($ent['entPhysicalContainedIn'] == $e_index) && isset($ent['entAliasMappingIdentifier'][0]))->first();
+                    // If we found one, let's use this ifindex
+                    if ($sibling) {
+                        $ifIndexTmp = $sibling['entAliasMappingIdentifier'][0];
+                        if (isset($ifIndexTmp)) {
+                            $e['ifIndex'] = preg_replace('/^.*ifIndex[.[](\d+).*$/', '$1', $ifIndexTmp);
+                        }
+                    }
                 }
 
                 return $e;
             });
         }
+
         $ifIndexToPortId = $this->getDevice()->ports()->pluck('port_id', 'ifIndex');
 
         return $data->map(function ($ent, $index) use ($ifIndexToPortId) {
@@ -686,7 +707,7 @@ class Cisco extends OS implements
                 'revision' => $ent['entPhysicalHardwareRev'] ?? null,
                 'model' => $ent['entPhysicalModelName'] ?? null,
                 'serial' => $ent['entPhysicalSerialNum'] ?? null,
-                'entity_physical_index' => $ifIndex,
+                'entity_physical_index' => $ent['entPhysicalIndex'],
             ]);
         });
     }
