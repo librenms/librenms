@@ -69,7 +69,7 @@ class Time
             if ($seconds < 0) {
                 return CarbonInterval::seconds($seconds)->invert()->cascade()->forHumans([
                     'syntax' => CarbonInterface::DIFF_RELATIVE_TO_NOW,
-                    'skip' => ['years','months'],
+                    'skip' => ['years', 'months'],
                     'parts' => $parts,
                     'short' => $short,
                 ]);
@@ -77,7 +77,7 @@ class Time
 
             return CarbonInterval::seconds($seconds)->cascade()->forHumans([
                 'syntax' => CarbonInterface::DIFF_ABSOLUTE,
-                'skip' => ['years','months'],
+                'skip' => ['years', 'months'],
                 'parts' => $parts,
                 'short' => $short,
             ]);
