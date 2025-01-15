@@ -25,13 +25,11 @@
 
 namespace LibreNMS\OS;
 
-use App\Models\Device;
-use App\Models\Transceiver;
 use App\Models\Processor;
 use Illuminate\Support\Collection;
-use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
+use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
 use LibreNMS\OS;
 use SnmpQuery;
 
@@ -100,7 +98,7 @@ class Edgecos extends OS implements TransceiverDiscovery, MempoolsDiscovery, Pro
         $data = SnmpQuery::walk('ECS4120-MIB::deviceCpuUsageTable')->table(1);
 
         foreach ($data as $index => $entry) {
-            $usage_oid = ".1.3.6.1.4.1.259.10.1.2.1.5." . $index;
+            $usage_oid = '.1.3.6.1.4.1.259.10.1.2.1.5.' . $index;
             $descr = $entry['ECS4120-MIB::deviceCpuUsageDescr'] ?? "Processor $index";
             $usage = $entry['ECS4120-MIB::deviceCpuUsage'] ?? 0;
 
@@ -146,4 +144,3 @@ class Edgecos extends OS implements TransceiverDiscovery, MempoolsDiscovery, Pro
         return $mempools;
     }
 }
-
