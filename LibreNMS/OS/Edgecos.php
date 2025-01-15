@@ -27,75 +27,41 @@ namespace LibreNMS\OS;
 
 use App\Models\Device;
 use App\Models\Mempool;
+use App\Models\Processor;
+use App\Models\Transceiver;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
-use LibreNMS\Device\Processor;
-use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
+use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
 use LibreNMS\OS;
-use LibreNMS\Util\Oid;
+use SnmpQuery;
 
-class Edgecos extends OS implements MempoolsDiscovery, ProcessorDiscovery
-{
-    public function discoverMempools()
-    {
-        $mib = $this->findMib();
-        $data = snmp_get_multi_oid($this->getDeviceArray(), ['memoryTotal.0', 'memoryFreed.0', 'memoryAllocated.0'], '-OUQs', $mib);
-
-        if (empty($data)) {
-            return new Collection();
-        }
-
-        $mempool = new Mempool([
-            'mempool_index' => 0,
-            'mempool_type' => 'edgecos',
-            'mempool_class' => 'system',
-            'mempool_precision' => 1,
-            'mempool_descr' => 'Memory',
-            'mempool_perc_warn' => 90,
-        ]);
-
-        if (! empty($data['memoryAllocated.0'])) {
-            $mempool->mempool_used_oid = Oid::of('memoryAllocated.0')->toNumeric($mib);
-        } else {
-            $mempool->mempool_free_oid = Oid::of('memoryFreed.0')->toNumeric($mib);
-        }
-
-        $mempool->fillUsage($data['memoryAllocated.0'] ?? null, $data['memoryTotal.0'] ?? null, $data['memoryFreed.0']);
-
-        return new \Illuminate\Support\Collection([$mempool]);
-    }
-
-    public function discoverOS(Device $device): void
-    {
-        $mib = $this->findMib();
-        $data = snmp_get_multi($this->getDeviceArray(), ['swOpCodeVer.1', 'swProdName.0', 'swSerialNumber.1', 'swHardwareVer.1'], '-OQUs', $mib);
-
-        $device->version = isset($data[1]['swHardwareVer'], $data[1]['swOpCodeVer']) ? trim($data[1]['swHardwareVer'] . ' ' . $data[1]['swOpCodeVer']) : null;
-        $device->hardware = $data[0]['swProdName'] ?? null;
-        $device->serial = $data[1]['swSerialNumber'] ?? null;
-    }
+class Edgecos extends OS implements TransceiverDiscovery, MempoolsDiscovery, ProcessorDiscovery
 {
     public function discoverTransceivers(): Collection
     {
         $ifIndexToPortId = $this->getDevice()->ports()->pluck('port_id', 'ifIndex');
+        $entityToIfIndex = $this->getIfIndexEntPhysicalMap();
 
-        return SnmpQuery::cache()->walk('ECS4120-MIB::portMediaInfoTable')->mapTable(function ($data, $ifIndex) use ($ifIndexToPortId) {
+        return SnmpQuery::walk('ECS4120-MIB::portMediaInfoTable')->mapTable(function ($data, $entIndex) use ($entityToIfIndex, $ifIndexToPortId) {
+            // Skip inactive transceivers
             if ($data['ECS4120-MIB::portMediaInfoConnectorType'] === 'inactive') {
                 return null;
             }
 
+            $distance = $data['ECS4120-MIB::portMediaInfoBaudRate'] ?? null;
             $cable = $data['ECS4120-MIB::portMediaInfoFiberType'] ?? null;
-            $distance = null;
 
-            if (isset($data['ECS4120-MIB::portMediaInfoBaudRate']) && $data['ECS4120-MIB::portMediaInfoBaudRate'] > 0) {
-                $distance = $data['ECS4120-MIB::portMediaInfoBaudRate'];
+            $ifIndex = $entityToIfIndex[$entIndex] ?? null;
+            $port_id = $ifIndexToPortId->get($ifIndex);
+
+            if (is_null($port_id)) {
+                return null;
             }
 
             return new Transceiver([
-                'port_id' => $ifIndexToPortId->get($ifIndex),
-                'index' => $ifIndex,
+                'port_id' => $port_id,
+                'index' => $entIndex,
                 'vendor' => $data['ECS4120-MIB::portMediaInfoVendorName'] ?? null,
                 'type' => $data['ECS4120-MIB::portMediaInfoConnectorType'] ?? null,
                 'model' => $data['ECS4120-MIB::portMediaInfoPartNumber'] ?? null,
@@ -103,54 +69,87 @@ class Edgecos extends OS implements MempoolsDiscovery, ProcessorDiscovery
                 'cable' => $cable,
                 'distance' => $distance,
                 'wavelength' => $data['ECS4120-MIB::portMediaInfoEthComplianceCodes'] ?? null,
-                'entity_physical_index' => $ifIndex,
+                'entity_physical_index' => $entIndex,
             ]);
         })->filter();
     }
-}
 
-    /**
-     * Discover processors.
-     * Returns an array of LibreNMS\Device\Processor objects that have been discovered
-     *
-     * @return array Processors
-     */
-    public function discoverProcessors()
+    public function discoverEntityPhysical(): Collection
     {
-        $device = $this->getDevice();
+        $inventory = parent::discoverEntityPhysical();
 
-        if (Str::startsWith($device->sysObjectID, '.1.3.6.1.4.1.259.10.1.24.')) { //ECS4510
-            $oid = '.1.3.6.1.4.1.259.10.1.24.1.39.2.1.0';
-        } elseif (Str::startsWith($device->sysObjectID, '.1.3.6.1.4.1.259.10.1.22.')) { //ECS3528
-            $oid = '.1.3.6.1.4.1.259.10.1.22.1.39.2.1.0';
-        } elseif (Str::startsWith($device->sysObjectID, '.1.3.6.1.4.1.259.10.1.39.')) { //ECS4110
-            $oid = '.1.3.6.1.4.1.259.10.1.39.1.39.2.1.0';
-        } elseif (Str::startsWith($device->sysObjectID, '.1.3.6.1.4.1.259.10.1.45.')) { //ECS4120
-            $oid = '.1.3.6.1.4.1.259.10.1.45.1.39.2.1.0';
-        } elseif (Str::startsWith($device->sysObjectID, '.1.3.6.1.4.1.259.10.1.42.')) { //ECS4210
-            $oid = '.1.3.6.1.4.1.259.10.1.42.101.1.39.2.1.0';
-        } elseif (Str::startsWith($device->sysObjectID, '.1.3.6.1.4.1.259.10.1.27.')) { //ECS3510
-            $oid = '.1.3.6.1.4.1.259.10.1.27.1.39.2.1.0';
-        } elseif (Str::startsWith($device->sysObjectID, '.1.3.6.1.4.1.259.8.1.11.')) { //ES3510MA
-            $oid = '.1.3.6.1.4.1.259.8.1.11.1.39.2.1.0';
-        } elseif (Str::startsWith($device->sysObjectID, '.1.3.6.1.4.1.259.10.1.46.')) { //ECS4100-52T
-            $oid = '.1.3.6.1.4.1.259.10.1.46.1.39.2.1.0';
-        } elseif (Str::startsWith($device->sysObjectID, '.1.3.6.1.4.1.259.10.1.5')) { //ECS4610-24F
-            $oid = '.1.3.6.1.4.1.259.10.1.5.1.39.2.1.0';
-        }
+        $extra = SnmpQuery::walk([
+            'ECS4120-MIB::portMediaInfoVendorName',
+            'ECS4120-MIB::portMediaInfoPartNumber',
+        ])->table(1);
 
-        if (isset($oid)) {
-            return [
-                Processor::discover(
-                    $this->getName(),
-                    $this->getDeviceId(),
-                    $oid,
-                    0
-                ),
-            ];
-        }
+        $inventory->each(function ($entry) use ($extra) {
+            if (isset($entry->entPhysicalIndex)) {
+                if (!empty($extra[$entry->entPhysicalIndex]['ECS4120-MIB::portMediaInfoVendorName'])) {
+                    $entry->entPhysicalDescr = $extra[$entry->entPhysicalIndex]['ECS4120-MIB::portMediaInfoVendorName'];
+                }
 
-        return parent::discoverProcessors();
+                if (!empty($extra[$entry->entPhysicalIndex]['ECS4120-MIB::portMediaInfoPartNumber'])) {
+                    $entry->entPhysicalModelName = $extra[$entry->entPhysicalIndex]['ECS4120-MIB::portMediaInfoPartNumber'];
+                }
+            }
+        });
+
+        return $inventory;
     }
 
-    
+    public function discoverProcessors(): array
+    {
+        $device = $this->getDeviceArray();
+
+        $processors = [];
+        $data = SnmpQuery::walk('ECS4120-MIB::deviceCpuUsageTable')->table(1);
+
+        foreach ($data as $index => $entry) {
+            $usage_oid = ".1.3.6.1.4.1.259.10.1.2.1.5." . $index;
+            $descr = $entry['ECS4120-MIB::deviceCpuUsageDescr'] ?? "Processor $index";
+            $usage = $entry['ECS4120-MIB::deviceCpuUsage'] ?? 0;
+
+            $processors[] = Processor::discover(
+                'edgecos',
+                $this->getDeviceId(),
+                $usage_oid,
+                $index,
+                $descr,
+                1,
+                $usage
+            );
+        }
+
+        return $processors;
+    }
+
+    public function discoverMempools(): Collection
+    {
+        $device = $this->getDeviceArray();
+
+        $mempools = new Collection();
+        $data = SnmpQuery::walk([
+            'ECS4120-MIB::deviceMemoryUsage',
+            'ECS4120-MIB::deviceMemorySize',
+        ])->table(1);
+
+        foreach ($data as $index => $entry) {
+            $size = $entry['ECS4120-MIB::deviceMemorySize'] ?? 0;
+            $usage = $entry['ECS4120-MIB::deviceMemoryUsage'] ?? 0;
+            $descr = "Memory $index";
+
+            if ($size > 0) {
+                $mempools->push((new Mempool([
+                    'mempool_index' => $index,
+                    'mempool_type' => 'edgecos',
+                    'mempool_class' => 'system',
+                    'mempool_precision' => 1,
+                    'mempool_descr' => $descr,
+                ]))->fillUsage($usage, $size));
+            }
+        }
+
+        return $mempools;
+    }
+}
