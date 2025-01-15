@@ -17,6 +17,7 @@ discovery:
             - '/^U6/'
             - '/^U7/'
             - '/^U-LTE/'
+            - '/^E7/'
     -
         sysObjectID: .1.3.6.1.4.1.10002.1
         sysDescr: Linux
