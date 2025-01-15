@@ -1,0 +1,17 @@
+modules:
+    os:
+        hardware: ADVA-FSP3000ALM-MIB::inventoryType.0
+        serial: ADVA-FSP3000ALM-MIB::serialNumber.0
+        version: ADVA-FSP3000ALM-MIB::firmwarePackageRev.0
+
+    sensors:
+        temperature:
+            data:
+                -
+                    oid: ADVA-FSP3000ALM-MIB::tempCPU
+                    descr: CPU Temp
+                    divisor: 10
+                -
+                    oid: ADVA-FSP3000ALM-MIB::tempBoard1
+                    descr: Board Temp
+                    divisor: 10
