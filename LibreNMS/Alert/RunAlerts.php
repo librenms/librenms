@@ -260,6 +260,10 @@ class RunAlerts
             echo 'Issuing Alert-UID #' . $alert['id'] . '/' . $alert['state'] . ':' . PHP_EOL;
             if ($alert['state'] != AlertState::ACKNOWLEDGED || Config::get('alert.acknowledged') === true) {
                 $this->extTransports($obj);
+            } elseif ($alert['state'] != AlertState::WORSE || Config::get('alert.statechange') == true) {
+                    $this->extTransports($obj);
+            } elseif ($alert['state'] != AlertState::BETTER || Config::get('alert.statechange') == true) {
+                    $this->extTransports($obj);
             }
             echo "\r\n";
         }
