@@ -32,6 +32,7 @@ return [
             'ldap' => ['name' => 'LDAP Settings'],
             'radius' => ['name' => 'Radius Settings'],
             'socialite' => ['name' => 'Socialite Settings'],
+            'http' => ['name' => 'HTTP Auth Settings'],
         ],
         'authorization' => [
             'device-group' => ['name' => 'Device Group Settings'],
@@ -453,6 +454,10 @@ return [
         'auth_ldap_userdn' => [
             'description' => 'Use full user DN',
             'help' => "Uses a user's full DN as the value of the member attribute in a group instead of member: username using the prefix and suffix. (it's member: uid=username,ou=groups,dc=domain,dc=com)",
+        ],
+        'auth_ldap_userlist_filter' => [
+            'description' => 'Custom LDAP User filter',
+            'help' => 'Custom ldap filter to limit the number of responses if you have an ldap directory with thousand of users',
         ],
         'auth_ldap_wildcard_ou' => [
             'description' => 'Wildcard user OU',
@@ -957,6 +962,10 @@ return [
         'http_auth_header' => [
             'description' => 'Field name containing username',
             'help' => 'Can be a ENV or HTTP-header field like REMOTE_USER, PHP_AUTH_USER or a custom variant',
+        ],
+        'http_auth_guest' => [
+            'description' => 'Http Auth guest user',
+            'help' => 'If set, allows all http users to authenticate and assigns unknown users to give local username',
         ],
         'http_proxy' => [
             'description' => 'HTTP Proxy',

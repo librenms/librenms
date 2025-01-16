@@ -750,6 +750,12 @@
             "order": 5,
             "type": "boolean"
         },
+        "auth_ldap_userlist_filter": {
+            "group": "auth",
+            "section": "ldap",
+            "order": 30,
+            "type": "text"
+        },
         "auth_ldap_wildcard_ou": {
             "default": false,
             "group": "auth",
@@ -4124,15 +4130,21 @@
                 "custom8": "Custom 8"
             }
         },
+        "html_dir": {
+            "type": "directory"
+        },
         "http_auth_header": {
             "default": "REMOTE_USER",
             "group": "auth",
-            "section": "general",
-            "order": 4,
+            "section": "http",
+            "order": 0,
             "type": "text"
         },
-        "html_dir": {
-            "type": "directory"
+        "http_auth_guest": {
+            "group": "auth",
+            "section": "http",
+            "order": 1,
+            "type": "text"
         },
         "http_proxy": {
             "group": "system",
