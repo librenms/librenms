@@ -73,9 +73,6 @@ class PortSecurity implements Module
      */
     public function poll(OS $os, DataStorageInterface $datastore): void
     {
-        if ($os->getDevice()->portSecurity->isEmpty()) {
-            return;
-        }
         if ($os instanceof PortSecurityPolling) {
             $device = $os->getDevice();
             $portsec = $os->pollPortSecurity($os, $device);
