@@ -15,7 +15,7 @@ $grouped_sensors = DeviceCache::getPrimary()
     ->orderBy('group')
     ->orderBy('sensor_descr')
     ->get()
-    ->groupBy('sensnor_class');
+    ->groupBy('sensor_class');
 
 //TODO: from here should be a blade view once graph is a object
 foreach ($grouped_sensors as $sensor_class => $sensors) {
