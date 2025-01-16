@@ -129,13 +129,13 @@ if (! empty($peers)) {
 
                     $address = $peer_ip->uncompressed();
                     $peer_data = [
-                        'bgpPeerState' => $junos[$address]['BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerState'] ?? null,
-                        'bgpPeerAdminStatus' => $junos[$address]['BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerStatus'] ?? null,
-                        'bgpPeerInUpdates' => $junos[$address]['BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerInUpdates'] ?? null,
-                        'bgpPeerOutUpdates' => $junos[$address]['BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerOutUpdates'] ?? null,
-                        'bgpPeerInTotalMessages' => $junos[$address]['BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerInTotalMessages'] ?? null,
-                        'bgpPeerOutTotalMessages' => $junos[$address]['BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerOutTotalMessages'] ?? null,
-                        'bgpPeerFsmEstablishedTime' => $junos[$address]['BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerFsmEstablishedTime'] ?? null,
+                        'bgpPeerState' => $junos[$address]['BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerState'] ?? 'unknown',
+                        'bgpPeerAdminStatus' => $junos[$address]['BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerStatus'] ?? 'unknown',
+                        'bgpPeerInUpdates' => $junos[$address]['BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerInUpdates'] ?? 0,
+                        'bgpPeerOutUpdates' => $junos[$address]['BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerOutUpdates'] ?? 0,
+                        'bgpPeerInTotalMessages' => $junos[$address]['BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerInTotalMessages'] ?? 0,
+                        'bgpPeerOutTotalMessages' => $junos[$address]['BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerOutTotalMessages'] ?? 0,
+                        'bgpPeerFsmEstablishedTime' => $junos[$address]['BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerFsmEstablishedTime'] ?? 0,
                         'bgpPeerLastErrorText' => $junos[$address]['BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerLastErrorReceivedText'] ?? null,
                     ];
 
