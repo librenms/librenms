@@ -25,9 +25,8 @@
 
 namespace LibreNMS\Util;
 
-use Carbon\Carbon;
 use Carbon\CarbonInterface;
-use Carbon\CarbonInterval;
+use Illuminate\Support\Carbon;
 
 class Time
 {
@@ -62,23 +61,22 @@ class Time
             return '';
         }
 
-        $parts = $parts ?? ($short ? 3 : -1);
+        $parts = $parts ?? ($short ? 3 : 4);
 
         try {
             // handle negative seconds correctly
             if ($seconds < 0) {
-                return CarbonInterval::seconds($seconds)->invert()->cascade()->forHumans([
-                    'syntax' => CarbonInterface::DIFF_RELATIVE_TO_NOW,
-                    'parts' => $parts,
-                    'short' => $short,
-                ]);
+                return Carbon::now()->addSeconds($seconds)->diffForHumans(
+                    short: $short,
+                    parts: $parts,
+                );
             }
 
-            return CarbonInterval::seconds($seconds)->cascade()->forHumans([
-                'syntax' => CarbonInterface::DIFF_ABSOLUTE,
-                'parts' => $parts,
-                'short' => $short,
-            ]);
+            return Carbon::now()->subSeconds($seconds)->diffForHumans(
+                syntax: CarbonInterface::DIFF_ABSOLUTE,
+                short: $short,
+                parts: $parts,
+            );
         } catch (\Exception) {
             return '';
         }
