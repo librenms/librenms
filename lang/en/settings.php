@@ -457,7 +457,7 @@ return [
         ],
         'auth_ldap_userlist_filter' => [
             'description' => 'Custom LDAP User filter',
-            'help' => "Custom ldap filter to limit the number of responses if you have an ldap directory with thousand of users",
+            'help' => 'Custom ldap filter to limit the number of responses if you have an ldap directory with thousand of users',
         ],
         'auth_ldap_wildcard_ou' => [
             'description' => 'Wildcard user OU',
