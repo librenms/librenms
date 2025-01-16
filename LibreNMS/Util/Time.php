@@ -61,21 +61,11 @@ class Time
             return '';
         }
 
-        $parts = $parts ?? ($short ? 3 : 4);
-
         try {
-            // handle negative seconds correctly
-            if ($seconds < 0) {
-                return Carbon::now()->addSeconds($seconds)->diffForHumans(
-                    short: $short,
-                    parts: $parts,
-                );
-            }
-
-            return Carbon::now()->subSeconds($seconds)->diffForHumans(
-                syntax: CarbonInterface::DIFF_ABSOLUTE,
+            return Carbon::now()->subSeconds(abs($seconds))->diffForHumans(
+                syntax: $seconds < 0 ? CarbonInterface::DIFF_RELATIVE_TO_NOW : CarbonInterface::DIFF_ABSOLUTE,
                 short: $short,
-                parts: $parts,
+                parts: $parts ?? ($short ? 3 : 4),
             );
         } catch (\Exception) {
             return '';
