@@ -26,7 +26,11 @@ if (! empty($peers)) {
 
     $generic = false;
     if ($device['os'] == 'junos') {
-        $peer_data_check = SnmpQuery::mibDir('junos')->numericIndex()->abortOnFailure()->walk([
+        $peer_data_check = SnmpQuery::mibDir('junos')
+            ->enumStrings()
+            ->numericIndex()
+            ->abortOnFailure()
+            ->walk([
             'BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerIndex',
             'BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerState',
             'BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerStatus',
