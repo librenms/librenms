@@ -43,4 +43,23 @@ class TimeUtilityTest extends TestCase
 
         $this->assertSame('4 years', Time::formatInterval(1461 * 24 * 60 * 60));
     }
+
+    public function testParseAtTime(): void
+    {
+        $this->assertEquals(time(), Time::parseAt('now'), 'now did not match');
+        $this->assertEquals(time() + 180, Time::parseAt('+3m'), '+3m did not match');
+        $this->assertEquals(time() + 7200, Time::parseAt('+2h'), '+2h did not match');
+        $this->assertEquals(time() + 172800, Time::parseAt('+2d'), '+2d did not match');
+        $this->assertEquals(time() + 63115200, Time::parseAt('+2y'), '+2y did not match');
+        $this->assertEquals(time() - 180, Time::parseAt('-3m'), '-3m did not match');
+        $this->assertEquals(time() - 7200, Time::parseAt('-2h'), '-2h did not match');
+        $this->assertEquals(time() - 172800, Time::parseAt('-2d'), '-2d did not match');
+        $this->assertEquals(time() - 63115200, Time::parseAt('-2y'), '-2y did not match');
+        $this->assertEquals(429929439, Time::parseAt('429929439'));
+        $this->assertEquals(212334234, Time::parseAt(212334234));
+        $this->assertEquals(time() - 43, Time::parseAt('-43'), '-43 did not match');
+        $this->assertEquals(0, Time::parseAt('invalid'));
+        $this->assertEquals(606614400, Time::parseAt('March 23 1989 UTC'));
+        $this->assertEquals(time() + 86400, Time::parseAt('+1 day'));
+    }
 }
