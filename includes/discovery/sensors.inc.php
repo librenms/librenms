@@ -51,7 +51,6 @@ if ($device['os'] == 'loop-telecom') {
 $run_sensors = SensorClass::all()
     ->intersect(Config::get('discovery_submodules.sensors', SensorClass::all()->toArray()))
     ->toArray();
-
 sensors($run_sensors, $os, $pre_cache);
 unset(
     $pre_cache,

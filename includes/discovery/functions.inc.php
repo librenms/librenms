@@ -24,6 +24,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Device\YamlDiscovery;
+use LibreNMS\Enum\SensorClass;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\HostExistsException;
 use LibreNMS\Exceptions\InvalidIpException;
@@ -788,7 +789,7 @@ function sensors($types, $os, $pre_cache = [])
 {
     $device = &$os->getDeviceArray();
     foreach ((array) $types as $sensor_class) {
-        echo ucfirst($sensor_class) . ': ';
+        echo SensorClass::descr($sensor_class) . ': ';
         $dir = Config::get('install_dir') . '/includes/discovery/sensors/' . $sensor_class . '/';
 
         if (isset($device['os_group']) && is_file($dir . $device['os_group'] . '.inc.php')) {

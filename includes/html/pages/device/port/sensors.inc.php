@@ -1,11 +1,12 @@
 <?php
 
+use LibreNMS\Enum\SensorClass;
 use LibreNMS\Util\Number;
 
 $sensors = dbFetchRows("SELECT * FROM `sensors` WHERE `device_id` = ? AND `entPhysicalIndex` = ? AND entPhysicalIndex_measured = 'ports' ORDER BY `sensor_type` ASC", [$device['device_id'], $port['ifIndex']]);
 
 foreach ($sensors as $sensor) {
-    $unit = __('sensors.' . $sensor['sensor_class'] . '.unit');
+    $unit = SensorClass::unit($sensor['sensor_class']);
 
     if ($sensor['poller_type'] == 'ipmi') {
         $sensor_descr = ipmiSensorName($device['hardware'], $sensor['sensor_descr']);

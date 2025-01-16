@@ -9,6 +9,7 @@ class SensorClass
 {
     const airflow = 'angle-double-right';
     const ber = 'sort-amount-desc';
+    const bitrate = 'bar-chart';
     const charge = 'battery-half';
     const chromatic_dispersion = 'indent';
     const cooling = 'thermometer-full';
@@ -22,10 +23,11 @@ class SensorClass
     const humidity = 'tint';
     const load = 'percent';
     const loss = 'percentage';
+    const percent = 'percent';
     const power = 'power-off';
     const power_consumed = 'plug';
     const power_factor = 'calculator';
-    const pressur = 'thermometer-empty';
+    const pressure = 'thermometer-empty';
     const quality_factor = 'arrows';
     const runtime = 'hourglass-half';
     const signal = 'wifi';
@@ -33,10 +35,8 @@ class SensorClass
     const state = 'bullseye';
     const temperature = 'thermometer-three-quarters';
     const tv_signal = 'signal';
-    const bitrate = 'bar-chart';
     const voltage = 'bolt';
     const waterflow = 'tint';
-    const percent = 'percent';
 
     public static function all(): Collection
     {
