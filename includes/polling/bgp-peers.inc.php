@@ -31,19 +31,19 @@ if (! empty($peers)) {
             ->numericIndex()
             ->abortOnFailure()
             ->walk([
-            'BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerIndex',
-            'BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerState',
-            'BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerStatus',
-            'BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerInUpdates',
-            'BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerOutUpdates',
-            'BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerInTotalMessages',
-            'BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerOutTotalMessages',
-            'BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerFsmEstablishedTime',
-            'BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerLocalAddr',
-            'BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerRemoteAddrType',
-            'BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerLastErrorReceived',
-            'BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerLastErrorReceivedText',
-        ])->valuesByIndex();
+                'BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerIndex',
+                'BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerState',
+                'BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerStatus',
+                'BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerInUpdates',
+                'BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerOutUpdates',
+                'BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerInTotalMessages',
+                'BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerOutTotalMessages',
+                'BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerFsmEstablishedTime',
+                'BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerLocalAddr',
+                'BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerRemoteAddrType',
+                'BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerLastErrorReceived',
+                'BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerLastErrorReceivedText',
+            ])->valuesByIndex();
     } elseif ($device['os_group'] === 'arista') {
         $peer_data_check = snmpwalk_cache_oid($device, 'aristaBgp4V2PeerRemoteAs', [], 'ARISTA-BGP4V2-MIB');
     } elseif ($device['os'] === 'dell-os10') {
