@@ -94,7 +94,7 @@ class AppServiceProvider extends ServiceProvider
     private function configureMorphAliases()
     {
         $sensor_types = SensorClass::all()
-            ->mapWithKeys(fn($type) => [$type => \App\Models\Sensor::class])
+            ->mapWithKeys(fn ($type) => [$type => \App\Models\Sensor::class])
             ->toArray();
         Relation::morphMap(array_merge([
             'interface' => \App\Models\Port::class,
