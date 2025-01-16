@@ -38,7 +38,6 @@ class Viptela extends OS implements ProcessorDiscovery, ProcessorPolling
     public function discoverOS(Device $device): void
     {
         parent::discoverOS($device); // yaml
-        $device->hardware = $this->getHardware($device->hardware);
     }
 
     /**
