@@ -106,13 +106,13 @@ class Port
         if (! array_key_exists($device_id, $this->ipMaps) || ! array_key_exists($ip_string, $this->ipMaps[$device_id])) {
             if ($ip->getFamily() == 'ipv4') {
                 $this->ipMaps[$device_id][$ip_string] = Ipv4Address::query()
-                    ->when($device, fn($q) => $q->where('device_id', $device_id))
+                    ->when($device, fn ($q) => $q->where('device_id', $device_id))
                     ->where('ipv4_address', $ip_string)
                     ->where('context_name', $context_name)
                     ->value('port_id');
             } else {
                 $this->ipMaps[$device_id][$ip_string] = Ipv6Address::query()
-                    ->when($device, fn($q) => $q->where('device_id', $device_id))
+                    ->when($device, fn ($q) => $q->where('device_id', $device_id))
                     ->where('ipv6_address', $ip_string)
                     ->where('context_name', $context_name)
                     ->value('port_id');
