@@ -728,7 +728,7 @@ function discovery_process($os, $sensor_class, $pre_cache)
                         $divisor = 1;
                     }
                     if ($divisor == 0) {
-                        \Log::warning('Valid nonzero number not found for divisor, defaulting to 1');
+                        Log::warning('Valid nonzero number not found for divisor, defaulting to 1');
                         $divisor = 1;
                     }
 
@@ -741,7 +741,7 @@ function discovery_process($os, $sensor_class, $pre_cache)
                             if (is_numeric($multiplier)) {
                                 $multiplier = (int) $multiplier;
                             } else {
-                                \Log::warning('Valid number not found in data for multiplier, defaulting to 1');
+                                Log::warning('Valid number not found in data for multiplier, defaulting to 1');
                                 $multiplier = 1;
                             }
                         }
@@ -750,7 +750,7 @@ function discovery_process($os, $sensor_class, $pre_cache)
                         if (is_numeric($multiplier)) {
                             $multiplier = (int) $multiplier;
                         } else {
-                            \Log::warning('Valid number not found in sensor options for multiplier, defaulting to 1');
+                            Log::warning('Valid number not found in sensor options for multiplier, defaulting to 1');
                             $multiplier = 1;
                         }
                     } else {
