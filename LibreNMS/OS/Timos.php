@@ -317,7 +317,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
         $filter_value = '/^Internal SAP/';
 
         foreach ($mplsSapCache as $key => $value) {
-            if (preg_match($filter_key, $key) || empty($value['sapDescription']) || preg_match($filter_value, $value['sapDescription'])) {
+            if (preg_match($filter_key, $key) || ! array_key_exists('sapDescription', $value) || preg_match($filter_value, $value['sapDescription'])) {
                 continue;
             }
 
