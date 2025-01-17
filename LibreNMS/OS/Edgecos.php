@@ -26,6 +26,8 @@
 namespace LibreNMS\OS;
 
 use App\Models\Processor;
+use App\Models\Transceiver;
+use App\Models\Mempool;
 use Illuminate\Support\Collection;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
