@@ -19,6 +19,7 @@ use App\Models\Device;
 use App\Polling\Measure\Measurement;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
+use LibreNMS\Data\Source\NetSnmpQuery;
 use LibreNMS\Util\Oid;
 
 function prep_snmp_setting($device, $setting)
@@ -399,7 +400,59 @@ function snmp_walk($device, $oid, $options = null, $mib = null, $mibdir = null)
     return $data;
 }//end snmp_walk()
 
+function snmpquery_style_snmpwalk($device_obj, $mib, $oid)
+{
+    $q = new NetSnmpQuery();
+    $q->device($device_obj);
+    $result = $q->enumStrings()->mibs([$mib], false)->walk($oid)->values();
+
+    return snmpquery_result_to_snmpwalk_result($result);
+}// end snmpquery_snmpwalk()
+
+function snmpquery_result_to_snmpwalk_result($result)
+{
+    $new_result = [];
+    foreach ($result as $verbose_key => $value) {
+        // $verbose_key == 'CISCO-IPSEC-FLOW-MONITOR-MIB::cipSecTunStatus[88381][x]'
+        [$mib_name, $key] = explode('::', $verbose_key, 2);
+        // $mib_name == 'CISCO-IPSEC-FLOW-MONITOR-MIB'
+        // $key == 'cipSecTunStatus[88381][x]'
+        [$key, $key_num] = explode('[', $key, 2);
+        // $key == 'cipSecTunStatus'
+        // $key_num == '88381][x]'
+        $key_num = str_replace('][', '.', rtrim($key_num, ']'));
+        // $key_num == '88381.x'
+
+        if (! array_key_exists($key_num, $new_result)) {
+            $new_result[$key_num] = [];
+        }
+
+        $new_result[$key_num][$key] = $value;
+    }
+
+    return $new_result;
+}//end snmpquery_result_to_snmpwalk_result()
+
 function snmpwalk_cache_oid($device, $oid, $array = [], $mib = null, $mibdir = null, $snmpflags = '-OQUs')
+{
+    /**
+     * snmpwalk_* is deprecated. Its parsing is also fragile, breaking for some
+     * combinations of characters. Here we check the most common use of
+     * snmpwalk_cache_oid() and call the new SnmpQuery functions instead. It
+     * should provide the same output, but better (no escaping/trimming
+     * hazards).
+     *
+     * Ideally you'll want to replace your usage of snmpwalk_cache_oid() with
+     * SnmpQuery directly.
+     */
+    if (empty($array) && $mib !== null && $mibdir === null && $snmpflags == '-OQUs') {
+        return snmpquery_style_snmpwalk(Device::findByHostname($device['hostname']), $mib, $oid);
+    }
+
+    return snmpwalk_cache_oid_orig($device, $oid, $array, $mib, $mibdir, $snmpflags);
+}//end snmpwalk_cache_oid()
+
+function snmpwalk_cache_oid_orig($device, $oid, $array = [], $mib = null, $mibdir = null, $snmpflags = '-OQUs')
 {
     $data = snmp_walk($device, $oid, $snmpflags, $mib, $mibdir);
 
@@ -426,7 +479,7 @@ function snmpwalk_cache_oid($device, $oid, $array = [], $mib = null, $mibdir = n
     }
 
     return $array;
-}//end snmpwalk_cache_oid()
+}//end snmpwalk_cache_oid_orig()
 
 /**
  * Just like snmpwalk_cache_oid except that it returns the numerical oid as the index
