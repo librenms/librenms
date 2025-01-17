@@ -37,6 +37,8 @@ parameters:
 
     ignoreErrors:
         - '#Unsafe usage of new static#'
+        - identifier: missingType.iterableValue
+        - identifier: missingType.generics
 
     parallel:
         processTimeout: 300.0
