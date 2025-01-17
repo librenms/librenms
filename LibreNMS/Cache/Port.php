@@ -160,7 +160,7 @@ class Port
     private function deviceToId(\App\Models\Device|int|null $device): int
     {
         if ($device === null) {
-            return \DeviceCache::getPrimary()->device_id;
+            return (int) \DeviceCache::getPrimary()->device_id;
         }
 
         if ($device instanceof \App\Models\Device) {

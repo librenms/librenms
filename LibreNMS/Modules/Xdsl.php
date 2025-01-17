@@ -210,7 +210,7 @@ class Xdsl implements Module
 
             if ($datastore) {
                 $this->storeVdsl($portVdsl, $data, (int) $ifIndex, $os, $datastore);
-                Log::info(' VDSL(' . PortCache::getNameFromIfIndex($ifIndex) . '/' . Number::formatSi($portVdsl->xdsl2LineStatusAttainableRateDs, 2, 0, 'bps') . '/' . Number::formatSi($portVdsl->xdsl2LineStatusAttainableRateUs, 2, 0, 'bps') . ') ');
+                Log::info(' VDSL(' . PortCache::getNameFromIfIndex($ifIndex, $os->getDevice()) . '/' . Number::formatSi($portVdsl->xdsl2LineStatusAttainableRateDs, 2, 0, 'bps') . '/' . Number::formatSi($portVdsl->xdsl2LineStatusAttainableRateUs, 2, 0, 'bps') . ') ');
             }
 
             $vdslPorts->push($portVdsl);
@@ -275,7 +275,7 @@ class Xdsl implements Module
         ];
 
         $datastore->put($os->getDeviceArray(), 'adsl', [
-            'ifName' => (string) PortCache::getNameFromIfIndex($ifIndex),
+            'ifName' => (string) PortCache::getNameFromIfIndex($ifIndex, $os->getDevice()),
             'rrd_name' => Rrd::portName($port->port_id, 'adsl'),
             'rrd_def' => $rrd_def,
         ], $fields);
@@ -285,7 +285,7 @@ class Xdsl implements Module
     {
         // Attainable
         $datastore->put($os->getDeviceArray(), 'xdsl2LineStatusAttainableRate', [
-            'ifName' => (string) PortCache::getNameFromIfIndex($ifIndex),
+            'ifName' => (string) PortCache::getNameFromIfIndex($ifIndex, $os->getDevice()),
             'rrd_name' => Rrd::portName($port->port_id, 'xdsl2LineStatusAttainableRate'),
             'rrd_def' => RrdDefinition::make()
                 ->addDataset('ds', 'GAUGE', 0)
@@ -297,7 +297,7 @@ class Xdsl implements Module
 
         // actual data rates
         $datastore->put($os->getDeviceArray(), 'xdsl2ChStatusActDataRate', [
-            'ifName' => (string) PortCache::getNameFromIfIndex($ifIndex),
+            'ifName' => (string) PortCache::getNameFromIfIndex($ifIndex, $os->getDevice()),
             'rrd_name' => Rrd::portName($port->port_id, 'xdsl2ChStatusActDataRate'),
             'rrd_def' => RrdDefinition::make()
                 ->addDataset('xtuc', 'GAUGE', 0)
@@ -309,7 +309,7 @@ class Xdsl implements Module
 
         // power levels
         $datastore->put($os->getDeviceArray(), 'xdsl2LineStatusActAtp', [
-            'ifName' => (string) PortCache::getNameFromIfIndex($ifIndex),
+            'ifName' => (string) PortCache::getNameFromIfIndex($ifIndex, $os->getDevice()),
             'rrd_name' => Rrd::portName($port->port_id, 'xdsl2LineStatusActAtp'),
             'rrd_def' => RrdDefinition::make()
                 ->addDataset('ds', 'GAUGE', -100)
