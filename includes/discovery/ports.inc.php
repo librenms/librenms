@@ -22,6 +22,11 @@ $port_stats = snmpwalk_cache_oid($device, 'ifAlias', $port_stats, 'IF-MIB');
 $port_stats = snmpwalk_cache_oid($device, 'ifType', $port_stats, 'IF-MIB', null, $typeSnmpFlags);
 $port_stats = snmpwalk_cache_oid($device, 'ifOperStatus', $port_stats, 'IF-MIB', null, $operStatusSnmpFlags);
 
+// Add ports from other snmp context
+if ($device['os'] == 'nokia-isam') {
+    require base_path('includes/discovery/ports/nokia-isam.inc.php');
+}
+
 // Get adva-fsp150cp
 if ($device['os'] == 'adva-fsp150cp') {
     require base_path('includes/discovery/ports/adva-fsp150cp.inc.php');
@@ -70,6 +75,11 @@ if ($device['os'] == 'slms') {
 //Cambium cnMatrix port description mapping
 if ($device['os'] == 'cnmatrix') {
     require base_path('includes/discovery/ports/cnmatrix.inc.php');
+}
+
+//Get Tachyon ports
+if ($device['os'] == 'tachyon') {
+    require base_path('includes/discovery/ports/tachyon.inc.php');
 }
 
 // End Building SNMP Cache Array

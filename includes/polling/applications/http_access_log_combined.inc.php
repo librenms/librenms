@@ -169,7 +169,7 @@ if (count($added_logs) > 0 || count($removed_logs) > 0) {
     $log_message = 'HTTP Access Log Set Change:';
     $log_message .= count($added_logs) > 0 ? ' Added ' . implode(',', $added_logs) : '';
     $log_message .= count($removed_logs) > 0 ? ' Removed ' . implode(',', $added_logs) : '';
-    Eventlog::log($log_message, $device, 'application');
+    Eventlog::log($log_message, $device['device_id'], 'application');
 }
 
 // all done so update the app metrics

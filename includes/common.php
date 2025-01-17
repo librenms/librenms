@@ -203,13 +203,6 @@ function device_by_name($name)
     return device_by_id_cache(getidbyname($name));
 }
 
-function accesspoint_by_id($ap_id, $refresh = '0')
-{
-    $ap = dbFetchRow('SELECT * FROM `access_points` WHERE `accesspoint_id` = ?', [$ap_id]);
-
-    return $ap;
-}
-
 function device_by_id_cache($device_id, $refresh = false)
 {
     $model = $refresh ? DeviceCache::refresh((int) $device_id) : DeviceCache::get((int) $device_id);
@@ -260,11 +253,6 @@ function zeropad($num, $length = 2)
 function set_dev_attrib($device, $attrib_type, $attrib_value)
 {
     return DeviceCache::get((int) $device['device_id'])->setAttrib($attrib_type, $attrib_value);
-}
-
-function get_dev_attribs($device_id)
-{
-    return DeviceCache::get((int) $device_id)->getAttribs();
 }
 
 function get_dev_attrib($device, $attrib_type)
