@@ -723,7 +723,7 @@ function discovery_process($os, $sensor_class, $pre_cache)
                     } else {
                         $divisor = 1;
                     }
-                    if ($divisor == 0)
+                    if ($divisor == 0) {
                         Log::warning('Divisor is not a nonzero number, defaulting to 1');
                         $divisor = 1;
                     }
