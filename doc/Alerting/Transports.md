@@ -335,7 +335,7 @@ You will also find additional information is sent as part of the payload to Graf
 can be useful within the templates or routes. If you perform a test of the LibreNMS transport 
 you will be able to see the payload within the Grafana interface.
 
-customise what is sent to ZenDuty and override or add additional fields, you can create
+customise what is sent to Grafana and override or add additional fields, you can create
 a custom template which outputs the correct information via JSON. As an example:
 
 ```
