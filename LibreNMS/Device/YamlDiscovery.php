@@ -248,14 +248,14 @@ class YamlDiscovery
 
         if (isset($discovery_data['oid']) && ! is_array($discovery_data['oid']) && isset($pre_cache[$discovery_data['oid']][$index]) && isset($pre_cache[$discovery_data['oid']][$index][$name])) {
             $value = $pre_cache[$discovery_data['oid']][$index][$name];
-            Log::debug("Using $value from discovery data for $name");
+            Log::debug("Using $value from \$pre_cache[\$discovery_data['oid']][$index][$name] for $name");
 
             return $value;
         }
 
         if (isset($pre_cache[$index][$name])) {
             $value = $pre_cache[$index][$name];
-            Log::debug("Using $value from pre_cache for $name");
+            Log::debug("Using $value from \$pre_cache[$index][$name] for $name");
 
             return $value;
         }
@@ -279,23 +279,23 @@ class YamlDiscovery
             if (is_array($pre_cache[$name])) {
                 if (isset($pre_cache[$name][$index][$name])) {
                     $value = $pre_cache[$name][$index][$name];
-                    Log::debug("Using $value from pre_cache[$name][$index][$name] for $name");
+                    Log::debug("Using $value from \$pre_cache[$name][$index][$name] for $name");
 
                     return $value;
                 } elseif (isset($pre_cache[$name][$index])) {
                     $value = $pre_cache[$name][$index];
-                    Log::debug("Using $value from pre_cache[$name][$index] for $name");
+                    Log::debug("Using $value from \$pre_cache[$name][$index] for $name");
 
                     return $value;
                 } elseif (count($pre_cache[$name]) === 1 && ! is_array(current($pre_cache[$name]))) {
                     $value = current($pre_cache[$name]);
-                    Log::debug("Using single entry $value from pre_cache[$name] for $name");
+                    Log::debug("Using sole entry $value from \$pre_cache[$name] array for $name");
 
                     return $value;
                 }
             } else {
                 $value = $pre_cache[$name];
-                Log::debug("Using $value from from pre_cache[$name] for $name");
+                Log::debug("Using $value from from \$pre_cache[$name] for $name");
 
                 return $value;
             }
