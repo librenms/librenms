@@ -317,10 +317,10 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
         $filter_value = '/^Internal SAP/';
 
         foreach ($mplsSapCache as $key => $value) {
-            if (preg_match($filter_key, $key) || preg_match($filter_value, $value['sapDescription'])) {
-                unset($key);
+            if (preg_match($filter_key, $key) || empty($value['sapDescription']) || preg_match($filter_value, $value['sapDescription'])) {
                 continue;
             }
+
             [$svcId, $sapPortId, $sapEncapValue] = explode('.', $key);
             $svc_id = $svcs->firstWhere('svc_oid', $svcId)->svc_id;
             $traffic_id = $svcId . '.' . $sapPortId . '.' . $this->nokiaEncap($sapEncapValue);
@@ -358,6 +358,10 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
 
         $binds = new Collection();
         foreach ($mplsBindCache as $key => $value) {
+            if (empty($value['sdpBindRowStatus'])) {
+                continue;
+            }
+
             [$svcId] = explode('.', $key);
             $bind_id = str_replace(' ', '', $value['sdpBindId'] ?? '');
             $sdp_oid = hexdec(substr($bind_id, 0, 8));
@@ -371,7 +375,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
                     'sdp_oid' => $sdp_oid,
                     'svc_oid' => $svc_oid,
                     'device_id' => $this->getDeviceId(),
-                    'sdpBindRowStatus' => $value['sdpBindRowStatus'] ?? null,
+                    'sdpBindRowStatus' => $value['sdpBindRowStatus'],
                     'sdpBindAdminStatus' => $value['sdpBindAdminStatus'] ?? null,
                     'sdpBindOperStatus' => $value['sdpBindOperStatus'] ?? null,
                     'sdpBindLastMgmtChange' => round(($value['sdpBindLastMgmtChange'] ?? 0) / 100),
@@ -487,6 +491,10 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
 
         $lsps = new Collection();
         foreach ($mplsLspCache as $key => $value) {
+            if (empty($value['vRtrMplsLspRowStatus'])) {
+                continue;
+            }
+
             [$vrf_oid, $lsp_oid] = explode('.', $key);
 
             $mplsLspFromAddr = $value['vRtrMplsLspFromAddr'] ?? null;
@@ -502,7 +510,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
                 'vrf_oid' => $vrf_oid,
                 'lsp_oid' => $lsp_oid,
                 'device_id' => $this->getDeviceId(),
-                'mplsLspRowStatus' => $value['vRtrMplsLspRowStatus'] ?? null,
+                'mplsLspRowStatus' => $value['vRtrMplsLspRowStatus'],
                 'mplsLspLastChange' => round(($value['vRtrMplsLspLastChange'] ?? 0) / 100),
                 'mplsLspName' => $value['vRtrMplsLspName'] ?? null,
                 'mplsLspAdminState' => $value['vRtrMplsLspAdminState'] ?? null,
