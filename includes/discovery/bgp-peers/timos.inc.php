@@ -28,7 +28,7 @@ use LibreNMS\Config;
 use LibreNMS\Util\IP;
 
 if ($device['os'] == 'timos') {
-    $bgpPeersCache = snmpwalk_cache_multi_oid($device, 'tBgpPeerNgTable', [], 'TIMETRA-BGP-MIB', 'nokia');
+    $bgpPeersCache = SnmpQuery::walk('TIMETRA-BGP-MIB::tBgpPeerNgTable')->valuesByIndex();
     foreach ($bgpPeersCache as $key => $value) {
         $oid = explode('.', $key);
         $vrfInstance = $oid[0];

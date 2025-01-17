@@ -49,7 +49,10 @@ if (! empty($peers)) {
     } elseif ($device['os'] === 'dell-os10') {
         $peer_data_check = snmpwalk_cache_oid($device, 'os10bgp4V2PeerRemoteAs', [], 'DELLEMC-OS10-BGP4V2-MIB', 'dell'); // practically identical MIB as arista
     } elseif ($device['os'] === 'timos') {
-        $peer_data_check = snmpwalk_cache_multi_oid($device, 'tBgpInstanceRowStatus', [], 'TIMETRA-BGP-MIB', 'nokia');
+        $peer_data_check = SnmpQuery::enumStrings()->hideMib()->abortOnFailure()->walk([
+            'TIMETRA-BGP-MIB::tBgpPeerNgTable',
+            'TIMETRA-BGP-MIB::tBgpPeerNgOperTable',
+        ])->valuesByIndex();
     } elseif ($device['os'] === 'firebrick') {
         $peer_data_check = snmpwalk_cache_multi_oid($device, 'fbBgpPeerTable', [], 'FIREBRICK-BGP-MIB', 'firebrick');
     } elseif ($device['os'] === 'aos7') {
@@ -224,10 +227,7 @@ if (! empty($peers)) {
                     unset($peer_data['bgpPeerLastError']);
                 } elseif ($device['os'] == 'timos') {
                     if (! isset($bgpPeers)) {
-                        echo "\nCaching Oids...";
-                        $bgpPeersCache = snmpwalk_cache_multi_oid($device, 'tBgpPeerNgTable', [], 'TIMETRA-BGP-MIB', 'nokia');
-                        $bgpPeersCache = snmpwalk_cache_multi_oid($device, 'tBgpPeerNgOperEntry', $bgpPeersCache, 'TIMETRA-BGP-MIB', 'nokia');
-                        foreach ($bgpPeersCache as $key => $value) {
+                        foreach ($peer_data_check as $key => $value) {
                             $oid = explode('.', $key);
                             $vrfInstance = $oid[0];
                             $address = str_replace($oid[0] . '.' . $oid[1] . '.', '', $key);
