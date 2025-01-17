@@ -1,4 +1,8 @@
-ES3528MO-MIB DEFINITIONS ::= BEGIN
+--------------------------------------------------
+--Version Number: 20100723001
+--------------------------------------------------
+
+ES3528M-SFP-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
 
@@ -21,11 +25,11 @@ IMPORTS
                 FROM IEEE8021-PAE-MIB;
 
 accton              OBJECT IDENTIFIER ::= { enterprises 259 }
-snmpMgt             OBJECT IDENTIFIER ::= { accton 6 }
-cheetahSwitchMgt    OBJECT IDENTIFIER ::= { snmpMgt 10 }
+edgecore             OBJECT IDENTIFIER ::= { accton 8 }
+edgeCoreSwitchMgt   OBJECT IDENTIFIER ::= { edgecore 1 }
 
-es3528moMIB MODULE-IDENTITY
-        LAST-UPDATED "200605240000Z"
+es3528m-sfpMIB MODULE-IDENTITY
+        LAST-UPDATED "201002250000Z"
         ORGANIZATION "Accton Technology Corp."
         CONTACT-INFO
                 "Accton Technology Corp.
@@ -39,47 +43,49 @@ es3528moMIB MODULE-IDENTITY
                  Fax: +886-3-5780764
                  E-mail: sales_ec@edge-core.com"
         DESCRIPTION
-                "The MIB module for ES3528MO."
+                "The MIB module for ES3528M-SFP."
         REVISION "200605240000Z"
         DESCRIPTION
                 "Initial version of this MIB."
-        ::= { cheetahSwitchMgt 94 }
+        ::= { edgeCoreSwitchMgt 4 }
 
-es3528moMIBObjects       OBJECT IDENTIFIER ::= { es3528moMIB 1 }
-es3528moNotifications    OBJECT IDENTIFIER ::= { es3528moMIB 2 }
-es3528moConformance      OBJECT IDENTIFIER ::= { es3528moMIB 3 }
+es3528m-sfpMIBObjects       OBJECT IDENTIFIER ::= { es3528m-sfpMIB 1 }
+es3528m-sfpNotifications    OBJECT IDENTIFIER ::= { es3528m-sfpMIB 2 }
+es3528m-sfpConformance      OBJECT IDENTIFIER ::= { es3528m-sfpMIB 3 }
 
 --supported groups
-switchMgt           OBJECT IDENTIFIER ::= { es3528moMIBObjects 1 }
-portMgt             OBJECT IDENTIFIER ::= { es3528moMIBObjects 2 }
-trunkMgt            OBJECT IDENTIFIER ::= { es3528moMIBObjects 3 }
-lacpMgt             OBJECT IDENTIFIER ::= { es3528moMIBObjects 4 }
-staMgt              OBJECT IDENTIFIER ::= { es3528moMIBObjects 5 }
-restartMgt          OBJECT IDENTIFIER ::= { es3528moMIBObjects 7 }
-mirrorMgt           OBJECT IDENTIFIER ::= { es3528moMIBObjects 8 }
-igmpSnoopMgt        OBJECT IDENTIFIER ::= { es3528moMIBObjects 9 }
-ipMgt               OBJECT IDENTIFIER ::= { es3528moMIBObjects 10 }
-vlanMgt             OBJECT IDENTIFIER ::= { es3528moMIBObjects 12 }
-priorityMgt         OBJECT IDENTIFIER ::= { es3528moMIBObjects 13 }
-trapDestMgt         OBJECT IDENTIFIER ::= { es3528moMIBObjects 14 }
-qosMgt              OBJECT IDENTIFIER ::= { es3528moMIBObjects 16 }
-securityMgt         OBJECT IDENTIFIER ::= { es3528moMIBObjects 17 }
-sysLogMgt           OBJECT IDENTIFIER ::= { es3528moMIBObjects 19 }
-lineMgt             OBJECT IDENTIFIER ::= { es3528moMIBObjects 20 }
-sysTimeMgt          OBJECT IDENTIFIER ::= { es3528moMIBObjects 23 }
-fileMgt             OBJECT IDENTIFIER ::= { es3528moMIBObjects 24 }
-dnsMgt              OBJECT IDENTIFIER ::= { es3528moMIBObjects 26 }
-stormMgt            OBJECT IDENTIFIER ::= { es3528moMIBObjects 33 }
-sysResourceMgt      OBJECT IDENTIFIER ::= { es3528moMIBObjects 39 }
-mvrMgt              OBJECT IDENTIFIER ::= { es3528moMIBObjects 44 }
-dhcpSnoopMgt        OBJECT IDENTIFIER ::= { es3528moMIBObjects 46 }
-clusterMgt          OBJECT IDENTIFIER ::= { es3528moMIBObjects 47 }
-ipSrcGuardMgt       OBJECT IDENTIFIER ::= { es3528moMIBObjects 48 }
-upnpMgt             OBJECT IDENTIFIER ::= { es3528moMIBObjects 49 }
-sFlowMgt            OBJECT IDENTIFIER ::= { es3528moMIBObjects 55 }
-dynamicArpInspectionMgt         OBJECT IDENTIFIER ::= { es3528moMIBObjects 56 }
-erpsMgt             OBJECT IDENTIFIER ::= { es3528moMIBObjects 62 }
-lbdMgt              OBJECT IDENTIFIER ::= { es3528moMIBObjects 63 }
+switchMgt           OBJECT IDENTIFIER ::= { es3528m-sfpMIBObjects 1 }
+portMgt             OBJECT IDENTIFIER ::= { es3528m-sfpMIBObjects 2 }
+trunkMgt            OBJECT IDENTIFIER ::= { es3528m-sfpMIBObjects 3 }
+lacpMgt             OBJECT IDENTIFIER ::= { es3528m-sfpMIBObjects 4 }
+staMgt              OBJECT IDENTIFIER ::= { es3528m-sfpMIBObjects 5 }
+restartMgt          OBJECT IDENTIFIER ::= { es3528m-sfpMIBObjects 7 }
+mirrorMgt           OBJECT IDENTIFIER ::= { es3528m-sfpMIBObjects 8 }
+igmpSnoopMgt        OBJECT IDENTIFIER ::= { es3528m-sfpMIBObjects 9 }
+ipMgt               OBJECT IDENTIFIER ::= { es3528m-sfpMIBObjects 10 }
+vlanMgt             OBJECT IDENTIFIER ::= { es3528m-sfpMIBObjects 12 }
+priorityMgt         OBJECT IDENTIFIER ::= { es3528m-sfpMIBObjects 13 }
+trapDestMgt         OBJECT IDENTIFIER ::= { es3528m-sfpMIBObjects 14 }
+qosMgt              OBJECT IDENTIFIER ::= { es3528m-sfpMIBObjects 16 }
+securityMgt         OBJECT IDENTIFIER ::= { es3528m-sfpMIBObjects 17 }
+sysLogMgt           OBJECT IDENTIFIER ::= { es3528m-sfpMIBObjects 19 }
+lineMgt             OBJECT IDENTIFIER ::= { es3528m-sfpMIBObjects 20 }
+sysTimeMgt          OBJECT IDENTIFIER ::= { es3528m-sfpMIBObjects 23 }
+fileMgt             OBJECT IDENTIFIER ::= { es3528m-sfpMIBObjects 24 }
+dnsMgt              OBJECT IDENTIFIER ::= { es3528m-sfpMIBObjects 26 }
+stormMgt            OBJECT IDENTIFIER ::= { es3528m-sfpMIBObjects 33 }
+sysResourceMgt      OBJECT IDENTIFIER ::= { es3528m-sfpMIBObjects 39 }
+mvrMgt              OBJECT IDENTIFIER ::= { es3528m-sfpMIBObjects 44 }
+dhcpSnoopMgt        OBJECT IDENTIFIER ::= { es3528m-sfpMIBObjects 46 }
+clusterMgt          OBJECT IDENTIFIER ::= { es3528m-sfpMIBObjects 47 }
+ipSrcGuardMgt       OBJECT IDENTIFIER ::= { es3528m-sfpMIBObjects 48 }
+upnpMgt             OBJECT IDENTIFIER ::= { es3528m-sfpMIBObjects 49 }
+oamMgt              OBJECT IDENTIFIER ::= { es3528m-sfpMIBObjects 52 }
+remoteMgt           OBJECT IDENTIFIER ::= { es3528m-sfpMIBObjects 53 }
+sFlowMgt            OBJECT IDENTIFIER ::= { es3528m-sfpMIBObjects 55 }
+dynamicArpInspectionMgt         OBJECT IDENTIFIER ::= { es3528m-sfpMIBObjects 56 }
+erpsMgt             OBJECT IDENTIFIER ::= { es3528m-sfpMIBObjects 62 }
+lbdMgt              OBJECT IDENTIFIER ::= { es3528m-sfpMIBObjects 63 }
 
 -- -------------------------------------------------------------
 -- Textual Conventions
@@ -3074,128 +3080,6 @@ igmpSnoopThrottlePortCurrentGroups   OBJECT-TYPE
         ::= { igmpSnoopThrottlePortEntry 5}
 
 --
--- igmpSnoopPortTable
---
-igmpSnoopPortTable OBJECT-TYPE
-    SYNTAX      SEQUENCE OF IgmpSnoopPortEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "Table of IGMP Snooping service per port."
-    ::= {igmpSnoopMgt 27 }
-
-igmpSnoopPortEntry OBJECT-TYPE
-    SYNTAX      IgmpSnoopPortEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "Entry of IGMP Snooping service per port."
-    INDEX       { igmpSnoopPortIndex }
-    ::= {igmpSnoopPortTable 1}
-
-IgmpSnoopPortEntry ::=
-    SEQUENCE {
-        igmpSnoopPortIndex   Unsigned32,
-        igmpSnoopQueryDrop   EnabledStatus
-    }
-
-igmpSnoopPortIndex OBJECT-TYPE
-    SYNTAX      Unsigned32
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "The port and the trunk (excluding trunk members)
-         interface of the igmpSnoopPortTable. The interface
-         identified by a particular value of this index
-         is the same interface as identified by the same
-         value of ifIndex in the IF-MIB."
-    ::= { igmpSnoopPortEntry 1 }
-
-
-igmpSnoopQueryDrop OBJECT-TYPE
-        SYNTAX      INTEGER
-                {
-                    enable(1),
-                    disable(2)
-                }
-        MAX-ACCESS  read-write
-        STATUS      current
-        DESCRIPTION "Parameter to enable or disable dropping IGMP Query packet."
-        DEFVAL      { disable }
-        ::= { igmpSnoopPortEntry 3 }
-
-igmpSnoopForwardingPriority OBJECT-TYPE
-    SYNTAX      Integer32(0..6|65535)
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-        "Configure IGMP snooping multicast stream forwarding priority.
-        If value is 65535, it means the priority is disabled"
-    ::= { igmpSnoopMgt 29 }
-
---
--- igmpSnoopPortVlanTable
---
-igmpSnoopPortVlanTable OBJECT-TYPE
-    SYNTAX      SEQUENCE OF IgmpSnoopPortVlanEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "Table of IGMP Snooping service per port per VLAN."
-    ::= {igmpSnoopMgt 32 }
-
-igmpSnoopPortVlanEntry OBJECT-TYPE
-    SYNTAX      IgmpSnoopPortVlanEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "Entry of IGMP Snooping service per port."
-    INDEX       { igmpSnoopPortVlanPortIndex, igmpSnoopPortVlanVlanIndex}
-    ::= {igmpSnoopPortVlanTable 1}
-
-IgmpSnoopPortVlanEntry ::=
-    SEQUENCE {
-        igmpSnoopPortVlanPortIndex   Unsigned32,
-        igmpSnoopPortVlanVlanIndex   Unsigned32,
-        igmpSnoopPortVlanQueryDrop   EnabledStatus
-    }
-
-igmpSnoopPortVlanPortIndex OBJECT-TYPE
-    SYNTAX      Unsigned32
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "The port and the trunk (excluding trunk members)
-         interface of the igmpSnoopPortTable. The interface
-         identified by a particular value of this index
-         is the same interface as identified by the same
-         value of ifIndex in the IF-MIB."
-    ::= { igmpSnoopPortVlanEntry 1 }
-
-igmpSnoopPortVlanVlanIndex OBJECT-TYPE
-    SYNTAX      Unsigned32
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "The interface identified by a particular value of
-         this index is the same interface as identified by
-         the same value of dot1qVlanIndex in the Q-BRIDGE-MIB."
-    ::= { igmpSnoopPortVlanEntry 2 }
-
-igmpSnoopPortVlanQueryDrop OBJECT-TYPE
-        SYNTAX      INTEGER
-                {
-                    enable(1),
-                    disable(2)
-                }
-        MAX-ACCESS  read-write
-        STATUS      current
-        DESCRIPTION "Parameter to enable or disable dropping IGMP Query packet."
-        DEFVAL      { disable }
-        ::= { igmpSnoopPortVlanEntry 3 }
-
-
---
 -- The IpMgt Group
 --
 
@@ -3404,7 +3288,7 @@ ipHttpsPort OBJECT-TYPE
 
 dhcpMgt              OBJECT IDENTIFIER ::= { ipMgt 11 }
 dhcpClient           OBJECT IDENTIFIER ::= { dhcpMgt 1 }
-dhcpOption82		 OBJECT IDENTIFIER ::= { dhcpMgt 4 }
+dhcpOption82         OBJECT IDENTIFIER ::= { dhcpMgt 4 }
 dhcpcOptions         OBJECT IDENTIFIER ::= { dhcpClient 1 }
 
 dhcpcInterfaceTable OBJECT-TYPE
@@ -3528,43 +3412,6 @@ dhcpOption82EncodeFormat OBJECT-TYPE
 			 Set no-extra-subtype-included(2) will only have TLV format for CID and RID."
 		::= { dhcpOption82 5 }
 
-dhcpOption82RelayServerAddrTable OBJECT-TYPE
-          SYNTAX      SEQUENCE OF DhcpOption82RelayServerAddrEntry
-          MAX-ACCESS  not-accessible
-          STATUS      current
-          DESCRIPTION " This table is to specify relay server IP address,
-                        the maximum number of server IP addresses user can specify is 5.
-                        "
-          ::= { dhcpOption82 6 }
-
-dhcpOption82RelayServerAddrEntry OBJECT-TYPE
-          SYNTAX      DhcpOption82RelayServerAddrEntry
-          MAX-ACCESS  not-accessible
-          STATUS      current
-          DESCRIPTION "A conceptual row of dhcpOption82RelayServerAddrTable."
-          INDEX { dhcpOption82RelayServerAddrIndex }
-          ::= { dhcpOption82RelayServerAddrTable 1 }
-
-DhcpOption82RelayServerAddrEntry ::= SEQUENCE
-{
-     dhcpOption82RelayServerAddrIndex Integer32,
-     dhcpOption82RelayServerAddrServerIp  IpAddress
-}
-
-dhcpOption82RelayServerAddrIndex OBJECT-TYPE
-          SYNTAX      Integer32 (1..5)
-          MAX-ACCESS  not-accessible
-          STATUS      current
-          DESCRIPTION "The index of the relay server IP address."
-          ::= { dhcpOption82RelayServerAddrEntry 1 }
-
-dhcpOption82RelayServerAddrServerIp OBJECT-TYPE
-          SYNTAX      IpAddress
-          MAX-ACCESS  read-write
-          STATUS      current
-          DESCRIPTION "The IP address of the relay server."
-          ::= { dhcpOption82RelayServerAddrEntry 2 }
-		  
 arpCacheDeleteAll OBJECT-TYPE
         SYNTAX      INTEGER
                     {
@@ -3949,22 +3796,6 @@ voiceVlanPortRuleLldp OBJECT-TYPE
         DESCRIPTION "The address of voice device is learned from
                      LLDP discovery."
         ::= { voiceVlanPortEntry 6 }
-
-voiceVlanRemarkIpDscpStatus  OBJECT-TYPE
-        SYNTAX      EnabledStatus
-        MAX-ACCESS  read-write
-        STATUS      current
-        DESCRIPTION "Set enabled(1) to enable remarking of IP DSCP
-                     for voice traffic. Set disabled(2) to disable
-                     it."
-        ::= { voiceVlanMgt 8 }
-        
-voiceVlanIpDscp  OBJECT-TYPE
-        SYNTAX      INTEGER
-        MAX-ACCESS  read-write
-        STATUS      current
-        DESCRIPTION "New IP DSCP value for voice traffic."
-        ::= { voiceVlanMgt 9 }
 
 --
 -- macVlanMgt
@@ -4570,15 +4401,6 @@ trapVlanId OBJECT-TYPE
     DESCRIPTION "This variable is for trap var binding,
                  indicating the identifier of a VLAN."
     ::= { trapVar 31 }
-
--- For Port Security
-
-trapPortSecurityIntrusionMac OBJECT-TYPE
-     SYNTAX      MacAddress
-     MAX-ACCESS  accessible-for-notify
-     STATUS      current
-     DESCRIPTION "This variable indicates the intrusion MAC address."
-     ::= { trapVar 29 }
 
 --
 -- qosMgt
@@ -5381,11 +5203,11 @@ diffServAclAttachCtlIndex OBJECT-TYPE
 diffServAclAttachCtlAceType OBJECT-TYPE
         SYNTAX  INTEGER
                 {
-                    macAce(1),
-                    ipAce(2),
-                    ipv6Ace(3),
-                    arpAce(4)
-                }
+        macAce(1),
+        ipAce(2),
+        ipv6Ace(3),
+        arpAce(4)
+    }
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION "Type for attachment control. Specifies the type of
@@ -8487,8 +8309,6 @@ userAuthAuthTrapStatus OBJECT-TYPE
 -- dot1xMgt
 --
 
-dot1xSuppMgt            OBJECT IDENTIFIER ::= { dot1xMgt 2 }
-
 -- The extension table of dot1xAuthConfigTable
 
 dot1xAuthConfigExtTable OBJECT-TYPE
@@ -8550,60 +8370,6 @@ dot1xAuthConfigExtPortIntrusionAction      OBJECT-TYPE
                  guest-vlan(2) means that to join to a guest VLAN when the authentication is failed."
     ::= { dot1xAuthConfigExtEntry 3 }
 
-dot1xSuppUserName OBJECT-TYPE
-    SYNTAX      DisplayString(SIZE(0..8))
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION "The user name that will be sent to Request-Id packects."
-    ::= { dot1xSuppMgt 1 }
-
-dot1xSuppPassword OBJECT-TYPE
-    SYNTAX      DisplayString(SIZE(0..8))
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION "The password that should be used when replying to
-                 a MD5 challenge."
-    ::= { dot1xSuppMgt 2 }
-
-dot1xSuppConfigPortTable OBJECT-TYPE
-    SYNTAX      SEQUENCE OF Dot1xSuppConfigPortEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION "The table of supplicant for port."
-    ::= { dot1xSuppMgt 3 }
-
-dot1xSuppConfigPortEntry OBJECT-TYPE
-    SYNTAX      Dot1xSuppConfigPortEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION "The entry of dot1xSuppConfigPortTable."
-    INDEX       { dot1xSuppConfigPortIndex }
-    ::= { dot1xSuppConfigPortTable 1 }
-
-Dot1xSuppConfigPortEntry ::= SEQUENCE
-{
-        dot1xSuppConfigPortIndex      Integer32,
-        dot1xSuppConfigPortStatus     EnabledStatus
-}
-
-dot1xSuppConfigPortIndex OBJECT-TYPE
-    SYNTAX      Integer32
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION "The port and the trunk (excluding trunk members) interface of the
-                 portTable. The interface identified by a particular value of this port
-                 index is the same interface identified by the same value of
-                 ifIndex in the IF-MIB."
-    ::= { dot1xSuppConfigPortEntry 1 }
-
-dot1xSuppConfigPortStatus OBJECT-TYPE
-    SYNTAX      EnabledStatus
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION "Set enabled(1) to let the port act as a supplicant and will
-                 not respond to messages that are meant for an authenticator.
-                 Set disabled(2) to disable supplicant ability of the port."
-    ::= { dot1xSuppConfigPortEntry 2 }
 
 dot1xEapolPassThrough OBJECT-TYPE
         SYNTAX      EnabledStatus
@@ -8640,8 +8406,8 @@ networkAccessPortEntry   OBJECT-TYPE
 
 NetworkAccessPortEntry ::= SEQUENCE
 {
-    networkAccessPortPortIndex              Integer32,
-    networkAccessPortMaxMacCount            INTEGER,
+    networkAccessPortPortIndex        Integer32,
+    networkAccessPortMaxMacCount      INTEGER,
     networkAccessPortMode                   EnabledStatus,
     networkAccessPortMacFilter              INTEGER,
     networkAccessPortGuestVlan              INTEGER,
@@ -9581,8 +9347,8 @@ telnetPortNumber OBJECT-TYPE
 -- sysTimeMgt
 --
 
-sntpMgt          OBJECT IDENTIFIER ::= { sysTimeMgt 1 }
-ntpMgt           OBJECT IDENTIFIER ::= { sysTimeMgt 5 }
+sntpMgt OBJECT IDENTIFIER ::= { sysTimeMgt 1 }
+ntpMgt  OBJECT IDENTIFIER ::= { sysTimeMgt 5 }
 sysSummerTimeMgt OBJECT IDENTIFIER ::= { sysTimeMgt 7 }
 
 sntpStatus OBJECT-TYPE
@@ -10054,6 +9820,7 @@ ntpAuthKeyStatus OBJECT-TYPE
 
 
 fileCopyMgt OBJECT IDENTIFIER ::= { fileMgt 1 }
+fileInfoMgt OBJECT IDENTIFIER ::= { fileMgt 2 }
 fileAutoUpgradeMgt OBJECT IDENTIFIER ::= { fileMgt 4 }
 --
 -- This performs the copy operation.
@@ -10100,8 +9867,7 @@ fileCopySrcOperType OBJECT-TYPE
                  (16) copy file ftp; (17) copy running-config ftp;
                  (18) copy startup-config ftp; (19) copy ftp file;
                  (20) copy ftp running-config; (21) copy ftp startup-config;
-                 (22) copy tftp add-to-running-config;
-                 (23) copy ftp add-to-running-config;"
+                 (22) copy tftp cluster-member; (23) copy tftp oam-remote."
     ::= { fileCopyMgt 1}
 
 fileCopySrcFileName OBJECT-TYPE
@@ -10126,7 +9892,7 @@ fileCopyDestOperType OBJECT-TYPE
                  unit(5),
                  http(6),
                  ftp(7),
-                 addRunningCfg(10)
+                 oamRemote(9)
                 }
     MAX-ACCESS read-write
     STATUS     current
@@ -10145,8 +9911,8 @@ fileCopyDestOperType OBJECT-TYPE
                  http(6) means we can read the status of the transfer via
                  HTTP protocol, but can not change the status.
                  ftp(7) means we want to perform 'copy fileCopySrcOperType ftp'
-                 operation.addRunningCfg(10) means we want to perform
-                 'copy fileCopySrcOperType add-to-running-config'
+                 operation.oamRemote(9) means we want to perform
+                 'copy fileCopySrcOperType oam-remote' operation,
 
                  The possible permutations are as follows: (1) copy file file;
                  (2) copy file runningCfg; (3) copy file startUpCfg;
@@ -10159,8 +9925,7 @@ fileCopyDestOperType OBJECT-TYPE
                  (16) copy file ftp; (17) copy running-config ftp;
                  (18) copy startup-config ftp; (19) copy ftp file;
                  (20) copy ftp running-config; (21) copy ftp startup-config;
-                 (22) copy tftp add-to-running-config;
-                 (23) copy ftp add-to-running-config;"
+                 (22) copy tftp cluster-member; (23) copy tftp oam-remote."
     ::= { fileCopyMgt 3 }
 
 fileCopyDestFileName  OBJECT-TYPE
@@ -10171,8 +9936,8 @@ fileCopyDestFileName  OBJECT-TYPE
         "The destination file name for fileCopyMgt when a
         copy operation is next requested via this MIB.  This value is set to
         a zero length string when no file name has been specified.
-        Note: If the fileCopyDestOperType is runningCfg(2) or startupCfg(3),
-        this variable can be ignored."
+        Note: If the fileCopyDestOperType is runningCfg(2), startupCfg(3), or
+        oamRemote(9), this variable can be ignored."
     ::= { fileCopyMgt 4 }
 
 fileCopyFileType  OBJECT-TYPE
@@ -10180,7 +9945,8 @@ fileCopyFileType  OBJECT-TYPE
                   opcode(1),
                   config(2),
                   bootRom(3),
-                  loader(5)
+                  loader(5),
+                  oamRemoteFirmware(6)
                }
     MAX-ACCESS read-write
     STATUS     current
@@ -10191,7 +9957,8 @@ fileCopyFileType  OBJECT-TYPE
          the fileCopySrcOperType or fileCopyDestOperType is either runningCfg(2)
          or startupCfg(3), this variable can be ignored. bootRom(3) and
          loader(5) can be set only when the fileCopySrcOperType is tftp(4) and
-         fileCopyDestOperType is file(1)."
+         fileCopyDestOperType is file(1). If the fileCopyDestOperType is oamRemote(9), this variable
+         should be oamRemoteFirmware(4)."
     ::= { fileCopyMgt 5 }
 
 fileCopyTftpServer  OBJECT-TYPE
@@ -10222,8 +9989,8 @@ fileCopyAction OBJECT-TYPE
                   notCopying(1),
                   copy(2)
                 }
-    MAX-ACCESS  read-write
-    STATUS      current
+    MAX-ACCESS read-write
+    STATUS     current
     DESCRIPTION "Setting this object to copy(2) to begin the copy operation. When
                  the device is not copying, this object will have a value of
                  notCopying(1)."
@@ -10235,9 +10002,10 @@ fileCopyStatus  OBJECT-TYPE
     MAX-ACCESS read-only
     STATUS     current
     DESCRIPTION
-        "The status of the last copy procedure, if any.  This
-        object will have a value of fileCopyUnknown(18) if no
-        copy operation has been performed."
+        "The status of the last copy procedure, if any.  This object will
+        have a value of fileCopyUnknown(18) if no copy operation has been
+        performed. If the fileCopyDestOperType is oamRemote(9), refer the
+        detail results to fileCopyEfmOamResultTable."
     ::= { fileCopyMgt 9 }
 
 fileCopyFtpLoginUsername OBJECT-TYPE
@@ -10259,6 +10027,89 @@ fileCopyFtpLoginPassword OBJECT-TYPE
                  written. When this variable is read, it always returns a
                  zero-length string."
     ::= { fileCopyMgt 13 }
+
+fileCopyOam        OBJECT IDENTIFIER ::= { fileCopyMgt 15 }
+
+fileCopyOamPorts OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The port list which ports on the bitmap perform remote
+                 firmware upgrade. Note: If the fileCopyDestOperType is not
+                 oamRemote(9), this variable can be ignored."
+    ::= { fileCopyOam 1 }
+
+fileCopyOamResultTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FileCopyOamResultEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Table for OAM remote firmware upgrade result."
+    ::= { fileCopyOam 2 }
+
+fileCopyOamResultEntry OBJECT-TYPE
+    SYNTAX      FileCopyOamResultEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "A result entry for OAM remote firmware upgrade."
+    INDEX       { fileCopyOamLocalIfIndex }
+    ::= { fileCopyOamResultTable 1 }
+
+FileCopyOamResultEntry       ::= SEQUENCE
+{
+    fileCopyOamLocalIfIndex     InterfaceIndex,
+    fileCopyOamResult           INTEGER
+}
+
+fileCopyOamLocalIfIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "The ifIndex value of the port excluding trunk. The interface
+                 identified by a particular value of this index is the same
+                 interface as identified by the same value of ifIndex in the
+                 IF-MIB."
+    ::= { fileCopyOamResultEntry 1 }
+
+fileCopyOamResult OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    oamSuccess(1),
+                    oamStatusUnknown(2),
+                    oamTransmissionTerminated(3),
+                    oamTerminatedByPeer(4),
+                    oamTimeout(5),
+                    oamResourceNotAvailable(6),
+                    oamFileFormatNotSupported(7),
+                    oamChecksumError(8),
+                    oamWriteFlashError(9),
+                    oamLinkDown(10),
+                    oamUpgradeFailed(11),
+                    oamDownloadFailed(12)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The status of the last firmware upgrade procedure. This
+                 object will have a value of oamStatusUnknown(2) if no
+                 firmware upgrade operation has been performed.
+
+                 The oamSuccess(1) indicates that the remote firmware
+                 upgrade is success. The oamTransmissionTerminated(3)
+                 indicates that the transmission is terminated by local device.
+                 The oamTerminatedByPeer(4) indicates that the transmission
+                 is terminated by peer. The oamTimeout(5) indicates that the
+                 acknowledge or packets is not received from the peer. The
+                 oamResouceNotAvailable(6) indicates that the resource is
+                 not available to do firmware upgrade. The
+                 oamFileFormatNotSupported(7) indicates that the file format
+                 is not accepted by remote device. The oamChecksumError(8)
+                 indicates that the checksum is wrong. The
+                 oamWriteFlashError(9) indicates that it is failed to write
+                 the firmware to flash. The oamLinkDown(10) indicates that
+                 the OAM link is disconnected. The oamUpgradeFailed(11)
+                 indicates that the upgrade result is failed. The
+                 oamDownloadFailed(12) indicates that download firmware from
+                 TFTP server is failed."
+    ::= { fileCopyOamResultEntry 2 }
 
 fileInfoMgt OBJECT IDENTIFIER ::= { fileMgt 2 }
 --
@@ -10676,17 +10527,6 @@ fileAutoUpgradeOpCodeFileName OBJECT-TYPE
     DESCRIPTION "The file name of the image file."
     ::= { fileAutoUpgradeMgt 3 }
 
-fileAutoUpgradeOpCodeForceModeStatus OBJECT-TYPE
-    SYNTAX      EnabledStatus
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION "Set this variable to enabled(1) to enable the force-mode of
-                 automatic image upgrade. In force-mode, switch shall check
-                 the new image every provision completed and detected an
-                 interface is configured. Set this variable to disabled(2)
-                 to disable this mode."
-    ::= { fileAutoUpgradeMgt 4 }
-
 --
 -- mcastStormMgt
 --
@@ -10763,8 +10603,8 @@ bcastStormEntry OBJECT-TYPE
 
 BcastStormEntry ::= SEQUENCE
 {
-    bcastStormIfIndex      Integer32,
-    bcastStormStatus       EnabledStatus,
+    bcastStormIfIndex            Integer32,
+    bcastStormStatus             EnabledStatus,
     bcastStormOctetRate    Integer32
 }
 
@@ -11321,6 +11161,7 @@ mvrCurrentGroups   OBJECT-TYPE
         DESCRIPTION "The current learned number of MVR groups."
         ::= { mvrMgt 4}
 
+
 mvrGroupStaticTable   OBJECT-TYPE
         SYNTAX      SEQUENCE OF MvrGroupStaticEntry
         MAX-ACCESS  not-accessible
@@ -11541,7 +11382,8 @@ mvrReceiverGroupEntry OBJECT-TYPE
 MvrReceiverGroupEntry ::= SEQUENCE
 {
     mvrReceiverGroupId      IpAddress,
-    mvrReceiverGroupActive  INTEGER
+    mvrReceiverGroupActive  INTEGER,
+    mvrReceiverGroupStatus  INTEGER
 }
 
 mvrReceiverGroupId OBJECT-TYPE
@@ -11564,6 +11406,18 @@ mvrReceiverGroupActive   OBJECT-TYPE
                      the status will be active(1)."
         ::= { mvrReceiverGroupEntry 2 }
 
+mvrReceiverGroupStatus   OBJECT-TYPE
+        SYNTAX      INTEGER
+        {
+            valid(1),
+            invalid(2)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Setting this to valid(1) creates an entry. Setting this
+                     to invalid(2) destroys an entry."
+        ::= { mvrReceiverGroupEntry 3 }
+
 mvrReceiverGroupStaticTable   OBJECT-TYPE
         SYNTAX      SEQUENCE OF MvrReceiverGroupStaticEntry
         MAX-ACCESS  not-accessible
@@ -11584,7 +11438,8 @@ mvrReceiverGroupStaticEntry OBJECT-TYPE
 MvrReceiverGroupStaticEntry ::= SEQUENCE
 {
     mvrReceiverGroupStaticAddress   IpAddress,
-    mvrReceiverGroupStaticPorts     PortList
+    mvrReceiverGroupStaticPorts     PortList,
+    mvrReceiverGroupStaticStatus    INTEGER
 
 }
 
@@ -11604,6 +11459,17 @@ mvrReceiverGroupStaticPorts  OBJECT-TYPE
                      of this MVR receiver group."
         ::= { mvrReceiverGroupStaticEntry 2 }
 
+mvrReceiverGroupStaticStatus  OBJECT-TYPE
+        SYNTAX      INTEGER
+        {
+            valid(1),
+            invalid(2)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Setting this to valid(1) creates an entry. Setting this
+                     to invalid(2) destroys an entry."
+        ::= { mvrReceiverGroupStaticEntry 3 }
 
 mvrReceiverGroupCurrentTable   OBJECT-TYPE
         SYNTAX      SEQUENCE OF MvrReceiverGroupCurrentEntry
@@ -11670,8 +11536,8 @@ mvrGroupStartIPAddress   OBJECT-TYPE
         MAX-ACCESS  not-accessible
         STATUS      current
         DESCRIPTION "MVR Profile range start IP address.
-                     NOTE: All mvrGroupStartIPAddress use the same buffer to temply store the mvrGroupStartIPAddress before
-                     mvrGroupCtlAction really creat the profile."
+                     NOTE: All mvrProfileCtlId use the same buffer to temply store the mvrProfileStartIPAddress before
+                     mvr6ProfileCtlAction really creat the profile."
         ::= { mvrGroupCtlEntry 1 }
 
 mvrGroupEndIPAddress   OBJECT-TYPE
@@ -11694,68 +11560,6 @@ mvrGroupCtlAction   OBJECT-TYPE
                      to destory(3) to delete mvr group range. When
                      the action is complete, this object becomes noAction(1)."
         ::= { mvrGroupCtlEntry 3 }
-
-mvrRecieverGroupCtlTable   OBJECT-TYPE
-        SYNTAX      SEQUENCE OF MvrReceiverGroupCtlEntry
-        MAX-ACCESS  not-accessible
-        STATUS      current
-        DESCRIPTION "Configure MVR receiver group"
-        ::= {mvrMgt 29 }
-
-mvrReceiverGroupCtlEntry OBJECT-TYPE
-       SYNTAX      MvrReceiverGroupCtlEntry
-       MAX-ACCESS  not-accessible
-       STATUS      current
-       DESCRIPTION "The entry for configuring the MVR receiver group."
-       INDEX  {mvrReceiverGroupIPAddress, mvrReceiverGroupMask}
-       ::= { mvrRecieverGroupCtlTable 1 }
-
-MvrReceiverGroupCtlEntry ::= SEQUENCE
-{
-    mvrReceiverGroupIPAddress   IpAddress,
-    mvrReceiverGroupMask        IpAddress,
-    mvrReceiverGroupCtlAction   Integer32
-}
-
-
-mvrReceiverGroupIPAddress   OBJECT-TYPE
-        SYNTAX      IpAddress
-        MAX-ACCESS  not-accessible
-        STATUS      current
-        DESCRIPTION "MVR receiver group IP address.
-                     NOTE: All mvrReceiverGroupIPAddress use the same buffer to temply store the mvrReceiverGroupIPAddress before
-                     mvrReceiverGroupCtlAction really creat the profile."
-        ::= { mvrReceiverGroupCtlEntry 1 }
-
-mvrReceiverGroupMask   OBJECT-TYPE
-        SYNTAX      IpAddress
-        MAX-ACCESS  not-accessible
-        STATUS      current
-        DESCRIPTION "MVR receiver group IP mask."
-        ::= { mvrReceiverGroupCtlEntry 2 }
-
-mvrReceiverGroupCtlAction   OBJECT-TYPE
-        SYNTAX      Integer32
-        {
-            noAction(0),
-            create(1),
-            destory(2)
-        }
-        MAX-ACCESS  read-write
-        STATUS      current
-        DESCRIPTION "Set this object to create(2) to create mvr receiver group. Set this object
-                     to destory(3) to delete mvr receiver group.
-                     When destroy mvr receiver group, it needn't to specify mvrReceiverGroupIPAddress and mvrReceiverGroupMask.
-                     When the action is complete, this object becomes noAction(1)."
-        ::= { mvrReceiverGroupCtlEntry 3 }
-
-mvrForwardingPriority OBJECT-TYPE
-        SYNTAX  Integer32(0..6|65535)
-        MAX-ACCESS  read-write
-        STATUS      current
-        DESCRIPTION "Configure MVR multicast stream forwarding priority.
-                     If value is 65535, it means the priority is disabled"
-        ::= { mvrMgt 18 }
 --
 -- dhcpSnoopMgt
 --
@@ -12564,6 +12368,2242 @@ sFlowPortStatus OBJECT-TYPE
                      set this to disabled(2) to disable sFlow on this port."
         ::= { sFlowPortEntry 2 }
 
+-- oamMgt
+-- for ES3528M-SFP-FLF-38
+--
+
+oamPortStatusTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF OamPortStatusEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "A table contains the status of OAM at each port."
+        ::= { oamMgt 1 }
+
+oamPortStatusEntry OBJECT-TYPE
+        SYNTAX      OamPortStatusEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry contains the status of OAM at each port."
+        INDEX       { oamPortIfIndex }
+        ::= { oamPortStatusTable 1 }
+
+OamPortStatusEntry       ::= SEQUENCE
+{
+        oamPortIfIndex       InterfaceIndex,
+        oamEnableStatus      EnabledStatus
+}
+
+oamPortIfIndex OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This object shows the ifIndex value of the port excluding
+                     trunk."
+        ::= { oamPortStatusEntry 1 }
+
+oamEnableStatus OBJECT-TYPE
+        SYNTAX      EnabledStatus
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "This object configures the status of OAM at each port."
+        ::= { oamPortStatusEntry 2 }
+
+--
+oamPortModeTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF OamPortModeEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "A table contains the mode of OAM at each port."
+        ::= { oamMgt 2 }
+
+oamPortModeEntry OBJECT-TYPE
+        SYNTAX      OamPortModeEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry contains the mode of OAM at each port."
+        INDEX       { oamPortModeIndex }
+        ::= { oamPortModeTable 1 }
+
+OamPortModeEntry       ::= SEQUENCE
+{
+        oamPortModeIndex       InterfaceIndex,
+        oamPortMode            INTEGER
+}
+
+oamPortModeIndex OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This object shows the ifIndex value of the port excluding
+                     trunk."
+        ::= { oamPortModeEntry 1 }
+
+oamPortMode OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                        active(1),
+                        passive(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "This object configures the mode of OAM at each port."
+        ::= { oamPortModeEntry 2 }
+
+--
+oamPortClearStatTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF OamPortClearStatEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "A table contains the information of clear OAM statistics
+                     at each port."
+        ::= { oamMgt 3 }
+
+oamPortClearStatEntry OBJECT-TYPE
+        SYNTAX      OamPortClearStatEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry contains the information of clear OAM statistics
+                     at each port."
+        INDEX       { oamPortClearStatIndex }
+        ::= { oamPortClearStatTable 1 }
+
+OamPortClearStatEntry       ::= SEQUENCE
+{
+        oamPortClearStatIndex       InterfaceIndex,
+        oamClearStatistics          INTEGER
+}
+
+oamPortClearStatIndex OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This object shows the ifIndex value of the port excluding
+                     trunk."
+        ::= { oamPortClearStatEntry 1 }
+
+oamClearStatistics OBJECT-TYPE
+    SYNTAX  INTEGER
+            {
+                noClear(1),
+                clear(2)
+            }
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION "This variable is used to clear the counters for OAM.
+                 Set this variable to clear(2) to perform the clear operation,
+                 noClear(1) will always be displayed when reading this
+                 variable."
+    ::= { oamPortClearStatEntry  2 }
+
+oamLoopbackTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF OamLoopbackEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Table for OAM remote loopback test."
+    ::= { oamMgt 4 }
+
+oamLoopbackEntry OBJECT-TYPE
+    SYNTAX      OamLoopbackEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Entry for OAM remote loopback test."
+    INDEX       { oamLoopbackTestIfIndex }
+    ::= { oamLoopbackTable 1 }
+
+OamLoopbackEntry ::= SEQUENCE
+{
+    oamLoopbackTestIfIndex          Integer32,
+    oamLoopbackTestPacketNumber     Integer32,
+    oamLoopbackTestPacketSize       Integer32,
+    oamLoopbackTestAction           INTEGER,
+    oamLoopbackTestResultTx         Counter32,
+    oamLoopbackTestResultRx         Counter32
+}
+
+oamLoopbackTestIfIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "The ifIndex value of the port(excluding trunk). The interface
+                 identified by a particular value of this index is the same
+                 interface as identified by the same value of ifIndex in the
+                 IF-MIB."
+        ::= { oamLoopbackEntry 1 }
+
+oamLoopbackTestPacketNumber OBJECT-TYPE
+    SYNTAX     Integer32(1..99999999)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION "Setting the packet number when performing loopback test."
+    ::= { oamLoopbackEntry 2}
+
+oamLoopbackTestPacketSize OBJECT-TYPE
+    SYNTAX      Integer32(64..1518)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Setting the packet size when performing loopback test."
+    ::= { oamLoopbackEntry 3 }
+
+oamLoopbackTestAction OBJECT-TYPE
+    SYNTAX  INTEGER
+            {
+                noTest(1),
+                test(2)
+            }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION "Setting this object to test(2) to begin the loopback test.
+                 This object will be noTest(1) when the loopback test is
+                 canceled or the loopback test has finished."
+    ::= { oamLoopbackEntry 4}
+
+oamLoopbackTestResultTx OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "frames"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "A count of the the total number of loopback frames transmitted
+                 at last loopback test on this interface."
+    ::= { oamLoopbackEntry 5}
+
+oamLoopbackTestResultRx OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "frames"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "A count of the the total number of loopback frames received
+                 at last loopback test on this interface."
+    ::= { oamLoopbackEntry 6}
+
+
+--
+-- remoteMgt
+-- node 1-20 are form China
+-- node 21 for ASE3528B-E1-FLF-38
+--
+
+remoteAcceptableFrameTypeTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF RemoteAcceptableFrameTypeEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "A table that contains the acceptable frame type
+                     configuration at the specified remote device."
+        ::= { remoteMgt 1 }
+
+
+remoteAcceptableFrameTypeEntry OBJECT-TYPE
+        SYNTAX      RemoteAcceptableFrameTypeEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry that contains the acceptable frame type
+                     configuration at the specified remote device."
+        INDEX       { remoteAcceptableFrameTypeIndex }
+        ::= { remoteAcceptableFrameTypeTable 1 }
+
+RemoteAcceptableFrameTypeEntry       ::= SEQUENCE
+{
+        remoteAcceptableFrameTypeIndex   InterfaceIndex,
+        remoteAcceptableFrameType        INTEGER
+}
+
+remoteAcceptableFrameTypeIndex OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This object shows the ifIndex value of the port excluding
+                     trunk."
+        ::= { remoteAcceptableFrameTypeEntry 1 }
+
+remoteAcceptableFrameType OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                    both(1),
+                    tagged(2),
+                    untagged(3)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "This object configures the acceptable frame types at the
+                     specified remote device."
+        ::= { remoteAcceptableFrameTypeEntry 2 }
+
+
+----
+remoteEepromWriteTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF RemoteEepromWriteEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "A table contains the information of whether EEPROM is
+                     writable at the specified remote device."
+        ::= { remoteMgt 2 }
+
+remoteEepromWriteEntry OBJECT-TYPE
+        SYNTAX      RemoteEepromWriteEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry that contains  the information of whether EEPROM
+                     is writable at the specified remote device."
+        INDEX       { remoteEepromWriteIndex }
+        ::= { remoteEepromWriteTable 1 }
+
+RemoteEepromWriteEntry       ::= SEQUENCE
+{
+        remoteEepromWriteIndex               InterfaceIndex,
+        remoteEepromWriteEnableStatus        EnabledStatus
+}
+
+remoteEepromWriteIndex OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This object shows the ifIndex value of the port excluding
+                     trunk."
+        ::= { remoteEepromWriteEntry 1 }
+
+remoteEepromWriteEnableStatus OBJECT-TYPE
+        SYNTAX      EnabledStatus
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The object configures the status of EEPROM at the
+                     specified remote device."
+        ::= { remoteEepromWriteEntry 2 }
+
+----
+remoteFlowControlEnbaleTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF RemoteFlowControlEnbaleEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "A table contains the flow control configuation at the
+                     specified remote device."
+        ::= { remoteMgt 3 }
+
+remoteFlowControlEnbaleEntry OBJECT-TYPE
+        SYNTAX      RemoteFlowControlEnbaleEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry that contains  the flow control configuration
+                     at the specified remote device."
+        INDEX       { remoteFLIndex }
+        ::= { remoteFlowControlEnbaleTable 1 }
+
+RemoteFlowControlEnbaleEntry       ::= SEQUENCE
+{
+        remoteFLIndex               InterfaceIndex,
+        remoteFlowControlEnbale        EnabledStatus
+}
+
+remoteFLIndex OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This object shows the ifIndex value of the port excluding
+                     trunk."
+        ::= { remoteFlowControlEnbaleEntry 1 }
+
+remoteFlowControlEnbale OBJECT-TYPE
+        SYNTAX      EnabledStatus
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The object configures the status of flow control at the
+                     specified remote device."
+        ::= { remoteFlowControlEnbaleEntry 2 }
+
+----
+remoteNegotiationEnableTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF RemoteNegotiationEnableEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "A table contains the auto-negotiation configuration
+                     at the specified remote device."
+        ::= { remoteMgt 4 }
+
+remoteNegotiationEnableEntry OBJECT-TYPE
+        SYNTAX      RemoteNegotiationEnableEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry contains the auto-negotiation configuration
+                     at the specified remote device."
+        INDEX       { remoteNegoIndex }
+        ::= { remoteNegotiationEnableTable 1 }
+
+RemoteNegotiationEnableEntry       ::= SEQUENCE
+{
+        remoteNegoIndex               InterfaceIndex,
+        remoteNegotiationEnable        EnabledStatus
+}
+
+remoteNegoIndex OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This object shows the ifIndex value of the port excluding
+                     trunk."
+        ::= { remoteNegotiationEnableEntry 1 }
+
+remoteNegotiationEnable OBJECT-TYPE
+        SYNTAX      EnabledStatus
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The object configures the status of auto negotiation
+                     at the specified remote device."
+        ::= { remoteNegotiationEnableEntry 2 }
+
+----
+remoteShutDownEnableTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF RemoteShutDownEnableEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "A table contains the information of whether shutdown
+                     process is enabled at the specified remote device."
+        ::= { remoteMgt 5 }
+
+remoteShutDownEnableEntry OBJECT-TYPE
+        SYNTAX      RemoteShutDownEnableEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry contains  the information of whether shutdown
+                     process is enabled at the specified remote device."
+        INDEX       { remoteSDIndex }
+        ::= { remoteShutDownEnableTable 1 }
+
+RemoteShutDownEnableEntry       ::= SEQUENCE
+{
+        remoteSDIndex               InterfaceIndex,
+        remoteShutDownEnable        EnabledStatus
+}
+
+remoteSDIndex OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This object shows the ifIndex value of the port excluding
+                     trunk."
+        ::= { remoteShutDownEnableEntry 1 }
+
+remoteShutDownEnable OBJECT-TYPE
+        SYNTAX      EnabledStatus
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Enable or disable the remote ShutDown."
+        ::= { remoteShutDownEnableEntry 2 }
+
+----
+remoteInputToSwitchTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF RemoteInputToSwitchEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "A table contains the information of whether the input
+                     is tagged or untagged at the specified remote device."
+        ::= { remoteMgt 6 }
+
+remoteInputToSwitchEntry OBJECT-TYPE
+        SYNTAX      RemoteInputToSwitchEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry contains  the information of whether the input
+                     is tagged or untagged at the specified remote device."
+        INDEX       { remoteInputIndex }
+        ::= { remoteInputToSwitchTable 1 }
+
+RemoteInputToSwitchEntry       ::= SEQUENCE
+{
+        remoteInputIndex               InterfaceIndex,
+        remoteInputToSwitch            INTEGER
+}
+
+remoteInputIndex OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This object shows the ifIndex value of the port excluding
+                     trunk."
+        ::= { remoteInputToSwitchEntry 1 }
+
+remoteInputToSwitch OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                    tagged(1),
+                    untagged(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The object configures the packet format of input at the
+                     specified remote device."
+        ::= { remoteInputToSwitchEntry 2 }
+----
+remoteOutputToSubscriberTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF RemoteOutputToSubscriberEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "A table contains the information of whether output to
+                     subscriber is tagged or untagged at the specified remote
+                     device."
+        ::= { remoteMgt 7 }
+
+remoteOutputToSubscriberEntry OBJECT-TYPE
+        SYNTAX      RemoteOutputToSubscriberEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry contains  the information of whether output to
+                     subscriber is tagged or untagged at the specified remote
+                     device."
+        INDEX       { remoteOutputIndex }
+        ::= { remoteOutputToSubscriberTable 1 }
+
+RemoteOutputToSubscriberEntry       ::= SEQUENCE
+{
+        remoteOutputIndex               InterfaceIndex,
+        remoteOutputToSubscriber            INTEGER
+}
+
+remoteOutputIndex OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This object shows the ifIndex value of the port excluding
+                     trunk."
+        ::= { remoteOutputToSubscriberEntry 1 }
+
+remoteOutputToSubscriber OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                    tagged(1),
+                    untagged(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The object configures the packet format of output to
+                     subscriber at the specified remote device."
+        ::= { remoteOutputToSubscriberEntry 2 }
+----
+remoteSpeedDuplexTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF RemoteSpeedDuplexEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "A table contains the speed-duplex configuration at the
+                     specified remote device."
+        ::= { remoteMgt 8 }
+
+remoteSpeedDuplexEntry OBJECT-TYPE
+        SYNTAX      RemoteSpeedDuplexEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry contains the speed-duplex configuration at the
+                     specified remote device."
+        INDEX       { remoteSpeedDuplexIndex }
+        ::= { remoteSpeedDuplexTable 1 }
+
+RemoteSpeedDuplexEntry       ::= SEQUENCE
+{
+        remoteSpeedDuplexIndex                InterfaceIndex,
+        remoteSpeedDuplex            INTEGER
+}
+
+remoteSpeedDuplexIndex OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This object shows the ifIndex value of the port excluding
+                     trunk."
+        ::= { remoteSpeedDuplexEntry 1 }
+
+remoteSpeedDuplex OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                    half10(1),
+                    full10(2),
+                    half100(3),
+                    full100(4),
+                    negotiation(5)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The object configures the speed-duplex at the specified
+                     remote device."
+        ::= { remoteSpeedDuplexEntry 2 }
+
+----
+remoteMdixTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF RemoteMdixEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "A table contains the MDIX configuration at the specified
+                     remote device."
+        ::= { remoteMgt 9 }
+
+remoteMdixEntry OBJECT-TYPE
+        SYNTAX      RemoteMdixEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry contains the MDIX configuration at the specified
+                     remote device."
+        INDEX       { remoteMdixIndex }
+        ::= { remoteMdixTable 1 }
+
+RemoteMdixEntry       ::= SEQUENCE
+{
+        remoteMdixIndex                InterfaceIndex,
+        remoteMdix            INTEGER
+}
+
+remoteMdixIndex OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This object shows the ifIndex value of the port excluding
+                     trunk."
+        ::= { remoteMdixEntry 1 }
+
+remoteMdix OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                    auto(1),
+                    normal(2),
+                    crossover(3)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The object configures the MDIX at the specified remote
+                     device."
+        ::= { remoteMdixEntry 2 }
+
+----
+remoteDefaultTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF RemoteDefaultEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "A table contains the information of default VLAN and
+                     priority at the specified remote device."
+        ::= { remoteMgt 10 }
+
+remoteDefaultEntry OBJECT-TYPE
+        SYNTAX      RemoteDefaultEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry contains the information of default VLAN and
+                     priority at the specified remote device."
+        INDEX       { remoteDefaultIndex }
+        ::= { remoteDefaultTable 1 }
+
+RemoteDefaultEntry       ::= SEQUENCE
+{
+        remoteDefaultIndex                InterfaceIndex,
+        remoteDefaultVlan                 INTEGER,
+        remoteDefaultPriority              INTEGER,
+        remoteDefaultEnable               EnabledStatus
+}
+
+remoteDefaultIndex OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This object shows the ifIndex value of the port excluding
+                     trunk."
+        ::= { remoteDefaultEntry 1 }
+
+remoteDefaultVlan OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The object configures the default VLAN at the specified
+                     remote device."
+        ::= { remoteDefaultEntry 2 }
+
+remoteDefaultPriority OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The object configures the default priority at the remote
+                     specified device."
+        ::= { remoteDefaultEntry 3 }
+
+remoteDefaultEnable OBJECT-TYPE
+        SYNTAX      EnabledStatus
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The object is to take effect default VLAN and priority
+                     at the remote specified device."
+        ::= { remoteDefaultEntry 4 }
+----
+remoteProtocolVlanTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF RemoteProtocolVlanEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "A table contains the information of protocal VLAN at the
+                     remote specified device."
+        ::= { remoteMgt 11 }
+
+remoteProtocolVlanEntry OBJECT-TYPE
+        SYNTAX      RemoteProtocolVlanEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry contains the information of protocal VLAN at the
+                     specified remote device."
+        INDEX       { remoteProtocolVlanIndex,remoteProtocolVlanEtherType }
+        ::= { remoteProtocolVlanTable 1 }
+
+RemoteProtocolVlanEntry       ::= SEQUENCE
+{
+        remoteProtocolVlanIndex                InterfaceIndex,
+        remoteProtocolVlanEtherType            Integer32,
+        remoteProtocolVlanVid                  INTEGER,
+        remoteProtocolVlanPririty              INTEGER,
+        remoteProtocolVlanRowStatus            EnabledStatus
+}
+
+remoteProtocolVlanIndex OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This object shows the ifIndex value of the port excluding
+                     trunk."
+        ::= { remoteProtocolVlanEntry 1 }
+
+remoteProtocolVlanEtherType OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The object configures the Ether type at the specified
+                     remote device."
+        ::= { remoteProtocolVlanEntry 2 }
+
+remoteProtocolVlanVid OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The vlan of each port."
+        ::= { remoteProtocolVlanEntry 3 }
+
+remoteProtocolVlanPririty OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The object configures the VLAN ID at the specified remote
+                     device."
+        ::= { remoteProtocolVlanEntry 4 }
+
+remoteProtocolVlanRowStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+	    DESCRIPTION "The status of this conceptual row entry. This object is
+	                 issued to manage the creation and deletion of conceptual
+	                 rows.
+
+			The status column has six defined values:
+
+			     - 'active', which indicates that the conceptual row is
+			     available for use by the managed device;
+
+			     - 'notInService', which indicates that the conceptual
+    			     row exists in the agent, but it is unavailable for use by
+			     the managed device (see NOTE below);
+
+			     - 'notReady', which indicates that the conceptual row
+    			     exists in the agent, but it is missing information
+			     necessary in order to be available for use by the
+			     managed device;
+
+			     - 'createAndGo', which is supplied by a management
+    			     station intending to create a new instance of a
+			     conceptual row and to have its status automatically set
+    			     to be active and then to make it available for use by the
+    			     managed device;
+
+			     - 'createAndWait', which is supplied by a management
+    			     station intending to create a new instance of a
+    			     conceptual row (but not to make it available for use by
+			     the managed device); and,
+
+			     - 'destroy', which is supplied by a management station
+    			     intending to delete all of the instances associated with
+			     an existing conceptual row.
+
+			Whereas five of the six values (all except 'notReady') may
+			be specified in a management protocol set operation, only
+			three values will be returned in response to a management
+                        protocol retrieval operation:  'notReady', 'notInService'
+                        and 'active'.  That is, when queried, an existing
+                        conceptual row has only three states:  it is available for
+                        use by the managed device (the status column has value
+                        'active'); it is not available for use by the managed
+                        device, though the agent has sufficient information to
+                        make it so (the status column has value 'notInService');
+                        or, it is not available for use by the managed device,
+                        and an attempt to make it so would be failed because the
+                        agent has insufficient information (the state column has
+                        value 'notReady').
+
+            For a detailed description of this object, please refer to
+            SNMPv2-TC MIB."
+        ::= { remoteProtocolVlanEntry 5 }
+
+
+----
+remoteQueueCosMapTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF RemoteQueueCosMapEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "A table contains the information of queue number and
+                     priority of CoS map at the specified remote device."
+        ::= { remoteMgt 12 }
+
+remoteQueueCosMapEntry OBJECT-TYPE
+        SYNTAX      RemoteQueueCosMapEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry contains the information of queue number and
+                     priority of CoS map at the specified remote device."
+        INDEX       { remoteQueueCosMapIndex,remoteQueueCosMapPriority }
+        ::= { remoteQueueCosMapTable 1 }
+
+RemoteQueueCosMapEntry       ::= SEQUENCE
+{
+        remoteQueueCosMapIndex                InterfaceIndex,
+        remoteQueueCosMapPriority              INTEGER,
+        remoteQueueCosMapQueue                 INTEGER,
+        remoteQueueCosMapEnable               EnabledStatus
+}
+
+remoteQueueCosMapIndex OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This object shows the ifIndex value of the port excluding
+                     trunk."
+        ::= { remoteQueueCosMapEntry 1 }
+
+remoteQueueCosMapPriority OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The object configures the priority at the specified
+                     remote device."
+        ::= { remoteQueueCosMapEntry 2 }
+
+remoteQueueCosMapQueue OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The object configures the queue number of CoS map at the
+                     specified remote device."
+        ::= { remoteQueueCosMapEntry 3 }
+
+remoteQueueCosMapEnable OBJECT-TYPE
+        SYNTAX      EnabledStatus
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The object is to take effect the queue Cos map setting at
+                     the remote device."
+        ::= { remoteQueueCosMapEntry 4 }
+
+----
+remoteQueueModeMgt        OBJECT IDENTIFIER ::= { remoteMgt 13 }
+
+remoteQueueModeTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF RemoteQueueModeEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "A table contains the information of queue mode at the
+                     specified remote device."
+        ::= { remoteQueueModeMgt 1 }
+
+remoteQueueModeEntry OBJECT-TYPE
+        SYNTAX      RemoteQueueModeEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry contains the information of queue mode at the
+                     specified remote device."
+        INDEX       { remoteOutputIndex }
+        ::= { remoteQueueModeTable 1 }
+
+RemoteQueueModeEntry       ::= SEQUENCE
+{
+        remoteQueueModeIndex               InterfaceIndex,
+        remoteQueueMode            INTEGER
+}
+
+remoteQueueModeIndex OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This object shows the ifIndex value of the port excluding
+                     trunk."
+        ::= { remoteQueueModeEntry 1 }
+
+remoteQueueMode OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                    wrr(1),
+                    strict(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The object configures the queue mode at the specified
+                     remote device."
+        ::= { remoteQueueModeEntry 2 }
+
+
+remoteWrrPortTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF RemoteWrrPortEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "A table contains the information of the weighted round
+                     robin (WRR) at the specified remote device."
+        ::= { remoteQueueModeMgt 2 }
+
+remoteWrrPortEntry OBJECT-TYPE
+        SYNTAX      RemoteWrrPortEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry contains the information of the WRR at the
+                     specified remote device."
+        INDEX       { remoteWrrPortIfIndex,remoteWrrPortQueueID }
+        ::= { remoteWrrPortTable 1 }
+
+RemoteWrrPortEntry ::= SEQUENCE
+{
+	  remoteWrrPortIfIndex 			Integer32,
+    remoteWrrPortQueueID    Integer32,
+    remoteWrrPortWeight          Integer32
+}
+
+remoteWrrPortIfIndex OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This object shows the ifIndex value of the port excluding
+                     trunk."
+        ::= { remoteWrrPortEntry 1 }
+
+remoteWrrPortQueueID OBJECT-TYPE
+        SYNTAX      Integer32 (0..3)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The object configures the queue ID of WRR at the specified
+                     remote device."
+        ::= { remoteWrrPortEntry 2 }
+
+remoteWrrPortWeight OBJECT-TYPE
+        SYNTAX      Integer32 (1..15)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The object configures the weight of WRR at the specified
+                     remote device."
+        ::= { remoteWrrPortEntry 3 }
+----
+remoteMapTagPriorityMgt        OBJECT IDENTIFIER ::= { remoteMgt 14 }
+
+remoteMapTagPriStatusTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF RemoteMapTagPriStatusEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "A table contains the status of tag-priority map at the
+                     specified remote device."
+        ::= { remoteMapTagPriorityMgt 1 }
+
+remoteMapTagPriStatusEntry OBJECT-TYPE
+        SYNTAX      RemoteMapTagPriStatusEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry contains the status of tag-priority map at the
+                     specified remote device."
+        INDEX       { remoteMapTagPriStatusIndex }
+        ::= { remoteMapTagPriStatusTable 1 }
+
+RemoteMapTagPriStatusEntry       ::= SEQUENCE
+{
+        remoteMapTagPriStatusIndex               InterfaceIndex,
+        remoteMapTagPriStatus            EnabledStatus
+}
+
+remoteMapTagPriStatusIndex OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This object shows the ifIndex value of the port excluding
+                     trunk."
+        ::= { remoteMapTagPriStatusEntry 1 }
+
+remoteMapTagPriStatus OBJECT-TYPE
+        SYNTAX      EnabledStatus
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The object configures the status of tap-priority map at
+                     the specified remote device."
+        ::= { remoteMapTagPriStatusEntry 2 }
+
+
+remoteMapTagPriorityTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF RemoteMapTagPriorityEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "A table contains the information of tag-priority map at
+                     the specified remote device."
+        ::= { remoteMapTagPriorityMgt 2 }
+
+remoteMapTagPriorityEntry OBJECT-TYPE
+        SYNTAX      RemoteMapTagPriorityEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry contains the information of tag-priority map at
+                     the specified remote device."
+        INDEX       { remoteMapTagPriorityIndex,remoteMapTagPriority }
+        ::= { remoteMapTagPriorityTable 1 }
+
+RemoteMapTagPriorityEntry ::= SEQUENCE
+{
+	  remoteMapTagPriorityIndex 			Integer32,
+    remoteMapTagPriority            Integer32,
+    remoteMapTagPriorityPri         Integer32
+}
+
+remoteMapTagPriorityIndex OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This object shows the ifIndex value of the port excluding
+                     trunk."
+        ::= { remoteMapTagPriorityEntry 1 }
+
+remoteMapTagPriority OBJECT-TYPE
+        SYNTAX      Integer32 (0..7)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The object shows the tap-priority map at the specified
+                     remote device."
+        ::= { remoteMapTagPriorityEntry 2 }
+
+remoteMapTagPriorityPri OBJECT-TYPE
+        SYNTAX      Integer32 (0..7)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The object configures the priority of tap-priority map at
+                     the specified remote device."
+        ::= { remoteMapTagPriorityEntry 3 }
+
+----
+remoteMapTosMgt        OBJECT IDENTIFIER ::= { remoteMgt 15 }
+
+remoteMapTosStatusTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF RemoteMapTosStatusEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "A table contains the status of ToS map at the specified
+                     remote device."
+        ::= { remoteMapTosMgt 1 }
+
+remoteMapTosStatusEntry OBJECT-TYPE
+        SYNTAX      RemoteMapTosStatusEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry contains the status of ToS map at the specified
+                     remote device."
+        INDEX       { remoteMapTosStatusIndex }
+        ::= { remoteMapTosStatusTable 1 }
+
+RemoteMapTosStatusEntry       ::= SEQUENCE
+{
+        remoteMapTosStatusIndex               InterfaceIndex,
+        remoteMapTosEnableStatus            EnabledStatus
+}
+
+remoteMapTosStatusIndex OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This object shows the ifIndex value of the port excluding
+                     trunk."
+        ::= { remoteMapTosStatusEntry 1 }
+
+remoteMapTosEnableStatus OBJECT-TYPE
+        SYNTAX      EnabledStatus
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The object configures the status of ToS map at the
+                     specified remote device."
+        ::= { remoteMapTosStatusEntry 2 }
+
+
+remoteMapTosTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF RemoteMapTosEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "A table contains the information of ToS map at the
+                     specified remote device."
+        ::= { remoteMapTosMgt 2 }
+
+remoteMapTosEntry OBJECT-TYPE
+        SYNTAX      RemoteMapTosEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry contains the information of the TOS map at the
+                     remote device."
+        INDEX       { remoteMapTosIndex,remoteMapTos }
+        ::= { remoteMapTosTable 1 }
+
+RemoteMapTosEntry ::= SEQUENCE
+{
+	  remoteMapTosIndex 			Integer32,
+    remoteMapTos            Integer32,
+    remoteMapTosPri         Integer32,
+    remoteMapTosStatus      RowStatus
+}
+
+remoteMapTosIndex OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This object shows the ifIndex value of the port excluding
+                     trunk."
+        ::= { remoteMapTosEntry 1 }
+
+remoteMapTos OBJECT-TYPE
+        SYNTAX      Integer32 (0..255)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The object shows the ToS map at the specified remote
+                     device."
+        ::= { remoteMapTosEntry 2 }
+
+remoteMapTosPri OBJECT-TYPE
+        SYNTAX      Integer32 (0..7)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The object configures the the priority of ToS map at the
+                     specified remote device."
+        ::= { remoteMapTosEntry 3 }
+
+remoteMapTosStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+	    DESCRIPTION "The status of this conceptual row entry. This object is
+	                 isused to manage the creation and deletion of conceptual
+	                 rows.
+
+			The status column has six defined values:
+
+			     - 'active', which indicates that the conceptual row is
+			     available for use by the managed device;
+
+			     - 'notInService', which indicates that the conceptual
+    			     row exists in the agent, but it is unavailable for use by
+			     the managed device (see NOTE below);
+
+			     - 'notReady', which indicates that the conceptual row
+    			     exists in the agent, but it is missing information
+			     necessary in order to be available for use by the
+			     managed device;
+
+			     - 'createAndGo', which is supplied by a management
+    			     station intending to create a new instance of a
+			     conceptual row and to have its status automatically set
+    			     to be active, and then to make it available for use by the
+    			     managed device;
+
+			     - 'createAndWait', which is supplied by a management
+    			     station intending to create a new instance of a
+    			     conceptual row (but not to make it available for use by
+			     the managed device); and,
+
+			     - 'destroy', which is supplied by a management station
+    			     intending to delete all of the instances associated with
+			     an existing conceptual row.
+
+			Whereas five of the six values (all except 'notReady') may
+			be specified in a management protocol set operation, only
+			three values will be returned in response to a management
+			         protocol retrieval operation:  'notReady', 'notInService'
+			         and 'active'.  That is, when queried, an existing
+			         conceptual row has only three states:  it is available for
+			         use by the managed device (the status column has value
+			         'active'); it is not available for use by the managed
+			         device, though the agent has sufficient information to
+			         make it so (the status column has value 'notInService');
+			         or, it is not available for use by the managed device,
+			         and an attempt to make it so would be failed because the
+			         agent has insufficient information (the state column has
+			         value 'notReady').
+
+                     For a detailed description of this object, please refer
+                     to SNMPv2-TC MIB."
+        ::= { remoteMapTosEntry 4 }
+
+remoteMapTrafficClassMgt        OBJECT IDENTIFIER ::= { remoteMgt 16 }
+
+remoteMapTrafficClassStatusTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF RemoteMapTrafficClassStatusEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "A table contains the status of traffic class map at the
+                     specified remote device."
+        ::= { remoteMapTrafficClassMgt 1 }
+
+remoteMapTrafficClassStatusEntry OBJECT-TYPE
+        SYNTAX      RemoteMapTrafficClassStatusEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry contains the status of traffic class map at the
+                     specified remote device."
+        INDEX       { remoteMapTCStatusIndex }
+        ::= { remoteMapTrafficClassStatusTable 1 }
+
+RemoteMapTrafficClassStatusEntry       ::= SEQUENCE
+{
+        remoteMapTCStatusIndex               InterfaceIndex,
+        remoteMapTCEnableStatus            EnabledStatus
+}
+
+remoteMapTCStatusIndex OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This object shows the ifIndex value of the port excluding
+                     trunk."
+        ::= { remoteMapTrafficClassStatusEntry 1 }
+
+remoteMapTCEnableStatus OBJECT-TYPE
+        SYNTAX      EnabledStatus
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The object configures the status of traffic class map at
+                     the specified remote device."
+        ::= { remoteMapTrafficClassStatusEntry 2 }
+
+--remoteMapTrafficClassTable
+remoteMapTrafficClassTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF RemoteMapTrafficClassEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "A table contains the information of traffic class map at
+                     the specified remote device."
+        ::= { remoteMapTrafficClassMgt 2 }
+
+remoteMapTrafficClassEntry OBJECT-TYPE
+        SYNTAX      RemoteMapTrafficClassEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry contains the information of traffic class map
+                     at the specified remote device."
+        INDEX       { remoteMapTrafficClassIfIndex,remoteMapTrafficClass }
+        ::= { remoteMapTrafficClassTable 1 }
+
+RemoteMapTrafficClassEntry ::= SEQUENCE
+{
+	  remoteMapTrafficClassIfIndex 		 Integer32,
+    remoteMapTrafficClass            Integer32,
+    remoteMapCos                  Integer32,
+    remoteMapTrafficClassStatus      RowStatus
+}
+
+remoteMapTrafficClassIfIndex OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This object shows the ifIndex value of the port excluding
+                     trunk."
+        ::= { remoteMapTrafficClassEntry 1 }
+
+remoteMapTrafficClass OBJECT-TYPE
+        SYNTAX      Integer32 (0..255)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The object shows the traffic class map at the specified
+                     remote device."
+        REFERENCE "MIB.IETF|Q-BRIDGE-MIB.dot1dTrafficClass."
+        ::= { remoteMapTrafficClassEntry 2 }
+
+remoteMapCos OBJECT-TYPE
+        SYNTAX      Integer32 (0..7)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The object configures the value of CoS at the specified
+                     remote device."
+        ::= { remoteMapTrafficClassEntry 3 }
+
+
+remoteMapTrafficClassStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+	    DESCRIPTION "The status of this conceptual row entry. This object is
+	                 issued to manage the creation and deletion of conceptual
+	                 rows.
+
+			         For the following, check the corrections above.
+
+			     - 'active', which indicates that the conceptual row is
+			     available for use by the managed device;
+
+			     - 'notInService', which indicates that the conceptual
+			     row exists in the agent, but is unavailable for use by
+			     the managed device (see NOTE below);
+
+			     - 'notReady', which indicates that the conceptual row
+			     exists in the agent, but is missing information
+			     necessary in order to be available for use by the
+			     managed device;
+
+			     - 'createAndGo', which is supplied by a management
+			     station wishing to create a new instance of a
+			     conceptual row and to have its status automatically set
+			     to active, making it available for use by the managed
+			     device;
+
+			     - 'createAndWait', which is supplied by a management
+			     station wishing to create a new instance of a
+			     conceptual row (but not make it available for use by
+			     the managed device); and,
+
+			     - 'destroy', which is supplied by a management station
+			     wishing to delete all of the instances associated with
+			     an existing conceptual row.
+
+			         Whereas five of the six values (all except 'notReady')
+			         may be specified in a management protocol set operation,
+			         only three values will be returned in response to a
+			         management protocol retrieval operation:  'notReady',
+			         'notInService' or 'active'.  That is, when queried, an
+			         existing conceptual row has only three states:  it is
+			         either available for use by the managed device (the
+			         status column has value 'active'); it is not available
+			         for use by the managed device, though the agent has
+			         sufficient information to make it so (the status column
+			         has value 'notInService'); or, it is not available for
+			         use by the managed device, and an attempt to make it so
+			         would fail because the agent has insufficient information
+			         (the state column has value 'notReady').
+
+                     For a detailed description of this object, please refer
+                     to SNMPv2-TC MIB."
+        ::= { remoteMapTrafficClassEntry 4 }
+
+----
+----
+remoteFactoryDefaultTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF RemoteFactoryDefaultEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "A table contains the factory default setting at the
+                     specified remote device."
+        ::= { remoteMgt 17 }
+
+remoteFactoryDefaultEntry OBJECT-TYPE
+        SYNTAX      RemoteFactoryDefaultEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry contains the factory default setting at the
+                     specified remote device."
+        INDEX       { remoteFactoryDefaultIndex }
+        ::= { remoteFactoryDefaultTable 1 }
+
+RemoteFactoryDefaultEntry       ::= SEQUENCE
+{
+        remoteFactoryDefaultIndex               InterfaceIndex,
+        remoteFactoryDefault        INTEGER
+}
+
+remoteFactoryDefaultIndex OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This object shows the ifIndex value of the port excluding
+                     trunk."
+        ::= { remoteFactoryDefaultEntry 1 }
+
+remoteFactoryDefault OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                        set(1)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "This object is to apply the factory default setting at
+                     the specified remote device."
+        ::= { remoteFactoryDefaultEntry 2 }
+
+----
+remoteDeviceStatisticTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF RemoteDeviceStatisticEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "A table shows the statistics for each remote device's
+                     port."
+        ::= { remoteMgt 18 }
+
+remoteDeviceStatisticEntry OBJECT-TYPE
+        SYNTAX      RemoteDeviceStatisticEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry shows the statistics for each remote device's
+                     port."
+        INDEX       { remoteStatisticPortIndex,remoteDeviceStatisticIfIndex }
+        ::= { remoteDeviceStatisticTable 1 }
+
+RemoteDeviceStatisticEntry       ::= SEQUENCE
+{
+        remoteStatisticPortIndex       InterfaceIndex,
+        remoteDeviceStatisticIfIndex           INTEGER,
+        remoteTxPausePacket                    INTEGER,
+        remoteRxPausePacket                    INTEGER,
+        remoteRxErrorPacket                    INTEGER
+}
+
+remoteStatisticPortIndex OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This object shows the ifIndex value of the port excluding
+                     trunk."
+        ::= { remoteDeviceStatisticEntry 1 }
+
+remoteDeviceStatisticIfIndex OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This object shows the ifIndex value of the remote device."
+        ::= { remoteDeviceStatisticEntry 2 }
+
+remoteTxPausePacket OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The total number of pause frames transmitted from the
+                     remote device's port."
+        ::= { remoteDeviceStatisticEntry 3 }
+
+remoteRxPausePacket OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The total number of pause frames received from the remote
+                     device's port."
+        ::= { remoteDeviceStatisticEntry 4 }
+
+remoteRxErrorPacket OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The total number of error frames received from the remote
+                     device's port."
+        ::= { remoteDeviceStatisticEntry 5 }
+
+
+remoteQueuePacketStatisticTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF RemoteQueuePacketStatisticEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "A table contains the packet statistics of each queue for
+                     the remote device's port."
+        ::= { remoteMgt 19 }
+
+remoteQueuePacketStatisticEntry OBJECT-TYPE
+        SYNTAX      RemoteQueuePacketStatisticEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry contains the packet statistics of each queue for
+                     the remote device's port."
+        INDEX       { remoteQueuePacketStatisticPortIndex,
+                      remoteQueuePacketDeviceStatisticIfIndex,
+                      remoteQueuePacketQueueIndex }
+        ::= { remoteQueuePacketStatisticTable 1 }
+
+RemoteQueuePacketStatisticEntry       ::= SEQUENCE
+{
+        remoteQueuePacketStatisticPortIndex       InterfaceIndex,
+        remoteQueuePacketDeviceStatisticIfIndex           INTEGER,
+        remoteQueuePacketQueueIndex                       INTEGER,
+        remoteQueueDropPacket                  INTEGER,
+        remoteQueueForwardingPacket            INTEGER
+}
+
+remoteQueuePacketStatisticPortIndex OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This object shows the ifIndex value of the port excluding
+                     trunk."
+        ::= { remoteQueuePacketStatisticEntry 1 }
+
+remoteQueuePacketDeviceStatisticIfIndex OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This object shows the ifIndex value of the specified
+                     remote device."
+        ::= { remoteQueuePacketStatisticEntry 2 }
+
+remoteQueuePacketQueueIndex OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This object shows the index of packet queue of the
+                     specified remote device."
+        ::= { remoteQueuePacketStatisticEntry 3 }
+
+remoteQueueDropPacket OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The total number of packets dropped by the remote device's
+                     port."
+        ::= { remoteQueuePacketStatisticEntry 4 }
+
+remoteQueueForwardingPacket OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The total number of packets forwarded by the remote
+                     device's port."
+        ::= { remoteQueuePacketStatisticEntry 5 }
+
+remoteMacAddressTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF RemoteMacAddressEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "A table contains the MAC address of the specified remote
+                     device."
+        ::= { remoteMgt 20 }
+
+remoteMacAddressEntry OBJECT-TYPE
+        SYNTAX      RemoteMacAddressEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry contains the MAC address of the specified remote
+                     device."
+        INDEX       { remoteMacAddressIfIndex }
+        ::= { remoteMacAddressTable 1 }
+
+RemoteMacAddressEntry       ::= SEQUENCE
+{
+        remoteMacAddressIfIndex       InterfaceIndex,
+        remoteMacAddress              OCTET STRING,
+        remoteMacAddressStatus        ValidStatus
+}
+
+remoteMacAddressIfIndex OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This object shows the ifIndex value of the port excluding
+                     trunk."
+        ::= { remoteMacAddressEntry 1 }
+
+remoteMacAddress OBJECT-TYPE
+        SYNTAX      OCTET STRING
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "This object shows the MAC address of the specified remote
+                     device."
+        ::= { remoteMacAddressEntry 2 }
+
+remoteMacAddressStatus OBJECT-TYPE
+        SYNTAX      ValidStatus
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "This object shows the information of whether the MAC
+                     address of the remote device is valided."
+        ::= { remoteMacAddressEntry 3 }
+
+--
+-- remoteDeviceMgt
+--
+
+remoteDeviceMgt        OBJECT IDENTIFIER ::= { remoteMgt 21 }
+
+remoteDeviceReset OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "To reset the remote device which is connected to a port,
+                     assign remoteDeviceReset to the value of ifIndex defined
+                     by the ifIndex in the IF-MIB. When read, this object
+                     always returns 0."
+        ::= { remoteDeviceMgt 1 }
+
+remoteDeviceFactoryDefault OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "To reset the remote device which is connected to a port
+                     and restore the default setting, assign
+                     remoteDeviceFactoryDefault to the value of ifIndex defined
+                     by the ifIndex in the IF-MIB. When read, this object
+                     always returns 0."
+        ::= { remoteDeviceMgt 2 }
+
+remoteAccessPointTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF RemoteAccessPointEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Contains the access point setting of CPE."
+        ::= { remoteDeviceMgt 3 }
+
+remoteAccessPointEntry OBJECT-TYPE
+        SYNTAX      RemoteAccessPointEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "A conceptual row in the remoteAccessPoint table."
+        INDEX       { remoteAccessPointLocalPort }
+        ::= { remoteAccessPointTable 1 }
+
+RemoteAccessPointEntry       ::= SEQUENCE
+{
+        remoteAccessPointLocalPort     InterfaceIndex,
+        remoteAccessPointStatus        EnabledStatus
+}
+
+remoteAccessPointLocalPort OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The port interface on the switch. The interface identified
+                     by a particular value of this index is the same interface
+                     as identified by the same value of ifIndex in the IF-MIB."
+        ::= { remoteAccessPointEntry 1 }
+
+remoteAccessPointStatus OBJECT-TYPE
+        SYNTAX      EnabledStatus
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Set this to enabled(1) to enable the Wireless Access Point
+                     function. Sets disabled(2) to disable the Wireless
+                     Access Point function."
+        ::= { remoteAccessPointEntry 2 }
+
+--
+-- remoteDhcpServerTable
+--
+
+remoteDhcpServerTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF RemoteDhcpServerEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Contains the DHCP server setting of CPE."
+        ::= { remoteDeviceMgt 4 }
+
+remoteDhcpServerEntry OBJECT-TYPE
+        SYNTAX      RemoteDhcpServerEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "A conceptual row in the remoteDhcpServer table."
+        INDEX       { remoteDhcpServerLocalPort}
+        ::= { remoteDhcpServerTable 1 }
+
+RemoteDhcpServerEntry       ::= SEQUENCE
+{
+        remoteDhcpServerLocalPort     InterfaceIndex,
+        remoteDhcpServerStatus        EnabledStatus,
+        remoteDhcpServerIpAddress     IpAddress,
+        remoteDhcpServerSubnetMask    IpAddress,
+        remoteDhcpServerGateway       IpAddress
+}
+
+remoteDhcpServerLocalPort OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The port interface on the switch. The interface identified
+                     by a particular value of this index is the same interface
+                     as identified by the same value of ifIndex in the IF-MIB."
+        ::= { remoteDhcpServerEntry 1 }
+
+remoteDhcpServerStatus OBJECT-TYPE
+        SYNTAX      EnabledStatus
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "If this is enabled(1), the remote device acts as a DHCP
+                     server on the LAN side. If this is disabled(2), the remote
+                     device does not act as a DHCP server."
+        ::= { remoteDhcpServerEntry 2 }
+
+remoteDhcpServerIpAddress OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The IP address of DHCP server at remote device."
+        ::= { remoteDhcpServerEntry 3 }
+
+remoteDhcpServerSubnetMask OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The subnet mask of DHCP server at remote device."
+        ::= { remoteDhcpServerEntry 4 }
+
+remoteDhcpServerGateway OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The IP Address of the default gateway at remote device.
+                     If this value is undefined or unknown, it shall have the
+                     value 0.0.0.0."
+        ::= { remoteDhcpServerEntry 5 }
+
+--
+-- remoteVlanTable
+--
+
+remoteVlanTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF RemoteVlanEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Contains the VLAN settings of CPE."
+        ::= { remoteDeviceMgt 5 }
+
+remoteVlanEntry OBJECT-TYPE
+        SYNTAX      RemoteVlanEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "A conceptual row in the remoteVlan table."
+        INDEX       { remoteVlanLocalPort, remoteVlanId}
+        ::= { remoteVlanTable 1 }
+
+RemoteVlanEntry       ::= SEQUENCE
+{
+        remoteVlanLocalPort     InterfaceIndex,
+        remoteVlanId            Integer32,
+        remoteVlanStatus        ValidStatus
+}
+
+remoteVlanLocalPort OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The port interface on the switch. The interface identified
+                     by a particular value of this index is the same interface
+                     as identified by the same value of ifIndex in the IF-MIB."
+        ::= { remoteVlanEntry 1 }
+
+remoteVlanId OBJECT-TYPE
+        SYNTAX      Integer32 (1..4094)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Specifiies the VLAN ID."
+        ::= { remoteVlanEntry 2 }
+
+remoteVlanStatus OBJECT-TYPE
+       SYNTAX      ValidStatus
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION "Set valid(1) to create the VLAN. Set invalid(2) to delete
+                    the VLAN."
+       ::= { remoteVlanEntry 3 }
+
+--
+-- remotePortMgt
+--
+
+remotePortMgt        OBJECT IDENTIFIER ::= { remoteMgt 22 }
+
+remotePortAdminTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF RemotePortAdminEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Contains the admin status of LAN ports on CPE."
+        ::= { remotePortMgt 1 }
+
+remotePortAdminEntry OBJECT-TYPE
+        SYNTAX      RemotePortAdminEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "A conceptual row in the remotePortAdmin table."
+        INDEX       { remotePortAdminLocalPort, remotePortAdminRemotePort }
+        ::= { remotePortAdminTable 1 }
+
+RemotePortAdminEntry       ::= SEQUENCE
+{
+        remotePortAdminLocalPort        InterfaceIndex,
+        remotePortAdminRemotePort       Integer32,
+        remotePortAdminStatus           EnabledStatus
+}
+
+remotePortAdminLocalPort OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The port interface on the switch. The interface identified
+                     by a particular value of this index is the same interface
+                     as identified by the same value of ifIndex in the IF-MIB."
+        ::= { remotePortAdminEntry 1 }
+
+remotePortAdminRemotePort OBJECT-TYPE
+        SYNTAX      Integer32 (1..16)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The port interface of remote device."
+        ::= { remotePortAdminEntry 2 }
+
+remotePortAdminStatus OBJECT-TYPE
+        SYNTAX      EnabledStatus
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "If this is enabled(1), the remote port is in enabled. If
+                     this is disabled(2), the remote port is not in enabled."
+        ::= { remotePortAdminEntry 3 }
+
+remotePortPvidTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF RemotePortPvidEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Contains the VID of LAN ports on CPE."
+        ::= { remotePortMgt 2 }
+
+remotePortPvidEntry OBJECT-TYPE
+        SYNTAX      RemotePortPvidEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "A conceptual row in the remotePortPvid table."
+        INDEX       { remotePortPvidLocalPort, remotePortPvidRemotePort }
+        ::= { remotePortPvidTable 1 }
+
+RemotePortPvidEntry       ::= SEQUENCE
+{
+        remotePortPvidLocalPort       InterfaceIndex,
+        remotePortPvidRemotePort      Integer32,
+        remotePortPvid                Integer32
+}
+
+remotePortPvidLocalPort OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The port interface on the switch. The interface identified
+                     by a particular value of this index is the same interface
+                     as identified by the same value of ifIndex in the IF-MIB."
+        ::= { remotePortPvidEntry 1 }
+
+remotePortPvidRemotePort OBJECT-TYPE
+        SYNTAX      Integer32 (1..16)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The port interface of remote device."
+        ::= { remotePortPvidEntry 2 }
+
+remotePortPvid OBJECT-TYPE
+        SYNTAX      Integer32 (1..4094)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Sets default VLAN on remote port."
+        ::= { remotePortPvidEntry 3 }
+
+remotePortPriorityTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF RemotePortPriorityEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Contains the priority of LAN ports on CPE."
+        ::= { remotePortMgt 3 }
+
+remotePortPriorityEntry OBJECT-TYPE
+        SYNTAX      RemotePortPriorityEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "A conceptual row in the remotePortPriority table."
+        INDEX       { remotePortPriorityLocalPort, remotePortPriorityRemotePort }
+        ::= { remotePortPriorityTable 1 }
+
+RemotePortPriorityEntry       ::= SEQUENCE
+{
+        remotePortPriorityLocalPort    InterfaceIndex,
+        remotePortPriorityRemotePort   Integer32,
+        remotePortPriority             Integer32
+}
+
+remotePortPriorityLocalPort OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The port interface on the switch. The interface identified
+                     by a particular value of this index is the same interface
+                     as identified by the same value of ifIndex in the IF-MIB."
+        ::= { remotePortPriorityEntry 1 }
+
+remotePortPriorityRemotePort OBJECT-TYPE
+        SYNTAX      Integer32 (1..16)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The port interface of remote device."
+        ::= { remotePortPriorityEntry 2 }
+
+remotePortPriority OBJECT-TYPE
+        SYNTAX      Integer32 (0..7)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Sets default priority on remote port."
+        ::= { remotePortPriorityEntry 3 }
+
+remotePortIgmpSnoopingTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF RemotePortIgmpSnoopingEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Contains the IGMP snooping status of LAN ports on CPE."
+        ::= { remotePortMgt 4 }
+
+remotePortIgmpSnoopingEntry OBJECT-TYPE
+        SYNTAX      RemotePortIgmpSnoopingEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "A conceptual row in the remotePortIgmpSnooping table."
+        INDEX       { remotePortIgmpSnoopingLocalPort, remotePortIgmpSnoopingRemotePort }
+        ::= { remotePortIgmpSnoopingTable 1 }
+
+RemotePortIgmpSnoopingEntry       ::= SEQUENCE
+{
+        remotePortIgmpSnoopingLocalPort       InterfaceIndex,
+        remotePortIgmpSnoopingRemotePort      Integer32,
+        remotePortIgmpSnooping                EnabledStatus
+}
+
+remotePortIgmpSnoopingLocalPort OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The port interface on the switch. The interface identified
+                     by a particular value of this index is the same interface
+                     as identified by the same value of ifIndex in the IF-MIB."
+        ::= { remotePortIgmpSnoopingEntry 1 }
+
+remotePortIgmpSnoopingRemotePort OBJECT-TYPE
+        SYNTAX      Integer32 (1..16)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The port interface of remote device."
+        ::= { remotePortIgmpSnoopingEntry 2 }
+
+remotePortIgmpSnooping OBJECT-TYPE
+        SYNTAX      EnabledStatus
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "If this is enabled(1), IGMP snooping is enabled on the
+                     remote port. If this is disabled(2), IGMP snooping is
+                     disabled on the remote port."
+        ::= { remotePortIgmpSnoopingEntry 3 }
+
+remotePortCountersTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF RemotePortCountersEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Contains the information of LAN ports on CPE."
+        ::= { remotePortMgt 5 }
+
+remotePortCountersEntry OBJECT-TYPE
+        SYNTAX      RemotePortCountersEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "A conceptual row in the remotePortCounters table."
+        INDEX       { remotePortCountersLocalPort, remotePortCountersRemotePort }
+        ::= { remotePortCountersTable 1 }
+
+RemotePortCountersEntry       ::= SEQUENCE
+{
+        remotePortCountersLocalPort                  InterfaceIndex,
+        remotePortCountersRemotePort                 Integer32,
+        remotePortCountersInUnicastSupported         TruthValue,
+        remotePortCountersInUnicast                  Counter32,
+        remotePortCountersInBroadcastSupported       TruthValue,
+        remotePortCountersInBroadcast                Counter32,
+        remotePortCountersInPauseSupported           TruthValue,
+        remotePortCountersInPause                    Counter32,
+        remotePortCountersInMulticastSupported       TruthValue,
+        remotePortCountersInMulticast                Counter32,
+        remotePortCountersOutUnicastSupported        TruthValue,
+        remotePortCountersOutUnicast                 Counter32,
+        remotePortCountersOutBroadcastSupported      TruthValue,
+        remotePortCountersOutBroadcast               Counter32,
+        remotePortCountersOutMulticastSupported      TruthValue,
+        remotePortCountersOutMulticast               Counter32,
+        remotePortCountersInFcsErrorsSupported       TruthValue,
+        remotePortCountersInFcsErrors                Counter32,
+        remotePortCountersOutFcsErrorsSupported      TruthValue,
+        remotePortCountersOutFcsErrors               Counter32,
+        remotePortCountersInGoodOctetsSupported      TruthValue,
+        remotePortCountersInGoodOctets               Counter32,
+        remotePortCountersOutGoodOctetsSupported     TruthValue,
+        remotePortCountersOutGoodOctets              Counter32,
+        remotePortCountersInBadOctetsSupported       TruthValue,
+        remotePortCountersInBadOctets                Counter32,
+        remotePortCountersInDiscardsSupported        TruthValue,
+        remotePortCountersInDiscards                 Counter32,
+        remotePortCountersAlignmentErrorsSupported   TruthValue,
+        remotePortCountersAlignmentErrors            Counter32,
+        remotePortCountersUndersizeErrorsSupported   TruthValue,
+        remotePortCountersUndersizeErrors            Counter32
+}
+
+remotePortCountersLocalPort OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The port interface on the switch. The interface identified
+                     by a particular value of this index is the same interface
+                     as identified by the same value of ifIndex in the IF-MIB."
+        ::= { remotePortCountersEntry 1 }
+
+remotePortCountersRemotePort OBJECT-TYPE
+        SYNTAX      Integer32 (1..16)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The port interface of remote device."
+        ::= { remotePortCountersEntry 2 }
+
+remotePortCountersInUnicastSupported OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "A value of true(1) indicates that supports receiving
+                     unicast packet counts. A value of false(2) indicates that
+                     not support receiving unicast packet counts."
+        ::= { remotePortCountersEntry 3 }
+
+remotePortCountersInUnicast OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The total number of unicast packets received from
+                     remote port."
+        ::= { remotePortCountersEntry 4 }
+
+remotePortCountersInBroadcastSupported OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "A value of true(1) indicates that supports receiving
+                     broadcast packet counts. A value of false(2) indicates
+                     that not support receiving broadcast packet counts."
+        ::= { remotePortCountersEntry 5 }
+
+remotePortCountersInBroadcast OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The total number of broadcasts packets received from
+                     remote port."
+        ::= { remotePortCountersEntry 6 }
+
+remotePortCountersInPauseSupported OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "A value of true(1) indicates that supports receiving
+                     pause packet counts. A value of false(2) indicates that
+                     not support receiving pause packet counts."
+        ::= { remotePortCountersEntry 7 }
+
+remotePortCountersInPause OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The total number of pause packets received from
+                     remote port."
+        ::= { remotePortCountersEntry 8 }
+
+remotePortCountersInMulticastSupported OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "A value of true(1) indicates that supports receiving
+                     multicast packet counts. A value of false(2) indicates
+                     that not support receiving multicast packet counts."
+        ::= { remotePortCountersEntry 9 }
+
+remotePortCountersInMulticast OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The total number of multicasts packets received from
+                     remote port."
+        ::= { remotePortCountersEntry 10 }
+
+remotePortCountersOutUnicastSupported OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "A value of true(1) indicates that supports transmitting
+                     unicast packet counts. A value of false(2) indicates that
+                     not support transmitting unicast packet counts."
+        ::= { remotePortCountersEntry 11 }
+
+remotePortCountersOutUnicast OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The total number of unicast packets transmitted from
+                     remote port."
+        ::= { remotePortCountersEntry 12 }
+
+remotePortCountersOutBroadcastSupported OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "A value of true(1) indicates that supports transmitting
+                     broadcast packet counts. A value of false(2) indicates
+                     that not support transmitting broadcast packet counts."
+        ::= { remotePortCountersEntry 13 }
+
+remotePortCountersOutBroadcast OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The total number of broadcast packets transmitted from
+                     remote port."
+        ::= { remotePortCountersEntry 14 }
+
+remotePortCountersOutMulticastSupported OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "A value of true(1) indicates that supports transmitting
+                     multicast packet counts. A value of false(2) indicates
+                     that not support transmitting multicast packet counts."
+        ::= { remotePortCountersEntry 15 }
+
+remotePortCountersOutMulticast OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The total number of multicast packets transmitted from
+                     remote port."
+        ::= { remotePortCountersEntry 16 }
+
+remotePortCountersInFcsErrorsSupported OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "A value of true(1) indicates that supports receiving
+                     FCS error packet counts. A value of false(2) indicates
+                     that not support receiving FCS error packet counts."
+        ::= { remotePortCountersEntry 17 }
+
+remotePortCountersInFcsErrors OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The total number of FCS error packets received from
+                     remote port."
+        ::= { remotePortCountersEntry 18 }
+
+remotePortCountersOutFcsErrorsSupported OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "A value of true(1) indicates that supports transmitting
+                     FCS error packet counts. A value of false(2) indicates
+                     that not support transmitting FCS error packet counts."
+        ::= { remotePortCountersEntry 19 }
+
+remotePortCountersOutFcsErrors OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The total number of FCS error packets transmitted from
+                     remote port."
+        ::= { remotePortCountersEntry 20 }
+
+remotePortCountersInGoodOctetsSupported OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "A value of true(1) indicates that supports receiving
+                     normal packet counts. A value of false(2) indicates that
+                     not support receiving normal packet counts."
+        ::= { remotePortCountersEntry 21 }
+
+remotePortCountersInGoodOctets OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The total number of normal packets received from
+                     remote port."
+        ::= { remotePortCountersEntry 22 }
+
+remotePortCountersOutGoodOctetsSupported OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "A value of true(1) indicates that supports transmitting
+                     normal packet counts. A value of false(2) indicates that
+                     not support transmitting normal packet counts."
+        ::= { remotePortCountersEntry 23 }
+
+remotePortCountersOutGoodOctets OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The total number of normal packets transmitted from
+                     remote port."
+        ::= { remotePortCountersEntry 24 }
+
+remotePortCountersInBadOctetsSupported OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "A value of true(1) indicates that supports receiving
+                     bad packet counts. A value of false(2) indicates that
+                     not support receiving bad packet counts."
+        ::= { remotePortCountersEntry 25 }
+
+remotePortCountersInBadOctets OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The total number of bad packets received from
+                     remote port."
+        ::= { remotePortCountersEntry 26 }
+
+remotePortCountersInDiscardsSupported OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "A value of true(1) indicates that supports receiving
+                     discard packet counts. A value of false(2) indicates
+                     that not support receiving discard packet counts."
+        ::= { remotePortCountersEntry 27 }
+
+remotePortCountersInDiscards OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The total number of discard packets received from
+                     remote port."
+        ::= { remotePortCountersEntry 28 }
+
+remotePortCountersAlignmentErrorsSupported OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "A value of true(1) indicates that supports align
+                     error packet counts. A value of false(2) indicates that
+                     not support alignment error packet counts."
+        ::= { remotePortCountersEntry 29 }
+
+remotePortCountersAlignmentErrors OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "A count of frames received on a particular
+                     interface that are not an integral number of
+                     octets in length and do not pass the FCS check."
+        ::= { remotePortCountersEntry 30 }
+
+remotePortCountersUndersizeErrorsSupported OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "A value of true(1) indicates that supports under
+                     error packet counts. A value of false(2) indicates that
+                     not support under error packet counts."
+        ::= { remotePortCountersEntry 31 }
+
+remotePortCountersUndersizeErrors OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The total number of packets received that were
+                     less than 64 octets long (excluding framing bits,
+                     but including FCS octets) and were otherwise well
+                     formed."
+        ::= { remotePortCountersEntry 32 }
 --
 -- dynamicArpInspectionMgt
 --
@@ -12998,8 +15038,7 @@ erpsDomainWestRingPort OBJECT-TYPE
 
                  The interface identified by a particular value of this index
                  is the same interface as identified by the same value of
-                 ifIndex in the IF-MIB. A value of 0 means no west ring port
-                 configured for this domain."
+                 ifIndex in the IF-MIB."
     ::= { erpsDomainEntry 5 }
 
 erpsDomainEastRingPort OBJECT-TYPE
@@ -13013,8 +15052,7 @@ erpsDomainEastRingPort OBJECT-TYPE
 
                  The interface identified by a particular value of this index
                  is the same interface as identified by the same value of
-                 ifIndex in the IF-MIB. A value of 0 means no east ring port
-                 configured for this domain."
+                 ifIndex in the IF-MIB."
     ::= { erpsDomainEntry 6 }
 
 erpsDomainRplOwner OBJECT-TYPE
@@ -13087,8 +15125,7 @@ erpsDomainControlVlanID OBJECT-TYPE
     DESCRIPTION "This is defined as dot1qVlanIndex in the Q-BRIDGE-MIB.
                  Configures one control VLAN for each ERPS domain. The control
                  VLAN is used only to send and receive ERPS message. A control
-                 VLAN can not belong to more than one ERPS domain. A value of 0
-                 means no control VLAN configured for this domain."
+                 VLAN can not belong to more than on ERPS domain."
     ::= { erpsDomainEntry 12 }
 
 erpsDomainNodeState OBJECT-TYPE
@@ -13271,57 +15308,65 @@ lbdGlobal       OBJECT IDENTIFIER ::= { lbdMgt 1 }
 lbdInterface    OBJECT IDENTIFIER ::= { lbdMgt 2 }
 
 lbdGlobalStatus OBJECT-TYPE
-        SYNTAX      INTEGER { enabled(1), disabled(2) }
-        MAX-ACCESS  read-write
-        STATUS      current
-        DESCRIPTION "Set enabled(1) to enable global LBD status.
-                     Set disabled(2) to disable global LBD status."
-        ::= { lbdGlobal 1 }
+    SYNTAX      INTEGER
+                {
+                    enabled(1),
+                    disabled(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Set enabled(1) to enable global LBD status.
+                 Set disabled(2) to disable global LBD status."
+    ::= { lbdGlobal 1 }
 
 lbdTransmitInterval OBJECT-TYPE
-        SYNTAX      Unsigned32(1..32767)
-        MAX-ACCESS  read-write
-        STATUS      current
-        DESCRIPTION "The transmission interval for LBD control frames."
-        ::= { lbdGlobal 2 }
+    SYNTAX      Unsigned32(1..32767)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The transmission interval for LBD control frames."
+    ::= { lbdGlobal 2 }
 
 lbdRecoverTime OBJECT-TYPE
-        SYNTAX      Unsigned32(0|60..1000000)
-        MAX-ACCESS  read-write
-        STATUS      current
-        DESCRIPTION "The recover time used by LBD auto recovery mechanism. A
-                     value of 0 disables auto recovery."
-        ::= { lbdGlobal 3 }
+    SYNTAX      Unsigned32(0|60..1000000)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The recover time used by LBD auto recovery mechanism. A
+                 value of 0 disables auto recovery."
+    ::= { lbdGlobal 3 }
 
 lbdMode OBJECT-TYPE
-        SYNTAX      INTEGER { port-based(1), VLAN-based(2) }
-        MAX-ACCESS  read-write
-        STATUS      current
-        DESCRIPTION "The detection mode of LBD."
-        ::= { lbdGlobal 4 }
+    SYNTAX      INTEGER
+                {
+                    port-based(1),
+                    VLAN-based(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The detection mode of LBD."
+    ::= { lbdGlobal 4 }
 
 lbdPortTable OBJECT-TYPE
-        SYNTAX      SEQUENCE OF LbdPortEntry
-        MAX-ACCESS  not-accessible
-        STATUS      current
-        DESCRIPTION "A table containing LBD configurations for all interfaces."
-        ::= { lbdInterface 1 }
+    SYNTAX      SEQUENCE OF LbdPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "A table containing LBD configurations for all interfaces."
+    ::= { lbdInterface 1 }
 
 lbdPortEntry OBJECT-TYPE
-        SYNTAX      LbdPortEntry
-        MAX-ACCESS  not-accessible
-        STATUS      current
-        DESCRIPTION "An instance containing the configuration of LBD at each
-                     interface."
-        INDEX       { lbdPortIfIndex }
-        ::= { lbdPortTable 1 }
+    SYNTAX      LbdPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "An instance containing the configuration of LBD at each
+                 interface."
+    INDEX       { lbdPortIfIndex }
+    ::= { lbdPortTable 1 }
 
 LbdPortEntry    ::= SEQUENCE
 {
-        lbdPortIfIndex          InterfaceIndex,
-        lbdPortAdminState       INTEGER,
-        lbdPortOperState        INTEGER,
-        lbdPortLoopedVlan       OCTET STRING
+    lbdPortIfIndex          InterfaceIndex,
+    lbdPortAdminState       INTEGER,
+    lbdPortOperState        INTEGER,
+    lbdPortLoopedVlan       OCTET STRING
 }
 
 lbdPortIfIndex OBJECT-TYPE
@@ -13332,14 +15377,23 @@ lbdPortIfIndex OBJECT-TYPE
         ::= { lbdPortEntry 1 }
 
 lbdPortAdminState OBJECT-TYPE
-        SYNTAX      INTEGER { enabled(1), disabled(2) }
+        SYNTAX      INTEGER
+                    {
+                        enabled(1),
+                        disabled(2)
+                    }
         MAX-ACCESS  read-write
         STATUS      current
         DESCRIPTION "The LBD administrative port status."
         ::= { lbdPortEntry 2 }
 
 lbdPortOperState OBJECT-TYPE
-        SYNTAX      INTEGER { disabled(1), normal(2), looped(3) }
+        SYNTAX      INTEGER
+                    {
+                        disabled(1),
+                        normal(2),
+                        looped(3)
+                    }
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION "The LBD operative port status."
@@ -13358,43 +15412,42 @@ lbdPortLoopedVlan OBJECT-TYPE
 -- trap definitions
 --
 
-es3528moTraps  OBJECT IDENTIFIER ::= { es3528moNotifications  1 }
-es3528moTrapsPrefix OBJECT IDENTIFIER ::= { es3528moTraps 0 }
+es3528m-sfpTraps  OBJECT IDENTIFIER ::= { es3528m-sfpNotifications  1 }
+es3528m-sfpTrapsPrefix OBJECT IDENTIFIER ::= { es3528m-sfpTraps 0 }
 
 swPowerStatusChangeTrap NOTIFICATION-TYPE
-        OBJECTS     { swIndivPowerUnitIndex, swIndivPowerIndex, swIndivPowerStatus }
-        STATUS      current
-        DESCRIPTION "This trap is sent when the power state changes."
-        ::= { es3528moTrapsPrefix 1 }
+          OBJECTS     { swIndivPowerUnitIndex, swIndivPowerIndex, swIndivPowerStatus }
+          STATUS      current
+          DESCRIPTION "This trap is sent when the power state changes."
+          ::= { es3528m-sfpTrapsPrefix 1 }
 
 swPortSecurityTrap NOTIFICATION-TYPE
-        OBJECTS       { ifIndex }
-        STATUS        current
-        DESCRIPTION "This trap is sent when the port is being intruded. This trap
-                     will only be sent when the portSecActionTrap is enabled."
-        ::= { es3528moTrapsPrefix 36 }
+          OBJECTS       { ifIndex }
+          STATUS        current
+          DESCRIPTION "This trap is sent when the port is being intruded. This trap
+                       will only be sent when the portSecActionTrap is enabled."
+          ::= { es3528m-sfpTrapsPrefix 36 }
 
 swIpFilterRejectTrap NOTIFICATION-TYPE
           OBJECTS     { trapIpFilterRejectMode, trapIpFilterRejectIp }
           STATUS      current
           DESCRIPTION "This trap is sent when an incorrect IP address is rejected by
                        the ipfilter."
-          ::= { es3528moTrapsPrefix 40 }
+          ::= { es3528m-sfpTrapsPrefix 40 }
 
 swAuthenticationFailure NOTIFICATION-TYPE
-        OBJECTS     { trapVarLoginUserName, trapVarLoginMethod, trapVarLoginIPAddress, trapVarLoginTime }
-        STATUS      current
-        DESCRIPTION "This trap will be triggered if authentication is failed."
-        ::= { es3528moTrapsPrefix 66 }
+          OBJECTS     { trapVarLoginUserName, trapVarLoginMethod, trapVarLoginIPAddress, trapVarLoginTime }
+          STATUS      current
+          DESCRIPTION "This trap will be triggered if authentication is failed."
+          ::= { es3528m-sfpTrapsPrefix 66 }
 
 swAuthenticationSuccess NOTIFICATION-TYPE
-        OBJECTS     { trapVarLoginUserName, trapVarLoginMethod, trapVarLoginIPAddress, trapVarLoginTime }
-        STATUS      current
-        DESCRIPTION "This trap will be triggered if authentication is successful."
-        ::= { es3528moTrapsPrefix 67 }
-
+          OBJECTS     { trapVarLoginUserName, trapVarLoginMethod, trapVarLoginIPAddress, trapVarLoginTime }
+          STATUS      current
+          DESCRIPTION "This trap will be triggered if authentication is successful."
+          ::= { es3528m-sfpTrapsPrefix 67 }
 --
--- ATC trap
+-- ATC trap ASE3528B-E1-FLF-P5-00011
 --
 swAtcBcastStormAlarmFireTrap NOTIFICATION-TYPE
         OBJECTS     {
@@ -13407,7 +15460,7 @@ swAtcBcastStormAlarmFireTrap NOTIFICATION-TYPE
         DESCRIPTION
             "When the broadcast traffic is detected as the storm, this trap
              will be fired."
-        ::= { es3528moTrapsPrefix 70 }
+        ::= { es3528m-sfpTrapsPrefix 70 }
 
 swAtcBcastStormAlarmClearTrap NOTIFICATION-TYPE
         OBJECTS     {
@@ -13420,7 +15473,7 @@ swAtcBcastStormAlarmClearTrap NOTIFICATION-TYPE
         DESCRIPTION
             "When the broadcast storm is detected as the normal traffic, this
              trap will be fired."
-        ::= { es3528moTrapsPrefix 71 }
+        ::= { es3528m-sfpTrapsPrefix 71 }
 
 swAtcBcastStormTcApplyTrap NOTIFICATION-TYPE
         OBJECTS     {
@@ -13433,7 +15486,7 @@ swAtcBcastStormTcApplyTrap NOTIFICATION-TYPE
         STATUS      current
         DESCRIPTION
             "When the ATC is activated, this trap will be fired."
-        ::= { es3528moTrapsPrefix 72 }
+        ::= { es3528m-sfpTrapsPrefix 72 }
 
 swAtcBcastStormTcReleaseTrap NOTIFICATION-TYPE
         OBJECTS     {
@@ -13446,7 +15499,7 @@ swAtcBcastStormTcReleaseTrap NOTIFICATION-TYPE
         STATUS      current
         DESCRIPTION
             "When the ATC is released, this trap will be fired."
-        ::= { es3528moTrapsPrefix 73 }
+        ::= { es3528m-sfpTrapsPrefix 73 }
 
 swAtcMcastStormAlarmFireTrap      NOTIFICATION-TYPE
         OBJECTS     {
@@ -13459,7 +15512,7 @@ swAtcMcastStormAlarmFireTrap      NOTIFICATION-TYPE
         DESCRIPTION
             "When the multicast traffic is detected as the storm, this trap
              will be fired."
-        ::= { es3528moTrapsPrefix 74 }
+        ::= { es3528m-sfpTrapsPrefix 74 }
 
 swAtcMcastStormAlarmClearTrap NOTIFICATION-TYPE
         OBJECTS     {
@@ -13472,7 +15525,7 @@ swAtcMcastStormAlarmClearTrap NOTIFICATION-TYPE
         DESCRIPTION
             "When the multicast storm is detected as the normal traffic, this
              trap will be fired."
-        ::= { es3528moTrapsPrefix 75 }
+        ::= { es3528m-sfpTrapsPrefix 75 }
 
 swAtcMcastStormTcApplyTrap NOTIFICATION-TYPE
         OBJECTS     {
@@ -13485,7 +15538,7 @@ swAtcMcastStormTcApplyTrap NOTIFICATION-TYPE
         STATUS      current
         DESCRIPTION
             "When the ATC is activated, this trap will be fired."
-        ::= { es3528moTrapsPrefix 76 }
+        ::= { es3528m-sfpTrapsPrefix 76 }
 
 swAtcMcastStormTcReleaseTrap NOTIFICATION-TYPE
         OBJECTS     {
@@ -13498,13 +15551,13 @@ swAtcMcastStormTcReleaseTrap NOTIFICATION-TYPE
         STATUS      current
         DESCRIPTION
             "When the ATC is released, this trap will be fired."
-        ::= { es3528moTrapsPrefix 77 }
+        ::= { es3528m-sfpTrapsPrefix 77 }
 
 swLoopbackDetectionTrap NOTIFICATION-TYPE
-        OBJECTS     { staLoopbackDetectionPortIfIndex }
-        STATUS   current
-        DESCRIPTION "This trap will be sent when loopback BPDUs have been detected."
-        ::= { es3528moTrapsPrefix 92 }
+          OBJECTS     { staLoopbackDetectionPortIfIndex }
+          STATUS   current
+          DESCRIPTION "This trap will be sent when loopback BPDUs have been detected."
+          ::= { es3528m-sfpTrapsPrefix  92}
 
 networkAccessPortLinkDetectionTrap NOTIFICATION-TYPE
         OBJECTS
@@ -13518,7 +15571,7 @@ networkAccessPortLinkDetectionTrap NOTIFICATION-TYPE
         DESCRIPTION
             "This trap is sent when a networkAccessPortLinkDetection
              event is triggered."
-        ::= { es3528moTrapsPrefix 96 }
+        ::= { es3528m-sfpTrapsPrefix 96 }
 
 dot1agCfmMepUpTrap NOTIFICATION-TYPE
     OBJECTS     {
@@ -13526,16 +15579,16 @@ dot1agCfmMepUpTrap NOTIFICATION-TYPE
                 }
     STATUS      current
     DESCRIPTION "This trap is sent when a new remote MEP is discovered."
-    ::= { es3528moTrapsPrefix 97 }
+    ::= { es3528m-sfpTrapsPrefix 97 }
 
 dot1agCfmMepDownTrap NOTIFICATION-TYPE
     OBJECTS     {
                     dot1agCfmMepDbRMepIdentifier
                 }
     STATUS      current
-    DESCRIPTION "This trap is sent when port status or interface status TLV
-                 received from remote MEP indicates it is not up."
-    ::= { es3528moTrapsPrefix 98 }
+    DESCRIPTION "This trap is sent when received port status or interface
+                 status TLV from remote MEP is not up."
+    ::= { es3528m-sfpTrapsPrefix 98 }
 
 dot1agCfmConfigFailTrap NOTIFICATION-TYPE
     OBJECTS     {
@@ -13544,7 +15597,7 @@ dot1agCfmConfigFailTrap NOTIFICATION-TYPE
     STATUS      current
     DESCRIPTION "This trap is sent when a MEP receives a CCM with MPID
                  which already exists on the same MA in this switch."
-    ::= { es3528moTrapsPrefix 99 }
+    ::= { es3528m-sfpTrapsPrefix 99 }
 
 dot1agCfmLoopFindTrap NOTIFICATION-TYPE
     OBJECTS     {
@@ -13552,7 +15605,7 @@ dot1agCfmLoopFindTrap NOTIFICATION-TYPE
                 }
     STATUS      current
     DESCRIPTION "This trap is sent when a MEP receives its own CCMs."
-    ::= { es3528moTrapsPrefix 100 }
+    ::= { es3528m-sfpTrapsPrefix 100 }
 
 dot1agCfmMepUnknownTrap NOTIFICATION-TYPE
     OBJECTS     {
@@ -13561,7 +15614,7 @@ dot1agCfmMepUnknownTrap NOTIFICATION-TYPE
     STATUS      current
     DESCRIPTION "This trap is sent when a CCM is received from
                  an unexpected MEP."
-    ::= { es3528moTrapsPrefix 101 }
+    ::= { es3528m-sfpTrapsPrefix 101 }
 
 dot1agCfmMepMissingTrap NOTIFICATION-TYPE
     OBJECTS     {
@@ -13570,7 +15623,7 @@ dot1agCfmMepMissingTrap NOTIFICATION-TYPE
     STATUS      current
     DESCRIPTION "This trap is sent when the cross-check enable timer expires
                  and no CCMs were received from an expected (configured) MEP."
-    ::= { es3528moTrapsPrefix 102 }
+    ::= { es3528m-sfpTrapsPrefix 102 }
 
 dot1agCfmMaUpTrap NOTIFICATION-TYPE
     OBJECTS     {
@@ -13578,46 +15631,46 @@ dot1agCfmMaUpTrap NOTIFICATION-TYPE
                 }
     STATUS      current
     DESCRIPTION "This trap is sent when all expected remote MEPs are up."
-    ::= { es3528moTrapsPrefix 103 }
+    ::= { es3528m-sfpTrapsPrefix 103 }
 
 autoUpgradeTrap NOTIFICATION-TYPE
-        OBJECTS
-        {
-            fileCopyFileType,
-            trapAutoUpgradeResult,
-            trapAutoUpgradeNewVer
-        }
-        STATUS      current
-        DESCRIPTION "This trap is sent when auto upgrade is executed."
-        ::= { es3528moTrapsPrefix 104 }
+          OBJECTS
+          {
+                      fileCopyFileType,
+                      trapAutoUpgradeResult,
+                      trapAutoUpgradeNewVer
+                      }
+          STATUS      current
+          DESCRIPTION "This trap is sent when auto upgrade is executed."
+          ::= { es3528m-sfpTrapsPrefix 104 }
 
 swCpuUtiRisingNotification NOTIFICATION-TYPE
         STATUS      current
         DESCRIPTION
               "This notification indicates that the CPU utilization has risen
                from cpuUtiFallingThreshold to cpuUtiRisingThreshold."
-        ::= { es3528moTrapsPrefix 107 }
+        ::= { es3528m-sfpTrapsPrefix 107 }
 
 swCpuUtiFallingNotification NOTIFICATION-TYPE
         STATUS      current
         DESCRIPTION
               "This notification indicates that the CPU utilization has fallen
                from cpuUtiRisingThreshold to cpuUtiFallingThreshold."
-        ::= { es3528moTrapsPrefix 108 }
+        ::= { es3528m-sfpTrapsPrefix 108 }
 
 swMemoryUtiRisingThresholdNotification NOTIFICATION-TYPE
         STATUS      current
         DESCRIPTION
               "This notification indicates that the memory utilization has risen
                from memoryUtiFallingThreshold to memoryUtiRisingThreshold."
-        ::= { es3528moTrapsPrefix 109 }
+        ::= { es3528m-sfpTrapsPrefix 109 }
 
 swMemoryUtiFallingThresholdNotification NOTIFICATION-TYPE
         STATUS      current
         DESCRIPTION
               "This notification indicates that the memory utilization has fallen
                from memoryUtiRisingThreshold to memoryUtiFallingThreshold."
-        ::= { es3528moTrapsPrefix 110 }
+        ::= { es3528m-sfpTrapsPrefix 110 }
 
 dhcpRougeServerAttackTrap NOTIFICATION-TYPE
         OBJECTS
@@ -13628,7 +15681,7 @@ dhcpRougeServerAttackTrap NOTIFICATION-TYPE
         STATUS      current
         DESCRIPTION "This trap is sent when receiving a DHCP packet from a
                     rouge server."
-        ::= { es3528moTrapsPrefix 114 }
+        ::= { es3528m-sfpTrapsPrefix 114 }
 
 macNotificationTrap NOTIFICATION-TYPE
     OBJECTS
@@ -13641,24 +15694,24 @@ macNotificationTrap NOTIFICATION-TYPE
     STATUS      current
     DESCRIPTION "This trap is sent when there are changes of the
                  dynamic mac on the switch."
-    ::= { es3528moTrapsPrefix 138 }
+    ::= { es3528m-sfpTrapsPrefix 138 }
 
 lbdDetectionTrap NOTIFICATION-TYPE
-        OBJECTS     {
-                        trapIfIndex,
-                        trapVlanId
-                    }
-        STATUS      current
-        DESCRIPTION "This trap is sent when a loopback condition is detected
-                     by LBD."
-        ::= { es3528moTrapsPrefix 141 }
+    OBJECTS     {
+                    trapIfIndex,
+                    trapVlanId
+                }
+    STATUS      current
+    DESCRIPTION "This trap is sent when a loopback condition is detected
+                 by LBD."
+    ::= { es3528m-sfpTrapsPrefix 141 }
 
 lbdRecoveryTrap NOTIFICATION-TYPE
-        OBJECTS     {
-                        trapIfIndex
-                    }
-        STATUS      current
-        DESCRIPTION "This trap is sent when a recovery is done by LBD."
-        ::= { es3528moTrapsPrefix 142 }
+    OBJECTS     {
+                    trapIfIndex
+                }
+    STATUS      current
+    DESCRIPTION "This trap is sent when a recovery is done by LBD."
+    ::= { es3528m-sfpTrapsPrefix 142 }
 
 END

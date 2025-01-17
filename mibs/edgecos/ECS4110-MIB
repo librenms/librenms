@@ -88,6 +88,7 @@ oamMgt              OBJECT IDENTIFIER ::= { ecs4110-MIBObjects 52 }
 mldSnoopMgt         OBJECT IDENTIFIER ::= { ecs4110-MIBObjects 54 }
 dynamicArpInspectionMgt    OBJECT IDENTIFIER ::= { ecs4110-MIBObjects 56 }
 pppoeiaMgt          OBJECT IDENTIFIER ::= { ecs4110-MIBObjects 60 }
+timeRangeMgt        OBJECT IDENTIFIER ::= { ecs4110-MIBObjects 61 }
 erpsMgt             OBJECT IDENTIFIER ::= { ecs4110-MIBObjects 62 }
 lbdMgt              OBJECT IDENTIFIER ::= { ecs4110-MIBObjects 63 }
 mvr6Mgt             OBJECT IDENTIFIER ::= { ecs4110-MIBObjects 66 }
@@ -190,7 +191,6 @@ SwitchInfoEntry ::= SEQUENCE
     swHardwareVer           DisplayString,
     swMicrocodeVer          DisplayString,
     swLoaderVer             DisplayString,
-    swBootRomVer            DisplayString,
     swOpCodeVer             DisplayString,
     swPortNumber            Integer32,
     swPowerStatus           INTEGER,
@@ -198,7 +198,8 @@ SwitchInfoEntry ::= SEQUENCE
     swSerialNumber          DisplayString,
     swServiceTag            DisplayString,
     swModelNumber           DisplayString,
-    swEpldVer               DisplayString
+    swEpldVer               DisplayString,
+    swLinuxVersion          DisplayString
 }
 
 swUnitIndex OBJECT-TYPE
@@ -230,13 +231,6 @@ swLoaderVer OBJECT-TYPE
         STATUS      current
         DESCRIPTION "Loader version of the main board."
         ::= { switchInfoEntry 4 }
-
-swBootRomVer OBJECT-TYPE
-        SYNTAX      DisplayString (SIZE(0..20))
-        MAX-ACCESS  read-only
-        STATUS      current
-        DESCRIPTION "Boot ROM code version of the main board."
-        ::= { switchInfoEntry 5 }
 
 swOpCodeVer OBJECT-TYPE
         SYNTAX      DisplayString (SIZE(0..20))
@@ -305,6 +299,13 @@ swEpldVer OBJECT-TYPE
         STATUS      current
         DESCRIPTION "The EPLD version of the switch."
         ::= { switchInfoEntry 15 }
+
+swLinuxVersion OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..20))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The Linux Kernel version of the switch."
+        ::= { switchInfoEntry 17 }
 
 switchOperState OBJECT-TYPE
         SYNTAX      INTEGER
@@ -450,6 +451,234 @@ amtrMacAddrAgingStatus OBJECT-TYPE
                       age out."
          ::= { amtrMgt 3 }
 
+amtrMacAddrDynamicCount OBJECT-TYPE
+         SYNTAX     Counter32
+         MAX-ACCESS read-only
+         STATUS     current
+         DESCRIPTION
+             "The number of dot1dTpFdbTable entries in the BRIDGE-MIB."
+         ::= { amtrMgt 4 }
+
+amtrMacAddrStaticCount OBJECT-TYPE
+         SYNTAX     Counter32
+         MAX-ACCESS read-only
+         STATUS     current
+         DESCRIPTION
+             "The number of dot1dStaticTable entries in  the BRIDGE-MIB."
+         ::= { amtrMgt 5 }
+
+amtrMacAddrTotalCount OBJECT-TYPE
+         SYNTAX     Counter32
+         MAX-ACCESS read-only
+         STATUS     current
+         DESCRIPTION
+             "The sum of dot1dTpFdbTable and dot1dStaticTable entries."
+         ::= { amtrMgt 6 }
+
+--
+-- amtrMacAddrMacThrashing
+--
+amtrMacAddrMacThrashingActionDuration OBJECT-TYPE
+        SYNTAX      Unsigned32(10..10000)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The action duration configure the duration of an action
+                     of mac-thrashing."
+        ::= { amtrMgt 14 }
+
+amtrMacAddrMacThrashingTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AmtrMacAddrMacThrashingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Table about the status of MAC address
+                 mac-thrashing by interface id."
+    ::= { amtrMgt 15 }
+
+amtrMacAddrMacThrashingEntry OBJECT-TYPE
+    SYNTAX      AmtrMacAddrMacThrashingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Entry of MAC address mac-thrashing by interface ID."
+    INDEX       { amtrMacAddrMacThrashingIfIndex }
+    ::= { amtrMacAddrMacThrashingTable 1 }
+
+AmtrMacAddrMacThrashingEntry ::= SEQUENCE
+{
+    amtrMacAddrMacThrashingIfIndex     InterfaceIndex,
+    amtrMacAddrMacThrashingEnable      INTEGER,
+    amtrMacAddrMacThrashingAction      INTEGER,
+    amtrMacAddrMacThrashingStatus      INTEGER
+}
+
+amtrMacAddrMacThrashingIfIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "The interface number of mac-thrashing MAC address.
+                 The interface identified by a particular value
+                 of this index is the same interface as identified by
+                 the same value of ifIndex in the IF-MIB."
+    ::= {amtrMacAddrMacThrashingEntry 1}
+
+amtrMacAddrMacThrashingEnable OBJECT-TYPE
+        SYNTAX      INTEGER { enabled(1), disabled(2) }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The mac-thrashing administrative enabled or disabled."
+    ::= {amtrMacAddrMacThrashingEntry 2}
+
+amtrMacAddrMacThrashingAction OBJECT-TYPE
+        SYNTAX      INTEGER { port-disable(0),stop-learning(1), link-down(2)}
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Configures actions of mac-thrashing detected."
+    ::= {amtrMacAddrMacThrashingEntry 3}
+
+amtrMacAddrMacThrashingStatus OBJECT-TYPE
+        SYNTAX      INTEGER { on(1), off(2) }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The mac-thrashing detected port status."
+    ::= {amtrMacAddrMacThrashingEntry 4}
+
+-- switchThermalTempTable
+
+switchThermalTempTable OBJECT-TYPE
+       SYNTAX      SEQUENCE OF SwitchThermalTempEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION "The table which collects switch temperature information."
+       ::= { switchMgt 11 }
+
+switchThermalTempEntry OBJECT-TYPE
+       SYNTAX      SwitchThermalTempEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION "A conceptual row of the switchThermalTempTable."
+       INDEX  { switchThermalTempUnitIndex,switchThermalTempThermalIndex}
+       ::= { switchThermalTempTable 1 }
+
+SwitchThermalTempEntry ::= SEQUENCE
+{
+    switchThermalTempUnitIndex          Integer32,
+    switchThermalTempThermalIndex       Integer32,
+    switchThermalTempValue              Integer32
+}
+
+switchThermalTempUnitIndex OBJECT-TYPE
+       SYNTAX      Integer32(1..8)
+       MAX-ACCESS  accessible-for-notify
+       STATUS      current
+       DESCRIPTION "The unit of the switch for stackable device."
+       ::= { switchThermalTempEntry 1 }
+
+switchThermalTempThermalIndex OBJECT-TYPE
+       SYNTAX      Integer32(1..8)
+       MAX-ACCESS  accessible-for-notify
+       STATUS      current
+       DESCRIPTION "The thermal index of the switch."
+       ::= { switchThermalTempEntry 2 }
+
+switchThermalTempValue OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "The temperature of the device in degrees Celsius."
+       ::= { switchThermalTempEntry 3 }
+
+--switchThermalActionTable
+
+switchThermalActionTable OBJECT-TYPE
+       SYNTAX      SEQUENCE OF SwitchThermalActionEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION "The table for configuring the thermal action."
+       ::= { switchMgt 12 }
+
+switchThermalActionEntry OBJECT-TYPE
+       SYNTAX      SwitchThermalActionEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION "A conceptual row of the switchThermalActionTable."
+       INDEX  { switchThermalActionUnitIndex,switchThermalActionThermalIndex,
+                switchThermalActionIndex }
+       ::= { switchThermalActionTable 1 }
+
+SwitchThermalActionEntry ::= SEQUENCE
+{
+    switchThermalActionUnitIndex        Integer32,
+    switchThermalActionThermalIndex     Integer32,
+    switchThermalActionIndex            Integer32,
+    switchThermalActionRisingThreshold  Integer32,
+    switchThermalActionFallingThreshold Integer32,
+    switchThermalActionAction           BITS,
+    switchThermalActionStatus           ValidStatus
+}
+
+switchThermalActionUnitIndex OBJECT-TYPE
+       SYNTAX      Integer32(1..8)
+       MAX-ACCESS  accessible-for-notify
+       STATUS      current
+       DESCRIPTION "The unit of the switch for stackable device."
+       ::= { switchThermalActionEntry 1 }
+
+switchThermalActionThermalIndex OBJECT-TYPE
+       SYNTAX      Integer32(1..8)
+       MAX-ACCESS  accessible-for-notify
+       STATUS      current
+       DESCRIPTION "The thermal index of the switch."
+       ::= { switchThermalActionEntry 2 }
+
+switchThermalActionIndex OBJECT-TYPE
+       SYNTAX      Integer32(1)
+       MAX-ACCESS  accessible-for-notify
+       STATUS      current
+       DESCRIPTION "The action index of the switchTheramlActionTable."
+       ::= { switchThermalActionEntry 3 }
+
+switchThermalActionRisingThreshold OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION "The rising threshold of the switch temperature."
+       ::= { switchThermalActionEntry 4 }
+
+switchThermalActionFallingThreshold OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION "The falling threshold of the switch temperature."
+       ::= { switchThermalActionEntry 5 }
+
+switchThermalActionAction OBJECT-TYPE
+       SYNTAX      BITS {
+                            trap(0)
+                        }
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION "The action that will be taken when the
+                    temperature exceeds the rising threshold
+                    or falls below the falling threshold."
+       ::= { switchThermalActionEntry 6 }
+
+switchThermalActionStatus OBJECT-TYPE
+       SYNTAX      ValidStatus
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION "Set valid(1) to create an entry, Set Invalid(2) to delete an entry."
+       ::= { switchThermalActionEntry 7 }
+
+switchResetButtonStatus OBJECT-TYPE
+         SYNTAX     INTEGER
+                    {
+                        released(1),
+                        pressed(2)
+                    }
+         MAX-ACCESS read-only
+         STATUS     current
+         DESCRIPTION "released(1) means the Reset button has been released, pressed(2)
+                     means the Reset button has been pressed."
+         ::= { switchMgt 25 }
 --
 -- portMgt
 --
@@ -18127,6 +18356,327 @@ pppoeiaPortStatsClearAction OBJECT-TYPE
                      The value noClear(2) will always be displayed when reading."
         ::= { pppoeiaPortStatsEntry 11 }
 
+--
+-- time range
+--
+
+timeRangeTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF TimeRangeEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Table for time range."
+        ::= { timeRangeMgt 1 }
+
+timeRangeEntry OBJECT-TYPE
+        SYNTAX      TimeRangeEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Entry for time range."
+        INDEX       { timeRangeIndex }
+        ::= { timeRangeTable 1 }
+
+TimeRangeEntry ::= SEQUENCE
+{
+        timeRangeIndex         Integer32,
+        timeRangeName          DisplayString,
+        timeRangeStatus        ValidStatus
+}
+
+timeRangeIndex OBJECT-TYPE
+        SYNTAX       Integer32
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION "The index of time range entry."
+        ::= { timeRangeEntry 1 }
+
+timeRangeName OBJECT-TYPE
+        SYNTAX       DisplayString (SIZE (1..32))
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION "The name of time range entry."
+        ::= { timeRangeEntry 2 }
+
+timeRangeStatus OBJECT-TYPE
+        SYNTAX       ValidStatus
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION "Setting this to valid(1) creates an entry.
+                     Setting this to invalid(2) destroys an entry."
+        ::= { timeRangeEntry 3 }
+
+timeRangePeriodicTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF TimeRangePeriodicEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Table for periodic time-range entries."
+        ::= { timeRangeMgt 2 }
+
+timeRangePeriodicEntry OBJECT-TYPE
+        SYNTAX      TimeRangePeriodicEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Entry for periodic time-range."
+        INDEX       {
+                      timeRangePeriodicTimeRangeIndex,
+                      timeRangePeriodicStartDaysOfTheWeek,
+                      timeRangePeriodicStartHours,
+                      timeRangePeriodicStartMinutes,
+                      timeRangePeriodicEndDaysOfTheWeek,
+                      timeRangePeriodicEndHours,
+                      timeRangePeriodicEndMinutes
+                    }
+        ::= { timeRangePeriodicTable 1 }
+
+TimeRangePeriodicEntry ::= SEQUENCE
+{
+        timeRangePeriodicTimeRangeIndex       Integer32,
+        timeRangePeriodicStartDaysOfTheWeek   INTEGER,
+        timeRangePeriodicStartHours           Integer32,
+        timeRangePeriodicStartMinutes         Integer32,
+        timeRangePeriodicEndDaysOfTheWeek     INTEGER,
+        timeRangePeriodicEndHours             Integer32,
+        timeRangePeriodicEndMinutes           Integer32,
+        timeRangePeriodicStatus               ValidStatus
+}
+
+timeRangePeriodicTimeRangeIndex OBJECT-TYPE
+        SYNTAX       Integer32
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION "The index of time range. The object
+                     should exist in timeRangeIndex of timeRangeTable."
+        ::= { timeRangePeriodicEntry 1 }
+
+timeRangePeriodicStartDaysOfTheWeek OBJECT-TYPE
+        SYNTAX       INTEGER
+                     {
+                        sunday(0),
+                        monday(1),
+                        tuesday(2),
+                        wednesday(3),
+                        thursday(4),
+                        friday(5),
+                        saturday(6),
+                        daily(7),
+                        weekdays(8),
+                        weekend(9)
+                     }
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION "Specifies the start days-of-the-week of the periodic time-range entry.
+                     1. If the start days-of-the-week is set to Sunday, Monday or Saturday
+                        then the end days-of-the-week shall be set to Sunday, Monday or Saturday.
+                        1-1. If the start time is equal to the end time (for example: 09:00 - 09:00),
+                             it means that the rule is active in the whole day.
+                        1-2. If the end time is prior to the start time (for example: 05:00 - 01:00),
+                             it means that the rule is inactive from 01:01 to 04:59.
+                     2. If the start days-of-the-week is set to Daily, Weekdays, or Weekend,
+                        then the end days-of-the-week shall be set the same as start,
+                        and the start time shall be before the end time."
+        ::= { timeRangePeriodicEntry 2 }
+
+timeRangePeriodicStartHours OBJECT-TYPE
+        SYNTAX       Integer32(0..23)
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION "Specifies the start hours of the periodic time-range entry."
+        ::= { timeRangePeriodicEntry 3 }
+
+timeRangePeriodicStartMinutes OBJECT-TYPE
+        SYNTAX       Integer32(0..59)
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION "Specifies the start minutess of the periodic time-range entry."
+        ::= { timeRangePeriodicEntry 4 }
+
+timeRangePeriodicEndDaysOfTheWeek OBJECT-TYPE
+        SYNTAX       INTEGER
+                     {
+                        sunday(0),
+                        monday(1),
+                        tuesday(2),
+                        wednesday(3),
+                        thursday(4),
+                        friday(5),
+                        saturday(6),
+                        daily(7),
+                        weekdays(8),
+                        weekend(9)
+                     }
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION "Specifies the end days-of-the-week of the periodic time-range entry.
+                     1. If the start days-of-the-week is set to Sunday, Monday or Saturday
+                        then the end days-of-the-week shall be set to Sunday, Monday or Saturday.
+                        1-1. If the start time is equal to the end time (for example: 09:00 - 09:00),
+                             it means that the rule is active in the whole day.
+                        1-2. If the end time is prior to the start time (for example: 05:00 - 01:00),
+                             it means that the rule is inactive from 01:01 to 04:59.
+                     2. If the start days-of-the-week is set to Daily, Weekdays, or Weekend,
+                        then the end days-of-the-week shall be set the same as start,
+                        and the start time shall be before the end time."
+        ::= { timeRangePeriodicEntry 5 }
+
+timeRangePeriodicEndHours OBJECT-TYPE
+        SYNTAX       Integer32(0..23)
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION "Specifies the end hours of the periodic time-range entry."
+        ::= { timeRangePeriodicEntry 6 }
+
+timeRangePeriodicEndMinutes OBJECT-TYPE
+        SYNTAX       Integer32(0..59)
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION "Specifies the end minutess of the periodic time-range entry."
+        ::= { timeRangePeriodicEntry 7 }
+
+timeRangePeriodicStatus OBJECT-TYPE
+        SYNTAX       ValidStatus
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION "Setting this to valid(1) creates an periodic entry.
+                     Setting this to invalid(2) destroys an periodic entry."
+        ::= { timeRangePeriodicEntry 8 }
+
+timeRangeAbsoluteTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF TimeRangeAbsoluteEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Table for absolute time-range entries."
+        ::= { timeRangeMgt 3 }
+
+timeRangeAbsoluteEntry OBJECT-TYPE
+        SYNTAX      TimeRangeAbsoluteEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Entry for absolute time-range."
+        INDEX       {
+                      timeRangeAbsoluteTimeRangeIndex,
+                      timeRangeAbsoluteStartYears,
+                      timeRangeAbsoluteStartMonths,
+                      timeRangeAbsoluteStartDays,
+                      timeRangeAbsoluteStartHours,
+                      timeRangeAbsoluteStartMinutes,
+                      timeRangeAbsoluteEndYears,
+                      timeRangeAbsoluteEndMonths,
+                      timeRangeAbsoluteEndDays,
+                      timeRangeAbsoluteEndHours,
+                      timeRangeAbsoluteEndMinutes
+                    }
+        ::= { timeRangeAbsoluteTable 1 }
+
+TimeRangeAbsoluteEntry ::= SEQUENCE
+{
+        timeRangeAbsoluteTimeRangeIndex       Integer32,
+        timeRangeAbsoluteStartYears           Integer32,
+        timeRangeAbsoluteStartMonths          Integer32,
+        timeRangeAbsoluteStartDays            Integer32,
+        timeRangeAbsoluteStartHours           Integer32,
+        timeRangeAbsoluteStartMinutes         Integer32,
+        timeRangeAbsoluteEndYears             Integer32,
+        timeRangeAbsoluteEndMonths            Integer32,
+        timeRangeAbsoluteEndDays              Integer32,
+        timeRangeAbsoluteEndHours             Integer32,
+        timeRangeAbsoluteEndMinutes           Integer32,
+        timeRangeAbsoluteStatus               ValidStatus
+}
+
+timeRangeAbsoluteTimeRangeIndex OBJECT-TYPE
+        SYNTAX       Integer32
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION "The index of time range. The object
+                     should exist in timeRangeIndex of timeRangeTable."
+        ::= { timeRangeAbsoluteEntry 1 }
+
+timeRangeAbsoluteStartYears OBJECT-TYPE
+        SYNTAX       Integer32(2013..2037|65535)
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION "Specifies the start years of the absolute time-range entry.
+                     65535 means don't care."
+        ::= { timeRangeAbsoluteEntry 2 }
+
+timeRangeAbsoluteStartMonths OBJECT-TYPE
+        SYNTAX       Integer32(1..12|255)
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION "Specifies the start months of the absolute time-range entry.
+                     255 means don't care."
+        ::= { timeRangeAbsoluteEntry 3 }
+
+timeRangeAbsoluteStartDays OBJECT-TYPE
+        SYNTAX       Integer32(1..31|255)
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION "Specifies the start days of the absolute time-range entry.
+                     255 means don't care."
+        ::= { timeRangeAbsoluteEntry 4 }
+
+timeRangeAbsoluteStartHours OBJECT-TYPE
+        SYNTAX       Integer32(0..23|255)
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION "Specifies the start hours of the absolute time-range entry.\
+                     255 means don't care."
+        ::= { timeRangeAbsoluteEntry 5 }
+
+timeRangeAbsoluteStartMinutes OBJECT-TYPE
+        SYNTAX       Integer32(0..59|255)
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION "Specifies the start minutes of the absolute time-range entry.\
+                     255 means don't care."
+        ::= { timeRangeAbsoluteEntry 6 }
+
+timeRangeAbsoluteEndYears OBJECT-TYPE
+        SYNTAX       Integer32(2013..2037|65535)
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION "Specifies the end years of the absolute time-range entry.
+                     65535 means don't care."
+        ::= { timeRangeAbsoluteEntry 7 }
+
+timeRangeAbsoluteEndMonths OBJECT-TYPE
+        SYNTAX       Integer32(1..12|255)
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION "Specifies the end months of the absolute time-range entry.
+                     255 means don't care."
+        ::= { timeRangeAbsoluteEntry 8 }
+
+timeRangeAbsoluteEndDays OBJECT-TYPE
+        SYNTAX       Integer32(1..31|255)
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION "Specifies the end days of the absolute time-range entry.
+                     255 means don't care."
+        ::= { timeRangeAbsoluteEntry 9 }
+
+timeRangeAbsoluteEndHours OBJECT-TYPE
+        SYNTAX       Integer32(0..23|255)
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION "Specifies the end hours of the absolute time-range entry.\
+                     255 means don't care."
+        ::= { timeRangeAbsoluteEntry 10 }
+
+timeRangeAbsoluteEndMinutes OBJECT-TYPE
+        SYNTAX       Integer32(0..59|255)
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION "Specifies the end minutes of the absolute time-range entry.\
+                     255 means don't care."
+        ::= { timeRangeAbsoluteEntry 11 }
+
+timeRangeAbsoluteStatus OBJECT-TYPE
+        SYNTAX       ValidStatus
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION "Setting this to valid(1) creates an absolute entry.
+                     Setting this to invalid(2) destroys an absolute entry."
+        ::= { timeRangeAbsoluteEntry 12 }
 
 --
 -- erpsMgt

@@ -20,12 +20,12 @@ IMPORTS
         Dot1agCfmMepId, dot1agCfmMdIndex, dot1agCfmMaIndex, dot1agCfmMepIdentifier, dot1agCfmMepIdentifier, dot1agCfmMepDbRMepIdentifier
                 FROM IEEE8021-CFM-MIB
         dot1vProtocolPortEntry
-                FROM Q-BRIDGE-MIB			
+                FROM Q-BRIDGE-MIB
         dot1xAuthConfigEntry
                 FROM IEEE8021-PAE-MIB;
 
 es3510maMIB MODULE-IDENTITY
-        LAST-UPDATED "201311250000Z"
+        LAST-UPDATED "201508070000Z"
         ORGANIZATION "Accton Technology Corp."
         CONTACT-INFO
                 "Accton Technology Corp.
@@ -802,7 +802,7 @@ portShutdownReason OBJECT-TYPE
                         lbd(6),
                         atcBstorm(7),
                         atcMstorm(8),
-                        udld(9),
+                        udld(9)
                     }
         MAX-ACCESS  read-only
         STATUS      current
@@ -2536,7 +2536,9 @@ StaPortEntry ::= SEQUENCE
     staPortRootGuardStatus          EnabledStatus,
     staPortBpduGuardAutoRecovery            EnabledStatus,
     staPortBpduGuardAutoRecoveryInterval    Unsigned32,
-    staPortTcPropStop               TruthValue
+    staPortTcPropStop               TruthValue,
+    staPortBpduVlanId               Integer32,
+    staPortBpduTagPriority          Integer32
 }
 
 -- for MST, RSTP
@@ -2737,6 +2739,42 @@ staPortTcPropStop         OBJECT-TYPE
          Don't enable on potentially ring port.
         "
     ::= { staPortEntry 21 }
+
+staPortBpduVlanId OBJECT-TYPE
+    SYNTAX      Integer32(0|1..4094)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+          "Configure VLAN ID of tagged BPDU on the specified port.
+
+          Setting this to 0 means that the untagged BPDU transmitted.
+
+          When setting the specified port working on TRUNK mode and
+          allowed the VLAN id, the tagged BPDU should be transmitted
+          on the specified port.
+          "
+    ::= { staPortEntry 22 }
+
+staPortBpduTagPriority OBJECT-TYPE
+    SYNTAX      Integer32(0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+          "Configure Tag Priority of tagged BPDU on the specified port.
+
+          The default value of tag priority is 0.
+
+          When setting the specified port working on the specified VLAN
+          ID, the tag priority of tagged BPDU is carried on the specified
+          port.
+          
+          Only if the range of specified VLAN ID is 1-4094, the tag priority 
+          can be configured to a specified value. While the specified VLAN ID 
+          is 0, the tag priority is configured FAILED. So before tag prority
+          will be configured, please configure VLAN ID of tagged BPDU on the
+          specified port.
+          "
+    ::= { staPortEntry 23 }
 
 staProtocolType OBJECT-TYPE
     SYNTAX      INTEGER {
@@ -3496,7 +3534,9 @@ StaLoopbackDetectionPortEntry    ::= SEQUENCE
         staLoopbackDetectionPortStatus             EnabledStatus,
         staLoopbackDetectionPortTrapStatus         EnabledStatus,
         staLoopbackDetectionPortReleaseMode        INTEGER,
-        staLoopbackDetectionPortRelease            INTEGER
+        staLoopbackDetectionPortRelease            INTEGER,
+        staLoopbackDetectionPortAction             INTEGER, 
+        staLoopbackDetectionPortShutdownInterval   INTEGER
 }
 
 staLoopbackDetectionPortIfIndex        OBJECT-TYPE
@@ -3523,7 +3563,7 @@ staLoopbackDetectionPortTrapStatus    OBJECT-TYPE
                      to be sent when the loopback BPDUs have been detected."
         ::= { staLoopbackDetectionPortEntry  3 }
 
- staLoopbackDetectionPortReleaseMode   OBJECT-TYPE
+staLoopbackDetectionPortReleaseMode   OBJECT-TYPE
         SYNTAX     INTEGER
         {
             auto(1),
@@ -3548,6 +3588,24 @@ staLoopbackDetectionPortRelease    OBJECT-TYPE
         DESCRIPTION "Set this to release(2) to release the port from discarding state.
                      noRelease(1) will always be obtained when reading this variable."
         ::= { staLoopbackDetectionPortEntry  5 }
+
+staLoopbackDetectionPortAction   OBJECT-TYPE
+        SYNTAX     INTEGER
+        {
+            shutdown(2)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Setting this to block(1) indicates that this port can be executed block operation.
+                     Setting this to shutdown(2) indicates that this port can be execute shutdown operation."
+        ::= { staLoopbackDetectionPortEntry  6 }
+
+staLoopbackDetectionPortShutdownInterval    OBJECT-TYPE
+        SYNTAX      INTEGER(60..86400)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Set this to release the port after the specified value seconds while the port action is shutdown."
+        ::= { staLoopbackDetectionPortEntry  7 }
 
 staSystemBPDUFlooding    OBJECT-TYPE
         SYNTAX      INTEGER
@@ -5618,6 +5676,84 @@ dhcpOption82RelayServerAddrServerIp OBJECT-TYPE
           DESCRIPTION "The IP address of the relay server."
           ::= { dhcpOption82RelayServerAddrEntry 2 }
 
+dhcpOption82VlanConfigTable OBJECT-TYPE
+          SYNTAX      SEQUENCE OF DhcpOption82VlanConfigEntry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION "A table contains DHCP option82 configurations
+                       for existing VLANs."
+          ::= { dhcpOption82 7 }
+
+dhcpOption82VlanConfigEntry    OBJECT-TYPE
+        SYNTAX      DhcpOption82VlanConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An instance contains the configuration to enable
+                     or disable DHCP option82 for each existing VLAN."
+        INDEX       { dhcpOption82VlanIndex }
+        ::= { dhcpOption82VlanConfigTable 1 }
+
+DhcpOption82VlanConfigEntry  ::= SEQUENCE
+{
+        dhcpOption82VlanIndex      VlanIndex,
+        dhcpOption82VlanStatus     EnabledStatus
+}
+
+dhcpOption82VlanIndex      OBJECT-TYPE
+        SYNTAX      VlanIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This object indicates the VLAN ID on which DHCP Option82
+                     feature is configured."
+        ::= { dhcpOption82VlanConfigEntry 1 }
+
+dhcpOption82VlanStatus     OBJECT-TYPE
+        SYNTAX     EnabledStatus
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "This object indicates whether DHCP Option82 is enabled in
+                     this VLAN."
+        ::= { dhcpOption82VlanConfigEntry 2 }
+
+--
+dhcpOption82PortConfigTable    OBJECT-TYPE
+        SYNTAX      SEQUENCE OF DhcpOption82PortConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "A table contains DHCP option82 configurations
+                     for port interfaces."
+        ::= { dhcpOption82 8 }
+
+dhcpOption82PortConfigEntry    OBJECT-TYPE
+        SYNTAX      DhcpOption82PortConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An instance contains the configuration to enable
+                     or disable DHCP option82 at each port interface."
+        INDEX       { dhcpOption82PortIfIndex }
+        ::= { dhcpOption82PortConfigTable 1 }
+
+DhcpOption82PortConfigEntry    ::= SEQUENCE
+{
+        dhcpOption82PortIfIndex        InterfaceIndex,
+        dhcpOption82PortStatus         EnabledStatus
+}
+
+dhcpOption82PortIfIndex        OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The ifIndex value of the port."
+        ::= { dhcpOption82PortConfigEntry 1 }
+
+dhcpOption82PortStatus    OBJECT-TYPE
+        SYNTAX     EnabledStatus
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "This object indicates whether the port is enabled
+                     for DHCP Option82."
+        ::= { dhcpOption82PortConfigEntry 2 }
+--
 dhcpDynamicProvisionStatus OBJECT-TYPE
     SYNTAX     EnabledStatus
     MAX-ACCESS read-write
@@ -7032,6 +7168,229 @@ prioIfClassificationModeStatus OBJECT-TYPE
     ::= { prioIfClassificationModeEntry 2 }
 
 --
+-- The interface mapping table from CoS/CFI to internal QoS label
+--
+
+prioCosToDscpTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrioCosToDscpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table for CoS/CFI to internal QoS label mapping."
+    ::= { cosMgt 3 }
+
+prioCosToDscpEntry OBJECT-TYPE
+    SYNTAX      PrioCosToDscpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Entry for CoS/CFI to internal QoS label mapping."
+    INDEX
+    {
+          prioCosToDscpIfValue,
+          prioCosToDscpCosValue,
+          prioCosToDscpCFIValue
+    }
+    ::= { prioCosToDscpTable 1 }
+
+PrioCosToDscpEntry ::= SEQUENCE
+{
+    prioCosToDscpIfValue    InterfaceIndex,
+    prioCosToDscpCosValue   Integer32,
+    prioCosToDscpCFIValue   Integer32,
+    prioCosToDscpPhbValue   Integer32,
+    prioCosToDscpColorValue INTEGER
+}
+
+prioCosToDscpIfValue OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The port or the trunk interface of the device. The interface
+         identified by a particular value of this index is the same interface
+         as identified by the same value of ifIndex in the IF-MIB."
+    ::= { prioCosToDscpEntry 1 }
+
+prioCosToDscpCosValue OBJECT-TYPE
+    SYNTAX      Integer32 (0..7)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The CoS value (0 to 7) mapped to an internal QoS label value which is
+         composed of PHB (3 bits) and drop precedence (2 bits)."
+    ::= { prioCosToDscpEntry 2 }
+
+prioCosToDscpCFIValue OBJECT-TYPE
+    SYNTAX      Integer32 (0..1)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The CFI value (0 or 1) mapped to an internal QoS label value which is
+         composed of PHB (3 bits) and drop precedence (2 bits)."
+    ::= { prioCosToDscpEntry 3 }
+
+prioCosToDscpPhbValue OBJECT-TYPE
+    SYNTAX      Integer32 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The PHB value of internal QoS label."
+    ::= { prioCosToDscpEntry 5 }
+
+prioCosToDscpColorValue OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    green(0),
+                    red(1),
+                    yellow(3)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The drop precedence value of internal QoS label. Green(0), Yellow(3),
+         Red(1)."
+    ::= { prioCosToDscpEntry 6 }
+
+--
+-- The interface mapping table from DSCP to internal Qos label
+--
+
+prioDscpToDscpTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrioDscpToDscpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table for DSCP to internal QoS label mapping. This table setting will
+         take effect only when the interface Qos mapping classification mode is
+         set to DSCP mode."
+    ::= { cosMgt 5 }
+
+prioDscpToDscpEntry OBJECT-TYPE
+    SYNTAX      PrioDscpToDscpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Entry for ingress DSCP to internal QoS label mapping."
+    INDEX
+    {
+        prioDscpToDscpIfValue,
+        prioDscpToDscpIngressDscpValue
+    }
+    ::= { prioDscpToDscpTable 1 }
+
+PrioDscpToDscpEntry ::= SEQUENCE
+{
+    prioDscpToDscpIfValue           InterfaceIndex,
+    prioDscpToDscpIngressDscpValue  Integer32,
+    prioDscpToDscpPhbValue          Integer32,
+    prioDscpToDscpColorValue        INTEGER
+}
+
+prioDscpToDscpIfValue OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The port or trunk interface of the device. The interface identified by
+         a particular value of this index is the same interface as identified
+         by the same value of ifIndex in the IF-MIB."
+    ::= { prioDscpToDscpEntry 1 }
+
+prioDscpToDscpIngressDscpValue OBJECT-TYPE
+    SYNTAX      Integer32 (0..63)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ingress DSCP value which will be mapped to internal QoS label
+         value."
+    ::= { prioDscpToDscpEntry 2 }
+
+prioDscpToDscpPhbValue OBJECT-TYPE
+    SYNTAX      Integer32 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The PHB value of internal QoS label."
+    ::= { prioDscpToDscpEntry 4 }
+
+prioDscpToDscpColorValue OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    green(0),
+                    red(1),
+                    yellow(3)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The drop precedence value of internal QoS label. Green(0), Yellow(3),
+         Red(1)."
+    ::= { prioDscpToDscpEntry 5 }
+
+--
+-- The interface mapping table from PHB to queue
+--
+
+prioDscpToQueueTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrioDscpToQueueEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table for PHB to queue mapping."
+    ::= { cosMgt 9 }
+
+prioDscpToQueueEntry OBJECT-TYPE
+    SYNTAX      PrioDscpToQueueEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Entry for PHB to queue mapping."
+    INDEX
+    {
+        prioDscpToQueueIfValue,
+        prioDscpToQueuePHBValue
+    }
+    ::= { prioDscpToQueueTable 1 }
+
+PrioDscpToQueueEntry ::= SEQUENCE
+{
+    prioDscpToQueueIfValue      InterfaceIndex,
+    prioDscpToQueuePHBValue     Integer32,
+    prioDscpToQueueQueueValue   Integer32
+}
+
+prioDscpToQueueIfValue OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The port or trunk interface of the device. The interface identified by
+         a particular value of this index is the same interface as identified
+         by the same value of ifIndex in the IF-MIB."
+    ::= { prioDscpToQueueEntry 1 }
+
+prioDscpToQueuePHBValue OBJECT-TYPE
+    SYNTAX      Integer32 (0..7)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The PHB value of internal QoS label."
+    ::= { prioDscpToQueueEntry 2 }
+
+prioDscpToQueueQueueValue OBJECT-TYPE
+    SYNTAX      Integer32 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The queue value which is mapped from the PHB value of QoS label."
+    ::= { prioDscpToQueueEntry 3 }
+
+-- End of interface tables for Cos priority management: cosMgt(3).
+-- Corresponding global tables are defined in cosGlobalMgt(6).
+
+
+--
 --diffServMgt
 --
 diffServMgt    OBJECT IDENTIFIER ::= { qosMgt 4 }
@@ -7382,7 +7741,7 @@ diffServClassMapElementIndexTypeList OBJECT-TYPE
                  index of differServClasssMapElementIndexList is the
                  diffServIpAceEntry. When the type is acl(3), the maping index
                  of differServClasssMapElementIndexList is the diffServAclEntry.
-                 When the type is ipv6Ace(4), the maping index of 
+                 When the type is ipv6Ace(4), the maping index of
                  differServClasssMapElementIndexList is the diffServIpv6AceEntry."
     ::= { diffServClassMapEntry 5 }
 
@@ -8323,10 +8682,10 @@ diffServMacAceSourceIpAddr OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION "If the diffServMacAceEtherTypeOp is equal(2),
-                 diffServMacAceEtherTypeBitmask is 'FFFF'h, and 
-                 diffServMacAceMinEtherType is '0800'h, this specified source 
-                 IP address. The packet's source address is AND-ed with the value 
-                 of diffServMacAceSourceIpAddrBitmask and then compared against 
+                 diffServMacAceEtherTypeBitmask is 'FFFF'h, and
+                 diffServMacAceMinEtherType is '0800'h, this specified source
+                 IP address. The packet's source address is AND-ed with the value
+                 of diffServMacAceSourceIpAddrBitmask and then compared against
                  the value of this object."
     ::= { diffServMacAceEntry 32 }
 
@@ -8335,10 +8694,10 @@ diffServMacAceSourceIpAddrBitmask OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION "If the diffServMacAceEtherTypeOp is equal(2),
-                 diffServMacAceEtherTypeBitmask is 'FFFF'h, and 
-                 diffServMacAceMinEtherType is '0800'h, this specified source IP 
-                 address mask. The packet's source address is AND-ed with the 
-                 value of diffServMacAceSourceIpAddr and then compared against 
+                 diffServMacAceEtherTypeBitmask is 'FFFF'h, and
+                 diffServMacAceMinEtherType is '0800'h, this specified source IP
+                 address mask. The packet's source address is AND-ed with the
+                 value of diffServMacAceSourceIpAddr and then compared against
                  the value of this object."
     ::= { diffServMacAceEntry 33 }
 
@@ -8347,9 +8706,9 @@ diffServMacAceDestIpAddr OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION "If the diffServMacAceEtherTypeOp is equal(2),
-                 diffServMacAceEtherTypeBitmask is 'FFFF'h, and 
-                 diffServMacAceMinEtherType is '0800'h, this specified destination 
-                 IP address. The packet's destination address is AND-ed with the 
+                 diffServMacAceEtherTypeBitmask is 'FFFF'h, and
+                 diffServMacAceMinEtherType is '0800'h, this specified destination
+                 IP address. The packet's destination address is AND-ed with the
                  value of diffServMacAceDestIpAddrBitmask and then compared against
                  the value of this object."
     ::= { diffServMacAceEntry 34 }
@@ -8359,10 +8718,10 @@ diffServMacAceDestIpAddrBitmask OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION "If the diffServMacAceEtherTypeOp is equal(2),
-                 diffServMacAceEtherTypeBitmask is 'FFFF'h, and 
-                 diffServMacAceMinEtherType is '0800'h, this specified destination 
-                 IP address mask. The packet's source address is AND-ed with the 
-                 value of diffServMacAceDestIpAddr and then compared against the 
+                 diffServMacAceEtherTypeBitmask is 'FFFF'h, and
+                 diffServMacAceMinEtherType is '0800'h, this specified destination
+                 IP address mask. The packet's source address is AND-ed with the
+                 value of diffServMacAceDestIpAddr and then compared against the
                  value of this object."
     ::= { diffServMacAceEntry 35 }
 
@@ -8371,7 +8730,7 @@ diffServMacAceSourceIpv6Addr OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION "If the diffServMacAceEtherTypeOp is equal(2),
-                 diffServMacAceEtherTypeBitmask is 'FFFF'h, and 
+                 diffServMacAceEtherTypeBitmask is 'FFFF'h, and
                  diffServMacAceMinEtherType is '86DD'h, this specifies the source
                  IPv6 address."
     ::= { diffServMacAceEntry 36 }
@@ -8381,8 +8740,8 @@ diffServMacAceSourceIpv6AddrPrefixLen OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION "If the diffServMacAceEtherTypeOp is equal(2),
-                 diffServMacAceEtherTypeBitmask is 'FFFF'h, and 
-                 diffServMacAceMinEtherType is '86DD'h, this specifies the length 
+                 diffServMacAceEtherTypeBitmask is 'FFFF'h, and
+                 diffServMacAceMinEtherType is '86DD'h, this specifies the length
                  (in bits) associated with the source IPv6 address prefix of this
                  entry."
     ::= { diffServMacAceEntry 37 }
@@ -8392,7 +8751,7 @@ diffServMacAceDestIpv6Addr OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION "If the diffServMacAceEtherTypeOp is equal(2),
-                 diffServMacAceEtherTypeBitmask is 'FFFF'h, and 
+                 diffServMacAceEtherTypeBitmask is 'FFFF'h, and
                  diffServMacAceMinEtherType is '86DD'h, this specifies the destination
                  IPv6 address. This object may not be modified if the associated
                  aclIpv6AceType object is equal to standard(1)."
@@ -8403,7 +8762,7 @@ diffServMacAceDestIpv6AddrPrefixLen OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION "If the diffServMacAceEtherTypeOp is equal(2),
-                 diffServMacAceEtherTypeBitmask is 'FFFF'h, and 
+                 diffServMacAceEtherTypeBitmask is 'FFFF'h, and
                  diffServMacAceMinEtherType is '86DD'h, this specifies the length
                  (in bits) associated with the destination IPv6 address prefix of
                  this entry."
@@ -8413,15 +8772,15 @@ diffServMacAceIpProtocol OBJECT-TYPE
     SYNTAX      Integer32 (0..256)
     MAX-ACCESS  read-create
     STATUS      current
-    DESCRIPTION "The protocol number field in the IP header (or the next header 
-                 field in the IPv6 header) used to indicate the higher layer 
-                 protocol as specified in RFC 1700. A value of 0 matches every 
-                 IP packet. The object=256 means 'any'. For example: 0 is IP, 
+    DESCRIPTION "The protocol number field in the IP header (or the next header
+                 field in the IPv6 header) used to indicate the higher layer
+                 protocol as specified in RFC 1700. A value of 0 matches every
+                 IP packet. The object=256 means 'any'. For example: 0 is IP,
                  1 is ICMP, 2 is IGMP, 4 is IP in IP encapsulation, 6 is TCP,
-                 9 is IGRP, 17 is UDP, 47 is GRE, 50 is ESP, 51 is AH, 88 is 
+                 9 is IGRP, 17 is UDP, 47 is GRE, 50 is ESP, 51 is AH, 88 is
                  IGRP, 89 is OSPF, 94 is KA9Q/NOS compatible IP over IP, 103 is
-                 PIMv2, 108 is PCP. This object may not be modified if the 
-                 associated diffServMacAceMinEtherType object is not equal to 
+                 PIMv2, 108 is PCP. This object may not be modified if the
+                 associated diffServMacAceMinEtherType object is not equal to
                  '0800'h or '86DD'h. "
     ::= { diffServMacAceEntry 40 }
 
@@ -8451,8 +8810,8 @@ diffServMacAceL4SourcePortBitmask OBJECT-TYPE
     STATUS      current
     DESCRIPTION "If the object type of diffServMacAceL4SourcePortOp is equal(2),
                  this indicates the bitmask for diffServMacAceL4SourcePort"
-    ::= { diffServMacAceEntry 43 } 
-    
+    ::= { diffServMacAceEntry 43 }
+
 diffServMacAceL4DestPortOp OBJECT-TYPE
     SYNTAX    INTEGER {
         noOperator(1),
@@ -9303,9 +9662,9 @@ diffServAclHwCounterAceIndex OBJECT-TYPE
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION "An index that uniquely identifies an entry of an ACL.
-                     This entry might be a compressed ACE (which index is 
-                     bigger than SYS_ADPT_MAX_NBRS_OF_ACE_OF_SYSTEM) with 
-                     multiple user configured ACEs, and the index of 
+                     This entry might be a compressed ACE (which index is
+                     bigger than SYS_ADPT_MAX_NBRS_OF_ACE_OF_SYSTEM) with
+                     multiple user configured ACEs, and the index of
                      compressed ACE will not show in ACE table."
         ::= { diffServAclHwCounterEntry 4 }
 
@@ -9331,7 +9690,7 @@ diffServPolicyMapPortEntry OBJECT-TYPE
         MAX-ACCESS  not-accessible
         STATUS      current
         DESCRIPTION "Entry for diffServPolicyMapPortTable."
-        INDEX       { 
+        INDEX       {
                         diffServPolicyMapPortIfIndex,
                         diffServPolicyMapPortDirection
                     }
@@ -9366,7 +9725,7 @@ diffServPolicyMapPortDirection OBJECT-TYPE
                      which direction of traffic."
         ::= { diffServPolicyMapPortEntry 2 }
 
-        
+
 diffServPolicyMapPortPolicyMapIndex OBJECT-TYPE
     SYNTAX      Integer32
     MAX-ACCESS  read-write
@@ -9376,7 +9735,7 @@ diffServPolicyMapPortPolicyMapIndex OBJECT-TYPE
                  this index is associated with the same DiffServPolicyMapEntry
                  as identified by the same value of diffServPolicyMapIndex."
     ::= { diffServPolicyMapPortEntry 3 }
-    
+
 diffServPolicyMapPortStatus OBJECT-TYPE
     SYNTAX      RowStatus
     MAX-ACCESS  read-create
@@ -9474,7 +9833,7 @@ diffServAccessGroupIfIndex OBJECT-TYPE
         DESCRIPTION "This object is the interface index of diffServAccessGroupEntry.
                      The interface identified by a particular value of this
                      index is the same interface as identified by the same
-                     value of ifIndex in the IF-MIB. If support global ACL, 
+                     value of ifIndex in the IF-MIB. If support global ACL,
                      using the specific ifindex(65535)."
         ::= { diffServAccessGroupEntry 1 }
 
@@ -9505,17 +9864,17 @@ diffServAccessGroupAclIndex OBJECT-TYPE
         SYNTAX      Integer32
         MAX-ACCESS  read-write
         STATUS      current
-        DESCRIPTION "Specifies the ACL index apply to this access 
+        DESCRIPTION "Specifies the ACL index apply to this access
                      group. The index uniquely identifies an
-                     entry in diffServAclTable." 
+                     entry in diffServAclTable."
         ::= { diffServAccessGroupEntry 4 }
 
 diffServAccessGroupTimeRangeName OBJECT-TYPE
         SYNTAX       DisplayString (SIZE (1..32))
         MAX-ACCESS   read-write
         STATUS       current
-        DESCRIPTION "The name of the time range entry bound to 
-                     the access group. This object should be 
+        DESCRIPTION "The name of the time range entry bound to
+                     the access group. This object should be
                      equal to one of the timeRangeName objects
                      in timeRangeTable."
         ::= { diffServAccessGroupEntry 5 }
@@ -9621,21 +9980,21 @@ diffServTcamUnit OBJECT-TYPE
         DESCRIPTION "This object identifies the switch within the system
                      for which this entry contains information."
         ::= { diffServTcamEntry 1 }
-        
+
 diffServTcamDevice OBJECT-TYPE
         SYNTAX      Integer32
         MAX-ACCESS  not-accessible
         STATUS      current
         DESCRIPTION "The device id of the specified unit."
         ::= { diffServTcamEntry 2 }
-        
+
 diffServTcamPool OBJECT-TYPE
         SYNTAX      Integer32
         MAX-ACCESS  not-accessible
         STATUS      current
         DESCRIPTION "The TCAM pool index of the specified unit and device."
         ::= { diffServTcamEntry 3 }
-        
+
 diffServTcamPoolCapability OBJECT-TYPE
         SYNTAX      BITS
                     {
@@ -9668,14 +10027,14 @@ diffServTcamPoolCapability OBJECT-TYPE
         DESCRIPTION "The bitmap value used to identify which functions
                      supported on this pool."
         ::= { diffServTcamEntry 4 }
-        
+
 diffServTcamTotal OBJECT-TYPE
         SYNTAX      Integer32
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION "The total number of TCAM pool entry."
         ::= { diffServTcamEntry 5 }
-        
+
 diffServTcamFree OBJECT-TYPE
         SYNTAX      Integer32
         MAX-ACCESS  read-only
@@ -9689,199 +10048,6 @@ diffServTcamUsed OBJECT-TYPE
         STATUS      current
         DESCRIPTION "The used number of TCAM pool entry."
         ::= { diffServTcamEntry 7 }
-
---
--- Global tables for CoS priority management: cosGlobalMgt(6).
--- Corresponding interface tables are defined in cosMgt(6).
---
-
-cosGlobalMgt        OBJECT IDENTIFIER ::= { qosMgt 6 }
-
---
--- The global mapping table from CoS/CFI to internal QoS label
---
-
-prioGlobalCosToDscpTable OBJECT-TYPE
-    SYNTAX      SEQUENCE OF PrioGlobalCosToDscpEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "Table for CoS/CFI to internal QoS label mapping."
-    ::= { cosGlobalMgt 4 }
-
-prioGlobalCosToDscpEntry OBJECT-TYPE
-    SYNTAX      PrioGlobalCosToDscpEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "Entry for CoS/CFI to internal QoS label mapping."
-    INDEX
-    {
-          prioGlobalCosToDscpCosValue,
-          prioGlobalCosToDscpCFIValue
-    }
-    ::= { prioGlobalCosToDscpTable 1 }
-
-PrioGlobalCosToDscpEntry ::= SEQUENCE
-{
-    prioGlobalCosToDscpCosValue   Integer32,
-    prioGlobalCosToDscpCFIValue   Integer32,
-    prioGlobalCosToDscpPhbValue   Integer32,
-    prioGlobalCosToDscpColorValue INTEGER
-}
-
-prioGlobalCosToDscpCosValue OBJECT-TYPE
-    SYNTAX      Integer32 (0..7)
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "The CoS value (0 to 7) mapped to an internal QoS label value which is
-         composed of PHB (3 bits) and drop precedence (2 bits)."
-    ::= { prioGlobalCosToDscpEntry 1 }
-
-prioGlobalCosToDscpCFIValue OBJECT-TYPE
-    SYNTAX      Integer32 (0..1)
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "The CFI value (0 or 1) mapped to an internal QoS label value which is
-         composed of PHB (3 bits) and drop precedence (2 bits)."
-    ::= { prioGlobalCosToDscpEntry 2 }
-
-prioGlobalCosToDscpPhbValue OBJECT-TYPE
-    SYNTAX      Integer32 (0..7)
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-        "The PHB value of internal QoS label."
-    ::= { prioGlobalCosToDscpEntry 4 }
-
-prioGlobalCosToDscpColorValue OBJECT-TYPE
-    SYNTAX      INTEGER
-                {
-                    green(0),
-                    red(1),
-                    yellow(3)
-                }
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-        "The drop precedence value of internal QoS label. Green(0), Yellow(3),
-         Red(1)."
-    ::= { prioGlobalCosToDscpEntry 5 }
-
---
--- The global mapping table from DSCP to internal Qos label
---
-
-prioGlobalDscpToDscpTable OBJECT-TYPE
-    SYNTAX      SEQUENCE OF PrioGlobalDscpToDscpEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "Table for DSCP to internal QoS label mapping. This table setting will
-         take effect only when the interface Qos mapping classification mode is
-         set to DSCP mode."
-    ::= { cosGlobalMgt 6 }
-
-prioGlobalDscpToDscpEntry OBJECT-TYPE
-    SYNTAX      PrioGlobalDscpToDscpEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "Entry for ingress DSCP to internal QoS label mapping."
-    INDEX
-    {
-        prioGlobalDscpToDscpIngressDscpValue
-    }
-    ::= { prioGlobalDscpToDscpTable 1 }
-
-PrioGlobalDscpToDscpEntry ::= SEQUENCE
-{
-    prioGlobalDscpToDscpIngressDscpValue  Integer32,
-    prioGlobalDscpToDscpPhbValue          Integer32,
-    prioGlobalDscpToDscpColorValue        INTEGER
-}
-
-prioGlobalDscpToDscpIngressDscpValue OBJECT-TYPE
-    SYNTAX      Integer32 (0..63)
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "The ingress DSCP value which will be mapped to internal QoS label
-         value."
-    ::= { prioGlobalDscpToDscpEntry 1 }
-
-prioGlobalDscpToDscpPhbValue OBJECT-TYPE
-    SYNTAX      Integer32 (0..7)
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-        "The PHB value of internal QoS label."
-    ::= { prioGlobalDscpToDscpEntry 3 }
-
-prioGlobalDscpToDscpColorValue OBJECT-TYPE
-    SYNTAX      INTEGER
-                {
-                    green(0),
-                    red(1),
-                    yellow(3)
-                }
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-        "The drop precedence value of internal QoS label. Green(0), Yellow(3),
-         Red(1)."
-    ::= { prioGlobalDscpToDscpEntry 4 }
-
---
--- The global mapping table from PHB to queue
---
-
-prioGlobalDscpToQueueTable OBJECT-TYPE
-    SYNTAX      SEQUENCE OF PrioGlobalDscpToQueueEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "Table for PHB to queue mapping."
-    ::= { cosGlobalMgt 10 }
-
-prioGlobalDscpToQueueEntry OBJECT-TYPE
-    SYNTAX      PrioGlobalDscpToQueueEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "Entry for PHB to queue mapping."
-    INDEX
-    {
-        prioGlobalDscpToQueuePHBValue
-    }
-    ::= { prioGlobalDscpToQueueTable 1 }
-
-PrioGlobalDscpToQueueEntry ::= SEQUENCE
-{
-    prioGlobalDscpToQueuePHBValue     Integer32,
-    prioGlobalDscpToQueueQueueValue   Integer32
-}
-
-prioGlobalDscpToQueuePHBValue OBJECT-TYPE
-    SYNTAX      Integer32 (0..7)
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "The PHB value of internal QoS label."
-    ::= { prioGlobalDscpToQueueEntry 1 }
-
-prioGlobalDscpToQueueQueueValue OBJECT-TYPE
-    SYNTAX      Integer32 (0..3)
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-        "The queue value which is mapped from the PHB value of QoS label."
-    ::= { prioGlobalDscpToQueueEntry 2 }
-
--- End of global tables for Cos priority management: cosGlobalMgt(6).
--- Corresponding interface tables are defined in cosMgt(3).
 
 --
 -- securityMgt
@@ -10704,9 +10870,6 @@ SshConnInfoEntry ::= SEQUENCE
    sshConnMinorVersion   Integer32,
    sshConnStatus         INTEGER,
 --both sshv1 & sshv2 end
---sshv1 only start
---sshConnEncryptionType INTEGER,
---sshv1 only end
 --both sshv1 & sshv2 start
    sshConnUserName       DisplayString,
    sshDisconnect         INTEGER,
@@ -15057,7 +15220,7 @@ cpuGuardTrapStatus       OBJECT-TYPE
         SYNTAX      EnabledStatus
         MAX-ACCESS  read-write
         STATUS      current
-        DESCRIPTION "The CPU guard trap status."            
+        DESCRIPTION "The CPU guard trap status."
         ::= { cpuGuard 6 }
 
 cpuGuardCurrentThreshold OBJECT-TYPE
@@ -16803,7 +16966,8 @@ dhcpSnoopPortConfigEntry    OBJECT-TYPE
 DhcpSnoopPortConfigEntry    ::= SEQUENCE
 {
         dhcpSnoopPortIfIndex        InterfaceIndex,
-        dhcpSnoopPortTrustEnable    EnabledStatus
+        dhcpSnoopPortTrustEnable    EnabledStatus,
+        dhcpSnoopPortMaxNumber      Integer32
 }
 
 dhcpSnoopPortIfIndex        OBJECT-TYPE
@@ -16820,6 +16984,15 @@ dhcpSnoopPortTrustEnable    OBJECT-TYPE
         DESCRIPTION "This object indicates whether the port or trunk is trusted
                      for DHCP Snooping purpose."
         ::= { dhcpSnoopPortConfigEntry 2 }
+
+dhcpSnoopPortMaxNumber OBJECT-TYPE
+        SYNTAX      Integer32(1..1024|65535)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "This object indicates the max client number of per port.
+                     If the value is 65535, it means the filter-only mode is
+                     enabled."
+        ::= { dhcpSnoopPortConfigEntry 6}
 --
 dhcpSnoopBindingsTable      OBJECT-TYPE
         SYNTAX      SEQUENCE OF DhcpSnoopBindingsEntry
@@ -16836,7 +17009,7 @@ dhcpSnoopBindingsEntry      OBJECT-TYPE
         DESCRIPTION "An instance contains the Mac address, IP address type,
                      IP address, VLAN number, interface number, leased time and
                      status."
-        INDEX       { dhcpSnoopBindingsVlanIndex, dhcpSnoopBindingsMacAddress }
+        INDEX       { dhcpSnoopBindingsIpAddress, dhcpSnoopBindingsMacAddress }
         ::= { dhcpSnoopBindingsTable 1 }
 
 DhcpSnoopBindingsEntry      ::= SEQUENCE
@@ -16852,7 +17025,7 @@ DhcpSnoopBindingsEntry      ::= SEQUENCE
 
 dhcpSnoopBindingsVlanIndex      OBJECT-TYPE
         SYNTAX      VlanIndex
-        MAX-ACCESS  not-accessible
+        MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION "This object indicates the VLAN which a DHCP client host
                      belongs to."
@@ -16884,7 +17057,7 @@ dhcpSnoopBindingsEntryType      OBJECT-TYPE
 
 dhcpSnoopBindingsIpAddress      OBJECT-TYPE
         SYNTAX      IpAddress
-        MAX-ACCESS  read-only
+        MAX-ACCESS  not-accessible
         STATUS      current
         DESCRIPTION "This object indicates the allocated IP address of
                      a DHCP client host."
@@ -17229,9 +17402,9 @@ ipSrcGuardPortIfIndex       OBJECT-TYPE
         ::= { ipSrcGuardConfigEntry 1 }
 
 ipSrcGuardMode      OBJECT-TYPE
-        SYNTAX      INTEGER 
-                    { diabled(0), 
-                      srcIp(1), 
+        SYNTAX      INTEGER
+                    { diabled(0),
+                      srcIp(1),
                       srcIpMac(2) }
         MAX-ACCESS  read-write
         STATUS      current
@@ -17244,23 +17417,23 @@ ipSrcGuardMode      OBJECT-TYPE
         ::= { ipSrcGuardConfigEntry 2 }
 
 ipSrcGuardTableMode OBJECT-TYPE
-        SYNTAX      INTEGER 
-                    { acl(1), 
+        SYNTAX      INTEGER
+                    { acl(1),
                       mac(2)}
         MAX-ACCESS  read-write
         STATUS      current
         DESCRIPTION "This object indicates the table mode IP Source Guard select.
                      If the value equals 1, it means IP Source Guard choose ACL mode
-                     to filter packet. If the value equals 2, it means IP Source 
+                     to filter packet. If the value equals 2, it means IP Source
                      Guard choose MAC mode to filter packet."
         ::= { ipSrcGuardConfigEntry 3}
 
 ipSrcGuardAclMaxBinding OBJECT-TYPE
-        SYNTAX      INTEGER (1..10)
+        SYNTAX      INTEGER (1..16)
         MAX-ACCESS  read-write
         STATUS      current
         DESCRIPTION "This object indicates the maximum binding number in ACL mode.
-                     The number of IP Source Guard bindings in ACL mode will 
+                     The number of IP Source Guard bindings in ACL mode will
                      be limited by this value."
         ::= { ipSrcGuardConfigEntry 4}
 
@@ -17269,7 +17442,7 @@ ipSrcGuardMacMaxBinding OBJECT-TYPE
         MAX-ACCESS  read-create
         STATUS      current
         DESCRIPTION "This object indicates the maximum binding numer in MAC mode.
-                     The number of IP Source Guard bindings in MAC mode will 
+                     The number of IP Source Guard bindings in MAC mode will
                      be limited by this value."
         ::= { ipSrcGuardConfigEntry 5}
 --
@@ -17288,8 +17461,8 @@ ipSrcGuardAclEntry     OBJECT-TYPE
         STATUS      current
         DESCRIPTION "An instance contains the IP address, Mac address, entry type,
                      VLAN number, interface number and status."
-        INDEX   { ipSrcGuardAclBindingIpAddress, 
-                  ipSrcGuardAclBindingMacAddress,  
+        INDEX   { ipSrcGuardAclBindingIpAddress,
+                  ipSrcGuardAclBindingMacAddress,
                   ipSrcGuardAclBindingEntryType}
         ::= { ipSrcGuardAclTable 1 }
 
@@ -17298,7 +17471,7 @@ IpSrcGuardAclEntry     ::= SEQUENCE
         ipSrcGuardAclBindingIpAddress         IpAddress,
         ipSrcGuardAclBindingMacAddress        MacAddress,
         ipSrcGuardAclBindingEntryType         INTEGER,
-        ipSrcGuardAclBindingVlanIndex         VlanIndex,                  
+        ipSrcGuardAclBindingVlanIndex         VlanIndex,
         ipSrcGuardAclBindingPortIfIndex       InterfaceIndex,
         ipSrcGuardAclBindingStatus            RowStatus
 }
@@ -17375,7 +17548,7 @@ IpSrcGuardMacEntry     ::= SEQUENCE
         ipSrcGuardMacBindingMacAddress        MacAddress,
         ipSrcGuardMacBindingIpAddress         IpAddress,
         ipSrcGuardMacBindingStartVlan         Integer32,
-        ipSrcGuardMacBindingEndVlan           Integer32,                  
+        ipSrcGuardMacBindingEndVlan           Integer32,
         ipSrcGuardMacBindingPortList          OCTET STRING,
         ipSrcGuardMacBindingStatus            RowStatus
 }
@@ -17525,7 +17698,7 @@ oamLoopbackEntry OBJECT-TYPE
     ::= { oamLoopbackTable 1 }
 
 OamLoopbackEntry ::= SEQUENCE
-{    
+{
     oamLoopbackTestIfIndex          InterfaceIndex,
     oamLoopbackTestPacketNumber     Integer32,
     oamLoopbackTestPacketSize       Integer32,
@@ -17536,30 +17709,30 @@ OamLoopbackEntry ::= SEQUENCE
 }
 
 oamLoopbackTestIfIndex OBJECT-TYPE
-    SYNTAX      InterfaceIndex 
+    SYNTAX      InterfaceIndex
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION "The ifIndex value of the port
-                 (excluding trunk and trunk members). The interface 
-                 identified by a particular value of this index is the same 
-                 interface as identified by the same value of ifIndex in the 
+                 (excluding trunk and trunk members). The interface
+                 identified by a particular value of this index is the same
+                 interface as identified by the same value of ifIndex in the
                  IF-MIB."
         ::= { oamLoopbackEntry 1 }
-        
+
 oamLoopbackTestPacketNumber OBJECT-TYPE
     SYNTAX     Integer32(1..99999999)
     MAX-ACCESS read-write
     STATUS     current
     DESCRIPTION "Setting the packet number when performing loopback test."
     ::= { oamLoopbackEntry 2}
-    
+
 oamLoopbackTestPacketSize OBJECT-TYPE
     SYNTAX      Integer32(64..1518)
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION "Setting the packet size when performing loopback test."
     ::= { oamLoopbackEntry 3 }
-                
+
 oamLoopbackTestAction OBJECT-TYPE
     SYNTAX  INTEGER
             {
@@ -17572,16 +17745,16 @@ oamLoopbackTestAction OBJECT-TYPE
                  This object will be noTest(1) when the loopback test is
                  canceled or the loopback test has finished."
     ::= { oamLoopbackEntry 4}
-    
+
 oamLoopbackTestResultTx OBJECT-TYPE
     SYNTAX      Counter32
     UNITS       "frames"
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION "A count of the the total number of loopback frames transmitted 
-                 at last loopback test on this interface."        
+    DESCRIPTION "A count of the the total number of loopback frames transmitted
+                 at last loopback test on this interface."
     ::= { oamLoopbackEntry 5}
-    
+
 oamLoopbackTestResultRx OBJECT-TYPE
     SYNTAX      Counter32
     UNITS       "frames"
@@ -17589,19 +17762,19 @@ oamLoopbackTestResultRx OBJECT-TYPE
     STATUS      current
     DESCRIPTION "A count of the the total number of loopback frames received
                  at last loopback test on this interface."
-    ::= { oamLoopbackEntry 6}  
+    ::= { oamLoopbackEntry 6}
 
 oamLoopbackTestResultLossRate OBJECT-TYPE
     SYNTAX     Integer32 (0..10000)
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION "Packet loss rate of this loopback test operation in hundredths
-                 of a percent. This variable is calculated by 
+                 of a percent. This variable is calculated by
                  oamLoopbackTestResultRx and oamLoopbackTestResultTx."
-    ::= { oamLoopbackEntry 7}  
+    ::= { oamLoopbackEntry 7}
 
 oamPrivateEventLogType OBJECT-TYPE
-    SYNTAX      INTEGER 
+    SYNTAX      INTEGER
                 {
                     connectionToRemoteDeviceUp(1001),
                     connectionToRemoteDeviceDown(1002),
@@ -17611,7 +17784,7 @@ oamPrivateEventLogType OBJECT-TYPE
                 }
     MAX-ACCESS  not-accessible
     STATUS      current
-    DESCRIPTION "This object augments the dot3OamEventLogType  
+    DESCRIPTION "This object augments the dot3OamEventLogType
                  of dot3OamEventLogTable in DOT3-OAM-MIB.
                  When the OUI (dot3OamEventLogOui) is 0x0012CF, the following
                  event types are defined:
@@ -21148,8 +21321,8 @@ fileCopyTrap NOTIFICATION-TYPE
     DESCRIPTION "This trap is sent when file copy is executed.
                  If the copy action is triggered by system,
                  the login user information(trapVarLoginUserName/
-                 trapVarSessionType/trapVarLoginInetAddressTypes/
-                 trapVarLoginInetAddres) will be null value."
+                 trapVarSessionType/trapVarLoginInetAddressType/
+                 trapVarLoginInetAddress) will be null value."
     ::= { es3510maTrapsPrefix 208 }
 
 userauthCreateUserTrap NOTIFICATION-TYPE
@@ -21179,13 +21352,13 @@ userauthModifyUserPrivilegeTrap NOTIFICATION-TYPE
 
 cpuGuardControlTrap NOTIFICATION-TYPE
     STATUS      current
-    DESCRIPTION "This trap is sent when CPU utilization 
+    DESCRIPTION "This trap is sent when CPU utilization
                  rises above the high-watermark first time or when CPU utilization
                  rises from below the low-watermark to above the high-watermark."
     ::= { es3510maTrapsPrefix 213 }
 
 cpuGuardReleaseTrap NOTIFICATION-TYPE
-    STATUS      current 
+    STATUS      current
     DESCRIPTION "This trap is sent when CPU utilization falls from
                  above the high-watermark to below the low-watermark."
     ::= { es3510maTrapsPrefix 214 }

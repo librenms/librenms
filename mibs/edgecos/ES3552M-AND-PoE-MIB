@@ -1,4 +1,4 @@
-ES3528MO-MIB DEFINITIONS ::= BEGIN
+ES3552M-AND-PoE-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
 
@@ -15,7 +15,7 @@ IMPORTS
                 FROM IF-MIB
         EnabledStatus
                 FROM P-BRIDGE-MIB
-		BridgeId, Timeout, dot1dStpPort,dot1dStpPortEntry, MacAddress
+        BridgeId, Timeout, dot1dStpPort,dot1dStpPortEntry, MacAddress
                 FROM BRIDGE-MIB
         dot1xAuthConfigEntry
                 FROM IEEE8021-PAE-MIB;
@@ -23,9 +23,11 @@ IMPORTS
 accton              OBJECT IDENTIFIER ::= { enterprises 259 }
 snmpMgt             OBJECT IDENTIFIER ::= { accton 6 }
 cheetahSwitchMgt    OBJECT IDENTIFIER ::= { snmpMgt 10 }
+edgecore            OBJECT IDENTIFIER ::= { accton 8 }
+edgeCoreSwitchMgt   OBJECT IDENTIFIER ::= { edgecore 1 }
 
-es3528moMIB MODULE-IDENTITY
-        LAST-UPDATED "200605240000Z"
+es3552m-and-poeMIB MODULE-IDENTITY
+        LAST-UPDATED "200907170000Z"
         ORGANIZATION "Accton Technology Corp."
         CONTACT-INFO
                 "Accton Technology Corp.
@@ -39,47 +41,51 @@ es3528moMIB MODULE-IDENTITY
                  Fax: +886-3-5780764
                  E-mail: sales_ec@edge-core.com"
         DESCRIPTION
-                "The MIB module for ES3528MO."
+                "The MIB module for ES3528/52M[-V1] and ES3528/52M[-V1]-PoE."
         REVISION "200605240000Z"
         DESCRIPTION
                 "Initial version of this MIB."
-        ::= { cheetahSwitchMgt 94 }
+        ::= { edgeCoreSwitchMgt 12 }
 
-es3528moMIBObjects       OBJECT IDENTIFIER ::= { es3528moMIB 1 }
-es3528moNotifications    OBJECT IDENTIFIER ::= { es3528moMIB 2 }
-es3528moConformance      OBJECT IDENTIFIER ::= { es3528moMIB 3 }
+es3552m-and-poeMIBObjects       OBJECT IDENTIFIER ::= { es3552m-and-poeMIB 1 }
+es3552m-and-poeNotifications    OBJECT IDENTIFIER ::= { es3552m-and-poeMIB 2 }
+es3552m-and-poeConformance      OBJECT IDENTIFIER ::= { es3552m-and-poeMIB 3 }
 
 --supported groups
-switchMgt           OBJECT IDENTIFIER ::= { es3528moMIBObjects 1 }
-portMgt             OBJECT IDENTIFIER ::= { es3528moMIBObjects 2 }
-trunkMgt            OBJECT IDENTIFIER ::= { es3528moMIBObjects 3 }
-lacpMgt             OBJECT IDENTIFIER ::= { es3528moMIBObjects 4 }
-staMgt              OBJECT IDENTIFIER ::= { es3528moMIBObjects 5 }
-restartMgt          OBJECT IDENTIFIER ::= { es3528moMIBObjects 7 }
-mirrorMgt           OBJECT IDENTIFIER ::= { es3528moMIBObjects 8 }
-igmpSnoopMgt        OBJECT IDENTIFIER ::= { es3528moMIBObjects 9 }
-ipMgt               OBJECT IDENTIFIER ::= { es3528moMIBObjects 10 }
-vlanMgt             OBJECT IDENTIFIER ::= { es3528moMIBObjects 12 }
-priorityMgt         OBJECT IDENTIFIER ::= { es3528moMIBObjects 13 }
-trapDestMgt         OBJECT IDENTIFIER ::= { es3528moMIBObjects 14 }
-qosMgt              OBJECT IDENTIFIER ::= { es3528moMIBObjects 16 }
-securityMgt         OBJECT IDENTIFIER ::= { es3528moMIBObjects 17 }
-sysLogMgt           OBJECT IDENTIFIER ::= { es3528moMIBObjects 19 }
-lineMgt             OBJECT IDENTIFIER ::= { es3528moMIBObjects 20 }
-sysTimeMgt          OBJECT IDENTIFIER ::= { es3528moMIBObjects 23 }
-fileMgt             OBJECT IDENTIFIER ::= { es3528moMIBObjects 24 }
-dnsMgt              OBJECT IDENTIFIER ::= { es3528moMIBObjects 26 }
-stormMgt            OBJECT IDENTIFIER ::= { es3528moMIBObjects 33 }
-sysResourceMgt      OBJECT IDENTIFIER ::= { es3528moMIBObjects 39 }
-mvrMgt              OBJECT IDENTIFIER ::= { es3528moMIBObjects 44 }
-dhcpSnoopMgt        OBJECT IDENTIFIER ::= { es3528moMIBObjects 46 }
-clusterMgt          OBJECT IDENTIFIER ::= { es3528moMIBObjects 47 }
-ipSrcGuardMgt       OBJECT IDENTIFIER ::= { es3528moMIBObjects 48 }
-upnpMgt             OBJECT IDENTIFIER ::= { es3528moMIBObjects 49 }
-sFlowMgt            OBJECT IDENTIFIER ::= { es3528moMIBObjects 55 }
-dynamicArpInspectionMgt         OBJECT IDENTIFIER ::= { es3528moMIBObjects 56 }
-erpsMgt             OBJECT IDENTIFIER ::= { es3528moMIBObjects 62 }
-lbdMgt              OBJECT IDENTIFIER ::= { es3528moMIBObjects 63 }
+switchMgt           OBJECT IDENTIFIER ::= { es3552m-and-poeMIBObjects 1 }
+portMgt             OBJECT IDENTIFIER ::= { es3552m-and-poeMIBObjects 2 }
+trunkMgt            OBJECT IDENTIFIER ::= { es3552m-and-poeMIBObjects 3 }
+lacpMgt             OBJECT IDENTIFIER ::= { es3552m-and-poeMIBObjects 4 }
+staMgt              OBJECT IDENTIFIER ::= { es3552m-and-poeMIBObjects 5 }
+restartMgt          OBJECT IDENTIFIER ::= { es3552m-and-poeMIBObjects 7 }
+mirrorMgt           OBJECT IDENTIFIER ::= { es3552m-and-poeMIBObjects 8 }
+igmpSnoopMgt        OBJECT IDENTIFIER ::= { es3552m-and-poeMIBObjects 9 }
+ipMgt               OBJECT IDENTIFIER ::= { es3552m-and-poeMIBObjects 10 }
+vlanMgt             OBJECT IDENTIFIER ::= { es3552m-and-poeMIBObjects 12 }
+priorityMgt         OBJECT IDENTIFIER ::= { es3552m-and-poeMIBObjects 13 }
+trapDestMgt         OBJECT IDENTIFIER ::= { es3552m-and-poeMIBObjects 14 }
+qosMgt              OBJECT IDENTIFIER ::= { es3552m-and-poeMIBObjects 16 }
+securityMgt         OBJECT IDENTIFIER ::= { es3552m-and-poeMIBObjects 17 }
+sysLogMgt           OBJECT IDENTIFIER ::= { es3552m-and-poeMIBObjects 19 }
+lineMgt             OBJECT IDENTIFIER ::= { es3552m-and-poeMIBObjects 20 }
+sysTimeMgt          OBJECT IDENTIFIER ::= { es3552m-and-poeMIBObjects 23 }
+fileMgt             OBJECT IDENTIFIER ::= { es3552m-and-poeMIBObjects 24 }
+dnsMgt              OBJECT IDENTIFIER ::= { es3552m-and-poeMIBObjects 26 }
+stormMgt            OBJECT IDENTIFIER ::= { es3552m-and-poeMIBObjects 33 }
+sysResourceMgt      OBJECT IDENTIFIER ::= { es3552m-and-poeMIBObjects 39 }
+mvrMgt              OBJECT IDENTIFIER ::= { es3552m-and-poeMIBObjects 44 }
+dhcpSnoopMgt        OBJECT IDENTIFIER ::= { es3552m-and-poeMIBObjects 46 }
+clusterMgt          OBJECT IDENTIFIER ::= { es3552m-and-poeMIBObjects 47 }
+ipSrcGuardMgt       OBJECT IDENTIFIER ::= { es3552m-and-poeMIBObjects 48 }
+upnpMgt             OBJECT IDENTIFIER ::= { es3552m-and-poeMIBObjects 49 }
+sFlowMgt            OBJECT IDENTIFIER ::= { es3552m-and-poeMIBObjects 55 }
+dynamicArpInspectionMgt         OBJECT IDENTIFIER ::= { es3552m-and-poeMIBObjects 56 }
+erpsMgt             OBJECT IDENTIFIER ::= { es3552m-and-poeMIBObjects 62 }
+lbdMgt              OBJECT IDENTIFIER ::= { es3552m-and-poeMIBObjects 63 }
+
+--
+-- Product sysObjectID values
+--
 
 -- -------------------------------------------------------------
 -- Textual Conventions
@@ -129,7 +135,7 @@ StaPathCostMode ::= TEXTUAL-CONVENTION
 FileCopyStatus ::= TEXTUAL-CONVENTION
        STATUS       current
        DESCRIPTION
-       		   "The file copy result status."
+               "The file copy result status."
        SYNTAX  INTEGER {
                     fileCopyTftpUndefError(1),
                     fileCopyTftpFileNotFound(2),
@@ -1010,6 +1016,44 @@ portOutUtil OBJECT-TYPE
                      hundred."
         ::= { portUtilEntry 7 }
 
+portVlanTrunkingTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PortVlanTrunkingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Configures vlan trunking feature."
+    ::= { portMgt 7 }
+
+portVlanTrunkingEntry OBJECT-TYPE
+    SYNTAX      PortVlanTrunkingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Configures vlan trunking feature."
+    INDEX       { portVlanTrunkingIfIndex }
+    ::= { portVlanTrunkingTable 1 }
+
+PortVlanTrunkingEntry ::= SEQUENCE
+{
+    portVlanTrunkingIfIndex     Integer32,
+    portVlanTrunkingStatus      EnabledStatus
+}
+
+portVlanTrunkingIfIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "The port and trunk interface of the portVlanTrunkingTable.
+                 The interface identified by a particular value of this
+                 index is the same interface identified by the same value
+                 of ifIndex in the IF-MIB."
+    ::= { portVlanTrunkingEntry 1 }
+
+portVlanTrunkingStatus OBJECT-TYPE
+    SYNTAX      EnabledStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Whether vlan trunking is enabled."
+    ::= { portVlanTrunkingEntry 2 }
+
 --
 -- trunkMgt
 --
@@ -1198,7 +1242,7 @@ StaPortEntry ::= SEQUENCE
     staPortRootGuardAdminStatus     EnabledStatus,
     staPortRootGuardOperStatus      EnabledStatus,
     staPortBpduGuard                EnabledStatus,
-    staPortAdminEdgePortWithAuto	INTEGER,
+    staPortAdminEdgePortWithAuto    INTEGER,
     staPortBpduFilter               EnabledStatus,
     staPortBpduGuardAutoRecovery            EnabledStatus,
     staPortBpduGuardAutoRecoveryInterval    Unsigned32
@@ -1362,12 +1406,12 @@ staPortAdminEdgePortWithAuto OBJECT-TYPE
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION "The administrative value of the edge port parameter.
-    		A value of enable(1) indicates that this port should be
-    		assumed as an edge-port, a value of disable(2) indicates
-    		that this port should be assumed as a non-edge-port and
-    		a value of auot (3) indicates this port in RSPT or MSTP mode
-    		should be assumed as an edge-port after migration or max age expire
-    		without receiving any BPDU and sending BPDU with proposal flag on."
+            A value of enable(1) indicates that this port should be
+            assumed as an edge-port, a value of disable(2) indicates
+            that this port should be assumed as a non-edge-port and
+            a value of auot (3) indicates this port in RSPT or MSTP mode
+            should be assumed as an edge-port after migration or max age expire
+            without receiving any BPDU and sending BPDU with proposal flag on."
     ::= { staPortEntry 17 }
 
 staPortBpduFilter  OBJECT-TYPE
@@ -3074,128 +3118,6 @@ igmpSnoopThrottlePortCurrentGroups   OBJECT-TYPE
         ::= { igmpSnoopThrottlePortEntry 5}
 
 --
--- igmpSnoopPortTable
---
-igmpSnoopPortTable OBJECT-TYPE
-    SYNTAX      SEQUENCE OF IgmpSnoopPortEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "Table of IGMP Snooping service per port."
-    ::= {igmpSnoopMgt 27 }
-
-igmpSnoopPortEntry OBJECT-TYPE
-    SYNTAX      IgmpSnoopPortEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "Entry of IGMP Snooping service per port."
-    INDEX       { igmpSnoopPortIndex }
-    ::= {igmpSnoopPortTable 1}
-
-IgmpSnoopPortEntry ::=
-    SEQUENCE {
-        igmpSnoopPortIndex   Unsigned32,
-        igmpSnoopQueryDrop   EnabledStatus
-    }
-
-igmpSnoopPortIndex OBJECT-TYPE
-    SYNTAX      Unsigned32
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "The port and the trunk (excluding trunk members)
-         interface of the igmpSnoopPortTable. The interface
-         identified by a particular value of this index
-         is the same interface as identified by the same
-         value of ifIndex in the IF-MIB."
-    ::= { igmpSnoopPortEntry 1 }
-
-
-igmpSnoopQueryDrop OBJECT-TYPE
-        SYNTAX      INTEGER
-                {
-                    enable(1),
-                    disable(2)
-                }
-        MAX-ACCESS  read-write
-        STATUS      current
-        DESCRIPTION "Parameter to enable or disable dropping IGMP Query packet."
-        DEFVAL      { disable }
-        ::= { igmpSnoopPortEntry 3 }
-
-igmpSnoopForwardingPriority OBJECT-TYPE
-    SYNTAX      Integer32(0..6|65535)
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-        "Configure IGMP snooping multicast stream forwarding priority.
-        If value is 65535, it means the priority is disabled"
-    ::= { igmpSnoopMgt 29 }
-
---
--- igmpSnoopPortVlanTable
---
-igmpSnoopPortVlanTable OBJECT-TYPE
-    SYNTAX      SEQUENCE OF IgmpSnoopPortVlanEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "Table of IGMP Snooping service per port per VLAN."
-    ::= {igmpSnoopMgt 32 }
-
-igmpSnoopPortVlanEntry OBJECT-TYPE
-    SYNTAX      IgmpSnoopPortVlanEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "Entry of IGMP Snooping service per port."
-    INDEX       { igmpSnoopPortVlanPortIndex, igmpSnoopPortVlanVlanIndex}
-    ::= {igmpSnoopPortVlanTable 1}
-
-IgmpSnoopPortVlanEntry ::=
-    SEQUENCE {
-        igmpSnoopPortVlanPortIndex   Unsigned32,
-        igmpSnoopPortVlanVlanIndex   Unsigned32,
-        igmpSnoopPortVlanQueryDrop   EnabledStatus
-    }
-
-igmpSnoopPortVlanPortIndex OBJECT-TYPE
-    SYNTAX      Unsigned32
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "The port and the trunk (excluding trunk members)
-         interface of the igmpSnoopPortTable. The interface
-         identified by a particular value of this index
-         is the same interface as identified by the same
-         value of ifIndex in the IF-MIB."
-    ::= { igmpSnoopPortVlanEntry 1 }
-
-igmpSnoopPortVlanVlanIndex OBJECT-TYPE
-    SYNTAX      Unsigned32
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "The interface identified by a particular value of
-         this index is the same interface as identified by
-         the same value of dot1qVlanIndex in the Q-BRIDGE-MIB."
-    ::= { igmpSnoopPortVlanEntry 2 }
-
-igmpSnoopPortVlanQueryDrop OBJECT-TYPE
-        SYNTAX      INTEGER
-                {
-                    enable(1),
-                    disable(2)
-                }
-        MAX-ACCESS  read-write
-        STATUS      current
-        DESCRIPTION "Parameter to enable or disable dropping IGMP Query packet."
-        DEFVAL      { disable }
-        ::= { igmpSnoopPortVlanEntry 3 }
-
-
---
 -- The IpMgt Group
 --
 
@@ -3298,51 +3220,51 @@ netConfigStatus  OBJECT-TYPE
     MAX-ACCESS read-create
     STATUS     current
     DESCRIPTION
-			"The status of this conceptual row entry. This object isused to manage the
-			creation and deletion of conceptual rows.
+            "The status of this conceptual row entry. This object isused to manage the
+            creation and deletion of conceptual rows.
 
-			The status column has six defined values:
+            The status column has six defined values:
 
-			     - 'active', which indicates that the conceptual row is
-			     available for use by the managed device;
+                 - 'active', which indicates that the conceptual row is
+                 available for use by the managed device;
 
-			     - 'notInService', which indicates that the conceptual
-			     row exists in the agent, but is unavailable for use by
-			     the managed device (see NOTE below);
+                 - 'notInService', which indicates that the conceptual
+                 row exists in the agent, but is unavailable for use by
+                 the managed device (see NOTE below);
 
-			     - 'notReady', which indicates that the conceptual row
-			     exists in the agent, but is missing information
-			     necessary in order to be available for use by the
-			     managed device;
+                 - 'notReady', which indicates that the conceptual row
+                 exists in the agent, but is missing information
+                 necessary in order to be available for use by the
+                 managed device;
 
-			     - 'createAndGo', which is supplied by a management
-			     station wishing to create a new instance of a
-			     conceptual row and to have its status automatically set
-			     to active, making it available for use by the managed
-			     device;
+                 - 'createAndGo', which is supplied by a management
+                 station wishing to create a new instance of a
+                 conceptual row and to have its status automatically set
+                 to active, making it available for use by the managed
+                 device;
 
-			     - 'createAndWait', which is supplied by a management
-			     station wishing to create a new instance of a
-			     conceptual row (but not make it available for use by
-			     the managed device); and,
+                 - 'createAndWait', which is supplied by a management
+                 station wishing to create a new instance of a
+                 conceptual row (but not make it available for use by
+                 the managed device); and,
 
-			     - 'destroy', which is supplied by a management station
-			     wishing to delete all of the instances associated with
-			     an existing conceptual row.
+                 - 'destroy', which is supplied by a management station
+                 wishing to delete all of the instances associated with
+                 an existing conceptual row.
 
-			Whereas five of the six values (all except 'notReady') may
-			be specified in a management protocol set operation, only
-			three values will be returned in response to a management
-			protocol retrieval operation: 'notReady', 'notInService' or
-			'active'. That is, when queried, an existing conceptual row
-			has only three states:  it is either available for use by
-			the managed device (the status column has value 'active');
-			it is not available for use by the managed device, though
-			the agent has sufficient information to make it so (the
-			status column has value 'notInService'); or, it is not
-			available for use by the managed device, and an attempt to
-			make it so would fail because the agent has insufficient
-			information (the state column has value 'notReady').
+            Whereas five of the six values (all except 'notReady') may
+            be specified in a management protocol set operation, only
+            three values will be returned in response to a management
+            protocol retrieval operation: 'notReady', 'notInService' or
+            'active'. That is, when queried, an existing conceptual row
+            has only three states:  it is either available for use by
+            the managed device (the status column has value 'active');
+            it is not available for use by the managed device, though
+            the agent has sufficient information to make it so (the
+            status column has value 'notInService'); or, it is not
+            available for use by the managed device, and an attempt to
+            make it so would fail because the agent has insufficient
+            information (the state column has value 'notReady').
 
             For a detailed description of this object, please refer to
             SNMPv2-TC MIB."
@@ -3404,7 +3326,7 @@ ipHttpsPort OBJECT-TYPE
 
 dhcpMgt              OBJECT IDENTIFIER ::= { ipMgt 11 }
 dhcpClient           OBJECT IDENTIFIER ::= { dhcpMgt 1 }
-dhcpOption82		 OBJECT IDENTIFIER ::= { dhcpMgt 4 }
+dhcpOption82         OBJECT IDENTIFIER ::= { dhcpMgt 4 }
 dhcpcOptions         OBJECT IDENTIFIER ::= { dhcpClient 1 }
 
 dhcpcInterfaceTable OBJECT-TYPE
@@ -3469,10 +3391,10 @@ dhcpOption82Status OBJECT-TYPE
             disabled(2)
         }
         MAX-ACCESS read-write
-	    STATUS     current
-	    DESCRIPTION
+        STATUS     current
+        DESCRIPTION
             "Set enabled(1) to enable DHCP Relay Option 82,
-			set disabled(2) to disable it."
+            set disabled(2) to disable it."
         ::= { dhcpOption82 1 }
 
 dhcpOption82Policy OBJECT-TYPE
@@ -3482,89 +3404,12 @@ dhcpOption82Policy OBJECT-TYPE
             replace(2),
             keep(3)
         }
-	    MAX-ACCESS read-write
-	    STATUS     current
-	    DESCRIPTION
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
             "Provide three policies to handle packet"
-	    ::= { dhcpOption82 2 }
+        ::= { dhcpOption82 2 }
 
-dhcpOption82RemoteIDMode OBJECT-TYPE
-		SYNTAX		INTEGER
-		{
-			mac-address-in-hex(1),
-			mac-address-in-ascii(2),
-			ip-address-in-hex(3),
-			ip-address-in-ascii(4),
-			configured-string(5)
-		}
-		MAX-ACCESS read-write
-		STATUS	   current
-		DESCRIPTION
-			"Provide five mode for insertion remote-id sub-option of option 82.
-			 If configured-string(5) has been set, dhcpOption82RemoteIDString
-			 will take effect."
-		::= { dhcpOption82 3 }
-
-dhcpOption82RemoteIDString OBJECT-TYPE
-		SYNTAX		OCTET STRING (SIZE(0..32))
-		MAX-ACCESS read-write
-		STATUS	   current
-		DESCRIPTION
-			"Set string to remote-id sub-option of option 82.
-			 It only take effect when dhcpOption82RemoteIDMode is set to configured-string(5)"
-		::= { dhcpOption82 4 }
-
-dhcpOption82EncodeFormat OBJECT-TYPE
-		SYNTAX		INTEGER
-		{
-			extra-subtype-included(1),
-			no-extra-subtype-included(2)
-		}
-		MAX-ACCESS read-write
-		STATUS	   current
-		DESCRIPTION
-			"Set encode format for CID and RID in option82.
-			 Set extra-subtype-included(1) will have extra subtype and length field in CID and RID.
-			 Set no-extra-subtype-included(2) will only have TLV format for CID and RID."
-		::= { dhcpOption82 5 }
-
-dhcpOption82RelayServerAddrTable OBJECT-TYPE
-          SYNTAX      SEQUENCE OF DhcpOption82RelayServerAddrEntry
-          MAX-ACCESS  not-accessible
-          STATUS      current
-          DESCRIPTION " This table is to specify relay server IP address,
-                        the maximum number of server IP addresses user can specify is 5.
-                        "
-          ::= { dhcpOption82 6 }
-
-dhcpOption82RelayServerAddrEntry OBJECT-TYPE
-          SYNTAX      DhcpOption82RelayServerAddrEntry
-          MAX-ACCESS  not-accessible
-          STATUS      current
-          DESCRIPTION "A conceptual row of dhcpOption82RelayServerAddrTable."
-          INDEX { dhcpOption82RelayServerAddrIndex }
-          ::= { dhcpOption82RelayServerAddrTable 1 }
-
-DhcpOption82RelayServerAddrEntry ::= SEQUENCE
-{
-     dhcpOption82RelayServerAddrIndex Integer32,
-     dhcpOption82RelayServerAddrServerIp  IpAddress
-}
-
-dhcpOption82RelayServerAddrIndex OBJECT-TYPE
-          SYNTAX      Integer32 (1..5)
-          MAX-ACCESS  not-accessible
-          STATUS      current
-          DESCRIPTION "The index of the relay server IP address."
-          ::= { dhcpOption82RelayServerAddrEntry 1 }
-
-dhcpOption82RelayServerAddrServerIp OBJECT-TYPE
-          SYNTAX      IpAddress
-          MAX-ACCESS  read-write
-          STATUS      current
-          DESCRIPTION "The IP address of the relay server."
-          ::= { dhcpOption82RelayServerAddrEntry 2 }
-		  
 arpCacheDeleteAll OBJECT-TYPE
         SYNTAX      INTEGER
                     {
@@ -3698,10 +3543,10 @@ vlanPortPrivateVlanType OBJECT-TYPE
 protocolVlanTable   OBJECT-TYPE
     SYNTAX      SEQUENCE OF ProtocolVlanEntry
     MAX-ACCESS  not-accessible
-	STATUS      current
-	DESCRIPTION "The configuration table which contains the binding entry
-	             of the protocol-group and VLANs."
-	::= { vlanMgt 5 }
+    STATUS      current
+    DESCRIPTION "The configuration table which contains the binding entry
+                 of the protocol-group and VLANs."
+    ::= { vlanMgt 5 }
 
 protocolVlanEntry   OBJECT-TYPE
     SYNTAX      ProtocolVlanEntry
@@ -3807,55 +3652,55 @@ voiceVlanMgt        OBJECT IDENTIFIER ::= { vlanMgt 6 }
 voiceVlanOuiTable   OBJECT-TYPE
     SYNTAX      SEQUENCE OF VoiceVlanOuiEntry
     MAX-ACCESS  not-accessible
-	STATUS      current
-	DESCRIPTION "A table containing the mac address which can be identified
-	             by voice vlan."
-	::= { voiceVlanMgt 1 }
+    STATUS      current
+    DESCRIPTION "A table containing the mac address which can be identified
+                 by voice vlan."
+    ::= { voiceVlanMgt 1 }
 
 voiceVlanOuiEntry OBJECT-TYPE
-		SYNTAX  VoiceVlanOuiEntry
-		MAX-ACCESS not-accessible
-		STATUS current
-		DESCRIPTION "A table containing the mac address which can be identified
-		             by voice vlan."
+        SYNTAX  VoiceVlanOuiEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION "A table containing the mac address which can be identified
+                     by voice vlan."
         INDEX   { voiceVlanOuiAddress }
         ::= { voiceVlanOuiTable 1 }
 
-VoiceVlanOuiEntry	::=
-	SEQUENCE {
-              voiceVlanOuiAddress	    MacAddress,
-              voiceVlanOuiMask	        MacAddress,
-              voiceVlanOuiDescription	DisplayString,
-              voiceVlanOuiStatus  	    ValidStatus
-		     }
+VoiceVlanOuiEntry   ::=
+    SEQUENCE {
+              voiceVlanOuiAddress       MacAddress,
+              voiceVlanOuiMask          MacAddress,
+              voiceVlanOuiDescription   DisplayString,
+              voiceVlanOuiStatus        ValidStatus
+             }
 
 voiceVlanOuiAddress OBJECT-TYPE
         SYNTAX      MacAddress
-		MAX-ACCESS  read-only
-		STATUS      current
-		DESCRIPTION "MAC address can be identified by voice vlan."
-		::= { voiceVlanOuiEntry 1 }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "MAC address can be identified by voice vlan."
+        ::= { voiceVlanOuiEntry 1 }
 
 voiceVlanOuiMask OBJECT-TYPE
-		SYNTAX      MacAddress
-		MAX-ACCESS  read-write
-		STATUS      current
-		DESCRIPTION "The mask of MAC address."
-		::= { voiceVlanOuiEntry 2 }
+        SYNTAX      MacAddress
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The mask of MAC address."
+        ::= { voiceVlanOuiEntry 2 }
 
 voiceVlanOuiDescription OBJECT-TYPE
-		SYNTAX      DisplayString (SIZE(0..30))
-		MAX-ACCESS  read-write
-		STATUS      current
-		DESCRIPTION "The description of oui."
-		::= { voiceVlanOuiEntry 3 }
+        SYNTAX      DisplayString (SIZE(0..30))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The description of oui."
+        ::= { voiceVlanOuiEntry 3 }
 
 voiceVlanOuiStatus OBJECT-TYPE
-		SYNTAX      ValidStatus
-		MAX-ACCESS  read-create
-		STATUS      current
-		DESCRIPTION "Current operation status of the row."
-		::= { voiceVlanOuiEntry 4 }
+        SYNTAX      ValidStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "Current operation status of the row."
+        ::= { voiceVlanOuiEntry 4 }
 
 voiceVlanEnabledId  OBJECT-TYPE
         SYNTAX      INTEGER
@@ -3869,7 +3714,7 @@ voiceVlanAgingTime  OBJECT-TYPE
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION " Voice vlan aging time, the unit of which is minute."
-	DEFVAL      { 1440 }
+    DEFVAL      { 1440 }
         ::= { voiceVlanMgt 3 }
 
 voiceVlanPortTable OBJECT-TYPE
@@ -3896,7 +3741,7 @@ VoiceVlanPortEntry ::=
          voiceVlanPortPriority  INTEGER,
          voiceVlanPortRuleOui   EnabledStatus,
          voiceVlanPortRuleLldp  EnabledStatus
-		 }
+         }
 
 voiceVlanPortIfIndex OBJECT-TYPE
         SYNTAX      Integer32(1..2147483647)
@@ -3905,15 +3750,15 @@ voiceVlanPortIfIndex OBJECT-TYPE
         DESCRIPTION "The index of interface on which voice vlan function
                     is enabled."
         REFERENCE "IfIndex in RFC1213"
-	::= { voiceVlanPortEntry 1 }
+    ::= { voiceVlanPortEntry 1 }
 
 voiceVlanPortMode OBJECT-TYPE
         SYNTAX      INTEGER
-                	{
-                	auto (1),
-                	manual (2),
-                	none (3)
-                	}
+                    {
+                    auto (1),
+                    manual (2),
+                    none (3)
+                    }
         MAX-ACCESS  read-write
         STATUS      current
         DESCRIPTION "Voice vlan configuration mode status."
@@ -3950,22 +3795,6 @@ voiceVlanPortRuleLldp OBJECT-TYPE
                      LLDP discovery."
         ::= { voiceVlanPortEntry 6 }
 
-voiceVlanRemarkIpDscpStatus  OBJECT-TYPE
-        SYNTAX      EnabledStatus
-        MAX-ACCESS  read-write
-        STATUS      current
-        DESCRIPTION "Set enabled(1) to enable remarking of IP DSCP
-                     for voice traffic. Set disabled(2) to disable
-                     it."
-        ::= { voiceVlanMgt 8 }
-        
-voiceVlanIpDscp  OBJECT-TYPE
-        SYNTAX      INTEGER
-        MAX-ACCESS  read-write
-        STATUS      current
-        DESCRIPTION "New IP DSCP value for voice traffic."
-        ::= { voiceVlanMgt 9 }
-
 --
 -- macVlanMgt
 --
@@ -3982,15 +3811,14 @@ macVlanEntry OBJECT-TYPE
         MAX-ACCESS  not-accessible
         STATUS      current
         DESCRIPTION "A conceptual row in the macVlanTable."
-        INDEX       { macVlanMacMask, macVlanMacAddress }
+        INDEX       { macVlanMacAddress }
         ::= { macVlanTable 1 }
 
 MacVlanEntry ::= SEQUENCE
 {
         macVlanMacAddress       MacAddress,
         macVlanId               Integer32,
-        macVlanStatus           ValidStatus,
-        macVlanMacMask          MacAddress
+        macVlanStatus           ValidStatus
 }
 
 macVlanMacAddress OBJECT-TYPE
@@ -4016,14 +3844,6 @@ macVlanStatus OBJECT-TYPE
         DESCRIPTION "Set this to valid(1) to create an entry. Set this to
                      invalid(2) to destroy an entry."
         ::= { macVlanEntry 4 }
-
-macVlanMacMask OBJECT-TYPE
-        SYNTAX      MacAddress
-        MAX-ACCESS  not-accessible
-        STATUS      current
-        DESCRIPTION "The MAC address mask that may specify an entry in the table
-                     which contains MAC-based VLAN information."
-        ::= { macVlanEntry 5 }
 
 macVlanClearAction OBJECT-TYPE
         SYNTAX      INTEGER
@@ -4155,6 +3975,7 @@ VlanL2ProtocolTunnelPortEntry ::= SEQUENCE
     vlanL2ptPortCdp             EnabledStatus,
     vlanL2ptPortVtp             EnabledStatus,
     vlanL2ptPortPvst            EnabledStatus
+
 }
 
 vlanL2ptPortIndex OBJECT-TYPE
@@ -4368,14 +4189,14 @@ prioWrrWeight OBJECT-TYPE
         ::= { prioWrrEntry 2 }
 
 prioQueueMode OBJECT-TYPE
-        SYNTAX 	INTEGER {
-	                wrr(1),
-	                strict(2)
-            	}
+        SYNTAX  INTEGER {
+                    wrr(1),
+                    strict(2)
+                }
         MAX-ACCESS  read-write
         STATUS      current
         DESCRIPTION "The global status for the prioQueue.
-        			wrr(1),strict(2)"
+                    wrr(1),strict(2)"
         ::= { priorityMgt 10 }
 
 -- trapDestMgt
@@ -4523,37 +4344,6 @@ trapDhcpServerIpAddress OBJECT-TYPE
     STATUS      current
     DESCRIPTION "The IP address of the rouge server."
     ::= { trapVar 21 }
-
--- For MAC Notification Trap
-trapMacNotifyVid OBJECT-TYPE
-    SYNTAX      Unsigned32
-    MAX-ACCESS  accessible-for-notify
-    STATUS      current
-    DESCRIPTION "This variable is for trap var binding,
-                 indicated the VLAN id of MAC operation."
-    ::= { trapVar 24 }
-
-trapMacNotifyMac OBJECT-TYPE
-    SYNTAX      MacAddress
-    MAX-ACCESS  accessible-for-notify
-    STATUS      current
-    DESCRIPTION "This variable is for trap var binding,
-                 indicated the MAC address of MAC operation."
-    ::= { trapVar 25 }
-
-trapMacNotifyAction OBJECT-TYPE
-     SYNTAX      INTEGER
-                 {
-                     add(1),
-                     remove(2)
-                 }
-     MAX-ACCESS  accessible-for-notify
-     STATUS      current
-     DESCRIPTION "This variable is for trap var binding,
-                  indicated the action of MAC operation.
-                  add(1),
-                  remove(2)."
-     ::= { trapVar 26 }
 
 trapIfIndex OBJECT-TYPE
     SYNTAX      Unsigned32
@@ -6592,52 +6382,52 @@ diffServArpAceStatus OBJECT-TYPE
         SYNTAX      RowStatus
         MAX-ACCESS  read-create
         STATUS      current
-	    DESCRIPTION
-			"The status of this conceptual row entry. This object isused to manage the
-			creation and deletion of conceptual rows.
+        DESCRIPTION
+            "The status of this conceptual row entry. This object isused to manage the
+            creation and deletion of conceptual rows.
 
-			The status column has six defined values:
+            The status column has six defined values:
 
-			     - 'active', which indicates that the conceptual row is
-			     available for use by the managed device;
+                 - 'active', which indicates that the conceptual row is
+                 available for use by the managed device;
 
-			     - 'notInService', which indicates that the conceptual
-			     row exists in the agent, but is unavailable for use by
-			     the managed device (see NOTE below);
+                 - 'notInService', which indicates that the conceptual
+                 row exists in the agent, but is unavailable for use by
+                 the managed device (see NOTE below);
 
-			     - 'notReady', which indicates that the conceptual row
-			     exists in the agent, but is missing information
-			     necessary in order to be available for use by the
-			     managed device;
+                 - 'notReady', which indicates that the conceptual row
+                 exists in the agent, but is missing information
+                 necessary in order to be available for use by the
+                 managed device;
 
-			     - 'createAndGo', which is supplied by a management
-			     station wishing to create a new instance of a
-			     conceptual row and to have its status automatically set
-			     to active, making it available for use by the managed
-			     device;
+                 - 'createAndGo', which is supplied by a management
+                 station wishing to create a new instance of a
+                 conceptual row and to have its status automatically set
+                 to active, making it available for use by the managed
+                 device;
 
-			     - 'createAndWait', which is supplied by a management
-			     station wishing to create a new instance of a
-			     conceptual row (but not make it available for use by
-			     the managed device); and,
+                 - 'createAndWait', which is supplied by a management
+                 station wishing to create a new instance of a
+                 conceptual row (but not make it available for use by
+                 the managed device); and,
 
-			     - 'destroy', which is supplied by a management station
-			     wishing to delete all of the instances associated with
-			     an existing conceptual row.
+                 - 'destroy', which is supplied by a management station
+                 wishing to delete all of the instances associated with
+                 an existing conceptual row.
 
-			Whereas five of the six values (all except 'notReady') may
-			be specified in a management protocol set operation, only
-			three values will be returned in response to a management
-			protocol retrieval operation:  'notReady', 'notInService' or
-			'active'.  That is, when queried, an existing conceptual row
-			has only three states:  it is either available for use by
-			the managed device (the status column has value 'active');
-			it is not available for use by the managed device, though
-			the agent has sufficient information to make it so (the
-			status column has value 'notInService'); or, it is not
-			available for use by the managed device, and an attempt to
-			make it so would fail because the agent has insufficient
-			information (the state column has value 'notReady').
+            Whereas five of the six values (all except 'notReady') may
+            be specified in a management protocol set operation, only
+            three values will be returned in response to a management
+            protocol retrieval operation:  'notReady', 'notInService' or
+            'active'.  That is, when queried, an existing conceptual row
+            has only three states:  it is either available for use by
+            the managed device (the status column has value 'active');
+            it is not available for use by the managed device, though
+            the agent has sufficient information to make it so (the
+            status column has value 'notInService'); or, it is not
+            available for use by the managed device, and an attempt to
+            make it so would fail because the agent has insufficient
+            information (the state column has value 'notReady').
 
             For a detailed description of this object, please refer to
             SNMPv2-TC MIB."
@@ -6707,7 +6497,6 @@ radiusMgt           OBJECT IDENTIFIER ::= { securityMgt 4 }
 tacacsMgt           OBJECT IDENTIFIER ::= { securityMgt 5 }
 sshMgt              OBJECT IDENTIFIER ::= { securityMgt 6 }
 ipFilterMgt         OBJECT IDENTIFIER ::= { securityMgt 9 }
-userAuthMgt         OBJECT IDENTIFIER ::= { securityMgt 10}
 dot1xMgt            OBJECT IDENTIFIER ::= { securityMgt 11}
 aaaMgt              OBJECT IDENTIFIER ::= { securityMgt 12}
 networkAccessMgt    OBJECT IDENTIFIER ::= { securityMgt 13}
@@ -7337,7 +7126,7 @@ TacacsPlusServerEntry ::= SEQUENCE
    tacacsPlusServerIndex            Integer32,
    tacacsPlusServerAddress          IpAddress,
    tacacsPlusServerPortNumber       Integer32,
-   tacacsPlusServerKey	            DisplayString,
+   tacacsPlusServerKey              DisplayString,
    tacacsPlusServerStatus           ValidStatus,
    tacacsPlusServerRetransmit       Integer32,
    tacacsPlusServerTimeout          Integer32
@@ -8473,17 +8262,6 @@ ipFilterTelnetStatus OBJECT-TYPE
         ::= { ipFilterTelnetEntry 3 }
 
 --
---userAuthMgt
---
-userAuthAuthTrapStatus OBJECT-TYPE
-        SYNTAX       EnabledStatus
-        MAX-ACCESS   read-write
-        STATUS       current
-        DESCRIPTION  "Indicates whether user authentication failure/success traps should be generated."
-        DEFVAL       { enabled }
-        ::= { userAuthMgt 6 }
-
---
 -- dot1xMgt
 --
 
@@ -8803,9 +8581,9 @@ networkAccessClearMacAddressAction     OBJECT-TYPE
 networkAccessMacAddressTable   OBJECT-TYPE
     SYNTAX      SEQUENCE OF NetworkAccessMacAddressEntry
     MAX-ACCESS  not-accessible
-	STATUS      current
-	DESCRIPTION "Contains the information of network access MAC addresses."
-	::= { networkAccessMgt  4}
+    STATUS      current
+    DESCRIPTION "Contains the information of network access MAC addresses."
+    ::= { networkAccessMgt  4}
 
 networkAccessMacAddressEntry   OBJECT-TYPE
     SYNTAX      NetworkAccessMacAddressEntry
@@ -9564,9 +9342,9 @@ telnetStatus OBJECT-TYPE
         MAX-ACCESS  read-write
         STATUS      current
         DESCRIPTION "To enable or disable the telnet function.
-        		Any new telnet request will be rejected and all current telnet sessions will be
-        			terminated if this status is set to disabled(2)."
-		DEFVAL { enabled }
+                Any new telnet request will be rejected and all current telnet sessions will be
+                    terminated if this status is set to disabled(2)."
+        DEFVAL { enabled }
         ::= { telnetMgt 4 }
 
 telnetPortNumber OBJECT-TYPE
@@ -9702,11 +9480,11 @@ ntpServiceMode OBJECT-TYPE
         ::= { ntpMgt 2 }
 
 ntpPollInterval OBJECT-TYPE
-    	SYNTAX      Integer32
-    	MAX-ACCESS  read-only
-    	STATUS      current
-    	DESCRIPTION "Polling interval in seconds."
-    	::= { ntpMgt 3 }
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Polling interval in seconds."
+        ::= { ntpMgt 3 }
 
 ntpAuthenticateStatus OBJECT-TYPE
         SYNTAX      EnabledStatus
@@ -9714,14 +9492,14 @@ ntpAuthenticateStatus OBJECT-TYPE
         STATUS      current
         DESCRIPTION "Set enabled(1) to enable the NTP Authenticate, set disabled(2) to
                      disable  the NTP."
-	::= { ntpMgt 4 }
+    ::= { ntpMgt 4 }
 
 ntpServerTable OBJECT-TYPE
-       	SYNTAX      SEQUENCE OF NtpServerEntry
-       	MAX-ACCESS  not-accessible
-       	STATUS      current
-       	DESCRIPTION "Table for NTP servers"
-       	::= { ntpMgt 5 }
+        SYNTAX      SEQUENCE OF NtpServerEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Table for NTP servers"
+        ::= { ntpMgt 5 }
 
 sysTimeZonePredefined OBJECT-TYPE
      SYNTAX      INTEGER
@@ -9923,21 +9701,21 @@ ntpServerEntry OBJECT-TYPE
         ::= { ntpServerTable 1 }
 
 NtpServerEntry ::= SEQUENCE
-	{
-	    ntpServerIpAddress    IpAddress,
-	    ntpServerVersion      Integer32,
-	    ntpServerKeyId        Integer32,
-	    ntpServerStatus       INTEGER
-	}
+    {
+        ntpServerIpAddress    IpAddress,
+        ntpServerVersion      Integer32,
+        ntpServerKeyId        Integer32,
+        ntpServerStatus       INTEGER
+    }
 
 ntpServerIpAddress OBJECT-TYPE
-    	SYNTAX      IpAddress
-    	MAX-ACCESS  not-accessible
-    	STATUS      current
-    	DESCRIPTION "The IP address of a server. Valid IP addresses
+        SYNTAX      IpAddress
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The IP address of a server. Valid IP addresses
                  must occupy contiguous indexes.
                  All IP addresses after the last valid index is 0."
-    	::= { ntpServerEntry 1 }
+        ::= { ntpServerEntry 1 }
 
 ntpServerVersion OBJECT-TYPE
         SYNTAX      Integer32
@@ -9962,23 +9740,23 @@ ntpServerStatus OBJECT-TYPE
                    }
         MAX-ACCESS  read-create
         STATUS      current
-	DESCRIPTION "The status of this conceptual row entry. This object isused to manage the
-		     creation and deletion of conceptual rows.
+    DESCRIPTION "The status of this conceptual row entry. This object isused to manage the
+             creation and deletion of conceptual rows.
 
-		     The status column has six defined values:
+             The status column has six defined values:
 
-		     - 'active', which indicates that the conceptual row is
-		     available for use by the managed device;
+             - 'active', which indicates that the conceptual row is
+             available for use by the managed device;
 
-		     - 'create', which is supplied by a management
-		     station wishing to create a new instance of a
-		     conceptual row and to have its status automatically set
-		     to active, making it available for use by the managed
-		     device;
+             - 'create', which is supplied by a management
+             station wishing to create a new instance of a
+             conceptual row and to have its status automatically set
+             to active, making it available for use by the managed
+             device;
 
-		     - 'destroy', which is supplied by a management station
-		     wishing to delete all of the instances associated with
-		     an existing conceptual row."
+             - 'destroy', which is supplied by a management station
+             wishing to delete all of the instances associated with
+             an existing conceptual row."
         ::= { ntpServerEntry 4 }
 
 ntpAuthKeyTable OBJECT-TYPE
@@ -9997,26 +9775,26 @@ ntpAuthKeyEntry OBJECT-TYPE
         ::= { ntpAuthKeyTable 1 }
 
 NtpAuthKeyEntry::= SEQUENCE
-	{
-	    ntpAuthKeyId        Integer32,
-	    ntpAuthKeyWord      OCTET STRING,
-	    ntpAuthKeyStatus    INTEGER
-	}
+    {
+        ntpAuthKeyId        Integer32,
+        ntpAuthKeyWord      OCTET STRING,
+        ntpAuthKeyStatus    INTEGER
+    }
 
 ntpAuthKeyId OBJECT-TYPE
-    	SYNTAX      Integer32 (1..65536)
-    	MAX-ACCESS  not-accessible
-    	STATUS      current
-    	DESCRIPTION "The index of a Authentication key. This table has fixed size."
-    	::= { ntpAuthKeyEntry 1 }
+        SYNTAX      Integer32 (1..65536)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The index of a Authentication key. This table has fixed size."
+        ::= { ntpAuthKeyEntry 1 }
 
 ntpAuthKeyWord OBJECT-TYPE
-    	SYNTAX      OCTET STRING (SIZE (1..32))
-    	MAX-ACCESS  read-create
-    	STATUS      current
-    	DESCRIPTION "The Authentication key word is used to created a key  by the MD5
-	And the max length is 32."
-    	::= { ntpAuthKeyEntry 2 }
+        SYNTAX      OCTET STRING (SIZE (1..32))
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "The Authentication key word is used to created a key  by the MD5
+    And the max length is 32."
+        ::= { ntpAuthKeyEntry 2 }
 
 ntpAuthKeyStatus OBJECT-TYPE
         SYNTAX      INTEGER
@@ -10027,23 +9805,23 @@ ntpAuthKeyStatus OBJECT-TYPE
                     }
         MAX-ACCESS  read-create
         STATUS      current
-	DESCRIPTION "The status of this conceptual row entry. This object isused to manage the
-	             creation and deletion of conceptual rows.
+    DESCRIPTION "The status of this conceptual row entry. This object isused to manage the
+                 creation and deletion of conceptual rows.
 
-	             The status column has six defined values:
+                 The status column has six defined values:
 
-	             - 'active', which indicates that the conceptual row is
-	             available for use by the managed device;
+                 - 'active', which indicates that the conceptual row is
+                 available for use by the managed device;
 
-	             - 'create', which is supplied by a management
-		     station wishing to create a new instance of a
-		     conceptual row and to have its status automatically set
-		     to active, making it available for use by the managed
-		     device;
+                 - 'create', which is supplied by a management
+             station wishing to create a new instance of a
+             conceptual row and to have its status automatically set
+             to active, making it available for use by the managed
+             device;
 
-		     - 'destroy', which is supplied by a management station
-		     wishing to delete all of the instances associated with
-		     an existing conceptual row."
+             - 'destroy', which is supplied by a management station
+             wishing to delete all of the instances associated with
+             an existing conceptual row."
         ::= { ntpAuthKeyEntry 3 }
 
 --
@@ -10052,9 +9830,10 @@ ntpAuthKeyStatus OBJECT-TYPE
 
 -- Management for File System Manipulate, including files copy, display and delete.
 
-
 fileCopyMgt OBJECT IDENTIFIER ::= { fileMgt 1 }
+fileInfoMgt OBJECT IDENTIFIER ::= { fileMgt 2 }
 fileAutoUpgradeMgt OBJECT IDENTIFIER ::= { fileMgt 4 }
+
 --
 -- This performs the copy operation.
 --
@@ -10099,9 +9878,7 @@ fileCopySrcOperType OBJECT-TYPE
                  (14) copy tftp startUpCfg; (15) copy unit file;
                  (16) copy file ftp; (17) copy running-config ftp;
                  (18) copy startup-config ftp; (19) copy ftp file;
-                 (20) copy ftp running-config; (21) copy ftp startup-config;
-                 (22) copy tftp add-to-running-config;
-                 (23) copy ftp add-to-running-config;"
+                 (20) copy ftp running-config; (21) copy ftp startup-config"
     ::= { fileCopyMgt 1}
 
 fileCopySrcFileName OBJECT-TYPE
@@ -10125,8 +9902,7 @@ fileCopyDestOperType OBJECT-TYPE
                  tftp(4),
                  unit(5),
                  http(6),
-                 ftp(7),
-                 addRunningCfg(10)
+                 ftp(7)
                 }
     MAX-ACCESS read-write
     STATUS     current
@@ -10145,8 +9921,7 @@ fileCopyDestOperType OBJECT-TYPE
                  http(6) means we can read the status of the transfer via
                  HTTP protocol, but can not change the status.
                  ftp(7) means we want to perform 'copy fileCopySrcOperType ftp'
-                 operation.addRunningCfg(10) means we want to perform
-                 'copy fileCopySrcOperType add-to-running-config'
+                 operation.
 
                  The possible permutations are as follows: (1) copy file file;
                  (2) copy file runningCfg; (3) copy file startUpCfg;
@@ -10158,9 +9933,7 @@ fileCopyDestOperType OBJECT-TYPE
                  (14) copy tftp startUpCfg; (15) copy unit file;
                  (16) copy file ftp; (17) copy running-config ftp;
                  (18) copy startup-config ftp; (19) copy ftp file;
-                 (20) copy ftp running-config; (21) copy ftp startup-config;
-                 (22) copy tftp add-to-running-config;
-                 (23) copy ftp add-to-running-config;"
+                 (20) copy ftp running-config; (21) copy ftp startup-config"
     ::= { fileCopyMgt 3 }
 
 fileCopyDestFileName  OBJECT-TYPE
@@ -10213,7 +9986,7 @@ fileCopyUnitId OBJECT-TYPE
     DESCRIPTION "Specifies the switch unit for stackable devices.
                 When performing the 'copy unit file' or 'copy file unit' action,
                 if neither fileCopySrcOperType nor fileCopyDestOperType
-        		is unit(5), this variable can be ignored."
+                is unit(5), this variable can be ignored."
     ::= { fileCopyMgt 7 }
 
 fileCopyAction OBJECT-TYPE
@@ -10260,11 +10033,9 @@ fileCopyFtpLoginPassword OBJECT-TYPE
                  zero-length string."
     ::= { fileCopyMgt 13 }
 
-fileInfoMgt OBJECT IDENTIFIER ::= { fileMgt 2 }
 --
 -- This mangement performs the display and delete operation.
 --
-
 
 fileInfoTable OBJECT-TYPE
     SYNTAX       SEQUENCE OF FileInfoEntry
@@ -10390,7 +10161,7 @@ fileAutoDownloadResultEntry OBJECT-TYPE
 FileAutoDownloadResultEntry ::= SEQUENCE
     {
         fileAutoDownloadResultUnitID                  Integer32,
-        fileAutoDownloadResultAction				  INTEGER,
+        fileAutoDownloadResultAction                  INTEGER,
         fileAutoDownloadResultStatus                  FileCopyStatus
     }
 
@@ -10405,22 +10176,22 @@ fileAutoDownloadResultUnitID OBJECT-TYPE
 fileAutoDownloadResultAction OBJECT-TYPE
     SYNTAX       INTEGER
                  {
-	                  notCopying(1),
-	                  copying(2)
+                      notCopying(1),
+                      copying(2)
                  }
     MAX-ACCESS   read-only
     STATUS       current
     DESCRIPTION "The status of the auto download action.
-    			 value copying(2) will be obtained if the auto download action is currently processing,
-    			 or value notCopying(1) will be obtained if no auto download action is currently processing.
+                 value copying(2) will be obtained if the auto download action is currently processing,
+                 or value notCopying(1) will be obtained if no auto download action is currently processing.
 
-    			 You can check the download result through the fileAutoDownloadResultStatus object
-    			 after the download action has finished.
+                 You can check the download result through the fileAutoDownloadResultStatus object
+                 after the download action has finished.
 
-    			 Please note that this object is read-only, since the auto download action is triggered
-    			 automatically by the system when an image file or a config file is set as startup setting
-    			 through the fileInfoIsStartUp, restartOpCodeFile or restartConfigFile objects,
-    			 but not set by the user manually through this fileAutoDownloadResultAction object."
+                 Please note that this object is read-only, since the auto download action is triggered
+                 automatically by the system when an image file or a config file is set as startup setting
+                 through the fileInfoIsStartUp, restartOpCodeFile or restartConfigFile objects,
+                 but not set by the user manually through this fileAutoDownloadResultAction object."
     ::= { fileAutoDownloadResultEntry 2 }
 
 fileAutoDownloadResultStatus OBJECT-TYPE
@@ -10428,8 +10199,8 @@ fileAutoDownloadResultStatus OBJECT-TYPE
     MAX-ACCESS   read-only
     STATUS       current
     DESCRIPTION "The last auto download result status.
-    			value fileCopyUnknown(18) will be obtained
-    			if no download action has been performed before."
+                value fileCopyUnknown(18) will be obtained
+                if no download action has been performed before."
     ::= { fileAutoDownloadResultEntry 3 }
 
 --
@@ -10691,6 +10462,7 @@ fileAutoUpgradeOpCodeForceModeStatus OBJECT-TYPE
 -- mcastStormMgt
 --
 mcastStormMgt OBJECT IDENTIFIER ::= { stormMgt 1 }
+
 mcastStormTable OBJECT-TYPE
         SYNTAX      SEQUENCE OF McastStormEntry
         MAX-ACCESS  not-accessible
@@ -10742,10 +10514,8 @@ mcastStormOctetRate OBJECT-TYPE
 --
 -- bcastStormMgt
 --
-
--- Management for broadcast storm control for ports.
-
 bcastStormMgt OBJECT IDENTIFIER ::= { stormMgt 3 }
+
 bcastStormTable OBJECT-TYPE
         SYNTAX      SEQUENCE OF BcastStormEntry
         MAX-ACCESS  not-accessible
@@ -11309,17 +11079,104 @@ mvrMaxGroups  OBJECT-TYPE
         SYNTAX      Integer32
         MAX-ACCESS  read-only
         STATUS      current
-        DESCRIPTION "The maximum allow number of MVR groups to be forwarded according to subscriber port.
-                     If mvrCurrentGroups over mvrMaxGroups, the multicast stream will be flood to all receiver port.
-                    "
+        DESCRIPTION "The maximum number of MVR groups."
         ::= { mvrMgt 3 }
 
 mvrCurrentGroups   OBJECT-TYPE
         SYNTAX      Integer32
         MAX-ACCESS  read-only
         STATUS      current
-        DESCRIPTION "The current learned number of MVR groups."
+        DESCRIPTION "The current number of MVR groups."
         ::= { mvrMgt 4}
+
+mvrGroupsCtl      OBJECT IDENTIFIER   ::= { mvrMgt 5 }
+
+mvrGroupsCtlId   OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The start of a contiguous range of MVR group
+                     addresses."
+        ::= { mvrGroupsCtl 1 }
+
+mvrGroupsCtlCount   OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The range count for configuring MVR group addresses."
+        ::= { mvrGroupsCtl 2 }
+
+mvrGroupsCtlAction   OBJECT-TYPE
+        SYNTAX      INTEGER
+        {
+            noAction(0),
+            create(1),
+            destory(2)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Sets the configure action for a contiguous range of MVR group
+                     addresses. The start addresses is the current value of
+                     mvrGroupsCtlId and the range count is the current value of
+                     mvrGroupsCtlCount. Set this object to create(2) to
+                     create MVR group addresses. Set this object
+                     to destory(3) to delete MVR group addresses. When
+                     the action is complete, this object becomes noAction(1)."
+        ::= { mvrGroupsCtl 3 }
+
+mvrGroupTable OBJECT-TYPE
+       SYNTAX      SEQUENCE OF MvrGroupEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION "The table for configuring the MVR group."
+       ::= { mvrMgt 6 }
+
+mvrGroupEntry OBJECT-TYPE
+       SYNTAX      MvrGroupEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION "The entry for configuring the MVR group."
+       INDEX  {mvrGroupId}
+       ::= { mvrGroupTable 1 }
+
+MvrGroupEntry ::= SEQUENCE
+{
+    mvrGroupId IpAddress,
+    mvrGroutActive INTEGER,
+    mvrGroupStatus INTEGER
+}
+
+mvrGroupId OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The multicast address of the MVR group."
+        ::= { mvrGroupEntry 1 }
+
+mvrGroutActive   OBJECT-TYPE
+        SYNTAX      INTEGER
+        {
+            active(1),
+            inactive(2)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "To indicate if the group has a member or not. If there are no
+                     members, the status is inactive(2); otherwise the status
+                     is active(1)."
+        ::= { mvrGroupEntry 2 }
+
+mvrGroupStatus   OBJECT-TYPE
+        SYNTAX      INTEGER
+        {
+            valid(1),
+            invalid(2)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Setting this to valid(1) creates an entry. Setting this
+                     to invalid(2) destroys an entry."
+        ::= { mvrGroupEntry 3 }
 
 mvrGroupStaticTable   OBJECT-TYPE
         SYNTAX      SEQUENCE OF MvrGroupStaticEntry
@@ -11541,7 +11398,8 @@ mvrReceiverGroupEntry OBJECT-TYPE
 MvrReceiverGroupEntry ::= SEQUENCE
 {
     mvrReceiverGroupId      IpAddress,
-    mvrReceiverGroupActive  INTEGER
+    mvrReceiverGroupActive  INTEGER,
+    mvrReceiverGroupStatus  INTEGER
 }
 
 mvrReceiverGroupId OBJECT-TYPE
@@ -11564,6 +11422,18 @@ mvrReceiverGroupActive   OBJECT-TYPE
                      the status will be active(1)."
         ::= { mvrReceiverGroupEntry 2 }
 
+mvrReceiverGroupStatus   OBJECT-TYPE
+        SYNTAX      INTEGER
+        {
+            valid(1),
+            invalid(2)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Setting this to valid(1) creates an entry. Setting this
+                     to invalid(2) destroys an entry."
+        ::= { mvrReceiverGroupEntry 3 }
+
 mvrReceiverGroupStaticTable   OBJECT-TYPE
         SYNTAX      SEQUENCE OF MvrReceiverGroupStaticEntry
         MAX-ACCESS  not-accessible
@@ -11584,7 +11454,8 @@ mvrReceiverGroupStaticEntry OBJECT-TYPE
 MvrReceiverGroupStaticEntry ::= SEQUENCE
 {
     mvrReceiverGroupStaticAddress   IpAddress,
-    mvrReceiverGroupStaticPorts     PortList
+    mvrReceiverGroupStaticPorts     PortList,
+    mvrReceiverGroupStaticStatus    INTEGER
 
 }
 
@@ -11604,6 +11475,17 @@ mvrReceiverGroupStaticPorts  OBJECT-TYPE
                      of this MVR receiver group."
         ::= { mvrReceiverGroupStaticEntry 2 }
 
+mvrReceiverGroupStaticStatus  OBJECT-TYPE
+        SYNTAX      INTEGER
+        {
+            valid(1),
+            invalid(2)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Setting this to valid(1) creates an entry. Setting this
+                     to invalid(2) destroys an entry."
+        ::= { mvrReceiverGroupStaticEntry 3 }
 
 mvrReceiverGroupCurrentTable   OBJECT-TYPE
         SYNTAX      SEQUENCE OF MvrReceiverGroupCurrentEntry
@@ -11641,121 +11523,6 @@ mvrReceiverGroupCurrentPorts   OBJECT-TYPE
                      MVR receiver group."
         ::= { mvrReceiverGroupCurrentEntry 2 }
 
-mvrGroupCtlTable   OBJECT-TYPE
-        SYNTAX      SEQUENCE OF MvrGroupCtlEntry
-        MAX-ACCESS  not-accessible
-        STATUS      current
-        DESCRIPTION "Configure MVR group range"
-        ::= {mvrMgt 26 }
-
-mvrGroupCtlEntry OBJECT-TYPE
-       SYNTAX      MvrGroupCtlEntry
-       MAX-ACCESS  not-accessible
-       STATUS      current
-       DESCRIPTION "The entry for configuring the MVR group range.
-                    If configured range overlap to old one, it will be combinded with old one."
-       INDEX  {mvrGroupStartIPAddress, mvrGroupEndIPAddress}
-       ::= { mvrGroupCtlTable 1 }
-
-MvrGroupCtlEntry ::= SEQUENCE
-{
-    mvrGroupStartIPAddress   IpAddress,
-    mvrGroupEndIPAddress     IpAddress,
-    mvrGroupCtlAction        Integer32
-}
-
-
-mvrGroupStartIPAddress   OBJECT-TYPE
-        SYNTAX      IpAddress
-        MAX-ACCESS  not-accessible
-        STATUS      current
-        DESCRIPTION "MVR Profile range start IP address.
-                     NOTE: All mvrGroupStartIPAddress use the same buffer to temply store the mvrGroupStartIPAddress before
-                     mvrGroupCtlAction really creat the profile."
-        ::= { mvrGroupCtlEntry 1 }
-
-mvrGroupEndIPAddress   OBJECT-TYPE
-        SYNTAX      IpAddress
-        MAX-ACCESS  not-accessible
-        STATUS      current
-        DESCRIPTION "MVR group range end IP address."
-        ::= { mvrGroupCtlEntry 2 }
-
-mvrGroupCtlAction   OBJECT-TYPE
-        SYNTAX      Integer32
-        {
-            noAction(0),
-            create(1),
-            destory(2)
-        }
-        MAX-ACCESS  read-write
-        STATUS      current
-        DESCRIPTION "Set this object to create(2) to create mvr group range. Set this object
-                     to destory(3) to delete mvr group range. When
-                     the action is complete, this object becomes noAction(1)."
-        ::= { mvrGroupCtlEntry 3 }
-
-mvrRecieverGroupCtlTable   OBJECT-TYPE
-        SYNTAX      SEQUENCE OF MvrReceiverGroupCtlEntry
-        MAX-ACCESS  not-accessible
-        STATUS      current
-        DESCRIPTION "Configure MVR receiver group"
-        ::= {mvrMgt 29 }
-
-mvrReceiverGroupCtlEntry OBJECT-TYPE
-       SYNTAX      MvrReceiverGroupCtlEntry
-       MAX-ACCESS  not-accessible
-       STATUS      current
-       DESCRIPTION "The entry for configuring the MVR receiver group."
-       INDEX  {mvrReceiverGroupIPAddress, mvrReceiverGroupMask}
-       ::= { mvrRecieverGroupCtlTable 1 }
-
-MvrReceiverGroupCtlEntry ::= SEQUENCE
-{
-    mvrReceiverGroupIPAddress   IpAddress,
-    mvrReceiverGroupMask        IpAddress,
-    mvrReceiverGroupCtlAction   Integer32
-}
-
-
-mvrReceiverGroupIPAddress   OBJECT-TYPE
-        SYNTAX      IpAddress
-        MAX-ACCESS  not-accessible
-        STATUS      current
-        DESCRIPTION "MVR receiver group IP address.
-                     NOTE: All mvrReceiverGroupIPAddress use the same buffer to temply store the mvrReceiverGroupIPAddress before
-                     mvrReceiverGroupCtlAction really creat the profile."
-        ::= { mvrReceiverGroupCtlEntry 1 }
-
-mvrReceiverGroupMask   OBJECT-TYPE
-        SYNTAX      IpAddress
-        MAX-ACCESS  not-accessible
-        STATUS      current
-        DESCRIPTION "MVR receiver group IP mask."
-        ::= { mvrReceiverGroupCtlEntry 2 }
-
-mvrReceiverGroupCtlAction   OBJECT-TYPE
-        SYNTAX      Integer32
-        {
-            noAction(0),
-            create(1),
-            destory(2)
-        }
-        MAX-ACCESS  read-write
-        STATUS      current
-        DESCRIPTION "Set this object to create(2) to create mvr receiver group. Set this object
-                     to destory(3) to delete mvr receiver group.
-                     When destroy mvr receiver group, it needn't to specify mvrReceiverGroupIPAddress and mvrReceiverGroupMask.
-                     When the action is complete, this object becomes noAction(1)."
-        ::= { mvrReceiverGroupCtlEntry 3 }
-
-mvrForwardingPriority OBJECT-TYPE
-        SYNTAX  Integer32(0..6|65535)
-        MAX-ACCESS  read-write
-        STATUS      current
-        DESCRIPTION "Configure MVR multicast stream forwarding priority.
-                     If value is 65535, it means the priority is disabled"
-        ::= { mvrMgt 18 }
 --
 -- dhcpSnoopMgt
 --
@@ -11825,45 +11592,6 @@ dhcpSnoopBindingsTableCtlAction OBJECT-TYPE
                      noAction(1) will always be obtained when reading this variable."
         ::= { dhcpSnoopGlobal 5 }
 
-dhcpSnoopInformationOptionRemoteIDMode OBJECT-TYPE
-		SYNTAX		INTEGER
-					{
-						mac-address-in-hex(1),
-						mac-address-in-ascii(2),
-						ip-address-in-hex(3),
-						ip-address-in-ascii(4),
-						configured-string(5)
-					}
-		MAX-ACCESS  read-write
-        STATUS      current
-        DESCRIPTION
-			"Provide five mode for insertion remote-id sub-option of option 82.
-			 If configured-string(5) has been set, dhcpSnoopInformationOptionRemoteIDString
-			 will take effect."
-        ::= { dhcpSnoopGlobal 6 }
-
-dhcpSnoopInformationOptionRemoteIDString OBJECT-TYPE
-		SYNTAX	   OCTET STRING (SIZE(0..32))
-		MAX-ACCESS read-write
-		STATUS	   current
-		DESCRIPTION
-			"Set string to remote-id sub-option of option 82.
-			 It only take effect when dhcpSnoopInformationOptionRemoteIDMode is set to configured-string(5)"
-		::= { dhcpSnoopGlobal 7 }
-
-dhcpSnoopInformationOptionEncodeFormat OBJECT-TYPE
-		SYNTAX		INTEGER
-		{
-			extra-subtype-included(1),
-			no-extra-subtype-included(2)
-		}
-		MAX-ACCESS read-write
-		STATUS	   current
-		DESCRIPTION
-			"Set encode format for CID and RID in option82.
-			 Set extra-subtype-included(1) will have extra subtype and length filed in CID and RID.
-			 Set no-extra-subtype-included(2) will only have TLV format for CID and RID."
-		::= { dhcpSnoopGlobal 8 }
 --
 dhcpSnoopVlanConfigTable    OBJECT-TYPE
         SYNTAX      SEQUENCE OF DhcpSnoopVlanConfigEntry
@@ -11923,10 +11651,8 @@ dhcpSnoopPortConfigEntry    OBJECT-TYPE
 
 DhcpSnoopPortConfigEntry    ::= SEQUENCE
 {
-        dhcpSnoopPortIfIndex            InterfaceIndex,
-        dhcpSnoopPortTrustEnable    	EnabledStatus,
-	dhcpSnoopPortCircuitIDMode  	INTEGER,
-	dhcpSnoopPortCircuitIDString    OCTET STRING
+        dhcpSnoopPortIfIndex        InterfaceIndex,
+        dhcpSnoopPortTrustEnable    EnabledStatus
 }
 
 dhcpSnoopPortIfIndex        OBJECT-TYPE
@@ -11943,29 +11669,6 @@ dhcpSnoopPortTrustEnable    OBJECT-TYPE
         DESCRIPTION "This object indicates whether the port or trunk is trusted
                      for DHCP Snooping purpose."
         ::= { dhcpSnoopPortConfigEntry 2 }
-
-dhcpSnoopPortCircuitIDMode	OBJECT-TYPE
-        SYNTAX      INTEGER
-		{
-            received-vlan-unit-port(1),
-            configured-string(2)
-        }
-        MAX-ACCESS  read-write
-        STATUS      current
-        DESCRIPTION
-		    "Provide two mode for insertion circuit-id sub-option of option 82.
-			 If configured-string(2) has been set, dhcpSnoopPortCircuitIDString
-			 will take effect."
-        ::= { dhcpSnoopPortConfigEntry 3 }
-
-dhcpSnoopPortCircuitIDString  OBJECT-TYPE
-        SYNTAX      OCTET STRING(SIZE(0..32))
-        MAX-ACCESS  read-write
-        STATUS      current
-        DESCRIPTION
-		    "Set string to circuit-id sub-option of option 82.
-			 It only take effect when dhcpSnoopPortCircuitIDMode is set to configured-string(2)"
-        ::= { dhcpSnoopPortConfigEntry 4 }
 --
 dhcpSnoopBindingsTable      OBJECT-TYPE
         SYNTAX      SEQUENCE OF DhcpSnoopBindingsEntry
@@ -12101,10 +11804,10 @@ clusterIpPool  OBJECT-TYPE
 
 clusterClearCandidateTable  OBJECT-TYPE
     SYNTAX     INTEGER
-    					 {
-    					     noClear(1),
-    					     clear(2)
-    					 }
+                         {
+                             noClear(1),
+                             clear(2)
+                         }
     MAX-ACCESS read-write
     STATUS     current
     DESCRIPTION
@@ -12998,8 +12701,7 @@ erpsDomainWestRingPort OBJECT-TYPE
 
                  The interface identified by a particular value of this index
                  is the same interface as identified by the same value of
-                 ifIndex in the IF-MIB. A value of 0 means no west ring port
-                 configured for this domain."
+                 ifIndex in the IF-MIB."
     ::= { erpsDomainEntry 5 }
 
 erpsDomainEastRingPort OBJECT-TYPE
@@ -13013,8 +12715,7 @@ erpsDomainEastRingPort OBJECT-TYPE
 
                  The interface identified by a particular value of this index
                  is the same interface as identified by the same value of
-                 ifIndex in the IF-MIB. A value of 0 means no east ring port
-                 configured for this domain."
+                 ifIndex in the IF-MIB."
     ::= { erpsDomainEntry 6 }
 
 erpsDomainRplOwner OBJECT-TYPE
@@ -13087,8 +12788,7 @@ erpsDomainControlVlanID OBJECT-TYPE
     DESCRIPTION "This is defined as dot1qVlanIndex in the Q-BRIDGE-MIB.
                  Configures one control VLAN for each ERPS domain. The control
                  VLAN is used only to send and receive ERPS message. A control
-                 VLAN can not belong to more than one ERPS domain. A value of 0
-                 means no control VLAN configured for this domain."
+                 VLAN can not belong to more than on ERPS domain."
     ::= { erpsDomainEntry 12 }
 
 erpsDomainNodeState OBJECT-TYPE
@@ -13358,40 +13058,40 @@ lbdPortLoopedVlan OBJECT-TYPE
 -- trap definitions
 --
 
-es3528moTraps  OBJECT IDENTIFIER ::= { es3528moNotifications  1 }
-es3528moTrapsPrefix OBJECT IDENTIFIER ::= { es3528moTraps 0 }
+es3552m-and-poeTraps  OBJECT IDENTIFIER ::= { es3552m-and-poeNotifications  1 }
+es3552m-and-poeTrapsPrefix OBJECT IDENTIFIER ::= { es3552m-and-poeTraps 0 }
 
 swPowerStatusChangeTrap NOTIFICATION-TYPE
         OBJECTS     { swIndivPowerUnitIndex, swIndivPowerIndex, swIndivPowerStatus }
         STATUS      current
         DESCRIPTION "This trap is sent when the power state changes."
-        ::= { es3528moTrapsPrefix 1 }
+        ::= { es3552m-and-poeTrapsPrefix 1 }
 
 swPortSecurityTrap NOTIFICATION-TYPE
         OBJECTS       { ifIndex }
         STATUS        current
         DESCRIPTION "This trap is sent when the port is being intruded. This trap
                      will only be sent when the portSecActionTrap is enabled."
-        ::= { es3528moTrapsPrefix 36 }
+        ::= { es3552m-and-poeTrapsPrefix 36 }
 
 swIpFilterRejectTrap NOTIFICATION-TYPE
           OBJECTS     { trapIpFilterRejectMode, trapIpFilterRejectIp }
           STATUS      current
           DESCRIPTION "This trap is sent when an incorrect IP address is rejected by
                        the ipfilter."
-          ::= { es3528moTrapsPrefix 40 }
+          ::= { es3552m-and-poeTrapsPrefix 40 }
 
 swAuthenticationFailure NOTIFICATION-TYPE
         OBJECTS     { trapVarLoginUserName, trapVarLoginMethod, trapVarLoginIPAddress, trapVarLoginTime }
         STATUS      current
         DESCRIPTION "This trap will be triggered if authentication is failed."
-        ::= { es3528moTrapsPrefix 66 }
+        ::= { es3552m-and-poeTrapsPrefix 66 }
 
 swAuthenticationSuccess NOTIFICATION-TYPE
         OBJECTS     { trapVarLoginUserName, trapVarLoginMethod, trapVarLoginIPAddress, trapVarLoginTime }
         STATUS      current
         DESCRIPTION "This trap will be triggered if authentication is successful."
-        ::= { es3528moTrapsPrefix 67 }
+        ::= { es3552m-and-poeTrapsPrefix 67 }
 
 --
 -- ATC trap
@@ -13407,7 +13107,7 @@ swAtcBcastStormAlarmFireTrap NOTIFICATION-TYPE
         DESCRIPTION
             "When the broadcast traffic is detected as the storm, this trap
              will be fired."
-        ::= { es3528moTrapsPrefix 70 }
+        ::= { es3552m-and-poeTrapsPrefix 70 }
 
 swAtcBcastStormAlarmClearTrap NOTIFICATION-TYPE
         OBJECTS     {
@@ -13420,7 +13120,7 @@ swAtcBcastStormAlarmClearTrap NOTIFICATION-TYPE
         DESCRIPTION
             "When the broadcast storm is detected as the normal traffic, this
              trap will be fired."
-        ::= { es3528moTrapsPrefix 71 }
+        ::= { es3552m-and-poeTrapsPrefix 71 }
 
 swAtcBcastStormTcApplyTrap NOTIFICATION-TYPE
         OBJECTS     {
@@ -13433,7 +13133,7 @@ swAtcBcastStormTcApplyTrap NOTIFICATION-TYPE
         STATUS      current
         DESCRIPTION
             "When the ATC is activated, this trap will be fired."
-        ::= { es3528moTrapsPrefix 72 }
+        ::= { es3552m-and-poeTrapsPrefix 72 }
 
 swAtcBcastStormTcReleaseTrap NOTIFICATION-TYPE
         OBJECTS     {
@@ -13446,7 +13146,7 @@ swAtcBcastStormTcReleaseTrap NOTIFICATION-TYPE
         STATUS      current
         DESCRIPTION
             "When the ATC is released, this trap will be fired."
-        ::= { es3528moTrapsPrefix 73 }
+        ::= { es3552m-and-poeTrapsPrefix 73 }
 
 swAtcMcastStormAlarmFireTrap      NOTIFICATION-TYPE
         OBJECTS     {
@@ -13459,7 +13159,7 @@ swAtcMcastStormAlarmFireTrap      NOTIFICATION-TYPE
         DESCRIPTION
             "When the multicast traffic is detected as the storm, this trap
              will be fired."
-        ::= { es3528moTrapsPrefix 74 }
+        ::= { es3552m-and-poeTrapsPrefix 74 }
 
 swAtcMcastStormAlarmClearTrap NOTIFICATION-TYPE
         OBJECTS     {
@@ -13472,7 +13172,7 @@ swAtcMcastStormAlarmClearTrap NOTIFICATION-TYPE
         DESCRIPTION
             "When the multicast storm is detected as the normal traffic, this
              trap will be fired."
-        ::= { es3528moTrapsPrefix 75 }
+        ::= { es3552m-and-poeTrapsPrefix 75 }
 
 swAtcMcastStormTcApplyTrap NOTIFICATION-TYPE
         OBJECTS     {
@@ -13485,7 +13185,7 @@ swAtcMcastStormTcApplyTrap NOTIFICATION-TYPE
         STATUS      current
         DESCRIPTION
             "When the ATC is activated, this trap will be fired."
-        ::= { es3528moTrapsPrefix 76 }
+        ::= { es3552m-and-poeTrapsPrefix 76 }
 
 swAtcMcastStormTcReleaseTrap NOTIFICATION-TYPE
         OBJECTS     {
@@ -13498,13 +13198,13 @@ swAtcMcastStormTcReleaseTrap NOTIFICATION-TYPE
         STATUS      current
         DESCRIPTION
             "When the ATC is released, this trap will be fired."
-        ::= { es3528moTrapsPrefix 77 }
+        ::= { es3552m-and-poeTrapsPrefix 77 }
 
 swLoopbackDetectionTrap NOTIFICATION-TYPE
         OBJECTS     { staLoopbackDetectionPortIfIndex }
         STATUS   current
         DESCRIPTION "This trap will be sent when loopback BPDUs have been detected."
-        ::= { es3528moTrapsPrefix 92 }
+        ::= { es3552m-and-poeTrapsPrefix 92 }
 
 networkAccessPortLinkDetectionTrap NOTIFICATION-TYPE
         OBJECTS
@@ -13518,7 +13218,7 @@ networkAccessPortLinkDetectionTrap NOTIFICATION-TYPE
         DESCRIPTION
             "This trap is sent when a networkAccessPortLinkDetection
              event is triggered."
-        ::= { es3528moTrapsPrefix 96 }
+        ::= { es3552m-and-poeTrapsPrefix 96 }
 
 dot1agCfmMepUpTrap NOTIFICATION-TYPE
     OBJECTS     {
@@ -13526,16 +13226,16 @@ dot1agCfmMepUpTrap NOTIFICATION-TYPE
                 }
     STATUS      current
     DESCRIPTION "This trap is sent when a new remote MEP is discovered."
-    ::= { es3528moTrapsPrefix 97 }
+    ::= { es3552m-and-poeTrapsPrefix 97 }
 
 dot1agCfmMepDownTrap NOTIFICATION-TYPE
     OBJECTS     {
                     dot1agCfmMepDbRMepIdentifier
                 }
     STATUS      current
-    DESCRIPTION "This trap is sent when port status or interface status TLV
-                 received from remote MEP indicates it is not up."
-    ::= { es3528moTrapsPrefix 98 }
+    DESCRIPTION "This trap is sent when received port status or interface
+                 status TLV from remote MEP is not up."
+    ::= { es3552m-and-poeTrapsPrefix 98 }
 
 dot1agCfmConfigFailTrap NOTIFICATION-TYPE
     OBJECTS     {
@@ -13544,7 +13244,7 @@ dot1agCfmConfigFailTrap NOTIFICATION-TYPE
     STATUS      current
     DESCRIPTION "This trap is sent when a MEP receives a CCM with MPID
                  which already exists on the same MA in this switch."
-    ::= { es3528moTrapsPrefix 99 }
+    ::= { es3552m-and-poeTrapsPrefix 99 }
 
 dot1agCfmLoopFindTrap NOTIFICATION-TYPE
     OBJECTS     {
@@ -13552,7 +13252,7 @@ dot1agCfmLoopFindTrap NOTIFICATION-TYPE
                 }
     STATUS      current
     DESCRIPTION "This trap is sent when a MEP receives its own CCMs."
-    ::= { es3528moTrapsPrefix 100 }
+    ::= { es3552m-and-poeTrapsPrefix 100 }
 
 dot1agCfmMepUnknownTrap NOTIFICATION-TYPE
     OBJECTS     {
@@ -13561,7 +13261,7 @@ dot1agCfmMepUnknownTrap NOTIFICATION-TYPE
     STATUS      current
     DESCRIPTION "This trap is sent when a CCM is received from
                  an unexpected MEP."
-    ::= { es3528moTrapsPrefix 101 }
+    ::= { es3552m-and-poeTrapsPrefix 101 }
 
 dot1agCfmMepMissingTrap NOTIFICATION-TYPE
     OBJECTS     {
@@ -13570,7 +13270,7 @@ dot1agCfmMepMissingTrap NOTIFICATION-TYPE
     STATUS      current
     DESCRIPTION "This trap is sent when the cross-check enable timer expires
                  and no CCMs were received from an expected (configured) MEP."
-    ::= { es3528moTrapsPrefix 102 }
+    ::= { es3552m-and-poeTrapsPrefix 102 }
 
 dot1agCfmMaUpTrap NOTIFICATION-TYPE
     OBJECTS     {
@@ -13578,46 +13278,45 @@ dot1agCfmMaUpTrap NOTIFICATION-TYPE
                 }
     STATUS      current
     DESCRIPTION "This trap is sent when all expected remote MEPs are up."
-    ::= { es3528moTrapsPrefix 103 }
+    ::= { es3552m-and-poeTrapsPrefix 103 }
 
 autoUpgradeTrap NOTIFICATION-TYPE
-        OBJECTS
-        {
-            fileCopyFileType,
-            trapAutoUpgradeResult,
-            trapAutoUpgradeNewVer
-        }
+        OBJECTS     {
+                        fileCopyFileType,
+                        trapAutoUpgradeResult,
+                        trapAutoUpgradeNewVer
+                    }
         STATUS      current
         DESCRIPTION "This trap is sent when auto upgrade is executed."
-        ::= { es3528moTrapsPrefix 104 }
+        ::= { es3552m-and-poeTrapsPrefix 104 }
 
 swCpuUtiRisingNotification NOTIFICATION-TYPE
         STATUS      current
         DESCRIPTION
               "This notification indicates that the CPU utilization has risen
                from cpuUtiFallingThreshold to cpuUtiRisingThreshold."
-        ::= { es3528moTrapsPrefix 107 }
+        ::= { es3552m-and-poeTrapsPrefix 107 }
 
 swCpuUtiFallingNotification NOTIFICATION-TYPE
         STATUS      current
         DESCRIPTION
               "This notification indicates that the CPU utilization has fallen
                from cpuUtiRisingThreshold to cpuUtiFallingThreshold."
-        ::= { es3528moTrapsPrefix 108 }
+        ::= { es3552m-and-poeTrapsPrefix 108 }
 
 swMemoryUtiRisingThresholdNotification NOTIFICATION-TYPE
         STATUS      current
         DESCRIPTION
               "This notification indicates that the memory utilization has risen
                from memoryUtiFallingThreshold to memoryUtiRisingThreshold."
-        ::= { es3528moTrapsPrefix 109 }
+        ::= { es3552m-and-poeTrapsPrefix 109 }
 
 swMemoryUtiFallingThresholdNotification NOTIFICATION-TYPE
         STATUS      current
         DESCRIPTION
               "This notification indicates that the memory utilization has fallen
                from memoryUtiRisingThreshold to memoryUtiFallingThreshold."
-        ::= { es3528moTrapsPrefix 110 }
+        ::= { es3552m-and-poeTrapsPrefix 110 }
 
 dhcpRougeServerAttackTrap NOTIFICATION-TYPE
         OBJECTS
@@ -13628,20 +13327,7 @@ dhcpRougeServerAttackTrap NOTIFICATION-TYPE
         STATUS      current
         DESCRIPTION "This trap is sent when receiving a DHCP packet from a
                     rouge server."
-        ::= { es3528moTrapsPrefix 114 }
-
-macNotificationTrap NOTIFICATION-TYPE
-    OBJECTS
-    {
-    	 ifIndex,
-    	 trapMacNotifyVid,
-        trapMacNotifyMac,
-        trapMacNotifyAction
-    }
-    STATUS      current
-    DESCRIPTION "This trap is sent when there are changes of the
-                 dynamic mac on the switch."
-    ::= { es3528moTrapsPrefix 138 }
+        ::= { es3552m-and-poeTrapsPrefix 114 }
 
 lbdDetectionTrap NOTIFICATION-TYPE
         OBJECTS     {
@@ -13651,7 +13337,7 @@ lbdDetectionTrap NOTIFICATION-TYPE
         STATUS      current
         DESCRIPTION "This trap is sent when a loopback condition is detected
                      by LBD."
-        ::= { es3528moTrapsPrefix 141 }
+        ::= { es3552m-and-poeTrapsPrefix 141 }
 
 lbdRecoveryTrap NOTIFICATION-TYPE
         OBJECTS     {
@@ -13659,6 +13345,6 @@ lbdRecoveryTrap NOTIFICATION-TYPE
                     }
         STATUS      current
         DESCRIPTION "This trap is sent when a recovery is done by LBD."
-        ::= { es3528moTrapsPrefix 142 }
+        ::= { es3552m-and-poeTrapsPrefix 142 }
 
 END

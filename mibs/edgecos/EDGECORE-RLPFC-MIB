@@ -1,0 +1,151 @@
+EDGECORE-RLPFC-MIB DEFINITIONS ::= BEGIN
+
+--             PFC Application MIBs definition
+-- Version:    7.50
+-- Date:       18-Apr-2010
+--             Initial definitions
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32     FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION,TruthValue               FROM SNMPv2-TC
+    ifIndex                                     FROM IF-MIB
+    rnd                                         FROM EDGECORE-MIB;
+
+
+rlPfcMib MODULE-IDENTITY
+        LAST-UPDATED "201004180000Z" -- 18-Apr-2010
+        ORGANIZATION "Radlan Computer Communications Ltd."
+        CONTACT-INFO
+                "radlan.com"
+        DESCRIPTION
+                "PFC Application MIBs initial version. "
+        REVISION "201004180000Z" -- 18-Apr-2010
+        DESCRIPTION
+                "PFC Application MIBs initial version. "
+    ::= { rnd 148 }
+
+--------
+-- Textual Conventions
+--------
+RlPfcPriority ::= TEXTUAL-CONVENTION
+    STATUS    current
+    DESCRIPTION
+        "IEEE 802.1p Priorities."
+    SYNTAX    Integer32 (0..7)
+
+
+-- PFC Scalars
+rlPfcGlobalEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "PFC Application Global Admin Enable."
+    ::= { rlPfcMib 1 }
+
+-- PFC Port Table
+rlPfcPortTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlPfcPortEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "PFC Application Port Table"
+    ::= { rlPfcMib 2 }
+
+rlPfcPortEntry OBJECT-TYPE
+    SYNTAX RlPfcPortEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "PFC Application Port Table Entry. Key is ifIndex."
+    INDEX { ifIndex }
+    ::= {  rlPfcPortTable 1 }
+
+RlPfcPortEntry ::= SEQUENCE {
+        rlPfcPortEnableAdmin     TruthValue,
+        rlPfcPortEnableOper      TruthValue
+    }
+
+rlPfcPortEnableAdmin OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "PFC Port Admin Status"
+    ::= { rlPfcPortEntry 1 }
+
+rlPfcPortEnableOper    OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "PFC Port OPER Status"
+    ::= { rlPfcPortEntry 2 }
+
+
+-- PFC Priority Table
+rlPfcPriorityTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlPfcPriorityEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "PFC Application Priority Table"
+    ::= { rlPfcMib 3 }
+
+rlPfcPriorityEntry OBJECT-TYPE
+    SYNTAX RlPfcPriorityEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "PFC Application Priority Entry. Key is the user priority."
+    INDEX { rlPfcPriority }
+    ::= {  rlPfcPriorityTable 1 }
+
+RlPfcPriorityEntry ::= SEQUENCE {
+        rlPfcPriority                       RlPfcPriority,
+        rlPfcPriorityEnable                 TruthValue,
+        rlPfcPriorityEnableOperStatus       TruthValue,
+        rlPfcPriorityEnableOperStatusReason INTEGER
+    }
+
+rlPfcPriority OBJECT-TYPE
+    SYNTAX     RlPfcPriority
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "PFC Priority - KEY"
+    ::= { rlPfcPriorityEntry 1 }
+
+rlPfcPriorityEnable OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "PFC Priority Admin Status"
+    ::= { rlPfcPriorityEntry 2 }
+
+rlPfcPriorityEnableOperStatus OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Operational status of this priority."
+    ::= { rlPfcPriorityEntry 3 }
+
+rlPfcPriorityEnableOperStatusReason OBJECT-TYPE
+    SYNTAX INTEGER {
+                    ok(1),                  -- Oper status is TRUE
+                    pfcGlobalDis(2),        -- PFC is globally disabled
+                    pfcPriorityAdminDis(3), -- PFC priority admin disabled
+                    queue0(4),              -- PFC priority is mapped to queue 0
+                    sharedQueue(5),         -- PFC priority is mapped to shared queue (more than one priorities are mapped to the same queue)
+                    notSameQueue(6)         -- PFC prioirty is mapped to queue different than prioirty num(e.g prioirty 3 mapped to queue 4)
+                   }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Reason for priority oper status 'FALSE'."
+    ::= { rlPfcPriorityEntry 4 }
+
+
+END
