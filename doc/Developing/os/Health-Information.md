@@ -294,12 +294,12 @@ required or supported.
 
 You will need to add code for your new sensor class in the following existing files:
 
-- `app/Models/Sensor.php $icons`: mandatory - add a free icon from [Font Awesome](https://fontawesome.com/icons?d=gallery&m=free) in the $icons array.
-- `app/Models/Sensor.php guessLimits()`: optional - if sensible `low` or `high` warnings or hard limit values are guessable when a SNMP-retrievable threshold is not available, add a case for the sensor class.
-- `doc/Developing/os/Health-Information.md`: mandatory - The documentation for every sensor class in this document is mandatory
-- `includes/discovery/sensors/$class/`: mandatory - create the folder where advanced php-based discovery files are stored. Not used for yaml discovery.
-- `includes/html/graphs/sensor/$class.inc.php`: optional - define your own [parameters](https://oss.oetiker.ch/rrdtool/doc/rrdgraph_graph.en.html) for RRDtool graphs. This is just nessesary for special cases.
+- `LibreNMS/Enum/SensorClass.php const`: mandatory - add a free icon from [Font Awesome](https://fontawesome.com/icons?d=gallery&m=free) as a Enum const.
 - `lang/en/sensors.php`: mandatory - add human-readable names and units for the sensor class in English, feel free to do so for other languages as well.
+- `includes/discovery/sensors/$class/`: mandatory - create the folder where advanced php-based discovery files are stored. Not used for yaml discovery.
+- `doc/Developing/os/Health-Information.md`: mandatory - The documentation for every sensor class in this document is mandatory
+- `app/Models/Sensor.php guessLimits()`: optional - if sensible `low` or `high` warnings or hard limit values are guessable when a SNMP-retrievable threshold is not available, add a case for the sensor class.
+- `includes/html/graphs/sensor/$class.inc.php`: optional - define your own [parameters](https://oss.oetiker.ch/rrdtool/doc/rrdgraph_graph.en.html) for RRDtool graphs. This is just nessesary for special cases.
 - `LibreNMS/Util/ObjectCache.php`: optional - choose menu grouping for the sensor class.
 
 #### Advanced health sensor example

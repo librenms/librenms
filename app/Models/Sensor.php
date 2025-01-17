@@ -67,8 +67,6 @@ class Sensor extends DeviceRelatedModel implements Keyable
         return SensorClass::icon($this->sensor_class);
     }
 
-    // Static Methods
-
     public function guessLimits(bool $high, bool $high_warn, bool $low_warn, bool $low): void
     {
         if ($high) {
