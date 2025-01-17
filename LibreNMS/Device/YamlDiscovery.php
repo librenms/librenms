@@ -223,9 +223,8 @@ class YamlDiscovery
 
                 return $replace;
             });
-            $value = (string) $template;
-        } else {
-            Log::debug("Setting value of $name to $value");
+
+            return (string) $template;
         }
 
         return $value;
