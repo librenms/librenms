@@ -12,12 +12,12 @@ foreach (glob(Config::get('install_dir') . '/includes/discovery/storage/*.inc.ph
 Log::debug($valid_storage);
 
 // Remove storage which weren't redetected here
-foreach (DeviceCache::getPrimary()->storage as $test_storage) {
-    Log::debug($storage_index . ' -> ' . $storage_mib . "\n");
+foreach (DeviceCache::getPrimary()->storage as $s) {
+    Log::debug($s->storage_index . ' -> ' . $s->storage_mib . "\n");
 
-    if (! $valid_storage[$test_storage->storage_index][$test_storage->storage_mib]) {
+    if (! $valid_storage[$s->storage_index][$s->storage_mib]) {
         echo '-';
-        $test_storage->delete();
+        $s->delete();
     }
 }
 echo "\n";
