@@ -20,7 +20,7 @@ class Port
     /** @var array<int, array<int, string>> */
     private array $ifNameMaps = [];
 
-    /** @var array<int, array<int, string>> */
+    /** @var array<int, array<string, array<string, string>>> */
     private array $ipMaps = [];
 
     /**
@@ -126,7 +126,7 @@ class Port
         }
 
         if (isset($this->ipMaps[$device_id][$context_name][$ip_string])) {
-            return $this->ipMaps[$device_id][$context_name][$ip_string];
+            return (int) $this->ipMaps[$device_id][$context_name][$ip_string];
         }
 
         return null;
