@@ -16,6 +16,12 @@ A small shell script that reports the status of PHP-FPM (FastCGI Process Manager
     pkg install p5-File-Slurp p5-JSON p5-String-ShellQuote p5-MIME-Base64
     ```
 
+=== "Fedora"
+
+    ```bash
+    dnf install perl-JSON perl-File-Slurp perl-String-ShellQuote
+    ```
+
 ## Agent or SNMP Extend
 
 === "SNMP Extend"
