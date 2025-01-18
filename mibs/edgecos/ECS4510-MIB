@@ -55,7 +55,7 @@ ecs4510MIB MODULE-IDENTITY
 ecs4510MIBObjects       OBJECT IDENTIFIER ::= { ecs4510MIB 1 }
 ecs4510Notifications    OBJECT IDENTIFIER ::= { ecs4510MIB 2 }
 
---supported groups
+-- supported groups
 switchMgt           OBJECT IDENTIFIER ::= { ecs4510MIBObjects 1 }
 portMgt             OBJECT IDENTIFIER ::= { ecs4510MIBObjects 2 }
 trunkMgt            OBJECT IDENTIFIER ::= { ecs4510MIBObjects 3 }
@@ -88,6 +88,7 @@ oamMgt              OBJECT IDENTIFIER ::= { ecs4510MIBObjects 52 }
 mldSnoopMgt         OBJECT IDENTIFIER ::= { ecs4510MIBObjects  54 }
 dynamicArpInspectionMgt         OBJECT IDENTIFIER ::= { ecs4510MIBObjects 56 }
 pppoeiaMgt          OBJECT IDENTIFIER ::= { ecs4510MIBObjects 60 }
+timeRangeMgt        OBJECT IDENTIFIER ::= { ecs4510MIBObjects 61 }
 erpsMgt             OBJECT IDENTIFIER ::= { ecs4510MIBObjects 62 }
 lbdMgt              OBJECT IDENTIFIER ::= { ecs4510MIBObjects 63 }
 mvr6Mgt             OBJECT IDENTIFIER ::= { ecs4510MIBObjects 66 }
@@ -511,6 +512,48 @@ switchJumboFrameStatus OBJECT-TYPE
 
 amtrMgt      OBJECT IDENTIFIER   ::= { switchMgt 8 }
 
+--switchFanTable
+switchFanTable OBJECT-TYPE
+       SYNTAX      SEQUENCE OF SwitchFanEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION "The fan status table."
+       ::= { switchMgt 9 }
+
+switchFanEntry OBJECT-TYPE
+       SYNTAX      SwitchFanEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION "A conceptual row of the switchFanTable."
+       INDEX  { switchUnitIndex, switchFanIndex }
+       ::= { switchFanTable 1 }
+
+SwitchFanEntry ::= SEQUENCE
+{
+    switchFanStatus     INTEGER,
+    switchFanOperSpeed    Integer32
+}
+
+
+switchFanStatus OBJECT-TYPE
+       SYNTAX   INTEGER
+                {
+                    ok(1),
+                    failure(2)
+                }
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "Indicating the status of the fan, 1:ok; 2:failure."
+       ::= { switchFanEntry 3 }
+
+switchFanOperSpeed OBJECT-TYPE
+       SYNTAX   Integer32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "The operational value of the fan speed, measured in rpm (rotations per
+                    minute)."
+       ::= { switchFanEntry 6 }       
+
 -- switchThermalTempTable
 
 switchThermalTempTable OBJECT-TYPE
@@ -555,6 +598,65 @@ switchThermalTempValue OBJECT-TYPE
        STATUS      current
        DESCRIPTION "The temperature of the device in degrees Celsius."
        ::= { switchThermalTempEntry 3 }
+
+
+--switchThermalActionTable
+
+switchThermalActionTable OBJECT-TYPE
+       SYNTAX      SEQUENCE OF SwitchThermalActionEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION "The table for configuring the thermal action."
+       ::= { switchMgt 12 }
+
+switchThermalActionEntry OBJECT-TYPE
+       SYNTAX      SwitchThermalActionEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION "A conceptual row of the switchThermalActionTable."
+       INDEX  { switchThermalActionUnitIndex,switchThermalActionThermalIndex,
+                switchThermalActionIndex }
+       ::= { switchThermalActionTable 1 }
+
+SwitchThermalActionEntry ::= SEQUENCE
+{
+    switchThermalActionRisingThreshold  Integer32,
+    switchThermalActionFallingThreshold Integer32,
+    switchThermalActionAction           BITS,
+    switchThermalActionStatus           ValidStatus
+}
+
+switchThermalActionRisingThreshold OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION "The rising threshold of the switch temperature."
+       ::= { switchThermalActionEntry 4 }
+
+switchThermalActionFallingThreshold OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION "The falling threshold of the switch temperature."
+       ::= { switchThermalActionEntry 5 }
+
+switchThermalActionAction OBJECT-TYPE
+       SYNTAX      BITS {
+                            trap(0)
+                        }
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION "The action that will be taken when the
+                    temperature exceeds the rising threshold
+                    or falls below the falling threshold."
+       ::= { switchThermalActionEntry 6 }
+
+switchThermalActionStatus OBJECT-TYPE
+       SYNTAX      ValidStatus
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION "Set valid(1) to create an entry, Set Invalid(2) to delete an entry."
+       ::= { switchThermalActionEntry 7 }
 
 -- Address Management
 amtrMacAddrAgingStatus OBJECT-TYPE
@@ -948,25 +1050,31 @@ portComboForcedMode  OBJECT-TYPE
                     none(1),
                     copperForced(2),
                     copperPreferredAuto(3),
-                    sfpForced(4),
-                    sfpPreferredAuto(5)
+                    reserved4(4),
+                    sfpPreferredAuto(5),
+                    sfpForced100Fx(6),
+                    sfpForced1000Sfp(7),
+                    sfpForced10gSfp(8)
                   }
        MAX-ACCESS read-write
        STATUS     current
-       DESCRIPTION "This determines the running mode of a combo port.
+       DESCRIPTION "This determines the running mode of a fiber port.
                     For a non-combo port, this variable has a value of none(1),
                     and setting this variable to none(1) has no effect.
                     For a combo port, this has its own valid values not
                     equal to none(1), and setting this variable to none(1) is
                     not allowed. copperForced(2) is set if user wants to force
                     this combo port to run in copper mode. copperPreferredAuto(3)
-                    is obsoleted, and user shall not set this state. sfpForced(4)
-                    is set if user wants to force this combo port to run in fiber
-                    mode. sfpPreferredAuto(5) is set if user wants to change copper or
-                    fiber mode automatically by SFP transceiver present state. If SFP
-                    transceiver is present, this combo port will run in fiber mode, and
-                    if SFP transceiver is not present, this combo port will run in
-                    copper mode."
+                    is obsoleted, and user shall not set this state. sfpPreferredAuto(5)
+                    is set if user wants to change copper or fiber mode automatically
+                    by SFP transceiver present state. If SFP transceiver is present,
+                    this combo port will run in fiber mode, and if SFP transceiver is
+                    not present, this combo port will run in copper mode. sfpForced100Fx(6)
+                    is set if user wants to force this fiber port to run in fiber mode with
+                    speed 100Mbps. sfpForced1000Sfp(7) is set if user wants to force this
+                    fiber port to run in fiber mode with speed 1Gbps. sfpForced10gSfp(8) is
+                    set if user wants to force this fiber port to run in fiber mode with
+                    speed 10Gbps."
        ::= { portEntry 12}
 
 portMasterSlaveModeCfg OBJECT-TYPE
@@ -5238,7 +5346,7 @@ dhcpOption82RemoteIDMode OBJECT-TYPE
         ::= { dhcpOption82 3 }
 
 dhcpOption82RemoteIDString OBJECT-TYPE
-        SYNTAX      OCTET STRING (SIZE(0..32))
+        SYNTAX      OCTET STRING (SIZE(0..125))
         MAX-ACCESS read-write
         STATUS     current
         DESCRIPTION
@@ -6640,6 +6748,24 @@ trapTcnStackingDownPortLinkStatusChanged OBJECT-TYPE
     STATUS      current
     DESCRIPTION "The parameter indicates the link status of down-link stacking port is changed."
     ::= { trapVar 77 }
+
+trapStackingUnitIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..8)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION "This parameter indicates which unit is inserted/removed."
+    ::= { trapVar 81 }
+
+trapStackingUnitInsertRemove OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    inserted(1),
+                    removed(2)
+                }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION "This parameter indicates unit is inserted or removed."
+    ::= { trapVar 82 }
 
 --
 -- qosMgt
@@ -20727,7 +20853,7 @@ dhcpSnoopBindingsEntry      OBJECT-TYPE
         DESCRIPTION "An instance contains the Mac address, IP address type,
                      IP address, VLAN number, interface number, leased time and
                      status."
-        INDEX       { dhcpSnoopBindingsVlanIndex, dhcpSnoopBindingsMacAddress }
+        INDEX       { dhcpSnoopBindingsIpAddress, dhcpSnoopBindingsMacAddress }
         ::= { dhcpSnoopBindingsTable 1 }
 
 DhcpSnoopBindingsEntry      ::= SEQUENCE
@@ -20743,7 +20869,7 @@ DhcpSnoopBindingsEntry      ::= SEQUENCE
 
 dhcpSnoopBindingsVlanIndex      OBJECT-TYPE
         SYNTAX      VlanIndex
-        MAX-ACCESS  not-accessible
+        MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION "This object indicates the VLAN which a DHCP client host
                      belongs to."
@@ -20775,7 +20901,7 @@ dhcpSnoopBindingsEntryType      OBJECT-TYPE
 
 dhcpSnoopBindingsIpAddress      OBJECT-TYPE
         SYNTAX      IpAddress
-        MAX-ACCESS  read-only
+        MAX-ACCESS  not-accessible
         STATUS      current
         DESCRIPTION "This object indicates the allocated IP address of
                      a DHCP client host."
@@ -21143,7 +21269,7 @@ ipSrcGuardAddrEntry     OBJECT-TYPE
         DESCRIPTION "An instance contains the Mac address, IP address type,
                      IP address, VLAN number, interface number, leased time and
                      status."
-        INDEX   { ipSrcGuardBindingsVlanIndex, ipSrcGuardBindingsMacAddress }
+        INDEX   { ipSrcGuardBindingsIpAddress, ipSrcGuardBindingsMacAddress }
         ::= { ipSrcGuardAddrTable 1 }
 
 IpSrcGuardAddrEntry     ::= SEQUENCE
@@ -21159,7 +21285,7 @@ IpSrcGuardAddrEntry     ::= SEQUENCE
 }
 ipSrcGuardBindingsVlanIndex      OBJECT-TYPE
         SYNTAX      VlanIndex
-        MAX-ACCESS  not-accessible
+        MAX-ACCESS  read-create
         STATUS      current
         DESCRIPTION "This object indicates the VLAN which a DHCP client host
                      belongs to."
@@ -21191,7 +21317,7 @@ ipSrcGuardBindingsEntryType     OBJECT-TYPE
 
 ipSrcGuardBindingsIpAddress     OBJECT-TYPE
         SYNTAX      IpAddress
-        MAX-ACCESS  read-create
+        MAX-ACCESS  not-accessible
         STATUS      current
         DESCRIPTION "This object indicates the allocated IP address of
                      a DHCP client host."
@@ -23044,6 +23170,328 @@ pppoeiaPortStatsClearAction OBJECT-TYPE
                      interface. Set clear(1) to perform  the clear operation.
                      The value noClear(2) will always be displayed when reading."
         ::= { pppoeiaPortStatsEntry 11 }
+
+--
+-- time range
+--
+
+timeRangeTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF TimeRangeEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Table for time range."
+        ::= { timeRangeMgt 1 }
+
+timeRangeEntry OBJECT-TYPE
+        SYNTAX      TimeRangeEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Entry for time range."
+        INDEX       { timeRangeIndex }
+        ::= { timeRangeTable 1 }
+
+TimeRangeEntry ::= SEQUENCE
+{
+        timeRangeIndex         Integer32,
+        timeRangeName          DisplayString,
+        timeRangeStatus        ValidStatus
+}
+
+timeRangeIndex OBJECT-TYPE
+        SYNTAX       Integer32 (0..49)
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION "The index of time range entry."
+        ::= { timeRangeEntry 1 }
+
+timeRangeName OBJECT-TYPE
+        SYNTAX       DisplayString (SIZE (1..32))
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION "The name of time range entry."
+        ::= { timeRangeEntry 2 }
+
+timeRangeStatus OBJECT-TYPE
+        SYNTAX       ValidStatus
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION "Setting this to valid(1) creates an entry.
+                     Setting this to invalid(2) destroys an entry."
+        ::= { timeRangeEntry 3 }
+
+timeRangePeriodicTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF TimeRangePeriodicEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Table for periodic time-range entries."
+        ::= { timeRangeMgt 2 }
+
+timeRangePeriodicEntry OBJECT-TYPE
+        SYNTAX      TimeRangePeriodicEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Entry for periodic time-range."
+        INDEX       { 
+                      timeRangePeriodicTimeRangeIndex, 
+                      timeRangePeriodicStartDaysOfTheWeek,
+                      timeRangePeriodicStartHours,
+                      timeRangePeriodicStartMinutes,
+                      timeRangePeriodicEndDaysOfTheWeek,
+                      timeRangePeriodicEndHours,
+                      timeRangePeriodicEndMinutes
+                    }
+        ::= { timeRangePeriodicTable 1 }
+
+TimeRangePeriodicEntry ::= SEQUENCE
+{
+        timeRangePeriodicTimeRangeIndex       Integer32,
+        timeRangePeriodicStartDaysOfTheWeek   INTEGER,
+        timeRangePeriodicStartHours           Integer32,
+        timeRangePeriodicStartMinutes         Integer32,
+        timeRangePeriodicEndDaysOfTheWeek     INTEGER,
+        timeRangePeriodicEndHours             Integer32,
+        timeRangePeriodicEndMinutes           Integer32,
+        timeRangePeriodicStatus               ValidStatus
+}
+
+timeRangePeriodicTimeRangeIndex OBJECT-TYPE
+        SYNTAX       Integer32 (0..6)
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION "The index of time range. The object
+                     should exist in timeRangeIndex of timeRangeTable."
+        ::= { timeRangePeriodicEntry 1 }
+
+timeRangePeriodicStartDaysOfTheWeek OBJECT-TYPE
+        SYNTAX       INTEGER
+                     {
+                        sunday(0),
+                        monday(1),
+                        tuesday(2),
+                        wednesday(3),
+                        thursday(4),
+                        friday(5),
+                        saturday(6),
+                        daily(7),
+                        weekdays(8),
+                        weekend(9)
+                     }
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION "Specifies the start days-of-the-week of the periodic time-range entry.
+                     1.	If the start days-of-the-week is set to Sunday, Monday... or Saturday
+                        then the end days-of-the-week shall be set to Sunday, Monday..., or Saturday.
+                        1-1. If the start time is equal to the end time (for example: 09:00 - 09:00), 
+                             it means that the rule is active in the whole day.
+                        1-2. If the end time is prior to the start time (for example: 05:00 - 01:00), 
+                             it means that the rule is inactive from 01:01 to 04:59.
+                     2.	If the start days-of-the-week is set to Daily, Weekdays, or Weekend, 
+                        then the end days-of-the-week shall be set the same as start, 
+                        and the start time shall be before the end time."
+        ::= { timeRangePeriodicEntry 2 }
+
+timeRangePeriodicStartHours OBJECT-TYPE
+        SYNTAX       Integer32(0..23)
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION "Specifies the start hours of the periodic time-range entry."
+        ::= { timeRangePeriodicEntry 3 } 
+
+timeRangePeriodicStartMinutes OBJECT-TYPE
+        SYNTAX       Integer32(0..59)
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION "Specifies the start minutess of the periodic time-range entry."
+        ::= { timeRangePeriodicEntry 4 }
+
+timeRangePeriodicEndDaysOfTheWeek OBJECT-TYPE
+        SYNTAX       INTEGER
+                     {
+                        sunday(0),
+                        monday(1),
+                        tuesday(2),
+                        wednesday(3),
+                        thursday(4),
+                        friday(5),
+                        saturday(6),
+                        daily(7),
+                        weekdays(8),
+                        weekend(9)
+                     }
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION "Specifies the end days-of-the-week of the periodic time-range entry.
+                     1.	If the start days-of-the-week is set to Sunday, Monday... or Saturday
+                        then the end days-of-the-week shall be set to Sunday, Monday..., or Saturday.
+                        1-1. If the start time is equal to the end time (for example: 09:00 - 09:00), 
+                             it means that the rule is active in the whole day.
+                        1-2. If the end time is prior to the start time (for example: 05:00 - 01:00), 
+                             it means that the rule is inactive from 01:01 to 04:59.
+                     2.	If the start days-of-the-week is set to Daily, Weekdays, or Weekend, 
+                        then the end days-of-the-week shall be set the same as start, 
+                        and the start time shall be before the end time."
+        ::= { timeRangePeriodicEntry 5 }
+
+timeRangePeriodicEndHours OBJECT-TYPE
+        SYNTAX       Integer32(0..23)
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION "Specifies the end hours of the periodic time-range entry."
+        ::= { timeRangePeriodicEntry 6 } 
+
+timeRangePeriodicEndMinutes OBJECT-TYPE
+        SYNTAX       Integer32(0..59)
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION "Specifies the end minutess of the periodic time-range entry."
+        ::= { timeRangePeriodicEntry 7 }
+
+timeRangePeriodicStatus OBJECT-TYPE
+        SYNTAX       ValidStatus
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION "Setting this to valid(1) creates an periodic entry.
+                     Setting this to invalid(2) destroys an periodic entry."
+        ::= { timeRangePeriodicEntry 8 }
+
+timeRangeAbsoluteTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF TimeRangeAbsoluteEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Table for absolute time-range entries."
+        ::= { timeRangeMgt 3 }
+
+timeRangeAbsoluteEntry OBJECT-TYPE
+        SYNTAX      TimeRangeAbsoluteEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Entry for absolute time-range."
+        INDEX       { 
+                      timeRangeAbsoluteTimeRangeIndex, 
+                      timeRangeAbsoluteStartYears,
+                      timeRangeAbsoluteStartMonths,
+                      timeRangeAbsoluteStartDays,
+                      timeRangeAbsoluteStartHours,
+                      timeRangeAbsoluteStartMinutes,
+                      timeRangeAbsoluteEndYears,
+                      timeRangeAbsoluteEndMonths,
+                      timeRangeAbsoluteEndDays,
+                      timeRangeAbsoluteEndHours,
+                      timeRangeAbsoluteEndMinutes
+                    }
+        ::= { timeRangeAbsoluteTable 1 }
+
+TimeRangeAbsoluteEntry ::= SEQUENCE
+{
+        timeRangeAbsoluteTimeRangeIndex       Integer32,
+        timeRangeAbsoluteStartYears           Integer32,
+        timeRangeAbsoluteStartMonths          Integer32,
+        timeRangeAbsoluteStartDays            Integer32,
+        timeRangeAbsoluteStartHours           Integer32,
+        timeRangeAbsoluteStartMinutes         Integer32,
+        timeRangeAbsoluteEndYears             Integer32,
+        timeRangeAbsoluteEndMonths            Integer32,
+        timeRangeAbsoluteEndDays              Integer32,
+        timeRangeAbsoluteEndHours             Integer32,
+        timeRangeAbsoluteEndMinutes           Integer32,
+        timeRangeAbsoluteStatus               ValidStatus
+}
+
+timeRangeAbsoluteTimeRangeIndex OBJECT-TYPE
+        SYNTAX       Integer32 (0..49)
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION "The index of time range. The object
+                     should exist in timeRangeIndex of timeRangeTable."
+        ::= { timeRangeAbsoluteEntry 1 }
+
+timeRangeAbsoluteStartYears OBJECT-TYPE
+        SYNTAX       Integer32(2013..2037|65535)
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION "Specifies the start years of the absolute time-range entry.
+                     65535 means don't care."
+        ::= { timeRangeAbsoluteEntry 2 }
+        
+timeRangeAbsoluteStartMonths OBJECT-TYPE
+        SYNTAX       Integer32(1..12|255)
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION "Specifies the start months of the absolute time-range entry.
+                     255 means don't care."
+        ::= { timeRangeAbsoluteEntry 3 }        
+
+timeRangeAbsoluteStartDays OBJECT-TYPE
+        SYNTAX       Integer32(1..31|255)
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION "Specifies the start days of the absolute time-range entry.
+                     255 means don't care."
+        ::= { timeRangeAbsoluteEntry 4 }
+
+timeRangeAbsoluteStartHours OBJECT-TYPE
+        SYNTAX       Integer32(0..23|255)
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION "Specifies the start hours of the absolute time-range entry.\
+                     255 means don't care."
+        ::= { timeRangeAbsoluteEntry 5 }
+        
+timeRangeAbsoluteStartMinutes OBJECT-TYPE
+        SYNTAX       Integer32(0..59|255)
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION "Specifies the start minutes of the absolute time-range entry.\
+                     255 means don't care."
+        ::= { timeRangeAbsoluteEntry 6 }         
+
+timeRangeAbsoluteEndYears OBJECT-TYPE
+        SYNTAX       Integer32(2013..2037|65535)
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION "Specifies the end years of the absolute time-range entry.
+                     65535 means don't care."
+        ::= { timeRangeAbsoluteEntry 7 }
+        
+timeRangeAbsoluteEndMonths OBJECT-TYPE
+        SYNTAX       Integer32(1..12|255)
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION "Specifies the end months of the absolute time-range entry.
+                     255 means don't care."
+        ::= { timeRangeAbsoluteEntry 8 }        
+
+timeRangeAbsoluteEndDays OBJECT-TYPE
+        SYNTAX       Integer32(1..31|255)
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION "Specifies the end days of the absolute time-range entry.
+                     255 means don't care."
+        ::= { timeRangeAbsoluteEntry 9 }
+
+timeRangeAbsoluteEndHours OBJECT-TYPE
+        SYNTAX       Integer32(0..23|255)
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION "Specifies the end hours of the absolute time-range entry.\
+                     255 means don't care."
+        ::= { timeRangeAbsoluteEntry 10 }
+        
+timeRangeAbsoluteEndMinutes OBJECT-TYPE
+        SYNTAX       Integer32(0..59|255)
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION "Specifies the end minutes of the absolute time-range entry.\
+                     255 means don't care."
+        ::= { timeRangeAbsoluteEntry 11 } 
+
+timeRangeAbsoluteStatus OBJECT-TYPE
+        SYNTAX       ValidStatus
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION "Setting this to valid(1) creates an absolute entry.
+                     Setting this to invalid(2) destroys an absolute entry."
+        ::= { timeRangeAbsoluteEntry 12 }
 
 --
 -- erpsMgt
@@ -25169,5 +25617,14 @@ cpuGuardReleaseTrap NOTIFICATION-TYPE
     DESCRIPTION "This trap is sent when CPU utilization falls from
                  above the high-watermark to below the low-watermark."
     ::= { ecs4510TrapsPrefix 214 }
+
+stackingUnitInsertRemoveTrap NOTIFICATION-TYPE
+    OBJECTS  {
+                 trapStackingUnitIndex,
+                 trapStackingUnitInsertRemove
+             }
+    STATUS      current
+    DESCRIPTION "This trap is sent when stacking unit is inserted or removed."
+    ::= { ecs4510TrapsPrefix 244 }
 
 END

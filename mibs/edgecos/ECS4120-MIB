@@ -31,7 +31,7 @@ IMPORTS
                 FROM POWER-ETHERNET-MIB;
 
 ecs4120MIB MODULE-IDENTITY
-        LAST-UPDATED "202309280000Z"
+        LAST-UPDATED "201903080000Z"
         ORGANIZATION "Edgecore Networks, Inc."
         CONTACT-INFO
                 "Edgecore Networks, Inc.
@@ -49,7 +49,7 @@ ecs4120MIB MODULE-IDENTITY
                  technical support:brandsupport@edge-core.com"
         DESCRIPTION
                 "The MIB module for ECS4120-Series."
-        REVISION "202309280000Z"
+        REVISION "201710180000Z"
         DESCRIPTION
                 "The current version of this MIB."
         ::= { edgeCoreNetworksMgt 45 }
@@ -732,16 +732,6 @@ swAlarmInputStatus    OBJECT-TYPE
     DESCRIPTION "The parameter indicates which event triggers the trap."
     ::= { switchAlarmInputEntry 3 }
 
-switchFanSteadySpeed     OBJECT-TYPE
-    SYNTAX      INTEGER
-                {
-                    enable(1),
-                    disable(2)
-                }
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION "Enable or Disable Fan low steady speed."
-    ::= { switchMgt 25 }
 --
 -- portMgt
 --
@@ -784,11 +774,7 @@ PortEntry ::= SEQUENCE
     portMacAddrLearningStatus   EnabledStatus,
     portMacAddrLearningCount    Counter32,
     portUpTime                  TimeTicks,
-    portShutdownReason          BITS,
-    portResetConfiguration      INTEGER,
-    portLinkDelayUp             Integer32,
-    portLinkDelayDown           Integer32
-    
+    portShutdownReason          BITS
 }
 
 portIndex OBJECT-TYPE
@@ -1082,17 +1068,6 @@ portMacAddrLearningCount OBJECT-TYPE
         DESCRIPTION "The current number of learned MAC addresses."
         ::= { portEntry 18 }
 
-portResetConfiguration OBJECT-TYPE
-        SYNTAX      INTEGER
-                    {
-                        reset(1),
-                        noReset(2)
-                    }
-        MAX-ACCESS  read-write
-        STATUS      current
-        DESCRIPTION "Set this variable to reset(1) to reset the port configuration to its original state."
-        ::= { portEntry 21 }
-
 portUpTime OBJECT-TYPE
         SYNTAX      TimeTicks
         MAX-ACCESS  read-only
@@ -1119,22 +1094,7 @@ portShutdownReason OBJECT-TYPE
         DESCRIPTION "The reason of port shutdown. The value is 0 if no
                      shutdown action is applied to this port."
         ::= { portEntry 20 }
-        
-portLinkDelayUp OBJECT-TYPE
-        SYNTAX      Integer32(0..30)
-        MAX-ACCESS  read-write
-        STATUS      current
-        DESCRIPTION "Keep port state for a few time that it does 
-                     not become up state."
-        ::= { portEntry 22 }
-        
-portLinkDelayDown OBJECT-TYPE
-        SYNTAX      Integer32(0..30)
-        MAX-ACCESS  read-write
-        STATUS      current
-        DESCRIPTION "Keep port state for a few time that it does 
-                     not become down state."
-        ::= { portEntry 23 }        
+
 --
 -- cable diagnostics
 --
@@ -2198,10 +2158,6 @@ PortMediaInfoEntry ::=
                  portMediaInfoSerialNumber
                            DisplayString,
                  portMediaInfoDateCode
-                           DisplayString,
-		 portMediaInfoWavelength
-                           DisplayString,	
-                 portMediaInfoLinklength
                            DisplayString
          }
 
@@ -2281,20 +2237,6 @@ portMediaInfoDateCode  OBJECT-TYPE
     STATUS       current
     DESCRIPTION "The date code of the media device."
     ::= { portMediaInfoEntry 11 }
-
-portMediaInfoWavelength  OBJECT-TYPE
-    SYNTAX       DisplayString (SIZE (0..128))
-    MAX-ACCESS       read-only
-    STATUS       current
-    DESCRIPTION "The wavelength of the media device."
-    ::= { portMediaInfoEntry 12 }
-	
-portMediaInfoLinklength  OBJECT-TYPE
-    SYNTAX       DisplayString (SIZE (0..128))
-    MAX-ACCESS       read-only
-    STATUS       current
-    DESCRIPTION "The link length of the media device."
-    ::= { portMediaInfoEntry 13 }
 
 -- ifIndex to Optical Parameters Table
 -- Given an ifIndex, this table returns the optical parameters for the ifIndex.
@@ -2647,17 +2589,6 @@ portTransceiverThresholdAutoMode OBJECT-TYPE
     ::= { portTransceiverThresholdInfoEntry 22 }
 
 --
--- portUtilszationPeriod
---
-
-portUtilizationPeriod OBJECT-TYPE
-    SYNTAX      Integer32(30..300)
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-        "The node sets the port utilization period."
-    ::= { portMgt 13 }
---
 -- trunkMgt
 --
 
@@ -2702,10 +2633,7 @@ TrunkEntry ::= SEQUENCE
     trunkIndex                InterfaceIndex,
     trunkPorts                PortList,
     trunkCreation             INTEGER,
-    trunkStatus               ValidStatus,
-    trunkResetConfiguration   INTEGER,
-    trunkLinkDelayUp          Integer32,
-    trunkLinkDelayDown        Integer32   
+    trunkStatus               ValidStatus
 }
 
 trunkIndex OBJECT-TYPE
@@ -2749,34 +2677,6 @@ trunkStatus OBJECT-TYPE
          or (re)configured."
     ::= { trunkEntry 4 }
 
-
-trunkResetConfiguration OBJECT-TYPE
-    SYNTAX      INTEGER
-                {
-                    reset(1),
-                    noReset(2)
-                }
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION "Set this variable to reset(1) to reset the trunk configuration to its original state."
-    ::= { trunkEntry 6 }
-    
-trunkLinkDelayUp OBJECT-TYPE
-        SYNTAX      Integer32(0..30)
-        MAX-ACCESS  read-write
-        STATUS      current
-        DESCRIPTION "Keep port state for a few time that it does 
-                     not become up state."
-        ::= { trunkEntry 7 }
-        
-trunkLinkDelayDown OBJECT-TYPE
-        SYNTAX      Integer32(0..30)
-        MAX-ACCESS  read-write
-        STATUS      current
-        DESCRIPTION "Keep port state for a few time that it does 
-                     not become down state."
-        ::= { trunkEntry 8 } 
-        
 trunkBalanceMode OBJECT-TYPE
     SYNTAX  INTEGER
     {
@@ -5651,192 +5551,7 @@ dhcpcIfVendorClassId OBJECT-TYPE
                       This value may be used by DHCP servers to identify vendor
                       classof the client."
          ::= { dhcpcInterfaceEntry 5 }
---
--- dhcpRealyMgt
---         
-dhcpRelay OBJECT IDENTIFIER ::= { dhcpMgt 2 }
 
---dhcpRelayRestart
-dhcpRelayRestart OBJECT-TYPE
-          SYNTAX      INTEGER
-                      {
-                        restart(1),
-                        noRestart(2)
-                      }
-          MAX-ACCESS  read-write
-          STATUS      current
-          DESCRIPTION "Set this object to restart(1) to restart DCHP Relay.
-                       Always get noRestart(2) when you read this variable."
-          ::= { dhcpRelay 3 }
-
-dhcpRelayServerInetAddrTable OBJECT-TYPE
-    SYNTAX      SEQUENCE OF DhcpRelayServerInetAddrEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "The role of DHCP Relay Agent is to forward requests and replies
-         between server and client when they are not in the same subnet. To
-         enable DHCP Relay service user needs to specify Relay Server IP
-         address and then restart DHCP Relay. This Table is to specify Relay
-         Server IP address,the maximum numbers of server IP address user can
-         specify is 5.To Restart DHCP Relay, please use the dhcpRelayRestart
-         variable."
-    ::= { dhcpRelay 4 }
-
-dhcpRelayServerInetAddrEntry OBJECT-TYPE
-    SYNTAX      DhcpRelayServerInetAddrEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "A conceptual row of dhcpRelayServerAddrTable."
-    INDEX
-    {
-        dhcpRelayServerInetAddrIfIndex,
-        dhcpRelayServerInetAddrIndex
-    }
-    ::= { dhcpRelayServerInetAddrTable 1 }
-
-DhcpRelayServerInetAddrEntry ::= SEQUENCE
-{
-    dhcpRelayServerInetAddrIfIndex  Integer32,
-    dhcpRelayServerInetAddrIndex    Integer32,
-    dhcpRelayServerInetAddressType  InetAddressType,
-    dhcpRelayServerInetAddress      InetAddress
-}
-
-dhcpRelayServerInetAddrIfIndex OBJECT-TYPE
-    SYNTAX      Integer32(1..4093)
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "The VLAN interface being used by this table entry."
-    ::= { dhcpRelayServerInetAddrEntry 1 }
-
-dhcpRelayServerInetAddrIndex OBJECT-TYPE
-    SYNTAX      Integer32 (1..5)
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "The index of the Relay server IP address."
-    ::= { dhcpRelayServerInetAddrEntry 2 }
-
-dhcpRelayServerInetAddressType OBJECT-TYPE
-    SYNTAX      InetAddressType
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-        "The INET address type of the relay server."
-    ::= { dhcpRelayServerInetAddrEntry 3 }
-
-dhcpRelayServerInetAddress OBJECT-TYPE
-    SYNTAX      InetAddress
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-        "The INET address of the relay server."
-    ::= { dhcpRelayServerInetAddrEntry 4 }
-
-dhcpv6RelayServerInetAddrTable OBJECT-TYPE
-    SYNTAX      SEQUENCE OF Dhcpv6RelayServerInetAddrEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "The role of DHCP Relay Agent is to forward requests and replies
-         between server and client when they are not in the same subnet. To
-         enable DHCP Relay service user needs to specify Relay Server IPv6
-         address. This Table is to specify Relay Server IPv6 address,
-         the maximum numbers of server IPv6 address user can specify is 5."
-    ::= { dhcpRelay 5 }
-
-dhcpv6RelayServerInetAddrEntry OBJECT-TYPE
-    SYNTAX      Dhcpv6RelayServerInetAddrEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "A conceptual row of dhcpv6RelayServerAddrTable."
-    INDEX
-    {
-        dhcpv6RelayServerInetAddrIfIndex,
-        dhcpv6RelayServerInetAddress
-    }
-    ::= { dhcpv6RelayServerInetAddrTable 1 }
-
-Dhcpv6RelayServerInetAddrEntry ::= SEQUENCE
-{
-    dhcpv6RelayServerInetAddrIfIndex  Integer32,
-    dhcpv6RelayServerInetAddress      InetAddressIPv6
-}
-
-dhcpv6RelayServerInetAddrIfIndex OBJECT-TYPE
-    SYNTAX      Integer32(1..4094)
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "The VLAN interface being used by this table entry."
-    ::= { dhcpv6RelayServerInetAddrEntry 1 }
-
-dhcpv6RelayServerInetAddress OBJECT-TYPE
-    SYNTAX      InetAddressIPv6
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-        "The INET address of the relay server."
-    ::= { dhcpv6RelayServerInetAddrEntry 2 }
-
-dhcpv6RelayServerVlanTable OBJECT-TYPE
-    SYNTAX      SEQUENCE OF Dhcpv6RelayServerVlanEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "The role of DHCP Relay Agent is to forward requests and replies
-         between server and client when they are not in the same subnet. To
-         enable DHCP Relay service user needs to specify multicast Relay Server Vlan.
-         This Table is to specify multicast Relay Server Vlan."
-    ::= { dhcpRelay 6 }
-
-dhcpv6RelayServerVlanEntry OBJECT-TYPE
-    SYNTAX      Dhcpv6RelayServerVlanEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "A conceptual row of dhcpv6RelayServerVlanTable."
-    INDEX
-    {
-        dhcpv6RelayServerVlanIfIndex,
-        dhcpv6RelayServerMcastIfIndex
-    }
-    ::= { dhcpv6RelayServerVlanTable 1 }
-
-Dhcpv6RelayServerVlanEntry ::= SEQUENCE
-{
-    dhcpv6RelayServerVlanIfIndex  Integer32,
-    dhcpv6RelayServerMcastIfIndex Integer32,
-    dhcpv6RelayServerVlanEnable   EnabledStatus
-}
-
-dhcpv6RelayServerVlanIfIndex OBJECT-TYPE
-    SYNTAX      Integer32(1..4094)
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "The relay VLAN interface."
-    ::= { dhcpv6RelayServerVlanEntry 1 }
-
-dhcpv6RelayServerMcastIfIndex OBJECT-TYPE
-    SYNTAX      Integer32(1..4094)
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "The multicast relay destination VLAN interface."
-    ::= { dhcpv6RelayServerVlanEntry 2 }
-
-dhcpv6RelayServerVlanEnable OBJECT-TYPE
-    SYNTAX      EnabledStatus
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-        "The status of multicast relay destination VLAN interface."
-    ::= { dhcpv6RelayServerVlanEntry 3 }
 --
 -- dhcpServerMgt
 --
@@ -6571,7 +6286,7 @@ pingIpAddress OBJECT-TYPE
     ::= { pingMgt 1 }
 
 pingPacketSize OBJECT-TYPE
-    SYNTAX      Integer32 (32..1472)
+    SYNTAX      Integer32 (32..512)
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION "Specifies the size of each data potion of ping packets
@@ -6610,7 +6325,7 @@ pingAction OBJECT-TYPE
 -- For CHT
 
 pingProbeCount OBJECT-TYPE
-    SYNTAX      Integer32 (1..10000)
+    SYNTAX      Integer32 (1..16)
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION "Specifies the number of times to perform a ping operation at a
@@ -6669,7 +6384,7 @@ pingHistoryEntry OBJECT-TYPE
 PingHistoryEntry::= SEQUENCE
 {
     pingHistoryIndex          Integer32,
-    pingHistoryResponse       DisplayString
+    pingHistoryResponse       Integer32
 }
 
 pingHistoryIndex OBJECT-TYPE
@@ -6682,7 +6397,7 @@ pingHistoryIndex OBJECT-TYPE
     ::= { pingHistoryEntry  1 }
 
 pingHistoryResponse OBJECT-TYPE
-    SYNTAX      DisplayString (SIZE(0..15))
+    SYNTAX      Integer32
     UNITS       "milliseconds"
     MAX-ACCESS  read-only
     STATUS      current
@@ -6998,7 +6713,7 @@ vlanPortMode OBJECT-TYPE
                     Setting it to access(3) sets an access link."
         ::= { vlanPortEntry 2 }
 
--- SYS_CPNT_COMMUNITY_PRIVATE_VLAN (use PVLAN_MGR API) start
+--¡@SYS_CPNT_COMMUNITY_PRIVATE_VLAN¡@(use PVLAN_MGR API) start
 vlanPortPrivateVlanType OBJECT-TYPE
         SYNTAX     INTEGER
                    {
@@ -11544,53 +11259,7 @@ pvePortStatus OBJECT-TYPE
 
 
 -- SYS_CPNT_PORT_TRAFFIC_SEGMENTATION(use SWCTRL api) end
---
--- privateVlanSessionStatusTable
---
 
-privateVlanSessionStatusTable   OBJECT-TYPE
-    SYNTAX      SEQUENCE OF PrivateVlanSessionStatusEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION "Contains the settings for private VLAN Session status."
-    ::= { privateVlanMgt 11 }
-
-privateVlanSessionStatusEntry   OBJECT-TYPE
-    SYNTAX      PrivateVlanSessionStatusEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION "A conceptual row in the privateVlanSession table."
-    INDEX { privateVlanSessionStatusId }
-    ::= { privateVlanSessionStatusTable 1 }
-
-PrivateVlanSessionStatusEntry::= SEQUENCE
-{
-    privateVlanSessionStatusId                      INTEGER,
-    privateVlanSessionStatusUplinkToUplink          INTEGER
-}
-
-privateVlanSessionStatusId   OBJECT-TYPE
-    SYNTAX      INTEGER(1..4)
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION "The session ID that may specifiy certain entry in the table which contains private
-                 VLAN session information."
-    ::= { privateVlanSessionStatusEntry 1 }
-
-privateVlanSessionStatusUplinkToUplink   OBJECT-TYPE
-    SYNTAX      INTEGER
-                {
-                    blocking(1),
-                    forwarding(2)
-                }
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION "Sets this to blocking(2) to deny the traffic of uplink
-                 ports between same sessions. Set this to forwarding(1)
-                 to allow the traffic of uplink ports between same
-                 sessions."
-    ::= { privateVlanSessionStatusEntry 2 }
-	
 -- PortSecurityMgt
 
 -- Management for Port Security. A secure port only allows
@@ -11774,14 +11443,6 @@ radiusServerGlobalTimeout OBJECT-TYPE
                      timeout, this value is used."
         ::= { radiusMgt 5 }
 
-radiusServerGlobalType OBJECT-TYPE
-        SYNTAX      EnabledStatus
-        MAX-ACCESS  read-write
-        STATUS      current
-        DESCRIPTION "Sets enabled(1) to enable radsec for Radius and
-                     sets disabled(2) to disable radsec for Radius."
-        ::= { radiusMgt 6 }
-
 --radiusServerTable
 
 radiusServerTable OBJECT-TYPE
@@ -11808,8 +11469,7 @@ RadiusServerEntry ::= SEQUENCE
    radiusServerKey                    DisplayString,
    radiusServerRetransmit             Integer32,
    radiusServerTimeout                Integer32,
-   radiusServerStatus                 ValidStatus,
-   radiusServerType                    EnabledStatus  
+   radiusServerStatus                 ValidStatus
 }
 
 radiusServerIndex OBJECT-TYPE
@@ -11870,14 +11530,6 @@ radiusServerStatus OBJECT-TYPE
         DESCRIPTION "Setting this to valid(1) creates an entry.
                      Setting this to invalid(2) destroys an entry."
         ::= { radiusServerEntry 8 }
-
-radiusServerType OBJECT-TYPE
-        SYNTAX      EnabledStatus
-        MAX-ACCESS  read-write
-        STATUS      current
-        DESCRIPTION "Sets enabled(1) to enable radsec for Radius and
-                     sets disabled(2) to disable radsec for Radius."
-        ::= { radiusServerEntry 9 }
 
 --
 -- tacacsMgt
@@ -14083,21 +13735,7 @@ smtpDestEMailStatus OBJECT-TYPE
        DESCRIPTION "Setting this to valid(1) creates an entry.
                        Setting this to invalid(2) destroys an entry."
        ::= { smtpDestEMailEntry 2 }
-sysLogCommandLogStatus OBJECT-TYPE
-    SYNTAX       EnabledStatus
-    MAX-ACCESS   read-write
-    STATUS       current
-    DESCRIPTION "Set enabled(1) to enable command log, set disabled(2) to disable
-                 command log."
-    ::= { sysLogMgt 10 }
 
-sysLogPrtscrLogStatus OBJECT-TYPE
-    SYNTAX       EnabledStatus
-    MAX-ACCESS   read-write
-    STATUS       current
-    DESCRIPTION "Set enabled(1) to enable print screen log, set disabled(2) to disable
-                 print screen log."
-    ::= { sysLogMgt 11 }
 --
 -- lineMgt
 --
@@ -15794,8 +15432,7 @@ AtcBcastStormEntry ::= SEQUENCE
     atcBcastStormAlarmFireTrapStatus    EnabledStatus,
     atcBcastStormAlarmClearTrapStatus   EnabledStatus,
     atcBcastStormTcApplyTrapStatus      EnabledStatus,
-    atcBcastStormTcReleaseTrapStatus    EnabledStatus,
-    atcBcastStormAutoReleaseShutdown    EnabledStatus
+    atcBcastStormTcReleaseTrapStatus    EnabledStatus
 }
 
 atcBcastStormIfIndex OBJECT-TYPE
@@ -15901,14 +15538,6 @@ atcBcastStormTcReleaseTrapStatus OBJECT-TYPE
                  the ATC is released."
     ::= { atcBcastStormEntry 12 }
 
-atcBcastStormAutoReleaseShutdown OBJECT-TYPE
-    SYNTAX      EnabledStatus
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION "The parameter indicates whether the Auto-Release for shutdown feature
-                 of ATC is applied."
-    ::= { atcBcastStormEntry 14 }
-
 atcMcastStormTcApplyTime OBJECT-TYPE
     SYNTAX      INTEGER
     MAX-ACCESS  read-write
@@ -15955,8 +15584,7 @@ AtcMcastStormEntry ::= SEQUENCE
     atcMcastStormAlarmFireTrapStatus        EnabledStatus,
     atcMcastStormAlarmClearTrapStatus        EnabledStatus,
     atcMcastStormTcApplyTrapStatus         EnabledStatus,
-    atcMcastStormTcReleaseTrapStatus    EnabledStatus,
-    atcMcastStormAutoReleaseShutdown    EnabledStatus
+    atcMcastStormTcReleaseTrapStatus    EnabledStatus
 }
 
 atcMcastStormIfIndex OBJECT-TYPE
@@ -16061,14 +15689,6 @@ atcMcastStormTcReleaseTrapStatus OBJECT-TYPE
     DESCRIPTION "The parameter indicates whether the trap has to be sent when
                  the ATC is released."
     ::= { atcMcastStormEntry 12 }
-
-atcMcastStormAutoReleaseShutdown OBJECT-TYPE
-    SYNTAX      EnabledStatus
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION "The parameter indicates whether the Auto-Release for shutdown feature
-                 of ATC is applied."
-    ::= { atcMcastStormEntry 14 }
 
 --
 -- sysResourceMgt
@@ -18107,8 +17727,8 @@ dhcpSnoopInformationOptionRID     OBJECT-TYPE
                         string(5),
                         tr101IP(6),
                         tr101Sysname(7),
-                        stringPlusPortDescription(8),
-                        portDescription(9)
+                        string_plus_port_description(8),
+                        port_description(9)
                     }
         MAX-ACCESS  read-write
         STATUS      current
@@ -18231,8 +17851,7 @@ dhcpSnoopPortInformationOptionCID    OBJECT-TYPE
                         vlanUnitPort(1),
                         string(2),
                         tr101IP(3),
-                        tr101Sysname(4),
-                        vlanSlotPortMac(5)
+                        tr101Sysname(4)
                     }
         MAX-ACCESS  read-write
         STATUS      current
@@ -18240,9 +17859,7 @@ dhcpSnoopPortInformationOptionCID    OBJECT-TYPE
                      information circuit ID sub-option. A value of tr101IP(3)
              means that the RID format is '<IP> eth <BOARD ID>/<SID>/<PORT>[:<VLAN>]'.
              A value of tr101Sysname(4) means that the RID format
-             is 'eth <BOARD ID>/<SID>/<PORT>[:<VLAN>][SYSNAME]'.
-             A value of vlanSlotPortMac(5) means that the CID format
-             is '<VLAN>/<SLOT>/<PORT>/<MAC>'."
+             is 'eth <BOARD ID>/<SID>/<PORT>[:<VLAN>][SYSNAME]'."
         ::= { dhcpSnoopPortConfigEntry 3 }
 
 dhcpSnoopPortInformationOptionCIDString OBJECT-TYPE
@@ -22154,7 +21771,7 @@ ip6SrcGuardPortIfIndex       OBJECT-TYPE
         ::= { ip6SrcGuardConfigEntry 1 }
 
 ip6SrcGuardMode      OBJECT-TYPE
-        SYNTAX      INTEGER { disabled(1), srcIp(2), srcPrefix(3), srcIp-srcPrefix(4)}
+        SYNTAX      INTEGER { disabled(1), srcIp(2), srcPrefix(3)}
         MAX-ACCESS  read-write
         STATUS      current
         DESCRIPTION "This object indicates whether IPv6 Source Guard is enabled
@@ -22162,9 +21779,7 @@ ip6SrcGuardMode      OBJECT-TYPE
                      Guard  is disabled. If the value equals 2, it means IPv6 Source
                      Guard is enabled, and packets are filtered by checking source ip.
                      If the value equals 3, it means IPv6 Prefix Guard is enabled, and
-                     packets are filtered by checking source prefix.If the value equals 4,
-                     it means IPv6 Source Guard and IPv6 Prefix Guard is enabled,
-                     and packets are filtered by checking source ip and source prefix."
+                     packets are filtered by checking source prefix."
         ::= { ip6SrcGuardConfigEntry 2 }
 
 ip6SrcGuardMaxBinding   OBJECT-TYPE

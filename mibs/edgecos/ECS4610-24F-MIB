@@ -13,7 +13,7 @@ IMPORTS
                 FROM SNMPv2-SMI
         TEXTUAL-CONVENTION, DisplayString, RowStatus, TruthValue, RowPointer
                 FROM SNMPv2-TC
-        PortList, VlanIndex, VlanId
+        PortList, VlanIndex, VlanId, dot1qVlanStaticEntry
                 FROM Q-BRIDGE-MIB
         InetAddressType, InetAddress, InetAddressIPv6, InetAddressPrefixLength
                 FROM INET-ADDRESS-MIB
@@ -1366,6 +1366,233 @@ portVlanTrunkingStatus OBJECT-TYPE
     ::= { portVlanTrunkingEntry 2 }
 
 --
+-- Show Media Information
+-- Information of the media device installed in the physical ports.
+--
+
+portMediaInfoTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PortMediaInfoEntry
+    MAX-ACCESS      not-accessible
+    STATUS      current
+    DESCRIPTION "This table lists the information of the media device
+                 (SFP/XFP/Copper) installed in the physical port.
+                 Only the ifIndices of Ethernet ports those are associated
+                 with the operational cards will be included in this table."
+    ::= { portMgt 10 }
+
+portMediaInfoEntry  OBJECT-TYPE
+    SYNTAX      PortMediaInfoEntry
+    MAX-ACCESS      not-accessible
+    STATUS      current
+    DESCRIPTION "An entry in the Interface Media Information table.
+                 The ifIndices of ethernet interfaces will be used
+                 to index this table."
+    INDEX       { portMediaInfoIfIndex }
+    ::= { portMediaInfoTable 1 }
+
+PortMediaInfoEntry ::=
+    SEQUENCE  {
+                 portMediaInfoIfIndex
+                           Integer32,
+                 portMediaInfoConnectorType
+                           DisplayString,
+                 portMediaInfoFiberType
+                           DisplayString,
+                 portMediaInfoEthComplianceCodes
+                           DisplayString,
+                 portMediaInfoBaudRate
+                           DisplayString,
+                 portMediaInfoVendorOUI
+                           DisplayString,
+                 portMediaInfoVendorName
+                           DisplayString,
+                 portMediaInfoPartNumber
+                           DisplayString,
+                 portMediaInfoRevision
+                           DisplayString,
+                 portMediaInfoSerialNumber
+                           DisplayString,
+                 portMediaInfoDateCode
+                           DisplayString
+         }
+
+portMediaInfoIfIndex  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS       current
+    DESCRIPTION "ifindex."
+    ::= { portMediaInfoEntry 1 }
+
+portMediaInfoConnectorType  OBJECT-TYPE
+    SYNTAX       DisplayString (SIZE (0..128))
+    MAX-ACCESS       read-only
+    STATUS       current
+    DESCRIPTION "The connector type."
+    ::= { portMediaInfoEntry 2 }
+
+portMediaInfoFiberType  OBJECT-TYPE
+    SYNTAX       DisplayString (SIZE (0..128))
+    MAX-ACCESS       read-only
+    STATUS       current
+    DESCRIPTION "The fiber type."
+    ::= { portMediaInfoEntry 3 }
+
+portMediaInfoEthComplianceCodes  OBJECT-TYPE
+    SYNTAX       DisplayString (SIZE (0..128))
+    MAX-ACCESS       read-only
+    STATUS       current
+    DESCRIPTION "The ethernet compliance codes."
+    ::= { portMediaInfoEntry 4 }
+
+portMediaInfoBaudRate  OBJECT-TYPE
+    SYNTAX       DisplayString (SIZE (0..128))
+    MAX-ACCESS       read-only
+    STATUS       current
+    DESCRIPTION "The baud rate."
+    ::= { portMediaInfoEntry 5 }
+
+portMediaInfoVendorOUI  OBJECT-TYPE
+    SYNTAX       DisplayString (SIZE (0..128))
+    MAX-ACCESS       read-only
+    STATUS       current
+    DESCRIPTION "The OUI of the vendor."
+    ::= { portMediaInfoEntry 6 }
+
+portMediaInfoVendorName  OBJECT-TYPE
+    SYNTAX       DisplayString (SIZE (0..128))
+    MAX-ACCESS       read-only
+    STATUS       current
+    DESCRIPTION "The media vendor name, full name of the corporation."
+    ::= { portMediaInfoEntry 7 }
+
+portMediaInfoPartNumber  OBJECT-TYPE
+    SYNTAX       DisplayString (SIZE (0..128))
+    MAX-ACCESS       read-only
+    STATUS       current
+    DESCRIPTION "The media vendor part number."
+    ::= { portMediaInfoEntry 8 }
+
+portMediaInfoRevision  OBJECT-TYPE
+    SYNTAX       DisplayString (SIZE (0..128))
+    MAX-ACCESS       read-only
+    STATUS       current
+    DESCRIPTION "The media vendor product version number."
+    ::= { portMediaInfoEntry 9 }
+
+portMediaInfoSerialNumber  OBJECT-TYPE
+    SYNTAX       DisplayString (SIZE (0..128))
+    MAX-ACCESS       read-only
+    STATUS       current
+    DESCRIPTION "The vendor serial number of the media device."
+    ::= { portMediaInfoEntry 10 }
+
+portMediaInfoDateCode  OBJECT-TYPE
+    SYNTAX       DisplayString (SIZE (0..128))
+    MAX-ACCESS       read-only
+    STATUS       current
+    DESCRIPTION "The date code of the media device."
+    ::= { portMediaInfoEntry 11 }
+
+-- ifIndex to Optical Parameters Table
+-- Given an ifIndex, this table returns the optical parameters for the ifIndex.
+
+portOpticalMonitoringInfoTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PortOpticalMonitoringInfoEntry
+    MAX-ACCESS      not-accessible
+    STATUS      current
+    DESCRIPTION "This table lists the instrumented parameters of all
+                 optical interfaces."
+    REFERENCE   "ITU recommendations G.783, G.784, G.953"
+    ::= { portMgt 11 }
+
+portOpticalMonitoringInfoEntry  OBJECT-TYPE
+    SYNTAX      PortOpticalMonitoringInfoEntry
+    MAX-ACCESS      not-accessible
+    STATUS      current
+    DESCRIPTION "Only the ifIndices of optical interfaces
+                 whose parameters need to be monitored will
+                 be used to index this table."
+    INDEX       { portOpticalMonitoringInfoIfIndex }
+    ::= { portOpticalMonitoringInfoTable 1 }
+
+PortOpticalMonitoringInfoEntry ::=
+    SEQUENCE  {
+                 portOpticalMonitoringInfoIfIndex
+                                  Integer32,
+                 portOpticalMonitoringInfoTemperature
+                                  DisplayString,
+                 portOpticalMonitoringInfoVcc
+                                  DisplayString,
+                 portOpticalMonitoringInfoTxBiasCurrent
+                                  DisplayString,
+                 portOpticalMonitoringInfoTxPower
+                                  DisplayString,
+                 portOpticalMonitoringInfoRxPower
+                                  DisplayString
+         }
+
+portOpticalMonitoringInfoIfIndex  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS       current
+    DESCRIPTION "ifindex."
+    ::= { portOpticalMonitoringInfoEntry 1 }
+
+portOpticalMonitoringInfoTemperature  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS    current
+    DESCRIPTION "This object holds the value of the transmitter laser
+                 diode temperature for the interface.  This object
+                 indicates the health of the transmitter.
+                 The format is xxx.yyyy C(elcius). If the device supports
+                 ALARM WARNING TRAP, then followed by whether the measured
+                 value is normal, high/low alarm or high/low warning."
+    ::= { portOpticalMonitoringInfoEntry 2 }
+
+portOpticalMonitoringInfoVcc  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS    current
+    DESCRIPTION "This object holds the value of the Vcc. It is measured
+                 in V. If the device supports ALARM WARNING TRAP, then
+                 followed by whether the measured value is normal,
+                 high/low alarm or high/low warning."
+    ::= { portOpticalMonitoringInfoEntry 3 }
+
+portOpticalMonitoringInfoTxBiasCurrent  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS    current
+    DESCRIPTION "Tx Bias Current.  It is measured in mA. If the device
+                 supports ALARM WARNING TRAP, then followed by whether
+                 the measured value is normal, high/low alarm or
+                 high/low warning."
+    ::= { portOpticalMonitoringInfoEntry 4 }
+
+portOpticalMonitoringInfoTxPower  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS    current
+    DESCRIPTION "This object holds the value of the transmitter optical
+                 signal power for the interface, measured in dBm. If the
+                 device supports ALARM WARNING TRAP, then followed by
+                 whether the measured value is normal, high/low alarm
+                 or high/low warning."
+    ::= { portOpticalMonitoringInfoEntry 5 }
+
+portOpticalMonitoringInfoRxPower  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS    current
+    DESCRIPTION "This object holds the value of the receiver optical
+                 signal power for the interface, measured in dBm. If
+                 the device support ALARM WARNING TRAP, then followed
+                 by whether the measured value is normal, high/low alarm
+                 or high/low warning."
+    ::= { portOpticalMonitoringInfoEntry 6 }
+
+--
 -- trunkMgt
 --
 
@@ -1453,6 +1680,29 @@ trunkStatus OBJECT-TYPE
          A trunk created by LACP cannot be manually destroyed
          or (re)configured."
     ::= { trunkEntry 4 }
+
+trunkBalanceMode OBJECT-TYPE
+    SYNTAX  INTEGER
+    {
+        macSrc(1),
+        macDst(2),
+        macSrcDst(3),
+        ipSrc(4),
+        ipDst(5),
+        ipSrcDst(6)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "This defines the load balancing mode of trunks
+                in the system. It may be based on source and/or
+                destination MAC address or IP address.
+                macSrc(1) means source MAC address.
+                macDst(2) means destination MAC address.
+                macSrcDst(3) means source and destination MAC address.
+                ipSrc(4) means source IP address.
+                ipDst(5) means destination IP address.
+                ipSrcDst(6) means source and destination IP address."
+    ::= { trunkMgt 4 }
 
 ---
 --- lacpMgt
@@ -1554,10 +1804,11 @@ StaPortEntry ::= SEQUENCE
     staPortBpduFilter               EnabledStatus,
     staPortRootGuardStatus          EnabledStatus,
     staPortBpduGuardAutoRecovery            EnabledStatus,
-    staPortBpduGuardAutoRecoveryInterval    Unsigned32
+    staPortBpduGuardAutoRecoveryInterval    Unsigned32,
+    staPortTcPropStop               TruthValue
 }
 
--- for MST, RSTP
+-- for MSTP, RSTP
 staPortProtocolMigration OBJECT-TYPE
     SYNTAX      TruthValue
     MAX-ACCESS  read-write
@@ -1743,6 +1994,16 @@ staPortBpduGuardAutoRecoveryInterval    OBJECT-TYPE
     DESCRIPTION "The interval in seconds used by BPDU guard auto recovery
                  mechanism."
     ::= { staPortEntry 20 }
+
+staPortTcPropStop         OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Stop topology change progate on this ifindex.
+         Don't enable on potentially ring port.
+        "
+    ::= { staPortEntry 21 }
 
 staProtocolType OBJECT-TYPE
     SYNTAX      INTEGER {
@@ -2684,6 +2945,134 @@ mirrorStatus OBJECT-TYPE
         ::= { mirrorEntry 4 }
 
 --
+-- rspanMgt
+--
+
+rspanTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF RspanEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "A table that contains the settings of RSPAN."
+        ::= { mirrorMgt 3 }
+
+rspanEntry OBJECT-TYPE
+        SYNTAX      RspanEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The conceptual row of rspanTable."
+        INDEX       { rspanSessionId }
+        ::= { rspanTable 1 }
+
+RspanEntry ::= SEQUENCE
+{
+        rspanSessionId          Integer32,
+        rspanSrcTxPorts         PortList,
+        rspanSrcRxPorts         PortList,
+        rspanDstPort            Integer32,
+        rspanDstPortTag         INTEGER,
+        rspanSwitchRole         INTEGER,
+        rspanRemotePorts        PortList,
+        rspanRemoteVlanId       Integer32,
+        rspanOperStatus         INTEGER,
+        rspanStatus             ValidStatus
+}
+
+rspanSessionId OBJECT-TYPE
+        SYNTAX      Integer32 (1..2)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The session ID that may specify an entry in the table which
+                     contains destination port(s) information."
+        ::= { rspanEntry 1 }
+
+rspanSrcTxPorts OBJECT-TYPE
+        SYNTAX      PortList
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "Specifies the source port list in tx mode."
+        ::= { rspanEntry 2 }
+
+rspanSrcRxPorts OBJECT-TYPE
+        SYNTAX      PortList
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "Specifies the source port list in rx mode."
+        ::= { rspanEntry 3 }
+
+rspanDstPort OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "The port number of a destination port. The interface
+                     identified by a particular value of this index is the same
+                     interface as identified by the same value of ifIndex in the
+                     IF-MIB."
+        ::= { rspanEntry 4 }
+
+rspanDstPortTag OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                        none(1),
+                        untagged(2),
+                        tagged(3)
+                    }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "Specifies the traffic which is sent out from source port
+                     with RSPAN VLAN ID or not."
+        ::= { rspanEntry 5 }
+
+rspanSwitchRole OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                        none(1),
+                        source(2),
+                        intermediate(3),
+                        destination(4)
+                    }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "Specifies the role of current switch."
+        ::= { rspanEntry 6 }
+
+rspanRemotePorts OBJECT-TYPE
+        SYNTAX      PortList
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "Specifies the uplink port list."
+        ::= { rspanEntry 7 }
+
+rspanRemoteVlanId OBJECT-TYPE
+        SYNTAX      Integer32 (1..4094)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "Specifies the ID of a RSPAN VLAN."
+        ::= { rspanEntry 8 }
+
+rspanOperStatus OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                        up(1),
+                        down(2)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The operational status of the entry. A status of up(1)
+                     means the setting of a session is complete and it has
+                     started performing its function. A status of down(2) means
+                     no function is performed because of incompleted session
+                     setting."
+        ::= { rspanEntry 9 }
+
+rspanStatus OBJECT-TYPE
+        SYNTAX      ValidStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "Set this to valid(1) to create an entry. Set this to
+                     invalid(2) to destroy an entry."
+        ::= { rspanEntry 10 }
+
+--
 -- igmpSnoopMgt
 --
 
@@ -3125,6 +3514,305 @@ igmpSnoopMulticastGroupStatus OBJECT-TYPE
     DESCRIPTION
         "The set of ports which are static IGMP member ports."
     ::= { igmpSnoopMulticastGroupEntry 5 }
+
+igmpSnoopFilterStatus OBJECT-TYPE
+    SYNTAX      EnabledStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Parameter to enable or disable IGMP filtering on the device."
+    ::= { igmpSnoopMgt 17 }
+
+igmpSnoopProfileTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF IgmpSnoopProfileEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The table for configuring the IGMP snooping profile."
+        ::= { igmpSnoopMgt 18 }
+
+igmpSnoopProfileEntry OBJECT-TYPE
+        SYNTAX      IgmpSnoopProfileEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The entry for configuring the IGMP snooping profile."
+        INDEX       { igmpSnoopProfileId }
+        ::= { igmpSnoopProfileTable 1 }
+
+IgmpSnoopProfileEntry ::= SEQUENCE
+{
+    igmpSnoopProfileId               Unsigned32,
+    igmpSnoopProfileAction           INTEGER,
+    igmpSnoopProfileStatus           ValidStatus
+}
+
+igmpSnoopProfileId OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The ID of the IGMP snooping profile."
+        ::= { igmpSnoopProfileEntry 1 }
+
+igmpSnoopProfileAction OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    permit(1),
+                    deny(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The access mode of the IGMP snooping profile."
+    DEFVAL      { deny }
+    ::= { igmpSnoopProfileEntry 2 }
+
+igmpSnoopProfileStatus OBJECT-TYPE
+        SYNTAX      ValidStatus
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Setting this to valid(1) creates an entry.
+                     Setting this to invalid(2) destroys an entry."
+        ::= { igmpSnoopProfileEntry 3 }
+
+igmpSnoopProfileCtl      OBJECT IDENTIFIER   ::= { igmpSnoopMgt 19 }
+
+igmpSnoopProfileCtlId OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The ID of the IGMP snooping profile. The default value
+                     is zero, meaning that no ID is specified.  In order to
+                     create a profile, a non-zero value must be specified."
+        ::= { igmpSnoopProfileCtl 1 }
+
+igmpSnoopProfileCtlInetAddressType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The address type is associated with this agent.
+                 Only ipv4(1) type is supported."
+    ::= { igmpSnoopProfileCtl 2 }
+
+igmpSnoopProfileCtlStartInetAddress OBJECT-TYPE
+        SYNTAX      InetAddress
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The specified addresses in the start of the controlled
+                     IP multicast addresses."
+        ::= { igmpSnoopProfileCtl 3 }
+
+igmpSnoopProfileCtlEndInetAddress OBJECT-TYPE
+        SYNTAX      InetAddress
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The specified addresses in the end of the controlled
+                     IP multicast addresses."
+        ::= { igmpSnoopProfileCtl 4 }
+
+igmpSnoopProfileCtlAction OBJECT-TYPE
+        SYNTAX      INTEGER
+        {
+            noAction(1),
+            create(2),
+            destroy(3)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Setting it to create(2) creates the range of the
+                     controlled IP multicast addresses.
+                     Setting it to destroy(3) destroys the range of the
+                     controlled IP multicast addresses.
+                     When the action is completed, this object becomes
+                     noAction(1)."
+        ::= { igmpSnoopProfileCtl 5 }
+
+igmpSnoopProfileRangeTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF IgmpSnoopProfileRangeEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The table for configuring the range of the IGMP snooping
+                     profile."
+        ::= { igmpSnoopMgt 20 }
+
+igmpSnoopProfileRangeEntry OBJECT-TYPE
+        SYNTAX      IgmpSnoopProfileRangeEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The entry for configuring the range of the IGMP snooping
+                     profile."
+        INDEX       { igmpSnoopProfileRangeProfileId,
+                      igmpSnoopProfileRangeInetAddressType,
+                      igmpSnoopProfileRangeStartInetAddress }
+        ::= { igmpSnoopProfileRangeTable 1 }
+
+IgmpSnoopProfileRangeEntry ::= SEQUENCE
+{
+    igmpSnoopProfileRangeProfileId           Unsigned32,
+    igmpSnoopProfileRangeInetAddressType     InetAddressType,
+    igmpSnoopProfileRangeStartInetAddress    InetAddress,
+    igmpSnoopProfileRangeEndInetAddress      InetAddress,
+    igmpSnoopProfileRangeAction              INTEGER
+}
+
+igmpSnoopProfileRangeProfileId  OBJECT-TYPE
+        SYNTAX      Unsigned32 (1..4294967295)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This is defined as igmpSnoopProfileId."
+        ::= { igmpSnoopProfileRangeEntry 1 }
+
+igmpSnoopProfileRangeInetAddressType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "The address type is associated with this agent.
+        Only ipv4(1) type is supported."
+    ::= { igmpSnoopProfileRangeEntry 2 }
+
+igmpSnoopProfileRangeStartInetAddress OBJECT-TYPE
+        SYNTAX      InetAddress
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The specified addresses in the start of the controlled
+                     IP multicast addresses."
+        ::= { igmpSnoopProfileRangeEntry 3 }
+
+igmpSnoopProfileRangeEndInetAddress OBJECT-TYPE
+        SYNTAX      InetAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The specified addresses in the end of the controlled
+                     IP multicast addresses."
+        ::= { igmpSnoopProfileRangeEntry 4 }
+
+igmpSnoopProfileRangeAction OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    permit(1),
+                    deny(2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The access mode of the IGMP snooping profile."
+    DEFVAL      { deny }
+    ::= { igmpSnoopProfileRangeEntry 5 }
+
+igmpSnoopFilterPortTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF IgmpSnoopFilterPortEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Table for port configuration in IGMP filtering."
+        ::= { igmpSnoopMgt 21 }
+
+igmpSnoopFilterPortEntry OBJECT-TYPE
+        SYNTAX      IgmpSnoopFilterPortEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Entry for port configuration in IGMP filtering."
+        INDEX       { igmpSnoopFilterPortIndex }
+        ::= { igmpSnoopFilterPortTable 1 }
+
+IgmpSnoopFilterPortEntry ::= SEQUENCE
+{
+    igmpSnoopFilterPortIndex              Unsigned32,
+    igmpSnoopFilterPortProfileId          Integer32
+}
+
+igmpSnoopFilterPortIndex OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The port and trunk (including trunk members) interface of
+                     the portTable. The interface identified by a particular value
+                     of this index is the same interface identified by the same
+                     value of ifIndex in the IF-MIB."
+        ::= { igmpSnoopFilterPortEntry 1 }
+
+igmpSnoopFilterPortProfileId OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+            "The igmpSnoopProfileEntry identified by a particular value of this index
+             is the same interface identified by the same value of the igmpSnoopProfileId
+             object. If there is no corresponding entry in the igmpSnoopProfileTable,
+             then no association exists. In particular, if this value is zero, no
+             associated profile will be generated, as zero is not a valid profile index."
+        ::= { igmpSnoopFilterPortEntry 2 }
+
+igmpSnoopThrottlePortTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF IgmpSnoopThrottlePortEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Table for port configuration in IGMP throttling."
+        ::= { igmpSnoopMgt 22 }
+
+igmpSnoopThrottlePortEntry OBJECT-TYPE
+        SYNTAX      IgmpSnoopThrottlePortEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Entry for port configuration in IGMP throttling."
+        INDEX       { igmpSnoopThrottlePortIndex }
+        ::= { igmpSnoopThrottlePortTable 1 }
+
+IgmpSnoopThrottlePortEntry ::= SEQUENCE
+{
+    igmpSnoopThrottlePortIndex            Unsigned32,
+    igmpSnoopThrottlePortRunningStatus    INTEGER,
+    igmpSnoopThrottlePortAction           INTEGER,
+    igmpSnoopThrottlePortMaxGroups        Integer32,
+    igmpSnoopThrottlePortCurrentGroups    Integer32
+}
+
+igmpSnoopThrottlePortIndex OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The port and trunk (including trunk members) interface of
+                     the portTable. The interface identified by a particular value
+                     of this index is the same interface identified by the same
+                     value of ifIndex in the IF-MIB."
+        ::= { igmpSnoopThrottlePortEntry 1 }
+
+igmpSnoopThrottlePortRunningStatus OBJECT-TYPE
+        SYNTAX  TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Describes the running status of the IGMP throttling to the switch.
+                     A value of true(1) indicates the IGMP throttling mechanism is active.
+                     A value of false(2) indicates the IGMP throttling mechanism is inactive."
+        ::= { igmpSnoopThrottlePortEntry 2 }
+
+igmpSnoopThrottlePortAction OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    replace(1),
+                    deny(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The action mode of the IGMP throttling. A value of replace(1)
+                 means to replace a joined multicast group randomly when an interface
+                 receives an IGMP report and the number of current joined multicast groups
+                 is equal to the maximum number of IGMP groups that the interface can join.
+                 A value of deny(2) means to deny the IGMP report request when an interface
+                 receives an IGMP report and the number of current joined multicast groups
+                 is equal to the maximum number of IGMP groups that the interface can join."
+    DEFVAL      { deny }
+    ::= { igmpSnoopThrottlePortEntry 3 }
+
+igmpSnoopThrottlePortMaxGroups  OBJECT-TYPE
+        SYNTAX      Integer32(0..256)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The maximum number of IGMP groups that the interface can join."
+        ::= { igmpSnoopThrottlePortEntry 4 }
+
+igmpSnoopThrottlePortCurrentGroups   OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The current number of IGMP groups that the interface has joined."
+        ::= { igmpSnoopThrottlePortEntry 5}
 
 --
 --
@@ -5202,7 +5890,7 @@ macVlanEntry OBJECT-TYPE
 MacVlanEntry ::= SEQUENCE
 {
         macVlanMacAddress       MacAddress,
-        macVlanId               Integer32,
+        macVlanId               VlanId,
         macVlanPriority         Integer32,
         macVlanStatus           ValidStatus
 }
@@ -5216,7 +5904,7 @@ macVlanMacAddress OBJECT-TYPE
         ::= { macVlanEntry 1 }
 
 macVlanId OBJECT-TYPE
-        SYNTAX      Integer32 (1..4092)
+        SYNTAX      VlanId
         MAX-ACCESS  read-create
         STATUS      current
         DESCRIPTION "Specifies the VLAN ID which the MAC address associates
@@ -5339,6 +6027,46 @@ subnetVlanClearAction OBJECT-TYPE
                      cleared. When this object is read, the value of this object
                      is always noClear(1)."
         ::= { vlanMgt 14 }
+
+-- vlanStaticExtTable
+vlanStaticExtTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF VlanStaticExtEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The extension table of dot1qVlanStaticTable. This table
+                     enhances the original table with extra
+                     vlanStaticExtRspanStatus to create and destroy RSPAN
+                     VLAN(s)."
+        ::= { vlanMgt 15 }
+
+vlanStaticExtEntry OBJECT-TYPE
+        SYNTAX      VlanStaticExtEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "A conceptual row in the vlanStaticExtTable."
+        AUGMENTS    { dot1qVlanStaticEntry }
+        ::= { vlanStaticExtTable 1 }
+
+VlanStaticExtEntry ::= SEQUENCE
+{
+        vlanStaticExtRspanStatus  INTEGER
+}
+
+vlanStaticExtRspanStatus OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                        destroy(1),
+                        vlan(2),
+                        rspanVlan(3)
+                    }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "Displays type of a VLAN is vlan(2) or rspanVlan(3). Set
+                     this to destroy(1) to destroy a RSPAN VLAN. Set this to
+                     rspanVlan(3) to create a RSPAN VLAN. Setting this to
+                     vlan(2) is not allowed."
+        ::= { vlanStaticExtEntry 1 }
+
 
 vlanDot1qTunnelGlobalConfig OBJECT IDENTIFIER ::= { vlanMgt 8 }
 
@@ -5773,6 +6501,13 @@ trapLoginIp OBJECT-TYPE
                  indicating the login IP address."
      ::= { trapVar 21 }
 
+trapPortSecurityIntrusionMac OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION "This variable indicates the intrusion MAC address."
+    ::= { trapVar 29 }
+
 --
 -- qosMgt
 --
@@ -5806,10 +6541,10 @@ rateLimitPortEntry OBJECT-TYPE
 RateLimitPortEntry ::= SEQUENCE
 {
     rlPortIndex              Integer32,
-    rlPortInputLimit         Integer32,
-    rlPortOutputLimit        Integer32,
     rlPortInputStatus        EnabledStatus,
-    rlPortOutputStatus       EnabledStatus
+    rlPortOutputStatus       EnabledStatus,
+    rlPortInputLimitInKilo   Integer32,
+    rlPortOutputLimitInKilo  Integer32
 }
 
 rlPortIndex OBJECT-TYPE
@@ -5821,29 +6556,6 @@ rlPortIndex OBJECT-TYPE
                      of this index is the same interface as identified by the same
                      value of ifIndex in the IF-MIB."
         ::= { rateLimitPortEntry 1 }
-
--- non ACD
-rlPortInputLimit OBJECT-TYPE
-        SYNTAX      Integer32
-        MAX-ACCESS  read-write
-        STATUS      current
-        DESCRIPTION "Value of the input rate limit. Its unit is megabits per
-                     second. For a 100 Mbps port, the range is 1 to 100.
-                     For a 1000 Mbps port, the range is 1 to 1000.
-                     For a 10 Gbps port, the range is 1 to 10000."
-        ::= { rateLimitPortEntry 2 }
-
--- non ACD
-rlPortOutputLimit OBJECT-TYPE
-        SYNTAX      Integer32
-        MAX-ACCESS  read-write
-        STATUS      current
-        DESCRIPTION "Value of the output rate limit. Its unit is megabits per
-                     second. For a 100 Mbps port, the range is 1 to 100.
-                     For a 1000 Mbps port, the range is 1 to 1000.
-                     For a 10 Gbps port, the range is 1 to 10000."
-        ::= { rateLimitPortEntry 3 }
-
 
 -- all need (both acd and non-acd)
 rlPortInputStatus OBJECT-TYPE
@@ -5860,6 +6572,24 @@ rlPortOutputStatus OBJECT-TYPE
         STATUS      current
         DESCRIPTION "Whether output rate limit is enabled for this port."
         ::= { rateLimitPortEntry 7 }
+
+rlPortInputLimitInKilo OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Value of the input rate limit. Its unit is kilobits per
+                     second. For a 100 Mbps port, the range is 64 to 100000.
+                     For a 1000 Mbps port, the range is 64 to 1000000."
+        ::= { rateLimitPortEntry 10 }
+
+rlPortOutputLimitInKilo OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Value of the output rate limit. Its unit is kilobits per
+                     second. For a 100 Mbps port, the range is 64 to 100000.
+                     For a 1000 Mbps port, the range is 64 to 1000000."
+        ::= { rateLimitPortEntry 11 }
 
 
 cosMgt        OBJECT IDENTIFIER ::= { qosMgt 3 }
@@ -9876,14 +10606,14 @@ aaaMethodIndex OBJECT-TYPE
         ::= { aaaMethodEntry 1 }
 
 aaaMethodName OBJECT-TYPE
-        SYNTAX       DisplayString(SIZE(1..255))
+        SYNTAX       DisplayString(SIZE(1..64))
         MAX-ACCESS   read-create
         STATUS       current
         DESCRIPTION "Name for the method."
         ::= { aaaMethodEntry 2 }
 
 aaaMethodGroupName OBJECT-TYPE
-        SYNTAX       DisplayString(SIZE(1..255))
+        SYNTAX       DisplayString(SIZE(1..64))
         MAX-ACCESS   read-create
         STATUS       current
         DESCRIPTION "Name for the server to use, pointing to aaaRadiusGroupName
@@ -14401,13 +15131,15 @@ remoteLogServerInetEntry OBJECT-TYPE
         STATUS      current
         DESCRIPTION "A conceptual row for remoteLogServerInetTable."
         INDEX { remoteLogServerInetAddressType,
-                IMPLIED remoteLogServerInetAddress}
+                remoteLogServerInetAddress,
+                remoteLogServerUdpPort}
         ::= { remoteLogServerInetTable 1 }
 
 RemoteLogServerInetEntry ::= SEQUENCE
 {
     remoteLogServerInetAddressType  InetAddressType,
     remoteLogServerInetAddress      InetAddress,
+    remoteLogServerUdpPort          Integer32,
     remoteLogServerStatus ValidStatus
 }
 
@@ -14429,13 +15161,20 @@ remoteLogServerInetAddress OBJECT-TYPE
          DESCRIPTION "The IP address of the remote log Server."
     ::= { remoteLogServerInetEntry 2 }
 
+remoteLogServerUdpPort OBJECT-TYPE
+         SYNTAX      Integer32 (1..65535)
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION  "The UDP port number of the remote log Server"
+         ::= { remoteLogServerInetEntry 3 }
+
 remoteLogServerStatus OBJECT-TYPE
          SYNTAX      ValidStatus
          MAX-ACCESS  read-create
          STATUS      current
          DESCRIPTION  "Setting this to valid(1) creates an entry.
                        Setting this to invalid(2) destroys an entry."
-         ::= { remoteLogServerInetEntry 3 }
+         ::= { remoteLogServerInetEntry 4 }
 
 --
 --smtpMgt
@@ -14607,7 +15346,7 @@ consoleStopBits OBJECT-TYPE
         ::= { consoleMgt 4 }
 
 consoleExecTimeout OBJECT-TYPE
-        SYNTAX      Integer32 (0..65535)
+        SYNTAX      Integer32 (0 | 60..65535)
         MAX-ACCESS  read-write
         STATUS      current
         DESCRIPTION "In a serial console, use the consoleExecTimeout
@@ -14617,7 +15356,7 @@ consoleExecTimeout OBJECT-TYPE
         ::= { consoleMgt 5 }
 
 consolePasswordThreshold OBJECT-TYPE
-        SYNTAX      Integer32 (0..120)
+        SYNTAX      Integer32 (0 | 1..120)
         MAX-ACCESS  read-write
         STATUS      current
         DESCRIPTION "The number of failed console logon attempts that may be
@@ -14627,7 +15366,7 @@ consolePasswordThreshold OBJECT-TYPE
         ::= { consoleMgt 6 }
 
 consoleSilentTime OBJECT-TYPE
-        SYNTAX      Integer32 (0..65535)
+        SYNTAX      Integer32 (0 | 1..65535)
         MAX-ACCESS  read-write
         STATUS      current
         DESCRIPTION "The length of time that the management console is
@@ -14639,11 +15378,10 @@ consoleSilentTime OBJECT-TYPE
 
 --to set login timeout seconds
 consoleLoginResponseTimeout OBJECT-TYPE
-        SYNTAX      Integer32(0..300)
+        SYNTAX      Integer32(10..300)
         MAX-ACCESS  read-write
         STATUS      current
-        DESCRIPTION  "Console login response timeout setting.
-                     Valid range is 0 to 300. Setting to 0 means disabled."
+        DESCRIPTION  "Console login response timeout setting."
         ::= { consoleMgt 10 }
 
 -- telnetMgt
@@ -14669,7 +15407,7 @@ telnetPortNumber OBJECT-TYPE
 -- vtyMgt
 
 vtyExecTimeout OBJECT-TYPE
-    SYNTAX      Integer32 (1..65535)
+    SYNTAX      Integer32 (60..65535)
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION "Specifies the interval that the system waits for user input
@@ -14677,18 +15415,19 @@ vtyExecTimeout OBJECT-TYPE
     ::= { vtyMgt 1 }
 
 vtyPasswordThreshold OBJECT-TYPE
-    SYNTAX      Integer32 (0..120)
+    SYNTAX      Integer32 (0 | 1..120)
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION "The number of failed logon attempts that may be made before the
-                 system will not accept a further attempt to log on."
+                 system will not accept a further attempt to log on.
+                 Setting to 0 means disabled."
     ::= { vtyMgt 2 }
 
 vtyLoginResponseTimeout OBJECT-TYPE
-    SYNTAX      Integer32(0..300)
+    SYNTAX      Integer32(10..300)
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION "Login response timeout setting. Setting to 0 means disabled."
+    DESCRIPTION "Login response timeout setting."
     ::= { vtyMgt 3 }
 
 vtyMaxSession OBJECT-TYPE
@@ -14700,12 +15439,13 @@ vtyMaxSession OBJECT-TYPE
     ::= { vtyMgt 4 }
 
 vtySilentTime OBJECT-TYPE
-    SYNTAX      Integer32 (0..65535)
+    SYNTAX      Integer32 (0 | 1..65535)
     UNITS       "seconds"
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION "The time the system waits before etablishing a new session
-                 after the number of failed logins reaches the specified limit."
+                 after the number of failed logins reaches the specified limit.
+                 Setting to 0 means disabled."
     ::= { vtyMgt 5 }
 
 --
@@ -17585,7 +18325,8 @@ mldSnoopMulticastCurrentEntry OBJECT-TYPE
     STATUS      current
     DESCRIPTION "Entry for current multicast addresses."
     INDEX   { mldSnoopMulticastCurrentVlanIndex,
-              mldSnoopMulticastCurrentIpAddress }
+              mldSnoopMulticastCurrentIpAddress,
+              mldSnoopMulticastCurrentSourceIpAddress }
     ::= {
 mldSnoopMulticastCurrentTable 1 }
 
@@ -17593,6 +18334,7 @@ MldSnoopMulticastCurrentEntry ::=
     SEQUENCE {
         mldSnoopMulticastCurrentVlanIndex Unsigned32,
         mldSnoopMulticastCurrentIpAddress InetAddressIPv6,
+        mldSnoopMulticastCurrentSourceIpAddress InetAddressIPv6,
         mldSnoopMulticastCurrentPorts     PortList
     }
 
@@ -17614,6 +18356,13 @@ mldSnoopMulticastCurrentIpAddress OBJECT-TYPE
     DESCRIPTION "IPv6 address of multicast group."
     ::= { mldSnoopMulticastCurrentEntry 2 }
 
+mldSnoopMulticastCurrentSourceIpAddress OBJECT-TYPE
+    SYNTAX      InetAddressIPv6
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "IPv6 address of the source."
+    ::= { mldSnoopMulticastCurrentEntry 3 }
+
 mldSnoopMulticastCurrentPorts OBJECT-TYPE
     SYNTAX      PortList
     MAX-ACCESS  read-only
@@ -17621,7 +18370,7 @@ mldSnoopMulticastCurrentPorts OBJECT-TYPE
     DESCRIPTION "The set of ports which are members of a multicast group,
                  including static members. Please refer to
                  mldSnoopMulticastStaticTable."
-    ::= { mldSnoopMulticastCurrentEntry 3 }
+    ::= { mldSnoopMulticastCurrentEntry 4 }
 
 mldSnoopMulticastStaticTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF MldSnoopMulticastStaticEntry
@@ -17715,6 +18464,15 @@ mldSnoopCurrentVlanImmediateLeave OBJECT-TYPE
 --
 -- sFlowMgt
 --
+
+sFlowStatus OBJECT-TYPE
+        SYNTAX      EnabledStatus
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Set this to enabled(1) to enable global sFlow, and set
+                     this to disabled(2) to disable global sFlow."
+        ::= { sFlowMgt 1 }
+
 sFlowPortTable OBJECT-TYPE
         SYNTAX      SEQUENCE OF SFlowPortEntry
         MAX-ACCESS  not-accessible
@@ -18187,7 +18945,8 @@ erpsDomainWestRingPort OBJECT-TYPE
 
                  The interface identified by a particular value of this index
                  is the same interface as identified by the same value of
-                 ifIndex in the IF-MIB."
+                 ifIndex in the IF-MIB. A value of 0 means no west ring port
+                 configured for this domain."
     ::= { erpsDomainEntry 5 }
 
 erpsDomainEastRingPort OBJECT-TYPE
@@ -18201,7 +18960,8 @@ erpsDomainEastRingPort OBJECT-TYPE
 
                  The interface identified by a particular value of this index
                  is the same interface as identified by the same value of
-                 ifIndex in the IF-MIB."
+                 ifIndex in the IF-MIB. A value of 0 means no east ring port
+                 configured for this domain."
     ::= { erpsDomainEntry 6 }
 
 erpsDomainRplOwner OBJECT-TYPE
@@ -18274,7 +19034,8 @@ erpsDomainControlVlanID OBJECT-TYPE
     DESCRIPTION "This is defined as dot1qVlanIndex in the Q-BRIDGE-MIB.
                  Configures one control VLAN for each ERPS domain. The control
                  VLAN is used only to send and receive ERPS message. A control
-                 VLAN can not belong to more than on ERPS domain."
+                 VLAN can not belong to more than one ERPS domain. A value of 0
+                 means no control VLAN configured for this domain."
     ::= { erpsDomainEntry 12 }
 
 erpsDomainNodeState OBJECT-TYPE
