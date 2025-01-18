@@ -38,6 +38,9 @@ use SnmpQuery;
 
 class Edgecos extends OS implements TransceiverDiscovery, MempoolsDiscovery, ProcessorDiscovery
 {
+	public $entPhysicalDescr;
+    public $entPhysicalModelName;
+	
     public function discoverTransceivers(): Collection
     {
         $ifIndexToPortId = $this->getDevice()->ports()->pluck('port_id', 'ifIndex');
