@@ -41,7 +41,7 @@ class Port
      * Get a port from an ifIndex.
      * Must be constrained to a device, when $device is null, use primary device
      */
-    public function getByIfIndex(int $ifIndex, \App\Models\Device|int|null $device = null): ?\App\Models\Port
+    public function getByIfIndex(int|string|null $ifIndex, \App\Models\Device|int|null $device = null): ?\App\Models\Port
     {
         return $this->get((int) $this->getIdFromIfIndex($ifIndex, $device));
     }
@@ -59,9 +59,10 @@ class Port
      * Get a port_id from an ifIndex.
      * Must be constrained to a device, when $device is null, use primary device
      */
-    public function getIdFromIfIndex(int $ifIndex, \App\Models\Device|int|null $device = null): ?int
+    public function getIdFromIfIndex(int|string|null $ifIndex, \App\Models\Device|int|null $device = null): ?int
     {
         $device_id = $this->deviceToId($device);
+        $ifIndex = (int) $ifIndex;
 
         if (! array_key_exists($device_id, $this->ifIndexMaps)) {
             $this->ifIndexMaps[$device_id] = \App\Models\Port::where('device_id', $device_id)->pluck('port_id', 'ifIndex')->all();
