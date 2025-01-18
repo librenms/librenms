@@ -25,7 +25,6 @@
 
 namespace LibreNMS\OS;
 
-
 use App\Models\Mempool;
 use App\Models\Processor;
 use App\Models\Transceiver;
@@ -37,8 +36,7 @@ use LibreNMS\OS;
 use SnmpQuery;
 
 class Edgecos extends OS implements TransceiverDiscovery, MempoolsDiscovery, ProcessorDiscovery
-{
-	
+{	
     public function discoverTransceivers(): Collection
     {
         $ifIndexToPortId = $this->getDevice()->ports()->pluck('port_id', 'ifIndex');
@@ -86,8 +84,8 @@ class Edgecos extends OS implements TransceiverDiscovery, MempoolsDiscovery, Pro
 
         $inventory->each(function ($entry) use ($extra) {
             if (isset($entry->entPhysicalIndex)) {
-                $entry->entPhysicalDescr = $extra[$entry->entPhysicalIndex]['ECS4120-MIB::portMediaInfoVendorName'] ?? '';
-                $entry->entPhysicalModelName = $extra[$entry->entPhysicalIndex]['ECS4120-MIB::portMediaInfoPartNumber'] ?? '';
+                $entry->entPhysicalDescr = $extra[$entry->entPhysicalIndex]['ECS4120-MIB::portMediaInfoIfIndex'] ?? '';
+                $entry->entPhysicalModelName = $extra[$entry->entPhysicalIndex]['ECS4120-MIB::portMediaInfoIfIndex'] ?? '';
             }
         });
 
