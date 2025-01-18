@@ -19,7 +19,7 @@ jobs:
       matrix:
         include:
           -
-            php-version: 8.3
+            php-version: 8.3.15
             name: Unit
             skip-web-check: 1
             database: mariadb:10.5
