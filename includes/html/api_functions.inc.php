@@ -18,7 +18,11 @@ use App\Models\Device;
 use App\Models\DeviceGroup;
 use App\Models\DeviceOutage;
 use App\Models\Eventlog;
+use App\Models\Ipv4Address;
+use App\Models\Ipv6Address;
 use App\Models\Ipv4Mac;
+use App\Models\Ipv4Network;
+use App\Models\Ipv6Network;
 use App\Models\Location;
 use App\Models\MplsSap;
 use App\Models\MplsService;
@@ -2827,6 +2831,26 @@ function list_ip_addresses()
     return api_success(array_merge($ipv4_addresses, $ipv6_addresses), 'ip_addresses');
 }
 
+function list_ipv4_addresses(Illuminate\Http\Request $request)
+{
+    $ipv4_addresses = Ipv4Address::hasAccess(Auth::user())->get();
+    if ($ipv4_addresses->isEmpty()) {
+        return api_error(404, 'IPv4 Addresses do not exist');
+    }
+
+    return api_success($ipv4_addresses, 'ipv4_addresses', null, 200, $ipv4_addresses->count());
+}
+
+function list_ipv6_addresses(Illuminate\Http\Request $request)
+{
+    $ipv6_addresses = Ipv6Address::hasAccess(Auth::user())->get();
+    if ($ipv6_addresses->isEmpty()) {
+        return api_error(404, 'IPv6 Addresses do not exist');
+    }
+
+    return api_success($ipv6_addresses, 'ipv6_addresses', null, 200, $ipv6_addresses->count());
+}
+
 function list_ip_networks()
 {
     $ipv4_networks = dbFetchRows('SELECT * FROM `ipv4_networks`');
@@ -2837,6 +2861,26 @@ function list_ip_networks()
     }
 
     return api_success(array_merge($ipv4_networks, $ipv6_networks), 'ip_networks');
+}
+
+function list_ipv4_networks(Illuminate\Http\Request $request)
+{
+    $ipv4_networks = Ipv4Network::get();
+    if ($ipv4_networks->isEmpty()) {
+        return api_error(404, 'IPv4 Networks do not exist');
+    }
+
+    return api_success($ipv4_networks, 'ipv4_networks', null, 200, $ipv4_networks->count());
+}
+
+function list_ipv6_networks(Illuminate\Http\Request $request)
+{
+    $ipv6_networks = Ipv6Network::get();
+    if ($ipv6_networks->isEmpty()) {
+        return api_error(404, 'IPv6 Networks do not exist');
+    }
+
+    return api_success($ipv6_networks, 'ipv6_networks', null, 200, $ipv6_networks->count());
 }
 
 function list_arp(Illuminate\Http\Request $request)
