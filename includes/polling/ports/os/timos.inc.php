@@ -24,7 +24,7 @@
  */
 
 // get all virtual router ports and statistics
-$timos_vrf_stats = SnmpQuery::abortOnFailure()->walk([
+$timos_vrf_stats = SnmpQuery::enumStrings()->abortOnFailure()->walk([
     'TIMETRA-VRTR-MIB::vRtrIfName',
     'TIMETRA-VRTR-MIB::vRtrIfAlias',
     'TIMETRA-VRTR-MIB::vRtrIfDescription',

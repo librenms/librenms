@@ -49,7 +49,7 @@ if (! empty($peers)) {
     } elseif ($device['os'] === 'dell-os10') {
         $peer_data_check = snmpwalk_cache_oid($device, 'os10bgp4V2PeerRemoteAs', [], 'DELLEMC-OS10-BGP4V2-MIB', 'dell'); // practically identical MIB as arista
     } elseif ($device['os'] === 'timos') {
-        $peer_data_check = SnmpQuery::enumStrings()->hideMib()->abortOnFailure()->walk([
+        $peer_data_check = SnmpQuery::enumStrings()->numericIndex()->abortOnFailure()->walk([
             'TIMETRA-BGP-MIB::tBgpPeerNgTable',
             'TIMETRA-BGP-MIB::tBgpPeerNgOperTable',
         ])->valuesByIndex();
@@ -227,10 +227,11 @@ if (! empty($peers)) {
                     unset($peer_data['bgpPeerLastError']);
                 } elseif ($device['os'] == 'timos') {
                     if (! isset($bgpPeers)) {
+                        $bgpPeers = [];
                         foreach ($peer_data_check as $key => $value) {
                             $oid = explode('.', $key);
                             $vrfInstance = $oid[0];
-                            $address = str_replace($oid[0] . '.' . $oid[1] . '.', '', $key);
+                            $address = implode('.', array_slice($oid, 3));
                             if (strlen($address) > 15) {
                                 $address = IP::fromHexString($address)->compressed();
                             }
@@ -238,20 +239,17 @@ if (! empty($peers)) {
                         }
                     }
                     $address = (string) $peer_ip;
-                    $tmpTime = $bgpPeers[$vrfOid][$address]['tBgpPeerNgLastChanged'];
-                    $tmpTime = explode('.', $tmpTime);
-                    $tmpTime = explode(':', $tmpTime[0]);
-                    $establishedTime = ($tmpTime[0] * 86400) + ($tmpTime[1] * 3600) + ($tmpTime[2] * 60) + $tmpTime[3];
+                    $establishedTime = $bgpPeers[$vrfOid][$address]['TIMETRA-BGP-MIB::tBgpPeerNgLastChanged'] / 100;
 
                     $peer_data = [];
-                    $peer_data['bgpPeerState'] = $bgpPeers[$vrfOid][$address]['tBgpPeerNgConnState'];
-                    if ($bgpPeers[$vrfOid][$address]['tBgpPeerNgShutdown'] == '1') {
+                    $peer_data['bgpPeerState'] = $bgpPeers[$vrfOid][$address]['TIMETRA-BGP-MIB::tBgpPeerNgConnState'];
+                    if ($bgpPeers[$vrfOid][$address]['TIMETRA-BGP-MIB::tBgpPeerNgShutdown'] == '1') {
                         $peer_data['bgpPeerAdminStatus'] = 'adminShutdown';
                     } else {
-                        $peer_data['bgpPeerAdminStatus'] = $bgpPeers[$vrfOid][$address]['tBgpPeerNgOperLastEvent'];
+                        $peer_data['bgpPeerAdminStatus'] = $bgpPeers[$vrfOid][$address]['TIMETRA-BGP-MIB::tBgpPeerNgOperLastEvent'];
                     }
-                    $peer_data['bgpPeerInTotalMessages'] = $bgpPeers[$vrfOid][$address]['tBgpPeerNgOperMsgOctetsRcvd'] % (2 ** 32);  // That are actually only octets available,
-                    $peer_data['bgpPeerOutTotalMessages'] = $bgpPeers[$vrfOid][$address]['tBgpPeerNgOperMsgOctetsSent'] % (2 ** 32); // not messages
+                    $peer_data['bgpPeerInTotalMessages'] = $bgpPeers[$vrfOid][$address]['TIMETRA-BGP-MIB::tBgpPeerNgOperMsgOctetsRcvd'] % (2 ** 32);  // That are actually only octets available,
+                    $peer_data['bgpPeerOutTotalMessages'] = $bgpPeers[$vrfOid][$address]['TIMETRA-BGP-MIB::tBgpPeerNgOperMsgOctetsSent'] % (2 ** 32); // not messages
                     $peer_data['bgpPeerFsmEstablishedTime'] = $establishedTime;
                 } elseif ($device['os'] == 'firebrick') {
                     // ToDo, It seems that bgpPeer(In|Out)Updates and bgpPeerInUpdateElapsedTime are actually not available over SNMP
