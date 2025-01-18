@@ -25,6 +25,7 @@
 
 namespace LibreNMS\OS;
 
+use App\Models\Device;
 use App\Models\Mempool;
 use App\Models\Processor;
 use App\Models\Transceiver;
