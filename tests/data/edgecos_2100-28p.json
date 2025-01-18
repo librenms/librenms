@@ -3,14 +3,14 @@
         "discovery": {
             "devices": [
                 {
-                    "sysName": "<private>",
+                    "sysName": "EdgeCore",
                     "sysObjectID": ".1.3.6.1.4.1.259.10.1.43.105",
                     "sysDescr": "ECS2100-28P",
-                    "sysContact": "<private>",
+                    "sysContact": null,
                     "version": "R01 1.2.2.17",
                     "hardware": "ECS2100-28P",
                     "features": null,
-                    "location": "<private>",
+                    "location": null,
                     "os": "edgecos",
                     "type": "network",
                     "serial": "EC1806001051",

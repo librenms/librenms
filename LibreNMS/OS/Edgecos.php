@@ -25,7 +25,7 @@
 
 namespace LibreNMS\OS;
 
-use App\Models\Device;
+
 use App\Models\Mempool;
 use App\Models\Processor;
 use App\Models\Transceiver;
@@ -38,8 +38,6 @@ use SnmpQuery;
 
 class Edgecos extends OS implements TransceiverDiscovery, MempoolsDiscovery, ProcessorDiscovery
 {
-	public $entPhysicalDescr;
-    public $entPhysicalModelName;
 	
     public function discoverTransceivers(): Collection
     {
