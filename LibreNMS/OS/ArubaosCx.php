@@ -56,7 +56,7 @@ class ArubaosCx extends \LibreNMS\OS implements NacPolling
                 $rowSet[$macKey]['authz_status'] = '';
                 $rowSet[$macKey]['username'] = $macEntry['arubaWiredPacUserName'] ?? '';
                 $rowSet[$macKey]['vlan'] = $macEntry['arubaWiredPacVlanId'] ?? null;
-                $rowSet[$macKey]['port_id'] = (int) PortCache::getIdfromIfName($ifName, $this->getDevice());
+                $rowSet[$macKey]['port_id'] = (int) PortCache::getIdFromIfName($ifName, $this->getDevice());
                 $rowSet[$macKey]['auth_id'] = $ifName;
                 $rowSet[$macKey]['method'] = $macEntry['arubaWiredPacOnboardedMethods'] ?? '';
             }

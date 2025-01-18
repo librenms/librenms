@@ -470,7 +470,7 @@ class Cisco extends OS implements
                 $mac_address = Mac::parse($portAuthSessionEntryParameters['cafSessionClientMacAddress'])->hex();
 
                 $nac->put($mac_address, new PortsNac([
-                    'port_id' => (int) PortCache::getIdFromIfIndex($ifIndex, $this->getDevice()),
+                    'port_id' => (int) PortCache::getIdFromIfIndex((int) $ifIndex, $this->getDevice()),
                     'mac_address' => $mac_address,
                     'auth_id' => $auth_id,
                     'domain' => $portAuthSessionEntryParameters['cafSessionDomain'] ?? '',

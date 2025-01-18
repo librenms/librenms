@@ -81,7 +81,11 @@ class Port
             $this->ifNameMaps[$device_id] = \App\Models\Port::where('device_id', $device_id)->pluck('port_id', 'ifName')->all();
         }
 
-        return $this->ifNameMaps[$device_id][$ifName] ?? null;
+        if(isset($this->ifNameMaps[$device_id][$ifName])) {
+            return (int) $this->ifNameMaps[$device_id][$ifName];
+        }
+
+        return null;
     }
 
     /**
@@ -119,7 +123,11 @@ class Port
             }
         }
 
-        return $this->ipMaps[$device_id][$ip_string];
+        if (isset($this->ipMaps[$device_id][$ip_string])) {
+            return $this->ipMaps[$device_id][$ip_string];
+        }
+
+        return null;
     }
 
     public function getNameFromIfIndex(int $ifIndex, \App\Models\Device|int|null $device = null): ?string
