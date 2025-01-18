@@ -82,7 +82,7 @@ class Port
             $this->ifNameMaps[$device_id] = \App\Models\Port::where('device_id', $device_id)->pluck('port_id', 'ifName')->all();
         }
 
-        if(isset($this->ifNameMaps[$device_id][$ifName])) {
+        if (isset($this->ifNameMaps[$device_id][$ifName])) {
             return (int) $this->ifNameMaps[$device_id][$ifName];
         }
 
